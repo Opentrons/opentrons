@@ -45,12 +45,21 @@ export function getModuleUnderLabware(
     .reverse()[0]
   const newLocation = moveLabwareStep?.newLocation
 
-  return values(initialDeckSetup.modules).find(
-    (moduleOnDeck: ModuleOnDeck) =>
-      (newLocation != null
-        ? newLocation
-        : initialDeckSetup.labware[labwareId]?.slot) === moduleOnDeck.id
-  )
+  return values(initialDeckSetup.modules).find((moduleOnDeck: ModuleOnDeck) => {
+    const labwareSlot = initialDeckSetup.labware[labwareId]?.slot
+    let location
+    if (newLocation != null) {
+      location = newLocation
+    } else if (
+      labwareSlot != null &&
+      initialDeckSetup.labware[labwareSlot] != null
+    ) {
+      location = initialDeckSetup.labware[labwareSlot].slot
+    } else {
+      location = labwareSlot
+    }
+    return location === moduleOnDeck.id
+  })
 }
 export function getModuleLabwareOptions(
   initialDeckSetup: InitialDeckSetup,

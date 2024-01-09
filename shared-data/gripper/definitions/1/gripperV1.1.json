@@ -10,6 +10,7 @@
       [2, 0.0135956]
     ],
     "defaultGripForce": 15.0,
+    "defaultIdleForce": 10.0,
     "defaultHomeForce": 12.0,
     "min": 2.0,
     "max": 30.0
@@ -22,6 +23,7 @@
     "jawWidth": {
       "min": 60.0,
       "max": 92.0
-    }
+    },
+    "maxAllowedGripError": 6.0
   }
 }

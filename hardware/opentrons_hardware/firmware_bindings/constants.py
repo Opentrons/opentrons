@@ -154,6 +154,9 @@ class MessageId(int, Enum):
     set_gripper_error_tolerance = 0x47
     gripper_jaw_state_request = 0x48
     gripper_jaw_state_response = 0x49
+    set_gripper_jaw_holdoff_request = 0x401
+    gripper_jaw_holdoff_request = 0x402
+    gripper_jaw_holdoff_response = 0x403
 
     acknowledgement = 0x50
 

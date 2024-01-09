@@ -19,12 +19,16 @@ import {
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
   LabwareDefinition2,
   ModuleType,
+  ModuleModel,
+  getModuleType,
+  THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import { SPAN7_8_10_11_SLOT } from '../../constants'
 import {
   getLabwareIsCompatible as _getLabwareIsCompatible,
   getLabwareCompatibleWithAdapter,
+  ADAPTER_96_CHANNEL,
 } from '../../utils/labwareModuleCompatibility'
 import { getOnlyLatestDefs } from '../../labware-defs/utils'
 import { Portal } from '../portals/TopPortal'
@@ -34,8 +38,9 @@ import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import { LabwareItem } from './LabwareItem'
 import { LabwarePreview } from './LabwarePreview'
 import styles from './styles.css'
-import { DeckSlot } from '../../types'
-import { LabwareDefByDefURI } from '../../labware-defs'
+
+import type { DeckSlot } from '../../types'
+import type { LabwareDefByDefURI } from '../../labware-defs'
 
 export interface Props {
   onClose: (e?: any) => unknown
@@ -46,11 +51,12 @@ export interface Props {
   slot?: DeckSlot | null
   /** if adding to a module, the slot of the parent (for display) */
   parentSlot?: DeckSlot | null
-  /** if adding to a module, the module's type */
-  moduleType?: ModuleType | null
+  /** if adding to a module, the module's model */
+  moduleModel?: ModuleModel | null
   /** tipracks that may be added to deck (depends on pipette<>tiprack assignment) */
   permittedTipracks: string[]
   isNextToHeaterShaker: boolean
+  has96Channel: boolean
   adapterLoadName?: string
 }
 
@@ -78,13 +84,17 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
     'opentrons_24_aluminumblock_nest_2ml_screwcap',
     'opentrons_24_aluminumblock_nest_2ml_snapcap',
     'opentrons_24_aluminumblock_nest_0.5ml_screwcap',
+    'opentrons_aluminum_flat_bottom_plate',
   ],
   [MAGNETIC_MODULE_TYPE]: [
     'nest_96_wellplate_100ul_pcr_full_skirt',
     'nest_96_wellplate_2ml_deep',
     'opentrons_96_wellplate_200ul_pcr_full_skirt',
   ],
-  [THERMOCYCLER_MODULE_TYPE]: ['nest_96_wellplate_100ul_pcr_full_skirt'],
+  [THERMOCYCLER_MODULE_TYPE]: [
+    'nest_96_wellplate_100ul_pcr_full_skirt',
+    'opentrons_96_wellplate_200ul_pcr_full_skirt',
+  ],
   [HEATERSHAKER_MODULE_TYPE]: [
     'opentrons_96_deep_well_adapter',
     'opentrons_96_flat_bottom_adapter',
@@ -100,14 +110,23 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
 
 export const getLabwareIsRecommended = (
   def: LabwareDefinition2,
-  moduleType?: ModuleType | null
-): boolean =>
-  moduleType
-    ? RECOMMENDED_LABWARE_BY_MODULE[moduleType].includes(
-        def.parameters.loadName
-      )
-    : false
-
+  moduleModel?: ModuleModel | null
+): boolean => {
+  //  special-casing the thermocycler module V2 recommended labware
+  //  since its different from V1
+  const moduleType = moduleModel != null ? getModuleType(moduleModel) : null
+  if (moduleModel === THERMOCYCLER_MODULE_V2) {
+    return (
+      def.parameters.loadName === 'opentrons_96_wellplate_200ul_pcr_full_skirt'
+    )
+  } else {
+    return moduleType != null
+      ? RECOMMENDED_LABWARE_BY_MODULE[moduleType].includes(
+          def.parameters.loadName
+        )
+      : false
+  }
+}
 export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
   const {
     customLabwareDefs,
@@ -116,12 +135,15 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
     onUploadLabware,
     slot,
     parentSlot,
-    moduleType,
+    moduleModel,
     selectLabware,
     isNextToHeaterShaker,
     adapterLoadName,
+    has96Channel,
   } = props
   const defs = getOnlyLatestDefs()
+  const moduleType = moduleModel != null ? getModuleType(moduleModel) : null
+  const URIs = Object.keys(defs)
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(
     null
   )
@@ -185,21 +207,30 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
 
   const getIsLabwareFiltered = React.useCallback(
     (labwareDef: LabwareDefinition2) => {
-      const smallXDimension = labwareDef.dimensions.xDimension < 127.75
-      const smallYDimension = labwareDef.dimensions.yDimension < 85.48
-      const irregularSize = smallXDimension && smallYDimension
-      const adapter = labwareDef.metadata.displayCategory === 'adapter'
+      const { dimensions, parameters } = labwareDef
+      const { xDimension, yDimension } = dimensions
+
+      const isSmallXDimension = xDimension < 127.75
+      const isSmallYDimension = yDimension < 85.48
+      const isIrregularSize = isSmallXDimension && isSmallYDimension
+
+      const isAdapter = labwareDef.allowedRoles?.includes('adapter')
+      const isAdapter96Channel = parameters.loadName === ADAPTER_96_CHANNEL
 
       return (
         (filterRecommended &&
-          !getLabwareIsRecommended(labwareDef, moduleType)) ||
+          !getLabwareIsRecommended(labwareDef, moduleModel)) ||
         (filterHeight &&
           getIsLabwareAboveHeight(
             labwareDef,
             MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM
           )) ||
         !getLabwareCompatible(labwareDef) ||
-        (adapter && irregularSize && !slot?.includes(HEATERSHAKER_MODULE_TYPE))
+        (isAdapter &&
+          isIrregularSize &&
+          !slot?.includes(HEATERSHAKER_MODULE_TYPE)) ||
+        (isAdapter96Channel && !has96Channel) ||
+        (slot === 'offDeck' && isAdapter)
       )
     },
     [filterRecommended, filterHeight, getLabwareCompatible, moduleType, slot]
@@ -225,6 +256,24 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
     return `Slot ${slot} Labware`
   }
 
+  const getLabwareAdapterItem = (
+    index: number,
+    labwareDefUri?: string
+  ): JSX.Element | null => {
+    const labwareDef = labwareDefUri != null ? defs[labwareDefUri] : null
+    return labwareDef != null ? (
+      <LabwareItem
+        key={`${labwareDef.parameters.loadName}_${index}`}
+        icon="check-decagram"
+        labwareDef={labwareDef}
+        selectLabware={selectLabware}
+        onMouseEnter={() => setPreviewedLabware(labwareDef)}
+        // @ts-expect-error(sa, 2021-6-22): setPreviewedLabware expects an argument (even if nullsy)
+        onMouseLeave={() => setPreviewedLabware()}
+      />
+    ) : null
+  }
+
   const customLabwareURIs: string[] = React.useMemo(
     () => Object.keys(customLabwareDefs),
     [customLabwareDefs]
@@ -238,13 +287,10 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
       defs,
       (acc, def: typeof defs[keyof typeof defs]) => {
         const category: string = def.metadata.displayCategory
-        //  filter out non-permitted tipracks +
-        //  temporarily filtering out 96-channel adapter until we support
-        //  96-channel
+        //  filter out non-permitted tipracks
         if (
-          (category === 'tipRack' &&
-            !permittedTipracks.includes(getLabwareDefURI(def))) ||
-          def.parameters.loadName === 'opentrons_flex_96_tiprack_adapter'
+          category === 'tipRack' &&
+          !permittedTipracks.includes(getLabwareDefURI(def))
         ) {
           return acc
         }
@@ -334,7 +380,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
     typeof LabwarePreview
   >['moduleCompatibility'] = null
   if (previewedLabware && moduleType) {
-    if (getLabwareIsRecommended(previewedLabware, moduleType)) {
+    if (getLabwareIsRecommended(previewedLabware, moduleModel)) {
       moduleCompatibility = 'recommended'
     } else if (getLabwareCompatible(previewedLabware)) {
       moduleCompatibility = 'potentiallyCompatible'
@@ -342,6 +388,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
       moduleCompatibility = 'notCompatible'
     }
   }
+
   return (
     <>
       <Portal>
@@ -351,7 +398,11 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
         />
       </Portal>
       {blockingCustomLabwareHint}
-      <div ref={wrapperRef} className={styles.labware_dropdown}>
+      <div
+        ref={wrapperRef}
+        className={styles.labware_dropdown}
+        style={{ zIndex: 5 }}
+      >
         <div className={styles.title}>{getTitleText()}</div>
         {getFilterCheckbox()}
         <ul>
@@ -396,7 +447,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
                           <LabwareItem
                             key={index}
                             icon={
-                              getLabwareIsRecommended(labwareDef, moduleType)
+                              getLabwareIsRecommended(labwareDef, moduleModel)
                                 ? 'check-decagram'
                                 : null
                             }
@@ -415,6 +466,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
             })
           ) : (
             <PDTitledList
+              data-testid="LabwareSelectionModal_adapterCompatibleLabware"
               key={adapterCompatibleLabware}
               title="adapter compatible labware"
               collapsed={selectedCategory !== adapterCompatibleLabware}
@@ -422,30 +474,21 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
               onClick={makeToggleCategory(adapterCompatibleLabware)}
               inert={false}
             >
-              {getLabwareCompatibleWithAdapter(adapterLoadName).map(
-                (adapterDefUri, index) => {
-                  const latestDefs = getOnlyLatestDefs()
-                  const Uris = Object.keys(latestDefs)
-                  const labwareDefUri = Uris.find(
-                    defUri => defUri === adapterDefUri
-                  )
-                  const labwareDef = labwareDefUri
-                    ? latestDefs[labwareDefUri]
-                    : null
-
-                  return labwareDef != null ? (
-                    <LabwareItem
-                      key={index}
-                      icon="check-decagram"
-                      labwareDef={labwareDef}
-                      selectLabware={selectLabware}
-                      onMouseEnter={() => setPreviewedLabware(labwareDef)}
-                      // @ts-expect-error(sa, 2021-6-22): setPreviewedLabware expects an argument (even if nullsy)
-                      onMouseLeave={() => setPreviewedLabware()}
-                    />
-                  ) : null
-                }
-              )}
+              {has96Channel && adapterLoadName === ADAPTER_96_CHANNEL
+                ? permittedTipracks.map((tiprackDefUri, index) => {
+                    const labwareDefUri = URIs.find(
+                      defUri => defUri === tiprackDefUri
+                    )
+                    return getLabwareAdapterItem(index, labwareDefUri)
+                  })
+                : getLabwareCompatibleWithAdapter(adapterLoadName).map(
+                    (adapterDefUri, index) => {
+                      const labwareDefUri = URIs.find(
+                        defUri => defUri === adapterDefUri
+                      )
+                      return getLabwareAdapterItem(index, labwareDefUri)
+                    }
+                  )}
             </PDTitledList>
           )}
         </ul>

@@ -18,11 +18,11 @@ import {
   DISPLAY_FLEX,
   DIRECTION_COLUMN,
   ALIGN_FLEX_START,
-  TYPOGRAPHY,
-  JUSTIFY_SPACE_BETWEEN,
-  Link,
   Icon,
   PrimaryButton,
+  JUSTIFY_SPACE_BETWEEN,
+  TYPOGRAPHY,
+  Link,
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
@@ -35,6 +35,10 @@ import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent
 import type { RunCommandSummary, RunData } from '@opentrons/api-client'
 import type { IconName } from '@opentrons/components'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import { useRobotType } from '../Devices/hooks'
+
+const LEARN_ABOUT_MANUAL_STEPS_URL =
+  'https://support.opentrons.com/s/article/Manual-protocol-steps'
 
 const BASE_STYLE = {
   position: POSITION_ABSOLUTE,
@@ -105,6 +109,7 @@ export function InterventionModal({
   const { t } = useTranslation(['protocol_command_text', 'protocol_info'])
   const isOnDevice = useSelector(getIsOnDevice)
 
+  const robotType = useRobotType(robotName)
   const childContent = React.useMemo(() => {
     if (
       command.commandType === 'waitForResume' ||
@@ -119,7 +124,7 @@ export function InterventionModal({
     } else if (command.commandType === 'moveLabware') {
       return (
         <MoveLabwareInterventionContent
-          {...{ command, run, analysis }}
+          {...{ command, run, analysis, robotType }}
           isOnDevice={isOnDevice}
         />
       )
@@ -204,7 +209,11 @@ export function InterventionModal({
           <Box {...CONTENT_STYLE}>
             {childContent}
             <Box {...FOOTER_STYLE}>
-              <Link css={TYPOGRAPHY.darkLinkH4SemiBold} href="" external>
+              <Link
+                css={TYPOGRAPHY.darkLinkH4SemiBold}
+                href={LEARN_ABOUT_MANUAL_STEPS_URL}
+                external
+              >
                 {t('protocol_info:manual_steps_learn_more')}
                 <Icon
                   name="open-in-new"

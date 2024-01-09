@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { resetAllWhenMocks } from 'jest-when'
+import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../redux/config'
@@ -33,6 +34,8 @@ describe('ResultsSummary', () => {
       protocolData: mockCompletedAnalysis,
       workingOffsets: mockWorkingOffsets,
       existingOffsets: mockExistingOffsets,
+      isApplyingOffsets: false,
+      isDeletingMaintenanceRun: false,
       handleApplyOffsets: jest.fn(),
     }
   })
@@ -51,8 +54,24 @@ describe('ResultsSummary', () => {
   })
   it('calls handle apply offsets function when button is clicked', () => {
     const { getByRole } = render(props)
-    getByRole('button', { name: 'Apply offsets' }).click()
+    fireEvent.click(getByRole('button', { name: 'Apply offsets' }))
     expect(props.handleApplyOffsets).toHaveBeenCalled()
+  })
+  it('does disables the CTA to apply offsets when offsets are already being applied', () => {
+    props.isApplyingOffsets = true
+    const { getByRole } = render(props)
+    const button = getByRole('button', { name: 'Apply offsets' })
+    expect(button).toBeDisabled()
+    fireEvent.click(button)
+    expect(props.handleApplyOffsets).not.toHaveBeenCalled()
+  })
+  it('does disables the CTA to apply offsets when the maintenance run is being deleted', () => {
+    props.isDeletingMaintenanceRun = true
+    const { getByRole } = render(props)
+    const button = getByRole('button', { name: 'Apply offsets' })
+    expect(button).toBeDisabled()
+    fireEvent.click(button)
+    expect(props.handleApplyOffsets).not.toHaveBeenCalled()
   })
   it('renders a row per offset to apply', () => {
     const { getByRole, queryAllByRole } = render(props)

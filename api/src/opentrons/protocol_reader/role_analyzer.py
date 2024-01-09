@@ -40,7 +40,9 @@ class RoleAnalyzer:
         This validates that there is exactly one main protocol file.
         """
         if len(files) == 0:
-            raise RoleAnalysisError("No files were provided.")
+            raise RoleAnalysisError(
+                message="No files were provided.", detail={"kind": "no-files"}
+            )
 
         main_file_candidates: List[Union[IdentifiedJsonMain, IdentifiedPythonMain]] = []
         labware_files: List[IdentifiedLabwareDefinition] = []
@@ -57,17 +59,22 @@ class RoleAnalyzer:
         if len(main_file_candidates) == 0:
             if len(files) == 1:
                 raise RoleAnalysisError(
-                    f'"{files[0].original_file.name}" is not a valid protocol file.'
+                    message=f'"{files[0].original_file.name}" is not a valid protocol file.',
+                    detail={"kind": "protocol-does-not-have-main"},
                 )
             else:
                 file_list = ", ".join(f'"{f.original_file.name}"' for f in files)
-                raise RoleAnalysisError(f"No valid protocol file found in {file_list}.")
+                raise RoleAnalysisError(
+                    message=f"No valid protocol file found in {file_list}.",
+                    detail={"kind": "protocol-does-not-have-main"},
+                )
         elif len(main_file_candidates) > 1:
             file_list = ", ".join(
                 f'"{f.original_file.name}"' for f in main_file_candidates
             )
             raise RoleAnalysisError(
-                f"Could not pick single main file from {file_list}."
+                message=f"Could not pick single main file from {file_list}.",
+                detail={"kind": "multiple-main-candidates"},
             )
         else:
             main_file = main_file_candidates[0]

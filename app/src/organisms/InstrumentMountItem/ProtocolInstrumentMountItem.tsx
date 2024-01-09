@@ -14,7 +14,6 @@ import {
   JUSTIFY_FLEX_START,
 } from '@opentrons/components'
 import {
-  CompletedProtocolAnalysis,
   getGripperDisplayName,
   getPipetteNameSpecs,
   NINETY_SIX_CHANNEL,
@@ -27,11 +26,7 @@ import { FLOWS } from '../PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../PipetteWizardFlows'
 import { GripperWizardFlows } from '../GripperWizardFlows'
 
-import type {
-  InstrumentData,
-  PipetteOffsetCalibration,
-  GripperData,
-} from '@opentrons/api-client'
+import type { InstrumentData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
 import type { Mount } from '../../redux/pipettes/types'
 
@@ -51,12 +46,7 @@ export const MountItem = styled.div<{ isReady: boolean }>`
 `
 interface ProtocolInstrumentMountItemProps {
   mount: Mount | 'extension'
-  mostRecentAnalysis?: CompletedProtocolAnalysis | null
   attachedInstrument: InstrumentData | null
-  attachedCalibrationData:
-    | PipetteOffsetCalibration
-    | GripperData['data']['calibratedOffset']
-    | null
   speccedName: PipetteName | GripperModel
   instrumentsRefetch?: () => void
 }
@@ -64,7 +54,7 @@ export function ProtocolInstrumentMountItem(
   props: ProtocolInstrumentMountItemProps
 ): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
-  const { mount, attachedInstrument, speccedName, mostRecentAnalysis } = props
+  const { mount, attachedInstrument, speccedName } = props
   const [
     showPipetteWizardFlow,
     setShowPipetteWizardFlow,
@@ -114,7 +104,7 @@ export function ProtocolInstrumentMountItem(
           gridGap={SPACING.spacing24}
         >
           <Flex
-            flex={isAttachedWithCal ? 1 : 2}
+            flex="2"
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing4}
           >
@@ -165,6 +155,15 @@ export function ProtocolInstrumentMountItem(
               />
             </Flex>
           )}
+          {isAttachedWithCal && (
+            <Flex flex="1">
+              <SmallButton
+                onClick={handleCalibrate}
+                buttonText={i18n.format(t('recalibrate'), 'capitalize')}
+                buttonCategory="rounded"
+              />
+            </Flex>
+          )}
         </Flex>
       </MountItem>
       {showPipetteWizardFlow ? (
@@ -173,7 +172,6 @@ export function ProtocolInstrumentMountItem(
           closeFlow={() => setShowPipetteWizardFlow(false)}
           selectedPipette={selectedPipette}
           mount={mount as Mount}
-          pipetteInfo={mostRecentAnalysis?.pipettes}
           onComplete={props.instrumentsRefetch}
         />
       ) : null}

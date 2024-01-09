@@ -5,11 +5,15 @@ import { Tooltip, useHoverTooltip, TOOLTIP_FIXED } from '@opentrons/components'
 import {
   getLabwareDisplayName,
   getModuleDisplayName,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+import { i18n } from '../../localization'
 import {
+  getAdditionalEquipmentEntities,
   getLabwareEntities,
   getModuleEntities,
 } from '../../step-forms/selectors'
+import { getHasWasteChute } from '../labware'
 import { PDListItem } from '../lists'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
 
@@ -21,11 +25,13 @@ interface MoveLabwareHeaderProps {
   useGripper: boolean
 }
 
-//  TODO(jr, 7/31/23): add text to i18n
 export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
   const { sourceLabwareNickname, destinationSlot, useGripper } = props
   const moduleEntities = useSelector(getModuleEntities)
   const labwareEntities = useSelector(getLabwareEntities)
+  const additionalEquipmentEntities = useSelector(
+    getAdditionalEquipmentEntities
+  )
 
   const [sourceTargetProps, sourceTooltipProps] = useHoverTooltip({
     placement: 'bottom-start',
@@ -39,7 +45,7 @@ export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
 
   let destSlot: string | null | undefined = null
   if (destinationSlot === 'offDeck') {
-    destSlot = 'off deck'
+    destSlot = 'off-deck'
   } else if (
     destinationSlot != null &&
     moduleEntities[destinationSlot] != null
@@ -50,18 +56,27 @@ export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
     labwareEntities[destinationSlot] != null
   ) {
     destSlot = getLabwareDisplayName(labwareEntities[destinationSlot].def)
+  } else if (
+    getHasWasteChute(additionalEquipmentEntities) &&
+    destinationSlot === WASTE_CHUTE_CUTOUT
+  ) {
+    destSlot = i18n.t('application.waste_chute_slot')
   } else {
     destSlot = destinationSlot
   }
   return (
     <>
       <li className={styles.substep_header}>
-        <span>{useGripper ? 'With gripper' : 'Manually'} </span>
+        <span>
+          {useGripper
+            ? i18n.t('application.with_gripper')
+            : i18n.t('application.manually')}
+        </span>
       </li>
       <li className={styles.substep_header}>
-        <span>LABWARE</span>
+        <span>{i18n.t('application.labware')}</span>
         <span className={styles.spacer} />
-        <span>NEW LOCATION</span>
+        <span>{i18n.t('application.new_location')}</span>
       </li>
 
       <Tooltip {...sourceTooltipProps}>

@@ -9,7 +9,7 @@ else:
     import importlib_metadata as metadata  # type: ignore[no-redef]
 
 try:
-    version: str = metadata.version("system_server")  # type: ignore[attr-defined]
+    version: str = metadata.version("system_server")
 except Exception as e:
     logging.warning(
         "Could not determine version for system_server, may be dev install, using 0.0.0-dev"

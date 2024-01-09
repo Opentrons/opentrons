@@ -44,7 +44,6 @@ async def _time_status() -> Dict[str, Union[str, bool]]:
         "timedatectl show",
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
-        loop=asyncio.get_event_loop(),
     )
     out, err = await proc.communicate()
     return _str_to_dict(out.decode())
@@ -60,7 +59,6 @@ async def _set_time(time: str) -> Tuple[str, str]:
         f'date --utc --set "{time}"',
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
-        loop=asyncio.get_event_loop(),
     )
     out, err = await proc.communicate()
     return out.decode(), err.decode()

@@ -133,29 +133,29 @@ class LabwareSetup:
     def get_close_button(self) -> WebElement:
         """Locator for close button."""
         toggle: WebElement = self.base.clickable_wrapper(LabwareSetup.close_button)
-        actions = ActionChains(self.base.driver)  # type: ignore
-        actions.move_to_element(toggle).perform()  # type: ignore
+        actions = ActionChains(self.base.driver)
+        actions.move_to_element(toggle).perform()
         return toggle
 
     def click_close_button(self) -> None:
         """Click close button."""
         toggle: WebElement = self.base.clickable_wrapper(LabwareSetup.close_button)
-        actions = ActionChains(self.base.driver)  # type: ignore
-        actions.move_to_element(toggle).perform()  # type: ignore
+        actions = ActionChains(self.base.driver)
+        actions.move_to_element(toggle).perform()
         self.base.click(LabwareSetup.close_button)
 
     def get_proceed_to_run_button(self) -> WebElement:
         """Locator for proceed to run button."""
         scroll: WebElement = self.base.clickable_wrapper(LabwareSetup.proceed_to_run_button)
-        actions = ActionChains(self.base.driver)  # type: ignore
-        actions.move_to_element(scroll).perform()  # type: ignore
+        actions = ActionChains(self.base.driver)
+        actions.move_to_element(scroll).perform()
         return scroll
 
     def click_proceed_to_run_button(self) -> None:
         """Click proceed to run."""
         scroll: WebElement = self.base.clickable_wrapper(LabwareSetup.proceed_to_run_button)
-        actions = ActionChains(self.base.driver)  # type: ignore
-        actions.move_to_element(scroll).perform()  # type: ignore
+        actions = ActionChains(self.base.driver)
+        actions.move_to_element(scroll).perform()
         self.base.click(LabwareSetup.proceed_to_run_button)
 
     def get_start_run_button(self) -> WebElement:

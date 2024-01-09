@@ -8,6 +8,7 @@ from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 from ..types import DeckSlotLocation, ModuleModel, ModuleDefinition
 
 if TYPE_CHECKING:
+    from ..state import StateView
     from ..execution import EquipmentHandler
 
 
@@ -95,21 +96,32 @@ class LoadModuleResult(BaseModel):
 class LoadModuleImplementation(AbstractCommandImpl[LoadModuleParams, LoadModuleResult]):
     """The implementation of the load module command."""
 
-    def __init__(self, equipment: EquipmentHandler, **kwargs: object) -> None:
+    def __init__(
+        self, equipment: EquipmentHandler, state_view: StateView, **kwargs: object
+    ) -> None:
         self._equipment = equipment
+        self._state_view = state_view
 
     async def execute(self, params: LoadModuleParams) -> LoadModuleResult:
         """Check that the requested module is attached and assign its identifier."""
+        self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
+            params.location.slotName.id
+        )
+
+        verified_location = self._state_view.geometry.ensure_location_not_occupied(
+            params.location
+        )
+
         if params.model == ModuleModel.MAGNETIC_BLOCK_V1:
             loaded_module = await self._equipment.load_magnetic_block(
                 model=params.model,
-                location=params.location,
+                location=verified_location,
                 module_id=params.moduleId,
             )
         else:
             loaded_module = await self._equipment.load_module(
                 model=params.model,
-                location=params.location,
+                location=verified_location,
                 module_id=params.moduleId,
             )
 

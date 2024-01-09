@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation, Trans } from 'react-i18next'
-import capitalize from 'lodash/capitalize'
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -20,14 +20,15 @@ import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface UpdateResultsModalProps {
   isSuccess: boolean
-  closeModal: () => void
+  shouldExit: boolean
+  onClose: () => void
   instrument?: InstrumentData
 }
 
 export function UpdateResultsModal(
   props: UpdateResultsModalProps
 ): JSX.Element {
-  const { isSuccess, closeModal, instrument } = props
+  const { isSuccess, shouldExit, onClose, instrument } = props
   const { i18n, t } = useTranslation(['firmware_update', 'shared'])
 
   const updateFailedHeader: ModalHeaderBaseProps = {
@@ -35,18 +36,29 @@ export function UpdateResultsModal(
     iconName: 'ot-alert',
     iconColor: COLORS.red2,
   }
-
+  let instrumentName = 'instrument'
+  if (instrument?.ok) {
+    instrumentName =
+      instrument?.instrumentType === 'pipette'
+        ? getPipetteModelSpecs(instrument.instrumentModel)?.displayName ??
+          'pipette'
+        : 'Flex Gripper'
+  }
   return (
     <>
-      {!isSuccess || instrument?.ok !== true ? (
+      {!isSuccess ? (
         <Modal header={updateFailedHeader}>
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText as="p" marginBottom={SPACING.spacing32}>
               {t('download_logs')}
             </StyledText>
             <SmallButton
-              onClick={() => closeModal()}
-              buttonText={i18n.format(t('shared:close'), 'capitalize')}
+              onClick={onClose}
+              buttonText={
+                shouldExit
+                  ? i18n.format(t('shared:close'), 'capitalize')
+                  : t('shared:next')
+              }
               width="100%"
             />
           </Flex>
@@ -88,9 +100,7 @@ export function UpdateResultsModal(
                   t={t}
                   i18nKey="ready_to_use"
                   values={{
-                    instrument: capitalize(
-                      instrument?.instrumentModel ?? 'instrument'
-                    ),
+                    instrument: instrumentName,
                   }}
                   components={{
                     bold: <strong />,
@@ -99,8 +109,12 @@ export function UpdateResultsModal(
               </StyledText>
             </Flex>
             <SmallButton
-              onClick={() => closeModal()}
-              buttonText={i18n.format(t('shared:close'), 'capitalize')}
+              onClick={onClose}
+              buttonText={
+                shouldExit
+                  ? i18n.format(t('shared:close'), 'capitalize')
+                  : t('shared:next')
+              }
               width="100%"
             />
           </Flex>

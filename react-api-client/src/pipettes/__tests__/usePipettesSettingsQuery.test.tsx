@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook, waitFor } from '@testing-library/react'
 import {
   getPipetteSettings,
   pipetteSettingsResponseFixture,
@@ -14,6 +14,7 @@ import type {
   PipetteSettings,
   Response,
 } from '@opentrons/api-client'
+import type { UsePipetteSettingsQueryOptions } from '../usePipetteSettingsQuery'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
@@ -26,11 +27,15 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
 describe('usePipetteSettingsQuery hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<
+    { children: React.ReactNode } & UsePipetteSettingsQueryOptions
+  >
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<
+      { children: React.ReactNode } & UsePipetteSettingsQueryOptions
+    > = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -66,12 +71,12 @@ describe('usePipetteSettingsQuery hook', () => {
         data: pipetteSettingsResponseFixture as any,
       } as Response<PipetteSettings>)
 
-    const { result, waitFor } = renderHook(usePipetteSettingsQuery, {
+    const { result } = renderHook(usePipetteSettingsQuery, {
       wrapper,
     })
 
-    await waitFor(() => result.current.data != null)
-
-    expect(result.current.data).toEqual(pipetteSettingsResponseFixture)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(pipetteSettingsResponseFixture)
+    })
   })
 })

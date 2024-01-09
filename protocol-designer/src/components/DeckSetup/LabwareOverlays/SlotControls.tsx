@@ -1,17 +1,16 @@
 import assert from 'assert'
 import * as React from 'react'
-import { Icon, RobotCoordsForeignDiv } from '@opentrons/components'
-import { DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd'
-import cx from 'classnames'
 import { connect } from 'react-redux'
 import noop from 'lodash/noop'
+import { DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd'
+import cx from 'classnames'
+import { Icon, RobotCoordsForeignDiv } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import { DND_TYPES } from '../../../constants'
 import {
   getLabwareIsCompatible,
   getLabwareIsCustom,
 } from '../../../utils/labwareModuleCompatibility'
-import { BlockedSlot } from './BlockedSlot'
 import {
   moveDeckItem,
   openAddLabwareModal,
@@ -21,13 +20,15 @@ import {
   selectors as labwareDefSelectors,
 } from '../../../labware-defs'
 import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../../../steplist'
+import { BlockedSlot } from './BlockedSlot'
 
-import { BaseState, DeckSlot, ThunkDispatch } from '../../../types'
-import { LabwareOnDeck } from '../../../step-forms'
-import {
-  DeckSlot as DeckSlotDefinition,
+import type {
+  CoordinateTuple,
+  Dimensions,
   ModuleType,
 } from '@opentrons/shared-data'
+import type { BaseState, DeckSlot, ThunkDispatch } from '../../../types'
+import type { LabwareOnDeck } from '../../../step-forms'
 import styles from './LabwareOverlays.css'
 
 interface DNDP {
@@ -38,7 +39,10 @@ interface DNDP {
 }
 
 interface OP {
-  slot: DeckSlotDefinition & { id: DeckSlot } // NOTE: Ian 2019-10-22 make slot `id` more restrictive when used in PD
+  slotPosition: CoordinateTuple | null
+  slotBoundingBox: Dimensions
+  //  NOTE: slotId can be either AddressableAreaName or moduleId
+  slotId: string
   moduleType: ModuleType | null
   selectedTerminalItemId?: TerminalItemId | null
   handleDragHover?: () => unknown
@@ -59,7 +63,8 @@ export const SlotControlsComponent = (
   props: SlotControlsProps
 ): JSX.Element | null => {
   const {
-    slot,
+    slotBoundingBox,
+    slotPosition,
     addLabware,
     selectedTerminalItemId,
     isOver,
@@ -71,7 +76,8 @@ export const SlotControlsComponent = (
   } = props
   if (
     selectedTerminalItemId !== START_TERMINAL_ITEM_ID ||
-    (itemType !== DND_TYPES.LABWARE && itemType !== null)
+    (itemType !== DND_TYPES.LABWARE && itemType !== null) ||
+    slotPosition == null
   )
     return null
 
@@ -107,18 +113,18 @@ export const SlotControlsComponent = (
     <g>
       {slotBlocked ? (
         <BlockedSlot
-          x={slot.position[0]}
-          y={slot.position[1]}
-          width={slot.boundingBox.xDimension}
-          height={slot.boundingBox.yDimension}
+          x={slotPosition[0]}
+          y={slotPosition[1]}
+          width={slotBoundingBox.xDimension}
+          height={slotBoundingBox.yDimension}
           message="MODULE_INCOMPATIBLE_SINGLE_LABWARE"
         />
       ) : (
         <RobotCoordsForeignDiv
-          x={slot.position[0]}
-          y={slot.position[1]}
-          width={slot.boundingBox.xDimension}
-          height={slot.boundingBox.yDimension}
+          x={slotPosition[0]}
+          y={slotPosition[1]}
+          width={slotBoundingBox.xDimension}
+          height={slotBoundingBox.yDimension}
           innerDivProps={{
             className: cx(styles.slot_overlay, styles.appear_on_mouseover, {
               [styles.appear]: isOver,
@@ -146,7 +152,7 @@ const mapDispatchToProps = (
   dispatch: ThunkDispatch<any>,
   ownProps: OP
 ): DP => ({
-  addLabware: () => dispatch(openAddLabwareModal({ slot: ownProps.slot.id })),
+  addLabware: () => dispatch(openAddLabwareModal({ slot: ownProps.slotId })),
   moveDeckItem: (sourceSlot, destSlot) =>
     dispatch(moveDeckItem(sourceSlot, destSlot)),
 })
@@ -155,7 +161,7 @@ const slotTarget = {
   drop: (props: SlotControlsProps, monitor: DropTargetMonitor) => {
     const draggedItem = monitor.getItem()
     if (draggedItem) {
-      props.moveDeckItem(draggedItem.labwareOnDeck.slot, props.slot.id)
+      props.moveDeckItem(draggedItem.labwareOnDeck.slot, props.slotId)
     }
   },
   hover: (props: SlotControlsProps) => {
@@ -185,6 +191,7 @@ const collectSlotTarget = (
   connect: DropTargetConnector,
   monitor: DropTargetMonitor
 ): React.ReactNode => ({
+  // @ts-expect-error(BC, 12-13-2023): react dnd needs to be updated or removed to include proper type
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver(),
   draggedItem: monitor.getItem(),

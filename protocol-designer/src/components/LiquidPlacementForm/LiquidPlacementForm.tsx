@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Formik, FormikProps } from 'formik'
+import { Formik } from 'formik'
 import * as Yup from 'yup'
 // TODO: Ian 2018-10-19 move the processors out of steplist (chore)
 import * as fieldProcessors from '../../steplist/fieldLevel/processing'
@@ -122,7 +122,7 @@ export class LiquidPlacementForm extends React.Component<Props> {
             setFieldValue,
             touched,
             values,
-          }: FormikProps<LiquidPlacementFormValues>) => (
+          }) => (
             <form onSubmit={handleSubmit}>
               <div className={styles.field_row}>
                 <FormGroup

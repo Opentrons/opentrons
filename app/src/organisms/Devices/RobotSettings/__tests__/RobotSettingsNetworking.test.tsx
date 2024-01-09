@@ -17,12 +17,13 @@ import {
   useWifiList,
 } from '../../../../resources/networking/hooks'
 import * as Fixtures from '../../../../redux/networking/__fixtures__'
-import { useIsOT3, useIsRobotBusy } from '../../hooks'
+import { useIsFlex, useIsRobotBusy } from '../../hooks'
 import { DisconnectModal } from '../ConnectNetwork/DisconnectModal'
 import { RobotSettingsNetworking } from '../RobotSettingsNetworking'
 
 import type { DiscoveryClientRobotAddress } from '../../../../redux/discovery/types'
 import type { State } from '../../../../redux/types'
+import { fireEvent, screen } from '@testing-library/react'
 
 jest.mock('../../../../redux/discovery/selectors')
 jest.mock('../../../../redux/networking')
@@ -44,7 +45,7 @@ const mockUseCanDisconnect = useCanDisconnect as jest.MockedFunction<
   typeof useCanDisconnect
 >
 
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
   typeof useIsRobotBusy
 >
@@ -114,7 +115,7 @@ describe('RobotSettingsNetworking', () => {
       .calledWith(ROBOT_NAME, 10000)
       .mockReturnValue(mockWifiList)
 
-    when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(false)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(false)
     when(mockUseIsRobotBusy).calledWith({ poll: true }).mockReturnValue(false)
     when(mockUseCanDisconnect).calledWith(ROBOT_NAME).mockReturnValue(false)
     mockDisconnectModal.mockReturnValue(<div>mock disconnect modal</div>)
@@ -127,35 +128,43 @@ describe('RobotSettingsNetworking', () => {
 
   it('should render title and description for OT-2', () => {
     when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue(mockWifiList)
-    const [{ getByText, getByTestId, queryByRole, queryByText }] = render()
-    getByText('Wi-Fi - foo')
-    getByText('Wired USB')
-    getByText('Learn about connecting to a robot via USB')
-    getByText('Looking for USB-to-Ethernet Adapter info?')
-    getByText('Go to Advanced App Settings')
+    render()
+    screen.getByText('Wi-Fi - foo')
+    screen.getByText('Wired USB')
+    screen.getByText('Learn about connecting to a robot via USB')
+    screen.getByText('Looking for USB-to-Ethernet Adapter info?')
+    screen.getByText('Go to Advanced App Settings')
     expect(
-      getByTestId('RobotSettings_Networking_wifi_icon')
+      screen.getByTestId('RobotSettings_Networking_wifi_icon')
     ).toBeInTheDocument()
-    expect(getByTestId('RobotSettings_Networking_usb_icon')).toBeInTheDocument()
-    expect(queryByText('Wi-Fi - bar')).not.toBeInTheDocument()
-    expect(queryByRole('button', { name: 'Disconnect from Wi-Fi' })).toBeNull()
+    expect(
+      screen.getByTestId('RobotSettings_Networking_usb_icon')
+    ).toBeInTheDocument()
+    expect(screen.queryByText('Wi-Fi - bar')).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Disconnect from Wi-Fi' })
+    ).toBeNull()
   })
 
-  it('should render title and description for OT-3', () => {
+  it('should render title and description for Flex', () => {
     when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue(mockWifiList)
-    when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)
-    const [{ getByText, queryByText }] = render()
-    getByText('Wi-Fi - foo')
-    getByText('Ethernet')
-    getByText('USB')
-    expect(queryByText('Learn about connecting to a robot via USB')).toBeNull()
-    expect(queryByText('Looking for USB-to-Ethernet Adapter info?')).toBeNull()
-    expect(queryByText('Go to Advanced App Settings')).toBeNull()
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
+    render()
+    screen.getByText('Wi-Fi - foo')
+    screen.getByText('Ethernet')
+    screen.getByText('USB')
+    expect(
+      screen.queryByText('Learn about connecting to a robot via USB')
+    ).toBeNull()
+    expect(
+      screen.queryByText('Looking for USB-to-Ethernet Adapter info?')
+    ).toBeNull()
+    expect(screen.queryByText('Go to Advanced App Settings')).toBeNull()
   })
 
-  it('should render USB connection message for OT-3 when connected via USB', () => {
+  it('should render USB connection message for Flex when connected via USB', () => {
     when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue(mockWifiList)
-    when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
     when(mockGetRobotAddressesByName)
       .calledWith({} as State, ROBOT_NAME)
       .mockReturnValue([
@@ -165,34 +174,36 @@ describe('RobotSettingsNetworking', () => {
         } as DiscoveryClientRobotAddress,
       ])
 
-    const [{ getByText }] = render()
-    getByText('Directly connected to this computer.')
+    render()
+    screen.getByText('Directly connected to this computer.')
   })
 
   it('should render Wi-Fi mock data and ethernet mock data for OT-2', () => {
     when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue(mockWifiList)
-    const [{ getByText, getByTestId, queryByText, queryAllByTestId }] = render()
-    getByText('Wi-Fi - foo')
-    getByText('Wired USB')
-    getByText('Wireless IP')
-    getByText('Wireless Subnet Mask')
-    getByText('Wireless MAC Address')
-    getByText('127.0.0.100')
-    getByText('255.255.255.230')
-    getByText('WI:FI:00:00:00:00')
-    getByText('Wired IP')
-    getByText('Wired Subnet Mask')
-    getByText('Wired MAC Address')
-    getByText('127.0.0.101')
-    getByText('255.255.255.231')
-    getByText('US:B0:00:00:00:00')
-    expect(queryByText('Wi-Fi - bar')).not.toBeInTheDocument()
+    render()
+    screen.getByText('Wi-Fi - foo')
+    screen.getByText('Wired USB')
+    screen.getByText('Wireless IP')
+    screen.getByText('Wireless Subnet Mask')
+    screen.getByText('Wireless MAC Address')
+    screen.getByText('127.0.0.100')
+    screen.getByText('255.255.255.230')
+    screen.getByText('WI:FI:00:00:00:00')
+    screen.getByText('Wired IP')
+    screen.getByText('Wired Subnet Mask')
+    screen.getByText('Wired MAC Address')
+    screen.getByText('127.0.0.101')
+    screen.getByText('255.255.255.231')
+    screen.getByText('US:B0:00:00:00:00')
+    expect(screen.queryByText('Wi-Fi - bar')).not.toBeInTheDocument()
     expect(
-      getByTestId('RobotSettings_Networking_wifi_icon')
+      screen.getByTestId('RobotSettings_Networking_wifi_icon')
     ).toBeInTheDocument()
-    expect(getByTestId('RobotSettings_Networking_usb_icon')).toBeInTheDocument()
     expect(
-      queryAllByTestId('RobotSettings_Networking_check_circle')
+      screen.getByTestId('RobotSettings_Networking_usb_icon')
+    ).toBeInTheDocument()
+    expect(
+      screen.queryAllByTestId('RobotSettings_Networking_check_circle')
     ).toHaveLength(2)
   })
 
@@ -215,23 +226,25 @@ describe('RobotSettingsNetworking', () => {
           healthStatus: HEALTH_STATUS_OK,
         } as DiscoveryClientRobotAddress,
       ])
-    const [{ getByText, getByTestId, queryByText, queryAllByTestId }] = render()
-    getByText('Wi-Fi - foo')
-    getByText('Wireless IP')
-    getByText('Wireless Subnet Mask')
-    getByText('Wireless MAC Address')
-    getByText('1.2.3.4')
-    getByText('255.255.255.123')
-    getByText('00:00:00:00:00:00')
-    getByText('Wired USB')
-    getByText('Not connected via wired USB')
-    expect(queryByText('Wi-Fi - bar')).not.toBeInTheDocument()
+    render()
+    screen.getByText('Wi-Fi - foo')
+    screen.getByText('Wireless IP')
+    screen.getByText('Wireless Subnet Mask')
+    screen.getByText('Wireless MAC Address')
+    screen.getByText('1.2.3.4')
+    screen.getByText('255.255.255.123')
+    screen.getByText('00:00:00:00:00:00')
+    screen.getByText('Wired USB')
+    screen.getByText('Not connected via wired USB')
+    expect(screen.queryByText('Wi-Fi - bar')).not.toBeInTheDocument()
     expect(
-      getByTestId('RobotSettings_Networking_wifi_icon')
+      screen.getByTestId('RobotSettings_Networking_wifi_icon')
     ).toBeInTheDocument()
-    expect(getByTestId('RobotSettings_Networking_usb_icon')).toBeInTheDocument()
     expect(
-      queryAllByTestId('RobotSettings_Networking_check_circle')
+      screen.getByTestId('RobotSettings_Networking_usb_icon')
+    ).toBeInTheDocument()
+    expect(
+      screen.queryAllByTestId('RobotSettings_Networking_check_circle')
     ).toHaveLength(1)
   })
 
@@ -257,22 +270,24 @@ describe('RobotSettingsNetworking', () => {
         } as DiscoveryClientRobotAddress,
       ])
     when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue([])
-    const [{ getByText, getByTestId, queryAllByTestId }] = render()
+    render()
 
-    getByText('Wired USB')
-    getByText('Wired IP')
-    getByText('Wired Subnet Mask')
-    getByText('Wired MAC Address')
-    getByText('5.6.7.8')
-    getByText('255.255.255.124')
-    getByText('00:00:00:00:00:00')
-    getByText('Wi-Fi - foo')
+    screen.getByText('Wired USB')
+    screen.getByText('Wired IP')
+    screen.getByText('Wired Subnet Mask')
+    screen.getByText('Wired MAC Address')
+    screen.getByText('5.6.7.8')
+    screen.getByText('255.255.255.124')
+    screen.getByText('00:00:00:00:00:00')
+    screen.getByText('Wi-Fi - foo')
     expect(
-      getByTestId('RobotSettings_Networking_wifi_icon')
+      screen.getByTestId('RobotSettings_Networking_wifi_icon')
     ).toBeInTheDocument()
-    expect(getByTestId('RobotSettings_Networking_usb_icon')).toBeInTheDocument()
     expect(
-      queryAllByTestId('RobotSettings_Networking_check_circle')
+      screen.getByTestId('RobotSettings_Networking_usb_icon')
+    ).toBeInTheDocument()
+    expect(
+      screen.queryAllByTestId('RobotSettings_Networking_check_circle')
     ).toHaveLength(1)
   })
 
@@ -284,20 +299,20 @@ describe('RobotSettingsNetworking', () => {
         ethernet: null,
       })
     when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue([])
-    const [{ getByText, queryByText, queryAllByTestId }] = render()
+    render()
 
-    expect(queryByText('Wireless IP')).not.toBeInTheDocument()
-    expect(queryByText('Wireless Subnet Mask')).not.toBeInTheDocument()
-    expect(queryByText('Wireless MAC Address')).not.toBeInTheDocument()
-    expect(queryByText('Wired IP')).not.toBeInTheDocument()
-    expect(queryByText('Wired Subnet Mask')).not.toBeInTheDocument()
-    expect(queryByText('Wired MAC Address')).not.toBeInTheDocument()
+    expect(screen.queryByText('Wireless IP')).not.toBeInTheDocument()
+    expect(screen.queryByText('Wireless Subnet Mask')).not.toBeInTheDocument()
+    expect(screen.queryByText('Wireless MAC Address')).not.toBeInTheDocument()
+    expect(screen.queryByText('Wired IP')).not.toBeInTheDocument()
+    expect(screen.queryByText('Wired Subnet Mask')).not.toBeInTheDocument()
+    expect(screen.queryByText('Wired MAC Address')).not.toBeInTheDocument()
     expect(
-      queryAllByTestId('RobotSettings_Networking_check_circle')
+      screen.queryAllByTestId('RobotSettings_Networking_check_circle')
     ).toHaveLength(0)
-    getByText('Wi-Fi - foo')
-    getByText('Wired USB')
-    getByText('Not connected via wired USB')
+    screen.getByText('Wi-Fi - foo')
+    screen.getByText('Wired USB')
+    screen.getByText('Not connected via wired USB')
   })
 
   it('should render the right links to external resource and internal resource for OT-2', () => {
@@ -305,30 +320,35 @@ describe('RobotSettingsNetworking', () => {
     const usbExternalLink =
       'https://support.opentrons.com/s/article/Get-started-Connect-to-your-OT-2-over-USB'
     const usbInternalLink = '/app-settings/advanced'
-    const [{ getByText }] = render()
-    const externalLink = getByText('Learn about connecting to a robot via USB')
-    const internalLink = getByText('Go to Advanced App Settings')
-    expect(externalLink.closest('a')).toHaveAttribute('href', usbExternalLink)
-    expect(internalLink.closest('a')).toHaveAttribute('href', usbInternalLink)
+    render()
+    const externalLink = screen.getByText(
+      'Learn about connecting to a robot via USB'
+    )
+    const internalLink = screen.getByText('Go to Advanced App Settings')
+    expect(externalLink).toHaveAttribute('href', usbExternalLink)
+    expect(internalLink).toHaveAttribute('href', usbInternalLink)
   })
 
   it('should render Disconnect from Wi-Fi button when robot can disconnect and is not busy', () => {
     when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue([])
     when(mockUseCanDisconnect).calledWith(ROBOT_NAME).mockReturnValue(true)
-    const [{ getByRole, getByText, queryByText }] = render()
-
-    expect(queryByText('mock disconnect modal')).toBeNull()
-    getByRole('button', { name: 'Disconnect from Wi-Fi' }).click()
-    getByText('mock disconnect modal')
+    render()
+    expect(screen.queryByText('mock disconnect modal')).toBeNull()
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Disconnect from Wi-Fi' })
+    )
+    screen.getByText('mock disconnect modal')
   })
 
   it('should not render Disconnect from Wi-Fi button when robot is busy', () => {
     when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue([])
     when(mockUseCanDisconnect).calledWith(ROBOT_NAME).mockReturnValue(true)
     when(mockUseIsRobotBusy).calledWith({ poll: true }).mockReturnValue(true)
-    const [{ queryByRole }] = render()
+    render()
 
-    expect(queryByRole('button', { name: 'Disconnect from Wi-Fi' })).toBeNull()
+    expect(
+      screen.queryByRole('button', { name: 'Disconnect from Wi-Fi' })
+    ).toBeNull()
   })
 
   it('should not render connected check circles when discovery client cannot find a healthy robot at its network connection ip addresses', () => {
@@ -345,28 +365,30 @@ describe('RobotSettingsNetworking', () => {
           healthStatus: HEALTH_STATUS_NOT_OK,
         } as DiscoveryClientRobotAddress,
       ])
-    const [{ getByText, getByTestId, queryByText, queryAllByTestId }] = render()
-    getByText('Wi-Fi - foo')
-    getByText('Wired USB')
-    getByText('Wireless IP')
-    getByText('Wireless Subnet Mask')
-    getByText('Wireless MAC Address')
-    getByText('127.0.0.100')
-    getByText('255.255.255.230')
-    getByText('WI:FI:00:00:00:00')
-    getByText('Wired IP')
-    getByText('Wired Subnet Mask')
-    getByText('Wired MAC Address')
-    getByText('127.0.0.101')
-    getByText('255.255.255.231')
-    getByText('US:B0:00:00:00:00')
-    expect(queryByText('Wi-Fi - bar')).not.toBeInTheDocument()
+    render()
+    screen.getByText('Wi-Fi - foo')
+    screen.getByText('Wired USB')
+    screen.getByText('Wireless IP')
+    screen.getByText('Wireless Subnet Mask')
+    screen.getByText('Wireless MAC Address')
+    screen.getByText('127.0.0.100')
+    screen.getByText('255.255.255.230')
+    screen.getByText('WI:FI:00:00:00:00')
+    screen.getByText('Wired IP')
+    screen.getByText('Wired Subnet Mask')
+    screen.getByText('Wired MAC Address')
+    screen.getByText('127.0.0.101')
+    screen.getByText('255.255.255.231')
+    screen.getByText('US:B0:00:00:00:00')
+    expect(screen.queryByText('Wi-Fi - bar')).not.toBeInTheDocument()
     expect(
-      getByTestId('RobotSettings_Networking_wifi_icon')
+      screen.getByTestId('RobotSettings_Networking_wifi_icon')
     ).toBeInTheDocument()
-    expect(getByTestId('RobotSettings_Networking_usb_icon')).toBeInTheDocument()
     expect(
-      queryAllByTestId('RobotSettings_Networking_check_circle')
+      screen.getByTestId('RobotSettings_Networking_usb_icon')
+    ).toBeInTheDocument()
+    expect(
+      screen.queryAllByTestId('RobotSettings_Networking_check_circle')
     ).toHaveLength(0)
   })
 })

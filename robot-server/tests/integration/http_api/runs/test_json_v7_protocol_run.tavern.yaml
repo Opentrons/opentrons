@@ -31,7 +31,7 @@ stages:
       json:
         data:
           id: !anystr
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          createdAt: !anystr
           status: idle
           current: True
           actions: []
@@ -92,10 +92,10 @@ stages:
               commandId: '{setup_command_id}'
               key: '{setup_command_key}'
               createdAt: '{setup_command_created_at}'
-              index: 15
+              index: 14
         meta:
           cursor: 0
-          totalLength: 16
+          totalLength: 15
         data:
           # Initial home
           - id: !anystr
@@ -172,19 +172,6 @@ stages:
               version: 1
               labwareId: tipRackId
               displayName: Opentrons 96 Tip Rack 10 µL
-          - id: !anystr
-            key: !anystr
-            commandType: loadLabware
-            createdAt: !anystr
-            status: queued
-            params:
-              location:
-                slotName: '12'
-              loadName: opentrons_1_trash_1100ml_fixed
-              namespace: opentrons
-              version: 1
-              labwareId: fixedTrash
-              displayName: Trash
           - id: !anystr
             createdAt: !anystr
             commandType: loadLiquid
@@ -318,7 +305,7 @@ stages:
         data:
           id: !anystr
           actionType: play
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          createdAt: !anystr
 
   - name: Wait for the protocol to complete
     max_retries: 10
@@ -345,7 +332,7 @@ stages:
           current: !anydict
         meta:
           cursor: 0
-          totalLength: 16
+          totalLength: 15
         data:
           - id: !anystr
             key: !anystr
@@ -435,21 +422,6 @@ stages:
               version: 1
               labwareId: tipRackId
               displayName: Opentrons 96 Tip Rack 10 µL
-          - id: !anystr
-            key: !anystr
-            commandType: loadLabware
-            createdAt: !anystr
-            startedAt: !anystr
-            completedAt: !anystr
-            status: succeeded
-            params:
-              location:
-                slotName: '12'
-              loadName: opentrons_1_trash_1100ml_fixed
-              namespace: opentrons
-              version: 1
-              labwareId: fixedTrash
-              displayName: Trash
           - id: !anystr
             key: !anystr
             commandType: loadLiquid

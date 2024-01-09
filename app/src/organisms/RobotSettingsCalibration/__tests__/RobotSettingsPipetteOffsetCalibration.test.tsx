@@ -10,7 +10,7 @@ import {
   mockPipetteOffsetCalibration3,
 } from '../../../redux/calibration/pipette-offset/__fixtures__'
 import {
-  useIsOT3,
+  useIsFlex,
   usePipetteOffsetCalibrations,
   useAttachedPipettesFromInstrumentsQuery,
 } from '../../../organisms/Devices/hooks'
@@ -24,7 +24,7 @@ import type { FormattedPipetteOffsetCalibration } from '..'
 jest.mock('../../../organisms/Devices/hooks')
 jest.mock('../CalibrationDetails/PipetteOffsetCalibrationItems')
 
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockUsePipetteOffsetCalibrations = usePipetteOffsetCalibrations as jest.MockedFunction<
   typeof usePipetteOffsetCalibrations
 >
@@ -59,7 +59,7 @@ const render = (
 
 describe('RobotSettingsPipetteOffsetCalibration', () => {
   beforeEach(() => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(false)
     mockUsePipetteOffsetCalibrations.mockReturnValue([
       mockPipetteOffsetCalibration1,
       mockPipetteOffsetCalibration2,
@@ -85,8 +85,8 @@ describe('RobotSettingsPipetteOffsetCalibration', () => {
     getByText('PipetteOffsetCalibrationItems')
   })
 
-  it('renders an OT-3 title and description - Pipette Calibrations', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+  it('renders a Flex title and description - Pipette Calibrations', () => {
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
       left: mockAttachedPipetteInformation,
       right: null,
@@ -94,7 +94,7 @@ describe('RobotSettingsPipetteOffsetCalibration', () => {
     const [{ getByText }] = render()
     getByText('Pipette Calibrations')
     getByText(
-      `Pipette calibration uses a metal probe to determine the pipette's exact position relative to precision-cut divots on deck slots.`
+      `Pipette calibration uses a metal probe to determine the pipette's exact position relative to precision-cut squares on deck slots.`
     )
     getByText('PipetteOffsetCalibrationItems')
   })

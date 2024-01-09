@@ -5,12 +5,20 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
-import { uuid } from '../../utils'
+import * as warningCreators from '../../warningCreators'
+import {
+  getHasWasteChute,
+  getTiprackHasTips,
+  getLabwareHasLiquid,
+  uuid,
+} from '../../utils'
 import type {
   CommandCreator,
   CommandCreatorError,
   MoveLabwareArgs,
+  CommandCreatorWarning,
 } from '../../types'
+
 /** Move labware from one location to another, manually or via a gripper. */
 export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   args,
@@ -18,8 +26,28 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   prevRobotState
 ) => {
   const { labware, useGripper, newLocation } = args
+  const { additionalEquipmentEntities, labwareEntities } = invariantContext
+  const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
+  const tiprackHasTip =
+    prevRobotState.tipState != null
+      ? getTiprackHasTips(prevRobotState.tipState, labware)
+      : false
+  const labwareHasLiquid =
+    prevRobotState.liquidState != null
+      ? getLabwareHasLiquid(prevRobotState.liquidState, labware)
+      : false
   const actionName = 'moveToLabware'
   const errors: CommandCreatorError[] = []
+  const warnings: CommandCreatorWarning[] = []
+
+  const newLocationInWasteChute =
+    newLocation !== 'offDeck' &&
+    'addressableAreaName' in newLocation &&
+    newLocation.addressableAreaName === 'gripperWasteChute'
+
+  const hasGripper = Object.values(additionalEquipmentEntities).find(
+    aE => aE.name === 'gripper'
+  )
 
   if (!labware || !prevRobotState.labware[labware]) {
     errors.push(
@@ -30,6 +58,20 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
     )
   } else if (prevRobotState.labware[labware].slot === 'offDeck' && useGripper) {
     errors.push(errorCreators.labwareOffDeck())
+  }
+
+  const isAluminumBlock =
+    labwareEntities[labware]?.def.metadata.displayCategory === 'aluminumBlock'
+
+  if (useGripper && isAluminumBlock) {
+    errors.push(errorCreators.cannotMoveWithGripper())
+  }
+
+  if (
+    (newLocationInWasteChute && hasGripper && !useGripper) ||
+    (!hasGripper && useGripper)
+  ) {
+    errors.push(errorCreators.gripperRequired())
   }
 
   const initialLabwareSlot = prevRobotState.labware[labware]?.slot
@@ -62,17 +104,31 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
     newLocation !== 'offDeck' && 'labwareId' in newLocation
       ? newLocation.labwareId
       : null
-  const destModuleIdUnderAdapter =
+
+  const destModuleOrSlotUnderAdapterId =
     destAdapterId != null ? prevRobotState.labware[destAdapterId].slot : null
-  const destinationModuleId =
-    destModuleIdUnderAdapter != null ? destModuleIdUnderAdapter : destModuleId
+  const destinationModuleIdOrSlot =
+    destModuleOrSlotUnderAdapterId != null
+      ? destModuleOrSlotUnderAdapterId
+      : destModuleId
 
   if (newLocation === 'offDeck' && useGripper) {
     errors.push(errorCreators.labwareOffDeck())
   }
-  if (destinationModuleId != null) {
+
+  if (tiprackHasTip && newLocationInWasteChute && hasWasteChute) {
+    warnings.push(warningCreators.tiprackInWasteChuteHasTips())
+  } else if (labwareHasLiquid && newLocationInWasteChute && hasWasteChute) {
+    warnings.push(warningCreators.labwareInWasteChuteHasLiquid())
+  }
+
+  if (
+    destinationModuleIdOrSlot != null &&
+    prevRobotState.modules[destinationModuleIdOrSlot] != null
+  ) {
     const destModuleState =
-      prevRobotState.modules[destinationModuleId].moduleState
+      prevRobotState.modules[destinationModuleIdOrSlot].moduleState
+
     if (
       destModuleState.type === THERMOCYCLER_MODULE_TYPE &&
       destModuleState.lidOpen !== true
@@ -107,7 +163,9 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
       params,
     },
   ]
+
   return {
     commands,
+    warnings: warnings.length > 0 ? warnings : undefined,
   }
 }

@@ -21,13 +21,17 @@ export interface GalleryProps {
 
 export function Gallery(props: GalleryProps): JSX.Element {
   const { definition } = props
-  const { parameters: params, dimensions: dims } = definition
+  const {
+    parameters: params,
+    dimensions: dims,
+    cornerOffsetFromSlot,
+  } = definition
   const [currentImage, setCurrentImage] = React.useState<number>(0)
   const render = (
     <Box width="100%">
       <RobotWorkSpace
         key="center"
-        viewBox={`0 0 ${String(dims.xDimension)} ${String(dims.yDimension)}`}
+        viewBox={`${cornerOffsetFromSlot.x} ${cornerOffsetFromSlot.y} ${dims.xDimension} ${dims.yDimension}`}
       >
         {() => <LabwareRender definition={definition} />}
       </RobotWorkSpace>

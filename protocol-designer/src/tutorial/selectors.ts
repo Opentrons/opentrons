@@ -1,10 +1,18 @@
 import { createSelector } from 'reselect'
-import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+import {
+  THERMOCYCLER_MODULE_TYPE,
+  WASTE_CHUTE_CUTOUT,
+} from '@opentrons/shared-data'
 import { timelineFrameBeforeActiveItem } from '../top-selectors/timelineFrames'
-import { getUnsavedForm, getOrderedStepIds } from '../step-forms/selectors'
+import {
+  getUnsavedForm,
+  getOrderedStepIds,
+  getAdditionalEquipmentEntities,
+} from '../step-forms/selectors'
 import isEmpty from 'lodash/isEmpty'
 import { BaseState, Selector } from '../types'
 import { HintKey } from '.'
+import { getHasWasteChute } from '../components/labware'
 
 const rootSelector = (state: BaseState): BaseState['tutorial'] => state.tutorial
 
@@ -63,4 +71,24 @@ export const shouldShowCoolingHint: Selector<boolean> = createSelector(
 export const shouldShowBatchEditHint: Selector<boolean> = createSelector(
   getOrderedStepIds,
   orderedStepIds => orderedStepIds.length >= 1
+)
+export const shouldShowWasteChuteHint: Selector<boolean> = createSelector(
+  timelineFrameBeforeActiveItem,
+  getUnsavedForm,
+  getAdditionalEquipmentEntities,
+  (prevTimelineFrame, unsavedForm, additionalEquipmentEntities) => {
+    const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
+    if (unsavedForm?.stepType !== 'moveLabware' || !hasWasteChute) {
+      return false
+    }
+    if (prevTimelineFrame == null) {
+      return false
+    }
+    const { newLocation } = unsavedForm
+    if (newLocation === WASTE_CHUTE_CUTOUT) {
+      return true
+    }
+
+    return false
+  }
 )

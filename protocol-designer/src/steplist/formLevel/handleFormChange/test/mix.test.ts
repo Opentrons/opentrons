@@ -1,6 +1,8 @@
 import { LabwareDefinition2 } from '@opentrons/shared-data'
 import _fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import _fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
+import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { LabwareEntities, PipetteEntities } from '@opentrons/step-generation'
 import { DEFAULT_MM_FROM_BOTTOM_DISPENSE } from '../../../../constants'
 import { FormData } from '../../../../form-types'
@@ -8,6 +10,8 @@ import { dependentFieldsUpdateMix } from '../dependentFieldsUpdateMix'
 
 const fixture96Plate = _fixture_96_plate as LabwareDefinition2
 const fixtureTrash = _fixture_trash as LabwareDefinition2
+const fixtureTipRack10ul = fixture_tiprack_10_ul as LabwareDefinition2
+const fixtureTipRack300ul = fixture_tiprack_300_ul as LabwareDefinition2
 
 let pipetteEntities: PipetteEntities
 let labwareEntities: LabwareEntities
@@ -20,6 +24,7 @@ beforeEach(() => {
       spec: {
         channels: 1,
       },
+      tiprackLabwareDef: fixtureTipRack300ul,
     },
     pipetteMultiId: {
       name: 'p10_multi',
@@ -27,6 +32,7 @@ beforeEach(() => {
       spec: {
         channels: 8,
       },
+      tiprackLabwareDef: fixtureTipRack10ul,
     },
   } as any
   labwareEntities = {

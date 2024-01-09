@@ -30,7 +30,6 @@ export interface SlideoutProps {
 
 const SHARED_STYLE = css`
   z-index: 2;
-  overflow: hidden;
   @keyframes slidein {
     from {
       transform: translateX(100%);
@@ -73,22 +72,27 @@ const EXPANDED_STYLE = css`
 const COLLAPSED_STYLE = css`
   ${SHARED_STYLE}
   animation: slideout 300ms forwards;
+  overflow: hidden;
 `
 const INITIALLY_COLLAPSED_STYLE = css`
   ${SHARED_STYLE}
   animation: slideout 0ms forwards;
+  overflow: hidden;
 `
 const OVERLAY_IN_STYLE = css`
   ${SHARED_STYLE}
   animation: overlayin 300ms forwards;
+  overflow: hidden;
 `
 const OVERLAY_OUT_STYLE = css`
   ${SHARED_STYLE}
   animation: overlayout 300ms forwards;
+  overflow: hidden;
 `
 const INITIALLY_OVERLAY_OUT_STYLE = css`
   ${SHARED_STYLE}
   animation: overlayout 0ms forwards;
+  overflow: hidden;
 `
 
 const CLOSE_ICON_STYLE = css`
@@ -133,6 +137,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
   const overlayOutStyle = hasBeenExpanded.current
     ? OVERLAY_OUT_STYLE
     : INITIALLY_OVERLAY_OUT_STYLE
+
   return (
     <>
       <Overlay
@@ -181,9 +186,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
                   size="1.5rem"
                   onClick={handleClose}
                   aria-label="exit"
-                  data-testid={`Slideout_icon_close_${
-                    typeof title === 'string' ? title : ''
-                  }`}
+                  data-testid={`Slideout_icon_close_${title}`}
                 >
                   <Icon name="close" css={CLOSE_ICON_STYLE} />
                 </Btn>

@@ -61,7 +61,11 @@ export function WizardRequiredEquipmentList(
                 paddingY={SPACING.spacing4}
                 key={`${index}_${requiredEquipmentProps.loadName}`}
               >
-                <StyledText fontSize="1.25rem" paddingY={SPACING.spacing12}>
+                <StyledText
+                  fontSize={TYPOGRAPHY.fontSize20}
+                  paddingY={SPACING.spacing12}
+                  overflowWrap="anywhere"
+                >
                   {requiredEquipmentProps.displayName}
                 </StyledText>
                 {/* do not show divider after the last equipment in the list */}
@@ -83,12 +87,11 @@ export function WizardRequiredEquipmentList(
           >
             {t('you_will_need')}
           </StyledText>
-          {equipmentList.length > 1 ? <Divider /> : null}
-          {equipmentList.map((requiredEquipmentProps, index) => (
+          <Divider />
+          {equipmentList.map(requiredEquipmentProps => (
             <RequiredEquipmentCard
               key={requiredEquipmentProps.loadName}
               {...requiredEquipmentProps}
-              bottomDivider={equipmentList.length - 1 !== index}
             />
           ))}
           {footer != null ? (

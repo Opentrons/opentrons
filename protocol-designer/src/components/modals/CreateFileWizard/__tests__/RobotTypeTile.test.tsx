@@ -1,5 +1,6 @@
 import * as React from 'react'
 import i18n from 'i18next'
+import { fireEvent, screen } from '@testing-library/react'
 import { COLORS, renderWithProviders } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { RobotTypeTile } from '../RobotTypeTile'
@@ -38,18 +39,18 @@ describe('RobotTypeTile', () => {
   })
 
   it('renders robot images and clicking on them changing the style', () => {
-    const { getByLabelText, getByRole } = render(props)
-    getByLabelText('OpentronsFlex.png')
-    getByLabelText('OT2.png')
-    const flex = getByLabelText('RobotTypeTile_OT-3 Standard')
-    flex.click()
+    render(props)
+    screen.getByLabelText('OpentronsFlex.png')
+    screen.getByLabelText('OT2.png')
+    const flex = screen.getByLabelText('RobotTypeTile_OT-3 Standard')
+    fireEvent.click(flex)
     expect(props.setFieldValue).toHaveBeenCalled()
     expect(flex).toHaveStyle(`background-color: ${COLORS.lightBlue}`)
-    const ot2 = getByLabelText('RobotTypeTile_OT-2 Standard')
-    ot2.click()
+    const ot2 = screen.getByLabelText('RobotTypeTile_OT-2 Standard')
+    fireEvent.click(ot2)
     expect(props.setFieldValue).toHaveBeenCalled()
     expect(ot2).toHaveStyle(`background-color: ${COLORS.white}`)
-    getByRole('button', { name: 'Next' }).click()
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }))
     expect(props.proceed).toHaveBeenCalled()
   })
 })

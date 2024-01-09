@@ -32,6 +32,7 @@ from opentrons_hardware.hardware_control.motion import (
     MoveGroupStep,
 )
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
+from opentrons_hardware.hardware_control.types import MotorPositionStatus
 
 LOG = getLogger(__name__)
 PipetteProbeTarget = Literal[NodeId.pipette_left, NodeId.pipette_right]
@@ -73,7 +74,7 @@ async def liquid_probe(
     auto_zero_sensor: bool = True,
     num_baseline_reads: int = 10,
     sensor_id: SensorId = SensorId.S0,
-) -> Dict[NodeId, Tuple[float, float, bool, bool]]:
+) -> Dict[NodeId, MotorPositionStatus]:
     """Move the mount and pipette simultaneously while reading from the pressure sensor."""
     sensor_driver = SensorDriver()
     threshold_fixed_point = threshold_pascals * sensor_fixed_point_conversion
@@ -160,7 +161,7 @@ async def capacitive_probe(
     sensor_id: SensorId = SensorId.S0,
     relative_threshold_pf: float = 1.0,
     log_sensor_values: bool = False,
-) -> Tuple[float, float]:
+) -> MotorPositionStatus:
     """Move the specified tool down until its capacitive sensor triggers.
 
     Moves down by the specified distance at the specified speed until the
@@ -185,7 +186,7 @@ async def capacitive_probe(
             detail={
                 "tool": tool.name,
                 "sensor": sensor_id.name,
-                "threshold": relative_threshold_pf,
+                "threshold": str(relative_threshold_pf),
             },
         )
     LOG.info(f"starting capacitive probe with threshold {threshold.to_float()}")
@@ -197,7 +198,7 @@ async def capacitive_probe(
         do_log=log_sensor_values,
     ):
         position = await runner.run(can_messenger=messenger)
-        return position[mover][:2]
+        return position[mover]
 
 
 async def capacitive_pass(

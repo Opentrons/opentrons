@@ -1,14 +1,19 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import {
   useDeleteMaintenanceRunMutation,
   useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
 import { COLORS } from '@opentrons/components'
-import { CreateCommand, LEFT, getModuleType } from '@opentrons/shared-data'
+import {
+  CreateCommand,
+  getModuleType,
+  getModuleDisplayName,
+} from '@opentrons/shared-data'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
+import { StyledText } from '../../atoms/text'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { useAttachedPipettesFromInstrumentsQuery } from '../../organisms/Devices/hooks'
@@ -25,16 +30,17 @@ import { AttachProbe } from './AttachProbe'
 import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
+import { DetachProbe } from './DetachProbe'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
-import { DetachProbe } from './DetachProbe'
-import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 
 interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
   closeFlow: () => void
+  isPrepCommandLoading: boolean
   initialSlotName?: string
   onComplete?: () => void
+  prepCommandErrorMessage?: string
 }
 
 const RUN_REFETCH_INTERVAL = 5000
@@ -42,14 +48,23 @@ const RUN_REFETCH_INTERVAL = 5000
 export const ModuleWizardFlows = (
   props: ModuleWizardFlowsProps
 ): JSX.Element | null => {
-  const { attachedModule, initialSlotName, closeFlow, onComplete } = props
+  const {
+    attachedModule,
+    initialSlotName,
+    isPrepCommandLoading,
+    closeFlow,
+    onComplete,
+    prepCommandErrorMessage,
+  } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('module_wizard_flows')
-
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
-  const attachedPipette = attachedPipettes.left ?? attachedPipettes.right
-  const moduleCalibrationSteps = getModuleCalibrationSteps()
+  const attachedPipette =
+    attachedPipettes.left?.data.calibratedOffset?.last_modified != null
+      ? attachedPipettes.left
+      : attachedPipettes.right
 
+  const moduleCalibrationSteps = getModuleCalibrationSteps()
   const availableSlotNames =
     FLEX_SLOT_NAMES_BY_MOD_TYPE[getModuleType(attachedModule.moduleModel)] ?? []
   const [slotName, setSlotName] = React.useState(
@@ -181,7 +196,11 @@ export const ModuleWizardFlows = (
         continuePastCommandFailure
       )
   }
-  if (currentStep == null || attachedPipette == null) return null
+  if (
+    currentStep == null ||
+    attachedPipette?.data.calibratedOffset?.last_modified == null
+  )
+    return null
 
   const maintenanceRunId =
     maintenanceRunData?.data.id != null &&
@@ -202,23 +221,44 @@ export const ModuleWizardFlows = (
     slotName,
     isExiting,
   }
+
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
-  if (errorMessage != null) {
+  if (isPrepCommandLoading) {
+    modalContent = (
+      <InProgressModal
+        description={t('prepping_module', {
+          module: getModuleDisplayName(attachedModule.moduleModel),
+        })}
+      />
+    )
+  } else if (prepCommandErrorMessage != null || errorMessage != null) {
     modalContent = (
       <SimpleWizardBody
         isSuccess={false}
         iconColor={COLORS.errorEnabled}
-        header={t('error_during_calibration')}
+        header={t(
+          prepCommandErrorMessage != null
+            ? 'error_prepping_module'
+            : 'error_during_calibration'
+        )}
         subHeader={
-          <>
-            {t('module_calibration_failed')}
-            {errorMessage}
-          </>
+          prepCommandErrorMessage != null ? (
+            prepCommandErrorMessage
+          ) : (
+            <Trans
+              t={t}
+              i18nKey={'module_calibration_failed'}
+              values={{ error: errorMessage }}
+              components={{
+                block: <StyledText as="p" />,
+              }}
+            />
+          )
         }
       />
     )
   } else if (isExiting) {
-    modalContent = <InProgressModal description={t('stand_back')} />
+    modalContent = <InProgressModal description={t('stand_back_exiting')} />
   } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
     modalContent = (
       <BeforeBeginning
@@ -227,16 +267,6 @@ export const ModuleWizardFlows = (
         createMaintenanceRun={createTargetedMaintenanceRun}
         isCreateLoading={isCreateLoading}
         createdMaintenanceRunId={createdMaintenanceRunId}
-      />
-    )
-  } else if (currentStep.section === SECTIONS.FIRMWARE_UPDATE) {
-    modalContent = (
-      <FirmwareUpdateModal
-        proceed={proceed}
-        subsystem={
-          attachedPipette.mount === LEFT ? 'pipette_left' : 'pipette_right'
-        }
-        description={t('firmware_update')}
       />
     )
   } else if (currentStep.section === SECTIONS.SELECT_LOCATION) {

@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import {
   ALIGN_CENTER,
   COLORS,
+  DIRECTION_ROW,
   Flex,
   Icon,
   JUSTIFY_FLEX_START,
@@ -19,7 +20,12 @@ import { SmallButton } from '../../atoms/buttons'
 import { InlineNotification } from '../../atoms/InlineNotification'
 import { StyledText } from '../../atoms/text'
 
+import type { IconName } from '@opentrons/components'
 import type { InlineNotificationProps } from '../../atoms/InlineNotification'
+import type {
+  IconPlacement,
+  SmallButtonTypes,
+} from '../../atoms/buttons/SmallButton'
 
 interface ChildNavigationProps {
   header: string
@@ -27,6 +33,10 @@ interface ChildNavigationProps {
   buttonText?: React.ReactNode
   inlineNotification?: InlineNotificationProps
   onClickButton?: React.MouseEventHandler
+  buttonType?: SmallButtonTypes
+  iconName?: IconName
+  iconPlacement?: IconPlacement
+  secondaryButtonProps?: React.ComponentProps<typeof SmallButton>
 }
 
 export function ChildNavigation({
@@ -35,6 +45,10 @@ export function ChildNavigation({
   inlineNotification,
   onClickBack,
   onClickButton,
+  buttonType = 'primary',
+  iconName,
+  iconPlacement,
+  secondaryButtonProps,
 }: ChildNavigationProps): JSX.Element {
   return (
     <Flex
@@ -50,7 +64,10 @@ export function ChildNavigation({
       backgroundColor={COLORS.white}
     >
       <Flex gridGap={SPACING.spacing16} justifyContent={JUSTIFY_FLEX_START}>
-        <IconButton onClick={onClickBack}>
+        <IconButton
+          onClick={onClickBack}
+          data-testid="ChildNavigation_Back_Button"
+        >
           <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
         </IconButton>
         <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
@@ -58,11 +75,20 @@ export function ChildNavigation({
         </StyledText>
       </Flex>
       {onClickButton != null && buttonText != null ? (
-        <SmallButton
-          buttonCategory="rounded"
-          buttonText={buttonText}
-          onClick={onClickButton}
-        />
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
+          {secondaryButtonProps != null ? (
+            <SmallButton {...secondaryButtonProps} />
+          ) : null}
+
+          <SmallButton
+            buttonType={buttonType}
+            buttonCategory={buttonType === 'primary' ? 'rounded' : 'default'}
+            buttonText={buttonText}
+            onClick={onClickButton}
+            iconName={iconName}
+            iconPlacement={iconPlacement}
+          />
+        </Flex>
       ) : null}
       {inlineNotification != null ? (
         <InlineNotification

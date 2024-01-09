@@ -14,28 +14,32 @@ import {
 import { getLabwareDisplayName, getIsTiprack } from '@opentrons/shared-data'
 import styles from './styles.css'
 
-import type { LabwareDefinition2, DeckSlot } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  CoordinateTuple,
+} from '@opentrons/shared-data'
 
 const SHORT = 'SHORT'
 const TALL = 'TALL'
 
 interface CalibrationLabwareRenderProps {
   labwareDef: LabwareDefinition2
-  slotDef: DeckSlot
+  slotDefPosition: CoordinateTuple | null
 }
 
 export function CalibrationLabwareRender(
   props: CalibrationLabwareRenderProps
 ): JSX.Element {
-  const { labwareDef, slotDef } = props
+  const { labwareDef, slotDefPosition } = props
+
   const title = getLabwareDisplayName(labwareDef)
   const isTiprack = getIsTiprack(labwareDef)
 
   // TODO: we can change this boolean to check to isCalibrationBlock instead of isTiprack to render any labware
   return isTiprack ? (
     <g
-      transform={`translate(${String(slotDef.position[0])}, ${String(
-        slotDef.position[1]
+      transform={`translate(${String(slotDefPosition?.[0])}, ${String(
+        slotDefPosition?.[1]
       )})`}
     >
       <LabwareRender definition={labwareDef} />
@@ -52,21 +56,24 @@ export function CalibrationLabwareRender(
       </RobotCoordsForeignDiv>
     </g>
   ) : (
-    <CalibrationBlockRender labwareDef={labwareDef} slotDef={slotDef} />
+    <CalibrationBlockRender
+      labwareDef={labwareDef}
+      slotDefPosition={slotDefPosition}
+    />
   )
 }
 
 export function CalibrationBlockRender(
   props: CalibrationLabwareRenderProps
 ): JSX.Element | null {
-  const { labwareDef, slotDef } = props
+  const { labwareDef, slotDefPosition } = props
 
   switch (labwareDef.parameters.loadName) {
     case 'opentrons_calibrationblock_short_side_right': {
       return (
         <g
-          transform={`translate(${String(slotDef.position[0])}, ${String(
-            slotDef.position[1]
+          transform={`translate(${String(slotDefPosition?.[0])}, ${String(
+            slotDefPosition?.[1]
           )})`}
         >
           <rect
@@ -115,8 +122,8 @@ export function CalibrationBlockRender(
     case 'opentrons_calibrationblock_short_side_left': {
       return (
         <g
-          transform={`translate(${String(slotDef.position[0])}, ${String(
-            slotDef.position[1]
+          transform={`translate(${String(slotDefPosition?.[0])}, ${String(
+            slotDefPosition?.[1]
           )})`}
         >
           <rect

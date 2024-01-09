@@ -72,7 +72,7 @@ def test_filter_zero_duration_step() -> None:
         Axis.P_R: 0,
     }
     moves = [Move.build_dummy([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R, Axis.P_L])]
-    for block in (moves[0].blocks[0], moves[0].blocks[1]):
+    for block in moves[0].blocks:
         block.distance = f64(25.0)
         block.time = f64(1.0)
         block.initial_speed = f64(25.0)

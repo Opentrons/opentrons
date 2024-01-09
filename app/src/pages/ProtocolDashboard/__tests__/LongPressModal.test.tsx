@@ -1,8 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
-import { renderHook } from '@testing-library/react-hooks'
+import { fireEvent, renderHook } from '@testing-library/react'
 
 import { renderWithProviders, useLongPress } from '@opentrons/components'
 import { HostConfig } from '@opentrons/api-client'
@@ -20,6 +19,7 @@ const mockUseCreateRunMutation = useCreateRunMutation as jest.MockedFunction<
 >
 const mockuseHost = useHost as jest.MockedFunction<typeof useHost>
 const mockFunc = jest.fn()
+const mockSetTargetProtocolId = jest.fn()
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
   return {
@@ -36,6 +36,7 @@ const render = (longPress: UseLongPressResult) => {
         longpress={longPress}
         protocolId={'mockProtocol1'}
         setShowDeleteConfirmationModal={mockFunc}
+        setTargetProtocolId={mockSetTargetProtocolId}
       />
     </MemoryRouter>,
     {
@@ -65,7 +66,8 @@ describe('Long Press Modal', () => {
     result.current.isLongPressed = true
     const [{ getByText }] = render(result.current)
     const button = getByText('Delete protocol')
-    button.click()
+    fireEvent.click(button)
+    expect(mockSetTargetProtocolId).toHaveBeenCalledWith('mockProtocol1')
     expect(mockFunc).toHaveBeenCalled()
   })
 

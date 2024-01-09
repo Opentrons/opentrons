@@ -36,6 +36,7 @@ from .command_unions import (
     CommandCreate,
     CommandResult,
     CommandType,
+    CommandPrivateResult,
 )
 
 from .aspirate import (
@@ -141,6 +142,7 @@ from .load_pipette import (
     LoadPipetteCreate,
     LoadPipetteResult,
     LoadPipetteCommandType,
+    LoadPipettePrivateResult,
 )
 
 from .move_labware import (
@@ -173,6 +175,22 @@ from .move_to_well import (
     MoveToWellCreate,
     MoveToWellResult,
     MoveToWellCommandType,
+)
+
+from .move_to_addressable_area import (
+    MoveToAddressableArea,
+    MoveToAddressableAreaParams,
+    MoveToAddressableAreaCreate,
+    MoveToAddressableAreaResult,
+    MoveToAddressableAreaCommandType,
+)
+
+from .move_to_addressable_area_for_drop_tip import (
+    MoveToAddressableAreaForDropTip,
+    MoveToAddressableAreaForDropTipParams,
+    MoveToAddressableAreaForDropTipCreate,
+    MoveToAddressableAreaForDropTipResult,
+    MoveToAddressableAreaForDropTipCommandType,
 )
 
 from .wait_for_resume import (
@@ -256,6 +274,47 @@ from .retract_axis import (
     RetractAxisCommandType,
 )
 
+from .configure_for_volume import (
+    ConfigureForVolume,
+    ConfigureForVolumeCreate,
+    ConfigureForVolumeParams,
+    ConfigureForVolumeResult,
+    ConfigureForVolumeCommandType,
+)
+
+from .prepare_to_aspirate import (
+    PrepareToAspirate,
+    PrepareToAspirateCreate,
+    PrepareToAspirateParams,
+    PrepareToAspirateResult,
+    PrepareToAspirateCommandType,
+)
+
+from .configure_nozzle_layout import (
+    ConfigureNozzleLayout,
+    ConfigureNozzleLayoutCreate,
+    ConfigureNozzleLayoutParams,
+    ConfigureNozzleLayoutResult,
+    ConfigureNozzleLayoutPrivateResult,
+    ConfigureNozzleLayoutCommandType,
+)
+
+from .get_tip_presence import (
+    GetTipPresence,
+    GetTipPresenceCreate,
+    GetTipPresenceParams,
+    GetTipPresenceResult,
+    GetTipPresenceCommandType,
+)
+
+from .verify_tip_presence import (
+    VerifyTipPresence,
+    VerifyTipPresenceCreate,
+    VerifyTipPresenceParams,
+    VerifyTipPresenceResult,
+    VerifyTipPresenceCommandType,
+)
+
 __all__ = [
     # command type unions
     "Command",
@@ -263,8 +322,10 @@ __all__ = [
     "CommandCreate",
     "CommandResult",
     "CommandType",
+    "CommandPrivateResult",
     # base interfaces
     "AbstractCommandImpl",
+    "AbstractCommandWithPrivateResultImpl",
     "BaseCommand",
     "BaseCommandCreate",
     "CommandStatus",
@@ -351,6 +412,7 @@ __all__ = [
     "LoadPipetteParams",
     "LoadPipetteResult",
     "LoadPipetteCommandType",
+    "LoadPipettePrivateResult",
     # move labware command models
     "MoveLabware",
     "MoveLabwareCreate",
@@ -375,6 +437,18 @@ __all__ = [
     "MoveToWellParams",
     "MoveToWellResult",
     "MoveToWellCommandType",
+    # move to addressable area command models
+    "MoveToAddressableArea",
+    "MoveToAddressableAreaParams",
+    "MoveToAddressableAreaCreate",
+    "MoveToAddressableAreaResult",
+    "MoveToAddressableAreaCommandType",
+    # move to addressable area for drop tip command models
+    "MoveToAddressableAreaForDropTip",
+    "MoveToAddressableAreaForDropTipParams",
+    "MoveToAddressableAreaForDropTipCreate",
+    "MoveToAddressableAreaForDropTipResult",
+    "MoveToAddressableAreaForDropTipCommandType",
     # wait for resume command models
     "WaitForResume",
     "WaitForResumeParams",
@@ -444,4 +518,35 @@ __all__ = [
     "thermocycler",
     # calibration command bundle
     "calibration",
+    # configure pipette volume command bundle
+    "ConfigureForVolume",
+    "ConfigureForVolumeCreate",
+    "ConfigureForVolumeParams",
+    "ConfigureForVolumeResult",
+    "ConfigureForVolumeCommandType",
+    # prepare pipette for aspirate command bundle
+    "PrepareToAspirate",
+    "PrepareToAspirateCreate",
+    "PrepareToAspirateParams",
+    "PrepareToAspirateResult",
+    "PrepareToAspirateCommandType",
+    # configure nozzle layout command bundle
+    "ConfigureNozzleLayout",
+    "ConfigureNozzleLayoutCreate",
+    "ConfigureNozzleLayoutParams",
+    "ConfigureNozzleLayoutResult",
+    "ConfigureNozzleLayoutCommandType",
+    "ConfigureNozzleLayoutPrivateResult",
+    # get pipette tip presence bundle
+    "GetTipPresence",
+    "GetTipPresenceCreate",
+    "GetTipPresenceParams",
+    "GetTipPresenceResult",
+    "GetTipPresenceCommandType",
+    # verify pipette tip presence bundle
+    "VerifyTipPresence",
+    "VerifyTipPresenceCreate",
+    "VerifyTipPresenceParams",
+    "VerifyTipPresenceResult",
+    "VerifyTipPresenceCommandType",
 ]

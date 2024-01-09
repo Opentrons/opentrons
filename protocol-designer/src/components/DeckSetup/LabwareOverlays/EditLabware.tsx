@@ -148,6 +148,7 @@ const collectLabwareSource = (
   connect: DragSourceConnector,
   monitor: DragSourceMonitor
 ): React.ReactNode => ({
+  // @ts-expect-error(BC, 12-13-2023): react dnd needs to be updated or removed to include proper type
   connectDragSource: connect.dragSource(),
   isDragging: monitor.isDragging(),
   draggedItem: monitor.getItem(),
@@ -185,6 +186,7 @@ const collectLabwareDropTarget = (
   connect: DropTargetConnector,
   monitor: DropTargetMonitor
 ): React.ReactNode => ({
+  // @ts-expect-error(BC, 12-13-2023): react dnd needs to be updated or removed to include proper type
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver(),
   draggedLabware: monitor.getItem()?.labwareOnDeck || null,

@@ -4,18 +4,21 @@
   "model": "p300",
   "displayCategory": "GEN2",
   "pickUpTipConfigurations": {
-    "current": 0.125,
-    "speed": 10.0,
-    "presses": 1,
-    "increment": 0.0,
-    "distance": 17.0
+    "pressFit": {
+      "speed": 10.0,
+      "presses": 1,
+      "increment": 0.0,
+      "distance": 17.0,
+      "currentByTipCount": {
+        "1": 0.125
+      }
+    }
   },
   "dropTipConfigurations": {
-    "current": 1.25,
-    "speed": 7.0,
-    "presses": 0,
-    "increment": 0.0,
-    "distance": 0.0
+    "plungerEject": {
+      "current": 1.25,
+      "speed": 7.0
+    }
   },
   "plungerMotorConfigurations": {
     "idle": 0.3,

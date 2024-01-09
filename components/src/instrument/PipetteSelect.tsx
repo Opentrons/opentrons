@@ -31,6 +31,7 @@ export interface PipetteSelectProps {
   className?: string
   /** custom id to be applied. likely to be used as a data test id for e2e testing */
   id?: string
+  disabled?: boolean
 }
 
 // TODO(mc, 2019-10-14): i18n
@@ -63,6 +64,7 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
     enableNoneOption,
     id,
     nameBlocklist = [],
+    disabled = false,
   } = props
   const allowlist = ({ value }: SelectOption): boolean => {
     return !nameBlocklist.some(n => n === value)
@@ -89,6 +91,7 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
       className={className}
       options={groupedOptions}
       value={value}
+      isDisabled={disabled}
       defaultValue={defaultValue}
       tabIndex={tabIndex as number}
       id={id}
@@ -139,7 +142,9 @@ const PipetteNameItem = (props: PipetteNameSpecs): JSX.Element => {
     >
       <div className={styles.pipette_volume_class}>{volumeClass}</div>
       <div className={styles.pipette_channels}>{displayChannels}</div>
-      <div className={styles.pipette_category}>{displayCategory}</div>
+      <div className={styles.pipette_category}>
+        {channels === 96 ? 'FLEX' : displayCategory}
+      </div>
     </Flex>
   )
 }

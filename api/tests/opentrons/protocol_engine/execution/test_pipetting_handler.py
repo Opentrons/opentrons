@@ -1,5 +1,5 @@
 """Pipetting execution handler."""
-from typing import cast
+from typing import cast, Optional
 
 import pytest
 from decoy import Decoy
@@ -19,6 +19,7 @@ from opentrons.protocol_engine.errors.exceptions import (
     TipNotAttachedError,
     InvalidPipettingVolumeError,
     InvalidPushOutVolumeError,
+    InvalidDispenseVolumeError,
 )
 
 
@@ -362,6 +363,10 @@ async def test_dispense_in_place_virtual(
         TipGeometry(length=1, diameter=2, volume=3)
     )
 
+    decoy.when(mock_state_view.pipettes.get_aspirated_volume("pipette-id")).then_return(
+        3
+    )
+
     result = await subject.dispense_in_place(
         pipette_id="pipette-id", volume=3, flow_rate=5, push_out=None
     )
@@ -378,24 +383,35 @@ async def test_dispense_in_place_virtual_raises_invalid_push_out(
         TipGeometry(length=1, diameter=2, volume=3)
     )
 
+    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
+        TipGeometry(length=1, diameter=2, volume=3)
+    )
+
     with pytest.raises(InvalidPushOutVolumeError):
         await subject.dispense_in_place(
             pipette_id="pipette-id", volume=3, flow_rate=5, push_out=-7
         )
 
 
-async def test_validate_tip_attached_in_blow_out(
-    mock_state_view: StateView, decoy: Decoy
+@pytest.mark.parametrize("aspirated_volume", [(None), (1)])
+async def test_dispense_in_place_virtual_raises_invalid_dispense(
+    decoy: Decoy, mock_state_view: StateView, aspirated_volume: Optional[float]
 ) -> None:
-    """Should raise an error that a tip is not attached."""
+    """Should raise an InvalidDispenseVolumeError."""
     subject = VirtualPipettingHandler(state_view=mock_state_view)
 
     decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
-        None
+        TipGeometry(length=1, diameter=2, volume=3)
     )
 
-    with pytest.raises(TipNotAttachedError):
-        await subject.blow_out_in_place("pipette-id", flow_rate=1)
+    decoy.when(mock_state_view.pipettes.get_aspirated_volume("pipette-id")).then_return(
+        aspirated_volume
+    )
+
+    with pytest.raises(InvalidDispenseVolumeError):
+        await subject.dispense_in_place(
+            pipette_id="pipette-id", volume=3, flow_rate=5, push_out=7
+        )
 
 
 async def test_validate_tip_attached_in_aspirate(

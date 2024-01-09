@@ -281,7 +281,8 @@ function transferLikeSubsteps(args: {
       substepCommandCreator,
       invariantContext,
       initialRobotState,
-      pipetteSpec.channels
+      pipetteSpec.channels,
+      stepArgs.nozzles
     )
     const mergedMultiRows: StepItemSourceDestRow[][] = mergeSubstepRowsMultiChannel(
       {
@@ -304,7 +305,8 @@ function transferLikeSubsteps(args: {
       substepCommandCreator,
       invariantContext,
       initialRobotState,
-      1
+      1,
+      null
     )
     const mergedRows: StepItemSourceDestRow[] = mergeSubstepRowsSingleChannel({
       substepRows,

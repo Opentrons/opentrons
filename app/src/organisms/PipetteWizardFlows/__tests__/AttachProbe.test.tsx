@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import {
@@ -17,6 +18,11 @@ const render = (props: React.ComponentProps<typeof AttachProbe>) => {
     i18nInstance: i18n,
   })[0]
 }
+jest.mock('@opentrons/react-api-client')
+
+const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
+  typeof useDeckConfigurationQuery
+>
 
 describe('AttachProbe', () => {
   let props: React.ComponentProps<typeof AttachProbe>
@@ -27,6 +33,7 @@ describe('AttachProbe', () => {
       proceed: jest.fn(),
       chainRunCommands: jest
         .fn()
+        .mockImplementationOnce(() => Promise.resolve())
         .mockImplementationOnce(() => Promise.resolve()),
       maintenanceRunId: RUN_ID_1,
       attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
@@ -38,6 +45,13 @@ describe('AttachProbe', () => {
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       isOnDevice: false,
     }
+    mockUseDeckConfigurationQuery.mockReturnValue({
+      data: [
+        {
+          cutoutId: 'cutoutD3',
+        } as any,
+      ],
+    } as any)
   })
   it('returns the correct information, buttons work as expected', async () => {
     const { getByText, getByTestId, getByRole, getByLabelText } = render(props)
@@ -48,23 +62,40 @@ describe('AttachProbe', () => {
     getByTestId('Pipette_Attach_Probe_1.webm')
     const proceedBtn = getByRole('button', { name: 'Begin calibration' })
     fireEvent.click(proceedBtn)
-    expect(props.chainRunCommands).toHaveBeenCalledWith(
-      [
-        {
-          commandType: 'home',
-          params: { axes: ['leftZ'] },
-        },
-        {
-          commandType: 'calibration/calibratePipette',
-          params: { mount: 'left' },
-        },
-        {
-          commandType: 'calibration/moveToMaintenancePosition',
-          params: { mount: 'left' },
-        },
-      ],
-      false
-    )
+    await waitFor(() => {
+      expect(props.chainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'verifyTipPresence',
+            params: { pipetteId: 'abc', expectedState: 'present' },
+          },
+        ],
+        false
+      )
+    })
+    await waitFor(() => {
+      expect(props.chainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'home',
+            params: { axes: ['leftZ'] },
+          },
+          {
+            commandType: 'home',
+            params: { skipIfMountPositionOk: 'left' },
+          },
+          {
+            commandType: 'calibration/calibratePipette',
+            params: { mount: 'left' },
+          },
+          {
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: 'left' },
+          },
+        ],
+        false
+      )
+    })
     await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()
     })
@@ -98,7 +129,7 @@ describe('AttachProbe', () => {
     const { getByText, getByTestId } = render(props)
     getByText('Stand back, Flex 1-Channel 1000 μL is calibrating')
     getByText(
-      'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position'
+      'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position.'
     )
     getByTestId('Pipette_Probing_1.webm')
   })
@@ -115,7 +146,7 @@ describe('AttachProbe', () => {
     const { getByText, getByTestId } = render(props)
     getByText('Stand back, Flex 96-Channel 1000 μL is calibrating')
     getByText(
-      'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position'
+      'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position.'
     )
     getByTestId('Pipette_Probing_96.webm')
   })
@@ -130,7 +161,7 @@ describe('AttachProbe', () => {
     getByText('Stand back, robot is in motion')
     expect(
       screen.queryByText(
-        'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position'
+        'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position.'
       )
     ).not.toBeInTheDocument()
   })
@@ -158,28 +189,45 @@ describe('AttachProbe', () => {
       'Take the calibration probe from its storage location. Ensure its collar is unlocked. Push the pipette ejector up and press the probe firmly onto the pipette nozzle. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
     )
     getByTestId('Pipette_Attach_Probe_1.webm')
-    getByRole('button', { name: 'Begin calibration' }).click()
-    expect(props.chainRunCommands).toHaveBeenCalledWith(
-      [
-        {
-          commandType: 'home',
-          params: { axes: ['leftZ'] },
-        },
-        {
-          commandType: 'calibration/calibratePipette',
-          params: { mount: 'left' },
-        },
-        {
-          commandType: 'calibration/moveToMaintenancePosition',
-          params: { mount: 'left' },
-        },
-      ],
-      false
-    )
+    fireEvent.click(getByRole('button', { name: 'Begin calibration' }))
+    await waitFor(() => {
+      expect(props.chainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'verifyTipPresence',
+            params: { pipetteId: 'abc', expectedState: 'present' },
+          },
+        ],
+        false
+      )
+    })
+    await waitFor(() => {
+      expect(props.chainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'home',
+            params: { axes: ['leftZ'] },
+          },
+          {
+            commandType: 'home',
+            params: { skipIfMountPositionOk: 'left' },
+          },
+          {
+            commandType: 'calibration/calibratePipette',
+            params: { mount: 'left' },
+          },
+          {
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: 'left' },
+          },
+        ],
+        false
+      )
+    })
     await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()
     })
-    getByLabelText('back').click()
+    fireEvent.click(getByLabelText('back'))
     expect(props.goBack).toHaveBeenCalled()
   })
 
@@ -189,5 +237,19 @@ describe('AttachProbe', () => {
       flowType: FLOWS.ATTACH,
     }
     expect(screen.queryByLabelText('back')).not.toBeInTheDocument()
+  })
+
+  it('renders a waste chute warning when 96 channel and waste chute are attached', () => {
+    props = {
+      ...props,
+      attachedPipettes: {
+        left: mock96ChannelAttachedPipetteInformation,
+        right: null,
+      },
+    }
+    const { getByText } = render(props)
+    getByText(
+      'Remove the waste chute from the deck plate adapter before proceeding.'
+    )
   })
 })

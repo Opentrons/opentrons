@@ -365,7 +365,7 @@ describe('disposal volume should update...', () => {
 
   describe('blowout location should reset via updatePatchBlowoutFields...', () => {
     const resetBlowoutLocation = {
-      blowout_location: 'fixedTrash',
+      blowout_location: null,
     }
 
     const testCases = [

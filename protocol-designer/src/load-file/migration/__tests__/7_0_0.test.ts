@@ -69,7 +69,7 @@ describe('v7 migration', () => {
             '0b44c760-75c7-11ea-b42f-4b64e50f43e5:opentrons/opentrons_96_tiprack_300ul/1',
           location: { slotName: '2' },
           displayName: 'Opentrons 96 Tip Rack 300 µL',
-          loadName: 'opentrons/opentrons_96_tiprack_300ul/1',
+          loadName: 'opentrons_96_tiprack_300ul',
           namespace: 'opentrons',
           version: 1,
         },
@@ -84,7 +84,7 @@ describe('v7 migration', () => {
             moduleId: '0b419310-75c7-11ea-b42f-4b64e50f43e5:magneticModuleType',
           },
           displayName: 'NEST 96 Well Plate 100 µL PCR Full Skirt',
-          loadName: 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
+          loadName: 'nest_96_wellplate_100ul_pcr_full_skirt',
           namespace: 'opentrons',
           version: 1,
         },
@@ -101,8 +101,7 @@ describe('v7 migration', () => {
           },
           namespace: 'opentrons',
           version: 1,
-          loadName:
-            'opentrons/opentrons_24_aluminumblock_generic_2ml_screwcap/1',
+          loadName: 'opentrons_24_aluminumblock_generic_2ml_screwcap',
           displayName:
             'Opentrons 24 Well Aluminum Block with Generic 2 mL Screwcap',
         },

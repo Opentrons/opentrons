@@ -12,6 +12,7 @@ export const mockOT3HealthResponse = {
   fw_version: '4.5.6',
   system_version: '7.8.9',
   robot_model: 'OT-3 Standard',
+  robot_serial: 'this is a flex serial',
 }
 
 export const mockOT2HealthResponse = {
@@ -20,6 +21,7 @@ export const mockOT2HealthResponse = {
   fw_version: '4.5.6',
   system_version: '7.8.9',
   robot_model: 'OT-2 Standard',
+  robot_serial: 'this is an ot2 serial',
 }
 
 export const mockLegacyServerHealthResponse = {
@@ -34,7 +36,7 @@ export const mockLegacyServerHealthResponse = {
 export const mockOT3ServerHealthResponse = {
   name: 'opentrons-dev',
   apiServerVersion: '1.2.3',
-  serialNumber: '12345',
+  serialNumber: 'unknown',
   updateServerVersion: '1.2.3',
   smoothieVersion: '4.5.6',
   systemVersion: '7.8.9',

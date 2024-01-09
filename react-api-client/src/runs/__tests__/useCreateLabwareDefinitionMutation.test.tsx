@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook } from '@testing-library/react-hooks'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { createLabwareDefinition } from '@opentrons/api-client'
 import { useHost } from '../../api'
 
@@ -22,12 +22,14 @@ const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const RUN_ID = 'run_id'
 
 describe('useCreateLabwareDefinitionMutation hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   let labwareDefinition: LabwareDefinition2
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
     wrapper = clientProvider
@@ -43,7 +45,7 @@ describe('useCreateLabwareDefinitionMutation hook', () => {
       .calledWith(HOST_CONFIG, RUN_ID, labwareDefinition)
       .mockResolvedValue({ data: 'created labware definition!' } as any)
 
-    const { result, waitFor } = renderHook(useCreateLabwareDefinitionMutation, {
+    const { result } = renderHook(useCreateLabwareDefinitionMutation, {
       wrapper,
     })
 
@@ -55,8 +57,7 @@ describe('useCreateLabwareDefinitionMutation hook', () => {
       })
     })
     await waitFor(() => {
-      return result.current.data != null
+      expect(result.current.data).toBe('created labware definition!')
     })
-    expect(result.current.data).toBe('created labware definition!')
   })
 })

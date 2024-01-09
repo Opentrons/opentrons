@@ -4,10 +4,18 @@ from __future__ import annotations
 import logging
 from typing import Optional, List
 
-from opentrons.types import Point
+from opentrons.types import Point, MountType
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
-from ..types import WellLocation, DeckPoint, MovementAxis, MotorAxis, CurrentWell
+from ..types import (
+    WellLocation,
+    DeckPoint,
+    MovementAxis,
+    MotorAxis,
+    CurrentWell,
+    AddressableOffsetVector,
+)
 from ..state import StateStore
 from ..resources import ModelUtils
 from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
@@ -49,6 +57,7 @@ class MovementHandler:
                 state_store=self._state_store, hardware_api=hardware_api
             )
         )
+        self._hardware_api = hardware_api
 
         self._gantry_mover = gantry_mover
 
@@ -64,6 +73,10 @@ class MovementHandler:
         speed: Optional[float] = None,
     ) -> Point:
         """Move to a specific well."""
+        self._state_store.labware.raise_if_labware_inaccessible_by_pipette(
+            labware_id=labware_id
+        )
+
         self._state_store.labware.raise_if_labware_has_labware_on_top(
             labware_id=labware_id
         )
@@ -94,7 +107,7 @@ class MovementHandler:
         # get the pipette's mount and current critical point, if applicable
         pipette_location = self._state_store.motion.get_pipette_location(
             pipette_id=pipette_id,
-            current_well=current_well,
+            current_location=current_well,
         )
         origin_cp = pipette_location.critical_point
 
@@ -113,6 +126,73 @@ class MovementHandler:
             current_well=current_well,
             force_direct=force_direct,
             minimum_z_height=minimum_z_height,
+        )
+
+        speed = self._state_store.pipettes.get_movement_speed(
+            pipette_id=pipette_id, requested_speed=speed
+        )
+
+        final_point = await self._gantry_mover.move_to(
+            pipette_id=pipette_id, waypoints=waypoints, speed=speed
+        )
+
+        return final_point
+
+    async def move_to_addressable_area(
+        self,
+        pipette_id: str,
+        addressable_area_name: str,
+        offset: AddressableOffsetVector,
+        force_direct: bool = False,
+        minimum_z_height: Optional[float] = None,
+        speed: Optional[float] = None,
+        stay_at_highest_possible_z: bool = False,
+    ) -> Point:
+        """Move to a specific addressable area."""
+        # Check for presence of heater shakers on deck, and if planned
+        # pipette movement is allowed
+        hs_movement_restrictors = (
+            self._state_store.modules.get_heater_shaker_movement_restrictors()
+        )
+
+        dest_slot_int = (
+            self._state_store.addressable_areas.get_addressable_area_base_slot(
+                addressable_area_name
+            ).as_int()
+        )
+
+        self._hs_movement_flagger.raise_if_movement_restricted(
+            hs_movement_restrictors=hs_movement_restrictors,
+            destination_slot=dest_slot_int,
+            is_multi_channel=(
+                self._state_store.tips.get_pipette_channels(pipette_id) > 1
+            ),
+            destination_is_tip_rack=False,
+        )
+
+        # TODO(jbl 11-28-2023) check if addressable area is a deck slot, and if it is check if there are no labware
+        #   or modules on top.
+
+        # get the pipette's mount and current critical point, if applicable
+        pipette_location = self._state_store.motion.get_pipette_location(
+            pipette_id=pipette_id,
+            current_location=None,
+        )
+        origin_cp = pipette_location.critical_point
+
+        origin = await self._gantry_mover.get_position(pipette_id=pipette_id)
+        max_travel_z = self._gantry_mover.get_max_travel_z(pipette_id=pipette_id)
+
+        # calculate the movement's waypoints
+        waypoints = self._state_store.motion.get_movement_waypoints_to_addressable_area(
+            addressable_area_name=addressable_area_name,
+            offset=offset,
+            origin=origin,
+            origin_cp=origin_cp,
+            max_travel_z=max_travel_z,
+            force_direct=force_direct,
+            minimum_z_height=minimum_z_height,
+            stay_at_max_travel_z=stay_at_highest_possible_z,
         )
 
         speed = self._state_store.pipettes.get_movement_speed(
@@ -199,3 +279,16 @@ class MovementHandler:
         For the OT3, the axis will retract to its known home position.
         """
         await self._gantry_mover.retract_axis(axis)
+
+    async def check_for_valid_position(self, mount: MountType) -> bool:
+        """Check if any axes have an unknown position.
+
+        Returns `True` if the mount position is known, or `False` if it is not known.
+        """
+        try:
+            await self._hardware_api.gantry_position(
+                mount=mount.to_hw_mount(), fail_on_not_homed=True
+            )
+        except PositionUnknownError:
+            return False
+        return True

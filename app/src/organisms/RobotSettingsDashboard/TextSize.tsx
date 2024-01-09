@@ -19,7 +19,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 
-import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SetSettingOption } from '../../pages/RobotSettingsDashboard'
 
 interface RectProps {
   isActive: boolean

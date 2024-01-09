@@ -27,6 +27,17 @@ _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
 commands_router = APIRouter()
 
 
+class RequestModelWithStatelessCommandCreate(RequestModel[StatelessCommandCreate]):
+    """Equivalent to RequestModel[StatelessCommandCreate].
+
+    This works around a Pydantic v<2 bug where RequestModel[StatelessCommandCreate]
+    doesn't parse using the StatelessCommandCreate union discriminator.
+    https://github.com/pydantic/pydantic/issues/3782
+    """
+
+    data: StatelessCommandCreate
+
+
 class CommandNotFound(ErrorDetails):
     """An error returned if the given command cannot be found."""
 
@@ -50,7 +61,7 @@ class CommandNotFound(ErrorDetails):
     },
 )
 async def create_command(
-    request_body: RequestModel[StatelessCommandCreate],
+    request_body: RequestModelWithStatelessCommandCreate,
     waitUntilComplete: bool = Query(
         False,
         description=(

@@ -1,12 +1,11 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import probing1 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
-import probing8 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
-import probing96 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_96.webm'
 import attachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
 import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 import { Trans, useTranslation } from 'react-i18next'
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
+import { WASTE_CHUTE_CUTOUT, CreateCommand } from '@opentrons/shared-data'
 import {
   LEFT,
   THERMOCYCLER_MODULE_MODELS,
@@ -20,6 +19,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { Banner } from '../../atoms/Banner'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 
@@ -41,7 +41,6 @@ const IN_PROGRESS_STYLE = css`
 `
 const BODY_STYLE = css`
   ${TYPOGRAPHY.pRegular};
-
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: 1.275rem;
     line-height: 1.75rem;
@@ -62,29 +61,35 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     isOnDevice,
     slotName,
   } = props
-  const { t, i18n } = useTranslation('module_wizard_flows')
+  const { t, i18n } = useTranslation([
+    'module_wizard_flows',
+    'pipette_wizard_flows',
+  ])
 
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
 
   const attachedPipetteChannels = attachedPipette.data.channels
-  let pipetteAttachProbeVideoSource, pipetteProbingVideoSource, i18nKey
+  let pipetteAttachProbeVideoSource, probeLocation
   switch (attachedPipetteChannels) {
     case 1:
       pipetteAttachProbeVideoSource = attachProbe1
-      pipetteProbingVideoSource = probing1
-      i18nKey = 'install_probe'
+      probeLocation = ''
       break
     case 8:
       pipetteAttachProbeVideoSource = attachProbe8
-      pipetteProbingVideoSource = probing8
-      i18nKey = 'install_probe_8_channel'
+      probeLocation = t('pipette_wizard_flows:backmost')
       break
     case 96:
       pipetteAttachProbeVideoSource = attachProbe96
-      pipetteProbingVideoSource = probing96
-      i18nKey = 'install_probe_96_channel'
+      probeLocation = t('pipette_wizard_flows:ninety_six_probe_location')
       break
   }
+  const wasteChuteConflict =
+    slotName === 'C3' && attachedPipette.data.channels === 96
+  const deckConfig = useDeckConfigurationQuery().data
+  const isWasteChuteOnDeck =
+    deckConfig?.find(fixture => fixture.cutoutId === WASTE_CHUTE_CUTOUT) ??
+    false
 
   const pipetteAttachProbeVid = (
     <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
@@ -98,24 +103,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         controls={false}
       >
         <source src={pipetteAttachProbeVideoSource} />
-      </video>
-    </Flex>
-  )
-
-  // TODO: add assets for probing actual module calibration adapters (ND 8/25/23)
-  const pipetteProbingVid = (
-    <Flex height="10.2rem" paddingTop={SPACING.spacing4}>
-      <video
-        css={css`
-          max-width: 100%;
-          max-height: 100%;
-        `}
-        autoPlay={true}
-        loop={true}
-        controls={false}
-        data-testid={pipetteProbingVideoSource}
-      >
-        <source src={pipetteProbingVideoSource} />
       </video>
     </Flex>
   )
@@ -136,10 +123,75 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     })
   }
 
+  const bodyText = (
+    <>
+      <StyledText css={BODY_STYLE}>
+        <Trans
+          t={t}
+          i18nKey={'pipette_wizard_flows:install_probe'}
+          values={{ location: probeLocation }}
+          components={{
+            bold: <strong />,
+          }}
+        />
+      </StyledText>
+
+      {wasteChuteConflict && (
+        <Banner
+          type={isWasteChuteOnDeck ? 'error' : 'warning'}
+          size={isOnDevice ? '1.5rem' : '1rem'}
+          marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
+        >
+          {isWasteChuteOnDeck
+            ? t('pipette_wizard_flows:waste_chute_error')
+            : t('pipette_wizard_flows:waste_chute_warning')}
+        </Banner>
+      )}
+    </>
+  )
+
+  const handleBeginCalibration = (): void => {
+    if (adapterId == null) {
+      setErrorMessage('calibration adapter has not been loaded yet')
+      return
+    }
+    const homeCommands: CreateCommand[] = [
+      {
+        commandType: 'home' as const,
+        params: {
+          axes: attachedPipette.mount === LEFT ? ['leftZ'] : ['rightZ'],
+        },
+      },
+      {
+        commandType: 'calibration/calibrateModule',
+        params: {
+          moduleId: attachedModule.id,
+          labwareId: adapterId,
+          mount: attachedPipette.mount,
+        },
+      },
+      {
+        commandType: 'calibration/moveToMaintenancePosition' as const,
+        params: {
+          mount: attachedPipette.mount,
+        },
+      },
+    ]
+
+    chainRunCommands?.(homeCommands, false)
+      .then(() => {
+        proceed()
+      })
+      .catch((e: Error) => {
+        setErrorMessage(`error starting module calibration: ${e.message}`)
+      })
+  }
+
   if (isRobotMoving)
     return (
       <InProgressModal
-        alternativeSpinner={isExiting ? null : pipetteProbingVid}
+        // TODO ND: 9/6/23 use spinner until animations are made
+        alternativeSpinner={null}
         description={
           isExiting
             ? t('stand_back')
@@ -157,66 +209,16 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         )}
       </InProgressModal>
     )
-
-  const bodyText =
-    attachedPipetteChannels === 8 || attachedPipetteChannels === 96 ? (
-      <Trans
-        t={t}
-        i18nKey={i18nKey}
-        components={{
-          strong: <strong />,
-          block: <StyledText css={BODY_STYLE} />,
-        }}
-      />
-    ) : (
-      <StyledText css={BODY_STYLE}>{t('install_probe')}</StyledText>
-    )
-
-  const handleBeginCalibration = (): void => {
-    if (adapterId == null) {
-      setErrorMessage('calibration adapter has not been loaded yet')
-      return
-    }
-    chainRunCommands?.(
-      [
-        {
-          commandType: 'home' as const,
-          params: {
-            axes: attachedPipette.mount === LEFT ? ['leftZ'] : ['rightZ'],
-          },
-        },
-        {
-          commandType: 'calibration/calibrateModule',
-          params: {
-            moduleId: attachedModule.id,
-            labwareId: adapterId,
-            mount: attachedPipette.mount,
-          },
-        },
-        {
-          commandType: 'calibration/moveToMaintenancePosition' as const,
-          params: {
-            mount: attachedPipette.mount,
-          },
-        },
-      ],
-      false
-    )
-      .then(() => proceed())
-      .catch((e: Error) =>
-        setErrorMessage(`error starting module calibration: ${e.message}`)
-      )
-  }
-
   // TODO: add calibration loading screen and error screen
-  return (
-    <GenericWizardTile
-      header={i18n.format(t('attach_probe'), 'capitalize')}
-      rightHandBody={pipetteAttachProbeVid}
-      bodyText={bodyText}
-      proceedButtonText={t('begin_calibration')}
-      proceed={handleBeginCalibration}
-      back={goBack}
-    />
-  )
+  else
+    return (
+      <GenericWizardTile
+        header={i18n.format(t('attach_probe'), 'capitalize')}
+        rightHandBody={pipetteAttachProbeVid}
+        bodyText={bodyText}
+        proceedButtonText={t('begin_calibration')}
+        proceed={handleBeginCalibration}
+        back={goBack}
+      />
+    )
 }

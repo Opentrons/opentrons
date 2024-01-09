@@ -1,5 +1,6 @@
 import range from 'lodash/range'
-import { getLabwareHasQuirk, sortWells } from '.'
+import { get96Channel384WellPlateWells } from './get96Channel384WellPlateWells'
+import { getLabwareHasQuirk, orderWells, sortWells } from './index'
 import type { LabwareDefinition2 } from '../types'
 
 // TODO Ian 2018-03-13 pull pipette offsets/positions from some pipette definitions data
@@ -36,10 +37,10 @@ export function findWellAt(
 // "topWellName" means well at the "top" of the column we're accessing: usually A row, or B row for 384-format
 export function getWellNamePerMultiTip(
   labwareDef: LabwareDefinition2,
-  topWellName: string
+  topWellName: string,
+  channels: 8 | 96
 ): string[] | null {
   const topWell = labwareDef.wells[topWellName]
-
   if (!topWell) {
     console.warn(
       `well "${topWellName}" does not exist in labware ${labwareDef?.namespace}/${labwareDef?.parameters?.loadName}, cannot getWellNamePerMultiTip`
@@ -51,6 +52,7 @@ export function getWellNamePerMultiTip(
   let offsetYTipPositions: number[] = range(0, 8).map(
     tipNo => y - tipNo * OFFSET_8_CHANNEL
   )
+  const orderedWells = orderWells(labwareDef.ordering, 't2b', 'l2r')
 
   if (getLabwareHasQuirk(labwareDef, 'centerMultichannelOnWells')) {
     // move multichannel up in Y by half the pipette's tip span to center it in the well
@@ -58,19 +60,27 @@ export function getWellNamePerMultiTip(
       tipPosY => tipPosY + MULTICHANNEL_TIP_SPAN / 2
     )
   }
-
   // Return null for containers with any undefined wells
   const wellsAccessed = offsetYTipPositions.reduce(
     (acc: string[] | null, tipPosY) => {
       const wellForTip = findWellAt(labwareDef, x, tipPosY)
-
       if (acc === null || !wellForTip) {
         return null
       }
-
       return acc.concat(wellForTip)
     },
     []
   )
-  return wellsAccessed
+
+  let ninetySixChannelWells = orderedWells
+  //  special casing 384 well plates to be every other well
+  //  both on the x and y ases.
+  if (orderedWells.length === 384) {
+    ninetySixChannelWells = get96Channel384WellPlateWells(
+      orderedWells,
+      topWellName
+    )
+  }
+
+  return channels === 8 ? wellsAccessed : ninetySixChannelWells
 }

@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, List, Type
 from typing_extensions import Literal
 
+from opentrons.types import MountType
 from ..types import MotorAxis
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
@@ -25,6 +26,14 @@ class HomeParams(BaseModel):
             " to ensure accurate homing of the explicitly specified axes."
         ),
     )
+    skipIfMountPositionOk: Optional[MountType] = Field(
+        None,
+        description=(
+            "If this parameter is provided, the gantry will only be homed if the"
+            " specified mount has an invalid position. If omitted, the homing action"
+            " will be executed unconditionally."
+        ),
+    )
 
 
 class HomeResult(BaseModel):
@@ -39,7 +48,13 @@ class HomeImplementation(AbstractCommandImpl[HomeParams, HomeResult]):
 
     async def execute(self, params: HomeParams) -> HomeResult:
         """Home some or all motors to establish positional accuracy."""
-        await self._movement.home(axes=params.axes)
+        if (
+            params.skipIfMountPositionOk is None
+            or not await self._movement.check_for_valid_position(
+                mount=params.skipIfMountPositionOk
+            )
+        ):
+            await self._movement.home(axes=params.axes)
         return HomeResult()
 
 

@@ -49,10 +49,10 @@
       "title": "Missing labware",
       "body": "Your module has no labware on it. We recommend you add labware before proceeding."
     },
-    "export_v7_protocol_7_0": {
+    "export_v8_protocol_7_1": {
       "title": "Robot and app update may be required",
       "body1": "This protocol can only run on app and robot server version",
-      "body2": "7.0 or higher",
+      "body2": "7.1 or higher",
       "body3": ". Please ensure your robot is updated to the correct version."
     },
     "change_magnet_module_model": {
@@ -84,6 +84,10 @@
 
       "body4a": "To batch edit Transfer or Mix advanced settings:",
       "body4b": "Only include Transfer or Mix steps in your selection."
+    },
+    "waste_chute_warning": {
+      "title": "Disposing labware",
+      "body1": "Moving labware to the Waste Chute permanently discards it. You can't use this labware in later steps. During a protocol run, the labware will be dropped in the chute and become irretrievable."
     }
   },
   "timeline": {
@@ -141,12 +145,36 @@
         "body": "8-Channel pipettes cannot access labware in front of or behind a Heater-Shaker. They can access Opentrons Tip Racks in this slot. Move labware to a different slot."
       },
       "LABWARE_OFF_DECK": {
-        "title": "Labware is off deck",
+        "title": "Labware is off-deck",
         "body": "The robot can only perform steps on labware that is on the deck. Add or change a Move Labware step to put it on the deck before this step."
       },
       "HEATER_SHAKER_LATCH_CLOSED": {
         "title": "Heater-Shaker labware latch is closed",
         "body": "The Heater-Shaker’s labware latch must be open when moving labware to or from the module. Add a Heater-Shaker step that opens the latch before this step."
+      },
+      "DROP_TIP_LOCATION_DOES_NOT_EXIST": {
+        "title": "Attempting to drop tip in an unknown location",
+        "body": "The Waste Chute or Trash Bin to drop tip in does not exist."
+      },
+      "MISSING_96_CHANNEL_TIPRACK_ADAPTER": {
+        "title": "Missing 96-channel tip rack adapter",
+        "body": "The tip rack must be placed in an adapter when picking up 96 tips simultaneously."
+      },
+      "EQUIPMENT_DOES_NOT_EXIST": {
+        "title": "Attempting to interact with an unknown entity",
+        "body": "An entity you are interacting with does not exist."
+      },
+      "GRIPPER_REQUIRED": {
+        "title": "A gripper is required to complete this action",
+        "body": "Attempting to move a labware without a gripper into the waste chute. Please add a gripper to this step."
+      },
+      "REMOVE_96_CHANNEL_TIPRACK_ADAPTER": {
+        "title": "Do not use tip rack adapter for partial tip pickup",
+        "body": "Partial tip pickup requires a tip rack placed directly on the deck. Remove the adapter, or add a new tip rack without an adapter."
+      },
+      "CANNOT_MOVE_WITH_GRIPPER": {
+        "title": "Cannot move with gripper",
+        "body": "The gripper cannot move aluminum blocks. Edit the step and deselect the 'Use Gripper' checkbox."
       }
     },
     "warning": {
@@ -157,6 +185,14 @@
       "ASPIRATE_FROM_PRISTINE_WELL": {
         "title": "Source well is empty",
         "body": "The well(s) you're trying to aspirate from are empty. To add liquids, hover over labware in "
+      },
+      "LABWARE_IN_WASTE_CHUTE_HAS_LIQUID": {
+        "title": "Moving labware into waste chute",
+        "body": "This labware has remaining liquid, be advised that once you dispose of it, there is no way to get it back later in the protocol."
+      },
+      "TIPRACK_IN_WASTE_CHUTE_HAS_TIPS": {
+        "title": "Moving tiprack into waste chute",
+        "body": "This tiprack has remaining tips, be advised that once you dispose of it, there is no way to get it back later in the protocol. "
       }
     }
   },
@@ -169,7 +205,7 @@
   "module_placement": {
     "SLOT_OCCUPIED": {
       "title": "Cannot place module",
-      "body": "Slot {{selectedSlot}} is occupied by another module or by labware incompatible with this module. Remove module or labware from the slot in order to continue."
+      "body": "Slot {{selectedSlot}} is occupied. Navigate to the design tab and remove the labware or remove the additional item to continue."
     },
     "HEATER_SHAKER_ADJACENT_LABWARE_TOO_TALL": {
       "title": "Cannot place module",
@@ -182,6 +218,13 @@
     "HEATER_SHAKER_ADJACENT_TO_MODULE": {
       "title": "Cannot place module",
       "body": "Slot {{selectedSlot}} is occupied by a Heater-Shaker. Other modules cannot be placed in front of or behind a Heater-Shaker."
+    }
+  },
+  "deck_config_placement": {
+    "SLOT_OCCUPIED": {
+      "staging_area": "Cannot place staging area",
+      "trashBin": "Cannot place trash bin",
+      "wasteChute": "Cannot place waste chute"
     }
   },
   "export_warnings": {
@@ -214,6 +257,18 @@
       "heading": "Unused gripper",
       "body1": "The Flex Gripper specified in your protocol is not currently used in any step. In order to run this protocol you will need to connect it to your robot.",
       "body2": "If you don't intend to use the Flex Gripper, please consider removing it from your protocol."
+    },
+    "unused_trash": {
+      "heading": "Unused trash",
+      "body": "The {{name}} specified in your protocol is not currently used in any step. It will not appear as a needed item on the deck when uploaded to the app.",
+      "body_both": "The {{trashName}} and {{wasteName}} specified in your protocol are not currently used in any step. They will not appear as a needed item on the deck when uploaded to the app."
+    },
+    "unused_staging_area": {
+      "heading": "One or more staging area slots are unused",
+      "body1_plural": "The {{count}} staging area slots in [{{slot}}] in your protocol are not currently in use. They will not appear as a needed item on the deck when uploaded to the app.",
+      "body1": "The staging area slot in {{slot}} in your protocol is not currently in use. It will not appear as a needed item on the deck when uploaded to the app.",
+      "body2_plural": "If you don't intend to use these staging area slots, please consider removing it from your protocol.",
+      "body2": "If you don't intend to use this staging area slot, please consider removing it from your protocol."
     }
   },
   "crash": {

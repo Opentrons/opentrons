@@ -12,6 +12,9 @@
       "$ref": "#/definitions/CommentCreate"
     },
     {
+      "$ref": "#/definitions/ConfigureForVolumeCreate"
+    },
+    {
       "$ref": "#/definitions/CustomCreate"
     },
     {
@@ -367,6 +370,55 @@
         },
         "params": {
           "$ref": "#/definitions/CommentParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "ConfigureForVolumeParams": {
+      "title": "ConfigureForVolumeParams",
+      "description": "Parameters required to configure volume for a specific pipette.",
+      "type": "object",
+      "properties": {
+        "volume": {
+          "title": "Volume",
+          "description": "Amount of liquid in uL. Must be greater than 0 and less than a pipette-specific maximum volume.",
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        }
+      },
+      "required": ["volume", "pipetteId"]
+    },
+    "ConfigureForVolumeCreate": {
+      "title": "ConfigureForVolumeCreate",
+      "description": "Configure for volume command creation request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "configureForVolume",
+          "enum": ["configureForVolume"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/ConfigureForVolumeParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
@@ -836,6 +888,12 @@
       ],
       "type": "string"
     },
+    "MountType": {
+      "title": "MountType",
+      "description": "An enumeration.",
+      "enum": ["left", "right", "extension"],
+      "type": "string"
+    },
     "HomeParams": {
       "title": "HomeParams",
       "description": "Payload required for a Home command.",
@@ -847,6 +905,14 @@
           "items": {
             "$ref": "#/definitions/MotorAxis"
           }
+        },
+        "skipIfMountPositionOk": {
+          "description": "If this parameter is provided, the gantry will only be homed if the specified mount has an invalid position. If omitted, the homing action will be executed unconditionally.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/MountType"
+            }
+          ]
         }
       }
     },
@@ -1235,27 +1301,16 @@
       ],
       "type": "string"
     },
-    "MountType": {
-      "title": "MountType",
-      "description": "An enumeration.",
-      "enum": ["left", "right", "extension"],
-      "type": "string"
-    },
     "LoadPipetteParams": {
       "title": "LoadPipetteParams",
       "description": "Payload needed to load a pipette on to a mount.",
       "type": "object",
       "properties": {
         "pipetteName": {
-          "title": "Pipettename",
           "description": "The load name of the pipette to be required.",
-          "anyOf": [
+          "allOf": [
             {
               "$ref": "#/definitions/PipetteNameType"
-            },
-            {
-              "enum": ["p1000_96"],
-              "type": "string"
             }
           ]
         },

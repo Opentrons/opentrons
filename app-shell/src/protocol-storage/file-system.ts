@@ -24,7 +24,10 @@ import { analyzeProtocolSource } from '../protocol-analysis'
  *  │  ├─ analysis/
  *  │  │  ├─ 1646303906.json
  */
-
+export const PRE_V7_PARITY_DIRECTORY_PATH = path.join(
+  app.getPath('userData'),
+  'protocols_v7.0-supported'
+)
 export const PROTOCOLS_DIRECTORY_NAME = 'protocols'
 export const PROTOCOLS_DIRECTORY_PATH = path.join(
   app.getPath('userData'),

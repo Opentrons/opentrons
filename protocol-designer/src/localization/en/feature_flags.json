@@ -11,5 +11,9 @@
   "OT_PD_ALLOW_ALL_TIPRACKS": {
     "title": "Allow all tip rack options",
     "description": "Enable selection of all tip racks for each pipette."
+  },
+  "OT_PD_ENABLE_MULTI_TIP": {
+    "title": "Enable multi tiprack support",
+    "description": "Allow users to select multiple tipracks per pipette"
   }
 }

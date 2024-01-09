@@ -15,7 +15,7 @@ class Protocol(BaseModel):
     file_name: names = Field(description="file name not including extension")
     file_extension: Literal["json", "py"] = Field(description="file extension of the protocol")
     protocol_name: str = Field(description="the protocol name which will appear in the protocol name field in the app")
-    robot: Literal["OT-2", "OT-3"] = Field(description="the robot type which will appear in the robot field in the app")
+    robot: Literal["OT-2", "Flex"] = Field(description="the robot type which will appear in the robot field in the app")
     app_error: bool = Field(description="will analysis with the app raise an error")
     robot_error: bool = Field(description="will analysis with the robot raise an error")
     app_analysis_error: Optional[str] = Field(description="the exact error shown in the app popout", default=None)
@@ -24,6 +24,8 @@ class Protocol(BaseModel):
     instruments: Optional[list[str]] = Field(description="list of instruments that will show in the app", default=None)
     modules: Optional[list[module_types]] = Field(description="list of modules that will show in the app", default=None)
     description: Optional[str] = Field(description="Details about this protocol", default=None)
+    expected_test_failure: bool = Field(description="Is this test expected to fail", default=False)
+    expected_test_reason: Optional[str] = Field(description="Reason test is failing", default=False)
 
     @property
     def file_path(self) -> Path:

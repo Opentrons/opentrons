@@ -8,24 +8,28 @@ import {
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
-  JUSTIFY_FLEX_END,
   SPACING,
   Flex,
   NewPrimaryBtn,
   NewSecondaryBtn,
   BORDERS,
+  JUSTIFY_SPACE_BETWEEN,
+  JUSTIFY_SPACE_AROUND,
 } from '@opentrons/components'
 
 import {
   getShellUpdateState,
+  getAvailableShellUpdate,
   downloadShellUpdate,
   applyShellUpdate,
 } from '../../redux/shell'
 
+import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { ReleaseNotes } from '../../molecules/ReleaseNotes'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { Banner } from '../../atoms/Banner'
 import { ProgressBar } from '../../atoms/ProgressBar'
+import { useRemoveActiveAppUpdateToast } from '../Alerts'
 
 import type { Dispatch } from '../../redux/types'
 import { StyledText } from '../../atoms/text'
@@ -34,7 +38,6 @@ interface PlaceHolderErrorProps {
   errorMessage?: string
 }
 
-// TODO(jh, 2023-08-25): refactor default error handling into LegacyModal
 const PlaceholderError = ({
   errorMessage,
 }: PlaceHolderErrorProps): JSX.Element => {
@@ -56,7 +59,8 @@ const PlaceholderError = ({
     </>
   )
 }
-
+export const RELEASE_NOTES_URL_BASE =
+  'https://github.com/Opentrons/opentrons/releases/tag/v'
 const UPDATE_ERROR = 'Update Error'
 const FOOTER_BUTTON_STYLE = css`
   text-transform: lowercase;
@@ -74,10 +78,17 @@ const UpdateAppBanner = styled(Banner)`
   border: none;
 `
 const UPDATE_PROGRESS_BAR_STYLE = css`
-  margin-top: 1.5rem;
+  margin-top: ${SPACING.spacing24};
   border-radius: ${BORDERS.borderRadiusSize3};
   background: ${COLORS.medGreyEnabled};
+  width: 17.12rem;
 `
+const LEGACY_MODAL_STYLE = css`
+  width: 40rem;
+  textalign: center;
+`
+
+const RESTART_APP_AFTER_TIME = 5000
 
 export interface UpdateAppModalProps {
   closeModal: (arg0: boolean) => void
@@ -97,42 +108,63 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
   const releaseNotes = updateInfo?.releaseNotes
   const { t } = useTranslation('app_settings')
   const history = useHistory()
+  const { removeActiveAppUpdateToast } = useRemoveActiveAppUpdateToast()
+  const availableAppUpdateVersion = useSelector(getAvailableShellUpdate) ?? ''
 
-  if (downloaded) setTimeout(() => dispatch(applyShellUpdate()), 5000)
+  if (downloaded)
+    setTimeout(() => dispatch(applyShellUpdate()), RESTART_APP_AFTER_TIME)
 
   const handleRemindMeLaterClick = (): void => {
     history.push('/app-settings/general')
     closeModal(true)
   }
 
+  removeActiveAppUpdateToast()
+
   const appUpdateFooter = (
-    <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_FLEX_END}>
-      <NewSecondaryBtn
-        onClick={handleRemindMeLaterClick}
-        marginRight={SPACING.spacing8}
-        css={FOOTER_BUTTON_STYLE}
+    <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+      <ExternalLink
+        href={`${RELEASE_NOTES_URL_BASE}${availableAppUpdateVersion}`}
+        css={css`
+          font-size: 0.875rem;
+        `}
+        id="SoftwareUpdateReleaseNotesLink"
+        marginLeft={SPACING.spacing32}
       >
-        {t('remind_later')}
-      </NewSecondaryBtn>
-      <NewPrimaryBtn
-        onClick={() => dispatch(downloadShellUpdate())}
-        marginRight={SPACING.spacing12}
-        css={FOOTER_BUTTON_STYLE}
-      >
-        {t('update_app_now')}
-      </NewPrimaryBtn>
+        {t('release_notes')}
+      </ExternalLink>
+      <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_AROUND}>
+        <NewSecondaryBtn
+          onClick={handleRemindMeLaterClick}
+          marginRight={SPACING.spacing8}
+          css={FOOTER_BUTTON_STYLE}
+        >
+          {t('remind_later')}
+        </NewSecondaryBtn>
+        <NewPrimaryBtn
+          onClick={() => dispatch(downloadShellUpdate())}
+          marginRight={SPACING.spacing12}
+          css={FOOTER_BUTTON_STYLE}
+        >
+          {t('update_app_now')}
+        </NewPrimaryBtn>
+      </Flex>
     </Flex>
   )
 
   return (
     <>
       {error != null ? (
-        <LegacyModal title={UPDATE_ERROR} onClose={() => closeModal(true)}>
+        <LegacyModal
+          title={UPDATE_ERROR}
+          onClose={() => closeModal(true)}
+          css={LEGACY_MODAL_STYLE}
+        >
           <PlaceholderError errorMessage={error.message} />
         </LegacyModal>
       ) : null}
       {(downloading || downloaded) && error == null ? (
-        <LegacyModal title={t('opentrons_app_update')}>
+        <LegacyModal title={t('opentrons_app_update')} css={LEGACY_MODAL_STYLE}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
             alignItems={ALIGN_CENTER}
@@ -155,6 +187,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
           closeOnOutsideClick={true}
           footer={appUpdateFooter}
           maxHeight="80%"
+          css={LEGACY_MODAL_STYLE}
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
             <UpdateAppBanner type="informing" marginBottom={SPACING.spacing8}>

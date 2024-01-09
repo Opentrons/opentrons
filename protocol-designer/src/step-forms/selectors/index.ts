@@ -16,6 +16,7 @@ import {
   MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
 import {
+  AdditionalEquipmentEntities,
   NormalizedAdditionalEquipmentById,
   TEMPERATURE_DEACTIVATED,
 } from '@opentrons/step-generation'
@@ -30,10 +31,10 @@ import {
   getProfileFormErrors,
 } from '../../steplist/formLevel/profileErrors'
 import { getMoveLabwareFormErrors } from '../../steplist/formLevel/moveLabwareFormErrors'
-import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
+import { getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 import * as featureFlagSelectors from '../../feature-flags/selectors'
-import { denormalizePipetteEntities } from '../utils'
+import { denormalizePipetteEntities, getHydratedForm } from '../utils'
 import {
   selectors as labwareDefSelectors,
   LabwareDefByDefURI,
@@ -50,7 +51,6 @@ import type {
   LabwareEntity,
   LabwareEntities,
   ModuleEntities,
-  ModuleEntity,
   PipetteEntities,
 } from '@opentrons/step-generation'
 import type { FormWarning } from '../../steplist/formLevel'
@@ -151,6 +151,15 @@ export const _getPipetteEntitiesRootState: (
   labwareDefSelectors._getLabwareDefsByIdRootState,
   denormalizePipetteEntities
 )
+// Special version of `getAdditionalEquipmentEntities` selector for use in step-forms reducers
+export const _getAdditionalEquipmentEntitiesRootState: (
+  arg: RootState
+) => AdditionalEquipmentEntities = rs =>
+  rs.additionalEquipmentInvariantProperties
+export const getAdditionalEquipmentEntities: Selector<
+  BaseState,
+  AdditionalEquipmentEntities
+> = createSelector(rootSelector, _getAdditionalEquipmentEntitiesRootState)
 
 export const getPipetteEntities: Selector<
   BaseState,
@@ -204,18 +213,36 @@ const _getInitialDeckSetup = (
   initialSetupStep: FormData,
   labwareEntities: LabwareEntities,
   pipetteEntities: PipetteEntities,
-  moduleEntities: ModuleEntities
+  moduleEntities: ModuleEntities,
+  additionalEquipmentEntities: AdditionalEquipmentEntities
 ): InitialDeckSetup => {
   assert(
     initialSetupStep && initialSetupStep.stepType === 'manualIntervention',
     'expected initial deck setup step to be "manualIntervention" step'
   )
+
   const labwareLocations =
     (initialSetupStep && initialSetupStep.labwareLocationUpdate) || {}
   const moduleLocations =
     (initialSetupStep && initialSetupStep.moduleLocationUpdate) || {}
   const pipetteLocations =
     (initialSetupStep && initialSetupStep.pipetteLocationUpdate) || {}
+
+  // filtering only the additionalEquipmentEntities that are rendered on the deck
+  // which for now is wasteChute, trashBin, and stagingArea
+  const additionalEquipmentEntitiesOnDeck = Object.values(
+    additionalEquipmentEntities
+  ).reduce((aeEntities: AdditionalEquipmentEntities, ae) => {
+    if (
+      ae.name === 'wasteChute' ||
+      ae.name === 'stagingArea' ||
+      ae.name === 'trashBin'
+    ) {
+      aeEntities[ae.id] = ae
+    }
+    return aeEntities
+  }, {})
+
   return {
     labware: mapValues<{}, LabwareOnDeck>(
       labwareLocations,
@@ -281,6 +308,7 @@ const _getInitialDeckSetup = (
         return { mount, ...pipetteEntities[pipetteId] }
       }
     ),
+    additionalEquipmentOnDeck: additionalEquipmentEntitiesOnDeck,
   }
 }
 
@@ -292,6 +320,7 @@ export const getInitialDeckSetup: Selector<
   getLabwareEntities,
   getPipetteEntities,
   getModuleEntities,
+  getAdditionalEquipment,
   _getInitialDeckSetup
 )
 // Special version of `getLabwareEntities` selector for use in step-forms reducers
@@ -302,6 +331,7 @@ export const _getInitialDeckSetupRootState: (
   _getLabwareEntitiesRootState,
   _getPipetteEntitiesRootState,
   _getModuleEntitiesRootState,
+  _getAdditionalEquipmentRootState,
   _getInitialDeckSetup
 )
 export const getPermittedTipracks: Selector<
@@ -481,38 +511,6 @@ export const getBatchEditFormHasUnsavedChanges: Selector<
   boolean
 > = createSelector(getBatchEditFieldChanges, changes => !isEmpty(changes))
 
-const getModuleEntity = (state: InvariantContext, id: string): ModuleEntity => {
-  return state.moduleEntities[id]
-}
-
-// TODO: Ian 2019-01-25 type with hydrated form type, see #3161
-function _getHydratedForm(
-  rawForm: FormData,
-  invariantContext: InvariantContext
-): FormData {
-  const hydratedForm = mapValues(rawForm, (value, name) =>
-    hydrateField(invariantContext, name, value)
-  )
-  // TODO(IL, 2020-03-23): separate hydrated/denormalized fields from the other fields.
-  // It's confusing that pipette is an ID string before this,
-  // but a PipetteEntity object after this.
-  // For `moduleId` field, it would be surprising to be a ModuleEntity!
-  // Consider nesting all additional fields under 'meta' key,
-  // following what we're doing with 'module'.
-  // See #3161
-  hydratedForm.meta = {}
-
-  if (rawForm?.moduleId != null) {
-    // @ts-expect-error(sa, 2021-6-14): type this properly in #3161
-    hydratedForm.meta.module = getModuleEntity(
-      invariantContext,
-      rawForm.moduleId
-    )
-  }
-  // @ts-expect-error(sa, 2021-6-14):type this properly in #3161
-  return hydratedForm
-}
-
 // TODO type with hydrated form type
 const _formLevelErrors = (hydratedForm: FormData): StepFormErrors => {
   return getFormErrors(hydratedForm.stepType, hydratedForm)
@@ -595,18 +593,21 @@ export const getInvariantContext: Selector<
   getLabwareEntities,
   getModuleEntities,
   getPipetteEntities,
+  getAdditionalEquipmentEntities,
   featureFlagSelectors.getDisableModuleRestrictions,
   featureFlagSelectors.getAllowAllTipracks,
   (
     labwareEntities,
     moduleEntities,
     pipetteEntities,
+    additionalEquipmentEntities,
     disableModuleRestrictions,
     allowAllTipracks
   ) => ({
     labwareEntities,
     moduleEntities,
     pipetteEntities,
+    additionalEquipmentEntities,
     config: {
       OT_PD_ALLOW_ALL_TIPRACKS: Boolean(allowAllTipracks),
       OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),
@@ -623,7 +624,7 @@ export const getHydratedUnsavedForm: Selector<
   (unsavedForm, invariantContext) => {
     if (unsavedForm == null) return null
 
-    const hydratedForm = _getHydratedForm(unsavedForm, invariantContext)
+    const hydratedForm = getHydratedForm(unsavedForm, invariantContext)
 
     return hydratedForm ?? null
   }
@@ -669,7 +670,7 @@ export const getArgsAndErrorsByStepId: Selector<
     return reduce(
       stepForms,
       (acc, stepForm) => {
-        const hydratedForm = _getHydratedForm(stepForm, contextualState)
+        const hydratedForm = getHydratedForm(stepForm, contextualState)
 
         const errors = _formHasErrors(hydratedForm, contextualState)
         const nextStepData = !errors
@@ -723,7 +724,7 @@ export const getFormLevelWarningsForUnsavedForm: Selector<
   (unsavedForm, contextualState) => {
     if (!unsavedForm) return []
 
-    const hydratedForm = _getHydratedForm(unsavedForm, contextualState)
+    const hydratedForm = getHydratedForm(unsavedForm, contextualState)
 
     return getFormWarnings(unsavedForm.stepType, hydratedForm)
   }
@@ -738,7 +739,7 @@ export const getFormLevelWarningsPerStep: Selector<
     mapValues(forms, (form, stepId) => {
       if (!form) return []
 
-      const hydratedForm = _getHydratedForm(form, contextualState)
+      const hydratedForm = getHydratedForm(form, contextualState)
 
       return getFormWarnings(form.stepType, hydratedForm)
     })

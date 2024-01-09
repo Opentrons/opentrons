@@ -21,7 +21,11 @@ import { StyledText } from '../../../../atoms/text'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { useRobot } from '../../../../organisms/Devices/hooks'
 import { CONNECTABLE } from '../../../../redux/discovery'
-import { postWifiDisconnect } from '../../../../redux/networking'
+import {
+  clearWifiStatus,
+  getNetworkInterfaces,
+  postWifiDisconnect,
+} from '../../../../redux/networking'
 import { useWifiList } from '../../../../resources/networking/hooks'
 import {
   dismissRequest,
@@ -46,6 +50,9 @@ export const DisconnectModal = ({
   const { t } = useTranslation(['device_settings', 'shared'])
 
   const wifiList = useWifiList(robotName)
+  const { wifi } = useSelector((state: State) =>
+    getNetworkInterfaces(state, robotName)
+  )
 
   const activeNetwork = wifiList?.find(nw => nw.active)
   const ssid = activeNetwork?.ssid ?? null
@@ -93,7 +100,10 @@ export const DisconnectModal = ({
   // check for connectable robot health status and presume successful disconnection if request pending and robot not connectable
   const { status } = useRobot(robotName) ?? {}
   const isDisconnected =
-    isRequestSucceeded || (isRequestPending && status !== CONNECTABLE)
+    isRequestSucceeded ||
+    (isRequestPending && status !== CONNECTABLE) ||
+    // as a fallback, if polled wifi interface ipAddress is null presume successful disconnection
+    wifi?.ipAddress == null
 
   if (isDisconnected) {
     disconnectModalBody = t('disconnect_from_wifi_network_success')
@@ -102,6 +112,12 @@ export const DisconnectModal = ({
   } else if (isRequestFailed) {
     disconnectModalBody = t('disconnect_from_wifi_network_failure', { ssid })
   }
+
+  React.useEffect(() => {
+    if (isDisconnected) {
+      dispatch(clearWifiStatus(robotName))
+    }
+  }, [isDisconnected])
 
   return (
     <LegacyModal

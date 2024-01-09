@@ -1,10 +1,10 @@
 """Instruments routes."""
-from typing import Optional, Dict, List, TYPE_CHECKING, cast
+from typing import Optional, Dict, List, cast
 
 from fastapi import APIRouter, status, Depends
 
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
-    PipetteOffsetByPipetteMount,
+    PipetteOffsetSummary,
 )
 from opentrons.protocol_engine.errors import HardwareNotSupportedError
 
@@ -42,20 +42,20 @@ from .instrument_models import (
     BadGripper,
     BadPipette,
     PipetteState,
+    InconsistentCalibrationFailure,
 )
 
 from robot_server.subsystems.models import SubSystem
 from robot_server.subsystems.router import status_route_for, update_route_for
 
-if TYPE_CHECKING:
-    from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control import OT3HardwareControlAPI
 
 instruments_router = APIRouter()
 
 
 def _pipette_dict_to_pipette_res(
     pipette_dict: PipetteDict,
-    pipette_offset: Optional[PipetteOffsetByPipetteMount],
+    pipette_offset: Optional[PipetteOffsetSummary],
     mount: Mount,
     fw_version: Optional[int],
     pipette_state: Optional[PipetteStateDict],
@@ -83,6 +83,16 @@ def _pipette_dict_to_pipette_res(
                     ),
                     source=calibration_data.source,
                     last_modified=calibration_data.last_modified,
+                    reasonability_check_failures=[
+                        InconsistentCalibrationFailure.construct(
+                            offsets={
+                                k.name: Vec3f.construct(x=v.x, y=v.y, z=v.z)
+                                for k, v in failure.offsets.items()
+                            },
+                            limit=failure.limit,
+                        )
+                        for failure in calibration_data.reasonability_check_failures
+                    ],
                 )
                 if calibration_data
                 else None,
@@ -113,6 +123,7 @@ def _gripper_dict_to_gripper_res(
                 ),
                 source=calibration_data.source,
                 last_modified=calibration_data.last_modified,
+                reasonability_check_failures=[],
             ),
         ),
     )
@@ -139,7 +150,7 @@ def _bad_pipette_response(subsystem: SubSystem) -> BadPipette:
 
 
 async def _get_gripper_instrument_data(
-    hardware: "OT3API",
+    hardware: OT3HardwareControlAPI,
     attached_gripper: Optional[GripperDict],
 ) -> Optional[AttachedItem]:
     subsys = HWSubSystem.of_mount(OT3Mount.GRIPPER)
@@ -155,7 +166,7 @@ async def _get_gripper_instrument_data(
 
 
 async def _get_pipette_instrument_data(
-    hardware: "OT3API",
+    hardware: OT3HardwareControlAPI,
     attached_pipettes: Dict[Mount, PipetteDict],
     mount: Mount,
 ) -> Optional[AttachedItem]:
@@ -166,7 +177,7 @@ async def _get_pipette_instrument_data(
         return _bad_pipette_response(SubSystem.from_hw(subsys))
     if pipette_dict:
         offset = cast(
-            Optional[PipetteOffsetByPipetteMount],
+            Optional[PipetteOffsetSummary],
             hardware.get_instrument_offset(OT3Mount.from_mount(mount)),
         )
         pipette_state = await hardware.get_instrument_state(mount)
@@ -181,7 +192,7 @@ async def _get_pipette_instrument_data(
 
 
 async def _get_instrument_data(
-    hardware: "OT3API",
+    hardware: OT3HardwareControlAPI,
 ) -> List[AttachedItem]:
     attached_pipettes = hardware.attached_pipettes
     attached_gripper = hardware.attached_gripper
@@ -202,7 +213,7 @@ async def _get_instrument_data(
 
 
 async def _get_attached_instruments_ot3(
-    hardware: "OT3API",
+    hardware: OT3HardwareControlAPI,
 ) -> PydanticResponse[SimpleMultiBody[AttachedItem]]:
     # OT3
     await hardware.cache_instruments()

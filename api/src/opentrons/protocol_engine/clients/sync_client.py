@@ -1,7 +1,6 @@
 """Control a `ProtocolEngine` without async/await."""
 
-from typing import cast, List, Optional, Union, Dict
-from typing_extensions import Literal
+from typing import cast, List, Optional, Dict
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareUri
@@ -24,6 +23,8 @@ from ..types import (
     LabwareOffsetVector,
     MotorAxis,
     Liquid,
+    NozzleLayoutConfigurationType,
+    AddressableOffsetVector,
 )
 from .transports import ChildThreadTransport
 
@@ -141,11 +142,9 @@ class SyncClient:
 
         return cast(commands.MoveLabwareResult, result)
 
-    # TODO (tz, 11-23-22): remove Union when refactoring load_pipette for 96 channels.
-    # https://opentrons.atlassian.net/browse/RLIQ-255
     def load_pipette(
         self,
-        pipette_name: Union[PipetteNameType, Literal["p1000_96"]],
+        pipette_name: PipetteNameType,
         mount: MountType,
     ) -> commands.LoadPipetteResult:
         """Execute a LoadPipette command and return the result."""
@@ -181,6 +180,56 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
 
         return cast(commands.MoveToWellResult, result)
+
+    def move_to_addressable_area(
+        self,
+        pipette_id: str,
+        addressable_area_name: str,
+        offset: AddressableOffsetVector,
+        minimum_z_height: Optional[float],
+        force_direct: bool,
+        speed: Optional[float],
+    ) -> commands.MoveToAddressableAreaResult:
+        """Execute a MoveToAddressableArea command and return the result."""
+        request = commands.MoveToAddressableAreaCreate(
+            params=commands.MoveToAddressableAreaParams(
+                pipetteId=pipette_id,
+                addressableAreaName=addressable_area_name,
+                offset=offset,
+                forceDirect=force_direct,
+                minimumZHeight=minimum_z_height,
+                speed=speed,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+
+        return cast(commands.MoveToAddressableAreaResult, result)
+
+    def move_to_addressable_area_for_drop_tip(
+        self,
+        pipette_id: str,
+        addressable_area_name: str,
+        offset: AddressableOffsetVector,
+        minimum_z_height: Optional[float],
+        force_direct: bool,
+        speed: Optional[float],
+        alternate_drop_location: Optional[bool],
+    ) -> commands.MoveToAddressableAreaForDropTipResult:
+        """Execute a MoveToAddressableArea command and return the result."""
+        request = commands.MoveToAddressableAreaForDropTipCreate(
+            params=commands.MoveToAddressableAreaForDropTipParams(
+                pipetteId=pipette_id,
+                addressableAreaName=addressable_area_name,
+                offset=offset,
+                forceDirect=force_direct,
+                minimumZHeight=minimum_z_height,
+                speed=speed,
+                alternateDropLocation=alternate_drop_location,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+
+        return cast(commands.MoveToAddressableAreaForDropTipResult, result)
 
     def move_to_coordinates(
         self,
@@ -259,6 +308,55 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.DropTipResult, result)
+
+    def drop_tip_in_place(
+        self,
+        pipette_id: str,
+        home_after: Optional[bool],
+    ) -> commands.DropTipInPlaceResult:
+        """Execute a DropTipInPlace command and return the result."""
+        request = commands.DropTipInPlaceCreate(
+            params=commands.DropTipInPlaceParams(
+                pipetteId=pipette_id,
+                homeAfter=home_after,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.DropTipInPlaceResult, result)
+
+    def configure_for_volume(
+        self, pipette_id: str, volume: float
+    ) -> commands.ConfigureForVolumeResult:
+        """Execute a ConfigureForVolume command."""
+        request = commands.ConfigureForVolumeCreate(
+            params=commands.ConfigureForVolumeParams(
+                pipetteId=pipette_id, volume=volume
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.ConfigureForVolumeResult, result)
+
+    def prepare_to_aspirate(self, pipette_id: str) -> commands.PrepareToAspirateResult:
+        """Execute a PrepareToAspirate command."""
+        request = commands.PrepareToAspirateCreate(
+            params=commands.PrepareToAspirateParams(pipetteId=pipette_id)
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.PrepareToAspirateResult, result)
+
+    def configure_nozzle_layout(
+        self,
+        pipette_id: str,
+        configuration_params: NozzleLayoutConfigurationType,
+    ) -> commands.ConfigureNozzleLayoutResult:
+        """Execute a ConfigureForVolume command."""
+        request = commands.ConfigureNozzleLayoutCreate(
+            params=commands.ConfigureNozzleLayoutParams(
+                pipetteId=pipette_id, configurationParams=configuration_params
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.ConfigureNozzleLayoutResult, result)
 
     def aspirate(
         self,

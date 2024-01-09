@@ -18,9 +18,9 @@ Metadata and Requirements
 Flex requires you to specify an ``apiLevel`` of 2.15 or higher. If your OT-2 protocol specified ``apiLevel`` in the ``metadata`` dictionary, it's best to move it to the ``requirements`` dictionary. You can't specify it in both places, or the API will raise an error.
 
 .. note::
-    Consult the list of :ref:`version-notes` to see what effect raising the ``apiLevel`` will have. If you increased it by multiple minor versions to get your protocol running on Flex, make sure that your protocol isn't using removed commands or commands whose behavior has changed in a way that may affect your scientific results.
+    Consult the :ref:`list of changes in API versions <version-notes>` to see what effect raising the ``apiLevel`` will have. If you increased it by multiple minor versions to get your protocol running on Flex, make sure that your protocol isn't using removed commands or commands whose behavior has changed in a way that may affect your scientific results.
 
-You also need to specify ``'robotType': 'Flex'``. If you omit ``robotType`` in the ``requirements`` dictionary, the API will assume the protocol is designed for the OT-2.
+You also need to specify ``"robotType": "Flex"``. If you omit ``robotType`` in the ``requirements`` dictionary, the API will assume the protocol is designed for the OT-2.
 
 .. tabs::
     
@@ -34,7 +34,7 @@ You also need to specify ``'robotType': 'Flex'``. If you omit ``robotType`` in t
             metadata = {
                 "protocolName": "My Protocol",
                 "description": "This protocol uses the OT-2",
-                "apiLevel": "2.14" 
+                "apiLevel": "|apiLevel|"
             }
 
     .. tab:: Updated Flex code
@@ -84,10 +84,17 @@ This example converts OT-2 code that uses a P300 Single-Channel GEN2 pipette and
                     "flex_1channel_1000", "left", tip_racks[tips]
                 )
 
+Trash Container
+===============
+
+OT-2 protocols always have a :py:obj:`.fixed_trash` in slot 12. In Flex protocols specifying API version 2.16 or later, you need to :ref:`load a trash bin <configure-trash-bin>`. Put it in slot A3 to match the physical position of the OT-2 fixed trash::
+
+    trash = protocol.load_trash_bin("A3")
+
 Deck Slot Labels
 ================
 
-It's good practice to update numeric labels for :ref:`deck-slots` (which match the labels on an OT-2) to coordinate ones (which match the labels on Flex). This is an optional step, since the two formats are interchangeable.
+It's good practice to update numeric labels for :ref:`deck slots <deck-slots>` (which match the labels on an OT-2) to coordinate ones (which match the labels on Flex). This is an optional step, since the two formats are interchangeable.
 
 For example, the code in the previous section changed the location of the tip rack from ``1`` to ``"D1"``.
 
@@ -102,7 +109,7 @@ If your OT-2 protocol uses older generations of the Temperature Module or Thermo
     
 The Heater-Shaker Module only has one generation, ``heaterShakerModuleV1``, which is compatible with Flex and OT-2.
 
-The Magnetic Module is not compatible with Flex. For protocols that load ``magnetic module``, ``magdeck``, or ``magnetic module gen2``, you will need to make further modifications to use the :ref:`magnetic-block` and Flex Gripper instead. This will require reworking some of your protocol steps, and you should verify that your new protocol design achieves similar results.
+The Magnetic Module is not compatible with Flex. For protocols that load ``magnetic module``, ``magdeck``, or ``magnetic module gen2``, you will need to make further modifications to use the :ref:`Magnetic Block <magnetic-block>` and Flex Gripper instead. This will require reworking some of your protocol steps, and you should verify that your new protocol design achieves similar results.
 
 This simplified example, taken from a DNA extraction protocol, shows how using the Flex Gripper and the Magnetic Block can save time. Instead of pipetting an entire plate's worth of liquid from the Heater-Shaker to the Magnetic Module and then engaging the module, the gripper moves the plate to the Magnetic Block in one step.
 

@@ -33,12 +33,19 @@ import {
   forHeaterShakerStopShake,
 } from './heaterShakerUpdates'
 import { forMoveLabware } from './forMoveLabware'
+import {
+  forAspirateInPlace,
+  forBlowOutInPlace,
+  forDispenseInPlace,
+  forDropTipInPlace,
+} from './inPlaceCommandUpdates'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   RobotState,
   RobotStateAndWarnings,
 } from '../types'
+import { forConfigureNozzleLayout } from './forConfigureNozzleLayout'
 
 // WARNING this will mutate the prevRobotState
 function _getNextRobotStateAndWarningsSingleCommand(
@@ -92,11 +99,46 @@ function _getNextRobotStateAndWarningsSingleCommand(
       forMoveLabware(command.params, invariantContext, robotStateAndWarnings)
       break
 
+    case 'aspirateInPlace':
+      forAspirateInPlace(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+
+    case 'dropTipInPlace':
+      forDropTipInPlace(command.params, invariantContext, robotStateAndWarnings)
+      break
+
+    case 'blowOutInPlace':
+      forBlowOutInPlace(command.params, invariantContext, robotStateAndWarnings)
+      break
+
+    case 'dispenseInPlace':
+      forDispenseInPlace(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+
+    case 'configureNozzleLayout':
+      forConfigureNozzleLayout(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+
     case 'touchTip':
     case 'waitForDuration':
     case 'waitForResume':
     case 'moveToWell':
     case 'delay':
+    case 'configureForVolume':
+    case 'moveToAddressableArea':
+    case 'moveToAddressableAreaForDropTip':
       // these commands don't have any effects on the state
       break
 

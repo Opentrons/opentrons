@@ -1,4 +1,8 @@
-import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
+import {
+  HEATERSHAKER_MODULE_TYPE,
+  LabwareDefinition2,
+  WASTE_CHUTE_CUTOUT,
+} from '@opentrons/shared-data'
 import {
   getInitialRobotStateStandard,
   getInitialRobotStateWithOffDeckLabwareStandard,
@@ -7,10 +11,14 @@ import {
   getErrorResult,
   getStateAndContextTempTCModules,
   SOURCE_LABWARE,
+  TIPRACK_1,
 } from '../fixtures'
 import { moveLabware, MoveLabwareArgs } from '..'
 
 import type { InvariantContext, RobotState } from '../types'
+
+const mockWasteChuteId = 'mockWasteChuteId'
+const mockGripperId = 'mockGripperId'
 
 describe('moveLabware', () => {
   let robotState: RobotState
@@ -18,6 +26,16 @@ describe('moveLabware', () => {
   beforeEach(() => {
     invariantContext = makeContext()
     robotState = getInitialRobotStateStandard(invariantContext)
+
+    invariantContext = {
+      ...invariantContext,
+      additionalEquipmentEntities: {
+        mockGripperId: {
+          name: 'gripper',
+          id: mockGripperId,
+        },
+      },
+    }
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -109,6 +127,41 @@ describe('moveLabware', () => {
       type: 'LABWARE_OFF_DECK',
     })
   })
+  it('should return an error for trying to move an aluminum block with a gripper', () => {
+    const aluminumBlockDef = ({
+      metadata: { displayCategory: 'aluminumBlock' },
+    } as any) as LabwareDefinition2
+
+    invariantContext = {
+      ...invariantContext,
+      additionalEquipmentEntities: {
+        mockGripperId: {
+          name: 'gripper',
+          id: mockGripperId,
+        },
+      },
+      labwareEntities: {
+        [SOURCE_LABWARE]: {
+          id: 'labwareid',
+          labwareDefURI: 'mockDefUri',
+          def: aluminumBlockDef,
+        },
+      },
+    }
+
+    const params = {
+      commandCreatorFnName: 'moveLabware',
+      labware: SOURCE_LABWARE,
+      useGripper: true,
+      newLocation: { slotName: 'A1' },
+    } as MoveLabwareArgs
+
+    const result = moveLabware(params, invariantContext, robotState)
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'CANNOT_MOVE_WITH_GRIPPER',
+    })
+  })
   it('should return an error when trying to move labware to the thermocycler when lid is closed', () => {
     const temperatureModuleId = 'temperatureModuleId'
     const thermocyclerId = 'thermocyclerId'
@@ -123,7 +176,7 @@ describe('moveLabware', () => {
     const params = {
       commandCreatorFnName: 'moveLabware',
       labware: SOURCE_LABWARE,
-      useGripper: true,
+      useGripper: false,
       newLocation: { moduleId: thermocyclerId },
     } as MoveLabwareArgs
 
@@ -234,6 +287,130 @@ describe('moveLabware', () => {
     expect(getErrorResult(result).errors).toHaveLength(1)
     expect(getErrorResult(result).errors[0]).toMatchObject({
       type: 'HEATER_SHAKER_IS_SHAKING',
+    })
+  })
+  it('should return a warning for if you try to move a tiprack with tips into the waste chute', () => {
+    const wasteChuteInvariantContext = {
+      ...invariantContext,
+      additionalEquipmentEntities: {
+        ...invariantContext.additionalEquipmentEntities,
+        mockWasteChuteId: {
+          name: 'wasteChute',
+          id: mockWasteChuteId,
+          location: WASTE_CHUTE_CUTOUT,
+        },
+      },
+    } as InvariantContext
+
+    const robotStateWithTip = ({
+      ...robotState,
+      tipState: {
+        tipracks: {
+          tiprack1Id: { A1: true },
+        },
+      },
+    } as any) as RobotState
+    const params = {
+      commandCreatorFnName: 'moveLabware',
+      labware: TIPRACK_1,
+      useGripper: true,
+      newLocation: { addressableAreaName: 'gripperWasteChute' },
+    } as MoveLabwareArgs
+
+    const result = moveLabware(
+      params,
+      wasteChuteInvariantContext,
+      robotStateWithTip
+    )
+    expect(result.warnings).toEqual([
+      {
+        message: 'Disposing of a tiprack with tips',
+        type: 'TIPRACK_IN_WASTE_CHUTE_HAS_TIPS',
+      },
+    ])
+  })
+  it('should return a warning for if you try to move a labware with liquids into the waste chute', () => {
+    const wasteChuteInvariantContext = {
+      ...invariantContext,
+      additionalEquipmentEntities: {
+        ...invariantContext.additionalEquipmentEntities,
+        mockWasteChuteId: {
+          name: 'wasteChute',
+          id: mockWasteChuteId,
+          location: WASTE_CHUTE_CUTOUT,
+        },
+      },
+    } as InvariantContext
+    const robotStateWithLiquid = ({
+      ...robotState,
+      liquidState: {
+        labware: {
+          sourcePlateId: { A1: { ingredGroup: { volume: 10 } } },
+        },
+      },
+    } as any) as RobotState
+    const params = {
+      commandCreatorFnName: 'moveLabware',
+      labware: SOURCE_LABWARE,
+      useGripper: true,
+      newLocation: { addressableAreaName: 'gripperWasteChute' },
+    } as MoveLabwareArgs
+
+    const result = moveLabware(
+      params,
+      wasteChuteInvariantContext,
+      robotStateWithLiquid
+    )
+    expect(result.warnings).toEqual([
+      {
+        message: 'Disposing of a labware with liquid',
+        type: 'LABWARE_IN_WASTE_CHUTE_HAS_LIQUID',
+      },
+    ])
+  })
+  it('should return an error when trying to move with gripper when there is no gripper', () => {
+    invariantContext = {
+      ...invariantContext,
+      additionalEquipmentEntities: {},
+    } as InvariantContext
+
+    const params = {
+      commandCreatorFnName: 'moveLabware',
+      labware: SOURCE_LABWARE,
+      useGripper: true,
+      newLocation: { slotName: 'A1' },
+    } as MoveLabwareArgs
+
+    const result = moveLabware(params, invariantContext, robotState)
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'GRIPPER_REQUIRED',
+    })
+  })
+  it('should return an error when trying to move into the waste chute when useGripper is not selected', () => {
+    invariantContext = {
+      ...invariantContext,
+      additionalEquipmentEntities: {
+        ...invariantContext.additionalEquipmentEntities,
+        mockWasteChuteId: {
+          name: 'wasteChute',
+          id: mockWasteChuteId,
+          location: WASTE_CHUTE_CUTOUT,
+        },
+      },
+    } as InvariantContext
+
+    const params = {
+      commandCreatorFnName: 'moveLabware',
+      labware: SOURCE_LABWARE,
+      useGripper: false,
+      newLocation: { addressableAreaName: 'gripperWasteChute' },
+    } as MoveLabwareArgs
+
+    const result = moveLabware(params, invariantContext, robotState)
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'GRIPPER_REQUIRED',
     })
   })
 })

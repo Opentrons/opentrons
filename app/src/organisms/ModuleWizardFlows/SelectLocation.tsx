@@ -6,6 +6,7 @@ import {
   ModuleLocation,
   getDeckDefFromRobotType,
   getModuleDisplayName,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
   RESPONSIVENESS,
@@ -49,12 +50,12 @@ export const SelectLocation = (
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const bodyText = (
     <>
-      <Banner type="warning" size={SIZE_1} marginY={SPACING.spacing4}>
-        {t('module_secured')}
-      </Banner>
       <StyledText css={BODY_STYLE}>
         {t('select_the_slot', { module: moduleName })}
       </StyledText>
+      <Banner type="warning" size={SIZE_1} marginY={SPACING.spacing4}>
+        {t('module_secured')}
+      </Banner>
     </>
   )
   return (
@@ -65,13 +66,16 @@ export const SelectLocation = (
           deckDef={deckDef}
           selectedLocation={{ slotName }}
           setSelectedLocation={loc => setSlotName(loc.slotName)}
-          disabledLocations={deckDef.locations.orderedSlots.reduce<
+          disabledLocations={deckDef.locations.addressableAreas.reduce<
             ModuleLocation[]
           >((acc, slot) => {
             if (availableSlotNames.some(slotName => slotName === slot.id))
               return acc
             return [...acc, { slotName: slot.id }]
           }, [])}
+          isThermocycler={
+            attachedModule.moduleType === THERMOCYCLER_MODULE_TYPE
+          }
         />
       }
       bodyText={bodyText}

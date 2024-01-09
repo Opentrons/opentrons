@@ -21,7 +21,7 @@ from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.types import Mount, DeckSlotName, Location
+from opentrons.types import Mount, DeckSlotName, StagingSlotName, Location
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     MagneticModuleModel,
@@ -32,6 +32,9 @@ from opentrons.hardware_control.modules.types import (
     ThermocyclerStep,
 )
 
+from ._trash_bin import TrashBin
+from ._waste_chute import WasteChute
+
 if TYPE_CHECKING:
     from .labware import Well
 
@@ -39,17 +42,29 @@ if TYPE_CHECKING:
 # The first APIVersion where Python protocols can specify deck labels like "D1" instead of "1".
 _COORDINATE_DECK_LABEL_VERSION_GATE = APIVersion(2, 15)
 
-# Mapping of user-facing pipette names to names used by the internal Opentrons system
-_FLEX_PIPETTE_NAMES_MAP = {
-    "p50_single_gen3": "p50_single_flex",
-    "flex_1channel_50": "p50_single_flex",
-    "p50_multi_gen3": "p50_multi_flex",
-    "flex_8channel_50": "p50_multi_flex",
-    "p1000_single_gen3": "p1000_single_flex",
-    "flex_1channel_1000": "p1000_single_flex",
-    "p1000_multi_gen3": "p1000_multi_flex",
-    "flex_8channel_1000": "p1000_multi_flex",
-    "flex_96channel_1000": "p1000_96",
+# The first APIVersion where Python protocols can specify staging deck slots (e.g. "D4")
+_STAGING_DECK_SLOT_VERSION_GATE = APIVersion(2, 16)
+
+# Mapping of public Python Protocol API pipette load names
+# to names used by the internal Opentrons system
+_PIPETTE_NAMES_MAP = {
+    "p10_single": PipetteNameType.P10_SINGLE,
+    "p10_multi": PipetteNameType.P10_MULTI,
+    "p20_single_gen2": PipetteNameType.P20_SINGLE_GEN2,
+    "p20_multi_gen2": PipetteNameType.P20_MULTI_GEN2,
+    "p50_single": PipetteNameType.P50_SINGLE,
+    "p50_multi": PipetteNameType.P50_MULTI,
+    "p300_single": PipetteNameType.P300_SINGLE,
+    "p300_multi": PipetteNameType.P300_MULTI,
+    "p300_single_gen2": PipetteNameType.P300_SINGLE_GEN2,
+    "p300_multi_gen2": PipetteNameType.P300_MULTI_GEN2,
+    "p1000_single": PipetteNameType.P1000_SINGLE,
+    "p1000_single_gen2": PipetteNameType.P1000_SINGLE_GEN2,
+    "flex_1channel_50": PipetteNameType.P50_SINGLE_FLEX,
+    "flex_8channel_50": PipetteNameType.P50_MULTI_FLEX,
+    "flex_1channel_1000": PipetteNameType.P1000_SINGLE_FLEX,
+    "flex_8channel_1000": PipetteNameType.P1000_MULTI_FLEX,
+    "flex_96channel_1000": PipetteNameType.P1000_96,
 }
 
 
@@ -69,7 +84,31 @@ class LabwareDefinitionIsNotLabwareError(ValueError):
     """An error raised when a labware is not loaded using `load_labware`."""
 
 
-def ensure_mount(mount: Union[str, Mount]) -> Mount:
+class InvalidTrashBinLocationError(ValueError):
+    """An error raised when attempting to load trash bins in invalid slots."""
+
+
+def ensure_mount_for_pipette(
+    mount: Union[str, Mount, None], pipette: PipetteNameType
+) -> Mount:
+    """Ensure that an input value represents a valid mount, and is valid for the given pipette."""
+    if pipette == PipetteNameType.P1000_96:
+        # Always validate the raw mount input, even if the pipette is a 96-channel and we're not going
+        # to use the mount value.
+        if mount is not None:
+            _ensure_mount(mount)
+        # Internal layers treat the 96-channel as being on the left mount.
+        return Mount.LEFT
+    else:
+        if mount is None:
+            raise InvalidPipetteMountError(
+                f"You must specify a left or right mount to load {pipette.value}."
+            )
+        else:
+            return _ensure_mount(mount)
+
+
+def _ensure_mount(mount: Union[str, Mount]) -> Mount:
     """Ensure that an input value represents a valid Mount."""
     if mount in [Mount.EXTENSION, "extension"]:
         # This would cause existing protocols that might be iterating over mount types
@@ -109,25 +148,19 @@ def ensure_pipette_name(pipette_name: str) -> PipetteNameType:
     pipette_name = ensure_lowercase_name(pipette_name)
 
     try:
-        if pipette_name in _FLEX_PIPETTE_NAMES_MAP.keys():
-            # TODO (spp: 2023-07-11): !!! VERY IMPORTANT!!!
-            #  We DO NOT want to support the old 'gen3' suffixed names for Flex launch.
-            #  This provision to accept the old names is added only for maintaining
-            #  backwards compatibility during internal testing and should be phased out.
-            #  So remove this name mapping and conversion at an appropriate time before launch
-            checked_name = PipetteNameType(_FLEX_PIPETTE_NAMES_MAP[pipette_name])
-        else:
-            checked_name = PipetteNameType(pipette_name)
-        return checked_name
-    except ValueError as e:
+        return _PIPETTE_NAMES_MAP[pipette_name]
+    except KeyError:
         raise ValueError(
             f"Cannot resolve {pipette_name} to pipette, must be given valid pipette name."
-        ) from e
+        ) from None
 
 
+# TODO(jbl 11-17-2023) this function's original purpose was ensure a valid deck slot for a given robot type
+#   With deck configuration, the shape of this should change to better represent it checking if a deck slot
+#   (and maybe any addressable area) being valid for that deck configuration
 def ensure_and_convert_deck_slot(
     deck_slot: Union[int, str], api_version: APIVersion, robot_type: RobotType
-) -> DeckSlotName:
+) -> Union[DeckSlotName, StagingSlotName]:
     """Ensure that a primitive value matches a named deck slot.
 
     Also, convert the deck slot to match the given `robot_type`.
@@ -149,25 +182,33 @@ def ensure_and_convert_deck_slot(
     if not isinstance(deck_slot, (int, str)):
         raise TypeError(f"Deck slot must be a string or integer, but got {deck_slot}")
 
-    try:
-        parsed_slot = DeckSlotName.from_primitive(deck_slot)
-    except ValueError as e:
-        raise ValueError(f"'{deck_slot}' is not a valid deck slot") from e
+    if str(deck_slot).upper() in {"A4", "B4", "C4", "D4"}:
+        if api_version < APIVersion(2, 16):
+            raise APIVersionError(
+                f"Using a staging deck slot requires apiLevel {_STAGING_DECK_SLOT_VERSION_GATE}."
+            )
+        # Don't need a try/except since we're already pre-validating this
+        parsed_staging_slot = StagingSlotName.from_primitive(str(deck_slot))
+        return parsed_staging_slot
+    else:
+        try:
+            parsed_slot = DeckSlotName.from_primitive(deck_slot)
+        except ValueError as e:
+            raise ValueError(f"'{deck_slot}' is not a valid deck slot") from e
+        is_ot2_style = parsed_slot.to_ot2_equivalent() == parsed_slot
+        if not is_ot2_style and api_version < _COORDINATE_DECK_LABEL_VERSION_GATE:
+            alternative = parsed_slot.to_ot2_equivalent().id
+            raise APIVersionError(
+                f'Specifying a deck slot like "{deck_slot}" requires apiLevel'
+                f" {_COORDINATE_DECK_LABEL_VERSION_GATE}."
+                f' Increase your protocol\'s apiLevel, or use slot "{alternative}" instead.'
+            )
 
-    is_ot2_style = parsed_slot.to_ot2_equivalent() == parsed_slot
-    if not is_ot2_style and api_version < _COORDINATE_DECK_LABEL_VERSION_GATE:
-        alternative = parsed_slot.to_ot2_equivalent().id
-        raise APIVersionError(
-            f'Specifying a deck slot like "{deck_slot}" requires apiLevel'
-            f" {_COORDINATE_DECK_LABEL_VERSION_GATE}."
-            f' Increase your protocol\'s apiLevel, or use slot "{alternative}" instead.'
-        )
-
-    return parsed_slot.to_equivalent_for_robot_type(robot_type)
+        return parsed_slot.to_equivalent_for_robot_type(robot_type)
 
 
 def internal_slot_to_public_string(
-    slot_name: DeckSlotName, robot_type: RobotType
+    slot_name: Union[DeckSlotName, StagingSlotName], robot_type: RobotType
 ) -> str:
     """Convert an internal `DeckSlotName` to a user-facing Python Protocol API string.
 
@@ -175,7 +216,11 @@ def internal_slot_to_public_string(
     Flexes. This probably won't change anything because the internal `DeckSlotName` should already
     match the robot's native format, but it's nice to have an explicit interface barrier.
     """
-    return slot_name.to_equivalent_for_robot_type(robot_type).id
+    if isinstance(slot_name, DeckSlotName):
+        return slot_name.to_equivalent_for_robot_type(robot_type).id
+    else:
+        # No need to convert staging slot names per robot type, since they only exist on Flex.
+        return slot_name.id
 
 
 def ensure_lowercase_name(name: str) -> str:
@@ -244,6 +289,48 @@ def ensure_module_model(load_name: str) -> ModuleModel:
         )
 
     return model
+
+
+def ensure_and_convert_trash_bin_location(
+    deck_slot: Union[int, str], api_version: APIVersion, robot_type: RobotType
+) -> str:
+    """Ensure trash bin load location is valid.
+
+    Also, convert the deck slot to a valid trash bin addressable area.
+    """
+
+    if robot_type == "OT-2 Standard":
+        raise InvalidTrashBinLocationError("Cannot load trash on OT-2.")
+
+    # map trash bin location to addressable area
+    trash_bin_slots = [
+        DeckSlotName(slot) for slot in ["A1", "B1", "C1", "D1", "A3", "B3", "C3", "D3"]
+    ]
+    trash_bin_addressable_areas = [
+        "movableTrashA1",
+        "movableTrashB1",
+        "movableTrashC1",
+        "movableTrashD1",
+        "movableTrashA3",
+        "movableTrashB3",
+        "movableTrashC3",
+        "movableTrashD3",
+    ]
+    map_trash_bin_addressable_area = {
+        slot: addressable_area
+        for slot, addressable_area in zip(trash_bin_slots, trash_bin_addressable_areas)
+    }
+
+    slot_name_ot3 = ensure_and_convert_deck_slot(deck_slot, api_version, robot_type)
+    if not isinstance(slot_name_ot3, DeckSlotName):
+        raise ValueError("Staging areas not permitted for trash bin.")
+    if slot_name_ot3 not in trash_bin_slots:
+        raise InvalidTrashBinLocationError(
+            f"Invalid location for trash bin: {slot_name_ot3}.\n"
+            f"Valid slots: Any slot in column 1 or 3."
+        )
+
+    return map_trash_bin_addressable_area[slot_name_ot3]
 
 
 def ensure_hold_time_seconds(
@@ -342,8 +429,9 @@ class LocationTypeError(TypeError):
 
 
 def validate_location(
-    location: Union[Location, Well, None], last_location: Optional[Location]
-) -> Union[WellTarget, PointTarget]:
+    location: Union[Location, Well, TrashBin, WasteChute, None],
+    last_location: Optional[Location],
+) -> Union[WellTarget, PointTarget, TrashBin, WasteChute]:
     """Validate a given location for a liquid handling command.
 
     Args:
@@ -365,10 +453,13 @@ def validate_location(
     if target_location is None:
         raise NoLocationError()
 
-    if not isinstance(target_location, (Location, Well)):
+    if not isinstance(target_location, (Location, Well, TrashBin, WasteChute)):
         raise LocationTypeError(
-            f"location should be a Well or Location, but it is {location}"
+            f"location should be a Well, Location, TrashBin or WasteChute, but it is {location}"
         )
+
+    if isinstance(target_location, (TrashBin, WasteChute)):
+        return target_location
 
     in_place = target_location == last_location
 

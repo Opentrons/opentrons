@@ -1,10 +1,10 @@
 [tool.black]
-line-length = 120
-target-version = ['py311']
+line-length = 140
+target-version = ['py312']
 
 [tool.ruff]
-line-length = 120
-target-version = "py311"
+line-length = 140
+target-version = "py312"
 exclude = ["files"]
 src = ["*.py", "automation", "tests"]
 select = [
@@ -28,6 +28,7 @@ disallow_any_generics = true
 check_untyped_defs = true
 no_implicit_reexport = true
 exclude = "__init__.py"
+python_version = "3.12"
 
 [mypy-selenium]
 ignore_missing_imports = true

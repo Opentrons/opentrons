@@ -34,7 +34,7 @@ export type ShellUpdateAction =
   | { type: 'shell:CHECK_UPDATE'; meta: { shell: true } }
   | {
       type: 'shell:CHECK_UPDATE_RESULT'
-      payload: { available?: boolean; info?: UpdateInfo; error?: Error }
+      payload: { available?: boolean; info?: UpdateInfo | null; error?: Error }
     }
   | { type: 'shell:DOWNLOAD_UPDATE'; meta: { shell: true } }
   | { type: 'shell:DOWNLOAD_UPDATE_RESULT'; payload: { error?: Error } }
@@ -79,6 +79,31 @@ export interface UpdateBrightnessAction {
   meta: { shell: true }
 }
 
+export interface RobotMassStorageDeviceAdded {
+  type: 'shell:ROBOT_MASS_STORAGE_DEVICE_ADDED'
+  payload: {
+    rootPath: string
+  }
+  meta: { shell: true }
+}
+
+export interface RobotMassStorageDeviceEnumerated {
+  type: 'shell:ROBOT_MASS_STORAGE_DEVICE_ENUMERATED'
+  payload: {
+    rootPath: string
+    filePaths: string[]
+  }
+  meta: { shell: true }
+}
+
+export interface RobotMassStorageDeviceRemoved {
+  type: 'shell:ROBOT_MASS_STORAGE_DEVICE_REMOVED'
+  payload: {
+    rootPath: string
+  }
+  meta: { shell: true }
+}
+
 export type ShellAction =
   | UiInitializedAction
   | ShellUpdateAction
@@ -87,3 +112,6 @@ export type ShellAction =
   | AppRestartAction
   | SendLogAction
   | UpdateBrightnessAction
+  | RobotMassStorageDeviceAdded
+  | RobotMassStorageDeviceEnumerated
+  | RobotMassStorageDeviceRemoved

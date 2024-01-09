@@ -35,11 +35,11 @@ tests ?= tests
 cov_opts ?= --cov=$(SRC_PATH) --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
 test_opts ?=
 
-# Host key location for buildroot robot
-br_ssh_key ?= $(default_ssh_key)
+# Host key location for robot
+ssh_key ?= $(default_ssh_key)
 # Pubkey location for buildroot robot to install with install-key
-br_ssh_pubkey ?= $(br_ssh_key).pub
-# Other SSH args for buildroot robots
+br_ssh_pubkey ?= $(ssh_key).pub
+# Other SSH args for robot
 ssh_opts ?= $(default_ssh_opts)
 
 # Source discovery
@@ -111,9 +111,9 @@ local-shell:
 
 .PHONY: push
 push: wheel
-	$(call push-python-package,$(host),$(br_ssh_key),$(ssh_opts),$(wheel_file))
+	$(call push-python-package,$(host),$(ssh_key),$(ssh_opts),$(wheel_file))
 
 .PHONY: push-ot3
 push-ot3: sdist
-	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),"/opt/opentrons-system-server","server_utils",,,$(version_file))
-	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),"/opt/opentrons-robot-server","server_utils")
+	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),"/opt/opentrons-system-server","server_utils",,,$(version_file))
+	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),"/opt/opentrons-robot-server","server_utils")

@@ -130,7 +130,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
         <Flex
           flexDirection={DIRECTION_COLUMN}
           flex="1"
-          gridGap={SPACING.spacing24}
+          gridGap={isOnDevice ? SPACING.spacing8 : SPACING.spacing16}
         >
           <Flex display={DISPLAY_INLINE_BLOCK}>
             {typeof header === 'string' ? <Title>{header}</Title> : header}

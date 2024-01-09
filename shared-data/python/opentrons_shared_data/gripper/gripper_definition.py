@@ -69,6 +69,7 @@ class Geometry(GripperBaseModel):
     pin_one_offset_from_base: Offset
     pin_two_offset_from_base: Offset
     jaw_width: Dict[str, float]
+    max_allowed_grip_error: _StrictNonNegativeFloat
 
 
 PolynomialTerm = Tuple[_StrictNonNegativeInt, float]
@@ -83,6 +84,7 @@ class GripForceProfile(GripperBaseModel):
         min_items=1,
     )
     default_grip_force: _StrictNonNegativeFloat
+    default_idle_force: _StrictNonNegativeFloat
     default_home_force: _StrictNonNegativeFloat
     min: _StrictNonNegativeFloat
     max: _StrictNonNegativeFloat

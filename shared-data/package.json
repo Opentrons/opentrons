@@ -1,7 +1,7 @@
 {
   "name": "@opentrons/shared-data",
   "version": "0.0.0-dev",
-  "description": "Default labware definitions for Opentrons robots",
+  "description": "Shared system definitions and utilities for Opentrons robots and software",
   "repository": {
     "type": "git",
     "url": "https://github.com/Opentrons/opentrons.git"
@@ -10,11 +10,10 @@
   "license": "Apache-2.0",
   "source": "js/index.ts",
   "types": "lib/js/index.d.ts",
-  "flow:main": "flow-types/js/index.js.flow",
+  "main": "lib/opentrons-shared-data.js",
+  "module": "js/index.ts",
   "dependencies": {
     "ajv": "^6.12.3",
-    "html-react-parser": "^1.2.8",
-    "lodash": "4.17.21",
-    "svgson": "^5.2.1"
+    "lodash": "4.17.21"
   }
 }

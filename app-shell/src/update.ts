@@ -39,8 +39,9 @@ function checkUpdate(dispatch: Dispatch): void {
   const onNotAvailable = (info: UpdateInfo): void => {
     done({ info, available: false })
   }
+
   const onError = (error: Error): void => {
-    done({ error: PlainObjectError(error) })
+    done({ error: PlainObjectError(error), info: null, available: false })
   }
 
   updater.once('update-available', onAvailable)
@@ -53,7 +54,7 @@ function checkUpdate(dispatch: Dispatch): void {
   updater.checkForUpdates()
 
   function done(payload: {
-    info?: UpdateInfo
+    info?: UpdateInfo | null
     available?: boolean
     error?: PlainError
   }): void {

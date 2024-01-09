@@ -5,6 +5,7 @@ import protocol_command_text from './protocol_command_text.json'
 import device_details from './device_details.json'
 import device_settings from './device_settings.json'
 import devices_landing from './devices_landing.json'
+import drop_tip_wizard from './drop_tip_wizard.json'
 import firmware_update from './firmware_update.json'
 import gripper_wizard_flows from './gripper_wizard_flows.json'
 import heater_shaker from './heater_shaker.json'
@@ -37,6 +38,7 @@ export const en = {
   device_details,
   device_settings,
   devices_landing,
+  drop_tip_wizard,
   firmware_update,
   gripper_wizard_flows,
   heater_shaker,

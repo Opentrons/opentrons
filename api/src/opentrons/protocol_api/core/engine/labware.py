@@ -30,7 +30,9 @@ class LabwareCore(AbstractLabware[WellCore]):
 
         labware_state = engine_client.state.labware
         self._definition = labware_state.get_definition(labware_id)
-        self._user_display_name = labware_state.get_display_name(labware_id)
+        self._user_display_name = labware_state.get_user_specified_display_name(
+            labware_id
+        )
 
     @property
     def labware_id(self) -> str:

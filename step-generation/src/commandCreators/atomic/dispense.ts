@@ -11,6 +11,7 @@ import {
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
   uuid,
 } from '../../utils'
+import { COLUMN_4_SLOTS } from '../../constants'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { DispenseParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { CommandCreator, CommandCreatorError } from '../../types'
@@ -80,8 +81,12 @@ export const dispense: CommandCreator<DispenseParams> = (
         labware,
       })
     )
-  } else if (prevRobotState.labware[labware].slot === 'offDeck') {
+  } else if (prevRobotState.labware[labware]?.slot === 'offDeck') {
     errors.push(errorCreators.labwareOffDeck())
+  }
+
+  if (COLUMN_4_SLOTS.includes(slotName)) {
+    errors.push(errorCreators.pipettingIntoColumn4({ typeOfStep: actionName }))
   }
 
   if (
@@ -170,6 +175,8 @@ export const dispense: CommandCreator<DispenseParams> = (
           },
         },
         flowRate,
+        //  pushOut will always be undefined in step-generation for now
+        //  since there is no easy way to allow users to select a volume for it in PD
       },
       ...(isAirGap && { meta: { isAirGap } }),
     },

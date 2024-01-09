@@ -1,27 +1,49 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { GripperData } from '@opentrons/api-client'
 import { SPACING } from '@opentrons/components'
 import { getGripperDisplayName, GripperModel } from '@opentrons/shared-data'
+import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
 import { Banner } from '../../atoms/Banner'
 import { StyledText } from '../../atoms/text'
 import { InstrumentCard } from '../../molecules/InstrumentCard'
 import { GripperWizardFlows } from '../GripperWizardFlows'
 import { AboutGripperSlideout } from './AboutGripperSlideout'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
+import type { BadGripper, GripperData, Subsystem } from '@opentrons/api-client'
 import type { GripperWizardFlowType } from '../GripperWizardFlows/types'
 
 interface GripperCardProps {
-  attachedGripper: GripperData | null
+  attachedGripper: GripperData | BadGripper | null
   isCalibrated: boolean
+  setSubsystemToUpdate: (subsystem: Subsystem | null) => void
+  isRunActive: boolean
 }
+const BANNER_LINK_CSS = css`
+  text-decoration: underline;
+  cursor: pointer;
+  margin-left: ${SPACING.spacing8};
+`
+
+const INSTRUMENT_CARD_STYLE = css`
+  p {
+    text-transform: lowercase;
+  }
+
+  p::first-letter {
+    text-transform: uppercase;
+  }
+`
+
+const POLL_DURATION_MS = 5000
 
 export function GripperCard({
   attachedGripper,
   isCalibrated,
+  setSubsystemToUpdate,
+  isRunActive,
 }: GripperCardProps): JSX.Element {
-  const { t } = useTranslation(['device_details', 'shared'])
+  const { t, i18n } = useTranslation(['device_details', 'shared'])
   const [
     openWizardFlowType,
     setOpenWizardFlowType,
@@ -42,13 +64,39 @@ export function GripperCard({
   const handleCalibrate: React.MouseEventHandler<HTMLButtonElement> = () => {
     setOpenWizardFlowType(GRIPPER_FLOW_TYPES.RECALIBRATE)
   }
+  const [pollForSubsystemUpdate, setPollForSubsystemUpdate] = React.useState(
+    false
+  )
+  const { data: subsystemUpdateData } = useCurrentSubsystemUpdateQuery(
+    'gripper',
+    {
+      enabled: pollForSubsystemUpdate,
+      refetchInterval: POLL_DURATION_MS,
+    }
+  )
+  // we should poll for a subsystem update from the time a bad instrument is
+  // detected until the update has been done for 5 seconds
+  // this gives the instruments endpoint time to start reporting
+  // a good instrument
+  React.useEffect(() => {
+    if (attachedGripper?.ok === false) {
+      setPollForSubsystemUpdate(true)
+    } else if (
+      subsystemUpdateData != null &&
+      subsystemUpdateData.data.updateStatus === 'done'
+    ) {
+      setTimeout(() => {
+        setPollForSubsystemUpdate(false)
+      }, POLL_DURATION_MS)
+    }
+  }, [attachedGripper?.ok, subsystemUpdateData])
 
   const menuOverlayItems =
-    attachedGripper == null
+    attachedGripper == null || !attachedGripper.ok
       ? [
           {
             label: t('attach_gripper'),
-            disabled: attachedGripper != null,
+            disabled: attachedGripper != null || isRunActive,
             onClick: handleAttach,
           },
         ]
@@ -58,12 +106,12 @@ export function GripperCard({
               attachedGripper.data.calibratedOffset?.last_modified != null
                 ? t('recalibrate_gripper')
                 : t('calibrate_gripper'),
-            disabled: attachedGripper == null,
+            disabled: attachedGripper == null || isRunActive,
             onClick: handleCalibrate,
           },
           {
             label: t('detach_gripper'),
-            disabled: attachedGripper == null,
+            disabled: attachedGripper == null || isRunActive,
             onClick: handleDetach,
           },
           {
@@ -74,41 +122,72 @@ export function GripperCard({
         ]
   return (
     <>
-      <InstrumentCard
-        description={
-          attachedGripper != null
-            ? getGripperDisplayName(
-                attachedGripper.instrumentModel as GripperModel
-              )
-            : t('shared:empty')
-        }
-        banner={
-          attachedGripper != null && !isCalibrated ? (
-            <Banner type="error" marginBottom={SPACING.spacing4}>
+      {(attachedGripper == null || attachedGripper.ok) &&
+      subsystemUpdateData == null ? (
+        <InstrumentCard
+          description={
+            attachedGripper != null
+              ? getGripperDisplayName(
+                  attachedGripper.instrumentModel as GripperModel
+                )
+              : t('shared:empty')
+          }
+          banner={
+            attachedGripper?.ok && !isCalibrated ? (
+              <Banner type="error" marginBottom={SPACING.spacing4}>
+                <Trans
+                  t={t}
+                  i18nKey="calibration_needed"
+                  components={{
+                    calLink: (
+                      <StyledText
+                        as="p"
+                        css={BANNER_LINK_CSS}
+                        onClick={handleCalibrate}
+                      />
+                    ),
+                  }}
+                />
+              </Banner>
+            ) : null
+          }
+          isGripperAttached={attachedGripper != null}
+          label={t('shared:extension_mount')}
+          menuOverlayItems={menuOverlayItems}
+        />
+      ) : null}
+      {attachedGripper?.ok === false ||
+      (subsystemUpdateData != null && pollForSubsystemUpdate) ? (
+        <InstrumentCard
+          label={i18n.format(t('mount', { side: 'extension' }), 'capitalize')}
+          css={INSTRUMENT_CARD_STYLE}
+          description={t('instrument_attached')}
+          banner={
+            <Banner
+              type={subsystemUpdateData != null ? 'warning' : 'error'}
+              marginBottom={SPACING.spacing4}
+            >
               <Trans
                 t={t}
-                i18nKey="calibration_needed"
+                i18nKey={
+                  subsystemUpdateData != null
+                    ? 'firmware_update_occurring'
+                    : 'firmware_update_available_now'
+                }
                 components={{
-                  calLink: (
+                  updateLink: (
                     <StyledText
                       as="p"
-                      css={css`
-                        text-decoration: underline;
-                        cursor: pointer;
-                        margin-left: 0.5rem;
-                      `}
-                      onClick={handleCalibrate}
+                      css={BANNER_LINK_CSS}
+                      onClick={() => setSubsystemToUpdate('gripper')}
                     />
                   ),
                 }}
               />
             </Banner>
-          ) : null
-        }
-        isGripperAttached={attachedGripper != null}
-        label={t('shared:extension_mount')}
-        menuOverlayItems={menuOverlayItems}
-      />
+          }
+        />
+      ) : null}
       {openWizardFlowType != null ? (
         <GripperWizardFlows
           flowType={openWizardFlowType}
@@ -116,7 +195,7 @@ export function GripperCard({
           closeFlow={() => setOpenWizardFlowType(null)}
         />
       ) : null}
-      {attachedGripper != null && showAboutGripperSlideout && (
+      {attachedGripper?.ok && showAboutGripperSlideout && (
         <AboutGripperSlideout
           serialNumber={attachedGripper.serialNumber}
           firmwareVersion={attachedGripper.firmwareVersion}

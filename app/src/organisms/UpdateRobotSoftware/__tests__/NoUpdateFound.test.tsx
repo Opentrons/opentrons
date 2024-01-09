@@ -1,21 +1,15 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 
 import { NoUpdateFound } from '../NoUpdateFound'
 
-const mockPush = jest.fn()
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
-  return {
-    ...reactRouterDom,
-    useHistory: () => ({ push: mockPush } as any),
-  }
-})
+const mockOnContinue = jest.fn()
 
 const render = () => {
-  return renderWithProviders(<NoUpdateFound />, {
+  return renderWithProviders(<NoUpdateFound onContinue={mockOnContinue} />, {
     i18nInstance: i18n,
   })
 }
@@ -30,7 +24,7 @@ describe('NoUpdateFound', () => {
 
   it('should call mock function when tapping next button', () => {
     const [{ getByText }] = render()
-    getByText('Continue').click()
-    expect(mockPush).toBeCalledWith('/emergency-stop')
+    fireEvent.click(getByText('Continue'))
+    expect(mockOnContinue).toBeCalled()
   })
 })

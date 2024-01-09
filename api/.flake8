@@ -26,7 +26,6 @@ noqa-require-code = true
 per-file-ignores =
     setup.py:ANN,D
     src/opentrons/__init__.py:ANN,D
-    src/opentrons/broker.py:ANN,D
     src/opentrons/execute.py:ANN,D
     src/opentrons/simulate.py:ANN,D
     src/opentrons/types.py:ANN,D
@@ -40,11 +39,14 @@ per-file-ignores =
     src/opentrons/resources/*:ANN,D
     src/opentrons/system/*:ANN,D
     src/opentrons/tools/*:ANN,D
-    src/opentrons/util/*:ANN,D
+    src/opentrons/util/async_helpers.py:ANN,D
+    src/opentrons/util/logging_config.py:ANN,D
+    src/opentrons/util/linal.py:ANN,D
+    src/opentrons/util/entrypoint_util.py:ANN,D
+    src/opentrons/util/helpers.py:ANN,D
     tests/opentrons/test_init.py:ANN,D
     tests/opentrons/test_types.py:ANN,D
     tests/opentrons/conftest.py:ANN,D
-    tests/opentrons/broker/*:ANN,D
     tests/opentrons/calibration_storage/*:ANN,D
     tests/opentrons/commands/*:ANN,D
     tests/opentrons/config/*:ANN,D
@@ -55,4 +57,6 @@ per-file-ignores =
     tests/opentrons/protocols/*:ANN,D
     tests/opentrons/system/*:ANN,D
     tests/opentrons/tools/*:ANN,D
-    tests/opentrons/util/*:ANN,D
+    tests/opentrons/util/test_async_helpers.py:ANN,D
+    tests/opentrons/util/test_linal.py:ANN,D
+    tests/opentrons/util/test_entrypoint_util.py:ANN,D

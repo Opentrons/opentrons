@@ -12,12 +12,15 @@ import {
   TYPOGRAPHY,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import {
+  useInstrumentsQuery,
+  useModulesQuery,
+} from '@opentrons/react-api-client'
 import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import {
   useDeckCalibrationData,
-  useIsOT3,
+  useIsFlex,
   usePipetteOffsetCalibrations,
   useRobot,
   useTipLengthCalibrations,
@@ -49,26 +52,20 @@ export function CalibrationDataDownload({
   const doTrackEvent = useTrackEvent()
 
   const robot = useRobot(robotName)
-  const isOT3 = useIsOT3(robotName)
+  const isFlex = useIsFlex(robotName)
   // wait for robot request to resolve instead of using name directly from params
   const deckCalibrationData = useDeckCalibrationData(robot?.name)
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations()
   const tipLengthCalibrations = useTipLengthCalibrations()
-  const { data: attachedInstruments } = useInstrumentsQuery({ enabled: isOT3 })
+  const { data: attachedInstruments } = useInstrumentsQuery({ enabled: isFlex })
+  const { data: attachedModules } = useModulesQuery({ enabled: isFlex })
 
-  const downloadIsPossible =
+  const ot2DownloadIsPossible =
     deckCalibrationData.isDeckCalibrated &&
     pipetteOffsetCalibrations != null &&
     pipetteOffsetCalibrations.length > 0 &&
     tipLengthCalibrations != null &&
     tipLengthCalibrations.length > 0
-
-  const ot3DownloadIsPossible =
-    isOT3 &&
-    attachedInstruments?.data.some(
-      instrument =>
-        instrument.ok && instrument.data.calibratedOffset?.last_modified != null
-    )
 
   const onClickSaveAs: React.MouseEventHandler = e => {
     e.preventDefault()
@@ -78,9 +75,10 @@ export function CalibrationDataDownload({
     })
     saveAs(
       new Blob([
-        isOT3
+        isFlex
           ? JSON.stringify({
               instrumentData: attachedInstruments,
+              moduleData: attachedModules,
             })
           : JSON.stringify({
               deck: deckCalibrationData,
@@ -96,15 +94,15 @@ export function CalibrationDataDownload({
     <Flex
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
-      paddingTop={SPACING.spacing24}
+      gridGap={SPACING.spacing40}
     >
       <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
         <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-          {isOT3
+          {isFlex
             ? t('about_calibration_title')
             : t('robot_calibration:download_calibration_title')}
         </StyledText>
-        {isOT3 ? (
+        {isFlex ? (
           <>
             <Trans
               t={t}
@@ -124,7 +122,7 @@ export function CalibrationDataDownload({
         ) : (
           <StyledText as="p">
             {t(
-              downloadIsPossible
+              ot2DownloadIsPossible
                 ? 'robot_calibration:download_calibration_data_available'
                 : 'robot_calibration:download_calibration_data_unavailable'
             )}
@@ -133,7 +131,7 @@ export function CalibrationDataDownload({
       </Flex>
       <TertiaryButton
         onClick={onClickSaveAs}
-        disabled={isOT3 ? !ot3DownloadIsPossible : !downloadIsPossible}
+        disabled={isFlex ? false : !ot2DownloadIsPossible} // always enable download on Flex
       >
         <Flex alignItems={ALIGN_CENTER}>
           <Icon name="download" size="0.75rem" marginRight={SPACING.spacing8} />

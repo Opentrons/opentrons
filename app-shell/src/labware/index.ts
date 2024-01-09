@@ -158,6 +158,7 @@ export function registerLabware(
             filters: [
               { name: 'JSON Labware Definitions', extensions: ['json'] },
             ],
+            properties: ['multiSelections' as const],
           }
 
           addLabwareTask = showOpenFileDialog(mainWindow, dialogOptions).then(

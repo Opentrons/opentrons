@@ -16,7 +16,7 @@ import { StyledText } from '../text'
 import { ODD_FOCUS_VISIBLE } from './constants'
 import type { IconName, StyleProps } from '@opentrons/components'
 
-type SmallButtonTypes =
+export type SmallButtonTypes =
   | 'alert'
   | 'primary'
   | 'secondary'
@@ -25,13 +25,13 @@ type SmallButtonTypes =
 
 export type ButtonCategory = 'default' | 'rounded'
 
-type IconPlacement = 'startIcon' | 'endIcon'
+export type IconPlacement = 'startIcon' | 'endIcon'
 interface SmallButtonProps extends StyleProps {
   onClick: React.MouseEventHandler
   buttonType?: SmallButtonTypes
   buttonText: React.ReactNode
-  iconPlacement?: IconPlacement
-  iconName?: IconName
+  iconPlacement?: IconPlacement | null
+  iconName?: IconName | null
   buttonCategory?: ButtonCategory // if not specified, it will be 'default'
   disabled?: boolean
 }
@@ -138,7 +138,6 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
   return (
     <Btn
       css={SMALL_BUTTON_STYLE}
-      aria-label={`SmallButton_${buttonType}`}
       disabled={disabled}
       padding={
         iconPlacement != null
@@ -153,7 +152,11 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
         alignItems={ALIGN_CENTER}
       >
         {iconPlacement === 'startIcon' && iconName != null ? (
-          <Flex aria-label={`SmallButton_${iconName}_positionStart`}>
+          <Flex
+            aria-label={
+              iconName === 'ot-spinner' ? 'loading indicator' : iconName
+            }
+          >
             <Icon
               size="1.75rem"
               marginRight={SPACING.spacing8}
@@ -171,7 +174,11 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
           {buttonText}
         </StyledText>
         {iconPlacement === 'endIcon' && iconName != null ? (
-          <Flex aria-label={`SmallButton_${iconName}_positionEnd`}>
+          <Flex
+            aria-label={
+              iconName === 'ot-spinner' ? 'loading indicator' : iconName
+            }
+          >
             <Icon
               size="1.75rem"
               marginLeft={SPACING.spacing8}

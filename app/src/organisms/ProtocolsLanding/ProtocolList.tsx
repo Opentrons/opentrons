@@ -28,8 +28,8 @@ import { useSortedProtocols } from './hooks'
 import { StyledText } from '../../atoms/text'
 import { Slideout } from '../../atoms/Slideout'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
-import { SendProtocolToOT3Slideout } from '../SendProtocolToOT3Slideout'
-import { UploadInput } from './UploadInput'
+import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
+import { ProtocolUploadInput } from './ProtocolUploadInput'
 import { ProtocolCard } from './ProtocolCard'
 import { EmptyStateLinks } from './EmptyStateLinks'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
@@ -64,8 +64,8 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
     setShowChooseRobotToRunProtocolSlideout,
   ] = React.useState<boolean>(false)
   const [
-    showSendProtocolToOT3Slideout,
-    setShowSendProtocolToOT3Slideout,
+    showSendProtocolToFlexSlideout,
+    setShowSendProtocolToFlexSlideout,
   ] = React.useState<boolean>(false)
   const sortBy = useSelector(getProtocolsDesktopSortKey) ?? 'alphabetical'
   const [showSortByMenu, setShowSortByMenu] = React.useState<boolean>(false)
@@ -121,11 +121,11 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
     setShowChooseRobotToRunProtocolSlideout(true)
   }
 
-  const handleSendProtocolToOT3 = (
+  const handleSendProtocolToFlex = (
     storedProtocol: StoredProtocolData
   ): void => {
     setSelectedProtocol(storedProtocol)
-    setShowSendProtocolToOT3Slideout(true)
+    setShowSendProtocolToFlexSlideout(true)
   }
 
   return (
@@ -133,13 +133,15 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
       {selectedProtocol != null ? (
         <>
           <ChooseRobotToRunProtocolSlideout
+            key={`ChooseRobotToRunProtocolSlideout_${selectedProtocol.protocolKey}`}
             onCloseClick={() => setShowChooseRobotToRunProtocolSlideout(false)}
             showSlideout={showChooseRobotToRunProtocolSlideout}
             storedProtocolData={selectedProtocol}
           />
-          <SendProtocolToOT3Slideout
-            isExpanded={showSendProtocolToOT3Slideout}
-            onCloseClick={() => setShowSendProtocolToOT3Slideout(false)}
+          <SendProtocolToFlexSlideout
+            key={`SendProtocolToFlexSlideout_${selectedProtocol.protocolKey}`}
+            isExpanded={showSendProtocolToFlexSlideout}
+            onCloseClick={() => setShowSendProtocolToFlexSlideout(false)}
             storedProtocolData={selectedProtocol}
           />
         </>
@@ -240,7 +242,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
           <ProtocolCard
             key={storedProtocol.protocolKey}
             handleRunProtocol={handleRunProtocol}
-            handleSendProtocolToOT3={handleSendProtocolToOT3}
+            handleSendProtocolToFlex={handleSendProtocolToFlex}
             storedProtocolData={storedProtocol}
           />
         ))}
@@ -252,7 +254,9 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
         onCloseClick={() => setShowImportProtocolSlideout(false)}
       >
         <Box marginTop={SPACING.spacing16}>
-          <UploadInput onUpload={() => setShowImportProtocolSlideout(false)} />
+          <ProtocolUploadInput
+            onUpload={() => setShowImportProtocolSlideout(false)}
+          />
         </Box>
       </Slideout>
     </Box>

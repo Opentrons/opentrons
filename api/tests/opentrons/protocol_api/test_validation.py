@@ -12,7 +12,7 @@ from opentrons_shared_data.labware.labware_definition import (
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons.types import Mount, DeckSlotName, Location, Point
+from opentrons.types import Mount, DeckSlotName, StagingSlotName, Location, Point
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     MagneticModuleModel,
@@ -28,18 +28,28 @@ from opentrons.protocol_api import validation as subject, Well, Labware
 
 
 @pytest.mark.parametrize(
-    ["input_value", "expected"],
+    ["input_mount", "input_pipette", "expected"],
     [
-        ("left", Mount.LEFT),
-        ("right", Mount.RIGHT),
-        ("LeFt", Mount.LEFT),
-        (Mount.LEFT, Mount.LEFT),
-        (Mount.RIGHT, Mount.RIGHT),
+        # Different string capitalizations:
+        ("left", PipetteNameType.P300_MULTI_GEN2, Mount.LEFT),
+        ("right", PipetteNameType.P300_MULTI_GEN2, Mount.RIGHT),
+        ("LeFt", PipetteNameType.P300_MULTI_GEN2, Mount.LEFT),
+        # Passing in a Mount:
+        (Mount.LEFT, PipetteNameType.P300_MULTI_GEN2, Mount.LEFT),
+        (Mount.RIGHT, PipetteNameType.P300_MULTI_GEN2, Mount.RIGHT),
+        # Special handling for the 96-channel:
+        ("left", PipetteNameType.P1000_96, Mount.LEFT),
+        ("right", PipetteNameType.P1000_96, Mount.LEFT),
+        (None, PipetteNameType.P1000_96, Mount.LEFT),
     ],
 )
-def test_ensure_mount(input_value: Union[str, Mount], expected: Mount) -> None:
+def test_ensure_mount(
+    input_mount: Union[str, Mount, None],
+    input_pipette: PipetteNameType,
+    expected: Mount,
+) -> None:
     """It should properly map strings and mounts."""
-    result = subject.ensure_mount(input_value)
+    result = subject.ensure_mount_for_pipette(input_mount, input_pipette)
     assert result == expected
 
 
@@ -48,31 +58,57 @@ def test_ensure_mount_input_invalid() -> None:
     with pytest.raises(
         subject.InvalidPipetteMountError, match="must be 'left' or 'right'"
     ):
-        subject.ensure_mount("oh no")
+        subject.ensure_mount_for_pipette("oh no", PipetteNameType.P300_MULTI_GEN2)
+
+    # Any mount is valid for the 96-Channel, but it needs to be a valid mount.
+    with pytest.raises(
+        subject.InvalidPipetteMountError, match="must be 'left' or 'right'"
+    ):
+        subject.ensure_mount_for_pipette("oh no", PipetteNameType.P1000_96)
 
     with pytest.raises(
         subject.PipetteMountTypeError,
         match="'left', 'right', or an opentrons.types.Mount",
     ):
-        subject.ensure_mount(42)  # type: ignore[arg-type]
+        subject.ensure_mount_for_pipette(42, PipetteNameType.P300_MULTI_GEN2)  # type: ignore[arg-type]
 
     with pytest.raises(
         subject.InvalidPipetteMountError, match="Use the left or right mounts instead"
     ):
-        subject.ensure_mount(Mount.EXTENSION)
+        subject.ensure_mount_for_pipette(
+            Mount.EXTENSION, PipetteNameType.P300_MULTI_GEN2
+        )
+
+    with pytest.raises(
+        subject.InvalidPipetteMountError, match="You must specify a left or right mount"
+    ):
+        subject.ensure_mount_for_pipette(None, PipetteNameType.P300_MULTI_GEN2)
 
 
 @pytest.mark.parametrize(
     ["input_value", "expected"],
     [
+        # Every OT-2 pipette:
+        ("p10_single", PipetteNameType.P10_SINGLE),
+        ("p10_multi", PipetteNameType.P10_MULTI),
+        ("p50_single", PipetteNameType.P50_SINGLE),
+        ("p50_multi", PipetteNameType.P50_MULTI),
         ("p300_single", PipetteNameType.P300_SINGLE),
-        ("P300_muLTI_gen2", PipetteNameType.P300_MULTI_GEN2),
-        (
-            "p50_single_gen3",
-            PipetteNameType.P50_SINGLE_FLEX,
-        ),  # Remove this line once we phase out '_gen3' names
+        ("p300_multi", PipetteNameType.P300_MULTI),
+        ("p1000_single", PipetteNameType.P1000_SINGLE),
+        ("p20_single_gen2", PipetteNameType.P20_SINGLE_GEN2),
+        ("p20_multi_gen2", PipetteNameType.P20_MULTI_GEN2),
+        ("p300_single_gen2", PipetteNameType.P300_SINGLE_GEN2),
+        ("p300_multi_gen2", PipetteNameType.P300_MULTI_GEN2),
+        ("p1000_single_gen2", PipetteNameType.P1000_SINGLE_GEN2),
+        # Every Flex pipette:
+        ("flex_1channel_50", PipetteNameType.P50_SINGLE_FLEX),
+        ("flex_8channel_50", PipetteNameType.P50_MULTI_FLEX),
+        ("flex_1channel_1000", PipetteNameType.P1000_SINGLE_FLEX),
         ("flex_8channel_1000", PipetteNameType.P1000_MULTI_FLEX),
         ("flex_96channel_1000", PipetteNameType.P1000_96),
+        # Weird capitalization:
+        ("P300_muLTI_gen2", PipetteNameType.P300_MULTI_GEN2),
     ],
 )
 def test_ensure_pipette_name(input_value: str, expected: PipetteNameType) -> None:
@@ -81,10 +117,22 @@ def test_ensure_pipette_name(input_value: str, expected: PipetteNameType) -> Non
     assert result == expected
 
 
-def test_ensure_pipette_input_invalid() -> None:
+@pytest.mark.parametrize(
+    "input_value",
+    [
+        "oh-no",  # Not even remotely a pipette name.
+        "p1000_single_gen3",  # Obsolete name for Flex pipette.
+        "p1000_single_flex",  # Internal-only name for Flex pipette.
+        "p1000_96",  # Internal-only name for Flex pipette.
+    ],
+)
+def test_ensure_pipette_input_invalid(input_value: str) -> None:
     """It should raise a ValueError if given an invalid name."""
-    with pytest.raises(ValueError, match="must be given valid pipette name"):
-        subject.ensure_pipette_name("oh-no")
+    with pytest.raises(
+        ValueError,
+        match=f"Cannot resolve {input_value} to pipette, must be given valid pipette name",
+    ):
+        subject.ensure_pipette_name(input_value)
 
 
 @pytest.mark.parametrize(
@@ -106,6 +154,11 @@ def test_ensure_pipette_input_invalid() -> None:
         ("a3", APIVersion(2, 15), "OT-3 Standard", DeckSlotName.SLOT_A3),
         ("A3", APIVersion(2, 15), "OT-2 Standard", DeckSlotName.FIXED_TRASH),
         ("A3", APIVersion(2, 15), "OT-3 Standard", DeckSlotName.SLOT_A3),
+        # Staging slots:
+        ("A4", APIVersion(2, 16), "OT-3 Standard", StagingSlotName.SLOT_A4),
+        ("b4", APIVersion(2, 16), "OT-3 Standard", StagingSlotName.SLOT_B4),
+        ("C4", APIVersion(2, 16), "OT-3 Standard", StagingSlotName.SLOT_C4),
+        ("d4", APIVersion(2, 16), "OT-3 Standard", StagingSlotName.SLOT_D4),
     ],
 )
 def test_ensure_and_convert_deck_slot(
@@ -137,6 +190,7 @@ def test_ensure_and_convert_deck_slot(
             APIVersionError,
             '"A1" requires apiLevel 2.15. Increase your protocol\'s apiLevel, or use slot "10" instead.',
         ),
+        ("A4", APIVersion(2, 15), APIVersionError, "Using a staging deck slot"),
     ],
 )
 @pytest.mark.parametrize("input_robot_type", ["OT-2 Standard", "OT-3 Standard"])

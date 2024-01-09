@@ -1,8 +1,7 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { resetAllWhenMocks } from 'jest-when'
 import { fireEvent } from '@testing-library/react'
-import '@testing-library/jest-dom'
 import {
   renderWithProviders,
   useConditionalConfirm,
@@ -93,10 +92,6 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
 
-const mockUseFeatureFlag = Config.useFeatureFlag as jest.MockedFunction<
-  typeof Config.useFeatureFlag
->
-
 let mockTrackEvent: jest.Mock
 const mockConfirm = jest.fn()
 const mockCancel = jest.fn()
@@ -123,9 +118,6 @@ describe('AdvancedSettings', () => {
       showConfirmation: true,
       cancel: mockCancel,
     })
-    when(mockUseFeatureFlag)
-      .calledWith('enableExtendedHardware')
-      .mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -138,7 +130,7 @@ describe('AdvancedSettings', () => {
     getByText('Additional Custom Labware Source Folder')
     getByText('Prevent Robot Caching')
     getByText('Clear Unavailable Robots')
-    getByText('Enable Developer Tools')
+    getByText('Developer Tools')
     getByText('OT-2 Advanced Settings')
     getByText('Tip Length Calibration Method')
     getByText('USB-to-Ethernet Adapter Information')
@@ -256,33 +248,6 @@ describe('AdvancedSettings', () => {
       'Only for users who need to apply Labware Offset data outside of the Opentrons App. When enabled, code snippets for Jupyter Notebook and SSH are available during protocol setup.'
     )
     getByRole('switch', { name: 'show_link_to_get_labware_offset_data' })
-  })
-
-  it('does not render the allow sending all protocols to ot-3 section when feature flag is off', () => {
-    const [{ queryByText, queryByRole }] = render()
-    expect(
-      queryByText('Allow Sending All Protocols to Opentrons Flex')
-    ).toBeNull()
-    expect(
-      queryByText(
-        'Enable the "Send to Opentrons Flex" menu item for each imported protocol, even if protocol analysis fails or does not recognize it as designed for the OT-3.'
-      )
-    ).toBeNull()
-    expect(
-      queryByRole('switch', { name: 'allow_sending_all_protocols_to_ot3' })
-    ).toBeNull()
-  })
-
-  it('renders the allow sending all protocols to ot-3 section when feature flag is on', () => {
-    when(mockUseFeatureFlag)
-      .calledWith('enableExtendedHardware')
-      .mockReturnValue(true)
-    const [{ getByText, getByRole }] = render()
-    getByText('Allow Sending All Protocols to Opentrons Flex')
-    getByText(
-      'Enable the "Send to Opentrons Flex" menu item for each imported protocol, even if protocol analysis fails or does not recognize it as designed for the Opentrons Flex.'
-    )
-    getByRole('switch', { name: 'allow_sending_all_protocols_to_ot3' })
   })
 
   it('renders the toggle button on when show link to labware offset data setting is true', () => {

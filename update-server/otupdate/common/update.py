@@ -14,7 +14,7 @@ from subprocess import CalledProcessError
 from typing import Optional
 from typing_extensions import Protocol
 
-from aiohttp import web, BodyPartReader
+from aiohttp import web, BodyPartReader, MultipartReader
 
 from . import config, update_actions
 from .constants import APP_VARIABLE_PREFIX, RESTART_LOCK_NAME
@@ -97,6 +97,8 @@ async def status(request: web.Request, session: UpdateSession) -> web.Response:
 async def _save_file(part: BodyPartReader, path: str) -> None:
     # making sure directory exists first
     Path(path).mkdir(parents=True, exist_ok=True)
+    if not part.name:
+        raise Exception("Cannot save file with no name")
     with open(os.path.join(path, part.name), "wb") as write:
         while not part.at_eof():
             chunk = await part.read_chunk()
@@ -171,6 +173,21 @@ def _begin_validation(
     return validation_future
 
 
+async def _read_parts_and_find_update(
+    reader: MultipartReader, session: UpdateSession
+) -> Optional[str]:
+    found: Optional[str] = None
+    async for part in reader:
+        if part.name not in VALID_UPDATE_PKG:
+            LOG.info(f"Unknown field name {part.name} in file_upload, ignoring")
+            await part.release()
+        else:
+            LOG.info(f"Writing {part.name}")
+            await _save_file(part, session.download_path)
+            found = part.name
+    return found
+
+
 @require_session
 async def file_upload(request: web.Request, session: UpdateSession) -> web.Response:
     """Serves /update/:session/file
@@ -187,13 +204,7 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
             status=409,
         )
     reader = await request.multipart()
-    async for part in reader:
-        if part.name not in VALID_UPDATE_PKG:
-            LOG.info(f"Unknown field name {part.name} in file_upload, ignoring")
-            await part.release()
-        else:
-            LOG.info(f"Writing {part.name}")
-            await _save_file(part, session.download_path)
+    found_name = await _read_parts_and_find_update(reader, session)
 
     maybe_actions = update_actions.UpdateActionsInterface.from_request(request)
     if not maybe_actions:
@@ -205,11 +216,20 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
             status=500,
         )
 
+    if not found_name:
+        return web.json_response(
+            data={
+                "error": "no-file-name",
+                "message": "Request error: no field name for system zip",
+            },
+            status=400,
+        )
+
     _begin_validation(
         session,
         config.config_from_request(request),
         asyncio.get_event_loop(),
-        os.path.join(session.download_path, part.name),
+        os.path.join(session.download_path, found_name),
         maybe_actions,
     )
 

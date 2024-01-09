@@ -1,9 +1,13 @@
 import * as React from 'react'
-import { i18n } from '../../../i18n'
+import { when } from 'jest-when'
 import { fireEvent } from '@testing-library/react'
-import * as Shell from '../../../redux/shell'
+
 import { renderWithProviders } from '@opentrons/components'
-import { UpdateAppModal, UpdateAppModalProps } from '..'
+
+import { i18n } from '../../../i18n'
+import * as Shell from '../../../redux/shell'
+import { useRemoveActiveAppUpdateToast } from '../../Alerts'
+import { UpdateAppModal, UpdateAppModalProps, RELEASE_NOTES_URL_BASE } from '..'
 
 import type { State } from '../../../redux/types'
 import type { ShellUpdateState } from '../../../redux/shell/types'
@@ -19,14 +23,21 @@ jest.mock('react-router-dom', () => ({
     push: jest.fn(),
   }),
 }))
+jest.mock('../../Alerts')
 
 const getShellUpdateState = Shell.getShellUpdateState as jest.MockedFunction<
   typeof Shell.getShellUpdateState
+>
+const mockUseRemoveActiveAppUpdateToast = useRemoveActiveAppUpdateToast as jest.MockedFunction<
+  typeof useRemoveActiveAppUpdateToast
 >
 
 const render = (props: React.ComponentProps<typeof UpdateAppModal>) => {
   return renderWithProviders(<UpdateAppModal {...props} />, {
     i18nInstance: i18n,
+    initialState: {
+      shell: { update: { info: { version: '7.0.0' }, available: true } },
+    },
   })
 }
 
@@ -50,6 +61,9 @@ describe('UpdateAppModal', () => {
         },
       } as ShellUpdateState
     })
+    when(mockUseRemoveActiveAppUpdateToast).calledWith().mockReturnValue({
+      removeActiveAppUpdateToast: jest.fn(),
+    })
   })
 
   afterEach(() => {
@@ -67,6 +81,14 @@ describe('UpdateAppModal', () => {
     fireEvent.click(getByText('Remind me later'))
     expect(closeModal).toHaveBeenCalled()
   })
+
+  it('renders a release notes link pointing to the Github releases page', () => {
+    const [{ getByText }] = render(props)
+
+    const link = getByText('Release notes')
+    expect(link).toHaveAttribute('href', RELEASE_NOTES_URL_BASE + '7.0.0')
+  })
+
   it('shows error modal on error', () => {
     getShellUpdateState.mockReturnValue({
       error: {

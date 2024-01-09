@@ -21,6 +21,7 @@ import {
   Icon,
   PrimaryButton,
   COLORS,
+  ProtocolDeck,
 } from '@opentrons/components'
 
 import { useLogger } from '../../logger'
@@ -30,7 +31,6 @@ import { appShellRequestor } from '../../redux/shell/remote'
 import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
 import { MiniCard } from '../../molecules/MiniCard'
-import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 import { useCreateRunFromProtocol } from '../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
@@ -205,11 +205,8 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
           selectedProtocol != null &&
           storedProtocol.protocolKey === selectedProtocol.protocolKey
         return (
-          <>
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              key={storedProtocol.protocolKey}
-            >
+          <React.Fragment key={storedProtocol.protocolKey}>
+            <Flex flexDirection={DIRECTION_COLUMN}>
               <MiniCard
                 isSelected={isSelected}
                 isError={runCreationError != null}
@@ -223,12 +220,11 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                     height="4.25rem"
                     width="4.75rem"
                   >
-                    <DeckThumbnail
-                      commands={
-                        storedProtocol.mostRecentAnalysis?.commands ?? []
-                      }
-                      labware={storedProtocol.mostRecentAnalysis?.labware ?? []}
-                    />
+                    {storedProtocol.mostRecentAnalysis != null ? (
+                      <ProtocolDeck
+                        protocolAnalysis={storedProtocol.mostRecentAnalysis}
+                      />
+                    ) : null}
                   </Box>
                   <StyledText
                     as="p"
@@ -283,7 +279,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 )}
               </StyledText>
             ) : null}
-          </>
+          </React.Fragment>
         )
       })}
     </Flex>

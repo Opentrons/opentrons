@@ -575,6 +575,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: 'some_pipette_id',
         },
+        nozzles: {
+          isIndeterminate: false,
+          value: undefined,
+        },
         volume: {
           isIndeterminate: false,
           value: '30',
@@ -582,6 +586,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
         path: {
           isIndeterminate: false,
           value: 'single',
+        },
+        dropTip_location: {
+          value: 'fixedTrash',
+          isIndeterminate: false,
         },
       })
     })
@@ -624,6 +632,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
           // same thing with dispense_touchTip_mmFromBottom
           blowout_checkbox: false,
           // same thing here with blowout location
+          nozzles: null,
         },
       }
     })
@@ -778,9 +787,16 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: 'some_pipette_id',
         },
+        nozzles: {
+          isIndeterminate: true,
+        },
         volume: {
           isIndeterminate: false,
           value: '30',
+        },
+        dropTip_location: {
+          value: 'fixedTrash',
+          isIndeterminate: false,
         },
       })
     })
@@ -826,6 +842,11 @@ describe('_getSavedMultiSelectFieldValues', () => {
         dispense_delay_seconds: { value: '1', isIndeterminate: false },
         mix_touchTip_checkbox: { value: false, isIndeterminate: false },
         mix_touchTip_mmFromBottom: { value: null, isIndeterminate: false },
+        nozzles: { value: undefined, isIndeterminate: false },
+        dropTip_location: {
+          value: 'fixedTrash',
+          isIndeterminate: false,
+        },
       })
     })
   })
@@ -857,6 +878,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
           dispense_delay_seconds: '3',
           mix_touchTip_checkbox: true,
           mix_touchTip_mmFromBottom: '14',
+          nozzles: null,
         },
       }
 
@@ -889,6 +911,11 @@ describe('_getSavedMultiSelectFieldValues', () => {
         dispense_delay_seconds: { isIndeterminate: true },
         mix_touchTip_checkbox: { isIndeterminate: true },
         mix_touchTip_mmFromBottom: { isIndeterminate: true },
+        nozzles: { isIndeterminate: true },
+        dropTip_location: {
+          value: 'fixedTrash',
+          isIndeterminate: false,
+        },
       })
     })
   })

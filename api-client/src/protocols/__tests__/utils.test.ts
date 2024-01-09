@@ -13,7 +13,7 @@ import {
 } from '../utils'
 import { simpleAnalysisFileFixture } from '../__fixtures__'
 
-import type { RunTimeCommand } from '@opentrons/shared-data'
+import { RunTimeCommand } from '@opentrons/shared-data'
 
 const mockRunTimeCommands: RunTimeCommand[] = simpleAnalysisFileFixture.commands as any
 const mockLoadLiquidRunTimeCommands = [
@@ -261,7 +261,7 @@ describe('parseInitialLoadedLabwareByAdapter', () => {
   })
 })
 describe('parseInitialLoadedLabwareBySlot', () => {
-  it('returns only labware loaded in slots', () => {
+  it('returns labware loaded in slots', () => {
     const expected = {
       2: mockRunTimeCommands.find(
         c =>
@@ -281,6 +281,48 @@ describe('parseInitialLoadedLabwareBySlot', () => {
     expect(parseInitialLoadedLabwareBySlot(mockRunTimeCommands)).toEqual(
       expected
     )
+  })
+  it('returns labware loaded in addressable areas', () => {
+    const mockAddressableAreaLoadedLabwareCommand = ([
+      {
+        id: 'commands.LOAD_LABWARE-3',
+        createdAt: '2022-04-01T15:46:01.745870+00:00',
+        commandType: 'loadLabware',
+        key: 'commands.LOAD_LABWARE-3',
+        status: 'succeeded',
+        params: {
+          location: {
+            addressableAreaName: 'D4',
+          },
+          loadName: 'nest_96_wellplate_100ul_pcr_full_skirt',
+          namespace: 'opentrons',
+          version: 1,
+          labwareId: null,
+          displayName: 'NEST 96 Well Plate 100 µL PCR Full Skirt',
+        },
+        result: {
+          labwareId: 'labware-3',
+          definition: {},
+          offsetId: null,
+        },
+        error: null,
+        startedAt: '2022-04-01T15:46:01.745870+00:00',
+        completedAt: '2022-04-01T15:46:01.745870+00:00',
+      },
+    ] as any) as RunTimeCommand[]
+
+    const expected = {
+      D4: mockAddressableAreaLoadedLabwareCommand.find(
+        c =>
+          c.commandType === 'loadLabware' &&
+          typeof c.params.location === 'object' &&
+          'addressableAreaName' in c.params?.location &&
+          c.params?.location?.addressableAreaName === 'D4'
+      ),
+    }
+    expect(
+      parseInitialLoadedLabwareBySlot(mockAddressableAreaLoadedLabwareCommand)
+    ).toEqual(expected)
   })
 })
 describe('parseInitialLoadedLabwareByModuleId', () => {

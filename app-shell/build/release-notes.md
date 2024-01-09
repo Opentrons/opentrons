@@ -6,20 +6,84 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## Opentrons App Changes in 7.1.1
+
+Welcome to the v7.1.1 release of the Opentrons App!
+
+### Bug Fixes
+
+- The app properly displays Flex 1-Channel 1000 µL pipettes.
+
+---
+
+## Opentrons App Changes in 7.1.0
+
+Welcome to the v7.1.0 release of the Opentrons App! This release includes new deck and pipette functionality for Opentrons Flex, a new workflow for dropping tips after a protocol is canceled, and other improvements.
+
+### New Features
+
+- Specify the deck configuration of Flex, including the movable trash bin, waste chute, and staging area slots.
+- Resolve conflicts between the hardware a protocol requires and the current deck configuration as part of run setup.
+- Run protocols that use the Flex 96-Channel Pipette, including partial tip pickup.
+- Choose where to dispense liquid and drop tips held by a pipette when a protocol is canceled.
+
+### Improved Features
+
+- Labware Position Check on Flex uses the pipette calibration probe, instead of a tip, for greater accuracy.
+
+### Bug Fixes
+
+- Labware Position Check no longer tries to check the same labware in the same position twice, which was leading to errors.
+
+---
+
+## Opentrons App Changes in 7.0.2
+
+Welcome to the v7.0.2 release of the Opentrons App!
+
+### Bug Fixes
+
+- Fixes an issue where robot system updates over USB were stalling
+- Fixes an issue where app protocol analysis would fail if you had Python 3.10 installed on your computer and installed the opentrons package there
+
+---
+
+## Opentrons App Changes in 7.0.1
+
+Welcome to the v7.0.1 release of the Opentrons App! This release builds on the major release that added support for Opentrons Flex.
+
+### Improved Features
+
+- Pipettes move higher during Labware Position Check to avoid crashes in all deck slots, not just those with labware loaded in the protocol.
+
+### Bug Fixes
+
+- The app no longer blocks running valid protocols due to "not valid JSON" or "apiLevel not declared" errors.
+- Robot commands, like turning the lights on or off, no longer take a long time to execute.
+
+---
+
 ## Opentrons App Changes in 7.0.0
 
 Welcome to the v7.0.0 release of the Opentrons App! This release adds support for the Opentrons Flex robot, instruments, modules, and labware.
 
 ### New Features
 
-- Opentrons Flex features
-  - Connect to Opentrons Flex robots via Wi-Fi, Ethernet, or USB.
-  - Send a protocol to Opentrons Flex. Protocols are stored on the Flex robot and can be run from the touchscreen.
-  - Run protocols that automatically move labware with the Flex Gripper, including onto and off of the new Magnetic Block.
-  - Attach, detach, and run automated calibration for Flex pipettes and the Flex Gripper.
-- General app features
-  - Manually move labware around the deck during protocols. The app shows animated instructions for which labware to move, and lets you resume the protocol when movement is complete.
-  - See when your protocol will pause. During a run, marks on the protocol timeline show all pauses that require user attention, including labware movement.
+Opentrons Flex features
+
+- Connect to Opentrons Flex robots via Wi-Fi, Ethernet, or USB.
+- Send a protocol to Opentrons Flex. Protocols are stored on the Flex robot and can be run from the touchscreen.
+- Run protocols that automatically move labware with the Flex Gripper, including onto and off of the new Magnetic Block.
+- Attach, detach, and run automated calibration for Flex pipettes and the Flex Gripper.
+
+General app features
+
+- Manually move labware around the deck during protocols. The app shows animated instructions for which labware to move, and lets you resume the protocol when movement is complete.
+- See when your protocol will pause. During a run, marks on the protocol timeline show all pauses that require user attention, including labware movement.
+
+### Improved Features
+
+- The app loads various pages faster.
 
 ---
 
@@ -37,13 +101,16 @@ Welcome to the v6.3.0 release of the Opentrons App!
 
 ### New Features
 
-- Liquid Setup
-  - See a summary of the initial locations of liquids in a list or deck map view.
-  - Drill down to view exact volumes for individual wells when setting up a protocol run.
-  - Works for all protocols created with Protocol Designer, and for Python protocols that use the liquid setup methods introduced in v2.14 of the Python API.
-  - Supports custom liquid colors set in Protocol Designer or the Python API.
-- Calibration Dashboard: Manage your robot's Deck Calibration, Pipette Offset Calibrations, and Tip Length Calibrations all in one place.
-- Run Progress Monitor: The run log has been redesigned to give you a better sense of the progress of your protocol and to make way for future improvements.
+Liquid Setup
+
+- See a summary of the initial locations of liquids in a list or deck map view.
+- Drill down to view exact volumes for individual wells when setting up a protocol run.
+- Works for all protocols created with Protocol Designer, and for Python protocols that use the liquid setup methods introduced in v2.14 of the Python API.
+- Supports custom liquid colors set in Protocol Designer or the Python API.
+
+Calibration Dashboard: Manage your robot's Deck Calibration, Pipette Offset Calibrations, and Tip Length Calibrations all in one place.
+
+Run Progress Monitor: The run log has been redesigned to give you a better sense of the progress of your protocol and to make way for future improvements.
 
 ### Improved Features
 
@@ -94,12 +161,14 @@ Welcome to the v6.1.0 release of the Opentrons App! This release focuses on addi
 
 ### New Features
 
-- Heater-Shaker support
-  - Access guided setup instructions for attaching the Heater-Shaker to the deck
-  - Analyze, upload, and run protocols that include the Heater-Shaker
-  - View the status of a Heater-Shaker connected to an OT-2 and control its heater, shaker, and labware latch
-  - Update the Heater-Shaker's firmware from the module card
-- Module cards now show if a Heater-Shaker or Thermocycler has an error
+Heater-Shaker support
+
+- Access guided setup instructions for attaching the Heater-Shaker to the deck
+- Analyze, upload, and run protocols that include the Heater-Shaker
+- View the status of a Heater-Shaker connected to an OT-2 and control its heater, shaker, and labware latch
+- Update the Heater-Shaker's firmware from the module card
+
+Module cards now show if a Heater-Shaker or Thermocycler has an error
 
 ### Improved Features
 
@@ -124,19 +193,25 @@ This release also includes updates to the robot operating system, so be sure to 
 
 ### New Features
 
-- Updated design: A more polished and modern design, built around the new, always-accessible Protocols, Labware, and Devices sections.
-- Protocols section
-  - Import multiple protocols and manage them all in one place.
-  - In-app protocol analysis lets you import Python and JSON protocol files without connecting to a robot.
-  - View deck setup, required hardware, and protocol metadata — before, during, or after a run.
-- Labware section
-  - Browse labware definitions from the Opentrons Labware Library right in the app.
-  - Import custom labware and manage it alongside standard labware.
-- Devices section
-  - New view for currently available and recently connected robots.
-  - See recently run protocols on a robot, including those run from other computers.
-  - Run a protocol directly from the robot details page.
-  - Easily change a robot's name from the new robot settings page.
+Updated design: A more polished and modern design, built around the new, always-accessible Protocols, Labware, and Devices sections.
+
+Protocols section
+
+- Import multiple protocols and manage them all in one place.
+- In-app protocol analysis lets you import Python and JSON protocol files without connecting to a robot.
+- View deck setup, required hardware, and protocol metadata — before, during, or after a run.
+
+Labware section
+
+- Browse labware definitions from the Opentrons Labware Library right in the app.
+- Import custom labware and manage it alongside standard labware.
+
+Devices section
+
+- New view for currently available and recently connected robots.
+- See recently run protocols on a robot, including those run from other computers.
+- Run a protocol directly from the robot details page.
+- Easily change a robot's name from the new robot settings page.
 
 ### 6.0.0 to 6.0.1
 
@@ -147,9 +222,10 @@ The 6.0.1 hotfix release fixes two issues:
 
 ### Improved Features
 
-- Labware Position Check
-  - When re-running a protocol, the app will now automatically recommend stored Labware Offset data (from the last 20 runs on that robot) that applies to the same labware and deck slot.
-  - When running Labware Position Check, you will see live offset values as you jog the pipette.
+Labware Position Check
+
+- When re-running a protocol, the app will now automatically recommend stored Labware Offset data (from the last 20 runs on that robot) that applies to the same labware and deck slot.
+- When running Labware Position Check, you will see live offset values as you jog the pipette.
 
 ---
 
@@ -270,8 +346,7 @@ We've improved module functionality with Opentrons App 4.3.0. The app now suppor
 
 ### Changes
 
-- Do not automatically resume when the user decides not to confirm cancelling a protocol
-  - If you click the "cancel" button and then click "Go back", the protocol will be paused until you click resume.
+- Do not automatically resume when the user decides not to confirm cancelling a protocol. If you click the "cancel" button and then click "Go back", the protocol will be paused until you click resume.
 
 ### Bug Fixes
 

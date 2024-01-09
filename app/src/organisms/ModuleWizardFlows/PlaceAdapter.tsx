@@ -2,11 +2,11 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import { v4 as uuidv4 } from 'uuid'
-import HeaterShaker_PlaceAdapter_L from '@opentrons/app/src/assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_L.webm'
-import HeaterShaker_PlaceAdapter_R from '@opentrons/app/src/assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_R.webm'
-import TempModule_PlaceAdapter_L from '@opentrons/app/src/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_L.webm'
-import TempModule_PlaceAdapter_R from '@opentrons/app/src/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_R.webm'
-import Thermocycler_PlaceAdapter from '@opentrons/app/src/assets/videos/module_wizard_flows/Thermocycler_PlaceAdapter.webm'
+import HeaterShaker_PlaceAdapter_L from '../../assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_L.webm'
+import HeaterShaker_PlaceAdapter_R from '../../assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_R.webm'
+import TempModule_PlaceAdapter_L from '../../assets/videos/module_wizard_flows/TempModule_PlaceAdapter_L.webm'
+import TempModule_PlaceAdapter_R from '../../assets/videos/module_wizard_flows/TempModule_PlaceAdapter_R.webm'
+import Thermocycler_PlaceAdapter from '../../assets/videos/module_wizard_flows/Thermocycler_PlaceAdapter.webm'
 
 import {
   Flex,
@@ -18,6 +18,8 @@ import {
   CreateCommand,
   getCalibrationAdapterLoadName,
   getModuleDisplayName,
+  HEATERSHAKER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { StyledText } from '../../atoms/text'
@@ -59,7 +61,6 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
     isRobotMoving,
   } = props
   const { t } = useTranslation('module_wizard_flows')
-  const moduleName = getModuleDisplayName(attachedModule.moduleModel)
   const mount = attachedPipette.mount
   const handleOnClick = (): void => {
     const calibrationAdapterLoadName = getCalibrationAdapterLoadName(
@@ -109,9 +110,18 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
       .catch((e: Error) => setErrorMessage(e.message))
   }
 
-  const bodyText = (
-    <StyledText css={BODY_STYLE}>{t('place_flush', { moduleName })}</StyledText>
-  )
+  const moduleType = attachedModule.moduleType
+  let bodyText = <StyledText css={BODY_STYLE}>{t('place_flush')}</StyledText>
+  if (moduleType === HEATERSHAKER_MODULE_TYPE) {
+    bodyText = (
+      <StyledText css={BODY_STYLE}>{t('place_flush_heater_shaker')}</StyledText>
+    )
+  }
+  if (moduleType === THERMOCYCLER_MODULE_TYPE) {
+    bodyText = (
+      <StyledText css={BODY_STYLE}>{t('place_flush_thermocycler')}</StyledText>
+    )
+  }
 
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
   const isInLeftSlot = LEFT_SLOTS.some(slot => slot === slotName)
@@ -171,8 +181,11 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
     )
   return (
     <GenericWizardTile
-      header={t('place_adapter', { module: moduleDisplayName })}
-      // TODO: swap this out with the right animation
+      header={
+        moduleType === HEATERSHAKER_MODULE_TYPE
+          ? t('install_calibration_adapter')
+          : t('install_adapter', { module: moduleDisplayName })
+      }
       rightHandBody={placeAdapterVid}
       bodyText={bodyText}
       proceedButtonText={t('confirm_placement')}

@@ -142,3 +142,10 @@ class RadwagValueRelease(Enum):
     fast = 1
     fast_reliable = 2
     reliable = 3
+
+
+class RadwagAmbiant(Enum):
+    """Radwag ambiant enviornment states."""
+
+    unstable = 0
+    stable = 1

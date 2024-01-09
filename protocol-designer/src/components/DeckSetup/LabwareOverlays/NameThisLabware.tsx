@@ -3,13 +3,14 @@ import { connect } from 'react-redux'
 import cx from 'classnames'
 import { Icon, useOnClickOutside } from '@opentrons/components'
 import { renameLabware } from '../../../labware-ingred/actions'
-import { ThunkDispatch } from '../../../types'
 import { i18n } from '../../../localization'
-import { LabwareOnDeck } from '../../../step-forms'
 import styles from './LabwareOverlays.css'
+import type { LabwareEntity } from '@opentrons/step-generation'
+import type { ThunkDispatch } from '../../../types'
+import type { LabwareOnDeck } from '../../../step-forms'
 
 interface OP {
-  labwareOnDeck: LabwareOnDeck
+  labwareOnDeck: LabwareOnDeck | LabwareEntity
   editLiquids: () => unknown
 }
 

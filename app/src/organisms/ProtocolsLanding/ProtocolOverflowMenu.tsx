@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
 import {
   Flex,
@@ -22,14 +22,12 @@ import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_DELETE_PROTOCOL_FROM_APP,
 } from '../../redux/analytics'
-import { getSendAllProtocolsToOT3 } from '../../redux/config'
 import {
   analyzeProtocol,
   removeProtocol,
   viewProtocolSourceFolder,
 } from '../../redux/protocol-storage'
 import { ConfirmDeleteProtocolModal } from './ConfirmDeleteProtocolModal'
-import { getIsOT3Protocol } from './utils'
 
 import type { StyleProps } from '@opentrons/components'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
@@ -37,7 +35,7 @@ import type { Dispatch } from '../../redux/types'
 
 interface ProtocolOverflowMenuProps extends StyleProps {
   handleRunProtocol: (storedProtocolData: StoredProtocolData) => void
-  handleSendProtocolToOT3: (storedProtocolData: StoredProtocolData) => void
+  handleSendProtocolToFlex: (storedProtocolData: StoredProtocolData) => void
   storedProtocolData: StoredProtocolData
 }
 
@@ -47,9 +45,9 @@ export function ProtocolOverflowMenu(
   const {
     storedProtocolData,
     handleRunProtocol,
-    handleSendProtocolToOT3,
+    handleSendProtocolToFlex,
   } = props
-  const { protocolKey } = storedProtocolData
+  const { mostRecentAnalysis, protocolKey } = storedProtocolData
   const { t } = useTranslation(['protocol_list', 'shared'])
   const {
     menuOverlay,
@@ -67,9 +65,11 @@ export function ProtocolOverflowMenu(
     dispatch(removeProtocol(protocolKey))
     trackEvent({ name: ANALYTICS_DELETE_PROTOCOL_FROM_APP, properties: {} })
   }, true)
-  const sendAllProtocolsToOT3 = useSelector(getSendAllProtocolsToOT3)
 
-  const isOT3Protocol = getIsOT3Protocol(storedProtocolData?.mostRecentAnalysis)
+  const robotType =
+    mostRecentAnalysis != null && mostRecentAnalysis.errors.length === 0
+      ? mostRecentAnalysis?.robotType ?? null
+      : null
 
   const handleClickShowInFolder: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
@@ -90,7 +90,7 @@ export function ProtocolOverflowMenu(
   const handleClickSendToOT3: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
-    handleSendProtocolToOT3(storedProtocolData)
+    handleSendProtocolToFlex(storedProtocolData)
     setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
   const handleClickDelete: React.MouseEventHandler<HTMLButtonElement> = e => {
@@ -140,13 +140,12 @@ export function ProtocolOverflowMenu(
           >
             {t('shared:reanalyze')}
           </MenuItem>
-
-          {sendAllProtocolsToOT3 || isOT3Protocol ? (
+          {robotType !== 'OT-2 Standard' ? (
             <MenuItem
               onClick={handleClickSendToOT3}
               data-testid="ProtocolOverflowMenu_sendToOT3"
             >
-              {t('protocol_list:send_to_ot3_overflow', {
+              {t('protocol_list:send_to_robot_overflow', {
                 robot_display_name: FLEX_DISPLAY_NAME,
               })}
             </MenuItem>

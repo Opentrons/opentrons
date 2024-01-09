@@ -16,7 +16,7 @@ from opentrons.protocols.api_support.types import APIVersion
 MODULE_LOG = logging.getLogger(__name__)
 
 
-def run_protocol(protocol: Protocol, context: ProtocolContext):
+def run_protocol(protocol: Protocol, context: ProtocolContext) -> None:
     """Run a protocol.
 
     :param protocol: The :py:class:`.protocols.types.Protocol` to execute

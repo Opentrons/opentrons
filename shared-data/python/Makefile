@@ -3,9 +3,9 @@
 include ../../scripts/python.mk
 include ../../scripts/push.mk
 
-# Host key location for buildroot robot
-br_ssh_key ?= $(default_ssh_key)
-# Other SSH args for buildroot robots
+# Host key location for robot
+ssh_key ?= $(default_ssh_key)
+# Other SSH args for robot
 ssh_opts ?= $(default_ssh_opts)
 
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
@@ -45,7 +45,7 @@ gripper_sources = $(wildcard ../gripper/definitions/*.json) $(wildcard ../grippe
 
 json_sources = $(deck_sources) $(labware_sources) $(module_sources) $(pipette_sources) $(protocol_sources) $(gripper_sources)
 
-
+tests ?= tests
 
 twine_auth_args := --username $(pypi_username) --password $(pypi_password)
 twine_repository_url ?= $(pypi_test_upload_url)
@@ -103,19 +103,19 @@ format:
 
 .PHONY: push-no-restart
 push-no-restart: wheel
-	$(call push-python-package,$(host),$(br_ssh_key),$(ssh_opts),$(wheel_file))
+	$(call push-python-package,$(host),$(ssh_key),$(ssh_opts),$(wheel_file))
 
 .PHONY: push
 push: push-no-restart
-	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),opentrons-robot-server)
+	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),opentrons-robot-server)
 
 .PHONY: push-no-restart-ot3
 push-no-restart-ot3: sdist
-	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,opentrons_shared_data)
+	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,opentrons_shared_data)
 
 .PHONY: push-ot3
 push-ot3: push-no-restart-ot3
-	$(call restart-server,$(host),,$(ssh_opts),opentrons-robot-server)
+	$(call restart-server,$(host),$(ssh_key),$(ssh_opts),opentrons-robot-server)
 
 .PHONY: deploy
 deploy: wheel
@@ -123,7 +123,7 @@ deploy: wheel
 
 .PHONY: test
 test:
-	$(python) -m pytest --cov=opentrons_shared_data --cov-report xml:coverage.xml tests
+	$(python) -m pytest --cov=opentrons_shared_data --cov-report xml:coverage.xml $(tests) $(test_opts)
 
 
 .PHONY: generate-schema

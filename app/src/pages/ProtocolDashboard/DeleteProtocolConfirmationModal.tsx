@@ -14,33 +14,37 @@ import {
   Box,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { useHost } from '@opentrons/react-api-client'
+import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
 
 import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
+import { useToaster } from '../../organisms/ToasterOven'
 
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface DeleteProtocolConfirmationModalProps {
-  protocolName?: string
-  protocolId?: string
+  protocolId: string
   setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
 }
 
 export function DeleteProtocolConfirmationModal({
-  protocolName,
   protocolId,
   setShowDeleteConfirmationModal,
 }: DeleteProtocolConfirmationModalProps): JSX.Element {
   const { i18n, t } = useTranslation(['protocol_list', 'shared'])
+  const { makeSnackbar } = useToaster()
   const [showIcon, setShowIcon] = React.useState<boolean>(false)
   const modalHeader: ModalHeaderBaseProps = {
-    title: t('should_delete_this_protocol'),
+    title: t('delete_this_protocol'),
     iconName: 'ot-alert',
     iconColor: COLORS.yellow2,
   }
   const host = useHost()
   const queryClient = useQueryClient()
+  const { data: protocolRecord } = useProtocolQuery(protocolId)
+  const protocolName =
+    protocolRecord?.data.metadata.protocolName ??
+    protocolRecord?.data.files[0].name
 
   const handleCloseModal = (): void => {
     setShowDeleteConfirmationModal(false)
@@ -69,6 +73,7 @@ export function DeleteProtocolConfirmationModal({
         .then(() => {
           setShowIcon(false)
           setShowDeleteConfirmationModal(false)
+          makeSnackbar(t('protocol_deleted'))
         })
         .catch((e: Error) => {
           console.error(`error deleting resources: ${e.message}`)

@@ -1,7 +1,7 @@
 import { MATCH, INEXACT_MATCH } from '../../../redux/pipettes'
 import {
   useDeckCalibrationStatus,
-  useIsOT3,
+  useIsFlex,
   useRunPipetteInfoByMount,
   useStoredProtocolAnalysis,
 } from '.'
@@ -23,6 +23,7 @@ export interface ProtocolCalibrationStatus {
     | 'calibrate_tiprack_failure_reason'
     | 'calibrate_pipette_failure_reason'
     | 'calibrate_gripper_failure_reason'
+    | 'calibrate_module_failure_reason'
     | 'attach_pipette_failure_reason'
     | 'attach_gripper_failure_reason'
 }
@@ -33,12 +34,12 @@ export function useRunCalibrationStatus(
 ): ProtocolCalibrationStatus {
   const deckCalStatus = useDeckCalibrationStatus(robotName)
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
-  const isOT3 = useIsOT3(robotName)
+  const isFlex = useIsFlex(robotName)
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const { data: instrumentsQueryData = null } = useInstrumentsQuery()
 
-  return isOT3
+  return isFlex
     ? getFlexRunCalibrationStatus(
         mostRecentAnalysis,
         storedProtocolAnalysis,

@@ -16,6 +16,7 @@ import {
 } from '../fixtures'
 import { ProtocolSetupLiquids } from '..'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import { screen, fireEvent } from '@testing-library/react'
 
 jest.mock('../../Devices/ProtocolRun/SetupLiquids/utils')
 jest.mock('../../../atoms/buttons')
@@ -60,11 +61,11 @@ describe('ProtocolSetupLiquids', () => {
   })
 
   it('renders the total volume of the liquid, sample display name, clicking on arrow renders the modal', () => {
-    const [{ getByText, getAllByText, getByLabelText }] = render(props)
-    getByText('mock liquid 1')
-    getByText('mock liquid 2')
-    getAllByText('50 µL')
-    getByLabelText('Liquids_1').click()
-    getByText('mock liquid details')
+    render(props)
+    screen.getByText('mock liquid 1')
+    screen.getByText('mock liquid 2')
+    screen.getAllByText('50 µL')
+    fireEvent.click(screen.getByLabelText('Liquids_1'))
+    screen.getByText('mock liquid details')
   })
 })

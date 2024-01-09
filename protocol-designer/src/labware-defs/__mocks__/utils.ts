@@ -1,6 +1,6 @@
 // replace webpack-specific require.context with Node-based glob in tests
 import assert from 'assert'
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import { LabwareDefinition1, getLabwareDefURI } from '@opentrons/shared-data'
 import { LabwareDefByDefURI } from '../types'
 import path from 'path'
 import glob from 'glob'
@@ -24,3 +24,16 @@ export const getAllDefinitions = jest.fn(() => allLabware)
 export const _getSharedLabware = jest.fn(() => null)
 
 export const getOnlyLatestDefs = jest.fn(() => allLabware)
+
+const LEGACY_LABWARE_FIXTURE_PATTERN = path.join(
+  __dirname,
+  '../../../../shared-data/labware/fixtures/1/*.json'
+)
+// @ts-expect-error(sa, 2021-6-20): not sure why TS thinks d is void
+const legacyLabwareDefs: LabwareDefinition1[] = glob
+  .sync(LEGACY_LABWARE_FIXTURE_PATTERN)
+  .map(require)
+
+export const getLegacyLabwareDef = jest.fn(() => {
+  return legacyLabwareDefs[0]
+})

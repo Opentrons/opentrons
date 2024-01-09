@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
+
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
@@ -48,13 +50,13 @@ describe('RobotSystemVersionModal', () => {
 
   it('should close the modal when tapping remind me later', () => {
     const [{ getByText }] = render(props)
-    getByText('Update').click()
+    fireEvent.click(getByText('Update'))
     expect(mockPush).toHaveBeenCalledWith('/robot-settings/update-robot')
   })
 
   it('should call the mock function when tapping update', () => {
     const [{ getByText }] = render(props)
-    getByText('Not now').click()
+    fireEvent.click(getByText('Not now'))
     expect(mockFn).toHaveBeenCalled()
   })
 })

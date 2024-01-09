@@ -26,7 +26,6 @@ const Template: Story<BorderRadiusStorybookProps> = args => {
   const targetBorderRadiuses = args.borderRadius.filter(s =>
     s[0].includes('borderRadiusSize')
   )
-  console.log(targetBorderRadiuses)
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
