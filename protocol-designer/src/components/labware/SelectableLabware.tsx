@@ -1,11 +1,7 @@
 import * as React from 'react'
 import reduce from 'lodash/reduce'
 
-import {
-  SELECTABLE_WELL_CLASS,
-  WellMouseEvent,
-  WellGroup,
-} from '@opentrons/components'
+import { WellMouseEvent, WellGroup } from '@opentrons/components'
 import { COLUMN } from '@opentrons/shared-data'
 import {
   arrayToWellGroup,
@@ -48,7 +44,7 @@ const getChannelsFromNozleType = (nozzleType: NozzleType): ChannelType => {
 
 export class SelectableLabware extends React.Component<Props> {
   _getWellsFromRect: (rect: GenericRect) => WellGroup = rect => {
-    const selectedWells = getCollidingWells(rect, SELECTABLE_WELL_CLASS)
+    const selectedWells = getCollidingWells(rect)
     return this._wellsFromSelected(selectedWells)
   }
 
@@ -189,7 +185,6 @@ export class SelectableLabware extends React.Component<Props> {
                 this.handleMouseLeaveWell(mouseEventArgs)
                 handleMouseLeaveWell(mouseEventArgs.event)
               }}
-              selectableWellClass={SELECTABLE_WELL_CLASS}
               onMouseEnterWell={({ wellName, event }) => {
                 if (wellContents !== null) {
                   this.handleMouseEnterWell({ wellName, event })

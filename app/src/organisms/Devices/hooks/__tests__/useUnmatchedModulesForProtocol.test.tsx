@@ -10,7 +10,7 @@ import {
   useUnmatchedModulesForProtocol,
 } from '..'
 
-import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
+import type { ModuleDefinition } from '@opentrons/shared-data'
 
 jest.mock('../useAttachedModules')
 jest.mock('../useModuleRenderInfoForProtocolById')
@@ -27,22 +27,22 @@ const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockMagneticBlockDef = {
   labwareOffset: { x: 5, y: 5, z: 5 },
   moduleId: 'someMagneticBlock',
-  model: 'magneticBlockV1' as ModuleModel,
-  type: 'magneticBlockType' as ModuleType,
+  model: 'magneticBlockV1',
+  type: 'magneticBlockType',
   compatibleWith: [],
 }
 const mockMagneticModuleDef = {
   labwareOffset: { x: 5, y: 5, z: 5 },
   moduleId: 'someMagneticModule',
-  model: 'magneticModuleV2' as ModuleModel,
-  type: 'magneticModuleType' as ModuleType,
+  model: 'magneticModuleV2',
+  type: 'magneticModuleType',
   compatibleWith: [],
 }
 const mockTemperatureModuleDef = {
   labwareOffset: { x: 5, y: 5, z: 5 },
   moduleId: 'someTempModule',
-  model: 'temperatureModuleV2' as ModuleModel,
-  type: 'temperatureModuleType' as ModuleType,
+  model: 'temperatureModuleV2',
+  type: 'temperatureModuleType',
   compatibleWith: ['temperatureModuleV1'],
 }
 describe('useModuleMatchResults', () => {
@@ -74,7 +74,7 @@ describe('useModuleMatchResults', () => {
           x: 0,
           y: 0,
           z: 0,
-          moduleDef: mockMagneticBlockDef as any,
+          moduleDef: (mockMagneticBlockDef as unknown) as ModuleDefinition,
           nestedLabwareDef: null,
           nestedLabwareId: null,
           nestedLabwareDisplayName: null,
@@ -130,7 +130,7 @@ describe('useModuleMatchResults', () => {
           x: 0,
           y: 0,
           z: 0,
-          moduleDef: mockTemperatureModuleDef as any,
+          moduleDef: (mockTemperatureModuleDef as unknown) as ModuleDefinition,
           nestedLabwareDef: null,
           nestedLabwareId: null,
           nestedLabwareDisplayName: null,
@@ -157,10 +157,10 @@ describe('useModuleMatchResults', () => {
           x: 0,
           y: 0,
           z: 0,
-          moduleDef: {
+          moduleDef: ({
             ...mockTemperatureModuleDef,
             compatibleWith: ['fakeModuleModel'],
-          } as any,
+          } as unknown) as ModuleDefinition,
           nestedLabwareDef: null,
           nestedLabwareId: null,
           nestedLabwareDisplayName: null,

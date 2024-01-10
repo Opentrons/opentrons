@@ -6,16 +6,17 @@ from automation.data.protocols import Protocols
 from rich.panel import Panel
 
 stems = [p.stem for p in pathlib.Path(pathlib.Path.cwd(), "files", "protocols").rglob("*") if p.is_file()]
+sorted_stems = sorted(stems)
 rich.print(Panel("For protocol_files.names"))
-rich.print(stems)
+rich.print(sorted_stems)
 rich.print(Panel("Formatted for .env"))
-rich.print(", ".join(stems))
+rich.print(", ".join(sorted_stems))
 rich.print(Panel("What are actually defined?"))
 protocols = Protocols()
 props = [prop for prop in dir(protocols) if "__" not in prop]
 rich.print(",\n".join(props))
 
-possible = set(stems)
+possible = set(sorted_stems)
 actual = set(props)
 missing_protocols = possible - actual
 orphan_protocols = actual - possible

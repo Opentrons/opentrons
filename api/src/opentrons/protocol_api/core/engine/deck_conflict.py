@@ -26,7 +26,7 @@ from opentrons.protocol_engine import (
     DropTipWellLocation,
 )
 from opentrons.protocol_engine.errors.exceptions import LabwareNotLoadedOnModuleError
-from opentrons.types import DeckSlotName, Point
+from opentrons.types import DeckSlotName, StagingSlotName, Point
 
 
 class PartialTipMovementNotAllowedError(MotionPlanningFailureError):
@@ -142,7 +142,9 @@ def check(
     )
     mapped_existing_modules = (m for m in all_existing_modules if m is not None)
 
-    existing_items: Dict[DeckSlotName, wrapped_deck_conflict.DeckItem] = {}
+    existing_items: Dict[
+        Union[DeckSlotName, StagingSlotName], wrapped_deck_conflict.DeckItem
+    ] = {}
     for existing_location, existing_item in itertools.chain(
         mapped_existing_labware, mapped_existing_modules
     ):
@@ -435,20 +437,37 @@ def _is_within_pipette_extents(
 def _map_labware(
     engine_state: StateView,
     labware_id: str,
-) -> Optional[Tuple[DeckSlotName, wrapped_deck_conflict.DeckItem]]:
+) -> Optional[
+    Tuple[Union[DeckSlotName, StagingSlotName], wrapped_deck_conflict.DeckItem]
+]:
     location_from_engine = engine_state.labware.get_location(labware_id=labware_id)
 
     if isinstance(location_from_engine, AddressableAreaLocation):
-        # TODO need to deal with staging slots, which will raise the value error we are returning None with below
+        # This will be guaranteed to be either deck slot name or staging slot name
+        slot: Union[DeckSlotName, StagingSlotName]
         try:
-            deck_slot = DeckSlotName.from_primitive(
+            slot = DeckSlotName.from_primitive(location_from_engine.addressableAreaName)
+        except ValueError:
+            slot = StagingSlotName.from_primitive(
                 location_from_engine.addressableAreaName
             )
-        except ValueError:
-            return None
-        location_from_engine = DeckSlotLocation(slotName=deck_slot)
+        return (
+            slot,
+            wrapped_deck_conflict.Labware(
+                name_for_errors=engine_state.labware.get_load_name(
+                    labware_id=labware_id
+                ),
+                highest_z=engine_state.geometry.get_labware_highest_z(
+                    labware_id=labware_id
+                ),
+                uri=engine_state.labware.get_definition_uri(labware_id=labware_id),
+                is_fixed_trash=engine_state.labware.is_fixed_trash(
+                    labware_id=labware_id
+                ),
+            ),
+        )
 
-    if isinstance(location_from_engine, DeckSlotLocation):
+    elif isinstance(location_from_engine, DeckSlotLocation):
         # This labware is loaded directly into a deck slot.
         # Map it to a wrapped_deck_conflict.Labware.
         return (
@@ -504,6 +523,14 @@ def _map_module(
         return (
             mapped_location,
             wrapped_deck_conflict.HeaterShakerModule(
+                name_for_errors=name_for_errors,
+                highest_z_including_labware=highest_z_including_labware,
+            ),
+        )
+    elif module_type == ModuleType.MAGNETIC_BLOCK:
+        return (
+            mapped_location,
+            wrapped_deck_conflict.MagneticBlockModule(
                 name_for_errors=name_for_errors,
                 highest_z_including_labware=highest_z_including_labware,
             ),

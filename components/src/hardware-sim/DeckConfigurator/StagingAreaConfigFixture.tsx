@@ -12,12 +12,12 @@ import {
   STAGING_AREA_FIXTURE_WIDTH,
 } from './constants'
 
-import type { Cutout, DeckDefinition } from '@opentrons/shared-data'
+import type { CutoutId, DeckDefinition } from '@opentrons/shared-data'
 
 interface StagingAreaConfigFixtureProps {
   deckDefinition: DeckDefinition
-  fixtureLocation: Cutout
-  handleClickRemove?: (fixtureLocation: Cutout) => void
+  fixtureLocation: CutoutId
+  handleClickRemove?: (fixtureLocation: CutoutId) => void
 }
 
 export function StagingAreaConfigFixture(
@@ -25,11 +25,17 @@ export function StagingAreaConfigFixture(
 ): JSX.Element {
   const { deckDefinition, handleClickRemove, fixtureLocation } = props
 
-  const stagingAreaSlot = deckDefinition.locations.cutouts.find(
-    slot => slot.id === fixtureLocation
+  const stagingAreaCutout = deckDefinition.locations.cutouts.find(
+    cutout => cutout.id === fixtureLocation
   )
-  const [xSlotPosition = 0, ySlotPosition = 0] = stagingAreaSlot?.position ?? []
-  // TODO: remove adjustment when reading from fixture position
+
+  /**
+   * deck definition cutout position is the position of the single slot located within that cutout
+   * so, to get the position of the cutout itself we must add an adjustment to the slot position
+   */
+  const [xSlotPosition = 0, ySlotPosition = 0] =
+    stagingAreaCutout?.position ?? []
+
   const xAdjustment = -17
   const x = xSlotPosition + xAdjustment
   const yAdjustment = -10

@@ -9,7 +9,7 @@ from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.motion_planning import deck_conflict
 
-from opentrons.types import DeckSlotName
+from opentrons.types import DeckSlotName, StagingSlotName
 
 
 @pytest.mark.parametrize(
@@ -34,15 +34,25 @@ def test_empty_no_conflict(robot_type: RobotType, slot_name: DeckSlotName) -> No
 
 @pytest.mark.parametrize(
     "robot_type, slot_name",
-    [("OT-2 Standard", DeckSlotName.SLOT_1), ("OT-3 Standard", DeckSlotName.SLOT_A1)],
+    [
+        ("OT-2 Standard", DeckSlotName.SLOT_1),
+        ("OT-3 Standard", DeckSlotName.SLOT_A1),
+        ("OT-3 Standard", StagingSlotName.SLOT_A4),
+    ],
 )
 def test_no_multiple_locations(robot_type: RobotType, slot_name: DeckSlotName) -> None:
     """It should not allow two items in the same slot."""
-    item_1 = deck_conflict.OtherModule(
-        highest_z_including_labware=123, name_for_errors="some_item_1"
+    item_1 = deck_conflict.Labware(
+        uri=LabwareUri("some_labware_uri"),
+        highest_z=123,
+        is_fixed_trash=False,
+        name_for_errors="some_item_1",
     )
-    item_2 = deck_conflict.OtherModule(
-        highest_z_including_labware=123, name_for_errors="some_item_2"
+    item_2 = deck_conflict.Labware(
+        uri=LabwareUri("some_labware_uri"),
+        highest_z=123,
+        is_fixed_trash=False,
+        name_for_errors="some_item_2",
     )
 
     with pytest.raises(
@@ -484,3 +494,81 @@ def test_no_heater_shaker_south_of_trash() -> None:
             new_location=DeckSlotName.SLOT_9,
             robot_type="OT-2 Standard",
         )
+
+
+@pytest.mark.parametrize(
+    ("deck_slot_name", "adjacent_staging_slot", "non_adjacent_staging_slot"),
+    [
+        (DeckSlotName.SLOT_A3, StagingSlotName.SLOT_A4, StagingSlotName.SLOT_B4),
+        (DeckSlotName.SLOT_B3, StagingSlotName.SLOT_B4, StagingSlotName.SLOT_C4),
+        (DeckSlotName.SLOT_C3, StagingSlotName.SLOT_C4, StagingSlotName.SLOT_D4),
+        (DeckSlotName.SLOT_D3, StagingSlotName.SLOT_D4, StagingSlotName.SLOT_A4),
+    ],
+)
+def test_no_staging_slot_adjacent_to_module(
+    deck_slot_name: DeckSlotName,
+    adjacent_staging_slot: StagingSlotName,
+    non_adjacent_staging_slot: StagingSlotName,
+) -> None:
+    """It should raise if certain modules are placed adjacent to labware on a staging slot."""
+    staging_slot_labware = deck_conflict.Labware(
+        uri=LabwareUri("some_labware_uri"),
+        highest_z=123,
+        is_fixed_trash=False,
+        name_for_errors="some_labware",
+    )
+    heater_shaker = deck_conflict.HeaterShakerModule(
+        name_for_errors="some_heater_shaker",
+        highest_z_including_labware=123,
+    )
+    with pytest.raises(
+        deck_conflict.DeckConflictError,
+        match=(
+            f"some_labware in slot {adjacent_staging_slot}"
+            f" prevents some_heater_shaker from using slot {deck_slot_name}"
+        ),
+    ):
+        deck_conflict.check(
+            existing_items={adjacent_staging_slot: staging_slot_labware},
+            new_item=heater_shaker,
+            new_location=deck_slot_name,
+            robot_type="OT-3 Standard",
+        )
+
+    # Non-adjacent staging slot passes
+    deck_conflict.check(
+        existing_items={non_adjacent_staging_slot: staging_slot_labware},
+        new_item=heater_shaker,
+        new_location=deck_slot_name,
+        robot_type="OT-3 Standard",
+    )
+
+    other_module = deck_conflict.OtherModule(
+        name_for_errors="some_other_module",
+        highest_z_including_labware=123,
+    )
+    with pytest.raises(
+        deck_conflict.DeckConflictError,
+        match=(
+            f"some_other_module in slot {deck_slot_name}"
+            f" prevents some_labware from using slot {adjacent_staging_slot}"
+        ),
+    ):
+        deck_conflict.check(
+            existing_items={deck_slot_name: other_module},
+            new_item=staging_slot_labware,
+            new_location=adjacent_staging_slot,
+            robot_type="OT-3 Standard",
+        )
+
+    # Magnetic block is allowed
+    magnetic_block = deck_conflict.MagneticBlockModule(
+        name_for_errors="some_mag_block",
+        highest_z_including_labware=123,
+    )
+    deck_conflict.check(
+        existing_items={adjacent_staging_slot: staging_slot_labware},
+        new_item=magnetic_block,
+        new_location=deck_slot_name,
+        robot_type="OT-3 Standard",
+    )

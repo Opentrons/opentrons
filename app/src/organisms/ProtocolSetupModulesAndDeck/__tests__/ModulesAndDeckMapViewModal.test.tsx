@@ -2,7 +2,10 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import { renderWithProviders, BaseDeck } from '@opentrons/components'
-import { getSimplestDeckConfigForProtocol } from '@opentrons/shared-data'
+import {
+  FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC,
+  getSimplestDeckConfigForProtocol,
+} from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
 import { ModulesAndDeckMapViewModal } from '../ModulesAndDeckMapViewModal'
@@ -104,8 +107,7 @@ describe('ModulesAndDeckMapViewModal', () => {
       protocolAnalysis: PROTOCOL_ANALYSIS,
     }
     when(mockGetSimplestDeckConfigForProtocol).mockReturnValue(
-      // TODO(bh, 2023-11-13): mock cutout config protocol spec
-      []
+      FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC
     )
     mockBaseDeck.mockReturnValue(<div>mock BaseDeck</div>)
   })
