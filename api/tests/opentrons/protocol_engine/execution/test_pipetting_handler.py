@@ -1,5 +1,5 @@
 """Pipetting execution handler."""
-from typing import cast, Optional
+from typing import cast
 
 import pytest
 from decoy import Decoy

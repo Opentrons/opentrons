@@ -264,29 +264,6 @@ class VirtualPipettingHandler(PipettingHandler):
         self, pipette_id: str, dispense_volume: float
     ) -> float:
         """Validate dispense volume."""
-        # TODO:
-        #
-        # Does this code belong here, or in PipetteView?
-        #
-        #
-        # TODO: Does it matter what order we do the subtraction in?
-        #
-        # remaining = aspirated - dispensed
-        # if remaining >= -_TOLERANCE:
-        #    ok, clamp to 0 remaining
-        # else:
-        #    error
-        #
-        #
-        # vs.
-        #
-        #
-        # available = aspirated + _TOLERANCE
-        # if dispensed <= available
-        #    ok, clamp to 0 remaining
-        # else:
-        #    error
-
         aspirated_volume = self._state_view.pipettes.get_aspirated_volume(pipette_id)
         if aspirated_volume is None:
             raise InvalidDispenseVolumeError(
