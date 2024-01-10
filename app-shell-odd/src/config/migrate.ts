@@ -14,6 +14,7 @@ import type {
   ConfigV18,
   ConfigV19,
   ConfigV20,
+  ConfigV21,
 } from '@opentrons/app/src/redux/config/types'
 // format
 // base config v12 defaults
@@ -169,6 +170,21 @@ const toVersion20 = (prevConfig: ConfigV19): ConfigV20 => {
   }
 }
 
+const toVersion21 = (prevConfig: ConfigV20): ConfigV21 => {
+  return {
+    ...prevConfig,
+    version: 21 as const,
+    onDeviceDisplaySettings: {
+      ...prevConfig.onDeviceDisplaySettings,
+      unfinishedUnboxingFlowRoute:
+        prevConfig.onDeviceDisplaySettings.unfinishedUnboxingFlowRoute ===
+        '/dashboard'
+          ? null
+          : prevConfig.onDeviceDisplaySettings.unfinishedUnboxingFlowRoute,
+    },
+  }
+}
+
 const MIGRATIONS: [
   (prevConfig: ConfigV12) => ConfigV13,
   (prevConfig: ConfigV13) => ConfigV14,
@@ -177,7 +193,8 @@ const MIGRATIONS: [
   (prevConfig: ConfigV16) => ConfigV17,
   (prevConfig: ConfigV17) => ConfigV18,
   (prevConfig: ConfigV18) => ConfigV19,
-  (prevConfig: ConfigV19) => ConfigV20
+  (prevConfig: ConfigV19) => ConfigV20,
+  (prevConfig: ConfigV20) => ConfigV21
 ] = [
   toVersion13,
   toVersion14,
@@ -187,6 +204,7 @@ const MIGRATIONS: [
   toVersion18,
   toVersion19,
   toVersion20,
+  toVersion21,
 ]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V12)
@@ -202,6 +220,7 @@ export function migrate(
     | ConfigV18
     | ConfigV19
     | ConfigV20
+    | ConfigV21
 ): Config {
   let result = prevConfig
   // loop through the migrations, skipping any migrations that are unnecessary

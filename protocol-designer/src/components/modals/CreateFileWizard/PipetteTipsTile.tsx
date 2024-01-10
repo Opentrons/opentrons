@@ -35,6 +35,8 @@ import { HandleEnter } from './HandleEnter'
 
 import type { PipetteName } from '@opentrons/shared-data'
 import type { FormState, WizardTileProps } from './types'
+import { ThunkDispatch } from 'redux-thunk'
+import { BaseState } from '../../../types'
 
 export function FirstPipetteTipsTile(props: WizardTileProps): JSX.Element {
   return <PipetteTipsTile {...props} mount="left" />
@@ -147,7 +149,7 @@ interface PipetteTipsFieldProps extends FormikProps<FormState> {
 function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
   const { mount, values, setFieldValue } = props
   const allowAllTipracks = useSelector(getAllowAllTipracks)
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const [showCustomTipracks, setShowCustomTipracks] = React.useState<boolean>(
     false
   )
@@ -179,7 +181,12 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
 
   React.useEffect(() => {
     if (currentValue === undefined) {
-      setFieldValue(nameAccessor, tiprackOptions[0]?.value ?? '')
+      // this timeout avoids an infinite loop caused by Formik and React 18 not playing nice
+      // see https://github.com/downshift-js/downshift/issues/1511
+      // TODO: migrate away from formik
+      setTimeout(() => {
+        setFieldValue(nameAccessor, tiprackOptions[0]?.value ?? '')
+      })
     }
   }, [currentValue, setFieldValue, nameAccessor, tiprackOptions])
 

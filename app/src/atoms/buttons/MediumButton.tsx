@@ -145,7 +145,6 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       display={DISPLAY_FLEX}
       disabled={disabled}
       css={MEDIUM_BUTTON_STYLE}
-      aria-label={`MediumButton_${buttonType}`}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
       flexDirection={DIRECTION_ROW}
@@ -160,7 +159,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       {iconName !== undefined && (
         <Icon
           name={iconName ?? 'play'}
-          aria-label={`MediumButton_${iconName ?? 'play'}`}
+          aria-label={`${iconName ?? 'play'} icon`}
           color={
             disabled
               ? COLORS.darkBlack60

@@ -54,7 +54,7 @@ jobs:
           node-version: '21'
       - uses: 'actions/setup-python@v3'
         with:
-          python-version: '3.7'
+          python-version: '3.10'
 
       - uses: './.github/actions/python/setup'
         with:
@@ -71,10 +71,8 @@ jobs:
         os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
         # TODO(mc, 2022-02-24): expand this matrix to 3.8 and 3.9,
         # preferably in a nightly cronjob on edge or something
-        python: ['3.7', '3.10']
-        exclude:
-          - os: 'macos-latest'
-            python: '3.10'
+        python: ['3.10']
+
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v3'
@@ -164,7 +162,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - uses: 'actions/setup-python@v4'
         with:
-          python-version: '3.7'
+          python-version: '3.10'
       - uses: './.github/actions/python/setup'
         with:
           project: 'shared-data/python'
@@ -199,10 +197,10 @@ jobs:
         - id: publish-switch
           run: |
             echo "Determining whether to publish artifacts for event ${{github.event_type}} and ref ${{github.ref}}"
-            if [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/shared-data')) }}" = "true"] ; then
+            if [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/shared-data')) }}" = "true" ] ; then
               echo "Publishing builds for shared-data@ tags"
               echo 'should_publish=true' >> $GITHUB_OUTPUT
-            elif [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/components')) }}" = "true"] ; then
+            elif [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/components')) }}" = "true" ] ; then
               echo "Publishing builds for components@ tags"
               echo 'should_publish=true' >> $GITHUB_OUTPUT
             else 

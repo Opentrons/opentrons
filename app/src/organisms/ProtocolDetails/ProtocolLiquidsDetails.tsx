@@ -45,7 +45,7 @@ export const ProtocolLiquidsDetails = (
       overflowY="auto"
       data-testid="LiquidsDetailsTab"
     >
-      {liquids.length > 0 ? (
+      {liquidsInLoadOrder.length > 0 ? (
         liquidsInLoadOrder?.map((liquid, index) => {
           return (
             <React.Fragment key={liquid.id}>

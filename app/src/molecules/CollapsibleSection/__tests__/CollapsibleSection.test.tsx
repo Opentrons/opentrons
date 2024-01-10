@@ -1,40 +1,40 @@
 import * as React from 'react'
-import { fireEvent, render } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { CollapsibleSection } from '../'
 
 describe('CollapsibleSection', () => {
   it('renders children by default', () => {
-    const { queryByText } = render(
+    render(
       <CollapsibleSection title="fakeTitle">
         section children
       </CollapsibleSection>
     )
-    expect(queryByText('section children')).toBeInTheDocument()
+    expect(screen.getByText('section children')).toBeInTheDocument()
   })
   it('renders title by default', () => {
-    const { queryByText } = render(
+    render(
       <CollapsibleSection title="fakeTitle">
         section children
       </CollapsibleSection>
     )
-    expect(queryByText('fakeTitle')).toBeInTheDocument()
+    expect(screen.getByText('fakeTitle')).toBeInTheDocument()
   })
   it('after clicking collapse icon, children are hidden', () => {
-    const { queryByRole, queryByText } = render(
+    render(
       <CollapsibleSection title="fakeTitle">
         section children
       </CollapsibleSection>
     )
-    const collapseButton = queryByRole('button')
-    collapseButton != null && fireEvent.click(collapseButton)
-    expect(queryByText('section children')).toBeFalsy()
+    const collapseButton = screen.getByRole('button')
+    fireEvent.click(collapseButton)
+    expect(screen.queryByText('section children')).toBeNull()
   })
   it('initially collapsed if prop passed to override', () => {
-    const { queryByText } = render(
+    render(
       <CollapsibleSection title="fakeTitle" isExpandedInitially={false}>
         section children
       </CollapsibleSection>
     )
-    expect(queryByText('section children')).toBeFalsy()
+    expect(screen.queryByText('section children')).toBeNull()
   })
 })

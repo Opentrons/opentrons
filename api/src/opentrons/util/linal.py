@@ -33,7 +33,7 @@ def identity_deck_transform() -> DoubleArray:
 def solve_attitude(expected: SolvePoints, actual: SolvePoints) -> AttitudeMatrix:
     ex = np.array([list(point) for point in expected]).transpose()
     ac = np.array([list(point) for point in actual]).transpose()
-    t = np.dot(ac, inv(ex))  # type: ignore[no-untyped-call]
+    t = np.dot(ac, inv(ex))
 
     mask_transform = np.array(
         [[True, True, False], [True, True, False], [False, False, False]]
@@ -105,7 +105,7 @@ def solve(
     # [ y1 y2 y3 ]
     # [  1  1  1 ]
 
-    transform = np.dot(ac, inv(ex))  # type: ignore[no-untyped-call]
+    transform = np.dot(ac, inv(ex))
     # `dot` in numpy is a misnomer. When both arguments are square, N-
     # dimensional arrays, the return type is the result of performing matrix
     # multiplication, rather than the dot-product (so the return here will be
@@ -132,21 +132,21 @@ def add_z(xy: DoubleArray, z: float) -> DoubleArray:
             [ 0  0  0  1 ]
     """
     # First, insert a column of zeros as into the input matrix
-    interm = insert(xy, 2, [0, 0, 0], axis=1)  # type: ignore[no-untyped-call]
+    interm = insert(xy, 2, [0, 0, 0], axis=1)
     # Result:
     # [ 1  0  0  x ]
     # [ 0  1  0  y ]
     # [ 0  0  0  1 ]
 
     # Then, insert the z row to create a properly formed 3-D transform matrix:
-    xyz = insert(interm, 2, [0, 0, 1, z], axis=0)  # type: ignore[no-untyped-call]
+    xyz = insert(interm, 2, [0, 0, 1, z], axis=0)
     # Result:
     # [ 1  0  0  x ]
     # [ 0  1  0  y ]
     # [ 0  0  1  z ]
     # [ 0  0  0  1 ]
 
-    return xyz.round(11)  # type: ignore[no-any-return]
+    return xyz.round(11)
 
 
 def add_matrices(
@@ -178,4 +178,4 @@ def apply_reverse(
     pos: AxisPosition,
 ) -> Tuple[float, float, float]:
     """Like apply_transform but inverts the transform first"""
-    return apply_transform(inv(t), pos)  # type: ignore[no-untyped-call]
+    return apply_transform(inv(t), pos)

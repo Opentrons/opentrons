@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { BackgroundOverlay } from '..'
 
@@ -10,8 +11,8 @@ describe('BackgroundOverlay', () => {
   let props: React.ComponentProps<typeof BackgroundOverlay>
   it('renders background overlay', () => {
     props = { onClick: jest.fn() }
-    const { getByLabelText } = render(props)
-    getByLabelText('BackgroundOverlay').click()
+    render(props)
+    fireEvent.click(screen.getByLabelText('BackgroundOverlay'))
     expect(props.onClick).toHaveBeenCalled()
   })
 })

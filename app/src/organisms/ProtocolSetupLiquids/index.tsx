@@ -22,7 +22,7 @@ import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostR
 import { getTotalVolumePerLiquidId } from '../Devices/ProtocolRun/SetupLiquids/utils'
 import { LiquidDetails } from './LiquidDetails'
 import type { ParsedLiquid } from '@opentrons/api-client'
-import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import type { SetupScreens } from '../../pages/ProtocolSetup'
 
 export interface ProtocolSetupLiquidsProps {
   runId: string

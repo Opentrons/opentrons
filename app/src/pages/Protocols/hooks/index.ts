@@ -62,6 +62,8 @@ export type ProtocolHardware =
   | ProtocolGripper
   | ProtocolFixture
 
+const DECK_CONFIG_REFETCH_INTERVAL = 5000
+
 export const useRequiredProtocolHardwareFromAnalysis = (
   analysis: CompletedProtocolAnalysis | null
 ): { requiredProtocolHardware: ProtocolHardware[]; isLoading: boolean } => {
@@ -79,7 +81,9 @@ export const useRequiredProtocolHardwareFromAnalysis = (
 
   const robotType = FLEX_ROBOT_TYPE
   const deckDef = getDeckDefFromRobotType(robotType)
-  const { data: deckConfig = [] } = useDeckConfigurationQuery()
+  const { data: deckConfig = [] } = useDeckConfigurationQuery({
+    refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
+  })
   const deckConfigCompatibility = useDeckConfigurationCompatibility(
     robotType,
     analysis

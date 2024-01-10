@@ -735,13 +735,19 @@ class OT3Controller:
             if not self._feature_flags.stall_detection_enabled
             else False,
         )
-        positions = await runner.run(can_messenger=self._messenger)
-        if NodeId.pipette_left in positions:
-            self._gear_motor_position = {
-                NodeId.pipette_left: positions[NodeId.pipette_left].motor_position
-            }
-        else:
-            log.debug("no position returned from NodeId.pipette_left")
+        try:
+            positions = await runner.run(can_messenger=self._messenger)
+            if NodeId.pipette_left in positions:
+                self._gear_motor_position = {
+                    NodeId.pipette_left: positions[NodeId.pipette_left].motor_position
+                }
+            else:
+                log.debug("no position returned from NodeId.pipette_left")
+                self._gear_motor_position = {}
+        except Exception as e:
+            log.error("Clearing tip motor position due to failed movement")
+            self._gear_motor_position = {}
+            raise e
 
     async def tip_action(
         self,
@@ -755,13 +761,19 @@ class OT3Controller:
             if not self._feature_flags.stall_detection_enabled
             else False,
         )
-        positions = await runner.run(can_messenger=self._messenger)
-        if NodeId.pipette_left in positions:
-            self._gear_motor_position = {
-                NodeId.pipette_left: positions[NodeId.pipette_left].motor_position
-            }
-        else:
-            log.debug("no position returned from NodeId.pipette_left")
+        try:
+            positions = await runner.run(can_messenger=self._messenger)
+            if NodeId.pipette_left in positions:
+                self._gear_motor_position = {
+                    NodeId.pipette_left: positions[NodeId.pipette_left].motor_position
+                }
+            else:
+                log.debug("no position returned from NodeId.pipette_left")
+                self._gear_motor_position = {}
+        except Exception as e:
+            log.error("Clearing tip motor position due to failed movement")
+            self._gear_motor_position = {}
+            raise e
 
     @requires_update
     @requires_estop
@@ -959,8 +971,8 @@ class OT3Controller:
     @asynccontextmanager
     async def motor_current(
         self,
-        run_currents: OT3AxisMap[float] = {},
-        hold_currents: OT3AxisMap[float] = {},
+        run_currents: Optional[OT3AxisMap[float]] = None,
+        hold_currents: Optional[OT3AxisMap[float]] = None,
     ) -> AsyncIterator[None]:
         """Update and restore current."""
         assert self._current_settings

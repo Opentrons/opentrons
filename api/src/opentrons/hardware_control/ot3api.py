@@ -36,6 +36,7 @@ from opentrons_shared_data.pipette import (
 from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.errors.exceptions import (
     StallOrCollisionDetectedError,
+    FailedGripperPickupError,
 )
 
 from opentrons import types as top_types
@@ -739,7 +740,7 @@ class OT3API(
         """Configure instruments"""
         await self.set_gantry_load(self._gantry_load_from_instruments())
         await self.refresh_positions()
-        await self.reset_tip_detectors()
+        await self.reset_tip_detectors(False)
 
     async def reset_tip_detectors(
         self,
@@ -907,10 +908,11 @@ class OT3API(
             GantryLoad.HIGH_THROUGHPUT
         ][OT3AxisKind.Q]
 
+        max_distance = self._backend.axis_bounds[Axis.Q][1]
         # if position is not known, move toward limit switch at a constant velocity
-        if not any(self._backend.gear_motor_position):
+        if len(self._backend.gear_motor_position.keys()) == 0:
             await self._backend.home_tip_motors(
-                distance=self._backend.axis_bounds[Axis.Q][1],
+                distance=max_distance,
                 velocity=homing_velocity,
             )
             return
@@ -919,7 +921,13 @@ class OT3API(
             Axis.P_L
         ]
 
-        if current_pos_float > self._config.safe_home_distance:
+        # We filter out a distance more than `max_distance` because, if the tip motor was stopped during
+        # a slow-home motion, the position may be stuck at an enormous large value.
+        if (
+            current_pos_float > self._config.safe_home_distance
+            and current_pos_float < max_distance
+        ):
+
             fast_home_moves = self._build_moves(
                 {Axis.Q: current_pos_float}, {Axis.Q: self._config.safe_home_distance}
             )
@@ -933,7 +941,9 @@ class OT3API(
 
         # move until the limit switch is triggered, with no acceleration
         await self._backend.home_tip_motors(
-            distance=(current_pos_float + self._config.safe_home_distance),
+            distance=min(
+                current_pos_float + self._config.safe_home_distance, max_distance
+            ),
             velocity=homing_velocity,
         )
 
@@ -1313,6 +1323,24 @@ class OT3API(
                 )
         except GripperNotPresentError:
             pass
+
+    def raise_error_if_gripper_pickup_failed(self, labware_width: float) -> None:
+        """Ensure that a gripper pickup succeeded."""
+        # check if the gripper is at an acceptable position after attempting to
+        #  pick up labware
+        assert self.hardware_gripper
+        expected_gripper_position = labware_width
+        current_gripper_position = self.hardware_gripper.jaw_width
+        if (
+            abs(current_gripper_position - expected_gripper_position)
+            > self.hardware_gripper.max_allowed_grip_error
+        ):
+            raise FailedGripperPickupError(
+                details={
+                    "expected jaw width": expected_gripper_position,
+                    "actual jaw width": current_gripper_position,
+                },
+            )
 
     def gripper_jaw_can_home(self) -> bool:
         return self._gripper_handler.is_ready_for_jaw_home()
@@ -2002,15 +2030,20 @@ class OT3API(
         self,
         mount: Union[top_types.Mount, OT3Mount],
     ) -> TipStateType:
-        real_mount = OT3Mount.from_mount(mount)
-        async with contextlib.AsyncExitStack() as stack:
-            if (
-                real_mount == OT3Mount.LEFT
-                and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
-            ):
-                await stack.enter_async_context(self._high_throughput_check_tip())
-            result = await self._backend.get_tip_status(real_mount)
-        return result
+        """
+        Check tip presence status. If a high throughput pipette is present,
+        move the tip motors down before checking the sensor status.
+        """
+        async with self._motion_lock:
+            real_mount = OT3Mount.from_mount(mount)
+            async with contextlib.AsyncExitStack() as stack:
+                if (
+                    real_mount == OT3Mount.LEFT
+                    and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
+                ):
+                    await stack.enter_async_context(self._high_throughput_check_tip())
+                result = await self._backend.get_tip_status(real_mount)
+            return result
 
     async def verify_tip_presence(
         self, mount: Union[top_types.Mount, OT3Mount], expected: TipStateType

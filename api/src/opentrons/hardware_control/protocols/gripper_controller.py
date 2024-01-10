@@ -33,6 +33,9 @@ class GripperController(Protocol):
         """
         ...
 
+    def raise_error_if_gripper_pickup_failed(self, labware_width: float) -> None:
+        """Ensure that a gripper pickup succeeded."""
+
     @property
     def attached_gripper(self) -> Optional[GripperDict]:
         """Get a dict of all attached grippers."""

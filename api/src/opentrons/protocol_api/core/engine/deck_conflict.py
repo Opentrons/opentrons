@@ -24,11 +24,20 @@ from opentrons.protocol_engine import (
     DropTipWellLocation,
 )
 from opentrons.protocol_engine.errors.exceptions import LabwareNotLoadedOnModuleError
-from opentrons.types import DeckSlotName, Point
+from opentrons.types import DeckSlotName, StagingSlotName, Point
 
 
 class PartialTipMovementNotAllowedError(MotionPlanningFailureError):
     """Error raised when trying to perform a partial tip movement to an illegal location."""
+
+    def __init__(self, message: str) -> None:
+        super().__init__(
+            message=message,
+        )
+
+
+class UnsuitableTiprackForPipetteMotion(MotionPlanningFailureError):
+    """Error raised when trying to perform a pipette movement to a tip rack, based on adapter status."""
 
     def __init__(self, message: str) -> None:
         super().__init__(
@@ -122,7 +131,9 @@ def check(
     )
     mapped_existing_modules = (m for m in all_existing_modules if m is not None)
 
-    existing_items: Dict[DeckSlotName, wrapped_deck_conflict.DeckItem] = {}
+    existing_items: Dict[
+        Union[DeckSlotName, StagingSlotName], wrapped_deck_conflict.DeckItem
+    ] = {}
     for existing_location, existing_item in itertools.chain(
         mapped_existing_labware, mapped_existing_modules
     ):
@@ -171,6 +182,60 @@ def check_safe_for_pipette_movement(
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
+        )
+
+
+def check_safe_for_tip_pickup_and_return(
+    engine_state: StateView,
+    pipette_id: str,
+    labware_id: str,
+) -> None:
+    """Check if the presence or absence of a tiprack adapter might cause any pipette movement issues.
+
+    A 96 channel pipette will pick up tips using cam action when it's configured
+    to use ALL nozzles. For this, the tiprack needs to be on the Flex 96 channel tiprack adapter
+    or similar or the tips will not be picked up.
+
+    On the other hand, if the pipette is configured with partial nozzle configuration,
+    it uses the usual pipette presses to pick the tips up, in which case, having the tiprack
+    on the Flex 96 channel tiprack adapter (or similar) will cause the pipette to
+    crash against the adapter posts.
+
+    In order to check if the 96-channel can move and pickup/drop tips safely, this method
+    checks for the height attribute of the tiprack adapter rather than checking for the
+    specific official adapter since users might create custom labware &/or definitions
+    compatible with the official adapter.
+    """
+    if not engine_state.pipettes.get_channels(pipette_id) == 96:
+        # Adapters only matter to 96 ch.
+        return
+
+    is_partial_config = engine_state.pipettes.get_is_partially_configured(pipette_id)
+    tiprack_name = engine_state.labware.get_display_name(labware_id)
+    tiprack_parent = engine_state.labware.get_location(labware_id)
+    if isinstance(tiprack_parent, OnLabwareLocation):  # tiprack is on an adapter
+        is_96_ch_tiprack_adapter = engine_state.labware.get_has_quirk(
+            labware_id=tiprack_parent.labwareId, quirk="tiprackAdapterFor96Channel"
+        )
+        tiprack_height = engine_state.labware.get_dimensions(labware_id).z
+        adapter_height = engine_state.labware.get_dimensions(tiprack_parent.labwareId).z
+        if is_partial_config and tiprack_height < adapter_height:
+            raise PartialTipMovementNotAllowedError(
+                f"{tiprack_name} cannot be on an adapter taller than the tip rack"
+                f" when picking up fewer than 96 tips."
+            )
+        elif not is_partial_config and not is_96_ch_tiprack_adapter:
+            raise UnsuitableTiprackForPipetteMotion(
+                f"{tiprack_name} must be on an Opentrons Flex 96 Tip Rack Adapter"
+                f" in order to pick up or return all 96 tips simultaneously."
+            )
+
+    elif (
+        not is_partial_config
+    ):  # tiprack is not on adapter and pipette is in full config
+        raise UnsuitableTiprackForPipetteMotion(
+            f"{tiprack_name} must be on an Opentrons Flex 96 Tip Rack Adapter"
+            f" in order to pick up or return all 96 tips simultaneously."
         )
 
 
@@ -335,20 +400,37 @@ def _is_within_pipette_extents(
 def _map_labware(
     engine_state: StateView,
     labware_id: str,
-) -> Optional[Tuple[DeckSlotName, wrapped_deck_conflict.DeckItem]]:
+) -> Optional[
+    Tuple[Union[DeckSlotName, StagingSlotName], wrapped_deck_conflict.DeckItem]
+]:
     location_from_engine = engine_state.labware.get_location(labware_id=labware_id)
 
     if isinstance(location_from_engine, AddressableAreaLocation):
-        # TODO need to deal with staging slots, which will raise the value error we are returning None with below
+        # This will be guaranteed to be either deck slot name or staging slot name
+        slot: Union[DeckSlotName, StagingSlotName]
         try:
-            deck_slot = DeckSlotName.from_primitive(
+            slot = DeckSlotName.from_primitive(location_from_engine.addressableAreaName)
+        except ValueError:
+            slot = StagingSlotName.from_primitive(
                 location_from_engine.addressableAreaName
             )
-        except ValueError:
-            return None
-        location_from_engine = DeckSlotLocation(slotName=deck_slot)
+        return (
+            slot,
+            wrapped_deck_conflict.Labware(
+                name_for_errors=engine_state.labware.get_load_name(
+                    labware_id=labware_id
+                ),
+                highest_z=engine_state.geometry.get_labware_highest_z(
+                    labware_id=labware_id
+                ),
+                uri=engine_state.labware.get_definition_uri(labware_id=labware_id),
+                is_fixed_trash=engine_state.labware.is_fixed_trash(
+                    labware_id=labware_id
+                ),
+            ),
+        )
 
-    if isinstance(location_from_engine, DeckSlotLocation):
+    elif isinstance(location_from_engine, DeckSlotLocation):
         # This labware is loaded directly into a deck slot.
         # Map it to a wrapped_deck_conflict.Labware.
         return (
@@ -404,6 +486,14 @@ def _map_module(
         return (
             mapped_location,
             wrapped_deck_conflict.HeaterShakerModule(
+                name_for_errors=name_for_errors,
+                highest_z_including_labware=highest_z_including_labware,
+            ),
+        )
+    elif module_type == ModuleType.MAGNETIC_BLOCK:
+        return (
+            mapped_location,
+            wrapped_deck_conflict.MagneticBlockModule(
                 name_for_errors=name_for_errors,
                 highest_z_including_labware=highest_z_including_labware,
             ),

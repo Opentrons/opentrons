@@ -251,7 +251,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         """Configure the pipette for a specific volume.
 
         Args:
-            volume: The volume to preppare to handle.
+            volume: The volume to prepare to handle.
         """
         ...
 
@@ -269,9 +269,13 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
 
         Args:
             style: The type of configuration you wish to build.
-            primary_nozzle: The nozzle that will determine a pipettes critical point.
+            primary_nozzle: The nozzle that will determine a pipette's critical point.
             front_right_nozzle: The front right most nozzle in the requested layout.
         """
+        ...
+
+    def is_tip_tracking_available(self) -> bool:
+        """Return whether auto tip tracking is available for the pipette's current nozzle configuration."""
         ...
 
 

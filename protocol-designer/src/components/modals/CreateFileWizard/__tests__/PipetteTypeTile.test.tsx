@@ -1,9 +1,11 @@
 import * as React from 'react'
 import i18n from 'i18next'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { PipetteTypeTile } from '../PipetteTypeTile'
 import { EquipmentOption } from '../EquipmentOption'
+
 import type { FormPipettesByMount } from '../../../../step-forms'
 import type { FormState, WizardTileProps } from '../types'
 
@@ -61,13 +63,13 @@ describe('PipetteTypeTile', () => {
     mockEquipmentOption.mockReturnValue(<div>mock EquipmentOption</div>)
   })
   it('renders the correct pipettes for flex with no empty pip allowed and btn ctas work', () => {
-    const { getByText, getAllByText, getByRole } = render(props)
-    getByText('header')
-    expect(getAllByText('mock EquipmentOption')).toHaveLength(5)
-    getByText('Go back')
-    getByRole('button', { name: 'GoBack_button' }).click()
+    render(props)
+    screen.getByText('header')
+    expect(screen.getAllByText('mock EquipmentOption')).toHaveLength(5)
+    screen.getByText('Go back')
+    fireEvent.click(screen.getByRole('button', { name: 'GoBack_button' }))
     expect(props.goBack).toHaveBeenCalled()
-    getByRole('button', { name: 'Next' }).click()
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }))
     expect(props.proceed).toHaveBeenCalled()
   })
   it('renders the correct pipettes for flex with empty pip allowed', () => {
@@ -76,8 +78,8 @@ describe('PipetteTypeTile', () => {
       allowNoPipette: true,
       display96Channel: false,
     }
-    const { getAllByText } = render(props)
-    expect(getAllByText('mock EquipmentOption')).toHaveLength(5)
+    render(props)
+    expect(screen.getAllByText('mock EquipmentOption')).toHaveLength(5)
   })
   it('renders correct pipettes for ot-2 with no empty pip allowed', () => {
     const mockWizardTileProps: Partial<WizardTileProps> = {
@@ -108,7 +110,7 @@ describe('PipetteTypeTile', () => {
       allowNoPipette: false,
       tileHeader: 'header',
     }
-    const { getAllByText } = render(props)
-    expect(getAllByText('mock EquipmentOption')).toHaveLength(12)
+    render(props)
+    expect(screen.getAllByText('mock EquipmentOption')).toHaveLength(12)
   })
 })

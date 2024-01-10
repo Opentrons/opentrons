@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
 
@@ -211,7 +212,7 @@ describe('RobotOverview', () => {
     expect(image.getAttribute('src')).toEqual(OT2_PNG_FILE_NAME)
   })
 
-  it('renders an OT-3 image', () => {
+  it('renders a Flex image', () => {
     when(mockGetRobotModelByName)
       .calledWith(MOCK_STATE, mockConnectableRobot.name)
       .mockReturnValue('Opentrons Flex')
@@ -379,7 +380,7 @@ describe('RobotOverview', () => {
     getByText('Controls')
     getByText('Lights')
     const toggle = getByRole('switch', { name: 'Lights' })
-    toggle.click()
+    fireEvent.click(toggle)
     expect(mockToggleLights).toBeCalled()
   })
 

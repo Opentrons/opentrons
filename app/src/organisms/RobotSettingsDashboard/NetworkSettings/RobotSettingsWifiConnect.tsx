@@ -10,7 +10,7 @@ import {
 } from '../../../organisms/NetworkSettings'
 import { FAILURE, PENDING, SUCCESS } from '../../../redux/robot-api'
 
-import type { SetSettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SetSettingOption } from '../../../pages/RobotSettingsDashboard'
 import type { RequestState } from '../../../redux/robot-api/types'
 
 interface RobotSettingsWifiConnectProps {

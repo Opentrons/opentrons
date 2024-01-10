@@ -44,17 +44,19 @@ const StagingAreasModalComponent = (
   const { onCloseClick, stagingAreas } = props
   const { values, setFieldValue } = useFormikContext<StagingAreasValues>()
   const initialDeckSetup = useSelector(getInitialDeckSetup)
-  const areSlotsEmpty = values.selectedSlots.map(slot =>
-    getSlotIsEmpty(initialDeckSetup, slot)
-  )
   const hasWasteChute =
     Object.values(initialDeckSetup.additionalEquipmentOnDeck).find(
       aE => aE.name === 'wasteChute'
     ) != null
-  const hasConflictedSlot =
-    hasWasteChute && values.selectedSlots.find(slot => slot === 'cutoutD3')
-      ? false
-      : areSlotsEmpty.includes(false)
+  const areSlotsEmpty = values.selectedSlots.map(slot => {
+    if (slot === 'cutoutD3' && hasWasteChute) {
+      return true
+    } else {
+      return getSlotIsEmpty(initialDeckSetup, slot)
+    }
+  })
+
+  const hasConflictedSlot = areSlotsEmpty.includes(false)
 
   const mappedStagingAreas: DeckConfiguration = stagingAreas.flatMap(area => {
     return area.location != null
@@ -120,7 +122,7 @@ const StagingAreasModalComponent = (
 
   return (
     <Form>
-      <Flex height="20rem" flexDirection={DIRECTION_COLUMN}>
+      <Flex height="23rem" flexDirection={DIRECTION_COLUMN}>
         <Flex
           justifyContent={JUSTIFY_END}
           alignItems={ALIGN_CENTER}
@@ -143,12 +145,12 @@ const StagingAreasModalComponent = (
           deckConfig={updatedSlots}
           handleClickAdd={handleClickAdd}
           handleClickRemove={handleClickRemove}
+          showExpansion={false}
         />
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_FLEX_END}
-        paddingTop="4rem"
         paddingRight={SPACING.spacing32}
         paddingBottom={SPACING.spacing32}
         gridGap={SPACING.spacing8}

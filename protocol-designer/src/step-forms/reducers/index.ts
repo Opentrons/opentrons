@@ -18,6 +18,7 @@ import {
   LoadPipetteCreateCommand,
   MoveLabwareCreateCommand,
   MoveToAddressableAreaCreateCommand,
+  MoveToAddressableAreaForDropTipCreateCommand,
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
   PipetteName,
@@ -1393,12 +1394,17 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
       }, {})
 
       const trashBinCommand = Object.values(file.commands).find(
-        (command): command is MoveToAddressableAreaCreateCommand =>
-          command.commandType === 'moveToAddressableArea' &&
-          (MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
-            command.params.addressableAreaName
-          ) ||
-            command.params.addressableAreaName === 'fixedTrash')
+        (
+          command
+        ): command is
+          | MoveToAddressableAreaCreateCommand
+          | MoveToAddressableAreaForDropTipCreateCommand =>
+          (command.commandType === 'moveToAddressableArea' &&
+            (MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
+              command.params.addressableAreaName
+            ) ||
+              command.params.addressableAreaName === 'fixedTrash')) ||
+          command.commandType === 'moveToAddressableAreaForDropTip'
       )
       const trashAddressableAreaName =
         trashBinCommand?.params.addressableAreaName

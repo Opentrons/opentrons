@@ -10,8 +10,6 @@ import {
   ALIGN_CENTER,
   PrimaryButton,
   JUSTIFY_SPACE_BETWEEN,
-  LEFT,
-  RIGHT,
   InstrumentDiagram,
 } from '@opentrons/components'
 import {
@@ -21,6 +19,8 @@ import {
   OT3_PIPETTES,
   getAllPipetteNames,
   getPipetteNameSpecs,
+  LEFT,
+  RIGHT,
 } from '@opentrons/shared-data'
 
 import { i18n } from '../../../localization'
@@ -161,13 +161,7 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
         allowNoPipette ? '' : pipetteOptions[0]?.value ?? ''
       )
     }
-  }, [
-    currentValue,
-    setFieldValue,
-    nameAccessor,
-    allowNoPipette,
-    pipetteOptions,
-  ])
+  }, [])
 
   return (
     <Flex

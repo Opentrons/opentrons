@@ -51,7 +51,7 @@ export const BaseDeck: Story = {
   args: {
     robotType: FLEX_ROBOT_TYPE,
     deckConfig: EXTENDED_DECK_CONFIG_FIXTURE,
-    labwareLocations: [
+    labwareOnDeck: [
       {
         labwareLocation: { slotName: 'C2' },
         definition: fixture_96_plate as LabwareDefinition2,
@@ -61,7 +61,7 @@ export const BaseDeck: Story = {
         definition: fixture_tiprack_1000_ul as LabwareDefinition2,
       },
     ],
-    moduleLocations: [
+    modulesOnDeck: [
       {
         moduleLocation: { slotName: 'B1' },
         moduleModel: THERMOCYCLER_MODULE_V2,

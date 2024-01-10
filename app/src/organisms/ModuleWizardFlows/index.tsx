@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import {
   useDeleteMaintenanceRunMutation,
   useCurrentMaintenanceRun,
@@ -10,10 +10,10 @@ import {
   CreateCommand,
   getModuleType,
   getModuleDisplayName,
-  LEFT,
 } from '@opentrons/shared-data'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
+import { StyledText } from '../../atoms/text'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { useAttachedPipettesFromInstrumentsQuery } from '../../organisms/Devices/hooks'
@@ -31,7 +31,6 @@ import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
 import { DetachProbe } from './DetachProbe'
-import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
 
@@ -246,10 +245,14 @@ export const ModuleWizardFlows = (
           prepCommandErrorMessage != null ? (
             prepCommandErrorMessage
           ) : (
-            <>
-              {t('module_calibration_failed')}
-              {errorMessage}
-            </>
+            <Trans
+              t={t}
+              i18nKey={'module_calibration_failed'}
+              values={{ error: errorMessage }}
+              components={{
+                block: <StyledText as="p" />,
+              }}
+            />
           )
         }
       />
@@ -264,20 +267,6 @@ export const ModuleWizardFlows = (
         createMaintenanceRun={createTargetedMaintenanceRun}
         isCreateLoading={isCreateLoading}
         createdMaintenanceRunId={createdMaintenanceRunId}
-      />
-    )
-  } else if (currentStep.section === SECTIONS.FIRMWARE_UPDATE) {
-    modalContent = (
-      <FirmwareUpdateModal
-        proceed={proceed}
-        subsystem={
-          attachedPipette.mount === LEFT ? 'pipette_left' : 'pipette_right'
-        }
-        description={t('firmware_update')}
-        proceedDescription={t('firmware_up_to_date', {
-          module: getModuleDisplayName(attachedModule.moduleModel),
-        })}
-        isOnDevice={isOnDevice}
       />
     )
   } else if (currentStep.section === SECTIONS.SELECT_LOCATION) {

@@ -80,7 +80,7 @@ export const FirmwareUpdateModal = (
     description,
     isOnDevice,
   } = props
-  const [updateId, setUpdateId] = React.useState('')
+  const [updateId, setUpdateId] = React.useState<string | null>(null)
   const [firmwareText, setFirmwareText] = React.useState('')
   const {
     data: attachedInstruments,

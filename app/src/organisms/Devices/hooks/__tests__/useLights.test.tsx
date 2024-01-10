@@ -2,7 +2,7 @@ import * as React from 'react'
 import { resetAllWhenMocks } from 'jest-when'
 import { Provider } from 'react-redux'
 import { createStore, Store } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import {
   useLightsQuery,
@@ -23,7 +23,7 @@ const mockUseSetLightsMutation = useSetLightsMutation as jest.MockedFunction<
 const store: Store<any> = createStore(jest.fn(), {})
 
 describe('useLights hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   let setLights: jest.Mock
 
   beforeEach(() => {

@@ -505,6 +505,16 @@ class CriticalPoint(enum.Enum):
     back calibration pin slot.
     """
 
+    Y_CENTER = enum.auto()
+    """
+    Y_CENTER means the critical point under consideration is at the same X
+    coordinate as the default nozzle point (i.e. TIP | NOZZLE | FRONT_NOZZLE)
+    but halfway in between the Y axis bounding box of the pipette - it is the
+    XY center of the first column in the pipette. It's really only relevant for
+    the 96; it will produce the same position as XY_CENTER on an eight or one
+    channel pipette.
+    """
+
 
 class ExecutionState(enum.Enum):
     RUNNING = enum.auto()

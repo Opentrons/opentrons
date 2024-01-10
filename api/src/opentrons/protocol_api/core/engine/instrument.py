@@ -383,6 +383,11 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_name=well_name,
             absolute_point=location.point,
         )
+        deck_conflict.check_safe_for_tip_pickup_and_return(
+            engine_state=self._engine_client.state,
+            pipette_id=self._pipette_id,
+            labware_id=labware_id,
+        )
         deck_conflict.check_safe_for_pipette_movement(
             engine_state=self._engine_client.state,
             pipette_id=self._pipette_id,
@@ -434,12 +439,19 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             )
         else:
             well_location = DropTipWellLocation()
+
+        if self._engine_client.state.labware.is_tiprack(labware_id):
+            deck_conflict.check_safe_for_tip_pickup_and_return(
+                engine_state=self._engine_client.state,
+                pipette_id=self._pipette_id,
+                labware_id=labware_id,
+            )
         deck_conflict.check_safe_for_pipette_movement(
             engine_state=self._engine_client.state,
             pipette_id=self._pipette_id,
             labware_id=labware_id,
             well_name=well_name,
-            well_location=WellLocation(),
+            well_location=well_location,
         )
         self._engine_client.drop_tip(
             pipette_id=self._pipette_id,
@@ -459,6 +471,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             disposal_location,
             force_direct=False,
             speed=None,
+            alternate_tip_drop=True,
         )
         self._drop_tip_in_place(home_after=home_after)
         self._protocol_core.set_last_location(location=None, mount=self.get_mount())
@@ -468,6 +481,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         disposal_location: Union[TrashBin, WasteChute],
         force_direct: bool,
         speed: Optional[float],
+        alternate_tip_drop: bool = False,
     ) -> None:
         # TODO (nd, 2023-11-30): give appropriate offset when finalized
         # https://opentrons.atlassian.net/browse/RSS-391
@@ -475,6 +489,16 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
         if isinstance(disposal_location, TrashBin):
             addressable_area_name = disposal_location._addressable_area_name
+            self._engine_client.move_to_addressable_area_for_drop_tip(
+                pipette_id=self._pipette_id,
+                addressable_area_name=addressable_area_name,
+                offset=offset,
+                force_direct=force_direct,
+                speed=speed,
+                minimum_z_height=None,
+                alternate_drop_location=alternate_tip_drop,
+            )
+
         if isinstance(disposal_location, WasteChute):
             num_channels = self.get_channels()
             addressable_area_name = {
@@ -483,14 +507,14 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 96: "96ChannelWasteChute",
             }[num_channels]
 
-        self._engine_client.move_to_addressable_area(
-            pipette_id=self._pipette_id,
-            addressable_area_name=addressable_area_name,
-            offset=offset,
-            force_direct=force_direct,
-            speed=speed,
-            minimum_z_height=None,
-        )
+            self._engine_client.move_to_addressable_area(
+                pipette_id=self._pipette_id,
+                addressable_area_name=addressable_area_name,
+                offset=offset,
+                force_direct=force_direct,
+                speed=speed,
+                minimum_z_height=None,
+            )
 
     def _drop_tip_in_place(self, home_after: Optional[bool]) -> None:
         self._engine_client.drop_tip_in_place(
@@ -656,6 +680,28 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         return self._engine_client.state.pipettes.get_nozzle_layout_type(
             self._pipette_id
         )
+
+    def is_tip_tracking_available(self) -> bool:
+        primary_nozzle = self._engine_client.state.pipettes.get_primary_nozzle(
+            self._pipette_id
+        )
+        if self.get_nozzle_configuration() == NozzleConfigurationType.FULL:
+            return True
+        else:
+            if self.get_channels() == 96:
+                # SINGLE configuration with H12 nozzle is technically supported by the
+                # current tip tracking implementation but we don't do any deck conflict
+                # checks for it, so we won't provide full support for it yet.
+                return (
+                    self.get_nozzle_configuration() == NozzleConfigurationType.COLUMN
+                    and primary_nozzle == "A12"
+                )
+            if self.get_channels() == 8:
+                return (
+                    self.get_nozzle_configuration() == NozzleConfigurationType.SINGLE
+                    and primary_nozzle == "H1"
+                )
+        return False
 
     def set_flow_rate(
         self,

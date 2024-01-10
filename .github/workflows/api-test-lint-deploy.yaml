@@ -59,7 +59,7 @@ jobs:
           node-version: '21'
       - uses: 'actions/setup-python@v4'
         with:
-          python-version: '3.7'
+          python-version: '3.10'
 
       - uses: './.github/actions/python/setup'
         with:
@@ -75,16 +75,12 @@ jobs:
         os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
         # TODO(mc, 2022-02-24): expand this matrix to 3.8 and 3.9,
         # preferably in a nightly cronjob on edge or something
-        python: ['3.7', '3.10']
+        python: ['3.10']
         with-ot-hardware: ['true', 'false']
         exclude:
           - os: 'windows-2022'
             with-ot-hardware: 'true'
           - os: 'macos-latest'
-            with-ot-hardware: 'true'
-          - os: 'macos-latest'
-            python: '3.10'
-          - python: '3.10'
             with-ot-hardware: 'true'
     runs-on: '${{ matrix.os }}'
     steps:
@@ -152,7 +148,7 @@ jobs:
           node-version: '21'
       - uses: 'actions/setup-python@v4'
         with:
-          python-version: '3.7'
+          python-version: '3.10'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6
         with:

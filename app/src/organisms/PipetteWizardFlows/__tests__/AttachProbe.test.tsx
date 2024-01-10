@@ -1,10 +1,7 @@
 import * as React from 'react'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
-import {
-  useInstrumentsQuery,
-  useDeckConfigurationQuery,
-} from '@opentrons/react-api-client'
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import {
@@ -23,16 +20,12 @@ const render = (props: React.ComponentProps<typeof AttachProbe>) => {
 }
 jest.mock('@opentrons/react-api-client')
 
-const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
-  typeof useInstrumentsQuery
->
 const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
   typeof useDeckConfigurationQuery
 >
 
 describe('AttachProbe', () => {
   let props: React.ComponentProps<typeof AttachProbe>
-  const refetch = jest.fn(() => Promise.resolve())
   beforeEach(() => {
     props = {
       mount: LEFT,
@@ -40,6 +33,7 @@ describe('AttachProbe', () => {
       proceed: jest.fn(),
       chainRunCommands: jest
         .fn()
+        .mockImplementationOnce(() => Promise.resolve())
         .mockImplementationOnce(() => Promise.resolve()),
       maintenanceRunId: RUN_ID_1,
       attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
@@ -51,20 +45,6 @@ describe('AttachProbe', () => {
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       isOnDevice: false,
     }
-    mockUseInstrumentsQuery.mockReturnValue({
-      data: {
-        data: [
-          {
-            ok: true,
-            mount: LEFT,
-            state: {
-              tipDetected: true,
-            },
-          },
-        ],
-      } as any,
-      refetch,
-    } as any)
     mockUseDeckConfigurationQuery.mockReturnValue({
       data: [
         {
@@ -82,7 +62,17 @@ describe('AttachProbe', () => {
     getByTestId('Pipette_Attach_Probe_1.webm')
     const proceedBtn = getByRole('button', { name: 'Begin calibration' })
     fireEvent.click(proceedBtn)
-    expect(refetch).toHaveBeenCalled()
+    await waitFor(() => {
+      expect(props.chainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'verifyTipPresence',
+            params: { pipetteId: 'abc', expectedState: 'present' },
+          },
+        ],
+        false
+      )
+    })
     await waitFor(() => {
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
@@ -105,6 +95,8 @@ describe('AttachProbe', () => {
         ],
         false
       )
+    })
+    await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()
     })
 
@@ -197,8 +189,18 @@ describe('AttachProbe', () => {
       'Take the calibration probe from its storage location. Ensure its collar is unlocked. Push the pipette ejector up and press the probe firmly onto the pipette nozzle. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
     )
     getByTestId('Pipette_Attach_Probe_1.webm')
-    getByRole('button', { name: 'Begin calibration' }).click()
-    expect(refetch).toHaveBeenCalled()
+    fireEvent.click(getByRole('button', { name: 'Begin calibration' }))
+    await waitFor(() => {
+      expect(props.chainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'verifyTipPresence',
+            params: { pipetteId: 'abc', expectedState: 'present' },
+          },
+        ],
+        false
+      )
+    })
     await waitFor(() => {
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
@@ -221,9 +223,11 @@ describe('AttachProbe', () => {
         ],
         false
       )
+    })
+    await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()
     })
-    getByLabelText('back').click()
+    fireEvent.click(getByLabelText('back'))
     expect(props.goBack).toHaveBeenCalled()
   })
 

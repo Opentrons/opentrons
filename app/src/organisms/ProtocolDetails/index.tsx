@@ -58,7 +58,7 @@ import {
 } from '../../redux/protocol-storage'
 import { useFeatureFlag } from '../../redux/config'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
-import { SendProtocolToOT3Slideout } from '../SendProtocolToOT3Slideout'
+import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import {
   getAnalysisStatus,
@@ -200,8 +200,8 @@ export function ProtocolDetails(
     setShowChooseRobotToRunProtocolSlideout,
   ] = React.useState<boolean>(false)
   const [
-    showSendProtocolToOT3Slideout,
-    setShowSendProtocolToOT3Slideout,
+    showSendProtocolToFlexSlideout,
+    setShowSendProtocolToFlexSlideout,
   ] = React.useState<boolean>(false)
   const [showDeckViewModal, setShowDeckViewModal] = React.useState(false)
 
@@ -379,9 +379,9 @@ export function ProtocolDetails(
             showSlideout={showChooseRobotToRunProtocolSlideout}
             storedProtocolData={props}
           />
-          <SendProtocolToOT3Slideout
-            isExpanded={showSendProtocolToOT3Slideout}
-            onCloseClick={() => setShowSendProtocolToOT3Slideout(false)}
+          <SendProtocolToFlexSlideout
+            isExpanded={showSendProtocolToFlexSlideout}
+            onCloseClick={() => setShowSendProtocolToFlexSlideout(false)}
             storedProtocolData={props}
           />
 
@@ -518,8 +518,8 @@ export function ProtocolDetails(
                 handleRunProtocol={() =>
                   setShowChooseRobotToRunProtocolSlideout(true)
                 }
-                handleSendProtocolToOT3={() =>
-                  setShowSendProtocolToOT3Slideout(true)
+                handleSendProtocolToFlex={() =>
+                  setShowSendProtocolToFlexSlideout(true)
                 }
                 storedProtocolData={props}
                 data-testid="ProtocolDetails_overFlowMenu"

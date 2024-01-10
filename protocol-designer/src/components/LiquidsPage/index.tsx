@@ -99,7 +99,6 @@ function mergeProps(
 
 export const LiquidsPage = connect(
   mapStateToProps,
-  // @ts-expect-error(sa, 2021-6-21): TODO: refactor to use hooks api
   null,
   mergeProps
 )(LiquidEditFormWrapper)

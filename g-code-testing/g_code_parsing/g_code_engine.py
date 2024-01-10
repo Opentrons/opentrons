@@ -172,6 +172,7 @@ class GCodeEngine:
                             deck_type=DeckType(
                                 deck_type.for_simulation(robot_type=robot_type)
                             ),
+                            use_simulated_deck_config=True,
                         ),
                         load_fixed_trash=deck_type.should_load_fixed_trash(config),
                     ),

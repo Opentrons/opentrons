@@ -61,7 +61,11 @@ export function WizardRequiredEquipmentList(
                 paddingY={SPACING.spacing4}
                 key={`${index}_${requiredEquipmentProps.loadName}`}
               >
-                <StyledText fontSize="1.25rem" paddingY={SPACING.spacing12}>
+                <StyledText
+                  fontSize={TYPOGRAPHY.fontSize20}
+                  paddingY={SPACING.spacing12}
+                  overflowWrap="anywhere"
+                >
                   {requiredEquipmentProps.displayName}
                 </StyledText>
                 {/* do not show divider after the last equipment in the list */}

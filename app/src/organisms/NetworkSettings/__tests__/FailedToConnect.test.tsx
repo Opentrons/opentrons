@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -66,14 +67,14 @@ describe('ConnectedResult', () => {
   it('should call handleChangeNetwork when pressing Change network', () => {
     const [{ getByText }] = render(props)
     const button = getByText('Change network')
-    button.click()
+    fireEvent.click(button)
     expect(props.handleChangeNetwork).toHaveBeenCalled()
   })
 
   it('should call handleTryAgain when pressing Try again', () => {
     const [{ getByText }] = render(props)
     const button = getByText('Try again')
-    button.click()
+    fireEvent.click(button)
     expect(props.handleTryAgain).toHaveBeenCalled()
   })
 })

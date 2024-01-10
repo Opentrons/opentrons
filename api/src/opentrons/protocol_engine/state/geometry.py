@@ -1,7 +1,7 @@
 """Geometry state getters."""
 import enum
 from numpy import array, dot
-from typing import Optional, List, Tuple, Union, cast, TypeVar
+from typing import Optional, List, Tuple, Union, cast, TypeVar, Dict
 
 from opentrons.types import Point, DeckSlotName, StagingSlotName, MountType
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
@@ -32,6 +32,7 @@ from ..types import (
     LabwareMovementOffsetData,
     OnDeckLabwareLocation,
     AddressableAreaLocation,
+    AddressableOffsetVector,
 )
 from .config import Config
 from .labware import LabwareView
@@ -82,7 +83,7 @@ class GeometryView:
         self._modules = module_view
         self._pipettes = pipette_view
         self._addressable_areas = addressable_area_view
-        self._last_drop_tip_location_spot: Optional[_TipDropSection] = None
+        self._last_drop_tip_location_spot: Dict[str, _TipDropSection] = {}
 
     def get_labware_highest_z(self, labware_id: str) -> float:
         """Get the highest Z-point of a labware."""
@@ -282,7 +283,7 @@ class GeometryView:
             # Since the module was rotated, the calibration offset vector needs to be rotated by 180 degrees along the z axis
             saved_offset = array([offset.x, offset.y, offset.z])
             rotation_matrix = array([[-1, 0, 0], [0, -1, 0], [0, 0, 1]])
-            new_offset = dot(saved_offset, rotation_matrix)  # type: ignore[no-untyped-call]
+            new_offset = dot(saved_offset, rotation_matrix)
             offset = ModuleOffsetVector(
                 x=new_offset[0], y=new_offset[1], z=new_offset[2]
             )
@@ -753,7 +754,7 @@ class GeometryView:
             slot_name=self.get_ancestor_slot_name(labware_id)
         )
 
-        if self._last_drop_tip_location_spot == _TipDropSection.RIGHT:
+        if self._last_drop_tip_location_spot.get(labware_id) == _TipDropSection.RIGHT:
             # Drop tip in LEFT section
             x_offset = self._get_drop_tip_well_x_offset(
                 tip_drop_section=_TipDropSection.LEFT,
@@ -762,7 +763,7 @@ class GeometryView:
                 pipette_mount=pipette_mount,
                 labware_slot_column=labware_slot_column,
             )
-            self._last_drop_tip_location_spot = _TipDropSection.LEFT
+            self._last_drop_tip_location_spot[labware_id] = _TipDropSection.LEFT
         else:
             # Drop tip in RIGHT section
             x_offset = self._get_drop_tip_well_x_offset(
@@ -772,7 +773,7 @@ class GeometryView:
                 pipette_mount=pipette_mount,
                 labware_slot_column=labware_slot_column,
             )
-            self._last_drop_tip_location_spot = _TipDropSection.RIGHT
+            self._last_drop_tip_location_spot[labware_id] = _TipDropSection.RIGHT
 
         return DropTipWellLocation(
             origin=DropTipWellOrigin.TOP,
@@ -782,6 +783,59 @@ class GeometryView:
                 z=0,
             ),
         )
+
+    # TODO find way to combine this with above
+    def get_next_tip_drop_location_for_addressable_area(
+        self,
+        addressable_area_name: str,
+        pipette_id: str,
+    ) -> AddressableOffsetVector:
+        """Get the next location within the specified well to drop the tip into.
+
+        See the doc-string for `get_next_tip_drop_location` for more info on execution.
+        """
+        area_x_dim = self._addressable_areas.get_addressable_area(
+            addressable_area_name
+        ).bounding_box.x
+
+        pipette_channels = self._pipettes.get_config(pipette_id).channels
+        pipette_mount = self._pipettes.get_mount(pipette_id)
+
+        labware_slot_column = self.get_slot_column(
+            slot_name=self._addressable_areas.get_addressable_area_base_slot(
+                addressable_area_name
+            )
+        )
+
+        if (
+            self._last_drop_tip_location_spot.get(addressable_area_name)
+            == _TipDropSection.RIGHT
+        ):
+            # Drop tip in LEFT section
+            x_offset = self._get_drop_tip_well_x_offset(
+                tip_drop_section=_TipDropSection.LEFT,
+                well_x_dim=area_x_dim,
+                pipette_channels=pipette_channels,
+                pipette_mount=pipette_mount,
+                labware_slot_column=labware_slot_column,
+            )
+            self._last_drop_tip_location_spot[
+                addressable_area_name
+            ] = _TipDropSection.LEFT
+        else:
+            # Drop tip in RIGHT section
+            x_offset = self._get_drop_tip_well_x_offset(
+                tip_drop_section=_TipDropSection.RIGHT,
+                well_x_dim=area_x_dim,
+                pipette_channels=pipette_channels,
+                pipette_mount=pipette_mount,
+                labware_slot_column=labware_slot_column,
+            )
+            self._last_drop_tip_location_spot[
+                addressable_area_name
+            ] = _TipDropSection.RIGHT
+
+        return AddressableOffsetVector(x=x_offset, y=0, z=0)
 
     @staticmethod
     def _get_drop_tip_well_x_offset(
@@ -804,7 +858,7 @@ class GeometryView:
             ):
                 # Pipette might not reach the default left spot so use a different left spot
                 x_well_offset = (
-                    well_x_dim / 2 - SLOT_WIDTH + drop_location_margin_from_labware_edge
+                    -well_x_dim / 2 + drop_location_margin_from_labware_edge * 2
                 )
             else:
                 x_well_offset = -well_x_dim / 2 + drop_location_margin_from_labware_edge

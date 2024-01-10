@@ -33,6 +33,7 @@ export interface InstrumentInfoProps {
 }
 
 export function InstrumentInfo(props: InstrumentInfoProps): JSX.Element {
+  const has96Channel = props.pipetteSpecs?.channels === 96
   return (
     <Flex justifyContent={JUSTIFY_CENTER} gridGap={SPACING.spacing16}>
       {props.mount === RIGHT && props.pipetteSpecs && (
@@ -42,15 +43,21 @@ export function InstrumentInfo(props: InstrumentInfoProps): JSX.Element {
           mount={props.mount}
         />
       )}
+
       <Flex flexDirection={DIRECTION_COLUMN}>
         <InfoItem
-          title={props.showMountLabel ? `${props.mount} pipette` : 'pipette'}
+          title={
+            props.showMountLabel && !has96Channel
+              ? `${props.mount} pipette`
+              : 'pipette'
+          }
           value={props.description}
         />
         {props.tiprackModel && (
           <InfoItem title="tip rack" value={props.tiprackModel} />
         )}
       </Flex>
+
       {props.children}
       {props.mount === LEFT && props.pipetteSpecs && (
         <InstrumentDiagram

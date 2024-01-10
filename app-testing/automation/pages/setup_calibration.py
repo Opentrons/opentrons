@@ -90,9 +90,7 @@ class SetupCalibration:
         "close robot calibration button",
     )
 
-    proceed_to_module_setup_cta: Element = Element(
-        (By.ID, "RobotCalStep_proceedButton"), "proceed to module setup button"
-    )
+    proceed_to_module_setup_cta: Element = Element((By.ID, "RobotCalStep_proceedButton"), "proceed to module setup button")
 
     def get_setup_for_run(self) -> WebElement:
         """Search for the setup for run text."""
@@ -129,8 +127,8 @@ class SetupCalibration:
     def get_robot_calibration_close_button(self) -> WebElement:
         """Robot claibration close button."""
         close: WebElement = self.base.clickable_wrapper(SetupCalibration.close_robot_calibration_button)
-        actions = ActionChains(self.base.driver)  # type: ignore
-        actions.move_to_element(close).perform()  # type: ignore
+        actions = ActionChains(self.base.driver)
+        actions.move_to_element(close).perform()
         return close
 
     def click_robot_calibration_help_link(self) -> None:
@@ -140,8 +138,8 @@ class SetupCalibration:
     def click_robot_calibration_close_button(self) -> None:
         """Click robot calibration close."""
         close: WebElement = self.base.clickable_wrapper(SetupCalibration.close_robot_calibration_button)
-        actions = ActionChains(self.base.driver)  # type: ignore
-        actions.move_to_element(close).perform()  # type: ignore
+        actions = ActionChains(self.base.driver)
+        actions.move_to_element(close).perform()
         self.base.click(SetupCalibration.close_robot_calibration_button)
 
     def get_required_tip_length_calibration(self) -> WebElement:

@@ -141,6 +141,8 @@ describe('SetupModuleAndDeck', () => {
         cutoutId: 'cutoutA1',
         cutoutFixtureId: 'trashBinAdapter',
         requiredAddressableAreas: ['movableTrashA1'],
+        compatibleCutoutFixtureIds: ['trashBinAdapter'],
+        missingLabwareDisplayName: null,
       },
     ])
     const { getByRole, getByText } = render(props)
