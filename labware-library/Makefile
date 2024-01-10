@@ -12,6 +12,9 @@ tests ?=
 cov_opts ?= --coverage=true --ci=true --collectCoverageFrom='labware-library/src/**/*.(js|ts|tsx)'
 test_opts ?=
 
+# override webpack's default hashing algorithm for node 18: https://github.com/webpack/webpack/issues/14532
+export NODE_OPTIONS := --openssl-legacy-provider
+
 # --coverage=true --ci=true --collectCoverageFrom="labware-library/src/**/*.(js|ts|tsx)" labware-library/src
 
 .PHONY: all

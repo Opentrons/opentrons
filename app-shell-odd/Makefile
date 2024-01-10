@@ -11,6 +11,9 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 # dev server port
 PORT ?= 8090
 
+# override webpack's default hashing algorithm for node 18: https://github.com/webpack/webpack/issues/14532
+export NODE_OPTIONS := --openssl-legacy-provider
+
 # dep directories for production build
 # TODO(mc, 2018-08-07): figure out a better way to do this
 ui_dir := ../app
@@ -24,7 +27,7 @@ ssh_opts ?= $(default_ssh_opts)
 builder := yarn electron-builder \
 	--config electron-builder.config.js \
 	--publish never
-  
+
 electron := yarn electron . \
 	--devtools \
 	--log.level.console="debug" \
