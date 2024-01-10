@@ -73,11 +73,10 @@ def test_deck_conflicts_for_96_ch_a12_column_configuration() -> None:
     instrument.dispense(25, badly_placed_labware.wells_by_name()["A1"].top(150))
 
     thermocycler.open_lid()  # type: ignore[union-attr]
-    with pytest.raises(
-        PartialTipMovementNotAllowedError, match="outside of robot bounds"
-    ):
-        # Will raise error since first column of TC labware is out of bounds
-        instrument.dispense(25, partially_accessible_plate.wells_by_name()["A1"])
+
+    # Will NOT raise error since first column of TC labware is accessible
+    # (it is just a few mm away from the left bound)
+    instrument.dispense(25, partially_accessible_plate.wells_by_name()["A1"])
 
     instrument.drop_tip()
 
@@ -131,8 +130,9 @@ def test_deck_conflicts_for_96_ch_a1_column_configuration() -> None:
     # No error cuz within pipette extent bounds and no taller labware to right of tiprack
     instrument.pick_up_tip(well_placed_tiprack.wells_by_name()["A12"])
 
-    # No error cuz no labware on right of plate
-    instrument.aspirate(25, well_placed_plate.wells_by_name()["A4"])
+    # No error cuz no labware on right of plate, and also well A10 is juusst inside the right bound
+    instrument.aspirate(25, well_placed_plate.wells_by_name()["A10"])
+
     # No error cuz dispensing from high above plate, so it clears tuberack on the right
     instrument.dispense(25, badly_placed_plate.wells_by_name()["A1"].top(150))
 
@@ -144,13 +144,27 @@ def test_deck_conflicts_for_96_ch_a1_column_configuration() -> None:
     with pytest.raises(
         PartialTipMovementNotAllowedError, match="outside of robot bounds"
     ):
-        instrument.aspirate(
-            25, well_placed_plate.wells_by_name()["A12"].center().move(Point(70, 0, 0))
-        )
+        instrument.aspirate(25, well_placed_plate.wells_by_name()["A11"])
 
     # No error cuz no taller labware on the right
     instrument.aspirate(10, my_tuberack.wells_by_name()["A1"])
 
+    with pytest.raises(
+        PartialTipMovementNotAllowedError, match="outside of robot bounds"
+    ):
+        # Raises error because drop tip alternation makes the pipette drop the tips
+        # near the trash bin labware's right edge, which is out of bounds for column1 nozzles
+        # We should probably move this tip drop location within the nozzles' accessible area,
+        # but since we do not recommend loading the trash as labware (there are other things
+        # wrong with that approach), it is not a critical issue.
+        instrument.drop_tip()
+
+    instrument.trash_container = None  # type: ignore
+    protocol.load_trash_bin("C1")
+
+    # This doesn't raise an error because it now treats the trash bin as an addressable area
+    # and the bounds check doesn't yet check moves to addressable areas.
+    # The aim is to do checks for ALL moves, but also, fix the offset used for tip drop alternation.
     instrument.drop_tip()
 
     # ######## CHANGE CONFIG TO ALL #########
