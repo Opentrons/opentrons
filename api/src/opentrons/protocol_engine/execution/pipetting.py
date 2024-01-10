@@ -212,7 +212,6 @@ class VirtualPipettingHandler(PipettingHandler):
                 "push out value cannot have a negative value."
             )
         self._validate_tip_attached(pipette_id=pipette_id, command_name="dispense")
-        # TODO: PipetteStore does clamping. We should remove it from there for clarity if we keep this here.
         return self._validate_dispense_volume(
             pipette_id=pipette_id, dispense_volume=volume
         )
