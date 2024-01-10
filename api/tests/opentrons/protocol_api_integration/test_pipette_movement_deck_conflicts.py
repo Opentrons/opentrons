@@ -7,7 +7,6 @@ from opentrons.protocol_api import COLUMN, ALL
 from opentrons.protocol_api.core.engine.deck_conflict import (
     PartialTipMovementNotAllowedError,
 )
-from opentrons.types import Point
 
 
 @pytest.mark.ot3_only
