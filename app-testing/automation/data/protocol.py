@@ -1,4 +1,5 @@
 """Model of a protocol for testing."""
+import hashlib
 import os
 from pathlib import Path
 from typing import Literal, Optional
@@ -52,3 +53,11 @@ class Protocol(BaseModel):
             )
             for p in self.custom_labware
         ]
+
+    @property
+    def short_sha(self) -> str:
+        """Short sha of the file."""
+        # Hash the string using SHA-1
+        hash_object = hashlib.sha1(self.file_name.encode())
+        # Convert to hexadecimal and truncate
+        return hash_object.hexdigest()[:10]
