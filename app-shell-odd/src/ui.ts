@@ -51,17 +51,16 @@ export function createUi(dispatch: Dispatch): BrowserWindow {
   log.debug('Creating main window', { options: WINDOW_OPTS })
   log.info('before ready-to-show')
 
-  const mainWindow = new BrowserWindow(WINDOW_OPTS).once(
-    'ready-to-show',
-    () => {
-      log.debug('Main window ready to show')
-      log.info('before show')
-      mainWindow.show()
-      log.info('after show')
-      process.env.NODE_ENV !== 'development' &&
-        waitForRobotServerAndShowMainWIndow(dispatch)
-    }
-  )
+  const mainWindow = new BrowserWindow(WINDOW_OPTS)
+  mainWindow.show()
+  mainWindow.once('ready-to-show', () => {
+    log.debug('Main window ready to show')
+    log.info('before show')
+    mainWindow.show()
+    log.info('after show')
+    process.env.NODE_ENV !== 'development' &&
+      waitForRobotServerAndShowMainWIndow(dispatch)
+  })
   log.info('after ready-to-show')
 
   // test
@@ -69,39 +68,87 @@ export function createUi(dispatch: Dispatch): BrowserWindow {
     log.info('will-navigate')
   })
 
-  mainWindow.webContents.on('did-fail-load', () => {
-    log.info('did-fail-load')
-  })
+  const pollWCStatus = (): void => {
+    log.info(`isCrashed: ${mainWindow.webContents.isCrashed()}`)
+    log.info(`isLoading: ${mainWindow.webContents.isLoading()}`)
+    log.info(
+      `isLoadingMainFrame: ${mainWindow.webContents.isLoadingMainFrame()}`
+    )
+    log.info(
+      `isWaitingForResponse: ${mainWindow.webContents.isWaitingForResponse()}`
+    )
+    log.info(`isDestroyed: ${mainWindow.webContents.isDestroyed()}`)
+    log.info(`isPainting: ${mainWindow.webContents.isPainting()}`)
+    log.info(`isOffscreen: ${mainWindow.webContents.isOffscreen()}`)
+    log.info(`isFocused: ${mainWindow.webContents.isFocused()}`)
+    if (!mainWindow.webContents.isWaitingForResponse()) {
+      setTimeout(pollWCStatus, 5000)
+    } else {
+      setTimeout(pollWCStatus, 100)
+    }
+  }
 
-  mainWindow.webContents.on('did-fail-load', () => {
-    log.info('did-fail-load')
-  })
+  mainWindow.webContents.on(
+    'did-fail-load',
+    (
+      event,
+      errorCode,
+      errorDescription,
+      validatedURL,
+      isMainFrame,
+      frameProcessId,
+      frameRoutingId
+    ) => {
+      log.info('did-fail-load', {
+        event,
+        errorCode,
+        errorDescription,
+        validatedURL,
+        isMainFrame,
+        frameProcessId,
+        frameRoutingId,
+      })
+      log.info(`did-fail-provisional-load ${errorCode}
+      `)
+      log.info(`did-fail-provisional-load ${validatedURL}
+      `)
+      log.info(`did-fail-provisional-load ${errorDescription}
+      `)
+    }
+  )
 
-  mainWindow.webContents.on('dom-ready', () => {
-    log.info('dom-ready')
-  })
-
-  mainWindow.webContents.on('did-create-window', () => {
-    log.info('did-create-window')
-  })
-
-  mainWindow.webContents.on('unresponsive', () => {
-    log.info('unresponsive')
-    mainWindow.webContents.reload()
-  })
+  mainWindow.webContents.on(
+    'did-fail-provisional-load',
+    (
+      event,
+      errorCode,
+      errorDescription,
+      validatedURL
+      // isMainFrame,
+      // frameProcessId,
+      // frameRoutingId
+    ) => {
+      log.info(`did-fail-provisional-load ${errorCode}
+      `)
+      log.info(`did-fail-provisional-load ${validatedURL}
+      `)
+      log.info(`did-fail-provisional-load ${errorDescription}
+      `)
+    }
+  )
 
   mainWindow.webContents.on('did-attach-webview', () => {
-    log.info('did-attach-webview')
+    log.info(`did-attach-webview`)
   })
 
-  log.info('isCrashed', mainWindow.webContents.isCrashed())
+  const testUrl = 'https://google.com'
 
-  log.info('mainWindow', mainWindow)
+  log.info(`mainWindow: ${JSON.stringify(mainWindow, null, 4)}`)
 
-  log.info(`Loading ${url}`)
+  log.info(`Loading ${testUrl}`)
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   mainWindow
-    .loadURL(url, { extraHeaders: 'pragma: no-cache\n' })
+    .loadURL(testUrl, { extraHeaders: 'pragma: no-cache\n' })
     .then(() => log.info('loadURL is fine'))
     .catch((e: any) => log.info('load url error', e))
   // open new windows (<a target="_blank" ...) in browser windows

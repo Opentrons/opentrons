@@ -53,6 +53,15 @@ let rendererLogger: Logger
 app.prependOnceListener('ready', startUp)
 if (config.devtools) app.once('ready', installDevtools)
 
+ipcMain.handle('file_manage_process', (event, data) => {
+  log.info(`preload.js is loaded`)
+  const file_list = data.file_list
+  const folder_name = data.folder_name
+
+  log.info(`list: ${file_list}`)
+  log.info(`folder: ${folder_name}`)
+})
+
 app.once('window-all-closed', () => {
   log.debug('all windows closed, quitting the app')
   app.quit()
