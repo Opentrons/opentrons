@@ -19,9 +19,6 @@ shell_dir := ../app-shell
 shell_odd_dir := ../app-shell-odd
 discovery_client_dir := ../discovery-client
 
-# override webpack's default hashing algorithm for node 18: https://github.com/webpack/webpack/issues/14532
-export NODE_OPTIONS := --openssl-legacy-provider
-
 # These variables can be overriden when make is invoked to customize the
 # behavior of jest. For instance,
 # make test tests=src/pages/Labware/__tests__/hooks.test.tsx would run only the
@@ -46,11 +43,11 @@ clean:
 
 # artifacts
 #####################################################################
-
+# override webpack's default hashing algorithm for node 18: https://github.com/webpack/webpack/issues/14532
 .PHONY: dist
 dist: export NODE_ENV := production
 dist:
-	webpack --profile
+	NODE_OPTIONS=--openssl-legacy-provider webpack --profile
 
 # development
 #####################################################################
@@ -75,7 +72,7 @@ dev-odd:
 .PHONY: dev-server
 dev-server: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
 dev-server:
-	webpack-dev-server --hot
+	NODE_OPTIONS=--openssl-legacy-provider webpack-dev-server --hot
 
 .PHONY: dev-shell
 dev-shell:
