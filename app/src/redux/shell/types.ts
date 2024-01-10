@@ -1,3 +1,4 @@
+import type { IpcMainEvent } from 'electron'
 import type { Error } from '../types'
 import type { RobotSystemAction } from './is-ready/types'
 
@@ -5,6 +6,10 @@ export interface Remote {
   ipcRenderer: {
     invoke: (channel: string, ...args: unknown[]) => Promise<any>
     send: (channel: string, ...args: unknown[]) => void
+    on: (
+      channel: string,
+      listener: (event: IpcMainEvent, data: string, ...args: unknown[]) => void
+    ) => void
   }
 }
 
@@ -104,6 +109,32 @@ export interface RobotMassStorageDeviceRemoved {
   meta: { shell: true }
 }
 
+// TOME: think through the exact hierarchy you want. I think robot-server is a very valid high level topic, but think through!
+
+export type NotifyTopic =
+  | 'robot-server/maintenance_runs'
+  | 'robot-server/current_command'
+
+export type NotifyAction = 'subscribe' | 'unsubscribe'
+
+export interface NotifySubscribeAction {
+  type: 'shell:NOTIFY_SUBSCRIBE'
+  payload: {
+    hostname: string
+    topic: NotifyTopic
+  }
+  meta: { shell: true }
+}
+
+export interface NotifyUnsubscribeAction {
+  type: 'shell:NOTIFY_UNSUBSCRIBE'
+  payload: {
+    hostname: string
+    topic: NotifyTopic
+  }
+  meta: { shell: true }
+}
+
 export type ShellAction =
   | UiInitializedAction
   | ShellUpdateAction
@@ -115,3 +146,5 @@ export type ShellAction =
   | RobotMassStorageDeviceAdded
   | RobotMassStorageDeviceEnumerated
   | RobotMassStorageDeviceRemoved
+  | NotifySubscribeAction
+  | NotifyUnsubscribeAction
