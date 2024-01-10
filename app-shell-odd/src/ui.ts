@@ -141,14 +141,12 @@ export function createUi(dispatch: Dispatch): BrowserWindow {
     log.info(`did-attach-webview`)
   })
 
-  const testUrl = 'https://google.com'
-
   log.info(`mainWindow: ${JSON.stringify(mainWindow, null, 4)}`)
 
-  log.info(`Loading ${testUrl}`)
+  log.info(`Loading ${url}`)
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   mainWindow
-    .loadURL(testUrl, { extraHeaders: 'pragma: no-cache\n' })
+    .loadURL(url, { extraHeaders: 'pragma: no-cache\n' })
     .then(() => log.info('loadURL is fine'))
     .catch((e: any) => log.info('load url error', e))
   // open new windows (<a target="_blank" ...) in browser windows
