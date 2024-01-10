@@ -17,7 +17,7 @@ from opentrons.protocol_engine.execution.pipetting import (
 )
 from opentrons.protocol_engine.errors.exceptions import (
     TipNotAttachedError,
-    InvalidPipettingVolumeError,
+    InvalidAspirateVolumeError,
     InvalidPushOutVolumeError,
     InvalidDispenseVolumeError,
 )
@@ -265,7 +265,7 @@ async def test_virtual_validate_aspirated_volume_raises(
 
     subject = VirtualPipettingHandler(state_view=mock_state_view)
 
-    with pytest.raises(InvalidPipettingVolumeError):
+    with pytest.raises(InvalidAspirateVolumeError):
         await subject.aspirate_in_place(pipette_id="pipette-id", volume=4, flow_rate=1)
 
 
