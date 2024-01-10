@@ -91,14 +91,16 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
     >
       {deckDef.locations.cutouts.map(cutout => (
-        <SingleSlotFixture
-          key={cutout.id}
-          cutoutId={cutout.id as CutoutId}
-          deckDefinition={deckDef}
-          slotClipColor={COLORS.transparent}
-          fixtureBaseColor={lightFill}
-          showExpansion={showExpansion}
-        />
+        // give the outside of the base fixture svgs a stroke for extra spacing
+        <g key={cutout.id} stroke={COLORS.white} strokeWidth="4">
+          <SingleSlotFixture
+            cutoutId={cutout.id}
+            deckDefinition={deckDef}
+            slotClipColor={COLORS.transparent}
+            fixtureBaseColor={lightFill}
+            showExpansion={showExpansion}
+          />
+        </g>
       ))}
       {stagingAreaFixtures.map(({ cutoutId }) => (
         <StagingAreaConfigFixture

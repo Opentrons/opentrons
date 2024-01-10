@@ -41,9 +41,9 @@ export function TrashBinConfigFixture(
     fixtureLocation === 'cutoutB1' ||
     fixtureLocation === 'cutoutC1' ||
     fixtureLocation === 'cutoutD1'
-  const xAdjustment = isLeftSideofDeck ? -101.5 : -17
+  const xAdjustment = isLeftSideofDeck ? -99.5 : -15
   const x = xSlotPosition + xAdjustment
-  const yAdjustment = -10
+  const yAdjustment = -8
   const y = ySlotPosition + yAdjustment
 
   return (
