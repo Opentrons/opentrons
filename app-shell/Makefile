@@ -12,7 +12,7 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 PORT ?= 8090
 
 # override webpack's default hashing algorithm for node 18: https://github.com/webpack/webpack/issues/14532
-export NODE_OPTIONS := --openssl-legacy-provider
+# export NODE_OPTIONS := --openssl-legacy-provider
 
 # dep directories for production build
 # TODO(mc, 2018-08-07): figure out a better way to do this
@@ -100,7 +100,7 @@ clean:
 .PHONY: lib
 lib: export NODE_ENV := production
 lib:
-	webpack --profile
+	NODE_OPTIONS=--openssl-legacy-provider webpack --profile
 
 .PHONY: deps
 deps:
@@ -185,7 +185,7 @@ dev-app-update.yml:
 dev: export NODE_ENV := development
 dev: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
 dev: clean-dev-autoupdate ./dev-app-update.yml
-	webpack
+	NODE_OPTIONS=--openssl-legacy-provider webpack
 	$(electron)
 
 .PHONY: test
