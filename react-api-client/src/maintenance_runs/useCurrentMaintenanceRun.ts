@@ -1,78 +1,49 @@
-import React from 'react'
-import mqtt from 'mqtt'
-import { uniqueId } from 'lodash'
 import { useQuery, useQueryClient } from 'react-query'
 
-import { MaintenanceRun } from '@opentrons/api-client'
+import {
+  HostConfig,
+  getCurrentMaintenanceRun,
+  MaintenanceRun,
+} from '@opentrons/api-client'
 
 import { useHost } from '../api'
+import { useNotifyService, hasNotifyServiceReceivedError } from '../api/notify'
 
-import type { UseQueryResult, UseQueryOptions } from 'react-query'
+import type { UseQueryResult } from 'react-query'
+import type { QueryOptionsWithPolling } from '../api/notify'
 
-export function useCurrentMaintenanceRun<TError = Error>(
-  options: UseQueryOptions<MaintenanceRun | null, TError> = {}
-): UseQueryResult<MaintenanceRun | null, TError> {
+export function useCurrentMaintenanceRun<Error>(
+  options: QueryOptionsWithPolling<MaintenanceRun, Error> = {}
+): UseQueryResult<MaintenanceRun, Error> {
   const host = useHost()
   const queryClient = useQueryClient()
+  const queryKey = [host, 'maintenance_runs', 'current_run']
 
-  React.useEffect(() => {
-    const client = mqtt.connect('ws://broker.emqx.io:8083/mqtt', {
-      clientId: uniqueId('emqx_'),
-      username: 'emqx2',
-      password: '**********',
-    })
+  // TOME: Need to type here so it returns MiantenenceRun data.
+  const notifyData = useNotifyService({
+    topic: 'robot-server/maintenance_runs',
+    queryKey: queryKey,
+    options,
+  })
+  const isNotifyError = hasNotifyServiceReceivedError(notifyData)
+  const isUsingNotifyData = !isNotifyError && !options.forceHttpPolling
+  if (isUsingNotifyData) queryClient.setQueryData(queryKey, notifyData)
 
-    client.subscribe(
-      'opentrons/test/maintenance_runs',
-      {
-        qos: 2,
-      },
-      function (err) {
-        if (err == null) {
-          console.log('NO ERROR SUBSCRIBING TO opentrons/test/maintenance_runs')
-        } else {
-          console.log('ERROR SUBSCRIBING TO opentrons/test/maintenance_runs')
-          console.log(err)
-        }
-      }
-    )
-
-    client.on('message', function (topic, message) {
-      let formattedMessage = JSON.parse(message.toString())
-      formattedMessage =
-        formattedMessage != null
-          ? { data: JSON.parse(formattedMessage.data) }
-          : null
-      console.log(
-        '🚀 ~ file: useCurrentMaintenanceRun.ts:37 ~ formattedMessage:',
-        formattedMessage
-      )
-
-      // message is Buffer
-      queryClient.setQueryData(
-        [host, 'maintenance_runs', 'current_run'],
-        formattedMessage
-      )
-    })
-
-    return () => {
-      client.end()
-    }
-  }, [host, queryClient])
-
-  const query = useQuery<MaintenanceRun | null, TError>(
-    [host, 'maintenance_runs', 'current_run'],
-    () =>
-      queryClient.getQueryData([host, 'maintenance_runs', 'current_run']) ??
-      null,
-    {
-      ...options,
-      enabled: host !== null && options.enabled !== false,
-      onError: () =>
-        queryClient.resetQueries([host, 'maintenance_runs', 'current_run']),
-      staleTime: Infinity,
-    }
-  )
+  const queryFn = isUsingNotifyData
+    ? () => notifyData
+    : () =>
+        getCurrentMaintenanceRun(host as HostConfig).then(
+          response => response.data
+        )
+  // TOME: You might still get an issue with polling, which makes me think you don't use ANY query function in notify, but instead you
+  // tweak options here.
+  const query = useQuery<MaintenanceRun, Error>(queryKey, queryFn, {
+    ...options,
+    enabled: host !== null && options.enabled !== false,
+    onError: () => {
+      queryClient.resetQueries(queryKey)
+    },
+  })
 
   return query
 }

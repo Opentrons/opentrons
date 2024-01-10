@@ -41,7 +41,6 @@
     "jszip": "3.2.2",
     "lodash": "4.17.21",
     "mixpanel-browser": "2.22.1",
-    "mqtt": "4.3.8",
     "netmask": "2.0.2",
     "path-to-regexp": "3.0.0",
     "react": "17.0.1",
