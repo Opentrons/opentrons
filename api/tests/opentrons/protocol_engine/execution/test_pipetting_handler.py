@@ -265,8 +265,15 @@ async def test_virtual_validate_aspirated_volume_raises(
 
     subject = VirtualPipettingHandler(state_view=mock_state_view)
 
+    ok_volume = 1.0000000000001
+    not_ok_volume = 1.01
+    await subject.aspirate_in_place(  # Should not raise.
+        pipette_id="pipette-id", volume=ok_volume, flow_rate=1
+    )
     with pytest.raises(InvalidAspirateVolumeError):
-        await subject.aspirate_in_place(pipette_id="pipette-id", volume=4, flow_rate=1)
+        await subject.aspirate_in_place(
+            pipette_id="pipette-id", volume=not_ok_volume, flow_rate=1
+        )
 
 
 async def test_virtual_blow_out_in_place(
@@ -393,9 +400,8 @@ async def test_virtual_dispense_in_place_raises_invalid_push_out(
         )
 
 
-@pytest.mark.parametrize("aspirated_volume", [(None), (1)])
-async def test_virtual_dispense_in_place_raises_invalid_dispense(
-    decoy: Decoy, mock_state_view: StateView, aspirated_volume: Optional[float]
+async def test_virtual_dispense_in_place_raises_no_tip(
+    decoy: Decoy, mock_state_view: StateView
 ) -> None:
     """Should raise an InvalidDispenseVolumeError."""
     subject = VirtualPipettingHandler(state_view=mock_state_view)
@@ -405,12 +411,37 @@ async def test_virtual_dispense_in_place_raises_invalid_dispense(
     )
 
     decoy.when(mock_state_view.pipettes.get_aspirated_volume("pipette-id")).then_return(
-        aspirated_volume
+        None
     )
 
     with pytest.raises(InvalidDispenseVolumeError):
         await subject.dispense_in_place(
             pipette_id="pipette-id", volume=3, flow_rate=5, push_out=7
+        )
+
+
+async def test_virtual_dispense_in_place_raises_invalid_volume(
+    decoy: Decoy, mock_state_view: StateView
+) -> None:
+    """Should raise an InvalidDispenseVolumeError."""
+    subject = VirtualPipettingHandler(state_view=mock_state_view)
+
+    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
+        TipGeometry(length=1, diameter=2, volume=3)
+    )
+
+    decoy.when(mock_state_view.pipettes.get_aspirated_volume("pipette-id")).then_return(
+        1
+    )
+
+    ok_volume = 1.0000000000001
+    not_ok_volume = 1.01
+    await subject.dispense_in_place(
+        pipette_id="pipette-id", volume=ok_volume, flow_rate=5, push_out=7
+    )
+    with pytest.raises(InvalidDispenseVolumeError):
+        await subject.dispense_in_place(
+            pipette_id="pipette-id", volume=not_ok_volume, flow_rate=5, push_out=7
         )
 
 
