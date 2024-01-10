@@ -77,7 +77,7 @@ async def test_create_pipette_handler(
         (1.0, False, False),
     ],
 )
-def test_get_is_ready_to_aspirate(
+def test_hw_get_is_ready_to_aspirate(
     decoy: Decoy,
     mock_state_view: StateView,
     mock_hardware_api: HardwareAPI,
@@ -103,7 +103,7 @@ def test_get_is_ready_to_aspirate(
     assert hardware_subject.get_is_ready_to_aspirate("pipette-id") == expected
 
 
-def test_get_is_ready_to_aspirate_raises_no_tip_attached(
+def test_hw_get_is_ready_to_aspirate_raises_no_tip_attached(
     decoy: Decoy,
     mock_state_view: StateView,
     mock_hardware_api: HardwareAPI,
@@ -127,7 +127,7 @@ def test_get_is_ready_to_aspirate_raises_no_tip_attached(
         assert hardware_subject.get_is_ready_to_aspirate("pipette-id")
 
 
-async def test_dispense_in_place(
+async def test_hw_dispense_in_place(
     decoy: Decoy,
     mock_state_view: StateView,
     mock_hardware_api: HardwareAPI,
@@ -171,7 +171,7 @@ async def test_dispense_in_place(
     )
 
 
-async def test_dispense_in_place_raises_invalid_push_out(
+async def test_hw_dispense_in_place_raises_invalid_push_out(
     decoy: Decoy,
     mock_state_view: StateView,
     mock_hardware_api: HardwareAPI,
@@ -204,7 +204,7 @@ async def test_dispense_in_place_raises_invalid_push_out(
         )
 
 
-async def test_aspirate_in_place(
+async def test_hw_aspirate_in_place(
     decoy: Decoy,
     mock_state_view: StateView,
     mock_hardware_api: HardwareAPI,
@@ -269,7 +269,7 @@ async def test_virtual_validate_aspirated_volume_raises(
         await subject.aspirate_in_place(pipette_id="pipette-id", volume=4, flow_rate=1)
 
 
-async def test_blow_out_in_place(
+async def test_virtual_blow_out_in_place(
     decoy: Decoy,
     mock_state_view: StateView,
     mock_hardware_api: HardwareAPI,
@@ -309,7 +309,7 @@ async def test_blow_out_in_place(
     )
 
 
-def test_get_is_ready_to_aspirate_virtual(
+def test_virtual_get_is_ready_to_aspirate(
     decoy: Decoy, mock_state_view: StateView
 ) -> None:
     """Should check if pipette is ready to aspirate."""
@@ -329,7 +329,7 @@ def test_get_is_ready_to_aspirate_virtual(
     assert subject.get_is_ready_to_aspirate(pipette_id="pipette-id-123") is True
 
 
-async def test_aspirate_in_place_virtual(
+async def test_virtual_aspirate_in_place(
     mock_state_view: StateView, decoy: Decoy
 ) -> None:
     """Should return the volume."""
@@ -353,7 +353,7 @@ async def test_aspirate_in_place_virtual(
     assert result == 2
 
 
-async def test_dispense_in_place_virtual(
+async def test_virtual_dispense_in_place(
     decoy: Decoy, mock_state_view: StateView
 ) -> None:
     """Should return the volume."""
@@ -373,7 +373,7 @@ async def test_dispense_in_place_virtual(
     assert result == 3
 
 
-async def test_dispense_in_place_virtual_raises_invalid_push_out(
+async def test_virtual_dispense_in_place_raises_invalid_push_out(
     decoy: Decoy, mock_state_view: StateView
 ) -> None:
     """Should raise an InvalidPushOutVolumeError."""
@@ -394,7 +394,7 @@ async def test_dispense_in_place_virtual_raises_invalid_push_out(
 
 
 @pytest.mark.parametrize("aspirated_volume", [(None), (1)])
-async def test_dispense_in_place_virtual_raises_invalid_dispense(
+async def test_virtual_dispense_in_place_raises_invalid_dispense(
     decoy: Decoy, mock_state_view: StateView, aspirated_volume: Optional[float]
 ) -> None:
     """Should raise an InvalidDispenseVolumeError."""
@@ -414,7 +414,7 @@ async def test_dispense_in_place_virtual_raises_invalid_dispense(
         )
 
 
-async def test_validate_tip_attached_in_aspirate(
+async def test_virtual_aspirate_validate_tip_attached(
     mock_state_view: StateView, decoy: Decoy
 ) -> None:
     """Should raise an error that a tip is not attached."""
@@ -430,7 +430,7 @@ async def test_validate_tip_attached_in_aspirate(
         await subject.aspirate_in_place("pipette-id", volume=20, flow_rate=1)
 
 
-async def test_validate_tip_attached_in_dispense(
+async def test_virtual_dispense_validate_tip_attached(
     mock_state_view: StateView, decoy: Decoy
 ) -> None:
     """Should raise an error that a tip is not attached."""
