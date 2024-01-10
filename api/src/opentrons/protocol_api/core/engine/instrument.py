@@ -45,6 +45,9 @@ if TYPE_CHECKING:
     from .protocol import ProtocolCore
 
 
+_DISPENSE_VOLUME_VALIDATION_ADDED_IN = APIVersion(2, 17)
+
+
 class InstrumentCore(AbstractInstrument[WellCore]):
     """Instrument API core using a ProtocolEngine.
 
@@ -181,12 +184,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             in_place: whether this is a in-place command.
             push_out: The amount to push the plunger below bottom position.
         """
-        # TODO: Is this the proper place to put this version check?
-        # Maybe take in a `clamp: bool` param?
-        # TODO: Do we also need to clamp volumes <0? Have negative dispense volumes
-        # worked historically?
-        # TODO: Reference docs
-        if self._protocol_core.api_version < APIVersion(2, 16):
+        if self._protocol_core.api_version < _DISPENSE_VOLUME_VALIDATION_ADDED_IN:
             # In older API versions, when you try to dispense more than you can,
             # it gets clamped.
             volume = min(volume, self.get_current_volume())
