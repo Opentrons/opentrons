@@ -189,7 +189,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         if self._protocol_core.api_version < APIVersion(2, 16):
             # In older API versions, when you try to dispense more than you can,
             # it gets clamped.
-            volume = max(volume, self.get_current_volume())
+            volume = min(volume, self.get_current_volume())
         else:
             # Newer API versions raise an error if you try to dispense more than
             # you can. Let the error come from Protocol Engine's validation.
