@@ -14,7 +14,7 @@ from .commands import (
 )
 from .responses import RadwagResponse, RadwagResponseCodes, radwag_response_parse
 
-from hardware_testing.data import get_testing_data_directory
+#from hardware_testing.data import get_testing_data_directory
 
 
 class RadwagScaleBase(ABC):
@@ -94,7 +94,8 @@ class RadwagScale(RadwagScaleBase):
     def __init__(self, connection: Serial) -> None:
         """Constructor."""
         self._connection = connection
-        _raw_file_path = get_testing_data_directory() / "scale_raw.txt"
+        #_raw_file_path = get_testing_data_directory() / "scale_raw.txt"
+        _raw_file_path  = "scale_raw.txt"
         self._raw_log = open(_raw_file_path, "w")
 
     @classmethod
