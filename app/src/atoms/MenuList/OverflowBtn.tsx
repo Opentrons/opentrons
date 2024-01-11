@@ -53,7 +53,7 @@ export const OverflowBtn = React.forwardRef(
           width="19"
           height="31"
           viewBox="0 0 19 31"
-          fill={COLORS.grey50Enabled}
+          fill={COLORS.grey50}
           xmlns="http://www.w3.org/2000/svg"
         >
           <circle cx="9.5" cy="9.5" r="1.5" />

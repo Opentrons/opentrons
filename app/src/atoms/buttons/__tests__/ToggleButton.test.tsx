@@ -77,7 +77,7 @@ describe('ToggleButton', () => {
     props.toggledOn = false
     const { getByLabelText } = render(props)
     const button = getByLabelText('toggle button')
-    expect(button).toHaveStyle(`color: ${String(COLORS.grey50Enabled)}`)
+    expect(button).toHaveStyle(`color: ${String(COLORS.grey50)}`)
     expect(button).toHaveStyle(`height: ${String(SIZE_2)}`)
     expect(button).toHaveStyle(`width: ${String(SIZE_2)}`)
     expect(button).toHaveAttribute('aria-checked', 'false')

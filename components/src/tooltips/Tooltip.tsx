@@ -4,7 +4,7 @@ import { css } from 'styled-components'
 import { radiusSoftCorners } from '../ui-style-constants/borders'
 import { fontSizeH4 } from '../ui-style-constants/typography'
 import { spacing8 } from '../ui-style-constants/spacing'
-import { white, grey50Enabled } from '../ui-style-constants/colors'
+import { white, grey50 } from '../ui-style-constants/colors'
 import { ARROW_SIZE_PX } from './styles'
 import { Box } from '../primitives'
 
@@ -51,7 +51,7 @@ export const Tooltip = React.forwardRef(function TooltipComponent(
     children,
     width,
     fontSize = fontSizeH4,
-    backgroundColor = grey50Enabled,
+    backgroundColor = grey50,
     ...boxProps
   } = props
 

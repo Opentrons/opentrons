@@ -1,5 +1,10 @@
 import { css } from 'styled-components'
-import { blueEnabled, grey35, transparent, grey55 } from './colors'
+import {
+  blueEnabled,
+  medGreyEnabled,
+  transparent,
+  medGreyHover,
+} from './colors'
 
 export const radiusSoftCorners = '4px'
 export const radiusRoundEdge = '20px'
@@ -20,15 +25,15 @@ export const tabBorder = css`
 `
 
 export const activeLineBorder = `1px ${styleSolid} ${blueEnabled}`
-export const lineBorder = `1px ${styleSolid} ${grey35}`
+export const lineBorder = `1px ${styleSolid} ${medGreyEnabled}`
 export const transparentLineBorder = `1px ${styleSolid} ${transparent}`
 export const cardOutlineBorder = css`
   border-style: ${styleSolid};
   border-width: 1px;
-  border-color: ${grey35};
+  border-color: ${medGreyEnabled};
   border-radius: ${radiusSoftCorners};
   &:hover {
-    border-color: ${grey55};
+    border-color: ${medGreyHover};
   }
 `
 
