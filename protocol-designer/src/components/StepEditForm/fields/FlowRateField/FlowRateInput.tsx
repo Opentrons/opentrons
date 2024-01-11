@@ -1,5 +1,6 @@
 import * as React from 'react'
 import round from 'lodash/round'
+import { useTranslation } from 'react-i18next'
 import {
   AlertModal,
   FormGroup,
@@ -13,7 +14,6 @@ import stepFormStyles from '../../StepEditForm.css'
 import styles from './FlowRateInput.css'
 import { FieldProps } from '../../types'
 
-const DEFAULT_LABEL = i18n.t('form.step_edit_form.field.flow_rate.label')
 const DECIMALS_ALLOWED = 1
 
 /** When flow rate is falsey (including 0), it means 'use default' */
@@ -47,6 +47,8 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
     name,
     pipetteDisplayName,
   } = props
+  const { t } = useTranslation('form')
+  const DEFAULT_LABEL = t('step_edit_form.field.flow_rate.label')
 
   const initialState: State = {
     isPristine: true,

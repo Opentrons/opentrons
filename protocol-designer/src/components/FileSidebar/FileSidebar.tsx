@@ -1,5 +1,6 @@
 import * as React from 'react'
 import cx from 'classnames'
+import { useTranslation } from 'react-i18next'
 import {
   DeprecatedPrimaryButton,
   AlertModal,
@@ -222,16 +223,18 @@ function getWarningContent({
   return null
 }
 
-export const v8WarningContent: JSX.Element = (
-  <div>
-    <p>
-      {i18n.t(`alert.hint.export_v8_protocol_7_1.body1`)}{' '}
-      <strong>{i18n.t(`alert.hint.export_v8_protocol_7_1.body2`)}</strong>
-      {i18n.t(`alert.hint.export_v8_protocol_7_1.body3`)}
-    </p>
-  </div>
-)
-
+export function v8WarningContent(): JSX.Element {
+  const { t } = useTranslation('alert')
+  return (
+    <div>
+      <p>
+        {t(`hint.export_v8_protocol_7_1.body1`)}{' '}
+        <strong>{t(`hint.export_v8_protocol_7_1.body2`)}</strong>
+        {t(`hint.export_v8_protocol_7_1.body3`)}
+      </p>
+    </div>
+  )
+}
 export function FileSidebar(props: Props): JSX.Element {
   const {
     canDownload,
@@ -322,7 +325,7 @@ export function FileSidebar(props: Props): JSX.Element {
   } => {
     return {
       hintKey: 'export_v8_protocol_7_1',
-      content: v8WarningContent,
+      content: v8WarningContent(),
     }
   }
 

@@ -1,24 +1,31 @@
-import i18next from 'i18next'
+import i18n from 'i18next'
 import capitalize from 'lodash/capitalize'
 import startCase from 'lodash/startCase'
 import { initReactI18next } from 'react-i18next'
 import { titleCase } from '@opentrons/shared-data'
 import { en } from './en'
 
-// TODO(IL, 2020-06-08): use a proper type def for i18next module -- but flow-types seems wrong
-interface I18n {
-  t: (
-    key: string | Array<string | null | undefined>,
-    data?: Record<string, unknown> | string
-  ) => string
-}
-// @ts-expect-error missing property t
-export const i18n: I18n = i18next.use(initReactI18next).init(
+i18n.use(initReactI18next).init(
   {
     lng: 'en',
-    resources: {
-      en,
-    },
+    fallbackLng: 'en',
+    resources: { en },
+    ns: [
+      'shared',
+      'alert',
+      'button',
+      'card',
+      'contex_menu',
+      'deck',
+      'feature_flags',
+      'form',
+      'modal',
+      'modules',
+      'nav',
+      'tooltip',
+      'well_selection',
+    ],
+    defaultNS: 'shared',
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default
       format: function (value, format, lng) {
@@ -29,8 +36,15 @@ export const i18n: I18n = i18next.use(initReactI18next).init(
         return value
       },
     },
+    keySeparator: false,
+    saveMissing: true,
+    missingKeyHandler: (lng, ns, key) => {
+      process.env.NODE_ENV === 'test'
+        ? console.error(`Missing ${lng} Translation: key={${key}} ns={${ns}}`)
+        : console.warn(`Missing ${lng} Translation: key={${key}} ns={${ns}}`)
+    },
   },
-  (err, t) => {
+  err => {
     if (err) {
       console.error(
         'Internationalization was not initialized properly. error: ',
@@ -39,3 +53,5 @@ export const i18n: I18n = i18next.use(initReactI18next).init(
     }
   }
 )
+
+export { i18n }

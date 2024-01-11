@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -16,7 +17,6 @@ import {
   PrimaryButton,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
-import { i18n } from '../../../localization'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { css } from 'styled-components'
 import opentronsFlexImage from '../../../images/OpentronsFlex.png'
@@ -30,6 +30,7 @@ const ROBOT_TYPES: RobotType[] = [OT2_ROBOT_TYPE, FLEX_ROBOT_TYPE]
 
 export function RobotTypeTile(props: WizardTileProps): JSX.Element {
   const { values, setFieldValue, proceed } = props
+  const { t } = useTranslation(['modal', 'application'])
   return (
     <HandleEnter onEnter={proceed}>
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
@@ -38,9 +39,7 @@ export function RobotTypeTile(props: WizardTileProps): JSX.Element {
           height="26rem"
           gridGap={SPACING.spacing32}
         >
-          <Text as="h2">
-            {i18n.t('modal.create_file_wizard.choose_robot_type')}
-          </Text>
+          <Text as="h2">{t('modal:choose_robot_type')}</Text>
 
           <Flex
             justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -64,7 +63,7 @@ export function RobotTypeTile(props: WizardTileProps): JSX.Element {
           width="100%"
         >
           <PrimaryButton onClick={() => proceed()}>
-            {i18n.t('application.next')}
+            {t('application:next')}
           </PrimaryButton>
         </Flex>
       </Flex>
