@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {
   Flex,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   SPACING,
   TYPOGRAPHY,
@@ -51,7 +51,7 @@ const Template: Story<SpacingsStorybookProps> = args => {
           <Box
             width={spacing[1]}
             height="2rem"
-            backgroundColor={LEGACY_COLORS.blueEnabled}
+            backgroundColor={COLORS.blueEnabled}
           />
         </Flex>
       ))}

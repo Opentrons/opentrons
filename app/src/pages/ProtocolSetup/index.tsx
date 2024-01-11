@@ -11,7 +11,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   Btn,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
@@ -118,9 +118,9 @@ export function ProtocolSetupStep({
   disabledReason,
 }: ProtocolSetupStepProps): JSX.Element {
   const backgroundColorByStepStatus = {
-    ready: LEGACY_COLORS.green3,
-    'not ready': LEGACY_COLORS.yellow3,
-    general: LEGACY_COLORS.light1,
+    ready: COLORS.green3,
+    'not ready': COLORS.yellow3,
+    general: COLORS.light1,
   }
   const { makeSnackbar } = useToaster()
 
@@ -134,13 +134,13 @@ export function ProtocolSetupStep({
   if (!disabled) {
     switch (status) {
       case 'general':
-        backgroundColor = LEGACY_COLORS.darkBlack40
+        backgroundColor = COLORS.darkBlack40
         break
       case 'ready':
-        backgroundColor = LEGACY_COLORS.green3Pressed
+        backgroundColor = COLORS.green3Pressed
         break
       default:
-        backgroundColor = LEGACY_COLORS.yellow3Pressed
+        backgroundColor = COLORS.yellow3Pressed
     }
   } else backgroundColor = ''
 
@@ -160,7 +160,7 @@ export function ProtocolSetupStep({
       <Flex
         alignItems={ALIGN_CENTER}
         backgroundColor={
-          disabled ? LEGACY_COLORS.light1 : backgroundColorByStepStatus[status]
+          disabled ? COLORS.light1 : backgroundColorByStepStatus[status]
         }
         borderRadius={BORDERS.borderRadiusSize4}
         gridGap={SPACING.spacing16}
@@ -169,7 +169,7 @@ export function ProtocolSetupStep({
       >
         {status !== 'general' && !disabled ? (
           <Icon
-            color={status === 'ready' ? LEGACY_COLORS.green2 : LEGACY_COLORS.yellow2}
+            color={status === 'ready' ? COLORS.green2 : COLORS.yellow2}
             size="2rem"
             name={status === 'ready' ? 'ot-check' : 'ot-alert'}
           />
@@ -177,7 +177,7 @@ export function ProtocolSetupStep({
         <StyledText
           as="h4"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={disabled ? LEGACY_COLORS.darkBlack60 : LEGACY_COLORS.darkBlack100}
+          color={disabled ? COLORS.darkBlack60 : COLORS.darkBlack100}
         >
           {title}
         </StyledText>
@@ -185,7 +185,7 @@ export function ProtocolSetupStep({
           <StyledText
             as="p"
             textAlign={TEXT_ALIGN_RIGHT}
-            color={disabled ? LEGACY_COLORS.darkBlack60 : LEGACY_COLORS.darkBlack100}
+            color={disabled ? COLORS.darkBlack60 : COLORS.darkBlack100}
           >
             {detail}
             {subDetail != null && detail != null ? <br /> : null}
@@ -590,7 +590,7 @@ function PrepareToRun({
         padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
         position={POSITION_STICKY}
         top={0}
-        backgroundColor={LEGACY_COLORS.white}
+        backgroundColor={COLORS.white}
         overflowY="auto"
         marginX={`-${SPACING.spacing32}`}
       >
@@ -607,7 +607,7 @@ function PrepareToRun({
                 </StyledText>
                 <StyledText
                   as="h4"
-                  color={LEGACY_COLORS.darkGreyEnabled}
+                  color={COLORS.darkGreyEnabled}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   overflowWrap="anywhere"
                 >

@@ -8,7 +8,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   Box,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -37,7 +37,7 @@ const BrightnessTile = styled(Box)`
   height: 8.75rem;
   border-radius: ${BORDERS.borderRadiusSize2};
   background: ${(props: BrightnessTileProps) =>
-    props.isActive ? LEGACY_COLORS.blueEnabled : LEGACY_COLORS.mediumBlueEnabled};
+    props.isActive ? COLORS.blueEnabled : COLORS.mediumBlueEnabled};
 `
 
 // Note The actual brightness is Bright 1 <---> 6 Dark which is opposite to the UI
@@ -122,14 +122,14 @@ export function TouchscreenBrightness({
 const IconButton = styled('button')`
   border-radius: 50%;
   max-height: 100%;
-  background-color: ${LEGACY_COLORS.white};
+  background-color: ${COLORS.white};
 
   &:active {
-    background-color: ${LEGACY_COLORS.darkBlack20};
+    background-color: ${COLORS.darkBlack20};
   }
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${LEGACY_COLORS.darkBlack20};
+    background-color: ${COLORS.darkBlack20};
   }
   &:disabled {
     background-color: transparent;

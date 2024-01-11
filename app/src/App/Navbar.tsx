@@ -6,7 +6,7 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   ALIGN_STRETCH,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   FLEX_NONE,
   Flex,
@@ -30,18 +30,18 @@ import type { RouteProps } from './types'
 const SALESFORCE_HELP_LINK = 'https://support.opentrons.com/s/'
 
 const NavbarLink = styled(NavLink)`
-  color: ${LEGACY_COLORS.white};
+  color: ${COLORS.white};
   align-self: ${ALIGN_STRETCH};
-  background-color: ${LEGACY_COLORS.darkBlackEnabled};
+  background-color: ${COLORS.darkBlackEnabled};
 
   &:hover {
-    background-color: ${LEGACY_COLORS.darkBlackHover};
+    background-color: ${COLORS.darkBlackHover};
   }
 
   &:focus-visible {
-    box-shadow: inset 0 0 0 3px ${LEGACY_COLORS.fundamentalsFocus};
+    box-shadow: inset 0 0 0 3px ${COLORS.fundamentalsFocus};
     outline: none;
-    background-color: ${LEGACY_COLORS.darkGreyHover};
+    background-color: ${COLORS.darkGreyHover};
   }
 
   &:focus-visible.active {
@@ -50,26 +50,26 @@ const NavbarLink = styled(NavLink)`
   }
 
   &:active {
-    background-color: ${LEGACY_COLORS.darkBlackEnabled};
+    background-color: ${COLORS.darkBlackEnabled};
   }
 
   &.active {
-    background-color: ${LEGACY_COLORS.darkBlackSelected};
+    background-color: ${COLORS.darkBlackSelected};
   }
   &.active:has(svg) {
-    background-color: ${LEGACY_COLORS.darkBlackEnabled};
+    background-color: ${COLORS.darkBlackEnabled};
   }
 `
 const NavIconLink = styled(NavLink)`
   &.active > svg {
-    color: ${LEGACY_COLORS.medGreyEnabled};
-    background-color: ${LEGACY_COLORS.darkBlackSelected};
+    color: ${COLORS.medGreyEnabled};
+    background-color: ${COLORS.darkBlackSelected};
   }
 `
 const IconLink = styled(Link)`
   &.active > svg {
-    color: ${LEGACY_COLORS.medGreyEnabled};
-    background-color: ${LEGACY_COLORS.darkBlackSelected};
+    color: ${COLORS.medGreyEnabled};
+    background-color: ${COLORS.darkBlackSelected};
   }
 `
 
@@ -78,27 +78,27 @@ const NavbarIcon = styled(Icon)`
   height: ${SIZE_2};
   padding: ${SPACING.spacing6};
   border-radius: 50%;
-  color: ${LEGACY_COLORS.medGreyEnabled};
-  background-color: ${LEGACY_COLORS.transparent};
+  color: ${COLORS.medGreyEnabled};
+  background-color: ${COLORS.transparent};
 
   &:hover {
-    background-color: ${LEGACY_COLORS.darkBlackHover};
+    background-color: ${COLORS.darkBlackHover};
   }
 
   &:focus-visible {
-    box-shadow: inset 0 0 0 3px ${LEGACY_COLORS.fundamentalsFocus};
+    box-shadow: inset 0 0 0 3px ${COLORS.fundamentalsFocus};
     outline: none;
-    background-color: ${LEGACY_COLORS.darkGreyHover};
+    background-color: ${COLORS.darkGreyHover};
   }
 
   &:active {
-    color: ${LEGACY_COLORS.medGreyEnabled};
-    background-color: ${LEGACY_COLORS.darkBlackEnabled};
+    color: ${COLORS.medGreyEnabled};
+    background-color: ${COLORS.darkBlackEnabled};
   }
 
   &.active {
-    color: ${LEGACY_COLORS.medGreyEnabled};
-    background-color: ${LEGACY_COLORS.darkBlackSelected};
+    color: ${COLORS.medGreyEnabled};
+    background-color: ${COLORS.darkBlackSelected};
   }
 `
 
@@ -113,7 +113,7 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
   )
   return (
     <Flex
-      backgroundColor={LEGACY_COLORS.darkBlackEnabled}
+      backgroundColor={COLORS.darkBlackEnabled}
       css={TYPOGRAPHY.h3Regular}
       flexDirection={DIRECTION_COLUMN}
       flex={FLEX_NONE}

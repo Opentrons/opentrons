@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { BORDERS, LEGACY_COLORS, renderWithProviders } from '@opentrons/components'
+import { BORDERS, COLORS, renderWithProviders } from '@opentrons/components'
 
 import { Chip } from '..'
 
@@ -19,8 +19,8 @@ describe('Chip', () => {
     const [{ getByTestId, getByText, queryByLabelText }] = render(props)
     const chip = getByTestId('Chip_basic')
     const chipText = getByText('mockBasic')
-    expect(chip).toHaveStyle(`background-color: ${LEGACY_COLORS.darkBlack20}`)
-    expect(chipText).toHaveStyle(`color: ${LEGACY_COLORS.darkBlack90}`)
+    expect(chip).toHaveStyle(`background-color: ${COLORS.darkBlack20}`)
+    expect(chipText).toHaveStyle(`color: ${COLORS.darkBlack90}`)
     expect(queryByLabelText('icon_mockBasic')).not.toBeInTheDocument()
   })
 
@@ -32,11 +32,11 @@ describe('Chip', () => {
     const [{ getByTestId, getByText, getByLabelText }] = render(props)
     const chip = getByTestId('Chip_success')
     const chipText = getByText('mockSuccess')
-    expect(chip).toHaveStyle(`background-color: ${LEGACY_COLORS.green3}`)
+    expect(chip).toHaveStyle(`background-color: ${COLORS.green3}`)
     expect(chip).toHaveStyle(`border-radius: ${BORDERS.borderRadiusSize5}`)
-    expect(chipText).toHaveStyle(`color: ${LEGACY_COLORS.green1}`)
+    expect(chipText).toHaveStyle(`color: ${COLORS.green1}`)
     const icon = getByLabelText('icon_mockSuccess')
-    expect(icon).toHaveStyle(`color: ${LEGACY_COLORS.green1}`)
+    expect(icon).toHaveStyle(`color: ${COLORS.green1}`)
   })
 
   it('should render text, icon, no bgcolor with success colors and bg false', () => {
@@ -48,11 +48,11 @@ describe('Chip', () => {
     const [{ getByTestId, getByText, getByLabelText }] = render(props)
     const chip = getByTestId('Chip_success')
     const chipText = getByText('mockSuccess')
-    expect(chip).toHaveStyle(`background-color: ${LEGACY_COLORS.transparent}`)
+    expect(chip).toHaveStyle(`background-color: ${COLORS.transparent}`)
     expect(chip).toHaveStyle(`border-radius: ${BORDERS.borderRadiusSize5}`)
-    expect(chipText).toHaveStyle(`color: ${LEGACY_COLORS.green1}`)
+    expect(chipText).toHaveStyle(`color: ${COLORS.green1}`)
     const icon = getByLabelText('icon_mockSuccess')
-    expect(icon).toHaveStyle(`color: ${LEGACY_COLORS.green1}`)
+    expect(icon).toHaveStyle(`color: ${COLORS.green1}`)
   })
 
   it('should render text, icon, bgcolor with warning colors', () => {
@@ -63,11 +63,11 @@ describe('Chip', () => {
     const [{ getByTestId, getByText, getByLabelText }] = render(props)
     const chip = getByTestId('Chip_warning')
     const chipText = getByText('mockWarning')
-    expect(chip).toHaveStyle(`background-color: ${LEGACY_COLORS.yellow3}`)
+    expect(chip).toHaveStyle(`background-color: ${COLORS.yellow3}`)
     expect(chip).toHaveStyle(`border-radius: ${BORDERS.borderRadiusSize5}`)
-    expect(chipText).toHaveStyle(`color: ${LEGACY_COLORS.yellow1}`)
+    expect(chipText).toHaveStyle(`color: ${COLORS.yellow1}`)
     const icon = getByLabelText('icon_mockWarning')
-    expect(icon).toHaveStyle(`color: ${LEGACY_COLORS.yellow1}`)
+    expect(icon).toHaveStyle(`color: ${COLORS.yellow1}`)
   })
 
   it('should render text, icon, no bgcolor with warning colors and bg false', () => {
@@ -79,11 +79,11 @@ describe('Chip', () => {
     const [{ getByTestId, getByText, getByLabelText }] = render(props)
     const chip = getByTestId('Chip_warning')
     const chipText = getByText('mockWarning')
-    expect(chip).toHaveStyle(`background-color: ${String(LEGACY_COLORS.transparent)}`)
+    expect(chip).toHaveStyle(`background-color: ${String(COLORS.transparent)}`)
     expect(chip).toHaveStyle(`border-radius: ${BORDERS.borderRadiusSize5}`)
-    expect(chipText).toHaveStyle(`color: ${String(LEGACY_COLORS.yellow1)}`)
+    expect(chipText).toHaveStyle(`color: ${String(COLORS.yellow1)}`)
     const icon = getByLabelText('icon_mockWarning')
-    expect(icon).toHaveStyle(`color: ${String(LEGACY_COLORS.yellow1)}`)
+    expect(icon).toHaveStyle(`color: ${String(COLORS.yellow1)}`)
   })
 
   it('should render text, icon, bgcolor with neutral colors', () => {
@@ -94,11 +94,11 @@ describe('Chip', () => {
     const [{ getByTestId, getByText, getByLabelText }] = render(props)
     const chip = getByTestId('Chip_neutral')
     const chipText = getByText('mockNeutral')
-    expect(chip).toHaveStyle(`background-color: ${LEGACY_COLORS.darkBlack20}`)
+    expect(chip).toHaveStyle(`background-color: ${COLORS.darkBlack20}`)
     expect(chip).toHaveStyle(`border-radius: ${BORDERS.borderRadiusSize5}`)
-    expect(chipText).toHaveStyle(`color: ${LEGACY_COLORS.darkBlack70}`)
+    expect(chipText).toHaveStyle(`color: ${COLORS.darkBlack70}`)
     const icon = getByLabelText('icon_mockNeutral')
-    expect(icon).toHaveStyle(`color: ${LEGACY_COLORS.darkBlack90}`)
+    expect(icon).toHaveStyle(`color: ${COLORS.darkBlack90}`)
   })
 
   it('should render text, icon, no bgcolor with neutral colors and bg false', () => {
@@ -110,11 +110,11 @@ describe('Chip', () => {
     const [{ getByTestId, getByText, getByLabelText }] = render(props)
     const chip = getByTestId('Chip_neutral')
     const chipText = getByText('mockNeutral')
-    expect(chip).toHaveStyle(`background-color: ${LEGACY_COLORS.transparent}`)
+    expect(chip).toHaveStyle(`background-color: ${COLORS.transparent}`)
     expect(chip).toHaveStyle(`border-radius: ${BORDERS.borderRadiusSize5}`)
-    expect(chipText).toHaveStyle(`color: ${LEGACY_COLORS.darkBlack70}`)
+    expect(chipText).toHaveStyle(`color: ${COLORS.darkBlack70}`)
     const icon = getByLabelText('icon_mockNeutral')
-    expect(icon).toHaveStyle(`color: ${LEGACY_COLORS.darkBlack90}`)
+    expect(icon).toHaveStyle(`color: ${COLORS.darkBlack90}`)
   })
 
   it('should render text, icon, bgcolor with error colors', () => {
@@ -125,11 +125,11 @@ describe('Chip', () => {
     const [{ getByTestId, getByText, getByLabelText }] = render(props)
     const chip = getByTestId('Chip_error')
     const chipText = getByText('mockError')
-    expect(chip).toHaveStyle(`background-color: ${LEGACY_COLORS.red3}`)
+    expect(chip).toHaveStyle(`background-color: ${COLORS.red3}`)
     expect(chip).toHaveStyle(`border-radius: ${BORDERS.borderRadiusSize5}`)
-    expect(chipText).toHaveStyle(`color: ${LEGACY_COLORS.red1}`)
+    expect(chipText).toHaveStyle(`color: ${COLORS.red1}`)
     const icon = getByLabelText('icon_mockError')
-    expect(icon).toHaveStyle(`color: ${LEGACY_COLORS.red1}`)
+    expect(icon).toHaveStyle(`color: ${COLORS.red1}`)
   })
 
   it('should render text, icon, no bgcolor with error colors and bg false', () => {
@@ -141,10 +141,10 @@ describe('Chip', () => {
     const [{ getByTestId, getByText, getByLabelText }] = render(props)
     const chip = getByTestId('Chip_error')
     const chipText = getByText('mockError')
-    expect(chip).toHaveStyle(`background-color: ${LEGACY_COLORS.transparent}`)
+    expect(chip).toHaveStyle(`background-color: ${COLORS.transparent}`)
     expect(chip).toHaveStyle(`border-radius: ${BORDERS.borderRadiusSize5}`)
-    expect(chipText).toHaveStyle(`color: ${LEGACY_COLORS.red1}`)
+    expect(chipText).toHaveStyle(`color: ${COLORS.red1}`)
     const icon = getByLabelText('icon_mockError')
-    expect(icon).toHaveStyle(`color: ${LEGACY_COLORS.red1}`)
+    expect(icon).toHaveStyle(`color: ${COLORS.red1}`)
   })
 })

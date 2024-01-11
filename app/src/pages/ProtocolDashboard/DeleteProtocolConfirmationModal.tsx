@@ -6,7 +6,7 @@ import styled from 'styled-components'
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import {
   Flex,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
   DIRECTION_ROW,
@@ -37,7 +37,7 @@ export function DeleteProtocolConfirmationModal({
   const modalHeader: ModalHeaderBaseProps = {
     title: t('delete_this_protocol'),
     iconName: 'ot-alert',
-    iconColor: LEGACY_COLORS.yellow2,
+    iconColor: COLORS.yellow2,
   }
   const host = useHost()
   const queryClient = useQueryClient()
@@ -128,11 +128,11 @@ const ProtocolNameText = styled.span`
   font-weight: ${TYPOGRAPHY.fontWeightBold};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
-  color: ${LEGACY_COLORS.darkBlack90};
+  color: ${COLORS.darkBlack90};
 `
 const AdditionalText = styled.span`
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
-  color: ${LEGACY_COLORS.darkBlack90};
+  color: ${COLORS.darkBlack90};
 `

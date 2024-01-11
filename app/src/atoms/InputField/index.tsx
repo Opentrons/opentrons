@@ -5,7 +5,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLOR_WARNING_DARK,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DISPLAY_INLINE_BLOCK,
   Flex,
@@ -71,7 +71,7 @@ export function InputField(props: InputFieldProps): JSX.Element {
       lineHeight={1}
       fontSize={TYPOGRAPHY.fontSizeP}
       fontWeight={TYPOGRAPHY.fontWeightRegular}
-      color={props.error != null ? COLOR_WARNING_DARK : LEGACY_COLORS.darkBlackEnabled}
+      color={props.error != null ? COLOR_WARNING_DARK : COLORS.darkBlackEnabled}
       opacity={props.disabled ?? false ? 0.5 : ''}
     >
       <Input {...props} />
@@ -86,20 +86,20 @@ function Input(props: InputFieldProps): JSX.Element {
 
   const INPUT_FIELD = css`
     display: flex;
-    background-color: ${LEGACY_COLORS.white};
+    background-color: ${COLORS.white};
     border-radius: ${SPACING.spacing4};
     padding: ${SPACING.spacing8};
     border: 1px ${BORDERS.styleSolid}
-      ${error ? LEGACY_COLORS.errorEnabled : LEGACY_COLORS.medGreyEnabled};
+      ${error ? COLORS.errorEnabled : COLORS.medGreyEnabled};
     font-size: ${TYPOGRAPHY.fontSizeP};
 
     &:active {
-      border: 1px ${BORDERS.styleSolid} ${LEGACY_COLORS.darkGreyEnabled};
+      border: 1px ${BORDERS.styleSolid} ${COLORS.darkGreyEnabled};
     }
 
     & input {
       border-radius: inherit;
-      color: ${LEGACY_COLORS.darkBlackEnabled};
+      color: ${COLORS.darkBlackEnabled};
       border: none;
       flex: 1 1 auto;
       width: 100%;
@@ -111,13 +111,13 @@ function Input(props: InputFieldProps): JSX.Element {
 
     &:hover {
       border: 1px ${BORDERS.styleSolid}
-        ${error ? LEGACY_COLORS.errorEnabled : LEGACY_COLORS.medGreyHover};
+        ${error ? COLORS.errorEnabled : COLORS.medGreyHover};
     }
     &:focus {
-      border: 1px ${BORDERS.styleSolid} ${LEGACY_COLORS.blueEnabled};
+      border: 1px ${BORDERS.styleSolid} ${COLORS.blueEnabled};
     }
     &:disabled {
-      border: 1px ${BORDERS.styleSolid} ${LEGACY_COLORS.darkGreyDisabled};
+      border: 1px ${BORDERS.styleSolid} ${COLORS.darkGreyDisabled};
     }
     input[type='number']::-webkit-inner-spin-button,
     input[type='number']::-webkit-outer-spin-button {
@@ -134,10 +134,10 @@ function Input(props: InputFieldProps): JSX.Element {
   `
 
   const ERROR_TEXT_STYLE = css`
-    color: ${LEGACY_COLORS.errorEnabled};
+    color: ${COLORS.errorEnabled};
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       font-size: ${TYPOGRAPHY.fontSize22};
-      color: ${LEGACY_COLORS.red2};
+      color: ${COLORS.red2};
     }
   `
 
@@ -155,7 +155,7 @@ function Input(props: InputFieldProps): JSX.Element {
             display={DISPLAY_INLINE_BLOCK}
             textAlign={TEXT_ALIGN_RIGHT}
             alignSelf={ALIGN_CENTER}
-            color={LEGACY_COLORS.darkGreyEnabled}
+            color={COLORS.darkGreyEnabled}
             fontSize={TYPOGRAPHY.fontSizeLabel}
           >
             {props.units}
@@ -163,7 +163,7 @@ function Input(props: InputFieldProps): JSX.Element {
         )}
       </Flex>
       <Flex
-        color={LEGACY_COLORS.darkGreyEnabled}
+        color={COLORS.darkGreyEnabled}
         fontSize={TYPOGRAPHY.fontSizeLabel}
         paddingTop={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}

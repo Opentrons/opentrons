@@ -4,7 +4,7 @@ import {
   nestedTextMatcher,
   renderWithProviders,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
 } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import {
@@ -93,7 +93,7 @@ describe('LiquidDetailCard', () => {
     getAllByText(nestedTextMatcher('100 µL'))
     getAllByText(nestedTextMatcher('total volume'))
     expect(getByLabelText('liquidBox_odd')).toHaveStyle(
-      `border: ${SPACING.spacing4} solid ${LEGACY_COLORS.medGreyEnabled}`
+      `border: ${SPACING.spacing4} solid ${COLORS.medGreyEnabled}`
     )
   })
 })

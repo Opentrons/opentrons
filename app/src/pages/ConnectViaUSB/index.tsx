@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom'
 import {
   Flex,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_ROW,
   JUSTIFY_CENTER,
   ALIGN_CENTER,
@@ -70,7 +70,7 @@ export function ConnectViaUSB(): JSX.Element {
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <Flex
               alignItems={ALIGN_CENTER}
-              backgroundColor={LEGACY_COLORS.green3}
+              backgroundColor={COLORS.green3}
               borderRadius={BORDERS.borderRadiusSize3}
               height="18.5rem"
               flexDirection={DIRECTION_COLUMN}
@@ -78,7 +78,7 @@ export function ConnectViaUSB(): JSX.Element {
               justifyContent={JUSTIFY_CENTER}
               padding={`${SPACING.spacing40} ${SPACING.spacing80}`}
             >
-              <Icon name="ot-check" size="3rem" color={LEGACY_COLORS.green2} />
+              <Icon name="ot-check" size="3rem" color={COLORS.green2} />
               <Flex
                 alignItems={ALIGN_CENTER}
                 flexDirection={DIRECTION_COLUMN}
@@ -89,7 +89,7 @@ export function ConnectViaUSB(): JSX.Element {
                 </StyledText>
                 <StyledText
                   as="h4"
-                  color={LEGACY_COLORS.darkBlack70}
+                  color={COLORS.darkBlack70}
                   textAlign={TYPOGRAPHY.textAlignCenter}
                 >
                   {t('find_your_robot')}
@@ -104,7 +104,7 @@ export function ConnectViaUSB(): JSX.Element {
         ) : (
           <Flex
             alignItems={ALIGN_CENTER}
-            backgroundColor={LEGACY_COLORS.darkBlack20}
+            backgroundColor={COLORS.darkBlack20}
             borderRadius={BORDERS.borderRadiusSize3}
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing32}
@@ -127,13 +127,13 @@ export function ConnectViaUSB(): JSX.Element {
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing8}
               >
-                <StyledText as="h4" color={LEGACY_COLORS.darkBlack70}>
+                <StyledText as="h4" color={COLORS.darkBlack70}>
                   {t('connect_via_usb_description_1')}
                 </StyledText>
-                <StyledText as="h4" color={LEGACY_COLORS.darkBlack70}>
+                <StyledText as="h4" color={COLORS.darkBlack70}>
                   {t('connect_via_usb_description_2')}
                 </StyledText>
-                <StyledText as="h4" color={LEGACY_COLORS.darkBlack70}>
+                <StyledText as="h4" color={COLORS.darkBlack70}>
                   {t('connect_via_usb_description_3')}
                 </StyledText>
               </Flex>

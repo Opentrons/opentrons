@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders, LEGACY_COLORS, BORDERS } from '@opentrons/components'
+import { renderWithProviders, COLORS, BORDERS } from '@opentrons/components'
 
 import { SmallButton } from '../SmallButton'
 
@@ -22,7 +22,7 @@ describe('SmallButton', () => {
     fireEvent.click(screen.getByText('small button'))
     expect(props.onClick).toHaveBeenCalled()
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.blueEnabled}`
+      `background-color: ${COLORS.blueEnabled}`
     )
     expect(screen.getByRole('button')).toHaveStyle(
       `border-radius: ${BORDERS.borderRadiusSize4}`
@@ -35,7 +35,7 @@ describe('SmallButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.red2}`
+      `background-color: ${COLORS.red2}`
     )
   })
   it('renders the secondary button', () => {
@@ -45,7 +45,7 @@ describe('SmallButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.mediumBlueEnabled}`
+      `background-color: ${COLORS.mediumBlueEnabled}`
     )
   })
   it('renders the tertiary high light button', () => {
@@ -55,7 +55,7 @@ describe('SmallButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `color: ${LEGACY_COLORS.darkBlackEnabled}`
+      `color: ${COLORS.darkBlackEnabled}`
     )
   })
   it('renders the tertiary low light', () => {
@@ -65,7 +65,7 @@ describe('SmallButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `color: ${LEGACY_COLORS.darkBlackEnabled}${LEGACY_COLORS.opacity70HexCode}`
+      `color: ${COLORS.darkBlackEnabled}${COLORS.opacity70HexCode}`
     )
   })
   it('renders the button as disabled', () => {

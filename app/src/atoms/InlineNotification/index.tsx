@@ -6,7 +6,7 @@ import {
   Flex,
   DIRECTION_ROW,
   ALIGN_CENTER,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
   BORDERS,
@@ -36,23 +36,23 @@ const INLINE_NOTIFICATION_PROPS_BY_TYPE: Record<
 > = {
   alert: {
     icon: { name: 'ot-alert' },
-    backgroundColor: LEGACY_COLORS.yellow3,
-    color: LEGACY_COLORS.yellow2,
+    backgroundColor: COLORS.yellow3,
+    color: COLORS.yellow2,
   },
   error: {
     icon: { name: 'ot-alert' },
-    backgroundColor: LEGACY_COLORS.red3,
-    color: LEGACY_COLORS.red2,
+    backgroundColor: COLORS.red3,
+    color: COLORS.red2,
   },
   neutral: {
     icon: { name: 'information' },
-    backgroundColor: LEGACY_COLORS.darkBlack20,
-    color: LEGACY_COLORS.darkBlackEnabled,
+    backgroundColor: COLORS.darkBlack20,
+    color: COLORS.darkBlackEnabled,
   },
   success: {
     icon: { name: 'ot-check' },
-    backgroundColor: LEGACY_COLORS.green3,
-    color: LEGACY_COLORS.green2,
+    backgroundColor: COLORS.green3,
+    color: COLORS.green2,
   },
 }
 

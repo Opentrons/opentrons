@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom'
 
 import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -53,7 +53,7 @@ export function ConfirmCancelRunModal({
     title: t('cancel_run_modal_heading'),
     hasExitIcon: false,
     iconName: 'ot-alert',
-    iconColor: LEGACY_COLORS.yellow2,
+    iconColor: COLORS.yellow2,
   }
 
   const handleCancelRun = (): void => {

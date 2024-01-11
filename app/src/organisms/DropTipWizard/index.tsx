@@ -7,7 +7,7 @@ import {
   Flex,
   DIRECTION_COLUMN,
   POSITION_ABSOLUTE,
-  LEGACY_COLORS,
+  COLORS,
   BORDERS,
 } from '@opentrons/components'
 import {
@@ -351,7 +351,7 @@ export const DropTipWizardComponent = (
     modalContent = (
       <SimpleWizardBody
         isSuccess={false}
-        iconColor={LEGACY_COLORS.errorEnabled}
+        iconColor={COLORS.errorEnabled}
         header={t('error_dropping_tips')}
         subHeader={
           <>
@@ -524,7 +524,7 @@ export const DropTipWizardComponent = (
           boxShadow={BORDERS.shadowSmall}
           borderRadius={BORDERS.borderRadiusSize4}
           position={POSITION_ABSOLUTE}
-          backgroundColor={LEGACY_COLORS.white}
+          backgroundColor={COLORS.white}
         >
           {wizardHeader}
           {modalContent}

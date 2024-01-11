@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { renderWithProviders, LEGACY_COLORS, SPACING } from '@opentrons/components'
+import { renderWithProviders, COLORS, SPACING } from '@opentrons/components'
 
 import { RadioButton } from '..'
 
@@ -23,7 +23,7 @@ describe('RadioButton', () => {
     }
     const { getByRole } = render(props)
     const label = getByRole('label')
-    expect(label).toHaveStyle(`background-color: ${LEGACY_COLORS.mediumBlueEnabled}`)
+    expect(label).toHaveStyle(`background-color: ${COLORS.mediumBlueEnabled}`)
     expect(label).toHaveStyle(`padding: ${SPACING.spacing24}`)
   })
   it('renders the large selected button', () => {
@@ -34,7 +34,7 @@ describe('RadioButton', () => {
     }
     const { getByRole } = render(props)
     const label = getByRole('label')
-    expect(label).toHaveStyle(`background-color: ${LEGACY_COLORS.blueEnabled}`)
+    expect(label).toHaveStyle(`background-color: ${COLORS.blueEnabled}`)
     expect(label).toHaveStyle(`padding: ${SPACING.spacing24}`)
   })
   it('renders the small button', () => {
@@ -44,7 +44,7 @@ describe('RadioButton', () => {
     }
     const { getByRole } = render(props)
     const label = getByRole('label')
-    expect(label).toHaveStyle(`background-color: ${LEGACY_COLORS.mediumBlueEnabled}`)
+    expect(label).toHaveStyle(`background-color: ${COLORS.mediumBlueEnabled}`)
     expect(label).toHaveStyle(`padding: ${SPACING.spacing20}`)
   })
   it('renders the small selected button', () => {
@@ -55,7 +55,7 @@ describe('RadioButton', () => {
     }
     const { getByRole } = render(props)
     const label = getByRole('label')
-    expect(label).toHaveStyle(`background-color: ${LEGACY_COLORS.blueEnabled}`)
+    expect(label).toHaveStyle(`background-color: ${COLORS.blueEnabled}`)
     expect(label).toHaveStyle(`padding: ${SPACING.spacing20}`)
   })
 })

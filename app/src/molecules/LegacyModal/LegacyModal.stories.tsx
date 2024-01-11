@@ -4,7 +4,7 @@ import { LegacyModal } from './index'
 import { StyledText } from '../../atoms/text'
 
 import type { Story, Meta } from '@storybook/react'
-import { LEGACY_COLORS, PrimaryBtn, SPACING, TYPOGRAPHY } from '@opentrons/components'
+import { COLORS, PrimaryBtn, SPACING, TYPOGRAPHY } from '@opentrons/components'
 
 export default {
   title: 'App/Molecules/LegacyModal',
@@ -26,7 +26,7 @@ const Children = (
     </StyledText>
 
     <PrimaryBtn
-      backgroundColor={LEGACY_COLORS.blueEnabled}
+      backgroundColor={COLORS.blueEnabled}
       marginTop="28rem"
       textTransform={TYPOGRAPHY.textTransformNone}
     >

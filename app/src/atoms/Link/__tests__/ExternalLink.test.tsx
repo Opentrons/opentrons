@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { renderWithProviders, LEGACY_COLORS } from '@opentrons/components'
+import { renderWithProviders, COLORS } from '@opentrons/components'
 import { ExternalLink } from '../ExternalLink'
 
 const TEST_URL = 'https://opentrons.com'
@@ -25,7 +25,7 @@ describe('ExternalLink', () => {
     const link = getByText('Test Link')
     expect(link).toHaveAttribute('href', 'https://opentrons.com')
     expect(link).toHaveAttribute('target', '_blank')
-    expect(link).toHaveStyle(`color: ${String(LEGACY_COLORS.blueEnabled)}`)
+    expect(link).toHaveStyle(`color: ${String(COLORS.blueEnabled)}`)
   })
 
   it('renders open-in-new icon', () => {

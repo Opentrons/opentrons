@@ -10,7 +10,7 @@ import {
   JUSTIFY_CENTER,
   TEXT_ALIGN_CENTER,
 } from '../../styles'
-import { LEGACY_COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import { SlotBase } from './SlotBase'
 
@@ -31,8 +31,8 @@ export function WasteChuteFixture(
   const {
     cutoutId,
     deckDefinition,
-    fixtureBaseColor = LEGACY_COLORS.light1,
-    wasteChuteColor = LEGACY_COLORS.grey2,
+    fixtureBaseColor = COLORS.light1,
+    wasteChuteColor = COLORS.grey2,
     ...restProps
   } = props
 
@@ -100,7 +100,7 @@ export function WasteChute(props: WasteChuteProps): JSX.Element {
       >
         <Icon name="trash" color={wasteIconColor} height="2rem" />
         <Text
-          color={LEGACY_COLORS.white}
+          color={COLORS.white}
           textAlign={TEXT_ALIGN_CENTER}
           css={TYPOGRAPHY.bodyTextSemiBold}
         >

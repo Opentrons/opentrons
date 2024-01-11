@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 
-import { LEGACY_COLORS } from '../../ui-style-constants'
+import { COLORS } from '../../ui-style-constants'
 import { SlotBase } from './SlotBase'
 import { SlotClip } from './SlotClip'
 import { WasteChute } from './WasteChuteFixture'
@@ -26,9 +26,9 @@ export function WasteChuteStagingAreaFixture(
   const {
     cutoutId,
     deckDefinition,
-    fixtureBaseColor = LEGACY_COLORS.light1,
-    slotClipColor = LEGACY_COLORS.darkBlack70,
-    wasteChuteColor = LEGACY_COLORS.grey2,
+    fixtureBaseColor = COLORS.light1,
+    slotClipColor = COLORS.darkBlack70,
+    wasteChuteColor = COLORS.grey2,
     ...restProps
   } = props
 

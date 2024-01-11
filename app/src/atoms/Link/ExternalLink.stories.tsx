@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Flex, LEGACY_COLORS } from '@opentrons/components'
+import { Flex, COLORS } from '@opentrons/components'
 import { ExternalLink } from './ExternalLink'
 
 import type { Story, Meta } from '@storybook/react'
@@ -10,7 +10,7 @@ export default {
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof ExternalLink>> = args => (
-  <Flex backgroundColor={LEGACY_COLORS.fundamentalsBackground}>
+  <Flex backgroundColor={COLORS.fundamentalsBackground}>
     <ExternalLink {...args} />
   </Flex>
 )

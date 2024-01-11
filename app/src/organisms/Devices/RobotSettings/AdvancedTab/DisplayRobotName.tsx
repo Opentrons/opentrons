@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   ALIGN_CENTER,
-  LEGACY_COLORS,
+  COLORS,
   JUSTIFY_SPACE_BETWEEN,
   Box,
   SPACING,
@@ -54,7 +54,7 @@ export function DisplayRobotName({
         >
           {t('robot_name')}
         </StyledText>
-        <StyledText as="p" color={LEGACY_COLORS.darkGreyEnabled}>
+        <StyledText as="p" color={COLORS.darkGreyEnabled}>
           {robotName}
         </StyledText>
       </Box>

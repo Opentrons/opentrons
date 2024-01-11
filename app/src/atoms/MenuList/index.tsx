@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {
-  LEGACY_COLORS,
+  COLORS,
   POSITION_ABSOLUTE,
   DIRECTION_COLUMN,
   Flex,
@@ -38,7 +38,7 @@ export const MenuList = (props: MenuListProps): JSX.Element | null => {
       zIndex={10}
       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
       position={POSITION_ABSOLUTE}
-      backgroundColor={LEGACY_COLORS.white}
+      backgroundColor={COLORS.white}
       top="2.6rem"
       right={`calc(50% + ${SPACING.spacing4})`}
       flexDirection={DIRECTION_COLUMN}

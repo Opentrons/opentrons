@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -118,7 +118,7 @@ export const ProtocolLabwareDetailItem = (
         >
           {namespace === 'opentrons' ? (
             <Icon
-              color={LEGACY_COLORS.blueEnabled}
+              color={COLORS.blueEnabled}
               name="check-decagram"
               height="0.75rem"
               minHeight="0.75rem"
@@ -181,7 +181,7 @@ export const LabwareDetailOverflowMenu = (
           borderRadius="4px 4px 0px 0px"
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
-          backgroundColor={LEGACY_COLORS.white}
+          backgroundColor={COLORS.white}
           top="2.3rem"
           right={0}
           flexDirection={DIRECTION_COLUMN}

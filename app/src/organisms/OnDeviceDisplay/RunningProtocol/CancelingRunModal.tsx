@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
@@ -24,7 +24,7 @@ export function CancelingRunModal(): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
-        backgroundColor={LEGACY_COLORS.darkBlack20}
+        backgroundColor={COLORS.darkBlack20}
         borderRadius={BORDERS.borderRadiusSize3}
         width="41.625rem"
         height="17.25rem"
@@ -34,7 +34,7 @@ export function CancelingRunModal(): JSX.Element {
           name="ot-spinner"
           spin
           size="3.75rem"
-          color={LEGACY_COLORS.darkBlack70}
+          color={COLORS.darkBlack70}
           aria-label="CancelingRunModal_icon"
         />
         <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>

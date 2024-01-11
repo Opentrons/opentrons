@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import {
   Icon,
   Flex,
-  LEGACY_COLORS,
+  COLORS,
   RESPONSIVENESS,
   TYPOGRAPHY,
   SIZE_4,
@@ -33,7 +33,7 @@ export function RobotMotionLoader(props: RobotMotionLoaderProps): JSX.Element {
         name="ot-spinner"
         spin
         size={SIZE_4}
-        color={LEGACY_COLORS.darkGreyEnabled}
+        color={COLORS.darkGreyEnabled}
       />
       {header != null ? <LoadingText>{header}</LoadingText> : null}
       {body != null ? <StyledText as="p">{body}</StyledText> : null}

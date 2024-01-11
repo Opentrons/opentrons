@@ -1,7 +1,7 @@
 import * as React from 'react'
 import find from 'lodash/find'
 import { Select } from './Select'
-import { LEGACY_COLORS, Flex, TYPOGRAPHY } from '@opentrons/components'
+import { COLORS, Flex, TYPOGRAPHY } from '@opentrons/components'
 import { css } from 'styled-components'
 
 import type { SelectProps, SelectOption } from './Select'
@@ -45,7 +45,7 @@ export interface SelectFieldProps {
 const CAPTION_STYLE = css`
   font-size: ${TYPOGRAPHY.fontSizeCaption};
   &.error {
-    color: ${LEGACY_COLORS.errorEnabled};
+    color: ${COLORS.errorEnabled};
     font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   }
 `

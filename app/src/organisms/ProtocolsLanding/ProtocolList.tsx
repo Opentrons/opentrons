@@ -14,7 +14,7 @@ import {
   TYPOGRAPHY,
   BORDERS,
   POSITION_ABSOLUTE,
-  LEGACY_COLORS,
+  COLORS,
   SecondaryButton,
   DIRECTION_COLUMN,
   Overlay,
@@ -39,14 +39,14 @@ import type { ProtocolSort } from './hooks'
 import type { Dispatch } from '../../redux/types'
 
 const SORT_BY_BUTTON_STYLE = css`
-  background-color: ${LEGACY_COLORS.transparent};
+  background-color: ${COLORS.transparent};
   cursor: pointer;
   &:hover {
-    background-color: ${LEGACY_COLORS.medGreyHover};
+    background-color: ${COLORS.medGreyHover};
   }
   &:active,
   &:focus {
-    background-color: ${LEGACY_COLORS.medGreyEnabled};
+    background-color: ${COLORS.medGreyEnabled};
   }
 `
 const FLEX = 'Flex'
@@ -161,7 +161,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
             <StyledText
               as="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={LEGACY_COLORS.darkGreyEnabled}
+              color={COLORS.darkGreyEnabled}
             >
               {t('shared:sort_by')}
             </StyledText>
@@ -197,7 +197,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               borderRadius={BORDERS.radiusSoftCorners}
               boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
               position={POSITION_ABSOLUTE}
-              backgroundColor={LEGACY_COLORS.white}
+              backgroundColor={COLORS.white}
               top="3.25rem"
               right="7rem"
               flexDirection={DIRECTION_COLUMN}
@@ -225,7 +225,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
           {showSortByMenu ? (
             <Overlay
               onClick={handleClickOutside}
-              backgroundColor={LEGACY_COLORS.transparent}
+              backgroundColor={COLORS.transparent}
             />
           ) : null}
           <SecondaryButton onClick={() => setShowImportProtocolSlideout(true)}>

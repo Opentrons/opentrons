@@ -4,7 +4,7 @@ import {
   Flex,
   DIRECTION_COLUMN,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   SecondaryButton,
 } from '@opentrons/components'
 
@@ -33,7 +33,7 @@ const Template: Story<React.ComponentProps<typeof ProgressBar>> = args => {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing40}
-      backgroundColor={LEGACY_COLORS.darkGreyDisabled}
+      backgroundColor={COLORS.darkGreyDisabled}
       padding={SPACING.spacing16}
     >
       <StyledText>{'Add 5% to the current progress every 0.2 sec'}</StyledText>

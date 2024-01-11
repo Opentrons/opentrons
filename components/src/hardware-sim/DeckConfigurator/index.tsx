@@ -10,7 +10,7 @@ import {
   WASTE_CHUTE_STAGING_AREA_FIXTURES,
 } from '@opentrons/shared-data'
 
-import { LEGACY_COLORS } from '../../ui-style-constants'
+import { COLORS } from '../../ui-style-constants'
 import { SingleSlotFixture } from '../BaseDeck/SingleSlotFixture'
 import { SlotLabels } from '../Deck'
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
@@ -37,8 +37,8 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     deckConfig,
     handleClickAdd,
     handleClickRemove,
-    lightFill = LEGACY_COLORS.light1,
-    darkFill = LEGACY_COLORS.darkBlackEnabled,
+    lightFill = COLORS.light1,
+    darkFill = COLORS.darkBlackEnabled,
     readOnly = false,
     showExpansion = true,
     children,
@@ -95,7 +95,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           key={cutout.id}
           cutoutId={cutout.id as CutoutId}
           deckDefinition={deckDef}
-          slotClipColor={LEGACY_COLORS.transparent}
+          slotClipColor={COLORS.transparent}
           fixtureBaseColor={lightFill}
           showExpansion={showExpansion}
         />

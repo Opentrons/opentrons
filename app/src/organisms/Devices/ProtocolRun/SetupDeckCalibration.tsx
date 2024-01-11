@@ -8,7 +8,7 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -47,7 +47,7 @@ export function SetupDeckCalibration({
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <StyledText
-          color={LEGACY_COLORS.black}
+          color={COLORS.black}
           css={TYPOGRAPHY.pSemiBold}
           id="DeckCalibration_deckCalibrationTitle"
         >

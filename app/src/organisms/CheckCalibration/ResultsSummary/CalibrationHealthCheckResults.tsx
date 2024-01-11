@@ -6,7 +6,7 @@ import {
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -31,15 +31,15 @@ export const CalibrationHealthCheckResults = ({
         }
         backgroundColor={
           isCalibrationRecommended
-            ? LEGACY_COLORS.warningBackgroundLight
-            : LEGACY_COLORS.successBackgroundLight
+            ? COLORS.warningBackgroundLight
+            : COLORS.successBackgroundLight
         }
         iconColor={
           isCalibrationRecommended
-            ? LEGACY_COLORS.warningEnabled
-            : LEGACY_COLORS.successEnabled
+            ? COLORS.warningEnabled
+            : COLORS.successEnabled
         }
-        textColor={LEGACY_COLORS.darkBlackEnabled}
+        textColor={COLORS.darkBlackEnabled}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         iconSize="0.3125rem"
       ></StatusLabel>

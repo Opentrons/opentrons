@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { SPACING, Flex, LEGACY_COLORS, BORDERS } from '@opentrons/components'
+import { SPACING, Flex, COLORS, BORDERS } from '@opentrons/components'
 
 import type { StyleProps } from '@opentrons/components'
 
@@ -11,36 +11,36 @@ interface MiniCardProps extends StyleProps {
   isError?: boolean
 }
 const unselectedOptionStyles = css`
-  background-color: ${LEGACY_COLORS.white};
-  border: 1px solid ${LEGACY_COLORS.medGreyEnabled};
+  background-color: ${COLORS.white};
+  border: 1px solid ${COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing8};
   width: 100%;
   cursor: pointer;
 
   &:hover {
-    border: 1px solid ${LEGACY_COLORS.medGreyHover};
+    border: 1px solid ${COLORS.medGreyHover};
   }
 `
 const selectedOptionStyles = css`
   ${unselectedOptionStyles}
-  border: 1px solid ${LEGACY_COLORS.blueEnabled};
-  background-color: ${LEGACY_COLORS.lightBlue};
+  border: 1px solid ${COLORS.blueEnabled};
+  background-color: ${COLORS.lightBlue};
 
   &:hover {
-    border: 1px solid ${LEGACY_COLORS.blueEnabled};
-    background-color: ${LEGACY_COLORS.lightBlue};
+    border: 1px solid ${COLORS.blueEnabled};
+    background-color: ${COLORS.lightBlue};
   }
 `
 
 const errorOptionStyles = css`
   ${selectedOptionStyles}
-  border: 1px solid ${LEGACY_COLORS.errorEnabled};
-  background-color: ${LEGACY_COLORS.errorBackgroundLight};
+  border: 1px solid ${COLORS.errorEnabled};
+  background-color: ${COLORS.errorBackgroundLight};
 
   &:hover {
-    border: 1px solid ${LEGACY_COLORS.errorEnabled};
-    background-color: ${LEGACY_COLORS.errorBackgroundLight};
+    border: 1px solid ${COLORS.errorEnabled};
+    background-color: ${COLORS.errorBackgroundLight};
   }
 `
 

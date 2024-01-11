@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { BORDERS, LEGACY_COLORS, renderWithProviders } from '@opentrons/components'
+import { BORDERS, COLORS, renderWithProviders } from '@opentrons/components'
 import { EquipmentOption } from '../EquipmentOption'
 
 const render = (props: React.ComponentProps<typeof EquipmentOption>) => {
@@ -27,7 +27,7 @@ describe('EquipmentOption', () => {
     }
     const { getByLabelText } = render(props)
     expect(getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.darkGreyDisabled}`
+      `background-color: ${COLORS.darkGreyDisabled}`
     )
   })
   it('renders the equipment option without check not selected and image', () => {
@@ -41,7 +41,7 @@ describe('EquipmentOption', () => {
     getByRole('img')
     expect(
       getByLabelText('EquipmentOption_checkbox-blank-outline')
-    ).toHaveStyle(`color: ${LEGACY_COLORS.darkGreyEnabled}`)
+    ).toHaveStyle(`color: ${COLORS.darkGreyEnabled}`)
     expect(getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
       `border: ${BORDERS.lineBorder}`
     )
@@ -55,7 +55,7 @@ describe('EquipmentOption', () => {
     const { getByText, getByLabelText } = render(props)
     getByText('mockText')
     expect(getByLabelText('EquipmentOption_checkbox-marked')).toHaveStyle(
-      `color: ${LEGACY_COLORS.blueEnabled}`
+      `color: ${COLORS.blueEnabled}`
     )
     expect(getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
       `border: ${BORDERS.activeLineBorder}`

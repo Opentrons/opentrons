@@ -9,7 +9,7 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   ALIGN_FLEX_START,
-  LEGACY_COLORS,
+  COLORS,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { StyledText } from '../../../atoms/text'
@@ -30,7 +30,7 @@ export const HeaterShakerModuleCard = (
 
   return (
     <Flex
-      backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+      backgroundColor={COLORS.fundamentalsBackground}
       borderRadius={SPACING.spacing4}
       marginBottom={SPACING.spacing8}
       padding={`${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8}`}
@@ -45,7 +45,7 @@ export const HeaterShakerModuleCard = (
         <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING.spacing8}>
           <StyledText
             textTransform={TYPOGRAPHY.textTransformUppercase}
-            color={LEGACY_COLORS.darkGreyEnabled}
+            color={COLORS.darkGreyEnabled}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeCaption}
             paddingBottom={SPACING.spacing4}
@@ -62,7 +62,7 @@ export const HeaterShakerModuleCard = (
               aria-label="heater-shaker"
               size={SIZE_1}
               marginRight={SPACING.spacing4}
-              color={LEGACY_COLORS.darkGreyEnabled}
+              color={COLORS.darkGreyEnabled}
             />
             <StyledText fontSize={TYPOGRAPHY.fontSizeP}>
               {getModuleDisplayName(module.moduleModel)}

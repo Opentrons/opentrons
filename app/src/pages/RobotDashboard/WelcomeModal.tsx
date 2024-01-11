@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
@@ -77,7 +77,7 @@ export function WelcomeModal({
           <StyledText
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightRegular}
-            color={LEGACY_COLORS.darkBlack90}
+            color={COLORS.darkBlack90}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
             {t('welcome_modal_description')}

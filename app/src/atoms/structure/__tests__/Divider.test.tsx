@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { renderWithProviders, SPACING, LEGACY_COLORS } from '@opentrons/components'
+import { renderWithProviders, SPACING, COLORS } from '@opentrons/components'
 import { Divider } from '../index'
 
 const render = (props: React.ComponentProps<typeof Divider>) => {
@@ -19,7 +19,7 @@ describe('Divider', () => {
     const { getByTestId } = render(props)
     const divider = getByTestId('divider')
     expect(divider).toHaveStyle(
-      `borderBottom: 1px solid ${String(LEGACY_COLORS.medGreyEnabled)}`
+      `borderBottom: 1px solid ${String(COLORS.medGreyEnabled)}`
     )
     expect(divider).toHaveStyle('width: 80%')
     expect(divider).toHaveStyle(`margin-top: ${SPACING.spacing4}`)
@@ -30,13 +30,13 @@ describe('Divider', () => {
     props = {
       ...props,
       width: '100%',
-      color: LEGACY_COLORS.blueEnabled,
+      color: COLORS.blueEnabled,
       marginY: 0,
       paddingX: SPACING.spacing4,
     }
     const { getByTestId } = render(props)
     const divider = getByTestId('divider')
-    expect(divider).toHaveStyle(`color: ${String(LEGACY_COLORS.blueEnabled)}`)
+    expect(divider).toHaveStyle(`color: ${String(COLORS.blueEnabled)}`)
     expect(divider).toHaveStyle('width: 100%')
     expect(divider).toHaveStyle('margin-top: 0')
     expect(divider).toHaveStyle('margin-bottom: 0')

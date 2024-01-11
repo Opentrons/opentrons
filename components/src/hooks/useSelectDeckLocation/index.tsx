@@ -23,7 +23,7 @@ import {
 import { Icon } from '../../icons'
 import { Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
-import { LEGACY_COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
 import type {
   DeckDefinition,
@@ -110,14 +110,14 @@ export function DeckLocationSelect({
           const isSelected = isEqual(selectedLocation, slotLocation)
           let fill =
             theme === 'default'
-              ? LEGACY_COLORS.highlightPurple2
-              : LEGACY_COLORS.lightGreyPressed
+              ? COLORS.highlightPurple2
+              : COLORS.lightGreyPressed
           if (isSelected)
             fill =
               theme === 'default'
-                ? LEGACY_COLORS.highlightPurple1
-                : LEGACY_COLORS.darkGreyEnabled
-          if (isDisabled) fill = LEGACY_COLORS.darkGreyDisabled
+                ? COLORS.highlightPurple1
+                : COLORS.darkGreyEnabled
+          if (isDisabled) fill = COLORS.darkGreyDisabled
           if (isSelected && slot.id === 'B1' && isThermocycler) {
             return (
               <g key="thermocyclerSelectionArea">
@@ -135,9 +135,9 @@ export function DeckLocationSelect({
                   <Icon
                     name="check-circle"
                     size="1.5rem"
-                    color={LEGACY_COLORS.white}
+                    color={COLORS.white}
                   />
-                  <Text color={LEGACY_COLORS.white} fontSize="1.5rem">
+                  <Text color={COLORS.white} fontSize="1.5rem">
                     Selected
                   </Text>
                 </RobotCoordsForeignDiv>
@@ -156,7 +156,7 @@ export function DeckLocationSelect({
                 <SingleSlotFixture
                   cutoutId={cutoutId}
                   fixtureBaseColor={fill}
-                  slotClipColor={LEGACY_COLORS.white}
+                  slotClipColor={COLORS.white}
                   onClick={() =>
                     !isDisabled &&
                     setSelectedLocation != null &&
@@ -174,7 +174,7 @@ export function DeckLocationSelect({
                   robotType={robotType}
                   slotBaseColor={fill}
                   slotName={slot.id}
-                  slotClipColor={LEGACY_COLORS.white}
+                  slotClipColor={COLORS.white}
                   onClick={() =>
                     !isDisabled &&
                     setSelectedLocation != null &&
@@ -204,7 +204,7 @@ export function DeckLocationSelect({
                   innerDivProps={INNER_DIV_PROPS}
                 >
                   <Text
-                    color={LEGACY_COLORS.white}
+                    color={COLORS.white}
                     css={
                       robotType === FLEX_ROBOT_TYPE
                         ? TYPOGRAPHY.level4HeaderSemiBold
@@ -224,7 +224,7 @@ export function DeckLocationSelect({
           layerBlocklist={OT2_DECK_LOCATION_SELECT_LAYER_BLOCK_LIST}
         />
       ) : null}
-      <SlotLabels robotType={robotType} color={LEGACY_COLORS.darkGreyEnabled} />
+      <SlotLabels robotType={robotType} color={COLORS.darkGreyEnabled} />
     </RobotCoordinateSpace>
   )
 }

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { renderWithProviders, LEGACY_COLORS } from '@opentrons/components'
+import { renderWithProviders, COLORS } from '@opentrons/components'
 import { ProgressBar } from '..'
 
 const render = (props: React.ComponentProps<typeof ProgressBar>) => {
@@ -24,7 +24,7 @@ describe('ProgressBar', () => {
     const [{ getByTestId }] = render(props)
     const container = getByTestId('ProgressBar_Container')
     const bar = getByTestId('ProgressBar_Bar')
-    expect(container).toHaveStyle(`background: ${LEGACY_COLORS.white}`)
+    expect(container).toHaveStyle(`background: ${COLORS.white}`)
     expect(bar).toHaveStyle('width: 0%')
   })
 
@@ -32,7 +32,7 @@ describe('ProgressBar', () => {
     props.percentComplete = 50
     const [{ getByTestId }] = render(props)
     const bar = getByTestId('ProgressBar_Bar')
-    expect(bar).toHaveStyle(`background: ${LEGACY_COLORS.blueEnabled}`)
+    expect(bar).toHaveStyle(`background: ${COLORS.blueEnabled}`)
     expect(bar).toHaveStyle('width: 50%')
   })
 
@@ -40,19 +40,19 @@ describe('ProgressBar', () => {
     props.percentComplete = 100
     const [{ getByTestId }] = render(props)
     const bar = getByTestId('ProgressBar_Bar')
-    expect(bar).toHaveStyle(`background: ${LEGACY_COLORS.blueEnabled}`)
+    expect(bar).toHaveStyle(`background: ${COLORS.blueEnabled}`)
     expect(bar).toHaveStyle('width: 100%')
   })
 
   it('renders LinerProgress Bar at 50% + red width', () => {
     props.percentComplete = 50
     props.innerStyles = css`
-      background: ${LEGACY_COLORS.errorEnabled};
+      background: ${COLORS.errorEnabled};
     `
     const [{ getByTestId }] = render(props)
     const bar = getByTestId('ProgressBar_Bar')
-    expect(bar).not.toHaveStyle(`background: ${LEGACY_COLORS.blueEnabled}`)
-    expect(bar).toHaveStyle(`background: ${LEGACY_COLORS.errorEnabled}`)
+    expect(bar).not.toHaveStyle(`background: ${COLORS.blueEnabled}`)
+    expect(bar).toHaveStyle(`background: ${COLORS.errorEnabled}`)
     expect(bar).toHaveStyle('width: 50%')
   })
 })

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
   SecondaryButton,
@@ -22,7 +22,7 @@ export function UnskippableModal(props: UnskippableModalProps): JSX.Element {
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   return (
     <SimpleWizardBody
-      iconColor={LEGACY_COLORS.warningEnabled}
+      iconColor={COLORS.warningEnabled}
       header={i18n.format(t('critical_unskippable_step'), 'capitalize')}
       subHeader={t('must_detach_mounting_plate')}
       isSuccess={false}

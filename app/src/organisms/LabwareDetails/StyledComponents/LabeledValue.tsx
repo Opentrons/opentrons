@@ -4,7 +4,7 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
 } from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'
@@ -22,7 +22,7 @@ export function LabeledValue({ label, value }: LabeledValueProps): JSX.Element {
       alignItems={ALIGN_CENTER}
       paddingY={SPACING.spacing8}
     >
-      <StyledText as="h6" color={LEGACY_COLORS.darkGreyEnabled}>
+      <StyledText as="h6" color={COLORS.darkGreyEnabled}>
         {label}
       </StyledText>
       <StyledText as="p">{value}</StyledText>

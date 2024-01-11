@@ -3,7 +3,7 @@ import ReactSelect, { components, DropdownIndicatorProps } from 'react-select'
 import {
   BORDERS,
   Box,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_ROW,
   Icon,
   POSITION_ABSOLUTE,
@@ -43,15 +43,15 @@ export function Select(props: SelectComponentProps): JSX.Element {
       border: BORDERS.lineBorder,
       width: props.width != null ? props.width : 'auto',
       height: SPACING.spacing16,
-      borderColor: LEGACY_COLORS.medGreyEnabled,
+      borderColor: COLORS.medGreyEnabled,
       boxShadow: 'none',
       padding: SPACING.spacing6,
       flexDirection: DIRECTION_ROW,
       '&:hover': {
-        borderColor: LEGACY_COLORS.medGreyHover,
+        borderColor: COLORS.medGreyHover,
       },
       '&:active': {
-        borderColor: LEGACY_COLORS.medGreyHover,
+        borderColor: COLORS.medGreyHover,
       },
     }),
     container: (styles: CSSObjectWithLabel) => ({
@@ -62,7 +62,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
     group: NO_STYLE_FN,
     groupHeading: (styles: CSSObjectWithLabel) => ({
       ...styles,
-      color: LEGACY_COLORS.darkBlackEnabled,
+      color: COLORS.darkBlackEnabled,
       fontWeight: TYPOGRAPHY.fontWeightSemiBold,
       fontSize: TYPOGRAPHY.fontSizeP,
     }),
@@ -80,7 +80,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
     loadingMessage: NO_STYLE_FN,
     menu: (styles: CSSObjectWithLabel) => ({
       ...styles,
-      backgroundColor: LEGACY_COLORS.white,
+      backgroundColor: COLORS.white,
       width: props.width != null ? props.width : 'auto',
       boxShadowcha: '0px 1px 3px rgba(0, 0, 0, 0.2)',
       borderRadius: '4px 4px 0px 0px',
@@ -102,27 +102,27 @@ export function Select(props: SelectComponentProps): JSX.Element {
     noOptionsMessage: (styles: CSSObjectWithLabel) => ({
       ...styles,
       padding: SPACING.spacing6,
-      color: LEGACY_COLORS.darkBlackEnabled,
+      color: COLORS.darkBlackEnabled,
     }),
     option: (styles: CSSObjectWithLabel, state: OptionProps<SelectOption>) => ({
       ...styles,
       color: Boolean(state.isDisabled)
-        ? LEGACY_COLORS.darkGreyDisabled
-        : LEGACY_COLORS.darkBlackEnabled,
+        ? COLORS.darkGreyDisabled
+        : COLORS.darkBlackEnabled,
       backgroundColor: Boolean(state.isSelected)
-        ? LEGACY_COLORS.lightBlue
-        : LEGACY_COLORS.white,
+        ? COLORS.lightBlue
+        : COLORS.white,
       '&:hover': {
-        backgroundColor: LEGACY_COLORS.lightBlue,
+        backgroundColor: COLORS.lightBlue,
       },
       '&:active': {
-        backgroundColor: LEGACY_COLORS.lightBlue,
+        backgroundColor: COLORS.lightBlue,
       },
     }),
     placeholder: (styles: CSSObjectWithLabel) => ({
       ...styles,
       marginLeft: SPACING.spacing8,
-      color: LEGACY_COLORS.darkBlackEnabled,
+      color: COLORS.darkBlackEnabled,
       fontSize: TYPOGRAPHY.fontSizeP,
       marginTop: '0.2rem',
     }),

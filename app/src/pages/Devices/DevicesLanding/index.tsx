@@ -12,7 +12,7 @@ import {
   DIRECTION_COLUMN,
   SIZE_6,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   Link,
   TYPOGRAPHY,
   POSITION_ABSOLUTE,
@@ -154,7 +154,7 @@ function DevicesLoadingState(): JSX.Element {
         size="3.25rem"
         marginTop={SPACING.spacing16}
         marginBottom={SPACING.spacing16}
-        color={LEGACY_COLORS.darkGreyEnabled}
+        color={COLORS.darkGreyEnabled}
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}

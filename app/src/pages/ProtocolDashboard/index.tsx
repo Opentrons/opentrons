@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -161,7 +161,7 @@ export function ProtocolDashboard(): JSX.Element {
               <StyledText
                 as="p"
                 marginBottom={SPACING.spacing8}
-                color={LEGACY_COLORS.darkBlack70}
+                color={COLORS.darkBlack70}
               >
                 {t('pinned_protocols')}
               </StyledText>
@@ -177,7 +177,7 @@ export function ProtocolDashboard(): JSX.Element {
             <>
               <Flex
                 alignItems={ALIGN_CENTER}
-                backgroundColor={LEGACY_COLORS.white}
+                backgroundColor={COLORS.white}
                 flexDirection={DIRECTION_ROW}
                 paddingBottom={SPACING.spacing16}
                 paddingTop={SPACING.spacing16}

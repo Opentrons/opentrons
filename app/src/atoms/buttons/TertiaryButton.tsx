@@ -2,17 +2,17 @@ import styled from 'styled-components'
 import {
   NewPrimaryBtn,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   BORDERS,
   TYPOGRAPHY,
   styleProps,
 } from '@opentrons/components'
 
 export const TertiaryButton = styled(NewPrimaryBtn)`
-  background-color: ${LEGACY_COLORS.blueEnabled};
+  background-color: ${COLORS.blueEnabled};
   border-radius: ${BORDERS.radiusRoundEdge};
   box-shadow: none;
-  color: ${LEGACY_COLORS.fundamentalsBackground};
+  color: ${COLORS.fundamentalsBackground};
   overflow: no-wrap;
   padding-left: ${SPACING.spacing16};
   padding-right: ${SPACING.spacing16};
@@ -23,20 +23,20 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
   ${styleProps}
 
   &:hover {
-    background-color: ${LEGACY_COLORS.blueHover};
+    background-color: ${COLORS.blueHover};
     box-shadow: none;
   }
 
   &:active {
-    background-color: ${LEGACY_COLORS.bluePressed};
+    background-color: ${COLORS.bluePressed};
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${LEGACY_COLORS.fundamentalsFocus};
+    box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
   }
 
   &:disabled {
-    background-color: ${LEGACY_COLORS.darkGreyDisabled};
-    color: ${LEGACY_COLORS.errorDisabled};
+    background-color: ${COLORS.darkGreyDisabled};
+    color: ${COLORS.errorDisabled};
   }
 `

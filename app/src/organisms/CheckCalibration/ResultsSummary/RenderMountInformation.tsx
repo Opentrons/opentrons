@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   DIRECTION_COLUMN,
-  LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
@@ -32,7 +32,7 @@ export const RenderMountInformation = ({
     <Flex flexDirection={DIRECTION_COLUMN}>
       <StyledText
         css={TYPOGRAPHY.h6SemiBold}
-        color={LEGACY_COLORS.darkGreyEnabled}
+        color={COLORS.darkGreyEnabled}
         textTransform={TYPOGRAPHY.textTransformUppercase}
       >{`${mount} MOUNT`}</StyledText>
       {pipette != null ? (

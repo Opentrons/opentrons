@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
@@ -21,7 +21,7 @@ export function NoProtocols(): JSX.Element {
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={LEGACY_COLORS.darkBlack20}
+      backgroundColor={COLORS.darkBlack20}
       flexDirection={DIRECTION_COLUMN}
       height="27.25rem"
       justifyContent={JUSTIFY_CENTER}
@@ -41,7 +41,7 @@ export function NoProtocols(): JSX.Element {
       >
         {t('nothing_here_yet')}
       </StyledText>
-      <StyledText as="h4" color={LEGACY_COLORS.darkBlack70}>
+      <StyledText as="h4" color={COLORS.darkBlack70}>
         {t('send_a_protocol_to_store')}
       </StyledText>
     </Flex>

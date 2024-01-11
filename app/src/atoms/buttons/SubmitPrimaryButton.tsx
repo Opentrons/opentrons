@@ -2,7 +2,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import {
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   BORDERS,
   TYPOGRAPHY,
   styleProps,
@@ -18,10 +18,10 @@ export const SubmitPrimaryButton = (
   props: SubmitPrimaryButtonProps
 ): JSX.Element => {
   const SUBMIT_INPUT_STYLE = css`
-    background-color: ${LEGACY_COLORS.blueEnabled};
+    background-color: ${COLORS.blueEnabled};
     border-radius: ${BORDERS.radiusSoftCorners};
     padding: ${SPACING.spacing8} ${SPACING.spacing16};
-    color: ${LEGACY_COLORS.white};
+    color: ${COLORS.white};
     ${TYPOGRAPHY.pSemiBold}
     width: 100%;
     border: none;
@@ -29,21 +29,21 @@ export const SubmitPrimaryButton = (
     ${styleProps}
 
     &:focus-visible {
-      box-shadow: 0 0 0 3px ${LEGACY_COLORS.warningEnabled};
+      box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
     }
 
     &:hover {
-      background-color: ${LEGACY_COLORS.blueHover};
+      background-color: ${COLORS.blueHover};
       box-shadow: 0 0 0;
     }
 
     &:active {
-      background-color: ${LEGACY_COLORS.bluePressed};
+      background-color: ${COLORS.bluePressed};
     }
 
     &:disabled {
-      background-color: ${LEGACY_COLORS.darkGreyDisabled};
-      color: ${LEGACY_COLORS.successDisabled};
+      background-color: ${COLORS.darkGreyDisabled};
+      color: ${COLORS.successDisabled};
     }
   `
   return <input {...props} css={SUBMIT_INPUT_STYLE} type="submit" />

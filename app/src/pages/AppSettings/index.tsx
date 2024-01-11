@@ -10,7 +10,7 @@ import {
   ALIGN_START,
   DIRECTION_ROW,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   BORDERS,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -47,10 +47,10 @@ export function AppSettings(): JSX.Element {
   return (
     <Flex paddingX={SPACING.spacing16} paddingY={SPACING.spacing16}>
       <Box
-        backgroundColor={LEGACY_COLORS.white}
+        backgroundColor={COLORS.white}
         height="100%"
         width="100%"
-        border={`1px ${BORDERS.styleSolid} ${LEGACY_COLORS.medGreyEnabled}`}
+        border={`1px ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
         borderRadius={BORDERS.radiusSoftCorners}
         minHeight="95%"
       >

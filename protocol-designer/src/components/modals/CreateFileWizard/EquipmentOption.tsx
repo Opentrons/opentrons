@@ -7,7 +7,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   JUSTIFY_CENTER,
-  LEGACY_COLORS,
+  COLORS,
   StyleProps,
   TYPOGRAPHY,
   useHoverTooltip,
@@ -51,7 +51,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
         borderRadius={BORDERS.borderRadiusSize2}
         cursor={disabled ? 'auto' : 'pointer'}
         backgroundColor={
-          disabled ? LEGACY_COLORS.darkGreyDisabled : LEGACY_COLORS.transparent
+          disabled ? COLORS.darkGreyDisabled : COLORS.transparent
         }
         onClick={disabled ? undefined : onClick}
         {...styleProps}
@@ -62,7 +62,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
             aria-label={`EquipmentOption_${
               isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'
             }`}
-            color={isSelected ? LEGACY_COLORS.blueEnabled : LEGACY_COLORS.darkGreyEnabled}
+            color={isSelected ? COLORS.blueEnabled : COLORS.darkGreyEnabled}
             size="1.5rem"
             name={isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'}
           />
@@ -77,7 +77,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
         <Text
           as="p"
           fontSize={TYPOGRAPHY.fontSizeP}
-          color={disabled ? LEGACY_COLORS.errorDisabled : LEGACY_COLORS.darkBlackEnabled}
+          color={disabled ? COLORS.errorDisabled : COLORS.darkBlackEnabled}
         >
           {text}
         </Text>

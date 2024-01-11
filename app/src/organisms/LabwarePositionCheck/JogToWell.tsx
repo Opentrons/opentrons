@@ -11,7 +11,7 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   WELL_LABEL_OPTIONS,
   ALIGN_FLEX_START,
   PrimaryButton,
@@ -104,7 +104,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
   }
 
   const wellStroke: WellStroke = wellsToHighlight.reduce(
-    (acc, wellName) => ({ ...acc, [wellName]: LEGACY_COLORS.blueEnabled }),
+    (acc, wellName) => ({ ...acc, [wellName]: COLORS.blueEnabled }),
     {}
   )
 
@@ -144,8 +144,8 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
                   wellStroke={wellStroke}
                   wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_OUTSIDE}
                   highlightedWellLabels={{ wells: wellsToHighlight }}
-                  labwareStroke={LEGACY_COLORS.medGreyEnabled}
-                  wellLabelColor={LEGACY_COLORS.medGreyEnabled}
+                  labwareStroke={COLORS.medGreyEnabled}
+                  wellLabelColor={COLORS.medGreyEnabled}
                 />
                 <PipetteRender
                   labwareDef={labwareDef}

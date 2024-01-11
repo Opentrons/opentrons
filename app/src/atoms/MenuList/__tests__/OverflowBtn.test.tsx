@@ -1,7 +1,7 @@
 import 'jest-styled-components'
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
-import { LEGACY_COLORS, renderWithProviders } from '@opentrons/components'
+import { COLORS, renderWithProviders } from '@opentrons/components'
 import { OverflowBtn } from '../OverflowBtn'
 
 const render = (props: React.ComponentProps<typeof OverflowBtn>) => {
@@ -27,7 +27,7 @@ describe('OverflowBtn', () => {
 
     expect(getByRole('button')).toHaveStyleRule(
       'background-color',
-      `${String(LEGACY_COLORS.lightGreyHover)}`,
+      `${String(COLORS.lightGreyHover)}`,
       {
         modifier: ':hover',
       }
@@ -41,7 +41,7 @@ describe('OverflowBtn', () => {
 
     expect(getByRole('button')).toHaveStyleRule(
       'background-color',
-      `${String(LEGACY_COLORS.lightGreyPressed)}`,
+      `${String(COLORS.lightGreyPressed)}`,
       {
         modifier: ':active',
       }
@@ -55,7 +55,7 @@ describe('OverflowBtn', () => {
 
     expect(getByRole('button')).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${String(LEGACY_COLORS.fundamentalsFocus)}`,
+      `0 0 0 3px ${String(COLORS.fundamentalsFocus)}`,
       {
         modifier: ':focus-visible',
       }
@@ -69,7 +69,7 @@ describe('OverflowBtn', () => {
 
     expect(getByRole('button')).toHaveStyleRule(
       'fill',
-      `${String(LEGACY_COLORS.successDisabled)}`,
+      `${String(COLORS.successDisabled)}`,
       {
         modifier: ':disabled circle',
       }

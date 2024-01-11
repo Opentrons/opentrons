@@ -8,7 +8,7 @@ import {
   JUSTIFY_CENTER,
   SPACING,
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
   BORDERS,
 } from '@opentrons/components'
 
@@ -19,7 +19,7 @@ export function DisplaySearchNetwork(): JSX.Element {
   return (
     <Flex
       height="17.5rem"
-      backgroundColor={LEGACY_COLORS.white}
+      backgroundColor={COLORS.white}
       justifyContent={JUSTIFY_CENTER}
       borderRadius={BORDERS.borderRadiusSize3}
       width="100%"
@@ -32,7 +32,7 @@ export function DisplaySearchNetwork(): JSX.Element {
       >
         <StyledText
           as="h3"
-          color={LEGACY_COLORS.darkBlack70}
+          color={COLORS.darkBlack70}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing40}
         >

@@ -6,7 +6,7 @@ import {
   SPACING,
   PrimaryButton,
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { StyledText } from '../../../atoms/text'
@@ -57,7 +57,7 @@ export const AboutPipetteSlideout = (
             <StyledText
               as="h6"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={LEGACY_COLORS.darkGreyEnabled}
+              color={COLORS.darkGreyEnabled}
             >
               {i18n.format(t('current_version'), 'upperCase')}
             </StyledText>
@@ -73,7 +73,7 @@ export const AboutPipetteSlideout = (
         <StyledText
           as="h6"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={LEGACY_COLORS.darkGreyEnabled}
+          color={COLORS.darkGreyEnabled}
           data-testid={`AboutPipetteSlideout_serial_number_text_${pipetteId}`}
         >
           {i18n.format(t('serial_number'), 'upperCase')}

@@ -5,7 +5,7 @@ import {
   Box,
   Icon,
   Link,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -29,7 +29,7 @@ export function ManufacturerDetails(
 
   return (
     <Box
-      backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+      backgroundColor={COLORS.fundamentalsBackground}
       padding={SPACING.spacing16}
     >
       <Flex

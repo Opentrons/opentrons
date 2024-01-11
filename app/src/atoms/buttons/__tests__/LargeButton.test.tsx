@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders, LEGACY_COLORS } from '@opentrons/components'
+import { renderWithProviders, COLORS } from '@opentrons/components'
 
 import { LargeButton } from '../LargeButton'
 
@@ -22,7 +22,7 @@ describe('LargeButton', () => {
     fireEvent.click(screen.getByText('large button'))
     expect(props.onClick).toHaveBeenCalled()
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.blueEnabled}`
+      `background-color: ${COLORS.blueEnabled}`
     )
   })
   it('renders the alert button', () => {
@@ -32,7 +32,7 @@ describe('LargeButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.red3}`
+      `background-color: ${COLORS.red3}`
     )
   })
   it('renders the secondary button', () => {
@@ -42,7 +42,7 @@ describe('LargeButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.mediumBlueEnabled}`
+      `background-color: ${COLORS.mediumBlueEnabled}`
     )
   })
   it('renders the button as disabled', () => {

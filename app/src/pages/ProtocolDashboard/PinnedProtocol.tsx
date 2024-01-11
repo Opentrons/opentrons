@@ -7,7 +7,7 @@ import styled, { css } from 'styled-components'
 import {
   ALIGN_FLEX_START,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -95,14 +95,14 @@ export function PinnedProtocol(props: {
 
   const PUSHED_STATE_STYLE = css`
     &:active {
-      background-color: ${longpress.isLongPressed ? '' : LEGACY_COLORS.darkBlack40};
+      background-color: ${longpress.isLongPressed ? '' : COLORS.darkBlack40};
     }
   `
 
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
-      backgroundColor={LEGACY_COLORS.light1}
+      backgroundColor={COLORS.light1}
       borderRadius={BORDERS.borderRadiusSize4}
       css={PUSHED_STATE_STYLE}
       flexDirection={DIRECTION_COLUMN}
@@ -129,7 +129,7 @@ export function PinnedProtocol(props: {
         gridGap={SPACING.spacing8}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         width="100%"
-        color={LEGACY_COLORS.darkBlack70}
+        color={COLORS.darkBlack70}
       >
         <StyledText as="p">
           {lastRun !== undefined

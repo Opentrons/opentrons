@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   Flex,
   LocationIcon,
   ModuleIcon,
@@ -41,8 +41,8 @@ const TableHeader = styled('th')`
 `
 
 const TableRow = styled('tr')`
-  background-color: ${LEGACY_COLORS.light1};
-  border: 1px ${LEGACY_COLORS.white} solid;
+  background-color: ${COLORS.light1};
+  border: 1px ${COLORS.white} solid;
   height: 4.75rem;
 `
 
@@ -102,7 +102,7 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
           <TableHeader>
             <StyledText
               fontSize={TYPOGRAPHY.fontSize20}
-              color={LEGACY_COLORS.darkBlack70}
+              color={COLORS.darkBlack70}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingLeft={SPACING.spacing24}
             >
@@ -112,7 +112,7 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
           <TableHeader>
             <StyledText
               fontSize={TYPOGRAPHY.fontSize20}
-              color={LEGACY_COLORS.darkBlack70}
+              color={COLORS.darkBlack70}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingLeft={SPACING.spacing24}
             >

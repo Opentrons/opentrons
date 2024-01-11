@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
@@ -77,7 +77,7 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
 
   return (
     <Flex
-      backgroundColor={LEGACY_COLORS.light1}
+      backgroundColor={COLORS.light1}
       borderRadius={BORDERS.borderRadiusSize4}
       fontSize={TYPOGRAPHY.fontSize22}
       flexDirection={DIRECTION_COLUMN}
@@ -94,7 +94,7 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
         <Flex
           borderRadius={BORDERS.borderRadiusSize2}
           padding={SPACING.spacing16}
-          backgroundColor={LEGACY_COLORS.white}
+          backgroundColor={COLORS.white}
           height="3.75rem"
           width="3.75rem"
         >
@@ -115,7 +115,7 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
         </Flex>
         <Flex justifyContent={JUSTIFY_FLEX_END} flex="1">
           <Flex
-            backgroundColor={LEGACY_COLORS.darkBlack20}
+            backgroundColor={COLORS.darkBlack20}
             borderRadius={BORDERS.radiusSoftCorners}
             height="2.75rem"
             padding={`${SPACING.spacing8} ${SPACING.spacing12}`}

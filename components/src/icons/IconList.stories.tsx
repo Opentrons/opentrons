@@ -7,7 +7,7 @@ import {
   WRAP,
   TYPOGRAPHY,
   ALIGN_CENTER,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   BORDERS,
 } from '@opentrons/components'
@@ -81,8 +81,8 @@ const Template: Story<React.ComponentProps<typeof IconComponent>> = args => {
           onClick={() => handleCopy(name, index)}
           border={
             selectedIcon === name
-              ? `2px solid ${LEGACY_COLORS.blueEnabled}`
-              : `2px solid ${LEGACY_COLORS.darkBlackEnabled}`
+              ? `2px solid ${COLORS.blueEnabled}`
+              : `2px solid ${COLORS.darkBlackEnabled}`
           }
         >
           <IconComponent name={name as IconName} size="4rem" />
@@ -95,7 +95,7 @@ const Template: Story<React.ComponentProps<typeof IconComponent>> = args => {
           </Text>
           <Flex height="1.5rem">
             {showText ? (
-              <Text color={LEGACY_COLORS.blueEnabled}> {'copied'}</Text>
+              <Text color={COLORS.blueEnabled}> {'copied'}</Text>
             ) : null}
           </Flex>
         </Flex>
@@ -105,5 +105,5 @@ const Template: Story<React.ComponentProps<typeof IconComponent>> = args => {
 }
 export const IconList = Template.bind({})
 IconList.args = {
-  backgroundColor: LEGACY_COLORS.blueEnabled,
+  backgroundColor: COLORS.blueEnabled,
 }

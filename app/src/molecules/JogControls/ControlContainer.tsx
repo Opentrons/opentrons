@@ -2,7 +2,7 @@ import React from 'react'
 import { css } from 'styled-components'
 import {
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   JUSTIFY_CENTER,
   Flex,
@@ -17,7 +17,7 @@ interface ControlContainerProps extends StyleProps {
 }
 
 const CONTROL_CHILDREN_STYLES = css`
-  background-color: ${LEGACY_COLORS.fundamentalsBackground};
+  background-color: ${COLORS.fundamentalsBackground};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing16};
   width: 100%;

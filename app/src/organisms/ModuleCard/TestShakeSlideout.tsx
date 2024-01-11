@@ -6,7 +6,7 @@ import {
   Flex,
   TYPOGRAPHY,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Icon,
   DIRECTION_ROW,
@@ -168,14 +168,14 @@ export const TestShakeSlideout = (
       <Flex
         borderRadius={BORDERS.radiusSoftCorners}
         marginBottom={SPACING.spacing8}
-        backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+        backgroundColor={COLORS.fundamentalsBackground}
         paddingY={SPACING.spacing16}
         paddingLeft={SPACING.spacing4}
         paddingRight={SPACING.spacing16}
         flexDirection={DIRECTION_ROW}
         data-testid="test_shake_slideout_banner_info"
       >
-        <Flex color={LEGACY_COLORS.darkGreyEnabled}>
+        <Flex color={COLORS.darkGreyEnabled}>
           <Icon
             name="information"
             size={SPACING.spacing32}
@@ -235,7 +235,7 @@ export const TestShakeSlideout = (
             </Tooltip>
           ) : null}
         </Flex>
-        <Divider color={LEGACY_COLORS.medGreyEnabled} />
+        <Divider color={COLORS.medGreyEnabled} />
         <StyledText
           fontSize={TYPOGRAPHY.fontSizeLabel}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -264,7 +264,7 @@ export const TestShakeSlideout = (
               disabled={isShaking}
             />
             <StyledText
-              color={LEGACY_COLORS.darkGreyEnabled}
+              color={COLORS.darkGreyEnabled}
               fontSize={TYPOGRAPHY.fontSizeCaption}
             ></StyledText>
           </Flex>

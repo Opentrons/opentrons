@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { renderWithProviders, LEGACY_COLORS } from '@opentrons/components'
+import { renderWithProviders, COLORS } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { UpdateSoftware } from '../UpdateSoftware'
 
@@ -21,7 +21,7 @@ describe('UpdateSoftware', () => {
     const [{ getByText, getByTestId }] = render(props)
     getByText('Downloading software...')
     const bar = getByTestId('ProgressBar_Bar')
-    expect(bar).toHaveStyle(`background: ${String(LEGACY_COLORS.blueEnabled)}`)
+    expect(bar).toHaveStyle(`background: ${String(COLORS.blueEnabled)}`)
     expect(bar).toHaveStyle('width: 50%')
   })
   it('should render text and progressbar - sending software', () => {

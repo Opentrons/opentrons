@@ -10,7 +10,7 @@ import {
   SPACING,
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
-  LEGACY_COLORS,
+  COLORS,
   Overlay,
   POSITION_FIXED,
   TYPOGRAPHY,
@@ -99,10 +99,10 @@ const CLOSE_ICON_STYLE = css`
   border-radius: 50%;
 
   &:hover {
-    background: ${LEGACY_COLORS.lightGreyHover};
+    background: ${COLORS.lightGreyHover};
   }
   &:active {
-    background: ${LEGACY_COLORS.lightGreyPressed};
+    background: ${COLORS.lightGreyPressed};
   }
 `
 
@@ -145,7 +145,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
         css={`
           ${isExpanded ?? false ? OVERLAY_IN_STYLE : overlayOutStyle}
         `}
-        backgroundColor={LEGACY_COLORS.darkBlackEnabled}
+        backgroundColor={COLORS.darkBlackEnabled}
       />
       <Box
         css={isExpanded ?? false ? EXPANDED_STYLE : collapsedStyle}
@@ -153,7 +153,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
         position={POSITION_FIXED}
         right="0"
         top="0"
-        backgroundColor={LEGACY_COLORS.white}
+        backgroundColor={COLORS.white}
         boxShadow="0px 3px 6px rgba(0, 0, 0, 0.23)"
         height="100%"
       >
@@ -195,7 +195,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
           ) : (
             <>{title}</>
           )}
-          <Divider marginY={0} color={LEGACY_COLORS.medGreyEnabled} />
+          <Divider marginY={0} color={COLORS.medGreyEnabled} />
           <Box
             padding={SPACING.spacing16}
             flex="1 1 auto"

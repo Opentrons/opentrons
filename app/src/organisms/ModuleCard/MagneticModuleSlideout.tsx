@@ -6,7 +6,7 @@ import {
   DIRECTION_ROW,
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
-  LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   SPACING,
   JUSTIFY_END,
@@ -154,7 +154,7 @@ export const MagneticModuleSlideout = (
       </StyledText>
       <StyledText
         fontSize={TYPOGRAPHY.fontSizeH6}
-        color={LEGACY_COLORS.darkGreyEnabled}
+        color={COLORS.darkGreyEnabled}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         paddingTop={SPACING.spacing16}
         textTransform={TYPOGRAPHY.textTransformUppercase}
@@ -164,7 +164,7 @@ export const MagneticModuleSlideout = (
         {t('height_ranges', { gen: info.version })}
       </StyledText>
       <Flex
-        backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+        backgroundColor={COLORS.fundamentalsBackground}
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
@@ -211,7 +211,7 @@ export const MagneticModuleSlideout = (
         <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
-          color={LEGACY_COLORS.darkGreyEnabled}
+          color={COLORS.darkGreyEnabled}
           paddingBottom={SPACING.spacing8}
         >
           {t('set_engage_height')}

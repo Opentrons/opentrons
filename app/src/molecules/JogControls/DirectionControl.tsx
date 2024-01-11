@@ -11,7 +11,7 @@ import {
   ALIGN_CENTER,
   JUSTIFY_CENTER,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
@@ -170,45 +170,45 @@ const PLANE_BUTTONS_STYLE = css`
 
 const DEFAULT_BUTTON_STYLE = css`
   display: flex;
-  border: 1px ${LEGACY_COLORS.white} solid;
+  border: 1px ${COLORS.white} solid;
   justify-content: ${JUSTIFY_FLEX_START};
   align-items: ${ALIGN_CENTER};
-  background-color: ${LEGACY_COLORS.white};
-  color: ${LEGACY_COLORS.black};
+  background-color: ${COLORS.white};
+  color: ${COLORS.black};
   grid-gap: ${SPACING.spacing8};
   padding: ${SPACING.spacing8};
 
   &:focus {
-    background-color: ${LEGACY_COLORS.white};
+    background-color: ${COLORS.white};
   }
 
   &:hover {
-    background-color: ${LEGACY_COLORS.white};
-    color: ${LEGACY_COLORS.black};
+    background-color: ${COLORS.white};
+    color: ${COLORS.black};
     box-shadow: 0 0 0;
-    border: 1px ${LEGACY_COLORS.lightGreyHover} solid;
+    border: 1px ${COLORS.lightGreyHover} solid;
   }
 
   &:active {
-    background-color: ${LEGACY_COLORS.white};
-    color: ${LEGACY_COLORS.blueEnabled};
-    border: 1px ${LEGACY_COLORS.blueEnabled} solid;
+    background-color: ${COLORS.white};
+    color: ${COLORS.blueEnabled};
+    border: 1px ${COLORS.blueEnabled} solid;
   }
 
   &:disabled {
-    background-color: ${LEGACY_COLORS.white};
-    color: ${LEGACY_COLORS.errorDisabled};
+    background-color: ${COLORS.white};
+    color: ${COLORS.errorDisabled};
   }
 `
 
 const ACTIVE_BUTTON_STYLE = css`
   ${DEFAULT_BUTTON_STYLE}
-  color: ${LEGACY_COLORS.blueEnabled};
-  border: 1px ${LEGACY_COLORS.blueEnabled} solid;
+  color: ${COLORS.blueEnabled};
+  border: 1px ${COLORS.blueEnabled} solid;
 
   &:hover {
-    color: ${LEGACY_COLORS.bluePressed};
-    border: 1px ${LEGACY_COLORS.bluePressed} solid;
+    color: ${COLORS.bluePressed};
+    border: 1px ${COLORS.bluePressed} solid;
   }
 `
 
@@ -266,7 +266,7 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
                   <StyledText
                     textAlign={TEXT_ALIGN_LEFT}
                     alignSelf={ALIGN_STRETCH}
-                    color={LEGACY_COLORS.darkGreyEnabled}
+                    color={COLORS.darkGreyEnabled}
                     css={TYPOGRAPHY.labelRegular}
                   >
                     {subtitle}
@@ -330,8 +330,8 @@ const ARROW_GRID_STYLES = css`
   }
 `
 const ARROW_BUTTON_STYLES = css`
-  color: ${LEGACY_COLORS.darkGreyEnabled};
-  background-color: ${LEGACY_COLORS.white};
+  color: ${COLORS.darkGreyEnabled};
+  background-color: ${COLORS.white};
 
   border: ${BORDERS.lineBorder};
   width: 2.75rem;
@@ -341,25 +341,25 @@ const ARROW_BUTTON_STYLES = css`
   align-items: ${ALIGN_CENTER};
   justify-content: ${JUSTIFY_CENTER};
   &:hover {
-    background-color: ${LEGACY_COLORS.white};
-    color: ${LEGACY_COLORS.darkGreyHover};
+    background-color: ${COLORS.white};
+    color: ${COLORS.darkGreyHover};
     box-shadow: 0 0 0;
-    border: 1px ${LEGACY_COLORS.lightGreyHover} solid;
+    border: 1px ${COLORS.lightGreyHover} solid;
   }
 
   &:active {
-    background-color: ${LEGACY_COLORS.white};
-    color: ${LEGACY_COLORS.darkGreyPressed};
-    border: 1px ${LEGACY_COLORS.lightGreyHover} solid;
+    background-color: ${COLORS.white};
+    color: ${COLORS.darkGreyPressed};
+    border: 1px ${COLORS.lightGreyHover} solid;
   }
 
   &:focus {
-    background-color: ${LEGACY_COLORS.white};
+    background-color: ${COLORS.white};
   }
 
   &:disabled {
-    background-color: ${LEGACY_COLORS.white};
-    color: ${LEGACY_COLORS.darkGreyDisabled};
+    background-color: ${COLORS.white};
+    color: ${COLORS.darkGreyDisabled};
   }
 
   @media (max-width: 750px) {
@@ -369,29 +369,29 @@ const ARROW_BUTTON_STYLES = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     width: 125px;
     height: 125px;
-    background-color: ${LEGACY_COLORS.light1};
-    color: ${LEGACY_COLORS.darkBlackEnabled};
+    background-color: ${COLORS.light1};
+    color: ${COLORS.darkBlackEnabled};
     border-radius: ${BORDERS.borderRadiusSize4};
 
     &:hover {
-      background-color: ${LEGACY_COLORS.light1Pressed};
-      color: ${LEGACY_COLORS.darkBlackHover};
-      border: 1px ${LEGACY_COLORS.transparent} solid;
+      background-color: ${COLORS.light1Pressed};
+      color: ${COLORS.darkBlackHover};
+      border: 1px ${COLORS.transparent} solid;
     }
 
     &:active {
-      background-color: ${LEGACY_COLORS.light1Pressed};
-      color: ${LEGACY_COLORS.darkGreyPressed};
+      background-color: ${COLORS.light1Pressed};
+      color: ${COLORS.darkGreyPressed};
     }
 
     &:focus {
-      background-color: ${LEGACY_COLORS.light1Pressed};
+      background-color: ${COLORS.light1Pressed};
     }
 
     &:disabled {
-      background-color: ${LEGACY_COLORS.darkBlack20};
-      color: ${LEGACY_COLORS.darkBlack40};
-      border: 1px ${LEGACY_COLORS.transparent} solid;
+      background-color: ${COLORS.darkBlack20};
+      color: ${COLORS.darkBlack40};
+      border: 1px ${COLORS.transparent} solid;
     }
   }
 `
@@ -457,7 +457,7 @@ export function TouchDirectionControl(
     <Flex
       flex="1"
       flexDirection={DIRECTION_COLUMN}
-      border={`1px solid ${LEGACY_COLORS.darkBlack40}`}
+      border={`1px solid ${COLORS.darkBlack40}`}
       borderRadius={BORDERS.borderRadiusSize4}
       padding={SPACING.spacing16}
       gridGap={SPACING.spacing16}
@@ -486,7 +486,7 @@ export function TouchDirectionControl(
                   <StyledText
                     as="p"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    color={selected ? LEGACY_COLORS.white : LEGACY_COLORS.darkBlackEnabled}
+                    color={selected ? COLORS.white : COLORS.darkBlackEnabled}
                   >
                     {CONTROLS_CONTENTS_BY_PLANE[plane].title}
                   </StyledText>

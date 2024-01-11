@@ -10,7 +10,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -54,7 +54,7 @@ export function SetupCalibrationItem({
   ) : null
   return (
     <Flex
-      backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+      backgroundColor={COLORS.fundamentalsBackground}
       borderRadius={BORDERS.radiusSoftCorners}
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -68,8 +68,8 @@ export function SetupCalibrationItem({
               size={SIZE_1}
               color={
                 calibratedDate != null
-                  ? LEGACY_COLORS.successEnabled
-                  : LEGACY_COLORS.warningEnabled
+                  ? COLORS.successEnabled
+                  : COLORS.warningEnabled
               }
               marginRight={SPACING.spacing16}
               name={calibratedDate != null ? 'ot-check' : 'alert-circle'}
@@ -78,7 +78,7 @@ export function SetupCalibrationItem({
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             {label != null && (
               <StyledText
-                color={LEGACY_COLORS.darkGreyEnabled}
+                color={COLORS.darkGreyEnabled}
                 css={TYPOGRAPHY.h6SemiBold}
                 textTransform={TYPOGRAPHY.textTransformUppercase}
                 id={id}
@@ -87,11 +87,11 @@ export function SetupCalibrationItem({
               </StyledText>
             )}
             {title != null && (
-              <StyledText as="p" color={LEGACY_COLORS.darkBlackEnabled} id={id}>
+              <StyledText as="p" color={COLORS.darkBlackEnabled} id={id}>
                 {title}
               </StyledText>
             )}
-            <StyledText as="label" color={LEGACY_COLORS.darkGreyEnabled}>
+            <StyledText as="label" color={COLORS.darkGreyEnabled}>
               {calibrationDataNotAvailableText ?? subText ?? calibratedText}
             </StyledText>
           </Flex>
