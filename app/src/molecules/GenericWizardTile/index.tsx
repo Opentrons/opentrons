@@ -9,7 +9,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   DIRECTION_ROW,
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
   Btn,
   JUSTIFY_FLEX_END,
   JUSTIFY_START,
@@ -40,7 +40,7 @@ const CAPITALIZE_FIRST_LETTER_STYLE = css`
 `
 const GO_BACK_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${LEGACY_COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50Enabled};
 
   &:hover {
     opacity: 70%;
@@ -59,7 +59,7 @@ const GO_BACK_BUTTON_STYLE = css`
 `
 const GO_BACK_BUTTON_DISABLED_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${LEGACY_COLORS.darkBlack70};
+  color: ${COLORS.grey60};
 `
 const Title = styled.h1`
   ${TYPOGRAPHY.h1Default};

@@ -7,7 +7,7 @@ import {
   ALIGN_STRETCH,
   BORDERS,
   Box,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -247,7 +247,7 @@ export function ProtocolSetupLabware({
                 >
                   {getLabwareDisplayName(selectedLabware)}
                 </StyledText>
-                <StyledText as="p" color={LEGACY_COLORS.darkBlack70}>
+                <StyledText as="p" color={COLORS.grey60}>
                   {selectedLabware.nickName}
                   {selectedLabwareLocation != null &&
                   selectedLabwareLocation !== 'offDeck' &&
@@ -275,7 +275,7 @@ export function ProtocolSetupLabware({
       >
         <Flex
           gridGap={SPACING.spacing8}
-          color={LEGACY_COLORS.darkBlack70}
+          color={COLORS.grey60}
           fontSize={TYPOGRAPHY.fontSize22}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           lineHeight={TYPOGRAPHY.lineHeight28}
@@ -316,7 +316,7 @@ export function ProtocolSetupLabware({
 
 const labwareLatchStyles = css`
   &:active {
-    background-color: ${LEGACY_COLORS.mediumBluePressed};
+    background-color: ${COLORS.mediumBluePressed};
   }
 `
 
@@ -409,13 +409,13 @@ function LabwareLatch({
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
-      backgroundColor={LEGACY_COLORS.mediumBlueEnabled}
+      backgroundColor={COLORS.mediumBlueEnabled}
       borderRadius={BORDERS.borderRadiusSize3}
       css={labwareLatchStyles}
       color={
         isLatchLoading
-          ? `${COLORS.black90}${LEGACY_COLORS.opacity60HexCode}`
-          : COLORS.black90
+          ? `${COLORS.darkBlack100}${COLORS.opacity60HexCode}`
+          : COLORS.darkBlackEnabled
       }
       height="6.5rem"
       alignSelf={ALIGN_CENTER}
@@ -446,7 +446,7 @@ function LabwareLatch({
               size="2.5rem"
               color={
                 commandType === 'heaterShaker/closeLabwareLatch'
-                  ? LEGACY_COLORS.blueEnabled
+                  ? COLORS.blueEnabled
                   : ''
               }
             />
@@ -546,7 +546,7 @@ function RowLabware({
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={LEGACY_COLORS.light1}
+      backgroundColor={COLORS.light1}
       borderRadius={BORDERS.borderRadiusSize3}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       gridGap={SPACING.spacing32}
@@ -569,13 +569,13 @@ function RowLabware({
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {getLabwareDisplayName(definition)}
             </StyledText>
-            <StyledText color={LEGACY_COLORS.darkBlack70} as="p">
+            <StyledText color={COLORS.grey60} as="p">
               {nickName}
             </StyledText>
           </Flex>
           {nestedLabwareInfo != null ? (
             <Box
-              borderBottom={`1px solid ${LEGACY_COLORS.darkBlack70}`}
+              borderBottom={`1px solid ${COLORS.grey60}`}
               marginY={SPACING.spacing16}
               width="33rem"
             />
@@ -586,7 +586,7 @@ function RowLabware({
               <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {nestedLabwareInfo.nestedLabwareDisplayName}
               </StyledText>
-              <StyledText as="p" color={LEGACY_COLORS.darkBlack70}>
+              <StyledText as="p" color={COLORS.grey60}>
                 {nestedLabwareInfo.nestedLabwareNickName}
               </StyledText>
             </Flex>

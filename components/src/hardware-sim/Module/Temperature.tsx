@@ -1,7 +1,6 @@
 import * as React from 'react'
 
-import { LEGACY_COLORS } from '../../ui-style-constants'
-import { COLORS } from '../../helix-design-system'
+import { COLORS } from '../../ui-style-constants'
 
 export interface TemperatureVizProps {
   targetTemperature: number | null
@@ -15,8 +14,8 @@ export function Temperature(props: TemperatureVizProps): JSX.Element {
   if (targetTemperature != null) {
     ledLightColor =
       targetTemperature <= ROOM_TEMPERATURE_C
-        ? LEGACY_COLORS.mediumBlueEnabled
-        : LEGACY_COLORS.red4
+        ? COLORS.mediumBlueEnabled
+        : COLORS.red4
   }
 
   return (
@@ -49,7 +48,7 @@ export function Temperature(props: TemperatureVizProps): JSX.Element {
       <g id="statusLight">
         <path
           fill={ledLightColor}
-          stroke={LEGACY_COLORS.black}
+          stroke={COLORS.black}
           strokeWidth={0.5}
           d="M 25.8 36.5 c -1.7 0 -3.1 1.4 -3.1 3.1 v 10.9 c 0 1.7 1.4 3.1 3.1 3.1 s 3.1 -1.4 3.1 -3.1 v -11 C 28.9 37.8 27.5 36.5 25.8 36.5 z"
         />

@@ -41,7 +41,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
   PrimaryButton,
@@ -336,7 +336,7 @@ export function ProtocolRunHeader({
               <StyledText
                 as="h2"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                color={LEGACY_COLORS.blueEnabled}
+                color={COLORS.blueEnabled}
               >
                 {displayName}
               </StyledText>
@@ -412,7 +412,7 @@ export function ProtocolRunHeader({
         </Box>
         {runStatus != null ? (
           <Box
-            backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+            backgroundColor={COLORS.grey35}
             display="grid"
             gridTemplateColumns="4fr 6fr 4fr"
             padding={SPACING.spacing8}
@@ -503,14 +503,14 @@ function DisplayRunStatus(props: DisplayRunStatusProps): JSX.Element {
       {props.runStatus === RUN_STATUS_RUNNING ? (
         <Icon
           name="circle"
-          color={LEGACY_COLORS.blueEnabled}
+          color={COLORS.blueEnabled}
           size={SPACING.spacing4}
           marginRight={SPACING.spacing4}
           data-testid="running_circle"
         >
           <animate
             attributeName="fill"
-            values={`${LEGACY_COLORS.blueEnabled}; transparent`}
+            values={`${COLORS.blueEnabled}; transparent`}
             dur="1s"
             calcMode="discrete"
             repeatCount="indefinite"

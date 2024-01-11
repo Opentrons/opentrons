@@ -10,7 +10,7 @@ import {
   TYPOGRAPHY,
   SPACING,
   JUSTIFY_SPACE_BETWEEN,
-  LEGACY_COLORS,
+  COLORS,
   BORDERS,
   ALIGN_CENTER,
 } from '@opentrons/components'
@@ -61,7 +61,7 @@ export const NotConfiguredModal = (
           <Flex paddingTop={SPACING.spacing16} flexDirection={DIRECTION_COLUMN}>
             <Flex
               padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
-              backgroundColor={LEGACY_COLORS.medGreyEnabled}
+              backgroundColor={COLORS.grey35}
               borderRadius={BORDERS.radiusSoftCorners}
               alignItems={ALIGN_CENTER}
               justifyContent={JUSTIFY_SPACE_BETWEEN}

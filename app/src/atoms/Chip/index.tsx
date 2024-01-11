@@ -10,7 +10,6 @@ import {
   TYPOGRAPHY,
   Icon,
   COLORS,
-  LEGACY_COLORS,
 } from '@opentrons/components'
 
 import { StyledText } from '../text'
@@ -41,34 +40,34 @@ const CHIP_PROPS_BY_TYPE: Record<
   }
 > = {
   basic: {
-    backgroundColor: LEGACY_COLORS.darkBlack20,
+    backgroundColor: COLORS.darkBlack20,
     borderRadius: BORDERS.borderRadiusSize1,
-    textColor: LEGACY_COLORS.darkBlack90,
+    textColor: COLORS.grey60,
   },
   error: {
-    backgroundColor: LEGACY_COLORS.red3,
+    backgroundColor: COLORS.red3,
     borderRadius: BORDERS.borderRadiusSize5,
-    iconColor: LEGACY_COLORS.red1,
-    textColor: LEGACY_COLORS.red1,
+    iconColor: COLORS.red1,
+    textColor: COLORS.red1,
   },
   neutral: {
-    backgroundColor: LEGACY_COLORS.darkBlack20,
+    backgroundColor: COLORS.darkBlack20,
     borderRadius: BORDERS.borderRadiusSize5,
-    iconColor: LEGACY_COLORS.darkBlack90,
-    textColor: LEGACY_COLORS.darkBlack70,
+    iconColor: COLORS.grey60,
+    textColor: COLORS.grey60,
   },
   success: {
-    backgroundColor: COLORS.green35,
+    backgroundColor: COLORS.green3,
     borderRadius: BORDERS.borderRadiusSize5,
-    iconColor: COLORS.green60,
+    iconColor: COLORS.green1,
     iconName: 'ot-check',
-    textColor: COLORS.green60,
+    textColor: COLORS.green1,
   },
   warning: {
-    backgroundColor: LEGACY_COLORS.yellow3,
+    backgroundColor: COLORS.yellow3,
     borderRadius: BORDERS.borderRadiusSize5,
-    iconColor: LEGACY_COLORS.yellow1,
-    textColor: LEGACY_COLORS.yellow1,
+    iconColor: COLORS.yellow1,
+    textColor: COLORS.yellow1,
   },
 }
 

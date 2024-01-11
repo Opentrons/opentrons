@@ -4,7 +4,7 @@ import { saveAs } from 'file-saver'
 
 import {
   Flex,
-  LEGACY_COLORS,
+  COLORS,
   POSITION_ABSOLUTE,
   DIRECTION_COLUMN,
   POSITION_RELATIVE,

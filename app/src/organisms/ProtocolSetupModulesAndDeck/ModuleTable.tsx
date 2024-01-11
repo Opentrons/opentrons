@@ -6,7 +6,6 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
-  LEGACY_COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
@@ -84,7 +83,7 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       <Flex
-        color={LEGACY_COLORS.darkBlack70}
+        color={COLORS.grey60}
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         gridGap={SPACING.spacing24}
@@ -303,10 +302,10 @@ function ModuleTableItem({
           isModuleReady &&
           module.attachedModuleMatch?.moduleOffset?.last_modified != null &&
           conflictedFixture == null
-            ? COLORS.green35
+            ? COLORS.green3
             : isNonConnectingModule && conflictedFixture == null
-            ? LEGACY_COLORS.light1
-            : LEGACY_COLORS.yellow3
+            ? COLORS.light1
+            : COLORS.yellow3
         }
         borderRadius={BORDERS.borderRadiusSize3}
         cursor={isDuplicateModuleModel ? 'pointer' : 'inherit'}

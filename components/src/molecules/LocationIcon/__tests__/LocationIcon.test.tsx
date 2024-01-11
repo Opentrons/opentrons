@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import { renderWithProviders } from '../../../testing/utils'
-import { BORDERS, LEGACY_COLORS, SPACING } from '../../../ui-style-constants'
+import { BORDERS, COLORS, SPACING } from '../../../ui-style-constants'
 
 import { LocationIcon } from '..'
 
@@ -24,7 +24,7 @@ describe('LocationIcon', () => {
     expect(locationIcon).toHaveStyle(`padding: ${SPACING.spacing4} 0.375rem`)
     expect(locationIcon).toHaveStyle('height: 2rem')
     expect(locationIcon).toHaveStyle('width: max-content')
-    expect(locationIcon).toHaveStyle(`border: 2px solid ${COLORS.black90}`)
+    expect(locationIcon).toHaveStyle(`border: 2px solid ${COLORS.darkBlack100}`)
     expect(locationIcon).toHaveStyle(
       `border-radius: ${BORDERS.borderRadiusSize3}`
     )

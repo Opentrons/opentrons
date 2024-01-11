@@ -8,7 +8,6 @@ import {
   Box,
   Btn,
   COLORS,
-  LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -274,10 +273,10 @@ export function ModulesListItem({
       <Btn
         marginLeft={SPACING.spacing20}
         css={css`
-          color: ${LEGACY_COLORS.blueEnabled};
+          color: ${COLORS.blueEnabled};
 
           &:hover {
-            color: ${LEGACY_COLORS.blueHover};
+            color: ${COLORS.blueHover};
           }
         `}
         marginTop={SPACING.spacing4}
@@ -300,7 +299,7 @@ export function ModulesListItem({
       <StyledText
         as="p"
         marginLeft={SPACING.spacing20}
-        color={LEGACY_COLORS.darkGreyEnabled}
+        color={COLORS.grey50Enabled}
       >
         {t('no_usb_connection_required')}
       </StyledText>
@@ -320,9 +319,9 @@ export function ModulesListItem({
   let renderModuleStatus: JSX.Element = (
     <StatusLabel
       status={moduleConnectionStatus}
-      backgroundColor={COLORS.green20}
-      iconColor={COLORS.green50}
-      textColor={LEGACY_COLORS.successText}
+      backgroundColor={COLORS.successBackgroundLight}
+      iconColor={COLORS.successEnabled}
+      textColor={COLORS.successText}
     />
   )
 
@@ -352,9 +351,9 @@ export function ModulesListItem({
     renderModuleStatus = (
       <StatusLabel
         status={moduleConnectionStatus}
-        backgroundColor={LEGACY_COLORS.warningBackgroundLight}
-        iconColor={LEGACY_COLORS.warningEnabled}
-        textColor={LEGACY_COLORS.warningText}
+        backgroundColor={COLORS.warningBackgroundLight}
+        iconColor={COLORS.warningEnabled}
+        textColor={COLORS.warningText}
       />
     )
   }
@@ -384,7 +383,7 @@ export function ModulesListItem({
       ) : null}
       <Box
         border={BORDERS.styleSolid}
-        borderColor={LEGACY_COLORS.medGreyEnabled}
+        borderColor={COLORS.grey35}
         borderWidth="1px"
         borderRadius={BORDERS.radiusSoftCorners}
         padding={SPACING.spacing16}
@@ -434,9 +433,9 @@ export function ModulesListItem({
               >
                 <StatusLabel
                   status={t('location_conflict')}
-                  backgroundColor={LEGACY_COLORS.warningBackgroundLight}
-                  iconColor={LEGACY_COLORS.warningEnabled}
-                  textColor={LEGACY_COLORS.warningText}
+                  backgroundColor={COLORS.warningBackgroundLight}
+                  iconColor={COLORS.warningEnabled}
+                  textColor={COLORS.warningText}
                 />
                 <TertiaryButton
                   width="max-content"

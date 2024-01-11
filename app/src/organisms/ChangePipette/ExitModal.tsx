@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   SecondaryButton,
   AlertPrimaryButton,
@@ -25,7 +25,7 @@ export function ExitModal(props: Props): JSX.Element {
 
   return (
     <SimpleWizardBody
-      iconColor={LEGACY_COLORS.warningEnabled}
+      iconColor={COLORS.warningEnabled}
       header={t('progress_will_be_lost')}
       subHeader={t('are_you_sure_exit', { direction: flow })}
       isSuccess={false}

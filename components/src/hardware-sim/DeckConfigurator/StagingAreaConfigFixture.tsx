@@ -4,12 +4,7 @@ import { css } from 'styled-components'
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
-import {
-  BORDERS,
-  LEGACY_COLORS,
-  SPACING,
-  TYPOGRAPHY,
-} from '../../ui-style-constants'
+import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   FIXTURE_HEIGHT,
@@ -82,7 +77,7 @@ export function StagingAreaConfigFixture(
 const STAGING_AREA_CONFIG_STYLE_READ_ONLY = css`
   display: ${DISPLAY_FLEX};
   align-items: ${ALIGN_CENTER};
-  background-color: ${LEGACY_COLORS.grey2};
+  background-color: ${COLORS.grey50};
   border-radius: ${BORDERS.borderRadiusSize1};
   color: ${COLORS.white};
   grid-gap: ${SPACING.spacing8};
@@ -94,14 +89,14 @@ const STAGING_AREA_CONFIG_STYLE_EDITABLE = css`
   ${STAGING_AREA_CONFIG_STYLE_READ_ONLY}
 
   &:active {
-    background-color: ${LEGACY_COLORS.darkBlack90};
+    background-color: ${COLORS.grey60};
   }
 
   &:hover {
-    background-color: ${LEGACY_COLORS.grey1};
+    background-color: ${COLORS.grey1};
   }
 
   &:focus-visible {
-    border: 3px solid ${COLORS.blue50};
+    border: 3px solid ${COLORS.fundamentalsFocus};
   }
 `

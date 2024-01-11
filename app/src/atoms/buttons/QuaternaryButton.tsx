@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import {
   NewSecondaryBtn,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   BORDERS,
   TYPOGRAPHY,
   styleProps,
@@ -12,7 +12,7 @@ export const QuaternaryButton = styled(NewSecondaryBtn)`
   background-color: ${COLORS.white};
   border-radius: ${BORDERS.radiusRoundEdge};
   box-shadow: none;
-  color: ${LEGACY_COLORS.blueEnabled};
+  color: ${COLORS.blueEnabled};
   overflow: no-wrap;
   padding-left: ${SPACING.spacing16};
   padding-right: ${SPACING.spacing16};
@@ -27,7 +27,7 @@ export const QuaternaryButton = styled(NewSecondaryBtn)`
     box-shadow: 0 0 0;
   }
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${LEGACY_COLORS.warningEnabled};
+    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
   }
 
   &:disabled {

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import {
   Flex,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
@@ -19,7 +19,7 @@ export function CheckUpdates(): JSX.Element {
   const { t } = useTranslation('device_settings')
   return (
     <Flex
-      backgroundColor={LEGACY_COLORS.darkBlack20}
+      backgroundColor={COLORS.grey35}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing40}
       alignItems={ALIGN_CENTER}
@@ -28,7 +28,7 @@ export function CheckUpdates(): JSX.Element {
       height="32.5rem"
       borderRadius={BORDERS.borderRadiusSize3}
     >
-      <Icon name="ot-spinner" size="5rem" spin color={LEGACY_COLORS.darkBlack70} />
+      <Icon name="ot-spinner" size="5rem" spin color={COLORS.grey60} />
       <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
         {t('checking_for_updates')}
       </StyledText>

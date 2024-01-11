@@ -12,7 +12,7 @@ import {
   ALIGN_FLEX_START,
 } from '../../styles'
 import { Box, Flex, Text } from '../../primitives'
-import { TYPOGRAPHY, SPACING, LEGACY_COLORS } from '../../ui-style-constants'
+import { TYPOGRAPHY, SPACING, COLORS } from '../../ui-style-constants'
 
 const labwareDisplayNameStyle = css`
   overflow: hidden;

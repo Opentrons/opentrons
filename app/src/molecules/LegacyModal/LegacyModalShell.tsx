@@ -2,7 +2,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import {
   StyleProps,
-  LEGACY_COLORS,
+  COLORS,
   POSITION_FIXED,
   POSITION_ABSOLUTE,
   ALIGN_CENTER,
@@ -82,11 +82,11 @@ const Overlay = styled.div`
   top: 0;
   bottom: 0;
   z-index: 1;
-  background-color: ${COLORS.transparentBlack40};
+  background-color: ${COLORS.backgroundOverlay};
   cursor: default;
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    background-color: ${LEGACY_COLORS.darkBlack60};
+    background-color: ${COLORS.grey50};
   }
 `
 const ContentArea = styled.div<{ zIndex: string | number }>`

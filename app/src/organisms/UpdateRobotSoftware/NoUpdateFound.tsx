@@ -31,7 +31,7 @@ export function NoUpdateFound(props: NoUpdateFoundProps): JSX.Element {
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        backgroundColor={COLORS.green35}
+        backgroundColor={COLORS.green3}
         height="25.75rem"
         gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}
@@ -42,7 +42,7 @@ export function NoUpdateFound(props: NoUpdateFoundProps): JSX.Element {
         <Icon
           name="ot-check"
           size="3.75rem"
-          color={COLORS.green50}
+          color={COLORS.green2}
           data-testid="NoUpdateFound_check_circle_icon"
         />
         <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>

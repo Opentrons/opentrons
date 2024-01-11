@@ -5,7 +5,7 @@ import {
   Icon,
   Btn,
   ALIGN_CENTER,
-  LEGACY_COLORS,
+  COLORS,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 
@@ -14,29 +14,29 @@ import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
 const STOP_BUTTON_STYLE = css`
   -webkit-tap-highlight-color: transparent;
   display: flex;
-  background-color: ${LEGACY_COLORS.red2};
+  background-color: ${COLORS.red2};
   border-radius: 50%;
 
   &:focus {
-    background-color: ${LEGACY_COLORS.red2Pressed};
+    background-color: ${COLORS.red2Pressed};
     box-shadow: none;
   }
   &:hover {
     border: none;
     box-shadow: none;
-    background-color: ${LEGACY_COLORS.red2};
+    background-color: ${COLORS.red2};
     color: ${COLORS.white};
   }
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${LEGACY_COLORS.red2};
+    background-color: ${COLORS.red2};
   }
   &:active {
-    background-color: ${LEGACY_COLORS.red2};
+    background-color: ${COLORS.red2};
   }
   &:disabled {
-    background-color: ${LEGACY_COLORS.darkBlack20};
-    color: ${LEGACY_COLORS.darkBlack60};
+    background-color: ${COLORS.grey35};
+    color: ${COLORS.grey50};
   }
 `
 

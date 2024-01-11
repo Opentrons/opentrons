@@ -5,7 +5,7 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   Box,
-  LEGACY_COLORS,
+  COLORS,
   BORDERS,
   RoundTab,
 } from '@opentrons/components'

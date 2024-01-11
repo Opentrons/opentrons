@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
-import { LEGACY_COLORS, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+import { COLORS, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import {
   useInstrumentsQuery,
   useSubsystemUpdateQuery,
@@ -68,7 +68,7 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
   const updateNeededHeader: ModalHeaderBaseProps = {
     title: t('update_needed'),
     iconName: 'ot-alert',
-    iconColor: LEGACY_COLORS.yellow2,
+    iconColor: COLORS.yellow2,
   }
 
   let modalContent = (

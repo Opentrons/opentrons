@@ -8,7 +8,6 @@ import {
 import {
   ALIGN_CENTER,
   COLORS,
-  LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -253,10 +252,7 @@ export function ProtocolRunSetup({
             <InfoMessage title={t('setup_is_view_only')} />
           ) : null}
           {analysisErrors != null && analysisErrors?.length > 0 ? (
-            <StyledText
-              alignSelf={ALIGN_CENTER}
-              color={LEGACY_COLORS.darkGreyEnabled}
-            >
+            <StyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50Enabled}>
               {t('protocol_analysis_failed')}
             </StyledText>
           ) : (
@@ -317,10 +313,7 @@ export function ProtocolRunSetup({
           )}
         </>
       ) : (
-        <StyledText
-          alignSelf={ALIGN_CENTER}
-          color={LEGACY_COLORS.darkGreyEnabled}
-        >
+        <StyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50Enabled}>
           {t('loading_data')}
         </StyledText>
       )}
@@ -379,15 +372,15 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           size="1rem"
           color={
             calibrationStatus?.complete
-              ? COLORS.green50
-              : LEGACY_COLORS.warningEnabled
+              ? COLORS.successEnabled
+              : COLORS.warningEnabled
           }
           marginRight={SPACING.spacing8}
           name={calibrationStatus?.complete ? 'ot-check' : 'alert-circle'}
           id="RunSetupCard_calibrationIcon"
         />
         <StyledText
-          color={LEGACY_COLORS.black}
+          color={COLORS.black}
           css={TYPOGRAPHY.pSemiBold}
           marginRight={SPACING.spacing16}
           textTransform={TYPOGRAPHY.textTransformCapitalize}

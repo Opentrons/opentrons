@@ -8,7 +8,7 @@ import {
   Icon,
   ALIGN_CENTER,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_ROW,
   POSITION_FIXED,
   SPACING,
@@ -36,26 +36,26 @@ export function FloatingActionButton(
     ...buttonProps
   } = props
 
-  const contentColor = disabled ? LEGACY_COLORS.darkBlack60 : COLORS.white
+  const contentColor = disabled ? COLORS.grey50 : COLORS.white
   const FLOATING_ACTION_BUTTON_STYLE = css`
-    background-color: ${LEGACY_COLORS.highlightPurple1};
+    background-color: ${COLORS.highlightPurple1};
     border-radius: ${BORDERS.borderRadiusSize5};
     box-shadow: ${BORDERS.shadowBig};
     color: ${contentColor};
     cursor: default;
 
     &:active {
-      background-color: ${LEGACY_COLORS.highlightPurple1Pressed};
+      background-color: ${COLORS.highlightPurple1Pressed};
     }
 
     &:focus-visible {
-      border-color: ${COLORS.blue50};
+      border-color: ${COLORS.fundamentalsFocus};
       border-width: ${SPACING.spacing4};
       box-shadow: ${BORDERS.shadowBig};
     }
 
     &:disabled {
-      background-color: ${LEGACY_COLORS.darkBlack20};
+      background-color: ${COLORS.grey35};
       color: ${contentColor};
     }
   `

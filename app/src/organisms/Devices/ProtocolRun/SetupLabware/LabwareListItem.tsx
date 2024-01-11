@@ -6,7 +6,7 @@ import {
   Flex,
   SPACING,
   Icon,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_ROW,
   DIRECTION_COLUMN,
   TYPOGRAPHY,
@@ -56,7 +56,7 @@ const LabwareRow = styled.div`
   grid-template-columns: 1fr 6fr 5.9fr;
   border-style: ${BORDERS.styleSolid};
   border-width: 1px;
-  border-color: ${LEGACY_COLORS.medGreyEnabled};
+  border-color: ${COLORS.grey35};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing16};
 `
@@ -161,10 +161,10 @@ export function LabwareListItem(
           extraAttentionText = (
             <Btn
               css={css`
-                color: ${LEGACY_COLORS.darkGreyEnabled};
+                color: ${COLORS.grey50Enabled};
 
                 &:hover {
-                  color: ${COLORS.black90};
+                  color: ${COLORS.darkBlackEnabled};
                 }
               `}
               onClick={() => setSecureLabwareModalType(moduleType)}
@@ -190,11 +190,7 @@ export function LabwareListItem(
       case HEATERSHAKER_MODULE_TYPE:
         isHeaterShakerInProtocol = true
         extraAttentionText = (
-          <StyledText
-            as="p"
-            color={LEGACY_COLORS.darkGreyEnabled}
-            maxWidth="15.25rem"
-          >
+          <StyledText as="p" color={COLORS.grey50Enabled} maxWidth="15.25rem">
             {t('heater_shaker_labware_list_view')}
           </StyledText>
         )
@@ -275,7 +271,7 @@ export function LabwareListItem(
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {labwareDisplayName}
             </StyledText>
-            <StyledText as="p" color={LEGACY_COLORS.darkGreyEnabled}>
+            <StyledText as="p" color={COLORS.grey50Enabled}>
               {nickName}
             </StyledText>
           </Flex>
@@ -297,7 +293,7 @@ export function LabwareListItem(
               <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {nestedLabwareInfo.nestedLabwareDisplayName}
               </StyledText>
-              <StyledText as="p" color={LEGACY_COLORS.darkGreyEnabled}>
+              <StyledText as="p" color={COLORS.grey50Enabled}>
                 {nestedLabwareInfo.nestedLabwareNickName}
               </StyledText>
             </Flex>

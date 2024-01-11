@@ -4,7 +4,6 @@ import compact from 'lodash/compact'
 import values from 'lodash/values'
 import {
   COLORS,
-  LEGACY_COLORS,
   DeckFromLayers,
   FlexTrash,
   Module,
@@ -113,8 +112,8 @@ interface ContentsProps {
   trashSlot: string | null
 }
 
-const lightFill = LEGACY_COLORS.light1
-const darkFill = LEGACY_COLORS.darkBlack70
+const lightFill = COLORS.light1
+const darkFill = COLORS.grey60
 
 export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   const {
@@ -619,7 +618,7 @@ export const DeckSetup = (): JSX.Element => {
                               robotType={robotType}
                               trashIconColor={lightFill}
                               trashCutoutId={cutoutId as TrashCutoutId}
-                              backgroundColor={LEGACY_COLORS.grey2}
+                              backgroundColor={COLORS.grey50}
                             />
                           </React.Fragment>
                         ) : null

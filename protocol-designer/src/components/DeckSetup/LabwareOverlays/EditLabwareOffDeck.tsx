@@ -4,7 +4,7 @@ import { css } from 'styled-components'
 import {
   ALIGN_FLEX_START,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Icon,
   JUSTIFY_SPACE_AROUND,
@@ -40,7 +40,7 @@ const NAME_LABWARE_OVERLAY_STYLE = css`
 const REGULAR_OVERLAY_STYLE = css`
   z-index: 1;
   padding: ${SPACING.spacing8};
-  background-color: ${LEGACY_COLORS.darkBlack90};
+  background-color: ${COLORS.grey60};
   flex-direction: ${DIRECTION_COLUMN};
   color: ${COLORS.white};
   display: flex;

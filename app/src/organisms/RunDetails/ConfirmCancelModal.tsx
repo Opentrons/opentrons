@@ -9,7 +9,7 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_FLEX_END,
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
   ALIGN_CENTER,
 } from '@opentrons/components'
 import {
@@ -88,7 +88,7 @@ export function ConfirmCancelModal(
               </Link>
             )}
             <AlertPrimaryButton
-              backgroundColor={LEGACY_COLORS.errorEnabled}
+              backgroundColor={COLORS.errorEnabled}
               onClick={cancelRun}
               disabled={isCanceling}
               minWidth="8rem"

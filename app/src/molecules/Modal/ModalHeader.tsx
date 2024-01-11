@@ -2,7 +2,7 @@ import * as React from 'react'
 import {
   ALIGN_CENTER,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_ROW,
   Flex,
   Icon,
@@ -25,7 +25,7 @@ export function ModalHeader(props: ModalHeaderBaseProps): JSX.Element {
   return (
     <Flex
       backgroundColor={COLORS.white}
-      color={LEGACY_COLORS.black}
+      color={COLORS.black}
       height="6.25rem"
       width="100%"
       padding={SPACING.spacing32}

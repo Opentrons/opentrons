@@ -2,7 +2,7 @@ import * as React from 'react'
 import styled, { css } from 'styled-components'
 import {
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   BORDERS,
   Flex,
@@ -40,25 +40,25 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
   `
 
   const AVAILABLE_BUTTON_STYLE = css`
-    background: ${LEGACY_COLORS.mediumBlueEnabled};
+    background: ${COLORS.mediumBlueEnabled};
 
     &:active {
-      background-color: ${LEGACY_COLORS.mediumBluePressed};
+      background-color: ${COLORS.mediumBluePressed};
     }
   `
 
   const SELECTED_BUTTON_STYLE = css`
-    background: ${LEGACY_COLORS.blueEnabled};
+    background: ${COLORS.blueEnabled};
     color: ${COLORS.white};
 
     &:active {
-      background-color: ${LEGACY_COLORS.bluePressed};
+      background-color: ${COLORS.bluePressed};
     }
   `
 
   const DISABLED_BUTTON_STYLE = css`
-    background-color: ${LEGACY_COLORS.darkBlack20};
-    color: ${LEGACY_COLORS.darkBlack60};
+    background-color: ${COLORS.grey35};
+    color: ${COLORS.grey50};
     cursor: not-allowed;
   `
 

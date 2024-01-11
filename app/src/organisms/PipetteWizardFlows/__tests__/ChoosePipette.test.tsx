@@ -5,7 +5,7 @@ import {
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import { fireEvent, screen } from '@testing-library/react'
-import { LEGACY_COLORS, renderWithProviders } from '@opentrons/components'
+import { COLORS, renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 import { getIsOnDevice } from '../../../redux/config'
@@ -69,7 +69,7 @@ describe('ChoosePipette', () => {
 
     //  Single and 8-Channel pipettes are selected first by default
     expect(singleMountPipettes).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.lightBlue}`
+      `background-color: ${COLORS.lightBlue}`
     )
     expect(ninetySixPipette).toHaveStyle(`background-color: ${COLORS.white}`)
 
@@ -140,7 +140,7 @@ describe('ChoosePipette', () => {
     })
     expect(singleMountPipettes).toHaveStyle(`background-color: ${COLORS.white}`)
     expect(ninetySixPipette).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.lightBlue}`
+      `background-color: ${COLORS.lightBlue}`
     )
   })
   it('renders the correct text for the 96 channel button when there is a left pipette attached', () => {

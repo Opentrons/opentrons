@@ -7,7 +7,6 @@ import {
   BORDERS,
   Btn,
   COLORS,
-  LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
@@ -80,7 +79,7 @@ export function WifiConnectionDetails({
             <StyledText
               as="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={LEGACY_COLORS.darkBlack70}
+              color={COLORS.grey60}
             >
               {t('connected_network')}
             </StyledText>
@@ -88,7 +87,7 @@ export function WifiConnectionDetails({
               display={DISPLAY_FLEX}
               width="100%"
               padding={SPACING.spacing24}
-              backgroundColor={COLORS.green35}
+              backgroundColor={COLORS.green3}
               borderRadius={BORDERS.borderRadiusSize3}
               onClick={() => setShowNetworkDetailModal(true)}
               alignItems={ALIGN_CENTER}
@@ -125,7 +124,7 @@ export function WifiConnectionDetails({
                     size="2.5rem"
                     name="info"
                     aria-label={`${activeSsid}_info_icon`}
-                    color={COLORS.black90}
+                    color={COLORS.darkBlack100}
                   />
                   <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                     {t('view_details')}
@@ -139,7 +138,7 @@ export function WifiConnectionDetails({
           <StyledText
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            color={LEGACY_COLORS.darkBlack70}
+            color={COLORS.grey60}
             paddingX={SPACING.spacing40}
             marginBottom={SPACING.spacing8}
           >

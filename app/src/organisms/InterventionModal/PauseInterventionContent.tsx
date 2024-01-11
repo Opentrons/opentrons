@@ -5,7 +5,7 @@ import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   RESPONSIVENESS,
@@ -47,13 +47,13 @@ export function PauseInterventionContent({
 
 const PAUSE_HEADER_STYLE = css`
   align-items: ${ALIGN_CENTER};
-  background-color: ${LEGACY_COLORS.fundamentalsBackground};
+  background-color: ${COLORS.grey35};
   border-radius: ${BORDERS.radiusSoftCorners};
   grid-gap: ${SPACING.spacing6};
   padding: ${SPACING.spacing16};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     align-self: ${ALIGN_CENTER};
-    background-color: ${LEGACY_COLORS.light1};
+    background-color: ${COLORS.light1};
     border-radius: ${BORDERS.borderRadiusSize3};
     grid-gap: ${SPACING.spacing32};
     padding: ${SPACING.spacing24};

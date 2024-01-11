@@ -7,7 +7,7 @@ import { ErrorBoundary } from 'react-error-boundary'
 import {
   Box,
   POSITION_RELATIVE,
-  LEGACY_COLORS,
+  COLORS,
   OVERFLOW_AUTO,
   useIdle,
   useScrolling,
@@ -256,7 +256,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     }
 
     &::-webkit-scrollbar-thumb {
-      background: ${LEGACY_COLORS.darkBlack40};
+      background: ${COLORS.grey50};
       border-radius: 11px;
     }
   `

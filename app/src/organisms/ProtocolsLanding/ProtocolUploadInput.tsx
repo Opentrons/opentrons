@@ -6,7 +6,7 @@ import {
   DIRECTION_COLUMN,
   ALIGN_CENTER,
   Link,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
@@ -59,7 +59,7 @@ export function ProtocolUploadInput(
               t={t}
               i18nKey="shared:drag_and_drop"
               components={{
-                a: <Link color={LEGACY_COLORS.blueHover} role="button" />,
+                a: <Link color={COLORS.blueHover} role="button" />,
               }}
             />
           </StyledText>

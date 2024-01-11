@@ -1,11 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import {
-  TYPOGRAPHY,
-  BORDERS,
-  SPACING,
-  LEGACY_COLORS,
-} from '../ui-style-constants'
+import { TYPOGRAPHY, BORDERS, SPACING, COLORS } from '../ui-style-constants'
 import {
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,
@@ -25,11 +20,11 @@ const defaultTabStyle = css`
 `
 
 const inactiveTabStyle = css`
-  color: ${LEGACY_COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50Enabled};
 
   &:hover {
-    color: ${LEGACY_COLORS.darkGreyEnabled};
-    background-color: ${LEGACY_COLORS.fundamentalsBackgroundShade};
+    color: ${COLORS.grey50Enabled};
+    background-color: ${COLORS.fundamentalsBackgroundShade};
   }
 `
 
@@ -39,7 +34,7 @@ const currentTabStyle = css`
   border-top: ${BORDERS.lineBorder};
   border-left: ${BORDERS.lineBorder};
   border-right: ${BORDERS.lineBorder};
-  color: ${LEGACY_COLORS.blueEnabled};
+  color: ${COLORS.blueEnabled};
 
   /* extend below the tab when active to flow into the content */
   &:after {

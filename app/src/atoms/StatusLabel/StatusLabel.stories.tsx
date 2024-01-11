@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { LEGACY_COLORS } from '@opentrons/components'
+import { COLORS } from '@opentrons/components'
 import { StatusLabel } from './index'
 import type { Story, Meta } from '@storybook/react'
 
@@ -15,31 +15,31 @@ const Template: Story<React.ComponentProps<typeof StatusLabel>> = args => (
 export const Active = Template.bind({})
 Active.args = {
   status: 'Heating',
-  backgroundColor: LEGACY_COLORS.medBlue,
-  iconColor: LEGACY_COLORS.blueEnabled,
+  backgroundColor: COLORS.medBlue,
+  iconColor: COLORS.blueEnabled,
   pulse: true,
 }
 
 export const Holding = Template.bind({})
 Holding.args = {
   status: 'Holding at target',
-  backgroundColor: LEGACY_COLORS.medBlue,
-  iconColor: LEGACY_COLORS.blueEnabled,
+  backgroundColor: COLORS.medBlue,
+  iconColor: COLORS.blueEnabled,
   pulse: false,
 }
 
 export const Idle = Template.bind({})
 Idle.args = {
   status: 'Idle',
-  backgroundColor: LEGACY_COLORS.medGreyEnabled,
-  iconColor: LEGACY_COLORS.darkGreyEnabled,
+  backgroundColor: COLORS.grey35,
+  iconColor: COLORS.grey50Enabled,
   pulse: true,
 }
 
 export const Error = Template.bind({})
 Error.args = {
   status: 'Error',
-  backgroundColor: LEGACY_COLORS.warningBackgroundLight,
-  iconColor: LEGACY_COLORS.warningEnabled,
+  backgroundColor: COLORS.warningBackgroundLight,
+  iconColor: COLORS.warningEnabled,
   pulse: true,
 }

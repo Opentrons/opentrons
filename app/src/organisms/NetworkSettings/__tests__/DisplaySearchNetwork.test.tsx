@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { LEGACY_COLORS, renderWithProviders } from '@opentrons/components'
+import { COLORS, renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
 import { DisplaySearchNetwork } from '../DisplaySearchNetwork'

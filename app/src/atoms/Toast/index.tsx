@@ -15,7 +15,6 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
-  LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
@@ -190,7 +189,7 @@ export function Toast(props: ToastProps): JSX.Element {
   const ODD_ANIMATION_NONE = css``
 
   const TEXT_STYLE = css`
-    color: ${COLORS.black90};
+    color: ${COLORS.darkBlackEnabled};
     font-size: ${showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP};
     font-weight: ${showODDStyle
       ? TYPOGRAPHY.fontWeightSemiBold
@@ -228,36 +227,30 @@ export function Toast(props: ToastProps): JSX.Element {
   } = {
     [ERROR_TOAST]: {
       iconName: 'ot-alert',
-      color: `${
-        showODDStyle ? LEGACY_COLORS.red2 : LEGACY_COLORS.errorEnabled
-      }`,
+      color: `${showODDStyle ? COLORS.red2 : COLORS.errorEnabled}`,
       backgroundColor: `${
-        showODDStyle ? LEGACY_COLORS.red4 : LEGACY_COLORS.errorBackgroundLight
+        showODDStyle ? COLORS.red4 : COLORS.errorBackgroundLight
       }`,
     },
     [INFO_TOAST]: {
       iconName: 'information',
-      color: `${
-        showODDStyle ? LEGACY_COLORS.grey2 : LEGACY_COLORS.darkGreyEnabled
-      }`,
+      color: `${showODDStyle ? COLORS.grey50 : COLORS.grey50Enabled}`,
       backgroundColor: `${
-        showODDStyle ? LEGACY_COLORS.grey4 : LEGACY_COLORS.darkGreyDisabled
+        showODDStyle ? COLORS.grey35 : COLORS.grey50Disabled
       }`,
     },
     [SUCCESS_TOAST]: {
       iconName: 'ot-check',
-      color: `${showODDStyle ? COLORS.green50 : COLORS.green50}`,
-      backgroundColor: `${showODDStyle ? COLORS.green30 : COLORS.green20}`,
+      color: `${showODDStyle ? COLORS.green2 : COLORS.successEnabled}`,
+      backgroundColor: `${
+        showODDStyle ? COLORS.green4 : COLORS.successBackgroundLight
+      }`,
     },
     [WARNING_TOAST]: {
       iconName: 'ot-alert',
-      color: `${
-        showODDStyle ? LEGACY_COLORS.yellow2 : LEGACY_COLORS.warningEnabled
-      }`,
+      color: `${showODDStyle ? COLORS.yellow2 : COLORS.warningEnabled}`,
       backgroundColor: `${
-        showODDStyle
-          ? LEGACY_COLORS.yellow4
-          : LEGACY_COLORS.warningBackgroundLight
+        showODDStyle ? COLORS.yellow4 : COLORS.warningBackgroundLight
       }`,
     },
   }
@@ -365,7 +358,7 @@ export function Toast(props: ToastProps): JSX.Element {
         >
           {headingText.length > 0 ? (
             <StyledText
-              color={COLORS.black90}
+              color={COLORS.darkBlackEnabled}
               fontSize={
                 showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
               }
@@ -409,7 +402,7 @@ export function Toast(props: ToastProps): JSX.Element {
       {closeText ? (
         <Link role="button" onClick={() => onCloseHandler()}>
           <StyledText
-            color={COLORS.black90}
+            color={COLORS.darkBlackEnabled}
             fontSize={
               showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
             }

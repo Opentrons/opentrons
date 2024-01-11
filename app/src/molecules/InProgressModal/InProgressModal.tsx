@@ -3,7 +3,7 @@ import { css } from 'styled-components'
 import { useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   TYPOGRAPHY,
   SPACING,
@@ -49,10 +49,10 @@ const MODAL_STYLE = css`
   }
 `
 const SPINNER_STYLE = css`
-  color: ${LEGACY_COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50Enabled};
   opacity: 100%;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    color: ${COLORS.black90};
+    color: ${COLORS.darkBlackEnabled};
     opacity: 70%;
   }
 `

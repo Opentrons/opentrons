@@ -73,7 +73,7 @@ export const Success = (
 
   return (
     <SimpleWizardBody
-      iconColor={COLORS.green50}
+      iconColor={COLORS.successEnabled}
       header={header}
       isSuccess
       css={HEADER_STYLE}

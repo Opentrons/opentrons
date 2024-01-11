@@ -1,7 +1,7 @@
 import * as React from 'react'
 import i18n from 'i18next'
 import { fireEvent, screen } from '@testing-library/react'
-import { LEGACY_COLORS, renderWithProviders } from '@opentrons/components'
+import { COLORS, renderWithProviders } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { RobotTypeTile } from '../RobotTypeTile'
 import type { FormState, WizardTileProps } from '../types'
@@ -45,7 +45,7 @@ describe('RobotTypeTile', () => {
     const flex = screen.getByLabelText('RobotTypeTile_OT-3 Standard')
     fireEvent.click(flex)
     expect(props.setFieldValue).toHaveBeenCalled()
-    expect(flex).toHaveStyle(`background-color: ${LEGACY_COLORS.lightBlue}`)
+    expect(flex).toHaveStyle(`background-color: ${COLORS.lightBlue}`)
     const ot2 = screen.getByLabelText('RobotTypeTile_OT-2 Standard')
     fireEvent.click(ot2)
     expect(props.setFieldValue).toHaveBeenCalled()

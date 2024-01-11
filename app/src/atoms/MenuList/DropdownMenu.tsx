@@ -3,7 +3,7 @@ import { css } from 'styled-components'
 import {
   Flex,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   POSITION_ABSOLUTE,
   DIRECTION_COLUMN,

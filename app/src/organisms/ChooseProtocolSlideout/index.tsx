@@ -20,7 +20,7 @@ import {
   DISPLAY_BLOCK,
   Icon,
   PrimaryButton,
-  LEGACY_COLORS,
+  COLORS,
   ProtocolDeck,
 } from '@opentrons/components'
 
@@ -243,7 +243,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                     <Icon
                       name="alert-circle"
                       size="1.25rem"
-                      color={LEGACY_COLORS.errorEnabled}
+                      color={COLORS.errorEnabled}
                     />
                   </>
                 ) : null}
@@ -252,7 +252,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
             {runCreationError != null && isSelected ? (
               <StyledText
                 as="label"
-                color={LEGACY_COLORS.errorText}
+                color={COLORS.errorText}
                 overflowWrap="anywhere"
                 display={DISPLAY_BLOCK}
                 marginTop={`-${SPACING.spacing8}`}
@@ -266,7 +266,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                       robotLink: (
                         <NavLink
                           css={css`
-                            color: ${LEGACY_COLORS.errorText};
+                            color: ${COLORS.errorText};
                             text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
                           `}
                           to={`/devices/${robotName}`}
@@ -294,15 +294,11 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
       css={css`
         ${BORDERS.cardOutlineBorder}
         &:hover {
-          border-color: ${LEGACY_COLORS.medGreyEnabled};
+          border-color: ${COLORS.grey35};
         }
       `}
     >
-      <Icon
-        size="1.25rem"
-        name="alert-circle"
-        color={LEGACY_COLORS.medGreyEnabled}
-      />
+      <Icon size="1.25rem" name="alert-circle" color={COLORS.grey35} />
       <StyledText
         as="p"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}

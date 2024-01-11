@@ -15,7 +15,7 @@ import {
   ALIGN_START,
   BORDERS,
   DIRECTION_ROW,
-  LEGACY_COLORS,
+  COLORS,
   OutlineButton,
   Icon,
   JUSTIFY_CENTER,
@@ -104,10 +104,10 @@ export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
 }
 
 const INPUT_STYLE = css`
-  background-color: ${LEGACY_COLORS.blueEnabled};
+  background-color: ${COLORS.blueEnabled};
   border-radius: ${BORDERS.radiusRoundEdge};
   box-shadow: none;
-  color: ${LEGACY_COLORS.fundamentalsBackground};
+  color: ${COLORS.grey35};
   overflow: no-wrap;
   padding-left: ${SPACING.spacing16};
   padding-right: ${SPACING.spacing16};
@@ -124,22 +124,22 @@ const INPUT_STYLE = css`
   }
 
   &:hover {
-    background-color: ${LEGACY_COLORS.blueHover};
+    background-color: ${COLORS.blueHover};
     box-shadow: none;
   }
 
   &:active {
-    background-color: ${LEGACY_COLORS.bluePressed};
+    background-color: ${COLORS.bluePressed};
   }
 `
 
 const ACCORDION_STYLE = css`
   border-radius: 50%;
   &:hover {
-    background: ${LEGACY_COLORS.lightGreyHover};
+    background: ${COLORS.grey35};
   }
   &:active {
-    background: ${LEGACY_COLORS.lightGreyPressed};
+    background: ${COLORS.grey35};
   }
 `
 interface PipetteTipsFieldProps extends FormikProps<FormState> {
@@ -275,7 +275,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
               alignItems={ALIGN_CENTER}
               width="100%"
               height="8.5rem"
-              backgroundColor={LEGACY_COLORS.darkBlack20}
+              backgroundColor={COLORS.grey35}
               padding={SPACING.spacing8}
               border={BORDERS.lineBorder}
               borderRadius={BORDERS.borderRadiusSize2}
@@ -283,7 +283,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
               <Text
                 as="h4"
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
-                color={LEGACY_COLORS.darkBlack70}
+                color={COLORS.grey60}
               >
                 {i18n.t('modal.create_file_wizard.upload_tiprack')}
               </Text>

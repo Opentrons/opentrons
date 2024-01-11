@@ -4,7 +4,7 @@ import { css } from 'styled-components'
 
 import {
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   POSITION_FIXED,
@@ -24,13 +24,13 @@ const SSID_INPUT_FIELD_STYLE = css`
   font-size: ${TYPOGRAPHY.fontSize28};
   line-height: ${TYPOGRAPHY.lineHeight36};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  color: ${COLORS.black90};
+  color: ${COLORS.darkBlack100};
   padding-left: ${SPACING.spacing24};
   box-sizing: border-box;
 
   &:focus {
-    border: 3px solid ${LEGACY_COLORS.blueEnabled};
-    filter: drop-shadow(0px 0px 10px ${LEGACY_COLORS.blueEnabled});
+    border: 3px solid ${COLORS.blueEnabled};
+    filter: drop-shadow(0px 0px 10px ${COLORS.blueEnabled});
     border-radius: ${BORDERS.borderRadiusSize1};
   }
 `
@@ -61,7 +61,7 @@ export function SetWifiSsid({
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={errorMessage != null ? LEGACY_COLORS.red2 : COLORS.black90}
+          color={errorMessage != null ? COLORS.red2 : COLORS.darkBlack100}
         >
           {t('enter_network_name')}
         </StyledText>

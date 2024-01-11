@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import { EXTENSION } from '@opentrons/shared-data'
-import { LEGACY_COLORS, TYPOGRAPHY, SPACING, Flex } from '@opentrons/components'
+import { COLORS, TYPOGRAPHY, SPACING, Flex } from '@opentrons/components'
 import { css } from 'styled-components'
 import { StyledText } from '../../atoms/text'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
@@ -247,7 +247,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
   return errorMessage != null ? (
     <SimpleWizardBody
       isSuccess={false}
-      iconColor={LEGACY_COLORS.errorEnabled}
+      iconColor={COLORS.errorEnabled}
       header={t('shared:error_encountered')}
       subHeader={
         <Trans

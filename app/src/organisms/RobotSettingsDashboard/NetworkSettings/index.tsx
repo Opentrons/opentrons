@@ -6,7 +6,6 @@ import {
   Flex,
   SPACING,
   COLORS,
-  LEGACY_COLORS,
   Icon,
   Btn,
   DIRECTION_ROW,
@@ -44,7 +43,7 @@ export function NetworkSettings({
   }
 
   const handleButtonBackgroundColor = (isConnected: boolean): string =>
-    isConnected ? COLORS.green35 : LEGACY_COLORS.light1
+    isConnected ? COLORS.green3 : COLORS.light1
 
   const handleChipText = (isConnected: boolean): string =>
     isConnected ? t('connected') : t('not_connected')
@@ -103,8 +102,8 @@ function NetworkSettingButton({
   const PUSHED_STATE_STYLE = css`
     &:active {
       background-color: ${chipType === 'success'
-        ? COLORS.green40
-        : LEGACY_COLORS.darkBlack40};
+        ? COLORS.green3Pressed
+        : COLORS.grey50};
     }
   `
 
@@ -136,7 +135,7 @@ function NetworkSettingButton({
                   fontSize={TYPOGRAPHY.fontSize28}
                   lineHeight={TYPOGRAPHY.lineHeight36}
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={LEGACY_COLORS.darkBlack70}
+                  color={COLORS.grey60}
                 >
                   {networkName}
                 </StyledText>

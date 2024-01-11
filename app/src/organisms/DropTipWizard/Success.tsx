@@ -29,7 +29,7 @@ export const Success = (props: SuccessProps): JSX.Element => {
 
   return (
     <SimpleWizardBody
-      iconColor={COLORS.green50}
+      iconColor={COLORS.successEnabled}
       header={i18n.format(message, 'capitalize')}
       isSuccess
     >

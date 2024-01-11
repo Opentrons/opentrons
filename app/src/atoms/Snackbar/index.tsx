@@ -5,7 +5,7 @@ import {
   Flex,
   ALIGN_CENTER,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -79,7 +79,7 @@ export function Snackbar(props: SnackbarProps): JSX.Element {
       alignItems={ALIGN_CENTER}
       borderRadius={BORDERS.borderRadiusSize3}
       boxShadow={BORDERS.shadowSmall}
-      backgroundColor={COLORS.black90}
+      backgroundColor={COLORS.darkBlack100}
       maxWidth="max-content"
       padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
       data-testid="Snackbar"

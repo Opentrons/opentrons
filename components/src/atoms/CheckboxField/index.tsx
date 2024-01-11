@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { LEGACY_COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { Flex, Box } from '../../primitives'
 import { Icon } from '../../icons'
 import { ALIGN_CENTER, JUSTIFY_CENTER, SIZE_1 } from '../../styles'
@@ -45,7 +45,7 @@ const OUTER_STYLE = css`
 const INNER_STYLE_VALUE = css`
   width: ${SPACING.spacing20};
   min-width: ${SPACING.spacing20};
-  color: ${LEGACY_COLORS.blueEnabled};
+  color: ${COLORS.blueEnabled};
   display: flex;
   border-radius: 1px;
   justify-content: ${JUSTIFY_CENTER};
@@ -53,25 +53,25 @@ const INNER_STYLE_VALUE = css`
 
   &:hover {
     cursor: pointer;
-    color: ${LEGACY_COLORS.blueHover};
+    color: ${COLORS.blueHover};
   }
 
   &:active {
-    color: ${LEGACY_COLORS.bluePressed};
+    color: ${COLORS.bluePressed};
   }
 
   &:focus {
-    box-shadow: 0 0 0 3px ${COLORS.blue50};
+    box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
   }
   &:disabled {
-    color: ${LEGACY_COLORS.bluePressed};
+    color: ${COLORS.bluePressed};
   }
 `
 
 const INNER_STYLE_NO_VALUE = css`
   width: ${SPACING.spacing20};
   min-width: ${SPACING.spacing20};
-  color: ${LEGACY_COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50Enabled};
   display: flex;
   border-radius: 1px;
   justify-content: ${JUSTIFY_CENTER};
@@ -79,26 +79,26 @@ const INNER_STYLE_NO_VALUE = css`
 
   &:hover {
     cursor: pointer;
-    color: ${LEGACY_COLORS.darkGreyHover};
+    color: ${COLORS.grey55};
   }
 
   &:active {
-    color: ${LEGACY_COLORS.darkGreyPressed};
+    color: ${COLORS.grey60};
   }
 
   &:focus {
-    box-shadow: 0 0 0 3px ${COLORS.blue50};
+    box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
   }
 
   &:disabled {
-    color: ${LEGACY_COLORS.darkGreyPressed};
+    color: ${COLORS.grey60};
   }
 `
 
 const LABEL_TEXT_STYLE = css`
   font-size: ${TYPOGRAPHY.fontSizeP};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  color: ${COLORS.black90};
+  color: ${COLORS.darkBlackEnabled};
   flex: 0 0 auto;
   padding: ${SPACING.spacing8} ${SPACING.spacing8};
 
@@ -126,13 +126,13 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
           borderRadius="2px"
-          backgroundColor={LEGACY_COLORS.darkGreyDisabled}
+          backgroundColor={COLORS.grey50Disabled}
           size={SIZE_1}
         >
           <Box
             height="1.5px"
             width="0.375rem"
-            backgroundColor={LEGACY_COLORS.darkGreyEnabled}
+            backgroundColor={COLORS.grey50Enabled}
           />
         </Flex>
       ) : (

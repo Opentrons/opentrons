@@ -11,7 +11,6 @@ import {
   BORDERS,
   Btn,
   COLORS,
-  LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
@@ -239,7 +238,7 @@ export function RunSummary(): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing40}
           padding={SPACING.spacing40}
-          backgroundColor={didRunSucceed ? COLORS.green50 : LEGACY_COLORS.red2}
+          backgroundColor={didRunSucceed ? COLORS.green2 : COLORS.red2}
         >
           <SplashFrame>
             <Flex gridGap={SPACING.spacing32} alignItems={ALIGN_CENTER}>
@@ -284,7 +283,7 @@ export function RunSummary(): JSX.Element {
                 name={didRunSucceed ? 'ot-check' : 'ot-alert'}
                 size="2rem"
                 color={
-                  didRunSucceed ? COLORS.green50 : LEGACY_COLORS.errorEnabled
+                  didRunSucceed ? COLORS.successEnabled : COLORS.errorEnabled
                 }
               />
               <SummaryHeader>{headerText}</SummaryHeader>
@@ -389,7 +388,7 @@ const SplashFrame = styled(Flex)`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
-  border: ${BORDERS.borderRadiusSize2} solid ${COLORS.white}${LEGACY_COLORS.opacity20HexCode};
+  border: ${BORDERS.borderRadiusSize2} solid ${COLORS.white}${COLORS.opacity20HexCode};
   border-radius: ${BORDERS.borderRadiusSize3};
   grid-gap: ${SPACING.spacing40};
 `
@@ -399,7 +398,7 @@ const ProtocolName = styled.h4`
   text-align: ${TYPOGRAPHY.textAlignLeft};
   font-size: ${TYPOGRAPHY.fontSize28};
   line-height: ${TYPOGRAPHY.lineHeight36};
-  color: ${LEGACY_COLORS.darkBlack70};
+  color: ${COLORS.grey60};
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -417,7 +416,7 @@ const SummaryDatum = styled.div`
   height: 44px;
   background: #d6d6d6;
   border-radius: 4px;
-  color: ${LEGACY_COLORS.darkBlack90};
+  color: ${COLORS.grey60};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
@@ -430,17 +429,17 @@ const DURATION_TEXT_STYLE = css`
 `
 
 const RUN_AGAIN_CLICKED_STYLE = css`
-  background-color: ${LEGACY_COLORS.bluePressed};
+  background-color: ${COLORS.bluePressed};
   &:focus {
-    background-color: ${LEGACY_COLORS.bluePressed};
+    background-color: ${COLORS.bluePressed};
   }
   &:hover {
-    background-color: ${LEGACY_COLORS.bluePressed};
+    background-color: ${COLORS.bluePressed};
   }
   &:focus-visible {
-    background-color: ${LEGACY_COLORS.bluePressed};
+    background-color: ${COLORS.bluePressed};
   }
   &:active {
-    background-color: ${LEGACY_COLORS.bluePressed};
+    background-color: ${COLORS.bluePressed};
   }
 `

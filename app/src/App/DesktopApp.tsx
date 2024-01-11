@@ -3,7 +3,7 @@ import { Redirect, Route, Switch, useRouteMatch } from 'react-router-dom'
 
 import {
   Box,
-  LEGACY_COLORS,
+  COLORS,
   OVERFLOW_AUTO,
   POSITION_RELATIVE,
 } from '@opentrons/components'
@@ -118,7 +118,7 @@ export const DesktopApp = (): JSX.Element => {
                         position={POSITION_RELATIVE}
                         width="100%"
                         height="100%"
-                        backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+                        backgroundColor={COLORS.grey35}
                         overflow={OVERFLOW_AUTO}
                       >
                         <ModalPortalRoot />

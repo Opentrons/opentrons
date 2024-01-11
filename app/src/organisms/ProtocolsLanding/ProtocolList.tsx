@@ -15,7 +15,6 @@ import {
   BORDERS,
   POSITION_ABSOLUTE,
   COLORS,
-  LEGACY_COLORS,
   SecondaryButton,
   DIRECTION_COLUMN,
   Overlay,
@@ -43,11 +42,11 @@ const SORT_BY_BUTTON_STYLE = css`
   background-color: ${COLORS.transparent};
   cursor: pointer;
   &:hover {
-    background-color: ${LEGACY_COLORS.medGreyHover};
+    background-color: ${COLORS.grey55};
   }
   &:active,
   &:focus {
-    background-color: ${LEGACY_COLORS.medGreyEnabled};
+    background-color: ${COLORS.grey35};
   }
 `
 const FLEX = 'Flex'
@@ -162,7 +161,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
             <StyledText
               as="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={LEGACY_COLORS.darkGreyEnabled}
+              color={COLORS.grey50Enabled}
             >
               {t('shared:sort_by')}
             </StyledText>

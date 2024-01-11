@@ -3,7 +3,7 @@ import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import {
   renderWithProviders,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
   BORDERS,
@@ -33,7 +33,7 @@ describe('SubmitPrimaryButton', () => {
     const { getByText } = render(props)
     const button = getByText('submit primary button')
     expect(button).toHaveStyle(
-      `background-color: ${String(LEGACY_COLORS.blueEnabled)}`
+      `background-color: ${String(COLORS.blueEnabled)}`
     )
     expect(button).toHaveStyle(
       `border-radius: ${String(BORDERS.radiusSoftCorners)}`
@@ -64,11 +64,9 @@ describe('SubmitPrimaryButton', () => {
     const button = getByText('submit primary button')
     expect(button).toBeDisabled()
     expect(button).toHaveStyle(
-      `background-color: ${String(LEGACY_COLORS.darkGreyDisabled)}`
+      `background-color: ${String(COLORS.grey50Disabled)}`
     )
-    expect(button).toHaveStyle(
-      `color: ${String(LEGACY_COLORS.successDisabled)}`
-    )
+    expect(button).toHaveStyle(`color: ${String(COLORS.successDisabled)}`)
   })
 
   it('calls mock function when clicking the button', () => {
@@ -83,7 +81,7 @@ describe('SubmitPrimaryButton', () => {
     const button = getByText('submit primary button')
     expect(button).toHaveStyleRule(
       'background-color',
-      `${String(LEGACY_COLORS.blueHover)}`,
+      `${String(COLORS.blueHover)}`,
       {
         modifier: ':hover',
       }
@@ -98,7 +96,7 @@ describe('SubmitPrimaryButton', () => {
     const button = getByText('submit primary button')
     expect(button).toHaveStyleRule(
       'background-color',
-      `${String(LEGACY_COLORS.bluePressed)}`,
+      `${String(COLORS.bluePressed)}`,
       {
         modifier: ':active',
       }
@@ -110,7 +108,7 @@ describe('SubmitPrimaryButton', () => {
     const button = getByText('submit primary button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${String(LEGACY_COLORS.warningEnabled)}`,
+      `0 0 0 3px ${String(COLORS.warningEnabled)}`,
       {
         modifier: ':focus-visible',
       }

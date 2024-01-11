@@ -10,7 +10,6 @@ import {
   SPACING,
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
-  LEGACY_COLORS,
   COLORS,
   Overlay,
   POSITION_FIXED,
@@ -94,10 +93,10 @@ const CLOSE_ICON_STYLE = css`
   border-radius: 50%;
 
   &:hover {
-    background: ${LEGACY_COLORS.lightGreyHover};
+    background: ${COLORS.grey35};
   }
   &:active {
-    background: ${LEGACY_COLORS.lightGreyPressed};
+    background: ${COLORS.grey35};
   }
 `
 
@@ -192,10 +191,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
           ) : (
             <>{title}</>
           )}
-          <Box
-            borderBottom={`1px solid ${LEGACY_COLORS.medGreyEnabled}`}
-            marginY={0}
-          />
+          <Box borderBottom={`1px solid ${COLORS.grey35}`} marginY={0} />
           <Box
             padding={SPACING.spacing16}
             flex="1 1 auto"

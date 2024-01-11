@@ -5,7 +5,7 @@ import {
   Box,
   Icon,
   Link,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -28,10 +28,7 @@ export function ManufacturerDetails(
     brandName === 'all' || brandName === 'generic' ? t(brandName) : brandName
 
   return (
-    <Box
-      backgroundColor={LEGACY_COLORS.fundamentalsBackground}
-      padding={SPACING.spacing16}
-    >
+    <Box backgroundColor={COLORS.grey35} padding={SPACING.spacing16}>
       <Flex
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
