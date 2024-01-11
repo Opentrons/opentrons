@@ -87,7 +87,7 @@
     "cz-conventional-changelog": "2.1.0",
     "decompress": "4.2.1",
     "download": "8.0.0",
-    "electron": "23.3.13",
+    "electron": "27.0.0",
     "electron-builder": "24.0.0",
     "eslint": "^7.22.0",
     "eslint-config-prettier": "^8.1.0",
