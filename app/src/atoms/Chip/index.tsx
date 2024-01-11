@@ -8,6 +8,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   Icon,
+  COLORS,
   LEGACY_COLORS,
 } from '@opentrons/components'
 
@@ -79,7 +80,7 @@ export function Chip({
 }: ChipProps): JSX.Element {
   const backgroundColor =
     background === false && type !== 'basic'
-      ? LEGACY_COLORS.transparent
+      ? COLORS.transparent
       : CHIP_PROPS_BY_TYPE[type].backgroundColor
   const icon = iconName ?? CHIP_PROPS_BY_TYPE[type].iconName ?? 'ot-alert'
   return (

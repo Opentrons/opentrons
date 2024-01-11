@@ -5,6 +5,7 @@ import {
   Icon,
   RobotCoordsForeignObject,
   ALIGN_CENTER,
+  COLORS,
   LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -64,7 +65,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
         backgroundColor:
           moduleDef.moduleType === THERMOCYCLER_MODULE_TYPE
             ? COLORS.white
-            : LEGACY_COLORS.transparent,
+            : COLORS.transparent,
       }}
     >
       <Flex

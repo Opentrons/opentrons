@@ -8,6 +8,7 @@ import {
   Flex,
   Link,
   SPACING,
+  COLORS,
   LEGACY_COLORS,
   BORDERS,
   TYPOGRAPHY,
@@ -64,7 +65,7 @@ const FILTER_OPTIONS: DropdownOption[] = labwareDisplayCategoryFilters.map(
 )
 
 const SORT_BY_BUTTON_STYLE = css`
-  background-color: ${LEGACY_COLORS.transparent};
+  background-color: ${COLORS.transparent};
   cursor: pointer;
   &:hover {
     background-color: ${LEGACY_COLORS.medGreyHover};

@@ -8,6 +8,7 @@ import {
 
 import { C_MED_LIGHT_GRAY } from '../../../styles'
 import { LEGACY_COLORS, BORDERS } from '../../../ui-style-constants'
+import { COLORS } from '../../../helix-design-system'
 
 import { RobotCoordsForeignDiv } from '../../Deck'
 import { ThermocyclerGEN1 } from './ThermocyclerGEN1'
@@ -40,7 +41,7 @@ export function Thermocycler(props: ThermocyclerVizProps): JSX.Element {
     )
   }
 
-  let ledLightColor = LEGACY_COLORS.transparent
+  let ledLightColor = COLORS.transparent
   if (blockTargetTemp != null) {
     ledLightColor =
       blockTargetTemp <= ROOM_TEMPERATURE_C

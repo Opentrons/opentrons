@@ -6,6 +6,7 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   ALIGN_STRETCH,
+  COLORS,
   LEGACY_COLORS,
   COLORS,
   DIRECTION_COLUMN,
@@ -80,7 +81,7 @@ const NavbarIcon = styled(Icon)`
   padding: ${SPACING.spacing6};
   border-radius: 50%;
   color: ${LEGACY_COLORS.medGreyEnabled};
-  background-color: ${LEGACY_COLORS.transparent};
+  background-color: ${COLORS.transparent};
 
   &:hover {
     background-color: ${COLORS.black80};

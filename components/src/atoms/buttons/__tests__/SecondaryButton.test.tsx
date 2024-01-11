@@ -7,6 +7,7 @@ import {
   TYPOGRAPHY,
   SPACING,
 } from '../../../ui-style-constants'
+import { COLORS } from '../../../helix-design-system'
 
 import { SecondaryButton } from '../SecondaryButton'
 
@@ -26,7 +27,7 @@ describe('SecondaryButton', () => {
   it('renders primary button with text', () => {
     const { getByText } = render(props)
     const button = getByText('secondary button')
-    expect(button).toHaveStyle(`background-color: ${LEGACY_COLORS.transparent}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.transparent}`)
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16}`
     )

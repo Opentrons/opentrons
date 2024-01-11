@@ -7,6 +7,7 @@ import {
 import {
   ALIGN_CENTER,
   BORDERS,
+  COLORS,
   LEGACY_COLORS,
   Flex,
   JUSTIFY_CENTER,
@@ -49,7 +50,7 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
           key={cutout.id}
           cutoutId={cutout.id}
           deckDefinition={deckDef}
-          slotClipColor={LEGACY_COLORS.transparent}
+          slotClipColor={COLORS.transparent}
           fixtureBaseColor={LEGACY_COLORS.light1}
         />
       ))}

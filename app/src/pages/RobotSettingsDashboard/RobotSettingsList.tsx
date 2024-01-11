@@ -8,6 +8,7 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   Btn,
+  COLORS,
   LEGACY_COLORS,
   BORDERS,
   DISPLAY_FLEX,
@@ -250,7 +251,7 @@ export function OnOffToggle(props: { isOn: boolean }): JSX.Element {
       flexDirection={DIRECTION_ROW}
       gridGap={SPACING.spacing12}
       alignItems={ALIGN_CENTER}
-      backgroundColor={LEGACY_COLORS.transparent}
+      backgroundColor={COLORS.transparent}
       padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
       borderRadius={BORDERS.borderRadiusSize4}
     >

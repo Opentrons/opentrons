@@ -13,6 +13,7 @@ import {
   PrimaryButton,
   TYPOGRAPHY,
   BORDERS,
+  COLORS,
   LEGACY_COLORS,
   POSITION_FIXED,
 } from '@opentrons/components'
@@ -93,7 +94,7 @@ export const RunPreviewComponent = (
           const isCurrent = index === currentRunCommandIndex
           const borderColor = isCurrent
             ? LEGACY_COLORS.blueEnabled
-            : LEGACY_COLORS.transparent
+            : COLORS.transparent
           const backgroundColor = isCurrent
             ? LEGACY_COLORS.lightBlue
             : LEGACY_COLORS.fundamentalsBackground

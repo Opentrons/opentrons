@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import { LEGACY_COLORS } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 
 export interface TemperatureVizProps {
   targetTemperature: number | null
@@ -10,7 +11,7 @@ const ROOM_TEMPERATURE_C = 23
 
 export function Temperature(props: TemperatureVizProps): JSX.Element {
   const { targetTemperature } = props
-  let ledLightColor = LEGACY_COLORS.transparent
+  let ledLightColor = COLORS.transparent
   if (targetTemperature != null) {
     ledLightColor =
       targetTemperature <= ROOM_TEMPERATURE_C

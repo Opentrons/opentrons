@@ -6,7 +6,7 @@ import {
   SPACING,
 } from '../../ui-style-constants'
 import { isntStyleProp, styleProps } from '../../primitives'
-
+import { COLORS } from '../../helix-design-system'
 import type { StyleProps } from '../../index'
 
 interface SecondaryButtonProps extends StyleProps {
@@ -15,7 +15,7 @@ interface SecondaryButtonProps extends StyleProps {
 }
 export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   shouldForwardProp: p => isntStyleProp(p) && p !== 'isDangerous',
-})<SecondaryButtonProps>`
+}) <SecondaryButtonProps>`
   appearance: none;
   cursor: pointer;
   color: ${props =>
@@ -26,7 +26,7 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing8} ${SPACING.spacing16};
   text-transform: ${TYPOGRAPHY.textTransformNone};
-  background-color: ${LEGACY_COLORS.transparent};
+  background-color: ${COLORS.transparent};
   ${TYPOGRAPHY.pSemiBold}
 
   &:hover,
