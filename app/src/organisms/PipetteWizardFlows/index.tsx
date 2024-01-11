@@ -12,13 +12,13 @@ import {
 import {
   useHost,
   useDeleteMaintenanceRunMutation,
-  useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
 import {
   useCreateTargetedMaintenanceRunMutation,
   useChainMaintenanceCommands,
 } from '../../resources/runs/hooks'
 
+import { useNotifyCurrentMaintenanceRun } from '../../resources/notify/useNotifyCurrentMaintenanceRun'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
@@ -119,7 +119,7 @@ export const PipetteWizardFlows = (
       currentStepIndex !== totalStepCount ? 0 : currentStepIndex
     )
   }
-  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
     enabled: createdMaintenanceRunId != null,
   })

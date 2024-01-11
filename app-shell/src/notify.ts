@@ -11,9 +11,7 @@ import type { Action, Dispatch } from './types'
 // TOME: Explain that redundant requests don't harm network, but might as well prevent them (when subscribing),
 // but redundant connections do disconnect old connections.
 
-// TOME: Wire up the MR endpoint (add logic to the hook that makes use of the dispatches)
-// TOME: Test that redundant emissions still get data.
-// TOME: Test that fallback logic works.
+// TOME: Test that redundant emissions still get data!
 
 interface ConnectionStore {
   [hostname: string]: {

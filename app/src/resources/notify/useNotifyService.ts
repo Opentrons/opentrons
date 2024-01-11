@@ -1,55 +1,34 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
-import { useQueryClient } from 'react-query'
+import { useQuery, useQueryClient } from 'react-query'
 
-import { useHost } from './useHost'
+import { useHost } from '@opentrons/react-api-client'
 
-import { appShellListener } from '../../../app/src/redux/shell/remote'
+import { appShellListener } from '../../redux/shell/remote'
 import {
   notifySubscribeAction,
   notifyUnsubscribeAction,
-} from '../../../app/src/redux/shell'
+} from '../../redux/shell'
 
-import type { UseQueryOptions } from 'react-query'
 import type { HostConfig } from '@opentrons/api-client'
-import type { NotifyTopic } from '../../../app/src/redux/shell/types'
+import type { NotifyTopic } from '../../redux/shell/types'
 
-export const createNotifyOptions = <TData, TError>(): UseQueryOptions<
-  TData,
-  TError
-> => ({
-  staleTime: Infinity,
-  refetchInterval: false,
-  refetchIntervalInBackground: false,
-  refetchOnWindowFocus: false,
-  refetchOnMount: false,
-  refetchOnReconnect: false,
-})
-
-// TOME: Again, you want to use generics here.
-export interface QueryOptionsWithPolling<TData, Error>
-  extends UseQueryOptions<TData, Error> {
-  forceHttpPolling?: boolean
-}
-
-interface useNotifyServiceProps<TData, Error> {
+interface useNotifyServiceProps {
   topic: NotifyTopic
   queryKey: Array<string | HostConfig | null>
-  options: QueryOptionsWithPolling<TData, Error> // TOME: Will have to mess with this.
+  forceHttpPolling: boolean
 }
 
 // TOME: Remember to adjust typing here.
-export function useNotifyService<TData, Error>({
+export function useNotifyService({
   topic,
   queryKey,
-  options,
-}: useNotifyServiceProps<TData, Error>): any {
+  forceHttpPolling,
+}: useNotifyServiceProps): any {
   const dispatch = useDispatch()
   const host = useHost()
   const queryClient = useQueryClient()
   const [isNotifyError, setIsNotifyError] = React.useState(false)
-
-  const { forceHttpPolling } = options
 
   React.useEffect(() => {
     if (!forceHttpPolling) {
@@ -77,6 +56,7 @@ export function useNotifyService<TData, Error>({
       eventEmitter.on('data', onDataListener)
 
       if (hostname != null) {
+        console.log('hitting subscribe!')
         dispatch(notifySubscribeAction(hostname, topic))
       } else {
         console.error('Expected hostname, received null.')
@@ -91,5 +71,7 @@ export function useNotifyService<TData, Error>({
     }
   }, [])
 
-  return { notifyData: queryClient.getQueryData(queryKey), isNotifyError }
+  const query = useQuery(queryKey, () => queryClient.getQueryData(queryKey))
+
+  return { notifyQueryResponse: query, isNotifyError }
 }

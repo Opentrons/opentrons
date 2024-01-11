@@ -17,7 +17,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  useCurrentMaintenanceRun,
   useDeckConfigurationQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
@@ -30,6 +29,7 @@ import {
   SINGLE_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 
+import { useNotifyCurrentMaintenanceRun } from '../../resources/notify/useNotifyCurrentMaintenanceRun'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
@@ -62,7 +62,7 @@ export function DeviceDetailsDeckConfiguration({
   const deckConfig = useDeckConfigurationQuery().data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const { isRunRunning } = useRunStatuses()
-  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
   })
   const isMaintenanceRunExisting = maintenanceRunData?.data?.id != null
