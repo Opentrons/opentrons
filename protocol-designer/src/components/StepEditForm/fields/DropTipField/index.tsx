@@ -35,6 +35,12 @@ export function DropTipField(
   const options: DropdownOption[] = []
   if (wasteChute != null) options.push(wasteChuteOption)
   if (trashBin != null) options.push(trashOption)
+
+  React.useEffect(() => {
+    if (additionalEquipment[String(dropdownItem)] == null) {
+      updateValue(null)
+    }
+  }, [dropdownItem])
   return (
     <FormGroup
       label={i18n.t('form.step_edit_form.field.location.label')}
