@@ -49,7 +49,7 @@ describe('RobotTypeTile', () => {
     const ot2 = screen.getByLabelText('RobotTypeTile_OT-2 Standard')
     fireEvent.click(ot2)
     expect(props.setFieldValue).toHaveBeenCalled()
-    expect(ot2).toHaveStyle(`background-color: ${LEGACY_COLORS.white}`)
+    expect(ot2).toHaveStyle(`background-color: ${COLORS.white}`)
     fireEvent.click(screen.getByRole('button', { name: 'Next' }))
     expect(props.proceed).toHaveBeenCalled()
   })

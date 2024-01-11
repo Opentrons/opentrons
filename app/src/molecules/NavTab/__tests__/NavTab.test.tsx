@@ -46,7 +46,7 @@ describe('NavTab', () => {
     )
     expect(tab).toHaveStyle(`color: ${String(LEGACY_COLORS.darkGreyEnabled)}`)
     fireEvent.click(tab)
-    expect(tab).toHaveStyle(`color: ${String(LEGACY_COLORS.darkBlackEnabled)}`)
+    expect(tab).toHaveStyle(`color: ${String(COLORS.black90)}`)
     expect(tab).toHaveStyle(
       `border-bottom-color: ${String(LEGACY_COLORS.blueEnabled)}`
     )

@@ -25,28 +25,28 @@ describe('LegacyModalHeader', () => {
     props = {
       onClose: mockClose,
       title: 'mock modal header title',
-      backgroundColor: LEGACY_COLORS.white,
-      color: LEGACY_COLORS.darkBlackEnabled,
+      backgroundColor: COLORS.white,
+      color: COLORS.black90,
     }
   })
 
   it('should render text and close icon', () => {
     render(props)
     const title = screen.getByText('mock modal header title')
-    expect(title).toHaveStyle(`color: ${LEGACY_COLORS.darkBlackEnabled}`)
+    expect(title).toHaveStyle(`color: ${COLORS.black90}`)
     screen.getByTestId('ModalHeader_icon_close_mock modal header title')
   })
 
   it('should render text, icon, and close icon', () => {
     props.icon = {
       name: 'ot-alert',
-      color: LEGACY_COLORS.darkBlackEnabled,
+      color: COLORS.black90,
       size: '1.25rem',
       marginRight: SPACING.spacing8,
     }
     render(props)
     expect(screen.getByTestId('Modal_header_icon')).toHaveStyle(
-      `color: ${LEGACY_COLORS.darkBlackEnabled}`
+      `color: ${COLORS.black90}`
     )
     expect(screen.getByTestId('Modal_header_icon')).toHaveStyle(
       `width: 1.25rem`

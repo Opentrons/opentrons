@@ -23,7 +23,7 @@ export function StrokedWellsComponent(props: StrokedWellProps): JSX.Element {
               wellName={wellName}
               well={definition.wells[wellName]}
               stroke={color}
-              fill={LEGACY_COLORS.white}
+              fill={COLORS.white}
               strokeWidth="0.6"
             />
           )

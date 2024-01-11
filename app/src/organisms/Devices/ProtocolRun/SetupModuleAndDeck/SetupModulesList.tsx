@@ -387,7 +387,7 @@ export function ModulesListItem({
         borderWidth="1px"
         borderRadius={BORDERS.radiusSoftCorners}
         padding={SPACING.spacing16}
-        backgroundColor={LEGACY_COLORS.white}
+        backgroundColor={COLORS.white}
       >
         {showModuleSetupModal && heaterShakerModuleFromProtocol != null ? (
           <ModuleSetupModal

@@ -55,7 +55,7 @@ describe('OverflowBtn', () => {
 
     expect(getByRole('button')).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${String(LEGACY_COLORS.fundamentalsFocus)}`,
+      `0 0 0 3px ${String(COLORS.blue50)}`,
       {
         modifier: ':focus-visible',
       }

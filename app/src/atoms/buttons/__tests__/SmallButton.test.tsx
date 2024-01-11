@@ -1,6 +1,10 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders, LEGACY_COLORS, BORDERS } from '@opentrons/components'
+import {
+  renderWithProviders,
+  LEGACY_COLORS,
+  BORDERS,
+} from '@opentrons/components'
 
 import { SmallButton } from '../SmallButton'
 
@@ -54,9 +58,7 @@ describe('SmallButton', () => {
       buttonType: 'tertiaryHighLight',
     }
     render(props)
-    expect(screen.getByRole('button')).toHaveStyle(
-      `color: ${LEGACY_COLORS.darkBlackEnabled}`
-    )
+    expect(screen.getByRole('button')).toHaveStyle(`color: ${COLORS.black90}`)
   })
   it('renders the tertiary low light', () => {
     props = {
@@ -65,7 +67,7 @@ describe('SmallButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `color: ${LEGACY_COLORS.darkBlackEnabled}${LEGACY_COLORS.opacity70HexCode}`
+      `color: ${COLORS.black90}${LEGACY_COLORS.opacity70HexCode}`
     )
   })
   it('renders the button as disabled', () => {

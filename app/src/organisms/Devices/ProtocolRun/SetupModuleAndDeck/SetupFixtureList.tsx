@@ -170,7 +170,7 @@ export function FixtureListItem({
         borderWidth="1px"
         borderRadius={BORDERS.radiusSoftCorners}
         padding={SPACING.spacing16}
-        backgroundColor={LEGACY_COLORS.white}
+        backgroundColor={COLORS.white}
       >
         <Flex
           flexDirection={DIRECTION_ROW}

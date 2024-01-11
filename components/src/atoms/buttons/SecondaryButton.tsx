@@ -1,5 +1,10 @@
 import styled from 'styled-components'
-import { LEGACY_COLORS, BORDERS, TYPOGRAPHY, SPACING } from '../../ui-style-constants'
+import {
+  LEGACY_COLORS,
+  BORDERS,
+  TYPOGRAPHY,
+  SPACING,
+} from '../../ui-style-constants'
 import { isntStyleProp, styleProps } from '../../primitives'
 
 import type { StyleProps } from '../../index'
@@ -35,7 +40,7 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${LEGACY_COLORS.fundamentalsFocus};
+    box-shadow: 0 0 0 3px ${COLORS.blue50};
   }
 
   &:active {

@@ -90,10 +90,10 @@ const ZOOM_ICON_STYLE = css`
     background: ${LEGACY_COLORS.lightGreyPressed};
   }
   &:disabled {
-    background: ${LEGACY_COLORS.white};
+    background: ${COLORS.white};
   }
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${LEGACY_COLORS.fundamentalsFocus};
+    box-shadow: 0 0 0 3px ${COLORS.blue50};
   }
 `
 
@@ -327,8 +327,12 @@ export function ProtocolDetails(
   const deckMap = <ProtocolDeck protocolAnalysis={mostRecentAnalysis} />
 
   const deckViewByAnalysisStatus = {
-    missing: <Box size="14rem" backgroundColor={LEGACY_COLORS.medGreyEnabled} />,
-    loading: <Box size="14rem" backgroundColor={LEGACY_COLORS.medGreyEnabled} />,
+    missing: (
+      <Box size="14rem" backgroundColor={LEGACY_COLORS.medGreyEnabled} />
+    ),
+    loading: (
+      <Box size="14rem" backgroundColor={LEGACY_COLORS.medGreyEnabled} />
+    ),
     error: <Box size="14rem" backgroundColor={LEGACY_COLORS.medGreyEnabled} />,
     complete: (
       <Box size="14rem" height="auto">
@@ -386,7 +390,7 @@ export function ProtocolDetails(
           />
 
           <Flex
-            backgroundColor={LEGACY_COLORS.white}
+            backgroundColor={COLORS.white}
             border={`1px solid ${LEGACY_COLORS.medGreyEnabled}`}
             borderRadius={BORDERS.radiusSoftCorners}
             position={POSITION_RELATIVE}
@@ -534,7 +538,7 @@ export function ProtocolDetails(
             <Flex
               flex={`0 0 ${String(SIZE_5)}`}
               flexDirection={DIRECTION_COLUMN}
-              backgroundColor={LEGACY_COLORS.white}
+              backgroundColor={COLORS.white}
               border={`1px solid ${String(LEGACY_COLORS.medGreyEnabled)}`}
               borderRadius={BORDERS.radiusSoftCorners}
               height="100%"
@@ -561,7 +565,7 @@ export function ProtocolDetails(
                   <Icon name="union" size={SIZE_1} />
                 </Btn>
               </Flex>
-              <Box padding={SPACING.spacing16} backgroundColor={LEGACY_COLORS.white}>
+              <Box padding={SPACING.spacing16} backgroundColor={COLORS.white}>
                 {deckViewByAnalysisStatus[analysisStatus]}
               </Box>
             </Flex>
@@ -615,7 +619,7 @@ export function ProtocolDetails(
                 )}
               </Flex>
               <Box
-                backgroundColor={LEGACY_COLORS.white}
+                backgroundColor={COLORS.white}
                 border={BORDERS.lineBorder}
                 // remove left upper corner border radius when first tab is active
                 borderRadius={`${

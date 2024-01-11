@@ -44,7 +44,7 @@ export const ThermocyclerModuleData = (
       case 'idle': {
         StatusLabelProps.backgroundColor = LEGACY_COLORS.medGreyEnabled
         StatusLabelProps.iconColor = LEGACY_COLORS.darkGreyEnabled
-        StatusLabelProps.textColor = LEGACY_COLORS.darkBlackEnabled
+        StatusLabelProps.textColor = COLORS.black90
         break
       }
       case 'holding at target': {
@@ -89,7 +89,7 @@ export const ThermocyclerModuleData = (
             <StatusLabel
               status={data.lidStatus === 'in_between' ? 'open' : data.lidStatus}
               backgroundColor={LEGACY_COLORS.medGreyEnabled}
-              textColor={LEGACY_COLORS.darkBlackEnabled}
+              textColor={COLORS.black90}
               showIcon={false}
               key="lidStatus"
               id="lidStatus"

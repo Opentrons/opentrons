@@ -43,7 +43,7 @@ export function CalibrationStatusBanner({
         <RouterLink to={`/devices/${robotName}/robot-settings/calibration`}>
           <StyledText
             as="p"
-            color={LEGACY_COLORS.darkBlackEnabled}
+            color={COLORS.black90}
             paddingRight={SPACING.spacing16}
             textAlign={TEXT_ALIGN_RIGHT}
             textDecoration={TYPOGRAPHY.textDecorationUnderline}

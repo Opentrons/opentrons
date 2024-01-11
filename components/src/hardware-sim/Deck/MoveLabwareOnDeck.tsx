@@ -234,7 +234,7 @@ export function MoveLabwareOnDeck(
             y={OUTLINE_THICKNESS_MM}
             strokeWidth={OUTLINE_THICKNESS_MM}
             stroke={LEGACY_COLORS.blueEnabled}
-            fill={LEGACY_COLORS.white}
+            fill={COLORS.white}
             width={
               movedLabwareDef.dimensions.xDimension - 2 * OUTLINE_THICKNESS_MM
             }
@@ -282,7 +282,7 @@ function Well(props: WellProps): JSX.Element {
 
   return wellDef.shape === 'rectangular' ? (
     <rect
-      fill={LEGACY_COLORS.white}
+      fill={COLORS.white}
       stroke={LEGACY_COLORS.black}
       x={x - wellDef.xDimension / 2}
       y={y - wellDef.yDimension / 2}
@@ -291,7 +291,7 @@ function Well(props: WellProps): JSX.Element {
     />
   ) : (
     <circle
-      fill={LEGACY_COLORS.white}
+      fill={COLORS.white}
       stroke={LEGACY_COLORS.black}
       cx={x}
       cy={y}

@@ -64,7 +64,7 @@ export function LabwareOffsetTabs({
         </RoundTab>
       </Flex>
       <Box
-        backgroundColor={LEGACY_COLORS.white}
+        backgroundColor={COLORS.white}
         border={BORDERS.lineBorder}
         // remove left upper corner border radius when first tab is active
         borderRadius={`${

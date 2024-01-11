@@ -68,7 +68,7 @@ export function Tick(props: TickProps): JSX.Element {
       {...targetProps}
       cursor="pointer"
       onClick={makeHandleJumpToStep(index)}
-      backgroundColor={LEGACY_COLORS.white}
+      backgroundColor={COLORS.white}
       fontSize="9px"
       borderRadius="4px"
       border={`${LEGACY_COLORS.blueEnabled} 1px solid`}

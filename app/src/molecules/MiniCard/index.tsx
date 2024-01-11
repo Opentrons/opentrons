@@ -11,7 +11,7 @@ interface MiniCardProps extends StyleProps {
   isError?: boolean
 }
 const unselectedOptionStyles = css`
-  background-color: ${LEGACY_COLORS.white};
+  background-color: ${COLORS.white};
   border: 1px solid ${LEGACY_COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing8};

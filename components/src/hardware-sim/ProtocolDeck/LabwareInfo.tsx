@@ -44,7 +44,7 @@ export function LabwareInfo(props: {
         borderRadius="0 0 0.4rem 0.4rem"
         fontSize={TYPOGRAPHY.fontSizeCaption}
         padding={SPACING.spacing4}
-        color={LEGACY_COLORS.white}
+        color={COLORS.white}
       >
         <Flex
           flexDirection={DIRECTION_ROW}

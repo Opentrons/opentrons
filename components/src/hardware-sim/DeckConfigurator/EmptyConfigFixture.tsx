@@ -86,6 +86,6 @@ const EMPTY_CONFIG_STYLE = css`
   }
 
   &:focus-visible {
-    border: 3px solid ${LEGACY_COLORS.fundamentalsFocus};
+    border: 3px solid ${COLORS.blue50};
   }
 `

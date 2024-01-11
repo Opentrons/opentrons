@@ -46,7 +46,7 @@ export const HeaterShakerModuleData = (
       case 'idle': {
         StatusLabelProps.backgroundColor = LEGACY_COLORS.medGreyEnabled
         StatusLabelProps.iconColor = LEGACY_COLORS.darkGreyEnabled
-        StatusLabelProps.textColor = LEGACY_COLORS.darkBlackEnabled
+        StatusLabelProps.textColor = COLORS.black90
         break
       }
       case 'holding at target': {

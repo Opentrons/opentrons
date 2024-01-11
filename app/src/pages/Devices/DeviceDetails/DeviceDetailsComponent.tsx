@@ -48,7 +48,7 @@ export function DeviceDetailsComponent({
       ) : null}
       <Flex
         alignItems={ALIGN_CENTER}
-        backgroundColor={LEGACY_COLORS.white}
+        backgroundColor={COLORS.white}
         border={`1px solid ${String(LEGACY_COLORS.medGreyEnabled)}`}
         borderRadius="3px"
         flexDirection={DIRECTION_COLUMN}

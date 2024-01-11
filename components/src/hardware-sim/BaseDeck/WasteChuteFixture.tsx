@@ -100,7 +100,7 @@ export function WasteChute(props: WasteChuteProps): JSX.Element {
       >
         <Icon name="trash" color={wasteIconColor} height="2rem" />
         <Text
-          color={LEGACY_COLORS.white}
+          color={COLORS.white}
           textAlign={TEXT_ALIGN_CENTER}
           css={TYPOGRAPHY.bodyTextSemiBold}
         >

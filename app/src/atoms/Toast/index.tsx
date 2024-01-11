@@ -189,7 +189,7 @@ export function Toast(props: ToastProps): JSX.Element {
   const ODD_ANIMATION_NONE = css``
 
   const TEXT_STYLE = css`
-    color: ${LEGACY_COLORS.darkBlackEnabled};
+    color: ${COLORS.black90};
     font-size: ${showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP};
     font-weight: ${showODDStyle
       ? TYPOGRAPHY.fontWeightSemiBold
@@ -227,30 +227,42 @@ export function Toast(props: ToastProps): JSX.Element {
   } = {
     [ERROR_TOAST]: {
       iconName: 'ot-alert',
-      color: `${showODDStyle ? LEGACY_COLORS.red2 : LEGACY_COLORS.errorEnabled}`,
+      color: `${
+        showODDStyle ? LEGACY_COLORS.red2 : LEGACY_COLORS.errorEnabled
+      }`,
       backgroundColor: `${
         showODDStyle ? LEGACY_COLORS.red4 : LEGACY_COLORS.errorBackgroundLight
       }`,
     },
     [INFO_TOAST]: {
       iconName: 'information',
-      color: `${showODDStyle ? LEGACY_COLORS.grey2 : LEGACY_COLORS.darkGreyEnabled}`,
+      color: `${
+        showODDStyle ? LEGACY_COLORS.grey2 : LEGACY_COLORS.darkGreyEnabled
+      }`,
       backgroundColor: `${
         showODDStyle ? LEGACY_COLORS.grey4 : LEGACY_COLORS.darkGreyDisabled
       }`,
     },
     [SUCCESS_TOAST]: {
       iconName: 'ot-check',
-      color: `${showODDStyle ? LEGACY_COLORS.green2 : LEGACY_COLORS.successEnabled}`,
+      color: `${
+        showODDStyle ? LEGACY_COLORS.green2 : LEGACY_COLORS.successEnabled
+      }`,
       backgroundColor: `${
-        showODDStyle ? LEGACY_COLORS.green4 : LEGACY_COLORS.successBackgroundLight
+        showODDStyle
+          ? LEGACY_COLORS.green4
+          : LEGACY_COLORS.successBackgroundLight
       }`,
     },
     [WARNING_TOAST]: {
       iconName: 'ot-alert',
-      color: `${showODDStyle ? LEGACY_COLORS.yellow2 : LEGACY_COLORS.warningEnabled}`,
+      color: `${
+        showODDStyle ? LEGACY_COLORS.yellow2 : LEGACY_COLORS.warningEnabled
+      }`,
       backgroundColor: `${
-        showODDStyle ? LEGACY_COLORS.yellow4 : LEGACY_COLORS.warningBackgroundLight
+        showODDStyle
+          ? LEGACY_COLORS.yellow4
+          : LEGACY_COLORS.warningBackgroundLight
       }`,
     },
   }
@@ -358,7 +370,7 @@ export function Toast(props: ToastProps): JSX.Element {
         >
           {headingText.length > 0 ? (
             <StyledText
-              color={LEGACY_COLORS.darkBlackEnabled}
+              color={COLORS.black90}
               fontSize={
                 showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
               }
@@ -402,7 +414,7 @@ export function Toast(props: ToastProps): JSX.Element {
       {closeText ? (
         <Link role="button" onClick={() => onCloseHandler()}>
           <StyledText
-            color={LEGACY_COLORS.darkBlackEnabled}
+            color={COLORS.black90}
             fontSize={
               showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
             }

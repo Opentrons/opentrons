@@ -62,7 +62,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
     group: NO_STYLE_FN,
     groupHeading: (styles: CSSObjectWithLabel) => ({
       ...styles,
-      color: LEGACY_COLORS.darkBlackEnabled,
+      color: COLORS.black90,
       fontWeight: TYPOGRAPHY.fontWeightSemiBold,
       fontSize: TYPOGRAPHY.fontSizeP,
     }),
@@ -80,7 +80,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
     loadingMessage: NO_STYLE_FN,
     menu: (styles: CSSObjectWithLabel) => ({
       ...styles,
-      backgroundColor: LEGACY_COLORS.white,
+      backgroundColor: COLORS.white,
       width: props.width != null ? props.width : 'auto',
       boxShadowcha: '0px 1px 3px rgba(0, 0, 0, 0.2)',
       borderRadius: '4px 4px 0px 0px',
@@ -102,16 +102,16 @@ export function Select(props: SelectComponentProps): JSX.Element {
     noOptionsMessage: (styles: CSSObjectWithLabel) => ({
       ...styles,
       padding: SPACING.spacing6,
-      color: LEGACY_COLORS.darkBlackEnabled,
+      color: COLORS.black90,
     }),
     option: (styles: CSSObjectWithLabel, state: OptionProps<SelectOption>) => ({
       ...styles,
       color: Boolean(state.isDisabled)
         ? LEGACY_COLORS.darkGreyDisabled
-        : LEGACY_COLORS.darkBlackEnabled,
+        : COLORS.black90,
       backgroundColor: Boolean(state.isSelected)
         ? LEGACY_COLORS.lightBlue
-        : LEGACY_COLORS.white,
+        : COLORS.white,
       '&:hover': {
         backgroundColor: LEGACY_COLORS.lightBlue,
       },
@@ -122,7 +122,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
     placeholder: (styles: CSSObjectWithLabel) => ({
       ...styles,
       marginLeft: SPACING.spacing8,
-      color: LEGACY_COLORS.darkBlackEnabled,
+      color: COLORS.black90,
       fontSize: TYPOGRAPHY.fontSizeP,
       marginTop: '0.2rem',
     }),

@@ -83,7 +83,7 @@ describe('Unselected TabbedButton', () => {
     const button = getByText('tabbed button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${String(LEGACY_COLORS.fundamentalsFocus)}`,
+      `0 0 0 3px ${String(COLORS.blue50)}`,
       {
         modifier: ':focus-visible',
       }
@@ -124,7 +124,7 @@ describe('Selected TabbedButton', () => {
       `text-transform: ${String(TYPOGRAPHY.textTransformNone)}`
     )
     expect(button).toHaveStyle(`box-shadow: none`)
-    expect(button).toHaveStyle(`color: ${String(LEGACY_COLORS.white)}`)
+    expect(button).toHaveStyle(`color: ${String(COLORS.white)}`)
   })
 
   it('renders selected tabbed button with text and disabled', () => {
@@ -161,7 +161,7 @@ describe('Selected TabbedButton', () => {
     const button = getByText('tabbed button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${String(LEGACY_COLORS.fundamentalsFocus)}`,
+      `0 0 0 3px ${String(COLORS.blue50)}`,
       {
         modifier: ':focus-visible',
       }

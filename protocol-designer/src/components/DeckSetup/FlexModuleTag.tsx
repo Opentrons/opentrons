@@ -24,7 +24,7 @@ export function FlexModuleTag(props: FlexModuleTagProps): JSX.Element {
         backgroundColor: LEGACY_COLORS.darkGreyEnabled,
         padding: SPACING.spacing4,
         height: '100%',
-        color: LEGACY_COLORS.white,
+        color: COLORS.white,
         border: `1px solid ${LEGACY_COLORS.darkGrey}`,
       }}
     >

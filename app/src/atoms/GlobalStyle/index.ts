@@ -25,7 +25,7 @@ export const GlobalStyle = createGlobalStyle<{ isOnDevice?: boolean }>`
   body {
     width: 100%;
     height: 100%;
-    color: ${LEGACY_COLORS.darkBlackEnabled};
+    color: ${COLORS.black90};
   }
 
   a {

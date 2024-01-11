@@ -58,28 +58,28 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     }
   > = {
     secondary: {
-      defaultColor: LEGACY_COLORS.darkBlackEnabled,
+      defaultColor: COLORS.black90,
       defaultBackgroundColor: LEGACY_COLORS.mediumBlueEnabled,
       activeBackgroundColor: LEGACY_COLORS.mediumBluePressed,
       disabledBackgroundColor: `${LEGACY_COLORS.darkBlack20}`,
       disabledColor: `${LEGACY_COLORS.darkBlack60}`,
     },
     alert: {
-      defaultColor: LEGACY_COLORS.white,
+      defaultColor: COLORS.white,
       defaultBackgroundColor: LEGACY_COLORS.red2,
       activeBackgroundColor: LEGACY_COLORS.red2Pressed,
       disabledBackgroundColor: `${LEGACY_COLORS.darkBlack20}`,
       disabledColor: `${LEGACY_COLORS.darkBlack60}`,
     },
     primary: {
-      defaultColor: LEGACY_COLORS.white,
+      defaultColor: COLORS.white,
       defaultBackgroundColor: LEGACY_COLORS.blueEnabled,
       activeBackgroundColor: LEGACY_COLORS.bluePressed,
       disabledBackgroundColor: `${LEGACY_COLORS.darkBlack20}`,
       disabledColor: `${LEGACY_COLORS.darkBlack60}`,
     },
     tertiaryHighLight: {
-      defaultColor: LEGACY_COLORS.darkBlackEnabled,
+      defaultColor: COLORS.black90,
       defaultBackgroundColor: `${LEGACY_COLORS.blueEnabled}${LEGACY_COLORS.opacity0HexCode}`,
       activeBackgroundColor: `${LEGACY_COLORS.darkBlack20}`,
       disabledBackgroundColor: `${LEGACY_COLORS.blueEnabled}${LEGACY_COLORS.opacity0HexCode}`,

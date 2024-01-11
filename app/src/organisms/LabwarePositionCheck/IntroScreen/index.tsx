@@ -139,7 +139,7 @@ export const IntroScreen = (props: {
 
 const VIEW_OFFSETS_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${LEGACY_COLORS.darkBlackEnabled};
+  color: ${COLORS.black90};
   font-size: ${TYPOGRAPHY.fontSize22};
   &:hover {
     opacity: 100%;
@@ -167,7 +167,7 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
         css={VIEW_OFFSETS_BUTTON_STYLE}
         aria-label="show labware offsets"
       >
-        <Icon name="reticle" size="1.75rem" color={LEGACY_COLORS.darkBlackEnabled} />
+        <Icon name="reticle" size="1.75rem" color={COLORS.black90} />
         <StyledText as="p">
           {i18n.format(t('view_current_offsets'), 'capitalize')}
         </StyledText>

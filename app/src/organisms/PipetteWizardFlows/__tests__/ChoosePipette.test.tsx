@@ -71,7 +71,7 @@ describe('ChoosePipette', () => {
     expect(singleMountPipettes).toHaveStyle(
       `background-color: ${LEGACY_COLORS.lightBlue}`
     )
-    expect(ninetySixPipette).toHaveStyle(`background-color: ${LEGACY_COLORS.white}`)
+    expect(ninetySixPipette).toHaveStyle(`background-color: ${COLORS.white}`)
 
     //  Selecting 96-Channel called setSelectedPipette prop
     fireEvent.click(ninetySixPipette)
@@ -138,7 +138,7 @@ describe('ChoosePipette', () => {
     const ninetySixPipette = screen.getByRole('radio', {
       name: '96-Channel pipette 96-Channel pipette',
     })
-    expect(singleMountPipettes).toHaveStyle(`background-color: ${LEGACY_COLORS.white}`)
+    expect(singleMountPipettes).toHaveStyle(`background-color: ${COLORS.white}`)
     expect(ninetySixPipette).toHaveStyle(
       `background-color: ${LEGACY_COLORS.lightBlue}`
     )

@@ -135,9 +135,9 @@ export function DeckLocationSelect({
                   <Icon
                     name="check-circle"
                     size="1.5rem"
-                    color={LEGACY_COLORS.white}
+                    color={COLORS.white}
                   />
-                  <Text color={LEGACY_COLORS.white} fontSize="1.5rem">
+                  <Text color={COLORS.white} fontSize="1.5rem">
                     Selected
                   </Text>
                 </RobotCoordsForeignDiv>
@@ -156,7 +156,7 @@ export function DeckLocationSelect({
                 <SingleSlotFixture
                   cutoutId={cutoutId}
                   fixtureBaseColor={fill}
-                  slotClipColor={LEGACY_COLORS.white}
+                  slotClipColor={COLORS.white}
                   onClick={() =>
                     !isDisabled &&
                     setSelectedLocation != null &&
@@ -174,7 +174,7 @@ export function DeckLocationSelect({
                   robotType={robotType}
                   slotBaseColor={fill}
                   slotName={slot.id}
-                  slotClipColor={LEGACY_COLORS.white}
+                  slotClipColor={COLORS.white}
                   onClick={() =>
                     !isDisabled &&
                     setSelectedLocation != null &&
@@ -204,7 +204,7 @@ export function DeckLocationSelect({
                   innerDivProps={INNER_DIV_PROPS}
                 >
                   <Text
-                    color={LEGACY_COLORS.white}
+                    color={COLORS.white}
                     css={
                       robotType === FLEX_ROBOT_TYPE
                         ? TYPOGRAPHY.level4HeaderSemiBold

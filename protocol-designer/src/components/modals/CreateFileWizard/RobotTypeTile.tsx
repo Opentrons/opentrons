@@ -119,7 +119,7 @@ function RobotTypeOption(props: RobotTypeOptionProps): JSX.Element {
 }
 
 const UNSELECTED_OPTIONS_STYLE = css`
-  background-color: ${LEGACY_COLORS.white};
+  background-color: ${COLORS.white};
   border: 1px solid ${LEGACY_COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   height: 14.5625rem;
@@ -162,7 +162,7 @@ const SELECTED_OPTIONS_STYLE = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     border-width: 0px;
     background-color: ${LEGACY_COLORS.blueEnabled};
-    color: ${LEGACY_COLORS.white};
+    color: ${COLORS.white};
 
     &:hover {
       border-width: 0px;

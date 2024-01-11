@@ -1,6 +1,10 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders, LEGACY_COLORS, BORDERS } from '@opentrons/components'
+import {
+  renderWithProviders,
+  LEGACY_COLORS,
+  BORDERS,
+} from '@opentrons/components'
 
 import { MediumButton } from '../MediumButton'
 
@@ -62,7 +66,7 @@ describe('MediumButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.white}`
+      `background-color: ${COLORS.white}`
     )
   })
   it('renders the tertiary low light button', () => {
@@ -72,7 +76,7 @@ describe('MediumButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.white}`
+      `background-color: ${COLORS.white}`
     )
   })
   it('renders the button as disabled', () => {

@@ -34,7 +34,7 @@ function ClosedThermocyclerGEN2Layers(props: {
   return (
     <g id="closed_thermocycler_gen2">
       <path
-        style={{ fill: LEGACY_COLORS.white }}
+        style={{ fill: COLORS.white }}
         d="M145.2,232.7V186c0-4-2.7-7.2-6-7.2H32.5c-3.3,0-5.7,3.2-5.7,7.2v46.7H0.4V0.4h171.2v232.3H145.2z"
       ></path>
       <path
@@ -49,7 +49,7 @@ function ClosedThermocyclerGEN2Layers(props: {
         height="38.3"
       ></rect>
       <path
-        style={{ fill: LEGACY_COLORS.white }}
+        style={{ fill: COLORS.white }}
         d="M141,191.8H31.1c-1.1,0-2,0.9-2,2v49.2c0,1.1,0.9,2,2,2H141c1.1,0,2-0.9,2-2v-49.2 C143,192.7,142.1,191.8,141,191.8z"
       ></path>
       <rect
@@ -60,7 +60,7 @@ function ClosedThermocyclerGEN2Layers(props: {
         height="49.5"
       ></rect>
       <path
-        style={{ fill: LEGACY_COLORS.white }}
+        style={{ fill: COLORS.white }}
         d="M130.8,18.5H41.2c-1.6,0-3,1.3-3,3l0,0c0,1.7,1.3,3,3,3h89.6c1.6,0,3-1.3,3-3l0,0 C133.8,19.9,132.5,18.5,130.8,18.5z"
       ></path>
       <path
@@ -80,7 +80,7 @@ function ClosedThermocyclerGEN2Layers(props: {
       <path d="M171.6,4.2H0.4c-0.1,0-0.2,0.1-0.2,0.2c0,0.1,0.1,0.2,0.2,0.2h171.2c0.1,0,0.2-0.1,0.2-0.2 C171.8,4.3,171.7,4.2,171.6,4.2z"></path>
       <path d="M150.6,12.4c-5,0-9.1,4.1-9.1,9.1s4.1,9.1,9.1,9.1s9.1-4.1,9.1-9.1S155.6,12.4,150.6,12.4z M150.6,30.2 c-4.8,0-8.7-3.9-8.7-8.7s3.9-8.7,8.7-8.7s8.7,3.9,8.7,8.7S155.4,30.2,150.6,30.2z"></path>
       <ellipse
-        style={{ fill: LEGACY_COLORS.white }}
+        style={{ fill: COLORS.white }}
         cx="150.6"
         cy="21.5"
         rx="5.8"
@@ -110,7 +110,7 @@ function OpenThermocyclerGEN2Layers(): JSX.Element {
     <g id="open_thermocycler_gen2">
       <g id="shading">
         <path
-          style={{ fill: LEGACY_COLORS.white }}
+          style={{ fill: COLORS.white }}
           d="M51.7,247.3c0,2.4,0,9.8,0,11.1c0,1.4,0,2.8,1.1,3.9c1.2,1.2,2.6,1.2,4.1,1.2c1.6,0,58,0,59.1,0 c1.3,0,2.5-0.3,3.3-1.3c1.3-1.4,1-3.3,1-5c0-1.8,0-8.4,0-9.9"
         ></path>
         <rect
@@ -121,7 +121,7 @@ function OpenThermocyclerGEN2Layers(): JSX.Element {
           height="12.7"
         ></rect>
         <path
-          style={{ fill: LEGACY_COLORS.white }}
+          style={{ fill: COLORS.white }}
           d="M171.6,38.7H0.4v206.3c0,1.1,0.9,2,2,2h167.3c1.1,0,2-0.9,2-2L171.6,38.7L171.6,38.7z"
         ></path>
         <path d="M171.6,38.3H0.4c-0.2,0-0.4,0.2-0.4,0.4v206.3c0,1.3,1.1,2.3,2.3,2.3h167.3c1.3,0,2.3-1.1,2.3-2.3V38.7 C172,38.5,171.8,38.3,171.6,38.3z M0.7,39h170.6v205.9c0,0.9-0.7,1.6-1.6,1.6H2.3c-0.9,0-1.6-0.7-1.6-1.6 C0.7,244.9,0.7,39,0.7,39z"></path>
@@ -135,11 +135,11 @@ function OpenThermocyclerGEN2Layers(): JSX.Element {
           height="203.4"
         ></rect>
         <path
-          style={{ fill: LEGACY_COLORS.white }}
+          style={{ fill: COLORS.white }}
           d="M19.3,70.9v-4.4c0-1.2,1-2.2,2.2-2.2h129c1.2,0,2.2,1,2.2,2.2v4.4h-5.9c-0.6,0-1,0.4-1,1v2.5 c0,0.6,0.4,1,1,1h5.9v65.3h-5.9c-0.6,0-1,0.4-1,1v2.5c0,0.6,0.4,1,1,1h5.9V156c0,1.2-1,2.2-2.2,2.2h-129l0,0 c-1.2,0-2.2-1-2.2-2.2v0v-10.8h5.9c0.6,0,1-0.4,1-1v-2.5c0-0.6-0.4-1-1-1h-5.9V75.4h5.9c0.6,0,1-0.4,1-1v-2.5c0-0.6-0.4-1-1-1 L19.3,70.9"
         ></path>
         <path
-          style={{ fill: LEGACY_COLORS.white }}
+          style={{ fill: COLORS.white }}
           d="M143,203v-9.2c0-1.1-0.9-2-2-2H31.1c-1.1,0-2,0.9-2,2v9.2"
         ></path>
         <polyline

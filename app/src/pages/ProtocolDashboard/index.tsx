@@ -177,7 +177,7 @@ export function ProtocolDashboard(): JSX.Element {
             <>
               <Flex
                 alignItems={ALIGN_CENTER}
-                backgroundColor={LEGACY_COLORS.white}
+                backgroundColor={COLORS.white}
                 flexDirection={DIRECTION_ROW}
                 paddingBottom={SPACING.spacing16}
                 paddingTop={SPACING.spacing16}

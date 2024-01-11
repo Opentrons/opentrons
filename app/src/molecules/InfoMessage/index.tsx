@@ -41,7 +41,7 @@ export function InfoMessage({ title, body }: InfoMessageProps): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         alignItems={body != null ? ALIGN_FLEX_START : ALIGN_CENTER}
         gridGap={SPACING.spacing4}
-        color={LEGACY_COLORS.darkBlackEnabled}
+        color={COLORS.black90}
       >
         <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {title}

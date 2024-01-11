@@ -54,7 +54,7 @@ export function Modal(props: ModalProps): JSX.Element {
       justifyContent={JUSTIFY_CENTER}
     >
       <Flex
-        backgroundColor={LEGACY_COLORS.white}
+        backgroundColor={COLORS.white}
         width={modalWidth}
         height="max-content"
         maxHeight="36.875rem"
@@ -71,7 +71,7 @@ export function Modal(props: ModalProps): JSX.Element {
           <ModalHeader {...header} onClick={onOutsideClick} />
         ) : null}
         <Flex
-          backgroundColor={LEGACY_COLORS.white}
+          backgroundColor={COLORS.white}
           paddingX={SPACING.spacing32}
           paddingBottom={SPACING.spacing32}
           paddingTop={header != null ? '0rem' : SPACING.spacing32}

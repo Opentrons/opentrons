@@ -26,7 +26,7 @@ describe('QuaternaryButton', () => {
   it('renders secondary tertiary button with text', () => {
     const { getByText } = render(props)
     const button = getByText('secondary tertiary button')
-    expect(button).toHaveStyle(`background-color: ${String(LEGACY_COLORS.white)}`)
+    expect(button).toHaveStyle(`background-color: ${String(COLORS.white)}`)
     expect(button).toHaveStyle(
       `border-radius: ${String(BORDERS.radiusRoundEdge)}`
     )
@@ -83,7 +83,7 @@ describe('QuaternaryButton', () => {
     props.color = LEGACY_COLORS.errorEnabled
     const { getByText } = render(props)
     const button = getByText('secondary tertiary button')
-    expect(button).toHaveStyle(`background-color: ${String(LEGACY_COLORS.white)}`)
+    expect(button).toHaveStyle(`background-color: ${String(COLORS.white)}`)
     expect(button).toHaveStyle(`color: ${String(LEGACY_COLORS.errorEnabled)}`)
   })
 })

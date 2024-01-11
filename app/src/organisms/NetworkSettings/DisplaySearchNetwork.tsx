@@ -19,7 +19,7 @@ export function DisplaySearchNetwork(): JSX.Element {
   return (
     <Flex
       height="17.5rem"
-      backgroundColor={LEGACY_COLORS.white}
+      backgroundColor={COLORS.white}
       justifyContent={JUSTIFY_CENTER}
       borderRadius={BORDERS.borderRadiusSize3}
       width="100%"

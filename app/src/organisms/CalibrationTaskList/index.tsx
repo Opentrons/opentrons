@@ -133,9 +133,17 @@ export function CalibrationTaskList({
             alignItems={ALIGN_CENTER}
           >
             {exitBeforeDeckConfigCompletion ? (
-              <Icon name="ot-alert" size="3rem" color={LEGACY_COLORS.warningEnabled} />
+              <Icon
+                name="ot-alert"
+                size="3rem"
+                color={LEGACY_COLORS.warningEnabled}
+              />
             ) : (
-              <Icon name="ot-check" size="3rem" color={LEGACY_COLORS.successEnabled} />
+              <Icon
+                name="ot-check"
+                size="3rem"
+                color={LEGACY_COLORS.successEnabled}
+              />
             )}
             <StyledText as="h1" marginTop={SPACING.spacing24}>
               {exitBeforeDeckConfigCompletion
@@ -169,7 +177,7 @@ export function CalibrationTaskList({
                 LEGACY_COLORS.opacity12HexCode
               )}`}
               iconColor={statusLabelIconColor}
-              textColor={LEGACY_COLORS.darkBlackEnabled}
+              textColor={COLORS.black90}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               iconSize="0.313rem"
             />

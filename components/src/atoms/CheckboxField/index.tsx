@@ -61,7 +61,7 @@ const INNER_STYLE_VALUE = css`
   }
 
   &:focus {
-    box-shadow: 0 0 0 3px ${LEGACY_COLORS.fundamentalsFocus};
+    box-shadow: 0 0 0 3px ${COLORS.blue50};
   }
   &:disabled {
     color: ${LEGACY_COLORS.bluePressed};
@@ -87,7 +87,7 @@ const INNER_STYLE_NO_VALUE = css`
   }
 
   &:focus {
-    box-shadow: 0 0 0 3px ${LEGACY_COLORS.fundamentalsFocus};
+    box-shadow: 0 0 0 3px ${COLORS.blue50};
   }
 
   &:disabled {
@@ -98,7 +98,7 @@ const INNER_STYLE_NO_VALUE = css`
 const LABEL_TEXT_STYLE = css`
   font-size: ${TYPOGRAPHY.fontSizeP};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  color: ${LEGACY_COLORS.darkBlackEnabled};
+  color: ${COLORS.black90};
   flex: 0 0 auto;
   padding: ${SPACING.spacing8} ${SPACING.spacing8};
 

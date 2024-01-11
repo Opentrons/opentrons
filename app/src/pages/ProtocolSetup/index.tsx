@@ -169,7 +169,9 @@ export function ProtocolSetupStep({
       >
         {status !== 'general' && !disabled ? (
           <Icon
-            color={status === 'ready' ? LEGACY_COLORS.green2 : LEGACY_COLORS.yellow2}
+            color={
+              status === 'ready' ? LEGACY_COLORS.green2 : LEGACY_COLORS.yellow2
+            }
             size="2rem"
             name={status === 'ready' ? 'ot-check' : 'ot-alert'}
           />
@@ -177,7 +179,9 @@ export function ProtocolSetupStep({
         <StyledText
           as="h4"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={disabled ? LEGACY_COLORS.darkBlack60 : LEGACY_COLORS.darkBlack100}
+          color={
+            disabled ? LEGACY_COLORS.darkBlack60 : LEGACY_COLORS.darkBlack100
+          }
         >
           {title}
         </StyledText>
@@ -185,7 +189,9 @@ export function ProtocolSetupStep({
           <StyledText
             as="p"
             textAlign={TEXT_ALIGN_RIGHT}
-            color={disabled ? LEGACY_COLORS.darkBlack60 : LEGACY_COLORS.darkBlack100}
+            color={
+              disabled ? LEGACY_COLORS.darkBlack60 : LEGACY_COLORS.darkBlack100
+            }
           >
             {detail}
             {subDetail != null && detail != null ? <br /> : null}
@@ -590,7 +596,7 @@ function PrepareToRun({
         padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
         position={POSITION_STICKY}
         top={0}
-        backgroundColor={LEGACY_COLORS.white}
+        backgroundColor={COLORS.white}
         overflowY="auto"
         marginX={`-${SPACING.spacing32}`}
       >

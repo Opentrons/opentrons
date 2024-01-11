@@ -61,7 +61,7 @@ export function ChildNavigation({
       top="0"
       left="0"
       width="100%"
-      backgroundColor={LEGACY_COLORS.white}
+      backgroundColor={COLORS.white}
     >
       <Flex gridGap={SPACING.spacing16} justifyContent={JUSTIFY_FLEX_START}>
         <IconButton
@@ -104,7 +104,7 @@ export function ChildNavigation({
 const IconButton = styled('button')`
   border-radius: ${SPACING.spacing4};
   max-height: 100%;
-  background-color: ${LEGACY_COLORS.white};
+  background-color: ${COLORS.white};
 
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};

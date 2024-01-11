@@ -31,7 +31,7 @@ export const TemperatureModuleData = (
     case 'idle': {
       backgroundColor = LEGACY_COLORS.medGreyEnabled
       iconColor = LEGACY_COLORS.darkGreyEnabled
-      textColor = LEGACY_COLORS.darkBlackEnabled
+      textColor = COLORS.black90
       break
     }
     case 'holding at target': {

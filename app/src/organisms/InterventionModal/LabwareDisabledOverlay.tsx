@@ -19,7 +19,7 @@ export function LabwareDisabledOverlay({
         width={definition.dimensions.xDimension}
         height={definition.dimensions.yDimension}
         rx={6}
-        fill={LEGACY_COLORS.white}
+        fill={COLORS.white}
         fillOpacity={0.9}
       />
       <path

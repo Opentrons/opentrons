@@ -98,7 +98,7 @@ export const RunPreviewComponent = (
             ? LEGACY_COLORS.lightBlue
             : LEGACY_COLORS.fundamentalsBackground
           const contentColor = isCurrent
-            ? LEGACY_COLORS.darkBlackEnabled
+            ? COLORS.black90
             : LEGACY_COLORS.darkGreyEnabled
           return (
             <Flex
@@ -117,12 +117,14 @@ export const RunPreviewComponent = (
                 gridGap={SPACING.spacing4}
                 width="100%"
                 border={`solid 1px ${
-                  index === jumpedIndex ? LEGACY_COLORS.electricPurple : borderColor
+                  index === jumpedIndex
+                    ? LEGACY_COLORS.electricPurple
+                    : borderColor
                 }`}
                 backgroundColor={
                   index === jumpedIndex ? '#F5E3FF' : backgroundColor
                 }
-                color={LEGACY_COLORS.darkBlackEnabled}
+                color={COLORS.black90}
                 borderRadius={BORDERS.radiusSoftCorners}
                 padding={SPACING.spacing8}
                 css={css`

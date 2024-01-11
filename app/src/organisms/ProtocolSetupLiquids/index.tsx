@@ -94,7 +94,7 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
         <Flex
           borderRadius={BORDERS.borderRadiusSize2}
           padding={SPACING.spacing16}
-          backgroundColor={LEGACY_COLORS.white}
+          backgroundColor={COLORS.white}
           height="3.75rem"
           width="3.75rem"
         >

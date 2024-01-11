@@ -32,7 +32,7 @@ const StyledInput = styled.input`
   width: 100%;
   flex: 6;
   margin: ${SPACING.spacing4} 0;
-  background-color: ${LEGACY_COLORS.white};
+  background-color: ${COLORS.white};
   border-radius: ${SPACING.spacing4};
   border: 1px ${BORDERS.styleSolid} ${LEGACY_COLORS.medGreyEnabled};
   height: ${SIZE_2};
@@ -79,7 +79,9 @@ export function ManualIpHostnameForm({
       const ip = values.ip.trim()
       const inputForm = document.getElementById('ip')
       if (inputForm != null)
-        inputForm.style.border = `1px solid ${String(LEGACY_COLORS.medGreyEnabled)}`
+        inputForm.style.border = `1px solid ${String(
+          LEGACY_COLORS.medGreyEnabled
+        )}`
       addManualIpAndHostname(ip)
       resetForm()
       setMostRecentAddition(ip)
@@ -92,7 +94,9 @@ export function ManualIpHostnameForm({
         errors.ip = t('add_ip_error')
         const inputForm = document.getElementById('ip')
         if (inputForm != null)
-          inputForm.style.border = `1px solid ${String(LEGACY_COLORS.errorEnabled)}`
+          inputForm.style.border = `1px solid ${String(
+            LEGACY_COLORS.errorEnabled
+          )}`
       }
       return errors
     },

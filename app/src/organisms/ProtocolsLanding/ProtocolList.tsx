@@ -197,7 +197,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               borderRadius={BORDERS.radiusSoftCorners}
               boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
               position={POSITION_ABSOLUTE}
-              backgroundColor={LEGACY_COLORS.white}
+              backgroundColor={COLORS.white}
               top="3.25rem"
               right="7rem"
               flexDirection={DIRECTION_COLUMN}

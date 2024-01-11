@@ -284,7 +284,7 @@ export function AdvancedSettings(): JSX.Element {
               <Link
                 role="button"
                 css={TYPOGRAPHY.pRegular}
-                color={LEGACY_COLORS.darkBlackEnabled}
+                color={COLORS.black90}
                 onClick={() =>
                   dispatch(CustomLabware.openCustomLabwareDirectory())
                 }
@@ -444,7 +444,7 @@ export function AdvancedSettings(): JSX.Element {
               <Link
                 role="button"
                 css={TYPOGRAPHY.pRegular}
-                color={LEGACY_COLORS.darkBlackEnabled}
+                color={COLORS.black90}
                 onClick={() =>
                   dispatch(ProtocolAnalysis.openPythonInterpreterDirectory())
                 }
@@ -561,14 +561,14 @@ export function AdvancedSettings(): JSX.Element {
             {driverOutdated && (
               <Banner type="warning" marginTop={SPACING.spacing16}>
                 <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-                  <StyledText as="p" color={LEGACY_COLORS.darkBlackEnabled}>
+                  <StyledText as="p" color={COLORS.black90}>
                     {t('usb_to_ethernet_adapter_toast_message')}
                   </StyledText>
                   <Link
                     external
                     href={REALTEK_URL}
                     css={TYPOGRAPHY.pRegular}
-                    color={LEGACY_COLORS.darkBlackEnabled}
+                    color={COLORS.black90}
                     textDecoration={TYPOGRAPHY.textDecorationUnderline}
                     id="AdvancedSettings_realtekLink"
                   >

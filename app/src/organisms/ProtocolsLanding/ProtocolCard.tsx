@@ -91,7 +91,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
 
   return (
     <Box
-      backgroundColor={LEGACY_COLORS.white}
+      backgroundColor={COLORS.white}
       borderRadius={BORDERS.radiusSoftCorners}
       cursor="pointer"
       minWidth="36rem"
@@ -169,12 +169,17 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
           {
             missing: <Icon name="ot-spinner" spin size={SIZE_3} />,
             loading: <Icon name="ot-spinner" spin size={SIZE_3} />,
-            error: <Box size="6rem" backgroundColor={LEGACY_COLORS.medGreyEnabled} />,
+            error: (
+              <Box size="6rem" backgroundColor={LEGACY_COLORS.medGreyEnabled} />
+            ),
             complete:
               mostRecentAnalysis != null ? (
                 <ProtocolDeck protocolAnalysis={mostRecentAnalysis} />
               ) : (
-                <Box size="6rem" backgroundColor={LEGACY_COLORS.medGreyEnabled} />
+                <Box
+                  size="6rem"
+                  backgroundColor={LEGACY_COLORS.medGreyEnabled}
+                />
               ),
           }[analysisStatus]
         }

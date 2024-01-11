@@ -1,5 +1,9 @@
 import * as React from 'react'
-import { renderWithProviders, LEGACY_COLORS, TYPOGRAPHY } from '@opentrons/components'
+import {
+  renderWithProviders,
+  LEGACY_COLORS,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { CalibrationHealthCheckResults } from '../CalibrationHealthCheckResults'
 
@@ -23,7 +27,7 @@ describe('CalibrationHealthCheckResults', () => {
     const { getByText, getByTestId } = render(props)
     getByText('Calibration Health Check Results')
     const statusLabel = getByText('Calibration complete')
-    expect(statusLabel).toHaveStyle(`color: ${String(LEGACY_COLORS.darkBlackEnabled)}`)
+    expect(statusLabel).toHaveStyle(`color: ${String(COLORS.black90)}`)
     expect(statusLabel).toHaveStyle(
       `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
     )

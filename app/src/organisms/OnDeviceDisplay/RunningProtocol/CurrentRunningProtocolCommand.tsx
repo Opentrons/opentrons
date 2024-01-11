@@ -71,7 +71,7 @@ const RUN_TIMER_STYLE = css`
   font-size: 2rem;
   font-weight: ${TYPOGRAPHY.fontWeightBold};
   line-height: 2.625rem;
-  color: ${LEGACY_COLORS.darkBlackEnabled};
+  color: ${COLORS.black90};
 `
 
 const COMMAND_ROW_STYLE_ANIMATED = css`

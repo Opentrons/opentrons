@@ -42,9 +42,11 @@ const OptionLabel = styled.label<LabelProps>`
   padding: ${SPACING.spacing16} ${SPACING.spacing24};
   border-radius: ${BORDERS.borderRadiusSize4};
   color: ${({ isSelected }) =>
-    isSelected === true ? LEGACY_COLORS.white : LEGACY_COLORS.darkBlack100};
+    isSelected === true ? COLORS.white : LEGACY_COLORS.darkBlack100};
   background: ${({ isSelected }) =>
-    isSelected === true ? LEGACY_COLORS.blueEnabled : LEGACY_COLORS.mediumBlueEnabled};
+    isSelected === true
+      ? LEGACY_COLORS.blueEnabled
+      : LEGACY_COLORS.mediumBlueEnabled};
 `
 
 interface DeviceResetProps {
@@ -231,7 +233,7 @@ export function DeviceReset({
                         as="p"
                         color={
                           resetOptions[option.id] ?? false
-                            ? LEGACY_COLORS.white
+                            ? COLORS.white
                             : LEGACY_COLORS.darkBlack70
                         }
                       >
@@ -283,7 +285,7 @@ export function DeviceReset({
                   ((resetOptions.authorizedKeys ?? false) &&
                     (resetOptions.onDeviceDisplay ?? false)) ||
                   isEveryOptionSelected(resetOptions)
-                    ? LEGACY_COLORS.white
+                    ? COLORS.white
                     : LEGACY_COLORS.darkBlack70
                 }
               >

@@ -71,7 +71,7 @@ export function WizardRequiredEquipmentList(
                 {/* do not show divider after the last equipment in the list */}
                 {index + 1 === Object.keys(equipmentList).length ? null : (
                   <Box
-                    borderBottom={`1px solid ${LEGACY_COLORS.darkBlackEnabled}${LEGACY_COLORS.opacity20HexCode}`}
+                    borderBottom={`1px solid ${COLORS.black90}${LEGACY_COLORS.opacity20HexCode}`}
                   />
                 )}
               </Box>

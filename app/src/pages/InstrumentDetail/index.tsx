@@ -78,7 +78,7 @@ export const InstrumentDetail = (): JSX.Element => {
 const IconButton = styled('button')`
   border-radius: ${SPACING.spacing4};
   max-height: 100%;
-  background-color: ${LEGACY_COLORS.white};
+  background-color: ${COLORS.white};
 
   &:active {
     background-color: ${LEGACY_COLORS.darkBlack20};

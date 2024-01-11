@@ -33,7 +33,7 @@ const TableHeader = styled('th')`
 
 const TableRow = styled('tr')`
   background-color: ${LEGACY_COLORS.light1};
-  border: 1px ${LEGACY_COLORS.white} solid;
+  border: 1px ${COLORS.white} solid;
   height: 4.75rem;
 `
 

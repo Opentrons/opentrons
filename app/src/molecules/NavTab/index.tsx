@@ -2,7 +2,12 @@ import * as React from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { BORDERS, LEGACY_COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
+import {
+  BORDERS,
+  LEGACY_COLORS,
+  SPACING,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 
 interface NavTabProps {
   to: string
@@ -16,7 +21,7 @@ const StyledNavLink = styled(NavLink)<React.ComponentProps<typeof NavLink>>`
   color: ${LEGACY_COLORS.darkGreyEnabled};
 
   &.active {
-    color: ${LEGACY_COLORS.darkBlackEnabled};
+    color: ${COLORS.black90};
     ${BORDERS.tabBorder}
   }
 `

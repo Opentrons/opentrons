@@ -63,7 +63,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
         padding: SPACING.spacing16,
         backgroundColor:
           moduleDef.moduleType === THERMOCYCLER_MODULE_TYPE
-            ? LEGACY_COLORS.white
+            ? COLORS.white
             : LEGACY_COLORS.transparent,
       }}
     >
@@ -76,7 +76,11 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
             <Icon
               name={isAttached ? 'ot-check' : 'alert-circle'}
-              color={isAttached ? LEGACY_COLORS.successEnabled : LEGACY_COLORS.warningEnabled}
+              color={
+                isAttached
+                  ? LEGACY_COLORS.successEnabled
+                  : LEGACY_COLORS.warningEnabled
+              }
               key="icon"
               size="10px"
               marginRight={SPACING.spacing4}

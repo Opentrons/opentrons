@@ -148,7 +148,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
         position={POSITION_FIXED}
         right="0"
         top="0"
-        backgroundColor={LEGACY_COLORS.white}
+        backgroundColor={COLORS.white}
         boxShadow="0px 3px 6px rgba(0, 0, 0, 0.23)"
         height="92.5%"
         marginTop={SPACING.spacing48}

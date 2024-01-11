@@ -64,7 +64,7 @@ export function HistoricalProtocolRunOffsetDrawer(
         padding={`${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing48}`}
       >
         <Box
-          backgroundColor={LEGACY_COLORS.white}
+          backgroundColor={COLORS.white}
           padding={SPACING.spacing24}
           textAlign="center"
         >
@@ -143,7 +143,7 @@ export function HistoricalProtocolRunOffsetDrawer(
             key={index}
             justifyContent={JUSTIFY_FLEX_START}
             padding={SPACING.spacing8}
-            backgroundColor={LEGACY_COLORS.white}
+            backgroundColor={COLORS.white}
             marginY={SPACING.spacing8}
           >
             <StyledText width="23.5%" as="label">

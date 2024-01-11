@@ -14,7 +14,7 @@ import type { AttachedModule } from '../../redux/modules/types'
 
 const MODULE_ICON_STYLE = css`
   &:hover {
-    color: ${LEGACY_COLORS.darkBlackEnabled};
+    color: ${COLORS.black90};
   }
 `
 interface ModuleIconProps {

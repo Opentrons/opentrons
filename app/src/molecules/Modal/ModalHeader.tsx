@@ -24,7 +24,7 @@ export function ModalHeader(props: ModalHeaderBaseProps): JSX.Element {
   } = props
   return (
     <Flex
-      backgroundColor={LEGACY_COLORS.white}
+      backgroundColor={COLORS.white}
       color={LEGACY_COLORS.black}
       height="6.25rem"
       width="100%"

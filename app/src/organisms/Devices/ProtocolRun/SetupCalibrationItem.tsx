@@ -87,7 +87,7 @@ export function SetupCalibrationItem({
               </StyledText>
             )}
             {title != null && (
-              <StyledText as="p" color={LEGACY_COLORS.darkBlackEnabled} id={id}>
+              <StyledText as="p" color={COLORS.black90} id={id}>
                 {title}
               </StyledText>
             )}

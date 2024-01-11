@@ -40,7 +40,7 @@ export function Interstitial(props: InterstitialProps): JSX.Element {
       data-testid="interstitial"
       {...outerProps}
     >
-      <Overlay backgroundColor={LEGACY_COLORS.white} />
+      <Overlay backgroundColor={COLORS.white} />
 
       <InterstitialTitleBar {...titleBar} />
       <Box
@@ -51,7 +51,7 @@ export function Interstitial(props: InterstitialProps): JSX.Element {
         position={POSITION_RELATIVE}
         boxShadow="0px 1px 3px rgba(0, 0, 0, 0.3)"
         border={`1px solid ${String(LEGACY_COLORS.medGreyEnabled)}`}
-        backgroundColor={LEGACY_COLORS.white}
+        backgroundColor={COLORS.white}
         maxHeight="100%"
         overflowY="auto"
         paddingTop={SPACING.spacing16}

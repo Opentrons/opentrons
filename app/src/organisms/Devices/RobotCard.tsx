@@ -62,7 +62,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
   return robot != null ? (
     <Flex
       alignItems={ALIGN_START}
-      backgroundColor={LEGACY_COLORS.white}
+      backgroundColor={COLORS.white}
       cursor="pointer"
       flexDirection={DIRECTION_ROW}
       gridGap={SPACING.spacing16}

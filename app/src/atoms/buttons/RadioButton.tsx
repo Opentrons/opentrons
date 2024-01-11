@@ -49,7 +49,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
 
   const SELECTED_BUTTON_STYLE = css`
     background: ${LEGACY_COLORS.blueEnabled};
-    color: ${LEGACY_COLORS.white};
+    color: ${COLORS.white};
 
     &:active {
       background-color: ${LEGACY_COLORS.bluePressed};

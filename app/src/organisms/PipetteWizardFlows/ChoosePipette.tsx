@@ -48,7 +48,7 @@ import type { PipetteMount } from '@opentrons/shared-data'
 import type { SelectablePipettes } from './types'
 
 const UNSELECTED_OPTIONS_STYLE = css`
-  background-color: ${LEGACY_COLORS.white};
+  background-color: ${COLORS.white};
   border: 1px solid ${LEGACY_COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   height: 14.5625rem;
@@ -91,7 +91,7 @@ const SELECTED_OPTIONS_STYLE = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     border-width: 0px;
     background-color: ${LEGACY_COLORS.blueEnabled};
-    color: ${LEGACY_COLORS.white};
+    color: ${COLORS.white};
 
     &:hover {
       border-width: 0px;
@@ -147,7 +147,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             flexDirection={DIRECTION_COLUMN}
             width="100%"
             position={POSITION_ABSOLUTE}
-            backgroundColor={LEGACY_COLORS.white}
+            backgroundColor={COLORS.white}
           >
             {showExitConfirmation ? (
               <ExitModal

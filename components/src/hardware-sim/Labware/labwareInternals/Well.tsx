@@ -25,7 +25,7 @@ export function WellComponent(props: WellProps): JSX.Element {
     wellName,
     stroke = LEGACY_COLORS.black,
     strokeWidth = 1,
-    fill = LEGACY_COLORS.white,
+    fill = COLORS.white,
     onMouseEnterWell,
     onMouseLeaveWell,
   } = props

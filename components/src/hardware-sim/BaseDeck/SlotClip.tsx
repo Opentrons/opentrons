@@ -6,7 +6,7 @@ export function SlotClip(props: React.SVGProps<SVGPathElement>): JSX.Element {
   return (
     <path
       fill="none"
-      stroke={LEGACY_COLORS.darkBlackEnabled}
+      stroke={COLORS.black90}
       strokeWidth={3}
       strokeOpacity={0.7}
       {...props}

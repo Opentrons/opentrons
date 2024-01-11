@@ -47,7 +47,7 @@ export function AppSettings(): JSX.Element {
   return (
     <Flex paddingX={SPACING.spacing16} paddingY={SPACING.spacing16}>
       <Box
-        backgroundColor={LEGACY_COLORS.white}
+        backgroundColor={COLORS.white}
         height="100%"
         width="100%"
         border={`1px ${BORDERS.styleSolid} ${LEGACY_COLORS.medGreyEnabled}`}

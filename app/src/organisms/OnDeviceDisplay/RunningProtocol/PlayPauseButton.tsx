@@ -28,7 +28,7 @@ const PLAY_PAUSE_BUTTON_STYLE = css`
     border: none;
     box-shadow: none;
     background-color: ${LEGACY_COLORS.blueEnabled};
-    color: ${LEGACY_COLORS.white};
+    color: ${COLORS.white};
   }
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
@@ -70,7 +70,7 @@ export function PlayPauseButton({
       onClick={onTogglePlayPause}
       aria-label={isRunning ? 'pause' : 'play'}
     >
-      <Icon name={iconName} color={LEGACY_COLORS.white} size={iconSize} />
+      <Icon name={iconName} color={COLORS.white} size={iconSize} />
     </Btn>
   )
 }

@@ -212,7 +212,7 @@ export function RunSummary(): JSX.Element {
         aria-label="icon_ot-spinner"
         spin={true}
         size="2.5rem"
-        color={LEGACY_COLORS.white}
+        color={COLORS.white}
       />
     </Flex>
   )
@@ -238,14 +238,16 @@ export function RunSummary(): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing40}
           padding={SPACING.spacing40}
-          backgroundColor={didRunSucceed ? LEGACY_COLORS.green2 : LEGACY_COLORS.red2}
+          backgroundColor={
+            didRunSucceed ? LEGACY_COLORS.green2 : LEGACY_COLORS.red2
+          }
         >
           <SplashFrame>
             <Flex gridGap={SPACING.spacing32} alignItems={ALIGN_CENTER}>
               <Icon
                 name={didRunSucceed ? 'ot-check' : 'ot-alert'}
                 size="4.5rem"
-                color={LEGACY_COLORS.white}
+                color={COLORS.white}
               />
               <SplashHeader>
                 {didRunSucceed
@@ -283,7 +285,9 @@ export function RunSummary(): JSX.Element {
                 name={didRunSucceed ? 'ot-check' : 'ot-alert'}
                 size="2rem"
                 color={
-                  didRunSucceed ? LEGACY_COLORS.successEnabled : LEGACY_COLORS.errorEnabled
+                  didRunSucceed
+                    ? LEGACY_COLORS.successEnabled
+                    : LEGACY_COLORS.errorEnabled
                 }
               />
               <SummaryHeader>{headerText}</SummaryHeader>
@@ -358,7 +362,7 @@ const SplashHeader = styled.h1`
   text-align: ${TYPOGRAPHY.textAlignLeft};
   font-size: 80px;
   line-height: 94px;
-  color: ${LEGACY_COLORS.white};
+  color: ${COLORS.white};
 `
 const SplashBody = styled.h4`
   display: -webkit-box;
@@ -371,7 +375,7 @@ const SplashBody = styled.h4`
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-size: ${TYPOGRAPHY.fontSize32};
   line-height: ${TYPOGRAPHY.lineHeight42};
-  color: ${LEGACY_COLORS.white};
+  color: ${COLORS.white};
 `
 
 const SummaryHeader = styled.h4`
@@ -388,7 +392,7 @@ const SplashFrame = styled(Flex)`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
-  border: ${BORDERS.borderRadiusSize2} solid ${LEGACY_COLORS.white}${LEGACY_COLORS.opacity20HexCode};
+  border: ${BORDERS.borderRadiusSize2} solid ${COLORS.white}${LEGACY_COLORS.opacity20HexCode};
   border-radius: ${BORDERS.borderRadiusSize3};
   grid-gap: ${SPACING.spacing40};
 `

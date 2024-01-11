@@ -83,9 +83,7 @@ export function ManualIpHostnameItem({
           <StyledText
             as="p"
             data-testid="ip-hostname"
-            color={
-              discovered ? LEGACY_COLORS.darkBlackEnabled : LEGACY_COLORS.successDisabled
-            }
+            color={discovered ? COLORS.black90 : LEGACY_COLORS.successDisabled}
           >
             {candidate}
           </StyledText>
@@ -101,7 +99,7 @@ export function ManualIpHostnameItem({
         </StyledText>
         <Btn
           size={TYPOGRAPHY.lineHeight20}
-          color={LEGACY_COLORS.darkBlackEnabled}
+          color={COLORS.black90}
           onClick={remove}
           marginLeft={SPACING.spacing16}
           data-testid="close-button"

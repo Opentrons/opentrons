@@ -35,14 +35,14 @@ export function PlayButton({
       background-color: ${ready && !isDoorOpen
         ? LEGACY_COLORS.bluePressed
         : LEGACY_COLORS.darkBlack40};
-      color: ${LEGACY_COLORS.white};
+      color: ${COLORS.white};
     }
 
     &:hover {
       background-color: ${ready && !isDoorOpen
         ? LEGACY_COLORS.blueEnabled
         : LEGACY_COLORS.darkBlack20};
-      color: ${LEGACY_COLORS.white};
+      color: ${COLORS.white};
     }
 
     &:focus-visible {
@@ -56,7 +56,7 @@ export function PlayButton({
       background-color: ${ready && !isDoorOpen
         ? LEGACY_COLORS.bluePressed
         : LEGACY_COLORS.darkBlack40};
-      color: ${LEGACY_COLORS.white};
+      color: ${COLORS.white};
     }
 
     &:disabled {
@@ -84,7 +84,9 @@ export function PlayButton({
     >
       <Icon
         color={
-          disabled || !ready || isDoorOpen ? LEGACY_COLORS.darkBlack60 : LEGACY_COLORS.white
+          disabled || !ready || isDoorOpen
+            ? LEGACY_COLORS.darkBlack60
+            : COLORS.white
         }
         name="play-icon"
         size="2.5rem"
@@ -111,7 +113,7 @@ export function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
       aria-label="close"
       css={CLOSE_BUTTON_STYLE}
     >
-      <Icon color={LEGACY_COLORS.white} name="close-icon" size="2.5rem" />
+      <Icon color={COLORS.white} name="close-icon" size="2.5rem" />
     </Btn>
   )
 }
@@ -120,12 +122,12 @@ const CLOSE_BUTTON_STYLE = css`
   -webkit-tap-highlight-color: transparent;
   &:focus {
     background-color: ${LEGACY_COLORS.red2Pressed};
-    color: ${LEGACY_COLORS.white};
+    color: ${COLORS.white};
   }
 
   &:hover {
     background-color: ${LEGACY_COLORS.red2};
-    color: ${LEGACY_COLORS.white};
+    color: ${COLORS.white};
   }
 
   &:focus-visible {
@@ -135,7 +137,7 @@ const CLOSE_BUTTON_STYLE = css`
 
   &:active {
     background-color: ${LEGACY_COLORS.red2Pressed};
-    color: ${LEGACY_COLORS.white};
+    color: ${COLORS.white};
   }
 
   &:disabled {

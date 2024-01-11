@@ -87,7 +87,7 @@ export function SetupStep({
                 {label}
               </StyledText>
               <StyledText
-                color={LEGACY_COLORS.darkBlackEnabled}
+                color={COLORS.black90}
                 css={TYPOGRAPHY.h3SemiBold}
                 marginBottom={SPACING.spacing4}
                 id={`CollapsibleStep_${String(title)}`}
@@ -96,7 +96,7 @@ export function SetupStep({
               </StyledText>
               <StyledText
                 as="p"
-                color={LEGACY_COLORS.darkBlackEnabled}
+                color={COLORS.black90}
                 id={`CollapsibleStep_${description}`}
               >
                 {description}
@@ -105,7 +105,7 @@ export function SetupStep({
             <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_ROW}>
               {rightElement}
               <Icon
-                color={LEGACY_COLORS.darkBlackEnabled}
+                color={COLORS.black90}
                 size="1.5rem"
                 css={ACCORDION_STYLE}
                 name={expanded ? 'minus' : 'plus'}

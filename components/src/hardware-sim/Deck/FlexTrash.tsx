@@ -8,7 +8,12 @@ import {
 import { Icon } from '../../icons'
 import { Flex, Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
-import { BORDERS, LEGACY_COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import {
+  BORDERS,
+  LEGACY_COLORS,
+  SPACING,
+  TYPOGRAPHY,
+} from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
 
 import trashDef from '@opentrons/shared-data/labware/definitions/2/opentrons_1_trash_3200ml_fixed/1.json'
@@ -98,7 +103,7 @@ export const FlexTrash = ({
         >
           {rotateDegrees === '180' ? (
             <Text
-              color={LEGACY_COLORS.white}
+              color={COLORS.white}
               // rotate text back 180 degrees
               transform={`rotate(${rotateDegrees}deg)`}
               transformOrigin="center"
@@ -116,7 +121,7 @@ export const FlexTrash = ({
             transformOrigin="center"
           />
           {rotateDegrees === '0' ? (
-            <Text color={LEGACY_COLORS.white} css={TYPOGRAPHY.bodyTextSemiBold}>
+            <Text color={COLORS.white} css={TYPOGRAPHY.bodyTextSemiBold}>
               Trash bin
             </Text>
           ) : null}

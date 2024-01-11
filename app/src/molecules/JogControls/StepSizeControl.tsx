@@ -47,24 +47,24 @@ const BUTTON_WRAPPER_STYLE = css`
 `
 
 const DEFAULT_BUTTON_STYLE = css`
-  background-color: ${LEGACY_COLORS.white};
-  border: 1px ${LEGACY_COLORS.white} solid;
+  background-color: ${COLORS.white};
+  border: 1px ${COLORS.white} solid;
   height: 3.62rem;
   color: ${LEGACY_COLORS.black};
 
   &:focus {
-    background-color: ${LEGACY_COLORS.white};
+    background-color: ${COLORS.white};
   }
 
   &:hover {
-    background-color: ${LEGACY_COLORS.white};
+    background-color: ${COLORS.white};
     color: ${LEGACY_COLORS.black};
     box-shadow: 0 0 0;
     border: 1px ${LEGACY_COLORS.lightGreyHover} solid;
   }
 
   &:active {
-    background-color: ${LEGACY_COLORS.white};
+    background-color: ${COLORS.white};
     color: ${LEGACY_COLORS.blueEnabled};
     border: 1px ${LEGACY_COLORS.blueEnabled} solid;
   }
@@ -198,13 +198,13 @@ export function TouchStepSizeControl(props: StepSizeControlProps): JSX.Element {
               <StyledText
                 as="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                color={selected ? LEGACY_COLORS.white : LEGACY_COLORS.darkBlackEnabled}
+                color={selected ? COLORS.white : COLORS.black90}
               >
                 {t(stepSizeTranslationKeyByStep[stepSize])}
               </StyledText>
               <StyledText
                 as="p"
-                color={selected ? LEGACY_COLORS.white : LEGACY_COLORS.darkBlack70}
+                color={selected ? COLORS.white : LEGACY_COLORS.darkBlack70}
               >
                 {`${stepSize} mm`}
               </StyledText>

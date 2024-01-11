@@ -194,7 +194,7 @@ export function Labware(): JSX.Element {
               borderRadius={BORDERS.radiusSoftCorners}
               boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
               position={POSITION_ABSOLUTE}
-              backgroundColor={LEGACY_COLORS.white}
+              backgroundColor={COLORS.white}
               top="8.5rem"
               right={SPACING.spacing2}
               flexDirection={DIRECTION_COLUMN}

@@ -87,7 +87,7 @@ export function RobotOverview({
     <>
       <Flex
         alignItems={ALIGN_START}
-        backgroundColor={LEGACY_COLORS.white}
+        backgroundColor={COLORS.white}
         flexDirection={DIRECTION_COLUMN}
         paddingTop={SPACING.spacing8}
         position={POSITION_RELATIVE}
@@ -150,7 +150,7 @@ export function RobotOverview({
                       as="p"
                       color={
                         isRobotViewable
-                          ? LEGACY_COLORS.darkBlackEnabled
+                          ? COLORS.black90
                           : LEGACY_COLORS.errorDisabled
                       }
                     >

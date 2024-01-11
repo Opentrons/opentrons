@@ -88,9 +88,11 @@ function ProgressTrackerItem({
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
           backgroundColor={
-            isFutureTask ? LEGACY_COLORS.medGreyHover : LEGACY_COLORS.blueEnabled
+            isFutureTask
+              ? LEGACY_COLORS.medGreyHover
+              : LEGACY_COLORS.blueEnabled
           }
-          color={LEGACY_COLORS.white}
+          color={COLORS.white}
           margin={SPACING.spacing16}
           height="1.25rem"
           width="1.25rem"
@@ -151,10 +153,12 @@ function ProgressTrackerItem({
                   }
                   border={BORDERS.lineBorder}
                   borderColor={
-                    isFutureSubTask ? LEGACY_COLORS.medGreyHover : LEGACY_COLORS.blueEnabled
+                    isFutureSubTask
+                      ? LEGACY_COLORS.medGreyHover
+                      : LEGACY_COLORS.blueEnabled
                   }
                   borderWidth={SPACING.spacing2}
-                  color={LEGACY_COLORS.white}
+                  color={COLORS.white}
                   margin={SPACING.spacing16}
                   height="0.75rem"
                   width="0.75rem"
@@ -219,7 +223,7 @@ function SubTask({
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={isActiveSubTask ? LEGACY_COLORS.lightBlue : LEGACY_COLORS.white}
+      backgroundColor={isActiveSubTask ? LEGACY_COLORS.lightBlue : COLORS.white}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       padding={SPACING.spacing16}
       border={isActiveSubTask ? BORDERS.activeLineBorder : BORDERS.lineBorder}
@@ -361,7 +365,7 @@ function Task({
         flexDirection={DIRECTION_COLUMN}
         padding={SPACING.spacing16}
         backgroundColor={
-          isActiveTask && !isTaskOpen ? LEGACY_COLORS.lightBlue : LEGACY_COLORS.white
+          isActiveTask && !isTaskOpen ? LEGACY_COLORS.lightBlue : COLORS.white
         }
         border={
           isActiveTask && !isTaskOpen

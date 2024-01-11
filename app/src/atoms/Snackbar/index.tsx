@@ -86,7 +86,7 @@ export function Snackbar(props: SnackbarProps): JSX.Element {
       {...styleProps}
     >
       <StyledText
-        color={LEGACY_COLORS.white}
+        color={COLORS.white}
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         lineHeight={TYPOGRAPHY.lineHeight28}

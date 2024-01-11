@@ -170,33 +170,33 @@ const PLANE_BUTTONS_STYLE = css`
 
 const DEFAULT_BUTTON_STYLE = css`
   display: flex;
-  border: 1px ${LEGACY_COLORS.white} solid;
+  border: 1px ${COLORS.white} solid;
   justify-content: ${JUSTIFY_FLEX_START};
   align-items: ${ALIGN_CENTER};
-  background-color: ${LEGACY_COLORS.white};
+  background-color: ${COLORS.white};
   color: ${LEGACY_COLORS.black};
   grid-gap: ${SPACING.spacing8};
   padding: ${SPACING.spacing8};
 
   &:focus {
-    background-color: ${LEGACY_COLORS.white};
+    background-color: ${COLORS.white};
   }
 
   &:hover {
-    background-color: ${LEGACY_COLORS.white};
+    background-color: ${COLORS.white};
     color: ${LEGACY_COLORS.black};
     box-shadow: 0 0 0;
     border: 1px ${LEGACY_COLORS.lightGreyHover} solid;
   }
 
   &:active {
-    background-color: ${LEGACY_COLORS.white};
+    background-color: ${COLORS.white};
     color: ${LEGACY_COLORS.blueEnabled};
     border: 1px ${LEGACY_COLORS.blueEnabled} solid;
   }
 
   &:disabled {
-    background-color: ${LEGACY_COLORS.white};
+    background-color: ${COLORS.white};
     color: ${LEGACY_COLORS.errorDisabled};
   }
 `
@@ -331,7 +331,7 @@ const ARROW_GRID_STYLES = css`
 `
 const ARROW_BUTTON_STYLES = css`
   color: ${LEGACY_COLORS.darkGreyEnabled};
-  background-color: ${LEGACY_COLORS.white};
+  background-color: ${COLORS.white};
 
   border: ${BORDERS.lineBorder};
   width: 2.75rem;
@@ -341,24 +341,24 @@ const ARROW_BUTTON_STYLES = css`
   align-items: ${ALIGN_CENTER};
   justify-content: ${JUSTIFY_CENTER};
   &:hover {
-    background-color: ${LEGACY_COLORS.white};
+    background-color: ${COLORS.white};
     color: ${LEGACY_COLORS.darkGreyHover};
     box-shadow: 0 0 0;
     border: 1px ${LEGACY_COLORS.lightGreyHover} solid;
   }
 
   &:active {
-    background-color: ${LEGACY_COLORS.white};
+    background-color: ${COLORS.white};
     color: ${LEGACY_COLORS.darkGreyPressed};
     border: 1px ${LEGACY_COLORS.lightGreyHover} solid;
   }
 
   &:focus {
-    background-color: ${LEGACY_COLORS.white};
+    background-color: ${COLORS.white};
   }
 
   &:disabled {
-    background-color: ${LEGACY_COLORS.white};
+    background-color: ${COLORS.white};
     color: ${LEGACY_COLORS.darkGreyDisabled};
   }
 
@@ -370,12 +370,12 @@ const ARROW_BUTTON_STYLES = css`
     width: 125px;
     height: 125px;
     background-color: ${LEGACY_COLORS.light1};
-    color: ${LEGACY_COLORS.darkBlackEnabled};
+    color: ${COLORS.black90};
     border-radius: ${BORDERS.borderRadiusSize4};
 
     &:hover {
       background-color: ${LEGACY_COLORS.light1Pressed};
-      color: ${LEGACY_COLORS.darkBlackHover};
+      color: ${COLORS.black80};
       border: 1px ${LEGACY_COLORS.transparent} solid;
     }
 
@@ -486,7 +486,7 @@ export function TouchDirectionControl(
                   <StyledText
                     as="p"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    color={selected ? LEGACY_COLORS.white : LEGACY_COLORS.darkBlackEnabled}
+                    color={selected ? COLORS.white : COLORS.black90}
                   >
                     {CONTROLS_CONTENTS_BY_PLANE[plane].title}
                   </StyledText>

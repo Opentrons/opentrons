@@ -45,12 +45,12 @@ export const STYLE_BY_WELL_CONTENTS: {
     strokeWidth: 0.6,
   },
   tipPresent: {
-    fill: LEGACY_COLORS.white,
+    fill: COLORS.white,
     stroke: '#A4A4A4', // LEGACY --c-near-black
     strokeWidth: 0.6,
   },
   defaultWell: {
-    fill: LEGACY_COLORS.white,
+    fill: COLORS.white,
     stroke: LEGACY_COLORS.black,
     strokeWidth: 0.6,
   },

@@ -24,7 +24,7 @@ describe('ProgressBar', () => {
     const [{ getByTestId }] = render(props)
     const container = getByTestId('ProgressBar_Container')
     const bar = getByTestId('ProgressBar_Bar')
-    expect(container).toHaveStyle(`background: ${LEGACY_COLORS.white}`)
+    expect(container).toHaveStyle(`background: ${COLORS.white}`)
     expect(bar).toHaveStyle('width: 0%')
   })
 

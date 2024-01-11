@@ -1,5 +1,9 @@
 import * as React from 'react'
-import { C_SKY_BLUE, LEGACY_COLORS, renderWithProviders } from '@opentrons/components'
+import {
+  C_SKY_BLUE,
+  LEGACY_COLORS,
+  renderWithProviders,
+} from '@opentrons/components'
 import { StatusLabel } from '..'
 
 const render = (props: React.ComponentProps<typeof StatusLabel>) => {
@@ -37,7 +41,7 @@ describe('StatusLabel', () => {
       status: 'Idle',
       backgroundColor: LEGACY_COLORS.medGreyEnabled,
       iconColor: LEGACY_COLORS.darkGrey,
-      textColor: LEGACY_COLORS.darkBlackEnabled,
+      textColor: COLORS.black90,
       showIcon: false,
     }
     const { getByText } = render(props)

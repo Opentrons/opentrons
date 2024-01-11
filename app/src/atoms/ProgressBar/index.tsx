@@ -26,7 +26,7 @@ export function ProgressBar({
 
   const LINER_PROGRESS_CONTAINER_STYLE = css`
     height: 0.5rem;
-    background: ${LEGACY_COLORS.white};
+    background: ${COLORS.white};
     padding: 0;
     width: 100%;
     margin: 0;

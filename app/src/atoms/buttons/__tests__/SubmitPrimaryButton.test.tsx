@@ -41,7 +41,7 @@ describe('SubmitPrimaryButton', () => {
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16}`
     )
-    expect(button).toHaveStyle(`color: ${String(LEGACY_COLORS.white)}`)
+    expect(button).toHaveStyle(`color: ${String(COLORS.white)}`)
     expect(button).toHaveStyle(`font-size: ${String(TYPOGRAPHY.fontSizeP)}`)
     expect(button).toHaveStyle(
       `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
@@ -66,7 +66,9 @@ describe('SubmitPrimaryButton', () => {
     expect(button).toHaveStyle(
       `background-color: ${String(LEGACY_COLORS.darkGreyDisabled)}`
     )
-    expect(button).toHaveStyle(`color: ${String(LEGACY_COLORS.successDisabled)}`)
+    expect(button).toHaveStyle(
+      `color: ${String(LEGACY_COLORS.successDisabled)}`
+    )
   })
 
   it('calls mock function when clicking the button', () => {

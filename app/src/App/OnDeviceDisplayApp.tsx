@@ -242,7 +242,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     position: ${POSITION_RELATIVE};
     width: 100%;
     height: 100%;
-    background-color: ${LEGACY_COLORS.white};
+    background-color: ${COLORS.white};
     overflow-y: ${OVERFLOW_AUTO};
 
     &::-webkit-scrollbar {

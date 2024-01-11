@@ -73,7 +73,7 @@ export interface BaseModalProps extends StyleProps {
  */
 export function BaseModal(props: BaseModalProps): JSX.Element {
   const {
-    overlayColor = LEGACY_COLORS.backgroundOverlay,
+    overlayColor = COLORS.transparentBlack40,
     onOutsideClick,
     zIndex = 10,
     header,

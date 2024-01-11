@@ -79,7 +79,7 @@ export function CalibrationStatusCard({
               LEGACY_COLORS.opacity12HexCode
             )}`}
             iconColor={statusLabelIconColor}
-            textColor={LEGACY_COLORS.darkBlackEnabled}
+            textColor={COLORS.black90}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             iconSize="0.313rem"
           />

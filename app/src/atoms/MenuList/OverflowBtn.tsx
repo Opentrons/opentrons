@@ -17,7 +17,7 @@ export const OverflowBtn = React.forwardRef(
             background-color: ${LEGACY_COLORS.lightGreyHover};
           }
           &:hover circle {
-            fill: ${LEGACY_COLORS.darkBlackEnabled};
+            fill: ${COLORS.black90};
           }
 
           &:active,

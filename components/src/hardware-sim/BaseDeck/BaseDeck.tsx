@@ -141,7 +141,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           {showSlotLabels ? (
             <SlotLabels
               robotType={robotType}
-              color={LEGACY_COLORS.darkBlackEnabled}
+              color={COLORS.black90}
               show4thColumn={
                 stagingAreaFixtures.length > 0 ||
                 wasteChuteStagingAreaFixtures.length > 0

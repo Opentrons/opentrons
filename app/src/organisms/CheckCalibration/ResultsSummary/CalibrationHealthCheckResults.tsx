@@ -39,7 +39,7 @@ export const CalibrationHealthCheckResults = ({
             ? LEGACY_COLORS.warningEnabled
             : LEGACY_COLORS.successEnabled
         }
-        textColor={LEGACY_COLORS.darkBlackEnabled}
+        textColor={COLORS.black90}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         iconSize="0.3125rem"
       ></StatusLabel>

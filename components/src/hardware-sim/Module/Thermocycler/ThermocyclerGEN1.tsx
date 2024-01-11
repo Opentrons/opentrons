@@ -41,7 +41,7 @@ function ClosedThermocyclerGEN1Layers(): JSX.Element {
       <g id="closedChassisLightFill">
         <path
           d="M144.7,244.4v13.1H27.1v-13.1H1.4V1.5h168.9v242.9H144.7z"
-          style={{ fill: LEGACY_COLORS.white }}
+          style={{ fill: COLORS.white }}
         ></path>
       </g>
       <g id="closedChassisDarkFill">
@@ -77,7 +77,7 @@ function OpenThermocyclerGEN1Layers(): JSX.Element {
       <g id="openChassisLightFill">
         <path
           d="M144.7,244.4v13.1H27.1v-13.1H1.4V1.5h168.9v242.9H144.7z"
-          style={{ fill: LEGACY_COLORS.white }}
+          style={{ fill: COLORS.white }}
         ></path>
       </g>
       <g id="openChassisDarkFill">
@@ -97,7 +97,7 @@ function OpenThermocyclerGEN1Layers(): JSX.Element {
       <g id="openWellBlockLightFill">
         <path
           d="M149.5,80.3H22.2c-1.6,0-2.9,1.3-2.9,2.9v87.1c0,1.6,1.3,2.9,2.9,2.9h127.3c1.6,0,2.9-1.3,2.9-2.9V83.2 C152.4,81.6,151.1,80.3,149.5,80.3z"
-          style={{ fill: LEGACY_COLORS.white }}
+          style={{ fill: COLORS.white }}
         ></path>
       </g>
       <g id="openInnerWallEdges">
@@ -227,7 +227,7 @@ function OpenThermocyclerGEN1Layers(): JSX.Element {
       <g id="openLidLightFill">
         <path
           d="M0.7,223.9v33.7c0,2.4,1.9,4.3,4.3,4.3h162c2.4,0,4.3-1.9,4.3-4.3v-33.7"
-          style={{ fill: LEGACY_COLORS.white }}
+          style={{ fill: COLORS.white }}
         ></path>
       </g>
       <g id="openLidDarkFill">

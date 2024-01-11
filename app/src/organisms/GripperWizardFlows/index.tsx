@@ -359,7 +359,7 @@ export const GripperWizard = (
           boxShadow={BORDERS.shadowSmall}
           borderRadius={BORDERS.borderRadiusSize4}
           position={POSITION_ABSOLUTE}
-          backgroundColor={LEGACY_COLORS.white}
+          backgroundColor={COLORS.white}
         >
           {wizardHeader}
           {modalContent}

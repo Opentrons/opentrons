@@ -33,7 +33,9 @@ describe('FloatingActionButton', () => {
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing12} ${SPACING.spacing24}`
     )
-    expect(button).toHaveStyle(`background-color: ${LEGACY_COLORS.highlightPurple1}`)
+    expect(button).toHaveStyle(
+      `background-color: ${LEGACY_COLORS.highlightPurple1}`
+    )
     expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSize28}`)
     expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
     expect(button).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight36}`)
@@ -42,7 +44,7 @@ describe('FloatingActionButton', () => {
       `text-transform: ${TYPOGRAPHY.textTransformNone}`
     )
     expect(button).toHaveStyle(`box-shadow: ${BORDERS.shadowBig}`)
-    expect(button).toHaveStyle(`color: ${LEGACY_COLORS.white}`)
+    expect(button).toHaveStyle(`color: ${COLORS.white}`)
   })
 
   it('renders unselected floating action button with text and disabled', () => {
@@ -69,12 +71,8 @@ describe('FloatingActionButton', () => {
   it('applies the correct states to the unselected floating action button - focus-visible', () => {
     const { getByRole } = render(props)
     const button = getByRole('button')
-    expect(button).toHaveStyleRule(
-      'border-color',
-      `${LEGACY_COLORS.fundamentalsFocus}`,
-      {
-        modifier: ':focus-visible',
-      }
-    )
+    expect(button).toHaveStyleRule('border-color', `${COLORS.blue50}`, {
+      modifier: ':focus-visible',
+    })
   })
 })

@@ -21,7 +21,7 @@ export const SubmitPrimaryButton = (
     background-color: ${LEGACY_COLORS.blueEnabled};
     border-radius: ${BORDERS.radiusSoftCorners};
     padding: ${SPACING.spacing8} ${SPACING.spacing16};
-    color: ${LEGACY_COLORS.white};
+    color: ${COLORS.white};
     ${TYPOGRAPHY.pSemiBold}
     width: 100%;
     border: none;

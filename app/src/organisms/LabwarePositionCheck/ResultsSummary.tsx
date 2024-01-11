@@ -220,7 +220,7 @@ const Table = styled('table')`
 `
 const TableHeader = styled('th')`
   text-transform: ${TYPOGRAPHY.textTransformUppercase};
-  color: ${LEGACY_COLORS.darkBlackEnabled};
+  color: ${COLORS.black90};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   font-size: ${TYPOGRAPHY.fontSizeCaption};
   padding: ${SPACING.spacing4};

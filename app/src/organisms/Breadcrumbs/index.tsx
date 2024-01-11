@@ -40,7 +40,9 @@ function CrumbName({ crumbName, isLastCrumb }: CrumbNameProps): JSX.Element {
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      color={isLastCrumb ? LEGACY_COLORS.darkGreyEnabled : LEGACY_COLORS.blueEnabled}
+      color={
+        isLastCrumb ? LEGACY_COLORS.darkGreyEnabled : LEGACY_COLORS.blueEnabled
+      }
     >
       <Box
         paddingRight={SPACING.spacing4}
@@ -120,7 +122,7 @@ function BreadcrumbsComponent(): JSX.Element | null {
   return pathCrumbs.length > 1 ? (
     <Flex
       alignItems={ALIGN_FLEX_START}
-      backgroundColor={LEGACY_COLORS.white}
+      backgroundColor={COLORS.white}
       borderBottom={`1px solid ${String(LEGACY_COLORS.medGreyEnabled)}`}
       css={TYPOGRAPHY.labelRegular}
       flexDirection={DIRECTION_ROW}

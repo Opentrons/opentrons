@@ -65,7 +65,7 @@ const SPINNER_STYLE = css`
   color: ${LEGACY_COLORS.darkGreyEnabled};
   opacity: 100%;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    color: ${LEGACY_COLORS.darkBlackEnabled};
+    color: ${COLORS.black90};
     opacity: 70%;
   }
 `

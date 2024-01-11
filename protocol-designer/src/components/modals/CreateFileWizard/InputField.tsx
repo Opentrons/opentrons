@@ -71,7 +71,7 @@ export function InputField(props: InputFieldProps): JSX.Element {
       lineHeight={1}
       fontSize={TYPOGRAPHY.fontSizeP}
       fontWeight={TYPOGRAPHY.fontWeightRegular}
-      color={props.error != null ? COLOR_WARNING_DARK : LEGACY_COLORS.darkBlackEnabled}
+      color={props.error != null ? COLOR_WARNING_DARK : COLORS.black90}
       opacity={props.disabled ?? false ? 0.5 : ''}
     >
       <Input {...props} />
@@ -87,7 +87,7 @@ function Input(props: InputFieldProps): JSX.Element {
 
   const INPUT_FIELD = css`
     display: flex;
-    background-color: ${LEGACY_COLORS.white};
+    background-color: ${COLORS.white};
     border-radius: ${SPACING.spacing4};
     padding: ${SPACING.spacing8};
     border: 1px ${BORDERS.styleSolid}
@@ -104,7 +104,7 @@ function Input(props: InputFieldProps): JSX.Element {
 
     & input {
       border-radius: inherit;
-      color: ${LEGACY_COLORS.darkBlackEnabled};
+      color: ${COLORS.black90};
       border: none;
       flex: 1 1 auto;
       width: 100%;

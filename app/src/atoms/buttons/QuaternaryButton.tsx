@@ -9,7 +9,7 @@ import {
 } from '@opentrons/components'
 
 export const QuaternaryButton = styled(NewSecondaryBtn)`
-  background-color: ${LEGACY_COLORS.white};
+  background-color: ${COLORS.white};
   border-radius: ${BORDERS.radiusRoundEdge};
   box-shadow: none;
   color: ${LEGACY_COLORS.blueEnabled};

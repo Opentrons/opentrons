@@ -42,7 +42,7 @@ const REGULAR_OVERLAY_STYLE = css`
   padding: ${SPACING.spacing8};
   background-color: ${LEGACY_COLORS.darkBlack90};
   flex-direction: ${DIRECTION_COLUMN};
-  color: ${LEGACY_COLORS.white};
+  color: ${COLORS.white};
   display: flex;
   align-items: ${ALIGN_FLEX_START};
   justify-content: ${JUSTIFY_SPACE_AROUND};

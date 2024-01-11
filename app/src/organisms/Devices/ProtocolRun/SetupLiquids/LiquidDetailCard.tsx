@@ -66,8 +66,11 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
 
   const ACTIVE_STYLE = css`
-    background-color: ${isOnDevice ? LEGACY_COLORS.medBlue : LEGACY_COLORS.lightBlue};
-    border: ${isOnDevice ? SPACING.spacing4 : `1px`} solid ${LEGACY_COLORS.blueEnabled};
+    background-color: ${isOnDevice
+      ? LEGACY_COLORS.medBlue
+      : LEGACY_COLORS.lightBlue};
+    border: ${isOnDevice ? SPACING.spacing4 : `1px`} solid
+      ${LEGACY_COLORS.blueEnabled};
     border-radius: ${isOnDevice ? BORDERS.borderRadiusSize3 : 0};
   `
   const volumePerWellRange = getWellRangeForLiquidLabwarePair(
@@ -87,7 +90,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
     <Box
       css={selectedValue === liquidId ? ACTIVE_STYLE : LIQUID_CARD_ODD_STYLE}
       borderRadius={BORDERS.radiusSoftCorners}
-      backgroundColor={LEGACY_COLORS.white}
+      backgroundColor={COLORS.white}
       onClick={() => setSelectedValue(liquidId)}
       width="19.875rem"
       minHeight="max-content"
@@ -99,7 +102,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           padding={SPACING.spacing8}
           height="3rem"
           width="3rem"
-          backgroundColor={LEGACY_COLORS.white}
+          backgroundColor={COLORS.white}
           justifyContent={JUSTIFY_CENTER}
           alignItems={ALIGN_CENTER}
         >
@@ -181,7 +184,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
       css={selectedValue === liquidId ? ACTIVE_STYLE : LIQUID_CARD_STYLE}
       borderRadius={BORDERS.radiusSoftCorners}
       padding={SPACING.spacing16}
-      backgroundColor={LEGACY_COLORS.white}
+      backgroundColor={COLORS.white}
       onClick={handleSelectedValue}
       width="10.3rem"
       minHeight="max-content"
@@ -196,7 +199,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           padding={SPACING.spacing8}
           height="max-content"
           width="max-content"
-          backgroundColor={LEGACY_COLORS.white}
+          backgroundColor={COLORS.white}
         >
           <Icon name="circle" color={displayColor} size={SIZE_1} />
         </Flex>
@@ -212,7 +215,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
         </StyledText>
 
         <Flex
-          backgroundColor={LEGACY_COLORS.darkBlackEnabled + '1A'}
+          backgroundColor={COLORS.black90 + '1A'}
           borderRadius={BORDERS.radiusSoftCorners}
           height="max-content"
           width="max-content"

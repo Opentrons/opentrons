@@ -66,7 +66,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
   const { totalSteps, currentStep, title, onExit, exitDisabled } = props
 
   return (
-    <Box backgroundColor={LEGACY_COLORS.white}>
+    <Box backgroundColor={COLORS.white}>
       <Flex css={HEADER_CONTAINER_STYLE}>
         <Flex flexDirection={DIRECTION_ROW}>
           <Text css={HEADER_TEXT_STYLE} marginRight={SPACING.spacing8}>

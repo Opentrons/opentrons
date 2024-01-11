@@ -31,7 +31,7 @@ export function MenuOverlay(props: MenuOverlayProps): JSX.Element {
 
   return (
     <Flex
-      backgroundColor={LEGACY_COLORS.white}
+      backgroundColor={COLORS.white}
       borderRadius={BORDERS.radiusSoftCorners}
       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
       flexDirection={DIRECTION_COLUMN}

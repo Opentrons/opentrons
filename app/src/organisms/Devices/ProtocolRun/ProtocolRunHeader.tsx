@@ -312,7 +312,7 @@ export function ProtocolRunHeader({
       ) : null}
       <Flex
         ref={protocolRunHeaderRef}
-        backgroundColor={LEGACY_COLORS.white}
+        backgroundColor={COLORS.white}
         border={BORDERS.lineBorder}
         borderRadius={BORDERS.radiusSoftCorners}
         flexDirection={DIRECTION_COLUMN}

@@ -92,7 +92,7 @@ const ProtocolHeader = ({
       padding={`${SPACING.spacing32} ${SPACING.spacing40}`}
       position={POSITION_STICKY}
       top="0"
-      backgroundColor={LEGACY_COLORS.white}
+      backgroundColor={COLORS.white}
       marginX={`-${SPACING.spacing32}`}
       zIndex={1} // the header is always visble when things scroll beneath
     >

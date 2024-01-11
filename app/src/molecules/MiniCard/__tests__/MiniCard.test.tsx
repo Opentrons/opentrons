@@ -28,7 +28,7 @@ describe('MiniCard', () => {
   it('renders the correct style unselectedOptionStyles', () => {
     const { getByText } = render(props)
     const miniCard = getByText('mock mini card')
-    expect(miniCard).toHaveStyle(`background-color: ${String(LEGACY_COLORS.white)}`)
+    expect(miniCard).toHaveStyle(`background-color: ${String(COLORS.white)}`)
     expect(miniCard).toHaveStyle(
       `border: 1px solid ${String(LEGACY_COLORS.medGreyEnabled)}`
     )

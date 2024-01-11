@@ -1,6 +1,10 @@
 import 'jest-styled-components'
 import * as React from 'react'
-import { renderWithProviders, LEGACY_COLORS, SPACING } from '@opentrons/components'
+import {
+  renderWithProviders,
+  LEGACY_COLORS,
+  SPACING,
+} from '@opentrons/components'
 
 import { ModuleIcon } from '../'
 
@@ -55,18 +59,16 @@ describe('ModuleIcon', () => {
   it('renders SharedIcon with correct style', () => {
     const { getByTestId } = render(props)
     const module = getByTestId('ModuleIcon_ot-temperature-v2')
-    expect(module).toHaveStyle(`color: ${String(LEGACY_COLORS.darkGreyEnabled)}`)
+    expect(module).toHaveStyle(
+      `color: ${String(LEGACY_COLORS.darkGreyEnabled)}`
+    )
     expect(module).toHaveStyle(`height: ${SPACING.spacing16}`)
     expect(module).toHaveStyle(`width: ${SPACING.spacing16}`)
     expect(module).toHaveStyle(`margin-left: ${SPACING.spacing2}`)
     expect(module).toHaveStyle(`margin-right: ${SPACING.spacing2}`)
-    expect(module).toHaveStyleRule(
-      'color',
-      `${String(LEGACY_COLORS.darkBlackEnabled)}`,
-      {
-        modifier: ':hover',
-      }
-    )
+    expect(module).toHaveStyleRule('color', `${String(COLORS.black90)}`, {
+      modifier: ':hover',
+    })
   })
 
   it('renders magnetic module icon', () => {

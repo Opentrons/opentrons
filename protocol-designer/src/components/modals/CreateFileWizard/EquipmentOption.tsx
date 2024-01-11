@@ -62,7 +62,11 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
             aria-label={`EquipmentOption_${
               isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'
             }`}
-            color={isSelected ? LEGACY_COLORS.blueEnabled : LEGACY_COLORS.darkGreyEnabled}
+            color={
+              isSelected
+                ? LEGACY_COLORS.blueEnabled
+                : LEGACY_COLORS.darkGreyEnabled
+            }
             size="1.5rem"
             name={isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'}
           />
@@ -77,7 +81,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
         <Text
           as="p"
           fontSize={TYPOGRAPHY.fontSizeP}
-          color={disabled ? LEGACY_COLORS.errorDisabled : LEGACY_COLORS.darkBlackEnabled}
+          color={disabled ? LEGACY_COLORS.errorDisabled : COLORS.black90}
         >
           {text}
         </Text>

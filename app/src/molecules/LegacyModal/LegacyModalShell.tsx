@@ -82,7 +82,7 @@ const Overlay = styled.div`
   top: 0;
   bottom: 0;
   z-index: 1;
-  background-color: ${LEGACY_COLORS.backgroundOverlay};
+  background-color: ${COLORS.transparentBlack40};
   cursor: default;
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
@@ -114,7 +114,7 @@ const ModalArea = styled.div<
   border-radius: ${BORDERS.radiusSoftCorners};
   box-shadow: ${BORDERS.smallDropShadow};
   height: ${({ isFullPage }) => (isFullPage ? '100%' : 'auto')};
-  background-color: ${LEGACY_COLORS.white};
+  background-color: ${COLORS.white};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     border-radius: ${BORDERS.borderRadiusSize4};
   }
@@ -122,12 +122,12 @@ const ModalArea = styled.div<
 `
 
 const Footer = styled.div`
-  background-color: ${LEGACY_COLORS.white};
+  background-color: ${COLORS.white};
   position: ${POSITION_STICKY};
   bottom: 0;
 `
 const Header = styled.div`
-  background-color: ${LEGACY_COLORS.white};
+  background-color: ${COLORS.white};
   position: ${POSITION_STICKY};
   top: 0;
 `

@@ -164,7 +164,7 @@ export function LabwareListItem(
                 color: ${LEGACY_COLORS.darkGreyEnabled};
 
                 &:hover {
-                  color: ${LEGACY_COLORS.darkBlackEnabled};
+                  color: ${COLORS.black90};
                 }
               `}
               onClick={() => setSecureLabwareModalType(moduleType)}
@@ -190,7 +190,11 @@ export function LabwareListItem(
       case HEATERSHAKER_MODULE_TYPE:
         isHeaterShakerInProtocol = true
         extraAttentionText = (
-          <StyledText as="p" color={LEGACY_COLORS.darkGreyEnabled} maxWidth="15.25rem">
+          <StyledText
+            as="p"
+            color={LEGACY_COLORS.darkGreyEnabled}
+            maxWidth="15.25rem"
+          >
             {t('heater_shaker_labware_list_view')}
           </StyledText>
         )

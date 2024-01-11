@@ -54,7 +54,7 @@ const COPY_ICON_STYLE = css`
   }
   &:active,
   &:focus {
-    color: ${LEGACY_COLORS.darkBlackEnabled};
+    color: ${COLORS.black90};
   }
 `
 

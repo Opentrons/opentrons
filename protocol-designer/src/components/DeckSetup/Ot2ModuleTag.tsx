@@ -46,7 +46,7 @@ export function Ot2ModuleTag(props: Ot2ModuleTagProps): JSX.Element {
         backgroundColor: LEGACY_COLORS.darkGreyEnabled,
         padding: SPACING.spacing4,
         height: '100%',
-        color: LEGACY_COLORS.white,
+        color: COLORS.white,
       }}
     >
       <Text as="p" fontSize="0.5rem">

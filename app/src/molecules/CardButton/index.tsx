@@ -35,7 +35,7 @@ const CARD_BUTTON_STYLE = css`
     border: none;
     box-shadow: none;
     background-color: ${LEGACY_COLORS.mediumBlueEnabled};
-    color: ${LEGACY_COLORS.darkBlackEnabled};
+    color: ${COLORS.black90};
   }
 
   &:focus-visible {
@@ -83,7 +83,9 @@ export function CardButton(props: CardButtonProps): JSX.Element {
       onClick={() => history.push(destinationPath)}
       width="100%"
       css={CARD_BUTTON_STYLE}
-      backgroundColor={disabled ? LEGACY_COLORS.darkBlack20 : LEGACY_COLORS.mediumBlueEnabled}
+      backgroundColor={
+        disabled ? LEGACY_COLORS.darkBlack20 : LEGACY_COLORS.mediumBlueEnabled
+      }
       disabled={disabled}
     >
       <Icon
@@ -96,7 +98,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
         <StyledText
           as="h4"
           fontWeight={TYPOGRAPHY.fontWeightBold}
-          color={disabled ? LEGACY_COLORS.darkBlack60 : LEGACY_COLORS.darkBlackEnabled}
+          color={disabled ? LEGACY_COLORS.darkBlack60 : COLORS.black90}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {title}
@@ -110,7 +112,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={disabled ? LEGACY_COLORS.darkBlack60 : LEGACY_COLORS.darkBlackEnabled}
+          color={disabled ? LEGACY_COLORS.darkBlack60 : COLORS.black90}
           css={CARD_BUTTON_TEXT_STYLE}
         >
           {description}

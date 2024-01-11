@@ -87,7 +87,7 @@ export function CheckPipettesButton(
     >
       <Flex
         flexDirection={DIRECTION_ROW}
-        color={LEGACY_COLORS.white}
+        color={COLORS.white}
         alignItems={ALIGN_CENTER}
       >
         {body}

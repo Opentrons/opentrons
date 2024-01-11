@@ -215,7 +215,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 <Box display="grid" gridTemplateColumns="1fr 3fr">
                   <Box
                     marginY={SPACING.spacingAuto}
-                    backgroundColor={isSelected ? LEGACY_COLORS.white : 'inherit'}
+                    backgroundColor={isSelected ? COLORS.white : 'inherit'}
                     marginRight={SPACING.spacing16}
                     height="4.25rem"
                     width="4.75rem"
@@ -298,7 +298,11 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
         }
       `}
     >
-      <Icon size="1.25rem" name="alert-circle" color={LEGACY_COLORS.medGreyEnabled} />
+      <Icon
+        size="1.25rem"
+        name="alert-circle"
+        color={LEGACY_COLORS.medGreyEnabled}
+      />
       <StyledText
         as="p"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}

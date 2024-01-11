@@ -41,7 +41,7 @@ export function NetworkDetailsModal({
     title: securityType != null ? networkName : t('ethernet'),
     hasExitIcon: true,
     iconName: securityType != null ? 'wifi' : 'ethernet',
-    iconColor: LEGACY_COLORS.darkBlackEnabled,
+    iconColor: COLORS.black90,
   }
 
   return (

@@ -46,7 +46,7 @@ const EXIT_BUTTON_STYLE = css`
   }
 `
 const BOX_STYLE = css`
-  background-color: ${LEGACY_COLORS.white} @media
+  background-color: ${COLORS.white} @media
     ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     border-radius: ${BORDERS.borderRadiusSize4};
   }
@@ -89,7 +89,10 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
           </StyledText>
 
           {currentStep != null && totalSteps != null && currentStep > 0 ? (
-            <StyledText css={STEP_TEXT_STYLE} color={LEGACY_COLORS.darkGreyEnabled}>
+            <StyledText
+              css={STEP_TEXT_STYLE}
+              color={LEGACY_COLORS.darkGreyEnabled}
+            >
               {t('step', { current: currentStep, max: totalSteps })}
             </StyledText>
           ) : null}

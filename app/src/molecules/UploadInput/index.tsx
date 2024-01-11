@@ -26,7 +26,7 @@ const StyledLabel = styled.label`
   border: 2px dashed ${LEGACY_COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   text-align: center;
-  background-color: ${LEGACY_COLORS.white};
+  background-color: ${COLORS.white};
 
   &:hover,
   &:focus-within {

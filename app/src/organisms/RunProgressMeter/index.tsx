@@ -225,7 +225,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
               color: ${
                 downloadIsDisabled
                   ? LEGACY_COLORS.darkGreyEnabled
-                  : LEGACY_COLORS.darkBlackEnabled
+                  : COLORS.black90
               };
             }
             cursor: ${downloadIsDisabled ? 'default' : 'pointer'};

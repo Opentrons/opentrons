@@ -38,7 +38,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   return (
     <Box
       role="link"
-      backgroundColor={LEGACY_COLORS.white}
+      backgroundColor={COLORS.white}
       color={LEGACY_COLORS.black}
       css={BORDERS.cardOutlineBorder}
       paddingLeft={SPACING.spacing16}

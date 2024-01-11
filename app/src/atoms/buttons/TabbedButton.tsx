@@ -10,7 +10,7 @@ import {
 
 const SELECTED_STYLE = css`
   background-color: ${LEGACY_COLORS.highlightPurple1};
-  color: ${LEGACY_COLORS.white};
+  color: ${COLORS.white};
 
   &:focus,
   &:hover {
@@ -58,7 +58,7 @@ export const TabbedButton = styled(Btn)<TabbedButtonProps>`
       ${styleProps}
 
       &:focus-visible {
-        box-shadow: 0 0 0 3px ${LEGACY_COLORS.fundamentalsFocus};
+        box-shadow: 0 0 0 3px ${COLORS.blue50};
       }
       &:disabled {
         background-color: ${LEGACY_COLORS.darkBlack20};

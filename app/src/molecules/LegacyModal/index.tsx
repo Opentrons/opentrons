@@ -56,8 +56,8 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
       onClose={onClose}
       title={title}
       icon={['error', 'warning'].includes(type) ? modalIcon : undefined}
-      color={LEGACY_COLORS.darkBlackEnabled}
-      backgroundColor={LEGACY_COLORS.white}
+      color={COLORS.black90}
+      backgroundColor={COLORS.white}
     />
   )
 

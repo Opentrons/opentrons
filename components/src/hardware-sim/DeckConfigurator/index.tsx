@@ -38,7 +38,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     handleClickAdd,
     handleClickRemove,
     lightFill = LEGACY_COLORS.light1,
-    darkFill = LEGACY_COLORS.darkBlackEnabled,
+    darkFill = COLORS.black90,
     readOnly = false,
     showExpansion = true,
     children,

@@ -56,10 +56,8 @@ describe('Tooltip', () => {
     expect(tooltip).toBeInTheDocument()
     expect(tooltip).toHaveStyle('position: absolute')
     expect(tooltip).toHaveStyle('left: 0.25rem')
-    expect(tooltip).toHaveStyle(
-      `background: ${String(LEGACY_COLORS.darkBlackEnabled)}`
-    )
-    expect(tooltip).toHaveStyle(`color: ${String(LEGACY_COLORS.white)}`)
+    expect(tooltip).toHaveStyle(`background: ${String(COLORS.black90)}`)
+    expect(tooltip).toHaveStyle(`color: ${String(COLORS.white)}`)
     expect(tooltip).toHaveStyle('width: 8.75rem')
     expect(tooltip).toHaveStyle('font-size: 0.625rem')
     expect(tooltip).toHaveAttribute('role', 'tooltip')

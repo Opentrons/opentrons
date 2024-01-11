@@ -16,7 +16,7 @@ describe('SearchNetwork', () => {
     const [{ getByText, getByTestId }] = render()
     getByText('Searching for networks...')
     expect(getByTestId('Display-Search-Network-text')).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.white}`
+      `background-color: ${COLORS.white}`
     )
   })
 })

@@ -89,7 +89,7 @@ export function Navigation(props: NavigationProps): JSX.Element {
         paddingX={SPACING.spacing40}
         top="0"
         width="100%"
-        backgroundColor={LEGACY_COLORS.white}
+        backgroundColor={COLORS.white}
         boxShadow={isScrolled ? BORDERS.shadowBig : ''}
         gridGap={SPACING.spacing24}
         aria-label="Navigation_container"
@@ -168,7 +168,7 @@ const TouchNavLink = styled(NavLink)`
 const IconButton = styled('button')`
   border-radius: ${SPACING.spacing4};
   max-height: 100%;
-  background-color: ${LEGACY_COLORS.white};
+  background-color: ${COLORS.white};
 
   &:active {
     background-color: ${LEGACY_COLORS.darkBlack20};

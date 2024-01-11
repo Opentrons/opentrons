@@ -117,7 +117,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
     }
   `
   const LIQUID_CARD_ITEM_STYLE = css`
-    border: 1px solid ${LEGACY_COLORS.white};
+    border: 1px solid ${COLORS.white};
     &:hover {
       cursor: pointer;
       ${BORDERS.cardOutlineBorder}
@@ -132,7 +132,9 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
       css={LIQUID_CARD_STYLE}
       padding={SPACING.spacing16}
       onClick={handleSetOpenItem}
-      backgroundColor={openItem ? LEGACY_COLORS.fundamentalsBackground : LEGACY_COLORS.white}
+      backgroundColor={
+        openItem ? LEGACY_COLORS.fundamentalsBackground : COLORS.white
+      }
       data-testid="LiquidsListItem_Row"
     >
       <LiquidsListItemDetails
@@ -205,7 +207,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                 borderRadius="4px"
                 marginBottom={SPACING.spacing8}
                 padding={SPACING.spacing16}
-                backgroundColor={LEGACY_COLORS.white}
+                backgroundColor={COLORS.white}
                 data-testid={`LiquidsListItem_slotRow_${String(index)}`}
                 onClick={handleLiquidDetailsLabwareId}
               >
@@ -296,7 +298,7 @@ export const LiquidsListItemDetails = (
         css={LIQUID_BORDER_STYLE}
         padding={SPACING.spacing12}
         height="max-content"
-        backgroundColor={LEGACY_COLORS.white}
+        backgroundColor={COLORS.white}
       >
         <Icon name="circle" color={displayColor} size={SIZE_1} />
       </Flex>
@@ -318,7 +320,7 @@ export const LiquidsListItemDetails = (
         </StyledText>
       </Flex>
       <Flex
-        backgroundColor={LEGACY_COLORS.darkBlackEnabled + '1A'}
+        backgroundColor={COLORS.black90 + '1A'}
         borderRadius={BORDERS.radiusSoftCorners}
         height="max-content"
         paddingY={SPACING.spacing4}

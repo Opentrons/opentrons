@@ -235,7 +235,7 @@ export const darkLinkH4SemiBold = css`
   line-height: ${lineHeight20};
   color: ${LEGACY_COLORS.darkGreyEnabled};
   &:hover {
-    color: ${LEGACY_COLORS.darkBlackEnabled};
+    color: ${COLORS.black90};
   }
 `
 
@@ -245,7 +245,7 @@ export const darkLinkLabelSemiBold = css`
   line-height: ${lineHeight20};
   color: ${LEGACY_COLORS.darkGreyEnabled};
   &:hover {
-    color: ${LEGACY_COLORS.darkBlackEnabled};
+    color: ${COLORS.black90};
   }
 `
 

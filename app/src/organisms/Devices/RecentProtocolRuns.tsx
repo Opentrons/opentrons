@@ -42,7 +42,7 @@ export function RecentProtocolRuns({
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
-      backgroundColor={LEGACY_COLORS.white}
+      backgroundColor={COLORS.white}
       border={BORDERS.lineBorder}
       borderRadius={BORDERS.radiusSoftCorners}
       flexDirection={DIRECTION_COLUMN}

@@ -16,7 +16,7 @@ export const MenuItem = styled.button<ButtonProps>`
   text-align: ${TYPOGRAPHY.textAlignLeft};
   font-size: ${TYPOGRAPHY.fontSizeP};
   background-color: ${LEGACY_COLORS.transparent};
-  color: ${LEGACY_COLORS.darkBlackEnabled};
+  color: ${COLORS.black90};
   padding: ${SPACING.spacing8} ${SPACING.spacing12} ${SPACING.spacing8}
     ${SPACING.spacing12};
 
@@ -36,8 +36,7 @@ export const MenuItem = styled.button<ButtonProps>`
     font-size: ${TYPOGRAPHY.fontSize28};
     background-color: ${({ isAlert }) =>
       isAlert ? LEGACY_COLORS.errorEnabled : LEGACY_COLORS.transparent};
-    color: ${({ isAlert }) =>
-      isAlert ? LEGACY_COLORS.white : LEGACY_COLORS.darkBlackEnabled};
+    color: ${({ isAlert }) => (isAlert ? COLORS.white : COLORS.black90)};
     padding: ${SPACING.spacing24};
     height: 5.5rem;
     line-height: ${TYPOGRAPHY.lineHeight36};
@@ -50,7 +49,8 @@ export const MenuItem = styled.button<ButtonProps>`
     &:disabled {
       background-color: ${({ isAlert }) =>
         isAlert ? LEGACY_COLORS.errorEnabled : LEGACY_COLORS.transparent};
-      color: ${({ isAlert }) => (isAlert ? LEGACY_COLORS.white : LEGACY_COLORS.darkBlack60)};
+      color: ${({ isAlert }) =>
+        isAlert ? COLORS.white : LEGACY_COLORS.darkBlack60};
     }
   }
 `

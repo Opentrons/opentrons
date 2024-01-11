@@ -82,7 +82,7 @@ const Template: Story<React.ComponentProps<typeof IconComponent>> = args => {
           border={
             selectedIcon === name
               ? `2px solid ${LEGACY_COLORS.blueEnabled}`
-              : `2px solid ${LEGACY_COLORS.darkBlackEnabled}`
+              : `2px solid ${COLORS.black90}`
           }
         >
           <IconComponent name={name as IconName} size="4rem" />

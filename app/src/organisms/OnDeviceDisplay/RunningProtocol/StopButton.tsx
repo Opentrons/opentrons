@@ -25,7 +25,7 @@ const STOP_BUTTON_STYLE = css`
     border: none;
     box-shadow: none;
     background-color: ${LEGACY_COLORS.red2};
-    color: ${LEGACY_COLORS.white};
+    color: ${COLORS.white};
   }
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
@@ -62,7 +62,7 @@ export function StopButton({
       onClick={onStop}
       aria-label="stop"
     >
-      <Icon name="ot-close-thick" color={LEGACY_COLORS.white} size={iconSize} />
+      <Icon name="ot-close-thick" color={COLORS.white} size={iconSize} />
     </Btn>
   )
 }

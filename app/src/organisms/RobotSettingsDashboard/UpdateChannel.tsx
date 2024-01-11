@@ -36,8 +36,10 @@ const SettingButtonLabel = styled.label<LabelProps>`
   border-radius: ${BORDERS.borderRadiusSize4};
   cursor: pointer;
   background: ${({ isSelected }) =>
-    isSelected === true ? LEGACY_COLORS.blueEnabled : LEGACY_COLORS.mediumBlueEnabled};
-  color: ${({ isSelected }) => isSelected === true && LEGACY_COLORS.white};
+    isSelected === true
+      ? LEGACY_COLORS.blueEnabled
+      : LEGACY_COLORS.mediumBlueEnabled};
+  color: ${({ isSelected }) => isSelected === true && COLORS.white};
 `
 
 interface UpdateChannelProps {
@@ -113,7 +115,7 @@ export function UpdateChannel({
                     fontWeight={TYPOGRAPHY.fontWeightRegular}
                     color={
                       radio.value === channel
-                        ? LEGACY_COLORS.white
+                        ? COLORS.white
                         : LEGACY_COLORS.darkBlack70
                     }
                   >

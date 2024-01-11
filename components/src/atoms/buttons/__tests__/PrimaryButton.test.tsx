@@ -37,7 +37,7 @@ describe('PrimaryButton', () => {
       `text-transform: ${TYPOGRAPHY.textTransformNone}`
     )
     expect(button).toHaveStyle(`box-shadow: none`)
-    expect(button).toHaveStyle(`color: ${LEGACY_COLORS.white}`)
+    expect(button).toHaveStyle(`color: ${COLORS.white}`)
   })
 
   it('renders primary button with text and disabled', () => {
@@ -45,24 +45,34 @@ describe('PrimaryButton', () => {
     const { getByText } = render(props)
     const button = getByText('primary button')
     expect(button).toBeDisabled()
-    expect(button).toHaveStyle(`background-color: ${LEGACY_COLORS.darkGreyDisabled}`)
+    expect(button).toHaveStyle(
+      `background-color: ${LEGACY_COLORS.darkGreyDisabled}`
+    )
     expect(button).toHaveStyle(`color: ${LEGACY_COLORS.errorDisabled}`)
   })
 
   it('applies the correct states to the button - focus', () => {
     const { getByText } = render(props)
     const button = getByText('primary button')
-    expect(button).toHaveStyleRule('background-color', `${LEGACY_COLORS.blueHover}`, {
-      modifier: ':focus',
-    })
+    expect(button).toHaveStyleRule(
+      'background-color',
+      `${LEGACY_COLORS.blueHover}`,
+      {
+        modifier: ':focus',
+      }
+    )
   })
 
   it('applies the correct states to the button - hover', () => {
     const { getByText } = render(props)
     const button = getByText('primary button')
-    expect(button).toHaveStyleRule('background-color', `${LEGACY_COLORS.blueHover}`, {
-      modifier: ':hover',
-    })
+    expect(button).toHaveStyleRule(
+      'background-color',
+      `${LEGACY_COLORS.blueHover}`,
+      {
+        modifier: ':hover',
+      }
+    )
   })
 
   it('applies the correct states to the button - active', () => {
@@ -93,7 +103,9 @@ describe('PrimaryButton', () => {
     props.backgroundColor = LEGACY_COLORS.errorEnabled
     const { getByText } = render(props)
     const button = getByText('primary button')
-    expect(button).toHaveStyle(`background-color: ${LEGACY_COLORS.errorEnabled}`)
-    expect(button).toHaveStyle(`color: ${LEGACY_COLORS.white}`)
+    expect(button).toHaveStyle(
+      `background-color: ${LEGACY_COLORS.errorEnabled}`
+    )
+    expect(button).toHaveStyle(`color: ${COLORS.white}`)
   })
 })

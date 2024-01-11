@@ -4,7 +4,12 @@ import { css } from 'styled-components'
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
-import { BORDERS, LEGACY_COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import {
+  BORDERS,
+  LEGACY_COLORS,
+  SPACING,
+  TYPOGRAPHY,
+} from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   FIXTURE_HEIGHT,
@@ -67,7 +72,7 @@ export function StagingAreaConfigFixture(
           {STAGING_AREA_DISPLAY_NAME}
         </Text>
         {handleClickRemove != null ? (
-          <Icon name="remove" color={LEGACY_COLORS.white} size="2rem" />
+          <Icon name="remove" color={COLORS.white} size="2rem" />
         ) : null}
       </Btn>
     </RobotCoordsForeignObject>
@@ -79,7 +84,7 @@ const STAGING_AREA_CONFIG_STYLE_READ_ONLY = css`
   align-items: ${ALIGN_CENTER};
   background-color: ${LEGACY_COLORS.grey2};
   border-radius: ${BORDERS.borderRadiusSize1};
-  color: ${LEGACY_COLORS.white};
+  color: ${COLORS.white};
   grid-gap: ${SPACING.spacing8};
   justify-content: ${JUSTIFY_CENTER};
   width: 100%;
@@ -97,6 +102,6 @@ const STAGING_AREA_CONFIG_STYLE_EDITABLE = css`
   }
 
   &:focus-visible {
-    border: 3px solid ${LEGACY_COLORS.fundamentalsFocus};
+    border: 3px solid ${COLORS.blue50};
   }
 `
