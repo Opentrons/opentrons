@@ -27,7 +27,7 @@ describe('Unselected TabbedButton', () => {
     const { getByText } = render(props)
     const button = getByText('tabbed button')
     expect(button).toHaveStyle(
-      `background-color: ${String(COLORS.highlightPurple2)}`
+      `background-color: ${String(COLORS.purple35)}`
     )
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
@@ -63,7 +63,7 @@ describe('Unselected TabbedButton', () => {
     const button = getByText('tabbed button')
     expect(button).toHaveStyleRule(
       'background-color',
-      `${String(COLORS.highlightPurple2Pressed)}`,
+      `${String(COLORS.purple40)}`,
       {
         modifier: ':active',
       }
@@ -105,7 +105,7 @@ describe('Selected TabbedButton', () => {
     const { getByText } = render(props)
     const button = getByText('tabbed button')
     expect(button).toHaveStyle(
-      `background-color: ${String(COLORS.highlightPurple1)}`
+      `background-color: ${String(COLORS.purple50)}`
     )
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
@@ -141,7 +141,7 @@ describe('Selected TabbedButton', () => {
     const button = getByText('tabbed button')
     expect(button).toHaveStyleRule(
       'background-color',
-      `${String(COLORS.highlightPurple1Pressed)}`,
+      `${String(COLORS.purple55)}`,
       {
         modifier: ':active',
       }

@@ -33,7 +33,7 @@ describe('FloatingActionButton', () => {
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing12} ${SPACING.spacing24}`
     )
-    expect(button).toHaveStyle(`background-color: ${COLORS.highlightPurple1}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.purple50}`)
     expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSize28}`)
     expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
     expect(button).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight36}`)
@@ -59,7 +59,7 @@ describe('FloatingActionButton', () => {
     const button = getByRole('button')
     expect(button).toHaveStyleRule(
       'background-color',
-      `${COLORS.highlightPurple1Pressed}`,
+      `${COLORS.purple55}`,
       {
         modifier: ':active',
       }

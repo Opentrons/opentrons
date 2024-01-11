@@ -9,32 +9,32 @@ import {
 } from '@opentrons/components'
 
 const SELECTED_STYLE = css`
-  background-color: ${COLORS.highlightPurple1};
+  background-color: ${COLORS.purple50};
   color: ${COLORS.white};
 
   &:focus,
   &:hover {
-    background-color: ${COLORS.highlightPurple1};
+    background-color: ${COLORS.purple50};
     box-shadow: none;
   }
 
   &:active {
-    background-color: ${COLORS.highlightPurple1Pressed};
+    background-color: ${COLORS.purple55};
   }
 `
 
 const UNSELECTED_STYLE = css`
-  background-color: ${COLORS.highlightPurple2};
+  background-color: ${COLORS.purple35};
   color: ${COLORS.darkBlack100};
 
   &:focus,
   &:hover {
-    background-color: ${COLORS.highlightPurple2};
+    background-color: ${COLORS.purple35};
     box-shadow: none;
   }
 
   &:active {
-    background-color: ${COLORS.highlightPurple2Pressed};
+    background-color: ${COLORS.purple40};
   }
 `
 
