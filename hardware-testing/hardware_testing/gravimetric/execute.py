@@ -602,13 +602,16 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
     try:
         ui.print_title("FIND LIQUID HEIGHT")
         first_tip = _next_tip_for_channel(cfg, resources, 0, total_tips)
+        ui.print_info(f"bbbbbbbb{first_tip}")
         setup_channel_offset = _get_channel_offset(cfg, channel=0)
         first_tip_location = first_tip.top().move(setup_channel_offset)
+        ui.print_info(f"aaaaaaaa{resources}")
         _pick_up_tip(resources.ctx, resources.pipette, cfg, location=first_tip_location)
         mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
         resources.ctx._core.get_hardware().retract(mnt)
         ui.print_info("moving to scale")
         well = labware_on_scale["A1"]
+        ui.print_info(f"well is {well}")
         _liquid_height = _get_liquid_height(resources, cfg, well)
         height_below_top = well.depth - _liquid_height
         ui.print_info(f"liquid is {height_below_top} mm below top of vial")
@@ -658,6 +661,8 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
             False,
             resources.env_sensor,
         )
+
+        print("trials",trials)
         for volume in trials.keys():
             actual_asp_list_all = []
             actual_disp_list_all = []
@@ -748,6 +753,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                             else OT3Mount.RIGHT
                         )
                         resources.ctx._core.get_hardware().retract(mnt)
+                        ui.print_info("dropping tip 2222")
                         _drop_tip(
                             resources.pipette, cfg.return_tip, _minimum_z_height(cfg)
                         )
