@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { COLORS } from '@opentrons/components'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { Flex, Box } from '../../primitives'
 import { Icon } from '../../icons'
 import { ALIGN_CENTER, JUSTIFY_CENTER, SIZE_1 } from '../../styles'
@@ -71,7 +72,7 @@ const INNER_STYLE_VALUE = css`
 const INNER_STYLE_NO_VALUE = css`
   width: ${SPACING.spacing20};
   min-width: ${SPACING.spacing20};
-  color: ${COLORS.grey50Enabled};
+  color: ${COLORS.grey50};
   display: flex;
   border-radius: 1px;
   justify-content: ${JUSTIFY_CENTER};
@@ -126,13 +127,13 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
           borderRadius="2px"
-          backgroundColor={COLORS.grey50Disabled}
+          backgroundColor={COLORS.grey30}
           size={SIZE_1}
         >
           <Box
             height="1.5px"
             width="0.375rem"
-            backgroundColor={COLORS.grey50Enabled}
+            backgroundColor={COLORS.grey50}
           />
         </Flex>
       ) : (

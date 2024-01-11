@@ -40,7 +40,7 @@ function CrumbName({ crumbName, isLastCrumb }: CrumbNameProps): JSX.Element {
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      color={isLastCrumb ? COLORS.grey50Enabled : COLORS.blueEnabled}
+      color={isLastCrumb ? COLORS.grey50 : LEGACY_COLORS.blueEnabled}
     >
       <Box
         paddingRight={SPACING.spacing4}
@@ -121,7 +121,7 @@ function BreadcrumbsComponent(): JSX.Element | null {
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.white}
-      borderBottom={`1px solid ${String(COLORS.grey35)}`}
+      borderBottom={`1px solid ${String(COLORS.grey30)}`}
       css={TYPOGRAPHY.labelRegular}
       flexDirection={DIRECTION_ROW}
       padding={`${SPACING.spacing4} 0 ${SPACING.spacing4} ${SPACING.spacing8}`}

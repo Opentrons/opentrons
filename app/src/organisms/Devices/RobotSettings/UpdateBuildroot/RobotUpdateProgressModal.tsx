@@ -37,11 +37,11 @@ const UPDATE_PROGRESS_BAR_STYLE = css`
   margin-top: ${SPACING.spacing24};
   margin-bottom: ${SPACING.spacing24};
   border-radius: ${BORDERS.borderRadiusSize3};
-  background: ${COLORS.grey35};
+  background: ${COLORS.grey30};
   width: 17.12rem;
 `
 const UPDATE_TEXT_STYLE = css`
-  color: ${COLORS.grey50Enabled};
+  color: ${COLORS.grey50};
   font-size: 0.8rem;
 `
 const HIDDEN_CSS = css`

@@ -107,7 +107,7 @@ const INPUT_STYLE = css`
   background-color: ${COLORS.blueEnabled};
   border-radius: ${BORDERS.radiusRoundEdge};
   box-shadow: none;
-  color: ${COLORS.grey35};
+  color: ${COLORS.grey10};
   overflow: no-wrap;
   padding-left: ${SPACING.spacing16};
   padding-right: ${SPACING.spacing16};
@@ -136,7 +136,7 @@ const INPUT_STYLE = css`
 const ACCORDION_STYLE = css`
   border-radius: 50%;
   &:hover {
-    background: ${COLORS.grey35};
+    background: ${COLORS.grey30};
   }
   &:active {
     background: ${COLORS.grey35};

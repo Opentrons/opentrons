@@ -99,7 +99,7 @@ export function SetupLabwarePositionCheck(
         <Flex
           paddingY={SPACING.spacing8}
           marginY={SPACING.spacing24}
-          backgroundColor={COLORS.grey35}
+          backgroundColor={COLORS.grey10}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
         >

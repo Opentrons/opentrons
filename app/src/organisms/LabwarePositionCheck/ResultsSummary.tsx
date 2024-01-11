@@ -226,7 +226,7 @@ const TableHeader = styled('th')`
   padding: ${SPACING.spacing4};
 `
 const TableRow = styled('tr')`
-  background-color: ${COLORS.grey35};
+  background-color: ${COLORS.grey10};
 `
 
 const TableDatum = styled('td')`
@@ -404,7 +404,7 @@ const TerseHeader = styled('th')`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
 `
 const TerseTableRow = styled('tr')`
-  background-color: ${COLORS.light1};
+  background-color: ${COLORS.grey35};
 `
 
 const TerseTableDatum = styled('td')`

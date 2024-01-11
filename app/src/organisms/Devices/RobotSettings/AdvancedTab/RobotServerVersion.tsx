@@ -82,7 +82,7 @@ export function RobotServerVersion({
           <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
             <StyledText
               as="label"
-              color={COLORS.grey50Enabled}
+              color={COLORS.grey50}
               paddingRight={SPACING.spacing16}
             >
               {t('up_to_date')}

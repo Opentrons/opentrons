@@ -296,11 +296,7 @@ export function ModulesListItem({
     )
   } else if (moduleModel === MAGNETIC_BLOCK_V1) {
     subText = (
-      <StyledText
-        as="p"
-        marginLeft={SPACING.spacing20}
-        color={COLORS.grey50Enabled}
-      >
+      <StyledText as="p" marginLeft={SPACING.spacing20} color={COLORS.grey50}>
         {t('no_usb_connection_required')}
       </StyledText>
     )
@@ -383,7 +379,7 @@ export function ModulesListItem({
       ) : null}
       <Box
         border={BORDERS.styleSolid}
-        borderColor={COLORS.grey35}
+        borderColor={COLORS.grey30}
         borderWidth="1px"
         borderRadius={BORDERS.radiusSoftCorners}
         padding={SPACING.spacing16}

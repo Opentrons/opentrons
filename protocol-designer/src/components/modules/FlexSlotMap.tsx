@@ -50,7 +50,7 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
           cutoutId={cutout.id}
           deckDefinition={deckDef}
           slotClipColor={COLORS.transparent}
-          fixtureBaseColor={COLORS.light1}
+          fixtureBaseColor={COLORS.grey35}
         />
       ))}
       {selectedSlots.map((selectedSlot, index) => {

@@ -78,7 +78,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             {isCustomDefinition ? (
               <StyledText
                 as="label"
-                color={COLORS.grey50Enabled}
+                color={COLORS.grey50}
                 id="LabwareCard_customDef"
               >
                 {t('custom_def')}
@@ -104,7 +104,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             <StyledText
               as="h6"
               textTransform={TYPOGRAPHY.textTransformUppercase}
-              color={COLORS.grey50Enabled}
+              color={COLORS.grey50}
               id="LabwareCard_apiName"
             >
               {t('api_name')}
@@ -131,14 +131,14 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText
                 as="label"
-                color={COLORS.grey50Enabled}
+                color={COLORS.grey50}
                 textAlign={TYPOGRAPHY.textAlignRight}
               >
                 {t('date_added')}
               </StyledText>
               <StyledText
                 as="label"
-                color={COLORS.grey50Enabled}
+                color={COLORS.grey50}
                 id="LabwareCard_dateAdded"
               >
                 {format(new Date(modified), 'MM/dd/yyyy')}

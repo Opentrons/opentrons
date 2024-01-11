@@ -28,7 +28,7 @@ import type { BadGripper, GripperData } from '@opentrons/api-client'
 
 const GO_BACK_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.grey50Enabled};
+  color: ${COLORS.grey50};
   padding-left: ${SPACING.spacing32};
 
   &:hover {

@@ -146,7 +146,7 @@ export function ProtocolCard(props: {
       background-color: ${longpress.isLongPressed
         ? ''
         : isFailedAnalysis
-        ? COLORS.red3Pressed
+        ? LEGACY_COLORS.red3Pressed
         : COLORS.grey50};
     }
   `
@@ -154,7 +154,7 @@ export function ProtocolCard(props: {
   return (
     <Flex
       alignItems={isFailedAnalysis ? ALIGN_END : ALIGN_CENTER}
-      backgroundColor={isFailedAnalysis ? COLORS.red3 : COLORS.light1}
+      backgroundColor={isFailedAnalysis ? LEGACY_COLORS.red3 : COLORS.grey35}
       borderRadius={BORDERS.borderRadiusSize4}
       marginBottom={SPACING.spacing8}
       gridGap={SPACING.spacing48}

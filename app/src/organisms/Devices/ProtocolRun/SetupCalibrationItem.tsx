@@ -54,7 +54,7 @@ export function SetupCalibrationItem({
   ) : null
   return (
     <Flex
-      backgroundColor={COLORS.grey35}
+      backgroundColor={COLORS.grey10}
       borderRadius={BORDERS.radiusSoftCorners}
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -76,7 +76,7 @@ export function SetupCalibrationItem({
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             {label != null && (
               <StyledText
-                color={COLORS.grey50Enabled}
+                color={COLORS.grey50}
                 css={TYPOGRAPHY.h6SemiBold}
                 textTransform={TYPOGRAPHY.textTransformUppercase}
                 id={id}
@@ -89,7 +89,7 @@ export function SetupCalibrationItem({
                 {title}
               </StyledText>
             )}
-            <StyledText as="label" color={COLORS.grey50Enabled}>
+            <StyledText as="label" color={COLORS.grey50}>
               {calibrationDataNotAvailableText ?? subText ?? calibratedText}
             </StyledText>
           </Flex>

@@ -30,7 +30,7 @@ const TextSizeTile = styled(Box)`
   height: 6.25rem;
   border-radius: ${BORDERS.borderRadiusSize2};
   background: ${(props: RectProps) =>
-    props.isActive ? COLORS.highlightPurple1 : COLORS.highlightPurple2};
+    props.isActive ? LEGACY_COLORS.purple50 : LEGACY_COLORS.purple35};
 `
 
 interface TextSizeProps {

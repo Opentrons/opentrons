@@ -10,7 +10,8 @@ import {
   JUSTIFY_CENTER,
   TEXT_ALIGN_CENTER,
 } from '../../styles'
-import { COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { COLORS } from '@opentrons/components'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import { SlotBase } from './SlotBase'
 
@@ -31,7 +32,7 @@ export function WasteChuteFixture(
   const {
     cutoutId,
     deckDefinition,
-    fixtureBaseColor = COLORS.light1,
+    fixtureBaseColor = COLORS.grey35,
     wasteChuteColor = COLORS.grey50,
     ...restProps
   } = props

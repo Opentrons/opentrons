@@ -112,7 +112,7 @@ interface ContentsProps {
   trashSlot: string | null
 }
 
-const lightFill = COLORS.light1
+const lightFill = COLORS.grey35
 const darkFill = COLORS.grey60
 
 export const DeckSetupContents = (props: ContentsProps): JSX.Element => {

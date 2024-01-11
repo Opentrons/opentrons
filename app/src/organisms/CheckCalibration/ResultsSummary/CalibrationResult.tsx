@@ -16,7 +16,7 @@ import { StyledText } from '../../../atoms/text'
 import { RenderResult } from './RenderResult'
 
 export const RESULT_SUMMARY_STYLE = css`
-  border: 1px solid ${COLORS.grey35};
+  border: 1px solid ${COLORS.grey30};
   border-radius: ${BORDERS.radiusSoftCorners};
 `
 

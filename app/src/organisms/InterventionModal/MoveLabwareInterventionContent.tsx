@@ -54,10 +54,10 @@ const LABWARE_DESCRIPTION_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   grid-gap: ${SPACING.spacing8};
   padding: ${SPACING.spacing16};
-  background-color: ${COLORS.grey35};
+  background-color: ${COLORS.grey10};
   border-radius: ${BORDERS.radiusSoftCorners};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    background-color: ${COLORS.light1};
+    background-color: ${COLORS.grey35};
     border-radius: ${BORDERS.borderRadiusSize3};
   }
 `
@@ -192,7 +192,7 @@ export function MoveLabwareInterventionContent({
             <MoveLabwareOnDeck
               key={command.id} // important so that back to back move labware commands bust the cache
               robotType={robotType}
-              deckFill={isOnDevice ? COLORS.light1 : '#e6e6e6'}
+              deckFill={isOnDevice ? COLORS.grey35 : '#e6e6e6'}
               initialLabwareLocation={oldLabwareLocation}
               finalLabwareLocation={command.params.newLocation}
               movedLabwareDef={movedLabwareDef}

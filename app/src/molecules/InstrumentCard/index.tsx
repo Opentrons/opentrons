@@ -61,7 +61,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
-      backgroundColor={COLORS.grey35}
+      backgroundColor={COLORS.grey10}
       borderRadius={BORDERS.radiusSoftCorners}
       gridGap={SPACING.spacing8}
       padding={SPACING.spacing16}
@@ -97,7 +97,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
         {banner}
         <StyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={COLORS.grey50Enabled}
+          color={COLORS.grey50}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
         >

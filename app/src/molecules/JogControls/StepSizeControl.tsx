@@ -60,7 +60,7 @@ const DEFAULT_BUTTON_STYLE = css`
     background-color: ${COLORS.white};
     color: ${COLORS.black};
     box-shadow: 0 0 0;
-    border: 1px ${COLORS.grey35} solid;
+    border: 1px ${COLORS.grey30} solid;
   }
 
   &:active {
@@ -132,10 +132,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
               {t('jump_size')}
             </StyledText>
           </Flex>
-          <StyledText
-            color={COLORS.grey50Enabled}
-            css={TYPOGRAPHY.labelRegular}
-          >
+          <StyledText color={COLORS.grey50} css={TYPOGRAPHY.labelRegular}>
             {JUMP_SIZE_SUBTITLE}
           </StyledText>
           <Box css={BUTTON_WRAPPER_STYLE}>
@@ -153,7 +150,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
                 >
                   {t(stepSizeTranslationKeyByStep[stepSize])}
                   <StyledText
-                    color={COLORS.grey50Enabled}
+                    color={COLORS.grey50}
                     css={TYPOGRAPHY.labelRegular}
                   >{`${stepSize} mm`}</StyledText>
                 </PrimaryButton>

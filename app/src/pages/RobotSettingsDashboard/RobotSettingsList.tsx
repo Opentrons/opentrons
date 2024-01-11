@@ -206,7 +206,7 @@ function FeatureFlags(): JSX.Element {
           key={flag}
           width="100%"
           marginBottom={SPACING.spacing8}
-          backgroundColor={COLORS.light1}
+          backgroundColor={COLORS.grey35}
           padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
           borderRadius={BORDERS.borderRadiusSize4}
           display={DISPLAY_FLEX}

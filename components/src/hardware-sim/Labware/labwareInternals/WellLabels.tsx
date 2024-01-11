@@ -4,7 +4,7 @@ import { RobotCoordsText } from '../../Deck'
 import { WellLabelOption, WELL_LABEL_OPTIONS } from '../LabwareRender'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { HighlightedWellLabels } from './types'
-import { COLORS } from '../../../ui-style-constants'
+import { COLORS } from '@opentrons/components'
 
 // magic layout numbers to make the letters close to the edges of the labware
 const LETTER_COLUMN_X_INSIDE = 4

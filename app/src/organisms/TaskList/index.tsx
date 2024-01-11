@@ -78,7 +78,7 @@ function ProgressTrackerItem({
           name="ot-check"
           color={
             isTaskListComplete || isPastTask
-              ? COLORS.blueEnabled
+              ? LEGACY_COLORS.blueEnabled
               : COLORS.grey55
           }
         />
@@ -87,8 +87,10 @@ function ProgressTrackerItem({
           flex={FLEX_NONE}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
-          backgroundColor={isFutureTask ? COLORS.grey55 : COLORS.blueEnabled}
-          color={COLORS.white}
+          backgroundColor={
+            isFutureTask ? COLORS.grey55 : LEGACY_COLORS.blueEnabled
+          }
+          color={LEGACY_COLORS.white}
           margin={SPACING.spacing16}
           height="1.25rem"
           width="1.25rem"
@@ -149,7 +151,7 @@ function ProgressTrackerItem({
                   }
                   border={BORDERS.lineBorder}
                   borderColor={
-                    isFutureSubTask ? COLORS.grey55 : COLORS.blueEnabled
+                    isFutureSubTask ? COLORS.grey55 : LEGACY_COLORS.blueEnabled
                   }
                   borderWidth={SPACING.spacing2}
                   color={COLORS.white}
@@ -167,8 +169,8 @@ function ProgressTrackerItem({
                     isFinalSubTaskOfTaskList
                       ? COLORS.transparent
                       : isTaskListComplete || isPastSubTask
-                      ? COLORS.blueEnabled
-                      : COLORS.grey35
+                      ? LEGACY_COLORS.blueEnabled
+                      : COLORS.grey30
                   }
                   marginTop={`-${SPACING.spacing8}`}
                   marginBottom={
@@ -241,7 +243,7 @@ function SubTask({
         </StyledText>
         <StyledText as="p">{description}</StyledText>
         {footer != null ? (
-          <StyledText as="p" color={COLORS.grey50Enabled}>
+          <StyledText as="p" color={COLORS.grey50}>
             <Flex
               alignItems={ALIGN_CENTER}
               flexDirection={DIRECTION_ROW}
@@ -402,7 +404,7 @@ function Task({
             </StyledText>
             <StyledText as="p">{description}</StyledText>
             {footer != null ? (
-              <StyledText as="p" color={COLORS.grey50Enabled}>
+              <StyledText as="p" color={COLORS.grey50}>
                 <Flex
                   alignItems={ALIGN_CENTER}
                   flexDirection={DIRECTION_ROW}

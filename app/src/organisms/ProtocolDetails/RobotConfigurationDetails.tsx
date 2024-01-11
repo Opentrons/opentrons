@@ -155,7 +155,7 @@ export const RobotConfigurationDetails = (
                     moduleType={getModuleType(module.params.model)}
                     marginRight={SPACING.spacing4}
                     alignSelf={ALIGN_CENTER}
-                    color={COLORS.grey50Enabled}
+                    color={COLORS.grey50}
                     height={SIZE_1}
                     minWidth={SIZE_1}
                     minHeight={SIZE_1}
@@ -208,7 +208,7 @@ export const RobotConfigurationDetailsItem = (
         flex="0 0 auto"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         marginRight={SPACING.spacing16}
-        color={COLORS.grey50Enabled}
+        color={COLORS.grey50}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
         width="4.625rem"
       >

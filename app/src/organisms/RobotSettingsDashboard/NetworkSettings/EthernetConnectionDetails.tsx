@@ -24,7 +24,7 @@ import type { State } from '../../../redux/types'
 const STRETCH_LIST_STYLE = css`
   width: 100%;
   padding: ${SPACING.spacing16};
-  background-color: ${COLORS.light1};
+  background-color: ${COLORS.grey35};
   border-radius: ${BORDERS.borderRadiusSize3};
 `
 

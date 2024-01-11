@@ -48,7 +48,7 @@ const TableRow = styled('tr')`
 
 const TableDatum = styled('td')`
   padding: ${SPACING.spacing16} ${SPACING.spacing24};
-  background-color: ${COLORS.light1};
+  background-color: ${COLORS.grey35};
   white-space: break-spaces;
   text-overflow: ${WRAP};
   &:first-child {

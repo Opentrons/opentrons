@@ -546,7 +546,7 @@ function RowLabware({
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={COLORS.light1}
+      backgroundColor={COLORS.grey35}
       borderRadius={BORDERS.borderRadiusSize3}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       gridGap={SPACING.spacing32}

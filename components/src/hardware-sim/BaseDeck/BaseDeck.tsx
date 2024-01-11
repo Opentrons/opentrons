@@ -15,6 +15,7 @@ import {
   WASTE_CHUTE_ONLY_FIXTURES,
   WASTE_CHUTE_STAGING_AREA_FIXTURES,
 } from '@opentrons/shared-data'
+import { COLORS } from '@opentrons/components'
 
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
 import { Module } from '../Module'
@@ -22,7 +23,6 @@ import { LabwareRender } from '../Labware'
 import { FlexTrash } from '../Deck/FlexTrash'
 import { DeckFromLayers } from '../Deck/DeckFromLayers'
 import { SlotLabels } from '../Deck'
-import { COLORS } from '../../ui-style-constants'
 
 import { Svg } from '../../primitives'
 import { SingleSlotFixture } from './SingleSlotFixture'
@@ -84,7 +84,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
     robotType,
     modulesOnDeck = [],
     labwareOnDeck = [],
-    lightFill = COLORS.light1,
+    lightFill = COLORS.grey35,
     mediumFill = COLORS.grey50,
     darkFill = COLORS.grey60,
     deckLayerBlocklist = [],

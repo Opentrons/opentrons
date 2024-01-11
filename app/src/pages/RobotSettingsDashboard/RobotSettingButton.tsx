@@ -25,7 +25,7 @@ import type { IconName } from '@opentrons/components'
 const SETTING_BUTTON_STYLE = css`
   width: 100%;
   margin-bottom: ${SPACING.spacing8};
-  background-color: ${COLORS.light1};
+  background-color: ${COLORS.grey35};
   padding: ${SPACING.spacing20} ${SPACING.spacing24};
   border-radius: ${BORDERS.borderRadiusSize4};
 

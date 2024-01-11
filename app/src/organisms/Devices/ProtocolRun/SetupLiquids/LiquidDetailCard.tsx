@@ -35,8 +35,8 @@ const LIQUID_CARD_STYLE = css`
   }
 `
 const LIQUID_CARD_ODD_STYLE = css`
-  border-color: ${COLORS.grey35};
-  border: ${SPACING.spacing4} solid ${COLORS.grey35};
+  border-color: ${COLORS.grey30};
+  border: ${SPACING.spacing4} solid ${COLORS.grey30};
   border-radius: ${BORDERS.borderRadiusSize3};
 `
 interface LiquidDetailCardProps {
@@ -116,7 +116,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
         <StyledText
           fontSize={TYPOGRAPHY.fontSize22}
           lineHeight={TYPOGRAPHY.lineHeight28}
-          color={COLORS.grey50Enabled}
+          color={COLORS.grey50}
         >
           {description != null ? description : null}
         </StyledText>
@@ -207,7 +207,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
         >
           {displayName}
         </StyledText>
-        <StyledText as="p" color={COLORS.grey50Enabled}>
+        <StyledText as="p" color={COLORS.grey50}>
           {description != null ? description : null}
         </StyledText>
 

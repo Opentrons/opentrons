@@ -36,7 +36,7 @@ const BACKGROUND_SIZE = '47rem'
 
 const GO_BACK_BUTTON_TEXT_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.grey50Enabled};
+  color: ${COLORS.grey50};
 
   &:hover {
     opacity: 70%;

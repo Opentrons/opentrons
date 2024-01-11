@@ -54,7 +54,7 @@ export function DisplayRobotName({
         >
           {t('robot_name')}
         </StyledText>
-        <StyledText as="p" color={COLORS.grey50Enabled}>
+        <StyledText as="p" color={COLORS.grey50}>
           {robotName}
         </StyledText>
       </Box>

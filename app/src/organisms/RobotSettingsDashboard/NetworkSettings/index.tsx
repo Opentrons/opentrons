@@ -43,7 +43,7 @@ export function NetworkSettings({
   }
 
   const handleButtonBackgroundColor = (isConnected: boolean): string =>
-    isConnected ? COLORS.green3 : COLORS.light1
+    isConnected ? COLORS.green35 : COLORS.grey35
 
   const handleChipText = (isConnected: boolean): string =>
     isConnected ? t('connected') : t('not_connected')
@@ -102,7 +102,7 @@ function NetworkSettingButton({
   const PUSHED_STATE_STYLE = css`
     &:active {
       background-color: ${chipType === 'success'
-        ? COLORS.green3Pressed
+        ? COLORS.green40
         : COLORS.grey50};
     }
   `

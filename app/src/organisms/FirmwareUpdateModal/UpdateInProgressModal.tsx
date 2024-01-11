@@ -21,7 +21,7 @@ interface UpdateInProgressModalProps {
 }
 
 const OUTER_STYLES = css`
-  background: ${COLORS.grey35};
+  background: ${COLORS.grey30};
   width: 100%;
 `
 

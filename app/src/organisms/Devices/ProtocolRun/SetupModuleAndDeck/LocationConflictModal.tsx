@@ -150,7 +150,7 @@ export const LocationConflictModal = (
               >
                 <Flex
                   padding={SPACING.spacing24}
-                  backgroundColor={COLORS.light1}
+                  backgroundColor={COLORS.grey35}
                   flexDirection={DIRECTION_ROW}
                   alignItems={ALIGN_CENTER}
                   justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -164,7 +164,7 @@ export const LocationConflictModal = (
                 </Flex>
                 <Flex
                   padding={SPACING.spacing24}
-                  backgroundColor={COLORS.light1}
+                  backgroundColor={COLORS.grey35}
                   flexDirection={DIRECTION_ROW}
                   justifyContent={JUSTIFY_SPACE_BETWEEN}
                   alignItems={ALIGN_CENTER}
@@ -243,7 +243,7 @@ export const LocationConflictModal = (
               >
                 <Flex
                   padding={SPACING.spacing8}
-                  backgroundColor={COLORS.grey35}
+                  backgroundColor={COLORS.grey10}
                   flexDirection={DIRECTION_ROW}
                   gridGap={SPACING.spacing20}
                   alignItems={ALIGN_CENTER}
@@ -259,7 +259,7 @@ export const LocationConflictModal = (
                 </Flex>
                 <Flex
                   padding={SPACING.spacing8}
-                  backgroundColor={COLORS.grey35}
+                  backgroundColor={COLORS.grey10}
                   flexDirection={DIRECTION_ROW}
                   gridGap={SPACING.spacing20}
                   alignItems={ALIGN_CENTER}

@@ -34,7 +34,7 @@ export function DisplayConnectionStatus({
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
       <Flex
         alignItems={ALIGN_CENTER}
-        backgroundColor={isConnected ? COLORS.green3 : COLORS.grey35}
+        backgroundColor={isConnected ? COLORS.green35 : COLORS.grey35}
         borderRadius={BORDERS.borderRadiusSize3}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}
@@ -48,7 +48,7 @@ export function DisplayConnectionStatus({
         <Icon
           name={isConnected ? 'ot-check' : 'ot-alert'}
           size="3rem"
-          color={isConnected ? COLORS.green2 : COLORS.grey60}
+          color={isConnected ? COLORS.green50 : COLORS.grey60}
           data-testid={
             isConnected
               ? 'Ethernet_connected_icon'

@@ -57,7 +57,7 @@ export const AboutPipetteSlideout = (
             <StyledText
               as="h6"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={COLORS.grey50Enabled}
+              color={COLORS.grey50}
             >
               {i18n.format(t('current_version'), 'upperCase')}
             </StyledText>
@@ -73,7 +73,7 @@ export const AboutPipetteSlideout = (
         <StyledText
           as="h6"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={COLORS.grey50Enabled}
+          color={COLORS.grey50}
           data-testid={`AboutPipetteSlideout_serial_number_text_${pipetteId}`}
         >
           {i18n.format(t('serial_number'), 'upperCase')}

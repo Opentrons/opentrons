@@ -36,17 +36,17 @@ export const HeaterShakerModuleData = (
     status: SpeedStatus | TemperatureStatus
   ): { backgroundColor: string; iconColor: string; textColor: string } => {
     const StatusLabelProps = {
-      backgroundColor: COLORS.grey35,
-      iconColor: COLORS.grey50Enabled,
-      textColor: COLORS.bluePressed,
+      backgroundColor: COLORS.grey30,
+      iconColor: COLORS.grey50,
+      textColor: LEGACY_COLORS.bluePressed,
       pulse: false,
     }
 
     switch (status) {
       case 'idle': {
-        StatusLabelProps.backgroundColor = COLORS.grey35
-        StatusLabelProps.iconColor = COLORS.grey50Enabled
-        StatusLabelProps.textColor = COLORS.darkBlackEnabled
+        StatusLabelProps.backgroundColor = COLORS.grey30
+        StatusLabelProps.iconColor = COLORS.grey50
+        StatusLabelProps.textColor = COLORS.black90
         break
       }
       case 'holding at target': {
@@ -114,7 +114,7 @@ export const HeaterShakerModuleData = (
         >
           <StyledText
             textTransform={TYPOGRAPHY.textTransformUppercase}
-            color={COLORS.grey50Enabled}
+            color={COLORS.grey50}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH6}
             marginTop={SPACING.spacing8}
@@ -148,7 +148,7 @@ export const HeaterShakerModuleData = (
       >
         <StyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={COLORS.grey50Enabled}
+          color={COLORS.grey50}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           fontSize={TYPOGRAPHY.fontSizeH6}
           marginTop={SPACING.spacing8}
@@ -184,7 +184,7 @@ export const HeaterShakerModuleData = (
         <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText
             textTransform={TYPOGRAPHY.textTransformUppercase}
-            color={COLORS.grey50Enabled}
+            color={COLORS.grey50}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH6}
             marginTop={SPACING.spacing8}

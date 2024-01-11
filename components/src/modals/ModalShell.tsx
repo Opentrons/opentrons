@@ -1,6 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { BORDERS, COLORS, RESPONSIVENESS, SPACING } from '../ui-style-constants'
+import { COLORS } from '@opentrons/components'
+import { BORDERS, RESPONSIVENESS, SPACING } from '../ui-style-constants'
 import { StyleProps, styleProps } from '../primitives'
 import {
   POSITION_FIXED,

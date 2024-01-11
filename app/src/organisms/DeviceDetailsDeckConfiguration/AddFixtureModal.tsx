@@ -215,7 +215,7 @@ export function AddFixtureModal({
                         alignItems={ALIGN_CENTER}
                         justifyContent={JUSTIFY_SPACE_BETWEEN}
                         padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
-                        backgroundColor={COLORS.grey35}
+                        backgroundColor={COLORS.grey30}
                         borderRadius={BORDERS.borderRadiusSize1}
                       >
                         <StyledText css={TYPOGRAPHY.pSemiBold}>
@@ -251,7 +251,7 @@ export function AddFixtureModal({
 }
 
 const FIXTURE_BUTTON_STYLE = css`
-  background-color: ${COLORS.light1};
+  background-color: ${COLORS.grey35};
   cursor: default;
   border-radius: ${BORDERS.borderRadiusSize3};
   box-shadow: none;
@@ -264,12 +264,12 @@ const FIXTURE_BUTTON_STYLE = css`
   &:hover {
     border: none;
     box-shadow: none;
-    background-color: ${COLORS.light1};
+    background-color: ${COLORS.grey35};
   }
 
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.light1};
+    background-color: ${COLORS.grey35};
   }
 
   &:active {
@@ -277,13 +277,13 @@ const FIXTURE_BUTTON_STYLE = css`
   }
 
   &:disabled {
-    background-color: ${COLORS.light1};
+    background-color: ${COLORS.grey35};
     color: ${COLORS.grey50};
   }
 `
 const GO_BACK_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.grey50Enabled};
+  color: ${COLORS.grey50};
 
   &:hover {
     opacity: 70%;

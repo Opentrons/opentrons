@@ -34,17 +34,17 @@ export const ThermocyclerModuleData = (
     textColor: string
   } => {
     const StatusLabelProps = {
-      backgroundColor: COLORS.grey35,
-      iconColor: COLORS.grey50Enabled,
-      textColor: COLORS.bluePressed,
+      backgroundColor: COLORS.grey30,
+      iconColor: COLORS.grey50,
+      textColor: LEGACY_COLORS.bluePressed,
       pulse: false,
     }
 
     switch (status) {
       case 'idle': {
-        StatusLabelProps.backgroundColor = COLORS.grey35
-        StatusLabelProps.iconColor = COLORS.grey50Enabled
-        StatusLabelProps.textColor = COLORS.darkBlackEnabled
+        StatusLabelProps.backgroundColor = COLORS.grey30
+        StatusLabelProps.iconColor = COLORS.grey50
+        StatusLabelProps.textColor = COLORS.black90
         break
       }
       case 'holding at target': {
@@ -54,8 +54,8 @@ export const ThermocyclerModuleData = (
       }
       case 'cooling':
       case 'heating': {
-        StatusLabelProps.backgroundColor = COLORS.medBlue
-        StatusLabelProps.iconColor = COLORS.grey50Enabled
+        StatusLabelProps.backgroundColor = LEGACY_COLORS.medBlue
+        StatusLabelProps.iconColor = COLORS.grey50
         StatusLabelProps.pulse = true
         break
       }
@@ -77,7 +77,7 @@ export const ThermocyclerModuleData = (
       >
         <StyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={COLORS.grey50Enabled}
+          color={COLORS.grey50}
           fontSize={TYPOGRAPHY.fontSizeCaption}
           marginTop={SPACING.spacing8}
         >
@@ -88,8 +88,8 @@ export const ThermocyclerModuleData = (
           <Box marginRight={SPACING.spacing4}>
             <StatusLabel
               status={data.lidStatus === 'in_between' ? 'open' : data.lidStatus}
-              backgroundColor={COLORS.grey35}
-              textColor={COLORS.darkBlackEnabled}
+              backgroundColor={COLORS.grey30}
+              textColor={COLORS.black90}
               showIcon={false}
               key="lidStatus"
               id="lidStatus"
@@ -122,7 +122,7 @@ export const ThermocyclerModuleData = (
       >
         <StyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={COLORS.grey50Enabled}
+          color={COLORS.grey50}
           fontWeight={FONT_WEIGHT_REGULAR}
           fontSize={TYPOGRAPHY.fontSizeCaption}
           marginTop={SPACING.spacing8}

@@ -186,7 +186,7 @@ const DEFAULT_BUTTON_STYLE = css`
     background-color: ${COLORS.white};
     color: ${COLORS.black};
     box-shadow: 0 0 0;
-    border: 1px ${COLORS.grey35} solid;
+    border: 1px ${COLORS.grey30} solid;
   }
 
   &:active {
@@ -266,7 +266,7 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
                   <StyledText
                     textAlign={TEXT_ALIGN_LEFT}
                     alignSelf={ALIGN_STRETCH}
-                    color={COLORS.grey50Enabled}
+                    color={COLORS.grey50}
                     css={TYPOGRAPHY.labelRegular}
                   >
                     {subtitle}
@@ -330,7 +330,7 @@ const ARROW_GRID_STYLES = css`
   }
 `
 const ARROW_BUTTON_STYLES = css`
-  color: ${COLORS.grey50Enabled};
+  color: ${COLORS.grey50};
   background-color: ${COLORS.white};
 
   border: ${BORDERS.lineBorder};
@@ -344,13 +344,13 @@ const ARROW_BUTTON_STYLES = css`
     background-color: ${COLORS.white};
     color: ${COLORS.grey55};
     box-shadow: 0 0 0;
-    border: 1px ${COLORS.grey35} solid;
+    border: 1px ${COLORS.grey30} solid;
   }
 
   &:active {
     background-color: ${COLORS.white};
     color: ${COLORS.grey60};
-    border: 1px ${COLORS.grey35} solid;
+    border: 1px ${COLORS.grey30} solid;
   }
 
   &:focus {
@@ -359,7 +359,7 @@ const ARROW_BUTTON_STYLES = css`
 
   &:disabled {
     background-color: ${COLORS.white};
-    color: ${COLORS.grey50Disabled};
+    color: ${COLORS.grey30};
   }
 
   @media (max-width: 750px) {
@@ -369,13 +369,13 @@ const ARROW_BUTTON_STYLES = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     width: 125px;
     height: 125px;
-    background-color: ${COLORS.light1};
-    color: ${COLORS.darkBlackEnabled};
+    background-color: ${COLORS.grey35};
+    color: ${COLORS.black90};
     border-radius: ${BORDERS.borderRadiusSize4};
 
     &:hover {
       background-color: ${COLORS.grey40};
-      color: ${COLORS.darkBlackHover};
+      color: ${COLORS.black80};
       border: 1px ${COLORS.transparent} solid;
     }
 

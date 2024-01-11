@@ -46,7 +46,7 @@ const SORT_BY_BUTTON_STYLE = css`
   }
   &:active,
   &:focus {
-    background-color: ${COLORS.grey35};
+    background-color: ${COLORS.grey30};
   }
 `
 const FLEX = 'Flex'
@@ -161,7 +161,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
             <StyledText
               as="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={COLORS.grey50Enabled}
+              color={COLORS.grey50}
             >
               {t('shared:sort_by')}
             </StyledText>

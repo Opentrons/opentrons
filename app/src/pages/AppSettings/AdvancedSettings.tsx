@@ -275,7 +275,7 @@ export function AdvancedSettings(): JSX.Element {
             <StyledText
               as="h6"
               textTransform={TYPOGRAPHY.textTransformUppercase}
-              color={COLORS.grey50Enabled}
+              color={COLORS.grey50}
               paddingBottom={SPACING.spacing4}
             >
               {t('additional_folder_location')}
@@ -435,7 +435,7 @@ export function AdvancedSettings(): JSX.Element {
             <StyledText
               as="h6"
               textTransform={TYPOGRAPHY.textTransformUppercase}
-              color={COLORS.grey50Enabled}
+              color={COLORS.grey50}
               paddingBottom={SPACING.spacing4}
             >
               {t('override_path')}

@@ -64,7 +64,7 @@ export const RunPreviewComponent = (
         <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('run_preview')}
         </StyledText>
-        <StyledText as="label" color={COLORS.grey50Enabled}>
+        <StyledText as="label" color={COLORS.grey50}>
           {t('steps_total', { count: robotSideAnalysis.commands.length })}
         </StyledText>
       </Flex>
@@ -94,10 +94,10 @@ export const RunPreviewComponent = (
           const borderColor = isCurrent
             ? COLORS.blueEnabled
             : COLORS.transparent
-          const backgroundColor = isCurrent ? COLORS.lightBlue : COLORS.grey35
-          const contentColor = isCurrent
-            ? COLORS.darkBlackEnabled
-            : COLORS.grey50Enabled
+          const backgroundColor = isCurrent
+            ? LEGACY_COLORS.lightBlue
+            : COLORS.grey10
+          const contentColor = isCurrent ? COLORS.black90 : COLORS.grey50
           return (
             <Flex
               key={command.id}

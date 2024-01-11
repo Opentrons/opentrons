@@ -304,8 +304,8 @@ function ModuleTableItem({
           conflictedFixture == null
             ? COLORS.green3
             : isNonConnectingModule && conflictedFixture == null
-            ? COLORS.light1
-            : COLORS.yellow3
+            ? COLORS.grey35
+            : LEGACY_COLORS.yellow3
         }
         borderRadius={BORDERS.borderRadiusSize3}
         cursor={isDuplicateModuleModel ? 'pointer' : 'inherit'}

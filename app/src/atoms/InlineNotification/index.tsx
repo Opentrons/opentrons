@@ -47,7 +47,7 @@ const INLINE_NOTIFICATION_PROPS_BY_TYPE: Record<
   neutral: {
     icon: { name: 'information' },
     backgroundColor: COLORS.grey35,
-    color: COLORS.darkBlackEnabled,
+    color: COLORS.black90,
   },
   success: {
     icon: { name: 'ot-check' },

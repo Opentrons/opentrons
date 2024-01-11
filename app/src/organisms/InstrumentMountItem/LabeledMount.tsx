@@ -25,10 +25,10 @@ const MountButton = styled.button<{ isAttached: boolean }>`
   padding: ${SPACING.spacing24};
   border-radius: ${BORDERS.borderRadiusSize3};
   background-color: ${({ isAttached }) =>
-    isAttached ? COLORS.green3 : COLORS.light1};
+    isAttached ? COLORS.green35 : COLORS.grey35};
   &:active {
     background-color: ${({ isAttached }) =>
-      isAttached ? COLORS.green3Pressed : COLORS.grey40};
+      isAttached ? COLORS.green40 : COLORS.grey40};
   }
 `
 interface LabeledMountProps {

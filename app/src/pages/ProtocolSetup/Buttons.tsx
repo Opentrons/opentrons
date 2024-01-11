@@ -33,14 +33,14 @@ export function PlayButton({
     -webkit-tap-highlight-color: transparent;
     &:focus {
       background-color: ${ready && !isDoorOpen
-        ? COLORS.bluePressed
+        ? LEGACY_COLORS.bluePressed
         : COLORS.grey50};
       color: ${COLORS.white};
     }
 
     &:hover {
       background-color: ${ready && !isDoorOpen
-        ? COLORS.blueEnabled
+        ? LEGACY_COLORS.blueEnabled
         : COLORS.grey35};
       color: ${COLORS.white};
     }
@@ -48,13 +48,13 @@ export function PlayButton({
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE};
       background-color: ${ready && !isDoorOpen
-        ? COLORS.blueEnabled
+        ? LEGACY_COLORS.blueEnabled
         : COLORS.grey35};
     }
 
     &:active {
       background-color: ${ready && !isDoorOpen
-        ? COLORS.bluePressed
+        ? LEGACY_COLORS.bluePressed
         : COLORS.grey50};
       color: ${COLORS.white};
     }
@@ -68,7 +68,9 @@ export function PlayButton({
     <Btn
       alignItems={ALIGN_CENTER}
       backgroundColor={
-        disabled || !ready || isDoorOpen ? COLORS.grey35 : COLORS.blueEnabled
+        disabled || !ready || isDoorOpen
+          ? COLORS.grey35
+          : LEGACY_COLORS.blueEnabled
       }
       borderRadius="6.25rem"
       display={DISPLAY_FLEX}

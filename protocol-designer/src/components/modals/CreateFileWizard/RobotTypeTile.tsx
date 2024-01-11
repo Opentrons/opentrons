@@ -120,7 +120,7 @@ function RobotTypeOption(props: RobotTypeOptionProps): JSX.Element {
 
 const UNSELECTED_OPTIONS_STYLE = css`
   background-color: ${COLORS.white};
-  border: 1px solid ${COLORS.grey35};
+  border: 1px solid ${COLORS.grey30};
   border-radius: ${BORDERS.radiusSoftCorners};
   height: 14.5625rem;
   width: 14.5625rem;

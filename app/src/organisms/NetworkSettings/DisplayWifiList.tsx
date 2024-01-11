@@ -31,25 +31,25 @@ const NETWORK_ROW_STYLE = css`
   align-items: ${ALIGN_CENTER};
   grid-gap: ${SPACING.spacing16};
 
-  background-color: ${COLORS.light1};
+  background-color: ${COLORS.grey35};
   margin-bottom: ${SPACING.spacing8};
   border-radius: ${BORDERS.borderRadiusSize4};
 
   &:hover {
     border: none;
     box-shadow: none;
-    background-color: ${COLORS.light1};
-    color: ${COLORS.darkBlack100};
+    background-color: ${COLORS.grey35};
+    color: ${COLORS.black90};
   }
 
   &:focus {
     background-color: ${COLORS.grey40};
-    color: ${COLORS.darkBlack100};
+    color: ${COLORS.black90};
     box-shadow: none;
   }
   &:active {
     background-color: ${COLORS.grey40};
-    color: ${COLORS.darkBlack100};
+    color: ${COLORS.black90};
   }
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
@@ -106,7 +106,7 @@ export function DisplayWifiList({
           display="flex"
           onClick={handleJoinAnotherNetwork}
           height="5rem"
-          backgroundColor={COLORS.light1}
+          backgroundColor={COLORS.grey35}
           borderRadius={BORDERS.borderRadiusSize4}
           color={COLORS.black}
           css={NETWORK_ROW_STYLE}

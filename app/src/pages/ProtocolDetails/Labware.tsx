@@ -32,7 +32,7 @@ const TableHeader = styled('th')`
 `
 
 const TableRow = styled('tr')`
-  background-color: ${COLORS.light1};
+  background-color: ${COLORS.grey35};
   border: 1px ${COLORS.white} solid;
   height: 4.75rem;
 `

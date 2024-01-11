@@ -182,7 +182,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   }
   return (
     <Flex
-      backgroundColor={COLORS.grey35}
+      backgroundColor={COLORS.grey10}
       borderRadius={BORDERS.radiusSoftCorners}
       width="100%"
       data-testid={`PipetteCard_${String(pipetteDisplayName)}`}
@@ -289,7 +289,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                 ) : null}
                 <StyledText
                   textTransform={TYPOGRAPHY.textTransformUppercase}
-                  color={COLORS.grey50Enabled}
+                  color={COLORS.grey50}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   fontSize={TYPOGRAPHY.fontSizeH6}
                   paddingBottom={SPACING.spacing4}

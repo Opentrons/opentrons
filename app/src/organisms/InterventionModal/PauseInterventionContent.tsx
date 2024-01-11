@@ -47,13 +47,13 @@ export function PauseInterventionContent({
 
 const PAUSE_HEADER_STYLE = css`
   align-items: ${ALIGN_CENTER};
-  background-color: ${COLORS.grey35};
+  background-color: ${COLORS.grey10};
   border-radius: ${BORDERS.radiusSoftCorners};
   grid-gap: ${SPACING.spacing6};
   padding: ${SPACING.spacing16};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     align-self: ${ALIGN_CENTER};
-    background-color: ${COLORS.light1};
+    background-color: ${COLORS.grey35};
     border-radius: ${BORDERS.borderRadiusSize3};
     grid-gap: ${SPACING.spacing32};
     padding: ${SPACING.spacing24};

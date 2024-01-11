@@ -52,7 +52,7 @@ const HIDE_SCROLLBAR = css`
 const LIQUID_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
   border-width: 1px;
-  border-color: ${COLORS.grey35};
+  border-color: ${COLORS.grey30};
   border-radius: ${BORDERS.radiusSoftCorners};
 `
 
@@ -132,7 +132,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
       css={LIQUID_CARD_STYLE}
       padding={SPACING.spacing16}
       onClick={handleSetOpenItem}
-      backgroundColor={openItem ? COLORS.grey35 : COLORS.white}
+      backgroundColor={openItem ? COLORS.grey10 : COLORS.white}
       data-testid="LiquidsListItem_Row"
     >
       <LiquidsListItemDetails
@@ -235,7 +235,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                       <StyledText
                         as="p"
                         fontWeight={TYPOGRAPHY.fontWeightRegular}
-                        color={COLORS.grey50Enabled}
+                        color={COLORS.grey50}
                       >
                         {moduleModel != null
                           ? t('on_adapter_in_mod', {
@@ -311,7 +311,7 @@ export const LiquidsListItemDetails = (
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={COLORS.grey50Enabled}
+          color={COLORS.grey50}
           marginX={SPACING.spacing16}
         >
           {description != null ? description : null}

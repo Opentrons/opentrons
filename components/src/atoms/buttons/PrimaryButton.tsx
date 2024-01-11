@@ -1,5 +1,11 @@
 import styled from 'styled-components'
-import { COLORS, BORDERS, TYPOGRAPHY, SPACING } from '../../ui-style-constants'
+import { COLORS } from '@opentrons/components'
+import {
+  BORDERS,
+  TYPOGRAPHY,
+  SPACING,
+  LEGACY_COLORS,
+} from '../../ui-style-constants'
 import { NewPrimaryBtn, styleProps } from '../../primitives'
 
 export const PrimaryButton = styled(NewPrimaryBtn)`
@@ -29,7 +35,7 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
   }
 
   &:disabled {
-    background-color: ${COLORS.grey50Disabled};
-    color: ${COLORS.grey40};
+    background-color: ${COLORS.grey30};
+    color: ${LEGACY_COLORS.errorDisabled};
   }
 `

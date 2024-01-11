@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { css } from 'styled-components'
+import { COLORS } from '@opentrons/components'
 import { Box } from '../../primitives'
-import { COLORS, RESPONSIVENESS, SPACING } from '../../ui-style-constants'
+import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 import { POSITION_ABSOLUTE, POSITION_RELATIVE } from '../../styles'
 
 interface StepMeterProps {
@@ -22,7 +23,7 @@ export const StepMeter = (props: StepMeterProps): JSX.Element => {
   const StepMeterContainer = css`
     position: ${POSITION_RELATIVE};
     height: ${SPACING.spacing4};
-    background-color: ${COLORS.grey35};
+    background-color: ${COLORS.grey30};
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       height: ${SPACING.spacing12};
     }

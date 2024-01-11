@@ -18,7 +18,7 @@ export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
   }
 
   &:disabled {
-    background-color: ${COLORS.grey50Disabled};
-    color: ${COLORS.grey40};
+    background-color: ${COLORS.grey30};
+    color: ${LEGACY_COLORS.errorDisabled};
   }
 `

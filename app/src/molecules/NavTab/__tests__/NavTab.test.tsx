@@ -44,7 +44,7 @@ describe('NavTab', () => {
     expect(tab).toHaveStyle(
       `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
     )
-    expect(tab).toHaveStyle(`color: ${String(COLORS.grey50Enabled)}`)
+    expect(tab).toHaveStyle(`color: ${String(COLORS.grey50)}`)
     fireEvent.click(tab)
     expect(tab).toHaveStyle(`color: ${String(COLORS.darkBlackEnabled)}`)
     expect(tab).toHaveStyle(
