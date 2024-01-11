@@ -6,6 +6,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   Btn,
+  COLORS,
   LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -87,7 +88,7 @@ export function WifiConnectionDetails({
               display={DISPLAY_FLEX}
               width="100%"
               padding={SPACING.spacing24}
-              backgroundColor={LEGACY_COLORS.green3}
+              backgroundColor={COLORS.green35}
               borderRadius={BORDERS.borderRadiusSize3}
               onClick={() => setShowNetworkDetailModal(true)}
               alignItems={ALIGN_CENTER}

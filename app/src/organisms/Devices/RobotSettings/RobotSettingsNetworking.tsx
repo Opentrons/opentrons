@@ -9,6 +9,7 @@ import {
   Icon,
   useInterval,
   ALIGN_CENTER,
+  COLORS,
   LEGACY_COLORS,
   DIRECTION_COLUMN,
   SPACING,
@@ -110,7 +111,7 @@ export function RobotSettingsNetworking({
             <Icon
               size="1.25rem"
               name="ot-check"
-              color={LEGACY_COLORS.successEnabled}
+              color={COLORS.green50}
               marginRight={SPACING.spacing8}
               data-testid="RobotSettings_Networking_check_circle"
             />
@@ -195,7 +196,7 @@ export function RobotSettingsNetworking({
             <Icon
               size="1.25rem"
               name="ot-check"
-              color={LEGACY_COLORS.successEnabled}
+              color={COLORS.green50}
               marginRight={SPACING.spacing8}
               data-testid="RobotSettings_Networking_check_circle"
             />
@@ -287,7 +288,7 @@ export function RobotSettingsNetworking({
                 <Icon
                   size="1.25rem"
                   name="ot-check"
-                  color={LEGACY_COLORS.successEnabled}
+                  color={COLORS.green50}
                   marginRight={SPACING.spacing8}
                   data-testid="RobotSettings_Networking_check_circle"
                 />

@@ -6,6 +6,7 @@ import {
   Icon,
   Flex,
   SPACING,
+  COLORS,
   LEGACY_COLORS,
   BORDERS,
   DIRECTION_COLUMN,
@@ -57,7 +58,7 @@ export function EmergencyStop(): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           padding={`${SPACING.spacing40} ${SPACING.spacing80}`}
           backgroundColor={
-            isEstopConnected ? LEGACY_COLORS.green3 : LEGACY_COLORS.darkBlack20
+            isEstopConnected ? COLORS.green35 : LEGACY_COLORS.darkBlack20
           }
           borderRadius={BORDERS.borderRadiusSize3}
           alignItems={ALIGN_CENTER}
@@ -74,7 +75,7 @@ export function EmergencyStop(): JSX.Element {
                 <Icon
                   name="ot-check"
                   size="3rem"
-                  color={LEGACY_COLORS.green2}
+                  color={COLORS.green50}
                   data-testid="EmergencyStop_connected_icon"
                 />
                 <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>

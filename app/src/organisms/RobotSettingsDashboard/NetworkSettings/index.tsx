@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   SPACING,
+  COLORS,
   LEGACY_COLORS,
   Icon,
   Btn,
@@ -43,7 +44,7 @@ export function NetworkSettings({
   }
 
   const handleButtonBackgroundColor = (isConnected: boolean): string =>
-    isConnected ? LEGACY_COLORS.green3 : LEGACY_COLORS.light1
+    isConnected ? COLORS.green35 : LEGACY_COLORS.light1
 
   const handleChipText = (isConnected: boolean): string =>
     isConnected ? t('connected') : t('not_connected')
@@ -102,7 +103,7 @@ function NetworkSettingButton({
   const PUSHED_STATE_STYLE = css`
     &:active {
       background-color: ${chipType === 'success'
-        ? LEGACY_COLORS.green3Pressed
+        ? COLORS.green40
         : LEGACY_COLORS.darkBlack40};
     }
   `

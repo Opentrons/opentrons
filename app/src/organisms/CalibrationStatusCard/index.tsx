@@ -8,6 +8,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   BORDERS,
+  COLORS,
   LEGACY_COLORS,
   JUSTIFY_SPACE_BETWEEN,
   DIRECTION_COLUMN,
@@ -43,8 +44,8 @@ export function CalibrationStatusCard({
 
   // if the tasklist is empty, though, all calibrations are good
   if (taskListStatus === 'complete') {
-    statusLabelBackgroundColor = LEGACY_COLORS.successEnabled
-    statusLabelIconColor = LEGACY_COLORS.successEnabled
+    statusLabelBackgroundColor = COLORS.green50
+    statusLabelIconColor = COLORS.green50
     statusLabelText = t('calibration_complete')
     // if we have tasks and they are all marked bad, then we should
     // strongly suggest they re-do those calibrations

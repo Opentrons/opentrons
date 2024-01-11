@@ -7,6 +7,7 @@ import {
   BORDERS,
   Box,
   Btn,
+  COLORS,
   LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -319,8 +320,8 @@ export function ModulesListItem({
   let renderModuleStatus: JSX.Element = (
     <StatusLabel
       status={moduleConnectionStatus}
-      backgroundColor={LEGACY_COLORS.successBackgroundLight}
-      iconColor={LEGACY_COLORS.successEnabled}
+      backgroundColor={COLORS.green20}
+      iconColor={COLORS.green50}
       textColor={LEGACY_COLORS.successText}
     />
   )

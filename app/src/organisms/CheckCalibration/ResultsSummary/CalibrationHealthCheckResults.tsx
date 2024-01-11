@@ -6,7 +6,7 @@ import {
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -32,10 +32,12 @@ export const CalibrationHealthCheckResults = ({
         backgroundColor={
           isCalibrationRecommended
             ? COLORS.yellow20
-            : COLORS.successBackgroundLight
+            : COLORS.green20
         }
         iconColor={
-          isCalibrationRecommended ? COLORS.yellow50 : COLORS.successEnabled
+          isCalibrationRecommended
+            ? COLORS.yellow50 
+            : COLORS.green50
         }
         textColor={COLORS.black90}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}

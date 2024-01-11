@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   BORDERS,
+  COLORS,
   LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -189,7 +190,7 @@ function FixtureTableItem({
         flexDirection={DIRECTION_ROW}
         alignItems={ALIGN_CENTER}
         backgroundColor={
-          isCurrentFixtureCompatible ? LEGACY_COLORS.green3 : LEGACY_COLORS.yellow3
+          isCurrentFixtureCompatible ? COLORS.green35 : LEGACY_COLORS.yellow3
         }
         borderRadius={BORDERS.borderRadiusSize3}
         gridGap={SPACING.spacing24}

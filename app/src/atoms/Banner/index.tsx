@@ -4,6 +4,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   Btn,
+  COLORS,
   LEGACY_COLORS,
   COLORS,
   DIRECTION_ROW,
@@ -50,8 +51,8 @@ const BANNER_PROPS_BY_TYPE: Record<
 > = {
   success: {
     icon: { name: 'check-circle' },
-    backgroundColor: LEGACY_COLORS.successBackgroundLight,
-    color: LEGACY_COLORS.successEnabled,
+    backgroundColor: COLORS.green20,
+    color: COLORS.green50,
   },
   error: {
     icon: { name: 'alert-circle' },

@@ -2,6 +2,7 @@ import * as React from 'react'
 
 import {
   BORDERS,
+  COLORS,
   Flex,
   DIRECTION_ROW,
   ALIGN_CENTER,
@@ -57,11 +58,11 @@ const CHIP_PROPS_BY_TYPE: Record<
     textColor: LEGACY_COLORS.darkBlack70,
   },
   success: {
-    backgroundColor: LEGACY_COLORS.green3,
+    backgroundColor: COLORS.green35,
     borderRadius: BORDERS.borderRadiusSize5,
-    iconColor: LEGACY_COLORS.green1,
+    iconColor: COLORS.green60,
     iconName: 'ot-check',
-    textColor: LEGACY_COLORS.green1,
+    textColor: COLORS.green60,
   },
   warning: {
     backgroundColor: COLORS.yellow35,

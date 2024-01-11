@@ -5,6 +5,7 @@ import { useHistory } from 'react-router-dom'
 import {
   ALIGN_CENTER,
   BORDERS,
+  COLORS,
   LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -34,7 +35,9 @@ export function DisplayConnectionStatus({
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
       <Flex
         alignItems={ALIGN_CENTER}
-        backgroundColor={isConnected ? LEGACY_COLORS.green3 : LEGACY_COLORS.darkBlack20}
+        backgroundColor={
+          isConnected ? COLORS.green35 : LEGACY_COLORS.darkBlack20
+        }
         borderRadius={BORDERS.borderRadiusSize3}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}
@@ -48,7 +51,7 @@ export function DisplayConnectionStatus({
         <Icon
           name={isConnected ? 'ot-check' : 'ot-alert'}
           size="3rem"
-          color={isConnected ? LEGACY_COLORS.green2 : LEGACY_COLORS.darkBlack90}
+          color={isConnected ? COLORS.green50 : LEGACY_COLORS.darkBlack90}
           data-testid={
             isConnected
               ? 'Ethernet_connected_icon'

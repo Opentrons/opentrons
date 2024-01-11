@@ -10,6 +10,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
   BORDERS,
+  COLORS,
   LEGACY_COLORS,
   SPACING,
   TYPOGRAPHY,
@@ -67,7 +68,9 @@ export function SetupCalibrationItem({
             <Icon
               size={SIZE_1}
               color={
-                calibratedDate != null ? COLORS.successEnabled : COLORS.yellow50
+                calibratedDate != null
+                  ? COLORS.green50
+                  : COLORS.yellow50
               }
               marginRight={SPACING.spacing16}
               name={calibratedDate != null ? 'ot-check' : 'alert-circle'}

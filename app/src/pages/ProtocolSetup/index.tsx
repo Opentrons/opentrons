@@ -11,6 +11,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   Btn,
+  COLORS,
   LEGACY_COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -118,9 +119,9 @@ export function ProtocolSetupStep({
   disabledReason,
 }: ProtocolSetupStepProps): JSX.Element {
   const backgroundColorByStepStatus = {
-    ready: COLORS.green3,
+    ready: COLORS.green35,
     'not ready': COLORS.yellow35,
-    general: COLORS.light1,
+    general: LEGACY_COLORS.light1,
   }
   const { makeSnackbar } = useToaster()
 
@@ -137,10 +138,10 @@ export function ProtocolSetupStep({
         backgroundColor = LEGACY_COLORS.darkBlack40
         break
       case 'ready':
-        backgroundColor = LEGACY_COLORS.green3Pressed
+        backgroundColor = COLORS.green40
         break
       default:
-        backgroundColor = COLORS.yellow350
+        backgroundColor = COLORS.yellow40
     }
   } else backgroundColor = ''
 
@@ -169,7 +170,7 @@ export function ProtocolSetupStep({
       >
         {status !== 'general' && !disabled ? (
           <Icon
-            color={status === 'ready' ? COLORS.green2 : COLORS.yellow50}
+            color={status === 'ready' ? COLORS.green50 : COLORS.yellow50}
             size="2rem"
             name={status === 'ready' ? 'ot-check' : 'ot-alert'}
           />

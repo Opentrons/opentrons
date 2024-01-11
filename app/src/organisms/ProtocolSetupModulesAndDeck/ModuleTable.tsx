@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   BORDERS,
+  COLORS,
   LEGACY_COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -302,7 +303,7 @@ function ModuleTableItem({
           isModuleReady &&
           module.attachedModuleMatch?.moduleOffset?.last_modified != null &&
           conflictedFixture == null
-            ? LEGACY_COLORS.green3
+            ? COLORS.green35
             : isNonConnectingModule && conflictedFixture == null
             ? LEGACY_COLORS.light1
             : LEGACY_COLORS.yellow3

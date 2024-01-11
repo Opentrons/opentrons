@@ -7,6 +7,7 @@ import {
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
+  COLORS,
   LEGACY_COLORS,
   JUSTIFY_SPACE_BETWEEN,
   Icon,
@@ -25,10 +26,10 @@ const MountButton = styled.button<{ isAttached: boolean }>`
   padding: ${SPACING.spacing24};
   border-radius: ${BORDERS.borderRadiusSize3};
   background-color: ${({ isAttached }) =>
-    isAttached ? LEGACY_COLORS.green3 : LEGACY_COLORS.light1};
+    isAttached ? COLORS.green35 : LEGACY_COLORS.light1};
   &:active {
     background-color: ${({ isAttached }) =>
-      isAttached ? LEGACY_COLORS.green3Pressed : LEGACY_COLORS.light1Pressed};
+      isAttached ? COLORS.green40 : LEGACY_COLORS.light1Pressed};
   }
 `
 interface LabeledMountProps {

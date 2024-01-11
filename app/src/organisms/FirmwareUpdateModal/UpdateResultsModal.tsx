@@ -4,6 +4,7 @@ import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   BORDERS,
+  COLORS,
   LEGACY_COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -75,7 +76,7 @@ export function UpdateResultsModal(
             <Flex
               height="11.5rem"
               width="100%"
-              backgroundColor={LEGACY_COLORS.green3}
+              backgroundColor={COLORS.green35}
               borderRadius={BORDERS.borderRadiusSize3}
               flexDirection={DIRECTION_COLUMN}
               color={LEGACY_COLORS.darkBlack90}
@@ -84,7 +85,7 @@ export function UpdateResultsModal(
             >
               <Icon
                 name="ot-check"
-                color={LEGACY_COLORS.green2}
+                color={COLORS.green50}
                 size="2.5rem"
                 marginBottom={SPACING.spacing16}
               />

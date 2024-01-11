@@ -6,6 +6,7 @@ import {
   Flex,
   DIRECTION_ROW,
   ALIGN_CENTER,
+  COLORS,
   LEGACY_COLORS,
   SPACING,
   TYPOGRAPHY,
@@ -51,8 +52,8 @@ const INLINE_NOTIFICATION_PROPS_BY_TYPE: Record<
   },
   success: {
     icon: { name: 'ot-check' },
-    backgroundColor: LEGACY_COLORS.green3,
-    color: LEGACY_COLORS.green2,
+    backgroundColor: COLORS.green35,
+    color: COLORS.green50,
   },
 }
 

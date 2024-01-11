@@ -1,6 +1,11 @@
 import * as React from 'react'
 
-import { BORDERS, COLORS, LEGACY_COLORS, renderWithProviders } from '@opentrons/components'
+import {
+  BORDERS,
+  COLORS,
+  LEGACY_COLORS,
+  renderWithProviders,
+} from '@opentrons/components'
 
 import { Chip } from '..'
 
@@ -32,11 +37,11 @@ describe('Chip', () => {
     const [{ getByTestId, getByText, getByLabelText }] = render(props)
     const chip = getByTestId('Chip_success')
     const chipText = getByText('mockSuccess')
-    expect(chip).toHaveStyle(`background-color: ${LEGACY_COLORS.green3}`)
+    expect(chip).toHaveStyle(`background-color: ${COLORS.green35}`)
     expect(chip).toHaveStyle(`border-radius: ${BORDERS.borderRadiusSize5}`)
-    expect(chipText).toHaveStyle(`color: ${LEGACY_COLORS.green1}`)
+    expect(chipText).toHaveStyle(`color: ${COLORS.green60}`)
     const icon = getByLabelText('icon_mockSuccess')
-    expect(icon).toHaveStyle(`color: ${LEGACY_COLORS.green1}`)
+    expect(icon).toHaveStyle(`color: ${COLORS.green60}`)
   })
 
   it('should render text, icon, no bgcolor with success colors and bg false', () => {
@@ -50,9 +55,9 @@ describe('Chip', () => {
     const chipText = getByText('mockSuccess')
     expect(chip).toHaveStyle(`background-color: ${COLORS.transparent}`)
     expect(chip).toHaveStyle(`border-radius: ${BORDERS.borderRadiusSize5}`)
-    expect(chipText).toHaveStyle(`color: ${LEGACY_COLORS.green1}`)
+    expect(chipText).toHaveStyle(`color: ${COLORS.green60}`)
     const icon = getByLabelText('icon_mockSuccess')
-    expect(icon).toHaveStyle(`color: ${LEGACY_COLORS.green1}`)
+    expect(icon).toHaveStyle(`color: ${COLORS.green60}`)
   })
 
   it('should render text, icon, bgcolor with warning colors', () => {

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   Flex,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
   Icon,
@@ -38,10 +38,10 @@ export const MountItem = styled.div<{ isReady: boolean }>`
   padding: ${SPACING.spacing16} ${SPACING.spacing24};
   border-radius: ${BORDERS.borderRadiusSize3};
   background-color: ${({ isReady }) =>
-    isReady ? COLORS.green3 : COLORS.yellow35};
+    isReady ? COLORS.green35 : COLORS.yellow35};
   &:active {
     background-color: ${({ isReady }) =>
-      isReady ? COLORS.green3Pressed : COLORS.yellow350};
+      isReady ? COLORS.green40 : COLORS.yellow40};
   }
 `
 interface ProtocolInstrumentMountItemProps {
@@ -130,10 +130,10 @@ export function ProtocolInstrumentMountItem(
             <Icon
               size="1.5rem"
               name={isAttachedWithCal ? 'ot-check' : 'ot-alert'}
-              color={isAttachedWithCal ? COLORS.green1 : COLORS.yellow60}
+              color={isAttachedWithCal ? COLORS.green60 : COLORS.yellow60}
             />
             <CalibrationStatus
-              color={isAttachedWithCal ? COLORS.green1 : COLORS.yellow60}
+              color={isAttachedWithCal ? COLORS.green60 : COLORS.yellow60}
             >
               {i18n.format(
                 t(isAttachedWithCal ? 'calibrated' : 'no_data'),

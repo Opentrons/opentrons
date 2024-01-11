@@ -5,6 +5,7 @@ import { useHistory } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
+  COLORS,
   LEGACY_COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -96,8 +97,8 @@ export function CalibrationTaskList({
 
   // if the tasklist is empty, though, all calibrations are good
   if (taskListStatus === 'complete') {
-    statusLabelBackgroundColor = LEGACY_COLORS.successEnabled
-    statusLabelIconColor = LEGACY_COLORS.successEnabled
+    statusLabelBackgroundColor = COLORS.green50
+    statusLabelIconColor = COLORS.green50
     statusLabelText = t('calibration_complete')
     // if we have tasks and they are all marked bad, then we should
     // strongly suggest they re-do those calibrations
@@ -135,11 +136,7 @@ export function CalibrationTaskList({
             {exitBeforeDeckConfigCompletion ? (
               <Icon name="ot-alert" size="3rem" color={COLORS.yellow50} />
             ) : (
-              <Icon
-                name="ot-check"
-                size="3rem"
-                color={LEGACY_COLORS.successEnabled}
-              />
+              <Icon name="ot-check" size="3rem" color={COLORS.green50} />
             )}
             <StyledText as="h1" marginTop={SPACING.spacing24}>
               {exitBeforeDeckConfigCompletion
