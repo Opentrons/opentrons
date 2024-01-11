@@ -32,7 +32,13 @@ export const yellow20 = '#FDF3E2'
 /**
  * purple
  */
-
+export const purple60 = '#562566'
+export const purple55 = '#713187'
+export const purple50 = '#893BA4'
+export const purple40 = '#CEA4DF'
+export const purple35 = '#DBBCE7'
+export const purple30 = '#E6D5EC'
+export const purple20 = '#F1E8F5'
 /**
  * blue
  */
