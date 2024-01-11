@@ -36,8 +36,8 @@ const INLINE_NOTIFICATION_PROPS_BY_TYPE: Record<
 > = {
   alert: {
     icon: { name: 'ot-alert' },
-    backgroundColor: LEGACY_COLORS.yellow3,
-    color: LEGACY_COLORS.yellow2,
+    backgroundColor: COLORS.yellow3,
+    color: COLORS.yellow50,
   },
   error: {
     icon: { name: 'ot-alert' },

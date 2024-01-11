@@ -4,6 +4,7 @@ import { fireEvent } from '@testing-library/react'
 import {
   renderWithProviders,
   LEGACY_COLORS,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
   BORDERS,
@@ -110,7 +111,7 @@ describe('SubmitPrimaryButton', () => {
     const button = getByText('submit primary button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${String(LEGACY_COLORS.warningEnabled)}`,
+      `0 0 0 3px ${String(COLORS.yellow50)}`,
       {
         modifier: ':focus-visible',
       }

@@ -3,6 +3,7 @@ import { css } from 'styled-components'
 import {
   SPACING,
   LEGACY_COLORS,
+  COLORS,
   BORDERS,
   TYPOGRAPHY,
   styleProps,
@@ -29,7 +30,7 @@ export const SubmitPrimaryButton = (
     ${styleProps}
 
     &:focus-visible {
-      box-shadow: 0 0 0 3px ${LEGACY_COLORS.warningEnabled};
+      box-shadow: 0 0 0 3px ${COLORS.yellow50};
     }
 
     &:hover {

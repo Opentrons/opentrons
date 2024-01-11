@@ -49,8 +49,8 @@ export function CalibrationStatusCard({
     // if we have tasks and they are all marked bad, then we should
     // strongly suggest they re-do those calibrations
   } else if (taskListStatus === 'bad') {
-    statusLabelBackgroundColor = LEGACY_COLORS.warningEnabled
-    statusLabelIconColor = LEGACY_COLORS.warningEnabled
+    statusLabelBackgroundColor = COLORS.yellow50
+    statusLabelIconColor = COLORS.yellow50
     statusLabelText = t('calibration_recommended')
   }
 

@@ -20,7 +20,7 @@ export const RenderResult = ({ isBadCal }: RenderResultProps): JSX.Element => {
   return (
     <Flex alignItems={ALIGN_CENTER}>
       <StyledText
-        color={isBadCal ? LEGACY_COLORS.warningText : LEGACY_COLORS.successText}
+        color={isBadCal ? COLORS.yellow60 : COLORS.successText}
         marginRight={SPACING.spacing8}
       >
         {isBadCal ? t('recalibration_recommended') : t('good_calibration')}
@@ -28,7 +28,7 @@ export const RenderResult = ({ isBadCal }: RenderResultProps): JSX.Element => {
       <Icon
         name={isBadCal ? 'alert-circle' : 'check-circle'}
         size={SIZE_1}
-        color={isBadCal ? LEGACY_COLORS.warningEnabled : LEGACY_COLORS.successEnabled}
+        color={isBadCal ? COLORS.yellow50 : COLORS.successEnabled}
         marginRight={SPACING.spacing12}
         data-testid="RenderResult_icon"
       />

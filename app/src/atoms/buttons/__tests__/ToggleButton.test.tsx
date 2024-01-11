@@ -1,7 +1,7 @@
 import 'jest-styled-components'
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders, LEGACY_COLORS, SIZE_2 } from '@opentrons/components'
+import { renderWithProviders, LEGACY_COLORS, COLORS, SIZE_2 } from '@opentrons/components'
 
 import { ToggleButton } from '..'
 
@@ -46,7 +46,7 @@ describe('ToggleButton', () => {
     const button = getByLabelText('toggle button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${String(LEGACY_COLORS.warningEnabled)}`,
+      `0 0 0 3px ${String(COLORS.yellow50)}`,
       {
         modifier: ':focus-visible',
       }
@@ -98,7 +98,7 @@ describe('ToggleButton', () => {
     const button = getByLabelText('toggle button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${String(LEGACY_COLORS.warningEnabled)}`,
+      `0 0 0 3px ${String(COLORS.yellow50)}`,
       {
         modifier: ':focus-visible',
       }

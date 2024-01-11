@@ -145,7 +145,7 @@ describe('HeaterShakerModuleData', () => {
     getByText('Target: 200 rpm')
     getByText('Current: 200 rpm')
     expect(getByText('Mock StatusLabel')).toHaveStyle(
-      'backgroundColor: LEGACY_COLORS.warningBackgroundLight'
+      'backgroundColor: COLORS.yellow20'
     )
   })
 

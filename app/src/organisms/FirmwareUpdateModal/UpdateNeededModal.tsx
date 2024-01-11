@@ -68,7 +68,7 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
   const updateNeededHeader: ModalHeaderBaseProps = {
     title: t('update_needed'),
     iconName: 'ot-alert',
-    iconColor: LEGACY_COLORS.yellow2,
+    iconColor: COLORS.yellow50,
   }
 
   let modalContent = (

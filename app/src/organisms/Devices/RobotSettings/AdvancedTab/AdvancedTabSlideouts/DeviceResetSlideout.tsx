@@ -168,17 +168,17 @@ export function DeviceResetSlideout({
         <Flex
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_CENTER}
-          backgroundColor={LEGACY_COLORS.warningBackgroundLight}
+          backgroundColor={COLORS.yellow20}
           borderRadius={BORDERS.borderRadiusSize1}
           padding={SPACING.spacing8}
-          border={`1px solid ${LEGACY_COLORS.warningEnabled}`}
+          border={`1px solid ${COLORS.yellow50}`}
           marginBottom={SPACING.spacing24}
         >
           <Icon
             name="alert-circle"
             size="1rem"
             marginRight={SPACING.spacing8}
-            color={LEGACY_COLORS.warningEnabled}
+            color={COLORS.yellow50}
           />
           <StyledText as="p">{t('resets_cannot_be_undone')}</StyledText>
         </Flex>

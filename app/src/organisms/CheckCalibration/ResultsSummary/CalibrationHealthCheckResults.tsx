@@ -31,13 +31,11 @@ export const CalibrationHealthCheckResults = ({
         }
         backgroundColor={
           isCalibrationRecommended
-            ? LEGACY_COLORS.warningBackgroundLight
-            : LEGACY_COLORS.successBackgroundLight
+            ? COLORS.yellow20
+            : COLORS.successBackgroundLight
         }
         iconColor={
-          isCalibrationRecommended
-            ? LEGACY_COLORS.warningEnabled
-            : LEGACY_COLORS.successEnabled
+          isCalibrationRecommended ? COLORS.yellow50 : COLORS.successEnabled
         }
         textColor={COLORS.black90}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}

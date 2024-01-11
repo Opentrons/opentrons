@@ -112,9 +112,9 @@ export function FixtureListItem({
             ? t('location_conflict')
             : t('not_configured')
         }
-        backgroundColor={LEGACY_COLORS.warningBackgroundLight}
-        iconColor={LEGACY_COLORS.warningEnabled}
-        textColor={LEGACY_COLORS.warningText}
+        backgroundColor={COLORS.yellow20}
+        iconColor={COLORS.yellow50}
+        textColor={COLORS.yellow60}
       />
     )
   } else {

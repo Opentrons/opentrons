@@ -33,7 +33,7 @@ describe('LegacyModal', () => {
     const [{ getByTestId }] = render(props)
     const headerIcon = getByTestId('Modal_header_icon')
     expect(headerIcon).toBeInTheDocument()
-    expect(headerIcon).toHaveStyle(`color: ${LEGACY_COLORS.warningEnabled}`)
+    expect(headerIcon).toHaveStyle(`color: ${COLORS.yellow50}`)
     expect(getByTestId('Modal_header')).toHaveStyle(
       `background-color: ${COLORS.white}`
     )

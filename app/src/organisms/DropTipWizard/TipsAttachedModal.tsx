@@ -48,7 +48,7 @@ const TipsAttachedModal = NiceModal.create(
     const tipsAttachedHeader: ModalHeaderBaseProps = {
       title: t('tips_are_attached'),
       iconName: 'ot-alert',
-      iconColor: LEGACY_COLORS.yellow2,
+      iconColor: COLORS.yellow50,
     }
 
     const is96Channel = instrumentModelSpecs.channels === 96

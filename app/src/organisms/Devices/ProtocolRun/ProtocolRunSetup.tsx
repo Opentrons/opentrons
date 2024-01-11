@@ -372,8 +372,8 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           size="1rem"
           color={
             calibrationStatus?.complete
-              ? LEGACY_COLORS.successEnabled
-              : LEGACY_COLORS.warningEnabled
+              ? COLORS.successEnabled
+              : COLORS.yellow50
           }
           marginRight={SPACING.spacing8}
           name={calibrationStatus?.complete ? 'ot-check' : 'alert-circle'}

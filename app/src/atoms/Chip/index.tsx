@@ -64,10 +64,10 @@ const CHIP_PROPS_BY_TYPE: Record<
     textColor: LEGACY_COLORS.green1,
   },
   warning: {
-    backgroundColor: LEGACY_COLORS.yellow3,
+    backgroundColor: COLORS.yellow35,
     borderRadius: BORDERS.borderRadiusSize5,
-    iconColor: LEGACY_COLORS.yellow1,
-    textColor: LEGACY_COLORS.yellow1,
+    iconColor: COLORS.yellow60,
+    textColor: COLORS.yellow60,
   },
 }
 

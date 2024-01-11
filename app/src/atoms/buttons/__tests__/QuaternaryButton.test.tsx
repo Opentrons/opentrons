@@ -3,6 +3,7 @@ import * as React from 'react'
 import {
   renderWithProviders,
   LEGACY_COLORS,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
   BORDERS,
@@ -72,7 +73,7 @@ describe('QuaternaryButton', () => {
     const button = getByText('secondary tertiary button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${String(LEGACY_COLORS.warningEnabled)}`,
+      `0 0 0 3px ${String(COLORS.yellow50)}`,
       {
         modifier: ':focus-visible',
       }

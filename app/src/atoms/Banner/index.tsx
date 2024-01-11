@@ -5,6 +5,7 @@ import {
   BORDERS,
   Btn,
   LEGACY_COLORS,
+  COLORS,
   DIRECTION_ROW,
   Flex,
   Icon,
@@ -59,8 +60,8 @@ const BANNER_PROPS_BY_TYPE: Record<
   },
   warning: {
     icon: { name: 'alert-circle' },
-    backgroundColor: LEGACY_COLORS.warningBackgroundLight,
-    color: LEGACY_COLORS.warningEnabled,
+    backgroundColor: COLORS.yellow20,
+    color: COLORS.yellow50,
   },
   updating: {
     icon: { name: 'ot-spinner' },

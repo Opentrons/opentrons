@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 
-import { Btn, Icon, LEGACY_COLORS, SIZE_1, SIZE_2 } from '@opentrons/components'
+import { Btn, Icon, LEGACY_COLORS, COLORS, SIZE_1, SIZE_2 } from '@opentrons/components'
 
 import type { StyleProps } from '@opentrons/components'
 
@@ -13,7 +13,7 @@ const TOGGLE_DISABLED_STYLES = css`
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${LEGACY_COLORS.warningEnabled};
+    box-shadow: 0 0 0 3px ${COLORS.yellow50};
   }
 
   &:disabled {
@@ -29,7 +29,7 @@ const TOGGLE_ENABLED_STYLES = css`
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${LEGACY_COLORS.warningEnabled};
+    box-shadow: 0 0 0 3px ${COLORS.yellow50};
   }
 
   &:disabled {

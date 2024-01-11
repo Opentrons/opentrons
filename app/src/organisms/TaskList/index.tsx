@@ -257,8 +257,8 @@ function SubTask({
               {markedBad === true && (
                 <Icon
                   name="alert-circle"
-                  backgroundColor={LEGACY_COLORS.warningBackgroundLight}
-                  color={LEGACY_COLORS.warningEnabled}
+                  backgroundColor={COLORS.yellow20}
+                  color={COLORS.yellow50}
                   height="1rem"
                   aria-label={`icon_warning`}
                 />
@@ -398,8 +398,8 @@ function Task({
                 {markedBad === true && (
                   <Icon
                     name="alert-circle"
-                    backgroundColor={LEGACY_COLORS.warningBackgroundLight}
-                    color={LEGACY_COLORS.warningEnabled}
+                    backgroundColor={COLORS.yellow20}
+                    color={COLORS.yellow50}
                     height="1rem"
                     aria-label={`icon_warning`}
                   />

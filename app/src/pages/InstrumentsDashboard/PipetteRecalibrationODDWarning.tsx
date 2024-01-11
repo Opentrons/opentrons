@@ -31,7 +31,7 @@ export const PipetteRecalibrationODDWarning = (): JSX.Element | null => {
       <Flex justifyContent={JUSTIFY_FLEX_START}>
         <Icon
           name="alert-circle"
-          color={LEGACY_COLORS.yellow2}
+          color={COLORS.yellow50}
           width="45px"
           marginRight={SPACING.spacing12}
           aria-label="alert-circle_icon"
