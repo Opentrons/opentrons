@@ -9,7 +9,7 @@ import {
   DIRECTION_COLUMN,
   TYPOGRAPHY,
   SPACING,
-  COLORS,
+  LEGACY_COLORS,
   SIZE_2,
   BORDERS,
 } from '@opentrons/components'
@@ -32,18 +32,18 @@ const StyledInput = styled.input`
   width: 100%;
   flex: 6;
   margin: ${SPACING.spacing4} 0;
-  background-color: ${COLORS.white};
+  background-color: ${LEGACY_COLORS.white};
   border-radius: ${SPACING.spacing4};
-  border: 1px ${BORDERS.styleSolid} ${COLORS.medGreyEnabled};
+  border: 1px ${BORDERS.styleSolid} ${LEGACY_COLORS.medGreyEnabled};
   height: ${SIZE_2};
   font-size: ${TYPOGRAPHY.fontSizeP};
 
   &:active {
-    border: 1px ${BORDERS.styleSolid} ${COLORS.darkGreyEnabled};
+    border: 1px ${BORDERS.styleSolid} ${LEGACY_COLORS.darkGreyEnabled};
   }
 
   &:hover {
-    border: 1px ${BORDERS.styleSolid} ${COLORS.blueEnabled};
+    border: 1px ${BORDERS.styleSolid} ${LEGACY_COLORS.blueEnabled};
   }
 
   &:focus-visible {
@@ -51,7 +51,7 @@ const StyledInput = styled.input`
   }
 
   &:disabled {
-    border: 1px ${BORDERS.styleSolid} ${COLORS.darkGreyDisabled};
+    border: 1px ${BORDERS.styleSolid} ${LEGACY_COLORS.darkGreyDisabled};
   }
 `
 
@@ -79,7 +79,7 @@ export function ManualIpHostnameForm({
       const ip = values.ip.trim()
       const inputForm = document.getElementById('ip')
       if (inputForm != null)
-        inputForm.style.border = `1px solid ${String(COLORS.medGreyEnabled)}`
+        inputForm.style.border = `1px solid ${String(LEGACY_COLORS.medGreyEnabled)}`
       addManualIpAndHostname(ip)
       resetForm()
       setMostRecentAddition(ip)
@@ -92,7 +92,7 @@ export function ManualIpHostnameForm({
         errors.ip = t('add_ip_error')
         const inputForm = document.getElementById('ip')
         if (inputForm != null)
-          inputForm.style.border = `1px solid ${String(COLORS.errorEnabled)}`
+          inputForm.style.border = `1px solid ${String(LEGACY_COLORS.errorEnabled)}`
       }
       return errors
     },
@@ -128,7 +128,7 @@ export function ManualIpHostnameForm({
         <StyledText
           as="label"
           marginTop={SPACING.spacing4}
-          color={COLORS.errorEnabled}
+          color={LEGACY_COLORS.errorEnabled}
         >
           {formik.errors.ip}
         </StyledText>

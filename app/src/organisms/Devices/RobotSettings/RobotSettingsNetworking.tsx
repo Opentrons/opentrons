@@ -9,7 +9,7 @@ import {
   Icon,
   useInterval,
   ALIGN_CENTER,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   SPACING,
   SecondaryButton,
@@ -110,7 +110,7 @@ export function RobotSettingsNetworking({
             <Icon
               size="1.25rem"
               name="ot-check"
-              color={COLORS.successEnabled}
+              color={LEGACY_COLORS.successEnabled}
               marginRight={SPACING.spacing8}
               data-testid="RobotSettings_Networking_check_circle"
             />
@@ -154,7 +154,7 @@ export function RobotSettingsNetworking({
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('wireless_ip')}
                   </StyledText>
-                  <StyledText as="p" color={COLORS.darkGrey}>
+                  <StyledText as="p" color={LEGACY_COLORS.darkGrey}>
                     {wifi?.ipAddress}
                   </StyledText>
                 </Flex>
@@ -165,7 +165,7 @@ export function RobotSettingsNetworking({
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('wireless_subnet_mask')}
                   </StyledText>
-                  <StyledText as="p" color={COLORS.darkGrey}>
+                  <StyledText as="p" color={LEGACY_COLORS.darkGrey}>
                     {wifi?.subnetMask}
                   </StyledText>
                 </Flex>
@@ -177,7 +177,7 @@ export function RobotSettingsNetworking({
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('wireless_mac_address')}
                   </StyledText>
-                  <StyledText as="p" color={COLORS.darkGrey}>
+                  <StyledText as="p" color={LEGACY_COLORS.darkGrey}>
                     {wifi?.macAddress}
                   </StyledText>
                 </Flex>
@@ -195,7 +195,7 @@ export function RobotSettingsNetworking({
             <Icon
               size="1.25rem"
               name="ot-check"
-              color={COLORS.successEnabled}
+              color={LEGACY_COLORS.successEnabled}
               marginRight={SPACING.spacing8}
               data-testid="RobotSettings_Networking_check_circle"
             />
@@ -223,7 +223,7 @@ export function RobotSettingsNetworking({
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('wired_ip')}
                   </StyledText>
-                  <StyledText as="p" color={COLORS.darkGrey}>
+                  <StyledText as="p" color={LEGACY_COLORS.darkGrey}>
                     {ethernet?.ipAddress}
                   </StyledText>
                 </Flex>
@@ -234,7 +234,7 @@ export function RobotSettingsNetworking({
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('wired_subnet_mask')}
                   </StyledText>
-                  <StyledText as="p" color={COLORS.darkGrey}>
+                  <StyledText as="p" color={LEGACY_COLORS.darkGrey}>
                     {ethernet?.subnetMask}
                   </StyledText>
                 </Flex>
@@ -245,13 +245,13 @@ export function RobotSettingsNetworking({
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('wired_mac_address')}
                   </StyledText>
-                  <StyledText as="p" color={COLORS.darkGrey}>
+                  <StyledText as="p" color={LEGACY_COLORS.darkGrey}>
                     {ethernet?.macAddress}
                   </StyledText>
                 </Flex>
               </>
             ) : (
-              <StyledText as="p" color={COLORS.darkGrey}>
+              <StyledText as="p" color={LEGACY_COLORS.darkGrey}>
                 {isFlex
                   ? t('not_connected_via_ethernet')
                   : t('not_connected_via_wired_usb')}
@@ -287,7 +287,7 @@ export function RobotSettingsNetworking({
                 <Icon
                   size="1.25rem"
                   name="ot-check"
-                  color={COLORS.successEnabled}
+                  color={LEGACY_COLORS.successEnabled}
                   marginRight={SPACING.spacing8}
                   data-testid="RobotSettings_Networking_check_circle"
                 />
@@ -305,7 +305,7 @@ export function RobotSettingsNetworking({
               </StyledText>
             </Flex>
             <Box paddingLeft="3.75rem">
-              <StyledText as="p" color={COLORS.darkGrey}>
+              <StyledText as="p" color={LEGACY_COLORS.darkGrey}>
                 {isFlexConnectedViaUSB
                   ? t('directly_connected_to_this_computer')
                   : t('not_connected_via_usb')}

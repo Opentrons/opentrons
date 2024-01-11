@@ -5,7 +5,7 @@ import {
   Icon,
   RobotCoordsForeignObject,
   ALIGN_CENTER,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_CENTER,
@@ -63,8 +63,8 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
         padding: SPACING.spacing16,
         backgroundColor:
           moduleDef.moduleType === THERMOCYCLER_MODULE_TYPE
-            ? COLORS.white
-            : COLORS.transparent,
+            ? LEGACY_COLORS.white
+            : LEGACY_COLORS.transparent,
       }}
     >
       <Flex
@@ -76,14 +76,14 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
             <Icon
               name={isAttached ? 'ot-check' : 'alert-circle'}
-              color={isAttached ? COLORS.successEnabled : COLORS.warningEnabled}
+              color={isAttached ? LEGACY_COLORS.successEnabled : LEGACY_COLORS.warningEnabled}
               key="icon"
               size="10px"
               marginRight={SPACING.spacing4}
             />
 
             <StyledText
-              color={COLORS.darkGreyEnabled}
+              color={LEGACY_COLORS.darkGreyEnabled}
               fontSize={TYPOGRAPHY.fontSizeCaption}
             >
               {!isAttached ? t('module_not_connected') : t('module_connected')}
@@ -92,13 +92,13 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
         ) : null}
         <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={COLORS.darkGreyEnabled}
+          color={LEGACY_COLORS.darkGreyEnabled}
           fontSize={TYPOGRAPHY.fontSizeLabel}
         >
           {getModuleDisplayName(moduleModel)}
         </StyledText>
         <StyledText
-          color={COLORS.darkGreyEnabled}
+          color={LEGACY_COLORS.darkGreyEnabled}
           fontSize={TYPOGRAPHY.fontSizeH6}
           fontStyle={
             runHasStarted

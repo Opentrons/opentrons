@@ -8,7 +8,7 @@ import {
   Flex,
   Link,
   SPACING,
-  COLORS,
+  LEGACY_COLORS,
   BORDERS,
   TYPOGRAPHY,
   POSITION_ABSOLUTE,
@@ -64,15 +64,15 @@ const FILTER_OPTIONS: DropdownOption[] = labwareDisplayCategoryFilters.map(
 )
 
 const SORT_BY_BUTTON_STYLE = css`
-  background-color: ${COLORS.transparent};
+  background-color: ${LEGACY_COLORS.transparent};
   cursor: pointer;
   &:hover {
-    background-color: ${COLORS.medGreyHover};
+    background-color: ${LEGACY_COLORS.medGreyHover};
   }
 
   &:active,
   &:focus {
-    background-color: ${COLORS.medGreyEnabled};
+    background-color: ${LEGACY_COLORS.medGreyEnabled};
   }
 `
 
@@ -157,7 +157,7 @@ export function Labware(): JSX.Element {
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
             <StyledText
               css={TYPOGRAPHY.pSemiBold}
-              color={COLORS.darkGreyEnabled}
+              color={LEGACY_COLORS.darkGreyEnabled}
             >
               {t('shared:sort_by')}
             </StyledText>
@@ -194,7 +194,7 @@ export function Labware(): JSX.Element {
               borderRadius={BORDERS.radiusSoftCorners}
               boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
               position={POSITION_ABSOLUTE}
-              backgroundColor={COLORS.white}
+              backgroundColor={LEGACY_COLORS.white}
               top="8.5rem"
               right={SPACING.spacing2}
               flexDirection={DIRECTION_COLUMN}
@@ -238,7 +238,7 @@ export function Labware(): JSX.Element {
         >
           <StyledText
             as="p"
-            color={COLORS.black}
+            color={LEGACY_COLORS.black}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {t('create_new_def')}

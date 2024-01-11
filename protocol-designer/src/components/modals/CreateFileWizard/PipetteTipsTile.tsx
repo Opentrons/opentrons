@@ -15,7 +15,7 @@ import {
   ALIGN_START,
   BORDERS,
   DIRECTION_ROW,
-  COLORS,
+  LEGACY_COLORS,
   OutlineButton,
   Icon,
   JUSTIFY_CENTER,
@@ -104,10 +104,10 @@ export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
 }
 
 const INPUT_STYLE = css`
-  background-color: ${COLORS.blueEnabled};
+  background-color: ${LEGACY_COLORS.blueEnabled};
   border-radius: ${BORDERS.radiusRoundEdge};
   box-shadow: none;
-  color: ${COLORS.fundamentalsBackground};
+  color: ${LEGACY_COLORS.fundamentalsBackground};
   overflow: no-wrap;
   padding-left: ${SPACING.spacing16};
   padding-right: ${SPACING.spacing16};
@@ -124,22 +124,22 @@ const INPUT_STYLE = css`
   }
 
   &:hover {
-    background-color: ${COLORS.blueHover};
+    background-color: ${LEGACY_COLORS.blueHover};
     box-shadow: none;
   }
 
   &:active {
-    background-color: ${COLORS.bluePressed};
+    background-color: ${LEGACY_COLORS.bluePressed};
   }
 `
 
 const ACCORDION_STYLE = css`
   border-radius: 50%;
   &:hover {
-    background: ${COLORS.lightGreyHover};
+    background: ${LEGACY_COLORS.lightGreyHover};
   }
   &:active {
-    background: ${COLORS.lightGreyPressed};
+    background: ${LEGACY_COLORS.lightGreyPressed};
   }
 `
 interface PipetteTipsFieldProps extends FormikProps<FormState> {
@@ -275,7 +275,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
               alignItems={ALIGN_CENTER}
               width="100%"
               height="8.5rem"
-              backgroundColor={COLORS.darkBlack20}
+              backgroundColor={LEGACY_COLORS.darkBlack20}
               padding={SPACING.spacing8}
               border={BORDERS.lineBorder}
               borderRadius={BORDERS.borderRadiusSize2}
@@ -283,7 +283,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
               <Text
                 as="h4"
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
-                color={COLORS.darkBlack70}
+                color={LEGACY_COLORS.darkBlack70}
               >
                 {i18n.t('modal.create_file_wizard.upload_tiprack')}
               </Text>

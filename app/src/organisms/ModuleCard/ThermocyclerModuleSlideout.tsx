@@ -10,7 +10,7 @@ import {
 } from '@opentrons/shared-data'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
@@ -130,7 +130,7 @@ export const ThermocyclerModuleSlideout = (
         <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
-          color={COLORS.darkGreyEnabled}
+          color={LEGACY_COLORS.darkGreyEnabled}
           paddingBottom={SPACING.spacing8}
         >
           {t(isSecondaryTemp ? 'set_lid_temperature' : 'set_block_temperature')}

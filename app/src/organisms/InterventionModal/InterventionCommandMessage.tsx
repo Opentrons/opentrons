@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   Flex,
   RESPONSIVENESS,
@@ -24,11 +24,11 @@ const INTERVENTION_COMMAND_STYLE = css`
 
 const INTERVENTION_COMMAND_NOTES_STYLE = css`
   ${TYPOGRAPHY.h6Default}
-  color: ${COLORS.errorDisabled};
+  color: ${LEGACY_COLORS.errorDisabled};
   text-transform: ${TEXT_TRANSFORM_UPPERCASE};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     ${TYPOGRAPHY.smallBodyTextBold}
-    color: ${COLORS.darkBlack100};
+    color: ${LEGACY_COLORS.darkBlack100};
     text-transform: ${TEXT_TRANSFORM_CAPITALIZE};
   }
 `

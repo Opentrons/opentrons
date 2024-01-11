@@ -10,7 +10,7 @@ import {
   RESPONSIVENESS,
   JUSTIFY_CENTER,
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
 } from '@opentrons/components'
 import {
   useInstrumentsQuery,
@@ -57,15 +57,15 @@ const MODAL_STYLE = css`
 `
 const OUTER_STYLES = css`
   border-radius: ${BORDERS.borderRadiusSize4};
-  background: ${COLORS.medGreyEnabled};
+  background: ${LEGACY_COLORS.medGreyEnabled};
   width: 13.374rem;
 `
 
 const SPINNER_STYLE = css`
-  color: ${COLORS.darkGreyEnabled};
+  color: ${LEGACY_COLORS.darkGreyEnabled};
   opacity: 100%;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    color: ${COLORS.darkBlackEnabled};
+    color: ${LEGACY_COLORS.darkBlackEnabled};
     opacity: 70%;
   }
 `

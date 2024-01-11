@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { COLORS, BORDERS, TYPOGRAPHY, SPACING } from '../../ui-style-constants'
+import { LEGACY_COLORS, BORDERS, TYPOGRAPHY, SPACING } from '../../ui-style-constants'
 import { isntStyleProp, styleProps } from '../../primitives'
 
 import type { StyleProps } from '../../index'
@@ -14,14 +14,14 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   appearance: none;
   cursor: pointer;
   color: ${props =>
-    props.isDangerous ? COLORS.errorText : COLORS.blueEnabled};
+    props.isDangerous ? LEGACY_COLORS.errorText : LEGACY_COLORS.blueEnabled};
   border: ${BORDERS.lineBorder};
   border-color: ${props =>
-    props.isDangerous ? COLORS.errorEnabled : 'initial'};
+    props.isDangerous ? LEGACY_COLORS.errorEnabled : 'initial'};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing8} ${SPACING.spacing16};
   text-transform: ${TYPOGRAPHY.textTransformNone};
-  background-color: ${COLORS.transparent};
+  background-color: ${LEGACY_COLORS.transparent};
   ${TYPOGRAPHY.pSemiBold}
 
   &:hover,
@@ -35,7 +35,7 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
+    box-shadow: 0 0 0 3px ${LEGACY_COLORS.fundamentalsFocus};
   }
 
   &:active {

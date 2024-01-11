@@ -3,7 +3,7 @@ import * as React from 'react'
 import {
   Flex,
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
@@ -31,7 +31,7 @@ export function MenuOverlay(props: MenuOverlayProps): JSX.Element {
 
   return (
     <Flex
-      backgroundColor={COLORS.white}
+      backgroundColor={LEGACY_COLORS.white}
       borderRadius={BORDERS.radiusSoftCorners}
       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
       flexDirection={DIRECTION_COLUMN}

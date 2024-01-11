@@ -4,7 +4,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   Flex,
   TYPOGRAPHY,
-  COLORS,
+  LEGACY_COLORS,
   SPACING,
   RESPONSIVENESS,
 } from '@opentrons/components'
@@ -186,7 +186,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   return errorMessage != null ? (
     <SimpleWizardBody
       isSuccess={false}
-      iconColor={COLORS.errorEnabled}
+      iconColor={LEGACY_COLORS.errorEnabled}
       header={t('shared:error_encountered')}
       subHeader={
         <Trans

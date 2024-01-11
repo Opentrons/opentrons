@@ -6,7 +6,7 @@ import {
   Icon,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
-  COLORS,
+  LEGACY_COLORS,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
@@ -17,29 +17,29 @@ import type { RunStatus } from '@opentrons/api-client'
 const PLAY_PAUSE_BUTTON_STYLE = css`
   display: flex;
   border-radius: 50%;
-  background-color: ${COLORS.blueEnabled};
+  background-color: ${LEGACY_COLORS.blueEnabled};
   -webkit-tap-highlight-color: transparent;
 
   &:focus {
-    background-color: ${COLORS.bluePressed};
+    background-color: ${LEGACY_COLORS.bluePressed};
     box-shadow: none;
   }
   &:hover {
     border: none;
     box-shadow: none;
-    background-color: ${COLORS.blueEnabled};
-    color: ${COLORS.white};
+    background-color: ${LEGACY_COLORS.blueEnabled};
+    color: ${LEGACY_COLORS.white};
   }
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.blueEnabled};
+    background-color: ${LEGACY_COLORS.blueEnabled};
   }
   &:active {
-    background-color: ${COLORS.bluePressed};
+    background-color: ${LEGACY_COLORS.bluePressed};
   }
   &:disabled {
-    background-color: ${COLORS.darkBlack20};
-    color: ${COLORS.darkBlack60};
+    background-color: ${LEGACY_COLORS.darkBlack20};
+    color: ${LEGACY_COLORS.darkBlack60};
   }
 `
 
@@ -70,7 +70,7 @@ export function PlayPauseButton({
       onClick={onTogglePlayPause}
       aria-label={isRunning ? 'pause' : 'play'}
     >
-      <Icon name={iconName} color={COLORS.white} size={iconSize} />
+      <Icon name={iconName} color={LEGACY_COLORS.white} size={iconSize} />
     </Btn>
   )
 }

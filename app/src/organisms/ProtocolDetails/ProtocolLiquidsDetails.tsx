@@ -7,7 +7,7 @@ import {
 } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
@@ -74,7 +74,7 @@ export const ProtocolLiquidsDetails = (
           flexDirection={DIRECTION_COLUMN}
         >
           <Icon
-            color={COLORS.medGreyEnabled}
+            color={LEGACY_COLORS.medGreyEnabled}
             alignSelf={ALIGN_CENTER}
             size="1.25rem"
             name="ot-alert"

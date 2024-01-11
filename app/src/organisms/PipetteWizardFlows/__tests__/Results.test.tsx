@@ -5,7 +5,7 @@ import {
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { COLORS, renderWithProviders } from '@opentrons/components'
+import { LEGACY_COLORS, renderWithProviders } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 import { i18n } from '../../../i18n'
@@ -150,7 +150,7 @@ describe('Results', () => {
     render(props)
     screen.getByText('Unable to detect pipette')
     expect(screen.getByLabelText('ot-alert')).toHaveStyle(
-      `color: ${String(COLORS.errorEnabled)}`
+      `color: ${String(LEGACY_COLORS.errorEnabled)}`
     )
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
     await act(() => pipettePromise)
@@ -180,7 +180,7 @@ describe('Results', () => {
     render(props)
     screen.getByText('Flex 1-Channel 1000 μL still attached')
     expect(screen.getByLabelText('ot-alert')).toHaveStyle(
-      `color: ${String(COLORS.errorEnabled)}`
+      `color: ${String(LEGACY_COLORS.errorEnabled)}`
     )
     screen.getByRole('button', { name: 'Try again' })
   })
@@ -215,7 +215,7 @@ describe('Results', () => {
     render(props)
     screen.getByText('Flex 1-Channel 1000 μL still attached')
     expect(screen.getByLabelText('ot-alert')).toHaveStyle(
-      `color: ${String(COLORS.errorEnabled)}`
+      `color: ${String(LEGACY_COLORS.errorEnabled)}`
     )
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
     await act(() => pipettePromise)
@@ -304,7 +304,7 @@ describe('Results', () => {
     render(props)
     screen.getByText('Unable to detect pipette')
     expect(screen.getByLabelText('ot-alert')).toHaveStyle(
-      `color: ${String(COLORS.errorEnabled)}`
+      `color: ${String(LEGACY_COLORS.errorEnabled)}`
     )
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
     await act(() => pipettePromise)

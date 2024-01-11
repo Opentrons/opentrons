@@ -4,7 +4,7 @@ import { css } from 'styled-components'
 import { Icon } from '../../icons'
 import { Btn } from '../../primitives'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
-import { BORDERS, COLORS } from '../../ui-style-constants'
+import { BORDERS, LEGACY_COLORS } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import { FIXTURE_HEIGHT, SINGLE_SLOT_FIXTURE_WIDTH } from './constants'
 
@@ -56,7 +56,7 @@ export function EmptyConfigFixture(
         css={EMPTY_CONFIG_STYLE}
         onClick={() => handleClickAdd(fixtureLocation)}
       >
-        <Icon name="add" color={COLORS.blueEnabled} size="2rem" />
+        <Icon name="add" color={LEGACY_COLORS.blueEnabled} size="2rem" />
       </Btn>
     </RobotCoordsForeignObject>
   )
@@ -66,26 +66,26 @@ const EMPTY_CONFIG_STYLE = css`
   display: ${DISPLAY_FLEX};
   align-items: ${ALIGN_CENTER};
   justify-content: ${JUSTIFY_CENTER};
-  background-color: ${COLORS.mediumBlueEnabled};
-  border: 3px dashed ${COLORS.blueEnabled};
+  background-color: ${LEGACY_COLORS.mediumBlueEnabled};
+  border: 3px dashed ${LEGACY_COLORS.blueEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   width: 100%;
 
   &:active {
-    border: 3px solid ${COLORS.blueEnabled};
-    background-color: ${COLORS.mediumBluePressed};
+    border: 3px solid ${LEGACY_COLORS.blueEnabled};
+    background-color: ${LEGACY_COLORS.mediumBluePressed};
   }
 
   &:focus {
-    border: 3px solid ${COLORS.blueEnabled};
-    background-color: ${COLORS.mediumBluePressed};
+    border: 3px solid ${LEGACY_COLORS.blueEnabled};
+    background-color: ${LEGACY_COLORS.mediumBluePressed};
   }
 
   &:hover {
-    background-color: ${COLORS.mediumBluePressed};
+    background-color: ${LEGACY_COLORS.mediumBluePressed};
   }
 
   &:focus-visible {
-    border: 3px solid ${COLORS.fundamentalsFocus};
+    border: 3px solid ${LEGACY_COLORS.fundamentalsFocus};
   }
 `

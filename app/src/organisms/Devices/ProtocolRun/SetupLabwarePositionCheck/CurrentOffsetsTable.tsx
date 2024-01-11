@@ -13,7 +13,7 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   TYPOGRAPHY,
-  COLORS,
+  LEGACY_COLORS,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 
@@ -45,7 +45,7 @@ const OffsetTableHeader = styled('th')`
   padding: ${SPACING.spacing4};
 `
 const OffsetTableRow = styled('tr')`
-  background-color: ${COLORS.fundamentalsBackground};
+  background-color: ${LEGACY_COLORS.fundamentalsBackground};
   padding: ${SPACING.spacing8};
 `
 

@@ -1,5 +1,5 @@
 import { createGlobalStyle } from 'styled-components'
-import { COLORS } from '@opentrons/components'
+import { LEGACY_COLORS } from '@opentrons/components'
 import 'typeface-open-sans'
 import '@fontsource/dejavu-sans'
 import '@fontsource/public-sans'
@@ -25,7 +25,7 @@ export const GlobalStyle = createGlobalStyle<{ isOnDevice?: boolean }>`
   body {
     width: 100%;
     height: 100%;
-    color: ${COLORS.darkBlackEnabled};
+    color: ${LEGACY_COLORS.darkBlackEnabled};
   }
 
   a {

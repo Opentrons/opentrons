@@ -7,7 +7,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   TYPOGRAPHY,
-  COLORS,
+  LEGACY_COLORS,
   SPACING,
   RESPONSIVENESS,
   Text,
@@ -26,7 +26,7 @@ interface WizardHeaderProps {
 const EXIT_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
-  color: ${COLORS.darkGreyEnabled};
+  color: ${LEGACY_COLORS.darkGreyEnabled};
 
   &:hover {
     opacity: 70%;
@@ -66,7 +66,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
   const { totalSteps, currentStep, title, onExit, exitDisabled } = props
 
   return (
-    <Box backgroundColor={COLORS.white}>
+    <Box backgroundColor={LEGACY_COLORS.white}>
       <Flex css={HEADER_CONTAINER_STYLE}>
         <Flex flexDirection={DIRECTION_ROW}>
           <Text css={HEADER_TEXT_STYLE} marginRight={SPACING.spacing8}>
@@ -74,7 +74,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
           </Text>
 
           {currentStep != null && totalSteps != null && currentStep > 0 ? (
-            <Text css={STEP_TEXT_STYLE} color={COLORS.darkGreyEnabled}>
+            <Text css={STEP_TEXT_STYLE} color={LEGACY_COLORS.darkGreyEnabled}>
               {i18n.t('shared.step', { current: currentStep, max: totalSteps })}
             </Text>
           ) : null}

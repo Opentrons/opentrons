@@ -8,7 +8,7 @@ import {
   DIRECTION_COLUMN,
   TYPOGRAPHY,
   DIRECTION_ROW,
-  COLORS,
+  LEGACY_COLORS,
   BORDERS,
   JUSTIFY_CENTER,
   ALIGN_CENTER,
@@ -185,8 +185,8 @@ export const BeforeBeginning = (
 }
 
 const UNSELECTED_OPTIONS_STYLE = css`
-  background-color: ${COLORS.white};
-  border: 1px solid ${COLORS.medGreyEnabled};
+  background-color: ${LEGACY_COLORS.white};
+  border: 1px solid ${LEGACY_COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   height: 12.5625rem;
   width: 14.5625rem;
@@ -197,13 +197,13 @@ const UNSELECTED_OPTIONS_STYLE = css`
   grid-gap: ${SPACING.spacing8}
 
   &:hover {
-    border: 1px solid ${COLORS.medGreyHover};
+    border: 1px solid ${LEGACY_COLORS.medGreyHover};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     flex-direction: ${DIRECTION_ROW};
     justify-content: ${JUSTIFY_FLEX_START};
-    background-color: ${COLORS.mediumBlueEnabled};
+    background-color: ${LEGACY_COLORS.mediumBlueEnabled};
     border-width: 0; 
     border-radius: ${BORDERS.borderRadiusSize4};
     padding: ${SPACING.spacing24};
@@ -217,20 +217,20 @@ const UNSELECTED_OPTIONS_STYLE = css`
 `
 const SELECTED_OPTIONS_STYLE = css`
   ${UNSELECTED_OPTIONS_STYLE}
-  border: 1px solid ${COLORS.blueEnabled};
+  border: 1px solid ${LEGACY_COLORS.blueEnabled};
 
   &:hover {
-    border: 1px solid ${COLORS.blueEnabled};
+    border: 1px solid ${LEGACY_COLORS.blueEnabled};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     border-width: 0px;
-    background-color: ${COLORS.blueEnabled};
-    color: ${COLORS.white};
+    background-color: ${LEGACY_COLORS.blueEnabled};
+    color: ${LEGACY_COLORS.white};
 
     &:hover {
       border-width: 0px;
-      background-color: ${COLORS.blueEnabled};
+      background-color: ${LEGACY_COLORS.blueEnabled};
     }
   }
 `

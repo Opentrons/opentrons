@@ -3,7 +3,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
 import {
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -32,7 +32,7 @@ export function RestartRobotConfirmationModal({
   const modalHeader: ModalHeaderBaseProps = {
     title: t('restart_now'),
     iconName: 'ot-alert',
-    iconColor: COLORS.yellow2,
+    iconColor: LEGACY_COLORS.yellow2,
   }
   const dispatch = useDispatch<Dispatch>()
 

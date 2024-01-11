@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { BORDERS, COLORS, RESPONSIVENESS, SPACING } from '../ui-style-constants'
+import { BORDERS, LEGACY_COLORS, RESPONSIVENESS, SPACING } from '../ui-style-constants'
 import { StyleProps, styleProps } from '../primitives'
 import {
   POSITION_FIXED,
@@ -77,11 +77,11 @@ const Overlay = styled.div`
   top: 0;
   bottom: 0;
   z-index: 1;
-  background-color: ${COLORS.backgroundOverlay};
+  background-color: ${LEGACY_COLORS.backgroundOverlay};
   cursor: default;
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    background-color: ${COLORS.darkBlack60};
+    background-color: ${LEGACY_COLORS.darkBlack60};
   }
 `
 const ContentArea = styled.div<{ zIndex: string | number }>`
@@ -109,17 +109,17 @@ const ModalArea = styled.div<
   border-radius: ${BORDERS.radiusSoftCorners};
   box-shadow: ${BORDERS.smallDropShadow};
   height: ${({ isFullPage }) => (isFullPage ? '100%' : 'auto')};
-  background-color: ${COLORS.white};
+  background-color: ${LEGACY_COLORS.white};
   ${styleProps};
 `
 
 const Footer = styled.div`
-  background-color: ${COLORS.white};
+  background-color: ${LEGACY_COLORS.white};
   position: ${POSITION_STICKY};
   bottom: 0;
 `
 const Header = styled.div`
-  background-color: ${COLORS.white};
+  background-color: ${LEGACY_COLORS.white};
   position: ${POSITION_STICKY};
   top: 0;
 `

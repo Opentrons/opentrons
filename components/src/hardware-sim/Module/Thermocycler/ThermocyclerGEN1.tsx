@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { COLORS } from '../../../ui-style-constants'
+import { LEGACY_COLORS } from '../../../ui-style-constants'
 
 interface ThermocyclerGEN1Props {
   lidMotorState: 'open' | 'closed'
@@ -23,7 +23,7 @@ export function ThermocyclerGEN1(props: ThermocyclerGEN1Props): JSX.Element {
       <g id="statusLight">
         <path
           fill={props.ledLightColor}
-          stroke={COLORS.black}
+          stroke={LEGACY_COLORS.black}
           strokeWidth={0.5}
           d="M130.4,23.2H41.6c-1.9,0-3.4,1.5-3.4,3.4s1.5,3.4,3.4,3.4h88.8c1.9,0,3.4-1.5,3.4-3.4C133.8,24.7,132.3,23.2,130.4,23.2z"
         ></path>
@@ -41,7 +41,7 @@ function ClosedThermocyclerGEN1Layers(): JSX.Element {
       <g id="closedChassisLightFill">
         <path
           d="M144.7,244.4v13.1H27.1v-13.1H1.4V1.5h168.9v242.9H144.7z"
-          style={{ fill: COLORS.white }}
+          style={{ fill: LEGACY_COLORS.white }}
         ></path>
       </g>
       <g id="closedChassisDarkFill">
@@ -77,7 +77,7 @@ function OpenThermocyclerGEN1Layers(): JSX.Element {
       <g id="openChassisLightFill">
         <path
           d="M144.7,244.4v13.1H27.1v-13.1H1.4V1.5h168.9v242.9H144.7z"
-          style={{ fill: COLORS.white }}
+          style={{ fill: LEGACY_COLORS.white }}
         ></path>
       </g>
       <g id="openChassisDarkFill">
@@ -97,7 +97,7 @@ function OpenThermocyclerGEN1Layers(): JSX.Element {
       <g id="openWellBlockLightFill">
         <path
           d="M149.5,80.3H22.2c-1.6,0-2.9,1.3-2.9,2.9v87.1c0,1.6,1.3,2.9,2.9,2.9h127.3c1.6,0,2.9-1.3,2.9-2.9V83.2 C152.4,81.6,151.1,80.3,149.5,80.3z"
-          style={{ fill: COLORS.white }}
+          style={{ fill: LEGACY_COLORS.white }}
         ></path>
       </g>
       <g id="openInnerWallEdges">
@@ -227,7 +227,7 @@ function OpenThermocyclerGEN1Layers(): JSX.Element {
       <g id="openLidLightFill">
         <path
           d="M0.7,223.9v33.7c0,2.4,1.9,4.3,4.3,4.3h162c2.4,0,4.3-1.9,4.3-4.3v-33.7"
-          style={{ fill: COLORS.white }}
+          style={{ fill: LEGACY_COLORS.white }}
         ></path>
       </g>
       <g id="openLidDarkFill">

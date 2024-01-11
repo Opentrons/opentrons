@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
-  COLORS,
+  LEGACY_COLORS,
   Flex,
   Icon,
   SPACING,
@@ -82,7 +82,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
             <Icon
               name="restart"
               size="2.5rem"
-              color={COLORS.black}
+              color={LEGACY_COLORS.black}
               aria-label="restart_icon"
             />
             <StyledText
@@ -114,7 +114,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
             <Icon
               name="light"
               size="2.5rem"
-              color={COLORS.black}
+              color={LEGACY_COLORS.black}
               aria-label="light_icon"
             />
             <StyledText

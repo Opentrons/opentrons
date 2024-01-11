@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
-  COLORS,
+  LEGACY_COLORS,
   SPACING,
   AlertPrimaryButton,
   SecondaryButton,
@@ -44,7 +44,7 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
 
   return (
     <SimpleWizardBody
-      iconColor={COLORS.warningEnabled}
+      iconColor={LEGACY_COLORS.warningEnabled}
       header={t('progress_will_be_lost', { flow: flowTitle })}
       subHeader={t('are_you_sure_exit', { flow: flowTitle })}
       isSuccess={false}

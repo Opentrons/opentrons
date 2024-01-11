@@ -4,7 +4,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  COLORS,
+  LEGACY_COLORS,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { StatusLabel } from '../../atoms/StatusLabel'
@@ -23,25 +23,25 @@ export const TemperatureModuleData = (
   const { moduleStatus, targetTemp, currentTemp } = props
   const { t } = useTranslation('device_details')
 
-  let backgroundColor: string = COLORS.medGreyEnabled
-  let iconColor: string = COLORS.darkGreyEnabled
+  let backgroundColor: string = LEGACY_COLORS.medGreyEnabled
+  let iconColor: string = LEGACY_COLORS.darkGreyEnabled
   let textColor
   let pulse
   switch (moduleStatus) {
     case 'idle': {
-      backgroundColor = COLORS.medGreyEnabled
-      iconColor = COLORS.darkGreyEnabled
-      textColor = COLORS.darkBlackEnabled
+      backgroundColor = LEGACY_COLORS.medGreyEnabled
+      iconColor = LEGACY_COLORS.darkGreyEnabled
+      textColor = LEGACY_COLORS.darkBlackEnabled
       break
     }
     case 'holding at target': {
-      backgroundColor = COLORS.medBlue
-      iconColor = COLORS.blueEnabled
+      backgroundColor = LEGACY_COLORS.medBlue
+      iconColor = LEGACY_COLORS.blueEnabled
       break
     }
     case 'cooling':
     case 'heating': {
-      backgroundColor = COLORS.medBlue
+      backgroundColor = LEGACY_COLORS.medBlue
       pulse = true
       break
     }

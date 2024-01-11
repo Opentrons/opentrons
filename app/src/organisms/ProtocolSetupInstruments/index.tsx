@@ -2,7 +2,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
-  COLORS,
+  LEGACY_COLORS,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
@@ -106,5 +106,5 @@ const ColumnLabel = styled.p`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
-  color: ${COLORS.darkBlack70};
+  color: ${LEGACY_COLORS.darkBlack70};
 `

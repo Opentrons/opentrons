@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 import {
   ALIGN_CENTER,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_ROW,
   Flex,
   Icon,
@@ -61,14 +61,14 @@ export function ChildNavigation({
       top="0"
       left="0"
       width="100%"
-      backgroundColor={COLORS.white}
+      backgroundColor={LEGACY_COLORS.white}
     >
       <Flex gridGap={SPACING.spacing16} justifyContent={JUSTIFY_FLEX_START}>
         <IconButton
           onClick={onClickBack}
           data-testid="ChildNavigation_Back_Button"
         >
-          <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
+          <Icon name="back" size="3rem" color={LEGACY_COLORS.darkBlack100} />
         </IconButton>
         <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {header}
@@ -104,11 +104,11 @@ export function ChildNavigation({
 const IconButton = styled('button')`
   border-radius: ${SPACING.spacing4};
   max-height: 100%;
-  background-color: ${COLORS.white};
+  background-color: ${LEGACY_COLORS.white};
 
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.darkBlack20};
+    background-color: ${LEGACY_COLORS.darkBlack20};
   }
   &:disabled {
     background-color: transparent;

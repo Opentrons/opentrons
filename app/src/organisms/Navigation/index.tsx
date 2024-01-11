@@ -7,7 +7,7 @@ import {
   Icon,
   Flex,
   Box,
-  COLORS,
+  LEGACY_COLORS,
   SPACING,
   DIRECTION_ROW,
   ALIGN_CENTER,
@@ -89,7 +89,7 @@ export function Navigation(props: NavigationProps): JSX.Element {
         paddingX={SPACING.spacing40}
         top="0"
         width="100%"
-        backgroundColor={COLORS.white}
+        backgroundColor={LEGACY_COLORS.white}
         boxShadow={isScrolled ? BORDERS.shadowBig : ''}
         gridGap={SPACING.spacing24}
         aria-label="Navigation_container"
@@ -105,7 +105,7 @@ export function Navigation(props: NavigationProps): JSX.Element {
                 aria-label="network icon"
                 name={icon}
                 size="2.5rem"
-                color={COLORS.darkBlack70}
+                color={LEGACY_COLORS.darkBlack70}
               />
             )}
           </Flex>
@@ -122,7 +122,7 @@ export function Navigation(props: NavigationProps): JSX.Element {
               name="overflow-btn-touchscreen"
               height="3.75rem"
               width="3rem"
-              color={COLORS.darkBlack70}
+              color={LEGACY_COLORS.darkBlack70}
             />
           </IconButton>
         </Flex>
@@ -147,17 +147,17 @@ const NavigationLink = (props: { to: string; name: string }): JSX.Element => (
 
 const TouchNavLink = styled(NavLink)`
   ${TYPOGRAPHY.level3HeaderSemiBold}
-  color: ${COLORS.darkBlack70};
+  color: ${LEGACY_COLORS.darkBlack70};
   height: 3.5rem;
   display: flex;
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_CENTER};
   white-space: nowrap;
   &.active {
-    color: ${COLORS.black};
+    color: ${LEGACY_COLORS.black};
   }
   &.active > div {
-    background-color: ${COLORS.highlightPurple1};
+    background-color: ${LEGACY_COLORS.highlightPurple1};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
@@ -168,14 +168,14 @@ const TouchNavLink = styled(NavLink)`
 const IconButton = styled('button')`
   border-radius: ${SPACING.spacing4};
   max-height: 100%;
-  background-color: ${COLORS.white};
+  background-color: ${LEGACY_COLORS.white};
 
   &:active {
-    background-color: ${COLORS.darkBlack20};
+    background-color: ${LEGACY_COLORS.darkBlack20};
   }
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.darkBlack20};
+    background-color: ${LEGACY_COLORS.darkBlack20};
   }
   &:disabled {
     background-color: transparent;

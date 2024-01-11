@@ -1,39 +1,39 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 
-import { Btn, Icon, COLORS, SIZE_1, SIZE_2 } from '@opentrons/components'
+import { Btn, Icon, LEGACY_COLORS, SIZE_1, SIZE_2 } from '@opentrons/components'
 
 import type { StyleProps } from '@opentrons/components'
 
 const TOGGLE_DISABLED_STYLES = css`
-  color: ${COLORS.darkGreyEnabled};
+  color: ${LEGACY_COLORS.darkGreyEnabled};
 
   &:hover {
-    color: ${COLORS.darkGreyHover};
+    color: ${LEGACY_COLORS.darkGreyHover};
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
+    box-shadow: 0 0 0 3px ${LEGACY_COLORS.warningEnabled};
   }
 
   &:disabled {
-    color: ${COLORS.darkGreyDisabled};
+    color: ${LEGACY_COLORS.darkGreyDisabled};
   }
 `
 
 const TOGGLE_ENABLED_STYLES = css`
-  color: ${COLORS.blueEnabled};
+  color: ${LEGACY_COLORS.blueEnabled};
 
   &:hover {
-    color: ${COLORS.blueHover};
+    color: ${LEGACY_COLORS.blueHover};
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
+    box-shadow: 0 0 0 3px ${LEGACY_COLORS.warningEnabled};
   }
 
   &:disabled {
-    color: ${COLORS.darkGreyDisabled};
+    color: ${LEGACY_COLORS.darkGreyDisabled};
   }
 `
 

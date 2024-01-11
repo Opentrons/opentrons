@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
   Icon,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   Flex,
   PrimaryButton,
@@ -52,7 +52,7 @@ export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
           <Icon
             name="ot-alert"
             size="2.5rem"
-            color={COLORS.errorEnabled}
+            color={LEGACY_COLORS.errorEnabled}
             aria-label="alert"
           />
           <ErrorHeader>

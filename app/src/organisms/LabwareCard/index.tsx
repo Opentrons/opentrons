@@ -12,7 +12,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   JUSTIFY_SPACE_BETWEEN,
   DIRECTION_COLUMN,
   ALIGN_FLEX_END,
@@ -38,8 +38,8 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   return (
     <Box
       role="link"
-      backgroundColor={COLORS.white}
-      color={COLORS.black}
+      backgroundColor={LEGACY_COLORS.white}
+      color={LEGACY_COLORS.black}
       css={BORDERS.cardOutlineBorder}
       paddingLeft={SPACING.spacing16}
       paddingY={SPACING.spacing16}
@@ -78,7 +78,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             {isCustomDefinition ? (
               <StyledText
                 as="label"
-                color={COLORS.darkGreyEnabled}
+                color={LEGACY_COLORS.darkGreyEnabled}
                 id="LabwareCard_customDef"
               >
                 {t('custom_def')}
@@ -86,7 +86,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             ) : (
               <Flex alignItems={ALIGN_CENTER} marginTop={SPACING.spacing4}>
                 <Icon
-                  color={COLORS.blueEnabled}
+                  color={LEGACY_COLORS.blueEnabled}
                   name="check-decagram"
                   height=".7rem"
                 />
@@ -104,7 +104,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             <StyledText
               as="h6"
               textTransform={TYPOGRAPHY.textTransformUppercase}
-              color={COLORS.darkGreyEnabled}
+              color={LEGACY_COLORS.darkGreyEnabled}
               id="LabwareCard_apiName"
             >
               {t('api_name')}
@@ -131,14 +131,14 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText
                 as="label"
-                color={COLORS.darkGreyEnabled}
+                color={LEGACY_COLORS.darkGreyEnabled}
                 textAlign={TYPOGRAPHY.textAlignRight}
               >
                 {t('date_added')}
               </StyledText>
               <StyledText
                 as="label"
-                color={COLORS.darkGreyEnabled}
+                color={LEGACY_COLORS.darkGreyEnabled}
                 id="LabwareCard_dateAdded"
               >
                 {format(new Date(modified), 'MM/dd/yyyy')}

@@ -13,7 +13,7 @@ import {
   PrimaryButton,
   TYPOGRAPHY,
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   POSITION_FIXED,
 } from '@opentrons/components'
 
@@ -64,7 +64,7 @@ export const RunPreviewComponent = (
         <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('run_preview')}
         </StyledText>
-        <StyledText as="label" color={COLORS.darkGreyEnabled}>
+        <StyledText as="label" color={LEGACY_COLORS.darkGreyEnabled}>
           {t('steps_total', { count: robotSideAnalysis.commands.length })}
         </StyledText>
       </Flex>
@@ -92,14 +92,14 @@ export const RunPreviewComponent = (
         {(command, index) => {
           const isCurrent = index === currentRunCommandIndex
           const borderColor = isCurrent
-            ? COLORS.blueEnabled
-            : COLORS.transparent
+            ? LEGACY_COLORS.blueEnabled
+            : LEGACY_COLORS.transparent
           const backgroundColor = isCurrent
-            ? COLORS.lightBlue
-            : COLORS.fundamentalsBackground
+            ? LEGACY_COLORS.lightBlue
+            : LEGACY_COLORS.fundamentalsBackground
           const contentColor = isCurrent
-            ? COLORS.darkBlackEnabled
-            : COLORS.darkGreyEnabled
+            ? LEGACY_COLORS.darkBlackEnabled
+            : LEGACY_COLORS.darkGreyEnabled
           return (
             <Flex
               key={command.id}
@@ -117,12 +117,12 @@ export const RunPreviewComponent = (
                 gridGap={SPACING.spacing4}
                 width="100%"
                 border={`solid 1px ${
-                  index === jumpedIndex ? COLORS.electricPurple : borderColor
+                  index === jumpedIndex ? LEGACY_COLORS.electricPurple : borderColor
                 }`}
                 backgroundColor={
                   index === jumpedIndex ? '#F5E3FF' : backgroundColor
                 }
-                color={COLORS.darkBlackEnabled}
+                color={LEGACY_COLORS.darkBlackEnabled}
                 borderRadius={BORDERS.radiusSoftCorners}
                 padding={SPACING.spacing8}
                 css={css`

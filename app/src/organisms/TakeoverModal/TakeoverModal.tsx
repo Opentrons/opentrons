@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
@@ -36,7 +36,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
   const terminateHeader: ModalHeaderBaseProps = {
     title: t('terminate') + '?',
     iconName: 'ot-alert',
-    iconColor: COLORS.yellow2,
+    iconColor: LEGACY_COLORS.yellow2,
   }
 
   return (
@@ -76,10 +76,10 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
           >
             <Flex
               height="12.5rem"
-              backgroundColor={COLORS.darkBlack20}
+              backgroundColor={LEGACY_COLORS.darkBlack20}
               borderRadius={BORDERS.borderRadiusSize3}
               flexDirection={DIRECTION_COLUMN}
-              color={COLORS.darkBlack90}
+              color={LEGACY_COLORS.darkBlack90}
               padding={SPACING.spacing24}
               alignItems={ALIGN_CENTER}
             >

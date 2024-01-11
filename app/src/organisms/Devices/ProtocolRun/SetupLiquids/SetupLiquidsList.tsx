@@ -10,7 +10,7 @@ import {
   Flex,
   SPACING,
   Icon,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_ROW,
   DIRECTION_COLUMN,
   TYPOGRAPHY,
@@ -52,7 +52,7 @@ const HIDE_SCROLLBAR = css`
 const LIQUID_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
   border-width: 1px;
-  border-color: ${COLORS.medGreyEnabled};
+  border-color: ${LEGACY_COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
 `
 
@@ -113,11 +113,11 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
 
     &:hover {
       cursor: pointer;
-      border: 1px solid ${COLORS.medGreyHover};
+      border: 1px solid ${LEGACY_COLORS.medGreyHover};
     }
   `
   const LIQUID_CARD_ITEM_STYLE = css`
-    border: 1px solid ${COLORS.white};
+    border: 1px solid ${LEGACY_COLORS.white};
     &:hover {
       cursor: pointer;
       ${BORDERS.cardOutlineBorder}
@@ -132,7 +132,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
       css={LIQUID_CARD_STYLE}
       padding={SPACING.spacing16}
       onClick={handleSetOpenItem}
-      backgroundColor={openItem ? COLORS.fundamentalsBackground : COLORS.white}
+      backgroundColor={openItem ? LEGACY_COLORS.fundamentalsBackground : LEGACY_COLORS.white}
       data-testid="LiquidsListItem_Row"
     >
       <LiquidsListItemDetails
@@ -205,7 +205,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                 borderRadius="4px"
                 marginBottom={SPACING.spacing8}
                 padding={SPACING.spacing16}
-                backgroundColor={COLORS.white}
+                backgroundColor={LEGACY_COLORS.white}
                 data-testid={`LiquidsListItem_slotRow_${String(index)}`}
                 onClick={handleLiquidDetailsLabwareId}
               >
@@ -235,7 +235,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                       <StyledText
                         as="p"
                         fontWeight={TYPOGRAPHY.fontWeightRegular}
-                        color={COLORS.darkGreyEnabled}
+                        color={LEGACY_COLORS.darkGreyEnabled}
                       >
                         {moduleModel != null
                           ? t('on_adapter_in_mod', {
@@ -296,7 +296,7 @@ export const LiquidsListItemDetails = (
         css={LIQUID_BORDER_STYLE}
         padding={SPACING.spacing12}
         height="max-content"
-        backgroundColor={COLORS.white}
+        backgroundColor={LEGACY_COLORS.white}
       >
         <Icon name="circle" color={displayColor} size={SIZE_1} />
       </Flex>
@@ -311,14 +311,14 @@ export const LiquidsListItemDetails = (
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={COLORS.darkGreyEnabled}
+          color={LEGACY_COLORS.darkGreyEnabled}
           marginX={SPACING.spacing16}
         >
           {description != null ? description : null}
         </StyledText>
       </Flex>
       <Flex
-        backgroundColor={COLORS.darkBlackEnabled + '1A'}
+        backgroundColor={LEGACY_COLORS.darkBlackEnabled + '1A'}
         borderRadius={BORDERS.radiusSoftCorners}
         height="max-content"
         paddingY={SPACING.spacing4}

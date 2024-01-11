@@ -3,7 +3,7 @@ import * as React from 'react'
 import {
   renderWithProviders,
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -33,7 +33,7 @@ describe('FloatingActionButton', () => {
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing12} ${SPACING.spacing24}`
     )
-    expect(button).toHaveStyle(`background-color: ${COLORS.highlightPurple1}`)
+    expect(button).toHaveStyle(`background-color: ${LEGACY_COLORS.highlightPurple1}`)
     expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSize28}`)
     expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
     expect(button).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight36}`)
@@ -42,7 +42,7 @@ describe('FloatingActionButton', () => {
       `text-transform: ${TYPOGRAPHY.textTransformNone}`
     )
     expect(button).toHaveStyle(`box-shadow: ${BORDERS.shadowBig}`)
-    expect(button).toHaveStyle(`color: ${COLORS.white}`)
+    expect(button).toHaveStyle(`color: ${LEGACY_COLORS.white}`)
   })
 
   it('renders unselected floating action button with text and disabled', () => {
@@ -59,7 +59,7 @@ describe('FloatingActionButton', () => {
     const button = getByRole('button')
     expect(button).toHaveStyleRule(
       'background-color',
-      `${COLORS.highlightPurple1Pressed}`,
+      `${LEGACY_COLORS.highlightPurple1Pressed}`,
       {
         modifier: ':active',
       }
@@ -71,7 +71,7 @@ describe('FloatingActionButton', () => {
     const button = getByRole('button')
     expect(button).toHaveStyleRule(
       'border-color',
-      `${COLORS.fundamentalsFocus}`,
+      `${LEGACY_COLORS.fundamentalsFocus}`,
       {
         modifier: ':focus-visible',
       }

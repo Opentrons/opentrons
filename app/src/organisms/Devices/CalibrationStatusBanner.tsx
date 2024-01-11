@@ -5,7 +5,7 @@ import { Link as RouterLink } from 'react-router-dom'
 import {
   Flex,
   ALIGN_CENTER,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
@@ -43,7 +43,7 @@ export function CalibrationStatusBanner({
         <RouterLink to={`/devices/${robotName}/robot-settings/calibration`}>
           <StyledText
             as="p"
-            color={COLORS.darkBlackEnabled}
+            color={LEGACY_COLORS.darkBlackEnabled}
             paddingRight={SPACING.spacing16}
             textAlign={TEXT_ALIGN_RIGHT}
             textDecoration={TYPOGRAPHY.textDecorationUnderline}

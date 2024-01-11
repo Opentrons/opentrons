@@ -16,7 +16,7 @@ import {
   JUSTIFY_CENTER,
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,
-  COLORS,
+  LEGACY_COLORS,
   TYPOGRAPHY,
   Icon,
   Btn,
@@ -179,7 +179,7 @@ export function NameRobot(): JSX.Element {
                     }
                   }}
                 >
-                  <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
+                  <Icon name="back" size="3rem" color={LEGACY_COLORS.darkBlack100} />
                 </Btn>
               </Flex>
               <Flex marginLeft={isUnboxingFlowOngoing ? '0' : '4rem'}>
@@ -224,7 +224,7 @@ export function NameRobot(): JSX.Element {
                 <StyledText
                   as="h4"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={COLORS.darkBlack70}
+                  color={LEGACY_COLORS.darkBlack70}
                   marginBottom={SPACING.spacing24}
                 >
                   {t('name_your_robot_description')}
@@ -243,7 +243,7 @@ export function NameRobot(): JSX.Element {
             </Flex>
             <StyledText
               as="p"
-              color={COLORS.darkBlack70}
+              color={LEGACY_COLORS.darkBlack70}
               fontWeight={TYPOGRAPHY.fontWeightRegular}
             >
               {t('name_rule_description')}
@@ -252,7 +252,7 @@ export function NameRobot(): JSX.Element {
               <StyledText
                 as="p"
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
-                color={COLORS.red2}
+                color={LEGACY_COLORS.red2}
               >
                 {formik.errors.newRobotName}
               </StyledText>

@@ -7,7 +7,7 @@ import {
   BORDERS,
   Box,
   Btn,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -273,10 +273,10 @@ export function ModulesListItem({
       <Btn
         marginLeft={SPACING.spacing20}
         css={css`
-          color: ${COLORS.blueEnabled};
+          color: ${LEGACY_COLORS.blueEnabled};
 
           &:hover {
-            color: ${COLORS.blueHover};
+            color: ${LEGACY_COLORS.blueHover};
           }
         `}
         marginTop={SPACING.spacing4}
@@ -299,7 +299,7 @@ export function ModulesListItem({
       <StyledText
         as="p"
         marginLeft={SPACING.spacing20}
-        color={COLORS.darkGreyEnabled}
+        color={LEGACY_COLORS.darkGreyEnabled}
       >
         {t('no_usb_connection_required')}
       </StyledText>
@@ -319,9 +319,9 @@ export function ModulesListItem({
   let renderModuleStatus: JSX.Element = (
     <StatusLabel
       status={moduleConnectionStatus}
-      backgroundColor={COLORS.successBackgroundLight}
-      iconColor={COLORS.successEnabled}
-      textColor={COLORS.successText}
+      backgroundColor={LEGACY_COLORS.successBackgroundLight}
+      iconColor={LEGACY_COLORS.successEnabled}
+      textColor={LEGACY_COLORS.successText}
     />
   )
 
@@ -351,9 +351,9 @@ export function ModulesListItem({
     renderModuleStatus = (
       <StatusLabel
         status={moduleConnectionStatus}
-        backgroundColor={COLORS.warningBackgroundLight}
-        iconColor={COLORS.warningEnabled}
-        textColor={COLORS.warningText}
+        backgroundColor={LEGACY_COLORS.warningBackgroundLight}
+        iconColor={LEGACY_COLORS.warningEnabled}
+        textColor={LEGACY_COLORS.warningText}
       />
     )
   }
@@ -383,11 +383,11 @@ export function ModulesListItem({
       ) : null}
       <Box
         border={BORDERS.styleSolid}
-        borderColor={COLORS.medGreyEnabled}
+        borderColor={LEGACY_COLORS.medGreyEnabled}
         borderWidth="1px"
         borderRadius={BORDERS.radiusSoftCorners}
         padding={SPACING.spacing16}
-        backgroundColor={COLORS.white}
+        backgroundColor={LEGACY_COLORS.white}
       >
         {showModuleSetupModal && heaterShakerModuleFromProtocol != null ? (
           <ModuleSetupModal
@@ -433,9 +433,9 @@ export function ModulesListItem({
               >
                 <StatusLabel
                   status={t('location_conflict')}
-                  backgroundColor={COLORS.warningBackgroundLight}
-                  iconColor={COLORS.warningEnabled}
-                  textColor={COLORS.warningText}
+                  backgroundColor={LEGACY_COLORS.warningBackgroundLight}
+                  iconColor={LEGACY_COLORS.warningEnabled}
+                  textColor={LEGACY_COLORS.warningText}
                 />
                 <TertiaryButton
                   width="max-content"

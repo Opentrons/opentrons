@@ -12,7 +12,7 @@ import {
   ALIGN_FLEX_START,
 } from '../../styles'
 import { Box, Flex, Text } from '../../primitives'
-import { TYPOGRAPHY, SPACING, COLORS } from '../../ui-style-constants'
+import { TYPOGRAPHY, SPACING, LEGACY_COLORS } from '../../ui-style-constants'
 
 const labwareDisplayNameStyle = css`
   overflow: hidden;
@@ -44,7 +44,7 @@ export function LabwareInfo(props: {
         borderRadius="0 0 0.4rem 0.4rem"
         fontSize={TYPOGRAPHY.fontSizeCaption}
         padding={SPACING.spacing4}
-        color={COLORS.white}
+        color={LEGACY_COLORS.white}
       >
         <Flex
           flexDirection={DIRECTION_ROW}

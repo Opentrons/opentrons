@@ -8,7 +8,7 @@ import {
   SPACING,
   DIRECTION_COLUMN,
   Icon,
-  COLORS,
+  LEGACY_COLORS,
   TYPOGRAPHY,
   PrimaryButton,
 } from '@opentrons/components'
@@ -32,7 +32,7 @@ export const FirmwareUpdateFailedModal = (
     <Flex flexDirection={DIRECTION_ROW}>
       <Icon
         width={SPACING.spacing20}
-        color={COLORS.errorEnabled}
+        color={LEGACY_COLORS.errorEnabled}
         name="information"
         aria-label="information"
       />

@@ -8,7 +8,7 @@ import {
   DIRECTION_COLUMN,
   TYPOGRAPHY,
   SPACING,
-  COLORS,
+  LEGACY_COLORS,
   PrimaryButton,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
@@ -170,13 +170,13 @@ export function RenameRobotSlideout({
           value={formik.values.newRobotName}
           error={formik.errors.newRobotName && ' '}
         />
-        <StyledText as="label" color={COLORS.darkGreyEnabled}>
+        <StyledText as="label" color={LEGACY_COLORS.darkGreyEnabled}>
           {t('characters_max')}
         </StyledText>
         {formik.errors.newRobotName && (
           <StyledText
             as="label"
-            color={COLORS.errorEnabled}
+            color={LEGACY_COLORS.errorEnabled}
             marginTop={SPACING.spacing4}
           >
             {formik.errors.newRobotName}

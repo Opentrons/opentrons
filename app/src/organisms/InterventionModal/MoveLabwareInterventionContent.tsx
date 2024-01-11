@@ -7,7 +7,7 @@ import {
   ALIGN_CENTER,
   Icon,
   SPACING,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   TYPOGRAPHY,
   BORDERS,
@@ -54,10 +54,10 @@ const LABWARE_DESCRIPTION_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   grid-gap: ${SPACING.spacing8};
   padding: ${SPACING.spacing16};
-  background-color: ${COLORS.fundamentalsBackground};
+  background-color: ${LEGACY_COLORS.fundamentalsBackground};
   border-radius: ${BORDERS.radiusSoftCorners};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    background-color: ${COLORS.light1};
+    background-color: ${LEGACY_COLORS.light1};
     border-radius: ${BORDERS.borderRadiusSize3};
   }
 `
@@ -70,10 +70,10 @@ const LABWARE_NAME_TITLE_STYLE = css`
 `
 
 const LABWARE_NAME_STYLE = css`
-  color: ${COLORS.errorDisabled};
+  color: ${LEGACY_COLORS.errorDisabled};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     ${TYPOGRAPHY.bodyTextBold}
-    color: ${COLORS.darkBlack100};
+    color: ${LEGACY_COLORS.darkBlack100};
   }
 `
 
@@ -192,7 +192,7 @@ export function MoveLabwareInterventionContent({
             <MoveLabwareOnDeck
               key={command.id} // important so that back to back move labware commands bust the cache
               robotType={robotType}
-              deckFill={isOnDevice ? COLORS.light1 : '#e6e6e6'}
+              deckFill={isOnDevice ? LEGACY_COLORS.light1 : '#e6e6e6'}
               initialLabwareLocation={oldLabwareLocation}
               finalLabwareLocation={command.params.newLocation}
               movedLabwareDef={movedLabwareDef}

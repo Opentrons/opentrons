@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { COLORS, TYPOGRAPHY } from '@opentrons/components'
+import { LEGACY_COLORS, TYPOGRAPHY } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
@@ -25,8 +25,8 @@ export const MagneticModuleData = (
     <>
       <StatusLabel
         status={moduleStatus}
-        backgroundColor={COLORS.medBlue}
-        iconColor={COLORS.blueEnabled}
+        backgroundColor={LEGACY_COLORS.medBlue}
+        iconColor={LEGACY_COLORS.blueEnabled}
         pulse={moduleStatus === 'engaged'}
       />
       <StyledText

@@ -7,7 +7,7 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -39,7 +39,7 @@ import type { TrackProtocolRunEvent } from '../../Devices/hooks'
 import type { RobotAnalyticsData } from '../../../redux/analytics/types'
 
 const TITLE_TEXT_STYLE = css`
-  color: ${COLORS.darkBlack70};
+  color: ${LEGACY_COLORS.darkBlack70};
   font-size: ${TYPOGRAPHY.fontSize28};
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   line-height: ${TYPOGRAPHY.lineHeight36};
@@ -217,8 +217,8 @@ export function RunningProtocolCommandList({
             {(command, index) => {
               const backgroundColor =
                 index === currentRunCommandIndex
-                  ? COLORS.mediumBlueEnabled
-                  : COLORS.light1
+                  ? LEGACY_COLORS.mediumBlueEnabled
+                  : LEGACY_COLORS.light1
               return (
                 <Flex
                   key={command.id}

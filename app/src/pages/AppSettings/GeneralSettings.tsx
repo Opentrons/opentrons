@@ -14,7 +14,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
-  COLORS,
+  LEGACY_COLORS,
   ALIGN_START,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
@@ -174,7 +174,7 @@ export function GeneralSettings(): JSX.Element {
               <StyledText
                 fontSize={TYPOGRAPHY.fontSizeLabel}
                 lineHeight={TYPOGRAPHY.lineHeight12}
-                color={COLORS.darkGreyEnabled}
+                color={LEGACY_COLORS.darkGreyEnabled}
                 paddingY={SPACING.spacing24}
               >
                 {t('up_to_date')}

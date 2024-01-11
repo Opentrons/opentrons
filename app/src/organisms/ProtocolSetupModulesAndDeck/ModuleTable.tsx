@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
@@ -83,7 +83,7 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       <Flex
-        color={COLORS.darkBlack70}
+        color={LEGACY_COLORS.darkBlack70}
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         gridGap={SPACING.spacing24}
@@ -302,10 +302,10 @@ function ModuleTableItem({
           isModuleReady &&
           module.attachedModuleMatch?.moduleOffset?.last_modified != null &&
           conflictedFixture == null
-            ? COLORS.green3
+            ? LEGACY_COLORS.green3
             : isNonConnectingModule && conflictedFixture == null
-            ? COLORS.light1
-            : COLORS.yellow3
+            ? LEGACY_COLORS.light1
+            : LEGACY_COLORS.yellow3
         }
         borderRadius={BORDERS.borderRadiusSize3}
         cursor={isDuplicateModuleModel ? 'pointer' : 'inherit'}

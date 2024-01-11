@@ -3,7 +3,7 @@ import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import {
   renderWithProviders,
-  COLORS,
+  LEGACY_COLORS,
   SPACING,
   TYPOGRAPHY,
   BORDERS,
@@ -33,7 +33,7 @@ describe('SubmitPrimaryButton', () => {
     const { getByText } = render(props)
     const button = getByText('submit primary button')
     expect(button).toHaveStyle(
-      `background-color: ${String(COLORS.blueEnabled)}`
+      `background-color: ${String(LEGACY_COLORS.blueEnabled)}`
     )
     expect(button).toHaveStyle(
       `border-radius: ${String(BORDERS.radiusSoftCorners)}`
@@ -41,7 +41,7 @@ describe('SubmitPrimaryButton', () => {
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16}`
     )
-    expect(button).toHaveStyle(`color: ${String(COLORS.white)}`)
+    expect(button).toHaveStyle(`color: ${String(LEGACY_COLORS.white)}`)
     expect(button).toHaveStyle(`font-size: ${String(TYPOGRAPHY.fontSizeP)}`)
     expect(button).toHaveStyle(
       `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
@@ -64,9 +64,9 @@ describe('SubmitPrimaryButton', () => {
     const button = getByText('submit primary button')
     expect(button).toBeDisabled()
     expect(button).toHaveStyle(
-      `background-color: ${String(COLORS.darkGreyDisabled)}`
+      `background-color: ${String(LEGACY_COLORS.darkGreyDisabled)}`
     )
-    expect(button).toHaveStyle(`color: ${String(COLORS.successDisabled)}`)
+    expect(button).toHaveStyle(`color: ${String(LEGACY_COLORS.successDisabled)}`)
   })
 
   it('calls mock function when clicking the button', () => {
@@ -81,7 +81,7 @@ describe('SubmitPrimaryButton', () => {
     const button = getByText('submit primary button')
     expect(button).toHaveStyleRule(
       'background-color',
-      `${String(COLORS.blueHover)}`,
+      `${String(LEGACY_COLORS.blueHover)}`,
       {
         modifier: ':hover',
       }
@@ -96,7 +96,7 @@ describe('SubmitPrimaryButton', () => {
     const button = getByText('submit primary button')
     expect(button).toHaveStyleRule(
       'background-color',
-      `${String(COLORS.bluePressed)}`,
+      `${String(LEGACY_COLORS.bluePressed)}`,
       {
         modifier: ':active',
       }
@@ -108,7 +108,7 @@ describe('SubmitPrimaryButton', () => {
     const button = getByText('submit primary button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${String(COLORS.warningEnabled)}`,
+      `0 0 0 3px ${String(LEGACY_COLORS.warningEnabled)}`,
       {
         modifier: ':focus-visible',
       }

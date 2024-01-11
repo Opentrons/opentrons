@@ -22,7 +22,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   TYPOGRAPHY,
-  COLORS,
+  LEGACY_COLORS,
   PrimaryButton,
   RESPONSIVENESS,
   MODULE_ICON_NAME_BY_TYPE,
@@ -220,13 +220,13 @@ const Table = styled('table')`
 `
 const TableHeader = styled('th')`
   text-transform: ${TYPOGRAPHY.textTransformUppercase};
-  color: ${COLORS.darkBlackEnabled};
+  color: ${LEGACY_COLORS.darkBlackEnabled};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   font-size: ${TYPOGRAPHY.fontSizeCaption};
   padding: ${SPACING.spacing4};
 `
 const TableRow = styled('tr')`
-  background-color: ${COLORS.fundamentalsBackground};
+  background-color: ${LEGACY_COLORS.fundamentalsBackground};
 `
 
 const TableDatum = styled('td')`
@@ -404,7 +404,7 @@ const TerseHeader = styled('th')`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
 `
 const TerseTableRow = styled('tr')`
-  background-color: ${COLORS.light1};
+  background-color: ${LEGACY_COLORS.light1};
 `
 
 const TerseTableDatum = styled('td')`

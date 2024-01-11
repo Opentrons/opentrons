@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { BORDERS, COLORS, Flex, SPACING } from '@opentrons/components'
+import { BORDERS, LEGACY_COLORS, Flex, SPACING } from '@opentrons/components'
 
 import type { StyleProps } from '@opentrons/components'
 
@@ -18,16 +18,16 @@ const LISTITEM_PROPS_BY_TYPE: Record<
   { backgroundColor: string }
 > = {
   error: {
-    backgroundColor: COLORS.red3,
+    backgroundColor: LEGACY_COLORS.red3,
   },
   noActive: {
-    backgroundColor: COLORS.light1,
+    backgroundColor: LEGACY_COLORS.light1,
   },
   success: {
-    backgroundColor: COLORS.green3,
+    backgroundColor: LEGACY_COLORS.green3,
   },
   warning: {
-    backgroundColor: COLORS.yellow3,
+    backgroundColor: LEGACY_COLORS.yellow3,
   },
 }
 

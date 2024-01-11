@@ -3,7 +3,7 @@ import * as React from 'react'
 import {
   RobotCoordsForeignDiv,
   Text,
-  COLORS,
+  LEGACY_COLORS,
   SPACING,
 } from '@opentrons/components'
 import type { ModuleDefinition } from '@opentrons/shared-data'
@@ -21,11 +21,11 @@ export function FlexModuleTag(props: FlexModuleTagProps): JSX.Element {
       height={20}
       y={-22}
       innerDivProps={{
-        backgroundColor: COLORS.darkGreyEnabled,
+        backgroundColor: LEGACY_COLORS.darkGreyEnabled,
         padding: SPACING.spacing4,
         height: '100%',
-        color: COLORS.white,
-        border: `1px solid ${COLORS.darkGrey}`,
+        color: LEGACY_COLORS.white,
+        border: `1px solid ${LEGACY_COLORS.darkGrey}`,
       }}
     >
       <Text as="p" fontSize="0.5rem">

@@ -5,7 +5,7 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   Box,
-  COLORS,
+  LEGACY_COLORS,
   BORDERS,
   RoundTab,
 } from '@opentrons/components'
@@ -64,7 +64,7 @@ export function LabwareOffsetTabs({
         </RoundTab>
       </Flex>
       <Box
-        backgroundColor={COLORS.white}
+        backgroundColor={LEGACY_COLORS.white}
         border={BORDERS.lineBorder}
         // remove left upper corner border radius when first tab is active
         borderRadius={`${

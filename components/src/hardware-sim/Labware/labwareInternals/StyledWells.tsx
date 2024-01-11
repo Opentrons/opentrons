@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Well } from './Well'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { WellGroup } from './types'
-import { COLORS } from '../../../ui-style-constants'
+import { LEGACY_COLORS } from '../../../ui-style-constants'
 
 type WellContents =
   | 'tipPresent'
@@ -25,8 +25,8 @@ export const STYLE_BY_WELL_CONTENTS: {
   }
 } = {
   highlightedWell: {
-    stroke: COLORS.blueEnabled,
-    fill: `${COLORS.blueEnabled}33`, // 20% opacity
+    stroke: LEGACY_COLORS.blueEnabled,
+    fill: `${LEGACY_COLORS.blueEnabled}33`, // 20% opacity
     strokeWidth: 1,
   },
   disabledWell: {
@@ -35,8 +35,8 @@ export const STYLE_BY_WELL_CONTENTS: {
     strokeWidth: 0.6,
   },
   selectedWell: {
-    stroke: COLORS.blueEnabled,
-    fill: COLORS.transparent,
+    stroke: LEGACY_COLORS.blueEnabled,
+    fill: LEGACY_COLORS.transparent,
     strokeWidth: 1,
   },
   tipMissing: {
@@ -45,13 +45,13 @@ export const STYLE_BY_WELL_CONTENTS: {
     strokeWidth: 0.6,
   },
   tipPresent: {
-    fill: COLORS.white,
+    fill: LEGACY_COLORS.white,
     stroke: '#A4A4A4', // LEGACY --c-near-black
     strokeWidth: 0.6,
   },
   defaultWell: {
-    fill: COLORS.white,
-    stroke: COLORS.black,
+    fill: LEGACY_COLORS.white,
+    stroke: LEGACY_COLORS.black,
     strokeWidth: 0.6,
   },
 }

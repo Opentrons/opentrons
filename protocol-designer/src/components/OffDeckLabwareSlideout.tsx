@@ -6,7 +6,7 @@ import {
   DeprecatedPrimaryButton,
   useHoverTooltip,
   Flex,
-  COLORS,
+  LEGACY_COLORS,
   Icon,
   SPACING,
   Text,
@@ -93,7 +93,7 @@ export const OffDeckLabwareSlideout = (
         <Flex
           borderRadius={BORDERS.borderRadiusSize3}
           alignItems={ALIGN_CENTER}
-          backgroundColor={COLORS.light1}
+          backgroundColor={LEGACY_COLORS.light1}
           flexDirection={DIRECTION_COLUMN}
           padding={SPACING.spacing16}
           textAlign={TYPOGRAPHY.textAlignCenter}
@@ -103,7 +103,7 @@ export const OffDeckLabwareSlideout = (
           <Icon
             name="ot-alert"
             size="2rem"
-            color={COLORS.darkBlack90}
+            color={LEGACY_COLORS.darkBlack90}
             marginBottom={SPACING.spacing32}
           />
           <Text>{i18n.t('deck.off_deck.slideout_empty_state')}</Text>

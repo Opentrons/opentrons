@@ -9,7 +9,7 @@ import {
   DIRECTION_ROW,
   SPACING,
   TYPOGRAPHY,
-  COLORS,
+  LEGACY_COLORS,
   Icon,
   Link,
   PrimaryButton,
@@ -105,7 +105,7 @@ export function ConnectRobotSlideout({
             <Flex flexDirection={DIRECTION_ROW}>
               <StyledText
                 as="p"
-                color={COLORS.darkGreyEnabled}
+                color={LEGACY_COLORS.darkGreyEnabled}
                 marginRight={SPACING.spacing8}
               >
                 {t('searching')}
@@ -118,7 +118,7 @@ export function ConnectRobotSlideout({
                 <>
                   <StyledText
                     as="p"
-                    color={COLORS.darkGreyEnabled}
+                    color={LEGACY_COLORS.darkGreyEnabled}
                     marginX={SPACING.spacing4}
                   >
                     {t('discovery_timeout')}

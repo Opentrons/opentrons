@@ -2,7 +2,7 @@ import * as React from 'react'
 import {
   Flex,
   DIRECTION_COLUMN,
-  COLORS,
+  LEGACY_COLORS,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -17,7 +17,7 @@ interface EmptySetupStepProps {
 export function EmptySetupStep(props: EmptySetupStepProps): JSX.Element {
   const { title, description, label } = props
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} color={COLORS.successDisabled}>
+    <Flex flexDirection={DIRECTION_COLUMN} color={LEGACY_COLORS.successDisabled}>
       <StyledText css={TYPOGRAPHY.h6SemiBold} marginBottom={SPACING.spacing2}>
         {label}
       </StyledText>

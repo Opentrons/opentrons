@@ -5,7 +5,7 @@ import {
   Flex,
   Icon,
   ALIGN_CENTER,
-  COLORS,
+  LEGACY_COLORS,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -21,7 +21,7 @@ export function ODDBackButton(
     <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing16}>
       <Btn onClick={onClick}>
         <Icon
-          color={COLORS.darkBlack100}
+          color={LEGACY_COLORS.darkBlack100}
           data-testid="back_icon"
           name="back"
           width="3rem"

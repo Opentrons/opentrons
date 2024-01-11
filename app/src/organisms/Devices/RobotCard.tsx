@@ -8,7 +8,7 @@ import {
   Flex,
   ALIGN_START,
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_FLEX_START,
@@ -62,7 +62,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
   return robot != null ? (
     <Flex
       alignItems={ALIGN_START}
-      backgroundColor={COLORS.white}
+      backgroundColor={LEGACY_COLORS.white}
       cursor="pointer"
       flexDirection={DIRECTION_ROW}
       gridGap={SPACING.spacing16}
@@ -132,7 +132,7 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
       <StyledText
         as="h6"
         textTransform={TYPOGRAPHY.textTransformUppercase}
-        color={COLORS.darkGreyEnabled}
+        color={LEGACY_COLORS.darkGreyEnabled}
       >
         {t('modules')}
       </StyledText>
@@ -185,7 +185,7 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
       gridGap={SPACING.spacing4}
       minWidth="24rem"
     >
-      <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+      <StyledText as="h6" color={LEGACY_COLORS.darkGreyEnabled}>
         {t('shared:instruments')}
       </StyledText>
 

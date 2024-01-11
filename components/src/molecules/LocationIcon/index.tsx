@@ -4,7 +4,7 @@ import { css } from 'styled-components'
 import { Icon } from '../../icons'
 import { Flex, Text } from '../../primitives'
 import { ALIGN_CENTER } from '../../styles'
-import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { BORDERS, LEGACY_COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
 import type { IconName } from '../../icons'
 import type { StyleProps } from '../../primitives'
@@ -31,7 +31,7 @@ const LOCATION_ICON_STYLE = css<{
   width?: string
 }>`
   align-items: ${ALIGN_CENTER};
-  border: 2px solid ${props => props.color ?? COLORS.darkBlack100};
+  border: 2px solid ${props => props.color ?? LEGACY_COLORS.darkBlack100};
   border-radius: ${BORDERS.borderRadiusSize3};
   height: ${props => props.height ?? SPACING.spacing32};
   width: ${props => props.width ?? 'max-content'};
@@ -63,7 +63,7 @@ export function LocationIcon({
         <Icon
           name={iconName}
           size="1.25rem"
-          color={color ?? COLORS.darkBlack100}
+          color={color ?? LEGACY_COLORS.darkBlack100}
           aria-label={iconName}
         />
       ) : (

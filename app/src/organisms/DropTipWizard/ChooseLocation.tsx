@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import {
   Btn,
   Flex,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   RESPONSIVENESS,
@@ -171,7 +171,7 @@ const TILE_CONTAINER_STYLE = css`
 `
 const GO_BACK_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.darkGreyEnabled};
+  color: ${LEGACY_COLORS.darkGreyEnabled};
 
   &:hover {
     opacity: 70%;

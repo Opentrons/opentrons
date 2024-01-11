@@ -9,7 +9,7 @@ import {
   Icon,
   Flex,
   Link,
-  COLORS,
+  LEGACY_COLORS,
   BORDERS,
   DIRECTION_COLUMN,
   DISPLAY_INLINE_BLOCK,
@@ -184,7 +184,7 @@ export function ChooseRobotSlideout(
             <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
               <StyledText
                 as="p"
-                color={COLORS.darkGreyEnabled}
+                color={LEGACY_COLORS.darkGreyEnabled}
                 marginRight={SPACING.spacing12}
               >
                 {t('app_settings:searching')}
@@ -193,7 +193,7 @@ export function ChooseRobotSlideout(
                 name="ot-spinner"
                 spin
                 size="1.25rem"
-                color={COLORS.darkGreyEnabled}
+                color={LEGACY_COLORS.darkGreyEnabled}
               />
             </Flex>
           ) : (
@@ -212,7 +212,7 @@ export function ChooseRobotSlideout(
             css={css`
               ${BORDERS.cardOutlineBorder}
               &:hover {
-                border-color: ${COLORS.medGreyEnabled};
+                border-color: ${LEGACY_COLORS.medGreyEnabled};
               }
             `}
             flexDirection={DIRECTION_COLUMN}
@@ -251,7 +251,7 @@ export function ChooseRobotSlideout(
                 {runCreationError != null && isSelected && (
                   <StyledText
                     as="label"
-                    color={COLORS.errorText}
+                    color={LEGACY_COLORS.errorText}
                     overflowWrap="anywhere"
                     display={DISPLAY_INLINE_BLOCK}
                     marginTop={`-${SPACING.spacing8}`}
@@ -265,7 +265,7 @@ export function ChooseRobotSlideout(
                           robotLink: (
                             <NavLink
                               css={css`
-                                color: ${COLORS.errorText};
+                                color: ${LEGACY_COLORS.errorText};
                                 text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
                               `}
                               to={`/devices/${robot.name}`}
@@ -289,7 +289,7 @@ export function ChooseRobotSlideout(
             textAlign={TYPOGRAPHY.textAlignCenter}
             marginTop={SPACING.spacing24}
           >
-            <StyledText as="p" color={COLORS.darkGreyEnabled}>
+            <StyledText as="p" color={LEGACY_COLORS.darkGreyEnabled}>
               {showIdleOnly
                 ? t('unavailable_or_busy_robot_not_listed', {
                     count: unavailableCount + reducerBusyCount,

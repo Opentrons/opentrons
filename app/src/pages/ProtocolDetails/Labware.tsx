@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_ROW,
   Flex,
   Icon,
@@ -32,8 +32,8 @@ const TableHeader = styled('th')`
 `
 
 const TableRow = styled('tr')`
-  background-color: ${COLORS.light1};
-  border: 1px ${COLORS.white} solid;
+  background-color: ${LEGACY_COLORS.light1};
+  border: 1px ${LEGACY_COLORS.white} solid;
   height: 4.75rem;
 `
 
@@ -77,7 +77,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
         <tr>
           <TableHeader>
             <StyledText
-              color={COLORS.darkBlack70}
+              color={LEGACY_COLORS.darkBlack70}
               fontSize={TYPOGRAPHY.fontSize20}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingLeft={SPACING.spacing24}
@@ -88,7 +88,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
           <TableHeader>
             <StyledText
               alignItems={ALIGN_CENTER}
-              color={COLORS.darkBlack70}
+              color={LEGACY_COLORS.darkBlack70}
               fontSize={TYPOGRAPHY.fontSize20}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingRight={SPACING.spacing12}
@@ -113,7 +113,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
                 >
                   {definition?.namespace === 'opentrons' ? (
                     <Icon
-                      color={COLORS.blueEnabled}
+                      color={LEGACY_COLORS.blueEnabled}
                       name="check-decagram"
                       height="1.77125rem"
                       minHeight="1.77125rem"

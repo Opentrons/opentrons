@@ -105,7 +105,7 @@ describe('ThermocyclerModuleData', () => {
     const { getByTestId } = render(props)
 
     expect(getByTestId('status_label_heating_blockStatus')).toHaveStyle(
-      'backgroundColor: COLORS.warningBackgroundLight'
+      'backgroundColor: LEGACY_COLORS.warningBackgroundLight'
     )
   })
 

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   TYPOGRAPHY,
   SPACING,
@@ -44,7 +44,7 @@ export function ConfirmDeleteProtocolModal(
             {t('shared:cancel')}
           </Link>
           <AlertPrimaryButton
-            backgroundColor={COLORS.errorEnabled}
+            backgroundColor={LEGACY_COLORS.errorEnabled}
             onClick={props.handleClickDelete}
           >
             {t('yes_delete_this_protocol')}

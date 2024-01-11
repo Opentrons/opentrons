@@ -2,7 +2,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import {
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   Flex,
   SPACING,
   PrimaryButton,
@@ -25,23 +25,23 @@ const BUTTON_GROUP_STYLES = css`
     padding-bottom: 8px;
     &:focus {
       box-shadow: none;
-      color: ${COLORS.white};
+      color: ${LEGACY_COLORS.white};
     }
 
     &:hover {
-      background-color: ${COLORS.fundamentalsBackground};
-      color: ${COLORS.black};
+      background-color: ${LEGACY_COLORS.fundamentalsBackground};
+      color: ${LEGACY_COLORS.black};
       box-shadow: 0 0 0;
     }
 
     &.active {
-      background-color: ${COLORS.blueEnabled};
-      color: ${COLORS.white};
+      background-color: ${LEGACY_COLORS.blueEnabled};
+      color: ${LEGACY_COLORS.white};
     }
 
     &:disabled {
       background-color: inherit;
-      color: ${COLORS.errorDisabled};
+      color: ${LEGACY_COLORS.errorDisabled};
     }
   }
 
@@ -59,17 +59,17 @@ const BUTTON_GROUP_STYLES = css`
 const ACTIVE_STYLE = css`
   padding-left: ${SPACING.spacing8};
   padding-right: ${SPACING.spacing8};
-  background-color: ${COLORS.blueEnabled};
-  color: ${COLORS.white};
+  background-color: ${LEGACY_COLORS.blueEnabled};
+  color: ${LEGACY_COLORS.white};
   pointer-events: none;
 `
 
 const DEFAULT_STYLE = css`
   padding-left: ${SPACING.spacing8};
   padding-right: ${SPACING.spacing8};
-  background-color: ${COLORS.white};
-  color: ${COLORS.black};
-  border: 1px ${COLORS.medGreyEnabled} solid;
+  background-color: ${LEGACY_COLORS.white};
+  color: ${LEGACY_COLORS.black};
+  border: 1px ${LEGACY_COLORS.medGreyEnabled} solid;
 `
 
 export const useToggleGroup = (

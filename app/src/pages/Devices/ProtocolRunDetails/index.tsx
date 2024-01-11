@@ -16,7 +16,7 @@ import {
   OVERFLOW_SCROLL,
   SIZE_6,
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -59,21 +59,21 @@ const baseRoundTabStyling = css`
 
 const RoundNavLink = styled(NavLink)`
   ${baseRoundTabStyling}
-  color: ${COLORS.darkGreyEnabled};
+  color: ${LEGACY_COLORS.darkGreyEnabled};
 
   &:hover {
-    background-color: ${COLORS.fundamentalsBackgroundShade};
+    background-color: ${LEGACY_COLORS.fundamentalsBackgroundShade};
   }
 
   &.active {
-    background-color: ${COLORS.white};
+    background-color: ${LEGACY_COLORS.white};
     border-top: ${BORDERS.lineBorder};
     border-left: ${BORDERS.lineBorder};
     border-right: ${BORDERS.lineBorder};
-    color: ${COLORS.blueEnabled};
+    color: ${LEGACY_COLORS.blueEnabled};
 
     &:hover {
-      color: ${COLORS.blueHover};
+      color: ${LEGACY_COLORS.blueHover};
     }
 
     /* extend below the tab when active to flow into the content */
@@ -81,7 +81,7 @@ const RoundNavLink = styled(NavLink)`
       position: ${POSITION_ABSOLUTE};
       display: ${DISPLAY_BLOCK};
       content: '';
-      background-color: ${COLORS.white};
+      background-color: ${LEGACY_COLORS.white};
       bottom: -1px;
       left: 0;
       height: 1px;
@@ -108,7 +108,7 @@ function RoundTab({
   return disabled ? (
     <>
       <StyledText
-        color={COLORS.successDisabled}
+        color={LEGACY_COLORS.successDisabled}
         css={baseRoundTabStyling}
         {...targetProps}
       >
@@ -238,8 +238,8 @@ function PageContents(props: PageContentsProps): JSX.Element {
         <RunPreviewTab robotName={robotName} runId={runId} />
       </Flex>
       <Box
-        backgroundColor={COLORS.white}
-        border={`1px ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
+        backgroundColor={LEGACY_COLORS.white}
+        border={`1px ${BORDERS.styleSolid} ${LEGACY_COLORS.medGreyEnabled}`}
         // remove left upper corner border radius when first tab is active
         borderRadius={`${
           protocolRunDetailsTab === 'setup'

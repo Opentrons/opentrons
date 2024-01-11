@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_FLEX_END,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -36,7 +36,7 @@ export function DeckFixtureSetupInstructionsModal({
   const modalHeader: ModalHeaderBaseProps = {
     title: t('deck_fixture_setup_instructions'),
     iconName: 'information',
-    iconColor: COLORS.darkBlack100,
+    iconColor: LEGACY_COLORS.darkBlack100,
     hasExitIcon: true,
     onClick: () => setShowSetupInstructionsModal(false),
   }

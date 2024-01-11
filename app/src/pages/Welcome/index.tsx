@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom'
 import {
   Flex,
   SPACING,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   JUSTIFY_CENTER,
   TYPOGRAPHY,
@@ -36,7 +36,7 @@ export function Welcome(): JSX.Element {
       <Flex justifyContent={JUSTIFY_CENTER}>
         <StyledText
           as="h4"
-          color={COLORS.darkBlack70}
+          color={LEGACY_COLORS.darkBlack70}
           textAlign={TYPOGRAPHY.textAlignCenter}
           width="39.875rem"
         >

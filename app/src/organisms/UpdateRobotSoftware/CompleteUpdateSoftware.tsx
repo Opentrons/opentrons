@@ -5,7 +5,7 @@ import {
   Flex,
   DIRECTION_COLUMN,
   SPACING,
-  COLORS,
+  LEGACY_COLORS,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
   Box,
@@ -28,7 +28,7 @@ export function CompleteUpdateSoftware({
     <Flex flexDirection={DIRECTION_COLUMN} width="100%">
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        backgroundColor={COLORS.darkBlack20}
+        backgroundColor={LEGACY_COLORS.darkBlack20}
         height="33rem"
         gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}
@@ -38,7 +38,7 @@ export function CompleteUpdateSoftware({
         <StyledText
           as="h2"
           fontWeight={TYPOGRAPHY.fontWeightBold}
-          color={COLORS.black}
+          color={LEGACY_COLORS.black}
         >
           {t('update_complete')}
         </StyledText>

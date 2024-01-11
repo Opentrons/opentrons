@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
-  COLORS,
+  LEGACY_COLORS,
   BORDERS,
   Flex,
   DIRECTION_COLUMN,
@@ -224,8 +224,8 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             &:hover {
               color: ${
                 downloadIsDisabled
-                  ? COLORS.darkGreyEnabled
-                  : COLORS.darkBlackEnabled
+                  ? LEGACY_COLORS.darkGreyEnabled
+                  : LEGACY_COLORS.darkBlackEnabled
               };
             }
             cursor: ${downloadIsDisabled ? 'default' : 'pointer'};
@@ -256,14 +256,14 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             }
             outerStyles={css`
               height: 0.375rem;
-              background-color: ${COLORS.medGreyEnabled};
+              background-color: ${LEGACY_COLORS.medGreyEnabled};
               border-radius: ${BORDERS.radiusSoftCorners};
               position: relative;
               overflow: initial;
             `}
             innerStyles={css`
               height: 0.375rem;
-              background-color: ${COLORS.darkGreyEnabled};
+              background-color: ${LEGACY_COLORS.darkGreyEnabled};
               border-radius: ${BORDERS.radiusSoftCorners};
             `}
           >

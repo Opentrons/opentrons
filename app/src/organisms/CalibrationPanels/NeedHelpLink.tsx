@@ -4,7 +4,7 @@ import {
   Flex,
   Link,
   Icon,
-  COLORS,
+  LEGACY_COLORS,
   TYPOGRAPHY,
   SIZE_1,
   ALIGN_CENTER,
@@ -23,7 +23,7 @@ export function NeedHelpLink(props: NeedHelpLinkProps): JSX.Element {
   return (
     <Flex alignItems={ALIGN_CENTER} {...flexProps}>
       <Icon
-        color={COLORS.darkGreyEnabled}
+        color={LEGACY_COLORS.darkGreyEnabled}
         size={SIZE_1}
         marginRight={SPACING.spacing4}
         name="question-mark-circle"

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { COLORS, Box } from '@opentrons/components'
+import { LEGACY_COLORS, Box } from '@opentrons/components'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
 
@@ -26,7 +26,7 @@ export function ProgressBar({
 
   const LINER_PROGRESS_CONTAINER_STYLE = css`
     height: 0.5rem;
-    background: ${COLORS.white};
+    background: ${LEGACY_COLORS.white};
     padding: 0;
     width: 100%;
     margin: 0;
@@ -38,7 +38,7 @@ export function ProgressBar({
   const LINER_PROGRESS_FILLER_STYLE = css`
     height: 0.5rem;
     width: ${progress};
-    background: ${COLORS.blueEnabled};
+    background: ${LEGACY_COLORS.blueEnabled};
     transition: width 0.5s ease-in-out;
     webkit-transition: width 0.5s ease-in-out;
     moz-transition: width 0.5s ease-in-out;

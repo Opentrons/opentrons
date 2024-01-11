@@ -7,7 +7,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   ALIGN_CENTER,
-  COLORS,
+  LEGACY_COLORS,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
@@ -35,7 +35,7 @@ export function TipConfirmation(props: TipConfirmationProps): JSX.Element {
   return isOnDevice ? (
     <SimpleWizardBody
       isSuccess={false}
-      iconColor={COLORS.warningEnabled}
+      iconColor={LEGACY_COLORS.warningEnabled}
       header={t('did_pipette_pick_up_tip')}
     >
       <Flex

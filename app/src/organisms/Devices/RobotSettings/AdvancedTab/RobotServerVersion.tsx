@@ -8,7 +8,7 @@ import {
   Box,
   SPACING,
   TYPOGRAPHY,
-  COLORS,
+  LEGACY_COLORS,
   Link,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
@@ -82,7 +82,7 @@ export function RobotServerVersion({
           <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
             <StyledText
               as="label"
-              color={COLORS.darkGreyEnabled}
+              color={LEGACY_COLORS.darkGreyEnabled}
               paddingRight={SPACING.spacing16}
             >
               {t('up_to_date')}

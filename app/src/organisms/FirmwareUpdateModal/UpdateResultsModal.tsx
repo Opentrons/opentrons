@@ -4,7 +4,7 @@ import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
@@ -34,7 +34,7 @@ export function UpdateResultsModal(
   const updateFailedHeader: ModalHeaderBaseProps = {
     title: t('update_failed'),
     iconName: 'ot-alert',
-    iconColor: COLORS.red2,
+    iconColor: LEGACY_COLORS.red2,
   }
   let instrumentName = 'instrument'
   if (instrument?.ok) {
@@ -75,16 +75,16 @@ export function UpdateResultsModal(
             <Flex
               height="11.5rem"
               width="100%"
-              backgroundColor={COLORS.green3}
+              backgroundColor={LEGACY_COLORS.green3}
               borderRadius={BORDERS.borderRadiusSize3}
               flexDirection={DIRECTION_COLUMN}
-              color={COLORS.darkBlack90}
+              color={LEGACY_COLORS.darkBlack90}
               padding={SPACING.spacing24}
               alignItems={ALIGN_CENTER}
             >
               <Icon
                 name="ot-check"
-                color={COLORS.green2}
+                color={LEGACY_COLORS.green2}
                 size="2.5rem"
                 marginBottom={SPACING.spacing16}
               />

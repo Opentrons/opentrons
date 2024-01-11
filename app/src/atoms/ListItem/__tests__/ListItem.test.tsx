@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   renderWithProviders,
   SPACING,
 } from '@opentrons/components'
@@ -26,7 +26,7 @@ describe('ListItem', () => {
     const [{ getByText, getByTestId }] = render(props)
     getByText('mock listitem content')
     const listItem = getByTestId('ListItem_error')
-    expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.red3}`)
+    expect(listItem).toHaveStyle(`backgroundColor: ${LEGACY_COLORS.red3}`)
     expect(listItem).toHaveStyle(
       `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
     )
@@ -37,7 +37,7 @@ describe('ListItem', () => {
     const [{ getByText, getByTestId }] = render(props)
     getByText('mock listitem content')
     const listItem = getByTestId('ListItem_noActive')
-    expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.light1}`)
+    expect(listItem).toHaveStyle(`backgroundColor: ${LEGACY_COLORS.light1}`)
     expect(listItem).toHaveStyle(
       `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
     )
@@ -48,7 +48,7 @@ describe('ListItem', () => {
     const [{ getByText, getByTestId }] = render(props)
     getByText('mock listitem content')
     const listItem = getByTestId('ListItem_success')
-    expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.green3}`)
+    expect(listItem).toHaveStyle(`backgroundColor: ${LEGACY_COLORS.green3}`)
     expect(listItem).toHaveStyle(
       `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
     )
@@ -59,7 +59,7 @@ describe('ListItem', () => {
     const [{ getByText, getByTestId }] = render(props)
     getByText('mock listitem content')
     const listItem = getByTestId('ListItem_warning')
-    expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.yellow3}`)
+    expect(listItem).toHaveStyle(`backgroundColor: ${LEGACY_COLORS.yellow3}`)
     expect(listItem).toHaveStyle(
       `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
     )

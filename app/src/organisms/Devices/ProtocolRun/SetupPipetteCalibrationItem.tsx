@@ -13,7 +13,7 @@ import {
   TOOLTIP_LEFT,
   TYPOGRAPHY,
   Link,
-  COLORS,
+  LEGACY_COLORS,
   SPACING,
   JUSTIFY_FLEX_END,
   WRAP,
@@ -70,7 +70,7 @@ export function SetupPipetteCalibrationItem({
             {t('pipette_mismatch')}
             <Link
               external
-              color={COLORS.darkBlackEnabled}
+              color={LEGACY_COLORS.darkBlackEnabled}
               fontSize={TYPOGRAPHY.fontSizeP}
               lineHeight={TYPOGRAPHY.lineHeight12}
               textDecoration={TYPOGRAPHY.textDecorationUnderline}

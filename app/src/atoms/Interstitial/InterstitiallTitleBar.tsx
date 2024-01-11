@@ -8,7 +8,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   Flex,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
@@ -36,8 +36,8 @@ export function InterstitialTitleBar(
   return (
     <Flex
       width="100%"
-      backgroundColor={COLORS.darkBlackEnabled}
-      color={COLORS.white}
+      backgroundColor={LEGACY_COLORS.darkBlackEnabled}
+      color={LEGACY_COLORS.white}
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       css={TITLE_BAR}
@@ -79,7 +79,7 @@ export function InterstitialTitleBar(
             paddingTop="3px"
             aria-label="close_btn"
           >
-            <Icon name="close" aria-label="close" color={COLORS.white} />
+            <Icon name="close" aria-label="close" color={LEGACY_COLORS.white} />
           </Btn>
         </Flex>
       )}

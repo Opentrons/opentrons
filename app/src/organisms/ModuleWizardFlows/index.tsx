@@ -5,7 +5,7 @@ import {
   useDeleteMaintenanceRunMutation,
   useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
-import { COLORS } from '@opentrons/components'
+import { LEGACY_COLORS } from '@opentrons/components'
 import {
   CreateCommand,
   getModuleType,
@@ -235,7 +235,7 @@ export const ModuleWizardFlows = (
     modalContent = (
       <SimpleWizardBody
         isSuccess={false}
-        iconColor={COLORS.errorEnabled}
+        iconColor={LEGACY_COLORS.errorEnabled}
         header={t(
           prepCommandErrorMessage != null
             ? 'error_prepping_module'

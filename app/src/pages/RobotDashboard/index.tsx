@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
@@ -66,7 +66,7 @@ export function RobotDashboard(): JSX.Element {
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={COLORS.darkBlack70}
+          color={LEGACY_COLORS.darkBlack70}
         >
           {t('run_again')}
         </StyledText>

@@ -7,7 +7,7 @@ import {
   RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
-  COLORS,
+  LEGACY_COLORS,
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_FLEX_END,
   ALIGN_CENTER,
@@ -34,7 +34,7 @@ export const ProbeNotAttached = (
     <SimpleWizardBody
       header={t('unable_to_detect_probe')}
       subHeader={numberOfTryAgains > 2 ? t('something_seems_wrong') : undefined}
-      iconColor={COLORS.errorEnabled}
+      iconColor={LEGACY_COLORS.errorEnabled}
       isSuccess={false}
     >
       <Flex
@@ -80,7 +80,7 @@ const ALIGN_BUTTONS = css`
 `
 const GO_BACK_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.darkGreyEnabled};
+  color: ${LEGACY_COLORS.darkGreyEnabled};
   padding-left: ${SPACING.spacing32};
 
   &:hover {

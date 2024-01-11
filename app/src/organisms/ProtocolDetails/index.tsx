@@ -17,7 +17,7 @@ import {
   Link,
   ALIGN_CENTER,
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
@@ -84,16 +84,16 @@ const GRID_STYLE = css`
 const ZOOM_ICON_STYLE = css`
   border-radius: ${BORDERS.radiusSoftCorners};
   &:hover {
-    background: ${COLORS.lightGreyHover};
+    background: ${LEGACY_COLORS.lightGreyHover};
   }
   &:active {
-    background: ${COLORS.lightGreyPressed};
+    background: ${LEGACY_COLORS.lightGreyPressed};
   }
   &:disabled {
-    background: ${COLORS.white};
+    background: ${LEGACY_COLORS.white};
   }
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
+    box-shadow: 0 0 0 3px ${LEGACY_COLORS.fundamentalsFocus};
   }
 `
 
@@ -327,9 +327,9 @@ export function ProtocolDetails(
   const deckMap = <ProtocolDeck protocolAnalysis={mostRecentAnalysis} />
 
   const deckViewByAnalysisStatus = {
-    missing: <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />,
-    loading: <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />,
-    error: <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />,
+    missing: <Box size="14rem" backgroundColor={LEGACY_COLORS.medGreyEnabled} />,
+    loading: <Box size="14rem" backgroundColor={LEGACY_COLORS.medGreyEnabled} />,
+    error: <Box size="14rem" backgroundColor={LEGACY_COLORS.medGreyEnabled} />,
     complete: (
       <Box size="14rem" height="auto">
         {deckMap}
@@ -386,8 +386,8 @@ export function ProtocolDetails(
           />
 
           <Flex
-            backgroundColor={COLORS.white}
-            border={`1px solid ${COLORS.medGreyEnabled}`}
+            backgroundColor={LEGACY_COLORS.white}
+            border={`1px solid ${LEGACY_COLORS.medGreyEnabled}`}
             borderRadius={BORDERS.radiusSoftCorners}
             position={POSITION_RELATIVE}
             flexDirection={DIRECTION_ROW}
@@ -421,7 +421,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_creationMethod"
                 >
-                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  <StyledText as="h6" color={LEGACY_COLORS.darkGreyEnabled}>
                     {t('creation_method')}
                   </StyledText>
                   <StyledText as="p">
@@ -434,7 +434,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_lastUpdated"
                 >
-                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  <StyledText as="h6" color={LEGACY_COLORS.darkGreyEnabled}>
                     {t('last_updated')}
                   </StyledText>
                   <StyledText as="p">
@@ -447,7 +447,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_lastAnalyzed"
                 >
-                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  <StyledText as="h6" color={LEGACY_COLORS.darkGreyEnabled}>
                     {t('last_analyzed')}
                   </StyledText>
                   <StyledText as="p">
@@ -477,7 +477,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_author"
                 >
-                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  <StyledText as="h6" color={LEGACY_COLORS.darkGreyEnabled}>
                     {t('org_or_author')}
                   </StyledText>
                   <StyledText
@@ -494,7 +494,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_description"
                 >
-                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  <StyledText as="h6" color={LEGACY_COLORS.darkGreyEnabled}>
                     {t('description')}
                   </StyledText>
                   {analysisStatus === 'loading' ? (
@@ -534,8 +534,8 @@ export function ProtocolDetails(
             <Flex
               flex={`0 0 ${String(SIZE_5)}`}
               flexDirection={DIRECTION_COLUMN}
-              backgroundColor={COLORS.white}
-              border={`1px solid ${String(COLORS.medGreyEnabled)}`}
+              backgroundColor={LEGACY_COLORS.white}
+              border={`1px solid ${String(LEGACY_COLORS.medGreyEnabled)}`}
               borderRadius={BORDERS.radiusSoftCorners}
               height="100%"
               data-testid="ProtocolDetails_deckMap"
@@ -561,7 +561,7 @@ export function ProtocolDetails(
                   <Icon name="union" size={SIZE_1} />
                 </Btn>
               </Flex>
-              <Box padding={SPACING.spacing16} backgroundColor={COLORS.white}>
+              <Box padding={SPACING.spacing16} backgroundColor={LEGACY_COLORS.white}>
                 {deckViewByAnalysisStatus[analysisStatus]}
               </Box>
             </Flex>
@@ -615,7 +615,7 @@ export function ProtocolDetails(
                 )}
               </Flex>
               <Box
-                backgroundColor={COLORS.white}
+                backgroundColor={LEGACY_COLORS.white}
                 border={BORDERS.lineBorder}
                 // remove left upper corner border radius when first tab is active
                 borderRadius={`${

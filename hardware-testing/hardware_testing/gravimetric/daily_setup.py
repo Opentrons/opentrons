@@ -29,7 +29,7 @@ MOVE_MINI_MM = 5
 
 WALKING_SECONDS = 15
 
-COLORS = {
+LEGACY_COLORS = {
     "white": StatusBarState.IDLE,
     "green": StatusBarState.RUNNING,
     "yellow": StatusBarState.SOFTWARE_ERROR,
@@ -42,12 +42,12 @@ COLORS = {
     "disco-quick": StatusBarState.DISCO,
 }
 COLOR_STATES = {
-    "idle": COLORS["white"],
-    "interact": COLORS["white-pulsing"],
-    "stable": COLORS["yellow"],
-    "walking": COLORS["blue-pulsing"],
-    "fail": COLORS["red-flashing"],
-    "pass": COLORS["green"],
+    "idle": LEGACY_COLORS["white"],
+    "interact": LEGACY_COLORS["white-pulsing"],
+    "stable": LEGACY_COLORS["yellow"],
+    "walking": LEGACY_COLORS["blue-pulsing"],
+    "fail": LEGACY_COLORS["red-flashing"],
+    "pass": LEGACY_COLORS["green"],
 }
 
 

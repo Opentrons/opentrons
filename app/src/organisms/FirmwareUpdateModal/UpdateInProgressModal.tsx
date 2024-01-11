@@ -4,7 +4,7 @@ import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
@@ -21,7 +21,7 @@ interface UpdateInProgressModalProps {
 }
 
 const OUTER_STYLES = css`
-  background: ${COLORS.medGreyEnabled};
+  background: ${LEGACY_COLORS.medGreyEnabled};
   width: 100%;
 `
 
@@ -36,7 +36,7 @@ export function UpdateInProgressModal(
       <Flex
         height="17.25rem"
         width="100%"
-        backgroundColor={COLORS.darkBlack20}
+        backgroundColor={LEGACY_COLORS.darkBlack20}
         borderRadius={BORDERS.borderRadiusSize3}
         flexDirection={DIRECTION_COLUMN}
         padding={SPACING.spacing32}

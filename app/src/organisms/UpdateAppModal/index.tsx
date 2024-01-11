@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   SPACING,
   Flex,
@@ -80,7 +80,7 @@ const UpdateAppBanner = styled(Banner)`
 const UPDATE_PROGRESS_BAR_STYLE = css`
   margin-top: ${SPACING.spacing24};
   border-radius: ${BORDERS.borderRadiusSize3};
-  background: ${COLORS.medGreyEnabled};
+  background: ${LEGACY_COLORS.medGreyEnabled};
   width: 17.12rem;
 `
 const LEGACY_MODAL_STYLE = css`

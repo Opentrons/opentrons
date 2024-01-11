@@ -8,7 +8,7 @@ import {
   DIRECTION_COLUMN,
   SIZE_6,
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -106,7 +106,7 @@ export function RobotSettings(): JSX.Element | null {
   return (
     <Box minWidth={SIZE_6} height="max-content" padding={SPACING.spacing16}>
       <Flex
-        backgroundColor={COLORS.white}
+        backgroundColor={LEGACY_COLORS.white}
         border={BORDERS.lineBorder}
         borderRadius={BORDERS.radiusSoftCorners}
         flexDirection={DIRECTION_COLUMN}
@@ -116,7 +116,7 @@ export function RobotSettings(): JSX.Element | null {
       >
         <Box paddingX={SPACING.spacing16}>
           <Box
-            color={COLORS.black}
+            color={LEGACY_COLORS.black}
             css={TYPOGRAPHY.h1Default}
             padding={`${SPACING.spacing24} 0`}
           >

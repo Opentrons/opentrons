@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {
-  COLORS,
+  LEGACY_COLORS,
   TYPOGRAPHY,
   Tooltip as SharedTooltip,
 } from '@opentrons/components'
@@ -21,7 +21,7 @@ export function Tooltip(props: TooltipProps): JSX.Element {
   return (
     <SharedTooltip
       {...tooltipProps}
-      backgroundColor={COLORS.darkBlackEnabled}
+      backgroundColor={LEGACY_COLORS.darkBlackEnabled}
       fontSize={TYPOGRAPHY.fontSizeCaption}
       width={width}
       {...styleProps}

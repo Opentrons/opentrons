@@ -2,7 +2,7 @@ import * as React from 'react'
 import capitalize from 'lodash/capitalize'
 import { useTranslation } from 'react-i18next'
 import {
-  COLORS,
+  LEGACY_COLORS,
   SPACING,
   TYPOGRAPHY,
   SecondaryButton,
@@ -42,7 +42,7 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
 
   return (
     <SimpleWizardBody
-      iconColor={COLORS.warningEnabled}
+      iconColor={LEGACY_COLORS.warningEnabled}
       header={t('progress_will_be_lost', { flow: flowTitle })}
       subHeader={t('are_you_sure_exit', { flow: flowTitle })}
       isSuccess={false}

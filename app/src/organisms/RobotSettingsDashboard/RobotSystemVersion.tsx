@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import {
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -79,7 +79,7 @@ export function RobotSystemVersion({
               {t('view_latest_release_notes_at', { url: GITHUB_URL })}
             </StyledText>
             <Flex
-              backgroundColor={COLORS.light1}
+              backgroundColor={LEGACY_COLORS.light1}
               flexDirection={DIRECTION_ROW}
               padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
               justifyContent={JUSTIFY_SPACE_BETWEEN}

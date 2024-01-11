@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import {
-  COLORS,
+  LEGACY_COLORS,
   JUSTIFY_FLEX_END,
   PrimaryButton,
   RESPONSIVENESS,
@@ -44,7 +44,7 @@ export const Success = (
     <SimpleWizardBody
       header={t('successfully_calibrated', { module: moduleDisplayName })}
       // TODO: iconColor unused, change SimpleWizardBody props interface
-      iconColor={COLORS.errorEnabled}
+      iconColor={LEGACY_COLORS.errorEnabled}
       isSuccess
       justifyContentForOddButton={JUSTIFY_FLEX_END}
     >

@@ -6,7 +6,7 @@ import {
   useHoverTooltip,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
-  COLORS,
+  LEGACY_COLORS,
   SPACING,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
@@ -68,10 +68,10 @@ export function Tick(props: TickProps): JSX.Element {
       {...targetProps}
       cursor="pointer"
       onClick={makeHandleJumpToStep(index)}
-      backgroundColor={COLORS.white}
+      backgroundColor={LEGACY_COLORS.white}
       fontSize="9px"
       borderRadius="4px"
-      border={`${COLORS.blueEnabled} 1px solid`}
+      border={`${LEGACY_COLORS.blueEnabled} 1px solid`}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
       height="0.75rem"

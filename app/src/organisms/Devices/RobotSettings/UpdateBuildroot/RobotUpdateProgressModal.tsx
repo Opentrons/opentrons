@@ -9,7 +9,7 @@ import {
   NewPrimaryBtn,
   JUSTIFY_FLEX_END,
   ALIGN_CENTER,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   SPACING,
   BORDERS,
@@ -37,11 +37,11 @@ const UPDATE_PROGRESS_BAR_STYLE = css`
   margin-top: ${SPACING.spacing24};
   margin-bottom: ${SPACING.spacing24};
   border-radius: ${BORDERS.borderRadiusSize3};
-  background: ${COLORS.medGreyEnabled};
+  background: ${LEGACY_COLORS.medGreyEnabled};
   width: 17.12rem;
 `
 const UPDATE_TEXT_STYLE = css`
-  color: ${COLORS.darkGreyEnabled};
+  color: ${LEGACY_COLORS.darkGreyEnabled};
   font-size: 0.8rem;
 `
 const HIDDEN_CSS = css`
@@ -217,7 +217,7 @@ function SuccessOrError({ errorMessage }: SuccessOrErrorProps): JSX.Element {
       <Icon
         name="alert-circle"
         height="40px"
-        color={COLORS.errorEnabled}
+        color={LEGACY_COLORS.errorEnabled}
         margin={SPACING.spacing24}
       />
     )

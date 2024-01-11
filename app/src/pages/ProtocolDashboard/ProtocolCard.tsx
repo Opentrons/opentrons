@@ -10,7 +10,7 @@ import {
   ALIGN_CENTER,
   ALIGN_END,
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -146,15 +146,15 @@ export function ProtocolCard(props: {
       background-color: ${longpress.isLongPressed
         ? ''
         : isFailedAnalysis
-        ? COLORS.red3Pressed
-        : COLORS.darkBlack40};
+        ? LEGACY_COLORS.red3Pressed
+        : LEGACY_COLORS.darkBlack40};
     }
   `
 
   return (
     <Flex
       alignItems={isFailedAnalysis ? ALIGN_END : ALIGN_CENTER}
-      backgroundColor={isFailedAnalysis ? COLORS.red3 : COLORS.light1}
+      backgroundColor={isFailedAnalysis ? LEGACY_COLORS.red3 : LEGACY_COLORS.light1}
       borderRadius={BORDERS.borderRadiusSize4}
       marginBottom={SPACING.spacing8}
       gridGap={SPACING.spacing48}
@@ -181,7 +181,7 @@ export function ProtocolCard(props: {
       >
         {isFailedAnalysis ? (
           <Flex
-            color={COLORS.red1}
+            color={LEGACY_COLORS.red1}
             flexDirection={DIRECTION_ROW}
             gridGap={SPACING.spacing8}
           >
@@ -204,7 +204,7 @@ export function ProtocolCard(props: {
         </StyledText>
       </Flex>
       <Flex width="9.25rem">
-        <StyledText as="p" color={COLORS.darkBlack70}>
+        <StyledText as="p" color={LEGACY_COLORS.darkBlack70}>
           {lastRun != null
             ? formatDistance(new Date(lastRun), new Date(), {
                 addSuffix: true,
@@ -213,7 +213,7 @@ export function ProtocolCard(props: {
         </StyledText>
       </Flex>
       <Flex width="12.5rem" whiteSpace="nowrap">
-        <StyledText as="p" color={COLORS.darkBlack70}>
+        <StyledText as="p" color={LEGACY_COLORS.darkBlack70}>
           {formatTimeWithUtcLabel(protocol.createdAt)}
         </StyledText>
         {longpress.isLongPressed && !isFailedAnalysis && (

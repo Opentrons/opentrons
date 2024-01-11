@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
-  COLORS,
+  LEGACY_COLORS,
   Flex,
   SPACING,
   JUSTIFY_CENTER,
@@ -99,7 +99,7 @@ export const ProtocolRunModuleControls = ({
     <Flex justifyContent={JUSTIFY_CENTER}>
       <StyledText
         as="p"
-        color={COLORS.darkGreyEnabled}
+        color={LEGACY_COLORS.darkGreyEnabled}
         marginY={SPACING.spacing16}
       >
         {t('connect_modules_to_see_controls')}

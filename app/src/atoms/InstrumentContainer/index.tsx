@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { Flex, BORDERS, COLORS, SPACING } from '@opentrons/components'
+import { Flex, BORDERS, LEGACY_COLORS, SPACING } from '@opentrons/components'
 
 import { StyledText } from '../text'
 
@@ -16,7 +16,7 @@ export const InstrumentContainer = (
 
   return (
     <Flex
-      backgroundColor={COLORS.fundamentalsBackgroundShade}
+      backgroundColor={LEGACY_COLORS.fundamentalsBackgroundShade}
       borderRadius={BORDERS.radiusSoftCorners}
       paddingX={SPACING.spacing8}
       paddingY={SPACING.spacing2}

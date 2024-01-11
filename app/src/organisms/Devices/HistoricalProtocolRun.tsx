@@ -8,7 +8,7 @@ import {
   Box,
   Icon,
   SPACING,
-  COLORS,
+  LEGACY_COLORS,
   JUSTIFY_SPACE_AROUND,
   ALIGN_CENTER,
   BORDERS,
@@ -68,7 +68,7 @@ export function HistoricalProtocolRun(
         padding={SPACING.spacing8}
         borderTop={BORDERS.lineBorder}
         backgroundColor={
-          run.status === 'running' ? COLORS.lightBlue : COLORS.white
+          run.status === 'running' ? LEGACY_COLORS.lightBlue : LEGACY_COLORS.white
         }
         width="100%"
       >
@@ -129,7 +129,7 @@ export function HistoricalProtocolRun(
           {runStatus === 'running' && (
             <Icon
               name="circle"
-              color={COLORS.blueEnabled}
+              color={LEGACY_COLORS.blueEnabled}
               size={SPACING.spacing4}
               marginX={SPACING.spacing4}
               marginBottom={SPACING.spacing4}

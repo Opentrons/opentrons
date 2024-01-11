@@ -3,7 +3,7 @@ import { Redirect } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
@@ -35,7 +35,7 @@ export function InitialLoadingScreen(): JSX.Element {
 
   return (
     <Flex
-      backgroundColor={COLORS.darkBlack20}
+      backgroundColor={LEGACY_COLORS.darkBlack20}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing40}
       alignItems={ALIGN_CENTER}
@@ -47,7 +47,7 @@ export function InitialLoadingScreen(): JSX.Element {
         name="ot-spinner"
         size="160px"
         spin
-        color={COLORS.darkBlack70}
+        color={LEGACY_COLORS.darkBlack70}
         aria-label="InitialLoadingScreen-spinner"
       />
       {targetPath != null && <Redirect exact from="/" to={targetPath} />}

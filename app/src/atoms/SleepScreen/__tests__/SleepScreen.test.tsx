@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { renderWithProviders, COLORS } from '@opentrons/components'
+import { renderWithProviders, LEGACY_COLORS } from '@opentrons/components'
 
 import { SleepScreen } from '..'
 
@@ -14,6 +14,6 @@ describe('SleepScreen', () => {
     const touchScreen = getByTestId('Touchscreen_SleepScreen')
     expect(touchScreen).toHaveStyle('width: 100vw')
     expect(touchScreen).toHaveStyle('height: 100vh')
-    expect(touchScreen).toHaveStyle(`background-color: ${COLORS.black}`)
+    expect(touchScreen).toHaveStyle(`background-color: ${LEGACY_COLORS.black}`)
   })
 })

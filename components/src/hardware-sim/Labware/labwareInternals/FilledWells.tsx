@@ -1,6 +1,6 @@
 import * as React from 'react'
 import map from 'lodash/map'
-import { COLORS } from '../../../ui-style-constants'
+import { LEGACY_COLORS } from '../../../ui-style-constants'
 import { Well } from './Well'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { CSSProperties } from 'styled-components'
@@ -23,7 +23,7 @@ function FilledWellsComponent(props: FilledWellsProps): JSX.Element {
               wellName={wellName}
               well={definition.wells[wellName]}
               fill={color}
-              stroke={COLORS.black}
+              stroke={LEGACY_COLORS.black}
               strokeWidth="0.6"
             />
           )

@@ -10,7 +10,7 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
-  COLORS,
+  LEGACY_COLORS,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -49,10 +49,10 @@ const COLLAPSED_STYLE = css`
 const ACCORDION_STYLE = css`
   border-radius: 50%;
   &:hover {
-    background: ${COLORS.lightGreyHover};
+    background: ${LEGACY_COLORS.lightGreyHover};
   }
   &:active {
-    background: ${COLORS.lightGreyPressed};
+    background: ${LEGACY_COLORS.lightGreyPressed};
   }
 `
 export function SetupStep({
@@ -79,7 +79,7 @@ export function SetupStep({
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText
-                color={COLORS.darkGreyEnabled}
+                color={LEGACY_COLORS.darkGreyEnabled}
                 css={TYPOGRAPHY.h6SemiBold}
                 marginBottom={SPACING.spacing2}
                 id={`CollapsibleStep_${label}`}
@@ -87,7 +87,7 @@ export function SetupStep({
                 {label}
               </StyledText>
               <StyledText
-                color={COLORS.darkBlackEnabled}
+                color={LEGACY_COLORS.darkBlackEnabled}
                 css={TYPOGRAPHY.h3SemiBold}
                 marginBottom={SPACING.spacing4}
                 id={`CollapsibleStep_${String(title)}`}
@@ -96,7 +96,7 @@ export function SetupStep({
               </StyledText>
               <StyledText
                 as="p"
-                color={COLORS.darkBlackEnabled}
+                color={LEGACY_COLORS.darkBlackEnabled}
                 id={`CollapsibleStep_${description}`}
               >
                 {description}
@@ -105,7 +105,7 @@ export function SetupStep({
             <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_ROW}>
               {rightElement}
               <Icon
-                color={COLORS.darkBlackEnabled}
+                color={LEGACY_COLORS.darkBlackEnabled}
                 size="1.5rem"
                 css={ACCORDION_STYLE}
                 name={expanded ? 'minus' : 'plus'}

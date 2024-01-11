@@ -2,39 +2,39 @@ import styled, { css } from 'styled-components'
 import {
   Btn,
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   SPACING,
   styleProps,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 const SELECTED_STYLE = css`
-  background-color: ${COLORS.highlightPurple1};
-  color: ${COLORS.white};
+  background-color: ${LEGACY_COLORS.highlightPurple1};
+  color: ${LEGACY_COLORS.white};
 
   &:focus,
   &:hover {
-    background-color: ${COLORS.highlightPurple1};
+    background-color: ${LEGACY_COLORS.highlightPurple1};
     box-shadow: none;
   }
 
   &:active {
-    background-color: ${COLORS.highlightPurple1Pressed};
+    background-color: ${LEGACY_COLORS.highlightPurple1Pressed};
   }
 `
 
 const UNSELECTED_STYLE = css`
-  background-color: ${COLORS.highlightPurple2};
-  color: ${COLORS.darkBlack100};
+  background-color: ${LEGACY_COLORS.highlightPurple2};
+  color: ${LEGACY_COLORS.darkBlack100};
 
   &:focus,
   &:hover {
-    background-color: ${COLORS.highlightPurple2};
+    background-color: ${LEGACY_COLORS.highlightPurple2};
     box-shadow: none;
   }
 
   &:active {
-    background-color: ${COLORS.highlightPurple2Pressed};
+    background-color: ${LEGACY_COLORS.highlightPurple2Pressed};
   }
 `
 
@@ -58,11 +58,11 @@ export const TabbedButton = styled(Btn)<TabbedButtonProps>`
       ${styleProps}
 
       &:focus-visible {
-        box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
+        box-shadow: 0 0 0 3px ${LEGACY_COLORS.fundamentalsFocus};
       }
       &:disabled {
-        background-color: ${COLORS.darkBlack20};
-        color: ${COLORS.darkBlack60};
+        background-color: ${LEGACY_COLORS.darkBlack20};
+        color: ${LEGACY_COLORS.darkBlack60};
       }
     `}
 `

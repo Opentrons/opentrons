@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {
   Flex,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   SPACING,
   TYPOGRAPHY,
@@ -48,7 +48,7 @@ const Template: Story<BorderRadiusStorybookProps> = args => {
           <Box
             width="10rem"
             height="4rem"
-            backgroundColor={COLORS.blueEnabled}
+            backgroundColor={LEGACY_COLORS.blueEnabled}
             borderRadius={br[1]}
           />
         </Flex>

@@ -7,7 +7,7 @@ import {
 import {
   ALIGN_CENTER,
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   Flex,
   JUSTIFY_CENTER,
   RobotCoordinateSpace,
@@ -31,9 +31,9 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
   const slotFill = (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={COLORS.grey2}
+      backgroundColor={LEGACY_COLORS.grey2}
       borderRadius={BORDERS.radiusSoftCorners}
-      color={COLORS.white}
+      color={LEGACY_COLORS.white}
       gridGap={SPACING.spacing8}
       justifyContent={JUSTIFY_CENTER}
       width="100%"
@@ -49,8 +49,8 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
           key={cutout.id}
           cutoutId={cutout.id}
           deckDefinition={deckDef}
-          slotClipColor={COLORS.transparent}
-          fixtureBaseColor={COLORS.light1}
+          slotClipColor={LEGACY_COLORS.transparent}
+          fixtureBaseColor={LEGACY_COLORS.light1}
         />
       ))}
       {selectedSlots.map((selectedSlot, index) => {

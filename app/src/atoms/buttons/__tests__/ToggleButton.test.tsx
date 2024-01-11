@@ -1,7 +1,7 @@
 import 'jest-styled-components'
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders, COLORS, SIZE_2 } from '@opentrons/components'
+import { renderWithProviders, LEGACY_COLORS, SIZE_2 } from '@opentrons/components'
 
 import { ToggleButton } from '..'
 
@@ -27,7 +27,7 @@ describe('ToggleButton', () => {
   it('renders toggle button - on', () => {
     const { getByLabelText } = render(props)
     const button = getByLabelText('toggle button')
-    expect(button).toHaveStyle(`color: ${String(COLORS.blueEnabled)}`)
+    expect(button).toHaveStyle(`color: ${String(LEGACY_COLORS.blueEnabled)}`)
     expect(button).toHaveStyle(`height: ${String(SIZE_2)}`)
     expect(button).toHaveStyle(`width: ${String(SIZE_2)}`)
     expect(button).toHaveAttribute('aria-checked', 'true')
@@ -36,7 +36,7 @@ describe('ToggleButton', () => {
   it('applies the correct states to the toggle on- hover', () => {
     const { getByLabelText } = render(props)
     const button = getByLabelText('toggle button')
-    expect(button).toHaveStyleRule('color', `${String(COLORS.blueHover)}`, {
+    expect(button).toHaveStyleRule('color', `${String(LEGACY_COLORS.blueHover)}`, {
       modifier: ':hover',
     })
   })
@@ -46,7 +46,7 @@ describe('ToggleButton', () => {
     const button = getByLabelText('toggle button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${String(COLORS.warningEnabled)}`,
+      `0 0 0 3px ${String(LEGACY_COLORS.warningEnabled)}`,
       {
         modifier: ':focus-visible',
       }
@@ -59,7 +59,7 @@ describe('ToggleButton', () => {
     const button = getByLabelText('toggle button')
     expect(button).toHaveStyleRule(
       'color',
-      `${String(COLORS.darkGreyDisabled)}`,
+      `${String(LEGACY_COLORS.darkGreyDisabled)}`,
       {
         modifier: ':disabled',
       }
@@ -77,7 +77,7 @@ describe('ToggleButton', () => {
     props.toggledOn = false
     const { getByLabelText } = render(props)
     const button = getByLabelText('toggle button')
-    expect(button).toHaveStyle(`color: ${String(COLORS.darkGreyEnabled)}`)
+    expect(button).toHaveStyle(`color: ${String(LEGACY_COLORS.darkGreyEnabled)}`)
     expect(button).toHaveStyle(`height: ${String(SIZE_2)}`)
     expect(button).toHaveStyle(`width: ${String(SIZE_2)}`)
     expect(button).toHaveAttribute('aria-checked', 'false')
@@ -87,7 +87,7 @@ describe('ToggleButton', () => {
     props.toggledOn = false
     const { getByLabelText } = render(props)
     const button = getByLabelText('toggle button')
-    expect(button).toHaveStyleRule('color', `${String(COLORS.darkGreyHover)}`, {
+    expect(button).toHaveStyleRule('color', `${String(LEGACY_COLORS.darkGreyHover)}`, {
       modifier: ':hover',
     })
   })
@@ -98,7 +98,7 @@ describe('ToggleButton', () => {
     const button = getByLabelText('toggle button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${String(COLORS.warningEnabled)}`,
+      `0 0 0 3px ${String(LEGACY_COLORS.warningEnabled)}`,
       {
         modifier: ':focus-visible',
       }
@@ -112,7 +112,7 @@ describe('ToggleButton', () => {
     const button = getByLabelText('toggle button')
     expect(button).toHaveStyleRule(
       'color',
-      `${String(COLORS.darkGreyDisabled)}`,
+      `${String(LEGACY_COLORS.darkGreyDisabled)}`,
       {
         modifier: ':disabled',
       }

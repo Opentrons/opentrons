@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
-  COLORS,
+  LEGACY_COLORS,
   Flex,
   Btn,
   JUSTIFY_SPACE_BETWEEN,
@@ -28,7 +28,7 @@ import type { GripperData } from '@opentrons/api-client'
 
 const GO_BACK_BUTTON_TEXT_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.darkGreyEnabled};
+  color: ${LEGACY_COLORS.darkGreyEnabled};
 
   &:hover {
     opacity: 70%;
@@ -99,7 +99,7 @@ export const UnmountGripper = (
     )
   return showGripperStillDetected ? (
     <SimpleWizardBody
-      iconColor={COLORS.errorEnabled}
+      iconColor={LEGACY_COLORS.errorEnabled}
       header={t('gripper_still_attached')}
       isSuccess={false}
     >

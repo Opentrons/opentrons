@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { COLORS, renderWithProviders } from '@opentrons/components'
+import { LEGACY_COLORS, renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
 import { DisplaySearchNetwork } from '../DisplaySearchNetwork'
@@ -16,7 +16,7 @@ describe('SearchNetwork', () => {
     const [{ getByText, getByTestId }] = render()
     getByText('Searching for networks...')
     expect(getByTestId('Display-Search-Network-text')).toHaveStyle(
-      `background-color: ${COLORS.white}`
+      `background-color: ${LEGACY_COLORS.white}`
     )
   })
 })

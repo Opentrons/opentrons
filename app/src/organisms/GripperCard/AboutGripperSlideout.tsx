@@ -6,7 +6,7 @@ import {
   SPACING,
   PrimaryButton,
   TYPOGRAPHY,
-  COLORS,
+  LEGACY_COLORS,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { Slideout } from '../../atoms/Slideout'
@@ -45,7 +45,7 @@ export const AboutGripperSlideout = (
             <StyledText
               as="h6"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={COLORS.darkGreyEnabled}
+              color={LEGACY_COLORS.darkGreyEnabled}
             >
               {i18n.format(t('current_version'), 'upperCase')}
             </StyledText>
@@ -61,7 +61,7 @@ export const AboutGripperSlideout = (
         <StyledText
           as="h6"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={COLORS.darkGreyEnabled}
+          color={LEGACY_COLORS.darkGreyEnabled}
         >
           {i18n.format(t('serial_number'), 'upperCase')}
         </StyledText>

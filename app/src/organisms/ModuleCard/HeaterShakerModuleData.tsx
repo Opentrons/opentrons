@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   SPACING,
   Icon,
@@ -36,35 +36,35 @@ export const HeaterShakerModuleData = (
     status: SpeedStatus | TemperatureStatus
   ): { backgroundColor: string; iconColor: string; textColor: string } => {
     const StatusLabelProps = {
-      backgroundColor: COLORS.medGreyEnabled,
-      iconColor: COLORS.darkGreyEnabled,
-      textColor: COLORS.bluePressed,
+      backgroundColor: LEGACY_COLORS.medGreyEnabled,
+      iconColor: LEGACY_COLORS.darkGreyEnabled,
+      textColor: LEGACY_COLORS.bluePressed,
       pulse: false,
     }
 
     switch (status) {
       case 'idle': {
-        StatusLabelProps.backgroundColor = COLORS.medGreyEnabled
-        StatusLabelProps.iconColor = COLORS.darkGreyEnabled
-        StatusLabelProps.textColor = COLORS.darkBlackEnabled
+        StatusLabelProps.backgroundColor = LEGACY_COLORS.medGreyEnabled
+        StatusLabelProps.iconColor = LEGACY_COLORS.darkGreyEnabled
+        StatusLabelProps.textColor = LEGACY_COLORS.darkBlackEnabled
         break
       }
       case 'holding at target': {
-        StatusLabelProps.backgroundColor = COLORS.medBlue
-        StatusLabelProps.iconColor = COLORS.blueEnabled
+        StatusLabelProps.backgroundColor = LEGACY_COLORS.medBlue
+        StatusLabelProps.iconColor = LEGACY_COLORS.blueEnabled
         break
       }
       case 'error': {
-        StatusLabelProps.backgroundColor = COLORS.warningBackgroundLight
-        StatusLabelProps.iconColor = COLORS.warningEnabled
-        StatusLabelProps.textColor = COLORS.warningText
+        StatusLabelProps.backgroundColor = LEGACY_COLORS.warningBackgroundLight
+        StatusLabelProps.iconColor = LEGACY_COLORS.warningEnabled
+        StatusLabelProps.textColor = LEGACY_COLORS.warningText
         break
       }
       case 'heating':
       case 'cooling':
       case 'slowing down':
       case 'speeding up': {
-        StatusLabelProps.backgroundColor = COLORS.blueEnabled + '1A'
+        StatusLabelProps.backgroundColor = LEGACY_COLORS.blueEnabled + '1A'
         StatusLabelProps.pulse = true
         break
       }
@@ -114,7 +114,7 @@ export const HeaterShakerModuleData = (
         >
           <StyledText
             textTransform={TYPOGRAPHY.textTransformUppercase}
-            color={COLORS.darkGreyEnabled}
+            color={LEGACY_COLORS.darkGreyEnabled}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH6}
             marginTop={SPACING.spacing8}
@@ -148,7 +148,7 @@ export const HeaterShakerModuleData = (
       >
         <StyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={COLORS.darkGreyEnabled}
+          color={LEGACY_COLORS.darkGreyEnabled}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           fontSize={TYPOGRAPHY.fontSizeH6}
           marginTop={SPACING.spacing8}
@@ -184,7 +184,7 @@ export const HeaterShakerModuleData = (
         <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText
             textTransform={TYPOGRAPHY.textTransformUppercase}
-            color={COLORS.darkGreyEnabled}
+            color={LEGACY_COLORS.darkGreyEnabled}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH6}
             marginTop={SPACING.spacing8}

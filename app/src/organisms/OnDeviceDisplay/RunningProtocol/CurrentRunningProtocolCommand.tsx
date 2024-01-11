@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 import {
   Flex,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_ROW,
   SPACING,
   TYPOGRAPHY,
@@ -55,7 +55,7 @@ to {
 `
 
 const TITLE_TEXT_STYLE = css`
-  color: ${COLORS.darkBlack70};
+  color: ${LEGACY_COLORS.darkBlack70};
   font-size: 1.75rem;
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   line-height: 2.25rem;
@@ -71,7 +71,7 @@ const RUN_TIMER_STYLE = css`
   font-size: 2rem;
   font-weight: ${TYPOGRAPHY.fontWeightBold};
   line-height: 2.625rem;
-  color: ${COLORS.darkBlackEnabled};
+  color: ${LEGACY_COLORS.darkBlackEnabled};
 `
 
 const COMMAND_ROW_STYLE_ANIMATED = css`
@@ -225,7 +225,7 @@ export function CurrentRunningProtocolCommand({
       </Flex>
       <Flex
         padding={`${SPACING.spacing12} ${SPACING.spacing24}`}
-        backgroundColor={COLORS.mediumBlueEnabled}
+        backgroundColor={LEGACY_COLORS.mediumBlueEnabled}
         borderRadius={BORDERS.borderRadiusSize2}
         justifyContent={JUSTIFY_CENTER}
         css={shouldAnimate ? COMMAND_ROW_STYLE_ANIMATED : COMMAND_ROW_STYLE}

@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { COLORS } from '../../ui-style-constants'
+import { LEGACY_COLORS } from '../../ui-style-constants'
 
 export interface HeaterShakerVizProps {
   targetTemp: number | null
@@ -8,8 +8,8 @@ export interface HeaterShakerVizProps {
 
 export function HeaterShaker(props: HeaterShakerVizProps): JSX.Element {
   const { targetTemp } = props
-  let ledLightColor: string = COLORS.white
-  if (targetTemp != null) ledLightColor = COLORS.red4
+  let ledLightColor: string = LEGACY_COLORS.white
+  if (targetTemp != null) ledLightColor = LEGACY_COLORS.red4
 
   return (
     <g id="heaterShaker">
@@ -47,7 +47,7 @@ export function HeaterShaker(props: HeaterShakerVizProps): JSX.Element {
       <g id="plateBottomFill">
         <path
           d="M49.1,6.5c-0.9,0-1.7,0.6-1.9,1.6c-0.4,1.7-1.9,2.9-3.7,2.9s-3.3-1.2-3.7-2.9 c-0.2-1-1.1-1.6-1.9-1.6H24.4c-1.6,0-2.9,1.3-2.9,2.9v72.9c0,1.6,1.3,2.9,2.9,2.9h13.4c0.8,0,1.6-0.6,1.9-1.6 c0.4-1.7,1.9-2.9,3.7-2.9s3.3,1.2,3.7,2.9c0.2,1,1,1.6,1.9,1.6h60.2c0.9,0,1.7-0.6,1.9-1.6c0.4-1.7,1.9-2.9,3.7-2.9 c1.8,0,3.3,1.2,3.7,2.9c0.2,1,1.1,1.6,1.9,1.6H134c1.6,0,2.9-1.3,2.9-2.9V9.4c0-1.6-1.3-2.9-2.9-2.9h-13.4c-0.8,0-1.6,0.6-1.9,1.6 c-0.4,1.7-1.9,2.9-3.7,2.9c-1.8,0-3.3-1.2-3.7-2.9c-0.2-1-1-1.6-1.9-1.6L49.1,6.5L49.1,6.5z"
-          style={{ fill: COLORS.white }}
+          style={{ fill: LEGACY_COLORS.white }}
         ></path>
       </g>
       <g id="plateBottomOutline">

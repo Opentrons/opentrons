@@ -20,7 +20,7 @@ import {
   DISPLAY_BLOCK,
   Icon,
   PrimaryButton,
-  COLORS,
+  LEGACY_COLORS,
   ProtocolDeck,
 } from '@opentrons/components'
 
@@ -215,7 +215,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 <Box display="grid" gridTemplateColumns="1fr 3fr">
                   <Box
                     marginY={SPACING.spacingAuto}
-                    backgroundColor={isSelected ? COLORS.white : 'inherit'}
+                    backgroundColor={isSelected ? LEGACY_COLORS.white : 'inherit'}
                     marginRight={SPACING.spacing16}
                     height="4.25rem"
                     width="4.75rem"
@@ -243,7 +243,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                     <Icon
                       name="alert-circle"
                       size="1.25rem"
-                      color={COLORS.errorEnabled}
+                      color={LEGACY_COLORS.errorEnabled}
                     />
                   </>
                 ) : null}
@@ -252,7 +252,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
             {runCreationError != null && isSelected ? (
               <StyledText
                 as="label"
-                color={COLORS.errorText}
+                color={LEGACY_COLORS.errorText}
                 overflowWrap="anywhere"
                 display={DISPLAY_BLOCK}
                 marginTop={`-${SPACING.spacing8}`}
@@ -266,7 +266,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                       robotLink: (
                         <NavLink
                           css={css`
-                            color: ${COLORS.errorText};
+                            color: ${LEGACY_COLORS.errorText};
                             text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
                           `}
                           to={`/devices/${robotName}`}
@@ -294,11 +294,11 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
       css={css`
         ${BORDERS.cardOutlineBorder}
         &:hover {
-          border-color: ${COLORS.medGreyEnabled};
+          border-color: ${LEGACY_COLORS.medGreyEnabled};
         }
       `}
     >
-      <Icon size="1.25rem" name="alert-circle" color={COLORS.medGreyEnabled} />
+      <Icon size="1.25rem" name="alert-circle" color={LEGACY_COLORS.medGreyEnabled} />
       <StyledText
         as="p"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}

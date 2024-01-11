@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {
   JUSTIFY_CENTER,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
@@ -23,7 +23,7 @@ export const EmptySection = (props: EmptySectionProps): JSX.Element => {
 
   return (
     <Flex
-      backgroundColor={COLORS.light1}
+      backgroundColor={LEGACY_COLORS.light1}
       borderRadius={BORDERS.borderRadiusSize3}
       width="100%"
       height="12.625rem"
@@ -35,7 +35,7 @@ export const EmptySection = (props: EmptySectionProps): JSX.Element => {
       <Icon
         name="ot-alert"
         size="3rem"
-        color={COLORS.darkBlack90}
+        color={LEGACY_COLORS.darkBlack90}
         marginBottom={SPACING.spacing32}
         aria-label="EmptySection_ot-alert"
       />

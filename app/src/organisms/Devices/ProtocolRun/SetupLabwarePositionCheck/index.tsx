@@ -11,7 +11,7 @@ import {
   useHoverTooltip,
   SecondaryButton,
   PrimaryButton,
-  COLORS,
+  LEGACY_COLORS,
 } from '@opentrons/components'
 import { useRunQuery, useProtocolQuery } from '@opentrons/react-api-client'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -99,7 +99,7 @@ export function SetupLabwarePositionCheck(
         <Flex
           paddingY={SPACING.spacing8}
           marginY={SPACING.spacing24}
-          backgroundColor={COLORS.fundamentalsBackground}
+          backgroundColor={LEGACY_COLORS.fundamentalsBackground}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
         >

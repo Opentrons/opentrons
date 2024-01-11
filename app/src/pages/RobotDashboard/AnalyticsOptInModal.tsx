@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import {
   Flex,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   SPACING,
@@ -64,7 +64,7 @@ export function AnalyticsOptInModal({
           gridGap={SPACING.spacing12}
           paddingBottom={SPACING.spacing32}
         >
-          <StyledText as="p" color={COLORS.darkBlack90}>
+          <StyledText as="p" color={LEGACY_COLORS.darkBlack90}>
             {t('opt_in_description')}
           </StyledText>
         </Flex>

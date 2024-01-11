@@ -6,7 +6,7 @@ import {
   DIRECTION_COLUMN,
   ALIGN_CENTER,
   SPACING,
-  COLORS,
+  LEGACY_COLORS,
   TYPOGRAPHY,
   Icon,
   Btn,
@@ -27,29 +27,29 @@ const CARD_BUTTON_STYLE = css`
   box-shadow: none;
 
   &:focus {
-    background-color: ${COLORS.mediumBluePressed};
+    background-color: ${LEGACY_COLORS.mediumBluePressed};
     box-shadow: none;
   }
 
   &:hover {
     border: none;
     box-shadow: none;
-    background-color: ${COLORS.mediumBlueEnabled};
-    color: ${COLORS.darkBlackEnabled};
+    background-color: ${LEGACY_COLORS.mediumBlueEnabled};
+    color: ${LEGACY_COLORS.darkBlackEnabled};
   }
 
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.mediumBlueEnabled};
+    background-color: ${LEGACY_COLORS.mediumBlueEnabled};
   }
 
   &:active {
-    background-color: ${COLORS.mediumBluePressed};
+    background-color: ${LEGACY_COLORS.mediumBluePressed};
   }
 
   &:disabled {
-    background-color: ${COLORS.darkBlack20};
-    color: ${COLORS.darkBlack70};
+    background-color: ${LEGACY_COLORS.darkBlack20};
+    color: ${LEGACY_COLORS.darkBlack70};
   }
 `
 
@@ -83,20 +83,20 @@ export function CardButton(props: CardButtonProps): JSX.Element {
       onClick={() => history.push(destinationPath)}
       width="100%"
       css={CARD_BUTTON_STYLE}
-      backgroundColor={disabled ? COLORS.darkBlack20 : COLORS.mediumBlueEnabled}
+      backgroundColor={disabled ? LEGACY_COLORS.darkBlack20 : LEGACY_COLORS.mediumBlueEnabled}
       disabled={disabled}
     >
       <Icon
         name={iconName}
         size="3.75rem"
         data-testid={`cardButton_icon_${String(iconName)}`}
-        color={disabled ? COLORS.darkBlack60 : COLORS.blueEnabled}
+        color={disabled ? LEGACY_COLORS.darkBlack60 : LEGACY_COLORS.blueEnabled}
       />
       <Flex marginTop={SPACING.spacing16}>
         <StyledText
           as="h4"
           fontWeight={TYPOGRAPHY.fontWeightBold}
-          color={disabled ? COLORS.darkBlack60 : COLORS.darkBlackEnabled}
+          color={disabled ? LEGACY_COLORS.darkBlack60 : LEGACY_COLORS.darkBlackEnabled}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {title}
@@ -110,7 +110,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={disabled ? COLORS.darkBlack60 : COLORS.darkBlackEnabled}
+          color={disabled ? LEGACY_COLORS.darkBlack60 : LEGACY_COLORS.darkBlackEnabled}
           css={CARD_BUTTON_TEXT_STYLE}
         >
           {description}

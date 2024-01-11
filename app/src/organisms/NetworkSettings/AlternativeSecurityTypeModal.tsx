@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 
 import {
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
@@ -56,7 +56,7 @@ export function AlternativeSecurityTypeModal({
           <StyledText
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightRegular}
-            color={COLORS.darkBlack90}
+            color={LEGACY_COLORS.darkBlack90}
           >
             {t('alternative_security_types_description')}
           </StyledText>

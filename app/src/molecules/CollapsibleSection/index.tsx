@@ -8,7 +8,7 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   StyleProps,
-  COLORS,
+  LEGACY_COLORS,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
@@ -16,10 +16,10 @@ import { StyledText } from '../../atoms/text'
 const ACCORDION_STYLE = css`
   border-radius: 50%;
   &:hover {
-    background: ${COLORS.lightGreyHover};
+    background: ${LEGACY_COLORS.lightGreyHover};
   }
   &:active {
-    background: ${COLORS.lightGreyPressed};
+    background: ${LEGACY_COLORS.lightGreyPressed};
   }
 `
 

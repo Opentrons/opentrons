@@ -7,7 +7,7 @@ import {
   Flex,
   DIRECTION_COLUMN,
   POSITION_ABSOLUTE,
-  COLORS,
+  LEGACY_COLORS,
   BORDERS,
 } from '@opentrons/components'
 import {
@@ -359,7 +359,7 @@ export const GripperWizard = (
           boxShadow={BORDERS.shadowSmall}
           borderRadius={BORDERS.borderRadiusSize4}
           position={POSITION_ABSOLUTE}
-          backgroundColor={COLORS.white}
+          backgroundColor={LEGACY_COLORS.white}
         >
           {wizardHeader}
           {modalContent}

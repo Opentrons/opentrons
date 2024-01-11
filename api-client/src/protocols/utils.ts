@@ -1,7 +1,7 @@
 // set of functions that parse details out of a protocol record and it's internals
 import reduce from 'lodash/reduce'
 
-import { COLORS } from '@opentrons/components/src/ui-style-constants'
+import { LEGACY_COLORS } from '@opentrons/components/src/ui-style-constants'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import type {
   Liquid,
@@ -254,7 +254,7 @@ export function parseLiquidsInLoadOrder(
       ...liquid,
       displayColor:
         liquid.displayColor ??
-        COLORS.liquidColors[index % COLORS.liquidColors.length],
+        LEGACY_COLORS.liquidColors[index % LEGACY_COLORS.liquidColors.length],
     }
   })
 

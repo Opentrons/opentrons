@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux'
 import {
   Box,
   Flex,
-  COLORS,
+  LEGACY_COLORS,
   SPACING,
   POSITION_FIXED,
   POSITION_ABSOLUTE,
@@ -53,12 +53,12 @@ const BASE_STYLE = {
 } as const
 
 const MODAL_STYLE = {
-  backgroundColor: COLORS.white,
+  backgroundColor: LEGACY_COLORS.white,
   position: POSITION_RELATIVE,
   overflowY: OVERFLOW_AUTO,
   maxHeight: '100%',
   width: '47rem',
-  border: `6px ${BORDERS.styleSolid} ${COLORS.blueEnabled}`,
+  border: `6px ${BORDERS.styleSolid} ${LEGACY_COLORS.blueEnabled}`,
   borderRadius: BORDERS.radiusSoftCorners,
   boxShadow: BORDERS.smallDropShadow,
 } as const
@@ -67,8 +67,8 @@ const HEADER_STYLE = {
   alignItems: ALIGN_CENTER,
   gridGap: SPACING.spacing12,
   padding: `${SPACING.spacing20} ${SPACING.spacing32}`,
-  color: COLORS.white,
-  backgroundColor: COLORS.blueEnabled,
+  color: LEGACY_COLORS.white,
+  backgroundColor: LEGACY_COLORS.blueEnabled,
   position: POSITION_STICKY,
   top: 0,
 } as const
@@ -158,12 +158,12 @@ export function InterventionModal({
   // reimplement when design system shares a modal component between desktop/ODD
   return isOnDevice ? (
     <Modal
-      border={`8px ${BORDERS.styleSolid} ${COLORS.blueEnabled}`}
+      border={`8px ${BORDERS.styleSolid} ${LEGACY_COLORS.blueEnabled}`}
       modalSize="large"
       header={{
-        backgroundColor: COLORS.blueEnabled,
-        color: COLORS.white,
-        iconColor: COLORS.white,
+        backgroundColor: LEGACY_COLORS.blueEnabled,
+        color: LEGACY_COLORS.white,
+        iconColor: LEGACY_COLORS.white,
         iconName: iconName ?? undefined,
         title: headerTitleOnDevice,
       }}
@@ -190,7 +190,7 @@ export function InterventionModal({
       top="0"
       bottom="0"
       zIndex="1"
-      backgroundColor={COLORS.backgroundOverlay}
+      backgroundColor={LEGACY_COLORS.backgroundOverlay}
       cursor="default"
     >
       <Flex {...BASE_STYLE} zIndex={10}>

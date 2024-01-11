@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { UseMutateFunction } from 'react-query'
-import { COLORS, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+import { LEGACY_COLORS, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import {
   NINETY_SIX_CHANNEL,
   RIGHT,
@@ -227,7 +227,7 @@ export const BeforeBeginning = (
   return errorMessage != null ? (
     <SimpleWizardBody
       isSuccess={false}
-      iconColor={COLORS.errorEnabled}
+      iconColor={LEGACY_COLORS.errorEnabled}
       header={t('shared:error_encountered')}
       subHeader={errorMessage}
     />

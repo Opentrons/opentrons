@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
@@ -31,7 +31,7 @@ export function SmallModalChildren(
         whiteSpace="break-spaces"
       >
         <StyledText
-          color={COLORS.darkBlackEnabled}
+          color={LEGACY_COLORS.darkBlackEnabled}
           fontSize={TYPOGRAPHY.fontSize28}
           fontWeight={TYPOGRAPHY.fontWeightBold}
           lineHeight={TYPOGRAPHY.lineHeight36}
@@ -40,7 +40,7 @@ export function SmallModalChildren(
           {header}
         </StyledText>
         <StyledText
-          color={COLORS.darkBlack90}
+          color={LEGACY_COLORS.darkBlack90}
           fontSize={TYPOGRAPHY.fontSize22}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           lineHeight={TYPOGRAPHY.lineHeight28}

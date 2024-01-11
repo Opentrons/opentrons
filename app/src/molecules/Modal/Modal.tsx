@@ -2,7 +2,7 @@ import * as React from 'react'
 import {
   ALIGN_CENTER,
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   Flex,
   SPACING,
   DIRECTION_COLUMN,
@@ -54,7 +54,7 @@ export function Modal(props: ModalProps): JSX.Element {
       justifyContent={JUSTIFY_CENTER}
     >
       <Flex
-        backgroundColor={COLORS.white}
+        backgroundColor={LEGACY_COLORS.white}
         width={modalWidth}
         height="max-content"
         maxHeight="36.875rem"
@@ -71,7 +71,7 @@ export function Modal(props: ModalProps): JSX.Element {
           <ModalHeader {...header} onClick={onOutsideClick} />
         ) : null}
         <Flex
-          backgroundColor={COLORS.white}
+          backgroundColor={LEGACY_COLORS.white}
           paddingX={SPACING.spacing32}
           paddingBottom={SPACING.spacing32}
           paddingTop={header != null ? '0rem' : SPACING.spacing32}

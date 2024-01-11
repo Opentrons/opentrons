@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   SPACING,
-  COLORS,
+  LEGACY_COLORS,
   Icon,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
@@ -33,14 +33,14 @@ export function ErrorUpdateSoftware({
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        backgroundColor={COLORS.red3}
+        backgroundColor={LEGACY_COLORS.red3}
         height="26.625rem"
         gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
         borderRadius={BORDERS.borderRadiusSize3}
       >
-        <Icon name="ot-alert" size="3.75rem" color={COLORS.errorEnabled} />
+        <Icon name="ot-alert" size="3.75rem" color={LEGACY_COLORS.errorEnabled} />
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing4}
@@ -49,7 +49,7 @@ export function ErrorUpdateSoftware({
           <StyledText
             as="h2"
             fontWeight={TYPOGRAPHY.fontWeightBold}
-            color={COLORS.black}
+            color={LEGACY_COLORS.black}
           >
             {t('software_update_error')}
           </StyledText>

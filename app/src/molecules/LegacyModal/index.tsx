@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { SPACING, COLORS, Box } from '@opentrons/components'
+import { SPACING, LEGACY_COLORS, Box } from '@opentrons/components'
 import { LegacyModalHeader } from './LegacyModalHeader'
 import { LegacyModalShell } from './LegacyModalShell'
 import type { IconProps, StyleProps } from '@opentrons/components'
@@ -35,10 +35,10 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
     let iconColor: string = ''
     switch (type) {
       case 'warning':
-        iconColor = COLORS.warningEnabled
+        iconColor = LEGACY_COLORS.warningEnabled
         break
       case 'error':
-        iconColor = COLORS.errorEnabled
+        iconColor = LEGACY_COLORS.errorEnabled
         break
     }
     return iconColor
@@ -56,8 +56,8 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
       onClose={onClose}
       title={title}
       icon={['error', 'warning'].includes(type) ? modalIcon : undefined}
-      color={COLORS.darkBlackEnabled}
-      backgroundColor={COLORS.white}
+      color={LEGACY_COLORS.darkBlackEnabled}
+      backgroundColor={LEGACY_COLORS.white}
     />
   )
 

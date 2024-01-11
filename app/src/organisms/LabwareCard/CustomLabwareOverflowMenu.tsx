@@ -10,7 +10,7 @@ import {
   Icon,
   useConditionalConfirm,
   SPACING,
-  COLORS,
+  LEGACY_COLORS,
   POSITION_ABSOLUTE,
   AlertPrimaryButton,
   DIRECTION_COLUMN,
@@ -111,7 +111,7 @@ export function CustomLabwareOverflowMenu(
           borderRadius="4px 4px 0px 0px"
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
-          backgroundColor={COLORS.white}
+          backgroundColor={LEGACY_COLORS.white}
           top={SPACING.spacing32}
           right={0}
           flexDirection={DIRECTION_COLUMN}

@@ -3,7 +3,7 @@ import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
   Btn,
-  COLORS,
+  LEGACY_COLORS,
   RESPONSIVENESS,
   TYPOGRAPHY,
   SPACING,
@@ -73,7 +73,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
       : null
   const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
   let header: string = 'unknown results screen'
-  let iconColor: string = COLORS.successEnabled
+  let iconColor: string = LEGACY_COLORS.successEnabled
   let isSuccess: boolean = true
   let buttonText: string = i18n.format(t('shared:exit'), 'capitalize')
   let subHeader
@@ -99,12 +99,12 @@ export const Results = (props: ResultsProps): JSX.Element => {
       ) {
         header = i18n.format(t('wrong_pip'), 'capitalize')
         buttonText = i18n.format(t('detach_and_retry'), 'capitalize')
-        iconColor = COLORS.errorEnabled
+        iconColor = LEGACY_COLORS.errorEnabled
         isSuccess = false
       } else {
         // attachment flow fail
         header = i18n.format(t('pipette_failed_to_attach'), 'capitalize')
-        iconColor = COLORS.errorEnabled
+        iconColor = LEGACY_COLORS.errorEnabled
         isSuccess = false
       }
       break
@@ -112,7 +112,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
     case FLOWS.DETACH: {
       if (attachedPipettes[mount] != null) {
         header = t('pipette_failed_to_detach', { pipetteName: pipetteName })
-        iconColor = COLORS.errorEnabled
+        iconColor = LEGACY_COLORS.errorEnabled
         isSuccess = false
       } else {
         header = i18n.format(t('pipette_detached'), 'capitalize')
@@ -248,7 +248,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
   ) {
     const GO_BACK_BUTTON_STYLE = css`
       ${TYPOGRAPHY.pSemiBold};
-      color: ${COLORS.darkGreyEnabled};
+      color: ${LEGACY_COLORS.darkGreyEnabled};
 
       &:hover {
         opacity: 70%;
@@ -301,7 +301,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
     return (
       <SimpleWizardBody
         isSuccess={false}
-        iconColor={COLORS.errorEnabled}
+        iconColor={LEGACY_COLORS.errorEnabled}
         header={t('shared:error_encountered')}
         subHeader={errorMessage}
       />

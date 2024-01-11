@@ -9,7 +9,7 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_AROUND,
   SIZE_4,
@@ -42,7 +42,7 @@ export function RecentProtocolRuns({
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
-      backgroundColor={COLORS.white}
+      backgroundColor={LEGACY_COLORS.white}
       border={BORDERS.lineBorder}
       borderRadius={BORDERS.radiusSoftCorners}
       flexDirection={DIRECTION_COLUMN}
@@ -146,7 +146,7 @@ export function RecentProtocolRuns({
           <StyledText
             as="p"
             alignItems={ALIGN_CENTER}
-            color={COLORS.errorDisabled}
+            color={LEGACY_COLORS.errorDisabled}
             display={DISPLAY_FLEX}
             flex="1 0"
             id="RecentProtocolRuns_offline"

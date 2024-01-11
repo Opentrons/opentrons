@@ -4,7 +4,7 @@ import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -188,14 +188,14 @@ export const StatRow = (props: StatRowProps): JSX.Element => {
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={COLORS.darkGreyEnabled}
+          color={LEGACY_COLORS.darkGreyEnabled}
           marginX={SPACING.spacing16}
         >
           {description}
         </StyledText>
       </Flex>
       <Flex
-        backgroundColor={COLORS.darkBlackEnabled + '1A'}
+        backgroundColor={LEGACY_COLORS.darkBlackEnabled + '1A'}
         borderRadius={BORDERS.radiusSoftCorners}
         height="max-content"
         paddingY={SPACING.spacing4}

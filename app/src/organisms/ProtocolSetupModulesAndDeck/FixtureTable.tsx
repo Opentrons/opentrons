@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -76,7 +76,7 @@ export function FixtureTable({
   return sortedDeckConfigCompatibility.length > 0 ? (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       <Flex
-        color={COLORS.darkBlack70}
+        color={LEGACY_COLORS.darkBlack70}
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         gridGap={SPACING.spacing24}
@@ -189,7 +189,7 @@ function FixtureTableItem({
         flexDirection={DIRECTION_ROW}
         alignItems={ALIGN_CENTER}
         backgroundColor={
-          isCurrentFixtureCompatible ? COLORS.green3 : COLORS.yellow3
+          isCurrentFixtureCompatible ? LEGACY_COLORS.green3 : LEGACY_COLORS.yellow3
         }
         borderRadius={BORDERS.borderRadiusSize3}
         gridGap={SPACING.spacing24}

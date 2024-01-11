@@ -3,7 +3,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
-  COLORS,
+  LEGACY_COLORS,
   PrimaryButton,
   TEXT_TRANSFORM_CAPITALIZE,
   JUSTIFY_FLEX_END,
@@ -73,7 +73,7 @@ export const Success = (
 
   return (
     <SimpleWizardBody
-      iconColor={COLORS.successEnabled}
+      iconColor={LEGACY_COLORS.successEnabled}
       header={header}
       isSuccess
       css={HEADER_STYLE}

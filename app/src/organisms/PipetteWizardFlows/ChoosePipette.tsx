@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import startCase from 'lodash/startCase'
 import {
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   Flex,
   SPACING,
   TYPOGRAPHY,
@@ -48,8 +48,8 @@ import type { PipetteMount } from '@opentrons/shared-data'
 import type { SelectablePipettes } from './types'
 
 const UNSELECTED_OPTIONS_STYLE = css`
-  background-color: ${COLORS.white};
-  border: 1px solid ${COLORS.medGreyEnabled};
+  background-color: ${LEGACY_COLORS.white};
+  border: 1px solid ${LEGACY_COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   height: 14.5625rem;
   width: 14.5625rem;
@@ -60,13 +60,13 @@ const UNSELECTED_OPTIONS_STYLE = css`
   grid-gap: ${SPACING.spacing8}
 
   &:hover {
-    border: 1px solid ${COLORS.medGreyHover};
+    border: 1px solid ${LEGACY_COLORS.medGreyHover};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     flex-direction: ${DIRECTION_ROW};
     justify-content: ${JUSTIFY_FLEX_START};
-    background-color: ${COLORS.mediumBlueEnabled};
+    background-color: ${LEGACY_COLORS.mediumBlueEnabled};
     border-width: 0; 
     border-radius: ${BORDERS.borderRadiusSize4};
     padding: ${SPACING.spacing24};
@@ -80,22 +80,22 @@ const UNSELECTED_OPTIONS_STYLE = css`
 `
 const SELECTED_OPTIONS_STYLE = css`
   ${UNSELECTED_OPTIONS_STYLE}
-  border: 1px solid ${COLORS.blueEnabled};
-  background-color: ${COLORS.lightBlue};
+  border: 1px solid ${LEGACY_COLORS.blueEnabled};
+  background-color: ${LEGACY_COLORS.lightBlue};
 
   &:hover {
-    border: 1px solid ${COLORS.blueEnabled};
-    background-color: ${COLORS.lightBlue};
+    border: 1px solid ${LEGACY_COLORS.blueEnabled};
+    background-color: ${LEGACY_COLORS.lightBlue};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     border-width: 0px;
-    background-color: ${COLORS.blueEnabled};
-    color: ${COLORS.white};
+    background-color: ${LEGACY_COLORS.blueEnabled};
+    color: ${LEGACY_COLORS.white};
 
     &:hover {
       border-width: 0px;
-      background-color: ${COLORS.blueEnabled};
+      background-color: ${LEGACY_COLORS.blueEnabled};
     }
   }
 `
@@ -147,7 +147,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             flexDirection={DIRECTION_COLUMN}
             width="100%"
             position={POSITION_ABSOLUTE}
-            backgroundColor={COLORS.white}
+            backgroundColor={LEGACY_COLORS.white}
           >
             {showExitConfirmation ? (
               <ExitModal

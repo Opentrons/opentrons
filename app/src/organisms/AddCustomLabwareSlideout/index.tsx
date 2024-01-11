@@ -4,7 +4,7 @@ import { useTranslation, Trans } from 'react-i18next'
 import {
   Flex,
   Link,
-  COLORS,
+  LEGACY_COLORS,
   SPACING,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
@@ -65,7 +65,7 @@ export function AddCustomLabwareSlideout(
                 components={{
                   a: (
                     <Link
-                      color={COLORS.blueEnabled}
+                      color={LEGACY_COLORS.blueEnabled}
                       onClick={() => dispatch(addCustomLabware())}
                       role="button"
                     />

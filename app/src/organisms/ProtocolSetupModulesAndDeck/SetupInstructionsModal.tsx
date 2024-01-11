@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   ALIGN_STRETCH,
   BORDERS,
-  COLORS,
+  LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -30,7 +30,7 @@ export function SetupInstructionsModal({
   const modalHeader: ModalHeaderBaseProps = {
     title: i18n.format(t('setup_instructions'), 'capitalize'),
     iconName: 'information',
-    iconColor: COLORS.darkBlack100,
+    iconColor: LEGACY_COLORS.darkBlack100,
     hasExitIcon: true,
   }
 
@@ -47,7 +47,7 @@ export function SetupInstructionsModal({
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
           <StyledText as="p">{t('setup_instructions_description')}</StyledText>
           <Flex
-            backgroundColor={COLORS.light1}
+            backgroundColor={LEGACY_COLORS.light1}
             borderRadius={BORDERS.borderRadiusSize3}
             padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
           >

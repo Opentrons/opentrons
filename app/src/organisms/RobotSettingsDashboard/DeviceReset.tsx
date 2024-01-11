@@ -7,7 +7,7 @@ import {
   Flex,
   DIRECTION_COLUMN,
   TYPOGRAPHY,
-  COLORS,
+  LEGACY_COLORS,
   SPACING,
   BORDERS,
   useConditionalConfirm,
@@ -42,9 +42,9 @@ const OptionLabel = styled.label<LabelProps>`
   padding: ${SPACING.spacing16} ${SPACING.spacing24};
   border-radius: ${BORDERS.borderRadiusSize4};
   color: ${({ isSelected }) =>
-    isSelected === true ? COLORS.white : COLORS.darkBlack100};
+    isSelected === true ? LEGACY_COLORS.white : LEGACY_COLORS.darkBlack100};
   background: ${({ isSelected }) =>
-    isSelected === true ? COLORS.blueEnabled : COLORS.mediumBlueEnabled};
+    isSelected === true ? LEGACY_COLORS.blueEnabled : LEGACY_COLORS.mediumBlueEnabled};
 `
 
 interface DeviceResetProps {
@@ -231,8 +231,8 @@ export function DeviceReset({
                         as="p"
                         color={
                           resetOptions[option.id] ?? false
-                            ? COLORS.white
-                            : COLORS.darkBlack70
+                            ? LEGACY_COLORS.white
+                            : LEGACY_COLORS.darkBlack70
                         }
                       >
                         {subText}
@@ -283,8 +283,8 @@ export function DeviceReset({
                   ((resetOptions.authorizedKeys ?? false) &&
                     (resetOptions.onDeviceDisplay ?? false)) ||
                   isEveryOptionSelected(resetOptions)
-                    ? COLORS.white
-                    : COLORS.darkBlack70
+                    ? LEGACY_COLORS.white
+                    : LEGACY_COLORS.darkBlack70
                 }
               >
                 {t('clear_all_stored_data_description')}
@@ -325,7 +325,7 @@ export const ConfirmClearDataModal = ({
     title: t('confirm_device_reset_heading'),
     hasExitIcon: false,
     iconName: 'ot-alert',
-    iconColor: COLORS.yellow2,
+    iconColor: LEGACY_COLORS.yellow2,
   }
   return (
     <Modal

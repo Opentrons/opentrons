@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
 
-import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
+import { BORDERS, LEGACY_COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
 import { useAttachedPipettes } from '../../../organisms/Devices/hooks'
@@ -35,7 +35,7 @@ const StyledTableCell = styled.td`
 `
 
 const BODY_STYLE = css`
-  box-shadow: 0 0 0 1px ${COLORS.medGreyEnabled};
+  box-shadow: 0 0 0 1px ${LEGACY_COLORS.medGreyEnabled};
   border-radius: 3px;
 `
 interface TipLengthCalibrationItemsProps {

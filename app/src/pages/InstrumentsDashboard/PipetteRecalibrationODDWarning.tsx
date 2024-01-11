@@ -4,7 +4,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   Btn,
-  COLORS,
+  LEGACY_COLORS,
   Flex,
   Icon,
   JUSTIFY_FLEX_START,
@@ -23,7 +23,7 @@ export const PipetteRecalibrationODDWarning = (): JSX.Element | null => {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
       borderRadius={BORDERS.borderRadiusSize3}
-      backgroundColor={COLORS.yellow3}
+      backgroundColor={LEGACY_COLORS.yellow3}
       padding={`${SPACING.spacing12} ${SPACING.spacing16}`}
       height="5.76rem"
       width="60rem"
@@ -31,7 +31,7 @@ export const PipetteRecalibrationODDWarning = (): JSX.Element | null => {
       <Flex justifyContent={JUSTIFY_FLEX_START}>
         <Icon
           name="alert-circle"
-          color={COLORS.yellow2}
+          color={LEGACY_COLORS.yellow2}
           width="45px"
           marginRight={SPACING.spacing12}
           aria-label="alert-circle_icon"

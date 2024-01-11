@@ -5,7 +5,7 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_FLEX_END,
   ALIGN_CENTER,
-  COLORS,
+  LEGACY_COLORS,
   TYPOGRAPHY,
   PrimaryButton,
   SPACING,
@@ -48,14 +48,14 @@ export function DeckCalibrationConfirmModal({
             onClick={cancel}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             marginRight={SPACING.spacing24}
-            color={COLORS.blueEnabled}
+            color={LEGACY_COLORS.blueEnabled}
             css={TYPOGRAPHY.fontSizeP}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {t('shared:cancel')}
           </Link>
           <PrimaryButton
-            backgroundColor={COLORS.errorEnabled}
+            backgroundColor={LEGACY_COLORS.errorEnabled}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             css={TYPOGRAPHY.fontSizeP}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}

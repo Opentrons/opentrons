@@ -10,7 +10,7 @@ import {
   SIZE_3,
   AlertPrimaryButton,
   JUSTIFY_CENTER,
-  COLORS,
+  LEGACY_COLORS,
   TYPOGRAPHY,
   RESPONSIVENESS,
   SecondaryButton,
@@ -45,7 +45,7 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
         alignItems={ALIGN_CENTER}
         paddingX={SPACING.spacing32}
       >
-        <Icon name="ot-alert" size={SIZE_3} color={COLORS.warningEnabled} />
+        <Icon name="ot-alert" size={SIZE_3} color={LEGACY_COLORS.warningEnabled} />
         {isOnDevice ? (
           <>
             <ConfirmationHeaderODD>
@@ -140,5 +140,5 @@ const ConfirmationBodyODD = styled.h1`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     ${TYPOGRAPHY.level4HeaderRegular}
   }
-  color: ${COLORS.darkBlack70};
+  color: ${LEGACY_COLORS.darkBlack70};
 `
