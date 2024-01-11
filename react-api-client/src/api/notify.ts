@@ -14,6 +14,18 @@ import type { UseQueryOptions } from 'react-query'
 import type { HostConfig } from '@opentrons/api-client'
 import type { NotifyTopic } from '../../../app/src/redux/shell/types'
 
+export const createNotifyOptions = <TData, TError>(): UseQueryOptions<
+  TData,
+  TError
+> => ({
+  staleTime: Infinity,
+  refetchInterval: false,
+  refetchIntervalInBackground: false,
+  refetchOnWindowFocus: false,
+  refetchOnMount: false,
+  refetchOnReconnect: false,
+})
+
 // TOME: Again, you want to use generics here.
 export interface QueryOptionsWithPolling<TData, Error>
   extends UseQueryOptions<TData, Error> {
@@ -26,6 +38,7 @@ interface useNotifyServiceProps<TData, Error> {
   options: QueryOptionsWithPolling<TData, Error> // TOME: Will have to mess with this.
 }
 
+// TOME: Remember to adjust typing here.
 export function useNotifyService<TData, Error>({
   topic,
   queryKey,
@@ -34,21 +47,30 @@ export function useNotifyService<TData, Error>({
   const dispatch = useDispatch()
   const host = useHost()
   const queryClient = useQueryClient()
+  const [isNotifyError, setIsNotifyError] = React.useState(false)
+
   const { forceHttpPolling } = options
 
   React.useEffect(() => {
-    if (forceHttpPolling) {
+    if (!forceHttpPolling) {
       const hostname = host?.hostname ?? null
       const eventEmitter = appShellListener(hostname, topic)
 
       const onDataListener = (data: any): void => {
-        console.log('RECEIVING DATA IN LISTENER')
-        // TOME: For now, I'm serializing here, but this needs to go elsewhere.
-        if (data === 'ECONNFAILED') queryClient.setQueryData(queryKey, data)
-        else {
-          const formattedData = { data: JSON.parse(JSON.parse(data)).data }
-          console.log('🚀 ~ onDataListener ~ formattedData:', formattedData)
-          queryClient.setQueryData(queryKey, formattedData)
+        if (!isNotifyError) {
+          if (data === 'ECONNFAILED') {
+            setIsNotifyError(true)
+          } else {
+            // TOME: Just temp until serialization nonsense is solved.
+            if (topic === 'robot-server/maintenance_runs') {
+              const extraCrispy = {
+                data: JSON.parse(data.data),
+              }
+              queryClient.setQueryData(queryKey, extraCrispy)
+            } else {
+              queryClient.setQueryData(queryKey, data)
+            }
+          }
         }
       }
 
@@ -63,17 +85,11 @@ export function useNotifyService<TData, Error>({
       return () => {
         eventEmitter.off('data', onDataListener)
         if (hostname != null) {
-          notifyUnsubscribeAction(hostname, topic)
+          dispatch(notifyUnsubscribeAction(hostname, topic))
         }
       }
     }
   }, [])
 
-  return queryClient.getQueryData(queryKey)
-}
-
-// TOME: The actual Notifier hooks can go here. This should be a simple wrapper that takes in the react-api-client method. Has a name that contains notify.
-export function hasNotifyServiceReceivedError(notifyData: any): boolean {
-  if (notifyData === 'ECONNFAILED') return true
-  else return false
+  return { notifyData: queryClient.getQueryData(queryKey), isNotifyError }
 }

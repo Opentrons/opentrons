@@ -48,10 +48,21 @@ export function appShellListener(
   // The cool thing is it self regulates here! You don't have to manager subscriptions on this level at all.
   // Can you even do the subscribing from in here as well? That would be tight.
   const eventEmitter = new EventEmitter()
-  remote.ipcRenderer.on('mqtt', (_, data) => {
-    const [shellHostname, shellTopic, shellMessage] = data.split(':')
-    // You'd emit the subscription here assumming the HOST:SUBSCRIPTION PATTERN MATCHES.
-    if (hostname === shellHostname && topic === shellTopic) {
+
+  remote.ipcRenderer.on('notify', (_, message) => {
+    console.log('IPCRENDERER RECEIVING message')
+    console.log(message)
+
+    const {
+      shellHostname,
+      shellTopic,
+      shellMessage,
+    } = deserializeNotifyMessage(message)
+    console.log('🚀 ~ remote.ipcRenderer.on ~ shellMessage:', shellMessage)
+
+    // TOME: TEMPORARILY NOT CHECKING HOSTNAME MATCHING, SINCE USING CLOUD PROVIDER.
+    // if (hostname === shellHostname && topic === shellTopic) {
+    if (topic === shellTopic) {
       // TOME: Need to de-serialize the data here? May be better elsewhere, since you have to think about error message.
       eventEmitter.emit('data', shellMessage)
     }
@@ -59,13 +70,29 @@ export function appShellListener(
   return eventEmitter
 }
 
-// TOME: Here is an example pattern. The actual on 'data' never changes.
-// const eventEmitter = appShellListener('cat')
-// eventEmitter.on('data', data => {
-//   console.log(data)
-// })
+function deserializeNotifyMessage(
+  message: string
+): {
+  shellHostname: string
+  shellTopic: string
+  shellMessage: Object
+} {
+  // TOME: Most performant way to do this. Make this a part of a serialize function.
+  const delimiter = ':'
+  const firstIndex = message.indexOf(delimiter)
+  const secondIndex = message.indexOf(delimiter, firstIndex + 1)
 
-// const eventEmitterTwo = appShellListener('dog')
-// eventEmitterTwo.on('data', data => {
-//   console.log(data)
-// })
+  const shellHostname = message.substring(0, firstIndex)
+  const shellTopic = message.substring(firstIndex + 1, secondIndex)
+  const serializedShellMessage = message.substring(secondIndex + 1)
+
+  let shellMessage: Object | string
+
+  try {
+    shellMessage = JSON.parse(serializedShellMessage)
+  } catch {
+    shellMessage = serializedShellMessage
+  }
+
+  return { shellHostname, shellTopic, shellMessage }
+}

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-dynamic-delete */
 import mqtt from 'mqtt'
+import uniqueId from 'lodash/uniqueId'
 
 import { createLogger } from './log'
 
@@ -14,8 +15,6 @@ import type { Action, Dispatch } from './types'
 // TOME: Test that redundant emissions still get data.
 // TOME: Test that fallback logic works.
 
-const log = createLogger('notify')
-
 interface ConnectionStore {
   [hostname: string]: {
     client: mqtt.MqttClient
@@ -24,10 +23,13 @@ interface ConnectionStore {
 }
 
 const connectionStore: ConnectionStore = {}
+const CLIENT_ID = uniqueId('app_')
+const log = createLogger('notify')
 
 // TOME: Highlight here that we make the assumption that if we can connect
 // to the broker at some point, we don't need a backup connection via HTTP. I think that's very fair.
 const connectOptions: mqtt.IClientOptions = {
+  clientId: CLIENT_ID,
   port: 1883,
   keepalive: 60,
   protocolVersion: 5,
@@ -55,11 +57,16 @@ export function registerNotify(
 ): (action: Action) => unknown {
   return function handleAction(action: Action) {
     switch (action.type) {
+      // TOME: USING THIS BROKER TO TEST FOR NOW. REMEMBER TO DELETE WHEN USING REAL BROKER.
       case 'shell:NOTIFY_SUBSCRIBE':
-        return subscribe({ ...action.payload, browserWindow: mainWindow })
+        return subscribe({
+          ...action.payload,
+          browserWindow: mainWindow,
+          hostname: 'broker.emqx.io',
+        })
 
       case 'shell:NOTIFY_UNSUBSCRIBE':
-        return unsubscribe({ ...action.payload })
+        return unsubscribe({ ...action.payload, hostname: 'broker.emqx.io' })
     }
   }
 }
@@ -94,16 +101,20 @@ function unsubscribe({ hostname, topic }: UnsubscribeParams): void {
 }
 
 export function closeAllNotifyConnections(): Promise<unknown[]> {
-  const closePromises = Object.values(connectionStore).map(({ client }) => {
-    return new Promise(() => {
-      client.end()
+  log.debug('Stopping all active notify service connections')
+  const closeConnections = Object.values(connectionStore).map(({ client }) => {
+    return new Promise((resolve, reject) => {
+      client.end(true, {}, () => resolve(null))
     })
   })
-  return Promise.all(closePromises)
+  return Promise.all(closeConnections)
 }
 
-interface ListenerParams extends NotifyParams {
+interface ListenerParams {
   client: mqtt.MqttClient
+  browserWindow: BrowserWindow
+  topic: NotifyTopic
+  hostname: string
 }
 
 // See https://docs.emqx.com/en/cloud/latest/connect_to_deployments/mqtt_client_error_codes.html
@@ -142,11 +153,14 @@ function establishListeners({
   // TOME: I'd really think about this error code null logic here. Is that actually good?
   // What is the normal reason code given. THAT is a better indication of what to do.
   // TOME: Also console.log out the connectionStore object. Are subscriptions & connectionStore added/removed correctly?
+  // TOME: Clean up the browser window send stuff, IMO.
   client.on('packetreceive', packet => {
     switch (packet.cmd) {
       case 'suback':
         console.log('SUBACK PACKET RECEIVED')
         console.log(packet)
+        console.log('SUBACK PACKET REASON CODE')
+        console.log(packet.reasonCode)
         if (packet.reasonCode == null || packet.reasonCode < 128) {
           log.info(`Successfully subscribed on ${hostname} to topic: ${topic}`)
           connectionStore[hostname].subscriptions[topic] =
@@ -168,10 +182,7 @@ function establishListeners({
             `Successfully unsubscribed on ${hostname} from topic: ${topic}`
           )
           const { client, subscriptions } = connectionStore[hostname]
-          delete subscriptions[topic]
-
-          console.log('UPDATED CONNECTION STORE')
-          console.log(connectionStore)
+          if (topic in subscriptions) delete subscriptions[topic]
 
           if (Object.keys(subscriptions).length <= 0) {
             client.end()
@@ -192,16 +203,19 @@ function establishListeners({
   })
 
   client.on('reconnect', () => {
-    log.info(`Reconnected to ${hostname}`)
+    log.info(`Attempting to reconnect to ${hostname}`)
   })
   // handles transport layer errors only
+  // TOME: More sophisticated reconnection logic would be helpful. If it worked before but now doesn't work, that's a good sign you should retry.
   client.on('error', error => {
     log.warn(`Error - ${error.name}: ${error.message}`)
+    browserWindow.webContents.send('notify', `${hostname}:${topic}:ECONNFAILED`)
+    client.end()
   })
 
   client.on('end', () => {
     log.info(`Closed connection to ${hostname}`)
-    delete connectionStore[hostname]
+    if (hostname in connectionStore) delete connectionStore[hostname]
   })
 
   client.on('disconnect', packet =>

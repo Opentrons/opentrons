@@ -120,6 +120,7 @@ export const PipetteWizardFlows = (
     )
   }
   const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+    refetchInterval: RUN_REFETCH_INTERVAL,
     enabled: createdMaintenanceRunId != null,
   })
   console.log(
@@ -149,18 +150,18 @@ export const PipetteWizardFlows = (
   React.useEffect(() => {
     if (
       createdMaintenanceRunId !== null &&
-      maintenanceRunData?.data.id === createdMaintenanceRunId
+      maintenanceRunData?.data?.id === createdMaintenanceRunId
     ) {
       setMonitorMaintenanceRunForDeletion(true)
     }
     if (
-      maintenanceRunData?.data.id !== createdMaintenanceRunId &&
+      maintenanceRunData?.data?.id !== createdMaintenanceRunId &&
       monitorMaintenanceRunForDeletion
     ) {
       closeFlow()
     }
   }, [
-    maintenanceRunData?.data.id,
+    maintenanceRunData?.data?.id,
     createdMaintenanceRunId,
     monitorMaintenanceRunForDeletion,
     closeFlow,
@@ -192,15 +193,15 @@ export const PipetteWizardFlows = (
 
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
-    if (maintenanceRunData?.data.id == null) handleClose()
+    if (maintenanceRunData?.data?.id == null) handleClose()
     else {
       chainRunCommands(
-        maintenanceRunData?.data.id,
+        maintenanceRunData?.data?.id,
         [{ commandType: 'home' as const, params: {} }],
         false
       )
         .then(() => {
-          deleteMaintenanceRun(maintenanceRunData?.data.id)
+          deleteMaintenanceRun(maintenanceRunData?.data?.id)
         })
         .catch(error => {
           console.error(error.message)
@@ -225,7 +226,7 @@ export const PipetteWizardFlows = (
   }, [isCommandMutationLoading, isExiting])
 
   let chainMaintenanceRunCommands
-  if (maintenanceRunData?.data.id != null) {
+  if (maintenanceRunData?.data?.id != null) {
     chainMaintenanceRunCommands = (
       commands: CreateCommand[],
       continuePastCommandFailure: boolean
@@ -238,8 +239,8 @@ export const PipetteWizardFlows = (
   }
 
   const maintenanceRunId =
-    maintenanceRunData?.data.id != null &&
-    maintenanceRunData?.data.id === createdMaintenanceRunId
+    maintenanceRunData?.data?.id != null &&
+    maintenanceRunData?.data?.id === createdMaintenanceRunId
       ? createdMaintenanceRunId
       : undefined
   const calibrateBaseProps = {
