@@ -7,6 +7,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   JUSTIFY_CENTER,
+  COLORS,
   LEGACY_COLORS,
   StyleProps,
   TYPOGRAPHY,
@@ -51,7 +52,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
         borderRadius={BORDERS.borderRadiusSize2}
         cursor={disabled ? 'auto' : 'pointer'}
         backgroundColor={
-          disabled ? LEGACY_COLORS.darkGreyDisabled : LEGACY_COLORS.transparent
+          disabled ? LEGACY_COLORS.darkGreyDisabled : COLORS.transparent
         }
         onClick={disabled ? undefined : onClick}
         {...styleProps}

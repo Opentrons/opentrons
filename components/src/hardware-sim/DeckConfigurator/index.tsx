@@ -10,6 +10,7 @@ import {
   WASTE_CHUTE_STAGING_AREA_FIXTURES,
 } from '@opentrons/shared-data'
 
+import { COLORS } from '../../helix-design-system'
 import { LEGACY_COLORS } from '../../ui-style-constants'
 import { SingleSlotFixture } from '../BaseDeck/SingleSlotFixture'
 import { SlotLabels } from '../Deck'
@@ -95,7 +96,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           key={cutout.id}
           cutoutId={cutout.id as CutoutId}
           deckDefinition={deckDef}
-          slotClipColor={LEGACY_COLORS.transparent}
+          slotClipColor={COLORS.transparent}
           fixtureBaseColor={lightFill}
           showExpansion={showExpansion}
         />

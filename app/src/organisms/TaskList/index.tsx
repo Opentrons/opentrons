@@ -7,6 +7,7 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   BORDERS,
+  COLORS,
   LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -167,7 +168,7 @@ function ProgressTrackerItem({
                   borderColor={
                     // do not show the subtask connector if it's the final subtask of the task list
                     isFinalSubTaskOfTaskList
-                      ? LEGACY_COLORS.transparent
+                      ? COLORS.transparent
                       : isTaskListComplete || isPastSubTask
                       ? LEGACY_COLORS.blueEnabled
                       : LEGACY_COLORS.medGreyEnabled

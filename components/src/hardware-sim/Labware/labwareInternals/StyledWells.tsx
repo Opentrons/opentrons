@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { Well } from './Well'
+import { LEGACY_COLORS } from '../../../ui-style-constants'
+import { COLORS } from '../../../helix-design-system'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { WellGroup } from './types'
-import { LEGACY_COLORS } from '../../../ui-style-constants'
 
 type WellContents =
   | 'tipPresent'
@@ -36,7 +37,7 @@ export const STYLE_BY_WELL_CONTENTS: {
   },
   selectedWell: {
     stroke: LEGACY_COLORS.blueEnabled,
-    fill: LEGACY_COLORS.transparent,
+    fill: COLORS.transparent,
     strokeWidth: 1,
   },
   tipMissing: {

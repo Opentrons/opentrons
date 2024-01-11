@@ -11,6 +11,7 @@ import {
   ALIGN_CENTER,
   JUSTIFY_CENTER,
   BORDERS,
+  COLORS,
   LEGACY_COLORS,
   SPACING,
   TYPOGRAPHY,
@@ -376,7 +377,7 @@ const ARROW_BUTTON_STYLES = css`
     &:hover {
       background-color: ${LEGACY_COLORS.light1Pressed};
       color: ${LEGACY_COLORS.darkBlackHover};
-      border: 1px ${LEGACY_COLORS.transparent} solid;
+      border: 1px ${COLORS.transparent} solid;
     }
 
     &:active {
@@ -391,7 +392,7 @@ const ARROW_BUTTON_STYLES = css`
     &:disabled {
       background-color: ${LEGACY_COLORS.darkBlack20};
       color: ${LEGACY_COLORS.darkBlack40};
-      border: 1px ${LEGACY_COLORS.transparent} solid;
+      border: 1px ${COLORS.transparent} solid;
     }
   }
 `

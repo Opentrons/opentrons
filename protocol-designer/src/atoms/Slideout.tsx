@@ -11,6 +11,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   LEGACY_COLORS,
+  COLORS,
   Overlay,
   POSITION_FIXED,
   TYPOGRAPHY,
@@ -138,7 +139,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
         css={`
           ${isExpanded ?? false ? OVERLAY_IN_STYLE : overlayOutStyle}
         `}
-        backgroundColor={LEGACY_COLORS.transparent}
+        backgroundColor={COLORS.transparent}
         height="92.5%"
         marginTop={SPACING.spacing48}
       />

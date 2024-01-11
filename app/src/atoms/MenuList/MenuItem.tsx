@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 import {
   SPACING,
+  COLORS,
   LEGACY_COLORS,
   TYPOGRAPHY,
   ALIGN_CENTER,
@@ -15,7 +16,7 @@ interface ButtonProps extends StyleProps {
 export const MenuItem = styled.button<ButtonProps>`
   text-align: ${TYPOGRAPHY.textAlignLeft};
   font-size: ${TYPOGRAPHY.fontSizeP};
-  background-color: ${LEGACY_COLORS.transparent};
+  background-color: ${COLORS.transparent};
   color: ${LEGACY_COLORS.darkBlackEnabled};
   padding: ${SPACING.spacing8} ${SPACING.spacing12} ${SPACING.spacing8}
     ${SPACING.spacing12};
@@ -26,7 +27,7 @@ export const MenuItem = styled.button<ButtonProps>`
   }
 
   &:disabled {
-    background-color: ${LEGACY_COLORS.transparent};
+    background-color: ${COLORS.transparent};
     color: ${LEGACY_COLORS.black}${LEGACY_COLORS.opacity50HexCode};
   }
 
@@ -35,7 +36,7 @@ export const MenuItem = styled.button<ButtonProps>`
     text-align: ${TYPOGRAPHY.textAlignCenter};
     font-size: ${TYPOGRAPHY.fontSize28};
     background-color: ${({ isAlert }) =>
-      isAlert ? LEGACY_COLORS.errorEnabled : LEGACY_COLORS.transparent};
+      isAlert ? LEGACY_COLORS.errorEnabled : COLORS.transparent};
     color: ${({ isAlert }) =>
       isAlert ? LEGACY_COLORS.white : LEGACY_COLORS.darkBlackEnabled};
     padding: ${SPACING.spacing24};
@@ -49,7 +50,7 @@ export const MenuItem = styled.button<ButtonProps>`
 
     &:disabled {
       background-color: ${({ isAlert }) =>
-        isAlert ? LEGACY_COLORS.errorEnabled : LEGACY_COLORS.transparent};
+        isAlert ? LEGACY_COLORS.errorEnabled : COLORS.transparent};
       color: ${({ isAlert }) => (isAlert ? LEGACY_COLORS.white : LEGACY_COLORS.darkBlack60)};
     }
   }

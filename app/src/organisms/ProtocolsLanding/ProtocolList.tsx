@@ -14,6 +14,7 @@ import {
   TYPOGRAPHY,
   BORDERS,
   POSITION_ABSOLUTE,
+  COLORS,
   LEGACY_COLORS,
   SecondaryButton,
   DIRECTION_COLUMN,
@@ -39,7 +40,7 @@ import type { ProtocolSort } from './hooks'
 import type { Dispatch } from '../../redux/types'
 
 const SORT_BY_BUTTON_STYLE = css`
-  background-color: ${LEGACY_COLORS.transparent};
+  background-color: ${COLORS.transparent};
   cursor: pointer;
   &:hover {
     background-color: ${LEGACY_COLORS.medGreyHover};
@@ -225,7 +226,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
           {showSortByMenu ? (
             <Overlay
               onClick={handleClickOutside}
-              backgroundColor={LEGACY_COLORS.transparent}
+              backgroundColor={COLORS.transparent}
             />
           ) : null}
           <SecondaryButton onClick={() => setShowImportProtocolSlideout(true)}>

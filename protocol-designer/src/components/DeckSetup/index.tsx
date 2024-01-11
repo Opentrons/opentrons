@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import compact from 'lodash/compact'
 import values from 'lodash/values'
 import {
+  COLORS,
   LEGACY_COLORS,
   DeckFromLayers,
   FlexTrash,
@@ -611,7 +612,7 @@ export const DeckSetup = (): JSX.Element => {
                             <SingleSlotFixture
                               cutoutId={cutoutId}
                               deckDefinition={deckDef}
-                              slotClipColor={LEGACY_COLORS.transparent}
+                              slotClipColor={COLORS.transparent}
                               fixtureBaseColor={lightFill}
                             />
                             <FlexTrash
