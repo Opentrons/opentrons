@@ -2,6 +2,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import {
   StyleProps,
+  COLORS,
   LEGACY_COLORS,
   POSITION_FIXED,
   POSITION_ABSOLUTE,
@@ -82,7 +83,7 @@ const Overlay = styled.div`
   top: 0;
   bottom: 0;
   z-index: 1;
-  background-color: ${COLORS.transparentBlack40};
+  background-color: ${COLORS.black90}${COLORS.opacity40HexCode};
   cursor: default;
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {

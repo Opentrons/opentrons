@@ -6,6 +6,7 @@ import {
   RESPONSIVENESS,
   SPACING,
 } from '../ui-style-constants'
+import { COLORS } from '../helix-design-system'
 import { StyleProps, styleProps } from '../primitives'
 import {
   POSITION_FIXED,
@@ -82,7 +83,7 @@ const Overlay = styled.div`
   top: 0;
   bottom: 0;
   z-index: 1;
-  background-color: ${COLORS.transparentBlack40};
+  background-color: ${COLORS.black90}${COLORS.opacity40HexCode};
   cursor: default;
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {

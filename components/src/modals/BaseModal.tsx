@@ -2,9 +2,10 @@ import * as React from 'react'
 
 import * as Styles from '../styles'
 import { Box, Flex } from '../primitives'
-import { LEGACY_COLORS, SPACING } from '../ui-style-constants'
-import type { StyleProps } from '../primitives'
+import { SPACING } from '../ui-style-constants'
+import { COLORS } from '../helix-design-system'
 import { POSITION_FIXED } from '../styles'
+import type { StyleProps } from '../primitives'
 
 const BASE_STYLE = {
   position: Styles.POSITION_ABSOLUTE,
@@ -73,7 +74,7 @@ export interface BaseModalProps extends StyleProps {
  */
 export function BaseModal(props: BaseModalProps): JSX.Element {
   const {
-    overlayColor = COLORS.transparentBlack40,
+    overlayColor = `${COLORS.black90}${COLORS.opacity40HexCode}`,
     onOutsideClick,
     zIndex = 10,
     header,

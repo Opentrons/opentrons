@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 import {
   Box,
   Flex,
+  COLORS,
   LEGACY_COLORS,
   SPACING,
   POSITION_FIXED,
@@ -190,7 +191,7 @@ export function InterventionModal({
       top="0"
       bottom="0"
       zIndex="1"
-      backgroundColor={COLORS.transparentBlack40}
+      backgroundColor={`${COLORS.black90}${COLORS.opacity40HexCode}`}
       cursor="default"
     >
       <Flex {...BASE_STYLE} zIndex={10}>
