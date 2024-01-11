@@ -2,15 +2,13 @@ import * as React from 'react'
 
 import {
   BORDERS,
+  COLORS,
   Flex,
   DIRECTION_ROW,
   ALIGN_CENTER,
   SPACING,
   TYPOGRAPHY,
   Icon,
-  COLORS,
-  LEGACY_COLORS,
-  COLORS,
 } from '@opentrons/components'
 
 import { StyledText } from '../text'
@@ -41,34 +39,34 @@ const CHIP_PROPS_BY_TYPE: Record<
   }
 > = {
   basic: {
-    backgroundColor: `${COLORS.black90}${COLORS.opacity20HexCode}`,
+    backgroundColor: COLORS.darkBlack20,
     borderRadius: BORDERS.borderRadiusSize1,
-    textColor: LEGACY_COLORS.darkBlack90,
+    textColor: COLORS.grey60,
   },
   error: {
-    backgroundColor: LEGACY_COLORS.red3,
+    backgroundColor: COLORS.red3,
     borderRadius: BORDERS.borderRadiusSize5,
-    iconColor: LEGACY_COLORS.red1,
-    textColor: LEGACY_COLORS.red1,
+    iconColor: COLORS.red1,
+    textColor: COLORS.red1,
   },
   neutral: {
-    backgroundColor: `${COLORS.black90}${COLORS.opacity20HexCode}`,
+    backgroundColor: COLORS.darkBlack20,
     borderRadius: BORDERS.borderRadiusSize5,
-    iconColor: LEGACY_COLORS.darkBlack90,
-    textColor: LEGACY_COLORS.darkBlack70,
+    iconColor: COLORS.grey60,
+    textColor: COLORS.grey60,
   },
   success: {
-    backgroundColor: LEGACY_COLORS.green3,
+    backgroundColor: COLORS.green3,
     borderRadius: BORDERS.borderRadiusSize5,
-    iconColor: LEGACY_COLORS.green1,
+    iconColor: COLORS.green1,
     iconName: 'ot-check',
-    textColor: LEGACY_COLORS.green1,
+    textColor: COLORS.green1,
   },
   warning: {
-    backgroundColor: LEGACY_COLORS.yellow3,
+    backgroundColor: COLORS.yellow35,
     borderRadius: BORDERS.borderRadiusSize5,
-    iconColor: LEGACY_COLORS.yellow1,
-    textColor: LEGACY_COLORS.yellow1,
+    iconColor: COLORS.yellow60,
+    textColor: COLORS.yellow60,
   },
 }
 

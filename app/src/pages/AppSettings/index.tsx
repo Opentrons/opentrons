@@ -10,7 +10,6 @@ import {
   ALIGN_START,
   DIRECTION_ROW,
   SPACING,
-  LEGACY_COLORS,
   COLORS,
   BORDERS,
   TYPOGRAPHY,
@@ -51,7 +50,7 @@ export function AppSettings(): JSX.Element {
         backgroundColor={COLORS.white}
         height="100%"
         width="100%"
-        border={`1px ${BORDERS.styleSolid} ${LEGACY_COLORS.medGreyEnabled}`}
+        border={`1px ${BORDERS.styleSolid} ${COLORS.grey35}`}
         borderRadius={BORDERS.radiusSoftCorners}
         minHeight="95%"
       >

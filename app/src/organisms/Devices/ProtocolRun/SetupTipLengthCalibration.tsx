@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   DIRECTION_COLUMN,
-  LEGACY_COLORS,
   COLORS,
   SPACING,
   TYPOGRAPHY,
@@ -30,7 +29,7 @@ export function SetupTipLengthCalibration({
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       <StyledText
-        color={LEGACY_COLORS.black}
+        color={COLORS.black}
         css={TYPOGRAPHY.pSemiBold}
         id="TipRackCalibration_requiredTipLengthTitle"
       >

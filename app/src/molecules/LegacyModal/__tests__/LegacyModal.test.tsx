@@ -1,7 +1,6 @@
 import * as React from 'react'
 
-import { LEGACY_COLORS,
-  COLORS, renderWithProviders } from '@opentrons/components'
+import { COLORS, renderWithProviders } from '@opentrons/components'
 
 import { LegacyModal } from '..'
 
@@ -34,7 +33,7 @@ describe('LegacyModal', () => {
     const [{ getByTestId }] = render(props)
     const headerIcon = getByTestId('Modal_header_icon')
     expect(headerIcon).toBeInTheDocument()
-    expect(headerIcon).toHaveStyle(`color: ${LEGACY_COLORS.warningEnabled}`)
+    expect(headerIcon).toHaveStyle(`color: ${COLORS.yellow50}`)
     expect(getByTestId('Modal_header')).toHaveStyle(
       `background-color: ${COLORS.white}`
     )
@@ -45,7 +44,7 @@ describe('LegacyModal', () => {
     const [{ getByTestId }] = render(props)
     const headerIcon = getByTestId('Modal_header_icon')
     expect(headerIcon).toBeInTheDocument()
-    expect(headerIcon).toHaveStyle(`color: ${LEGACY_COLORS.errorEnabled}`)
+    expect(headerIcon).toHaveStyle(`color: ${COLORS.errorEnabled}`)
     expect(getByTestId('Modal_header')).toHaveStyle(
       `background-color: ${COLORS.white}`
     )

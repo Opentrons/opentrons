@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  LEGACY_COLORS,
   COLORS,
   PrimaryButton,
   TEXT_TRANSFORM_CAPITALIZE,
@@ -30,7 +29,7 @@ export const Success = (props: SuccessProps): JSX.Element => {
 
   return (
     <SimpleWizardBody
-      iconColor={LEGACY_COLORS.successEnabled}
+      iconColor={COLORS.successEnabled}
       header={i18n.format(message, 'capitalize')}
       isSuccess
     >

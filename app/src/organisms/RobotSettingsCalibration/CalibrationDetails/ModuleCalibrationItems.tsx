@@ -2,8 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 
-import { BORDERS, LEGACY_COLORS,
-  COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
+import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data/js/modules'
 
 import { StyledText } from '../../../atoms/text'
@@ -96,6 +95,6 @@ const StyledTableCell = styled.td`
 `
 
 const BODY_STYLE = css`
-  box-shadow: 0 0 0 1px ${LEGACY_COLORS.medGreyEnabled};
+  box-shadow: 0 0 0 1px ${COLORS.grey35};
   border-radius: 3px;
 `

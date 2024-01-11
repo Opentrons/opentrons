@@ -7,7 +7,6 @@ import {
   SPACING,
   JUSTIFY_SPACE_BETWEEN,
   Btn,
-  LEGACY_COLORS,
   COLORS,
   TYPOGRAPHY,
   DIRECTION_ROW,
@@ -46,7 +45,7 @@ interface Props {
 const GO_BACK_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
-  color: ${LEGACY_COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50Enabled};
 
   &:hover {
     opacity: 70%;

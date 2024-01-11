@@ -14,8 +14,6 @@ import {
   TYPOGRAPHY,
   BORDERS,
   COLORS,
-  LEGACY_COLORS,
-  COLORS,
   POSITION_FIXED,
 } from '@opentrons/components'
 
@@ -66,7 +64,7 @@ export const RunPreviewComponent = (
         <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('run_preview')}
         </StyledText>
-        <StyledText as="label" color={LEGACY_COLORS.darkGreyEnabled}>
+        <StyledText as="label" color={COLORS.grey50Enabled}>
           {t('steps_total', { count: robotSideAnalysis.commands.length })}
         </StyledText>
       </Flex>
@@ -94,14 +92,12 @@ export const RunPreviewComponent = (
         {(command, index) => {
           const isCurrent = index === currentRunCommandIndex
           const borderColor = isCurrent
-            ? LEGACY_COLORS.blueEnabled
+            ? COLORS.blueEnabled
             : COLORS.transparent
-          const backgroundColor = isCurrent
-            ? LEGACY_COLORS.lightBlue
-            : LEGACY_COLORS.fundamentalsBackground
+          const backgroundColor = isCurrent ? COLORS.lightBlue : COLORS.grey35
           const contentColor = isCurrent
-            ? COLORS.black90
-            : LEGACY_COLORS.darkGreyEnabled
+            ? COLORS.darkBlackEnabled
+            : COLORS.grey50Enabled
           return (
             <Flex
               key={command.id}
@@ -119,14 +115,12 @@ export const RunPreviewComponent = (
                 gridGap={SPACING.spacing4}
                 width="100%"
                 border={`solid 1px ${
-                  index === jumpedIndex
-                    ? LEGACY_COLORS.electricPurple
-                    : borderColor
+                  index === jumpedIndex ? COLORS.electricPurple : borderColor
                 }`}
                 backgroundColor={
                   index === jumpedIndex ? '#F5E3FF' : backgroundColor
                 }
-                color={COLORS.black90}
+                color={COLORS.darkBlackEnabled}
                 borderRadius={BORDERS.radiusSoftCorners}
                 padding={SPACING.spacing8}
                 css={css`

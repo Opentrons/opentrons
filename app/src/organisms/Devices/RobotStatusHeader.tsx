@@ -13,7 +13,6 @@ import {
   useHoverTooltip,
   useInterval,
   ALIGN_CENTER,
-  LEGACY_COLORS,
   COLORS,
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
@@ -154,7 +153,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
       <Flex flexDirection={DIRECTION_COLUMN}>
         <StyledText
           as="h6"
-          color={LEGACY_COLORS.darkGreyEnabled}
+          color={COLORS.grey50Enabled}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing2}
           textTransform={TYPOGRAPHY.textTransformUppercase}
@@ -186,7 +185,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
                   aria-label={iconName}
                   paddingTop={SPACING.spacing4}
                   name={iconName}
-                  color={LEGACY_COLORS.darkGreyEnabled}
+                  color={COLORS.grey50Enabled}
                   size="1.25rem"
                 />
               </Btn>

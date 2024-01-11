@@ -4,7 +4,6 @@ import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   Btn,
-  LEGACY_COLORS,
   COLORS,
   DISPLAY_FLEX,
   JUSTIFY_CENTER,
@@ -34,44 +33,42 @@ export function PlayButton({
     -webkit-tap-highlight-color: transparent;
     &:focus {
       background-color: ${ready && !isDoorOpen
-        ? LEGACY_COLORS.bluePressed
-        : LEGACY_COLORS.darkBlack40};
+        ? COLORS.bluePressed
+        : COLORS.grey50};
       color: ${COLORS.white};
     }
 
     &:hover {
       background-color: ${ready && !isDoorOpen
-        ? LEGACY_COLORS.blueEnabled
-        : LEGACY_COLORS.darkBlack20};
+        ? COLORS.blueEnabled
+        : COLORS.grey35};
       color: ${COLORS.white};
     }
 
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE};
       background-color: ${ready && !isDoorOpen
-        ? LEGACY_COLORS.blueEnabled
-        : LEGACY_COLORS.darkBlack20};
+        ? COLORS.blueEnabled
+        : COLORS.grey35};
     }
 
     &:active {
       background-color: ${ready && !isDoorOpen
-        ? LEGACY_COLORS.bluePressed
-        : LEGACY_COLORS.darkBlack40};
+        ? COLORS.bluePressed
+        : COLORS.grey50};
       color: ${COLORS.white};
     }
 
     &:disabled {
-      background-color: ${LEGACY_COLORS.darkBlack20};
-      color: ${LEGACY_COLORS.darkBlack60};
+      background-color: ${COLORS.grey35};
+      color: ${COLORS.grey50};
     }
   `
   return (
     <Btn
       alignItems={ALIGN_CENTER}
       backgroundColor={
-        disabled || !ready || isDoorOpen
-          ? LEGACY_COLORS.darkBlack20
-          : LEGACY_COLORS.blueEnabled
+        disabled || !ready || isDoorOpen ? COLORS.grey35 : COLORS.blueEnabled
       }
       borderRadius="6.25rem"
       display={DISPLAY_FLEX}
@@ -84,11 +81,7 @@ export function PlayButton({
       css={playButtonStyle}
     >
       <Icon
-        color={
-          disabled || !ready || isDoorOpen
-            ? LEGACY_COLORS.darkBlack60
-            : COLORS.white
-        }
+        color={disabled || !ready || isDoorOpen ? COLORS.grey50 : COLORS.white}
         name="play-icon"
         size="2.5rem"
       />
@@ -104,7 +97,7 @@ export function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
   return (
     <Btn
       alignItems={ALIGN_CENTER}
-      backgroundColor={LEGACY_COLORS.red2}
+      backgroundColor={COLORS.red2}
       borderRadius="6.25rem"
       display={DISPLAY_FLEX}
       height="6.25rem"
@@ -122,27 +115,27 @@ export function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
 const CLOSE_BUTTON_STYLE = css`
   -webkit-tap-highlight-color: transparent;
   &:focus {
-    background-color: ${LEGACY_COLORS.red2Pressed};
+    background-color: ${COLORS.red2Pressed};
     color: ${COLORS.white};
   }
 
   &:hover {
-    background-color: ${LEGACY_COLORS.red2};
+    background-color: ${COLORS.red2};
     color: ${COLORS.white};
   }
 
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${LEGACY_COLORS.red2};
+    background-color: ${COLORS.red2};
   }
 
   &:active {
-    background-color: ${LEGACY_COLORS.red2Pressed};
+    background-color: ${COLORS.red2Pressed};
     color: ${COLORS.white};
   }
 
   &:disabled {
-    background-color: ${LEGACY_COLORS.darkBlack20};
-    color: ${LEGACY_COLORS.darkBlack60};
+    background-color: ${COLORS.grey35};
+    color: ${COLORS.grey50};
   }
 `

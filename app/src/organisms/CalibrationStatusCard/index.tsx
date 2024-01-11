@@ -8,7 +8,6 @@ import {
   SPACING,
   TYPOGRAPHY,
   BORDERS,
-  LEGACY_COLORS,
   COLORS,
   JUSTIFY_SPACE_BETWEEN,
   DIRECTION_COLUMN,
@@ -38,20 +37,20 @@ export function CalibrationStatusCard({
   const { taskListStatus } = useCalibrationTaskList()
 
   // start off assuming we are missing calibrations
-  let statusLabelBackgroundColor: string = LEGACY_COLORS.errorEnabled
-  let statusLabelIconColor: string = LEGACY_COLORS.errorEnabled
+  let statusLabelBackgroundColor: string = COLORS.errorEnabled
+  let statusLabelIconColor: string = COLORS.errorEnabled
   let statusLabelText = t('missing_calibration_data')
 
   // if the tasklist is empty, though, all calibrations are good
   if (taskListStatus === 'complete') {
-    statusLabelBackgroundColor = LEGACY_COLORS.successEnabled
-    statusLabelIconColor = LEGACY_COLORS.successEnabled
+    statusLabelBackgroundColor = COLORS.successEnabled
+    statusLabelIconColor = COLORS.successEnabled
     statusLabelText = t('calibration_complete')
     // if we have tasks and they are all marked bad, then we should
     // strongly suggest they re-do those calibrations
   } else if (taskListStatus === 'bad') {
-    statusLabelBackgroundColor = LEGACY_COLORS.warningEnabled
-    statusLabelIconColor = LEGACY_COLORS.warningEnabled
+    statusLabelBackgroundColor = COLORS.yellow50
+    statusLabelIconColor = COLORS.yellow50
     statusLabelText = t('calibration_recommended')
   }
 
@@ -77,10 +76,10 @@ export function CalibrationStatusCard({
           <StatusLabel
             status={statusLabelText}
             backgroundColor={`${String(statusLabelBackgroundColor)}${String(
-              LEGACY_COLORS.opacity12HexCode
+              COLORS.opacity12HexCode
             )}`}
             iconColor={statusLabelIconColor}
-            textColor={COLORS.black90}
+            textColor={COLORS.darkBlackEnabled}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             iconSize="0.313rem"
           />

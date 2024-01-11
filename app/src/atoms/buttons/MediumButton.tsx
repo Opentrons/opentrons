@@ -5,8 +5,6 @@ import {
   BORDERS,
   Btn,
   COLORS,
-  LEGACY_COLORS,
-  COLORS,
   DIRECTION_ROW,
   Icon,
   SPACING,
@@ -60,48 +58,48 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
     alert: {
       //  TODO(ew, 3/22/23): replaces these hex codes with the color constants
       activeBackgroundColor: '#b91f20',
-      defaultBackgroundColor: LEGACY_COLORS.red2,
+      defaultBackgroundColor: COLORS.red2,
       defaultColor: COLORS.white,
-      disabledBackgroundColor: LEGACY_COLORS.darkBlack20,
+      disabledBackgroundColor: COLORS.grey35,
       iconColor: COLORS.white,
     },
     alertSecondary: {
       //  TODO(ew, 3/22/23): replaces these hex codes with the color constants
       activeBackgroundColor: '#ccabac',
-      defaultBackgroundColor: LEGACY_COLORS.red3,
-      defaultColor: LEGACY_COLORS.red1,
-      disabledBackgroundColor: LEGACY_COLORS.darkBlack20,
-      iconColor: LEGACY_COLORS.red1,
+      defaultBackgroundColor: COLORS.red3,
+      defaultColor: COLORS.red1,
+      disabledBackgroundColor: COLORS.grey35,
+      iconColor: COLORS.red1,
     },
     primary: {
       //  TODO(ew, 3/22/23): replaces these hex codes with the color constants
       activeBackgroundColor: '#045dd0',
-      defaultBackgroundColor: LEGACY_COLORS.blueEnabled,
+      defaultBackgroundColor: COLORS.blueEnabled,
       defaultColor: COLORS.white,
-      disabledBackgroundColor: LEGACY_COLORS.darkBlack20,
+      disabledBackgroundColor: COLORS.grey35,
       iconColor: COLORS.white,
     },
     secondary: {
       //  TODO(ew, 3/22/23): replaces these hex codes with the color constants
       activeBackgroundColor: '#94afd4',
-      defaultBackgroundColor: LEGACY_COLORS.mediumBlueEnabled,
-      defaultColor: COLORS.black90,
-      disabledBackgroundColor: LEGACY_COLORS.darkBlack20,
-      iconColor: LEGACY_COLORS.blueEnabled,
+      defaultBackgroundColor: COLORS.mediumBlueEnabled,
+      defaultColor: COLORS.darkBlackEnabled,
+      disabledBackgroundColor: COLORS.grey35,
+      iconColor: COLORS.blueEnabled,
     },
     tertiaryHigh: {
-      activeBackgroundColor: LEGACY_COLORS.darkBlack20,
+      activeBackgroundColor: COLORS.grey35,
       defaultBackgroundColor: COLORS.white,
-      defaultColor: LEGACY_COLORS.darkBlack100,
+      defaultColor: COLORS.darkBlack100,
       disabledBackgroundColor: COLORS.transparent,
-      iconColor: LEGACY_COLORS.darkBlack100,
+      iconColor: COLORS.darkBlack100,
     },
     tertiaryLowLight: {
-      activeBackgroundColor: LEGACY_COLORS.darkBlack20,
+      activeBackgroundColor: COLORS.grey35,
       defaultBackgroundColor: COLORS.white,
-      defaultColor: LEGACY_COLORS.darkBlack70,
+      defaultColor: COLORS.grey60,
       disabledBackgroundColor: COLORS.transparent,
-      iconColor: LEGACY_COLORS.darkBlack70,
+      iconColor: COLORS.grey60,
     },
   }
 
@@ -139,7 +137,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
     &:disabled {
       background-color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType]
         .disabledBackgroundColor};
-      color: ${LEGACY_COLORS.darkBlack60};
+      color: ${COLORS.grey50};
     }
   `
   return (
@@ -164,7 +162,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
           aria-label={`${iconName ?? 'play'} icon`}
           color={
             disabled
-              ? LEGACY_COLORS.darkBlack60
+              ? COLORS.grey50
               : MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
           }
           size={SPACING.spacing40}

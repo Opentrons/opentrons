@@ -13,7 +13,6 @@ import {
   SecondaryButton,
   Icon,
   DIRECTION_ROW,
-  LEGACY_COLORS,
   COLORS,
   JUSTIFY_END,
   ALIGN_CENTER,
@@ -118,7 +117,7 @@ export const LocationConflictModal = (
             hasExitIcon: true,
             onClick: onCloseClick,
             iconName: 'ot-alert',
-            iconColor: LEGACY_COLORS.warningEnabled,
+            iconColor: COLORS.yellow50,
           }}
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
@@ -151,7 +150,7 @@ export const LocationConflictModal = (
               >
                 <Flex
                   padding={SPACING.spacing24}
-                  backgroundColor={LEGACY_COLORS.light1}
+                  backgroundColor={COLORS.light1}
                   flexDirection={DIRECTION_ROW}
                   alignItems={ALIGN_CENTER}
                   justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -165,7 +164,7 @@ export const LocationConflictModal = (
                 </Flex>
                 <Flex
                   padding={SPACING.spacing24}
-                  backgroundColor={LEGACY_COLORS.light1}
+                  backgroundColor={COLORS.light1}
                   flexDirection={DIRECTION_ROW}
                   justifyContent={JUSTIFY_SPACE_BETWEEN}
                   alignItems={ALIGN_CENTER}
@@ -206,7 +205,7 @@ export const LocationConflictModal = (
               gridGap={SPACING.spacing10}
               alignItems={ALIGN_CENTER}
             >
-              <Icon name="ot-alert" size="1rem" color={LEGACY_COLORS.warningEnabled} />
+              <Icon name="ot-alert" size="1rem" color={COLORS.yellow50} />
               <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {t('deck_conflict')}
               </StyledText>
@@ -244,7 +243,7 @@ export const LocationConflictModal = (
               >
                 <Flex
                   padding={SPACING.spacing8}
-                  backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+                  backgroundColor={COLORS.grey35}
                   flexDirection={DIRECTION_ROW}
                   gridGap={SPACING.spacing20}
                   alignItems={ALIGN_CENTER}
@@ -260,7 +259,7 @@ export const LocationConflictModal = (
                 </Flex>
                 <Flex
                   padding={SPACING.spacing8}
-                  backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+                  backgroundColor={COLORS.grey35}
                   flexDirection={DIRECTION_ROW}
                   gridGap={SPACING.spacing20}
                   alignItems={ALIGN_CENTER}

@@ -5,7 +5,6 @@ import {
   Flex,
   SPACING,
   TYPOGRAPHY,
-  LEGACY_COLORS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -42,7 +41,7 @@ export function NetworkDetailsModal({
     title: securityType != null ? networkName : t('ethernet'),
     hasExitIcon: true,
     iconName: securityType != null ? 'wifi' : 'ethernet',
-    iconColor: COLORS.black90,
+    iconColor: COLORS.darkBlackEnabled,
   }
 
   return (
@@ -77,7 +76,7 @@ function ListItem({ itemName, itemValue }: ListItemProps): JSX.Element {
       flexDirection={DIRECTION_ROW}
       alignItems={ALIGN_CENTER}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-      backgroundColor={LEGACY_COLORS.grey3}
+      backgroundColor={COLORS.grey3}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       borderRadius={BORDERS.borderRadiusSize3}
     >

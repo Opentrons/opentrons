@@ -12,7 +12,6 @@ import {
   SPACING_AUTO,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  LEGACY_COLORS,
   COLORS,
   SPACING,
   TYPOGRAPHY,
@@ -212,7 +211,7 @@ export function AdvancedSettings(): JSX.Element {
                     <Btn
                       onClick={cancelExit}
                       textTransform={TYPOGRAPHY.textTransformCapitalize}
-                      color={LEGACY_COLORS.blueEnabled}
+                      color={COLORS.blueEnabled}
                       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                       marginRight={SPACING.spacing32}
                     >
@@ -276,7 +275,7 @@ export function AdvancedSettings(): JSX.Element {
             <StyledText
               as="h6"
               textTransform={TYPOGRAPHY.textTransformUppercase}
-              color={LEGACY_COLORS.darkGreyEnabled}
+              color={COLORS.grey50Enabled}
               paddingBottom={SPACING.spacing4}
             >
               {t('additional_folder_location')}
@@ -285,7 +284,7 @@ export function AdvancedSettings(): JSX.Element {
               <Link
                 role="button"
                 css={TYPOGRAPHY.pRegular}
-                color={COLORS.black90}
+                color={COLORS.darkBlackEnabled}
                 onClick={() =>
                   dispatch(CustomLabware.openCustomLabwareDirectory())
                 }
@@ -436,7 +435,7 @@ export function AdvancedSettings(): JSX.Element {
             <StyledText
               as="h6"
               textTransform={TYPOGRAPHY.textTransformUppercase}
-              color={LEGACY_COLORS.darkGreyEnabled}
+              color={COLORS.grey50Enabled}
               paddingBottom={SPACING.spacing4}
             >
               {t('override_path')}
@@ -445,7 +444,7 @@ export function AdvancedSettings(): JSX.Element {
               <Link
                 role="button"
                 css={TYPOGRAPHY.pRegular}
-                color={COLORS.black90}
+                color={COLORS.darkBlackEnabled}
                 onClick={() =>
                   dispatch(ProtocolAnalysis.openPythonInterpreterDirectory())
                 }
@@ -562,14 +561,14 @@ export function AdvancedSettings(): JSX.Element {
             {driverOutdated && (
               <Banner type="warning" marginTop={SPACING.spacing16}>
                 <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-                  <StyledText as="p" color={COLORS.black90}>
+                  <StyledText as="p" color={COLORS.darkBlackEnabled}>
                     {t('usb_to_ethernet_adapter_toast_message')}
                   </StyledText>
                   <Link
                     external
                     href={REALTEK_URL}
                     css={TYPOGRAPHY.pRegular}
-                    color={COLORS.black90}
+                    color={COLORS.darkBlackEnabled}
                     textDecoration={TYPOGRAPHY.textDecorationUnderline}
                     id="AdvancedSettings_realtekLink"
                   >

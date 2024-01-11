@@ -4,6 +4,7 @@ import { Well } from './Well'
 import { COLORS } from '../../../helix-design-system'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { CSSProperties } from 'styled-components'
+import { COLORS } from '../../../ui-style-constants'
 
 export interface StrokedWellProps {
   definition: LabwareDefinition2

@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
-  LEGACY_COLORS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -162,7 +161,7 @@ export function ProtocolDashboard(): JSX.Element {
               <StyledText
                 as="p"
                 marginBottom={SPACING.spacing8}
-                color={LEGACY_COLORS.darkBlack70}
+                color={COLORS.grey60}
               >
                 {t('pinned_protocols')}
               </StyledText>

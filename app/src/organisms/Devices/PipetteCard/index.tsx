@@ -10,7 +10,6 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   TYPOGRAPHY,
-  LEGACY_COLORS,
   COLORS,
   useOnClickOutside,
   InstrumentDiagram,
@@ -183,7 +182,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   }
   return (
     <Flex
-      backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+      backgroundColor={COLORS.grey35}
       borderRadius={BORDERS.radiusSoftCorners}
       width="100%"
       data-testid={`PipetteCard_${String(pipetteDisplayName)}`}
@@ -290,7 +289,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                 ) : null}
                 <StyledText
                   textTransform={TYPOGRAPHY.textTransformUppercase}
-                  color={LEGACY_COLORS.darkGreyEnabled}
+                  color={COLORS.grey50Enabled}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   fontSize={TYPOGRAPHY.fontSizeH6}
                   paddingBottom={SPACING.spacing4}

@@ -6,8 +6,6 @@ import {
   RobotCoordsForeignObject,
   ALIGN_CENTER,
   COLORS,
-  LEGACY_COLORS,
-  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_CENTER,
@@ -78,18 +76,14 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
             <Icon
               name={isAttached ? 'ot-check' : 'alert-circle'}
-              color={
-                isAttached
-                  ? LEGACY_COLORS.successEnabled
-                  : LEGACY_COLORS.warningEnabled
-              }
+              color={isAttached ? COLORS.successEnabled : COLORS.yellow50}
               key="icon"
               size="10px"
               marginRight={SPACING.spacing4}
             />
 
             <StyledText
-              color={LEGACY_COLORS.darkGreyEnabled}
+              color={COLORS.grey50Enabled}
               fontSize={TYPOGRAPHY.fontSizeCaption}
             >
               {!isAttached ? t('module_not_connected') : t('module_connected')}
@@ -98,13 +92,13 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
         ) : null}
         <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={LEGACY_COLORS.darkGreyEnabled}
+          color={COLORS.grey50Enabled}
           fontSize={TYPOGRAPHY.fontSizeLabel}
         >
           {getModuleDisplayName(moduleModel)}
         </StyledText>
         <StyledText
-          color={LEGACY_COLORS.darkGreyEnabled}
+          color={COLORS.grey50Enabled}
           fontSize={TYPOGRAPHY.fontSizeH6}
           fontStyle={
             runHasStarted

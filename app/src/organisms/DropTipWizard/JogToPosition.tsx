@@ -15,7 +15,6 @@ import {
   ALIGN_FLEX_START,
   JUSTIFY_FLEX_END,
   TYPOGRAPHY,
-  LEGACY_COLORS,
   COLORS,
   TEXT_ALIGN_CENTER,
   Icon,
@@ -72,7 +71,7 @@ const ConfirmPosition = (props: ConfirmPositionProps): JSX.Element | null => {
             <Icon
               name="ot-alert"
               size="3.75rem"
-              color={LEGACY_COLORS.warningEnabled}
+              color={COLORS.yellow50}
               aria-label="ot-alert"
             />
           </Flex>
@@ -109,7 +108,7 @@ const ConfirmPosition = (props: ConfirmPositionProps): JSX.Element | null => {
   } else {
     return (
       <SimpleWizardBody
-        iconColor={LEGACY_COLORS.warningEnabled}
+        iconColor={COLORS.yellow50}
         header={
           currentStep === POSITION_AND_BLOWOUT
             ? t('confirm_blowout_location', { flow: flowTitle })

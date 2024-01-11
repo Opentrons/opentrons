@@ -8,7 +8,6 @@ import {
   DIRECTION_COLUMN,
   SIZE_6,
   BORDERS,
-  LEGACY_COLORS,
   COLORS,
   SPACING,
   TYPOGRAPHY,
@@ -117,7 +116,7 @@ export function RobotSettings(): JSX.Element | null {
       >
         <Box paddingX={SPACING.spacing16}>
           <Box
-            color={LEGACY_COLORS.black}
+            color={COLORS.black}
             css={TYPOGRAPHY.h1Default}
             padding={`${SPACING.spacing24} 0`}
           >

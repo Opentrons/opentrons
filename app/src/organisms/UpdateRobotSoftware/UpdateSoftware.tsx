@@ -5,7 +5,6 @@ import {
   ALIGN_CENTER,
   BORDERS,
   Box,
-  LEGACY_COLORS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -44,7 +43,7 @@ export function UpdateSoftware({
 
   return (
     <Flex
-      backgroundColor={LEGACY_COLORS.darkBlack20}
+      backgroundColor={COLORS.grey35}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing40}
       alignItems={ALIGN_CENTER}
@@ -64,7 +63,7 @@ export function UpdateSoftware({
         <StyledText
           as="h3"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={LEGACY_COLORS.darkBlack70}
+          color={COLORS.grey60}
         >
           {renderText()}
         </StyledText>

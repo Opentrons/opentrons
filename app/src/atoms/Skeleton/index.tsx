@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { BORDERS, Box, LEGACY_COLORS } from '@opentrons/components'
+import { BORDERS, Box, COLORS } from '@opentrons/components'
 
 interface SkeletonProps {
   width: string
@@ -16,9 +16,9 @@ export const Skeleton = (props: SkeletonProps): JSX.Element => {
     animation: shimmer 2s infinite linear;
     background: linear-gradient(
       to right,
-      ${LEGACY_COLORS.medGreyEnabled} 1%,
+      ${COLORS.grey35} 1%,
       #e3e3e366 25%,
-      ${LEGACY_COLORS.medGreyEnabled} 40%
+      ${COLORS.grey35} 40%
     );
     background-size: ${backgroundSize};
     width: ${width};

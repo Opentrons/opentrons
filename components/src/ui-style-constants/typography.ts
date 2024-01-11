@@ -1,6 +1,5 @@
 import { css } from 'styled-components'
-import { COLORS } from '../helix-design-system'
-import { LEGACY_COLORS } from './'
+import { COLORS } from './'
 
 // Font Sizes
 export const fontSize80 = '5rem' // 80px
@@ -126,7 +125,7 @@ export const linkPSemiBold = css`
   font-size: ${fontSizeP};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
-  color: ${LEGACY_COLORS.blueEnabled};
+  color: ${COLORS.blueEnabled};
 
   &:hover {
     opacity: 70%;
@@ -234,9 +233,9 @@ export const darkLinkH4SemiBold = css`
   font-size: ${fontSizeH4};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
-  color: ${LEGACY_COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50Enabled};
   &:hover {
-    color: ${COLORS.black90};
+    color: ${COLORS.darkBlackEnabled};
   }
 `
 
@@ -244,9 +243,9 @@ export const darkLinkLabelSemiBold = css`
   font-size: ${fontSizeLabel};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
-  color: ${LEGACY_COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50Enabled};
   &:hover {
-    color: ${COLORS.black90};
+    color: ${COLORS.darkBlackEnabled};
   }
 `
 
@@ -254,6 +253,6 @@ export const darkLinkLabelSemiBoldDisabled = css`
   font-size: ${fontSizeLabel};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
-  color: ${LEGACY_COLORS.medGreyHover};
+  color: ${COLORS.grey55};
   cursor: not-allowed;
 `

@@ -1,10 +1,5 @@
 import styled from 'styled-components'
-import {
-  LEGACY_COLORS,
-  BORDERS,
-  TYPOGRAPHY,
-  SPACING,
-} from '../../ui-style-constants'
+import { COLORS, BORDERS, TYPOGRAPHY, SPACING } from '../../ui-style-constants'
 import { isntStyleProp, styleProps } from '../../primitives'
 import { COLORS } from '../../helix-design-system'
 import type { StyleProps } from '../../index'
@@ -19,10 +14,10 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   appearance: none;
   cursor: pointer;
   color: ${props =>
-    props.isDangerous ? LEGACY_COLORS.errorText : LEGACY_COLORS.blueEnabled};
+    props.isDangerous ? COLORS.errorText : COLORS.blueEnabled};
   border: ${BORDERS.lineBorder};
   border-color: ${props =>
-    props.isDangerous ? LEGACY_COLORS.errorEnabled : 'initial'};
+    props.isDangerous ? COLORS.errorEnabled : 'initial'};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing8} ${SPACING.spacing16};
   text-transform: ${TYPOGRAPHY.textTransformNone};
@@ -40,7 +35,7 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.blue50};
+    box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
   }
 
   &:active {

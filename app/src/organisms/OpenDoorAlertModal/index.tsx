@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   BORDERS,
-  LEGACY_COLORS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -22,7 +21,7 @@ export function OpenDoorAlertModal(): JSX.Element {
     <Portal level="top">
       <Modal>
         <Flex
-          backgroundColor={LEGACY_COLORS.darkBlack20}
+          backgroundColor={COLORS.grey35}
           borderRadius={BORDERS.borderRadiusSize3}
           flexDirection={DIRECTION_COLUMN}
           padding={SPACING.spacing24}
@@ -44,7 +43,7 @@ export function OpenDoorAlertModal(): JSX.Element {
             <StyledText
               as="p"
               textAlign={TYPOGRAPHY.textAlignCenter}
-              color={LEGACY_COLORS.darkBlack90}
+              color={COLORS.grey60}
             >
               {t('close_door_to_resume')}
             </StyledText>

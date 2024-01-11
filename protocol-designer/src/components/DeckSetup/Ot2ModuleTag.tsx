@@ -3,7 +3,6 @@ import * as React from 'react'
 import {
   RobotCoordsForeignDiv,
   Text,
-  LEGACY_COLORS,
   COLORS,
   SPACING,
 } from '@opentrons/components'
@@ -44,7 +43,7 @@ export function Ot2ModuleTag(props: Ot2ModuleTagProps): JSX.Element {
       y={isThermocyclerModel ? -22 : 0}
       x={isThermocyclerModel ? 0 : xCoordinateForOtherMods}
       innerDivProps={{
-        backgroundColor: LEGACY_COLORS.darkGreyEnabled,
+        backgroundColor: COLORS.grey50Enabled,
         padding: SPACING.spacing4,
         height: '100%',
         color: COLORS.white,

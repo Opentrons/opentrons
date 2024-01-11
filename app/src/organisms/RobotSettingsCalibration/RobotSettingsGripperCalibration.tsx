@@ -5,7 +5,6 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   BORDERS,
-  LEGACY_COLORS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -42,7 +41,7 @@ const StyledTableCell = styled.td`
 `
 
 const BODY_STYLE = css`
-  box-shadow: 0 0 0 1px ${LEGACY_COLORS.medGreyEnabled};
+  box-shadow: 0 0 0 1px ${COLORS.grey35};
   border-radius: 3px;
 `
 

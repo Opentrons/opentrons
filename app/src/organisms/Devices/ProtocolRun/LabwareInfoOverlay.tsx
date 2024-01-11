@@ -7,7 +7,6 @@ import {
   Flex,
   RobotCoordsForeignDiv,
   SPACING,
-  LEGACY_COLORS,
   COLORS,
   TYPOGRAPHY,
   DISPLAY_FLEX,
@@ -48,7 +47,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
 
   return (
     <Box
-      backgroundColor={hover ? LEGACY_COLORS.blueEnabled : '#000000B3'}
+      backgroundColor={hover ? COLORS.blueEnabled : '#000000B3'}
       borderRadius="0 0 0.4rem 0.4rem"
       fontSize={TYPOGRAPHY.fontSizeCaption}
       padding={SPACING.spacing4}

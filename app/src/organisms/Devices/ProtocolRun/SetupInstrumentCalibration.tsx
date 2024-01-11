@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   DIRECTION_COLUMN,
-  LEGACY_COLORS,
   COLORS,
   SPACING,
   TYPOGRAPHY,
@@ -64,7 +63,7 @@ export function SetupInstrumentCalibration({
         <PipetteRecalibrationWarning />
       )}
       <StyledText
-        color={LEGACY_COLORS.black}
+        color={COLORS.black}
         css={TYPOGRAPHY.pSemiBold}
         id="PipetteCalibration_requiredPipettesTitle"
       >

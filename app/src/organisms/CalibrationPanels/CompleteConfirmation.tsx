@@ -9,7 +9,6 @@ import {
   SPACING,
   SIZE_3,
   JUSTIFY_CENTER,
-  LEGACY_COLORS,
   COLORS,
   ALIGN_STRETCH,
   PrimaryButton,
@@ -45,7 +44,7 @@ export function CompleteConfirmation(
         {visualAid != null ? (
           visualAid
         ) : (
-          <Icon name="ot-check" size={SIZE_3} color={LEGACY_COLORS.successEnabled} />
+          <Icon name="ot-check" size={SIZE_3} color={COLORS.successEnabled} />
         )}
         <StyledText as="h1" marginTop={SPACING.spacing24}>
           {t('flow_complete', { flowName })}

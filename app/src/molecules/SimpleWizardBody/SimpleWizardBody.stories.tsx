@@ -1,8 +1,7 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import { LEGACY_COLORS,
-  COLORS, PrimaryButton } from '@opentrons/components'
+import { COLORS, PrimaryButton } from '@opentrons/components'
 import { LegacyModalShell } from '../LegacyModal'
 import { WizardHeader } from '../WizardHeader'
 import { configReducer } from '../../redux/config/reducer'
@@ -35,7 +34,7 @@ const Template: Story<React.ComponentProps<typeof SimpleWizardBody>> = args => (
 
 export const AlertIcon = Template.bind({})
 AlertIcon.args = {
-  iconColor: LEGACY_COLORS.errorEnabled,
+  iconColor: COLORS.errorEnabled,
   header: 'Pipette still detected',
   subHeader: 'Are you sure you want to exit before detaching your pipette?',
   isSuccess: false,
@@ -44,7 +43,7 @@ AlertIcon.args = {
 
 export const SuccessIcon = Template.bind({})
 SuccessIcon.args = {
-  iconColor: LEGACY_COLORS.successEnabled,
+  iconColor: COLORS.successEnabled,
   header: 'Pipette still detected',
   subHeader: 'Are you sure you want to exit before detaching your pipette?',
   isSuccess: true,

@@ -2,8 +2,6 @@ import styled from 'styled-components'
 import {
   SPACING,
   COLORS,
-  LEGACY_COLORS,
-  COLORS,
   TYPOGRAPHY,
   ALIGN_CENTER,
   RESPONSIVENESS,
@@ -18,18 +16,18 @@ export const MenuItem = styled.button<ButtonProps>`
   text-align: ${TYPOGRAPHY.textAlignLeft};
   font-size: ${TYPOGRAPHY.fontSizeP};
   background-color: ${COLORS.transparent};
-  color: ${COLORS.black90};
+  color: ${COLORS.darkBlackEnabled};
   padding: ${SPACING.spacing8} ${SPACING.spacing12} ${SPACING.spacing8}
     ${SPACING.spacing12};
 
   &:hover,
   &:active {
-    background-color: ${LEGACY_COLORS.lightBlue};
+    background-color: ${COLORS.lightBlue};
   }
 
   &:disabled {
     background-color: ${COLORS.transparent};
-    color: ${LEGACY_COLORS.black}${LEGACY_COLORS.opacity50HexCode};
+    color: ${COLORS.black}${COLORS.opacity50HexCode};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
@@ -37,22 +35,22 @@ export const MenuItem = styled.button<ButtonProps>`
     text-align: ${TYPOGRAPHY.textAlignCenter};
     font-size: ${TYPOGRAPHY.fontSize28};
     background-color: ${({ isAlert }) =>
-      isAlert ? LEGACY_COLORS.errorEnabled : COLORS.transparent};
-    color: ${({ isAlert }) => (isAlert ? COLORS.white : COLORS.black90)};
+      isAlert ? COLORS.errorEnabled : COLORS.transparent};
+    color: ${({ isAlert }) =>
+      isAlert ? COLORS.white : COLORS.darkBlackEnabled};
     padding: ${SPACING.spacing24};
     height: 5.5rem;
     line-height: ${TYPOGRAPHY.lineHeight36};
     &:hover,
     &:active {
       background-color: ${({ isAlert }) =>
-        isAlert ? LEGACY_COLORS.errorEnabled : LEGACY_COLORS.darkBlack20};
+        isAlert ? COLORS.errorEnabled : COLORS.grey35};
     }
 
     &:disabled {
       background-color: ${({ isAlert }) =>
-        isAlert ? LEGACY_COLORS.errorEnabled : COLORS.transparent};
-      color: ${({ isAlert }) =>
-        isAlert ? COLORS.white : LEGACY_COLORS.darkBlack60};
+        isAlert ? COLORS.errorEnabled : COLORS.transparent};
+      color: ${({ isAlert }) => (isAlert ? COLORS.white : COLORS.grey50)};
     }
   }
 `

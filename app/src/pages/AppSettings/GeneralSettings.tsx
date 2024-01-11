@@ -14,7 +14,6 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
-  LEGACY_COLORS,
   COLORS,
   ALIGN_START,
   DIRECTION_COLUMN,
@@ -175,7 +174,7 @@ export function GeneralSettings(): JSX.Element {
               <StyledText
                 fontSize={TYPOGRAPHY.fontSizeLabel}
                 lineHeight={TYPOGRAPHY.lineHeight12}
-                color={LEGACY_COLORS.darkGreyEnabled}
+                color={COLORS.grey50Enabled}
                 paddingY={SPACING.spacing24}
               >
                 {t('up_to_date')}

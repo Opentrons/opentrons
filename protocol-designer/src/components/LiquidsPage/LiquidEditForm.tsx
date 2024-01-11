@@ -14,7 +14,6 @@ import {
   Flex,
   JUSTIFY_END,
   TYPOGRAPHY,
-  LEGACY_COLORS,
   COLORS,
 } from '@opentrons/components'
 import { selectors } from '../../labware-ingred/selectors'
@@ -49,7 +48,7 @@ function checkColor(hex: string): boolean {
   return luminance < 0.1 || luminance > 0.9
 }
 
-const INVALID_DISPLAY_LEGACY_COLORS = ['#000000', '#ffffff', LEGACY_COLORS.whaleGrey]
+const INVALID_DISPLAY_COLORS = ['#000000', '#ffffff', COLORS.whaleGrey]
 
 export const liquidEditFormSchema: Yup.Schema<
   { name: string; description: string; serialize: boolean } | undefined,
@@ -67,9 +66,9 @@ export const liquidEditFormSchema: Yup.Schema<
       if (value == null) {
         return true
       }
-      return !INVALID_DISPLAY_LEGACY_COLORS.includes(value)
+      return !INVALID_DISPLAY_COLORS.includes(value)
         ? !checkColor(value)
-        : !INVALID_DISPLAY_LEGACY_COLORS.includes(value)
+        : !INVALID_DISPLAY_COLORS.includes(value)
     }
   ),
   description: Yup.string(),

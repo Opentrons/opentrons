@@ -23,7 +23,7 @@ import {
 import { Icon } from '../../icons'
 import { Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
-import { LEGACY_COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
 import type {
   DeckDefinition,
@@ -110,15 +110,13 @@ export function DeckLocationSelect({
           )
           const isSelected = isEqual(selectedLocation, slotLocation)
           let fill =
-            theme === 'default'
-              ? LEGACY_COLORS.highlightPurple2
-              : LEGACY_COLORS.lightGreyPressed
+            theme === 'default' ? COLORS.highlightPurple2 : COLORS.grey35
           if (isSelected)
             fill =
               theme === 'default'
-                ? LEGACY_COLORS.highlightPurple1
-                : LEGACY_COLORS.darkGreyEnabled
-          if (isDisabled) fill = LEGACY_COLORS.darkGreyDisabled
+                ? COLORS.highlightPurple1
+                : COLORS.grey50Enabled
+          if (isDisabled) fill = COLORS.grey50Disabled
           if (isSelected && slot.id === 'B1' && isThermocycler) {
             return (
               <g key="thermocyclerSelectionArea">
@@ -225,7 +223,7 @@ export function DeckLocationSelect({
           layerBlocklist={OT2_DECK_LOCATION_SELECT_LAYER_BLOCK_LIST}
         />
       ) : null}
-      <SlotLabels robotType={robotType} color={LEGACY_COLORS.darkGreyEnabled} />
+      <SlotLabels robotType={robotType} color={COLORS.grey50Enabled} />
     </RobotCoordinateSpace>
   )
 }

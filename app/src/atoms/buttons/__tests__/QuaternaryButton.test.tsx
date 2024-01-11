@@ -2,7 +2,6 @@ import 'jest-styled-components'
 import * as React from 'react'
 import {
   renderWithProviders,
-  LEGACY_COLORS,
   COLORS,
   SPACING,
   TYPOGRAPHY,
@@ -32,7 +31,7 @@ describe('QuaternaryButton', () => {
       `border-radius: ${String(BORDERS.radiusRoundEdge)}`
     )
     expect(button).toHaveStyle('box-shadow: none')
-    expect(button).toHaveStyle(`color: ${String(LEGACY_COLORS.blueEnabled)}`)
+    expect(button).toHaveStyle(`color: ${String(COLORS.blueEnabled)}`)
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16}`
     )
@@ -73,7 +72,7 @@ describe('QuaternaryButton', () => {
     const button = getByText('secondary tertiary button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${String(LEGACY_COLORS.warningEnabled)}`,
+      `0 0 0 3px ${String(COLORS.yellow50)}`,
       {
         modifier: ':focus-visible',
       }
@@ -81,10 +80,10 @@ describe('QuaternaryButton', () => {
   })
 
   it('renders secondary tertiary button with text and different background color', () => {
-    props.color = LEGACY_COLORS.errorEnabled
+    props.color = COLORS.errorEnabled
     const { getByText } = render(props)
     const button = getByText('secondary tertiary button')
     expect(button).toHaveStyle(`background-color: ${String(COLORS.white)}`)
-    expect(button).toHaveStyle(`color: ${String(LEGACY_COLORS.errorEnabled)}`)
+    expect(button).toHaveStyle(`color: ${String(COLORS.errorEnabled)}`)
   })
 })

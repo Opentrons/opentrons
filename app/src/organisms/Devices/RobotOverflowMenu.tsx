@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom'
 
 import {
   Flex,
-  LEGACY_COLORS,
   COLORS,
   POSITION_ABSOLUTE,
   DIRECTION_COLUMN,

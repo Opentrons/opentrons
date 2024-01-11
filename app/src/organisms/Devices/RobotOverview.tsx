@@ -8,7 +8,6 @@ import {
   ALIGN_CENTER,
   ALIGN_START,
   BORDERS,
-  LEGACY_COLORS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -127,7 +126,7 @@ export function RobotOverview({
                 >
                   <StyledText
                     as="h6"
-                    color={LEGACY_COLORS.darkGreyEnabled}
+                    color={COLORS.grey50Enabled}
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     paddingBottom={SPACING.spacing4}
                     textTransform={TYPOGRAPHY.textTransformUppercase}
@@ -151,8 +150,8 @@ export function RobotOverview({
                       as="p"
                       color={
                         isRobotViewable
-                          ? COLORS.black90
-                          : LEGACY_COLORS.errorDisabled
+                          ? COLORS.darkBlackEnabled
+                          : COLORS.grey40
                       }
                     >
                       {t('lights')}

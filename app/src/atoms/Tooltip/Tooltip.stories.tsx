@@ -3,7 +3,6 @@ import {
   Flex,
   JUSTIFY_CENTER,
   ALIGN_CENTER,
-  LEGACY_COLORS,
   COLORS,
   useHoverTooltip,
   TOOLTIP_TOP_START,
@@ -25,7 +24,7 @@ export default {
         alignItems={ALIGN_CENTER}
         height={SIZE_4}
         width="100%"
-        backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+        backgroundColor={COLORS.grey35}
       >
         <Story />
       </Flex>

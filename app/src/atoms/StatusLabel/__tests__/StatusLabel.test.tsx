@@ -1,10 +1,5 @@
 import * as React from 'react'
-import {
-  C_SKY_BLUE,
-  LEGACY_COLORS,
-  COLORS,
-  renderWithProviders,
-} from '@opentrons/components'
+import { C_SKY_BLUE, COLORS, renderWithProviders } from '@opentrons/components'
 import { StatusLabel } from '..'
 
 const render = (props: React.ComponentProps<typeof StatusLabel>) => {
@@ -18,7 +13,7 @@ describe('StatusLabel', () => {
     props = {
       status: 'Engaged',
       backgroundColor: C_SKY_BLUE,
-      iconColor: LEGACY_COLORS.blueEnabled,
+      iconColor: COLORS.blueEnabled,
       id: 'engaged_status',
       showIcon: true,
     }
@@ -31,7 +26,7 @@ describe('StatusLabel', () => {
     props = {
       status: 'Disengaged',
       backgroundColor: C_SKY_BLUE,
-      iconColor: LEGACY_COLORS.blueEnabled,
+      iconColor: COLORS.blueEnabled,
     }
     const { getByText } = render(props)
     expect(getByText('Disengaged')).toHaveStyle('backgroundColor: C_SKY_BLUE')
@@ -40,9 +35,9 @@ describe('StatusLabel', () => {
   it('renders an idle status label with a gray background and text', () => {
     props = {
       status: 'Idle',
-      backgroundColor: LEGACY_COLORS.medGreyEnabled,
-      iconColor: LEGACY_COLORS.darkGrey,
-      textColor: COLORS.black90,
+      backgroundColor: COLORS.grey35,
+      iconColor: COLORS.grey50,
+      textColor: COLORS.darkBlackEnabled,
       showIcon: false,
     }
     const { getByText } = render(props)
@@ -54,7 +49,7 @@ describe('StatusLabel', () => {
     props = {
       status: 'holding at target',
       backgroundColor: C_SKY_BLUE,
-      iconColor: LEGACY_COLORS.blueEnabled,
+      iconColor: COLORS.blueEnabled,
     }
     const { getByText } = render(props)
     expect(getByText('Holding at target')).toHaveStyle(
@@ -66,7 +61,7 @@ describe('StatusLabel', () => {
     props = {
       status: 'cooling',
       backgroundColor: C_SKY_BLUE,
-      iconColor: LEGACY_COLORS.blueEnabled,
+      iconColor: COLORS.blueEnabled,
     }
     const { getByText } = render(props)
     expect(getByText('Cooling')).toHaveStyle('backgroundColor: C_SKY_BLUE')
@@ -76,7 +71,7 @@ describe('StatusLabel', () => {
     props = {
       status: 'heating',
       backgroundColor: C_SKY_BLUE,
-      iconColor: LEGACY_COLORS.blueEnabled,
+      iconColor: COLORS.blueEnabled,
     }
     const { getByText } = render(props)
     expect(getByText('Heating')).toHaveStyle('backgroundColor: C_SKY_BLUE')
@@ -86,7 +81,7 @@ describe('StatusLabel', () => {
     props = {
       status: 'Engaged',
       backgroundColor: C_SKY_BLUE,
-      iconColor: LEGACY_COLORS.blueEnabled,
+      iconColor: COLORS.blueEnabled,
       pulse: true,
     }
     const { getByTestId } = render(props)

@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   SPACING,
-  LEGACY_COLORS,
   COLORS,
   Icon,
   DIRECTION_COLUMN,
@@ -32,7 +31,7 @@ export function NoUpdateFound(props: NoUpdateFoundProps): JSX.Element {
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        backgroundColor={LEGACY_COLORS.green3}
+        backgroundColor={COLORS.green3}
         height="25.75rem"
         gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}
@@ -43,7 +42,7 @@ export function NoUpdateFound(props: NoUpdateFoundProps): JSX.Element {
         <Icon
           name="ot-check"
           size="3.75rem"
-          color={LEGACY_COLORS.green2}
+          color={COLORS.green2}
           data-testid="NoUpdateFound_check_circle_icon"
         />
         <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>

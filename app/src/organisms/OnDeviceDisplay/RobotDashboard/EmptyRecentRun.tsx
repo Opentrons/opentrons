@@ -5,7 +5,6 @@ import {
   Flex,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
-  LEGACY_COLORS,
   COLORS,
   JUSTIFY_CENTER,
   SPACING,
@@ -22,7 +21,7 @@ export function EmptyRecentRun(): JSX.Element {
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={LEGACY_COLORS.darkBlack20}
+      backgroundColor={COLORS.grey35}
       flexDirection={DIRECTION_COLUMN}
       height="27.25rem"
       justifyContent={JUSTIFY_CENTER}
@@ -45,7 +44,7 @@ export function EmptyRecentRun(): JSX.Element {
       <StyledText
         as="h4"
         fontWeight={TYPOGRAPHY.fontWeightRegular}
-        color={LEGACY_COLORS.darkBlack70}
+        color={COLORS.grey60}
       >
         {t('no_recent_runs_description')}
       </StyledText>

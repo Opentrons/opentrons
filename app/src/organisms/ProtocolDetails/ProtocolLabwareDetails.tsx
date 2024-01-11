@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
-  LEGACY_COLORS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -119,7 +118,7 @@ export const ProtocolLabwareDetailItem = (
         >
           {namespace === 'opentrons' ? (
             <Icon
-              color={LEGACY_COLORS.blueEnabled}
+              color={COLORS.blueEnabled}
               name="check-decagram"
               height="0.75rem"
               minHeight="0.75rem"

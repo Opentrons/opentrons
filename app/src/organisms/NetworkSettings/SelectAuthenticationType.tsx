@@ -6,7 +6,6 @@ import {
   Flex,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
-  LEGACY_COLORS,
   COLORS,
   SPACING,
   Btn,
@@ -106,7 +105,7 @@ export function SelectAuthenticationType({
             <StyledText
               as="h4"
               fontWeight={TYPOGRAPHY.fontWeightRegular}
-              color={LEGACY_COLORS.darkBlack70}
+              color={COLORS.grey60}
             >
               {t('your_mac_address_is', { macAddress: wifi?.macAddress })}
             </StyledText>
@@ -122,7 +121,7 @@ export function SelectAuthenticationType({
             <StyledText
               as="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={LEGACY_COLORS.darkBlack70}
+              color={COLORS.grey60}
             >
               {t('need_another_security_type')}
             </StyledText>

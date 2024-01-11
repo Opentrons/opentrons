@@ -3,7 +3,6 @@ import ReactSelect, { components, DropdownIndicatorProps } from 'react-select'
 import {
   BORDERS,
   Box,
-  LEGACY_COLORS,
   COLORS,
   DIRECTION_ROW,
   Icon,
@@ -44,15 +43,15 @@ export function Select(props: SelectComponentProps): JSX.Element {
       border: BORDERS.lineBorder,
       width: props.width != null ? props.width : 'auto',
       height: SPACING.spacing16,
-      borderColor: LEGACY_COLORS.medGreyEnabled,
+      borderColor: COLORS.grey35,
       boxShadow: 'none',
       padding: SPACING.spacing6,
       flexDirection: DIRECTION_ROW,
       '&:hover': {
-        borderColor: LEGACY_COLORS.medGreyHover,
+        borderColor: COLORS.grey55,
       },
       '&:active': {
-        borderColor: LEGACY_COLORS.medGreyHover,
+        borderColor: COLORS.grey55,
       },
     }),
     container: (styles: CSSObjectWithLabel) => ({
@@ -63,7 +62,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
     group: NO_STYLE_FN,
     groupHeading: (styles: CSSObjectWithLabel) => ({
       ...styles,
-      color: COLORS.black90,
+      color: COLORS.darkBlackEnabled,
       fontWeight: TYPOGRAPHY.fontWeightSemiBold,
       fontSize: TYPOGRAPHY.fontSizeP,
     }),
@@ -103,27 +102,27 @@ export function Select(props: SelectComponentProps): JSX.Element {
     noOptionsMessage: (styles: CSSObjectWithLabel) => ({
       ...styles,
       padding: SPACING.spacing6,
-      color: COLORS.black90,
+      color: COLORS.darkBlackEnabled,
     }),
     option: (styles: CSSObjectWithLabel, state: OptionProps<SelectOption>) => ({
       ...styles,
       color: Boolean(state.isDisabled)
-        ? LEGACY_COLORS.darkGreyDisabled
-        : COLORS.black90,
+        ? COLORS.grey50Disabled
+        : COLORS.darkBlackEnabled,
       backgroundColor: Boolean(state.isSelected)
-        ? LEGACY_COLORS.lightBlue
+        ? COLORS.lightBlue
         : COLORS.white,
       '&:hover': {
-        backgroundColor: LEGACY_COLORS.lightBlue,
+        backgroundColor: COLORS.lightBlue,
       },
       '&:active': {
-        backgroundColor: LEGACY_COLORS.lightBlue,
+        backgroundColor: COLORS.lightBlue,
       },
     }),
     placeholder: (styles: CSSObjectWithLabel) => ({
       ...styles,
       marginLeft: SPACING.spacing8,
-      color: COLORS.black90,
+      color: COLORS.darkBlackEnabled,
       fontSize: TYPOGRAPHY.fontSizeP,
       marginTop: '0.2rem',
     }),

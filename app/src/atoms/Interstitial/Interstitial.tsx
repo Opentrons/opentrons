@@ -6,7 +6,6 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_FLEX_START,
   POSITION_RELATIVE,
-  LEGACY_COLORS,
   COLORS,
   TYPOGRAPHY,
   SPACING,
@@ -51,7 +50,7 @@ export function Interstitial(props: InterstitialProps): JSX.Element {
         padding={SPACING.spacing16}
         position={POSITION_RELATIVE}
         boxShadow="0px 1px 3px rgba(0, 0, 0, 0.3)"
-        border={`1px solid ${String(LEGACY_COLORS.medGreyEnabled)}`}
+        border={`1px solid ${String(COLORS.grey35)}`}
         backgroundColor={COLORS.white}
         maxHeight="100%"
         overflowY="auto"

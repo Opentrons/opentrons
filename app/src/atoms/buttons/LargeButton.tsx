@@ -2,7 +2,6 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import {
   TYPOGRAPHY,
-  LEGACY_COLORS,
   COLORS,
   SPACING,
   BORDERS,
@@ -44,21 +43,21 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     }
   > = {
     secondary: {
-      defaultColor: COLORS.black90,
-      defaultBackgroundColor: LEGACY_COLORS.mediumBlueEnabled,
-      activeBackgroundColor: LEGACY_COLORS.mediumBluePressed,
-      iconColor: LEGACY_COLORS.blueEnabled,
+      defaultColor: COLORS.darkBlackEnabled,
+      defaultBackgroundColor: COLORS.mediumBlueEnabled,
+      activeBackgroundColor: COLORS.mediumBluePressed,
+      iconColor: COLORS.blueEnabled,
     },
     alert: {
-      defaultColor: LEGACY_COLORS.red1,
-      defaultBackgroundColor: LEGACY_COLORS.red3,
-      activeBackgroundColor: LEGACY_COLORS.red3Pressed,
-      iconColor: LEGACY_COLORS.red1,
+      defaultColor: COLORS.red1,
+      defaultBackgroundColor: COLORS.red3,
+      activeBackgroundColor: COLORS.red3Pressed,
+      iconColor: COLORS.red1,
     },
     primary: {
       defaultColor: COLORS.white,
-      defaultBackgroundColor: LEGACY_COLORS.blueEnabled,
-      activeBackgroundColor: LEGACY_COLORS.bluePressed,
+      defaultBackgroundColor: COLORS.blueEnabled,
+      activeBackgroundColor: COLORS.bluePressed,
       iconColor: COLORS.white,
     },
   }
@@ -98,8 +97,8 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     }
 
     &:disabled {
-      background-color: ${LEGACY_COLORS.darkBlack20};
-      color: ${LEGACY_COLORS.darkBlack60};
+      background-color: ${COLORS.grey35};
+      color: ${COLORS.grey50};
     }
   `
   return (
@@ -123,7 +122,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
         aria-label={`${iconName} icon`}
         color={
           disabled
-            ? LEGACY_COLORS.darkBlack60
+            ? COLORS.grey50
             : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
         }
         size="5rem"

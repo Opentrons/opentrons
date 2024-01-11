@@ -11,7 +11,6 @@ import {
   Btn,
   ALIGN_START,
   PrimaryButton,
-  LEGACY_COLORS,
   COLORS,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
@@ -102,7 +101,7 @@ export const AboutModuleSlideout = (
             <StyledText
               as="h6"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={LEGACY_COLORS.darkGreyEnabled}
+              color={COLORS.grey50Enabled}
             >
               {i18n.format(t('current_version'), 'upperCase')}
             </StyledText>
@@ -118,7 +117,7 @@ export const AboutModuleSlideout = (
         <StyledText
           as="h6"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={LEGACY_COLORS.darkGreyEnabled}
+          color={COLORS.grey50Enabled}
           data-testid={`alert_item_serial_number_text_${String(
             module.moduleModel
           )}`}

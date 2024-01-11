@@ -9,7 +9,6 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  LEGACY_COLORS,
   COLORS,
   JUSTIFY_SPACE_AROUND,
   TYPOGRAPHY,
@@ -72,7 +71,7 @@ export function WizardRequiredEquipmentList(
                 {/* do not show divider after the last equipment in the list */}
                 {index + 1 === Object.keys(equipmentList).length ? null : (
                   <Box
-                    borderBottom={`1px solid ${COLORS.black90}${LEGACY_COLORS.opacity20HexCode}`}
+                    borderBottom={`1px solid ${COLORS.darkBlackEnabled}${COLORS.opacity20HexCode}`}
                   />
                 )}
               </Box>
@@ -99,7 +98,7 @@ export function WizardRequiredEquipmentList(
             <StyledText
               marginTop={SPACING.spacing8}
               as="label"
-              color={LEGACY_COLORS.darkGreyEnabled}
+              color={COLORS.grey50Enabled}
             >
               {footer}
             </StyledText>
@@ -161,7 +160,7 @@ function RequiredEquipmentCard(props: RequiredEquipmentCardProps): JSX.Element {
         >
           <StyledText as="p">{displayName}</StyledText>
           {subtitle != null ? (
-            <StyledText as="p" color={LEGACY_COLORS.darkGreyEnabled}>
+            <StyledText as="p" color={COLORS.grey50Enabled}>
               {subtitle}
             </StyledText>
           ) : null}

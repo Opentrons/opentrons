@@ -5,7 +5,6 @@ import styled, { css } from 'styled-components'
 import {
   Btn,
   Icon,
-  LEGACY_COLORS,
   COLORS,
   TYPOGRAPHY,
   Flex,
@@ -29,10 +28,10 @@ const CLOSE_ICON_STYLE = css`
   border-radius: 50%;
 
   &:hover {
-    background: ${LEGACY_COLORS.lightGreyHover};
+    background: ${COLORS.grey35};
   }
   &:active {
-    background: ${LEGACY_COLORS.lightGreyPressed};
+    background: ${COLORS.grey35};
   }
 `
 interface IpHostnameItemProps {
@@ -84,14 +83,16 @@ export function ManualIpHostnameItem({
           <StyledText
             as="p"
             data-testid="ip-hostname"
-            color={discovered ? COLORS.black90 : LEGACY_COLORS.successDisabled}
+            color={
+              discovered ? COLORS.darkBlackEnabled : COLORS.successDisabled
+            }
           >
             {candidate}
           </StyledText>
         </IpItem>
         <StyledText
           as="label"
-          color={LEGACY_COLORS.darkGreyEnabled}
+          color={COLORS.grey50Enabled}
           css={{
             'white-space': 'nowrap',
           }}
@@ -100,7 +101,7 @@ export function ManualIpHostnameItem({
         </StyledText>
         <Btn
           size={TYPOGRAPHY.lineHeight20}
-          color={COLORS.black90}
+          color={COLORS.darkBlackEnabled}
           onClick={remove}
           marginLeft={SPACING.spacing16}
           data-testid="close-button"

@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 
 import {
   Flex,
-  LEGACY_COLORS,
   COLORS,
   SPACING,
   DIRECTION_COLUMN,
@@ -63,7 +62,7 @@ export function RobotSettingsDeckCalibration({
         {t('deck_calibration_title')}
       </StyledText>
       <StyledText as="p">{t('deck_calibration_description')}</StyledText>
-      <StyledText as="label" color={LEGACY_COLORS.darkGreyEnabled}>
+      <StyledText as="label" color={COLORS.grey50Enabled}>
         {deckLastModified}
       </StyledText>
     </Flex>

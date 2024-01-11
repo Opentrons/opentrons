@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { renderWithProviders, LEGACY_COLORS,
-  COLORS, SIZE_1 } from '@opentrons/components'
+import { renderWithProviders, COLORS, SIZE_1 } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 
 import { RenderResult } from '../RenderResult'
@@ -24,7 +23,7 @@ describe('RenderResult', () => {
     const { getByText, getByTestId } = render(props)
     getByText('Good calibration')
     const icon = getByTestId('RenderResult_icon')
-    expect(icon).toHaveStyle(`color: ${String(LEGACY_COLORS.successEnabled)}`)
+    expect(icon).toHaveStyle(`color: ${String(COLORS.successEnabled)}`)
     expect(icon).toHaveStyle(`height: ${String(SIZE_1)}`)
     expect(icon).toHaveStyle(`width: ${String(SIZE_1)}`)
   })
@@ -34,7 +33,7 @@ describe('RenderResult', () => {
     const { getByText, getByTestId } = render(props)
     getByText('Recalibration recommended')
     const icon = getByTestId('RenderResult_icon')
-    expect(icon).toHaveStyle(`color: ${String(LEGACY_COLORS.warningEnabled)}`)
+    expect(icon).toHaveStyle(`color: ${String(COLORS.yellow50)}`)
     expect(icon).toHaveStyle(`height: ${String(SIZE_1)}`)
     expect(icon).toHaveStyle(`width: ${String(SIZE_1)}`)
   })

@@ -1,7 +1,6 @@
 import * as React from 'react'
 
-import { LEGACY_COLORS } from '../../../ui-style-constants'
-import { COLORS } from '../../../helix-design-system'
+import { COLORS } from '../../../ui-style-constants'
 
 interface ThermocyclerGEN2Props {
   lidMotorState: 'open' | 'closed'
@@ -66,7 +65,7 @@ function ClosedThermocyclerGEN2Layers(props: {
       ></path>
       <path
         fill={props.ledLightColor}
-        stroke={LEGACY_COLORS.black}
+        stroke={COLORS.black}
         strokeWidth={0.5}
         d="M130.8,18.3H41.2c-1.7,0-3.2,1.4-3.2,3.2c0,1.7,1.4,3.2,3.2,3.2h89.6c1.7,0,3.2-1.4,3.2-3.2 C133.9,19.8,132.5,18.3,130.8,18.3z"
       ></path>

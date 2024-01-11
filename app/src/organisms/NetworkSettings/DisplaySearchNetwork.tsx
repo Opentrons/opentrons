@@ -8,7 +8,6 @@ import {
   JUSTIFY_CENTER,
   SPACING,
   TYPOGRAPHY,
-  LEGACY_COLORS,
   COLORS,
   BORDERS,
 } from '@opentrons/components'
@@ -33,7 +32,7 @@ export function DisplaySearchNetwork(): JSX.Element {
       >
         <StyledText
           as="h3"
-          color={LEGACY_COLORS.darkBlack70}
+          color={COLORS.grey60}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing40}
         >

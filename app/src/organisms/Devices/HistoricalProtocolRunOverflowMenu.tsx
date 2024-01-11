@@ -10,7 +10,6 @@ import {
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   POSITION_RELATIVE,
-  LEGACY_COLORS,
   COLORS,
   useOnClickOutside,
   useHoverTooltip,
@@ -190,7 +189,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
             <Icon
               name="ot-spinner"
               size={SIZE_1}
-              color={LEGACY_COLORS.darkGreyEnabled}
+              color={COLORS.grey50Enabled}
               aria-label="spinner"
               spin
             />

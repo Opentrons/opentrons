@@ -5,7 +5,6 @@ import {
   BORDERS,
   Box,
   Btn,
-  LEGACY_COLORS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -113,18 +112,18 @@ export function FixtureListItem({
             ? t('location_conflict')
             : t('not_configured')
         }
-        backgroundColor={LEGACY_COLORS.warningBackgroundLight}
-        iconColor={LEGACY_COLORS.warningEnabled}
-        textColor={LEGACY_COLORS.warningText}
+        backgroundColor={COLORS.yellow20}
+        iconColor={COLORS.yellow50}
+        textColor={COLORS.yellow60}
       />
     )
   } else {
     statusLabel = (
       <StatusLabel
         status={t('configured')}
-        backgroundColor={LEGACY_COLORS.successBackgroundLight}
-        iconColor={LEGACY_COLORS.successEnabled}
-        textColor={LEGACY_COLORS.successText}
+        backgroundColor={COLORS.successBackgroundLight}
+        iconColor={COLORS.successEnabled}
+        textColor={COLORS.successText}
       />
     )
   }
@@ -167,7 +166,7 @@ export function FixtureListItem({
       ) : null}
       <Box
         border={BORDERS.styleSolid}
-        borderColor={LEGACY_COLORS.medGreyEnabled}
+        borderColor={COLORS.grey35}
         borderWidth="1px"
         borderRadius={BORDERS.radiusSoftCorners}
         padding={SPACING.spacing16}
@@ -203,10 +202,10 @@ export function FixtureListItem({
               <Btn
                 marginLeft={SPACING.spacing16}
                 css={css`
-                  color: ${LEGACY_COLORS.blueEnabled};
+                  color: ${COLORS.blueEnabled};
 
                   &:hover {
-                    color: ${LEGACY_COLORS.blueHover};
+                    color: ${COLORS.blueHover};
                   }
                 `}
                 marginTop={SPACING.spacing4}

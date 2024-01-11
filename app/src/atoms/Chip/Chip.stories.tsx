@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { Flex, LEGACY_COLORS,
-  COLORS, SPACING } from '@opentrons/components'
+import { Flex, COLORS, SPACING } from '@opentrons/components'
 import { touchScreenViewport } from '../../DesignTokens/constants'
 import { Chip } from '.'
 import type { Story, Meta } from '@storybook/react'
@@ -19,7 +18,7 @@ interface ChipStorybookProps extends React.ComponentProps<typeof Chip> {
 const Template: Story<ChipStorybookProps> = ({ ...args }) => (
   <Flex
     padding={SPACING.spacing16}
-    backgroundColor={LEGACY_COLORS.darkBlack40}
+    backgroundColor={COLORS.grey50}
     width="59rem"
   >
     <Chip {...args} />

@@ -1,9 +1,9 @@
 import styled from 'styled-components'
-import { LEGACY_COLORS, BORDERS, TYPOGRAPHY, SPACING } from '../../ui-style-constants'
+import { COLORS, BORDERS, TYPOGRAPHY, SPACING } from '../../ui-style-constants'
 import { NewAlertPrimaryBtn, styleProps } from '../../primitives'
 
 export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
-  background-color: ${LEGACY_COLORS.errorEnabled};
+  background-color: ${COLORS.errorEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding-left: ${SPACING.spacing16};
   padding-right: ${SPACING.spacing16};
@@ -18,7 +18,7 @@ export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
   }
 
   &:disabled {
-    background-color: ${LEGACY_COLORS.darkGreyDisabled};
-    color: ${LEGACY_COLORS.errorDisabled};
+    background-color: ${COLORS.grey50Disabled};
+    color: ${COLORS.grey40};
   }
 `

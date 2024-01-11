@@ -12,7 +12,6 @@ import {
   Flex,
   JUSTIFY_CENTER,
   SPACING,
-  LEGACY_COLORS,
   COLORS,
 } from '@opentrons/components'
 
@@ -40,7 +39,7 @@ export function OnDeviceDisplayAppFallback({
   const modalHeader: ModalHeaderBaseProps = {
     title: t('error_boundary_title'),
     iconName: 'ot-alert',
-    iconColor: LEGACY_COLORS.red2,
+    iconColor: COLORS.red2,
   }
 
   // immediately report to robot logs that something fatal happened

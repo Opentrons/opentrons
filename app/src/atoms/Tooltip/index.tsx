@@ -1,6 +1,5 @@
 import * as React from 'react'
 import {
-  LEGACY_COLORS,
   COLORS,
   TYPOGRAPHY,
   Tooltip as SharedTooltip,
@@ -22,7 +21,7 @@ export function Tooltip(props: TooltipProps): JSX.Element {
   return (
     <SharedTooltip
       {...tooltipProps}
-      backgroundColor={COLORS.black90}
+      backgroundColor={COLORS.darkBlackEnabled}
       fontSize={TYPOGRAPHY.fontSizeCaption}
       width={width}
       {...styleProps}

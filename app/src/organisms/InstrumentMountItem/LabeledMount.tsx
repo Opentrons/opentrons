@@ -7,7 +7,6 @@ import {
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
-  LEGACY_COLORS,
   COLORS,
   JUSTIFY_SPACE_BETWEEN,
   Icon,
@@ -26,10 +25,10 @@ const MountButton = styled.button<{ isAttached: boolean }>`
   padding: ${SPACING.spacing24};
   border-radius: ${BORDERS.borderRadiusSize3};
   background-color: ${({ isAttached }) =>
-    isAttached ? LEGACY_COLORS.green3 : LEGACY_COLORS.light1};
+    isAttached ? COLORS.green3 : COLORS.light1};
   &:active {
     background-color: ${({ isAttached }) =>
-      isAttached ? LEGACY_COLORS.green3Pressed : LEGACY_COLORS.light1Pressed};
+      isAttached ? COLORS.green3Pressed : COLORS.grey40};
   }
 `
 interface LabeledMountProps {
@@ -70,7 +69,7 @@ export function LabeledMount(props: LabeledMountProps): JSX.Element {
           <StyledText
             flex="5"
             as="h4"
-            color={LEGACY_COLORS.darkBlack70}
+            color={COLORS.grey60}
             textAlign={TYPOGRAPHY.textAlignLeft}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSize28}

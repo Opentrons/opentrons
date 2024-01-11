@@ -5,7 +5,6 @@ import {
   Flex,
   TYPOGRAPHY,
   SPACING,
-  LEGACY_COLORS,
   COLORS,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
@@ -96,7 +95,7 @@ export const TemperatureModuleSlideout = (
         <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
-          color={LEGACY_COLORS.black}
+          color={COLORS.black}
           paddingBottom={SPACING.spacing8}
         >
           {t('set_temperature')}

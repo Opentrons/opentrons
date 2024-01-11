@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import {
-  LEGACY_COLORS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -70,7 +69,7 @@ function TouchscreenModal({
   const modalHeader: ModalHeaderBaseProps = {
     title: t('estop_missing'),
     iconName: 'ot-alert',
-    iconColor: LEGACY_COLORS.red2,
+    iconColor: COLORS.red2,
   }
   const modalProps = {
     header: { ...modalHeader },

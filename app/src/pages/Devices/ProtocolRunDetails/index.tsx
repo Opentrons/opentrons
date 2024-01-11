@@ -16,7 +16,6 @@ import {
   OVERFLOW_SCROLL,
   SIZE_6,
   BORDERS,
-  LEGACY_COLORS,
   COLORS,
   SPACING,
   TYPOGRAPHY,
@@ -60,10 +59,10 @@ const baseRoundTabStyling = css`
 
 const RoundNavLink = styled(NavLink)`
   ${baseRoundTabStyling}
-  color: ${LEGACY_COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50Enabled};
 
   &:hover {
-    background-color: ${LEGACY_COLORS.fundamentalsBackgroundShade};
+    background-color: ${COLORS.grey35};
   }
 
   &.active {
@@ -71,10 +70,10 @@ const RoundNavLink = styled(NavLink)`
     border-top: ${BORDERS.lineBorder};
     border-left: ${BORDERS.lineBorder};
     border-right: ${BORDERS.lineBorder};
-    color: ${LEGACY_COLORS.blueEnabled};
+    color: ${COLORS.blueEnabled};
 
     &:hover {
-      color: ${LEGACY_COLORS.blueHover};
+      color: ${COLORS.blueHover};
     }
 
     /* extend below the tab when active to flow into the content */
@@ -109,7 +108,7 @@ function RoundTab({
   return disabled ? (
     <>
       <StyledText
-        color={LEGACY_COLORS.successDisabled}
+        color={COLORS.successDisabled}
         css={baseRoundTabStyling}
         {...targetProps}
       >
@@ -240,7 +239,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
       </Flex>
       <Box
         backgroundColor={COLORS.white}
-        border={`1px ${BORDERS.styleSolid} ${LEGACY_COLORS.medGreyEnabled}`}
+        border={`1px ${BORDERS.styleSolid} ${COLORS.grey35}`}
         // remove left upper corner border radius when first tab is active
         borderRadius={`${
           protocolRunDetailsTab === 'setup'

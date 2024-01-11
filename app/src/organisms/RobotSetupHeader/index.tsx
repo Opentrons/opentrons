@@ -3,7 +3,6 @@ import * as React from 'react'
 import {
   ALIGN_CENTER,
   Btn,
-  LEGACY_COLORS,
   COLORS,
   Flex,
   Icon,
@@ -50,7 +49,7 @@ export function RobotSetupHeader({
             position={POSITION_ABSOLUTE}
             left="0"
           >
-            <Icon name="back" size="3rem" color={LEGACY_COLORS.darkBlack100} />
+            <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
           </Btn>
         ) : null}
         <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>

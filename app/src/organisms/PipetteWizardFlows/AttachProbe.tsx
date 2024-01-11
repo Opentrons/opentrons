@@ -4,7 +4,6 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   Flex,
   TYPOGRAPHY,
-  LEGACY_COLORS,
   COLORS,
   SPACING,
   RESPONSIVENESS,
@@ -187,7 +186,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   return errorMessage != null ? (
     <SimpleWizardBody
       isSuccess={false}
-      iconColor={LEGACY_COLORS.errorEnabled}
+      iconColor={COLORS.errorEnabled}
       header={t('shared:error_encountered')}
       subHeader={
         <Trans

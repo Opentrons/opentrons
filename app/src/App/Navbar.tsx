@@ -6,9 +6,7 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   ALIGN_STRETCH,
-  COLORS,
   LEGACY_COLORS,
-  COLORS,
   COLORS,
   DIRECTION_COLUMN,
   FLEX_NONE,
@@ -35,16 +33,16 @@ const SALESFORCE_HELP_LINK = 'https://support.opentrons.com/s/'
 const NavbarLink = styled(NavLink)`
   color: ${COLORS.white};
   align-self: ${ALIGN_STRETCH};
-  background-color: ${COLORS.black90};
+  background-color: ${COLORS.darkBlackEnabled};
 
   &:hover {
-    background-color: ${COLORS.black80};
+    background-color: ${COLORS.darkBlackHover};
   }
 
   &:focus-visible {
-    box-shadow: inset 0 0 0 3px ${COLORS.blue50};
+    box-shadow: inset 0 0 0 3px ${COLORS.fundamentalsFocus};
     outline: none;
-    background-color: ${LEGACY_COLORS.darkGreyHover};
+    background-color: ${COLORS.grey55};
   }
 
   &:focus-visible.active {
@@ -53,26 +51,26 @@ const NavbarLink = styled(NavLink)`
   }
 
   &:active {
-    background-color: ${COLORS.black90};
+    background-color: ${COLORS.darkBlackEnabled};
   }
 
   &.active {
-    background-color: ${COLORS.black70};
+    background-color: ${COLORS.darkBlackSelected};
   }
   &.active:has(svg) {
-    background-color: ${COLORS.black90};
+    background-color: ${COLORS.darkBlackEnabled};
   }
 `
 const NavIconLink = styled(NavLink)`
   &.active > svg {
-    color: ${LEGACY_COLORS.medGreyEnabled};
-    background-color: ${COLORS.black70};
+    color: ${COLORS.grey35};
+    background-color: ${COLORS.darkBlackSelected};
   }
 `
 const IconLink = styled(Link)`
   &.active > svg {
-    color: ${LEGACY_COLORS.medGreyEnabled};
-    background-color: ${COLORS.black70};
+    color: ${COLORS.grey35};
+    background-color: ${COLORS.darkBlackSelected};
   }
 `
 
@@ -81,27 +79,27 @@ const NavbarIcon = styled(Icon)`
   height: ${SIZE_2};
   padding: ${SPACING.spacing6};
   border-radius: 50%;
-  color: ${LEGACY_COLORS.medGreyEnabled};
+  color: ${COLORS.grey35};
   background-color: ${COLORS.transparent};
 
   &:hover {
-    background-color: ${COLORS.black80};
+    background-color: ${COLORS.darkBlackHover};
   }
 
   &:focus-visible {
-    box-shadow: inset 0 0 0 3px ${COLORS.blue50};
+    box-shadow: inset 0 0 0 3px ${COLORS.fundamentalsFocus};
     outline: none;
-    background-color: ${LEGACY_COLORS.darkGreyHover};
+    background-color: ${COLORS.grey55};
   }
 
   &:active {
-    color: ${LEGACY_COLORS.medGreyEnabled};
-    background-color: ${COLORS.black90};
+    color: ${COLORS.grey35};
+    background-color: ${COLORS.darkBlackEnabled};
   }
 
   &.active {
-    color: ${LEGACY_COLORS.medGreyEnabled};
-    background-color: ${COLORS.black70};
+    color: ${COLORS.grey35};
+    background-color: ${COLORS.darkBlackSelected};
   }
 `
 
@@ -116,7 +114,7 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
   )
   return (
     <Flex
-      backgroundColor={COLORS.black90}
+      backgroundColor={COLORS.darkBlackEnabled}
       css={TYPOGRAPHY.h3Regular}
       flexDirection={DIRECTION_COLUMN}
       flex={FLEX_NONE}

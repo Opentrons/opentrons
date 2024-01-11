@@ -2,7 +2,7 @@ import 'jest-styled-components'
 import * as React from 'react'
 import { renderWithProviders } from '../../../testing/utils'
 import {
-  LEGACY_COLORS,
+  COLORS,
   BORDERS,
   TYPOGRAPHY,
   SPACING,
@@ -38,7 +38,7 @@ describe('SecondaryButton', () => {
     expect(button).toHaveStyle(
       `text-transform: ${TYPOGRAPHY.textTransformNone}`
     )
-    expect(button).toHaveStyle(`color: ${LEGACY_COLORS.blueEnabled}`)
+    expect(button).toHaveStyle(`color: ${COLORS.blueEnabled}`)
   })
 
   it('renders secondary button with text and disabled', () => {
@@ -65,7 +65,7 @@ describe('SecondaryButton', () => {
     const button = getByText('secondary button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${LEGACY_COLORS.warningEnabled}`,
+      `0 0 0 3px ${COLORS.warningEnabled}`,
       {
         modifier: ':focus-visible',
       }
@@ -73,9 +73,9 @@ describe('SecondaryButton', () => {
   })
 
   it('renders secondary button with text and different background color', () => {
-    props.color = LEGACY_COLORS.errorEnabled
+    props.color = COLORS.errorEnabled
     const { getByText } = render(props)
     const button = getByText('secondary button')
-    expect(button).toHaveStyle(`color: ${LEGACY_COLORS.errorEnabled}`)
+    expect(button).toHaveStyle(`color: ${COLORS.errorEnabled}`)
   })
 })

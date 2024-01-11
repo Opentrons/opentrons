@@ -3,7 +3,6 @@ import * as React from 'react'
 import {
   renderWithProviders,
   BORDERS,
-  LEGACY_COLORS,
   COLORS,
   SPACING,
   TYPOGRAPHY,
@@ -28,7 +27,7 @@ describe('Unselected TabbedButton', () => {
     const { getByText } = render(props)
     const button = getByText('tabbed button')
     expect(button).toHaveStyle(
-      `background-color: ${String(LEGACY_COLORS.highlightPurple2)}`
+      `background-color: ${String(COLORS.highlightPurple2)}`
     )
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
@@ -47,7 +46,7 @@ describe('Unselected TabbedButton', () => {
       `text-transform: ${String(TYPOGRAPHY.textTransformNone)}`
     )
     expect(button).toHaveStyle(`box-shadow: none`)
-    expect(button).toHaveStyle(`color: ${String(LEGACY_COLORS.darkBlack100)}`)
+    expect(button).toHaveStyle(`color: ${String(COLORS.darkBlack100)}`)
   })
 
   it('renders unselected tabbed button with text and disabled', () => {
@@ -64,7 +63,7 @@ describe('Unselected TabbedButton', () => {
     const button = getByText('tabbed button')
     expect(button).toHaveStyleRule(
       'background-color',
-      `${String(LEGACY_COLORS.highlightPurple2Pressed)}`,
+      `${String(COLORS.highlightPurple2Pressed)}`,
       {
         modifier: ':active',
       }
@@ -84,7 +83,7 @@ describe('Unselected TabbedButton', () => {
     const button = getByText('tabbed button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${String(COLORS.blue50)}`,
+      `0 0 0 3px ${String(COLORS.fundamentalsFocus)}`,
       {
         modifier: ':focus-visible',
       }
@@ -106,7 +105,7 @@ describe('Selected TabbedButton', () => {
     const { getByText } = render(props)
     const button = getByText('tabbed button')
     expect(button).toHaveStyle(
-      `background-color: ${String(LEGACY_COLORS.highlightPurple1)}`
+      `background-color: ${String(COLORS.highlightPurple1)}`
     )
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
@@ -142,7 +141,7 @@ describe('Selected TabbedButton', () => {
     const button = getByText('tabbed button')
     expect(button).toHaveStyleRule(
       'background-color',
-      `${String(LEGACY_COLORS.highlightPurple1Pressed)}`,
+      `${String(COLORS.highlightPurple1Pressed)}`,
       {
         modifier: ':active',
       }
@@ -162,7 +161,7 @@ describe('Selected TabbedButton', () => {
     const button = getByText('tabbed button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${String(COLORS.blue50)}`,
+      `0 0 0 3px ${String(COLORS.fundamentalsFocus)}`,
       {
         modifier: ':focus-visible',
       }

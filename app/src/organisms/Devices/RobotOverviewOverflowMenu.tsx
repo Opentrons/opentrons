@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import {
   BORDERS,
-  LEGACY_COLORS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,

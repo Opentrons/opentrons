@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   BORDERS,
-  LEGACY_COLORS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -87,7 +86,7 @@ export function RunFailedModal({
           marginTop={SPACING.spacing8}
           marginBottom={SPACING.spacing16}
           padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
-          backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+          backgroundColor={COLORS.grey35}
           borderRadius={BORDERS.borderRadiusSize1}
           overflowWrap="anywhere"
           border={BORDERS.lineBorder}

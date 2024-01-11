@@ -6,7 +6,6 @@ import {
   InstrumentDiagram,
   ALIGN_FLEX_START,
   BORDERS,
-  LEGACY_COLORS,
   COLORS,
   DIRECTION_COLUMN,
   JUSTIFY_CENTER,
@@ -62,7 +61,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
-      backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+      backgroundColor={COLORS.grey35}
       borderRadius={BORDERS.radiusSoftCorners}
       gridGap={SPACING.spacing8}
       padding={SPACING.spacing16}
@@ -98,7 +97,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
         {banner}
         <StyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={LEGACY_COLORS.darkGreyEnabled}
+          color={COLORS.grey50Enabled}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
         >

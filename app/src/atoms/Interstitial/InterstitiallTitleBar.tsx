@@ -8,7 +8,6 @@ import {
   SPACING,
   TYPOGRAPHY,
   Flex,
-  LEGACY_COLORS,
   COLORS,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
@@ -37,7 +36,7 @@ export function InterstitialTitleBar(
   return (
     <Flex
       width="100%"
-      backgroundColor={COLORS.black90}
+      backgroundColor={COLORS.darkBlackEnabled}
       color={COLORS.white}
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}

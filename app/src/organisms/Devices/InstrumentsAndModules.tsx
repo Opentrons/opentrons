@@ -13,7 +13,6 @@ import {
   ModalShell,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
-  LEGACY_COLORS,
   COLORS,
   DIRECTION_COLUMN,
   JUSTIFY_CENTER,
@@ -303,7 +302,7 @@ export function InstrumentsAndModules({
             {/* TODO(bh, 2022-10-20): insert "offline" image when provided by illustrator */}
             <StyledText
               as="p"
-              color={LEGACY_COLORS.errorDisabled}
+              color={COLORS.grey40}
               id="InstrumentsAndModules_offline"
             >
               {t('offline_instruments_and_modules')}

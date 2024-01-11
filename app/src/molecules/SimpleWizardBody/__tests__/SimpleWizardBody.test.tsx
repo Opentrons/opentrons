@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { LEGACY_COLORS,
-  COLORS, renderWithProviders } from '@opentrons/components'
+import { COLORS, renderWithProviders } from '@opentrons/components'
 import { Skeleton } from '../../../atoms/Skeleton'
 import { getIsOnDevice } from '../../../redux/config'
 import { SimpleWizardBody } from '..'
@@ -20,7 +19,7 @@ describe('SimpleWizardBody', () => {
   let props: React.ComponentProps<typeof SimpleWizardBody>
   beforeEach(() => {
     props = {
-      iconColor: LEGACY_COLORS.errorText,
+      iconColor: COLORS.errorText,
       children: <div>children</div>,
       header: 'header',
       subHeader: 'subheader',

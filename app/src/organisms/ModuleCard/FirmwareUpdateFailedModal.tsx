@@ -8,7 +8,6 @@ import {
   SPACING,
   DIRECTION_COLUMN,
   Icon,
-  LEGACY_COLORS,
   COLORS,
   TYPOGRAPHY,
   PrimaryButton,
@@ -33,7 +32,7 @@ export const FirmwareUpdateFailedModal = (
     <Flex flexDirection={DIRECTION_ROW}>
       <Icon
         width={SPACING.spacing20}
-        color={LEGACY_COLORS.errorEnabled}
+        color={COLORS.errorEnabled}
         name="information"
         aria-label="information"
       />

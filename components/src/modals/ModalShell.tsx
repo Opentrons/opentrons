@@ -1,12 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import {
-  BORDERS,
-  LEGACY_COLORS,
-  RESPONSIVENESS,
-  SPACING,
-} from '../ui-style-constants'
-import { COLORS } from '../helix-design-system'
+import { BORDERS, COLORS, RESPONSIVENESS, SPACING } from '../ui-style-constants'
 import { StyleProps, styleProps } from '../primitives'
 import {
   POSITION_FIXED,
@@ -83,11 +77,11 @@ const Overlay = styled.div`
   top: 0;
   bottom: 0;
   z-index: 1;
-  background-color: ${COLORS.black90}${COLORS.opacity40HexCode};
+  background-color: ${COLORS.backgroundOverlay};
   cursor: default;
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    background-color: ${LEGACY_COLORS.darkBlack60};
+    background-color: ${COLORS.grey50};
   }
 `
 const ContentArea = styled.div<{ zIndex: string | number }>`

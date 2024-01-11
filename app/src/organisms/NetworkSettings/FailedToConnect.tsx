@@ -6,7 +6,6 @@ import {
   DIRECTION_COLUMN,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
-  LEGACY_COLORS,
   COLORS,
   SPACING,
   TYPOGRAPHY,
@@ -40,7 +39,7 @@ export function FailedToConnect({
     <Flex flex="1" flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
       <Flex
         flex="1"
-        backgroundColor={LEGACY_COLORS.red3}
+        backgroundColor={COLORS.red3}
         justifyContent={JUSTIFY_CENTER}
         borderRadius={BORDERS.borderRadiusSize3}
       >
@@ -52,7 +51,7 @@ export function FailedToConnect({
           <Icon
             name="ot-alert"
             size="3rem"
-            color={LEGACY_COLORS.red2}
+            color={COLORS.red2}
             aria-label={'failed_to_connect_invalidPassword'}
           />
           <Flex

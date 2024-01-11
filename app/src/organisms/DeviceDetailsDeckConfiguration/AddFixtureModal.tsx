@@ -6,7 +6,6 @@ import {
   ALIGN_CENTER,
   BORDERS,
   Btn,
-  LEGACY_COLORS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -216,7 +215,7 @@ export function AddFixtureModal({
                         alignItems={ALIGN_CENTER}
                         justifyContent={JUSTIFY_SPACE_BETWEEN}
                         padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
-                        backgroundColor={LEGACY_COLORS.medGreyEnabled}
+                        backgroundColor={COLORS.grey35}
                         borderRadius={BORDERS.borderRadiusSize1}
                       >
                         <StyledText css={TYPOGRAPHY.pSemiBold}>
@@ -252,39 +251,39 @@ export function AddFixtureModal({
 }
 
 const FIXTURE_BUTTON_STYLE = css`
-  background-color: ${LEGACY_COLORS.light1};
+  background-color: ${COLORS.light1};
   cursor: default;
   border-radius: ${BORDERS.borderRadiusSize3};
   box-shadow: none;
 
   &:focus {
-    background-color: ${LEGACY_COLORS.light1Pressed};
+    background-color: ${COLORS.grey40};
     box-shadow: none;
   }
 
   &:hover {
     border: none;
     box-shadow: none;
-    background-color: ${LEGACY_COLORS.light1};
+    background-color: ${COLORS.light1};
   }
 
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${LEGACY_COLORS.light1};
+    background-color: ${COLORS.light1};
   }
 
   &:active {
-    background-color: ${LEGACY_COLORS.light1Pressed};
+    background-color: ${COLORS.grey40};
   }
 
   &:disabled {
-    background-color: ${LEGACY_COLORS.light1};
-    color: ${LEGACY_COLORS.darkBlack60};
+    background-color: ${COLORS.light1};
+    color: ${COLORS.grey50};
   }
 `
 const GO_BACK_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${LEGACY_COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50Enabled};
 
   &:hover {
     opacity: 70%;

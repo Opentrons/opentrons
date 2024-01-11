@@ -22,7 +22,6 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   TYPOGRAPHY,
-  LEGACY_COLORS,
   COLORS,
   PrimaryButton,
   RESPONSIVENESS,
@@ -221,13 +220,13 @@ const Table = styled('table')`
 `
 const TableHeader = styled('th')`
   text-transform: ${TYPOGRAPHY.textTransformUppercase};
-  color: ${COLORS.black90};
+  color: ${COLORS.darkBlackEnabled};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   font-size: ${TYPOGRAPHY.fontSizeCaption};
   padding: ${SPACING.spacing4};
 `
 const TableRow = styled('tr')`
-  background-color: ${LEGACY_COLORS.fundamentalsBackground};
+  background-color: ${COLORS.grey35};
 `
 
 const TableDatum = styled('td')`
@@ -405,7 +404,7 @@ const TerseHeader = styled('th')`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
 `
 const TerseTableRow = styled('tr')`
-  background-color: ${LEGACY_COLORS.light1};
+  background-color: ${COLORS.light1};
 `
 
 const TerseTableDatum = styled('td')`

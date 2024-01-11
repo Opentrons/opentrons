@@ -7,7 +7,6 @@ import { formatDistance } from 'date-fns'
 import {
   Flex,
   Icon,
-  LEGACY_COLORS,
   COLORS,
   SPACING,
   TYPOGRAPHY,
@@ -92,8 +91,8 @@ export function ProtocolWithLastRun({
     flex: 1 0 0;
     &:active {
       background-color: ${isReadyToBeReRun
-        ? LEGACY_COLORS.green3Pressed
-        : LEGACY_COLORS.yellow3Pressed};
+        ? COLORS.green3Pressed
+        : COLORS.yellow300};
     }
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE};
@@ -103,8 +102,8 @@ export function ProtocolWithLastRun({
   const PROTOCOL_CARD_CLICKED_STYLE = css`
     flex: 1 0 0;
     background-color: ${isReadyToBeReRun
-      ? LEGACY_COLORS.green3Pressed
-      : LEGACY_COLORS.yellow3Pressed};
+      ? COLORS.green3Pressed
+      : COLORS.yellow350};
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE};
     }
@@ -158,7 +157,7 @@ export function ProtocolWithLastRun({
       flexDirection={DIRECTION_COLUMN}
       padding={SPACING.spacing24}
       gridGap={SPACING.spacing24}
-      backgroundColor={isReadyToBeReRun ? LEGACY_COLORS.green3 : LEGACY_COLORS.yellow3}
+      backgroundColor={isReadyToBeReRun ? COLORS.green3 : COLORS.yellow35}
       width="25.8125rem"
       height="24.5rem"
       borderRadius={BORDERS.borderRadiusSize4}
@@ -177,7 +176,7 @@ export function ProtocolWithLastRun({
             aria-label="icon_ot-spinner"
             spin={true}
             size="2.5rem"
-            color={LEGACY_COLORS.darkBlack100}
+            color={COLORS.darkBlack100}
           />
         )}
       </Flex>
@@ -195,7 +194,7 @@ export function ProtocolWithLastRun({
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         lineHeight={TYPOGRAPHY.lineHeight28}
-        color={LEGACY_COLORS.darkBlack70}
+        color={COLORS.grey60}
       >
         {i18n.format(
           `${terminationTypeMap[runData.status] ?? ''} ${formattedLastRunTime}`,

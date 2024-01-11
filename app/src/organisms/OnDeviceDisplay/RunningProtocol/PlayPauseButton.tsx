@@ -6,7 +6,6 @@ import {
   Icon,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
-  LEGACY_COLORS,
   COLORS,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
@@ -18,29 +17,29 @@ import type { RunStatus } from '@opentrons/api-client'
 const PLAY_PAUSE_BUTTON_STYLE = css`
   display: flex;
   border-radius: 50%;
-  background-color: ${LEGACY_COLORS.blueEnabled};
+  background-color: ${COLORS.blueEnabled};
   -webkit-tap-highlight-color: transparent;
 
   &:focus {
-    background-color: ${LEGACY_COLORS.bluePressed};
+    background-color: ${COLORS.bluePressed};
     box-shadow: none;
   }
   &:hover {
     border: none;
     box-shadow: none;
-    background-color: ${LEGACY_COLORS.blueEnabled};
+    background-color: ${COLORS.blueEnabled};
     color: ${COLORS.white};
   }
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${LEGACY_COLORS.blueEnabled};
+    background-color: ${COLORS.blueEnabled};
   }
   &:active {
-    background-color: ${LEGACY_COLORS.bluePressed};
+    background-color: ${COLORS.bluePressed};
   }
   &:disabled {
-    background-color: ${LEGACY_COLORS.darkBlack20};
-    color: ${LEGACY_COLORS.darkBlack60};
+    background-color: ${COLORS.grey35};
+    color: ${COLORS.grey50};
   }
 `
 
