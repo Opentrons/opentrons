@@ -6,6 +6,7 @@ import {
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   TYPOGRAPHY,
+  COLORS,
   LEGACY_COLORS,
 } from '@opentrons/components'
 
@@ -32,12 +33,12 @@ export const CalibrationHealthCheckResults = ({
         backgroundColor={
           isCalibrationRecommended
             ? LEGACY_COLORS.warningBackgroundLight
-            : LEGACY_COLORS.successBackgroundLight
+            : COLORS.green20
         }
         iconColor={
           isCalibrationRecommended
             ? LEGACY_COLORS.warningEnabled
-            : LEGACY_COLORS.successEnabled
+            : COLORS.green50
         }
         textColor={COLORS.black90}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}

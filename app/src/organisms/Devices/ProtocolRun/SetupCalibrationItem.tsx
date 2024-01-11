@@ -10,6 +10,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
   BORDERS,
+  COLORS,
   LEGACY_COLORS,
   SPACING,
   TYPOGRAPHY,
@@ -68,7 +69,7 @@ export function SetupCalibrationItem({
               size={SIZE_1}
               color={
                 calibratedDate != null
-                  ? LEGACY_COLORS.successEnabled
+                  ? COLORS.green50
                   : LEGACY_COLORS.warningEnabled
               }
               marginRight={SPACING.spacing16}

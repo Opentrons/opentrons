@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import { LEGACY_COLORS, PrimaryButton } from '@opentrons/components'
+import { COLORS, LEGACY_COLORS, PrimaryButton } from '@opentrons/components'
 import { LegacyModalShell } from '../LegacyModal'
 import { WizardHeader } from '../WizardHeader'
 import { configReducer } from '../../redux/config/reducer'
@@ -43,7 +43,7 @@ AlertIcon.args = {
 
 export const SuccessIcon = Template.bind({})
 SuccessIcon.args = {
-  iconColor: LEGACY_COLORS.successEnabled,
+  iconColor: COLORS.green50,
   header: 'Pipette still detected',
   subHeader: 'Are you sure you want to exit before detaching your pipette?',
   isSuccess: true,

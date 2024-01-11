@@ -4,6 +4,7 @@ import { useHistory } from 'react-router-dom'
 import {
   Flex,
   SPACING,
+  COLORS,
   LEGACY_COLORS,
   DIRECTION_ROW,
   JUSTIFY_CENTER,
@@ -70,7 +71,7 @@ export function ConnectViaUSB(): JSX.Element {
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <Flex
               alignItems={ALIGN_CENTER}
-              backgroundColor={LEGACY_COLORS.green3}
+              backgroundColor={COLORS.green35}
               borderRadius={BORDERS.borderRadiusSize3}
               height="18.5rem"
               flexDirection={DIRECTION_COLUMN}
@@ -78,7 +79,7 @@ export function ConnectViaUSB(): JSX.Element {
               justifyContent={JUSTIFY_CENTER}
               padding={`${SPACING.spacing40} ${SPACING.spacing80}`}
             >
-              <Icon name="ot-check" size="3rem" color={LEGACY_COLORS.green2} />
+              <Icon name="ot-check" size="3rem" color={COLORS.green50} />
               <Flex
                 alignItems={ALIGN_CENTER}
                 flexDirection={DIRECTION_COLUMN}

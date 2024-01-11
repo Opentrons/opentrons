@@ -6,7 +6,7 @@ import { MemoryRouter } from 'react-router-dom'
 
 import { useAllRunsQuery, useProtocolQuery } from '@opentrons/react-api-client'
 import { RUN_STATUS_FAILED } from '@opentrons/api-client'
-import { LEGACY_COLORS, renderWithProviders } from '@opentrons/components'
+import { COLORS, renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 import { Skeleton } from '../../../../atoms/Skeleton'
@@ -209,7 +209,7 @@ describe('RecentRunProtocolCard', () => {
   it('when tapping a card, mock functions is called and loading state is activated', () => {
     const [{ getByLabelText }] = render(props)
     const button = getByLabelText('RecentRunProtocolCard')
-    expect(button).toHaveStyle(`background-color: ${LEGACY_COLORS.green3}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.green35}`)
     fireEvent.click(button)
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: 'proceedToRun',
@@ -218,7 +218,7 @@ describe('RecentRunProtocolCard', () => {
     // TODO(BC, 08/30/23): reintroduce check for tracking when tracking is reintroduced lazily
     // expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
     getByLabelText('icon_ot-spinner')
-    expect(button).toHaveStyle(`background-color: ${LEGACY_COLORS.green3Pressed}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.green40}`)
   })
 
   it('should render the skeleton when react query is loading', () => {

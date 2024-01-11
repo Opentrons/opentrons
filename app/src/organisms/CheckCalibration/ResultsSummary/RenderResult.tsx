@@ -4,6 +4,7 @@ import {
   Flex,
   ALIGN_CENTER,
   Icon,
+  COLORS,
   LEGACY_COLORS,
   SPACING,
   SIZE_1,
@@ -28,7 +29,7 @@ export const RenderResult = ({ isBadCal }: RenderResultProps): JSX.Element => {
       <Icon
         name={isBadCal ? 'alert-circle' : 'check-circle'}
         size={SIZE_1}
-        color={isBadCal ? LEGACY_COLORS.warningEnabled : LEGACY_COLORS.successEnabled}
+        color={isBadCal ? LEGACY_COLORS.warningEnabled : COLORS.green50}
         marginRight={SPACING.spacing12}
         data-testid="RenderResult_icon"
       />

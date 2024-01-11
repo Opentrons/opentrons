@@ -11,6 +11,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   Btn,
+  COLORS,
   LEGACY_COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -118,7 +119,7 @@ export function ProtocolSetupStep({
   disabledReason,
 }: ProtocolSetupStepProps): JSX.Element {
   const backgroundColorByStepStatus = {
-    ready: LEGACY_COLORS.green3,
+    ready: COLORS.green35,
     'not ready': LEGACY_COLORS.yellow3,
     general: LEGACY_COLORS.light1,
   }
@@ -137,7 +138,7 @@ export function ProtocolSetupStep({
         backgroundColor = LEGACY_COLORS.darkBlack40
         break
       case 'ready':
-        backgroundColor = LEGACY_COLORS.green3Pressed
+        backgroundColor = COLORS.green40
         break
       default:
         backgroundColor = LEGACY_COLORS.yellow3Pressed
@@ -169,9 +170,7 @@ export function ProtocolSetupStep({
       >
         {status !== 'general' && !disabled ? (
           <Icon
-            color={
-              status === 'ready' ? LEGACY_COLORS.green2 : LEGACY_COLORS.yellow2
-            }
+            color={status === 'ready' ? COLORS.green50 : LEGACY_COLORS.yellow2}
             size="2rem"
             name={status === 'ready' ? 'ot-check' : 'ot-alert'}
           />

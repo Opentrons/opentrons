@@ -14,6 +14,7 @@ import {
   Link,
   ALIGN_CENTER,
   BORDERS,
+  COLORS,
   LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -245,14 +246,8 @@ export function Toast(props: ToastProps): JSX.Element {
     },
     [SUCCESS_TOAST]: {
       iconName: 'ot-check',
-      color: `${
-        showODDStyle ? LEGACY_COLORS.green2 : LEGACY_COLORS.successEnabled
-      }`,
-      backgroundColor: `${
-        showODDStyle
-          ? LEGACY_COLORS.green4
-          : LEGACY_COLORS.successBackgroundLight
-      }`,
+      color: `${showODDStyle ? COLORS.green50 : COLORS.green50}`,
+      backgroundColor: `${showODDStyle ? COLORS.green30 : COLORS.green20}`,
     },
     [WARNING_TOAST]: {
       iconName: 'ot-alert',

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
+  COLORS,
   LEGACY_COLORS,
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
@@ -125,7 +126,7 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
     <SimpleWizardBody
       iconColor={
         success || wrongWantedPipette || confirmPipetteLevel
-          ? LEGACY_COLORS.successEnabled
+          ? COLORS.green50
           : LEGACY_COLORS.errorEnabled
       }
       header={header}

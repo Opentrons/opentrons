@@ -3,6 +3,7 @@ import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
   Btn,
+  COLORS,
   LEGACY_COLORS,
   RESPONSIVENESS,
   TYPOGRAPHY,
@@ -73,7 +74,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
       : null
   const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
   let header: string = 'unknown results screen'
-  let iconColor: string = LEGACY_COLORS.successEnabled
+  let iconColor: string = COLORS.green50
   let isSuccess: boolean = true
   let buttonText: string = i18n.format(t('shared:exit'), 'capitalize')
   let subHeader

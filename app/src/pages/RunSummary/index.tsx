@@ -10,6 +10,7 @@ import {
   ALIGN_STRETCH,
   BORDERS,
   Btn,
+  COLORS,
   LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -238,9 +239,7 @@ export function RunSummary(): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing40}
           padding={SPACING.spacing40}
-          backgroundColor={
-            didRunSucceed ? LEGACY_COLORS.green2 : LEGACY_COLORS.red2
-          }
+          backgroundColor={didRunSucceed ? COLORS.green50 : LEGACY_COLORS.red2}
         >
           <SplashFrame>
             <Flex gridGap={SPACING.spacing32} alignItems={ALIGN_CENTER}>
@@ -285,9 +284,7 @@ export function RunSummary(): JSX.Element {
                 name={didRunSucceed ? 'ot-check' : 'ot-alert'}
                 size="2rem"
                 color={
-                  didRunSucceed
-                    ? LEGACY_COLORS.successEnabled
-                    : LEGACY_COLORS.errorEnabled
+                  didRunSucceed ? COLORS.green50 : LEGACY_COLORS.errorEnabled
                 }
               />
               <SummaryHeader>{headerText}</SummaryHeader>

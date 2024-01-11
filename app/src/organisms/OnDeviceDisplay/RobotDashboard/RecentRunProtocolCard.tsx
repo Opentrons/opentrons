@@ -7,6 +7,7 @@ import { formatDistance } from 'date-fns'
 import {
   Flex,
   Icon,
+  COLORS,
   LEGACY_COLORS,
   SPACING,
   TYPOGRAPHY,
@@ -91,7 +92,7 @@ export function ProtocolWithLastRun({
     flex: 1 0 0;
     &:active {
       background-color: ${isReadyToBeReRun
-        ? LEGACY_COLORS.green3Pressed
+        ? COLORS.green40
         : LEGACY_COLORS.yellow3Pressed};
     }
     &:focus-visible {
@@ -102,7 +103,7 @@ export function ProtocolWithLastRun({
   const PROTOCOL_CARD_CLICKED_STYLE = css`
     flex: 1 0 0;
     background-color: ${isReadyToBeReRun
-      ? LEGACY_COLORS.green3Pressed
+      ? COLORS.green40
       : LEGACY_COLORS.yellow3Pressed};
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE};
@@ -158,7 +159,7 @@ export function ProtocolWithLastRun({
       padding={SPACING.spacing24}
       gridGap={SPACING.spacing24}
       backgroundColor={
-        isReadyToBeReRun ? LEGACY_COLORS.green3 : LEGACY_COLORS.yellow3
+        isReadyToBeReRun ? COLORS.green35 : LEGACY_COLORS.yellow3
       }
       width="25.8125rem"
       height="24.5rem"

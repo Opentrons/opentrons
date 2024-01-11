@@ -1,6 +1,7 @@
 import * as React from 'react'
 import {
   renderWithProviders,
+  COLORS,
   LEGACY_COLORS,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -32,7 +33,7 @@ describe('CalibrationHealthCheckResults', () => {
       `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
     )
     expect(getByTestId('status_circle')).toHaveStyle(
-      `color: ${String(LEGACY_COLORS.successEnabled)}`
+      `color: ${String(COLORS.green50)}`
     )
     expect(getByTestId('status_circle')).toHaveStyle(`height: 0.3125rem`)
     expect(getByTestId('status_circle')).toHaveStyle(`width: 0.3125rem`)
