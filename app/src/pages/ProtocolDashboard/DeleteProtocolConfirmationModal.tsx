@@ -37,7 +37,7 @@ export function DeleteProtocolConfirmationModal({
   const modalHeader: ModalHeaderBaseProps = {
     title: t('delete_this_protocol'),
     iconName: 'ot-alert',
-    iconColor: COLORS.yellow2,
+    iconColor: COLORS.yellow50,
   }
   const host = useHost()
   const queryClient = useQueryClient()

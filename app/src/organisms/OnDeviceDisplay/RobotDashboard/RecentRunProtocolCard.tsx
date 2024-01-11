@@ -92,7 +92,7 @@ export function ProtocolWithLastRun({
     &:active {
       background-color: ${isReadyToBeReRun
         ? COLORS.green3Pressed
-        : COLORS.yellow3Pressed};
+        : COLORS.yellow300};
     }
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE};
@@ -103,7 +103,7 @@ export function ProtocolWithLastRun({
     flex: 1 0 0;
     background-color: ${isReadyToBeReRun
       ? COLORS.green3Pressed
-      : COLORS.yellow3Pressed};
+      : COLORS.yellow350};
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE};
     }
@@ -157,7 +157,7 @@ export function ProtocolWithLastRun({
       flexDirection={DIRECTION_COLUMN}
       padding={SPACING.spacing24}
       gridGap={SPACING.spacing24}
-      backgroundColor={isReadyToBeReRun ? COLORS.green3 : COLORS.yellow3}
+      backgroundColor={isReadyToBeReRun ? COLORS.green3 : COLORS.yellow35}
       width="25.8125rem"
       height="24.5rem"
       borderRadius={BORDERS.borderRadiusSize4}

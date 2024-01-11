@@ -102,8 +102,8 @@ export function CalibrationTaskList({
     // if we have tasks and they are all marked bad, then we should
     // strongly suggest they re-do those calibrations
   } else if (taskListStatus === 'bad') {
-    statusLabelBackgroundColor = COLORS.warningEnabled
-    statusLabelIconColor = COLORS.warningEnabled
+    statusLabelBackgroundColor = COLORS.yellow50
+    statusLabelIconColor = COLORS.yellow50
     statusLabelText = t('calibration_recommended')
   }
 
@@ -133,7 +133,7 @@ export function CalibrationTaskList({
             alignItems={ALIGN_CENTER}
           >
             {exitBeforeDeckConfigCompletion ? (
-              <Icon name="ot-alert" size="3rem" color={COLORS.warningEnabled} />
+              <Icon name="ot-alert" size="3rem" color={COLORS.yellow50} />
             ) : (
               <Icon name="ot-check" size="3rem" color={COLORS.successEnabled} />
             )}

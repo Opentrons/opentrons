@@ -35,7 +35,7 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
     let iconColor: string = ''
     switch (type) {
       case 'warning':
-        iconColor = COLORS.warningEnabled
+        iconColor = COLORS.yellow50
         break
       case 'error':
         iconColor = COLORS.errorEnabled

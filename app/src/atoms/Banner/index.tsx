@@ -59,8 +59,8 @@ const BANNER_PROPS_BY_TYPE: Record<
   },
   warning: {
     icon: { name: 'alert-circle' },
-    backgroundColor: COLORS.warningBackgroundLight,
-    color: COLORS.warningEnabled,
+    backgroundColor: COLORS.yellow20,
+    color: COLORS.yellow50,
   },
   updating: {
     icon: { name: 'ot-spinner' },

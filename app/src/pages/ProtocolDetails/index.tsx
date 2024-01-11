@@ -412,7 +412,7 @@ export function ProtocolDetails(): JSX.Element | null {
   const deleteModalHeader: ModalHeaderBaseProps = {
     title: 'Delete this protocol?',
     iconName: 'ot-alert',
-    iconColor: COLORS.yellow2,
+    iconColor: COLORS.yellow50,
   }
 
   return (

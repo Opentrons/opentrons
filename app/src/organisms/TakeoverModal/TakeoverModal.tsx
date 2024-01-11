@@ -36,7 +36,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
   const terminateHeader: ModalHeaderBaseProps = {
     title: t('terminate') + '?',
     iconName: 'ot-alert',
-    iconColor: COLORS.yellow2,
+    iconColor: COLORS.yellow50,
   }
 
   return (

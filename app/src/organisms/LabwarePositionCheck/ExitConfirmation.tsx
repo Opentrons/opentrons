@@ -45,7 +45,7 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
         alignItems={ALIGN_CENTER}
         paddingX={SPACING.spacing32}
       >
-        <Icon name="ot-alert" size={SIZE_3} color={COLORS.warningEnabled} />
+        <Icon name="ot-alert" size={SIZE_3} color={COLORS.yellow50} />
         {isOnDevice ? (
           <>
             <ConfirmationHeaderODD>

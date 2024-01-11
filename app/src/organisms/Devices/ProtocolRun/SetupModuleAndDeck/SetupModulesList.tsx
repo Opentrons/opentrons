@@ -351,9 +351,9 @@ export function ModulesListItem({
     renderModuleStatus = (
       <StatusLabel
         status={moduleConnectionStatus}
-        backgroundColor={COLORS.warningBackgroundLight}
-        iconColor={COLORS.warningEnabled}
-        textColor={COLORS.warningText}
+        backgroundColor={COLORS.yellow20}
+        iconColor={COLORS.yellow50}
+        textColor={COLORS.yellow60}
       />
     )
   }
@@ -433,9 +433,9 @@ export function ModulesListItem({
               >
                 <StatusLabel
                   status={t('location_conflict')}
-                  backgroundColor={COLORS.warningBackgroundLight}
-                  iconColor={COLORS.warningEnabled}
-                  textColor={COLORS.warningText}
+                  backgroundColor={COLORS.yellow20}
+                  iconColor={COLORS.yellow50}
+                  textColor={COLORS.yellow60}
                 />
                 <TertiaryButton
                   width="max-content"
