@@ -5,6 +5,7 @@ import { css } from 'styled-components'
 import {
   BORDERS,
   LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   POSITION_FIXED,

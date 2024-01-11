@@ -6,6 +6,7 @@ import {
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,
   LEGACY_COLORS,
+  COLORS,
   SPACING,
   DIRECTION_COLUMN,
 } from '@opentrons/components'

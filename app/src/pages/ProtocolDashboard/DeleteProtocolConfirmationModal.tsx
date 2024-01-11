@@ -7,6 +7,7 @@ import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import {
   Flex,
   LEGACY_COLORS,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
   DIRECTION_ROW,

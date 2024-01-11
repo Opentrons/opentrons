@@ -2,6 +2,7 @@ import * as React from 'react'
 import {
   C_SKY_BLUE,
   LEGACY_COLORS,
+  COLORS,
   renderWithProviders,
 } from '@opentrons/components'
 import { StatusLabel } from '..'

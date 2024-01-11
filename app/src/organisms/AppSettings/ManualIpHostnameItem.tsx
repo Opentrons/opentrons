@@ -6,6 +6,7 @@ import {
   Btn,
   Icon,
   LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   Flex,
   JUSTIFY_FLEX_START,

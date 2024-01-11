@@ -7,6 +7,7 @@ import {
   ALIGN_CENTER,
   Link,
   LEGACY_COLORS,
+  COLORS,
   SPACING,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'

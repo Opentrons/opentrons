@@ -7,6 +7,7 @@ import {
   ALIGN_CENTER,
   JUSTIFY_CENTER,
   LEGACY_COLORS,
+  COLORS,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 

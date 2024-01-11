@@ -4,6 +4,7 @@ import {
   Flex,
   BORDERS,
   LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'

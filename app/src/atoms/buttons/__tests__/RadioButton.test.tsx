@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { renderWithProviders, LEGACY_COLORS, SPACING } from '@opentrons/components'
+import { renderWithProviders, LEGACY_COLORS,
+  COLORS, SPACING } from '@opentrons/components'
 
 import { RadioButton } from '..'
 

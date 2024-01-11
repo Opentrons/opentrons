@@ -7,6 +7,7 @@ import {
   TYPOGRAPHY,
   SPACING,
 } from '../../../ui-style-constants'
+import { COLORS } from '../../../helix-design-system'
 import { PrimaryButton } from '../PrimaryButton'
 
 const render = (props: React.ComponentProps<typeof PrimaryButton>) => {

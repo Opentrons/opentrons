@@ -8,6 +8,7 @@ import {
   Box,
   POSITION_RELATIVE,
   LEGACY_COLORS,
+  COLORS,
   OVERFLOW_AUTO,
   useIdle,
   useScrolling,

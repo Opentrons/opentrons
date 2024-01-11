@@ -5,6 +5,7 @@ import { Icon } from '../../icons'
 import { Btn } from '../../primitives'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
 import { BORDERS, LEGACY_COLORS } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import { FIXTURE_HEIGHT, SINGLE_SLOT_FIXTURE_WIDTH } from './constants'
 

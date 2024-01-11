@@ -7,6 +7,7 @@ import {
   TYPOGRAPHY,
   BORDERS,
   LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   SIZE_1,
 } from '@opentrons/components'

@@ -14,6 +14,7 @@ import {
   Icon,
   DIRECTION_ROW,
   LEGACY_COLORS,
+  COLORS,
   JUSTIFY_END,
   ALIGN_CENTER,
   Box,

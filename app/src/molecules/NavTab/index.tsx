@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import {
   BORDERS,
   LEGACY_COLORS,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'

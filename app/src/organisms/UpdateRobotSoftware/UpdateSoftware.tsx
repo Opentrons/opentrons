@@ -6,6 +6,7 @@ import {
   BORDERS,
   Box,
   LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,

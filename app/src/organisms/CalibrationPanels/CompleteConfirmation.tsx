@@ -10,6 +10,7 @@ import {
   SIZE_3,
   JUSTIFY_CENTER,
   LEGACY_COLORS,
+  COLORS,
   ALIGN_STRETCH,
   PrimaryButton,
   TYPOGRAPHY,

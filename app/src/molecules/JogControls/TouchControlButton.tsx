@@ -1,5 +1,6 @@
 import styled from 'styled-components'
-import { LEGACY_COLORS, SPACING, BORDERS } from '@opentrons/components'
+import { LEGACY_COLORS,
+  COLORS, SPACING, BORDERS } from '@opentrons/components'
 
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 

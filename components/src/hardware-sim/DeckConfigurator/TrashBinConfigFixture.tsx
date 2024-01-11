@@ -10,6 +10,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   FIXTURE_HEIGHT,

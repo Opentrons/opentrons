@@ -7,6 +7,7 @@ import {
   useHoverTooltip,
   Flex,
   LEGACY_COLORS,
+  COLORS,
   Icon,
   SPACING,
   Text,

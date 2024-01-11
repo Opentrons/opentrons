@@ -16,6 +16,7 @@ import {
   POSITION_ABSOLUTE,
   COLORS,
   LEGACY_COLORS,
+  COLORS,
   SecondaryButton,
   DIRECTION_COLUMN,
   Overlay,

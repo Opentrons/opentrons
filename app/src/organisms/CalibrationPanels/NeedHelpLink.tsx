@@ -5,6 +5,7 @@ import {
   Link,
   Icon,
   LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   SIZE_1,
   ALIGN_CENTER,

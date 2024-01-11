@@ -1,4 +1,5 @@
 import { css } from 'styled-components'
+import { COLORS } from '../helix-design-system'
 import { LEGACY_COLORS } from './'
 
 // Font Sizes

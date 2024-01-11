@@ -15,6 +15,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   LEGACY_COLORS,
+  COLORS,
   ALIGN_START,
   DIRECTION_COLUMN,
 } from '@opentrons/components'

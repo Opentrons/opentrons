@@ -10,6 +10,7 @@ import {
   SPACING,
   ALIGN_FLEX_START,
   LEGACY_COLORS,
+  COLORS,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { StyledText } from '../../../atoms/text'

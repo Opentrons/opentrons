@@ -5,6 +5,7 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   LEGACY_COLORS,
+  COLORS,
   SecondaryButton,
 } from '@opentrons/components'
 

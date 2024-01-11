@@ -7,6 +7,7 @@ import {
   ALIGN_CENTER,
   JUSTIFY_CENTER,
   LEGACY_COLORS,
+  COLORS,
   SPACING,
   DIRECTION_COLUMN,
 } from '@opentrons/components'

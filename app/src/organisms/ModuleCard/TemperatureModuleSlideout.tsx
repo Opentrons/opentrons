@@ -6,6 +6,7 @@ import {
   TYPOGRAPHY,
   SPACING,
   LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
 import {

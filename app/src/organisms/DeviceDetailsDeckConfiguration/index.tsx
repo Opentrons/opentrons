@@ -7,6 +7,7 @@ import {
   ALIGN_FLEX_START,
   BORDERS,
   LEGACY_COLORS,
+  COLORS,
   DeckConfigurator,
   DIRECTION_COLUMN,
   DIRECTION_ROW,

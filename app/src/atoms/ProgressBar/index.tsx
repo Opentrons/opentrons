@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { LEGACY_COLORS, Box } from '@opentrons/components'
+import { LEGACY_COLORS,
+  COLORS, Box } from '@opentrons/components'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
 

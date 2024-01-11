@@ -5,6 +5,7 @@ import values from 'lodash/values'
 import {
   COLORS,
   LEGACY_COLORS,
+  COLORS,
   DeckFromLayers,
   FlexTrash,
   Module,

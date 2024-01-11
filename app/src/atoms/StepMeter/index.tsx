@@ -3,6 +3,7 @@ import { css } from 'styled-components'
 import {
   Box,
   LEGACY_COLORS,
+  COLORS,
   SPACING,
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,

@@ -3,6 +3,7 @@ import {
   SPACING,
   Box,
   LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   Flex,
   ALIGN_CENTER,

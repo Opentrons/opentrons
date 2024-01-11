@@ -5,6 +5,7 @@ import {
   BORDERS,
   Btn,
   LEGACY_COLORS,
+  COLORS,
   Flex,
   Icon,
   JUSTIFY_FLEX_START,

@@ -8,6 +8,7 @@ import {
   DIRECTION_COLUMN,
   POSITION_ABSOLUTE,
   LEGACY_COLORS,
+  COLORS,
   BORDERS,
 } from '@opentrons/components'
 import {

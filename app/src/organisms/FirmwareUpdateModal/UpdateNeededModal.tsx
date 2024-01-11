@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
-import { LEGACY_COLORS, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+import { LEGACY_COLORS,
+  COLORS, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import {
   useInstrumentsQuery,
   useSubsystemUpdateQuery,

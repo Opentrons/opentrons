@@ -6,6 +6,7 @@ import {
   SPACING,
   Box,
   LEGACY_COLORS,
+  COLORS,
   BORDERS,
   RoundTab,
 } from '@opentrons/components'

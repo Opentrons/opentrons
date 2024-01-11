@@ -4,6 +4,7 @@ import {
   Icon,
   Flex,
   LEGACY_COLORS,
+  COLORS,
   RESPONSIVENESS,
   TYPOGRAPHY,
   SIZE_4,

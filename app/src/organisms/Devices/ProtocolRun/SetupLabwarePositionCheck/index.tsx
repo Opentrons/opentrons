@@ -12,6 +12,7 @@ import {
   SecondaryButton,
   PrimaryButton,
   LEGACY_COLORS,
+  COLORS,
 } from '@opentrons/components'
 import { useRunQuery, useProtocolQuery } from '@opentrons/react-api-client'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'

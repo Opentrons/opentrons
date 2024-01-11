@@ -8,6 +8,7 @@ import {
   Flex,
   Box,
   LEGACY_COLORS,
+  COLORS,
   SPACING,
   DIRECTION_ROW,
   ALIGN_CENTER,

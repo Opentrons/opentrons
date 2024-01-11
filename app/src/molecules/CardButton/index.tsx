@@ -7,6 +7,7 @@ import {
   ALIGN_CENTER,
   SPACING,
   LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   Icon,
   Btn,

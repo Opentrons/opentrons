@@ -3,6 +3,7 @@ import { css } from 'styled-components'
 import {
   TYPOGRAPHY,
   LEGACY_COLORS,
+  COLORS,
   SPACING,
   BORDERS,
   Btn,

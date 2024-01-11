@@ -9,6 +9,7 @@ import {
   COLORS,
   LEGACY_COLORS,
   COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   FLEX_NONE,
   Flex,

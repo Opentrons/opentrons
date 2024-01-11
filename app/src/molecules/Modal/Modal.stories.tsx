@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { LEGACY_COLORS, Flex, BORDERS, SPACING } from '@opentrons/components'
+import { LEGACY_COLORS,
+  COLORS, Flex, BORDERS, SPACING } from '@opentrons/components'
 import { touchScreenViewport } from '../../DesignTokens/constants'
 import { Modal } from './Modal'
 import type { Story, Meta } from '@storybook/react'

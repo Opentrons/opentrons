@@ -1,9 +1,10 @@
 import * as React from 'react'
 
+import { LEGACY_COLORS } from '../../../ui-style-constants'
+import { COLORS } from '../../../helix-design-system'
 import type { LabwareWell } from '@opentrons/shared-data'
 import type { WellMouseEvent } from './types'
 import type { StyleProps } from '../../../primitives'
-import { LEGACY_COLORS } from '../../../ui-style-constants'
 
 export const INTERACTIVE_WELL_DATA_ATTRIBUTE = 'data-wellname'
 export interface WellProps extends StyleProps {

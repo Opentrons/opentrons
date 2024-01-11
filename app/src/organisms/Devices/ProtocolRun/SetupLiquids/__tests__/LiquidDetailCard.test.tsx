@@ -5,6 +5,7 @@ import {
   renderWithProviders,
   SPACING,
   LEGACY_COLORS,
+  COLORS,
 } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import {

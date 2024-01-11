@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 
 import {
   LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   SPACING,

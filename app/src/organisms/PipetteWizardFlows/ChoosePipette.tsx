@@ -6,6 +6,7 @@ import startCase from 'lodash/startCase'
 import {
   BORDERS,
   LEGACY_COLORS,
+  COLORS,
   Flex,
   SPACING,
   TYPOGRAPHY,

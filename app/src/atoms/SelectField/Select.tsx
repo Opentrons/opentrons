@@ -4,6 +4,7 @@ import {
   BORDERS,
   Box,
   LEGACY_COLORS,
+  COLORS,
   DIRECTION_ROW,
   Icon,
   POSITION_ABSOLUTE,

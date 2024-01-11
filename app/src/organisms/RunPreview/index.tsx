@@ -15,6 +15,7 @@ import {
   BORDERS,
   COLORS,
   LEGACY_COLORS,
+  COLORS,
   POSITION_FIXED,
 } from '@opentrons/components'
 

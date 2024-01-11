@@ -10,6 +10,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   LEGACY_COLORS,
+  COLORS,
   Icon,
   Link,
   PrimaryButton,

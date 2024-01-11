@@ -4,6 +4,7 @@ import { css } from 'styled-components'
 
 import {
   LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   RESPONSIVENESS,

@@ -15,6 +15,7 @@ import {
   JUSTIFY_END,
   TYPOGRAPHY,
   LEGACY_COLORS,
+  COLORS,
 } from '@opentrons/components'
 import { selectors } from '../../labware-ingred/selectors'
 import styles from './LiquidEditForm.css'

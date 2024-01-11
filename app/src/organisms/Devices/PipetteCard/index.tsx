@@ -11,6 +11,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   LEGACY_COLORS,
+  COLORS,
   useOnClickOutside,
   InstrumentDiagram,
   BORDERS,

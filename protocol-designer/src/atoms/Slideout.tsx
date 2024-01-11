@@ -12,6 +12,7 @@ import {
   ALIGN_CENTER,
   LEGACY_COLORS,
   COLORS,
+  COLORS,
   Overlay,
   POSITION_FIXED,
   TYPOGRAPHY,

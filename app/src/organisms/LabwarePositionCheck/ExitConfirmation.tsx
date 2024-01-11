@@ -11,6 +11,7 @@ import {
   AlertPrimaryButton,
   JUSTIFY_CENTER,
   LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   RESPONSIVENESS,
   SecondaryButton,

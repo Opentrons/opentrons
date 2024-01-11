@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import { LEGACY_COLORS } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 
 export interface HeaterShakerVizProps {
   targetTemp: number | null

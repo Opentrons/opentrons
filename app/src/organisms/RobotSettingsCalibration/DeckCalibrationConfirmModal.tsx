@@ -6,6 +6,7 @@ import {
   JUSTIFY_FLEX_END,
   ALIGN_CENTER,
   LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   PrimaryButton,
   SPACING,

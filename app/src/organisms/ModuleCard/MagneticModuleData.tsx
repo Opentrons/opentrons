@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { LEGACY_COLORS, TYPOGRAPHY } from '@opentrons/components'
+import { LEGACY_COLORS,
+  COLORS, TYPOGRAPHY } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,

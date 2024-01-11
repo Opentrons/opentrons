@@ -2,7 +2,8 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 
-import { BORDERS, LEGACY_COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
+import { BORDERS, LEGACY_COLORS,
+  COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data/js/modules'
 
 import { StyledText } from '../../../atoms/text'

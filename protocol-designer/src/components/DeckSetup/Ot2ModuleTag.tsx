@@ -4,6 +4,7 @@ import {
   RobotCoordsForeignDiv,
   Text,
   LEGACY_COLORS,
+  COLORS,
   SPACING,
 } from '@opentrons/components'
 import {

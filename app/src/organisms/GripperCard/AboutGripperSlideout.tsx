@@ -7,6 +7,7 @@ import {
   PrimaryButton,
   TYPOGRAPHY,
   LEGACY_COLORS,
+  COLORS,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { Slideout } from '../../atoms/Slideout'

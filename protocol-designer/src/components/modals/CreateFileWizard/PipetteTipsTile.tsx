@@ -16,6 +16,7 @@ import {
   BORDERS,
   DIRECTION_ROW,
   LEGACY_COLORS,
+  COLORS,
   OutlineButton,
   Icon,
   JUSTIFY_CENTER,

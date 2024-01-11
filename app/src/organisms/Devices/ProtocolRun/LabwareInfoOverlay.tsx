@@ -8,6 +8,7 @@ import {
   RobotCoordsForeignDiv,
   SPACING,
   LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   DISPLAY_FLEX,
   DIRECTION_COLUMN,

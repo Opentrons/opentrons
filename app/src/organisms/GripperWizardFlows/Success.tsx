@@ -4,6 +4,7 @@ import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
   LEGACY_COLORS,
+  COLORS,
   PrimaryButton,
   TEXT_TRANSFORM_CAPITALIZE,
   JUSTIFY_FLEX_END,

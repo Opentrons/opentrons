@@ -3,6 +3,7 @@ import {
   Icon,
   Flex,
   LEGACY_COLORS,
+  COLORS,
   SIZE_4,
   JUSTIFY_CENTER,
   ALIGN_CENTER,

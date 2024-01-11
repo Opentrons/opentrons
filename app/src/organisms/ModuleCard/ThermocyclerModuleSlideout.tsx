@@ -11,6 +11,7 @@ import {
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   SPACING,

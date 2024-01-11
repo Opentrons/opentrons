@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { renderWithProviders, LEGACY_COLORS, SIZE_1 } from '@opentrons/components'
+import { renderWithProviders, LEGACY_COLORS,
+  COLORS, SIZE_1 } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 
 import { RenderResult } from '../RenderResult'

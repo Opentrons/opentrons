@@ -12,6 +12,7 @@ import {
   BORDERS,
   Btn,
   LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,

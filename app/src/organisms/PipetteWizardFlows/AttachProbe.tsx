@@ -5,6 +5,7 @@ import {
   Flex,
   TYPOGRAPHY,
   LEGACY_COLORS,
+  COLORS,
   SPACING,
   RESPONSIVENESS,
 } from '@opentrons/components'

@@ -16,6 +16,7 @@ import {
   IconProps,
   useHoverTooltip,
   LEGACY_COLORS,
+  COLORS,
   Icon,
   ModuleIcon,
 } from '@opentrons/components'

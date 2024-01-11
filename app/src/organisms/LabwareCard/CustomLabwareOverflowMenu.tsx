@@ -11,6 +11,7 @@ import {
   useConditionalConfirm,
   SPACING,
   LEGACY_COLORS,
+  COLORS,
   POSITION_ABSOLUTE,
   AlertPrimaryButton,
   DIRECTION_COLUMN,

@@ -5,6 +5,7 @@ import {
   Flex,
   DIRECTION_COLUMN,
   LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'

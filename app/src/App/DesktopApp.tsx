@@ -4,6 +4,7 @@ import { Redirect, Route, Switch, useRouteMatch } from 'react-router-dom'
 import {
   Box,
   LEGACY_COLORS,
+  COLORS,
   OVERFLOW_AUTO,
   POSITION_RELATIVE,
 } from '@opentrons/components'

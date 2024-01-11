@@ -3,6 +3,7 @@ import { css } from 'styled-components'
 import {
   BORDERS,
   LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   JUSTIFY_CENTER,
   Flex,

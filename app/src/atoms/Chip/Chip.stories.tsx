@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { Flex, LEGACY_COLORS, SPACING } from '@opentrons/components'
+import { Flex, LEGACY_COLORS,
+  COLORS, SPACING } from '@opentrons/components'
 import { touchScreenViewport } from '../../DesignTokens/constants'
 import { Chip } from '.'
 import type { Story, Meta } from '@storybook/react'

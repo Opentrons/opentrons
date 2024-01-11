@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   LEGACY_COLORS,
+  COLORS,
   DIRECTION_ROW,
   SPACING,
   TYPOGRAPHY,

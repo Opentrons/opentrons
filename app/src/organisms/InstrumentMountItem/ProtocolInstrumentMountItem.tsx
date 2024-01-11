@@ -5,6 +5,7 @@ import {
   ALIGN_CENTER,
   Flex,
   LEGACY_COLORS,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
   Icon,

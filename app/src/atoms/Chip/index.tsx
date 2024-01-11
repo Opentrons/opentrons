@@ -10,6 +10,7 @@ import {
   Icon,
   COLORS,
   LEGACY_COLORS,
+  COLORS,
 } from '@opentrons/components'
 
 import { StyledText } from '../text'

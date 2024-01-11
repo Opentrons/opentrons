@@ -5,6 +5,7 @@ import {
   ALIGN_CENTER,
   Btn,
   LEGACY_COLORS,
+  COLORS,
   DISPLAY_FLEX,
   JUSTIFY_CENTER,
   Icon,

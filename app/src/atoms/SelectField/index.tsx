@@ -1,7 +1,8 @@
 import * as React from 'react'
 import find from 'lodash/find'
 import { Select } from './Select'
-import { LEGACY_COLORS, Flex, TYPOGRAPHY } from '@opentrons/components'
+import { LEGACY_COLORS,
+  COLORS, Flex, TYPOGRAPHY } from '@opentrons/components'
 import { css } from 'styled-components'
 
 import type { SelectProps, SelectOption } from './Select'

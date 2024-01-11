@@ -1,6 +1,7 @@
 import * as React from 'react'
 import {
   LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   Tooltip as SharedTooltip,
 } from '@opentrons/components'

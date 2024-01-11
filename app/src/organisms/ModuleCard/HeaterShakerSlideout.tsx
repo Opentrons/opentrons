@@ -9,6 +9,7 @@ import {
 } from '@opentrons/shared-data'
 import {
   LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   SPACING,

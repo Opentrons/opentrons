@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
-import { LEGACY_COLORS, SPACING, PrimaryButton } from '@opentrons/components'
+import { LEGACY_COLORS,
+  COLORS, SPACING, PrimaryButton } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'

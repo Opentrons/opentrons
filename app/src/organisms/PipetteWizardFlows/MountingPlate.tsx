@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { LEFT } from '@opentrons/shared-data'
-import { LEGACY_COLORS, SPACING } from '@opentrons/components'
+import { LEGACY_COLORS,
+  COLORS, SPACING } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'

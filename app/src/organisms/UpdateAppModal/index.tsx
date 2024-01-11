@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   SPACING,
   Flex,

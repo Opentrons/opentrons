@@ -3,7 +3,8 @@ import { capitalize } from 'lodash'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { Trans, useTranslation } from 'react-i18next'
 
-import { Flex, LEGACY_COLORS, SPACING, DIRECTION_COLUMN } from '@opentrons/components'
+import { Flex, LEGACY_COLORS,
+  COLORS, SPACING, DIRECTION_COLUMN } from '@opentrons/components'
 
 import { useCloseCurrentRun } from '../ProtocolUpload/hooks'
 import { SmallButton } from '../../atoms/buttons'

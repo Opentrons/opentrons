@@ -8,6 +8,7 @@ import {
   Flex,
   Icon,
   LEGACY_COLORS,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
   DIRECTION_COLUMN,

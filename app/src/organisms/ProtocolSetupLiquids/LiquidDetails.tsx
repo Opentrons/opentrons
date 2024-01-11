@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
   LEGACY_COLORS,
+  COLORS,
   Flex,
   SPACING,
   TYPOGRAPHY,

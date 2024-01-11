@@ -7,6 +7,7 @@ import {
   PrimaryButton,
   TYPOGRAPHY,
   LEGACY_COLORS,
+  COLORS,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { StyledText } from '../../../atoms/text'

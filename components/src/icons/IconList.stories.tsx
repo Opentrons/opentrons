@@ -10,6 +10,7 @@ import {
   LEGACY_COLORS,
   SPACING,
   BORDERS,
+  COLORS,
 } from '@opentrons/components'
 import { ICON_DATA_BY_NAME } from './icon-data'
 import { Icon as IconComponent, IconName } from './Icon'

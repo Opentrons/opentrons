@@ -10,6 +10,7 @@ import {
   Box,
   Flex,
   LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   SPACING,

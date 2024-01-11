@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { LEGACY_COLORS, Flex, POSITION_FIXED } from '@opentrons/components'
+import { LEGACY_COLORS,
+  COLORS, Flex, POSITION_FIXED } from '@opentrons/components'
 
 export interface BackgroundOverlayProps
   extends React.ComponentProps<typeof Flex> {

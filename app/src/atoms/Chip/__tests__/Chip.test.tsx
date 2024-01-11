@@ -1,6 +1,7 @@
 import * as React from 'react'
 
-import { BORDERS, COLORS, LEGACY_COLORS, renderWithProviders } from '@opentrons/components'
+import { BORDERS, COLORS, LEGACY_COLORS,
+  COLORS, renderWithProviders } from '@opentrons/components'
 
 import { Chip } from '..'
 

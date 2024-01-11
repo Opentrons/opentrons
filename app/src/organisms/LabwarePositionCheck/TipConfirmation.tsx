@@ -8,6 +8,7 @@ import {
   SPACING,
   ALIGN_CENTER,
   LEGACY_COLORS,
+  COLORS,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'

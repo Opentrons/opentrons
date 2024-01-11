@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { BORDERS, LEGACY_COLORS, renderWithProviders } from '@opentrons/components'
+import { BORDERS, LEGACY_COLORS,
+  COLORS, renderWithProviders } from '@opentrons/components'
 import { EquipmentOption } from '../EquipmentOption'
 
 const render = (props: React.ComponentProps<typeof EquipmentOption>) => {

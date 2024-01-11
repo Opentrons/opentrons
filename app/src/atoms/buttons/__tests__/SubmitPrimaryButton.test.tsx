@@ -4,6 +4,7 @@ import { fireEvent } from '@testing-library/react'
 import {
   renderWithProviders,
   LEGACY_COLORS,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
   BORDERS,

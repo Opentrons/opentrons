@@ -10,6 +10,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   BORDERS,
 } from '@opentrons/components'

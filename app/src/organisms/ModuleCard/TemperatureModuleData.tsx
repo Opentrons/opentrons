@@ -5,6 +5,7 @@ import {
   Flex,
   SPACING,
   LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { StatusLabel } from '../../atoms/StatusLabel'

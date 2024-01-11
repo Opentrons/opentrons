@@ -1,6 +1,7 @@
 import * as React from 'react'
 import {
   LEGACY_COLORS,
+  COLORS,
   POSITION_ABSOLUTE,
   DIRECTION_COLUMN,
   Flex,

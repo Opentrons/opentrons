@@ -10,6 +10,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   LEGACY_COLORS,
+  COLORS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'

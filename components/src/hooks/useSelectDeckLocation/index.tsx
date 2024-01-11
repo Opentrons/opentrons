@@ -30,6 +30,7 @@ import type {
   ModuleLocation,
   RobotType,
 } from '@opentrons/shared-data'
+import { COLORS } from '../../helix-design-system'
 
 export type DeckLocationSelectThemes = 'default' | 'grey'
 

@@ -14,6 +14,7 @@ import {
   TYPOGRAPHY,
   Link,
   LEGACY_COLORS,
+  COLORS,
   SPACING,
   JUSTIFY_FLEX_END,
   WRAP,

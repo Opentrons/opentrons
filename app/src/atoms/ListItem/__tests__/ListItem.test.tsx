@@ -3,6 +3,7 @@ import * as React from 'react'
 import {
   BORDERS,
   LEGACY_COLORS,
+  COLORS,
   renderWithProviders,
   SPACING,
 } from '@opentrons/components'

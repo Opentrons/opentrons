@@ -3,6 +3,7 @@ import {
   Btn,
   BORDERS,
   LEGACY_COLORS,
+  COLORS,
   SPACING,
   styleProps,
   TYPOGRAPHY,

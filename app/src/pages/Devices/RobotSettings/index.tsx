@@ -9,6 +9,7 @@ import {
   SIZE_6,
   BORDERS,
   LEGACY_COLORS,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'

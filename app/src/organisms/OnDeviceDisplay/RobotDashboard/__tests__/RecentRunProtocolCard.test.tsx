@@ -6,7 +6,8 @@ import { MemoryRouter } from 'react-router-dom'
 
 import { useAllRunsQuery, useProtocolQuery } from '@opentrons/react-api-client'
 import { RUN_STATUS_FAILED } from '@opentrons/api-client'
-import { LEGACY_COLORS, renderWithProviders } from '@opentrons/components'
+import { LEGACY_COLORS,
+  COLORS, renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 import { Skeleton } from '../../../../atoms/Skeleton'
