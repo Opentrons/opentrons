@@ -117,7 +117,7 @@ export const LocationConflictModal = (
             hasExitIcon: true,
             onClick: onCloseClick,
             iconName: 'ot-alert',
-            iconColor: COLORS.warningEnabled,
+            iconColor: COLORS.yellow50,
           }}
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
@@ -205,7 +205,7 @@ export const LocationConflictModal = (
               gridGap={SPACING.spacing10}
               alignItems={ALIGN_CENTER}
             >
-              <Icon name="ot-alert" size="1rem" color={COLORS.warningEnabled} />
+              <Icon name="ot-alert" size="1rem" color={COLORS.yellow50} />
               <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {t('deck_conflict')}
               </StyledText>

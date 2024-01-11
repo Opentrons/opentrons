@@ -31,7 +31,7 @@ export const QuaternaryButton = styled(NewSecondaryBtn)`
     box-shadow: 0 0 0;
   }
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
+    box-shadow: 0 0 0 3px ${COLORS.yellow50};
   }
 
   &:disabled {

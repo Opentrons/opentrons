@@ -119,7 +119,7 @@ export function ProtocolSetupStep({
 }: ProtocolSetupStepProps): JSX.Element {
   const backgroundColorByStepStatus = {
     ready: COLORS.green3,
-    'not ready': COLORS.yellow3,
+    'not ready': COLORS.yellow35,
     general: COLORS.light1,
   }
   const { makeSnackbar } = useToaster()
@@ -140,7 +140,7 @@ export function ProtocolSetupStep({
         backgroundColor = COLORS.green3Pressed
         break
       default:
-        backgroundColor = COLORS.yellow3Pressed
+        backgroundColor = COLORS.yellow350
     }
   } else backgroundColor = ''
 
@@ -169,7 +169,7 @@ export function ProtocolSetupStep({
       >
         {status !== 'general' && !disabled ? (
           <Icon
-            color={status === 'ready' ? COLORS.green2 : COLORS.yellow2}
+            color={status === 'ready' ? COLORS.green2 : COLORS.yellow50}
             size="2rem"
             name={status === 'ready' ? 'ot-check' : 'ot-alert'}
           />

@@ -49,7 +49,7 @@ Idle.args = {
 export const Error = Template.bind({})
 Error.args = {
   status: 'Error',
-  backgroundColor: COLORS.warningBackgroundLight,
-  iconColor: COLORS.warningEnabled,
+  backgroundColor: COLORS.yellow20,
+  iconColor: COLORS.yellow50,
   pulse: true,
 }

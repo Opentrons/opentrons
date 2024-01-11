@@ -22,6 +22,12 @@ export const red20 = '#FCE9E9'
 /**
  * yellow
  */
+export const yellow60 = '#825512'
+export const yellow50 = '#F09D20'
+export const yellow40 = '#FCD48B'
+export const yellow35 = '#FFE1A4'
+export const yellow30 = '#FFE9BE'
+export const yellow20 = '#FDF3E2'
 
 /**
  * purple

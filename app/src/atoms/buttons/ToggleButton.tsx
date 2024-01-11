@@ -13,7 +13,7 @@ const TOGGLE_DISABLED_STYLES = css`
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
+    box-shadow: 0 0 0 3px ${COLORS.yellow50};
   }
 
   &:disabled {
@@ -36,7 +36,7 @@ const TOGGLE_ENABLED_STYLES = css`
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
+    box-shadow: 0 0 0 3px ${COLORS.yellow50};
   }
 
   &:disabled {

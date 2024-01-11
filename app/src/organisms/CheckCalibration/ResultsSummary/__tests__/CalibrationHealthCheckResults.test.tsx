@@ -39,7 +39,7 @@ describe('CalibrationHealthCheckResults', () => {
     const { getByText, getByTestId } = render(props)
     getByText('Calibration recommended')
     expect(getByTestId('status_circle')).toHaveStyle(
-      `color: ${String(COLORS.warningEnabled)}`
+      `color: ${String(COLORS.yellow50)}`
     )
   })
 })

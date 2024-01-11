@@ -33,7 +33,7 @@ export const SubmitPrimaryButton = (
     ${styleProps}
 
     &:focus-visible {
-      box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
+      box-shadow: 0 0 0 3px ${COLORS.yellow50};
     }
 
     &:hover {

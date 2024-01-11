@@ -373,7 +373,7 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           color={
             calibrationStatus?.complete
               ? COLORS.successEnabled
-              : COLORS.warningEnabled
+              : COLORS.yellow50
           }
           marginRight={SPACING.spacing8}
           name={calibrationStatus?.complete ? 'ot-check' : 'alert-circle'}

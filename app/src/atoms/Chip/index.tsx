@@ -9,7 +9,6 @@ import {
   SPACING,
   TYPOGRAPHY,
   Icon,
-  COLORS,
 } from '@opentrons/components'
 
 import { StyledText } from '../text'
@@ -64,10 +63,10 @@ const CHIP_PROPS_BY_TYPE: Record<
     textColor: COLORS.green1,
   },
   warning: {
-    backgroundColor: COLORS.yellow3,
+    backgroundColor: COLORS.yellow35,
     borderRadius: BORDERS.borderRadiusSize5,
-    iconColor: COLORS.yellow1,
-    textColor: COLORS.yellow1,
+    iconColor: COLORS.yellow60,
+    textColor: COLORS.yellow60,
   },
 }
 

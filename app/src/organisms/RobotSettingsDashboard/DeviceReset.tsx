@@ -325,7 +325,7 @@ export const ConfirmClearDataModal = ({
     title: t('confirm_device_reset_heading'),
     hasExitIcon: false,
     iconName: 'ot-alert',
-    iconColor: COLORS.yellow2,
+    iconColor: COLORS.yellow50,
   }
   return (
     <Modal

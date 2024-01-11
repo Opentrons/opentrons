@@ -248,10 +248,8 @@ export function Toast(props: ToastProps): JSX.Element {
     },
     [WARNING_TOAST]: {
       iconName: 'ot-alert',
-      color: `${showODDStyle ? COLORS.yellow2 : COLORS.warningEnabled}`,
-      backgroundColor: `${
-        showODDStyle ? COLORS.yellow4 : COLORS.warningBackgroundLight
-      }`,
+      color: `${COLORS.yellow50}`,
+      backgroundColor: `${showODDStyle ? COLORS.yellow30 : COLORS.yellow20}`,
     },
   }
 
