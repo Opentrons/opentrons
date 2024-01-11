@@ -24,7 +24,7 @@ describe('LocationIcon', () => {
     expect(locationIcon).toHaveStyle(`padding: ${SPACING.spacing4} 0.375rem`)
     expect(locationIcon).toHaveStyle('height: 2rem')
     expect(locationIcon).toHaveStyle('width: max-content')
-    expect(locationIcon).toHaveStyle(`border: 2px solid ${LEGACY_COLORS.darkBlack100}`)
+    expect(locationIcon).toHaveStyle(`border: 2px solid ${COLORS.black90}`)
     expect(locationIcon).toHaveStyle(
       `border-radius: ${BORDERS.borderRadiusSize3}`
     )

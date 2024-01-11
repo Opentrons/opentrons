@@ -414,7 +414,7 @@ function LabwareLatch({
       css={labwareLatchStyles}
       color={
         isLatchLoading
-          ? `${LEGACY_COLORS.darkBlack100}${LEGACY_COLORS.opacity60HexCode}`
+          ? `${COLORS.black90}${LEGACY_COLORS.opacity60HexCode}`
           : COLORS.black90
       }
       height="6.5rem"

@@ -42,7 +42,7 @@ const OptionLabel = styled.label<LabelProps>`
   padding: ${SPACING.spacing16} ${SPACING.spacing24};
   border-radius: ${BORDERS.borderRadiusSize4};
   color: ${({ isSelected }) =>
-    isSelected === true ? COLORS.white : LEGACY_COLORS.darkBlack100};
+    isSelected === true ? COLORS.white : COLORS.black90};
   background: ${({ isSelected }) =>
     isSelected === true
       ? LEGACY_COLORS.blueEnabled

@@ -39,17 +39,17 @@ const NETWORK_ROW_STYLE = css`
     border: none;
     box-shadow: none;
     background-color: ${LEGACY_COLORS.light1};
-    color: ${LEGACY_COLORS.darkBlack100};
+    color: ${COLORS.black90};
   }
 
   &:focus {
     background-color: ${LEGACY_COLORS.light1Pressed};
-    color: ${LEGACY_COLORS.darkBlack100};
+    color: ${COLORS.black90};
     box-shadow: none;
   }
   &:active {
     background-color: ${LEGACY_COLORS.light1Pressed};
-    color: ${LEGACY_COLORS.darkBlack100};
+    color: ${COLORS.black90};
   }
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
@@ -115,7 +115,7 @@ export function DisplayWifiList({
           alignItems={ALIGN_CENTER}
           gridGap={SPACING.spacing4}
         >
-          <Icon name="plus" size="2.5rem" color={LEGACY_COLORS.darkBlack100} />
+          <Icon name="plus" size="2.5rem" color={COLORS.black90} />
           <StyledText as="h4">{t('join_other_network')}</StyledText>
         </Btn>
         {list != null && list.length > 0 ? null : <DisplaySearchNetwork />}

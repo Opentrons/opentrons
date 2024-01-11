@@ -179,9 +179,7 @@ export function ProtocolSetupStep({
         <StyledText
           as="h4"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={
-            disabled ? LEGACY_COLORS.darkBlack60 : LEGACY_COLORS.darkBlack100
-          }
+          color={disabled ? LEGACY_COLORS.darkBlack60 : COLORS.black90}
         >
           {title}
         </StyledText>
@@ -189,9 +187,7 @@ export function ProtocolSetupStep({
           <StyledText
             as="p"
             textAlign={TEXT_ALIGN_RIGHT}
-            color={
-              disabled ? LEGACY_COLORS.darkBlack60 : LEGACY_COLORS.darkBlack100
-            }
+            color={disabled ? LEGACY_COLORS.darkBlack60 : COLORS.black90}
           >
             {detail}
             {subDetail != null && detail != null ? <br /> : null}

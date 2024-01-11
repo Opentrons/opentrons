@@ -30,7 +30,7 @@ export function SetupInstructionsModal({
   const modalHeader: ModalHeaderBaseProps = {
     title: i18n.format(t('setup_instructions'), 'capitalize'),
     iconName: 'information',
-    iconColor: LEGACY_COLORS.darkBlack100,
+    iconColor: COLORS.black90,
     hasExitIcon: true,
   }
 

@@ -157,7 +157,9 @@ export function ProtocolWithLastRun({
       flexDirection={DIRECTION_COLUMN}
       padding={SPACING.spacing24}
       gridGap={SPACING.spacing24}
-      backgroundColor={isReadyToBeReRun ? LEGACY_COLORS.green3 : LEGACY_COLORS.yellow3}
+      backgroundColor={
+        isReadyToBeReRun ? LEGACY_COLORS.green3 : LEGACY_COLORS.yellow3
+      }
       width="25.8125rem"
       height="24.5rem"
       borderRadius={BORDERS.borderRadiusSize4}
@@ -176,7 +178,7 @@ export function ProtocolWithLastRun({
             aria-label="icon_ot-spinner"
             spin={true}
             size="2.5rem"
-            color={LEGACY_COLORS.darkBlack100}
+            color={COLORS.black90}
           />
         )}
       </Flex>

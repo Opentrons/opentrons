@@ -119,7 +119,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
                   hug={true}
                 />
               ) : null}
-              <Icon name="more" size="3rem" color={LEGACY_COLORS.darkBlack100} />
+              <Icon name="more" size="3rem" color={COLORS.black90} />
             </Flex>
           }
         />
@@ -224,7 +224,7 @@ function FeatureFlags(): JSX.Element {
             gridGap={SPACING.spacing24}
             alignItems={ALIGN_CENTER}
           >
-            <Icon name="alert-circle" size="3rem" color={LEGACY_COLORS.darkBlack100} />
+            <Icon name="alert-circle" size="3rem" color={COLORS.black90} />
             <Flex
               flexDirection={DIRECTION_COLUMN}
               gridGap={SPACING.spacing2}

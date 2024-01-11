@@ -25,7 +25,7 @@ const SELECTED_STYLE = css`
 
 const UNSELECTED_STYLE = css`
   background-color: ${LEGACY_COLORS.highlightPurple2};
-  color: ${LEGACY_COLORS.darkBlack100};
+  color: ${COLORS.black90};
 
   &:focus,
   &:hover {

@@ -24,7 +24,7 @@ const SSID_INPUT_FIELD_STYLE = css`
   font-size: ${TYPOGRAPHY.fontSize28};
   line-height: ${TYPOGRAPHY.lineHeight36};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  color: ${LEGACY_COLORS.darkBlack100};
+  color: ${COLORS.black90};
   padding-left: ${SPACING.spacing24};
   box-sizing: border-box;
 
@@ -61,7 +61,7 @@ export function SetWifiSsid({
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={errorMessage != null ? LEGACY_COLORS.red2 : LEGACY_COLORS.darkBlack100}
+          color={errorMessage != null ? LEGACY_COLORS.red2 : COLORS.black90}
         >
           {t('enter_network_name')}
         </StyledText>

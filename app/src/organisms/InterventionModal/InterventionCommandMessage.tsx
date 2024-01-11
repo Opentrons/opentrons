@@ -28,7 +28,7 @@ const INTERVENTION_COMMAND_NOTES_STYLE = css`
   text-transform: ${TEXT_TRANSFORM_UPPERCASE};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     ${TYPOGRAPHY.smallBodyTextBold}
-    color: ${LEGACY_COLORS.darkBlack100};
+    color: ${COLORS.black90};
     text-transform: ${TEXT_TRANSFORM_CAPITALIZE};
   }
 `
