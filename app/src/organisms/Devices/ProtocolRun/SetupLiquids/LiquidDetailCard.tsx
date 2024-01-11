@@ -66,7 +66,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
 
   const ACTIVE_STYLE = css`
-    background-color: ${isOnDevice ? LEGACY_COLORS.medBlue : LEGACY_COLORS.lightBlue};
+    background-color: ${isOnDevice ? COLORS.blue30 : COLORS.blue10};
     border: ${isOnDevice ? SPACING.spacing4 : `1px`} solid ${COLORS.blue50};
     border-radius: ${isOnDevice ? BORDERS.borderRadiusSize3 : 0};
   `

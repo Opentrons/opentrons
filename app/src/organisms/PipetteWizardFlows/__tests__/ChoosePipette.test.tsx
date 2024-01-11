@@ -69,7 +69,7 @@ describe('ChoosePipette', () => {
 
     //  Single and 8-Channel pipettes are selected first by default
     expect(singleMountPipettes).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.lightBlue}`
+      `background-color: ${COLORS.blue10}`
     )
     expect(ninetySixPipette).toHaveStyle(`background-color: ${LEGACY_COLORS.white}`)
 
@@ -140,7 +140,7 @@ describe('ChoosePipette', () => {
     })
     expect(singleMountPipettes).toHaveStyle(`background-color: ${LEGACY_COLORS.white}`)
     expect(ninetySixPipette).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.lightBlue}`
+      `background-color: ${COLORS.blue10}`
     )
   })
   it('renders the correct text for the 96 channel button when there is a left pipette attached', () => {

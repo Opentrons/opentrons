@@ -30,12 +30,12 @@ const StyledLabel = styled.label`
 
   &:hover,
   &:focus-within {
-    background-color: ${LEGACY_COLORS.lightBlue};
+    background-color: ${COLORS.blue10};
     border: 2px dashed ${COLORS.blue50};
   }
 `
 const DRAG_OVER_STYLES = css`
-  background-color: ${LEGACY_COLORS.lightBlue};
+  background-color: ${COLORS.blue10};
   border: 2px dashed ${COLORS.blue50};
 `
 

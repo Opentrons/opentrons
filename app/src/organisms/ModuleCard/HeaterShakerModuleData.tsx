@@ -50,7 +50,7 @@ export const HeaterShakerModuleData = (
         break
       }
       case 'holding at target': {
-        StatusLabelProps.backgroundColor = LEGACY_COLORS.medBlue
+        StatusLabelProps.backgroundColor = COLORS.blue30
         StatusLabelProps.iconColor = COLORS.blue50
         break
       }
