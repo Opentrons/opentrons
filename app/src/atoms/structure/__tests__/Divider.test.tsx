@@ -30,13 +30,13 @@ describe('Divider', () => {
     props = {
       ...props,
       width: '100%',
-      color: LEGACY_COLORS.blueEnabled,
+      color: COLORS.blue50,
       marginY: 0,
       paddingX: SPACING.spacing4,
     }
     const { getByTestId } = render(props)
     const divider = getByTestId('divider')
-    expect(divider).toHaveStyle(`color: ${String(LEGACY_COLORS.blueEnabled)}`)
+    expect(divider).toHaveStyle(`color: ${String(COLORS.blue50)}`)
     expect(divider).toHaveStyle('width: 100%')
     expect(divider).toHaveStyle('margin-top: 0')
     expect(divider).toHaveStyle('margin-bottom: 0')

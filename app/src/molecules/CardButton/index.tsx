@@ -27,24 +27,24 @@ const CARD_BUTTON_STYLE = css`
   box-shadow: none;
 
   &:focus {
-    background-color: ${LEGACY_COLORS.mediumBluePressed};
+    background-color: ${COLORS.blue40};
     box-shadow: none;
   }
 
   &:hover {
     border: none;
     box-shadow: none;
-    background-color: ${LEGACY_COLORS.mediumBlueEnabled};
+    background-color: ${COLORS.blue35};
     color: ${LEGACY_COLORS.darkBlackEnabled};
   }
 
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${LEGACY_COLORS.mediumBlueEnabled};
+    background-color: ${COLORS.blue35};
   }
 
   &:active {
-    background-color: ${LEGACY_COLORS.mediumBluePressed};
+    background-color: ${COLORS.blue40};
   }
 
   &:disabled {
@@ -83,14 +83,14 @@ export function CardButton(props: CardButtonProps): JSX.Element {
       onClick={() => history.push(destinationPath)}
       width="100%"
       css={CARD_BUTTON_STYLE}
-      backgroundColor={disabled ? LEGACY_COLORS.darkBlack20 : LEGACY_COLORS.mediumBlueEnabled}
+      backgroundColor={disabled ? LEGACY_COLORS.darkBlack20 : COLORS.blue35}
       disabled={disabled}
     >
       <Icon
         name={iconName}
         size="3.75rem"
         data-testid={`cardButton_icon_${String(iconName)}`}
-        color={disabled ? LEGACY_COLORS.darkBlack60 : LEGACY_COLORS.blueEnabled}
+        color={disabled ? LEGACY_COLORS.darkBlack60 : COLORS.blue50}
       />
       <Flex marginTop={SPACING.spacing16}>
         <StyledText

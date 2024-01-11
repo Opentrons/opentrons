@@ -22,7 +22,7 @@ export * from './tabbedNav'
 export * from './slotmap'
 export * from './structure'
 export * from './tooltips'
-
+export * from './helix-design-system'
 // styles
 export * from './styles'
 // new ui-overhaul style vars

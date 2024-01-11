@@ -316,7 +316,7 @@ export function ProtocolSetupLabware({
 
 const labwareLatchStyles = css`
   &:active {
-    background-color: ${LEGACY_COLORS.mediumBluePressed};
+    background-color: ${COLORS.blue40};
   }
 `
 
@@ -409,7 +409,7 @@ function LabwareLatch({
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
-      backgroundColor={LEGACY_COLORS.mediumBlueEnabled}
+      backgroundColor={COLORS.blue35}
       borderRadius={BORDERS.borderRadiusSize3}
       css={labwareLatchStyles}
       color={
@@ -446,7 +446,7 @@ function LabwareLatch({
               size="2.5rem"
               color={
                 commandType === 'heaterShaker/closeLabwareLatch'
-                  ? LEGACY_COLORS.blueEnabled
+                  ? COLORS.blue50
                   : ''
               }
             />

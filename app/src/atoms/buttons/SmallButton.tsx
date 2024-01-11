@@ -59,8 +59,8 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
   > = {
     secondary: {
       defaultColor: LEGACY_COLORS.darkBlackEnabled,
-      defaultBackgroundColor: LEGACY_COLORS.mediumBlueEnabled,
-      activeBackgroundColor: LEGACY_COLORS.mediumBluePressed,
+      defaultBackgroundColor: COLORS.blue35,
+      activeBackgroundColor: COLORS.blue40,
       disabledBackgroundColor: `${LEGACY_COLORS.darkBlack20}`,
       disabledColor: `${LEGACY_COLORS.darkBlack60}`,
     },
@@ -73,23 +73,23 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     },
     primary: {
       defaultColor: LEGACY_COLORS.white,
-      defaultBackgroundColor: LEGACY_COLORS.blueEnabled,
-      activeBackgroundColor: LEGACY_COLORS.bluePressed,
+      defaultBackgroundColor: COLORS.blue50,
+      activeBackgroundColor: COLORS.blue60,
       disabledBackgroundColor: `${LEGACY_COLORS.darkBlack20}`,
       disabledColor: `${LEGACY_COLORS.darkBlack60}`,
     },
     tertiaryHighLight: {
       defaultColor: LEGACY_COLORS.darkBlackEnabled,
-      defaultBackgroundColor: `${LEGACY_COLORS.blueEnabled}${LEGACY_COLORS.opacity0HexCode}`,
+      defaultBackgroundColor: `${COLORS.blue50}${LEGACY_COLORS.opacity0HexCode}`,
       activeBackgroundColor: `${LEGACY_COLORS.darkBlack20}`,
-      disabledBackgroundColor: `${LEGACY_COLORS.blueEnabled}${LEGACY_COLORS.opacity0HexCode}`,
+      disabledBackgroundColor: `${COLORS.blue50}${LEGACY_COLORS.opacity0HexCode}`,
       disabledColor: `${LEGACY_COLORS.darkBlack60}`,
     },
     tertiaryLowLight: {
       defaultColor: `${LEGACY_COLORS.darkBlack70}`,
-      defaultBackgroundColor: ` ${LEGACY_COLORS.blueEnabled}${LEGACY_COLORS.opacity0HexCode}`,
+      defaultBackgroundColor: ` ${COLORS.blue50}${LEGACY_COLORS.opacity0HexCode}`,
       activeBackgroundColor: `${LEGACY_COLORS.darkBlack20}`,
-      disabledBackgroundColor: `${LEGACY_COLORS.blueEnabled}${LEGACY_COLORS.opacity0HexCode}`,
+      disabledBackgroundColor: `${COLORS.blue50}${LEGACY_COLORS.opacity0HexCode}`,
       disabledColor: `${LEGACY_COLORS.darkBlack60}`,
     },
   }

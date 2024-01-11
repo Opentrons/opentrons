@@ -17,25 +17,25 @@ import type { RunStatus } from '@opentrons/api-client'
 const PLAY_PAUSE_BUTTON_STYLE = css`
   display: flex;
   border-radius: 50%;
-  background-color: ${LEGACY_COLORS.blueEnabled};
+  background-color: ${COLORS.blue50};
   -webkit-tap-highlight-color: transparent;
 
   &:focus {
-    background-color: ${LEGACY_COLORS.bluePressed};
+    background-color: ${COLORS.blue60};
     box-shadow: none;
   }
   &:hover {
     border: none;
     box-shadow: none;
-    background-color: ${LEGACY_COLORS.blueEnabled};
+    background-color: ${COLORS.blue50};
     color: ${LEGACY_COLORS.white};
   }
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${LEGACY_COLORS.blueEnabled};
+    background-color: ${COLORS.blue50};
   }
   &:active {
-    background-color: ${LEGACY_COLORS.bluePressed};
+    background-color: ${COLORS.blue60};
   }
   &:disabled {
     background-color: ${LEGACY_COLORS.darkBlack20};

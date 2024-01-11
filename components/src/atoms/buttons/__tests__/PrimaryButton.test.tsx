@@ -25,7 +25,7 @@ describe('PrimaryButton', () => {
   it('renders primary button with text', () => {
     const { getByText } = render(props)
     const button = getByText('primary button')
-    expect(button).toHaveStyle(`background-color: ${LEGACY_COLORS.blueEnabled}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.blue50}`)
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16}`
     )
@@ -52,7 +52,7 @@ describe('PrimaryButton', () => {
   it('applies the correct states to the button - focus', () => {
     const { getByText } = render(props)
     const button = getByText('primary button')
-    expect(button).toHaveStyleRule('background-color', `${LEGACY_COLORS.blueHover}`, {
+    expect(button).toHaveStyleRule('background-color', `${COLORS.blue55}`, {
       modifier: ':focus',
     })
   })
@@ -60,7 +60,7 @@ describe('PrimaryButton', () => {
   it('applies the correct states to the button - hover', () => {
     const { getByText } = render(props)
     const button = getByText('primary button')
-    expect(button).toHaveStyleRule('background-color', `${LEGACY_COLORS.blueHover}`, {
+    expect(button).toHaveStyleRule('background-color', `${COLORS.blue55}`, {
       modifier: ':hover',
     })
   })

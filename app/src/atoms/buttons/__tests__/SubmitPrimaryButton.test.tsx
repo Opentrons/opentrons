@@ -33,7 +33,7 @@ describe('SubmitPrimaryButton', () => {
     const { getByText } = render(props)
     const button = getByText('submit primary button')
     expect(button).toHaveStyle(
-      `background-color: ${String(LEGACY_COLORS.blueEnabled)}`
+      `background-color: ${String(COLORS.blue50)}`
     )
     expect(button).toHaveStyle(
       `border-radius: ${String(BORDERS.radiusSoftCorners)}`
@@ -81,7 +81,7 @@ describe('SubmitPrimaryButton', () => {
     const button = getByText('submit primary button')
     expect(button).toHaveStyleRule(
       'background-color',
-      `${String(LEGACY_COLORS.blueHover)}`,
+      `${String(COLORS.blue55)}`,
       {
         modifier: ':hover',
       }
@@ -96,7 +96,7 @@ describe('SubmitPrimaryButton', () => {
     const button = getByText('submit primary button')
     expect(button).toHaveStyleRule(
       'background-color',
-      `${String(LEGACY_COLORS.bluePressed)}`,
+      `${String(COLORS.blue60)}`,
       {
         modifier: ':active',
       }

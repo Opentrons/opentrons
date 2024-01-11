@@ -125,7 +125,7 @@ export const linkPSemiBold = css`
   font-size: ${fontSizeP};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
-  color: ${LEGACY_COLORS.blueEnabled};
+  color: ${COLORS.blue50};
 
   &:hover {
     opacity: 70%;

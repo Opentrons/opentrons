@@ -31,12 +31,12 @@ const StyledLabel = styled.label`
   &:hover,
   &:focus-within {
     background-color: ${LEGACY_COLORS.lightBlue};
-    border: 2px dashed ${LEGACY_COLORS.blueEnabled};
+    border: 2px dashed ${COLORS.blue50};
   }
 `
 const DRAG_OVER_STYLES = css`
   background-color: ${LEGACY_COLORS.lightBlue};
-  border: 2px dashed ${LEGACY_COLORS.blueEnabled};
+  border: 2px dashed ${COLORS.blue50};
 `
 
 const StyledInput = styled.input`

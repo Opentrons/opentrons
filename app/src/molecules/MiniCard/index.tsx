@@ -24,11 +24,11 @@ const unselectedOptionStyles = css`
 `
 const selectedOptionStyles = css`
   ${unselectedOptionStyles}
-  border: 1px solid ${LEGACY_COLORS.blueEnabled};
+  border: 1px solid ${COLORS.blue50};
   background-color: ${LEGACY_COLORS.lightBlue};
 
   &:hover {
-    border: 1px solid ${LEGACY_COLORS.blueEnabled};
+    border: 1px solid ${COLORS.blue50};
     background-color: ${LEGACY_COLORS.lightBlue};
   }
 `

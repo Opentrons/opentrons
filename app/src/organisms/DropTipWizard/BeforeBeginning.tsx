@@ -203,7 +203,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     flex-direction: ${DIRECTION_ROW};
     justify-content: ${JUSTIFY_FLEX_START};
-    background-color: ${LEGACY_COLORS.mediumBlueEnabled};
+    background-color: ${COLORS.blue35};
     border-width: 0; 
     border-radius: ${BORDERS.borderRadiusSize4};
     padding: ${SPACING.spacing24};
@@ -217,20 +217,20 @@ const UNSELECTED_OPTIONS_STYLE = css`
 `
 const SELECTED_OPTIONS_STYLE = css`
   ${UNSELECTED_OPTIONS_STYLE}
-  border: 1px solid ${LEGACY_COLORS.blueEnabled};
+  border: 1px solid ${COLORS.blue50};
 
   &:hover {
-    border: 1px solid ${LEGACY_COLORS.blueEnabled};
+    border: 1px solid ${COLORS.blue50};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     border-width: 0px;
-    background-color: ${LEGACY_COLORS.blueEnabled};
+    background-color: ${COLORS.blue50};
     color: ${LEGACY_COLORS.white};
 
     &:hover {
       border-width: 0px;
-      background-color: ${LEGACY_COLORS.blueEnabled};
+      background-color: ${COLORS.blue50};
     }
   }
 `

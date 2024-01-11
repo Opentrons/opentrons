@@ -4,12 +4,13 @@ import {
   ALIGN_CENTER,
   BORDERS,
   Btn,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_ROW,
   Icon,
   SPACING,
   TYPOGRAPHY,
   DISPLAY_FLEX,
+  LEGACY_COLORS,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 import { StyledText } from '../text'
@@ -74,7 +75,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
     primary: {
       //  TODO(ew, 3/22/23): replaces these hex codes with the color constants
       activeBackgroundColor: '#045dd0',
-      defaultBackgroundColor: LEGACY_COLORS.blueEnabled,
+      defaultBackgroundColor: COLORS.blue50,
       defaultColor: LEGACY_COLORS.white,
       disabledBackgroundColor: LEGACY_COLORS.darkBlack20,
       iconColor: LEGACY_COLORS.white,
@@ -82,10 +83,10 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
     secondary: {
       //  TODO(ew, 3/22/23): replaces these hex codes with the color constants
       activeBackgroundColor: '#94afd4',
-      defaultBackgroundColor: LEGACY_COLORS.mediumBlueEnabled,
+      defaultBackgroundColor: COLORS.blue35,
       defaultColor: LEGACY_COLORS.darkBlackEnabled,
       disabledBackgroundColor: LEGACY_COLORS.darkBlack20,
-      iconColor: LEGACY_COLORS.blueEnabled,
+      iconColor: COLORS.blue50,
     },
     tertiaryHigh: {
       activeBackgroundColor: LEGACY_COLORS.darkBlack20,

@@ -36,7 +36,7 @@ const SettingButtonLabel = styled.label<LabelProps>`
   border-radius: ${BORDERS.borderRadiusSize4};
   cursor: pointer;
   background: ${({ isSelected }) =>
-    isSelected === true ? LEGACY_COLORS.blueEnabled : LEGACY_COLORS.mediumBlueEnabled};
+    isSelected === true ? COLORS.blue50 : COLORS.blue35};
   color: ${({ isSelected }) => isSelected === true && LEGACY_COLORS.white};
 `
 

@@ -25,9 +25,7 @@ describe('TertiaryButton', () => {
   it('renders tertiary button with text', () => {
     const { getByText } = render(props)
     const button = getByText('tertiary button')
-    expect(button).toHaveStyle(
-      `background-color: ${String(LEGACY_COLORS.blueEnabled)}`
-    )
+    expect(button).toHaveStyle(`background-color: ${String(COLORS.blue50)}`)
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16}`
     )
@@ -68,7 +66,7 @@ describe('TertiaryButton', () => {
     const button = getByText('tertiary button')
     expect(button).toHaveStyleRule(
       'background-color',
-      `${String(LEGACY_COLORS.blueHover)}`,
+      `${String(COLORS.blue55)}`,
       {
         modifier: ':hover',
       }
@@ -83,7 +81,7 @@ describe('TertiaryButton', () => {
     const button = getByText('tertiary button')
     expect(button).toHaveStyleRule(
       'background-color',
-      `${String(LEGACY_COLORS.bluePressed)}`,
+      `${String(COLORS.blue60)}`,
       {
         modifier: ':active',
       }

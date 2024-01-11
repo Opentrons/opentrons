@@ -92,7 +92,7 @@ export const RunPreviewComponent = (
         {(command, index) => {
           const isCurrent = index === currentRunCommandIndex
           const borderColor = isCurrent
-            ? LEGACY_COLORS.blueEnabled
+            ? COLORS.blue50
             : LEGACY_COLORS.transparent
           const backgroundColor = isCurrent
             ? LEGACY_COLORS.lightBlue

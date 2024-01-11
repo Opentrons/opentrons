@@ -36,8 +36,8 @@ const SSID_INPUT_FIELD_STYLE = css`
   width: 42.625rem;
 
   &:focus {
-    border: 3px solid ${LEGACY_COLORS.blueEnabled};
-    filter: drop-shadow(0px 0px 10px ${LEGACY_COLORS.blueEnabled});
+    border: 3px solid ${COLORS.blue50};
+    filter: drop-shadow(0px 0px 10px ${COLORS.blue50});
     border-radius: ${BORDERS.borderRadiusSize1};
   }
 `

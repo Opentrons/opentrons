@@ -14,7 +14,7 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   appearance: none;
   cursor: pointer;
   color: ${props =>
-    props.isDangerous ? LEGACY_COLORS.errorText : LEGACY_COLORS.blueEnabled};
+    props.isDangerous ? LEGACY_COLORS.errorText : COLORS.blue50};
   border: ${BORDERS.lineBorder};
   border-color: ${props =>
     props.isDangerous ? LEGACY_COLORS.errorEnabled : 'initial'};

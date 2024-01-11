@@ -21,7 +21,7 @@ describe('UpdateSoftware', () => {
     const [{ getByText, getByTestId }] = render(props)
     getByText('Downloading software...')
     const bar = getByTestId('ProgressBar_Bar')
-    expect(bar).toHaveStyle(`background: ${String(LEGACY_COLORS.blueEnabled)}`)
+    expect(bar).toHaveStyle(`background: ${String(COLORS.blue50)}`)
     expect(bar).toHaveStyle('width: 50%')
   })
   it('should render text and progressbar - sending software', () => {

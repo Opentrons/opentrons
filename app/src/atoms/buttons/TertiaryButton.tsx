@@ -9,7 +9,7 @@ import {
 } from '@opentrons/components'
 
 export const TertiaryButton = styled(NewPrimaryBtn)`
-  background-color: ${LEGACY_COLORS.blueEnabled};
+  background-color: ${COLORS.blue50};
   border-radius: ${BORDERS.radiusRoundEdge};
   box-shadow: none;
   color: ${LEGACY_COLORS.fundamentalsBackground};
@@ -23,12 +23,12 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
   ${styleProps}
 
   &:hover {
-    background-color: ${LEGACY_COLORS.blueHover};
+    background-color: ${COLORS.blue55};
     box-shadow: none;
   }
 
   &:active {
-    background-color: ${LEGACY_COLORS.bluePressed};
+    background-color: ${COLORS.blue60};
   }
 
   &:focus-visible {

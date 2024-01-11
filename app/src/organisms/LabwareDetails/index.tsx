@@ -50,7 +50,7 @@ const CLOSE_ICON_STYLE = css`
 const COPY_ICON_STYLE = css`
   transform: translateY(${SPACING.spacing4});
   &:hover {
-    color: ${LEGACY_COLORS.blueEnabled};
+    color: ${COLORS.blue50};
   }
   &:active,
   &:focus {
@@ -123,7 +123,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
       {!isCustomDefinition && (
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
           <Icon
-            color={LEGACY_COLORS.blueEnabled}
+            color={COLORS.blue50}
             name="check-decagram"
             height=".7rem"
           />{' '}

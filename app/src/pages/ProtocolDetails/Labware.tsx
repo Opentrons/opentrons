@@ -113,7 +113,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
                 >
                   {definition?.namespace === 'opentrons' ? (
                     <Icon
-                      color={LEGACY_COLORS.blueEnabled}
+                      color={COLORS.blue50}
                       name="check-decagram"
                       height="1.77125rem"
                       minHeight="1.77125rem"

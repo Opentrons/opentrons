@@ -43,7 +43,7 @@ const StyledInput = styled.input`
   }
 
   &:hover {
-    border: 1px ${BORDERS.styleSolid} ${LEGACY_COLORS.blueEnabled};
+    border: 1px ${BORDERS.styleSolid} ${COLORS.blue50};
   }
 
   &:focus-visible {

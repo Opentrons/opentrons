@@ -32,7 +32,7 @@ describe('ProgressBar', () => {
     props.percentComplete = 50
     const [{ getByTestId }] = render(props)
     const bar = getByTestId('ProgressBar_Bar')
-    expect(bar).toHaveStyle(`background: ${LEGACY_COLORS.blueEnabled}`)
+    expect(bar).toHaveStyle(`background: ${COLORS.blue50}`)
     expect(bar).toHaveStyle('width: 50%')
   })
 
@@ -40,7 +40,7 @@ describe('ProgressBar', () => {
     props.percentComplete = 100
     const [{ getByTestId }] = render(props)
     const bar = getByTestId('ProgressBar_Bar')
-    expect(bar).toHaveStyle(`background: ${LEGACY_COLORS.blueEnabled}`)
+    expect(bar).toHaveStyle(`background: ${COLORS.blue50}`)
     expect(bar).toHaveStyle('width: 100%')
   })
 
@@ -51,7 +51,7 @@ describe('ProgressBar', () => {
     `
     const [{ getByTestId }] = render(props)
     const bar = getByTestId('ProgressBar_Bar')
-    expect(bar).not.toHaveStyle(`background: ${LEGACY_COLORS.blueEnabled}`)
+    expect(bar).not.toHaveStyle(`background: ${COLORS.blue50}`)
     expect(bar).toHaveStyle(`background: ${LEGACY_COLORS.errorEnabled}`)
     expect(bar).toHaveStyle('width: 50%')
   })

@@ -129,7 +129,7 @@ export function HistoricalProtocolRun(
           {runStatus === 'running' && (
             <Icon
               name="circle"
-              color={LEGACY_COLORS.blueEnabled}
+              color={COLORS.blue50}
               size={SPACING.spacing4}
               marginX={SPACING.spacing4}
               marginBottom={SPACING.spacing4}

@@ -56,7 +56,7 @@ export function EmptyConfigFixture(
         css={EMPTY_CONFIG_STYLE}
         onClick={() => handleClickAdd(fixtureLocation)}
       >
-        <Icon name="add" color={LEGACY_COLORS.blueEnabled} size="2rem" />
+        <Icon name="add" color={COLORS.blue50} size="2rem" />
       </Btn>
     </RobotCoordsForeignObject>
   )
@@ -67,17 +67,17 @@ const EMPTY_CONFIG_STYLE = css`
   align-items: ${ALIGN_CENTER};
   justify-content: ${JUSTIFY_CENTER};
   background-color: ${LEGACY_COLORS.mediumBlueEnabled};
-  border: 3px dashed ${LEGACY_COLORS.blueEnabled};
+  border: 3px dashed ${COLORS.blue50};
   border-radius: ${BORDERS.radiusSoftCorners};
   width: 100%;
 
   &:active {
-    border: 3px solid ${LEGACY_COLORS.blueEnabled};
+    border: 3px solid ${COLORS.blue50};
     background-color: ${LEGACY_COLORS.mediumBluePressed};
   }
 
   &:focus {
-    border: 3px solid ${LEGACY_COLORS.blueEnabled};
+    border: 3px solid ${COLORS.blue50};
     background-color: ${LEGACY_COLORS.mediumBluePressed};
   }
 

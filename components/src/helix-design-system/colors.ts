@@ -17,7 +17,12 @@
 /**
  * blue
  */
-
+export const blue60 = '#004196'
+export const blue55 = '#0056C8'
+export const blue40 = '#A9CEFD'
+export const blue35 = '#BFDCFD'
+export const blue30 = '#D0E6FE'
+export const blue10 = '#F1F8FF'
 /**
  * grey
  */

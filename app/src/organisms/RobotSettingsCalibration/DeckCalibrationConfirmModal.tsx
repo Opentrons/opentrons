@@ -48,7 +48,7 @@ export function DeckCalibrationConfirmModal({
             onClick={cancel}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             marginRight={SPACING.spacing24}
-            color={LEGACY_COLORS.blueEnabled}
+            color={COLORS.blue50}
             css={TYPOGRAPHY.fontSizeP}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >

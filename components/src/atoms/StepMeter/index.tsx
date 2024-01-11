@@ -31,7 +31,7 @@ export const StepMeter = (props: StepMeterProps): JSX.Element => {
     position: ${POSITION_ABSOLUTE};
     top: 0;
     height: 100%;
-    background-color: ${LEGACY_COLORS.blueEnabled};
+    background-color: ${COLORS.blue50};
     width: ${percentComplete};
     webkit-transition: width 0.5s ease-in-out;
     moz-transition: width 0.5s ease-in-out;

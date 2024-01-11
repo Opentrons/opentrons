@@ -12,7 +12,7 @@ export const QuaternaryButton = styled(NewSecondaryBtn)`
   background-color: ${LEGACY_COLORS.white};
   border-radius: ${BORDERS.radiusRoundEdge};
   box-shadow: none;
-  color: ${LEGACY_COLORS.blueEnabled};
+  color: ${COLORS.blue50};
   overflow: no-wrap;
   padding-left: ${SPACING.spacing16};
   padding-right: ${SPACING.spacing16};

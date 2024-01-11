@@ -35,7 +35,7 @@ const BUTTON_GROUP_STYLES = css`
     }
 
     &.active {
-      background-color: ${LEGACY_COLORS.blueEnabled};
+      background-color: ${COLORS.blue50};
       color: ${LEGACY_COLORS.white};
     }
 
@@ -59,7 +59,7 @@ const BUTTON_GROUP_STYLES = css`
 const ACTIVE_STYLE = css`
   padding-left: ${SPACING.spacing8};
   padding-right: ${SPACING.spacing8};
-  background-color: ${LEGACY_COLORS.blueEnabled};
+  background-color: ${COLORS.blue50};
   color: ${LEGACY_COLORS.white};
   pointer-events: none;
 `

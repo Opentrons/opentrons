@@ -124,7 +124,7 @@ describe('CheckboxField', () => {
     const checkBoxIcon = getByTestId('CheckboxField_icon')
     expect(checkBoxIcon).toHaveStyle(`width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
-    expect(checkBoxIcon).toHaveStyle(`color: ${String(LEGACY_COLORS.blueEnabled)}`)
+    expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.blue50)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
     expect(checkBoxIcon).toHaveStyle(`border-radius: 1px`)
     expect(checkBoxIcon).toHaveStyle(

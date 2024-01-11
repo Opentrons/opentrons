@@ -31,7 +31,7 @@ describe('QuaternaryButton', () => {
       `border-radius: ${String(BORDERS.radiusRoundEdge)}`
     )
     expect(button).toHaveStyle('box-shadow: none')
-    expect(button).toHaveStyle(`color: ${String(LEGACY_COLORS.blueEnabled)}`)
+    expect(button).toHaveStyle(`color: ${String(COLORS.blue50)}`)
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16}`
     )

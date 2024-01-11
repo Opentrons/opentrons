@@ -37,7 +37,7 @@ describe('SecondaryButton', () => {
     expect(button).toHaveStyle(
       `text-transform: ${TYPOGRAPHY.textTransformNone}`
     )
-    expect(button).toHaveStyle(`color: ${LEGACY_COLORS.blueEnabled}`)
+    expect(button).toHaveStyle(`color: ${COLORS.blue50}`)
   })
 
   it('renders secondary button with text and disabled', () => {

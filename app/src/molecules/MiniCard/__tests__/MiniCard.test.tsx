@@ -48,7 +48,7 @@ describe('MiniCard', () => {
       `background-color: ${String(LEGACY_COLORS.lightBlue)}`
     )
     expect(miniCard).toHaveStyle(
-      `border: 1px solid ${String(LEGACY_COLORS.blueEnabled)}`
+      `border: 1px solid ${String(COLORS.blue50)}`
     )
     expect(miniCard).toHaveStyle(
       `border-radius: ${String(BORDERS.radiusSoftCorners)}`
@@ -58,7 +58,7 @@ describe('MiniCard', () => {
     expect(miniCard).toHaveStyle(`cursor: pointer`)
     expect(miniCard).toHaveStyleRule(
       'border',
-      `1px solid ${String(LEGACY_COLORS.blueEnabled)}`,
+      `1px solid ${String(COLORS.blue50)}`,
       {
         modifier: ':hover',
       }

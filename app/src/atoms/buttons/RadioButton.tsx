@@ -5,6 +5,7 @@ import {
   LEGACY_COLORS,
   SPACING,
   BORDERS,
+  COLORS,
   Flex,
   RESPONSIVENESS,
 } from '@opentrons/components'
@@ -40,19 +41,19 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
   `
 
   const AVAILABLE_BUTTON_STYLE = css`
-    background: ${LEGACY_COLORS.mediumBlueEnabled};
+    background: ${COLORS.blue35};
 
     &:active {
-      background-color: ${LEGACY_COLORS.mediumBluePressed};
+      background-color: ${COLORS.blue40};
     }
   `
 
   const SELECTED_BUTTON_STYLE = css`
-    background: ${LEGACY_COLORS.blueEnabled};
+    background: ${COLORS.blue50};
     color: ${LEGACY_COLORS.white};
 
     &:active {
-      background-color: ${LEGACY_COLORS.bluePressed};
+      background-color: ${COLORS.blue60};
     }
   `
 

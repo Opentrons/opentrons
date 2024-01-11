@@ -33,14 +33,14 @@ export function PlayButton({
     -webkit-tap-highlight-color: transparent;
     &:focus {
       background-color: ${ready && !isDoorOpen
-        ? LEGACY_COLORS.bluePressed
+        ? COLORS.blue60
         : LEGACY_COLORS.darkBlack40};
       color: ${LEGACY_COLORS.white};
     }
 
     &:hover {
       background-color: ${ready && !isDoorOpen
-        ? LEGACY_COLORS.blueEnabled
+        ? COLORS.blue50
         : LEGACY_COLORS.darkBlack20};
       color: ${LEGACY_COLORS.white};
     }
@@ -48,13 +48,13 @@ export function PlayButton({
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE};
       background-color: ${ready && !isDoorOpen
-        ? LEGACY_COLORS.blueEnabled
+        ? COLORS.blue50
         : LEGACY_COLORS.darkBlack20};
     }
 
     &:active {
       background-color: ${ready && !isDoorOpen
-        ? LEGACY_COLORS.bluePressed
+        ? COLORS.blue60
         : LEGACY_COLORS.darkBlack40};
       color: ${LEGACY_COLORS.white};
     }
@@ -70,7 +70,7 @@ export function PlayButton({
       backgroundColor={
         disabled || !ready || isDoorOpen
           ? LEGACY_COLORS.darkBlack20
-          : LEGACY_COLORS.blueEnabled
+          : COLORS.blue50
       }
       borderRadius="6.25rem"
       display={DISPLAY_FLEX}
