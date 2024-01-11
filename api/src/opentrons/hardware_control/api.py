@@ -908,6 +908,7 @@ class API(
     async def disengage_axes(self, which: List[Axis]) -> None:
         await self._backend.disengage_axes([ot2_axis_to_string(ax) for ax in which])
 
+    @ExecutionManagerProvider.wait_for_running
     async def _fast_home(self, axes: Sequence[str], margin: float) -> Dict[str, float]:
         converted_axes = "".join(axes)
         return await self._backend.fast_home(converted_axes, margin)
@@ -1206,9 +1207,9 @@ class API(
                 home_flagged_axes=False,
             )
             if move.home_after:
-                smoothie_pos = await self._backend.fast_home(
-                    [ot2_axis_to_string(ax) for ax in move.home_axes],
-                    move.home_after_safety_margin,
+                smoothie_pos = await self._fast_home(
+                    axes=[ot2_axis_to_string(ax) for ax in move.home_axes],
+                    margin=move.home_after_safety_margin,
                 )
                 self._current_position = deck_from_machine(
                     machine_pos=self._axis_map_from_string_map(smoothie_pos),
