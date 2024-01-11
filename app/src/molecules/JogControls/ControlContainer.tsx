@@ -17,7 +17,7 @@ interface ControlContainerProps extends StyleProps {
 }
 
 const CONTROL_CHILDREN_STYLES = css`
-  background-color: ${COLORS.fundamentalsBackground};
+  background-color: ${COLORS.grey35};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing16};
   width: 100%;

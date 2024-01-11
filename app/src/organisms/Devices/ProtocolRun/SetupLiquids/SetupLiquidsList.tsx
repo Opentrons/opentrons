@@ -52,7 +52,7 @@ const HIDE_SCROLLBAR = css`
 const LIQUID_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
   border-width: 1px;
-  border-color: ${COLORS.medGreyEnabled};
+  border-color: ${COLORS.grey35};
   border-radius: ${BORDERS.radiusSoftCorners};
 `
 
@@ -113,7 +113,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
 
     &:hover {
       cursor: pointer;
-      border: 1px solid ${COLORS.medGreyHover};
+      border: 1px solid ${COLORS.grey55};
     }
   `
   const LIQUID_CARD_ITEM_STYLE = css`
@@ -132,7 +132,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
       css={LIQUID_CARD_STYLE}
       padding={SPACING.spacing16}
       onClick={handleSetOpenItem}
-      backgroundColor={openItem ? COLORS.fundamentalsBackground : COLORS.white}
+      backgroundColor={openItem ? COLORS.grey35 : COLORS.white}
       data-testid="LiquidsListItem_Row"
     >
       <LiquidsListItemDetails
@@ -235,7 +235,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                       <StyledText
                         as="p"
                         fontWeight={TYPOGRAPHY.fontWeightRegular}
-                        color={COLORS.darkGreyEnabled}
+                        color={COLORS.grey50Enabled}
                       >
                         {moduleModel != null
                           ? t('on_adapter_in_mod', {
@@ -311,7 +311,7 @@ export const LiquidsListItemDetails = (
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey50Enabled}
           marginX={SPACING.spacing16}
         >
           {description != null ? description : null}

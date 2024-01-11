@@ -99,10 +99,10 @@ const CLOSE_ICON_STYLE = css`
   border-radius: 50%;
 
   &:hover {
-    background: ${COLORS.lightGreyHover};
+    background: ${COLORS.grey35};
   }
   &:active {
-    background: ${COLORS.lightGreyPressed};
+    background: ${COLORS.grey35};
   }
 `
 
@@ -195,7 +195,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
           ) : (
             <>{title}</>
           )}
-          <Divider marginY={0} color={COLORS.medGreyEnabled} />
+          <Divider marginY={0} color={COLORS.grey35} />
           <Box
             padding={SPACING.spacing16}
             flex="1 1 auto"

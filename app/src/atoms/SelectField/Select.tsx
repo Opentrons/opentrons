@@ -43,15 +43,15 @@ export function Select(props: SelectComponentProps): JSX.Element {
       border: BORDERS.lineBorder,
       width: props.width != null ? props.width : 'auto',
       height: SPACING.spacing16,
-      borderColor: COLORS.medGreyEnabled,
+      borderColor: COLORS.grey35,
       boxShadow: 'none',
       padding: SPACING.spacing6,
       flexDirection: DIRECTION_ROW,
       '&:hover': {
-        borderColor: COLORS.medGreyHover,
+        borderColor: COLORS.grey55,
       },
       '&:active': {
-        borderColor: COLORS.medGreyHover,
+        borderColor: COLORS.grey55,
       },
     }),
     container: (styles: CSSObjectWithLabel) => ({
@@ -107,7 +107,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
     option: (styles: CSSObjectWithLabel, state: OptionProps<SelectOption>) => ({
       ...styles,
       color: Boolean(state.isDisabled)
-        ? COLORS.darkGreyDisabled
+        ? COLORS.grey50Disabled
         : COLORS.darkBlackEnabled,
       backgroundColor: Boolean(state.isSelected)
         ? COLORS.lightBlue

@@ -29,7 +29,7 @@ const BUTTON_GROUP_STYLES = css`
     }
 
     &:hover {
-      background-color: ${COLORS.fundamentalsBackground};
+      background-color: ${COLORS.grey35};
       color: ${COLORS.black};
       box-shadow: 0 0 0;
     }
@@ -41,7 +41,7 @@ const BUTTON_GROUP_STYLES = css`
 
     &:disabled {
       background-color: inherit;
-      color: ${COLORS.errorDisabled};
+      color: ${COLORS.grey40};
     }
   }
 
@@ -69,7 +69,7 @@ const DEFAULT_STYLE = css`
   padding-right: ${SPACING.spacing8};
   background-color: ${COLORS.white};
   color: ${COLORS.black};
-  border: 1px ${COLORS.medGreyEnabled} solid;
+  border: 1px ${COLORS.grey35} solid;
 `
 
 export const useToggleGroup = (

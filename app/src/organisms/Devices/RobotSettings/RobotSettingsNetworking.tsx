@@ -154,7 +154,7 @@ export function RobotSettingsNetworking({
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('wireless_ip')}
                   </StyledText>
-                  <StyledText as="p" color={COLORS.darkGrey}>
+                  <StyledText as="p" color={COLORS.grey50}>
                     {wifi?.ipAddress}
                   </StyledText>
                 </Flex>
@@ -165,7 +165,7 @@ export function RobotSettingsNetworking({
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('wireless_subnet_mask')}
                   </StyledText>
-                  <StyledText as="p" color={COLORS.darkGrey}>
+                  <StyledText as="p" color={COLORS.grey50}>
                     {wifi?.subnetMask}
                   </StyledText>
                 </Flex>
@@ -177,7 +177,7 @@ export function RobotSettingsNetworking({
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('wireless_mac_address')}
                   </StyledText>
-                  <StyledText as="p" color={COLORS.darkGrey}>
+                  <StyledText as="p" color={COLORS.grey50}>
                     {wifi?.macAddress}
                   </StyledText>
                 </Flex>
@@ -223,7 +223,7 @@ export function RobotSettingsNetworking({
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('wired_ip')}
                   </StyledText>
-                  <StyledText as="p" color={COLORS.darkGrey}>
+                  <StyledText as="p" color={COLORS.grey50}>
                     {ethernet?.ipAddress}
                   </StyledText>
                 </Flex>
@@ -234,7 +234,7 @@ export function RobotSettingsNetworking({
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('wired_subnet_mask')}
                   </StyledText>
-                  <StyledText as="p" color={COLORS.darkGrey}>
+                  <StyledText as="p" color={COLORS.grey50}>
                     {ethernet?.subnetMask}
                   </StyledText>
                 </Flex>
@@ -245,13 +245,13 @@ export function RobotSettingsNetworking({
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('wired_mac_address')}
                   </StyledText>
-                  <StyledText as="p" color={COLORS.darkGrey}>
+                  <StyledText as="p" color={COLORS.grey50}>
                     {ethernet?.macAddress}
                   </StyledText>
                 </Flex>
               </>
             ) : (
-              <StyledText as="p" color={COLORS.darkGrey}>
+              <StyledText as="p" color={COLORS.grey50}>
                 {isFlex
                   ? t('not_connected_via_ethernet')
                   : t('not_connected_via_wired_usb')}
@@ -305,7 +305,7 @@ export function RobotSettingsNetworking({
               </StyledText>
             </Flex>
             <Box paddingLeft="3.75rem">
-              <StyledText as="p" color={COLORS.darkGrey}>
+              <StyledText as="p" color={COLORS.grey50}>
                 {isFlexConnectedViaUSB
                   ? t('directly_connected_to_this_computer')
                   : t('not_connected_via_usb')}

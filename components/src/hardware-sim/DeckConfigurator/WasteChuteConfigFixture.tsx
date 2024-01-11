@@ -86,7 +86,7 @@ export function WasteChuteConfigFixture(
 const WASTE_CHUTE_CONFIG_STYLE_READ_ONLY = css`
   display: ${DISPLAY_FLEX};
   align-items: ${ALIGN_CENTER};
-  background-color: ${COLORS.grey2};
+  background-color: ${COLORS.grey50};
   border-radius: ${BORDERS.borderRadiusSize1};
   color: ${COLORS.white};
   justify-content: ${JUSTIFY_CENTER};
@@ -98,7 +98,7 @@ const WASTE_CHUTE_CONFIG_STYLE_EDITABLE = css`
   ${WASTE_CHUTE_CONFIG_STYLE_READ_ONLY}
 
   &:active {
-    background-color: ${COLORS.darkBlack90};
+    background-color: ${COLORS.grey60};
   }
 
   &:hover {

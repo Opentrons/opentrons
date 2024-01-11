@@ -107,7 +107,7 @@ const INPUT_STYLE = css`
   background-color: ${COLORS.blueEnabled};
   border-radius: ${BORDERS.radiusRoundEdge};
   box-shadow: none;
-  color: ${COLORS.fundamentalsBackground};
+  color: ${COLORS.grey35};
   overflow: no-wrap;
   padding-left: ${SPACING.spacing16};
   padding-right: ${SPACING.spacing16};
@@ -136,10 +136,10 @@ const INPUT_STYLE = css`
 const ACCORDION_STYLE = css`
   border-radius: 50%;
   &:hover {
-    background: ${COLORS.lightGreyHover};
+    background: ${COLORS.grey35};
   }
   &:active {
-    background: ${COLORS.lightGreyPressed};
+    background: ${COLORS.grey35};
   }
 `
 interface PipetteTipsFieldProps extends FormikProps<FormState> {
@@ -275,7 +275,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
               alignItems={ALIGN_CENTER}
               width="100%"
               height="8.5rem"
-              backgroundColor={COLORS.darkBlack20}
+              backgroundColor={COLORS.grey35}
               padding={SPACING.spacing8}
               border={BORDERS.lineBorder}
               borderRadius={BORDERS.borderRadiusSize2}
@@ -283,7 +283,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
               <Text
                 as="h4"
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
-                color={COLORS.darkBlack70}
+                color={COLORS.grey60}
               >
                 {i18n.t('modal.create_file_wizard.upload_tiprack')}
               </Text>

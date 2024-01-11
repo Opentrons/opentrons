@@ -21,11 +21,11 @@ export function FlexModuleTag(props: FlexModuleTagProps): JSX.Element {
       height={20}
       y={-22}
       innerDivProps={{
-        backgroundColor: COLORS.darkGreyEnabled,
+        backgroundColor: COLORS.grey50Enabled,
         padding: SPACING.spacing4,
         height: '100%',
         color: COLORS.white,
-        border: `1px solid ${COLORS.darkGrey}`,
+        border: `1px solid ${COLORS.grey50}`,
       }}
     >
       <Text as="p" fontSize="0.5rem">

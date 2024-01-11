@@ -103,7 +103,7 @@ export const OffDeckLabwareSlideout = (
           <Icon
             name="ot-alert"
             size="2rem"
-            color={COLORS.darkBlack90}
+            color={COLORS.grey60}
             marginBottom={SPACING.spacing32}
           />
           <Text>{i18n.t('deck.off_deck.slideout_empty_state')}</Text>

@@ -184,7 +184,7 @@ export function ChooseRobotSlideout(
             <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
               <StyledText
                 as="p"
-                color={COLORS.darkGreyEnabled}
+                color={COLORS.grey50Enabled}
                 marginRight={SPACING.spacing12}
               >
                 {t('app_settings:searching')}
@@ -193,7 +193,7 @@ export function ChooseRobotSlideout(
                 name="ot-spinner"
                 spin
                 size="1.25rem"
-                color={COLORS.darkGreyEnabled}
+                color={COLORS.grey50Enabled}
               />
             </Flex>
           ) : (
@@ -212,7 +212,7 @@ export function ChooseRobotSlideout(
             css={css`
               ${BORDERS.cardOutlineBorder}
               &:hover {
-                border-color: ${COLORS.medGreyEnabled};
+                border-color: ${COLORS.grey35};
               }
             `}
             flexDirection={DIRECTION_COLUMN}
@@ -289,7 +289,7 @@ export function ChooseRobotSlideout(
             textAlign={TYPOGRAPHY.textAlignCenter}
             marginTop={SPACING.spacing24}
           >
-            <StyledText as="p" color={COLORS.darkGreyEnabled}>
+            <StyledText as="p" color={COLORS.grey50Enabled}>
               {showIdleOnly
                 ? t('unavailable_or_busy_robot_not_listed', {
                     count: unavailableCount + reducerBusyCount,

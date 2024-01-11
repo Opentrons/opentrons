@@ -91,7 +91,7 @@ function Input(props: InputFieldProps): JSX.Element {
     border-radius: ${SPACING.spacing4};
     padding: ${SPACING.spacing8};
     border: 1px ${BORDERS.styleSolid}
-      ${error ? COLORS.errorEnabled : COLORS.medGreyEnabled};
+      ${error ? COLORS.errorEnabled : COLORS.grey35};
     font-size: ${TYPOGRAPHY.fontSizeP};
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
@@ -99,7 +99,7 @@ function Input(props: InputFieldProps): JSX.Element {
     }
 
     &:active {
-      border: 1px ${BORDERS.styleSolid} ${COLORS.darkGreyEnabled};
+      border: 1px ${BORDERS.styleSolid} ${COLORS.grey50Enabled};
     }
 
     & input {
@@ -116,13 +116,13 @@ function Input(props: InputFieldProps): JSX.Element {
 
     &:hover {
       border: 1px ${BORDERS.styleSolid}
-        ${error ? COLORS.errorEnabled : COLORS.medGreyHover};
+        ${error ? COLORS.errorEnabled : COLORS.grey55};
     }
     &:focus {
       border: 1px ${BORDERS.styleSolid} ${COLORS.blueEnabled};
     }
     &:disabled {
-      border: 1px ${BORDERS.styleSolid} ${COLORS.darkGreyDisabled};
+      border: 1px ${BORDERS.styleSolid} ${COLORS.grey50Disabled};
     }
     input[type='number']::-webkit-inner-spin-button,
     input[type='number']::-webkit-outer-spin-button {
@@ -145,7 +145,7 @@ function Input(props: InputFieldProps): JSX.Element {
             display={DISPLAY_INLINE_BLOCK}
             textAlign={TEXT_ALIGN_RIGHT}
             alignSelf={ALIGN_CENTER}
-            color={COLORS.darkGreyEnabled}
+            color={COLORS.grey50Enabled}
             fontSize={TYPOGRAPHY.fontSizeLabel}
           >
             {props.units}
@@ -153,7 +153,7 @@ function Input(props: InputFieldProps): JSX.Element {
         )}
       </Flex>
       <Flex
-        color={COLORS.darkGreyEnabled}
+        color={COLORS.grey50Enabled}
         fontSize={TYPOGRAPHY.fontSizeLabel}
         paddingTop={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}

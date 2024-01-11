@@ -147,7 +147,7 @@ export function ProtocolCard(props: {
         ? ''
         : isFailedAnalysis
         ? COLORS.red3Pressed
-        : COLORS.darkBlack40};
+        : COLORS.grey50};
     }
   `
 
@@ -204,7 +204,7 @@ export function ProtocolCard(props: {
         </StyledText>
       </Flex>
       <Flex width="9.25rem">
-        <StyledText as="p" color={COLORS.darkBlack70}>
+        <StyledText as="p" color={COLORS.grey60}>
           {lastRun != null
             ? formatDistance(new Date(lastRun), new Date(), {
                 addSuffix: true,
@@ -213,7 +213,7 @@ export function ProtocolCard(props: {
         </StyledText>
       </Flex>
       <Flex width="12.5rem" whiteSpace="nowrap">
-        <StyledText as="p" color={COLORS.darkBlack70}>
+        <StyledText as="p" color={COLORS.grey60}>
           {formatTimeWithUtcLabel(protocol.createdAt)}
         </StyledText>
         {longpress.isLongPressed && !isFailedAnalysis && (

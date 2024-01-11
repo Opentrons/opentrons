@@ -13,7 +13,7 @@ interface NavTabProps {
 const StyledNavLink = styled(NavLink)<React.ComponentProps<typeof NavLink>>`
   padding: 0 ${SPACING.spacing4} ${SPACING.spacing8};
   ${TYPOGRAPHY.labelSemiBold}
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50Enabled};
 
   &.active {
     color: ${COLORS.darkBlackEnabled};
@@ -23,7 +23,7 @@ const StyledNavLink = styled(NavLink)<React.ComponentProps<typeof NavLink>>`
 const DisabledNavLink = styled.span`
   padding: 0 ${SPACING.spacing4} ${SPACING.spacing8};
   ${TYPOGRAPHY.labelSemiBold}
-  color: ${COLORS.errorDisabled};
+  color: ${COLORS.grey40};
 `
 
 export function NavTab({

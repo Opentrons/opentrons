@@ -98,7 +98,7 @@ export function WizardRequiredEquipmentList(
             <StyledText
               marginTop={SPACING.spacing8}
               as="label"
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.grey50Enabled}
             >
               {footer}
             </StyledText>
@@ -160,7 +160,7 @@ function RequiredEquipmentCard(props: RequiredEquipmentCardProps): JSX.Element {
         >
           <StyledText as="p">{displayName}</StyledText>
           {subtitle != null ? (
-            <StyledText as="p" color={COLORS.darkGreyEnabled}>
+            <StyledText as="p" color={COLORS.grey50Enabled}>
               {subtitle}
             </StyledText>
           ) : null}

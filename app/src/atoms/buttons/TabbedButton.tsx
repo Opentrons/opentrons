@@ -61,8 +61,8 @@ export const TabbedButton = styled(Btn)<TabbedButtonProps>`
         box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
       }
       &:disabled {
-        background-color: ${COLORS.darkBlack20};
-        color: ${COLORS.darkBlack60};
+        background-color: ${COLORS.grey35};
+        color: ${COLORS.grey50};
       }
     `}
 `

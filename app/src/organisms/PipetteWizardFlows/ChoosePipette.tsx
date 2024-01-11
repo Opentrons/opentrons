@@ -49,7 +49,7 @@ import type { SelectablePipettes } from './types'
 
 const UNSELECTED_OPTIONS_STYLE = css`
   background-color: ${COLORS.white};
-  border: 1px solid ${COLORS.medGreyEnabled};
+  border: 1px solid ${COLORS.grey35};
   border-radius: ${BORDERS.radiusSoftCorners};
   height: 14.5625rem;
   width: 14.5625rem;
@@ -60,7 +60,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
   grid-gap: ${SPACING.spacing8}
 
   &:hover {
-    border: 1px solid ${COLORS.medGreyHover};
+    border: 1px solid ${COLORS.grey55};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {

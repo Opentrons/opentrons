@@ -59,7 +59,7 @@ describe('ToggleButton', () => {
     const button = getByLabelText('toggle button')
     expect(button).toHaveStyleRule(
       'color',
-      `${String(COLORS.darkGreyDisabled)}`,
+      `${String(COLORS.grey50Disabled)}`,
       {
         modifier: ':disabled',
       }
@@ -77,7 +77,7 @@ describe('ToggleButton', () => {
     props.toggledOn = false
     const { getByLabelText } = render(props)
     const button = getByLabelText('toggle button')
-    expect(button).toHaveStyle(`color: ${String(COLORS.darkGreyEnabled)}`)
+    expect(button).toHaveStyle(`color: ${String(COLORS.grey50Enabled)}`)
     expect(button).toHaveStyle(`height: ${String(SIZE_2)}`)
     expect(button).toHaveStyle(`width: ${String(SIZE_2)}`)
     expect(button).toHaveAttribute('aria-checked', 'false')
@@ -87,7 +87,7 @@ describe('ToggleButton', () => {
     props.toggledOn = false
     const { getByLabelText } = render(props)
     const button = getByLabelText('toggle button')
-    expect(button).toHaveStyleRule('color', `${String(COLORS.darkGreyHover)}`, {
+    expect(button).toHaveStyleRule('color', `${String(COLORS.grey55)}`, {
       modifier: ':hover',
     })
   })
@@ -112,7 +112,7 @@ describe('ToggleButton', () => {
     const button = getByLabelText('toggle button')
     expect(button).toHaveStyleRule(
       'color',
-      `${String(COLORS.darkGreyDisabled)}`,
+      `${String(COLORS.grey50Disabled)}`,
       {
         modifier: ':disabled',
       }

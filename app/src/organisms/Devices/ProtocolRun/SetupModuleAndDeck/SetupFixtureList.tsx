@@ -166,7 +166,7 @@ export function FixtureListItem({
       ) : null}
       <Box
         border={BORDERS.styleSolid}
-        borderColor={COLORS.medGreyEnabled}
+        borderColor={COLORS.grey35}
         borderWidth="1px"
         borderRadius={BORDERS.radiusSoftCorners}
         padding={SPACING.spacing16}

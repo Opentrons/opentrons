@@ -23,7 +23,7 @@ export interface InfoMessageProps {
 export function InfoMessage({ title, body }: InfoMessageProps): JSX.Element {
   return (
     <Flex
-      backgroundColor={COLORS.fundamentalsBackground}
+      backgroundColor={COLORS.grey35}
       flexDirection={DIRECTION_ROW}
       alignItems={body != null ? ALIGN_FLEX_START : ALIGN_CENTER}
       borderRadius={BORDERS.radiusSoftCorners}
@@ -32,7 +32,7 @@ export function InfoMessage({ title, body }: InfoMessageProps): JSX.Element {
       data-testid={`InfoMessage_${title}`}
     >
       <Icon
-        color={COLORS.darkGreyEnabled}
+        color={COLORS.grey50Enabled}
         name="information"
         aria-label="icon_information"
         size={SIZE_1}

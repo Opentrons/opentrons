@@ -197,7 +197,7 @@ export function DeviceDetailsDeckConfiguration({
                 fixtureDisplayList.map(fixture => (
                   <Flex
                     key={fixture.cutoutId}
-                    backgroundColor={COLORS.fundamentalsBackground}
+                    backgroundColor={COLORS.grey35}
                     gridGap={SPACING.spacing60}
                     padding={SPACING.spacing8}
                     width="100%"
@@ -213,7 +213,7 @@ export function DeviceDetailsDeckConfiguration({
                 ))
               ) : (
                 <Flex
-                  backgroundColor={COLORS.fundamentalsBackground}
+                  backgroundColor={COLORS.grey35}
                   gridGap={SPACING.spacing60}
                   padding={SPACING.spacing8}
                   width="100%"

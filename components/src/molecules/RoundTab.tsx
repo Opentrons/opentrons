@@ -20,10 +20,10 @@ const defaultTabStyle = css`
 `
 
 const inactiveTabStyle = css`
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50Enabled};
 
   &:hover {
-    color: ${COLORS.darkGreyEnabled};
+    color: ${COLORS.grey50Enabled};
     background-color: ${COLORS.fundamentalsBackgroundShade};
   }
 `

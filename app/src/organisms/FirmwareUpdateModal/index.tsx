@@ -57,12 +57,12 @@ const MODAL_STYLE = css`
 `
 const OUTER_STYLES = css`
   border-radius: ${BORDERS.borderRadiusSize4};
-  background: ${COLORS.medGreyEnabled};
+  background: ${COLORS.grey35};
   width: 13.374rem;
 `
 
 const SPINNER_STYLE = css`
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50Enabled};
   opacity: 100%;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     color: ${COLORS.darkBlackEnabled};

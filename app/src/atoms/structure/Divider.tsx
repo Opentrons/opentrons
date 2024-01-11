@@ -6,7 +6,7 @@ type Props = React.ComponentProps<typeof Box>
 export function Divider(props: Props): JSX.Element {
   return (
     <Box
-      borderBottom={`1px solid ${String(COLORS.medGreyEnabled)}`}
+      borderBottom={`1px solid ${String(COLORS.grey35)}`}
       marginY={SPACING.spacing4}
       {...props}
       data-testid="divider"

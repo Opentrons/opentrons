@@ -61,7 +61,7 @@ const Labels = (props: {
                   NUMBER_COLUMN_Y_FROM_TOP
             }
             style={{
-              color: COLORS.darkGrey, // LEGACY --c-font-dark
+              color: COLORS.grey50, // LEGACY --c-font-dark
               fontSize: '0.2rem', // LEGACY --fs-micro
               textAnchor: 'middle',
               dominantBaseline:

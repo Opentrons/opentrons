@@ -28,7 +28,7 @@ export function CompleteUpdateSoftware({
     <Flex flexDirection={DIRECTION_COLUMN} width="100%">
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        backgroundColor={COLORS.darkBlack20}
+        backgroundColor={COLORS.grey35}
         height="33rem"
         gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}

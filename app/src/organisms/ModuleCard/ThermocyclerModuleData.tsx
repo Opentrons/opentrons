@@ -34,16 +34,16 @@ export const ThermocyclerModuleData = (
     textColor: string
   } => {
     const StatusLabelProps = {
-      backgroundColor: COLORS.medGreyEnabled,
-      iconColor: COLORS.darkGreyEnabled,
+      backgroundColor: COLORS.grey35,
+      iconColor: COLORS.grey50Enabled,
       textColor: COLORS.bluePressed,
       pulse: false,
     }
 
     switch (status) {
       case 'idle': {
-        StatusLabelProps.backgroundColor = COLORS.medGreyEnabled
-        StatusLabelProps.iconColor = COLORS.darkGreyEnabled
+        StatusLabelProps.backgroundColor = COLORS.grey35
+        StatusLabelProps.iconColor = COLORS.grey50Enabled
         StatusLabelProps.textColor = COLORS.darkBlackEnabled
         break
       }
@@ -55,7 +55,7 @@ export const ThermocyclerModuleData = (
       case 'cooling':
       case 'heating': {
         StatusLabelProps.backgroundColor = COLORS.medBlue
-        StatusLabelProps.iconColor = COLORS.darkGreyEnabled
+        StatusLabelProps.iconColor = COLORS.grey50Enabled
         StatusLabelProps.pulse = true
         break
       }
@@ -77,7 +77,7 @@ export const ThermocyclerModuleData = (
       >
         <StyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey50Enabled}
           fontSize={TYPOGRAPHY.fontSizeCaption}
           marginTop={SPACING.spacing8}
         >
@@ -88,7 +88,7 @@ export const ThermocyclerModuleData = (
           <Box marginRight={SPACING.spacing4}>
             <StatusLabel
               status={data.lidStatus === 'in_between' ? 'open' : data.lidStatus}
-              backgroundColor={COLORS.medGreyEnabled}
+              backgroundColor={COLORS.grey35}
               textColor={COLORS.darkBlackEnabled}
               showIcon={false}
               key="lidStatus"
@@ -122,7 +122,7 @@ export const ThermocyclerModuleData = (
       >
         <StyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey50Enabled}
           fontWeight={FONT_WEIGHT_REGULAR}
           fontSize={TYPOGRAPHY.fontSizeCaption}
           marginTop={SPACING.spacing8}

@@ -12,7 +12,7 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
   background-color: ${COLORS.blueEnabled};
   border-radius: ${BORDERS.radiusRoundEdge};
   box-shadow: none;
-  color: ${COLORS.fundamentalsBackground};
+  color: ${COLORS.grey35};
   overflow: no-wrap;
   padding-left: ${SPACING.spacing16};
   padding-right: ${SPACING.spacing16};
@@ -36,7 +36,7 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
   }
 
   &:disabled {
-    background-color: ${COLORS.darkGreyDisabled};
-    color: ${COLORS.errorDisabled};
+    background-color: ${COLORS.grey50Disabled};
+    color: ${COLORS.grey40};
   }
 `

@@ -135,7 +135,7 @@ const SCROLL_BAR_STYLE = css`
   }
 
   &::-webkit-scrollbar-thumb {
-    background: ${COLORS.darkBlack40};
+    background: ${COLORS.grey50};
     border-radius: 11px;
   }
 `

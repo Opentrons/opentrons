@@ -234,9 +234,9 @@ export function Toast(props: ToastProps): JSX.Element {
     },
     [INFO_TOAST]: {
       iconName: 'information',
-      color: `${showODDStyle ? COLORS.grey2 : COLORS.darkGreyEnabled}`,
+      color: `${showODDStyle ? COLORS.grey50 : COLORS.grey50Enabled}`,
       backgroundColor: `${
-        showODDStyle ? COLORS.grey4 : COLORS.darkGreyDisabled
+        showODDStyle ? COLORS.grey35 : COLORS.grey50Disabled
       }`,
     },
     [SUCCESS_TOAST]: {

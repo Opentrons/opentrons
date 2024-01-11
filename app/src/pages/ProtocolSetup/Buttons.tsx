@@ -34,14 +34,14 @@ export function PlayButton({
     &:focus {
       background-color: ${ready && !isDoorOpen
         ? COLORS.bluePressed
-        : COLORS.darkBlack40};
+        : COLORS.grey50};
       color: ${COLORS.white};
     }
 
     &:hover {
       background-color: ${ready && !isDoorOpen
         ? COLORS.blueEnabled
-        : COLORS.darkBlack20};
+        : COLORS.grey35};
       color: ${COLORS.white};
     }
 
@@ -49,28 +49,26 @@ export function PlayButton({
       box-shadow: ${ODD_FOCUS_VISIBLE};
       background-color: ${ready && !isDoorOpen
         ? COLORS.blueEnabled
-        : COLORS.darkBlack20};
+        : COLORS.grey35};
     }
 
     &:active {
       background-color: ${ready && !isDoorOpen
         ? COLORS.bluePressed
-        : COLORS.darkBlack40};
+        : COLORS.grey50};
       color: ${COLORS.white};
     }
 
     &:disabled {
-      background-color: ${COLORS.darkBlack20};
-      color: ${COLORS.darkBlack60};
+      background-color: ${COLORS.grey35};
+      color: ${COLORS.grey50};
     }
   `
   return (
     <Btn
       alignItems={ALIGN_CENTER}
       backgroundColor={
-        disabled || !ready || isDoorOpen
-          ? COLORS.darkBlack20
-          : COLORS.blueEnabled
+        disabled || !ready || isDoorOpen ? COLORS.grey35 : COLORS.blueEnabled
       }
       borderRadius="6.25rem"
       display={DISPLAY_FLEX}
@@ -83,9 +81,7 @@ export function PlayButton({
       css={playButtonStyle}
     >
       <Icon
-        color={
-          disabled || !ready || isDoorOpen ? COLORS.darkBlack60 : COLORS.white
-        }
+        color={disabled || !ready || isDoorOpen ? COLORS.grey50 : COLORS.white}
         name="play-icon"
         size="2.5rem"
       />
@@ -139,7 +135,7 @@ const CLOSE_BUTTON_STYLE = css`
   }
 
   &:disabled {
-    background-color: ${COLORS.darkBlack20};
-    color: ${COLORS.darkBlack60};
+    background-color: ${COLORS.grey35};
+    color: ${COLORS.grey50};
   }
 `

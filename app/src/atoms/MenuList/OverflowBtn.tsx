@@ -14,7 +14,7 @@ export const OverflowBtn = React.forwardRef(
           max-height: ${SPACING.spacing32};
 
           &:hover {
-            background-color: ${COLORS.lightGreyHover};
+            background-color: ${COLORS.grey35};
           }
           &:hover circle {
             fill: ${COLORS.darkBlackEnabled};
@@ -22,12 +22,12 @@ export const OverflowBtn = React.forwardRef(
 
           &:active,
           &:focus {
-            background-color: ${COLORS.lightGreyPressed};
+            background-color: ${COLORS.grey35};
           }
 
           &:active circle,
           &:focus circle {
-            fill: ${COLORS.darkGreyPressed};
+            fill: ${COLORS.grey60};
           }
 
           &:focus-visible {
@@ -36,7 +36,7 @@ export const OverflowBtn = React.forwardRef(
           }
 
           &:focus-visible circle {
-            fill: ${COLORS.darkGreyHover};
+            fill: ${COLORS.grey55};
           }
 
           &:disabled circle {
@@ -53,7 +53,7 @@ export const OverflowBtn = React.forwardRef(
           width="19"
           height="31"
           viewBox="0 0 19 31"
-          fill={COLORS.darkGreyEnabled}
+          fill={COLORS.grey50Enabled}
           xmlns="http://www.w3.org/2000/svg"
         >
           <circle cx="9.5" cy="9.5" r="1.5" />

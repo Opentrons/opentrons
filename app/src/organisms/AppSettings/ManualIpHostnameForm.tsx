@@ -34,12 +34,12 @@ const StyledInput = styled.input`
   margin: ${SPACING.spacing4} 0;
   background-color: ${COLORS.white};
   border-radius: ${SPACING.spacing4};
-  border: 1px ${BORDERS.styleSolid} ${COLORS.medGreyEnabled};
+  border: 1px ${BORDERS.styleSolid} ${COLORS.grey35};
   height: ${SIZE_2};
   font-size: ${TYPOGRAPHY.fontSizeP};
 
   &:active {
-    border: 1px ${BORDERS.styleSolid} ${COLORS.darkGreyEnabled};
+    border: 1px ${BORDERS.styleSolid} ${COLORS.grey50Enabled};
   }
 
   &:hover {
@@ -51,7 +51,7 @@ const StyledInput = styled.input`
   }
 
   &:disabled {
-    border: 1px ${BORDERS.styleSolid} ${COLORS.darkGreyDisabled};
+    border: 1px ${BORDERS.styleSolid} ${COLORS.grey50Disabled};
   }
 `
 
@@ -79,7 +79,7 @@ export function ManualIpHostnameForm({
       const ip = values.ip.trim()
       const inputForm = document.getElementById('ip')
       if (inputForm != null)
-        inputForm.style.border = `1px solid ${String(COLORS.medGreyEnabled)}`
+        inputForm.style.border = `1px solid ${String(COLORS.grey35)}`
       addManualIpAndHostname(ip)
       resetForm()
       setMostRecentAddition(ip)

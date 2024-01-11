@@ -169,7 +169,7 @@ function DesktopModal({
         <Banner type={isEngaged ? 'error' : 'success'}>
           {isEngaged ? t('estop_engaged') : t('estop_disengaged')}
         </Banner>
-        <StyledText as="p" color={COLORS.darkBlack90}>
+        <StyledText as="p" color={COLORS.grey60}>
           {t('estop_pressed_description')}
         </StyledText>
         <Flex justifyContent={JUSTIFY_FLEX_END}>

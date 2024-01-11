@@ -60,7 +60,7 @@ const DEFAULT_BUTTON_STYLE = css`
     background-color: ${COLORS.white};
     color: ${COLORS.black};
     box-shadow: 0 0 0;
-    border: 1px ${COLORS.lightGreyHover} solid;
+    border: 1px ${COLORS.grey35} solid;
   }
 
   &:active {
@@ -71,7 +71,7 @@ const DEFAULT_BUTTON_STYLE = css`
 
   &:disabled {
     background-color: inherit;
-    color: ${COLORS.errorDisabled};
+    color: ${COLORS.grey40};
   }
 `
 const ACTIVE_BUTTON_STYLE = css`
@@ -133,7 +133,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
             </StyledText>
           </Flex>
           <StyledText
-            color={COLORS.darkGreyEnabled}
+            color={COLORS.grey50Enabled}
             css={TYPOGRAPHY.labelRegular}
           >
             {JUMP_SIZE_SUBTITLE}
@@ -153,7 +153,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
                 >
                   {t(stepSizeTranslationKeyByStep[stepSize])}
                   <StyledText
-                    color={COLORS.darkGreyEnabled}
+                    color={COLORS.grey50Enabled}
                     css={TYPOGRAPHY.labelRegular}
                   >{`${stepSize} mm`}</StyledText>
                 </PrimaryButton>
@@ -173,7 +173,7 @@ export function TouchStepSizeControl(props: StepSizeControlProps): JSX.Element {
     <Flex
       flex="3"
       flexDirection={DIRECTION_COLUMN}
-      border={`1px solid ${COLORS.darkBlack40}`}
+      border={`1px solid ${COLORS.grey50}`}
       borderRadius={BORDERS.borderRadiusSize4}
       padding={SPACING.spacing16}
       gridGap={SPACING.spacing16}
@@ -204,7 +204,7 @@ export function TouchStepSizeControl(props: StepSizeControlProps): JSX.Element {
               </StyledText>
               <StyledText
                 as="p"
-                color={selected ? COLORS.white : COLORS.darkBlack70}
+                color={selected ? COLORS.white : COLORS.grey60}
               >
                 {`${stepSize} mm`}
               </StyledText>

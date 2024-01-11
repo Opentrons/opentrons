@@ -78,7 +78,7 @@ export function UpdateResultsModal(
               backgroundColor={COLORS.green3}
               borderRadius={BORDERS.borderRadiusSize3}
               flexDirection={DIRECTION_COLUMN}
-              color={COLORS.darkBlack90}
+              color={COLORS.grey60}
               padding={SPACING.spacing24}
               alignItems={ALIGN_CENTER}
             >

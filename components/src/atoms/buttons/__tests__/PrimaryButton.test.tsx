@@ -45,8 +45,8 @@ describe('PrimaryButton', () => {
     const { getByText } = render(props)
     const button = getByText('primary button')
     expect(button).toBeDisabled()
-    expect(button).toHaveStyle(`background-color: ${COLORS.darkGreyDisabled}`)
-    expect(button).toHaveStyle(`color: ${COLORS.errorDisabled}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.grey50Disabled}`)
+    expect(button).toHaveStyle(`color: ${COLORS.grey40}`)
   })
 
   it('applies the correct states to the button - focus', () => {

@@ -46,7 +46,7 @@ const INLINE_NOTIFICATION_PROPS_BY_TYPE: Record<
   },
   neutral: {
     icon: { name: 'information' },
-    backgroundColor: COLORS.darkBlack20,
+    backgroundColor: COLORS.grey35,
     color: COLORS.darkBlackEnabled,
   },
   success: {

@@ -70,20 +70,12 @@ describe('LegacyModalHeader', () => {
     expect(closeIcon).toHaveStyle(`justify-content: ${JUSTIFY_CENTER}`)
     expect(closeIcon).toHaveStyle(`align-items: ${ALIGN_CENTER}`)
     expect(closeIcon).toHaveStyle('border-radius: 0.875rem')
-    expect(closeIcon).toHaveStyleRule(
-      'background-color',
-      COLORS.lightGreyHover,
-      {
-        modifier: ':hover',
-      }
-    )
-    expect(closeIcon).toHaveStyleRule(
-      'background-color',
-      COLORS.lightGreyPressed,
-      {
-        modifier: ':active',
-      }
-    )
+    expect(closeIcon).toHaveStyleRule('background-color', COLORS.grey35, {
+      modifier: ':hover',
+    })
+    expect(closeIcon).toHaveStyleRule('background-color', COLORS.grey35, {
+      modifier: ':active',
+    })
     fireEvent.click(closeIcon)
     expect(mockClose).toHaveBeenCalled()
   })

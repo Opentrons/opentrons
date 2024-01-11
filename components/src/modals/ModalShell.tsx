@@ -81,7 +81,7 @@ const Overlay = styled.div`
   cursor: default;
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    background-color: ${COLORS.darkBlack60};
+    background-color: ${COLORS.grey50};
   }
 `
 const ContentArea = styled.div<{ zIndex: string | number }>`

@@ -56,9 +56,7 @@ export function EmergencyStop(): JSX.Element {
         <Flex
           flexDirection={DIRECTION_COLUMN}
           padding={`${SPACING.spacing40} ${SPACING.spacing80}`}
-          backgroundColor={
-            isEstopConnected ? COLORS.green3 : COLORS.darkBlack20
-          }
+          backgroundColor={isEstopConnected ? COLORS.green3 : COLORS.grey35}
           borderRadius={BORDERS.borderRadiusSize3}
           alignItems={ALIGN_CENTER}
         >
@@ -87,7 +85,7 @@ export function EmergencyStop(): JSX.Element {
                 <StyledText
                   as="h3"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  color={COLORS.darkBlack70}
+                  color={COLORS.grey60}
                   textAlign={TYPOGRAPHY.textAlignCenter}
                 >
                   {t('e_stop_not_connected')}

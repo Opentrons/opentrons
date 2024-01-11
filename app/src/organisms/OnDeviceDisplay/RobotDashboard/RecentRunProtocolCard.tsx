@@ -194,7 +194,7 @@ export function ProtocolWithLastRun({
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         lineHeight={TYPOGRAPHY.lineHeight28}
-        color={COLORS.darkBlack70}
+        color={COLORS.grey60}
       >
         {i18n.format(
           `${terminationTypeMap[runData.status] ?? ''} ${formattedLastRunTime}`,

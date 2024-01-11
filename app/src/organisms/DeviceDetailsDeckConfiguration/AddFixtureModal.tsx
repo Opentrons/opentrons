@@ -215,7 +215,7 @@ export function AddFixtureModal({
                         alignItems={ALIGN_CENTER}
                         justifyContent={JUSTIFY_SPACE_BETWEEN}
                         padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
-                        backgroundColor={COLORS.medGreyEnabled}
+                        backgroundColor={COLORS.grey35}
                         borderRadius={BORDERS.borderRadiusSize1}
                       >
                         <StyledText css={TYPOGRAPHY.pSemiBold}>
@@ -257,7 +257,7 @@ const FIXTURE_BUTTON_STYLE = css`
   box-shadow: none;
 
   &:focus {
-    background-color: ${COLORS.light1Pressed};
+    background-color: ${COLORS.grey40};
     box-shadow: none;
   }
 
@@ -273,17 +273,17 @@ const FIXTURE_BUTTON_STYLE = css`
   }
 
   &:active {
-    background-color: ${COLORS.light1Pressed};
+    background-color: ${COLORS.grey40};
   }
 
   &:disabled {
     background-color: ${COLORS.light1};
-    color: ${COLORS.darkBlack60};
+    color: ${COLORS.grey50};
   }
 `
 const GO_BACK_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50Enabled};
 
   &:hover {
     opacity: 70%;

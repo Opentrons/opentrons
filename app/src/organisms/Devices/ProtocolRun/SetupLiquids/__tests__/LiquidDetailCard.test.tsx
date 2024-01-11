@@ -93,7 +93,7 @@ describe('LiquidDetailCard', () => {
     getAllByText(nestedTextMatcher('100 µL'))
     getAllByText(nestedTextMatcher('total volume'))
     expect(getByLabelText('liquidBox_odd')).toHaveStyle(
-      `border: ${SPACING.spacing4} solid ${COLORS.medGreyEnabled}`
+      `border: ${SPACING.spacing4} solid ${COLORS.grey35}`
     )
   })
 })

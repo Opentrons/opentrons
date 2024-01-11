@@ -74,7 +74,7 @@ export const ProtocolLiquidsDetails = (
           flexDirection={DIRECTION_COLUMN}
         >
           <Icon
-            color={COLORS.medGreyEnabled}
+            color={COLORS.grey35}
             alignSelf={ALIGN_CENTER}
             size="1.25rem"
             name="ot-alert"

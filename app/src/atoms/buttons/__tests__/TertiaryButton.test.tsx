@@ -47,9 +47,7 @@ describe('TertiaryButton', () => {
     expect(button).toHaveStyle('box-shadow: none')
     expect(button).toHaveStyle('overflow: no-wrap')
     expect(button).toHaveStyle('white-space: nowrap')
-    expect(button).toHaveStyle(
-      `color: ${String(COLORS.fundamentalsBackground)}`
-    )
+    expect(button).toHaveStyle(`color: ${String(COLORS.grey35)}`)
   })
 
   it('renders tertiary button with text and disabled', () => {
@@ -58,9 +56,9 @@ describe('TertiaryButton', () => {
     const button = getByText('tertiary button')
     expect(button).toBeDisabled()
     expect(button).toHaveStyle(
-      `background-color: ${String(COLORS.darkGreyDisabled)}`
+      `background-color: ${String(COLORS.grey50Disabled)}`
     )
-    expect(button).toHaveStyle(`color: ${String(COLORS.errorDisabled)}`)
+    expect(button).toHaveStyle(`color: ${String(COLORS.grey40)}`)
   })
 
   it('applies the correct states to the button - hover', () => {
@@ -109,8 +107,6 @@ describe('TertiaryButton', () => {
     expect(button).toHaveStyle(
       `background-color: ${String(COLORS.errorEnabled)}`
     )
-    expect(button).toHaveStyle(
-      `color: ${String(COLORS.fundamentalsBackground)}`
-    )
+    expect(button).toHaveStyle(`color: ${String(COLORS.grey35)}`)
   })
 })

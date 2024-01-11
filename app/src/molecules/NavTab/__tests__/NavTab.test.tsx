@@ -44,7 +44,7 @@ describe('NavTab', () => {
     expect(tab).toHaveStyle(
       `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
     )
-    expect(tab).toHaveStyle(`color: ${String(COLORS.darkGreyEnabled)}`)
+    expect(tab).toHaveStyle(`color: ${String(COLORS.grey50Enabled)}`)
     fireEvent.click(tab)
     expect(tab).toHaveStyle(`color: ${String(COLORS.darkBlackEnabled)}`)
     expect(tab).toHaveStyle(
@@ -68,7 +68,7 @@ describe('NavTab', () => {
     expect(tab).toHaveStyle(
       `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
     )
-    expect(tab).toHaveStyle(`color: ${String(COLORS.errorDisabled)}`)
+    expect(tab).toHaveStyle(`color: ${String(COLORS.grey40)}`)
   })
 
   it('renders navtab when pass to / as to', () => {

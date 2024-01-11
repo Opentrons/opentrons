@@ -49,10 +49,10 @@ const COLLAPSED_STYLE = css`
 const ACCORDION_STYLE = css`
   border-radius: 50%;
   &:hover {
-    background: ${COLORS.lightGreyHover};
+    background: ${COLORS.grey35};
   }
   &:active {
-    background: ${COLORS.lightGreyPressed};
+    background: ${COLORS.grey35};
   }
 `
 export function SetupStep({
@@ -79,7 +79,7 @@ export function SetupStep({
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText
-                color={COLORS.darkGreyEnabled}
+                color={COLORS.grey50Enabled}
                 css={TYPOGRAPHY.h6SemiBold}
                 marginBottom={SPACING.spacing2}
                 id={`CollapsibleStep_${label}`}

@@ -39,7 +39,7 @@ const TableHeader = styled('th')`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   font-size: ${TYPOGRAPHY.fontSize20};
   padding: 0 ${SPACING.spacing24} 0 ${SPACING.spacing24};
-  color: ${COLORS.darkBlack70};
+  color: ${COLORS.grey60};
 `
 
 const TableRow = styled('tr')`
@@ -123,7 +123,7 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
                     <StyledText as="p">
                       {i18n.format(liquid.displayName, 'titleCase')}
                     </StyledText>
-                    <StyledText as="p" color={COLORS.darkBlack70}>
+                    <StyledText as="p" color={COLORS.grey60}>
                       {i18n.format(liquid.description, 'titleCase')}
                     </StyledText>
                   </Flex>
@@ -132,7 +132,7 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
 
               <TableDatum>
                 <Flex
-                  backgroundColor={COLORS.darkBlack20}
+                  backgroundColor={COLORS.grey35}
                   borderRadius={BORDERS.radiusSoftCorners}
                   height="2.75rem"
                   padding={`${SPACING.spacing8} ${SPACING.spacing12}`}

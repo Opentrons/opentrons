@@ -19,7 +19,7 @@ describe('Divider', () => {
     const { getByTestId } = render(props)
     const divider = getByTestId('divider')
     expect(divider).toHaveStyle(
-      `borderBottom: 1px solid ${String(COLORS.medGreyEnabled)}`
+      `borderBottom: 1px solid ${String(COLORS.grey35)}`
     )
     expect(divider).toHaveStyle('width: 80%')
     expect(divider).toHaveStyle(`margin-top: ${SPACING.spacing4}`)

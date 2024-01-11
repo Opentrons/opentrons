@@ -99,7 +99,7 @@ export const ProtocolRunModuleControls = ({
     <Flex justifyContent={JUSTIFY_CENTER}>
       <StyledText
         as="p"
-        color={COLORS.darkGreyEnabled}
+        color={COLORS.grey50Enabled}
         marginY={SPACING.spacing16}
       >
         {t('connect_modules_to_see_controls')}

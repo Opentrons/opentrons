@@ -63,7 +63,7 @@ export const InstrumentDetail = (): JSX.Element => {
                   name="overflow-btn-touchscreen"
                   height="3.75rem"
                   width="3rem"
-                  color={COLORS.darkBlack70}
+                  color={COLORS.grey60}
                 />
               </IconButton>
             </Flex>
@@ -81,11 +81,11 @@ const IconButton = styled('button')`
   background-color: ${COLORS.white};
 
   &:active {
-    background-color: ${COLORS.darkBlack20};
+    background-color: ${COLORS.grey35};
   }
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.darkBlack20};
+    background-color: ${COLORS.grey35};
   }
   &:disabled {
     background-color: transparent;

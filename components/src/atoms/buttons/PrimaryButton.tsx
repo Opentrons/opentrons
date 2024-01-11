@@ -29,7 +29,7 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
   }
 
   &:disabled {
-    background-color: ${COLORS.darkGreyDisabled};
-    color: ${COLORS.errorDisabled};
+    background-color: ${COLORS.grey50Disabled};
+    color: ${COLORS.grey40};
   }
 `

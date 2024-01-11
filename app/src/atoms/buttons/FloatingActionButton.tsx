@@ -36,7 +36,7 @@ export function FloatingActionButton(
     ...buttonProps
   } = props
 
-  const contentColor = disabled ? COLORS.darkBlack60 : COLORS.white
+  const contentColor = disabled ? COLORS.grey50 : COLORS.white
   const FLOATING_ACTION_BUTTON_STYLE = css`
     background-color: ${COLORS.highlightPurple1};
     border-radius: ${BORDERS.borderRadiusSize5};
@@ -55,7 +55,7 @@ export function FloatingActionButton(
     }
 
     &:disabled {
-      background-color: ${COLORS.darkBlack20};
+      background-color: ${COLORS.grey35};
       color: ${contentColor};
     }
   `

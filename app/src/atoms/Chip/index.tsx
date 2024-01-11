@@ -41,7 +41,7 @@ const CHIP_PROPS_BY_TYPE: Record<
   basic: {
     backgroundColor: COLORS.darkBlack20,
     borderRadius: BORDERS.borderRadiusSize1,
-    textColor: COLORS.darkBlack90,
+    textColor: COLORS.grey60,
   },
   error: {
     backgroundColor: COLORS.red3,
@@ -52,8 +52,8 @@ const CHIP_PROPS_BY_TYPE: Record<
   neutral: {
     backgroundColor: COLORS.darkBlack20,
     borderRadius: BORDERS.borderRadiusSize5,
-    iconColor: COLORS.darkBlack90,
-    textColor: COLORS.darkBlack70,
+    iconColor: COLORS.grey60,
+    textColor: COLORS.grey60,
   },
   success: {
     backgroundColor: COLORS.green3,

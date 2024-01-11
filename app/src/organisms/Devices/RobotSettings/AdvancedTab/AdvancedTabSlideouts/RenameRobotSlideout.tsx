@@ -170,7 +170,7 @@ export function RenameRobotSlideout({
           value={formik.values.newRobotName}
           error={formik.errors.newRobotName && ' '}
         />
-        <StyledText as="label" color={COLORS.darkGreyEnabled}>
+        <StyledText as="label" color={COLORS.grey50Enabled}>
           {t('characters_max')}
         </StyledText>
         {formik.errors.newRobotName && (

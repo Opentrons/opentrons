@@ -67,12 +67,12 @@ const SORT_BY_BUTTON_STYLE = css`
   background-color: ${COLORS.transparent};
   cursor: pointer;
   &:hover {
-    background-color: ${COLORS.medGreyHover};
+    background-color: ${COLORS.grey55};
   }
 
   &:active,
   &:focus {
-    background-color: ${COLORS.medGreyEnabled};
+    background-color: ${COLORS.grey35};
   }
 `
 
@@ -155,10 +155,7 @@ export function Labware(): JSX.Element {
             />
           </Flex>
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-            <StyledText
-              css={TYPOGRAPHY.pSemiBold}
-              color={COLORS.darkGreyEnabled}
-            >
+            <StyledText css={TYPOGRAPHY.pSemiBold} color={COLORS.grey50Enabled}>
               {t('shared:sort_by')}
             </StyledText>
             <Flex

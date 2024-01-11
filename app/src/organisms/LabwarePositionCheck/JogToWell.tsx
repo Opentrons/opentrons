@@ -144,8 +144,8 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
                   wellStroke={wellStroke}
                   wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_OUTSIDE}
                   highlightedWellLabels={{ wells: wellsToHighlight }}
-                  labwareStroke={COLORS.medGreyEnabled}
-                  wellLabelColor={COLORS.medGreyEnabled}
+                  labwareStroke={COLORS.grey35}
+                  wellLabelColor={COLORS.grey35}
                 />
                 <PipetteRender
                   labwareDef={labwareDef}

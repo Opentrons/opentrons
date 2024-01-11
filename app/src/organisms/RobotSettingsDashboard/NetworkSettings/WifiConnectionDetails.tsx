@@ -79,7 +79,7 @@ export function WifiConnectionDetails({
             <StyledText
               as="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={COLORS.darkBlack70}
+              color={COLORS.grey60}
             >
               {t('connected_network')}
             </StyledText>
@@ -138,7 +138,7 @@ export function WifiConnectionDetails({
           <StyledText
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            color={COLORS.darkBlack70}
+            color={COLORS.grey60}
             paddingX={SPACING.spacing40}
             marginBottom={SPACING.spacing8}
           >

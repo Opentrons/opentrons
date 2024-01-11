@@ -243,7 +243,7 @@ export const LocationConflictModal = (
               >
                 <Flex
                   padding={SPACING.spacing8}
-                  backgroundColor={COLORS.fundamentalsBackground}
+                  backgroundColor={COLORS.grey35}
                   flexDirection={DIRECTION_ROW}
                   gridGap={SPACING.spacing20}
                   alignItems={ALIGN_CENTER}
@@ -259,7 +259,7 @@ export const LocationConflictModal = (
                 </Flex>
                 <Flex
                   padding={SPACING.spacing8}
-                  backgroundColor={COLORS.fundamentalsBackground}
+                  backgroundColor={COLORS.grey35}
                   flexDirection={DIRECTION_ROW}
                   gridGap={SPACING.spacing20}
                   alignItems={ALIGN_CENTER}

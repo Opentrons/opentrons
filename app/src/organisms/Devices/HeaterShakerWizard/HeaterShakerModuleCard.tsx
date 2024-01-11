@@ -30,7 +30,7 @@ export const HeaterShakerModuleCard = (
 
   return (
     <Flex
-      backgroundColor={COLORS.fundamentalsBackground}
+      backgroundColor={COLORS.grey35}
       borderRadius={SPACING.spacing4}
       marginBottom={SPACING.spacing8}
       padding={`${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8}`}
@@ -45,7 +45,7 @@ export const HeaterShakerModuleCard = (
         <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING.spacing8}>
           <StyledText
             textTransform={TYPOGRAPHY.textTransformUppercase}
-            color={COLORS.darkGreyEnabled}
+            color={COLORS.grey50Enabled}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeCaption}
             paddingBottom={SPACING.spacing4}
@@ -62,7 +62,7 @@ export const HeaterShakerModuleCard = (
               aria-label="heater-shaker"
               size={SIZE_1}
               marginRight={SPACING.spacing4}
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.grey50Enabled}
             />
             <StyledText fontSize={TYPOGRAPHY.fontSizeP}>
               {getModuleDisplayName(module.moduleModel)}

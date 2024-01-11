@@ -35,8 +35,8 @@ describe('StatusLabel', () => {
   it('renders an idle status label with a gray background and text', () => {
     props = {
       status: 'Idle',
-      backgroundColor: COLORS.medGreyEnabled,
-      iconColor: COLORS.darkGrey,
+      backgroundColor: COLORS.grey35,
+      iconColor: COLORS.grey50,
       textColor: COLORS.darkBlackEnabled,
       showIcon: false,
     }

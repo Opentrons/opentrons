@@ -71,7 +71,7 @@ const INNER_STYLE_VALUE = css`
 const INNER_STYLE_NO_VALUE = css`
   width: ${SPACING.spacing20};
   min-width: ${SPACING.spacing20};
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50Enabled};
   display: flex;
   border-radius: 1px;
   justify-content: ${JUSTIFY_CENTER};
@@ -79,11 +79,11 @@ const INNER_STYLE_NO_VALUE = css`
 
   &:hover {
     cursor: pointer;
-    color: ${COLORS.darkGreyHover};
+    color: ${COLORS.grey55};
   }
 
   &:active {
-    color: ${COLORS.darkGreyPressed};
+    color: ${COLORS.grey60};
   }
 
   &:focus {
@@ -91,7 +91,7 @@ const INNER_STYLE_NO_VALUE = css`
   }
 
   &:disabled {
-    color: ${COLORS.darkGreyPressed};
+    color: ${COLORS.grey60};
   }
 `
 
@@ -126,13 +126,13 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
           borderRadius="2px"
-          backgroundColor={COLORS.darkGreyDisabled}
+          backgroundColor={COLORS.grey50Disabled}
           size={SIZE_1}
         >
           <Box
             height="1.5px"
             width="0.375rem"
-            backgroundColor={COLORS.darkGreyEnabled}
+            backgroundColor={COLORS.grey50Enabled}
           />
         </Flex>
       ) : (

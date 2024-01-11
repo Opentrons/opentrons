@@ -103,7 +103,7 @@ function NetworkSettingButton({
     &:active {
       background-color: ${chipType === 'success'
         ? COLORS.green3Pressed
-        : COLORS.darkBlack40};
+        : COLORS.grey50};
     }
   `
 
@@ -135,7 +135,7 @@ function NetworkSettingButton({
                   fontSize={TYPOGRAPHY.fontSize28}
                   lineHeight={TYPOGRAPHY.lineHeight36}
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={COLORS.darkBlack70}
+                  color={COLORS.grey60}
                 >
                   {networkName}
                 </StyledText>

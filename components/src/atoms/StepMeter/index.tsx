@@ -22,7 +22,7 @@ export const StepMeter = (props: StepMeterProps): JSX.Element => {
   const StepMeterContainer = css`
     position: ${POSITION_RELATIVE};
     height: ${SPACING.spacing4};
-    background-color: ${COLORS.medGreyEnabled};
+    background-color: ${COLORS.grey35};
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       height: ${SPACING.spacing12};
     }

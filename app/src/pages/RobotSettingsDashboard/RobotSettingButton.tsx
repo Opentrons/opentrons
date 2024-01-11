@@ -30,7 +30,7 @@ const SETTING_BUTTON_STYLE = css`
   border-radius: ${BORDERS.borderRadiusSize4};
 
   &:active {
-    background-color: ${COLORS.darkBlack40};
+    background-color: ${COLORS.grey50};
   }
 `
 
@@ -82,7 +82,7 @@ export function RobotSettingButton({
           </StyledText>
           {settingInfo != null ? (
             <StyledText
-              color={COLORS.darkBlack70}
+              color={COLORS.grey60}
               as="h4"
               fontWeight={TYPOGRAPHY.fontWeightRegular}
               textAlign={TYPOGRAPHY.textAlignLeft}

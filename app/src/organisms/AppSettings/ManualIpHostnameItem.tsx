@@ -28,10 +28,10 @@ const CLOSE_ICON_STYLE = css`
   border-radius: 50%;
 
   &:hover {
-    background: ${COLORS.lightGreyHover};
+    background: ${COLORS.grey35};
   }
   &:active {
-    background: ${COLORS.lightGreyPressed};
+    background: ${COLORS.grey35};
   }
 `
 interface IpHostnameItemProps {
@@ -92,7 +92,7 @@ export function ManualIpHostnameItem({
         </IpItem>
         <StyledText
           as="label"
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey50Enabled}
           css={{
             'white-space': 'nowrap',
           }}

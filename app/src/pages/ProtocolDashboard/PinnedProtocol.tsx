@@ -95,7 +95,7 @@ export function PinnedProtocol(props: {
 
   const PUSHED_STATE_STYLE = css`
     &:active {
-      background-color: ${longpress.isLongPressed ? '' : COLORS.darkBlack40};
+      background-color: ${longpress.isLongPressed ? '' : COLORS.grey50};
     }
   `
 
@@ -129,7 +129,7 @@ export function PinnedProtocol(props: {
         gridGap={SPACING.spacing8}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         width="100%"
-        color={COLORS.darkBlack70}
+        color={COLORS.grey60}
       >
         <StyledText as="p">
           {lastRun !== undefined

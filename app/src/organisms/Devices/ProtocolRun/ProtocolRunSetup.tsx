@@ -252,7 +252,7 @@ export function ProtocolRunSetup({
             <InfoMessage title={t('setup_is_view_only')} />
           ) : null}
           {analysisErrors != null && analysisErrors?.length > 0 ? (
-            <StyledText alignSelf={ALIGN_CENTER} color={COLORS.darkGreyEnabled}>
+            <StyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50Enabled}>
               {t('protocol_analysis_failed')}
             </StyledText>
           ) : (
@@ -313,7 +313,7 @@ export function ProtocolRunSetup({
           )}
         </>
       ) : (
-        <StyledText alignSelf={ALIGN_CENTER} color={COLORS.darkGreyEnabled}>
+        <StyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50Enabled}>
           {t('loading_data')}
         </StyledText>
       )}

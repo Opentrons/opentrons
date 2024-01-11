@@ -21,7 +21,7 @@ const OffsetTableHeader = styled('th')`
   padding: ${SPACING.spacing4};
 `
 const OffsetTableRow = styled('tr')`
-  background-color: ${COLORS.fundamentalsBackground};
+  background-color: ${COLORS.grey35};
   padding: ${SPACING.spacing8};
 `
 

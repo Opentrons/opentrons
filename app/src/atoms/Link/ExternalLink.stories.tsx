@@ -10,7 +10,7 @@ export default {
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof ExternalLink>> = args => (
-  <Flex backgroundColor={COLORS.fundamentalsBackground}>
+  <Flex backgroundColor={COLORS.grey35}>
     <ExternalLink {...args} />
   </Flex>
 )

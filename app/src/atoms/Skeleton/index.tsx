@@ -16,9 +16,9 @@ export const Skeleton = (props: SkeletonProps): JSX.Element => {
     animation: shimmer 2s infinite linear;
     background: linear-gradient(
       to right,
-      ${COLORS.medGreyEnabled} 1%,
+      ${COLORS.grey35} 1%,
       #e3e3e366 25%,
-      ${COLORS.medGreyEnabled} 40%
+      ${COLORS.grey35} 40%
     );
     background-size: ${backgroundSize};
     width: ${width};

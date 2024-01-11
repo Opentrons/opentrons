@@ -30,13 +30,13 @@ import { getWellRangeForLiquidLabwarePair } from './utils'
 const LIQUID_CARD_STYLE = css`
   ${BORDERS.cardOutlineBorder}
   &:hover {
-    border: 1px solid ${COLORS.medGreyHover};
+    border: 1px solid ${COLORS.grey55};
     cursor: pointer;
   }
 `
 const LIQUID_CARD_ODD_STYLE = css`
-  border-color: ${COLORS.medGreyEnabled};
-  border: ${SPACING.spacing4} solid ${COLORS.medGreyEnabled};
+  border-color: ${COLORS.grey35};
+  border: ${SPACING.spacing4} solid ${COLORS.grey35};
   border-radius: ${BORDERS.borderRadiusSize3};
 `
 interface LiquidDetailCardProps {
@@ -116,12 +116,12 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
         <StyledText
           fontSize={TYPOGRAPHY.fontSize22}
           lineHeight={TYPOGRAPHY.lineHeight28}
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey50Enabled}
         >
           {description != null ? description : null}
         </StyledText>
         <Flex
-          backgroundColor={COLORS.darkBlack20}
+          backgroundColor={COLORS.grey35}
           borderRadius={BORDERS.radiusSoftCorners}
           height="2.75rem"
           padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
@@ -137,7 +137,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
       </Flex>
       {selectedValue === liquidId ? (
         <>
-          <Box borderBottom={`3px solid ${COLORS.darkBlack20}`} />
+          <Box borderBottom={`3px solid ${COLORS.grey35}`} />
           <Flex
             padding={SPACING.spacing16}
             flexDirection={DIRECTION_COLUMN}
@@ -158,14 +158,14 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
                   <StyledText
                     lineHeight={TYPOGRAPHY.lineHeight28}
                     fontSize={TYPOGRAPHY.fontSize22}
-                    color={COLORS.darkBlack70}
+                    color={COLORS.grey60}
                   >
                     {well.wellName}
                   </StyledText>
                   <StyledText
                     lineHeight={TYPOGRAPHY.lineHeight28}
                     fontSize={TYPOGRAPHY.fontSize22}
-                    color={COLORS.darkBlack70}
+                    color={COLORS.grey60}
                   >
                     {well.volume} {MICRO_LITERS}
                   </StyledText>
@@ -207,7 +207,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
         >
           {displayName}
         </StyledText>
-        <StyledText as="p" color={COLORS.darkGreyEnabled}>
+        <StyledText as="p" color={COLORS.grey50Enabled}>
           {description != null ? description : null}
         </StyledText>
 

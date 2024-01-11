@@ -398,7 +398,7 @@ const ProtocolName = styled.h4`
   text-align: ${TYPOGRAPHY.textAlignLeft};
   font-size: ${TYPOGRAPHY.fontSize28};
   line-height: ${TYPOGRAPHY.lineHeight36};
-  color: ${COLORS.darkBlack70};
+  color: ${COLORS.grey60};
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -416,7 +416,7 @@ const SummaryDatum = styled.div`
   height: 44px;
   background: #d6d6d6;
   border-radius: 4px;
-  color: ${COLORS.darkBlack90};
+  color: ${COLORS.grey60};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};

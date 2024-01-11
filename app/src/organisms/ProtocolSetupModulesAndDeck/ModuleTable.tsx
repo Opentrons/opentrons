@@ -83,7 +83,7 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       <Flex
-        color={COLORS.darkBlack70}
+        color={COLORS.grey60}
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         gridGap={SPACING.spacing24}

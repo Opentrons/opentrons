@@ -97,8 +97,8 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     }
 
     &:disabled {
-      background-color: ${COLORS.darkBlack20};
-      color: ${COLORS.darkBlack60};
+      background-color: ${COLORS.grey35};
+      color: ${COLORS.grey50};
     }
   `
   return (
@@ -122,7 +122,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
         aria-label={`${iconName} icon`}
         color={
           disabled
-            ? COLORS.darkBlack60
+            ? COLORS.grey50
             : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
         }
         size="5rem"

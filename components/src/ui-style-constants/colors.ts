@@ -48,12 +48,9 @@ export const lightGreyPressed = `${darkBlackEnabled}${opacity17HexCode}`
 export const lightGreyHover = `${darkBlackEnabled}${opacity10HexCode}`
 export const medGreyEnabled = '#e3e3e3'
 export const medGreyHover = '#b8b8b8'
-export const medGreyPressed = '#5a5a5e'
-export const medGreySelected = '#5a5a5e'
 export const darkGreyEnabled = '#707075'
 export const darkGreyHover = '#646468'
 export const darkGreyPressed = '#5a5a5e'
-export const darkGreySelected = '#5a5a5e'
 export const darkGreyDisabled = '#eaeaeb'
 
 // colors success

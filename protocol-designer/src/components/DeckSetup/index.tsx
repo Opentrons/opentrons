@@ -113,7 +113,7 @@ interface ContentsProps {
 }
 
 const lightFill = COLORS.light1
-const darkFill = COLORS.darkBlack70
+const darkFill = COLORS.grey60
 
 export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   const {
@@ -618,7 +618,7 @@ export const DeckSetup = (): JSX.Element => {
                               robotType={robotType}
                               trashIconColor={lightFill}
                               trashCutoutId={cutoutId as TrashCutoutId}
-                              backgroundColor={COLORS.grey2}
+                              backgroundColor={COLORS.grey50}
                             />
                           </React.Fragment>
                         ) : null

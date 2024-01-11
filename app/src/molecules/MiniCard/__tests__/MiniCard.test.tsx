@@ -29,9 +29,7 @@ describe('MiniCard', () => {
     const { getByText } = render(props)
     const miniCard = getByText('mock mini card')
     expect(miniCard).toHaveStyle(`background-color: ${String(COLORS.white)}`)
-    expect(miniCard).toHaveStyle(
-      `border: 1px solid ${String(COLORS.medGreyEnabled)}`
-    )
+    expect(miniCard).toHaveStyle(`border: 1px solid ${String(COLORS.grey35)}`)
     expect(miniCard).toHaveStyle(
       `border-radius: ${String(BORDERS.radiusSoftCorners)}`
     )

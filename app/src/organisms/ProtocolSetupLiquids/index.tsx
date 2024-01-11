@@ -115,7 +115,7 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
         </Flex>
         <Flex justifyContent={JUSTIFY_FLEX_END} flex="1">
           <Flex
-            backgroundColor={COLORS.darkBlack20}
+            backgroundColor={COLORS.grey35}
             borderRadius={BORDERS.radiusSoftCorners}
             height="2.75rem"
             padding={`${SPACING.spacing8} ${SPACING.spacing12}`}

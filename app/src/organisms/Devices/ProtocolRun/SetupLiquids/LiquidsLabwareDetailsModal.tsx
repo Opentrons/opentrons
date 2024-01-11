@@ -167,7 +167,7 @@ export const LiquidsLabwareDetailsModal = (
       <Box
         paddingX={SPACING.spacing16}
         paddingTop={SPACING.spacing16}
-        backgroundColor={COLORS.fundamentalsBackground}
+        backgroundColor={COLORS.grey35}
         height="28.125rem"
       >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
@@ -193,7 +193,7 @@ export const LiquidsLabwareDetailsModal = (
                 <StyledText
                   as="h6"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={COLORS.darkGreyEnabled}
+                  color={COLORS.grey50Enabled}
                 >
                   {t('slot_number')}
                 </StyledText>
@@ -212,7 +212,7 @@ export const LiquidsLabwareDetailsModal = (
                 <StyledText
                   as="h6"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={COLORS.darkGreyEnabled}
+                  color={COLORS.grey50Enabled}
                 >
                   {t('labware_name')}
                 </StyledText>

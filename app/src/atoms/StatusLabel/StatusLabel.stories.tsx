@@ -31,8 +31,8 @@ Holding.args = {
 export const Idle = Template.bind({})
 Idle.args = {
   status: 'Idle',
-  backgroundColor: COLORS.medGreyEnabled,
-  iconColor: COLORS.darkGreyEnabled,
+  backgroundColor: COLORS.grey35,
+  iconColor: COLORS.grey50Enabled,
   pulse: true,
 }
 

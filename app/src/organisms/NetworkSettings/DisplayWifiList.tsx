@@ -43,19 +43,19 @@ const NETWORK_ROW_STYLE = css`
   }
 
   &:focus {
-    background-color: ${COLORS.light1Pressed};
+    background-color: ${COLORS.grey40};
     color: ${COLORS.darkBlack100};
     box-shadow: none;
   }
   &:active {
-    background-color: ${COLORS.light1Pressed};
+    background-color: ${COLORS.grey40};
     color: ${COLORS.darkBlack100};
   }
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
   }
   &:disabled {
-    color: ${COLORS.darkBlack60};
+    color: ${COLORS.grey50};
   }
 `
 
