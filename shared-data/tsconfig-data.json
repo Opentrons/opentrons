@@ -7,7 +7,9 @@
     "rootDir": ".",
     "outDir": "lib"
   },
+  "module": "ESNext",
   "include": [
+    "vite.config.ts",
     "deck/**/*.json",
     "labware/**/*.json",
     "liquid/**/*.json",

@@ -1,7 +1,7 @@
 /* button styling */
 @import '..';
 
-:root {
+#root {
   --button-pad: 0.5rem;
 
   --button-disabled : {

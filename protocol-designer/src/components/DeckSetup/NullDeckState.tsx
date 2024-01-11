@@ -1,8 +1,8 @@
 import * as React from 'react'
+import { getDeckDefinitions } from '@opentrons/shared-data'
 import {
   FONT_SIZE_BODY_1,
   FONT_WEIGHT_BOLD,
-  getDeckDefinitions,
   RobotCoordsText,
   RobotWorkSpace,
   TEXT_TRANSFORM_UPPERCASE,

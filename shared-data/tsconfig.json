@@ -4,8 +4,10 @@
   "compilerOptions": {
     "composite": true,
     "rootDir": ".",
-    "outDir": "lib"
+    "outDir": "lib",
+    "moduleResolution": "Node",
   },
+  "module": "ESNext",
   "include": [
     "js",
     "protocol",

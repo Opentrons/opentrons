@@ -17,6 +17,8 @@ initialize(store)
 // initialize analytics
 initializeMixpanel(store.getState())
 
+console.log({pdMeta: import.meta})
+
 const render = (Component: any): void => {
   ReactDOM.render(
     <Provider store={store}>
@@ -29,12 +31,5 @@ const render = (Component: any): void => {
     document.getElementById('root')
   )
 }
-
+console.log('ABOUT TO RENDER')
 render(App)
-
-// Hot Module Replacement API
-if (module.hot) {
-  module.hot.accept('./components/App', () => {
-    render(App)
-  })
-}

@@ -1,7 +1,7 @@
 @import '@opentrons/components/styles';
 
 /* TODO Ian 2018-02-16: this is copied from LabwareWrapper.css in complib -- should it be imported in index.css? */
-:root {
+#root {
   --round-slot: {
     clip-path: url(#roundSlotClipPath);
   }

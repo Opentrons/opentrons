@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "module": "commonjs",
+    "module": "es2020",
     "jsx": "preserve",
     "declaration": true,
     "emitDeclarationOnly": true,
@@ -10,6 +10,10 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "noErrorTruncation": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["vite/client"],
+    "paths": {
+      "@opentrons/shared-data": ["./shared-data"]
+    }
   }
 }

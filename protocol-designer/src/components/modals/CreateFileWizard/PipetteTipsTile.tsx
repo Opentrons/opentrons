@@ -164,6 +164,8 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
     selectedPipetteName: selectedPipetteName,
   })
 
+  console.log({tiprackOptions})
+
   const defaultTiprackOptions = tiprackOptions.filter(option =>
     allowAllTipracks
       ? !option.value.includes('custom_beta')
@@ -179,7 +181,11 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
 
   React.useEffect(() => {
     if (currentValue === undefined) {
-      setFieldValue(nameAccessor, tiprackOptions[0]?.value ?? '')
+      setTimeout(() => {
+        console.log('updating field value')
+        console.log({ nameAccessor, tiprack: tiprackOptions[0]?.value ?? '' })
+        setFieldValue(nameAccessor, tiprackOptions[0]?.value ?? '')
+      })
     }
   }, [currentValue, setFieldValue, nameAccessor, tiprackOptions])
 

@@ -32,7 +32,7 @@ export const announcements: Announcement[] = [
       <div className={styles.modules_diagrams_row}>
         <img
           className={styles.modules_diagram}
-          src={require('../../../images/modules/magdeck_tempdeck_combined.png')}
+          src={import('../../../images/modules/magdeck_tempdeck_combined.png')}
         />
       </div>
     ),
@@ -58,7 +58,7 @@ export const announcements: Announcement[] = [
       <div className={styles.thermocycler_diagram_row}>
         <img
           className={styles.modules_diagram}
-          src={require('../../../images/modules/thermocycler.jpg')}
+          src={import('../../../images/modules/thermocycler.jpg')}
         />
       </div>
     ),
@@ -98,9 +98,9 @@ export const announcements: Announcement[] = [
     announcementKey: 'batchEditTransfer',
     image: (
       <Flex css={batchEditStyles}>
-        <img src={require('../../../images/announcements/multi_select.gif')} />
+        <img src={import('../../../images/announcements/multi_select.gif')} />
 
-        <img src={require('../../../images/announcements/batch_edit.gif')} />
+        <img src={import('../../../images/announcements/batch_edit.gif')} />
       </Flex>
     ),
     heading: "We've updated the Protocol Designer",
@@ -132,7 +132,7 @@ export const announcements: Announcement[] = [
       <div className={styles.modules_diagrams_row}>
         <img
           className={styles.modules_diagram}
-          src={require('../../../images/modules/heatershaker.png')}
+          src={import('../../../images/modules/heatershaker.png')}
         />
       </div>
     ),
@@ -155,7 +155,7 @@ export const announcements: Announcement[] = [
       <div className={styles.modules_diagrams_row}>
         <img
           className={styles.modules_diagram}
-          src={require('../../../images/modules/thermocycler_gen2.png')}
+          src={import('../../../images/modules/thermocycler_gen2.png')}
         />
       </div>
     ),
@@ -179,7 +179,7 @@ export const announcements: Announcement[] = [
       <div className={styles.modules_diagrams_color_enhancements}>
         <img
           className={styles.modules_diagram}
-          src={require('../../../images/announcements/liquid-enhancements.gif')}
+          src={import('../../../images/announcements/liquid-enhancements.gif')}
         />
       </div>
     ),
@@ -203,7 +203,7 @@ export const announcements: Announcement[] = [
         <img
           height="240"
           width="240"
-          src={require('../../../images/OpentronsFlex.png')}
+          src={import('../../../images/OpentronsFlex.png')}
         />
       </Flex>
     ),
@@ -226,7 +226,7 @@ export const announcements: Announcement[] = [
       <Flex justifyContent={JUSTIFY_CENTER} paddingTop={SPACING.spacing8}>
         <img
           width="340"
-          src={require('../../../images/deck_configuration.png')}
+          src={import('../../../images/deck_configuration.png')}
         />
       </Flex>
     ),

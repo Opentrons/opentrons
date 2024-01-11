@@ -8,7 +8,12 @@
   "compilerOptions": {
     "composite": true,
     "rootDir": "src",
-    "outDir": "lib"
+    "outDir": "lib",
+    "paths": {
+      "@opentrons/shared-data": ["../shared-data"]
+    },
+    "module": "ESNext",
+    "types": ["vite/client"]
   },
   "include": ["typings", "src"],
   "exclude": ["**/*.stories.tsx"]

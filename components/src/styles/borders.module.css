@@ -1,6 +1,6 @@
 @import './colors.module.css';
 
-:root {
+#root {
   /* borders */
   --bd-radius-default: 2px;
   --bd-radius-form-field: 3px;

@@ -160,9 +160,11 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
   const currentValue = values.pipettesByMount[mount].pipetteName
   React.useEffect(() => {
     if (currentValue === undefined) {
-      setFieldValue(
-        nameAccessor,
-        allowNoPipette ? '' : pipetteOptions[0]?.value ?? ''
+      setTimeout(() =>
+        setFieldValue(
+          nameAccessor,
+          allowNoPipette ? '' : pipetteOptions[0]?.value ?? ''
+        )
       )
     }
   }, [

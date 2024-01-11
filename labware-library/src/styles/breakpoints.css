@@ -1,6 +1,6 @@
 /* mobile-first custom media queries */
 
-:root {
+#root {
   --screen-width-small: 480px;
   --screen-width-medium: 768px;
   --screen-width-desktop: 1024px;

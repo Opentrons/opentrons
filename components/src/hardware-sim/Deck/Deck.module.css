@@ -1,6 +1,6 @@
 @import '../..';
 
-:root {
+#root {
   --deck-element: {
     fill: #fff;
     stroke: var(--c-plate-bg);

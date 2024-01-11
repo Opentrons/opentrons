@@ -4,16 +4,12 @@ import { css } from 'styled-components'
 import { Box, POSITION_FIXED } from '@opentrons/components'
 import * as fileDataSelectors from '../file-data/selectors'
 
-const waitCursorStyle = css`
-  cursor: wait;
-`
 
 export const ComputingSpinner = (): JSX.Element | null => {
-  const showSpinner = useSelector(fileDataSelectors.getTimelineIsBeingComputed)
+  const showSpinner = false
 
   return showSpinner ? (
     <Box
-      css={waitCursorStyle}
       opacity={0}
       zIndex={999}
       position={POSITION_FIXED}

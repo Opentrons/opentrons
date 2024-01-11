@@ -403,6 +403,7 @@ export const getPipettesForInstrumentGroup: Selector<
     ) => {
       const pipetteSpec = pipetteOnDeck.spec
       const tiprackDef = pipetteOnDeck.tiprackLabwareDef
+      console.log({pipetteOnDeck})
       const pipetteForInstrumentGroup: InstrumentInfoProps = {
         mount: pipetteOnDeck.mount,
         pipetteSpecs: pipetteSpec,

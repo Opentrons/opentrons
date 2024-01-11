@@ -2,7 +2,7 @@
 @import '../styles/breakpoints.css';
 @import '../styles/spacing.css';
 
-:root {
+#root {
   --link-btn-blue: {
     display: inline-block;
     width: auto;

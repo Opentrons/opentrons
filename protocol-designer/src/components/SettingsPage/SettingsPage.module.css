@@ -1,6 +1,6 @@
 @import '@opentrons/components/styles';
 
-:root {
+#root {
   --mw-labeled-toggle: 25rem;
 }
 
@@ -42,6 +42,11 @@
 }
 
 .feature_flag_description {
+  --font-body-2-dark: {
+    font-size: var(--fs-body-2);
+    font-weight: var(--fw-regular);
+    color: var(--c-font-dark);
+  };
   @apply --font-body-2-dark;
 
   & p {

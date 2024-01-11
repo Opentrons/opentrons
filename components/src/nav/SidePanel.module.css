@@ -1,6 +1,6 @@
 @import '..';
 
-:root {
+#root {
   --sidebar-width: 18.25rem;
 }
 

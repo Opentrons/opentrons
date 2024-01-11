@@ -11,9 +11,9 @@ import { DisabledPathMap, ValuesForPath } from './getDisabledPathMap'
 import styles from '../../StepEditForm.module.css'
 
 const PATH_ANIMATION_IMAGES = {
-  single: require('../../../../images/path_single.gif'),
-  multiAspirate: require('../../../../images/path_multiAspirate.gif'),
-  multiDispense: require('../../../../images/path_multiDispense.gif'),
+  single: import('../../../../images/path_single.gif'),
+  multiAspirate: import('../../../../images/path_multiAspirate.gif'),
+  multiDispense: import('../../../../images/path_multiDispense.gif'),
 }
 
 const ALL_PATH_OPTIONS: Array<{ name: PathOption; image: string }> = [

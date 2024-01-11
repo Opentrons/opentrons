@@ -13,67 +13,70 @@ type Diagrams = Record<string, string[]>
 
 const FOOTPRINT_DIAGRAMS: Diagrams = {
   wellPlate: [
-    require('./images/dimensions/footprint@3x.png'),
-    require('./images/dimensions/height-plate-and-reservoir@3x.png'),
+    new URL('./images/dimensions/footprint@3x.png', import.meta.url).href,
+    new URL(
+      './images/dimensions/height-plate-and-reservoir@3x.png',
+      import.meta.url
+    ).href,
   ],
   tipRack: [
-    require('./images/dimensions/footprint@3x.png'),
-    require('./images/dimensions/height-tip-rack@3x.png'),
+    import('./images/dimensions/footprint@3x.png'),
+    import('./images/dimensions/height-tip-rack@3x.png'),
   ],
   tubeRack: [
-    require('./images/dimensions/footprint@3x.png'),
-    require('./images/dimensions/height-tube-rack@3x.png'),
+    import('./images/dimensions/footprint@3x.png'),
+    import('./images/dimensions/height-tube-rack@3x.png'),
   ],
   reservoir: [
-    require('./images/dimensions/footprint@3x.png'),
-    require('./images/dimensions/height-plate-and-reservoir@3x.png'),
+    import('./images/dimensions/footprint@3x.png'),
+    import('./images/dimensions/height-plate-and-reservoir@3x.png'),
   ],
   irregular: [
-    require('./images/dimensions/footprint@3x.png'),
-    require('./images/dimensions/height-tube-rack-irregular@3x.png'),
+    import('./images/dimensions/footprint@3x.png'),
+    import('./images/dimensions/height-tube-rack-irregular@3x.png'),
   ],
   adapter: [
-    require('./images/dimensions/footprint@3x.png'),
-    require('./images/dimensions/height-plate-and-reservoir@3x.png'),
+    import('./images/dimensions/footprint@3x.png'),
+    import('./images/dimensions/height-plate-and-reservoir@3x.png'),
   ],
 }
 
 const ALUM_BLOCK_FOOTPRINTS: Diagrams = {
   tubeRack: [
-    require('./images/dimensions/footprint@3x.png'),
-    require('./images/dimensions/height-alum-block-tubes@3x.png'),
+    import('./images/dimensions/footprint@3x.png'),
+    import('./images/dimensions/height-alum-block-tubes@3x.png'),
   ],
   wellPlate: [
-    require('./images/dimensions/footprint@3x.png'),
-    require('./images/dimensions/height-alum-block-plate@3x.png'),
+    import('./images/dimensions/footprint@3x.png'),
+    import('./images/dimensions/height-alum-block-plate@3x.png'),
   ],
 }
 
 const RESERVOIR_SPACING_DIAGRAMS: Diagrams = {
   singleRow: [
-    require('./images/offset/offset-reservoir@3x.png'),
-    require('./images/spacing/spacing-reservoir@3x.png'),
+    import('./images/offset/offset-reservoir@3x.png'),
+    import('./images/spacing/spacing-reservoir@3x.png'),
   ],
   multiRow: [
-    require('./images/offset/offset-reservoir@3x.png'),
-    require('./images/spacing/spacing-reservoir-multi-row@3x.png'),
+    import('./images/offset/offset-reservoir@3x.png'),
+    import('./images/spacing/spacing-reservoir-multi-row@3x.png'),
   ],
 }
 
 const SPACING_DIAGRAMS: Diagrams = {
   circular: [
-    require('./images/offset/offset-well-circular@3x.png'),
-    require('./images/spacing/spacing-well-circular@3x.png'),
+    import('./images/offset/offset-well-circular@3x.png'),
+    import('./images/spacing/spacing-well-circular@3x.png'),
   ],
   rectangular: [
-    require('./images/offset/offset-well-rectangular@3x.png'),
-    require('./images/spacing/spacing-well-rectangular@3x.png'),
+    import('./images/offset/offset-well-rectangular@3x.png'),
+    import('./images/spacing/spacing-well-rectangular@3x.png'),
   ],
 }
 
 const TIPRACK_MEASUREMENT_DIAGRAMS: string[] = [
-  require('./images/depth/length-tip-rack@3x.png'),
-  require('./images/shape/shape-circular@3x.png'),
+  import('./images/depth/length-tip-rack@3x.png'),
+  import('./images/shape/shape-circular@3x.png'),
 ]
 
 type NestedDiagrams = Record<string, Record<string, string[]>>
@@ -81,64 +84,64 @@ type NestedDiagrams = Record<string, Record<string, string[]>>
 const PLATE_MEASUREMENT_DIAGRAMS: NestedDiagrams = {
   flat: {
     circular: [
-      require('./images/depth/depth-plate-flat@3x.png'),
-      require('./images/shape/shape-circular@3x.png'),
+      import('./images/depth/depth-plate-flat@3x.png'),
+      import('./images/shape/shape-circular@3x.png'),
     ],
     rectangular: [
-      require('./images/depth/depth-plate-flat@3x.png'),
-      require('./images/shape/shape-rectangular@3x.png'),
+      import('./images/depth/depth-plate-flat@3x.png'),
+      import('./images/shape/shape-rectangular@3x.png'),
     ],
   },
   u: {
     circular: [
-      require('./images/depth/depth-plate-round@3x.png'),
-      require('./images/shape/shape-circular@3x.png'),
+      import('./images/depth/depth-plate-round@3x.png'),
+      import('./images/shape/shape-circular@3x.png'),
     ],
     rectangular: [
-      require('./images/depth/depth-plate-round@3x.png'),
-      require('./images/shape/shape-rectangular@3x.png'),
+      import('./images/depth/depth-plate-round@3x.png'),
+      import('./images/shape/shape-rectangular@3x.png'),
     ],
   },
   v: {
     circular: [
-      require('./images/depth/depth-plate-v@3x.png'),
-      require('./images/shape/shape-circular@3x.png'),
+      import('./images/depth/depth-plate-v@3x.png'),
+      import('./images/shape/shape-circular@3x.png'),
     ],
     rectangular: [
-      require('./images/depth/depth-plate-v@3x.png'),
-      require('./images/shape/shape-rectangular@3x.png'),
+      import('./images/depth/depth-plate-v@3x.png'),
+      import('./images/shape/shape-rectangular@3x.png'),
     ],
   },
 }
 const MEASUREMENT_DIAGRAMS: NestedDiagrams = {
   flat: {
     circular: [
-      require('./images/depth/depth-reservoir-and-tubes-flat@3x.png'),
-      require('./images/shape/shape-circular@3x.png'),
+      import('./images/depth/depth-reservoir-and-tubes-flat@3x.png'),
+      import('./images/shape/shape-circular@3x.png'),
     ],
     rectangular: [
-      require('./images/depth/depth-reservoir-and-tubes-flat@3x.png'),
-      require('./images/shape/shape-rectangular@3x.png'),
+      import('./images/depth/depth-reservoir-and-tubes-flat@3x.png'),
+      import('./images/shape/shape-rectangular@3x.png'),
     ],
   },
   u: {
     circular: [
-      require('./images/depth/depth-reservoir-and-tubes-round@3x.png'),
-      require('./images/shape/shape-circular@3x.png'),
+      import('./images/depth/depth-reservoir-and-tubes-round@3x.png'),
+      import('./images/shape/shape-circular@3x.png'),
     ],
     rectangular: [
-      require('./images/depth/depth-reservoir-and-tubes-round@3x.png'),
-      require('./images/shape/shape-rectangular@3x.png'),
+      import('./images/depth/depth-reservoir-and-tubes-round@3x.png'),
+      import('./images/shape/shape-rectangular@3x.png'),
     ],
   },
   v: {
     circular: [
-      require('./images/depth/depth-reservoir-and-tubes-v@3x.png'),
-      require('./images/shape/shape-circular@3x.png'),
+      import('./images/depth/depth-reservoir-and-tubes-v@3x.png'),
+      import('./images/shape/shape-circular@3x.png'),
     ],
     rectangular: [
-      require('./images/depth/depth-reservoir-and-tubes-v@3x.png'),
-      require('./images/shape/shape-rectangular@3x.png'),
+      import('./images/depth/depth-reservoir-and-tubes-v@3x.png'),
+      import('./images/shape/shape-rectangular@3x.png'),
     ],
   },
 }

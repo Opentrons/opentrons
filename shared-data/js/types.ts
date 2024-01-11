@@ -186,6 +186,8 @@ export interface LabwareDefinition2 {
   allowedRoles?: LabwareRoles[]
 }
 
+export type LabwareDefByDefURI = Record<string, LabwareDefinition2>
+
 export type ModuleType =
   | typeof MAGNETIC_MODULE_TYPE
   | typeof TEMPERATURE_MODULE_TYPE

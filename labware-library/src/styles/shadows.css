@@ -1,5 +1,5 @@
 /* box-shadow settings */
 
-:root {
+#root {
   --shadow-1: 0 2px 2px rgba(0, 0, 0, 0.2);
 }

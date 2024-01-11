@@ -1,9 +1,6 @@
 import path from 'path'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import postCssApply from 'postcss-apply'
-import postCssImport from 'postcss-import'
-console.log({ postCssApply: postCssApply() })
 
 export default defineConfig({
   build: {
@@ -15,16 +12,10 @@ export default defineConfig({
     esbuildOptions: {
       target: 'es2020',
     },
-    include: ['@opentrons/shared-data'],
   },
   css: {
     postcss: {
-      plugins: [
-        postCssImport({
-          root: 'src/',
-        }),
-        postCssApply(),
-      ],
+      plugins: [],
     },
   },
   define: {

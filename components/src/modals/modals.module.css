@@ -1,7 +1,7 @@
 /* common styling for modals */
 @import '..';
 
-:root {
+#root {
   --modal-contents: {
     z-index: 1;
     width: 100%;

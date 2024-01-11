@@ -22,6 +22,7 @@
   "dependencies": {
     "@hot-loader/react-dom": "17.0.1",
     "@vitejs/plugin-react": "^4.2.1",
+    "@vituum/vite-plugin-postcss": "1.1.0",
     "@opentrons/components": "link:../components",
     "@opentrons/step-generation": "link:../step-generation",
     "@opentrons/shared-data": "link:../shared-data",
@@ -57,6 +58,12 @@
     "vite": "5.0.5",
     "yup": "0.26.6",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.4"
+    "eslint-plugin-react-refresh": "^0.4.4",
+    "postcss-apply": "0.12.0",
+    "postcss-import": "16.0.0",
+    "autoprefixer": "^10.0.2",
+    "postcss": "^8.1.7",
+    "postcss-loader": "^4.0.4"
+
   }
 }
