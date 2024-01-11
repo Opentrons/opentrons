@@ -1,6 +1,6 @@
 /* cursor styling */
 
-#root {
+:root {
   --clickable: {
     cursor: pointer;
   };

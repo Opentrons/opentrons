@@ -1,7 +1,7 @@
 /* TitleBar styles */
-@import '..';
+@import '../index.module.css';
 
-#root {
+:root {
   --card-disabled: {
     color: var(--c-font-disabled);
     fill: var(--c-font-disabled);

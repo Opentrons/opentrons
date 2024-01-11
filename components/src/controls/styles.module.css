@@ -1,6 +1,6 @@
-@import '../index.css';
+@import '../index.module.css';
 
-#root {
+:root {
   --mw-labeled-toggle: 25rem;
 }
 

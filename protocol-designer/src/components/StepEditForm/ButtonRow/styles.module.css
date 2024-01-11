@@ -1,4 +1,4 @@
-#root {
+:root {
   --form-max-width: 55rem; /* 'breakpoint' for gutter */
   --form-button-width: 6.25rem;
   --form-button-margin: 0.625rem;

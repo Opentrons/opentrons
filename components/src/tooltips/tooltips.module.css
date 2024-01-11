@@ -1,5 +1,5 @@
 /* common styling for tooltips */
-@import '..';
+@import '../index.module.css';
 
 .tooltip_box {
   @apply --font-body-1-light;

@@ -1,6 +1,6 @@
 @import '@opentrons/components/styles';
 
-#root {
+:root {
   --mw-labeled-toggle: 25rem;
 }
 

@@ -1,4 +1,4 @@
-@import '..';
+@import '../index.module.css';
 
 .fallback_plate_text {
   height: 100%;

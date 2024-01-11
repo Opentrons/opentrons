@@ -1,4 +1,4 @@
-@import '../../..';
+@import '../../../index.module.css';
 
 .labware_detail_group {
   fill: none;

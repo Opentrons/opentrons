@@ -1,5 +1,5 @@
 /* stylelint-disable selector-class-pattern */
-@import '..';
+@import '../index.module.css';
 
 /* NOTE(mc, 2021-04-27): this class only used by storybook */
 .example_select_override {

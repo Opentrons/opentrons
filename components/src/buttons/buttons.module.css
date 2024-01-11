@@ -1,7 +1,7 @@
 /* button styling */
-@import '..';
+@import '../index.module.css';
 
-#root {
+:root {
   --button-pad: 0.5rem;
 
   --button-disabled : {

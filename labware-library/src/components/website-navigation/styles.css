@@ -4,7 +4,7 @@
 @import '../../styles/shadows.css';
 @import '../../styles/spacing.css';
 
-#root {
+:root {
   --c-nav-gray: #707070;
   --spacing-subdomain: 2.5rem;
   --spacing-nav: 1.75rem;

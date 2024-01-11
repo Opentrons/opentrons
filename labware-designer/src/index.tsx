@@ -12,7 +12,7 @@ console.log('Functions are available under global "sharedData":', sharedData)
 const $root = document.getElementById('root')
 
 if (!$root) {
-  throw new Error('fatal: #root not found')
+  throw new Error('fatal: :root not found')
 }
 
 ReactDOM.render(

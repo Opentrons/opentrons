@@ -1,4 +1,4 @@
-@import '../..';
+@import '../../index.module.css';
 
 .highlighted_well {
   stroke: var(--c-blue-enabled);

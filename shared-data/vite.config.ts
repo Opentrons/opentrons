@@ -24,7 +24,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@opentrons/components/styles': `@opentrons/components/src/index.css`,
+      '@opentrons/components/styles': `@opentrons/components/src/index.module.css`,
       '@opentrons/components': `@opentrons/components/src/index.ts`,
       '@opentrons/shared-data': `@opentrons/shared-data/js/index.ts`,
       '@opentrons/step-generation': `@opentrons/step-generation/src/index.ts`,

@@ -1,6 +1,6 @@
-@import '..';
+@import '../index.module.css';
 
-#root {
+:root {
   --list-padding-large: 1rem;
   --list-padding-small: 0.75rem;
 

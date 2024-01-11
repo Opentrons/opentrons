@@ -1,4 +1,4 @@
-@import '..';
+@import '../index.module.css';
 
 .pill {
   border-radius: var(--bd-radius-pill);
