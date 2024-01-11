@@ -127,7 +127,14 @@ This keeps tip tracking consistent across each type of pickup. And it reduces th
 Tip Pickup and Conflicts
 ========================
 
-The horizontally offset position of the 96-channel pipette during partial tip pickup  places restrictions on where you can put other tall labware on the deck. The restrictions vary depending on the layout. For column layouts, Opentrons recommends using column 12. Currently, this is the *only* partial nozzle configuration for which the API will automatically detect labware placed in locations that could cause collisions, and raise errors to prevent them.
+The horizontally offset position of the 96-channel pipette during partial tip pickup  places restrictions on where you can put other tall labware on the deck. The restrictions vary depending on the layout. For column layouts, Opentrons recommends using column 12.
+
+The API will raise errors for potential labware crashes when using a column partial configuration. Nevertheless, it's a good idea to do the following when working with partial tip pickup:
+
+    - Plan your deck layout carefully. Make a diagram and visualize everywhere the pipette will travel.
+    - Simulate your protocol and compare the run preview to your expectations of where the pipette will travel.
+    - Perform a dry run with only tip racks on the deck. Have the Emergency Stop Pendant handy in case you see an impending crash.
+
 
 Using Column 12
 ---------------
@@ -155,8 +162,6 @@ You would get a similar error trying to aspirate from or dispense into a well pl
 .. tip::
 
     When using column 12 for partial tip pickup and pipetting, generally organize your deck with the shortest labware on the left side of the deck, and the tallest labware on the right side.
-    
-One limitation of the column 12 nozzle layout is that it can't access column 1 wells of labware loaded onto the Thermocycler Module. If you need to use all 96 wells on the Thermocycler, you can temporarily switch to the column 1 nozzle layout.
 
 Using Column 1
 --------------
@@ -168,9 +173,7 @@ If your application can't accommodate a deck layout that works well with column 
         start="A1",
     )
 
-This configuration has several drawbacks compared to using column 12.
-
-First, tip tracking is not available with column 1. You must always specify a ``location`` parameter for :py:meth:`.pick_up_tip`. This *requires careful tip tracking* so you don't place the pipette over more than a single column of unused tips at once. You can write some additional code to manage valid tip pickup locations, like this::
+The major drawbacks of this configuration, compared to using column 12, is that tip tracking is not available with column 1. You must always specify a ``location`` parameter for :py:meth:`.pick_up_tip`. This *requires careful tip tracking* so you don't place the pipette over more than a single column of unused tips at once. You can write some additional code to manage valid tip pickup locations, like this::
 
     tip_rack = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "C1")
     pipette.configure_nozzle_layout(style=COLUMN, start="A1")
@@ -182,15 +185,4 @@ First, tip tracking is not available with column 1. You must always specify a ``
 
 This code first constructs a list of all the wells in row A of the tip rack. Then, when picking up a tip, instead of referencing one of those wells directly, the ``location`` is set to ``row_a.pop()``. This uses the built-in :py:meth:`pop` method to get the last item from the list and remove it from the list. If you keep using this approach to pick up tips, you'll get an error once the tip rack is empty — not from the API, but from Python itself, since you're trying to ``pop`` an item from an empty list.
 
-Second, the API does not provide the same collision detection for the column 1 layout that it does for column 12.
-
-.. warning::
-
-    The API *will not* raise errors for potential labware crashes when using a column 1 partial configuration. If you must use one:
-
-    - Plan your deck layout carefully. Make a diagram and visualize everywhere the pipette will travel.
-    - Simulate your protocol and compare the run preview to your expectations of where the pipette will travel.
-    - Perform a dry run with only tip racks on the deck. Have the Emergency Stop Pendant handy in case you see an impending crash.
-    
 Finally, you can't access the rightmost columns in labware in column 3, since they are beyond the movement limit of the pipette. The exact number of inaccessible columns varies by labware type. Any well that is within 28 mm of the right edge of the slot is inaccessible in a column 12 configuration. Call ``configure_nozzle_layout()`` again to switch to a column 1 layout if you need to pipette in that area.
-
