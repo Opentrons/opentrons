@@ -1,0 +1,71 @@
+from ast import Try
+import sys, os, time, datetime
+import pandas as pd
+
+if __name__ == '__main__':
+    df = pd.DataFrame()
+    test_type_list = {'E', 'P'}
+
+    # Gets the current working directory
+    current_working_directory = os.getcwd()
+    test_type   = input('Test Type (E/P): ')
+    if test_type    == 'E':
+        subfolder = 'Evaporation Results/'
+    elif test_type  == 'P':
+        subfolder = 'Protocol Results/'
+    else:
+        print(f'Your input was: {test_type}. Expected input was {test_type_list}')
+        test_type = input('Test Type (E/P): ' )
+    new_folder_path = os.path.join(current_working_directory, subfolder)
+    folders_in_directory = os.listdir(new_folder_path)
+    analysis_folder = input(f'Desired Folder, Available Folders: {folders_in_directory} ')
+    analysis_folder_path = os.path.join(new_folder_path, analysis_folder)
+    analysis_results_folder = os.path.join(analysis_folder_path, 'Results')
+    if not os.path.exists(analysis_results_folder):
+        os.makedirs(analysis_results_folder)
+    final_df = pd.DataFrame()
+    i = 0
+    for filename in os.listdir(analysis_folder_path):
+        if filename.endswith(".csv"):
+            path = os.path.join(analysis_folder_path, filename)
+            df = pd.read_csv(path)
+            date, robot, step, sample = filename.split('_')[:4]
+            sample = sample.split('.')[0]
+            df['Sample Name'] = filename
+            sample_num = filename.split('_')[2].split('.')[0]
+            df['Date'] = pd.to_datetime(df['Date'])
+            duration = (df['Date'].iloc[-1] - df['Date'].iloc[0]).total_seconds()
+            mass_stable = df.loc[df['Stable'] == 1, 'Scale Reading'].iloc[0]
+            date = str(df['Date'][0]).split(' ')[0]
+            df_summary = pd.DataFrame({'Date': date, 'File Name': filename, 'Plate State': step, 'Robot': robot, 'Stabilization Duration (sec)': duration, 'Mass (g)': mass_stable, 'Sample' : sample}, index = [i])
+            final_df = pd.concat([df_summary, final_df])
+            i = i+1
+            
+    # Pivot the DataFrame
+    pivoted_df = final_df.pivot_table(index=['Date', 'Robot', 'Sample'], columns='Plate State', values=[ 'Mass (g)'], aggfunc='first').reset_index()
+
+    # Flatten the MultiIndex columns
+    pivoted_df.columns = [f'{col[0]}_{col[1]}' if col[1] else col[0] for col in pivoted_df.columns]
+    pivoted_df = pivoted_df.rename(columns = {'Mass (g)_1': 'Empty Plate Mass (g)', 'Mass (g)_2': 'PreRun Mass (g)', 'Mass (g)_3': 'PostRun Mass (g)'})
+    pivoted_df['PreRun Mass (g)'].fillna(pivoted_df['Empty Plate Mass (g)'], inplace=True)
+    # If mass 2 is missing fill with mass 1 bc no liquid added
+    if test_type == 'P':
+        # Add columns
+        pivoted_df['PreRun Liquid (uL)'] = 1000 * (pivoted_df['PreRun Mass (g)'] - pivoted_df['Empty Plate Mass (g)'])
+        pivoted_df['PostRun Liquid (uL)'] = 1000 * (pivoted_df['PostRun Mass (g)'] - pivoted_df['Empty Plate Mass (g)'])
+        pivoted_df['Liquid Moved (uL)'] = pivoted_df['PostRun Liquid (uL)'] - pivoted_df['PreRun Liquid (uL)']
+        pivoted_df['Expected (uL)'] = ' '
+        pivoted_df['Setup Error (uL)'] = ' '
+        pivoted_df['Software'] = ' '
+        pivoted_df['Protocol'] = ' '
+        pivoted_df['Labware Type'] = ' '
+        pivoted_df = pivoted_df[['Date', 'Robot', 'Software', 'Protocol', 'Labware Type', 'Sample', 'Empty Plate Mass (g)',	'PreRun Mass (g)',	'PreRun Liquid (uL)', 'Expected (uL)', 'Setup Error (uL)', 'PostRun Mass (g)', 'PostRun Liquid (uL)'	,'Liquid Moved (uL)']]
+    else:
+        print('Evaporation Runs')
+    # Save to csv in input folder
+    time_now = datetime.datetime.now()
+    today_date = str(time_now).split(' ')[0]
+    filename =   'Analyzed-' + today_date + '_Summary.csv'
+    results_path = os.path.join(analysis_results_folder, filename)
+    pivoted_df.to_csv(results_path, index = False)
+    
