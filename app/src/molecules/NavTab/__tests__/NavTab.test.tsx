@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 import {
   renderWithProviders,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   BORDERS,
 } from '@opentrons/components'
@@ -44,12 +44,10 @@ describe('NavTab', () => {
     expect(tab).toHaveStyle(
       `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
     )
-    expect(tab).toHaveStyle(`color: ${String(LEGACY_COLORS.darkGreyEnabled)}`)
+    expect(tab).toHaveStyle(`color: ${String(COLORS.grey50Enabled)}`)
     fireEvent.click(tab)
-    expect(tab).toHaveStyle(`color: ${String(LEGACY_COLORS.darkBlackEnabled)}`)
-    expect(tab).toHaveStyle(
-      `border-bottom-color: ${String(COLORS.blue50)}`
-    )
+    expect(tab).toHaveStyle(`color: ${String(COLORS.darkBlackEnabled)}`)
+    expect(tab).toHaveStyle(`border-bottom-color: ${String(COLORS.blue50)}`)
     expect(tab).toHaveStyle(`border-bottom-width: 2px`)
     expect(tab).toHaveStyle(
       `border-bottom-style: ${String(BORDERS.styleSolid)}`
@@ -68,7 +66,7 @@ describe('NavTab', () => {
     expect(tab).toHaveStyle(
       `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
     )
-    expect(tab).toHaveStyle(`color: ${String(LEGACY_COLORS.errorDisabled)}`)
+    expect(tab).toHaveStyle(`color: ${String(COLORS.grey40)}`)
   })
 
   it('renders navtab when pass to / as to', () => {

@@ -2,7 +2,7 @@ import 'jest-styled-components'
 import * as React from 'react'
 import {
   renderWithProviders,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
   BORDERS,
@@ -25,7 +25,13 @@ describe('TertiaryButton', () => {
   it('renders tertiary button with text', () => {
     const { getByText } = render(props)
     const button = getByText('tertiary button')
+<<<<<<< HEAD
     expect(button).toHaveStyle(`background-color: ${String(COLORS.blue50)}`)
+=======
+    expect(button).toHaveStyle(
+      `background-color: ${String(COLORS.blueEnabled)}`
+    )
+>>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16}`
     )
@@ -45,9 +51,7 @@ describe('TertiaryButton', () => {
     expect(button).toHaveStyle('box-shadow: none')
     expect(button).toHaveStyle('overflow: no-wrap')
     expect(button).toHaveStyle('white-space: nowrap')
-    expect(button).toHaveStyle(
-      `color: ${String(LEGACY_COLORS.fundamentalsBackground)}`
-    )
+    expect(button).toHaveStyle(`color: ${String(COLORS.grey35)}`)
   })
 
   it('renders tertiary button with text and disabled', () => {
@@ -56,9 +60,9 @@ describe('TertiaryButton', () => {
     const button = getByText('tertiary button')
     expect(button).toBeDisabled()
     expect(button).toHaveStyle(
-      `background-color: ${String(LEGACY_COLORS.darkGreyDisabled)}`
+      `background-color: ${String(COLORS.grey50Disabled)}`
     )
-    expect(button).toHaveStyle(`color: ${String(LEGACY_COLORS.errorDisabled)}`)
+    expect(button).toHaveStyle(`color: ${String(COLORS.grey40)}`)
   })
 
   it('applies the correct states to the button - hover', () => {
@@ -66,7 +70,11 @@ describe('TertiaryButton', () => {
     const button = getByText('tertiary button')
     expect(button).toHaveStyleRule(
       'background-color',
+<<<<<<< HEAD
       `${String(COLORS.blue55)}`,
+=======
+      `${String(COLORS.blueHover)}`,
+>>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
       {
         modifier: ':hover',
       }
@@ -81,7 +89,11 @@ describe('TertiaryButton', () => {
     const button = getByText('tertiary button')
     expect(button).toHaveStyleRule(
       'background-color',
+<<<<<<< HEAD
       `${String(COLORS.blue60)}`,
+=======
+      `${String(COLORS.bluePressed)}`,
+>>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
       {
         modifier: ':active',
       }
@@ -93,7 +105,7 @@ describe('TertiaryButton', () => {
     const button = getByText('tertiary button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${String(LEGACY_COLORS.warningEnabled)}`,
+      `0 0 0 3px ${String(COLORS.warningEnabled)}`,
       {
         modifier: ':focus-visible',
       }
@@ -101,14 +113,12 @@ describe('TertiaryButton', () => {
   })
 
   it('renders tertiary button with text and different background color', () => {
-    props.backgroundColor = LEGACY_COLORS.errorEnabled
+    props.backgroundColor = COLORS.errorEnabled
     const { getByText } = render(props)
     const button = getByText('tertiary button')
     expect(button).toHaveStyle(
-      `background-color: ${String(LEGACY_COLORS.errorEnabled)}`
+      `background-color: ${String(COLORS.errorEnabled)}`
     )
-    expect(button).toHaveStyle(
-      `color: ${String(LEGACY_COLORS.fundamentalsBackground)}`
-    )
+    expect(button).toHaveStyle(`color: ${String(COLORS.grey35)}`)
   })
 })

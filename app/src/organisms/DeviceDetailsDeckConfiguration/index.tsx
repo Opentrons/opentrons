@@ -6,7 +6,7 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   DeckConfigurator,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -112,7 +112,7 @@ export function DeviceDetailsDeckConfiguration({
       ) : null}
       <Flex
         alignItems={ALIGN_FLEX_START}
-        backgroundColor={LEGACY_COLORS.white}
+        backgroundColor={COLORS.white}
         border={BORDERS.lineBorder}
         borderRadius={BORDERS.radiusSoftCorners}
         flexDirection={DIRECTION_COLUMN}
@@ -197,7 +197,7 @@ export function DeviceDetailsDeckConfiguration({
                 fixtureDisplayList.map(fixture => (
                   <Flex
                     key={fixture.cutoutId}
-                    backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+                    backgroundColor={COLORS.grey35}
                     gridGap={SPACING.spacing60}
                     padding={SPACING.spacing8}
                     width="100%"
@@ -213,7 +213,7 @@ export function DeviceDetailsDeckConfiguration({
                 ))
               ) : (
                 <Flex
-                  backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+                  backgroundColor={COLORS.grey35}
                   gridGap={SPACING.spacing60}
                   padding={SPACING.spacing8}
                   width="100%"

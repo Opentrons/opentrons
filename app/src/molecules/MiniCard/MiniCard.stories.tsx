@@ -2,7 +2,7 @@ import * as React from 'react'
 import {
   SPACING,
   Box,
-  LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   Flex,
   ALIGN_CENTER,
@@ -34,7 +34,7 @@ const Template: Story<React.ComponentProps<typeof MiniCard>> = args => {
 
 const Children = (
   <Flex alignItems={ALIGN_CENTER}>
-    <Box backgroundColor={LEGACY_COLORS.white}>
+    <Box backgroundColor={COLORS.white}>
       <img src={OT2_PNG} style={{ width: '3rem' }} />
     </Box>
     <StyledText

@@ -9,7 +9,7 @@ import {
 import {
   Box,
   Flex,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   SPACING,
@@ -167,7 +167,7 @@ export const LiquidsLabwareDetailsModal = (
       <Box
         paddingX={SPACING.spacing16}
         paddingTop={SPACING.spacing16}
-        backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+        backgroundColor={COLORS.grey35}
         height="28.125rem"
       >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
@@ -193,14 +193,14 @@ export const LiquidsLabwareDetailsModal = (
                 <StyledText
                   as="h6"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={LEGACY_COLORS.darkGreyEnabled}
+                  color={COLORS.grey50Enabled}
                 >
                   {t('slot_number')}
                 </StyledText>
                 <StyledText
                   as="p"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={LEGACY_COLORS.darkBlackEnabled}
+                  color={COLORS.darkBlackEnabled}
                 >
                   {slotName}
                 </StyledText>
@@ -212,14 +212,14 @@ export const LiquidsLabwareDetailsModal = (
                 <StyledText
                   as="h6"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={LEGACY_COLORS.darkGreyEnabled}
+                  color={COLORS.grey50Enabled}
                 >
                   {t('labware_name')}
                 </StyledText>
                 <StyledText
                   as="p"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={LEGACY_COLORS.darkBlackEnabled}
+                  color={COLORS.darkBlackEnabled}
                 >
                   {labwareName}
                 </StyledText>

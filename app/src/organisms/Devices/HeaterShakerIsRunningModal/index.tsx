@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   Icon,
-  LEGACY_COLORS,
+  COLORS,
   Flex,
   Box,
   DIRECTION_ROW,
@@ -50,7 +50,7 @@ export const HeaterShakerIsRunningModal = (
         name="alert-circle"
         marginX={SPACING.spacing8}
         size={SPACING.spacing20}
-        color={LEGACY_COLORS.warningEnabled}
+        color={COLORS.warningEnabled}
         data-testid="HeaterShakerIsRunning_warning_icon"
       />
       {t('heater_shaker_is_shaking')}

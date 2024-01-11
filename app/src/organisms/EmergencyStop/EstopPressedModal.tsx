@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -78,7 +78,7 @@ function TouchscreenModal({
   const modalHeader: ModalHeaderBaseProps = {
     title: t('estop_pressed'),
     iconName: 'ot-alert',
-    iconColor: LEGACY_COLORS.red2,
+    iconColor: COLORS.red2,
   }
   const modalProps = {
     header: { ...modalHeader },
@@ -169,7 +169,7 @@ function DesktopModal({
         <Banner type={isEngaged ? 'error' : 'success'}>
           {isEngaged ? t('estop_engaged') : t('estop_disengaged')}
         </Banner>
-        <StyledText as="p" color={LEGACY_COLORS.darkBlack90}>
+        <StyledText as="p" color={COLORS.grey60}>
           {t('estop_pressed_description')}
         </StyledText>
         <Flex justifyContent={JUSTIFY_FLEX_END}>

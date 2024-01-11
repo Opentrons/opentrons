@@ -8,7 +8,7 @@ import {
   ALIGN_CENTER,
   ALIGN_START,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
@@ -87,7 +87,7 @@ export function RobotOverview({
     <>
       <Flex
         alignItems={ALIGN_START}
-        backgroundColor={LEGACY_COLORS.white}
+        backgroundColor={COLORS.white}
         flexDirection={DIRECTION_COLUMN}
         paddingTop={SPACING.spacing8}
         position={POSITION_RELATIVE}
@@ -126,7 +126,7 @@ export function RobotOverview({
                 >
                   <StyledText
                     as="h6"
-                    color={LEGACY_COLORS.darkGreyEnabled}
+                    color={COLORS.grey50Enabled}
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     paddingBottom={SPACING.spacing4}
                     textTransform={TYPOGRAPHY.textTransformUppercase}
@@ -150,8 +150,8 @@ export function RobotOverview({
                       as="p"
                       color={
                         isRobotViewable
-                          ? LEGACY_COLORS.darkBlackEnabled
-                          : LEGACY_COLORS.errorDisabled
+                          ? COLORS.darkBlackEnabled
+                          : COLORS.grey40
                       }
                     >
                       {t('lights')}

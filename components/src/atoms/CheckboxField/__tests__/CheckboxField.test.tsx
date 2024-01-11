@@ -3,7 +3,7 @@ import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../../styles'
 import { renderWithProviders } from '../../../testing/utils'
-import { LEGACY_COLORS, TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
+import { COLORS, TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
 
 import { CheckboxField } from '..'
 
@@ -40,7 +40,7 @@ describe('CheckboxField', () => {
     // INNER_STYLE_NO_VALUE
     expect(checkBoxIcon).toHaveStyle(`width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
-    expect(checkBoxIcon).toHaveStyle(`color: ${String(LEGACY_COLORS.darkGreyEnabled)}`)
+    expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.grey50Enabled)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
     expect(checkBoxIcon).toHaveStyle(`border-radius: 1px`)
     expect(checkBoxIcon).toHaveStyle(
@@ -50,39 +50,27 @@ describe('CheckboxField', () => {
     expect(checkBoxIcon).toHaveStyleRule('cursor', 'pointer', {
       modifier: ':hover',
     })
-    expect(checkBoxIcon).toHaveStyleRule(
-      'color',
-      `${String(LEGACY_COLORS.darkGreyHover)}`,
-      {
-        modifier: ':hover',
-      }
-    )
-    expect(checkBoxIcon).toHaveStyleRule(
-      'color',
-      `${String(LEGACY_COLORS.darkGreyPressed)}`,
-      {
-        modifier: ':active',
-      }
-    )
+    expect(checkBoxIcon).toHaveStyleRule('color', `${String(COLORS.grey55)}`, {
+      modifier: ':hover',
+    })
+    expect(checkBoxIcon).toHaveStyleRule('color', `${String(COLORS.grey60)}`, {
+      modifier: ':active',
+    })
     expect(checkBoxIcon).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${String(LEGACY_COLORS.fundamentalsFocus)}`,
+      `0 0 0 3px ${String(COLORS.fundamentalsFocus)}`,
       { modifier: ':focus' }
     )
-    expect(checkBoxIcon).toHaveStyleRule(
-      'color',
-      `${String(LEGACY_COLORS.darkGreyPressed)}`,
-      {
-        modifier: ':disabled',
-      }
-    )
+    expect(checkBoxIcon).toHaveStyleRule('color', `${String(COLORS.grey60)}`, {
+      modifier: ':disabled',
+    })
 
     // TODO: kj 09/15/2022 This part will be update later OUTER_STYLE
     // const checkBoxLabel = getByTestId('CheckboxField_label')
     // expect(checkBoxLabel).toHaveStyle('@apply --font-form-default')
     // expect(checkBoxLabel).toHaveStyle('font-size: 0.75rem')
     // expect(checkBoxLabel).toHaveStyle('font-weight: 400')
-    // expect(checkBoxLabel).toHaveStyle(`color: ${LEGACY_COLORS.darkBlackEnabled}`)
+    // expect(checkBoxLabel).toHaveStyle(`color: ${COLORS.darkBlackEnabled}`)
     // expect(checkBoxLabel).toHaveStyle('display: flex')
     // expect(checkBoxLabel).toHaveStyle(`align-items: ${ALIGN_CENTER}`)
     // expect(checkBoxLabel).toHaveStyle('line-height: 1')
@@ -106,7 +94,7 @@ describe('CheckboxField', () => {
       `font-weight: ${String(TYPOGRAPHY.fontWeightRegular)}`
     )
     expect(checkBoxFieldBox).toHaveStyle(
-      `color: ${String(LEGACY_COLORS.darkBlackEnabled)}`
+      `color: ${String(COLORS.darkBlackEnabled)}`
     )
     expect(checkBoxFieldBox).toHaveStyle(`flex: 0 0 auto`)
     expect(checkBoxFieldBox).toHaveStyle(
@@ -139,7 +127,7 @@ describe('CheckboxField', () => {
     const checkBoxIcon = getByTestId('CheckboxField_icon')
     expect(checkBoxIcon).toHaveStyle(`width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
-    expect(checkBoxIcon).toHaveStyle(`color: ${String(LEGACY_COLORS.darkGreyEnabled)}`)
+    expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.grey50Enabled)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
     expect(checkBoxIcon).toHaveStyle(`border-radius: 1px`)
     expect(checkBoxIcon).toHaveStyle(

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT } from '@opentrons/shared-data'
-import { LEGACY_COLORS } from '../../../ui-style-constants'
+import { COLORS } from '../../../ui-style-constants'
 
 import type { CSSProperties } from 'styled-components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -36,7 +36,7 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
     dimensions = { xDimension: width, yDimension: height },
   } = definition ?? {}
 
-  const backgroundFill = parameters.isTiprack ? '#CCCCCC' : LEGACY_COLORS.white
+  const backgroundFill = parameters.isTiprack ? '#CCCCCC' : COLORS.white
   return (
     <>
       {highlight ? (
@@ -70,7 +70,7 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
           borderThickness={OUTLINE_THICKNESS_MM}
           xDimension={dimensions.xDimension}
           yDimension={dimensions.yDimension}
-          stroke={stroke ?? (parameters.isTiprack ? '#979797' : LEGACY_COLORS.black)}
+          stroke={stroke ?? (parameters.isTiprack ? '#979797' : COLORS.black)}
           fill={backgroundFill}
         />
       )}

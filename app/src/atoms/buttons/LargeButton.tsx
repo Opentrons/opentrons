@@ -2,7 +2,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import {
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   BORDERS,
   Btn,
@@ -44,22 +44,36 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     }
   > = {
     secondary: {
+<<<<<<< HEAD
       defaultColor: LEGACY_COLORS.darkBlackEnabled,
       defaultBackgroundColor: COLORS.blue35,
       activeBackgroundColor: COLORS.blue40,
       iconColor: COLORS.blue50,
+=======
+      defaultColor: COLORS.darkBlackEnabled,
+      defaultBackgroundColor: COLORS.mediumBlueEnabled,
+      activeBackgroundColor: COLORS.mediumBluePressed,
+      iconColor: COLORS.blueEnabled,
+>>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
     },
     alert: {
-      defaultColor: LEGACY_COLORS.red1,
-      defaultBackgroundColor: LEGACY_COLORS.red3,
-      activeBackgroundColor: LEGACY_COLORS.red3Pressed,
-      iconColor: LEGACY_COLORS.red1,
+      defaultColor: COLORS.red1,
+      defaultBackgroundColor: COLORS.red3,
+      activeBackgroundColor: COLORS.red3Pressed,
+      iconColor: COLORS.red1,
     },
     primary: {
+<<<<<<< HEAD
       defaultColor: LEGACY_COLORS.white,
       defaultBackgroundColor: COLORS.blue50,
       activeBackgroundColor: COLORS.blue60,
       iconColor: LEGACY_COLORS.white,
+=======
+      defaultColor: COLORS.white,
+      defaultBackgroundColor: COLORS.blueEnabled,
+      activeBackgroundColor: COLORS.bluePressed,
+      iconColor: COLORS.white,
+>>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
     },
   }
 
@@ -98,8 +112,8 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     }
 
     &:disabled {
-      background-color: ${LEGACY_COLORS.darkBlack20};
-      color: ${LEGACY_COLORS.darkBlack60};
+      background-color: ${COLORS.grey35};
+      color: ${COLORS.grey50};
     }
   `
   return (
@@ -123,7 +137,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
         aria-label={`${iconName} icon`}
         color={
           disabled
-            ? LEGACY_COLORS.darkBlack60
+            ? COLORS.grey50
             : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
         }
         size="5rem"

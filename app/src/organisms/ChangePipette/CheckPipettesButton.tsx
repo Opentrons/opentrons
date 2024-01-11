@@ -6,7 +6,7 @@ import {
   Icon,
   DIRECTION_ROW,
   Flex,
-  LEGACY_COLORS,
+  COLORS,
   ALIGN_CENTER,
   SPACING,
   SIZE_1,
@@ -87,7 +87,7 @@ export function CheckPipettesButton(
     >
       <Flex
         flexDirection={DIRECTION_ROW}
-        color={LEGACY_COLORS.white}
+        color={COLORS.white}
         alignItems={ALIGN_CENTER}
       >
         {body}

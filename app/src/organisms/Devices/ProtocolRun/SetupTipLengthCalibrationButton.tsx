@@ -11,7 +11,7 @@ import {
   SIZE_4,
   TEXT_ALIGN_CENTER,
   TOOLTIP_LEFT,
-  LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -89,7 +89,7 @@ export function SetupTipLengthCalibrationButton({
   const recalibrateLink = disableRecalibrate ? (
     <>
       <Box
-        color={LEGACY_COLORS.errorDisabled}
+        color={COLORS.grey40}
         css={TYPOGRAPHY.labelSemiBold}
         {...targetProps}
       >

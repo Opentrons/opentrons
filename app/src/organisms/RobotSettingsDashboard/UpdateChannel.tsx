@@ -8,7 +8,7 @@ import {
   SPACING,
   DIRECTION_COLUMN,
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
   BORDERS,
 } from '@opentrons/components'
 
@@ -37,7 +37,7 @@ const SettingButtonLabel = styled.label<LabelProps>`
   cursor: pointer;
   background: ${({ isSelected }) =>
     isSelected === true ? COLORS.blue50 : COLORS.blue35};
-  color: ${({ isSelected }) => isSelected === true && LEGACY_COLORS.white};
+  color: ${({ isSelected }) => isSelected === true && COLORS.white};
 `
 
 interface UpdateChannelProps {
@@ -112,9 +112,7 @@ export function UpdateChannel({
                     lineHeight={TYPOGRAPHY.lineHeight36}
                     fontWeight={TYPOGRAPHY.fontWeightRegular}
                     color={
-                      radio.value === channel
-                        ? LEGACY_COLORS.white
-                        : LEGACY_COLORS.darkBlack70
+                      radio.value === channel ? COLORS.white : COLORS.grey60
                     }
                   >
                     {t('alpha_description')}

@@ -5,7 +5,7 @@ import {
   BORDERS,
   Box,
   Btn,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -112,18 +112,18 @@ export function FixtureListItem({
             ? t('location_conflict')
             : t('not_configured')
         }
-        backgroundColor={LEGACY_COLORS.warningBackgroundLight}
-        iconColor={LEGACY_COLORS.warningEnabled}
-        textColor={LEGACY_COLORS.warningText}
+        backgroundColor={COLORS.warningBackgroundLight}
+        iconColor={COLORS.warningEnabled}
+        textColor={COLORS.warningText}
       />
     )
   } else {
     statusLabel = (
       <StatusLabel
         status={t('configured')}
-        backgroundColor={LEGACY_COLORS.successBackgroundLight}
-        iconColor={LEGACY_COLORS.successEnabled}
-        textColor={LEGACY_COLORS.successText}
+        backgroundColor={COLORS.successBackgroundLight}
+        iconColor={COLORS.successEnabled}
+        textColor={COLORS.successText}
       />
     )
   }
@@ -166,11 +166,11 @@ export function FixtureListItem({
       ) : null}
       <Box
         border={BORDERS.styleSolid}
-        borderColor={LEGACY_COLORS.medGreyEnabled}
+        borderColor={COLORS.grey35}
         borderWidth="1px"
         borderRadius={BORDERS.radiusSoftCorners}
         padding={SPACING.spacing16}
-        backgroundColor={LEGACY_COLORS.white}
+        backgroundColor={COLORS.white}
       >
         <Flex
           flexDirection={DIRECTION_ROW}

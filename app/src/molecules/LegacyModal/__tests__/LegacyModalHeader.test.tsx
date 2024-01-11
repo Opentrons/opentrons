@@ -4,7 +4,7 @@ import * as React from 'react'
 
 import {
   ALIGN_CENTER,
-  LEGACY_COLORS,
+  COLORS,
   JUSTIFY_CENTER,
   renderWithProviders,
   SPACING,
@@ -25,28 +25,28 @@ describe('LegacyModalHeader', () => {
     props = {
       onClose: mockClose,
       title: 'mock modal header title',
-      backgroundColor: LEGACY_COLORS.white,
-      color: LEGACY_COLORS.darkBlackEnabled,
+      backgroundColor: COLORS.white,
+      color: COLORS.darkBlackEnabled,
     }
   })
 
   it('should render text and close icon', () => {
     render(props)
     const title = screen.getByText('mock modal header title')
-    expect(title).toHaveStyle(`color: ${LEGACY_COLORS.darkBlackEnabled}`)
+    expect(title).toHaveStyle(`color: ${COLORS.darkBlackEnabled}`)
     screen.getByTestId('ModalHeader_icon_close_mock modal header title')
   })
 
   it('should render text, icon, and close icon', () => {
     props.icon = {
       name: 'ot-alert',
-      color: LEGACY_COLORS.darkBlackEnabled,
+      color: COLORS.darkBlackEnabled,
       size: '1.25rem',
       marginRight: SPACING.spacing8,
     }
     render(props)
     expect(screen.getByTestId('Modal_header_icon')).toHaveStyle(
-      `color: ${LEGACY_COLORS.darkBlackEnabled}`
+      `color: ${COLORS.darkBlackEnabled}`
     )
     expect(screen.getByTestId('Modal_header_icon')).toHaveStyle(
       `width: 1.25rem`
@@ -70,20 +70,12 @@ describe('LegacyModalHeader', () => {
     expect(closeIcon).toHaveStyle(`justify-content: ${JUSTIFY_CENTER}`)
     expect(closeIcon).toHaveStyle(`align-items: ${ALIGN_CENTER}`)
     expect(closeIcon).toHaveStyle('border-radius: 0.875rem')
-    expect(closeIcon).toHaveStyleRule(
-      'background-color',
-      LEGACY_COLORS.lightGreyHover,
-      {
-        modifier: ':hover',
-      }
-    )
-    expect(closeIcon).toHaveStyleRule(
-      'background-color',
-      LEGACY_COLORS.lightGreyPressed,
-      {
-        modifier: ':active',
-      }
-    )
+    expect(closeIcon).toHaveStyleRule('background-color', COLORS.grey35, {
+      modifier: ':hover',
+    })
+    expect(closeIcon).toHaveStyleRule('background-color', COLORS.grey35, {
+      modifier: ':active',
+    })
     fireEvent.click(closeIcon)
     expect(mockClose).toHaveBeenCalled()
   })

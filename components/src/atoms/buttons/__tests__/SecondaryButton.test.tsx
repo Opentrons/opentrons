@@ -2,11 +2,12 @@ import 'jest-styled-components'
 import * as React from 'react'
 import { renderWithProviders } from '../../../testing/utils'
 import {
-  LEGACY_COLORS,
+  COLORS,
   BORDERS,
   TYPOGRAPHY,
   SPACING,
 } from '../../../ui-style-constants'
+import { COLORS } from '../../../helix-design-system'
 
 import { SecondaryButton } from '../SecondaryButton'
 
@@ -26,7 +27,7 @@ describe('SecondaryButton', () => {
   it('renders primary button with text', () => {
     const { getByText } = render(props)
     const button = getByText('secondary button')
-    expect(button).toHaveStyle(`background-color: ${LEGACY_COLORS.transparent}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.transparent}`)
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16}`
     )
@@ -64,7 +65,7 @@ describe('SecondaryButton', () => {
     const button = getByText('secondary button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${LEGACY_COLORS.warningEnabled}`,
+      `0 0 0 3px ${COLORS.warningEnabled}`,
       {
         modifier: ':focus-visible',
       }
@@ -72,9 +73,9 @@ describe('SecondaryButton', () => {
   })
 
   it('renders secondary button with text and different background color', () => {
-    props.color = LEGACY_COLORS.errorEnabled
+    props.color = COLORS.errorEnabled
     const { getByText } = render(props)
     const button = getByText('secondary button')
-    expect(button).toHaveStyle(`color: ${LEGACY_COLORS.errorEnabled}`)
+    expect(button).toHaveStyle(`color: ${COLORS.errorEnabled}`)
   })
 })

@@ -10,7 +10,7 @@ import {
   Flex,
   Box,
   DIRECTION_COLUMN,
-  LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   SIZE_1,
 } from '@opentrons/components'
@@ -143,7 +143,7 @@ export function AvailableRobotOption(
             <Icon
               name="alert-circle"
               size="1.25rem"
-              color={LEGACY_COLORS.errorEnabled}
+              color={COLORS.errorEnabled}
             />
           </>
         ) : null}
@@ -152,11 +152,11 @@ export function AvailableRobotOption(
       {isSelectedRobotOnDifferentSoftwareVersion && isSelected ? (
         <StyledText
           as="label"
-          color={LEGACY_COLORS.errorText}
+          color={COLORS.errorText}
           marginBottom={SPACING.spacing8}
           css={css`
             & > a {
-              color: ${LEGACY_COLORS.errorText};
+              color: ${COLORS.errorText};
               text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
             }
           `}

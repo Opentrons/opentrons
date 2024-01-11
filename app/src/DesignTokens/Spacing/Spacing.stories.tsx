@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {
   Flex,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   SPACING,
   TYPOGRAPHY,

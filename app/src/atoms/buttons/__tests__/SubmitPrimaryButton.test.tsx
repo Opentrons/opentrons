@@ -3,7 +3,7 @@ import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import {
   renderWithProviders,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
   BORDERS,
@@ -33,7 +33,11 @@ describe('SubmitPrimaryButton', () => {
     const { getByText } = render(props)
     const button = getByText('submit primary button')
     expect(button).toHaveStyle(
+<<<<<<< HEAD
       `background-color: ${String(COLORS.blue50)}`
+=======
+      `background-color: ${String(COLORS.blueEnabled)}`
+>>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
     )
     expect(button).toHaveStyle(
       `border-radius: ${String(BORDERS.radiusSoftCorners)}`
@@ -41,7 +45,7 @@ describe('SubmitPrimaryButton', () => {
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16}`
     )
-    expect(button).toHaveStyle(`color: ${String(LEGACY_COLORS.white)}`)
+    expect(button).toHaveStyle(`color: ${String(COLORS.white)}`)
     expect(button).toHaveStyle(`font-size: ${String(TYPOGRAPHY.fontSizeP)}`)
     expect(button).toHaveStyle(
       `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
@@ -64,9 +68,9 @@ describe('SubmitPrimaryButton', () => {
     const button = getByText('submit primary button')
     expect(button).toBeDisabled()
     expect(button).toHaveStyle(
-      `background-color: ${String(LEGACY_COLORS.darkGreyDisabled)}`
+      `background-color: ${String(COLORS.grey50Disabled)}`
     )
-    expect(button).toHaveStyle(`color: ${String(LEGACY_COLORS.successDisabled)}`)
+    expect(button).toHaveStyle(`color: ${String(COLORS.successDisabled)}`)
   })
 
   it('calls mock function when clicking the button', () => {
@@ -81,7 +85,11 @@ describe('SubmitPrimaryButton', () => {
     const button = getByText('submit primary button')
     expect(button).toHaveStyleRule(
       'background-color',
+<<<<<<< HEAD
       `${String(COLORS.blue55)}`,
+=======
+      `${String(COLORS.blueHover)}`,
+>>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
       {
         modifier: ':hover',
       }
@@ -96,7 +104,11 @@ describe('SubmitPrimaryButton', () => {
     const button = getByText('submit primary button')
     expect(button).toHaveStyleRule(
       'background-color',
+<<<<<<< HEAD
       `${String(COLORS.blue60)}`,
+=======
+      `${String(COLORS.bluePressed)}`,
+>>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
       {
         modifier: ':active',
       }
@@ -108,7 +120,7 @@ describe('SubmitPrimaryButton', () => {
     const button = getByText('submit primary button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${String(LEGACY_COLORS.warningEnabled)}`,
+      `0 0 0 3px ${String(COLORS.warningEnabled)}`,
       {
         modifier: ':focus-visible',
       }

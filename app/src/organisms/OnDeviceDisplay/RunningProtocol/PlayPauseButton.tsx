@@ -6,7 +6,7 @@ import {
   Icon,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
-  LEGACY_COLORS,
+  COLORS,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
@@ -38,8 +38,8 @@ const PLAY_PAUSE_BUTTON_STYLE = css`
     background-color: ${COLORS.blue60};
   }
   &:disabled {
-    background-color: ${LEGACY_COLORS.darkBlack20};
-    color: ${LEGACY_COLORS.darkBlack60};
+    background-color: ${COLORS.grey35};
+    color: ${COLORS.grey50};
   }
 `
 
@@ -70,7 +70,7 @@ export function PlayPauseButton({
       onClick={onTogglePlayPause}
       aria-label={isRunning ? 'pause' : 'play'}
     >
-      <Icon name={iconName} color={LEGACY_COLORS.white} size={iconSize} />
+      <Icon name={iconName} color={COLORS.white} size={iconSize} />
     </Btn>
   )
 }

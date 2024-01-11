@@ -8,7 +8,7 @@ import {
   PrimaryButton,
   Flex,
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_FLEX_END,
   ALIGN_CENTER,
@@ -36,7 +36,7 @@ const BACKGROUND_SIZE = '47rem'
 
 const GO_BACK_BUTTON_TEXT_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${LEGACY_COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50Enabled};
 
   &:hover {
     opacity: 70%;
@@ -177,7 +177,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
   if (showPipetteStillAttached) {
     return (
       <SimpleWizardBody
-        iconColor={LEGACY_COLORS.errorEnabled}
+        iconColor={COLORS.errorEnabled}
         header={t('pipette_failed_to_detach', { pipetteName: pipetteName })}
         isSuccess={false}
       >
@@ -213,7 +213,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
   return errorMessage != null ? (
     <SimpleWizardBody
       isSuccess={false}
-      iconColor={LEGACY_COLORS.errorEnabled}
+      iconColor={COLORS.errorEnabled}
       header={t('shared:error_encountered')}
       subHeader={errorMessage}
     />

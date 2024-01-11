@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders, LEGACY_COLORS, BORDERS } from '@opentrons/components'
+import { renderWithProviders, COLORS, BORDERS } from '@opentrons/components'
 
 import { MediumButton } from '../MediumButton'
 
@@ -22,7 +22,11 @@ describe('MediumButton', () => {
     fireEvent.click(screen.getByText('Medium button'))
     expect(props.onClick).toHaveBeenCalled()
     expect(screen.getByRole('button')).toHaveStyle(
+<<<<<<< HEAD
       `background-color: ${COLORS.blue50}`
+=======
+      `background-color: ${COLORS.blueEnabled}`
+>>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
     )
   })
   it('renders the alert button', () => {
@@ -32,7 +36,7 @@ describe('MediumButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.red2}`
+      `background-color: ${COLORS.red2}`
     )
   })
   it('renders the secondary button', () => {
@@ -42,7 +46,11 @@ describe('MediumButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
+<<<<<<< HEAD
       `background-color: ${COLORS.blue35}`
+=======
+      `background-color: ${COLORS.mediumBlueEnabled}`
+>>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
     )
   })
   it('renders the secondary alert button', () => {
@@ -52,7 +60,7 @@ describe('MediumButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.red3}`
+      `background-color: ${COLORS.red3}`
     )
   })
   it('renders the tertiary high button', () => {
@@ -62,7 +70,7 @@ describe('MediumButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.white}`
+      `background-color: ${COLORS.white}`
     )
   })
   it('renders the tertiary low light button', () => {
@@ -72,7 +80,7 @@ describe('MediumButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.white}`
+      `background-color: ${COLORS.white}`
     )
   })
   it('renders the button as disabled', () => {

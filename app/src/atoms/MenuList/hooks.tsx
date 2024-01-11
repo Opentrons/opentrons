@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { LEGACY_COLORS, Overlay } from '@opentrons/components'
+import { COLORS, Overlay } from '@opentrons/components'
 
 interface MenuHandleClickOutside {
   menuOverlay: JSX.Element
@@ -28,7 +28,7 @@ export function useMenuHandleClickOutside(): MenuHandleClickOutside {
       {showOverflowMenu ? (
         <Overlay
           onClick={handleClickOutside}
-          backgroundColor={LEGACY_COLORS.transparent}
+          backgroundColor={COLORS.transparent}
         />
       ) : null}
     </>

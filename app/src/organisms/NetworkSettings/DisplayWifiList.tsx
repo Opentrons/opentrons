@@ -7,7 +7,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   Btn,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
@@ -31,31 +31,31 @@ const NETWORK_ROW_STYLE = css`
   align-items: ${ALIGN_CENTER};
   grid-gap: ${SPACING.spacing16};
 
-  background-color: ${LEGACY_COLORS.light1};
+  background-color: ${COLORS.light1};
   margin-bottom: ${SPACING.spacing8};
   border-radius: ${BORDERS.borderRadiusSize4};
 
   &:hover {
     border: none;
     box-shadow: none;
-    background-color: ${LEGACY_COLORS.light1};
-    color: ${LEGACY_COLORS.darkBlack100};
+    background-color: ${COLORS.light1};
+    color: ${COLORS.darkBlack100};
   }
 
   &:focus {
-    background-color: ${LEGACY_COLORS.light1Pressed};
-    color: ${LEGACY_COLORS.darkBlack100};
+    background-color: ${COLORS.grey40};
+    color: ${COLORS.darkBlack100};
     box-shadow: none;
   }
   &:active {
-    background-color: ${LEGACY_COLORS.light1Pressed};
-    color: ${LEGACY_COLORS.darkBlack100};
+    background-color: ${COLORS.grey40};
+    color: ${COLORS.darkBlack100};
   }
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
   }
   &:disabled {
-    color: ${LEGACY_COLORS.darkBlack60};
+    color: ${COLORS.grey50};
   }
 `
 
@@ -106,16 +106,16 @@ export function DisplayWifiList({
           display="flex"
           onClick={handleJoinAnotherNetwork}
           height="5rem"
-          backgroundColor={LEGACY_COLORS.light1}
+          backgroundColor={COLORS.light1}
           borderRadius={BORDERS.borderRadiusSize4}
-          color={LEGACY_COLORS.black}
+          color={COLORS.black}
           css={NETWORK_ROW_STYLE}
           padding={`${SPACING.spacing20} ${SPACING.spacing32}`}
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_CENTER}
           gridGap={SPACING.spacing4}
         >
-          <Icon name="plus" size="2.5rem" color={LEGACY_COLORS.darkBlack100} />
+          <Icon name="plus" size="2.5rem" color={COLORS.darkBlack100} />
           <StyledText as="h4">{t('join_other_network')}</StyledText>
         </Btn>
         {list != null && list.length > 0 ? null : <DisplaySearchNetwork />}

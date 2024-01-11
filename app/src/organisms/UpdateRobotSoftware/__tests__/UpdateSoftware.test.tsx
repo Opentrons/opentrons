@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { renderWithProviders, LEGACY_COLORS } from '@opentrons/components'
+import { renderWithProviders, COLORS } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { UpdateSoftware } from '../UpdateSoftware'
 

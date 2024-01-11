@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { TYPOGRAPHY, BORDERS, SPACING, LEGACY_COLORS } from '../ui-style-constants'
+import { TYPOGRAPHY, BORDERS, SPACING, COLORS } from '../ui-style-constants'
 import {
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,
@@ -20,17 +20,17 @@ const defaultTabStyle = css`
 `
 
 const inactiveTabStyle = css`
-  color: ${LEGACY_COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50Enabled};
 
   &:hover {
-    color: ${LEGACY_COLORS.darkGreyEnabled};
-    background-color: ${LEGACY_COLORS.fundamentalsBackgroundShade};
+    color: ${COLORS.grey50Enabled};
+    background-color: ${COLORS.fundamentalsBackgroundShade};
   }
 `
 
 const currentTabStyle = css`
   ${TYPOGRAPHY.pSemiBold}
-  background-color: ${LEGACY_COLORS.white};
+  background-color: ${COLORS.white};
   border-top: ${BORDERS.lineBorder};
   border-left: ${BORDERS.lineBorder};
   border-right: ${BORDERS.lineBorder};
@@ -41,7 +41,7 @@ const currentTabStyle = css`
     position: ${POSITION_ABSOLUTE};
     display: ${DISPLAY_BLOCK};
     content: '';
-    background-color: ${LEGACY_COLORS.white};
+    background-color: ${COLORS.white};
     top: 100;
     left: 0;
     height: ${SIZE_1};

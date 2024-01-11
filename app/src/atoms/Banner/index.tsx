@@ -4,7 +4,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   Btn,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_ROW,
   Flex,
   Icon,
@@ -49,28 +49,28 @@ const BANNER_PROPS_BY_TYPE: Record<
 > = {
   success: {
     icon: { name: 'check-circle' },
-    backgroundColor: LEGACY_COLORS.successBackgroundLight,
-    color: LEGACY_COLORS.successEnabled,
+    backgroundColor: COLORS.successBackgroundLight,
+    color: COLORS.successEnabled,
   },
   error: {
     icon: { name: 'alert-circle' },
-    backgroundColor: LEGACY_COLORS.errorBackgroundLight,
-    color: LEGACY_COLORS.errorEnabled,
+    backgroundColor: COLORS.errorBackgroundLight,
+    color: COLORS.errorEnabled,
   },
   warning: {
     icon: { name: 'alert-circle' },
-    backgroundColor: LEGACY_COLORS.warningBackgroundLight,
-    color: LEGACY_COLORS.warningEnabled,
+    backgroundColor: COLORS.warningBackgroundLight,
+    color: COLORS.warningEnabled,
   },
   updating: {
     icon: { name: 'ot-spinner' },
-    backgroundColor: LEGACY_COLORS.darkGreyDisabled,
-    color: LEGACY_COLORS.darkGreyEnabled,
+    backgroundColor: COLORS.grey50Disabled,
+    color: COLORS.grey50Enabled,
   },
   informing: {
     icon: { name: 'information' },
-    backgroundColor: LEGACY_COLORS.fundamentalsBackground,
-    color: LEGACY_COLORS.darkGreyEnabled,
+    backgroundColor: COLORS.grey35,
+    color: COLORS.grey50Enabled,
   },
 }
 
@@ -106,7 +106,7 @@ export function Banner(props: BannerProps): JSX.Element {
       font-size: 1.25rem;
       font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
       border: none;
-      background-color: ${LEGACY_COLORS.yellow3};
+      background-color: ${COLORS.yellow3};
       border-radius: ${BORDERS.borderRadiusSize3};
       line-height: 1.5rem;
     }

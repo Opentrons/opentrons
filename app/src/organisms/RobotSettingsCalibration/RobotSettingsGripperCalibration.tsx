@@ -5,7 +5,7 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   POSITION_ABSOLUTE,
@@ -41,7 +41,7 @@ const StyledTableCell = styled.td`
 `
 
 const BODY_STYLE = css`
-  box-shadow: 0 0 0 1px ${LEGACY_COLORS.medGreyEnabled};
+  box-shadow: 0 0 0 1px ${COLORS.grey35};
   border-radius: 3px;
 `
 
@@ -137,7 +137,7 @@ export function RobotSettingsGripperCalibration(
                       borderRadius="4px 4px 0px 0px"
                       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
                       position={POSITION_ABSOLUTE}
-                      backgroundColor={LEGACY_COLORS.white}
+                      backgroundColor={COLORS.white}
                       top="2.3rem"
                       right={0}
                       flexDirection={DIRECTION_COLUMN}

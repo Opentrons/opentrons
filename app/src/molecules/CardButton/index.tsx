@@ -96,7 +96,11 @@ export function CardButton(props: CardButtonProps): JSX.Element {
         <StyledText
           as="h4"
           fontWeight={TYPOGRAPHY.fontWeightBold}
-          color={disabled ? LEGACY_COLORS.darkBlack60 : LEGACY_COLORS.darkBlackEnabled}
+          color={
+            disabled
+              ? LEGACY_COLORS.darkBlack60
+              : LEGACY_COLORS.darkBlackEnabled
+          }
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {title}
@@ -110,7 +114,11 @@ export function CardButton(props: CardButtonProps): JSX.Element {
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={disabled ? LEGACY_COLORS.darkBlack60 : LEGACY_COLORS.darkBlackEnabled}
+          color={
+            disabled
+              ? LEGACY_COLORS.darkBlack60
+              : LEGACY_COLORS.darkBlackEnabled
+          }
           css={CARD_BUTTON_TEXT_STYLE}
         >
           {description}

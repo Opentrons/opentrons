@@ -8,7 +8,7 @@ import {
   DIRECTION_COLUMN,
   TYPOGRAPHY,
   DIRECTION_ROW,
-  LEGACY_COLORS,
+  COLORS,
   BORDERS,
   JUSTIFY_CENTER,
   ALIGN_CENTER,
@@ -185,8 +185,8 @@ export const BeforeBeginning = (
 }
 
 const UNSELECTED_OPTIONS_STYLE = css`
-  background-color: ${LEGACY_COLORS.white};
-  border: 1px solid ${LEGACY_COLORS.medGreyEnabled};
+  background-color: ${COLORS.white};
+  border: 1px solid ${COLORS.grey35};
   border-radius: ${BORDERS.radiusSoftCorners};
   height: 12.5625rem;
   width: 14.5625rem;
@@ -197,7 +197,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
   grid-gap: ${SPACING.spacing8}
 
   &:hover {
-    border: 1px solid ${LEGACY_COLORS.medGreyHover};
+    border: 1px solid ${COLORS.grey55};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {

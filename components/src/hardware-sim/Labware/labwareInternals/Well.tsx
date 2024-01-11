@@ -3,7 +3,7 @@ import * as React from 'react'
 import type { LabwareWell } from '@opentrons/shared-data'
 import type { WellMouseEvent } from './types'
 import type { StyleProps } from '../../../primitives'
-import { LEGACY_COLORS } from '../../../ui-style-constants'
+import { COLORS } from '../../../ui-style-constants'
 
 export const INTERACTIVE_WELL_DATA_ATTRIBUTE = 'data-wellname'
 export interface WellProps extends StyleProps {
@@ -23,9 +23,9 @@ export function WellComponent(props: WellProps): JSX.Element {
   const {
     well,
     wellName,
-    stroke = LEGACY_COLORS.black,
+    stroke = COLORS.black,
     strokeWidth = 1,
-    fill = LEGACY_COLORS.white,
+    fill = COLORS.white,
     onMouseEnterWell,
     onMouseLeaveWell,
   } = props

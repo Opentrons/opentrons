@@ -7,7 +7,7 @@ import {
   BORDERS,
   Box,
   Btn,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -30,7 +30,7 @@ const SSID_INPUT_FIELD_STYLE = css`
   font-size: ${TYPOGRAPHY.fontSize28};
   line-height: ${TYPOGRAPHY.lineHeight36};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  color: ${LEGACY_COLORS.darkBlack100};
+  color: ${COLORS.darkBlack100};
   padding-left: ${SPACING.spacing24};
   box-sizing: border-box;
   width: 42.625rem;

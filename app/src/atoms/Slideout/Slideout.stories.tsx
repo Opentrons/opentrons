@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { TYPOGRAPHY, PrimaryBtn, LEGACY_COLORS, SPACING } from '@opentrons/components'
+import { TYPOGRAPHY, PrimaryBtn, COLORS, SPACING } from '@opentrons/components'
 import { Slideout } from './index'
 import { StyledText } from '../text'
 
@@ -26,7 +26,11 @@ const Children = (
     </StyledText>
 
     <PrimaryBtn
+<<<<<<< HEAD
       backgroundColor={COLORS.blue50}
+=======
+      backgroundColor={COLORS.blueEnabled}
+>>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
       marginTop="28rem"
       textTransform={TYPOGRAPHY.textTransformNone}
     >

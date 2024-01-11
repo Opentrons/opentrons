@@ -13,7 +13,7 @@ import {
   Icon,
   Box,
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
   BORDERS,
 } from '@opentrons/components'
 
@@ -64,7 +64,7 @@ export function TextSize({ setCurrentOption }: TextSizeProps): JSX.Element {
           textSize="1.375rem"
           lineHeight="1.75rem"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={LEGACY_COLORS.darkBlack70}
+          color={COLORS.grey60}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {t('text_size_description')}

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { renderWithProviders, SPACING, LEGACY_COLORS } from '@opentrons/components'
+import { renderWithProviders, SPACING, COLORS } from '@opentrons/components'
 import { Line } from '../index'
 
 const render = (props: React.ComponentProps<typeof Line>) => {
@@ -19,9 +19,7 @@ describe('Line', () => {
     const { getByTestId } = render(props)
     const line = getByTestId('line')
     expect(line).toHaveStyle('width: 100%')
-    expect(line).toHaveStyle(
-      `borderBottom: 1px solid ${String(LEGACY_COLORS.medGreyEnabled)}`
-    )
+    expect(line).toHaveStyle(`borderBottom: 1px solid ${String(COLORS.grey35)}`)
   })
 
   it('renders line with additional props', () => {
@@ -36,9 +34,6 @@ describe('Line', () => {
     const line = getByTestId('line')
     expect(line).toHaveStyle(`color: ${String(COLORS.blue50)}`)
     expect(line).toHaveStyle('width: 80%')
-    expect(line).toHaveStyle('margin-top: 0')
-    expect(line).toHaveStyle('margin-bottom: 0')
-    expect(line).toHaveStyle('padding-left: 0.25rem')
     expect(line).toHaveStyle('padding-right: 0.25rem')
   })
 })

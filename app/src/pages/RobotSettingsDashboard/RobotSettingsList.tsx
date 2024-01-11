@@ -8,7 +8,7 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   Btn,
-  LEGACY_COLORS,
+  COLORS,
   BORDERS,
   DISPLAY_FLEX,
   DIRECTION_ROW,
@@ -118,7 +118,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
                   hug={true}
                 />
               ) : null}
-              <Icon name="more" size="3rem" color={LEGACY_COLORS.darkBlack100} />
+              <Icon name="more" size="3rem" color={COLORS.darkBlack100} />
             </Flex>
           }
         />
@@ -206,7 +206,7 @@ function FeatureFlags(): JSX.Element {
           key={flag}
           width="100%"
           marginBottom={SPACING.spacing8}
-          backgroundColor={LEGACY_COLORS.light1}
+          backgroundColor={COLORS.light1}
           padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
           borderRadius={BORDERS.borderRadiusSize4}
           display={DISPLAY_FLEX}
@@ -223,7 +223,7 @@ function FeatureFlags(): JSX.Element {
             gridGap={SPACING.spacing24}
             alignItems={ALIGN_CENTER}
           >
-            <Icon name="alert-circle" size="3rem" color={LEGACY_COLORS.darkBlack100} />
+            <Icon name="alert-circle" size="3rem" color={COLORS.darkBlack100} />
             <Flex
               flexDirection={DIRECTION_COLUMN}
               gridGap={SPACING.spacing2}
@@ -250,7 +250,7 @@ export function OnOffToggle(props: { isOn: boolean }): JSX.Element {
       flexDirection={DIRECTION_ROW}
       gridGap={SPACING.spacing12}
       alignItems={ALIGN_CENTER}
-      backgroundColor={LEGACY_COLORS.transparent}
+      backgroundColor={COLORS.transparent}
       padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
       borderRadius={BORDERS.borderRadiusSize4}
     >

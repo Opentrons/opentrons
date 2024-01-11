@@ -8,7 +8,7 @@ import {
   BORDERS,
   Box,
   CheckboxField,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -168,17 +168,17 @@ export function DeviceResetSlideout({
         <Flex
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_CENTER}
-          backgroundColor={LEGACY_COLORS.warningBackgroundLight}
+          backgroundColor={COLORS.warningBackgroundLight}
           borderRadius={BORDERS.borderRadiusSize1}
           padding={SPACING.spacing8}
-          border={`1px solid ${LEGACY_COLORS.warningEnabled}`}
+          border={`1px solid ${COLORS.warningEnabled}`}
           marginBottom={SPACING.spacing24}
         >
           <Icon
             name="alert-circle"
             size="1rem"
             marginRight={SPACING.spacing8}
-            color={LEGACY_COLORS.warningEnabled}
+            color={COLORS.warningEnabled}
           />
           <StyledText as="p">{t('resets_cannot_be_undone')}</StyledText>
         </Flex>

@@ -9,7 +9,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   Btn,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -92,7 +92,7 @@ const ProtocolHeader = ({
       padding={`${SPACING.spacing32} ${SPACING.spacing40}`}
       position={POSITION_STICKY}
       top="0"
-      backgroundColor={LEGACY_COLORS.white}
+      backgroundColor={COLORS.white}
       marginX={`-${SPACING.spacing32}`}
       zIndex={1} // the header is always visble when things scroll beneath
     >
@@ -107,7 +107,7 @@ const ProtocolHeader = ({
           onClick={() => history.push('/protocols')}
           width="3rem"
         >
-          <Icon name="back" size="3rem" color={LEGACY_COLORS.darkBlack100} />
+          <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
         </Btn>
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -213,12 +213,12 @@ const Summary = ({ author, description, date }: SummaryProps): JSX.Element => {
       </Flex>
       <StyledText
         as="p"
-        color={description === null ? LEGACY_COLORS.darkBlack70 : undefined}
+        color={description === null ? COLORS.grey60 : undefined}
       >
         {description ?? i18n.format(t('no_summary'), 'capitalize')}
       </StyledText>
       <Flex
-        backgroundColor={LEGACY_COLORS.darkBlack20}
+        backgroundColor={COLORS.grey35}
         borderRadius={BORDERS.borderRadiusSize1}
         marginTop={SPACING.spacing24}
         width="max-content"
@@ -412,7 +412,7 @@ export function ProtocolDetails(): JSX.Element | null {
   const deleteModalHeader: ModalHeaderBaseProps = {
     title: 'Delete this protocol?',
     iconName: 'ot-alert',
-    iconColor: LEGACY_COLORS.yellow2,
+    iconColor: COLORS.yellow2,
   }
 
   return (

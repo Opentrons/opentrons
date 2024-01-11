@@ -6,7 +6,7 @@ import {
   Flex,
   SPACING,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   SIZE_3,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
@@ -23,10 +23,10 @@ const StyledLabel = styled.label`
   align-items: ${ALIGN_CENTER};
   width: 100%;
   padding: ${SPACING.spacing32};
-  border: 2px dashed ${LEGACY_COLORS.medGreyEnabled};
+  border: 2px dashed ${COLORS.grey35};
   border-radius: ${BORDERS.radiusSoftCorners};
   text-align: center;
-  background-color: ${LEGACY_COLORS.white};
+  background-color: ${COLORS.white};
 
   &:hover,
   &:focus-within {
@@ -120,7 +120,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
       >
         <Icon
           width={SIZE_3}
-          color={LEGACY_COLORS.darkGreyEnabled}
+          color={COLORS.grey50Enabled}
           name="upload"
           marginBottom={SPACING.spacing24}
         />

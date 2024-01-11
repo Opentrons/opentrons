@@ -7,7 +7,7 @@ import {
   Flex,
   ALIGN_CENTER,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   BORDERS,
 } from '@opentrons/components'
@@ -45,7 +45,7 @@ const StyledTableCell = styled.td`
 `
 
 const BODY_STYLE = css`
-  box-shadow: 0 0 0 1px ${LEGACY_COLORS.medGreyEnabled};
+  box-shadow: 0 0 0 1px ${COLORS.grey35};
   border-radius: 3px;
 `
 interface PipetteOffsetCalibrationItemsProps {

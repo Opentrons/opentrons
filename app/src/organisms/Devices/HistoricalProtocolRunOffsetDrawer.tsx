@@ -5,7 +5,7 @@ import {
   Flex,
   Box,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   JUSTIFY_FLEX_START,
   DIRECTION_COLUMN,
@@ -59,12 +59,12 @@ export function HistoricalProtocolRunOffsetDrawer(
   if (uniqueLabwareOffsets == null || uniqueLabwareOffsets.length === 0) {
     return (
       <Box
-        backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+        backgroundColor={COLORS.grey35}
         width="100%"
         padding={`${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing48}`}
       >
         <Box
-          backgroundColor={LEGACY_COLORS.white}
+          backgroundColor={COLORS.white}
           padding={SPACING.spacing24}
           textAlign="center"
         >
@@ -82,7 +82,7 @@ export function HistoricalProtocolRunOffsetDrawer(
 
   return (
     <Box
-      backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+      backgroundColor={COLORS.grey35}
       width="100%"
       padding={`${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing48}`}
     >
@@ -143,7 +143,7 @@ export function HistoricalProtocolRunOffsetDrawer(
             key={index}
             justifyContent={JUSTIFY_FLEX_START}
             padding={SPACING.spacing8}
-            backgroundColor={LEGACY_COLORS.white}
+            backgroundColor={COLORS.white}
             marginY={SPACING.spacing8}
           >
             <StyledText width="23.5%" as="label">

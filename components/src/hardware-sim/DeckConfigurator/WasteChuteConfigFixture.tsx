@@ -4,7 +4,7 @@ import { css } from 'styled-components'
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
-import { BORDERS, LEGACY_COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   WASTE_CHUTE_DISPLAY_NAME,
@@ -76,7 +76,7 @@ export function WasteChuteConfigFixture(
           {WASTE_CHUTE_DISPLAY_NAME}
         </Text>
         {handleClickRemove != null ? (
-          <Icon name="remove" color={LEGACY_COLORS.white} size="2rem" />
+          <Icon name="remove" color={COLORS.white} size="2rem" />
         ) : null}
       </Btn>
     </RobotCoordsForeignObject>
@@ -86,9 +86,9 @@ export function WasteChuteConfigFixture(
 const WASTE_CHUTE_CONFIG_STYLE_READ_ONLY = css`
   display: ${DISPLAY_FLEX};
   align-items: ${ALIGN_CENTER};
-  background-color: ${LEGACY_COLORS.grey2};
+  background-color: ${COLORS.grey50};
   border-radius: ${BORDERS.borderRadiusSize1};
-  color: ${LEGACY_COLORS.white};
+  color: ${COLORS.white};
   justify-content: ${JUSTIFY_CENTER};
   grid-gap: ${SPACING.spacing8};
   width: 100%;
@@ -98,14 +98,14 @@ const WASTE_CHUTE_CONFIG_STYLE_EDITABLE = css`
   ${WASTE_CHUTE_CONFIG_STYLE_READ_ONLY}
 
   &:active {
-    background-color: ${LEGACY_COLORS.darkBlack90};
+    background-color: ${COLORS.grey60};
   }
 
   &:hover {
-    background-color: ${LEGACY_COLORS.grey1};
+    background-color: ${COLORS.grey1};
   }
 
   &:focus-visible {
-    border: 3px solid ${LEGACY_COLORS.fundamentalsFocus};
+    border: 3px solid ${COLORS.fundamentalsFocus};
   }
 `

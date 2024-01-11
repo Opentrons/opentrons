@@ -6,7 +6,7 @@ import {
   ALIGN_CENTER,
   TYPOGRAPHY,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   SIZE_1,
 } from '@opentrons/components'
@@ -47,7 +47,7 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
       </StyledText>
       <Flex
         alignItems={ALIGN_CENTER}
-        border={`${BORDERS.styleSolid} 1px ${LEGACY_COLORS.lightGreyHover}`}
+        border={`${BORDERS.styleSolid} 1px ${COLORS.grey35}`}
         borderRadius={BORDERS.radiusSoftCorners}
         padding={SPACING.spacing8}
         {...styleProps}

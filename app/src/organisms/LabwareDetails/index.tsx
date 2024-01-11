@@ -9,7 +9,7 @@ import {
   Icon,
   Flex,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   BORDERS,
   DIRECTION_COLUMN,
@@ -40,10 +40,10 @@ const CLOSE_ICON_STYLE = css`
   border-radius: 50%;
 
   &:hover {
-    background: ${LEGACY_COLORS.lightGreyHover};
+    background: ${COLORS.grey35};
   }
   &:active {
-    background: ${LEGACY_COLORS.lightGreyPressed};
+    background: ${COLORS.grey35};
   }
 `
 
@@ -54,7 +54,7 @@ const COPY_ICON_STYLE = css`
   }
   &:active,
   &:focus {
-    color: ${LEGACY_COLORS.darkBlackEnabled};
+    color: ${COLORS.darkBlackEnabled};
   }
 `
 
@@ -122,11 +122,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
       </Flex>
       {!isCustomDefinition && (
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-          <Icon
-            color={COLORS.blue50}
-            name="check-decagram"
-            height=".7rem"
-          />{' '}
+          <Icon color={COLORS.blue50} name="check-decagram" height=".7rem" />{' '}
           <StyledText
             as="label"
             id="LabwareDetails_opentronsDef"
@@ -145,7 +141,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         >
           <StyledText
             as="label"
-            color={LEGACY_COLORS.darkGreyEnabled}
+            color={COLORS.grey50Enabled}
             id="LabwareDetails_dateAdded"
           >
             {t('last_updated')} {format(new Date(modified), 'MM/dd/yyyy')}
@@ -163,7 +159,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
     <Slideout onCloseClick={props.onClose} title={slideoutHeader} isExpanded>
       <Gallery definition={definition} />
       <Box
-        backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+        backgroundColor={COLORS.grey35}
         padding={SPACING.spacing16}
         marginBottom={SPACING.spacing24}
       >
@@ -175,7 +171,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           aria-label="copy"
         >
           <Flex overflowWrap="anywhere">
-            <Box fontSize={TYPOGRAPHY.fontSizeP} color={LEGACY_COLORS.black}>
+            <Box fontSize={TYPOGRAPHY.fontSizeP} color={COLORS.black}>
               {apiName}
               <span {...targetProps}>
                 <Icon size={SIZE_1} name="copy-text" css={COPY_ICON_STYLE} />

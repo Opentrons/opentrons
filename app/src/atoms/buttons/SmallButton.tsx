@@ -2,7 +2,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import {
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   BORDERS,
   Btn,
@@ -58,20 +58,29 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     }
   > = {
     secondary: {
+<<<<<<< HEAD
       defaultColor: LEGACY_COLORS.darkBlackEnabled,
       defaultBackgroundColor: COLORS.blue35,
       activeBackgroundColor: COLORS.blue40,
       disabledBackgroundColor: `${LEGACY_COLORS.darkBlack20}`,
       disabledColor: `${LEGACY_COLORS.darkBlack60}`,
+=======
+      defaultColor: COLORS.darkBlackEnabled,
+      defaultBackgroundColor: COLORS.mediumBlueEnabled,
+      activeBackgroundColor: COLORS.mediumBluePressed,
+      disabledBackgroundColor: `${COLORS.grey35}`,
+      disabledColor: `${COLORS.grey50}`,
+>>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
     },
     alert: {
-      defaultColor: LEGACY_COLORS.white,
-      defaultBackgroundColor: LEGACY_COLORS.red2,
-      activeBackgroundColor: LEGACY_COLORS.red2Pressed,
-      disabledBackgroundColor: `${LEGACY_COLORS.darkBlack20}`,
-      disabledColor: `${LEGACY_COLORS.darkBlack60}`,
+      defaultColor: COLORS.white,
+      defaultBackgroundColor: COLORS.red2,
+      activeBackgroundColor: COLORS.red2Pressed,
+      disabledBackgroundColor: `${COLORS.grey35}`,
+      disabledColor: `${COLORS.grey50}`,
     },
     primary: {
+<<<<<<< HEAD
       defaultColor: LEGACY_COLORS.white,
       defaultBackgroundColor: COLORS.blue50,
       activeBackgroundColor: COLORS.blue60,
@@ -91,6 +100,27 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       activeBackgroundColor: `${LEGACY_COLORS.darkBlack20}`,
       disabledBackgroundColor: `${COLORS.blue50}${LEGACY_COLORS.opacity0HexCode}`,
       disabledColor: `${LEGACY_COLORS.darkBlack60}`,
+=======
+      defaultColor: COLORS.white,
+      defaultBackgroundColor: COLORS.blueEnabled,
+      activeBackgroundColor: COLORS.bluePressed,
+      disabledBackgroundColor: `${COLORS.grey35}`,
+      disabledColor: `${COLORS.grey50}`,
+    },
+    tertiaryHighLight: {
+      defaultColor: COLORS.darkBlackEnabled,
+      defaultBackgroundColor: `${COLORS.blueEnabled}${COLORS.opacity0HexCode}`,
+      activeBackgroundColor: `${COLORS.grey35}`,
+      disabledBackgroundColor: `${COLORS.blueEnabled}${COLORS.opacity0HexCode}`,
+      disabledColor: `${COLORS.grey50}`,
+    },
+    tertiaryLowLight: {
+      defaultColor: `${COLORS.grey60}`,
+      defaultBackgroundColor: ` ${COLORS.blueEnabled}${COLORS.opacity0HexCode}`,
+      activeBackgroundColor: `${COLORS.grey35}`,
+      disabledBackgroundColor: `${COLORS.blueEnabled}${COLORS.opacity0HexCode}`,
+      disabledColor: `${COLORS.grey50}`,
+>>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
     },
   }
 

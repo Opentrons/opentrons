@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 import {
   Flex,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_ROW,
   SPACING,
   TYPOGRAPHY,
@@ -55,7 +55,7 @@ to {
 `
 
 const TITLE_TEXT_STYLE = css`
-  color: ${LEGACY_COLORS.darkBlack70};
+  color: ${COLORS.grey60};
   font-size: 1.75rem;
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   line-height: 2.25rem;
@@ -71,7 +71,7 @@ const RUN_TIMER_STYLE = css`
   font-size: 2rem;
   font-weight: ${TYPOGRAPHY.fontWeightBold};
   line-height: 2.625rem;
-  color: ${LEGACY_COLORS.darkBlackEnabled};
+  color: ${COLORS.darkBlackEnabled};
 `
 
 const COMMAND_ROW_STYLE_ANIMATED = css`

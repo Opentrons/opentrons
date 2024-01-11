@@ -2,7 +2,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import {
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   Flex,
   SPACING,
   PrimaryButton,
@@ -25,12 +25,12 @@ const BUTTON_GROUP_STYLES = css`
     padding-bottom: 8px;
     &:focus {
       box-shadow: none;
-      color: ${LEGACY_COLORS.white};
+      color: ${COLORS.white};
     }
 
     &:hover {
-      background-color: ${LEGACY_COLORS.fundamentalsBackground};
-      color: ${LEGACY_COLORS.black};
+      background-color: ${COLORS.grey35};
+      color: ${COLORS.black};
       box-shadow: 0 0 0;
     }
 
@@ -41,7 +41,7 @@ const BUTTON_GROUP_STYLES = css`
 
     &:disabled {
       background-color: inherit;
-      color: ${LEGACY_COLORS.errorDisabled};
+      color: ${COLORS.grey40};
     }
   }
 
@@ -62,14 +62,10 @@ const ACTIVE_STYLE = css`
   background-color: ${COLORS.blue50};
   color: ${LEGACY_COLORS.white};
   pointer-events: none;
-`
-
-const DEFAULT_STYLE = css`
-  padding-left: ${SPACING.spacing8};
   padding-right: ${SPACING.spacing8};
-  background-color: ${LEGACY_COLORS.white};
-  color: ${LEGACY_COLORS.black};
-  border: 1px ${LEGACY_COLORS.medGreyEnabled} solid;
+  background-color: ${COLORS.white};
+  color: ${COLORS.black};
+  border: 1px ${COLORS.grey35} solid;
 `
 
 export const useToggleGroup = (

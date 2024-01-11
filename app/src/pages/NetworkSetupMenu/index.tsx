@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   JUSTIFY_CENTER,
   ALIGN_CENTER,
@@ -57,7 +57,7 @@ export function NetworkSetupMenu(): JSX.Element {
           <StyledText
             as="h2"
             fontWeight={TYPOGRAPHY.fontWeightBold}
-            color={LEGACY_COLORS.black}
+            color={COLORS.black}
           >
             {t('choose_network_type')}
           </StyledText>
@@ -70,7 +70,7 @@ export function NetworkSetupMenu(): JSX.Element {
           <StyledText
             as="h4"
             fontWeight={TYPOGRAPHY.fontWeightRegular}
-            color={LEGACY_COLORS.darkBlack70}
+            color={COLORS.grey60}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
             {t('network_setup_menu_description')}

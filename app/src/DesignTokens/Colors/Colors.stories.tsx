@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {
   Flex,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   SPACING,
@@ -51,7 +51,7 @@ const Template: Story<ColorsStorybookProps> = args => {
   }
 
   const handleClick = (colorName: string): void => {
-    navigator.clipboard.writeText(`LEGACY_COLORS.${colorName}`)
+    navigator.clipboard.writeText(`COLORS.${colorName}`)
     setCopiedColor(colorName)
     setTimeout(() => {
       setCopiedColor(null)
@@ -79,7 +79,7 @@ const Template: Story<ColorsStorybookProps> = args => {
           borderRadius={BORDERS.borderRadiusSize2}
           onClick={() => handleClick(color[0])}
           style={{ cursor: 'pointer' }}
-          border={`2px solid ${LEGACY_COLORS.darkBlackEnabled}`}
+          border={`2px solid ${COLORS.darkBlackEnabled}`}
         >
           <StyledText
             color={invertColor(color[1])}
@@ -109,7 +109,7 @@ const Template: Story<ColorsStorybookProps> = args => {
 }
 
 export const AllColors = Template.bind({})
-const allColors = Object.entries(LEGACY_COLORS)
+const allColors = Object.entries(COLORS)
 AllColors.args = {
   colors: allColors,
 }

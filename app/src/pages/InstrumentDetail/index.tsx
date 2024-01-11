@@ -14,7 +14,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   RESPONSIVENESS,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
@@ -63,7 +63,7 @@ export const InstrumentDetail = (): JSX.Element => {
                   name="overflow-btn-touchscreen"
                   height="3.75rem"
                   width="3rem"
-                  color={LEGACY_COLORS.darkBlack70}
+                  color={COLORS.grey60}
                 />
               </IconButton>
             </Flex>
@@ -78,14 +78,14 @@ export const InstrumentDetail = (): JSX.Element => {
 const IconButton = styled('button')`
   border-radius: ${SPACING.spacing4};
   max-height: 100%;
-  background-color: ${LEGACY_COLORS.white};
+  background-color: ${COLORS.white};
 
   &:active {
-    background-color: ${LEGACY_COLORS.darkBlack20};
+    background-color: ${COLORS.grey35};
   }
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${LEGACY_COLORS.darkBlack20};
+    background-color: ${COLORS.grey35};
   }
   &:disabled {
     background-color: transparent;

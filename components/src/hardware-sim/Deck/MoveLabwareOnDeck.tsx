@@ -11,7 +11,7 @@ import {
   LoadedLabware,
 } from '@opentrons/shared-data'
 
-import { LEGACY_COLORS } from '../../ui-style-constants'
+import { COLORS } from '../../ui-style-constants'
 import { IDENTITY_AFFINE_TRANSFORM, multiplyMatrices } from '../utils'
 import { BaseDeck } from '../BaseDeck'
 
@@ -282,8 +282,8 @@ function Well(props: WellProps): JSX.Element {
 
   return wellDef.shape === 'rectangular' ? (
     <rect
-      fill={LEGACY_COLORS.white}
-      stroke={LEGACY_COLORS.black}
+      fill={COLORS.white}
+      stroke={COLORS.black}
       x={x - wellDef.xDimension / 2}
       y={y - wellDef.yDimension / 2}
       width={wellDef.xDimension}
@@ -291,8 +291,8 @@ function Well(props: WellProps): JSX.Element {
     />
   ) : (
     <circle
-      fill={LEGACY_COLORS.white}
-      stroke={LEGACY_COLORS.black}
+      fill={COLORS.white}
+      stroke={COLORS.black}
       cx={x}
       cy={y}
       r={wellDef.diameter / 2}

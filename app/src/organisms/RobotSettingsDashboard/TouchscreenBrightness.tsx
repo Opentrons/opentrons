@@ -8,7 +8,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   Box,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -122,14 +122,14 @@ export function TouchscreenBrightness({
 const IconButton = styled('button')`
   border-radius: 50%;
   max-height: 100%;
-  background-color: ${LEGACY_COLORS.white};
+  background-color: ${COLORS.white};
 
   &:active {
-    background-color: ${LEGACY_COLORS.darkBlack20};
+    background-color: ${COLORS.grey35};
   }
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${LEGACY_COLORS.darkBlack20};
+    background-color: ${COLORS.grey35};
   }
   &:disabled {
     background-color: transparent;

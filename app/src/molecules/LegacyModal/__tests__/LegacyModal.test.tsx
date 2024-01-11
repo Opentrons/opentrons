@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { LEGACY_COLORS, renderWithProviders } from '@opentrons/components'
+import { COLORS, renderWithProviders } from '@opentrons/components'
 
 import { LegacyModal } from '..'
 
@@ -24,7 +24,7 @@ describe('LegacyModal', () => {
     expect(queryByTestId('Modal_header_icon')).not.toBeInTheDocument()
     getByText('mock info modal')
     expect(getByTestId('Modal_header')).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.white}`
+      `background-color: ${COLORS.white}`
     )
   })
 
@@ -33,9 +33,9 @@ describe('LegacyModal', () => {
     const [{ getByTestId }] = render(props)
     const headerIcon = getByTestId('Modal_header_icon')
     expect(headerIcon).toBeInTheDocument()
-    expect(headerIcon).toHaveStyle(`color: ${LEGACY_COLORS.warningEnabled}`)
+    expect(headerIcon).toHaveStyle(`color: ${COLORS.warningEnabled}`)
     expect(getByTestId('Modal_header')).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.white}`
+      `background-color: ${COLORS.white}`
     )
   })
 
@@ -44,9 +44,9 @@ describe('LegacyModal', () => {
     const [{ getByTestId }] = render(props)
     const headerIcon = getByTestId('Modal_header_icon')
     expect(headerIcon).toBeInTheDocument()
-    expect(headerIcon).toHaveStyle(`color: ${LEGACY_COLORS.errorEnabled}`)
+    expect(headerIcon).toHaveStyle(`color: ${COLORS.errorEnabled}`)
     expect(getByTestId('Modal_header')).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.white}`
+      `background-color: ${COLORS.white}`
     )
   })
 })

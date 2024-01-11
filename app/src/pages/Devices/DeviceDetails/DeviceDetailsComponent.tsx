@@ -3,7 +3,7 @@ import { useEstopQuery } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
   Box,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
@@ -48,8 +48,8 @@ export function DeviceDetailsComponent({
       ) : null}
       <Flex
         alignItems={ALIGN_CENTER}
-        backgroundColor={LEGACY_COLORS.white}
-        border={`1px solid ${String(LEGACY_COLORS.medGreyEnabled)}`}
+        backgroundColor={COLORS.white}
+        border={`1px solid ${String(COLORS.grey35)}`}
         borderRadius="3px"
         flexDirection={DIRECTION_COLUMN}
         marginBottom={SPACING.spacing16}

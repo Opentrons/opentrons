@@ -9,7 +9,7 @@ import {
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   BORDERS,
 } from '@opentrons/components'
@@ -24,7 +24,7 @@ import type { State } from '../../../redux/types'
 const STRETCH_LIST_STYLE = css`
   width: 100%;
   padding: ${SPACING.spacing16};
-  background-color: ${LEGACY_COLORS.light1};
+  background-color: ${COLORS.light1};
   border-radius: ${BORDERS.borderRadiusSize3};
 `
 
@@ -82,7 +82,7 @@ export function EthernetConnectionDetails(
         {ethernet?.ipAddress === null || ethernet?.macAddress === null ? (
           <Flex marginTop="9rem">
             <StyledText
-              color={LEGACY_COLORS.darkBlack70}
+              color={COLORS.grey60}
               fontSize={TYPOGRAPHY.fontSize28}
               lineHeight={TYPOGRAPHY.lineHeight36}
               fontWeight={TYPOGRAPHY.fontWeightRegular}
@@ -120,7 +120,7 @@ const EthernetDetailsRow = ({
         {title}
       </StyledText>
       <StyledText
-        color={LEGACY_COLORS.darkBlack70}
+        color={COLORS.grey60}
         fontSize={TYPOGRAPHY.fontSize22}
         lineHeight={TYPOGRAPHY.lineHeight28}
         fontWeight={TYPOGRAPHY.fontWeightRegular}

@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { LEGACY_COLORS, BORDERS, TYPOGRAPHY, SPACING } from '../../ui-style-constants'
+import { COLORS, BORDERS, TYPOGRAPHY, SPACING } from '../../ui-style-constants'
 import { NewPrimaryBtn, styleProps } from '../../primitives'
 
 export const PrimaryButton = styled(NewPrimaryBtn)`
@@ -21,15 +21,15 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${LEGACY_COLORS.warningEnabled};
+    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
   }
 
   &:active {
-    background-color: ${LEGACY_COLORS.bluePressed};
+    background-color: ${COLORS.bluePressed};
   }
 
   &:disabled {
-    background-color: ${LEGACY_COLORS.darkGreyDisabled};
-    color: ${LEGACY_COLORS.errorDisabled};
+    background-color: ${COLORS.grey50Disabled};
+    color: ${COLORS.grey40};
   }
 `

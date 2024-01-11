@@ -41,7 +41,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
   PrimaryButton,
@@ -312,7 +312,7 @@ export function ProtocolRunHeader({
       ) : null}
       <Flex
         ref={protocolRunHeaderRef}
-        backgroundColor={LEGACY_COLORS.white}
+        backgroundColor={COLORS.white}
         border={BORDERS.lineBorder}
         borderRadius={BORDERS.radiusSoftCorners}
         flexDirection={DIRECTION_COLUMN}
@@ -412,7 +412,7 @@ export function ProtocolRunHeader({
         </Box>
         {runStatus != null ? (
           <Box
-            backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+            backgroundColor={COLORS.grey35}
             display="grid"
             gridTemplateColumns="4fr 6fr 4fr"
             padding={SPACING.spacing8}

@@ -10,7 +10,7 @@ import {
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   POSITION_RELATIVE,
-  LEGACY_COLORS,
+  COLORS,
   useOnClickOutside,
   useHoverTooltip,
   Box,
@@ -155,7 +155,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       borderRadius="4px 4px 0px 0px"
       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
       position={POSITION_ABSOLUTE}
-      backgroundColor={LEGACY_COLORS.white}
+      backgroundColor={COLORS.white}
       top="2.3rem"
       right={0}
       flexDirection={DIRECTION_COLUMN}
@@ -189,7 +189,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
             <Icon
               name="ot-spinner"
               size={SIZE_1}
-              color={LEGACY_COLORS.darkGreyEnabled}
+              color={COLORS.grey50Enabled}
               aria-label="spinner"
               spin
             />

@@ -7,7 +7,7 @@ import {
   Flex,
   RobotCoordsForeignDiv,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   DISPLAY_FLEX,
   DIRECTION_COLUMN,
@@ -51,7 +51,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
       borderRadius="0 0 0.4rem 0.4rem"
       fontSize={TYPOGRAPHY.fontSizeCaption}
       padding={SPACING.spacing4}
-      color={LEGACY_COLORS.white}
+      color={COLORS.white}
       id={`LabwareInfoOverlay_slot_${labwareId}_offsetBox`}
     >
       <Flex
@@ -68,7 +68,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
           {displayName ?? definitionDisplayName}
         </StyledText>
         {props.labwareHasLiquid && (
-          <Icon name="water" color={LEGACY_COLORS.white} width="0" minWidth="1rem" />
+          <Icon name="water" color={COLORS.white} width="0" minWidth="1rem" />
         )}
       </Flex>
       {vector != null && (

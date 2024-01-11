@@ -7,7 +7,7 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   FLEX_NONE,
@@ -55,7 +55,11 @@ function ProgressTrackerItem({
       borderLeft={BORDERS.lineBorder}
       borderColor={
         isTaskListComplete || isPastTask || isActiveTaskWithSubtasks
+<<<<<<< HEAD
           ? COLORS.blue50
+=======
+          ? COLORS.blueEnabled
+>>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
           : ''
       }
       marginTop={`-${SPACING.spacing12}`}
@@ -79,7 +83,7 @@ function ProgressTrackerItem({
           color={
             isTaskListComplete || isPastTask
               ? COLORS.blue50
-              : LEGACY_COLORS.medGreyHover
+              : COLORS.grey55
           }
         />
       ) : (
@@ -88,7 +92,7 @@ function ProgressTrackerItem({
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
           backgroundColor={
-            isFutureTask ? LEGACY_COLORS.medGreyHover : COLORS.blue50
+            isFutureTask ? COLORS.grey55: COLORS.blue50
           }
           color={LEGACY_COLORS.white}
           margin={SPACING.spacing16}
@@ -146,15 +150,15 @@ function ProgressTrackerItem({
                     isTaskListComplete || isPastSubTask
                       ? COLORS.blue50
                       : subTask.isComplete === true
-                      ? LEGACY_COLORS.medGreyHover
+                      ? COLORS.grey55
                       : 'initial'
                   }
                   border={BORDERS.lineBorder}
                   borderColor={
-                    isFutureSubTask ? LEGACY_COLORS.medGreyHover : COLORS.blue50
+                    isFutureSubTask ? COLORS.grey55 : COLORS.blue50
                   }
                   borderWidth={SPACING.spacing2}
-                  color={LEGACY_COLORS.white}
+                  color={COLORS.white}
                   margin={SPACING.spacing16}
                   height="0.75rem"
                   width="0.75rem"
@@ -167,10 +171,10 @@ function ProgressTrackerItem({
                   borderColor={
                     // do not show the subtask connector if it's the final subtask of the task list
                     isFinalSubTaskOfTaskList
-                      ? LEGACY_COLORS.transparent
+                      ? COLORS.transparent
                       : isTaskListComplete || isPastSubTask
                       ? COLORS.blue50
-                      : LEGACY_COLORS.medGreyEnabled
+                      : COLORS.grey35
                   }
                   marginTop={`-${SPACING.spacing8}`}
                   marginBottom={
@@ -219,7 +223,7 @@ function SubTask({
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={isActiveSubTask ? COLORS.blue10 : LEGACY_COLORS.white}
+      backgroundColor={isActiveSubTask ? COLORS.blue10 : COLORS.white}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       padding={SPACING.spacing16}
       border={isActiveSubTask ? BORDERS.activeLineBorder : BORDERS.lineBorder}
@@ -243,7 +247,7 @@ function SubTask({
         </StyledText>
         <StyledText as="p">{description}</StyledText>
         {footer != null ? (
-          <StyledText as="p" color={LEGACY_COLORS.darkGreyEnabled}>
+          <StyledText as="p" color={COLORS.grey50Enabled}>
             <Flex
               alignItems={ALIGN_CENTER}
               flexDirection={DIRECTION_ROW}
@@ -252,8 +256,8 @@ function SubTask({
               {markedBad === true && (
                 <Icon
                   name="alert-circle"
-                  backgroundColor={LEGACY_COLORS.warningBackgroundLight}
-                  color={LEGACY_COLORS.warningEnabled}
+                  backgroundColor={COLORS.warningBackgroundLight}
+                  color={COLORS.warningEnabled}
                   height="1rem"
                   aria-label={`icon_warning`}
                 />
@@ -361,7 +365,7 @@ function Task({
         flexDirection={DIRECTION_COLUMN}
         padding={SPACING.spacing16}
         backgroundColor={
-          isActiveTask && !isTaskOpen ? COLORS.blue10 : LEGACY_COLORS.white
+          isActiveTask && !isTaskOpen ? COLORS.blue10 : COLORS.white
         }
         border={
           isActiveTask && !isTaskOpen
@@ -393,8 +397,8 @@ function Task({
                 {markedBad === true && (
                   <Icon
                     name="alert-circle"
-                    backgroundColor={LEGACY_COLORS.warningBackgroundLight}
-                    color={LEGACY_COLORS.warningEnabled}
+                    backgroundColor={COLORS.warningBackgroundLight}
+                    color={COLORS.warningEnabled}
                     height="1rem"
                     aria-label={`icon_warning`}
                   />
@@ -404,7 +408,7 @@ function Task({
             </StyledText>
             <StyledText as="p">{description}</StyledText>
             {footer != null ? (
-              <StyledText as="p" color={LEGACY_COLORS.darkGreyEnabled}>
+              <StyledText as="p" color={COLORS.grey50Enabled}>
                 <Flex
                   alignItems={ALIGN_CENTER}
                   flexDirection={DIRECTION_ROW}

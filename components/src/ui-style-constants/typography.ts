@@ -1,5 +1,5 @@
 import { css } from 'styled-components'
-import { LEGACY_COLORS } from './'
+import { COLORS } from './'
 
 // Font Sizes
 export const fontSize80 = '5rem' // 80px
@@ -233,9 +233,9 @@ export const darkLinkH4SemiBold = css`
   font-size: ${fontSizeH4};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
-  color: ${LEGACY_COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50Enabled};
   &:hover {
-    color: ${LEGACY_COLORS.darkBlackEnabled};
+    color: ${COLORS.darkBlackEnabled};
   }
 `
 
@@ -243,9 +243,9 @@ export const darkLinkLabelSemiBold = css`
   font-size: ${fontSizeLabel};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
-  color: ${LEGACY_COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50Enabled};
   &:hover {
-    color: ${LEGACY_COLORS.darkBlackEnabled};
+    color: ${COLORS.darkBlackEnabled};
   }
 `
 
@@ -253,6 +253,6 @@ export const darkLinkLabelSemiBoldDisabled = css`
   font-size: ${fontSizeLabel};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
-  color: ${LEGACY_COLORS.medGreyHover};
+  color: ${COLORS.grey55};
   cursor: not-allowed;
 `

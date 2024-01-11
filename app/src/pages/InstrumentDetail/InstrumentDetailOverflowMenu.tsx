@@ -7,7 +7,7 @@ import {
   Icon,
   SPACING,
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
 } from '@opentrons/components'
 import {
   SINGLE_MOUNT_PIPETTES,
@@ -96,7 +96,7 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
                 <Icon
                   name="restart"
                   size="2.5rem"
-                  color={LEGACY_COLORS.black}
+                  color={COLORS.black}
                   aria-label="restart_icon"
                 />
                 <StyledText

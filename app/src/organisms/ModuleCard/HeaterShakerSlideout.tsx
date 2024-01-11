@@ -8,7 +8,7 @@ import {
   HS_TEMP_MAX,
 } from '@opentrons/shared-data'
 import {
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
@@ -110,7 +110,7 @@ export const HeaterShakerSlideout = (
         <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
-          color={LEGACY_COLORS.darkGrey}
+          color={COLORS.grey50}
           marginBottom={SPACING.spacing8}
         >
           {t('set_block_temp')}

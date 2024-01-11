@@ -7,7 +7,7 @@ import {
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
   BORDERS,
   SPACING,
 } from '@opentrons/components'
@@ -16,7 +16,7 @@ import { StyledText } from '../../../atoms/text'
 import { RenderResult } from './RenderResult'
 
 export const RESULT_SUMMARY_STYLE = css`
-  border: 1px solid ${LEGACY_COLORS.medGreyEnabled};
+  border: 1px solid ${COLORS.grey35};
   border-radius: ${BORDERS.radiusSoftCorners};
 `
 

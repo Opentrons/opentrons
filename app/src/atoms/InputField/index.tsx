@@ -71,7 +71,11 @@ export function InputField(props: InputFieldProps): JSX.Element {
       lineHeight={1}
       fontSize={TYPOGRAPHY.fontSizeP}
       fontWeight={TYPOGRAPHY.fontWeightRegular}
-      color={props.error != null ? COLOR_WARNING_DARK : LEGACY_COLORS.darkBlackEnabled}
+      color={
+        props.error != null
+          ? COLOR_WARNING_DARK
+          : LEGACY_COLORS.darkBlackEnabled
+      }
       opacity={props.disabled ?? false ? 0.5 : ''}
     >
       <Input {...props} />

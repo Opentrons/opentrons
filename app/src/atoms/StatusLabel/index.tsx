@@ -6,6 +6,10 @@ import {
   Icon,
   ALIGN_CENTER,
   BORDERS,
+<<<<<<< HEAD
+=======
+  COLORS,
+>>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -73,7 +77,11 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
         <StyledText
           fontSize={TYPOGRAPHY.fontSizeLabel}
           fontWeight={fontWeight ?? TYPOGRAPHY.fontWeightRegular}
+<<<<<<< HEAD
           color={textColor ?? COLORS.blue60}
+=======
+          color={textColor ?? COLORS.bluePressed}
+>>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
         >
           {capitalize(status)}
         </StyledText>

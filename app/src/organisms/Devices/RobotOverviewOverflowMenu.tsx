@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import {
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   POSITION_ABSOLUTE,
@@ -112,7 +112,7 @@ export const RobotOverviewOverflowMenu = (
           borderRadius={BORDERS.radiusSoftCorners}
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
-          backgroundColor={LEGACY_COLORS.white}
+          backgroundColor={COLORS.white}
           top="2.25rem"
           right={0}
           flexDirection={DIRECTION_COLUMN}

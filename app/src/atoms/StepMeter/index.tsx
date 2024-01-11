@@ -2,7 +2,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import {
   Box,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,
@@ -27,7 +27,7 @@ export const StepMeter = (props: StepMeterProps): JSX.Element => {
   const StepMeterContainer = css`
     position: ${POSITION_RELATIVE};
     height: ${SPACING.spacing4};
-    background-color: ${LEGACY_COLORS.medGreyEnabled};
+    background-color: ${COLORS.grey35};
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       height: ${SPACING.spacing12};
     }
@@ -44,7 +44,11 @@ export const StepMeter = (props: StepMeterProps): JSX.Element => {
     position: ${POSITION_ABSOLUTE};
     top: 0;
     height: 100%;
+<<<<<<< HEAD
     background-color: ${COLORS.blue50};
+=======
+    background-color: ${COLORS.blueEnabled};
+>>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
     width: ${percentComplete}%;
     transform: translateX(0);
     transition: ${prevPercentComplete.current <= percentComplete

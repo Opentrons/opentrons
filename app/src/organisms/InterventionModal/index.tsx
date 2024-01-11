@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux'
 import {
   Box,
   Flex,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   POSITION_FIXED,
   POSITION_ABSOLUTE,
@@ -53,7 +53,7 @@ const BASE_STYLE = {
 } as const
 
 const MODAL_STYLE = {
-  backgroundColor: LEGACY_COLORS.white,
+  backgroundColor: COLORS.white,
   position: POSITION_RELATIVE,
   overflowY: OVERFLOW_AUTO,
   maxHeight: '100%',
@@ -67,7 +67,7 @@ const HEADER_STYLE = {
   alignItems: ALIGN_CENTER,
   gridGap: SPACING.spacing12,
   padding: `${SPACING.spacing20} ${SPACING.spacing32}`,
-  color: LEGACY_COLORS.white,
+  color: COLORS.white,
   backgroundColor: COLORS.blue50,
   position: POSITION_STICKY,
   top: 0,
@@ -162,8 +162,8 @@ export function InterventionModal({
       modalSize="large"
       header={{
         backgroundColor: COLORS.blue50,
-        color: LEGACY_COLORS.white,
-        iconColor: LEGACY_COLORS.white,
+        color: COLORS.white,
+        iconColor: COLORS.white,
         iconName: iconName ?? undefined,
         title: headerTitleOnDevice,
       }}
@@ -190,7 +190,7 @@ export function InterventionModal({
       top="0"
       bottom="0"
       zIndex="1"
-      backgroundColor={LEGACY_COLORS.backgroundOverlay}
+      backgroundColor={COLORS.backgroundOverlay}
       cursor="default"
     >
       <Flex {...BASE_STYLE} zIndex={10}>
