@@ -35,7 +35,7 @@ export const EmptySection = (props: EmptySectionProps): JSX.Element => {
       <Icon
         name="ot-alert"
         size="3rem"
-        color={LEGACY_COLORS.darkBlack90}
+        color={COLORS.grey60}
         marginBottom={SPACING.spacing32}
         aria-label="EmptySection_ot-alert"
       />

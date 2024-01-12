@@ -56,7 +56,7 @@ export function AlternativeSecurityTypeModal({
           <StyledText
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightRegular}
-            color={LEGACY_COLORS.darkBlack90}
+            color={COLORS.grey60}
           >
             {t('alternative_security_types_description')}
           </StyledText>

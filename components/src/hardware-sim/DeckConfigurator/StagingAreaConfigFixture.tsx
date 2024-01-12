@@ -94,7 +94,7 @@ const STAGING_AREA_CONFIG_STYLE_EDITABLE = css`
   ${STAGING_AREA_CONFIG_STYLE_READ_ONLY}
 
   &:active {
-    background-color: ${LEGACY_COLORS.darkBlack90};
+    background-color: ${COLORS.grey60};
   }
 
   &:hover {

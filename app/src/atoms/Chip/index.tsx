@@ -43,7 +43,7 @@ const CHIP_PROPS_BY_TYPE: Record<
   basic: {
     backgroundColor: `${COLORS.black90}${COLORS.opacity20HexCode}`,
     borderRadius: BORDERS.borderRadiusSize1,
-    textColor: LEGACY_COLORS.darkBlack90,
+    textColor: COLORS.grey60,
   },
   error: {
     backgroundColor: LEGACY_COLORS.red3,
@@ -54,7 +54,7 @@ const CHIP_PROPS_BY_TYPE: Record<
   neutral: {
     backgroundColor: `${COLORS.black90}${COLORS.opacity20HexCode}`,
     borderRadius: BORDERS.borderRadiusSize5,
-    iconColor: LEGACY_COLORS.darkBlack90,
+    iconColor: COLORS.grey60,
     textColor: LEGACY_COLORS.darkBlack70,
   },
   success: {

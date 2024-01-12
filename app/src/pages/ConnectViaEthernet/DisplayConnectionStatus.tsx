@@ -51,7 +51,7 @@ export function DisplayConnectionStatus({
         <Icon
           name={isConnected ? 'ot-check' : 'ot-alert'}
           size="3rem"
-          color={isConnected ? COLORS.green50 : LEGACY_COLORS.darkBlack90}
+          color={isConnected ? COLORS.green50 : COLORS.grey60}
           data-testid={
             isConnected
               ? 'Ethernet_connected_icon'

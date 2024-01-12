@@ -79,7 +79,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
               backgroundColor={LEGACY_COLORS.darkBlack20}
               borderRadius={BORDERS.borderRadiusSize3}
               flexDirection={DIRECTION_COLUMN}
-              color={LEGACY_COLORS.darkBlack90}
+              color={COLORS.grey60}
               padding={SPACING.spacing24}
               alignItems={ALIGN_CENTER}
             >

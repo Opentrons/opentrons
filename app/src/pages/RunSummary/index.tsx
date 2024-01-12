@@ -417,7 +417,7 @@ const SummaryDatum = styled.div`
   height: 44px;
   background: #d6d6d6;
   border-radius: 4px;
-  color: ${LEGACY_COLORS.darkBlack90};
+  color: ${COLORS.grey60};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};

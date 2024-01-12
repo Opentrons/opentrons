@@ -128,11 +128,11 @@ const ProtocolNameText = styled.span`
   font-weight: ${TYPOGRAPHY.fontWeightBold};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
-  color: ${LEGACY_COLORS.darkBlack90};
+  color: ${COLORS.grey60};
 `
 const AdditionalText = styled.span`
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
-  color: ${LEGACY_COLORS.darkBlack90};
+  color: ${COLORS.grey60};
 `
