@@ -391,7 +391,7 @@ const ARROW_BUTTON_STYLES = css`
 
     &:disabled {
       background-color: ${LEGACY_COLORS.darkBlack20};
-      color: ${LEGACY_COLORS.darkBlack40};
+      color: ${COLORS.grey50};
       border: 1px ${COLORS.transparent} solid;
     }
   }
@@ -458,7 +458,7 @@ export function TouchDirectionControl(
     <Flex
       flex="1"
       flexDirection={DIRECTION_COLUMN}
-      border={`1px solid ${LEGACY_COLORS.darkBlack40}`}
+      border={`1px solid ${COLORS.grey50}`}
       borderRadius={BORDERS.borderRadiusSize4}
       padding={SPACING.spacing16}
       gridGap={SPACING.spacing16}

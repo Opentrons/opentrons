@@ -18,7 +18,7 @@ interface ChipStorybookProps extends React.ComponentProps<typeof Chip> {
 const Template: Story<ChipStorybookProps> = ({ ...args }) => (
   <Flex
     padding={SPACING.spacing16}
-    backgroundColor={LEGACY_COLORS.darkBlack40}
+    backgroundColor={COLORS.grey50}
     width="59rem"
   >
     <Chip {...args} />

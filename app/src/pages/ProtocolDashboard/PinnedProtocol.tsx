@@ -95,7 +95,7 @@ export function PinnedProtocol(props: {
 
   const PUSHED_STATE_STYLE = css`
     &:active {
-      background-color: ${longpress.isLongPressed ? '' : LEGACY_COLORS.darkBlack40};
+      background-color: ${longpress.isLongPressed ? '' : COLORS.grey50};
     }
   `
 

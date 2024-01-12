@@ -34,7 +34,7 @@ export function PlayButton({
     &:focus {
       background-color: ${ready && !isDoorOpen
         ? COLORS.blue60
-        : LEGACY_COLORS.darkBlack40};
+        : COLORS.grey50};
       color: ${COLORS.white};
     }
 
@@ -55,7 +55,7 @@ export function PlayButton({
     &:active {
       background-color: ${ready && !isDoorOpen
         ? COLORS.blue60
-        : LEGACY_COLORS.darkBlack40};
+        : COLORS.grey50};
       color: ${COLORS.white};
     }
 

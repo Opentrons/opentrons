@@ -147,7 +147,7 @@ export function ProtocolCard(props: {
         ? ''
         : isFailedAnalysis
         ? LEGACY_COLORS.red3Pressed
-        : LEGACY_COLORS.darkBlack40};
+        : COLORS.grey50};
     }
   `
 

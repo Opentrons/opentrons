@@ -104,7 +104,7 @@ function NetworkSettingButton({
     &:active {
       background-color: ${chipType === 'success'
         ? COLORS.green40
-        : LEGACY_COLORS.darkBlack40};
+        : COLORS.grey50};
     }
   `
 

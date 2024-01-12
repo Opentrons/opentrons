@@ -30,7 +30,7 @@ const SETTING_BUTTON_STYLE = css`
   border-radius: ${BORDERS.borderRadiusSize4};
 
   &:active {
-    background-color: ${LEGACY_COLORS.darkBlack40};
+    background-color: ${COLORS.grey50};
   }
 `
 
