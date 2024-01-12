@@ -75,32 +75,18 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
     primary: {
       //  TODO(ew, 3/22/23): replaces these hex codes with the color constants
       activeBackgroundColor: '#045dd0',
-<<<<<<< HEAD
       defaultBackgroundColor: COLORS.blue50,
       defaultColor: LEGACY_COLORS.white,
       disabledBackgroundColor: LEGACY_COLORS.darkBlack20,
       iconColor: LEGACY_COLORS.white,
-=======
-      defaultBackgroundColor: COLORS.blueEnabled,
-      defaultColor: COLORS.white,
-      disabledBackgroundColor: COLORS.grey35,
-      iconColor: COLORS.white,
->>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
     },
     secondary: {
       //  TODO(ew, 3/22/23): replaces these hex codes with the color constants
       activeBackgroundColor: '#94afd4',
-<<<<<<< HEAD
       defaultBackgroundColor: COLORS.blue35,
       defaultColor: LEGACY_COLORS.darkBlackEnabled,
       disabledBackgroundColor: LEGACY_COLORS.darkBlack20,
       iconColor: COLORS.blue50,
-=======
-      defaultBackgroundColor: COLORS.mediumBlueEnabled,
-      defaultColor: COLORS.darkBlackEnabled,
-      disabledBackgroundColor: COLORS.grey35,
-      iconColor: COLORS.blueEnabled,
->>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
     },
     tertiaryHigh: {
       activeBackgroundColor: COLORS.grey35,

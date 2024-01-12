@@ -35,22 +35,13 @@ export const TemperatureModuleData = (
       break
     }
     case 'holding at target': {
-<<<<<<< HEAD
       backgroundColor = COLORS.blue30
       iconColor = COLORS.blue50
-=======
-      backgroundColor = COLORS.medBlue
-      iconColor = COLORS.blueEnabled
->>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
       break
     }
     case 'cooling':
     case 'heating': {
-<<<<<<< HEAD
       backgroundColor = COLORS.blue30
-=======
-      backgroundColor = COLORS.medBlue
->>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
       pulse = true
       break
     }

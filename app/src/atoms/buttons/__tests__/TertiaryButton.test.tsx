@@ -25,13 +25,7 @@ describe('TertiaryButton', () => {
   it('renders tertiary button with text', () => {
     const { getByText } = render(props)
     const button = getByText('tertiary button')
-<<<<<<< HEAD
     expect(button).toHaveStyle(`background-color: ${String(COLORS.blue50)}`)
-=======
-    expect(button).toHaveStyle(
-      `background-color: ${String(COLORS.blueEnabled)}`
-    )
->>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16}`
     )
@@ -70,11 +64,7 @@ describe('TertiaryButton', () => {
     const button = getByText('tertiary button')
     expect(button).toHaveStyleRule(
       'background-color',
-<<<<<<< HEAD
       `${String(COLORS.blue55)}`,
-=======
-      `${String(COLORS.blueHover)}`,
->>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
       {
         modifier: ':hover',
       }
@@ -89,11 +79,7 @@ describe('TertiaryButton', () => {
     const button = getByText('tertiary button')
     expect(button).toHaveStyleRule(
       'background-color',
-<<<<<<< HEAD
       `${String(COLORS.blue60)}`,
-=======
-      `${String(COLORS.bluePressed)}`,
->>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
       {
         modifier: ':active',
       }

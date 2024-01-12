@@ -429,7 +429,6 @@ const DURATION_TEXT_STYLE = css`
 `
 
 const RUN_AGAIN_CLICKED_STYLE = css`
-<<<<<<< HEAD
   background-color: ${COLORS.blue60};
   &:focus {
     background-color: ${COLORS.blue60};
@@ -442,19 +441,5 @@ const RUN_AGAIN_CLICKED_STYLE = css`
   }
   &:active {
     background-color: ${COLORS.blue60};
-=======
-  background-color: ${COLORS.bluePressed};
-  &:focus {
-    background-color: ${COLORS.bluePressed};
-  }
-  &:hover {
-    background-color: ${COLORS.bluePressed};
-  }
-  &:focus-visible {
-    background-color: ${COLORS.bluePressed};
-  }
-  &:active {
-    background-color: ${COLORS.bluePressed};
->>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
   }
 `

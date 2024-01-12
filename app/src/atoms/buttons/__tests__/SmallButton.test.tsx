@@ -22,11 +22,7 @@ describe('SmallButton', () => {
     fireEvent.click(screen.getByText('small button'))
     expect(props.onClick).toHaveBeenCalled()
     expect(screen.getByRole('button')).toHaveStyle(
-<<<<<<< HEAD
       `background-color: ${COLORS.blue50}`
-=======
-      `background-color: ${COLORS.blueEnabled}`
->>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
     )
     expect(screen.getByRole('button')).toHaveStyle(
       `border-radius: ${BORDERS.borderRadiusSize4}`
@@ -49,11 +45,7 @@ describe('SmallButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-<<<<<<< HEAD
       `background-color: ${COLORS.blue35}`
-=======
-      `background-color: ${COLORS.mediumBlueEnabled}`
->>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
     )
   })
   it('renders the tertiary high light button', () => {

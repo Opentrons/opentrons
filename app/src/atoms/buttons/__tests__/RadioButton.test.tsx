@@ -23,11 +23,7 @@ describe('RadioButton', () => {
     }
     const { getByRole } = render(props)
     const label = getByRole('label')
-<<<<<<< HEAD
     expect(label).toHaveStyle(`background-color: ${COLORS.blue35}`)
-=======
-    expect(label).toHaveStyle(`background-color: ${COLORS.mediumBlueEnabled}`)
->>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
     expect(label).toHaveStyle(`padding: ${SPACING.spacing24}`)
   })
   it('renders the large selected button', () => {
@@ -38,11 +34,7 @@ describe('RadioButton', () => {
     }
     const { getByRole } = render(props)
     const label = getByRole('label')
-<<<<<<< HEAD
     expect(label).toHaveStyle(`background-color: ${COLORS.blue50}`)
-=======
-    expect(label).toHaveStyle(`background-color: ${COLORS.blueEnabled}`)
->>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
     expect(label).toHaveStyle(`padding: ${SPACING.spacing24}`)
   })
   it('renders the small button', () => {
@@ -52,11 +44,7 @@ describe('RadioButton', () => {
     }
     const { getByRole } = render(props)
     const label = getByRole('label')
-<<<<<<< HEAD
     expect(label).toHaveStyle(`background-color: ${COLORS.blue35}`)
-=======
-    expect(label).toHaveStyle(`background-color: ${COLORS.mediumBlueEnabled}`)
->>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
     expect(label).toHaveStyle(`padding: ${SPACING.spacing20}`)
   })
   it('renders the small selected button', () => {
@@ -67,11 +55,7 @@ describe('RadioButton', () => {
     }
     const { getByRole } = render(props)
     const label = getByRole('label')
-<<<<<<< HEAD
     expect(label).toHaveStyle(`background-color: ${COLORS.blue50}`)
-=======
-    expect(label).toHaveStyle(`background-color: ${COLORS.blueEnabled}`)
->>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
     expect(label).toHaveStyle(`padding: ${SPACING.spacing20}`)
   })
 })

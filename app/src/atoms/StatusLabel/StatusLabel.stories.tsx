@@ -15,26 +15,16 @@ const Template: Story<React.ComponentProps<typeof StatusLabel>> = args => (
 export const Active = Template.bind({})
 Active.args = {
   status: 'Heating',
-<<<<<<< HEAD
   backgroundColor: COLORS.blue30
   iconColor: COLORS.blue50,
-=======
-  backgroundColor: COLORS.medBlue,
-  iconColor: COLORS.blueEnabled,
->>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
   pulse: true,
 }
 
 export const Holding = Template.bind({})
 Holding.args = {
   status: 'Holding at target',
-<<<<<<< HEAD
   backgroundColor: COLORS.blue30
   iconColor: COLORS.blue50,
-=======
-  backgroundColor: COLORS.medBlue,
-  iconColor: COLORS.blueEnabled,
->>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
   pulse: false,
 }
 

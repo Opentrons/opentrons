@@ -55,11 +55,7 @@ function ProgressTrackerItem({
       borderLeft={BORDERS.lineBorder}
       borderColor={
         isTaskListComplete || isPastTask || isActiveTaskWithSubtasks
-<<<<<<< HEAD
           ? COLORS.blue50
-=======
-          ? COLORS.blueEnabled
->>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
           : ''
       }
       marginTop={`-${SPACING.spacing12}`}
@@ -81,9 +77,7 @@ function ProgressTrackerItem({
           margin={SPACING.spacing16}
           name="ot-check"
           color={
-            isTaskListComplete || isPastTask
-              ? COLORS.blue50
-              : COLORS.grey55
+            isTaskListComplete || isPastTask ? COLORS.blue50 : COLORS.grey55
           }
         />
       ) : (
@@ -91,9 +85,7 @@ function ProgressTrackerItem({
           flex={FLEX_NONE}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
-          backgroundColor={
-            isFutureTask ? COLORS.grey55: COLORS.blue50
-          }
+          backgroundColor={isFutureTask ? COLORS.grey55 : COLORS.blue50}
           color={LEGACY_COLORS.white}
           margin={SPACING.spacing16}
           height="1.25rem"
@@ -154,9 +146,7 @@ function ProgressTrackerItem({
                       : 'initial'
                   }
                   border={BORDERS.lineBorder}
-                  borderColor={
-                    isFutureSubTask ? COLORS.grey55 : COLORS.blue50
-                  }
+                  borderColor={isFutureSubTask ? COLORS.grey55 : COLORS.blue50}
                   borderWidth={SPACING.spacing2}
                   color={COLORS.white}
                   margin={SPACING.spacing16}

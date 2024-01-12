@@ -10,7 +10,6 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
   DISPLAY_FLEX,
-  COLORS,
 } from '@opentrons/components'
 import { StyledText } from '../text'
 import { ODD_FOCUS_VISIBLE } from './constants'
@@ -44,17 +43,10 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     }
   > = {
     secondary: {
-<<<<<<< HEAD
       defaultColor: LEGACY_COLORS.darkBlackEnabled,
       defaultBackgroundColor: COLORS.blue35,
       activeBackgroundColor: COLORS.blue40,
       iconColor: COLORS.blue50,
-=======
-      defaultColor: COLORS.darkBlackEnabled,
-      defaultBackgroundColor: COLORS.mediumBlueEnabled,
-      activeBackgroundColor: COLORS.mediumBluePressed,
-      iconColor: COLORS.blueEnabled,
->>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
     },
     alert: {
       defaultColor: COLORS.red1,
@@ -63,17 +55,10 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       iconColor: COLORS.red1,
     },
     primary: {
-<<<<<<< HEAD
       defaultColor: LEGACY_COLORS.white,
       defaultBackgroundColor: COLORS.blue50,
       activeBackgroundColor: COLORS.blue60,
       iconColor: LEGACY_COLORS.white,
-=======
-      defaultColor: COLORS.white,
-      defaultBackgroundColor: COLORS.blueEnabled,
-      activeBackgroundColor: COLORS.bluePressed,
-      iconColor: COLORS.white,
->>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
     },
   }
 

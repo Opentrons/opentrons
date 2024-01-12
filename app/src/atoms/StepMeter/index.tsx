@@ -44,11 +44,7 @@ export const StepMeter = (props: StepMeterProps): JSX.Element => {
     position: ${POSITION_ABSOLUTE};
     top: 0;
     height: 100%;
-<<<<<<< HEAD
     background-color: ${COLORS.blue50};
-=======
-    background-color: ${COLORS.blueEnabled};
->>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
     width: ${percentComplete}%;
     transform: translateX(0);
     transition: ${prevPercentComplete.current <= percentComplete

@@ -22,17 +22,10 @@ const TOGGLE_DISABLED_STYLES = css`
 `
 
 const TOGGLE_ENABLED_STYLES = css`
-<<<<<<< HEAD
   color: ${COLORS.blue50};
 
   &:hover {
     color: ${COLORS.blue55};
-=======
-  color: ${COLORS.blueEnabled};
-
-  &:hover {
-    color: ${COLORS.blueHover};
->>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
   }
 
   &:focus-visible {

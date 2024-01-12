@@ -203,18 +203,12 @@ const DEFAULT_BUTTON_STYLE = css`
 
 const ACTIVE_BUTTON_STYLE = css`
   ${DEFAULT_BUTTON_STYLE}
-<<<<<<< HEAD
   color: ${COLORS.blue50};
   border: 1px ${COLORS.blue50} solid;
 
   &:hover {
     color: ${COLORS.blue60};
-=======
-  color: ${COLORS.blueEnabled};
-  border: 1px ${COLORS.blueEnabled} solid;
 
-  &:hover {
-    color: ${COLORS.bluePressed};
   stepSize: StepSize
   initialPlane?: Plane
   buttonColor?: string

@@ -22,11 +22,7 @@ describe('MediumButton', () => {
     fireEvent.click(screen.getByText('Medium button'))
     expect(props.onClick).toHaveBeenCalled()
     expect(screen.getByRole('button')).toHaveStyle(
-<<<<<<< HEAD
       `background-color: ${COLORS.blue50}`
-=======
-      `background-color: ${COLORS.blueEnabled}`
->>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
     )
   })
   it('renders the alert button', () => {
@@ -46,11 +42,7 @@ describe('MediumButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-<<<<<<< HEAD
       `background-color: ${COLORS.blue35}`
-=======
-      `background-color: ${COLORS.mediumBlueEnabled}`
->>>>>>> 2524ab95c98ff696e637a42d46ea6a893c63f735
     )
   })
   it('renders the secondary alert button', () => {
