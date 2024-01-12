@@ -8,7 +8,7 @@ from pydantic import Field
 from ..types import DeckPoint
 from .pipetting_common import (
     PipetteIdMixin,
-    VolumeMixin,
+    DispenseVolumeMixin,
     FlowRateMixin,
     WellLocationMixin,
     BaseLiquidHandlingResult,
@@ -23,7 +23,9 @@ if TYPE_CHECKING:
 DispenseCommandType = Literal["dispense"]
 
 
-class DispenseParams(PipetteIdMixin, VolumeMixin, FlowRateMixin, WellLocationMixin):
+class DispenseParams(
+    PipetteIdMixin, DispenseVolumeMixin, FlowRateMixin, WellLocationMixin
+):
     """Payload required to dispense to a specific well."""
 
     pushOut: Optional[float] = Field(

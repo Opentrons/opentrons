@@ -95,7 +95,7 @@ def sort_all_lists(d: Any, sort_key: str | None = None) -> Any:
 @pytest.mark.parametrize(
     "protocol",
     what_protocols(),
-    ids=[x.file_name for x in what_protocols()],
+    ids=[x.short_sha for x in what_protocols()],
 )
 def test_analysis_snapshot(analyze_protocols: None, snapshot_json: SerializableData, protocol: Protocol) -> None:
     target = os.getenv("TARGET")

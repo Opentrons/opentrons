@@ -316,7 +316,7 @@ describe('Advanced Settings for Mix Form', () => {
     // Verify dest well is selected
     cy.get('[id=BlowoutLocationField_dropdown]').should($input => {
       const value = $input.val()
-      const expectedSubstring = 'dest_well'
+      const expectedSubstring = 'trashBin'
       expect(value).to.include(expectedSubstring)
     })
     // Click on step 3 to verify the batch editing
@@ -326,7 +326,7 @@ describe('Advanced Settings for Mix Form', () => {
     // Verify that dest well is selected for the blowout option
     cy.get('[id=BlowoutLocationField_dropdown]').should($input => {
       const value = $input.val()
-      const expectedSubstring = 'dest_well'
+      const expectedSubstring = 'trashBin'
       expect(value).to.include(expectedSubstring)
     })
   })
