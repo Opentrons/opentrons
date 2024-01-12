@@ -257,7 +257,7 @@ const FIXTURE_BUTTON_STYLE = css`
   box-shadow: none;
 
   &:focus {
-    background-color: ${LEGACY_COLORS.light1Pressed};
+    background-color: ${COLORS.grey40};
     box-shadow: none;
   }
 
@@ -273,7 +273,7 @@ const FIXTURE_BUTTON_STYLE = css`
   }
 
   &:active {
-    background-color: ${LEGACY_COLORS.light1Pressed};
+    background-color: ${COLORS.grey40};
   }
 
   &:disabled {

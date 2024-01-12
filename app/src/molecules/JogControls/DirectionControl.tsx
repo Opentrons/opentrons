@@ -375,18 +375,18 @@ const ARROW_BUTTON_STYLES = css`
     border-radius: ${BORDERS.borderRadiusSize4};
 
     &:hover {
-      background-color: ${LEGACY_COLORS.light1Pressed};
+      background-color: ${COLORS.grey40};
       color: ${COLORS.black80};
       border: 1px ${COLORS.transparent} solid;
     }
 
     &:active {
-      background-color: ${LEGACY_COLORS.light1Pressed};
+      background-color: ${COLORS.grey40};
       color: ${COLORS.grey60};
     }
 
     &:focus {
-      background-color: ${LEGACY_COLORS.light1Pressed};
+      background-color: ${COLORS.grey40};
     }
 
     &:disabled {

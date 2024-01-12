@@ -29,7 +29,7 @@ const MountButton = styled.button<{ isAttached: boolean }>`
     isAttached ? COLORS.green35 : LEGACY_COLORS.light1};
   &:active {
     background-color: ${({ isAttached }) =>
-      isAttached ? COLORS.green40 : LEGACY_COLORS.light1Pressed};
+      isAttached ? COLORS.green40 : COLORS.grey40};
   }
 `
 interface LabeledMountProps {

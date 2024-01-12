@@ -43,12 +43,12 @@ const NETWORK_ROW_STYLE = css`
   }
 
   &:focus {
-    background-color: ${LEGACY_COLORS.light1Pressed};
+    background-color: ${COLORS.grey40};
     color: ${LEGACY_COLORS.darkBlack100};
     box-shadow: none;
   }
   &:active {
-    background-color: ${LEGACY_COLORS.light1Pressed};
+    background-color: ${COLORS.grey40};
     color: ${LEGACY_COLORS.darkBlack100};
   }
   &:focus-visible {
