@@ -1,10 +1,8 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import {
-  useDeleteMaintenanceRunMutation,
-  useCurrentMaintenanceRun,
-} from '@opentrons/react-api-client'
+
+import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 import { COLORS } from '@opentrons/components'
 import {
   CreateCommand,
@@ -12,6 +10,7 @@ import {
   getModuleDisplayName,
   LEFT,
 } from '@opentrons/shared-data'
+
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
@@ -32,6 +31,7 @@ import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
 import { DetachProbe } from './DetachProbe'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/notify/useNotifyCurrentMaintenanceRun'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
 
@@ -93,7 +93,7 @@ export const ModuleWizardFlows = (
     setMonitorMaintenanceRunForDeletion,
   ] = React.useState<boolean>(false)
 
-  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
     enabled: createdMaintenanceRunId != null,
   })
@@ -116,18 +116,18 @@ export const ModuleWizardFlows = (
   React.useEffect(() => {
     if (
       createdMaintenanceRunId !== null &&
-      maintenanceRunData?.data.id === createdMaintenanceRunId
+      maintenanceRunData?.data?.id === createdMaintenanceRunId
     ) {
       setMonitorMaintenanceRunForDeletion(true)
     }
     if (
-      maintenanceRunData?.data.id !== createdMaintenanceRunId &&
+      maintenanceRunData?.data?.id !== createdMaintenanceRunId &&
       monitorMaintenanceRunForDeletion
     ) {
       closeFlow()
     }
   }, [
-    maintenanceRunData?.data.id,
+    maintenanceRunData?.data?.id,
     createdMaintenanceRunId,
     monitorMaintenanceRunForDeletion,
     closeFlow,
@@ -157,15 +157,15 @@ export const ModuleWizardFlows = (
 
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
-    if (maintenanceRunData?.data.id == null) handleClose()
+    if (maintenanceRunData?.data?.id == null) handleClose()
     else {
       chainRunCommands(
-        maintenanceRunData?.data.id,
+        maintenanceRunData?.data?.id,
         [{ commandType: 'home' as const, params: {} }],
         false
       )
         .then(() => {
-          deleteMaintenanceRun(maintenanceRunData?.data.id)
+          deleteMaintenanceRun(maintenanceRunData?.data?.id)
         })
         .catch(error => {
           console.error(error.message)
@@ -186,13 +186,13 @@ export const ModuleWizardFlows = (
 
   let chainMaintenanceRunCommands
 
-  if (maintenanceRunData?.data.id != null) {
+  if (maintenanceRunData?.data?.id != null) {
     chainMaintenanceRunCommands = (
       commands: CreateCommand[],
       continuePastCommandFailure: boolean
     ): Promise<CommandData[]> =>
       chainRunCommands(
-        maintenanceRunData?.data.id,
+        maintenanceRunData?.data?.id,
         commands,
         continuePastCommandFailure
       )
@@ -204,8 +204,8 @@ export const ModuleWizardFlows = (
     return null
 
   const maintenanceRunId =
-    maintenanceRunData?.data.id != null &&
-    maintenanceRunData?.data.id === createdMaintenanceRunId
+    maintenanceRunData?.data?.id != null &&
+    maintenanceRunData?.data?.id === createdMaintenanceRunId
       ? createdMaintenanceRunId
       : undefined
   const calibrateBaseProps = {

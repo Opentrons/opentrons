@@ -7,8 +7,8 @@ import type { MaintenanceRun } from '@opentrons/api-client'
 import type { QueryOptionsWithPolling } from './types'
 
 export function useNotifyCurrentMaintenanceRun(
-  options: QueryOptionsWithPolling<MaintenanceRun, Error> = {}
-): UseQueryResult<MaintenanceRun, Error> {
+  options: QueryOptionsWithPolling<MaintenanceRun, Error>
+): UseQueryResult<MaintenanceRun> | UseQueryResult<MaintenanceRun, Error> {
   const host = useHost()
   const queryKey = [host, 'maintenance_runs', 'current_run']
 

@@ -123,10 +123,6 @@ export const PipetteWizardFlows = (
     refetchInterval: RUN_REFETCH_INTERVAL,
     enabled: createdMaintenanceRunId != null,
   })
-  console.log(
-    '🚀 ~ file: index.tsx:125 ~ maintenanceRunData:',
-    maintenanceRunData
-  )
 
   const {
     chainRunCommands,

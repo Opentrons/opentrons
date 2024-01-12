@@ -12,9 +12,9 @@ import {
 import {
   useCreateMaintenanceCommandMutation,
   useDeleteMaintenanceRunMutation,
-  useCurrentMaintenanceRun,
   CreateMaintenanceRunType,
 } from '@opentrons/react-api-client'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/notify/useNotifyCurrentMaintenanceRun'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
@@ -104,7 +104,7 @@ export function DropTipWizard(props: MaintenanceRunManagerProps): JSX.Element {
     },
   })
 
-  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL_MS,
     enabled: createdMaintenanceRunId != null,
   })
@@ -114,18 +114,18 @@ export function DropTipWizard(props: MaintenanceRunManagerProps): JSX.Element {
   React.useEffect(() => {
     if (
       createdMaintenanceRunId !== null &&
-      maintenanceRunData?.data.id === createdMaintenanceRunId
+      maintenanceRunData?.data?.id === createdMaintenanceRunId
     ) {
       setMonitorMaintenanceRunForDeletion(true)
     }
     if (
-      maintenanceRunData?.data.id !== createdMaintenanceRunId &&
+      maintenanceRunData?.data?.id !== createdMaintenanceRunId &&
       monitorMaintenanceRunForDeletion
     ) {
       closeFlow()
     }
   }, [
-    maintenanceRunData?.data.id,
+    maintenanceRunData?.data?.id,
     createdMaintenanceRunId,
     monitorMaintenanceRunForDeletion,
     closeFlow,
@@ -141,10 +141,10 @@ export function DropTipWizard(props: MaintenanceRunManagerProps): JSX.Element {
 
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
-    if (maintenanceRunData?.data.id == null) {
+    if (maintenanceRunData?.data?.id == null) {
       closeFlow()
     } else {
-      deleteMaintenanceRun(maintenanceRunData?.data.id, {
+      deleteMaintenanceRun(maintenanceRunData?.data?.id, {
         onSuccess: () => {
           closeFlow()
           setIsExiting(false)
@@ -157,7 +157,7 @@ export function DropTipWizard(props: MaintenanceRunManagerProps): JSX.Element {
     <DropTipWizardComponent
       robotType={robotType}
       createdMaintenanceRunId={createdMaintenanceRunId}
-      maintenanceRunId={maintenanceRunData?.data.id}
+      maintenanceRunId={maintenanceRunData?.data?.id}
       mount={mount}
       instrumentModelSpecs={instrumentModelSpecs}
       createMaintenanceRun={createTargetedMaintenanceRun}
