@@ -129,7 +129,7 @@ Changes in API Versions
 Version 2.17
 ------------
 
-- :py:meth:`.dispense` will now raise an error if you try to dispense more than is available.
+- :py:meth:`.dispense` now raises an error if you try to dispense more than :py:obj:`.InstrumentContext.current_volume`.
 
 Version 2.16
 ------------
