@@ -173,7 +173,7 @@ If your application can't accommodate a deck layout that works well with column 
         start="A1",
     )
 
-The major drawbacks of this configuration, compared to using column 12, is that tip tracking is not available with column 1. You must always specify a ``location`` parameter for :py:meth:`.pick_up_tip`. This *requires careful tip tracking* so you don't place the pipette over more than a single column of unused tips at once. You can write some additional code to manage valid tip pickup locations, like this::
+The major drawback of this configuration, compared to using column 12, is that tip tracking is not available with column 1. You must always specify a ``location`` parameter for :py:meth:`.pick_up_tip`. This *requires careful tip tracking* so you don't place the pipette over more than a single column of unused tips at once. You can write some additional code to manage valid tip pickup locations, like this::
 
     tip_rack = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "C1")
     pipette.configure_nozzle_layout(style=COLUMN, start="A1")
