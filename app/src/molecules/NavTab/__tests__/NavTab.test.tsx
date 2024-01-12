@@ -68,7 +68,7 @@ describe('NavTab', () => {
     expect(tab).toHaveStyle(
       `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
     )
-    expect(tab).toHaveStyle(`color: ${String(LEGACY_COLORS.errorDisabled)}`)
+    expect(tab).toHaveStyle(`color: ${String(COLORS.grey40)}`)
   })
 
   it('renders navtab when pass to / as to', () => {

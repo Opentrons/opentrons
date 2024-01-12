@@ -30,6 +30,6 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
 
   &:disabled {
     background-color: ${COLORS.grey50Disabled};
-    color: ${LEGACY_COLORS.errorDisabled};
+    color: ${COLORS.grey40};
   }
 `

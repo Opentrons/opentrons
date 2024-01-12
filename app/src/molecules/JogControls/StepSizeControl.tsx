@@ -71,7 +71,7 @@ const DEFAULT_BUTTON_STYLE = css`
 
   &:disabled {
     background-color: inherit;
-    color: ${LEGACY_COLORS.errorDisabled};
+    color: ${COLORS.grey40};
   }
 `
 const ACTIVE_BUTTON_STYLE = css`

@@ -61,7 +61,7 @@ describe('TertiaryButton', () => {
     expect(button).toHaveStyle(
       `background-color: ${String(COLORS.grey50Disabled)}`
     )
-    expect(button).toHaveStyle(`color: ${String(LEGACY_COLORS.errorDisabled)}`)
+    expect(button).toHaveStyle(`color: ${String(COLORS.grey40)}`)
   })
 
   it('applies the correct states to the button - hover', () => {

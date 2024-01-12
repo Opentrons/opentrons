@@ -48,7 +48,7 @@ describe('PrimaryButton', () => {
     expect(button).toHaveStyle(
       `background-color: ${COLORS.grey50Disabled}`
     )
-    expect(button).toHaveStyle(`color: ${LEGACY_COLORS.errorDisabled}`)
+    expect(button).toHaveStyle(`color: ${COLORS.grey40}`)
   })
 
   it('applies the correct states to the button - focus', () => {

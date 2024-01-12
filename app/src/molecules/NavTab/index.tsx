@@ -28,7 +28,7 @@ const StyledNavLink = styled(NavLink)<React.ComponentProps<typeof NavLink>>`
 const DisabledNavLink = styled.span`
   padding: 0 ${SPACING.spacing4} ${SPACING.spacing8};
   ${TYPOGRAPHY.labelSemiBold}
-  color: ${LEGACY_COLORS.errorDisabled};
+  color: ${COLORS.grey40};
 `
 
 export function NavTab({

@@ -151,7 +151,7 @@ export function RobotOverview({
                       color={
                         isRobotViewable
                           ? COLORS.black90
-                          : LEGACY_COLORS.errorDisabled
+                          : COLORS.grey40
                       }
                     >
                       {t('lights')}

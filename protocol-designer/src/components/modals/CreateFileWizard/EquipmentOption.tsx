@@ -82,7 +82,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
         <Text
           as="p"
           fontSize={TYPOGRAPHY.fontSizeP}
-          color={disabled ? LEGACY_COLORS.errorDisabled : COLORS.black90}
+          color={disabled ? COLORS.grey40 : COLORS.black90}
         >
           {text}
         </Text>

@@ -41,7 +41,7 @@ const BUTTON_GROUP_STYLES = css`
 
     &:disabled {
       background-color: inherit;
-      color: ${LEGACY_COLORS.errorDisabled};
+      color: ${COLORS.grey40};
     }
   }
 

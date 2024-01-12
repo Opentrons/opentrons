@@ -198,7 +198,7 @@ const DEFAULT_BUTTON_STYLE = css`
 
   &:disabled {
     background-color: ${COLORS.white};
-    color: ${LEGACY_COLORS.errorDisabled};
+    color: ${COLORS.grey40};
   }
 `
 
