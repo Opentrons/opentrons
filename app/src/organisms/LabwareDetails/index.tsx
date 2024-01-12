@@ -175,7 +175,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           aria-label="copy"
         >
           <Flex overflowWrap="anywhere">
-            <Box fontSize={TYPOGRAPHY.fontSizeP} color={LEGACY_COLORS.black}>
+            <Box fontSize={TYPOGRAPHY.fontSizeP} color={COLORS.black90}>
               {apiName}
               <span {...targetProps}>
                 <Icon size={SIZE_1} name="copy-text" css={COPY_ICON_STYLE} />

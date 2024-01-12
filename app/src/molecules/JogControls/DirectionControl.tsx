@@ -175,7 +175,7 @@ const DEFAULT_BUTTON_STYLE = css`
   justify-content: ${JUSTIFY_FLEX_START};
   align-items: ${ALIGN_CENTER};
   background-color: ${COLORS.white};
-  color: ${LEGACY_COLORS.black};
+  color: ${COLORS.black90};
   grid-gap: ${SPACING.spacing8};
   padding: ${SPACING.spacing8};
 
@@ -185,7 +185,7 @@ const DEFAULT_BUTTON_STYLE = css`
 
   &:hover {
     background-color: ${COLORS.white};
-    color: ${LEGACY_COLORS.black};
+    color: ${COLORS.black90};
     box-shadow: 0 0 0;
     border: 1px ${COLORS.grey30} solid;
   }

@@ -154,7 +154,7 @@ const TouchNavLink = styled(NavLink)`
   align-items: ${ALIGN_CENTER};
   white-space: nowrap;
   &.active {
-    color: ${LEGACY_COLORS.black};
+    color: ${COLORS.black90};
   }
   &.active > div {
     background-color: ${COLORS.purple50};

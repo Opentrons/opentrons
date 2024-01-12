@@ -38,7 +38,7 @@ export function CompleteUpdateSoftware({
         <StyledText
           as="h2"
           fontWeight={TYPOGRAPHY.fontWeightBold}
-          color={LEGACY_COLORS.black}
+          color={COLORS.black90}
         >
           {t('update_complete')}
         </StyledText>

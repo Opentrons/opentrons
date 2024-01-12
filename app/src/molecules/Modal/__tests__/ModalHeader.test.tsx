@@ -23,12 +23,12 @@ describe('ModalHeader', () => {
       ...props,
       hasExitIcon: true,
       iconName: 'information',
-      iconColor: LEGACY_COLORS.black,
+      iconColor: COLORS.black90,
       onClick: jest.fn(),
     }
     render(props)
     expect(screen.getByLabelText('icon_information')).toHaveStyle(
-      `color: ${LEGACY_COLORS.black}`
+      `color: ${COLORS.black90}`
     )
     fireEvent.click(screen.getByLabelText('closeIcon'))
     expect(props.onClick).toHaveBeenCalled()

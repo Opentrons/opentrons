@@ -283,7 +283,7 @@ function Well(props: WellProps): JSX.Element {
   return wellDef.shape === 'rectangular' ? (
     <rect
       fill={COLORS.white}
-      stroke={LEGACY_COLORS.black}
+      stroke={COLORS.black90}
       x={x - wellDef.xDimension / 2}
       y={y - wellDef.yDimension / 2}
       width={wellDef.xDimension}
@@ -292,7 +292,7 @@ function Well(props: WellProps): JSX.Element {
   ) : (
     <circle
       fill={COLORS.white}
-      stroke={LEGACY_COLORS.black}
+      stroke={COLORS.black90}
       cx={x}
       cy={y}
       r={wellDef.diameter / 2}

@@ -49,7 +49,7 @@ export function Temperature(props: TemperatureVizProps): JSX.Element {
       <g id="statusLight">
         <path
           fill={ledLightColor}
-          stroke={LEGACY_COLORS.black}
+          stroke={COLORS.black90}
           strokeWidth={0.5}
           d="M 25.8 36.5 c -1.7 0 -3.1 1.4 -3.1 3.1 v 10.9 c 0 1.7 1.4 3.1 3.1 3.1 s 3.1 -1.4 3.1 -3.1 v -11 C 28.9 37.8 27.5 36.5 25.8 36.5 z"
         />

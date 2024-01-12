@@ -108,7 +108,7 @@ export function DisplayWifiList({
           height="5rem"
           backgroundColor={COLORS.grey35}
           borderRadius={BORDERS.borderRadiusSize4}
-          color={LEGACY_COLORS.black}
+          color={COLORS.black90}
           css={NETWORK_ROW_STYLE}
           padding={`${SPACING.spacing20} ${SPACING.spacing32}`}
           flexDirection={DIRECTION_ROW}

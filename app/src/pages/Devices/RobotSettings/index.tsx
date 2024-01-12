@@ -116,7 +116,7 @@ export function RobotSettings(): JSX.Element | null {
       >
         <Box paddingX={SPACING.spacing16}>
           <Box
-            color={LEGACY_COLORS.black}
+            color={COLORS.black90}
             css={TYPOGRAPHY.h1Default}
             padding={`${SPACING.spacing24} 0`}
           >

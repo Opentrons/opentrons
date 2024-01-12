@@ -7,7 +7,7 @@ export function SleepScreen(): JSX.Element {
     <Flex
       width="100vw"
       height="100vh"
-      backgroundColor={LEGACY_COLORS.black}
+      backgroundColor={COLORS.black90}
       data-testid="Touchscreen_SleepScreen"
     ></Flex>
   )

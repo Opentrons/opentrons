@@ -23,7 +23,7 @@ export function WellComponent(props: WellProps): JSX.Element {
   const {
     well,
     wellName,
-    stroke = LEGACY_COLORS.black,
+    stroke = COLORS.black90,
     strokeWidth = 1,
     fill = COLORS.white,
     onMouseEnterWell,

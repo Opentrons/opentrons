@@ -8,7 +8,7 @@ export function MagneticBlock(): JSX.Element {
         <rect
           style={{
             fill: '#e6e6e6',
-            stroke: LEGACY_COLORS.black,
+            stroke: COLORS.black90,
             strokeLinecap: 'round',
             strokeLinejoin: 'round',
             strokeWidth: '0.71px',
@@ -25,7 +25,7 @@ export function MagneticBlock(): JSX.Element {
         <path
           style={{
             fill: 'none',
-            stroke: LEGACY_COLORS.black,
+            stroke: COLORS.black90,
             strokeLinecap: 'round',
             strokeLinejoin: 'round',
             strokeWidth: '0.71px',

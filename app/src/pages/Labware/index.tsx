@@ -239,7 +239,7 @@ export function Labware(): JSX.Element {
         >
           <StyledText
             as="p"
-            color={LEGACY_COLORS.black}
+            color={COLORS.black90}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {t('create_new_def')}

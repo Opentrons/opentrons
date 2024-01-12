@@ -30,7 +30,7 @@ const BUTTON_GROUP_STYLES = css`
 
     &:hover {
       background-color: ${COLORS.grey10};
-      color: ${LEGACY_COLORS.black};
+      color: ${COLORS.black90};
       box-shadow: 0 0 0;
     }
 
@@ -68,7 +68,7 @@ const DEFAULT_STYLE = css`
   padding-left: ${SPACING.spacing8};
   padding-right: ${SPACING.spacing8};
   background-color: ${COLORS.white};
-  color: ${LEGACY_COLORS.black};
+  color: ${COLORS.black90};
   border: 1px ${COLORS.grey30} solid;
 `
 

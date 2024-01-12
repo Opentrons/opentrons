@@ -29,7 +29,7 @@ export function SetupTipLengthCalibration({
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       <StyledText
-        color={LEGACY_COLORS.black}
+        color={COLORS.black90}
         css={TYPOGRAPHY.pSemiBold}
         id="TipRackCalibration_requiredTipLengthTitle"
       >

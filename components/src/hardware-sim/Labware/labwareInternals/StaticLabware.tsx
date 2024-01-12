@@ -44,7 +44,7 @@ const TipDecoration = React.memo(function TipDecoration(props: {
 
 const LabwareDetailGroup = styled.g`
   fill: none;
-  stroke: ${LEGACY_COLORS.black};
+  stroke: ${COLORS.black90};
   stroke-width: 1;
 `
 

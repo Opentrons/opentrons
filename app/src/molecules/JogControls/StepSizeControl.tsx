@@ -50,7 +50,7 @@ const DEFAULT_BUTTON_STYLE = css`
   background-color: ${COLORS.white};
   border: 1px ${COLORS.white} solid;
   height: 3.62rem;
-  color: ${LEGACY_COLORS.black};
+  color: ${COLORS.black90};
 
   &:focus {
     background-color: ${COLORS.white};
@@ -58,7 +58,7 @@ const DEFAULT_BUTTON_STYLE = css`
 
   &:hover {
     background-color: ${COLORS.white};
-    color: ${LEGACY_COLORS.black};
+    color: ${COLORS.black90};
     box-shadow: 0 0 0;
     border: 1px ${COLORS.grey30} solid;
   }

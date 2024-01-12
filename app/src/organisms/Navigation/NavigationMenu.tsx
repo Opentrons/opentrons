@@ -82,7 +82,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
             <Icon
               name="restart"
               size="2.5rem"
-              color={LEGACY_COLORS.black}
+              color={COLORS.black90}
               aria-label="restart_icon"
             />
             <StyledText
@@ -114,7 +114,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
             <Icon
               name="light"
               size="2.5rem"
-              color={LEGACY_COLORS.black}
+              color={COLORS.black90}
               aria-label="light_icon"
             />
             <StyledText

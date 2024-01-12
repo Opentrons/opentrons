@@ -52,7 +52,7 @@ export const STYLE_BY_WELL_CONTENTS: {
   },
   defaultWell: {
     fill: COLORS.white,
-    stroke: LEGACY_COLORS.black,
+    stroke: COLORS.black90,
     strokeWidth: 0.6,
   },
 }

@@ -28,7 +28,7 @@ export const MenuItem = styled.button<ButtonProps>`
 
   &:disabled {
     background-color: ${COLORS.transparent};
-    color: ${LEGACY_COLORS.black}${LEGACY_COLORS.opacity50HexCode};
+    color: ${COLORS.black90}${LEGACY_COLORS.opacity50HexCode};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {

@@ -63,7 +63,7 @@ export function SetupInstrumentCalibration({
         <PipetteRecalibrationWarning />
       )}
       <StyledText
-        color={LEGACY_COLORS.black}
+        color={COLORS.black90}
         css={TYPOGRAPHY.pSemiBold}
         id="PipetteCalibration_requiredPipettesTitle"
       >

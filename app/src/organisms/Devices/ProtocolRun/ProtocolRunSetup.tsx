@@ -387,7 +387,7 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           id="RunSetupCard_calibrationIcon"
         />
         <StyledText
-          color={LEGACY_COLORS.black}
+          color={COLORS.black90}
           css={TYPOGRAPHY.pSemiBold}
           marginRight={SPACING.spacing16}
           textTransform={TYPOGRAPHY.textTransformCapitalize}

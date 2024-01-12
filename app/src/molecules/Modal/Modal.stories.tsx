@@ -26,7 +26,7 @@ Default.args = {
     title: 'Header',
     hasExitIcon: true,
     iconName: 'information',
-    iconColor: LEGACY_COLORS.black,
+    iconColor: COLORS.black90,
   },
   children: (
     <Flex

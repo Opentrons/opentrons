@@ -15,7 +15,7 @@ export default {
       control: {
         type: 'color',
         presetColors: [
-          LEGACY_COLORS.black,
+          COLORS.black90,
           COLORS.blue50,
           COLORS.red50,
           LEGACY_COLORS.successText,
@@ -35,5 +35,5 @@ Default.args = {
   title: 'Header',
   hasExitIcon: true,
   iconName: 'information',
-  iconColor: LEGACY_COLORS.black,
+  iconColor: COLORS.black90,
 }
