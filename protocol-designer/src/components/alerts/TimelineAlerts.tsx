@@ -1,7 +1,7 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
-import { i18n } from '../../localization'
 import { ErrorContents } from './ErrorContents'
 import { WarningContents } from './WarningContents'
 import { actions as dismissActions } from '../../dismiss'
@@ -28,17 +28,18 @@ interface SP {
  */
 
 function mapStateToProps(state: BaseState): SP {
+  const { t } = useTranslation('alert')
   const timeline = fileDataSelectors.getRobotStateTimeline(state)
   const errors = (timeline.errors || ([] as CommandCreatorError[])).map(
     (error: CommandCreatorError) => ({
-      title: i18n.t(`alert.timeline.error.${error.type}.title`, error.message),
+      title: t(`timeline.error.${error.type}.title`, error.message),
       description: <ErrorContents level="timeline" errorType={error.type} />,
     })
   )
   const warnings = timelineWarningSelectors
     .getTimelineWarningsForSelectedStep(state)
     .map(warning => ({
-      title: i18n.t(`alert.timeline.warning.${warning.type}.title`),
+      title: t(`timeline.warning.${warning.type}.title`),
       description: (
         <WarningContents level="timeline" warningType={warning.type} />
       ),

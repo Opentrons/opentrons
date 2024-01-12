@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
 import cx from 'classnames'
 import { Icon } from '@opentrons/components'
@@ -12,7 +13,6 @@ import {
   DropTargetMonitor,
   DropTargetSpec,
 } from 'react-dnd'
-import { i18n } from '../../../localization'
 import { NameThisLabware } from './NameThisLabware'
 import { DND_TYPES } from '../../../constants'
 import {
@@ -64,7 +64,7 @@ const EditLabwareComponent = (props: Props): JSX.Element => {
     connectDropTarget,
     swapBlocked,
   } = props
-
+  const { t } = useTranslation('deck')
   const { isTiprack } = labwareOnDeck.def.parameters
   if (isYetUnnamed && !isTiprack) {
     return (
@@ -87,10 +87,8 @@ const EditLabwareComponent = (props: Props): JSX.Element => {
             [styles.drag_text]: isBeingDragged,
           })}
         >
-          {i18n.t(
-            `deck.overlay.slot.${
-              isBeingDragged ? 'drag_to_new_slot' : 'place_here'
-            }`
+          {t(
+            `overlay.slot.${isBeingDragged ? 'drag_to_new_slot' : 'place_here'}`
           )}
         </div>
       )
@@ -100,18 +98,18 @@ const EditLabwareComponent = (props: Props): JSX.Element => {
           {!isTiprack ? (
             <a className={styles.overlay_button} onClick={editLiquids}>
               <Icon className={styles.overlay_icon} name="pencil" />
-              {i18n.t('deck.overlay.edit.name_and_liquids')}
+              {t('overlay.edit.name_and_liquids')}
             </a>
           ) : (
             <div className={styles.button_spacer} />
           )}
           <a className={styles.overlay_button} onClick={duplicateLabware}>
             <Icon className={styles.overlay_icon} name="content-copy" />
-            {i18n.t('deck.overlay.edit.duplicate')}
+            {t('overlay.edit.duplicate')}
           </a>
           <a className={styles.overlay_button} onClick={deleteLabware}>
             <Icon className={styles.overlay_icon} name="close" />
-            {i18n.t('deck.overlay.edit.delete')}
+            {t('overlay.edit.delete')}
           </a>
         </>
       )

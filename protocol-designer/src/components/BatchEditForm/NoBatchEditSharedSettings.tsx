@@ -7,9 +7,10 @@ import {
   JUSTIFY_CENTER,
   SPACING_3,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
+import { useTranslation } from 'react-i18next'
 
 export const NoBatchEditSharedSettings = (): JSX.Element => {
+  const { t } = useTranslation('application')
   return (
     <Flex
       justifyContent={JUSTIFY_CENTER}
@@ -18,7 +19,7 @@ export const NoBatchEditSharedSettings = (): JSX.Element => {
       padding={SPACING_3}
     >
       <Text id="Text_noSharedSettings" color={C_DARK_GRAY}>
-        {i18n.t('application.no_batch_edit_shared_settings')}
+        {t('no_batch_edit_shared_settings')}
       </Text>
     </Flex>
   )

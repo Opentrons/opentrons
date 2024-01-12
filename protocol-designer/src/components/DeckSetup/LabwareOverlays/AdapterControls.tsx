@@ -1,11 +1,11 @@
 import assert from 'assert'
+import { useTranslation } from 'react-i18next'
 import * as React from 'react'
 import { DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd'
 import cx from 'classnames'
 import { connect } from 'react-redux'
 import noop from 'lodash/noop'
 import { Icon, RobotCoordsForeignDiv } from '@opentrons/components'
-import { i18n } from '../../../localization'
 import { DND_TYPES } from '../../../constants'
 import {
   getAdapterLabwareIsAMatch,
@@ -76,6 +76,7 @@ export const AdapterControlsComponents = (
     onDeck,
     allLabware,
   } = props
+  const { t } = useTranslation('deck')
   if (
     selectedTerminalItemId !== START_TERMINAL_ITEM_ID ||
     (itemType !== DND_TYPES.LABWARE && itemType !== null)
@@ -127,13 +128,11 @@ export const AdapterControlsComponents = (
         >
           <a className={styles.overlay_button} onClick={addLabware}>
             {!isOver && <Icon className={styles.overlay_icon} name="plus" />}
-            {i18n.t(
-              `deck.overlay.slot.${isOver ? 'place_here' : 'add_labware'}`
-            )}
+            {t(`overlay.slot.${isOver ? 'place_here' : 'add_labware'}`)}
           </a>
           <a className={styles.overlay_button} onClick={deleteLabware}>
             {!isOver && <Icon className={styles.overlay_icon} name="close" />}
-            {i18n.t('deck.overlay.edit.delete')}
+            {t('overlay.edit.delete')}
           </a>
         </RobotCoordsForeignDiv>
       )}
@@ -151,7 +150,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<any>, ownProps: OP): DP => {
   const adapterName =
     ownProps.allLabware.find(labware => labware.id === ownProps.labwareId)?.def
       .metadata.displayName ?? ''
-
+  const { t } = useTranslation('deck')
   return {
     addLabware: () =>
       dispatch(openAddLabwareModal({ slot: ownProps.labwareId })),
@@ -159,7 +158,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<any>, ownProps: OP): DP => {
       dispatch(moveDeckItem(sourceSlot, destSlot)),
     deleteLabware: () => {
       window.confirm(
-        i18n.t('deck.warning.cancelForSure', { adapterName: adapterName })
+        t('warning.cancelForSure', { adapterName: adapterName })
       ) && dispatch(deleteContainer({ labwareId: ownProps.labwareId }))
     },
   }
