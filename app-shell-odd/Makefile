@@ -56,7 +56,7 @@ clean:
 .PHONY: lib
 lib: export NODE_ENV := production
 lib:
-	OPENTRONS_PROJECT=$(OPENTRONS_PROJECT) webpack --profile
+	OPENTRONS_PROJECT=$(OPENTRONS_PROJECT) NODE_OPTIONS=--openssl-legacy-provider webpack --profile
 
 .PHONY: deps
 deps:
