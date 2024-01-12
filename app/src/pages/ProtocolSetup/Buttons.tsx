@@ -121,7 +121,7 @@ export function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
 const CLOSE_BUTTON_STYLE = css`
   -webkit-tap-highlight-color: transparent;
   &:focus {
-    background-color: ${LEGACY_COLORS.red2Pressed};
+    background-color: ${COLORS.red55};
     color: ${COLORS.white};
   }
 
@@ -136,7 +136,7 @@ const CLOSE_BUTTON_STYLE = css`
   }
 
   &:active {
-    background-color: ${LEGACY_COLORS.red2Pressed};
+    background-color: ${COLORS.red55};
     color: ${COLORS.white};
   }
 

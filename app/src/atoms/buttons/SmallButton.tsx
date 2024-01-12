@@ -67,7 +67,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     alert: {
       defaultColor: COLORS.white,
       defaultBackgroundColor: LEGACY_COLORS.red2,
-      activeBackgroundColor: LEGACY_COLORS.red2Pressed,
+      activeBackgroundColor: COLORS.red55,
       disabledBackgroundColor: `${COLORS.grey35}`,
       disabledColor: `${COLORS.grey50}`,
     },

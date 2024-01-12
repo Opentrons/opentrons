@@ -18,7 +18,7 @@ const STOP_BUTTON_STYLE = css`
   border-radius: 50%;
 
   &:focus {
-    background-color: ${LEGACY_COLORS.red2Pressed};
+    background-color: ${COLORS.red55};
     box-shadow: none;
   }
   &:hover {
