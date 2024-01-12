@@ -61,7 +61,7 @@ describe('FloatingActionButton', () => {
     const button = getByRole('button')
     expect(button).toHaveStyleRule(
       'background-color',
-      `${LEGACY_COLORS.highlightPurple1Pressed}`,
+      `${COLORS.purple55}`,
       {
         modifier: ':active',
       }

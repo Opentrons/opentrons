@@ -141,7 +141,7 @@ describe('Selected TabbedButton', () => {
     const button = getByText('tabbed button')
     expect(button).toHaveStyleRule(
       'background-color',
-      `${String(LEGACY_COLORS.highlightPurple1Pressed)}`,
+      `${String(COLORS.purple55)}`,
       {
         modifier: ':active',
       }

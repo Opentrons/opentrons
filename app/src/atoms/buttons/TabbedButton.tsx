@@ -19,7 +19,7 @@ const SELECTED_STYLE = css`
   }
 
   &:active {
-    background-color: ${LEGACY_COLORS.highlightPurple1Pressed};
+    background-color: ${COLORS.purple55};
   }
 `
 

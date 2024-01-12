@@ -45,7 +45,7 @@ export function FloatingActionButton(
     cursor: default;
 
     &:active {
-      background-color: ${LEGACY_COLORS.highlightPurple1Pressed};
+      background-color: ${COLORS.purple55};
     }
 
     &:focus-visible {
