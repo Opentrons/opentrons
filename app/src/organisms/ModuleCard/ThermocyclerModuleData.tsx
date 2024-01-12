@@ -48,13 +48,13 @@ export const ThermocyclerModuleData = (
         break
       }
       case 'holding at target': {
-        StatusLabelProps.backgroundColor = LEGACY_COLORS.medBlue
+        StatusLabelProps.backgroundColor = COLORS.blue30
         StatusLabelProps.iconColor = COLORS.blue50
         break
       }
       case 'cooling':
       case 'heating': {
-        StatusLabelProps.backgroundColor = LEGACY_COLORS.medBlue
+        StatusLabelProps.backgroundColor = COLORS.blue30
         StatusLabelProps.iconColor = LEGACY_COLORS.darkGreyEnabled
         StatusLabelProps.pulse = true
         break
