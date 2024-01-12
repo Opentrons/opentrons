@@ -64,7 +64,7 @@ const Bullet = styled.div`
   border-radius: 50%;
   z-index: 2;
   background: ${(props: BulletProps) =>
-    props.isActive ? LEGACY_COLORS.darkBlack60 : LEGACY_COLORS.darkBlack40};
+    props.isActive ? COLORS.grey50 : LEGACY_COLORS.darkBlack40};
   transform: ${(props: BulletProps) =>
     props.isActive ? 'scale(2)' : 'scale(1)'};
 `

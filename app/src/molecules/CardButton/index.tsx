@@ -92,13 +92,13 @@ export function CardButton(props: CardButtonProps): JSX.Element {
         name={iconName}
         size="3.75rem"
         data-testid={`cardButton_icon_${String(iconName)}`}
-        color={disabled ? LEGACY_COLORS.darkBlack60 : COLORS.blue50}
+        color={disabled ? COLORS.grey50 : COLORS.blue50}
       />
       <Flex marginTop={SPACING.spacing16}>
         <StyledText
           as="h4"
           fontWeight={TYPOGRAPHY.fontWeightBold}
-          color={disabled ? LEGACY_COLORS.darkBlack60 : COLORS.black90}
+          color={disabled ? COLORS.grey50 : COLORS.black90}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {title}
@@ -112,7 +112,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={disabled ? LEGACY_COLORS.darkBlack60 : COLORS.black90}
+          color={disabled ? COLORS.grey50 : COLORS.black90}
           css={CARD_BUTTON_TEXT_STYLE}
         >
           {description}

@@ -58,7 +58,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
 
   const DISABLED_BUTTON_STYLE = css`
     background-color: ${LEGACY_COLORS.darkBlack20};
-    color: ${LEGACY_COLORS.darkBlack60};
+    color: ${COLORS.grey50};
     cursor: not-allowed;
   `
 

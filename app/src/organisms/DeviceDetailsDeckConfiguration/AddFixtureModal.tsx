@@ -278,7 +278,7 @@ const FIXTURE_BUTTON_STYLE = css`
 
   &:disabled {
     background-color: ${LEGACY_COLORS.light1};
-    color: ${LEGACY_COLORS.darkBlack60};
+    color: ${COLORS.grey50};
   }
 `
 const GO_BACK_BUTTON_STYLE = css`

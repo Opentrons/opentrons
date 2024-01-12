@@ -138,7 +138,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
     &:disabled {
       background-color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType]
         .disabledBackgroundColor};
-      color: ${LEGACY_COLORS.darkBlack60};
+      color: ${COLORS.grey50};
     }
   `
   return (
@@ -163,7 +163,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
           aria-label={`${iconName ?? 'play'} icon`}
           color={
             disabled
-              ? LEGACY_COLORS.darkBlack60
+              ? COLORS.grey50
               : MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
           }
           size={SPACING.spacing40}

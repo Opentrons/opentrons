@@ -61,7 +61,7 @@ export function PlayButton({
 
     &:disabled {
       background-color: ${LEGACY_COLORS.darkBlack20};
-      color: ${LEGACY_COLORS.darkBlack60};
+      color: ${COLORS.grey50};
     }
   `
   return (
@@ -85,7 +85,7 @@ export function PlayButton({
       <Icon
         color={
           disabled || !ready || isDoorOpen
-            ? LEGACY_COLORS.darkBlack60
+            ? COLORS.grey50
             : COLORS.white
         }
         name="play-icon"
@@ -142,6 +142,6 @@ const CLOSE_BUTTON_STYLE = css`
 
   &:disabled {
     background-color: ${LEGACY_COLORS.darkBlack20};
-    color: ${LEGACY_COLORS.darkBlack60};
+    color: ${COLORS.grey50};
   }
 `

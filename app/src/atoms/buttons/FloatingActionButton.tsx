@@ -36,7 +36,7 @@ export function FloatingActionButton(
     ...buttonProps
   } = props
 
-  const contentColor = disabled ? LEGACY_COLORS.darkBlack60 : COLORS.white
+  const contentColor = disabled ? COLORS.grey50 : COLORS.white
   const FLOATING_ACTION_BUTTON_STYLE = css`
     background-color: ${LEGACY_COLORS.highlightPurple1};
     border-radius: ${BORDERS.borderRadiusSize5};

@@ -55,7 +55,7 @@ const NETWORK_ROW_STYLE = css`
     box-shadow: ${ODD_FOCUS_VISIBLE};
   }
   &:disabled {
-    color: ${LEGACY_COLORS.darkBlack60};
+    color: ${COLORS.grey50};
   }
 `
 

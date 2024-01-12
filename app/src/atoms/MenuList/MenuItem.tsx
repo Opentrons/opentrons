@@ -51,7 +51,7 @@ export const MenuItem = styled.button<ButtonProps>`
       background-color: ${({ isAlert }) =>
         isAlert ? LEGACY_COLORS.errorEnabled : COLORS.transparent};
       color: ${({ isAlert }) =>
-        isAlert ? COLORS.white : LEGACY_COLORS.darkBlack60};
+        isAlert ? COLORS.white : COLORS.grey50};
     }
   }
 `
