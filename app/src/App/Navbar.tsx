@@ -43,7 +43,7 @@ const NavbarLink = styled(NavLink)`
   &:focus-visible {
     box-shadow: inset 0 0 0 3px ${COLORS.blue50};
     outline: none;
-    background-color: ${LEGACY_COLORS.darkGreyHover};
+    background-color: ${COLORS.grey60};
   }
 
   &:focus-visible.active {
@@ -90,7 +90,7 @@ const NavbarIcon = styled(Icon)`
   &:focus-visible {
     box-shadow: inset 0 0 0 3px ${COLORS.blue50};
     outline: none;
-    background-color: ${LEGACY_COLORS.darkGreyHover};
+    background-color: ${COLORS.grey60};
   }
 
   &:active {

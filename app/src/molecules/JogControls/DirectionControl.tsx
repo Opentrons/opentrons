@@ -343,7 +343,7 @@ const ARROW_BUTTON_STYLES = css`
   justify-content: ${JUSTIFY_CENTER};
   &:hover {
     background-color: ${COLORS.white};
-    color: ${LEGACY_COLORS.darkGreyHover};
+    color: ${COLORS.grey60};
     box-shadow: 0 0 0;
     border: 1px ${LEGACY_COLORS.lightGreyHover} solid;
   }

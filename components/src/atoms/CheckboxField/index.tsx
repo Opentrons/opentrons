@@ -79,7 +79,7 @@ const INNER_STYLE_NO_VALUE = css`
 
   &:hover {
     cursor: pointer;
-    color: ${LEGACY_COLORS.darkGreyHover};
+    color: ${COLORS.grey60};
   }
 
   &:active {

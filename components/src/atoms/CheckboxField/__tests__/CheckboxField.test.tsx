@@ -54,7 +54,7 @@ describe('CheckboxField', () => {
     })
     expect(checkBoxIcon).toHaveStyleRule(
       'color',
-      `${String(LEGACY_COLORS.darkGreyHover)}`,
+      `${String(COLORS.grey60)}`,
       {
         modifier: ':hover',
       }

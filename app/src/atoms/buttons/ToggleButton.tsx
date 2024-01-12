@@ -9,7 +9,7 @@ const TOGGLE_DISABLED_STYLES = css`
   color: ${LEGACY_COLORS.darkGreyEnabled};
 
   &:hover {
-    color: ${LEGACY_COLORS.darkGreyHover};
+    color: ${COLORS.grey60};
   }
 
   &:focus-visible {

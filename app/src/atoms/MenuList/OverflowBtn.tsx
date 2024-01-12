@@ -36,7 +36,7 @@ export const OverflowBtn = React.forwardRef(
           }
 
           &:focus-visible circle {
-            fill: ${LEGACY_COLORS.darkGreyHover};
+            fill: ${COLORS.grey60};
           }
 
           &:disabled circle {

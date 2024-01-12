@@ -87,7 +87,7 @@ describe('ToggleButton', () => {
     props.toggledOn = false
     const { getByLabelText } = render(props)
     const button = getByLabelText('toggle button')
-    expect(button).toHaveStyleRule('color', `${String(LEGACY_COLORS.darkGreyHover)}`, {
+    expect(button).toHaveStyleRule('color', `${String(COLORS.grey60)}`, {
       modifier: ':hover',
     })
   })
