@@ -7,7 +7,6 @@ import {
   OutlineButton,
   Text,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
 import { actions as stepsActions } from '../../ui/steps'
 import { TerminalItemId } from '../../steplist'
 import { actions, selectors, HintKey } from '../../tutorial'
@@ -17,8 +16,10 @@ import EXAMPLE_ADD_LIQUIDS_IMAGE from '../../images/example_add_liquids.png'
 import EXAMPLE_WATCH_LIQUIDS_MOVE_IMAGE from '../../images/example_watch_liquids_move.png'
 import EXAMPLE_BATCH_EDIT_IMAGE from '../../images/announcements/multi_select.gif'
 import { BaseState, ThunkDispatch } from '../../types'
+import { useTranslation } from 'react-i18next'
 
 interface SP {
+  t: any
   hintKey?: HintKey | null
 }
 interface DP {
@@ -58,8 +59,10 @@ class HintsComponent extends React.Component<Props, State> {
         return (
           <>
             <div className={styles.summary}>
-              {i18n.t('alert.hint.add_liquids_and_labware.summary', {
-                deck_setup_step: i18n.t('nav.terminal_item.__initial_setup__'),
+              {this.props.t('hint.add_liquids_and_labware.summary', {
+                deck_setup_step: this.props.t(
+                  'nav:terminal_item.__initial_setup__'
+                ),
               })}
             </div>
 
@@ -67,7 +70,7 @@ class HintsComponent extends React.Component<Props, State> {
               <div className={styles.step_description}>
                 <span>Step 1: </span>
                 <span>
-                  {i18n.t('alert.hint.add_liquids_and_labware.step1')}
+                  {this.props.t('hint.add_liquids_and_labware.step1')}
                 </span>
               </div>
               <img src={EXAMPLE_ADD_LIQUIDS_IMAGE} />
@@ -77,7 +80,7 @@ class HintsComponent extends React.Component<Props, State> {
               <div className={styles.step_description}>
                 <span>Step 2: </span>
                 <span>
-                  {i18n.t('alert.hint.add_liquids_and_labware.step2')}
+                  {this.props.t('hint.add_liquids_and_labware.step2')}
                 </span>
               </div>
               <img src={EXAMPLE_WATCH_LIQUIDS_MOVE_IMAGE} />
@@ -87,31 +90,33 @@ class HintsComponent extends React.Component<Props, State> {
       case 'deck_setup_explanation':
         return (
           <>
-            <p>{i18n.t(`alert.hint.${hintKey}.body1`)}</p>
-            <p>{i18n.t(`alert.hint.${hintKey}.body2`)}</p>
-            <p>{i18n.t(`alert.hint.${hintKey}.body3`)}</p>
+            <p>{this.props.t(`hint.${hintKey}.body1`)}</p>
+            <p>{this.props.t(`hint.${hintKey}.body2`)}</p>
+            <p>{this.props.t(`hint.${hintKey}.body3`)}</p>
           </>
         )
       case 'module_without_labware':
         return (
           <>
-            <p>{i18n.t(`alert.hint.${hintKey}.body`)}</p>
+            <p>{this.props.t(`alert:hint.${hintKey}.body`)}</p>
           </>
         )
       case 'thermocycler_lid_passive_cooling':
         return (
           <>
             <p>
-              {i18n.t(`alert.hint.${hintKey}.body1a`)}
-              <strong>{i18n.t(`alert.hint.${hintKey}.strong_body1`)}</strong>
-              {i18n.t(`alert.hint.${hintKey}.body1b`)}
+              {this.props.t(`alert:hint.${hintKey}.body1a`)}
+              <strong>
+                {this.props.t(`alert:hint.${hintKey}.strong_body1`)}
+              </strong>
+              {this.props.t(`alert:hint.${hintKey}.body1b`)}
             </p>
             <ol className={styles.numbered_list}>
               <li>
-                <span>{i18n.t(`alert.hint.${hintKey}.li1`)}</span>
+                <span>{this.props.t(`alert:hint.${hintKey}.li1`)}</span>
               </li>
               <li>
-                <span>{i18n.t(`alert.hint.${hintKey}.li2`)}</span>
+                <span>{this.props.t(`alert:hint.${hintKey}.li2`)}</span>
               </li>
             </ol>
           </>
@@ -123,33 +128,33 @@ class HintsComponent extends React.Component<Props, State> {
               <img src={EXAMPLE_BATCH_EDIT_IMAGE} />
             </span>
             <span className={styles.column_right}>
-              <p>{i18n.t(`alert.hint.${hintKey}.body1`)}</p>
+              <p>{this.props.t(`alert:hint.${hintKey}.body1`)}</p>
               <p>
-                {i18n.t(`alert.hint.${hintKey}.body2`)}
+                {this.props.t(`alert:hint.${hintKey}.body2`)}
                 <ol className={styles.numbered_list}>
                   <li>
-                    {i18n.t(`alert.hint.${hintKey}.li1a`)}
+                    {this.props.t(`alert:hint.${hintKey}.li1a`)}
                     <strong>
-                      {i18n.t(`alert.hint.${hintKey}.strong_li1`)}
+                      {this.props.t(`alert:hint.${hintKey}.strong_li1`)}
                     </strong>
-                    {i18n.t(`alert.hint.${hintKey}.li1b`)}
+                    {this.props.t(`alert:hint.${hintKey}.li1b`)}
                   </li>
                   <li>
-                    {i18n.t(`alert.hint.${hintKey}.li2a`)}
+                    {this.props.t(`alert:hint.${hintKey}.li2a`)}
                     <strong>
-                      {i18n.t(`alert.hint.${hintKey}.strong_li2`)}
+                      {this.props.t(`alert:hint.${hintKey}.strong_li2`)}
                     </strong>
-                    {i18n.t(`alert.hint.${hintKey}.li2b`)}
+                    {this.props.t(`alert:hint.${hintKey}.li2b`)}
                   </li>
                 </ol>
               </p>
               <p>
-                {i18n.t(`alert.hint.${hintKey}.body3a`)} <br />
-                {i18n.t(`alert.hint.${hintKey}.body3b`)}
+                {this.props.t(`alert:hint.${hintKey}.body3a`)} <br />
+                {this.props.t(`alert:hint.${hintKey}.body3b`)}
               </p>
               <p>
-                {i18n.t(`alert.hint.${hintKey}.body4a`)} <br />
-                {i18n.t(`alert.hint.${hintKey}.body4b`)}
+                {this.props.t(`alert:hint.${hintKey}.body4a`)} <br />
+                {this.props.t(`alert:hint.${hintKey}.body4b`)}
               </p>
             </span>
           </>
@@ -157,7 +162,7 @@ class HintsComponent extends React.Component<Props, State> {
       case 'waste_chute_warning':
         return (
           <Flex>
-            <Text>{i18n.t(`alert.hint.${hintKey}.body1`)}</Text>
+            <Text>{this.props.t(`hint.${hintKey}.body1`)}</Text>
           </Flex>
         )
       default:
@@ -169,7 +174,7 @@ class HintsComponent extends React.Component<Props, State> {
     const { hintKey } = this.props
     if (!hintKey) return null
 
-    const headingText = i18n.t(`alert.hint.${hintKey}.title`)
+    const headingText = this.props.t(`hint.${hintKey}.title`)
     const hintIsAlert = HINT_IS_ALERT.includes(hintKey)
     return (
       <Portal>
@@ -183,7 +188,7 @@ class HintsComponent extends React.Component<Props, State> {
           <div>
             <DeprecatedCheckboxField
               className={styles.dont_show_again}
-              label={i18n.t('alert.hint.dont_show_again')}
+              label={this.props.t('hint.dont_show_again')}
               onChange={this.toggleRememberDismissal}
               value={this.state.rememberDismissal}
             />
@@ -191,7 +196,7 @@ class HintsComponent extends React.Component<Props, State> {
               className={styles.ok_button}
               onClick={this.makeHandleCloseClick(hintKey)}
             >
-              {i18n.t('button.ok')}
+              {this.props.t('button:ok')}
             </OutlineButton>
           </div>
         </AlertModal>
@@ -200,9 +205,13 @@ class HintsComponent extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: BaseState): SP => ({
-  hintKey: selectors.getHint(state),
-})
+const mapStateToProps = (state: BaseState): SP => {
+  const { t } = useTranslation(['alert', 'nav', 'button'])
+  return {
+    hintKey: selectors.getHint(state),
+    t: t,
+  }
+}
 const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DP => ({
   removeHint: (hintKey, rememberDismissal) =>
     dispatch(actions.removeHint(hintKey, rememberDismissal)),

@@ -11,7 +11,6 @@ import {
   DeprecatedPrimaryButton,
   Options,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
 import styles from './LiquidPlacementForm.css'
 import formStyles from '../forms/forms.css'
 import stepEditFormStyles from '../StepEditForm/StepEditForm.css'
@@ -32,7 +31,7 @@ export interface Props {
   liquidSelectionOptions: Options
   selectedWellsMaxVolume: number
   showForm: boolean
-
+  t: any
   cancelForm: () => unknown
   clearWells: (() => unknown | null) | null
   saveForm: (liquidPlacementFormValues: LiquidPlacementFormValues) => unknown
@@ -58,21 +57,21 @@ export class LiquidPlacementForm extends React.Component<Props> {
     const { selectedWellsMaxVolume } = this.props
     return Yup.object().shape({
       selectedLiquidId: Yup.string().required(
-        i18n.t('form.generic.error.required', {
-          name: i18n.t('form.liquid_placement.liquid'),
+        this.props.t('generic.error.required', {
+          name: this.props.t('liquid_placement.liquid'),
         })
       ),
       volume: Yup.number()
         .nullable()
         .required(
-          i18n.t('form.generic.error.required', {
-            name: i18n.t('form.liquid_placement.volume'),
+          this.props.t('generic.error.required', {
+            name: this.props.t('liquid_placement.volume'),
           })
         )
-        .moreThan(0, i18n.t('form.generic.error.more_than_zero'))
+        .moreThan(0, this.props.t('generic.error.more_than_zero'))
         .max(
           selectedWellsMaxVolume,
-          i18n.t('form.liquid_placement.volume_exceeded', {
+          this.props.t('liquid_placement.volume_exceeded', {
             volume: selectedWellsMaxVolume,
           })
         ),
@@ -126,7 +125,7 @@ export class LiquidPlacementForm extends React.Component<Props> {
             <form onSubmit={handleSubmit}>
               <div className={styles.field_row}>
                 <FormGroup
-                  label={i18n.t('form.liquid_placement.liquid')}
+                  label={this.props.t('liquid_placement.liquid')}
                   className={styles.liquid_field}
                 >
                   <DropdownField
@@ -142,12 +141,12 @@ export class LiquidPlacementForm extends React.Component<Props> {
                   />
                 </FormGroup>
                 <FormGroup
-                  label={i18n.t('form.liquid_placement.volume')}
+                  label={this.props.t('liquid_placement.volume')}
                   className={styles.volume_field}
                 >
                   <InputField
                     name="volume"
-                    units={i18n.t('application.units.microliter')}
+                    units={this.props.t('application:units.microliter')}
                     error={touched.volume ? errors.volume : null}
                     value={values.volume}
                     onChange={this.handleChangeVolume(setFieldValue)}
@@ -161,13 +160,13 @@ export class LiquidPlacementForm extends React.Component<Props> {
                   disabled={!this.props.clearWells}
                   onClick={this.handleClearWells}
                 >
-                  {i18n.t('button.clear_wells')}
+                  {this.props.t('button:clear_wells')}
                 </OutlineButton>
                 <OutlineButton onClick={this.handleCancelForm}>
-                  {i18n.t('button.cancel')}
+                  {this.props.t('button:cancel')}
                 </OutlineButton>
                 <DeprecatedPrimaryButton type="submit">
-                  {i18n.t('button.save')}
+                  {this.props.t('button:save')}
                 </DeprecatedPrimaryButton>
               </div>
             </form>

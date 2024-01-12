@@ -7,7 +7,6 @@ import {
   RadioGroup,
   InputField,
 } from '@opentrons/components'
-import { i18n } from '../../../../localization'
 import { Portal } from '../../../portals/MainPageModalPortal'
 import modalStyles from '../../../modals/modal.css'
 import stepFormStyles from '../../StepEditForm.css'
@@ -47,7 +46,7 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
     name,
     pipetteDisplayName,
   } = props
-  const { t } = useTranslation('form')
+  const { t } = useTranslation(['form', 'application'])
   const DEFAULT_LABEL = t('step_edit_form.field.flow_rate.label')
 
   const initialState: State = {
@@ -142,7 +141,7 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
       isIndeterminate={isIndeterminate && modalFlowRate === null}
       name={`${name}_customFlowRate`}
       onChange={handleChangeNumber}
-      units={i18n.t('application.units.microliterPerSec')}
+      units={t('application:units.microliterPerSec')}
       value={`${modalFlowRate || ''}`}
     />
   )
@@ -181,8 +180,8 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
           onChange={handleChangeRadio}
           options={[
             {
-              name: `${defaultFlowRate || '?'} ${i18n.t(
-                'application.units.microliterPerSec'
+              name: `${defaultFlowRate || '?'} ${t(
+                'application:units.microliterPerSec'
               )} (default)`,
               value: 'default',
             },
@@ -207,7 +206,7 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
           name={name}
           onClick={openModal}
           readOnly
-          units={i18n.t('application.units.microliterPerSec')}
+          units={t('application:units.microliterPerSec')}
           value={props.value ? String(props.value) : 'default'}
         />
       </FormGroup>

@@ -1,5 +1,4 @@
 import assert from 'assert'
-import { i18n } from '../../localization'
 import * as React from 'react'
 import cx from 'classnames'
 import { connect } from 'react-redux'
@@ -19,6 +18,7 @@ import { LabwareDefinition2 } from '@opentrons/shared-data'
 
 import modalStyles from '../modals/modal.css'
 import styles from './labware.css'
+import { useTranslation } from 'react-i18next'
 
 interface SP {
   definition?: LabwareDefinition2 | null
@@ -34,6 +34,7 @@ type Props = SP & DP
 
 const BrowseLabwareModalComponent = (props: Props): JSX.Element | null => {
   const { drillUp, definition, ingredNames, wellContents } = props
+  const { t } = useTranslation('modal')
   if (!definition) {
     assert(definition, 'BrowseLabwareModal expected definition')
     return null
@@ -54,7 +55,7 @@ const BrowseLabwareModalComponent = (props: Props): JSX.Element | null => {
         wellContents={wellContents}
       />
       <div className={styles.modal_instructions}>
-        {i18n.t('modal.browse_labware.instructions')}
+        {t('browse_labware.instructions')}
       </div>
     </Modal>
   )

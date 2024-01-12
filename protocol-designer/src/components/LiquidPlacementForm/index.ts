@@ -16,6 +16,7 @@ import {
 } from './LiquidPlacementForm'
 import { Dispatch } from 'redux'
 import { BaseState } from '../../types'
+import { useTranslation } from 'react-i18next'
 type SP = Omit<
   LiquidPlacementFormProps & {
     _labwareId?: string | null
@@ -27,7 +28,7 @@ type SP = Omit<
 
 function mapStateToProps(state: BaseState): SP {
   const selectedWells = getSelectedWells(state)
-
+  const { t } = useTranslation(['form', 'button', 'application'])
   const _labwareId = labwareIngredSelectors.getSelectedLabwareId(state)
 
   const liquidLocations = labwareIngredSelectors.getLiquidsByLabwareId(state)
@@ -55,6 +56,7 @@ function mapStateToProps(state: BaseState): SP {
     _labwareId,
     _selectedWells: Object.keys(selectedWells),
     _selectionHasLiquids,
+    t: t,
   }
 }
 

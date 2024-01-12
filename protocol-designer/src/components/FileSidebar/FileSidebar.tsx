@@ -7,7 +7,6 @@ import {
   OutlineButton,
   SidePanel,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
 import { resetScrollElements } from '../../ui/steps/utils'
 import { Portal } from '../portals/MainPageModalPortal'
 import { useBlockingHint } from '../Hints/useBlockingHint'
@@ -86,18 +85,20 @@ function getWarningContent({
   gripperWithoutStep,
   fixtureWithoutStep,
 }: MissingContent): WarningContent | null {
+  const { t } = useTranslation(['alert', 'modules'])
+
   if (noCommands) {
     return {
       content: (
         <>
-          <p>{i18n.t('alert.export_warnings.no_commands.body1')}</p>
+          <p>{t('export_warnings.no_commands.body1')}</p>
           <p>
-            {i18n.t('alert.export_warnings.no_commands.body2')}
+            {t('export_warnings.no_commands.body2')}
             <KnowledgeBaseLink to="protocolSteps">here</KnowledgeBaseLink>.
           </p>
         </>
       ),
-      heading: i18n.t('alert.export_warnings.no_commands.heading'),
+      heading: t('export_warnings.no_commands.heading'),
     }
   }
 
@@ -105,11 +106,11 @@ function getWarningContent({
     return {
       content: (
         <>
-          <p>{i18n.t('alert.export_warnings.unused_gripper.body1')}</p>
-          <p>{i18n.t('alert.export_warnings.unused_gripper.body2')}</p>
+          <p>{t('export_warnings.unused_gripper.body1')}</p>
+          <p>{t('export_warnings.unused_gripper.body2')}</p>
         </>
       ),
-      heading: i18n.t('alert.export_warnings.unused_gripper.heading'),
+      heading: t('export_warnings.unused_gripper.heading'),
     }
   }
 
@@ -117,9 +118,7 @@ function getWarningContent({
     .map(pipette => `${pipette.mount} ${pipette.spec.displayName}`)
     .join(' and ')
   const modulesDetails = modulesWithoutStep
-    .map(moduleOnDeck =>
-      i18n.t(`modules.module_long_names.${moduleOnDeck.type}`)
-    )
+    .map(moduleOnDeck => t(`modules:module_long_names.${moduleOnDeck.type}`))
     .join(' and ')
 
   if (pipettesWithoutStep.length && modulesWithoutStep.length) {
@@ -127,19 +126,15 @@ function getWarningContent({
       content: (
         <>
           <p>
-            {i18n.t('alert.export_warnings.unused_pipette_and_module.body1', {
+            {t('export_warnings.unused_pipette_and_module.body1', {
               modulesDetails,
               pipettesDetails,
             })}
           </p>
-          <p>
-            {i18n.t('alert.export_warnings.unused_pipette_and_module.body2')}
-          </p>
+          <p>{t('export_warnings.unused_pipette_and_module.body2')}</p>
         </>
       ),
-      heading: i18n.t(
-        'alert.export_warnings.unused_pipette_and_module.heading'
-      ),
+      heading: t('export_warnings.unused_pipette_and_module.heading'),
     }
   }
 
@@ -148,14 +143,14 @@ function getWarningContent({
       content: (
         <>
           <p>
-            {i18n.t('alert.export_warnings.unused_pipette.body1', {
+            {t('export_warnings.unused_pipette.body1', {
               pipettesDetails,
             })}
           </p>
-          <p>{i18n.t('alert.export_warnings.unused_pipette.body2')}</p>
+          <p>{t('export_warnings.unused_pipette.body2')}</p>
         </>
       ),
-      heading: i18n.t('alert.export_warnings.unused_pipette.heading'),
+      heading: t('export_warnings.unused_pipette.heading'),
     }
   }
 
@@ -166,14 +161,14 @@ function getWarningContent({
       content: (
         <>
           <p>
-            {i18n.t(`alert.export_warnings.${moduleCase}.body1`, {
+            {t(`export_warnings.${moduleCase}.body1`, {
               modulesDetails,
             })}
           </p>
-          <p>{i18n.t(`alert.export_warnings.${moduleCase}.body2`)}</p>
+          <p>{t(`export_warnings.${moduleCase}.body2`)}</p>
         </>
       ),
-      heading: i18n.t(`alert.export_warnings.${moduleCase}.heading`),
+      heading: t(`export_warnings.${moduleCase}.heading`),
     }
   }
 
@@ -183,19 +178,19 @@ function getWarningContent({
         (fixtureWithoutStep.trashBin && !fixtureWithoutStep.wasteChute) ||
         (!fixtureWithoutStep.trashBin && fixtureWithoutStep.wasteChute) ? (
           <p>
-            {i18n.t('alert.export_warnings.unused_trash.body', {
+            {t('export_warnings.unused_trash.body', {
               name: fixtureWithoutStep.trashBin ? 'trash bin' : 'waste chute',
             })}
           </p>
         ) : (
           <p>
-            {i18n.t('alert.export_warnings.unused_trash.body_both', {
+            {t('export_warnings.unused_trash.body_both', {
               trashName: 'trash bin',
               wasteName: 'waste chute',
             })}
           </p>
         ),
-      heading: i18n.t('alert.export_warnings.unused_trash.heading'),
+      heading: t('export_warnings.unused_trash.heading'),
     }
   }
 
@@ -204,19 +199,19 @@ function getWarningContent({
       content: (
         <>
           <p>
-            {i18n.t('alert.export_warnings.unused_staging_area.body1', {
+            {t('export_warnings.unused_staging_area.body1', {
               count: fixtureWithoutStep.stagingAreaSlots.length,
               slot: fixtureWithoutStep.stagingAreaSlots,
             })}
           </p>
           <p>
-            {i18n.t('alert.export_warnings.unused_staging_area.body2', {
+            {t('export_warnings.unused_staging_area.body2', {
               count: fixtureWithoutStep.stagingAreaSlots.length,
             })}
           </p>
         </>
       ),
-      heading: i18n.t('alert.export_warnings.unused_staging_area.heading'),
+      heading: t('export_warnings.unused_staging_area.heading'),
     }
   }
 

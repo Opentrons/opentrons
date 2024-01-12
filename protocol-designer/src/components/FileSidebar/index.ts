@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import { i18n } from '../../localization'
+import { useTranslation } from 'react-i18next'
 import { actions, selectors } from '../../navigation'
 import { selectors as fileDataSelectors } from '../../file-data'
 import { selectors as stepFormSelectors } from '../../step-forms'
@@ -41,6 +41,7 @@ function mapStateToProps(state: BaseState): SP {
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const robotType = getRobotType(state)
   const additionalEquipment = getAdditionalEquipment(state)
+  const { t } = useTranslation('alert')
 
   return {
     canDownload,
@@ -76,10 +77,7 @@ function mergeProps(
   const { dispatch } = dispatchProps
   return {
     loadFile: fileChangeEvent => {
-      if (
-        !_hasUnsavedChanges ||
-        window.confirm(i18n.t('alert.window.confirm_import'))
-      ) {
+      if (!_hasUnsavedChanges || window.confirm(t('window.confirm_import'))) {
         dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
       }
     },

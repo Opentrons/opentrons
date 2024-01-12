@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
   ALIGN_FLEX_START,
@@ -12,7 +13,6 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { i18n } from '../../../localization'
 import {
   deleteContainer,
   duplicateLabware,
@@ -80,7 +80,7 @@ const EditLabwareOffDeckComponent = (props: Props): JSX.Element => {
     deleteLabware,
     duplicateLabware,
   } = props
-
+  const { t } = useTranslation('deck')
   const { isTiprack } = labwareEntity.def.parameters
   if (isYetUnnamed && !isTiprack) {
     return (
@@ -97,18 +97,18 @@ const EditLabwareOffDeckComponent = (props: Props): JSX.Element => {
         {!isTiprack ? (
           <a className={styles.overlay_button} onClick={editLiquids}>
             <Icon className={styles.overlay_icon} name="pencil" />
-            {i18n.t('deck.overlay.edit.name_and_liquids')}
+            {t('overlay.edit.name_and_liquids')}
           </a>
         ) : (
           <div className={styles.button_spacer} />
         )}
         <a className={styles.overlay_button} onClick={duplicateLabware}>
           <Icon className={styles.overlay_icon} name="content-copy" />
-          {i18n.t('deck.overlay.edit.duplicate')}
+          {t('overlay.edit.duplicate')}
         </a>
         <a className={styles.overlay_button} onClick={deleteLabware}>
           <Icon className={styles.overlay_icon} name="close" />
-          {i18n.t('deck.overlay.edit.delete')}
+          {t('overlay.edit.delete')}
         </a>
       </div>
     )

@@ -1,6 +1,6 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
-import { i18n } from '../../localization'
 import {
   DeprecatedPrimaryButton,
   SidePanel,
@@ -16,7 +16,6 @@ import * as labwareIngredActions from '../../labware-ingred/actions'
 import { BaseState, ThunkDispatch } from '../../types'
 
 import styles from './styles.css'
-
 interface SP {
   liquids: OrderedLiquids
   selectedLiquid?: string | null
@@ -31,6 +30,7 @@ type Props = SP & DP
 
 function LiquidsSidebarComponent(props: Props): JSX.Element {
   const { liquids, selectedLiquid, createNewLiquid, selectLiquid } = props
+  const { t } = useTranslation('button')
   return (
     <SidePanel title="Liquids">
       {liquids.map(({ ingredientId, name, displayColor }) => (
@@ -55,7 +55,7 @@ function LiquidsSidebarComponent(props: Props): JSX.Element {
       ))}
       <div className={listButtonStyles.list_item_button}>
         <DeprecatedPrimaryButton iconName="water" onClick={createNewLiquid}>
-          {i18n.t('button.new_liquid')}
+          {t('new_liquid')}
         </DeprecatedPrimaryButton>
       </div>
     </SidePanel>

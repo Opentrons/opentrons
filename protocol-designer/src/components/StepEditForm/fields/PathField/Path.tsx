@@ -1,7 +1,7 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import { FormGroup, Tooltip, useHoverTooltip } from '@opentrons/components'
-import { i18n } from '../../../../localization'
 import SINGLE_IMAGE from '../../../../images/path_single_transfers.svg'
 import MULTI_DISPENSE_IMAGE from '../../../../images/path_multi_dispense.svg'
 import MULTI_ASPIRATE_IMAGE from '../../../../images/path_multi_aspirate.svg'
@@ -57,11 +57,11 @@ const PathButton = (buttonProps: ButtonProps): JSX.Element => {
     subtitle,
   } = buttonProps
   const [targetProps, tooltipProps] = useHoverTooltip()
-
+  const { t } = useTranslation('form')
   const tooltip = (
     <Tooltip {...tooltipProps}>
       <div className={styles.path_tooltip_title}>
-        {i18n.t(`form.step_edit_form.field.path.title.${path}`)}
+        {t(`step_edit_form.field.path.title.${path}`)}
       </div>
       <img
         className={styles.path_tooltip_image}
