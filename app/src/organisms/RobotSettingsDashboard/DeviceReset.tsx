@@ -45,7 +45,7 @@ const OptionLabel = styled.label<LabelProps>`
     isSelected === true ? COLORS.white : LEGACY_COLORS.darkBlack100};
   background: ${({ isSelected }) =>
     isSelected === true
-      ? LEGACY_COLORS.blueEnabled
+      ? COLORS.blue50
       : LEGACY_COLORS.mediumBlueEnabled};
 `
 

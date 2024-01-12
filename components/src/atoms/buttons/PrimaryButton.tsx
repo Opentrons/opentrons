@@ -3,7 +3,7 @@ import { LEGACY_COLORS, BORDERS, TYPOGRAPHY, SPACING } from '../../ui-style-cons
 import { NewPrimaryBtn, styleProps } from '../../primitives'
 
 export const PrimaryButton = styled(NewPrimaryBtn)`
-  background-color: ${LEGACY_COLORS.blueEnabled};
+  background-color: ${COLORS.blue50};
   border-radius: ${BORDERS.radiusSoftCorners};
   box-shadow: none;
   padding-left: ${SPACING.spacing16};

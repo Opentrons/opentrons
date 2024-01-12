@@ -86,7 +86,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             ) : (
               <Flex alignItems={ALIGN_CENTER} marginTop={SPACING.spacing4}>
                 <Icon
-                  color={LEGACY_COLORS.blueEnabled}
+                  color={COLORS.blue50}
                   name="check-decagram"
                   height=".7rem"
                 />

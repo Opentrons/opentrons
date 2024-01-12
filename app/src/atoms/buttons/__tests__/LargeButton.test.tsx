@@ -22,7 +22,7 @@ describe('LargeButton', () => {
     fireEvent.click(screen.getByText('large button'))
     expect(props.onClick).toHaveBeenCalled()
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.blueEnabled}`
+      `background-color: ${COLORS.blue50}`
     )
   })
   it('renders the alert button', () => {

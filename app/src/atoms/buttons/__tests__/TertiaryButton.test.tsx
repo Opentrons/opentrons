@@ -27,7 +27,7 @@ describe('TertiaryButton', () => {
     const { getByText } = render(props)
     const button = getByText('tertiary button')
     expect(button).toHaveStyle(
-      `background-color: ${String(LEGACY_COLORS.blueEnabled)}`
+      `background-color: ${String(COLORS.blue50)}`
     )
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16}`

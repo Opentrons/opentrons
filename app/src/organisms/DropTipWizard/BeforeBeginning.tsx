@@ -217,20 +217,20 @@ const UNSELECTED_OPTIONS_STYLE = css`
 `
 const SELECTED_OPTIONS_STYLE = css`
   ${UNSELECTED_OPTIONS_STYLE}
-  border: 1px solid ${LEGACY_COLORS.blueEnabled};
+  border: 1px solid ${COLORS.blue50};
 
   &:hover {
-    border: 1px solid ${LEGACY_COLORS.blueEnabled};
+    border: 1px solid ${COLORS.blue50};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     border-width: 0px;
-    background-color: ${LEGACY_COLORS.blueEnabled};
+    background-color: ${COLORS.blue50};
     color: ${COLORS.white};
 
     &:hover {
       border-width: 0px;
-      background-color: ${LEGACY_COLORS.blueEnabled};
+      background-color: ${COLORS.blue50};
     }
   }
 `

@@ -17,7 +17,7 @@ import type { RunStatus } from '@opentrons/api-client'
 const PLAY_PAUSE_BUTTON_STYLE = css`
   display: flex;
   border-radius: 50%;
-  background-color: ${LEGACY_COLORS.blueEnabled};
+  background-color: ${COLORS.blue50};
   -webkit-tap-highlight-color: transparent;
 
   &:focus {
@@ -27,12 +27,12 @@ const PLAY_PAUSE_BUTTON_STYLE = css`
   &:hover {
     border: none;
     box-shadow: none;
-    background-color: ${LEGACY_COLORS.blueEnabled};
+    background-color: ${COLORS.blue50};
     color: ${COLORS.white};
   }
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${LEGACY_COLORS.blueEnabled};
+    background-color: ${COLORS.blue50};
   }
   &:active {
     background-color: ${COLORS.blue60};

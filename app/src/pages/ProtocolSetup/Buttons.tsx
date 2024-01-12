@@ -40,7 +40,7 @@ export function PlayButton({
 
     &:hover {
       background-color: ${ready && !isDoorOpen
-        ? LEGACY_COLORS.blueEnabled
+        ? COLORS.blue50
         : LEGACY_COLORS.darkBlack20};
       color: ${COLORS.white};
     }
@@ -48,7 +48,7 @@ export function PlayButton({
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE};
       background-color: ${ready && !isDoorOpen
-        ? LEGACY_COLORS.blueEnabled
+        ? COLORS.blue50
         : LEGACY_COLORS.darkBlack20};
     }
 
@@ -70,7 +70,7 @@ export function PlayButton({
       backgroundColor={
         disabled || !ready || isDoorOpen
           ? LEGACY_COLORS.darkBlack20
-          : LEGACY_COLORS.blueEnabled
+          : COLORS.blue50
       }
       borderRadius="6.25rem"
       display={DISPLAY_FLEX}

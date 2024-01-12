@@ -80,22 +80,22 @@ const UNSELECTED_OPTIONS_STYLE = css`
 `
 const SELECTED_OPTIONS_STYLE = css`
   ${UNSELECTED_OPTIONS_STYLE}
-  border: 1px solid ${LEGACY_COLORS.blueEnabled};
+  border: 1px solid ${COLORS.blue50};
   background-color: ${LEGACY_COLORS.lightBlue};
 
   &:hover {
-    border: 1px solid ${LEGACY_COLORS.blueEnabled};
+    border: 1px solid ${COLORS.blue50};
     background-color: ${LEGACY_COLORS.lightBlue};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     border-width: 0px;
-    background-color: ${LEGACY_COLORS.blueEnabled};
+    background-color: ${COLORS.blue50};
     color: ${COLORS.white};
 
     &:hover {
       border-width: 0px;
-      background-color: ${LEGACY_COLORS.blueEnabled};
+      background-color: ${COLORS.blue50};
     }
   }
 `

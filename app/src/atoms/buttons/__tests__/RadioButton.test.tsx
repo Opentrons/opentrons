@@ -34,7 +34,7 @@ describe('RadioButton', () => {
     }
     const { getByRole } = render(props)
     const label = getByRole('label')
-    expect(label).toHaveStyle(`background-color: ${LEGACY_COLORS.blueEnabled}`)
+    expect(label).toHaveStyle(`background-color: ${COLORS.blue50}`)
     expect(label).toHaveStyle(`padding: ${SPACING.spacing24}`)
   })
   it('renders the small button', () => {
@@ -55,7 +55,7 @@ describe('RadioButton', () => {
     }
     const { getByRole } = render(props)
     const label = getByRole('label')
-    expect(label).toHaveStyle(`background-color: ${LEGACY_COLORS.blueEnabled}`)
+    expect(label).toHaveStyle(`background-color: ${COLORS.blue50}`)
     expect(label).toHaveStyle(`padding: ${SPACING.spacing20}`)
   })
 })

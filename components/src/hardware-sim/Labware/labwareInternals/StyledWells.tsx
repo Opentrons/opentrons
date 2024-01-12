@@ -26,8 +26,8 @@ export const STYLE_BY_WELL_CONTENTS: {
   }
 } = {
   highlightedWell: {
-    stroke: LEGACY_COLORS.blueEnabled,
-    fill: `${LEGACY_COLORS.blueEnabled}33`, // 20% opacity
+    stroke: COLORS.blue50,
+    fill: `${COLORS.blue50}33`, // 20% opacity
     strokeWidth: 1,
   },
   disabledWell: {
@@ -36,7 +36,7 @@ export const STYLE_BY_WELL_CONTENTS: {
     strokeWidth: 0.6,
   },
   selectedWell: {
-    stroke: LEGACY_COLORS.blueEnabled,
+    stroke: COLORS.blue50,
     fill: COLORS.transparent,
     strokeWidth: 1,
   },

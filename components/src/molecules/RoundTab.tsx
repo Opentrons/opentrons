@@ -39,7 +39,7 @@ const currentTabStyle = css`
   border-top: ${BORDERS.lineBorder};
   border-left: ${BORDERS.lineBorder};
   border-right: ${BORDERS.lineBorder};
-  color: ${LEGACY_COLORS.blueEnabled};
+  color: ${COLORS.blue50};
 
   /* extend below the tab when active to flow into the content */
   &:after {

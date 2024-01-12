@@ -274,7 +274,7 @@ export function ModulesListItem({
       <Btn
         marginLeft={SPACING.spacing20}
         css={css`
-          color: ${LEGACY_COLORS.blueEnabled};
+          color: ${COLORS.blue50};
 
           &:hover {
             color: ${COLORS.blue55};

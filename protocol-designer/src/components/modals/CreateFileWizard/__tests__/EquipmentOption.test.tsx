@@ -55,7 +55,7 @@ describe('EquipmentOption', () => {
     const { getByText, getByLabelText } = render(props)
     getByText('mockText')
     expect(getByLabelText('EquipmentOption_checkbox-marked')).toHaveStyle(
-      `color: ${LEGACY_COLORS.blueEnabled}`
+      `color: ${COLORS.blue50}`
     )
     expect(getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
       `border: ${BORDERS.activeLineBorder}`

@@ -446,7 +446,7 @@ function LabwareLatch({
               size="2.5rem"
               color={
                 commandType === 'heaterShaker/closeLabwareLatch'
-                  ? LEGACY_COLORS.blueEnabled
+                  ? COLORS.blue50
                   : ''
               }
             />

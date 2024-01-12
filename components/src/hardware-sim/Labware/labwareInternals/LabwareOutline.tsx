@@ -59,7 +59,7 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
             borderThickness={1.5 * OUTLINE_THICKNESS_MM}
             xDimension={dimensions.xDimension}
             yDimension={dimensions.yDimension}
-            stroke={LEGACY_COLORS.blueEnabled}
+            stroke={COLORS.blue50}
             fill={backgroundFill}
             rx="4"
             ry="4"

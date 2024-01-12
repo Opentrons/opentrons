@@ -19,7 +19,7 @@ export const SubmitPrimaryButton = (
   props: SubmitPrimaryButtonProps
 ): JSX.Element => {
   const SUBMIT_INPUT_STYLE = css`
-    background-color: ${LEGACY_COLORS.blueEnabled};
+    background-color: ${COLORS.blue50};
     border-radius: ${BORDERS.radiusSoftCorners};
     padding: ${SPACING.spacing8} ${SPACING.spacing16};
     color: ${COLORS.white};

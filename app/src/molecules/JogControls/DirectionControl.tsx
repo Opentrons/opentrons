@@ -192,8 +192,8 @@ const DEFAULT_BUTTON_STYLE = css`
 
   &:active {
     background-color: ${COLORS.white};
-    color: ${LEGACY_COLORS.blueEnabled};
-    border: 1px ${LEGACY_COLORS.blueEnabled} solid;
+    color: ${COLORS.blue50};
+    border: 1px ${COLORS.blue50} solid;
   }
 
   &:disabled {
@@ -204,8 +204,8 @@ const DEFAULT_BUTTON_STYLE = css`
 
 const ACTIVE_BUTTON_STYLE = css`
   ${DEFAULT_BUTTON_STYLE}
-  color: ${LEGACY_COLORS.blueEnabled};
-  border: 1px ${LEGACY_COLORS.blueEnabled} solid;
+  color: ${COLORS.blue50};
+  border: 1px ${COLORS.blue50} solid;
 
   &:hover {
     color: ${COLORS.blue60};

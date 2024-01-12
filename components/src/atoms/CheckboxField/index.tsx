@@ -45,7 +45,7 @@ const OUTER_STYLE = css`
 const INNER_STYLE_VALUE = css`
   width: ${SPACING.spacing20};
   min-width: ${SPACING.spacing20};
-  color: ${LEGACY_COLORS.blueEnabled};
+  color: ${COLORS.blue50};
   display: flex;
   border-radius: 1px;
   justify-content: ${JUSTIFY_CENTER};

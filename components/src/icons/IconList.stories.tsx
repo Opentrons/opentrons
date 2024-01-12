@@ -81,7 +81,7 @@ const Template: Story<React.ComponentProps<typeof IconComponent>> = args => {
           onClick={() => handleCopy(name, index)}
           border={
             selectedIcon === name
-              ? `2px solid ${LEGACY_COLORS.blueEnabled}`
+              ? `2px solid ${COLORS.blue50}`
               : `2px solid ${COLORS.black90}`
           }
         >
@@ -95,7 +95,7 @@ const Template: Story<React.ComponentProps<typeof IconComponent>> = args => {
           </Text>
           <Flex height="1.5rem">
             {showText ? (
-              <Text color={LEGACY_COLORS.blueEnabled}> {'copied'}</Text>
+              <Text color={COLORS.blue50}> {'copied'}</Text>
             ) : null}
           </Flex>
         </Flex>
@@ -105,5 +105,5 @@ const Template: Story<React.ComponentProps<typeof IconComponent>> = args => {
 }
 export const IconList = Template.bind({})
 IconList.args = {
-  backgroundColor: LEGACY_COLORS.blueEnabled,
+  backgroundColor: COLORS.blue50,
 }

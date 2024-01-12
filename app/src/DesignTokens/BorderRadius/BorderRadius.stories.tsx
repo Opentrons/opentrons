@@ -48,7 +48,7 @@ const Template: Story<BorderRadiusStorybookProps> = args => {
           <Box
             width="10rem"
             height="4rem"
-            backgroundColor={LEGACY_COLORS.blueEnabled}
+            backgroundColor={COLORS.blue50}
             borderRadius={br[1]}
           />
         </Flex>

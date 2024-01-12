@@ -56,7 +56,7 @@ function ProgressTrackerItem({
       borderLeft={BORDERS.lineBorder}
       borderColor={
         isTaskListComplete || isPastTask || isActiveTaskWithSubtasks
-          ? LEGACY_COLORS.blueEnabled
+          ? COLORS.blue50
           : ''
       }
       marginTop={`-${SPACING.spacing12}`}
@@ -79,7 +79,7 @@ function ProgressTrackerItem({
           name="ot-check"
           color={
             isTaskListComplete || isPastTask
-              ? LEGACY_COLORS.blueEnabled
+              ? COLORS.blue50
               : LEGACY_COLORS.medGreyHover
           }
         />
@@ -91,7 +91,7 @@ function ProgressTrackerItem({
           backgroundColor={
             isFutureTask
               ? LEGACY_COLORS.medGreyHover
-              : LEGACY_COLORS.blueEnabled
+              : COLORS.blue50
           }
           color={COLORS.white}
           margin={SPACING.spacing16}
@@ -147,7 +147,7 @@ function ProgressTrackerItem({
                   backgroundColor={
                     // is in the past or list is complete
                     isTaskListComplete || isPastSubTask
-                      ? LEGACY_COLORS.blueEnabled
+                      ? COLORS.blue50
                       : subTask.isComplete === true
                       ? LEGACY_COLORS.medGreyHover
                       : 'initial'
@@ -156,7 +156,7 @@ function ProgressTrackerItem({
                   borderColor={
                     isFutureSubTask
                       ? LEGACY_COLORS.medGreyHover
-                      : LEGACY_COLORS.blueEnabled
+                      : COLORS.blue50
                   }
                   borderWidth={SPACING.spacing2}
                   color={COLORS.white}
@@ -174,7 +174,7 @@ function ProgressTrackerItem({
                     isFinalSubTaskOfTaskList
                       ? COLORS.transparent
                       : isTaskListComplete || isPastSubTask
-                      ? LEGACY_COLORS.blueEnabled
+                      ? COLORS.blue50
                       : LEGACY_COLORS.medGreyEnabled
                   }
                   marginTop={`-${SPACING.spacing8}`}

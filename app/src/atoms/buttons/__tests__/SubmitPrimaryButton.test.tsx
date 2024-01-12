@@ -34,7 +34,7 @@ describe('SubmitPrimaryButton', () => {
     const { getByText } = render(props)
     const button = getByText('submit primary button')
     expect(button).toHaveStyle(
-      `background-color: ${String(LEGACY_COLORS.blueEnabled)}`
+      `background-color: ${String(COLORS.blue50)}`
     )
     expect(button).toHaveStyle(
       `border-radius: ${String(BORDERS.radiusSoftCorners)}`

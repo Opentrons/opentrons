@@ -70,7 +70,7 @@ const RoundNavLink = styled(NavLink)`
     border-top: ${BORDERS.lineBorder};
     border-left: ${BORDERS.lineBorder};
     border-right: ${BORDERS.lineBorder};
-    color: ${LEGACY_COLORS.blueEnabled};
+    color: ${COLORS.blue50};
 
     &:hover {
       color: ${COLORS.blue55};

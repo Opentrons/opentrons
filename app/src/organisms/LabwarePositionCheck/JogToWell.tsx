@@ -104,7 +104,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
   }
 
   const wellStroke: WellStroke = wellsToHighlight.reduce(
-    (acc, wellName) => ({ ...acc, [wellName]: LEGACY_COLORS.blueEnabled }),
+    (acc, wellName) => ({ ...acc, [wellName]: COLORS.blue50 }),
     {}
   )
 

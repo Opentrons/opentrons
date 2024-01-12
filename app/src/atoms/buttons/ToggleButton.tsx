@@ -22,7 +22,7 @@ const TOGGLE_DISABLED_STYLES = css`
 `
 
 const TOGGLE_ENABLED_STYLES = css`
-  color: ${LEGACY_COLORS.blueEnabled};
+  color: ${COLORS.blue50};
 
   &:hover {
     color: ${COLORS.blue55};

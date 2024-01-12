@@ -9,7 +9,7 @@ import {
 } from '@opentrons/components'
 
 export const TertiaryButton = styled(NewPrimaryBtn)`
-  background-color: ${LEGACY_COLORS.blueEnabled};
+  background-color: ${COLORS.blue50};
   border-radius: ${BORDERS.radiusRoundEdge};
   box-shadow: none;
   color: ${LEGACY_COLORS.fundamentalsBackground};

@@ -59,7 +59,7 @@ const MODAL_STYLE = {
   overflowY: OVERFLOW_AUTO,
   maxHeight: '100%',
   width: '47rem',
-  border: `6px ${BORDERS.styleSolid} ${LEGACY_COLORS.blueEnabled}`,
+  border: `6px ${BORDERS.styleSolid} ${COLORS.blue50}`,
   borderRadius: BORDERS.radiusSoftCorners,
   boxShadow: BORDERS.smallDropShadow,
 } as const
@@ -69,7 +69,7 @@ const HEADER_STYLE = {
   gridGap: SPACING.spacing12,
   padding: `${SPACING.spacing20} ${SPACING.spacing32}`,
   color: COLORS.white,
-  backgroundColor: LEGACY_COLORS.blueEnabled,
+  backgroundColor: COLORS.blue50,
   position: POSITION_STICKY,
   top: 0,
 } as const
@@ -159,10 +159,10 @@ export function InterventionModal({
   // reimplement when design system shares a modal component between desktop/ODD
   return isOnDevice ? (
     <Modal
-      border={`8px ${BORDERS.styleSolid} ${LEGACY_COLORS.blueEnabled}`}
+      border={`8px ${BORDERS.styleSolid} ${COLORS.blue50}`}
       modalSize="large"
       header={{
-        backgroundColor: LEGACY_COLORS.blueEnabled,
+        backgroundColor: COLORS.blue50,
         color: COLORS.white,
         iconColor: COLORS.white,
         iconName: iconName ?? undefined,

@@ -36,7 +36,7 @@ export const TemperatureModuleData = (
     }
     case 'holding at target': {
       backgroundColor = LEGACY_COLORS.medBlue
-      iconColor = LEGACY_COLORS.blueEnabled
+      iconColor = COLORS.blue50
       break
     }
     case 'cooling':

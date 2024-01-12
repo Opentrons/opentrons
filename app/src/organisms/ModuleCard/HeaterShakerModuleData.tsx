@@ -51,7 +51,7 @@ export const HeaterShakerModuleData = (
       }
       case 'holding at target': {
         StatusLabelProps.backgroundColor = LEGACY_COLORS.medBlue
-        StatusLabelProps.iconColor = LEGACY_COLORS.blueEnabled
+        StatusLabelProps.iconColor = COLORS.blue50
         break
       }
       case 'error': {
@@ -64,7 +64,7 @@ export const HeaterShakerModuleData = (
       case 'cooling':
       case 'slowing down':
       case 'speeding up': {
-        StatusLabelProps.backgroundColor = LEGACY_COLORS.blueEnabled + '1A'
+        StatusLabelProps.backgroundColor = COLORS.blue50 + '1A'
         StatusLabelProps.pulse = true
         break
       }

@@ -114,7 +114,7 @@ function Input(props: InputFieldProps): JSX.Element {
         ${error ? LEGACY_COLORS.errorEnabled : LEGACY_COLORS.medGreyHover};
     }
     &:focus {
-      border: 1px ${BORDERS.styleSolid} ${LEGACY_COLORS.blueEnabled};
+      border: 1px ${BORDERS.styleSolid} ${COLORS.blue50};
     }
     &:disabled {
       border: 1px ${BORDERS.styleSolid} ${LEGACY_COLORS.darkGreyDisabled};

@@ -65,7 +65,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
             }`}
             color={
               isSelected
-                ? LEGACY_COLORS.blueEnabled
+                ? COLORS.blue50
                 : LEGACY_COLORS.darkGreyEnabled
             }
             size="1.5rem"

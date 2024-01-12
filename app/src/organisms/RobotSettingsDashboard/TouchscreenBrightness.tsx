@@ -38,7 +38,7 @@ const BrightnessTile = styled(Box)`
   border-radius: ${BORDERS.borderRadiusSize2};
   background: ${(props: BrightnessTileProps) =>
     props.isActive
-      ? LEGACY_COLORS.blueEnabled
+      ? COLORS.blue50
       : LEGACY_COLORS.mediumBlueEnabled};
 `
 
