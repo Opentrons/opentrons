@@ -87,7 +87,7 @@ export function TrashBinConfigFixture(
 const TRASH_BIN_CONFIG_STYLE_READ_ONLY = css`
   display: ${DISPLAY_FLEX};
   align-items: ${ALIGN_CENTER};
-  background-color: ${LEGACY_COLORS.grey2};
+  background-color: ${COLORS.grey50};
   border-radius: ${BORDERS.borderRadiusSize1};
   color: ${COLORS.white};
   justify-content: ${JUSTIFY_CENTER};

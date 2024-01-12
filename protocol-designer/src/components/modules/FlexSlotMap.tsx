@@ -32,7 +32,7 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
   const slotFill = (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={LEGACY_COLORS.grey2}
+      backgroundColor={COLORS.grey50}
       borderRadius={BORDERS.radiusSoftCorners}
       color={COLORS.white}
       gridGap={SPACING.spacing8}

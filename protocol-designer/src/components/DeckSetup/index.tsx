@@ -619,7 +619,7 @@ export const DeckSetup = (): JSX.Element => {
                               robotType={robotType}
                               trashIconColor={lightFill}
                               trashCutoutId={cutoutId as TrashCutoutId}
-                              backgroundColor={LEGACY_COLORS.grey2}
+                              backgroundColor={COLORS.grey50}
                             />
                           </React.Fragment>
                         ) : null
