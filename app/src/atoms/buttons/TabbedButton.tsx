@@ -34,7 +34,7 @@ const UNSELECTED_STYLE = css`
   }
 
   &:active {
-    background-color: ${LEGACY_COLORS.highlightPurple2Pressed};
+    background-color: ${COLORS.purple40};
   }
 `
 
