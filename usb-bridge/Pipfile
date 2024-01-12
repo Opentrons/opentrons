@@ -7,9 +7,9 @@ name = "pypi"
 typing-extensions = "==3.10.0.0"
 pyserial = "==3.5"
 pyudev = "==0.23.2"
+ot3usb = {path = ".", editable = true}
 
 [dev-packages]
-ot3usb = {path = ".", editable = true}
 flake8 = "~=3.9.0"
 flake8-annotations = "~=2.6.2"
 flake8-docstrings = "~=1.6.0"
