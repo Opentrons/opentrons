@@ -6,10 +6,10 @@ import { Btn, Text } from '../../primitives'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
 import {
   BORDERS,
-  LEGACY_COLORS,
   SPACING,
   TYPOGRAPHY,
 } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   WASTE_CHUTE_DISPLAY_NAME,
@@ -107,7 +107,7 @@ const WASTE_CHUTE_CONFIG_STYLE_EDITABLE = css`
   }
 
   &:hover {
-    background-color: ${LEGACY_COLORS.grey1};
+    background-color: ${COLORS.grey55};
   }
 
   &:focus-visible {
