@@ -92,7 +92,7 @@ describe('PrimaryButton', () => {
     const button = getByText('primary button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${LEGACY_COLORS.warningEnabled}`,
+      `0 0 0 3px ${COLORS.yellow50}`,
       {
         modifier: ':focus-visible',
       }
