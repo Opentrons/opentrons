@@ -84,10 +84,10 @@ const GRID_STYLE = css`
 const ZOOM_ICON_STYLE = css`
   border-radius: ${BORDERS.radiusSoftCorners};
   &:hover {
-    background: ${LEGACY_COLORS.lightGreyHover};
+    background: ${COLORS.grey30};
   }
   &:active {
-    background: ${LEGACY_COLORS.lightGreyPressed};
+    background: ${COLORS.grey35};
   }
   &:disabled {
     background: ${COLORS.white};
@@ -328,12 +328,12 @@ export function ProtocolDetails(
 
   const deckViewByAnalysisStatus = {
     missing: (
-      <Box size="14rem" backgroundColor={LEGACY_COLORS.medGreyEnabled} />
+      <Box size="14rem" backgroundColor={COLORS.grey30} />
     ),
     loading: (
-      <Box size="14rem" backgroundColor={LEGACY_COLORS.medGreyEnabled} />
+      <Box size="14rem" backgroundColor={COLORS.grey30} />
     ),
-    error: <Box size="14rem" backgroundColor={LEGACY_COLORS.medGreyEnabled} />,
+    error: <Box size="14rem" backgroundColor={COLORS.grey30} />,
     complete: (
       <Box size="14rem" height="auto">
         {deckMap}
@@ -391,7 +391,7 @@ export function ProtocolDetails(
 
           <Flex
             backgroundColor={COLORS.white}
-            border={`1px solid ${LEGACY_COLORS.medGreyEnabled}`}
+            border={`1px solid ${COLORS.grey30}`}
             borderRadius={BORDERS.radiusSoftCorners}
             position={POSITION_RELATIVE}
             flexDirection={DIRECTION_ROW}
@@ -539,7 +539,7 @@ export function ProtocolDetails(
               flex={`0 0 ${String(SIZE_5)}`}
               flexDirection={DIRECTION_COLUMN}
               backgroundColor={COLORS.white}
-              border={`1px solid ${String(LEGACY_COLORS.medGreyEnabled)}`}
+              border={`1px solid ${String(COLORS.grey30)}`}
               borderRadius={BORDERS.radiusSoftCorners}
               height="100%"
               data-testid="ProtocolDetails_deckMap"

@@ -102,7 +102,7 @@ export function PinnedProtocol(props: {
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
-      backgroundColor={LEGACY_COLORS.light1}
+      backgroundColor={COLORS.grey35}
       borderRadius={BORDERS.borderRadiusSize4}
       css={PUSHED_STATE_STYLE}
       flexDirection={DIRECTION_COLUMN}

@@ -97,7 +97,7 @@ export const RunPreviewComponent = (
             : COLORS.transparent
           const backgroundColor = isCurrent
             ? COLORS.blue10
-            : LEGACY_COLORS.fundamentalsBackground
+            : COLORS.grey10
           const contentColor = isCurrent
             ? COLORS.black90
             : COLORS.grey50Enabled

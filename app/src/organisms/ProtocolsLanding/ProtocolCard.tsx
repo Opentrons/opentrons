@@ -170,7 +170,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             missing: <Icon name="ot-spinner" spin size={SIZE_3} />,
             loading: <Icon name="ot-spinner" spin size={SIZE_3} />,
             error: (
-              <Box size="6rem" backgroundColor={LEGACY_COLORS.medGreyEnabled} />
+              <Box size="6rem" backgroundColor={COLORS.grey30} />
             ),
             complete:
               mostRecentAnalysis != null ? (
@@ -178,7 +178,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               ) : (
                 <Box
                   size="6rem"
-                  backgroundColor={LEGACY_COLORS.medGreyEnabled}
+                  backgroundColor={COLORS.grey30}
                 />
               ),
           }[analysisStatus]

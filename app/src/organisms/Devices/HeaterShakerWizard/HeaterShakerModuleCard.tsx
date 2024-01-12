@@ -30,7 +30,7 @@ export const HeaterShakerModuleCard = (
 
   return (
     <Flex
-      backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+      backgroundColor={COLORS.grey10}
       borderRadius={SPACING.spacing4}
       marginBottom={SPACING.spacing8}
       padding={`${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8}`}

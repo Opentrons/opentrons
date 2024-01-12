@@ -52,7 +52,7 @@ const HIDE_SCROLLBAR = css`
 const LIQUID_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
   border-width: 1px;
-  border-color: ${LEGACY_COLORS.medGreyEnabled};
+  border-color: ${COLORS.grey30};
   border-radius: ${BORDERS.radiusSoftCorners};
 `
 
@@ -133,7 +133,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
       padding={SPACING.spacing16}
       onClick={handleSetOpenItem}
       backgroundColor={
-        openItem ? LEGACY_COLORS.fundamentalsBackground : COLORS.white
+        openItem ? COLORS.grey10 : COLORS.white
       }
       data-testid="LiquidsListItem_Row"
     >

@@ -47,7 +47,7 @@ const SORT_BY_BUTTON_STYLE = css`
   }
   &:active,
   &:focus {
-    background-color: ${LEGACY_COLORS.medGreyEnabled};
+    background-color: ${COLORS.grey30};
   }
 `
 const FLEX = 'Flex'

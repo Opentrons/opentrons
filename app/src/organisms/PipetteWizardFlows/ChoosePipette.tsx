@@ -49,7 +49,7 @@ import type { SelectablePipettes } from './types'
 
 const UNSELECTED_OPTIONS_STYLE = css`
   background-color: ${COLORS.white};
-  border: 1px solid ${LEGACY_COLORS.medGreyEnabled};
+  border: 1px solid ${COLORS.grey30};
   border-radius: ${BORDERS.radiusSoftCorners};
   height: 14.5625rem;
   width: 14.5625rem;

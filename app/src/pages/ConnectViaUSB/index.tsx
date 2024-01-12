@@ -105,7 +105,7 @@ export function ConnectViaUSB(): JSX.Element {
         ) : (
           <Flex
             alignItems={ALIGN_CENTER}
-            backgroundColor={LEGACY_COLORS.darkBlack20}
+            backgroundColor={COLORS.grey35}
             borderRadius={BORDERS.borderRadiusSize3}
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing32}

@@ -64,13 +64,13 @@ const NavbarLink = styled(NavLink)`
 `
 const NavIconLink = styled(NavLink)`
   &.active > svg {
-    color: ${LEGACY_COLORS.medGreyEnabled};
+    color: ${COLORS.grey30};
     background-color: ${COLORS.black70};
   }
 `
 const IconLink = styled(Link)`
   &.active > svg {
-    color: ${LEGACY_COLORS.medGreyEnabled};
+    color: ${COLORS.grey30};
     background-color: ${COLORS.black70};
   }
 `
@@ -80,7 +80,7 @@ const NavbarIcon = styled(Icon)`
   height: ${SIZE_2};
   padding: ${SPACING.spacing6};
   border-radius: 50%;
-  color: ${LEGACY_COLORS.medGreyEnabled};
+  color: ${COLORS.grey30};
   background-color: ${COLORS.transparent};
 
   &:hover {
@@ -94,12 +94,12 @@ const NavbarIcon = styled(Icon)`
   }
 
   &:active {
-    color: ${LEGACY_COLORS.medGreyEnabled};
+    color: ${COLORS.grey30};
     background-color: ${COLORS.black90};
   }
 
   &.active {
-    color: ${LEGACY_COLORS.medGreyEnabled};
+    color: ${COLORS.grey30};
     background-color: ${COLORS.black70};
   }
 `

@@ -384,7 +384,7 @@ export function ModulesListItem({
       ) : null}
       <Box
         border={BORDERS.styleSolid}
-        borderColor={LEGACY_COLORS.medGreyEnabled}
+        borderColor={COLORS.grey30}
         borderWidth="1px"
         borderRadius={BORDERS.radiusSoftCorners}
         padding={SPACING.spacing16}

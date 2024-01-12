@@ -35,7 +35,7 @@ const STOP_BUTTON_STYLE = css`
     background-color: ${LEGACY_COLORS.red2};
   }
   &:disabled {
-    background-color: ${LEGACY_COLORS.darkBlack20};
+    background-color: ${COLORS.grey35};
     color: ${COLORS.grey50};
   }
 `

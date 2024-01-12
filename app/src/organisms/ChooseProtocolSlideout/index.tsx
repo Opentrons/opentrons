@@ -294,14 +294,14 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
       css={css`
         ${BORDERS.cardOutlineBorder}
         &:hover {
-          border-color: ${LEGACY_COLORS.medGreyEnabled};
+          border-color: ${COLORS.grey30};
         }
       `}
     >
       <Icon
         size="1.25rem"
         name="alert-circle"
-        color={LEGACY_COLORS.medGreyEnabled}
+        color={COLORS.grey30}
       />
       <StyledText
         as="p"

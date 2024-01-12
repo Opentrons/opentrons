@@ -23,7 +23,7 @@ export interface InfoMessageProps {
 export function InfoMessage({ title, body }: InfoMessageProps): JSX.Element {
   return (
     <Flex
-      backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+      backgroundColor={COLORS.grey10}
       flexDirection={DIRECTION_ROW}
       alignItems={body != null ? ALIGN_FLEX_START : ALIGN_CENTER}
       borderRadius={BORDERS.radiusSoftCorners}

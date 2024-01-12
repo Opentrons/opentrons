@@ -175,7 +175,7 @@ function ProgressTrackerItem({
                       ? COLORS.transparent
                       : isTaskListComplete || isPastSubTask
                       ? COLORS.blue50
-                      : LEGACY_COLORS.medGreyEnabled
+                      : COLORS.grey30
                   }
                   marginTop={`-${SPACING.spacing8}`}
                   marginBottom={

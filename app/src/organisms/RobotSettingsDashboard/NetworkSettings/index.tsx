@@ -44,7 +44,7 @@ export function NetworkSettings({
   }
 
   const handleButtonBackgroundColor = (isConnected: boolean): string =>
-    isConnected ? COLORS.green35 : LEGACY_COLORS.light1
+    isConnected ? COLORS.green35 : COLORS.grey35
 
   const handleChipText = (isConnected: boolean): string =>
     isConnected ? t('connected') : t('not_connected')

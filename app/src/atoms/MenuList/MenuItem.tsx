@@ -44,7 +44,7 @@ export const MenuItem = styled.button<ButtonProps>`
     &:hover,
     &:active {
       background-color: ${({ isAlert }) =>
-        isAlert ? LEGACY_COLORS.errorEnabled : LEGACY_COLORS.darkBlack20};
+        isAlert ? LEGACY_COLORS.errorEnabled : COLORS.grey35};
     }
 
     &:disabled {

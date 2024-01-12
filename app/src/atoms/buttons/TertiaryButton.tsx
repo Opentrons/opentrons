@@ -12,7 +12,7 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
   background-color: ${COLORS.blue50};
   border-radius: ${BORDERS.radiusRoundEdge};
   box-shadow: none;
-  color: ${LEGACY_COLORS.fundamentalsBackground};
+  color: ${COLORS.grey10};
   overflow: no-wrap;
   padding-left: ${SPACING.spacing16};
   padding-right: ${SPACING.spacing16};

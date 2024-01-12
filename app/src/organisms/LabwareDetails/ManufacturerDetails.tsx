@@ -29,7 +29,7 @@ export function ManufacturerDetails(
 
   return (
     <Box
-      backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+      backgroundColor={COLORS.grey10}
       padding={SPACING.spacing16}
     >
       <Flex

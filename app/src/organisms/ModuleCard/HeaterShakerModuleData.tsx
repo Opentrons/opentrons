@@ -36,7 +36,7 @@ export const HeaterShakerModuleData = (
     status: SpeedStatus | TemperatureStatus
   ): { backgroundColor: string; iconColor: string; textColor: string } => {
     const StatusLabelProps = {
-      backgroundColor: LEGACY_COLORS.medGreyEnabled,
+      backgroundColor: COLORS.grey30,
       iconColor: COLORS.grey50Enabled,
       textColor: COLORS.blue60,
       pulse: false,
@@ -44,7 +44,7 @@ export const HeaterShakerModuleData = (
 
     switch (status) {
       case 'idle': {
-        StatusLabelProps.backgroundColor = LEGACY_COLORS.medGreyEnabled
+        StatusLabelProps.backgroundColor = COLORS.grey30
         StatusLabelProps.iconColor = COLORS.grey50Enabled
         StatusLabelProps.textColor = COLORS.black90
         break

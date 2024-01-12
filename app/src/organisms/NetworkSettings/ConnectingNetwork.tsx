@@ -25,7 +25,7 @@ export function ConnectingNetwork({
   return (
     <Flex flexDirection={DIRECTION_COLUMN} flex="1" height="100%">
       <Flex
-        backgroundColor={LEGACY_COLORS.darkBlack20}
+        backgroundColor={COLORS.grey35}
         flex="1"
         justifyContent={JUSTIFY_CENTER}
         borderRadius={BORDERS.borderRadiusSize3}

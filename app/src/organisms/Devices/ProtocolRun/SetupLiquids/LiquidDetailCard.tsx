@@ -35,8 +35,8 @@ const LIQUID_CARD_STYLE = css`
   }
 `
 const LIQUID_CARD_ODD_STYLE = css`
-  border-color: ${LEGACY_COLORS.medGreyEnabled};
-  border: ${SPACING.spacing4} solid ${LEGACY_COLORS.medGreyEnabled};
+  border-color: ${COLORS.grey30};
+  border: ${SPACING.spacing4} solid ${COLORS.grey30};
   border-radius: ${BORDERS.borderRadiusSize3};
 `
 interface LiquidDetailCardProps {
@@ -124,7 +124,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           {description != null ? description : null}
         </StyledText>
         <Flex
-          backgroundColor={LEGACY_COLORS.darkBlack20}
+          backgroundColor={COLORS.grey35}
           borderRadius={BORDERS.radiusSoftCorners}
           height="2.75rem"
           padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
@@ -140,7 +140,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
       </Flex>
       {selectedValue === liquidId ? (
         <>
-          <Box borderBottom={`3px solid ${LEGACY_COLORS.darkBlack20}`} />
+          <Box borderBottom={`3px solid ${COLORS.grey35}`} />
           <Flex
             padding={SPACING.spacing16}
             flexDirection={DIRECTION_COLUMN}

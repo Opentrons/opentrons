@@ -47,7 +47,7 @@ export function SetupInstructionsModal({
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
           <StyledText as="p">{t('setup_instructions_description')}</StyledText>
           <Flex
-            backgroundColor={LEGACY_COLORS.light1}
+            backgroundColor={COLORS.grey35}
             borderRadius={BORDERS.borderRadiusSize3}
             padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
           >

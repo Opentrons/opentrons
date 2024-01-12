@@ -107,7 +107,7 @@ const INPUT_STYLE = css`
   background-color: ${COLORS.blue50};
   border-radius: ${BORDERS.radiusRoundEdge};
   box-shadow: none;
-  color: ${LEGACY_COLORS.fundamentalsBackground};
+  color: ${COLORS.grey10};
   overflow: no-wrap;
   padding-left: ${SPACING.spacing16};
   padding-right: ${SPACING.spacing16};
@@ -136,10 +136,10 @@ const INPUT_STYLE = css`
 const ACCORDION_STYLE = css`
   border-radius: 50%;
   &:hover {
-    background: ${LEGACY_COLORS.lightGreyHover};
+    background: ${COLORS.grey30};
   }
   &:active {
-    background: ${LEGACY_COLORS.lightGreyPressed};
+    background: ${COLORS.grey35};
   }
 `
 interface PipetteTipsFieldProps extends FormikProps<FormState> {
@@ -275,7 +275,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
               alignItems={ALIGN_CENTER}
               width="100%"
               height="8.5rem"
-              backgroundColor={LEGACY_COLORS.darkBlack20}
+              backgroundColor={COLORS.grey35}
               padding={SPACING.spacing8}
               border={BORDERS.lineBorder}
               borderRadius={BORDERS.borderRadiusSize2}

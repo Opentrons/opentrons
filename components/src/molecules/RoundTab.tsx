@@ -29,7 +29,7 @@ const inactiveTabStyle = css`
 
   &:hover {
     color: ${COLORS.grey50Enabled};
-    background-color: ${LEGACY_COLORS.fundamentalsBackgroundShade};
+    background-color: ${COLORS.grey20};
   }
 `
 

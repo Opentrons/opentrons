@@ -305,7 +305,7 @@ function ModuleTableItem({
           conflictedFixture == null
             ? COLORS.green35
             : isNonConnectingModule && conflictedFixture == null
-            ? LEGACY_COLORS.light1
+            ? COLORS.grey35
             : LEGACY_COLORS.yellow3
         }
         borderRadius={BORDERS.borderRadiusSize3}

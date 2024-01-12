@@ -55,7 +55,7 @@ export function FloatingActionButton(
     }
 
     &:disabled {
-      background-color: ${LEGACY_COLORS.darkBlack20};
+      background-color: ${COLORS.grey35};
       color: ${contentColor};
     }
   `

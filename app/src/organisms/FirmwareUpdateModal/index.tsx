@@ -57,7 +57,7 @@ const MODAL_STYLE = css`
 `
 const OUTER_STYLES = css`
   border-radius: ${BORDERS.borderRadiusSize4};
-  background: ${LEGACY_COLORS.medGreyEnabled};
+  background: ${COLORS.grey30};
   width: 13.374rem;
 `
 

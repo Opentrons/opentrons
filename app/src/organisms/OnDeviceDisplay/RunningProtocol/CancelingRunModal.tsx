@@ -24,7 +24,7 @@ export function CancelingRunModal(): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
-        backgroundColor={LEGACY_COLORS.darkBlack20}
+        backgroundColor={COLORS.grey35}
         borderRadius={BORDERS.borderRadiusSize3}
         width="41.625rem"
         height="17.25rem"

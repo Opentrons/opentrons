@@ -218,7 +218,7 @@ export function RunningProtocolCommandList({
               const backgroundColor =
                 index === currentRunCommandIndex
                   ? COLORS.blue35
-                  : LEGACY_COLORS.light1
+                  : COLORS.grey35
               return (
                 <Flex
                   key={command.id}

@@ -60,7 +60,7 @@ const DEFAULT_BUTTON_STYLE = css`
     background-color: ${COLORS.white};
     color: ${LEGACY_COLORS.black};
     box-shadow: 0 0 0;
-    border: 1px ${LEGACY_COLORS.lightGreyHover} solid;
+    border: 1px ${COLORS.grey30} solid;
   }
 
   &:active {

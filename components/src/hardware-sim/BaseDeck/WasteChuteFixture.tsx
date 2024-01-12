@@ -31,7 +31,7 @@ export function WasteChuteFixture(
   const {
     cutoutId,
     deckDefinition,
-    fixtureBaseColor = LEGACY_COLORS.light1,
+    fixtureBaseColor = COLORS.grey35,
     wasteChuteColor = COLORS.grey50,
     ...restProps
   } = props

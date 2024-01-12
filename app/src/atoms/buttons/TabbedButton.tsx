@@ -61,7 +61,7 @@ export const TabbedButton = styled(Btn)<TabbedButtonProps>`
         box-shadow: 0 0 0 3px ${COLORS.blue50};
       }
       &:disabled {
-        background-color: ${LEGACY_COLORS.darkBlack20};
+        background-color: ${COLORS.grey35};
         color: ${COLORS.grey50};
       }
     `}

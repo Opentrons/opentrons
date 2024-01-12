@@ -43,7 +43,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
       border: BORDERS.lineBorder,
       width: props.width != null ? props.width : 'auto',
       height: SPACING.spacing16,
-      borderColor: LEGACY_COLORS.medGreyEnabled,
+      borderColor: COLORS.grey30,
       boxShadow: 'none',
       padding: SPACING.spacing6,
       flexDirection: DIRECTION_ROW,

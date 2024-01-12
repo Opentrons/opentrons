@@ -256,7 +256,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             }
             outerStyles={css`
               height: 0.375rem;
-              background-color: ${LEGACY_COLORS.medGreyEnabled};
+              background-color: ${COLORS.grey30};
               border-radius: ${BORDERS.radiusSoftCorners};
               position: relative;
               overflow: initial;

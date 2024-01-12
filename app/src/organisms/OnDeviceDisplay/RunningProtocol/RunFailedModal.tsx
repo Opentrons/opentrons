@@ -89,7 +89,7 @@ export function RunFailedModal({
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing8}
             maxHeight="11rem"
-            backgroundColor={LEGACY_COLORS.light1}
+            backgroundColor={COLORS.grey35}
             borderRadius={BORDERS.borderRadiusSize3}
             padding={`${SPACING.spacing16} ${SPACING.spacing20}`}
           >
@@ -126,7 +126,7 @@ const SCROLL_BAR_STYLE = css`
 
   &::-webkit-scrollbar {
     width: 0.75rem;
-    background-color: ${LEGACY_COLORS.light1};
+    background-color: ${COLORS.grey35};
   }
 
   &::-webkit-scrollbar-track {

@@ -20,7 +20,7 @@ describe('Line', () => {
     const line = getByTestId('line')
     expect(line).toHaveStyle('width: 100%')
     expect(line).toHaveStyle(
-      `borderBottom: 1px solid ${String(LEGACY_COLORS.medGreyEnabled)}`
+      `borderBottom: 1px solid ${String(COLORS.grey30)}`
     )
   })
 

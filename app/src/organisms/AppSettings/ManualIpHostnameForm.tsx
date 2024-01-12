@@ -34,7 +34,7 @@ const StyledInput = styled.input`
   margin: ${SPACING.spacing4} 0;
   background-color: ${COLORS.white};
   border-radius: ${SPACING.spacing4};
-  border: 1px ${BORDERS.styleSolid} ${LEGACY_COLORS.medGreyEnabled};
+  border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
   height: ${SIZE_2};
   font-size: ${TYPOGRAPHY.fontSizeP};
 
@@ -80,7 +80,7 @@ export function ManualIpHostnameForm({
       const inputForm = document.getElementById('ip')
       if (inputForm != null)
         inputForm.style.border = `1px solid ${String(
-          LEGACY_COLORS.medGreyEnabled
+          COLORS.grey30
         )}`
       addManualIpAndHostname(ip)
       resetForm()

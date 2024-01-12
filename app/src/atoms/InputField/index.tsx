@@ -90,7 +90,7 @@ function Input(props: InputFieldProps): JSX.Element {
     border-radius: ${SPACING.spacing4};
     padding: ${SPACING.spacing8};
     border: 1px ${BORDERS.styleSolid}
-      ${error ? LEGACY_COLORS.errorEnabled : LEGACY_COLORS.medGreyEnabled};
+      ${error ? LEGACY_COLORS.errorEnabled : COLORS.grey30};
     font-size: ${TYPOGRAPHY.fontSizeP};
 
     &:active {

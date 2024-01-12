@@ -9,7 +9,6 @@ import {
   SPACING,
   TYPOGRAPHY,
   Icon,
-  COLORS,
   LEGACY_COLORS,
 } from '@opentrons/components'
 

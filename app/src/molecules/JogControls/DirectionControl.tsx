@@ -187,7 +187,7 @@ const DEFAULT_BUTTON_STYLE = css`
     background-color: ${COLORS.white};
     color: ${LEGACY_COLORS.black};
     box-shadow: 0 0 0;
-    border: 1px ${LEGACY_COLORS.lightGreyHover} solid;
+    border: 1px ${COLORS.grey30} solid;
   }
 
   &:active {
@@ -345,13 +345,13 @@ const ARROW_BUTTON_STYLES = css`
     background-color: ${COLORS.white};
     color: ${COLORS.grey60};
     box-shadow: 0 0 0;
-    border: 1px ${LEGACY_COLORS.lightGreyHover} solid;
+    border: 1px ${COLORS.grey30} solid;
   }
 
   &:active {
     background-color: ${COLORS.white};
     color: ${COLORS.grey60};
-    border: 1px ${LEGACY_COLORS.lightGreyHover} solid;
+    border: 1px ${COLORS.grey30} solid;
   }
 
   &:focus {
@@ -370,7 +370,7 @@ const ARROW_BUTTON_STYLES = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     width: 125px;
     height: 125px;
-    background-color: ${LEGACY_COLORS.light1};
+    background-color: ${COLORS.grey35};
     color: ${COLORS.black90};
     border-radius: ${BORDERS.borderRadiusSize4};
 
@@ -390,7 +390,7 @@ const ARROW_BUTTON_STYLES = css`
     }
 
     &:disabled {
-      background-color: ${LEGACY_COLORS.darkBlack20};
+      background-color: ${COLORS.grey35};
       color: ${COLORS.grey50};
       border: 1px ${COLORS.transparent} solid;
     }

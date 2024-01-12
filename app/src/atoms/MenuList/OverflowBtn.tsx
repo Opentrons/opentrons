@@ -14,7 +14,7 @@ export const OverflowBtn = React.forwardRef(
           max-height: ${SPACING.spacing32};
 
           &:hover {
-            background-color: ${LEGACY_COLORS.lightGreyHover};
+            background-color: ${COLORS.grey30};
           }
           &:hover circle {
             fill: ${COLORS.black90};
@@ -22,7 +22,7 @@ export const OverflowBtn = React.forwardRef(
 
           &:active,
           &:focus {
-            background-color: ${LEGACY_COLORS.lightGreyPressed};
+            background-color: ${COLORS.grey35};
           }
 
           &:active circle,

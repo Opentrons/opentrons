@@ -41,7 +41,7 @@ export function PlayButton({
     &:hover {
       background-color: ${ready && !isDoorOpen
         ? COLORS.blue50
-        : LEGACY_COLORS.darkBlack20};
+        : COLORS.grey35};
       color: ${COLORS.white};
     }
 
@@ -49,7 +49,7 @@ export function PlayButton({
       box-shadow: ${ODD_FOCUS_VISIBLE};
       background-color: ${ready && !isDoorOpen
         ? COLORS.blue50
-        : LEGACY_COLORS.darkBlack20};
+        : COLORS.grey35};
     }
 
     &:active {
@@ -60,7 +60,7 @@ export function PlayButton({
     }
 
     &:disabled {
-      background-color: ${LEGACY_COLORS.darkBlack20};
+      background-color: ${COLORS.grey35};
       color: ${COLORS.grey50};
     }
   `
@@ -69,7 +69,7 @@ export function PlayButton({
       alignItems={ALIGN_CENTER}
       backgroundColor={
         disabled || !ready || isDoorOpen
-          ? LEGACY_COLORS.darkBlack20
+          ? COLORS.grey35
           : COLORS.blue50
       }
       borderRadius="6.25rem"
@@ -141,7 +141,7 @@ const CLOSE_BUTTON_STYLE = css`
   }
 
   &:disabled {
-    background-color: ${LEGACY_COLORS.darkBlack20};
+    background-color: ${COLORS.grey35};
     color: ${COLORS.grey50};
   }
 `

@@ -212,7 +212,7 @@ export function ChooseRobotSlideout(
             css={css`
               ${BORDERS.cardOutlineBorder}
               &:hover {
-                border-color: ${LEGACY_COLORS.medGreyEnabled};
+                border-color: ${COLORS.grey30};
               }
             `}
             flexDirection={DIRECTION_COLUMN}

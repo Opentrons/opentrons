@@ -34,7 +34,7 @@ export const ThermocyclerModuleData = (
     textColor: string
   } => {
     const StatusLabelProps = {
-      backgroundColor: LEGACY_COLORS.medGreyEnabled,
+      backgroundColor: COLORS.grey30,
       iconColor: COLORS.grey50Enabled,
       textColor: COLORS.blue60,
       pulse: false,
@@ -42,7 +42,7 @@ export const ThermocyclerModuleData = (
 
     switch (status) {
       case 'idle': {
-        StatusLabelProps.backgroundColor = LEGACY_COLORS.medGreyEnabled
+        StatusLabelProps.backgroundColor = COLORS.grey30
         StatusLabelProps.iconColor = COLORS.grey50Enabled
         StatusLabelProps.textColor = COLORS.black90
         break
@@ -88,7 +88,7 @@ export const ThermocyclerModuleData = (
           <Box marginRight={SPACING.spacing4}>
             <StatusLabel
               status={data.lidStatus === 'in_between' ? 'open' : data.lidStatus}
-              backgroundColor={LEGACY_COLORS.medGreyEnabled}
+              backgroundColor={COLORS.grey30}
               textColor={COLORS.black90}
               showIcon={false}
               key="lidStatus"

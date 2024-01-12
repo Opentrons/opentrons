@@ -31,14 +31,14 @@ const NETWORK_ROW_STYLE = css`
   align-items: ${ALIGN_CENTER};
   grid-gap: ${SPACING.spacing16};
 
-  background-color: ${LEGACY_COLORS.light1};
+  background-color: ${COLORS.grey35};
   margin-bottom: ${SPACING.spacing8};
   border-radius: ${BORDERS.borderRadiusSize4};
 
   &:hover {
     border: none;
     box-shadow: none;
-    background-color: ${LEGACY_COLORS.light1};
+    background-color: ${COLORS.grey35};
     color: ${LEGACY_COLORS.darkBlack100};
   }
 
@@ -106,7 +106,7 @@ export function DisplayWifiList({
           display="flex"
           onClick={handleJoinAnotherNetwork}
           height="5rem"
-          backgroundColor={LEGACY_COLORS.light1}
+          backgroundColor={COLORS.grey35}
           borderRadius={BORDERS.borderRadiusSize4}
           color={LEGACY_COLORS.black}
           css={NETWORK_ROW_STYLE}

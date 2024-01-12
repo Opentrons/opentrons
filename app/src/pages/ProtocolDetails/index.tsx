@@ -218,7 +218,7 @@ const Summary = ({ author, description, date }: SummaryProps): JSX.Element => {
         {description ?? i18n.format(t('no_summary'), 'capitalize')}
       </StyledText>
       <Flex
-        backgroundColor={LEGACY_COLORS.darkBlack20}
+        backgroundColor={COLORS.grey35}
         borderRadius={BORDERS.borderRadiusSize1}
         marginTop={SPACING.spacing24}
         width="max-content"

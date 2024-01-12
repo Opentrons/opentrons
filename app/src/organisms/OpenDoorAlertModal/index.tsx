@@ -21,7 +21,7 @@ export function OpenDoorAlertModal(): JSX.Element {
     <Portal level="top">
       <Modal>
         <Flex
-          backgroundColor={LEGACY_COLORS.darkBlack20}
+          backgroundColor={COLORS.grey35}
           borderRadius={BORDERS.borderRadiusSize3}
           flexDirection={DIRECTION_COLUMN}
           padding={SPACING.spacing24}

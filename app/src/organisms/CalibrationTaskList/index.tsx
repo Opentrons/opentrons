@@ -115,7 +115,7 @@ export function CalibrationTaskList({
         history.push(`/devices/${robotName}/robot-settings/calibration`)
       }
       fullPage
-      backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+      backgroundColor={COLORS.grey10}
       childrenPadding={`${SPACING.spacing16} ${SPACING.spacing24} ${SPACING.spacing24} ${SPACING.spacing4}`}
       css={css`
         width: 50rem;

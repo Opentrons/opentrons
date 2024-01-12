@@ -48,7 +48,7 @@ const TableRow = styled('tr')`
 
 const TableDatum = styled('td')`
   padding: ${SPACING.spacing16} ${SPACING.spacing24};
-  background-color: ${LEGACY_COLORS.light1};
+  background-color: ${COLORS.grey35};
   white-space: break-spaces;
   text-overflow: ${WRAP};
   &:first-child {
@@ -132,7 +132,7 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
 
               <TableDatum>
                 <Flex
-                  backgroundColor={LEGACY_COLORS.darkBlack20}
+                  backgroundColor={COLORS.grey35}
                   borderRadius={BORDERS.radiusSoftCorners}
                   height="2.75rem"
                   padding={`${SPACING.spacing8} ${SPACING.spacing12}`}

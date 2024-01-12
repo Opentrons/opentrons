@@ -80,7 +80,7 @@ const UpdateAppBanner = styled(Banner)`
 const UPDATE_PROGRESS_BAR_STYLE = css`
   margin-top: ${SPACING.spacing24};
   border-radius: ${BORDERS.borderRadiusSize3};
-  background: ${LEGACY_COLORS.medGreyEnabled};
+  background: ${COLORS.grey30};
   width: 17.12rem;
 `
 const LEGACY_MODAL_STYLE = css`

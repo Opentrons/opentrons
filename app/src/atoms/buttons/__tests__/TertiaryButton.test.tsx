@@ -49,7 +49,7 @@ describe('TertiaryButton', () => {
     expect(button).toHaveStyle('overflow: no-wrap')
     expect(button).toHaveStyle('white-space: nowrap')
     expect(button).toHaveStyle(
-      `color: ${String(LEGACY_COLORS.fundamentalsBackground)}`
+      `color: ${String(COLORS.grey10)}`
     )
   })
 
@@ -111,7 +111,7 @@ describe('TertiaryButton', () => {
       `background-color: ${String(LEGACY_COLORS.errorEnabled)}`
     )
     expect(button).toHaveStyle(
-      `color: ${String(LEGACY_COLORS.fundamentalsBackground)}`
+      `color: ${String(COLORS.grey10)}`
     )
   })
 })

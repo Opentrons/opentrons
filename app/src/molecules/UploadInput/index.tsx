@@ -23,7 +23,7 @@ const StyledLabel = styled.label`
   align-items: ${ALIGN_CENTER};
   width: 100%;
   padding: ${SPACING.spacing32};
-  border: 2px dashed ${LEGACY_COLORS.medGreyEnabled};
+  border: 2px dashed ${COLORS.grey30};
   border-radius: ${BORDERS.radiusSoftCorners};
   text-align: center;
   background-color: ${COLORS.white};

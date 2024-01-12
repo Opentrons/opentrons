@@ -86,7 +86,7 @@ export function RunFailedModal({
           marginTop={SPACING.spacing8}
           marginBottom={SPACING.spacing16}
           padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
-          backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+          backgroundColor={COLORS.grey10}
           borderRadius={BORDERS.borderRadiusSize1}
           overflowWrap="anywhere"
           border={BORDERS.lineBorder}

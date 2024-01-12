@@ -167,7 +167,7 @@ export const LiquidsLabwareDetailsModal = (
       <Box
         paddingX={SPACING.spacing16}
         paddingTop={SPACING.spacing16}
-        backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+        backgroundColor={COLORS.grey10}
         height="28.125rem"
       >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>

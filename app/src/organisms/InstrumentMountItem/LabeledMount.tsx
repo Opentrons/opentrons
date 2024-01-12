@@ -26,7 +26,7 @@ const MountButton = styled.button<{ isAttached: boolean }>`
   padding: ${SPACING.spacing24};
   border-radius: ${BORDERS.borderRadiusSize3};
   background-color: ${({ isAttached }) =>
-    isAttached ? COLORS.green35 : LEGACY_COLORS.light1};
+    isAttached ? COLORS.green35 : COLORS.grey35};
   &:active {
     background-color: ${({ isAttached }) =>
       isAttached ? COLORS.green40 : COLORS.grey40};

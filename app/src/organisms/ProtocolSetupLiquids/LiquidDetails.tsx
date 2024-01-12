@@ -41,7 +41,7 @@ const TableRow = styled('tr')`
 const TableDatum = styled('td')`
   z-index: 2;
   padding: ${SPACING.spacing8} ${SPACING.spacing20};
-  background-color: ${LEGACY_COLORS.light2};
+  background-color: ${COLORS.grey30};
   font-size: ${TYPOGRAPHY.fontSize22};
   white-space: break-spaces;
   text-overflow: ${WRAP};

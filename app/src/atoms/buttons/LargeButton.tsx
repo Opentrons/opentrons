@@ -97,7 +97,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     }
 
     &:disabled {
-      background-color: ${LEGACY_COLORS.darkBlack20};
+      background-color: ${COLORS.grey35};
       color: ${COLORS.grey50};
     }
   `

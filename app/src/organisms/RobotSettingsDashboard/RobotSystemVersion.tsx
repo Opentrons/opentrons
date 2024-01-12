@@ -79,7 +79,7 @@ export function RobotSystemVersion({
               {t('view_latest_release_notes_at', { url: GITHUB_URL })}
             </StyledText>
             <Flex
-              backgroundColor={LEGACY_COLORS.light1}
+              backgroundColor={COLORS.grey35}
               flexDirection={DIRECTION_ROW}
               padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
               justifyContent={JUSTIFY_SPACE_BETWEEN}

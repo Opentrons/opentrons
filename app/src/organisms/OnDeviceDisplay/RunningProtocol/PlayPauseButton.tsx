@@ -38,7 +38,7 @@ const PLAY_PAUSE_BUTTON_STYLE = css`
     background-color: ${COLORS.blue60};
   }
   &:disabled {
-    background-color: ${LEGACY_COLORS.darkBlack20};
+    background-color: ${COLORS.grey35};
     color: ${COLORS.grey50};
   }
 `

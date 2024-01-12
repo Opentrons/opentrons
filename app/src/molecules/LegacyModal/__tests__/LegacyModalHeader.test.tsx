@@ -72,14 +72,14 @@ describe('LegacyModalHeader', () => {
     expect(closeIcon).toHaveStyle('border-radius: 0.875rem')
     expect(closeIcon).toHaveStyleRule(
       'background-color',
-      LEGACY_COLORS.lightGreyHover,
+      COLORS.grey30,
       {
         modifier: ':hover',
       }
     )
     expect(closeIcon).toHaveStyleRule(
       'background-color',
-      LEGACY_COLORS.lightGreyPressed,
+      COLORS.grey35,
       {
         modifier: ':active',
       }

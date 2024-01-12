@@ -85,7 +85,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
     robotType,
     modulesOnDeck = [],
     labwareOnDeck = [],
-    lightFill = LEGACY_COLORS.light1,
+    lightFill = COLORS.grey35,
     mediumFill = COLORS.grey50,
     darkFill = COLORS.grey60,
     deckLayerBlocklist = [],

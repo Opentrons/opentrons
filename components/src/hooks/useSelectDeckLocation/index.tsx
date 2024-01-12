@@ -111,7 +111,7 @@ export function DeckLocationSelect({
           let fill =
             theme === 'default'
               ? LEGACY_COLORS.highlightPurple2
-              : LEGACY_COLORS.lightGreyPressed
+              : COLORS.grey35
           if (isSelected)
             fill =
               theme === 'default'

@@ -23,7 +23,7 @@ export const EmptySection = (props: EmptySectionProps): JSX.Element => {
 
   return (
     <Flex
-      backgroundColor={LEGACY_COLORS.light1}
+      backgroundColor={COLORS.grey35}
       borderRadius={BORDERS.borderRadiusSize3}
       width="100%"
       height="12.625rem"

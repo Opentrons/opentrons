@@ -33,11 +33,11 @@ const closeIconStyles = css`
   width: 1.625rem;
   height: 1.625rem;
   &:hover {
-    background-color: ${LEGACY_COLORS.lightGreyHover};
+    background-color: ${COLORS.grey30};
   }
 
   &:active {
-    background-color: ${LEGACY_COLORS.lightGreyPressed};
+    background-color: ${COLORS.grey35};
   }
 `
 

@@ -71,7 +71,7 @@ const BANNER_PROPS_BY_TYPE: Record<
   },
   informing: {
     icon: { name: 'information' },
-    backgroundColor: LEGACY_COLORS.fundamentalsBackground,
+    backgroundColor: COLORS.grey10,
     color: COLORS.grey50Enabled,
   },
 }

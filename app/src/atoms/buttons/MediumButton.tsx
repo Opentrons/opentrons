@@ -61,7 +61,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       activeBackgroundColor: '#b91f20',
       defaultBackgroundColor: LEGACY_COLORS.red2,
       defaultColor: COLORS.white,
-      disabledBackgroundColor: LEGACY_COLORS.darkBlack20,
+      disabledBackgroundColor: COLORS.grey35,
       iconColor: COLORS.white,
     },
     alertSecondary: {
@@ -69,7 +69,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       activeBackgroundColor: '#ccabac',
       defaultBackgroundColor: LEGACY_COLORS.red3,
       defaultColor: LEGACY_COLORS.red1,
-      disabledBackgroundColor: LEGACY_COLORS.darkBlack20,
+      disabledBackgroundColor: COLORS.grey35,
       iconColor: LEGACY_COLORS.red1,
     },
     primary: {
@@ -77,7 +77,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       activeBackgroundColor: '#045dd0',
       defaultBackgroundColor: COLORS.blue50,
       defaultColor: COLORS.white,
-      disabledBackgroundColor: LEGACY_COLORS.darkBlack20,
+      disabledBackgroundColor: COLORS.grey35,
       iconColor: COLORS.white,
     },
     secondary: {
@@ -85,18 +85,18 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
       activeBackgroundColor: '#94afd4',
       defaultBackgroundColor: COLORS.blue35,
       defaultColor: COLORS.black90,
-      disabledBackgroundColor: LEGACY_COLORS.darkBlack20,
+      disabledBackgroundColor: COLORS.grey35,
       iconColor: COLORS.blue50,
     },
     tertiaryHigh: {
-      activeBackgroundColor: LEGACY_COLORS.darkBlack20,
+      activeBackgroundColor: COLORS.grey35,
       defaultBackgroundColor: COLORS.white,
       defaultColor: LEGACY_COLORS.darkBlack100,
       disabledBackgroundColor: COLORS.transparent,
       iconColor: LEGACY_COLORS.darkBlack100,
     },
     tertiaryLowLight: {
-      activeBackgroundColor: LEGACY_COLORS.darkBlack20,
+      activeBackgroundColor: COLORS.grey35,
       defaultBackgroundColor: COLORS.white,
       defaultColor: COLORS.grey60,
       disabledBackgroundColor: COLORS.transparent,

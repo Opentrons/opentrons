@@ -48,7 +48,7 @@ const CARD_BUTTON_STYLE = css`
   }
 
   &:disabled {
-    background-color: ${LEGACY_COLORS.darkBlack20};
+    background-color: ${COLORS.grey35};
     color: ${COLORS.grey60};
   }
 `
@@ -84,7 +84,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
       width="100%"
       css={CARD_BUTTON_STYLE}
       backgroundColor={
-        disabled ? LEGACY_COLORS.darkBlack20 : COLORS.blue35
+        disabled ? COLORS.grey35 : COLORS.blue35
       }
       disabled={disabled}
     >

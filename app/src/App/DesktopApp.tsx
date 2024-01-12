@@ -118,7 +118,7 @@ export const DesktopApp = (): JSX.Element => {
                         position={POSITION_RELATIVE}
                         width="100%"
                         height="100%"
-                        backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+                        backgroundColor={COLORS.grey10}
                         overflow={OVERFLOW_AUTO}
                       >
                         <ModalPortalRoot />

@@ -24,7 +24,7 @@ export default {
         alignItems={ALIGN_CENTER}
         height={SIZE_4}
         width="100%"
-        backgroundColor={LEGACY_COLORS.fundamentalsBackground}
+        backgroundColor={COLORS.grey10}
       >
         <Story />
       </Flex>
