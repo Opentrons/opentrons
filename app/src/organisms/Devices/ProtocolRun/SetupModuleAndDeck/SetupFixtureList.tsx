@@ -206,7 +206,7 @@ export function FixtureListItem({
                   color: ${LEGACY_COLORS.blueEnabled};
 
                   &:hover {
-                    color: ${LEGACY_COLORS.blueHover};
+                    color: ${COLORS.blue55};
                   }
                 `}
                 marginTop={SPACING.spacing4}

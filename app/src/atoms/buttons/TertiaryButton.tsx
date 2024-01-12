@@ -23,7 +23,7 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
   ${styleProps}
 
   &:hover {
-    background-color: ${LEGACY_COLORS.blueHover};
+    background-color: ${COLORS.blue55};
     box-shadow: none;
   }
 

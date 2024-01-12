@@ -80,8 +80,8 @@ const ACTIVE_BUTTON_STYLE = css`
   border: 1px ${LEGACY_COLORS.blueEnabled} solid;
 
   &:hover {
-    color: ${LEGACY_COLORS.blueHover};
-    border: 1px ${LEGACY_COLORS.blueHover} solid;
+    color: ${COLORS.blue55};
+    border: 1px ${COLORS.blue55} solid;
   }
 `
 interface StepSizeControlProps {

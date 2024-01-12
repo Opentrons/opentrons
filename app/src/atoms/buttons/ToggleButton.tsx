@@ -25,7 +25,7 @@ const TOGGLE_ENABLED_STYLES = css`
   color: ${LEGACY_COLORS.blueEnabled};
 
   &:hover {
-    color: ${LEGACY_COLORS.blueHover};
+    color: ${COLORS.blue55};
   }
 
   &:focus-visible {

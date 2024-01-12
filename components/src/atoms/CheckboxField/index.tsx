@@ -53,7 +53,7 @@ const INNER_STYLE_VALUE = css`
 
   &:hover {
     cursor: pointer;
-    color: ${LEGACY_COLORS.blueHover};
+    color: ${COLORS.blue55};
   }
 
   &:active {

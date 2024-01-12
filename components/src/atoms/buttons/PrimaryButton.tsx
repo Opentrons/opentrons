@@ -16,7 +16,7 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
 
   &:hover,
   &:focus {
-    background-color: ${LEGACY_COLORS.blueHover};
+    background-color: ${COLORS.blue55};
     box-shadow: none;
   }
 

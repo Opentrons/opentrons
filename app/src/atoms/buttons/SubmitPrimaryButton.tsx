@@ -34,7 +34,7 @@ export const SubmitPrimaryButton = (
     }
 
     &:hover {
-      background-color: ${LEGACY_COLORS.blueHover};
+      background-color: ${COLORS.blue55};
       box-shadow: 0 0 0;
     }
 

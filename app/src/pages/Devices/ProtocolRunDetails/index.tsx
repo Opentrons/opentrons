@@ -73,7 +73,7 @@ const RoundNavLink = styled(NavLink)`
     color: ${LEGACY_COLORS.blueEnabled};
 
     &:hover {
-      color: ${LEGACY_COLORS.blueHover};
+      color: ${COLORS.blue55};
     }
 
     /* extend below the tab when active to flow into the content */
