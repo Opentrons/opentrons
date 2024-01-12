@@ -97,7 +97,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
         {banner}
         <StyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={COLORS.grey50Enabled}
+          color={COLORS.grey50}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
         >

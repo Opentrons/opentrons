@@ -249,7 +249,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
   ) {
     const GO_BACK_BUTTON_STYLE = css`
       ${TYPOGRAPHY.pSemiBold};
-      color: ${COLORS.grey50Enabled};
+      color: ${COLORS.grey50};
 
       &:hover {
         opacity: 70%;

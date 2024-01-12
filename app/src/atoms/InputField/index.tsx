@@ -94,7 +94,7 @@ function Input(props: InputFieldProps): JSX.Element {
     font-size: ${TYPOGRAPHY.fontSizeP};
 
     &:active {
-      border: 1px ${BORDERS.styleSolid} ${COLORS.grey50Enabled};
+      border: 1px ${BORDERS.styleSolid} ${COLORS.grey50};
     }
 
     & input {
@@ -155,7 +155,7 @@ function Input(props: InputFieldProps): JSX.Element {
             display={DISPLAY_INLINE_BLOCK}
             textAlign={TEXT_ALIGN_RIGHT}
             alignSelf={ALIGN_CENTER}
-            color={COLORS.grey50Enabled}
+            color={COLORS.grey50}
             fontSize={TYPOGRAPHY.fontSizeLabel}
           >
             {props.units}
@@ -163,7 +163,7 @@ function Input(props: InputFieldProps): JSX.Element {
         )}
       </Flex>
       <Flex
-        color={COLORS.grey50Enabled}
+        color={COLORS.grey50}
         fontSize={TYPOGRAPHY.fontSizeLabel}
         paddingTop={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}

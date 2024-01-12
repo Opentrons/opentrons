@@ -21,7 +21,7 @@ export function FlexModuleTag(props: FlexModuleTagProps): JSX.Element {
       height={20}
       y={-22}
       innerDivProps={{
-        backgroundColor: COLORS.grey50Enabled,
+        backgroundColor: COLORS.grey50,
         padding: SPACING.spacing4,
         height: '100%',
         color: COLORS.white,

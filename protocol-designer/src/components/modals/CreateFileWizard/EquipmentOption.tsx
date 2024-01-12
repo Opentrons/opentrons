@@ -66,7 +66,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
             color={
               isSelected
                 ? COLORS.blue50
-                : COLORS.grey50Enabled
+                : COLORS.grey50
             }
             size="1.5rem"
             name={isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'}

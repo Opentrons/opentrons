@@ -71,7 +71,7 @@ const INNER_STYLE_VALUE = css`
 const INNER_STYLE_NO_VALUE = css`
   width: ${SPACING.spacing20};
   min-width: ${SPACING.spacing20};
-  color: ${COLORS.grey50Enabled};
+  color: ${COLORS.grey50};
   display: flex;
   border-radius: 1px;
   justify-content: ${JUSTIFY_CENTER};
@@ -132,7 +132,7 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
           <Box
             height="1.5px"
             width="0.375rem"
-            backgroundColor={COLORS.grey50Enabled}
+            backgroundColor={COLORS.grey50}
           />
         </Flex>
       ) : (

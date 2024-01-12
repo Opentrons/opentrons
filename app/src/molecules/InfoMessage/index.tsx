@@ -32,7 +32,7 @@ export function InfoMessage({ title, body }: InfoMessageProps): JSX.Element {
       data-testid={`InfoMessage_${title}`}
     >
       <Icon
-        color={COLORS.grey50Enabled}
+        color={COLORS.grey50}
         name="information"
         aria-label="icon_information"
         size={SIZE_1}

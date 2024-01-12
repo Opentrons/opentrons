@@ -28,7 +28,7 @@ export function LoadingState(props: LoadingStateProps): JSX.Element {
         name="ot-spinner"
         spin
         size={SIZE_4}
-        color={COLORS.grey50Enabled}
+        color={COLORS.grey50}
       />
       {header != null ? <StyledText as="h1">{header}</StyledText> : null}
       {body != null ? <StyledText as="p">{body}</StyledText> : null}

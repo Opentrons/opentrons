@@ -12,7 +12,6 @@ import {
   BORDERS,
   Btn,
   COLORS,
-  LEGACY_COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
@@ -612,7 +611,7 @@ function PrepareToRun({
                 </StyledText>
                 <StyledText
                   as="h4"
-                  color={COLORS.grey50Enabled}
+                  color={COLORS.grey50}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   overflowWrap="anywhere"
                 >

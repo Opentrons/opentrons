@@ -188,7 +188,7 @@ export const StatRow = (props: StatRowProps): JSX.Element => {
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={COLORS.grey50Enabled}
+          color={COLORS.grey50}
           marginX={SPACING.spacing16}
         >
           {description}

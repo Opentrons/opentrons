@@ -145,7 +145,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         >
           <StyledText
             as="label"
-            color={COLORS.grey50Enabled}
+            color={COLORS.grey50}
             id="LabwareDetails_dateAdded"
           >
             {t('last_updated')} {format(new Date(modified), 'MM/dd/yyyy')}

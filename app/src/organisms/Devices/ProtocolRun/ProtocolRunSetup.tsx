@@ -255,7 +255,7 @@ export function ProtocolRunSetup({
           {analysisErrors != null && analysisErrors?.length > 0 ? (
             <StyledText
               alignSelf={ALIGN_CENTER}
-              color={COLORS.grey50Enabled}
+              color={COLORS.grey50}
             >
               {t('protocol_analysis_failed')}
             </StyledText>
@@ -319,7 +319,7 @@ export function ProtocolRunSetup({
       ) : (
         <StyledText
           alignSelf={ALIGN_CENTER}
-          color={COLORS.grey50Enabled}
+          color={COLORS.grey50}
         >
           {t('loading_data')}
         </StyledText>

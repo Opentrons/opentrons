@@ -154,7 +154,7 @@ export const MagneticModuleSlideout = (
       </StyledText>
       <StyledText
         fontSize={TYPOGRAPHY.fontSizeH6}
-        color={COLORS.grey50Enabled}
+        color={COLORS.grey50}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         paddingTop={SPACING.spacing16}
         textTransform={TYPOGRAPHY.textTransformUppercase}
@@ -211,7 +211,7 @@ export const MagneticModuleSlideout = (
         <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
-          color={COLORS.grey50Enabled}
+          color={COLORS.grey50}
           paddingBottom={SPACING.spacing8}
         >
           {t('set_engage_height')}

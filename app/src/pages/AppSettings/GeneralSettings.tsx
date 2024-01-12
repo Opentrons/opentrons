@@ -174,7 +174,7 @@ export function GeneralSettings(): JSX.Element {
               <StyledText
                 fontSize={TYPOGRAPHY.fontSizeLabel}
                 lineHeight={TYPOGRAPHY.lineHeight12}
-                color={COLORS.grey50Enabled}
+                color={COLORS.grey50}
                 paddingY={SPACING.spacing24}
               >
                 {t('up_to_date')}

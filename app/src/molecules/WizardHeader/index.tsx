@@ -28,7 +28,7 @@ interface WizardHeaderProps {
 const EXIT_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
-  color: ${COLORS.grey50Enabled};
+  color: ${COLORS.grey50};
 
   &:hover {
     opacity: 70%;
@@ -91,7 +91,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
           {currentStep != null && totalSteps != null && currentStep > 0 ? (
             <StyledText
               css={STEP_TEXT_STYLE}
-              color={COLORS.grey50Enabled}
+              color={COLORS.grey50}
             >
               {t('step', { current: currentStep, max: totalSteps })}
             </StyledText>

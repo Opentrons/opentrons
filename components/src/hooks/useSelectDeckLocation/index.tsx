@@ -116,7 +116,7 @@ export function DeckLocationSelect({
             fill =
               theme === 'default'
                 ? COLORS.purple50
-                : COLORS.grey50Enabled
+                : COLORS.grey50
           if (isDisabled) fill = COLORS.grey50Disabled
           if (isSelected && slot.id === 'B1' && isThermocycler) {
             return (
@@ -224,7 +224,7 @@ export function DeckLocationSelect({
           layerBlocklist={OT2_DECK_LOCATION_SELECT_LAYER_BLOCK_LIST}
         />
       ) : null}
-      <SlotLabels robotType={robotType} color={COLORS.grey50Enabled} />
+      <SlotLabels robotType={robotType} color={COLORS.grey50} />
     </RobotCoordinateSpace>
   )
 }

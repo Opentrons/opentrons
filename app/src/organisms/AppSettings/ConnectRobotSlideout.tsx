@@ -105,7 +105,7 @@ export function ConnectRobotSlideout({
             <Flex flexDirection={DIRECTION_ROW}>
               <StyledText
                 as="p"
-                color={COLORS.grey50Enabled}
+                color={COLORS.grey50}
                 marginRight={SPACING.spacing8}
               >
                 {t('searching')}
@@ -118,7 +118,7 @@ export function ConnectRobotSlideout({
                 <>
                   <StyledText
                     as="p"
-                    color={COLORS.grey50Enabled}
+                    color={COLORS.grey50}
                     marginX={SPACING.spacing4}
                   >
                     {t('discovery_timeout')}

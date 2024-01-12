@@ -35,7 +35,7 @@ export const ThermocyclerModuleData = (
   } => {
     const StatusLabelProps = {
       backgroundColor: COLORS.grey30,
-      iconColor: COLORS.grey50Enabled,
+      iconColor: COLORS.grey50,
       textColor: COLORS.blue60,
       pulse: false,
     }
@@ -43,7 +43,7 @@ export const ThermocyclerModuleData = (
     switch (status) {
       case 'idle': {
         StatusLabelProps.backgroundColor = COLORS.grey30
-        StatusLabelProps.iconColor = COLORS.grey50Enabled
+        StatusLabelProps.iconColor = COLORS.grey50
         StatusLabelProps.textColor = COLORS.black90
         break
       }
@@ -55,7 +55,7 @@ export const ThermocyclerModuleData = (
       case 'cooling':
       case 'heating': {
         StatusLabelProps.backgroundColor = COLORS.blue30
-        StatusLabelProps.iconColor = COLORS.grey50Enabled
+        StatusLabelProps.iconColor = COLORS.grey50
         StatusLabelProps.pulse = true
         break
       }
@@ -77,7 +77,7 @@ export const ThermocyclerModuleData = (
       >
         <StyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={COLORS.grey50Enabled}
+          color={COLORS.grey50}
           fontSize={TYPOGRAPHY.fontSizeCaption}
           marginTop={SPACING.spacing8}
         >
@@ -122,7 +122,7 @@ export const ThermocyclerModuleData = (
       >
         <StyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={COLORS.grey50Enabled}
+          color={COLORS.grey50}
           fontWeight={FONT_WEIGHT_REGULAR}
           fontSize={TYPOGRAPHY.fontSizeCaption}
           marginTop={SPACING.spacing8}

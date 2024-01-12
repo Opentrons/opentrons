@@ -267,7 +267,7 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
                   <StyledText
                     textAlign={TEXT_ALIGN_LEFT}
                     alignSelf={ALIGN_STRETCH}
-                    color={COLORS.grey50Enabled}
+                    color={COLORS.grey50}
                     css={TYPOGRAPHY.labelRegular}
                   >
                     {subtitle}
@@ -331,7 +331,7 @@ const ARROW_GRID_STYLES = css`
   }
 `
 const ARROW_BUTTON_STYLES = css`
-  color: ${COLORS.grey50Enabled};
+  color: ${COLORS.grey50};
   background-color: ${COLORS.white};
 
   border: ${BORDERS.lineBorder};

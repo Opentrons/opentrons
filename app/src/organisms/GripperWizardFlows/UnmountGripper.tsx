@@ -28,7 +28,7 @@ import type { GripperData } from '@opentrons/api-client'
 
 const GO_BACK_BUTTON_TEXT_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.grey50Enabled};
+  color: ${COLORS.grey50};
 
   &:hover {
     opacity: 70%;

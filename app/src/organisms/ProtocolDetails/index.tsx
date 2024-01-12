@@ -425,7 +425,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_creationMethod"
                 >
-                  <StyledText as="h6" color={COLORS.grey50Enabled}>
+                  <StyledText as="h6" color={COLORS.grey50}>
                     {t('creation_method')}
                   </StyledText>
                   <StyledText as="p">
@@ -438,7 +438,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_lastUpdated"
                 >
-                  <StyledText as="h6" color={COLORS.grey50Enabled}>
+                  <StyledText as="h6" color={COLORS.grey50}>
                     {t('last_updated')}
                   </StyledText>
                   <StyledText as="p">
@@ -451,7 +451,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_lastAnalyzed"
                 >
-                  <StyledText as="h6" color={COLORS.grey50Enabled}>
+                  <StyledText as="h6" color={COLORS.grey50}>
                     {t('last_analyzed')}
                   </StyledText>
                   <StyledText as="p">
@@ -481,7 +481,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_author"
                 >
-                  <StyledText as="h6" color={COLORS.grey50Enabled}>
+                  <StyledText as="h6" color={COLORS.grey50}>
                     {t('org_or_author')}
                   </StyledText>
                   <StyledText
@@ -498,7 +498,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_description"
                 >
-                  <StyledText as="h6" color={COLORS.grey50Enabled}>
+                  <StyledText as="h6" color={COLORS.grey50}>
                     {t('description')}
                   </StyledText>
                   {analysisStatus === 'loading' ? (

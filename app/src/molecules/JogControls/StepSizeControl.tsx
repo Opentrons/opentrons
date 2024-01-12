@@ -133,7 +133,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
             </StyledText>
           </Flex>
           <StyledText
-            color={COLORS.grey50Enabled}
+            color={COLORS.grey50}
             css={TYPOGRAPHY.labelRegular}
           >
             {JUMP_SIZE_SUBTITLE}
@@ -153,7 +153,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
                 >
                   {t(stepSizeTranslationKeyByStep[stepSize])}
                   <StyledText
-                    color={COLORS.grey50Enabled}
+                    color={COLORS.grey50}
                     css={TYPOGRAPHY.labelRegular}
                   >{`${stepSize} mm`}</StyledText>
                 </PrimaryButton>

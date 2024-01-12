@@ -41,7 +41,7 @@ describe('EquipmentOption', () => {
     getByRole('img')
     expect(
       getByLabelText('EquipmentOption_checkbox-blank-outline')
-    ).toHaveStyle(`color: ${COLORS.grey50Enabled}`)
+    ).toHaveStyle(`color: ${COLORS.grey50}`)
     expect(getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
       `border: ${BORDERS.lineBorder}`
     )
