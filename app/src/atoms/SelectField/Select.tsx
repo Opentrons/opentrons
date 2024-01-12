@@ -110,13 +110,13 @@ export function Select(props: SelectComponentProps): JSX.Element {
         ? LEGACY_COLORS.darkGreyDisabled
         : COLORS.black90,
       backgroundColor: Boolean(state.isSelected)
-        ? LEGACY_COLORS.lightBlue
+        ? COLORS.blue10
         : COLORS.white,
       '&:hover': {
-        backgroundColor: LEGACY_COLORS.lightBlue,
+        backgroundColor: COLORS.blue10,
       },
       '&:active': {
-        backgroundColor: LEGACY_COLORS.lightBlue,
+        backgroundColor: COLORS.blue10,
       },
     }),
     placeholder: (styles: CSSObjectWithLabel) => ({

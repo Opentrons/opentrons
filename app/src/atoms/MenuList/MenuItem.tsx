@@ -23,7 +23,7 @@ export const MenuItem = styled.button<ButtonProps>`
 
   &:hover,
   &:active {
-    background-color: ${LEGACY_COLORS.lightBlue};
+    background-color: ${COLORS.blue10};
   }
 
   &:disabled {

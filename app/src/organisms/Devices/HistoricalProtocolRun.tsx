@@ -68,7 +68,7 @@ export function HistoricalProtocolRun(
         padding={SPACING.spacing8}
         borderTop={BORDERS.lineBorder}
         backgroundColor={
-          run.status === 'running' ? LEGACY_COLORS.lightBlue : COLORS.white
+          run.status === 'running' ? COLORS.blue10 : COLORS.white
         }
         width="100%"
       >

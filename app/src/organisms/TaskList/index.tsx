@@ -224,7 +224,7 @@ function SubTask({
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={isActiveSubTask ? LEGACY_COLORS.lightBlue : COLORS.white}
+      backgroundColor={isActiveSubTask ? COLORS.blue10 : COLORS.white}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       padding={SPACING.spacing16}
       border={isActiveSubTask ? BORDERS.activeLineBorder : BORDERS.lineBorder}
@@ -366,7 +366,7 @@ function Task({
         flexDirection={DIRECTION_COLUMN}
         padding={SPACING.spacing16}
         backgroundColor={
-          isActiveTask && !isTaskOpen ? LEGACY_COLORS.lightBlue : COLORS.white
+          isActiveTask && !isTaskOpen ? COLORS.blue10 : COLORS.white
         }
         border={
           isActiveTask && !isTaskOpen

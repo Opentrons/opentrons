@@ -81,11 +81,11 @@ const UNSELECTED_OPTIONS_STYLE = css`
 const SELECTED_OPTIONS_STYLE = css`
   ${UNSELECTED_OPTIONS_STYLE}
   border: 1px solid ${COLORS.blue50};
-  background-color: ${LEGACY_COLORS.lightBlue};
+  background-color: ${COLORS.blue10};
 
   &:hover {
     border: 1px solid ${COLORS.blue50};
-    background-color: ${LEGACY_COLORS.lightBlue};
+    background-color: ${COLORS.blue10};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
