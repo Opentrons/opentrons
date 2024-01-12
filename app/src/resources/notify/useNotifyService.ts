@@ -10,21 +10,27 @@ import {
   notifyUnsubscribeAction,
 } from '../../redux/shell'
 
+import type { UseQueryResult } from 'react-query'
 import type { HostConfig } from '@opentrons/api-client'
 import type { NotifyTopic } from '../../redux/shell/types'
 
-interface useNotifyServiceProps {
+interface UseNotifyServiceProps {
   topic: NotifyTopic
   queryKey: Array<string | HostConfig | null>
   forceHttpPolling: boolean
 }
 
+interface UseNotifyServiceReturn<TData> {
+  notifyQueryResponse: UseQueryResult<TData>
+  isNotifyError: boolean
+}
+
 // TOME: Remember to adjust typing here.
-export function useNotifyService({
+export function useNotifyService<TData>({
   topic,
   queryKey,
   forceHttpPolling,
-}: useNotifyServiceProps): any {
+}: UseNotifyServiceProps): UseNotifyServiceReturn<TData> {
   const dispatch = useDispatch()
   const host = useHost()
   const queryClient = useQueryClient()
@@ -35,7 +41,8 @@ export function useNotifyService({
       const hostname = host?.hostname ?? null
       const eventEmitter = appShellListener(hostname, topic)
 
-      const onDataListener = (data: any): void => {
+      // TOME: Type this as well!
+      const onDataListener = (data: TData): void => {
         if (!isNotifyError) {
           if (data === 'ECONNFAILED') {
             setIsNotifyError(true)
@@ -60,7 +67,6 @@ export function useNotifyService({
       eventEmitter.on('data', onDataListener)
 
       if (hostname != null) {
-        console.log('hitting subscribe!')
         dispatch(notifySubscribeAction(hostname, topic))
       } else {
         console.error('Expected hostname, received null.')
@@ -69,7 +75,6 @@ export function useNotifyService({
       return () => {
         eventEmitter.off('data', onDataListener)
         if (hostname != null) {
-          console.log('WE ARE DISMOUNTING')
           dispatch(notifyUnsubscribeAction(hostname, topic))
         }
       }

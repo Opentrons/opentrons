@@ -12,7 +12,10 @@ export function useNotifyCurrentMaintenanceRun(
   const host = useHost()
   const queryKey = [host, 'maintenance_runs', 'current_run']
 
-  const { notifyQueryResponse, isNotifyError } = useNotifyService({
+  const {
+    notifyQueryResponse,
+    isNotifyError,
+  } = useNotifyService<MaintenanceRun>({
     topic: 'robot-server/maintenance_runs',
     queryKey: queryKey,
     forceHttpPolling: options.forceHttpPolling ?? false,

@@ -1,5 +1,3 @@
-import { useQueryClient } from 'react-query'
-
 import { useAllCommandsQuery, useHost } from '@opentrons/react-api-client'
 import { useNotifyService } from './useNotifyService'
 import {
@@ -26,21 +24,17 @@ const LIVE_RUN_STATUSES = [
 const LIVE_RUN_COMMANDS_POLL_MS = 3000
 
 // TOME: This one is VERY up in the air until we decide on resource stuff.
-export function useLastRunCommandKey(runId: string): string | null {
+export function useNotifyLastRunCommandKey(runId: string): string | null {
   const host = useHost()
   const runStatus = useRunStatus(runId)
-  const queryKey = [host, 'runs', 'current_run']
+  const queryKey = [host, 'runs', 'current_command']
 
-  const { notifyQueryResponse, isNotifyError } = useNotifyService({
+  const { notifyQueryResponse, isNotifyError } = useNotifyService<string>({
     topic: 'robot-server/runs/current_command',
     queryKey: queryKey,
     forceHttpPolling: false,
   })
   const isUsingNotifyData = !isNotifyError
-  console.log(
-    '🚀 ~ useLastRunCommandKey ~ isUsingNotifyData:',
-    isUsingNotifyData
-  )
 
   const { data: commandsData } = useAllCommandsQuery(
     runId,

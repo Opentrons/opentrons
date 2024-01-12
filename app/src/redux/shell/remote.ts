@@ -38,32 +38,22 @@ export function appShellRequestor<Data>(
   return remote.ipcRenderer.invoke('usb:request', configProxy)
 }
 
-// TODO(jh, 2024-01-09): Remove "host" as a dependency.
-// TOME: WHERE SHOULD I ABSTRACT THIS TO? Ideally you want to wrap the subscribe/unsubscribe as well, so this needs to go within the react api I thin.
 export function appShellListener(
   hostname: string | null,
   topic: NotifyTopic
 ): EventEmitter {
-  // TOME: I think having the eventEmitter emit an event from the stream is a-ok. I'd do it like HOST:SUBSCRIPTION.
-  // The cool thing is it self regulates here! You don't have to manager subscriptions on this level at all.
-  // Can you even do the subscribing from in here as well? That would be tight.
   const eventEmitter = new EventEmitter()
 
   remote.ipcRenderer.on('notify', (_, message) => {
-    console.log('IPCRENDERER RECEIVING message')
-    console.log(message)
-
     const {
       shellHostname,
       shellTopic,
       shellMessage,
     } = deserializeNotifyMessage(message)
-    console.log('🚀 ~ remote.ipcRenderer.on ~ shellMessage:', shellMessage)
 
     // TOME: TEMPORARILY NOT CHECKING HOSTNAME MATCHING, SINCE USING CLOUD PROVIDER.
     // if (hostname === shellHostname && topic === shellTopic) {
     if (topic === shellTopic) {
-      // TOME: Need to de-serialize the data here? May be better elsewhere, since you have to think about error message.
       eventEmitter.emit('data', shellMessage)
     }
   })
@@ -74,16 +64,18 @@ function deserializeNotifyMessage(
   message: string
 ): {
   shellHostname: string
-  shellTopic: string
-  shellMessage: Object
+  shellTopic: NotifyTopic
+  shellMessage: string | Object
 } {
-  // TOME: Most performant way to do this. Make this a part of a serialize function.
   const delimiter = ':'
   const firstIndex = message.indexOf(delimiter)
   const secondIndex = message.indexOf(delimiter, firstIndex + 1)
 
   const shellHostname = message.substring(0, firstIndex)
-  const shellTopic = message.substring(firstIndex + 1, secondIndex)
+  const shellTopic = message.substring(
+    firstIndex + 1,
+    secondIndex
+  ) as NotifyTopic
   const serializedShellMessage = message.substring(secondIndex + 1)
 
   let shellMessage: Object | string

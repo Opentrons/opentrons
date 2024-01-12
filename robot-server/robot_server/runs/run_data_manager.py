@@ -357,7 +357,7 @@ class RunDataManager:
                     created_at=current_command.created_at,
                     index=current_command.index
 )
-                    mqtt_client.publish(topic="robot-server/current_command", qos=1, retain=True, 
+                    mqtt_client.publish(topic="robot-server/runs/current_command", qos=1, retain=True, 
                                     payload=json.dumps(regular_object.command_key))
                     cached_current_command = current_command
                 except Exception as e:
