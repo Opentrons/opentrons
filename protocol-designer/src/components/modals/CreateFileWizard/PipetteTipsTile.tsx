@@ -129,7 +129,7 @@ const INPUT_STYLE = css`
   }
 
   &:active {
-    background-color: ${LEGACY_COLORS.bluePressed};
+    background-color: ${COLORS.blue60};
   }
 `
 

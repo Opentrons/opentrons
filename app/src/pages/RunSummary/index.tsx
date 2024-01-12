@@ -430,17 +430,17 @@ const DURATION_TEXT_STYLE = css`
 `
 
 const RUN_AGAIN_CLICKED_STYLE = css`
-  background-color: ${LEGACY_COLORS.bluePressed};
+  background-color: ${COLORS.blue60};
   &:focus {
-    background-color: ${LEGACY_COLORS.bluePressed};
+    background-color: ${COLORS.blue60};
   }
   &:hover {
-    background-color: ${LEGACY_COLORS.bluePressed};
+    background-color: ${COLORS.blue60};
   }
   &:focus-visible {
-    background-color: ${LEGACY_COLORS.bluePressed};
+    background-color: ${COLORS.blue60};
   }
   &:active {
-    background-color: ${LEGACY_COLORS.bluePressed};
+    background-color: ${COLORS.blue60};
   }
 `

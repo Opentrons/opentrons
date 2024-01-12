@@ -33,7 +33,7 @@ export function PlayButton({
     -webkit-tap-highlight-color: transparent;
     &:focus {
       background-color: ${ready && !isDoorOpen
-        ? LEGACY_COLORS.bluePressed
+        ? COLORS.blue60
         : LEGACY_COLORS.darkBlack40};
       color: ${COLORS.white};
     }
@@ -54,7 +54,7 @@ export function PlayButton({
 
     &:active {
       background-color: ${ready && !isDoorOpen
-        ? LEGACY_COLORS.bluePressed
+        ? COLORS.blue60
         : LEGACY_COLORS.darkBlack40};
       color: ${COLORS.white};
     }

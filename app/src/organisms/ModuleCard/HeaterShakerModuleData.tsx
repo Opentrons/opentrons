@@ -38,7 +38,7 @@ export const HeaterShakerModuleData = (
     const StatusLabelProps = {
       backgroundColor: LEGACY_COLORS.medGreyEnabled,
       iconColor: LEGACY_COLORS.darkGreyEnabled,
-      textColor: LEGACY_COLORS.bluePressed,
+      textColor: COLORS.blue60,
       pulse: false,
     }
 

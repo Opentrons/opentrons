@@ -28,7 +28,7 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
   }
 
   &:active {
-    background-color: ${LEGACY_COLORS.bluePressed};
+    background-color: ${COLORS.blue60};
   }
 
   &:focus-visible {

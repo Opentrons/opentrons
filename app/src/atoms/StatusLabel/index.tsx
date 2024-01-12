@@ -74,7 +74,7 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
         <StyledText
           fontSize={TYPOGRAPHY.fontSizeLabel}
           fontWeight={fontWeight ?? TYPOGRAPHY.fontWeightRegular}
-          color={textColor ?? LEGACY_COLORS.bluePressed}
+          color={textColor ?? COLORS.blue60}
         >
           {capitalize(status)}
         </StyledText>

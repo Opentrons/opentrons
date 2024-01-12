@@ -208,8 +208,8 @@ const ACTIVE_BUTTON_STYLE = css`
   border: 1px ${LEGACY_COLORS.blueEnabled} solid;
 
   &:hover {
-    color: ${LEGACY_COLORS.bluePressed};
-    border: 1px ${LEGACY_COLORS.bluePressed} solid;
+    color: ${COLORS.blue60};
+    border: 1px ${COLORS.blue60} solid;
   }
 `
 

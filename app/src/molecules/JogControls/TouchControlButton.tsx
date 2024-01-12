@@ -13,7 +13,7 @@ export const TouchControlButton = styled.button<{ selected: boolean }>`
 
   &:focus {
     background-color: ${({ selected }) =>
-      selected ? LEGACY_COLORS.bluePressed : LEGACY_COLORS.mediumBluePressed};
+      selected ? COLORS.blue60 : LEGACY_COLORS.mediumBluePressed};
     box-shadow: none;
   }
   &:hover {
@@ -30,6 +30,6 @@ export const TouchControlButton = styled.button<{ selected: boolean }>`
 
   &:active {
     background-color: ${({ selected }) =>
-      selected ? LEGACY_COLORS.bluePressed : LEGACY_COLORS.mediumBluePressed};
+      selected ? COLORS.blue60 : LEGACY_COLORS.mediumBluePressed};
   }
 `

@@ -80,7 +80,7 @@ describe('PrimaryButton', () => {
     const button = getByText('primary button')
     expect(button).toHaveStyleRule(
       'background-color',
-      `${LEGACY_COLORS.bluePressed}`,
+      `${COLORS.blue60}`,
       {
         modifier: ':active',
       }

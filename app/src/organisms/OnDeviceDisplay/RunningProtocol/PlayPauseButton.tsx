@@ -21,7 +21,7 @@ const PLAY_PAUSE_BUTTON_STYLE = css`
   -webkit-tap-highlight-color: transparent;
 
   &:focus {
-    background-color: ${LEGACY_COLORS.bluePressed};
+    background-color: ${COLORS.blue60};
     box-shadow: none;
   }
   &:hover {
@@ -35,7 +35,7 @@ const PLAY_PAUSE_BUTTON_STYLE = css`
     background-color: ${LEGACY_COLORS.blueEnabled};
   }
   &:active {
-    background-color: ${LEGACY_COLORS.bluePressed};
+    background-color: ${COLORS.blue60};
   }
   &:disabled {
     background-color: ${LEGACY_COLORS.darkBlack20};

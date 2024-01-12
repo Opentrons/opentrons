@@ -99,7 +99,7 @@ describe('SubmitPrimaryButton', () => {
     const button = getByText('submit primary button')
     expect(button).toHaveStyleRule(
       'background-color',
-      `${String(LEGACY_COLORS.bluePressed)}`,
+      `${String(COLORS.blue60)}`,
       {
         modifier: ':active',
       }

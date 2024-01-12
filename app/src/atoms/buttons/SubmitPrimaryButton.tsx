@@ -39,7 +39,7 @@ export const SubmitPrimaryButton = (
     }
 
     &:active {
-      background-color: ${LEGACY_COLORS.bluePressed};
+      background-color: ${COLORS.blue60};
     }
 
     &:disabled {

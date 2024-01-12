@@ -84,7 +84,7 @@ describe('TertiaryButton', () => {
     const button = getByText('tertiary button')
     expect(button).toHaveStyleRule(
       'background-color',
-      `${String(LEGACY_COLORS.bluePressed)}`,
+      `${String(COLORS.blue60)}`,
       {
         modifier: ':active',
       }

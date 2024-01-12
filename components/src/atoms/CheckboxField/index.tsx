@@ -57,14 +57,14 @@ const INNER_STYLE_VALUE = css`
   }
 
   &:active {
-    color: ${LEGACY_COLORS.bluePressed};
+    color: ${COLORS.blue60};
   }
 
   &:focus {
     box-shadow: 0 0 0 3px ${COLORS.blue50};
   }
   &:disabled {
-    color: ${LEGACY_COLORS.bluePressed};
+    color: ${COLORS.blue60};
   }
 `
 
