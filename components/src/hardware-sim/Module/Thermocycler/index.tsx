@@ -46,7 +46,7 @@ export function Thermocycler(props: ThermocyclerVizProps): JSX.Element {
     ledLightColor =
       blockTargetTemp <= ROOM_TEMPERATURE_C
         ? COLORS.blue35
-        : LEGACY_COLORS.red4
+        : COLORS.red30
   }
 
   return model === THERMOCYCLER_MODULE_V1 ? (

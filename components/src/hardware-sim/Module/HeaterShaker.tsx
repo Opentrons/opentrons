@@ -9,7 +9,7 @@ export interface HeaterShakerVizProps {
 export function HeaterShaker(props: HeaterShakerVizProps): JSX.Element {
   const { targetTemp } = props
   let ledLightColor: string = COLORS.white
-  if (targetTemp != null) ledLightColor = LEGACY_COLORS.red4
+  if (targetTemp != null) ledLightColor = COLORS.red30
 
   return (
     <g id="heaterShaker">

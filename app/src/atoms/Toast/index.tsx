@@ -232,7 +232,7 @@ export function Toast(props: ToastProps): JSX.Element {
         showODDStyle ? COLORS.red50 : COLORS.red50
       }`,
       backgroundColor: `${
-        showODDStyle ? LEGACY_COLORS.red4 : LEGACY_COLORS.errorBackgroundLight
+        showODDStyle ? COLORS.red30 : LEGACY_COLORS.errorBackgroundLight
       }`,
     },
     [INFO_TOAST]: {
