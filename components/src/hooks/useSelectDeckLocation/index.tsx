@@ -110,7 +110,7 @@ export function DeckLocationSelect({
           const isSelected = isEqual(selectedLocation, slotLocation)
           let fill =
             theme === 'default'
-              ? LEGACY_COLORS.highlightPurple2
+              ? COLORS.purple35
               : COLORS.grey35
           if (isSelected)
             fill =

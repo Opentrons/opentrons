@@ -24,12 +24,12 @@ const SELECTED_STYLE = css`
 `
 
 const UNSELECTED_STYLE = css`
-  background-color: ${LEGACY_COLORS.highlightPurple2};
+  background-color: ${COLORS.purple35};
   color: ${LEGACY_COLORS.darkBlack100};
 
   &:focus,
   &:hover {
-    background-color: ${LEGACY_COLORS.highlightPurple2};
+    background-color: ${COLORS.purple35};
     box-shadow: none;
   }
 

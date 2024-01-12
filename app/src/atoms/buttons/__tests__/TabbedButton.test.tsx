@@ -27,7 +27,7 @@ describe('Unselected TabbedButton', () => {
     const { getByText } = render(props)
     const button = getByText('tabbed button')
     expect(button).toHaveStyle(
-      `background-color: ${String(LEGACY_COLORS.highlightPurple2)}`
+      `background-color: ${String(COLORS.purple35)}`
     )
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
