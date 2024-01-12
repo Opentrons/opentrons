@@ -152,11 +152,11 @@ export function AvailableRobotOption(
       {isSelectedRobotOnDifferentSoftwareVersion && isSelected ? (
         <StyledText
           as="label"
-          color={LEGACY_COLORS.errorText}
+          color={COLORS.red60}
           marginBottom={SPACING.spacing8}
           css={css`
             & > a {
-              color: ${LEGACY_COLORS.errorText};
+              color: ${COLORS.red60};
               text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
             }
           `}

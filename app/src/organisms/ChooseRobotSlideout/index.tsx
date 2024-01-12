@@ -251,7 +251,7 @@ export function ChooseRobotSlideout(
                 {runCreationError != null && isSelected && (
                   <StyledText
                     as="label"
-                    color={LEGACY_COLORS.errorText}
+                    color={COLORS.red60}
                     overflowWrap="anywhere"
                     display={DISPLAY_INLINE_BLOCK}
                     marginTop={`-${SPACING.spacing8}`}
@@ -265,7 +265,7 @@ export function ChooseRobotSlideout(
                           robotLink: (
                             <NavLink
                               css={css`
-                                color: ${LEGACY_COLORS.errorText};
+                                color: ${COLORS.red60};
                                 text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
                               `}
                               to={`/devices/${robot.name}`}

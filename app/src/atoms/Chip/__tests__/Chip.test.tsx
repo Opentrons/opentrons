@@ -132,9 +132,9 @@ describe('Chip', () => {
     const chipText = getByText('mockError')
     expect(chip).toHaveStyle(`background-color: ${LEGACY_COLORS.red3}`)
     expect(chip).toHaveStyle(`border-radius: ${BORDERS.borderRadiusSize5}`)
-    expect(chipText).toHaveStyle(`color: ${LEGACY_COLORS.red1}`)
+    expect(chipText).toHaveStyle(`color: ${COLORS.red60}`)
     const icon = getByLabelText('icon_mockError')
-    expect(icon).toHaveStyle(`color: ${LEGACY_COLORS.red1}`)
+    expect(icon).toHaveStyle(`color: ${COLORS.red60}`)
   })
 
   it('should render text, icon, no bgcolor with error colors and bg false', () => {
@@ -148,8 +148,8 @@ describe('Chip', () => {
     const chipText = getByText('mockError')
     expect(chip).toHaveStyle(`background-color: ${COLORS.transparent}`)
     expect(chip).toHaveStyle(`border-radius: ${BORDERS.borderRadiusSize5}`)
-    expect(chipText).toHaveStyle(`color: ${LEGACY_COLORS.red1}`)
+    expect(chipText).toHaveStyle(`color: ${COLORS.red60}`)
     const icon = getByLabelText('icon_mockError')
-    expect(icon).toHaveStyle(`color: ${LEGACY_COLORS.red1}`)
+    expect(icon).toHaveStyle(`color: ${COLORS.red60}`)
   })
 })

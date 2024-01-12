@@ -181,7 +181,7 @@ export function ProtocolCard(props: {
       >
         {isFailedAnalysis ? (
           <Flex
-            color={LEGACY_COLORS.red1}
+            color={COLORS.red60}
             flexDirection={DIRECTION_ROW}
             gridGap={SPACING.spacing8}
           >

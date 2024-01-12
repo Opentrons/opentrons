@@ -252,7 +252,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
             {runCreationError != null && isSelected ? (
               <StyledText
                 as="label"
-                color={LEGACY_COLORS.errorText}
+                color={COLORS.red60}
                 overflowWrap="anywhere"
                 display={DISPLAY_BLOCK}
                 marginTop={`-${SPACING.spacing8}`}
@@ -266,7 +266,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                       robotLink: (
                         <NavLink
                           css={css`
-                            color: ${LEGACY_COLORS.errorText};
+                            color: ${COLORS.red60};
                             text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
                           `}
                           to={`/devices/${robotName}`}
