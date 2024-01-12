@@ -73,16 +73,16 @@ const EMPTY_CONFIG_STYLE = css`
 
   &:active {
     border: 3px solid ${COLORS.blue50};
-    background-color: ${LEGACY_COLORS.mediumBluePressed};
+    background-color: ${COLORS.blue40};
   }
 
   &:focus {
     border: 3px solid ${COLORS.blue50};
-    background-color: ${LEGACY_COLORS.mediumBluePressed};
+    background-color: ${COLORS.blue40};
   }
 
   &:hover {
-    background-color: ${LEGACY_COLORS.mediumBluePressed};
+    background-color: ${COLORS.blue40};
   }
 
   &:focus-visible {

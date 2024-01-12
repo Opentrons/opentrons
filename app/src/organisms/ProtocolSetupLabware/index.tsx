@@ -316,7 +316,7 @@ export function ProtocolSetupLabware({
 
 const labwareLatchStyles = css`
   &:active {
-    background-color: ${LEGACY_COLORS.mediumBluePressed};
+    background-color: ${COLORS.blue40};
   }
 `
 

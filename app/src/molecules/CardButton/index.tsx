@@ -27,7 +27,7 @@ const CARD_BUTTON_STYLE = css`
   box-shadow: none;
 
   &:focus {
-    background-color: ${LEGACY_COLORS.mediumBluePressed};
+    background-color: ${COLORS.blue40};
     box-shadow: none;
   }
 
@@ -44,7 +44,7 @@ const CARD_BUTTON_STYLE = css`
   }
 
   &:active {
-    background-color: ${LEGACY_COLORS.mediumBluePressed};
+    background-color: ${COLORS.blue40};
   }
 
   &:disabled {

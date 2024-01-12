@@ -45,7 +45,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     secondary: {
       defaultColor: COLORS.black90,
       defaultBackgroundColor: LEGACY_COLORS.mediumBlueEnabled,
-      activeBackgroundColor: LEGACY_COLORS.mediumBluePressed,
+      activeBackgroundColor: COLORS.blue40,
       iconColor: COLORS.blue50,
     },
     alert: {
