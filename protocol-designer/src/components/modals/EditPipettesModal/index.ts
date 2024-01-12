@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { withTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
 import isEmpty from 'lodash/isEmpty'
 import last from 'lodash/last'
@@ -20,6 +21,7 @@ import { NormalizedPipette } from '@opentrons/step-generation'
 import { BaseState, ThunkDispatch } from '../../../types'
 import { StepIdType } from '../../../form-types'
 import { getRobotType } from '../../../file-data/selectors'
+import { useTranslation } from 'react-i18next'
 
 type Props = React.ComponentProps<typeof FilePipettesModal>
 
@@ -29,6 +31,7 @@ interface SP {
   _orderedStepIds: StepIdType[]
   moduleRestrictionsDisabled?: boolean | null
   robotType: RobotType
+  t: any
 }
 
 interface OP {
@@ -37,7 +40,7 @@ interface OP {
 
 const mapSTP = (state: BaseState): SP => {
   const initialPipettes = stepFormSelectors.getPipettesForEditPipetteForm(state)
-
+  const { t } = useTranslation(['modal', 'button', 'form'])
   return {
     robotType: getRobotType(state),
     initialPipetteValues: initialPipettes,
@@ -46,6 +49,7 @@ const mapSTP = (state: BaseState): SP => {
     moduleRestrictionsDisabled: featureFlagSelectors.getDisableModuleRestrictions(
       state
     ),
+    t: t,
   }
 }
 

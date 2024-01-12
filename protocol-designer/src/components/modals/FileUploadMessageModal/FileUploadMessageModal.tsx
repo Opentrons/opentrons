@@ -1,10 +1,10 @@
-import { i18n } from '../../../localization'
 import * as React from 'react'
 import cx from 'classnames'
 import { AlertModal, OutlineButton } from '@opentrons/components'
 import modalStyles from '../modal.css'
 import { getModalContents } from './modalContents'
 import { FileUploadMessage } from '../../../load-file'
+import { useTranslation } from 'react-i18next'
 
 export interface FileUploadMessageModalProps {
   message?: FileUploadMessage | null
@@ -16,13 +16,13 @@ export function FileUploadMessageModal(
   props: FileUploadMessageModalProps
 ): JSX.Element | null {
   const { message, cancelProtocolMigration, dismissModal } = props
-
+  const { t } = useTranslation('button')
   if (!message) return null
 
   const { title, body, okButtonText } = getModalContents(message)
   let buttons = [
     {
-      children: i18n.t('button.cancel'),
+      children: t('cancel'),
       onClick: cancelProtocolMigration,
       className: modalStyles.bottom_button,
     },

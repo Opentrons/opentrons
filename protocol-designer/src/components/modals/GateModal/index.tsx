@@ -2,7 +2,6 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import cx from 'classnames'
 import { AlertModal } from '@opentrons/components'
-import { i18n } from '../../../localization'
 import {
   actions as analyticsActions,
   selectors as analyticsSelectors,

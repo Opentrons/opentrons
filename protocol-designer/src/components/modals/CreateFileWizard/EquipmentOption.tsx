@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Flex,
   Text,
@@ -13,7 +14,6 @@ import {
   useHoverTooltip,
   Tooltip,
 } from '@opentrons/components'
-import { i18n } from '../../../localization'
 
 interface EquipmentOptionProps extends StyleProps {
   onClick: React.MouseEventHandler
@@ -33,7 +33,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
     disabled = false,
     ...styleProps
   } = props
-
+  const { t } = useTranslation('tooltip')
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   return (
@@ -82,7 +82,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
       </Flex>
       {disabled ? (
         <Tooltip {...tooltipProps}>
-          {i18n.t('tooltip.disabled_no_space_additional_items')}
+          {t('disabled_no_space_additional_items')}
         </Tooltip>
       ) : null}
     </>

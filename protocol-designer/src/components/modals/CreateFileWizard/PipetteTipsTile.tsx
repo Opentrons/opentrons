@@ -25,7 +25,6 @@ import {
   JUSTIFY_END,
 } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import { i18n } from '../../../localization'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { getAllowAllTipracks } from '../../../feature-flags/selectors'
@@ -65,7 +64,7 @@ interface PipetteTipsTileProps extends WizardTileProps {
 }
 export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
   const { proceed, goBack, mount, values } = props
-  const { t } = useTranslation('modal')
+  const { t } = useTranslation(['modal', 'application'])
 
   const firstPipetteName = values.pipettesByMount[mount].pipetteName
   const tileHeader = t('choose_tips_for_pipette', {
@@ -94,7 +93,7 @@ export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
         >
           <GoBack onClick={() => goBack()} />
           <PrimaryButton onClick={() => proceed()}>
-            {i18n.t('application.next')}
+            {t('application:next')}
           </PrimaryButton>
         </Flex>
       </Flex>
