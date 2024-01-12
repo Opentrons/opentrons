@@ -34,7 +34,7 @@ describe('FloatingActionButton', () => {
       `padding: ${SPACING.spacing12} ${SPACING.spacing24}`
     )
     expect(button).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.highlightPurple1}`
+      `background-color: ${COLORS.purple50}`
     )
     expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSize28}`)
     expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)

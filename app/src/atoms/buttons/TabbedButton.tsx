@@ -9,12 +9,12 @@ import {
 } from '@opentrons/components'
 
 const SELECTED_STYLE = css`
-  background-color: ${LEGACY_COLORS.highlightPurple1};
+  background-color: ${COLORS.purple50};
   color: ${COLORS.white};
 
   &:focus,
   &:hover {
-    background-color: ${LEGACY_COLORS.highlightPurple1};
+    background-color: ${COLORS.purple50};
     box-shadow: none;
   }
 

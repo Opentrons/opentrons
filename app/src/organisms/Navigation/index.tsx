@@ -157,7 +157,7 @@ const TouchNavLink = styled(NavLink)`
     color: ${LEGACY_COLORS.black};
   }
   &.active > div {
-    background-color: ${LEGACY_COLORS.highlightPurple1};
+    background-color: ${COLORS.purple50};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {

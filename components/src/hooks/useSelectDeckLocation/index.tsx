@@ -115,7 +115,7 @@ export function DeckLocationSelect({
           if (isSelected)
             fill =
               theme === 'default'
-                ? LEGACY_COLORS.highlightPurple1
+                ? COLORS.purple50
                 : COLORS.grey50Enabled
           if (isDisabled) fill = COLORS.grey50Disabled
           if (isSelected && slot.id === 'B1' && isThermocycler) {
