@@ -40,7 +40,7 @@ export const OverflowBtn = React.forwardRef(
           }
 
           &:disabled circle {
-            fill: ${LEGACY_COLORS.successDisabled};
+            fill: ${COLORS.grey40};
           }
           &:disabled {
             background-color: transparent;

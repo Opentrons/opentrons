@@ -108,7 +108,7 @@ function RoundTab({
   return disabled ? (
     <>
       <StyledText
-        color={LEGACY_COLORS.successDisabled}
+        color={COLORS.grey40}
         css={baseRoundTabStyling}
         {...targetProps}
       >

@@ -68,7 +68,7 @@ describe('SubmitPrimaryButton', () => {
       `background-color: ${String(COLORS.grey50Disabled)}`
     )
     expect(button).toHaveStyle(
-      `color: ${String(LEGACY_COLORS.successDisabled)}`
+      `color: ${String(COLORS.grey40)}`
     )
   })
 

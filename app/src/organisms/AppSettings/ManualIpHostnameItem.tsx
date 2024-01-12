@@ -83,7 +83,7 @@ export function ManualIpHostnameItem({
           <StyledText
             as="p"
             data-testid="ip-hostname"
-            color={discovered ? COLORS.black90 : LEGACY_COLORS.successDisabled}
+            color={discovered ? COLORS.black90 : COLORS.grey40}
           >
             {candidate}
           </StyledText>

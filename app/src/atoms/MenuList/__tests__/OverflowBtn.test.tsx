@@ -69,7 +69,7 @@ describe('OverflowBtn', () => {
 
     expect(getByRole('button')).toHaveStyleRule(
       'fill',
-      `${String(LEGACY_COLORS.successDisabled)}`,
+      `${String(COLORS.grey40)}`,
       {
         modifier: ':disabled circle',
       }
