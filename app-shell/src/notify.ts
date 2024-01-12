@@ -21,13 +21,12 @@ interface ConnectionStore {
 }
 
 const connectionStore: ConnectionStore = {}
-const CLIENT_ID = uniqueId('app_')
 const log = createLogger('notify')
 
 // TOME: Highlight here that we make the assumption that if we can connect
 // to the broker at some point, we don't need a backup connection via HTTP. I think that's very fair.
 const connectOptions: mqtt.IClientOptions = {
-  clientId: CLIENT_ID,
+  clientId: uniqueId('app_'),
   port: 1883,
   keepalive: 60,
   protocolVersion: 5,
@@ -89,13 +88,11 @@ function subscribe(notifyParams: NotifyParams): void {
   }
   // TOME: Adjsut this
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare
-  else if (topic in connectionStore[hostname].subscriptions === false) {
-    connectionStore[hostname].subscriptions[topic] = 1
-    const { client } = connectionStore[hostname]
-    client?.subscribe(topic, subscribeOptions)
-  } else {
+  else {
     connectionStore[hostname].subscriptions[topic] =
       (connectionStore[hostname].subscriptions[topic] ?? 0) + 1
+    const { client } = connectionStore[hostname]
+    client?.subscribe(topic, subscribeOptions)
   }
 }
 
@@ -178,7 +175,7 @@ function establishListeners({
           const { subscriptions } = connectionStore[hostname]
           if (topic in subscriptions) {
             subscriptions[topic] -= 1
-            if (connectionStore[hostname].subscriptions[topic] === 0) {
+            if (subscriptions[topic] <= 0) {
               delete subscriptions[topic]
             }
           }
@@ -199,7 +196,7 @@ function establishListeners({
           const { client, subscriptions } = connectionStore[hostname]
           if (topic in subscriptions) {
             subscriptions[topic] -= 1
-            if (connectionStore[hostname].subscriptions[topic] === 0) {
+            if (subscriptions[topic] <= 0) {
               delete subscriptions[topic]
             }
           }

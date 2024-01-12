@@ -22,13 +22,12 @@ interface ConnectionStore {
 }
 
 const connectionStore: ConnectionStore = {}
-const CLIENT_ID = uniqueId('app_')
 const log = createLogger('notify')
 
 // TOME: Highlight here that we make the assumption that if we can connect
 // to the broker at some point, we don't need a backup connection via HTTP. I think that's very fair.
 const connectOptions: mqtt.IClientOptions = {
-  clientId: CLIENT_ID,
+  clientId: uniqueId('odd_'),
   port: 1883,
   keepalive: 60,
   protocolVersion: 5,
@@ -56,7 +55,7 @@ export function registerNotify(
 ): (action: Action) => unknown {
   return function handleAction(action: Action) {
     switch (action.type) {
-      // TOME: I think you can hardcode this as the broker string here if you wanted. Definitely not required, but something to think about for ODD.
+      // TOME: USING THIS BROKER TO TEST FOR NOW. REMEMBER TO DELETE WHEN USING REAL BROKER.// TOME: I think you can hardcode this as the broker string here if you wanted. Definitely not required, but something to think about for ODD.      case 'shell:NOTIFY_SUBSCRIBE':
       case 'shell:NOTIFY_SUBSCRIBE':
         return subscribe({
           ...action.payload,
@@ -158,13 +157,13 @@ function establishListeners({
       if (hostname in connectionStore) delete connectionStore[hostname]
     }
   })
+
   // TOME: Clean up the browser window send stuff, IMO.
   client.on('packetreceive', packet => {
     switch (packet.cmd) {
       case 'suback':
         if (packet.reasonCode == null || packet.reasonCode < 128) {
           log.info(`Successfully subscribed on ${hostname} to topic: ${topic}`)
-          console.log('🚀 ~ connectionStore:', connectionStore)
         } else {
           log.warn(`Failed to subscribe on ${hostname} to topic: ${topic}`)
           browserWindow.webContents.send(
@@ -174,7 +173,7 @@ function establishListeners({
           const { subscriptions } = connectionStore[hostname]
           if (topic in subscriptions) {
             subscriptions[topic] -= 1
-            if (connectionStore[hostname].subscriptions[topic] === 0) {
+            if (subscriptions[topic] <= 0) {
               delete subscriptions[topic]
             }
           }
@@ -195,7 +194,7 @@ function establishListeners({
           const { client, subscriptions } = connectionStore[hostname]
           if (topic in subscriptions) {
             subscriptions[topic] -= 1
-            if (connectionStore[hostname].subscriptions[topic] === 0) {
+            if (subscriptions[topic] <= 0) {
               delete subscriptions[topic]
             }
           }
@@ -223,6 +222,8 @@ function establishListeners({
   })
   // handles transport layer errors only
   // TOME: More sophisticated reconnection logic would be helpful. If it worked before but now doesn't work, that's a good sign you should retry.
+  // TOME: Probably worth checking to see what happens during a disconnect (wifi out, etc). Does the error logic get hit? If so, that may be reason to think about this sooner rather than
+  // later.
   client.on('error', error => {
     log.warn(`Error - ${error.name}: ${error.message}`)
     browserWindow.webContents.send('notify', `${hostname}:${topic}:ECONNFAILED`)
