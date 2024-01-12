@@ -41,7 +41,7 @@ export function useNotifyService<TData>({
       const hostname = host?.hostname ?? null
       const eventEmitter = appShellListener(hostname, topic)
 
-      // TOME: Type this as well!
+      // TOME: Type this as well. Will be easier once serialization is solved.
       const onDataListener = (data: TData): void => {
         if (!isNotifyError) {
           if (data === 'ECONNFAILED') {

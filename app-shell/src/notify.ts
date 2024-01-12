@@ -1,4 +1,3 @@
-// TOME: Cnovert the object to a set. Better for performance and storing collections of objects. Not the biggest deal, though.
 /* eslint-disable @typescript-eslint/no-dynamic-delete */
 import mqtt from 'mqtt'
 
@@ -164,17 +163,7 @@ function establishListeners({
             'notify',
             `${hostname}:${topic}:ECONNFAILED`
           )
-          const { subscriptions } = connectionStore[hostname]
-          if (topic in subscriptions) {
-            subscriptions[topic] -= 1
-            if (subscriptions[topic] <= 0) {
-              delete subscriptions[topic]
-            }
-          }
-
-          if (Object.keys(subscriptions).length <= 0) {
-            client?.end()
-          }
+          decrementSubscription(hostname, topic)
         }
         break
 
@@ -185,17 +174,7 @@ function establishListeners({
           log.info(
             `Successfully unsubscribed on ${hostname} from topic: ${topic}`
           )
-          const { client, subscriptions } = connectionStore[hostname]
-          if (topic in subscriptions) {
-            subscriptions[topic] -= 1
-            if (subscriptions[topic] <= 0) {
-              delete subscriptions[topic]
-            }
-          }
-
-          if (Object.keys(subscriptions).length <= 0) {
-            client?.end()
-          }
+          decrementSubscription(hostname, topic)
         } else {
           log.warn(`Failed to unsubscribe on ${hostname} from topic: ${topic}`)
         }
@@ -233,4 +212,18 @@ function establishListeners({
       }`
     )
   )
+}
+
+function decrementSubscription(hostname: string, topic: NotifyTopic): void {
+  const { client, subscriptions } = connectionStore[hostname]
+  if (topic in subscriptions) {
+    subscriptions[topic] -= 1
+    if (subscriptions[topic] <= 0) {
+      delete subscriptions[topic]
+    }
+  }
+
+  if (Object.keys(subscriptions).length <= 0) {
+    client?.end()
+  }
 }
