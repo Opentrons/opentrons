@@ -30,7 +30,7 @@ import { getWellRangeForLiquidLabwarePair } from './utils'
 const LIQUID_CARD_STYLE = css`
   ${BORDERS.cardOutlineBorder}
   &:hover {
-    border: 1px solid ${LEGACY_COLORS.medGreyHover};
+    border: 1px solid ${COLORS.grey60};
     cursor: pointer;
   }
 `

@@ -68,7 +68,7 @@ const SORT_BY_BUTTON_STYLE = css`
   background-color: ${COLORS.transparent};
   cursor: pointer;
   &:hover {
-    background-color: ${LEGACY_COLORS.medGreyHover};
+    background-color: ${COLORS.grey60};
   }
 
   &:active,

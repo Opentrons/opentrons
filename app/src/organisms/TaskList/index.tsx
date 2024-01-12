@@ -80,7 +80,7 @@ function ProgressTrackerItem({
           color={
             isTaskListComplete || isPastTask
               ? COLORS.blue50
-              : LEGACY_COLORS.medGreyHover
+              : COLORS.grey60
           }
         />
       ) : (
@@ -90,7 +90,7 @@ function ProgressTrackerItem({
           justifyContent={JUSTIFY_CENTER}
           backgroundColor={
             isFutureTask
-              ? LEGACY_COLORS.medGreyHover
+              ? COLORS.grey60
               : COLORS.blue50
           }
           color={COLORS.white}
@@ -149,13 +149,13 @@ function ProgressTrackerItem({
                     isTaskListComplete || isPastSubTask
                       ? COLORS.blue50
                       : subTask.isComplete === true
-                      ? LEGACY_COLORS.medGreyHover
+                      ? COLORS.grey60
                       : 'initial'
                   }
                   border={BORDERS.lineBorder}
                   borderColor={
                     isFutureSubTask
-                      ? LEGACY_COLORS.medGreyHover
+                      ? COLORS.grey60
                       : COLORS.blue50
                   }
                   borderWidth={SPACING.spacing2}

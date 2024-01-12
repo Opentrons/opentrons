@@ -19,7 +19,7 @@ const unselectedOptionStyles = css`
   cursor: pointer;
 
   &:hover {
-    border: 1px solid ${LEGACY_COLORS.medGreyHover};
+    border: 1px solid ${COLORS.grey60};
   }
 `
 const selectedOptionStyles = css`

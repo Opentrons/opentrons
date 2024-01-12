@@ -197,7 +197,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
   grid-gap: ${SPACING.spacing8}
 
   &:hover {
-    border: 1px solid ${LEGACY_COLORS.medGreyHover};
+    border: 1px solid ${COLORS.grey60};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {

@@ -253,6 +253,6 @@ export const darkLinkLabelSemiBoldDisabled = css`
   font-size: ${fontSizeLabel};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
-  color: ${LEGACY_COLORS.medGreyHover};
+  color: ${COLORS.grey60};
   cursor: not-allowed;
 `

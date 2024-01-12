@@ -48,10 +48,10 @@ export function Select(props: SelectComponentProps): JSX.Element {
       padding: SPACING.spacing6,
       flexDirection: DIRECTION_ROW,
       '&:hover': {
-        borderColor: LEGACY_COLORS.medGreyHover,
+        borderColor: COLORS.grey60,
       },
       '&:active': {
-        borderColor: LEGACY_COLORS.medGreyHover,
+        borderColor: COLORS.grey60,
       },
     }),
     container: (styles: CSSObjectWithLabel) => ({

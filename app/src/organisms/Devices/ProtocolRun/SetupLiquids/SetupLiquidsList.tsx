@@ -113,7 +113,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
 
     &:hover {
       cursor: pointer;
-      border: 1px solid ${LEGACY_COLORS.medGreyHover};
+      border: 1px solid ${COLORS.grey60};
     }
   `
   const LIQUID_CARD_ITEM_STYLE = css`
