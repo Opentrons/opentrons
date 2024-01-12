@@ -67,7 +67,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
     alertSecondary: {
       //  TODO(ew, 3/22/23): replaces these hex codes with the color constants
       activeBackgroundColor: '#ccabac',
-      defaultBackgroundColor: LEGACY_COLORS.red3,
+      defaultBackgroundColor: COLORS.red35,
       defaultColor: COLORS.red60,
       disabledBackgroundColor: COLORS.grey35,
       iconColor: COLORS.red60,

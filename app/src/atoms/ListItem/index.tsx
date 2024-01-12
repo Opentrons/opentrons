@@ -24,7 +24,7 @@ const LISTITEM_PROPS_BY_TYPE: Record<
   { backgroundColor: string }
 > = {
   error: {
-    backgroundColor: LEGACY_COLORS.red3,
+    backgroundColor: COLORS.red35,
   },
   noActive: {
     backgroundColor: COLORS.grey35,

@@ -33,7 +33,7 @@ export function ErrorUpdateSoftware({
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        backgroundColor={LEGACY_COLORS.red3}
+        backgroundColor={COLORS.red35}
         height="26.625rem"
         gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}

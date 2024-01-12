@@ -27,7 +27,7 @@ describe('ListItem', () => {
     const [{ getByText, getByTestId }] = render(props)
     getByText('mock listitem content')
     const listItem = getByTestId('ListItem_error')
-    expect(listItem).toHaveStyle(`backgroundColor: ${LEGACY_COLORS.red3}`)
+    expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.red35}`)
     expect(listItem).toHaveStyle(
       `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
     )

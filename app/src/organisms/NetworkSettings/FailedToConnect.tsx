@@ -39,7 +39,7 @@ export function FailedToConnect({
     <Flex flex="1" flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
       <Flex
         flex="1"
-        backgroundColor={LEGACY_COLORS.red3}
+        backgroundColor={COLORS.red35}
         justifyContent={JUSTIFY_CENTER}
         borderRadius={BORDERS.borderRadiusSize3}
       >

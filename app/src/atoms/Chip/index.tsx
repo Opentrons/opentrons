@@ -45,7 +45,7 @@ const CHIP_PROPS_BY_TYPE: Record<
     textColor: COLORS.grey60,
   },
   error: {
-    backgroundColor: LEGACY_COLORS.red3,
+    backgroundColor: COLORS.red35,
     borderRadius: BORDERS.borderRadiusSize5,
     iconColor: COLORS.red60,
     textColor: COLORS.red60,

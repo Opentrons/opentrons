@@ -32,7 +32,7 @@ describe('LargeButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.red3}`
+      `background-color: ${COLORS.red35}`
     )
   })
   it('renders the secondary button', () => {

@@ -42,7 +42,7 @@ const INLINE_NOTIFICATION_PROPS_BY_TYPE: Record<
   },
   error: {
     icon: { name: 'ot-alert' },
-    backgroundColor: LEGACY_COLORS.red3,
+    backgroundColor: COLORS.red35,
     color: COLORS.red50,
   },
   neutral: {

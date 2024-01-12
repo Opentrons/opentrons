@@ -154,7 +154,7 @@ export function ProtocolCard(props: {
   return (
     <Flex
       alignItems={isFailedAnalysis ? ALIGN_END : ALIGN_CENTER}
-      backgroundColor={isFailedAnalysis ? LEGACY_COLORS.red3 : COLORS.grey35}
+      backgroundColor={isFailedAnalysis ? COLORS.red35 : COLORS.grey35}
       borderRadius={BORDERS.borderRadiusSize4}
       marginBottom={SPACING.spacing8}
       gridGap={SPACING.spacing48}
