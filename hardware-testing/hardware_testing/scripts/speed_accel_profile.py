@@ -33,13 +33,6 @@ ERROR_THRESHOLD = 0.2 #mm
 
 TEST_LIST: Dict[str, list] = {}
 
-FAKE_STATUS = {NodeId.gantry_x: MotorStatus(motor_ok=True, encoder_ok=True),
-                NodeId.gantry_y: MotorStatus(motor_ok=True, encoder_ok=True),
-                NodeId.head_l: MotorStatus(motor_ok=True, encoder_ok=True),
-                NodeId.head_r: MotorStatus(motor_ok=True, encoder_ok=True)}
-
-FAKE_GRIPPER = {NodeId.gripper_g: MotorStatus(motor_ok=True, encoder_ok=True)}
-
 TEST_PARAMETERS: Dict[GantryLoad, Dict[str, Dict[str, Dict[str, float]]]] = {
     GantryLoad.LOW_THROUGHPUT: {
         "X": {
@@ -309,9 +302,6 @@ async def _single_axis_move(
     await api.move_rel(mount=MOUNT, delta=HOME_POINT_MAP[axis], speed=80)
     #time.sleep(ENCODER_DELAY*2) #let postition settle
 
-    # if axis == "G":
-    #     await api.home_gripper_jaw()
-    #     api._backend._motor_status.update(FAKE_GRIPPER)
     for c in range(cycles):
         # print("before encoder check")
         # print("api._encoder_position: "+str(api._encoder_position))
@@ -475,13 +465,6 @@ async def _main(is_simulating: bool) -> None:
             is_simulating=is_simulating, stall_detection_enable=False
         )
 
-    #do not home all axes if on bench
-    if not BENCH:
-        print("HOMING")
-        await api.home([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R])
-    else:
-        api._backend._motor_status.update(FAKE_STATUS)
-
     try:
         # #run the test while recording raw results
         results_cycles = {}
@@ -531,9 +514,6 @@ async def _main(is_simulating: bool) -> None:
                     # attempt to cycle with the test settings
                     print("HOMING: " + str(test_axis))
                     await api.home(axes = [AXIS_MAP[test_axis]])
-                    if BENCH:
-                        api._backend._motor_status.update(FAKE_STATUS)
-                        print(api._backend._motor_status)
 
                     move_output_list = await _single_axis_move(
                         test_axis, api, cycles=CYCLES
