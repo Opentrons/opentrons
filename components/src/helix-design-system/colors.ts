@@ -32,14 +32,35 @@ export const yellow20 = '#FDF3E2'
 /**
  * purple
  */
+export const purple60 = '#562566'
+export const purple55 = '#713187'
+export const purple50 = '#893BA4'
+export const purple40 = '#CEA4DF'
+export const purple35 = '#DBBCE7'
+export const purple30 = '#E6D5EC'
+export const purple20 = '#F1E8F5'
 
 /**
  * blue
  */
+export const blue60 = '#004196'
+export const blue55 = '#0056C8'
+export const blue40 = '#A9CEFD'
+export const blue35 = '#BFDCFD'
+export const blue30 = '#D0E6FE'
+export const blue10 = '#F1F8FF'
 
 /**
  * grey
  */
+export const grey60 = '#4A4C4E'
+export const grey55 = '#737578'
+export const grey50 = '#9C9C9C'
+export const grey40 = '#D0D0D0'
+export const grey35 = '#CBCCCC'
+export const grey30 = '#DEDEDE'
+export const grey20 = '#DEDEDE'
+export const grey10 = '#ECECEC'
 
 /**
  * core
