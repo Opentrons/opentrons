@@ -2,7 +2,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import {
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   BORDERS,
   Btn,
@@ -80,16 +80,16 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
     },
     tertiaryHighLight: {
       defaultColor: COLORS.black90,
-      defaultBackgroundColor: `${COLORS.blue50}${LEGACY_COLORS.opacity0HexCode}`,
+      defaultBackgroundColor: `${COLORS.blue50}00`,
       activeBackgroundColor: `${COLORS.grey35}`,
-      disabledBackgroundColor: `${COLORS.blue50}${LEGACY_COLORS.opacity0HexCode}`,
+      disabledBackgroundColor: `${COLORS.blue50}00`,
       disabledColor: `${COLORS.grey50}`,
     },
     tertiaryLowLight: {
       defaultColor: `${COLORS.grey60}`,
-      defaultBackgroundColor: ` ${COLORS.blue50}${LEGACY_COLORS.opacity0HexCode}`,
+      defaultBackgroundColor: ` ${COLORS.blue50}00`,
       activeBackgroundColor: `${COLORS.grey35}`,
-      disabledBackgroundColor: `${COLORS.blue50}${LEGACY_COLORS.opacity0HexCode}`,
+      disabledBackgroundColor: `${COLORS.blue50}00`,
       disabledColor: `${COLORS.grey50}`,
     },
   }

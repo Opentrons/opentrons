@@ -322,7 +322,7 @@ export function ModulesListItem({
       status={moduleConnectionStatus}
       backgroundColor={COLORS.green20}
       iconColor={COLORS.green50}
-      textColor={LEGACY_COLORS.successText}
+      textColor={COLORS.green60}
     />
   )
 

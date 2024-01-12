@@ -14,7 +14,6 @@ import {
   TYPOGRAPHY,
   BORDERS,
   COLORS,
-  LEGACY_COLORS,
   POSITION_FIXED,
 } from '@opentrons/components'
 
@@ -119,7 +118,7 @@ export const RunPreviewComponent = (
                 width="100%"
                 border={`solid 1px ${
                   index === jumpedIndex
-                    ? LEGACY_COLORS.electricPurple
+                    ? COLORS.purple40
                     : borderColor
                 }`}
                 backgroundColor={

@@ -18,7 +18,7 @@ export default {
           COLORS.black90,
           COLORS.blue50,
           COLORS.red50,
-          LEGACY_COLORS.successText,
+          COLORS.green60,
         ],
       },
     },
