@@ -23,11 +23,14 @@ interface ConnectionStore {
 
 const connectionStore: ConnectionStore = {}
 const log = createLogger('notify')
+// MQTT is somewhat particular about the clientId format and will connect erratically if an unexpected string is supplied.
+// This clientId is derived from the mqttjs library.
+const CLIENT_ID = 'odd_' + Math.random().toString(16).slice(2, 8)
 
 // TOME: Highlight here that we make the assumption that if we can connect
 // to the broker at some point, we don't need a backup connection via HTTP. I think that's very fair.
 const connectOptions: mqtt.IClientOptions = {
-  clientId: uniqueId('odd_'),
+  clientId: CLIENT_ID,
   port: 1883,
   keepalive: 60,
   protocolVersion: 5,
@@ -127,7 +130,7 @@ interface ListenerParams {
   hostname: string
 }
 
-// See https://docs.emqx.com/en/cloud/latest/connect_to_deployments/mqtt_client_error_codes.html
+// See https://docs.oasis-open.org/mqtt/mqtt/v5.0/cos01/mqtt-v5.0-cos01.html
 // Packets with reason codes < 128 are successful operations.
 function establishListeners({
   client,
@@ -235,11 +238,12 @@ function establishListeners({
     if (hostname in connectionStore) delete connectionStore[hostname]
   })
 
-  client.on('disconnect', packet =>
+  client.on('disconnect', packet => {
     log.warn(
       `Disconnected from ${hostname} with code ${
         packet.reasonCode ?? 'undefined'
       }`
     )
-  )
+    log.warn(packet)
+  })
 }
