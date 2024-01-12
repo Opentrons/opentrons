@@ -146,7 +146,7 @@ export function ProtocolCard(props: {
       background-color: ${longpress.isLongPressed
         ? ''
         : isFailedAnalysis
-        ? LEGACY_COLORS.red3Pressed
+        ? COLORS.red40
         : COLORS.grey50};
     }
   `
