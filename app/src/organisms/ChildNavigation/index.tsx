@@ -68,7 +68,7 @@ export function ChildNavigation({
           onClick={onClickBack}
           data-testid="ChildNavigation_Back_Button"
         >
-          <Icon name="back" size="3rem" color={LEGACY_COLORS.darkBlack100} />
+          <Icon name="back" size="3rem" color={COLORS.black90} />
         </IconButton>
         <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {header}

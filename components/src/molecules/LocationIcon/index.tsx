@@ -31,7 +31,7 @@ const LOCATION_ICON_STYLE = css<{
   width?: string
 }>`
   align-items: ${ALIGN_CENTER};
-  border: 2px solid ${props => props.color ?? LEGACY_COLORS.darkBlack100};
+  border: 2px solid ${props => props.color ?? COLORS.black90};
   border-radius: ${BORDERS.borderRadiusSize3};
   height: ${props => props.height ?? SPACING.spacing32};
   width: ${props => props.width ?? 'max-content'};
@@ -63,7 +63,7 @@ export function LocationIcon({
         <Icon
           name={iconName}
           size="1.25rem"
-          color={color ?? LEGACY_COLORS.darkBlack100}
+          color={color ?? COLORS.black90}
           aria-label={iconName}
         />
       ) : (

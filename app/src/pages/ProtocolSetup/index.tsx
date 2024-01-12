@@ -179,7 +179,7 @@ export function ProtocolSetupStep({
           as="h4"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={
-            disabled ? COLORS.grey50 : LEGACY_COLORS.darkBlack100
+            disabled ? COLORS.grey50 : COLORS.black90
           }
         >
           {title}
@@ -189,7 +189,7 @@ export function ProtocolSetupStep({
             as="p"
             textAlign={TEXT_ALIGN_RIGHT}
             color={
-              disabled ? COLORS.grey50 : LEGACY_COLORS.darkBlack100
+              disabled ? COLORS.grey50 : COLORS.black90
             }
           >
             {detail}

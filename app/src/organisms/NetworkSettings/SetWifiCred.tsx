@@ -30,7 +30,7 @@ const SSID_INPUT_FIELD_STYLE = css`
   font-size: ${TYPOGRAPHY.fontSize28};
   line-height: ${TYPOGRAPHY.lineHeight36};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  color: ${LEGACY_COLORS.darkBlack100};
+  color: ${COLORS.black90};
   padding-left: ${SPACING.spacing24};
   box-sizing: border-box;
   width: 42.625rem;

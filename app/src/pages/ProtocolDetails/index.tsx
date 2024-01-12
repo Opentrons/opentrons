@@ -107,7 +107,7 @@ const ProtocolHeader = ({
           onClick={() => history.push('/protocols')}
           width="3rem"
         >
-          <Icon name="back" size="3rem" color={LEGACY_COLORS.darkBlack100} />
+          <Icon name="back" size="3rem" color={COLORS.black90} />
         </Btn>
         <Flex
           flexDirection={DIRECTION_COLUMN}

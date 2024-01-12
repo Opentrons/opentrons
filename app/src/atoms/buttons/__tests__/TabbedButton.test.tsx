@@ -46,7 +46,7 @@ describe('Unselected TabbedButton', () => {
       `text-transform: ${String(TYPOGRAPHY.textTransformNone)}`
     )
     expect(button).toHaveStyle(`box-shadow: none`)
-    expect(button).toHaveStyle(`color: ${String(LEGACY_COLORS.darkBlack100)}`)
+    expect(button).toHaveStyle(`color: ${String(COLORS.black90)}`)
   })
 
   it('renders unselected tabbed button with text and disabled', () => {

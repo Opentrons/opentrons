@@ -69,7 +69,7 @@ export function RobotSettingButton({
         whiteSpace="nowrap"
       >
         {iconName != null ? (
-          <Icon name={iconName} size="3rem" color={LEGACY_COLORS.darkBlack100} />
+          <Icon name={iconName} size="3rem" color={COLORS.black90} />
         ) : null}
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -96,7 +96,7 @@ export function RobotSettingButton({
         rightElement
       ) : (
         <Flex gridGap={SPACING.spacing40} alignItems={ALIGN_CENTER}>
-          <Icon name="more" size="3rem" color={LEGACY_COLORS.darkBlack100} />
+          <Icon name="more" size="3rem" color={COLORS.black90} />
         </Flex>
       )}
     </Btn>

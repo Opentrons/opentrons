@@ -125,7 +125,7 @@ export function WifiConnectionDetails({
                     size="2.5rem"
                     name="info"
                     aria-label={`${activeSsid}_info_icon`}
-                    color={LEGACY_COLORS.darkBlack100}
+                    color={COLORS.black90}
                   />
                   <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                     {t('view_details')}
