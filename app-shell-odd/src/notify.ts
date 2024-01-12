@@ -13,9 +13,10 @@ import type { Action, Dispatch } from './types'
 
 // TOME: Test that redundant emissions still get data!
 
+// TOME: I'd probably convert this a class at this point.
 interface ConnectionStore {
   [hostname: string]: {
-    client: mqtt.MqttClient
+    client: mqtt.MqttClient | null
     subscriptions: Partial<Record<NotifyTopic, number>> // a frequency counter. unsubscribe from topic when counter is 0.
   }
 }
@@ -78,12 +79,24 @@ interface NotifyParams {
 function subscribe(notifyParams: NotifyParams): void {
   const { hostname, topic } = notifyParams
   if (connectionStore[hostname] == null) {
+    connectionStore[hostname] = {
+      client: null,
+      subscriptions: { [topic]: 1 },
+    }
     const client = mqtt.connect(`mqtt://${hostname}`, connectOptions)
+    connectionStore[hostname].client = client
     establishListeners({ ...notifyParams, client })
     client.subscribe(topic, subscribeOptions)
-  } else {
+  }
+  // TOME: Adjsut this
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare
+  else if (topic in connectionStore[hostname].subscriptions === false) {
+    connectionStore[hostname].subscriptions[topic] = 1
     const { client } = connectionStore[hostname]
-    client.subscribe(topic, subscribeOptions)
+    client?.subscribe(topic, subscribeOptions)
+  } else {
+    connectionStore[hostname].subscriptions[topic] =
+      (connectionStore[hostname].subscriptions[topic] ?? 0) + 1
   }
 }
 
@@ -92,7 +105,7 @@ type UnsubscribeParams = Omit<NotifyParams, 'browserWindow'>
 function unsubscribe({ hostname, topic }: UnsubscribeParams): void {
   if (hostname in connectionStore) {
     const { client } = connectionStore[hostname]
-    client.unsubscribe(topic)
+    client?.unsubscribe(topic)
   } else {
     log.info(`Attempting to unsubscribe from unconnected hostname ${hostname}`)
   }
@@ -102,7 +115,7 @@ export function closeAllNotifyConnections(): Promise<unknown[]> {
   log.debug('Stopping all active notify service connections')
   const closeConnections = Object.values(connectionStore).map(({ client }) => {
     return new Promise((resolve, reject) => {
-      client.end(true, {}, () => resolve(null))
+      client?.end(true, {}, () => resolve(null))
     })
   })
   return Promise.all(closeConnections)
@@ -135,10 +148,6 @@ function establishListeners({
   client.on('connect', connack => {
     if (connack.reasonCode == null || connack.reasonCode < 128) {
       log.info(`Successfully connected to ${hostname}`)
-      connectionStore[hostname] = {
-        client,
-        subscriptions: {},
-      }
       client.subscribe(topic, subscribeOptions)
     } else {
       log.warn(`Failed to connect to ${hostname}`)
@@ -146,6 +155,7 @@ function establishListeners({
         'notify',
         `${hostname}:${topic}:ECONNFAILED`
       )
+      if (hostname in connectionStore) delete connectionStore[hostname]
     }
   })
   // TOME: Clean up the browser window send stuff, IMO.
@@ -154,14 +164,24 @@ function establishListeners({
       case 'suback':
         if (packet.reasonCode == null || packet.reasonCode < 128) {
           log.info(`Successfully subscribed on ${hostname} to topic: ${topic}`)
-          connectionStore[hostname].subscriptions[topic] =
-            (connectionStore[hostname].subscriptions[topic] ?? 0) + 1
+          console.log('🚀 ~ connectionStore:', connectionStore)
         } else {
           log.warn(`Failed to subscribe on ${hostname} to topic: ${topic}`)
           browserWindow.webContents.send(
             'notify',
             `${hostname}:${topic}:ECONNFAILED`
           )
+          const { subscriptions } = connectionStore[hostname]
+          if (topic in subscriptions) {
+            subscriptions[topic] -= 1
+            if (connectionStore[hostname].subscriptions[topic] === 0) {
+              delete subscriptions[topic]
+            }
+          }
+
+          if (Object.keys(subscriptions).length <= 0) {
+            client?.end()
+          }
         }
         break
 
@@ -173,10 +193,15 @@ function establishListeners({
             `Successfully unsubscribed on ${hostname} from topic: ${topic}`
           )
           const { client, subscriptions } = connectionStore[hostname]
-          if (topic in subscriptions) delete subscriptions[topic]
+          if (topic in subscriptions) {
+            subscriptions[topic] -= 1
+            if (connectionStore[hostname].subscriptions[topic] === 0) {
+              delete subscriptions[topic]
+            }
+          }
 
           if (Object.keys(subscriptions).length <= 0) {
-            client.end()
+            client?.end()
           }
         } else {
           log.warn(`Failed to unsubscribe on ${hostname} from topic: ${topic}`)

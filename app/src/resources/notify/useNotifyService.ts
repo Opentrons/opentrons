@@ -42,10 +42,14 @@ export function useNotifyService({
           } else {
             // TOME: Just temp until serialization nonsense is solved.
             if (topic === 'robot-server/maintenance_runs') {
-              const extraCrispy = {
-                data: JSON.parse(data.data),
+              try {
+                const extraCrispy = {
+                  data: JSON.parse(data.data),
+                }
+                queryClient.setQueryData(queryKey, extraCrispy)
+              } catch {
+                queryClient.setQueriesData(queryKey, null)
               }
-              queryClient.setQueryData(queryKey, extraCrispy)
             } else {
               queryClient.setQueryData(queryKey, data)
             }
@@ -65,6 +69,7 @@ export function useNotifyService({
       return () => {
         eventEmitter.off('data', onDataListener)
         if (hostname != null) {
+          console.log('WE ARE DISMOUNTING')
           dispatch(notifyUnsubscribeAction(hostname, topic))
         }
       }
