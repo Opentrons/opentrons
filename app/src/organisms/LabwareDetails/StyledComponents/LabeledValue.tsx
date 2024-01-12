@@ -22,7 +22,7 @@ export function LabeledValue({ label, value }: LabeledValueProps): JSX.Element {
       alignItems={ALIGN_CENTER}
       paddingY={SPACING.spacing8}
     >
-      <StyledText as="h6" color={LEGACY_COLORS.darkGreyEnabled}>
+      <StyledText as="h6" color={COLORS.grey50Enabled}>
         {label}
       </StyledText>
       <StyledText as="p">{value}</StyledText>

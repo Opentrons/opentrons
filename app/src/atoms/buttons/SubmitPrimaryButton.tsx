@@ -43,7 +43,7 @@ export const SubmitPrimaryButton = (
     }
 
     &:disabled {
-      background-color: ${LEGACY_COLORS.darkGreyDisabled};
+      background-color: ${COLORS.grey50Disabled};
       color: ${LEGACY_COLORS.successDisabled};
     }
   `

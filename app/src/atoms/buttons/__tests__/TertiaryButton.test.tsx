@@ -59,7 +59,7 @@ describe('TertiaryButton', () => {
     const button = getByText('tertiary button')
     expect(button).toBeDisabled()
     expect(button).toHaveStyle(
-      `background-color: ${String(LEGACY_COLORS.darkGreyDisabled)}`
+      `background-color: ${String(COLORS.grey50Disabled)}`
     )
     expect(button).toHaveStyle(`color: ${String(LEGACY_COLORS.errorDisabled)}`)
   })

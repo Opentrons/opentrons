@@ -37,7 +37,7 @@ export const HeaterShakerModuleData = (
   ): { backgroundColor: string; iconColor: string; textColor: string } => {
     const StatusLabelProps = {
       backgroundColor: LEGACY_COLORS.medGreyEnabled,
-      iconColor: LEGACY_COLORS.darkGreyEnabled,
+      iconColor: COLORS.grey50Enabled,
       textColor: COLORS.blue60,
       pulse: false,
     }
@@ -45,7 +45,7 @@ export const HeaterShakerModuleData = (
     switch (status) {
       case 'idle': {
         StatusLabelProps.backgroundColor = LEGACY_COLORS.medGreyEnabled
-        StatusLabelProps.iconColor = LEGACY_COLORS.darkGreyEnabled
+        StatusLabelProps.iconColor = COLORS.grey50Enabled
         StatusLabelProps.textColor = COLORS.black90
         break
       }
@@ -114,7 +114,7 @@ export const HeaterShakerModuleData = (
         >
           <StyledText
             textTransform={TYPOGRAPHY.textTransformUppercase}
-            color={LEGACY_COLORS.darkGreyEnabled}
+            color={COLORS.grey50Enabled}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH6}
             marginTop={SPACING.spacing8}
@@ -148,7 +148,7 @@ export const HeaterShakerModuleData = (
       >
         <StyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={LEGACY_COLORS.darkGreyEnabled}
+          color={COLORS.grey50Enabled}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           fontSize={TYPOGRAPHY.fontSizeH6}
           marginTop={SPACING.spacing8}
@@ -184,7 +184,7 @@ export const HeaterShakerModuleData = (
         <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText
             textTransform={TYPOGRAPHY.textTransformUppercase}
-            color={LEGACY_COLORS.darkGreyEnabled}
+            color={COLORS.grey50Enabled}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH6}
             marginTop={SPACING.spacing8}

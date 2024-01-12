@@ -120,7 +120,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
       >
         <Icon
           width={SIZE_3}
-          color={LEGACY_COLORS.darkGreyEnabled}
+          color={COLORS.grey50Enabled}
           name="upload"
           marginBottom={SPACING.spacing24}
         />

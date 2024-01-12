@@ -32,7 +32,7 @@ export const RenderMountInformation = ({
     <Flex flexDirection={DIRECTION_COLUMN}>
       <StyledText
         css={TYPOGRAPHY.h6SemiBold}
-        color={LEGACY_COLORS.darkGreyEnabled}
+        color={COLORS.grey50Enabled}
         textTransform={TYPOGRAPHY.textTransformUppercase}
       >{`${mount} MOUNT`}</StyledText>
       {pipette != null ? (

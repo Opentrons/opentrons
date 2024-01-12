@@ -300,7 +300,7 @@ export function ModulesListItem({
       <StyledText
         as="p"
         marginLeft={SPACING.spacing20}
-        color={LEGACY_COLORS.darkGreyEnabled}
+        color={COLORS.grey50Enabled}
       >
         {t('no_usb_connection_required')}
       </StyledText>

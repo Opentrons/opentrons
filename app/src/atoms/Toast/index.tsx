@@ -238,10 +238,10 @@ export function Toast(props: ToastProps): JSX.Element {
     [INFO_TOAST]: {
       iconName: 'information',
       color: `${
-        showODDStyle ? COLORS.grey50 : LEGACY_COLORS.darkGreyEnabled
+        showODDStyle ? COLORS.grey50 : COLORS.grey50Enabled
       }`,
       backgroundColor: `${
-        showODDStyle ? LEGACY_COLORS.grey4 : LEGACY_COLORS.darkGreyDisabled
+        showODDStyle ? LEGACY_COLORS.grey4 : COLORS.grey50Disabled
       }`,
     },
     [SUCCESS_TOAST]: {

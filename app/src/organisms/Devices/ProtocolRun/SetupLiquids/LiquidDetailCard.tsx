@@ -119,7 +119,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
         <StyledText
           fontSize={TYPOGRAPHY.fontSize22}
           lineHeight={TYPOGRAPHY.lineHeight28}
-          color={LEGACY_COLORS.darkGreyEnabled}
+          color={COLORS.grey50Enabled}
         >
           {description != null ? description : null}
         </StyledText>
@@ -210,7 +210,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
         >
           {displayName}
         </StyledText>
-        <StyledText as="p" color={LEGACY_COLORS.darkGreyEnabled}>
+        <StyledText as="p" color={COLORS.grey50Enabled}>
           {description != null ? description : null}
         </StyledText>
 

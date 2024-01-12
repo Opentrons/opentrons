@@ -40,7 +40,7 @@ describe('StatusLabel', () => {
     props = {
       status: 'Idle',
       backgroundColor: LEGACY_COLORS.medGreyEnabled,
-      iconColor: LEGACY_COLORS.darkGrey,
+      iconColor: COLORS.grey50,
       textColor: COLORS.black90,
       showIcon: false,
     }

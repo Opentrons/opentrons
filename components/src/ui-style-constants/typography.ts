@@ -233,7 +233,7 @@ export const darkLinkH4SemiBold = css`
   font-size: ${fontSizeH4};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
-  color: ${LEGACY_COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50Enabled};
   &:hover {
     color: ${COLORS.black90};
   }
@@ -243,7 +243,7 @@ export const darkLinkLabelSemiBold = css`
   font-size: ${fontSizeLabel};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
-  color: ${LEGACY_COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50Enabled};
   &:hover {
     color: ${COLORS.black90};
   }

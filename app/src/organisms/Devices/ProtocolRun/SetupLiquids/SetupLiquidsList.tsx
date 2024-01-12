@@ -237,7 +237,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                       <StyledText
                         as="p"
                         fontWeight={TYPOGRAPHY.fontWeightRegular}
-                        color={LEGACY_COLORS.darkGreyEnabled}
+                        color={COLORS.grey50Enabled}
                       >
                         {moduleModel != null
                           ? t('on_adapter_in_mod', {
@@ -313,7 +313,7 @@ export const LiquidsListItemDetails = (
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={LEGACY_COLORS.darkGreyEnabled}
+          color={COLORS.grey50Enabled}
           marginX={SPACING.spacing16}
         >
           {description != null ? description : null}

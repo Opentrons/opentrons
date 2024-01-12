@@ -158,7 +158,7 @@ export function Labware(): JSX.Element {
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
             <StyledText
               css={TYPOGRAPHY.pSemiBold}
-              color={LEGACY_COLORS.darkGreyEnabled}
+              color={COLORS.grey50Enabled}
             >
               {t('shared:sort_by')}
             </StyledText>

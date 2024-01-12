@@ -107,7 +107,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
     option: (styles: CSSObjectWithLabel, state: OptionProps<SelectOption>) => ({
       ...styles,
       color: Boolean(state.isDisabled)
-        ? LEGACY_COLORS.darkGreyDisabled
+        ? COLORS.grey50Disabled
         : COLORS.black90,
       backgroundColor: Boolean(state.isSelected)
         ? COLORS.blue10

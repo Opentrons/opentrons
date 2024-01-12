@@ -60,7 +60,7 @@ describe('ModuleIcon', () => {
     const { getByTestId } = render(props)
     const module = getByTestId('ModuleIcon_ot-temperature-v2')
     expect(module).toHaveStyle(
-      `color: ${String(LEGACY_COLORS.darkGreyEnabled)}`
+      `color: ${String(COLORS.grey50Enabled)}`
     )
     expect(module).toHaveStyle(`height: ${SPACING.spacing16}`)
     expect(module).toHaveStyle(`width: ${SPACING.spacing16}`)

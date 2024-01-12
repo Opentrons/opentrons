@@ -59,7 +59,7 @@ const baseRoundTabStyling = css`
 
 const RoundNavLink = styled(NavLink)`
   ${baseRoundTabStyling}
-  color: ${LEGACY_COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50Enabled};
 
   &:hover {
     background-color: ${LEGACY_COLORS.fundamentalsBackgroundShade};

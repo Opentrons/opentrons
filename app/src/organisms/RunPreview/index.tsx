@@ -65,7 +65,7 @@ export const RunPreviewComponent = (
         <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('run_preview')}
         </StyledText>
-        <StyledText as="label" color={LEGACY_COLORS.darkGreyEnabled}>
+        <StyledText as="label" color={COLORS.grey50Enabled}>
           {t('steps_total', { count: robotSideAnalysis.commands.length })}
         </StyledText>
       </Flex>
@@ -100,7 +100,7 @@ export const RunPreviewComponent = (
             : LEGACY_COLORS.fundamentalsBackground
           const contentColor = isCurrent
             ? COLORS.black90
-            : LEGACY_COLORS.darkGreyEnabled
+            : COLORS.grey50Enabled
           return (
             <Flex
               key={command.id}

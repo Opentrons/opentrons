@@ -41,7 +41,7 @@ describe('CheckboxField', () => {
     expect(checkBoxIcon).toHaveStyle(`width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(
-      `color: ${String(LEGACY_COLORS.darkGreyEnabled)}`
+      `color: ${String(COLORS.grey50Enabled)}`
     )
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
     expect(checkBoxIcon).toHaveStyle(`border-radius: 1px`)
@@ -142,7 +142,7 @@ describe('CheckboxField', () => {
     expect(checkBoxIcon).toHaveStyle(`width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(
-      `color: ${String(LEGACY_COLORS.darkGreyEnabled)}`
+      `color: ${String(COLORS.grey50Enabled)}`
     )
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
     expect(checkBoxIcon).toHaveStyle(`border-radius: 1px`)

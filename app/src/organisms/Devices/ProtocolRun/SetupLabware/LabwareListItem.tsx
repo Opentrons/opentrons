@@ -161,7 +161,7 @@ export function LabwareListItem(
           extraAttentionText = (
             <Btn
               css={css`
-                color: ${LEGACY_COLORS.darkGreyEnabled};
+                color: ${COLORS.grey50Enabled};
 
                 &:hover {
                   color: ${COLORS.black90};
@@ -192,7 +192,7 @@ export function LabwareListItem(
         extraAttentionText = (
           <StyledText
             as="p"
-            color={LEGACY_COLORS.darkGreyEnabled}
+            color={COLORS.grey50Enabled}
             maxWidth="15.25rem"
           >
             {t('heater_shaker_labware_list_view')}
@@ -275,7 +275,7 @@ export function LabwareListItem(
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {labwareDisplayName}
             </StyledText>
-            <StyledText as="p" color={LEGACY_COLORS.darkGreyEnabled}>
+            <StyledText as="p" color={COLORS.grey50Enabled}>
               {nickName}
             </StyledText>
           </Flex>
@@ -297,7 +297,7 @@ export function LabwareListItem(
               <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {nestedLabwareInfo.nestedLabwareDisplayName}
               </StyledText>
-              <StyledText as="p" color={LEGACY_COLORS.darkGreyEnabled}>
+              <StyledText as="p" color={COLORS.grey50Enabled}>
                 {nestedLabwareInfo.nestedLabwareNickName}
               </StyledText>
             </Flex>

@@ -612,7 +612,7 @@ function PrepareToRun({
                 </StyledText>
                 <StyledText
                   as="h4"
-                  color={LEGACY_COLORS.darkGreyEnabled}
+                  color={COLORS.grey50Enabled}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   overflowWrap="anywhere"
                 >

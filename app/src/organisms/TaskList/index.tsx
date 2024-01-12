@@ -248,7 +248,7 @@ function SubTask({
         </StyledText>
         <StyledText as="p">{description}</StyledText>
         {footer != null ? (
-          <StyledText as="p" color={LEGACY_COLORS.darkGreyEnabled}>
+          <StyledText as="p" color={COLORS.grey50Enabled}>
             <Flex
               alignItems={ALIGN_CENTER}
               flexDirection={DIRECTION_ROW}
@@ -409,7 +409,7 @@ function Task({
             </StyledText>
             <StyledText as="p">{description}</StyledText>
             {footer != null ? (
-              <StyledText as="p" color={LEGACY_COLORS.darkGreyEnabled}>
+              <StyledText as="p" color={COLORS.grey50Enabled}>
                 <Flex
                   alignItems={ALIGN_CENTER}
                   flexDirection={DIRECTION_ROW}

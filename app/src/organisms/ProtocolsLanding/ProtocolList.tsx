@@ -162,7 +162,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
             <StyledText
               as="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={LEGACY_COLORS.darkGreyEnabled}
+              color={COLORS.grey50Enabled}
             >
               {t('shared:sort_by')}
             </StyledText>

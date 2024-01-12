@@ -65,7 +65,7 @@ describe('SubmitPrimaryButton', () => {
     const button = getByText('submit primary button')
     expect(button).toBeDisabled()
     expect(button).toHaveStyle(
-      `background-color: ${String(LEGACY_COLORS.darkGreyDisabled)}`
+      `background-color: ${String(COLORS.grey50Disabled)}`
     )
     expect(button).toHaveStyle(
       `color: ${String(LEGACY_COLORS.successDisabled)}`

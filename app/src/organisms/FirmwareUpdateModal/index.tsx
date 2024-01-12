@@ -62,7 +62,7 @@ const OUTER_STYLES = css`
 `
 
 const SPINNER_STYLE = css`
-  color: ${LEGACY_COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50Enabled};
   opacity: 100%;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     color: ${COLORS.black90};

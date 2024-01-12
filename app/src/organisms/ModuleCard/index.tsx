@@ -382,7 +382,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               <>
                 <StyledText
                   textTransform={TYPOGRAPHY.textTransformUppercase}
-                  color={LEGACY_COLORS.darkGreyEnabled}
+                  color={COLORS.grey50Enabled}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   fontSize={TYPOGRAPHY.fontSizeH6}
                   paddingBottom={SPACING.spacing4}
@@ -407,7 +407,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                     moduleType={module.moduleType}
                     size="1rem"
                     marginRight={SPACING.spacing2}
-                    color={LEGACY_COLORS.darkGreyEnabled}
+                    color={COLORS.grey50Enabled}
                   />
                   <StyledText>
                     {getModuleDisplayName(module.moduleModel)}

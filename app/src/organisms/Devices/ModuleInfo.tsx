@@ -84,7 +84,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
             />
 
             <StyledText
-              color={LEGACY_COLORS.darkGreyEnabled}
+              color={COLORS.grey50Enabled}
               fontSize={TYPOGRAPHY.fontSizeCaption}
             >
               {!isAttached ? t('module_not_connected') : t('module_connected')}
@@ -93,13 +93,13 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
         ) : null}
         <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={LEGACY_COLORS.darkGreyEnabled}
+          color={COLORS.grey50Enabled}
           fontSize={TYPOGRAPHY.fontSizeLabel}
         >
           {getModuleDisplayName(moduleModel)}
         </StyledText>
         <StyledText
-          color={LEGACY_COLORS.darkGreyEnabled}
+          color={COLORS.grey50Enabled}
           fontSize={TYPOGRAPHY.fontSizeH6}
           fontStyle={
             runHasStarted

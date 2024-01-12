@@ -289,7 +289,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                 ) : null}
                 <StyledText
                   textTransform={TYPOGRAPHY.textTransformUppercase}
-                  color={LEGACY_COLORS.darkGreyEnabled}
+                  color={COLORS.grey50Enabled}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   fontSize={TYPOGRAPHY.fontSizeH6}
                   paddingBottom={SPACING.spacing4}

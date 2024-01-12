@@ -32,7 +32,7 @@ export const Idle = Template.bind({})
 Idle.args = {
   status: 'Idle',
   backgroundColor: LEGACY_COLORS.medGreyEnabled,
-  iconColor: LEGACY_COLORS.darkGreyEnabled,
+  iconColor: COLORS.grey50Enabled,
   pulse: true,
 }
 

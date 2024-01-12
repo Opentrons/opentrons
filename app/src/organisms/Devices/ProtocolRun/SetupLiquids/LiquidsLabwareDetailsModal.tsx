@@ -193,7 +193,7 @@ export const LiquidsLabwareDetailsModal = (
                 <StyledText
                   as="h6"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={LEGACY_COLORS.darkGreyEnabled}
+                  color={COLORS.grey50Enabled}
                 >
                   {t('slot_number')}
                 </StyledText>
@@ -212,7 +212,7 @@ export const LiquidsLabwareDetailsModal = (
                 <StyledText
                   as="h6"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={LEGACY_COLORS.darkGreyEnabled}
+                  color={COLORS.grey50Enabled}
                 >
                   {t('labware_name')}
                 </StyledText>

@@ -41,7 +41,7 @@ const UPDATE_PROGRESS_BAR_STYLE = css`
   width: 17.12rem;
 `
 const UPDATE_TEXT_STYLE = css`
-  color: ${LEGACY_COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50Enabled};
   font-size: 0.8rem;
 `
 const HIDDEN_CSS = css`

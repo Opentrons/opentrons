@@ -90,7 +90,7 @@ export function ManualIpHostnameItem({
         </IpItem>
         <StyledText
           as="label"
-          color={LEGACY_COLORS.darkGreyEnabled}
+          color={COLORS.grey50Enabled}
           css={{
             'white-space': 'nowrap',
           }}

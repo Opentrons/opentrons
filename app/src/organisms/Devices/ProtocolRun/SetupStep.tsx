@@ -79,7 +79,7 @@ export function SetupStep({
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText
-                color={LEGACY_COLORS.darkGreyEnabled}
+                color={COLORS.grey50Enabled}
                 css={TYPOGRAPHY.h6SemiBold}
                 marginBottom={SPACING.spacing2}
                 id={`CollapsibleStep_${label}`}

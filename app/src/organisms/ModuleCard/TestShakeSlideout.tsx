@@ -175,7 +175,7 @@ export const TestShakeSlideout = (
         flexDirection={DIRECTION_ROW}
         data-testid="test_shake_slideout_banner_info"
       >
-        <Flex color={LEGACY_COLORS.darkGreyEnabled}>
+        <Flex color={COLORS.grey50Enabled}>
           <Icon
             name="information"
             size={SPACING.spacing32}
@@ -264,7 +264,7 @@ export const TestShakeSlideout = (
               disabled={isShaking}
             />
             <StyledText
-              color={LEGACY_COLORS.darkGreyEnabled}
+              color={COLORS.grey50Enabled}
               fontSize={TYPOGRAPHY.fontSizeCaption}
             ></StyledText>
           </Flex>

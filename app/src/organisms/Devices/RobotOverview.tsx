@@ -126,7 +126,7 @@ export function RobotOverview({
                 >
                   <StyledText
                     as="h6"
-                    color={LEGACY_COLORS.darkGreyEnabled}
+                    color={COLORS.grey50Enabled}
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     paddingBottom={SPACING.spacing4}
                     textTransform={TYPOGRAPHY.textTransformUppercase}

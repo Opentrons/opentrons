@@ -25,10 +25,10 @@ const defaultTabStyle = css`
 `
 
 const inactiveTabStyle = css`
-  color: ${LEGACY_COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50Enabled};
 
   &:hover {
-    color: ${LEGACY_COLORS.darkGreyEnabled};
+    color: ${COLORS.grey50Enabled};
     background-color: ${LEGACY_COLORS.fundamentalsBackgroundShade};
   }
 `

@@ -52,7 +52,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
         borderRadius={BORDERS.borderRadiusSize2}
         cursor={disabled ? 'auto' : 'pointer'}
         backgroundColor={
-          disabled ? LEGACY_COLORS.darkGreyDisabled : COLORS.transparent
+          disabled ? COLORS.grey50Disabled : COLORS.transparent
         }
         onClick={disabled ? undefined : onClick}
         {...styleProps}
@@ -66,7 +66,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
             color={
               isSelected
                 ? COLORS.blue50
-                : LEGACY_COLORS.darkGreyEnabled
+                : COLORS.grey50Enabled
             }
             size="1.5rem"
             name={isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'}
