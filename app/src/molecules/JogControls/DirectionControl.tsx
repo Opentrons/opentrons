@@ -350,7 +350,7 @@ const ARROW_BUTTON_STYLES = css`
 
   &:active {
     background-color: ${COLORS.white};
-    color: ${LEGACY_COLORS.darkGreyPressed};
+    color: ${COLORS.grey60};
     border: 1px ${LEGACY_COLORS.lightGreyHover} solid;
   }
 
@@ -382,7 +382,7 @@ const ARROW_BUTTON_STYLES = css`
 
     &:active {
       background-color: ${LEGACY_COLORS.light1Pressed};
-      color: ${LEGACY_COLORS.darkGreyPressed};
+      color: ${COLORS.grey60};
     }
 
     &:focus {

@@ -61,7 +61,7 @@ describe('CheckboxField', () => {
     )
     expect(checkBoxIcon).toHaveStyleRule(
       'color',
-      `${String(LEGACY_COLORS.darkGreyPressed)}`,
+      `${String(COLORS.grey60)}`,
       {
         modifier: ':active',
       }
@@ -73,7 +73,7 @@ describe('CheckboxField', () => {
     )
     expect(checkBoxIcon).toHaveStyleRule(
       'color',
-      `${String(LEGACY_COLORS.darkGreyPressed)}`,
+      `${String(COLORS.grey60)}`,
       {
         modifier: ':disabled',
       }

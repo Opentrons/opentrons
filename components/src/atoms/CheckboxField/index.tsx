@@ -83,7 +83,7 @@ const INNER_STYLE_NO_VALUE = css`
   }
 
   &:active {
-    color: ${LEGACY_COLORS.darkGreyPressed};
+    color: ${COLORS.grey60};
   }
 
   &:focus {
@@ -91,7 +91,7 @@ const INNER_STYLE_NO_VALUE = css`
   }
 
   &:disabled {
-    color: ${LEGACY_COLORS.darkGreyPressed};
+    color: ${COLORS.grey60};
   }
 `
 

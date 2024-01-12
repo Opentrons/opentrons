@@ -27,7 +27,7 @@ export const OverflowBtn = React.forwardRef(
 
           &:active circle,
           &:focus circle {
-            fill: ${LEGACY_COLORS.darkGreyPressed};
+            fill: ${COLORS.grey60};
           }
 
           &:focus-visible {
