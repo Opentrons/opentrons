@@ -234,7 +234,7 @@ export function DeviceReset({
                         color={
                           resetOptions[option.id] ?? false
                             ? COLORS.white
-                            : LEGACY_COLORS.darkBlack70
+                            : COLORS.grey60
                         }
                       >
                         {subText}
@@ -286,7 +286,7 @@ export function DeviceReset({
                     (resetOptions.onDeviceDisplay ?? false)) ||
                   isEveryOptionSelected(resetOptions)
                     ? COLORS.white
-                    : LEGACY_COLORS.darkBlack70
+                    : COLORS.grey60
                 }
               >
                 {t('clear_all_stored_data_description')}

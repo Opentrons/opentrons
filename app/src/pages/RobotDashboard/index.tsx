@@ -66,7 +66,7 @@ export function RobotDashboard(): JSX.Element {
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={LEGACY_COLORS.darkBlack70}
+          color={COLORS.grey60}
         >
           {t('run_again')}
         </StyledText>

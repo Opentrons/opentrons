@@ -224,7 +224,7 @@ export function NameRobot(): JSX.Element {
                 <StyledText
                   as="h4"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={LEGACY_COLORS.darkBlack70}
+                  color={COLORS.grey60}
                   marginBottom={SPACING.spacing24}
                 >
                   {t('name_your_robot_description')}
@@ -243,7 +243,7 @@ export function NameRobot(): JSX.Element {
             </Flex>
             <StyledText
               as="p"
-              color={LEGACY_COLORS.darkBlack70}
+              color={COLORS.grey60}
               fontWeight={TYPOGRAPHY.fontWeightRegular}
             >
               {t('name_rule_description')}

@@ -49,7 +49,7 @@ const CARD_BUTTON_STYLE = css`
 
   &:disabled {
     background-color: ${LEGACY_COLORS.darkBlack20};
-    color: ${LEGACY_COLORS.darkBlack70};
+    color: ${COLORS.grey60};
   }
 `
 

@@ -161,7 +161,7 @@ export function ProtocolDashboard(): JSX.Element {
               <StyledText
                 as="p"
                 marginBottom={SPACING.spacing8}
-                color={LEGACY_COLORS.darkBlack70}
+                color={COLORS.grey60}
               >
                 {t('pinned_protocols')}
               </StyledText>

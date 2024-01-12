@@ -82,7 +82,7 @@ export function EthernetConnectionDetails(
         {ethernet?.ipAddress === null || ethernet?.macAddress === null ? (
           <Flex marginTop="9rem">
             <StyledText
-              color={LEGACY_COLORS.darkBlack70}
+              color={COLORS.grey60}
               fontSize={TYPOGRAPHY.fontSize28}
               lineHeight={TYPOGRAPHY.lineHeight36}
               fontWeight={TYPOGRAPHY.fontWeightRegular}
@@ -120,7 +120,7 @@ const EthernetDetailsRow = ({
         {title}
       </StyledText>
       <StyledText
-        color={LEGACY_COLORS.darkBlack70}
+        color={COLORS.grey60}
         fontSize={TYPOGRAPHY.fontSize22}
         lineHeight={TYPOGRAPHY.lineHeight28}
         fontWeight={TYPOGRAPHY.fontWeightRegular}

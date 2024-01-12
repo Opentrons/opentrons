@@ -90,7 +90,7 @@ export function ConnectViaUSB(): JSX.Element {
                 </StyledText>
                 <StyledText
                   as="h4"
-                  color={LEGACY_COLORS.darkBlack70}
+                  color={COLORS.grey60}
                   textAlign={TYPOGRAPHY.textAlignCenter}
                 >
                   {t('find_your_robot')}
@@ -128,13 +128,13 @@ export function ConnectViaUSB(): JSX.Element {
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing8}
               >
-                <StyledText as="h4" color={LEGACY_COLORS.darkBlack70}>
+                <StyledText as="h4" color={COLORS.grey60}>
                   {t('connect_via_usb_description_1')}
                 </StyledText>
-                <StyledText as="h4" color={LEGACY_COLORS.darkBlack70}>
+                <StyledText as="h4" color={COLORS.grey60}>
                   {t('connect_via_usb_description_2')}
                 </StyledText>
-                <StyledText as="h4" color={LEGACY_COLORS.darkBlack70}>
+                <StyledText as="h4" color={COLORS.grey60}>
                   {t('connect_via_usb_description_3')}
                 </StyledText>
               </Flex>

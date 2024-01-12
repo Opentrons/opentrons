@@ -247,7 +247,7 @@ export function ProtocolSetupLabware({
                 >
                   {getLabwareDisplayName(selectedLabware)}
                 </StyledText>
-                <StyledText as="p" color={LEGACY_COLORS.darkBlack70}>
+                <StyledText as="p" color={COLORS.grey60}>
                   {selectedLabware.nickName}
                   {selectedLabwareLocation != null &&
                   selectedLabwareLocation !== 'offDeck' &&
@@ -275,7 +275,7 @@ export function ProtocolSetupLabware({
       >
         <Flex
           gridGap={SPACING.spacing8}
-          color={LEGACY_COLORS.darkBlack70}
+          color={COLORS.grey60}
           fontSize={TYPOGRAPHY.fontSize22}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           lineHeight={TYPOGRAPHY.lineHeight28}
@@ -569,13 +569,13 @@ function RowLabware({
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {getLabwareDisplayName(definition)}
             </StyledText>
-            <StyledText color={LEGACY_COLORS.darkBlack70} as="p">
+            <StyledText color={COLORS.grey60} as="p">
               {nickName}
             </StyledText>
           </Flex>
           {nestedLabwareInfo != null ? (
             <Box
-              borderBottom={`1px solid ${LEGACY_COLORS.darkBlack70}`}
+              borderBottom={`1px solid ${COLORS.grey60}`}
               marginY={SPACING.spacing16}
               width="33rem"
             />
@@ -586,7 +586,7 @@ function RowLabware({
               <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {nestedLabwareInfo.nestedLabwareDisplayName}
               </StyledText>
-              <StyledText as="p" color={LEGACY_COLORS.darkBlack70}>
+              <StyledText as="p" color={COLORS.grey60}>
                 {nestedLabwareInfo.nestedLabwareNickName}
               </StyledText>
             </Flex>

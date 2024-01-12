@@ -41,7 +41,7 @@ export function NoProtocols(): JSX.Element {
       >
         {t('nothing_here_yet')}
       </StyledText>
-      <StyledText as="h4" color={LEGACY_COLORS.darkBlack70}>
+      <StyledText as="h4" color={COLORS.grey60}>
         {t('send_a_protocol_to_store')}
       </StyledText>
     </Flex>

@@ -105,7 +105,7 @@ export function Navigation(props: NavigationProps): JSX.Element {
                 aria-label="network icon"
                 name={icon}
                 size="2.5rem"
-                color={LEGACY_COLORS.darkBlack70}
+                color={COLORS.grey60}
               />
             )}
           </Flex>
@@ -122,7 +122,7 @@ export function Navigation(props: NavigationProps): JSX.Element {
               name="overflow-btn-touchscreen"
               height="3.75rem"
               width="3rem"
-              color={LEGACY_COLORS.darkBlack70}
+              color={COLORS.grey60}
             />
           </IconButton>
         </Flex>
@@ -147,7 +147,7 @@ const NavigationLink = (props: { to: string; name: string }): JSX.Element => (
 
 const TouchNavLink = styled(NavLink)`
   ${TYPOGRAPHY.level3HeaderSemiBold}
-  color: ${LEGACY_COLORS.darkBlack70};
+  color: ${COLORS.grey60};
   height: 3.5rem;
   display: flex;
   flex-direction: ${DIRECTION_COLUMN};

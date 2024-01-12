@@ -88,7 +88,7 @@ export function EmergencyStop(): JSX.Element {
                 <StyledText
                   as="h3"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  color={LEGACY_COLORS.darkBlack70}
+                  color={COLORS.grey60}
                   textAlign={TYPOGRAPHY.textAlignCenter}
                 >
                   {t('e_stop_not_connected')}

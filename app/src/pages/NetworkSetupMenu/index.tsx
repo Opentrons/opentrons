@@ -70,7 +70,7 @@ export function NetworkSetupMenu(): JSX.Element {
           <StyledText
             as="h4"
             fontWeight={TYPOGRAPHY.fontWeightRegular}
-            color={LEGACY_COLORS.darkBlack70}
+            color={COLORS.grey60}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
             {t('network_setup_menu_description')}

@@ -136,7 +136,7 @@ function NetworkSettingButton({
                   fontSize={TYPOGRAPHY.fontSize28}
                   lineHeight={TYPOGRAPHY.lineHeight36}
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={LEGACY_COLORS.darkBlack70}
+                  color={COLORS.grey60}
                 >
                   {networkName}
                 </StyledText>

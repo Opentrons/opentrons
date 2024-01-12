@@ -129,7 +129,7 @@ export function PinnedProtocol(props: {
         gridGap={SPACING.spacing8}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         width="100%"
-        color={LEGACY_COLORS.darkBlack70}
+        color={COLORS.grey60}
       >
         <StyledText as="p">
           {lastRun !== undefined

@@ -44,7 +44,7 @@ export function EmptyRecentRun(): JSX.Element {
       <StyledText
         as="h4"
         fontWeight={TYPOGRAPHY.fontWeightRegular}
-        color={LEGACY_COLORS.darkBlack70}
+        color={COLORS.grey60}
       >
         {t('no_recent_runs_description')}
       </StyledText>

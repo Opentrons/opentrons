@@ -399,7 +399,7 @@ const ProtocolName = styled.h4`
   text-align: ${TYPOGRAPHY.textAlignLeft};
   font-size: ${TYPOGRAPHY.fontSize28};
   line-height: ${TYPOGRAPHY.lineHeight36};
-  color: ${LEGACY_COLORS.darkBlack70};
+  color: ${COLORS.grey60};
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;

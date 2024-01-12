@@ -213,7 +213,7 @@ const Summary = ({ author, description, date }: SummaryProps): JSX.Element => {
       </Flex>
       <StyledText
         as="p"
-        color={description === null ? LEGACY_COLORS.darkBlack70 : undefined}
+        color={description === null ? COLORS.grey60 : undefined}
       >
         {description ?? i18n.format(t('no_summary'), 'capitalize')}
       </StyledText>

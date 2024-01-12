@@ -59,7 +59,7 @@ const GO_BACK_BUTTON_STYLE = css`
 `
 const GO_BACK_BUTTON_DISABLED_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${LEGACY_COLORS.darkBlack70};
+  color: ${COLORS.grey60};
 `
 const Title = styled.h1`
   ${TYPOGRAPHY.h1Default};

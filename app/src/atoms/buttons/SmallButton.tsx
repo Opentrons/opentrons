@@ -86,7 +86,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       disabledColor: `${LEGACY_COLORS.darkBlack60}`,
     },
     tertiaryLowLight: {
-      defaultColor: `${LEGACY_COLORS.darkBlack70}`,
+      defaultColor: `${COLORS.grey60}`,
       defaultBackgroundColor: ` ${COLORS.blue50}${LEGACY_COLORS.opacity0HexCode}`,
       activeBackgroundColor: `${LEGACY_COLORS.darkBlack20}`,
       disabledBackgroundColor: `${COLORS.blue50}${LEGACY_COLORS.opacity0HexCode}`,

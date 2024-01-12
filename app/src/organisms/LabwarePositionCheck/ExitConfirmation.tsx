@@ -140,5 +140,5 @@ const ConfirmationBodyODD = styled.h1`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     ${TYPOGRAPHY.level4HeaderRegular}
   }
-  color: ${LEGACY_COLORS.darkBlack70};
+  color: ${COLORS.grey60};
 `

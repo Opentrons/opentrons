@@ -47,7 +47,7 @@ export function InitialLoadingScreen(): JSX.Element {
         name="ot-spinner"
         size="160px"
         spin
-        color={LEGACY_COLORS.darkBlack70}
+        color={COLORS.grey60}
         aria-label="InitialLoadingScreen-spinner"
       />
       {targetPath != null && <Redirect exact from="/" to={targetPath} />}

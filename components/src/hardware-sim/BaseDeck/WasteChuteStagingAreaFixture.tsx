@@ -27,7 +27,7 @@ export function WasteChuteStagingAreaFixture(
     cutoutId,
     deckDefinition,
     fixtureBaseColor = LEGACY_COLORS.light1,
-    slotClipColor = LEGACY_COLORS.darkBlack70,
+    slotClipColor = COLORS.grey60,
     wasteChuteColor = LEGACY_COLORS.grey2,
     ...restProps
   } = props

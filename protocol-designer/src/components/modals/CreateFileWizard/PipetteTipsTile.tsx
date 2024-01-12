@@ -283,7 +283,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
               <Text
                 as="h4"
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
-                color={LEGACY_COLORS.darkBlack70}
+                color={COLORS.grey60}
               >
                 {i18n.t('modal.create_file_wizard.upload_tiprack')}
               </Text>

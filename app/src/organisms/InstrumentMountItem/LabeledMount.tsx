@@ -70,7 +70,7 @@ export function LabeledMount(props: LabeledMountProps): JSX.Element {
           <StyledText
             flex="5"
             as="h4"
-            color={LEGACY_COLORS.darkBlack70}
+            color={COLORS.grey60}
             textAlign={TYPOGRAPHY.textAlignLeft}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSize28}

@@ -28,7 +28,7 @@ export function CheckUpdates(): JSX.Element {
       height="32.5rem"
       borderRadius={BORDERS.borderRadiusSize3}
     >
-      <Icon name="ot-spinner" size="5rem" spin color={LEGACY_COLORS.darkBlack70} />
+      <Icon name="ot-spinner" size="5rem" spin color={COLORS.grey60} />
       <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
         {t('checking_for_updates')}
       </StyledText>

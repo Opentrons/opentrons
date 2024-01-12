@@ -98,9 +98,9 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
     tertiaryLowLight: {
       activeBackgroundColor: LEGACY_COLORS.darkBlack20,
       defaultBackgroundColor: COLORS.white,
-      defaultColor: LEGACY_COLORS.darkBlack70,
+      defaultColor: COLORS.grey60,
       disabledBackgroundColor: COLORS.transparent,
-      iconColor: LEGACY_COLORS.darkBlack70,
+      iconColor: COLORS.grey60,
     },
   }
 

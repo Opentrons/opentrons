@@ -161,14 +161,14 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
                   <StyledText
                     lineHeight={TYPOGRAPHY.lineHeight28}
                     fontSize={TYPOGRAPHY.fontSize22}
-                    color={LEGACY_COLORS.darkBlack70}
+                    color={COLORS.grey60}
                   >
                     {well.wellName}
                   </StyledText>
                   <StyledText
                     lineHeight={TYPOGRAPHY.lineHeight28}
                     fontSize={TYPOGRAPHY.fontSize22}
-                    color={LEGACY_COLORS.darkBlack70}
+                    color={COLORS.grey60}
                   >
                     {well.volume} {MICRO_LITERS}
                   </StyledText>

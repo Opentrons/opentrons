@@ -102,7 +102,7 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
           <TableHeader>
             <StyledText
               fontSize={TYPOGRAPHY.fontSize20}
-              color={LEGACY_COLORS.darkBlack70}
+              color={COLORS.grey60}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingLeft={SPACING.spacing24}
             >
@@ -112,7 +112,7 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
           <TableHeader>
             <StyledText
               fontSize={TYPOGRAPHY.fontSize20}
-              color={LEGACY_COLORS.darkBlack70}
+              color={COLORS.grey60}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingLeft={SPACING.spacing24}
             >

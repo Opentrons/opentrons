@@ -116,7 +116,7 @@ export function UpdateChannel({
                     color={
                       radio.value === channel
                         ? COLORS.white
-                        : LEGACY_COLORS.darkBlack70
+                        : COLORS.grey60
                     }
                   >
                     {t('alpha_description')}

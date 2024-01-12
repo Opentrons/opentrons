@@ -34,7 +34,7 @@ export function CancelingRunModal(): JSX.Element {
           name="ot-spinner"
           spin
           size="3.75rem"
-          color={LEGACY_COLORS.darkBlack70}
+          color={COLORS.grey60}
           aria-label="CancelingRunModal_icon"
         />
         <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>

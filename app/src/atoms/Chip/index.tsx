@@ -55,7 +55,7 @@ const CHIP_PROPS_BY_TYPE: Record<
     backgroundColor: `${COLORS.black90}${COLORS.opacity20HexCode}`,
     borderRadius: BORDERS.borderRadiusSize5,
     iconColor: COLORS.grey60,
-    textColor: LEGACY_COLORS.darkBlack70,
+    textColor: COLORS.grey60,
   },
   success: {
     backgroundColor: COLORS.green35,

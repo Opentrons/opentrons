@@ -114,7 +114,7 @@ interface ContentsProps {
 }
 
 const lightFill = LEGACY_COLORS.light1
-const darkFill = LEGACY_COLORS.darkBlack70
+const darkFill = COLORS.grey60
 
 export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   const {

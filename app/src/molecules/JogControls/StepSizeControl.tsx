@@ -204,7 +204,7 @@ export function TouchStepSizeControl(props: StepSizeControlProps): JSX.Element {
               </StyledText>
               <StyledText
                 as="p"
-                color={selected ? COLORS.white : LEGACY_COLORS.darkBlack70}
+                color={selected ? COLORS.white : COLORS.grey60}
               >
                 {`${stepSize} mm`}
               </StyledText>

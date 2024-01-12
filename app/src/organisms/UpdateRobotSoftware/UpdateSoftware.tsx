@@ -63,7 +63,7 @@ export function UpdateSoftware({
         <StyledText
           as="h3"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={LEGACY_COLORS.darkBlack70}
+          color={COLORS.grey60}
         >
           {renderText()}
         </StyledText>

@@ -27,11 +27,11 @@ export function ServerInitializing(): JSX.Element {
       borderRadius={BORDERS.borderRadiusSize3}
       gridGap={SPACING.spacing32}
     >
-      <Icon name="ot-spinner" spin size="6rem" color={LEGACY_COLORS.darkBlack70} />
+      <Icon name="ot-spinner" spin size="6rem" color={COLORS.grey60} />
       <StyledText
         as="h4"
         fontWeight={TYPOGRAPHY.fontWeightRegular}
-        color={LEGACY_COLORS.darkBlack70}
+        color={COLORS.grey60}
       >
         {t('robot_initializing')}
       </StyledText>

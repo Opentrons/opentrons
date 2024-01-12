@@ -82,7 +82,7 @@ export function RobotSettingButton({
           </StyledText>
           {settingInfo != null ? (
             <StyledText
-              color={LEGACY_COLORS.darkBlack70}
+              color={COLORS.grey60}
               as="h4"
               fontWeight={TYPOGRAPHY.fontWeightRegular}
               textAlign={TYPOGRAPHY.textAlignLeft}

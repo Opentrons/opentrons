@@ -39,7 +39,7 @@ export function ConnectingNetwork({
           <Icon
             name="ot-spinner"
             size="5rem"
-            color={LEGACY_COLORS.darkBlack70}
+            color={COLORS.grey60}
             aria-label="spinner"
             spin
           />
