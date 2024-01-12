@@ -35,7 +35,7 @@ export function UpdateResultsModal(
   const updateFailedHeader: ModalHeaderBaseProps = {
     title: t('update_failed'),
     iconName: 'ot-alert',
-    iconColor: LEGACY_COLORS.red2,
+    iconColor: COLORS.red50,
   }
   let instrumentName = 'instrument'
   if (instrument?.ok) {

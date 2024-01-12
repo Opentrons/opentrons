@@ -3,7 +3,7 @@ import { LEGACY_COLORS, BORDERS, TYPOGRAPHY, SPACING } from '../../ui-style-cons
 import { NewAlertPrimaryBtn, styleProps } from '../../primitives'
 
 export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
-  background-color: ${LEGACY_COLORS.errorEnabled};
+  background-color: ${COLORS.red50};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding-left: ${SPACING.spacing16};
   padding-right: ${SPACING.spacing16};

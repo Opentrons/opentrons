@@ -17,7 +17,7 @@ export default {
         presetColors: [
           LEGACY_COLORS.black,
           COLORS.blue50,
-          LEGACY_COLORS.red2,
+          COLORS.red50,
           LEGACY_COLORS.successText,
         ],
       },

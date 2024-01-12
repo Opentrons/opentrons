@@ -186,7 +186,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   return errorMessage != null ? (
     <SimpleWizardBody
       isSuccess={false}
-      iconColor={LEGACY_COLORS.errorEnabled}
+      iconColor={COLORS.red50}
       header={t('shared:error_encountered')}
       subHeader={
         <Trans

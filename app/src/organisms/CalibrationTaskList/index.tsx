@@ -91,8 +91,8 @@ export function CalibrationTaskList({
   }, [activeIndex, hasLaunchedWizard])
 
   // start off assuming we are missing calibrations
-  let statusLabelBackgroundColor: string = LEGACY_COLORS.errorEnabled
-  let statusLabelIconColor: string = LEGACY_COLORS.errorEnabled
+  let statusLabelBackgroundColor: string = COLORS.red50
+  let statusLabelIconColor: string = COLORS.red50
   let statusLabelText = t('missing_calibration_data')
 
   // if the tasklist is empty, though, all calibrations are good

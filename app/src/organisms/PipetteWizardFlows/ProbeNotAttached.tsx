@@ -34,7 +34,7 @@ export const ProbeNotAttached = (
     <SimpleWizardBody
       header={t('unable_to_detect_probe')}
       subHeader={numberOfTryAgains > 2 ? t('something_seems_wrong') : undefined}
-      iconColor={LEGACY_COLORS.errorEnabled}
+      iconColor={COLORS.red50}
       isSuccess={false}
     >
       <Flex

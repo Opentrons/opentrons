@@ -252,7 +252,7 @@ export function NameRobot(): JSX.Element {
               <StyledText
                 as="p"
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
-                color={LEGACY_COLORS.red2}
+                color={COLORS.red50}
               >
                 {formik.errors.newRobotName}
               </StyledText>

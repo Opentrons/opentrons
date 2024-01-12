@@ -40,7 +40,7 @@ export function ErrorUpdateSoftware({
         justifyContent={JUSTIFY_CENTER}
         borderRadius={BORDERS.borderRadiusSize3}
       >
-        <Icon name="ot-alert" size="3.75rem" color={LEGACY_COLORS.errorEnabled} />
+        <Icon name="ot-alert" size="3.75rem" color={COLORS.red50} />
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing4}

@@ -243,7 +243,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                     <Icon
                       name="alert-circle"
                       size="1.25rem"
-                      color={LEGACY_COLORS.errorEnabled}
+                      color={COLORS.red50}
                     />
                   </>
                 ) : null}

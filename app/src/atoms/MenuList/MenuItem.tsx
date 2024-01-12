@@ -36,7 +36,7 @@ export const MenuItem = styled.button<ButtonProps>`
     text-align: ${TYPOGRAPHY.textAlignCenter};
     font-size: ${TYPOGRAPHY.fontSize28};
     background-color: ${({ isAlert }) =>
-      isAlert ? LEGACY_COLORS.errorEnabled : COLORS.transparent};
+      isAlert ? COLORS.red50 : COLORS.transparent};
     color: ${({ isAlert }) => (isAlert ? COLORS.white : COLORS.black90)};
     padding: ${SPACING.spacing24};
     height: 5.5rem;
@@ -44,12 +44,12 @@ export const MenuItem = styled.button<ButtonProps>`
     &:hover,
     &:active {
       background-color: ${({ isAlert }) =>
-        isAlert ? LEGACY_COLORS.errorEnabled : COLORS.grey35};
+        isAlert ? COLORS.red50 : COLORS.grey35};
     }
 
     &:disabled {
       background-color: ${({ isAlert }) =>
-        isAlert ? LEGACY_COLORS.errorEnabled : COLORS.transparent};
+        isAlert ? COLORS.red50 : COLORS.transparent};
       color: ${({ isAlert }) =>
         isAlert ? COLORS.white : COLORS.grey50};
     }

@@ -217,7 +217,7 @@ function SuccessOrError({ errorMessage }: SuccessOrErrorProps): JSX.Element {
       <Icon
         name="alert-circle"
         height="40px"
-        color={LEGACY_COLORS.errorEnabled}
+        color={COLORS.red50}
         margin={SPACING.spacing24}
       />
     )

@@ -91,7 +91,7 @@ function Input(props: InputFieldProps): JSX.Element {
     border-radius: ${SPACING.spacing4};
     padding: ${SPACING.spacing8};
     border: 1px ${BORDERS.styleSolid}
-      ${error ? LEGACY_COLORS.errorEnabled : COLORS.grey30};
+      ${error ? COLORS.red50 : COLORS.grey30};
     font-size: ${TYPOGRAPHY.fontSizeP};
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
@@ -116,7 +116,7 @@ function Input(props: InputFieldProps): JSX.Element {
 
     &:hover {
       border: 1px ${BORDERS.styleSolid}
-        ${error ? LEGACY_COLORS.errorEnabled : COLORS.grey60};
+        ${error ? COLORS.red50 : COLORS.grey60};
     }
     &:focus {
       border: 1px ${BORDERS.styleSolid} ${COLORS.blue50};
@@ -162,7 +162,7 @@ function Input(props: InputFieldProps): JSX.Element {
         {props.secondaryCaption != null ? (
           <Flex paddingBottom={SPACING.spacing4}>{props.secondaryCaption}</Flex>
         ) : null}
-        <Flex color={LEGACY_COLORS.errorEnabled}>{props.error}</Flex>
+        <Flex color={COLORS.red50}>{props.error}</Flex>
       </Flex>
     </Flex>
   )

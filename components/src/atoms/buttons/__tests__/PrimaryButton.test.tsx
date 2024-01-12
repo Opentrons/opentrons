@@ -100,11 +100,11 @@ describe('PrimaryButton', () => {
   })
 
   it('renders primary button with text and different background color', () => {
-    props.backgroundColor = LEGACY_COLORS.errorEnabled
+    props.backgroundColor = COLORS.red50
     const { getByText } = render(props)
     const button = getByText('primary button')
     expect(button).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.errorEnabled}`
+      `background-color: ${COLORS.red50}`
     )
     expect(button).toHaveStyle(`color: ${COLORS.white}`)
   })

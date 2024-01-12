@@ -103,7 +103,7 @@ export function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
   return (
     <Btn
       alignItems={ALIGN_CENTER}
-      backgroundColor={LEGACY_COLORS.red2}
+      backgroundColor={COLORS.red50}
       borderRadius="6.25rem"
       display={DISPLAY_FLEX}
       height="6.25rem"
@@ -126,13 +126,13 @@ const CLOSE_BUTTON_STYLE = css`
   }
 
   &:hover {
-    background-color: ${LEGACY_COLORS.red2};
+    background-color: ${COLORS.red50};
     color: ${COLORS.white};
   }
 
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${LEGACY_COLORS.red2};
+    background-color: ${COLORS.red50};
   }
 
   &:active {

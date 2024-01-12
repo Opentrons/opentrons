@@ -95,7 +95,7 @@ export function ManualIpHostnameForm({
         const inputForm = document.getElementById('ip')
         if (inputForm != null)
           inputForm.style.border = `1px solid ${String(
-            LEGACY_COLORS.errorEnabled
+            COLORS.red50
           )}`
       }
       return errors
@@ -132,7 +132,7 @@ export function ManualIpHostnameForm({
         <StyledText
           as="label"
           marginTop={SPACING.spacing4}
-          color={LEGACY_COLORS.errorEnabled}
+          color={COLORS.red50}
         >
           {formik.errors.ip}
         </StyledText>

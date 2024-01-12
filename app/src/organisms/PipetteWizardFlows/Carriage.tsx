@@ -46,7 +46,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
   return errorMessage != null ? (
     <SimpleWizardBody
       isSuccess={false}
-      iconColor={LEGACY_COLORS.errorEnabled}
+      iconColor={COLORS.red50}
       header={t('shared:error_encountered')}
       subHeader={errorMessage}
     />

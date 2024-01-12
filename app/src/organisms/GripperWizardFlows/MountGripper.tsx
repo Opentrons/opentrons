@@ -90,7 +90,7 @@ export const MountGripper = (
   return showUnableToDetect ? (
     <SimpleWizardBody
       header={t('unable_to_detect_gripper')}
-      iconColor={LEGACY_COLORS.errorEnabled}
+      iconColor={COLORS.red50}
       isSuccess={false}
     >
       <Flex

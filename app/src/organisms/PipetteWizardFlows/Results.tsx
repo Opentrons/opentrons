@@ -100,12 +100,12 @@ export const Results = (props: ResultsProps): JSX.Element => {
       ) {
         header = i18n.format(t('wrong_pip'), 'capitalize')
         buttonText = i18n.format(t('detach_and_retry'), 'capitalize')
-        iconColor = LEGACY_COLORS.errorEnabled
+        iconColor = COLORS.red50
         isSuccess = false
       } else {
         // attachment flow fail
         header = i18n.format(t('pipette_failed_to_attach'), 'capitalize')
-        iconColor = LEGACY_COLORS.errorEnabled
+        iconColor = COLORS.red50
         isSuccess = false
       }
       break
@@ -113,7 +113,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
     case FLOWS.DETACH: {
       if (attachedPipettes[mount] != null) {
         header = t('pipette_failed_to_detach', { pipetteName: pipetteName })
-        iconColor = LEGACY_COLORS.errorEnabled
+        iconColor = COLORS.red50
         isSuccess = false
       } else {
         header = i18n.format(t('pipette_detached'), 'capitalize')
@@ -302,7 +302,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
     return (
       <SimpleWizardBody
         isSuccess={false}
-        iconColor={LEGACY_COLORS.errorEnabled}
+        iconColor={COLORS.red50}
         header={t('shared:error_encountered')}
         subHeader={errorMessage}
       />

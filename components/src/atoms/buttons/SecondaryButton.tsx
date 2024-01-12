@@ -22,7 +22,7 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
     props.isDangerous ? COLORS.red60 : COLORS.blue50};
   border: ${BORDERS.lineBorder};
   border-color: ${props =>
-    props.isDangerous ? LEGACY_COLORS.errorEnabled : 'initial'};
+    props.isDangerous ? COLORS.red50 : 'initial'};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing8} ${SPACING.spacing16};
   text-transform: ${TYPOGRAPHY.textTransformNone};

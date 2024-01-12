@@ -34,7 +34,7 @@ const Template: Story<React.ComponentProps<typeof SimpleWizardBody>> = args => (
 
 export const AlertIcon = Template.bind({})
 AlertIcon.args = {
-  iconColor: LEGACY_COLORS.errorEnabled,
+  iconColor: COLORS.red50,
   header: 'Pipette still detected',
   subHeader: 'Are you sure you want to exit before detaching your pipette?',
   isSuccess: false,

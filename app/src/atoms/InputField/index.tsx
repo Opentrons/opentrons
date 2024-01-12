@@ -90,7 +90,7 @@ function Input(props: InputFieldProps): JSX.Element {
     border-radius: ${SPACING.spacing4};
     padding: ${SPACING.spacing8};
     border: 1px ${BORDERS.styleSolid}
-      ${error ? LEGACY_COLORS.errorEnabled : COLORS.grey30};
+      ${error ? COLORS.red50 : COLORS.grey30};
     font-size: ${TYPOGRAPHY.fontSizeP};
 
     &:active {
@@ -111,7 +111,7 @@ function Input(props: InputFieldProps): JSX.Element {
 
     &:hover {
       border: 1px ${BORDERS.styleSolid}
-        ${error ? LEGACY_COLORS.errorEnabled : COLORS.grey60};
+        ${error ? COLORS.red50 : COLORS.grey60};
     }
     &:focus {
       border: 1px ${BORDERS.styleSolid} ${COLORS.blue50};
@@ -134,10 +134,10 @@ function Input(props: InputFieldProps): JSX.Element {
   `
 
   const ERROR_TEXT_STYLE = css`
-    color: ${LEGACY_COLORS.errorEnabled};
+    color: ${COLORS.red50};
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       font-size: ${TYPOGRAPHY.fontSize22};
-      color: ${LEGACY_COLORS.red2};
+      color: ${COLORS.red50};
     }
   `
 

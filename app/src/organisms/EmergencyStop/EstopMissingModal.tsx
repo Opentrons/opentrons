@@ -69,7 +69,7 @@ function TouchscreenModal({
   const modalHeader: ModalHeaderBaseProps = {
     title: t('estop_missing'),
     iconName: 'ot-alert',
-    iconColor: LEGACY_COLORS.red2,
+    iconColor: COLORS.red50,
   }
   const modalProps = {
     header: { ...modalHeader },

@@ -99,7 +99,7 @@ export const UnmountGripper = (
     )
   return showGripperStillDetected ? (
     <SimpleWizardBody
-      iconColor={LEGACY_COLORS.errorEnabled}
+      iconColor={COLORS.red50}
       header={t('gripper_still_attached')}
       isSuccess={false}
     >

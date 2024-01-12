@@ -73,9 +73,9 @@ describe('SecondaryButton', () => {
   })
 
   it('renders secondary button with text and different background color', () => {
-    props.color = LEGACY_COLORS.errorEnabled
+    props.color = COLORS.red50
     const { getByText } = render(props)
     const button = getByText('secondary button')
-    expect(button).toHaveStyle(`color: ${LEGACY_COLORS.errorEnabled}`)
+    expect(button).toHaveStyle(`color: ${COLORS.red50}`)
   })
 })

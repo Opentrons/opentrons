@@ -14,7 +14,7 @@ import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
 const STOP_BUTTON_STYLE = css`
   -webkit-tap-highlight-color: transparent;
   display: flex;
-  background-color: ${LEGACY_COLORS.red2};
+  background-color: ${COLORS.red50};
   border-radius: 50%;
 
   &:focus {
@@ -24,15 +24,15 @@ const STOP_BUTTON_STYLE = css`
   &:hover {
     border: none;
     box-shadow: none;
-    background-color: ${LEGACY_COLORS.red2};
+    background-color: ${COLORS.red50};
     color: ${COLORS.white};
   }
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${LEGACY_COLORS.red2};
+    background-color: ${COLORS.red50};
   }
   &:active {
-    background-color: ${LEGACY_COLORS.red2};
+    background-color: ${COLORS.red50};
   }
   &:disabled {
     background-color: ${COLORS.grey35};

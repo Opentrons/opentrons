@@ -229,7 +229,7 @@ export function Toast(props: ToastProps): JSX.Element {
     [ERROR_TOAST]: {
       iconName: 'ot-alert',
       color: `${
-        showODDStyle ? LEGACY_COLORS.red2 : LEGACY_COLORS.errorEnabled
+        showODDStyle ? COLORS.red50 : COLORS.red50
       }`,
       backgroundColor: `${
         showODDStyle ? LEGACY_COLORS.red4 : LEGACY_COLORS.errorBackgroundLight

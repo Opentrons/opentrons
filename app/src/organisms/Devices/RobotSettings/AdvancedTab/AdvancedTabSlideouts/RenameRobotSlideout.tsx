@@ -176,7 +176,7 @@ export function RenameRobotSlideout({
         {formik.errors.newRobotName && (
           <StyledText
             as="label"
-            color={LEGACY_COLORS.errorEnabled}
+            color={COLORS.red50}
             marginTop={SPACING.spacing4}
           >
             {formik.errors.newRobotName}

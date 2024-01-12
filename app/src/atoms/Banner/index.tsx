@@ -57,7 +57,7 @@ const BANNER_PROPS_BY_TYPE: Record<
   error: {
     icon: { name: 'alert-circle' },
     backgroundColor: LEGACY_COLORS.errorBackgroundLight,
-    color: LEGACY_COLORS.errorEnabled,
+    color: COLORS.red50,
   },
   warning: {
     icon: { name: 'alert-circle' },

@@ -127,7 +127,7 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
       iconColor={
         success || wrongWantedPipette || confirmPipetteLevel
           ? COLORS.green50
-          : LEGACY_COLORS.errorEnabled
+          : COLORS.red50
       }
       header={header}
       subHeader={subHeader}

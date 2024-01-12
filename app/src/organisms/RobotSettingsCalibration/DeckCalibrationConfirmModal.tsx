@@ -55,7 +55,7 @@ export function DeckCalibrationConfirmModal({
             {t('shared:cancel')}
           </Link>
           <PrimaryButton
-            backgroundColor={LEGACY_COLORS.errorEnabled}
+            backgroundColor={COLORS.red50}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             css={TYPOGRAPHY.fontSizeP}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}

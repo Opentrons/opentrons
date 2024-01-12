@@ -26,7 +26,7 @@ describe('AlertPrimaryButton', () => {
   it('renders alert primary button with text', () => {
     const { getByText } = render(props)
     const button = getByText('alert primary button')
-    expect(button).toHaveStyle(`background-color: ${LEGACY_COLORS.errorEnabled}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.red50}`)
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16}`
     )

@@ -81,10 +81,10 @@ describe('QuaternaryButton', () => {
   })
 
   it('renders secondary tertiary button with text and different background color', () => {
-    props.color = LEGACY_COLORS.errorEnabled
+    props.color = COLORS.red50
     const { getByText } = render(props)
     const button = getByText('secondary tertiary button')
     expect(button).toHaveStyle(`background-color: ${String(COLORS.white)}`)
-    expect(button).toHaveStyle(`color: ${String(LEGACY_COLORS.errorEnabled)}`)
+    expect(button).toHaveStyle(`color: ${String(COLORS.red50)}`)
   })
 })

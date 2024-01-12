@@ -48,7 +48,7 @@ export const MountingPlate = (
 
   return errorMessage ? (
     <SimpleWizardBody
-      iconColor={LEGACY_COLORS.errorEnabled}
+      iconColor={COLORS.red50}
       header={t('shared:error_encountered')}
       isSuccess={false}
       subHeader={errorMessage}

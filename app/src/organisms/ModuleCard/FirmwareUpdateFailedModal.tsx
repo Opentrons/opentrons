@@ -32,7 +32,7 @@ export const FirmwareUpdateFailedModal = (
     <Flex flexDirection={DIRECTION_ROW}>
       <Icon
         width={SPACING.spacing20}
-        color={LEGACY_COLORS.errorEnabled}
+        color={COLORS.red50}
         name="information"
         aria-label="information"
       />

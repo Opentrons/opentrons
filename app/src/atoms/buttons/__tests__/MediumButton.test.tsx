@@ -36,7 +36,7 @@ describe('MediumButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.red2}`
+      `background-color: ${COLORS.red50}`
     )
   })
   it('renders the secondary button', () => {

@@ -61,7 +61,7 @@ export function SetWifiSsid({
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={errorMessage != null ? LEGACY_COLORS.red2 : LEGACY_COLORS.darkBlack100}
+          color={errorMessage != null ? COLORS.red50 : LEGACY_COLORS.darkBlack100}
         >
           {t('enter_network_name')}
         </StyledText>

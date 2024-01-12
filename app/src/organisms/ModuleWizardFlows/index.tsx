@@ -235,7 +235,7 @@ export const ModuleWizardFlows = (
     modalContent = (
       <SimpleWizardBody
         isSuccess={false}
-        iconColor={LEGACY_COLORS.errorEnabled}
+        iconColor={COLORS.red50}
         header={t(
           prepCommandErrorMessage != null
             ? 'error_prepping_module'

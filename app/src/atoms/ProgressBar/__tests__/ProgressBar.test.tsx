@@ -47,12 +47,12 @@ describe('ProgressBar', () => {
   it('renders LinerProgress Bar at 50% + red width', () => {
     props.percentComplete = 50
     props.innerStyles = css`
-      background: ${LEGACY_COLORS.errorEnabled};
+      background: ${COLORS.red50};
     `
     const [{ getByTestId }] = render(props)
     const bar = getByTestId('ProgressBar_Bar')
     expect(bar).not.toHaveStyle(`background: ${COLORS.blue50}`)
-    expect(bar).toHaveStyle(`background: ${LEGACY_COLORS.errorEnabled}`)
+    expect(bar).toHaveStyle(`background: ${COLORS.red50}`)
     expect(bar).toHaveStyle('width: 50%')
   })
 })

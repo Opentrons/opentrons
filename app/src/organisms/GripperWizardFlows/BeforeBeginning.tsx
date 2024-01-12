@@ -126,7 +126,7 @@ export const BeforeBeginning = (
   return errorMessage != null ? (
     <SimpleWizardBody
       isSuccess={false}
-      iconColor={LEGACY_COLORS.errorEnabled}
+      iconColor={COLORS.red50}
       header={t('shared:error_encountered')}
       subHeader={errorMessage}
     />
