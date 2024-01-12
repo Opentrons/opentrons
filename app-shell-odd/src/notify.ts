@@ -55,7 +55,7 @@ export function registerNotify(
 ): (action: Action) => unknown {
   return function handleAction(action: Action) {
     switch (action.type) {
-      // TOME: USING THIS BROKER TO TEST FOR NOW. REMEMBER TO DELETE WHEN USING REAL BROKER.
+      // TOME: I think you can hardcode this as the broker string here if you wanted. Definitely not required, but something to think about for ODD.
       case 'shell:NOTIFY_SUBSCRIBE':
         return subscribe({
           ...action.payload,
@@ -148,16 +148,10 @@ function establishListeners({
       )
     }
   })
-  // TOME: I'd really think about this error code null logic here. Is that actually good?
-  // What is the normal reason code given. THAT is a better indication of what to do.
   // TOME: Clean up the browser window send stuff, IMO.
   client.on('packetreceive', packet => {
     switch (packet.cmd) {
       case 'suback':
-        console.log('SUBACK PACKET RECEIVED')
-        console.log(packet)
-        console.log('SUBACK PACKET REASON CODE')
-        console.log(packet.reasonCode)
         if (packet.reasonCode == null || packet.reasonCode < 128) {
           log.info(`Successfully subscribed on ${hostname} to topic: ${topic}`)
           connectionStore[hostname].subscriptions[topic] =
@@ -204,8 +198,6 @@ function establishListeners({
   })
   // handles transport layer errors only
   // TOME: More sophisticated reconnection logic would be helpful. If it worked before but now doesn't work, that's a good sign you should retry.
-  // TOME: Probably worth checking to see what happens during a disconnect (wifi out, etc). Does the error logic get hit? If so, that may be reason to think about this sooner rather than
-  // later.
   client.on('error', error => {
     log.warn(`Error - ${error.name}: ${error.message}`)
     browserWindow.webContents.send('notify', `${hostname}:${topic}:ECONNFAILED`)
