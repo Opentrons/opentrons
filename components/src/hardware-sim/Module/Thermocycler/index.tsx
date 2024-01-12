@@ -45,7 +45,7 @@ export function Thermocycler(props: ThermocyclerVizProps): JSX.Element {
   if (blockTargetTemp != null) {
     ledLightColor =
       blockTargetTemp <= ROOM_TEMPERATURE_C
-        ? LEGACY_COLORS.mediumBlueEnabled
+        ? COLORS.blue35
         : LEGACY_COLORS.red4
   }
 

@@ -49,7 +49,7 @@ describe('SmallButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${LEGACY_COLORS.mediumBlueEnabled}`
+      `background-color: ${COLORS.blue35}`
     )
   })
   it('renders the tertiary high light button', () => {

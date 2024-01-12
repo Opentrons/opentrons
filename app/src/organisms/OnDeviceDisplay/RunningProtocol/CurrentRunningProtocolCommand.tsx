@@ -225,7 +225,7 @@ export function CurrentRunningProtocolCommand({
       </Flex>
       <Flex
         padding={`${SPACING.spacing12} ${SPACING.spacing24}`}
-        backgroundColor={LEGACY_COLORS.mediumBlueEnabled}
+        backgroundColor={COLORS.blue35}
         borderRadius={BORDERS.borderRadiusSize2}
         justifyContent={JUSTIFY_CENTER}
         css={shouldAnimate ? COMMAND_ROW_STYLE_ANIMATED : COMMAND_ROW_STYLE}

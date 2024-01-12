@@ -39,7 +39,7 @@ const BrightnessTile = styled(Box)`
   background: ${(props: BrightnessTileProps) =>
     props.isActive
       ? COLORS.blue50
-      : LEGACY_COLORS.mediumBlueEnabled};
+      : COLORS.blue35};
 `
 
 // Note The actual brightness is Bright 1 <---> 6 Dark which is opposite to the UI

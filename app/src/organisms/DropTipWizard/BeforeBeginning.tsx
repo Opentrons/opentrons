@@ -203,7 +203,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     flex-direction: ${DIRECTION_ROW};
     justify-content: ${JUSTIFY_FLEX_START};
-    background-color: ${LEGACY_COLORS.mediumBlueEnabled};
+    background-color: ${COLORS.blue35};
     border-width: 0; 
     border-radius: ${BORDERS.borderRadiusSize4};
     padding: ${SPACING.spacing24};

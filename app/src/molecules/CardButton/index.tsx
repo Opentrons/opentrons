@@ -34,13 +34,13 @@ const CARD_BUTTON_STYLE = css`
   &:hover {
     border: none;
     box-shadow: none;
-    background-color: ${LEGACY_COLORS.mediumBlueEnabled};
+    background-color: ${COLORS.blue35};
     color: ${COLORS.black90};
   }
 
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${LEGACY_COLORS.mediumBlueEnabled};
+    background-color: ${COLORS.blue35};
   }
 
   &:active {
@@ -84,7 +84,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
       width="100%"
       css={CARD_BUTTON_STYLE}
       backgroundColor={
-        disabled ? LEGACY_COLORS.darkBlack20 : LEGACY_COLORS.mediumBlueEnabled
+        disabled ? LEGACY_COLORS.darkBlack20 : COLORS.blue35
       }
       disabled={disabled}
     >

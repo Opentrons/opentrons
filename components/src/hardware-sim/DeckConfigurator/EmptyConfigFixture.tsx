@@ -66,7 +66,7 @@ const EMPTY_CONFIG_STYLE = css`
   display: ${DISPLAY_FLEX};
   align-items: ${ALIGN_CENTER};
   justify-content: ${JUSTIFY_CENTER};
-  background-color: ${LEGACY_COLORS.mediumBlueEnabled};
+  background-color: ${COLORS.blue35};
   border: 3px dashed ${COLORS.blue50};
   border-radius: ${BORDERS.radiusSoftCorners};
   width: 100%;

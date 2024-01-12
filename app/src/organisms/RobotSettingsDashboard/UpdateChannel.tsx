@@ -38,7 +38,7 @@ const SettingButtonLabel = styled.label<LabelProps>`
   background: ${({ isSelected }) =>
     isSelected === true
       ? COLORS.blue50
-      : LEGACY_COLORS.mediumBlueEnabled};
+      : COLORS.blue35};
   color: ${({ isSelected }) => isSelected === true && COLORS.white};
 `
 

@@ -46,7 +46,7 @@ const OptionLabel = styled.label<LabelProps>`
   background: ${({ isSelected }) =>
     isSelected === true
       ? COLORS.blue50
-      : LEGACY_COLORS.mediumBlueEnabled};
+      : COLORS.blue35};
 `
 
 interface DeviceResetProps {

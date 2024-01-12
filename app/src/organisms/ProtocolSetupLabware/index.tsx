@@ -409,7 +409,7 @@ function LabwareLatch({
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
-      backgroundColor={LEGACY_COLORS.mediumBlueEnabled}
+      backgroundColor={COLORS.blue35}
       borderRadius={BORDERS.borderRadiusSize3}
       css={labwareLatchStyles}
       color={

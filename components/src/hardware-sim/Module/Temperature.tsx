@@ -15,7 +15,7 @@ export function Temperature(props: TemperatureVizProps): JSX.Element {
   if (targetTemperature != null) {
     ledLightColor =
       targetTemperature <= ROOM_TEMPERATURE_C
-        ? LEGACY_COLORS.mediumBlueEnabled
+        ? COLORS.blue35
         : LEGACY_COLORS.red4
   }
 
