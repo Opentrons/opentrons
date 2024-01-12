@@ -33,7 +33,7 @@ const LISTITEM_PROPS_BY_TYPE: Record<
     backgroundColor: COLORS.green35,
   },
   warning: {
-    backgroundColor: LEGACY_COLORS.yellow3,
+    backgroundColor: COLORS.yellow35,
   },
 }
 

@@ -190,7 +190,7 @@ function FixtureTableItem({
         flexDirection={DIRECTION_ROW}
         alignItems={ALIGN_CENTER}
         backgroundColor={
-          isCurrentFixtureCompatible ? COLORS.green35 : LEGACY_COLORS.yellow3
+          isCurrentFixtureCompatible ? COLORS.green35 : COLORS.yellow35
         }
         borderRadius={BORDERS.borderRadiusSize3}
         gridGap={SPACING.spacing24}

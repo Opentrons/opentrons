@@ -68,7 +68,7 @@ describe('Chip', () => {
     const [{ getByTestId, getByText, getByLabelText }] = render(props)
     const chip = getByTestId('Chip_warning')
     const chipText = getByText('mockWarning')
-    expect(chip).toHaveStyle(`background-color: ${LEGACY_COLORS.yellow3}`)
+    expect(chip).toHaveStyle(`background-color: ${COLORS.yellow35}`)
     expect(chip).toHaveStyle(`border-radius: ${BORDERS.borderRadiusSize5}`)
     expect(chipText).toHaveStyle(`color: ${COLORS.yellow60}`)
     const icon = getByLabelText('icon_mockWarning')
