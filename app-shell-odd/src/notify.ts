@@ -1,23 +1,23 @@
+// TOME: Cnovert the object to a set. Better for performance and storing collections of objects. Not the biggest deal, though.
 /* eslint-disable @typescript-eslint/no-dynamic-delete */
 import mqtt from 'mqtt'
-import uniqueId from 'lodash/uniqueId'
 
 import { createLogger } from './log'
 
 import type { BrowserWindow } from 'electron'
 import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
 import type { Action, Dispatch } from './types'
-// TOME:Write up purpose of what this does -- abstracts the connection/disconnection process.
-// TOME: Explain that redundant requests don't harm network, but might as well prevent them (when subscribing),
-// but redundant connections do disconnect old connections.
 
-// TOME: Test that redundant emissions still get data!
+// Manages MQTT broker connections via a connection store, establishing a connection to the broker only if a connection does not
+// already exist, and disconnects from the broker when the app is not subscribed to any topics for the given broker.
+// A redundant connection to the same broker results in the older connection forcibly closing, which we want to avoid.
+// However, redundant subscriptions are permitted and result in the broker sending the retained message for that topic.
+// To mitigate redundant connections, the connection manager eagerly adds the host, removing the host if the connection fails.
 
-// TOME: I'd probably convert this a class at this point.
 interface ConnectionStore {
   [hostname: string]: {
     client: mqtt.MqttClient | null
-    subscriptions: Partial<Record<NotifyTopic, number>> // a frequency counter. unsubscribe from topic when counter is 0.
+    subscriptions: Record<NotifyTopic, number>
   }
 }
 
@@ -27,8 +27,6 @@ const log = createLogger('notify')
 // This clientId is derived from the mqttjs library.
 const CLIENT_ID = 'odd_' + Math.random().toString(16).slice(2, 8)
 
-// TOME: Highlight here that we make the assumption that if we can connect
-// to the broker at some point, we don't need a backup connection via HTTP. I think that's very fair.
 const connectOptions: mqtt.IClientOptions = {
   clientId: CLIENT_ID,
   port: 1883,
@@ -58,7 +56,8 @@ export function registerNotify(
 ): (action: Action) => unknown {
   return function handleAction(action: Action) {
     switch (action.type) {
-      // TOME: USING THIS BROKER TO TEST FOR NOW. REMEMBER TO DELETE WHEN USING REAL BROKER.// TOME: I think you can hardcode this as the broker string here if you wanted. Definitely not required, but something to think about for ODD.      case 'shell:NOTIFY_SUBSCRIBE':
+      // TOME: USING THIS BROKER TO TEST FOR NOW. REMEMBER TO DELETE WHEN USING REAL BROKER.
+      // TOME: I think you can hardcode this as the broker string here if you wanted. Definitely not required, but something to think about for ODD.
       case 'shell:NOTIFY_SUBSCRIBE':
         return subscribe({
           ...action.payload,
@@ -83,22 +82,17 @@ function subscribe(notifyParams: NotifyParams): void {
   if (connectionStore[hostname] == null) {
     connectionStore[hostname] = {
       client: null,
-      subscriptions: { [topic]: 1 },
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      subscriptions: { [topic]: 1 } as Record<NotifyTopic, number>,
     }
     const client = mqtt.connect(`mqtt://${hostname}`, connectOptions)
     connectionStore[hostname].client = client
     establishListeners({ ...notifyParams, client })
     client.subscribe(topic, subscribeOptions)
-  }
-  // TOME: Adjsut this
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare
-  else if (topic in connectionStore[hostname].subscriptions === false) {
-    connectionStore[hostname].subscriptions[topic] = 1
+  } else {
+    connectionStore[hostname].subscriptions[topic] += 1
     const { client } = connectionStore[hostname]
     client?.subscribe(topic, subscribeOptions)
-  } else {
-    connectionStore[hostname].subscriptions[topic] =
-      (connectionStore[hostname].subscriptions[topic] ?? 0) + 1
   }
 }
 
@@ -139,7 +133,6 @@ function establishListeners({
   topic,
 }: ListenerParams): void {
   client.on('message', (topic, message, packet) => {
-    // TOME: Make sure data is sent properly as a string when testing. Let the app do all the serialization stuff.
     browserWindow.webContents.send(
       'notify',
       `${hostname}:${topic}:${message.toString()}`
@@ -161,7 +154,6 @@ function establishListeners({
     }
   })
 
-  // TOME: Clean up the browser window send stuff, IMO.
   client.on('packetreceive', packet => {
     switch (packet.cmd) {
       case 'suback':
@@ -224,9 +216,6 @@ function establishListeners({
     log.info(`Attempting to reconnect to ${hostname}`)
   })
   // handles transport layer errors only
-  // TOME: More sophisticated reconnection logic would be helpful. If it worked before but now doesn't work, that's a good sign you should retry.
-  // TOME: Probably worth checking to see what happens during a disconnect (wifi out, etc). Does the error logic get hit? If so, that may be reason to think about this sooner rather than
-  // later.
   client.on('error', error => {
     log.warn(`Error - ${error.name}: ${error.message}`)
     browserWindow.webContents.send('notify', `${hostname}:${topic}:ECONNFAILED`)
@@ -238,12 +227,11 @@ function establishListeners({
     if (hostname in connectionStore) delete connectionStore[hostname]
   })
 
-  client.on('disconnect', packet => {
+  client.on('disconnect', packet =>
     log.warn(
       `Disconnected from ${hostname} with code ${
         packet.reasonCode ?? 'undefined'
       }`
     )
-    log.warn(packet)
-  })
+  )
 }
