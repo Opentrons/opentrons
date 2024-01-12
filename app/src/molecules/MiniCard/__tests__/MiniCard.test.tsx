@@ -78,7 +78,7 @@ describe('MiniCard', () => {
     const { getByText } = render(props)
     const miniCard = getByText('mock mini card')
     expect(miniCard).toHaveStyle(
-      `background-color: ${String(LEGACY_COLORS.errorBackgroundLight)}`
+      `background-color: ${String(COLORS.red20)}`
     )
     expect(miniCard).toHaveStyle(
       `border: 1px solid ${String(COLORS.red50)}`
@@ -98,7 +98,7 @@ describe('MiniCard', () => {
     )
     expect(miniCard).toHaveStyleRule(
       'background-color',
-      `${String(LEGACY_COLORS.errorBackgroundLight)}`,
+      `${String(COLORS.red20)}`,
       {
         modifier: ':hover',
       }

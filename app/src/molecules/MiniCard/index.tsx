@@ -36,11 +36,11 @@ const selectedOptionStyles = css`
 const errorOptionStyles = css`
   ${selectedOptionStyles}
   border: 1px solid ${COLORS.red50};
-  background-color: ${LEGACY_COLORS.errorBackgroundLight};
+  background-color: ${COLORS.red20};
 
   &:hover {
     border: 1px solid ${COLORS.red50};
-    background-color: ${LEGACY_COLORS.errorBackgroundLight};
+    background-color: ${COLORS.red20};
   }
 `
 
