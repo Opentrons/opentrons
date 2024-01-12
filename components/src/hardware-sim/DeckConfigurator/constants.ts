@@ -8,11 +8,11 @@ import { BORDERS, COLORS, SPACING } from '../../ui-style-constants'
  * Position is relative to deck definition slot positions and a custom stroke applied to the single slot fixture SVG
  */
 export const FIXTURE_HEIGHT = 102.0
-export const SINGLE_SLOT_FIXTURE_WIDTH = 242.5
+export const SINGLE_SLOT_FIXTURE_WIDTH = 243.5
 export const STAGING_AREA_FIXTURE_WIDTH = 314.5
 
-export const COLUMN_1_X_ADJUSTMENT = -99.5
-export const COLUMN_3_X_ADJUSTMENT = -15
+export const COLUMN_1_X_ADJUSTMENT = -100
+export const COLUMN_3_X_ADJUSTMENT = -15.5
 export const Y_ADJUSTMENT = -8
 
 export const STAGING_AREA_DISPLAY_NAME = 'Staging area'
