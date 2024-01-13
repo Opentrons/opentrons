@@ -43,7 +43,6 @@ def test_is_bootloader(node_id: NodeId) -> None:
 @pytest.mark.parametrize("node_id", [n.application_for() for n in NodeId])
 def test_bootloader_for(node_id: NodeId) -> None:
     """Test application node id to bootloader node id mapping."""
-
     # There is no bootloader for these nodes, they return themselves.
     if node_id in {NodeId.broadcast, NodeId.host}:
         assert node_id.bootloader_for() == node_id
@@ -56,7 +55,6 @@ def test_bootloader_for(node_id: NodeId) -> None:
 @pytest.mark.parametrize("node_id", {n for n in NodeId})
 def test_application_for(node_id: NodeId) -> None:
     """Test bootloader node to application node mapping."""
-
     # bootloaders should produce application nodes
     if node_id.is_bootloader():
         assert node_id.application_for() == NodeId.bootloader_map()[node_id][0]
