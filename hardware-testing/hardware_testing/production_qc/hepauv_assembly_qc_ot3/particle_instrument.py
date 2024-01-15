@@ -242,6 +242,11 @@ if __name__ == '__main__':
     #     print(stats)
     #     if stats == "Stop":
     #         operation = False
+    PARTICLE_COUNTER.initialize_connection()
+    PARTICLE_COUNTER.clear_data()
+    PARTICLE_COUNTER.set_number_of_samples(3)
+    PARTICLE_COUNTER.start_sampling()
+    time.sleep()
     header, data = PARTICLE_COUNTER.available_records()
     #print(header)
     #print(data)
