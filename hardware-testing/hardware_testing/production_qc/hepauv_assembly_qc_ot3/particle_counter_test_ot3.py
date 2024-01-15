@@ -15,6 +15,7 @@ from time import time
 import os
 PRESSURE_DATA_CACHE = []
 FINAL_TEST_RESULTS = []
+SLOT_WIDTH_GAUGE = 
 
 async def _main(simulating: bool) -> None:
     final_result = []
@@ -97,7 +98,24 @@ async def _main(simulating: bool) -> None:
     except:
         pass
 
-def 
+def UV_test(args):
+    for width, slot in zip(TEST_WIDTHS_MM, SLOT_WIDTH_GAUGE):
+        await api.ungrip()
+        if slot is not None:
+            hover_pos, target_pos = _get_width_hover_and_grip_positions(api, slot)
+            # MOVE TO SLOT
+            await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos)
+            # OPERATOR SETS UP GAUGE
+            if not api.is_simulator:
+                ui.get_user_ready(f"add {width} mm wide gauge to slot {slot}")
+            # GRIPPER MOVES TO GAUGE
+            await api.move_to(mount, target_pos)
+            if not api.is_simulator:
+                ui.get_user_ready(f"prepare to grip {width} mm")
+            # grip once to center the thing
+            await api.grip(20)
+            await api.ungrip()
+        # LOOP THROUGH FORCES
 
 def determine_criterion(p_1, p_2):
     """
