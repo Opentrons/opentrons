@@ -153,7 +153,10 @@ def _assign_starting_volumes(
     )
     for test in DILUENT_SOURCES:
         src_ul_per_trial = _start_volumes_per_trial(
-            DILUENT_VOLUME, reservoir.load_name, pipette.channels, len(test["destinations"])
+            DILUENT_VOLUME,
+            reservoir.load_name,
+            pipette.channels,
+            len(test["destinations"]),
         )
         first_trial_ul = src_ul_per_trial[0]
         reservoir[str(test["source"])].load_liquid(diluent, first_trial_ul)
