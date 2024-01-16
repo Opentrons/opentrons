@@ -14,8 +14,8 @@ import {
   Flex,
   JUSTIFY_END,
   TYPOGRAPHY,
-  DEPRECATED_WHALE_GREY,
 } from '@opentrons/components'
+import { DEPRECATED_WHALE_GREY } from '@opentrons/shared-data'
 import { selectors } from '../../labware-ingred/selectors'
 import styles from './LiquidEditForm.css'
 import formStyles from '../forms/forms.css'
