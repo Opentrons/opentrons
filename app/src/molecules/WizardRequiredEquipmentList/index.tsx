@@ -9,7 +9,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   JUSTIFY_SPACE_AROUND,
   TYPOGRAPHY,
   Box,
@@ -71,7 +71,7 @@ export function WizardRequiredEquipmentList(
                 {/* do not show divider after the last equipment in the list */}
                 {index + 1 === Object.keys(equipmentList).length ? null : (
                   <Box
-                    borderBottom={`1px solid ${COLORS.black90}${LEGACY_COLORS.opacity20HexCode}`}
+                    borderBottom={`1px solid ${COLORS.black90}${COLORS.opacity20HexCode}`}
                   />
                 )}
               </Box>

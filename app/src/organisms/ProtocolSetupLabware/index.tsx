@@ -7,7 +7,7 @@ import {
   ALIGN_STRETCH,
   BORDERS,
   Box,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -413,9 +413,7 @@ function LabwareLatch({
       borderRadius={BORDERS.borderRadiusSize3}
       css={labwareLatchStyles}
       color={
-        isLatchLoading
-          ? `${COLORS.black90}${LEGACY_COLORS.opacity60HexCode}`
-          : COLORS.black90
+        isLatchLoading ? COLORS.grey60 : COLORS.black90
       }
       height="6.5rem"
       alignSelf={ALIGN_CENTER}

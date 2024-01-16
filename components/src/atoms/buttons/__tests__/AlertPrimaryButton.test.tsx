@@ -1,7 +1,7 @@
 import 'jest-styled-components'
 import * as React from 'react'
 import { renderWithProviders } from '../../../testing/utils'
-import { COLORS } from '../../helix-design-system'
+import { COLORS } from '../../../helix-design-system'
 import {
   BORDERS,
   TYPOGRAPHY,

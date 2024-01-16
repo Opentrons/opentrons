@@ -11,7 +11,6 @@ import {
   BORDERS,
   Btn,
   COLORS,
-  LEGACY_COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
@@ -389,7 +388,7 @@ const SplashFrame = styled(Flex)`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
-  border: ${BORDERS.borderRadiusSize2} solid ${COLORS.white}${LEGACY_COLORS.opacity20HexCode};
+  border: ${BORDERS.borderRadiusSize2} solid ${COLORS.white}${COLORS.opacity20HexCode};
   border-radius: ${BORDERS.borderRadiusSize3};
   grid-gap: ${SPACING.spacing40};
 `

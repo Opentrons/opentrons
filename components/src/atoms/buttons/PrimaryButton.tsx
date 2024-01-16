@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { COLORS, BORDERS, TYPOGRAPHY, SPACING } from '../../ui-style-constants'
+import { BORDERS, TYPOGRAPHY, SPACING } from '../../ui-style-constants'
 import { COLORS } from '../../helix-design-system'
 import { NewPrimaryBtn, styleProps } from '../../primitives'
 

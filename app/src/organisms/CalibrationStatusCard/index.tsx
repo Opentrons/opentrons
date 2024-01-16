@@ -38,19 +38,19 @@ export function CalibrationStatusCard({
   const { taskListStatus } = useCalibrationTaskList()
 
   // start off assuming we are missing calibrations
-  let statusLabelBackgroundColor: string = COLORS.red50
+  let statusLabelBackgroundColor: string = COLORS.red30
   let statusLabelIconColor: string = COLORS.red50
   let statusLabelText = t('missing_calibration_data')
 
   // if the tasklist is empty, though, all calibrations are good
   if (taskListStatus === 'complete') {
-    statusLabelBackgroundColor = COLORS.green50
+    statusLabelBackgroundColor = COLORS.green30
     statusLabelIconColor = COLORS.green50
     statusLabelText = t('calibration_complete')
     // if we have tasks and they are all marked bad, then we should
     // strongly suggest they re-do those calibrations
   } else if (taskListStatus === 'bad') {
-    statusLabelBackgroundColor = COLORS.yellow50
+    statusLabelBackgroundColor = COLORS.yellow30
     statusLabelIconColor = COLORS.yellow50
     statusLabelText = t('calibration_recommended')
   }
@@ -76,9 +76,7 @@ export function CalibrationStatusCard({
           </StyledText>
           <StatusLabel
             status={statusLabelText}
-            backgroundColor={`${String(statusLabelBackgroundColor)}${String(
-              LEGACY_COLORS.opacity12HexCode
-            )}`}
+            backgroundColor={statusLabelBackgroundColor}
             iconColor={statusLabelIconColor}
             textColor={COLORS.black90}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}

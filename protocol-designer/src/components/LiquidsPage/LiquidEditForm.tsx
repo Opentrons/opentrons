@@ -14,7 +14,7 @@ import {
   Flex,
   JUSTIFY_END,
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  DEPRECATED_WHALE_GREY,
 } from '@opentrons/components'
 import { selectors } from '../../labware-ingred/selectors'
 import styles from './LiquidEditForm.css'
@@ -48,7 +48,7 @@ function checkColor(hex: string): boolean {
   return luminance < 0.1 || luminance > 0.9
 }
 
-const INVALID_DISPLAY_LEGACY_COLORS = ['#000000', '#ffffff', LEGACY_COLORS.whaleGrey]
+const INVALID_DISPLAY_LEGACY_COLORS = ['#000000', '#ffffff', DEPRECATED_WHALE_GREY]
 
 export const liquidEditFormSchema: Yup.Schema<
   { name: string; description: string; serialize: boolean } | undefined,

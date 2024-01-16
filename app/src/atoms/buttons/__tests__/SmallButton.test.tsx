@@ -2,7 +2,7 @@ import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import {
   renderWithProviders,
-  LEGACY_COLORS,
+  COLORS,
   BORDERS,
 } from '@opentrons/components'
 
@@ -67,7 +67,7 @@ describe('SmallButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `color: ${COLORS.black90}${LEGACY_COLORS.opacity70HexCode}`
+      `color: ${COLORS.grey60}`
     )
   })
   it('renders the button as disabled', () => {
