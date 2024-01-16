@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { SPACING, Icon, IconName } from '@opentrons/components'
+import { Icon, IconName } from '@opentrons/components'
 import { RunTimeCommand } from '@opentrons/shared-data'
 import type { StyleProps } from '@opentrons/components'
 
@@ -14,7 +14,7 @@ interface CommandIconProps extends StyleProps {
   svgWidth?: string | number
 }
 export function CommandIcon(props: CommandIconProps): JSX.Element | null {
-  const { command, svgWidth, ...styleProps } = props
+  const { command, svgWidth = '1rem', ...styleProps } = props
   let iconName = null
   if (
     command.commandType === 'moveLabware' &&
