@@ -1,4 +1,5 @@
 import * as React from 'react'
+import classNames from 'classnames'
 import {
   getPipetteNameSpecs,
   LabwareDefinition2,
@@ -13,17 +14,20 @@ import {
   MULTI_CHANNEL_PIPETTE_HEIGHT,
   MULTI_CHANNEL_CENTER_Y_NOZZLE,
   MULTI_CHANNEL_Y_OFFSET,
+  NINETY_SIX_CHANNEL_PIPETTE_WIDTH,
 } from './constants'
 import { EmanatingNozzle } from './EmanatingNozzle'
 import { EightEmanatingNozzles } from './EightEmanatingNozzles'
+import styles from './styles.css'
 
 interface PipetteRenderProps {
   labwareDef: LabwareDefinition2
   pipetteName: PipetteName
+  usingMetalProbe?: boolean
 }
 
 export const PipetteRender = (props: PipetteRenderProps): JSX.Element => {
-  const { labwareDef, pipetteName } = props
+  const { labwareDef, pipetteName, usingMetalProbe = false } = props
   const channels = getPipetteNameSpecs(pipetteName)?.channels
   const cx =
     channels === 1
@@ -36,21 +40,33 @@ export const PipetteRender = (props: PipetteRenderProps): JSX.Element => {
   const x = labwareDef.wells.A1.x - cx
   const y = channels === 1 ? labwareDef.wells.A1.y - cy : MULTI_CHANNEL_Y_OFFSET
 
+  let boxWidth
+  let probeOffsetX = 0
+  let probeOffsetY = 0
+  if (channels === 1) {
+    boxWidth = SINGLE_CHANNEL_PIPETTE_WIDTH
+  } else if (channels === 8) {
+    boxWidth = MULTI_CHANNEL_PIPETTE_WIDTH
+    probeOffsetY = 63
+  } else {
+    boxWidth = NINETY_SIX_CHANNEL_PIPETTE_WIDTH
+    probeOffsetY = 63
+    if (Object.keys(labwareDef.wells).length === 1) {
+      probeOffsetX = 99 / 2
+    }
+  }
+
   return (
     <RobotCoordsForeignDiv
-      width={
-        channels === 1
-          ? SINGLE_CHANNEL_PIPETTE_WIDTH
-          : MULTI_CHANNEL_PIPETTE_WIDTH
-      }
+      width={boxWidth}
       height={
         channels === 1
           ? SINGLE_CHANNEL_PIPETTE_HEIGHT
           : MULTI_CHANNEL_PIPETTE_HEIGHT
       }
-      x={x}
+      x={x - probeOffsetX}
       y={y}
-      outerProps={{ style: { overflow: 'visible' } }}
+      className={classNames(styles.overflow)}
       innerDivProps={{
         style: {
           width: '100%',
@@ -64,10 +80,16 @@ export const PipetteRender = (props: PipetteRenderProps): JSX.Element => {
       }}
     >
       <svg overflow="visible">
-        {channels === 1 ? (
-          <EmanatingNozzle cx={cx} cy={cy} />
+        {channels === 1 || usingMetalProbe ? (
+          <EmanatingNozzle
+            cx={cx}
+            cy={usingMetalProbe ? cy + probeOffsetY : cy}
+          />
         ) : (
-          <EightEmanatingNozzles cx={cx} initialCy={cy} />
+          <EightEmanatingNozzles
+            cx={usingMetalProbe ? cx - probeOffsetX : cx}
+            initialCy={usingMetalProbe ? cy + probeOffsetY : cy}
+          />
         )}
       </svg>
     </RobotCoordsForeignDiv>
