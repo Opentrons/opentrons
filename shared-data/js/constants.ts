@@ -1,4 +1,5 @@
-import type { Cutout, ModuleType } from './types'
+import type { CutoutFixtureId, CutoutId, AddressableAreaName } from '../deck'
+import type { ModuleType } from './types'
 
 // constants for dealing with robot coordinate system (eg in labwareTools)
 export const SLOT_LENGTH_MM = 127.76 // along X axis in robot coordinate system
@@ -100,6 +101,12 @@ export const MODULE_MODELS = [
   ...MAGNETIC_BLOCK_MODELS,
 ]
 
+export const MODULE_MODELS_OT2_ONLY = [
+  ...MAGNETIC_MODULE_MODELS,
+  TEMPERATURE_MODULE_V1,
+  THERMOCYCLER_MODULE_V1,
+]
+
 export const MODULE_TYPES = [
   TEMPERATURE_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -183,18 +190,46 @@ export const TC_MODULE_LOCATION_OT3: 'A1+B1' = 'A1+B1'
 
 export const WEIGHT_OF_96_CHANNEL: '~10kg' = '~10kg'
 
-export const STAGING_AREA_CUTOUTS: Cutout[] = [
+export const MOVABLE_TRASH_CUTOUTS: CutoutId[] = [
+  'cutoutA1',
+  'cutoutB1',
+  'cutoutC1',
+  'cutoutD1',
   'cutoutA3',
   'cutoutB3',
   'cutoutC3',
   'cutoutD3',
 ]
-export const WASTE_CHUTE_CUTOUT: 'cutoutD3' = 'cutoutD3'
 
-export const STAGING_AREA_LOAD_NAME = 'stagingArea'
-export const STANDARD_SLOT_LOAD_NAME = 'standardSlot'
-export const TRASH_BIN_LOAD_NAME = 'trashBin'
-export const WASTE_CHUTE_LOAD_NAME = 'wasteChute'
+export const SINGLE_LEFT_CUTOUTS: CutoutId[] = [
+  'cutoutA1',
+  'cutoutB1',
+  'cutoutC1',
+  'cutoutD1',
+]
+
+export const SINGLE_CENTER_CUTOUTS: CutoutId[] = [
+  'cutoutA2',
+  'cutoutB2',
+  'cutoutC2',
+  'cutoutD2',
+]
+
+export const SINGLE_RIGHT_CUTOUTS: CutoutId[] = [
+  'cutoutA3',
+  'cutoutB3',
+  'cutoutC3',
+  'cutoutD3',
+]
+
+export const STAGING_AREA_CUTOUTS: CutoutId[] = [
+  'cutoutA3',
+  'cutoutB3',
+  'cutoutC3',
+  'cutoutD3',
+]
+
+export const WASTE_CHUTE_CUTOUT: 'cutoutD3' = 'cutoutD3'
 
 export const A1_ADDRESSABLE_AREA: 'A1' = 'A1'
 export const A2_ADDRESSABLE_AREA: 'A2' = 'A2'
@@ -230,14 +265,42 @@ export const MOVABLE_TRASH_D1_ADDRESSABLE_AREA: 'movableTrashD1' =
 export const MOVABLE_TRASH_D3_ADDRESSABLE_AREA: 'movableTrashD3' =
   'movableTrashD3'
 
-export const ONE_AND_EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA: '1and8ChannelWasteChute' =
-  '1and8ChannelWasteChute'
+export const ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA: '1ChannelWasteChute' =
+  '1ChannelWasteChute'
+export const EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA: '8ChannelWasteChute' =
+  '8ChannelWasteChute'
 export const NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA: '96ChannelWasteChute' =
   '96ChannelWasteChute'
 export const GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA: 'gripperWasteChute' =
   'gripperWasteChute'
 
-export const FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS = [
+export const ADDRESSABLE_AREA_1: '1' = '1'
+export const ADDRESSABLE_AREA_2: '2' = '2'
+export const ADDRESSABLE_AREA_3: '3' = '3'
+export const ADDRESSABLE_AREA_4: '4' = '4'
+export const ADDRESSABLE_AREA_5: '5' = '5'
+export const ADDRESSABLE_AREA_6: '6' = '6'
+export const ADDRESSABLE_AREA_7: '7' = '7'
+export const ADDRESSABLE_AREA_8: '8' = '8'
+export const ADDRESSABLE_AREA_9: '9' = '9'
+export const ADDRESSABLE_AREA_10: '10' = '10'
+export const ADDRESSABLE_AREA_11: '11' = '11'
+
+export const OT2_SINGLE_SLOT_ADDRESSABLE_AREAS: AddressableAreaName[] = [
+  ADDRESSABLE_AREA_1,
+  ADDRESSABLE_AREA_2,
+  ADDRESSABLE_AREA_3,
+  ADDRESSABLE_AREA_4,
+  ADDRESSABLE_AREA_5,
+  ADDRESSABLE_AREA_6,
+  ADDRESSABLE_AREA_7,
+  ADDRESSABLE_AREA_8,
+  ADDRESSABLE_AREA_9,
+  ADDRESSABLE_AREA_10,
+  ADDRESSABLE_AREA_11,
+]
+
+export const FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   A1_ADDRESSABLE_AREA,
   A2_ADDRESSABLE_AREA,
   A3_ADDRESSABLE_AREA,
@@ -252,14 +315,14 @@ export const FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS = [
   D3_ADDRESSABLE_AREA,
 ]
 
-export const FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS = [
+export const FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   A4_ADDRESSABLE_AREA,
   B4_ADDRESSABLE_AREA,
   C4_ADDRESSABLE_AREA,
   D4_ADDRESSABLE_AREA,
 ]
 
-export const MOVABLE_TRASH_ADDRESSABLE_AREAS = [
+export const MOVABLE_TRASH_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   MOVABLE_TRASH_A1_ADDRESSABLE_AREA,
   MOVABLE_TRASH_A3_ADDRESSABLE_AREA,
   MOVABLE_TRASH_B1_ADDRESSABLE_AREA,
@@ -270,8 +333,9 @@ export const MOVABLE_TRASH_ADDRESSABLE_AREAS = [
   MOVABLE_TRASH_D3_ADDRESSABLE_AREA,
 ]
 
-export const WASTE_CHUTE_ADDRESSABLE_AREAS = [
-  ONE_AND_EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+export const WASTE_CHUTE_ADDRESSABLE_AREAS: AddressableAreaName[] = [
+  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
 ]
@@ -294,15 +358,27 @@ export const STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE: '
 export const STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE: 'stagingAreaSlotWithWasteChuteRightAdapterNoCover' =
   'stagingAreaSlotWithWasteChuteRightAdapterNoCover'
 
-export const SINGLE_SLOT_FIXTURES = [
+export const SINGLE_SLOT_FIXTURES: CutoutFixtureId[] = [
   SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_CENTER_SLOT_FIXTURE,
   SINGLE_RIGHT_SLOT_FIXTURE,
 ]
 
-export const WASTE_CHUTE_FIXTURES = [
+export const WASTE_CHUTE_FIXTURES: CutoutFixtureId[] = [
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 ]
+
+export const WASTE_CHUTE_ONLY_FIXTURES: CutoutFixtureId[] = [
+  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+]
+
+export const WASTE_CHUTE_STAGING_AREA_FIXTURES: CutoutFixtureId[] = [
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+]
+
+export const LOW_VOLUME_PIPETTES = ['p50_single_flex', 'p50_multi_flex']

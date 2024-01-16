@@ -22,7 +22,9 @@ from .instrument_calibration import (
 )
 from ..instrument_abc import AbstractInstrument
 from opentrons.hardware_control.dev_types import AttachedGripper, GripperDict
-from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
+from opentrons_shared_data.errors.exceptions import (
+    CommandPreconditionViolated,
+)
 
 from opentrons_shared_data.gripper import (
     GripperDefinition,
@@ -100,6 +102,10 @@ class Gripper(AbstractInstrument[GripperDefinition]):
     def remove_probe(self) -> None:
         assert self.attached_probe
         self._attached_probe = None
+
+    @property
+    def max_allowed_grip_error(self) -> float:
+        return self._geometry.max_allowed_grip_error
 
     @property
     def jaw_width(self) -> float:

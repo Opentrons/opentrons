@@ -6,7 +6,6 @@ import {
   StrokedWells,
   StaticLabware,
 } from './labwareInternals'
-import styles from './LabwareRender.css'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
@@ -46,18 +45,14 @@ export interface LabwareRenderProps {
   wellStroke?: WellStroke
   /** CSS color to stroke the labware outline */
   labwareStroke?: CSSProperties['stroke']
+  /** adds thicker blue border with blur to labware */
+  highlight?: boolean
   /** Optional callback, called with WellMouseEvent args onMouseEnter */
   onMouseEnterWell?: (e: WellMouseEvent) => unknown
   /** Optional callback, called with WellMouseEvent args onMouseLeave */
   onMouseLeaveWell?: (e: WellMouseEvent) => unknown
-  /** Special class which, together with 'data-wellname' on the well elements,
-    allows drag-to-select behavior */
-  selectableWellClass?: string
   gRef?: React.RefObject<SVGGElement>
-  // adds blue border with drop shadow to labware
-  hover?: boolean
   onLabwareClick?: () => void
-  highlightLabware?: boolean
 }
 
 export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
@@ -73,63 +68,61 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         definition={props.definition}
         onMouseEnterWell={props.onMouseEnterWell}
         onMouseLeaveWell={props.onMouseLeaveWell}
-        selectableWellClass={props.selectableWellClass}
-        hover={props.hover}
         onLabwareClick={props.onLabwareClick}
-        highlightLabware={props.highlightLabware}
+        highlight={props.highlight}
       />
-      {props.wellStroke && (
+      {props.wellStroke != null ? (
         <StrokedWells
           definition={props.definition}
           strokeByWell={props.wellStroke}
         />
-      )}
-      {props.wellFill && (
+      ) : null}
+      {props.wellFill != null ? (
         <FilledWells
           definition={props.definition}
           fillByWell={props.wellFill}
         />
-      )}
+      ) : null}
       {props.disabledWells != null
         ? props.disabledWells.map((well, index) => (
             <StyledWells
               key={index}
-              className={styles.disabled_well}
+              wellContents="disabledWell"
               definition={props.definition}
               wells={well}
             />
           ))
         : null}
-      {props.highlightedWells && (
+      {props.highlightedWells != null ? (
         <StyledWells
-          className={styles.highlighted_well}
+          wellContents="highlightedWell"
           definition={props.definition}
           wells={props.highlightedWells}
         />
-      )}
-      {props.selectedWells && (
+      ) : null}
+      {props.selectedWells != null ? (
         <StyledWells
-          className={styles.selected_well}
+          wellContents="selectedWell"
           definition={props.definition}
           wells={props.selectedWells}
         />
-      )}
-      {props.missingTips && (
+      ) : null}
+      {props.missingTips != null ? (
         <StyledWells
-          className={styles.missing_tip}
+          wellContents="tipMissing"
           definition={props.definition}
           wells={props.missingTips}
         />
-      )}
-      {props.wellLabelOption &&
-        props.definition.metadata.displayCategory !== 'adapter' && (
-          <WellLabels
-            definition={props.definition}
-            wellLabelOption={props.wellLabelOption}
-            wellLabelColor={props.wellLabelColor}
-            highlightedWellLabels={props.highlightedWellLabels}
-          />
-        )}
+      ) : null}
+      {props.wellLabelOption != null &&
+      props.definition.metadata.displayCategory !== 'adapter' ? (
+        <WellLabels
+          definition={props.definition}
+          wellLabelOption={props.wellLabelOption}
+          wellLabelColor={props.wellLabelColor}
+          highlightedWellLabels={props.highlightedWellLabels}
+        />
+      ) : null}
     </g>
   )
 }

@@ -3,14 +3,22 @@ from typing import Optional, Dict
 from typing_extensions import Protocol as TypingProtocol
 
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.types import FailedTipStateCheck
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
+    PythonException,
 )
 
-from ..resources import LabwareDataProvider
+from ..resources import LabwareDataProvider, ensure_ot3_hardware
 from ..state import StateView
-from ..types import TipGeometry
+from ..types import TipGeometry, TipPresenceStatus
+from ..errors import (
+    HardwareNotSupportedError,
+    TipNotAttachedError,
+    TipAttachedError,
+    ProtocolEngineError,
+)
 
 
 PRIMARY_NOZZLE_TO_ENDING_NOZZLE_MAP = {
@@ -62,6 +70,55 @@ class TipHandler(TypingProtocol):
     async def add_tip(self, pipette_id: str, tip: TipGeometry) -> None:
         """Tell the Hardware API that a tip is attached."""
 
+    async def get_tip_presence(self, pipette_id: str) -> TipPresenceStatus:
+        """Get tip presence status on the pipette."""
+
+    async def verify_tip_presence(
+        self, pipette_id: str, expected: TipPresenceStatus
+    ) -> None:
+        """Verify the expected tip presence status."""
+
+
+async def _available_for_nozzle_layout(
+    channels: int,
+    style: str,
+    primary_nozzle: Optional[str],
+    front_right_nozzle: Optional[str],
+) -> Dict[str, str]:
+    """Check nozzle layout is compatible with the pipette.
+
+    Returns:
+        A dict of nozzles used to configure the pipette.
+    """
+    if channels == 1:
+        raise CommandPreconditionViolated(
+            message=f"Cannot configure nozzle layout with a {channels} channel pipette."
+        )
+    if style == "ALL":
+        return {}
+    if style == "ROW" and channels == 8:
+        raise CommandParameterLimitViolated(
+            command_name="configure_nozzle_layout",
+            parameter_name="RowNozzleLayout",
+            limit_statement="RowNozzleLayout is incompatible with {channels} channel pipettes.",
+            actual_value=str(primary_nozzle),
+        )
+    if not primary_nozzle:
+        return {"primary_nozzle": "A1"}
+    if style == "SINGLE":
+        return {"primary_nozzle": primary_nozzle}
+    if not front_right_nozzle:
+        return {
+            "primary_nozzle": primary_nozzle,
+            "front_right_nozzle": PRIMARY_NOZZLE_TO_ENDING_NOZZLE_MAP[primary_nozzle][
+                style
+            ],
+        }
+    return {
+        "primary_nozzle": primary_nozzle,
+        "front_right_nozzle": front_right_nozzle,
+    }
+
 
 class HardwareTipHandler(TipHandler):
     """Pick up and drop tips, using the Hardware API."""
@@ -72,9 +129,9 @@ class HardwareTipHandler(TipHandler):
         hardware_api: HardwareControlAPI,
         labware_data_provider: Optional[LabwareDataProvider] = None,
     ) -> None:
-        self._state_view = state_view
         self._hardware_api = hardware_api
         self._labware_data_provider = labware_data_provider or LabwareDataProvider()
+        self._state_view = state_view
 
     async def available_for_nozzle_layout(
         self,
@@ -83,40 +140,15 @@ class HardwareTipHandler(TipHandler):
         primary_nozzle: Optional[str] = None,
         front_right_nozzle: Optional[str] = None,
     ) -> Dict[str, str]:
-        """Check nozzle layout is compatible with the pipette."""
+        """Returns configuration for nozzle layout to pass to configure_nozzle_layout."""
         if self._state_view.pipettes.get_attached_tip(pipette_id):
             raise CommandPreconditionViolated(
                 message=f"Cannot configure nozzle layout of {str(self)} while it has tips attached."
             )
         channels = self._state_view.pipettes.get_channels(pipette_id)
-        if channels == 1:
-            raise CommandPreconditionViolated(
-                message=f"Cannot configure nozzle layout with a {channels} channel pipette."
-            )
-        if style == "EMPTY":
-            return {}
-        if style == "ROW" and channels == 8:
-            raise CommandParameterLimitViolated(
-                command_name="configure_nozzle_layout",
-                parameter_name="RowNozzleLayout",
-                limit_statement="RowNozzleLayout is incompatible with {channels} channel pipettes.",
-                actual_value=str(primary_nozzle),
-            )
-        if not primary_nozzle:
-            return {"primary_nozzle": "A1"}
-        if style == "SINGLE":
-            return {"primary_nozzle": primary_nozzle}
-        if not front_right_nozzle:
-            return {
-                "primary_nozzle": primary_nozzle,
-                "front_right_nozzle": PRIMARY_NOZZLE_TO_ENDING_NOZZLE_MAP[
-                    primary_nozzle
-                ][style],
-            }
-        return {
-            "primary_nozzle": primary_nozzle,
-            "front_right_nozzle": front_right_nozzle,
-        }
+        return await _available_for_nozzle_layout(
+            channels, style, primary_nozzle, front_right_nozzle
+        )
 
     async def pick_up_tip(
         self,
@@ -143,6 +175,7 @@ class HardwareTipHandler(TipHandler):
             presses=None,
             increment=None,
         )
+        await self.verify_tip_presence(pipette_id, TipPresenceStatus.PRESENT)
 
         self._hardware_api.set_current_tiprack_diameter(
             mount=hw_mount,
@@ -172,6 +205,7 @@ class HardwareTipHandler(TipHandler):
             kwargs = {}
 
         await self._hardware_api.drop_tip(mount=hw_mount, **kwargs)
+        await self.verify_tip_presence(pipette_id, TipPresenceStatus.ABSENT)
 
     async def add_tip(self, pipette_id: str, tip: TipGeometry) -> None:
         """Tell the Hardware API that a tip is attached."""
@@ -189,54 +223,51 @@ class HardwareTipHandler(TipHandler):
             tip_volume=tip.volume,
         )
 
+    async def get_tip_presence(self, pipette_id: str) -> TipPresenceStatus:
+        """Get the tip presence status of the pipette."""
+        try:
+            ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
+
+            hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
+
+            status = await ot3api.get_tip_presence_status(hw_mount)
+            return TipPresenceStatus.from_hw_state(status)
+        except HardwareNotSupportedError:
+            # Tip presence sensing is not supported on the OT2
+            return TipPresenceStatus.UNKNOWN
+
+    async def verify_tip_presence(
+        self, pipette_id: str, expected: TipPresenceStatus
+    ) -> None:
+        """Verify the expecterd tip presence status of the pipette.
+
+        This function will raise an exception if the specified tip presence status
+        isn't matched.
+        """
+        try:
+            ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
+            hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
+            await ot3api.verify_tip_presence(hw_mount, expected.to_hw_state())
+        except HardwareNotSupportedError:
+            # Tip presence sensing is not supported on the OT2
+            pass
+        except FailedTipStateCheck as e:
+            if expected == TipPresenceStatus.ABSENT:
+                raise TipAttachedError(wrapping=[PythonException(e)])
+            elif expected == TipPresenceStatus.PRESENT:
+                raise TipNotAttachedError(wrapping=[PythonException(e)])
+            else:
+                raise ProtocolEngineError(
+                    message="Unknown tip status in tip status check",
+                    wrapping=[PythonException(e)],
+                )
+
 
 class VirtualTipHandler(TipHandler):
     """Pick up and drop tips, using a virtual pipette."""
 
     def __init__(self, state_view: StateView) -> None:
         self._state_view = state_view
-
-    async def available_for_nozzle_layout(
-        self,
-        pipette_id: str,
-        style: str,
-        primary_nozzle: Optional[str] = None,
-        front_right_nozzle: Optional[str] = None,
-    ) -> Dict[str, str]:
-        """Check nozzle layout is compatible with the pipette."""
-        if self._state_view.pipettes.get_attached_tip(pipette_id):
-            raise CommandPreconditionViolated(
-                message=f"Cannot configure nozzle layout of {str(self)} while it has tips attached."
-            )
-        channels = self._state_view.pipettes.get_channels(pipette_id)
-        if channels == 1:
-            raise CommandPreconditionViolated(
-                message=f"Cannot configure nozzle layout with a {channels} channel pipette."
-            )
-        if style == "EMPTY":
-            return {}
-        if style == "ROW" and channels == 8:
-            raise CommandParameterLimitViolated(
-                command_name="configure_nozzle_layout",
-                parameter_name="RowNozzleLayout",
-                limit_statement="RowNozzleLayout is incompatible with {channels} channel pipettes.",
-                actual_value=str(primary_nozzle),
-            )
-        if not primary_nozzle:
-            return {"primary_nozzle": "A1"}
-        if style == "SINGLE":
-            return {"primary_nozzle": primary_nozzle}
-        if not front_right_nozzle:
-            return {
-                "primary_nozzle": primary_nozzle,
-                "front_right_nozzle": PRIMARY_NOZZLE_TO_ENDING_NOZZLE_MAP[
-                    primary_nozzle
-                ][style],
-            }
-        return {
-            "primary_nozzle": primary_nozzle,
-            "front_right_nozzle": front_right_nozzle,
-        }
 
     async def pick_up_tip(
         self,
@@ -262,6 +293,23 @@ class VirtualTipHandler(TipHandler):
 
         return nominal_tip_geometry
 
+    async def available_for_nozzle_layout(
+        self,
+        pipette_id: str,
+        style: str,
+        primary_nozzle: Optional[str] = None,
+        front_right_nozzle: Optional[str] = None,
+    ) -> Dict[str, str]:
+        """Returns configuration for nozzle layout to pass to configure_nozzle_layout."""
+        if self._state_view.pipettes.get_attached_tip(pipette_id):
+            raise CommandPreconditionViolated(
+                message=f"Cannot configure nozzle layout of {str(self)} while it has tips attached."
+            )
+        channels = self._state_view.pipettes.get_channels(pipette_id)
+        return await _available_for_nozzle_layout(
+            channels, style, primary_nozzle, front_right_nozzle
+        )
+
     async def drop_tip(
         self,
         pipette_id: str,
@@ -282,6 +330,22 @@ class VirtualTipHandler(TipHandler):
         This should not be called when using virtual pipettes.
         """
         assert False, "TipHandler.add_tip should not be used with virtual pipettes"
+
+    async def verify_tip_presence(
+        self, pipette_id: str, expected: TipPresenceStatus
+    ) -> None:
+        """Verify tip presence.
+
+        This should not be called when using virtual pipettes.
+        """
+
+    async def get_tip_presence(self, pipette_id: str) -> TipPresenceStatus:
+        """Get tip presence.
+
+        This is a check to the physical machine's sensors  and should not be
+        called on a virtual pipette.
+        """
+        raise RuntimeError("Do not call VirtualTipHandler.get_tip_presence")
 
 
 def create_tip_handler(

@@ -14,6 +14,7 @@ import type {
   ModuleModel,
   PipetteNameSpecs,
   PipetteName,
+  NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
   AtomicProfileStep,
@@ -40,6 +41,7 @@ export interface LabwareTemporalProperties {
 
 export interface PipetteTemporalProperties {
   mount: Mount
+  nozzles?: NozzleConfigurationStyle
 }
 
 export interface MagneticModuleState {
@@ -112,7 +114,7 @@ export interface NormalizedPipetteById {
 
 export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
-    name: 'gripper' | 'wasteChute' | 'stagingArea'
+    name: 'gripper' | 'wasteChute' | 'stagingArea' | 'trashBin'
     id: string
     location?: string
   }
@@ -165,7 +167,7 @@ interface CommonArgs {
 
 export type SharedTransferLikeArgs = CommonArgs & {
   pipette: string // PipetteId
-
+  nozzles: NozzleConfigurationStyle | null // setting for 96-channel
   sourceLabware: string
   destLabware: string
   /** volume is interpreted differently by different Step types */
@@ -209,7 +211,7 @@ export type ConsolidateArgs = SharedTransferLikeArgs & {
   commandCreatorFnName: 'consolidate'
 
   sourceWells: string[]
-  destWell: string
+  destWell: string | null
 
   /** If given, blow out in the specified destination after dispense at the end of each asp-asp-dispense cycle */
   blowoutLocation: string | null | undefined
@@ -226,7 +228,7 @@ export type TransferArgs = SharedTransferLikeArgs & {
   commandCreatorFnName: 'transfer'
 
   sourceWells: string[]
-  destWells: string[]
+  destWells: string[] | null
 
   /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
   blowoutLocation: string | null | undefined
@@ -261,6 +263,7 @@ export type MixArgs = CommonArgs & {
   commandCreatorFnName: 'mix'
   labware: string
   pipette: string
+  nozzles: NozzleConfigurationStyle | null // setting for 96-channel
   wells: string[]
   /** Mix volume (should not exceed pipette max) */
   volume: number
@@ -486,12 +489,18 @@ export interface RobotState {
         [well: string]: LocationLiquidState
       }
     }
+    additionalEquipment: {
+      /** for the waste chute and trash bin */
+      [additionalEquipmentId: string]: LocationLiquidState
+    }
   }
 }
 
 export type ErrorType =
-  | 'ADDITIONAL_EQUIPMENT_DOES_NOT_EXIST'
+  | 'CANNOT_MOVE_WITH_GRIPPER'
   | 'DROP_TIP_LOCATION_DOES_NOT_EXIST'
+  | 'EQUIPMENT_DOES_NOT_EXIST'
+  | 'GRIPPER_REQUIRED'
   | 'HEATER_SHAKER_EAST_WEST_LATCH_OPEN'
   | 'HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL'
   | 'HEATER_SHAKER_IS_SHAKING'
@@ -511,7 +520,10 @@ export type ErrorType =
   | 'NO_TIP_ON_PIPETTE'
   | 'PIPETTE_DOES_NOT_EXIST'
   | 'PIPETTE_VOLUME_EXCEEDED'
+  | 'PIPETTING_INTO_COLUMN_4'
+  | 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER'
   | 'TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER'
+  | 'TALL_LABWARE_WEST_OF_96_CHANNEL_LABWARE'
   | 'THERMOCYCLER_LID_CLOSED'
   | 'TIP_VOLUME_EXCEEDED'
 

@@ -16,6 +16,8 @@ import serial  # type: ignore[import]
 from serial.serialutil import SerialException  # type: ignore[import]
 from hardware_testing.data import ui
 
+from serial.tools.list_ports import comports  # type: ignore[import]
+
 log = logging.getLogger(__name__)
 
 USB_VID = 0x0403
@@ -72,17 +74,32 @@ class AsairSensorBase(ABC):
         ...
 
 
-def BuildAsairSensor(simulate: bool) -> AsairSensorBase:
+def BuildAsairSensor(simulate: bool, autosearch: bool = True) -> AsairSensorBase:
     """Try to find and return an Asair sensor, if not found return a simulator."""
     ui.print_title("Connecting to Environmental sensor")
     if not simulate:
-        port = list_ports_and_select(device_name="Asair environmental sensor")
-        try:
+        if not autosearch:
+            port = list_ports_and_select(device_name="Asair environmental sensor")
             sensor = AsairSensor.connect(port)
             ui.print_info(f"Found sensor on port {port}")
             return sensor
-        except SerialException:
-            pass
+        else:
+            ports = comports()
+            assert ports
+            for _port in ports:
+                port = _port.device  # type: ignore[attr-defined]
+                try:
+                    ui.print_info(f"Trying to connect to env sensor on port {port}")
+                    sensor = AsairSensor.connect(port)
+                    ser_id = sensor.get_serial()
+                    ui.print_info(f"Found env sensor {ser_id} on port {port}")
+                    return sensor
+                except:  # noqa: E722
+                    pass
+            use_sim = ui.get_user_answer("No env sensor found, use simulator?")
+            if not use_sim:
+                raise SerialException("No sensor found")
+    ui.print_info("no sensor found returning simulator")
     return SimAsairSensor()
 
 
@@ -168,8 +185,9 @@ class AsairSensor(AsairSensorBase):
 
     def get_serial(self) -> str:
         """Read the device ID register."""
-        serial_addr = "0A"
-        data_packet = "{}0300000002{}".format(serial_addr, addrs[serial_addr])
+        data_packet = "{}0300000002{}".format(
+            self._sensor_address, addrs[self._sensor_address]
+        )
         log.debug(f"sending {data_packet}")
         command_bytes = codecs.decode(data_packet.encode(), "hex")
         try:
@@ -180,6 +198,7 @@ class AsairSensor(AsairSensorBase):
 
             length = self._th_sensor.inWaiting()
             res = self._th_sensor.read(length)
+            res = codecs.encode(res, "hex")
             log.debug(f"received {res}")
             dev_id = res[6:14]
             return dev_id.decode()

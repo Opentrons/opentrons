@@ -15,8 +15,16 @@ export type FlexAddressableAreaName =
   | 'B4'
   | 'C4'
   | 'D4'
-  | 'movableTrash'
-  | '1and8ChannelWasteChute'
+  | 'movableTrashA1'
+  | 'movableTrashA3'
+  | 'movableTrashB1'
+  | 'movableTrashB3'
+  | 'movableTrashC1'
+  | 'movableTrashC3'
+  | 'movableTrashD1'
+  | 'movableTrashD3'
+  | '1ChannelWasteChute'
+  | '8ChannelWasteChute'
   | '96ChannelWasteChute'
   | 'gripperWasteChute'
 
@@ -32,6 +40,7 @@ export type OT2AddressableAreaName =
   | '9'
   | '10'
   | '11'
+  | '12'
   | 'fixedTrash'
 
 export type AddressableAreaName =
@@ -52,10 +61,26 @@ export type CutoutId =
   | 'cutoutA2'
   | 'cutoutA3'
 
+export type OT2CutoutId =
+  | 'cutout1'
+  | 'cutout2'
+  | 'cutout3'
+  | 'cutout4'
+  | 'cutout5'
+  | 'cutout6'
+  | 'cutout7'
+  | 'cutout8'
+  | 'cutout9'
+  | 'cutout10'
+  | 'cutout11'
+  | 'cutout12'
+
 export type SingleSlotCutoutFixtureId =
   | 'singleLeftSlot'
   | 'singleCenterSlot'
   | 'singleRightSlot'
+
+export type StagingAreaRightSlotFixtureId = 'stagingAreaRightSlot'
 
 export type TrashBinAdapterCutoutFixtureId = 'trashBinAdapter'
 
@@ -65,7 +90,14 @@ export type WasteChuteCutoutFixtureId =
   | 'stagingAreaSlotWithWasteChuteRightAdapterCovered'
   | 'stagingAreaSlotWithWasteChuteRightAdapterNoCover'
 
+export type OT2SingleStandardSlot = 'singleStandardSlot'
+
+export type OT2FixedTrashSlot = 'fixedTrashSlot'
+
 export type CutoutFixtureId =
   | SingleSlotCutoutFixtureId
+  | StagingAreaRightSlotFixtureId
   | TrashBinAdapterCutoutFixtureId
   | WasteChuteCutoutFixtureId
+  | OT2SingleStandardSlot
+  | OT2FixedTrashSlot

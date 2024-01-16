@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
-import '@testing-library/jest-dom'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -69,7 +68,7 @@ describe('GeneralSettings', () => {
     expect(
       getByRole('link', {
         name:
-          'Learn more about keeping the Opentrons app and robot software in sync',
+          'Learn more about keeping the Opentrons App and robot software in sync',
       })
     ).toHaveAttribute('href', 'https://support.opentrons.com/s/')
   })

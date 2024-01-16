@@ -20,7 +20,7 @@ from opentrons.protocols.api_support.deck_type import (
     STANDARD_OT3_DECK,
 )
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.types import DeckSlotName, Point, MountType
+from opentrons.types import DeckSlotName, MountType
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
@@ -34,6 +34,7 @@ from opentrons.protocol_engine.types import (
     ModuleLocation,
     OnLabwareLocation,
     LabwareLocation,
+    AddressableAreaLocation,
     OFF_DECK_LOCATION,
     OverlapOffset,
     LabwareMovementOffsetData,
@@ -805,45 +806,6 @@ def test_get_deck_definition(ot2_standard_deck_def: DeckDefinitionV4) -> None:
     assert subject.get_deck_definition() == ot2_standard_deck_def
 
 
-def test_get_slot_definition(ot2_standard_deck_def: DeckDefinitionV4) -> None:
-    """It should return a deck slot's definition."""
-    subject = get_labware_view(deck_definition=ot2_standard_deck_def)
-
-    result = subject.get_slot_definition(DeckSlotName.SLOT_6)
-
-    assert result["id"] == "6"
-    assert result["displayName"] == "Slot 6"
-
-
-def test_get_slot_definition_raises_with_bad_slot_name(
-    ot2_standard_deck_def: DeckDefinitionV4,
-) -> None:
-    """It should raise a SlotDoesNotExistError if a bad slot name is given."""
-    subject = get_labware_view(deck_definition=ot2_standard_deck_def)
-
-    with pytest.raises(errors.SlotDoesNotExistError):
-        subject.get_slot_definition(DeckSlotName.SLOT_A1)
-
-
-def test_get_slot_position(ot2_standard_deck_def: DeckDefinitionV4) -> None:
-    """It should get the absolute location of a deck slot's origin."""
-    subject = get_labware_view(deck_definition=ot2_standard_deck_def)
-
-    expected_position = Point(x=132.5, y=90.5, z=0.0)
-    result = subject.get_slot_position(DeckSlotName.SLOT_5)
-
-    assert result == expected_position
-
-
-def test_get_slot_center_position(ot2_standard_deck_def: DeckDefinitionV4) -> None:
-    """It should get the absolute location of a deck slot's center."""
-    subject = get_labware_view(deck_definition=ot2_standard_deck_def)
-
-    expected_center = Point(x=196.5, y=43.0, z=0.0)
-    result = subject.get_slot_center_position(DeckSlotName.SLOT_2)
-    assert result == expected_center
-
-
 def test_get_labware_offset_vector() -> None:
     """It should get a labware's offset vector."""
     labware_without_offset = LoadedLabware(
@@ -1023,7 +985,7 @@ def test_find_applicable_labware_offset() -> None:
     )
 
 
-def test_get_display_name() -> None:
+def test_get_user_specified_display_name() -> None:
     """It should get a labware's user-specified display name."""
     subject = get_labware_view(
         labware_by_id={
@@ -1032,8 +994,38 @@ def test_get_display_name() -> None:
         },
     )
 
-    assert subject.get_display_name("plate_with_display_name") == "Fancy Plate Name"
-    assert subject.get_display_name("reservoir_without_display_name") is None
+    assert (
+        subject.get_user_specified_display_name("plate_with_display_name")
+        == "Fancy Plate Name"
+    )
+    assert (
+        subject.get_user_specified_display_name("reservoir_without_display_name")
+        is None
+    )
+
+
+def test_get_display_name(
+    well_plate_def: LabwareDefinition,
+    reservoir_def: LabwareDefinition,
+) -> None:
+    """It should get the labware's display name."""
+    subject = get_labware_view(
+        labware_by_id={
+            "plate_with_custom_display_name": plate,
+            "reservoir_with_default_display_name": reservoir,
+        },
+        definitions_by_uri={
+            "some-plate-uri": well_plate_def,
+            "some-reservoir-uri": reservoir_def,
+        },
+    )
+    assert (
+        subject.get_display_name("plate_with_custom_display_name") == "Fancy Plate Name"
+    )
+    assert (
+        subject.get_display_name("reservoir_with_default_display_name")
+        == "NEST 12 Well Reservoir 15 mL"
+    )
 
 
 def test_get_fixed_trash_id() -> None:
@@ -1144,41 +1136,9 @@ def test_get_by_slot() -> None:
         labware_by_id={"1": labware_1, "2": labware_2, "3": labware_3}
     )
 
-    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1", "2"}) == labware_1
-    assert subject.get_by_slot(DeckSlotName.SLOT_2, {"1", "2"}) == labware_2
-    assert subject.get_by_slot(DeckSlotName.SLOT_3, {"1", "2"}) is None
-
-
-def test_get_by_slot_prefers_later() -> None:
-    """It should get the labware in a slot, preferring later items if locations match."""
-    labware_1 = LoadedLabware.construct(  # type: ignore[call-arg]
-        id="1", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
-    )
-    labware_1_again = LoadedLabware.construct(  # type: ignore[call-arg]
-        id="1-again", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
-    )
-
-    subject = get_labware_view(
-        labware_by_id={"1": labware_1, "1-again": labware_1_again}
-    )
-
-    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1", "1-again"}) == labware_1_again
-
-
-def test_get_by_slot_filter_ids() -> None:
-    """It should filter labwares in the same slot using IDs."""
-    labware_1 = LoadedLabware.construct(  # type: ignore[call-arg]
-        id="1", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
-    )
-    labware_1_again = LoadedLabware.construct(  # type: ignore[call-arg]
-        id="1-again", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
-    )
-
-    subject = get_labware_view(
-        labware_by_id={"1": labware_1, "1-again": labware_1_again}
-    )
-
-    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1"}) == labware_1
+    assert subject.get_by_slot(DeckSlotName.SLOT_1) == labware_1
+    assert subject.get_by_slot(DeckSlotName.SLOT_2) == labware_2
+    assert subject.get_by_slot(DeckSlotName.SLOT_3) is None
 
 
 @pytest.mark.parametrize(
@@ -1265,6 +1225,67 @@ def test_get_all_labware_definition_empty() -> None:
     result = subject.get_loaded_labware_definitions()
 
     assert result == []
+
+
+def test_raise_if_labware_inaccessible_by_pipette_staging_area() -> None:
+    """It should raise if the labware is on a staging slot."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="def-uri",
+                location=AddressableAreaLocation(addressableAreaName="B4"),
+            )
+        },
+    )
+
+    with pytest.raises(
+        errors.LocationNotAccessibleByPipetteError, match="on staging slot"
+    ):
+        subject.raise_if_labware_inaccessible_by_pipette("labware-id")
+
+
+def test_raise_if_labware_inaccessible_by_pipette_off_deck() -> None:
+    """It should raise if the labware is off-deck."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="def-uri",
+                location=OFF_DECK_LOCATION,
+            )
+        },
+    )
+
+    with pytest.raises(errors.LocationNotAccessibleByPipetteError, match="off-deck"):
+        subject.raise_if_labware_inaccessible_by_pipette("labware-id")
+
+
+def test_raise_if_labware_inaccessible_by_pipette_stacked_labware_on_staging_area() -> None:
+    """It should raise if the labware is stacked on a staging slot."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="def-uri",
+                location=OnLabwareLocation(labwareId="lower-labware-id"),
+            ),
+            "lower-labware-id": LoadedLabware(
+                id="lower-labware-id",
+                loadName="test",
+                definitionUri="def-uri",
+                location=AddressableAreaLocation(addressableAreaName="B4"),
+            ),
+        },
+    )
+
+    with pytest.raises(
+        errors.LocationNotAccessibleByPipetteError, match="on staging slot"
+    ):
+        subject.raise_if_labware_inaccessible_by_pipette("labware-id")
 
 
 def test_raise_if_labware_cannot_be_stacked_is_adapter() -> None:
@@ -1388,7 +1409,7 @@ def test_get_deck_gripper_offsets(ot3_standard_deck_def: DeckDefinitionV4) -> No
 
     assert subject.get_deck_default_gripper_offsets() == LabwareMovementOffsetData(
         pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
-        dropOffset=LabwareOffsetVector(x=0, y=0, z=-0.25),
+        dropOffset=LabwareOffsetVector(x=0, y=0, z=-0.75),
     )
 
 

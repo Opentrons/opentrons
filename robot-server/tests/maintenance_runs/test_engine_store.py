@@ -106,7 +106,7 @@ async def test_clear_engine(subject: MaintenanceEngineStore) -> None:
     await subject.create(
         run_id="run-id", labware_offsets=[], created_at=datetime(2023, 5, 1)
     )
-    await subject.runner.run()
+    await subject.runner.run(deck_configuration=[])
     result = await subject.clear()
 
     assert subject.current_run_id is None

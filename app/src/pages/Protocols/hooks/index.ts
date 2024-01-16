@@ -6,16 +6,25 @@ import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-import { STANDARD_SLOT_LOAD_NAME } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
+  SINGLE_SLOT_FIXTURES,
+  getCutoutIdForSlotName,
+  getDeckDefFromRobotType,
+} from '@opentrons/shared-data'
 import { getLabwareSetupItemGroups } from '../utils'
 import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
+import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
 
 import type {
   CompletedProtocolAnalysis,
-  Cutout,
-  FixtureLoadName,
+  CutoutFixtureId,
+  CutoutId,
   ModuleModel,
   PipetteName,
+  ProtocolAnalysisOutput,
+  RobotType,
 } from '@opentrons/shared-data'
 import type { LabwareSetupItem } from '../utils'
 import type { AttachedModule } from '@opentrons/api-client'
@@ -42,8 +51,8 @@ interface ProtocolGripper {
 
 export interface ProtocolFixture {
   hardwareType: 'fixture'
-  fixtureName: FixtureLoadName
-  location: { cutout: Cutout }
+  cutoutFixtureId: CutoutFixtureId | null
+  location: { cutout: CutoutId }
   hasSlotConflict: boolean
 }
 
@@ -53,8 +62,10 @@ export type ProtocolHardware =
   | ProtocolGripper
   | ProtocolFixture
 
+const DECK_CONFIG_REFETCH_INTERVAL = 5000
+
 export const useRequiredProtocolHardwareFromAnalysis = (
-  analysis?: CompletedProtocolAnalysis | null
+  analysis: CompletedProtocolAnalysis | null
 ): { requiredProtocolHardware: ProtocolHardware[]; isLoading: boolean } => {
   const {
     data: attachedModulesData,
@@ -68,7 +79,15 @@ export const useRequiredProtocolHardwareFromAnalysis = (
   } = useInstrumentsQuery()
   const attachedInstruments = attachedInstrumentsData?.data ?? []
 
-  const { data: deckConfig } = useDeckConfigurationQuery()
+  const robotType = FLEX_ROBOT_TYPE
+  const deckDef = getDeckDefFromRobotType(robotType)
+  const { data: deckConfig = [] } = useDeckConfigurationQuery({
+    refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
+  })
+  const deckConfigCompatibility = useDeckConfigurationCompatibility(
+    robotType,
+    analysis
+  )
 
   if (analysis == null || analysis?.status !== 'completed') {
     return { requiredProtocolHardware: [], isLoading: true }
@@ -103,10 +122,11 @@ export const useRequiredProtocolHardwareFromAnalysis = (
         moduleModel: model,
         slot: location.slotName,
         connected: handleModuleConnectionCheckFor(attachedModules, model),
-        hasSlotConflict: !!deckConfig?.find(
-          fixture =>
-            fixture.fixtureLocation === location.slotName &&
-            fixture.loadName !== STANDARD_SLOT_LOAD_NAME
+        hasSlotConflict: deckConfig.some(
+          ({ cutoutId, cutoutFixtureId }) =>
+            cutoutId === getCutoutIdForSlotName(location.slotName, deckDef) &&
+            cutoutFixtureId != null &&
+            !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
         ),
       }
     }
@@ -128,48 +148,35 @@ export const useRequiredProtocolHardwareFromAnalysis = (
     })
   )
 
-  //  TODO(jr, 10/2/23): IMMEDIATELY delete the stubs when api supports
-  //  loadFixture
-  // const requiredFixture: ProtocolFixture[] = analysis.commands
-  //   .filter(
-  //     (command): command is LoadFixtureRunTimeCommand =>
-  //       command.commandType === 'loadFixture'
-  //   )
-  //   .map(({ params }) => {
-  //     return {
-  //       hardwareType: 'fixture',
-  //       fixtureName: params.loadName,
-  //       location: params.location,
-  //     }
-  //   })
-  const STUBBED_FIXTURES: ProtocolFixture[] = [
-    {
-      hardwareType: 'fixture',
-      fixtureName: 'wasteChute',
-      location: { cutout: 'cutoutD3' },
-      hasSlotConflict: false,
-    },
-    {
-      hardwareType: 'fixture',
-      fixtureName: 'standardSlot',
-      location: { cutout: 'cutoutC3' },
-      hasSlotConflict: false,
-    },
-    {
-      hardwareType: 'fixture',
-      fixtureName: 'stagingArea',
-      location: { cutout: 'cutoutB3' },
-      hasSlotConflict: false,
-    },
-  ]
+  // fixture includes at least 1 required addressableArea AND it doesn't ONLY include a single slot addressableArea
+  const requiredDeckConfigCompatibility = deckConfigCompatibility.filter(
+    ({ requiredAddressableAreas }) => {
+      const atLeastOneAA = requiredAddressableAreas.length > 0
+      const notOnlySingleSlot = !(
+        requiredAddressableAreas.length === 1 &&
+        FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS.includes(requiredAddressableAreas[0])
+      )
+      return atLeastOneAA && notOnlySingleSlot
+    }
+  )
+
+  const requiredFixtures = requiredDeckConfigCompatibility.map(
+    ({ cutoutFixtureId, cutoutId, compatibleCutoutFixtureIds }) => ({
+      hardwareType: 'fixture' as const,
+      cutoutFixtureId: compatibleCutoutFixtureIds[0],
+      location: { cutout: cutoutId },
+      hasSlotConflict:
+        cutoutFixtureId != null &&
+        !compatibleCutoutFixtureIds.includes(cutoutFixtureId),
+    })
+  )
 
   return {
     requiredProtocolHardware: [
       ...requiredPipettes,
       ...requiredModules,
       ...requiredGripper,
-      // ...requiredFixture,
-      ...STUBBED_FIXTURES,
+      ...requiredFixtures,
     ],
     isLoading: isLoadingInstruments || isLoadingModules,
   }
@@ -192,7 +199,7 @@ export const useRequiredProtocolHardware = (
     { enabled: protocolData != null }
   )
 
-  return useRequiredProtocolHardwareFromAnalysis(analysis)
+  return useRequiredProtocolHardwareFromAnalysis(analysis ?? null)
 }
 
 /**
@@ -229,29 +236,38 @@ export const useRequiredProtocolLabware = (
 
 const useMissingProtocolHardwareFromRequiredProtocolHardware = (
   requiredProtocolHardware: ProtocolHardware[],
-  isLoading: boolean
+  isLoading: boolean,
+  robotType: RobotType,
+  protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
 ): {
   missingProtocolHardware: ProtocolHardware[]
   conflictedSlots: string[]
   isLoading: boolean
 } => {
-  const { data: deckConfig } = useDeckConfigurationQuery()
+  const deckConfigCompatibility = useDeckConfigurationCompatibility(
+    robotType,
+    protocolAnalysis
+  )
 
   // determine missing or conflicted hardware
   return {
-    missingProtocolHardware: requiredProtocolHardware.filter(hardware => {
-      if ('connected' in hardware) {
-        // instruments and modules
-        return !hardware.connected
-      } else {
-        // fixtures
-        return !deckConfig?.find(
-          fixture =>
-            hardware.location.cutout === fixture.fixtureLocation &&
-            hardware.fixtureName === fixture.loadName
+    missingProtocolHardware: [
+      ...requiredProtocolHardware.filter(
+        hardware => 'connected' in hardware && !hardware.connected
+      ),
+      ...deckConfigCompatibility
+        .filter(
+          ({ cutoutFixtureId, compatibleCutoutFixtureIds }) =>
+            cutoutFixtureId != null &&
+            !compatibleCutoutFixtureIds.some(id => id === cutoutFixtureId)
         )
-      }
-    }),
+        .map(({ compatibleCutoutFixtureIds, cutoutId }) => ({
+          hardwareType: 'fixture' as const,
+          cutoutFixtureId: compatibleCutoutFixtureIds[0],
+          location: { cutout: cutoutId },
+          hasSlotConflict: true,
+        })),
+    ],
     conflictedSlots: requiredProtocolHardware
       .filter(
         (hardware): hardware is ProtocolModule | ProtocolFixture =>
@@ -270,7 +286,8 @@ const useMissingProtocolHardwareFromRequiredProtocolHardware = (
 }
 
 export const useMissingProtocolHardwareFromAnalysis = (
-  analysis?: CompletedProtocolAnalysis | null
+  robotType: RobotType,
+  analysis: CompletedProtocolAnalysis | null
 ): {
   missingProtocolHardware: ProtocolHardware[]
   conflictedSlots: string[]
@@ -283,7 +300,9 @@ export const useMissingProtocolHardwareFromAnalysis = (
 
   return useMissingProtocolHardwareFromRequiredProtocolHardware(
     requiredProtocolHardware,
-    isLoading
+    isLoading,
+    robotType,
+    analysis ?? null
   )
 }
 
@@ -294,12 +313,21 @@ export const useMissingProtocolHardware = (
   conflictedSlots: string[]
   isLoading: boolean
 } => {
-  const { requiredProtocolHardware, isLoading } = useRequiredProtocolHardware(
-    protocolId
+  const { data: protocolData } = useProtocolQuery(protocolId)
+  const { data: analysis } = useProtocolAnalysisAsDocumentQuery(
+    protocolId,
+    last(protocolData?.data.analysisSummaries)?.id ?? null,
+    { enabled: protocolData != null }
   )
+  const {
+    requiredProtocolHardware,
+    isLoading,
+  } = useRequiredProtocolHardwareFromAnalysis(analysis ?? null)
 
   return useMissingProtocolHardwareFromRequiredProtocolHardware(
     requiredProtocolHardware,
-    isLoading
+    isLoading,
+    FLEX_ROBOT_TYPE,
+    analysis ?? null
   )
 }

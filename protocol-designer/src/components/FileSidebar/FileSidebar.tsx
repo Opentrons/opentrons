@@ -34,7 +34,7 @@ import type {
 
 export interface AdditionalEquipment {
   [additionalEquipmentId: string]: {
-    name: 'gripper' | 'wasteChute' | 'stagingArea'
+    name: 'gripper' | 'wasteChute' | 'stagingArea' | 'trashBin'
     id: string
     location?: string
   }
@@ -48,7 +48,6 @@ export interface Props {
   fileData?: ProtocolFile | null
   pipettesOnDeck: InitialDeckSetup['pipettes']
   modulesOnDeck: InitialDeckSetup['modules']
-  labwareOnDeck: InitialDeckSetup['labware']
   savedStepForms: SavedStepFormState
   robotType: RobotType
   additionalEquipment: AdditionalEquipment
@@ -245,7 +244,6 @@ export function FileSidebar(props: Props): JSX.Element {
     savedStepForms,
     robotType,
     additionalEquipment,
-    labwareOnDeck,
   } = props
   const [
     showExportWarningModal,
@@ -255,7 +253,6 @@ export function FileSidebar(props: Props): JSX.Element {
     equipment => equipment?.name === 'gripper'
   )
   const { trashBinUnused, wasteChuteUnused } = getUnusedTrash(
-    labwareOnDeck,
     additionalEquipment,
     fileData?.commands
   )

@@ -28,6 +28,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   WRAP,
+  ProtocolDeck,
 } from '@opentrons/components'
 
 import {
@@ -38,7 +39,6 @@ import {
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { StyledText } from '../../atoms/text'
-import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import {
@@ -53,14 +53,14 @@ import { getProtocolUsesGripper } from '../ProtocolSetupInstruments/utils'
 
 interface ProtocolCardProps {
   handleRunProtocol: (storedProtocolData: StoredProtocolData) => void
-  handleSendProtocolToOT3: (storedProtocolData: StoredProtocolData) => void
+  handleSendProtocolToFlex: (storedProtocolData: StoredProtocolData) => void
   storedProtocolData: StoredProtocolData
 }
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   const history = useHistory()
   const {
     handleRunProtocol,
-    handleSendProtocolToOT3,
+    handleSendProtocolToFlex,
     storedProtocolData,
   } = props
   const {
@@ -116,7 +116,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
       >
         <ProtocolOverflowMenu
           handleRunProtocol={handleRunProtocol}
-          handleSendProtocolToOT3={handleSendProtocolToOT3}
+          handleSendProtocolToFlex={handleSendProtocolToFlex}
           storedProtocolData={storedProtocolData}
         />
       </Box>
@@ -172,7 +172,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             error: <Box size="6rem" backgroundColor={COLORS.medGreyEnabled} />,
             complete:
               mostRecentAnalysis != null ? (
-                <DeckThumbnail protocolAnalysis={mostRecentAnalysis} />
+                <ProtocolDeck protocolAnalysis={mostRecentAnalysis} />
               ) : (
                 <Box size="6rem" backgroundColor={COLORS.medGreyEnabled} />
               ),

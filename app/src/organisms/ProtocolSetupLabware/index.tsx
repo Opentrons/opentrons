@@ -59,7 +59,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
 import type { LabwareSetupItem } from '../../pages/Protocols/utils'
-import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import type { SetupScreens } from '../../pages/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'
 import { LabwareMapViewModal } from './LabwareMapViewModal'
 
@@ -142,6 +142,14 @@ export function ProtocolSetupLabware({
     'slotName' in selectedLabware?.location
   ) {
     location = <LocationIcon slotName={selectedLabware?.location.slotName} />
+  } else if (
+    selectedLabware != null &&
+    typeof selectedLabware.location === 'object' &&
+    'addressableAreaName' in selectedLabware?.location
+  ) {
+    location = (
+      <LocationIcon slotName={selectedLabware?.location.addressableAreaName} />
+    )
   } else if (
     selectedLabware != null &&
     typeof selectedLabware.location === 'object' &&
@@ -490,6 +498,9 @@ function RowLabware({
   } else if ('slotName' in initialLocation) {
     slotName = initialLocation.slotName
     location = <LocationIcon slotName={initialLocation.slotName} />
+  } else if ('addressableAreaName' in initialLocation) {
+    slotName = initialLocation.addressableAreaName
+    location = <LocationIcon slotName={initialLocation.addressableAreaName} />
   } else if (matchedModuleType != null && matchedModule?.slotName != null) {
     slotName = matchedModule.slotName
     location = (

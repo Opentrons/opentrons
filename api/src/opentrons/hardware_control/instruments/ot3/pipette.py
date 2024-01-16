@@ -5,13 +5,15 @@ from typing import Any, Dict, Optional, Set, Tuple, Union, cast
 
 from opentrons.types import Point
 
-from opentrons.config import feature_flags as ff
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteConfigurations,
     PlungerPositions,
     MotorConfigurations,
     SupportedTipsDefinition,
-    TipHandlingConfigurations,
+    PickUpTipConfigurations,
+    PressFitPickUpTipConfiguration,
+    CamActionPickUpTipConfiguration,
+    DropTipConfigurations,
     PlungerHomingConfigurations,
     PipetteNameType,
     PipetteModelVersionType,
@@ -65,6 +67,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         config: PipetteConfigurations,
         pipette_offset_cal: PipetteOffsetByPipetteMount,
         pipette_id: Optional[str] = None,
+        use_old_aspiration_functions: bool = False,
     ) -> None:
         self._config = config
         self._config_as_dict = config.dict()
@@ -95,10 +98,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
         self._nozzle_offset = self._config.nozzle_offset
         self._nozzle_manager = (
-            nozzle_manager.NozzleConfigurationManager.build_from_nozzlemap(
-                self._config.nozzle_map,
-                self._config.partial_tip_configurations.per_tip_pickup_current,
-            )
+            nozzle_manager.NozzleConfigurationManager.build_from_config(self._config)
         )
         self._current_volume = 0.0
         self._working_volume = float(self._liquid_class.max_volume)
@@ -135,7 +135,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
         self._tip_overlap_lookup = self._liquid_class.tip_overlap_dictionary
 
-        if ff.use_old_aspiration_functions():
+        if use_old_aspiration_functions:
             self._pipetting_function_version = PIPETTING_FUNCTION_FALLBACK_VERSION
         else:
             self._pipetting_function_version = PIPETTING_FUNCTION_LATEST_VERSION
@@ -185,13 +185,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return self._plunger_motor_current
 
     @property
-    def pick_up_configurations(self) -> TipHandlingConfigurations:
+    def pick_up_configurations(self) -> PickUpTipConfigurations:
         return self._pick_up_configurations
 
     @pick_up_configurations.setter
-    def pick_up_configurations(
-        self, pick_up_configs: TipHandlingConfigurations
-    ) -> None:
+    def pick_up_configurations(self, pick_up_configs: PickUpTipConfigurations) -> None:
         self._pick_up_configurations = pick_up_configs
 
     @property
@@ -199,7 +197,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return self._plunger_homing_configurations
 
     @property
-    def drop_configurations(self) -> TipHandlingConfigurations:
+    def drop_configurations(self) -> DropTipConfigurations:
         return self._drop_configurations
 
     @property
@@ -258,10 +256,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
         self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
         self._nozzle_manager = (
-            nozzle_manager.NozzleConfigurationManager.build_from_nozzlemap(
-                self._config.nozzle_map,
-                self._config.partial_tip_configurations.per_tip_pickup_current,
-            )
+            nozzle_manager.NozzleConfigurationManager.build_from_config(self._config)
         )
 
     def reset_pipette_offset(self, mount: OT3Mount, to_default: bool) -> None:
@@ -489,7 +484,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         Remove the tip from the pipette (effectively updates the pipette's
         critical point)
         """
-        assert self.has_tip_length
         self._current_tip_length = 0.0
         self._has_tip_length = False
 
@@ -509,14 +503,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     def tip_presence_responses(self) -> int:
         # TODO: put this in shared-data
         return 2 if self.channels > 8 else 1
-
-    @property
-    def connect_tiprack_distance_mm(self) -> float:
-        return self._config.connect_tiprack_distance_mm
-
-    @property
-    def end_tip_action_retract_distance_mm(self) -> float:
-        return self._config.end_tip_action_retract_distance_mm
 
     # Cache max is chosen somewhat arbitrarily. With a float is input we don't
     # want this to unbounded.
@@ -672,11 +658,27 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
         self._working_volume = min(tip_type.value, self.liquid_class.max_volume)
 
+    def get_pick_up_configuration_for_tip_count(
+        self, count: int
+    ) -> Union[CamActionPickUpTipConfiguration, PressFitPickUpTipConfiguration]:
+        for config in (
+            self._config.pick_up_tip_configurations.press_fit,
+            self._config.pick_up_tip_configurations.cam_action,
+        ):
+            if not config:
+                continue
+            if count in config.current_by_tip_count:
+                return config
+        raise CommandPreconditionViolated(
+            message=f"No pick up tip configuration for {count} tips",
+        )
+
 
 def _reload_and_check_skip(
     new_config: PipetteConfigurations,
     attached_instr: Pipette,
     pipette_offset: PipetteOffsetByPipetteMount,
+    use_old_aspiration_functions: bool,
 ) -> Tuple[Pipette, bool]:
     # Once we have determined that the new and attached pipettes
     # are similar enough that we might skip, see if the configs
@@ -695,7 +697,12 @@ def _reload_and_check_skip(
                 changed.add(k)
         if changed.intersection("quirks"):
             # Something has changed that requires reconfig
-            p = Pipette(new_config, pipette_offset, attached_instr._pipette_id)
+            p = Pipette(
+                new_config,
+                pipette_offset,
+                attached_instr._pipette_id,
+                use_old_aspiration_functions,
+            )
             p.act_as(attached_instr.acting_as)
             return p, False
         # Good to skip, just need to update calibration offset and update_info
@@ -709,6 +716,7 @@ def load_from_config_and_check_skip(
     requested: Optional[PipetteName],
     serial: Optional[str],
     pipette_offset: PipetteOffsetByPipetteMount,
+    use_old_aspiration_functions: bool,
 ) -> Tuple[Optional[Pipette], bool]:
     """
     Given the pipette config for an attached pipette (if any) freshly read
@@ -740,6 +748,7 @@ def load_from_config_and_check_skip(
                         config,
                         attached,
                         pipette_offset,
+                        use_old_aspiration_functions,
                     )
             else:
                 # if there is no request, make sure that the old pipette
@@ -750,9 +759,13 @@ def load_from_config_and_check_skip(
                         config,
                         attached,
                         pipette_offset,
+                        use_old_aspiration_functions,
                     )
 
     if config:
-        return Pipette(config, pipette_offset, serial), False
+        return (
+            Pipette(config, pipette_offset, serial, use_old_aspiration_functions),
+            False,
+        )
     else:
         return None, False

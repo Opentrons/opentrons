@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
@@ -196,7 +197,7 @@ describe('DisconnectModal', () => {
     const { getByRole } = render()
 
     expect(mockPostWifiDisconnect).not.toHaveBeenCalled()
-    getByRole('button', { name: 'Disconnect' }).click()
+    fireEvent.click(getByRole('button', { name: 'Disconnect' }))
     expect(mockPostWifiDisconnect).toHaveBeenCalledWith(ROBOT_NAME, 'foo')
   })
 
@@ -205,7 +206,7 @@ describe('DisconnectModal', () => {
 
     expect(mockDismissRequest).not.toHaveBeenCalled()
     expect(mockOnCancel).not.toHaveBeenCalled()
-    getByRole('button', { name: 'cancel' }).click()
+    fireEvent.click(getByRole('button', { name: 'cancel' }))
     expect(mockDismissRequest).toHaveBeenCalledWith(LAST_ID)
     expect(mockOnCancel).toHaveBeenCalledWith()
   })

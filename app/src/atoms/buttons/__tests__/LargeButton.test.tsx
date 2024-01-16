@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders, COLORS } from '@opentrons/components'
 
 import { LargeButton } from '../LargeButton'
@@ -17,10 +18,10 @@ describe('LargeButton', () => {
     }
   })
   it('renders the default button and it works as expected', () => {
-    const { getByText, getByRole } = render(props)
-    getByText('large button').click()
+    render(props)
+    fireEvent.click(screen.getByText('large button'))
     expect(props.onClick).toHaveBeenCalled()
-    expect(getByRole('button')).toHaveStyle(
+    expect(screen.getByRole('button')).toHaveStyle(
       `background-color: ${COLORS.blueEnabled}`
     )
   })
@@ -29,16 +30,18 @@ describe('LargeButton', () => {
       ...props,
       buttonType: 'alert',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(`background-color: ${COLORS.red3}`)
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.red3}`
+    )
   })
   it('renders the secondary button', () => {
     props = {
       ...props,
       buttonType: 'secondary',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
       `background-color: ${COLORS.mediumBlueEnabled}`
     )
   })
@@ -47,7 +50,7 @@ describe('LargeButton', () => {
       ...props,
       disabled: true,
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toBeDisabled()
+    render(props)
+    expect(screen.getByRole('button')).toBeDisabled()
   })
 })

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
@@ -24,7 +24,7 @@ const mockGetRobotUpdateDownloadProgress = getRobotUpdateDownloadProgress as jes
 
 describe('useRobotUpdateInfo', () => {
   let store: Store<State>
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   const MOCK_ROBOT_NAME = 'testRobot'
   const mockRobotUpdateSession: RobotUpdateSession | null = {

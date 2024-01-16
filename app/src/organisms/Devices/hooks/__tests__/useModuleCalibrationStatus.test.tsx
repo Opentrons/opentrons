@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import {
@@ -23,7 +23,7 @@ const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
   typeof useModuleRenderInfoForProtocolById
 >
-let wrapper: React.FunctionComponent<{}>
+let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
 const mockMagneticModuleDefinition = {
   moduleId: 'someMagneticModule',
@@ -86,7 +86,7 @@ describe('useModuleCalibrationStatus hook', () => {
   it('should return calibration complete if OT-2', () => {
     when(mockUseIsFlex).calledWith('otie').mockReturnValue(false)
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith('otie', '1')
+      .calledWith('1')
       .mockReturnValue({})
 
     const { result } = renderHook(
@@ -100,7 +100,7 @@ describe('useModuleCalibrationStatus hook', () => {
   it('should return calibration complete if no modules needed', () => {
     when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith('otie', '1')
+      .calledWith('1')
       .mockReturnValue({})
 
     const { result } = renderHook(
@@ -114,13 +114,14 @@ describe('useModuleCalibrationStatus hook', () => {
   it('should return calibration complete if offset date exists', () => {
     when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith('otie', '1')
+      .calledWith('1')
       .mockReturnValue({
         magneticModuleId: {
           attachedModuleMatch: {
             ...mockMagneticModuleGen2,
             moduleOffset: mockOffsetData,
           },
+          conflictedFixture: null,
           ...MAGNETIC_MODULE_INFO,
         },
       })
@@ -136,12 +137,13 @@ describe('useModuleCalibrationStatus hook', () => {
   it('should return calibration needed if offset date does not exist', () => {
     when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith('otie', '1')
+      .calledWith('1')
       .mockReturnValue({
         magneticModuleId: {
           attachedModuleMatch: {
             ...mockMagneticModuleGen2,
           },
+          conflictedFixture: null,
           ...MAGNETIC_MODULE_INFO,
         },
       })

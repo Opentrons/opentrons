@@ -50,12 +50,12 @@ export const SelectLocation = (
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const bodyText = (
     <>
-      <Banner type="warning" size={SIZE_1} marginY={SPACING.spacing4}>
-        {t('module_secured')}
-      </Banner>
       <StyledText css={BODY_STYLE}>
         {t('select_the_slot', { module: moduleName })}
       </StyledText>
+      <Banner type="warning" size={SIZE_1} marginY={SPACING.spacing4}>
+        {t('module_secured')}
+      </Banner>
     </>
   )
   return (

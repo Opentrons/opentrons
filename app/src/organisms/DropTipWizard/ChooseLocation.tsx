@@ -3,22 +3,22 @@ import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import {
+  Btn,
   Flex,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   RESPONSIVENESS,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_CENTER,
-  JUSTIFY_FLEX_END,
+  ALIGN_FLEX_END,
+  ALIGN_CENTER,
   PrimaryButton,
   useDeckLocationSelect,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  getDeckDefFromRobotType,
-  getPositionFromSlotId,
-} from '@opentrons/shared-data'
+import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
@@ -27,17 +27,20 @@ import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal
 import { TwoUpTileLayout } from '../LabwarePositionCheck/TwoUpTileLayout'
 
 import type { CommandData } from '@opentrons/api-client'
-import type { RobotType } from '@opentrons/shared-data'
+import type { AddressableAreaName, RobotType } from '@opentrons/shared-data'
 
 // TODO: get help link article URL
 // const NEED_HELP_URL = ''
 
 interface ChooseLocationProps {
   handleProceed: () => void
+  handleGoBack: () => void
   title: string
   body: string | JSX.Element
   robotType: RobotType
-  moveToXYCoordinate: (x: number, y: number) => Promise<CommandData[] | null>
+  moveToAddressableArea: (
+    addressableArea: AddressableAreaName
+  ) => Promise<CommandData | null>
   isRobotMoving: boolean
   isOnDevice: boolean
   setErrorMessage: (arg0: string) => void
@@ -48,10 +51,11 @@ export const ChooseLocation = (
 ): JSX.Element | null => {
   const {
     handleProceed,
+    handleGoBack,
     title,
     body,
     robotType,
-    moveToXYCoordinate,
+    moveToAddressableArea,
     isRobotMoving,
     isOnDevice,
     setErrorMessage,
@@ -62,29 +66,13 @@ export const ChooseLocation = (
     robotType
   )
 
-  const handleConfirmPosition: React.MouseEventHandler = () => {
+  const handleConfirmPosition = (): void => {
     const deckSlot = deckDef.locations.addressableAreas.find(
       l => l.id === selectedLocation.slotName
-    )
+    )?.id
 
-    const slotPosition = getPositionFromSlotId(
-      selectedLocation.slotName,
-      deckDef
-    )
-
-    const slotX = slotPosition?.[0]
-    const slotY = slotPosition?.[1]
-    const xDimension = deckSlot?.boundingBox.xDimension
-    const yDimension = deckSlot?.boundingBox.yDimension
-    if (
-      slotX != null &&
-      slotY != null &&
-      xDimension != null &&
-      yDimension != null
-    ) {
-      const targetX = slotX + xDimension / 2
-      const targetY = slotY + yDimension / 2
-      moveToXYCoordinate(targetX, targetY)
+    if (deckSlot != null) {
+      moveToAddressableArea(deckSlot)
         .then(() => handleProceed())
         .catch(e => setErrorMessage(`${e.message}`))
     }
@@ -126,7 +114,17 @@ export const ChooseLocation = (
             {DeckLocationSelect}
           </Flex>
         </Flex>
-        <Flex justifyContent={JUSTIFY_FLEX_END}>
+        <Flex
+          width="100%"
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          css={ALIGN_BUTTONS}
+          gridGap={SPACING.spacing8}
+        >
+          <Btn onClick={() => handleGoBack()}>
+            <StyledText css={GO_BACK_BUTTON_STYLE}>
+              {t('shared:go_back')}
+            </StyledText>
+          </Btn>
           <SmallButton
             buttonText={i18n.format(t('move_to_slot'), 'capitalize')}
             onClick={handleConfirmPosition}
@@ -143,10 +141,15 @@ export const ChooseLocation = (
           rightElement={DeckLocationSelect}
           footer={
             <Flex
-              flexDirection={DIRECTION_ROW}
-              justifyContent={JUSTIFY_FLEX_END}
+              width="100%"
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+              gridGap={SPACING.spacing8}
             >
-              {/* <NeedHelpLink href={NEED_HELP_URL} /> */}
+              <Btn onClick={() => handleGoBack()}>
+                <StyledText css={GO_BACK_BUTTON_STYLE}>
+                  {t('shared:go_back')}
+                </StyledText>
+              </Btn>
               <PrimaryButton onClick={handleConfirmPosition}>
                 {i18n.format(t('move_to_slot'), 'capitalize')}
               </PrimaryButton>
@@ -164,5 +167,30 @@ const TILE_CONTAINER_STYLE = css`
   height: 24.625rem;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     height: 29.5rem;
+  }
+`
+const GO_BACK_BUTTON_STYLE = css`
+  ${TYPOGRAPHY.pSemiBold};
+  color: ${COLORS.darkGreyEnabled};
+
+  &:hover {
+    opacity: 70%;
+  }
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+    font-size: ${TYPOGRAPHY.fontSize22};
+    padding-left: 0rem;
+    &:hover {
+      opacity: 100%;
+    }
+  }
+`
+
+const ALIGN_BUTTONS = css`
+  align-items: ${ALIGN_FLEX_END};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    align-items: ${ALIGN_CENTER};
   }
 `

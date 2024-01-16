@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 
 import { useDispatchStartRobotUpdate } from '../hooks'
 import { startRobotUpdate, clearRobotUpdateSession } from '../actions'

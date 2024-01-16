@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { resetAllWhenMocks } from 'jest-when'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
@@ -57,28 +58,28 @@ describe('NavigationMenu', () => {
     resetAllWhenMocks()
   })
   it('should render the home menu item and clicking home gantry, dispatches home and call a mock function', () => {
-    const { getByText, getByLabelText } = render(props)
-    getByLabelText('BackgroundOverlay_ModalShell').click()
+    render(props)
+    fireEvent.click(screen.getByLabelText('BackgroundOverlay_ModalShell'))
     expect(props.onClick).toHaveBeenCalled()
-    getByLabelText('reset-position_icon')
-    getByText('Home gantry').click()
+    screen.getByLabelText('reset-position_icon')
+    fireEvent.click(screen.getByText('Home gantry'))
     expect(mockHome).toHaveBeenCalled()
     expect(props.setShowNavMenu).toHaveBeenCalled()
   })
 
   it('should render the restart robot menu item and clicking it, dispatches restart robot', () => {
-    const { getByText, getByLabelText } = render(props)
-    const restart = getByText('Restart robot')
-    getByLabelText('restart_icon')
-    restart.click()
-    getByText('mock RestartRobotConfirmationModal')
+    render(props)
+    const restart = screen.getByText('Restart robot')
+    screen.getByLabelText('restart_icon')
+    fireEvent.click(restart)
+    screen.getByText('mock RestartRobotConfirmationModal')
   })
 
   it('should render the lights menu item with lights off and clicking it, calls useLights', () => {
-    const { getByText, getByLabelText } = render(props)
-    const lights = getByText('Lights on')
-    getByLabelText('light_icon')
-    lights.click()
+    render(props)
+    const lights = screen.getByText('Lights on')
+    screen.getByLabelText('light_icon')
+    fireEvent.click(lights)
     expect(mockToggleLights).toHaveBeenCalled()
   })
 
@@ -87,19 +88,19 @@ describe('NavigationMenu', () => {
       lightsOn: true,
       toggleLights: mockToggleLights,
     })
-    const { getByText } = render(props)
-    getByText('Lights off')
+    render(props)
+    screen.getByText('Lights off')
   })
 
   it('should render the deck configuration menu item', () => {
-    const { getByText, getByLabelText } = render(props)
-    getByText('Deck configuration')
-    getByLabelText('deck-map_icon')
+    render(props)
+    screen.getByText('Deck configuration')
+    screen.getByLabelText('deck-map_icon')
   })
 
   it('should call a mock function when tapping deck configuration', () => {
-    const { getByText } = render(props)
-    getByText('Deck configuration').click()
+    render(props)
+    fireEvent.click(screen.getByText('Deck configuration'))
     expect(mockPush).toHaveBeenCalledWith('/deck-configuration')
   })
 })

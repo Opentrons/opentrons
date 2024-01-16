@@ -1,6 +1,71 @@
 {
   "title": "CreateCommandUnion",
   "description": "Model that validates a union of all CommandCreate models.",
+  "discriminator": {
+    "propertyName": "commandType",
+    "mapping": {
+      "aspirate": "#/definitions/AspirateCreate",
+      "aspirateInPlace": "#/definitions/AspirateInPlaceCreate",
+      "comment": "#/definitions/CommentCreate",
+      "configureForVolume": "#/definitions/ConfigureForVolumeCreate",
+      "configureNozzleLayout": "#/definitions/ConfigureNozzleLayoutCreate",
+      "custom": "#/definitions/CustomCreate",
+      "dispense": "#/definitions/DispenseCreate",
+      "dispenseInPlace": "#/definitions/DispenseInPlaceCreate",
+      "blowout": "#/definitions/BlowOutCreate",
+      "blowOutInPlace": "#/definitions/BlowOutInPlaceCreate",
+      "dropTip": "#/definitions/DropTipCreate",
+      "dropTipInPlace": "#/definitions/DropTipInPlaceCreate",
+      "home": "#/definitions/HomeCreate",
+      "retractAxis": "#/definitions/RetractAxisCreate",
+      "loadLabware": "#/definitions/LoadLabwareCreate",
+      "loadLiquid": "#/definitions/LoadLiquidCreate",
+      "loadModule": "#/definitions/LoadModuleCreate",
+      "loadPipette": "#/definitions/LoadPipetteCreate",
+      "moveLabware": "#/definitions/MoveLabwareCreate",
+      "moveRelative": "#/definitions/MoveRelativeCreate",
+      "moveToCoordinates": "#/definitions/MoveToCoordinatesCreate",
+      "moveToWell": "#/definitions/MoveToWellCreate",
+      "moveToAddressableArea": "#/definitions/MoveToAddressableAreaCreate",
+      "moveToAddressableAreaForDropTip": "#/definitions/MoveToAddressableAreaForDropTipCreate",
+      "prepareToAspirate": "#/definitions/PrepareToAspirateCreate",
+      "waitForResume": "#/definitions/WaitForResumeCreate",
+      "pause": "#/definitions/WaitForResumeCreate",
+      "waitForDuration": "#/definitions/WaitForDurationCreate",
+      "pickUpTip": "#/definitions/PickUpTipCreate",
+      "savePosition": "#/definitions/SavePositionCreate",
+      "setRailLights": "#/definitions/SetRailLightsCreate",
+      "touchTip": "#/definitions/TouchTipCreate",
+      "setStatusBar": "#/definitions/SetStatusBarCreate",
+      "verifyTipPresence": "#/definitions/VerifyTipPresenceCreate",
+      "getTipPresence": "#/definitions/GetTipPresenceCreate",
+      "heaterShaker/waitForTemperature": "#/definitions/opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureCreate",
+      "heaterShaker/setTargetTemperature": "#/definitions/opentrons__protocol_engine__commands__heater_shaker__set_target_temperature__SetTargetTemperatureCreate",
+      "heaterShaker/deactivateHeater": "#/definitions/DeactivateHeaterCreate",
+      "heaterShaker/setAndWaitForShakeSpeed": "#/definitions/SetAndWaitForShakeSpeedCreate",
+      "heaterShaker/deactivateShaker": "#/definitions/DeactivateShakerCreate",
+      "heaterShaker/openLabwareLatch": "#/definitions/OpenLabwareLatchCreate",
+      "heaterShaker/closeLabwareLatch": "#/definitions/CloseLabwareLatchCreate",
+      "magneticModule/disengage": "#/definitions/DisengageCreate",
+      "magneticModule/engage": "#/definitions/EngageCreate",
+      "temperatureModule/setTargetTemperature": "#/definitions/opentrons__protocol_engine__commands__temperature_module__set_target_temperature__SetTargetTemperatureCreate",
+      "temperatureModule/waitForTemperature": "#/definitions/opentrons__protocol_engine__commands__temperature_module__wait_for_temperature__WaitForTemperatureCreate",
+      "temperatureModule/deactivate": "#/definitions/DeactivateTemperatureCreate",
+      "thermocycler/setTargetBlockTemperature": "#/definitions/SetTargetBlockTemperatureCreate",
+      "thermocycler/waitForBlockTemperature": "#/definitions/WaitForBlockTemperatureCreate",
+      "thermocycler/setTargetLidTemperature": "#/definitions/SetTargetLidTemperatureCreate",
+      "thermocycler/waitForLidTemperature": "#/definitions/WaitForLidTemperatureCreate",
+      "thermocycler/deactivateBlock": "#/definitions/DeactivateBlockCreate",
+      "thermocycler/deactivateLid": "#/definitions/DeactivateLidCreate",
+      "thermocycler/openLid": "#/definitions/OpenLidCreate",
+      "thermocycler/closeLid": "#/definitions/CloseLidCreate",
+      "thermocycler/runProfile": "#/definitions/RunProfileCreate",
+      "calibration/calibrateGripper": "#/definitions/CalibrateGripperCreate",
+      "calibration/calibratePipette": "#/definitions/CalibratePipetteCreate",
+      "calibration/calibrateModule": "#/definitions/CalibrateModuleCreate",
+      "calibration/moveToMaintenancePosition": "#/definitions/MoveToMaintenancePositionCreate"
+    }
+  },
   "anyOf": [
     {
       "$ref": "#/definitions/AspirateCreate"
@@ -69,6 +134,12 @@
       "$ref": "#/definitions/MoveToWellCreate"
     },
     {
+      "$ref": "#/definitions/MoveToAddressableAreaCreate"
+    },
+    {
+      "$ref": "#/definitions/MoveToAddressableAreaForDropTipCreate"
+    },
+    {
       "$ref": "#/definitions/PrepareToAspirateCreate"
     },
     {
@@ -91,6 +162,12 @@
     },
     {
       "$ref": "#/definitions/SetStatusBarCreate"
+    },
+    {
+      "$ref": "#/definitions/VerifyTipPresenceCreate"
+    },
+    {
+      "$ref": "#/definitions/GetTipPresenceCreate"
     },
     {
       "$ref": "#/definitions/opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureCreate"
@@ -247,8 +324,8 @@
         },
         "volume": {
           "title": "Volume",
-          "description": "Amount of liquid in uL. Must be greater than 0 and less than a pipette-specific maximum volume.",
-          "exclusiveMinimum": 0,
+          "description": "The amount of liquid to aspirate, in \u00b5L. Must not be greater than the remaining available amount, which depends on the pipette (see `loadPipette`), its configuration (see `configureForVolume`), the tip (see `pickUpTip`), and the amount you've aspirated so far. There is some tolerance for floating point rounding errors.",
+          "minimum": 0,
           "type": "number"
         },
         "pipetteId": {
@@ -308,8 +385,8 @@
         },
         "volume": {
           "title": "Volume",
-          "description": "Amount of liquid in uL. Must be greater than 0 and less than a pipette-specific maximum volume.",
-          "exclusiveMinimum": 0,
+          "description": "The amount of liquid to aspirate, in \u00b5L. Must not be greater than the remaining available amount, which depends on the pipette (see `loadPipette`), its configuration (see `configureForVolume`), the tip (see `pickUpTip`), and the amount you've aspirated so far. There is some tolerance for floating point rounding errors.",
+          "minimum": 0,
           "type": "number"
         },
         "pipetteId": {
@@ -398,19 +475,19 @@
       "description": "Parameters required to configure volume for a specific pipette.",
       "type": "object",
       "properties": {
-        "volume": {
-          "title": "Volume",
-          "description": "Amount of liquid in uL. Must be greater than 0 and less than a pipette-specific maximum volume.",
-          "exclusiveMinimum": 0,
-          "type": "number"
-        },
         "pipetteId": {
           "title": "Pipetteid",
           "description": "Identifier of pipette to use for liquid handling.",
           "type": "string"
+        },
+        "volume": {
+          "title": "Volume",
+          "description": "Amount of liquid in uL. Must be at least 0 and no greater than a pipette-specific maximum volume.",
+          "minimum": 0,
+          "type": "number"
         }
       },
-      "required": ["volume", "pipetteId"]
+      "required": ["pipetteId", "volume"]
     },
     "ConfigureForVolumeCreate": {
       "title": "ConfigureForVolumeCreate",
@@ -442,15 +519,15 @@
       },
       "required": ["params"]
     },
-    "EmptyNozzleLayoutConfiguration": {
-      "title": "EmptyNozzleLayoutConfiguration",
-      "description": "Empty basemodel to represent a reset to the nozzle configuration. Sending no parameters resets to default.",
+    "AllNozzleLayoutConfiguration": {
+      "title": "AllNozzleLayoutConfiguration",
+      "description": "All basemodel to represent a reset to the nozzle configuration. Sending no parameters resets to default.",
       "type": "object",
       "properties": {
         "style": {
           "title": "Style",
-          "default": "EMPTY",
-          "enum": ["EMPTY"],
+          "default": "ALL",
+          "enum": ["ALL"],
           "type": "string"
         }
       }
@@ -466,14 +543,14 @@
           "enum": ["SINGLE"],
           "type": "string"
         },
-        "primary_nozzle": {
-          "title": "Primary Nozzle",
+        "primaryNozzle": {
+          "title": "Primarynozzle",
           "description": "The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
           "enum": ["A1", "H1", "A12", "H12"],
           "type": "string"
         }
       },
-      "required": ["primary_nozzle"]
+      "required": ["primaryNozzle"]
     },
     "RowNozzleLayoutConfiguration": {
       "title": "RowNozzleLayoutConfiguration",
@@ -486,14 +563,14 @@
           "enum": ["ROW"],
           "type": "string"
         },
-        "primary_nozzle": {
-          "title": "Primary Nozzle",
+        "primaryNozzle": {
+          "title": "Primarynozzle",
           "description": "The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
           "enum": ["A1", "H1", "A12", "H12"],
           "type": "string"
         }
       },
-      "required": ["primary_nozzle"]
+      "required": ["primaryNozzle"]
     },
     "ColumnNozzleLayoutConfiguration": {
       "title": "ColumnNozzleLayoutConfiguration",
@@ -506,14 +583,14 @@
           "enum": ["COLUMN"],
           "type": "string"
         },
-        "primary_nozzle": {
-          "title": "Primary Nozzle",
+        "primaryNozzle": {
+          "title": "Primarynozzle",
           "description": "The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
           "enum": ["A1", "H1", "A12", "H12"],
           "type": "string"
         }
       },
-      "required": ["primary_nozzle"]
+      "required": ["primaryNozzle"]
     },
     "QuadrantNozzleLayoutConfiguration": {
       "title": "QuadrantNozzleLayoutConfiguration",
@@ -526,20 +603,20 @@
           "enum": ["QUADRANT"],
           "type": "string"
         },
-        "primary_nozzle": {
-          "title": "Primary Nozzle",
+        "primaryNozzle": {
+          "title": "Primarynozzle",
           "description": "The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
           "enum": ["A1", "H1", "A12", "H12"],
           "type": "string"
         },
-        "front_right_nozzle": {
-          "title": "Front Right Nozzle",
+        "frontRightNozzle": {
+          "title": "Frontrightnozzle",
           "description": "The front right nozzle in your configuration.",
           "pattern": "[A-Z][0-100]",
           "type": "string"
         }
       },
-      "required": ["primary_nozzle", "front_right_nozzle"]
+      "required": ["primaryNozzle", "frontRightNozzle"]
     },
     "ConfigureNozzleLayoutParams": {
       "title": "ConfigureNozzleLayoutParams",
@@ -551,11 +628,11 @@
           "description": "Identifier of pipette to use for liquid handling.",
           "type": "string"
         },
-        "configuration_params": {
-          "title": "Configuration Params",
+        "configurationParams": {
+          "title": "Configurationparams",
           "anyOf": [
             {
-              "$ref": "#/definitions/EmptyNozzleLayoutConfiguration"
+              "$ref": "#/definitions/AllNozzleLayoutConfiguration"
             },
             {
               "$ref": "#/definitions/SingleNozzleLayoutConfiguration"
@@ -572,7 +649,7 @@
           ]
         }
       },
-      "required": ["pipetteId", "configuration_params"]
+      "required": ["pipetteId", "configurationParams"]
     },
     "ConfigureNozzleLayoutCreate": {
       "title": "ConfigureNozzleLayoutCreate",
@@ -672,8 +749,8 @@
         },
         "volume": {
           "title": "Volume",
-          "description": "Amount of liquid in uL. Must be greater than 0 and less than a pipette-specific maximum volume.",
-          "exclusiveMinimum": 0,
+          "description": "The amount of liquid to dispense, in \u00b5L. Must not be greater than the currently aspirated volume. There is some tolerance for floating point rounding errors.",
+          "minimum": 0,
           "type": "number"
         },
         "pipetteId": {
@@ -732,8 +809,8 @@
         },
         "volume": {
           "title": "Volume",
-          "description": "Amount of liquid in uL. Must be greater than 0 and less than a pipette-specific maximum volume.",
-          "exclusiveMinimum": 0,
+          "description": "The amount of liquid to dispense, in \u00b5L. Must not be greater than the currently aspirated volume. There is some tolerance for floating point rounding errors.",
+          "minimum": 0,
           "type": "number"
         },
         "pipetteId": {
@@ -1232,6 +1309,19 @@
       },
       "required": ["labwareId"]
     },
+    "AddressableAreaLocation": {
+      "title": "AddressableAreaLocation",
+      "description": "The location of something place in an addressable area. This is a superset of deck slots.",
+      "type": "object",
+      "properties": {
+        "addressableAreaName": {
+          "title": "Addressableareaname",
+          "description": "The name of the addressable area that you want to use. Valid values are the `id`s of `addressableArea`s in the [deck definition](https://github.com/Opentrons/opentrons/tree/edge/shared-data/deck).",
+          "type": "string"
+        }
+      },
+      "required": ["addressableAreaName"]
+    },
     "LoadLabwareParams": {
       "title": "LoadLabwareParams",
       "description": "Payload required to load a labware into a slot.",
@@ -1253,6 +1343,9 @@
             {
               "enum": ["offDeck"],
               "type": "string"
+            },
+            {
+              "$ref": "#/definitions/AddressableAreaLocation"
             }
           ]
         },
@@ -1580,6 +1673,9 @@
             {
               "enum": ["offDeck"],
               "type": "string"
+            },
+            {
+              "$ref": "#/definitions/AddressableAreaLocation"
             }
           ]
         },
@@ -1870,6 +1966,194 @@
       },
       "required": ["params"]
     },
+    "AddressableOffsetVector": {
+      "title": "AddressableOffsetVector",
+      "description": "Offset, in deck coordinates, from nominal to actual position of an addressable area.",
+      "type": "object",
+      "properties": {
+        "x": {
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "title": "Y",
+          "type": "number"
+        },
+        "z": {
+          "title": "Z",
+          "type": "number"
+        }
+      },
+      "required": ["x", "y", "z"]
+    },
+    "MoveToAddressableAreaParams": {
+      "title": "MoveToAddressableAreaParams",
+      "description": "Payload required to move a pipette to a specific addressable area.\n\nAn *addressable area* is a space in the robot that may or may not be usable depending on how\nthe robot's deck is configured. For example, if a Flex is configured with a waste chute, it will\nhave additional addressable areas representing the opening of the waste chute, where tips and\nlabware can be dropped.\n\nThis moves the pipette so all of its nozzles are centered over the addressable area.\nIf the pipette is currently configured with a partial tip layout, this centering is over all\nthe pipette's physical nozzles, not just the nozzles that are active.\n\nThe z-position will be chosen to put the bottom of the tips---or the bottom of the nozzles,\nif there are no tips---level with the top of the addressable area.\n\nWhen this command is executed, Protocol Engine will make sure the robot's deck is configured\nsuch that the requested addressable area actually exists. For example, if you request\nthe addressable area B4, it will make sure the robot is set up with a B3/B4 staging area slot.\nIf that's not the case, the command will fail.",
+      "type": "object",
+      "properties": {
+        "minimumZHeight": {
+          "title": "Minimumzheight",
+          "description": "Optional minimal Z margin in mm. If this is larger than the API's default safe Z margin, it will make the arc higher. If it's smaller, it will have no effect.",
+          "type": "number"
+        },
+        "forceDirect": {
+          "title": "Forcedirect",
+          "description": "If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the `minimumZHeight` param to be ignored. A 'direct' movement is in X/Y/Z simultaneously.",
+          "default": false,
+          "type": "boolean"
+        },
+        "speed": {
+          "title": "Speed",
+          "description": "Override the travel speed in mm/s. This controls the straight linear speed of motion.",
+          "type": "number"
+        },
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        },
+        "addressableAreaName": {
+          "title": "Addressableareaname",
+          "description": "The name of the addressable area that you want to use. Valid values are the `id`s of `addressableArea`s in the [deck definition](https://github.com/Opentrons/opentrons/tree/edge/shared-data/deck).",
+          "type": "string"
+        },
+        "offset": {
+          "title": "Offset",
+          "description": "Relative offset of addressable area to move pipette's critical point.",
+          "default": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "allOf": [
+            {
+              "$ref": "#/definitions/AddressableOffsetVector"
+            }
+          ]
+        },
+        "stayAtHighestPossibleZ": {
+          "title": "Stayathighestpossiblez",
+          "description": "If `true`, the pipette will retract to its highest possible height and stay there instead of descending to the destination. `minimumZHeight` will be ignored.",
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": ["pipetteId", "addressableAreaName"]
+    },
+    "MoveToAddressableAreaCreate": {
+      "title": "MoveToAddressableAreaCreate",
+      "description": "Move to addressable area command creation request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "moveToAddressableArea",
+          "enum": ["moveToAddressableArea"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/MoveToAddressableAreaParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "MoveToAddressableAreaForDropTipParams": {
+      "title": "MoveToAddressableAreaForDropTipParams",
+      "description": "Payload required to move a pipette to a specific addressable area.\n\nAn *addressable area* is a space in the robot that may or may not be usable depending on how\nthe robot's deck is configured. For example, if a Flex is configured with a waste chute, it will\nhave additional addressable areas representing the opening of the waste chute, where tips and\nlabware can be dropped.\n\nThis moves the pipette so all of its nozzles are centered over the addressable area.\nIf the pipette is currently configured with a partial tip layout, this centering is over all\nthe pipette's physical nozzles, not just the nozzles that are active.\n\nThe z-position will be chosen to put the bottom of the tips---or the bottom of the nozzles,\nif there are no tips---level with the top of the addressable area.\n\nWhen this command is executed, Protocol Engine will make sure the robot's deck is configured\nsuch that the requested addressable area actually exists. For example, if you request\nthe addressable area B4, it will make sure the robot is set up with a B3/B4 staging area slot.\nIf that's not the case, the command will fail.",
+      "type": "object",
+      "properties": {
+        "minimumZHeight": {
+          "title": "Minimumzheight",
+          "description": "Optional minimal Z margin in mm. If this is larger than the API's default safe Z margin, it will make the arc higher. If it's smaller, it will have no effect.",
+          "type": "number"
+        },
+        "forceDirect": {
+          "title": "Forcedirect",
+          "description": "If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the `minimumZHeight` param to be ignored. A 'direct' movement is in X/Y/Z simultaneously.",
+          "default": false,
+          "type": "boolean"
+        },
+        "speed": {
+          "title": "Speed",
+          "description": "Override the travel speed in mm/s. This controls the straight linear speed of motion.",
+          "type": "number"
+        },
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        },
+        "addressableAreaName": {
+          "title": "Addressableareaname",
+          "description": "The name of the addressable area that you want to use. Valid values are the `id`s of `addressableArea`s in the [deck definition](https://github.com/Opentrons/opentrons/tree/edge/shared-data/deck).",
+          "type": "string"
+        },
+        "offset": {
+          "title": "Offset",
+          "description": "Relative offset of addressable area to move pipette's critical point.",
+          "default": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "allOf": [
+            {
+              "$ref": "#/definitions/AddressableOffsetVector"
+            }
+          ]
+        },
+        "alternateDropLocation": {
+          "title": "Alternatedroplocation",
+          "description": "Whether to alternate location where tip is dropped within the addressable area. If True, this command will ignore the offset provided and alternate between dropping tips at two predetermined locations inside the specified labware well. If False, the tip will be dropped at the top center of the area.",
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": ["pipetteId", "addressableAreaName"]
+    },
+    "MoveToAddressableAreaForDropTipCreate": {
+      "title": "MoveToAddressableAreaForDropTipCreate",
+      "description": "Move to addressable area for drop tip command creation request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "moveToAddressableAreaForDropTip",
+          "enum": ["moveToAddressableAreaForDropTip"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/MoveToAddressableAreaForDropTipParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
     "PrepareToAspirateParams": {
       "title": "PrepareToAspirateParams",
       "description": "Parameters required to prepare a specific pipette for aspiration.",
@@ -2079,6 +2363,12 @@
           "title": "Positionid",
           "description": "An optional ID to assign to this command instance. Auto-assigned if not defined.",
           "type": "string"
+        },
+        "failOnNotHomed": {
+          "title": "Failonnothomed",
+          "default": true,
+          "descrption": "Require all axes to be homed before saving position.",
+          "type": "boolean"
         }
       },
       "required": ["pipetteId"]
@@ -2263,6 +2553,106 @@
         },
         "params": {
           "$ref": "#/definitions/SetStatusBarParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "TipPresenceStatus": {
+      "title": "TipPresenceStatus",
+      "description": "Tip presence status reported by a pipette.",
+      "enum": ["present", "absent", "unknown"],
+      "type": "string"
+    },
+    "VerifyTipPresenceParams": {
+      "title": "VerifyTipPresenceParams",
+      "description": "Payload required for a VerifyTipPresence command.",
+      "type": "object",
+      "properties": {
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        },
+        "expectedState": {
+          "description": "The expected tip presence status on the pipette.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/TipPresenceStatus"
+            }
+          ]
+        }
+      },
+      "required": ["pipetteId", "expectedState"]
+    },
+    "VerifyTipPresenceCreate": {
+      "title": "VerifyTipPresenceCreate",
+      "description": "VerifyTipPresence command creation request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "verifyTipPresence",
+          "enum": ["verifyTipPresence"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/VerifyTipPresenceParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "GetTipPresenceParams": {
+      "title": "GetTipPresenceParams",
+      "description": "Payload required for a GetTipPresence command.",
+      "type": "object",
+      "properties": {
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        }
+      },
+      "required": ["pipetteId"]
+    },
+    "GetTipPresenceCreate": {
+      "title": "GetTipPresenceCreate",
+      "description": "GetTipPresence command creation request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "getTipPresence",
+          "enum": ["getTipPresence"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/GetTipPresenceParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",

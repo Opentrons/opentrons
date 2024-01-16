@@ -1,9 +1,15 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
+import {
+  Flex,
+  DIRECTION_COLUMN,
+  SPACING,
+  ALIGN_CENTER,
+} from '@opentrons/components'
 import { getPipetteNameSpecs, RunTimeCommand } from '@opentrons/shared-data'
 import {
+  getAddressableAreaDisplayName,
   getLabwareName,
   getLabwareDisplayLocation,
   getFinalLabwareLocation,
@@ -47,13 +53,21 @@ interface Props extends StyleProps {
   command: RunTimeCommand
   robotSideAnalysis: CompletedProtocolAnalysis
   robotType: RobotType
+  isOnDevice?: boolean
 }
 export function CommandText(props: Props): JSX.Element | null {
-  const { command, robotSideAnalysis, robotType, ...styleProps } = props
+  const {
+    command,
+    robotSideAnalysis,
+    robotType,
+    isOnDevice = false,
+    ...styleProps
+  } = props
   const { t } = useTranslation('protocol_command_text')
 
   switch (command.commandType) {
     case 'aspirate':
+    case 'aspirateInPlace':
     case 'dispense':
     case 'dispenseInPlace':
     case 'blowout':
@@ -94,10 +108,17 @@ export function CommandText(props: Props): JSX.Element | null {
       const { profile } = command.params
       const steps = profile.map(
         ({ holdSeconds, celsius }: { holdSeconds: number; celsius: number }) =>
-          t('tc_run_profile_steps', { celsius: celsius, seconds: holdSeconds })
+          t('tc_run_profile_steps', {
+            celsius: celsius,
+            seconds: holdSeconds,
+          }).trim()
       )
       return (
-        <Flex flexDirection={DIRECTION_COLUMN} {...styleProps}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          {...styleProps}
+          alignItems={isOnDevice ? ALIGN_CENTER : undefined}
+        >
           <StyledText as="p" marginBottom={SPACING.spacing4} {...styleProps}>
             {t('tc_starting_profile', {
               repetitions: Object.keys(steps).length,
@@ -105,9 +126,13 @@ export function CommandText(props: Props): JSX.Element | null {
           </StyledText>
           <StyledText as="p" marginLeft={SPACING.spacing16}>
             <ul>
-              {steps.map((step: string, index: number) => (
-                <li key={index}> {step}</li>
-              ))}
+              {isOnDevice ? (
+                <li>{steps[0]}</li>
+              ) : (
+                steps.map((step: string, index: number) => (
+                  <li key={index}> {step}</li>
+                ))
+              )}
             </ul>
           </StyledText>
         </Flex>
@@ -197,6 +222,25 @@ export function CommandText(props: Props): JSX.Element | null {
         </StyledText>
       )
     }
+    case 'configureNozzleLayout': {
+      const { configurationParams, pipetteId } = command.params
+      const pipetteName = robotSideAnalysis.pipettes.find(
+        pip => pip.id === pipetteId
+      )?.pipetteName
+
+      // TODO (sb, 11/9/23): Add support for other configurations when needed
+      return (
+        <StyledText as="p" {...styleProps}>
+          {t('configure_nozzle_layout', {
+            amount: configurationParams.style === 'COLUMN' ? '8' : 'all',
+            pipette:
+              pipetteName != null
+                ? getPipetteNameSpecs(pipetteName)?.displayName
+                : '',
+          })}
+        </StyledText>
+      )
+    }
     case 'prepareToAspirate': {
       const { pipetteId } = command.params
       const pipetteName = robotSideAnalysis.pipettes.find(
@@ -215,13 +259,30 @@ export function CommandText(props: Props): JSX.Element | null {
       )
     }
     case 'moveToAddressableArea': {
-      const { addressableAreaName, speed, minimumZHeight } = command.params
+      const addressableAreaDisplayName = getAddressableAreaDisplayName(
+        robotSideAnalysis,
+        command.id,
+        t
+      )
+
       return (
         <StyledText as="p" {...styleProps}>
           {t('move_to_addressable_area', {
-            addressable_area: addressableAreaName,
-            speed: speed,
-            height: minimumZHeight,
+            addressable_area: addressableAreaDisplayName,
+          })}
+        </StyledText>
+      )
+    }
+    case 'moveToAddressableAreaForDropTip': {
+      const addressableAreaDisplayName = getAddressableAreaDisplayName(
+        robotSideAnalysis,
+        command.id,
+        t
+      )
+      return (
+        <StyledText as="p" {...styleProps}>
+          {t('move_to_addressable_area_drop_tip', {
+            addressable_area: addressableAreaDisplayName,
           })}
         </StyledText>
       )

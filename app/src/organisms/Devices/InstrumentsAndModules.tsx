@@ -105,6 +105,8 @@ export function InstrumentsAndModules({
     attachedPipettes?.left ?? null
   )
   const attachPipetteRequired =
+    attachedLeftPipette == null && attachedRightPipette == null
+  const calibratePipetteRequired =
     attachedLeftPipette?.data?.calibratedOffset?.last_modified == null &&
     attachedRightPipette?.data?.calibratedOffset?.last_modified == null
   const updatePipetteFWRequired =
@@ -240,6 +242,7 @@ export function InstrumentsAndModules({
                   module={module}
                   isLoadedInRun={false}
                   attachPipetteRequired={attachPipetteRequired}
+                  calibratePipetteRequired={calibratePipetteRequired}
                   updatePipetteFWRequired={updatePipetteFWRequired}
                 />
               ))}
@@ -281,6 +284,7 @@ export function InstrumentsAndModules({
                   module={module}
                   isLoadedInRun={false}
                   attachPipetteRequired={attachPipetteRequired}
+                  calibratePipetteRequired={calibratePipetteRequired}
                   updatePipetteFWRequired={updatePipetteFWRequired}
                 />
               ))}

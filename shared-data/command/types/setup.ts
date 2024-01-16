@@ -1,12 +1,11 @@
 import type {
+  AddressableAreaName,
   CommonCommandRunTimeInfo,
   CommonCommandCreateInfo,
   LabwareDefinition2,
   LabwareOffset,
   PipetteName,
   ModuleModel,
-  FixtureLoadName,
-  Cutout,
 } from '../../js'
 
 export interface LoadPipetteCreateCommand extends CommonCommandCreateInfo {
@@ -60,29 +59,31 @@ export interface LoadLiquidRunTimeCommand
     LoadLiquidCreateCommand {
   result?: LoadLiquidResult
 }
-//  TODO(jr, 10/31/23): update `loadFixture` to `loadAddressableArea`
-export interface LoadFixtureCreateCommand extends CommonCommandCreateInfo {
-  commandType: 'loadFixture'
-  params: LoadFixtureParams
+
+export interface ConfigureNozzleLayoutCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'configureNozzleLayout'
+  params: ConfigureNozzleLayoutParams
 }
-export interface LoadFixtureRunTimeCommand
+
+export interface ConfigureNozzleLayoutRunTimeCommand
   extends CommonCommandRunTimeInfo,
-    LoadFixtureCreateCommand {
-  result?: LoadLabwareResult
+    ConfigureNozzleLayoutCreateCommand {
+  result?: {}
 }
 
 export type SetupRunTimeCommand =
+  | ConfigureNozzleLayoutRunTimeCommand
   | LoadPipetteRunTimeCommand
   | LoadLabwareRunTimeCommand
-  | LoadFixtureRunTimeCommand
   | LoadModuleRunTimeCommand
   | LoadLiquidRunTimeCommand
   | MoveLabwareRunTimeCommand
 
 export type SetupCreateCommand =
+  | ConfigureNozzleLayoutCreateCommand
   | LoadPipetteCreateCommand
   | LoadLabwareCreateCommand
-  | LoadFixtureCreateCommand
   | LoadModuleCreateCommand
   | LoadLiquidCreateCommand
   | MoveLabwareCreateCommand
@@ -92,13 +93,13 @@ export type LabwareLocation =
   | { slotName: string }
   | { moduleId: string }
   | { labwareId: string }
-  | { addressableAreaName: string }
+  | { addressableAreaName: AddressableAreaName }
 
 export type NonStackedLocation =
   | 'offDeck'
   | { slotName: string }
   | { moduleId: string }
-  | { addressableAreaName: string }
+  | { addressableAreaName: AddressableAreaName }
 
 export interface ModuleLocation {
   slotName: string
@@ -156,8 +157,25 @@ interface LoadLiquidResult {
   liquidId: string
 }
 
-interface LoadFixtureParams {
-  location: { cutout: Cutout }
-  loadName: FixtureLoadName
-  fixtureId?: string
+export const COLUMN = 'COLUMN'
+const SINGLE = 'SINGLE'
+const ROW = 'ROW'
+const QUADRANT = 'QUADRANT'
+export const ALL = 'ALL'
+
+export type NozzleConfigurationStyle =
+  | typeof COLUMN
+  | typeof SINGLE
+  | typeof ROW
+  | typeof QUADRANT
+  | typeof ALL
+
+interface NozzleConfigurationParams {
+  primaryNozzle?: string
+  style: NozzleConfigurationStyle
+}
+
+interface ConfigureNozzleLayoutParams {
+  pipetteId: string
+  configurationParams: NozzleConfigurationParams
 }

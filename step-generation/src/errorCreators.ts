@@ -19,6 +19,13 @@ export function missingAdapter(): CommandCreatorError {
   }
 }
 
+export function removeAdapter(): CommandCreatorError {
+  return {
+    type: 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER',
+    message: 'A 96-channel cannot pick up tips partially with an adapter',
+  }
+}
+
 export function noTipOnPipette(args: {
   actionName: string
   pipette: string
@@ -161,6 +168,16 @@ export const tallLabwareEastWestOfHeaterShaker = (
   }
 }
 
+export const tallLabwareWestOf96ChannelPipetteLabware = (args: {
+  source: string
+  labware: string
+}): CommandCreatorError => {
+  return {
+    type: 'TALL_LABWARE_WEST_OF_96_CHANNEL_LABWARE',
+    message: `Labware to the left of the ${args.source} ${args.labware} is too tall and will collide with the 96-channel.`,
+  }
+}
+
 export const heaterShakerEastWestWithLatchOpen = (): CommandCreatorError => {
   return {
     type: 'HEATER_SHAKER_EAST_WEST_LATCH_OPEN',
@@ -203,11 +220,32 @@ export const dropTipLocationDoesNotExist = (): CommandCreatorError => {
   }
 }
 
-export const additionalEquipmentDoesNotExist = (args: {
-  additionalEquipment: string
+export const equipmentDoesNotExist = (): CommandCreatorError => {
+  return {
+    type: 'EQUIPMENT_DOES_NOT_EXIST',
+    message: `The equipment does not exist`,
+  }
+}
+
+export const gripperRequired = (): CommandCreatorError => {
+  return {
+    type: 'GRIPPER_REQUIRED',
+    message: 'The gripper is required to fulfill this action',
+  }
+}
+
+export const pipettingIntoColumn4 = (args: {
+  typeOfStep: string
 }): CommandCreatorError => {
   return {
-    type: 'ADDITIONAL_EQUIPMENT_DOES_NOT_EXIST',
-    message: `The ${args.additionalEquipment} does not exist`,
+    type: 'PIPETTING_INTO_COLUMN_4',
+    message: `Cannot ${args.typeOfStep} into a column 4 slot.`,
+  }
+}
+
+export const cannotMoveWithGripper = (): CommandCreatorError => {
+  return {
+    type: 'CANNOT_MOVE_WITH_GRIPPER',
+    message: 'The gripper cannot move aluminum blocks',
   }
 }

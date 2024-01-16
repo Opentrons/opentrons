@@ -27,6 +27,8 @@ import {
 import { Portal } from './portals/MainPageModalPortal'
 import { stepIconsByType, StepType } from '../form-types'
 import styles from './listButtons.css'
+import { ThunkDispatch } from 'redux-thunk'
+import { BaseState } from '../types'
 
 interface StepButtonComponentProps {
   children: React.ReactNode
@@ -137,7 +139,7 @@ export const StepCreationButton = (): JSX.Element => {
     enqueuedStepType,
     setEnqueuedStepType,
   ] = React.useState<StepType | null>(null)
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
 
   const addStep = (
     stepType: StepType

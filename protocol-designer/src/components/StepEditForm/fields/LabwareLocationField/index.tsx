@@ -12,7 +12,7 @@ import {
 } from '../../../../step-forms/selectors'
 import {
   getRobotStateAtActiveItem,
-  getUnocuppiedLabwareLocationOptions,
+  getUnoccupiedLabwareLocationOptions,
 } from '../../../../top-selectors/labware-locations'
 import { getHasWasteChute } from '../../../labware'
 import { StepFormDropdown } from '../StepFormDropdownField'
@@ -36,7 +36,7 @@ export function LabwareLocationField(
     useGripper && hasWasteChute && !isLabwareOffDeck
 
   let unoccupiedLabwareLocationsOptions =
-    useSelector(getUnocuppiedLabwareLocationOptions) ?? []
+    useSelector(getUnoccupiedLabwareLocationOptions) ?? []
 
   if (isLabwareOffDeck && hasWasteChute) {
     unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(

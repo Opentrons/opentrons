@@ -35,7 +35,7 @@ const INSTRUMENT_CARD_STYLE = css`
   }
 `
 
-const SUBSYSTEM_UPDATE_POLL_MS = 5000
+const POLL_DURATION_MS = 5000
 
 export function GripperCard({
   attachedGripper,
@@ -64,13 +64,33 @@ export function GripperCard({
   const handleCalibrate: React.MouseEventHandler<HTMLButtonElement> = () => {
     setOpenWizardFlowType(GRIPPER_FLOW_TYPES.RECALIBRATE)
   }
+  const [pollForSubsystemUpdate, setPollForSubsystemUpdate] = React.useState(
+    false
+  )
   const { data: subsystemUpdateData } = useCurrentSubsystemUpdateQuery(
     'gripper',
     {
-      enabled: attachedGripper?.ok === false,
-      refetchInterval: SUBSYSTEM_UPDATE_POLL_MS,
+      enabled: pollForSubsystemUpdate,
+      refetchInterval: POLL_DURATION_MS,
     }
   )
+  // we should poll for a subsystem update from the time a bad instrument is
+  // detected until the update has been done for 5 seconds
+  // this gives the instruments endpoint time to start reporting
+  // a good instrument
+  React.useEffect(() => {
+    if (attachedGripper?.ok === false) {
+      setPollForSubsystemUpdate(true)
+    } else if (
+      subsystemUpdateData != null &&
+      subsystemUpdateData.data.updateStatus === 'done'
+    ) {
+      setTimeout(() => {
+        setPollForSubsystemUpdate(false)
+      }, POLL_DURATION_MS)
+    }
+  }, [attachedGripper?.ok, subsystemUpdateData])
+
   const menuOverlayItems =
     attachedGripper == null || !attachedGripper.ok
       ? [
@@ -136,7 +156,8 @@ export function GripperCard({
           menuOverlayItems={menuOverlayItems}
         />
       ) : null}
-      {attachedGripper?.ok === false || subsystemUpdateData != null ? (
+      {attachedGripper?.ok === false ||
+      (subsystemUpdateData != null && pollForSubsystemUpdate) ? (
         <InstrumentCard
           label={i18n.format(t('mount', { side: 'extension' }), 'capitalize')}
           css={INSTRUMENT_CARD_STYLE}

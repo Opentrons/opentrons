@@ -14,13 +14,18 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
+import {
+  useDeckConfigurationQuery,
+  useUpdateDeckConfigurationMutation,
+} from '@opentrons/react-api-client'
 import {
   getCutoutDisplayName,
   getFixtureDisplayName,
-  STAGING_AREA_LOAD_NAME,
-  TRASH_BIN_LOAD_NAME,
-  WASTE_CHUTE_LOAD_NAME,
+  STAGING_AREA_CUTOUTS,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  TRASH_BIN_ADAPTER_FIXTURE,
+  WASTE_CHUTE_CUTOUT,
+  WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
 import { StyledText } from '../../atoms/text'
@@ -30,70 +35,68 @@ import { Modal } from '../../molecules/Modal'
 import { LegacyModal } from '../../molecules/LegacyModal'
 
 import type {
-  Cutout,
+  CutoutConfig,
+  CutoutId,
+  CutoutFixtureId,
   DeckConfiguration,
-  Fixture,
-  FixtureLoadName,
 } from '@opentrons/shared-data'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { LegacyModalProps } from '../../molecules/LegacyModal'
 
+const GENERIC_WASTE_CHUTE_OPTION = 'WASTE_CHUTE'
+
 interface AddFixtureModalProps {
-  fixtureLocation: Cutout
+  cutoutId: CutoutId
   setShowAddFixtureModal: (showAddFixtureModal: boolean) => void
-  setCurrentDeckConfig?: React.Dispatch<React.SetStateAction<DeckConfiguration>>
-  providedFixtureOptions?: FixtureLoadName[]
+  setCurrentDeckConfig?: React.Dispatch<React.SetStateAction<CutoutConfig[]>>
+  providedFixtureOptions?: CutoutFixtureId[]
   isOnDevice?: boolean
 }
 
 export function AddFixtureModal({
-  fixtureLocation,
+  cutoutId,
   setShowAddFixtureModal,
   setCurrentDeckConfig,
   providedFixtureOptions,
   isOnDevice = false,
 }: AddFixtureModalProps): JSX.Element {
-  const { t } = useTranslation('device_details')
+  const { t } = useTranslation(['device_details', 'shared'])
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
+  const deckConfig = useDeckConfigurationQuery()?.data ?? []
+  const [showWasteChuteOptions, setShowWasteChuteOptions] = React.useState(
+    false
+  )
 
   const modalHeader: ModalHeaderBaseProps = {
     title: t('add_to_slot', {
-      slotName: getCutoutDisplayName(fixtureLocation),
+      slotName: getCutoutDisplayName(cutoutId),
     }),
-    hasExitIcon: true,
+    hasExitIcon: providedFixtureOptions == null,
     onClick: () => setShowAddFixtureModal(false),
   }
 
   const modalProps: LegacyModalProps = {
     title: t('add_to_slot', {
-      slotName: getCutoutDisplayName(fixtureLocation),
+      slotName: getCutoutDisplayName(cutoutId),
     }),
     onClose: () => setShowAddFixtureModal(false),
     closeOnOutsideClick: true,
     childrenPadding: SPACING.spacing24,
-    width: '23.125rem',
+    width: '26.75rem',
   }
 
-  const availableFixtures: FixtureLoadName[] = [TRASH_BIN_LOAD_NAME]
-  if (
-    fixtureLocation === 'cutoutA3' ||
-    fixtureLocation === 'cutoutB3' ||
-    fixtureLocation === 'cutoutC3'
-  ) {
-    availableFixtures.push(STAGING_AREA_LOAD_NAME)
-  }
-  if (fixtureLocation === 'cutoutD3') {
-    availableFixtures.push(STAGING_AREA_LOAD_NAME, WASTE_CHUTE_LOAD_NAME)
+  const availableFixtures: CutoutFixtureId[] = [TRASH_BIN_ADAPTER_FIXTURE]
+  if (STAGING_AREA_CUTOUTS.includes(cutoutId)) {
+    availableFixtures.push(STAGING_AREA_RIGHT_SLOT_FIXTURE)
   }
 
-  // For Touchscreen app
-  const handleTapAdd = (fixtureLoadName: FixtureLoadName): void => {
+  const handleAddODD = (requiredFixtureId: CutoutFixtureId): void => {
     if (setCurrentDeckConfig != null)
       setCurrentDeckConfig(
         (prevDeckConfig: DeckConfiguration): DeckConfiguration =>
-          prevDeckConfig.map((fixture: Fixture) =>
-            fixture.fixtureLocation === fixtureLocation
-              ? { ...fixture, loadName: fixtureLoadName }
+          prevDeckConfig.map((fixture: CutoutConfig) =>
+            fixture.cutoutId === cutoutId
+              ? { ...fixture, cutoutFixtureId: requiredFixtureId }
               : fixture
           )
       )
@@ -101,14 +104,40 @@ export function AddFixtureModal({
     setShowAddFixtureModal(false)
   }
 
-  // For Desktop app
   const fixtureOptions = providedFixtureOptions ?? availableFixtures
+  const fixtureOptionsWithDisplayNames: Array<
+    [CutoutFixtureId | 'WASTE_CHUTE', string]
+  > = fixtureOptions.map(fixture => [fixture, getFixtureDisplayName(fixture)])
 
-  const handleClickAdd = (fixtureLoadName: FixtureLoadName): void => {
-    updateDeckConfiguration({
-      fixtureLocation,
-      loadName: fixtureLoadName,
-    })
+  const showSelectWasteChuteOptions =
+    cutoutId === WASTE_CHUTE_CUTOUT && providedFixtureOptions == null
+
+  const fixtureOptionsWithDisplayNamesAndGenericWasteChute = fixtureOptionsWithDisplayNames.concat(
+    showSelectWasteChuteOptions
+      ? [[GENERIC_WASTE_CHUTE_OPTION, t('waste_chute')]]
+      : []
+  )
+
+  fixtureOptionsWithDisplayNamesAndGenericWasteChute.sort((a, b) =>
+    a[1].localeCompare(b[1])
+  )
+
+  const wasteChuteOptionsWithDisplayNames = WASTE_CHUTE_FIXTURES.map(
+    fixture => [fixture, getFixtureDisplayName(fixture)]
+  ).sort((a, b) => a[1].localeCompare(b[1])) as Array<[CutoutFixtureId, string]>
+
+  const displayedFixtureOptions = showWasteChuteOptions
+    ? wasteChuteOptionsWithDisplayNames
+    : fixtureOptionsWithDisplayNamesAndGenericWasteChute
+
+  const handleAddDesktop = (requiredFixtureId: CutoutFixtureId): void => {
+    const newDeckConfig = deckConfig.map(fixture =>
+      fixture.cutoutId === cutoutId
+        ? { ...fixture, cutoutFixtureId: requiredFixtureId }
+        : fixture
+    )
+
+    updateDeckConfiguration(newDeckConfig)
     setShowAddFixtureModal(false)
   }
 
@@ -117,19 +146,49 @@ export function AddFixtureModal({
       {isOnDevice ? (
         <Modal
           header={modalHeader}
-          onOutsideClick={() => setShowAddFixtureModal(false)}
+          onOutsideClick={() =>
+            providedFixtureOptions != null
+              ? null
+              : setShowAddFixtureModal(false)
+          }
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <StyledText as="p">{t('add_to_slot_description')}</StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              {fixtureOptions.map(fixture => (
-                <React.Fragment key={fixture}>
-                  <AddFixtureButton
-                    fixtureLoadName={fixture}
-                    handleClickAdd={handleTapAdd}
-                  />
-                </React.Fragment>
-              ))}
+              {displayedFixtureOptions.map(
+                ([cutoutFixtureOption, fixtureDisplayName]) => {
+                  const onClickHandler =
+                    cutoutFixtureOption === GENERIC_WASTE_CHUTE_OPTION
+                      ? () => setShowWasteChuteOptions(true)
+                      : () => handleAddODD(cutoutFixtureOption)
+                  const buttonText =
+                    cutoutFixtureOption === GENERIC_WASTE_CHUTE_OPTION
+                      ? t('select_options')
+                      : t('add')
+
+                  return (
+                    <React.Fragment key={cutoutFixtureOption}>
+                      <Btn
+                        onClick={onClickHandler}
+                        display="flex"
+                        justifyContent={JUSTIFY_SPACE_BETWEEN}
+                        flexDirection={DIRECTION_ROW}
+                        alignItems={ALIGN_CENTER}
+                        padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
+                        css={FIXTURE_BUTTON_STYLE}
+                      >
+                        <StyledText
+                          as="p"
+                          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                        >
+                          {fixtureDisplayName}
+                        </StyledText>
+                        <StyledText as="p">{buttonText}</StyledText>
+                      </Btn>
+                    </React.Fragment>
+                  )
+                }
+              )}
             </Flex>
           </Flex>
         </Modal>
@@ -138,58 +197,56 @@ export function AddFixtureModal({
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
             <StyledText as="p">{t('add_fixture_description')}</StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              {fixtureOptions.map(fixture => (
-                <React.Fragment key={fixture}>
-                  <Flex
-                    flexDirection={DIRECTION_ROW}
-                    alignItems={ALIGN_CENTER}
-                    justifyContent={JUSTIFY_SPACE_BETWEEN}
-                    padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
-                    backgroundColor={COLORS.medGreyEnabled}
-                    borderRadius={BORDERS.borderRadiusSize1}
-                  >
-                    <StyledText css={TYPOGRAPHY.pSemiBold}>
-                      {getFixtureDisplayName(fixture)}
-                    </StyledText>
-                    <TertiaryButton onClick={() => handleClickAdd(fixture)}>
-                      {t('add')}
-                    </TertiaryButton>
-                  </Flex>
-                </React.Fragment>
-              ))}
+              {displayedFixtureOptions.map(
+                ([cutoutFixtureOption, fixtureDisplayName]) => {
+                  const onClickHandler =
+                    cutoutFixtureOption === GENERIC_WASTE_CHUTE_OPTION
+                      ? () => setShowWasteChuteOptions(true)
+                      : () => handleAddDesktop(cutoutFixtureOption)
+                  const buttonText =
+                    cutoutFixtureOption === GENERIC_WASTE_CHUTE_OPTION
+                      ? t('select_options')
+                      : t('add')
+
+                  return (
+                    <React.Fragment key={cutoutFixtureOption}>
+                      <Flex
+                        flexDirection={DIRECTION_ROW}
+                        alignItems={ALIGN_CENTER}
+                        justifyContent={JUSTIFY_SPACE_BETWEEN}
+                        padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
+                        backgroundColor={COLORS.medGreyEnabled}
+                        borderRadius={BORDERS.borderRadiusSize1}
+                      >
+                        <StyledText css={TYPOGRAPHY.pSemiBold}>
+                          {fixtureDisplayName}
+                        </StyledText>
+                        <TertiaryButton onClick={onClickHandler}>
+                          {buttonText}
+                        </TertiaryButton>
+                      </Flex>
+                    </React.Fragment>
+                  )
+                }
+              )}
             </Flex>
           </Flex>
+          {showWasteChuteOptions ? (
+            <Btn
+              onClick={() => setShowWasteChuteOptions(false)}
+              aria-label="back"
+              paddingX={SPACING.spacing16}
+              marginTop={'1.44rem'}
+              marginBottom={'0.56rem'}
+            >
+              <StyledText css={GO_BACK_BUTTON_STYLE}>
+                {t('shared:go_back')}
+              </StyledText>
+            </Btn>
+          ) : null}
         </LegacyModal>
       )}
     </>
-  )
-}
-
-interface AddFixtureButtonProps {
-  fixtureLoadName: FixtureLoadName
-  handleClickAdd: (fixtureLoadName: FixtureLoadName) => void
-}
-function AddFixtureButton({
-  fixtureLoadName,
-  handleClickAdd,
-}: AddFixtureButtonProps): JSX.Element {
-  const { t } = useTranslation('device_details')
-
-  return (
-    <Btn
-      onClick={() => handleClickAdd(fixtureLoadName)}
-      display="flex"
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      flexDirection={DIRECTION_ROW}
-      alignItems={ALIGN_CENTER}
-      padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-      css={FIXTURE_BUTTON_STYLE}
-    >
-      <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-        {getFixtureDisplayName(fixtureLoadName)}
-      </StyledText>
-      <StyledText as="p">{t('add')}</StyledText>
-    </Btn>
   )
 }
 
@@ -222,5 +279,13 @@ const FIXTURE_BUTTON_STYLE = css`
   &:disabled {
     background-color: ${COLORS.light1};
     color: ${COLORS.darkBlack60};
+  }
+`
+const GO_BACK_BUTTON_STYLE = css`
+  ${TYPOGRAPHY.pSemiBold};
+  color: ${COLORS.darkGreyEnabled};
+
+  &:hover {
+    opacity: 70%;
   }
 `

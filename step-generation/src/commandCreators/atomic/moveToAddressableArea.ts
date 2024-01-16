@@ -1,9 +1,11 @@
+import type { AddressableAreaName } from '@opentrons/shared-data'
+
 import { uuid } from '../../utils'
 import type { CommandCreator } from '../../types'
 
 export interface MoveToAddressableAreaArgs {
   pipetteId: string
-  addressableAreaName: string
+  addressableAreaName: AddressableAreaName
 }
 export const moveToAddressableArea: CommandCreator<MoveToAddressableAreaArgs> = (
   args,
@@ -19,6 +21,7 @@ export const moveToAddressableArea: CommandCreator<MoveToAddressableAreaArgs> = 
       params: {
         pipetteId,
         addressableAreaName,
+        offset: { x: 0, y: 0, z: 0 },
       },
     },
   ]

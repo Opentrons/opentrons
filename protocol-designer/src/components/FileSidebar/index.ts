@@ -28,11 +28,9 @@ interface SP {
   savedStepForms: SavedStepFormState
   robotType: RobotType
   additionalEquipment: AdditionalEquipment
-  labwareOnDeck: InitialDeckSetup['labware']
 }
 export const FileSidebar = connect(
   mapStateToProps,
-  // @ts-expect-error(sa, 2021-6-21): TODO: refactor to use hooks api
   null,
   mergeProps
 )(FileSidebarComponent)
@@ -55,7 +53,6 @@ function mapStateToProps(state: BaseState): SP {
     // Ignore clicking 'CREATE NEW' button in these cases
     _canCreateNew: !selectors.getNewProtocolModal(state),
     _hasUnsavedChanges: loadFileSelectors.getHasUnsavedChanges(state),
-    labwareOnDeck: initialDeckSetup.labware,
   }
 }
 
@@ -75,7 +72,6 @@ function mergeProps(
     savedStepForms,
     robotType,
     additionalEquipment,
-    labwareOnDeck,
   } = stateProps
   const { dispatch } = dispatchProps
   return {
@@ -98,6 +94,5 @@ function mergeProps(
     savedStepForms,
     robotType,
     additionalEquipment,
-    labwareOnDeck,
   }
 }

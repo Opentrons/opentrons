@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
@@ -98,26 +98,35 @@ describe('LabwareDetails', () => {
 
   it('should no render Mock Well Dimensions, if a labware does not have groupMetaData', () => {
     props.labware.definition.groups = []
-    const [{ queryByText }] = render(props)
-    expect(queryByText('Mock WellDimensions')).not.toBeInTheDocument()
+    render(props)
+    expect(screen.queryByText('Mock WellDimensions')).not.toBeInTheDocument()
   })
 
   it('should render correct info for custom labware', () => {
     props.labware.definition.namespace = 'custom'
-    const [{ queryByText }] = render(props)
-    expect(queryByText('Opentrons Definition')).not.toBeInTheDocument()
+    render(props)
+    expect(screen.queryByText('Opentrons Definition')).not.toBeInTheDocument()
   })
 
-  it('when clicking copy icon, should show tooltip as feedback', () => {
-    const [{ getByTestId, findByText }] = render(props)
-    const button = getByTestId('labwareDetails_slideout_close_button')
-    fireEvent.click(button)
-    findByText('Copied')
-  })
+  it.todo('when clicking copy icon, should show tooltip as feedback')
+  // NOTE: popper updates internally async so item is not visible,
+  // it might be worth mocking it's implementation
+  //
+  // , async () => {
+  //   const user = userEvent.setup()
+  //   render(props)
+  //   const button = screen.getByRole('button', { name: 'copy' })
+  //   user.click(button)
+  //   await waitFor(() => {
+  //     expect(screen.queryByText(/Copied!/i)).not.toBeNull()
+  //   })
+  // })
 
   it('should close the slideout when clicking the close button', () => {
-    const [{ getByTestId }] = render(props)
-    const closeButton = getByTestId('labwareDetails_slideout_close_button')
+    render(props)
+    const closeButton = screen.getByTestId(
+      'labwareDetails_slideout_close_button'
+    )
     fireEvent.click(closeButton)
     expect(props.onClose).toHaveBeenCalled()
   })

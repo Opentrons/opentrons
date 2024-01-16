@@ -11,6 +11,7 @@ const EXPECTED_VALID_QUIRKS = [
   'touchTipDisabled',
   'fixedTrash',
   'gripperIncompatible',
+  'tiprackAdapterFor96Channel',
 ]
 
 describe('check quirks for all labware defs', () => {

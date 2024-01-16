@@ -463,7 +463,7 @@ def create_geometry(
 
     # apply the slot transform if any
     xform = np.array(xform_ser)
-    xformed = np.dot(xform, pre_transform)  # type: ignore[no-untyped-call]
+    xformed = np.dot(xform, pre_transform)
     module_type = ModuleType(definition["moduleType"])
 
     if module_type == ModuleType.MAGNETIC or module_type == ModuleType.TEMPERATURE:

@@ -49,7 +49,7 @@ class DeckConfigurationResponse(pydantic.BaseModel):
     cutoutFixtures: List[CutoutFixture] = pydantic.Field(
         description="A full list of all the cutout fixtures that are mounted onto the deck."
     )
-    lastUpdatedAt: Optional[datetime] = pydantic.Field(
+    lastModifiedAt: Optional[datetime] = pydantic.Field(
         description=(
             "When the deck configuration was last set over HTTP."
             " If that has never happened, this will be `null` or omitted."

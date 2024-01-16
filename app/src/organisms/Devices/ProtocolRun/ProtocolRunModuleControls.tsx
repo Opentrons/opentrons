@@ -15,6 +15,7 @@ import type { BadPipette, PipetteData } from '@opentrons/api-client'
 
 interface PipetteStatus {
   attachPipetteRequired: boolean
+  calibratePipetteRequired: boolean
   updatePipetteFWRequired: boolean
 }
 
@@ -51,9 +52,16 @@ const usePipetteIsReady = (): PipetteStatus => {
 
   const attachPipetteRequired =
     attachedLeftPipette == null && attachedRightPipette == null
+  const calibratePipetteRequired =
+    attachedLeftPipette?.data.calibratedOffset?.last_modified == null &&
+    attachedRightPipette?.data.calibratedOffset?.last_modified == null
   const updatePipetteFWRequired =
     leftPipetteRequiresFWUpdate != null || rightPipetteFWRequired != null
-  return { attachPipetteRequired, updatePipetteFWRequired }
+  return {
+    attachPipetteRequired,
+    calibratePipetteRequired,
+    updatePipetteFWRequired,
+  }
 }
 
 interface ProtocolRunModuleControlsProps {
@@ -67,10 +75,13 @@ export const ProtocolRunModuleControls = ({
 }: ProtocolRunModuleControlsProps): JSX.Element => {
   const { t } = useTranslation('protocol_details')
 
-  const { attachPipetteRequired, updatePipetteFWRequired } = usePipetteIsReady()
+  const {
+    attachPipetteRequired,
+    calibratePipetteRequired,
+    updatePipetteFWRequired,
+  } = usePipetteIsReady()
 
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
-    robotName,
     runId
   )
   const attachedModules = Object.values(moduleRenderInfoForProtocolById).filter(
@@ -116,6 +127,7 @@ export const ProtocolRunModuleControls = ({
               slotName={module.slotName}
               isLoadedInRun={true}
               attachPipetteRequired={attachPipetteRequired}
+              calibratePipetteRequired={calibratePipetteRequired}
               updatePipetteFWRequired={updatePipetteFWRequired}
             />
           ) : null
@@ -136,6 +148,7 @@ export const ProtocolRunModuleControls = ({
               slotName={module.slotName}
               isLoadedInRun={true}
               attachPipetteRequired={attachPipetteRequired}
+              calibratePipetteRequired={calibratePipetteRequired}
               updatePipetteFWRequired={updatePipetteFWRequired}
             />
           ) : null

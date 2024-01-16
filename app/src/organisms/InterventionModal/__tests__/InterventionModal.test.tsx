@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import {
   CompletedProtocolAnalysis,
@@ -15,10 +16,15 @@ import {
   truncatedCommandMessage,
 } from '../__fixtures__'
 import { mockTipRackDefinition } from '../../../redux/custom-labware/__fixtures__'
+import { useIsFlex } from '../../Devices/hooks'
 
 const ROBOT_NAME = 'Otie'
 
 const mockOnResumeHandler = jest.fn()
+
+jest.mock('../../Devices/hooks')
+
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 
 const render = (props: React.ComponentProps<typeof InterventionModal>) => {
   return renderWithProviders(<InterventionModal {...props} />, {
@@ -43,6 +49,7 @@ describe('InterventionModal', () => {
         ],
       } as CompletedProtocolAnalysis,
     }
+    mockUseIsFlex.mockReturnValue(true)
   })
 
   it('renders an InterventionModal with the robot name in the header and confirm button', () => {
@@ -68,7 +75,7 @@ describe('InterventionModal', () => {
 
   it('clicking "Confirm and resume" triggers the resume handler', () => {
     const { getByText } = render(props)
-    getByText('Confirm and resume').click()
+    fireEvent.click(getByText('Confirm and resume'))
     expect(mockOnResumeHandler).toHaveBeenCalled()
   })
 
@@ -99,6 +106,45 @@ describe('InterventionModal', () => {
     getByText('mockLabware')
     queryAllByText('A1')
     queryAllByText('D3')
+  })
+
+  it('renders a move labware intervention modal given a move labware command - between staging area slots', () => {
+    props = {
+      ...props,
+      command: {
+        id: 'mockMoveLabwareCommandId',
+        key: 'mockMoveLabwareCommandKey',
+        commandType: 'moveLabware',
+        params: {
+          labwareId: 'mockLabwareId',
+          newLocation: {
+            addressableAreaName: 'C4',
+          },
+          strategy: 'manualMoveWithPause',
+        },
+        startedAt: 'fake_timestamp',
+        completedAt: 'fake_timestamp',
+        createdAt: 'fake_timestamp',
+        status: 'succeeded',
+      },
+      run: {
+        labware: [
+          {
+            id: 'mockLabwareId',
+            displayName: 'mockLabwareInStagingArea',
+            location: { slotName: 'B4' },
+            definitionUri: getLabwareDefURI(mockTipRackDefinition),
+          },
+        ],
+        modules: [],
+      } as any,
+    }
+    const { getByText, queryAllByText } = render(props)
+    getByText('Move labware on Otie')
+    getByText('Labware name')
+    getByText('mockLabwareInStagingArea')
+    queryAllByText('B4')
+    queryAllByText('C4')
   })
 
   it('renders a move labware intervention modal given a move labware command - module starting point', () => {

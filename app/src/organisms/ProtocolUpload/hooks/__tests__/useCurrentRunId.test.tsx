@@ -1,5 +1,5 @@
 import { when, resetAllWhenMocks } from 'jest-when'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { useAllRunsQuery } from '@opentrons/react-api-client'
 import { useCurrentRunId } from '../useCurrentRunId'
 

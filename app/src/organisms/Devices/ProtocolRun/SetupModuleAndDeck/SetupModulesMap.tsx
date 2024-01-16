@@ -8,11 +8,11 @@ import {
   SPACING,
 } from '@opentrons/components'
 import {
+  FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
-  getRobotTypeFromLoadedLabware,
+  getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 
-import { getDeckConfigFromProtocolCommands } from '../../../../resources/deck_configuration/utils'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getAttachedProtocolModuleMatches } from '../../../ProtocolSetupModulesAndDeck/utils'
 import { ModuleInfo } from '../../ModuleInfo'
@@ -42,7 +42,7 @@ export const SetupModulesMap = ({
   // early return null if no protocol analysis
   if (protocolAnalysis == null) return null
 
-  const robotType = getRobotTypeFromLoadedLabware(protocolAnalysis.labware)
+  const robotType = protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
   const deckDef = getDeckDefFromRobotType(robotType)
   const protocolModulesInfo = getProtocolModulesInfo(protocolAnalysis, deckDef)
 
@@ -51,7 +51,7 @@ export const SetupModulesMap = ({
     protocolModulesInfo
   )
 
-  const moduleLocations = attachedProtocolModuleMatches.map(module => ({
+  const modulesOnDeck = attachedProtocolModuleMatches.map(module => ({
     moduleModel: module.moduleDef.model,
     moduleLocation: { slotName: module.slotName },
     moduleChildren: (
@@ -64,9 +64,7 @@ export const SetupModulesMap = ({
     ),
   }))
 
-  const deckConfig = getDeckConfigFromProtocolCommands(
-    protocolAnalysis.commands
-  )
+  const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
 
   return (
     <Flex
@@ -77,11 +75,14 @@ export const SetupModulesMap = ({
     >
       <Box margin="0 auto" maxWidth="46.25rem" width="100%">
         <BaseDeck
-          deckConfig={deckConfig}
+          deckConfig={deckConfig.map(({ cutoutId, cutoutFixtureId }) => ({
+            cutoutId,
+            cutoutFixtureId,
+          }))}
           deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
           robotType={robotType}
-          labwareLocations={[]}
-          moduleLocations={moduleLocations}
+          labwareOnDeck={[]}
+          modulesOnDeck={modulesOnDeck}
         />
       </Box>
     </Flex>

@@ -177,8 +177,8 @@ class RunArgs:
         )
         return _ctx
 
-    @classmethod  # noqa: C901
-    def build_run_args(cls, args: argparse.Namespace) -> "RunArgs":
+    @classmethod
+    def build_run_args(cls, args: argparse.Namespace) -> "RunArgs":  # noqa: C901
         """Build."""
         _ctx = RunArgs._get_protocol_context(args)
         operator_name = helpers._get_operator_name(_ctx.is_simulating())
@@ -195,6 +195,7 @@ class RunArgs:
             args.pipette,
             "left",
             args.increment,
+            args.photometric,
             args.gantry_speed if not args.photometric else None,
         )
         pipette_tag = helpers._get_tag_from_pipette(
@@ -464,11 +465,6 @@ def _main(
     volumes: List[float],
 ) -> None:
     union_cfg: Union[PhotometricConfig, GravimetricConfig]
-    if not args.jog:
-        ui.print_warning(
-            "overwriting --jog to True, because liquid-probe "
-            "is not repeatable enough for gravimetric tests"
-        )
     if args.photometric:
         cfg_pm: PhotometricConfig = build_photometric_cfg(
             run_args.ctx,
@@ -479,7 +475,7 @@ def _main(
             args.touch_tip,
             args.refill,
             args.extra,
-            True,  # NOTE: (andy s) always jog
+            args.jog,
             args.same_tip,
             args.ignore_fail,
             args.channels,
@@ -503,7 +499,7 @@ def _main(
             args.isolate_channels if args.isolate_channels else [],
             args.isolate_volumes if args.isolate_volumes else [],
             args.extra,
-            True,  # NOTE: (andy s) always jog
+            args.jog,
             args.same_tip,
             args.ignore_fail,
             args.mode,

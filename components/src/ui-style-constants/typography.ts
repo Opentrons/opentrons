@@ -217,6 +217,12 @@ export const smallBodyTextBold = css`
   font-weight: ${fontWeightBold};
 `
 
+export const smallBodyTextSemiBold = css`
+  font-size: ${fontSize20};
+  line-height: ${lineHeight24};
+  font-weight: ${fontWeightSemiBold};
+`
+
 export const smallBodyTextRegular = css`
   font-size: ${fontSize20};
   line-height: ${lineHeight24};
@@ -232,6 +238,7 @@ export const darkLinkH4SemiBold = css`
     color: ${COLORS.darkBlackEnabled};
   }
 `
+
 export const darkLinkLabelSemiBold = css`
   font-size: ${fontSizeLabel};
   font-weight: ${fontWeightSemiBold};

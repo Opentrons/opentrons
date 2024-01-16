@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 from opentrons import types
 from opentrons.hardware_control import CriticalPoint
@@ -19,6 +19,7 @@ from opentrons.protocols.api_support.util import (
 from opentrons.protocols.geometry import planning
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 
+from ..._trash_bin import TrashBin
 from ..._waste_chute import WasteChute
 from ..instrument import AbstractInstrument
 from .legacy_well_core import LegacyWellCore
@@ -112,7 +113,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
 
     def dispense(
         self,
-        location: types.Location,
+        location: Union[types.Location, TrashBin, WasteChute],
         well_core: Optional[LegacyWellCore],
         volume: float,
         rate: float,
@@ -130,6 +131,10 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             in_place: Whether we should move_to location.
             push_out: The amount to push the plunger below bottom position.
         """
+        if isinstance(location, (TrashBin, WasteChute)):
+            raise APIVersionError(
+                "Dispense in Moveable Trash or Waste Chute are not supported in this API Version."
+            )
         if push_out:
             raise APIVersionError("push_out is not supported in this API version.")
         if not in_place:
@@ -139,7 +144,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
 
     def blow_out(
         self,
-        location: types.Location,
+        location: Union[types.Location, TrashBin, WasteChute],
         well_core: Optional[LegacyWellCore],
         in_place: bool,
     ) -> None:
@@ -150,6 +155,11 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             well_core: Unused by legacy core.
             in_place: Whether we should move_to location.
         """
+        if isinstance(location, (TrashBin, WasteChute)):
+            raise APIVersionError(
+                "Blow Out in Moveable Trash or Waste Chute are not supported in this API Version."
+            )
+
         if not in_place:
             self.move_to(location=location)
         self._protocol_interface.get_hardware().blow_out(self._mount)
@@ -284,11 +294,11 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
                     f"Could not return tip to {labware_core.get_display_name()}"
                 )
 
-    def drop_tip_in_waste_chute(
-        self, waste_chute: WasteChute, home_after: Optional[bool]
+    def drop_tip_in_disposal_location(
+        self, disposal_location: Union[TrashBin, WasteChute], home_after: Optional[bool]
     ) -> None:
         raise APIVersionError(
-            "Dropping tips in a waste chute is not supported in this API Version."
+            "Dropping tips in a trash bin or waste chute is not supported in this API Version."
         )
 
     def home(self) -> None:
@@ -307,7 +317,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
 
     def move_to(
         self,
-        location: types.Location,
+        location: Union[types.Location, TrashBin, WasteChute],
         well_core: Optional[LegacyWellCore] = None,
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
@@ -326,6 +336,10 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             LabwareHeightError: An item on the deck is taller than
                 the computed safe travel height.
         """
+        if isinstance(location, (TrashBin, WasteChute)):
+            raise APIVersionError(
+                "Move To Trash Bin and Waste Chute are not supported in this API Version."
+            )
         self.flag_unsafe_move(location)
 
         # prevent direct movement bugs in PAPI version >= 2.10
@@ -527,5 +541,13 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         primary_nozzle: Optional[str],
         front_right_nozzle: Optional[str],
     ) -> None:
-        """This will never be called because it was added in API 2.15."""
+        """This will never be called because it was added in API 2.16."""
         pass
+
+    def get_active_channels(self) -> int:
+        """This will never be called because it was added in API 2.16."""
+        assert False, "get_active_channels only supported in API 2.16 & later"
+
+    def is_tip_tracking_available(self) -> bool:
+        # Tip tracking is always available in legacy context
+        return True

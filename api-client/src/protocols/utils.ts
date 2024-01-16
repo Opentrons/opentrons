@@ -8,7 +8,6 @@ import type {
   LoadedLabware,
   LoadedModule,
   LoadedPipette,
-  LoadFixtureRunTimeCommand,
   LoadLabwareRunTimeCommand,
   LoadLiquidRunTimeCommand,
   LoadModuleRunTimeCommand,
@@ -16,7 +15,6 @@ import type {
   ModuleModel,
   PipetteName,
   RunTimeCommand,
-  AddressableAreaName,
 } from '@opentrons/shared-data'
 
 interface PipetteNamesByMount {
@@ -118,11 +116,14 @@ export function parseInitialLoadedLabwareBySlot(
   return reduce<LoadLabwareRunTimeCommand, LoadedLabwareBySlot>(
     loadLabwareCommandsReversed,
     (acc, command) => {
-      if (
-        typeof command.params.location === 'object' &&
-        'slotName' in command.params.location
-      ) {
-        return { ...acc, [command.params.location.slotName]: command }
+      if (typeof command.params.location === 'object') {
+        let slot: string
+        if ('slotName' in command.params.location) {
+          slot = command.params.location.slotName
+        } else if ('addressableAreaName' in command.params.location) {
+          slot = command.params.location.addressableAreaName
+        } else return acc
+        return { ...acc, [slot]: command }
       } else {
         return acc
       }
@@ -226,83 +227,6 @@ export function parseInitialLoadedModulesBySlot(
   )
 }
 
-export interface LoadedFixturesBySlot {
-  [slotName: string]: LoadFixtureRunTimeCommand
-}
-// TODO(bh, 2023-11-09): remove this util, there will be no loadFixture command
-export function parseInitialLoadedFixturesByCutout(
-  commands: RunTimeCommand[]
-): LoadedFixturesBySlot {
-  const loadFixtureCommandsReversed = commands
-    .filter(
-      (command): command is LoadFixtureRunTimeCommand =>
-        command.commandType === 'loadFixture'
-    )
-    .reverse()
-  return reduce<LoadFixtureRunTimeCommand, LoadedFixturesBySlot>(
-    loadFixtureCommandsReversed,
-    (acc, command) => ({ ...acc, [command.params.location.cutout]: command }),
-    {}
-  )
-}
-
-export function parseAllAddressableAreas(
-  commands: RunTimeCommand[]
-): AddressableAreaName[] {
-  return commands.reduce<AddressableAreaName[]>((acc, command) => {
-    if (
-      command.commandType === 'moveLabware' &&
-      command.params.newLocation !== 'offDeck' &&
-      'slotName' in command.params.newLocation &&
-      !acc.includes(command.params.newLocation.slotName as AddressableAreaName)
-    ) {
-      return [
-        ...acc,
-        command.params.newLocation.slotName as AddressableAreaName,
-      ]
-    } else if (
-      command.commandType === 'moveLabware' &&
-      command.params.newLocation !== 'offDeck' &&
-      'addressableAreaName' in command.params.newLocation &&
-      !acc.includes(
-        command.params.newLocation.addressableAreaName as AddressableAreaName
-      )
-    ) {
-      return [
-        ...acc,
-        command.params.newLocation.addressableAreaName as AddressableAreaName,
-      ]
-    } else if (
-      (command.commandType === 'loadLabware' ||
-        command.commandType === 'loadModule') &&
-      command.params.location !== 'offDeck' &&
-      'slotName' in command.params.location &&
-      !acc.includes(command.params.location.slotName as AddressableAreaName)
-    ) {
-      return [...acc, command.params.location.slotName as AddressableAreaName]
-    } else if (
-      command.commandType === 'loadLabware' &&
-      command.params.location !== 'offDeck' &&
-      'addressableAreaName' in command.params.location &&
-      !acc.includes(
-        command.params.location.addressableAreaName as AddressableAreaName
-      )
-    ) {
-      return [
-        ...acc,
-        command.params.location.addressableAreaName as AddressableAreaName,
-      ]
-    }
-    // TODO(BC, 11/6/23): once moveToAddressableArea command exists add it back here
-    // else if (command.commandType === 'moveToAddressableArea') {
-    // ...
-    // }
-    else {
-      return acc
-    }
-  }, [])
-}
-
 export interface LiquidsById {
   [liquidId: string]: {
     displayName: string
@@ -352,10 +276,12 @@ interface LabwareLiquidInfo {
   volumeByWell: { [well: string]: number }
 }
 
+/** @deprecated instead use LabwareByLiquidId from components/src/hardware-sim/ProtocolDeck/types */
 export interface LabwareByLiquidId {
   [liquidId: string]: LabwareLiquidInfo[]
 }
 
+/** @deprecated instead use getLabwareInfoByLiquidId from components/src/hardware-sim/ProtocolDeck/utils */
 export function parseLabwareInfoByLiquidId(
   commands: RunTimeCommand[]
 ): LabwareByLiquidId {

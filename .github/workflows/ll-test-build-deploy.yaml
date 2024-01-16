@@ -11,6 +11,8 @@ on:
       - 'webpack-config/**'
       - 'package.json'
       - '.github/workflows/ll-test-build-deploy.yaml'
+      - '.github/actions/webstack/deploy-to-sandbox/**'
+      - '.github/workflows/utils.js'
   push:
     paths:
       - 'labware-library/**'
@@ -116,6 +118,7 @@ jobs:
   build-ll:
     name: 'build labware library artifact'
     needs: ['js-unit-test']
+    timeout-minutes: 30
     runs-on: 'ubuntu-20.04'
     if: github.event_name != 'pull_request'
     steps:

@@ -1,13 +1,10 @@
 """Configure for volume command request, result, and implementation models."""
 from __future__ import annotations
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type, Tuple
 from typing_extensions import Literal
 
-from .pipetting_common import (
-    PipetteIdMixin,
-    VolumeMixin,
-)
+from .pipetting_common import PipetteIdMixin
 from .command import (
     AbstractCommandWithPrivateResultImpl,
     BaseCommand,
@@ -22,10 +19,15 @@ if TYPE_CHECKING:
 ConfigureForVolumeCommandType = Literal["configureForVolume"]
 
 
-class ConfigureForVolumeParams(PipetteIdMixin, VolumeMixin):
+class ConfigureForVolumeParams(PipetteIdMixin):
     """Parameters required to configure volume for a specific pipette."""
 
-    pass
+    volume: float = Field(
+        ...,
+        description="Amount of liquid in uL. Must be at least 0 and no greater "
+        "than a pipette-specific maximum volume.",
+        ge=0,
+    )
 
 
 class ConfigureForVolumePrivateResult(PipetteConfigUpdateResultMixin):

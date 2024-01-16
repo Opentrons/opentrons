@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+
 import {
   useConditionalConfirm,
   Flex,
@@ -13,8 +14,10 @@ import {
   useCreateMaintenanceCommandMutation,
   useDeleteMaintenanceRunMutation,
   useCurrentMaintenanceRun,
+  useDeckConfigurationQuery,
   CreateMaintenanceRunType,
 } from '@opentrons/react-api-client'
+
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
@@ -27,6 +30,7 @@ import {
 import { StyledText } from '../../atoms/text'
 import { Jog } from '../../molecules/JogControls'
 import { ExitConfirmation } from './ExitConfirmation'
+import { getAddressableAreaFromConfig } from './getAddressableAreaFromConfig'
 import { getDropTipWizardSteps } from './getDropTipWizardSteps'
 import {
   BLOWOUT_SUCCESS,
@@ -41,14 +45,15 @@ import { ChooseLocation } from './ChooseLocation'
 import { JogToPosition } from './JogToPosition'
 import { Success } from './Success'
 
-import type { PipetteData, CommandData } from '@opentrons/api-client'
+import type { PipetteData } from '@opentrons/api-client'
 import type {
-  Coordinates,
   PipetteModelSpecs,
   RobotType,
-  SavePositionRunTimeCommand,
-  CreateCommand,
+  DeckConfiguration,
+  AddressableAreaName,
 } from '@opentrons/shared-data'
+import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
+
 const RUN_REFETCH_INTERVAL_MS = 5000
 const JOG_COMMAND_TIMEOUT_MS = 10000
 const MANAGED_PIPETTE_ID = 'managedPipetteId'
@@ -67,9 +72,12 @@ export function DropTipWizard(props: MaintenanceRunManagerProps): JSX.Element {
   } = useChainMaintenanceCommands()
   const { createMaintenanceCommand } = useCreateMaintenanceCommandMutation()
 
+  const deckConfig = useDeckConfigurationQuery().data ?? []
+
   const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = React.useState<
     string | null
   >(null)
+  const hasCleanedUpAndClosed = React.useRef(false)
 
   // we should start checking for run deletion only after the maintenance run is created
   // and the useCurrentRun poll has returned that created id
@@ -80,7 +88,6 @@ export function DropTipWizard(props: MaintenanceRunManagerProps): JSX.Element {
 
   const {
     createTargetedMaintenanceRun,
-    isLoading: isCreateLoading,
   } = useCreateTargetedMaintenanceRunMutation({
     onSuccess: response => {
       chainRunCommands(
@@ -102,6 +109,7 @@ export function DropTipWizard(props: MaintenanceRunManagerProps): JSX.Element {
         })
         .catch(e => e)
     },
+    onError: error => setErrorMessage(error.message),
   })
 
   const { data: maintenanceRunData } = useCurrentMaintenanceRun({
@@ -140,16 +148,30 @@ export function DropTipWizard(props: MaintenanceRunManagerProps): JSX.Element {
   })
 
   const handleCleanUpAndClose = (): void => {
+    if (hasCleanedUpAndClosed.current) return
+
+    hasCleanedUpAndClosed.current = true
     setIsExiting(true)
     if (maintenanceRunData?.data.id == null) {
       closeFlow()
     } else {
-      deleteMaintenanceRun(maintenanceRunData?.data.id, {
-        onSuccess: () => {
-          closeFlow()
-          setIsExiting(false)
-        },
-      })
+      chainRunCommands(
+        maintenanceRunData?.data.id,
+        [
+          {
+            commandType: 'home' as const,
+            params: { axes: ['leftZ', 'rightZ', 'x', 'y'] },
+          },
+        ],
+        true
+      )
+        .then(() => {
+          deleteMaintenanceRun(maintenanceRunData?.data.id)
+        })
+        .catch(error => {
+          console.error(error.message)
+          deleteMaintenanceRun(maintenanceRunData?.data.id)
+        })
     }
   }
 
@@ -161,7 +183,6 @@ export function DropTipWizard(props: MaintenanceRunManagerProps): JSX.Element {
       mount={mount}
       instrumentModelSpecs={instrumentModelSpecs}
       createMaintenanceRun={createTargetedMaintenanceRun}
-      isCreateLoading={isCreateLoading}
       isRobotMoving={isChainCommandMutationLoading || isExiting}
       handleCleanUpAndClose={handleCleanUpAndClose}
       chainRunCommands={chainRunCommands}
@@ -169,6 +190,7 @@ export function DropTipWizard(props: MaintenanceRunManagerProps): JSX.Element {
       errorMessage={errorMessage}
       setErrorMessage={setErrorMessage}
       isExiting={isExiting}
+      deckConfig={deckConfig}
     />
   )
 }
@@ -178,7 +200,6 @@ interface DropTipWizardProps {
   mount: PipetteData['mount']
   createdMaintenanceRunId: string | null
   createMaintenanceRun: CreateMaintenanceRunType
-  isCreateLoading: boolean
   isRobotMoving: boolean
   isExiting: boolean
   setErrorMessage: (message: string | null) => void
@@ -191,6 +212,7 @@ interface DropTipWizardProps {
     typeof useCreateMaintenanceCommandMutation
   >['createMaintenanceCommand']
   instrumentModelSpecs: PipetteModelSpecs
+  deckConfig: DeckConfiguration
   maintenanceRunId?: string
 }
 
@@ -202,8 +224,6 @@ export const DropTipWizardComponent = (
     createMaintenanceRun,
     handleCleanUpAndClose,
     chainRunCommands,
-    // attachedInstrument,
-    isCreateLoading,
     isRobotMoving,
     createRunCommand,
     setErrorMessage,
@@ -211,6 +231,7 @@ export const DropTipWizardComponent = (
     isExiting,
     createdMaintenanceRunId,
     instrumentModelSpecs,
+    deckConfig,
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t, i18n } = useTranslation('drop_tip_wizard')
@@ -225,8 +246,19 @@ export const DropTipWizardComponent = (
       ? getDropTipWizardSteps(shouldDispenseLiquid)[currentStepIndex]
       : null
   const isFinalStep = currentStepIndex === DropTipWizardSteps.length - 1
+
+  React.useEffect(() => {
+    if (createdMaintenanceRunId == null) {
+      createMaintenanceRun({}).catch((e: Error) =>
+        setErrorMessage(`Error creating maintenance run: ${e.message}`)
+      )
+    }
+  }, [])
+
   const goBack = (): void => {
-    setCurrentStepIndex(isFinalStep ? currentStepIndex : currentStepIndex - 1)
+    if (createdMaintenanceRunId != null) {
+      setCurrentStepIndex(isFinalStep ? currentStepIndex : currentStepIndex - 1)
+    }
   }
 
   const proceed = (): void => {
@@ -236,7 +268,8 @@ export const DropTipWizardComponent = (
       setCurrentStepIndex(currentStepIndex + 1)
     }
   }
-  const handleJog: Jog = (axis, dir, step) => {
+
+  const handleJog: Jog = (axis: Axis, dir: Sign, step: StepSize): void => {
     if (createdMaintenanceRunId != null) {
       createRunCommand({
         maintenanceRunId: createdMaintenanceRunId,
@@ -246,11 +279,9 @@ export const DropTipWizardComponent = (
         },
         waitUntilComplete: true,
         timeout: JOG_COMMAND_TIMEOUT_MS,
-      })
-        .then(data => {})
-        .catch((e: Error) =>
-          setErrorMessage(`Error issuing jog command: ${e.message}`)
-        )
+      }).catch((e: Error) =>
+        setErrorMessage(`Error issuing jog command: ${e.message}`)
+      )
     }
   }
 
@@ -260,114 +291,48 @@ export const DropTipWizardComponent = (
     cancel: cancelExit,
   } = useConditionalConfirm(handleCleanUpAndClose, true)
 
-  const handleCreateAndSetup = (shouldDispenseLiquid: boolean): void => {
-    createMaintenanceRun({})
-      .then(() => {
-        setShouldDispenseLiquid(shouldDispenseLiquid)
-      })
-      .catch(e =>
-        setErrorMessage(`Error setting up blowout/droptip: ${e.message}`)
-      )
-  }
-
-  const retractAllAxesAndSavePosition = (): Promise<Coordinates | null> => {
-    if (createdMaintenanceRunId == null)
-      return Promise.reject<Coordinates>(
-        new Error('no maintenance run present to send move commands to')
-      )
-    const commands: CreateCommand[] = [
-      {
-        commandType: 'retractAxis' as const,
-        params: {
-          axis: 'leftZ',
-        },
-      },
-      {
-        commandType: 'retractAxis' as const,
-        params: {
-          axis: 'rightZ',
-        },
-      },
-      {
-        commandType: 'retractAxis' as const,
-        params: { axis: 'x' },
-      },
-      {
-        commandType: 'retractAxis' as const,
-        params: { axis: 'y' },
-      },
-      {
-        commandType: 'savePosition' as const,
-        params: {
-          pipetteId: MANAGED_PIPETTE_ID,
-        },
-      },
-    ]
-    return chainRunCommands(createdMaintenanceRunId, commands, false)
-      .then(responses => {
-        if (responses.length !== commands.length) {
-          return Promise.reject(
-            new Error('Not all commands executed successfully')
-          )
-        }
-        const currentPosition = (responses[responses.length - 1]
-          .data as SavePositionRunTimeCommand).result?.position
-        if (currentPosition != null) {
-          return Promise.resolve(currentPosition)
-        } else {
-          return Promise.reject(
-            new Error('Current position could not be saved')
-          )
-        }
-      })
-      .catch(e => {
-        setErrorMessage(
-          `Error retracting x and y axes or saving position: ${e.message}`
-        )
-        return null
-      })
-  }
-
-  const moveToXYCoordinate = (
-    x: number,
-    y: number
-  ): Promise<CommandData[] | null> => {
-    if (createdMaintenanceRunId == null)
+  const moveToAddressableArea = (
+    addressableArea: AddressableAreaName
+  ): Promise<null> => {
+    if (createdMaintenanceRunId == null) {
       return Promise.reject(
         new Error('no maintenance run present to send move commands to')
       )
+    }
 
-    return retractAllAxesAndSavePosition()
-      .then(currentPosition => {
-        if (currentPosition != null) {
-          return chainRunCommands(
-            createdMaintenanceRunId,
-            [
-              {
-                commandType: 'moveRelative',
-                params: {
-                  pipetteId: MANAGED_PIPETTE_ID,
-                  distance: y - currentPosition.y,
-                  axis: 'y',
-                },
-              },
-              {
-                commandType: 'moveRelative',
-                params: {
-                  pipetteId: MANAGED_PIPETTE_ID,
-                  distance: x - currentPosition.x,
-                  axis: 'x',
-                },
-              },
-            ],
-            true
-          )
-        } else return null
-      })
-      .catch(e => {
-        setErrorMessage(`error moving to position: ${e.message}`)
+    const addressableAreaFromConfig = getAddressableAreaFromConfig(
+      addressableArea,
+      deckConfig,
+      instrumentModelSpecs.channels,
+      robotType
+    )
+
+    if (addressableAreaFromConfig != null) {
+      return chainRunCommands(
+        createdMaintenanceRunId,
+        [
+          {
+            commandType: 'moveToAddressableArea',
+            params: {
+              pipetteId: MANAGED_PIPETTE_ID,
+              stayAtHighestPossibleZ: true,
+              addressableAreaName: addressableAreaFromConfig,
+              offset: { x: 0, y: 0, z: 0 },
+            },
+          },
+        ],
+        true
+      ).then(commandData => {
+        const error = commandData[0].data.error
+        if (error != null) {
+          setErrorMessage(`error moving to position: ${error.detail}`)
+        }
         return null
       })
+    } else {
+      setErrorMessage(`error moving to position: invalid addressable area.`)
+      return Promise.resolve(null)
+    }
   }
 
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
@@ -375,7 +340,10 @@ export const DropTipWizardComponent = (
     modalContent = (
       <ExitConfirmation
         handleGoBack={cancelExit}
-        handleExit={confirmExit}
+        handleExit={() => {
+          hasInitiatedExit.current = true
+          confirmExit()
+        }}
         isRobotMoving={isRobotMoving}
       />
     )
@@ -397,9 +365,10 @@ export const DropTipWizardComponent = (
     modalContent = (
       <BeforeBeginning
         {...{
-          handleCreateAndSetup,
-          isCreateLoading,
+          setShouldDispenseLiquid,
+          createdMaintenanceRunId,
           isOnDevice,
+          isRobotMoving,
         }}
       />
     )
@@ -421,6 +390,10 @@ export const DropTipWizardComponent = (
       <ChooseLocation
         robotType={robotType}
         handleProceed={proceed}
+        handleGoBack={() => {
+          setCurrentStepIndex(0)
+          setShouldDispenseLiquid(null)
+        }}
         title={
           currentStep === CHOOSE_BLOWOUT_LOCATION
             ? i18n.format(t('choose_blowout_location'), 'capitalize')
@@ -429,11 +402,11 @@ export const DropTipWizardComponent = (
         body={
           <Trans
             t={t}
-            i18nKey={i18n.format(t(bodyTextKey))}
+            i18nKey={bodyTextKey}
             components={{ block: <StyledText as="p" /> }}
           />
         }
-        moveToXYCoordinate={moveToXYCoordinate}
+        moveToAddressableArea={moveToAddressableArea}
         isRobotMoving={isRobotMoving}
         isOnDevice={isOnDevice}
         setErrorMessage={setErrorMessage}
@@ -467,12 +440,11 @@ export const DropTipWizardComponent = (
               ],
               true
             )
-              .then(() => {
-                retractAllAxesAndSavePosition()
-                  .then(() => proceed())
-                  .catch(e =>
-                    setErrorMessage(`Error moving to position: ${e.message}`)
-                  )
+              .then(commandData => {
+                const error = commandData[0].data.error
+                if (error != null) {
+                  setErrorMessage(`error moving to position: ${error.detail}`)
+                } else proceed()
               })
               .catch(e =>
                 setErrorMessage(
@@ -515,19 +487,16 @@ export const DropTipWizardComponent = (
             ? i18n.format(t('shared:continue'), 'capitalize')
             : i18n.format(t('shared:exit'), 'capitalize')
         }
-        isRobotMoving={isRobotMoving}
         isExiting={isExiting}
         isOnDevice={isOnDevice}
       />
     )
   }
 
-  let handleExit: (() => void) | null = confirmExit
-  if (isRobotMoving || showConfirmExit) {
-    handleExit = null
-  } else if (errorMessage != null) {
-    handleExit = handleCleanUpAndClose
-  }
+  const hasInitiatedExit = React.useRef(false)
+  let handleExit: () => void = () => null
+  if (!hasInitiatedExit.current) handleExit = confirmExit
+  else if (errorMessage != null) handleExit = handleCleanUpAndClose
 
   const wizardHeader = (
     <WizardHeader
@@ -561,7 +530,7 @@ export const DropTipWizardComponent = (
           {modalContent}
         </Flex>
       ) : (
-        <LegacyModalShell width="48rem" header={wizardHeader}>
+        <LegacyModalShell width="47rem" header={wizardHeader} overflow="hidden">
           {modalContent}
         </LegacyModalShell>
       )}

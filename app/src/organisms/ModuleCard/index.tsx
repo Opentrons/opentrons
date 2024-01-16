@@ -25,6 +25,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  MODULE_MODELS_OT2_ONLY,
 } from '@opentrons/shared-data'
 import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
@@ -47,6 +48,7 @@ import { Tooltip } from '../../atoms/Tooltip'
 import { StyledText } from '../../atoms/text'
 import { useChainLiveCommands } from '../../resources/runs/hooks'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
+import { useIsFlex } from '../../organisms/Devices/hooks'
 import { getModuleTooHot } from '../Devices/getModuleTooHot'
 import { useToaster } from '../ToasterOven'
 import { MagneticModuleData } from './MagneticModuleData'
@@ -79,6 +81,7 @@ interface ModuleCardProps {
   robotName: string
   isLoadedInRun: boolean
   attachPipetteRequired: boolean
+  calibratePipetteRequired: boolean
   updatePipetteFWRequired: boolean
   runId?: string
   slotName?: string
@@ -93,6 +96,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     runId,
     slotName,
     attachPipetteRequired,
+    calibratePipetteRequired,
     updatePipetteFWRequired,
   } = props
   const dispatch = useDispatch<Dispatch>()
@@ -123,9 +127,15 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       }
     },
   })
-  const requireModuleCalibration = module.moduleOffset?.last_modified == null
+  const isFlex = useIsFlex(robotName)
+  const requireModuleCalibration =
+    isFlex &&
+    !MODULE_MODELS_OT2_ONLY.some(modModel => modModel === module.moduleModel) &&
+    module.moduleOffset?.last_modified == null
   const isPipetteReady =
-    (!attachPipetteRequired ?? false) && (!updatePipetteFWRequired ?? false)
+    (!attachPipetteRequired ?? false) &&
+    (!calibratePipetteRequired ?? false) &&
+    (!updatePipetteFWRequired ?? false)
   const latestRequestId = last(requestIds)
   const latestRequest = useSelector<State, RequestState | null>(state =>
     latestRequestId ? getRequestById(state, latestRequestId) : null
@@ -303,6 +313,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               />
             )}
             {attachPipetteRequired != null &&
+            calibratePipetteRequired != null &&
             updatePipetteFWRequired != null &&
             requireModuleCalibration &&
             !isPending ? (
@@ -313,6 +324,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 setShowBanner={() => null}
                 handleUpdateClick={handleCalibrateClick}
                 attachPipetteRequired={attachPipetteRequired}
+                calibratePipetteRequired={calibratePipetteRequired}
                 updatePipetteFWRequired={updatePipetteFWRequired}
                 isTooHot={isTooHot}
               />

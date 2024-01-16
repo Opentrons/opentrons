@@ -201,17 +201,28 @@
         ]
       },
       {
-        "id": "shortFixedTrash",
-        "areaType": "fixedTrash",
+        "id": "12",
+        "areaType": "slot",
         "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
         "boundingBox": {
-          "xDimension": 172.86,
-          "yDimension": 165.86,
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot 12",
+        "compatibleModuleTypes": []
+      },
+      {
+        "id": "shortFixedTrash",
+        "areaType": "fixedTrash",
+        "offsetFromCutoutFixture": [29.285, -2.835, 0],
+        "boundingBox": {
+          "xDimension": 107.11,
+          "yDimension": 165.67,
           "zDimension": 58
         },
         "displayName": "Slot 12/Short Fixed Trash",
-        "ableToDropTips": true,
-        "dropTipsOffset": [82.84, 80.0, 58]
+        "ableToDropTips": true
       }
     ],
     "cutouts": [
@@ -361,7 +372,8 @@
         "cutout8",
         "cutout9",
         "cutout10",
-        "cutout11"
+        "cutout11",
+        "cutout12"
       ],
       "displayName": "Standard Slot",
       "providesAddressableAreas": {
@@ -375,8 +387,10 @@
         "cutout8": ["8"],
         "cutout9": ["9"],
         "cutout10": ["10"],
-        "cutout11": ["11"]
-      }
+        "cutout11": ["11"],
+        "cutout12": ["12"]
+      },
+      "height": 0
     },
     {
       "id": "fixedTrashSlot",
@@ -384,7 +398,8 @@
       "displayName": "Fixed Trash",
       "providesAddressableAreas": {
         "cutout12": ["shortFixedTrash"]
-      }
+      },
+      "height": 58
     }
   ]
 }

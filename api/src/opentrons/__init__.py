@@ -10,6 +10,7 @@ from opentrons.hardware_control import (
     API as HardwareAPI,
     ThreadManager,
     ThreadManagedHardware,
+    types as hw_types,
 )
 
 from opentrons.config import (
@@ -118,6 +119,7 @@ async def _create_thread_manager() -> ThreadManagedHardware:
             use_usb_bus=ff.rear_panel_integration(),
             threadmanager_nonblocking=True,
             status_bar_enabled=ff.status_bar_enabled(),
+            feature_flags=hw_types.HardwareFeatureFlags.build_from_ff(),
         )
     else:
         thread_manager = ThreadManager(
@@ -125,6 +127,7 @@ async def _create_thread_manager() -> ThreadManagedHardware:
             threadmanager_nonblocking=True,
             port=_get_motor_control_serial_port(),
             firmware=_find_smoothie_file(),
+            feature_flags=hw_types.HardwareFeatureFlags.build_from_ff(),
         )
 
     try:

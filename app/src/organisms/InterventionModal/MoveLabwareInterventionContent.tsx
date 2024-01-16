@@ -33,7 +33,6 @@ import {
   getModuleDisplayName,
   getModuleType,
   getOccludedSlotCountForModule,
-  getRobotTypeFromLoadedLabware,
 } from '@opentrons/shared-data'
 import {
   getRunLabwareRenderInfo,
@@ -49,6 +48,7 @@ import {
   getLoadedModule,
 } from '../CommandText/utils/accessors'
 import type { RunData } from '@opentrons/api-client'
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 
 const LABWARE_DESCRIPTION_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
@@ -103,6 +103,7 @@ export interface MoveLabwareInterventionProps {
   command: MoveLabwareRunTimeCommand
   analysis: CompletedProtocolAnalysis | null
   run: RunData
+  robotType: RobotType
   isOnDevice: boolean
 }
 
@@ -110,14 +111,15 @@ export function MoveLabwareInterventionContent({
   command,
   analysis,
   run,
+  robotType,
   isOnDevice,
 }: MoveLabwareInterventionProps): JSX.Element | null {
   const { t } = useTranslation(['protocol_setup', 'protocol_command_text'])
 
   const analysisCommands = analysis?.commands ?? []
   const labwareDefsByUri = getLoadedLabwareDefinitionsByUri(analysisCommands)
-  const robotType = getRobotTypeFromLoadedLabware(run.labware)
   const deckDef = getDeckDefFromRobotType(robotType)
+  const deckConfig = useDeckConfigurationQuery().data ?? []
 
   const moduleRenderInfo = getRunModuleRenderInfo(
     run,
@@ -196,10 +198,7 @@ export function MoveLabwareInterventionContent({
               movedLabwareDef={movedLabwareDef}
               loadedModules={run.modules}
               loadedLabware={run.labware}
-              // TODO(bh, 2023-07-19): remove when StyledDeck removed from MoveLabwareOnDeck
-              trashLocation={
-                robotType === 'OT-3 Standard' ? 'cutoutA3' : undefined
-              }
+              deckConfig={deckConfig}
               backgroundItems={
                 <>
                   {moduleRenderInfo.map(
@@ -256,6 +255,8 @@ function LabwareDisplayLocation(
     displayLocation = <LocationIcon slotName={String(t('offdeck'))} />
   } else if ('slotName' in location) {
     displayLocation = <LocationIcon slotName={location.slotName} />
+  } else if ('addressableAreaName' in location) {
+    displayLocation = <LocationIcon slotName={location.addressableAreaName} />
   } else if ('moduleId' in location) {
     const moduleModel = getModuleModelFromRunData(
       protocolData,
@@ -293,6 +294,11 @@ function LabwareDisplayLocation(
       displayLocation = t('adapter_in_slot', {
         adapter: adapterDisplayName,
         slot_name: adapter.location.slotName,
+      })
+    } else if ('addressableAreaName' in adapter.location) {
+      return t('adapter_in_slot', {
+        adapter: adapterDisplayName,
+        slot: adapter.location.addressableAreaName,
       })
     } else if ('moduleId' in adapter.location) {
       const moduleIdUnderAdapter = adapter.location.moduleId

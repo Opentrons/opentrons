@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import {
@@ -50,7 +50,6 @@ jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 jest.mock('../useAttachedPipetteCalibrations')
 jest.mock('../useAttachedPipettes')
 jest.mock('../useTipLengthCalibrations')
-jest.mock('../useProtocolDetailsForRun')
 jest.mock('../useStoredProtocolAnalysis')
 
 const mockGetPipetteNameSpecs = getPipetteNameSpecs as jest.MockedFunction<

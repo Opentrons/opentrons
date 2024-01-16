@@ -20,7 +20,7 @@ import { StagingAreasModal } from './StagingAreasModal'
 import { FlexSlotMap } from './FlexSlotMap'
 
 import styles from './styles.css'
-import type { Cutout } from '@opentrons/shared-data'
+import type { CutoutId } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 
 interface StagingAreasRowProps {
@@ -68,7 +68,7 @@ export function StagingAreasRow(props: StagingAreasRowProps): JSX.Element {
                 <LabeledValue
                   label="Position"
                   value={`${stagingAreaLocations.map(location =>
-                    getCutoutDisplayName(location as Cutout)
+                    getCutoutDisplayName(location as CutoutId)
                   )}`}
                 />
               </div>

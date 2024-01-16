@@ -2,7 +2,7 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { createStore } from 'redux'
 import { Provider } from 'react-redux'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { getRobotApiVersionByName } from '../../../redux/discovery'
 
 import { useIsFlex } from '../../../organisms/Devices/hooks'
@@ -24,9 +24,9 @@ const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 
 const store: Store<State> = createStore(state => state, {})
 
-const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-  <Provider store={store}>{children}</Provider>
-)
+const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+  children,
+}) => <Provider store={store}>{children}</Provider>
 
 const mockWifiNetwork: WifiNetwork = {
   ssid: 'linksys',
@@ -93,7 +93,7 @@ describe('useCanDisconnect', () => {
     expect(result.current).toBe(false)
   })
 
-  it('useCanDisconnect returns true for an OT-3', () => {
+  it('useCanDisconnect returns true for a Flex', () => {
     when(useWifiList)
       .calledWith('otie')
       .mockReturnValue([{ ...mockWifiNetwork, active: true }])

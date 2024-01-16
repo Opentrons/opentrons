@@ -1,5 +1,16 @@
 import uuidv1 from 'uuid/v4'
-import { WellSetHelpers, makeWellSetHelpers } from '@opentrons/shared-data'
+import {
+  WellSetHelpers,
+  makeWellSetHelpers,
+  AddressableAreaName,
+  getDeckDefFromRobotType,
+  FLEX_ROBOT_TYPE,
+  CutoutId,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  isAddressableAreaStandardSlot,
+  CutoutFixtureId,
+  RobotType,
+} from '@opentrons/shared-data'
 import { i18n } from '../localization'
 import { WellGroup } from '@opentrons/components'
 import { BoundingRect, GenericRect } from '../collision-types'
@@ -8,6 +19,7 @@ import type {
   LabwareEntities,
   PipetteEntities,
 } from '@opentrons/step-generation'
+import { INTERACTIVE_WELL_DATA_ATTRIBUTE } from '@opentrons/components/src/hardware-sim/Labware/labwareInternals/Well'
 
 export const registerSelectors: (arg0: any) => void =
   process.env.NODE_ENV === 'development'
@@ -32,10 +44,7 @@ export function clientRectToBoundingRect(rect: ClientRect): BoundingRect {
     height: rect.height,
   }
 }
-export const getCollidingWells = (
-  rectPositions: GenericRect,
-  selectableClassname: string
-): WellGroup => {
+export const getCollidingWells = (rectPositions: GenericRect): WellGroup => {
   // Returns set of selected wells under a collision rect
   const { x0, y0, x1, y1 } = rectPositions
   const selectionBoundingRect = {
@@ -45,9 +54,10 @@ export const getCollidingWells = (
     height: Math.abs(y1 - y0),
   }
   // NOTE: querySelectorAll returns a NodeList, so you need to unpack it as an Array to do .filter
-  // @ts-expect-error(sa, 2021-6-21): there is no option to query by class selector in HTMLElementTagNameMap (see type of querySelectorAll)
   const selectableElems: HTMLElement[] = [
-    ...document.querySelectorAll('.' + selectableClassname),
+    ...document.querySelectorAll<HTMLElement>(
+      `[${INTERACTIVE_WELL_DATA_ATTRIBUTE}]`
+    ),
   ]
   const collidedElems = selectableElems.filter((selectableElem, i) =>
     rectCollision(
@@ -57,11 +67,11 @@ export const getCollidingWells = (
   )
   const collidedWellData = collidedElems.reduce(
     (acc: WellGroup, elem): WellGroup => {
-      // TODO IMMEDIATELY no magic string 'wellname'
-      if ('wellname' in elem.dataset) {
+      if (
+        INTERACTIVE_WELL_DATA_ATTRIBUTE.replace('data-', '') in elem.dataset
+      ) {
         const wellName = elem.dataset.wellname
-        // @ts-expect-error(sa, 2021-6-21): wellName might be undefined
-        return { ...acc, [wellName]: null }
+        return wellName != null ? { ...acc, [wellName]: null } : acc
       }
 
       return acc
@@ -70,7 +80,6 @@ export const getCollidingWells = (
   )
   return collidedWellData
 }
-// TODO IMMEDIATELY use where appropriate
 export const arrayToWellGroup = (w: string[]): WellGroup =>
   w.reduce((acc, wellName) => ({ ...acc, [wellName]: null }), {})
 // cross-PD memoization of well set utils
@@ -131,4 +140,58 @@ export const getStagingAreaSlots = (
 
 export const getHas96Channel = (pipettes: PipetteEntities): boolean => {
   return Object.values(pipettes).some(pip => pip.spec.channels === 96)
+}
+
+export const getStagingAreaAddressableAreas = (
+  cutoutIds: CutoutId[]
+): AddressableAreaName[] => {
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  const cutoutFixtures = deckDef.cutoutFixtures
+
+  return cutoutIds
+    .flatMap(cutoutId => {
+      const addressableAreasOnCutout = cutoutFixtures.find(
+        cutoutFixture => cutoutFixture.id === STAGING_AREA_RIGHT_SLOT_FIXTURE
+      )?.providesAddressableAreas[cutoutId]
+      return addressableAreasOnCutout ?? []
+    })
+    .filter(aa => !isAddressableAreaStandardSlot(aa, deckDef))
+}
+
+export const getCutoutIdByAddressableArea = (
+  addressableAreaName: AddressableAreaName,
+  cutoutFixtureId: CutoutFixtureId,
+  robotType: RobotType
+): CutoutId => {
+  const deckDef = getDeckDefFromRobotType(robotType)
+  const cutoutFixtures = deckDef.cutoutFixtures
+  const providesAddressableAreasForAddressableArea = cutoutFixtures.find(
+    cutoutFixture => cutoutFixture.id.includes(cutoutFixtureId)
+  )?.providesAddressableAreas
+
+  const findCutoutIdByAddressableArea = (
+    addressableAreaName: AddressableAreaName
+  ): CutoutId | null => {
+    if (providesAddressableAreasForAddressableArea != null) {
+      for (const cutoutId in providesAddressableAreasForAddressableArea) {
+        if (
+          providesAddressableAreasForAddressableArea[
+            cutoutId as keyof typeof providesAddressableAreasForAddressableArea
+          ].includes(addressableAreaName)
+        ) {
+          return cutoutId as CutoutId
+        }
+      }
+    }
+    return null
+  }
+
+  const cutoutId = findCutoutIdByAddressableArea(addressableAreaName)
+
+  if (cutoutId == null) {
+    throw Error(
+      `expected to find cutoutId from addressableAreaName ${addressableAreaName} but could not`
+    )
+  }
+  return cutoutId
 }

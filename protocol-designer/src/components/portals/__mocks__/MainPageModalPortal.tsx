@@ -1,4 +1,4 @@
-// mock portal for enzyme tests
+// mock portal for tests
 import * as React from 'react'
 interface Props {
   children: React.ReactNode

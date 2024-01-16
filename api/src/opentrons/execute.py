@@ -35,6 +35,7 @@ from opentrons.hardware_control import (
     ThreadManagedHardware,
     ThreadManager,
 )
+from opentrons.hardware_control.types import HardwareFeatureFlags
 
 from opentrons.protocols import parse
 from opentrons.protocols.api_support.deck_type import (
@@ -360,6 +361,7 @@ def execute(  # noqa: C901
     stack_logger = logging.getLogger("opentrons")
     stack_logger.propagate = propagate_logs
     stack_logger.setLevel(getattr(logging, log_level.upper(), logging.WARNING))
+    # TODO(mm, 2023-11-20): We should restore the original log settings when we're done.
 
     # TODO(mm, 2023-10-02): Switch this truthy check to `is not None`
     # to match documented behavior.
@@ -627,7 +629,10 @@ def _run_file_pe(
         try:
             # TODO(mm, 2023-06-30): This will home and drop tips at the end, which is not how
             # things have historically behaved with PAPIv2.13 and older or JSONv5 and older.
-            result = await protocol_runner.run(protocol_source)
+            result = await protocol_runner.run(
+                deck_configuration=entrypoint_util.get_deck_configuration(),
+                protocol_source=protocol_source,
+            )
         finally:
             unsubscribe()
 
@@ -653,6 +658,8 @@ def _get_protocol_engine_config() -> Config:
         # We deliberately omit ignore_pause=True because, in the current implementation of
         # opentrons.protocol_api.core.engine, that would incorrectly make
         # ProtocolContext.is_simulating() return True.
+        use_simulated_deck_config=True,
+        # TODO the above is not correct for this and it should use the robot's actual config
     )
 
 
@@ -668,9 +675,15 @@ def _get_global_hardware_controller(robot_type: RobotType) -> ThreadManagedHardw
             # Conditional import because this isn't installed on OT-2s.
             from opentrons.hardware_control.ot3api import OT3API
 
-            _THREAD_MANAGED_HW = ThreadManager(OT3API.build_hardware_controller)
+            _THREAD_MANAGED_HW = ThreadManager(
+                OT3API.build_hardware_controller,
+                feature_flags=HardwareFeatureFlags.build_from_ff(),
+            )
         else:
-            _THREAD_MANAGED_HW = ThreadManager(OT2API.build_hardware_controller)
+            _THREAD_MANAGED_HW = ThreadManager(
+                OT2API.build_hardware_controller,
+                feature_flags=HardwareFeatureFlags.build_from_ff(),
+            )
 
     return _THREAD_MANAGED_HW
 

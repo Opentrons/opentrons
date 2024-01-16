@@ -2,30 +2,51 @@ import assert from 'assert'
 import reduce from 'lodash/reduce'
 import values from 'lodash/values'
 import find from 'lodash/find'
+import mapValues from 'lodash/mapValues'
 import {
   getPipetteNameSpecs,
   GEN_ONE_MULTI_PIPETTES,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
+import { hydrateField } from '../../steplist/fieldLevel'
+import { LabwareDefByDefURI } from '../../labware-defs'
 import type { DeckSlotId, ModuleType } from '@opentrons/shared-data'
 import {
-  NormalizedPipette,
-  NormalizedPipetteById,
-  PipetteEntity,
-  PipetteEntities,
-} from '@opentrons/step-generation'
-import { LabwareDefByDefURI } from '../../labware-defs'
-import { DeckSlot } from '../../types'
-import {
+  AdditionalEquipmentOnDeck,
   InitialDeckSetup,
   ModuleOnDeck,
   FormPipettesByMount,
   FormPipette,
   LabwareOnDeck as LabwareOnDeckType,
 } from '../types'
-import { AdditionalEquipmentOnDeck } from '..'
+import type { DeckSlot } from '../../types'
+import type {
+  NormalizedPipette,
+  NormalizedPipetteById,
+  PipetteEntity,
+  PipetteEntities,
+  InvariantContext,
+  ModuleEntity,
+} from '@opentrons/step-generation'
+import type { FormData } from '../../form-types'
 export { createPresavedStepForm } from './createPresavedStepForm'
+
+const slotToCutoutOt2Map: { [key: string]: string } = {
+  '1': 'cutout1',
+  '2': 'cutout2',
+  '3': 'cutout3',
+  '4': 'cutout4',
+  '5': 'cutout5',
+  '6': 'cutout6',
+  '7': 'cutout7',
+  '8': 'cutout8',
+  '9': 'cutout9',
+  '10': 'cutout10',
+  '11': 'cutout11',
+  '12': 'cutout12',
+}
+
 export function getIdsInRange<T extends string | number>(
   orderedIds: T[],
   startId: T,
@@ -122,16 +143,21 @@ export const getSlotIsEmpty = (
     return false
   }
 
-  const filteredAdditionalEquipmentOnDeck = includeStagingAreas
-    ? values(initialDeckSetup.additionalEquipmentOnDeck).filter(
-        (additionalEquipment: AdditionalEquipmentOnDeck) =>
-          additionalEquipment.location === slot
-      )
-    : values(initialDeckSetup.additionalEquipmentOnDeck).filter(
-        (additionalEquipment: AdditionalEquipmentOnDeck) =>
-          additionalEquipment.location === slot &&
-          additionalEquipment.name !== 'stagingArea'
-      )
+  const filteredAdditionalEquipmentOnDeck = values(
+    initialDeckSetup.additionalEquipmentOnDeck
+  ).filter((additionalEquipment: AdditionalEquipmentOnDeck) => {
+    const cutoutForSlotOt2 = slotToCutoutOt2Map[slot]
+    const includeStaging = includeStagingAreas
+      ? true
+      : additionalEquipment.name !== 'stagingArea'
+    if (cutoutForSlotOt2 != null) {
+      //  for Ot-2
+      return additionalEquipment.location === cutoutForSlotOt2 && includeStaging
+    } else {
+      //  for Flex
+      return additionalEquipment.location?.includes(slot) && includeStaging
+    }
+  })
 
   return (
     [
@@ -177,4 +203,36 @@ export const getIsModuleOnDeck = (
 ): boolean => {
   const moduleIds = Object.keys(modules)
   return moduleIds.some(moduleId => modules[moduleId]?.type === moduleType)
+}
+
+const getModuleEntity = (state: InvariantContext, id: string): ModuleEntity => {
+  return state.moduleEntities[id]
+}
+
+// TODO: Ian 2019-01-25 type with hydrated form type, see #3161
+export function getHydratedForm(
+  rawForm: FormData,
+  invariantContext: InvariantContext
+): FormData {
+  const hydratedForm = mapValues(rawForm, (value, name) =>
+    hydrateField(invariantContext, name, value)
+  )
+  // TODO(IL, 2020-03-23): separate hydrated/denormalized fields from the other fields.
+  // It's confusing that pipette is an ID string before this,
+  // but a PipetteEntity object after this.
+  // For `moduleId` field, it would be surprising to be a ModuleEntity!
+  // Consider nesting all additional fields under 'meta' key,
+  // following what we're doing with 'module'.
+  // See #3161
+  hydratedForm.meta = {}
+
+  if (rawForm?.moduleId != null) {
+    // @ts-expect-error(sa, 2021-6-14): type this properly in #3161
+    hydratedForm.meta.module = getModuleEntity(
+      invariantContext,
+      rawForm.moduleId
+    )
+  }
+  // @ts-expect-error(sa, 2021-6-14):type this properly in #3161
+  return hydratedForm
 }
