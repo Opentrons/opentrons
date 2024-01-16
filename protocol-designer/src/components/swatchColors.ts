@@ -1,5 +1,6 @@
 import { AIR } from '@opentrons/step-generation'
-import { DEFAULT_LIQUID_COLORS, COLORS } from '@opentrons/components'
+import { COLORS } from '@opentrons/components'
+import { DEFAULT_LIQUID_COLORS } from '@opentrons/shared-data'
 
 export const MIXED_WELL_COLOR = COLORS.grey50
 

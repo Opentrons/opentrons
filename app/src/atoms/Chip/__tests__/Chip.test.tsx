@@ -20,7 +20,7 @@ describe('Chip', () => {
     const chip = getByTestId('Chip_basic')
     const chipText = getByText('mockBasic')
     expect(chip).toHaveStyle(
-      `background-color: ${COLORS.grey90}${COLORS.opacity20HexCode}`
+      `background-color: ${COLORS.black90}${COLORS.opacity20HexCode}`
     )
     expect(chipText).toHaveStyle(`color: ${COLORS.grey60}`)
     expect(queryByLabelText('icon_mockBasic')).not.toBeInTheDocument()
@@ -97,7 +97,7 @@ describe('Chip', () => {
     const chip = getByTestId('Chip_neutral')
     const chipText = getByText('mockNeutral')
     expect(chip).toHaveStyle(
-      `background-color: ${COLORS.grey90}${COLORS.opacity20HexCode}`
+      `background-color: ${COLORS.black90}${COLORS.opacity20HexCode}`
     )
     expect(chip).toHaveStyle(`border-radius: ${BORDERS.borderRadiusSize5}`)
     expect(chipText).toHaveStyle(`color: ${COLORS.grey60}`)

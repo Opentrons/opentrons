@@ -1,8 +1,7 @@
 // set of functions that parse details out of a protocol record and it's internals
 import reduce from 'lodash/reduce'
 
-import { DEFAULT_LIQUID_COLORS } from '@opentrons/components'
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import { getLabwareDefURI, DEFAULT_LIQUID_COLORS } from '@opentrons/shared-data'
 import type {
   Liquid,
   LoadedLabware,

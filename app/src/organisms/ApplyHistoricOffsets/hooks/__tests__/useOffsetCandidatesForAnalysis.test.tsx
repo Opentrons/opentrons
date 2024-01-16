@@ -2,7 +2,10 @@ import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
 import { renderHook, waitFor } from '@testing-library/react'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import * as SharedData from '@opentrons/shared-data'
+import {
+  getLabwareDisplayName,
+  getLoadedLabwareDefinitionsByUri,
+} from '@opentrons/shared-data'
 import { useAllHistoricOffsets } from '../useAllHistoricOffsets'
 import { getLabwareLocationCombos } from '../getLabwareLocationCombos'
 
@@ -14,6 +17,8 @@ import type { OffsetCandidate } from '../useOffsetCandidatesForAnalysis'
 
 jest.mock('../useAllHistoricOffsets')
 jest.mock('../getLabwareLocationCombos')
+jest.mock('@opentrons/shared-data')
+
 const mockLabwareDef = fixture_tiprack_300_ul as LabwareDefinition2
 const mockUseAllHistoricOffsets = useAllHistoricOffsets as jest.MockedFunction<
   typeof useAllHistoricOffsets
@@ -21,15 +26,9 @@ const mockUseAllHistoricOffsets = useAllHistoricOffsets as jest.MockedFunction<
 const mockGetLabwareLocationCombos = getLabwareLocationCombos as jest.MockedFunction<
   typeof getLabwareLocationCombos
 >
-const mockGetLoadedLabwareDefinitionsByUri = SharedData.getLoadedLabwareDefinitionsByUri as jest.MockedFunction<
-  typeof SharedData.getLoadedLabwareDefinitionsByUri
+const mockGetLoadedLabwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri as jest.MockedFunction<
+  typeof getLoadedLabwareDefinitionsByUri
 >
-
-jest.mock('@opentrons/shared-data', () => ({
-  ...SharedData,
-  getLoadedLabwareDefinitionsByUri: mockGetLoadedLabwareDefinitionsByUri,
-}))
-
 const mockFirstCandidate: OffsetCandidate = {
   id: 'first_offset_id',
   labwareDisplayName: 'First Fake Labware Display Name',
@@ -156,15 +155,15 @@ describe('useOffsetCandidatesForAnalysis', () => {
       expect(result.current).toEqual([
         {
           ...mockFirstDupCandidate,
-          labwareDisplayName: SharedData.getLabwareDisplayName(mockLabwareDef),
+          labwareDisplayName: getLabwareDisplayName(mockLabwareDef),
         },
         {
           ...mockSecondCandidate,
-          labwareDisplayName: SharedData.getLabwareDisplayName(mockLabwareDef),
+          labwareDisplayName: getLabwareDisplayName(mockLabwareDef),
         },
         {
           ...mockThirdCandidate,
-          labwareDisplayName: SharedData.getLabwareDisplayName(mockLabwareDef),
+          labwareDisplayName: getLabwareDisplayName(mockLabwareDef),
         },
       ])
     })

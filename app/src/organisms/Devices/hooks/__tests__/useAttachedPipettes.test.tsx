@@ -3,7 +3,7 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { UseQueryResult } from 'react-query'
 import { renderHook } from '@testing-library/react'
 import { usePipettesQuery } from '@opentrons/react-api-client'
-import * as SharedData from '@opentrons/shared-data'
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { useAttachedPipettes } from '../useAttachedPipettes'
 import {
   pipetteResponseFixtureLeft,
@@ -13,18 +13,14 @@ import type { FetchPipettesResponseBody } from '@opentrons/api-client'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client')
+jest.mock('@opentrons/shared-data')
 
 const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
   typeof usePipettesQuery
 >
-const mockGetPipetteModelSpecs = SharedData.getPipetteModelSpecs as jest.MockedFunction<
-  typeof SharedData.getPipetteModelSpecs
+const mockGetPipetteModelSpecs = getPipetteModelSpecs as jest.MockedFunction<
+  typeof getPipetteModelSpecs
 >
-
-jest.mock('@opentrons/shared-data', () => ({
-  ...SharedData,
-  getPipetteModelSpecs: mockGetPipetteModelSpecs,
-}))
 
 describe('useAttachedPipettes hook', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
