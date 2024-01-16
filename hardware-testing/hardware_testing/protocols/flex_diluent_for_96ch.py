@@ -148,7 +148,7 @@ def _assign_starting_volumes(
 ) -> None:
     diluent = ctx.define_liquid(
         name="Diluent",
-        description=f"Artel MVS Diluent",
+        description="Artel MVS Diluent",
         display_color="#0000FF",
     )
     for test in DILUENT_SOURCES:
