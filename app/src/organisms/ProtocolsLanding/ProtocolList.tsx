@@ -15,7 +15,6 @@ import {
   BORDERS,
   POSITION_ABSOLUTE,
   COLORS,
-  COLORS,
   SecondaryButton,
   DIRECTION_COLUMN,
   Overlay,

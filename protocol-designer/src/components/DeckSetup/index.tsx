@@ -4,7 +4,6 @@ import compact from 'lodash/compact'
 import values from 'lodash/values'
 import {
   COLORS,
-  COLORS,
   DeckFromLayers,
   FlexTrash,
   Module,

@@ -5,7 +5,6 @@ import {
   BORDERS,
   Btn,
   COLORS,
-  COLORS,
   DIRECTION_ROW,
   Icon,
   SPACING,

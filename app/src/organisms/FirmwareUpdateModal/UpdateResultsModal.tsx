@@ -5,7 +5,6 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
-  COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import { COLORS, COLORS, PrimaryButton } from '@opentrons/components'
+import { COLORS, PrimaryButton } from '@opentrons/components'
 import { LegacyModalShell } from '../LegacyModal'
 import { WizardHeader } from '../WizardHeader'
 import { configReducer } from '../../redux/config/reducer'

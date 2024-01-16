@@ -7,7 +7,6 @@ import {
   Flex,
   SPACING,
   COLORS,
-  COLORS,
   BORDERS,
   DIRECTION_COLUMN,
   JUSTIFY_CENTER,

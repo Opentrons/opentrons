@@ -11,7 +11,6 @@ import {
   SIZE_1,
   BORDERS,
   COLORS,
-  COLORS,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'

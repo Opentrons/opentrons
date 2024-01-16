@@ -8,7 +8,6 @@ import {
 import {
   ALIGN_CENTER,
   COLORS,
-  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,

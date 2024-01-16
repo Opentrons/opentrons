@@ -5,7 +5,6 @@ import {
   ALIGN_CENTER,
   Icon,
   COLORS,
-  COLORS,
   SPACING,
   SIZE_1,
 } from '@opentrons/components'
@@ -21,7 +20,7 @@ export const RenderResult = ({ isBadCal }: RenderResultProps): JSX.Element => {
   return (
     <Flex alignItems={ALIGN_CENTER}>
       <StyledText
-        color={isBadCal ? COLORS.yellow60 : COLORS.successText}
+        color={isBadCal ? COLORS.yellow60 : COLORS.green60}
         marginRight={SPACING.spacing8}
       >
         {isBadCal ? t('recalibration_recommended') : t('good_calibration')}

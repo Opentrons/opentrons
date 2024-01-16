@@ -7,7 +7,6 @@ import {
   DIRECTION_ROW,
   ALIGN_CENTER,
   COLORS,
-  COLORS,
   SPACING,
   TYPOGRAPHY,
   BORDERS,
@@ -37,7 +36,7 @@ const INLINE_NOTIFICATION_PROPS_BY_TYPE: Record<
 > = {
   alert: {
     icon: { name: 'ot-alert' },
-    backgroundColor: COLORS.yellow3,
+    backgroundColor: COLORS.yellow35,
     color: COLORS.yellow50,
   },
   error: {

@@ -2,7 +2,6 @@ import * as React from 'react'
 
 import {
   BORDERS,
-  COLORS,
   Flex,
   DIRECTION_ROW,
   ALIGN_CENTER,

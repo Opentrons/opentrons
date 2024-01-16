@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 
 import {
   COLORS,
-  COLORS,
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,

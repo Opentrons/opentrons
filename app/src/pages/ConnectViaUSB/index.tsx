@@ -5,7 +5,6 @@ import {
   Flex,
   SPACING,
   COLORS,
-  COLORS,
   DIRECTION_ROW,
   JUSTIFY_CENTER,
   ALIGN_CENTER,

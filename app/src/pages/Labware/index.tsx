@@ -9,7 +9,6 @@ import {
   Link,
   SPACING,
   COLORS,
-  COLORS,
   BORDERS,
   TYPOGRAPHY,
   POSITION_ABSOLUTE,

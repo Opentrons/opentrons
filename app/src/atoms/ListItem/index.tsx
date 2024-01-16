@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { BORDERS, COLORS, COLORS, Flex, SPACING } from '@opentrons/components'
+import { BORDERS, COLORS, Flex, SPACING } from '@opentrons/components'
 
 import type { StyleProps } from '@opentrons/components'
 

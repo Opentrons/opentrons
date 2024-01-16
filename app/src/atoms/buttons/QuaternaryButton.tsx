@@ -3,7 +3,6 @@ import {
   NewSecondaryBtn,
   SPACING,
   COLORS,
-  COLORS,
   BORDERS,
   TYPOGRAPHY,
   styleProps,

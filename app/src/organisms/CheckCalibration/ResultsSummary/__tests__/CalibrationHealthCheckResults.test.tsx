@@ -1,10 +1,5 @@
 import * as React from 'react'
-import {
-  renderWithProviders,
-  COLORS,
-  COLORS,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { renderWithProviders, COLORS, TYPOGRAPHY } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { CalibrationHealthCheckResults } from '../CalibrationHealthCheckResults'
 

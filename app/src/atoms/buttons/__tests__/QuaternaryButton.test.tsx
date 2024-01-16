@@ -3,7 +3,6 @@ import * as React from 'react'
 import {
   renderWithProviders,
   COLORS,
-  COLORS,
   SPACING,
   TYPOGRAPHY,
   BORDERS,

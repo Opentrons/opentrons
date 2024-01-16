@@ -6,7 +6,6 @@ import {
   Box,
   Flex,
   COLORS,
-  COLORS,
   SPACING,
   POSITION_FIXED,
   POSITION_ABSOLUTE,

@@ -6,7 +6,6 @@ import {
   RobotCoordsForeignObject,
   ALIGN_CENTER,
   COLORS,
-  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_CENTER,
@@ -77,7 +76,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
             <Icon
               name={isAttached ? 'ot-check' : 'alert-circle'}
-              color={isAttached ? COLORS.successEnabled : COLORS.yellow50}
+              color={isAttached ? COLORS.green50 : COLORS.yellow50}
               key="icon"
               size="10px"
               marginRight={SPACING.spacing4}

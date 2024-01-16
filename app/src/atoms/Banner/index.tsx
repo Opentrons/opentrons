@@ -5,8 +5,6 @@ import {
   BORDERS,
   Btn,
   COLORS,
-  COLORS,
-  COLORS,
   DIRECTION_ROW,
   Flex,
   Icon,
