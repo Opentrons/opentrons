@@ -253,10 +253,7 @@ export function ProtocolRunSetup({
             <InfoMessage title={t('setup_is_view_only')} />
           ) : null}
           {analysisErrors != null && analysisErrors?.length > 0 ? (
-            <StyledText
-              alignSelf={ALIGN_CENTER}
-              color={COLORS.grey50}
-            >
+            <StyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
               {t('protocol_analysis_failed')}
             </StyledText>
           ) : (
@@ -317,10 +314,7 @@ export function ProtocolRunSetup({
           )}
         </>
       ) : (
-        <StyledText
-          alignSelf={ALIGN_CENTER}
-          color={COLORS.grey50}
-        >
+        <StyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
           {t('loading_data')}
         </StyledText>
       )}
@@ -377,11 +371,7 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
         <Icon
           size="1rem"
-          color={
-            calibrationStatus?.complete
-              ? COLORS.green50
-              : COLORS.yellow50
-          }
+          color={calibrationStatus?.complete ? COLORS.green50 : COLORS.yellow50}
           marginRight={SPACING.spacing8}
           name={calibrationStatus?.complete ? 'ot-check' : 'alert-circle'}
           id="RunSetupCard_calibrationIcon"

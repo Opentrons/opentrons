@@ -40,9 +40,7 @@ function CrumbName({ crumbName, isLastCrumb }: CrumbNameProps): JSX.Element {
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      color={
-        isLastCrumb ? COLORS.grey50 : COLORS.blue50
-      }
+      color={isLastCrumb ? COLORS.grey50 : COLORS.blue50}
     >
       <Box
         paddingRight={SPACING.spacing4}

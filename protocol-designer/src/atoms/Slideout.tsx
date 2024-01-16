@@ -192,10 +192,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
           ) : (
             <>{title}</>
           )}
-          <Box
-            borderBottom={`1px solid ${COLORS.grey30}`}
-            marginY={0}
-          />
+          <Box borderBottom={`1px solid ${COLORS.grey30}`} marginY={0} />
           <Box
             padding={SPACING.spacing16}
             flex="1 1 auto"

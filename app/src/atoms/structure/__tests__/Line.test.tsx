@@ -19,9 +19,7 @@ describe('Line', () => {
     const { getByTestId } = render(props)
     const line = getByTestId('line')
     expect(line).toHaveStyle('width: 100%')
-    expect(line).toHaveStyle(
-      `borderBottom: 1px solid ${String(COLORS.grey30)}`
-    )
+    expect(line).toHaveStyle(`borderBottom: 1px solid ${String(COLORS.grey30)}`)
   })
 
   it('renders line with additional props', () => {

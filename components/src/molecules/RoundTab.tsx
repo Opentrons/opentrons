@@ -1,10 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import {
-  TYPOGRAPHY,
-  BORDERS,
-  SPACING,
-} from '../ui-style-constants'
+import { TYPOGRAPHY, BORDERS, SPACING } from '../ui-style-constants'
 import { COLORS } from '../helix-design-system'
 import {
   POSITION_RELATIVE,

@@ -177,9 +177,7 @@ export function ProtocolSetupStep({
         <StyledText
           as="h4"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={
-            disabled ? COLORS.grey50 : COLORS.black90
-          }
+          color={disabled ? COLORS.grey50 : COLORS.black90}
         >
           {title}
         </StyledText>
@@ -187,9 +185,7 @@ export function ProtocolSetupStep({
           <StyledText
             as="p"
             textAlign={TEXT_ALIGN_RIGHT}
-            color={
-              disabled ? COLORS.grey50 : COLORS.black90
-            }
+            color={disabled ? COLORS.grey50 : COLORS.black90}
           >
             {detail}
             {subDetail != null && detail != null ? <br /> : null}

@@ -1,7 +1,12 @@
 import 'jest-styled-components'
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders, COLORS, COLORS, SIZE_2 } from '@opentrons/components'
+import {
+  renderWithProviders,
+  COLORS,
+  COLORS,
+  SIZE_2,
+} from '@opentrons/components'
 
 import { ToggleButton } from '..'
 
@@ -57,13 +62,9 @@ describe('ToggleButton', () => {
     props.disabled = true
     const { getByLabelText } = render(props)
     const button = getByLabelText('toggle button')
-    expect(button).toHaveStyleRule(
-      'color',
-      `${String(COLORS.grey30)}`,
-      {
-        modifier: ':disabled',
-      }
-    )
+    expect(button).toHaveStyleRule('color', `${String(COLORS.grey30)}`, {
+      modifier: ':disabled',
+    })
   })
 
   it('calls mock function when clicking the toggle button - on', () => {
@@ -110,13 +111,9 @@ describe('ToggleButton', () => {
     props.disabled = true
     const { getByLabelText } = render(props)
     const button = getByLabelText('toggle button')
-    expect(button).toHaveStyleRule(
-      'color',
-      `${String(COLORS.grey30)}`,
-      {
-        modifier: ':disabled',
-      }
-    )
+    expect(button).toHaveStyleRule('color', `${String(COLORS.grey30)}`, {
+      modifier: ':disabled',
+    })
   })
 
   it('calls mock function when clicking the toggle button - off', () => {

@@ -222,11 +222,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             css={css`
             ${TYPOGRAPHY.darkLinkH4SemiBold}
             &:hover {
-              color: ${
-                downloadIsDisabled
-                  ? COLORS.grey50
-                  : COLORS.black90
-              };
+              color: ${downloadIsDisabled ? COLORS.grey50 : COLORS.black90};
             }
             cursor: ${downloadIsDisabled ? 'default' : 'pointer'};
           }

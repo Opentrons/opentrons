@@ -139,9 +139,7 @@ describe('ChoosePipette', () => {
       name: '96-Channel pipette 96-Channel pipette',
     })
     expect(singleMountPipettes).toHaveStyle(`background-color: ${COLORS.white}`)
-    expect(ninetySixPipette).toHaveStyle(
-      `background-color: ${COLORS.blue10}`
-    )
+    expect(ninetySixPipette).toHaveStyle(`background-color: ${COLORS.blue10}`)
   })
   it('renders the correct text for the 96 channel button when there is a left pipette attached', () => {
     mockGetIsGantryEmpty.mockReturnValue(false)

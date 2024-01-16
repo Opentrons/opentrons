@@ -29,9 +29,7 @@ describe('MiniCard', () => {
     const { getByText } = render(props)
     const miniCard = getByText('mock mini card')
     expect(miniCard).toHaveStyle(`background-color: ${String(COLORS.white)}`)
-    expect(miniCard).toHaveStyle(
-      `border: 1px solid ${String(COLORS.grey30)}`
-    )
+    expect(miniCard).toHaveStyle(`border: 1px solid ${String(COLORS.grey30)}`)
     expect(miniCard).toHaveStyle(
       `border-radius: ${String(BORDERS.radiusSoftCorners)}`
     )
@@ -44,12 +42,8 @@ describe('MiniCard', () => {
     props.isSelected = true
     const { getByText } = render(props)
     const miniCard = getByText('mock mini card')
-    expect(miniCard).toHaveStyle(
-      `background-color: ${String(COLORS.blue10)}`
-    )
-    expect(miniCard).toHaveStyle(
-      `border: 1px solid ${String(COLORS.blue50)}`
-    )
+    expect(miniCard).toHaveStyle(`background-color: ${String(COLORS.blue10)}`)
+    expect(miniCard).toHaveStyle(`border: 1px solid ${String(COLORS.blue50)}`)
     expect(miniCard).toHaveStyle(
       `border-radius: ${String(BORDERS.radiusSoftCorners)}`
     )
@@ -77,12 +71,8 @@ describe('MiniCard', () => {
     props.isSelected = true
     const { getByText } = render(props)
     const miniCard = getByText('mock mini card')
-    expect(miniCard).toHaveStyle(
-      `background-color: ${String(COLORS.red20)}`
-    )
-    expect(miniCard).toHaveStyle(
-      `border: 1px solid ${String(COLORS.red50)}`
-    )
+    expect(miniCard).toHaveStyle(`background-color: ${String(COLORS.red20)}`)
+    expect(miniCard).toHaveStyle(`border: 1px solid ${String(COLORS.red50)}`)
     expect(miniCard).toHaveStyle(
       `border-radius: ${String(BORDERS.radiusSoftCorners)}`
     )

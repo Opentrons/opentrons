@@ -67,11 +67,7 @@ export function SetupCalibrationItem({
           {!runHasStarted ? (
             <Icon
               size={SIZE_1}
-              color={
-                calibratedDate != null
-                  ? COLORS.green50
-                  : COLORS.yellow50
-              }
+              color={calibratedDate != null ? COLORS.green50 : COLORS.yellow50}
               marginRight={SPACING.spacing16}
               name={calibratedDate != null ? 'ot-check' : 'alert-circle'}
             />

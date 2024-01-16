@@ -29,12 +29,7 @@ export function RobotMotionLoader(props: RobotMotionLoaderProps): JSX.Element {
       minHeight="29.5rem"
       gridGap={SPACING.spacing24}
     >
-      <Icon
-        name="ot-spinner"
-        spin
-        size={SIZE_4}
-        color={COLORS.grey50}
-      />
+      <Icon name="ot-spinner" spin size={SIZE_4} color={COLORS.grey50} />
       {header != null ? <LoadingText>{header}</LoadingText> : null}
       {body != null ? <StyledText as="p">{body}</StyledText> : null}
     </Flex>

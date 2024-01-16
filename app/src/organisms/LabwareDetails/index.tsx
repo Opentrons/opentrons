@@ -122,11 +122,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
       </Flex>
       {!isCustomDefinition && (
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-          <Icon
-            color={COLORS.blue50}
-            name="check-decagram"
-            height=".7rem"
-          />{' '}
+          <Icon color={COLORS.blue50} name="check-decagram" height=".7rem" />{' '}
           <StyledText
             as="label"
             id="LabwareDetails_opentronsDef"

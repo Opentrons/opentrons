@@ -298,11 +298,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
         }
       `}
     >
-      <Icon
-        size="1.25rem"
-        name="alert-circle"
-        color={COLORS.grey30}
-      />
+      <Icon size="1.25rem" name="alert-circle" color={COLORS.grey30} />
       <StyledText
         as="p"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}

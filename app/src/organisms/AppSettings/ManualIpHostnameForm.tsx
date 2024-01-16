@@ -79,9 +79,7 @@ export function ManualIpHostnameForm({
       const ip = values.ip.trim()
       const inputForm = document.getElementById('ip')
       if (inputForm != null)
-        inputForm.style.border = `1px solid ${String(
-          COLORS.grey30
-        )}`
+        inputForm.style.border = `1px solid ${String(COLORS.grey30)}`
       addManualIpAndHostname(ip)
       resetForm()
       setMostRecentAddition(ip)
@@ -94,9 +92,7 @@ export function ManualIpHostnameForm({
         errors.ip = t('add_ip_error')
         const inputForm = document.getElementById('ip')
         if (inputForm != null)
-          inputForm.style.border = `1px solid ${String(
-            COLORS.red50
-          )}`
+          inputForm.style.border = `1px solid ${String(COLORS.red50)}`
       }
       return errors
     },

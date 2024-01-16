@@ -2,11 +2,7 @@ import 'jest-styled-components'
 import * as React from 'react'
 import { renderWithProviders } from '../../../testing/utils'
 import { COLORS } from '../../../helix-design-system'
-import {
-  BORDERS,
-  TYPOGRAPHY,
-  SPACING,
-} from '../../../ui-style-constants'
+import { BORDERS, TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
 
 import { AlertPrimaryButton } from '../AlertPrimaryButton'
 

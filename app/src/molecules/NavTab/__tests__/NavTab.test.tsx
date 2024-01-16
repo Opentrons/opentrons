@@ -47,9 +47,7 @@ describe('NavTab', () => {
     expect(tab).toHaveStyle(`color: ${String(COLORS.grey50)}`)
     fireEvent.click(tab)
     expect(tab).toHaveStyle(`color: ${String(COLORS.black90)}`)
-    expect(tab).toHaveStyle(
-      `border-bottom-color: ${String(COLORS.blue50)}`
-    )
+    expect(tab).toHaveStyle(`border-bottom-color: ${String(COLORS.blue50)}`)
     expect(tab).toHaveStyle(`border-bottom-width: 2px`)
     expect(tab).toHaveStyle(
       `border-bottom-style: ${String(BORDERS.styleSolid)}`

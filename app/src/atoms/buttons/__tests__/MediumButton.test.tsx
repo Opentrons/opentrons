@@ -1,10 +1,6 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import {
-  renderWithProviders,
-  COLORS,
-  BORDERS,
-} from '@opentrons/components'
+import { renderWithProviders, COLORS, BORDERS } from '@opentrons/components'
 
 import { MediumButton } from '../MediumButton'
 

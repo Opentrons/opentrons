@@ -70,9 +70,7 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
           borderThickness={OUTLINE_THICKNESS_MM}
           xDimension={dimensions.xDimension}
           yDimension={dimensions.yDimension}
-          stroke={
-            stroke ?? (parameters.isTiprack ? '#979797' : COLORS.black90)
-          }
+          stroke={stroke ?? (parameters.isTiprack ? '#979797' : COLORS.black90)}
           fill={backgroundFill}
         />
       )}

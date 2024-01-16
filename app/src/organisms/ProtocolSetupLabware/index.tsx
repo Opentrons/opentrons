@@ -412,9 +412,7 @@ function LabwareLatch({
       backgroundColor={COLORS.blue35}
       borderRadius={BORDERS.borderRadiusSize3}
       css={labwareLatchStyles}
-      color={
-        isLatchLoading ? COLORS.grey60 : COLORS.black90
-      }
+      color={isLatchLoading ? COLORS.grey60 : COLORS.black90}
       height="6.5rem"
       alignSelf={ALIGN_CENTER}
       flexDirection={DIRECTION_COLUMN}

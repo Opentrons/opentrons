@@ -1,10 +1,6 @@
 import 'jest-styled-components'
 import * as React from 'react'
-import {
-  renderWithProviders,
-  COLORS,
-  SPACING,
-} from '@opentrons/components'
+import { renderWithProviders, COLORS, SPACING } from '@opentrons/components'
 
 import { ModuleIcon } from '../'
 
@@ -59,9 +55,7 @@ describe('ModuleIcon', () => {
   it('renders SharedIcon with correct style', () => {
     const { getByTestId } = render(props)
     const module = getByTestId('ModuleIcon_ot-temperature-v2')
-    expect(module).toHaveStyle(
-      `color: ${String(COLORS.grey50)}`
-    )
+    expect(module).toHaveStyle(`color: ${String(COLORS.grey50)}`)
     expect(module).toHaveStyle(`height: ${SPACING.spacing16}`)
     expect(module).toHaveStyle(`width: ${SPACING.spacing16}`)
     expect(module).toHaveStyle(`margin-left: ${SPACING.spacing2}`)

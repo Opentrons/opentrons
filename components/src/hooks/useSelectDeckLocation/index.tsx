@@ -109,15 +109,9 @@ export function DeckLocationSelect({
               typeof l === 'object' && 'slotName' in l && l.slotName === slot.id
           )
           const isSelected = isEqual(selectedLocation, slotLocation)
-          let fill =
-            theme === 'default'
-              ? COLORS.purple35
-              : COLORS.grey35
+          let fill = theme === 'default' ? COLORS.purple35 : COLORS.grey35
           if (isSelected)
-            fill =
-              theme === 'default'
-                ? COLORS.purple50
-                : COLORS.grey50
+            fill = theme === 'default' ? COLORS.purple50 : COLORS.grey50
           if (isDisabled) fill = COLORS.grey30
           if (isSelected && slot.id === 'B1' && isThermocycler) {
             return (

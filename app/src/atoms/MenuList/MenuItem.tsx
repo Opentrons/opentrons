@@ -50,8 +50,7 @@ export const MenuItem = styled.button<ButtonProps>`
     &:disabled {
       background-color: ${({ isAlert }) =>
         isAlert ? COLORS.red50 : COLORS.transparent};
-      color: ${({ isAlert }) =>
-        isAlert ? COLORS.white : COLORS.grey50};
+      color: ${({ isAlert }) => (isAlert ? COLORS.white : COLORS.grey50)};
     }
   }
 `

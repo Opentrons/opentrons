@@ -91,9 +91,7 @@ export function ProtocolWithLastRun({
   const PROTOCOL_CARD_STYLE = css`
     flex: 1 0 0;
     &:active {
-      background-color: ${isReadyToBeReRun
-        ? COLORS.green40
-        : COLORS.yellow40};
+      background-color: ${isReadyToBeReRun ? COLORS.green40 : COLORS.yellow40};
     }
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE};
@@ -102,9 +100,7 @@ export function ProtocolWithLastRun({
 
   const PROTOCOL_CARD_CLICKED_STYLE = css`
     flex: 1 0 0;
-    background-color: ${isReadyToBeReRun
-      ? COLORS.green40
-      : COLORS.yellow40};
+    background-color: ${isReadyToBeReRun ? COLORS.green40 : COLORS.yellow40};
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE};
     }
@@ -158,9 +154,7 @@ export function ProtocolWithLastRun({
       flexDirection={DIRECTION_COLUMN}
       padding={SPACING.spacing24}
       gridGap={SPACING.spacing24}
-      backgroundColor={
-        isReadyToBeReRun ? COLORS.green35 : COLORS.yellow35
-      }
+      backgroundColor={isReadyToBeReRun ? COLORS.green35 : COLORS.yellow35}
       width="25.8125rem"
       height="24.5rem"
       borderRadius={BORDERS.borderRadiusSize4}

@@ -94,9 +94,7 @@ const Template: Story<React.ComponentProps<typeof IconComponent>> = args => {
             {name}
           </Text>
           <Flex height="1.5rem">
-            {showText ? (
-              <Text color={COLORS.blue50}> {'copied'}</Text>
-            ) : null}
+            {showText ? <Text color={COLORS.blue50}> {'copied'}</Text> : null}
           </Flex>
         </Flex>
       ))}

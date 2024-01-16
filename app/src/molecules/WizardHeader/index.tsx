@@ -89,10 +89,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
           </StyledText>
 
           {currentStep != null && totalSteps != null && currentStep > 0 ? (
-            <StyledText
-              css={STEP_TEXT_STYLE}
-              color={COLORS.grey50}
-            >
+            <StyledText css={STEP_TEXT_STYLE} color={COLORS.grey50}>
               {t('step', { current: currentStep, max: totalSteps })}
             </StyledText>
           ) : null}

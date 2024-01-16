@@ -148,11 +148,7 @@ export function RobotOverview({
                     </Flex>
                     <StyledText
                       as="p"
-                      color={
-                        isRobotViewable
-                          ? COLORS.black90
-                          : COLORS.grey40
-                      }
+                      color={isRobotViewable ? COLORS.black90 : COLORS.grey40}
                     >
                       {t('lights')}
                     </StyledText>

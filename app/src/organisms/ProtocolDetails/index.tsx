@@ -327,12 +327,8 @@ export function ProtocolDetails(
   const deckMap = <ProtocolDeck protocolAnalysis={mostRecentAnalysis} />
 
   const deckViewByAnalysisStatus = {
-    missing: (
-      <Box size="14rem" backgroundColor={COLORS.grey30} />
-    ),
-    loading: (
-      <Box size="14rem" backgroundColor={COLORS.grey30} />
-    ),
+    missing: <Box size="14rem" backgroundColor={COLORS.grey30} />,
+    loading: <Box size="14rem" backgroundColor={COLORS.grey30} />,
     error: <Box size="14rem" backgroundColor={COLORS.grey30} />,
     complete: (
       <Box size="14rem" height="auto">

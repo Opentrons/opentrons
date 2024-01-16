@@ -228,21 +228,13 @@ export function Toast(props: ToastProps): JSX.Element {
   } = {
     [ERROR_TOAST]: {
       iconName: 'ot-alert',
-      color: `${
-        showODDStyle ? COLORS.red50 : COLORS.red50
-      }`,
-      backgroundColor: `${
-        showODDStyle ? COLORS.red30 : COLORS.red20
-      }`,
+      color: `${showODDStyle ? COLORS.red50 : COLORS.red50}`,
+      backgroundColor: `${showODDStyle ? COLORS.red30 : COLORS.red20}`,
     },
     [INFO_TOAST]: {
       iconName: 'information',
-      color: `${
-        showODDStyle ? COLORS.grey50 : COLORS.grey50
-      }`,
-      backgroundColor: `${
-        showODDStyle ? COLORS.grey30 : COLORS.grey30
-      }`,
+      color: `${showODDStyle ? COLORS.grey50 : COLORS.grey50}`,
+      backgroundColor: `${showODDStyle ? COLORS.grey30 : COLORS.grey30}`,
     },
     [SUCCESS_TOAST]: {
       iconName: 'ot-check',

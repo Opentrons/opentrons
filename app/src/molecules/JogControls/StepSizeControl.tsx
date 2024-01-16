@@ -132,10 +132,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
               {t('jump_size')}
             </StyledText>
           </Flex>
-          <StyledText
-            color={COLORS.grey50}
-            css={TYPOGRAPHY.labelRegular}
-          >
+          <StyledText color={COLORS.grey50} css={TYPOGRAPHY.labelRegular}>
             {JUMP_SIZE_SUBTITLE}
           </StyledText>
           <Box css={BUTTON_WRAPPER_STYLE}>

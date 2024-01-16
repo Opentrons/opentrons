@@ -32,30 +32,22 @@ export function PlayButton({
   const playButtonStyle = css`
     -webkit-tap-highlight-color: transparent;
     &:focus {
-      background-color: ${ready && !isDoorOpen
-        ? COLORS.blue60
-        : COLORS.grey50};
+      background-color: ${ready && !isDoorOpen ? COLORS.blue60 : COLORS.grey50};
       color: ${COLORS.white};
     }
 
     &:hover {
-      background-color: ${ready && !isDoorOpen
-        ? COLORS.blue50
-        : COLORS.grey35};
+      background-color: ${ready && !isDoorOpen ? COLORS.blue50 : COLORS.grey35};
       color: ${COLORS.white};
     }
 
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE};
-      background-color: ${ready && !isDoorOpen
-        ? COLORS.blue50
-        : COLORS.grey35};
+      background-color: ${ready && !isDoorOpen ? COLORS.blue50 : COLORS.grey35};
     }
 
     &:active {
-      background-color: ${ready && !isDoorOpen
-        ? COLORS.blue60
-        : COLORS.grey50};
+      background-color: ${ready && !isDoorOpen ? COLORS.blue60 : COLORS.grey50};
       color: ${COLORS.white};
     }
 
@@ -68,9 +60,7 @@ export function PlayButton({
     <Btn
       alignItems={ALIGN_CENTER}
       backgroundColor={
-        disabled || !ready || isDoorOpen
-          ? COLORS.grey35
-          : COLORS.blue50
+        disabled || !ready || isDoorOpen ? COLORS.grey35 : COLORS.blue50
       }
       borderRadius="6.25rem"
       display={DISPLAY_FLEX}
@@ -83,11 +73,7 @@ export function PlayButton({
       css={playButtonStyle}
     >
       <Icon
-        color={
-          disabled || !ready || isDoorOpen
-            ? COLORS.grey50
-            : COLORS.white
-        }
+        color={disabled || !ready || isDoorOpen ? COLORS.grey50 : COLORS.white}
         name="play-icon"
         size="2.5rem"
       />

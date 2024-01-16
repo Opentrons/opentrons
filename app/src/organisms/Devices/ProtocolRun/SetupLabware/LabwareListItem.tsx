@@ -190,11 +190,7 @@ export function LabwareListItem(
       case HEATERSHAKER_MODULE_TYPE:
         isHeaterShakerInProtocol = true
         extraAttentionText = (
-          <StyledText
-            as="p"
-            color={COLORS.grey50}
-            maxWidth="15.25rem"
-          >
+          <StyledText as="p" color={COLORS.grey50} maxWidth="15.25rem">
             {t('heater_shaker_labware_list_view')}
           </StyledText>
         )

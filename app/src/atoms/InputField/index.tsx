@@ -89,8 +89,7 @@ function Input(props: InputFieldProps): JSX.Element {
     background-color: ${COLORS.white};
     border-radius: ${SPACING.spacing4};
     padding: ${SPACING.spacing8};
-    border: 1px ${BORDERS.styleSolid}
-      ${error ? COLORS.red50 : COLORS.grey30};
+    border: 1px ${BORDERS.styleSolid} ${error ? COLORS.red50 : COLORS.grey30};
     font-size: ${TYPOGRAPHY.fontSizeP};
 
     &:active {
@@ -110,8 +109,7 @@ function Input(props: InputFieldProps): JSX.Element {
     }
 
     &:hover {
-      border: 1px ${BORDERS.styleSolid}
-        ${error ? COLORS.red50 : COLORS.grey60};
+      border: 1px ${BORDERS.styleSolid} ${error ? COLORS.red50 : COLORS.grey60};
     }
     &:focus {
       border: 1px ${BORDERS.styleSolid} ${COLORS.blue50};

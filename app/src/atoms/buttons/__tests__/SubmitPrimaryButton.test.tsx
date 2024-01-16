@@ -33,9 +33,7 @@ describe('SubmitPrimaryButton', () => {
   it('renders submit primary button with text', () => {
     const { getByText } = render(props)
     const button = getByText('submit primary button')
-    expect(button).toHaveStyle(
-      `background-color: ${String(COLORS.blue50)}`
-    )
+    expect(button).toHaveStyle(`background-color: ${String(COLORS.blue50)}`)
     expect(button).toHaveStyle(
       `border-radius: ${String(BORDERS.radiusSoftCorners)}`
     )
@@ -64,12 +62,8 @@ describe('SubmitPrimaryButton', () => {
     const { getByText } = render(props)
     const button = getByText('submit primary button')
     expect(button).toBeDisabled()
-    expect(button).toHaveStyle(
-      `background-color: ${String(COLORS.grey30)}`
-    )
-    expect(button).toHaveStyle(
-      `color: ${String(COLORS.grey40)}`
-    )
+    expect(button).toHaveStyle(`background-color: ${String(COLORS.grey30)}`)
+    expect(button).toHaveStyle(`color: ${String(COLORS.grey40)}`)
   })
 
   it('calls mock function when clicking the button', () => {

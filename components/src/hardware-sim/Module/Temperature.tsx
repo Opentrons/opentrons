@@ -12,9 +12,7 @@ export function Temperature(props: TemperatureVizProps): JSX.Element {
   let ledLightColor = COLORS.transparent
   if (targetTemperature != null) {
     ledLightColor =
-      targetTemperature <= ROOM_TEMPERATURE_C
-        ? COLORS.blue35
-        : COLORS.red30
+      targetTemperature <= ROOM_TEMPERATURE_C ? COLORS.blue35 : COLORS.red30
   }
 
   return (

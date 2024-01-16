@@ -140,11 +140,7 @@ export function AvailableRobotOption(
         isSelected ? (
           <>
             <Box flex="1 1 auto" />
-            <Icon
-              name="alert-circle"
-              size="1.25rem"
-              color={COLORS.red50}
-            />
+            <Icon name="alert-circle" size="1.25rem" color={COLORS.red50} />
           </>
         ) : null}
       </MiniCard>

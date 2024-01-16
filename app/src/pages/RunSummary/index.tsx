@@ -282,9 +282,7 @@ export function RunSummary(): JSX.Element {
               <Icon
                 name={didRunSucceed ? 'ot-check' : 'ot-alert'}
                 size="2rem"
-                color={
-                  didRunSucceed ? COLORS.green50 : COLORS.red50
-                }
+                color={didRunSucceed ? COLORS.green50 : COLORS.red50}
               />
               <SummaryHeader>{headerText}</SummaryHeader>
             </Flex>

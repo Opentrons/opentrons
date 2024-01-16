@@ -30,15 +30,9 @@ export const CalibrationHealthCheckResults = ({
             : t('calibration_complete')
         }
         backgroundColor={
-          isCalibrationRecommended
-            ? COLORS.yellow20
-            : COLORS.green20
+          isCalibrationRecommended ? COLORS.yellow20 : COLORS.green20
         }
-        iconColor={
-          isCalibrationRecommended
-            ? COLORS.yellow50 
-            : COLORS.green50
-        }
+        iconColor={isCalibrationRecommended ? COLORS.yellow50 : COLORS.green50}
         textColor={COLORS.black90}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         iconSize="0.3125rem"

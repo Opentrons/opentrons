@@ -41,9 +41,7 @@ describe('CheckboxField', () => {
     // INNER_STYLE_NO_VALUE
     expect(checkBoxIcon).toHaveStyle(`width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
-    expect(checkBoxIcon).toHaveStyle(
-      `color: ${String(COLORS.grey50)}`
-    )
+    expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.grey50)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
     expect(checkBoxIcon).toHaveStyle(`border-radius: 1px`)
     expect(checkBoxIcon).toHaveStyle(
@@ -53,32 +51,20 @@ describe('CheckboxField', () => {
     expect(checkBoxIcon).toHaveStyleRule('cursor', 'pointer', {
       modifier: ':hover',
     })
-    expect(checkBoxIcon).toHaveStyleRule(
-      'color',
-      `${String(COLORS.grey60)}`,
-      {
-        modifier: ':hover',
-      }
-    )
-    expect(checkBoxIcon).toHaveStyleRule(
-      'color',
-      `${String(COLORS.grey60)}`,
-      {
-        modifier: ':active',
-      }
-    )
+    expect(checkBoxIcon).toHaveStyleRule('color', `${String(COLORS.grey60)}`, {
+      modifier: ':hover',
+    })
+    expect(checkBoxIcon).toHaveStyleRule('color', `${String(COLORS.grey60)}`, {
+      modifier: ':active',
+    })
     expect(checkBoxIcon).toHaveStyleRule(
       'box-shadow',
       `0 0 0 3px ${String(COLORS.blue50)}`,
       { modifier: ':focus' }
     )
-    expect(checkBoxIcon).toHaveStyleRule(
-      'color',
-      `${String(COLORS.grey60)}`,
-      {
-        modifier: ':disabled',
-      }
-    )
+    expect(checkBoxIcon).toHaveStyleRule('color', `${String(COLORS.grey60)}`, {
+      modifier: ':disabled',
+    })
 
     // TODO: kj 09/15/2022 This part will be update later OUTER_STYLE
     // const checkBoxLabel = getByTestId('CheckboxField_label')
@@ -125,9 +111,7 @@ describe('CheckboxField', () => {
     const checkBoxIcon = getByTestId('CheckboxField_icon')
     expect(checkBoxIcon).toHaveStyle(`width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
-    expect(checkBoxIcon).toHaveStyle(
-      `color: ${String(COLORS.blue50)}`
-    )
+    expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.blue50)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
     expect(checkBoxIcon).toHaveStyle(`border-radius: 1px`)
     expect(checkBoxIcon).toHaveStyle(
@@ -142,9 +126,7 @@ describe('CheckboxField', () => {
     const checkBoxIcon = getByTestId('CheckboxField_icon')
     expect(checkBoxIcon).toHaveStyle(`width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
-    expect(checkBoxIcon).toHaveStyle(
-      `color: ${String(COLORS.grey50)}`
-    )
+    expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.grey50)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
     expect(checkBoxIcon).toHaveStyle(`border-radius: 1px`)
     expect(checkBoxIcon).toHaveStyle(

@@ -26,9 +26,7 @@ describe('Unselected TabbedButton', () => {
   it('renders unselected tabbed button with text', () => {
     const { getByText } = render(props)
     const button = getByText('tabbed button')
-    expect(button).toHaveStyle(
-      `background-color: ${String(COLORS.purple35)}`
-    )
+    expect(button).toHaveStyle(`background-color: ${String(COLORS.purple35)}`)
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
     )
@@ -104,9 +102,7 @@ describe('Selected TabbedButton', () => {
   it('renders selected tabbed button with text', () => {
     const { getByText } = render(props)
     const button = getByText('tabbed button')
-    expect(button).toHaveStyle(
-      `background-color: ${String(COLORS.purple50)}`
-    )
+    expect(button).toHaveStyle(`background-color: ${String(COLORS.purple50)}`)
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
     )

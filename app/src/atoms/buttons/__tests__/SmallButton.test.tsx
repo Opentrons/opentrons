@@ -1,10 +1,6 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import {
-  renderWithProviders,
-  COLORS,
-  BORDERS,
-} from '@opentrons/components'
+import { renderWithProviders, COLORS, BORDERS } from '@opentrons/components'
 
 import { SmallButton } from '../SmallButton'
 
@@ -66,9 +62,7 @@ describe('SmallButton', () => {
       buttonType: 'tertiaryLowLight',
     }
     render(props)
-    expect(screen.getByRole('button')).toHaveStyle(
-      `color: ${COLORS.grey60}`
-    )
+    expect(screen.getByRole('button')).toHaveStyle(`color: ${COLORS.grey60}`)
   })
   it('renders the button as disabled', () => {
     props = {
