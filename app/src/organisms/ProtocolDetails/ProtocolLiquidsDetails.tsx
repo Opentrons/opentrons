@@ -7,7 +7,7 @@ import {
 } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,

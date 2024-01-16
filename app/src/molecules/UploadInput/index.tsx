@@ -6,7 +6,7 @@ import {
   Flex,
   SPACING,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   SIZE_3,
   DIRECTION_COLUMN,
   ALIGN_CENTER,

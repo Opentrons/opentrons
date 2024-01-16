@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import {
   StyleProps,
   COLORS,
-  LEGACY_COLORS,
+  COLORS,
   POSITION_FIXED,
   POSITION_ABSOLUTE,
   ALIGN_CENTER,

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,

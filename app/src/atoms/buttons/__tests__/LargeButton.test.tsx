@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders, LEGACY_COLORS } from '@opentrons/components'
+import { renderWithProviders, COLORS } from '@opentrons/components'
 
 import { LargeButton } from '../LargeButton'
 

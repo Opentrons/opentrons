@@ -3,7 +3,7 @@ import { useEstopQuery } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
   Box,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   SPACING,

@@ -1,7 +1,7 @@
 import 'jest-styled-components'
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
-import { LEGACY_COLORS, renderWithProviders } from '@opentrons/components'
+import { COLORS, renderWithProviders } from '@opentrons/components'
 import { OverflowBtn } from '../OverflowBtn'
 
 const render = (props: React.ComponentProps<typeof OverflowBtn>) => {

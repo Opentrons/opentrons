@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { TYPOGRAPHY, PrimaryBtn, LEGACY_COLORS, SPACING } from '@opentrons/components'
+import { TYPOGRAPHY, PrimaryBtn, COLORS, SPACING } from '@opentrons/components'
 import { Slideout } from './index'
 import { StyledText } from '../text'
 

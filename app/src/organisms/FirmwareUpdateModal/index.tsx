@@ -10,7 +10,7 @@ import {
   RESPONSIVENESS,
   JUSTIFY_CENTER,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
 } from '@opentrons/components'
 import {
   useInstrumentsQuery,

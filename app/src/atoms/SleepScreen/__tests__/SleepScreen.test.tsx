@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { renderWithProviders, LEGACY_COLORS } from '@opentrons/components'
+import { renderWithProviders, COLORS } from '@opentrons/components'
 
 import { SleepScreen } from '..'
 

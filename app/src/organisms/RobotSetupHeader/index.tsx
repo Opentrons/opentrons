@@ -3,7 +3,7 @@ import * as React from 'react'
 import {
   ALIGN_CENTER,
   Btn,
-  LEGACY_COLORS,
+  COLORS,
   Flex,
   Icon,
   JUSTIFY_CENTER,

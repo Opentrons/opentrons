@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   Btn,
   COLORS,
-  LEGACY_COLORS,
+  COLORS,
   RESPONSIVENESS,
   TYPOGRAPHY,
   SPACING,

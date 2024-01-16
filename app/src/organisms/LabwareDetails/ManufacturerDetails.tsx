@@ -5,7 +5,7 @@ import {
   Box,
   Icon,
   Link,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   DIRECTION_COLUMN,
   DIRECTION_ROW,

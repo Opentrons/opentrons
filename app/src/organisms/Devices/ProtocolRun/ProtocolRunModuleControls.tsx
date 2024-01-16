@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
-  LEGACY_COLORS,
+  COLORS,
   Flex,
   SPACING,
   JUSTIFY_CENTER,

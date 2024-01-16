@@ -8,7 +8,7 @@ import {
   BORDERS,
   Box,
   CheckboxField,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,

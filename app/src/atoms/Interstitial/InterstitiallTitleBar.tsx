@@ -8,7 +8,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   Flex,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'

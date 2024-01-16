@@ -19,7 +19,7 @@ import {
   ModuleIcon,
   ALIGN_FLEX_START,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   JUSTIFY_FLEX_END,
   POSITION_ABSOLUTE,
@@ -78,8 +78,8 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
     mostRecentAnalysis
   )
 
-  const UNKNOWN_ATTACHMENT_ERROR = `${protocolDisplayName} protocol uses 
-  instruments or modules from a future version of Opentrons software. Please update 
+  const UNKNOWN_ATTACHMENT_ERROR = `${protocolDisplayName} protocol uses
+  instruments or modules from a future version of Opentrons software. Please update
   the app to the most recent version to run this protocol.`
 
   const UnknownAttachmentError = (

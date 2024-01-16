@@ -7,7 +7,7 @@ import styled, { css } from 'styled-components'
 import {
   ALIGN_FLEX_START,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,

@@ -9,7 +9,7 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_FLEX_END,
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
   ALIGN_CENTER,
 } from '@opentrons/components'
 import {

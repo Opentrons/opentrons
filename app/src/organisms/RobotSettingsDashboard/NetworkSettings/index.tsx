@@ -6,7 +6,7 @@ import {
   Flex,
   SPACING,
   COLORS,
-  LEGACY_COLORS,
+  COLORS,
   Icon,
   Btn,
   DIRECTION_ROW,

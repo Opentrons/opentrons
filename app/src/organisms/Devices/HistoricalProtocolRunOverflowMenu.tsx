@@ -10,7 +10,7 @@ import {
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   POSITION_RELATIVE,
-  LEGACY_COLORS,
+  COLORS,
   useOnClickOutside,
   useHoverTooltip,
   Box,

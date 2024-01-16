@@ -9,7 +9,7 @@ import {
   Icon,
   Flex,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   BORDERS,
   DIRECTION_COLUMN,

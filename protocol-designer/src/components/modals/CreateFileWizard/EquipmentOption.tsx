@@ -8,7 +8,7 @@ import {
   BORDERS,
   JUSTIFY_CENTER,
   COLORS,
-  LEGACY_COLORS,
+  COLORS,
   StyleProps,
   TYPOGRAPHY,
   useHoverTooltip,

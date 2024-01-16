@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom'
 import {
   Flex,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   JUSTIFY_CENTER,
   TYPOGRAPHY,

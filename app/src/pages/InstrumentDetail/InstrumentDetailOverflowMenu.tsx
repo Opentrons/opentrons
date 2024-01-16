@@ -7,7 +7,7 @@ import {
   Icon,
   SPACING,
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
 } from '@opentrons/components'
 import {
   SINGLE_MOUNT_PIPETTES,

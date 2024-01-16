@@ -20,7 +20,7 @@ import {
   DISPLAY_BLOCK,
   Icon,
   PrimaryButton,
-  LEGACY_COLORS,
+  COLORS,
   ProtocolDeck,
 } from '@opentrons/components'
 

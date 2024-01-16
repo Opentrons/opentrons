@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 
 import {
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,

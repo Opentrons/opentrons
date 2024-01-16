@@ -10,7 +10,7 @@ import {
   useInterval,
   ALIGN_CENTER,
   COLORS,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   SPACING,
   SecondaryButton,

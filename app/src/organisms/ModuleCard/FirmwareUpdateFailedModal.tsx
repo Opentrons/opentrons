@@ -8,7 +8,7 @@ import {
   SPACING,
   DIRECTION_COLUMN,
   Icon,
-  LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   PrimaryButton,
 } from '@opentrons/components'

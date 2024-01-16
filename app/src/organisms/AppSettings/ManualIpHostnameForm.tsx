@@ -9,7 +9,7 @@ import {
   DIRECTION_COLUMN,
   TYPOGRAPHY,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   SIZE_2,
   BORDERS,
 } from '@opentrons/components'

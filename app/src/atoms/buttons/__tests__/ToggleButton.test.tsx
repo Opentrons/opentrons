@@ -1,7 +1,7 @@
 import 'jest-styled-components'
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders, LEGACY_COLORS, COLORS, SIZE_2 } from '@opentrons/components'
+import { renderWithProviders, COLORS, COLORS, SIZE_2 } from '@opentrons/components'
 
 import { ToggleButton } from '..'
 

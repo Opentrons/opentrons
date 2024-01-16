@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { LEGACY_COLORS, renderWithProviders } from '@opentrons/components'
+import { COLORS, renderWithProviders } from '@opentrons/components'
 import { Skeleton } from '../../../atoms/Skeleton'
 import { getIsOnDevice } from '../../../redux/config'
 import { SimpleWizardBody } from '..'

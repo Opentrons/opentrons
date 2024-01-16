@@ -8,7 +8,7 @@ import {
   Box,
   Icon,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   JUSTIFY_SPACE_AROUND,
   ALIGN_CENTER,
   BORDERS,

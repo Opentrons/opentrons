@@ -2,7 +2,7 @@ import * as React from 'react'
 import {
   SPACING,
   Box,
-  LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   Flex,
   ALIGN_CENTER,

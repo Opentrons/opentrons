@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {
   JUSTIFY_CENTER,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,

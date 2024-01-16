@@ -9,7 +9,7 @@ import {
   SPACING,
   Btn,
   COLORS,
-  LEGACY_COLORS,
+  COLORS,
   BORDERS,
   DISPLAY_FLEX,
   DIRECTION_ROW,

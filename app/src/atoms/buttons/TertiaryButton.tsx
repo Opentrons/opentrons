@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import {
   NewPrimaryBtn,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   BORDERS,
   TYPOGRAPHY,
   styleProps,

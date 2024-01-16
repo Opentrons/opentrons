@@ -8,7 +8,7 @@ import {
   HS_TEMP_MAX,
 } from '@opentrons/shared-data'
 import {
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   SPACING,

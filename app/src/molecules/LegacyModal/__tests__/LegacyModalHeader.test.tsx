@@ -4,7 +4,7 @@ import * as React from 'react'
 
 import {
   ALIGN_CENTER,
-  LEGACY_COLORS,
+  COLORS,
   JUSTIFY_CENTER,
   renderWithProviders,
   SPACING,

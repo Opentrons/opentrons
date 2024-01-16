@@ -11,7 +11,7 @@ import {
   SIZE_4,
   TEXT_ALIGN_CENTER,
   TOOLTIP_LEFT,
-  LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {

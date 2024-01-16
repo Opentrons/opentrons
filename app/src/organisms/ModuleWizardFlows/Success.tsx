@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import {
-  LEGACY_COLORS,
+  COLORS,
   JUSTIFY_FLEX_END,
   PrimaryButton,
   RESPONSIVENESS,

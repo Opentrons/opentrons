@@ -10,7 +10,7 @@ import {
   SIZE_3,
   AlertPrimaryButton,
   JUSTIFY_CENTER,
-  LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   RESPONSIVENESS,
   SecondaryButton,

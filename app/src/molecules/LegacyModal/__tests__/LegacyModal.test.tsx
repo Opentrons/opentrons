@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { LEGACY_COLORS, renderWithProviders } from '@opentrons/components'
+import { COLORS, renderWithProviders } from '@opentrons/components'
 
 import { LegacyModal } from '..'
 

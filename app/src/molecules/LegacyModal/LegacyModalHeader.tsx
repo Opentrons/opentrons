@@ -9,7 +9,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   JUSTIFY_CENTER,
-  LEGACY_COLORS,
+  COLORS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'

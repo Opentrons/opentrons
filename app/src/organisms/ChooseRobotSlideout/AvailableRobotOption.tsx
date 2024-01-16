@@ -10,7 +10,7 @@ import {
   Flex,
   Box,
   DIRECTION_COLUMN,
-  LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   SIZE_1,
 } from '@opentrons/components'

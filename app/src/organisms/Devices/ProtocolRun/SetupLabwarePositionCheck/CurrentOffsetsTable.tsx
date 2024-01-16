@@ -13,7 +13,7 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 

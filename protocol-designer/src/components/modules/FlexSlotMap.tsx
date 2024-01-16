@@ -8,7 +8,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
-  LEGACY_COLORS,
+  COLORS,
   Flex,
   JUSTIFY_CENTER,
   RobotCoordinateSpace,

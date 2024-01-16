@@ -5,7 +5,7 @@ import {
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { LEGACY_COLORS, renderWithProviders } from '@opentrons/components'
+import { COLORS, renderWithProviders } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 import { i18n } from '../../../i18n'

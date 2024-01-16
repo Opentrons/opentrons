@@ -3,7 +3,7 @@ import {
   renderWithProviders,
   TOOLTIP_TOP,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
 import { Tooltip } from '..'

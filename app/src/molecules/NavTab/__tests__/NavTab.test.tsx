@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 import {
   renderWithProviders,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   BORDERS,
 } from '@opentrons/components'

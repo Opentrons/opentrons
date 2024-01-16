@@ -3,7 +3,7 @@ import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import {
   renderWithProviders,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   BORDERS,
 } from '@opentrons/components'

@@ -2,7 +2,7 @@ import styled, { css } from 'styled-components'
 import {
   Btn,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   styleProps,
   TYPOGRAPHY,

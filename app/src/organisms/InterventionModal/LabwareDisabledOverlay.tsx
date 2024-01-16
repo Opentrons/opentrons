@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { LEGACY_COLORS } from '@opentrons/components'
+import { COLORS } from '@opentrons/components'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 

@@ -7,7 +7,7 @@ import {
   Flex,
   DIRECTION_COLUMN,
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   BORDERS,
   useConditionalConfirm,

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { LEGACY_COLORS } from '@opentrons/components/src/ui-style-constants'
+import { COLORS } from '@opentrons/components/src/ui-style-constants'
 import { touchScreenViewport } from '../../DesignTokens/constants'
 import { ModalHeader } from './ModalHeader'
 import type { Story, Meta } from '@storybook/react'

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import startCase from 'lodash/startCase'
 import {
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   Flex,
   SPACING,
   TYPOGRAPHY,
@@ -67,7 +67,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
     flex-direction: ${DIRECTION_ROW};
     justify-content: ${JUSTIFY_FLEX_START};
     background-color: ${COLORS.blue35};
-    border-width: 0; 
+    border-width: 0;
     border-radius: ${BORDERS.borderRadiusSize4};
     padding: ${SPACING.spacing24};
     height: 5.25rem;

@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components'
 import {
   HandleKeypress,
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   Icon,
   DIRECTION_COLUMN,

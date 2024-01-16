@@ -9,7 +9,7 @@ import {
   Icon,
   Flex,
   Link,
-  LEGACY_COLORS,
+  COLORS,
   BORDERS,
   DIRECTION_COLUMN,
   DISPLAY_INLINE_BLOCK,

@@ -2,7 +2,7 @@ import * as React from 'react'
 import {
   renderWithProviders,
   COLORS,
-  LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { i18n } from '../../../../i18n'

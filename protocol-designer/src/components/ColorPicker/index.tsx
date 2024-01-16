@@ -1,7 +1,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { ColorResult, TwitterPicker } from 'react-color'
-import { DEFAULT_LIQUID_COLORS, LEGACY_COLORS } from '@opentrons/components'
+import { DEFAULT_LIQUID_COLORS } from '@opentrons/components'
 
 import styles from './ColorPicker.css'
 

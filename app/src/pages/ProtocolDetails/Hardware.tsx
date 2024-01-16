@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   Flex,
   LocationIcon,
   ModuleIcon,

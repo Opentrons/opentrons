@@ -8,7 +8,7 @@ import {
   Box,
   SPACING,
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
   Link,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'

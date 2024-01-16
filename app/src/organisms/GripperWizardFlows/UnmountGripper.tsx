@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
-  LEGACY_COLORS,
+  COLORS,
   Flex,
   Btn,
   JUSTIFY_SPACE_BETWEEN,

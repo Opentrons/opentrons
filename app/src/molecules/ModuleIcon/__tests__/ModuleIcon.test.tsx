@@ -2,7 +2,7 @@ import 'jest-styled-components'
 import * as React from 'react'
 import {
   renderWithProviders,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
 } from '@opentrons/components'
 

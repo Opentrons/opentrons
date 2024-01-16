@@ -3,7 +3,7 @@ import {
   Flex,
   JUSTIFY_CENTER,
   ALIGN_CENTER,
-  LEGACY_COLORS,
+  COLORS,
   useHoverTooltip,
   TOOLTIP_TOP_START,
   TOOLTIP_AUTO,

@@ -4,7 +4,7 @@ import { css } from 'styled-components'
 import {
   ALIGN_FLEX_START,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Icon,
   JUSTIFY_SPACE_AROUND,

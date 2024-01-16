@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { SPACING, LEGACY_COLORS, Box } from '@opentrons/components'
+import { SPACING, COLORS, Box } from '@opentrons/components'
 import { LegacyModalHeader } from './LegacyModalHeader'
 import { LegacyModalShell } from './LegacyModalShell'
 import type { IconProps, StyleProps } from '@opentrons/components'

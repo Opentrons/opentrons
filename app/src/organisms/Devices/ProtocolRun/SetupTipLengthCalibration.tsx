@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   DIRECTION_COLUMN,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'

@@ -4,7 +4,7 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
 } from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'

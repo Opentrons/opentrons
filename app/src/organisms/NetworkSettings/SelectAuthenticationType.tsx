@@ -6,7 +6,7 @@ import {
   Flex,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   Btn,
   JUSTIFY_CENTER,

@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import {
   SPACING,
   COLORS,
-  LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   ALIGN_CENTER,
   RESPONSIVENESS,

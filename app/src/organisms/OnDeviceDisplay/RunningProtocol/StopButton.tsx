@@ -5,7 +5,7 @@ import {
   Icon,
   Btn,
   ALIGN_CENTER,
-  LEGACY_COLORS,
+  COLORS,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 

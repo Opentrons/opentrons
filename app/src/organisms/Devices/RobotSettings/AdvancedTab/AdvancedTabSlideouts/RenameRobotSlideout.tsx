@@ -8,7 +8,7 @@ import {
   DIRECTION_COLUMN,
   TYPOGRAPHY,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   PrimaryButton,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'

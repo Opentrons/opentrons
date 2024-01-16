@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import {
-  LEGACY_COLORS,
+  COLORS,
   Flex,
   ModuleIcon as SharedModuleIcon,
   POSITION_RELATIVE,

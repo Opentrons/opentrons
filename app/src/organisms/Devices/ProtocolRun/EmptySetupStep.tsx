@@ -2,7 +2,7 @@ import * as React from 'react'
 import {
   Flex,
   DIRECTION_COLUMN,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'

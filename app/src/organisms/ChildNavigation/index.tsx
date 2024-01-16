@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 import {
   ALIGN_CENTER,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_ROW,
   Flex,
   Icon,

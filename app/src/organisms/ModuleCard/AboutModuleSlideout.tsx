@@ -11,7 +11,7 @@ import {
   Btn,
   ALIGN_START,
   PrimaryButton,
-  LEGACY_COLORS,
+  COLORS,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { Slideout } from '../../atoms/Slideout'

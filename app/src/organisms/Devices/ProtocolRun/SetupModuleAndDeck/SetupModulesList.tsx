@@ -8,7 +8,7 @@ import {
   Box,
   Btn,
   COLORS,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,

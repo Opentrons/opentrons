@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { renderWithProviders, SPACING, LEGACY_COLORS } from '@opentrons/components'
+import { renderWithProviders, SPACING, COLORS } from '@opentrons/components'
 import { Divider } from '../index'
 
 const render = (props: React.ComponentProps<typeof Divider>) => {

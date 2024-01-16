@@ -11,7 +11,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   Box,
-  LEGACY_COLORS,
+  COLORS,
   Link,
   PrimaryButton,
 } from '@opentrons/components'

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   ALIGN_CENTER,
-  LEGACY_COLORS,
+  COLORS,
   JUSTIFY_SPACE_BETWEEN,
   Box,
   SPACING,

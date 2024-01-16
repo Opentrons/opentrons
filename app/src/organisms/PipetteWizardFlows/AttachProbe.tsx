@@ -4,7 +4,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   Flex,
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   RESPONSIVENESS,
 } from '@opentrons/components'

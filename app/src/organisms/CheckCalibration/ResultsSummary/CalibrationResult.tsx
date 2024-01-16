@@ -7,7 +7,7 @@ import {
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
   BORDERS,
   SPACING,
 } from '@opentrons/components'

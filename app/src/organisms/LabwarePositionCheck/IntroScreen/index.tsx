@@ -20,7 +20,7 @@ import {
   ALIGN_CENTER,
   Box,
   Btn,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,

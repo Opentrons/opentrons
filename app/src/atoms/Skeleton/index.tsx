@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { BORDERS, Box, LEGACY_COLORS } from '@opentrons/components'
+import { BORDERS, Box, COLORS } from '@opentrons/components'
 
 interface SkeletonProps {
   width: string

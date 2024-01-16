@@ -7,7 +7,7 @@ import {
   Flex,
   ALIGN_CENTER,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   TYPOGRAPHY,
   BORDERS,
 } from '@opentrons/components'

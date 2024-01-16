@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
-  LEGACY_COLORS,
+  COLORS,
   Flex,
   Icon,
   SPACING,

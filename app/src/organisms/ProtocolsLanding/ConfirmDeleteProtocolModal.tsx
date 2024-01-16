@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   TYPOGRAPHY,
   SPACING,

@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom'
 
 import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,

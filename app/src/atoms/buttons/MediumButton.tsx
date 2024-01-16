@@ -5,7 +5,7 @@ import {
   BORDERS,
   Btn,
   COLORS,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_ROW,
   Icon,
   SPACING,

@@ -9,7 +9,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   Icon,
-  LEGACY_COLORS,
+  COLORS,
 } from '@opentrons/components'
 
 import { StyledText } from '../text'

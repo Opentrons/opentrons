@@ -5,7 +5,7 @@ import {
   useDeleteMaintenanceRunMutation,
   useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
-import { LEGACY_COLORS } from '@opentrons/components'
+import { COLORS } from '@opentrons/components'
 import {
   CreateCommand,
   getModuleType,

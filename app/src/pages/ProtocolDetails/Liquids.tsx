@@ -5,7 +5,7 @@ import styled from 'styled-components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
 import {
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,

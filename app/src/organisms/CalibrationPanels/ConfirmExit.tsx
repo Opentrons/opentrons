@@ -9,7 +9,7 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
   AlertPrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'

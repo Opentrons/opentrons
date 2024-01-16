@@ -2,7 +2,7 @@ import * as React from 'react'
 import capitalize from 'lodash/capitalize'
 import { useTranslation } from 'react-i18next'
 import {
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
   SecondaryButton,

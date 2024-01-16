@@ -41,7 +41,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   TYPOGRAPHY,
   PrimaryButton,

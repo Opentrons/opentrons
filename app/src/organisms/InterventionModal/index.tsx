@@ -6,7 +6,7 @@ import {
   Box,
   Flex,
   COLORS,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   POSITION_FIXED,
   POSITION_ABSOLUTE,

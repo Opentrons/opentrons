@@ -5,7 +5,7 @@ import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   RESPONSIVENESS,

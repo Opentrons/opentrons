@@ -9,7 +9,7 @@ import {
   DIRECTION_ROW,
   SPACING,
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
   Icon,
   Link,
   PrimaryButton,

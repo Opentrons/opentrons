@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import {
   Flex,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   SPACING,

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import {
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   COLORS,
   BORDERS,
   TYPOGRAPHY,

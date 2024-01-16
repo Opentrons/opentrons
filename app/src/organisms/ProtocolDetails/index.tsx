@@ -17,7 +17,7 @@ import {
   Link,
   ALIGN_CENTER,
   BORDERS,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
@@ -349,8 +349,8 @@ export function ProtocolDetails(
     setShowChooseRobotToRunProtocolSlideout(true)
   }
 
-  const UNKNOWN_ATTACHMENT_ERROR = `${protocolDisplayName} protocol uses 
-  instruments or modules from a future version of Opentrons software. Please update 
+  const UNKNOWN_ATTACHMENT_ERROR = `${protocolDisplayName} protocol uses
+  instruments or modules from a future version of Opentrons software. Please update
   the app to the most recent version to run this protocol.`
 
   const UnknownAttachmentError = (

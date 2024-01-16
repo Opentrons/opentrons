@@ -8,7 +8,7 @@ import {
   PrimaryButton,
   Flex,
   TYPOGRAPHY,
-  LEGACY_COLORS,
+  COLORS,
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_FLEX_END,
   ALIGN_CENTER,

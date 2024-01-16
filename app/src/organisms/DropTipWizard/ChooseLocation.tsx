@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import {
   Btn,
   Flex,
-  LEGACY_COLORS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   RESPONSIVENESS,

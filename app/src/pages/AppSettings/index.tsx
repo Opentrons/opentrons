@@ -10,7 +10,7 @@ import {
   ALIGN_START,
   DIRECTION_ROW,
   SPACING,
-  LEGACY_COLORS,
+  COLORS,
   BORDERS,
   TYPOGRAPHY,
 } from '@opentrons/components'

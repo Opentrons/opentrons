@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   Icon,
-  LEGACY_COLORS,
+  COLORS,
   Flex,
   Box,
   DIRECTION_ROW,
