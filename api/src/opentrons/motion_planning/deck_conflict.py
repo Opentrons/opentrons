@@ -61,6 +61,13 @@ class Labware:
 
 
 @dataclass
+class TrashBin:
+    """A non-labware trash bin (loaded via api level 2.16 and above)."""
+
+    name_for_errors: str
+
+
+@dataclass
 class _Module:
     name_for_errors: str
     highest_z_including_labware: float
@@ -98,6 +105,7 @@ DeckItem = Union[
     MagneticBlockModule,
     ThermocyclerModule,
     OtherModule,
+    TrashBin,
 ]
 
 
@@ -129,6 +137,10 @@ class _MaxHeight(NamedTuple):
                 return item.highest_z < self.max_height
         elif isinstance(item, _Module):
             return item.highest_z_including_labware < self.max_height
+        elif isinstance(item, TrashBin):
+            # Since this is a restriction for OT-2 only and OT-2 trashes exceeded the height limit, always return False
+            # TODO(jbl 2024-01-16) Include trash height and use that for check for more robustness
+            return False
 
 
 class _NoModule(NamedTuple):
@@ -380,4 +392,6 @@ def _flex_slots_covered_by_thermocycler() -> Set[DeckSlotName]:
 
 
 def _is_fixed_trash(item: DeckItem) -> bool:
-    return isinstance(item, Labware) and item.is_fixed_trash
+    return (isinstance(item, Labware) and item.is_fixed_trash) or isinstance(
+        item, TrashBin
+    )

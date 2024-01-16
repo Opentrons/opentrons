@@ -83,6 +83,7 @@ def test_maps_labware_on_deck(decoy: Decoy, mock_state_view: StateView) -> None:
         engine_state=mock_state_view,
         existing_labware_ids=["labware-id"],
         existing_module_ids=[],
+        existing_disposal_locations=[],
         new_labware_id="labware-id",
     )
     decoy.verify(
@@ -137,6 +138,7 @@ def test_maps_module_without_labware(decoy: Decoy, mock_state_view: StateView) -
         engine_state=mock_state_view,
         existing_labware_ids=[],
         existing_module_ids=["module-id"],
+        existing_disposal_locations=[],
         new_module_id="module-id",
     )
     decoy.verify(
@@ -190,6 +192,7 @@ def test_maps_module_with_labware(decoy: Decoy, mock_state_view: StateView) -> N
         engine_state=mock_state_view,
         existing_labware_ids=[],
         existing_module_ids=["module-id"],
+        existing_disposal_locations=[],
         new_module_id="module-id",
     )
     decoy.verify(
@@ -273,6 +276,7 @@ def test_maps_different_module_models(
         engine_state=mock_state_view,
         existing_labware_ids=[],
         existing_module_ids=[],
+        existing_disposal_locations=[],
         new_module_id="module-id",
     )
     decoy.verify(
