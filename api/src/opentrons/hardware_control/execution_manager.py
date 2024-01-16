@@ -1,6 +1,6 @@
 import asyncio
 import functools
-from typing import Set, TypeVar, Type, cast, Callable, Any, Awaitable, overload
+from typing import Set, TypeVar, Type, cast, Callable, Any, overload, Coroutine
 from .types import ExecutionState
 from opentrons_shared_data.errors.exceptions import ExecutionCancelledError
 
@@ -74,10 +74,11 @@ class ExecutionManager:
 
 DecoratedReturn = TypeVar("DecoratedReturn")
 DecoratedMethodReturningValue = TypeVar(
-    "DecoratedMethodReturningValue", bound=Callable[..., Awaitable[DecoratedReturn]]
+    "DecoratedMethodReturningValue",
+    bound=Callable[..., Coroutine[None, None, DecoratedReturn]],
 )
 DecoratedMethodNoReturn = TypeVar(
-    "DecoratedMethodNoReturn", bound=Callable[..., Awaitable[None]]
+    "DecoratedMethodNoReturn", bound=Callable[..., Coroutine[None, None, None]]
 )
 SubclassInstance = TypeVar("SubclassInstance", bound="ExecutionManagerProvider")
 

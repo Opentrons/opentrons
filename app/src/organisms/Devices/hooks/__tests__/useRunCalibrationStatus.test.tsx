@@ -65,7 +65,7 @@ describe('useRunCalibrationStatus hook', () => {
       reason: 'calibrate_deck_failure_reason',
     })
   })
-  it('should ignore deck calibration status of an OT-3', () => {
+  it('should ignore deck calibration status of a Flex', () => {
     when(mockUseDeckCalibrationStatus)
       .calledWith('otie')
       .mockReturnValue('BAD_CALIBRATION')
@@ -161,7 +161,7 @@ describe('useRunCalibrationStatus hook', () => {
       reason: 'calibrate_tiprack_failure_reason',
     })
   })
-  it('should ignore tip rack calibration for the OT-3', () => {
+  it('should ignore tip rack calibration for the Flex', () => {
     when(mockUseRunPipetteInfoByMount)
       .calledWith('1')
       .mockReturnValue({

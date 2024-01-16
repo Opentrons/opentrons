@@ -11,7 +11,6 @@ import {
   CreateCommand,
   getModuleType,
   getModuleDisplayName,
-  LEFT,
   CutoutId,
   FLEX_CUTOUT_BY_SLOT_ID,
 } from '@opentrons/shared-data'
@@ -35,7 +34,6 @@ import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
 import { DetachProbe } from './DetachProbe'
-import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type { SingleSlotCutoutFixtureId } from '@opentrons/shared-data'
@@ -289,20 +287,6 @@ export const ModuleWizardFlows = (
         createMaintenanceRun={createTargetedMaintenanceRun}
         isCreateLoading={isCreateLoading}
         createdMaintenanceRunId={createdMaintenanceRunId}
-      />
-    )
-  } else if (currentStep.section === SECTIONS.FIRMWARE_UPDATE) {
-    modalContent = (
-      <FirmwareUpdateModal
-        proceed={proceed}
-        subsystem={
-          attachedPipette.mount === LEFT ? 'pipette_left' : 'pipette_right'
-        }
-        description={t('firmware_update')}
-        proceedDescription={t('firmware_up_to_date', {
-          module: getModuleDisplayName(attachedModule.moduleModel),
-        })}
-        isOnDevice={isOnDevice}
       />
     )
   } else if (currentStep.section === SECTIONS.SELECT_LOCATION) {

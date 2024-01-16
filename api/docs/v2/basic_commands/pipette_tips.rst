@@ -28,9 +28,9 @@ This simple statement works because the variable ``tiprack_1`` in the sample pro
 
 If you omit the ``tip_rack`` argument from the ``pipette`` variable, the API will raise an error. You must pass in the tip rack's location to ``pick_up_tip`` like this::
     
-    pipette.pick_up_tip(tiprack_1['A1'])
+    pipette.pick_up_tip(tiprack_1["A1"])
     pipette.drop_tip()
-    pipette.pick_up_tip(tiprack_1['B1']) 
+    pipette.pick_up_tip(tiprack_1["B1"]) 
 
 If coding the location of each tip seems inefficient or tedious, try using a ``for`` loop to automate a sequential tip pick up process. When using a loop, the API keeps track of tips and manages tip pickup for you. But ``pick_up_tip`` is still a powerful feature. It gives you direct control over tip use when that’s important in your protocol.
 
@@ -86,7 +86,7 @@ You can also specify where to drop the tip by passing in a location. For example
     pipette.pick_up_tip()            # picks up tip from rack location A1
     pipette.drop_tip()               # drops tip in trash bin 
     pipette.pick_up_tip()            # picks up tip from rack location B1
-    pipette.drop_tip(tiprack['A1'])  # drops tip in rack location A1
+    pipette.drop_tip(tiprack["A1"])  # drops tip in rack location A1
 
 .. versionadded:: 2.0
 
@@ -115,7 +115,7 @@ Currently, the API considers tips as "used" after being picked up. For example, 
     pipette.return_tip()                 # drops tip in rack location A1
     pipette.pick_up_tip()                # picks up tip from rack location B1
     pipette.drop_tip()                   # drops tip in trash bin
-    pipette.pick_up_tip(tiprack_1['A1']) # picks up tip from rack location A1
+    pipette.pick_up_tip(tiprack_1["A1"]) # picks up tip from rack location A1
 
 Early API versions treated returned tips as unused items. They could be picked up again without an explicit argument. For example:: 
 

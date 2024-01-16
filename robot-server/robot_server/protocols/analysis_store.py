@@ -160,6 +160,7 @@ class AnalysisStore:
             id=analysis_id,
             result=result,
             robotType=robot_type,
+            status=AnalysisStatus.COMPLETED,
             commands=commands,
             labware=labware,
             modules=modules,

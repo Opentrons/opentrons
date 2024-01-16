@@ -1,6 +1,71 @@
 {
   "title": "CreateCommandUnion",
   "description": "Model that validates a union of all CommandCreate models.",
+  "discriminator": {
+    "propertyName": "commandType",
+    "mapping": {
+      "aspirate": "#/definitions/AspirateCreate",
+      "aspirateInPlace": "#/definitions/AspirateInPlaceCreate",
+      "comment": "#/definitions/CommentCreate",
+      "configureForVolume": "#/definitions/ConfigureForVolumeCreate",
+      "configureNozzleLayout": "#/definitions/ConfigureNozzleLayoutCreate",
+      "custom": "#/definitions/CustomCreate",
+      "dispense": "#/definitions/DispenseCreate",
+      "dispenseInPlace": "#/definitions/DispenseInPlaceCreate",
+      "blowout": "#/definitions/BlowOutCreate",
+      "blowOutInPlace": "#/definitions/BlowOutInPlaceCreate",
+      "dropTip": "#/definitions/DropTipCreate",
+      "dropTipInPlace": "#/definitions/DropTipInPlaceCreate",
+      "home": "#/definitions/HomeCreate",
+      "retractAxis": "#/definitions/RetractAxisCreate",
+      "loadLabware": "#/definitions/LoadLabwareCreate",
+      "loadLiquid": "#/definitions/LoadLiquidCreate",
+      "loadModule": "#/definitions/LoadModuleCreate",
+      "loadPipette": "#/definitions/LoadPipetteCreate",
+      "moveLabware": "#/definitions/MoveLabwareCreate",
+      "moveRelative": "#/definitions/MoveRelativeCreate",
+      "moveToCoordinates": "#/definitions/MoveToCoordinatesCreate",
+      "moveToWell": "#/definitions/MoveToWellCreate",
+      "moveToAddressableArea": "#/definitions/MoveToAddressableAreaCreate",
+      "moveToAddressableAreaForDropTip": "#/definitions/MoveToAddressableAreaForDropTipCreate",
+      "prepareToAspirate": "#/definitions/PrepareToAspirateCreate",
+      "waitForResume": "#/definitions/WaitForResumeCreate",
+      "pause": "#/definitions/WaitForResumeCreate",
+      "waitForDuration": "#/definitions/WaitForDurationCreate",
+      "pickUpTip": "#/definitions/PickUpTipCreate",
+      "savePosition": "#/definitions/SavePositionCreate",
+      "setRailLights": "#/definitions/SetRailLightsCreate",
+      "touchTip": "#/definitions/TouchTipCreate",
+      "setStatusBar": "#/definitions/SetStatusBarCreate",
+      "verifyTipPresence": "#/definitions/VerifyTipPresenceCreate",
+      "getTipPresence": "#/definitions/GetTipPresenceCreate",
+      "heaterShaker/waitForTemperature": "#/definitions/opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureCreate",
+      "heaterShaker/setTargetTemperature": "#/definitions/opentrons__protocol_engine__commands__heater_shaker__set_target_temperature__SetTargetTemperatureCreate",
+      "heaterShaker/deactivateHeater": "#/definitions/DeactivateHeaterCreate",
+      "heaterShaker/setAndWaitForShakeSpeed": "#/definitions/SetAndWaitForShakeSpeedCreate",
+      "heaterShaker/deactivateShaker": "#/definitions/DeactivateShakerCreate",
+      "heaterShaker/openLabwareLatch": "#/definitions/OpenLabwareLatchCreate",
+      "heaterShaker/closeLabwareLatch": "#/definitions/CloseLabwareLatchCreate",
+      "magneticModule/disengage": "#/definitions/DisengageCreate",
+      "magneticModule/engage": "#/definitions/EngageCreate",
+      "temperatureModule/setTargetTemperature": "#/definitions/opentrons__protocol_engine__commands__temperature_module__set_target_temperature__SetTargetTemperatureCreate",
+      "temperatureModule/waitForTemperature": "#/definitions/opentrons__protocol_engine__commands__temperature_module__wait_for_temperature__WaitForTemperatureCreate",
+      "temperatureModule/deactivate": "#/definitions/DeactivateTemperatureCreate",
+      "thermocycler/setTargetBlockTemperature": "#/definitions/SetTargetBlockTemperatureCreate",
+      "thermocycler/waitForBlockTemperature": "#/definitions/WaitForBlockTemperatureCreate",
+      "thermocycler/setTargetLidTemperature": "#/definitions/SetTargetLidTemperatureCreate",
+      "thermocycler/waitForLidTemperature": "#/definitions/WaitForLidTemperatureCreate",
+      "thermocycler/deactivateBlock": "#/definitions/DeactivateBlockCreate",
+      "thermocycler/deactivateLid": "#/definitions/DeactivateLidCreate",
+      "thermocycler/openLid": "#/definitions/OpenLidCreate",
+      "thermocycler/closeLid": "#/definitions/CloseLidCreate",
+      "thermocycler/runProfile": "#/definitions/RunProfileCreate",
+      "calibration/calibrateGripper": "#/definitions/CalibrateGripperCreate",
+      "calibration/calibratePipette": "#/definitions/CalibratePipetteCreate",
+      "calibration/calibrateModule": "#/definitions/CalibrateModuleCreate",
+      "calibration/moveToMaintenancePosition": "#/definitions/MoveToMaintenancePositionCreate"
+    }
+  },
   "anyOf": [
     {
       "$ref": "#/definitions/AspirateCreate"
@@ -259,7 +324,7 @@
         },
         "volume": {
           "title": "Volume",
-          "description": "Amount of liquid in uL. Must be at least 0 and no greater than a pipette-specific maximum volume.",
+          "description": "The amount of liquid to aspirate, in \u00b5L. Must not be greater than the remaining available amount, which depends on the pipette (see `loadPipette`), its configuration (see `configureForVolume`), the tip (see `pickUpTip`), and the amount you've aspirated so far. There is some tolerance for floating point rounding errors.",
           "minimum": 0,
           "type": "number"
         },
@@ -320,7 +385,7 @@
         },
         "volume": {
           "title": "Volume",
-          "description": "Amount of liquid in uL. Must be at least 0 and no greater than a pipette-specific maximum volume.",
+          "description": "The amount of liquid to aspirate, in \u00b5L. Must not be greater than the remaining available amount, which depends on the pipette (see `loadPipette`), its configuration (see `configureForVolume`), the tip (see `pickUpTip`), and the amount you've aspirated so far. There is some tolerance for floating point rounding errors.",
           "minimum": 0,
           "type": "number"
         },
@@ -410,19 +475,19 @@
       "description": "Parameters required to configure volume for a specific pipette.",
       "type": "object",
       "properties": {
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        },
         "volume": {
           "title": "Volume",
           "description": "Amount of liquid in uL. Must be at least 0 and no greater than a pipette-specific maximum volume.",
           "minimum": 0,
           "type": "number"
-        },
-        "pipetteId": {
-          "title": "Pipetteid",
-          "description": "Identifier of pipette to use for liquid handling.",
-          "type": "string"
         }
       },
-      "required": ["volume", "pipetteId"]
+      "required": ["pipetteId", "volume"]
     },
     "ConfigureForVolumeCreate": {
       "title": "ConfigureForVolumeCreate",
@@ -684,7 +749,7 @@
         },
         "volume": {
           "title": "Volume",
-          "description": "Amount of liquid in uL. Must be at least 0 and no greater than a pipette-specific maximum volume.",
+          "description": "The amount of liquid to dispense, in \u00b5L. Must not be greater than the currently aspirated volume. There is some tolerance for floating point rounding errors.",
           "minimum": 0,
           "type": "number"
         },
@@ -744,7 +809,7 @@
         },
         "volume": {
           "title": "Volume",
-          "description": "Amount of liquid in uL. Must be at least 0 and no greater than a pipette-specific maximum volume.",
+          "description": "The amount of liquid to dispense, in \u00b5L. Must not be greater than the currently aspirated volume. There is some tolerance for floating point rounding errors.",
           "minimum": 0,
           "type": "number"
         },

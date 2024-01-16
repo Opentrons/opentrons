@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -63,7 +64,7 @@ describe('WelcomeModal', () => {
 
   it('should call a mock function when tapping next button', () => {
     const [{ getByText }] = render(props)
-    getByText('Next').click()
+    fireEvent.click(getByText('Next'))
     expect(props.setShowWelcomeModal).toHaveBeenCalled()
     expect(props.setShowAnalyticsOptInModal).toHaveBeenCalled()
   })

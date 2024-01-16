@@ -180,6 +180,8 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         elif isinstance(command.result, (AspirateResult, AspirateInPlaceResult)):
             pipette_id = command.params.pipetteId
             previous_volume = self._state.aspirated_volume_by_id[pipette_id] or 0
+            # PipetteHandler will have clamped command.result.volume for us, so
+            # next_volume should always be in bounds.
             next_volume = previous_volume + command.result.volume
 
             self._state.aspirated_volume_by_id[pipette_id] = next_volume
@@ -187,7 +189,9 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         elif isinstance(command.result, (DispenseResult, DispenseInPlaceResult)):
             pipette_id = command.params.pipetteId
             previous_volume = self._state.aspirated_volume_by_id[pipette_id] or 0
-            next_volume = max(0.0, previous_volume - command.result.volume)
+            # PipetteHandler will have clamped command.result.volume for us, so
+            # next_volume should always be in bounds.
+            next_volume = previous_volume - command.result.volume
             self._state.aspirated_volume_by_id[pipette_id] = next_volume
 
         elif isinstance(command.result, PickUpTipResult):

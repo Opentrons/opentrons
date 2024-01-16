@@ -229,8 +229,7 @@ class BinarySerializable:
                 ),
                 None,
             )
-            # Mypy is not liking constructing the derived types.
-            ret_instance = cls(**args)  # type: ignore[call-arg]
+            ret_instance = cls(**args)
             if message_index is not None:
                 ret_instance.message_index = message_index  # type: ignore[attr-defined]
             return ret_instance

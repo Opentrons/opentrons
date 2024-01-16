@@ -244,12 +244,6 @@ def test_dispense_subtracts_volume(
 
     assert subject.state.aspirated_volume_by_id["pipette-id"] == 0
 
-    subject.handle_action(
-        UpdateCommandAction(private_result=None, command=dispense_command)
-    )
-
-    assert subject.state.aspirated_volume_by_id["pipette-id"] == 0
-
 
 @pytest.mark.parametrize(
     "blow_out_command",

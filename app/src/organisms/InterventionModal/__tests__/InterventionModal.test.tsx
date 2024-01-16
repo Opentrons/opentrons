@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import {
   CompletedProtocolAnalysis,
@@ -74,7 +75,7 @@ describe('InterventionModal', () => {
 
   it('clicking "Confirm and resume" triggers the resume handler', () => {
     const { getByText } = render(props)
-    getByText('Confirm and resume').click()
+    fireEvent.click(getByText('Confirm and resume'))
     expect(mockOnResumeHandler).toHaveBeenCalled()
   })
 

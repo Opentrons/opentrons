@@ -971,8 +971,8 @@ class OT3Controller:
     @asynccontextmanager
     async def motor_current(
         self,
-        run_currents: OT3AxisMap[float] = {},
-        hold_currents: OT3AxisMap[float] = {},
+        run_currents: Optional[OT3AxisMap[float]] = None,
+        hold_currents: Optional[OT3AxisMap[float]] = None,
     ) -> AsyncIterator[None]:
         """Update and restore current."""
         assert self._current_settings

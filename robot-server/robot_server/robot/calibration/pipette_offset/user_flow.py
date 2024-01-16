@@ -119,7 +119,7 @@ class PipetteOffsetCalibrationUserFlow:
 
         if perform_tip_length and has_calibration_block:
             self._load_calibration_block()
-            self._has_calibration_block = has_calibration_block
+            self._has_calibration_block: bool = has_calibration_block
         else:
             self._has_calibration_block = False
 

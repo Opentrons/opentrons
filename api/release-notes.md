@@ -4,6 +4,25 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 [technical change log]: https://github.com/Opentrons/opentrons/releases
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
+---
+
+## Opentrons Robot Software Changes in [!!EDIT ME WITH THE ACTUAL NUMBER OF THE NEXT RELEASE!!]
+
+### HTTP API
+
+- In the `/runs/commands`, `/maintenance_runs/commands`, and `/protocols` endpoints, the `dispense` command will now return an error if you try to dispense more than you've aspirated, instead of silently clamping.
+
+---
+
+## Opentrons Robot Software Changes in 7.1.1
+
+Welcome to the v7.1.1 release of the Opentrons robot software!
+
+### Bug Fixes
+
+- Fixed an issue with the pipette definition for Flex 1-Channel 1000 µL pipettes.
+
+---
 
 ## Opentrons Robot Software Changes in 7.1.0
 

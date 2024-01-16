@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { saveAs } from 'file-saver'
 import { when, resetAllWhenMocks } from 'jest-when'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 import {
@@ -135,7 +136,7 @@ describe('CalibrationDataDownload', () => {
     getByText('Download Calibration Data')
   })
 
-  it('renders an OT-3 title and description - About Calibration', () => {
+  it('renders a Flex title and description - About Calibration', () => {
     when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     const [{ queryByText }] = render()
     queryByText(
@@ -149,7 +150,7 @@ describe('CalibrationDataDownload', () => {
   it('renders a download calibration data button', () => {
     const [{ getByText }] = render()
     const downloadButton = getByText('Download calibration logs')
-    downloadButton.click()
+    fireEvent.click(downloadButton)
     expect(saveAs).toHaveBeenCalled()
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
@@ -164,7 +165,7 @@ describe('CalibrationDataDownload', () => {
     } as any)
     const [{ getByText }] = render()
     const downloadButton = getByText('Download calibration logs')
-    downloadButton.click()
+    fireEvent.click(downloadButton)
     expect(saveAs).toHaveBeenCalled()
   })
 

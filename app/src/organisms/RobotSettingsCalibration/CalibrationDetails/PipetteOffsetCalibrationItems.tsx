@@ -80,7 +80,7 @@ export function PipetteOffsetCalibrationItems({
         <tr>
           <StyledTableHeader>{t('model_and_serial')}</StyledTableHeader>
           <StyledTableHeader>{t('mount')}</StyledTableHeader>
-          {/* omit tip rack column for OT-3 */}
+          {/* omit tip rack column for Flex */}
           {isFlex ? null : (
             <StyledTableHeader>{t('tiprack')}</StyledTableHeader>
           )}

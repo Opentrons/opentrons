@@ -50,7 +50,7 @@ INSTALL_REQUIRES = [
     f"opentrons=={VERSION}",
     f"opentrons-shared-data=={VERSION}",
     "pyzmq==19.0.2",
-    "pydantic==1.8.2",
+    "pydantic==1.9.2",
 ]
 
 
