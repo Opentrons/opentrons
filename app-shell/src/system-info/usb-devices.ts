@@ -1,20 +1,16 @@
 import assert from 'assert'
 import execa from 'execa'
-import { usb } from 'usb'
+import { usb, webusb } from 'usb'
 import { isWindows } from '../os'
 import { createLogger } from '../log'
 
-import type { Device } from 'usb'
-
-export type { Device }
-
 export type UsbDeviceMonitorOptions = Partial<{
-  onDeviceAdd?: (device: Device) => unknown
-  onDeviceRemove?: (device: Device) => unknown
+  onDeviceAdd?: (device: USBDevice) => unknown
+  onDeviceRemove?: (device: USBDevice) => unknown
 }>
 
 export interface UsbDeviceMonitor {
-  getAllDevices: () => Device[]
+  getAllDevices: () => Promise<USBDevice[]>
   stop: () => void
 }
 
@@ -26,21 +22,21 @@ export function createUsbDeviceMonitor(
   const { onDeviceAdd, onDeviceRemove } = options
 
   if (typeof onDeviceAdd === 'function') {
-    usb.on('attach', onDeviceAdd)
+    usb.on('attach', device => onDeviceAdd)
   }
 
   if (typeof onDeviceRemove === 'function') {
-    usb.off('detach', onDeviceRemove)
+    usb.on('detach', device => onDeviceRemove)
   }
 
   return {
-    getAllDevices: () => usb.getDeviceList(),
+    getAllDevices: () => Promise.resolve(webusb.getDevices()),
     stop: () => {
       if (typeof onDeviceAdd === 'function') {
-        usb.off('attach', onDeviceAdd)
+        usb.removeAllListeners('attach')
       }
       if (typeof onDeviceRemove === 'function') {
-        usb.off('detach', onDeviceRemove)
+        usb.removeAllListeners('detach')
       }
 
       log.debug('usb detection monitoring stopped')
@@ -56,6 +52,11 @@ export function getWindowsDriverVersion(
 ): Promise<string | null> {
   const { vendorId: vidDecimal, productId: pidDecimal, serialNumber } = device
   const [vid, pid] = [decToHex(vidDecimal), decToHex(pidDecimal)]
+
+  // USBDevice serialNumber is  string | undefined
+  if (serialNumber == null) {
+    return Promise.resolve(null)
+  }
 
   assert(
     isWindows() || process.env.NODE_ENV === 'test',

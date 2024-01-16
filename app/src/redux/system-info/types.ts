@@ -12,13 +12,11 @@ import {
 } from './constants'
 
 export interface UsbDevice {
-  locationId: number
   vendorId: number
   productId: number
   deviceName: string
   manufacturer: string
   serialNumber: string
-  deviceAddress: number
   windowsDriverVersion?: string | null
 }
 

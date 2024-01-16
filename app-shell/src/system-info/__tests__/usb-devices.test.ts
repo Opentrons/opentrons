@@ -1,5 +1,5 @@
 import execa from 'execa'
-import { usb } from 'usb'
+import { webusb } from 'usb'
 
 import * as Fixtures from '@opentrons/app/src/redux/system-info/__fixtures__'
 import { createUsbDeviceMonitor, getWindowsDriverVersion } from '../usb-devices'
@@ -7,8 +7,8 @@ import { createUsbDeviceMonitor, getWindowsDriverVersion } from '../usb-devices'
 jest.mock('execa')
 jest.mock('usb')
 
-const usbGetDeviceList = usb.getDeviceList as jest.MockedFunction<
-  typeof usb.getDeviceList
+const usbGetDeviceList = webusb.getDevices as jest.MockedFunction<
+  typeof webusb.getDevices
 >
 
 const execaCommand = execa.command as jest.MockedFunction<typeof execa.command>

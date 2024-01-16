@@ -10,7 +10,6 @@ import {
   getActiveInterfaces,
 } from './network-interfaces'
 
-import type { WebUSBDevice } from 'usb'
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 import type { Action, Dispatch } from '../types'
 import type { UsbDeviceMonitor } from './usb-devices'
@@ -22,26 +21,39 @@ import type {
 export { createNetworkInterfaceMonitor }
 export type { NetworkInterface, NetworkInterfaceMonitor }
 
-type Device = Partial<WebUSBDevice>
-
 const RE_REALTEK = /realtek/i
 const IFACE_POLL_INTERVAL_MS = 30000
 
 const log = createLogger('system-info')
 
-const addDriverVersion = (device: WebUSBDevice): Promise<WebUSBDevice> => {
+// format USBDevice to UsbDevice type
+const createUsbDevice = (
+  device: USBDevice,
+  windowsDriverVersion?: string | null
+): UsbDevice => ({
+  vendorId: device.vendorId,
+  productId: device.productId,
+  deviceName: device.productName != null ? device.productName : 'no name',
+  manufacturer:
+    device.manufacturerName != null
+      ? device.manufacturerName
+      : 'no manufacture',
+  serialNumber: device.serialNumber != null ? device.serialNumber : 'no serial',
+  windowsDriverVersion,
+})
+
+const addDriverVersion = (device: USBDevice): Promise<UsbDevice> => {
   if (
     isWindows() &&
     device.manufacturerName != null &&
     RE_REALTEK.test(device.manufacturerName)
   ) {
-    return getWindowsDriverVersion(device).then(windowsDriverVersion => ({
-      ...device,
-      windowsDriverVersion,
-    }))
+    return getWindowsDriverVersion(device).then(windowsDriverVersion =>
+      createUsbDevice(device, windowsDriverVersion)
+    )
   }
 
-  return Promise.resolve({ ...device })
+  return Promise.resolve(createUsbDevice(device))
 }
 
 export function registerSystemInfo(
@@ -50,13 +62,13 @@ export function registerSystemInfo(
   let usbMonitor: UsbDeviceMonitor
   let ifaceMonitor: NetworkInterfaceMonitor
 
-  const handleDeviceAdd = (device: Device): void => {
+  const handleDeviceAdd = (device: USBDevice): void => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     addDriverVersion(device).then(d => dispatch(SystemInfo.usbDeviceAdded(d)))
   }
 
-  const handleDeviceRemove = (d: Device): void => {
-    dispatch(SystemInfo.usbDeviceRemoved({ ...d }))
+  const handleDeviceRemove = (d: USBDevice): void => {
+    dispatch(SystemInfo.usbDeviceRemoved(createUsbDevice(d)))
   }
 
   const handleIfacesChanged = (interfaces: NetworkInterface[]): void => {
