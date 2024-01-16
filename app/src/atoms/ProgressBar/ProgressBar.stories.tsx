@@ -33,7 +33,7 @@ const Template: Story<React.ComponentProps<typeof ProgressBar>> = args => {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing40}
-      backgroundColor={COLORS.grey50Disabled}
+      backgroundColor={COLORS.grey30}
       padding={SPACING.spacing16}
     >
       <StyledText>{'Add 5% to the current progress every 0.2 sec'}</StyledText>

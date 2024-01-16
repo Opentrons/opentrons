@@ -4,8 +4,8 @@ import {
   TYPOGRAPHY,
   BORDERS,
   SPACING,
-  LEGACY_COLORS,
 } from '../ui-style-constants'
+import { COLORS } from '../helix-design-system'
 import {
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,

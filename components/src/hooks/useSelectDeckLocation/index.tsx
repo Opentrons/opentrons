@@ -23,7 +23,8 @@ import {
 import { Icon } from '../../icons'
 import { Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
-import { LEGACY_COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 
 import type {
   DeckDefinition,
@@ -117,7 +118,7 @@ export function DeckLocationSelect({
               theme === 'default'
                 ? COLORS.purple50
                 : COLORS.grey50
-          if (isDisabled) fill = COLORS.grey50Disabled
+          if (isDisabled) fill = COLORS.grey30
           if (isSelected && slot.id === 'B1' && isThermocycler) {
             return (
               <g key="thermocyclerSelectionArea">

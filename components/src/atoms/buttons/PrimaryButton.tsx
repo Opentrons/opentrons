@@ -1,5 +1,6 @@
 import styled from 'styled-components'
-import { LEGACY_COLORS, BORDERS, TYPOGRAPHY, SPACING } from '../../ui-style-constants'
+import { COLORS, BORDERS, TYPOGRAPHY, SPACING } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 import { NewPrimaryBtn, styleProps } from '../../primitives'
 
 export const PrimaryButton = styled(NewPrimaryBtn)`
@@ -29,7 +30,7 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
   }
 
   &:disabled {
-    background-color: ${COLORS.grey50Disabled};
+    background-color: ${COLORS.grey30};
     color: ${COLORS.grey40};
   }
 `

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { LEGACY_COLORS } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 
 export function MagneticBlock(): JSX.Element {
   return (

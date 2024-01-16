@@ -43,7 +43,7 @@ export const SubmitPrimaryButton = (
     }
 
     &:disabled {
-      background-color: ${COLORS.grey50Disabled};
+      background-color: ${COLORS.grey30};
       color: ${COLORS.grey40};
     }
   `

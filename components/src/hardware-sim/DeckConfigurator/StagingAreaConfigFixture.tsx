@@ -4,11 +4,7 @@ import { css } from 'styled-components'
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
-import {
-  BORDERS,
-  SPACING,
-  TYPOGRAPHY,
-} from '../../ui-style-constants'
+import { BORDERS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { COLORS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {

@@ -1,8 +1,8 @@
 import 'jest-styled-components'
 import * as React from 'react'
 import { renderWithProviders } from '../../../testing/utils'
+import { COLORS } from '../../helix-design-system'
 import {
-  LEGACY_COLORS,
   BORDERS,
   TYPOGRAPHY,
   SPACING,
@@ -46,7 +46,7 @@ describe('PrimaryButton', () => {
     const button = getByText('primary button')
     expect(button).toBeDisabled()
     expect(button).toHaveStyle(
-      `background-color: ${COLORS.grey50Disabled}`
+      `background-color: ${COLORS.grey30}`
     )
     expect(button).toHaveStyle(`color: ${COLORS.grey40}`)
   })

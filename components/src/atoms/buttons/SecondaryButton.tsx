@@ -1,6 +1,5 @@
 import styled from 'styled-components'
 import {
-  LEGACY_COLORS,
   BORDERS,
   TYPOGRAPHY,
   SPACING,

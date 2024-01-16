@@ -122,7 +122,7 @@ function Input(props: InputFieldProps): JSX.Element {
       border: 1px ${BORDERS.styleSolid} ${COLORS.blue50};
     }
     &:disabled {
-      border: 1px ${BORDERS.styleSolid} ${COLORS.grey50Disabled};
+      border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
     }
     input[type='number']::-webkit-inner-spin-button,
     input[type='number']::-webkit-outer-spin-button {

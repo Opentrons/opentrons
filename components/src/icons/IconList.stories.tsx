@@ -7,7 +7,7 @@ import {
   WRAP,
   TYPOGRAPHY,
   ALIGN_CENTER,
-  LEGACY_COLORS,
+  COLORS,
   SPACING,
   BORDERS,
 } from '@opentrons/components'

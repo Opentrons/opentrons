@@ -23,7 +23,6 @@ import { FlexTrash } from '../Deck/FlexTrash'
 import { DeckFromLayers } from '../Deck/DeckFromLayers'
 import { SlotLabels } from '../Deck'
 import { COLORS } from '../../helix-design-system'
-import { LEGACY_COLORS } from '../../ui-style-constants'
 
 import { Svg } from '../../primitives'
 import { SingleSlotFixture } from './SingleSlotFixture'

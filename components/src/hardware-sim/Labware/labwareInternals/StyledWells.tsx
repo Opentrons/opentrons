@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Well } from './Well'
-import { LEGACY_COLORS } from '../../../ui-style-constants'
 import { COLORS } from '../../../helix-design-system'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { WellGroup } from './types'

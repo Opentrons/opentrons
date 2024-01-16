@@ -1,7 +1,8 @@
 import * as React from 'react'
 
 import { renderWithProviders } from '../../../testing/utils'
-import { BORDERS, LEGACY_COLORS, SPACING } from '../../../ui-style-constants'
+import { BORDERS, SPACING } from '../../../ui-style-constants'
+import { COLORS } from '../../../helix-design-system'
 
 import { LocationIcon } from '..'
 

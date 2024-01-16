@@ -51,7 +51,7 @@ const StyledInput = styled.input`
   }
 
   &:disabled {
-    border: 1px ${BORDERS.styleSolid} ${COLORS.grey50Disabled};
+    border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
   }
 `
 

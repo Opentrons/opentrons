@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 
-import { LEGACY_COLORS } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 import { SlotBase } from './SlotBase'
 import { SlotClip } from './SlotClip'
 import { WasteChute } from './WasteChuteFixture'

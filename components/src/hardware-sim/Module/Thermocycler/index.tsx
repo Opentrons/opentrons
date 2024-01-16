@@ -7,7 +7,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { C_MED_LIGHT_GRAY } from '../../../styles'
-import { LEGACY_COLORS, BORDERS } from '../../../ui-style-constants'
+import { BORDERS } from '../../../ui-style-constants'
 import { COLORS } from '../../../helix-design-system'
 
 import { RobotCoordsForeignDiv } from '../../Deck'

@@ -1,12 +1,7 @@
 import 'jest-styled-components'
 import * as React from 'react'
 import { renderWithProviders } from '../../../testing/utils'
-import {
-  LEGACY_COLORS,
-  BORDERS,
-  TYPOGRAPHY,
-  SPACING,
-} from '../../../ui-style-constants'
+import { BORDERS, TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
 import { COLORS } from '../../../helix-design-system'
 
 import { SecondaryButton } from '../SecondaryButton'

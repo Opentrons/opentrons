@@ -4,11 +4,7 @@ import { css } from 'styled-components'
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
-import {
-  BORDERS,
-  SPACING,
-  TYPOGRAPHY,
-} from '../../ui-style-constants'
+import { BORDERS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { COLORS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
@@ -103,7 +99,7 @@ const TRASH_BIN_CONFIG_STYLE_EDTIABLE = css`
   }
 
   &:hover {
-    background-color: ${COLORS.grey5555555555};
+    background-color: ${COLORS.grey55};
   }
 
   &:focus-visible {

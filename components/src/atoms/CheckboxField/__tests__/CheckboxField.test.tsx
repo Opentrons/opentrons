@@ -3,7 +3,8 @@ import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../../styles'
 import { renderWithProviders } from '../../../testing/utils'
-import { LEGACY_COLORS, TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
+import { COLORS } from '../../../helix-design-system'
+import { TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
 
 import { CheckboxField } from '..'
 

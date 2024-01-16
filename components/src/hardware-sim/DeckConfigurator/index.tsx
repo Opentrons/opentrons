@@ -11,7 +11,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { COLORS } from '../../helix-design-system'
-import { LEGACY_COLORS } from '../../ui-style-constants'
 import { SingleSlotFixture } from '../BaseDeck/SingleSlotFixture'
 import { SlotLabels } from '../Deck'
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'

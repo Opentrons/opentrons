@@ -1,6 +1,6 @@
 import * as React from 'react'
 import map from 'lodash/map'
-import { LEGACY_COLORS } from '../../../ui-style-constants'
+import { COLORS } from '../../../helix-design-system'
 import { Well } from './Well'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { CSSProperties } from 'styled-components'

@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { LEGACY_COLORS } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 
 export function SlotClip(props: React.SVGProps<SVGPathElement>): JSX.Element {
   return (

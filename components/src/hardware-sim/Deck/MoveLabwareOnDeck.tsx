@@ -11,7 +11,7 @@ import {
   LoadedLabware,
 } from '@opentrons/shared-data'
 
-import { LEGACY_COLORS } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 import { IDENTITY_AFFINE_TRANSFORM, multiplyMatrices } from '../utils'
 import { BaseDeck } from '../BaseDeck'
 

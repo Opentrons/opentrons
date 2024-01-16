@@ -2,7 +2,6 @@ import * as React from 'react'
 import styled from 'styled-components'
 import {
   BORDERS,
-  LEGACY_COLORS,
   RESPONSIVENESS,
   SPACING,
 } from '../ui-style-constants'

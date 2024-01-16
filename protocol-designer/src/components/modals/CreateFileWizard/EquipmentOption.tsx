@@ -52,7 +52,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
         borderRadius={BORDERS.borderRadiusSize2}
         cursor={disabled ? 'auto' : 'pointer'}
         backgroundColor={
-          disabled ? COLORS.grey50Disabled : COLORS.transparent
+          disabled ? COLORS.grey30 : COLORS.transparent
         }
         onClick={disabled ? undefined : onClick}
         {...styleProps}

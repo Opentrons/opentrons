@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { LEGACY_COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 import { Flex, Box } from '../../primitives'
 import { Icon } from '../../icons'
 import { ALIGN_CENTER, JUSTIFY_CENTER, SIZE_1 } from '../../styles'
@@ -126,7 +127,7 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
           borderRadius="2px"
-          backgroundColor={COLORS.grey50Disabled}
+          backgroundColor={COLORS.grey30}
           size={SIZE_1}
         >
           <Box

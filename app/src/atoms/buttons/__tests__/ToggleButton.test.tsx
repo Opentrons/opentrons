@@ -59,7 +59,7 @@ describe('ToggleButton', () => {
     const button = getByLabelText('toggle button')
     expect(button).toHaveStyleRule(
       'color',
-      `${String(COLORS.grey50Disabled)}`,
+      `${String(COLORS.grey30)}`,
       {
         modifier: ':disabled',
       }
@@ -112,7 +112,7 @@ describe('ToggleButton', () => {
     const button = getByLabelText('toggle button')
     expect(button).toHaveStyleRule(
       'color',
-      `${String(COLORS.grey50Disabled)}`,
+      `${String(COLORS.grey30)}`,
       {
         modifier: ':disabled',
       }

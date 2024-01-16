@@ -9,7 +9,7 @@ import { Well } from './Well'
 import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
 import type { WellMouseEvent } from './types'
 import { STYLE_BY_WELL_CONTENTS } from './StyledWells'
-import { LEGACY_COLORS } from '../../../ui-style-constants'
+import { COLORS } from '../../../helix-design-system'
 
 export interface StaticLabwareProps {
   /** Labware definition to render */

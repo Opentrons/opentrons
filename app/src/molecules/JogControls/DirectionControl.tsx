@@ -360,7 +360,7 @@ const ARROW_BUTTON_STYLES = css`
 
   &:disabled {
     background-color: ${COLORS.white};
-    color: ${COLORS.grey50Disabled};
+    color: ${COLORS.grey30};
   }
 
   @media (max-width: 750px) {

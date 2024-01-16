@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import { Box } from '../../primitives'
-import { LEGACY_COLORS, RESPONSIVENESS, SPACING } from '../../ui-style-constants'
+import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 import { POSITION_ABSOLUTE, POSITION_RELATIVE } from '../../styles'
 
 interface StepMeterProps {

@@ -1,5 +1,5 @@
 import { css } from 'styled-components'
-import { LEGACY_COLORS } from './'
+import { COLORS } from '../helix-design-system'
 
 // Font Sizes
 export const fontSize80 = '5rem' // 80px
