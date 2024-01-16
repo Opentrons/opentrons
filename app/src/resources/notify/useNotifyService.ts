@@ -47,19 +47,7 @@ export function useNotifyService<TData>({
           if (data === 'ECONNFAILED') {
             setIsNotifyError(true)
           } else {
-            // TOME: Just temp until serialization nonsense is solved.
-            if (topic === 'robot-server/maintenance_runs') {
-              try {
-                const extraCrispy = {
-                  data: JSON.parse(data.data),
-                }
-                queryClient.setQueryData(queryKey, extraCrispy)
-              } catch {
-                queryClient.setQueriesData(queryKey, null)
-              }
-            } else {
-              queryClient.setQueryData(queryKey, data)
-            }
+            queryClient.setQueryData(queryKey, data)
           }
         }
       }

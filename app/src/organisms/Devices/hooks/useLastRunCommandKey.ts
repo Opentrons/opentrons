@@ -33,6 +33,7 @@ export function useLastRunCommandKey(runId: string): string | null {
           : Infinity,
     }
   )
+  console.log('🚀 ~ useLastRunCommandKey ~ commandsData:', commandsData)
   return commandsData?.data?.[0]?.intent !== 'setup'
     ? commandsData?.links?.current?.meta?.key ??
         commandsData?.data?.[0]?.key ??

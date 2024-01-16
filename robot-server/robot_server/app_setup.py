@@ -21,7 +21,7 @@ from .runs.dependencies import (
     mark_light_control_startup_finished,
 )
 
-from .mqtt_example import run
+from .notifications import notification_client
 
 log = logging.getLogger(__name__)
 
@@ -51,10 +51,6 @@ app.add_middleware(
 # main router
 app.include_router(router=router)
 
-#TOME: Clean this up. 
-client = run()
-
-
 @app.on_event("startup")
 async def on_startup() -> None:
     """Handle app startup."""
@@ -78,6 +74,7 @@ async def on_startup() -> None:
         ),
     )
 
+    notification_client.connect()
 
 @app.on_event("shutdown")
 async def on_shutdown() -> None:
@@ -94,4 +91,4 @@ async def on_shutdown() -> None:
     for e in shutdown_errors:
         log.warning("Error during shutdown", exc_info=e)
 
-    client.loop_stop()
+    notification_client.disconnect()

@@ -23,7 +23,7 @@ from .run_store import RunResource, RunStore
 from .run_models import Run
 
 import json
-from robot_server.mqtt_example import client as mqtt_client
+from robot_server.notifications import notification_client
 
 from opentrons.protocol_engine.types import DeckConfigurationType
 
@@ -224,8 +224,8 @@ class RunDataManager:
             #delete retained messages below.
             log.info("Stopping poll for current_command!")
             self._stop_polling_event.set()
-            mqtt_client.publish(topic="robot-server/runs/current_command", qos=1, retain=True, 
-                                    payload=json.dumps(None))
+            notification_client.publish(topic="robot-server/runs/current_command",
+                                    message=json.dumps(None))
             await self._engine_store.clear()
         self._run_store.remove(run_id=run_id)
 
@@ -357,8 +357,7 @@ class RunDataManager:
                     created_at=current_command.created_at,
                     index=current_command.index
 )
-                    mqtt_client.publish(topic="robot-server/runs/current_command", qos=1, retain=True, 
-                                    payload=json.dumps(regular_object.command_key))
+                    notification_client.publish(topic="robot-server/runs/current_command", message=json.dumps(regular_object.command_key))
                     cached_current_command = current_command
                 except Exception as e:
                     log.info(f"ERROR PUBLISHING: {str(e)}")
