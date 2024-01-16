@@ -32,7 +32,7 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.blue50};
+    box-shadow: 0 0 0 3px ${COLORS.yellow50};
   }
 
   &:disabled {

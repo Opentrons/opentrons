@@ -31,7 +31,7 @@ export const OverflowBtn = React.forwardRef(
           }
 
           &:focus-visible {
-            box-shadow: ${`0 0 0 3px ${COLORS.yellow50}`};
+            box-shadow: ${`0 0 0 3px ${COLORS.blue50}`};
             background-color: ${'transparent'};
           }
 

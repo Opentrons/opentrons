@@ -24,7 +24,7 @@ describe('LabwareDisabledOverlay', () => {
 
     expect(overlayBg).toHaveAttribute('width', '84')
     expect(overlayBg).toHaveAttribute('height', '42')
-    expect(overlayBg).toHaveAttribute('fill', '#ffffff')
+    expect(overlayBg).toHaveAttribute('fill', '#FFFFFF')
     expect(overlayBg).toHaveAttribute('fill-opacity', '0.9')
     expect(overlayIcon).toHaveAttribute('stroke', '#bf0000')
   })
