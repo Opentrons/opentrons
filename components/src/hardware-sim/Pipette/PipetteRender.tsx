@@ -1,5 +1,4 @@
 import * as React from 'react'
-import classNames from 'classnames'
 import {
   getPipetteNameSpecs,
   LabwareDefinition2,
@@ -18,7 +17,6 @@ import {
 } from './constants'
 import { EmanatingNozzle } from './EmanatingNozzle'
 import { EightEmanatingNozzles } from './EightEmanatingNozzles'
-import styles from './styles.css'
 
 interface PipetteRenderProps {
   labwareDef: LabwareDefinition2
@@ -66,7 +64,7 @@ export const PipetteRender = (props: PipetteRenderProps): JSX.Element => {
       }
       x={x - probeOffsetX}
       y={y}
-      className={classNames(styles.overflow)}
+      outerProps={{ style: { overflow: 'visible' } }}
       innerDivProps={{
         style: {
           width: '100%',
