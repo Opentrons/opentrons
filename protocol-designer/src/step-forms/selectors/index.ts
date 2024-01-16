@@ -39,7 +39,6 @@ import {
   selectors as labwareDefSelectors,
   LabwareDefByDefURI,
 } from '../../labware-defs'
-import { i18n } from '../../localization'
 import { InstrumentGroup } from '@opentrons/components'
 import type {
   DropdownOption,
@@ -376,7 +375,7 @@ export const getEquippedPipetteOptions: Selector<
   return reduce(
     pipettes,
     (acc: DropdownOption[], pipette: PipetteOnDeck, id: string) => {
-      const mountLabel = i18n.t(`form.pipette_mount_label.${pipette.mount}`)
+      const mountLabel = pipette.mount === 'left' ? '(L}' : '{R}'
       const nextOption = {
         name: pipettesSame
           ? `${_getPipetteDisplayName(pipette.name)} ${mountLabel}`

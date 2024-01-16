@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {useTranslation} from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
 import { Path } from './Path'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
@@ -21,7 +21,7 @@ function mapSTP(state: BaseState, ownProps: OP): SP {
     pipette,
     volume,
   } = ownProps
-  const {t} = useTranslation('form')
+  const { t } = useTranslation('form')
   const pipetteEntities = stepFormSelectors.getPipetteEntities(state)
   const disabledPathMap = getDisabledPathMap(
     {
@@ -33,8 +33,8 @@ function mapSTP(state: BaseState, ownProps: OP): SP {
       pipette,
       volume,
     },
-    pipetteEntities
-    t: 
+    pipetteEntities,
+    t
   )
   return {
     disabledPathMap,

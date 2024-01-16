@@ -11,7 +11,6 @@ import {
   CutoutFixtureId,
   RobotType,
 } from '@opentrons/shared-data'
-import { i18n } from '../localization'
 import { WellGroup } from '@opentrons/components'
 import { BoundingRect, GenericRect } from '../collision-types'
 import type {
@@ -95,30 +94,35 @@ export {
   getWellSetForMultichannel,
 }
 export const makeTemperatureText = (
-  temperature: number | string | null
+  temperature: number | string | null,
+  t: any
 ): string =>
   temperature === null
-    ? i18n.t('modules.status.deactivated')
-    : `${temperature} ${i18n.t('application.units.degrees')}`
-export const makeLidLabelText = (lidOpen: boolean): string =>
-  i18n.t(`modules.lid_label`, {
-    lidStatus: i18n.t(lidOpen ? 'modules.lid_open' : 'modules.lid_closed'),
+    ? t('modules:status.deactivated')
+    : `${temperature} ${t('application:units.degrees')}`
+export const makeLidLabelText = (lidOpen: boolean, t: any): string =>
+  t(`modules:lid_label`, {
+    lidStatus: t(lidOpen ? 'modules:lid_open' : 'modules:lid_closed'),
   })
 
-export const makeSpeedText = (targetSpeed: number | string | null): string =>
+export const makeSpeedText = (
+  targetSpeed: number | string | null,
+  t: any
+): string =>
   targetSpeed === null
-    ? i18n.t('modules.status.deactivated')
-    : `${targetSpeed} ${i18n.t('application.units.rpm')}`
+    ? t('modules:status.deactivated')
+    : `${targetSpeed} ${t('application:units.rpm')}`
 
 export const makeTimerText = (
   targetMinutes: number | string | null,
-  targetSeconds: number | string | null
+  targetSeconds: number | string | null,
+  t: any
 ): string | null =>
   targetMinutes === null && targetSeconds === null
     ? null
-    : `${targetMinutes}  ${i18n.t(
-        'application.units.minutes'
-      )} ${targetSeconds}  ${i18n.t('application.units.seconds')} timer`
+    : `${targetMinutes}  ${t(
+        'application:units.minutes'
+      )} ${targetSeconds}  ${t('application:units.seconds')} timer`
 
 export const getIsAdapter = (
   labwareId: string,

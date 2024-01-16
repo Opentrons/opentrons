@@ -28,6 +28,7 @@ interface SP {
   savedStepForms: SavedStepFormState
   robotType: RobotType
   additionalEquipment: AdditionalEquipment
+  t: any
 }
 export const FileSidebar = connect(
   mapStateToProps,
@@ -54,6 +55,7 @@ function mapStateToProps(state: BaseState): SP {
     // Ignore clicking 'CREATE NEW' button in these cases
     _canCreateNew: !selectors.getNewProtocolModal(state),
     _hasUnsavedChanges: loadFileSelectors.getHasUnsavedChanges(state),
+    t,
   }
 }
 
@@ -73,6 +75,7 @@ function mergeProps(
     savedStepForms,
     robotType,
     additionalEquipment,
+    t,
   } = stateProps
   const { dispatch } = dispatchProps
   return {

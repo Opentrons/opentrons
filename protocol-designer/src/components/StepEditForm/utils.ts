@@ -5,7 +5,6 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
-import { i18n } from '../../localization'
 import {
   PROFILE_CYCLE,
   FormData,

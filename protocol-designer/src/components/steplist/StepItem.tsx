@@ -146,6 +146,7 @@ interface ProfileStepSubstepRowProps {
 export const ProfileStepSubstepRow = (
   props: ProfileStepSubstepRowProps
 ): JSX.Element => {
+  const { t } = useTranslation(['modules', 'application'])
   const { repetitionsDisplay, stepNumber } = props
   const { temperature, durationMinutes, durationSeconds } = props.step
   return (
@@ -165,7 +166,7 @@ export const ProfileStepSubstepRow = (
         {stepNumber}
       </span>
       <span className={styles.profile_block_temp}>
-        {makeTemperatureText(temperature)}
+        {makeTemperatureText(temperature, t)}
       </span>
       <span
         className={cx(
@@ -190,11 +191,13 @@ interface ProfileCycleRowProps {
 }
 const ProfileCycleRow = (props: ProfileCycleRowProps): JSX.Element => {
   const { step, stepNumber } = props
+  const { t } = useTranslation(['modules', 'application'])
+
   return (
     <div className={styles.cycle_step_row}>
       <span className={styles.profile_step_number}>{stepNumber}</span>
       <span className={styles.profile_block_temp}>
-        {makeTemperatureText(step.temperature)}
+        {makeTemperatureText(step.temperature, t)}
       </span>
       <span className={styles.align_right}>
         {makeDurationText(step.durationMinutes, step.durationSeconds)}
@@ -299,7 +302,7 @@ export const StepItemContents = (
     hoveredSubstep,
     additionalEquipmentEntities,
   } = props
-  const { t } = useTranslation('modules')
+  const { t } = useTranslation(['modules', 'application'])
   if (!rawForm) {
     return null
   }
@@ -322,7 +325,7 @@ export const StepItemContents = (
   }
 
   if (substeps && substeps.substepType === 'temperature') {
-    const temperature = makeTemperatureText(substeps.temperature)
+    const temperature = makeTemperatureText(substeps.temperature, t)
 
     return (
       <ModuleStepItems
@@ -337,12 +340,14 @@ export const StepItemContents = (
 
   if (substeps && substeps.substepType === 'heaterShaker') {
     const temperature = makeTemperatureText(
-      substeps.targetHeaterShakerTemperature
+      substeps.targetHeaterShakerTemperature,
+      t
     )
-    const shakerValue = makeSpeedText(substeps.targetSpeed)
+    const shakerValue = makeSpeedText(substeps.targetSpeed, t)
     const timer = makeTimerText(
       substeps.heaterShakerTimerMinutes,
-      substeps.heaterShakerTimerSeconds
+      substeps.heaterShakerTimerSeconds,
+      t
     )
 
     return (
@@ -390,8 +395,8 @@ export const StepItemContents = (
       >
         <ModuleStepItemRow
           // NOTE: for TC Profile, lid label text always says "closed" bc Profile runs with lid closed.
-          label={makeLidLabelText(false)}
-          value={makeTemperatureText(substeps.profileTargetLidTemp)}
+          label={makeLidLabelText(false, t)}
+          value={makeTemperatureText(substeps.profileTargetLidTemp, t)}
         />
         <CollapsibleSubstep
           headerContent={
@@ -432,14 +437,14 @@ export const StepItemContents = (
           }
         >
           <ModuleStepItems
-            actionText={makeTemperatureText(substeps.blockTargetTempHold)}
+            actionText={makeTemperatureText(substeps.blockTargetTempHold, t)}
             moduleType={THERMOCYCLER_MODULE_TYPE}
             hideHeader
             labwareNickname={substeps.labwareNickname}
           />
           <ModuleStepItemRow
-            label={makeLidLabelText(substeps.lidOpenHold)}
-            value={makeTemperatureText(substeps.lidTargetTempHold)}
+            label={makeLidLabelText(substeps.lidOpenHold, t)}
+            value={makeTemperatureText(substeps.lidTargetTempHold, t)}
           />
         </CollapsibleSubstep>
       </ModuleStepItems>
@@ -447,9 +452,9 @@ export const StepItemContents = (
   }
 
   if (substeps && substeps.substepType === THERMOCYCLER_STATE) {
-    const blockTemperature = makeTemperatureText(substeps.blockTargetTemp)
-    const lidTemperature = makeTemperatureText(substeps.lidTargetTemp)
-    const lidLabelText = makeLidLabelText(substeps.lidOpen)
+    const blockTemperature = makeTemperatureText(substeps.blockTargetTemp, t)
+    const lidTemperature = makeTemperatureText(substeps.lidTargetTemp, t)
+    const lidLabelText = makeLidLabelText(substeps.lidOpen, t)
 
     return (
       <ModuleStepItems
@@ -465,7 +470,7 @@ export const StepItemContents = (
   }
 
   if (substeps && substeps.substepType === 'waitForTemperature') {
-    const temperature = makeTemperatureText(substeps.temperature)
+    const temperature = makeTemperatureText(substeps.temperature, t)
 
     return (
       <ModuleStepItems
