@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import { Tooltip, useHoverTooltip, TOOLTIP_FIXED } from '@opentrons/components'
@@ -7,7 +8,6 @@ import {
   getModuleDisplayName,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { i18n } from '../../localization'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
@@ -27,6 +27,7 @@ interface MoveLabwareHeaderProps {
 
 export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
   const { sourceLabwareNickname, destinationSlot, useGripper } = props
+  const { t } = useTranslation('application')
   const moduleEntities = useSelector(getModuleEntities)
   const labwareEntities = useSelector(getLabwareEntities)
   const additionalEquipmentEntities = useSelector(
@@ -60,23 +61,19 @@ export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
     getHasWasteChute(additionalEquipmentEntities) &&
     destinationSlot === WASTE_CHUTE_CUTOUT
   ) {
-    destSlot = i18n.t('application.waste_chute_slot')
+    destSlot = t('waste_chute_slot')
   } else {
     destSlot = destinationSlot
   }
   return (
     <>
       <li className={styles.substep_header}>
-        <span>
-          {useGripper
-            ? i18n.t('application.with_gripper')
-            : i18n.t('application.manually')}
-        </span>
+        <span>{useGripper ? t('with_gripper') : t('manually')}</span>
       </li>
       <li className={styles.substep_header}>
-        <span>{i18n.t('application.labware')}</span>
+        <span>{t('labware')}</span>
         <span className={styles.spacer} />
-        <span>{i18n.t('application.new_location')}</span>
+        <span>{t('new_location')}</span>
       </li>
 
       <Tooltip {...sourceTooltipProps}>

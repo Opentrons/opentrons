@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { Dispatch } from 'redux'
+import { useTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
 import { COLUMN } from '@opentrons/shared-data'
 import { FormGroup, InputField } from '@opentrons/components'
-import { i18n } from '../../../../localization'
 import { Portal } from '../../../portals/MainPageModalPortal'
 import {
   actions as stepsActions,
@@ -18,6 +18,7 @@ import type { BaseState, NozzleType } from '../../../../types'
 import type { FieldProps } from '../../types'
 
 export interface SP {
+  t: any
   stepId?: StepIdType | null
   wellSelectionLabwareKey?: string | null
 }
@@ -67,8 +68,8 @@ export class WellSelectionInputComponent extends React.Component<Props> {
     const modalKey = this.getModalKey()
     const label =
       this.props.nozzleType === '8-channel' || this.props.nozzleType === COLUMN
-        ? i18n.t('form.step_edit_form.wellSelectionLabel.columns')
-        : i18n.t('form.step_edit_form.wellSelectionLabel.wells')
+        ? this.props.t('step_edit_form.wellSelectionLabel.columns')
+        : this.props.t('step_edit_form.wellSelectionLabel.wells')
     return (
       <FormGroup
         label={label}
@@ -104,10 +105,14 @@ export class WellSelectionInputComponent extends React.Component<Props> {
   }
 }
 
-const mapStateToProps = (state: BaseState): SP => ({
-  stepId: getSelectedStepId(state),
-  wellSelectionLabwareKey: getWellSelectionLabwareKey(state),
-})
+const mapStateToProps = (state: BaseState): SP => {
+  const { t } = useTranslation('form')
+  return {
+    stepId: getSelectedStepId(state),
+    wellSelectionLabwareKey: getWellSelectionLabwareKey(state),
+    t: t,
+  }
+}
 const mapDispatchToProps = (dispatch: Dispatch): DP => ({
   onOpen: key => dispatch(stepsActions.setWellSelectionLabwareKey(key)),
   onClose: () => dispatch(stepsActions.clearWellSelectionLabwareKey()),

@@ -11,7 +11,6 @@ import {
   OutlineButton,
   DeprecatedPrimaryButton,
 } from '@opentrons/components'
-import { i18n } from '../localization'
 import { resetScrollElements } from '../ui/steps/utils'
 import { Portal } from './portals/MainPageModalPortal'
 import { EditPipettesModal } from './modals/EditPipettesModal'
@@ -33,6 +32,7 @@ export interface Props {
   saveFileMetadata: (fileMetaDataFields: FileMetadataFields) => void
   swapPipettes: () => unknown
   modules: ModulesForEditModulesCard
+  t: any
 }
 
 interface State {
@@ -46,8 +46,6 @@ interface State {
 // TODO(mc, 2020-02-28): explore l10n for these dates
 const DATE_ONLY_FORMAT = 'MMM dd, yyyy'
 const DATETIME_FORMAT = 'MMM dd, yyyy | h:mm a'
-
-// TODO: Ian 2019-03-15 use i18n for labels
 export class FilePage extends React.Component<Props, State> {
   state: State = {
     isEditPipetteModalOpen: false,
@@ -86,6 +84,7 @@ export class FilePage extends React.Component<Props, State> {
       saveFileMetadata,
       swapPipettes,
       modules,
+      t,
     } = this.props
 
     return (
@@ -186,7 +185,7 @@ export class FilePage extends React.Component<Props, State> {
                 className={styles.edit_button}
                 name={'editPipettes'}
               >
-                {i18n.t('button.edit')}
+                {t('edit')}
               </DeprecatedPrimaryButton>
               <OutlineButton
                 onClick={swapPipettes}
@@ -195,7 +194,7 @@ export class FilePage extends React.Component<Props, State> {
                 name={'swapPipettes'}
                 disabled={instruments?.left?.pipetteSpecs?.channels === 96}
               >
-                {i18n.t('button.swap')}
+                {t('swap')}
               </OutlineButton>
             </div>
           </div>
@@ -213,7 +212,7 @@ export class FilePage extends React.Component<Props, State> {
             iconName="arrow-right"
             name={'continueToLiquids'}
           >
-            {i18n.t('button.continue_to_liquids')}
+            {t('continue_to_liquids')}
           </DeprecatedPrimaryButton>
         </div>
 

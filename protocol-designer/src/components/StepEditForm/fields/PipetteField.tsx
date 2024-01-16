@@ -1,34 +1,25 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
-import { FormGroup, DropdownField, Options } from '@opentrons/components'
-import { i18n } from '../../../localization'
+import { FormGroup, DropdownField } from '@opentrons/components'
 import { selectors as stepFormSelectors } from '../../../step-forms'
-import { BaseState } from '../../../types'
 import styles from '../StepEditForm.css'
 import { FieldProps } from '../types'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
-type OP = FieldProps
-
-interface SP {
-  pipetteOptions: Options
-}
-
-type Props = OP & SP
-
-const PipetteFieldSTP = (state: BaseState, ownProps: OP): SP => ({
-  pipetteOptions: stepFormSelectors.getEquippedPipetteOptions(state),
-})
-
-export const PipetteField = connect(PipetteFieldSTP)((props: Props) => {
+export const PipetteField = (props: FieldProps): JSX.Element => {
   const { onFieldBlur, onFieldFocus, updateValue, value } = props
+  const pipetteOptions = useSelector(
+    stepFormSelectors.getEquippedPipetteOptions
+  )
 
+  const { t } = useTranslation('form')
   return (
     <FormGroup
-      label={i18n.t('form.step_edit_form.field.pipette.label')}
+      label={t('step_edit_form.field.pipette.label')}
       className={styles.large_field}
     >
       <DropdownField
-        options={props.pipetteOptions}
+        options={pipetteOptions}
         name={props.name}
         value={value ? String(value) : null}
         onBlur={onFieldBlur}
@@ -39,4 +30,4 @@ export const PipetteField = connect(PipetteFieldSTP)((props: Props) => {
       />
     </FormGroup>
   )
-})
+}

@@ -1,5 +1,6 @@
-import { connect } from 'react-redux'
 import * as React from 'react'
+import { connect } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import mapValues from 'lodash/mapValues'
 import { FilePage } from '../components/FilePage'
 import {
@@ -20,14 +21,17 @@ interface SP {
   formValues: Props['formValues']
   _initialDeckSetup: InitialDeckSetup
   modules: Props['modules']
+  t: any
 }
 
 const mapStateToProps = (state: BaseState): SP => {
+  const { t } = useTranslation('button')
   return {
     formValues: fileSelectors.getFileMetadata(state),
     instruments: stepFormSelectors.getPipettesForInstrumentGroup(state),
     modules: stepFormSelectors.getModulesForEditModulesCard(state),
     _initialDeckSetup: stepFormSelectors.getInitialDeckSetup(state),
+    t: t,
   }
 }
 

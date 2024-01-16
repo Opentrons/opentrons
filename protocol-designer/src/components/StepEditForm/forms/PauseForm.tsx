@@ -10,7 +10,6 @@ import {
   TOOLTIP_BOTTOM,
   TOOLTIP_FIXED,
 } from '@opentrons/components'
-import { i18n } from '../../../localization'
 import {
   PAUSE_UNTIL_RESUME,
   PAUSE_UNTIL_TIME,
@@ -21,11 +20,13 @@ import { getSingleSelectDisabledTooltip } from '../utils'
 import styles from '../StepEditForm.css'
 
 import { StepFormProps } from '../types'
+import { useTranslation } from 'react-i18next'
 
 export const PauseForm = (props: StepFormProps): JSX.Element => {
   const tempModuleLabwareOptions = useSelector(
     uiModuleSelectors.getTemperatureLabwareOptions
   )
+  const { t } = useTranslation(['tooltip', 'application', 'form'])
 
   const heaterShakerModuleLabwareOptions = useSelector(
     uiModuleSelectors.getHeaterShakerLabwareOptions
@@ -59,7 +60,7 @@ export const PauseForm = (props: StepFormProps): JSX.Element => {
     <div className={styles.form_wrapper}>
       <div className={styles.section_header}>
         <span className={styles.section_header_text}>
-          {i18n.t('application.stepType.pause')}
+          {t('application:stepType.pause')}
         </span>
       </div>
 
@@ -70,8 +71,8 @@ export const PauseForm = (props: StepFormProps): JSX.Element => {
               {...propsForFields.pauseAction}
               options={[
                 {
-                  name: i18n.t(
-                    'form.step_edit_form.field.pauseAction.options.untilResume'
+                  name: t(
+                    'form:step_edit_form.field.pauseAction.options.untilResume'
                   ),
                   value: PAUSE_UNTIL_RESUME,
                 },
@@ -83,8 +84,8 @@ export const PauseForm = (props: StepFormProps): JSX.Element => {
               {...propsForFields.pauseAction}
               options={[
                 {
-                  name: i18n.t(
-                    'form.step_edit_form.field.pauseAction.options.untilTime'
+                  name: t(
+                    'form:step_edit_form.field.pauseAction.options.untilTime'
                   ),
                   value: PAUSE_UNTIL_TIME,
                 },
@@ -96,24 +97,24 @@ export const PauseForm = (props: StepFormProps): JSX.Element => {
               <TextField
                 {...propsForFields.pauseHour}
                 className={styles.small_field}
-                units={i18n.t('application.units.hours')}
+                units={t('application:units.hours')}
               />
               <TextField
                 {...propsForFields.pauseMinute}
                 className={styles.small_field}
-                units={i18n.t('application.units.minutes')}
+                units={t('application:units.minutes')}
               />
               <TextField
                 {...propsForFields.pauseSecond}
                 className={styles.small_field}
-                units={i18n.t('application.units.seconds')}
+                units={t('application:units.seconds')}
               />
             </div>
           )}
 
           {pauseUntilModuleEnabled ? null : (
             <Tooltip {...tooltipProps}>
-              {getSingleSelectDisabledTooltip('wait_until_temp', 'pauseAction')}
+              {getSingleSelectDisabledTooltip('wait_until_temp', 'pauseAction', t)}
             </Tooltip>
           )}
           <div {...targetProps}>
@@ -125,8 +126,8 @@ export const PauseForm = (props: StepFormProps): JSX.Element => {
                 })}
                 options={[
                   {
-                    name: i18n.t(
-                      'form.step_edit_form.field.pauseAction.options.untilTemperature'
+                    name: t(
+                      'form:step_edit_form.field.pauseAction.options.untilTemperature'
                     ),
                     value: PAUSE_UNTIL_TEMP,
                   },
@@ -136,8 +137,8 @@ export const PauseForm = (props: StepFormProps): JSX.Element => {
             {pauseAction === PAUSE_UNTIL_TEMP && (
               <div className={styles.form_row}>
                 <FormGroup
-                  label={i18n.t(
-                    'form.step_edit_form.field.moduleActionLabware.label'
+                  label={t(
+                    'form:step_edit_form.field.moduleActionLabware.label'
                   )}
                 >
                   <StepFormDropdown
@@ -146,14 +147,12 @@ export const PauseForm = (props: StepFormProps): JSX.Element => {
                   />
                 </FormGroup>
                 <FormGroup
-                  label={i18n.t(
-                    'form.step_edit_form.field.pauseTemperature.label'
-                  )}
+                  label={t('form:step_edit_form.field.pauseTemperature.label')}
                 >
                   <TextField
                     {...propsForFields.pauseTemperature}
                     className={styles.small_field}
-                    units={i18n.t('application.units.degrees')}
+                    units={t('application:units.degrees')}
                   />
                 </FormGroup>
               </div>
@@ -165,7 +164,7 @@ export const PauseForm = (props: StepFormProps): JSX.Element => {
             {/* TODO: Ian 2019-03-25 consider making this a component eg `TextAreaField.js` if used anywhere else */}
             <FormGroup
               className={styles.full_width_field}
-              label={i18n.t('form.step_edit_form.field.pauseMessage.label')}
+              label={t('form:step_edit_form.field.pauseMessage.label')}
             >
               <textarea
                 className={styles.textarea_field}

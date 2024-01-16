@@ -5,7 +5,6 @@ import { connect } from 'react-redux'
 import { TitleBar, Icon, IconName, TitleBarProps } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import styles from './TitleBar.css'
-import { i18n } from '../localization'
 import { START_TERMINAL_TITLE, END_TERMINAL_TITLE } from '../constants'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import { selectors as uiLabwareSelectors } from '../ui/labware'
@@ -23,6 +22,7 @@ import { stepIconsByType } from '../form-types'
 import { selectors, Page } from '../navigation'
 
 import { BaseState } from '../types'
+import { useTranslation } from 'react-i18next'
 
 type Props = React.ComponentProps<typeof TitleBar>
 
@@ -62,6 +62,7 @@ const Title = (props: TitleProps): JSX.Element => (
 )
 
 function mapStateToProps(state: BaseState): SP {
+  const { t } = useTranslation(['nav', 'application'])
   const selectedLabwareId = labwareIngredSelectors.getSelectedLabwareId(state)
   const _page = selectors.getCurrentPage(state)
   const fileName = fileDataSelectors.protocolName(state)
@@ -89,16 +90,16 @@ function mapStateToProps(state: BaseState): SP {
     case 'file-detail':
       return {
         _page,
-        title: i18n.t([`nav.title.${_page}`, fileName]),
-        subtitle: i18n.t([`nav.subtitle.${_page}`, '']),
+        title: t([`title.${_page}`, fileName]),
+        subtitle: t([`subtitle.${_page}`, '']),
       }
     case 'file-splash':
     case 'settings-features':
     case 'settings-app':
       return {
         _page,
-        title: <Title text={i18n.t([`nav.title.${_page}`, fileName])} />,
-        subtitle: i18n.t([`nav.subtitle.${_page}`, '']),
+        title: <Title text={t([`title.${_page}`, fileName])} />,
+        subtitle: t([`subtitle.${_page}`, '']),
       }
     case 'steplist':
     default: {
@@ -142,7 +143,7 @@ function mapStateToProps(state: BaseState): SP {
       } else if (selectedStepInfo) {
         const stepTitle =
           selectedStepInfo.stepName ||
-          i18n.t(`application.stepType.${selectedStepInfo.stepType}`)
+          t(`application:stepType.${selectedStepInfo.stepType}`)
         if (wellSelectionLabwareKey) {
           // well selection modal
           return {

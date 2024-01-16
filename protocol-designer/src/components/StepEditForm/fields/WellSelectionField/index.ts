@@ -8,6 +8,7 @@ import {
 } from './WellSelectionInput'
 import type { BaseState, NozzleType } from '../../../../types'
 import type { FieldProps } from '../../types'
+import { useTranslation } from 'react-i18next'
 
 type Props = Omit<
   JSX.LibraryManagedAttributes<
@@ -24,6 +25,7 @@ type OP = FieldProps & {
 interface SP {
   nozzleType: Props['nozzleType']
   primaryWellCount: Props['primaryWellCount']
+  t: any
 }
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
@@ -32,7 +34,7 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const pipette =
     pipetteId && stepFormSelectors.getPipetteEntities(state)[pipetteId]
   const is8Channel = pipette ? pipette.spec.channels === 8 : false
-
+  const { t } = useTranslation('form')
   let nozzleType: NozzleType | null = null
   if (pipette !== null && is8Channel) {
     nozzleType = '8-channel'
@@ -47,6 +49,7 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
       ? selectedWells.length
       : undefined,
     nozzleType,
+    t: t,
   }
 }
 
@@ -74,6 +77,7 @@ function mergeProps(stateProps: SP, _dispatchProps: null, ownProps: OP): Props {
     primaryWellCount: stateProps.primaryWellCount,
     updateValue,
     value,
+    t: stateProps.t,
   }
 }
 

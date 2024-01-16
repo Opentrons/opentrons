@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import cx from 'classnames'
 import {
@@ -11,7 +12,6 @@ import {
   TOOLTIP_TOP,
   TOOLTIP_TOP_END,
 } from '@opentrons/components'
-import { i18n } from '../../../localization'
 import * as steplistActions from '../../../steplist/actions'
 import {
   PROFILE_CYCLE,
@@ -51,7 +51,7 @@ interface ProfileCycleRowProps {
 export const ProfileCycleRow = (props: ProfileCycleRowProps): JSX.Element => {
   const { cycleItem, focusHandlers, stepOffset } = props
   const dispatch = useDispatch()
-
+  const { t } = useTranslation(['tooltip', 'application'])
   const addStepToCycle = (): void => {
     dispatch(steplistActions.addProfileStep({ cycleId: cycleItem.id }))
   }
@@ -108,7 +108,7 @@ export const ProfileCycleRow = (props: ProfileCycleRowProps): JSX.Element => {
                 name="repetitions"
                 focusHandlers={focusHandlers}
                 profileItem={cycleItem}
-                units={i18n.t('application.units.cycles')}
+                units={t('application:units.cycles')}
                 className={cx(styles.small_field, styles.cycles_field)}
                 updateValue={(name, value) =>
                   dispatch(
@@ -122,7 +122,7 @@ export const ProfileCycleRow = (props: ProfileCycleRowProps): JSX.Element => {
             </div>
           )}
           <Tooltip {...addStepToCycleTooltipProps}>
-            {i18n.t('tooltip.profile.add_step_to_cycle')}
+            {t('profile.add_step_to_cycle')}
           </Tooltip>
           <div className={styles.add_cycle_step} {...addStepToCycleTargetProps}>
             <OutlineButton onClick={addStepToCycle}>+ Step</OutlineButton>
@@ -130,7 +130,7 @@ export const ProfileCycleRow = (props: ProfileCycleRowProps): JSX.Element => {
         </div>
         <div onClick={confirmDeleteCycle} {...deleteCycleTargetProps}>
           <Tooltip {...deleteCycleTooltipProps}>
-            {i18n.t('tooltip.profile.delete_cycle')}
+            {t('profile.delete_cycle')}
           </Tooltip>
           <Icon name="close" className={styles.delete_step_icon} />
         </div>
@@ -149,7 +149,7 @@ export interface ProfileItemRowsProps {
 
 export const ProfileItemRows = (props: ProfileItemRowsProps): JSX.Element => {
   const { orderedProfileItems, profileItemsById } = props
-
+  const { t } = useTranslation(['tooltip', 'form'])
   const dispatch = useDispatch()
   const addProfileCycle = (): void => {
     dispatch(steplistActions.addProfileCycle(null))
@@ -205,28 +205,20 @@ export const ProfileItemRows = (props: ProfileItemRowsProps): JSX.Element => {
         </div>
       )}
       {rows}
-      <Tooltip {...addStepTooltipProps}>
-        {i18n.t('tooltip.profile.add_step')}
-      </Tooltip>
-      <Tooltip {...addCycleTooltipProps}>
-        {i18n.t('tooltip.profile.add_cycle')}
-      </Tooltip>
+      <Tooltip {...addStepTooltipProps}>{t('profile.add_step')}</Tooltip>
+      <Tooltip {...addCycleTooltipProps}>{t('profile.add_cycle')}</Tooltip>
       <div className={styles.profile_button_group}>
         <OutlineButton
           hoverTooltipHandlers={addStepTargetProps}
           onClick={addProfileStep}
         >
-          {i18n.t(
-            'form.step_edit_form.field.thermocyclerProfile.add_step_button'
-          )}
+          {t('form:step_edit_form.field.thermocyclerProfile.add_step_button')}
         </OutlineButton>
         <OutlineButton
           hoverTooltipHandlers={addCycleTargetProps}
           onClick={addProfileCycle}
         >
-          {i18n.t(
-            'form.step_edit_form.field.thermocyclerProfile.add_cycle_button'
-          )}
+          {t('form:step_edit_form.field.thermocyclerProfile.add_cycle_button')}
         </OutlineButton>
       </div>
     </>
@@ -297,6 +289,7 @@ interface ProfileStepRowProps {
 
 const ProfileStepRow = (props: ProfileStepRowProps): JSX.Element => {
   const { focusHandlers, profileStepItem, isCycle } = props
+  const { t } = useTranslation(['application', 'tooltip'])
   const dispatch = useDispatch()
 
   const updateStepFieldValue = (name: string, value: unknown): void => {
@@ -319,9 +312,9 @@ const ProfileStepRow = (props: ProfileStepRowProps): JSX.Element => {
   ] as const
   const units: Record<typeof names[number], string | null> = {
     title: null,
-    temperature: i18n.t('application.units.degrees'),
-    durationMinutes: i18n.t('application.units.minutes'),
-    durationSeconds: i18n.t('application.units.seconds'),
+    temperature: t('units.degrees'),
+    durationMinutes: t('units.minutes'),
+    durationSeconds: t('units.seconds'),
   }
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP,
@@ -357,9 +350,7 @@ const ProfileStepRow = (props: ProfileStepRowProps): JSX.Element => {
         className={cx({ [styles.cycle_step_delete]: isCycle })}
         {...targetProps}
       >
-        <Tooltip {...tooltipProps}>
-          {i18n.t('tooltip.profile.delete_step')}
-        </Tooltip>
+        <Tooltip {...tooltipProps}>{t('tooltip:profile.delete_step')}</Tooltip>
         <Icon name="close" className={styles.delete_step_icon} />
       </div>
     </div>

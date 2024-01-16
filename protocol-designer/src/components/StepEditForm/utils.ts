@@ -168,17 +168,18 @@ export const getVisibleProfileFormLevelErrors = (args: {
     })
   })
 }
-export const getFieldDefaultTooltip = (name: string): string =>
-  i18n.t([`tooltip.step_fields.defaults.${name}`, ''])
-export const getFieldIndeterminateTooltip = (name: string): string =>
-  i18n.t([`tooltip.step_fields.indeterminate.${name}`, ''])
+export const getFieldDefaultTooltip = (name: string, t: any): string =>
+  t([`step_fields.defaults.${name}`, ''])
+export const getFieldIndeterminateTooltip = (name: string, t: any): string =>
+  t([`step_fields.indeterminate.${name}`, ''])
 export const getSingleSelectDisabledTooltip = (
   name: string,
-  stepType: string
+  stepType: string,
+  t: any
 ): string =>
-  i18n.t([
-    `tooltip.step_fields.${stepType}.disabled.${name}`,
-    `tooltip.step_fields.${stepType}.disabled.$generic`,
+  t([
+    `step_fields.${stepType}.disabled.${name}`,
+    `step_fields.${stepType}.disabled.$generic`,
     '',
   ])
 // TODO(IL, 2021-03-03): keys for fieldMap are more strictly of TipOffsetFields type,
