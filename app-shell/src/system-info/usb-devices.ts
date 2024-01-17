@@ -7,8 +7,8 @@ import { createLogger } from '../log'
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 
 export type UsbDeviceMonitorOptions = Partial<{
-  onDeviceAdd?: (device: UsbDevice) => unknown
-  onDeviceRemove?: (device: UsbDevice) => unknown
+  onDeviceAdd?: (device: USBDevice) => void
+  onDeviceRemove?: (device: USBDevice) => void
 }>
 
 export interface UsbDeviceMonitor {
@@ -50,7 +50,7 @@ const decToHex = (number: number): string =>
   number.toString(16).toUpperCase().padStart(4, '0')
 
 export function getWindowsDriverVersion(
-  device: USBDevice
+  device: UsbDevice
 ): Promise<string | null> {
   console.log('getWindowsDriverVersion', device)
   const { vendorId: vidDecimal, productId: pidDecimal, serialNumber } = device

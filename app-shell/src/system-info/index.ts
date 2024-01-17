@@ -48,7 +48,9 @@ const addDriverVersion = (device: USBDevice): Promise<UsbDevice> => {
     device.manufacturerName != null &&
     RE_REALTEK.test(device.manufacturerName)
   ) {
-    return getWindowsDriverVersion(device).then(windowsDriverVersion =>
+    return getWindowsDriverVersion(
+      createUsbDevice(device)
+    ).then(windowsDriverVersion =>
       createUsbDevice(device, windowsDriverVersion)
     )
   }
