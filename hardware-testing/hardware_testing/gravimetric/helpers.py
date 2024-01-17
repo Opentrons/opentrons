@@ -309,12 +309,15 @@ def _pick_up_tip(
 
 
 def _drop_tip(
-    pipette: InstrumentContext, return_tip: bool, minimum_z_height: int = 0
+    pipette: InstrumentContext, return_tip: bool, minimum_z_height: int = 0, offset: Optional[Point] = None
 ) -> None:
     if return_tip:
         pipette.return_tip(home_after=False)
     else:
-        pipette.drop_tip(home_after=False)
+		if offset is not None:
+			pipette.drop_tip(pipette.trash_container.move(offset), home_after=False)
+		else:
+			pipette.drop_tip(home_after=False)
     if minimum_z_height > 0:
         cur_location = pipette._get_last_location_by_api_version()
         if cur_location is not None:
