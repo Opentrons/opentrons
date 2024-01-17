@@ -38,7 +38,11 @@ export function DesktopAppFallback({ error }: FallbackProps): JSX.Element {
   }
 
   return (
-    <LegacyModal type="warning" title={t('error_boundary_title')}>
+    <LegacyModal
+      type="warning"
+      title={t('error_boundary_title')}
+      marginLeft="0"
+    >
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <StyledText as="p">
