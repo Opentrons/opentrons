@@ -52,6 +52,12 @@ class Body(BaseResponseBody, GenericModel, Generic[ResponseDataT, ResponseLinksT
     data: ResponseDataT = Field(..., description=DESCRIPTION_DATA)
     links: ResponseLinksT = Field(..., description=DESCRIPTION_LINKS)
 
+class NotifyBody(BaseResponseBody, GenericModel, Generic[ResponseDataT, ResponseLinksT]):
+    """A notfiy response that returns a single resource, stateful links, and a status code."""
+
+    data: ResponseDataT = Field(..., description=DESCRIPTION_DATA)
+    links: ResponseLinksT = Field(..., description=DESCRIPTION_LINKS)
+    statusCode: int = Field(..., descrption="test")
 
 class SimpleEmptyBody(BaseResponseBody):
     """A response that returns no data and no links."""

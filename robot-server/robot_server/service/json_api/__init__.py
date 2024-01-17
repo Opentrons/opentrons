@@ -15,6 +15,7 @@ from .response import (
     ResourceModel,
     PydanticResponse,
     ResponseList,
+    NotifyBody
 )
 
 
@@ -43,4 +44,6 @@ __all__ = [
     "DeprecatedResponseModel",
     "DeprecatedMultiResponseModel",
     "ResponseList",
+    # notify body models
+    "NotifyBody",
 ]

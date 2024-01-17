@@ -65,7 +65,7 @@ export function DeviceDetailsDeckConfiguration({
   const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
   })
-  const isMaintenanceRunExisting = maintenanceRunData?.data?.id != null
+  const isMaintenanceRunExisting = maintenanceRunData?.data.id != null
 
   const handleClickAdd = (cutoutId: CutoutId): void => {
     setTargetCutoutId(cutoutId)

@@ -70,7 +70,6 @@ function deserializeNotifyMessage(
   const delimiter = ':'
   const firstIndex = message.indexOf(delimiter)
   const secondIndex = message.indexOf(delimiter, firstIndex + 1)
-  console.log('🚀 ~ message:', message)
 
   const shellHostname = message.substring(0, firstIndex)
   const shellTopic = message.substring(
@@ -86,8 +85,6 @@ function deserializeNotifyMessage(
   } catch {
     shellMessage = serializedShellMessage
   }
-
-  console.log('🚀 ~ shellMessage:', shellMessage)
 
   return { shellHostname, shellTopic, shellMessage }
 }

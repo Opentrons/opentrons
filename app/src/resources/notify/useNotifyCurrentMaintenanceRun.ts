@@ -1,3 +1,5 @@
+import { useQueryClient } from 'react-query'
+
 import { useHost, useCurrentMaintenanceRun } from '@opentrons/react-api-client'
 
 import { useNotifyService } from './useNotifyService'
@@ -11,6 +13,7 @@ export function useNotifyCurrentMaintenanceRun(
 ): UseQueryResult<MaintenanceRun> | UseQueryResult<MaintenanceRun, Error> {
   const host = useHost()
   const queryKey = [host, 'maintenance_runs', 'current_run']
+  const queryClient = useQueryClient()
 
   const {
     notifyQueryResponse,
@@ -18,7 +21,12 @@ export function useNotifyCurrentMaintenanceRun(
   } = useNotifyService<MaintenanceRun>({
     topic: 'robot-server/maintenance_runs',
     queryKey: queryKey,
-    forceHttpPolling: options.forceHttpPolling ?? false,
+    options: {
+      ...options,
+      onError: () => {
+        queryClient.resetQueries(queryKey)
+      },
+    },
   })
   const isUsingNotifyData = !isNotifyError && !options.forceHttpPolling
 

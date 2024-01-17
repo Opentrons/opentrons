@@ -16,8 +16,7 @@ from .maintenance_run_models import MaintenanceRun, MaintenanceRunNotFoundError
 
 from opentrons.protocol_engine.types import DeckConfigurationType
 
-import json
-from robot_server.notifications import notification_client
+from .maintenance_run_notify import notify_maintenance_run
 
 
 def _build_run(
@@ -106,9 +105,11 @@ class MaintenanceRunDataManager:
             state_summary=state_summary,
         )
 
-        #TOME: Send here!
-        print('SENDING MR DATA')
-        await notification_client.publish(topic='robot-server/maintenance_runs', message=maintenance_run_data)
+        await notify_maintenance_run(
+            topic='robot-server/maintenance_runs', 
+            message=maintenance_run_data, 
+            current_run_id=self._engine_store.current_run_id,
+        )
 
         return maintenance_run_data
 
@@ -149,8 +150,12 @@ class MaintenanceRunDataManager:
         """
         if run_id == self._engine_store.current_run_id:
             await self._engine_store.clear()
-            print('SENDING MR DATA')
-            await notification_client.publish(topic='robot-server/maintenance_runs', message=None)
+
+            await notify_maintenance_run(
+                    topic='robot-server/maintenance_runs', 
+                    message=None
+            )
+
         else:
             raise MaintenanceRunNotFoundError(run_id=run_id)
 

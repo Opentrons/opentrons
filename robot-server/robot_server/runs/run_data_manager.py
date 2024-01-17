@@ -1,6 +1,4 @@
 """Manage current and historical run data."""
-import asyncio
-import logging
 from datetime import datetime
 from typing import List, Optional
 
@@ -22,12 +20,7 @@ from .engine_store import EngineStore
 from .run_store import RunResource, RunStore
 from .run_models import Run
 
-import json
-from robot_server.notifications import notification_client
-
 from opentrons.protocol_engine.types import DeckConfigurationType
-
-log = logging.getLogger(__name__)
 
 
 def _build_run(
@@ -67,8 +60,7 @@ def _build_run(
 class RunNotCurrentError(ValueError):
     """Error raised when a requested run is not the current run."""
 
-#TOME: This is the relevant part for polling. Ideally, you'd just poll for current command,
-# but you can mimic the full RESTful response from this layer. 
+
 class RunDataManager:
     """Collaborator to manage current and historical run data.
 
@@ -86,7 +78,6 @@ class RunDataManager:
         self._engine_store = engine_store
         self._run_store = run_store
         self._task_runner = task_runner
-        self._stop_polling_event = asyncio.Event()
 
     @property
     def current_run_id(self) -> Optional[str]:
@@ -130,8 +121,6 @@ class RunDataManager:
             deck_configuration=deck_configuration,
             protocol=protocol,
         )
-        #TOME: After the run is created, start the poll here.
-        asyncio.create_task(self._poll_current_command(run_id))
         run_resource = self._run_store.insert(
             run_id=run_id,
             created_at=created_at,
@@ -220,12 +209,6 @@ class RunDataManager:
             RunNotFoundError: The given run identifier was not found in the database.
         """
         if run_id == self._engine_store.current_run_id:
-            #TOME: Stop the polling here after unsubscribing. You MUST
-            #delete retained messages below.
-            log.info("Stopping poll for current_command!")
-            self._stop_polling_event.set()
-            notification_client.publish(topic="robot-server/runs/current_command",
-                                    message=json.dumps(None))
             await self._engine_store.clear()
         self._run_store.remove(run_id=run_id)
 
@@ -331,34 +314,3 @@ class RunDataManager:
             result = self._run_store.get_state_summary(run_id=run_id)
 
         return result
-    
-    async def _poll_current_command(self, run_id: str) -> None:
-        """Continuously poll for the current command and publish.
-
-        Args:
-            run_id: ID of the run.
-        """
-        cached_current_command: CurrentCommand = None
-        while True:
-            current_command = self.get_current_command(run_id)
-            log.info(f"CURRENT COMMAND: {current_command}")
-            if current_command is not None and cached_current_command != current_command:
-                log.info(f"NEW CURRENT COMMAND: {current_command}")
-                try:
-                    class RegularObject:
-                        def __init__(self, command_id, command_key, created_at, index):
-                            self.command_id = command_id
-                            self.command_key = command_key
-                            self.created_at = created_at
-                            self.index = index
-                    regular_object = RegularObject(
-                    command_id=current_command.command_id,
-                    command_key=current_command.command_key,
-                    created_at=current_command.created_at,
-                    index=current_command.index
-)
-                    notification_client.publish(topic="robot-server/runs/current_command", message=json.dumps(regular_object.command_key))
-                    cached_current_command = current_command
-                except Exception as e:
-                    log.info(f"ERROR PUBLISHING: {str(e)}")
-            await asyncio.sleep(3)

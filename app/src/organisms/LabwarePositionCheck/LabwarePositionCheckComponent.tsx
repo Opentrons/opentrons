@@ -96,18 +96,18 @@ export const LabwarePositionCheckComponent = (
   React.useEffect(() => {
     if (
       maintenanceRunId !== null &&
-      maintenanceRunData?.data?.id === maintenanceRunId
+      maintenanceRunData?.data.id === maintenanceRunId
     ) {
       setMonitorMaintenanceRunForDeletion(true)
     }
     if (
-      maintenanceRunData?.data?.id !== maintenanceRunId &&
+      maintenanceRunData?.data.id !== maintenanceRunId &&
       monitorMaintenanceRunForDeletion
     ) {
       setMaintenanceRunId(null)
     }
   }, [
-    maintenanceRunData?.data?.id,
+    maintenanceRunData?.data.id,
     maintenanceRunId,
     monitorMaintenanceRunForDeletion,
     setMaintenanceRunId,
