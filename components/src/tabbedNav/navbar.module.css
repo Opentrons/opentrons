@@ -11,7 +11,6 @@
   flex: 1;
 }
 
-/* TODO(mc, 2018-03-21): @apply --button-default? */
 .tab {
   display: inline-block;
   cursor: pointer;
