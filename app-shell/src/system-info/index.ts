@@ -27,7 +27,7 @@ const IFACE_POLL_INTERVAL_MS = 30000
 const log = createLogger('system-info')
 
 // format USBDevice to UsbDevice type
-export const createUsbDevice = (
+const createUsbDevice = (
   device: USBDevice,
   windowsDriverVersion?: string | null
 ): UsbDevice => ({
