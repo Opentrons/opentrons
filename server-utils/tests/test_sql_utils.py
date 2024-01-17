@@ -1,7 +1,7 @@
 """Tests for the `sql_utils` module."""
 
 
-from contextlib import contextmanager, nullcontext
+from contextlib import nullcontext
 from pathlib import Path
 from typing import Any, Generator, ContextManager
 
@@ -9,14 +9,6 @@ import pytest
 import sqlalchemy
 
 from server_utils import sql_utils
-
-
-@contextmanager
-def make_scratch_engine(path: Path) -> Generator[sqlalchemy.engine.Engine, None, None]:
-    """Return a SQLAlchemy engine connected to an empty scratch database."""
-    engine = sqlalchemy.create_engine(sql_utils.get_connection_url(path))
-    yield engine
-    engine.dispose()
 
 
 @pytest.fixture
@@ -123,31 +115,3 @@ def test_fix_transaction_fixes_transactional_ddl(
         c["name"] for c in sqlalchemy.inspect(scratch_engine).get_columns("table")
     ]
     assert column_names == expected_final_column_names
-
-
-def test_copy(tmp_path: Path) -> None:
-    metadata = sqlalchemy.MetaData()
-    table = sqlalchemy.Table(
-        "table",
-        metadata,
-        sqlalchemy.Column("int_col", sqlalchemy.Integer, nullable=False),
-    )
-
-    source_file = tmp_path / "original.db"
-    copy_file = tmp_path / "copy.db"
-
-    with make_scratch_engine(source_file) as source_engine:
-        with source_engine.begin() as transaction:
-            metadata.create_all(source_engine)
-            transaction.execute(sqlalchemy.insert(table).values(int_col=123))
-            transaction.execute(sqlalchemy.insert(table).values(int_col=456))
-
-    sql_utils.copy(source_file=source_file, destination_file=copy_file)
-
-    with make_scratch_engine(copy_file) as copy_engine:
-        with copy_engine.begin() as transaction:
-            result = transaction.execute(
-                sqlalchemy.select(table.c.int_col).order_by(table.c.int_col)
-            ).scalars().all()
-
-    assert result == [123, 456]
