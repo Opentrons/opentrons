@@ -81,7 +81,10 @@
 }
 
 .label_text {
-  @apply --truncate;
+  white-space: nowrap; /* from legacy --truncate */
+  overflow: hidden; /* from legacy --truncate */
+  text-overflow: ellipsis; /* from legacy --truncate */
+  min-width: 0; /* from legacy --truncate */
 
   /* flex: none; */
   font-size: var(--fs-caption);

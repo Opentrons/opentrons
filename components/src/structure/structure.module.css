@@ -35,7 +35,10 @@
 }
 
 .title {
-  @apply --truncate;
+  white-space: nowrap; /* from legacy --truncate */
+  overflow: hidden; /* from legacy --truncate */
+  text-overflow: ellipsis; /* from legacy --truncate */
+  min-width: 0; /* from legacy --truncate */
 
   padding: 0 1.5rem;
 }

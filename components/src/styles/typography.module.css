@@ -19,11 +19,4 @@
   --lh-solid: 1;
   --lh-title: 1.25;
   --lh-copy: 1.5;
-  
-  --truncate: {
-    white-space: nowrap; /* from legacy --truncate */
-    overflow: hidden; /* from legacy --truncate */
-    text-overflow: ellipsis; /* from legacy --truncate */
-    min-width: 0; /* from legacy --truncate */
-  };
 }
