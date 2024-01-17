@@ -82,14 +82,14 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     slot_5 = helpers_ot3.get_slot_calibration_square_position_ot3(5)
     home_pos = await api.gantry_position(OT3Mount.LEFT)
     await api.move_to(OT3Mount.LEFT, slot_5._replace(z=home_pos.z))
-    for expected_state in [False, True]:
+    for expected_state in [True, False]:
         print("homing...")
         await api.home([ax])
         if not api.is_simulator:
             if expected_state:
-                ui.get_user_ready("remove all tips from the pipette")
+                ui.get_user_ready("press on tips to channels A1 + H12")               
             else:
-                ui.get_user_ready("press on tips to channels A1 + H12")
+                ui.get_user_ready("remove all tips from the pipette")
         if not api.is_simulator:
             init_state = await get_tip_status(api)
             if init_state != EXPECTED_STATE_AT_HOME_POSITION:
