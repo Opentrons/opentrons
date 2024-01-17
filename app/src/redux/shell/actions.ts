@@ -2,6 +2,7 @@ import type {
   UiInitializedAction,
   UsbRequestsAction,
   AppRestartAction,
+  ReloadUiAction,
   SendLogAction,
   UpdateBrightnessAction,
   RobotMassStorageDeviceAdded,
@@ -15,6 +16,7 @@ export const USB_HTTP_REQUESTS_START: 'shell:USB_HTTP_REQUESTS_START' =
 export const USB_HTTP_REQUESTS_STOP: 'shell:USB_HTTP_REQUESTS_STOP' =
   'shell:USB_HTTP_REQUESTS_STOP'
 export const APP_RESTART: 'shell:APP_RESTART' = 'shell:APP_RESTART'
+export const RELOAD_UI: 'shell:RELOAD_UI' = 'shell:RELOAD_UI'
 export const SEND_LOG: 'shell:SEND_LOG' = 'shell:SEND_LOG'
 export const UPDATE_BRIGHTNESS: 'shell:UPDATE_BRIGHTNESS' =
   'shell:UPDATE_BRIGHTNESS'
@@ -42,6 +44,14 @@ export const usbRequestsStop = (): UsbRequestsAction => ({
 
 export const appRestart = (message: string): AppRestartAction => ({
   type: APP_RESTART,
+  payload: {
+    message: message,
+  },
+  meta: { shell: true },
+})
+
+export const reloadUi = (message: string): ReloadUiAction => ({
+  type: RELOAD_UI,
   payload: {
     message: message,
   },
