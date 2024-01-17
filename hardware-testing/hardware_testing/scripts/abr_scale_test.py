@@ -22,7 +22,7 @@ def get_user_input():
     labware_PVT1ABR10 = ['Waste', 'R1', 'R2', 'PCR Plate', 'Deep Well Plate']
     labware_PVT1ABR11 = ['Waste', 'Reservoir', 'Sample Plate', 'Working Plate', 'Final Plate', 'Reagents']
     labware_DVT1ABR3 = ['Plate1', 'Seal1', 'Plate2', 'Seal2']
-    labware_PVT1ABR7 = ['PCR Plate']
+    labware_PVT1ABR7 = ['Waste', 'R1', 'R2', 'PCR Plate', 'Deep Well Plate']
     labware = [labware_DVT1ABR4, labware_PVT1ABR9, labware_PVT1ABR10, labware_PVT1ABR11, labware_DVT1ABR3, labware_PVT1ABR7]
     abr = ['DVT1ABR4', 'PVT1ABR9', 'PVT1ABR10', 'PVT1ABR11', 'DVT1ABR3', 'PVT1ABR7']
     data = {'Robot': [], 'Labware': []}
@@ -86,6 +86,10 @@ if __name__ == '__main__':
             df_reading = pd.DataFrame({'Date': time_now,'Labware': labware, 'Robot': robot, 'Scale Reading': grams, 'Stable': is_stable}, index = [0])
             df = pd.concat([df, df_reading])
             if bool(is_stable) == 1:
+                max_weight = df['Scale Reading'].max()
+                if max_weight < 10:
+                    print(f'You should remeasure. The maximum mass captured was {max_weight} grams.')
+                    break
                 df.to_csv(savepath)
                 break
             # disconnect from serial port

@@ -9,13 +9,14 @@ if __name__ == '__main__':
     # Gets the current working directory
     current_working_directory = os.getcwd()
     test_type   = input('Test Type (E/P): ')
+    
+    while test_type not in test_type_list:
+        print(f'Your input was: {test_type}. Expected input was {test_type_list}')
+        test_type = input('Test Type (E/P): ' )
     if test_type    == 'E':
         subfolder = 'Evaporation Results/'
     elif test_type  == 'P':
         subfolder = 'Protocol Results/'
-    else:
-        print(f'Your input was: {test_type}. Expected input was {test_type_list}')
-        test_type = input('Test Type (E/P): ' )
     new_folder_path = os.path.join(current_working_directory, subfolder)
     folders_in_directory = os.listdir(new_folder_path)
     analysis_folder = input(f'Desired Folder, Available Folders: {folders_in_directory} ')
@@ -27,6 +28,8 @@ if __name__ == '__main__':
     i = 0
     for filename in os.listdir(analysis_folder_path):
         if filename.endswith(".csv"):
+            if 'copy' in filename:
+                raise ValueError("Error: Filename contains the string 'copy'. Please rename file.")
             path = os.path.join(analysis_folder_path, filename)
             df = pd.read_csv(path)
             date, robot, step, sample = filename.split('_')[:4]
@@ -65,7 +68,7 @@ if __name__ == '__main__':
     # Save to csv in input folder
     time_now = datetime.datetime.now()
     today_date = str(time_now).split(' ')[0]
-    filename =   'Analyzed-' + today_date + '_Summary.csv'
+    filename =   'Analyzed-' + analysis_folder + '_Summary.csv'
     results_path = os.path.join(analysis_results_folder, filename)
     pivoted_df.to_csv(results_path, index = False)
     
