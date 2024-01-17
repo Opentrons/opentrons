@@ -7,7 +7,12 @@
 
 .gallery_image_container {
   @apply --aspect-item;
-  @apply --center-children;
+  display: flex;
+  /* from legacy --center-children */
+  justify-content: center;
+  /* from legacy --center-children */
+  align-items: center;
+  /* from legacy --center-children */
 }
 
 .gallery_thumbnail_row {
@@ -95,14 +100,24 @@ button.load_name_button {
 }
 
 .well_count_data {
-  @apply --flex-between;
+  display: flex;
+  /* from legacy --flex-between */
+  justify-content: space-between;
+  /* from legacy --flex-between */
+  align-items: center;
+  /* from legacy --flex-between */
 
   width: 100%;
   padding: 0 var(--spacing-1);
 }
 
 .well_properties {
-  @apply --flex-between;
+  display: flex;
+  /* from legacy --flex-between */
+  justify-content: space-between;
+  /* from legacy --flex-between */
+  align-items: center;
+  /* from legacy --flex-between */
 
   flex-wrap: wrap;
   margin-top: var(--spacing-5);

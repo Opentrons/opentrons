@@ -1,19 +1,23 @@
 /* common styling for modals */
 @import '../index.module.css';
 
-:root {
-  --modal-contents: {
-    z-index: 1;
-    width: 100%;
-    max-width: 38rem;
-    margin: 0 auto;
-    padding: 1rem;
-    border-radius: 0.5rem;
-  }
-}
-
 .modal {
-  @apply --modal;
+  position: absolute;
+  /* from legacy --absolute-fill */
+  top: 0;
+  /* from legacy --absolute-fill */
+  right: 0;
+  /* from legacy --absolute-fill */
+  bottom: 0;
+  /* from legacy --absolute-fill */
+  left: 0;
+  /* from legacy --absolute-fill */
+  display: flex;
+  /* from legacy --center-children */
+  justify-content: center;
+  /* from legacy --center-children */
+  align-items: center;
+  /* from legacy --center-children */
 
   align-items: flex-start;
   position: fixed;
@@ -22,15 +26,39 @@
 }
 
 .modal_page {
-  @apply --absolute-fill;
-  @apply --flex-start;
+  position: absolute;
+  /* from legacy --absolute-fill */
+  top: 0;
+  /* from legacy --absolute-fill */
+  right: 0;
+  /* from legacy --absolute-fill */
+  bottom: 0;
+  /* from legacy --absolute-fill */
+  left: 0;
+  /* from legacy --absolute-fill */
+
+  display: flex;
+  /* from legacy --flex-start */
+  justify-content: flex-start;
+  /* from legacy --flex-start */
+  align-items: center;
+  /* from legacy --flex-start */
 
   flex-direction: column;
   padding: 4.5rem 3rem 1rem 3rem;
 }
 
 .overlay {
-  @apply --absolute-fill;
+  position: absolute;
+  /* from legacy --absolute-fill */
+  top: 0;
+  /* from legacy --absolute-fill */
+  right: 0;
+  /* from legacy --absolute-fill */
+  bottom: 0;
+  /* from legacy --absolute-fill */
+  left: 0;
+  /* from legacy --absolute-fill */
 
   background-color: rgba(0, 0, 0, 0.9);
 }
@@ -45,13 +73,35 @@
 }
 
 .modal_contents {
-  @apply --modal-contents;
+  z-index: 1;
+  /* from legacy --modal-contents */
+  width: 100%;
+  /* from legacy --modal-contents */
+  max-width: 38rem;
+  /* from legacy --modal-contents */
+  margin: 0 auto;
+  /* from legacy --modal-contents */
+  padding: 1rem;
+  /* from legacy --modal-contents */
+  border-radius: 0.5rem;
+  /* from legacy --modal-contents */
 
   background-color: white;
 }
 
 .modal_page_contents {
-  @apply --modal-contents;
+  z-index: 1;
+  /* from legacy --modal-contents */
+  width: 100%;
+  /* from legacy --modal-contents */
+  max-width: 38rem;
+  /* from legacy --modal-contents */
+  margin: 0 auto;
+  /* from legacy --modal-contents */
+  padding: 1rem;
+  /* from legacy --modal-contents */
+  border-radius: 0.5rem;
+  /* from legacy --modal-contents */
 
   background-color: white;
   max-height: 100%;
@@ -60,9 +110,12 @@
 }
 
 .modal_heading {
-  font-size: var(--fs-header); /* from legacy --font-header-dark */
-    font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
-    color: var(--c-font-dark); /* from legacy --font-header-dark */
+  font-size: var(--fs-header);
+  /* from legacy --font-header-dark */
+  font-weight: var(--fw-semibold);
+  /* from legacy --font-header-dark */
+  color: var(--c-font-dark);
+  /* from legacy --font-header-dark */
 
   margin-top: 0;
   margin-bottom: 1rem;
@@ -85,10 +138,24 @@
 }
 
 .spinner_modal_contents {
-  @apply --modal-contents;
-  font-size: var(--fs-body-2); /* from legacy --font-body-2-light */
-  font-weight: var(--fw-regular); /* from legacy --font-body-2-light */
-  color: var(--c-font-light); /* from legacy --font-body-2-light */
+  z-index: 1;
+  /* from legacy --modal-contents */
+  width: 100%;
+  /* from legacy --modal-contents */
+  max-width: 38rem;
+  /* from legacy --modal-contents */
+  margin: 0 auto;
+  /* from legacy --modal-contents */
+  padding: 1rem;
+  /* from legacy --modal-contents */
+  border-radius: 0.5rem;
+  /* from legacy --modal-contents */
+  font-size: var(--fs-body-2);
+  /* from legacy --font-body-2-light */
+  font-weight: var(--fw-regular);
+  /* from legacy --font-body-2-light */
+  color: var(--c-font-light);
+  /* from legacy --font-body-2-light */
   @apply center-content;
 
   max-width: 30rem;
@@ -118,23 +185,29 @@
 }
 
 .alert_modal_contents {
-  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+  font-size: var(--fs-body-2);
+  /* from legacy --font-body-2-dark */
+  font-weight: var(--fw-regular);
+  /* from legacy --font-body-2-dark */
+  color: var(--c-font-dark);
+  /* from legacy --font-body-2-dark */
 
   width: 100%;
   max-height: 100%;
   padding: 1rem;
 
-  & > p {
+  &>p {
     padding-bottom: 1rem;
   }
 }
 
 .alert_modal_heading {
-  font-size: var(--fs-header); /* from legacy --font-header-dark */
-    font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
-    color: var(--c-font-dark); /* from legacy --font-header-dark */
+  font-size: var(--fs-header);
+  /* from legacy --font-header-dark */
+  font-weight: var(--fw-semibold);
+  /* from legacy --font-header-dark */
+  color: var(--c-font-dark);
+  /* from legacy --font-header-dark */
 
   font-weight: normal;
   position: absolute;

@@ -21,10 +21,18 @@
 }
 
 .file_drop {
-  font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-1-dark */
-  @apply --center-children;
+  font-size: var(--fs-body-1);
+  /* from legacy --font-body-1-dark */
+  font-weight: var(--fw-regular);
+  /* from legacy --font-body-1-dark */
+  color: var(--c-font-dark);
+  /* from legacy --font-body-1-dark */
+  display: flex;
+  /* from legacy --center-children */
+  justify-content: center;
+  /* from legacy --center-children */
+  align-items: center;
+  /* from legacy --center-children */
 
   width: 100%;
   padding: 1rem 2rem;

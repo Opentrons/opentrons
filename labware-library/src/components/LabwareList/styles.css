@@ -88,7 +88,12 @@
 }
 
 .well_count {
-  @apply --flex-between;
+  display: flex;
+  /* from legacy --flex-between */
+  justify-content: space-between;
+  /* from legacy --flex-between */
+  align-items: center;
+  /* from legacy --flex-between */
 }
 
 .well_group_properties {

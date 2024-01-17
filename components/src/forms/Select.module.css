@@ -53,7 +53,9 @@
   }
 
   & :global(.ot_select__group-heading) {
-    @apply --font-form-caption;
+    font-size: var(--fs-caption); /* from legacy --font-form-caption */
+    font-weight: var(--fw-semibold); /* from legacy --font-form-caption */
+    color: var(--c-med-gray); /* from legacy --font-form-caption */
 
     text-transform: uppercase;
     margin-left: 0.5rem;

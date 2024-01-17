@@ -78,7 +78,6 @@ describe('CheckboxField', () => {
 
     // TODO: kj 09/15/2022 This part will be update later OUTER_STYLE
     // const checkBoxLabel = getByTestId('CheckboxField_label')
-    // expect(checkBoxLabel).toHaveStyle('@apply --font-form-default')
     // expect(checkBoxLabel).toHaveStyle('font-size: 0.75rem')
     // expect(checkBoxLabel).toHaveStyle('font-weight: 400')
     // expect(checkBoxLabel).toHaveStyle(`color: ${COLORS.darkBlackEnabled}`)

@@ -13,7 +13,12 @@
 }
 
 .external_link {
-  @apply --flex-start;
+  display: flex;
+  /* from legacy --flex-start */
+  justify-content: flex-start;
+  /* from legacy --flex-start */
+  align-items: center;
+  /* from legacy --flex-start */
   @apply --transition-color;
 
   margin-top: var(--spacing-3);
@@ -49,7 +54,12 @@
   padding-bottom: var(--spacing-1);
   border-bottom: var(--bd-light);
 
-  @apply --flex-between;
+  display: flex;
+  /* from legacy --flex-between */
+  justify-content: space-between;
+  /* from legacy --flex-between */
+  align-items: center;
+  /* from legacy --flex-between */
 
   align-items: center;
 }
