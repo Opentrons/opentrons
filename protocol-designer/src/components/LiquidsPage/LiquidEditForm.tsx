@@ -51,15 +51,10 @@ function checkColor(hex: string): boolean {
 const INVALID_DISPLAY_COLORS = ['#000000', '#ffffff', DEPRECATED_WHALE_GREY]
 
 export const liquidEditFormSchema: Yup.Schema<
-  { description: string; serialize: boolean } | undefined,
+  { name: string; description: string; serialize: boolean } | undefined,
   any
 > = Yup.object().shape({
-  //TODO: FIX THIS
-  // name: Yup.string().required(
-  //   i18n.t('form.generic.error.required', {
-  //     name: i18n.t('form.liquid_edit.name'),
-  //   })
-  // ),
+  name: Yup.string().required('liquid name is required'),
   displayColor: Yup.string().test(
     'disallowed-color',
     'Invalid display color',

@@ -62,12 +62,16 @@ const MessageBody = (props: {
         {canOverwrite && (
           <p>{t('labware_upload_message.name_conflict.overwrite')}</p>
         )}
-        {canOverwrite && message.isOverwriteMismatched && (
-          <p>
-            <strong>{t('labware_upload_message.name_conflict.warning')}</strong>{' '}
-            {t('labware_upload_message.name_conflict.mismatched')}
-          </p>
-        )}
+        {canOverwrite &&
+          'isOverwriteMismatched' in message &&
+          message.isOverwriteMismatched && (
+            <p>
+              <strong>
+                {t('labware_upload_message.name_conflict.warning')}
+              </strong>{' '}
+              {t('labware_upload_message.name_conflict.mismatched')}
+            </p>
+          )}
       </>
     )
   }

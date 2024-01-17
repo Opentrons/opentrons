@@ -1,5 +1,4 @@
 import last from 'lodash/last'
-import { useTranslation } from 'react-i18next'
 import {
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -263,12 +262,9 @@ export const createPresavedStepForm = ({
   robotStateTimeline,
   additionalEquipmentEntities,
 }: CreatePresavedStepFormArgs): FormData => {
-  const { t } = useTranslation('application')
-
   const formData = createBlankForm({
     stepId,
     stepType,
-    t,
   })
 
   const updateDefaultDropTip = _patchDefaultDropTipLocation({

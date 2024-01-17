@@ -1,5 +1,4 @@
 import assert from 'assert'
-import { useTranslation } from 'react-i18next'
 import * as React from 'react'
 import { DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd'
 import cx from 'classnames'
@@ -76,7 +75,6 @@ export const AdapterControlsComponents = (
     onDeck,
     allLabware,
   } = props
-  const { t } = useTranslation('deck')
   if (
     selectedTerminalItemId !== START_TERMINAL_ITEM_ID ||
     (itemType !== DND_TYPES.LABWARE && itemType !== null)
@@ -128,11 +126,11 @@ export const AdapterControlsComponents = (
         >
           <a className={styles.overlay_button} onClick={addLabware}>
             {!isOver && <Icon className={styles.overlay_icon} name="plus" />}
-            {t(`overlay.slot.${isOver ? 'place_here' : 'add_labware'}`)}
+            {isOver ? 'Place Here' : 'Add Labware'}
           </a>
           <a className={styles.overlay_button} onClick={deleteLabware}>
             {!isOver && <Icon className={styles.overlay_icon} name="close" />}
-            {t('overlay.edit.delete')}
+            {'Delete'}
           </a>
         </RobotCoordsForeignDiv>
       )}
@@ -150,16 +148,14 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<any>, ownProps: OP): DP => {
   const adapterName =
     ownProps.allLabware.find(labware => labware.id === ownProps.labwareId)?.def
       .metadata.displayName ?? ''
-  const { t } = useTranslation('deck')
   return {
     addLabware: () =>
       dispatch(openAddLabwareModal({ slot: ownProps.labwareId })),
     moveDeckItem: (sourceSlot, destSlot) =>
       dispatch(moveDeckItem(sourceSlot, destSlot)),
     deleteLabware: () => {
-      window.confirm(
-        t('warning.cancelForSure', { adapterName: adapterName })
-      ) && dispatch(deleteContainer({ labwareId: ownProps.labwareId }))
+      window.confirm(`"Are you sure you want to remove this ${adapterName}?`) &&
+        dispatch(deleteContainer({ labwareId: ownProps.labwareId }))
     },
   }
 }

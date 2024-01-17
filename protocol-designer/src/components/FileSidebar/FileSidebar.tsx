@@ -1,5 +1,6 @@
 import * as React from 'react'
 import cx from 'classnames'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   DeprecatedPrimaryButton,
@@ -7,6 +8,15 @@ import {
   OutlineButton,
   SidePanel,
 } from '@opentrons/components'
+import {
+  actions as loadFileActions,
+  selectors as loadFileSelectors,
+} from '../../load-file'
+import { actions, selectors } from '../../navigation'
+import { selectors as fileDataSelectors } from '../../file-data'
+import { selectors as stepFormSelectors } from '../../step-forms'
+import { getRobotType } from '../../file-data/selectors'
+import { getAdditionalEquipment } from '../../step-forms/selectors'
 import { resetScrollElements } from '../../ui/steps/utils'
 import { Portal } from '../portals/MainPageModalPortal'
 import { useBlockingHint } from '../Hints/useBlockingHint'
@@ -19,6 +29,11 @@ import {
 import modalStyles from '../modals/modal.css'
 import styles from './FileSidebar.css'
 
+import type {
+  CreateCommand,
+  ProtocolFile,
+  RobotType,
+} from '@opentrons/shared-data'
 import type { HintKey } from '../../tutorial'
 import type {
   InitialDeckSetup,
@@ -26,11 +41,7 @@ import type {
   ModuleOnDeck,
   PipetteOnDeck,
 } from '../../step-forms'
-import type {
-  CreateCommand,
-  ProtocolFile,
-  RobotType,
-} from '@opentrons/shared-data'
+import type { ThunkDispatch } from '../../types'
 
 export interface AdditionalEquipment {
   [additionalEquipmentId: string]: {
@@ -69,6 +80,7 @@ interface MissingContent {
   modulesWithoutStep: ModuleOnDeck[]
   gripperWithoutStep: boolean
   fixtureWithoutStep: Fixture
+  t: any
 }
 
 const LOAD_COMMANDS: Array<CreateCommand['commandType']> = [
@@ -84,9 +96,8 @@ function getWarningContent({
   modulesWithoutStep,
   gripperWithoutStep,
   fixtureWithoutStep,
+  t,
 }: MissingContent): WarningContent | null {
-  const { t } = useTranslation(['alert', 'modules'])
-
   if (noCommands) {
     return {
       content: (
@@ -218,8 +229,7 @@ function getWarningContent({
   return null
 }
 
-export function v8WarningContent(): JSX.Element {
-  const { t } = useTranslation('alert')
+export function v8WarningContent(t: any): JSX.Element {
   return (
     <div>
       <p>
@@ -230,23 +240,25 @@ export function v8WarningContent(): JSX.Element {
     </div>
   )
 }
-export function FileSidebar(props: Props): JSX.Element {
-  const {
-    canDownload,
-    fileData,
-    loadFile,
-    createNewFile,
-    onDownload,
-    modulesOnDeck,
-    pipettesOnDeck,
-    savedStepForms,
-    robotType,
-    additionalEquipment,
-  } = props
+export function FileSidebar(): JSX.Element {
+  const fileData = useSelector(fileDataSelectors.createFile)
+  const canDownload = useSelector(selectors.getCurrentPage)
+  const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
+  const modulesOnDeck = initialDeckSetup.modules
+  const pipettesOnDeck = initialDeckSetup.pipettes
+  const robotType = useSelector(getRobotType)
+  const additionalEquipment = useSelector(getAdditionalEquipment)
+  const savedStepForms = useSelector(stepFormSelectors.getSavedStepForms)
+  const newProtocolModal = useSelector(selectors.getNewProtocolModal)
+  const hasUnsavedChanges = useSelector(loadFileSelectors.getHasUnsavedChanges)
+  const canCreateNew = !newProtocolModal
+  const dispatch: ThunkDispatch<any> = useDispatch()
+
   const [
     showExportWarningModal,
     setShowExportWarningModal,
   ] = React.useState<boolean>(false)
+  const { t } = useTranslation(['alert', 'modules'])
   const isGripperAttached = Object.values(additionalEquipment).some(
     equipment => equipment?.name === 'gripper'
   )
@@ -266,6 +278,20 @@ export function FileSidebar(props: Props): JSX.Element {
   const [showBlockingHint, setShowBlockingHint] = React.useState<boolean>(false)
 
   const cancelModal = (): void => setShowExportWarningModal(false)
+
+  const loadFile = (
+    fileChangeEvent: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    if (!hasUnsavedChanges || window.confirm(t('window.confirm_import'))) {
+      dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
+    }
+  }
+
+  const createNewFile = (): void => {
+    if (canCreateNew) {
+      dispatch(actions.toggleNewProtocolModal(true))
+    }
+  }
 
   const nonLoadCommands =
     fileData?.commands.filter(
@@ -312,6 +338,7 @@ export function FileSidebar(props: Props): JSX.Element {
       modulesWithoutStep,
       gripperWithoutStep,
       fixtureWithoutStep,
+      t,
     })
 
   const getExportHintContent = (): {
@@ -320,7 +347,7 @@ export function FileSidebar(props: Props): JSX.Element {
   } => {
     return {
       hintKey: 'export_v8_protocol_7_1',
-      content: v8WarningContent(),
+      content: v8WarningContent(t),
     }
   }
 
@@ -333,7 +360,7 @@ export function FileSidebar(props: Props): JSX.Element {
     handleCancel: () => setShowBlockingHint(false),
     handleContinue: () => {
       setShowBlockingHint(false)
-      onDownload()
+      dispatch(loadFileActions.saveProtocolFile())
     },
   })
 

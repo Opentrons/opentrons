@@ -36,7 +36,6 @@ i18n.use(initReactI18next).init(
         return value
       },
     },
-    keySeparator: false,
     saveMissing: true,
     missingKeyHandler: (lng, ns, key) => {
       process.env.NODE_ENV === 'test'

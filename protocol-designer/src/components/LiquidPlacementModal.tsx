@@ -8,7 +8,7 @@ import {
   wellFillFromWellContents,
   SelectableLabware,
 } from '../components/labware'
-import { LiquidPlacementForm } from '../components/LiquidPlacementForm'
+import { LiquidPlacementForm } from './LiquidPlacementForm/LiquidPlacementForm'
 import { WellSelectionInstructions } from './WellSelectionInstructions'
 
 import { selectors } from '../labware-ingred/selectors'

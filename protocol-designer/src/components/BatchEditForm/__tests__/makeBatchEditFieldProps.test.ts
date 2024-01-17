@@ -36,7 +36,8 @@ describe('makeBatchEditFieldProps', () => {
     const result = makeBatchEditFieldProps(
       fieldValues,
       disabledFields,
-      handleChangeFormInput
+      handleChangeFormInput,
+      []
     )
 
     expect(result).toEqual({
@@ -76,7 +77,8 @@ describe('makeBatchEditFieldProps', () => {
     const result = makeBatchEditFieldProps(
       fieldValues,
       disabledFields,
-      handleChangeFormInput
+      handleChangeFormInput,
+      []
     )
 
     expect(result.aspirate_flowRate.disabled).toBe(true)
@@ -99,7 +101,8 @@ describe('makeBatchEditFieldProps', () => {
     const result = makeBatchEditFieldProps(
       fieldValues,
       disabledFields,
-      handleChangeFormInput
+      handleChangeFormInput,
+      []
     )
 
     expect(result.aspirate_flowRate.isIndeterminate).toBe(true)
@@ -119,7 +122,8 @@ describe('makeBatchEditFieldProps', () => {
     const result = makeBatchEditFieldProps(
       fieldValues,
       disabledFields,
-      handleChangeFormInput
+      handleChangeFormInput,
+      []
     )
 
     expect(result.preWetTip.isIndeterminate).toBe(true)
@@ -144,7 +148,8 @@ describe('makeBatchEditFieldProps', () => {
     const result = makeBatchEditFieldProps(
       fieldValues,
       disabledFields,
-      handleChangeFormInput
+      handleChangeFormInput,
+      []
     )
 
     expect(result.preWetTip.isIndeterminate).toBe(true)
