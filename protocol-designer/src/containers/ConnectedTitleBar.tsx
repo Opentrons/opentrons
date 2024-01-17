@@ -51,7 +51,7 @@ export const ConnectedTitleBar = (): JSX.Element => {
   const selectedLabwareId = useSelector(
     labwareIngredSelectors.getSelectedLabwareId
   )
-  const _page = useSelector(selectors.getCurrentPage)
+  const page = useSelector(selectors.getCurrentPage)
   const labwareNicknamesById = useSelector(
     uiLabwareSelectors.getLabwareNicknamesById
   )
@@ -73,37 +73,36 @@ export const ConnectedTitleBar = (): JSX.Element => {
   const labwareEntity =
     selectedLabwareId != null ? labwareEntities[selectedLabwareId] : null
 
-  const liquidPlacementMode = selectedLabwareId != null
+  let liquidPlacementMode: boolean = selectedLabwareId != null
 
-  let title: React.ReactNode = <></>
+  let title
   let subtitle: string | null = null
   let backButtonLabel: string | undefined
-  let _wellSelectionMode: boolean = false
-  let _liquidPlacementMode: boolean = false
+  let wellSelectionMode: boolean = false
 
-  switch (_page) {
+  console.log('page', page)
+  switch (page) {
     case 'liquids':
     case 'file-detail': {
-      title = <>{t([`title.${_page}`, fileName])}</>
-      subtitle = t([`subtitle.${_page}`, ''])
+      title = <>{t([`title.${page}`, fileName])}</>
+      subtitle = t([`subtitle.${page}`, ''])
       break
     }
     case 'file-splash':
     case 'settings-features':
     case 'settings-app': {
-      title = <Title text={t([`title.${_page}`, fileName])} />
-      subtitle = t([`subtitle.${_page}`, ''])
+      title = <Title text={t([`title.${page}`, fileName])} />
+      subtitle = t([`subtitle.${page}`, ''])
       break
     }
     case 'steplist':
     default: {
       // NOTE: this default case error should never be reached, it's just a sanity check
-      if (_page !== 'steplist')
+      if (page !== 'steplist')
         console.error(
           'ConnectedTitleBar got an unsupported page, returning steplist instead'
         )
       if (liquidPlacementMode) {
-        _liquidPlacementMode = liquidPlacementMode
         title = labwareNickname
         // TODO(mc, 2019-06-27): µL to uL replacement needed to handle CSS capitalization
         subtitle =
@@ -114,6 +113,7 @@ export const ConnectedTitleBar = (): JSX.Element => {
 
       if (selectedTerminalId === START_TERMINAL_ITEM_ID) {
         subtitle = START_TERMINAL_TITLE
+        title = title || fileName || ''
       } else if (selectedTerminalId === END_TERMINAL_ITEM_ID) {
         subtitle = END_TERMINAL_TITLE
         if (drilledDownLabwareId) {
@@ -131,7 +131,7 @@ export const ConnectedTitleBar = (): JSX.Element => {
           t(`application:stepType.${selectedStepInfo.stepType}`)
         if (wellSelectionLabwareKey) {
           // well selection modal
-          _wellSelectionMode = true
+          wellSelectionMode = true
           title = (
             <TitleWithIcon
               iconName={stepIconsByType[selectedStepInfo.stepType]}
@@ -150,10 +150,10 @@ export const ConnectedTitleBar = (): JSX.Element => {
 
   let onBackClick
 
-  if (_page === 'steplist') {
-    if (_liquidPlacementMode) {
+  if (page === 'steplist') {
+    if (liquidPlacementMode) {
       onBackClick = () => dispatch(closeIngredientSelector())
-    } else if (_wellSelectionMode) {
+    } else if (wellSelectionMode) {
       onBackClick = () => dispatch(stepsActions.clearWellSelectionLabwareKey())
     } else if (backButtonLabel) {
       onBackClick = () => {}
