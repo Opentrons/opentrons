@@ -19,18 +19,6 @@
   --lh-solid: 1;
   --lh-title: 1.25;
   --lh-copy: 1.5;
-  
-  --font-body-2-light: {
-    font-size: var(--fs-body-2); /* from legacy --font-body-2-light */
-    font-weight: var(--fw-regular); /* from legacy --font-body-2-light */
-    color: var(--c-font-light); /* from legacy --font-body-2-light */
-  };
-
-  --font-body-1-dark: {
-    font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-1-dark */
-  };
 
   --font-body-1-light: {
     font-size: var(--fs-body-1); /* from legacy --font-body-1-light */

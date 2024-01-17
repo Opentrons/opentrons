@@ -98,7 +98,9 @@
 }
 
 .sub_label_no_checkbox {
-  @apply --font-body-1-dark;
+  font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
+    font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
+    color: var(--c-font-dark); /* from legacy --font-body-1-dark */
 
   width: 5rem;
   display: flex;
@@ -350,7 +352,9 @@ and when that is implemented.
 }
 
 .profile_step_number {
-  @apply --font-body-1-dark;
+  font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
+    font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
+    color: var(--c-font-dark); /* from legacy --font-body-1-dark */
 
   width: 1.5rem;
   text-align: right;

@@ -134,7 +134,9 @@
 }
 
 .list_item {
-  @apply --font-body-1-dark;
+  font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
+    font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
+    color: var(--c-font-dark); /* from legacy --font-body-1-dark */
 
   display: flex;
   flex-direction: row;
@@ -158,7 +160,9 @@ a.list_item {
 }
 
 .list_alert {
-  @apply --font-body-1-dark;
+  font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
+    font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
+    color: var(--c-font-dark); /* from legacy --font-body-1-dark */
 
   width: 100%;
   padding: var(--list-padding-small);

@@ -10,7 +10,9 @@
 }
 
 .warning_text {
-  @apply --font-body-1-dark;
+  font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
+    font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
+    color: var(--c-font-dark); /* from legacy --font-body-1-dark */
 
   margin-bottom: 0.75rem;
 }
@@ -39,7 +41,9 @@
 }
 
 .form_label {
-  @apply --font-body-1-dark;
+  font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
+    font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
+    color: var(--c-font-dark); /* from legacy --font-body-1-dark */
 }
 
 .form_button {
@@ -52,7 +56,9 @@
 }
 
 .reset_message {
-  @apply --font-body-1-dark;
+  font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
+    font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
+    color: var(--c-font-dark); /* from legacy --font-body-1-dark */
 
   text-align: left;
   margin-bottom: 1rem;
