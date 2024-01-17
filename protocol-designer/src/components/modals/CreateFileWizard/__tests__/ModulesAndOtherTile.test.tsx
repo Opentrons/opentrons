@@ -1,5 +1,6 @@
 import * as React from 'react'
-import i18n from 'i18next'
+import { i18n } from '../../../../localization'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { getDisableModuleRestrictions } from '../../../../feature-flags/selectors'
@@ -9,7 +10,6 @@ import { ModulesAndOtherTile } from '../ModulesAndOtherTile'
 import { EquipmentOption } from '../EquipmentOption'
 import type { FormPipettesByMount } from '../../../../step-forms'
 import type { FormState, WizardTileProps } from '../types'
-import { fireEvent, screen } from '@testing-library/react'
 
 jest.mock('../../../modules')
 jest.mock('../../FilePipettesModal/ModuleFields')

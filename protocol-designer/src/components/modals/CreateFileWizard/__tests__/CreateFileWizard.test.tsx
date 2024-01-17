@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { i18n } from '../../../../localization'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -74,7 +75,7 @@ const mockCreateDeckFixture = createDeckFixture as jest.MockedFunction<
   typeof createDeckFixture
 >
 const render = () => {
-  return renderWithProviders(<CreateFileWizard />)[0]
+  return renderWithProviders(<CreateFileWizard />, { i18nInstance: i18n })[0]
 }
 
 const fixtureTipRack10ul = {

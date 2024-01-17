@@ -375,7 +375,7 @@ export const getEquippedPipetteOptions: Selector<
   return reduce(
     pipettes,
     (acc: DropdownOption[], pipette: PipetteOnDeck, id: string) => {
-      const mountLabel = pipette.mount === 'left' ? '(L}' : '{R}'
+      const mountLabel = pipette.mount === 'left' ? '(L)' : '(R)'
       const nextOption = {
         name: pipettesSame
           ? `${_getPipetteDisplayName(pipette.name)} ${mountLabel}`

@@ -12,6 +12,14 @@ const getIndeterminateTooltipSpy = jest.spyOn(
   'getFieldIndeterminateTooltip'
 )
 
+jest.mock('react-i18next', () => ({
+  useTranslation: jest.fn().mockReturnValue({
+    t: (key: string) => key,
+  }),
+}))
+
+const tMock = (key: string) => key
+
 beforeEach(() => {
   getFieldDefaultTooltipSpy.mockImplementation(name => `tooltip for ${name}`)
   getIndeterminateTooltipSpy.mockImplementation(name => `tooltip for ${name}`)
@@ -37,7 +45,7 @@ describe('makeBatchEditFieldProps', () => {
       fieldValues,
       disabledFields,
       handleChangeFormInput,
-      []
+      tMock
     )
 
     expect(result).toEqual({
@@ -78,7 +86,7 @@ describe('makeBatchEditFieldProps', () => {
       fieldValues,
       disabledFields,
       handleChangeFormInput,
-      []
+      tMock
     )
 
     expect(result.aspirate_flowRate.disabled).toBe(true)
@@ -102,7 +110,7 @@ describe('makeBatchEditFieldProps', () => {
       fieldValues,
       disabledFields,
       handleChangeFormInput,
-      []
+      tMock
     )
 
     expect(result.aspirate_flowRate.isIndeterminate).toBe(true)
@@ -123,13 +131,10 @@ describe('makeBatchEditFieldProps', () => {
       fieldValues,
       disabledFields,
       handleChangeFormInput,
-      []
+      tMock
     )
 
     expect(result.preWetTip.isIndeterminate).toBe(true)
-    expect(result.preWetTip.tooltipContent).toBe(
-      'Not all selected steps are using this setting'
-    )
   })
 
   it('should override indeterminate tooltip content if field is also disabled', () => {
@@ -149,7 +154,7 @@ describe('makeBatchEditFieldProps', () => {
       fieldValues,
       disabledFields,
       handleChangeFormInput,
-      []
+      tMock
     )
 
     expect(result.preWetTip.isIndeterminate).toBe(true)

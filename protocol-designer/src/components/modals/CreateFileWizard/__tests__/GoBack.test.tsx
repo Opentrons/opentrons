@@ -1,5 +1,5 @@
 import * as React from 'react'
-import i18n from 'i18next'
+import { i18n } from '../../../../localization'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { GoBack } from '../GoBack'
