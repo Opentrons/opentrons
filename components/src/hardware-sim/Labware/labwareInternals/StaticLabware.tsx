@@ -9,7 +9,7 @@ import { Well } from './Well'
 import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
 import type { WellMouseEvent } from './types'
 import { STYLE_BY_WELL_CONTENTS } from './StyledWells'
-import { COLORS } from '../../../ui-style-constants'
+import { COLORS } from '../../../helix-design-system'
 
 export interface StaticLabwareProps {
   /** Labware definition to render */
@@ -44,7 +44,7 @@ const TipDecoration = React.memo(function TipDecoration(props: {
 
 const LabwareDetailGroup = styled.g`
   fill: none;
-  stroke: ${COLORS.black};
+  stroke: ${COLORS.black90};
   stroke-width: 1;
 `
 

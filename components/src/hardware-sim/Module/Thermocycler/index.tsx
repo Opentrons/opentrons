@@ -7,7 +7,8 @@ import {
 } from '@opentrons/shared-data'
 
 import { C_MED_LIGHT_GRAY } from '../../../styles'
-import { COLORS, BORDERS } from '../../../ui-style-constants'
+import { BORDERS } from '../../../ui-style-constants'
+import { COLORS } from '../../../helix-design-system'
 
 import { RobotCoordsForeignDiv } from '../../Deck'
 import { ThermocyclerGEN1 } from './ThermocyclerGEN1'
@@ -43,9 +44,7 @@ export function Thermocycler(props: ThermocyclerVizProps): JSX.Element {
   let ledLightColor = COLORS.transparent
   if (blockTargetTemp != null) {
     ledLightColor =
-      blockTargetTemp <= ROOM_TEMPERATURE_C
-        ? COLORS.mediumBlueEnabled
-        : COLORS.red4
+      blockTargetTemp <= ROOM_TEMPERATURE_C ? COLORS.blue35 : COLORS.red30
   }
 
   return model === THERMOCYCLER_MODULE_V1 ? (

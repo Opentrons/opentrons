@@ -105,7 +105,7 @@ export function Navigation(props: NavigationProps): JSX.Element {
                 aria-label="network icon"
                 name={icon}
                 size="2.5rem"
-                color={COLORS.darkBlack70}
+                color={COLORS.grey60}
               />
             )}
           </Flex>
@@ -122,7 +122,7 @@ export function Navigation(props: NavigationProps): JSX.Element {
               name="overflow-btn-touchscreen"
               height="3.75rem"
               width="3rem"
-              color={COLORS.darkBlack70}
+              color={COLORS.grey60}
             />
           </IconButton>
         </Flex>
@@ -147,17 +147,17 @@ const NavigationLink = (props: { to: string; name: string }): JSX.Element => (
 
 const TouchNavLink = styled(NavLink)`
   ${TYPOGRAPHY.level3HeaderSemiBold}
-  color: ${COLORS.darkBlack70};
+  color: ${COLORS.grey60};
   height: 3.5rem;
   display: flex;
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_CENTER};
   white-space: nowrap;
   &.active {
-    color: ${COLORS.black};
+    color: ${COLORS.black90};
   }
   &.active > div {
-    background-color: ${COLORS.highlightPurple1};
+    background-color: ${COLORS.purple50};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
@@ -171,11 +171,11 @@ const IconButton = styled('button')`
   background-color: ${COLORS.white};
 
   &:active {
-    background-color: ${COLORS.darkBlack20};
+    background-color: ${COLORS.grey35};
   }
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.darkBlack20};
+    background-color: ${COLORS.grey35};
   }
   &:disabled {
     background-color: transparent;

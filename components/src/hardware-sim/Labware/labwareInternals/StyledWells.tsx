@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { Well } from './Well'
+import { COLORS } from '../../../helix-design-system'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { WellGroup } from './types'
-import { COLORS } from '../../../ui-style-constants'
 
 type WellContents =
   | 'tipPresent'
@@ -25,8 +25,8 @@ export const STYLE_BY_WELL_CONTENTS: {
   }
 } = {
   highlightedWell: {
-    stroke: COLORS.blueEnabled,
-    fill: `${COLORS.blueEnabled}33`, // 20% opacity
+    stroke: COLORS.blue50,
+    fill: `${COLORS.blue50}33`, // 20% opacity
     strokeWidth: 1,
   },
   disabledWell: {
@@ -35,7 +35,7 @@ export const STYLE_BY_WELL_CONTENTS: {
     strokeWidth: 0.6,
   },
   selectedWell: {
-    stroke: COLORS.blueEnabled,
+    stroke: COLORS.blue50,
     fill: COLORS.transparent,
     strokeWidth: 1,
   },
@@ -51,7 +51,7 @@ export const STYLE_BY_WELL_CONTENTS: {
   },
   defaultWell: {
     fill: COLORS.white,
-    stroke: COLORS.black,
+    stroke: COLORS.black90,
     strokeWidth: 0.6,
   },
 }

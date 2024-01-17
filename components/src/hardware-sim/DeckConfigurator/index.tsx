@@ -10,7 +10,7 @@ import {
   WASTE_CHUTE_STAGING_AREA_FIXTURES,
 } from '@opentrons/shared-data'
 
-import { COLORS } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 import { SingleSlotFixture } from '../BaseDeck/SingleSlotFixture'
 import { SlotLabels } from '../Deck'
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
@@ -37,8 +37,8 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     deckConfig,
     handleClickAdd,
     handleClickRemove,
-    lightFill = COLORS.light1,
-    darkFill = COLORS.darkBlackEnabled,
+    lightFill = COLORS.grey35,
+    darkFill = COLORS.black90,
     readOnly = false,
     showExpansion = true,
     children,

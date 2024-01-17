@@ -26,7 +26,7 @@ interface WizardHeaderProps {
 const EXIT_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50};
 
   &:hover {
     opacity: 70%;
@@ -74,7 +74,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
           </Text>
 
           {currentStep != null && totalSteps != null && currentStep > 0 ? (
-            <Text css={STEP_TEXT_STYLE} color={COLORS.darkGreyEnabled}>
+            <Text css={STEP_TEXT_STYLE} color={COLORS.grey50}>
               {i18n.t('shared.step', { current: currentStep, max: totalSteps })}
             </Text>
           ) : null}

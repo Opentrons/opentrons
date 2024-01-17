@@ -140,11 +140,7 @@ export function AvailableRobotOption(
         isSelected ? (
           <>
             <Box flex="1 1 auto" />
-            <Icon
-              name="alert-circle"
-              size="1.25rem"
-              color={COLORS.errorEnabled}
-            />
+            <Icon name="alert-circle" size="1.25rem" color={COLORS.red50} />
           </>
         ) : null}
       </MiniCard>
@@ -152,11 +148,11 @@ export function AvailableRobotOption(
       {isSelectedRobotOnDifferentSoftwareVersion && isSelected ? (
         <StyledText
           as="label"
-          color={COLORS.errorText}
+          color={COLORS.red60}
           marginBottom={SPACING.spacing8}
           css={css`
             & > a {
-              color: ${COLORS.errorText};
+              color: ${COLORS.red60};
               text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
             }
           `}

@@ -25,12 +25,12 @@ import type { IconName } from '@opentrons/components'
 const SETTING_BUTTON_STYLE = css`
   width: 100%;
   margin-bottom: ${SPACING.spacing8};
-  background-color: ${COLORS.light1};
+  background-color: ${COLORS.grey35};
   padding: ${SPACING.spacing20} ${SPACING.spacing24};
   border-radius: ${BORDERS.borderRadiusSize4};
 
   &:active {
-    background-color: ${COLORS.darkBlack40};
+    background-color: ${COLORS.grey50};
   }
 `
 
@@ -69,7 +69,7 @@ export function RobotSettingButton({
         whiteSpace="nowrap"
       >
         {iconName != null ? (
-          <Icon name={iconName} size="3rem" color={COLORS.darkBlack100} />
+          <Icon name={iconName} size="3rem" color={COLORS.black90} />
         ) : null}
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -82,7 +82,7 @@ export function RobotSettingButton({
           </StyledText>
           {settingInfo != null ? (
             <StyledText
-              color={COLORS.darkBlack70}
+              color={COLORS.grey60}
               as="h4"
               fontWeight={TYPOGRAPHY.fontWeightRegular}
               textAlign={TYPOGRAPHY.textAlignLeft}
@@ -96,7 +96,7 @@ export function RobotSettingButton({
         rightElement
       ) : (
         <Flex gridGap={SPACING.spacing40} alignItems={ALIGN_CENTER}>
-          <Icon name="more" size="3rem" color={COLORS.darkBlack100} />
+          <Icon name="more" size="3rem" color={COLORS.black90} />
         </Flex>
       )}
     </Btn>

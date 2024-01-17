@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { COLORS } from '../../../ui-style-constants'
-
+import { COLORS } from '../../../helix-design-system'
 interface ThermocyclerGEN1Props {
   lidMotorState: 'open' | 'closed'
   ledLightColor: string
@@ -23,7 +22,7 @@ export function ThermocyclerGEN1(props: ThermocyclerGEN1Props): JSX.Element {
       <g id="statusLight">
         <path
           fill={props.ledLightColor}
-          stroke={COLORS.black}
+          stroke={COLORS.black90}
           strokeWidth={0.5}
           d="M130.4,23.2H41.6c-1.9,0-3.4,1.5-3.4,3.4s1.5,3.4,3.4,3.4h88.8c1.9,0,3.4-1.5,3.4-3.4C133.8,24.7,132.3,23.2,130.4,23.2z"
         ></path>

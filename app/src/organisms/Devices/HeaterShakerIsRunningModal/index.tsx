@@ -50,7 +50,7 @@ export const HeaterShakerIsRunningModal = (
         name="alert-circle"
         marginX={SPACING.spacing8}
         size={SPACING.spacing20}
-        color={COLORS.warningEnabled}
+        color={COLORS.yellow50}
         data-testid="HeaterShakerIsRunning_warning_icon"
       />
       {t('heater_shaker_is_shaking')}

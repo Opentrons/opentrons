@@ -1,8 +1,7 @@
 // set of functions that parse details out of a protocol record and it's internals
 import reduce from 'lodash/reduce'
 
-import { COLORS } from '@opentrons/components/src/ui-style-constants'
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import { getLabwareDefURI, DEFAULT_LIQUID_COLORS } from '@opentrons/shared-data'
 import type {
   Liquid,
   LoadedLabware,
@@ -254,7 +253,7 @@ export function parseLiquidsInLoadOrder(
       ...liquid,
       displayColor:
         liquid.displayColor ??
-        COLORS.liquidColors[index % COLORS.liquidColors.length],
+        DEFAULT_LIQUID_COLORS[index % DEFAULT_LIQUID_COLORS.length],
     }
   })
 

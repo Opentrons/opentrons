@@ -50,9 +50,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
         }
         borderRadius={BORDERS.borderRadiusSize2}
         cursor={disabled ? 'auto' : 'pointer'}
-        backgroundColor={
-          disabled ? COLORS.darkGreyDisabled : COLORS.transparent
-        }
+        backgroundColor={disabled ? COLORS.grey30 : COLORS.transparent}
         onClick={disabled ? undefined : onClick}
         {...styleProps}
         {...targetProps}
@@ -62,7 +60,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
             aria-label={`EquipmentOption_${
               isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'
             }`}
-            color={isSelected ? COLORS.blueEnabled : COLORS.darkGreyEnabled}
+            color={isSelected ? COLORS.blue50 : COLORS.grey50}
             size="1.5rem"
             name={isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'}
           />
@@ -77,7 +75,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
         <Text
           as="p"
           fontSize={TYPOGRAPHY.fontSizeP}
-          color={disabled ? COLORS.errorDisabled : COLORS.darkBlackEnabled}
+          color={disabled ? COLORS.grey40 : COLORS.black90}
         >
           {text}
         </Text>
