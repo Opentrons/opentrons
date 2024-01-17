@@ -86,7 +86,9 @@
 
 .spinner_modal_contents {
   @apply --modal-contents;
-  @apply --font-body-2-light;
+  font-size: var(--fs-body-2); /* from legacy --font-body-2-light */
+  font-weight: var(--fw-regular); /* from legacy --font-body-2-light */
+  color: var(--c-font-light); /* from legacy --font-body-2-light */
   @apply center-content;
 
   max-width: 30rem;
