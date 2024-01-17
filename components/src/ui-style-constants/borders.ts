@@ -1,10 +1,5 @@
 import { css } from 'styled-components'
-import {
-  blueEnabled,
-  medGreyEnabled,
-  transparent,
-  medGreyHover,
-} from './colors'
+import { COLORS } from '../helix-design-system'
 
 export const radiusSoftCorners = '4px'
 export const radiusRoundEdge = '20px'
@@ -21,19 +16,19 @@ export const borderRadiusSize6 = '60px'
 export const tabBorder = css`
   border-bottom-style: ${styleSolid};
   border-bottom-width: 2px;
-  border-bottom-color: ${blueEnabled};
+  border-bottom-color: ${COLORS.blue50};
 `
 
-export const activeLineBorder = `1px ${styleSolid} ${blueEnabled}`
-export const lineBorder = `1px ${styleSolid} ${medGreyEnabled}`
-export const transparentLineBorder = `1px ${styleSolid} ${transparent}`
+export const activeLineBorder = `1px ${styleSolid} ${COLORS.blue50}`
+export const lineBorder = `1px ${styleSolid} ${COLORS.grey30}`
+export const transparentLineBorder = `1px ${styleSolid} ${COLORS.transparent}`
 export const cardOutlineBorder = css`
   border-style: ${styleSolid};
   border-width: 1px;
-  border-color: ${medGreyEnabled};
+  border-color: ${COLORS.grey30};
   border-radius: ${radiusSoftCorners};
   &:hover {
-    border-color: ${medGreyHover};
+    border-color: ${COLORS.grey55};
   }
 `
 

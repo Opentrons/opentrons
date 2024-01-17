@@ -27,7 +27,6 @@ import {
 
 import type { Protocol, Run } from '@opentrons/api-client'
 
-jest.mock('@opentrons/shared-data')
 jest.mock('@opentrons/api-client')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../redux/protocol-storage/selectors')

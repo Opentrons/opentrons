@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { TYPOGRAPHY, BORDERS, SPACING, COLORS } from '../ui-style-constants'
+import { TYPOGRAPHY, BORDERS, SPACING } from '../ui-style-constants'
+import { COLORS } from '../helix-design-system'
 import {
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,
@@ -20,11 +21,11 @@ const defaultTabStyle = css`
 `
 
 const inactiveTabStyle = css`
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50};
 
   &:hover {
-    color: ${COLORS.darkGreyEnabled};
-    background-color: ${COLORS.fundamentalsBackgroundShade};
+    color: ${COLORS.grey50};
+    background-color: ${COLORS.grey20};
   }
 `
 
@@ -34,7 +35,7 @@ const currentTabStyle = css`
   border-top: ${BORDERS.lineBorder};
   border-left: ${BORDERS.lineBorder};
   border-right: ${BORDERS.lineBorder};
-  color: ${COLORS.blueEnabled};
+  color: ${COLORS.blue50};
 
   /* extend below the tab when active to flow into the content */
   &:after {

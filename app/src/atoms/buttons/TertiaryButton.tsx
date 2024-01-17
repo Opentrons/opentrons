@@ -9,10 +9,10 @@ import {
 } from '@opentrons/components'
 
 export const TertiaryButton = styled(NewPrimaryBtn)`
-  background-color: ${COLORS.blueEnabled};
+  background-color: ${COLORS.blue50};
   border-radius: ${BORDERS.radiusRoundEdge};
   box-shadow: none;
-  color: ${COLORS.fundamentalsBackground};
+  color: ${COLORS.grey10};
   overflow: no-wrap;
   padding-left: ${SPACING.spacing16};
   padding-right: ${SPACING.spacing16};
@@ -23,20 +23,20 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
   ${styleProps}
 
   &:hover {
-    background-color: ${COLORS.blueHover};
+    background-color: ${COLORS.blue55};
     box-shadow: none;
   }
 
   &:active {
-    background-color: ${COLORS.bluePressed};
+    background-color: ${COLORS.blue60};
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
+    box-shadow: 0 0 0 3px ${COLORS.yellow50};
   }
 
   &:disabled {
-    background-color: ${COLORS.darkGreyDisabled};
-    color: ${COLORS.errorDisabled};
+    background-color: ${COLORS.grey30};
+    color: ${COLORS.grey40};
   }
 `

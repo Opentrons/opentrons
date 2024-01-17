@@ -189,7 +189,7 @@ export function Toast(props: ToastProps): JSX.Element {
   const ODD_ANIMATION_NONE = css``
 
   const TEXT_STYLE = css`
-    color: ${COLORS.darkBlackEnabled};
+    color: ${COLORS.black90};
     font-size: ${showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP};
     font-weight: ${showODDStyle
       ? TYPOGRAPHY.fontWeightSemiBold
@@ -227,31 +227,23 @@ export function Toast(props: ToastProps): JSX.Element {
   } = {
     [ERROR_TOAST]: {
       iconName: 'ot-alert',
-      color: `${showODDStyle ? COLORS.red2 : COLORS.errorEnabled}`,
-      backgroundColor: `${
-        showODDStyle ? COLORS.red4 : COLORS.errorBackgroundLight
-      }`,
+      color: `${showODDStyle ? COLORS.red50 : COLORS.red50}`,
+      backgroundColor: `${showODDStyle ? COLORS.red30 : COLORS.red20}`,
     },
     [INFO_TOAST]: {
       iconName: 'information',
-      color: `${showODDStyle ? COLORS.grey2 : COLORS.darkGreyEnabled}`,
-      backgroundColor: `${
-        showODDStyle ? COLORS.grey4 : COLORS.darkGreyDisabled
-      }`,
+      color: `${showODDStyle ? COLORS.grey50 : COLORS.grey50}`,
+      backgroundColor: `${showODDStyle ? COLORS.grey30 : COLORS.grey30}`,
     },
     [SUCCESS_TOAST]: {
       iconName: 'ot-check',
-      color: `${showODDStyle ? COLORS.green2 : COLORS.successEnabled}`,
-      backgroundColor: `${
-        showODDStyle ? COLORS.green4 : COLORS.successBackgroundLight
-      }`,
+      color: `${showODDStyle ? COLORS.green50 : COLORS.green50}`,
+      backgroundColor: `${showODDStyle ? COLORS.green30 : COLORS.green20}`,
     },
     [WARNING_TOAST]: {
       iconName: 'ot-alert',
-      color: `${showODDStyle ? COLORS.yellow2 : COLORS.warningEnabled}`,
-      backgroundColor: `${
-        showODDStyle ? COLORS.yellow4 : COLORS.warningBackgroundLight
-      }`,
+      color: `${COLORS.yellow50}`,
+      backgroundColor: `${showODDStyle ? COLORS.yellow30 : COLORS.yellow20}`,
     },
   }
 
@@ -358,7 +350,7 @@ export function Toast(props: ToastProps): JSX.Element {
         >
           {headingText.length > 0 ? (
             <StyledText
-              color={COLORS.darkBlackEnabled}
+              color={COLORS.black90}
               fontSize={
                 showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
               }
@@ -402,7 +394,7 @@ export function Toast(props: ToastProps): JSX.Element {
       {closeText ? (
         <Link role="button" onClick={() => onCloseHandler()}>
           <StyledText
-            color={COLORS.darkBlackEnabled}
+            color={COLORS.black90}
             fontSize={
               showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
             }

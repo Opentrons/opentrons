@@ -222,11 +222,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             css={css`
             ${TYPOGRAPHY.darkLinkH4SemiBold}
             &:hover {
-              color: ${
-                downloadIsDisabled
-                  ? COLORS.darkGreyEnabled
-                  : COLORS.darkBlackEnabled
-              };
+              color: ${downloadIsDisabled ? COLORS.grey50 : COLORS.black90};
             }
             cursor: ${downloadIsDisabled ? 'default' : 'pointer'};
           }
@@ -256,14 +252,14 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             }
             outerStyles={css`
               height: 0.375rem;
-              background-color: ${COLORS.medGreyEnabled};
+              background-color: ${COLORS.grey30};
               border-radius: ${BORDERS.radiusSoftCorners};
               position: relative;
               overflow: initial;
             `}
             innerStyles={css`
               height: 0.375rem;
-              background-color: ${COLORS.darkGreyEnabled};
+              background-color: ${COLORS.grey50};
               border-radius: ${BORDERS.radiusSoftCorners};
             `}
           >
