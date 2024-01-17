@@ -128,8 +128,8 @@ describe('Selected TabbedButton', () => {
     const { getByText } = render(props)
     const button = getByText('tabbed button')
     expect(button).toBeDisabled()
-    expect(button).toHaveStyle(`background-color: #16212d33`)
-    expect(button).toHaveStyle(`color: #16212d99`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.grey35}`)
+    expect(button).toHaveStyle(`color: ${COLORS.grey50}`)
   })
 
   it('applies the correct states to the selected tabbed button - active', () => {
