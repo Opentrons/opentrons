@@ -87,7 +87,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         await api.home([ax])
         if not api.is_simulator:
             if expected_state:
-                ui.get_user_ready("press on tips to channels A1 + H12")               
+                ui.get_user_ready("press on tips to channels A1 + H12")
             else:
                 ui.get_user_ready("remove all tips from the pipette")
         if not api.is_simulator:
