@@ -64,7 +64,7 @@
     "autoprefixer": "^10.0.2",
     "postcss": "^8.1.7",
     "postcss-loader": "^4.0.4",
-    "postcss-preset-env": "9.3.0"
-
+    "postcss-preset-env": "9.3.0",
+    "postcss-color-mod-function": "3.0.3"
   }
 }

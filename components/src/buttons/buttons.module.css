@@ -33,14 +33,18 @@
       /* from legacy --button-disabled */
     }
 
-    /* stylelint-disable no-descending-specificity */
-    &:focus,
-    &:hover,
+    &:focus {
+      background-color: color-mod(var(--c-bg-dark) tint(5%));
+    }
+
+    &:hover {
+      background-color: color-mod(var(--c-bg-dark) tint(5%));
+    }
+
     &.hover {
       background-color: color-mod(var(--c-bg-dark) tint(5%));
     }
 
-    /* stylelint-enable */
     /* ^^^ from legacy --button-default ^^^ */
   }
 }
@@ -87,14 +91,18 @@
     /* from legacy --button-disabled */
   }
 
-  /* stylelint-disable no-descending-specificity */
-  &:focus,
-  &:hover,
+  &:focus {
+    background-color: color-mod(var(--c-med-gray) alpha(25%));
+  }
+
+  &:hover {
+    background-color: color-mod(var(--c-med-gray) alpha(25%));
+  }
+
   &.hover {
     background-color: color-mod(var(--c-med-gray) alpha(25%));
   }
 
-  /* stylelint-enable */
   /* ^^^ from legacy --button-default ^^^ */
 
   width: 100%;
@@ -105,8 +113,14 @@
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.12),
   0 2px 2px rgba(0, 0, 0, 0.24);
 
-  &:focus,
-  &:hover,
+  &:focus {
+    background-color: color-mod(var(--c-bg-dark) shade(30%));
+  }
+
+  &:hover {
+    background-color: color-mod(var(--c-bg-dark) shade(30%));
+  }
+
   &.hover {
     background-color: color-mod(var(--c-bg-dark) shade(30%));
   }
@@ -200,14 +214,18 @@
     /* from legacy --button-disabled */
   }
 
-  /* stylelint-disable no-descending-specificity */
-  &:focus,
-  &:hover,
+  &:focus {
+    background-color: color-mod(var(--c-med-gray) alpha(25%));
+  }
+
+  &:hover {
+    background-color: color-mod(var(--c-med-gray) alpha(25%));
+  }
+
   &.hover {
     background-color: color-mod(var(--c-med-gray) alpha(25%));
   }
 
-  /* stylelint-enable */
   /* ^^^ from legacy --button-default ^^^ */
 
 
@@ -242,14 +260,18 @@
       /* from legacy --button-disabled */
     }
 
-    /* stylelint-disable no-descending-specificity */
-    &:focus,
-    &:hover,
+    &:focus {
+      background-color: color-mod(var(--c-bg-dark) tint(5%));
+    }
+
+    &:hover {
+      background-color: color-mod(var(--c-bg-dark) tint(5%));
+    }
+
     &.hover {
       background-color: color-mod(var(--c-bg-dark) tint(5%));
     }
 
-    /* stylelint-enable */
     /* ^^^ from legacy --button-default ^^^ */
   }
 }
@@ -294,14 +316,18 @@
     /* from legacy --button-disabled */
   }
 
-  /* stylelint-disable no-descending-specificity */
-  &:focus,
-  &:hover,
+  &:focus {
+    background-color: color-mod(var(--c-med-gray) alpha(25%));
+  }
+
+  &:hover {
+    background-color: color-mod(var(--c-med-gray) alpha(25%));
+  }
+
   &.hover {
     background-color: color-mod(var(--c-med-gray) alpha(25%));
   }
 
-  /* stylelint-enable */
   /* ^^^ from legacy --button-default ^^^ */
 
   width: 9rem;
@@ -335,14 +361,18 @@
       /* from legacy --button-disabled */
     }
 
-    /* stylelint-disable no-descending-specificity */
-    &:focus,
-    &:hover,
+    &:focus {
+      background-color: color-mod(var(--c-bg-dark) tint(5%));
+    }
+
+    &:hover {
+      background-color: color-mod(var(--c-bg-dark) tint(5%));
+    }
+
     &.hover {
       background-color: color-mod(var(--c-bg-dark) tint(5%));
     }
 
-    /* stylelint-enable */
     /* ^^^ from legacy --button-default ^^^ */
   }
 }

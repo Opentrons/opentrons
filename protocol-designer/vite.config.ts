@@ -1,8 +1,9 @@
 import path from 'path'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import postCssApply from 'postcss-apply'
 import postCssImport from 'postcss-import'
+import postCssApply from 'postcss-apply'
+import postColorModFunction from 'postcss-color-mod-function'
 import postCssPresetEnv from 'postcss-preset-env'
 
 export default defineConfig({
@@ -20,24 +21,10 @@ export default defineConfig({
   css: {
     postcss: {
       plugins: [
-        postCssImport({
-          root: 'src/',
-        }),
+        postCssImport({ root: 'src/' }),
         postCssApply(),
-        postCssPresetEnv({
-          stage: 0,
-          features: {
-            'logical-properties-and-values': false,
-            'prefers-color-scheme-query': false,
-            'gap-properties': false,
-            'custom-properties': false,
-            'place-properties': false,
-            'not-pseudo-class': false,
-            'focus-visible-pseudo-class': false,
-            'focus-within-pseudo-class': false,
-            'color-functional-notation': false,
-          },
-        }),
+        postColorModFunction(),
+        postCssPresetEnv({ stage: 0 }),
       ],
     },
   },
