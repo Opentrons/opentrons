@@ -27,35 +27,35 @@ const IFACE_POLL_INTERVAL_MS = 30000
 const log = createLogger('system-info')
 
 // format USBDevice to UsbDevice type
-const createUsbDevice = (
-  device: USBDevice,
-  windowsDriverVersion?: string | null
-): UsbDevice => ({
-  vendorId: device.vendorId,
-  productId: device.productId,
-  deviceName: device.productName != null ? device.productName : 'no name',
-  manufacturer:
-    device.manufacturerName != null
-      ? device.manufacturerName
-      : 'no manufacture',
-  serialNumber: device.serialNumber != null ? device.serialNumber : 'no serial',
-  windowsDriverVersion,
-})
+const createUsbDevice = (device: USBDevice): UsbDevice => {
+  return {
+    vendorId: device.vendorId,
+    productId: device.productId,
+    deviceName: device.productName != null ? device.productName : 'no name',
+    manufacturer:
+      device.manufacturerName != null
+        ? device.manufacturerName
+        : 'no manufacture',
+    serialNumber:
+      device.serialNumber != null ? device.serialNumber : 'no serial',
+  }
+}
+const createUsbDevices = (devices: USBDevice[]): UsbDevice[] =>
+  devices.map((device: USBDevice) => createUsbDevice(device))
 
-const addDriverVersion = (device: USBDevice): Promise<UsbDevice> => {
+const addDriverVersion = (device: UsbDevice): Promise<UsbDevice> => {
   if (
     isWindows() &&
-    device.manufacturerName != null &&
-    RE_REALTEK.test(device.manufacturerName)
+    device.manufacturer != null &&
+    RE_REALTEK.test(device.manufacturer)
   ) {
-    return getWindowsDriverVersion(
-      createUsbDevice(device)
-    ).then(windowsDriverVersion =>
-      createUsbDevice(device, windowsDriverVersion)
-    )
+    return getWindowsDriverVersion(device).then(windowsDriverVersion => ({
+      ...device,
+      windowsDriverVersion,
+    }))
   }
 
-  return Promise.resolve(createUsbDevice(device))
+  return Promise.resolve(device)
 }
 
 export function registerSystemInfo(
@@ -64,13 +64,13 @@ export function registerSystemInfo(
   let usbMonitor: UsbDeviceMonitor
   let ifaceMonitor: NetworkInterfaceMonitor
 
-  const handleDeviceAdd = (device: USBDevice): void => {
+  const handleDeviceAdd = (device: UsbDevice): void => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     addDriverVersion(device).then(d => dispatch(SystemInfo.usbDeviceAdded(d)))
   }
 
-  const handleDeviceRemove = (d: USBDevice): void => {
-    dispatch(SystemInfo.usbDeviceRemoved(createUsbDevice(d)))
+  const handleDeviceRemove = (d: UsbDevice): void => {
+    dispatch(SystemInfo.usbDeviceRemoved(d))
   }
 
   const handleIfacesChanged = (interfaces: NetworkInterface[]): void => {
@@ -110,7 +110,9 @@ export function registerSystemInfo(
 
         usbMonitor
           .getAllDevices()
-          .then(devices => Promise.all(devices.map(addDriverVersion)))
+          .then(devices =>
+            Promise.all(createUsbDevices(devices).map(addDriverVersion))
+          )
           .then(devices => {
             dispatch(SystemInfo.initialized(devices, getActiveInterfaces()))
           })

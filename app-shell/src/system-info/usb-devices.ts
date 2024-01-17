@@ -7,8 +7,8 @@ import { createLogger } from '../log'
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 
 export type UsbDeviceMonitorOptions = Partial<{
-  onDeviceAdd?: (device: USBDevice) => void
-  onDeviceRemove?: (device: USBDevice) => void
+  onDeviceAdd?: (device: UsbDevice) => void
+  onDeviceRemove?: (device: UsbDevice) => void
 }>
 
 export interface UsbDeviceMonitor {
