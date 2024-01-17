@@ -50,8 +50,9 @@ const decToHex = (number: number): string =>
   number.toString(16).toUpperCase().padStart(4, '0')
 
 export function getWindowsDriverVersion(
-  device: UsbDevice
+  device: USBDevice
 ): Promise<string | null> {
+  console.log('getWindowsDriverVersion', device)
   const { vendorId: vidDecimal, productId: pidDecimal, serialNumber } = device
   const [vid, pid] = [decToHex(vidDecimal), decToHex(pidDecimal)]
 

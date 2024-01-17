@@ -38,7 +38,7 @@ describe('app-shell::system-info::usb-devices', () => {
     const onDeviceAdd = jest.fn()
     createUsbDeviceMonitor({ onDeviceAdd })
 
-    usb.on('attach', mockDevice)
+    usb.on('attach', mockDevice => onDeviceAdd)
 
     expect(onDeviceAdd).toHaveBeenCalledWith(mockDevice)
   })
@@ -47,7 +47,7 @@ describe('app-shell::system-info::usb-devices', () => {
     const onDeviceRemove = jest.fn()
     createUsbDeviceMonitor({ onDeviceRemove })
 
-    usb.on('detach', mockDevice)
+    usb.on('detach', mockDevice => onDeviceRemove)
 
     expect(onDeviceRemove).toHaveBeenCalledWith(mockDevice)
   })

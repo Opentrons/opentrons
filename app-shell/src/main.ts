@@ -1,6 +1,7 @@
 // electron main entry point
 import { app, ipcMain } from 'electron'
 import contextMenu from 'electron-context-menu'
+import { webusb } from 'usb'
 
 import { createUi } from './ui'
 import { initializeMenu } from './menu'
@@ -14,6 +15,7 @@ import { registerSystemInfo } from './system-info'
 import { registerProtocolStorage } from './protocol-storage'
 import { getConfig, getStore, getOverrides, registerConfig } from './config'
 import { registerUsb } from './usb'
+import { createUsbDeviceMonitor } from './system-info/usb-devices'
 
 import type { BrowserWindow } from 'electron'
 import type { Dispatch, Logger } from './types'
@@ -44,6 +46,8 @@ if (config.devtools) app.once('ready', installDevtools)
 
 app.once('window-all-closed', () => {
   log.debug('all windows closed, quitting the app')
+  webusb.removeEventListener('connect', () => createUsbDeviceMonitor())
+  webusb.removeEventListener('disconnect', () => createUsbDeviceMonitor())
   app.quit()
 })
 
@@ -54,6 +58,8 @@ function startUp(): void {
     log.error('Uncaught Promise rejection: ', { reason })
   )
 
+  webusb.addEventListener('connect', () => createUsbDeviceMonitor())
+  webusb.addEventListener('disconnect', () => createUsbDeviceMonitor())
   mainWindow = createUi()
   rendererLogger = createRendererLogger()
 
