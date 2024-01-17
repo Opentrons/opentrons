@@ -21,51 +21,51 @@
   --lh-copy: 1.5;
 
   --font-default-dark: {
-    font-size: var(--fs-default);
-    font-weight: var(--fw-regular);
-    color: var(--c-font-dark);
+    font-size: var(--fs-default); /* from legacy --font-default-dark */
+    font-weight: var(--fw-regular); /* from legacy --font-default-dark */
+    color: var(--c-font-dark); /* from legacy --font-default-dark */
   };
 
   --font-body-2-dark: {
-    font-size: var(--fs-body-2);
-    font-weight: var(--fw-regular);
-    color: var(--c-font-dark);
+    font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
+    font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
+    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
   };
 
   --font-body-2-light: {
-    font-size: var(--fs-body-2);
-    font-weight: var(--fw-regular);
-    color: var(--c-font-light);
+    font-size: var(--fs-body-2); /* from legacy --font-body-2-light */
+    font-weight: var(--fw-regular); /* from legacy --font-body-2-light */
+    color: var(--c-font-light); /* from legacy --font-body-2-light */
   };
 
   --font-body-1-dark: {
-    font-size: var(--fs-body-1);
-    font-weight: var(--fw-regular);
-    color: var(--c-font-dark);
+    font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
+    font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
+    color: var(--c-font-dark); /* from legacy --font-body-1-dark */
   };
 
   --font-body-1-light: {
-    font-size: var(--fs-body-1);
-    font-weight: var(--fw-regular);
-    color: var(--c-font-light);
+    font-size: var(--fs-body-1); /* from legacy --font-body-1-light */
+    font-weight: var(--fw-regular); /* from legacy --font-body-1-light */
+    color: var(--c-font-light); /* from legacy --font-body-1-light */
   };
 
   --font-form-default: {
-    font-size: var(--fs-body-1);
-    font-weight: var(--fw-regular);
-    color: var(--c-font-dark);
+    font-size: var(--fs-body-1); /* from legacy --font-form-default */
+    font-weight: var(--fw-regular); /* from legacy --font-form-default */
+    color: var(--c-font-dark); /* from legacy --font-form-default */
   };
 
   --font-form-caption: {
-    font-size: var(--fs-caption);
-    font-weight: var(--fw-semibold);
-    color: var(--c-med-gray);
+    font-size: var(--fs-caption); /* from legacy --font-form-caption */
+    font-weight: var(--fw-semibold); /* from legacy --font-form-caption */
+    color: var(--c-med-gray); /* from legacy --font-form-caption */
   };
 
   --truncate: {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    min-width: 0;
+    white-space: nowrap; /* from legacy --truncate */
+    overflow: hidden; /* from legacy --truncate */
+    text-overflow: ellipsis; /* from legacy --truncate */
+    min-width: 0; /* from legacy --truncate */
   };
 }

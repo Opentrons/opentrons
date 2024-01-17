@@ -9,7 +9,9 @@
   z-index: 9999;
 
   & h2 {
-    @apply --font-default-dark;
+    font-size: var(--fs-default); /* from legacy --font-default-dark */
+    font-weight: var(--fw-regular); /* from legacy --font-default-dark */
+    color: var(--c-font-dark); /* from legacy --font-default-dark */
 
     line-height: var(--lh-title);
     font-weight: var(--fw-semibold);
