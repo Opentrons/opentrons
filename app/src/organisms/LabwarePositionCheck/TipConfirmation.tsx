@@ -35,7 +35,7 @@ export function TipConfirmation(props: TipConfirmationProps): JSX.Element {
   return isOnDevice ? (
     <SimpleWizardBody
       isSuccess={false}
-      iconColor={COLORS.warningEnabled}
+      iconColor={COLORS.yellow50}
       header={t('did_pipette_pick_up_tip')}
     >
       <Flex

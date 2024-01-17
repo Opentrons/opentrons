@@ -245,7 +245,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
   return (
     <Flex
-      backgroundColor={COLORS.fundamentalsBackground}
+      backgroundColor={COLORS.grey10}
       borderRadius={SPACING.spacing4}
       width="100%"
       data-testid={`ModuleCard_${module.serialNumber}`}
@@ -382,7 +382,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               <>
                 <StyledText
                   textTransform={TYPOGRAPHY.textTransformUppercase}
-                  color={COLORS.darkGreyEnabled}
+                  color={COLORS.grey50}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   fontSize={TYPOGRAPHY.fontSizeH6}
                   paddingBottom={SPACING.spacing4}
@@ -407,7 +407,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                     moduleType={module.moduleType}
                     size="1rem"
                     marginRight={SPACING.spacing2}
-                    color={COLORS.darkGreyEnabled}
+                    color={COLORS.grey50}
                   />
                   <StyledText>
                     {getModuleDisplayName(module.moduleModel)}

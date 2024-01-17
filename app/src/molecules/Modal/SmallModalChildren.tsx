@@ -31,7 +31,7 @@ export function SmallModalChildren(
         whiteSpace="break-spaces"
       >
         <StyledText
-          color={COLORS.darkBlackEnabled}
+          color={COLORS.black90}
           fontSize={TYPOGRAPHY.fontSize28}
           fontWeight={TYPOGRAPHY.fontWeightBold}
           lineHeight={TYPOGRAPHY.lineHeight36}
@@ -40,7 +40,7 @@ export function SmallModalChildren(
           {header}
         </StyledText>
         <StyledText
-          color={COLORS.darkBlack90}
+          color={COLORS.grey60}
           fontSize={TYPOGRAPHY.fontSize22}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           lineHeight={TYPOGRAPHY.lineHeight28}

@@ -23,20 +23,20 @@ const StyledLabel = styled.label`
   align-items: ${ALIGN_CENTER};
   width: 100%;
   padding: ${SPACING.spacing32};
-  border: 2px dashed ${COLORS.medGreyEnabled};
+  border: 2px dashed ${COLORS.grey30};
   border-radius: ${BORDERS.radiusSoftCorners};
   text-align: center;
   background-color: ${COLORS.white};
 
   &:hover,
   &:focus-within {
-    background-color: ${COLORS.lightBlue};
-    border: 2px dashed ${COLORS.blueEnabled};
+    background-color: ${COLORS.blue10};
+    border: 2px dashed ${COLORS.blue50};
   }
 `
 const DRAG_OVER_STYLES = css`
-  background-color: ${COLORS.lightBlue};
-  border: 2px dashed ${COLORS.blueEnabled};
+  background-color: ${COLORS.blue10};
+  border: 2px dashed ${COLORS.blue50};
 `
 
 const StyledInput = styled.input`
@@ -120,7 +120,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
       >
         <Icon
           width={SIZE_3}
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey50}
           name="upload"
           marginBottom={SPACING.spacing24}
         />

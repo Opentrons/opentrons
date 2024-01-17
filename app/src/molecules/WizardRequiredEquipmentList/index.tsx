@@ -71,7 +71,7 @@ export function WizardRequiredEquipmentList(
                 {/* do not show divider after the last equipment in the list */}
                 {index + 1 === Object.keys(equipmentList).length ? null : (
                   <Box
-                    borderBottom={`1px solid ${COLORS.darkBlackEnabled}${COLORS.opacity20HexCode}`}
+                    borderBottom={`1px solid ${COLORS.black90}${COLORS.opacity20HexCode}`}
                   />
                 )}
               </Box>
@@ -98,7 +98,7 @@ export function WizardRequiredEquipmentList(
             <StyledText
               marginTop={SPACING.spacing8}
               as="label"
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.grey50}
             >
               {footer}
             </StyledText>
@@ -160,7 +160,7 @@ function RequiredEquipmentCard(props: RequiredEquipmentCardProps): JSX.Element {
         >
           <StyledText as="p">{displayName}</StyledText>
           {subtitle != null ? (
-            <StyledText as="p" color={COLORS.darkGreyEnabled}>
+            <StyledText as="p" color={COLORS.grey50}>
               {subtitle}
             </StyledText>
           ) : null}

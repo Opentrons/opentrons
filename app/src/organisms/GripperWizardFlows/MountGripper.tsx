@@ -28,7 +28,7 @@ import type { BadGripper, GripperData } from '@opentrons/api-client'
 
 const GO_BACK_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50};
   padding-left: ${SPACING.spacing32};
 
   &:hover {
@@ -90,7 +90,7 @@ export const MountGripper = (
   return showUnableToDetect ? (
     <SimpleWizardBody
       header={t('unable_to_detect_gripper')}
-      iconColor={COLORS.errorEnabled}
+      iconColor={COLORS.red50}
       isSuccess={false}
     >
       <Flex

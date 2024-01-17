@@ -22,7 +22,7 @@ import { LabwareRender } from '../Labware'
 import { FlexTrash } from '../Deck/FlexTrash'
 import { DeckFromLayers } from '../Deck/DeckFromLayers'
 import { SlotLabels } from '../Deck'
-import { COLORS } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 
 import { Svg } from '../../primitives'
 import { SingleSlotFixture } from './SingleSlotFixture'
@@ -84,9 +84,9 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
     robotType,
     modulesOnDeck = [],
     labwareOnDeck = [],
-    lightFill = COLORS.light1,
-    mediumFill = COLORS.grey2,
-    darkFill = COLORS.darkBlack70,
+    lightFill = COLORS.grey35,
+    mediumFill = COLORS.grey50,
+    darkFill = COLORS.grey60,
     deckLayerBlocklist = [],
     deckConfig,
     showExpansion = true,
@@ -141,7 +141,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           {showSlotLabels ? (
             <SlotLabels
               robotType={robotType}
-              color={COLORS.darkBlackEnabled}
+              color={COLORS.black90}
               show4thColumn={
                 stagingAreaFixtures.length > 0 ||
                 wasteChuteStagingAreaFixtures.length > 0

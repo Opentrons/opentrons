@@ -45,7 +45,7 @@ describe('RobotTypeTile', () => {
     const flex = screen.getByLabelText('RobotTypeTile_OT-3 Standard')
     fireEvent.click(flex)
     expect(props.setFieldValue).toHaveBeenCalled()
-    expect(flex).toHaveStyle(`background-color: ${COLORS.lightBlue}`)
+    expect(flex).toHaveStyle(`background-color: ${COLORS.blue10}`)
     const ot2 = screen.getByLabelText('RobotTypeTile_OT-2 Standard')
     fireEvent.click(ot2)
     expect(props.setFieldValue).toHaveBeenCalled()

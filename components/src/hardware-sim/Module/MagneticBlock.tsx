@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { COLORS } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 
 export function MagneticBlock(): JSX.Element {
   return (
@@ -8,7 +8,7 @@ export function MagneticBlock(): JSX.Element {
         <rect
           style={{
             fill: '#e6e6e6',
-            stroke: COLORS.black,
+            stroke: COLORS.black90,
             strokeLinecap: 'round',
             strokeLinejoin: 'round',
             strokeWidth: '0.71px',
@@ -25,7 +25,7 @@ export function MagneticBlock(): JSX.Element {
         <path
           style={{
             fill: 'none',
-            stroke: COLORS.black,
+            stroke: COLORS.black90,
             strokeLinecap: 'round',
             strokeLinejoin: 'round',
             strokeWidth: '0.71px',

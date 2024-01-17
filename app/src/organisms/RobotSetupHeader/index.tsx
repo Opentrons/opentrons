@@ -49,7 +49,7 @@ export function RobotSetupHeader({
             position={POSITION_ABSOLUTE}
             left="0"
           >
-            <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
+            <Icon name="back" size="3rem" color={COLORS.black90} />
           </Btn>
         ) : null}
         <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
