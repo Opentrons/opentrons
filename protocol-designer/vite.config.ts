@@ -11,7 +11,12 @@ export default defineConfig({
     // Relative to the root
     outDir: 'dist',
   },
-  plugins: [react()],
+  plugins: [react({
+    babel: {
+      // Use babel.config.js files
+      configFile: true,
+    }
+  })],
   optimizeDeps: {
     esbuildOptions: {
       target: 'es2020',
