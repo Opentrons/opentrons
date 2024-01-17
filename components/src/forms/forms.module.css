@@ -154,7 +154,9 @@
 }
 
 .input_caption {
-  @apply --font-form-caption;
+  font-size: var(--fs-caption); /* from legacy --font-form-caption */
+  font-weight: var(--fw-semibold); /* from legacy --font-form-caption */
+  color: var(--c-med-gray); /* from legacy --font-form-caption */
 
   line-height: 1.2;
 

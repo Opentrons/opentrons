@@ -20,12 +20,6 @@
   --lh-title: 1.25;
   --lh-copy: 1.5;
   
-  --font-form-caption: {
-    font-size: var(--fs-caption); /* from legacy --font-form-caption */
-    font-weight: var(--fw-semibold); /* from legacy --font-form-caption */
-    color: var(--c-med-gray); /* from legacy --font-form-caption */
-  };
-
   --truncate: {
     white-space: nowrap; /* from legacy --truncate */
     overflow: hidden; /* from legacy --truncate */
