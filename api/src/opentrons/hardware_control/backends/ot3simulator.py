@@ -429,7 +429,7 @@ class OT3Simulator(FlexBackend):
     async def tip_action(
         self, origin: Dict[Axis, float], targets: List[Tuple[Dict[Axis, float], float]]
     ) -> None:
-        self._position.update(
+        self._gear_motor_position.update(
             coalesce_move_segments(origin, [target[0] for target in targets])
         )
         await asyncio.sleep(0)

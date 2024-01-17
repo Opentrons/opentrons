@@ -1228,10 +1228,10 @@ async def test_gripper_move_to(
     await ot3_hardware.cache_gripper(instr_data)
 
     await ot3_hardware.move_to(OT3Mount.GRIPPER, Point(0, 0, 0))
-    _, moves, _ = mock_backend_move.call_args_list[0][0]
-    for move in moves:
+    origin, target, _, _ = mock_backend_move.call_args_list[0][0]
+    for pos in (origin, target):
         assert sorted(
-            move.unit_vector.keys(), key=lambda elem: cast(int, elem.value)
+            pos.keys(), key=lambda elem: cast(int, elem.value)
         ) == sorted(
             [
                 Axis.X,
@@ -1450,7 +1450,7 @@ async def test_move_expect_stall_flag(
 
     await ot3_hardware.move_to(Mount.LEFT, Point(0, 0, 0), _expect_stalls=expect_stalls)
     mock_backend_move.assert_called_once()
-    _, _, condition = mock_backend_move.call_args_list[0][0]
+    _, _, _, condition = mock_backend_move.call_args_list[0][0]
     assert condition == expected
 
     mock_backend_move.reset_mock()
@@ -1458,7 +1458,7 @@ async def test_move_expect_stall_flag(
         Mount.LEFT, Point(10, 0, 0), _expect_stalls=expect_stalls
     )
     mock_backend_move.assert_called_once()
-    _, _, condition = mock_backend_move.call_args_list[0][0]
+    _, _, _, condition = mock_backend_move.call_args_list[0][0]
     assert condition == expected
 
 
@@ -1528,7 +1528,6 @@ async def test_reset_instrument_offset(
 )
 def test_get_instrument_offset(
     ot3_hardware: ThreadManager[OT3API],
-    mount: OT3Mount,
     mount_expected_offset: Union[
         Tuple[Literal[OT3Mount.GRIPPER], GripperCalibrationOffset],
         Tuple[Literal[OT3Mount.RIGHT], PipetteOffsetByPipetteMount],
@@ -1676,21 +1675,14 @@ async def test_drop_tip_full_tiprack(
             mock_instr.plunger_positions.bottom = -18.5
 
         def _update_gear_motor_pos(
-            moves: Optional[List[Move[Axis]]] = None,
-            distance: Optional[float] = None,
-            velocity: Optional[float] = None,
-            tip_action: str = "home",
+            origin: Dict[Axis, float], targets: List[Tuple[Dict[Axis, float], float]]
         ) -> None:
             if Axis.P_L not in hardware_backend._gear_motor_position:
                 hardware_backend._gear_motor_position = {Axis.P_L: 0.0}
-            if moves:
-                for move in moves:
-                    for block in move.blocks:
-                        hardware_backend._gear_motor_position[Axis.P_L] += float(
-                            block.distance
-                        )
-            elif distance:
-                hardware_backend._gear_motor_position[Axis.P_L] += distance
+            for target in targets:
+                hardware_backend._gear_motor_position[Axis.P_L] += float(
+                    target[Axis.P_L]
+                )
 
         tip_action.side_effect = _update_gear_motor_pos
         set_mock_plunger_configs()
@@ -1834,15 +1826,15 @@ async def test_home_axis(
             if axis in [Axis.Z_L, Axis.P_L]:
                 # move is called
                 mock_hardware_backend_move.assert_awaited_once()
-                move = mock_hardware_backend_move.call_args_list[0][0][1][0]
-                assert move.distance == 95.0
+                distance = mock_hardware_backend_move.call_args_list[0][0][1][axis]
+                assert distance == 95.0
                 # then home is called
                 mock_hardware_backend_home.assert_awaited_once()
             else:
                 # we move to 20 mm away from home
                 mock_hardware_backend_move.assert_awaited_once()
-                move = mock_hardware_backend_move.call_args_list[0][0][1][0]
-                assert move.distance == 80.0
+                distance = mock_hardware_backend_move.call_args_list[0][0][1][axis]
+                assert distance == 80.0
                 # then home is called
                 mock_hardware_backend_home.assert_awaited_once()
         else:

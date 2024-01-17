@@ -68,9 +68,9 @@ async def test_transform_values(
             (target.z - right_offset[2] - sim.config.right_mount_offset[2]) * -1
             + sim.config.carriage_offset[2],
         ]
-        assert mock_move.call_args[2][Axis.X] == point[0]
-        assert mock_move.call_args[2][Axis.Y] == point[1]
-        assert mock_move.call_args[2][Axis.Z_R] == point[2]
+        assert mock_move.call_args[0][1][Axis.X] == point[0]
+        assert mock_move.call_args[0][1][Axis.Y] == point[1]
+        assert mock_move.call_args[0][1][Axis.Z_R] == point[2]
 
     with mock.patch.object(
         sim._backend,
@@ -90,6 +90,6 @@ async def test_transform_values(
             (target.z - left_offset[2] - sim.config.left_mount_offset[2]) * -1
             + sim.config.carriage_offset[2],
         ]
-        assert mock_move.call_args[2][Axis.X] == point[0]
-        assert mock_move.call_args[2][Axis.Y] == point[1]
-        assert mock_move.call_args[2][Axis.Z_L] == point[2]
+        assert mock_move.call_args[0][1][Axis.X] == point[0]
+        assert mock_move.call_args[0][1][Axis.Y] == point[1]
+        assert mock_move.call_args[0][1][Axis.Z_L] == point[2]

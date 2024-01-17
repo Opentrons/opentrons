@@ -177,7 +177,6 @@ async def test_find_edge(
     override_cal_config: None,
     mock_verify_edge: AsyncMock,
     mock_move_to: AsyncMock,
-    search_axis: Axis,
     direction_if_hit: Literal[1, -1],
     probe_results: Tuple[float, float, float],
     search_result: float,
@@ -192,14 +191,14 @@ async def test_find_edge(
         direction_if_hit,
         False,
     )
-    assert search_axis.of_point(result) == search_result
+    assert Axis.X.of_point(result) == search_result
     # the first move is in z only to the cal height
     checked_calls = mock_move_to.call_args_list[1:]
     # all other moves should only move in the search axis
     for call in checked_calls:
         assert call[0][0] == OT3Mount.RIGHT
-        assert _other_axis_val(call[0][1], search_axis) == pytest.approx(
-            _other_axis_val(Point(0, 0, 0), search_axis)
+        assert _other_axis_val(call[0][1], Axis.X) == pytest.approx(
+            _other_axis_val(Point(0, 0, 0), Axis.X)
         )
 
 
