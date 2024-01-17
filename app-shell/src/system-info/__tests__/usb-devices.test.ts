@@ -1,5 +1,5 @@
 import execa from 'execa'
-import { webusb } from 'usb'
+import { usb, webusb } from 'usb'
 
 import * as Fixtures from '@opentrons/app/src/redux/system-info/__fixtures__'
 import { createUsbDeviceMonitor, getWindowsDriverVersion } from '../usb-devices'
@@ -19,24 +19,12 @@ describe('app-shell::system-info::usb-devices', () => {
     jest.resetAllMocks()
   })
 
-  // it('can create a usb device monitor', () => {
-  //   expect(usbDetection.startMonitoring).toHaveBeenCalledTimes(0)
-  //   createUsbDeviceMonitor()
-  //   expect(usbDetection.startMonitoring).toHaveBeenCalledTimes(1)
-  // })
-
-  // it('usb device monitor can be stopped', () => {
-  //   const monitor = createUsbDeviceMonitor()
-  //   monitor.stop()
-  //   expect(usbDetection.stopMonitoring).toHaveBeenCalledTimes(1)
-  // })
-
   it('can return the list of all devices', async () => {
     const mockDevices = [
       { ...mockDevice, deviceName: 'foo' },
       { ...mockDevice, deviceName: 'bar' },
       { ...mockDevice, deviceName: 'baz' },
-    ]
+    ] as any
 
     usbGetDeviceList.mockResolvedValueOnce(mockDevices)
 
@@ -50,7 +38,7 @@ describe('app-shell::system-info::usb-devices', () => {
     const onDeviceAdd = jest.fn()
     createUsbDeviceMonitor({ onDeviceAdd })
 
-    usbDetection.emit('add', mockDevice)
+    usb.on('attach', mockDevice)
 
     expect(onDeviceAdd).toHaveBeenCalledWith(mockDevice)
   })
@@ -59,7 +47,7 @@ describe('app-shell::system-info::usb-devices', () => {
     const onDeviceRemove = jest.fn()
     createUsbDeviceMonitor({ onDeviceRemove })
 
-    usbDetection.emit('remove', mockDevice)
+    usb.on('detach', mockDevice)
 
     expect(onDeviceRemove).toHaveBeenCalledWith(mockDevice)
   })

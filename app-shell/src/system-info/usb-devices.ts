@@ -4,9 +4,11 @@ import { usb, webusb } from 'usb'
 import { isWindows } from '../os'
 import { createLogger } from '../log'
 
+import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
+
 export type UsbDeviceMonitorOptions = Partial<{
-  onDeviceAdd?: (device: USBDevice) => unknown
-  onDeviceRemove?: (device: USBDevice) => unknown
+  onDeviceAdd?: (device: UsbDevice) => unknown
+  onDeviceRemove?: (device: UsbDevice) => unknown
 }>
 
 export interface UsbDeviceMonitor {
@@ -48,7 +50,7 @@ const decToHex = (number: number): string =>
   number.toString(16).toUpperCase().padStart(4, '0')
 
 export function getWindowsDriverVersion(
-  device: USBDevice
+  device: UsbDevice
 ): Promise<string | null> {
   const { vendorId: vidDecimal, productId: pidDecimal, serialNumber } = device
   const [vid, pid] = [decToHex(vidDecimal), decToHex(pidDecimal)]
