@@ -20,12 +20,6 @@
   --lh-title: 1.25;
   --lh-copy: 1.5;
 
-  --font-body-1-light: {
-    font-size: var(--fs-body-1); /* from legacy --font-body-1-light */
-    font-weight: var(--fw-regular); /* from legacy --font-body-1-light */
-    color: var(--c-font-light); /* from legacy --font-body-1-light */
-  };
-
   --font-form-default: {
     font-size: var(--fs-body-1); /* from legacy --font-form-default */
     font-weight: var(--fw-regular); /* from legacy --font-form-default */

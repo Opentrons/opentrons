@@ -2,7 +2,9 @@
 @import '../index.module.css';
 
 .tooltip_box {
-  @apply --font-body-1-light;
+  font-size: var(--fs-body-1); /* from legacy --font-body-1-light */
+  font-weight: var(--fw-regular); /* from legacy --font-body-1-light */
+  color: var(--c-font-light); /* from legacy --font-body-1-light */
 
   background-color: var(--c-bg-dark);
   box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.13), 0 3px 6px 0 rgba(0, 0, 0, 0.23);
