@@ -124,7 +124,9 @@ a.subdomain_link {
 
 /* Dropdown Containers */
 .dropdown_small {
-  @apply --font-body-2-dark;
+  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
+    font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
+    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
   @apply --dropdown-base;
 
   left: 0;
@@ -144,7 +146,9 @@ a.subdomain_link {
 }
 
 .dropdown_medium {
-  @apply --font-body-2-dark;
+  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
+    font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
+    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
   @apply --dropdown-base;
 
   left: -11rem;
@@ -164,7 +168,9 @@ a.subdomain_link {
 }
 
 .dropdown_large {
-  @apply --font-body-2-dark;
+  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
+    font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
+    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
   @apply --dropdown-base;
 
   right: -0.125rem;

@@ -19,19 +19,7 @@
   --lh-solid: 1;
   --lh-title: 1.25;
   --lh-copy: 1.5;
-
-  --font-default-dark: {
-    font-size: var(--fs-default); /* from legacy --font-default-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-default-dark */
-    color: var(--c-font-dark); /* from legacy --font-default-dark */
-  };
-
-  --font-body-2-dark: {
-    font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
-  };
-
+  
   --font-body-2-light: {
     font-size: var(--fs-body-2); /* from legacy --font-body-2-light */
     font-weight: var(--fw-regular); /* from legacy --font-body-2-light */

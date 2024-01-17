@@ -116,7 +116,9 @@
 }
 
 .alert_modal_contents {
-  @apply --font-body-2-dark;
+  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
+    font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
+    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
 
   width: 100%;
   max-height: 100%;

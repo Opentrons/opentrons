@@ -26,7 +26,9 @@
 }
 
 .labware_creator {
-  @apply --font-body-2-dark;
+  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
+    font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
+    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
 
   max-width: 50rem;
   margin: 1rem auto;

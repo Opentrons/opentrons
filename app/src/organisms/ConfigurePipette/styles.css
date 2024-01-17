@@ -1,7 +1,9 @@
 @import '@opentrons/components/styles';
 
 .warning_title {
-  @apply --font-body-2-dark;
+  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
+    font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
+    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
 
   margin-bottom: 0.5rem;
   text-transform: uppercase;
