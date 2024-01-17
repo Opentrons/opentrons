@@ -114,7 +114,11 @@ export const PauseForm = (props: StepFormProps): JSX.Element => {
 
           {pauseUntilModuleEnabled ? null : (
             <Tooltip {...tooltipProps}>
-              {getSingleSelectDisabledTooltip('wait_until_temp', 'pauseAction', t)}
+              {getSingleSelectDisabledTooltip(
+                'wait_until_temp',
+                'pauseAction',
+                t
+              )}
             </Tooltip>
           )}
           <div {...targetProps}>
