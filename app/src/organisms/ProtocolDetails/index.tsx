@@ -84,16 +84,16 @@ const GRID_STYLE = css`
 const ZOOM_ICON_STYLE = css`
   border-radius: ${BORDERS.radiusSoftCorners};
   &:hover {
-    background: ${COLORS.lightGreyHover};
+    background: ${COLORS.grey30};
   }
   &:active {
-    background: ${COLORS.lightGreyPressed};
+    background: ${COLORS.grey35};
   }
   &:disabled {
     background: ${COLORS.white};
   }
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
+    box-shadow: 0 0 0 3px ${COLORS.blue50};
   }
 `
 
@@ -327,9 +327,9 @@ export function ProtocolDetails(
   const deckMap = <ProtocolDeck protocolAnalysis={mostRecentAnalysis} />
 
   const deckViewByAnalysisStatus = {
-    missing: <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />,
-    loading: <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />,
-    error: <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />,
+    missing: <Box size="14rem" backgroundColor={COLORS.grey30} />,
+    loading: <Box size="14rem" backgroundColor={COLORS.grey30} />,
+    error: <Box size="14rem" backgroundColor={COLORS.grey30} />,
     complete: (
       <Box size="14rem" height="auto">
         {deckMap}
@@ -345,8 +345,8 @@ export function ProtocolDetails(
     setShowChooseRobotToRunProtocolSlideout(true)
   }
 
-  const UNKNOWN_ATTACHMENT_ERROR = `${protocolDisplayName} protocol uses 
-  instruments or modules from a future version of Opentrons software. Please update 
+  const UNKNOWN_ATTACHMENT_ERROR = `${protocolDisplayName} protocol uses
+  instruments or modules from a future version of Opentrons software. Please update
   the app to the most recent version to run this protocol.`
 
   const UnknownAttachmentError = (
@@ -387,7 +387,7 @@ export function ProtocolDetails(
 
           <Flex
             backgroundColor={COLORS.white}
-            border={`1px solid ${COLORS.medGreyEnabled}`}
+            border={`1px solid ${COLORS.grey30}`}
             borderRadius={BORDERS.radiusSoftCorners}
             position={POSITION_RELATIVE}
             flexDirection={DIRECTION_ROW}
@@ -421,7 +421,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_creationMethod"
                 >
-                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  <StyledText as="h6" color={COLORS.grey50}>
                     {t('creation_method')}
                   </StyledText>
                   <StyledText as="p">
@@ -434,7 +434,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_lastUpdated"
                 >
-                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  <StyledText as="h6" color={COLORS.grey50}>
                     {t('last_updated')}
                   </StyledText>
                   <StyledText as="p">
@@ -447,7 +447,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_lastAnalyzed"
                 >
-                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  <StyledText as="h6" color={COLORS.grey50}>
                     {t('last_analyzed')}
                   </StyledText>
                   <StyledText as="p">
@@ -477,7 +477,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_author"
                 >
-                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  <StyledText as="h6" color={COLORS.grey50}>
                     {t('org_or_author')}
                   </StyledText>
                   <StyledText
@@ -494,7 +494,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_description"
                 >
-                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  <StyledText as="h6" color={COLORS.grey50}>
                     {t('description')}
                   </StyledText>
                   {analysisStatus === 'loading' ? (
@@ -535,7 +535,7 @@ export function ProtocolDetails(
               flex={`0 0 ${String(SIZE_5)}`}
               flexDirection={DIRECTION_COLUMN}
               backgroundColor={COLORS.white}
-              border={`1px solid ${String(COLORS.medGreyEnabled)}`}
+              border={`1px solid ${String(COLORS.grey30)}`}
               borderRadius={BORDERS.radiusSoftCorners}
               height="100%"
               data-testid="ProtocolDetails_deckMap"

@@ -35,7 +35,7 @@ export function InitialLoadingScreen(): JSX.Element {
 
   return (
     <Flex
-      backgroundColor={COLORS.darkBlack20}
+      backgroundColor={COLORS.grey35}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing40}
       alignItems={ALIGN_CENTER}
@@ -47,7 +47,7 @@ export function InitialLoadingScreen(): JSX.Element {
         name="ot-spinner"
         size="160px"
         spin
-        color={COLORS.darkBlack70}
+        color={COLORS.grey60}
         aria-label="InitialLoadingScreen-spinner"
       />
       {targetPath != null && <Redirect exact from="/" to={targetPath} />}

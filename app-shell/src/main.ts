@@ -3,7 +3,7 @@ import { app, ipcMain } from 'electron'
 import contextMenu from 'electron-context-menu'
 import { webusb } from 'usb'
 
-import { createUi } from './ui'
+import { createUi, registerReloadUi } from './ui'
 import { initializeMenu } from './menu'
 import { createLogger } from './log'
 import { registerProtocolAnalysis } from './protocol-analysis'
@@ -94,6 +94,7 @@ function startUp(): void {
     registerSystemInfo(dispatch),
     registerProtocolStorage(dispatch),
     registerUsb(dispatch),
+    registerReloadUi(mainWindow),
   ]
 
   ipcMain.on('dispatch', (_, action) => {

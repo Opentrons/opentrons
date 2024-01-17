@@ -64,7 +64,7 @@ export function AnalyticsOptInModal({
           gridGap={SPACING.spacing12}
           paddingBottom={SPACING.spacing32}
         >
-          <StyledText as="p" color={COLORS.darkBlack90}>
+          <StyledText as="p" color={COLORS.grey60}>
             {t('opt_in_description')}
           </StyledText>
         </Flex>

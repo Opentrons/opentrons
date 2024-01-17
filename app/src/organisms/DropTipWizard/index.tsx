@@ -351,7 +351,7 @@ export const DropTipWizardComponent = (
     modalContent = (
       <SimpleWizardBody
         isSuccess={false}
-        iconColor={COLORS.errorEnabled}
+        iconColor={COLORS.red50}
         header={t('error_dropping_tips')}
         subHeader={
           <>

@@ -12,7 +12,8 @@ import {
   ALIGN_FLEX_START,
 } from '../../styles'
 import { Box, Flex, Text } from '../../primitives'
-import { TYPOGRAPHY, SPACING, COLORS } from '../../ui-style-constants'
+import { TYPOGRAPHY, SPACING } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 
 const labwareDisplayNameStyle = css`
   overflow: hidden;

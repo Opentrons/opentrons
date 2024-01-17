@@ -1683,10 +1683,15 @@
     {
       "commandType": "aspirate",
       "error": {
-        "detail": "Cannot aspirate more than pipette max volume",
+        "detail": "Cannot aspirate 21.0 µL when only 20.0 is available.",
         "errorCode": "4000",
-        "errorInfo": {},
-        "errorType": "InvalidPipettingVolumeError",
+        "errorInfo": {
+          "attempted_aspirate_volume": 21.0,
+          "available_volume": 20.0,
+          "max_pipette_volume": 20,
+          "max_tip_volume": 20.0
+        },
+        "errorType": "InvalidAspirateVolumeError",
         "wrappedErrors": []
       },
       "params": {
@@ -1744,10 +1749,15 @@
   },
   "errors": [
     {
-      "detail": "Cannot aspirate more than pipette max volume",
+      "detail": "Cannot aspirate 21.0 µL when only 20.0 is available.",
       "errorCode": "4000",
-      "errorInfo": {},
-      "errorType": "InvalidPipettingVolumeError",
+      "errorInfo": {
+        "attempted_aspirate_volume": 21.0,
+        "available_volume": 20.0,
+        "max_pipette_volume": 20,
+        "max_tip_volume": 20.0
+      },
+      "errorType": "InvalidAspirateVolumeError",
       "wrappedErrors": []
     }
   ],

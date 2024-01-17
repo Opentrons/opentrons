@@ -619,7 +619,12 @@ class PipetteHandlerProvider(Generic[MountType]):
         else:
             disp_vol = volume
 
-        # Ensure we don't dispense more than the current volume
+        # Ensure we don't dispense more than the current volume.
+        #
+        # This clamping is inconsistent with plan_check_aspirate(), which asserts
+        # that its input is in bounds instead of clamping it. This is left to avoid
+        # disturbing Python protocols with apiLevel <= 2.13. In newer Python protocols,
+        # the Protocol Engine layer applies its own bounds checking.
         disp_vol = min(instrument.current_volume, disp_vol)
 
         if disp_vol == 0:

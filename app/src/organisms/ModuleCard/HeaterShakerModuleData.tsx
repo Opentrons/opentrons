@@ -36,35 +36,35 @@ export const HeaterShakerModuleData = (
     status: SpeedStatus | TemperatureStatus
   ): { backgroundColor: string; iconColor: string; textColor: string } => {
     const StatusLabelProps = {
-      backgroundColor: COLORS.medGreyEnabled,
-      iconColor: COLORS.darkGreyEnabled,
-      textColor: COLORS.bluePressed,
+      backgroundColor: COLORS.grey30,
+      iconColor: COLORS.grey50,
+      textColor: COLORS.blue60,
       pulse: false,
     }
 
     switch (status) {
       case 'idle': {
-        StatusLabelProps.backgroundColor = COLORS.medGreyEnabled
-        StatusLabelProps.iconColor = COLORS.darkGreyEnabled
-        StatusLabelProps.textColor = COLORS.darkBlackEnabled
+        StatusLabelProps.backgroundColor = COLORS.grey30
+        StatusLabelProps.iconColor = COLORS.grey50
+        StatusLabelProps.textColor = COLORS.black90
         break
       }
       case 'holding at target': {
-        StatusLabelProps.backgroundColor = COLORS.medBlue
-        StatusLabelProps.iconColor = COLORS.blueEnabled
+        StatusLabelProps.backgroundColor = COLORS.blue30
+        StatusLabelProps.iconColor = COLORS.blue50
         break
       }
       case 'error': {
-        StatusLabelProps.backgroundColor = COLORS.warningBackgroundLight
-        StatusLabelProps.iconColor = COLORS.warningEnabled
-        StatusLabelProps.textColor = COLORS.warningText
+        StatusLabelProps.backgroundColor = COLORS.yellow20
+        StatusLabelProps.iconColor = COLORS.yellow50
+        StatusLabelProps.textColor = COLORS.yellow60
         break
       }
       case 'heating':
       case 'cooling':
       case 'slowing down':
       case 'speeding up': {
-        StatusLabelProps.backgroundColor = COLORS.blueEnabled + '1A'
+        StatusLabelProps.backgroundColor = COLORS.blue50 + '1A'
         StatusLabelProps.pulse = true
         break
       }
@@ -114,7 +114,7 @@ export const HeaterShakerModuleData = (
         >
           <StyledText
             textTransform={TYPOGRAPHY.textTransformUppercase}
-            color={COLORS.darkGreyEnabled}
+            color={COLORS.grey50}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH6}
             marginTop={SPACING.spacing8}
@@ -148,7 +148,7 @@ export const HeaterShakerModuleData = (
       >
         <StyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey50}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           fontSize={TYPOGRAPHY.fontSizeH6}
           marginTop={SPACING.spacing8}
@@ -184,7 +184,7 @@ export const HeaterShakerModuleData = (
         <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText
             textTransform={TYPOGRAPHY.textTransformUppercase}
-            color={COLORS.darkGreyEnabled}
+            color={COLORS.grey50}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH6}
             marginTop={SPACING.spacing8}

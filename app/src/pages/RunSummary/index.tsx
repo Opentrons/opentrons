@@ -238,7 +238,7 @@ export function RunSummary(): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing40}
           padding={SPACING.spacing40}
-          backgroundColor={didRunSucceed ? COLORS.green2 : COLORS.red2}
+          backgroundColor={didRunSucceed ? COLORS.green50 : COLORS.red50}
         >
           <SplashFrame>
             <Flex gridGap={SPACING.spacing32} alignItems={ALIGN_CENTER}>
@@ -282,9 +282,7 @@ export function RunSummary(): JSX.Element {
               <Icon
                 name={didRunSucceed ? 'ot-check' : 'ot-alert'}
                 size="2rem"
-                color={
-                  didRunSucceed ? COLORS.successEnabled : COLORS.errorEnabled
-                }
+                color={didRunSucceed ? COLORS.green50 : COLORS.red50}
               />
               <SummaryHeader>{headerText}</SummaryHeader>
             </Flex>
@@ -398,7 +396,7 @@ const ProtocolName = styled.h4`
   text-align: ${TYPOGRAPHY.textAlignLeft};
   font-size: ${TYPOGRAPHY.fontSize28};
   line-height: ${TYPOGRAPHY.lineHeight36};
-  color: ${COLORS.darkBlack70};
+  color: ${COLORS.grey60};
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -416,7 +414,7 @@ const SummaryDatum = styled.div`
   height: 44px;
   background: #d6d6d6;
   border-radius: 4px;
-  color: ${COLORS.darkBlack90};
+  color: ${COLORS.grey60};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
@@ -429,17 +427,17 @@ const DURATION_TEXT_STYLE = css`
 `
 
 const RUN_AGAIN_CLICKED_STYLE = css`
-  background-color: ${COLORS.bluePressed};
+  background-color: ${COLORS.blue60};
   &:focus {
-    background-color: ${COLORS.bluePressed};
+    background-color: ${COLORS.blue60};
   }
   &:hover {
-    background-color: ${COLORS.bluePressed};
+    background-color: ${COLORS.blue60};
   }
   &:focus-visible {
-    background-color: ${COLORS.bluePressed};
+    background-color: ${COLORS.blue60};
   }
   &:active {
-    background-color: ${COLORS.bluePressed};
+    background-color: ${COLORS.blue60};
   }
 `

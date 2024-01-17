@@ -1,9 +1,10 @@
 import styled from 'styled-components'
-import { COLORS, BORDERS, TYPOGRAPHY, SPACING } from '../../ui-style-constants'
+import { BORDERS, TYPOGRAPHY, SPACING } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 import { NewAlertPrimaryBtn, styleProps } from '../../primitives'
 
 export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
-  background-color: ${COLORS.errorEnabled};
+  background-color: ${COLORS.red50};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding-left: ${SPACING.spacing16};
   padding-right: ${SPACING.spacing16};
@@ -18,7 +19,7 @@ export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
   }
 
   &:disabled {
-    background-color: ${COLORS.darkGreyDisabled};
-    color: ${COLORS.errorDisabled};
+    background-color: ${COLORS.grey30};
+    color: ${COLORS.grey40};
   }
 `
