@@ -12,7 +12,9 @@
 }
 
 .form_field {
-  @apply --font-form-default;
+  font-size: var(--fs-body-1); /* from legacy --font-form-default */
+    font-weight: var(--fw-regular); /* from legacy --font-form-default */
+    color: var(--c-font-dark); /* from legacy --font-form-default */
 
   display: flex;
   align-items: center;
@@ -29,7 +31,9 @@
 }
 
 .form_group_label {
-  @apply --font-form-default;
+  font-size: var(--fs-body-1); /* from legacy --font-form-default */
+    font-weight: var(--fw-regular); /* from legacy --font-form-default */
+    color: var(--c-font-dark); /* from legacy --font-form-default */
 
   font-weight: var(--fw-semibold);
   margin-bottom: 0.15rem;
@@ -41,7 +45,9 @@
 }
 
 .form_group_label_pipette_settings_slideout {
-  @apply --font-form-default;
+  font-size: var(--fs-body-1); /* from legacy --font-form-default */
+    font-weight: var(--fw-regular); /* from legacy --font-form-default */
+    color: var(--c-font-dark); /* from legacy --font-form-default */
 
   font-weight: var(--fw-semibold);
   margin-bottom: 0.5rem;
@@ -102,7 +108,9 @@
   padding: 0.25rem 0.25rem 0.25rem 0.5rem;
 
   & input {
-    @apply --font-form-default;
+    font-size: var(--fs-body-1); /* from legacy --font-form-default */
+    font-weight: var(--fw-regular); /* from legacy --font-form-default */
+    color: var(--c-font-dark); /* from legacy --font-form-default */
 
     background-color: inherit;
     border-radius: inherit;
@@ -133,7 +141,9 @@
   }
 
   & .suffix {
-    @apply --font-form-default;
+    font-size: var(--fs-body-1); /* from legacy --font-form-default */
+    font-weight: var(--fw-regular); /* from legacy --font-form-default */
+    color: var(--c-font-dark); /* from legacy --font-form-default */
 
     font-weight: var(--fw-semibold);
     display: inline-block;
@@ -183,7 +193,9 @@
   position: relative;
 
   & select {
-    @apply --font-form-default;
+    font-size: var(--fs-body-1); /* from legacy --font-form-default */
+    font-weight: var(--fw-regular); /* from legacy --font-form-default */
+    color: var(--c-font-dark); /* from legacy --font-form-default */
 
     border: 0;
     padding: 0.25rem 0.5rem;

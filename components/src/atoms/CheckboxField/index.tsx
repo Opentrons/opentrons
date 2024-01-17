@@ -35,7 +35,9 @@ const INPUT_STYLE = css`
   border: 0;
 `
 const OUTER_STYLE = css`
-  @apply --font-form-default;
+  font-size: var(--fs-body-1); /* from legacy --font-form-default */
+    font-weight: var(--fw-regular); /* from legacy --font-form-default */
+    color: var(--c-font-dark); /* from legacy --font-form-default */
 
   display: flex;
   align-items: ${ALIGN_CENTER};

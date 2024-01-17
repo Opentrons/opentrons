@@ -19,13 +19,7 @@
   --lh-solid: 1;
   --lh-title: 1.25;
   --lh-copy: 1.5;
-
-  --font-form-default: {
-    font-size: var(--fs-body-1); /* from legacy --font-form-default */
-    font-weight: var(--fw-regular); /* from legacy --font-form-default */
-    color: var(--c-font-dark); /* from legacy --font-form-default */
-  };
-
+  
   --font-form-caption: {
     font-size: var(--fs-caption); /* from legacy --font-form-caption */
     font-weight: var(--fw-semibold); /* from legacy --font-form-caption */

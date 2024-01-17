@@ -343,7 +343,9 @@ and when that is implemented.
 }
 
 .profile_step_labels {
-  @apply --font-form-default;
+  font-size: var(--fs-body-1); /* from legacy --font-form-default */
+    font-weight: var(--fw-regular); /* from legacy --font-form-default */
+    color: var(--c-font-dark); /* from legacy --font-form-default */
 
   display: grid;
   grid-template-columns: 12.5rem 7.25rem 7.25rem;
