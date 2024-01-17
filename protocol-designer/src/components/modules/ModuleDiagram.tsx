@@ -18,6 +18,15 @@ import {
   MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
 
+import magdeck_gen1 from '../../images/modules/magdeck_gen1.png'
+import magdeck_gen2 from '../../images/modules/magdeck_gen2.png'
+import tempdeck_gen1 from '../../images/modules/tempdeck_gen1.png'
+import temp_deck_gen_2_transparent from '../../images/modules/temp_deck_gen_2_transparent.png'
+import thermocycler from '../../images/modules/thermocycler.jpg'
+import thermocycler_gen2 from '../../images/modules/thermocycler_gen2.png'
+import heater_shaker_module_transparent from '../../images/modules/heater_shaker_module_transparent.png'
+import mag_block from '../../images/modules/mag_block.png'
+
 interface Props {
   type: ModuleType
   model: ModuleModel
@@ -31,22 +40,22 @@ type ModuleImg = {
 
 const MODULE_IMG_BY_TYPE: ModuleImg = {
   [MAGNETIC_MODULE_TYPE]: {
-    [MAGNETIC_MODULE_V1]: import('../../images/modules/magdeck_gen1.png'),
-    [MAGNETIC_MODULE_V2]: import('../../images/modules/magdeck_gen2.png'),
+    [MAGNETIC_MODULE_V1]: magdeck_gen1,
+    [MAGNETIC_MODULE_V2]: magdeck_gen2,
   },
   [TEMPERATURE_MODULE_TYPE]: {
-    [TEMPERATURE_MODULE_V1]: import('../../images/modules/tempdeck_gen1.png'),
-    [TEMPERATURE_MODULE_V2]: import('../../images/modules/temp_deck_gen_2_transparent.png'),
+    [TEMPERATURE_MODULE_V1]: tempdeck_gen1,
+    [TEMPERATURE_MODULE_V2]: temp_deck_gen_2_transparent,
   },
   [THERMOCYCLER_MODULE_TYPE]: {
-    [THERMOCYCLER_MODULE_V1]: import('../../images/modules/thermocycler.jpg'),
-    [THERMOCYCLER_MODULE_V2]: import('../../images/modules/thermocycler_gen2.png'),
+    [THERMOCYCLER_MODULE_V1]: thermocycler,
+    [THERMOCYCLER_MODULE_V2]: thermocycler_gen2,
   },
   [HEATERSHAKER_MODULE_TYPE]: {
-    [HEATERSHAKER_MODULE_V1]: import('../../images/modules/heater_shaker_module_transparent.png'),
+    [HEATERSHAKER_MODULE_V1]: heater_shaker_module_transparent,
   },
   [MAGNETIC_BLOCK_TYPE]: {
-    [MAGNETIC_BLOCK_V1]: import('../../images/modules/mag_block.png'),
+    [MAGNETIC_BLOCK_V1]: mag_block,
   },
 }
 
