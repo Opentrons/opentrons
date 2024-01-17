@@ -17,7 +17,6 @@ const RUN_TIME_COMMAND_STUB_MIXIN: Pick<
   status: 'succeeded',
 }
 
-// TODO(bh, 2023-12-4): test cases for legacy fixed trash
 describe('getSimplestDeckConfigForProtocol', () => {
   it('returns simplest deck if no commands alter addressable areas', () => {
     expect(getSimplestDeckConfigForProtocol(null)).toEqual(
@@ -149,6 +148,29 @@ describe('getSimplestDeckConfigForProtocol', () => {
         cutoutFixtureId: 'stagingAreaSlotWithWasteChuteRightAdapterNoCover',
         requiredAddressableAreas: ['gripperWasteChute', 'D4'],
       },
+    ])
+  })
+  it('returns deck with trash in A3 when legacy trash labware is present', () => {
+    const cutoutConfigs = getSimplestDeckConfigForProtocol(({
+      commands: [],
+      labware: [
+        {
+          id: 'trash_id',
+          definitionUri: 'opentrons/opentrons_1_trash_3200ml_fixed/1',
+          displayName: 'Trash',
+          loadName: 'opentrons_1_trash_3200ml_fixed',
+          location: { slotName: 'A3' },
+        },
+      ],
+    } as unknown) as CompletedProtocolAnalysis)
+    expect(cutoutConfigs).toEqual([
+      ...FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC.slice(0, 8),
+      {
+        cutoutId: 'cutoutA3',
+        cutoutFixtureId: 'trashBinAdapter',
+        requiredAddressableAreas: ['movableTrashA3'],
+      },
+      ...FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC.slice(9),
     ])
   })
 })

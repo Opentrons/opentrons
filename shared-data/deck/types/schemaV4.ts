@@ -61,6 +61,20 @@ export type CutoutId =
   | 'cutoutA2'
   | 'cutoutA3'
 
+export type OT2CutoutId =
+  | 'cutout1'
+  | 'cutout2'
+  | 'cutout3'
+  | 'cutout4'
+  | 'cutout5'
+  | 'cutout6'
+  | 'cutout7'
+  | 'cutout8'
+  | 'cutout9'
+  | 'cutout10'
+  | 'cutout11'
+  | 'cutout12'
+
 export type SingleSlotCutoutFixtureId =
   | 'singleLeftSlot'
   | 'singleCenterSlot'
@@ -76,11 +90,14 @@ export type WasteChuteCutoutFixtureId =
   | 'stagingAreaSlotWithWasteChuteRightAdapterCovered'
   | 'stagingAreaSlotWithWasteChuteRightAdapterNoCover'
 
+export type OT2SingleStandardSlot = 'singleStandardSlot'
+
+export type OT2FixedTrashSlot = 'fixedTrashSlot'
+
 export type CutoutFixtureId =
   | SingleSlotCutoutFixtureId
   | StagingAreaRightSlotFixtureId
   | TrashBinAdapterCutoutFixtureId
   | WasteChuteCutoutFixtureId
-  | 'stagingAreaRightSlot'
-  | 'trashBinAdapter'
-  | 'fixedTrashSlot'
+  | OT2SingleStandardSlot
+  | OT2FixedTrashSlot

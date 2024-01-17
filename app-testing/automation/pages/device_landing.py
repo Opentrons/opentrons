@@ -164,7 +164,10 @@ class DeviceLanding:
         if not button:  # None check but the finder throws so should never be hit
             return False
         # get the status of the toggle
-        return button.get_attribute("aria-checked").lower() == "true"
+        aria: str | None = button.get_attribute("aria-checked")
+        if not aria:  # None check but the finder throws so *should* never be hit
+            return False
+        return aria.lower() == "true"
 
     def set_lights(self, on: bool) -> bool:
         """Set the lights toggle.  Return a bool of the condition: final light state == the desired state."""
@@ -540,8 +543,8 @@ class DeviceLanding:
     def get_pipette_calibration_overflow_1(self) -> WebElement:
         """Get the first pipette three dot menu button."""
         scroll: WebElement = self.base.clickable_wrapper(self.pipette_calibration_overflow_1, 3)
-        actions = ActionChains(self.base.driver)  # type: ignore
-        actions.move_to_element(scroll).perform()  # type: ignore
+        actions = ActionChains(self.base.driver)
+        actions.move_to_element(scroll).perform()
         return scroll
 
     def click_pipette_calibration_overflow_1(self) -> None:
@@ -556,8 +559,8 @@ class DeviceLanding:
     def get_pipette_calibration_overflow_2(self) -> WebElement:
         """Get the first pipette three dot menu button."""
         scroll: WebElement = self.base.clickable_wrapper(self.pipette_calibration_overflow_2, 3)
-        actions = ActionChains(self.base.driver)  # type: ignore
-        actions.move_to_element(scroll).perform()  # type: ignore
+        actions = ActionChains(self.base.driver)
+        actions.move_to_element(scroll).perform()
         return scroll
 
     def click_pipette_calibration_overflow_2(self) -> None:
@@ -573,8 +576,8 @@ class DeviceLanding:
     def click_pipette_offset_calibrate_button(self) -> None:
         """Click the calibrate button."""
         scroll: WebElement = self.base.clickable_wrapper(self.calibrate_pipette_offset_button, 3)
-        actions = ActionChains(self.base.driver)  # type: ignore
-        actions.move_to_element(scroll).perform()  # type: ignore
+        actions = ActionChains(self.base.driver)
+        actions.move_to_element(scroll).perform()
         self.base.click(self.calibrate_pipette_offset_button)
 
     # pipette calibration
@@ -665,9 +668,9 @@ class DeviceLanding:
 
     def shift_down_arrow_key(self) -> None:
         """Send the keystroke shift + down arrow key."""
-        actions = ActionChains(self.base.driver)  # type: ignore
-        actions.send_keys(Keys.LEFT_SHIFT + Keys.ARROW_DOWN)  # type: ignore
-        actions.perform()  # type: ignore
+        actions = ActionChains(self.base.driver)
+        actions.send_keys(Keys.LEFT_SHIFT + Keys.ARROW_DOWN)
+        actions.perform()
 
     save_calibration_move_to_slot_1: Element = Element(
         (By.XPATH, '//button[text()="save calibration and move to slot 1"]'),
@@ -683,9 +686,9 @@ class DeviceLanding:
 
     def up_arrow_key(self) -> None:
         """Send the keystroke arrow up key."""
-        actions = ActionChains(self.base.driver)  # type: ignore
-        actions.send_keys(Keys.ARROW_UP)  # type: ignore
-        actions.perform()  # type: ignore
+        actions = ActionChains(self.base.driver)
+        actions.send_keys(Keys.ARROW_UP)
+        actions.perform()
 
     save_calibration: Element = Element(
         (By.XPATH, '//button[text()="save calibration"]'),

@@ -56,7 +56,7 @@ describe('Carriage', () => {
     )
     getByTestId('Pipette_Zaxis_Detach_96.webm')
     getByRole('button', { name: 'Continue' })
-    getByLabelText('back').click()
+    fireEvent.click(getByLabelText('back'))
     expect(props.goBack).toHaveBeenCalled()
   })
   it('clicking on continue button executes the commands correctly', () => {

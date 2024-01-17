@@ -105,9 +105,9 @@ describe('LocationConflictModal', () => {
     getByText('Currently configured')
     getAllByText('Trash bin')
     getByText('a tiprack')
-    getByRole('button', { name: 'Cancel' }).click()
+    fireEvent.click(getByRole('button', { name: 'Cancel' }))
     expect(props.onCloseClick).toHaveBeenCalled()
-    getByRole('button', { name: 'Update deck' }).click()
+    fireEvent.click(getByRole('button', { name: 'Update deck' }))
     expect(mockUpdate).toHaveBeenCalled()
   })
   it('should render correct info for a odd', () => {

@@ -5,7 +5,7 @@ by default. Please do not unconditionally import things outside the python stand
 library.
 """
 from enum import Enum, unique
-from typing import Union
+from typing import Union, Dict, List
 
 
 @unique
@@ -24,33 +24,78 @@ class NodeId(int, Enum):
     gripper = 0x20
     gripper_z = 0x21
     gripper_g = 0x22
+    hepa_uv = 0x32
     pipette_left_bootloader = pipette_left | 0xF
     pipette_right_bootloader = pipette_right | 0xF
     gantry_x_bootloader = gantry_x | 0xF
     gantry_y_bootloader = gantry_y | 0xF
     head_bootloader = head | 0xF
     gripper_bootloader = gripper | 0xF
+    # We cant use bitwise & 0xF0 to determine the application Node because
+    # the NodeId bitmask is only 7 bits long, which means we only have
+    # 7 unique pairs of (node_id <-> bootloader_node_id). i.e,
+    # head (0x50) <-> head_bootloader (0x5f). Since we have already
+    # hit that limit we have to move away from categorizing nodes with
+    # 0xf as the bootloader node and instead use an explicit map as defined
+    # here to determine relationship between node and bootloader_node.
+    hepa_uv_bootloader = hepa_uv | 0xE
+
+    @classmethod
+    def bootloader_map(cls) -> Dict["NodeId", List["NodeId"]]:
+        """Mapping between bootloader_node and nodes.
+
+        Note: The ordering of the Node list matters as the first element
+        represents the core appliaction node for that given node. For example
+
+        NodeId.head_bootloader : [NodeId.head, NodeId.head_l, NodeId.head_r]
+
+        The core node here is NodeId.head because its the first element.
+        """
+        return {
+            NodeId.broadcast: [NodeId.broadcast],
+            NodeId.host: [NodeId.host],
+            NodeId.pipette_left_bootloader: [NodeId.pipette_left],
+            NodeId.pipette_right_bootloader: [NodeId.pipette_right],
+            NodeId.gantry_x_bootloader: [NodeId.gantry_x],
+            NodeId.gantry_y_bootloader: [NodeId.gantry_y],
+            NodeId.head_bootloader: [NodeId.head, NodeId.head_l, NodeId.head_r],
+            NodeId.gripper_bootloader: [
+                NodeId.gripper,
+                NodeId.gripper_z,
+                NodeId.gripper_g,
+            ],
+            NodeId.hepa_uv_bootloader: [NodeId.hepa_uv],
+        }
 
     def is_bootloader(self) -> bool:
         """Whether this node ID is a bootloader."""
-        return bool(self.value & 0xF == 0xF)
+        return (
+            self not in [NodeId.broadcast, NodeId.host]
+            and self in NodeId.bootloader_map()
+        )
 
     def bootloader_for(self) -> "NodeId":
-        """The associated bootloader node ID for the node.
+        """The associated bootloader node ID for the node."""
+        if self.is_bootloader():
+            return self
 
-        This is safe to call on any node id, including ones that are already bootloaders.
-        """
-        return NodeId(self.value | 0xF)
+        # Get the bootloader for the given node
+        for bootloader, nodes in self.bootloader_map().items():
+            if self in nodes:
+                return bootloader
+        raise ValueError(f"No bootloader node for {self.name}.")
 
     def application_for(self) -> "NodeId":
         """The associated core node ID for the node (i.e. head, not head_l).
 
-        This is safe to call on any node ID, including non-core application node IDs like
-        head_l. It will always give the code node ID.
+        This is safe to call on any node ID, including non-core application
+        node IDs like head_l, head_bootloader. It will always give the core node ID.
         """
-        # in c this would be & ~0xf but in python that gives 0x10 for some reason
-        # so let's write out the whole byte
-        return NodeId(self.value & 0xF0)
+        for bootloader, nodes in self.bootloader_map().items():
+            # The core application node for any node is the first item in the node list
+            if bootloader is self or self in nodes:
+                return nodes[0]
+        raise ValueError(f"No application node for {self.name}.")
 
 
 # make these negative numbers so there is no chance they overlap with NodeId

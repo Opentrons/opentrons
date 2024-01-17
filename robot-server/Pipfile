@@ -34,11 +34,6 @@ types-requests = "==2.25.6"
 types-mock = "==4.0.1"
 sqlalchemy2-stubs = "==0.0.2a21"
 python-box = "==5.4.1"
-opentrons-hardware = {editable = true, path='../hardware', extras=['FLEX']}
-opentrons = { editable = true, path = "../api"}
-opentrons-shared-data = { editable = true, path = "../shared-data/python" }
-server-utils = {editable = true, path = "./../server-utils"}
-robot-server = { editable = true, path = "."}
 
 [packages]
 anyio = "==3.6.1"
@@ -56,3 +51,8 @@ numpy = "==1.23.3"
 zipp = "==3.5.0"
 sqlalchemy = "==1.4.32"
 aiosqlite = "==0.17.0"
+opentrons-hardware = {editable = true, path='../hardware', extras=['FLEX']}
+opentrons = { editable = true, path = "../api"}
+opentrons-shared-data = { editable = true, path = "../shared-data/python" }
+server-utils = {editable = true, path = "./../server-utils"}
+robot-server = { editable = true, path = "."}

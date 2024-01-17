@@ -365,9 +365,18 @@ describe('ModuleCard', () => {
   it('renders information when calibration is required so calibration update banner renders', () => {
     render({
       ...props,
-      module: mockMagneticModuleHub,
+      module: mockHotHeaterShaker,
     })
     screen.getByText('Module calibration required.')
+  })
+  it('does not render calibration update banner for OT-2-specific modules', () => {
+    render({
+      ...props,
+      module: mockMagneticModule,
+    })
+    expect(
+      screen.queryByText('Module calibration required.')
+    ).not.toBeInTheDocument()
   })
   it('renders information when a firmware update is available so firmware update banner renders', () => {
     render({

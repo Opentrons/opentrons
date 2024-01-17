@@ -10,7 +10,12 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ### HTTP API
 
-- Removed the `/notifications/subscribe` WebSocket endpoint and the `notify_server` Python package. See https://github.com/Opentrons/opentrons/pull/14280 for details.
+- In the `/runs/commands`, `/maintenance_runs/commands`, and `/protocols` endpoints, the `dispense` command will now return an error if you try to dispense more than you've aspirated, instead of silently clamping.
+- The `/notifications/subscribe` WebSocket endpoint has been removed. See https://github.com/Opentrons/opentrons/pull/14280 for details.
+
+### Other Changes
+
+- The `notify_server` Python package has been removed. See https://github.com/Opentrons/opentrons/pull/14280 for details.
 
 ---
 
