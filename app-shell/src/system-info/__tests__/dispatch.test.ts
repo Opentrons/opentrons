@@ -70,7 +70,7 @@ describe('app-shell::system-info module action tests', () => {
 
   it('sends initial USB device and network list on shell:UI_INITIALIZED', () => {
     handler(uiInitialized())
-
+    console.log([realtek0])
     return flush().then(() => {
       expect(dispatch).toHaveBeenCalledWith(
         SystemInfo.initialized(
