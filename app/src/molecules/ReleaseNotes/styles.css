@@ -6,13 +6,17 @@
   padding: 0 0.5rem;
 
   & > h1 {
-    @apply --font-header-dark;
+    font-size: var(--fs-header); /* from legacy --font-header-dark */
+    font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
+    color: var(--c-font-dark); /* from legacy --font-header-dark */
 
     margin-bottom: 1rem;
   }
 
   & > h2 {
-    @apply --font-header-dark;
+    font-size: var(--fs-header); /* from legacy --font-header-dark */
+    font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
+    color: var(--c-font-dark); /* from legacy --font-header-dark */
 
     font-weight: var(--fw-regular);
     margin-top: 1rem;

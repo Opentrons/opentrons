@@ -60,7 +60,9 @@
 }
 
 .modal_heading {
-  @apply --font-header-dark;
+  font-size: var(--fs-header); /* from legacy --font-header-dark */
+    font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
+    color: var(--c-font-dark); /* from legacy --font-header-dark */
 
   margin-top: 0;
   margin-bottom: 1rem;
@@ -126,7 +128,9 @@
 }
 
 .alert_modal_heading {
-  @apply --font-header-dark;
+  font-size: var(--fs-header); /* from legacy --font-header-dark */
+    font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
+    color: var(--c-font-dark); /* from legacy --font-header-dark */
 
   font-weight: normal;
   position: absolute;

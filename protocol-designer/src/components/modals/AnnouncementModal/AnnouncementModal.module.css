@@ -70,7 +70,9 @@
 }
 
 .announcement_heading {
-  @apply --font-header-dark;
+  font-size: var(--fs-header); /* from legacy --font-header-dark */
+    font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
+    color: var(--c-font-dark); /* from legacy --font-header-dark */
 
   display: flex;
   justify-content: center;

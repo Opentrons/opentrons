@@ -20,40 +20,10 @@
   --lh-title: 1.25;
   --lh-copy: 1.5;
 
-  --font-huge-dark: {
-    font-size: var(--fs-huge);
-    font-weight: var(--fw-bold);
-    color: var(--c-font-dark);
-  };
-
-  --font-huge-light: {
-    font-size: var(--fs-huge);
-    font-weight: var(--fw-bold);
-    color: var(--c-font-light);
-  };
-
-  --font-header-dark: {
-    font-size: var(--fs-header);
-    font-weight: var(--fw-semibold);
-    color: var(--c-font-dark);
-  };
-
-  --font-header-light: {
-    font-size: var(--fs-header);
-    font-weight: var(--fw-semibold);
-    color: var(--c-font-light);
-  };
-
   --font-default-dark: {
     font-size: var(--fs-default);
     font-weight: var(--fw-regular);
     color: var(--c-font-dark);
-  };
-
-  --font-default-light: {
-    font-size: var(--fs-default);
-    font-weight: var(--fw-regular);
-    color: var(--c-font-light);
   };
 
   --font-body-2-dark: {
@@ -80,13 +50,6 @@
     color: var(--c-font-light);
   };
 
-  --font-card-title: {
-    @apply --font-header-dark;
-
-    margin: 0.5rem 1rem;
-    font-weight: var(--fw-regular);
-  };
-
   --font-form-default: {
     font-size: var(--fs-body-1);
     font-weight: var(--fw-regular);
@@ -97,13 +60,6 @@
     font-size: var(--fs-caption);
     font-weight: var(--fw-semibold);
     color: var(--c-med-gray);
-  };
-
-  --font-code-dark: {
-    font-family: var(--ff-code);
-    font-size: var(--fs-body-1);
-    font-weight: var(--fw-regular);
-    color: var(--c-font-dark);
   };
 
   --truncate: {
