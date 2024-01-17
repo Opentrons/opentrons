@@ -8,13 +8,6 @@
   --bd-width-default: 1px;
   --bd-light: var(--bd-width-default) solid var(--c-light-gray);
 
-  /* outlines */
-  --outline-highlight: {
-    border-color: transparent;
-    outline: 2px solid var(--c-highlight);
-    outline-width: 2px 0;
-  }
-
   /* dropshadows */
 
   /* TODO: Ian 2018-07-26 consolidate all shadows here (eg from buttons) */

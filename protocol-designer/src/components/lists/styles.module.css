@@ -85,7 +85,7 @@
   text-align: center;
   font-size: var(--fs-body-1);
 
-  & > * {
+  &>* {
     flex: 1;
     overflow: hidden;
     white-space: nowrap;
@@ -107,9 +107,19 @@
 }
 
 .hoverable:hover {
-  @apply --outline-highlight;
+  border-color: transparent;
+  /* from legacy --outline-highlight */
+  outline: 2px solid var(--c-highlight);
+  /* from legacy --outline-highlight */
+  outline-width: 2px 0;
+  /* from legacy --outline-highlight */
 }
 
 .hover_border {
-  @apply --outline-highlight;
+  border-color: transparent;
+  /* from legacy --outline-highlight */
+  outline: 2px solid var(--c-highlight);
+  /* from legacy --outline-highlight */
+  outline-width: 2px 0;
+  /* from legacy --outline-highlight */
 }

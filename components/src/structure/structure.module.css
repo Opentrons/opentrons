@@ -1,14 +1,6 @@
 /* TitleBar styles */
 @import '../index.module.css';
 
-:root {
-  --card-disabled: {
-    color: var(--c-font-disabled);
-    fill: var(--c-font-disabled);
-    background-color: transparent;
-  }
-}
-
 .title_bar {
   display: flex;
   align-items: center;
@@ -89,7 +81,9 @@
   background-color: transparent;
 
   & * {
-    @apply --card-disabled;
+    color: var(--c-font-disabled);
+    fill: var(--c-font-disabled);
+    background-color: transparent;
   }
 }
 

@@ -86,7 +86,7 @@
     font-weight: var(--fw-regular); /* from legacy --font-default-dark */
     color: var(--c-font-dark); /* from legacy --font-default-dark */
   @apply --transition-color;
-  @apply --clickable;
+  cursor: pointer;
 
   line-height: var(--lh-title);
   font-weight: var(--fw-semibold);

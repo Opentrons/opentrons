@@ -1,25 +1,19 @@
 @import '../../index.module.css';
 
-:root {
-  --deck-element: {
-    fill: #fff;
-    stroke: var(--c-plate-bg);
-  }
-}
-
 .deck {
   overflow: visible;
 }
 
 .deck_outline {
-  @apply --deck-element;
-
+  fill: #fff;
+  stroke: var(--c-plate-bg);
   width: 100%;
   height: 100%;
 }
 
 .trash_outer {
-  @apply --deck-element;
+  fill: #fff;
+  stroke: var(--c-plate-bg);
 }
 
 .trash_inner {

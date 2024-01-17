@@ -23,7 +23,7 @@
 }
 
 .gallery_thumbnail_container {
-  @apply --clickable;
+  cursor: pointer;
 
   width: calc(var(--size-third) - var(--spacing-5) * 2 / 3);
   margin-right: var(--spacing-5);

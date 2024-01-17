@@ -156,7 +156,6 @@
   /* from legacy --font-body-2-light */
   color: var(--c-font-light);
   /* from legacy --font-body-2-light */
-  @apply center-content;
 
   max-width: 30rem;
   padding-top: 3rem;
@@ -173,7 +172,7 @@
 }
 
 .clickable {
-  @apply --clickable;
+  cursor: pointer;
 }
 
 .alert_modal {

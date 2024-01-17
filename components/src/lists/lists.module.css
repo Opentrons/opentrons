@@ -3,24 +3,20 @@
 :root {
   --list-padding-large: 1rem;
   --list-padding-small: 0.75rem;
-
-  --list-disabled: {
-    color: var(--c-font-disabled);
-    outline-color: #eee;
-    fill: var(--c-font-disabled);
-    background-color: transparent;
-  }
 }
 
 .clickable {
-  @apply --clickable;
+  cursor: pointer;
 }
 
 .disabled {
   background-color: transparent;
 
   & * {
-    @apply --list-disabled;
+    color: var(--c-font-disabled);
+    outline-color: #eee;
+    fill: var(--c-font-disabled);
+    background-color: transparent;
   }
 }
 
