@@ -164,8 +164,6 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
     selectedPipetteName: selectedPipetteName,
   })
 
-  console.log({tiprackOptions})
-
   const defaultTiprackOptions = tiprackOptions.filter(option =>
     allowAllTipracks
       ? !option.value.includes('custom_beta')
