@@ -1,5 +1,5 @@
 import execa from 'execa'
-import { usb, webusb } from 'usb'
+import { webusb } from 'usb'
 
 import * as Fixtures from '@opentrons/app/src/redux/system-info/__fixtures__'
 import { createUsbDeviceMonitor, getWindowsDriverVersion } from '../usb-devices'
@@ -37,8 +37,8 @@ describe('app-shell::system-info::usb-devices', () => {
   it('can notify when devices are added', () => {
     const onDeviceAdd = jest.fn()
     createUsbDeviceMonitor({ onDeviceAdd })
-
-    usb.on('attach', mockDevice => onDeviceAdd)
+    webusb.removeEventListener('connect', onDeviceAdd(mockDevice))
+    webusb.addEventListener('connect', onDeviceAdd(mockDevice))
 
     expect(onDeviceAdd).toHaveBeenCalledWith(mockDevice)
   })
@@ -46,8 +46,8 @@ describe('app-shell::system-info::usb-devices', () => {
   it('can notify when devices are removed', () => {
     const onDeviceRemove = jest.fn()
     createUsbDeviceMonitor({ onDeviceRemove })
-
-    usb.on('detach', mockDevice => onDeviceRemove)
+    webusb.removeEventListener('disconnect', onDeviceRemove(mockDevice))
+    webusb.addEventListener('disconnect', onDeviceRemove(mockDevice))
 
     expect(onDeviceRemove).toHaveBeenCalledWith(mockDevice)
   })
