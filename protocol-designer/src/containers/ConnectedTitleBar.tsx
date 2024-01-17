@@ -73,14 +73,13 @@ export const ConnectedTitleBar = (): JSX.Element => {
   const labwareEntity =
     selectedLabwareId != null ? labwareEntities[selectedLabwareId] : null
 
-  let liquidPlacementMode: boolean = selectedLabwareId != null
+  const liquidPlacementMode: boolean = selectedLabwareId != null
 
   let title
   let subtitle: string | null = null
   let backButtonLabel: string | undefined
   let wellSelectionMode: boolean = false
 
-  console.log('page', page)
   switch (page) {
     case 'liquids':
     case 'file-detail': {
