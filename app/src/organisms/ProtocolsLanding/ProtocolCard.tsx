@@ -78,8 +78,8 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
     mostRecentAnalysis
   )
 
-  const UNKNOWN_ATTACHMENT_ERROR = `${protocolDisplayName} protocol uses 
-  instruments or modules from a future version of Opentrons software. Please update 
+  const UNKNOWN_ATTACHMENT_ERROR = `${protocolDisplayName} protocol uses
+  instruments or modules from a future version of Opentrons software. Please update
   the app to the most recent version to run this protocol.`
 
   const UnknownAttachmentError = (
@@ -169,12 +169,12 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
           {
             missing: <Icon name="ot-spinner" spin size={SIZE_3} />,
             loading: <Icon name="ot-spinner" spin size={SIZE_3} />,
-            error: <Box size="6rem" backgroundColor={COLORS.medGreyEnabled} />,
+            error: <Box size="6rem" backgroundColor={COLORS.grey30} />,
             complete:
               mostRecentAnalysis != null ? (
                 <ProtocolDeck protocolAnalysis={mostRecentAnalysis} />
               ) : (
-                <Box size="6rem" backgroundColor={COLORS.medGreyEnabled} />
+                <Box size="6rem" backgroundColor={COLORS.grey30} />
               ),
           }[analysisStatus]
         }
@@ -203,7 +203,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
         </Flex>
         {/* data section */}
         {analysisStatus === 'loading' ? (
-          <StyledText as="p" flex="1" color={COLORS.darkGreyEnabled}>
+          <StyledText as="p" flex="1" color={COLORS.grey50}>
             {t('loading_data')}
           </StyledText>
         ) : (
@@ -216,7 +216,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing4}
               >
-                <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                <StyledText as="h6" color={COLORS.grey50}>
                   {t('robot')}
                 </StyledText>
                 <StyledText as="p">
@@ -230,7 +230,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 data-testid={`ProtocolCard_instruments_${protocolDisplayName}`}
                 minWidth="10.625rem"
               >
-                <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                <StyledText as="h6" color={COLORS.grey50}>
                   {t('shared:instruments')}
                 </StyledText>
                 {
@@ -275,14 +275,14 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               >
                 {requiredModuleTypes.length > 0 ? (
                   <>
-                    <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                    <StyledText as="h6" color={COLORS.grey50}>
                       {t('modules')}
                     </StyledText>
                     <Flex>
                       {requiredModuleTypes.map((moduleType, index) => (
                         <ModuleIcon
                           key={index}
-                          color={COLORS.darkGreyEnabled}
+                          color={COLORS.grey50}
                           moduleType={moduleType}
                           height="1rem"
                           marginRight={SPACING.spacing8}
@@ -297,7 +297,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               justifyContent={JUSTIFY_FLEX_END}
               data-testid={`ProtocolCard_date_${protocolDisplayName}`}
             >
-              <StyledText as="label" color={COLORS.darkGreyEnabled}>
+              <StyledText as="label" color={COLORS.grey50}>
                 {`${t('updated')} ${format(
                   new Date(modified),
                   'M/d/yy HH:mm'

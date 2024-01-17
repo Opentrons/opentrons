@@ -23,7 +23,8 @@ import {
 import { Icon } from '../../icons'
 import { Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
-import { COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 
 import type {
   DeckDefinition,
@@ -108,16 +109,10 @@ export function DeckLocationSelect({
               typeof l === 'object' && 'slotName' in l && l.slotName === slot.id
           )
           const isSelected = isEqual(selectedLocation, slotLocation)
-          let fill =
-            theme === 'default'
-              ? COLORS.highlightPurple2
-              : COLORS.lightGreyPressed
+          let fill = theme === 'default' ? COLORS.purple35 : COLORS.grey35
           if (isSelected)
-            fill =
-              theme === 'default'
-                ? COLORS.highlightPurple1
-                : COLORS.darkGreyEnabled
-          if (isDisabled) fill = COLORS.darkGreyDisabled
+            fill = theme === 'default' ? COLORS.purple50 : COLORS.grey50
+          if (isDisabled) fill = COLORS.grey30
           if (isSelected && slot.id === 'B1' && isThermocycler) {
             return (
               <g key="thermocyclerSelectionArea">
@@ -224,7 +219,7 @@ export function DeckLocationSelect({
           layerBlocklist={OT2_DECK_LOCATION_SELECT_LAYER_BLOCK_LIST}
         />
       ) : null}
-      <SlotLabels robotType={robotType} color={COLORS.darkGreyEnabled} />
+      <SlotLabels robotType={robotType} color={COLORS.grey50} />
     </RobotCoordinateSpace>
   )
 }

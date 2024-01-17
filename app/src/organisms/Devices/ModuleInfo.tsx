@@ -76,14 +76,14 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
             <Icon
               name={isAttached ? 'ot-check' : 'alert-circle'}
-              color={isAttached ? COLORS.successEnabled : COLORS.warningEnabled}
+              color={isAttached ? COLORS.green50 : COLORS.yellow50}
               key="icon"
               size="10px"
               marginRight={SPACING.spacing4}
             />
 
             <StyledText
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.grey50}
               fontSize={TYPOGRAPHY.fontSizeCaption}
             >
               {!isAttached ? t('module_not_connected') : t('module_connected')}
@@ -92,13 +92,13 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
         ) : null}
         <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey50}
           fontSize={TYPOGRAPHY.fontSizeLabel}
         >
           {getModuleDisplayName(moduleModel)}
         </StyledText>
         <StyledText
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey50}
           fontSize={TYPOGRAPHY.fontSizeH6}
           fontStyle={
             runHasStarted

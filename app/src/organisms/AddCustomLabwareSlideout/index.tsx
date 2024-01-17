@@ -65,7 +65,7 @@ export function AddCustomLabwareSlideout(
                 components={{
                   a: (
                     <Link
-                      color={COLORS.blueEnabled}
+                      color={COLORS.blue50}
                       onClick={() => dispatch(addCustomLabware())}
                       role="button"
                     />

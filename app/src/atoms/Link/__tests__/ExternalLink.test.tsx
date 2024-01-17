@@ -25,7 +25,7 @@ describe('ExternalLink', () => {
     const link = getByText('Test Link')
     expect(link).toHaveAttribute('href', 'https://opentrons.com')
     expect(link).toHaveAttribute('target', '_blank')
-    expect(link).toHaveStyle(`color: ${String(COLORS.blueEnabled)}`)
+    expect(link).toHaveStyle(`color: ${String(COLORS.blue50)}`)
   })
 
   it('renders open-in-new icon', () => {

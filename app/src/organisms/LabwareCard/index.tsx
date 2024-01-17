@@ -39,7 +39,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
     <Box
       role="link"
       backgroundColor={COLORS.white}
-      color={COLORS.black}
+      color={COLORS.black90}
       css={BORDERS.cardOutlineBorder}
       paddingLeft={SPACING.spacing16}
       paddingY={SPACING.spacing16}
@@ -78,7 +78,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             {isCustomDefinition ? (
               <StyledText
                 as="label"
-                color={COLORS.darkGreyEnabled}
+                color={COLORS.grey50}
                 id="LabwareCard_customDef"
               >
                 {t('custom_def')}
@@ -86,7 +86,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             ) : (
               <Flex alignItems={ALIGN_CENTER} marginTop={SPACING.spacing4}>
                 <Icon
-                  color={COLORS.blueEnabled}
+                  color={COLORS.blue50}
                   name="check-decagram"
                   height=".7rem"
                 />
@@ -104,7 +104,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             <StyledText
               as="h6"
               textTransform={TYPOGRAPHY.textTransformUppercase}
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.grey50}
               id="LabwareCard_apiName"
             >
               {t('api_name')}
@@ -131,14 +131,14 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText
                 as="label"
-                color={COLORS.darkGreyEnabled}
+                color={COLORS.grey50}
                 textAlign={TYPOGRAPHY.textAlignRight}
               >
                 {t('date_added')}
               </StyledText>
               <StyledText
                 as="label"
-                color={COLORS.darkGreyEnabled}
+                color={COLORS.grey50}
                 id="LabwareCard_dateAdded"
               >
                 {format(new Date(modified), 'MM/dd/yyyy')}

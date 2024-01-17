@@ -2,7 +2,8 @@ import * as React from 'react'
 
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
-import { COLORS, TYPOGRAPHY } from '../../ui-style-constants'
+import { TYPOGRAPHY } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   COLUMN_1_X_ADJUSTMENT,

@@ -1,7 +1,8 @@
 import { css } from 'styled-components'
 
+import { COLORS } from '../../helix-design-system'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
-import { BORDERS, COLORS, SPACING } from '../../ui-style-constants'
+import { BORDERS, SPACING } from '../../ui-style-constants'
 
 /**
  * These are Flex deck configurator-only values to position a foreign object
@@ -23,7 +24,7 @@ export const WASTE_CHUTE_DISPLAY_NAME = 'Waste chute'
 export const CONFIG_STYLE_READ_ONLY = css`
   display: ${DISPLAY_FLEX};
   align-items: ${ALIGN_CENTER};
-  background-color: ${COLORS.grey2};
+  background-color: ${COLORS.grey50};
   border-radius: ${BORDERS.borderRadiusSize1};
   color: ${COLORS.white};
   grid-gap: ${SPACING.spacing8};
@@ -35,14 +36,14 @@ export const CONFIG_STYLE_EDITABLE = css`
   ${CONFIG_STYLE_READ_ONLY}
 
   &:active {
-    background-color: ${COLORS.darkBlack90};
+    background-color: ${COLORS.grey60};
   }
 
   &:hover {
-    background-color: ${COLORS.grey1};
+    background-color: ${COLORS.grey55};
   }
 
   &:focus-visible {
-    border: 3px solid ${COLORS.fundamentalsFocus};
+    border: 3px solid ${COLORS.blue50};
   }
 `

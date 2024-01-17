@@ -346,6 +346,9 @@ class InstrumentContext(publisher.CommandPublisher):
         .. versionchanged:: 2.15
             Added the ``push_out`` parameter.
 
+        .. versionchanged:: 2.17
+            Now raises an exception if you try to dispense more than is available.
+            Previously, it would silently clamp.
         """
         if self.api_version < APIVersion(2, 15) and push_out:
             raise APIVersionError(
