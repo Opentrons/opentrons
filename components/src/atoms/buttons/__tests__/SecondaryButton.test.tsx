@@ -58,13 +58,9 @@ describe('SecondaryButton', () => {
   it('applies the correct states to the button - focus-visible', () => {
     const { getByText } = render(props)
     const button = getByText('secondary button')
-    expect(button).toHaveStyleRule(
-      'box-shadow',
-      `0 0 0 3px ${COLORS.yellow50}`,
-      {
-        modifier: ':focus-visible',
-      }
-    )
+    expect(button).toHaveStyleRule('box-shadow', `0 0 0 3px ${COLORS.blue50}`, {
+      modifier: ':focus-visible',
+    })
   })
 
   it('renders secondary button with text and different background color', () => {
