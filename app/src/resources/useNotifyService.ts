@@ -21,9 +21,20 @@ export interface QueryOptionsWithPolling<TData, Error>
 
 type DataWithStatusCode<TData> = TData & { statusCode: number }
 
+interface NotifyRefetchData {
+  refetchUsingHTTP: boolean
+  statusCode: never
+}
+
+type NotifyResponseData<TData> =
+  | DataWithStatusCode<TData>
+  | NotifyRefetchData
+  | 'ECONNFAILED'
+
 interface UseNotifyServiceProps<TData, Error> {
   topic: NotifyTopic
   queryKey: Array<HostConfig | string | null>
+  refetchUsingHTTP: () => void
   options: QueryOptionsWithPolling<TData, Error>
 }
 
@@ -35,6 +46,7 @@ interface UseNotifyServiceReturn<TData> {
 export function useNotifyService<TData>({
   topic,
   queryKey,
+  refetchUsingHTTP,
   options,
 }: UseNotifyServiceProps<TData, Error>): UseNotifyServiceReturn<TData> {
   const dispatch = useDispatch()
@@ -47,15 +59,13 @@ export function useNotifyService<TData>({
       const hostname = host?.hostname ?? null
       const eventEmitter = appShellListener(hostname, topic)
 
-      // Prefer setQueryData() and manual callback invocation within onDataListener
-      // as opposed to invalidateQueries() and manual callback invocation/cache logic
-      // within the query function. The former is signficantly more performant: ~25ms vs ~1.5s.
-      const onDataListener = (
-        data: DataWithStatusCode<TData> | 'ECONNFAILED'
-      ): void => {
+      const onDataListener = (data: NotifyResponseData<TData>): void => {
         if (!isNotifyError.current) {
+          // True when there is a notification networking error.
           if (data === 'ECONNFAILED') {
             isNotifyError.current = true
+          } else if ('refetchUsingHTTP' in data) {
+            refetchUsingHTTP()
           } else {
             // Emulate React Query's implict onError behavior when passed an error status code.
             if (options.onError != null && inRange(data.statusCode, 400, 600)) {
@@ -64,7 +74,11 @@ export function useNotifyService<TData>({
               )
               console.error(err)
               options.onError(err)
-            } else queryClient.setQueryData(queryKey, data)
+            }
+            // Prefer setQueryData() and manual callback invocation within onDataListener
+            // as opposed to invalidateQueries() and manual callback invocation/cache logic
+            // within the query function. The former is signficantly more performant: ~25ms vs ~1.5s.
+            else queryClient.setQueryData(queryKey, data)
           }
         }
       }
