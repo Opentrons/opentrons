@@ -14,7 +14,7 @@ import {
   useDeleteMaintenanceRunMutation,
   CreateMaintenanceRunType,
 } from '@opentrons/react-api-client'
-import { useNotifyCurrentMaintenanceRun } from '../../resources/notify/useNotifyCurrentMaintenanceRun'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'

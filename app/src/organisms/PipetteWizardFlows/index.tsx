@@ -18,7 +18,7 @@ import {
   useChainMaintenanceCommands,
 } from '../../resources/runs/hooks'
 
-import { useNotifyCurrentMaintenanceRun } from '../../resources/notify/useNotifyCurrentMaintenanceRun'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'

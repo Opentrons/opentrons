@@ -19,7 +19,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useNotifyLastRunCommandKey } from '../../resources/notify/useNotifyLastRunCommandKey'
+import { useNotifyLastRunCommandKey } from '../../resources/runs/useNotifyLastRunCommandKey'
 import { CommandText } from '../CommandText'
 import { Divider } from '../../atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'

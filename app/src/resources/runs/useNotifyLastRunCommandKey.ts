@@ -1,5 +1,5 @@
 import { useAllCommandsQuery, useHost } from '@opentrons/react-api-client'
-import { useNotifyService } from './useNotifyService'
+import { useNotifyService } from '../useNotifyService'
 import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_FINISHING,

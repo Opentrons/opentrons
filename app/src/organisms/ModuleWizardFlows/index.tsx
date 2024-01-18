@@ -31,7 +31,7 @@ import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
 import { DetachProbe } from './DetachProbe'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
-import { useNotifyCurrentMaintenanceRun } from '../../resources/notify/useNotifyCurrentMaintenanceRun'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
 

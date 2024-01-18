@@ -2,11 +2,11 @@ import { useQueryClient } from 'react-query'
 
 import { useHost, useCurrentMaintenanceRun } from '@opentrons/react-api-client'
 
-import { useNotifyService } from './useNotifyService'
+import { useNotifyService } from '../useNotifyService'
 
 import type { UseQueryResult } from 'react-query'
 import type { MaintenanceRun } from '@opentrons/api-client'
-import type { QueryOptionsWithPolling } from './types'
+import type { QueryOptionsWithPolling } from '../useNotifyService'
 
 export function useNotifyCurrentMaintenanceRun(
   options: QueryOptionsWithPolling<MaintenanceRun, Error>
@@ -23,16 +23,14 @@ export function useNotifyCurrentMaintenanceRun(
     queryKey: queryKey,
     options: {
       ...options,
-      onError: () => {
-        queryClient.resetQueries(queryKey)
-      },
+      onError: () => queryClient.resetQueries(queryKey),
     },
   })
   const isUsingNotifyData = !isNotifyError && !options.forceHttpPolling
 
   const httpQueryResult = useCurrentMaintenanceRun({
     ...options,
-    enabled: host !== null && options.enabled !== false && !isUsingNotifyData,
+    enabled: !isUsingNotifyData && host !== null && options.enabled !== false,
   })
 
   return isUsingNotifyData ? notifyQueryResponse : httpQueryResult

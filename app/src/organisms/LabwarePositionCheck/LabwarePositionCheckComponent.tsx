@@ -39,7 +39,7 @@ import { ResultsSummary } from './ResultsSummary'
 import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { FatalErrorModal } from './FatalErrorModal'
 import { RobotMotionLoader } from './RobotMotionLoader'
-import { useNotifyCurrentMaintenanceRun } from '../../resources/notify/useNotifyCurrentMaintenanceRun'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 
 import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'

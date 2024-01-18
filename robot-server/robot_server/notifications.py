@@ -19,13 +19,8 @@ TOPIC_PREFIX = "robot-server"
 
 log = logging.getLogger(__name__)
 
-
-class NotifyData:
-    def __init__(self, topic, message):
-        self.topic = topic
-        self.message = message
-
 # TOME: TYPE ALL OF THIS!
+# TOME: Don't forget to explain everything. 
 class NotificationClient:
     def __init__(self):
         self.client = mqtt.Client(client_id=CLIENT_ID, protocol=PROTOCOL_VERSION)

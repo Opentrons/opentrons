@@ -13,7 +13,7 @@ from robot_server.service.json_api import (
     NotifyBody
 )
 
-from robot_server.notifications import NotifyData, notification_client
+from robot_server.notifications import notification_client
 
 ##TOME: You'll want some sort of base class with a status code living somewhere else.
 class BaseNotificationResponse(BaseModel):
@@ -77,20 +77,20 @@ class AllRunsLinks(BaseModel):
         description="Path to the currently active run, if a run is active.",
     )
 
-#TOME: I think putting stuff in here for now is ok. You can get feedback on where to move things.
 #TOME: Double check that the async logic is correct. You also probably want to return actual stuff.
 #TOME: When you type, you don't want it to strictly contain the current run ID. It just needs to strictly contain the topic and the message.
 #TOME: I think you'll need some way to send status code, since you do utilize that on the client side from time to time...
+
+TOPIC_PREFIX = "robot-server/maintenance_runs"
 
 async def notify_maintenance_run(
         topic,
         message,
         current_run_id = None,
     ):
-    TOPIC_PREFIX = "robot-server/maintenance_runs"
 
     if topic == TOPIC_PREFIX:
-        #TOME: You'd want some assertion/error check here to make sure current run id exists. 
+        #TOME: You'd want some assertion check here to make sure current run id exists. 
         if message is not None:
             links = AllRunsLinks(
                 current=ResourceLink.construct(href=f"/maintenance_runs/{current_run_id}")
