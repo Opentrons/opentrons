@@ -31,8 +31,8 @@ const createUsbDevice = (device: USBDevice): UsbDevice => {
   return {
     vendorId: device.vendorId,
     productId: device.productId,
-    deviceName: device.productName != null ? device.productName : 'no name',
-    manufacturer:
+    productName: device.productName != null ? device.productName : 'no name',
+    manufacturerName:
       device.manufacturerName != null
         ? device.manufacturerName
         : 'no manufacture',
@@ -46,8 +46,8 @@ const createUsbDevices = (devices: USBDevice[]): UsbDevice[] =>
 const addDriverVersion = (device: UsbDevice): Promise<UsbDevice> => {
   if (
     isWindows() &&
-    device.manufacturer != null &&
-    RE_REALTEK.test(device.manufacturer)
+    device.manufacturerName != null &&
+    RE_REALTEK.test(device.manufacturerName)
   ) {
     return getWindowsDriverVersion(device).then(windowsDriverVersion => ({
       ...device,

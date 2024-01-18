@@ -14,9 +14,9 @@ import {
 export interface UsbDevice {
   vendorId: number
   productId: number
-  deviceName: string
-  manufacturer: string
-  serialNumber: string
+  productName?: string
+  manufacturerName?: string
+  serialNumber?: string
   windowsDriverVersion?: string | null
 }
 
@@ -41,9 +41,9 @@ export type DriverStatus =
 export interface U2EAnalyticsProps {
   'U2E Vendor ID': number
   'U2E Product ID': number
-  'U2E Serial Number': string
-  'U2E Device Name': string
-  'U2E Manufacturer': string
+  'U2E Serial Number'?: string
+  'U2E Device Name'?: string
+  'U2E Manufacturer'?: string
   'U2E Windows Driver Version'?: string | null
   [key: string]: string | number | null | undefined
 }

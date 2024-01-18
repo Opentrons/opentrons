@@ -1,6 +1,6 @@
 import assert from 'assert'
 import execa from 'execa'
-import { usb, webusb } from 'usb'
+import { usb, WebUSB } from 'usb'
 import { isWindows } from '../os'
 import { createLogger } from '../log'
 
@@ -17,6 +17,9 @@ export interface UsbDeviceMonitor {
 }
 
 const log = createLogger('usb-devices')
+const webusb = new WebUSB({
+  allowAllDevices: true,
+})
 
 export function createUsbDeviceMonitor(
   options: UsbDeviceMonitorOptions = {}
