@@ -38,7 +38,10 @@ export function useHoverTooltip(
   } = options
 
   const [targetProps, tooltipProps] = useTooltip(useTooltipOptions)
+  console.log('🚀 ~ tooltipProps:', tooltipProps)
+  console.log('🚀 ~ targetProps:', targetProps)
   const [visible, hoverHandlers] = useHover({ enterDelay, leaveDelay })
+  console.log('🚀 ~ visible:', visible)
 
   return [
     { ...targetProps, ...hoverHandlers },

@@ -76,6 +76,7 @@ export const SelectLocation = (
           isThermocycler={
             attachedModule.moduleType === THERMOCYCLER_MODULE_TYPE
           }
+          showToolTipDisabledLocation={true}
         />
       }
       bodyText={bodyText}

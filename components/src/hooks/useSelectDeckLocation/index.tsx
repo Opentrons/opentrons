@@ -9,6 +9,7 @@ import {
   isAddressableAreaStandardSlot,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
+import { Tooltip, useHoverTooltip } from '../../tooltips'
 
 import {
   DeckFromLayers,
@@ -76,6 +77,7 @@ interface DeckLocationSelectProps {
   setSelectedLocation?: (loc: ModuleLocation) => void
   disabledLocations?: ModuleLocation[]
   isThermocycler?: boolean
+  showToolTipDisabledLocation?: boolean
 }
 export function DeckLocationSelect({
   deckDef,
@@ -84,8 +86,10 @@ export function DeckLocationSelect({
   disabledLocations = [],
   theme = 'default',
   isThermocycler = false,
+  showToolTipDisabledLocation = false,
 }: DeckLocationSelectProps): JSX.Element {
   const robotType = deckDef.robot.model
+  const [targetProps, tooltipProps] = useHoverTooltip()
 
   return (
     <RobotCoordinateSpace
@@ -153,22 +157,50 @@ export function DeckLocationSelect({
           return (
             <React.Fragment key={slot.id}>
               {robotType === FLEX_ROBOT_TYPE ? (
-                <SingleSlotFixture
-                  cutoutId={cutoutId}
-                  fixtureBaseColor={fill}
-                  slotClipColor={COLORS.white}
-                  onClick={() =>
-                    !isDisabled &&
-                    setSelectedLocation != null &&
-                    setSelectedLocation(slotLocation)
-                  }
-                  cursor={
-                    setSelectedLocation == null || isDisabled || isSelected
-                      ? 'default'
-                      : 'pointer'
-                  }
-                  deckDefinition={deckDef}
-                />
+                <>
+                  <SingleSlotFixture
+                    cutoutId={cutoutId}
+                    fixtureBaseColor={fill}
+                    slotClipColor={COLORS.white}
+                    onClick={() =>
+                      !isDisabled &&
+                      setSelectedLocation != null &&
+                      setSelectedLocation(slotLocation)
+                    }
+                    cursor={
+                      setSelectedLocation == null || isDisabled || isSelected
+                        ? 'default'
+                        : 'pointer'
+                    }
+                    deckDefinition={deckDef}
+                    {...targetProps}
+                  />
+                  {isDisabled && showToolTipDisabledLocation && (
+                    <Tooltip
+                      key={slot.id}
+                      tooltipProps={{
+                        ...tooltipProps,
+                        style: {
+                          position: 'absolute',
+                          top: 'auto',
+                          right: 'auto',
+                          bottom: '0',
+                          left: '0',
+                          transform: 'translate3d(581.5px, -76px, 0)',
+                        },
+                        arrowStyle: {
+                          position: 'absolute',
+                          top: '',
+                          left: '0',
+                          transform: 'translate3d(66px, 0px, 0)',
+                        },
+                        placement: 'top',
+                      }}
+                    >
+                      TESTING TOOLTIP
+                    </Tooltip>
+                  )}
+                </>
               ) : (
                 <LegacyDeckSlotLocation
                   robotType={robotType}
