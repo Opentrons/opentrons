@@ -13,4 +13,10 @@ class TrashBin:
 
     @property
     def location(self) -> DeckSlotName:
+        """Location of the trash bin.
+
+        :meta private:
+
+        This is intended for Opentrons internal use only and is not a guarenteed API.
+        """
         return self._location

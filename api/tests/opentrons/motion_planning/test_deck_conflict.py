@@ -219,7 +219,7 @@ def test_flex_trash_bin_blocks_thermocycler() -> None:
     with pytest.raises(
         deck_conflict.DeckConflictError,
         match=(
-            "some_trash_bin in slot A1" " prevents some_thermocycler from using slot B1"
+            "some_trash_bin in slot A1 prevents some_thermocycler from using slot B1"
         ),
     ):
         deck_conflict.check(
@@ -231,7 +231,7 @@ def test_flex_trash_bin_blocks_thermocycler() -> None:
     with pytest.raises(
         deck_conflict.DeckConflictError,
         match=(
-            "some_thermocycler in slot B1" " prevents some_trash_bin from using slot A1"
+            "some_thermocycler in slot B1 prevents some_trash_bin from using slot A1"
         ),
     ):
         deck_conflict.check(
