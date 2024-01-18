@@ -618,6 +618,7 @@ class API(
                     home_flagged_axes=False,
                 )
 
+    @ExecutionManagerProvider.wait_for_running
     async def home_plunger(self, mount: top_types.Mount) -> None:
         """
         Home the plunger motor for a mount, and then return it to the 'bottom'
@@ -914,7 +915,6 @@ class API(
         converted_axes = "".join(axes)
         return await self._backend.fast_home(converted_axes, margin)
 
-    @ExecutionManagerProvider.wait_for_running
     async def retract(self, mount: top_types.Mount, margin: float = 10) -> None:
         """Pull the specified mount up to its home position.
 
@@ -922,7 +922,6 @@ class API(
         """
         await self.retract_axis(Axis.by_mount(mount), margin)
 
-    @ExecutionManagerProvider.wait_for_running
     async def retract_axis(self, axis: Axis, margin: float = 10) -> None:
         """Pull the specified axis up to its home position.
 
