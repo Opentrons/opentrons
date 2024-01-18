@@ -38,9 +38,9 @@ export const PipetteRender = (props: PipetteRenderProps): JSX.Element => {
   const x = labwareDef.wells.A1.x - cx
   const y = channels === 1 ? labwareDef.wells.A1.y - cy : MULTI_CHANNEL_Y_OFFSET
 
-  let boxWidth
-  let probeOffsetX = 0
-  let probeOffsetY = 0
+  let boxWidth: number
+  let probeOffsetX: number = 0
+  let probeOffsetY: number = 0
   if (channels === 1) {
     boxWidth = SINGLE_CHANNEL_PIPETTE_WIDTH
   } else if (channels === 8) {
