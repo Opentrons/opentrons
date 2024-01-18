@@ -87,7 +87,7 @@ if __name__ == '__main__':
             df = pd.concat([df, df_reading])
             if bool(is_stable) == 1:
                 max_weight = df['Scale Reading'].max()
-                if max_weight < 10:
+                if max_weight < 1:
                     print(f'You should remeasure. The maximum mass captured was {max_weight} grams.')
                     break
                 df.to_csv(savepath)
