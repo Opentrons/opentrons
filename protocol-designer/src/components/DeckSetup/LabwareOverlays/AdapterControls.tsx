@@ -5,7 +5,6 @@ import cx from 'classnames'
 import { connect } from 'react-redux'
 import noop from 'lodash/noop'
 import { Icon, RobotCoordsForeignDiv } from '@opentrons/components'
-import { i18n } from '../../../localization'
 import { DND_TYPES } from '../../../constants'
 import {
   getAdapterLabwareIsAMatch,
@@ -127,13 +126,11 @@ export const AdapterControlsComponents = (
         >
           <a className={styles.overlay_button} onClick={addLabware}>
             {!isOver && <Icon className={styles.overlay_icon} name="plus" />}
-            {i18n.t(
-              `deck.overlay.slot.${isOver ? 'place_here' : 'add_labware'}`
-            )}
+            {isOver ? 'Place Here' : 'Add Labware'}
           </a>
           <a className={styles.overlay_button} onClick={deleteLabware}>
             {!isOver && <Icon className={styles.overlay_icon} name="close" />}
-            {i18n.t('deck.overlay.edit.delete')}
+            {'Delete'}
           </a>
         </RobotCoordsForeignDiv>
       )}
@@ -151,16 +148,14 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<any>, ownProps: OP): DP => {
   const adapterName =
     ownProps.allLabware.find(labware => labware.id === ownProps.labwareId)?.def
       .metadata.displayName ?? ''
-
   return {
     addLabware: () =>
       dispatch(openAddLabwareModal({ slot: ownProps.labwareId })),
     moveDeckItem: (sourceSlot, destSlot) =>
       dispatch(moveDeckItem(sourceSlot, destSlot)),
     deleteLabware: () => {
-      window.confirm(
-        i18n.t('deck.warning.cancelForSure', { adapterName: adapterName })
-      ) && dispatch(deleteContainer({ labwareId: ownProps.labwareId }))
+      window.confirm(`"Are you sure you want to remove this ${adapterName}?`) &&
+        dispatch(deleteContainer({ labwareId: ownProps.labwareId }))
     },
   }
 }

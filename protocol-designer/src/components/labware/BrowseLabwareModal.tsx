@@ -1,21 +1,20 @@
 import assert from 'assert'
-import { i18n } from '../../localization'
 import * as React from 'react'
 import cx from 'classnames'
 import { connect } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 import { Modal } from '@opentrons/components'
-import { BrowsableLabware } from './BrowsableLabware'
-
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import { selectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import * as labwareIngredsActions from '../../labware-ingred/actions'
+import { BrowsableLabware } from './BrowsableLabware'
 
-import { BaseState, ThunkDispatch } from '../../types'
-import { ContentsByWell } from '../../labware-ingred/types'
-import { WellIngredientNames } from '../../steplist/types'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { BaseState, ThunkDispatch } from '../../types'
+import type { ContentsByWell } from '../../labware-ingred/types'
+import type { WellIngredientNames } from '../../steplist/types'
 
 import modalStyles from '../modals/modal.css'
 import styles from './labware.css'
@@ -34,6 +33,7 @@ type Props = SP & DP
 
 const BrowseLabwareModalComponent = (props: Props): JSX.Element | null => {
   const { drillUp, definition, ingredNames, wellContents } = props
+  const { t } = useTranslation('modal')
   if (!definition) {
     assert(definition, 'BrowseLabwareModal expected definition')
     return null
@@ -54,7 +54,7 @@ const BrowseLabwareModalComponent = (props: Props): JSX.Element | null => {
         wellContents={wellContents}
       />
       <div className={styles.modal_instructions}>
-        {i18n.t('modal.browse_labware.instructions')}
+        {t('browse_labware.instructions')}
       </div>
     </Modal>
   )

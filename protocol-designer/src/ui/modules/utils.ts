@@ -1,5 +1,4 @@
 import values from 'lodash/values'
-import { i18n } from '../../localization'
 import {
   MAGNETIC_MODULE_V1,
   getLabwareDefaultEngageHeight,
@@ -61,6 +60,22 @@ export function getModuleUnderLabware(
     return location === moduleOnDeck.id
   })
 }
+
+export const getModuleShortNames = (type: ModuleType): string => {
+  switch (type) {
+    case 'heaterShakerModuleType':
+      return 'Heater-Shaker'
+    case 'magneticBlockType':
+      return 'Magnetic Block'
+    case 'magneticModuleType':
+      return 'Magnetic Module'
+    case 'temperatureModuleType':
+      return 'Temperature Module'
+    case 'thermocyclerModuleType':
+      return 'Thermocycler'
+  }
+}
+
 export function getModuleLabwareOptions(
   initialDeckSetup: InitialDeckSetup,
   nicknamesById: Record<string, string>,
@@ -69,7 +84,7 @@ export function getModuleLabwareOptions(
   const moduleOnDeck = getModuleOnDeckByType(initialDeckSetup, type)
   const labware =
     moduleOnDeck && getLabwareOnModule(initialDeckSetup, moduleOnDeck.id)
-  const module = i18n.t(`form.step_edit_form.field.moduleLabwarePrefix.${type}`)
+  const module = getModuleShortNames(type)
   let options: Options = []
 
   if (moduleOnDeck) {

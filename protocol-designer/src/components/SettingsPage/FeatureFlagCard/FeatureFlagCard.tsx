@@ -1,7 +1,7 @@
-import sortBy from 'lodash/sortBy'
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import sortBy from 'lodash/sortBy'
 import { ContinueModal, Card, ToggleButton } from '@opentrons/components'
-import { i18n } from '../../../localization'
 import { resetScrollElements } from '../../../ui/steps/utils'
 import { Portal } from '../../portals/MainPageModalPortal'
 import styles from '../SettingsPage.css'
@@ -17,6 +17,7 @@ export const FeatureFlagCard = (props: Props): JSX.Element => {
   const [modalFlagName, setModalFlagName] = React.useState<FlagTypes | null>(
     null
   )
+  const { t } = useTranslation(['modal', 'card', 'feature_flags'])
 
   const prereleaseModeEnabled = props.flags.PRERELEASE_MODE === true
 
@@ -35,20 +36,18 @@ export const FeatureFlagCard = (props: Props): JSX.Element => {
     const RICH_DESCRIPTIONS: Partial<Record<FlagTypes, JSX.Element>> = {
       OT_PD_ALLOW_ALL_TIPRACKS: (
         <>
-          <p>{i18n.t(`feature_flags.${flag}.description`)} </p>
+          <p>{t(`feature_flags:${flag}.description`)} </p>
         </>
       ),
       OT_PD_DISABLE_MODULE_RESTRICTIONS: (
         <>
-          <p>{i18n.t(`feature_flags.${flag}.description_1`)} </p>
-          <p>{i18n.t(`feature_flags.${flag}.description_2`)} </p>
+          <p>{t(`feature_flags:${flag}.description_1`)} </p>
+          <p>{t(`feature_flags:${flag}.description_2`)} </p>
         </>
       ),
     }
     return (
-      RICH_DESCRIPTIONS[flag] || (
-        <p>{i18n.t(`feature_flags.${flag}.description`)}</p>
-      )
+      RICH_DESCRIPTIONS[flag] || <p>{t(`feature_flags:${flag}.description`)}</p>
     )
   }
 
@@ -56,7 +55,7 @@ export const FeatureFlagCard = (props: Props): JSX.Element => {
     <div key={flagName}>
       <div className={styles.setting_row}>
         <p className={styles.toggle_label}>
-          {i18n.t(`feature_flags.${flagName}.title`)}
+          {t(`feature_flags:${flagName}.title`)}
         </p>
         <ToggleButton
           className={styles.toggle_button}
@@ -96,8 +95,8 @@ export const FeatureFlagCard = (props: Props): JSX.Element => {
           <ContinueModal
             alertOverlay
             className={modalStyles.modal}
-            heading={i18n.t(
-              `modal.experimental_feature_warning.${flagSwitchDirection}.title`
+            heading={t(
+              `experimental_feature_warning.${flagSwitchDirection}.title`
             )}
             onCancelClick={() => setModalFlagName(null)}
             onContinueClick={() => {
@@ -108,25 +107,21 @@ export const FeatureFlagCard = (props: Props): JSX.Element => {
             }}
           >
             <p>
-              {i18n.t(
-                `modal.experimental_feature_warning.${flagSwitchDirection}.body1`
-              )}
+              {t(`experimental_feature_warning.${flagSwitchDirection}.body1`)}
             </p>
             <p>
-              {i18n.t(
-                `modal.experimental_feature_warning.${flagSwitchDirection}.body2`
-              )}
+              {t(`experimental_feature_warning.${flagSwitchDirection}.body2`)}
             </p>
           </ContinueModal>
         </Portal>
       )}
-      <Card title={i18n.t('card.title.feature_flags')}>
+      <Card title={t('card:title.feature_flags')}>
         <div className={styles.card_content}>
           {userFacingFlagRows.length > 0 ? userFacingFlagRows : noFlagsFallback}
         </div>
       </Card>
       {prereleaseModeEnabled && (
-        <Card title={i18n.t('card.title.prerelease_mode_flags')}>
+        <Card title={t('card:title.prerelease_mode_flags')}>
           <div className={styles.card_content}>{prereleaseFlagRows}</div>
         </Card>
       )}

@@ -3,6 +3,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { LabwareDefinition2 } from '@opentrons/shared-data'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import { i18n } from '../../../../localization'
 import { getNewProtocolModal } from '../../../../navigation/selectors'
 import {
   getCustomLabwareDefsByURI,
@@ -74,7 +75,7 @@ const mockCreateDeckFixture = createDeckFixture as jest.MockedFunction<
   typeof createDeckFixture
 >
 const render = () => {
-  return renderWithProviders(<CreateFileWizard />)[0]
+  return renderWithProviders(<CreateFileWizard />, { i18nInstance: i18n })[0]
 }
 
 const fixtureTipRack10ul = {

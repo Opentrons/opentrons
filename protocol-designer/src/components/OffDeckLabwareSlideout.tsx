@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
+import { useTranslation } from 'react-i18next'
 import {
   Tooltip,
   DeprecatedPrimaryButton,
@@ -23,7 +24,6 @@ import {
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { i18n } from '../localization'
 import { openAddLabwareModal } from '../labware-ingred/actions'
 import { getLabwareEntities } from '../step-forms/selectors'
 import { selectors } from '../labware-ingred/selectors'
@@ -44,6 +44,7 @@ interface OffDeckLabwareSlideoutProps {
 export const OffDeckLabwareSlideout = (
   props: OffDeckLabwareSlideoutProps
 ): JSX.Element => {
+  const { t } = useTranslation(['deck', 'button', 'tooltip'])
   const [targetProps, tooltipProps] = useHoverTooltip()
   const dispatch = useDispatch()
   const disabled = props.initialSetupTerminalItemId === false
@@ -69,7 +70,7 @@ export const OffDeckLabwareSlideout = (
   return (
     <Slideout
       onCloseClick={props.onCloseClick}
-      title={i18n.t('deck.off_deck.slideout_title')}
+      title={t('off_deck.slideout_title')}
       isExpanded={props.isExpanded}
       footer={
         <div {...targetProps}>
@@ -79,11 +80,11 @@ export const OffDeckLabwareSlideout = (
             marginRight={SPACING.spacing16}
             disabled={disabled}
           >
-            {i18n.t('button.add_off_deck')}
+            {t('button:add_off_deck')}
           </DeprecatedPrimaryButton>
           {disabled ? (
             <Tooltip {...tooltipProps}>
-              {i18n.t(`tooltip.disabled_off_deck`)}
+              {t(`tooltip:disabled_off_deck`)}
             </Tooltip>
           ) : null}
         </div>
@@ -106,7 +107,7 @@ export const OffDeckLabwareSlideout = (
             color={COLORS.grey60}
             marginBottom={SPACING.spacing32}
           />
-          <Text>{i18n.t('deck.off_deck.slideout_empty_state')}</Text>
+          <Text>{t('off_deck.slideout_empty_state')}</Text>
         </Flex>
       ) : (
         Object.keys(offDeck).map(labwareId => {

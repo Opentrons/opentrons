@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import {
   getModuleDisplayName,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../../localization'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
@@ -22,6 +22,7 @@ export function LabwareLocationField(
     useGripper: boolean
   } & { canSave: boolean } & { labware: string }
 ): JSX.Element {
+  const { t } = useTranslation('form')
   const { labware, useGripper, value } = props
   const labwareEntities = useSelector(getLabwareEntities)
   const robotState = useSelector(getRobotStateAtActiveItem)
@@ -79,10 +80,10 @@ export function LabwareLocationField(
       {...props}
       errorToShow={
         !props.canSave && bothFieldsSelected
-          ? i18n.t(
-              'form.step_edit_form.labwareLabel.errors.labwareSlotIncompatible',
-              { labwareName: labwareDisplayName, slot: locationString }
-            )
+          ? t('step_edit_form.labwareLabel.errors.labwareSlotIncompatible', {
+              labwareName: labwareDisplayName,
+              slot: locationString,
+            })
           : undefined
       }
       options={unoccupiedLabwareLocationsOptions}
