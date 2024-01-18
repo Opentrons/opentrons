@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Box,
   DeprecatedPrimaryButton,
@@ -28,7 +29,6 @@ import { WellOrderOption } from '../../form-types'
 import formStyles from '../forms/forms.css'
 import styles from '../StepEditForm/StepEditForm.css'
 import buttonStyles from '../StepEditForm/ButtonRow/styles.css'
-import { useTranslation } from 'react-i18next'
 
 const SourceDestBatchEditMoveLiquidFields = (props: {
   prefix: 'aspirate' | 'dispense'

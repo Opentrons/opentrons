@@ -1,15 +1,15 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { ALL, COLUMN } from '@opentrons/shared-data'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { FormGroup, InputField } from '@opentrons/components'
-import { Portal } from '../../../portals/MainPageModalPortal'
+import { ALL, COLUMN } from '@opentrons/shared-data'
 import {
   actions as stepsActions,
   getSelectedStepId,
   getWellSelectionLabwareKey,
 } from '../../../../ui/steps'
+import { selectors as stepFormSelectors } from '../../../../step-forms'
+import { Portal } from '../../../portals/MainPageModalPortal'
 import { WellSelectionModal } from './WellSelectionModal'
 import styles from '../../StepEditForm.css'
 

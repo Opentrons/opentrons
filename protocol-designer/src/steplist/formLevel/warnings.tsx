@@ -18,14 +18,14 @@ export type FormWarning = FormError & {
 
 const belowMinAirGapVolumeWarning = (min: number): FormWarning => ({
   type: 'BELOW_MIN_AIR_GAP_VOLUME',
-  title: `Air gap volume is below pipette minimum (${min}} uL)`,
+  title: `Air gap volume is below pipette minimum (${min} uL)`,
   body: <>{'Pipettes cannot accurately handle volumes below their minimum.'}</>,
   dependentFields: ['disposalVolume_volume', 'pipette'],
 })
 
 const belowPipetteMinVolumeWarning = (min: number): FormWarning => ({
   type: 'BELOW_PIPETTE_MINIMUM_VOLUME',
-  title: `Disposal volume is below recommended minimum (${min}} uL)`,
+  title: `Disposal volume is below recommended minimum (${min} uL)`,
   body: (
     <>
       {
@@ -44,7 +44,7 @@ const overMaxWellVolumeWarning = (): FormWarning => ({
 
 const belowMinDisposalVolumeWarning = (min: number): FormWarning => ({
   type: 'BELOW_MIN_DISPOSAL_VOLUME',
-  title: `Disposal volume is below recommended minimum (${min}} uL)`,
+  title: `Disposal volume is below recommended minimum (${min} uL)`,
   body: (
     <>
       {

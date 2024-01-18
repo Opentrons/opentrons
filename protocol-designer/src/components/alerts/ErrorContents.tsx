@@ -1,9 +1,10 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { START_TERMINAL_ITEM_ID } from '../../steplist'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
-import { AlertLevel } from './types'
 import { TerminalItemLink } from '../steplist/TerminalItem'
-import { useTranslation } from 'react-i18next'
+
+import type { AlertLevel } from './types'
 
 interface ErrorContentsProps {
   errorType: string

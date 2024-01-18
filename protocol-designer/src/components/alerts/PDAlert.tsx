@@ -1,10 +1,11 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { AlertItem, OutlineButton } from '@opentrons/components'
+import type { AlertData, AlertType } from './types'
+
 // TODO: Ian 2019-03-27 the use of Component Library `Alert` is being
 // stretched beyond its intentions here, we should reconcile PD + Run App uses of Alert later
 import styles from './alerts.css'
-import { AlertData, AlertType } from './types'
-import { useTranslation } from 'react-i18next'
 
 interface PDAlertProps {
   alertType: AlertType

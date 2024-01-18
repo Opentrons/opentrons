@@ -1,8 +1,7 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
-import { selectors as uiModuleSelectors } from '../../../ui/modules'
-
 import {
   FormGroup,
   useHoverTooltip,
@@ -10,6 +9,8 @@ import {
   TOOLTIP_BOTTOM,
   TOOLTIP_FIXED,
 } from '@opentrons/components'
+
+import { selectors as uiModuleSelectors } from '../../../ui/modules'
 import {
   PAUSE_UNTIL_RESUME,
   PAUSE_UNTIL_TIME,
@@ -17,10 +18,10 @@ import {
 } from '../../../constants'
 import { TextField, RadioGroupField, StepFormDropdown } from '../fields'
 import { getSingleSelectDisabledTooltip } from '../utils'
-import styles from '../StepEditForm.css'
 
-import { StepFormProps } from '../types'
-import { useTranslation } from 'react-i18next'
+import type { StepFormProps } from '../types'
+
+import styles from '../StepEditForm.css'
 
 export const PauseForm = (props: StepFormProps): JSX.Element => {
   const tempModuleLabwareOptions = useSelector(

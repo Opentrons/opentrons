@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { i18n } from '../../../../localization'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { LabwareDefinition2 } from '@opentrons/shared-data'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import { i18n } from '../../../../localization'
 import { getNewProtocolModal } from '../../../../navigation/selectors'
 import {
   getCustomLabwareDefsByURI,

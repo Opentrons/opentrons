@@ -1,10 +1,10 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import { AlertModal, OutlineButton } from '@opentrons/components'
 import modalStyles from '../modal.css'
 import { getModalContents } from './modalContents'
 import { FileUploadMessage } from '../../../load-file'
-import { useTranslation } from 'react-i18next'
 
 export interface FileUploadMessageModalProps {
   message?: FileUploadMessage | null

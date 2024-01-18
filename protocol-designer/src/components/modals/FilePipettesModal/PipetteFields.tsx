@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import isEmpty from 'lodash/isEmpty'
 import {
   DropdownField,
@@ -29,7 +30,6 @@ import formStyles from '../../forms/forms.css'
 import type { PipetteName } from '@opentrons/shared-data'
 import type { ThunkDispatch } from 'redux-thunk'
 import type { BaseState } from '../../../types'
-import { useTranslation } from 'react-i18next'
 export interface Props {
   initialTabIndex?: number
   values: FormPipettesByMount

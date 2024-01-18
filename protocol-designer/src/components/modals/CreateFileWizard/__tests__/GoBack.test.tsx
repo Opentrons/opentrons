@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { i18n } from '../../../../localization'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import { i18n } from '../../../../localization'
 import { GoBack } from '../GoBack'
 
 const render = (props: React.ComponentProps<typeof GoBack>) => {

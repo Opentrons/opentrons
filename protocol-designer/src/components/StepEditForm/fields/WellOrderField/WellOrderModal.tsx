@@ -37,6 +37,8 @@ export interface WellOrderModalProps {
     firstValue?: WellOrderOption | null,
     secondValue?: WellOrderOption | null
   ) => void
+  //  TODO(jr, 1/18/24): The newest i18next versions only support TypeScript v5
+  //  so need to type all ts as any for now https://www.i18next.com/overview/typescript
   t: any
 }
 

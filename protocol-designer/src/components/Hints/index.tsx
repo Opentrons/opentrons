@@ -8,8 +8,6 @@ import {
   OutlineButton,
   Text,
 } from '@opentrons/components'
-// import { actions as stepsActions } from '../../ui/steps'
-// import { TerminalItemId } from '../../steplist'
 import { actions, selectors, HintKey } from '../../tutorial'
 import { Portal } from '../portals/MainPageModalPortal'
 import styles from './hints.css'
@@ -29,10 +27,6 @@ export const Hints = (): JSX.Element | null => {
   const removeHint = (hintKey: HintKey): void => {
     dispatch(actions.removeHint(hintKey, rememberDismissal))
   }
-  //  Is this needed?
-  // const selectTerminalItem = (terminalId: TerminalItemId): void => {
-  //   dispatch(stepsActions.selectTerminalItem(terminalId))
-  // }
 
   const makeHandleCloseClick = (hintKey: HintKey): (() => void) => {
     return () => removeHint(hintKey)

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Flex,
   Text,
@@ -7,7 +8,6 @@ import {
   JUSTIFY_CENTER,
   SPACING_3,
 } from '@opentrons/components'
-import { useTranslation } from 'react-i18next'
 
 export const NoBatchEditSharedSettings = (): JSX.Element => {
   const { t } = useTranslation('application')

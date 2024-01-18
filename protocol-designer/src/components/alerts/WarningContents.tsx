@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { START_TERMINAL_ITEM_ID } from '../../steplist'
-import { AlertLevel } from './types'
-import { TerminalItemLink } from '../steplist/TerminalItem'
 import { useTranslation } from 'react-i18next'
+import { START_TERMINAL_ITEM_ID } from '../../steplist'
+import { TerminalItemLink } from '../steplist/TerminalItem'
 
+import type { AlertLevel } from './types'
 interface WarningContentsProps {
   warningType: string
   level: AlertLevel
