@@ -196,12 +196,10 @@
       }
     }
   },
-  "window": {
-    "confirm_create_new": "Are you sure you want to create a new file? Any unsaved changes will be discarded.",
-    "confirm_delete_step": "Are you sure you want to delete this step?",
-    "confirm_import": "Are you sure you want to import this file? You will lose any current unsaved changes.",
-    "confirm_leave": "Are you sure you want to leave? You will lose any unsaved changes."
-  },
+  "confirm_create_new": "Are you sure you want to create a new file? Any unsaved changes will be discarded.",
+  "confirm_delete_step": "Are you sure you want to delete this step?",
+  "confirm_import": "Are you sure you want to import this file? You will lose any current unsaved changes.",
+  "confirm_leave": "Are you sure you want to leave? You will lose any unsaved changes.",
   "module_placement": {
     "SLOT_OCCUPIED": {
       "title": "Cannot place module",

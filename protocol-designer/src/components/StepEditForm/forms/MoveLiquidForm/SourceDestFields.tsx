@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { i18n } from '../../../../localization'
+import { useTranslation } from 'react-i18next'
 import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors'
 
 import {
@@ -36,6 +36,7 @@ const makeAddFieldNamePrefix = (prefix: string) => (
 
 export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
   const { className, formData, prefix, propsForFields } = props
+  const { t } = useTranslation(['form', 'application'])
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
@@ -103,7 +104,7 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
         {hideWellOrderField ? null : (
           <WellOrderField
             prefix={prefix}
-            label={i18n.t('form.step_edit_form.field.well_order.label')}
+            label={t('step_edit_form.field.well_order.label')}
             updateFirstWellOrder={
               propsForFields[addFieldNamePrefix('wellOrder_first')].updateValue
             }
@@ -123,7 +124,7 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
           <>
             <CheckboxRowField
               {...propsForFields.preWetTip}
-              label={i18n.t('form.step_edit_form.field.preWetTip.label')}
+              label={t('step_edit_form.field.preWetTip.label')}
               className={styles.small_field}
             />
             {getMixFields()}
@@ -139,7 +140,7 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
 
         <CheckboxRowField
           {...propsForFields[addFieldNamePrefix('touchTip_checkbox')]}
-          label={i18n.t('form.step_edit_form.field.touchTip.label')}
+          label={t('step_edit_form.field.touchTip.label')}
           className={styles.small_field}
         >
           <TipPositionField
@@ -157,7 +158,7 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
         {prefix === 'dispense' && (
           <CheckboxRowField
             {...propsForFields.blowout_checkbox}
-            label={i18n.t('form.step_edit_form.field.blowout.label')}
+            label={t('step_edit_form.field.blowout.label')}
             className={styles.small_field}
           >
             <BlowoutLocationField
@@ -172,13 +173,13 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
         )}
         <CheckboxRowField
           {...propsForFields[addFieldNamePrefix('airGap_checkbox')]}
-          label={i18n.t('form.step_edit_form.field.airGap.label')}
+          label={t('step_edit_form.field.airGap.label')}
           className={styles.small_field}
         >
           <TextField
             {...propsForFields[addFieldNamePrefix('airGap_volume')]}
             className={styles.small_field}
-            units={i18n.t('application.units.microliter')}
+            units={t('application:units.microliter')}
           />
         </CheckboxRowField>
       </div>

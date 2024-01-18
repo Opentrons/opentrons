@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { i18n } from '../../localization'
+import { useTranslation } from 'react-i18next'
 import {
   Card,
   OutlineButton,
@@ -39,15 +39,16 @@ function SettingsAppComponent(props: Props): JSX.Element {
     restoreHints,
     toggleOptedIn,
   } = props
+  const { t } = useTranslation(['card', 'application', 'button'])
   return (
     <>
       <div className={styles.page_row}>
-        <Card title={i18n.t('card.title.information')}>
+        <Card title={t('title.information')}>
           <div className={styles.card_content}>
             <div className={styles.setting_row}>
               <LabeledValue
                 className={styles.labeled_value}
-                label={i18n.t('application.version')}
+                label={t('application:version')}
                 value={process.env.OT_PD_VERSION || OLDEST_MIGRATEABLE_VERSION}
               />
               {/* TODO: BC 2019-02-26 add release notes link here, when there are release notes */}
@@ -56,30 +57,28 @@ function SettingsAppComponent(props: Props): JSX.Element {
         </Card>
       </div>
       <div className={styles.page_row}>
-        <Card title={i18n.t('card.title.hints')}>
+        <Card title={t('title.hints')}>
           <div className={styles.card_content}>
             <div className={styles.setting_row}>
-              {i18n.t('card.body.restore_hints')}
+              {t('body.restore_hints')}
               <OutlineButton
                 className={styles.button}
                 disabled={!canClearHintDismissals}
                 onClick={restoreHints}
               >
                 {canClearHintDismissals
-                  ? i18n.t('button.restore')
-                  : i18n.t('button.restored')}
+                  ? t('button:restore')
+                  : t('button:restored')}
               </OutlineButton>
             </div>
           </div>
         </Card>
       </div>
       <div className={styles.page_row}>
-        <Card title={i18n.t('card.title.privacy')}>
+        <Card title={t('title.privacy')}>
           <div className={styles.card_content}>
             <div className={styles.setting_row}>
-              <p className={styles.toggle_label}>
-                {i18n.t('card.toggle.share_session')}
-              </p>
+              <p className={styles.toggle_label}>{t('toggle.share_session')}</p>
               <ToggleButton
                 className={styles.toggle_button}
                 toggledOn={Boolean(hasOptedIn)}
@@ -88,8 +87,8 @@ function SettingsAppComponent(props: Props): JSX.Element {
             </div>
 
             <p className={styles.card_body}>
-              {i18n.t('card.body.reason_for_collecting_data')}{' '}
-              {i18n.t('card.body.data_collected_is_internal')}.
+              {t('body.reason_for_collecting_data')}{' '}
+              {t('body.data_collected_is_internal')}.
             </p>
           </div>
         </Card>

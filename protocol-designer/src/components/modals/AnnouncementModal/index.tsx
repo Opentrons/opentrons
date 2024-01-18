@@ -1,7 +1,7 @@
 import * as React from 'react'
 import cx from 'classnames'
+import { useTranslation } from 'react-i18next'
 import { Modal, OutlineButton } from '@opentrons/components'
-import { i18n } from '../../../localization'
 import {
   setLocalStorageItem,
   getLocalStorageItem,
@@ -12,6 +12,7 @@ import { announcements } from './announcements'
 import styles from './AnnouncementModal.css'
 
 export const AnnouncementModal = (): JSX.Element => {
+  const { t } = useTranslation('button')
   const { announcementKey, message, heading, image } = announcements[
     announcements.length - 1
   ]
@@ -49,9 +50,7 @@ export const AnnouncementModal = (): JSX.Element => {
             <div className={styles.announcement_message}>{message}</div>
 
             <div className={modalStyles.button_row}>
-              <OutlineButton onClick={handleClick}>
-                {i18n.t('button.got_it')}
-              </OutlineButton>
+              <OutlineButton onClick={handleClick}>{t('got_it')}</OutlineButton>
             </div>
           </div>
         </Modal>

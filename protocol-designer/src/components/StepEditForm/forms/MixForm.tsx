@@ -1,8 +1,8 @@
 import * as React from 'react'
 import cx from 'classnames'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { FormGroup } from '@opentrons/components'
-import { i18n } from '../../../localization'
 import { getPipetteEntities } from '../../../step-forms/selectors'
 import {
   BlowoutLocationField,
@@ -33,6 +33,7 @@ import styles from '../StepEditForm.css'
 export const MixForm = (props: StepFormProps): JSX.Element => {
   const [collapsed, setCollapsed] = React.useState(true)
   const pipettes = useSelector(getPipetteEntities)
+  const { t } = useTranslation(['application', 'form'])
 
   const { propsForFields, formData } = props
   const is96Channel =
@@ -45,9 +46,7 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
   return (
     <div className={styles.form_wrapper}>
       <div className={styles.section_header}>
-        <span className={styles.section_header_text}>
-          {i18n.t('application.stepType.mix')}
-        </span>
+        <span className={styles.section_header_text}>{t('stepType.mix')}</span>
       </div>
       <div className={styles.form_row}>
         <PipetteField {...propsForFields.pipette} />
@@ -56,23 +55,20 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
         ) : null}
         <VolumeField
           {...propsForFields.volume}
-          label={i18n.t('form.step_edit_form.mixVolumeLabel')}
+          label={t('form:step_edit_form.mixVolumeLabel')}
           stepType="mix"
           className={styles.small_field}
         />
         <FormGroup
           className={styles.small_field}
-          label={i18n.t('form.step_edit_form.mixRepetitions')}
+          label={t('form:step_edit_form.mixRepetitions')}
         >
-          <TextField
-            {...propsForFields.times}
-            units={i18n.t('application.units.times')}
-          />
+          <TextField {...propsForFields.times} units={t('units.times')} />
         </FormGroup>
       </div>
       <div className={styles.form_row}>
         <FormGroup
-          label={i18n.t('form.step_edit_form.labwareLabel.mixLabware')}
+          label={t('form:step_edit_form.labwareLabel.mixLabware')}
           className={styles.large_field}
         >
           <LabwareField {...propsForFields.labware} />
@@ -132,7 +128,7 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
                   propsForFields.mix_wellOrder_second.updateValue
                 }
                 prefix="mix"
-                label={i18n.t('form.step_edit_form.field.well_order.label')}
+                label={t('form:step_edit_form.field.well_order.label')}
                 firstValue={formData.mix_wellOrder_first}
                 secondValue={formData.mix_wellOrder_second}
                 firstName={'mix_wellOrder_first'}
@@ -177,7 +173,7 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
               <CheckboxRowField
                 {...propsForFields.mix_touchTip_checkbox}
                 className={styles.small_field}
-                label={i18n.t('form.step_edit_form.field.touchTip.label')}
+                label={t('form:step_edit_form.field.touchTip.label')}
               >
                 <TipPositionField
                   {...propsForFields.mix_touchTip_mmFromBottom}
@@ -194,7 +190,7 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
               <CheckboxRowField
                 {...propsForFields.blowout_checkbox}
                 className={styles.small_field}
-                label={i18n.t('form.step_edit_form.field.blowout.label')}
+                label={t('form:step_edit_form.field.blowout.label')}
               >
                 <BlowoutLocationField
                   {...propsForFields.blowout_location}
@@ -211,10 +207,10 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
 
       <div className={styles.section_header}>
         <span className={styles.section_header_text_column}>
-          {i18n.t('form.step_edit_form.section.sterility')}
+          {t('form:step_edit_form.section.sterility')}
         </span>
         <span className={styles.section_header_text_column}>
-          {i18n.t('form.step_edit_form.section.dropTip')}
+          {t('form:step_edit_form.section.dropTip')}
         </span>
       </div>
       <div className={styles.section_wrapper}>

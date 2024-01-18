@@ -1,5 +1,6 @@
 import * as React from 'react'
 import without from 'lodash/without'
+import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -16,7 +17,6 @@ import {
   STAGING_AREA_CUTOUTS,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../localization'
 import { GoBack } from './GoBack'
 import { HandleEnter } from './HandleEnter'
 
@@ -25,6 +25,7 @@ import type { WizardTileProps } from './types'
 
 export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
   const { values, goBack, proceed, setFieldValue } = props
+  const { t } = useTranslation(['modal', 'application'])
   const isOt2 = values.fields.robotType === OT2_ROBOT_TYPE
   const stagingAreaItems = values.additionalEquipment.filter(equipment =>
     // TODO(bc, 11/14/2023): refactor the additional items field to include a cutoutId
@@ -113,9 +114,7 @@ export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
     <HandleEnter onEnter={proceed}>
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
         <Flex flexDirection={DIRECTION_COLUMN} height="26rem">
-          <Text as="h2">
-            {i18n.t('modal.create_file_wizard.staging_areas')}
-          </Text>
+          <Text as="h2">{t('staging_areas')}</Text>
           <DeckConfigurator
             deckConfig={updatedSlots}
             handleClickAdd={handleClickAdd}
@@ -140,7 +139,7 @@ export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
             }}
           />
           <PrimaryButton onClick={() => proceed()}>
-            {i18n.t('application.next')}
+            {t('application:next')}
           </PrimaryButton>
         </Flex>
       </Flex>

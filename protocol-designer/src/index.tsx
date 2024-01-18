@@ -23,7 +23,7 @@ const root = ReactDOM.createRoot(container)
 const render = (Component: any): void => {
   root.render(
     <Provider store={store}>
-      <I18nextProvider i18n={i18n as any}>
+      <I18nextProvider i18n={i18n}>
         <Component />
       </I18nextProvider>
     </Provider>
