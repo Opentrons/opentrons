@@ -45,8 +45,6 @@ from opentrons.hardware_control.types import (
     HardwareEventUnsubscriber,
 )
 
-from opentrons_hardware.hardware_control import status_bar
-
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
@@ -720,9 +718,6 @@ class OT3Simulator(FlexBackend):
     ) -> List[float]:
         self._position[moving] += distance_mm
         return []
-
-    def status_bar_interface(self) -> status_bar.StatusBar:
-        return status_bar.StatusBar(None)
 
     @property
     def subsystems(self) -> Dict[SubSystem, SubSystemState]:
