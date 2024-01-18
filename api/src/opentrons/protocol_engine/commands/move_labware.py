@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from pydantic import BaseModel, Field
-from typing import TYPE_CHECKING, Optional, Type
+from typing import TYPE_CHECKING, Optional, Type, List
 from typing_extensions import Literal
 
 from opentrons.types import Point
@@ -199,6 +199,7 @@ class MoveLabwareImplementation(
                 pickUpOffset=params.pickUpOffset or LabwareOffsetVector(x=0, y=0, z=0),
                 dropOffset=params.dropOffset or LabwareOffsetVector(x=0, y=0, z=0),
             )
+
             # Skips gripper moves when using virtual gripper
             await self._labware_movement.move_labware_with_gripper(
                 labware_id=params.labwareId,

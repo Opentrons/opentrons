@@ -6,6 +6,7 @@ from typing import Optional, List, Tuple, Union, cast, TypeVar, Dict
 from opentrons.types import Point, DeckSlotName, StagingSlotName, MountType
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
+
 from .. import errors
 from ..errors import LabwareNotLoadedOnLabwareError, LabwareNotLoadedOnModuleError
 from ..resources import fixture_validation
@@ -976,6 +977,28 @@ class GeometryView:
                         location=ancestor
                     ).dropOffset
                 )
+
+    def validate_gripper_labware_tip_collision(
+        self,
+        gripper_homed_position_z: float,
+        pipettes_homed_position_z: float,
+        tip: TipGeometry,
+        labware_id: str,
+        current_location: OnDeckLabwareLocation,
+    ) -> bool:
+        """Check for potential collision of tips against labware to be lifted."""
+        labware_top_z_when_gripped = gripper_homed_position_z + (
+            self.get_labware_highest_z(labware_id=labware_id)
+            - self.get_labware_grip_point(
+                labware_id=labware_id, location=current_location
+            ).z
+        )
+        # TODO(mm, 2024-01-18): Utilizing the nozzle map and labware X coordinates verify if collisions will occur on the X axis (analysis will use hard coded data to measure from the gripper critical point to the pipette mount)
+
+        tip_bottom_z = pipettes_homed_position_z - tip.length
+        if tip_bottom_z < labware_top_z_when_gripped:
+            return False
+        return True
 
     def _nominal_gripper_offsets_for_location(
         self, location: OnDeckLabwareLocation
