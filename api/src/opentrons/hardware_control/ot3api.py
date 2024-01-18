@@ -893,8 +893,8 @@ class OT3API(
 
             # move toward home until a safe distance
             await self._backend.tip_action(
-                {Axis.Q: current_pos_float},
-                [({Axis.Q: self._config.safe_home_distance}, 400)],
+                origin={Axis.Q: current_pos_float},
+                targets=[({Axis.Q: self._config.safe_home_distance}, 400)],
             )
 
             # update current position
@@ -1940,8 +1940,8 @@ class OT3API(
         # only move tip motors if they are not already below the sensor
         if tip_motor_pos_float < tip_presence_check_target:
             await self._backend.tip_action(
-                {Axis.Q: tip_motor_pos_float},
-                [({Axis.Q: tip_presence_check_target}, 400)],
+                origin={Axis.Q: tip_motor_pos_float},
+                targets=[({Axis.Q: tip_presence_check_target}, 400)],
             )
         try:
             yield

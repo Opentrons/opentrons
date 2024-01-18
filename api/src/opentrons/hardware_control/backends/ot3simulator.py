@@ -246,7 +246,7 @@ class OT3Simulator(FlexBackend):
 
     @property
     def gear_motor_position(self) -> Optional[float]:
-        return self._gear_motor_position.get(Axis.P_L, None)
+        return self._gear_motor_position.get(Axis.Q, None)
 
     @property
     def board_revision(self) -> BoardRevision:

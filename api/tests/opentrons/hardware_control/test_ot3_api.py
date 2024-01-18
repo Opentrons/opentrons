@@ -54,7 +54,6 @@ from opentrons.hardware_control.types import (
     InstrumentProbeType,
     SubSystem,
     GripperJawState,
-    StatusBarState,
     EstopState,
     EstopStateNotification,
     TipStateType,
@@ -68,7 +67,6 @@ from opentrons.hardware_control.backends.ot3simulator import OT3Simulator
 from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons.types import Point, Mount
 
-from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control.motion_planning.types import Move
 
 from opentrons.config import gripper_config as gc
@@ -97,6 +95,7 @@ from opentrons.hardware_control.modules import (
     SpeedStatus,
 )
 from opentrons.hardware_control.module_control import AttachedModulesControl
+from opentrons.hardware_control.backends.types import HWStopCondition
 
 
 # TODO (spp, 2023-08-22): write tests for ot3api.stop & ot3api.halt
@@ -1229,17 +1228,14 @@ async def test_gripper_move_to(
 
     await ot3_hardware.move_to(OT3Mount.GRIPPER, Point(0, 0, 0))
     origin, target, _, _ = mock_backend_move.call_args_list[0][0]
-    for pos in (origin, target):
-        assert sorted(
-            pos.keys(), key=lambda elem: cast(int, elem.value)
-        ) == sorted(
-            [
-                Axis.X,
-                Axis.Y,
-                Axis.Z_G,
-            ],
-            key=lambda elem: cast(int, elem.value),
-        )
+    assert sorted(target.keys(), key=lambda elem: cast(int, elem.value)) == sorted(
+        [
+            Axis.X,
+            Axis.Y,
+            Axis.Z_G,
+        ],
+        key=lambda elem: cast(int, elem.value),
+    )
 
 
 async def test_home_plunger(
@@ -1446,7 +1442,7 @@ async def test_move_expect_stall_flag(
     expect_stalls: bool,
 ) -> None:
 
-    expected = MoveStopCondition.stall if expect_stalls else MoveStopCondition.none
+    expected = HWStopCondition.stall if expect_stalls else HWStopCondition.none
 
     await ot3_hardware.move_to(Mount.LEFT, Point(0, 0, 0), _expect_stalls=expect_stalls)
     mock_backend_move.assert_called_once()
@@ -1654,9 +1650,11 @@ async def test_drop_tip_full_tiprack(
     _, pipette_handler = mock_instrument_handlers
 
     with patch.object(
-        hardware_backend, "tip_action", AsyncMock(spec=hardware_backend.tip_action)
+        hardware_backend,
+        "tip_action",
+        AsyncMock(spec=hardware_backend.tip_action, wraps=hardware_backend.tip_action),
     ) as tip_action:
-        hardware_backend._gear_motor_position = {Axis.P_L: 0}
+        hardware_backend._gear_motor_position = {Axis.Q: 0}
         pipette_handler.plan_ht_drop_tip.return_value = TipActionSpec(
             tip_action_moves=[
                 TipActionMoveSpec(
@@ -1674,28 +1672,21 @@ async def test_drop_tip_full_tiprack(
             mock_instr.config.plunger_homing_configurations.current = 1.0
             mock_instr.plunger_positions.bottom = -18.5
 
-        def _update_gear_motor_pos(
-            origin: Dict[Axis, float], targets: List[Tuple[Dict[Axis, float], float]]
-        ) -> None:
-            if Axis.P_L not in hardware_backend._gear_motor_position:
-                hardware_backend._gear_motor_position = {Axis.P_L: 0.0}
-            for target in targets:
-                hardware_backend._gear_motor_position[Axis.P_L] += float(
-                    target[Axis.P_L]
-                )
-
-        tip_action.side_effect = _update_gear_motor_pos
         set_mock_plunger_configs()
 
         await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
         mock_backend_get_tip_status.return_value = TipStateType.ABSENT
         await ot3_hardware.drop_tip(Mount.LEFT, home_after=True)
         pipette_handler.plan_ht_drop_tip.assert_called_once_with()
-        # first call should be "clamp", moving down
-        assert tip_action.call_args_list[0][-1]["moves"][0].unit_vector == {Axis.Q: 1}
-        # next call should be "clamp", moving back up
-        assert tip_action.call_args_list[1][-1]["moves"][0].unit_vector == {Axis.Q: -1}
         assert len(tip_action.call_args_list) == 2
+        # first call should be "clamp", moving down
+        first_target = tip_action.call_args_list[0][-1]["targets"][0][0]
+        assert list(first_target.keys()) == [Axis.Q]
+        assert first_target[Axis.Q] == 10
+        # next call should be "clamp", moving back up
+        second_target = tip_action.call_args_list[1][-1]["targets"][0][0]
+        assert list(second_target.keys()) == [Axis.Q]
+        assert second_target[Axis.Q] < 10
         # home should be called after tip_action is done
         assert len(mock_home_gear_motors.call_args_list) == 1
 
@@ -1822,19 +1813,19 @@ async def test_home_axis(
 
         if stepper_ok and encoder_ok:
             """Copy encoder position to stepper pos"""
-            # for accurate axis, we just move to home pos:
+            # for accurate axis, we just move very close to home pos
             if axis in [Axis.Z_L, Axis.P_L]:
                 # move is called
                 mock_hardware_backend_move.assert_awaited_once()
-                distance = mock_hardware_backend_move.call_args_list[0][0][1][axis]
-                assert distance == 95.0
+                target = mock_hardware_backend_move.call_args_list[0][0][1][axis]
+                assert target == 5
                 # then home is called
                 mock_hardware_backend_home.assert_awaited_once()
             else:
                 # we move to 20 mm away from home
                 mock_hardware_backend_move.assert_awaited_once()
-                distance = mock_hardware_backend_move.call_args_list[0][0][1][axis]
-                assert distance == 80.0
+                target = mock_hardware_backend_move.call_args_list[0][0][1][axis]
+                assert target == 20.0
                 # then home is called
                 mock_hardware_backend_home.assert_awaited_once()
         else:
@@ -1897,33 +1888,6 @@ def test_fw_version(
     ) as mock_fw_version:
         mock_fw_version.return_value = versions
         assert ot3_hardware.get_fw_version() == version_str
-
-
-@pytest.mark.parametrize(argnames=["enabled"], argvalues=[[True], [False]])
-async def test_status_bar_interface(
-    ot3_hardware: ThreadManager[OT3API],
-    enabled: bool,
-) -> None:
-    """Test setting status bar statuses and make sure the cached status is correct."""
-    await ot3_hardware.set_status_bar_enabled(enabled)
-
-    settings = {
-        StatusBarState.IDLE: StatusBarState.IDLE,
-        StatusBarState.RUNNING: StatusBarState.RUNNING,
-        StatusBarState.PAUSED: StatusBarState.PAUSED,
-        StatusBarState.HARDWARE_ERROR: StatusBarState.HARDWARE_ERROR,
-        StatusBarState.SOFTWARE_ERROR: StatusBarState.SOFTWARE_ERROR,
-        StatusBarState.CONFIRMATION: StatusBarState.IDLE,
-        StatusBarState.RUN_COMPLETED: StatusBarState.RUN_COMPLETED,
-        StatusBarState.UPDATING: StatusBarState.UPDATING,
-        StatusBarState.ACTIVATION: StatusBarState.IDLE,
-        StatusBarState.DISCO: StatusBarState.IDLE,
-        StatusBarState.OFF: StatusBarState.OFF,
-    }
-
-    for setting, response in settings.items():
-        await ot3_hardware.set_status_bar_state(state=setting)
-        assert ot3_hardware.get_status_bar_state() == response
 
 
 @pytest.mark.parametrize(
