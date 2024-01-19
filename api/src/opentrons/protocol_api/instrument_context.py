@@ -290,15 +290,15 @@ class InstrumentContext(publisher.CommandPublisher):
 
         See :ref:`new-dispense` for more details and examples.
 
-        :param volume: The volume to dispense, measured in µL. If unspecified,
-                       defaults to :py:attr:`current_volume`. If only a volume is
+        :param volume: The volume to dispense, measured in µL. If only a volume is
                        passed, the pipette will dispense from its current position.
 
-                       If ``dispense`` is called with a volume of precisely 0, its behavior
-                       depends on the API level of the protocol. On API levels below 2.16,
-                       it will behave the same as a volume of ``None``/unspecified: dispense
-                       all liquid in the pipette. On API levels at or above 2.16, no liquid
-                       will be dispensed.
+                         - If unspecified or ``None``, dispense the :py:attr:`current_volume`.
+
+                         - If 0, the behavior of ``dispense()`` depends on the API level
+                           of the protocol. In API version 2.16 and earlier, dispense all
+                           liquid in the pipette (same as unspecified or ``None``). In API
+                           version 2.17 and later, dispense no liquid.
         :type volume: int or float
 
         :param location: Tells the robot where to dispense liquid held in the pipette.
