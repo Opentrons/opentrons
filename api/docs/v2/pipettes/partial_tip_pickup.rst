@@ -127,19 +127,20 @@ This keeps tip tracking consistent across each type of pickup. And it reduces th
 Tip Pickup and Conflicts
 ========================
 
-The horizontally offset position of the 96-channel pipette during partial tip pickup  places restrictions on where you can put other tall labware on the deck. The restrictions vary depending on the layout. For column layouts, Opentrons recommends using column 12.
+During partial tip pickup, 96-channel pipette moves into spaces above adjacent slots. To avoid crashes, the API prevents you from performing partial tip pickup when there is tall labware in these spaces. The current nozzle layout determines which labware can safely occupy adjacent slots.
 
-The API will raise errors for potential labware crashes when using a column partial configuration. Nevertheless, it's a good idea to do the following when working with partial tip pickup:
+The API will raise errors for potential labware crashes when using a column nozzle configuration. Nevertheless, it's a good idea to do the following when working with partial tip pickup:
 
     - Plan your deck layout carefully. Make a diagram and visualize everywhere the pipette will travel.
     - Simulate your protocol and compare the run preview to your expectations of where the pipette will travel.
     - Perform a dry run with only tip racks on the deck. Have the Emergency Stop Pendant handy in case you see an impending crash.
 
+For column pickup, Opentrons recommends using the nozzles in column 12 of the pipette.
 
 Using Column 12
 ---------------
 
-All of the examples in this section will use a 96-channel pipette configured to pick up tips with column 12::
+The examples in this section use a 96-channel pipette configured to pick up tips with column 12::
 
     pipette.configure_nozzle_layout(
         style=COLUMN,
