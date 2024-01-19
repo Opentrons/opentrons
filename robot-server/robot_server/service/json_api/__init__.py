@@ -15,10 +15,10 @@ from .response import (
     ResourceModel,
     PydanticResponse,
     ResponseList,
-    NotifyBody
+    NotifyRefetchBody
 )
 
-#TOME: You'll probably change NotifyBody here, just FYI. 
+
 __all__ = [
     # request body model
     "RequestModel",
@@ -44,6 +44,6 @@ __all__ = [
     "DeprecatedResponseModel",
     "DeprecatedMultiResponseModel",
     "ResponseList",
-    # notify body models
-    "NotifyBody",
+    # notify models
+    "NotifyRefetchBody",
 ]

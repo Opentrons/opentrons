@@ -15,7 +15,6 @@ export function useNotifyCurrentMaintenanceRun(
 ): UseQueryResult<MaintenanceRun> | UseQueryResult<MaintenanceRun, Error> {
   const host = useHost()
   const queryClient = useQueryClient()
-  // If notify does not return real data for a route, we must refetch.
   const [refetchUsingHTTP, setRefetchUsingHTTP] = React.useState(true)
   const queryKey = [host, 'maintenance_runs', 'current_run']
 

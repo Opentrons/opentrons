@@ -45,9 +45,6 @@ class SimpleBody(BaseResponseBody, GenericModel, Generic[ResponseDataT]):
 
     data: ResponseDataT = Field(..., description=DESCRIPTION_DATA)
 
-# TOME: Type this.
-class DefaultNotifyBody(BaseResponseBody):
-    refetchUsingHTTP: bool = True
 
 class Body(BaseResponseBody, GenericModel, Generic[ResponseDataT, ResponseLinksT]):
     """A response that returns a single resource and stateful links."""
@@ -55,12 +52,6 @@ class Body(BaseResponseBody, GenericModel, Generic[ResponseDataT, ResponseLinksT
     data: ResponseDataT = Field(..., description=DESCRIPTION_DATA)
     links: ResponseLinksT = Field(..., description=DESCRIPTION_LINKS)
 
-class NotifyBody(BaseResponseBody, GenericModel, Generic[ResponseDataT, ResponseLinksT]):
-    """A notfiy response that returns a single resource, stateful links, and a status code."""
-
-    data: ResponseDataT = Field(..., description=DESCRIPTION_DATA)
-    links: ResponseLinksT = Field(..., description=DESCRIPTION_LINKS)
-    statusCode: int = Field(..., descrption="test")
 
 class SimpleEmptyBody(BaseResponseBody):
     """A response that returns no data and no links."""
@@ -213,3 +204,8 @@ class ResponseList(BaseModel, Generic[ResponseDataT]):
     """A response that returns a list resource."""
 
     __root__: List[ResponseDataT]
+
+
+class NotifyRefetchBody(BaseResponseBody):
+    "A notification response that returns an HTTP refetch flag."
+    refetchUsingHTTP: bool = True

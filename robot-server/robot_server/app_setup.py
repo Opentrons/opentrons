@@ -21,7 +21,7 @@ from .runs.dependencies import (
     mark_light_control_startup_finished,
 )
 
-from .notifications import notification_client
+from .notification_client import initialize_notification_client, clean_up_notification_client
 
 log = logging.getLogger(__name__)
 
@@ -73,8 +73,9 @@ async def on_startup() -> None:
             else settings.persistence_directory
         ),
     )
-
-    notification_client.connect()
+    initialize_notification_client(
+        app_state=app.state,
+    )
 
 @app.on_event("shutdown")
 async def on_shutdown() -> None:
@@ -83,6 +84,7 @@ async def on_shutdown() -> None:
         clean_up_hardware(app.state),
         clean_up_persistence(app.state),
         clean_up_task_runner(app.state),
+        clean_up_notification_client(app.state),
         return_exceptions=True,
     )
 
@@ -91,4 +93,4 @@ async def on_shutdown() -> None:
     for e in shutdown_errors:
         log.warning("Error during shutdown", exc_info=e)
 
-    notification_client.disconnect()
+    
