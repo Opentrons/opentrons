@@ -45,8 +45,7 @@ const connectOptions: mqtt.IClientOptions = {
   the client will receive the most recent message held by the broker if one is availble.
  */
 const subscribeOptions: mqtt.IClientSubscribeOptions = {
-  qos: 1,
-  rh: 1,
+  qos: 2,
 }
 
 export function registerNotify(
@@ -64,7 +63,11 @@ export function registerNotify(
         })
 
       case 'shell:NOTIFY_UNSUBSCRIBE':
-        return unsubscribe({ ...action.payload, hostname: 'broker.emqx.io' })
+        return unsubscribe({
+          ...action.payload,
+          browserWindow: mainWindow,
+          hostname: 'broker.emqx.io',
+        })
     }
   }
 }
@@ -75,44 +78,128 @@ interface NotifyParams {
   topic: NotifyTopic
 }
 
-function subscribe(notifyParams: NotifyParams): void {
-  const { hostname, topic } = notifyParams
+function subscribe(notifyParams: NotifyParams): Promise<void> {
+  const { hostname, topic, browserWindow } = notifyParams
+  // true if no subscription (and therefore connection) to host exists
   if (connectionStore[hostname] == null) {
     connectionStore[hostname] = {
       client: null,
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       subscriptions: { [topic]: 1 } as Record<NotifyTopic, number>,
     }
-    const client = mqtt.connect(`mqtt://${hostname}`, connectOptions)
-    connectionStore[hostname].client = client
-    establishListeners({ ...notifyParams, client })
-    client.subscribe(topic, subscribeOptions)
-  } else {
+    return connectAsync(`mqtt://${hostname}`)
+      .then(client => {
+        log.info(`Successfully connected to ${hostname}`)
+        connectionStore[hostname].client = client
+        establishListeners({ ...notifyParams, client })
+        return new Promise<void>(() => {
+          client.subscribe(topic, subscribeOptions, (error, result) => {
+            if (error != null) {
+              log.warn(`Failed to subscribe on ${hostname} to topic: ${topic}`)
+              browserWindow.webContents.send(
+                'notify',
+                `${hostname}:${topic}:ECONNFAILED`
+              )
+              handleDecrementSubscriptionCount(hostname, topic)
+            } else {
+              log.info(
+                `Successfully subscribed on ${hostname} to topic: ${topic}`
+              )
+            }
+          })
+        })
+      })
+      .catch(() => {
+        log.warn(`Failed to connect to ${hostname}`)
+        browserWindow.webContents.send(
+          'notify',
+          `${hostname}:${topic}:ECONNFAILED`
+        )
+        if (hostname in connectionStore) delete connectionStore[hostname]
+      })
+  }
+  // true if a connection AND subscription to host already exists.
+  else {
     connectionStore[hostname].subscriptions[topic] += 1
     const { client } = connectionStore[hostname]
-    client?.subscribe(topic, subscribeOptions)
+    return new Promise<void>(() => {
+      client?.subscribe(topic, subscribeOptions)
+    })
   }
 }
 
-type UnsubscribeParams = Omit<NotifyParams, 'browserWindow'>
-
-function unsubscribe({ hostname, topic }: UnsubscribeParams): void {
-  if (hostname in connectionStore) {
-    const { client } = connectionStore[hostname]
-    client?.unsubscribe(topic)
-  } else {
-    log.info(`Attempting to unsubscribe from unconnected hostname ${hostname}`)
-  }
+function unsubscribe(notifyParams: NotifyParams): Promise<void> {
+  const { hostname, topic } = notifyParams
+  return new Promise<void>(() => {
+    if (hostname in connectionStore) {
+      const { client } = connectionStore[hostname]
+      client?.unsubscribe(topic, {}, (error, result) => {
+        if (error != null) {
+          log.warn(`Failed to unsubscribe on ${hostname} from topic: ${topic}`)
+        } else {
+          log.info(
+            `Successfully unsubscribed on ${hostname} from topic: ${topic}`
+          )
+          handleDecrementSubscriptionCount(hostname, topic)
+        }
+      })
+    } else {
+      log.info(
+        `Attempted to unsubscribe from unconnected hostname: ${hostname}`
+      )
+    }
+  })
 }
 
-export function closeAllNotifyConnections(): Promise<unknown[]> {
-  log.debug('Stopping all active notify service connections')
-  const closeConnections = Object.values(connectionStore).map(({ client }) => {
-    return new Promise((resolve, reject) => {
-      client?.end(true, {}, () => resolve(null))
+function connectAsync(brokerURL: string): Promise<mqtt.Client> {
+  const client = mqtt.connect(brokerURL, connectOptions)
+
+  return new Promise((resolve, reject) => {
+    // Listeners added to client to trigger promise resolution
+    const promiseResolutionListeners: {
+      [key: string]: (...args: any[]) => void
+    } = {
+      connect: () => {
+        removePromiseResolutionListeners()
+        return resolve(client)
+      },
+      error: (error: Error | string) => {
+        removePromiseResolutionListeners()
+        const clientEndPromise = new Promise((resolve, reject) =>
+          client.end(true, {}, () => resolve(error))
+        )
+        return clientEndPromise.then(() => reject(error))
+      },
+      end: () => promiseResolutionListeners.error("Couldn't connect to server"),
+    }
+
+    function removePromiseResolutionListeners(): void {
+      Object.keys(promiseResolutionListeners).forEach(eventName => {
+        client.removeListener(eventName, promiseResolutionListeners[eventName])
+      })
+    }
+
+    Object.keys(promiseResolutionListeners).forEach(eventName => {
+      client.on(eventName, promiseResolutionListeners[eventName])
     })
   })
-  return Promise.all(closeConnections)
+}
+
+function handleDecrementSubscriptionCount(
+  hostname: string,
+  topic: NotifyTopic
+): void {
+  const { client, subscriptions } = connectionStore[hostname]
+  if (topic in subscriptions) {
+    subscriptions[topic] -= 1
+    if (subscriptions[topic] <= 0) {
+      delete subscriptions[topic]
+    }
+  }
+
+  if (Object.keys(subscriptions).length <= 0) {
+    client?.end()
+  }
 }
 
 interface ListenerParams {
@@ -122,8 +209,6 @@ interface ListenerParams {
   hostname: string
 }
 
-// See https://docs.oasis-open.org/mqtt/mqtt/v5.0/cos01/mqtt-v5.0-cos01.html
-// Packets with reason codes < 128 are successful operations.
 function establishListeners({
   client,
   browserWindow,
@@ -136,58 +221,6 @@ function establishListeners({
       `${hostname}:${topic}:${message.toString()}`
     )
     log.debug(`Received message: ${hostname}:${topic}:${message.toString()}`)
-  })
-
-  client.on('connect', connack => {
-    if (connack.reasonCode == null || connack.reasonCode < 128) {
-      log.info(`Successfully connected to ${hostname}`)
-      client.subscribe(topic, subscribeOptions)
-    } else {
-      log.warn(`Failed to connect to ${hostname}`)
-      browserWindow.webContents.send(
-        'notify',
-        `${hostname}:${topic}:ECONNFAILED`
-      )
-      if (hostname in connectionStore) delete connectionStore[hostname]
-    }
-  })
-
-  client.on('packetreceive', packet => {
-    switch (packet.cmd) {
-      case 'suback':
-        if (packet.reasonCode == null || packet.reasonCode < 128) {
-          log.info(`Successfully subscribed on ${hostname} to topic: ${topic}`)
-        } else {
-          log.warn(`Failed to subscribe on ${hostname} to topic: ${topic}`)
-          browserWindow.webContents.send(
-            'notify',
-            `${hostname}:${topic}:ECONNFAILED`
-          )
-          decrementSubscription(hostname, topic)
-        }
-        break
-
-      case 'unsuback':
-        console.log('UNSUBACK PACKET RECEIVED')
-        console.log(packet)
-        if (packet.reasonCode == null || packet.reasonCode < 128) {
-          log.info(
-            `Successfully unsubscribed on ${hostname} from topic: ${topic}`
-          )
-          decrementSubscription(hostname, topic)
-        } else {
-          log.warn(`Failed to unsubscribe on ${hostname} from topic: ${topic}`)
-        }
-        break
-
-      case 'puback':
-        if (packet.reasonCode == null || packet.reasonCode < 128) {
-          log.info(`Successfully published on ${hostname} to topic: ${topic}`)
-        } else {
-          log.warn(`Failed to publish on ${hostname} to topic: ${topic}`)
-        }
-        break
-    }
   })
 
   client.on('reconnect', () => {
@@ -214,16 +247,12 @@ function establishListeners({
   )
 }
 
-function decrementSubscription(hostname: string, topic: NotifyTopic): void {
-  const { client, subscriptions } = connectionStore[hostname]
-  if (topic in subscriptions) {
-    subscriptions[topic] -= 1
-    if (subscriptions[topic] <= 0) {
-      delete subscriptions[topic]
-    }
-  }
-
-  if (Object.keys(subscriptions).length <= 0) {
-    client?.end()
-  }
+export function closeAllNotifyConnections(): Promise<unknown[]> {
+  log.debug('Stopping notify service connections')
+  const closeConnections = Object.values(connectionStore).map(({ client }) => {
+    return new Promise((resolve, reject) => {
+      client?.end(true, {}, () => resolve(null))
+    })
+  })
+  return Promise.all(closeConnections)
 }
