@@ -6,6 +6,7 @@ import contextlib
 import logging
 import os
 from pathlib import Path
+import shutil
 import tempfile
 from typing import Generator, List, Union
 
@@ -77,8 +78,25 @@ class MigrationOrchestrator:
         return previous_output
 
     def clean_up_stray_temp_files(self) -> None:
-        # TODO: Find anything starting with self.temp_file_prefix and delete it.
-        raise NotImplementedError
+        """Delete any abandoned files or directories from prior interrupted work."""
+        to_clean = (
+            entry
+            for entry in self._root.iterdir()
+            if entry.name.startswith(self._temp_file_prefix)
+        )
+
+        for item in to_clean:
+            try:
+                if item.is_dir():
+                    # No need to be atomic about this, since it's just an abandoned
+                    # temporary directory.
+                    shutil.rmtree(item)
+                else:
+                    item.unlink()
+            except Exception:
+                # We don't expect any exceptions to happen, but just in case
+                # there's a weird permissions error or something...
+                _log.warning(f"Error deleting {item.resolve()}.", exc_info=True)
 
     def _get_current(self) -> Union[int, None]:
         """Get the most recent migration represented on the filesystem right now.

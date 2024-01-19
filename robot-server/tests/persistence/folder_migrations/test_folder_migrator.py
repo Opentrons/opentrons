@@ -9,7 +9,6 @@ from robot_server.persistence.folder_migrations import folder_migrator
 
 # TODO: More exhaustive tests here.
 
-# - Temp file cleanup
 # - Generally does not leave temp files hanging around in root directory
 
 
@@ -145,6 +144,23 @@ def test_migration_chain_from_intermediate(tmp_path: Path) -> None:
         "c_dir",
     }
     assert (tmp_path / "c_dir" / "c_file").exists()
+
+
+def test_clean_up_stray_temp_files(tmp_path: Path) -> None:
+    (tmp_path / "foobar_temp_file_a").touch()
+    (tmp_path / "foobar_temp_dir_b").mkdir()
+    (tmp_path / "foobar_temp_dir_b" / "file_b").touch()
+    (tmp_path / "not_a_temp_file").touch()
+
+    subject = folder_migrator.MigrationOrchestrator(
+        root=tmp_path,
+        legacy_uncontained_items=[],
+        migrations=[],
+        temp_file_prefix="foobar"
+    )
+    subject.clean_up_stray_temp_files()
+
+    assert _children(tmp_path) == {"not_a_temp_file"}
 
 
 def _children(directory: Path) -> Set[str]:
