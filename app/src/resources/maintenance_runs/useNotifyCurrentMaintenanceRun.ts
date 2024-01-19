@@ -1,7 +1,5 @@
 import * as React from 'react'
 
-import { useQueryClient } from 'react-query'
-
 import { useHost, useCurrentMaintenanceRun } from '@opentrons/react-api-client'
 
 import { useNotifyService } from '../useNotifyService'
@@ -14,7 +12,6 @@ export function useNotifyCurrentMaintenanceRun(
   options: QueryOptionsWithPolling<MaintenanceRun, Error>
 ): UseQueryResult<MaintenanceRun> | UseQueryResult<MaintenanceRun, Error> {
   const host = useHost()
-  const queryClient = useQueryClient()
   const [refetchUsingHTTP, setRefetchUsingHTTP] = React.useState(true)
   const queryKey = [host, 'maintenance_runs', 'current_run']
 
@@ -28,7 +25,6 @@ export function useNotifyCurrentMaintenanceRun(
     options: {
       ...options,
       enabled: host !== null && options.enabled !== false,
-      onError: () => queryClient.resetQueries(queryKey),
     },
   })
 

@@ -23,8 +23,12 @@ export function useCurrentMaintenanceRun<TError = Error>(
     {
       enabled: host !== null && options.enabled !== false,
       onError: () => {
-        queryClient.resetQueries([host, 'maintenance_runs', 'current_run'])
+        queryClient.setQueryData(
+          [host, 'maintenance_runs', 'current_run'],
+          undefined
+        )
       },
+      retry: false,
       ...options,
     }
   )
