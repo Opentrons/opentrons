@@ -55,7 +55,7 @@ function ProgressTrackerItem({
       borderLeft={BORDERS.lineBorder}
       borderColor={
         isTaskListComplete || isPastTask || isActiveTaskWithSubtasks
-          ? COLORS.blueEnabled
+          ? COLORS.blue50
           : ''
       }
       marginTop={`-${SPACING.spacing12}`}
@@ -77,9 +77,7 @@ function ProgressTrackerItem({
           margin={SPACING.spacing16}
           name="ot-check"
           color={
-            isTaskListComplete || isPastTask
-              ? COLORS.blueEnabled
-              : COLORS.medGreyHover
+            isTaskListComplete || isPastTask ? COLORS.blue50 : COLORS.grey60
           }
         />
       ) : (
@@ -87,9 +85,7 @@ function ProgressTrackerItem({
           flex={FLEX_NONE}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
-          backgroundColor={
-            isFutureTask ? COLORS.medGreyHover : COLORS.blueEnabled
-          }
+          backgroundColor={isFutureTask ? COLORS.grey60 : COLORS.blue50}
           color={COLORS.white}
           margin={SPACING.spacing16}
           height="1.25rem"
@@ -144,15 +140,13 @@ function ProgressTrackerItem({
                   backgroundColor={
                     // is in the past or list is complete
                     isTaskListComplete || isPastSubTask
-                      ? COLORS.blueEnabled
+                      ? COLORS.blue50
                       : subTask.isComplete === true
-                      ? COLORS.medGreyHover
+                      ? COLORS.grey60
                       : 'initial'
                   }
                   border={BORDERS.lineBorder}
-                  borderColor={
-                    isFutureSubTask ? COLORS.medGreyHover : COLORS.blueEnabled
-                  }
+                  borderColor={isFutureSubTask ? COLORS.grey60 : COLORS.blue50}
                   borderWidth={SPACING.spacing2}
                   color={COLORS.white}
                   margin={SPACING.spacing16}
@@ -169,8 +163,8 @@ function ProgressTrackerItem({
                     isFinalSubTaskOfTaskList
                       ? COLORS.transparent
                       : isTaskListComplete || isPastSubTask
-                      ? COLORS.blueEnabled
-                      : COLORS.medGreyEnabled
+                      ? COLORS.blue50
+                      : COLORS.grey30
                   }
                   marginTop={`-${SPACING.spacing8}`}
                   marginBottom={
@@ -219,7 +213,7 @@ function SubTask({
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={isActiveSubTask ? COLORS.lightBlue : COLORS.white}
+      backgroundColor={isActiveSubTask ? COLORS.blue10 : COLORS.white}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       padding={SPACING.spacing16}
       border={isActiveSubTask ? BORDERS.activeLineBorder : BORDERS.lineBorder}
@@ -243,7 +237,7 @@ function SubTask({
         </StyledText>
         <StyledText as="p">{description}</StyledText>
         {footer != null ? (
-          <StyledText as="p" color={COLORS.darkGreyEnabled}>
+          <StyledText as="p" color={COLORS.grey50}>
             <Flex
               alignItems={ALIGN_CENTER}
               flexDirection={DIRECTION_ROW}
@@ -252,8 +246,8 @@ function SubTask({
               {markedBad === true && (
                 <Icon
                   name="alert-circle"
-                  backgroundColor={COLORS.warningBackgroundLight}
-                  color={COLORS.warningEnabled}
+                  backgroundColor={COLORS.yellow20}
+                  color={COLORS.yellow50}
                   height="1rem"
                   aria-label={`icon_warning`}
                 />
@@ -361,7 +355,7 @@ function Task({
         flexDirection={DIRECTION_COLUMN}
         padding={SPACING.spacing16}
         backgroundColor={
-          isActiveTask && !isTaskOpen ? COLORS.lightBlue : COLORS.white
+          isActiveTask && !isTaskOpen ? COLORS.blue10 : COLORS.white
         }
         border={
           isActiveTask && !isTaskOpen
@@ -393,8 +387,8 @@ function Task({
                 {markedBad === true && (
                   <Icon
                     name="alert-circle"
-                    backgroundColor={COLORS.warningBackgroundLight}
-                    color={COLORS.warningEnabled}
+                    backgroundColor={COLORS.yellow20}
+                    color={COLORS.yellow50}
                     height="1rem"
                     aria-label={`icon_warning`}
                   />
@@ -404,7 +398,7 @@ function Task({
             </StyledText>
             <StyledText as="p">{description}</StyledText>
             {footer != null ? (
-              <StyledText as="p" color={COLORS.darkGreyEnabled}>
+              <StyledText as="p" color={COLORS.grey50}>
                 <Flex
                   alignItems={ALIGN_CENTER}
                   flexDirection={DIRECTION_ROW}

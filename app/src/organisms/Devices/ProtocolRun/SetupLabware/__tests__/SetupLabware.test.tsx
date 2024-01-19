@@ -11,7 +11,6 @@ import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTy
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../../redux/config'
 import {
   useLPCDisabledReason,
-  useProtocolDetailsForRun,
   useRunCalibrationStatus,
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
@@ -38,9 +37,6 @@ const mockLabwarePostionCheck = LabwarePositionCheck as jest.MockedFunction<
 const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
   typeof useRunHasStarted
 >
-const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
-  typeof useProtocolDetailsForRun
->
 const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
   typeof useUnmatchedModulesForProtocol
 >
@@ -64,28 +60,6 @@ const mockUseLPCDisabledReason = useLPCDisabledReason as jest.MockedFunction<
 >
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
-const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
-const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
-const PRIMARY_PIPETTE_NAME = 'PRIMARY_PIPETTE_NAME'
-const LABWARE_DEF_ID = 'LABWARE_DEF_ID'
-const LABWARE_DEF = {
-  ordering: [['A1', 'A2']],
-  parameters: { isTiprack: true },
-}
-const mockLabwarePositionCheckStepTipRack = {
-  labwareId:
-    '1d57fc10-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_96_filtertiprack_200ul/1',
-  section: '',
-  commands: [
-    {
-      commandType: 'pickUpTip',
-      params: {
-        pipetteId: PRIMARY_PIPETTE_ID,
-        labwareId: PICKUP_TIP_LABWARE_ID,
-      },
-    },
-  ],
-} as any
 
 const render = () => {
   return renderWithProviders(
@@ -130,34 +104,6 @@ describe('SetupLabware', () => {
         complete: true,
       })
     when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
-    when(mockUseProtocolDetailsForRun)
-      .calledWith(RUN_ID)
-      .mockReturnValue({
-        protocolData: {
-          labware: {
-            [mockLabwarePositionCheckStepTipRack.labwareId]: {
-              slot: '1',
-              displayName: 'someDisplayName',
-              definitionId: LABWARE_DEF_ID,
-            },
-          },
-          labwareDefinitions: {
-            [LABWARE_DEF_ID]: LABWARE_DEF,
-          },
-          pipettes: {
-            [PRIMARY_PIPETTE_ID]: {
-              name: PRIMARY_PIPETTE_NAME,
-              mount: 'left',
-            },
-          },
-          commands: [
-            {
-              commandType: 'pickUpTip',
-              params: { pipetteId: PRIMARY_PIPETTE_ID },
-            } as any,
-          ],
-        },
-      } as any)
     when(mockGetIsLabwareOffsetCodeSnippetsOn).mockReturnValue(false)
     when(mockSetupLabwareMap).mockReturnValue(<div>mock setup labware map</div>)
     when(mockSetupLabwareList).mockReturnValue(

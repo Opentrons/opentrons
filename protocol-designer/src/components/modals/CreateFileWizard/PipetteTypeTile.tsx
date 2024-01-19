@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import { FormikProps } from 'formik'
 import {
@@ -10,8 +11,6 @@ import {
   ALIGN_CENTER,
   PrimaryButton,
   JUSTIFY_SPACE_BETWEEN,
-  LEFT,
-  RIGHT,
   InstrumentDiagram,
 } from '@opentrons/components'
 import {
@@ -21,9 +20,10 @@ import {
   OT3_PIPETTES,
   getAllPipetteNames,
   getPipetteNameSpecs,
+  LEFT,
+  RIGHT,
 } from '@opentrons/shared-data'
 
-import { i18n } from '../../../localization'
 import { GoBack } from './GoBack'
 import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
@@ -36,6 +36,7 @@ export function FirstPipetteTypeTile(
     'mount' | 'allowNoPipette' | 'display96Channel' | 'tileHeader'
   >
 ): JSX.Element {
+  const { t } = useTranslation('modal')
   const mount = LEFT
   return (
     <PipetteTypeTile
@@ -43,7 +44,7 @@ export function FirstPipetteTypeTile(
       mount={mount}
       allowNoPipette={false}
       display96Channel={true}
-      tileHeader={i18n.t('modal.create_file_wizard.choose_left_pipette')}
+      tileHeader={t('choose_left_pipette')}
     />
   )
 }
@@ -53,6 +54,7 @@ export function SecondPipetteTypeTile(
     'mount' | 'allowNoPipette' | 'display96Channel' | 'tileHeader'
   >
 ): JSX.Element | null {
+  const { t } = useTranslation('modal')
   if (props.values.pipettesByMount.left.pipetteName === 'p1000_96') {
     props.proceed(2)
     return null
@@ -63,7 +65,7 @@ export function SecondPipetteTypeTile(
         mount={RIGHT}
         allowNoPipette
         display96Channel={false}
-        tileHeader={i18n.t('modal.create_file_wizard.choose_right_pipette')}
+        tileHeader={t('choose_right_pipette')}
       />
     )
   }
@@ -82,6 +84,7 @@ export function PipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
     proceed,
     goBack,
   } = props
+  const { t } = useTranslation('application')
 
   return (
     <HandleEnter onEnter={proceed}>
@@ -109,9 +112,7 @@ export function PipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
           width="100%"
         >
           <GoBack onClick={() => goBack()} />
-          <PrimaryButton onClick={() => proceed()}>
-            {i18n.t('application.next')}
-          </PrimaryButton>
+          <PrimaryButton onClick={() => proceed()}>{t('next')}</PrimaryButton>
         </Flex>
       </Flex>
     </HandleEnter>

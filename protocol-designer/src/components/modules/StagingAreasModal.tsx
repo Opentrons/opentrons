@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { Form, Formik, useFormikContext } from 'formik'
 import {
@@ -24,7 +25,6 @@ import {
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 import { getStagingAreaSlots } from '../../utils'
-import { i18n } from '../../localization'
 import {
   createDeckFixture,
   deleteDeckFixture,
@@ -41,6 +41,7 @@ export interface StagingAreasValues {
 const StagingAreasModalComponent = (
   props: StagingAreasModalProps
 ): JSX.Element => {
+  const { t } = useTranslation(['button', 'alert'])
   const { onCloseClick, stagingAreas } = props
   const { values, setFieldValue } = useFormikContext<StagingAreasValues>()
   const initialDeckSetup = useSelector(getInitialDeckSetup)
@@ -133,8 +134,8 @@ const StagingAreasModalComponent = (
             {hasConflictedSlot ? (
               <PDAlert
                 alertType="warning"
-                title={i18n.t(
-                  'alert.deck_config_placement.SLOT_OCCUPIED.staging_area'
+                title={t(
+                  'alert:deck_config_placement.SLOT_OCCUPIED.staging_area'
                 )}
                 description={''}
               />
@@ -155,11 +156,9 @@ const StagingAreasModalComponent = (
         paddingBottom={SPACING.spacing32}
         gridGap={SPACING.spacing8}
       >
-        <OutlineButton onClick={onCloseClick}>
-          {i18n.t('button.cancel')}
-        </OutlineButton>
+        <OutlineButton onClick={onCloseClick}>{t('cancel')}</OutlineButton>
         <OutlineButton type={BUTTON_TYPE_SUBMIT} disabled={hasConflictedSlot}>
-          {i18n.t('button.save')}
+          {t('save')}
         </OutlineButton>
       </Flex>
     </Form>
@@ -175,6 +174,7 @@ export const StagingAreasModal = (
   props: StagingAreasModalProps
 ): JSX.Element => {
   const { onCloseClick, stagingAreas } = props
+  const { t } = useTranslation('modules')
   const dispatch = useDispatch()
   const stagingAreaLocations = getStagingAreaSlots(stagingAreas)
 
@@ -203,7 +203,7 @@ export const StagingAreasModal = (
       <ModalShell width="48rem">
         <Box marginTop={SPACING.spacing32} paddingX={SPACING.spacing32}>
           <Text as="h2">
-            {i18n.t(`modules.additional_equipment_display_names.stagingAreas`)}
+            {t(`additional_equipment_display_names.stagingAreas`)}
           </Text>
         </Box>
         <StagingAreasModalComponent

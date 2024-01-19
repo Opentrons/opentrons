@@ -1,6 +1,6 @@
 import * as React from 'react'
 import cx from 'classnames'
-import { i18n } from '../../../../localization'
+import { useTranslation } from 'react-i18next'
 import { Portal } from '../../../portals/MainPageModalPortal'
 import {
   Modal,
@@ -37,6 +37,9 @@ export interface WellOrderModalProps {
     firstValue?: WellOrderOption | null,
     secondValue?: WellOrderOption | null
   ) => void
+  //  TODO(jr, 1/18/24): The newest i18next versions only support TypeScript v5
+  //  so need to type all ts as any for now https://www.i18next.com/overview/typescript
+  t: any
 }
 
 interface State {
@@ -44,30 +47,45 @@ interface State {
   secondValue: WellOrderOption
 }
 
-export const ResetButton = (props: { onClick: () => void }): JSX.Element => (
-  <OutlineButton className={modalStyles.button_medium} onClick={props.onClick}>
-    {i18n.t('button.reset')}
-  </OutlineButton>
-)
+export const ResetButton = (props: { onClick: () => void }): JSX.Element => {
+  const { t } = useTranslation('button')
+  return (
+    <OutlineButton
+      className={modalStyles.button_medium}
+      onClick={props.onClick}
+    >
+      {t('reset')}
+    </OutlineButton>
+  )
+}
 
-export const CancelButton = (props: { onClick: () => void }): JSX.Element => (
-  <DeprecatedPrimaryButton
-    className={cx(modalStyles.button_medium, modalStyles.button_right_of_break)}
-    onClick={props.onClick}
-  >
-    {i18n.t('button.cancel')}
-  </DeprecatedPrimaryButton>
-)
+export const CancelButton = (props: { onClick: () => void }): JSX.Element => {
+  const { t } = useTranslation('button')
 
-export const DoneButton = (props: { onClick: () => void }): JSX.Element => (
-  <DeprecatedPrimaryButton
-    className={modalStyles.button_medium}
-    onClick={props.onClick}
-  >
-    {i18n.t('button.done')}
-  </DeprecatedPrimaryButton>
-)
+  return (
+    <DeprecatedPrimaryButton
+      className={cx(
+        modalStyles.button_medium,
+        modalStyles.button_right_of_break
+      )}
+      onClick={props.onClick}
+    >
+      {t('cancel')}
+    </DeprecatedPrimaryButton>
+  )
+}
+export const DoneButton = (props: { onClick: () => void }): JSX.Element => {
+  const { t } = useTranslation('button')
 
+  return (
+    <DeprecatedPrimaryButton
+      className={modalStyles.button_medium}
+      onClick={props.onClick}
+    >
+      {t('done')}
+    </DeprecatedPrimaryButton>
+  )
+}
 export class WellOrderModal extends React.Component<
   WellOrderModalProps,
   State
@@ -170,7 +188,7 @@ export class WellOrderModal extends React.Component<
     if (!this.props.isOpen) return null
 
     const { firstValue, secondValue } = this.state
-    const { firstName, secondName } = this.props
+    const { firstName, secondName, t } = this.props
 
     return (
       <Portal>
@@ -180,11 +198,11 @@ export class WellOrderModal extends React.Component<
           onCloseClick={this.handleCancel}
         >
           <div className={styles.modal_header}>
-            <h4>{i18n.t('modal.well_order.title')}</h4>
-            <p>{i18n.t('modal.well_order.body')}</p>
+            <h4>{t('modal:well_order.title')}</h4>
+            <p>{t('modal:well_order.body')}</p>
           </div>
           <div className={styles.main_row}>
-            <FormGroup label={i18n.t('modal.well_order.field_label')}>
+            <FormGroup label={t('modal:well_order.field_label')}>
               <div className={styles.field_row}>
                 <DropdownField
                   name={firstName}
@@ -196,13 +214,11 @@ export class WellOrderModal extends React.Component<
                   onChange={this.makeOnChange('first')}
                   options={WELL_ORDER_VALUES.map(value => ({
                     value,
-                    name: i18n.t(
-                      `form.step_edit_form.field.well_order.option.${value}`
-                    ),
+                    name: t(`step_edit_form.field.well_order.option.${value}`),
                   }))}
                 />
                 <span className={styles.field_spacer}>
-                  {i18n.t('modal.well_order.then')}
+                  {t('modal:well_order.then')}
                 </span>
                 <DropdownField
                   name={secondName}
@@ -214,15 +230,13 @@ export class WellOrderModal extends React.Component<
                   onChange={this.makeOnChange('second')}
                   options={WELL_ORDER_VALUES.map(value => ({
                     value,
-                    name: i18n.t(
-                      `form.step_edit_form.field.well_order.option.${value}`
-                    ),
+                    name: t(`step_edit_form.field.well_order.option.${value}`),
                     disabled: this.isSecondOptionDisabled(value),
                   }))}
                 />
               </div>
             </FormGroup>
-            <FormGroup label={i18n.t('modal.well_order.viz_label')}>
+            <FormGroup label={t('well_order.viz_label')}>
               <WellOrderViz firstValue={firstValue} secondValue={secondValue} />
             </FormGroup>
           </div>

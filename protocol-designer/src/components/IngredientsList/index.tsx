@@ -1,10 +1,10 @@
 // TODO: Ian 2018-10-09 figure out what belongs in LiquidsSidebar vs IngredientsList after #2427
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { SingleLabwareLiquidState } from '@opentrons/step-generation'
 import { IconButton, SidePanel, truncateString } from '@opentrons/components'
 import { sortWells } from '@opentrons/shared-data'
-import { i18n } from '../../localization'
 import { selectors } from '../../labware-ingred/selectors'
 import { PDTitledList, PDListItem } from '../lists'
 import { TitledListNotes } from '../TitledListNotes'
@@ -38,7 +38,7 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
     groupId,
     labwareWellContents,
   } = props
-
+  const { t } = useTranslation(['card', 'application'])
   const showName = ingredGroup.serialize
 
   const [expanded, setExpanded] = React.useState(true)
@@ -58,7 +58,7 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
     ingredGroup.name != null ? truncateString(ingredGroup.name, 25) : null
   return (
     <PDTitledList
-      title={truncatedName ?? i18n.t('card.unnamedLiquid')}
+      title={truncatedName ?? t('unnamedLiquid')}
       iconProps={{
         style: {
           fill: liquidDisplayColors[Number(groupId)] ?? swatchColors(groupId),
@@ -71,9 +71,9 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
       description={<TitledListNotes notes={ingredGroup.description} />}
     >
       <PDListItem className={styles.ingredient_row_header}>
-        <span>{i18n.t('card.well')}</span>
-        <span>{i18n.t('application.units.microliter')}</span>
-        {showName && <span>{i18n.t('card.name')}</span>}
+        <span>{t('well')}</span>
+        <span>{t('application:units.microliter')}</span>
+        {showName && <span>{t('name')}</span>}
         <span />
       </PDListItem>
 
@@ -125,13 +125,11 @@ function IngredIndividual(props: IndividProps): JSX.Element {
     groupId,
     removeWellsContents,
   } = props
-
+  const { t } = useTranslation('application')
   return (
     <PDListItem border hoverable>
       <span>{wellName}</span>
-      <span>
-        {volume ? volume + ` ${i18n.t('application.units.microliter')}` : '-'}
-      </span>
+      <span>{volume ? volume + ` ${t('units.microliter')}` : '-'}</span>
       {name && <span>{name}</span>}
       {canDelete && (
         <IconButton
@@ -162,9 +160,9 @@ export function IngredientsList(props: Props): JSX.Element {
     removeWellsContents,
     selectedIngredientGroupId,
   } = props
-
+  const { t } = useTranslation('nav')
   return (
-    <SidePanel title={i18n.t('nav.nameAndLiquids')}>
+    <SidePanel title={t('nameAndLiquids')}>
       <LabwareDetailsCard />
 
       {Object.keys(liquidGroupsById).map(groupIdForCard => (

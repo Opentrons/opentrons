@@ -59,10 +59,10 @@ const baseRoundTabStyling = css`
 
 const RoundNavLink = styled(NavLink)`
   ${baseRoundTabStyling}
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50};
 
   &:hover {
-    background-color: ${COLORS.fundamentalsBackgroundShade};
+    background-color: ${COLORS.grey20};
   }
 
   &.active {
@@ -70,10 +70,10 @@ const RoundNavLink = styled(NavLink)`
     border-top: ${BORDERS.lineBorder};
     border-left: ${BORDERS.lineBorder};
     border-right: ${BORDERS.lineBorder};
-    color: ${COLORS.blueEnabled};
+    color: ${COLORS.blue50};
 
     &:hover {
-      color: ${COLORS.blueHover};
+      color: ${COLORS.blue55};
     }
 
     /* extend below the tab when active to flow into the content */
@@ -108,7 +108,7 @@ function RoundTab({
   return disabled ? (
     <>
       <StyledText
-        color={COLORS.successDisabled}
+        color={COLORS.grey40}
         css={baseRoundTabStyling}
         {...targetProps}
       >
@@ -239,7 +239,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
       </Flex>
       <Box
         backgroundColor={COLORS.white}
-        border={`1px ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
+        border={`1px ${BORDERS.styleSolid} ${COLORS.grey30}`}
         // remove left upper corner border radius when first tab is active
         borderRadius={`${
           protocolRunDetailsTab === 'setup'

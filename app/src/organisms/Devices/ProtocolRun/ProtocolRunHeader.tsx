@@ -336,7 +336,7 @@ export function ProtocolRunHeader({
               <StyledText
                 as="h2"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                color={COLORS.blueEnabled}
+                color={COLORS.blue50}
               >
                 {displayName}
               </StyledText>
@@ -412,7 +412,7 @@ export function ProtocolRunHeader({
         </Box>
         {runStatus != null ? (
           <Box
-            backgroundColor={COLORS.fundamentalsBackground}
+            backgroundColor={COLORS.grey10}
             display="grid"
             gridTemplateColumns="4fr 6fr 4fr"
             padding={SPACING.spacing8}
@@ -503,14 +503,14 @@ function DisplayRunStatus(props: DisplayRunStatusProps): JSX.Element {
       {props.runStatus === RUN_STATUS_RUNNING ? (
         <Icon
           name="circle"
-          color={COLORS.blueEnabled}
+          color={COLORS.blue50}
           size={SPACING.spacing4}
           marginRight={SPACING.spacing4}
           data-testid="running_circle"
         >
           <animate
             attributeName="fill"
-            values={`${COLORS.blueEnabled}; transparent`}
+            values={`${COLORS.blue50}; transparent`}
             dur="1s"
             calcMode="discrete"
             repeatCount="indefinite"

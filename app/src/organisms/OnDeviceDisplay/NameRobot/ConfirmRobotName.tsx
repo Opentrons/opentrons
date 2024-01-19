@@ -61,7 +61,7 @@ export function ConfirmRobotName({
               fontWeight={TYPOGRAPHY.fontWeightRegular}
               marginTop={SPACING.spacing12}
               marginBottom={SPACING.spacing40}
-              color={COLORS.darkBlack70}
+              color={COLORS.grey60}
             >
               {t('your_robot_is_ready_to_go')}
             </StyledText>

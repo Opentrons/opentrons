@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
 import {
   FormGroup,
@@ -12,7 +13,6 @@ import {
   getIsTouchTipField,
   getIsDelayPositionField,
 } from '../../../../form-types'
-import { i18n } from '../../../../localization'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import stepFormStyles from '../../StepEditForm.css'
 import styles from './TipPositionInput.css'
@@ -55,7 +55,7 @@ function TipPositionInput(props: Props): JSX.Element {
     updateValue,
     isIndeterminate,
   } = props
-
+  const { t } = useTranslation('application')
   const isTouchTipField = getIsTouchTipField(name)
   const isDelayPositionField = getIsDelayPositionField(name)
   let value: number | string = ''
@@ -95,7 +95,7 @@ function TipPositionInput(props: Props): JSX.Element {
           onClick={handleOpen}
           value={String(value)}
           isIndeterminate={isIndeterminate}
-          units={i18n.t('application.units.millimeter')}
+          units={t('units.millimeter')}
           id={`TipPositionField_${name}`}
         />
       </Wrapper>
@@ -111,13 +111,14 @@ interface WrapperProps {
   targetProps: UseHoverTooltipTargetProps
 }
 
-const Wrapper = (props: WrapperProps): JSX.Element =>
-  props.isTouchTipField || props.isDelayPositionField ? (
+const Wrapper = (props: WrapperProps): JSX.Element => {
+  const { t } = useTranslation('form')
+  return props.isTouchTipField || props.isDelayPositionField ? (
     <div {...props.targetProps}>{props.children}</div>
   ) : (
     <span {...props.targetProps}>
       <FormGroup
-        label={i18n.t('form.step_edit_form.field.tip_position.label')}
+        label={t('step_edit_form.field.tip_position.label')}
         disabled={props.disabled}
         className={styles.well_order_input}
       >
@@ -125,7 +126,7 @@ const Wrapper = (props: WrapperProps): JSX.Element =>
       </FormGroup>
     </span>
   )
-
+}
 const mapSTP = (state: BaseState, ownProps: OP): SP => {
   const { labwareId, value } = ownProps
 

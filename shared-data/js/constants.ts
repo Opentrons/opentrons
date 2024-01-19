@@ -101,6 +101,12 @@ export const MODULE_MODELS = [
   ...MAGNETIC_BLOCK_MODELS,
 ]
 
+export const MODULE_MODELS_OT2_ONLY = [
+  ...MAGNETIC_MODULE_MODELS,
+  TEMPERATURE_MODULE_V1,
+  THERMOCYCLER_MODULE_V1,
+]
+
 export const MODULE_TYPES = [
   TEMPERATURE_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -183,6 +189,17 @@ export const TC_MODULE_LOCATION_OT2: '7,8,10,11' = '7,8,10,11'
 export const TC_MODULE_LOCATION_OT3: 'A1+B1' = 'A1+B1'
 
 export const WEIGHT_OF_96_CHANNEL: '~10kg' = '~10kg'
+
+export const MOVABLE_TRASH_CUTOUTS: CutoutId[] = [
+  'cutoutA1',
+  'cutoutB1',
+  'cutoutC1',
+  'cutoutD1',
+  'cutoutA3',
+  'cutoutB3',
+  'cutoutC3',
+  'cutoutD3',
+]
 
 export const SINGLE_LEFT_CUTOUTS: CutoutId[] = [
   'cutoutA1',
@@ -365,3 +382,24 @@ export const WASTE_CHUTE_STAGING_AREA_FIXTURES: CutoutFixtureId[] = [
 ]
 
 export const LOW_VOLUME_PIPETTES = ['p50_single_flex', 'p50_multi_flex']
+
+// default hex values for liquid colors
+const electricPurple = '#b925ff'
+const goldenYellow = '#ffd600'
+const aquamarine = '#9dffd8'
+const orangePeel = '#ff9900'
+const skyBlue = '#50d5ff'
+const popPink = '#ff80f5'
+const springGreen = '#7eff42'
+const tartRed = '#ff4f4f'
+export const DEFAULT_LIQUID_COLORS = [
+  electricPurple,
+  goldenYellow,
+  aquamarine,
+  orangePeel,
+  skyBlue,
+  popPink,
+  springGreen,
+  tartRed,
+]
+export const DEPRECATED_WHALE_GREY = '#9395a0'

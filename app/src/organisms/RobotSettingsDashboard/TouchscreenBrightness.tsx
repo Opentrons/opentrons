@@ -37,7 +37,7 @@ const BrightnessTile = styled(Box)`
   height: 8.75rem;
   border-radius: ${BORDERS.borderRadiusSize2};
   background: ${(props: BrightnessTileProps) =>
-    props.isActive ? COLORS.blueEnabled : COLORS.mediumBlueEnabled};
+    props.isActive ? COLORS.blue50 : COLORS.blue35};
 `
 
 // Note The actual brightness is Bright 1 <---> 6 Dark which is opposite to the UI
@@ -125,11 +125,11 @@ const IconButton = styled('button')`
   background-color: ${COLORS.white};
 
   &:active {
-    background-color: ${COLORS.darkBlack20};
+    background-color: ${COLORS.grey35};
   }
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.darkBlack20};
+    background-color: ${COLORS.grey35};
   }
   &:disabled {
     background-color: transparent;

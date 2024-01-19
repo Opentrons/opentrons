@@ -27,29 +27,29 @@ const CARD_BUTTON_STYLE = css`
   box-shadow: none;
 
   &:focus {
-    background-color: ${COLORS.mediumBluePressed};
+    background-color: ${COLORS.blue40};
     box-shadow: none;
   }
 
   &:hover {
     border: none;
     box-shadow: none;
-    background-color: ${COLORS.mediumBlueEnabled};
-    color: ${COLORS.darkBlackEnabled};
+    background-color: ${COLORS.blue35};
+    color: ${COLORS.black90};
   }
 
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.mediumBlueEnabled};
+    background-color: ${COLORS.blue35};
   }
 
   &:active {
-    background-color: ${COLORS.mediumBluePressed};
+    background-color: ${COLORS.blue40};
   }
 
   &:disabled {
-    background-color: ${COLORS.darkBlack20};
-    color: ${COLORS.darkBlack70};
+    background-color: ${COLORS.grey35};
+    color: ${COLORS.grey60};
   }
 `
 
@@ -83,20 +83,20 @@ export function CardButton(props: CardButtonProps): JSX.Element {
       onClick={() => history.push(destinationPath)}
       width="100%"
       css={CARD_BUTTON_STYLE}
-      backgroundColor={disabled ? COLORS.darkBlack20 : COLORS.mediumBlueEnabled}
+      backgroundColor={disabled ? COLORS.grey35 : COLORS.blue35}
       disabled={disabled}
     >
       <Icon
         name={iconName}
         size="3.75rem"
         data-testid={`cardButton_icon_${String(iconName)}`}
-        color={disabled ? COLORS.darkBlack60 : COLORS.blueEnabled}
+        color={disabled ? COLORS.grey50 : COLORS.blue50}
       />
       <Flex marginTop={SPACING.spacing16}>
         <StyledText
           as="h4"
           fontWeight={TYPOGRAPHY.fontWeightBold}
-          color={disabled ? COLORS.darkBlack60 : COLORS.darkBlackEnabled}
+          color={disabled ? COLORS.grey50 : COLORS.black90}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {title}
@@ -110,7 +110,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={disabled ? COLORS.darkBlack60 : COLORS.darkBlackEnabled}
+          color={disabled ? COLORS.grey50 : COLORS.black90}
           css={CARD_BUTTON_TEXT_STYLE}
         >
           {description}

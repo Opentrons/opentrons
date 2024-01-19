@@ -57,6 +57,7 @@ import {
   _getPipetteEntitiesRootState,
   _getLabwareEntitiesRootState,
   _getInitialDeckSetupRootState,
+  _getAdditionalEquipmentEntitiesRootState,
 } from '../selectors'
 import {
   CreateDeckFixtureAction,
@@ -190,6 +191,9 @@ export const unsavedForm = (
         orderedStepIds: rootState.orderedStepIds,
         initialDeckSetup: _getInitialDeckSetupRootState(rootState),
         robotStateTimeline: action.meta.robotStateTimeline,
+        additionalEquipmentEntities: _getAdditionalEquipmentEntitiesRootState(
+          rootState
+        ),
       })
     }
 
@@ -1420,6 +1424,14 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
                   stepForm.blowout_location?.includes('trashBin'))
             )
           : null
+      const mixStepTrashBin =
+        savedStepForms != null
+          ? Object.values(savedStepForms).find(
+              stepForm =>
+                stepForm.stepType === 'mix' &&
+                stepForm.dropTip_location.includes('trashBin')
+            )
+          : null
 
       let trashBinId: string | null = null
       if (moveLiquidStepTrashBin != null) {
@@ -1438,6 +1450,8 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
         ) {
           trashBinId = moveLiquidStepTrashBin.blowOut_location
         }
+      } else if (mixStepTrashBin != null) {
+        trashBinId = mixStepTrashBin.dropTip_location
       }
 
       const trashCutoutId =

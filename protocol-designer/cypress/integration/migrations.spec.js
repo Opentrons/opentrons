@@ -46,14 +46,6 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       migrationModal: 'v8',
     },
     {
-      title:
-        'mix 5.0.x (schema 3, PD version 5.0.0) -> should migrate to 8.0.x, schema 8',
-      importFixture: '../../fixtures/protocol/5/mix_5_0_x.json',
-      expectedExportFixture: '../../fixtures/protocol/8/mix_8_0_0.json',
-      migrationModal: 'v8',
-      unusedPipettes: false,
-    },
-    {
       title: '96-channel full and column schema 8 -> reimported as schema 8',
       importFixture:
         '../../fixtures/protocol/8/ninetySixChannelFullAndColumn.json',

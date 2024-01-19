@@ -61,7 +61,7 @@ export const SlotLabels = ({
         height="2.5rem"
         width={hasStagingAreas ? '40.5rem' : '30.375rem'}
         x="-15"
-        y={hasWasteChute ? '-90' : '-65'}
+        y={hasWasteChute ? '-100' : '-65'}
       >
         <Flex
           alignItems={ALIGN_CENTER}

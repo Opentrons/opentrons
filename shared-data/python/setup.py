@@ -94,7 +94,7 @@ class BuildWithData(build_py.build_py):
         build_base = os.path.commonpath([f[2] for f in files])
         # We want a list of paths to only files relative to ../shared-data
         to_include = [str(f.relative_to(DATA_ROOT)) for f in get_shared_data_files()]
-        destination = os.path.join(build_base, "opentrons_shared_data", DEST_BASE_PATH)
+        destination = os.path.join(build_base, DEST_BASE_PATH)
         # And finally, tell the system about our files
         files.extend(
             [

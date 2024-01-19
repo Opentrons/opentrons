@@ -1,4 +1,4 @@
-import { getLabwareOnDeck } from '@opentrons/components'
+import { getTopMostLabwareInSlots } from '@opentrons/components'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
@@ -6,6 +6,7 @@ import {
   getCutoutFixturesForCutoutId,
   getCutoutIdForAddressableArea,
   getDeckDefFromRobotType,
+  getLabwareDisplayName,
   SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 
@@ -35,10 +36,10 @@ export function useDeckConfigurationCompatibility(
   const deckDef = getDeckDefFromRobotType(robotType)
   const allAddressableAreas =
     protocolAnalysis != null
-      ? getAddressableAreasInProtocol(protocolAnalysis)
+      ? getAddressableAreasInProtocol(protocolAnalysis, deckDef)
       : []
-  const labwareOnDeck =
-    protocolAnalysis != null ? getLabwareOnDeck(protocolAnalysis) : []
+  const labwareInSlots =
+    protocolAnalysis != null ? getTopMostLabwareInSlots(protocolAnalysis) : []
 
   return deckConfig.reduce<CutoutConfigAndCompatibility[]>(
     (acc, { cutoutId, cutoutFixtureId }) => {
@@ -68,21 +69,19 @@ export function useDeckConfigurationCompatibility(
         compatibleCutoutFixtureIds[0] != null &&
         // compatible fixture is single-slot
         SINGLE_SLOT_FIXTURES.includes(compatibleCutoutFixtureIds[0])
-          ? labwareOnDeck.find(
-              ({ labwareLocation }) =>
-                labwareLocation !== 'offDeck' &&
+          ? labwareInSlots.find(
+              ({ location }) =>
                 // match the addressable area to an on-deck labware
-                (('slotName' in labwareLocation &&
-                  requiredAddressableAreasForCutoutId[0] ===
-                    labwareLocation.slotName) ||
-                  ('addressableAreaName' in labwareLocation &&
-                    requiredAddressableAreasForCutoutId[0] ===
-                      labwareLocation.addressableAreaName))
+                requiredAddressableAreasForCutoutId[0] === location.slotName
             )
           : null
 
       const missingLabwareDisplayName =
-        missingSingleSlotLabware?.displayName ?? null
+        missingSingleSlotLabware != null
+          ? missingSingleSlotLabware.labwareNickName ??
+            getLabwareDisplayName(missingSingleSlotLabware.labwareDef) ??
+            null
+          : null
 
       return [
         ...acc,

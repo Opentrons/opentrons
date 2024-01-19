@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { Form, Formik, useField, useFormikContext } from 'formik'
 import {
@@ -24,7 +25,6 @@ import {
   getDeckDefFromRobotType,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { i18n } from '../../localization'
 import {
   createDeckFixture,
   deleteDeckFixture,
@@ -75,6 +75,7 @@ export const MOVABLE_TRASH_CUTOUTS: DropdownOption[] = [
 
 const TrashModalComponent = (props: TrashModalProps): JSX.Element => {
   const { onCloseClick, trashName } = props
+  const { t } = useTranslation(['alert', 'button'])
   const { values } = useFormikContext<TrashValues>()
   const initialDeckSetup = useSelector(getInitialDeckSetup)
   const isSlotEmpty = getSlotIsEmpty(
@@ -115,9 +116,7 @@ const TrashModalComponent = (props: TrashModalProps): JSX.Element => {
             {!isSlotEmpty ? (
               <PDAlert
                 alertType="warning"
-                title={i18n.t(
-                  `alert.deck_config_placement.SLOT_OCCUPIED.${trashName}`
-                )}
+                title={t(`deck_config_placement.SLOT_OCCUPIED.${trashName}`)}
                 description={''}
               />
             ) : null}
@@ -140,10 +139,10 @@ const TrashModalComponent = (props: TrashModalProps): JSX.Element => {
         gridGap={SPACING.spacing8}
       >
         <OutlineButton onClick={onCloseClick}>
-          {i18n.t('button.cancel')}
+          {t('button:cancel')}
         </OutlineButton>
         <OutlineButton disabled={!isSlotEmpty} type={BUTTON_TYPE_SUBMIT}>
-          {i18n.t('button.save')}
+          {t('button:save')}
         </OutlineButton>
       </Flex>
     </Form>
@@ -159,6 +158,7 @@ export interface TrashModalProps {
 export const TrashModal = (props: TrashModalProps): JSX.Element => {
   const { onCloseClick, trashName, trashBinId } = props
   const dispatch = useDispatch()
+  const { t } = useTranslation('modules')
 
   const onSaveClick = (values: TrashValues): void => {
     if (trashName === 'trashBin' && trashBinId == null) {
@@ -184,7 +184,7 @@ export const TrashModal = (props: TrashModalProps): JSX.Element => {
       <ModalShell width="48rem">
         <Box marginTop={SPACING.spacing32} paddingX={SPACING.spacing32}>
           <Text as="h2">
-            {i18n.t(`modules.additional_equipment_display_names.${trashName}`)}
+            {t(`additional_equipment_display_names.${trashName}`)}
           </Text>
         </Box>
         <TrashModalComponent

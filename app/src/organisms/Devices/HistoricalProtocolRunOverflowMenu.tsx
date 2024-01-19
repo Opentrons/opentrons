@@ -195,7 +195,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
             <Icon
               name="ot-spinner"
               size={SIZE_1}
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.grey50}
               aria-label="spinner"
               spin
             />

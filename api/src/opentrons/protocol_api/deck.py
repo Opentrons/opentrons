@@ -168,7 +168,7 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
         if isinstance(slot_name, DeckSlotName):
             west_slot = adjacent_slots_getters.get_west_slot(slot_name.as_int())
         else:
-            west_slot = adjacent_slots_getters.get_west_of_staging_slot(slot_name)
+            west_slot = adjacent_slots_getters.get_west_of_staging_slot(slot_name).id
 
         return self[west_slot] if west_slot is not None else None
 

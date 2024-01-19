@@ -1,0 +1,87 @@
+{
+  "commands": [
+    {
+      "commandType": "home",
+      "params": {},
+      "result": {},
+      "status": "succeeded"
+    }
+  ],
+  "config": {
+    "apiVersion": [
+      2,
+      13
+    ],
+    "protocolType": "python"
+  },
+  "errors": [
+    {
+      "detail": "No module named 'superspecialmagic'",
+      "errorCode": "4000",
+      "errorInfo": {},
+      "errorType": "UnexpectedProtocolError",
+      "wrappedErrors": [
+        {
+          "detail": "ModuleNotFoundError: No module named 'superspecialmagic'",
+          "errorCode": "4000",
+          "errorInfo": {
+            "args": "(\"No module named 'superspecialmagic'\",)",
+            "class": "ModuleNotFoundError",
+            "msg": "No module named 'superspecialmagic'",
+            "name": "superspecialmagic",
+            "path": "None",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_runner/task_queue.py\", line 90, in _run\n    await self._run_func()\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_runner/legacy_wrappers.py\", line 173, in execute\n    await to_thread.run_sync(run_protocol, protocol, context)\n\n  File \"/usr/local/lib/python3.10/site-packages/anyio/to_thread.py\", line 31, in run_sync\n    return await get_asynclib().run_sync_in_worker_thread(\n\n  File \"/usr/local/lib/python3.10/site-packages/anyio/_backends/_asyncio.py\", line 937, in run_sync_in_worker_thread\n    return await future\n\n  File \"/usr/local/lib/python3.10/site-packages/anyio/_backends/_asyncio.py\", line 867, in run\n    result = context.run(func, *args)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute.py\", line 27, in run_protocol\n    run_python(protocol, context)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 46, in run_python\n    exec(proto.contents, new_globs)\n\n  File \"OT2_None_None_2_13_PythonSyntaxError.py\", line 4, in <module>\n"
+          },
+          "errorType": "PythonException",
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "name": "OT2_None_None_2_13_PythonSyntaxError.py",
+      "role": "main"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    }
+  ],
+  "labware": [
+    {
+      "definitionUri": "opentrons/opentrons_1_trash_1100ml_fixed/1",
+      "loadName": "opentrons_1_trash_1100ml_fixed",
+      "location": {
+        "slotName": "12"
+      }
+    }
+  ],
+  "liquids": [],
+  "metadata": {
+    "apiLevel": "2.13",
+    "author": "Opentrons Engineering <engineering@opentrons.com>",
+    "description": "import superspecialmagic",
+    "protocolName": "bad import",
+    "source": "Software Testing Team"
+  },
+  "modules": [],
+  "pipettes": [],
+  "robotType": "OT-2 Standard"
+}

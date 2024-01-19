@@ -230,6 +230,11 @@ def test_maps_different_module_models(
                 name_for_errors=expected_name_for_errors,
                 highest_z_including_labware=3.14159,
             )
+        elif module_model is ModuleModel.MAGNETIC_BLOCK_V1:
+            return wrapped_deck_conflict.MagneticBlockModule(
+                name_for_errors=expected_name_for_errors,
+                highest_z_including_labware=3.14159,
+            )
         elif (
             module_model is ModuleModel.THERMOCYCLER_MODULE_V1
             or module_model is ModuleModel.THERMOCYCLER_MODULE_V2
@@ -322,7 +327,7 @@ module = LoadedModule(
         ),
         # Out-of-bounds error
         (
-            Point(x=-10, y=100, z=60),
+            Point(x=-12, y=100, z=60),
             pytest.raises(
                 deck_conflict.PartialTipMovementNotAllowedError,
                 match="outside of robot bounds",

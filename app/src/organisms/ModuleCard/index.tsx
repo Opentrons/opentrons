@@ -25,6 +25,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  MODULE_MODELS_OT2_ONLY,
 } from '@opentrons/shared-data'
 import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
@@ -47,6 +48,7 @@ import { Tooltip } from '../../atoms/Tooltip'
 import { StyledText } from '../../atoms/text'
 import { useChainLiveCommands } from '../../resources/runs/hooks'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
+import { useIsFlex } from '../../organisms/Devices/hooks'
 import { getModuleTooHot } from '../Devices/getModuleTooHot'
 import { useToaster } from '../ToasterOven'
 import { MagneticModuleData } from './MagneticModuleData'
@@ -126,7 +128,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       }
     },
   })
-  const requireModuleCalibration = module.moduleOffset?.last_modified == null
+  const isFlex = useIsFlex(robotName)
+  const requireModuleCalibration =
+    isFlex &&
+    !MODULE_MODELS_OT2_ONLY.some(modModel => modModel === module.moduleModel) &&
+    module.moduleOffset?.last_modified == null
   const isPipetteReady =
     (!attachPipetteRequired ?? false) &&
     (!calibratePipetteRequired ?? false) &&
@@ -241,7 +247,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
   return (
     <Flex
-      backgroundColor={COLORS.fundamentalsBackground}
+      backgroundColor={COLORS.grey10}
       borderRadius={SPACING.spacing4}
       width="100%"
       data-testid={`ModuleCard_${module.serialNumber}`}
@@ -378,7 +384,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               <>
                 <StyledText
                   textTransform={TYPOGRAPHY.textTransformUppercase}
-                  color={COLORS.darkGreyEnabled}
+                  color={COLORS.grey50}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   fontSize={TYPOGRAPHY.fontSizeH6}
                   paddingBottom={SPACING.spacing4}
@@ -403,7 +409,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                     moduleType={module.moduleType}
                     size="1rem"
                     marginRight={SPACING.spacing2}
-                    color={COLORS.darkGreyEnabled}
+                    color={COLORS.grey50}
                   />
                   <StyledText>
                     {getModuleDisplayName(module.moduleModel)}

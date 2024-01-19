@@ -19,7 +19,7 @@ describe('SimpleWizardBody', () => {
   let props: React.ComponentProps<typeof SimpleWizardBody>
   beforeEach(() => {
     props = {
-      iconColor: COLORS.errorText,
+      iconColor: COLORS.red60,
       children: <div>children</div>,
       header: 'header',
       subHeader: 'subheader',

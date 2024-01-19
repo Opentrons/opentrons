@@ -1,9 +1,8 @@
 import asyncio
 import functools
-from typing import Set, TypeVar, Type, cast, Callable, Any, overload
+from typing import Set, TypeVar, Type, cast, Callable, Any, overload, Coroutine
 from .types import ExecutionState
 from opentrons_shared_data.errors.exceptions import ExecutionCancelledError
-from collections.abc import Coroutine
 
 TaskContents = TypeVar("TaskContents")
 

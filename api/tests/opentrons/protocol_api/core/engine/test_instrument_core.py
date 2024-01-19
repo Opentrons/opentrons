@@ -19,6 +19,7 @@ from opentrons.protocol_engine import (
     DropTipWellLocation,
     DropTipWellOrigin,
 )
+from opentrons.protocol_engine.clients.sync_client import SyncClient
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.types import (
@@ -36,6 +37,8 @@ from opentrons.protocol_api.core.engine import (
     ProtocolCore,
     deck_conflict,
 )
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import Location, Mount, MountType, Point
 
 
@@ -600,6 +603,8 @@ def test_dispense_to_well(
         name="my cool well", labware_id="123abc", engine_client=mock_engine_client
     )
 
+    decoy.when(mock_protocol_core.api_version).then_return(MAX_SUPPORTED_VERSION)
+
     decoy.when(
         mock_engine_client.state.geometry.get_relative_well_location(
             labware_id="123abc", well_name="my cool well", absolute_point=Point(1, 2, 3)
@@ -648,6 +653,7 @@ def test_dispense_in_place(
     subject: InstrumentCore,
 ) -> None:
     """It should dispense in place."""
+    decoy.when(mock_protocol_core.api_version).then_return(MAX_SUPPORTED_VERSION)
     location = Location(point=Point(1, 2, 3), labware=None)
     subject.dispense(
         volume=12.34,
@@ -673,6 +679,7 @@ def test_dispense_to_coordinates(
     subject: InstrumentCore,
 ) -> None:
     """It should dispense in place."""
+    decoy.when(mock_protocol_core.api_version).then_return(MAX_SUPPORTED_VERSION)
     location = Location(point=Point(1, 2, 3), labware=None)
     subject.dispense(
         volume=12.34,
@@ -696,6 +703,51 @@ def test_dispense_to_coordinates(
             pipette_id="abc123", volume=12.34, flow_rate=7.8, push_out=None
         ),
     )
+
+
+@pytest.mark.parametrize(
+    ("api_version", "expect_clampage"),
+    [(APIVersion(2, 16), True), (APIVersion(2, 17), False)],
+)
+def test_dispense_conditionally_clamps_volume(
+    api_version: APIVersion,
+    expect_clampage: bool,
+    decoy: Decoy,
+    subject: InstrumentCore,
+    mock_protocol_core: ProtocolCore,
+    mock_engine_client: SyncClient,
+) -> None:
+    """It should clamp the dispensed volume to the available volume on older API versions."""
+    decoy.when(mock_protocol_core.api_version).then_return(api_version)
+    decoy.when(
+        mock_engine_client.state.pipettes.get_aspirated_volume(subject.pipette_id)
+    ).then_return(111.111)
+
+    subject.dispense(
+        volume=99999999.99999999,
+        rate=5.6,
+        flow_rate=7.8,
+        well_core=None,
+        location=Location(point=Point(1, 2, 3), labware=None),
+        in_place=True,
+        push_out=None,
+    )
+
+    if expect_clampage:
+        decoy.verify(
+            mock_engine_client.dispense_in_place(
+                pipette_id="abc123", volume=111.111, flow_rate=7.8, push_out=None
+            ),
+        )
+    else:
+        decoy.verify(
+            mock_engine_client.dispense_in_place(
+                pipette_id="abc123",
+                volume=99999999.99999999,
+                flow_rate=7.8,
+                push_out=None,
+            ),
+        )
 
 
 def test_initialization_sets_default_movement_speed(
