@@ -25,8 +25,6 @@ class MigrationOrchestrator:
         """Sequence migrations and perform them in order."""
         for legacy_uncontained_item in legacy_uncontained_items:
             _validate_bare_name(legacy_uncontained_item)
-        if len(migrations) < 1:
-            raise ValueError("At least one migration is required.")
         self._root = root
         self._legacy_uncontained_items = legacy_uncontained_items
         self._migrations = migrations
