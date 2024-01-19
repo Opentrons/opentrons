@@ -26,7 +26,7 @@ export const NameThisLabware = (props: Props): JSX.Element => {
   }
 
   const saveNickname = (): void => {
-    setLabwareName()
+    setLabwareName(inputValue ?? null)
   }
   const wrapperRef: React.RefObject<HTMLDivElement> = useOnClickOutside({
     onClickOutside: saveNickname,

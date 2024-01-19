@@ -21,17 +21,10 @@ import styles from './TipPositionInput.css'
 
 import type { FieldProps } from '../../types'
 
-interface OP extends FieldProps {
+interface Props extends FieldProps {
   labwareId?: string | null
   className?: string
 }
-
-interface SP {
-  mmFromBottom: number | null
-  wellDepthMm: number
-}
-
-type Props = OP & SP
 
 export function TipPositionField(props: Props): JSX.Element {
   const {
@@ -64,7 +57,7 @@ export function TipPositionField(props: Props): JSX.Element {
   }
 
   const handleOpen = (): void => {
-    if (props.wellDepthMm) {
+    if (wellDepthMm) {
       setModalOpen(true)
     }
   }
