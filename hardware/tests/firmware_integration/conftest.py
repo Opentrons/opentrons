@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 from typing import AsyncGenerator, Iterator, AsyncIterator, List, Dict
 
-from _pytest.fixtures import FixtureRequest
+from _pytest.fixtures import SubRequest
 
 from opentrons_hardware.drivers.can_bus.settings import DriverSettings
 from opentrons_hardware.drivers.can_bus.build import build_driver
@@ -55,9 +55,9 @@ def can_messenger_queue(
         constants.NodeId.gantry_y,
     ],
 )
-def subsystem_node_id(request: FixtureRequest) -> Iterator[constants.NodeId]:
+def subsystem_node_id(request: SubRequest) -> Iterator[constants.NodeId]:
     """Each subsystem's node id as a fixture."""
-    yield request.param  # type: ignore[attr-defined]
+    yield request.param
 
 
 _motor_nodes = [
@@ -88,9 +88,9 @@ _motor_node_step_sizes = {
     scope="session",
     params=_motor_nodes,
 )
-def motor_node_id(request: FixtureRequest) -> Iterator[constants.NodeId]:
+def motor_node_id(request: SubRequest) -> Iterator[constants.NodeId]:
     """Each motor's node id as a fixture."""
-    yield request.param  # type: ignore[attr-defined]
+    yield request.param
 
 
 @pytest.fixture(scope="session")
