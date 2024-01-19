@@ -15,7 +15,6 @@ import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCa
 import { useDeckCalibrationData, useIsFlex } from '../../hooks'
 import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
 import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
-import { useIsEstopNotDisengaged } from '../../../../resources/devices/hooks/useIsEstopNotDisengaged'
 import { PipetteCard } from '..'
 
 import {
@@ -35,7 +34,6 @@ jest.mock('../AboutPipetteSlideout')
 jest.mock('../../../../redux/robot-api')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../redux/pipettes')
-jest.mock('../../../../resources/devices/hooks/useIsEstopNotDisengaged')
 
 const mockPipetteOverflowMenu = PipetteOverflowMenu as jest.MockedFunction<
   typeof PipetteOverflowMenu
@@ -65,9 +63,6 @@ const mockUseCurrentSubsystemUpdateQuery = useCurrentSubsystemUpdateQuery as jes
 const mockUsePipetteSettingsQuery = usePipetteSettingsQuery as jest.MockedFunction<
   typeof usePipetteSettingsQuery
 >
-const mockUseIsEstopNotDisengaged = useIsEstopNotDisengaged as jest.MockedFunction<
-  typeof useIsEstopNotDisengaged
->
 
 const render = (props: React.ComponentProps<typeof PipetteCard>) => {
   return renderWithProviders(<PipetteCard {...props} />, {
@@ -94,6 +89,7 @@ describe('PipetteCard', () => {
       pipetteIsBad: false,
       updatePipette: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     when(mockUseIsFlex).calledWith(mockRobotName).mockReturnValue(false)
     when(mockAboutPipettesSlideout).mockReturnValue(
@@ -121,9 +117,6 @@ describe('PipetteCard', () => {
     when(mockUsePipetteSettingsQuery)
       .calledWith({ refetchInterval: 5000, enabled: true })
       .mockReturnValue({} as any)
-    when(mockUseIsEstopNotDisengaged)
-      .calledWith(mockRobotName)
-      .mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -141,6 +134,7 @@ describe('PipetteCard', () => {
       pipetteIsBad: false,
       updatePipette: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     render(props)
     screen.getByText('left Mount')
@@ -157,6 +151,7 @@ describe('PipetteCard', () => {
       pipetteIsBad: false,
       updatePipette: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     render(props)
     screen.getByText('Both Mounts')
@@ -179,10 +174,8 @@ describe('PipetteCard', () => {
       pipetteIsBad: false,
       updatePipette: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: true,
     }
-    when(mockUseIsEstopNotDisengaged)
-      .calledWith(mockRobotName)
-      .mockReturnValue(true)
     render(props)
     screen.getByText('Both Mounts')
     const overflowButton = screen.getByRole('button', {
@@ -203,6 +196,7 @@ describe('PipetteCard', () => {
       pipetteIsBad: false,
       updatePipette: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     render(props)
     screen.getByText('right Mount')
@@ -218,6 +212,7 @@ describe('PipetteCard', () => {
       pipetteIsBad: false,
       updatePipette: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     render(props)
     screen.getByText('right Mount')
@@ -233,6 +228,7 @@ describe('PipetteCard', () => {
       pipetteIsBad: false,
       updatePipette: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     render(props)
     screen.getByText('left Mount')
@@ -249,6 +245,7 @@ describe('PipetteCard', () => {
       pipetteIsBad: false,
       updatePipette: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     render(props)
     expect(screen.queryByText('Calibrate now')).toBeNull()
@@ -264,6 +261,7 @@ describe('PipetteCard', () => {
       pipetteIsBad: false,
       updatePipette: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     render(props)
     screen.getByText('Calibrate now')
@@ -278,6 +276,7 @@ describe('PipetteCard', () => {
       pipetteIsBad: false,
       updatePipette: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     render(props)
 
@@ -301,6 +300,7 @@ describe('PipetteCard', () => {
       pipetteIsBad: true,
       updatePipette: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     render(props)
     screen.getByText('Right mount')
@@ -322,6 +322,7 @@ describe('PipetteCard', () => {
       pipetteIsBad: true,
       updatePipette: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     render(props)
     screen.getByText('Right mount')

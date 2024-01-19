@@ -42,7 +42,6 @@ import { useIsFlex } from '../hooks'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
 import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
-import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { PipetteModelSpecs, PipetteName } from '@opentrons/shared-data'
 import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
@@ -62,6 +61,7 @@ interface PipetteCardProps {
   pipetteIsBad: boolean
   updatePipette: () => void
   isRunActive: boolean
+  isEstopNotDisengaged: boolean
 }
 const BANNER_LINK_STYLE = css`
   text-decoration: underline;
@@ -93,6 +93,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     pipetteIsBad,
     updatePipette,
     isRunActive,
+    isEstopNotDisengaged,
   } = props
   const {
     menuOverlay,
@@ -154,7 +155,6 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     selectedPipette,
     setSelectedPipette,
   ] = React.useState<SelectablePipettes>(SINGLE_MOUNT_PIPETTES)
-  const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
 
   const handleChangePipette = (): void => {
     if (isFlexPipetteAttached && isFlex) {
@@ -270,23 +270,29 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               >
                 {isFlexPipetteAttached && !isPipetteCalibrated ? (
                   <Banner type="error" marginBottom={SPACING.spacing4}>
-                    <Trans
-                      t={t}
-                      i18nKey="calibration_needed"
-                      components={{
-                        calLink: (
-                          <StyledText
-                            as="p"
-                            css={css`
-                              text-decoration: underline;
-                              cursor: pointer;
-                              margin-left: 0.5rem;
-                            `}
-                            onClick={handleCalibrate}
-                          />
-                        ),
-                      }}
-                    />
+                    {isEstopNotDisengaged ? (
+                      <StyledText as="p">
+                        {t('calibration_needed_without_link')}
+                      </StyledText>
+                    ) : (
+                      <Trans
+                        t={t}
+                        i18nKey="calibration_needed"
+                        components={{
+                          calLink: (
+                            <StyledText
+                              as="p"
+                              css={css`
+                                text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
+                                cursor: pointer;
+                                margin-left: ${SPACING.spacing8};
+                              `}
+                              onClick={handleCalibrate}
+                            />
+                          ),
+                        }}
+                      />
+                    )}
                   </Banner>
                 ) : null}
                 <StyledText
@@ -363,6 +369,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               />
             </Banner>
           }
+          isEstopNotDisengaged={isEstopNotDisengaged}
         />
       )}
       {showOverflowMenu && (
