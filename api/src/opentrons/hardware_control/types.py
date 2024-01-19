@@ -232,6 +232,13 @@ class Axis(enum.Enum):
         """
         return cls.of_main_tool_actuator(mount)
 
+    @classmethod
+    def node_axes(cls) -> List["Axis"]:
+        """
+        Get a list of axes that are backed by flex canbus nodes.
+        """
+        return [cls.X, cls.Y, cls.Z_L, cls.Z_R, cls.P_L, cls.P_R, cls.Z_G, cls.G]
+
 
 class SubSystem(enum.Enum):
     """An enumeration of ot3 components.
@@ -412,6 +419,7 @@ HardwareEvent = Union[
 ]
 
 HardwareEventHandler = Callable[[HardwareEvent], None]
+HardwareEventUnsubscriber = Callable[[], None]
 
 
 RevisionLiteral = Literal["2.1", "A", "B", "C", "UNKNOWN"]
