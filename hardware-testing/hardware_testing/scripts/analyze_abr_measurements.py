@@ -1,6 +1,8 @@
 from ast import Try
 import sys, os, time, datetime
 import pandas as pd
+import plotly.express as px
+import csv
 
 if __name__ == '__main__':
     df = pd.DataFrame()
@@ -69,6 +71,31 @@ if __name__ == '__main__':
     time_now = datetime.datetime.now()
     today_date = str(time_now).split(' ')[0]
     filename =   'Analyzed-' + analysis_folder + '_Summary.csv'
+    #analysis_results_folder = os.path.join(analysis_results_folder, filename)
+    print(analysis_results_folder)
+    #pivoted_df.to_csv(analysis_results_folder, mode='a', index=False, header=False)
+    # df = pd.read_csv(analysis_results_folder)
+    # df.drop_duplicates(inplace = True)
+
+    # print(df['Robot'].unique())
+    # df['Sample and Robot'] = df['Robot'] + "_" + df['Sample']
+    # fig = px.scatter(df, x='Date', y='Liquid Moved (uL)', color='Sample and Robot', hover_data = ['Robot'])
+    # # Create drop-down button for the 'Robot' column
+    # buttons = [
+    #     dict(label=robot, method='update', args=[{'visible': [robot == r for r in df['Robot']]}])
+    #     for robot in df['Robot'].unique()
+    # ]
+
+    # fig.update_layout(updatemenus=[dict(type='dropdown', active=0, buttons=buttons)])
+
+    # # Set initial visibility
+    # fig.update_traces(visible=False)  # Set all traces to invisible initially
+
+    # fig.show()
+    
+    # fig_path = os.path.join(new_folder_path, 'graphtest.html')
+    # fig.write_html(fig_path)
+
     results_path = os.path.join(analysis_results_folder, filename)
     pivoted_df.to_csv(results_path, index = False)
     
