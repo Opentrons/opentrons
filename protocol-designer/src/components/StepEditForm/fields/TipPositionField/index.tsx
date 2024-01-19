@@ -39,7 +39,10 @@ export function TipPositionField(props: Props): JSX.Element {
   } = props
   const [isModalOpen, setModalOpen] = React.useState(false)
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
-  const labwareDef = labwareId != null ? labwareEntities[labwareId].def : null
+  const labwareDef =
+    labwareId != null && labwareEntities[labwareId] != null
+      ? labwareEntities[labwareId].def
+      : null
 
   let wellDepthMm: number = 0
   if (labwareDef != null) {

@@ -1,41 +1,39 @@
 import * as React from 'react'
 
 import styles from './SelectionRect.css'
-import { DragRect, GenericRect } from '../collision-types'
+import type { DragRect, GenericRect } from '../collision-types'
 
 interface Props {
-  onSelectionMove?: (e: MouseEvent, arg: GenericRect) => unknown
-  onSelectionDone?: (e: MouseEvent, arg: GenericRect) => unknown
+  onSelectionMove?: (e: MouseEvent, arg: GenericRect) => void
+  onSelectionDone?: (e: MouseEvent, arg: GenericRect) => void
   svg?: boolean // set true if this is an embedded SVG
   children?: React.ReactNode
   originXOffset?: number
   originYOffset?: number
 }
 
-interface State {
-  positions: DragRect | null
-}
+export const SelectionRect = (props: Props): JSX.Element => {
+  const parentRef = React.useRef<HTMLElement | SVGElement | null>(null)
+  const {
+    onSelectionMove,
+    onSelectionDone,
+    svg,
+    children,
+    originXOffset,
+    originYOffset,
+  } = props
+  const [positions, setPositions] = React.useState<DragRect | null>(null)
 
-export class SelectionRect extends React.Component<Props, State> {
-  parentRef?: HTMLElement | SVGElement | null
-
-  constructor(props: Props) {
-    super(props)
-    this.state = { positions: null }
-  }
-
-  renderRect(args: DragRect): React.ReactNode {
+  const renderRect = (args: DragRect): React.ReactNode => {
     const { xStart, yStart, xDynamic, yDynamic } = args
     const left = Math.min(xStart, xDynamic)
     const top = Math.min(yStart, yDynamic)
     const width = Math.abs(xDynamic - xStart)
     const height = Math.abs(yDynamic - yStart)
-    const { originXOffset = 0, originYOffset = 0 } = this.props
-    if (this.props.svg) {
+    if (svg) {
       // calculate ratio btw clientRect bounding box vs svg parent viewBox
       // WARNING: May not work right if you're nesting SVGs!
-      const parentRef = this.parentRef
-      if (!parentRef) {
+      if (!parentRef.current) {
         return null
       }
 
@@ -44,7 +42,7 @@ export class SelectionRect extends React.Component<Props, State> {
         height: number
         left: number
         top: number
-      } = parentRef.getBoundingClientRect()
+      } = parentRef.current.getBoundingClientRect()
       // @ts-expect-error(sa, 2021-7-1): parentRef.closest might return null
       const viewBox: { width: number; height: number } = parentRef.closest(
         'svg'
@@ -55,8 +53,8 @@ export class SelectionRect extends React.Component<Props, State> {
 
       return (
         <rect
-          x={(left - clientRect.left) * xScale - originXOffset}
-          y={(top - clientRect.top) * yScale - originYOffset}
+          x={(left - clientRect.left) * xScale - (originXOffset ?? 0)}
+          y={(top - clientRect.top) * yScale - (originYOffset ?? 0)}
           width={width * xScale}
           height={height * yScale}
           className={styles.selection_rect}
@@ -77,7 +75,7 @@ export class SelectionRect extends React.Component<Props, State> {
     )
   }
 
-  getRect(args: DragRect): GenericRect {
+  const getRect = (args: DragRect): GenericRect => {
     const { xStart, yStart, xDynamic, yDynamic } = args
     // convert internal rect position to more generic form
     // TODO should this be used in renderRect?
@@ -89,74 +87,73 @@ export class SelectionRect extends React.Component<Props, State> {
     }
   }
 
-  handleMouseDown: React.MouseEventHandler = e => {
-    document.addEventListener('mousemove', this.handleDrag)
-    document.addEventListener('mouseup', this.handleMouseUp)
-    this.setState({
-      positions: {
-        xStart: e.clientX,
-        xDynamic: e.clientX,
-        yStart: e.clientY,
-        yDynamic: e.clientY,
-      },
+  const handleMouseDown: React.MouseEventHandler<
+    SVGGElement | HTMLElement
+  > = e => {
+    document.addEventListener('mousemove', handleDrag)
+    document.addEventListener('mouseup', handleMouseUp)
+    setPositions({
+      xStart: e.clientX,
+      xDynamic: e.clientX,
+      yStart: e.clientY,
+      yDynamic: e.clientY,
     })
   }
 
-  handleDrag: (e: MouseEvent) => void = e => {
-    if (this.state.positions) {
+  const handleDrag: (e: MouseEvent) => void = e => {
+    if (positions) {
       const nextRect = {
-        ...this.state.positions,
+        ...positions,
         xDynamic: e.clientX,
         yDynamic: e.clientY,
       }
-      this.setState({ positions: nextRect })
 
-      const rect = this.getRect(nextRect)
-      this.props.onSelectionMove && this.props.onSelectionMove(e, rect)
+      setPositions(nextRect)
+
+      const rect = getRect(nextRect)
+      onSelectionMove != null && onSelectionMove(e, rect)
     }
   }
 
-  handleMouseUp: (e: MouseEvent) => void = e => {
+  const handleMouseUp: (e: MouseEvent) => void = e => {
     if (!(e instanceof MouseEvent)) {
       return
     }
-    document.removeEventListener('mousemove', this.handleDrag)
-    document.removeEventListener('mouseup', this.handleMouseUp)
+    document.removeEventListener('mousemove', handleDrag)
+    document.removeEventListener('mouseup', handleMouseUp)
 
-    const finalRect = this.state.positions && this.getRect(this.state.positions)
+    const finalRect = positions != null && getRect(positions)
 
     // clear the rectangle
-    this.setState({ positions: null })
+    setPositions(null)
 
     // call onSelectionDone callback with {x0, x1, y0, y1} of final selection rectangle
-    this.props.onSelectionDone &&
-      finalRect &&
-      this.props.onSelectionDone(e, finalRect)
+    onSelectionDone != null && finalRect && onSelectionDone(e, finalRect)
   }
 
-  render(): React.ReactNode {
-    const { svg, children } = this.props
-
-    return svg ? (
-      <g
-        onMouseDown={this.handleMouseDown}
-        ref={ref => {
-          this.parentRef = ref
-        }}
-      >
-        {children}
-        {this.state.positions && this.renderRect(this.state.positions)}
-      </g>
-    ) : (
-      <div
-        onMouseDown={this.handleMouseDown}
-        ref={ref => {
-          this.parentRef = ref
-        }}
-      >
-        {this.state.positions && this.renderRect(this.state.positions)}
-        {children}
-      </div>
-    )
-  }
+  return svg ? (
+    <g
+      onMouseDown={handleMouseDown}
+      ref={ref => {
+        if (ref) {
+          parentRef.current = ref
+        }
+      }}
+    >
+      {children}
+      {positions != null && renderRect(positions)}
+    </g>
+  ) : (
+    <div
+      onMouseDown={handleMouseDown}
+      ref={ref => {
+        if (ref) {
+          parentRef.current = ref
+        }
+      }}
+    >
+      {positions && renderRect(positions)}
+      {children}
+    </div>
+  )
 }

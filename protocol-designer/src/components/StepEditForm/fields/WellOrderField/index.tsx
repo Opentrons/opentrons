@@ -128,7 +128,6 @@ export const WellOrderField = (props: WellOrderFieldProps): JSX.Element => {
         secondValue={secondValue}
         firstName={firstName}
         secondName={secondName}
-        t={t}
       />
     </>
   )
