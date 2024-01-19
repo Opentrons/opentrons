@@ -48,8 +48,8 @@ describe('app-shell::system-info module action tests', () => {
   const usbMonitor: UsbDeviceMonitor = { getAllDevices, stop: jest.fn() }
   const ifaceMonitor: NetworkInterfaceMonitor = { stop: jest.fn() }
   const { windowsDriverVersion: _, ...notRealtek } = Fixtures.mockUsbDevice
-  const realtek0 = { ...notRealtek, manufacturer: 'Realtek' }
-  const realtek1 = { ...notRealtek, manufacturer: 'realtek' }
+  const realtek0 = { ...notRealtek, manufacturerName: 'Realtek' }
+  const realtek1 = { ...notRealtek, manufacturerName: 'realtek' }
   let handler: Dispatch
 
   beforeEach(() => {
