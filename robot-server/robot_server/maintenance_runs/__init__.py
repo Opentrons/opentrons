@@ -11,7 +11,6 @@ commands and actions over HTTP.
 from .router import maintenance_runs_router
 from .maintenance_engine_store import MaintenanceEngineStore, EngineConflictError
 from .dependencies import get_maintenance_engine_store
-from .maintenance_run_notify import notify_maintenance_run
 
 __all__ = [
     # main export
@@ -20,5 +19,4 @@ __all__ = [
     "MaintenanceEngineStore",
     "EngineConflictError",
     "get_maintenance_engine_store",
-    "notify_maintenance_run",
 ]

@@ -5,6 +5,7 @@ import logging
 
 import paho.mqtt.client as mqtt
 from anyio import to_thread
+from .service.json_api.response import DefaultNotifyBody
 
 HOST = 'broker.emqx.io'
 PORT = 1883
@@ -12,14 +13,14 @@ CLIENT_ID = f'robot-server-{random.randint(0, 1000000)}'
 KEEPALIVE = 60
 PROTOCOL_VERSION = mqtt.MQTTv5
 CLEAN_SESSION = True
-DEFAULT_QOS = 1
-RETAIN_MESSAGE = True
+DEFAULT_QOS = 2
+RETAIN_MESSAGE = False
 
 TOPIC_PREFIX = "robot-server"
 
 log = logging.getLogger(__name__)
 
-# TOME: TYPE ALL OF THIS!
+# TOME: TYPE ALL OF THIS. FORMAT IT CORRECTLY.
 # TOME: Don't forget to explain everything. 
 class NotificationClient:
     def __init__(self):
@@ -38,7 +39,8 @@ class NotificationClient:
         self.client.loop_stop()
         self.client.disconnect()
 
-    async def publish(self, topic, message): 
+    async def publish(self, topic, message = DefaultNotifyBody()): 
+        print(f"MESSAGE: {message}")
         await to_thread.run_sync(self._publish, topic, message)
 
     def _on_connect(self, client, userdata, flags, rc, properties=None):

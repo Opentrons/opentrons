@@ -45,6 +45,9 @@ class SimpleBody(BaseResponseBody, GenericModel, Generic[ResponseDataT]):
 
     data: ResponseDataT = Field(..., description=DESCRIPTION_DATA)
 
+# TOME: Type this.
+class DefaultNotifyBody(BaseResponseBody):
+    refetchUsingHTTP: bool = True
 
 class Body(BaseResponseBody, GenericModel, Generic[ResponseDataT, ResponseLinksT]):
     """A response that returns a single resource and stateful links."""
