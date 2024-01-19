@@ -7,11 +7,6 @@ from robot_server.persistence import folder_migrations
 from robot_server.persistence.folder_migrations import folder_migrator
 
 
-# TODO: More exhaustive tests here.
-
-# - Generally does not leave temp files hanging around in root directory
-
-
 def test_noop_if_no_migrations_supplied(tmp_path: Path) -> None:
     """Migrating should no-op if no migrations are configured."""
     subject = folder_migrator.MigrationOrchestrator(
@@ -144,6 +139,77 @@ def test_migration_chain_from_intermediate(tmp_path: Path) -> None:
         "c_dir",
     }
     assert (tmp_path / "c_dir" / "c_file").exists()
+
+
+def test_aborted_intermediate_migration(tmp_path: Path) -> None:
+    class MigrationA(folder_migrator.Migration):
+        def migrate(self, source_dir: Path, dest_dir: Path) -> None:
+            pass  # no-op
+
+    class MigrationB(folder_migrator.Migration):
+        def migrate(self, source_dir: Path, dest_dir: Path) -> None:
+            pass  # no-op
+
+    class MigrationC(folder_migrator.Migration):
+        def migrate(self, source_dir: Path, dest_dir: Path) -> None:
+            raise RuntimeError("oy vey")
+
+    class MigrationD(folder_migrator.Migration):
+        def migrate(self, source_dir: Path, dest_dir: Path) -> None:
+            assert False, "This should never run."
+
+    subject = folder_migrator.MigrationOrchestrator(
+        root=tmp_path,
+        legacy_uncontained_items=[],
+        migrations=[
+            MigrationA("A", "a_dir"),
+            MigrationB("B", "b_dir"),
+            MigrationC("C", "c_dir"),
+            MigrationD("D", "d_dir"),
+        ],
+        temp_file_prefix="temp",
+    )
+
+    (tmp_path / "a_dir").mkdir()
+    initial_children = _children(tmp_path)
+
+    with pytest.raises(RuntimeError, match="oy vey"):
+        subject.migrate_to_latest()
+
+    assert _children(tmp_path) == initial_children
+
+
+def test_aborted_final_migration(tmp_path: Path) -> None:
+    class MigrationA(folder_migrator.Migration):
+        def migrate(self, source_dir: Path, dest_dir: Path) -> None:
+            pass  # no-op
+
+    class MigrationB(folder_migrator.Migration):
+        def migrate(self, source_dir: Path, dest_dir: Path) -> None:
+            pass  # no-op
+
+    class MigrationC(folder_migrator.Migration):
+        def migrate(self, source_dir: Path, dest_dir: Path) -> None:
+            raise RuntimeError("oy vey")
+
+    subject = folder_migrator.MigrationOrchestrator(
+        root=tmp_path,
+        legacy_uncontained_items=[],
+        migrations=[
+            MigrationA("A", "a_dir"),
+            MigrationB("B", "b_dir"),
+            MigrationC("C", "c_dir"),
+        ],
+        temp_file_prefix="temp",
+    )
+
+    (tmp_path / "a_dir").mkdir()
+    initial_children = _children(tmp_path)
+
+    with pytest.raises(RuntimeError, match="oy vey"):
+        subject.migrate_to_latest()
+
+    assert _children(tmp_path) == initial_children
 
 
 def test_clean_up_stray_temp_files(tmp_path: Path) -> None:
