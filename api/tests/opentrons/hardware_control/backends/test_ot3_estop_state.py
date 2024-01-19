@@ -2,7 +2,7 @@ import pytest
 from decoy import Decoy
 from typing import List, Tuple, Optional
 
-from opentrons.hardware_control.estop_state import EstopStateMachine
+from opentrons.hardware_control.backends.estop_state import EstopStateMachine
 from opentrons_hardware.hardware_control.estop.detector import (
     EstopSummary,
     EstopDetector,
@@ -73,11 +73,9 @@ async def test_estop_state_no_detector(
     subject.subscribe_to_detector(detector=mock_estop_detector)
 
     decoy.verify(
-        [
-            mock_estop_detector.add_listener(subject.detector_listener),
-            mock_estop_detector.remove_listener(subject.detector_listener),
-            mock_estop_detector.add_listener(subject.detector_listener),
-        ]
+        mock_estop_detector.add_listener(subject.detector_listener),
+        mock_estop_detector.remove_listener(subject.detector_listener),
+        mock_estop_detector.add_listener(subject.detector_listener),
     )
 
 

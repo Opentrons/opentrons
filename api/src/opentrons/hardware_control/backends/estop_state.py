@@ -13,6 +13,7 @@ from opentrons.hardware_control.types import (
     EstopAttachLocation,
     EstopStateNotification,
     HardwareEventHandler,
+    HardwareEventUnsubscriber,
 )
 
 
@@ -51,10 +52,12 @@ class EstopStateMachine:
         if self._detector is not None:
             self._detector.remove_listener(self.detector_listener)
 
-    def add_listener(self, listener: HardwareEventHandler) -> None:
+    def add_listener(self, listener: HardwareEventHandler) -> HardwareEventUnsubscriber:
         """Add a hardware event listener for estop event changes."""
         if listener not in self._listeners:
             self._listeners.append(listener)
+            return lambda: self.remove_listener(listener)
+        return lambda: None
 
     def remove_listener(self, listener: HardwareEventHandler) -> None:
         """Remove an existing hardware event listener for estop detector changes."""

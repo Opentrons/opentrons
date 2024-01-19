@@ -77,7 +77,7 @@ from opentrons_hardware.hardware_control.tools.types import (
     GripperInformation,
 )
 
-from opentrons.hardware_control.estop_state import EstopStateMachine
+from opentrons.hardware_control.backends.estop_state import EstopStateMachine
 
 from opentrons_shared_data.errors.exceptions import (
     EStopActivatedError,

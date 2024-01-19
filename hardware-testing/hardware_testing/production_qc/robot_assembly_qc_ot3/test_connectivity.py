@@ -1,10 +1,11 @@
 """Test Connectivity."""
 import asyncio
 from subprocess import run as run_subprocess
-from typing import List, Union, Optional, Tuple
+from typing import List, Union, Optional, Tuple, cast
 import re
 
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.system import nmcli
 from opentrons import config
 
@@ -301,10 +302,11 @@ async def _aux_subtest(
     api: OT3API, ui_promt: str, pass_states: RearPinState, sync_state: int
 ) -> Tuple[bool, str]:
     ui.get_user_ready(ui_promt)
-    await set_sync_pin(sync_state, api._backend._usb_messenger)  # type: ignore[union-attr]
-    result = await get_all_pin_state(api._backend._usb_messenger)  # type: ignore[union-attr]
+    backend = cast(OT3Controller, api._backend)
+    await set_sync_pin(sync_state, backend._usb_messenger)
+    result = await get_all_pin_state(backend._usb_messenger)
     LOG.info(f"Aux Result: {result}")
-    await set_sync_pin(0, api._backend._usb_messenger)  # type: ignore[union-attr]
+    await set_sync_pin(0, backend._usb_messenger)
 
     # format the state comparison nicely for csv output
     result_dict = vars(result)
