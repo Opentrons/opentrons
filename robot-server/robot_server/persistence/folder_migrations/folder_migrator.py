@@ -76,43 +76,6 @@ class MigrationOrchestrator:
         _log.info(f"All migrations complete.")
         return previous_output
 
-    def delete_old_versions(self, num_old_versions_to_keep: int) -> None:
-        """
-        Warning:
-            Only call this *after* `migrate_to_latest()` completes. Otherwise you might
-            delete the data you want to migrate from. :)
-        """
-        # +1 to represent the latest version, which we always keep.
-        num_to_keep = num_old_versions_to_keep + 1
-
-        num_to_delete = (
-            len(self._migrations)
-            + 1  # +1 to represent self._legacy_uncontained_files.
-            - num_to_keep
-        )
-        if num_to_delete < 0:
-            num_to_delete = 0
-
-        directories_to_delete = [
-            m._subdirectory for m in self._migrations[:num_to_delete]
-        ]
-        delete_legacy_files = num_to_delete > len(directories_to_delete)
-
-        if delete_legacy_files:
-            for legacy_file in self._legacy_uncontained_items:
-                _log.info(f"Deleting legacy file {legacy_file}.")
-                _atomic_delete_if_present(
-                    to_delete=self._root / legacy_file,
-                    temp_prefix=self._temp_file_prefix,
-                )
-
-        for directory_to_delete in directories_to_delete:
-            _log.info(f"Deleting old directory {directory_to_delete}.")
-            _atomic_delete_if_present(
-                to_delete=self._root / directory_to_delete,
-                temp_prefix=self._temp_file_prefix,
-            )
-
     def clean_up_stray_temp_files(self) -> None:
         # TODO: Find anything starting with self.temp_file_prefix and delete it.
         raise NotImplementedError
