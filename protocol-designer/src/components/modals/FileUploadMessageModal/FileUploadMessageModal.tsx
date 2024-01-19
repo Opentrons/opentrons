@@ -1,29 +1,30 @@
 import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import { AlertModal, OutlineButton } from '@opentrons/components'
-import modalStyles from '../modal.css'
+import {
+  selectors as loadFileSelectors,
+  actions as loadFileActions,
+} from '../../../load-file'
 import { getModalContents } from './modalContents'
-import { FileUploadMessage } from '../../../load-file'
+import modalStyles from '../modal.css'
 
-export interface FileUploadMessageModalProps {
-  message?: FileUploadMessage | null
-  cancelProtocolMigration: (event: React.MouseEvent) => unknown
-  dismissModal: (event: React.MouseEvent) => unknown
-}
-
-export function FileUploadMessageModal(
-  props: FileUploadMessageModalProps
-): JSX.Element | null {
-  const { message, cancelProtocolMigration, dismissModal } = props
+export function FileUploadMessageModal(): JSX.Element | null {
+  const message = useSelector(loadFileSelectors.getFileUploadMessages)
+  const dispatch = useDispatch()
   const { t } = useTranslation('button')
+
+  const dismissModal = (): void => {
+    dispatch(loadFileActions.dismissFileUploadMessage())
+  }
   if (!message) return null
 
   const { title, body, okButtonText } = getModalContents(message)
   let buttons = [
     {
       children: t('cancel'),
-      onClick: cancelProtocolMigration,
+      onClick: () => dispatch(loadFileActions.undoLoadFile()),
       className: modalStyles.bottom_button,
     },
     {

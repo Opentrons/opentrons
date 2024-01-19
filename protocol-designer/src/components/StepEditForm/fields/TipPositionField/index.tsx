@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
 import {
   FormGroup,
   InputField,
@@ -14,13 +14,12 @@ import {
   getIsDelayPositionField,
 } from '../../../../form-types'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
+import { TipPositionModal } from './TipPositionModal'
+import { getDefaultMmFromBottom } from './utils'
 import stepFormStyles from '../../StepEditForm.css'
 import styles from './TipPositionInput.css'
-import { TipPositionModal } from './TipPositionModal'
 
-import { getDefaultMmFromBottom } from './utils'
-import { BaseState } from '../../../../types'
-import { FieldProps } from '../../types'
+import type { FieldProps } from '../../types'
 
 interface OP extends FieldProps {
   labwareId?: string | null
@@ -34,8 +33,35 @@ interface SP {
 
 type Props = OP & SP
 
-function TipPositionInput(props: Props): JSX.Element {
+export function TipPositionField(props: Props): JSX.Element {
+  const {
+    disabled,
+    name,
+
+    tooltipContent,
+
+    updateValue,
+    isIndeterminate,
+    labwareId,
+  } = props
   const [isModalOpen, setModalOpen] = React.useState(false)
+  const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
+  const labwareDef = labwareId != null ? labwareEntities[labwareId].def : null
+
+  let wellDepthMm: number = 0
+  if (labwareDef != null) {
+    // NOTE: only taking depth of first well in labware def, UI not currently equipped for multiple depths
+    const firstWell = labwareDef.wells.A1
+    if (firstWell) {
+      wellDepthMm = getWellsDepth(labwareDef, ['A1'])
+    }
+  }
+
+  if (wellDepthMm === 0 && labwareId != null && labwareDef != null) {
+    console.error(
+      `expected to find the well depth mm with labwareId ${labwareId} but could not`
+    )
+  }
 
   const handleOpen = (): void => {
     if (props.wellDepthMm) {
@@ -45,30 +71,20 @@ function TipPositionInput(props: Props): JSX.Element {
   const handleClose = (): void => {
     setModalOpen(false)
   }
-
-  const {
-    disabled,
-    name,
-    mmFromBottom,
-    tooltipContent,
-    wellDepthMm,
-    updateValue,
-    isIndeterminate,
-  } = props
   const { t } = useTranslation('application')
   const isTouchTipField = getIsTouchTipField(name)
   const isDelayPositionField = getIsDelayPositionField(name)
-  let value: number | string = ''
+  let value: number = 0
+  const mmFromBottom = value ?? null
   if (wellDepthMm !== null) {
     // show default value for field in parens if no mmFromBottom value is selected
     value =
-      mmFromBottom !== null
+      mmFromBottom != null
         ? mmFromBottom
         : getDefaultMmFromBottom({ name, wellDepthMm })
   }
 
   const [targetProps, tooltipProps] = useHoverTooltip()
-
   return (
     <>
       <Tooltip {...tooltipProps}>{tooltipContent}</Tooltip>
@@ -127,31 +143,3 @@ const Wrapper = (props: WrapperProps): JSX.Element => {
     </span>
   )
 }
-const mapSTP = (state: BaseState, ownProps: OP): SP => {
-  const { labwareId, value } = ownProps
-
-  let wellDepthMm = 0
-  const labwareDef =
-    labwareId != null
-      ? stepFormSelectors.getLabwareEntities(state)[labwareId]?.def
-      : null
-
-  if (labwareDef != null) {
-    // NOTE: only taking depth of first well in labware def, UI not currently equipped for multiple depths
-    const firstWell = labwareDef.wells.A1
-    if (firstWell) wellDepthMm = getWellsDepth(labwareDef, ['A1'])
-  }
-
-  if (wellDepthMm === 0 && labwareId != null && labwareDef != null) {
-    console.error(
-      `expected to find the well depth mm with labwareId ${labwareId} but could not`
-    )
-  }
-
-  return {
-    wellDepthMm,
-    mmFromBottom: typeof value === 'number' ? value : null,
-  }
-}
-
-export const TipPositionField = connect(mapSTP, () => ({}))(TipPositionInput)

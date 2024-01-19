@@ -1,17 +1,23 @@
 import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { SidePanel } from '@opentrons/components'
 
-import { PresavedStepItem } from './PresavedStepItem'
-import { StartingDeckStateTerminalItem } from './StartingDeckStateTerminalItem'
-import { TerminalItem } from './TerminalItem'
 import { END_TERMINAL_TITLE } from '../../constants'
-import { END_TERMINAL_ITEM_ID } from '../../steplist'
-
+import {
+  END_TERMINAL_ITEM_ID,
+  actions as steplistActions,
+} from '../../steplist'
+import { actions as stepsActions, getIsMultiSelectMode } from '../../ui/steps'
+import { selectors as stepFormSelectors } from '../../step-forms'
 import { StepCreationButton } from '../StepCreationButton'
 import { DraggableStepItems } from './DraggableStepItems'
 import { MultiSelectToolbar } from './MultiSelectToolbar'
+import { PresavedStepItem } from './PresavedStepItem'
+import { StartingDeckStateTerminalItem } from './StartingDeckStateTerminalItem'
+import { TerminalItem } from './TerminalItem'
 
-import { StepIdType } from '../../form-types'
+import type { StepIdType } from '../../form-types'
+import type { ThunkDispatch } from '../../types'
 
 export interface StepListProps {
   isMultiSelectMode?: boolean | null
@@ -20,9 +26,12 @@ export interface StepListProps {
   reorderSteps: (steps: StepIdType[]) => unknown
 }
 
-export class StepList extends React.Component<StepListProps> {
-  handleKeyDown: (e: KeyboardEvent) => void = e => {
-    const { reorderSelectedStep } = this.props
+export const StepList = (): JSX.Element => {
+  const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
+  const isMultiSelectMode = useSelector(getIsMultiSelectMode)
+  const dispatch: ThunkDispatch<any> = useDispatch()
+
+  const handleKeyDown: (e: KeyboardEvent) => void = e => {
     const key = e.key
     const altIsPressed = e.altKey
 
@@ -34,34 +43,36 @@ export class StepList extends React.Component<StepListProps> {
         delta = 1
       }
       if (!delta) return
-      reorderSelectedStep(delta)
+      dispatch(stepsActions.reorderSelectedStep(delta))
     }
   }
 
-  componentDidMount(): void {
-    global.addEventListener('keydown', this.handleKeyDown, false)
-  }
+  React.useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent): void => {
+      handleKeyDown(e)
+    }
 
-  componentWillUnmount(): void {
-    global.removeEventListener('keydown', this.handleKeyDown, false)
-  }
+    global.addEventListener('keydown', onKeyDown, false)
 
-  render(): React.ReactNode {
-    return (
-      <SidePanel title="Protocol Timeline">
-        <MultiSelectToolbar
-          isMultiSelectMode={Boolean(this.props.isMultiSelectMode)}
-        />
+    return () => {
+      global.removeEventListener('keydown', onKeyDown, false)
+    }
+  }, [])
 
-        <StartingDeckStateTerminalItem />
-        <DraggableStepItems
-          orderedStepIds={this.props.orderedStepIds.slice()}
-          reorderSteps={this.props.reorderSteps}
-        />
-        <PresavedStepItem />
-        <StepCreationButton />
-        <TerminalItem id={END_TERMINAL_ITEM_ID} title={END_TERMINAL_TITLE} />
-      </SidePanel>
-    )
-  }
+  return (
+    <SidePanel title="Protocol Timeline">
+      <MultiSelectToolbar isMultiSelectMode={Boolean(isMultiSelectMode)} />
+
+      <StartingDeckStateTerminalItem />
+      <DraggableStepItems
+        orderedStepIds={orderedStepIds.slice()}
+        reorderSteps={(stepIds: StepIdType[]) => {
+          dispatch(steplistActions.reorderSteps(stepIds))
+        }}
+      />
+      <PresavedStepItem />
+      <StepCreationButton />
+      <TerminalItem id={END_TERMINAL_ITEM_ID} title={END_TERMINAL_TITLE} />
+    </SidePanel>
+  )
 }
