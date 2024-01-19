@@ -10,6 +10,9 @@ import {
   RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
 
+import type { UseQueryOptions } from 'react-query'
+import type { CommandsData } from '@opentrons/api-client'
+
 const LIVE_RUN_STATUSES = [
   RUN_STATUS_IDLE,
   RUN_STATUS_PAUSED,
@@ -21,19 +24,23 @@ const LIVE_RUN_STATUSES = [
 ]
 const LIVE_RUN_COMMANDS_POLL_MS = 3000
 
-export function useLastRunCommandKey(runId: string): string | null {
+export function useLastRunCommandKey(
+  runId: string,
+  options: UseQueryOptions<CommandsData, Error> = {}
+): string | null {
   const runStatus = useRunStatus(runId)
   const { data: commandsData } = useAllCommandsQuery(
     runId,
     { cursor: null, pageLength: 1 },
     {
+      ...options,
       refetchInterval:
         runStatus != null && LIVE_RUN_STATUSES.includes(runStatus)
-          ? LIVE_RUN_COMMANDS_POLL_MS
+          ? options.refetchInterval ?? LIVE_RUN_COMMANDS_POLL_MS
           : Infinity,
     }
   )
-  console.log('🚀 ~ useLastRunCommandKey ~ commandsData:', commandsData)
+
   return commandsData?.data?.[0]?.intent !== 'setup'
     ? commandsData?.links?.current?.meta?.key ??
         commandsData?.data?.[0]?.key ??

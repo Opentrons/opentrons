@@ -27,6 +27,8 @@ import { CommandIcon } from './CommandIcon'
 import type { RobotType } from '@opentrons/shared-data'
 
 const COLOR_FADE_MS = 500
+const LIVE_RUN_COMMANDS_POLL_MS = 3000
+
 interface RunPreviewProps {
   runId: string
   robotType: RobotType
@@ -40,7 +42,9 @@ export const RunPreviewComponent = (
   const { t } = useTranslation('run_details')
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
-  const currentRunCommandKey = useNotifyLastRunCommandKey(runId)
+  const currentRunCommandKey = useNotifyLastRunCommandKey(runId, {
+    refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
+  })
   const [
     isCurrentCommandVisible,
     setIsCurrentCommandVisible,

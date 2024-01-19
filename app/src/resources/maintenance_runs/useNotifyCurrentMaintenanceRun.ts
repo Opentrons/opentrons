@@ -13,14 +13,13 @@ export function useNotifyCurrentMaintenanceRun(
 ): UseQueryResult<MaintenanceRun> | UseQueryResult<MaintenanceRun, Error> {
   const host = useHost()
   const [refetchUsingHTTP, setRefetchUsingHTTP] = React.useState(true)
-  const queryKey = [host, 'maintenance_runs', 'current_run']
 
   const {
     notifyQueryResponse,
     isNotifyError,
   } = useNotifyService<MaintenanceRun>({
     topic: 'robot-server/maintenance_runs',
-    queryKey: queryKey,
+    queryKey: [host, 'maintenance_runs', 'current_run'],
     refetchUsingHTTP: () => setRefetchUsingHTTP(true),
     options: {
       ...options,
