@@ -193,6 +193,9 @@ def _atomic_dir(
 
     If the code inside the `with`-block succeeds, atomically move the temporary
     directory to `root`/`name`, promoting it to be non-temporary.
+
+    If the code inside the `with`-block raises an exception, delete the temporary
+    directory. This will not be atomic.
     """
     directory = tempfile.mkdtemp(
         # Manually specify `dir` to keep the temporary directory on the same filesystem
@@ -203,23 +206,24 @@ def _atomic_dir(
         prefix=temp_prefix,
     )
 
-    yield Path(directory)
+    try:
+        yield Path(directory)
+    except:
+        shutil.rmtree(directory)
+        raise
+    else:
+        # At this point, we have a directory full of files, but we haven't yet moved it into
+        # place. This os.sync() is a barrier to make sure that the kernel+filesystem don't
+        # reorder the "move into place" part before the "fill it with files" part, which
+        # would break our atomicity if we lost power between the two.
+        #
+        # We do a nuclear-option os.sync() instead of messing with the finer-grained
+        # os.fsync() because os.fsync() is difficult to get right.
+        # https://stackoverflow.com/questions/37288453/calling-fsync2-after-close2
+        os.sync()
 
-    # If we got here without an exception being raised from the `yield`, it means the
-    # code inside the `with`-block succeeded.
-
-    # At this point, we have a directory full of files, but we haven't yet moved it into
-    # place. This os.sync() is a barrier to make sure that the kernel+filesystem don't
-    # reorder the "move into place" part before the "fill it with files" part, which
-    # would break our atomicity if we lost power between the two.
-    #
-    # We do a nuclear-option os.sync() instead of messing with the finer-grained
-    # os.fsync() because os.fsync() is difficult to get right.
-    # https://stackoverflow.com/questions/37288453/calling-fsync2-after-close2
-    os.sync()
-
-    # Atomically move the filled directory into place.
-    os.replace(src=directory, dst=root / name)
+        # Atomically move the filled directory into place.
+        os.replace(src=directory, dst=root / name)
 
 
 def _validate_bare_name(name: str) -> None:
