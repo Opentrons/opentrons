@@ -76,7 +76,9 @@ To dispense liquid from a pipette tip, call the :py:meth:`.InstrumentContext.dis
     pipette.dispense(200, plate["B1"])
 
 .. note::
-    In API version 2.16 and earlier, you could pass a ``volume`` argument to ``dispense()`` greater than what was aspirated into the pipette. The API automatically clamped this value, and the robot *would not* move the plunger lower than dispensing the exact amount. In version 2.17 and later, passing such values raises an error.
+    In API version 2.16 and earlier, you could pass a ``volume`` argument to ``dispense()`` greater than what was aspirated into the pipette. In this case, the API would ignore ``volume`` and dispense the pipette's :py:obj:`~.InstrumentContext.current_volume`. The robot *would not* move the plunger lower as a result.
+
+    In version 2.17 and later, passing such values raises an error.
 
     To move the plunger a small extra amount, add a :ref:`push out <push-out-dispense>`. Or to move it a large amount, use :ref:`blow out <blow-out>`.
 
