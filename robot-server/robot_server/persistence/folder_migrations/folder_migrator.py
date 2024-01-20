@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from contextlib import contextmanager
 import contextlib
 import logging
 import os
 from pathlib import Path
 import shutil
 import tempfile
-from typing import Generator, List, Union
+from typing import Final, Generator, List, Union
 
 
 _log = logging.getLogger(__name__)
@@ -34,15 +33,15 @@ class MigrationOrchestrator:
             previous_output = self._root
         else:
             sequence = self._migrations[current + 1 :]
-            previous_output = self._root / self._migrations[current]._subdirectory
+            previous_output = self._root / self._migrations[current].subdirectory
 
         final_output = (
-            self._root / sequence[-1]._subdirectory
+            self._root / sequence[-1].subdirectory
             if len(sequence) > 0
             else previous_output
         )
 
-        _log.info(f"Migrations to perform: {[m._subdirectory for m in sequence]}")
+        _log.info(f"Migrations to perform: {[m.subdirectory for m in sequence]}")
 
         with contextlib.ExitStack() as exit_stack:
             for sequence_index, migration in enumerate(sequence):
@@ -52,8 +51,7 @@ class MigrationOrchestrator:
                     # goes well, we'll commit its output to persistent storage.
                     output_dir = exit_stack.enter_context(
                         _atomic_dir(
-                            root=self._root,
-                            name=migration._subdirectory,
+                            destination=self._root / migration.subdirectory,
                             temp_prefix=self._temp_file_prefix,
                         )
                     )
@@ -72,11 +70,11 @@ class MigrationOrchestrator:
                         exit_stack.enter_context(tempfile.TemporaryDirectory())
                     )
 
-                _log.info(f'Performing migration to "{migration._subdirectory}"...')
+                _log.info(f'Performing migration to "{migration.subdirectory}"...')
                 migration.migrate(source_dir=previous_output, dest_dir=output_dir)
                 previous_output = output_dir
 
-        _log.info(f"All migrations complete.")
+        _log.info("All migrations complete.")
         return final_output
 
     def clean_up_stray_temp_files(self) -> None:
@@ -107,7 +105,7 @@ class MigrationOrchestrator:
         Return `None` if it's just the legacy uncontained files, or no files at all.
         """
         for index, migration in reversed(list(enumerate(self._migrations))):
-            if (self._root / migration._subdirectory).exists():
+            if (self._root / migration.subdirectory).exists():
                 return index
         return None
 
@@ -124,8 +122,7 @@ class Migration(ABC):
             class that creates `foo/bar/storage/v2` should have `v2` for this argument.
         """
         _validate_bare_name(subdirectory)
-
-        self._subdirectory = subdirectory
+        self.subdirectory: Final = subdirectory
 
     @abstractmethod
     def migrate(self, source_dir: Path, dest_dir: Path) -> None:
@@ -149,31 +146,33 @@ class Migration(ABC):
         """
 
 
-@contextmanager
-def _atomic_dir(
-    *, root: Path, name: str, temp_prefix: str
-) -> Generator[Path, None, None]:
+@contextlib.contextmanager
+def _atomic_dir(destination: Path, temp_prefix: str) -> Generator[Path, None, None]:
     """Return a temporary directory.
 
-    If the code inside the `with`-block succeeds, atomically move the temporary
-    directory to `root`/`name`, promoting it to be non-temporary.
+    If the code inside the `with`-block succeeds, promote the directory to be
+    non-temporary by atomically moving it to be at `destination`.
 
     If the code inside the `with`-block raises an exception, delete the temporary
-    directory. This will not be atomic.
+    directory.
+
+    Crashes or shutdowns may leave the temporary directory behind, adjacent to
+    `destination`. Choose a `temp_prefix` that's easily identifiable so you can
+    clean it up in case this happens.
     """
-    directory = tempfile.mkdtemp(
+    temp_dir = tempfile.mkdtemp(
         # Manually specify `dir` to keep the temporary directory on the same filesystem
         # as our target. Otherwise, the rename won't be atomic. e.g. if `dir` were
         # automatically chosen to be /tmp, on tmpfs, our "rename" would just be a full
         # recursive copy followed by a full recursive delete.
-        dir=root,
+        dir=destination.parent,
         prefix=temp_prefix,
     )
 
     try:
-        yield Path(directory)
+        yield Path(temp_dir)
     except:
-        shutil.rmtree(directory)
+        shutil.rmtree(temp_dir)
         raise
     else:
         # At this point, we have a directory full of files, but we haven't yet moved it into
@@ -187,7 +186,7 @@ def _atomic_dir(
         os.sync()
 
         # Atomically move the filled directory into place.
-        os.replace(src=directory, dst=root / name)
+        os.replace(src=temp_dir, dst=destination)
 
 
 def _validate_bare_name(name: str) -> None:
