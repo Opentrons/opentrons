@@ -42,8 +42,8 @@ def test_noop_if_no_migrations_required(tmp_path: Path) -> None:
     subject = folder_migrator.MigrationOrchestrator(
         root=tmp_path,
         migrations=[
-            OlderMigration(subdirectory="older_dir", debug_name="older"),
-            NewerMigration(subdirectory="newer_dir", debug_name="newer"),
+            OlderMigration(subdirectory="older_dir"),
+            NewerMigration(subdirectory="newer_dir"),
         ],
         temp_file_prefix="tmp",
     )
@@ -92,9 +92,9 @@ def test_migration_chain_from_scratch(tmp_path: Path) -> None:
     subject = folder_migrator.MigrationOrchestrator(
         root=tmp_path,
         migrations=[
-            MigrationA("A", "a_dir"),
-            MigrationB("B", "b_dir"),
-            MigrationC("C", "c_dir"),
+            MigrationA("a_dir"),
+            MigrationB("b_dir"),
+            MigrationC("c_dir"),
         ],
         temp_file_prefix="temp",
     )
@@ -138,9 +138,9 @@ def test_migration_chain_from_intermediate(tmp_path: Path) -> None:
     subject = folder_migrator.MigrationOrchestrator(
         root=tmp_path,
         migrations=[
-            MigrationA("A", "a_dir"),
-            MigrationB("B", "b_dir"),
-            MigrationC("C", "c_dir"),
+            MigrationA("a_dir"),
+            MigrationB("b_dir"),
+            MigrationC("c_dir"),
         ],
         temp_file_prefix="temp",
     )
@@ -181,10 +181,10 @@ def test_aborted_intermediate_migration(tmp_path: Path) -> None:
     subject = folder_migrator.MigrationOrchestrator(
         root=tmp_path,
         migrations=[
-            MigrationA("A", "a_dir"),
-            MigrationB("B", "b_dir"),
-            MigrationC("C", "c_dir"),
-            MigrationD("D", "d_dir"),
+            MigrationA("a_dir"),
+            MigrationB("b_dir"),
+            MigrationC("c_dir"),
+            MigrationD("d_dir"),
         ],
         temp_file_prefix="temp",
     )
@@ -219,9 +219,9 @@ def test_aborted_final_migration(tmp_path: Path) -> None:
     subject = folder_migrator.MigrationOrchestrator(
         root=tmp_path,
         migrations=[
-            MigrationA("A", "a_dir"),
-            MigrationB("B", "b_dir"),
-            MigrationC("C", "c_dir"),
+            MigrationA("a_dir"),
+            MigrationB("b_dir"),
+            MigrationC("c_dir"),
         ],
         temp_file_prefix="temp",
     )

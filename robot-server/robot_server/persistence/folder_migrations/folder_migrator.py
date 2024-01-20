@@ -42,7 +42,7 @@ class MigrationOrchestrator:
             else previous_output
         )
 
-        _log.info(f"Migrations to perform: {[m._debug_name for m in sequence]}")
+        _log.info(f"Migrations to perform: {[m._subdirectory for m in sequence]}")
 
         with contextlib.ExitStack() as exit_stack:
             for sequence_index, migration in enumerate(sequence):
@@ -72,7 +72,7 @@ class MigrationOrchestrator:
                         exit_stack.enter_context(tempfile.TemporaryDirectory())
                     )
 
-                _log.info(f'Performing migration "{migration._debug_name}"...')
+                _log.info(f'Performing migration to "{migration._subdirectory}"...')
                 migration.migrate(source_dir=previous_output, dest_dir=output_dir)
                 previous_output = output_dir
 
@@ -113,13 +113,11 @@ class MigrationOrchestrator:
 
 
 class Migration(ABC):
-    def __init__(self, debug_name: str, subdirectory: str) -> None:
+    def __init__(self, subdirectory: str) -> None:
         """Represents a single migration, e.g. from v1 to v2.
 
         Subclass this and override `migrate()` to implement your actual migration logic.
 
-        :param debug_name: A developer-readable name for this migration,
-            to use in log messages.
         :param subdirectory: Where, under the `MigrationOrchestrator`'s root
             directory, this migration should output. e.g. if you have
             `foo/bar/storage/v1` and `foo/bar/storage/v2`, the instance of this
@@ -127,7 +125,6 @@ class Migration(ABC):
         """
         _validate_bare_name(subdirectory)
 
-        self._debug_name = debug_name
         self._subdirectory = subdirectory
 
     @abstractmethod
