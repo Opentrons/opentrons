@@ -20,8 +20,9 @@ def test_noop_if_no_migrations_supplied(tmp_path: Path) -> None:
     (tmp_path / "b_dir").mkdir()
     (tmp_path / "b_dir" / "b").write_text("original b contents")
 
-    subject.migrate_to_latest()
+    result = subject.migrate_to_latest()
 
+    assert result == tmp_path
     assert _children(tmp_path) == {"a", "b_dir"}
     assert (tmp_path / "a").read_text() == "original a contents"
     assert (tmp_path / "b_dir" / "b").read_text() == "original b contents"
@@ -52,8 +53,9 @@ def test_noop_if_no_migrations_required(tmp_path: Path) -> None:
     (tmp_path / "newer_dir").mkdir()
     (tmp_path / "newer_dir" / "newer_file").write_text("original newer_file contents")
 
-    subject.migrate_to_latest()
+    result = subject.migrate_to_latest()
 
+    assert result == tmp_path / "newer_dir"
     assert _children(tmp_path) == {"older_dir", "newer_dir"}
     assert (
         tmp_path / "older_dir" / "older_file"
@@ -99,8 +101,9 @@ def test_migration_chain_from_scratch(tmp_path: Path) -> None:
 
     (tmp_path / "initial_file").touch()
 
-    subject.migrate_to_latest()
+    result = subject.migrate_to_latest()
 
+    assert result == tmp_path / "c_dir"
     assert {child.name for child in tmp_path.iterdir()} == {"initial_file", "c_dir"}
     assert (tmp_path / "c_dir" / "c_file").exists()
 
@@ -142,8 +145,9 @@ def test_migration_chain_from_intermediate(tmp_path: Path) -> None:
         temp_file_prefix="temp",
     )
 
-    subject.migrate_to_latest()
+    result = subject.migrate_to_latest()
 
+    assert result == tmp_path / "c_dir"
     assert {child.name for child in tmp_path.iterdir()} == {
         "initial_file",
         "a_dir",
