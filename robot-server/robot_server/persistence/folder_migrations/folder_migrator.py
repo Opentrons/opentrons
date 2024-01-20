@@ -36,6 +36,12 @@ class MigrationOrchestrator:
             sequence = self._migrations[current + 1 :]
             previous_output = self._root / self._migrations[current]._subdirectory
 
+        final_output = (
+            self._root / sequence[-1]._subdirectory
+            if len(sequence) > 0
+            else previous_output
+        )
+
         _log.info(f"Migrations to perform: {[m._debug_name for m in sequence]}")
 
         with contextlib.ExitStack() as exit_stack:
@@ -71,7 +77,7 @@ class MigrationOrchestrator:
                 previous_output = output_dir
 
         _log.info(f"All migrations complete.")
-        return previous_output
+        return final_output
 
     def clean_up_stray_temp_files(self) -> None:
         """Delete any abandoned files or directories from prior interrupted work."""
