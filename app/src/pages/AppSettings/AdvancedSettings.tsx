@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { css } from 'styled-components'
 
@@ -52,6 +52,7 @@ import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { useToaster } from '../../organisms/ToasterOven'
+import { PreventRobotCaching } from '../../organisms/AdvancedSettings'
 
 import type { Dispatch, State } from '../../redux/types'
 
@@ -164,9 +165,6 @@ export function AdvancedSettings(): JSX.Element {
   const handleChannel = (_: string, value: string): void => {
     dispatch(Config.updateConfigValue('update.channel', value))
   }
-  const displayUnavailRobots = useSelector((state: State) => {
-    return Config.getConfig(state)?.discovery.disableCache ?? false
-  })
 
   const formatOptionLabel: React.ComponentProps<
     typeof SelectField
@@ -320,39 +318,7 @@ export function AdvancedSettings(): JSX.Element {
           }
         </Flex>
         <Divider marginY={SPACING.spacing24} />
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box width="70%">
-            <StyledText
-              css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing8}
-              id="AdvancedSettings_unavailableRobots"
-            >
-              {t('prevent_robot_caching')}
-            </StyledText>
-            <StyledText as="p">
-              <Trans
-                t={t}
-                i18nKey="prevent_robot_caching_description"
-                components={{
-                  strong: (
-                    <StyledText
-                      as="span"
-                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    />
-                  ),
-                }}
-              />
-            </StyledText>
-          </Box>
-          <ToggleButton
-            label="display_unavailable_robots"
-            toggledOn={!displayUnavailRobots}
-            onClick={() =>
-              dispatch(Config.toggleConfigValue('discovery.disableCache'))
-            }
-            id="AdvancedSettings_unavailableRobotsToggleButton"
-          />
-        </Flex>
+        <PreventRobotCaching />
         <Divider marginY={SPACING.spacing24} />
         <Flex
           alignItems={ALIGN_CENTER}

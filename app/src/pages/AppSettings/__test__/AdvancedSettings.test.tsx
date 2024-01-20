@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { resetAllWhenMocks } from 'jest-when'
-import { fireEvent } from '@testing-library/react'
+import { screen, fireEvent } from '@testing-library/react'
 import {
   renderWithProviders,
   useConditionalConfirm,
@@ -26,6 +26,8 @@ import * as ProtocolAnalysis from '../../../redux/protocol-analysis'
 import * as SystemInfo from '../../../redux/system-info'
 import * as Fixtures from '../../../redux/system-info/__fixtures__'
 
+import { PreventRobotCaching } from '../../../organisms/AdvancedSettings'
+
 import { AdvancedSettings } from '../AdvancedSettings'
 
 jest.mock('../../../redux/config')
@@ -36,6 +38,7 @@ jest.mock('../../../redux/protocol-analysis')
 jest.mock('../../../redux/system-info')
 jest.mock('@opentrons/components/src/hooks')
 jest.mock('../../../redux/analytics')
+jest.mock('../../../organisms/AdvancedSettings')
 
 const render = (): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(
@@ -91,6 +94,9 @@ const mockOpenPythonInterpreterDirectory = ProtocolAnalysis.openPythonInterprete
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
+const mockPreventRobotCaching = PreventRobotCaching as jest.MockedFunction<
+  typeof PreventRobotCaching
+>
 
 let mockTrackEvent: jest.Mock
 const mockConfirm = jest.fn()
@@ -118,7 +124,9 @@ describe('AdvancedSettings', () => {
       showConfirmation: true,
       cancel: mockCancel,
     })
+    mockPreventRobotCaching.mockReturnValue(<div>mock PreventRobotCaching</div>)
   })
+
   afterEach(() => {
     jest.resetAllMocks()
     resetAllWhenMocks()
@@ -128,13 +136,13 @@ describe('AdvancedSettings', () => {
     const [{ getByText }] = render()
     getByText('Update Channel')
     getByText('Additional Custom Labware Source Folder')
-    getByText('Prevent Robot Caching')
     getByText('Clear Unavailable Robots')
     getByText('Developer Tools')
     getByText('OT-2 Advanced Settings')
     getByText('Tip Length Calibration Method')
     getByText('USB-to-Ethernet Adapter Information')
   })
+
   it('renders the update channel combobox and section', () => {
     const [{ getByText, getByRole }] = render()
     getByText(
@@ -142,6 +150,7 @@ describe('AdvancedSettings', () => {
     )
     getByRole('combobox', { name: '' })
   })
+
   it('renders the custom labware section with source folder selected', () => {
     getCustomLabwarePath.mockReturnValue('/mock/custom-labware-path')
     const [{ getByText, getByRole }] = render()
@@ -151,6 +160,7 @@ describe('AdvancedSettings', () => {
     getByText('Additional Source Folder')
     getByRole('button', { name: 'Change labware source folder' })
   })
+
   it('renders the custom labware section with no source folder selected', () => {
     const [{ getByText, getByRole }] = render()
     getByText('No additional source folder specified')
@@ -169,12 +179,10 @@ describe('AdvancedSettings', () => {
       name: 'Always show the prompt to choose calibration block or trash bin',
     })
   })
-  it('renders the robot caching section', () => {
-    const [{ queryByText, getByRole }] = render()
-    queryByText(
-      'The app will immediately clear unavailable robots and will not remember unavailable robots while this is enabled. On networks with many robots, preventing caching may improve network performance at the expense of slower and less reliable robot discovery on app launch.'
-    )
-    getByRole('switch', { name: 'display_unavailable_robots' })
+
+  it('should render mock robot caching section', () => {
+    render()
+    screen.getByText('mock PreventRobotCaching')
   })
 
   it('render the usb-to-ethernet adapter information', () => {
@@ -338,6 +346,7 @@ describe('AdvancedSettings', () => {
     fireEvent.click(proceedBtn)
     expect(mockConfirm).toHaveBeenCalled()
   })
+
   it('renders the developer tools section', () => {
     const [{ getByText, getByRole }] = render()
     getByText(
