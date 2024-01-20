@@ -149,40 +149,6 @@ class Migration(ABC):
         """
 
 
-def _atomic_delete_if_present(*, to_delete: Path, temp_prefix: str) -> None:
-    deleted = False
-
-    with tempfile.TemporaryDirectory(
-        # Manually specify `dir` to keep the temporary directory on the same filesystem
-        # as our target. Otherwise, the move wouldn't be atomic. e.g. if `dir` were
-        # automatically chosen to be /tmp, on tmpfs, our move would just be a full
-        # recursive copy followed by a full recursive delete.
-        dir=to_delete.parent,
-        prefix=temp_prefix,
-    ) as temp_dir:
-        try:
-            to_delete.rename(Path(temp_dir) / to_delete.name)
-            deleted = True
-        except OSError:
-            pass  # File was probably not present.
-
-        # At this point, we've moved the target, but we haven't yet deleted it
-        # (or its contents, if it's a directory).
-        # This os.sync() is a barrier to make sure that the kernel+filesystem don't
-        # reorder the "delete it and its contents" part before the "move" part, which
-        # would break our atomicity if we lost power between the two.
-        #
-        # We do a nuclear-option os.sync() instead of messing with the finer-grained
-        # os.fsync() because os.fsync() is difficult to get right.
-        # https://stackoverflow.com/questions/37288453/calling-fsync2-after-close2
-        os.sync()
-
-    # Exiting the `with`-block will have deleted the temporary directory,
-    # and our target with it.
-    if deleted:
-        _log.info(f"Deleted {to_delete}.")
-
-
 @contextmanager
 def _atomic_dir(
     *, root: Path, name: str, temp_prefix: str
