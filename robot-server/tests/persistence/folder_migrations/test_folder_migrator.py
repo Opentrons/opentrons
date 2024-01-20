@@ -11,7 +11,6 @@ def test_noop_if_no_migrations_supplied(tmp_path: Path) -> None:
     """Migrating should no-op if no migrations are configured."""
     subject = folder_migrator.MigrationOrchestrator(
         root=tmp_path,
-        legacy_uncontained_items=[],
         migrations=[],
         temp_file_prefix="tmp",
     )
@@ -40,7 +39,6 @@ def test_noop_if_no_migrations_required(tmp_path: Path) -> None:
 
     subject = folder_migrator.MigrationOrchestrator(
         root=tmp_path,
-        legacy_uncontained_items=[],
         migrations=[
             OlderMigration(subdirectory="older_dir", debug_name="older"),
             NewerMigration(subdirectory="newer_dir", debug_name="newer"),
@@ -69,7 +67,7 @@ def test_migration_chain_from_scratch(tmp_path: Path) -> None:
 
     class MigrationA(folder_migrator.Migration):
         def migrate(self, source_dir: Path, dest_dir: Path) -> None:
-            assert (source_dir / "legacy_file").exists()
+            assert (source_dir / "initial_file").exists()
             (dest_dir / "a_file").touch()
 
     class MigrationB(folder_migrator.Migration):
@@ -84,7 +82,6 @@ def test_migration_chain_from_scratch(tmp_path: Path) -> None:
 
     subject = folder_migrator.MigrationOrchestrator(
         root=tmp_path,
-        legacy_uncontained_items=["legacy_file"],
         migrations=[
             MigrationA("A", "a_dir"),
             MigrationB("B", "b_dir"),
@@ -93,16 +90,16 @@ def test_migration_chain_from_scratch(tmp_path: Path) -> None:
         temp_file_prefix="temp",
     )
 
-    (tmp_path / "legacy_file").touch()
+    (tmp_path / "initial_file").touch()
 
     subject.migrate_to_latest()
 
-    assert {child.name for child in tmp_path.iterdir()} == {"legacy_file", "c_dir"}
+    assert {child.name for child in tmp_path.iterdir()} == {"initial_file", "c_dir"}
     assert (tmp_path / "c_dir" / "c_file").exists()
 
 
 def test_migration_chain_from_intermediate(tmp_path: Path) -> None:
-    (tmp_path / "legacy_file").touch()
+    (tmp_path / "initial_file").touch()
     (tmp_path / "a_dir").mkdir()
     (tmp_path / "a_dir" / "a_file").touch()
 
@@ -122,7 +119,6 @@ def test_migration_chain_from_intermediate(tmp_path: Path) -> None:
 
     subject = folder_migrator.MigrationOrchestrator(
         root=tmp_path,
-        legacy_uncontained_items=["legacy_file"],
         migrations=[
             MigrationA("A", "a_dir"),
             MigrationB("B", "b_dir"),
@@ -134,7 +130,7 @@ def test_migration_chain_from_intermediate(tmp_path: Path) -> None:
     subject.migrate_to_latest()
 
     assert {child.name for child in tmp_path.iterdir()} == {
-        "legacy_file",
+        "initial_file",
         "a_dir",
         "c_dir",
     }
@@ -160,7 +156,6 @@ def test_aborted_intermediate_migration(tmp_path: Path) -> None:
 
     subject = folder_migrator.MigrationOrchestrator(
         root=tmp_path,
-        legacy_uncontained_items=[],
         migrations=[
             MigrationA("A", "a_dir"),
             MigrationB("B", "b_dir"),
@@ -194,7 +189,6 @@ def test_aborted_final_migration(tmp_path: Path) -> None:
 
     subject = folder_migrator.MigrationOrchestrator(
         root=tmp_path,
-        legacy_uncontained_items=[],
         migrations=[
             MigrationA("A", "a_dir"),
             MigrationB("B", "b_dir"),
@@ -219,10 +213,7 @@ def test_clean_up_stray_temp_files(tmp_path: Path) -> None:
     (tmp_path / "not_a_temp_file").touch()
 
     subject = folder_migrator.MigrationOrchestrator(
-        root=tmp_path,
-        legacy_uncontained_items=[],
-        migrations=[],
-        temp_file_prefix="foobar"
+        root=tmp_path, migrations=[], temp_file_prefix="foobar"
     )
     subject.clean_up_stray_temp_files()
 

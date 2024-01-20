@@ -19,15 +19,11 @@ class MigrationOrchestrator:
         self,
         *,
         root: Path,
-        legacy_uncontained_items: List[str],
         migrations: List[Migration],
         temp_file_prefix: str,
     ) -> None:
         """Sequence migrations and perform them in order."""
-        for legacy_uncontained_item in legacy_uncontained_items:
-            _validate_bare_name(legacy_uncontained_item)
         self._root = root
-        self._legacy_uncontained_items = legacy_uncontained_items
         self._migrations = migrations
         self._temp_file_prefix = temp_file_prefix
 
@@ -134,8 +130,7 @@ class Migration(ABC):
 
         `source_dir` is the directory that was output by the previous migration.
         If this is the first migration in the sequence, it will be the
-        `MigrationOrchestrator`'s root, which may contain its
-        `legacy_uncontained_items`.
+        `MigrationOrchestrator`'s root.
 
         `dest_dir` is where this method should output. It will be a temporary directory;
         if everything goes well, it will be moved into place atomically.
