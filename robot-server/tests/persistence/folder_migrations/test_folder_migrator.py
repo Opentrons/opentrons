@@ -1,8 +1,9 @@
+"""Tests for the `folder_migrator` module."""
+
 from pathlib import Path
-from typing import List, NamedTuple, Set
+from typing import Set
 
 import pytest
-from robot_server.persistence import folder_migrations
 
 from robot_server.persistence.folder_migrations import folder_migrator
 
@@ -63,7 +64,13 @@ def test_noop_if_no_migrations_required(tmp_path: Path) -> None:
 
 
 def test_migration_chain_from_scratch(tmp_path: Path) -> None:
-    """It should successfully go through the migration chain starting from scratch."""
+    """It should successfully go through the migration chain starting from scratch.
+
+    Going from initial -> A -> B -> C, the final directory state should only contain
+    initial (because it was our starting data and we want to leave it alone)
+    and C (because that's our target final state). A and B should be left out, because
+    they were only intermediate.
+    """
 
     class MigrationA(folder_migrator.Migration):
         def migrate(self, source_dir: Path, dest_dir: Path) -> None:
@@ -99,6 +106,14 @@ def test_migration_chain_from_scratch(tmp_path: Path) -> None:
 
 
 def test_migration_chain_from_intermediate(tmp_path: Path) -> None:
+    """It should successfully complete a migration chain starting from the middle.
+
+    If the migrations are configured as initial -> A -> B -> C, and we see data already
+    there for A, migrating should only perform B and C. The final directory state should
+    contain initial and A (because that was our starting data and we want to leave
+    it alone), and C (because that's our target final state). B should be left out,
+    because it was only intermediate.
+    """
     (tmp_path / "initial_file").touch()
     (tmp_path / "a_dir").mkdir()
     (tmp_path / "a_dir" / "a_file").touch()
@@ -138,6 +153,11 @@ def test_migration_chain_from_intermediate(tmp_path: Path) -> None:
 
 
 def test_aborted_intermediate_migration(tmp_path: Path) -> None:
+    """It should clean up gracefully from exceptions in intermediate migration steps.
+
+    The directory should be left as it was before the migration started.
+    """
+
     class MigrationA(folder_migrator.Migration):
         def migrate(self, source_dir: Path, dest_dir: Path) -> None:
             pass  # no-op
@@ -175,6 +195,11 @@ def test_aborted_intermediate_migration(tmp_path: Path) -> None:
 
 
 def test_aborted_final_migration(tmp_path: Path) -> None:
+    """It should clean up gracefully from exceptions in the final migration step.
+
+    The directory should be left as it was before the migration started.
+    """
+
     class MigrationA(folder_migrator.Migration):
         def migrate(self, source_dir: Path, dest_dir: Path) -> None:
             pass  # no-op
@@ -207,6 +232,7 @@ def test_aborted_final_migration(tmp_path: Path) -> None:
 
 
 def test_clean_up_stray_temp_files(tmp_path: Path) -> None:
+    """It should delete any file or directory that begins with the given prefix."""
     (tmp_path / "foobar_temp_file_a").touch()
     (tmp_path / "foobar_temp_dir_b").mkdir()
     (tmp_path / "foobar_temp_dir_b" / "file_b").touch()
