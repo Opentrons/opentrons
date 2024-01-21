@@ -52,6 +52,7 @@ import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { useToaster } from '../../organisms/ToasterOven'
+import { EnableDevTools } from '../../organisms/AdvancedSettings'
 
 import type { Dispatch, State } from '../../redux/types'
 
@@ -71,7 +72,6 @@ export function AdvancedSettings(): JSX.Element {
     Config.getUseTrashSurfaceForTipCal(state)
   )
   const trackEvent = useTrackEvent()
-  const devToolsOn = useSelector(Config.getDevtoolsEnabled)
   const channel = useSelector(Config.getUpdateChannel)
   const channelOptions: SelectOption[] = useSelector(
     Config.getUpdateChannelOptions
@@ -159,8 +159,6 @@ export function AdvancedSettings(): JSX.Element {
       properties: {},
     })
   }
-
-  const toggleDevtools = (): unknown => dispatch(Config.toggleDevtools())
   const handleChannel = (_: string, value: string): void => {
     dispatch(Config.updateConfigValue('update.channel', value))
   }
@@ -482,24 +480,7 @@ export function AdvancedSettings(): JSX.Element {
           )}
         </Flex>
         <Divider marginY={SPACING.spacing24} />
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box width="70%">
-            <StyledText
-              css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing8}
-              id="AdvancedSettings_devTools"
-            >
-              {t('enable_dev_tools')}
-            </StyledText>
-            <StyledText as="p">{t('enable_dev_tools_description')}</StyledText>
-          </Box>
-          <ToggleButton
-            label="enable_dev_tools"
-            toggledOn={devToolsOn}
-            onClick={toggleDevtools}
-            id="AdvancedSettings_devTooltoggle"
-          />
-        </Flex>
+        <EnableDevTools />
         <Divider marginY={SPACING.spacing24} />
         <StyledText
           css={TYPOGRAPHY.h3SemiBold}
