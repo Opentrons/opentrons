@@ -1,14 +1,12 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
-import { css } from 'styled-components'
 
 import {
   Flex,
   Box,
   Link,
   Icon,
-  RadioGroup,
   SPACING_AUTO,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
@@ -25,7 +23,6 @@ import {
 
 import * as Config from '../../redux/config'
 import * as ProtocolAnalysis from '../../redux/protocol-analysis'
-import * as Calibration from '../../redux/calibration'
 import * as CustomLabware from '../../redux/custom-labware'
 import {
   clearDiscoveryCache,
@@ -52,24 +49,14 @@ import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { useToaster } from '../../organisms/ToasterOven'
+import { OT2AdvancedSettings } from '../../organisms/AdvancedSettings'
 
 import type { Dispatch, State } from '../../redux/types'
 
-const ALWAYS_BLOCK: 'always-block' = 'always-block'
-const ALWAYS_TRASH: 'always-trash' = 'always-trash'
-const ALWAYS_PROMPT: 'always-prompt' = 'always-prompt'
 const REALTEK_URL = 'https://www.realtek.com/en/'
-
-type BlockSelection =
-  | typeof ALWAYS_BLOCK
-  | typeof ALWAYS_TRASH
-  | typeof ALWAYS_PROMPT
 
 export function AdvancedSettings(): JSX.Element {
   const { t } = useTranslation(['app_settings', 'shared'])
-  const useTrashSurfaceForTipCal = useSelector((state: State) =>
-    Config.getUseTrashSurfaceForTipCal(state)
-  )
   const trackEvent = useTrackEvent()
   const devToolsOn = useSelector(Config.getDevtoolsEnabled)
   const channel = useSelector(Config.getUpdateChannel)
@@ -113,20 +100,6 @@ export function AdvancedSettings(): JSX.Element {
     showConfirmation: showConfirmDeleteUnavailRobots,
     cancel: cancelExit,
   } = useConditionalConfirm(handleDeleteUnavailRobots, true)
-
-  const handleUseTrashSelection = (selection: BlockSelection): void => {
-    switch (selection) {
-      case ALWAYS_PROMPT:
-        dispatch(Calibration.resetUseTrashSurfaceForTipCal())
-        break
-      case ALWAYS_BLOCK:
-        dispatch(Calibration.setUseTrashSurfaceForTipCal(false))
-        break
-      case ALWAYS_TRASH:
-        dispatch(Calibration.setUseTrashSurfaceForTipCal(true))
-        break
-    }
-  }
 
   const device = useSelector(getU2EAdapterDevice)
   const driverOutdated = useSelector((state: State) => {
@@ -501,50 +474,7 @@ export function AdvancedSettings(): JSX.Element {
           />
         </Flex>
         <Divider marginY={SPACING.spacing24} />
-        <StyledText
-          css={TYPOGRAPHY.h3SemiBold}
-          paddingBottom={SPACING.spacing24}
-          id="OT-2_Advanced_Settings"
-        >
-          {t('ot2_advanced_settings')}
-        </StyledText>
-        <Box>
-          <StyledText
-            css={TYPOGRAPHY.h3SemiBold}
-            paddingBottom={SPACING.spacing8}
-            id="AdvancedSettings_tipLengthCalibration"
-          >
-            {t('tip_length_cal_method')}
-          </StyledText>
-          <RadioGroup
-            useBlueChecked
-            css={css`
-              ${TYPOGRAPHY.pRegular}
-              line-height: ${TYPOGRAPHY.lineHeight20};
-            `}
-            value={
-              useTrashSurfaceForTipCal === true
-                ? ALWAYS_TRASH
-                : useTrashSurfaceForTipCal === false
-                ? ALWAYS_BLOCK
-                : ALWAYS_PROMPT
-            }
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              // you know this is a limited-selection field whose values are only
-              // the elements of BlockSelection; i know this is a limited-selection
-              // field whose values are only the elements of BlockSelection; but sadly,
-              // neither of us can get Flow to know it
-              handleUseTrashSelection(
-                event.currentTarget.value as BlockSelection
-              )
-            }}
-            options={[
-              { name: t('cal_block'), value: ALWAYS_BLOCK },
-              { name: t('trash_bin'), value: ALWAYS_TRASH },
-              { name: t('prompt'), value: ALWAYS_PROMPT },
-            ]}
-          />
-        </Box>
+        <OT2AdvancedSettings />
         <Divider marginY={SPACING.spacing24} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box>
