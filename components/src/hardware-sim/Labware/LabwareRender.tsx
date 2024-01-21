@@ -6,7 +6,11 @@ import {
   StrokedWells,
   StaticLabware,
 } from './labwareInternals'
-import { LabwareAdapter, labwareLoadNames } from './LabwareAdapter'
+import {
+  LabwareAdapter,
+  LabwareAdapterLoadName,
+  labwareAdapterLoadNames,
+} from './LabwareAdapter'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   HighlightedWellLabels,
@@ -58,13 +62,15 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
   const { gRef } = props
   const cornerOffsetFromSlot = props.definition.cornerOffsetFromSlot
   const labwareLoadName = props.definition.parameters.loadName
-  if (labwareLoadNames.includes(labwareLoadName)) {
+  if (labwareAdapterLoadNames.includes(labwareLoadName)) {
     return (
       <g
         transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
         ref={gRef}
       >
-        <LabwareAdapter labwareLoadName={labwareLoadName} />
+        <LabwareAdapter
+          labwareLoadName={labwareLoadName as LabwareAdapterLoadName}
+        />
       </g>
     )
   }
