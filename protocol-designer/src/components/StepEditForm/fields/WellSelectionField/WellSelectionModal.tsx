@@ -131,6 +131,7 @@ export const WellSelectionModal = (
     onCloseClick,
     pipetteId,
     nozzleType = null,
+    updateValue,
   } = props
   const wellFieldData = props.value
   // selector data
@@ -170,7 +171,7 @@ export const WellSelectionModal = (
 
   const handleSave = (): void => {
     const sortedWells = Object.keys(selectedPrimaryWells).sort(sortWells)
-    props.updateValue(sortedWells)
+    updateValue(sortedWells)
     onCloseClick()
   }
 
