@@ -982,11 +982,18 @@ class GeometryView:
         self,
         gripper_homed_position_z: float,
         pipettes_homed_position_z: float,
+        pipette_id: str,
         tip: TipGeometry,
         labware_id: str,
         current_location: OnDeckLabwareLocation,
     ) -> bool:
         """Check for potential collision of tips against labware to be lifted."""
+        # TODO(mm, 2024-01-22): Remove the Left mount 1 and 8 channel special case once we are doing X axis validation
+        mount = self._pipettes.get_mount(pipette_id)
+        if mount == MountType.LEFT:
+            if self._pipettes.get_channels(pipette_id) in [1, 8]:
+                return True
+
         labware_top_z_when_gripped = gripper_homed_position_z + (
             self.get_labware_highest_z(labware_id=labware_id)
             - self.get_labware_grip_point(

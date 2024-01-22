@@ -99,6 +99,7 @@ class LabwareMovementHandler:
                     if not self._state_store.geometry.validate_gripper_labware_tip_collision(
                         gripper_homed_position_z=166.125,
                         pipettes_homed_position_z=248.0,
+                        pipette_id=pipette_id,
                         tip=tip,
                         labware_id=labware_id,
                         current_location=current_location,
@@ -142,6 +143,7 @@ class LabwareMovementHandler:
                 if not self._state_store.geometry.validate_gripper_labware_tip_collision(
                     gripper_homed_position_z=gripper_homed_position.z,
                     pipettes_homed_position_z=pipetted_homed_position.z,
+                    pipette_id=pipette_id,
                     tip=tip,
                     labware_id=labware_id,
                     current_location=current_location,
