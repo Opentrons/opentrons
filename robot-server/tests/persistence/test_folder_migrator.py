@@ -5,12 +5,12 @@ from typing import Set
 
 import pytest
 
-from robot_server.persistence.folder_migrations import folder_migrator
+from robot_server.persistence._folder_migrator import Migration, MigrationOrchestrator
 
 
 def test_noop_if_no_migrations_supplied(tmp_path: Path) -> None:
     """Migrating should no-op if no migrations are configured."""
-    subject = folder_migrator.MigrationOrchestrator(
+    subject = MigrationOrchestrator(
         root=tmp_path,
         migrations=[],
         temp_file_prefix="tmp",
@@ -31,15 +31,15 @@ def test_noop_if_no_migrations_supplied(tmp_path: Path) -> None:
 def test_noop_if_no_migrations_required(tmp_path: Path) -> None:
     """Migrating should no-op if it looks like we're already at the latest version."""
 
-    class OlderMigration(folder_migrator.Migration):
+    class OlderMigration(Migration):
         def migrate(self, source_dir: Path, dest_dir: Path) -> None:
             assert False, "This should never run."
 
-    class NewerMigration(folder_migrator.Migration):
+    class NewerMigration(Migration):
         def migrate(self, source_dir: Path, dest_dir: Path) -> None:
             assert False, "This should never run."
 
-    subject = folder_migrator.MigrationOrchestrator(
+    subject = MigrationOrchestrator(
         root=tmp_path,
         migrations=[
             OlderMigration(subdirectory="older_dir"),
@@ -74,22 +74,22 @@ def test_migration_chain_from_scratch(tmp_path: Path) -> None:
     they were only intermediate.
     """
 
-    class MigrationA(folder_migrator.Migration):
+    class MigrationA(Migration):
         def migrate(self, source_dir: Path, dest_dir: Path) -> None:
             assert (source_dir / "initial_file").exists()
             (dest_dir / "a_file").touch()
 
-    class MigrationB(folder_migrator.Migration):
+    class MigrationB(Migration):
         def migrate(self, source_dir: Path, dest_dir: Path) -> None:
             assert (source_dir / "a_file").exists()
             (dest_dir / "b_file").touch()
 
-    class MigrationC(folder_migrator.Migration):
+    class MigrationC(Migration):
         def migrate(self, source_dir: Path, dest_dir: Path) -> None:
             assert (source_dir / "b_file").exists()
             (dest_dir / "c_file").touch()
 
-    subject = folder_migrator.MigrationOrchestrator(
+    subject = MigrationOrchestrator(
         root=tmp_path,
         migrations=[
             MigrationA("a_dir"),
@@ -121,21 +121,21 @@ def test_migration_chain_from_intermediate(tmp_path: Path) -> None:
     (tmp_path / "a_dir").mkdir()
     (tmp_path / "a_dir" / "a_file").touch()
 
-    class MigrationA(folder_migrator.Migration):
+    class MigrationA(Migration):
         def migrate(self, source_dir: Path, dest_dir: Path) -> None:
             assert False, "This should never run."
 
-    class MigrationB(folder_migrator.Migration):
+    class MigrationB(Migration):
         def migrate(self, source_dir: Path, dest_dir: Path) -> None:
             assert (source_dir / "a_file").exists()
             (dest_dir / "b_file").touch()
 
-    class MigrationC(folder_migrator.Migration):
+    class MigrationC(Migration):
         def migrate(self, source_dir: Path, dest_dir: Path) -> None:
             assert (source_dir / "b_file").exists()
             (dest_dir / "c_file").touch()
 
-    subject = folder_migrator.MigrationOrchestrator(
+    subject = MigrationOrchestrator(
         root=tmp_path,
         migrations=[
             MigrationA("a_dir"),
@@ -162,23 +162,23 @@ def test_aborted_intermediate_migration(tmp_path: Path) -> None:
     The directory should be left as it was before the migration started.
     """
 
-    class MigrationA(folder_migrator.Migration):
+    class MigrationA(Migration):
         def migrate(self, source_dir: Path, dest_dir: Path) -> None:
             pass  # no-op
 
-    class MigrationB(folder_migrator.Migration):
+    class MigrationB(Migration):
         def migrate(self, source_dir: Path, dest_dir: Path) -> None:
             pass  # no-op
 
-    class MigrationC(folder_migrator.Migration):
+    class MigrationC(Migration):
         def migrate(self, source_dir: Path, dest_dir: Path) -> None:
             raise RuntimeError("oy vey")
 
-    class MigrationD(folder_migrator.Migration):
+    class MigrationD(Migration):
         def migrate(self, source_dir: Path, dest_dir: Path) -> None:
             assert False, "This should never run."
 
-    subject = folder_migrator.MigrationOrchestrator(
+    subject = MigrationOrchestrator(
         root=tmp_path,
         migrations=[
             MigrationA("a_dir"),
@@ -204,19 +204,19 @@ def test_aborted_final_migration(tmp_path: Path) -> None:
     The directory should be left as it was before the migration started.
     """
 
-    class MigrationA(folder_migrator.Migration):
+    class MigrationA(Migration):
         def migrate(self, source_dir: Path, dest_dir: Path) -> None:
             pass  # no-op
 
-    class MigrationB(folder_migrator.Migration):
+    class MigrationB(Migration):
         def migrate(self, source_dir: Path, dest_dir: Path) -> None:
             pass  # no-op
 
-    class MigrationC(folder_migrator.Migration):
+    class MigrationC(Migration):
         def migrate(self, source_dir: Path, dest_dir: Path) -> None:
             raise RuntimeError("oy vey")
 
-    subject = folder_migrator.MigrationOrchestrator(
+    subject = MigrationOrchestrator(
         root=tmp_path,
         migrations=[
             MigrationA("a_dir"),
@@ -242,7 +242,7 @@ def test_clean_up_stray_temp_files(tmp_path: Path) -> None:
     (tmp_path / "foobar_temp_dir_b" / "file_b").touch()
     (tmp_path / "not_a_temp_file").touch()
 
-    subject = folder_migrator.MigrationOrchestrator(
+    subject = MigrationOrchestrator(
         root=tmp_path, migrations=[], temp_file_prefix="foobar"
     )
     subject.clean_up_stray_temp_files()

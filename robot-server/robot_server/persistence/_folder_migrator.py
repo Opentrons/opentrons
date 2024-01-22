@@ -230,7 +230,7 @@ def _atomic_dir(destination: Path, temp_prefix: str) -> Generator[Path, None, No
 
     try:
         yield Path(temp_dir)
-    except:
+    except Exception:
         shutil.rmtree(temp_dir)
         raise
     else:
