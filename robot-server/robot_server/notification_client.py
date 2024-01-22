@@ -1,4 +1,4 @@
-# python 3.8
+from typing import Any, Dict
 import random
 import logging
 import paho.mqtt.client as mqtt
@@ -76,8 +76,8 @@ class NotificationClient:
     def _on_connect(
             self, 
             client: mqtt.Client, 
-            userdata: mqtt._UserData, 
-            flags: dict, 
+            userdata: Any, 
+            flags: Dict, 
             rc:mqtt.ReasonCodes, 
             properties=None
     ) -> None:
@@ -98,7 +98,7 @@ class NotificationClient:
     def _on_disconnect(
             self, 
             client: mqtt.Client, 
-            userdata: mqtt._UserData, 
+            userdata: Any, 
             rc: mqtt.ReasonCodes, 
             properties: mqtt.Properties=None
     ) -> None:
@@ -125,8 +125,11 @@ def initialize_notification_client(app_state: AppState) -> None:
     Intended to be called just once, when the server starts up.
     """
     notification_client = NotificationClient()
-    notification_client.connect()
-    _notification_client_accessor.set_on(app_state, notification_client)
+    try:
+        notification_client.connect()
+        _notification_client_accessor.set_on(app_state, notification_client)
+    except Exception as error:
+        log.info(f"Could not successfully connect to notification server: {error}")
 
 
 async def clean_up_notification_client(app_state: AppState) -> None:

@@ -13,8 +13,7 @@ import {
   ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
 } from '../redux/analytics'
 
-import type { UseQueryResult, UseQueryOptions } from 'react-query'
-import type { HostConfig } from '@opentrons/api-client'
+import type { UseQueryResult, UseQueryOptions, QueryKey } from 'react-query'
 import type { NotifyTopic } from '../redux/shell/types'
 
 export interface QueryOptionsWithPolling<TData, Error>
@@ -39,7 +38,7 @@ type NotifyResponseData<TData> =
 
 interface UseNotifyServiceProps<TData, Error> {
   topic: NotifyTopic
-  queryKey: Array<HostConfig | string | null>
+  queryKey: QueryKey
   refetchUsingHTTP: () => void
   options: QueryOptionsWithPolling<TData, Error>
 }
