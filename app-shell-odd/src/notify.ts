@@ -110,8 +110,10 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
           })
         })
       })
-      .catch(() => {
-        log.warn(`Failed to connect to ${hostname}`)
+      .catch((error: Error) => {
+        log.warn(
+          `Failed to connect to ${hostname} - ${error.name}: ${error.message} `
+        )
         browserWindow.webContents.send(
           'notify',
           `${hostname}:${topic}:ECONNFAILED`
@@ -157,31 +159,32 @@ function connectAsync(brokerURL: string): Promise<mqtt.Client> {
 
   return new Promise((resolve, reject) => {
     // Listeners added to client to trigger promise resolution
-    const promiseResolutionListeners: {
+    const promiseListeners: {
       [key: string]: (...args: any[]) => void
     } = {
       connect: () => {
-        removePromiseResolutionListeners()
+        removePromiseListeners()
         return resolve(client)
       },
+      // A connection error event will close the connection without a retry.
       error: (error: Error | string) => {
-        removePromiseResolutionListeners()
+        removePromiseListeners()
         const clientEndPromise = new Promise((resolve, reject) =>
           client.end(true, {}, () => resolve(error))
         )
         return clientEndPromise.then(() => reject(error))
       },
-      end: () => promiseResolutionListeners.error("Couldn't connect to server"),
+      end: () => promiseListeners.error("Couldn't connect to server"),
     }
 
-    function removePromiseResolutionListeners(): void {
-      Object.keys(promiseResolutionListeners).forEach(eventName => {
-        client.removeListener(eventName, promiseResolutionListeners[eventName])
+    function removePromiseListeners(): void {
+      Object.keys(promiseListeners).forEach(eventName => {
+        client.removeListener(eventName, promiseListeners[eventName])
       })
     }
 
-    Object.keys(promiseResolutionListeners).forEach(eventName => {
-      client.on(eventName, promiseResolutionListeners[eventName])
+    Object.keys(promiseListeners).forEach(eventName => {
+      client.on(eventName, promiseListeners[eventName])
     })
   })
 }
