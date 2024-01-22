@@ -52,16 +52,16 @@ export function LiquidsPage(): JSX.Element {
     )}" to have fields in allIngredientGroupFields`
   )
 
-  return showForm && selectedIngredFields != null ? (
+  return showForm ? (
     <LiquidEditForm
       cancelForm={cancelForm}
       deleteLiquidGroup={deleteLiquidGroup}
       saveForm={saveForm}
       canDelete={liquidGroupId != null}
-      name={selectedIngredFields.name}
-      serialize={selectedIngredFields.serialize}
-      displayColor={selectedIngredFields.displayColor}
-      description={selectedIngredFields.description}
+      name={selectedIngredFields?.name ?? ''}
+      serialize={selectedIngredFields?.serialize ?? false}
+      displayColor={selectedIngredFields?.displayColor ?? '#B925FF'}
+      description={selectedIngredFields?.description ?? ''}
       key={formKey}
     />
   ) : (
