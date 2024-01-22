@@ -12,9 +12,6 @@ tests ?=
 cov_opts ?= --coverage=true --ci=true --collectCoverageFrom='labware-library/src/**/*.(js|ts|tsx)'
 test_opts ?=
 
-# override webpack's default hashing algorithm for node 18: https://github.com/webpack/webpack/issues/14532
-export NODE_OPTIONS := --openssl-legacy-provider
-
 # --coverage=true --ci=true --collectCoverageFrom="labware-library/src/**/*.(js|ts|tsx)" labware-library/src
 
 .PHONY: all
@@ -32,10 +29,11 @@ dist:
 	node ./renderStatic.js
 
 # development assets server
+# override webpack's default hashing algorithm for node 18: https://github.com/webpack/webpack/issues/14532
 .PHONY: dev
 dev: export NODE_ENV := development
 dev:
-	webpack-dev-server --hot
+	export NODE_OPTIONS=--openssl-legacy-provider && webpack-dev-server --hot
 
 # production assets server
 .PHONY: serve
