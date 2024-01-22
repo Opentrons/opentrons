@@ -1,7 +1,7 @@
 import * as React from 'react'
-
+import throttle from 'lodash/throttle'
 import styles from './SelectionRect.css'
-import type { DragRect, GenericRect } from '../collision-types'
+import { DragRect, GenericRect } from '../collision-types'
 
 interface Props {
   onSelectionMove?: (e: MouseEvent, arg: GenericRect) => void
@@ -13,48 +13,43 @@ interface Props {
 }
 
 export const SelectionRect = (props: Props): JSX.Element => {
-  const parentRef = React.useRef<HTMLElement | SVGElement | null>(null)
   const {
     onSelectionMove,
     onSelectionDone,
     svg,
     children,
-    originXOffset,
-    originYOffset,
+    originXOffset = 0,
+    originYOffset = 0,
   } = props
   const [positions, setPositions] = React.useState<DragRect | null>(null)
-
+  const parentRef = React.useRef<HTMLElement | SVGElement | null>(null)
   const renderRect = (args: DragRect): React.ReactNode => {
     const { xStart, yStart, xDynamic, yDynamic } = args
     const left = Math.min(xStart, xDynamic)
     const top = Math.min(yStart, yDynamic)
     const width = Math.abs(xDynamic - xStart)
     const height = Math.abs(yDynamic - yStart)
+
     if (svg) {
-      // calculate ratio btw clientRect bounding box vs svg parent viewBox
-      // WARNING: May not work right if you're nesting SVGs!
       if (!parentRef.current) {
         return null
       }
 
-      const clientRect: {
+      const clientRect: DOMRect = parentRef.current.getBoundingClientRect()
+      const viewBox: {
         width: number
         height: number
-        left: number
-        top: number
-      } = parentRef.current.getBoundingClientRect()
-      // @ts-expect-error(sa, 2021-7-1): parentRef.closest might return null
-      const viewBox: { width: number; height: number } = parentRef.closest(
-        'svg'
-      ).viewBox.baseVal // WARNING: elem.closest() is experiemental
-
+      } = parentRef.current.closest('svg')?.viewBox?.baseVal ?? {
+        width: 0,
+        height: 0,
+      }
       const xScale = viewBox.width / clientRect.width
       const yScale = viewBox.height / clientRect.height
 
       return (
         <rect
-          x={(left - clientRect.left) * xScale - (originXOffset ?? 0)}
-          y={(top - clientRect.top) * yScale - (originYOffset ?? 0)}
+          x={(left - clientRect.left) * xScale - originXOffset}
+          y={(top - clientRect.top) * yScale - originYOffset}
           width={width * xScale}
           height={height * yScale}
           className={styles.selection_rect}
@@ -77,8 +72,6 @@ export const SelectionRect = (props: Props): JSX.Element => {
 
   const getRect = (args: DragRect): GenericRect => {
     const { xStart, yStart, xDynamic, yDynamic } = args
-    // convert internal rect position to more generic form
-    // TODO should this be used in renderRect?
     return {
       x0: Math.min(xStart, xDynamic),
       x1: Math.max(xStart, xDynamic),
@@ -87,10 +80,9 @@ export const SelectionRect = (props: Props): JSX.Element => {
     }
   }
 
-  const handleMouseDown: React.MouseEventHandler<
-    SVGGElement | HTMLElement
-  > = e => {
-    document.addEventListener('mousemove', handleDrag)
+  const handleMouseDown: React.MouseEventHandler = e => {
+    e.preventDefault()
+    document.addEventListener('mousemove', handleDragThrottled)
     document.addEventListener('mouseup', handleMouseUp)
     setPositions({
       xStart: e.clientX,
@@ -100,56 +92,67 @@ export const SelectionRect = (props: Props): JSX.Element => {
     })
   }
 
-  const handleDrag: (e: MouseEvent) => void = e => {
-    if (positions) {
-      const nextRect = {
-        ...positions,
-        xDynamic: e.clientX,
-        yDynamic: e.clientY,
+  const handleDrag = (e: MouseEvent): void => {
+    setPositions(prevPositions => {
+      if (prevPositions) {
+        const nextRect = {
+          ...prevPositions,
+          xDynamic: e.clientX,
+          yDynamic: e.clientY,
+        }
+
+        const rect = getRect(nextRect)
+        onSelectionMove && onSelectionMove(e, rect)
+
+        return nextRect
       }
 
-      setPositions(nextRect)
-
-      const rect = getRect(nextRect)
-      onSelectionMove != null && onSelectionMove(e, rect)
-    }
+      return prevPositions
+    })
   }
 
-  const handleMouseUp: (e: MouseEvent) => void = e => {
+  //  ensure handleDrag is only fired once every ms using throttle fn
+  //  provides smoother experience and less lagginess when dragging
+  //  to select wells
+  const handleDragThrottled = throttle(handleDrag, 16)
+
+  const handleMouseUp = (e: MouseEvent): void => {
     if (!(e instanceof MouseEvent)) {
       return
     }
-    document.removeEventListener('mousemove', handleDrag)
+    document.removeEventListener('mousemove', handleDragThrottled)
     document.removeEventListener('mouseup', handleMouseUp)
 
-    const finalRect = positions != null && getRect(positions)
-
-    // clear the rectangle
-    setPositions(null)
+    const finalRect = positions && getRect(positions)
+    setPositions(prevPositions => {
+      return prevPositions === positions ? null : prevPositions
+    })
 
     // call onSelectionDone callback with {x0, x1, y0, y1} of final selection rectangle
-    onSelectionDone != null && finalRect && onSelectionDone(e, finalRect)
+    onSelectionDone && finalRect && onSelectionDone(e, finalRect)
   }
 
+  React.useEffect(() => {
+    return () => {
+      document.removeEventListener('mousemove', handleDragThrottled)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [])
   return svg ? (
     <g
       onMouseDown={handleMouseDown}
       ref={ref => {
-        if (ref) {
-          parentRef.current = ref
-        }
+        parentRef.current = ref
       }}
     >
       {children}
-      {positions != null && renderRect(positions)}
+      {positions && renderRect(positions)}
     </g>
   ) : (
     <div
       onMouseDown={handleMouseDown}
       ref={ref => {
-        if (ref) {
-          parentRef.current = ref
-        }
+        parentRef.current = ref
       }}
     >
       {positions && renderRect(positions)}
