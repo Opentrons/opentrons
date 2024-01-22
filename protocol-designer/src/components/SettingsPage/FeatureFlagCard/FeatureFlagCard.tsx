@@ -32,7 +32,7 @@ export const FeatureFlagCard = (): JSX.Element => {
   const prereleaseModeEnabled = flags.PRERELEASE_MODE === true
 
   // @ts-expect-error(sa, 2021-6-21): Object.keys not smart enough to take keys from props.flags
-  const allFlags: FlagTypes[] = sortBy(Object.keys(props.flags))
+  const allFlags: FlagTypes[] = sortBy(Object.keys(flags))
 
   const userFacingFlagNames = allFlags.filter(flagName =>
     userFacingFlags.includes(flagName)
