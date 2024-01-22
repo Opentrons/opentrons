@@ -74,7 +74,7 @@ async def on_startup() -> None:
         ],
     )
     start_initializing_persistence(
-        app_state=app.state, persistence_directory=persistence_directory
+        app_state=app.state, persistence_directory_root=persistence_directory
     )
 
 

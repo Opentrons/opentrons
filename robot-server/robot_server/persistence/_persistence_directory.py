@@ -7,6 +7,8 @@ from typing_extensions import Final
 
 from anyio import Path as AsyncPath, to_thread
 
+from ._folder_migrator import MigrationOrchestrator
+
 
 _TEMP_PERSISTENCE_DIR_PREFIX: Final = "opentrons-robot-server-"
 _RESET_MARKER_FILE_NAME: Final = "_TO_BE_DELETED_ON_REBOOT"
@@ -38,19 +40,30 @@ class PersistenceResetter:
         await file.write_text(encoding="utf-8", data=_RESET_MARKER_FILE_CONTENTS)
 
 
-async def prepare(persistence_directory: Optional[Path]) -> Path:
-    """Create the persistence directory, if necessary, and prepare it for use.
+async def prepare_active_subdirectory(prepared_root: Path) -> Path:
+    """Return the active persistence subdirectory after preparing it, if necessary."""
+    migration_orchestrator = MigrationOrchestrator(
+        root=prepared_root,
+        migrations=[],
+        temp_file_prefix="temp-",
+    )
 
-    If the persistence directory was previously marked for a reset, this will reset it.
+    await to_thread.run_sync(migration_orchestrator.clean_up_stray_temp_files)
+    subdirectory = await to_thread.run_sync(migration_orchestrator.migrate_to_latest)
 
-    Arguments:
-        path: Where to create the root persistence directory. If `None`, a fresh
-            temporary directory will be used.
+    return subdirectory
 
-    Returns:
-        The path to the prepared root persistence directory.
+
+async def prepare_root(persistence_directory_root: Optional[Path]) -> Path:
+    """Return `persistence_directory_root` after preparing it, if necessary.
+
+    This will create the directory if it doesn't already exist,
+    and clear its contents it if it was previously marked for reset.
+
+    If `persistence_directory_root` is `None`, this will return a fresh temporary
+    directory.
     """
-    if persistence_directory is None:
+    if persistence_directory_root is None:
         # It's bad for this blocking I/O to be in this async function,
         # but we don't have an async mkdtemp().
         new_temporary_directory = Path(mkdtemp(prefix=_TEMP_PERSISTENCE_DIR_PREFIX))
@@ -61,17 +74,19 @@ async def prepare(persistence_directory: Optional[Path]) -> Path:
         return new_temporary_directory
 
     else:
-        if await _is_marked_for_reset(directory_to_reset=persistence_directory):
-            _log.info(f"{persistence_directory} was marked for reset. Deleting it.")
+        if await _is_marked_for_reset(directory_to_reset=persistence_directory_root):
+            _log.info(
+                f"{persistence_directory_root} was marked for reset. Deleting it."
+            )
             # FIXME(mm, 2024-01-23): This can leave the persistence directory
             # in a half-deleted state if it deletes the marker file, and then some
             # of the other files, and then the device is power-cycled before it can
             # finish.
-            await to_thread.run_sync(rmtree, persistence_directory)
+            await to_thread.run_sync(rmtree, persistence_directory_root)
 
-        await AsyncPath(persistence_directory).mkdir(parents=True, exist_ok=True)
-        _log.info(f"Using directory {persistence_directory} for persistence.")
-        return persistence_directory
+        await AsyncPath(persistence_directory_root).mkdir(parents=True, exist_ok=True)
+        _log.info(f"Using directory {persistence_directory_root} for persistence.")
+        return persistence_directory_root
 
 
 async def _is_marked_for_reset(directory_to_reset: Path) -> bool:
