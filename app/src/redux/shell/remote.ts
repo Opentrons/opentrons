@@ -51,9 +51,7 @@ export function appShellListener(
       shellMessage,
     } = deserializeNotifyMessage(message)
 
-    // TOME: TEMPORARILY NOT CHECKING HOSTNAME MATCHING, SINCE USING CLOUD PROVIDER.
-    // if (hostname === shellHostname && topic === shellTopic) {
-    if (topic === shellTopic) {
+    if (hostname === shellHostname && topic === shellTopic) {
       eventEmitter.emit('data', shellMessage)
     }
   })

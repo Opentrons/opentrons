@@ -12,7 +12,7 @@ from server_utils.fastapi_utils.app_state import (
     get_app_state,
 )
 
-HOST = 'broker.emqx.io' #TOME: Don't forget to change at the end.
+HOST = '127.0.0.1' #TOME: Don't forget to change at the end.
 PORT = 1883
 CLIENT_ID = f'robot-server-{random.randint(0, 1000000)}'
 KEEPALIVE = 60

@@ -7,6 +7,8 @@ import type { BrowserWindow } from 'electron'
 import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
 import type { Action, Dispatch } from './types'
 
+// TODO(jh, 2024-01-22): refactor the ODD connection store to manage a single client only.
+
 // Manages MQTT broker connections via a connection store, establishing a connection to the broker only if a connection does not
 // already exist, and disconnects from the broker when the app is not subscribed to any topics for the given broker.
 // A redundant connection to the same broker results in the older connection forcibly closing, which we want to avoid.
@@ -54,19 +56,18 @@ export function registerNotify(
 ): (action: Action) => unknown {
   return function handleAction(action: Action) {
     switch (action.type) {
-      // TOME: USING THIS BROKER TO TEST FOR NOW. REMEMBER TO DELETE WHEN USING REAL BROKER.
       case 'shell:NOTIFY_SUBSCRIBE':
         return subscribe({
           ...action.payload,
           browserWindow: mainWindow,
-          hostname: 'broker.emqx.io',
+          hostname: '127.0.0.1',
         })
 
       case 'shell:NOTIFY_UNSUBSCRIBE':
         return unsubscribe({
           ...action.payload,
           browserWindow: mainWindow,
-          hostname: 'broker.emqx.io',
+          hostname: '127.0.0.1',
         })
     }
   }

@@ -54,19 +54,16 @@ export function registerNotify(
 ): (action: Action) => unknown {
   return function handleAction(action: Action) {
     switch (action.type) {
-      // TOME: USING THIS BROKER TO TEST FOR NOW. REMEMBER TO DELETE WHEN USING REAL BROKER.
       case 'shell:NOTIFY_SUBSCRIBE':
         return subscribe({
           ...action.payload,
           browserWindow: mainWindow,
-          hostname: 'broker.emqx.io',
         })
 
       case 'shell:NOTIFY_UNSUBSCRIBE':
         return unsubscribe({
           ...action.payload,
           browserWindow: mainWindow,
-          hostname: 'broker.emqx.io',
         })
     }
   }

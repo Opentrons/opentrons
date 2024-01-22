@@ -109,8 +109,6 @@ export interface RobotMassStorageDeviceRemoved {
   meta: { shell: true }
 }
 
-// TOME: think through the exact hierarchy you want. I think robot-server is a very valid high level topic, but think through!
-
 export type NotifyTopic =
   | 'robot-server/maintenance_runs'
   | 'robot-server/runs/current_command'

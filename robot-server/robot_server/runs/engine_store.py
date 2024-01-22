@@ -68,8 +68,7 @@ def get_estop_listener(engine_store: "EngineStore") -> HardwareEventHandler:
 
     return _callback
 
-#TOME: If you do the polling, this is closest to the source - whenever there could be a 
-#run in progress. That being said, the facade layer works.
+
 class EngineStore:
     """Factory and in-memory storage for ProtocolEngine."""
 
