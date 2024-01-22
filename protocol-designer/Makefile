@@ -8,9 +8,6 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 
 benchmark_output := $(shell node -e 'console.log(new Date());')
 
-# override webpack's default hashing algorithm for node 18: https://github.com/webpack/webpack/issues/14532
-export NODE_OPTIONS := --openssl-legacy-provider
-
 # These variables can be overriden when make is invoked to customize the
 # behavior of jest
 tests ?=
@@ -33,11 +30,12 @@ clean:
 
 # artifacts
 #####################################################################
+# override webpack's default hashing algorithm for node 18: https://github.com/webpack/webpack/issues/14532
 
 .PHONY: build
 build: export NODE_ENV := production
 build:
-	webpack --profile
+	export NODE_OPTIONS=--openssl-legacy-provider && webpack --profile
 	git rev-parse HEAD > dist/.commit
 
 # development
@@ -53,7 +51,7 @@ benchmarks:
 .PHONY: dev
 dev: export NODE_ENV := development
 dev:
-	webpack-dev-server --hot
+	export NODE_OPTIONS=--openssl-legacy-provider && webpack-dev-server --hot
 
 # production assets server
 .PHONY: serve
