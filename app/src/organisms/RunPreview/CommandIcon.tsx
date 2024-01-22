@@ -31,6 +31,6 @@ export function CommandIcon(props: CommandIconProps): JSX.Element | null {
   }
 
   return iconName != null ? (
-    <Icon {...styleProps} svgWidth={svgWidth} name={iconName} flex="0 0 auto" />
+    <Icon {...styleProps} size={svgWidth} name={iconName} flex="0 0 auto" />
   ) : null
 }
