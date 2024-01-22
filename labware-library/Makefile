@@ -22,14 +22,14 @@ clean:
 	shx rm -rf dist
 
 # production assets
+# override webpack's default hashing algorithm for node 18: https://github.com/webpack/webpack/issues/14532
 .PHONY: dist
 dist: export NODE_ENV := production
 dist:
-	webpack --profile
+	export NODE_OPTIONS=--openssl-legacy-provider && webpack --profile
 	node ./renderStatic.js
 
 # development assets server
-# override webpack's default hashing algorithm for node 18: https://github.com/webpack/webpack/issues/14532
 .PHONY: dev
 dev: export NODE_ENV := development
 dev:
