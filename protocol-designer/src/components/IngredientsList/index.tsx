@@ -161,8 +161,10 @@ export function IngredientsList(): JSX.Element {
   const allLabwareWellContents = useSelector(
     labwareIngredSelectors.getLiquidsByLabwareId
   )
+
   const labwareWellContents =
-    selectedLabwareId != null ? allLabwareWellContents[selectedLabwareId] : {}
+    (selectedLabwareId && allLabwareWellContents[selectedLabwareId]) || {}
+
   const liquidGroupsById = useSelector(
     labwareIngredSelectors.getLiquidGroupsById
   )
