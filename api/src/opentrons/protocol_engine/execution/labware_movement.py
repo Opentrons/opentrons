@@ -91,8 +91,8 @@ class LabwareMovementHandler:
         use_virtual_gripper = self._state_store.config.use_virtual_gripper
 
         if use_virtual_gripper:
-            # During Analysis we will pass in hard coded estimates for certain positions on accessible during execution
-            # Estimated gripper homed position Z: 253.575 + 93.85 - 94.825 - 86.475 = 166.125 mm
+            # During Analysis we will pass in hard coded estimates for certain positions only accessible during execution
+            # Estimated gripper homed Z position: 166.125 mm
             attached_tips = self._state_store.pipettes.get_all_attached_tips()
             if attached_tips:
                 for pipette_id, tip in attached_tips:
@@ -132,7 +132,12 @@ class LabwareMovementHandler:
         attached_tips = self._state_store.pipettes.get_all_attached_tips()
         if attached_tips:
             for pipette_id, tip in attached_tips:
-                pipetted_homed_position = await ot3api.gantry_position(mount=self._state_store.pipettes.get_mount(pipette_id))
+                pipette_mount = self._state_store.pipettes.get_mount(
+                    pipette_id
+                ).to_hw_mount()
+                pipetted_homed_position = await ot3api.gantry_position(
+                    mount=pipette_mount
+                )
 
                 if not self._state_store.geometry.validate_gripper_labware_tip_collision(
                     gripper_homed_position_z=gripper_homed_position.z,
