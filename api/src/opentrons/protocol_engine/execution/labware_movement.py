@@ -98,9 +98,8 @@ class LabwareMovementHandler:
                 for pipette_id, tip in attached_tips:
                     if not self._state_store.geometry.validate_gripper_labware_tip_collision(
                         gripper_homed_position_z=166.125,
-                        pipettes_homed_position_z=248.0,
-                        pipette_id=pipette_id,
                         tip=tip,
+                        pipette_id=pipette_id,
                         labware_id=labware_id,
                         current_location=current_location,
                     ):
@@ -133,18 +132,10 @@ class LabwareMovementHandler:
         attached_tips = self._state_store.pipettes.get_all_attached_tips()
         if attached_tips:
             for pipette_id, tip in attached_tips:
-                pipette_mount = self._state_store.pipettes.get_mount(
-                    pipette_id
-                ).to_hw_mount()
-                pipetted_homed_position = await ot3api.gantry_position(
-                    mount=pipette_mount
-                )
-
                 if not self._state_store.geometry.validate_gripper_labware_tip_collision(
                     gripper_homed_position_z=gripper_homed_position.z,
-                    pipettes_homed_position_z=pipetted_homed_position.z,
-                    pipette_id=pipette_id,
                     tip=tip,
+                    pipette_id=pipette_id,
                     labware_id=labware_id,
                     current_location=current_location,
                 ):

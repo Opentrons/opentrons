@@ -981,18 +981,16 @@ class GeometryView:
     def validate_gripper_labware_tip_collision(
         self,
         gripper_homed_position_z: float,
-        pipettes_homed_position_z: float,
-        pipette_id: str,
         tip: TipGeometry,
+        pipette_id: str,
         labware_id: str,
         current_location: OnDeckLabwareLocation,
     ) -> bool:
         """Check for potential collision of tips against labware to be lifted."""
-        # TODO(mm, 2024-01-22): Remove the Left mount 1 and 8 channel special case once we are doing X axis validation
-        mount = self._pipettes.get_mount(pipette_id)
-        if mount == MountType.LEFT:
-            if self._pipettes.get_channels(pipette_id) in [1, 8]:
-                return True
+        pipette_home_z = 248.0
+        # TODO(mm, 2024-01-22): Remove the 1 and 8 channel special case once we are doing X axis validation
+        if self._pipettes.get_channels(pipette_id) in [1, 8]:
+            return True
 
         labware_top_z_when_gripped = gripper_homed_position_z + (
             self.get_labware_highest_z(labware_id=labware_id)
@@ -1001,9 +999,7 @@ class GeometryView:
             ).z
         )
         # TODO(mm, 2024-01-18): Utilizing the nozzle map and labware X coordinates verify if collisions will occur on the X axis (analysis will use hard coded data to measure from the gripper critical point to the pipette mount)
-
-        tip_bottom_z = pipettes_homed_position_z - tip.length
-        if tip_bottom_z < labware_top_z_when_gripped:
+        if (pipette_home_z - tip.length) < labware_top_z_when_gripped:
             return False
         return True
 
