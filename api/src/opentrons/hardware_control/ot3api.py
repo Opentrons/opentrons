@@ -1302,9 +1302,25 @@ class OT3API(
         (and :py:attr:`_last_moved_mount` exists) then retract the mount
         in :py:attr:`_last_moved_mount`. Also unconditionally update
         :py:attr:`_last_moved_mount` to contain `mount`.
+
+        Disengage the 96-channel and gripper mount if retracted.
         """
         if mount != self._last_moved_mount and self._last_moved_mount:
             await self.retract(self._last_moved_mount, 10)
+
+            # disengage Axis.Z_L motor and engage the brake to lower power
+            # consumption and reduce the chance of the 96-channel pipette dropping
+            if (
+                self.gantry_load == GantryLoad.HIGH_THROUGHPUT
+                and self._last_moved_mount == OT3Mount.LEFT
+            ):
+                await self.disengage_axes([Axis.Z_L])
+
+            # disegnage Axis.Z_G when we can to reduce the chance of
+            # the gripper dropping
+            if self._last_moved_mount == OT3Mount.GRIPPER:
+                await self.disengage_axes([Axis.Z_G])
+
         if mount != OT3Mount.GRIPPER:
             await self.idle_gripper()
         self._last_moved_mount = mount
