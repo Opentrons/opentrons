@@ -1,6 +1,6 @@
 import * as React from 'react'
 import isEqual from 'lodash/isEqual'
-
+import { css } from 'styled-components'
 import {
   FLEX_CUTOUT_BY_SLOT_ID,
   FLEX_ROBOT_TYPE,
@@ -77,7 +77,7 @@ interface DeckLocationSelectProps {
   setSelectedLocation?: (loc: ModuleLocation) => void
   disabledLocations?: ModuleLocation[]
   isThermocycler?: boolean
-  showToolTipDisabledLocation?: boolean
+  showTooltipOnDisabled?: boolean
 }
 export function DeckLocationSelect({
   deckDef,
@@ -86,10 +86,9 @@ export function DeckLocationSelect({
   disabledLocations = [],
   theme = 'default',
   isThermocycler = false,
-  showToolTipDisabledLocation = false,
+  showTooltipOnDisabled = false,
 }: DeckLocationSelectProps): JSX.Element {
   const robotType = deckDef.robot.model
-  const [targetProps, tooltipProps] = useHoverTooltip()
 
   return (
     <RobotCoordinateSpace
@@ -106,6 +105,8 @@ export function DeckLocationSelect({
             addressableArea.id === 'fixedTrash'
         )
         .map(slot => {
+          // eslint-disable-next-line react-hooks/rules-of-hooks
+          const [targetProps, tooltipProps] = useHoverTooltip()
           const slotLocation = { slotName: slot.id }
           const isDisabled = disabledLocations.some(
             l =>
@@ -175,30 +176,23 @@ export function DeckLocationSelect({
                     deckDefinition={deckDef}
                     {...targetProps}
                   />
-                  {isDisabled && showToolTipDisabledLocation && (
-                    <Tooltip
-                      key={slot.id}
-                      tooltipProps={{
-                        ...tooltipProps,
-                        style: {
-                          position: 'absolute',
-                          top: 'auto',
-                          right: 'auto',
-                          bottom: '0',
-                          left: '0',
-                          transform: 'translate3d(581.5px, -76px, 0)',
-                        },
-                        arrowStyle: {
-                          position: 'absolute',
-                          top: '',
-                          left: '0',
-                          transform: 'translate3d(66px, 0px, 0)',
-                        },
-                        placement: 'top',
-                      }}
+                  {isDisabled && showTooltipOnDisabled && slotPosition != null && (
+                    <RobotCoordsForeignDiv
+                      x={slotPosition[0]}
+                      y={slotPosition[1]}
+                      width={slot.boundingBox.xDimension}
+                      height={slot.boundingBox.yDimension}
+                      innerDivProps={INNER_DIV_PROPS}
                     >
-                      TESTING TOOLTIP
-                    </Tooltip>
+                      <Tooltip
+                        {...tooltipProps}
+                        css={css`
+                          z-index: 100001;
+                        `}
+                      >
+                        {`Slot ${slot.id} disabled because of xyz`}
+                      </Tooltip>
+                    </RobotCoordsForeignDiv>
                   )}
                 </>
               ) : (
