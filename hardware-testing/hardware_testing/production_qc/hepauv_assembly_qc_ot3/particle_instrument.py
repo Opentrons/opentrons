@@ -52,7 +52,7 @@ class GT521S_Driver:
         print(data_output.decode('utf-8'))
         """Clear output buffer, aborting the current output and discarding all
         that is in the buffer """
-        flushOutput()
+        self.particle_counter.flushOutput()
 
     def unit_settings(self):
         """Returns the unit’s settings information"""

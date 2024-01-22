@@ -1,4 +1,5 @@
 import argparse
+import asyncio
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import (
     OT3Mount,
@@ -13,11 +14,16 @@ from hardware_testing import data
 from pathlib import Path
 from time import time
 import os
+from opentrons.hardware_control.ot3api import OT3API
 PRESSURE_DATA_CACHE = []
 FINAL_TEST_RESULTS = []
-SLOT_WIDTH_GAUGE = 
+GRIP_HEIGHT_MM = 48
+GAUGE_HEIGHT_MM = 75
+SLOT_WIDTH_GAUGE: List[Optional[int]] = [None, 3, 9]
 
 async def _main(simulating: bool) -> None:
+
+    
     final_result = []
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=simulating, use_defaults=True
@@ -94,28 +100,52 @@ async def _main(simulating: bool) -> None:
             final_result.append(test_result)
         print(f"CSV: {csv_props.name}")
 
-
+        #test uv
+        for width, slot in  SLOT_WIDTH_GAUGE:
+            await api.ungrip()
+            if slot is not None:
+                hover_pos, target_pos = _get_width_hover_and_grip_positions(api, slot)
+                # MOVE TO SLOT
+                mount = OT3Mount.GRIPPER
+                await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos)
+                # OPERATOR SETS UP GAUGE
+                
+                # GRIPPER MOVES TO GAUGE
+                await api.move_to(mount, target_pos)
+                
+                # grip once to center the thing
+                await api.grip(20)
+                await api.ungrip()
+            # LOOP THROUGH FORCES
     except:
         pass
 
-def UV_test(args):
-    for width, slot in zip(TEST_WIDTHS_MM, SLOT_WIDTH_GAUGE):
+async def UV_test(simulating: bool):
+    api = await helpers_ot3.build_async_ot3_hardware_api(
+        is_simulating=simulating, use_defaults=True
+    )
+    for width, slot in  SLOT_WIDTH_GAUGE:
         await api.ungrip()
         if slot is not None:
             hover_pos, target_pos = _get_width_hover_and_grip_positions(api, slot)
             # MOVE TO SLOT
+            mount = OT3Mount.GRIPPER
             await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos)
             # OPERATOR SETS UP GAUGE
-            if not api.is_simulator:
-                ui.get_user_ready(f"add {width} mm wide gauge to slot {slot}")
+            
             # GRIPPER MOVES TO GAUGE
             await api.move_to(mount, target_pos)
-            if not api.is_simulator:
-                ui.get_user_ready(f"prepare to grip {width} mm")
+            
             # grip once to center the thing
             await api.grip(20)
             await api.ungrip()
         # LOOP THROUGH FORCES
+
+def _get_width_hover_and_grip_positions(api: OT3API, slot: int) -> Tuple[Point, Point]:
+    grip_pos = helpers_ot3.get_slot_calibration_square_position_ot3(slot)
+    grip_pos += Point(z=GRIP_HEIGHT_MM)
+    hover_pos = grip_pos._replace(z=GAUGE_HEIGHT_MM + 15)
+    return hover_pos, grip_pos
 
 def determine_criterion(p_1, p_2):
     """
@@ -270,6 +300,8 @@ if __name__ == "__main__":
     arg_parser.add_argument("--s", "--samples",
                             dest="samples", type='int',
                             default=3, help="Number of Samples")
+    arg_parser.add_argument(f"--only-particle", action="store_true")
+    arg_parser.add_argument(f"--only-uv", action="store_true")
     args = arg_parser.parse_args()
     
     if args.operator:
@@ -279,3 +311,4 @@ if __name__ == "__main__":
     else:
         operator = "simulation"
     warm_up_time = 300 #300 seconds == 5mins
+    asyncio.run(_main(args.simulate))
