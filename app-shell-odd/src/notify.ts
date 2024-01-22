@@ -114,9 +114,13 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
         log.warn(
           `Failed to connect to ${hostname} - ${error.name}: ${error.message} `
         )
+        const failureMessage = error.message.includes('ECONNREFUSED')
+          ? 'ECONNREFUSED'
+          : 'ECONNFAILED'
+
         browserWindow.webContents.send(
           'notify',
-          `${hostname}:${topic}:ECONNFAILED`
+          `${hostname}:${topic}:${failureMessage}`
         )
         if (hostname in connectionStore) delete connectionStore[hostname]
       })
@@ -174,7 +178,7 @@ function connectAsync(brokerURL: string): Promise<mqtt.Client> {
         )
         return clientEndPromise.then(() => reject(error))
       },
-      end: () => promiseListeners.error("Couldn't connect to server"),
+      end: () => promiseListeners.error(`Couldn't connect to ${brokerURL}`),
     }
 
     function removePromiseListeners(): void {

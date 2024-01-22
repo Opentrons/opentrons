@@ -8,6 +8,10 @@ import { useHost } from '@opentrons/react-api-client'
 
 import { appShellListener } from '../redux/shell/remote'
 import { notifySubscribeAction, notifyUnsubscribeAction } from '../redux/shell'
+import {
+  useTrackEvent,
+  ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
+} from '../redux/analytics'
 
 import type { UseQueryResult, UseQueryOptions } from 'react-query'
 import type { HostConfig } from '@opentrons/api-client'
@@ -26,10 +30,12 @@ interface NotifyRefetchData {
   statusCode: never
 }
 
+export type NotifyNetworkError = 'ECONNFAILED' | 'ECONNREFUSED'
+
 type NotifyResponseData<TData> =
   | DataWithStatusCode<TData>
   | NotifyRefetchData
-  | 'ECONNFAILED'
+  | NotifyNetworkError
 
 interface UseNotifyServiceProps<TData, Error> {
   topic: NotifyTopic
@@ -53,17 +59,22 @@ export function useNotifyService<TData>({
   const host = useHost()
   const queryClient = useQueryClient()
   const isNotifyError = React.useRef(false)
+  const doTrackEvent = useTrackEvent()
 
   React.useEffect(() => {
     if (!options.forceHttpPolling) {
       const hostname = host?.hostname ?? null
       const eventEmitter = appShellListener(hostname, topic)
-
       const onDataListener = (data: NotifyResponseData<TData>): void => {
         if (!isNotifyError.current) {
-          // True when there is a notification networking error.
-          if (data === 'ECONNFAILED') {
+          if (data === 'ECONNFAILED' || data === 'ECONNREFUSED') {
             isNotifyError.current = true
+            if (data === 'ECONNREFUSED') {
+              doTrackEvent({
+                name: ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
+                properties: {},
+              })
+            }
           } else if ('refetchUsingHTTP' in data) {
             refetchUsingHTTP()
           } else {
