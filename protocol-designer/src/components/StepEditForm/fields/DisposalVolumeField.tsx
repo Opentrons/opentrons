@@ -36,17 +36,19 @@ const DropdownFormField = (props: DropdownFormFieldProps): JSX.Element => {
     />
   )
 }
-interface Props {
-  aspirate_airGap_checkbox?: boolean | null
-  aspirate_airGap_volume?: string | null
+interface DisposalVolumeFieldProps {
   path: PathOption
   pipette: string | null
   propsForFields: FieldPropsByName
   stepType: StepType
   volume: string | null
+  aspirate_airGap_checkbox?: boolean | null
+  aspirate_airGap_volume?: string | null
 }
 
-export const DisposalVolumeField = (props: Props): JSX.Element => {
+export const DisposalVolumeField = (
+  props: DisposalVolumeFieldProps
+): JSX.Element => {
   const {
     path,
     stepType,

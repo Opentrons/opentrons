@@ -113,34 +113,33 @@ export const WellOrderModal = (
     }
   }
 
-  const [state, setState] = React.useState<State>({
+  const [wellOrder, setWellOrder] = React.useState<State>({
     firstValue: DEFAULT_FIRST,
     secondValue: DEFAULT_SECOND,
   })
 
   React.useEffect(() => {
-    const { firstValue, secondValue } = props
     if (firstValue != null && secondValue != null) {
-      setState({
+      setWellOrder({
         firstValue: firstValue,
         secondValue: secondValue,
       })
     }
-  }, [props])
+  }, [firstValue, secondValue])
 
   const applyChanges = (): void => {
-    updateValues(state.firstValue, state.secondValue)
+    updateValues(wellOrder.firstValue, wellOrder.secondValue)
   }
 
   const handleReset = (): void => {
-    setState({ firstValue: DEFAULT_FIRST, secondValue: DEFAULT_SECOND })
+    setWellOrder({ firstValue: DEFAULT_FIRST, secondValue: DEFAULT_SECOND })
     applyChanges()
     closeModal()
   }
 
   const handleCancel = (): void => {
     const { initialFirstValue, initialSecondValue } = getInitialFirstValues()
-    setState({
+    setWellOrder({
       firstValue: initialFirstValue,
       secondValue: initialSecondValue,
     })
@@ -161,23 +160,23 @@ export const WellOrderModal = (
     if (ordinality === 'first') {
       if (
         VERTICAL_VALUES.includes(value as WellOrderOption) &&
-        VERTICAL_VALUES.includes(state.secondValue)
+        VERTICAL_VALUES.includes(wellOrder.secondValue)
       ) {
         nextState = { ...nextState, secondValue: HORIZONTAL_VALUES[0] }
       } else if (
         HORIZONTAL_VALUES.includes(value as WellOrderOption) &&
-        HORIZONTAL_VALUES.includes(state.secondValue)
+        HORIZONTAL_VALUES.includes(wellOrder.secondValue)
       ) {
         nextState = { ...nextState, secondValue: VERTICAL_VALUES[0] }
       }
     }
-    setState(nextState)
+    setWellOrder(nextState)
   }
 
   const isSecondOptionDisabled = (value: WellOrderOption): boolean => {
-    if (VERTICAL_VALUES.includes(state.firstValue)) {
+    if (VERTICAL_VALUES.includes(wellOrder.firstValue)) {
       return VERTICAL_VALUES.includes(value)
-    } else if (HORIZONTAL_VALUES.includes(state.firstValue)) {
+    } else if (HORIZONTAL_VALUES.includes(wellOrder.firstValue)) {
       return HORIZONTAL_VALUES.includes(value)
     } else {
       return false
@@ -202,7 +201,7 @@ export const WellOrderModal = (
             <div className={styles.field_row}>
               <DropdownField
                 name={firstName}
-                value={state.firstValue}
+                value={wellOrder.firstValue}
                 className={cx(stepEditStyles.field, styles.well_order_dropdown)}
                 onChange={makeOnChange('first')}
                 options={WELL_ORDER_VALUES.map(value => ({
@@ -215,7 +214,7 @@ export const WellOrderModal = (
               </span>
               <DropdownField
                 name={secondName}
-                value={state.secondValue}
+                value={wellOrder.secondValue}
                 className={cx(stepEditStyles.field, styles.well_order_dropdown)}
                 onChange={makeOnChange('second')}
                 options={WELL_ORDER_VALUES.map(value => ({
@@ -228,8 +227,8 @@ export const WellOrderModal = (
           </FormGroup>
           <FormGroup label={t('well_order.viz_label')}>
             <WellOrderViz
-              firstValue={state.firstValue}
-              secondValue={state.secondValue}
+              firstValue={wellOrder.firstValue}
+              secondValue={wellOrder.secondValue}
             />
           </FormGroup>
         </div>

@@ -35,6 +35,8 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
     isIndeterminate,
     labwareId,
   } = props
+  const { t } = useTranslation('application')
+  const [targetProps, tooltipProps] = useHoverTooltip()
   const [isModalOpen, setModalOpen] = React.useState(false)
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const labwareDef =
@@ -65,7 +67,6 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
   const handleClose = (): void => {
     setModalOpen(false)
   }
-  const { t } = useTranslation('application')
   const isTouchTipField = getIsTouchTipField(name)
   const isDelayPositionField = getIsDelayPositionField(name)
   let value: string | number = '0'
@@ -77,8 +78,6 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
         ? mmFromBottom
         : getDefaultMmFromBottom({ name, wellDepthMm })
   }
-  console.log('mmFromBotom', mmFromBottom)
-  const [targetProps, tooltipProps] = useHoverTooltip()
   return (
     <>
       <Tooltip {...tooltipProps}>{tooltipContent}</Tooltip>
