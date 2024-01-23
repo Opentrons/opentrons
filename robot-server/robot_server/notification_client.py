@@ -14,14 +14,14 @@ from server_utils.fastapi_utils.app_state import (
     get_app_state,
 )
 
-HOST: str = "127.0.0.1"
-PORT: int = 1883
-CLIENT_ID: str = f"robot-server-{random.randint(0, 1000000)}"
-KEEPALIVE: int = 60
-PROTOCOL_VERSION: int = mqtt.MQTTv5
-CLEAN_SESSION: bool = True
-DEFAULT_QOS: int = 2
-RETAIN_MESSAGE: bool = False
+HOST = "127.0.0.1"
+PORT = 1883
+CLIENT_ID = f"robot-server-{random.randint(0, 1000000)}"
+KEEPALIVE = 60
+PROTOCOL_VERSION = mqtt.MQTTv5
+CLEAN_SESSION = True
+DEFAULT_QOS = 1
+RETAIN_MESSAGE = False
 
 log: logging.Logger = logging.getLogger(__name__)
 

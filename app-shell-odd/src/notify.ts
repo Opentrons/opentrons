@@ -43,11 +43,9 @@ const connectOptions: mqtt.IClientOptions = {
  * @property {number} qos: "Quality of Service", "at least once". Because we use React Query, which does not trigger
   a render update event if duplicate data is received, we can avoid the additional overhead 
   to guarantee "exactly once" delivery. 
- * @property {number} rh: "Retain Handling" enabled. Upon successful subscription, 
-  the client will receive the most recent message held by the broker if one is availble.
  */
 const subscribeOptions: mqtt.IClientSubscribeOptions = {
-  qos: 2,
+  qos: 1,
 }
 
 export function registerNotify(
