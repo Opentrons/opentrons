@@ -21,7 +21,10 @@ from .runs.dependencies import (
     mark_light_control_startup_finished,
 )
 
-from .notification_client import initialize_notification_client, clean_up_notification_client
+from .notification_client import (
+    initialize_notification_client,
+    clean_up_notification_client,
+)
 
 log = logging.getLogger(__name__)
 
@@ -51,6 +54,7 @@ app.add_middleware(
 # main router
 app.include_router(router=router)
 
+
 @app.on_event("startup")
 async def on_startup() -> None:
     """Handle app startup."""
@@ -77,6 +81,7 @@ async def on_startup() -> None:
         app_state=app.state,
     )
 
+
 @app.on_event("shutdown")
 async def on_shutdown() -> None:
     """Handle app shutdown."""
@@ -92,5 +97,3 @@ async def on_shutdown() -> None:
 
     for e in shutdown_errors:
         log.warning("Error during shutdown", exc_info=e)
-
-    

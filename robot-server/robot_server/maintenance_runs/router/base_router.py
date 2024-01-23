@@ -280,4 +280,3 @@ async def remove_run(
         content=SimpleEmptyBody.construct(),
         status_code=status.HTTP_200_OK,
     )
-

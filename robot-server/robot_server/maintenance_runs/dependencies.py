@@ -42,10 +42,9 @@ async def get_maintenance_engine_store(
 
 async def get_maintenance_run_data_manager(
     engine_store: MaintenanceEngineStore = Depends(get_maintenance_engine_store),
-    notification_client: NotificationClient = Depends(get_notification_client)
+    notification_client: NotificationClient = Depends(get_notification_client),
 ) -> MaintenanceRunDataManager:
     """Get a maintenance run data manager to keep track of current run data."""
     return MaintenanceRunDataManager(
-        engine_store=engine_store,
-        notification_client=notification_client
+        engine_store=engine_store, notification_client=notification_client
     )

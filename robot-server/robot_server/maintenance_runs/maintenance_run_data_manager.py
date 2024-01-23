@@ -64,7 +64,11 @@ class MaintenanceRunDataManager:
         engine_store: In-memory store of the current run's ProtocolEngine.
     """
 
-    def __init__(self, engine_store: MaintenanceEngineStore, notification_client: NotificationClient) -> None:
+    def __init__(
+        self,
+        engine_store: MaintenanceEngineStore,
+        notification_client: NotificationClient,
+    ) -> None:
         self._engine_store = engine_store
         self._notification_client = notification_client
 
@@ -107,7 +111,7 @@ class MaintenanceRunDataManager:
         )
 
         await self._notification_client.publish(
-            topic='robot-server/maintenance_runs', 
+            topic="robot-server/maintenance_runs",
         )
 
         return maintenance_run_data
@@ -151,7 +155,7 @@ class MaintenanceRunDataManager:
             await self._engine_store.clear()
 
             await self._notification_client.publish(
-                    topic='robot-server/maintenance_runs',
+                topic="robot-server/maintenance_runs",
             )
 
         else:
@@ -206,5 +210,4 @@ class MaintenanceRunDataManager:
         return self._engine_store.engine.state_view.commands.get(command_id=command_id)
 
     def _get_state_summary(self, run_id: str) -> Optional[StateSummary]:
-
         return self._engine_store.engine.state_view.get_summary()

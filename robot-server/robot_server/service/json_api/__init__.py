@@ -15,7 +15,7 @@ from .response import (
     ResourceModel,
     PydanticResponse,
     ResponseList,
-    NotifyRefetchBody
+    NotifyRefetchBody,
 )
 
 

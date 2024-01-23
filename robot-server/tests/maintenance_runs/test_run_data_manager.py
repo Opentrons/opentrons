@@ -42,11 +42,13 @@ def mock_maintenance_engine_store(decoy: Decoy) -> MaintenanceEngineStore:
     decoy.when(mock.current_run_id).then_return(None)
     return mock
 
+
 @pytest.fixture
 def mock_notification_client(decoy: Decoy) -> NotificationClient:
     """Get a mock NotificationClient."""
     mock = decoy.mock(cls=NotificationClient)
     return mock
+
 
 @pytest.fixture
 def engine_state_summary() -> StateSummary:

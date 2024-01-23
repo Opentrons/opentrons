@@ -57,10 +57,12 @@ def mock_task_runner(decoy: Decoy) -> TaskRunner:
     """Get a mock background TaskRunner."""
     return decoy.mock(cls=TaskRunner)
 
+
 @pytest.fixture()
 def mock_notification_client(decoy: Decoy) -> NotificationClient:
     """Get a mock NotificationClient."""
     return decoy.mock(cls=NotificationClient)
+
 
 @pytest.fixture
 def engine_state_summary() -> StateSummary:
