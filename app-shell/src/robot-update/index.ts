@@ -27,7 +27,6 @@ import type {
   RobotUpdateAction,
   RobotUpdateTarget,
 } from '@opentrons/app/src/redux/robot-update/types'
-import type { RobotHost } from '@opentrons/app/src/redux/robot-api/types'
 
 const log = createLogger('robot-update/index')
 
