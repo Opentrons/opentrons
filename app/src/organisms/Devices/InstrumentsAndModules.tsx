@@ -35,6 +35,8 @@ import {
 } from './utils'
 import { PipetteCard } from './PipetteCard'
 import { GripperCard } from '../GripperCard'
+import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
+
 import type {
   BadGripper,
   BadPipette,
@@ -67,6 +69,7 @@ export function InstrumentsAndModules({
     subsystemToUpdate,
     setSubsystemToUpdate,
   ] = React.useState<Subsystem | null>(null)
+  const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
 
   const { data: attachedInstruments } = useInstrumentsQuery({
     refetchInterval: EQUIPMENT_POLL_MS,
@@ -220,6 +223,7 @@ export function InstrumentsAndModules({
                 pipetteIsBad={badLeftPipette != null}
                 updatePipette={() => setSubsystemToUpdate('pipette_left')}
                 isRunActive={currentRunId != null && isRunRunning}
+                isEstopNotDisengaged={isEstopNotDisengaged}
               />
               {isFlex && (
                 <GripperCard
@@ -231,6 +235,7 @@ export function InstrumentsAndModules({
                   }
                   setSubsystemToUpdate={setSubsystemToUpdate}
                   isRunActive={currentRunId != null && isRunRunning}
+                  isEstopNotDisengaged={isEstopNotDisengaged}
                 />
               )}
               {leftColumnModules.map((module, index) => (
@@ -273,6 +278,7 @@ export function InstrumentsAndModules({
                   pipetteIsBad={badRightPipette != null}
                   updatePipette={() => setSubsystemToUpdate('pipette_right')}
                   isRunActive={currentRunId != null && isRunRunning}
+                  isEstopNotDisengaged={isEstopNotDisengaged}
                 />
               )}
               {rightColumnModules.map((module, index) => (

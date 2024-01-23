@@ -35,6 +35,7 @@ import { Banner } from '../../atoms/Banner'
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
 import { AddFixtureModal } from './AddFixtureModal'
 import { useRunStatuses } from '../Devices/hooks'
+import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { CutoutId } from '@opentrons/shared-data'
 
@@ -65,6 +66,7 @@ export function DeviceDetailsDeckConfiguration({
       .data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const { isRunRunning } = useRunStatuses()
+  const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
   const { data: maintenanceRunData } = useCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
   })
@@ -174,7 +176,11 @@ export function DeviceDetailsDeckConfiguration({
               flexDirection={DIRECTION_COLUMN}
             >
               <DeckConfigurator
-                readOnly={isRunRunning || isMaintenanceRunExisting}
+                readOnly={
+                  isRunRunning ||
+                  isMaintenanceRunExisting ||
+                  isEstopNotDisengaged
+                }
                 deckConfig={deckConfig}
                 handleClickAdd={handleClickAdd}
                 handleClickRemove={handleClickRemove}

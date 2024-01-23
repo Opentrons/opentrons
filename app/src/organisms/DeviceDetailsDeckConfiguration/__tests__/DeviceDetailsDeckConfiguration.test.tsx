@@ -16,6 +16,7 @@ import {
 import { i18n } from '../../../i18n'
 import { useRunStatuses } from '../../Devices/hooks'
 import { DeckFixtureSetupInstructionsModal } from '../DeckFixtureSetupInstructionsModal'
+import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 import { DeviceDetailsDeckConfiguration } from '../'
 
 import type { MaintenanceRun } from '@opentrons/api-client'
@@ -24,6 +25,7 @@ jest.mock('@opentrons/components/src/hardware-sim/DeckConfigurator/index')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../DeckFixtureSetupInstructionsModal')
 jest.mock('../../Devices/hooks')
+jest.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
 
 const ROBOT_NAME = 'otie'
 const mockUpdateDeckConfiguration = jest.fn()
@@ -55,6 +57,9 @@ const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
 const mockUseCurrentMaintenanceRun = useCurrentMaintenanceRun as jest.MockedFunction<
   typeof useCurrentMaintenanceRun
 >
+const mockUseIsEstopNotDisengaged = useIsEstopNotDisengaged as jest.MockedFunction<
+  typeof useIsEstopNotDisengaged
+>
 
 const render = (
   props: React.ComponentProps<typeof DeviceDetailsDeckConfiguration>
@@ -83,6 +88,9 @@ describe('DeviceDetailsDeckConfiguration', () => {
     mockUseCurrentMaintenanceRun.mockReturnValue({
       data: {},
     } as any)
+    when(mockUseIsEstopNotDisengaged)
+      .calledWith(ROBOT_NAME)
+      .mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -137,5 +145,16 @@ describe('DeviceDetailsDeckConfiguration', () => {
       .mockReturnValue([] as any)
     render(props)
     screen.getByText('No deck fixtures')
+  })
+
+  it('should render disabled deck configurator when e-stop is pressed', () => {
+    when(mockUseIsEstopNotDisengaged)
+      .calledWith(ROBOT_NAME)
+      .mockReturnValue(true)
+    when(mockDeckConfigurator)
+      .calledWith(partialComponentPropsMatcher({ readOnly: true }))
+      .mockReturnValue(<div>disabled mock DeckConfigurator</div>)
+    const [{ getByText }] = render(props)
+    getByText('disabled mock DeckConfigurator')
   })
 })

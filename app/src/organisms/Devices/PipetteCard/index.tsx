@@ -61,6 +61,7 @@ interface PipetteCardProps {
   pipetteIsBad: boolean
   updatePipette: () => void
   isRunActive: boolean
+  isEstopNotDisengaged: boolean
 }
 const BANNER_LINK_STYLE = css`
   text-decoration: underline;
@@ -92,6 +93,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     pipetteIsBad,
     updatePipette,
     isRunActive,
+    isEstopNotDisengaged,
   } = props
   const {
     menuOverlay,
@@ -268,23 +270,29 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               >
                 {isFlexPipetteAttached && !isPipetteCalibrated ? (
                   <Banner type="error" marginBottom={SPACING.spacing4}>
-                    <Trans
-                      t={t}
-                      i18nKey="calibration_needed"
-                      components={{
-                        calLink: (
-                          <StyledText
-                            as="p"
-                            css={css`
-                              text-decoration: underline;
-                              cursor: pointer;
-                              margin-left: 0.5rem;
-                            `}
-                            onClick={handleCalibrate}
-                          />
-                        ),
-                      }}
-                    />
+                    {isEstopNotDisengaged ? (
+                      <StyledText as="p">
+                        {t('calibration_needed_without_link')}
+                      </StyledText>
+                    ) : (
+                      <Trans
+                        t={t}
+                        i18nKey="calibration_needed"
+                        components={{
+                          calLink: (
+                            <StyledText
+                              as="p"
+                              css={css`
+                                text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
+                                cursor: pointer;
+                                margin-left: ${SPACING.spacing8};
+                              `}
+                              onClick={handleCalibrate}
+                            />
+                          ),
+                        }}
+                      />
+                    )}
                   </Banner>
                 ) : null}
                 <StyledText
@@ -323,7 +331,11 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               pipetteDisplayName
             )}`}
           >
-            <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
+            <OverflowBtn
+              aria-label="overflow"
+              onClick={handleOverflowClick}
+              disabled={isEstopNotDisengaged}
+            />
           </Box>
         </>
       )}
@@ -357,6 +369,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               />
             </Banner>
           }
+          isEstopNotDisengaged={isEstopNotDisengaged}
         />
       )}
       {showOverflowMenu && (
