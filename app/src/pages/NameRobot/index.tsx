@@ -140,7 +140,7 @@ export function NameRobot(): JSX.Element {
       name: ANALYTICS_RENAME_ROBOT,
       properties: {
         previousRobotName: previousName,
-        newRobotName: formik.values.newRobotName,
+        newRobotName: newName,
       },
     })
     formik.handleSubmit()
