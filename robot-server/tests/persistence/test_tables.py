@@ -84,7 +84,61 @@ EXPECTED_STATEMENTS_LATEST = [
 EXPECTED_STATEMENTS_V3 = EXPECTED_STATEMENTS_LATEST
 
 
-EXPECTED_STATEMENTS_V2 = EXPECTED_STATEMENTS_V3
+EXPECTED_STATEMENTS_V2 = [
+    """
+    CREATE TABLE migration (
+        id INTEGER NOT NULL,
+        created_at DATETIME NOT NULL,
+        version INTEGER NOT NULL,
+        PRIMARY KEY (id)
+    )
+    """,
+    """
+    CREATE TABLE protocol (
+        id VARCHAR NOT NULL,
+        created_at DATETIME NOT NULL,
+        protocol_key VARCHAR,
+        PRIMARY KEY (id)
+    )
+    """,
+    """
+    CREATE TABLE analysis (
+        id VARCHAR NOT NULL,
+        protocol_id VARCHAR NOT NULL,
+        analyzer_version VARCHAR NOT NULL,
+        completed_analysis BLOB NOT NULL,
+        completed_analysis_as_document VARCHAR,
+        PRIMARY KEY (id),
+        FOREIGN KEY(protocol_id) REFERENCES protocol (id)
+    )
+    """,
+    """
+    CREATE INDEX ix_analysis_protocol_id ON analysis (protocol_id)
+    """,
+    """
+    CREATE TABLE run (
+        id VARCHAR NOT NULL,
+        created_at DATETIME NOT NULL,
+        protocol_id VARCHAR,
+        state_summary BLOB,
+        commands BLOB,
+        engine_status VARCHAR,
+        _updated_at DATETIME,
+        PRIMARY KEY (id),
+        FOREIGN KEY(protocol_id) REFERENCES protocol (id)
+    )
+    """,
+    """
+    CREATE TABLE action (
+        id VARCHAR NOT NULL,
+        created_at DATETIME NOT NULL,
+        action_type VARCHAR NOT NULL,
+        run_id VARCHAR NOT NULL,
+        PRIMARY KEY (id),
+        FOREIGN KEY(run_id) REFERENCES run (id)
+    )
+    """,
+]
 
 
 def _normalize_statement(statement: str) -> str:
