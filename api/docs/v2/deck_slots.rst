@@ -150,7 +150,7 @@ Starting in API version 2.16, you must load trash bin fixtures in your protocol 
 .. versionadded:: 2.16
 
 .. note::
-    The :py:class:`TrashBin` class doesn't have any callable methods, so you don't have to save the result of ``load_trash_bin()`` to a variable, especially if your protocol only loads a single trash container. Being able to reference the trash bin by name is useful when dealing with multiple trash containers.
+    The ``TrashBin`` class doesn't have any callable methods, so you don't have to save the result of ``load_trash_bin()`` to a variable, especially if your protocol only loads a single trash container. Being able to reference the trash bin by name is useful when dealing with multiple trash containers.
 
 Call ``load_trash_bin()`` multiple times to add more than one bin. See :ref:`pipette-trash-containers` for more information on using pipettes with multiple trash bins.
 

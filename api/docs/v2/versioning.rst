@@ -148,7 +148,7 @@ This version introduces new features for Flex and adds and improves methods for 
 
 - Other changes
 
-  - :py:obj:`.ProtocolContext.fixed_trash` and :py:obj:`.InstrumentContext.trash_container` now return :py:class:`.TrashBin` objects instead of :py:class:`.Labware` objects.
+  - :py:obj:`.ProtocolContext.fixed_trash` and :py:obj:`.InstrumentContext.trash_container` now return ``TrashBin`` objects instead of :py:class:`.Labware` objects.
   - Flex will no longer automatically drop tips in the trash at the end of a protocol. You can add a :py:meth:`.drop_tip()` command to your protocol or use the Opentrons App to drop the tips.
   
 - Known issues
