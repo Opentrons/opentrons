@@ -1,8 +1,8 @@
 """A Protocol-Engine-friendly wrapper for opentrons.motion_planning.deck_conflict."""
-
+from __future__ import annotations
 import itertools
 import logging
-from typing import Collection, Dict, Optional, Tuple, overload, Union
+from typing import Collection, Dict, Optional, Tuple, overload, Union, TYPE_CHECKING
 
 from opentrons_shared_data.errors.exceptions import MotionPlanningFailureError
 
@@ -27,6 +27,11 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.errors.exceptions import LabwareNotLoadedOnModuleError
 from opentrons.types import DeckSlotName, StagingSlotName, Point
+from ..._trash_bin import TrashBin
+from ..._waste_chute import WasteChute
+
+if TYPE_CHECKING:
+    from ...labware import Labware
 
 
 class PartialTipMovementNotAllowedError(MotionPlanningFailureError):
@@ -74,6 +79,7 @@ def check(
     engine_state: StateView,
     existing_labware_ids: Collection[str],
     existing_module_ids: Collection[str],
+    existing_disposal_locations: Collection[Union[Labware, WasteChute, TrashBin]],
     new_labware_id: str,
 ) -> None:
     pass
@@ -85,7 +91,20 @@ def check(
     engine_state: StateView,
     existing_labware_ids: Collection[str],
     existing_module_ids: Collection[str],
+    existing_disposal_locations: Collection[Union[Labware, WasteChute, TrashBin]],
     new_module_id: str,
+) -> None:
+    pass
+
+
+@overload
+def check(
+    *,
+    engine_state: StateView,
+    existing_labware_ids: Collection[str],
+    existing_module_ids: Collection[str],
+    existing_disposal_locations: Collection[Union[Labware, WasteChute, TrashBin]],
+    new_trash_bin: TrashBin,
 ) -> None:
     pass
 
@@ -95,12 +114,14 @@ def check(
     engine_state: StateView,
     existing_labware_ids: Collection[str],
     existing_module_ids: Collection[str],
+    existing_disposal_locations: Collection[Union[Labware, WasteChute, TrashBin]],
     # TODO(mm, 2023-02-23): This interface is impossible to use correctly. In order
     # to have new_labware_id or new_module_id, the caller needs to have already loaded
     # the new item into Protocol Engine--but then, it's too late to do deck conflict.
     # checking. Find a way to do deck conflict checking before the new item is loaded.
     new_labware_id: Optional[str] = None,
     new_module_id: Optional[str] = None,
+    new_trash_bin: Optional[TrashBin] = None,
 ) -> None:
     """Check for conflicts between items on the deck.
 
@@ -125,6 +146,8 @@ def check(
         new_location_and_item = _map_labware(engine_state, new_labware_id)
     if new_module_id is not None:
         new_location_and_item = _map_module(engine_state, new_module_id)
+    if new_trash_bin is not None:
+        new_location_and_item = _map_disposal_location(new_trash_bin)
 
     if new_location_and_item is None:
         # The new item should be excluded from deck conflict checking. Nothing to do.
@@ -142,11 +165,19 @@ def check(
     )
     mapped_existing_modules = (m for m in all_existing_modules if m is not None)
 
+    all_exisiting_disposal_locations = (
+        _map_disposal_location(disposal_location)
+        for disposal_location in existing_disposal_locations
+    )
+    mapped_disposal_locations = (
+        m for m in all_exisiting_disposal_locations if m is not None
+    )
+
     existing_items: Dict[
         Union[DeckSlotName, StagingSlotName], wrapped_deck_conflict.DeckItem
     ] = {}
     for existing_location, existing_item in itertools.chain(
-        mapped_existing_labware, mapped_existing_modules
+        mapped_existing_labware, mapped_existing_modules, mapped_disposal_locations
     ):
         assert existing_location not in existing_items
         existing_items[existing_location] = existing_item
@@ -554,6 +585,18 @@ def _map_module(
                 highest_z_including_labware=highest_z_including_labware,
             ),
         )
+
+
+def _map_disposal_location(
+    disposal_location: Union[Labware, WasteChute, TrashBin],
+) -> Optional[Tuple[DeckSlotName, wrapped_deck_conflict.DeckItem]]:
+    if isinstance(disposal_location, TrashBin):
+        return (
+            disposal_location.location,
+            wrapped_deck_conflict.TrashBin(name_for_errors="trash bin"),
+        )
+    else:
+        return None
 
 
 def _deck_slot_to_int(deck_slot_location: DeckSlotLocation) -> int:

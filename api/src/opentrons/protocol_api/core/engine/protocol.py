@@ -135,11 +135,22 @@ class ProtocolCore(
         self, disposal_location: Union[Labware, TrashBin, WasteChute]
     ) -> None:
         """Append a disposal location object to the core"""
+        if isinstance(disposal_location, TrashBin):
+            deck_conflict.check(
+                engine_state=self._engine_client.state,
+                new_trash_bin=disposal_location,
+                existing_disposal_locations=self._disposal_locations,
+                # TODO: We can now fetch these IDs from engine too.
+                #  See comment in self.load_labware().
+                #
+                # Wrapping .keys() in list() is just to make Decoy verification easier.
+                existing_labware_ids=list(self._labware_cores_by_id.keys()),
+                existing_module_ids=list(self._module_cores_by_id.keys()),
+            )
         self._disposal_locations.append(disposal_location)
 
     def get_disposal_locations(self) -> List[Union[Labware, TrashBin, WasteChute]]:
         """Get disposal locations."""
-
         return self._disposal_locations
 
     def get_max_speeds(self) -> AxisMaxSpeeds:
@@ -212,11 +223,12 @@ class ProtocolCore(
         deck_conflict.check(
             engine_state=self._engine_client.state,
             new_labware_id=load_result.labwareId,
-            # It's important that we don't fetch these IDs from Protocol Engine, and
-            # use our own bookkeeping instead. If we fetched these IDs from Protocol
-            # Engine, it would have leaked state from Labware Position Check in the
-            # same HTTP run.
-            #
+            existing_disposal_locations=self._disposal_locations,
+            # TODO (spp, 2023-11-27): We've been using IDs from _labware_cores_by_id
+            #  and _module_cores_by_id instead of getting the lists directly from engine
+            #  because of the chance of engine carrying labware IDs from LPC too.
+            #  But with https://github.com/Opentrons/opentrons/pull/13943,
+            #  & LPC in maintenance runs, we can now rely on engine state for these IDs too.
             # Wrapping .keys() in list() is just to make Decoy verification easier.
             existing_labware_ids=list(self._labware_cores_by_id.keys()),
             existing_module_ids=list(self._module_cores_by_id.keys()),
@@ -266,11 +278,10 @@ class ProtocolCore(
         deck_conflict.check(
             engine_state=self._engine_client.state,
             new_labware_id=load_result.labwareId,
-            # TODO (spp, 2023-11-27): We've been using IDs from _labware_cores_by_id
-            #  and _module_cores_by_id instead of getting the lists directly from engine
-            #  because of the chance of engine carrying labware IDs from LPC too.
-            #  But with https://github.com/Opentrons/opentrons/pull/13943,
-            #  & LPC in maintenance runs, we can now rely on engine state for these IDs too.
+            existing_disposal_locations=self._disposal_locations,
+            # TODO: We can now fetch these IDs from engine too.
+            #  See comment in self.load_labware().
+            #
             # Wrapping .keys() in list() is just to make Decoy verification easier.
             existing_labware_ids=list(self._labware_cores_by_id.keys()),
             existing_module_ids=list(self._module_cores_by_id.keys()),
@@ -343,6 +354,9 @@ class ProtocolCore(
         deck_conflict.check(
             engine_state=self._engine_client.state,
             new_labware_id=labware_core.labware_id,
+            existing_disposal_locations=self._disposal_locations,
+            # TODO: We can now fetch these IDs from engine too.
+            #  See comment in self.load_labware().
             existing_labware_ids=[
                 labware_id
                 for labware_id in self._labware_cores_by_id
@@ -400,6 +414,7 @@ class ProtocolCore(
         deck_conflict.check(
             engine_state=self._engine_client.state,
             new_module_id=result.moduleId,
+            existing_disposal_locations=self._disposal_locations,
             # TODO: We can now fetch these IDs from engine too.
             #  See comment in self.load_labware().
             #

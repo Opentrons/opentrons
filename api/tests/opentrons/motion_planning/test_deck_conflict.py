@@ -207,6 +207,41 @@ def test_flex_labware_when_thermocycler(
         )
 
 
+def test_flex_trash_bin_blocks_thermocycler() -> None:
+    """It should prevent loading a thermocycler when there is a trash in A1 and vice-versa."""
+    thermocycler = deck_conflict.ThermocyclerModule(
+        name_for_errors="some_thermocycler",
+        highest_z_including_labware=123,
+        is_semi_configuration=False,
+    )
+    trash = deck_conflict.TrashBin(name_for_errors="some_trash_bin")
+
+    with pytest.raises(
+        deck_conflict.DeckConflictError,
+        match=(
+            "some_trash_bin in slot A1 prevents some_thermocycler from using slot B1"
+        ),
+    ):
+        deck_conflict.check(
+            existing_items={DeckSlotName.SLOT_A1: trash},
+            new_item=thermocycler,
+            new_location=DeckSlotName.SLOT_B1,
+            robot_type="OT-3 Standard",
+        )
+    with pytest.raises(
+        deck_conflict.DeckConflictError,
+        match=(
+            "some_thermocycler in slot B1 prevents some_trash_bin from using slot A1"
+        ),
+    ):
+        deck_conflict.check(
+            existing_items={DeckSlotName.SLOT_B1: thermocycler},
+            new_item=trash,
+            new_location=DeckSlotName.SLOT_A1,
+            robot_type="OT-3 Standard",
+        )
+
+
 @pytest.mark.parametrize(
     ("heater_shaker_location", "labware_location"),
     [
@@ -492,6 +527,43 @@ def test_no_heater_shaker_south_of_trash() -> None:
             existing_items={DeckSlotName.FIXED_TRASH: trash},
             new_item=heater_shaker,
             new_location=DeckSlotName.SLOT_9,
+            robot_type="OT-2 Standard",
+        )
+
+
+def test_heater_shaker_restrictions_trash_bin_addressable_area() -> None:
+    """It should prevent loading a Heater-Shaker adjacent of a non-labware trash bin.
+
+    This is for the OT-2 only and for slot 11 and slot 9
+    """
+    heater_shaker = deck_conflict.HeaterShakerModule(
+        highest_z_including_labware=123, name_for_errors="some_heater_shaker"
+    )
+    trash = deck_conflict.TrashBin(name_for_errors="some_trash_bin")
+
+    with pytest.raises(
+        deck_conflict.DeckConflictError,
+        match=(
+            "some_trash_bin in slot 12" " prevents some_heater_shaker from using slot 9"
+        ),
+    ):
+        deck_conflict.check(
+            existing_items={DeckSlotName.FIXED_TRASH: trash},
+            new_item=heater_shaker,
+            new_location=DeckSlotName.SLOT_9,
+            robot_type="OT-2 Standard",
+        )
+    with pytest.raises(
+        deck_conflict.DeckConflictError,
+        match=(
+            "some_trash_bin in slot 12"
+            " prevents some_heater_shaker from using slot 11"
+        ),
+    ):
+        deck_conflict.check(
+            existing_items={DeckSlotName.FIXED_TRASH: trash},
+            new_item=heater_shaker,
+            new_location=DeckSlotName.SLOT_11,
             robot_type="OT-2 Standard",
         )
 
