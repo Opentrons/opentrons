@@ -318,6 +318,7 @@ def test_load_labware(
             engine_state=mock_engine_client.state,
             existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="abc123",
         )
     )
@@ -389,6 +390,7 @@ def test_load_labware_on_staging_slot(
             engine_state=mock_engine_client.state,
             existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="abc123",
         )
     )
@@ -467,6 +469,7 @@ def test_load_labware_on_labware(
             engine_state=mock_engine_client.state,
             existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="abc123",
         )
     )
@@ -530,6 +533,7 @@ def test_load_labware_off_deck(
             engine_state=mock_engine_client.state,
             existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="abc123",
         )
     )
@@ -589,6 +593,7 @@ def test_load_adapter(
             engine_state=mock_engine_client.state,
             existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="abc123",
         )
     )
@@ -658,6 +663,7 @@ def test_load_adapter_on_staging_slot(
             engine_state=mock_engine_client.state,
             existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="abc123",
         )
     )
@@ -729,6 +735,7 @@ def test_move_labware(
             engine_state=mock_engine_client.state,
             existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="labware-id",
         ),
     )
@@ -767,6 +774,7 @@ def test_move_labware_on_staging_slot(
             engine_state=mock_engine_client.state,
             existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="labware-id",
         ),
     )
@@ -810,6 +818,7 @@ def test_move_labware_on_non_connected_module(
             engine_state=mock_engine_client.state,
             existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="labware-id",
         ),
     )
@@ -849,6 +858,7 @@ def test_move_labware_off_deck(
             engine_state=mock_engine_client.state,
             existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="labware-id",
         ),
     )
@@ -918,6 +928,7 @@ def test_load_labware_on_module(
             engine_state=mock_engine_client.state,
             existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="abc123",
         )
     )
@@ -991,6 +1002,7 @@ def test_load_labware_on_non_connected_module(
             engine_state=mock_engine_client.state,
             existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="abc123",
         )
     )
@@ -1144,6 +1156,7 @@ def test_load_module(
             engine_state=mock_engine_client.state,
             existing_labware_ids=["fixed-trash-123"],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_module_id="abc123",
         )
     )
@@ -1308,6 +1321,7 @@ def test_load_mag_block(
             engine_state=mock_engine_client.state,
             existing_labware_ids=["fixed-trash-123"],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_module_id="abc123",
         )
     )
@@ -1393,6 +1407,7 @@ def test_load_module_thermocycler_with_no_location(
             engine_state=mock_engine_client.state,
             existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_module_id="abc123",
         )
     )
