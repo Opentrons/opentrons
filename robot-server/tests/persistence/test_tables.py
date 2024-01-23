@@ -53,7 +53,6 @@ EXPECTED_STATEMENTS_LATEST = [
         created_at DATETIME NOT NULL,
         protocol_id VARCHAR,
         state_summary BLOB,
-        commands BLOB,
         engine_status VARCHAR,
         _updated_at DATETIME,
         PRIMARY KEY (id),
@@ -69,6 +68,19 @@ EXPECTED_STATEMENTS_LATEST = [
         PRIMARY KEY (id),
         FOREIGN KEY(run_id) REFERENCES run (id)
     )
+    """,
+    """
+    CREATE TABLE run_command (
+        run_id VARCHAR NOT NULL,
+        index_in_run INTEGER NOT NULL,
+        command_id VARCHAR NOT NULL,
+        command BLOB NOT NULL,
+        PRIMARY KEY (run_id, command_id),
+        FOREIGN KEY(run_id) REFERENCES run (id)
+    )
+    """,
+    """
+    CREATE UNIQUE INDEX ix_run_run_id_index_in_run ON run_command (run_id, index_in_run)
     """,
 ]
 
