@@ -1,10 +1,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
-import {
-  useDeleteMaintenanceRunMutation,
-  useCurrentMaintenanceRun,
-} from '@opentrons/react-api-client'
+import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 import { COLORS } from '@opentrons/components'
 import {
   CreateCommand,
