@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { resetAllWhenMocks } from 'jest-when'
-import { screen, fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import {
   renderWithProviders,
   useConditionalConfirm,
@@ -25,8 +25,11 @@ import * as Config from '../../../redux/config'
 import * as ProtocolAnalysis from '../../../redux/protocol-analysis'
 import * as SystemInfo from '../../../redux/system-info'
 import * as Fixtures from '../../../redux/system-info/__fixtures__'
-
-import { PreventRobotCaching } from '../../../organisms/AdvancedSettings'
+import {
+  EnableDevTools,
+  OT2AdvancedSettings,
+  PreventRobotCaching,
+} from '../../../organisms/AdvancedSettings'
 
 import { AdvancedSettings } from '../AdvancedSettings'
 
@@ -98,6 +101,13 @@ const mockPreventRobotCaching = PreventRobotCaching as jest.MockedFunction<
   typeof PreventRobotCaching
 >
 
+const mockOT2AdvancedSettings = OT2AdvancedSettings as jest.MockedFunction<
+  typeof OT2AdvancedSettings
+>
+const mockEnableDevTools = EnableDevTools as jest.MockedFunction<
+  typeof EnableDevTools
+>
+
 let mockTrackEvent: jest.Mock
 const mockConfirm = jest.fn()
 const mockCancel = jest.fn()
@@ -125,6 +135,8 @@ describe('AdvancedSettings', () => {
       cancel: mockCancel,
     })
     mockPreventRobotCaching.mockReturnValue(<div>mock PreventRobotCaching</div>)
+    mockOT2AdvancedSettings.mockReturnValue(<div>mock OT2AdvancedSettings</div>)
+    mockEnableDevTools.mockReturnValue(<div>mock EnableDevTools</div>)
   })
 
   afterEach(() => {
@@ -137,9 +149,6 @@ describe('AdvancedSettings', () => {
     getByText('Update Channel')
     getByText('Additional Custom Labware Source Folder')
     getByText('Clear Unavailable Robots')
-    getByText('Developer Tools')
-    getByText('OT-2 Advanced Settings')
-    getByText('Tip Length Calibration Method')
     getByText('USB-to-Ethernet Adapter Information')
   })
 
@@ -171,13 +180,9 @@ describe('AdvancedSettings', () => {
       properties: {},
     })
   })
-  it('renders the tip length cal section', () => {
-    const [{ getByRole }] = render()
-    getByRole('radio', { name: 'Always use calibration block to calibrate' })
-    getByRole('radio', { name: 'Always use trash bin to calibrate' })
-    getByRole('radio', {
-      name: 'Always show the prompt to choose calibration block or trash bin',
-    })
+  it('should render mock OT-2 Advanced Settings Tip Length Calibration Method section', () => {
+    render()
+    screen.getByText('mock OT2AdvancedSettings')
   })
 
   it('should render mock robot caching section', () => {
@@ -347,11 +352,8 @@ describe('AdvancedSettings', () => {
     expect(mockConfirm).toHaveBeenCalled()
   })
 
-  it('renders the developer tools section', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText(
-      'Enabling this setting opens Developer Tools on app launch, enables additional logging and gives access to feature flags.'
-    )
-    getByRole('switch', { name: 'enable_dev_tools' })
+  it('should render mock developer tools section', () => {
+    render()
+    screen.getByText('mock EnableDevTools')
   })
 })
