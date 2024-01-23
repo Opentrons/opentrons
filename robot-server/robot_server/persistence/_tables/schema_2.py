@@ -1,4 +1,9 @@
-"""SQLite table schemas."""
+"""v2 of our SQLite schema.
+
+v0 and v1 are subsets of this, missing certain tables and columns.
+See our migration code for details.
+"""
+
 import sqlalchemy
 
 from robot_server.persistence import legacy_pickle
