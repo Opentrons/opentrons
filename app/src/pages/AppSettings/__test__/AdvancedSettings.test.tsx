@@ -25,7 +25,7 @@ import * as Config from '../../../redux/config'
 import * as ProtocolAnalysis from '../../../redux/protocol-analysis'
 import * as SystemInfo from '../../../redux/system-info'
 import * as Fixtures from '../../../redux/system-info/__fixtures__'
-import { OT2AdvancedSettings } from '../../../organisms/AdvancedSettings'
+import { EnableDevTools, OT2AdvancedSettings } from '../../../organisms/AdvancedSettings'
 
 import { AdvancedSettings } from '../AdvancedSettings'
 
@@ -96,6 +96,9 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
 
 const mockOT2AdvancedSettings = OT2AdvancedSettings as jest.MockedFunction<
   typeof OT2AdvancedSettings
+ >
+const mockEnableDevTools = EnableDevTools as jest.MockedFunction<
+  typeof EnableDevTools
 >
 
 let mockTrackEvent: jest.Mock
@@ -125,6 +128,7 @@ describe('AdvancedSettings', () => {
       cancel: mockCancel,
     })
     mockOT2AdvancedSettings.mockReturnValue(<div>mock OT2AdvancedSettings</div>)
+    mockEnableDevTools.mockReturnValue(<div>mock EnableDevTools</div>)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -137,7 +141,6 @@ describe('AdvancedSettings', () => {
     getByText('Additional Custom Labware Source Folder')
     getByText('Prevent Robot Caching')
     getByText('Clear Unavailable Robots')
-    getByText('Developer Tools')
     getByText('USB-to-Ethernet Adapter Information')
   })
   it('renders the update channel combobox and section', () => {
@@ -339,11 +342,8 @@ describe('AdvancedSettings', () => {
     fireEvent.click(proceedBtn)
     expect(mockConfirm).toHaveBeenCalled()
   })
-  it('renders the developer tools section', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText(
-      'Enabling this setting opens Developer Tools on app launch, enables additional logging and gives access to feature flags.'
-    )
-    getByRole('switch', { name: 'enable_dev_tools' })
+  it('should render mock developer tools section', () => {
+    render()
+    screen.getByText('mock EnableDevTools')
   })
 })
