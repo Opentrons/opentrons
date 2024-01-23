@@ -28,6 +28,7 @@ import { getIsShellReady } from '../../redux/shell'
 import { getLocalRobot } from '../../redux/discovery'
 import { mockConnectedRobot } from '../../redux/discovery/__fixtures__'
 import { useCurrentRunRoute, useProtocolReceiptToast } from '../hooks'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 
 import type { OnDeviceDisplaySettings } from '../../redux/config/types'
 
@@ -52,6 +53,7 @@ jest.mock('../../redux/config')
 jest.mock('../../redux/shell')
 jest.mock('../../redux/discovery')
 jest.mock('../hooks')
+jest.mock('../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
 
 const mockSettings = {
   sleepMs: 60 * 1000 * 60 * 24 * 7,
@@ -120,6 +122,9 @@ const mockUseProtocolReceiptToasts = useProtocolReceiptToast as jest.MockedFunct
 const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
   typeof getLocalRobot
 >
+const mockUseNotifyMaintenanceRun = useNotifyCurrentMaintenanceRun as jest.MockedFunction<
+  typeof useNotifyCurrentMaintenanceRun
+>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -159,6 +164,13 @@ describe('OnDeviceDisplayApp', () => {
     )
     mockUseCurrentRunRoute.mockReturnValue(null)
     mockGetLocalRobot.mockReturnValue(mockConnectedRobot)
+    mockUseNotifyMaintenanceRun.mockReturnValue({
+      data: {
+        data: {
+          id: 'test',
+        },
+      },
+    } as any)
   })
   afterEach(() => {
     jest.resetAllMocks()

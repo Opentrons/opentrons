@@ -7,7 +7,6 @@ import {
   renderWithProviders,
 } from '@opentrons/components'
 import {
-  useCurrentMaintenanceRun,
   useDeckConfigurationQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
@@ -16,6 +15,7 @@ import { i18n } from '../../../i18n'
 import { useRunStatuses } from '../../Devices/hooks'
 import { DeckFixtureSetupInstructionsModal } from '../DeckFixtureSetupInstructionsModal'
 import { DeviceDetailsDeckConfiguration } from '../'
+import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 
 import type { MaintenanceRun } from '@opentrons/api-client'
 
@@ -23,6 +23,7 @@ jest.mock('@opentrons/components/src/hardware-sim/DeckConfigurator/index')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../DeckFixtureSetupInstructionsModal')
 jest.mock('../../Devices/hooks')
+jest.mock('../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
 
 const ROBOT_NAME = 'otie'
 const mockUpdateDeckConfiguration = jest.fn()
@@ -51,8 +52,8 @@ const mockDeckConfigurator = DeckConfigurator as jest.MockedFunction<
 const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
   typeof useRunStatuses
 >
-const mockUseCurrentMaintenanceRun = useCurrentMaintenanceRun as jest.MockedFunction<
-  typeof useCurrentMaintenanceRun
+const mockUseNotifyCurrentMaintenanceRun = useNotifyCurrentMaintenanceRun as jest.MockedFunction<
+  typeof useNotifyCurrentMaintenanceRun
 >
 
 const render = (
@@ -79,7 +80,7 @@ describe('DeviceDetailsDeckConfiguration', () => {
     )
     when(mockDeckConfigurator).mockReturnValue(<div>mock DeckConfigurator</div>)
     mockUseRunStatuses.mockReturnValue(RUN_STATUSES)
-    mockUseCurrentMaintenanceRun.mockReturnValue({
+    mockUseNotifyCurrentMaintenanceRun.mockReturnValue({
       data: {},
     } as any)
   })
@@ -115,7 +116,7 @@ describe('DeviceDetailsDeckConfiguration', () => {
   })
 
   it('should render banner and make deck configurator disabled when a maintenance run exists', () => {
-    mockUseCurrentMaintenanceRun.mockReturnValue({
+    mockUseNotifyCurrentMaintenanceRun.mockReturnValue({
       data: mockCurrnetMaintenanceRun,
     } as any)
     when(mockDeckConfigurator)

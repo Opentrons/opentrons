@@ -31,6 +31,7 @@ from robot_server.runs.run_store import (
     CommandNotFoundError,
 )
 from robot_server.service.task_runner import TaskRunner
+from robot_server.notification_client import NotificationClient
 
 from opentrons.protocol_engine import Liquid
 
@@ -56,6 +57,10 @@ def mock_task_runner(decoy: Decoy) -> TaskRunner:
     """Get a mock background TaskRunner."""
     return decoy.mock(cls=TaskRunner)
 
+@pytest.fixture()
+def mock_notification_client(decoy: Decoy) -> NotificationClient:
+    """Get a mock NotificationClient."""
+    return decoy.mock(cls=NotificationClient)
 
 @pytest.fixture
 def engine_state_summary() -> StateSummary:
@@ -99,12 +104,14 @@ def subject(
     mock_engine_store: EngineStore,
     mock_run_store: RunStore,
     mock_task_runner: TaskRunner,
+    mock_notification_client: NotificationClient,
 ) -> RunDataManager:
     """Get a RunDataManager test subject."""
     return RunDataManager(
         engine_store=mock_engine_store,
         run_store=mock_run_store,
         task_runner=mock_task_runner,
+        notification_client=mock_notification_client,
     )
 
 

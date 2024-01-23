@@ -9,8 +9,11 @@ import { handleTipsAttachedModal } from '../TipsAttachedModal'
 import { LEFT } from '@opentrons/shared-data'
 import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
 import { ROBOT_MODEL_OT3 } from '../../../redux/discovery'
+import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
+
+jest.mock('../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
 
 const MOCK_ACTUAL_PIPETTE = {
   ...mockPipetteInfo.pipetteSpecs,
@@ -21,6 +24,9 @@ const MOCK_ACTUAL_PIPETTE = {
 } as PipetteModelSpecs
 
 const mockOnClose = jest.fn()
+const mockUseNotifyCurrentMaintenanceRun = useNotifyCurrentMaintenanceRun as jest.MockedFunction<
+  typeof useNotifyCurrentMaintenanceRun
+>
 
 const render = () => {
   return renderWithProviders(
@@ -44,7 +50,15 @@ const render = () => {
 }
 
 describe('TipsAttachedModal', () => {
-  beforeEach(() => {})
+  beforeEach(() => {
+    mockUseNotifyCurrentMaintenanceRun.mockReturnValue({
+      data: {
+        data: {
+          id: 'test',
+        },
+      },
+    } as any)
+  })
 
   afterEach(() => {
     jest.resetAllMocks()
