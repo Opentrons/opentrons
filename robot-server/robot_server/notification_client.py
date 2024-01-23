@@ -14,33 +14,41 @@ from server_utils.fastapi_utils.app_state import (
     get_app_state,
 )
 
-HOST = "127.0.0.1"
-PORT = 1883
-CLIENT_ID = f"robot-server-{random.randint(0, 1000000)}"
-KEEPALIVE = 60
-PROTOCOL_VERSION = mqtt.MQTTv5
-CLEAN_SESSION = True
-DEFAULT_QOS = 1
-RETAIN_MESSAGE = False
-
 log: logging.Logger = logging.getLogger(__name__)
 
 
 class NotificationClient:  # noqa: D101
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        host: str = "127.0.0.1",
+        port: int = 1883,
+        keepalive: int = 60,
+        protocol_version: int = mqtt.MQTTv5,
+        default_qos: int = 1,
+        retain_message: bool = False,
+    ) -> None:
         """Returns a configured MQTT client."""
-        self.client: mqtt.Client = mqtt.Client(
-            client_id=CLIENT_ID, protocol=PROTOCOL_VERSION
-        )
         self.client.on_connect = self._on_connect
         self.client.on_disconnect = self._on_disconnect
+        self.host = host
+        self.port = port
+        self.keepalive = keepalive
+        self.default_qos = default_qos
+        self.retain_message = retain_message
+
+        # MQTT is somewhat particular about the client_id format and will connect erratically
+        # if an unexpected string is supplied. This clientId is derived from the paho-mqtt library.
+        self.client_id: str = f"robot-server-{random.randint(0, 1000000)}"
+        self.client: mqtt.Client = mqtt.Client(
+            client_id=self.client_id, protocol=protocol_version
+        )
 
     def connect(self) -> None:
         """Connect the client to the MQTT broker."""
         self.client.on_connect = self._on_connect
         self.client.on_disconnect = self._on_disconnect
 
-        self.client.connect(host=HOST, port=PORT, keepalive=KEEPALIVE)
+        self.client.connect(host=self.host, port=self.port, keepalive=self.keepalive)
         self.client.loop_start()
 
     async def disconnect(self) -> None:
@@ -68,7 +76,10 @@ class NotificationClient:  # noqa: D101
         """
         payload = message.json()
         self.client.publish(
-            topic=topic, payload=payload, qos=DEFAULT_QOS, retain=RETAIN_MESSAGE
+            topic=topic,
+            payload=payload,
+            qos=self.default_qos,
+            retain=self.retain_message,
         )
 
     def _on_connect(

@@ -64,34 +64,6 @@ export function useNotifyService<TData>({
     if (!options.forceHttpPolling) {
       const hostname = host?.hostname ?? null
       const eventEmitter = appShellListener(hostname, topic)
-      const onDataListener = (data: NotifyResponseData<TData>): void => {
-        if (!isNotifyError.current) {
-          if (data === 'ECONNFAILED' || data === 'ECONNREFUSED') {
-            isNotifyError.current = true
-            if (data === 'ECONNREFUSED') {
-              doTrackEvent({
-                name: ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
-                properties: {},
-              })
-            }
-          } else if ('refetchUsingHTTP' in data) {
-            refetchUsingHTTP()
-          } else {
-            // Emulate React Query's implict onError behavior when passed an error status code.
-            if (options.onError != null && inRange(data.statusCode, 400, 600)) {
-              const err = new Error(
-                `NotifyService received status code: ${data.statusCode}`
-              )
-              console.error(err)
-              options.onError(err)
-            }
-            // Prefer setQueryData() and manual callback invocation within onDataListener
-            // as opposed to invalidateQueries() and manual callback invocation/cache logic
-            // within the query function. The former is signficantly more performant: ~25ms vs ~1.5s.
-            else queryClient.setQueryData(queryKey, data)
-          }
-        }
-      }
 
       eventEmitter.on('data', onDataListener)
 
@@ -122,4 +94,33 @@ export function useNotifyService<TData>({
   )
 
   return { notifyQueryResponse: query, isNotifyError: isNotifyError.current }
+
+  function onDataListener(data: NotifyResponseData<TData>): void {
+    if (!isNotifyError.current) {
+      if (data === 'ECONNFAILED' || data === 'ECONNREFUSED') {
+        isNotifyError.current = true
+        if (data === 'ECONNREFUSED') {
+          doTrackEvent({
+            name: ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
+            properties: {},
+          })
+        }
+      } else if ('refetchUsingHTTP' in data) {
+        refetchUsingHTTP()
+      } else {
+        // Emulate React Query's implict onError behavior when passed an error status code.
+        if (options.onError != null && inRange(data.statusCode, 400, 600)) {
+          const err = new Error(
+            `NotifyService received status code: ${data.statusCode}`
+          )
+          console.error(err)
+          options.onError(err)
+        }
+        // Prefer setQueryData() and manual callback invocation within onDataListener
+        // as opposed to invalidateQueries() and manual callback invocation/cache logic
+        // within the query function. The former is signficantly more performant: ~25ms vs ~1.5s.
+        else queryClient.setQueryData(queryKey, data)
+      }
+    }
+  }
 }
