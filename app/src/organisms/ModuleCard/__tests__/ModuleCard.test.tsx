@@ -20,7 +20,6 @@ import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { ErrorInfo } from '../ErrorInfo'
-import { ModuleCard } from '..'
 import {
   mockMagneticModule,
   mockTemperatureModuleGen2,
@@ -28,6 +27,8 @@ import {
   mockHeaterShaker,
 } from '../../../redux/modules/__fixtures__'
 import { mockRobot } from '../../../redux/robot-api/__fixtures__'
+import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { ModuleCard } from '..'
 
 import type {
   HeaterShakerModule,
@@ -54,6 +55,7 @@ jest.mock('react-router-dom', () => {
   }
 })
 jest.mock('../../../organisms/Devices/hooks')
+jest.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
 
 const mockMagneticModuleData = MagneticModuleData as jest.MockedFunction<
   typeof MagneticModuleData
@@ -87,6 +89,10 @@ const mockFirmwareUpdateFailedModal = FirmwareUpdateFailedModal as jest.MockedFu
 >
 const mockErrorInfo = ErrorInfo as jest.MockedFunction<typeof ErrorInfo>
 const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
+const mockUseIsEstopNotDisengaged = useIsEstopNotDisengaged as jest.MockedFunction<
+  typeof useIsEstopNotDisengaged
+>
+
 const mockMagneticModuleHub = {
   id: 'magdeck_id',
   moduleModel: 'magneticModuleV1',
@@ -255,6 +261,9 @@ describe('ModuleCard', () => {
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_IDLE)
     when(mockUseIsFlex).calledWith(props.robotName).mockReturnValue(true)
+    when(mockUseIsEstopNotDisengaged)
+      .calledWith(props.robotName)
+      .mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()

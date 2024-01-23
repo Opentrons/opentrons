@@ -68,6 +68,7 @@ import { getModuleCardImage } from './utils'
 import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
 import { ErrorInfo } from './ErrorInfo'
 import { ModuleSetupModal } from './ModuleSetupModal'
+import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type {
   AttachedModule,
@@ -140,6 +141,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const latestRequest = useSelector<State, RequestState | null>(state =>
     latestRequestId ? getRequestById(state, latestRequestId) : null
   )
+  const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
 
   const handleCloseErrorModal = (): void => {
     if (latestRequestId != null) {
@@ -433,7 +435,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       >
         <OverflowBtn
           aria-label="overflow"
-          disabled={isOverflowBtnDisabled}
+          disabled={isOverflowBtnDisabled || isEstopNotDisengaged}
           {...targetProps}
           onClick={handleOverflowClick}
         />

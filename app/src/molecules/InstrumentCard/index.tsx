@@ -33,6 +33,7 @@ interface InstrumentCardProps extends StyleProps {
   // special casing the gripper at least for now
   isGripperAttached?: boolean
   banner?: React.ReactNode
+  isEstopNotDisengaged: boolean
 }
 
 /**
@@ -48,6 +49,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
     label,
     menuOverlayItems,
     banner,
+    isEstopNotDisengaged,
     ...styleProps
   } = props
 
@@ -116,6 +118,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
           <OverflowBtn
             onClick={handleOverflowClick}
             aria-label="InstrumentCard_overflowMenu"
+            disabled={isEstopNotDisengaged}
           />
           {menuOverlay}
           {showOverflowMenu ? (
