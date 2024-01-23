@@ -52,7 +52,7 @@ import { useToaster } from '../../organisms/ToasterOven'
 import {
   EnableDevTools,
   OT2AdvancedSettings,
-  PreventRobotCaching
+  PreventRobotCaching,
 } from '../../organisms/AdvancedSettings'
 
 import type { Dispatch, State } from '../../redux/types'
