@@ -1,6 +1,6 @@
 import React from 'react'
 import NiceModal from '@ebay/nice-modal-react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, waitFor } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
@@ -186,7 +186,7 @@ describe('UpdateBuildroot', () => {
     getByText('Calibrate Gripper')
   })
 
-  it('closes the overflow menu when a launched wizard closes', () => {
+  it('closes the overflow menu when a launched wizard closes', async () => {
     const [{ getByTestId, getByText, queryByText }] = render(MOCK_GRIPPER)
     const btn = getByTestId('testButton')
     fireEvent.click(btn)
@@ -194,7 +194,9 @@ describe('UpdateBuildroot', () => {
 
     getByText('Calibrate Gripper')
     fireEvent.click(getByText('exit'))
-    expect(queryByText('Recalibrate')).not.toBeInTheDocument()
+    await waitFor(() =>
+      expect(queryByText('Recalibrate')).not.toBeInTheDocument()
+    )
   })
 
   it('closes the overflow menu when a click occurs outside of the overflow menu', () => {
