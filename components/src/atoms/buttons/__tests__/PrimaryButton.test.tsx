@@ -42,7 +42,7 @@ describe('PrimaryButton', () => {
     const button = getByText('primary button')
     expect(button).toBeDisabled()
     expect(button).toHaveStyle(`background-color: ${COLORS.grey30}`)
-    expect(button).toHaveStyle(`color: ${COLORS.grey40}`)
+    expect(button).toHaveStyle(`color: ${COLORS.grey50}`)
   })
 
   it('applies the correct states to the button - focus', () => {
