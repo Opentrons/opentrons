@@ -80,6 +80,11 @@ class MoveToMaintenancePositionImplementation(
         ot3_api = ensure_ot3_hardware(
             self._hardware_api,
         )
+        # the 96-channel mount is disengaged during gripper calibration and
+        #  must be homed before the gantry position can be called
+        if not ot3_api.backend.check_motor_status([Axis.Z_L]) and \
+            ot3_api.backend.check_encoder_status([Axis.Z_L]):
+            await ot3_api.home([Axis.Z_L])
         current_position_mount = await ot3_api.gantry_position(
             Mount.LEFT, critical_point=CriticalPoint.MOUNT
         )
