@@ -49,7 +49,10 @@ import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { useToaster } from '../../organisms/ToasterOven'
-import { EnableDevTools, OT2AdvancedSettings } from '../../organisms/AdvancedSettings'
+import {
+  EnableDevTools,
+  OT2AdvancedSettings,
+} from '../../organisms/AdvancedSettings'
 
 import type { Dispatch, State } from '../../redux/types'
 

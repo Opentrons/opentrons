@@ -25,7 +25,10 @@ import * as Config from '../../../redux/config'
 import * as ProtocolAnalysis from '../../../redux/protocol-analysis'
 import * as SystemInfo from '../../../redux/system-info'
 import * as Fixtures from '../../../redux/system-info/__fixtures__'
-import { EnableDevTools, OT2AdvancedSettings } from '../../../organisms/AdvancedSettings'
+import {
+  EnableDevTools,
+  OT2AdvancedSettings,
+} from '../../../organisms/AdvancedSettings'
 
 import { AdvancedSettings } from '../AdvancedSettings'
 
@@ -96,7 +99,7 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
 
 const mockOT2AdvancedSettings = OT2AdvancedSettings as jest.MockedFunction<
   typeof OT2AdvancedSettings
- >
+>
 const mockEnableDevTools = EnableDevTools as jest.MockedFunction<
   typeof EnableDevTools
 >
