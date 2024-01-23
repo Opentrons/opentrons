@@ -22,7 +22,7 @@ interface WellTooltipParams {
   tooltipWellName?: string | null
 }
 
-interface Props {
+interface WellTooltipProps {
   children: (wellTooltipParams: WellTooltipParams) => React.ReactNode
   ingredNames: WellIngredientNames
 }
@@ -34,7 +34,7 @@ interface State {
   tooltipWellIngreds?: LocationLiquidState | null
   tooltipOffset?: number | null
 }
-const initialState: State = {
+const initialTooltipState: State = {
   tooltipX: null,
   tooltipY: null,
   tooltipWellName: null,
@@ -42,9 +42,11 @@ const initialState: State = {
   tooltipOffset: DEFAULT_TOOLTIP_OFFSET,
 }
 
-export const WellTooltip = (props: Props): JSX.Element => {
+export const WellTooltip = (props: WellTooltipProps): JSX.Element => {
   const { children, ingredNames } = props
-  const [state, setState] = React.useState<State>(initialState)
+  const [tooltipState, setTooltipState] = React.useState<State>(
+    initialTooltipState
+  )
 
   const makeHandleMouseEnterWell: (
     wellName: string,
@@ -55,7 +57,7 @@ export const WellTooltip = (props: Props): JSX.Element => {
       const wellBoundingRect = target.getBoundingClientRect()
       const { left, top, height, width } = wellBoundingRect
       if (Object.keys(wellIngreds).length > 0 && left && top) {
-        setState({
+        setTooltipState({
           tooltipX: left + width / 2,
           tooltipY: top + height / 2,
           tooltipWellName: wellName,
@@ -67,7 +69,7 @@ export const WellTooltip = (props: Props): JSX.Element => {
   }
 
   const handleMouseLeaveWell = (): void => {
-    setState(initialState)
+    setTooltipState(initialTooltipState)
   }
 
   const {
@@ -76,7 +78,7 @@ export const WellTooltip = (props: Props): JSX.Element => {
     tooltipOffset,
     tooltipWellIngreds,
     tooltipWellName,
-  } = state
+  } = tooltipState
 
   return (
     <>
