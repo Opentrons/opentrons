@@ -3,7 +3,7 @@ import throttle from 'lodash/throttle'
 import styles from './SelectionRect.css'
 import { DragRect, GenericRect } from '../collision-types'
 
-interface Props {
+interface SelectionRectProps {
   onSelectionMove?: (e: MouseEvent, arg: GenericRect) => void
   onSelectionDone?: (e: MouseEvent, arg: GenericRect) => void
   svg?: boolean // set true if this is an embedded SVG
@@ -12,7 +12,7 @@ interface Props {
   originYOffset?: number
 }
 
-export const SelectionRect = (props: Props): JSX.Element => {
+export const SelectionRect = (props: SelectionRectProps): JSX.Element => {
   const {
     onSelectionMove,
     onSelectionDone,

@@ -143,20 +143,20 @@ export const getLabwareIsRecommended = (
 }
 export const LabwareSelectionModal = (): JSX.Element | null => {
   const { t } = useTranslation(['modules', 'modal', 'button', 'alert'])
-  const dispatch: ThunkDispatch<any> = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<any>>()
   const selectedLabwareSlot = useSelector(
     labwareIngredSelectors.selectedAddLabwareSlot
   )
-  const slot = selectedLabwareSlot === false ? null : selectedLabwareSlot
   const pipetteEntities = useSelector(getPipetteEntities)
   const permittedTipracks = useSelector(stepFormSelectors.getPermittedTipracks)
-  const has96Channel = getHas96Channel(pipetteEntities)
   const customLabwareDefs = useSelector(
     labwareDefSelectors.getCustomLabwareDefsByURI
   )
   const deckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
+  const has96Channel = getHas96Channel(pipetteEntities)
   const modulesById = deckSetup.modules
   const labwareById = deckSetup.labware
+  const slot = selectedLabwareSlot === false ? null : selectedLabwareSlot
 
   const onClose = (): void => {
     dispatch(closeLabwareSelector())

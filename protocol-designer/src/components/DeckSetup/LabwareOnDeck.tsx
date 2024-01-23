@@ -9,14 +9,14 @@ import * as tipContentsSelectors from '../../top-selectors/tip-contents'
 import { LabwareOnDeck as LabwareOnDeckType } from '../../step-forms'
 import { wellFillFromWellContents } from '../labware/utils'
 
-interface Props {
+interface LabwareOnDeckProps {
   className?: string
   labwareOnDeck: LabwareOnDeckType
   x: number
   y: number
 }
 
-export const LabwareOnDeck = (props: Props): JSX.Element => {
+export const LabwareOnDeck = (props: LabwareOnDeckProps): JSX.Element => {
   const { labwareOnDeck, x, y, className } = props
   const missingTipsByLabwareId = useSelector(
     tipContentsSelectors.getMissingTipsByLabwareId

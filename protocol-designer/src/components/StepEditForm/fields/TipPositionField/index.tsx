@@ -21,12 +21,12 @@ import styles from './TipPositionInput.css'
 
 import type { FieldProps } from '../../types'
 
-interface Props extends FieldProps {
+interface TipPositionFieldProps extends FieldProps {
   labwareId?: string | null
   className?: string
 }
 
-export function TipPositionField(props: Props): JSX.Element {
+export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
   const {
     disabled,
     name,

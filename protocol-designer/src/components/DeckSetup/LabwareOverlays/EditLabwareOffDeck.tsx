@@ -58,14 +58,16 @@ const REGULAR_OVERLAY_STYLE = css`
   }
 `
 
-interface Props {
+interface EditLabwareOffDeckProps {
   labwareEntity: LabwareEntity
 }
 
-export const EditLabwareOffDeck = (props: Props): JSX.Element => {
+export const EditLabwareOffDeck = (
+  props: EditLabwareOffDeckProps
+): JSX.Element => {
   const { labwareEntity } = props
   const { t } = useTranslation('deck')
-  const dispatch: ThunkDispatch<any> = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<any>>()
   const allSavedLabware = useSelector(labwareIngredSelectors.getSavedLabware)
   const hasName = allSavedLabware[labwareEntity.id]
   const { isTiprack } = labwareEntity.def.parameters

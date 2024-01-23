@@ -4,11 +4,11 @@ import { LabwareNameOverlay, truncateString } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { LabwareOnDeck } from '../../../step-forms'
-interface Props {
+interface LabwareNameProps {
   labwareOnDeck: LabwareOnDeck
 }
 
-export const LabwareName = (props: Props): JSX.Element => {
+export const LabwareName = (props: LabwareNameProps): JSX.Element => {
   const { labwareOnDeck } = props
   const nicknames = useSelector(uiLabwareSelectors.getLabwareNicknamesById)
   const nickname = nicknames[labwareOnDeck.id]

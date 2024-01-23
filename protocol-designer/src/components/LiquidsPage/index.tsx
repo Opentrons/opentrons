@@ -11,7 +11,7 @@ import type { LiquidGroup } from '../../labware-ingred/types'
 import type { ThunkDispatch } from '../../types'
 
 export function LiquidsPage(): JSX.Element {
-  const dispatch: ThunkDispatch<any> = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<any>>()
   const selectedLiquidGroupState = useSelector(
     labwareIngredSelectors.getSelectedLiquidGroupState
   )

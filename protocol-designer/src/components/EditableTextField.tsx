@@ -12,7 +12,9 @@ interface Props {
 export function EditableTextField(props: Props): JSX.Element {
   const { className, value, saveEdit } = props
   const [editing, setEditing] = React.useState<boolean>(false)
-  const [transientValue, setTransientValue] = React.useState(value)
+  const [transientValue, setTransientValue] = React.useState<
+    string | null | undefined
+  >(value)
 
   const enterEditMode = (): void => {
     setEditing(true)

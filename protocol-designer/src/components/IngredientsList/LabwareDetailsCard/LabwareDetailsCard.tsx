@@ -16,7 +16,7 @@ import styles from './labwareDetailsCard.css'
 
 export function LabwareDetailsCard(): JSX.Element {
   const { t } = useTranslation('form')
-  const dispatch: ThunkDispatch<any> = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<any>>()
   const labwareNicknamesById = useSelector(
     uiLabwareSelectors.getLabwareNicknamesById
   )

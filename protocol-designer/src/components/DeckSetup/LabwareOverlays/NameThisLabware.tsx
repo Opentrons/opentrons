@@ -10,12 +10,12 @@ import type { LabwareEntity } from '@opentrons/step-generation'
 import type { ThunkDispatch } from '../../../types'
 import type { LabwareOnDeck } from '../../../step-forms'
 
-interface Props {
+interface NameThisLabwareProps {
   labwareOnDeck: LabwareOnDeck | LabwareEntity
   editLiquids: () => void
 }
 
-export const NameThisLabware = (props: Props): JSX.Element => {
+export const NameThisLabware = (props: NameThisLabwareProps): JSX.Element => {
   const { labwareOnDeck } = props
   const dispatch: ThunkDispatch<any> = useDispatch()
   const [inputValue, setInputValue] = React.useState<string>('')

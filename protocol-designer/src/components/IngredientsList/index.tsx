@@ -162,9 +162,6 @@ export function IngredientsList(): JSX.Element {
     labwareIngredSelectors.getLiquidsByLabwareId
   )
 
-  const labwareWellContents =
-    (selectedLabwareId && allLabwareWellContents[selectedLabwareId]) || {}
-
   const liquidGroupsById = useSelector(
     labwareIngredSelectors.getLiquidGroupsById
   )
@@ -172,7 +169,10 @@ export function IngredientsList(): JSX.Element {
     wellSelectionSelectors.getSelectedWellsCommonIngredId
   )
   const { t } = useTranslation('nav')
-  const dispatch: ThunkDispatch<any> = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<any>>()
+
+  const labwareWellContents =
+    (selectedLabwareId && allLabwareWellContents[selectedLabwareId]) || {}
 
   const removeWellsContents = (
     labwareId?: SelectedContainerId | null
