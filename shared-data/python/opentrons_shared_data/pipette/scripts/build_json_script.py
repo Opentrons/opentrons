@@ -85,7 +85,8 @@ def _build_drop_tip_data(
         plungerEject=PlungerEjectDropTipConfiguration(
             current=current,
             speed=speed,
-        )
+        ),
+        camAction=None,
     )
 
 
