@@ -3,7 +3,7 @@
 import sqlalchemy.engine
 
 # Re-export the latest schema.
-from .schema_2 import (
+from .schema_3 import (
     metadata,
     migration_table,
     protocol_table,
