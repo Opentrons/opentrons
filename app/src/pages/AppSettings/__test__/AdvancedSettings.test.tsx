@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { resetAllWhenMocks } from 'jest-when'
-import { screen, fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import {
   renderWithProviders,
   useConditionalConfirm,
@@ -25,7 +25,10 @@ import * as Config from '../../../redux/config'
 import * as ProtocolAnalysis from '../../../redux/protocol-analysis'
 import * as SystemInfo from '../../../redux/system-info'
 import * as Fixtures from '../../../redux/system-info/__fixtures__'
-import { EnableDevTools } from '../../../organisms/AdvancedSettings'
+import {
+  EnableDevTools,
+  OT2AdvancedSettings,
+} from '../../../organisms/AdvancedSettings'
 
 import { AdvancedSettings } from '../AdvancedSettings'
 
@@ -94,6 +97,9 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
 
+const mockOT2AdvancedSettings = OT2AdvancedSettings as jest.MockedFunction<
+  typeof OT2AdvancedSettings
+>
 const mockEnableDevTools = EnableDevTools as jest.MockedFunction<
   typeof EnableDevTools
 >
@@ -124,6 +130,7 @@ describe('AdvancedSettings', () => {
       showConfirmation: true,
       cancel: mockCancel,
     })
+    mockOT2AdvancedSettings.mockReturnValue(<div>mock OT2AdvancedSettings</div>)
     mockEnableDevTools.mockReturnValue(<div>mock EnableDevTools</div>)
   })
   afterEach(() => {
@@ -137,8 +144,6 @@ describe('AdvancedSettings', () => {
     getByText('Additional Custom Labware Source Folder')
     getByText('Prevent Robot Caching')
     getByText('Clear Unavailable Robots')
-    getByText('OT-2 Advanced Settings')
-    getByText('Tip Length Calibration Method')
     getByText('USB-to-Ethernet Adapter Information')
   })
   it('renders the update channel combobox and section', () => {
@@ -167,13 +172,9 @@ describe('AdvancedSettings', () => {
       properties: {},
     })
   })
-  it('renders the tip length cal section', () => {
-    const [{ getByRole }] = render()
-    getByRole('radio', { name: 'Always use calibration block to calibrate' })
-    getByRole('radio', { name: 'Always use trash bin to calibrate' })
-    getByRole('radio', {
-      name: 'Always show the prompt to choose calibration block or trash bin',
-    })
+  it('should render mock OT-2 Advanced Settings Tip Length Calibration Method section', () => {
+    render()
+    screen.getByText('mock OT2AdvancedSettings')
   })
   it('renders the robot caching section', () => {
     const [{ queryByText, getByRole }] = render()
