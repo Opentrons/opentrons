@@ -1333,6 +1333,12 @@
             "index": "pypi",
             "version": "==4.0.1"
         },
+        "types-paho-mqtt": {
+            "hashes": [
+                "sha256:6b486b9e4438c856cc0ac8312bf6a81c2bca1697bf36cde6d2ecddb44513550e"
+            ],
+            "version": "==1.6.0.20240106"
+        },
         "types-requests": {
             "hashes": [
                 "sha256:a5a305b43ea57bf64d6731f89816946a405b591eff6de28d4c0fd58422cee779",
