@@ -1,15 +1,15 @@
 """SQLite table schemas."""
 import sqlalchemy
 
-from . import legacy_pickle
-from .pickle_protocol_version import PICKLE_PROTOCOL_VERSION
-from ._utc_datetime import UTCDateTime
+from robot_server.persistence import legacy_pickle
+from robot_server.persistence.pickle_protocol_version import PICKLE_PROTOCOL_VERSION
+from robot_server.persistence._utc_datetime import UTCDateTime
 
-_metadata = sqlalchemy.MetaData()
+metadata = sqlalchemy.MetaData()
 
 migration_table = sqlalchemy.Table(
     "migration",
-    _metadata,
+    metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column("created_at", UTCDateTime, nullable=False),
     sqlalchemy.Column(
@@ -21,7 +21,7 @@ migration_table = sqlalchemy.Table(
 
 protocol_table = sqlalchemy.Table(
     "protocol",
-    _metadata,
+    metadata,
     sqlalchemy.Column(
         "id",
         sqlalchemy.String,
@@ -37,7 +37,7 @@ protocol_table = sqlalchemy.Table(
 
 analysis_table = sqlalchemy.Table(
     "analysis",
-    _metadata,
+    metadata,
     sqlalchemy.Column(
         "id",
         sqlalchemy.String,
@@ -72,10 +72,9 @@ analysis_table = sqlalchemy.Table(
     ),
 )
 
-
 run_table = sqlalchemy.Table(
     "run",
-    _metadata,
+    metadata,
     sqlalchemy.Column(
         "id",
         sqlalchemy.String,
@@ -112,7 +111,7 @@ run_table = sqlalchemy.Table(
 
 action_table = sqlalchemy.Table(
     "action",
-    _metadata,
+    metadata,
     sqlalchemy.Column(
         "id",
         sqlalchemy.String,
@@ -127,12 +126,3 @@ action_table = sqlalchemy.Table(
         nullable=False,
     ),
 )
-
-
-def add_tables_to_db(sql_engine: sqlalchemy.engine.Engine) -> None:
-    """Create the necessary database tables to back all data stores.
-
-    Params:
-        sql_engine: An engine for a blank SQL database, to put the tables in.
-    """
-    _metadata.create_all(sql_engine)
