@@ -30,9 +30,7 @@ export function TipPositionField(props: Props): JSX.Element {
   const {
     disabled,
     name,
-
     tooltipContent,
-
     updateValue,
     isIndeterminate,
     labwareId,
@@ -44,7 +42,7 @@ export function TipPositionField(props: Props): JSX.Element {
       ? labwareEntities[labwareId].def
       : null
 
-  let wellDepthMm: number = 0
+  let wellDepthMm = 0
   if (labwareDef != null) {
     // NOTE: only taking depth of first well in labware def, UI not currently equipped for multiple depths
     const firstWell = labwareDef.wells.A1
@@ -70,16 +68,16 @@ export function TipPositionField(props: Props): JSX.Element {
   const { t } = useTranslation('application')
   const isTouchTipField = getIsTouchTipField(name)
   const isDelayPositionField = getIsDelayPositionField(name)
-  let value: number = 0
-  const mmFromBottom = value ?? null
+  let value: string | number = '0'
+  const mmFromBottom = typeof value === 'number' ? value : null
   if (wellDepthMm !== null) {
     // show default value for field in parens if no mmFromBottom value is selected
     value =
-      mmFromBottom != null
+      mmFromBottom !== null
         ? mmFromBottom
         : getDefaultMmFromBottom({ name, wellDepthMm })
   }
-
+  console.log('mmFromBotom', mmFromBottom)
   const [targetProps, tooltipProps] = useHoverTooltip()
   return (
     <>
