@@ -28,7 +28,7 @@ import type { StepFieldName, StepIdType } from '../../form-types'
 
 export const StepEditForm = (): JSX.Element | null => {
   const { t } = useTranslation('tooltip')
-  const dispatch: ThunkDispatch<any> = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<any>>()
   const canSave = useSelector(stepFormSelectors.getCurrentFormCanBeSaved)
   const formData = useSelector(stepFormSelectors.getUnsavedForm)
   const formHasChanges = useSelector(
@@ -152,7 +152,7 @@ export const StepEditForm = (): JSX.Element | null => {
   }
 
   return (
-    <React.Fragment key={formData?.id ?? 'empty'}>
+    <React.Fragment key={formData.id}>
       {showConfirmDeleteModal && (
         <ConfirmDeleteModal
           modalType={DELETE_STEP_FORM}
