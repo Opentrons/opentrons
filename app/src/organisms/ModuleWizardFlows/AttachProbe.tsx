@@ -5,7 +5,7 @@ import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attac
 import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
-import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+import { WASTE_CHUTE_CUTOUT, CreateCommand } from '@opentrons/shared-data'
 import {
   LEFT,
   THERMOCYCLER_MODULE_MODELS,
@@ -41,7 +41,6 @@ const IN_PROGRESS_STYLE = css`
 `
 const BODY_STYLE = css`
   ${TYPOGRAPHY.pRegular};
-
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: 1.275rem;
     line-height: 1.75rem;
@@ -124,6 +123,70 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     })
   }
 
+  const bodyText = (
+    <>
+      <StyledText css={BODY_STYLE}>
+        <Trans
+          t={t}
+          i18nKey={'pipette_wizard_flows:install_probe'}
+          values={{ location: probeLocation }}
+          components={{
+            bold: <strong />,
+          }}
+        />
+      </StyledText>
+
+      {wasteChuteConflict && (
+        <Banner
+          type={isWasteChuteOnDeck ? 'error' : 'warning'}
+          size={isOnDevice ? '1.5rem' : '1rem'}
+          marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
+        >
+          {isWasteChuteOnDeck
+            ? t('pipette_wizard_flows:waste_chute_error')
+            : t('pipette_wizard_flows:waste_chute_warning')}
+        </Banner>
+      )}
+    </>
+  )
+
+  const handleBeginCalibration = (): void => {
+    if (adapterId == null) {
+      setErrorMessage('calibration adapter has not been loaded yet')
+      return
+    }
+    const homeCommands: CreateCommand[] = [
+      {
+        commandType: 'home' as const,
+        params: {
+          axes: attachedPipette.mount === LEFT ? ['leftZ'] : ['rightZ'],
+        },
+      },
+      {
+        commandType: 'calibration/calibrateModule',
+        params: {
+          moduleId: attachedModule.id,
+          labwareId: adapterId,
+          mount: attachedPipette.mount,
+        },
+      },
+      {
+        commandType: 'calibration/moveToMaintenancePosition' as const,
+        params: {
+          mount: attachedPipette.mount,
+        },
+      },
+    ]
+
+    chainRunCommands?.(homeCommands, false)
+      .then(() => {
+        proceed()
+      })
+      .catch((e: Error) => {
+        setErrorMessage(`error starting module calibration: ${e.message}`)
+      })
+  }
+
   if (isRobotMoving)
     return (
       <InProgressModal
@@ -146,77 +209,16 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         )}
       </InProgressModal>
     )
-
-  const bodyText = (
-    <>
-      <Trans
-        t={t}
-        i18nKey={'pipette_wizard_flows:install_probe'}
-        values={{ location: probeLocation }}
-        components={{
-          strong: <strong />,
-          block: <StyledText css={BODY_STYLE} />,
-        }}
-      />
-      {wasteChuteConflict && (
-        <Banner
-          type={isWasteChuteOnDeck ? 'error' : 'warning'}
-          size={isOnDevice ? '1.5rem' : '1rem'}
-          marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
-        >
-          {isWasteChuteOnDeck
-            ? t('pipette_wizard_flows:waste_chute_error')
-            : t('pipette_wizard_flows:waste_chute_warning')}
-        </Banner>
-      )}
-    </>
-  )
-
-  const handleBeginCalibration = (): void => {
-    if (adapterId == null) {
-      setErrorMessage('calibration adapter has not been loaded yet')
-      return
-    }
-    chainRunCommands?.(
-      [
-        {
-          commandType: 'home' as const,
-          params: {
-            axes: attachedPipette.mount === LEFT ? ['leftZ'] : ['rightZ'],
-          },
-        },
-        {
-          commandType: 'calibration/calibrateModule',
-          params: {
-            moduleId: attachedModule.id,
-            labwareId: adapterId,
-            mount: attachedPipette.mount,
-          },
-        },
-        {
-          commandType: 'calibration/moveToMaintenancePosition' as const,
-          params: {
-            mount: attachedPipette.mount,
-          },
-        },
-      ],
-      false
-    )
-      .then(() => proceed())
-      .catch((e: Error) =>
-        setErrorMessage(`error starting module calibration: ${e.message}`)
-      )
-  }
-
   // TODO: add calibration loading screen and error screen
-  return (
-    <GenericWizardTile
-      header={i18n.format(t('attach_probe'), 'capitalize')}
-      rightHandBody={pipetteAttachProbeVid}
-      bodyText={bodyText}
-      proceedButtonText={t('begin_calibration')}
-      proceed={handleBeginCalibration}
-      back={goBack}
-    />
-  )
+  else
+    return (
+      <GenericWizardTile
+        header={i18n.format(t('attach_probe'), 'capitalize')}
+        rightHandBody={pipetteAttachProbeVid}
+        bodyText={bodyText}
+        proceedButtonText={t('begin_calibration')}
+        proceed={handleBeginCalibration}
+        back={goBack}
+      />
+    )
 }

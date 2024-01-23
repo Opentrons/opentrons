@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { UseQueryResult } from 'react-query'
 
@@ -31,7 +31,6 @@ import type {
 jest.mock('@opentrons/react-api-client/src/deck_configuration')
 jest.mock('../../ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../useAttachedModules')
-jest.mock('../useProtocolDetailsForRun')
 jest.mock('../useStoredProtocolAnalysis')
 jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 

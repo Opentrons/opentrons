@@ -25,7 +25,6 @@ import {
 } from '@opentrons/react-api-client'
 import {
   getPipetteModelSpecs,
-  HEATERSHAKER_MODULE_TYPE,
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
@@ -106,6 +105,7 @@ import { RunProgressMeter } from '../../RunProgressMeter'
 import { getIsFixtureMismatch } from '../../../resources/deck_configuration/utils'
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentRunId } from '../../ProtocolUpload/hooks/useMostRecentRunId'
 
 import type { Run, RunError } from '@opentrons/api-client'
 import type { State } from '../../../redux/types'
@@ -161,6 +161,7 @@ export function ProtocolRunHeader({
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const { data: attachedInstruments } = useInstrumentsQuery()
   const isRunCurrent = Boolean(useRunQuery(runId)?.data?.data?.current)
+  const mostRecentRunId = useMostRecentRunId()
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const [showRunFailedModal, setShowRunFailedModal] = React.useState(false)
@@ -203,33 +204,35 @@ export function ProtocolRunHeader({
   }
 
   React.useEffect(() => {
-    // Reset drop tip state when a new run occurs.
-    if (runStatus === RUN_STATUS_IDLE) {
-      setShowDropTipBanner(true)
-      setPipettesWithTip([])
-    } else if (runStatus != null && RUN_OVER_STATUSES.includes(runStatus)) {
-      getPipettesWithTipAttached({
-        host,
-        runId,
-        runRecord,
-        attachedInstruments,
-        isFlex,
-      })
-        .then(pipettesWithTipAttached => {
-          const newPipettesWithTipAttached = pipettesWithTipAttached.map(
-            pipette => {
-              const specs = getPipetteModelSpecs(pipette.instrumentModel)
-              return {
-                specs,
-                mount: pipette.mount,
+    if (isFlex) {
+      // Reset drop tip state when a new run occurs.
+      if (runStatus === RUN_STATUS_IDLE) {
+        setShowDropTipBanner(true)
+        setPipettesWithTip([])
+      } else if (runStatus != null && RUN_OVER_STATUSES.includes(runStatus)) {
+        getPipettesWithTipAttached({
+          host,
+          runId,
+          runRecord,
+          attachedInstruments,
+          isFlex,
+        })
+          .then(pipettesWithTipAttached => {
+            const newPipettesWithTipAttached = pipettesWithTipAttached.map(
+              pipette => {
+                const specs = getPipetteModelSpecs(pipette.instrumentModel)
+                return {
+                  specs,
+                  mount: pipette.mount,
+                }
               }
-            }
-          )
-          setPipettesWithTip(() => newPipettesWithTipAttached)
-        })
-        .catch(e => {
-          console.log(`Error checking pipette tip attachement state: ${e}`)
-        })
+            )
+            setPipettesWithTip(() => newPipettesWithTipAttached)
+          })
+          .catch(e => {
+            console.log(`Error checking pipette tip attachement state: ${e}`)
+          })
+      }
     }
   }, [runStatus, attachedInstruments, host, runId, runRecord, isFlex])
 
@@ -333,7 +336,7 @@ export function ProtocolRunHeader({
               <StyledText
                 as="h2"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                color={COLORS.blueEnabled}
+                color={COLORS.blue50}
               >
                 {displayName}
               </StyledText>
@@ -360,7 +363,7 @@ export function ProtocolRunHeader({
         CANCELLABLE_STATUSES.includes(runStatus) ? (
           <Banner type="warning">{t('shared:close_robot_door')}</Banner>
         ) : null}
-        {isRunCurrent ? (
+        {mostRecentRunId === runId ? (
           <TerminalRunBanner
             {...{
               runStatus,
@@ -371,7 +374,9 @@ export function ProtocolRunHeader({
             }}
           />
         ) : null}
-        {isRunCurrent && showDropTipBanner && pipettesWithTip.length !== 0 ? (
+        {mostRecentRunId === runId &&
+        showDropTipBanner &&
+        pipettesWithTip.length !== 0 ? (
           <ProtocolDropTipBanner
             onLaunchWizardClick={setShowDropTipWizard}
             onCloseClick={() => {
@@ -407,7 +412,7 @@ export function ProtocolRunHeader({
         </Box>
         {runStatus != null ? (
           <Box
-            backgroundColor={COLORS.fundamentalsBackground}
+            backgroundColor={COLORS.grey10}
             display="grid"
             gridTemplateColumns="4fr 6fr 4fr"
             padding={SPACING.spacing8}
@@ -449,7 +454,7 @@ export function ProtocolRunHeader({
         ) : null}
         {showDropTipWizard &&
         pipettesWithTip[0]?.specs != null &&
-        isRunCurrent ? (
+        mostRecentRunId === runId ? (
           <DropTipWizard
             robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
             mount={pipettesWithTip[0].mount}
@@ -498,14 +503,14 @@ function DisplayRunStatus(props: DisplayRunStatusProps): JSX.Element {
       {props.runStatus === RUN_STATUS_RUNNING ? (
         <Icon
           name="circle"
-          color={COLORS.blueEnabled}
+          color={COLORS.blue50}
           size={SPACING.spacing4}
           marginRight={SPACING.spacing4}
           data-testid="running_circle"
         >
           <animate
             attributeName="fill"
-            values={`${COLORS.blueEnabled}; transparent`}
+            values={`${COLORS.blue50}; transparent`}
             dur="1s"
             calcMode="discrete"
             repeatCount="indefinite"
@@ -635,15 +640,14 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
   const activeHeaterShaker = attachedModules.find(
     (module): module is HeaterShakerModule =>
-      module.moduleType === HEATERSHAKER_MODULE_TYPE &&
+      module.moduleType === 'heaterShakerModuleType' &&
       module?.data != null &&
       module.data.speedStatus !== 'idle'
   )
   const isHeaterShakerShaking = attachedModules
-    .filter(
-      (module): module is HeaterShakerModule =>
-        module.moduleType === HEATERSHAKER_MODULE_TYPE
-    )
+    .filter((module): module is HeaterShakerModule => {
+      return module.moduleType === 'heaterShakerModuleType'
+    })
     .some(module => module?.data != null && module.data.speedStatus !== 'idle')
 
   let buttonText: string = ''

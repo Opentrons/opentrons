@@ -56,6 +56,18 @@ def get_provided_addressable_area_names(
         ) from exception
 
 
+def get_addressable_area_display_name(
+    addressable_area_name: str, deck_definition: DeckDefinitionV4
+) -> str:
+    """Get the display name for an addressable area name."""
+    for addressable_area in deck_definition["locations"]["addressableAreas"]:
+        if addressable_area["id"] == addressable_area_name:
+            return addressable_area["displayName"]
+    raise AddressableAreaDoesNotExistError(
+        f"Could not find addressable area with name {addressable_area_name}"
+    )
+
+
 def get_potential_cutout_fixtures(
     addressable_area_name: str, deck_definition: DeckDefinitionV4
 ) -> Tuple[str, Set[PotentialCutoutFixture]]:

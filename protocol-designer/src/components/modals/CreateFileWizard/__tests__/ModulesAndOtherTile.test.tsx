@@ -1,7 +1,8 @@
 import * as React from 'react'
-import i18n from 'i18next'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { i18n } from '../../../../localization'
 import { getDisableModuleRestrictions } from '../../../../feature-flags/selectors'
 import { CrashInfoBox } from '../../../modules'
 import { ModuleFields } from '../../FilePipettesModal/ModuleFields'
@@ -74,14 +75,15 @@ describe('ModulesAndOtherTile', () => {
     mockGetDisableModuleRestrictions.mockReturnValue(false)
     mockModuleFields.mockReturnValue(<div>mock ModuleFields</div>)
   })
+
   it('renders correct module, gripper and trash length for flex with disabled button', () => {
-    const { getByText, getAllByText, getByRole } = render(props)
-    getByText('Choose additional items')
-    expect(getAllByText('mock EquipmentOption')).toHaveLength(7)
-    getByText('Go back')
-    getByRole('button', { name: 'GoBack_button' }).click()
+    render(props)
+    screen.getByText('Choose additional items')
+    expect(screen.getAllByText('mock EquipmentOption')).toHaveLength(7)
+    screen.getByText('Go back')
+    fireEvent.click(screen.getByRole('button', { name: 'GoBack_button' }))
     expect(props.goBack).toHaveBeenCalled()
-    expect(getByText('Review file details')).toBeDisabled()
+    expect(screen.getByText('Review file details')).toBeDisabled()
   })
   it('renders correct module, gripper and trash length for flex', () => {
     props = {
@@ -91,13 +93,13 @@ describe('ModulesAndOtherTile', () => {
         additionalEquipment: ['trashBin'],
       },
     } as WizardTileProps
-    const { getByText, getAllByText, getByRole } = render(props)
-    getByText('Choose additional items')
-    expect(getAllByText('mock EquipmentOption')).toHaveLength(7)
-    getByText('Go back')
-    getByRole('button', { name: 'GoBack_button' }).click()
+    render(props)
+    screen.getByText('Choose additional items')
+    expect(screen.getAllByText('mock EquipmentOption')).toHaveLength(7)
+    screen.getByText('Go back')
+    fireEvent.click(screen.getByRole('button', { name: 'GoBack_button' }))
     expect(props.goBack).toHaveBeenCalled()
-    getByText('Review file details').click()
+    fireEvent.click(screen.getByText('Review file details'))
     expect(props.proceed).toHaveBeenCalled()
   })
   it('renders correct module length for ot-2', () => {
@@ -124,11 +126,11 @@ describe('ModulesAndOtherTile', () => {
       ...props,
       ...mockWizardTileProps,
     } as WizardTileProps
-    const { getByText } = render(props)
-    getByText('Choose additional items')
-    getByText('mock ModuleFields')
-    getByText('mock CrashInfoBox')
-    getByText('Go back')
-    getByText('Review file details')
+    render(props)
+    screen.getByText('Choose additional items')
+    screen.getByText('mock ModuleFields')
+    screen.getByText('mock CrashInfoBox')
+    screen.getByText('Go back')
+    screen.getByText('Review file details')
   })
 })

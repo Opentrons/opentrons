@@ -1,6 +1,7 @@
-import { useConditionalConfirm } from '@opentrons/components'
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
+import { useConditionalConfirm } from '@opentrons/components'
 import { actions } from '../../steplist'
 import { actions as stepsActions } from '../../ui/steps'
 import { resetScrollElements } from '../../ui/steps/utils'
@@ -63,7 +64,7 @@ const StepEditFormManager = (
     saveStepForm,
     invariantContext,
   } = props
-
+  const { t } = useTranslation('tooltip')
   const [
     showMoreOptionsModal,
     setShowMoreOptionsModal,
@@ -146,7 +147,8 @@ const StepEditFormManager = (
     focusHandlers,
     formData,
     handleChangeFormInput,
-    hydratedForm
+    hydratedForm,
+    t
   )
   let handleSave = saveStepForm
   if (isPristineSetTempForm) {

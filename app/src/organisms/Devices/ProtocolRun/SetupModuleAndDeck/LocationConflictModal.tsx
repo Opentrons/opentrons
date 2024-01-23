@@ -44,6 +44,7 @@ import type {
 interface LocationConflictModalProps {
   onCloseClick: () => void
   cutoutId: CutoutId
+  missingLabwareDisplayName?: string | null
   requiredFixtureId?: CutoutFixtureId
   requiredModule?: ModuleModel
   isOnDevice?: boolean
@@ -55,6 +56,7 @@ export const LocationConflictModal = (
   const {
     onCloseClick,
     cutoutId,
+    missingLabwareDisplayName,
     requiredFixtureId,
     requiredModule,
     isOnDevice = false,
@@ -96,6 +98,15 @@ export const LocationConflictModal = (
     onCloseClick()
   }
 
+  let protocolSpecifiesDisplayName = ''
+  if (missingLabwareDisplayName != null) {
+    protocolSpecifiesDisplayName = missingLabwareDisplayName
+  } else if (requiredFixtureId != null) {
+    protocolSpecifiesDisplayName = getFixtureDisplayName(requiredFixtureId)
+  } else if (requiredModule != null) {
+    protocolSpecifiesDisplayName = getModuleDisplayName(requiredModule)
+  }
+
   return (
     <Portal level="top">
       {isOnDevice ? (
@@ -106,7 +117,7 @@ export const LocationConflictModal = (
             hasExitIcon: true,
             onClick: onCloseClick,
             iconName: 'ot-alert',
-            iconColor: COLORS.warningEnabled,
+            iconColor: COLORS.yellow50,
           }}
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
@@ -139,7 +150,7 @@ export const LocationConflictModal = (
               >
                 <Flex
                   padding={SPACING.spacing24}
-                  backgroundColor={COLORS.light1}
+                  backgroundColor={COLORS.grey35}
                   flexDirection={DIRECTION_ROW}
                   alignItems={ALIGN_CENTER}
                   justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -149,16 +160,11 @@ export const LocationConflictModal = (
                     {t('protocol_specifies')}
                   </StyledText>
 
-                  <StyledText as="p">
-                    {requiredFixtureId != null &&
-                      getFixtureDisplayName(requiredFixtureId)}
-                    {requiredModule != null &&
-                      getModuleDisplayName(requiredModule)}
-                  </StyledText>
+                  <StyledText as="p">{protocolSpecifiesDisplayName}</StyledText>
                 </Flex>
                 <Flex
                   padding={SPACING.spacing24}
-                  backgroundColor={COLORS.light1}
+                  backgroundColor={COLORS.grey35}
                   flexDirection={DIRECTION_ROW}
                   justifyContent={JUSTIFY_SPACE_BETWEEN}
                   alignItems={ALIGN_CENTER}
@@ -199,7 +205,7 @@ export const LocationConflictModal = (
               gridGap={SPACING.spacing10}
               alignItems={ALIGN_CENTER}
             >
-              <Icon name="ot-alert" size="1rem" color={COLORS.warningEnabled} />
+              <Icon name="ot-alert" size="1rem" color={COLORS.yellow50} />
               <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {t('deck_conflict')}
               </StyledText>
@@ -237,7 +243,7 @@ export const LocationConflictModal = (
               >
                 <Flex
                   padding={SPACING.spacing8}
-                  backgroundColor={COLORS.fundamentalsBackground}
+                  backgroundColor={COLORS.grey10}
                   flexDirection={DIRECTION_ROW}
                   gridGap={SPACING.spacing20}
                   alignItems={ALIGN_CENTER}
@@ -248,15 +254,12 @@ export const LocationConflictModal = (
                     </StyledText>
                   </Box>
                   <StyledText as="label">
-                    {requiredFixtureId != null &&
-                      getFixtureDisplayName(requiredFixtureId)}
-                    {requiredModule != null &&
-                      getModuleDisplayName(requiredModule)}
+                    {protocolSpecifiesDisplayName}
                   </StyledText>
                 </Flex>
                 <Flex
                   padding={SPACING.spacing8}
-                  backgroundColor={COLORS.fundamentalsBackground}
+                  backgroundColor={COLORS.grey10}
                   flexDirection={DIRECTION_ROW}
                   gridGap={SPACING.spacing20}
                   alignItems={ALIGN_CENTER}

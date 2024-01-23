@@ -44,6 +44,7 @@ import {
   COLUMN_4_SLOTS,
 } from '@opentrons/step-generation'
 import type {
+  AddressableAreaName,
   CommandAnnotationV1Mixin,
   CommandV8Mixin,
   CreateCommand,
@@ -113,7 +114,6 @@ export const createFile: Selector<ProtocolFile> = createSelector(
   stepFormSelectors.getPipetteEntities,
   uiLabwareSelectors.getLabwareNicknamesById,
   labwareDefSelectors.getLabwareDefsByURI,
-
   (
     fileMetadata,
     initialRobotState,
@@ -282,7 +282,12 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         } else if (isOnAdapter) {
           location = { labwareId: labware.slot }
         } else if (isAddressableAreaName) {
-          location = { addressableAreaName: labware.slot }
+          // TODO(bh, 2024-01-02): check slots against addressable areas via the deck definition
+          location = {
+            addressableAreaName: labware.slot as AddressableAreaName,
+          }
+        } else if (labware.slot === 'offDeck') {
+          location = 'offDeck'
         }
 
         const loadLabwareCommands = {

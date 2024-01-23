@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 import { renderWithProviders, nestedTextMatcher } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { UpdateResultsModal } from '../UpdateResultsModal'
@@ -14,9 +15,11 @@ describe('UpdateResultsModal', () => {
   beforeEach(() => {
     props = {
       isSuccess: true,
-      closeModal: jest.fn(),
+      shouldExit: true,
+      onClose: jest.fn(),
       instrument: {
         ok: true,
+        instrumentType: 'gripper',
         subsystem: 'gripper',
         instrumentModel: 'gripper',
       } as any,
@@ -25,17 +28,18 @@ describe('UpdateResultsModal', () => {
   it('renders correct text for a successful instrument update', () => {
     const { getByText } = render(props)
     getByText('Successful update!')
-    getByText(nestedTextMatcher('Your Gripper is ready to use!'))
+    getByText(nestedTextMatcher('Your Flex Gripper is ready to use!'))
   })
   it('calls close modal when the close button is pressed', () => {
     const { getByText } = render(props)
-    getByText('Close').click()
-    expect(props.closeModal).toHaveBeenCalled()
+    fireEvent.click(getByText('Close'))
+    expect(props.onClose).toHaveBeenCalled()
   })
   it('renders correct text for a failed instrument update', () => {
     props = {
       isSuccess: false,
-      closeModal: jest.fn(),
+      shouldExit: true,
+      onClose: jest.fn(),
       instrument: {
         ok: false,
       } as any,

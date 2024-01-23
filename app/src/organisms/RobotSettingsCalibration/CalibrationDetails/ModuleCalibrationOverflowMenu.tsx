@@ -22,6 +22,7 @@ import { useRunStatuses } from '../../Devices/hooks'
 import { getModulePrepCommands } from '../../Devices/getModulePrepCommands'
 import { ModuleWizardFlows } from '../../ModuleWizardFlows'
 import { getModuleTooHot } from '../../Devices/getModuleTooHot'
+import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { AttachedModule } from '../../../redux/modules/types'
 import type { FormattedPipetteOffsetCalibration } from '..'
@@ -30,6 +31,7 @@ interface ModuleCalibrationOverflowMenuProps {
   attachedModule: AttachedModule
   updateRobotStatus: (isRobotBusy: boolean) => void
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
+  robotName: string
 }
 
 export function ModuleCalibrationOverflowMenu({
@@ -37,6 +39,7 @@ export function ModuleCalibrationOverflowMenu({
   attachedModule,
   updateRobotStatus,
   formattedPipetteOffsetCalibrations,
+  robotName,
 }: ModuleCalibrationOverflowMenuProps): JSX.Element {
   const { t } = useTranslation([
     'device_settings',
@@ -70,6 +73,8 @@ export function ModuleCalibrationOverflowMenu({
     setPrepCommandErrorMessage,
   ] = React.useState<string>('')
 
+  const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
+
   const handleCalibration = (): void => {
     chainLiveCommands(getModulePrepCommands(attachedModule), false).catch(
       (e: Error) => {
@@ -92,6 +97,7 @@ export function ModuleCalibrationOverflowMenu({
         alignSelf={ALIGN_FLEX_END}
         aria-label="ModuleCalibrationOverflowMenu"
         onClick={handleOverflowClick}
+        disabled={isEstopNotDisengaged}
       />
       {showModuleWizard ? (
         <ModuleWizardFlows

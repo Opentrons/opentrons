@@ -309,9 +309,20 @@ class LabwareView(HasState[LabwareState]):
             LabwareUri(self.get(labware_id).definitionUri)
         )
 
-    def get_display_name(self, labware_id: str) -> Optional[str]:
+    def get_user_specified_display_name(self, labware_id: str) -> Optional[str]:
         """Get the labware's user-specified display name, if set."""
         return self.get(labware_id).displayName
+
+    def get_display_name(self, labware_id: str) -> str:
+        """Get the labware's display name.
+
+        If a user-specified display name exists, will return that, else will return
+        display name from the definition.
+        """
+        return (
+            self.get_user_specified_display_name(labware_id)
+            or self.get_definition(labware_id).metadata.displayName
+        )
 
     def get_deck_definition(self) -> DeckDefinitionV4:
         """Get the current deck definition."""
@@ -369,6 +380,28 @@ class LabwareView(HasState[LabwareState]):
         """Get a labware's quirks."""
         definition = self.get_definition(labware_id)
         return definition.parameters.quirks or []
+
+    def get_should_center_column_on_target_well(self, labware_id: str) -> bool:
+        """True if a pipette moving to this labware should center its active column on the target.
+
+        This is true for labware that have wells spanning entire columns.
+        """
+        has_quirk = self.get_has_quirk(labware_id, "centerMultichannelOnWells")
+        return has_quirk and (
+            len(self.get_definition(labware_id).wells) > 1
+            and len(self.get_definition(labware_id).wells) < 96
+        )
+
+    def get_should_center_pipette_on_target_well(self, labware_id: str) -> bool:
+        """True if a pipette moving to a well of this labware should center its body on the target.
+
+        This is true for 1-well reservoirs no matter the pipette, and for large plates.
+        """
+        has_quirk = self.get_has_quirk(labware_id, "centerMultichannelOnWells")
+        return has_quirk and (
+            len(self.get_definition(labware_id).wells) == 1
+            or len(self.get_definition(labware_id).wells) >= 96
+        )
 
     def get_well_definition(
         self,
@@ -655,7 +688,6 @@ class LabwareView(HasState[LabwareState]):
                 DeckSlotName.SLOT_A3,
             }:
                 return labware.id
-
         return None
 
     def is_fixed_trash(self, labware_id: str) -> bool:

@@ -27,7 +27,7 @@ export const EmanatingNozzle = (props: {
         fill={C_TRANSPARENT}
       >
         <animate
-          data-testid="animation_radius"
+          data-testid="radius_animation"
           attributeName="r"
           from={5}
           to={SINGLE_CHANNEL_PIPETTE_HEIGHT / 2}
@@ -37,7 +37,7 @@ export const EmanatingNozzle = (props: {
           repeatCount="indefinite"
         />
         <animate
-          data-testid="animation_radius"
+          data-testid="opacity_animation"
           attributeName="opacity"
           from={0.7}
           to={0}

@@ -28,7 +28,7 @@ import { useSortedProtocols } from './hooks'
 import { StyledText } from '../../atoms/text'
 import { Slideout } from '../../atoms/Slideout'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
-import { SendProtocolToOT3Slideout } from '../SendProtocolToOT3Slideout'
+import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { ProtocolUploadInput } from './ProtocolUploadInput'
 import { ProtocolCard } from './ProtocolCard'
 import { EmptyStateLinks } from './EmptyStateLinks'
@@ -42,11 +42,11 @@ const SORT_BY_BUTTON_STYLE = css`
   background-color: ${COLORS.transparent};
   cursor: pointer;
   &:hover {
-    background-color: ${COLORS.medGreyHover};
+    background-color: ${COLORS.grey60};
   }
   &:active,
   &:focus {
-    background-color: ${COLORS.medGreyEnabled};
+    background-color: ${COLORS.grey30};
   }
 `
 const FLEX = 'Flex'
@@ -64,8 +64,8 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
     setShowChooseRobotToRunProtocolSlideout,
   ] = React.useState<boolean>(false)
   const [
-    showSendProtocolToOT3Slideout,
-    setShowSendProtocolToOT3Slideout,
+    showSendProtocolToFlexSlideout,
+    setShowSendProtocolToFlexSlideout,
   ] = React.useState<boolean>(false)
   const sortBy = useSelector(getProtocolsDesktopSortKey) ?? 'alphabetical'
   const [showSortByMenu, setShowSortByMenu] = React.useState<boolean>(false)
@@ -121,11 +121,11 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
     setShowChooseRobotToRunProtocolSlideout(true)
   }
 
-  const handleSendProtocolToOT3 = (
+  const handleSendProtocolToFlex = (
     storedProtocol: StoredProtocolData
   ): void => {
     setSelectedProtocol(storedProtocol)
-    setShowSendProtocolToOT3Slideout(true)
+    setShowSendProtocolToFlexSlideout(true)
   }
 
   return (
@@ -133,15 +133,15 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
       {selectedProtocol != null ? (
         <>
           <ChooseRobotToRunProtocolSlideout
-            key={selectedProtocol.protocolKey}
+            key={`ChooseRobotToRunProtocolSlideout_${selectedProtocol.protocolKey}`}
             onCloseClick={() => setShowChooseRobotToRunProtocolSlideout(false)}
             showSlideout={showChooseRobotToRunProtocolSlideout}
             storedProtocolData={selectedProtocol}
           />
-          <SendProtocolToOT3Slideout
-            key={selectedProtocol.protocolKey}
-            isExpanded={showSendProtocolToOT3Slideout}
-            onCloseClick={() => setShowSendProtocolToOT3Slideout(false)}
+          <SendProtocolToFlexSlideout
+            key={`SendProtocolToFlexSlideout_${selectedProtocol.protocolKey}`}
+            isExpanded={showSendProtocolToFlexSlideout}
+            onCloseClick={() => setShowSendProtocolToFlexSlideout(false)}
             storedProtocolData={selectedProtocol}
           />
         </>
@@ -161,7 +161,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
             <StyledText
               as="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.grey50}
             >
               {t('shared:sort_by')}
             </StyledText>
@@ -242,7 +242,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
           <ProtocolCard
             key={storedProtocol.protocolKey}
             handleRunProtocol={handleRunProtocol}
-            handleSendProtocolToOT3={handleSendProtocolToOT3}
+            handleSendProtocolToFlex={handleSendProtocolToFlex}
             storedProtocolData={storedProtocol}
           />
         ))}

@@ -22,21 +22,22 @@ import {
   DIRECTION_ROW,
 } from '@opentrons/components'
 
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   getConnectableRobots,
   getReachableRobots,
   getUnreachableRobots,
   getScanning,
   startDiscovery,
+  RE_ROBOT_MODEL_OT2,
   RE_ROBOT_MODEL_OT3,
-  ROBOT_MODEL_OT3,
 } from '../../redux/discovery'
-import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { Banner } from '../../atoms/Banner'
 import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
 import { AvailableRobotOption } from './AvailableRobotOption'
 
+import type { RobotType } from '@opentrons/shared-data'
 import type { SlideoutProps } from '../../atoms/Slideout'
 import type { UseCreateRun } from '../../organisms/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import type { State, Dispatch } from '../../redux/types'
@@ -81,10 +82,12 @@ function robotBusyStatusByNameReducer(
 interface ChooseRobotSlideoutProps
   extends Omit<SlideoutProps, 'children'>,
     Partial<UseCreateRun> {
+  isSelectedRobotOnDifferentSoftwareVersion: boolean
+  robotType: RobotType | null
   selectedRobot: Robot | null
   setSelectedRobot: (robot: Robot | null) => void
-  showOT3Only?: boolean
   isAnalysisError?: boolean
+  showIdleOnly?: boolean
 }
 
 export function ChooseRobotSlideout(
@@ -96,31 +99,53 @@ export function ChooseRobotSlideout(
     onCloseClick,
     title,
     footer,
-    showOT3Only = false,
     isAnalysisError = false,
     isCreatingRun = false,
+    isSelectedRobotOnDifferentSoftwareVersion,
     reset: resetCreateRun,
     runCreationError,
     runCreationErrorCode,
     selectedRobot,
     setSelectedRobot,
+    robotType,
+    showIdleOnly = false,
   } = props
   const dispatch = useDispatch<Dispatch>()
   const isScanning = useSelector((state: State) => getScanning(state))
 
   const unhealthyReachableRobots = useSelector((state: State) =>
     getReachableRobots(state)
-  ).filter(robot =>
-    showOT3Only ? RE_ROBOT_MODEL_OT3.test(robot.robotModel) : true
-  )
+  ).filter(robot => {
+    if (robotType === FLEX_ROBOT_TYPE) {
+      return RE_ROBOT_MODEL_OT3.test(robot.robotModel)
+    } else if (robotType === OT2_ROBOT_TYPE) {
+      return RE_ROBOT_MODEL_OT2.test(robot.robotModel)
+    } else {
+      return true
+    }
+  })
   const unreachableRobots = useSelector((state: State) =>
     getUnreachableRobots(state)
-  ).filter(robot =>
-    showOT3Only ? RE_ROBOT_MODEL_OT3.test(robot.robotModel) : true
-  )
+  ).filter(robot => {
+    if (robotType === FLEX_ROBOT_TYPE) {
+      return RE_ROBOT_MODEL_OT3.test(robot.robotModel)
+    } else if (robotType === OT2_ROBOT_TYPE) {
+      return RE_ROBOT_MODEL_OT2.test(robot.robotModel)
+    } else {
+      return true
+    }
+  })
   const healthyReachableRobots = useSelector((state: State) =>
     getConnectableRobots(state)
-  ).filter(robot => (showOT3Only ? robot.robotModel === ROBOT_MODEL_OT3 : true))
+  ).filter(robot => {
+    if (robotType === FLEX_ROBOT_TYPE) {
+      return robot.robotModel === FLEX_ROBOT_TYPE
+    } else if (robotType === OT2_ROBOT_TYPE) {
+      return robot.robotModel === OT2_ROBOT_TYPE
+    } else {
+      return true
+    }
+  })
 
   const [robotBusyStatusByName, registerRobotBusyStatus] = React.useReducer(
     robotBusyStatusByNameReducer,
@@ -140,24 +165,8 @@ export function ChooseRobotSlideout(
     }
   }, [healthyReachableRobots, selectedRobot, setSelectedRobot])
 
-  const isSelectedRobotOnWrongVersionOfSoftware = [
-    'upgrade',
-    'downgrade',
-  ].includes(
-    useSelector((state: State) => {
-      const value =
-        selectedRobot != null
-          ? getRobotUpdateDisplayInfo(state, selectedRobot.name)
-          : { autoUpdateAction: '' }
-      return value
-    })?.autoUpdateAction
-  )
-
   const unavailableCount =
     unhealthyReachableRobots.length + unreachableRobots.length
-
-  // for now, the only use case for showing idle only is also the only use case for showing OT-3 only
-  const showIdleOnly = showOT3Only
 
   return (
     <Slideout
@@ -175,7 +184,7 @@ export function ChooseRobotSlideout(
             <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
               <StyledText
                 as="p"
-                color={COLORS.darkGreyEnabled}
+                color={COLORS.grey50}
                 marginRight={SPACING.spacing12}
               >
                 {t('app_settings:searching')}
@@ -184,7 +193,7 @@ export function ChooseRobotSlideout(
                 name="ot-spinner"
                 spin
                 size="1.25rem"
-                color={COLORS.darkGreyEnabled}
+                color={COLORS.grey50}
               />
             </Flex>
           ) : (
@@ -203,7 +212,7 @@ export function ChooseRobotSlideout(
             css={css`
               ${BORDERS.cardOutlineBorder}
               &:hover {
-                border-color: ${COLORS.medGreyEnabled};
+                border-color: ${COLORS.grey30};
               }
             `}
             flexDirection={DIRECTION_COLUMN}
@@ -222,11 +231,9 @@ export function ChooseRobotSlideout(
             const isSelected =
               selectedRobot != null && selectedRobot.ip === robot.ip
             return (
-              <>
+              <React.Fragment key={robot.ip}>
                 <AvailableRobotOption
-                  key={robot.ip}
                   robot={robot}
-                  // TODO: generalize to a disabled/reset prop
                   onClick={() => {
                     if (!isCreatingRun) {
                       resetCreateRun?.()
@@ -235,8 +242,8 @@ export function ChooseRobotSlideout(
                   }}
                   isError={runCreationError != null}
                   isSelected={isSelected}
-                  isOnDifferentSoftwareVersion={
-                    isSelectedRobotOnWrongVersionOfSoftware
+                  isSelectedRobotOnDifferentSoftwareVersion={
+                    isSelectedRobotOnDifferentSoftwareVersion
                   }
                   showIdleOnly={showIdleOnly}
                   registerRobotBusyStatus={registerRobotBusyStatus}
@@ -244,7 +251,7 @@ export function ChooseRobotSlideout(
                 {runCreationError != null && isSelected && (
                   <StyledText
                     as="label"
-                    color={COLORS.errorText}
+                    color={COLORS.red60}
                     overflowWrap="anywhere"
                     display={DISPLAY_INLINE_BLOCK}
                     marginTop={`-${SPACING.spacing8}`}
@@ -258,7 +265,7 @@ export function ChooseRobotSlideout(
                           robotLink: (
                             <NavLink
                               css={css`
-                                color: ${COLORS.errorText};
+                                color: ${COLORS.red60};
                                 text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
                               `}
                               to={`/devices/${robot.name}`}
@@ -271,7 +278,7 @@ export function ChooseRobotSlideout(
                     )}
                   </StyledText>
                 )}
-              </>
+              </React.Fragment>
             )
           })
         )}
@@ -282,7 +289,7 @@ export function ChooseRobotSlideout(
             textAlign={TYPOGRAPHY.textAlignCenter}
             marginTop={SPACING.spacing24}
           >
-            <StyledText as="p" color={COLORS.darkGreyEnabled}>
+            <StyledText as="p" color={COLORS.grey50}>
               {showIdleOnly
                 ? t('unavailable_or_busy_robot_not_listed', {
                     count: unavailableCount + reducerBusyCount,

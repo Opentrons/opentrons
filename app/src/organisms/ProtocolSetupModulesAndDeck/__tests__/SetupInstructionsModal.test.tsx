@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -36,7 +37,7 @@ describe('SetupInstructionsModal', () => {
 
   it('should call mock function when tapping close icon', () => {
     const [{ getByLabelText }] = render(props)
-    getByLabelText('closeIcon').click()
+    fireEvent.click(getByLabelText('closeIcon'))
     expect(mockSetShowSetupInstructionsModal).toHaveBeenCalled()
   })
 })

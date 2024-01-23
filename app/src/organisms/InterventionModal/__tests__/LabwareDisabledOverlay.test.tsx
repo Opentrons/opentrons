@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { render } from '@testing-library/react'
 
+import { COLORS } from '@opentrons/components'
 import { LabwareDisabledOverlay } from '../LabwareDisabledOverlay'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
@@ -24,8 +25,8 @@ describe('LabwareDisabledOverlay', () => {
 
     expect(overlayBg).toHaveAttribute('width', '84')
     expect(overlayBg).toHaveAttribute('height', '42')
-    expect(overlayBg).toHaveAttribute('fill', '#ffffff')
+    expect(overlayBg).toHaveAttribute('fill', '#FFFFFF')
     expect(overlayBg).toHaveAttribute('fill-opacity', '0.9')
-    expect(overlayIcon).toHaveAttribute('stroke', '#bf0000')
+    expect(overlayIcon).toHaveAttribute('stroke', COLORS.red50)
   })
 })

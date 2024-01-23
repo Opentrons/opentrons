@@ -124,8 +124,9 @@ export const duplicateLabware: (
   const templateLabwareIdIsOffDeck =
     initialDeckSetup.labware[templateLabwareId].slot === 'offDeck'
   const duplicateSlot = getNextAvailableDeckSlot(initialDeckSetup, robotType)
-  if (!duplicateSlot)
-    console.warn('no slots available, cannot duplicate labware')
+  if (duplicateSlot == null) {
+    console.error('no slots available, cannot duplicate labware')
+  }
   const allNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(state)
   const templateNickname = allNicknamesById[templateLabwareId]
   const duplicateLabwareNickname = getNextNickname(
@@ -133,7 +134,7 @@ export const duplicateLabware: (
     templateNickname
   )
 
-  if (templateLabwareDefURI && duplicateSlot) {
+  if (templateLabwareDefURI && duplicateSlot != null) {
     dispatch({
       type: 'DUPLICATE_LABWARE',
       payload: {

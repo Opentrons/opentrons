@@ -1,6 +1,9 @@
 """Main FastAPI application."""
 import asyncio
 import logging
+from typing import Optional
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -60,6 +63,12 @@ async def on_startup() -> None:
     """Handle app startup."""
     settings = get_settings()
 
+    if settings.persistence_directory == "automatically_make_temporary":
+        persistence_directory: Optional[Path] = None
+    else:
+        # mypy won't narrow out the sentinel literal from the above if, sadly
+        persistence_directory = settings.persistence_directory  # type: ignore[assignment]
+
     initialize_logging()
     initialize_task_runner(app_state=app.state)
     start_initializing_hardware(
@@ -70,12 +79,7 @@ async def on_startup() -> None:
         ],
     )
     start_initializing_persistence(
-        app_state=app.state,
-        persistence_directory=(
-            None
-            if settings.persistence_directory == "automatically_make_temporary"
-            else settings.persistence_directory
-        ),
+        app_state=app.state, persistence_directory=persistence_directory
     )
     initialize_notification_client(
         app_state=app.state,

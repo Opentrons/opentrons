@@ -12,12 +12,13 @@ import { i18n } from '../../../i18n'
 import runRecord from '../../../organisms/RunDetails/__fixtures__/runRecord.json'
 import { useDownloadRunLog, useTrackProtocolRunEvent } from '../hooks'
 import { useRunControls } from '../../RunTimeControl/hooks'
-import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '../../../redux/analytics'
 import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
+import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
 
 import type { CommandsData } from '@opentrons/api-client'
 
@@ -30,6 +31,7 @@ jest.mock('../../RunTimeControl/hooks')
 jest.mock('../../../redux/analytics')
 jest.mock('../../../redux/config')
 jest.mock('@opentrons/react-api-client')
+jest.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
   return {
@@ -59,6 +61,9 @@ const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.Mock
 const mockUseDownloadRunLog = useDownloadRunLog as jest.MockedFunction<
   typeof useDownloadRunLog
 >
+const mockUseIsEstopNotDisengaged = useIsEstopNotDisengaged as jest.MockedFunction<
+  typeof useIsEstopNotDisengaged
+>
 
 const render = (
   props: React.ComponentProps<typeof HistoricalProtocolRunOverflowMenu>
@@ -74,6 +79,7 @@ const render = (
 }
 const PAGE_LENGTH = 101
 const RUN_ID = 'id'
+const ROBOT_NAME = 'otie'
 let mockTrackEvent: jest.Mock
 let mockTrackProtocolRunEvent: jest.Mock
 const mockDownloadRunLog = jest.fn()
@@ -127,9 +133,12 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
       .mockReturnValue(({
         data: { data: runRecord.data.commands, meta: { totalLength: 14 } },
       } as unknown) as UseQueryResult<CommandsData>)
+    when(mockUseIsEstopNotDisengaged)
+      .calledWith(ROBOT_NAME)
+      .mockReturnValue(false)
     props = {
       runId: RUN_ID,
-      robotName: 'otie',
+      robotName: ROBOT_NAME,
       robotIsBusy: false,
     }
   })
@@ -177,5 +186,13 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
     })
     const rerunBtn = getByRole('button', { name: 'Rerun protocol now' })
     expect(rerunBtn).toBeDisabled()
+  })
+
+  it('should make overflow menu disabled when e-stop is pressed', () => {
+    when(mockUseIsEstopNotDisengaged)
+      .calledWith(ROBOT_NAME)
+      .mockReturnValue(true)
+    const { getByRole } = render(props)
+    expect(getByRole('button')).toBeDisabled()
   })
 })

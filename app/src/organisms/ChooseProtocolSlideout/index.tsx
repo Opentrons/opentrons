@@ -205,11 +205,8 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
           selectedProtocol != null &&
           storedProtocol.protocolKey === selectedProtocol.protocolKey
         return (
-          <>
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              key={storedProtocol.protocolKey}
-            >
+          <React.Fragment key={storedProtocol.protocolKey}>
+            <Flex flexDirection={DIRECTION_COLUMN}>
               <MiniCard
                 isSelected={isSelected}
                 isError={runCreationError != null}
@@ -246,7 +243,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                     <Icon
                       name="alert-circle"
                       size="1.25rem"
-                      color={COLORS.errorEnabled}
+                      color={COLORS.red50}
                     />
                   </>
                 ) : null}
@@ -255,7 +252,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
             {runCreationError != null && isSelected ? (
               <StyledText
                 as="label"
-                color={COLORS.errorText}
+                color={COLORS.red60}
                 overflowWrap="anywhere"
                 display={DISPLAY_BLOCK}
                 marginTop={`-${SPACING.spacing8}`}
@@ -269,7 +266,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                       robotLink: (
                         <NavLink
                           css={css`
-                            color: ${COLORS.errorText};
+                            color: ${COLORS.red60};
                             text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
                           `}
                           to={`/devices/${robotName}`}
@@ -282,7 +279,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 )}
               </StyledText>
             ) : null}
-          </>
+          </React.Fragment>
         )
       })}
     </Flex>
@@ -297,11 +294,11 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
       css={css`
         ${BORDERS.cardOutlineBorder}
         &:hover {
-          border-color: ${COLORS.medGreyEnabled};
+          border-color: ${COLORS.grey30};
         }
       `}
     >
-      <Icon size="1.25rem" name="alert-circle" color={COLORS.medGreyEnabled} />
+      <Icon size="1.25rem" name="alert-circle" color={COLORS.grey30} />
       <StyledText
         as="p"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}

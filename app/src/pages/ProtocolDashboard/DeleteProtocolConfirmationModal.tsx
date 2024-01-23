@@ -37,7 +37,7 @@ export function DeleteProtocolConfirmationModal({
   const modalHeader: ModalHeaderBaseProps = {
     title: t('delete_this_protocol'),
     iconName: 'ot-alert',
-    iconColor: COLORS.yellow2,
+    iconColor: COLORS.yellow50,
   }
   const host = useHost()
   const queryClient = useQueryClient()
@@ -128,11 +128,11 @@ const ProtocolNameText = styled.span`
   font-weight: ${TYPOGRAPHY.fontWeightBold};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
-  color: ${COLORS.darkBlack90};
+  color: ${COLORS.grey60};
 `
 const AdditionalText = styled.span`
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
-  color: ${COLORS.darkBlack90};
+  color: ${COLORS.grey60};
 `

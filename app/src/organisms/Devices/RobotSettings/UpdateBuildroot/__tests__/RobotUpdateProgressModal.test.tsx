@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { i18n } from '../../../../../i18n'
-import { act, fireEvent } from '@testing-library/react'
+import { act, fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
@@ -86,15 +86,13 @@ describe('DownloadUpdateModal', () => {
 
   it('renders robot update download errors', () => {
     mockGetRobotUpdateDownloadError.mockReturnValue('test download error')
-
-    const [{ getByText }] = render(props)
-    getByText('test download error')
+    render(props)
+    screen.getByText('test download error')
   })
 
   it('renders the robot name as a part of the header', () => {
-    const [{ getByText }] = render(props)
-
-    expect(getByText('Updating testRobot')).toBeInTheDocument()
+    render(props)
+    expect(screen.getByText('Updating testRobot')).toBeInTheDocument()
   })
 
   it('activates the Update animation when first rendered', () => {
@@ -103,7 +101,6 @@ describe('DownloadUpdateModal', () => {
       commandType: 'setStatusBar',
       params: { animation: 'updating' },
     }
-
     expect(mockUseCreateLiveCommandMutation).toBeCalledWith()
     expect(mockCreateLiveCommand).toBeCalledWith({
       command: updatingCommand,
@@ -112,13 +109,14 @@ describe('DownloadUpdateModal', () => {
   })
 
   it('renders the correct text when installing the robot update with no close button', () => {
-    const [{ queryByRole, getByText }] = render(props)
-
-    expect(getByText('Installing update...')).toBeInTheDocument()
+    render(props)
+    expect(screen.getByText('Installing update...')).toBeInTheDocument()
     expect(
-      getByText("This could take up to 15 minutes. Don't turn off the robot.")
+      screen.getByText(
+        "This could take up to 15 minutes. Don't turn off the robot."
+      )
     ).toBeInTheDocument()
-    expect(queryByRole('button')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
   it('renders the correct text when finalizing the robot update with no close button', () => {
@@ -126,15 +124,17 @@ describe('DownloadUpdateModal', () => {
       updateStep: 'restart',
       progressPercent: 100,
     })
-    const [{ queryByRole, getByText }] = render(props)
+    render(props)
 
     expect(
-      getByText('Install complete, robot restarting...')
+      screen.getByText('Install complete, robot restarting...')
     ).toBeInTheDocument()
     expect(
-      getByText("This could take up to 15 minutes. Don't turn off the robot.")
+      screen.getByText(
+        "This could take up to 15 minutes. Don't turn off the robot."
+      )
     ).toBeInTheDocument()
-    expect(queryByRole('button')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
   it('renders a success modal and exit button upon finishing the update process', () => {
@@ -142,11 +142,13 @@ describe('DownloadUpdateModal', () => {
       updateStep: 'finished',
       progressPercent: 100,
     })
-    const [{ getByText }] = render(props)
+    render(props)
 
-    const exitButton = getByText('exit')
+    const exitButton = screen.getByText('exit')
 
-    expect(getByText('Robot software successfully updated')).toBeInTheDocument()
+    expect(
+      screen.getByText('Robot software successfully updated')
+    ).toBeInTheDocument()
     expect(exitButton).toBeInTheDocument()
     expect(mockCreateLiveCommand).toBeCalledTimes(1)
     fireEvent.click(exitButton)
@@ -166,10 +168,10 @@ describe('DownloadUpdateModal', () => {
       params: { animation: 'idle' },
     }
 
-    const [{ getByText }] = render(props)
-    const exitButton = getByText('exit')
+    render(props)
+    const exitButton = screen.getByText('exit')
 
-    expect(getByText('test error')).toBeInTheDocument()
+    expect(screen.getByText('test error')).toBeInTheDocument()
     fireEvent.click(exitButton)
     expect(props.closeUpdateBuildroot).toHaveBeenCalled()
 
@@ -182,13 +184,14 @@ describe('DownloadUpdateModal', () => {
   })
 
   it('renders alternative text if update takes too long', () => {
-    const [{ findByText }] = render(props)
+    jest.useFakeTimers()
+    render(props)
 
     act(() => {
       jest.advanceTimersByTime(TIME_BEFORE_ALLOWING_EXIT_MS)
     })
 
-    findByText('Try restarting the update.')
-    findByText('testRobot restart is taking longer than expected to restart.')
+    screen.getByText(/Try restarting the update./i)
+    screen.getByText(/This update is taking longer than usual/i)
   })
 })

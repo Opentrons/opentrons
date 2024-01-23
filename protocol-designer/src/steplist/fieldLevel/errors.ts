@@ -1,5 +1,4 @@
 import isArray from 'lodash/isArray'
-import { i18n } from '../../localization'
 
 /*******************
  ** Error Messages **
@@ -56,9 +55,7 @@ export const temperatureRangeFieldValue = (
 ): ErrorChecker => (value: unknown): string | null =>
   value === null || (Number(value) <= maximum && Number(value) >= minimum)
     ? null
-    : `${FIELD_ERRORS.OUTSIDE_OF_RANGE} ${minimum} and ${maximum} ${i18n.t(
-        'application.units.degrees'
-      )}`
+    : `${FIELD_ERRORS.OUTSIDE_OF_RANGE} ${minimum} and ${maximum} °C`
 export const realNumber: ErrorChecker = (value: unknown) =>
   isNaN(Number(value)) ? FIELD_ERRORS.NOT_A_REAL_NUMBER : null
 

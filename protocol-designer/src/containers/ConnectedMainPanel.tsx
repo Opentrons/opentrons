@@ -4,14 +4,14 @@ import { Splash } from '@opentrons/components'
 import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../steplist'
 import { Portal as MainPageModalPortal } from '../components/portals/MainPageModalPortal'
 import { DeckSetupManager } from '../components/DeckSetupManager'
-import { ConnectedFilePage } from '../containers/ConnectedFilePage'
 import { SettingsPage } from '../components/SettingsPage'
+import { FilePage } from '../components/FilePage'
 import { LiquidsPage } from '../components/LiquidsPage'
 import { Hints } from '../components/Hints'
 import { LiquidPlacementModal } from '../components/LiquidPlacementModal'
 import { LabwareSelectionModal } from '../components/LabwareSelectionModal'
 import { FormManager } from '../components/FormManager'
-import { TimelineAlerts } from '../components/alerts/TimelineAlerts'
+import { Alerts } from '../components/alerts/Alerts'
 
 import { getSelectedTerminalItemId } from '../ui/steps'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
@@ -30,7 +30,7 @@ function MainPanelComponent(props: Props): JSX.Element {
     case 'file-splash':
       return <Splash />
     case 'file-detail':
-      return <ConnectedFilePage />
+      return <FilePage />
     case 'liquids':
       return <LiquidsPage />
     case 'settings-app':
@@ -41,7 +41,7 @@ function MainPanelComponent(props: Props): JSX.Element {
       return (
         <>
           <MainPageModalPortal>
-            <TimelineAlerts />
+            <Alerts componentType="Timeline" />
             <Hints />
             {startTerminalItemSelected && <LabwareSelectionModal />}
             <FormManager />

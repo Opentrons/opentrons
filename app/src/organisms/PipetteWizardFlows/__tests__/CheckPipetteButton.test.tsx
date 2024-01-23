@@ -1,8 +1,8 @@
 import * as React from 'react'
+import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { CheckPipetteButton } from '../CheckPipetteButton'
-import { waitFor } from '@testing-library/react'
 
 const render = (props: React.ComponentProps<typeof CheckPipetteButton>) => {
   return renderWithProviders(<CheckPipetteButton {...props} />)[0]
@@ -34,20 +34,12 @@ describe('CheckPipetteButton', () => {
   })
   it('clicking on the button calls refetch and proceed', async () => {
     const { getByRole } = render(props)
-    getByRole('button', { name: 'continue' }).click()
+    fireEvent.click(getByRole('button', { name: 'continue' }))
     expect(refetch).toHaveBeenCalled()
     await waitFor(() => expect(props.proceed).toHaveBeenCalled())
   })
   it('button is disabled when fetching is true', () => {
     const { getByRole } = render({ ...props, isFetching: true })
     expect(getByRole('button', { name: 'continue' })).toBeDisabled()
-  })
-  it('renders button for on device display', () => {
-    props = {
-      ...props,
-      isOnDevice: true,
-    }
-    const { getByLabelText } = render(props)
-    getByLabelText('SmallButton_primary')
   })
 })

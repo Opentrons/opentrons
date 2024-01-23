@@ -138,6 +138,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'delay':
     case 'configureForVolume':
     case 'moveToAddressableArea':
+    case 'moveToAddressableAreaForDropTip':
       // these commands don't have any effects on the state
       break
 

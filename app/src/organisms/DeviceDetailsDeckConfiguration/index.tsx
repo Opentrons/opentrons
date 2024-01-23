@@ -35,9 +35,11 @@ import { Banner } from '../../atoms/Banner'
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
 import { AddFixtureModal } from './AddFixtureModal'
 import { useRunStatuses } from '../Devices/hooks'
+import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { CutoutId } from '@opentrons/shared-data'
 
+const DECK_CONFIG_REFETCH_INTERVAL = 5000
 const RUN_REFETCH_INTERVAL = 5000
 
 interface DeviceDetailsDeckConfigurationProps {
@@ -59,12 +61,15 @@ export function DeviceDetailsDeckConfiguration({
     null
   )
 
-  const deckConfig = useDeckConfigurationQuery().data ?? []
+  const deckConfig =
+    useDeckConfigurationQuery({ refetchInterval: DECK_CONFIG_REFETCH_INTERVAL })
+      .data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const { isRunRunning } = useRunStatuses()
   const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
   })
+  const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
   const isMaintenanceRunExisting = maintenanceRunData?.data?.id != null
 
   const handleClickAdd = (cutoutId: CutoutId): void => {
@@ -171,7 +176,11 @@ export function DeviceDetailsDeckConfiguration({
               flexDirection={DIRECTION_COLUMN}
             >
               <DeckConfigurator
-                readOnly={isRunRunning || isMaintenanceRunExisting}
+                readOnly={
+                  isRunRunning ||
+                  isMaintenanceRunExisting ||
+                  isEstopNotDisengaged
+                }
                 deckConfig={deckConfig}
                 handleClickAdd={handleClickAdd}
                 handleClickRemove={handleClickRemove}
@@ -194,7 +203,7 @@ export function DeviceDetailsDeckConfiguration({
                 fixtureDisplayList.map(fixture => (
                   <Flex
                     key={fixture.cutoutId}
-                    backgroundColor={COLORS.fundamentalsBackground}
+                    backgroundColor={COLORS.grey10}
                     gridGap={SPACING.spacing60}
                     padding={SPACING.spacing8}
                     width="100%"
@@ -210,7 +219,7 @@ export function DeviceDetailsDeckConfiguration({
                 ))
               ) : (
                 <Flex
-                  backgroundColor={COLORS.fundamentalsBackground}
+                  backgroundColor={COLORS.grey10}
                   gridGap={SPACING.spacing60}
                   padding={SPACING.spacing8}
                   width="100%"

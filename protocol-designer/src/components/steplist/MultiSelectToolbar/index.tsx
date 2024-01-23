@@ -31,6 +31,8 @@ import {
   ConfirmDeleteModal,
   DELETE_MULTIPLE_STEP_FORMS,
 } from '../../modals/ConfirmDeleteModal'
+import { ThunkDispatch } from 'redux-thunk'
+import { BaseState } from '../../../types'
 
 export interface ClickableIconProps {
   id?: string
@@ -101,7 +103,7 @@ export const Accordion = (props: AccordionProps): JSX.Element => {
 }
 
 export const MultiSelectToolbar = (props: Props): JSX.Element => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const [isExpandState, setIsExpandState] = React.useState<boolean>(true)
   const stepCount = useSelector(stepFormSelectors.getOrderedStepIds).length
   const selectedStepCount = useSelector(getMultiSelectItemIds)?.length

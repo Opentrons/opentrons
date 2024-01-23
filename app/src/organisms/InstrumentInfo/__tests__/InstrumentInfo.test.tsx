@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { mockPipetteData1Channel } from '../../../redux/pipettes/__fixtures__'
@@ -78,47 +79,47 @@ describe('InstrumentInfo', () => {
     }
   })
   it('returns the correct information for a gripper with no cal data', () => {
-    const { getByText, getByRole } = render(props)
-    getByText('last calibrated')
-    getByText('No calibration data')
-    getByText('firmware version')
-    getByText('12')
-    getByText('serial number')
-    getByText('123')
-    getByRole('button', { name: 'MediumButton_secondary' }).click()
-    getByText('mock GripperWizardFlows')
-    getByRole('button', { name: 'MediumButton_primary' }).click()
-    getByText('mock GripperWizardFlows')
+    render(props)
+    screen.getByText('last calibrated')
+    screen.getByText('No calibration data')
+    screen.getByText('firmware version')
+    screen.getByText('12')
+    screen.getByText('serial number')
+    screen.getByText('123')
+    fireEvent.click(screen.getByRole('button', { name: 'detach' }))
+    screen.getByText('mock GripperWizardFlows')
+    fireEvent.click(screen.getByRole('button', { name: 'calibrate' }))
+    screen.getByText('mock GripperWizardFlows')
   })
 
   it('returns the correct information for a gripper with cal data', () => {
     props = {
       instrument: mockGripperDataWithCalData,
     }
-    const { getByText, getByRole } = render(props)
-    getByText('last calibrated')
-    getByText('8/15/23 20:25 UTC')
-    getByText('firmware version')
-    getByText('12')
-    getByText('serial number')
-    getByText('123')
-    getByRole('button', { name: 'MediumButton_secondary' }).click()
-    getByText('mock GripperWizardFlows')
-    getByRole('button', { name: 'MediumButton_primary' }).click()
-    getByText('mock GripperWizardFlows')
+    render(props)
+    screen.getByText('last calibrated')
+    screen.getByText('8/15/23 20:25 UTC')
+    screen.getByText('firmware version')
+    screen.getByText('12')
+    screen.getByText('serial number')
+    screen.getByText('123')
+    fireEvent.click(screen.getByRole('button', { name: 'detach' }))
+    screen.getByText('mock GripperWizardFlows')
+    fireEvent.click(screen.getByRole('button', { name: 'recalibrate' }))
+    screen.getByText('mock GripperWizardFlows')
   })
 
   it('returns the correct information for a pipette with cal data and no firmware version', () => {
     props = {
       instrument: mockPipetteData1Channel,
     }
-    const { getByText, getByRole, queryByText } = render(props)
-    getByText('last calibrated')
-    getByText('8/25/20 20:25 UTC')
-    getByText('serial number')
-    getByText('abc')
-    getByRole('button', { name: 'MediumButton_secondary' }).click()
-    getByText('mock PipetteWizardFlows')
-    expect(queryByText('Calibrate')).not.toBeInTheDocument()
+    render(props)
+    screen.getByText('last calibrated')
+    screen.getByText('8/25/20 20:25 UTC')
+    screen.getByText('serial number')
+    screen.getByText('abc')
+    fireEvent.click(screen.getByRole('button', { name: 'detach' }))
+    screen.getByText('mock PipetteWizardFlows')
+    expect(screen.queryByText('Calibrate')).not.toBeInTheDocument()
   })
 })

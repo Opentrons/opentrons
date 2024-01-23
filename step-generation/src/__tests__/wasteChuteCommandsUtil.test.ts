@@ -19,13 +19,13 @@ const curryCommandCreatorMock = curryCommandCreator as jest.MockedFunction<
 >
 
 const mockWasteChuteId = 'mockWasteChuteId'
-const mockAddressableAreaName = 'mockName'
+const mockAddressableAreaName: 'A3' = 'A3'
 const mockId = 'mockId'
 
 let invariantContext = makeContext()
 const args = {
   pipetteId: mockId,
-  addressableAreaName: 'mockName',
+  addressableAreaName: mockAddressableAreaName,
   volume: 10,
   flowRate: 10,
   prevRobotState: getInitialRobotStateStandard(invariantContext),

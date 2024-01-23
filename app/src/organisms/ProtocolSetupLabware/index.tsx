@@ -59,7 +59,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
 import type { LabwareSetupItem } from '../../pages/Protocols/utils'
-import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import type { SetupScreens } from '../../pages/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'
 import { LabwareMapViewModal } from './LabwareMapViewModal'
 
@@ -247,7 +247,7 @@ export function ProtocolSetupLabware({
                 >
                   {getLabwareDisplayName(selectedLabware)}
                 </StyledText>
-                <StyledText as="p" color={COLORS.darkBlack70}>
+                <StyledText as="p" color={COLORS.grey60}>
                   {selectedLabware.nickName}
                   {selectedLabwareLocation != null &&
                   selectedLabwareLocation !== 'offDeck' &&
@@ -275,7 +275,7 @@ export function ProtocolSetupLabware({
       >
         <Flex
           gridGap={SPACING.spacing8}
-          color={COLORS.darkBlack70}
+          color={COLORS.grey60}
           fontSize={TYPOGRAPHY.fontSize22}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           lineHeight={TYPOGRAPHY.lineHeight28}
@@ -316,7 +316,7 @@ export function ProtocolSetupLabware({
 
 const labwareLatchStyles = css`
   &:active {
-    background-color: ${COLORS.mediumBluePressed};
+    background-color: ${COLORS.blue40};
   }
 `
 
@@ -409,14 +409,10 @@ function LabwareLatch({
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
-      backgroundColor={COLORS.mediumBlueEnabled}
+      backgroundColor={COLORS.blue35}
       borderRadius={BORDERS.borderRadiusSize3}
       css={labwareLatchStyles}
-      color={
-        isLatchLoading
-          ? `${COLORS.darkBlack100}${COLORS.opacity60HexCode}`
-          : COLORS.darkBlackEnabled
-      }
+      color={isLatchLoading ? COLORS.grey60 : COLORS.black90}
       height="6.5rem"
       alignSelf={ALIGN_CENTER}
       flexDirection={DIRECTION_COLUMN}
@@ -446,7 +442,7 @@ function LabwareLatch({
               size="2.5rem"
               color={
                 commandType === 'heaterShaker/closeLabwareLatch'
-                  ? COLORS.blueEnabled
+                  ? COLORS.blue50
                   : ''
               }
             />
@@ -546,7 +542,7 @@ function RowLabware({
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={COLORS.light1}
+      backgroundColor={COLORS.grey35}
       borderRadius={BORDERS.borderRadiusSize3}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       gridGap={SPACING.spacing32}
@@ -569,13 +565,13 @@ function RowLabware({
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {getLabwareDisplayName(definition)}
             </StyledText>
-            <StyledText color={COLORS.darkBlack70} as="p">
+            <StyledText color={COLORS.grey60} as="p">
               {nickName}
             </StyledText>
           </Flex>
           {nestedLabwareInfo != null ? (
             <Box
-              borderBottom={`1px solid ${COLORS.darkBlack70}`}
+              borderBottom={`1px solid ${COLORS.grey60}`}
               marginY={SPACING.spacing16}
               width="33rem"
             />
@@ -586,7 +582,7 @@ function RowLabware({
               <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {nestedLabwareInfo.nestedLabwareDisplayName}
               </StyledText>
-              <StyledText as="p" color={COLORS.darkBlack70}>
+              <StyledText as="p" color={COLORS.grey60}>
                 {nestedLabwareInfo.nestedLabwareNickName}
               </StyledText>
             </Flex>

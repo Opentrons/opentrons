@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { renderHook } from '@testing-library/react-hooks'
+import { fireEvent, renderHook } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { NormalKeyboard } from '..'
 
@@ -9,16 +8,12 @@ const render = (props: React.ComponentProps<typeof NormalKeyboard>) => {
 }
 
 describe('SoftwareKeyboard', () => {
-  let props: React.ComponentProps<typeof NormalKeyboard>
-
-  beforeEach(() => {
+  it('should render the software keyboards', () => {
     const { result } = renderHook(() => React.useRef(null))
-    props = {
+    const props = {
       onChange: jest.fn(),
       keyboardRef: result.current,
     }
-  })
-  it('should render the software keyboards', () => {
     const { getAllByRole } = render(props)
     const buttons = getAllByRole('button')
 
@@ -62,6 +57,11 @@ describe('SoftwareKeyboard', () => {
   })
 
   it('should render the software keyboards when hitting shift key', () => {
+    const { result } = renderHook(() => React.useRef(null))
+    const props = {
+      onChange: jest.fn(),
+      keyboardRef: result.current,
+    }
     const { getAllByRole, getByRole } = render(props)
     const shiftKey = getByRole('button', { name: 'SHIFT' })
     fireEvent.click(shiftKey)
@@ -106,6 +106,11 @@ describe('SoftwareKeyboard', () => {
   })
 
   it('should render the software keyboards when hitting 123 key', () => {
+    const { result } = renderHook(() => React.useRef(null))
+    const props = {
+      onChange: jest.fn(),
+      keyboardRef: result.current,
+    }
     const { getAllByRole, getByRole } = render(props)
     const numberKey = getByRole('button', { name: '123' })
     fireEvent.click(numberKey)
@@ -149,6 +154,11 @@ describe('SoftwareKeyboard', () => {
   })
 
   it('should render the software keyboards when hitting #+= key', () => {
+    const { result } = renderHook(() => React.useRef(null))
+    const props = {
+      onChange: jest.fn(),
+      keyboardRef: result.current,
+    }
     const { getAllByRole, getByRole } = render(props)
     const numberKey = getByRole('button', { name: '123' })
     fireEvent.click(numberKey)
@@ -194,6 +204,11 @@ describe('SoftwareKeyboard', () => {
   })
 
   it('should call mock function when clicking a key', () => {
+    const { result } = renderHook(() => React.useRef(null))
+    const props = {
+      onChange: jest.fn(),
+      keyboardRef: result.current,
+    }
     const { getByRole } = render(props)
     const aKey = getByRole('button', { name: 'a' })
     fireEvent.click(aKey)

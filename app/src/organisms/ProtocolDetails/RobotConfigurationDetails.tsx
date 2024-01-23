@@ -67,25 +67,7 @@ export const RobotConfigurationDetails = (
     </StyledText>
   )
 
-  // TODO(bh, 2022-10-18): insert 96-channel display name
-  // const leftAndRightMountsPipetteDisplayName = 'P20 96-Channel GEN1'
-  const leftAndRightMountsPipetteDisplayName = null
-  const leftAndRightMountsItem =
-    leftAndRightMountsPipetteDisplayName != null ? (
-      <RobotConfigurationDetailsItem
-        label={t('left_and_right_mounts')}
-        item={
-          isLoading ? (
-            loadingText
-          ) : (
-            <InstrumentContainer
-              displayName={leftAndRightMountsPipetteDisplayName}
-            />
-          )
-        }
-      />
-    ) : null
-
+  const is96PipetteUsed = leftMountPipetteName === 'p1000_96'
   const leftMountPipetteDisplayName =
     getPipetteNameSpecs(leftMountPipetteName as PipetteName)?.displayName ??
     null
@@ -134,12 +116,12 @@ export const RobotConfigurationDetails = (
         }
       />
       <Divider marginY={SPACING.spacing12} width="100%" />
-      {leftAndRightMountsItem ?? (
+      <RobotConfigurationDetailsItem
+        label={is96PipetteUsed ? t('both_mounts') : t('left_mount')}
+        item={isLoading ? loadingText : leftMountItem}
+      />
+      {!is96PipetteUsed && (
         <>
-          <RobotConfigurationDetailsItem
-            label={t('left_mount')}
-            item={isLoading ? loadingText : leftMountItem}
-          />
           <Divider marginY={SPACING.spacing12} width="100%" />
           <RobotConfigurationDetailsItem
             label={t('right_mount')}
@@ -173,7 +155,7 @@ export const RobotConfigurationDetails = (
                     moduleType={getModuleType(module.params.model)}
                     marginRight={SPACING.spacing4}
                     alignSelf={ALIGN_CENTER}
-                    color={COLORS.darkGreyEnabled}
+                    color={COLORS.grey50}
                     height={SIZE_1}
                     minWidth={SIZE_1}
                     minHeight={SIZE_1}
@@ -226,7 +208,7 @@ export const RobotConfigurationDetailsItem = (
         flex="0 0 auto"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         marginRight={SPACING.spacing16}
-        color={COLORS.darkGreyEnabled}
+        color={COLORS.grey50}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
         width="4.625rem"
       >

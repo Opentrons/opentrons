@@ -39,7 +39,7 @@ export function FailedToConnect({
     <Flex flex="1" flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
       <Flex
         flex="1"
-        backgroundColor={COLORS.red3}
+        backgroundColor={COLORS.red35}
         justifyContent={JUSTIFY_CENTER}
         borderRadius={BORDERS.borderRadiusSize3}
       >
@@ -51,7 +51,7 @@ export function FailedToConnect({
           <Icon
             name="ot-alert"
             size="3rem"
-            color={COLORS.red2}
+            color={COLORS.red50}
             aria-label={'failed_to_connect_invalidPassword'}
           />
           <Flex

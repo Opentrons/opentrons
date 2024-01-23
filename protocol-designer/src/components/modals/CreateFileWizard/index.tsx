@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import reduce from 'lodash/reduce'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
@@ -59,6 +59,8 @@ import { StagingAreaTile } from './StagingAreaTile'
 import { getTrashSlot } from './utils'
 
 import type { NormalizedPipette } from '@opentrons/step-generation'
+import type { ThunkDispatch } from 'redux-thunk'
+import type { BaseState } from '../../../types'
 import type { FormState } from './types'
 
 type WizardStep =
@@ -93,7 +95,7 @@ export const adapter96ChannelDefUri =
   'opentrons/opentrons_flex_96_tiprack_adapter/1'
 
 export function CreateFileWizard(): JSX.Element | null {
-  const { t } = useTranslation()
+  const { t } = useTranslation(['modal', 'alert'])
   const showWizard = useSelector(getNewProtocolModal)
   const hasUnsavedChanges = useSelector(loadFileSelectors.getHasUnsavedChanges)
   const customLabware = useSelector(
@@ -111,7 +113,7 @@ export function CreateFileWizard(): JSX.Element | null {
     }
   }, [showWizard])
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
 
   const handleCancel = (): void => {
     dispatch(navigationActions.toggleNewProtocolModal(false))
@@ -162,10 +164,7 @@ export function CreateFileWizard(): JSX.Element | null {
     }
     const newProtocolFields = values.fields
 
-    if (
-      !hasUnsavedChanges ||
-      window.confirm(t('alert.window.confirm_create_new'))
-    ) {
+    if (!hasUnsavedChanges || window.confirm(t('alert:confirm_create_new'))) {
       dispatch(fileActions.createNewProtocol(newProtocolFields))
       const pipettesById: Record<string, PipetteOnDeck> = pipettes.reduce(
         (acc, pipette) => ({ ...acc, [uuid()]: pipette }),
@@ -266,7 +265,7 @@ export function CreateFileWizard(): JSX.Element | null {
   }
   const wizardHeader = (
     <WizardHeader
-      title={t('modal.create_file_wizard.create_new_protocol')}
+      title={t('create_new_protocol')}
       currentStep={currentStepIndex}
       totalSteps={wizardSteps.length - 1}
       onExit={handleCancel}

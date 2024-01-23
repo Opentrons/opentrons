@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { ALL, COLUMN } from '@opentrons/shared-data'
 import {
@@ -8,7 +9,6 @@ import {
   TOOLTIP_FIXED,
   useHoverTooltip,
 } from '@opentrons/components'
-import { i18n } from '../../../localization'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { StepFormDropdown } from './StepFormDropdownField'
 import styles from '../StepEditForm.css'
@@ -16,6 +16,7 @@ import styles from '../StepEditForm.css'
 export function Configure96ChannelField(
   props: Omit<React.ComponentProps<typeof StepFormDropdown>, 'options'>
 ): JSX.Element {
+  const { t } = useTranslation('form')
   const { value: dropdownItem, name, updateValue } = props
   const deckSetup = useSelector(getInitialDeckSetup)
   const tipracks = Object.values(deckSetup.labware).filter(
@@ -43,7 +44,7 @@ export function Configure96ChannelField(
 
   return (
     <FormGroup
-      label={i18n.t('form.step_edit_form.field.nozzles.label')}
+      label={t('step_edit_form.field.nozzles.label')}
       className={styles.small_field}
     >
       <SelectField
@@ -73,16 +74,15 @@ const OptionLabel = (props: OptionLabelProps): JSX.Element => {
     placement: 'bottom-start',
     strategy: TOOLTIP_FIXED,
   })
+  const { t } = useTranslation('form')
   return (
     <>
       <div {...targetProps}>
-        {i18n.t(`form.step_edit_form.field.nozzles.option.${value}`)}
+        {t(`step_edit_form.field.nozzles.option.${value}`)}
         {disabled ? (
           <Tooltip {...tooltipProps}>
             <div className={styles.tooltip}>
-              {i18n.t(
-                `form.step_edit_form.field.nozzles.option_tooltip.${value}`
-              )}
+              {t(`step_edit_form.field.nozzles.option_tooltip.${value}`)}
             </div>
           </Tooltip>
         ) : null}

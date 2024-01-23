@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -50,14 +51,14 @@ describe('MaintenanceRunTakeover', () => {
   })
 
   it('renders child components successfuly', () => {
-    const [{ getByText }] = render(props)
-    getByText('Test Component')
+    render(props)
+    screen.getByText('Test Component')
   })
 
   it('does not render a takeover modal if no maintenance run has been initiated', () => {
-    const [{ queryByText }] = render(props)
+    render(props)
 
-    expect(queryByText('Robot is busy')).not.toBeInTheDocument()
+    expect(screen.queryByText('Robot is busy')).not.toBeInTheDocument()
   })
 
   it('does not render a takeover modal if a maintenance run has been initiated by the ODD', () => {
@@ -71,9 +72,8 @@ describe('MaintenanceRunTakeover', () => {
 
     mockUseMaintenanceRunTakeover.mockReturnValue(MOCK_ODD_RUN)
 
-    const [{ queryByText }] = render(props)
-
-    expect(queryByText('Robot is busy')).not.toBeInTheDocument()
+    render(props)
+    expect(screen.queryByText('Robot is busy')).not.toBeInTheDocument()
   })
 
   it('renders a takeover modal if a maintenance run has been initiated by the desktop', () => {
@@ -87,8 +87,7 @@ describe('MaintenanceRunTakeover', () => {
 
     mockUseMaintenanceRunTakeover.mockReturnValue(MOCK_DESKTOP_RUN)
 
-    const [{ queryByText }] = render(props)
-
-    expect(queryByText('Robot is busy')).toBeInTheDocument()
+    render(props)
+    screen.getByText('Robot is busy')
   })
 })

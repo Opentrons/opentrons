@@ -94,7 +94,7 @@ class BuildWithData(build_py.build_py):
         build_base = os.path.commonpath([f[2] for f in files])
         # We want a list of paths to only files relative to ../shared-data
         to_include = [str(f.relative_to(DATA_ROOT)) for f in get_shared_data_files()]
-        destination = os.path.join(build_base, "opentrons_shared_data", DEST_BASE_PATH)
+        destination = os.path.join(build_base, DEST_BASE_PATH)
         # And finally, tell the system about our files
         files.extend(
             [
@@ -130,7 +130,6 @@ CLASSIFIERS = [
     "Intended Audience :: Science/Research",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -142,17 +141,17 @@ DESCRIPTION = (
     "Does not need to be installed manually; only a dependency of the "
     "opentrons package"
 )
-PACKAGES = find_packages(where=".", exclude=["tests"])
+PACKAGES = find_packages(where=".", exclude=["tests", "tests.*"])
 INSTALL_REQUIRES = [
     "jsonschema==3.0.2",
     "typing-extensions>=4.0.0,<5",
-    "pydantic==1.8.2",
+    "pydantic==1.9.2",
 ]
 
 
 if __name__ == "__main__":
     setup(
-        python_requires=">=3.7",
+        python_requires=">=3.8",
         name=DISTNAME,
         description=DESCRIPTION,
         license=LICENSE,

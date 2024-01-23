@@ -68,6 +68,14 @@ export interface AppRestartAction {
   meta: { shell: true }
 }
 
+export interface ReloadUiAction {
+  type: 'shell:RELOAD_UI'
+  payload: {
+    message: string
+  }
+  meta: { shell: true }
+}
+
 export interface SendLogAction {
   type: 'shell:SEND_LOG'
   payload: {
@@ -139,6 +147,7 @@ export type ShellAction =
   | RobotSystemAction
   | UsbRequestsAction
   | AppRestartAction
+  | ReloadUiAction
   | SendLogAction
   | UpdateBrightnessAction
   | RobotMassStorageDeviceAdded

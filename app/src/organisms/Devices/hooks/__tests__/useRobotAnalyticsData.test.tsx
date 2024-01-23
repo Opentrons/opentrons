@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { createStore, Store } from 'redux'
 import { Provider } from 'react-redux'
 import { QueryClient, QueryClientProvider } from 'react-query'
@@ -48,7 +48,7 @@ const ATTACHED_PIPETTES = {
   right: { id: '2', model: 'testModelRight' },
 }
 
-let wrapper: React.FunctionComponent<{}>
+let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 let store: Store<any> = createStore(jest.fn(), {})
 
 describe('useProtocolAnalysisErrors hook', () => {

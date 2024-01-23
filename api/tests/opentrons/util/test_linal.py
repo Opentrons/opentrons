@@ -25,7 +25,7 @@ def test_solve() -> None:
     expected2 = np.array(
         [cos(theta + pi / 2) * scale + 0.5, sin(theta + pi / 2) * scale + 0.25, 1]
     )
-    result = np.dot(X, np.array([[0], [1], [1]])).transpose()  # type: ignore[no-untyped-call]
+    result = np.dot(X, np.array([[0], [1], [1]])).transpose()
 
     assert np.isclose(expected2, result).all()
 
@@ -61,5 +61,5 @@ def test_apply_transform() -> None:
 
     expected = (round(x - x_delta, 2), round(y - y_delta, 2), round(z))
 
-    result = apply_transform(inv(transform), (1, 2, 3))  # type: ignore[no-untyped-call]
+    result = apply_transform(inv(transform), (1, 2, 3))
     assert np.isclose(result, expected, atol=0.1).all()

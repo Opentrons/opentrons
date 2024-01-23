@@ -108,10 +108,7 @@ def run(ctx):
     res2 = ctx.load_labware(res_type, "3", "reagent reservoir 2")
     res1 = ctx.load_labware(res_type, "2", "reagent reservoir 1")
     num_cols = math.ceil(num_samples / 8)
-    tips300 = [
-        ctx.load_labware("opentrons_96_tiprack_300ul", slot, "200µl filtertiprack")
-        for slot in ["5", "7", "8", "10", "11"]
-    ]
+    tips300 = [ctx.load_labware("opentrons_96_tiprack_300ul", slot, "200µl filtertiprack") for slot in ["5", "7", "8", "10", "11"]]
     if park_tips:
         parkingrack = ctx.load_labware("opentrons_96_tiprack_20ul", "4", "tiprack for parking")
         parking_spots = parkingrack.rows()[0][:num_cols]
@@ -433,7 +430,6 @@ resuming."
         remove_supernatant(vol, park=park)
 
     def dnase(vol, source, mix_reps=6, park=True, resuspend=True):
-
         if resuspend and magdeck.status == "engaged":
             magdeck.disengage()
 
@@ -463,7 +459,6 @@ resuming."
         ctx.pause("Incubating for 10 minutes for DNase 1 treatment with occasional mixing.")
 
     def stop_reaction(vol, source, mix_reps=6, park=True, resuspend=True):
-
         if resuspend and magdeck.status == "engaged":
             magdeck.disengage()
 

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { StaticRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 
 import { i18n } from '../../../i18n'
 import {
@@ -11,7 +11,6 @@ import {
   getUnreachableRobots,
   startDiscovery,
 } from '../../../redux/discovery'
-import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -24,9 +23,6 @@ jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/robot-update')
 jest.mock('../../../redux/networking')
 
-const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
-  typeof getRobotUpdateDisplayInfo
->
 const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
   typeof getConnectableRobots
 >
@@ -59,11 +55,6 @@ const mockSetSelectedRobot = jest.fn()
 
 describe('ChooseRobotSlideout', () => {
   beforeEach(() => {
-    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
-      autoUpdateAction: '',
-      autoUpdateDisabledReason: null,
-      updateFromFileDisabledReason: null,
-    })
     mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
     mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
     mockGetReachableRobots.mockReturnValue([mockReachableRobot])
@@ -76,76 +67,72 @@ describe('ChooseRobotSlideout', () => {
   })
 
   it('renders slideout if isExpanded true', () => {
-    const [{ queryAllByText }] = render({
+    render({
       onCloseClick: jest.fn(),
       isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
       setSelectedRobot: jest.fn(),
       title: 'choose robot slideout title',
+      robotType: 'OT-2 Standard',
     })
-    expect(queryAllByText('Choose Robot to Run')).not.toBeFalsy()
-    expect(queryAllByText('fakeSrcFileName')).not.toBeFalsy()
-  })
-  it('does not render slideout if isExpanded false', () => {
-    const [{ queryAllByText }] = render({
-      onCloseClick: jest.fn(),
-      isExpanded: true,
-      selectedRobot: null,
-      setSelectedRobot: jest.fn(),
-      title: 'choose robot slideout title',
-    })
-    expect(queryAllByText('Choose Robot to Run').length).toEqual(0)
-    expect(queryAllByText('fakeSrcFileName').length).toEqual(0)
+    screen.getByText('choose robot slideout title')
   })
   it('shows a warning if the protocol has failed analysis', () => {
-    const [{ getByText }] = render({
+    render({
       onCloseClick: jest.fn(),
       isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
       setSelectedRobot: jest.fn(),
       title: 'choose robot slideout title',
       isAnalysisError: true,
+      robotType: 'OT-2 Standard',
     })
-    getByText(
+    screen.getByText(
       'This protocol failed in-app analysis. It may be unusable on robots without custom software configurations.'
     )
   })
   it('renders an available robot option for every connectable robot, and link for other robots', () => {
-    const [{ queryByText }] = render({
+    render({
       onCloseClick: jest.fn(),
       isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
       setSelectedRobot: jest.fn(),
       title: 'choose robot slideout title',
+      robotType: 'OT-2 Standard',
     })
-    expect(queryByText('opentrons-robot-name')).toBeInTheDocument()
-    expect(
-      queryByText('2 unavailable robots are not listed.')
-    ).toBeInTheDocument()
+    screen.getByText('opentrons-robot-name')
+    screen.getByText('2 unavailable robots are not listed.')
   })
   it('if scanning, show robots, but do not show link to other devices', () => {
     mockGetScanning.mockReturnValue(true)
-    const [{ queryByText }] = render({
+    render({
       onCloseClick: jest.fn(),
       isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
       setSelectedRobot: jest.fn(),
       title: 'choose robot slideout title',
+      robotType: 'OT-2 Standard',
     })
-    expect(queryByText('opentrons-robot-name')).toBeInTheDocument()
+    screen.getByText('opentrons-robot-name')
     expect(
-      queryByText('2 unavailable robots are not listed.')
+      screen.queryByText('2 unavailable robots are not listed.')
     ).not.toBeInTheDocument()
   })
   it('if not scanning, show refresh button, start discovery if clicked', () => {
-    const [{ getByRole }, { dispatch }] = render({
+    const { dispatch } = render({
       onCloseClick: jest.fn(),
       isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
       setSelectedRobot: mockSetSelectedRobot,
       title: 'choose robot slideout title',
-    })
-    const refreshButton = getByRole('button', { name: 'refresh' })
+      robotType: 'OT-2 Standard',
+    })[1]
+    const refreshButton = screen.getByRole('button', { name: 'refresh' })
     fireEvent.click(refreshButton)
     expect(mockStartDiscovery).toHaveBeenCalled()
     expect(dispatch).toHaveBeenCalledWith({ type: 'mockStartDiscovery' })
@@ -155,23 +142,25 @@ describe('ChooseRobotSlideout', () => {
       { ...mockConnectableRobot, name: 'otherRobot', ip: 'otherIp' },
       mockConnectableRobot,
     ])
-    const [{ getByText }] = render({
+    render({
       onCloseClick: jest.fn(),
       isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
       setSelectedRobot: mockSetSelectedRobot,
       title: 'choose robot slideout title',
+      robotType: 'OT-2 Standard',
     })
     expect(mockSetSelectedRobot).toBeCalledWith({
       ...mockConnectableRobot,
       name: 'otherRobot',
       ip: 'otherIp',
     })
-    const mockRobot = getByText('opentrons-robot-name')
-    mockRobot.click() // unselect default robot
+    const mockRobot = screen.getByText('opentrons-robot-name')
+    fireEvent.click(mockRobot) // unselect default robot
     expect(mockSetSelectedRobot).toBeCalledWith(mockConnectableRobot)
-    const otherRobot = getByText('otherRobot')
-    otherRobot.click()
+    const otherRobot = screen.getByText('otherRobot')
+    fireEvent.click(otherRobot)
     expect(mockSetSelectedRobot).toBeCalledWith({
       ...mockConnectableRobot,
       name: 'otherRobot',

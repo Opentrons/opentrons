@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
 import {
@@ -49,7 +50,7 @@ describe('NotConfiguredModal', () => {
       'Add this fixture to your deck configuration. It will be referenced during protocol analysis.'
     )
     getByText('Trash bin')
-    getByRole('button', { name: 'Add' }).click()
+    fireEvent.click(getByRole('button', { name: 'Add' }))
     expect(mockUpdate).toHaveBeenCalled()
   })
 })

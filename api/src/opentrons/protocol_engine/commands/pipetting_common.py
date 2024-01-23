@@ -14,14 +14,29 @@ class PipetteIdMixin(BaseModel):
     )
 
 
-class VolumeMixin(BaseModel):
-    """Mixin for command requests that take a volume of liquid."""
+class AspirateVolumeMixin(BaseModel):
+    """Mixin for the `volume` field of aspirate commands."""
 
     volume: float = Field(
         ...,
-        description="Amount of liquid in uL. Must be greater than 0 and less "
-        "than a pipette-specific maximum volume.",
-        gt=0,
+        description="The amount of liquid to aspirate, in µL."
+        " Must not be greater than the remaining available amount, which depends on"
+        " the pipette (see `loadPipette`), its configuration (see `configureForVolume`),"
+        " the tip (see `pickUpTip`), and the amount you've aspirated so far."
+        " There is some tolerance for floating point rounding errors.",
+        ge=0,
+    )
+
+
+class DispenseVolumeMixin(BaseModel):
+    """Mixin for the `volume` field of dispense commands."""
+
+    volume: float = Field(
+        ...,
+        description="The amount of liquid to dispense, in µL."
+        " Must not be greater than the currently aspirated volume."
+        " There is some tolerance for floating point rounding errors.",
+        ge=0,
     )
 
 
@@ -88,7 +103,7 @@ class BaseLiquidHandlingResult(BaseModel):
     volume: float = Field(
         ...,
         description="Amount of liquid in uL handled in the operation.",
-        gt=0,
+        ge=0,
     )
 
 

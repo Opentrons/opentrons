@@ -2,15 +2,11 @@ import { createSelector } from 'reselect'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import { getIsTiprack, getLabwareDisplayName } from '@opentrons/shared-data'
-import {
-  AdditionalEquipmentEntity,
-  COLUMN_4_SLOTS,
-} from '@opentrons/step-generation'
-import { i18n } from '../../localization'
+import { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 import * as stepFormSelectors from '../../step-forms/selectors'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import { getModuleUnderLabware } from '../modules/utils'
-import { getLabwareOffDeck } from './utils'
+import { getModuleShortNames, getModuleUnderLabware } from '../modules/utils'
+import { getLabwareOffDeck, getLabwareInColumn4 } from './utils'
 
 import type { LabwareEntity } from '@opentrons/step-generation'
 import type { DropdownOption, Options } from '@opentrons/components'
@@ -82,27 +78,6 @@ export const getLabwareOptions: Selector<Options> = createSelector(
           savedStepForms ?? {},
           labwareId
         )
-        const isStartingInColumn4 = COLUMN_4_SLOTS.includes(
-          initialDeckSetup.labware[labwareId]?.slot
-        )
-
-        const isInColumn4 =
-          savedStepForms != null
-            ? Object.values(savedStepForms)
-                ?.reverse()
-                .some(
-                  form =>
-                    form.stepType === 'moveLabware' &&
-                    form.labware === labwareId &&
-                    (COLUMN_4_SLOTS.includes(form.newLocation) ||
-                      (isStartingInColumn4 &&
-                        !COLUMN_4_SLOTS.includes(form.newLocation)))
-                )
-            : false
-
-        const isAdapterOrAluminumBlock =
-          isAdapter ||
-          labwareEntity.def.metadata.displayCategory === 'aluminumBlock'
 
         const moduleOnDeck = getModuleUnderLabware(
           initialDeckSetup,
@@ -110,18 +85,20 @@ export const getLabwareOptions: Selector<Options> = createSelector(
           labwareId
         )
         const module =
-          moduleOnDeck != null
-            ? i18n.t(
-                `form.step_edit_form.field.moduleLabwarePrefix.${moduleOnDeck.type}`
-              )
-            : null
+          moduleOnDeck != null ? getModuleShortNames(moduleOnDeck.type) : null
+
+        const isLabwareInColumn4 = getLabwareInColumn4(
+          initialDeckSetup,
+          savedStepForms ?? {},
+          labwareId
+        )
 
         let nickName = nicknamesById[labwareId]
         if (module != null) {
           nickName = `${nicknamesById[labwareId]} in ${module}`
         } else if (isOffDeck) {
-          nickName = `Off-deck - ${nicknamesById[labwareId]}`
-        } else if (isInColumn4) {
+          nickName = `${nicknamesById[labwareId]} off-deck`
+        } else if (isLabwareInColumn4) {
           nickName = `${nicknamesById[labwareId]} in staging area slot`
         }
 
@@ -140,9 +117,9 @@ export const getLabwareOptions: Selector<Options> = createSelector(
                 },
               ]
         } else {
-          //  filter out moving trash, aluminum blocks, adapters and labware in
+          //  filter out moving trash, adapters, and labware in
           //  waste chute for moveLabware
-          return isAdapterOrAluminumBlock || isLabwareInWasteChute
+          return isAdapter || isLabwareInWasteChute
             ? acc
             : [
                 ...acc,

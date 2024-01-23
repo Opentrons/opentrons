@@ -5,7 +5,7 @@ import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors
 
 import { ConnectedStepList } from './ConnectedStepList'
 import { IngredientsList } from './IngredientsList'
-import { FileSidebar } from '../components/FileSidebar'
+import { FileSidebar } from '../components/FileSidebar/FileSidebar'
 import { LiquidsSidebar } from '../components/LiquidsSidebar'
 import { SettingsSidebar } from '../components/SettingsPage'
 
