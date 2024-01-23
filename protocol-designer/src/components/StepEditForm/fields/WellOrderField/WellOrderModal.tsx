@@ -9,12 +9,12 @@ import {
   FormGroup,
   DropdownField,
 } from '@opentrons/components'
-import modalStyles from '../../../modals/modal.css'
-import { WellOrderOption } from '../../../../form-types'
-
 import { WellOrderViz } from './WellOrderViz'
-import styles from './WellOrderInput.css'
+import type { WellOrderOption } from '../../../../form-types'
+
+import modalStyles from '../../../modals/modal.css'
 import stepEditStyles from '../../StepEditForm.css'
+import styles from './WellOrderInput.css'
 
 const DEFAULT_FIRST: WellOrderOption = 't2b'
 const DEFAULT_SECOND: WellOrderOption = 'l2r'
@@ -83,19 +83,20 @@ export const DoneButton = (props: { onClick: () => void }): JSX.Element => {
     </DeprecatedPrimaryButton>
   )
 }
+
 export const WellOrderModal = (
   props: WellOrderModalProps
 ): JSX.Element | null => {
+  const { t } = useTranslation(['form', 'modal'])
   const {
     isOpen,
     closeModal,
-    firstValue,
-    secondValue,
     firstName,
     secondName,
     updateValues,
+    firstValue,
+    secondValue,
   } = props
-  const { t } = useTranslation(['form', 'modal'])
   const getInitialFirstValues: () => {
     initialFirstValue: WellOrderOption
     initialSecondValue: WellOrderOption
@@ -112,11 +113,20 @@ export const WellOrderModal = (
     }
   }
 
-  const { initialFirstValue, initialSecondValue } = getInitialFirstValues()
   const [state, setState] = React.useState<State>({
-    firstValue: initialFirstValue,
-    secondValue: initialSecondValue,
+    firstValue: DEFAULT_FIRST,
+    secondValue: DEFAULT_SECOND,
   })
+
+  React.useEffect(() => {
+    const { firstValue, secondValue } = props
+    if (firstValue != null && secondValue != null) {
+      setState({
+        firstValue: firstValue,
+        secondValue: secondValue,
+      })
+    }
+  }, [props])
 
   const applyChanges = (): void => {
     updateValues(state.firstValue, state.secondValue)
@@ -129,6 +139,7 @@ export const WellOrderModal = (
   }
 
   const handleCancel = (): void => {
+    const { initialFirstValue, initialSecondValue } = getInitialFirstValues()
     setState({
       firstValue: initialFirstValue,
       secondValue: initialSecondValue,
@@ -141,11 +152,9 @@ export const WellOrderModal = (
     closeModal()
   }
 
-  const makeOnChange: (
-    ordinality: 'first' | 'second'
-  ) => (
+  const makeOnChange = (ordinality: 'first' | 'second') => (
     event: React.ChangeEvent<HTMLSelectElement>
-  ) => void = ordinality => event => {
+  ): void => {
     const { value } = event.currentTarget
     // @ts-expect-error (ce, 2021-06-22) missing one prop or the other
     let nextState: State = { [`${ordinality}Value`]: value }
@@ -165,9 +174,7 @@ export const WellOrderModal = (
     setState(nextState)
   }
 
-  const isSecondOptionDisabled: (
-    wellOrderOption: WellOrderOption
-  ) => boolean = (value: WellOrderOption) => {
+  const isSecondOptionDisabled = (value: WellOrderOption): boolean => {
     if (VERTICAL_VALUES.includes(state.firstValue)) {
       return VERTICAL_VALUES.includes(value)
     } else if (HORIZONTAL_VALUES.includes(state.firstValue)) {
@@ -195,7 +202,7 @@ export const WellOrderModal = (
             <div className={styles.field_row}>
               <DropdownField
                 name={firstName}
-                value={firstValue}
+                value={state.firstValue}
                 className={cx(stepEditStyles.field, styles.well_order_dropdown)}
                 onChange={makeOnChange('first')}
                 options={WELL_ORDER_VALUES.map(value => ({
@@ -208,7 +215,7 @@ export const WellOrderModal = (
               </span>
               <DropdownField
                 name={secondName}
-                value={secondValue}
+                value={state.secondValue}
                 className={cx(stepEditStyles.field, styles.well_order_dropdown)}
                 onChange={makeOnChange('second')}
                 options={WELL_ORDER_VALUES.map(value => ({
@@ -221,8 +228,8 @@ export const WellOrderModal = (
           </FormGroup>
           <FormGroup label={t('well_order.viz_label')}>
             <WellOrderViz
-              firstValue={firstValue ?? 'l2r'}
-              secondValue={secondValue ?? 'l2r'}
+              firstValue={state.firstValue}
+              secondValue={state.secondValue}
             />
           </FormGroup>
         </div>
