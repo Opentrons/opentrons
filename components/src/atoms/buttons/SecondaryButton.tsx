@@ -28,23 +28,31 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   }
 
   &:hover {
-    opacity: 70%;
+    color: ${props => (props.isDangerous ? COLORS.red60 : COLORS.blue60)};
+    border-color: ${props =>
+      props.isDangerous ? COLORS.red50 : COLORS.blue60};
     box-shadow: 0 0 0;
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.blue50};
+    color: ${props => (props.isDangerous ? COLORS.red60 : COLORS.blue60)};
+    border-color: ${props =>
+      props.isDangerous ? COLORS.red50 : COLORS.blue60};
+    box-shadow: 0 0 0 3px ${COLORS.yellow50};
   }
 
   &:active {
     box-shadow: none;
+    color: ${props => (props.isDangerous ? COLORS.red60 : COLORS.blue60)};
+    border-color: ${props =>
+      props.isDangerous ? COLORS.red50 : COLORS.blue60};
   }
 
   &:disabled,
   &.disabled {
     box-shadow: none;
-    opacity: 50%;
-    cursor: default;
+    border-color: ${COLORS.grey30};
+    color: ${COLORS.grey40};
   }
 
   ${styleProps}

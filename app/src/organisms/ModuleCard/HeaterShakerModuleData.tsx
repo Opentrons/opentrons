@@ -37,7 +37,7 @@ export const HeaterShakerModuleData = (
   ): { backgroundColor: string; iconColor: string; textColor: string } => {
     const StatusLabelProps = {
       backgroundColor: COLORS.grey30,
-      iconColor: COLORS.grey50,
+      iconColor: COLORS.grey60,
       textColor: COLORS.blue60,
       pulse: false,
     }
@@ -45,18 +45,18 @@ export const HeaterShakerModuleData = (
     switch (status) {
       case 'idle': {
         StatusLabelProps.backgroundColor = COLORS.grey30
-        StatusLabelProps.iconColor = COLORS.grey50
-        StatusLabelProps.textColor = COLORS.black90
+        StatusLabelProps.iconColor = COLORS.grey60
+        StatusLabelProps.textColor = COLORS.grey60
         break
       }
       case 'holding at target': {
         StatusLabelProps.backgroundColor = COLORS.blue30
-        StatusLabelProps.iconColor = COLORS.blue50
+        StatusLabelProps.iconColor = COLORS.blue60
         break
       }
       case 'error': {
-        StatusLabelProps.backgroundColor = COLORS.yellow20
-        StatusLabelProps.iconColor = COLORS.yellow50
+        StatusLabelProps.backgroundColor = COLORS.yellow30
+        StatusLabelProps.iconColor = COLORS.yellow60
         StatusLabelProps.textColor = COLORS.yellow60
         break
       }
@@ -64,7 +64,8 @@ export const HeaterShakerModuleData = (
       case 'cooling':
       case 'slowing down':
       case 'speeding up': {
-        StatusLabelProps.backgroundColor = COLORS.blue50 + '1A'
+        StatusLabelProps.backgroundColor = COLORS.blue30 + '1A'
+        StatusLabelProps.iconColor = COLORS.blue60
         StatusLabelProps.pulse = true
         break
       }
