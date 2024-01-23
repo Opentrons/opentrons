@@ -22,14 +22,14 @@ import type { ThunkDispatch } from '../../types'
 export interface StepListProps {
   isMultiSelectMode?: boolean | null
   orderedStepIds: StepIdType[]
-  reorderSelectedStep: (delta: number) => unknown
-  reorderSteps: (steps: StepIdType[]) => unknown
+  reorderSelectedStep: (delta: number) => void
+  reorderSteps: (steps: StepIdType[]) => void
 }
 
 export const StepList = (): JSX.Element => {
   const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
-  const dispatch: ThunkDispatch<any> = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<any>>()
 
   const handleKeyDown: (e: KeyboardEvent) => void = e => {
     const key = e.key
