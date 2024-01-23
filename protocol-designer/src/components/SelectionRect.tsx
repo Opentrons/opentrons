@@ -1,7 +1,6 @@
 import * as React from 'react'
-import throttle from 'lodash/throttle'
 import styles from './SelectionRect.css'
-import { DragRect, GenericRect } from '../collision-types'
+import type { DragRect, GenericRect } from '../collision-types'
 
 interface SelectionRectProps {
   onSelectionMove?: (e: MouseEvent, arg: GenericRect) => void
@@ -80,10 +79,36 @@ export const SelectionRect = (props: SelectionRectProps): JSX.Element => {
     }
   }
 
+  const handleDrag = (e: MouseEvent) => {
+    setPositions(prevPositions => {
+      if (prevPositions) {
+        const nextRect = {
+          ...prevPositions,
+          xDynamic: e.clientX,
+          yDynamic: e.clientY,
+        }
+        const rect = getRect(nextRect)
+        onSelectionMove && onSelectionMove(e, rect)
+
+        return nextRect
+      }
+      return prevPositions
+    })
+  }
+
+  const handleMouseUp = (e: MouseEvent): void => {
+    if (!(e instanceof MouseEvent)) {
+      return
+    }
+    const finalRect = positions && getRect(positions)
+    setPositions(prevPositions => {
+      return prevPositions === positions ? null : prevPositions
+    })
+    // call onSelectionDone callback with {x0, x1, y0, y1} of final selection rectangle
+    onSelectionDone && finalRect && onSelectionDone(e, finalRect)
+  }
+
   const handleMouseDown: React.MouseEventHandler = e => {
-    e.preventDefault()
-    document.addEventListener('mousemove', handleDragThrottled)
-    document.addEventListener('mouseup', handleMouseUp)
     setPositions({
       xStart: e.clientX,
       xDynamic: e.clientX,
@@ -92,52 +117,15 @@ export const SelectionRect = (props: SelectionRectProps): JSX.Element => {
     })
   }
 
-  const handleDrag = (e: MouseEvent): void => {
-    setPositions(prevPositions => {
-      if (prevPositions) {
-        const nextRect = {
-          ...prevPositions,
-          xDynamic: e.clientX,
-          yDynamic: e.clientY,
-        }
-
-        const rect = getRect(nextRect)
-        onSelectionMove && onSelectionMove(e, rect)
-
-        return nextRect
-      }
-
-      return prevPositions
-    })
-  }
-
-  //  ensure handleDrag is only fired once every ms using throttle fn
-  //  provides smoother experience and less lagginess when dragging
-  //  to select wells
-  const handleDragThrottled = throttle(handleDrag, 16)
-
-  const handleMouseUp = (e: MouseEvent): void => {
-    if (!(e instanceof MouseEvent)) {
-      return
-    }
-    document.removeEventListener('mousemove', handleDragThrottled)
-    document.removeEventListener('mouseup', handleMouseUp)
-
-    const finalRect = positions && getRect(positions)
-    setPositions(prevPositions => {
-      return prevPositions === positions ? null : prevPositions
-    })
-
-    // call onSelectionDone callback with {x0, x1, y0, y1} of final selection rectangle
-    onSelectionDone && finalRect && onSelectionDone(e, finalRect)
-  }
-
   React.useEffect(() => {
+    document.addEventListener('mousemove', handleDrag)
+    document.addEventListener('mouseup', handleMouseUp)
     return () => {
-      document.removeEventListener('mousemove', handleDragThrottled)
+      document.removeEventListener('mousemove', handleDrag)
       document.removeEventListener('mouseup', handleMouseUp)
     }
-  }, [])
+  }, [handleDrag, handleMouseUp])
+
   return svg ? (
     <g
       onMouseDown={handleMouseDown}
