@@ -79,7 +79,7 @@ export const SelectionRect = (props: SelectionRectProps): JSX.Element => {
     }
   }
 
-  const handleDrag = (e: MouseEvent) => {
+  const handleDrag = (e: MouseEvent): void => {
     setPositions(prevPositions => {
       if (prevPositions) {
         const nextRect = {
