@@ -208,8 +208,6 @@ async def get_active_persistence_directory(
         initialize_task is not None
     ), "Forgot to start persistence directory initialization as part of server startup?"
 
-    _log.warn("get_persistence_directory() result", initialize_task)
-
     try:
         return initialize_task.result()
 
