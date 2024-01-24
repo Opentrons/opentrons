@@ -9,6 +9,8 @@ import type {
   ModuleType,
 } from '@opentrons/shared-data'
 
+import { Tooltip, useHoverTooltip } from '../../tooltips'
+
 interface SingleSlotFixtureProps extends React.SVGProps<SVGGElement> {
   cutoutId: CutoutId
   deckDefinition: DeckDefinition
@@ -29,6 +31,8 @@ export function SingleSlotFixture(
     showExpansion = false,
     ...restProps
   } = props
+
+  const [targetProps, tooltipProps] = useHoverTooltip()
 
   const cutoutDef = deckDefinition?.locations.cutouts.find(
     s => s.id === cutoutId

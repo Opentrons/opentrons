@@ -2,6 +2,8 @@ import * as React from 'react'
 import isEqual from 'lodash/isEqual'
 import { css } from 'styled-components'
 import {
+  CutoutConfig,
+  CutoutFixtureId,
   FLEX_CUTOUT_BY_SLOT_ID,
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
@@ -10,7 +12,6 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { Tooltip, useHoverTooltip } from '../../tooltips'
-
 import {
   DeckFromLayers,
   LegacyDeckSlotLocation,
@@ -22,7 +23,7 @@ import {
   SlotLabels,
 } from '../../hardware-sim'
 import { Icon } from '../../icons'
-import { Text } from '../../primitives'
+import { Flex, Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
 import { COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
@@ -75,7 +76,7 @@ interface DeckLocationSelectProps {
   selectedLocation: ModuleLocation
   theme?: DeckLocationSelectThemes
   setSelectedLocation?: (loc: ModuleLocation) => void
-  disabledLocations?: ModuleLocation[]
+  disabledLocations?: CutoutConfig[]
   isThermocycler?: boolean
   showTooltipOnDisabled?: boolean
 }
@@ -174,23 +175,23 @@ export function DeckLocationSelect({
                         : 'pointer'
                     }
                     deckDefinition={deckDef}
-                    {...targetProps}
                   />
                   {isDisabled && showTooltipOnDisabled && slotPosition != null && (
                     <RobotCoordsForeignDiv
                       x={slotPosition[0]}
                       y={slotPosition[1]}
-                      width={slot.boundingBox.xDimension}
-                      height={slot.boundingBox.yDimension}
+                      width={200}
+                      height={100}
                       innerDivProps={INNER_DIV_PROPS}
+                      css={css`
+                        z-index: 1;
+                      `}
                     >
-                      <Tooltip
-                        {...tooltipProps}
-                        css={css`
-                          z-index: 100001;
-                        `}
-                      >
-                        {`Slot ${slot.id} disabled because of xyz`}
+                      <Flex height={100} width={200} {...targetProps} />
+                      <Tooltip {...tooltipProps}>
+                        <Text color={COLORS.white} fontSize="1.5rem">
+                          {`Slot ${slot.id} disabled because of xyz`}
+                        </Text>
                       </Tooltip>
                     </RobotCoordsForeignDiv>
                   )}

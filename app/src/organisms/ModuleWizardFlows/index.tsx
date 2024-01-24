@@ -11,7 +11,6 @@ import {
   CreateCommand,
   getModuleType,
   getModuleDisplayName,
-  CutoutId,
   FLEX_CUTOUT_BY_SLOT_ID,
 } from '@opentrons/shared-data'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
@@ -70,19 +69,18 @@ export const ModuleWizardFlows = (
 
   const moduleCalibrationSteps = getModuleCalibrationSteps()
   const deckConfig = useDeckConfigurationQuery().data ?? []
-  const occupiedCutouts = deckConfig.reduce<CutoutId[]>((acc, fixture) => {
-    return (fixture.cutoutFixtureId as SingleSlotCutoutFixtureId)?.includes(
-      'single'
-    )
-      ? acc
-      : [...acc, fixture.cutoutId]
-  }, [])
+  const occupiedCutouts = deckConfig.filter(
+    fixture =>
+      !(fixture.cutoutFixtureId as SingleSlotCutoutFixtureId)?.includes(
+        'single'
+      )
+  )
   const availableSlotNames =
     FLEX_SLOT_NAMES_BY_MOD_TYPE[
       getModuleType(attachedModule.moduleModel)
     ]?.filter(
       slot =>
-        !occupiedCutouts.some(
+        !Object.keys(occupiedCutouts).some(
           occCutout => occCutout === FLEX_CUTOUT_BY_SLOT_ID[slot]
         )
     ) ?? []
@@ -296,6 +294,7 @@ export const ModuleWizardFlows = (
         {...calibrateBaseProps}
         availableSlotNames={availableSlotNames}
         setSlotName={setSlotName}
+        occupiedCutouts={occupiedCutouts}
       />
     )
   } else if (currentStep.section === SECTIONS.PLACE_ADAPTER) {

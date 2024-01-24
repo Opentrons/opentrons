@@ -7,6 +7,9 @@ import {
   getDeckDefFromRobotType,
   getModuleDisplayName,
   THERMOCYCLER_MODULE_TYPE,
+  CutoutConfig,
+  FLEX_SLOT_BY_CUTOUT_ID,
+  FLEX_CUTOUT_BY_SLOT_ID,
 } from '@opentrons/shared-data'
 import {
   RESPONSIVENESS,
@@ -19,6 +22,7 @@ import { Banner } from '../../atoms/Banner'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import type { ModuleCalibrationWizardStepProps } from './types'
+import type { CutoutFixtureId } from '@opentrons/shared-data'
 
 export const BODY_STYLE = css`
   ${TYPOGRAPHY.pRegular};
@@ -31,6 +35,7 @@ export const BODY_STYLE = css`
 interface SelectLocationProps extends ModuleCalibrationWizardStepProps {
   setSlotName: React.Dispatch<React.SetStateAction<string>>
   availableSlotNames: string[]
+  occupiedCutouts: CutoutConfig[]
 }
 export const SelectLocation = (
   props: SelectLocationProps
@@ -41,6 +46,7 @@ export const SelectLocation = (
     slotName,
     setSlotName,
     availableSlotNames,
+    occupiedCutouts,
   } = props
   const { t } = useTranslation('module_wizard_flows')
   const moduleName = getModuleDisplayName(attachedModule.moduleModel)
@@ -58,6 +64,31 @@ export const SelectLocation = (
       </Banner>
     </>
   )
+
+  const disabledLocations = deckDef.locations.addressableAreas.reduce<
+    CutoutConfig[]
+  >((acc, slot) => {
+    if (availableSlotNames.some(slotName => slotName === slot.id)) return acc
+    else {
+      const cutoutMatches = occupiedCutouts.filter(
+        fixture => FLEX_SLOT_BY_CUTOUT_ID[fixture.cutoutId] === slot.id
+      )
+      if (cutoutMatches.length > 0) {
+        return [...acc, cutoutMatches[0]]
+      } else {
+        return [
+          ...acc,
+          {
+            cutoutId: FLEX_CUTOUT_BY_SLOT_ID[slot.id],
+            cutoutFixtureId: null,
+          } as CutoutConfig,
+        ]
+      }
+    }
+  }, [])
+
+  console.log('🚀 ~ disabledLocations:', disabledLocations)
+
   return (
     <GenericWizardTile
       header={t('select_location')}
@@ -66,13 +97,7 @@ export const SelectLocation = (
           deckDef={deckDef}
           selectedLocation={{ slotName }}
           setSelectedLocation={loc => setSlotName(loc.slotName)}
-          disabledLocations={deckDef.locations.addressableAreas.reduce<
-            ModuleLocation[]
-          >((acc, slot) => {
-            if (availableSlotNames.some(slotName => slotName === slot.id))
-              return acc
-            return [...acc, { slotName: slot.id }]
-          }, [])}
+          disabledLocations={disabledLocations}
           isThermocycler={
             attachedModule.moduleType === THERMOCYCLER_MODULE_TYPE
           }
