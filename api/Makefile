@@ -135,7 +135,6 @@ docs/build/html/v%: docs/v%
 docs/build/html/hardware: docs/hardware src/opentrons/hardware_control
 	$(sphinx_build_allow_warnings) -b html -d docs/build/doctrees -n $< $@
 	$(SHX) mkdir $@/_images/
-	$(SHX) cp docs/img/lightbulb.jpg $@/_images/
 
 docs/dist/v%: docs/build/html/v%
 	$(SHX) mkdir -p $@
