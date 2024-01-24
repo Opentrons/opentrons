@@ -2,6 +2,48 @@
   "browse_labware": {
     "instructions": "Hover on a well to see contents"
   },
+  "announcements": {
+    "header": "We've updated the {{pd}}",
+    "modulesRequireRunAppUpdate": {
+      "body1": "{{pd}} Beta now includes support for Temperature and Magnetic modules.",
+      "body2": "Note: Protocols with modules <bold>may require an app and robot update to run</bold>. You will need to have the {{app}} and robot on the latest versions ( <bold>3.17 or higher</bold>)"
+    },
+    "thermocyclerSupport": {
+      "body1": "{{pd}} Beta now includes support for the Thermocycler!",
+      "body2": "Note: Protocols with modules <strong>may require an app and robot update to run</strong>. You will need to have the {{app}} and robot on the latest versions (<strong>3.18 or higher</strong>)."
+    },
+    "airGapDelaySettings": {
+      "body1": "{{pd}} Beta now includes support for more pipetting settings: Air gap and Delay.",
+      "body2": "Note: Protocols using new features <strong>may require an app and robot update to run.</strong> You will need to have the {{app}} and orbot on the latest versions (<strong>3.20 or higher</strong>)."
+    },
+    "batchEditTransfer": {
+      "body1": "Starting today, you’ll be able to:",
+      "body2": "Select, delete, and duplicate multiple steps at once",
+      "body3": "Edit advanced settings for multiple Transfer or Mix steps at once",
+      "body4": "To enter multi-select mode, simply hold <strong>SHIFT</strong> or <strong>CTRL/CMND</strong> and click on a step.",
+      "body5": "From here, you can access the control bar at the top of the protocol timeline, or edit advanced settings for Transfer or Mix steps!"
+    },
+    "heaterShakerSupport": {
+      "body1": "The {{opd}} now supports our Heater-Shaker Module!",
+      "body2": "All protocols now require {{app}} version <strong> 6.1+ </strong> to run."
+    },
+    "thermocyclerGen2Support": {
+      "body1": "The {{opd}} now supports our Thermocycler Module GEN2!",
+      "body2": "All protocols now require {{app}} version <strong> 6.2+ </strong> to run."
+    },
+    "liquidColorEnhancements": {
+      "body1": "The {{opd}} now lets you customize liquid colors!",
+      "body2": "All protocols now require {{app}} version <strong> 6.2+ </strong> to run."
+    },
+    "flexSupport7.0": {
+      "body1": "Introducing the {{pd}} 7.0 with {{flex}} support!",
+      "body2": "All protocols now require {{app}} version <strong> 7.0+ </strong> to run."
+    },
+    "deckConfigAnd96Channel8.0": {
+      "body1": "Introducing the {{pd}} 8.0 with deck configuration and 96-channel pipette support!",
+      "body2": "All protocols now require {{app}} version <strong> 7.1+ </strong> to run."
+    }
+  },
   "labware_selection": {
     "measurements": "Labware Measurements",
     "well_count": "# of wells",
