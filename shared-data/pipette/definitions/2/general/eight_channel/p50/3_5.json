@@ -64,7 +64,7 @@
   "backCompatNames": [],
   "channels": 8,
   "shaftDiameter": 1.0,
-  "shaftULperMM": 0.785,
+  "shaftULperMM": 1.767,
   "backlashDistance": 0.1,
   "quirks": [],
   "plungerHomingConfigurations": {
