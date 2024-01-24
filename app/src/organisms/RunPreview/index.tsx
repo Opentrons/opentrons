@@ -131,11 +131,7 @@ export const RunPreviewComponent = (
                 `}
               >
                 <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-                  <CommandIcon
-                    command={command}
-                    color={contentColor}
-                    size="1rem"
-                  />
+                  <CommandIcon command={command} color={contentColor} />
                   <CommandText
                     command={command}
                     robotSideAnalysis={robotSideAnalysis}
