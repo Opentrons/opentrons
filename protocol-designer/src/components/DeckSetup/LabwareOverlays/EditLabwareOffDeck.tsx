@@ -40,7 +40,7 @@ const NAME_LABWARE_OVERLAY_STYLE = css`
 const REGULAR_OVERLAY_STYLE = css`
   z-index: 1;
   padding: ${SPACING.spacing8};
-  background-color: ${COLORS.grey60};
+  background-color: ${COLORS.black90}${COLORS.opacity90HexCode};
   flex-direction: ${DIRECTION_COLUMN};
   color: ${COLORS.white};
   display: flex;

@@ -5,19 +5,19 @@ import last from 'lodash/last'
 import { useHistory } from 'react-router-dom'
 
 import {
-  Box,
-  Flex,
-  DIRECTION_ROW,
   ALIGN_START,
+  Box,
+  COLORS,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  IconProps,
+  ModuleIcon,
   SPACING,
   TYPOGRAPHY,
-  useOnClickOutside,
-  IconProps,
   useHoverTooltip,
-  COLORS,
-  Icon,
-  ModuleIcon,
+  useOnClickOutside,
 } from '@opentrons/components'
 import {
   getModuleDisplayName,
@@ -409,7 +409,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                     moduleType={module.moduleType}
                     size="1rem"
                     marginRight={SPACING.spacing2}
-                    color={COLORS.grey50}
+                    color={COLORS.grey60}
                   />
                   <StyledText>
                     {getModuleDisplayName(module.moduleModel)}

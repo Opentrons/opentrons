@@ -4,19 +4,19 @@ import startCase from 'lodash/startCase'
 import { format } from 'date-fns'
 
 import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
+  BORDERS,
   Box,
+  COLORS,
+  DIRECTION_COLUMN,
   Flex,
   Icon,
+  JUSTIFY_SPACE_BETWEEN,
   LabwareRender,
   RobotWorkSpace,
   SPACING,
   TYPOGRAPHY,
-  BORDERS,
-  COLORS,
-  JUSTIFY_SPACE_BETWEEN,
-  DIRECTION_COLUMN,
-  ALIGN_FLEX_END,
-  ALIGN_CENTER,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -104,7 +104,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             <StyledText
               as="h6"
               textTransform={TYPOGRAPHY.textTransformUppercase}
-              color={COLORS.grey50}
+              color={COLORS.grey60}
               id="LabwareCard_apiName"
             >
               {t('api_name')}
