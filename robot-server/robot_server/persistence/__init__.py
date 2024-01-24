@@ -1,7 +1,7 @@
 """Support for persisting data across device reboots."""
 
 
-from ._database import create_sql_engine, sqlite_rowid
+from ._database import create_schema_3_sql_engine, sqlite_rowid
 from ._fastapi_dependencies import (
     start_initializing_persistence,
     clean_up_persistence,
@@ -21,7 +21,7 @@ from ._tables import (
 
 __all__ = [
     # database utilities and helpers
-    "create_sql_engine",
+    "create_schema_3_sql_engine",
     "sqlite_rowid",
     # database tables
     "migration_table",
