@@ -33,6 +33,7 @@ from ..types import (
     OnDeckLabwareLocation,
     AddressableAreaLocation,
     AddressableOffsetVector,
+    AddressableArea,
 )
 from .config import Config
 from .labware import LabwareView
@@ -158,6 +159,8 @@ class GeometryView:
         elif isinstance(slot_item, LoadedLabware):
             # get stacked heights of all labware in the slot
             return self.get_highest_z_of_labware_stack(slot_item.id)
+        elif isinstance(slot_item, AddressableArea):
+            return slot_item.position.z
         else:
             return 0
 
@@ -679,21 +682,35 @@ class GeometryView:
 
     def get_slot_item(
         self, slot_name: Union[DeckSlotName, StagingSlotName]
-    ) -> Union[LoadedLabware, LoadedModule, None]:
+    ) -> Union[LoadedLabware, LoadedModule, AddressableArea, None]:
         """Get the item present in a deck slot, if any."""
         maybe_labware = self._labware.get_by_slot(
             slot_name=slot_name,
         )
 
         if isinstance(slot_name, DeckSlotName):
-            maybe_module = self._modules.get_by_slot(
-                slot_name=slot_name,
-            )
+            areas = self._addressable_areas.get_all()
+            maybe_fixture = None
+            if areas:
+                for area in areas:
+                    if (
+                        self._addressable_areas.get_addressable_area_base_slot(area)
+                        == slot_name
+                    ):
+                        maybe_fixture = self._addressable_areas.get_addressable_area(
+                            area
+                        )
+
+                if maybe_fixture is None:
+                    maybe_module = self._modules.get_by_slot(
+                        slot_name=slot_name,
+                    )
         else:
-            # Modules can't be loaded on staging slots
+            # Modules and fixtures can't be loaded on staging slots
+            maybe_fixture = None
             maybe_module = None
 
-        return maybe_labware or maybe_module or None
+        return maybe_labware or maybe_fixture or maybe_module or None
 
     @staticmethod
     def get_slot_column(slot_name: DeckSlotName) -> int:
