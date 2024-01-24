@@ -30,7 +30,7 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   &:hover {
     color: ${props => (props.isDangerous ? COLORS.red60 : COLORS.blue60)};
     border-color: ${props =>
-      props.isDangerous ? COLORS.red50 : COLORS.blue60};
+      props.isDangerous ? COLORS.red50 : COLORS.blue55};
     box-shadow: 0 0 0;
   }
 
@@ -43,9 +43,9 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
 
   &:active {
     box-shadow: none;
-    color: ${props => (props.isDangerous ? COLORS.red60 : COLORS.blue60)};
+    color: ${props => (props.isDangerous ? COLORS.red60 : COLORS.blue55)};
     border-color: ${props =>
-      props.isDangerous ? COLORS.red50 : COLORS.blue60};
+      props.isDangerous ? COLORS.red50 : COLORS.blue55};
   }
 
   &:disabled,
