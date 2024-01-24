@@ -6,7 +6,7 @@ import sqlalchemy
 from server_utils import sql_utils
 
 from ._tables import add_tables_to_db
-from ._migrations import migrate
+from ._migrations.up_to_2 import migrate
 
 
 # A reference to SQLite's built-in ROWID column.
