@@ -28,6 +28,7 @@ import * as Fixtures from '../../../redux/system-info/__fixtures__'
 import {
   EnableDevTools,
   OT2AdvancedSettings,
+  PreventRobotCaching,
 } from '../../../organisms/AdvancedSettings'
 
 import { AdvancedSettings } from '../AdvancedSettings'
@@ -96,6 +97,9 @@ const mockOpenPythonInterpreterDirectory = ProtocolAnalysis.openPythonInterprete
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
+const mockPreventRobotCaching = PreventRobotCaching as jest.MockedFunction<
+  typeof PreventRobotCaching
+>
 
 const mockOT2AdvancedSettings = OT2AdvancedSettings as jest.MockedFunction<
   typeof OT2AdvancedSettings
@@ -130,9 +134,11 @@ describe('AdvancedSettings', () => {
       showConfirmation: true,
       cancel: mockCancel,
     })
+    mockPreventRobotCaching.mockReturnValue(<div>mock PreventRobotCaching</div>)
     mockOT2AdvancedSettings.mockReturnValue(<div>mock OT2AdvancedSettings</div>)
     mockEnableDevTools.mockReturnValue(<div>mock EnableDevTools</div>)
   })
+
   afterEach(() => {
     jest.resetAllMocks()
     resetAllWhenMocks()
@@ -142,10 +148,10 @@ describe('AdvancedSettings', () => {
     const [{ getByText }] = render()
     getByText('Update Channel')
     getByText('Additional Custom Labware Source Folder')
-    getByText('Prevent Robot Caching')
     getByText('Clear Unavailable Robots')
     getByText('USB-to-Ethernet Adapter Information')
   })
+
   it('renders the update channel combobox and section', () => {
     const [{ getByText, getByRole }] = render()
     getByText(
@@ -153,6 +159,7 @@ describe('AdvancedSettings', () => {
     )
     getByRole('combobox', { name: '' })
   })
+
   it('renders the custom labware section with source folder selected', () => {
     getCustomLabwarePath.mockReturnValue('/mock/custom-labware-path')
     const [{ getByText, getByRole }] = render()
@@ -162,6 +169,7 @@ describe('AdvancedSettings', () => {
     getByText('Additional Source Folder')
     getByRole('button', { name: 'Change labware source folder' })
   })
+
   it('renders the custom labware section with no source folder selected', () => {
     const [{ getByText, getByRole }] = render()
     getByText('No additional source folder specified')
@@ -176,12 +184,10 @@ describe('AdvancedSettings', () => {
     render()
     screen.getByText('mock OT2AdvancedSettings')
   })
-  it('renders the robot caching section', () => {
-    const [{ queryByText, getByRole }] = render()
-    queryByText(
-      'The app will immediately clear unavailable robots and will not remember unavailable robots while this is enabled. On networks with many robots, preventing caching may improve network performance at the expense of slower and less reliable robot discovery on app launch.'
-    )
-    getByRole('switch', { name: 'display_unavailable_robots' })
+
+  it('should render mock robot caching section', () => {
+    render()
+    screen.getByText('mock PreventRobotCaching')
   })
 
   it('render the usb-to-ethernet adapter information', () => {
@@ -345,6 +351,7 @@ describe('AdvancedSettings', () => {
     fireEvent.click(proceedBtn)
     expect(mockConfirm).toHaveBeenCalled()
   })
+
   it('should render mock developer tools section', () => {
     render()
     screen.getByText('mock EnableDevTools')
