@@ -224,7 +224,7 @@ async def _main(is_simulating: bool) -> None:
         ROWS = 1
     else:
         print("Test requires a high-throughput load (96ch pipette)\n")
-        Print("Exiting script...\n")
+        print("Exiting script...\n")
         sys.exit()
         # if "single" in test_pip['name']:
         #     multi_pip = False
@@ -236,18 +236,18 @@ async def _main(is_simulating: bool) -> None:
         #     ### remove ### check_tip_presence = True
 
     slot_loc = {
-        "A1": (13.42, 394.92, 110),
-        "A2": (177.32, 394.92, 110),
-        "A3": (341.03, 394.92, 110),
-        "B1": (13.42, 288.42, 110),
-        "B2": (177.32, 288.92, 110),
-        "B3": (341.03, 288.92, 110),
-        "C1": (13.42, 181.92, 110),
-        "C2": (177.32, 181.92, 110),
-        "C3": (341.03, 181.92, 110),
-        "D1": (13.42, 75.5, 110),
-        "D2": (177.32, 75.5, 110),
-        "D3": (341.03, 75.5, 110),
+        "A1": (13.42, 394.92, 150),
+        "A2": (177.32, 394.92, 150),
+        "A3": (341.03, 394.92, 150),
+        "B1": (13.42, 288.42, 150),
+        "B2": (177.32, 288.92, 150),
+        "B3": (341.03, 288.92, 150),
+        "C1": (13.42, 181.92, 150),
+        "C2": (177.32, 181.92, 150),
+        "C3": (341.03, 181.92, 150),
+        "D1": (13.42, 75.5, 150),
+        "D2": (177.32, 75.5, 150),
+        "D3": (341.03, 75.5, 150),
     }
 
     ### optional arg for tip rack calibration
@@ -371,14 +371,14 @@ async def _main(is_simulating: bool) -> None:
                         #     tip_presence_pick_up_flag = 'Tip Presence Not Checked'
 
                         ### move plunger from blowout to top, back to blow_out
-                        top_pos, bottom_pos, _, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
+                        # top_pos, bottom_pos, _, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
 
-                        print("Move to bottom plunger position\n")
-                        await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
-                        print("Move to top plunger position\n")
-                        await helpers_ot3.move_plunger_absolute_ot3(api, mount, top_pos)
-                        print("Move to bottom plunger position\n")
-                        await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
+                        # print("Move to bottom plunger position\n")
+                        # await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
+                        # print("Move to top plunger position\n")
+                        # await helpers_ot3.move_plunger_absolute_ot3(api, mount, top_pos)
+                        # print("Move to bottom plunger position\n")
+                        # await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
 
                         ### check tip presence after tip drop
                         print("Dropping tip...\n")
