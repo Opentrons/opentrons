@@ -898,3 +898,17 @@ class GetMotorUsageResponse(BaseMessage):
     message_id: Literal[
         MessageId.get_motor_usage_response
     ] = MessageId.get_motor_usage_response
+
+
+@dataclass
+class AddSensorLinearMoveRequest(BaseMessage):
+    """Sensor Linear Move Request."""
+
+    payload: payloads.AddSensorLinearMoveBasePayload
+    payload_type: Type[
+        payloads.AddSensorLinearMoveBasePayload
+    ] = payloads.AddSensorLinearMoveBasePayload
+    message_id: Literal[
+        MessageId.add_sensor_move_request
+    ] = MessageId.add_sensor_move_request
+

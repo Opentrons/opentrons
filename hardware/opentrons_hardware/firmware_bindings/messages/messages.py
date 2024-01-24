@@ -99,6 +99,7 @@ MessageDefinition = Union[
     defs.SetGripperJawHoldoffRequest,
     defs.GripperJawHoldoffRequest,
     defs.GripperJawHoldoffResponse,
+    defs.AddSensorLinearMoveRequest,
 ]
 
 

@@ -171,6 +171,7 @@ class MessageId(int, Enum):
     execute_move_group_request = 0x18
     clear_all_move_groups_request = 0x19
     home_request = 0x20
+    add_sensor_move_request = 0x23
     move_completed = 0x13
 
     motor_position_request = 0x12

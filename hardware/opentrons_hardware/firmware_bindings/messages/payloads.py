@@ -482,6 +482,13 @@ class BindSensorOutputResponsePayload(SensorPayload):
 
 
 @dataclass(eq=False)
+class AddSensorLinearMoveBasePayload(AddLinearMoveRequestPayload, SensorPayload):
+    """A request to add a linear move that also requires sensor reading for its duration."""
+    
+    report_freq: utils.UInt32Field
+
+
+@dataclass(eq=False)
 class PipetteInfoResponsePayload(EmptyPayload):
     """A response carrying data about an attached pipette."""
 
