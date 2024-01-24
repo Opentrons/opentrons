@@ -63,6 +63,10 @@ async def prepare(persistence_directory: Optional[Path]) -> Path:
     else:
         if await _is_marked_for_reset(directory_to_reset=persistence_directory):
             _log.info(f"{persistence_directory} was marked for reset. Deleting it.")
+            # FIXME(mm, 2024-01-23): This can leave the persistence directory
+            # in a half-deleted state if it deletes the marker file, and then some
+            # of the other files, and then the device is power-cycled before it can
+            # finish.
             await to_thread.run_sync(rmtree, persistence_directory)
 
         await AsyncPath(persistence_directory).mkdir(parents=True, exist_ok=True)
