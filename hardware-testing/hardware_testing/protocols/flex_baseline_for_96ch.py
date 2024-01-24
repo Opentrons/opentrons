@@ -1,4 +1,4 @@
-"""Flex: Diluent for 96ch."""
+"""Flex: Baseline for 96ch."""
 from math import pi
 from typing import List, Optional, Dict, Tuple
 
@@ -8,12 +8,12 @@ from opentrons.protocol_api import ProtocolContext, InstrumentContext, Labware
 #                EDIT - START                #
 ##############################################
 
-metadata = {"protocolName": "Flex: Diluent for 96ch"}
+metadata = {"protocolName": "Flex: Baseline for 96ch"}
 requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 RETURN_TIP = False
 
-DILUENT_VOLUME = 195
+DILUENT_VOLUME = 200
 DILUENT_PUSH_OUT = 15
 DILUENT_SOURCES = [
     {
@@ -214,7 +214,7 @@ def run(ctx: ProtocolContext) -> None:
     plate = ctx.load_labware("corning_96_wellplate_360ul_flat", "D2")
     pipette = ctx.load_instrument("flex_8channel_1000", "left", tip_racks=[tips])
     _assign_starting_volumes(ctx, pipette, reservoir)
-    for i in range(12):
+    for i in range(1):
         pipette.configure_for_volume(DILUENT_VOLUME)
         pipette.pick_up_tip()
         for test in DILUENT_SOURCES:
@@ -234,5 +234,5 @@ def run(ctx: ProtocolContext) -> None:
             pipette.return_tip()
         else:
             pipette.drop_tip()
-        if i < 11:
-            ctx.pause("refresh Diluent to start volumes, and add new Plate")
+        # if i < 11:
+        #     ctx.pause("refresh Diluent to start volumes, and add new Plate")
