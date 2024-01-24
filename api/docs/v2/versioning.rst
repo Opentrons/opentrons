@@ -182,7 +182,7 @@ This version introduces support for the Opentrons Flex robot, instruments, modul
 
   - Use coordinates or numbers to specify :ref:`deck slots <deck-slots>`. These formats match physical labels on Flex and OT-2, but you can use either system, regardless of ``robotType``.
   
-  - The new instrument context ``load_adapter()`` methods let you load adapters and labware separately on modules, and :py:meth:`.ProtocolContext.load_adapter` lets you load adapters directly in deck slots. See :ref:`labware-on-adapters`.
+  - The new module context ``load_adapter()`` methods let you load adapters and labware separately on modules, and :py:meth:`.ProtocolContext.load_adapter` lets you load adapters directly in deck slots. See :ref:`labware-on-adapters`.
   
   - Move labware manually using :py:meth:`.move_labware`, without having to stop your protocol. 
   
