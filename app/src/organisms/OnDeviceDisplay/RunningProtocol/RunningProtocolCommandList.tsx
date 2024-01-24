@@ -232,8 +232,9 @@ export function RunningProtocolCommandList({
                     lineHeight="1.75rem"
                     fontWeight={TYPOGRAPHY.fontWeightRegular}
                     borderRadius={BORDERS.borderRadiusSize2}
+                    gridGap="0.875rem"
                   >
-                    <CommandIcon command={command} />
+                    <CommandIcon command={command} size="2rem" />
                     <CommandText
                       command={command}
                       robotSideAnalysis={robotSideAnalysis}
