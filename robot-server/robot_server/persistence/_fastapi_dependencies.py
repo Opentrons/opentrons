@@ -200,7 +200,7 @@ async def get_active_persistence_directory(
 
     This directory is initialized in the background, starting when the server boots.
     This initialization can entail time-consuming migrations.
-    If this is called before those initialization completes, this will raise an
+    If this is called before that initialization completes, this will raise an
     appropriate HTTP-facing error to indicate that the server is busy.
     """
     initialize_task = _root_persistence_directory_init_task_accessor.get_from(app_state)
