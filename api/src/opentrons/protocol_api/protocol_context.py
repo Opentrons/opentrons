@@ -1029,7 +1029,7 @@ class ProtocolContext(CommandPublisher):
         will all return the object loaded in the front-left slot. (See :ref:`deck-slots`.)
 
         The value will be a :py:obj:`~opentrons.protocol_api.Labware` if the slot contains a
-        labware, a :py:obj:`~opentrons.protocol_api.ModuleContext` if the slot contains a hardware
+        labware, a module context if the slot contains a hardware
         module, or ``None`` if the slot doesn't contain anything.
 
         Rather than filtering the objects in the deck map yourself,
@@ -1061,10 +1061,10 @@ class ProtocolContext(CommandPublisher):
 
         In API version 2.15 only, Flex protocols have a fixed trash in slot A3.
 
-        In API version 2.16 and later, the fixed trash only exists in OT-2 protocols. It is a :py:class:`.TrashBin` object, which doesn't have any wells. Trying to access ``fixed_trash`` in a Flex protocol will raise an error. See :ref:`configure-trash-bin` for details on using the movable trash in Flex protocols.
+        In API version 2.16 and later, the fixed trash only exists in OT-2 protocols. It is a ``TrashBin`` object, which doesn't have any wells. Trying to access ``fixed_trash`` in a Flex protocol will raise an error. See :ref:`configure-trash-bin` for details on using the movable trash in Flex protocols.
 
         .. versionchanged:: 2.16
-            Returns a :py:class:`.TrashBin` object.
+            Returns a ``TrashBin`` object.
         """
         if self._api_version >= APIVersion(2, 16):
             if self._core.robot_type == "OT-3 Standard":
