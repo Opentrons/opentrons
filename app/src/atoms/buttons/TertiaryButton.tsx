@@ -12,7 +12,7 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
   background-color: ${COLORS.blue50};
   border-radius: ${BORDERS.radiusRoundEdge};
   box-shadow: none;
-  color: ${COLORS.grey10};
+  color: ${COLORS.white};
   overflow: no-wrap;
   padding-left: ${SPACING.spacing16};
   padding-right: ${SPACING.spacing16};
@@ -32,6 +32,7 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
   }
 
   &:focus-visible {
+    background-color: ${COLORS.blue55};
     box-shadow: 0 0 0 3px ${COLORS.yellow50};
   }
 

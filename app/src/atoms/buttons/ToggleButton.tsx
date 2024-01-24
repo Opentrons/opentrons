@@ -17,7 +17,7 @@ const TOGGLE_DISABLED_STYLES = css`
   }
 
   &:disabled {
-    color: ${COLORS.grey30};
+    color: ${COLORS.grey40};
   }
 `
 
@@ -33,7 +33,7 @@ const TOGGLE_ENABLED_STYLES = css`
   }
 
   &:disabled {
-    color: ${COLORS.grey30};
+    color: ${COLORS.grey40};
   }
 `
 
