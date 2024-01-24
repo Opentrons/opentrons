@@ -14,7 +14,8 @@ from typing import (
     Union,
     overload,
 )
-from numpy import array, dot
+from numpy import array, dot, double as npdouble
+from numpy.typing import NDArray
 
 from opentrons.hardware_control.modules.magdeck import (
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
@@ -661,7 +662,7 @@ class ModuleView(HasState[ModuleState]):
         definition = self.get_definition(module_id)
         slot = self.get_location(module_id).slotName.id
 
-        pre_transform = array(
+        pre_transform: NDArray[npdouble] = array(
             (
                 definition.labwareOffset.x,
                 definition.labwareOffset.y,
@@ -676,7 +677,7 @@ class ModuleView(HasState[ModuleState]):
         xforms_ser_offset = xforms_ser["labwareOffset"]
 
         # Apply the slot transform, if any
-        xform = array(xforms_ser_offset)
+        xform: NDArray[npdouble] = array(xforms_ser_offset)
         xformed = dot(xform, pre_transform)
         return LabwareOffsetVector(
             x=xformed[0],

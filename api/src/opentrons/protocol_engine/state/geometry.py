@@ -1,6 +1,7 @@
 """Geometry state getters."""
 import enum
-from numpy import array, dot
+from numpy import array, dot, double as npdouble
+from numpy.typing import NDArray
 from typing import Optional, List, Tuple, Union, cast, TypeVar, Dict
 
 from opentrons.types import Point, DeckSlotName, StagingSlotName, MountType
@@ -289,8 +290,10 @@ class GeometryView:
         # Check if the module has moved from one side of the deck to the other
         if calibrated_slot_column != current_slot_column:
             # Since the module was rotated, the calibration offset vector needs to be rotated by 180 degrees along the z axis
-            saved_offset = array([offset.x, offset.y, offset.z])
-            rotation_matrix = array([[-1, 0, 0], [0, -1, 0], [0, 0, 1]])
+            saved_offset: NDArray[npdouble] = array([offset.x, offset.y, offset.z])
+            rotation_matrix: NDArray[npdouble] = array(
+                [[-1, 0, 0], [0, -1, 0], [0, 0, 1]]
+            )
             new_offset = dot(saved_offset, rotation_matrix)
             offset = ModuleOffsetVector(
                 x=new_offset[0], y=new_offset[1], z=new_offset[2]

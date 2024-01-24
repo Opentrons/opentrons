@@ -13,6 +13,7 @@ from enum import Enum
 from typing import TYPE_CHECKING, Optional
 
 import numpy as np
+from numpy.typing import NDArray
 
 from opentrons_shared_data import module
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
@@ -32,7 +33,6 @@ from opentrons.hardware_control.modules.types import (
     module_model_from_string,
     ThermocyclerModuleModel,
 )
-
 
 if TYPE_CHECKING:
     from opentrons.protocol_api.labware import Labware
@@ -449,7 +449,7 @@ def create_geometry(
             )
         )
     else:
-        pre_transform = np.array(
+        pre_transform: NDArray[np.double] = np.array(
             (
                 definition["labwareOffset"]["x"],
                 definition["labwareOffset"]["y"],
@@ -480,7 +480,7 @@ def create_geometry(
     xform_ser = xforms_ser["labwareOffset"]
 
     # apply the slot transform if any
-    xform = np.array(xform_ser)
+    xform: NDArray[np.double] = np.array(xform_ser)
     xformed = np.dot(xform, pre_transform)
     labware_offset = Point(xformed[0], xformed[1], xformed[2])
 

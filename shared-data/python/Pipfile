@@ -26,3 +26,5 @@ pytest-clarity = "~=1.0.0"
 
 [packages]
 opentrons-shared-data = { editable = true, path = "." }
+jsonschema = "==4.21.1"
+pydantic = "==1.10.12"

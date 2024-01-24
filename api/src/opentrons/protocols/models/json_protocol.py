@@ -672,7 +672,7 @@ class Model(BaseModel):
     modules: Optional[Dict[str, Modules]] = Field(
         None, description="All modules used in this protocol"
     )
-    commands: List[AllCommands] = Field(
+    commands: Optional[List[AllCommands]] = Field(
         None,
         description="An array of command objects representing steps to be executed "
         "on the robot",

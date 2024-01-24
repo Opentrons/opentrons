@@ -3,6 +3,15 @@ url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[packages]
+jsonschema = "==4.21.1"
+pydantic = "==1.10.12"
+anyio = "==3.7.1"
+opentrons-shared-data = { editable = true, path = "../shared-data/python" }
+opentrons = { editable = true, path = "." }
+opentrons-hardware = { editable = true, path = "./../hardware", extras=["FLEX"] }
+numpy = "==1.22.3"
+
 [dev-packages]
 # atomicwrites and colorama are pytest dependencies on windows,
 # spec'd here to force lockfile inclusion
@@ -33,9 +42,6 @@ decoy = "~=1.11"
 black = "==22.3.0"
 types-mock = "==4.0.1"
 types-setuptools = "==57.0.2"
-opentrons-shared-data = { editable = true, path = "../shared-data/python" }
-opentrons = { editable = true, path = "." }
-opentrons-hardware = { editable = true, path = "./../hardware", extras=["FLEX"] }
 # specify typing-extensions explicitly to force lockfile inclusion on Python >= 3.8
 typing-extensions = ">=4.0.0,<5"
 pytest-profiling = "~=1.7.0"
