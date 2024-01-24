@@ -134,7 +134,7 @@ export const RunPreviewComponent = (
                   <CommandIcon
                     command={command}
                     color={contentColor}
-                    svgWidth="1rem"
+                    size="1rem"
                   />
                   <CommandText
                     command={command}

@@ -11,10 +11,10 @@ const ICON_BY_COMMAND_TYPE: { [commandType: string]: IconName } = {
 }
 interface CommandIconProps extends StyleProps {
   command: RunTimeCommand
-  svgWidth?: string | number
+  size?: string | number
 }
 export function CommandIcon(props: CommandIconProps): JSX.Element | null {
-  const { command, svgWidth = '1rem', ...styleProps } = props
+  const { command, size = '1rem', ...styleProps } = props
   let iconName = null
   if (
     command.commandType === 'moveLabware' &&
@@ -31,6 +31,6 @@ export function CommandIcon(props: CommandIconProps): JSX.Element | null {
   }
 
   return iconName != null ? (
-    <Icon {...styleProps} size={svgWidth} name={iconName} flex="0 0 auto" />
+    <Icon {...styleProps} size={size} name={iconName} flex="0 0 auto" />
   ) : null
 }
