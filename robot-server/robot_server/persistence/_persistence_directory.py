@@ -23,18 +23,18 @@ _log = getLogger(__name__)
 class PersistenceResetter:
     """A FastAPI dependency to reset the server's persistence directory."""
 
-    def __init__(self, persistence_directory: Path) -> None:
-        self._persistence_directory = persistence_directory
+    def __init__(self, directory_to_reset: Path) -> None:
+        self._directory_to_reset = directory_to_reset
 
     async def mark_directory_reset(self) -> None:
-        """Mark the persistence directory to be deleted (reset) on the next boot.
+        """Mark the directory to be deleted (reset) on the next boot.
 
         We defer deletions to the next boot instead of doing them immediately
         in order to avoid ongoing HTTP requests, runs, background protocol analysis
         tasks, etc. trying to do stuff in the persistence directory during and after
         the deletion.
         """
-        file = AsyncPath(self._persistence_directory / _RESET_MARKER_FILE_NAME)
+        file = AsyncPath(self._directory_to_reset / _RESET_MARKER_FILE_NAME)
         await file.write_text(encoding="utf-8", data=_RESET_MARKER_FILE_CONTENTS)
 
 
@@ -61,8 +61,8 @@ async def prepare(persistence_directory: Optional[Path]) -> Path:
         return new_temporary_directory
 
     else:
-        if await _is_marked_for_reset(persistence_directory=persistence_directory):
-            _log.info("Persistence directory was marked for reset. Deleting it.")
+        if await _is_marked_for_reset(directory_to_reset=persistence_directory):
+            _log.info(f"{persistence_directory} was marked for reset. Deleting it.")
             await to_thread.run_sync(rmtree, persistence_directory)
 
         await AsyncPath(persistence_directory).mkdir(parents=True, exist_ok=True)
@@ -70,6 +70,6 @@ async def prepare(persistence_directory: Optional[Path]) -> Path:
         return persistence_directory
 
 
-async def _is_marked_for_reset(persistence_directory: Path) -> bool:
+async def _is_marked_for_reset(directory_to_reset: Path) -> bool:
     """Return whether the persistence directory has been marked to be reset."""
-    return await (AsyncPath(persistence_directory) / _RESET_MARKER_FILE_NAME).exists()
+    return await (AsyncPath(directory_to_reset) / _RESET_MARKER_FILE_NAME).exists()
