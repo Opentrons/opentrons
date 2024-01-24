@@ -1094,7 +1094,12 @@ class OT3Controller(FlexBackend):
         watcher.watch(
             alias="modules",
             path="/dev",
-            flags=(aionotify.Flags.CREATE | aionotify.Flags.DELETE),
+            flags=(
+                aionotify.Flags.CREATE
+                | aionotify.Flags.DELETE
+                | aionotify.Flags.MOVED_FROM
+                | aionotify.Flags.MOVED_TO
+            ),
         )
         return watcher
 
@@ -1105,9 +1110,10 @@ class OT3Controller(FlexBackend):
             log.debug("incomplete read error when quitting watcher")
             return
         if event is not None:
+            flags = aionotify.Flags.parse(event.flags)
+            log.debug(f"aionotify: {flags} {event.name}")
             if "ot_module" in event.name:
                 event_name = event.name
-                flags = aionotify.Flags.parse(event.flags)
                 event_description = AionotifyEvent.build(event_name, flags)
                 await self.module_controls.handle_module_appearance(event_description)
 
