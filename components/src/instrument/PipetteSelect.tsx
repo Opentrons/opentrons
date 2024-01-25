@@ -142,7 +142,9 @@ const PipetteNameItem = (props: PipetteNameSpecs): JSX.Element => {
     >
       <div className={styles.pipette_volume_class}>{volumeClass}</div>
       <div className={styles.pipette_channels}>{displayChannels}</div>
-      <div className={styles.pipette_category}>{displayCategory}</div>
+      <div className={styles.pipette_category}>
+        {channels === 96 ? 'FLEX' : displayCategory}
+      </div>
     </Flex>
   )
 }

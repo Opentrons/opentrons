@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { useSelector } from 'react-redux'
 
 import {
   Box,
@@ -15,6 +14,7 @@ import {
   useOnClickOutside,
   InstrumentDiagram,
   BORDERS,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
@@ -23,12 +23,12 @@ import {
   OT2_ROBOT_TYPE,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
-
 import {
-  LEFT,
-  getAttachedPipetteSettingsFieldsById,
-} from '../../../redux/pipettes'
+  useCurrentSubsystemUpdateQuery,
+  usePipetteSettingsQuery,
+} from '@opentrons/react-api-client'
+
+import { LEFT } from '../../../redux/pipettes'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
@@ -42,7 +42,7 @@ import { useIsFlex } from '../hooks'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
 import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
-import type { State } from '../../../redux/types'
+
 import type { PipetteModelSpecs, PipetteName } from '@opentrons/shared-data'
 import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
 import type {
@@ -61,6 +61,7 @@ interface PipetteCardProps {
   pipetteIsBad: boolean
   updatePipette: () => void
   isRunActive: boolean
+  isEstopNotDisengaged: boolean
 }
 const BANNER_LINK_STYLE = css`
   text-decoration: underline;
@@ -78,7 +79,7 @@ const INSTRUMENT_CARD_STYLE = css`
   }
 `
 
-const SUBSYSTEM_UPDATE_POLL_MS = 5000
+const POLL_DURATION_MS = 5000
 
 export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const { t, i18n } = useTranslation(['device_details', 'protocol_setup'])
@@ -92,6 +93,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     pipetteIsBad,
     updatePipette,
     isRunActive,
+    isEstopNotDisengaged,
   } = props
   const {
     menuOverlay,
@@ -116,16 +118,38 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const [showAttachPipette, setShowAttachPipette] = React.useState(false)
   const [showAboutSlideout, setShowAboutSlideout] = React.useState(false)
   const subsystem = mount === LEFT ? 'pipette_left' : 'pipette_right'
+  const [pollForSubsystemUpdate, setPollForSubsystemUpdate] = React.useState(
+    false
+  )
   const { data: subsystemUpdateData } = useCurrentSubsystemUpdateQuery(
     subsystem,
     {
-      enabled: isFlex && pipetteIsBad,
-      refetchInterval: SUBSYSTEM_UPDATE_POLL_MS,
+      enabled: pollForSubsystemUpdate,
+      refetchInterval: POLL_DURATION_MS,
     }
   )
-  const settings = useSelector((state: State) =>
-    getAttachedPipetteSettingsFieldsById(state, robotName, pipetteId ?? '')
-  )
+  // we should poll for a subsystem update from the time a bad instrument is
+  // detected until the update has been done for 5 seconds
+  // this gives the instruments endpoint time to start reporting
+  // a good instrument
+  React.useEffect(() => {
+    if (pipetteIsBad && isFlex) {
+      setPollForSubsystemUpdate(true)
+    } else if (
+      subsystemUpdateData != null &&
+      subsystemUpdateData.data.updateStatus === 'done'
+    ) {
+      setTimeout(() => {
+        setPollForSubsystemUpdate(false)
+      }, POLL_DURATION_MS)
+    }
+  }, [pipetteIsBad, subsystemUpdateData, isFlex])
+
+  const settings =
+    usePipetteSettingsQuery({
+      refetchInterval: POLL_DURATION_MS,
+      enabled: pipetteId != null,
+    })?.data?.[pipetteId ?? '']?.fields ?? null
 
   const [
     selectedPipette,
@@ -160,7 +184,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   }
   return (
     <Flex
-      backgroundColor={COLORS.fundamentalsBackground}
+      backgroundColor={COLORS.grey10}
       borderRadius={BORDERS.radiusSoftCorners}
       width="100%"
       data-testid={`PipetteCard_${String(pipetteDisplayName)}`}
@@ -226,20 +250,16 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       )}
       {!pipetteIsBad && subsystemUpdateData == null && (
         <>
-          <Box
-            padding={`${SPACING.spacing16} ${SPACING.spacing8}`}
-            width="100%"
-          >
+          <Box padding={SPACING.spacing16} width="100%">
             <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing8}>
-              <Flex alignItems={ALIGN_START}>
+              <Flex alignItems={ALIGN_CENTER} width="3.75rem" height="3.375rem">
                 {pipetteModelSpecs !== null ? (
                   <InstrumentDiagram
                     pipetteSpecs={pipetteModelSpecs}
                     mount={mount}
                     //  pipette images for Flex are slightly smaller so need to be scaled accordingly
-                    transform={isFlex ? 'scale(0.4)' : 'scale(0.3)'}
-                    size="3.125rem"
-                    transformOrigin={isFlex ? '-50% -10%' : '20% -10%'}
+                    transform="scale(0.3)"
+                    transformOrigin={isFlex ? '-10% 52%' : '20% 52%'}
                   />
                 ) : null}
               </Flex>
@@ -250,28 +270,34 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               >
                 {isFlexPipetteAttached && !isPipetteCalibrated ? (
                   <Banner type="error" marginBottom={SPACING.spacing4}>
-                    <Trans
-                      t={t}
-                      i18nKey="calibration_needed"
-                      components={{
-                        calLink: (
-                          <StyledText
-                            as="p"
-                            css={css`
-                              text-decoration: underline;
-                              cursor: pointer;
-                              margin-left: 0.5rem;
-                            `}
-                            onClick={handleCalibrate}
-                          />
-                        ),
-                      }}
-                    />
+                    {isEstopNotDisengaged ? (
+                      <StyledText as="p">
+                        {t('calibration_needed_without_link')}
+                      </StyledText>
+                    ) : (
+                      <Trans
+                        t={t}
+                        i18nKey="calibration_needed"
+                        components={{
+                          calLink: (
+                            <StyledText
+                              as="p"
+                              css={css`
+                                text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
+                                cursor: pointer;
+                                margin-left: ${SPACING.spacing8};
+                              `}
+                              onClick={handleCalibrate}
+                            />
+                          ),
+                        }}
+                      />
+                    )}
                   </Banner>
                 ) : null}
                 <StyledText
                   textTransform={TYPOGRAPHY.textTransformUppercase}
-                  color={COLORS.darkGreyEnabled}
+                  color={COLORS.grey50}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   fontSize={TYPOGRAPHY.fontSizeH6}
                   paddingBottom={SPACING.spacing4}
@@ -305,11 +331,16 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               pipetteDisplayName
             )}`}
           >
-            <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
+            <OverflowBtn
+              aria-label="overflow"
+              onClick={handleOverflowClick}
+              disabled={isEstopNotDisengaged}
+            />
           </Box>
         </>
       )}
-      {(pipetteIsBad || subsystemUpdateData != null) && (
+      {(pipetteIsBad ||
+        (subsystemUpdateData != null && pollForSubsystemUpdate)) && (
         <InstrumentCard
           label={i18n.format(t('mount', { side: mount }), 'capitalize')}
           css={INSTRUMENT_CARD_STYLE}
@@ -338,6 +369,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               />
             </Banner>
           }
+          isEstopNotDisengaged={isEstopNotDisengaged}
         />
       )}
       {showOverflowMenu && (

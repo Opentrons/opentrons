@@ -81,7 +81,7 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
       styles={{ menuPortal: base => ({ ...base, zIndex: 10 }) }}
       value={value}
       defaultValue={defaultValue}
-      width="14rem"
+      width="15rem"
       tabIndex={tabIndex}
       onChange={(
         option: SingleValue<SelectOption> | MultiValue<SelectOption>,

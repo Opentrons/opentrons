@@ -53,8 +53,6 @@ class Params(BaseModel):
     offset: Optional[OffsetVector]
     profile: Optional[List[ProfileStep]]
     radius: Optional[float]
-    newLocation: Optional[Union[Location, Literal["offDeck"]]]
-    strategy: Optional[str]
 
 
 class Command(BaseModel):

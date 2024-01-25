@@ -30,13 +30,16 @@ import {
   ANALYTICS_PROTOCOL_RUN_PAUSE,
 } from '../../../redux/analytics'
 
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  RobotType,
+} from '@opentrons/shared-data'
 import type { RunStatus } from '@opentrons/api-client'
 import type { TrackProtocolRunEvent } from '../../Devices/hooks'
 import type { RobotAnalyticsData } from '../../../redux/analytics/types'
 
 const TITLE_TEXT_STYLE = css`
-  color: ${COLORS.darkBlack70};
+  color: ${COLORS.grey60};
   font-size: ${TYPOGRAPHY.fontSize28};
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   line-height: ${TYPOGRAPHY.lineHeight36};
@@ -77,6 +80,7 @@ interface VisibleIndexRange {
 interface RunningProtocolCommandListProps {
   runStatus: RunStatus | null
   robotSideAnalysis: CompletedProtocolAnalysis | null
+  robotType: RobotType
   playRun: () => void
   pauseRun: () => void
   setShowConfirmCancelRunModal: (showConfirmCancelRunModal: boolean) => void
@@ -89,6 +93,7 @@ interface RunningProtocolCommandListProps {
 export function RunningProtocolCommandList({
   runStatus,
   robotSideAnalysis,
+  robotType,
   playRun,
   pauseRun,
   setShowConfirmCancelRunModal,
@@ -211,9 +216,7 @@ export function RunningProtocolCommandList({
           >
             {(command, index) => {
               const backgroundColor =
-                index === currentRunCommandIndex
-                  ? COLORS.mediumBlueEnabled
-                  : COLORS.light1
+                index === currentRunCommandIndex ? COLORS.blue35 : COLORS.grey35
               return (
                 <Flex
                   key={command.id}
@@ -234,7 +237,9 @@ export function RunningProtocolCommandList({
                     <CommandText
                       command={command}
                       robotSideAnalysis={robotSideAnalysis}
+                      robotType={robotType}
                       css={COMMAND_ROW_STYLE}
+                      isOnDevice={true}
                     />
                   </Flex>
                 </Flex>

@@ -1,12 +1,12 @@
 import logging
 from typing import Dict, List, Optional, Set, Union, cast, Tuple
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons.types import DeckSlotName, Location, Mount, Point
+from opentrons.types import DeckSlotName, StagingSlotName, Location, Mount, Point
 from opentrons.util.broker import Broker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel, ModuleType
@@ -18,6 +18,8 @@ from opentrons.protocols import labware as labware_definition
 from ...labware import Labware
 from ..._liquid import Liquid
 from ..._types import OffDeckType
+from ..._trash_bin import TrashBin
+from ..._waste_chute import WasteChute
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 
@@ -86,6 +88,7 @@ class LegacyProtocolCore(
         self._loaded_modules: Set["AbstractModule"] = set()
         self._module_cores: List[legacy_module_core.LegacyModuleCore] = []
         self._labware_cores: List[LegacyLabwareCore] = [self.fixed_trash]
+        self._disposal_locations: List[Union[Labware, TrashBin, WasteChute]] = []
 
     @property
     def api_version(self) -> APIVersion:
@@ -130,6 +133,15 @@ class LegacyProtocolCore(
         """Returns true if hardware is being simulated."""
         return self._sync_hardware.is_simulator  # type: ignore[no-any-return]
 
+    def append_disposal_location(
+        self, disposal_location: Union[Labware, TrashBin, WasteChute]
+    ) -> None:
+        if isinstance(disposal_location, (TrashBin, WasteChute)):
+            raise APIVersionError(
+                "Trash Bin and Waste Chute Disposal locations are not supported in this API Version."
+            )
+        self._disposal_locations.append(disposal_location)
+
     def add_labware_definition(
         self,
         definition: LabwareDefinition,
@@ -151,6 +163,7 @@ class LegacyProtocolCore(
             DeckSlotName,
             LegacyLabwareCore,
             legacy_module_core.LegacyModuleCore,
+            StagingSlotName,
             OffDeckType,
         ],
         label: Optional[str],
@@ -166,6 +179,8 @@ class LegacyProtocolCore(
             raise APIVersionError(
                 "Loading a labware onto another labware or adapter is only supported with api version 2.15 and above"
             )
+        elif isinstance(location, StagingSlotName):
+            raise APIVersionError("Using a staging deck slot requires apiLevel 2.16.")
 
         deck_slot = (
             location if isinstance(location, DeckSlotName) else location.get_deck_slot()
@@ -236,7 +251,12 @@ class LegacyProtocolCore(
     def load_adapter(
         self,
         load_name: str,
-        location: Union[DeckSlotName, legacy_module_core.LegacyModuleCore, OffDeckType],
+        location: Union[
+            DeckSlotName,
+            StagingSlotName,
+            legacy_module_core.LegacyModuleCore,
+            OffDeckType,
+        ],
         namespace: Optional[str],
         version: Optional[int],
     ) -> LegacyLabwareCore:
@@ -249,9 +269,11 @@ class LegacyProtocolCore(
         labware_core: LegacyLabwareCore,
         new_location: Union[
             DeckSlotName,
+            StagingSlotName,
             LegacyLabwareCore,
             legacy_module_core.LegacyModuleCore,
             OffDeckType,
+            WasteChute,
         ],
         use_gripper: bool,
         pause_for_manual_move: bool,
@@ -362,6 +384,10 @@ class LegacyProtocolCore(
         """Get a mapping of mount to instrument."""
         return self._instruments
 
+    def get_disposal_locations(self) -> List[Union[Labware, TrashBin, WasteChute]]:
+        """Get valid disposal locations."""
+        return self._disposal_locations
+
     def pause(self, msg: Optional[str]) -> None:
         """Pause the protocol."""
         self._sync_hardware.pause(PauseType.PAUSE)
@@ -450,17 +476,31 @@ class LegacyProtocolCore(
     ) -> Optional[LegacyLabwareCore]:
         assert False, "get_labware_on_labware only supported on engine core"
 
-    def get_deck_definition(self) -> DeckDefinitionV3:
+    def get_deck_definition(self) -> DeckDefinitionV4:
         """Get the geometry definition of the robot's deck."""
         assert False, "get_deck_definition only supported on engine core"
 
+    def get_slot_definition(
+        self, slot: Union[DeckSlotName, StagingSlotName]
+    ) -> SlotDefV3:
+        """Get the slot definition from the robot's deck."""
+        assert False, "get_slot_definition only supported on engine core"
+
+    def get_slot_definitions(self) -> Dict[str, SlotDefV3]:
+        """Get all standard slot definitions available in the deck definition."""
+        assert False, "get_slot_definitions only supported on engine core"
+
+    def get_staging_slot_definitions(self) -> Dict[str, SlotDefV3]:
+        """Get all staging slot definitions available in the deck definition."""
+        assert False, "get_staging_slot_definitions only supported on engine core"
+
     def get_slot_item(
-        self, slot_name: DeckSlotName
+        self, slot_name: Union[DeckSlotName, StagingSlotName]
     ) -> Union[LegacyLabwareCore, legacy_module_core.LegacyModuleCore, None]:
         """Get the contents of a given slot, if any."""
         assert False, "get_slot_item only supported on engine core"
 
-    def get_slot_center(self, slot_name: DeckSlotName) -> Point:
+    def get_slot_center(self, slot_name: Union[DeckSlotName, StagingSlotName]) -> Point:
         """Get the absolute coordinate of a slot's center."""
         assert False, "get_slot_center only supported on engine core."
 

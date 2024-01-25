@@ -1,6 +1,6 @@
 import { resetAllWhenMocks } from 'jest-when'
 import { UseQueryResult } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { mockModulesResponse } from '@opentrons/api-client'
 import { useModulesQuery } from '@opentrons/react-api-client'
 import { useAttachedModules } from '..'
@@ -14,7 +14,7 @@ const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
 >
 
 describe('useAttachedModules hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   afterEach(() => {
     resetAllWhenMocks()
     jest.resetAllMocks()

@@ -26,6 +26,7 @@ import { Tooltip } from '../../../atoms/Tooltip'
 import {
   useModuleRenderInfoForProtocolById,
   useRobot,
+  useRobotType,
   useRunStatuses,
   useSyncRobotClock,
 } from '../../../organisms/Devices/hooks'
@@ -58,10 +59,10 @@ const baseRoundTabStyling = css`
 
 const RoundNavLink = styled(NavLink)`
   ${baseRoundTabStyling}
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50};
 
   &:hover {
-    background-color: ${COLORS.fundamentalsBackgroundShade};
+    background-color: ${COLORS.grey20};
   }
 
   &.active {
@@ -69,10 +70,10 @@ const RoundNavLink = styled(NavLink)`
     border-top: ${BORDERS.lineBorder};
     border-left: ${BORDERS.lineBorder};
     border-right: ${BORDERS.lineBorder};
-    color: ${COLORS.blueEnabled};
+    color: ${COLORS.blue50};
 
     &:hover {
-      color: ${COLORS.blueHover};
+      color: ${COLORS.blue55};
     }
 
     /* extend below the tab when active to flow into the content */
@@ -107,7 +108,7 @@ function RoundTab({
   return disabled ? (
     <>
       <StyledText
-        color={COLORS.successDisabled}
+        color={COLORS.grey40}
         css={baseRoundTabStyling}
         {...targetProps}
       >
@@ -175,6 +176,7 @@ interface PageContentsProps {
 }
 function PageContents(props: PageContentsProps): JSX.Element {
   const { runId, robotName, protocolRunDetailsTab } = props
+  const robotType = useRobotType(robotName)
   const protocolRunHeaderRef = React.useRef<HTMLDivElement>(null)
   const listRef = React.useRef<ViewportListRef | null>(null)
   const [jumpedIndex, setJumpedIndex] = React.useState<number | null>(null)
@@ -207,6 +209,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
     'run-preview': (
       <RunPreview
         runId={runId}
+        robotType={robotType}
         ref={listRef}
         jumpedIndex={jumpedIndex}
         makeHandleScrollToStep={makeHandleScrollToStep}
@@ -236,7 +239,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
       </Flex>
       <Box
         backgroundColor={COLORS.white}
-        border={`1px ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
+        border={`1px ${BORDERS.styleSolid} ${COLORS.grey30}`}
         // remove left upper corner border radius when first tab is active
         borderRadius={`${
           protocolRunDetailsTab === 'setup'
@@ -297,7 +300,6 @@ const ModuleControlsTab = (
   const { t } = useTranslation('run_details')
   const currentRunId = useCurrentRunId()
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
-    robotName,
     runId
   )
   const { isRunStill } = useRunStatuses()

@@ -23,25 +23,25 @@ export const TemperatureModuleData = (
   const { moduleStatus, targetTemp, currentTemp } = props
   const { t } = useTranslation('device_details')
 
-  let backgroundColor: string = COLORS.medGreyEnabled
-  let iconColor: string = COLORS.darkGreyEnabled
+  let backgroundColor: string = COLORS.grey30
+  let iconColor: string = COLORS.grey50
   let textColor
   let pulse
   switch (moduleStatus) {
     case 'idle': {
-      backgroundColor = COLORS.medGreyEnabled
-      iconColor = COLORS.darkGreyEnabled
-      textColor = COLORS.darkBlackEnabled
+      backgroundColor = COLORS.grey30
+      iconColor = COLORS.grey50
+      textColor = COLORS.black90
       break
     }
     case 'holding at target': {
-      backgroundColor = COLORS.medBlue
-      iconColor = COLORS.blueEnabled
+      backgroundColor = COLORS.blue30
+      iconColor = COLORS.blue50
       break
     }
     case 'cooling':
     case 'heating': {
-      backgroundColor = COLORS.medBlue
+      backgroundColor = COLORS.blue30
       pulse = true
       break
     }

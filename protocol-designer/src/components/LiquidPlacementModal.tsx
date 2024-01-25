@@ -8,7 +8,7 @@ import {
   wellFillFromWellContents,
   SelectableLabware,
 } from '../components/labware'
-import { LiquidPlacementForm } from '../components/LiquidPlacementForm'
+import { LiquidPlacementForm } from './LiquidPlacementForm/LiquidPlacementForm'
 import { WellSelectionInstructions } from './WellSelectionInstructions'
 
 import { selectors } from '../labware-ingred/selectors'
@@ -84,6 +84,7 @@ class LiquidPlacementModalComponent extends React.Component<Props, State> {
               updateHighlightedWells={this.updateHighlightedWells}
               ingredNames={this.props.liquidNamesById}
               wellContents={this.props.wellContents}
+              nozzleType={null}
             />
           </div>
         )}

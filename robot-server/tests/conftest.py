@@ -21,10 +21,17 @@ from opentrons import config
 from opentrons.hardware_control import API, HardwareControlAPI, ThreadedAsyncLock
 from opentrons.calibration_storage import (
     helpers,
+    save_robot_deck_attitude,
+)
+
+# NOTE(FS 10-24-2023), the fixtures using these functions currently ONLY
+# get pulled in by OT-2 server tests. If this ever changes, we need to
+# conditionally set up ot2/ot3 calibration structures instead of invariably
+# calling the OT2 functions.
+from opentrons.calibration_storage.ot2 import (
     save_pipette_calibration,
     create_tip_length_data,
     save_tip_length_calibration,
-    save_robot_deck_attitude,
 )
 from opentrons.protocol_api import labware
 from opentrons.types import Point, Mount

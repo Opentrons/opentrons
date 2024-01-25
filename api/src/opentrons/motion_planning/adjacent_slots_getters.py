@@ -1,6 +1,8 @@
 """Getters for specific adjacent slots."""
 
-from typing import Optional, List
+from typing import Optional, List, Dict
+
+from opentrons.types import DeckSlotName, StagingSlotName
 
 
 def get_north_slot(slot: int) -> Optional[int]:
@@ -33,6 +35,29 @@ def get_west_slot(slot: int) -> Optional[int]:
         return None
     else:
         return slot - 1
+
+
+_WEST_OF_STAGING_SLOT_MAP: Dict[StagingSlotName, DeckSlotName] = {
+    StagingSlotName.SLOT_A4: DeckSlotName.SLOT_A3,
+    StagingSlotName.SLOT_B4: DeckSlotName.SLOT_B3,
+    StagingSlotName.SLOT_C4: DeckSlotName.SLOT_C3,
+    StagingSlotName.SLOT_D4: DeckSlotName.SLOT_D3,
+}
+
+_EAST_OF_FLEX_COLUMN_3_MAP: Dict[DeckSlotName, StagingSlotName] = {
+    deck_slot: staging_slot
+    for staging_slot, deck_slot in _WEST_OF_STAGING_SLOT_MAP.items()
+}
+
+
+def get_west_of_staging_slot(staging_slot: StagingSlotName) -> DeckSlotName:
+    """Get slot west of a staging slot."""
+    return _WEST_OF_STAGING_SLOT_MAP[staging_slot]
+
+
+def get_adjacent_staging_slot(deck_slot: DeckSlotName) -> Optional[StagingSlotName]:
+    """Get the adjacent staging slot if the deck slot is in the third column."""
+    return _EAST_OF_FLEX_COLUMN_3_MAP.get(deck_slot)
 
 
 def get_east_west_slots(slot: int) -> List[int]:

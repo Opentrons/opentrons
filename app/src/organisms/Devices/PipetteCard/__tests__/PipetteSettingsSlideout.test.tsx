@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
-import { waitFor } from '@testing-library/dom'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import {
+  useHost,
+  useUpdatePipetteSettingsMutation,
+} from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
-import * as RobotApi from '../../../../redux/robot-api'
-import { updatePipetteSettings } from '../../../../redux/pipettes'
-import { getConfig } from '../../../../redux/config'
 import { PipetteSettingsSlideout } from '../PipetteSettingsSlideout'
 
 import {
@@ -14,22 +14,11 @@ import {
   mockPipetteSettingsFieldsMap,
 } from '../../../../redux/pipettes/__fixtures__'
 
-import type { DispatchApiRequestType } from '../../../../redux/robot-api'
-import type { UpdatePipetteSettingsAction } from '../../../../redux/pipettes/types'
+jest.mock('@opentrons/react-api-client')
 
-jest.mock('../../../../redux/robot-api')
-jest.mock('../../../../redux/config')
-jest.mock('../../../../redux/pipettes')
-
-const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
-const mockUseDispatchApiRequest = RobotApi.useDispatchApiRequest as jest.MockedFunction<
-  typeof RobotApi.useDispatchApiRequest
->
-const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
-  typeof RobotApi.getRequestById
->
-const mockUpdatePipetteSettings = updatePipetteSettings as jest.MockedFunction<
-  typeof updatePipetteSettings
+const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
+const mockUseUpdatePipetteSettingsMutation = useUpdatePipetteSettingsMutation as jest.MockedFunction<
+  typeof useUpdatePipetteSettingsMutation
 >
 
 const render = (
@@ -43,9 +32,8 @@ const render = (
 const mockRobotName = 'mockRobotName'
 
 describe('PipetteSettingsSlideout', () => {
-  let dispatchApiRequest: DispatchApiRequestType
-
   let props: React.ComponentProps<typeof PipetteSettingsSlideout>
+  let mockUpdatePipetteSettings: jest.Mock
 
   beforeEach(() => {
     props = {
@@ -56,20 +44,19 @@ describe('PipetteSettingsSlideout', () => {
       isExpanded: true,
       onCloseClick: jest.fn(),
     }
-    mockGetRequestById.mockReturnValue({
-      status: RobotApi.SUCCESS,
-      response: {
-        method: 'POST',
-        ok: true,
-        path: '/',
-        status: 200,
-      },
-    })
-    mockGetConfig.mockReturnValue({} as any)
-    dispatchApiRequest = jest.fn()
-    when(mockUseDispatchApiRequest)
+    when(mockUseHost)
       .calledWith()
-      .mockReturnValue([dispatchApiRequest, ['id']])
+      .mockReturnValue({} as any)
+
+    mockUpdatePipetteSettings = jest.fn()
+
+    when(mockUseUpdatePipetteSettingsMutation)
+      .calledWith(props.pipetteId, expect.anything())
+      .mockReturnValue({
+        updatePipetteSettings: mockUpdatePipetteSettings,
+        isLoading: false,
+        error: null,
+      } as any)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -96,30 +83,20 @@ describe('PipetteSettingsSlideout', () => {
     const { getByRole } = render(props)
     const button = getByRole('button', { name: 'Confirm' })
 
-    when(mockUpdatePipetteSettings)
-      .calledWith(
-        mockRobotName,
-        props.pipetteId,
-        expect.objectContaining({
-          blowout: 2,
-          bottom: 3,
-          dropTip: 1,
+    fireEvent.click(button)
+    await waitFor(() => {
+      expect(mockUpdatePipetteSettings).toHaveBeenCalledWith({
+        fields: expect.objectContaining({
+          blowout: { value: 2 },
+          bottom: { value: 3 },
+          dropTip: { value: 1 },
           dropTipCurrent: null,
           dropTipSpeed: null,
           pickUpCurrent: null,
           pickUpDistance: null,
           plungerCurrent: null,
-          top: 4,
-        })
-      )
-      .mockReturnValue({
-        type: 'pipettes:UPDATE_PIPETTE_SETTINGS',
-      } as UpdatePipetteSettingsAction)
-
-    fireEvent.click(button)
-    await waitFor(() => {
-      expect(dispatchApiRequest).toHaveBeenCalledWith({
-        type: 'pipettes:UPDATE_PIPETTE_SETTINGS',
+          top: { value: 4 },
+        }),
       })
     })
   })

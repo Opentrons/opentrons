@@ -10,10 +10,9 @@ The Heater-Shaker Module provides on-deck heating and orbital shaking. The modul
 
 The Heater-Shaker Module is represented in code by a :py:class:`.HeaterShakerContext` object. For example::
 
-    def run(protocol: protocol_api.ProtocolContext):
-         hs_mod = protocol.load_module(
-          module_name='heaterShakerModuleV1',
-          location="D1")
+    hs_mod = protocol.load_module(
+        module_name="heaterShakerModuleV1", location="D1"
+    )
 
 .. versionadded:: 2.13
 
@@ -74,14 +73,45 @@ To prepare the deck before running a protocol, use the labware latch controls in
 Loading Labware
 ===============
 
-Like with all modules, use the Heater-Shaker’s :py:meth:`~.HeaterShakerContext.load_labware` method to specify what you will place on the module. For the Heater-Shaker, you must use a definition that describes the combination of a thermal adapter and labware that fits it.  See the :ref:`load-labware-module` section for an example of how to place labware on a module.
+Use the Heater-Shaker’s :py:meth:`~.HeaterShakerContext.load_adapter` and :py:meth:`~.HeaterShakerContext.load_labware` methods to specify what you will place on the module. For the Heater-Shaker, use one of the thermal adapters listed below and labware that fits on the adapter. See :ref:`labware-on-adapters` for examples of loading labware on modules.
 
-Currently, the `Opentrons Labware Library <https://labware.opentrons.com/>`_ includes several pre-configured adapter–labware combinations and standalone adapter definitions that help make the Heater-Shaker ready to use right out of the box. See :ref:`labware-on-adapters` for examples of loading labware on modules.
+The `Opentrons Labware Library <https://labware.opentrons.com/>`_ includes definitions for both standalone adapters and adapter–labware combinations. These labware definitions help make the Heater-Shaker ready to use right out of the box.
+
+.. note::
+    If you plan to :ref:`move labware <moving-labware>` onto or off of the Heater-Shaker during your protocol, you must use a standalone adapter definition, not an adapter–labware combination definiton.
+
+Standalone Adapters
+-------------------
+
+You can use these standalone adapter definitions to load Opentrons verified or custom labware on top of the Heater-Shaker. 
+
+.. list-table::
+   :header-rows: 1
+
+   * - Adapter Type
+     - API Load Name
+   * - Opentrons Universal Flat Heater-Shaker Adapter
+     - ``opentrons_universal_flat_adapter``
+   * - Opentrons 96 PCR Heater-Shaker Adapter
+     - ``opentrons_96_pcr_adapter``
+   * - Opentrons 96 Deep Well Heater-Shaker Adapter
+     - ``opentrons_96_deep_well_adapter``
+   * - Opentrons 96 Flat Bottom Heater-Shaker Adapter
+     - ``opentrons_96_flat_bottom_adapter``
+
+For example, these commands load a well plate on top of the flat bottom adapter::
+
+    hs_adapter = hs_mod.load_adapter("opentrons_96_flat_bottom_adapter")
+    hs_plate = hs_adapter.load_labware("nest_96_wellplate_200ul_flat")
+
+.. versionadded:: 2.15
+    The ``load_adapter()`` method.
+
 
 Pre-configured Combinations
 ---------------------------
 
-The Heater-Shaker supports these thermal adapter and labware combinations by default. These let you load the adapter and labware with a single definition.
+The Heater-Shaker supports these thermal adapter and labware combinations for backwards compatibility. If your protocol specifies an ``apiLevel`` of 2.15 or higher, you should use the standalone adapter definitions instead.
 
 .. list-table::
    :header-rows: 1
@@ -99,24 +129,13 @@ The Heater-Shaker supports these thermal adapter and labware combinations by def
    * - Opentrons Universal Flat Adapter with Corning 384 Well Plate 112 µL Flat
      - ``opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat``
 
-Standalone Well-Plate Adapters
-------------------------------
+This command loads the same physical adapter and labware as the example in the previous section, but it is also compatible with API versions 2.13 and 2.14::
 
-You can use these standalone adapter definitions to load Opentrons verified or custom labware on top of the Heater-Shaker.
+    hs_combo = hs_mod.load_labware(
+        "opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat"
+    )
 
-.. list-table::
-   :header-rows: 1
-
-   * - Adapter Type
-     - API Load Name
-   * - Opentrons Universal Flat Adapter
-     - ``opentrons_universal_flat_adapter``
-   * - Opentrons 96 PCR Adapter
-     - ``opentrons_96_pcr_adapter``
-   * - Opentrons 96 Deep Well Adapter
-     - ``opentrons_96_deep_well_adapter``
-   * - Opentrons 96 Flat Bottom Adapter
-     - ``opentrons_96_flat_bottom_adapter``
+.. versionadded:: 2.13
 
 Custom Flat-Bottom Labware
 --------------------------
@@ -164,8 +183,8 @@ To pipette while the Heater-Shaker is heating, use :py:meth:`~.HeaterShakerConte
 
     hs_mod.set_target_temperature(75)
     pipette.pick_up_tip()   
-    pipette.aspirate(50, plate['A1'])
-    pipette.dispense(50, plate['B1'])
+    pipette.aspirate(50, plate["A1"])
+    pipette.dispense(50, plate["B1"])
     pipette.drop_tip()
     hs_mod.wait_for_temperature()
     protocol.delay(minutes=1)
@@ -180,8 +199,8 @@ Additionally, if you want to pipette while the module holds a temperature for a 
     hs_mod.set_and_wait_for_temperature(75)
     start_time = time.monotonic()  # set reference time
     pipette.pick_up_tip()   
-    pipette.aspirate(50, plate['A1'])
-    pipette.dispense(50, plate['B1'])
+    pipette.aspirate(50, plate["A1"])
+    pipette.dispense(50, plate["B1"])
     pipette.drop_tip()
     # delay for the difference between now and 60 seconds after the reference time
     protocol.delay(max(0, start_time+60 - time.monotonic()))

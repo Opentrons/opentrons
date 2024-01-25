@@ -63,11 +63,35 @@ export const createContainer: (
 
   if (slot) {
     const id = `${uuid()}:${args.labwareDefURI}`
-    dispatch({
-      type: 'CREATE_CONTAINER',
-      payload: { ...args, id, slot },
-    })
+    const adapterId =
+      args.adapterUnderLabwareDefURI != null
+        ? `${uuid()}:${args.adapterUnderLabwareDefURI}`
+        : null
 
+    if (adapterId != null && args.adapterUnderLabwareDefURI != null) {
+      dispatch({
+        type: 'CREATE_CONTAINER',
+        payload: {
+          ...args,
+          labwareDefURI: args.adapterUnderLabwareDefURI,
+          id: adapterId,
+          slot,
+        },
+      })
+      dispatch({
+        type: 'CREATE_CONTAINER',
+        payload: {
+          ...args,
+          id,
+          slot: adapterId,
+        },
+      })
+    } else {
+      dispatch({
+        type: 'CREATE_CONTAINER',
+        payload: { ...args, id, slot },
+      })
+    }
     if (isTiprack) {
       // Tipracks cannot be named, but should auto-increment.
       // We can't rely on reducers to do that themselves bc they don't have access
@@ -80,6 +104,7 @@ export const createContainer: (
     console.warn('no slots available, cannot create labware')
   }
 }
+
 export const duplicateLabware: (
   templateLabwareId: string
 ) => ThunkAction<DuplicateLabwareAction> = templateLabwareId => (
@@ -99,8 +124,9 @@ export const duplicateLabware: (
   const templateLabwareIdIsOffDeck =
     initialDeckSetup.labware[templateLabwareId].slot === 'offDeck'
   const duplicateSlot = getNextAvailableDeckSlot(initialDeckSetup, robotType)
-  if (!duplicateSlot)
-    console.warn('no slots available, cannot duplicate labware')
+  if (duplicateSlot == null) {
+    console.error('no slots available, cannot duplicate labware')
+  }
   const allNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(state)
   const templateNickname = allNicknamesById[templateLabwareId]
   const duplicateLabwareNickname = getNextNickname(
@@ -108,7 +134,7 @@ export const duplicateLabware: (
     templateNickname
   )
 
-  if (templateLabwareDefURI && duplicateSlot) {
+  if (templateLabwareDefURI && duplicateSlot != null) {
     dispatch({
       type: 'DUPLICATE_LABWARE',
       payload: {

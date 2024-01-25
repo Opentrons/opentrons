@@ -1,58 +1,35 @@
 import * as React from 'react'
-import { when } from 'jest-when'
+import { fireEvent, screen } from '@testing-library/react'
+
 import { renderWithProviders } from '@opentrons/components'
 import {
-  STAGING_AREA_LOAD_NAME,
-  WASTE_CHUTE_LOAD_NAME,
+  FLEX_ROBOT_TYPE,
+  MOVABLE_TRASH_D3_ADDRESSABLE_AREA,
+  SINGLE_RIGHT_SLOT_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
-import { useLoadedFixturesConfigStatus } from '../../../resources/deck_configuration/hooks'
-import { useFeatureFlag } from '../../../redux/config'
-import { LocationConflictModal } from '../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
+import { LocationConflictModal } from '../../../organisms/Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
+import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
 import { FixtureTable } from '../FixtureTable'
-import type { LoadFixtureRunTimeCommand } from '@opentrons/shared-data'
 
-jest.mock('../../../redux/config')
 jest.mock('../../../resources/deck_configuration/hooks')
-jest.mock('../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal')
+jest.mock(
+  '../../../organisms/Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
+)
 
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
-const mockUseLoadedFixturesConfigStatus = useLoadedFixturesConfigStatus as jest.MockedFunction<
-  typeof useLoadedFixturesConfigStatus
->
 const mockLocationConflictModal = LocationConflictModal as jest.MockedFunction<
   typeof LocationConflictModal
 >
-const mockLoadedFixture = {
-  id: 'stubbed_load_fixture',
-  commandType: 'loadFixture',
-  params: {
-    fixtureId: 'stubbedFixtureId',
-    loadName: WASTE_CHUTE_LOAD_NAME,
-    location: { cutout: 'D3' },
-  },
-  createdAt: 'fakeTimestamp',
-  startedAt: 'fakeTimestamp',
-  completedAt: 'fakeTimestamp',
-  status: 'succeeded',
-} as LoadFixtureRunTimeCommand
+const mockUseDeckConfigurationCompatibility = useDeckConfigurationCompatibility as jest.MockedFunction<
+  typeof useDeckConfigurationCompatibility
+>
 
-const mockLoadedStagingAreaFixture = {
-  id: 'stubbed_load_fixture_2',
-  commandType: 'loadFixture',
-  params: {
-    fixtureId: 'stubbedFixtureId',
-    loadName: STAGING_AREA_LOAD_NAME,
-    location: { cutout: 'D3' },
-  },
-  createdAt: 'fakeTimestamp',
-  startedAt: 'fakeTimestamp',
-  completedAt: 'fakeTimestamp',
-  status: 'succeeded',
-} as LoadFixtureRunTimeCommand
+const mockSetSetupScreen = jest.fn()
+const mockSetCutoutId = jest.fn()
+const mockSetProvidedFixtureOptions = jest.fn()
 
 const render = (props: React.ComponentProps<typeof FixtureTable>) => {
   return renderWithProviders(<FixtureTable {...props} />, {
@@ -64,51 +41,80 @@ describe('FixtureTable', () => {
   let props: React.ComponentProps<typeof FixtureTable>
   beforeEach(() => {
     props = {
-      mostRecentAnalysis: [] as any,
+      mostRecentAnalysis: { commands: [], labware: [] } as any,
+      robotType: FLEX_ROBOT_TYPE,
+      setSetupScreen: mockSetSetupScreen,
+      setCutoutId: mockSetCutoutId,
+      setProvidedFixtureOptions: mockSetProvidedFixtureOptions,
     }
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(true)
-    mockUseLoadedFixturesConfigStatus.mockReturnValue([
-      { ...mockLoadedFixture, configurationStatus: 'configured' },
-    ])
     mockLocationConflictModal.mockReturnValue(
       <div>mock location conflict modal</div>
     )
+    mockUseDeckConfigurationCompatibility.mockReturnValue([
+      {
+        cutoutId: 'cutoutD3',
+        cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+        requiredAddressableAreas: ['D4'],
+        compatibleCutoutFixtureIds: [
+          STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+        ],
+        missingLabwareDisplayName: null,
+      },
+    ])
+  })
+  afterEach(() => {
+    jest.clearAllMocks()
   })
 
   it('should render table header and contents', () => {
-    const [{ getByText }] = render(props)
-    getByText('Fixture')
-    getByText('Location')
-    getByText('Status')
+    render(props)
+    screen.getByText('Fixture')
+    screen.getByText('Location')
+    screen.getByText('Status')
   })
+
   it('should render the current status - configured', () => {
-    props = {
-      mostRecentAnalysis: { commands: [mockLoadedFixture] } as any,
-    }
-    const [{ getByText }] = render(props)
-    getByText('Configured')
+    render(props)
+    screen.getByText('Configured')
   })
+
   it('should render the current status - not configured', () => {
-    mockUseLoadedFixturesConfigStatus.mockReturnValue([
-      { ...mockLoadedFixture, configurationStatus: 'not configured' },
+    mockUseDeckConfigurationCompatibility.mockReturnValue([
+      {
+        cutoutId: 'cutoutD3',
+        cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
+        requiredAddressableAreas: [MOVABLE_TRASH_D3_ADDRESSABLE_AREA],
+        compatibleCutoutFixtureIds: [TRASH_BIN_ADAPTER_FIXTURE],
+        missingLabwareDisplayName: null,
+      },
     ])
-    props = {
-      mostRecentAnalysis: { commands: [mockLoadedStagingAreaFixture] } as any,
-    }
-    const [{ getByText }] = render(props)
-    getByText('Not configured')
+
+    render(props)
+
+    screen.getByText('Not configured')
+    fireEvent.click(screen.getByText('Configure'))
+    expect(mockSetCutoutId).toHaveBeenCalledWith('cutoutD3')
+    expect(mockSetSetupScreen).toHaveBeenCalledWith('deck configuration')
+    expect(mockSetProvidedFixtureOptions).toHaveBeenCalledWith([
+      TRASH_BIN_ADAPTER_FIXTURE,
+    ])
   })
+
   it('should render the current status - conflicting', () => {
-    mockUseLoadedFixturesConfigStatus.mockReturnValue([
-      { ...mockLoadedFixture, configurationStatus: 'conflicting' },
+    mockUseDeckConfigurationCompatibility.mockReturnValue([
+      {
+        cutoutId: 'cutoutD3',
+        cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+        requiredAddressableAreas: [MOVABLE_TRASH_D3_ADDRESSABLE_AREA],
+        compatibleCutoutFixtureIds: [TRASH_BIN_ADAPTER_FIXTURE],
+        missingLabwareDisplayName: null,
+      },
     ])
-    props = {
-      mostRecentAnalysis: { commands: [mockLoadedStagingAreaFixture] } as any,
-    }
-    const [{ getByText, getAllByText }] = render(props)
-    getByText('Location conflict').click()
-    getAllByText('mock location conflict modal')
+
+    render(props)
+
+    screen.getByText('Location conflict')
+    fireEvent.click(screen.getByText('Resolve'))
+    screen.getByText('mock location conflict modal')
   })
 })

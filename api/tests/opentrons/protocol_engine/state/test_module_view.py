@@ -1,5 +1,6 @@
 """Tests for module state accessors in the protocol engine state store."""
 import pytest
+from math import isclose
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
 from contextlib import nullcontext as does_not_raise
@@ -13,10 +14,9 @@ from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleDefinition,
     ModuleModel,
-    ModuleLocation,
     LabwareOffsetVector,
     DeckType,
-    ModuleOffsetVector,
+    ModuleOffsetData,
     HeaterShakerLatchStatus,
     LabwareMovementOffsetData,
 )
@@ -44,7 +44,7 @@ def make_module_view(
     requested_model_by_module_id: Optional[Dict[str, Optional[ModuleModel]]] = None,
     hardware_by_module_id: Optional[Dict[str, HardwareModule]] = None,
     substate_by_module_id: Optional[Dict[str, ModuleSubStateType]] = None,
-    module_offset_by_serial: Optional[Dict[str, ModuleOffsetVector]] = None,
+    module_offset_by_serial: Optional[Dict[str, ModuleOffsetData]] = None,
 ) -> ModuleView:
     """Get a module view test subject with the specified state."""
     state = ModuleState(
@@ -325,7 +325,8 @@ def test_get_module_offset_for_ot2_standard(
         },
     )
     assert (
-        subject.get_module_offset("module-id", DeckType.OT2_STANDARD) == expected_offset
+        subject.get_nominal_module_offset("module-id", DeckType.OT2_STANDARD)
+        == expected_offset
     )
 
 
@@ -379,7 +380,9 @@ def test_get_module_offset_for_ot3_standard(
             )
         },
     )
-    result_offset = subject.get_module_offset("module-id", DeckType.OT3_STANDARD)
+    result_offset = subject.get_nominal_module_offset(
+        "module-id", DeckType.OT3_STANDARD
+    )
     assert (result_offset.x, result_offset.y, result_offset.z) == pytest.approx(
         (expected_offset.x, expected_offset.y, expected_offset.z)
     )
@@ -1592,11 +1595,10 @@ def test_get_overall_height(
         ),
         (DeckSlotLocation(slotName=DeckSlotName.SLOT_2), does_not_raise()),
         (DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH), does_not_raise()),
-        (ModuleLocation(moduleId="module-id-1"), does_not_raise()),
     ],
 )
 def test_raise_if_labware_in_location(
-    location: Union[DeckSlotLocation, ModuleLocation],
+    location: DeckSlotLocation,
     expected_raise: ContextManager[Any],
     thermocycler_v1_def: ModuleDefinition,
 ) -> None:
@@ -1645,19 +1647,19 @@ def test_get_by_slot() -> None:
         },
     )
 
-    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1", "2"}) == LoadedModule(
+    assert subject.get_by_slot(DeckSlotName.SLOT_1) == LoadedModule(
         id="1",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         model=ModuleModel.TEMPERATURE_MODULE_V1,
         serialNumber="serial-number-1",
     )
-    assert subject.get_by_slot(DeckSlotName.SLOT_2, {"1", "2"}) == LoadedModule(
+    assert subject.get_by_slot(DeckSlotName.SLOT_2) == LoadedModule(
         id="2",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
         model=ModuleModel.TEMPERATURE_MODULE_V2,
         serialNumber="serial-number-2",
     )
-    assert subject.get_by_slot(DeckSlotName.SLOT_3, {"1", "2"}) is None
+    assert subject.get_by_slot(DeckSlotName.SLOT_3) is None
 
 
 def test_get_by_slot_prefers_later() -> None:
@@ -1683,42 +1685,11 @@ def test_get_by_slot_prefers_later() -> None:
         },
     )
 
-    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1", "1-again"}) == LoadedModule(
+    assert subject.get_by_slot(DeckSlotName.SLOT_1) == LoadedModule(
         id="1-again",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         model=ModuleModel.TEMPERATURE_MODULE_V1,
         serialNumber="serial-number-1-again",
-    )
-
-
-def test_get_by_slot_filter_ids() -> None:
-    """It should filter modules by ID in addition to checking the slot."""
-    subject = make_module_view(
-        slot_by_module_id={
-            "1": DeckSlotName.SLOT_1,
-            "1-again": DeckSlotName.SLOT_1,
-        },
-        hardware_by_module_id={
-            "1": HardwareModule(
-                serial_number="serial-number-1",
-                definition=ModuleDefinition.construct(  # type: ignore[call-arg]
-                    model=ModuleModel.TEMPERATURE_MODULE_V1
-                ),
-            ),
-            "1-again": HardwareModule(
-                serial_number="serial-number-1-again",
-                definition=ModuleDefinition.construct(  # type: ignore[call-arg]
-                    model=ModuleModel.TEMPERATURE_MODULE_V1
-                ),
-            ),
-        },
-    )
-
-    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1"}) == LoadedModule(
-        id="1",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        model=ModuleModel.TEMPERATURE_MODULE_V1,
-        serialNumber="serial-number-1",
     )
 
 
@@ -1753,14 +1724,14 @@ def test_is_edge_move_unsafe(
             lazy_fixture("thermocycler_v2_def"),
             LabwareMovementOffsetData(
                 pickUpOffset=LabwareOffsetVector(x=0, y=0, z=4.6),
-                dropOffset=LabwareOffsetVector(x=0, y=0, z=4.6),
+                dropOffset=LabwareOffsetVector(x=0, y=0, z=5.6),
             ),
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
             LabwareMovementOffsetData(
                 pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
-                dropOffset=LabwareOffsetVector(x=0, y=0, z=0.5),
+                dropOffset=LabwareOffsetVector(x=0, y=0, z=1.0),
             ),
         ),
         (
@@ -1789,3 +1760,35 @@ def test_get_default_gripper_offsets(
         },
     )
     assert subject.get_default_gripper_offsets("module-1") == expected_offset_data
+
+
+@pytest.mark.parametrize(
+    argnames=["deck_type", "slot_name", "expected_highest_z"],
+    argvalues=[
+        (DeckType.OT2_STANDARD, DeckSlotName.SLOT_1, 84),
+        (DeckType.OT3_STANDARD, DeckSlotName.SLOT_D1, 12.91),
+    ],
+)
+def test_get_module_highest_z(
+    tempdeck_v2_def: ModuleDefinition,
+    deck_type: DeckType,
+    slot_name: DeckSlotName,
+    expected_highest_z: float,
+) -> None:
+    """It should get the highest z point of the module."""
+    subject = make_module_view(
+        slot_by_module_id={"module-id": slot_name},
+        requested_model_by_module_id={
+            "module-id": ModuleModel.TEMPERATURE_MODULE_V2,
+        },
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="module-serial",
+                definition=tempdeck_v2_def,
+            )
+        },
+    )
+    assert isclose(
+        subject.get_module_highest_z(module_id="module-id", deck_type=deck_type),
+        expected_highest_z,
+    )

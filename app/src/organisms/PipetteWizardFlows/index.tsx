@@ -64,26 +64,20 @@ export const PipetteWizardFlows = (
   const { t } = useTranslation('pipette_wizard_flows')
 
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
-  const attachedPipette = attachedPipettes.left ?? attachedPipettes.right
-  const requiresFirmwareUpdate = !attachedPipette?.ok
   const memoizedPipetteInfo = React.useMemo(() => props.pipetteInfo ?? null, [])
-  const isGantryEmpty =
-    attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null
+  const isGantryEmpty = React.useMemo(
+    () => attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null,
+    []
+  )
+
   const pipetteWizardSteps = React.useMemo(
     () =>
       memoizedPipetteInfo == null
-        ? getPipetteWizardSteps(
-            flowType,
-            mount,
-            selectedPipette,
-            isGantryEmpty,
-            requiresFirmwareUpdate
-          )
+        ? getPipetteWizardSteps(flowType, mount, selectedPipette, isGantryEmpty)
         : getPipetteWizardStepsForProtocol(
             attachedPipettes,
             memoizedPipetteInfo,
-            mount,
-            requiresFirmwareUpdate
+            mount
           ),
     []
   )
@@ -97,9 +91,10 @@ export const PipetteWizardFlows = (
   const [isFetchingPipettes, setIsFetchingPipettes] = React.useState<boolean>(
     false
   )
-  const hasCalData =
-    attachedPipettes[mount]?.data.calibratedOffset?.last_modified != null
   const memoizedAttachedPipettes = React.useMemo(() => attachedPipettes, [])
+  const hasCalData =
+    memoizedAttachedPipettes[mount]?.data.calibratedOffset?.last_modified !=
+    null
   const wizardTitle = usePipetteFlowWizardHeaderText({
     flowType,
     mount,
@@ -109,6 +104,7 @@ export const PipetteWizardFlows = (
     attachedPipettes: memoizedAttachedPipettes,
     pipetteInfo: memoizedPipetteInfo,
   })
+  const memoizedWizardTitle = React.useMemo(() => wizardTitle, [])
   const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = React.useState<
     string | null
   >(null)
@@ -256,7 +252,20 @@ export const PipetteWizardFlows = (
     selectedPipette,
     isOnDevice,
   }
-  const exitModal = (
+  const is96ChannelUnskippableStep =
+    currentStep.section === SECTIONS.CARRIAGE ||
+    currentStep.section === SECTIONS.MOUNTING_PLATE ||
+    (selectedPipette === NINETY_SIX_CHANNEL &&
+      currentStep.section === SECTIONS.DETACH_PIPETTE)
+
+  const exitModal = is96ChannelUnskippableStep ? (
+    <UnskippableModal
+      proceed={handleCleanUpAndClose}
+      goBack={cancelExit}
+      isOnDevice={isOnDevice}
+      isRobotMoving={isRobotMoving}
+    />
+  ) : (
     <ExitModal
       isRobotMoving={isRobotMoving}
       goBack={cancelExit}
@@ -265,16 +274,7 @@ export const PipetteWizardFlows = (
       isOnDevice={isOnDevice}
     />
   )
-  const [
-    showUnskippableStepModal,
-    setIsUnskippableStep,
-  ] = React.useState<boolean>(false)
-  const unskippableModal = (
-    <UnskippableModal
-      goBack={() => setIsUnskippableStep(false)}
-      isOnDevice={isOnDevice}
-    />
-  )
+
   let onExit
   if (currentStep == null) return null
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
@@ -348,13 +348,19 @@ export const PipetteWizardFlows = (
     modalContent = (
       <FirmwareUpdateModal
         proceed={proceed}
-        subsystem={mount === LEFT ? 'pipette_left' : 'pipette_right'}
+        subsystem={
+          currentStep.mount === LEFT ? 'pipette_left' : 'pipette_right'
+        }
         description={t('firmware_updating')}
+        proceedDescription={t('firmware_up_to_date')}
+        isOnDevice={isOnDevice}
       />
     )
   } else if (currentStep.section === SECTIONS.DETACH_PIPETTE) {
     onExit = confirmExit
-    modalContent = (
+    modalContent = showConfirmExit ? (
+      exitModal
+    ) : (
       <DetachPipette
         {...currentStep}
         {...calibrateBaseProps}
@@ -362,37 +368,25 @@ export const PipetteWizardFlows = (
         setFetching={setIsFetchingPipettes}
       />
     )
-    if (showConfirmExit) {
-      modalContent = exitModal
-    } else if (showUnskippableStepModal) {
-      modalContent = unskippableModal
-    }
   } else if (currentStep.section === SECTIONS.CARRIAGE) {
     onExit = confirmExit
-    modalContent = showUnskippableStepModal ? (
-      unskippableModal
+    modalContent = showConfirmExit ? (
+      exitModal
     ) : (
       <Carriage {...currentStep} {...calibrateBaseProps} />
     )
   } else if (currentStep.section === SECTIONS.MOUNTING_PLATE) {
     onExit = confirmExit
-    modalContent = showUnskippableStepModal ? (
-      unskippableModal
+    modalContent = showConfirmExit ? (
+      exitModal
     ) : (
       <MountingPlate {...currentStep} {...calibrateBaseProps} />
     )
   }
-  const is96ChannelUnskippableStep =
-    currentStep.section === SECTIONS.CARRIAGE ||
-    currentStep.section === SECTIONS.MOUNTING_PLATE ||
-    (selectedPipette === NINETY_SIX_CHANNEL &&
-      currentStep.section === SECTIONS.DETACH_PIPETTE)
 
   let exitWizardButton = onExit
-  if (isRobotMoving || showUnskippableStepModal) {
+  if (isRobotMoving) {
     exitWizardButton = undefined
-  } else if (is96ChannelUnskippableStep) {
-    exitWizardButton = () => setIsUnskippableStep(true)
   } else if (showConfirmExit || errorMessage != null) {
     exitWizardButton = handleCleanUpAndClose
   }
@@ -403,7 +397,7 @@ export const PipetteWizardFlows = (
   const wizardHeader = (
     <WizardHeader
       exitDisabled={isRobotMoving || isFetchingPipettes}
-      title={wizardTitle}
+      title={memoizedWizardTitle}
       currentStep={
         progressBarForCalError ? currentStepIndex - 1 : currentStepIndex
       }

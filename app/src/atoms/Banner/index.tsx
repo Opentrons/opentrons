@@ -49,28 +49,28 @@ const BANNER_PROPS_BY_TYPE: Record<
 > = {
   success: {
     icon: { name: 'check-circle' },
-    backgroundColor: COLORS.successBackgroundLight,
-    color: COLORS.successEnabled,
+    backgroundColor: COLORS.green20,
+    color: COLORS.green50,
   },
   error: {
     icon: { name: 'alert-circle' },
-    backgroundColor: COLORS.errorBackgroundLight,
-    color: COLORS.errorEnabled,
+    backgroundColor: COLORS.red20,
+    color: COLORS.red50,
   },
   warning: {
     icon: { name: 'alert-circle' },
-    backgroundColor: COLORS.warningBackgroundLight,
-    color: COLORS.warningEnabled,
+    backgroundColor: COLORS.yellow20,
+    color: COLORS.yellow50,
   },
   updating: {
     icon: { name: 'ot-spinner' },
-    backgroundColor: COLORS.darkGreyDisabled,
-    color: COLORS.darkGreyEnabled,
+    backgroundColor: COLORS.grey30,
+    color: COLORS.grey50,
   },
   informing: {
     icon: { name: 'information' },
-    backgroundColor: COLORS.fundamentalsBackground,
-    color: COLORS.darkGreyEnabled,
+    backgroundColor: COLORS.grey10,
+    color: COLORS.grey50,
   },
 }
 
@@ -106,7 +106,7 @@ export function Banner(props: BannerProps): JSX.Element {
       font-size: 1.25rem;
       font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
       border: none;
-      background-color: ${COLORS.yellow3};
+      background-color: ${COLORS.yellow35};
       border-radius: ${BORDERS.borderRadiusSize3};
       line-height: 1.5rem;
     }

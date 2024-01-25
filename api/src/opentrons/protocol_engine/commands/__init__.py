@@ -177,6 +177,22 @@ from .move_to_well import (
     MoveToWellCommandType,
 )
 
+from .move_to_addressable_area import (
+    MoveToAddressableArea,
+    MoveToAddressableAreaParams,
+    MoveToAddressableAreaCreate,
+    MoveToAddressableAreaResult,
+    MoveToAddressableAreaCommandType,
+)
+
+from .move_to_addressable_area_for_drop_tip import (
+    MoveToAddressableAreaForDropTip,
+    MoveToAddressableAreaForDropTipParams,
+    MoveToAddressableAreaForDropTipCreate,
+    MoveToAddressableAreaForDropTipResult,
+    MoveToAddressableAreaForDropTipCommandType,
+)
+
 from .wait_for_resume import (
     WaitForResume,
     WaitForResumeParams,
@@ -264,6 +280,39 @@ from .configure_for_volume import (
     ConfigureForVolumeParams,
     ConfigureForVolumeResult,
     ConfigureForVolumeCommandType,
+)
+
+from .prepare_to_aspirate import (
+    PrepareToAspirate,
+    PrepareToAspirateCreate,
+    PrepareToAspirateParams,
+    PrepareToAspirateResult,
+    PrepareToAspirateCommandType,
+)
+
+from .configure_nozzle_layout import (
+    ConfigureNozzleLayout,
+    ConfigureNozzleLayoutCreate,
+    ConfigureNozzleLayoutParams,
+    ConfigureNozzleLayoutResult,
+    ConfigureNozzleLayoutPrivateResult,
+    ConfigureNozzleLayoutCommandType,
+)
+
+from .get_tip_presence import (
+    GetTipPresence,
+    GetTipPresenceCreate,
+    GetTipPresenceParams,
+    GetTipPresenceResult,
+    GetTipPresenceCommandType,
+)
+
+from .verify_tip_presence import (
+    VerifyTipPresence,
+    VerifyTipPresenceCreate,
+    VerifyTipPresenceParams,
+    VerifyTipPresenceResult,
+    VerifyTipPresenceCommandType,
 )
 
 __all__ = [
@@ -388,6 +437,18 @@ __all__ = [
     "MoveToWellParams",
     "MoveToWellResult",
     "MoveToWellCommandType",
+    # move to addressable area command models
+    "MoveToAddressableArea",
+    "MoveToAddressableAreaParams",
+    "MoveToAddressableAreaCreate",
+    "MoveToAddressableAreaResult",
+    "MoveToAddressableAreaCommandType",
+    # move to addressable area for drop tip command models
+    "MoveToAddressableAreaForDropTip",
+    "MoveToAddressableAreaForDropTipParams",
+    "MoveToAddressableAreaForDropTipCreate",
+    "MoveToAddressableAreaForDropTipResult",
+    "MoveToAddressableAreaForDropTipCommandType",
     # wait for resume command models
     "WaitForResume",
     "WaitForResumeParams",
@@ -463,4 +524,29 @@ __all__ = [
     "ConfigureForVolumeParams",
     "ConfigureForVolumeResult",
     "ConfigureForVolumeCommandType",
+    # prepare pipette for aspirate command bundle
+    "PrepareToAspirate",
+    "PrepareToAspirateCreate",
+    "PrepareToAspirateParams",
+    "PrepareToAspirateResult",
+    "PrepareToAspirateCommandType",
+    # configure nozzle layout command bundle
+    "ConfigureNozzleLayout",
+    "ConfigureNozzleLayoutCreate",
+    "ConfigureNozzleLayoutParams",
+    "ConfigureNozzleLayoutResult",
+    "ConfigureNozzleLayoutCommandType",
+    "ConfigureNozzleLayoutPrivateResult",
+    # get pipette tip presence bundle
+    "GetTipPresence",
+    "GetTipPresenceCreate",
+    "GetTipPresenceParams",
+    "GetTipPresenceResult",
+    "GetTipPresenceCommandType",
+    # verify pipette tip presence bundle
+    "VerifyTipPresence",
+    "VerifyTipPresenceCreate",
+    "VerifyTipPresenceParams",
+    "VerifyTipPresenceResult",
+    "VerifyTipPresenceCommandType",
 ]

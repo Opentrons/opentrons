@@ -20,5 +20,11 @@ export function useMostRecentCompletedAnalysis(
     { enabled: protocolData != null }
   )
 
-  return analysis ?? null
+  return analysis != null
+    ? {
+        ...analysis,
+        // NOTE: this is accounting for pre 7.1 robot-side protocol analysis that may not include the robotType key
+        robotType: analysis.robotType ?? protocolData?.data.robotType,
+      }
+    : null
 }

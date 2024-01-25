@@ -38,9 +38,10 @@ import {
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
 import { DeviceResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetSlideout'
 import { DeviceResetModal } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetModal'
-import { UpdateBuildroot } from './UpdateBuildroot'
+import { handleUpdateBuildroot } from './UpdateBuildroot'
 import { UNREACHABLE } from '../../../redux/discovery'
 import { Portal } from '../../../App/portal'
+import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { State, Dispatch } from '../../../redux/types'
 import type {
@@ -70,12 +71,9 @@ export function RobotSettingsAdvanced({
     showDeviceResetModal,
     setShowDeviceResetModal,
   ] = React.useState<boolean>(false)
-  const [
-    showSoftwareUpdateModal,
-    setShowSoftwareUpdateModal,
-  ] = React.useState<boolean>(false)
 
   const isRobotBusy = useIsRobotBusy({ poll: true })
+  const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
 
   const robot = useRobot(robotName)
   const isFlex = useIsFlex(robotName)
@@ -124,14 +122,6 @@ export function RobotSettingsAdvanced({
 
   return (
     <>
-      {showSoftwareUpdateModal &&
-      robot != null &&
-      robot.status !== UNREACHABLE ? (
-        <UpdateBuildroot
-          robot={robot}
-          close={() => setShowSoftwareUpdateModal(false)}
-        />
-      ) : null}
       <Box>
         {showRenameRobotSlideout && (
           <RenameRobotSlideout
@@ -161,7 +151,7 @@ export function RobotSettingsAdvanced({
         <DisplayRobotName
           robotName={robotName}
           updateIsExpanded={updateIsExpanded}
-          isRobotBusy={isRobotBusy}
+          isRobotBusy={isRobotBusy || isEstopNotDisengaged}
         />
         <Divider marginY={SPACING.spacing16} />
         <RobotServerVersion robotName={robotName} />
@@ -173,7 +163,7 @@ export function RobotSettingsAdvanced({
             <UsageSettings
               settings={findSettings('enableDoorSafetySwitch')}
               robotName={robotName}
-              isRobotBusy={isRobotBusy}
+              isRobotBusy={isRobotBusy || isEstopNotDisengaged}
             />
           </>
         )}
@@ -181,28 +171,37 @@ export function RobotSettingsAdvanced({
         <GantryHoming
           settings={findSettings('disableHomeOnBoot')}
           robotName={robotName}
-          isRobotBusy={isRobotBusy}
+          isRobotBusy={isRobotBusy || isEstopNotDisengaged}
         />
 
         {isFlex ? (
           <>
             <Divider marginY={SPACING.spacing16} />
-            <EnableStatusLight robotName={robotName} />
+            <EnableStatusLight
+              robotName={robotName}
+              isEstopNotDisengaged={isEstopNotDisengaged}
+            />
           </>
         ) : null}
         <Divider marginY={SPACING.spacing16} />
-        <OpenJupyterControl robotIp={ipAddress} />
+        <OpenJupyterControl
+          robotIp={ipAddress}
+          isEstopNotDisengaged={isEstopNotDisengaged}
+        />
         <Divider marginY={SPACING.spacing16} />
         <UpdateRobotSoftware
           robotName={robotName}
-          isRobotBusy={isRobotBusy}
-          onUpdateStart={() => setShowSoftwareUpdateModal(true)}
+          isRobotBusy={isRobotBusy || isEstopNotDisengaged}
+          onUpdateStart={() => handleUpdateBuildroot(robot)}
         />
-        <Troubleshooting robotName={robotName} />
+        <Troubleshooting
+          robotName={robotName}
+          isEstopNotDisengaged={isEstopNotDisengaged}
+        />
         <Divider marginY={SPACING.spacing16} />
         <DeviceReset
           updateIsExpanded={updateIsExpanded}
-          isRobotBusy={isRobotBusy}
+          isRobotBusy={isRobotBusy || isEstopNotDisengaged}
         />
         {isFlex ? null : (
           <>
@@ -210,25 +209,25 @@ export function RobotSettingsAdvanced({
             <UseOlderProtocol
               settings={findSettings('disableFastProtocolUpload')}
               robotName={robotName}
-              isRobotBusy={isRobotBusy}
+              isRobotBusy={isRobotBusy || isEstopNotDisengaged}
             />
             <Divider marginY={SPACING.spacing16} />
             <LegacySettings
               settings={findSettings('deckCalibrationDots')}
               robotName={robotName}
-              isRobotBusy={isRobotBusy}
+              isRobotBusy={isRobotBusy || isEstopNotDisengaged}
             />
             <Divider marginY={SPACING.spacing16} />
             <ShortTrashBin
               settings={findSettings('shortFixedTrash')}
               robotName={robotName}
-              isRobotBusy={isRobotBusy}
+              isRobotBusy={isRobotBusy || isEstopNotDisengaged}
             />
             <Divider marginY={SPACING.spacing16} />
             <UseOlderAspirateBehavior
               settings={findSettings('useOldAspirationFunctions')}
               robotName={robotName}
-              isRobotBusy={isRobotBusy}
+              isRobotBusy={isRobotBusy || isEstopNotDisengaged}
             />
           </>
         )}

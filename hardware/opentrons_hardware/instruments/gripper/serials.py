@@ -70,6 +70,6 @@ def gripper_serial_val_from_parts(model: int, serialval: bytes) -> bytes:
     except struct.error as e:
         raise InvalidInstrumentData(
             message="Invalid serial data",
-            detail={"model": model, "serial": serialval},
+            detail={"model": str(model), "serial": str(serialval)},
             wrapping=[PythonException(e)],
         )

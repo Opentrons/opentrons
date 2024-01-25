@@ -13,13 +13,12 @@ import {
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
-import { Portal } from '../../../../App/portal'
 import { TertiaryButton } from '../../../../atoms/buttons'
-import { getRobotApiVersion, UNREACHABLE } from '../../../../redux/discovery'
+import { getRobotApiVersion } from '../../../../redux/discovery'
 import { getRobotUpdateDisplayInfo } from '../../../../redux/robot-update'
 import { UpdateRobotBanner } from '../../../UpdateRobotBanner'
 import { useIsFlex, useRobot } from '../../hooks'
-import { UpdateBuildroot } from '../UpdateBuildroot'
+import { handleUpdateBuildroot } from '../UpdateBuildroot'
 
 import type { State } from '../../../../redux/types'
 
@@ -36,7 +35,6 @@ export function RobotServerVersion({
   const { t } = useTranslation(['device_settings', 'shared'])
   const robot = useRobot(robotName)
   const isFlex = useIsFlex(robotName)
-  const [showVersionInfoModal, setShowVersionInfoModal] = React.useState(false)
   const { autoUpdateAction } = useSelector((state: State) => {
     return getRobotUpdateDisplayInfo(state, robotName)
   })
@@ -46,14 +44,6 @@ export function RobotServerVersion({
 
   return (
     <>
-      {showVersionInfoModal && robot != null && robot.status !== UNREACHABLE ? (
-        <Portal level="top">
-          <UpdateBuildroot
-            robot={robot}
-            close={() => setShowVersionInfoModal(false)}
-          />
-        </Portal>
-      ) : null}
       {autoUpdateAction !== 'reinstall' && robot != null ? (
         <Box marginBottom={SPACING.spacing16} width="100%">
           <UpdateRobotBanner robot={robot} />
@@ -92,13 +82,13 @@ export function RobotServerVersion({
           <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
             <StyledText
               as="label"
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.grey50}
               paddingRight={SPACING.spacing16}
             >
               {t('up_to_date')}
             </StyledText>
             <TertiaryButton
-              onClick={() => setShowVersionInfoModal(true)}
+              onClick={() => handleUpdateBuildroot(robot)}
               textTransform={TYPOGRAPHY.textTransformCapitalize}
             >
               {t('reinstall')}

@@ -305,6 +305,15 @@ def test_get_is_started() -> None:
     assert subject.has_been_played() is True
 
 
+def test_get_is_terminal() -> None:
+    """It should return true if run is in a terminal state."""
+    subject = get_command_view(run_result=None)
+    assert subject.get_is_terminal() is False
+
+    subject = get_command_view(run_result=RunResult.SUCCEEDED)
+    assert subject.get_is_terminal() is True
+
+
 class ActionAllowedSpec(NamedTuple):
     """Spec data to test CommandView.validate_action_allowed."""
 
@@ -317,19 +326,25 @@ action_allowed_specs: List[ActionAllowedSpec] = [
     # play is allowed if the engine is idle
     ActionAllowedSpec(
         subject=get_command_view(queue_status=QueueStatus.SETUP),
-        action=PlayAction(requested_at=datetime(year=2021, month=1, day=1)),
+        action=PlayAction(
+            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
+        ),
         expected_error=None,
     ),
     # play is allowed if engine is idle, even if door is blocking
     ActionAllowedSpec(
         subject=get_command_view(is_door_blocking=True, queue_status=QueueStatus.SETUP),
-        action=PlayAction(requested_at=datetime(year=2021, month=1, day=1)),
+        action=PlayAction(
+            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
+        ),
         expected_error=None,
     ),
     # play is allowed if the engine is paused
     ActionAllowedSpec(
         subject=get_command_view(queue_status=QueueStatus.PAUSED),
-        action=PlayAction(requested_at=datetime(year=2021, month=1, day=1)),
+        action=PlayAction(
+            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
+        ),
         expected_error=None,
     ),
     # pause is allowed if the engine is running
@@ -360,13 +375,17 @@ action_allowed_specs: List[ActionAllowedSpec] = [
         subject=get_command_view(
             is_door_blocking=True, queue_status=QueueStatus.PAUSED
         ),
-        action=PlayAction(requested_at=datetime(year=2021, month=1, day=1)),
+        action=PlayAction(
+            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
+        ),
         expected_error=errors.RobotDoorOpenError,
     ),
     # play is disallowed if stop has been requested
     ActionAllowedSpec(
         subject=get_command_view(run_result=RunResult.STOPPED),
-        action=PlayAction(requested_at=datetime(year=2021, month=1, day=1)),
+        action=PlayAction(
+            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
+        ),
         expected_error=errors.RunStoppedError,
     ),
     # pause is disallowed if stop has been requested
@@ -658,15 +677,6 @@ get_okay_to_clear_specs: List[GetOkayToClearSpec] = [
 def test_get_okay_to_clear(subject: CommandView, expected_is_okay: bool) -> None:
     """It should report whether an engine is ok to clear."""
     assert subject.get_is_okay_to_clear() is expected_is_okay
-
-
-def test_get_running() -> None:
-    """It should return the command that's currently running."""
-    subject = get_command_view(running_command_id=None)
-    assert subject.get_running() is None
-
-    subject = get_command_view(running_command_id="command-id")
-    assert subject.get_running() == "command-id"
 
 
 def test_get_current() -> None:

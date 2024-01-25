@@ -1,24 +1,20 @@
 // set of functions that parse details out of a protocol record and it's internals
 import reduce from 'lodash/reduce'
 
-import { COLORS } from '@opentrons/components/src/ui-style-constants'
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import { getLabwareDefURI, DEFAULT_LIQUID_COLORS } from '@opentrons/shared-data'
 import type {
-  ModuleModel,
-  PipetteName,
   Liquid,
-  LoadedPipette,
   LoadedLabware,
   LoadedModule,
-} from '@opentrons/shared-data'
-import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7'
-import type {
+  LoadedPipette,
   LoadLabwareRunTimeCommand,
+  LoadLiquidRunTimeCommand,
   LoadModuleRunTimeCommand,
   LoadPipetteRunTimeCommand,
-  LoadLiquidRunTimeCommand,
-  LoadFixtureRunTimeCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+  ModuleModel,
+  PipetteName,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 
 interface PipetteNamesByMount {
   left: PipetteName | null
@@ -119,11 +115,14 @@ export function parseInitialLoadedLabwareBySlot(
   return reduce<LoadLabwareRunTimeCommand, LoadedLabwareBySlot>(
     loadLabwareCommandsReversed,
     (acc, command) => {
-      if (
-        typeof command.params.location === 'object' &&
-        'slotName' in command.params.location
-      ) {
-        return { ...acc, [command.params.location.slotName]: command }
+      if (typeof command.params.location === 'object') {
+        let slot: string
+        if ('slotName' in command.params.location) {
+          slot = command.params.location.slotName
+        } else if ('addressableAreaName' in command.params.location) {
+          slot = command.params.location.addressableAreaName
+        } else return acc
+        return { ...acc, [slot]: command }
       } else {
         return acc
       }
@@ -132,7 +131,7 @@ export function parseInitialLoadedLabwareBySlot(
   )
 }
 
-interface LoadedLabwareByAdapter {
+export interface LoadedLabwareByAdapter {
   [labwareId: string]: LoadLabwareRunTimeCommand
 }
 export function parseInitialLoadedLabwareByAdapter(
@@ -227,25 +226,6 @@ export function parseInitialLoadedModulesBySlot(
   )
 }
 
-export interface LoadedFixturesBySlot {
-  [slotName: string]: LoadFixtureRunTimeCommand
-}
-export function parseInitialLoadedFixturesByCutout(
-  commands: RunTimeCommand[]
-): LoadedFixturesBySlot {
-  const loadFixtureCommandsReversed = commands
-    .filter(
-      (command): command is LoadFixtureRunTimeCommand =>
-        command.commandType === 'loadFixture'
-    )
-    .reverse()
-  return reduce<LoadFixtureRunTimeCommand, LoadedFixturesBySlot>(
-    loadFixtureCommandsReversed,
-    (acc, command) => ({ ...acc, [command.params.location.cutout]: command }),
-    {}
-  )
-}
-
 export interface LiquidsById {
   [liquidId: string]: {
     displayName: string
@@ -273,7 +253,7 @@ export function parseLiquidsInLoadOrder(
       ...liquid,
       displayColor:
         liquid.displayColor ??
-        COLORS.liquidColors[index % COLORS.liquidColors.length],
+        DEFAULT_LIQUID_COLORS[index % DEFAULT_LIQUID_COLORS.length],
     }
   })
 
@@ -295,10 +275,12 @@ interface LabwareLiquidInfo {
   volumeByWell: { [well: string]: number }
 }
 
+/** @deprecated instead use LabwareByLiquidId from components/src/hardware-sim/ProtocolDeck/types */
 export interface LabwareByLiquidId {
   [liquidId: string]: LabwareLiquidInfo[]
 }
 
+/** @deprecated instead use getLabwareInfoByLiquidId from components/src/hardware-sim/ProtocolDeck/utils */
 export function parseLabwareInfoByLiquidId(
   commands: RunTimeCommand[]
 ): LabwareByLiquidId {

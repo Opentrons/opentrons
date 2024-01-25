@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { getModuleDisplayName, WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
-import { i18n } from '../../../../localization'
+import { useTranslation } from 'react-i18next'
+import {
+  getModuleDisplayName,
+  WASTE_CHUTE_CUTOUT,
+} from '@opentrons/shared-data'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
@@ -9,7 +12,7 @@ import {
 } from '../../../../step-forms/selectors'
 import {
   getRobotStateAtActiveItem,
-  getUnocuppiedLabwareLocationOptions,
+  getUnoccupiedLabwareLocationOptions,
 } from '../../../../top-selectors/labware-locations'
 import { getHasWasteChute } from '../../../labware'
 import { StepFormDropdown } from '../StepFormDropdownField'
@@ -19,6 +22,7 @@ export function LabwareLocationField(
     useGripper: boolean
   } & { canSave: boolean } & { labware: string }
 ): JSX.Element {
+  const { t } = useTranslation('form')
   const { labware, useGripper, value } = props
   const labwareEntities = useSelector(getLabwareEntities)
   const robotState = useSelector(getRobotStateAtActiveItem)
@@ -33,11 +37,12 @@ export function LabwareLocationField(
     useGripper && hasWasteChute && !isLabwareOffDeck
 
   let unoccupiedLabwareLocationsOptions =
-    useSelector(getUnocuppiedLabwareLocationOptions) ?? []
+    useSelector(getUnoccupiedLabwareLocationOptions) ?? []
 
   if (isLabwareOffDeck && hasWasteChute) {
     unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
-      option => option.value !== 'offDeck' && option.value !== WASTE_CHUTE_SLOT
+      option =>
+        option.value !== 'offDeck' && option.value !== WASTE_CHUTE_CUTOUT
     )
   } else if (useGripper || isLabwareOffDeck) {
     unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
@@ -75,10 +80,10 @@ export function LabwareLocationField(
       {...props}
       errorToShow={
         !props.canSave && bothFieldsSelected
-          ? i18n.t(
-              'form.step_edit_form.labwareLabel.errors.labwareSlotIncompatible',
-              { labwareName: labwareDisplayName, slot: locationString }
-            )
+          ? t('step_edit_form.labwareLabel.errors.labwareSlotIncompatible', {
+              labwareName: labwareDisplayName,
+              slot: locationString,
+            })
           : undefined
       }
       options={unoccupiedLabwareLocationsOptions}

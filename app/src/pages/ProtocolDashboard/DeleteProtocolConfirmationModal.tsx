@@ -18,6 +18,7 @@ import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
 
 import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
+import { useToaster } from '../../organisms/ToasterOven'
 
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
@@ -31,11 +32,12 @@ export function DeleteProtocolConfirmationModal({
   setShowDeleteConfirmationModal,
 }: DeleteProtocolConfirmationModalProps): JSX.Element {
   const { i18n, t } = useTranslation(['protocol_list', 'shared'])
+  const { makeSnackbar } = useToaster()
   const [showIcon, setShowIcon] = React.useState<boolean>(false)
   const modalHeader: ModalHeaderBaseProps = {
-    title: t('should_delete_this_protocol'),
+    title: t('delete_this_protocol'),
     iconName: 'ot-alert',
-    iconColor: COLORS.yellow2,
+    iconColor: COLORS.yellow50,
   }
   const host = useHost()
   const queryClient = useQueryClient()
@@ -71,6 +73,7 @@ export function DeleteProtocolConfirmationModal({
         .then(() => {
           setShowIcon(false)
           setShowDeleteConfirmationModal(false)
+          makeSnackbar(t('protocol_deleted'))
         })
         .catch((e: Error) => {
           console.error(`error deleting resources: ${e.message}`)
@@ -125,11 +128,11 @@ const ProtocolNameText = styled.span`
   font-weight: ${TYPOGRAPHY.fontWeightBold};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
-  color: ${COLORS.darkBlack90};
+  color: ${COLORS.grey60};
 `
 const AdditionalText = styled.span`
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
-  color: ${COLORS.darkBlack90};
+  color: ${COLORS.grey60};
 `

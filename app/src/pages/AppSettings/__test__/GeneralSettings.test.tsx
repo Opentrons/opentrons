@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
-import '@testing-library/jest-dom'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -56,17 +55,22 @@ describe('GeneralSettings', () => {
     const [{ getByText, getByRole }] = render()
     getByText('Up to date')
     getByText('View latest release notes on')
-    getByRole('link', { name: 'GitHub' })
+    expect(getByRole('link', { name: 'GitHub' })).toHaveAttribute(
+      'href',
+      'https://github.com/Opentrons/opentrons/blob/edge/app-shell/build/release-notes.md'
+    )
     getByRole('button', {
       name: 'See how to restore a previous software version',
     })
     expect(
       'It is very important for the robot and app software to be on the same version. Manage the robot software versions via Robot Settings &gt; Advanced.'
     ).toBeTruthy()
-    getByRole('link', {
-      name:
-        'Learn more about keeping the Opentrons app and robot software in sync',
-    })
+    expect(
+      getByRole('link', {
+        name:
+          'Learn more about keeping the Opentrons App and robot software in sync',
+      })
+    ).toHaveAttribute('href', 'https://support.opentrons.com/s/')
   })
 
   it('renders correct info if there is update available', () => {

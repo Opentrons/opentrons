@@ -1,11 +1,12 @@
 from typing import Dict, List, Optional, Mapping
 from typing_extensions import Protocol
 
-from opentrons.types import Mount, Point
+from opentrons.types import Point
 from ..types import Axis, CriticalPoint, MotionChecks
+from .types import MountArgType
 
 
-class MotionController(Protocol):
+class MotionController(Protocol[MountArgType]):
     """Protocol specifying fundamental motion controls."""
 
     async def halt(self, disengage_before_stopping: bool = False) -> None:
@@ -44,13 +45,13 @@ class MotionController(Protocol):
     # Gantry/frame (i.e. not pipette) action API
     async def home_z(
         self,
-        mount: Optional[Mount] = None,
+        mount: Optional[MountArgType] = None,
         allow_home_other: bool = True,
     ) -> None:
         """Home a selected z-axis, or both if not specified."""
         ...
 
-    async def home_plunger(self, mount: Mount) -> None:
+    async def home_plunger(self, mount: MountArgType) -> None:
         """
         Home the plunger motor for a mount, and then return it to the 'bottom'
         position.
@@ -69,7 +70,7 @@ class MotionController(Protocol):
 
     async def current_position(
         self,
-        mount: Mount,
+        mount: MountArgType,
         critical_point: Optional[CriticalPoint] = None,
         refresh: bool = False,
         # TODO(mc, 2021-11-15): combine with `refresh` for more reliable
@@ -97,7 +98,7 @@ class MotionController(Protocol):
 
     async def gantry_position(
         self,
-        mount: Mount,
+        mount: MountArgType,
         critical_point: Optional[CriticalPoint] = None,
         refresh: bool = False,
         # TODO(mc, 2021-11-15): combine with `refresh` for more reliable
@@ -114,7 +115,7 @@ class MotionController(Protocol):
 
     async def move_to(
         self,
-        mount: Mount,
+        mount: MountArgType,
         abs_position: Point,
         speed: Optional[float] = None,
         critical_point: Optional[CriticalPoint] = None,
@@ -173,7 +174,7 @@ class MotionController(Protocol):
 
     async def move_rel(
         self,
-        mount: Mount,
+        mount: MountArgType,
         delta: Point,
         speed: Optional[float] = None,
         max_speeds: Optional[Dict[Axis, float]] = None,
@@ -203,7 +204,7 @@ class MotionController(Protocol):
         """Disengage some axes."""
         ...
 
-    async def retract(self, mount: Mount, margin: float = 10) -> None:
+    async def retract(self, mount: MountArgType, margin: float = 10) -> None:
         """Pull the specified mount up to its home position.
 
         Works regardless of critical point or home status.
@@ -212,4 +213,16 @@ class MotionController(Protocol):
 
     async def retract_axis(self, axis: Axis) -> None:
         """Retract the specified axis to its home position."""
+        ...
+
+    def is_movement_execution_taskified(self) -> bool:
+        """Get whether move functions are being executed inside cancellable tasks."""
+        ...
+
+    def should_taskify_movement_execution(self, taskify: bool) -> None:
+        """Specify whether move functions should be executed inside cancellable tasks."""
+        ...
+
+    async def cancel_execution_and_running_tasks(self) -> None:
+        """Cancel all tasks and set execution manager state to Cancelled."""
         ...

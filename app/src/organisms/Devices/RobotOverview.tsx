@@ -112,12 +112,7 @@ export function RobotOverview({
             <Box marginBottom={SPACING.spacing8}>
               <ReachableBanner robot={robot} />
             </Box>
-            {robot != null ? (
-              <UpdateRobotBanner
-                robot={robot}
-                marginBottom={SPACING.spacing8}
-              />
-            ) : null}
+            <UpdateRobotBanner robot={robot} marginBottom={SPACING.spacing8} />
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
               <RobotStatusHeader
                 name={robot.name}
@@ -131,7 +126,7 @@ export function RobotOverview({
                 >
                   <StyledText
                     as="h6"
-                    color={COLORS.darkGreyEnabled}
+                    color={COLORS.grey50}
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     paddingBottom={SPACING.spacing4}
                     textTransform={TYPOGRAPHY.textTransformUppercase}
@@ -153,11 +148,7 @@ export function RobotOverview({
                     </Flex>
                     <StyledText
                       as="p"
-                      color={
-                        isRobotViewable
-                          ? COLORS.darkBlackEnabled
-                          : COLORS.errorDisabled
-                      }
+                      color={isRobotViewable ? COLORS.black90 : COLORS.grey40}
                     >
                       {t('lights')}
                     </StyledText>

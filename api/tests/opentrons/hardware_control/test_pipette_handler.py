@@ -2,10 +2,10 @@
 import pytest
 
 from decoy import Decoy
-from typing import Optional, Tuple, Dict
+from typing import Optional, Tuple, Dict, List
 
 from opentrons import types
-from opentrons.hardware_control.types import Axis, OT3Mount
+from opentrons.hardware_control.types import OT3Mount, Axis
 from opentrons.hardware_control.instruments.ot2.pipette import Pipette
 from opentrons.hardware_control.instruments.ot2.pipette_handler import (
     PipetteHandlerProvider,
@@ -13,7 +13,12 @@ from opentrons.hardware_control.instruments.ot2.pipette_handler import (
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette as OT3Pipette
 from opentrons.hardware_control.instruments.ot3.pipette_handler import (
     OT3PipetteHandler,
-    TipMotorPickUpTipSpec,
+    TipActionMoveSpec,
+)
+
+from opentrons_shared_data.pipette.pipette_definition import (
+    PressFitPickUpTipConfiguration,
+    CamActionPickUpTipConfiguration,
 )
 
 
@@ -41,9 +46,51 @@ def subject(decoy: Decoy, mock_pipette: Pipette) -> PipetteHandlerProvider:
 
 @pytest.fixture
 def subject_ot3(decoy: Decoy, mock_pipette_ot3: OT3Pipette) -> OT3PipetteHandler:
-    inst_by_mount = {types.Mount.LEFT: mock_pipette_ot3, types.Mount.RIGHT: None}
+    inst_by_mount = {OT3Mount.LEFT: mock_pipette_ot3, OT3Mount.RIGHT: None}
     subject = OT3PipetteHandler(attached_instruments=inst_by_mount)
     return subject
+
+
+@pytest.fixture
+def mock_presses_list() -> List[TipActionMoveSpec]:
+    return [
+        TipActionMoveSpec(
+            distance=-10.0,
+            speed=5.5,
+            currents={Axis.Z_L: 1.0},
+        ),
+        TipActionMoveSpec(
+            distance=10.0,
+            speed=5.5,
+            currents=None,
+        ),
+        TipActionMoveSpec(
+            distance=-11.0,
+            speed=5.5,
+            currents={Axis.Z_L: 1.0},
+        ),
+        TipActionMoveSpec(
+            distance=11.0,
+            speed=5.5,
+            currents=None,
+        ),
+    ]
+
+
+@pytest.fixture
+def mock_pickup_list() -> List[TipActionMoveSpec]:
+    return [
+        TipActionMoveSpec(
+            distance=19.0,
+            speed=10,
+            currents={Axis.P_L: 1.0, Axis.Q: 1.0},
+        ),
+        TipActionMoveSpec(
+            distance=29,
+            speed=5.5,
+            currents={Axis.P_L: 1.0, Axis.Q: 1.0},
+        ),
+    ]
 
 
 @pytest.mark.parametrize(
@@ -64,13 +111,19 @@ def test_plan_check_pick_up_tip_with_presses_argument(
 
     decoy.when(mock_pipette.has_tip).then_return(False)
     decoy.when(mock_pipette.config.quirks).then_return([])
-    decoy.when(mock_pipette.pick_up_configurations.distance).then_return(0)
-    decoy.when(mock_pipette.pick_up_configurations.increment).then_return(0)
-
-    if presses_input is None:
-        decoy.when(mock_pipette.pick_up_configurations.presses).then_return(
-            expected_array_length
-        )
+    decoy.when(mock_pipette.pick_up_configurations.press_fit.presses).then_return(
+        expected_array_length
+    )
+    decoy.when(mock_pipette.pick_up_configurations.press_fit.distance).then_return(5)
+    decoy.when(mock_pipette.pick_up_configurations.press_fit.increment).then_return(0)
+    decoy.when(mock_pipette.pick_up_configurations.press_fit.speed).then_return(10)
+    decoy.when(mock_pipette.config.end_tip_action_retract_distance_mm).then_return(0)
+    decoy.when(
+        mock_pipette.pick_up_configurations.press_fit.current_by_tip_count
+    ).then_return({1: 1.0})
+    decoy.when(mock_pipette.nozzle_manager.current_configuration.tip_count).then_return(
+        1
+    )
 
     spec, _add_tip_to_instrs = subject.plan_check_pick_up_tip(
         mount, tip_length, presses, increment
@@ -82,21 +135,9 @@ def test_plan_check_pick_up_tip_with_presses_argument(
 @pytest.mark.parametrize(
     "presses_input, expected_array_length, channels, expected_pick_up_motor_actions",
     [
-        (
-            0,
-            0,
-            96,
-            TipMotorPickUpTipSpec(
-                tiprack_down=types.Point(0, 0, -7),
-                tiprack_up=types.Point(0, 0, 2),
-                pick_up_distance=0,
-                speed=10,
-                currents={Axis.Q: 1},
-                home_buffer=10,
-            ),
-        ),
-        (None, 3, 8, None),
-        (3, 3, 1, None),
+        (0, 2, 96, "mock_pickup_list"),
+        (None, 4, 8, "mock_presses_list"),
+        (2, 4, 1, "mock_presses_list"),
     ],
 )
 def test_plan_check_pick_up_tip_with_presses_argument_ot3(
@@ -106,34 +147,50 @@ def test_plan_check_pick_up_tip_with_presses_argument_ot3(
     presses_input: int,
     expected_array_length: int,
     channels: int,
-    expected_pick_up_motor_actions: Optional[TipMotorPickUpTipSpec],
+    expected_pick_up_motor_actions: Optional[List[TipActionMoveSpec]],
+    request,
 ) -> None:
     """Should return an array with expected length."""
-    tip_length = 25.0
-    mount = types.Mount.LEFT
+    mount = OT3Mount.LEFT
     presses = presses_input
     increment = 1
 
     decoy.when(mock_pipette_ot3.has_tip).then_return(False)
-    decoy.when(mock_pipette_ot3.pick_up_configurations.presses).then_return(3)
-    decoy.when(mock_pipette_ot3.pick_up_configurations.increment).then_return(increment)
-    decoy.when(mock_pipette_ot3.pick_up_configurations.speed).then_return(10)
-    decoy.when(mock_pipette_ot3.pick_up_configurations.distance).then_return(0)
-    decoy.when(mock_pipette_ot3.pick_up_configurations.current).then_return(1)
+    decoy.when(
+        mock_pipette_ot3.get_pick_up_configuration_for_tip_count(channels)
+    ).then_return(
+        CamActionPickUpTipConfiguration(
+            distance=10,
+            speed=5.5,
+            prep_move_distance=19.0,
+            prep_move_speed=10,
+            currentByTipCount={96: 1.0},
+            connectTiprackDistanceMM=8,
+        )
+        if channels == 96
+        else PressFitPickUpTipConfiguration(
+            presses=2,
+            increment=increment,
+            distance=10,
+            speed=5.5,
+            currentByTipCount={channels: 1.0},
+        )
+    )
+    decoy.when(mock_pipette_ot3.plunger_motor_current.run).then_return(1)
     decoy.when(mock_pipette_ot3.config.quirks).then_return([])
     decoy.when(mock_pipette_ot3.channels).then_return(channels)
-
-    if presses_input is None:
-        decoy.when(mock_pipette_ot3.config.pick_up_presses).then_return(
-            expected_array_length
-        )
-
-    spec, _add_tip_to_instrs = subject_ot3.plan_check_pick_up_tip(
-        mount, tip_length, presses, increment
+    decoy.when(mock_pipette_ot3.config.end_tip_action_retract_distance_mm).then_return(
+        2
     )
 
-    assert len(spec.presses) == expected_array_length
-    assert spec.pick_up_motor_actions == expected_pick_up_motor_actions
+    if channels == 96:
+        spec = subject_ot3.plan_ht_pick_up_tip(96)
+    else:
+        spec = subject_ot3.plan_lt_pick_up_tip(mount, channels, presses, increment)
+    assert len(spec.tip_action_moves) == expected_array_length
+    assert spec.tip_action_moves == request.getfixturevalue(
+        expected_pick_up_motor_actions
+    )
 
 
 def test_get_pipette_fails(decoy: Decoy, subject: PipetteHandlerProvider):

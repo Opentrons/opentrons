@@ -1,11 +1,16 @@
-import { useConditionalConfirm } from '@opentrons/components'
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
+import { useConditionalConfirm } from '@opentrons/components'
 import { actions } from '../../steplist'
 import { actions as stepsActions } from '../../ui/steps'
 import { resetScrollElements } from '../../ui/steps/utils'
-import { selectors as stepFormSelectors } from '../../step-forms'
+import {
+  getHydratedForm,
+  selectors as stepFormSelectors,
+} from '../../step-forms'
 import { maskField } from '../../steplist/fieldLevel'
+import { getInvariantContext } from '../../step-forms/selectors'
 import { AutoAddPauseUntilTempStepModal } from '../modals/AutoAddPauseUntilTempStepModal'
 import { AutoAddPauseUntilHeaterShakerTempStepModal } from '../modals/AutoAddPauseUntilHeaterShakerTempStepModal'
 import {
@@ -17,8 +22,10 @@ import {
 import { makeSingleEditFieldProps } from './fields/makeSingleEditFieldProps'
 import { StepEditFormComponent } from './StepEditFormComponent'
 import { getDirtyFields } from './utils'
-import { BaseState, ThunkDispatch } from '../../types'
-import { FormData, StepFieldName, StepIdType } from '../../form-types'
+
+import type { InvariantContext } from '@opentrons/step-generation'
+import type { BaseState, ThunkDispatch } from '../../types'
+import type { FormData, StepFieldName, StepIdType } from '../../form-types'
 
 interface SP {
   canSave: boolean
@@ -27,6 +34,7 @@ interface SP {
   isNewStep: boolean
   isPristineSetTempForm: boolean
   isPristineSetHeaterShakerTempForm: boolean
+  invariantContext: InvariantContext
 }
 interface DP {
   deleteStep: (stepId: string) => unknown
@@ -54,8 +62,9 @@ const StepEditFormManager = (
     saveSetTempFormWithAddedPauseUntilTemp,
     saveHeaterShakerFormWithAddedPauseUntilTemp,
     saveStepForm,
+    invariantContext,
   } = props
-
+  const { t } = useTranslation('tooltip')
   const [
     showMoreOptionsModal,
     setShowMoreOptionsModal,
@@ -125,6 +134,8 @@ const StepEditFormManager = (
     return null
   }
 
+  const hydratedForm = getHydratedForm(formData, invariantContext)
+
   const focusHandlers = {
     focusedField,
     dirtyFields,
@@ -135,7 +146,9 @@ const StepEditFormManager = (
   const propsForFields = makeSingleEditFieldProps(
     focusHandlers,
     formData,
-    handleChangeFormInput
+    handleChangeFormInput,
+    hydratedForm,
+    t
   )
   let handleSave = saveStepForm
   if (isPristineSetTempForm) {
@@ -210,6 +223,7 @@ const mapStateToProps = (state: BaseState): SP => {
     isPristineSetTempForm: stepFormSelectors.getUnsavedFormIsPristineSetTempForm(
       state
     ),
+    invariantContext: getInvariantContext(state),
   }
 }
 

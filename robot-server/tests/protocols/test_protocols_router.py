@@ -450,7 +450,7 @@ async def test_create_protocol_not_readable(
 
     assert exc_info.value.status_code == 422
     assert exc_info.value.content["errors"][0]["id"] == "ProtocolFilesInvalid"
-    assert exc_info.value.content["errors"][0]["detail"] == "oh no"
+    assert "oh no" in exc_info.value.content["errors"][0]["detail"]
 
 
 async def test_create_protocol_different_robot_type(
@@ -559,6 +559,7 @@ async def test_get_protocol_analyses(
     """It should get all analyses of a protocol."""
     analysis = CompletedAnalysis(
         id="analysis-id",
+        status=AnalysisStatus.COMPLETED,
         result=AnalysisResult.OK,
         labware=[],
         pipettes=[],

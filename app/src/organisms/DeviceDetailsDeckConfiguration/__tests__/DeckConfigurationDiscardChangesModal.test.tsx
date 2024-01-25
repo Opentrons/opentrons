@@ -1,11 +1,20 @@
 import * as React from 'react'
-
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
 import { DeckConfigurationDiscardChangesModal } from '../DeckConfigurationDiscardChangesModal'
 
 const mockFunc = jest.fn()
+const mockGoBack = jest.fn()
+
+jest.mock('react-router-dom', () => {
+  const reactRouterDom = jest.requireActual('react-router-dom')
+  return {
+    ...reactRouterDom,
+    useHistory: () => ({ goBack: mockGoBack } as any),
+  }
+})
 
 const render = (
   props: React.ComponentProps<typeof DeckConfigurationDiscardChangesModal>
@@ -27,25 +36,25 @@ describe('DeckConfigurationDiscardChangesModal', () => {
     }
   })
   it('should render text and buttons', () => {
-    const [{ getByText }] = render(props)
-    getByText('Changes will be lost')
-    getByText(
+    render(props)
+    screen.getByText('Changes will be lost')
+    screen.getByText(
       'Are you sure you want to exit without saving your deck configuration?'
     )
-    getByText('Discard changes')
-    getByText('Continue editing')
+    screen.getByText('Discard changes')
+    screen.getByText('Continue editing')
   })
 
   it('should call a mock function when tapping discard changes button', () => {
-    const [{ getByText }] = render(props)
-    getByText('Discard changes').click()
-    // ToDo (kk:09/29/2023) need to update this test case later
-    expect(mockFunc).toHaveBeenCalled()
+    render(props)
+    fireEvent.click(screen.getByText('Discard changes'))
+    expect(mockFunc).toHaveBeenCalledWith(false)
+    expect(mockGoBack).toHaveBeenCalled()
   })
 
   it('should call a mock function when tapping continue editing button', () => {
-    const [{ getByText }] = render(props)
-    getByText('Continue editing').click()
-    expect(mockFunc).toHaveBeenCalled()
+    render(props)
+    fireEvent.click(screen.getByText('Continue editing'))
+    expect(mockFunc).toHaveBeenCalledWith(false)
   })
 })

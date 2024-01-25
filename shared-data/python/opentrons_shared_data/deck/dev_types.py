@@ -17,7 +17,7 @@ DeckSchemaVersion1 = Literal[1]
 
 DeckSchema = NewType("DeckSchema", Dict[str, Any])
 
-
+DeckSchemaId = Literal["opentronsDeckSchemaV3", "opentronsDeckSchemaV4"]
 RobotModel = Union[Literal["OT-2 Standard"], Literal["OT-3 Standard"]]
 
 
@@ -101,15 +101,12 @@ class AddressableArea(_RequiredAddressableArea, total=False):
     matingSurfaceUnitVector: List[Union[Literal[1], Literal[-1]]]
     ableToDropTips: bool
     ableToDropLabware: bool
-    dropTipsOffset: List[float]
-    dropLabwareOffset: List[float]
 
 
 class Cutout(TypedDict):
     id: str
     position: List[float]
     displayName: str
-    compatibleFixtureTypes: List[str]
 
 
 class CutoutFixture(TypedDict):
@@ -117,6 +114,7 @@ class CutoutFixture(TypedDict):
     mayMountTo: List[str]
     displayName: str
     providesAddressableAreas: Dict[str, List[str]]
+    height: float
 
 
 Fixture = Union[
@@ -134,6 +132,7 @@ class LocationsV4(TypedDict):
     addressableAreas: List[AddressableArea]
     calibrationPoints: List[CalibrationPoint]
     cutouts: List[Cutout]
+    legacyFixtures: List[Fixture]
 
 
 class NamedOffset(TypedDict):

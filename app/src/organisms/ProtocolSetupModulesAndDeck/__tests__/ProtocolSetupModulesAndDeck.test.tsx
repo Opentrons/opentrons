@@ -1,18 +1,13 @@
 import * as React from 'react'
 import { UseQueryResult } from 'react-query'
-import { waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { MemoryRouter } from 'react-router-dom'
 
 import { renderWithProviders } from '@opentrons/components'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
-import {
-  DeckConfiguration,
-  Fixture,
-  getDeckDefFromRobotType,
-  STAGING_AREA_LOAD_NAME,
-} from '@opentrons/shared-data'
-import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
+import { WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE } from '@opentrons/shared-data'
+import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/4/ot3_standard.json'
 
 import { i18n } from '../../../i18n'
 import { useChainLiveCommands } from '../../../resources/runs/hooks'
@@ -27,7 +22,6 @@ import { mockApiHeaterShaker } from '../../../redux/modules/__fixtures__'
 import { mockProtocolModuleInfo } from '../../ProtocolSetupInstruments/__fixtures__'
 import { getLocalRobot } from '../../../redux/discovery'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
-import { useFeatureFlag } from '../../../redux/config'
 import {
   getAttachedProtocolModuleMatches,
   getUnmatchedModulesForProtocol,
@@ -36,13 +30,14 @@ import { LocationConflictModal } from '../../Devices/ProtocolRun/SetupModuleAndD
 import { ModuleWizardFlows } from '../../ModuleWizardFlows'
 import { SetupInstructionsModal } from '../SetupInstructionsModal'
 import { FixtureTable } from '../FixtureTable'
+import { ModulesAndDeckMapViewModal } from '../ModulesAndDeckMapViewModal'
 import { ProtocolSetupModulesAndDeck } from '..'
+
+import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../resources/runs/hooks')
-jest.mock('@opentrons/shared-data/js/helpers')
 jest.mock('../../../redux/discovery')
-jest.mock('../../../redux/config')
 jest.mock('../../../organisms/Devices/hooks')
 jest.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -53,10 +48,8 @@ jest.mock('../SetupInstructionsModal')
 jest.mock('../../ModuleWizardFlows')
 jest.mock('../FixtureTable')
 jest.mock('../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal')
+jest.mock('../ModulesAndDeckMapViewModal')
 
-const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
-  typeof getDeckDefFromRobotType
->
 const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
   typeof useAttachedModules
 >
@@ -87,9 +80,6 @@ const mockModuleWizardFlows = ModuleWizardFlows as jest.MockedFunction<
 const mockUseChainLiveCommands = useChainLiveCommands as jest.MockedFunction<
   typeof useChainLiveCommands
 >
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
 const mockFixtureTable = FixtureTable as jest.MockedFunction<
   typeof FixtureTable
 >
@@ -99,10 +89,15 @@ const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFu
 const mockLocationConflictModal = LocationConflictModal as jest.MockedFunction<
   typeof LocationConflictModal
 >
+const mockModulesAndDeckMapViewModal = ModulesAndDeckMapViewModal as jest.MockedFunction<
+  typeof ModulesAndDeckMapViewModal
+>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
 const mockSetSetupScreen = jest.fn()
+const mockSetCutoutId = jest.fn()
+const mockSetProvidedFixtureOptions = jest.fn()
 
 const calibratedMockApiHeaterShaker = {
   ...mockApiHeaterShaker,
@@ -116,11 +111,10 @@ const calibratedMockApiHeaterShaker = {
     last_modified: '2023-06-01T14:42:20.131798+00:00',
   },
 }
-const mockFixture = {
-  fixtureId: 'mockId',
-  fixtureLocation: '10' as any,
-  loadName: STAGING_AREA_LOAD_NAME,
-} as Fixture
+const mockFixture: CutoutConfig = {
+  cutoutId: 'cutoutD3',
+  cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+}
 
 const render = () => {
   return renderWithProviders(
@@ -128,6 +122,8 @@ const render = () => {
       <ProtocolSetupModulesAndDeck
         runId={RUN_ID}
         setSetupScreen={mockSetSetupScreen}
+        setCutoutId={mockSetCutoutId}
+        setProvidedFixtureOptions={mockSetProvidedFixtureOptions}
       />
     </MemoryRouter>,
     {
@@ -155,9 +151,6 @@ describe('ProtocolSetupModulesAndDeck', () => {
     when(mockGetUnmatchedModulesForProtocol)
       .calledWith([], [])
       .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
-    when(mockGetDeckDefFromRobotType)
-      .calledWith('OT-3 Standard')
-      .mockReturnValue(ot3StandardDeckDef as any)
     mockSetupInstructionsModal.mockReturnValue(
       <div>mock SetupInstructionsModal</div>
     )
@@ -168,9 +161,9 @@ describe('ProtocolSetupModulesAndDeck', () => {
     mockLocationConflictModal.mockReturnValue(
       <div>mock location conflict modal</div>
     )
-    mockUseDeckConfigurationQuery.mockReturnValue({
-      data: [mockFixture],
-    } as UseQueryResult<DeckConfiguration>)
+    mockUseDeckConfigurationQuery.mockReturnValue(({
+      data: [],
+    } as unknown) as UseQueryResult<DeckConfiguration>)
     when(mockUseRunCalibrationStatus)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({
@@ -180,10 +173,10 @@ describe('ProtocolSetupModulesAndDeck', () => {
     mockUseChainLiveCommands.mockReturnValue({
       chainLiveCommands: mockChainLiveCommands,
     } as any)
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(false)
     mockFixtureTable.mockReturnValue(<div>mock FixtureTable</div>)
+    mockModulesAndDeckMapViewModal.mockReturnValue(
+      <div>mock ModulesAndDeckMapViewModal</div>
+    )
   })
 
   afterEach(() => {
@@ -192,28 +185,35 @@ describe('ProtocolSetupModulesAndDeck', () => {
   })
 
   it('should render text and buttons', () => {
-    const [{ getByRole, getByText }] = render()
-    getByText('Module')
-    getByText('Location')
-    getByText('Status')
-    getByText('Setup Instructions')
-    getByRole('button', { name: 'Map View' })
+    mockGetAttachedProtocolModuleMatches.mockReturnValue([
+      {
+        ...mockProtocolModuleInfo[0],
+        attachedModuleMatch: calibratedMockApiHeaterShaker,
+      },
+    ])
+    render()
+    screen.getByText('Module')
+    screen.getByText('Location')
+    screen.getByText('Status')
+    screen.getByText('Setup Instructions')
+    screen.getByRole('button', { name: 'Map View' })
   })
 
   it('should launch deck map on button click', () => {
-    const [{ getByRole }] = render()
+    render()
 
-    getByRole('button', { name: 'Map View' }).click()
+    fireEvent.click(screen.getByRole('button', { name: 'Map View' }))
   })
 
   it('should launch setup instructions modal on button click', () => {
-    const [{ getByText }] = render()
+    render()
 
-    getByText('Setup Instructions').click()
-    getByText('mock SetupInstructionsModal')
+    fireEvent.click(screen.getByText('Setup Instructions'))
+    screen.getByText('mock SetupInstructionsModal')
   })
 
   it('should render module information when a protocol has module - connected', () => {
+    // TODO: connected not location conflict
     when(mockGetUnmatchedModulesForProtocol)
       .calledWith(calibratedMockApiHeaterShaker as any, mockProtocolModuleInfo)
       .mockReturnValue({
@@ -226,12 +226,13 @@ describe('ProtocolSetupModulesAndDeck', () => {
         attachedModuleMatch: calibratedMockApiHeaterShaker,
       },
     ])
-    const [{ getByText }] = render()
-    getByText('Heater-Shaker Module GEN1')
-    getByText('Connected')
+    render()
+    screen.getByText('Heater-Shaker Module GEN1')
+    screen.getByText('Connected')
   })
 
   it('should render module information when a protocol has module - disconnected', () => {
+    // TODO: disconnected not location conflict
     when(mockGetUnmatchedModulesForProtocol)
       .calledWith(mockApiHeaterShaker as any, mockProtocolModuleInfo)
       .mockReturnValue({
@@ -243,12 +244,13 @@ describe('ProtocolSetupModulesAndDeck', () => {
         ...mockProtocolModuleInfo[0],
       },
     ])
-    const [{ getByText }] = render()
-    getByText('Heater-Shaker Module GEN1')
-    getByText('Disconnected')
+    render()
+    screen.getByText('Heater-Shaker Module GEN1')
+    screen.getByText('Disconnected')
   })
 
   it('should render module information with calibrate button when a protocol has module', async () => {
+    // TODO: not location conflict
     when(mockGetUnmatchedModulesForProtocol)
       .calledWith(mockApiHeaterShaker as any, mockProtocolModuleInfo)
       .mockReturnValue({
@@ -261,9 +263,9 @@ describe('ProtocolSetupModulesAndDeck', () => {
         attachedModuleMatch: mockApiHeaterShaker,
       },
     ])
-    const [{ getByText }] = render()
-    getByText('Heater-Shaker Module GEN1')
-    getByText('Calibrate').click()
+    render()
+    screen.getByText('Heater-Shaker Module GEN1')
+    fireEvent.click(screen.getByText('Calibrate'))
     await waitFor(() => {
       expect(mockChainLiveCommands).toHaveBeenCalledWith(
         [
@@ -295,7 +297,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
         false
       )
     })
-    getByText('mock ModuleWizardFlows')
+    screen.getByText('mock ModuleWizardFlows')
   })
 
   it('should render module information with text button when a protocol has module - attach pipette first', () => {
@@ -318,9 +320,9 @@ describe('ProtocolSetupModulesAndDeck', () => {
         attachedModuleMatch: mockApiHeaterShaker,
       },
     ])
-    const [{ getByText }] = render()
-    getByText('Heater-Shaker Module GEN1')
-    getByText('Calibration required Attach pipette first')
+    render()
+    screen.getByText('Heater-Shaker Module GEN1')
+    screen.getByText('Calibration required Attach pipette first')
   })
 
   it('should render module information with text button when a protocol has module - calibrate pipette first', () => {
@@ -343,24 +345,31 @@ describe('ProtocolSetupModulesAndDeck', () => {
         attachedModuleMatch: mockApiHeaterShaker,
       },
     ])
-    const [{ getByText }] = render()
-    getByText('Heater-Shaker Module GEN1')
-    getByText('Calibration required Calibrate pipette first')
+    render()
+    screen.getByText('Heater-Shaker Module GEN1')
+    screen.getByText('Calibration required Calibrate pipette first')
   })
 
-  it('should render mock Fixture table and module location conflict when is enableDeckConfiguration on', () => {
+  it('should render mock Fixture table and module location conflict', () => {
+    mockUseDeckConfigurationQuery.mockReturnValue({
+      data: [mockFixture],
+    } as UseQueryResult<DeckConfiguration>)
     mockGetAttachedProtocolModuleMatches.mockReturnValue([
       {
         ...mockProtocolModuleInfo[0],
         attachedModuleMatch: calibratedMockApiHeaterShaker,
+        slotName: 'D3',
       },
     ])
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(true)
-    const [{ getByText }] = render()
-    getByText('mock FixtureTable')
-    getByText('Location conflict').click()
-    getByText('mock location conflict modal')
+    render()
+    screen.getByText('mock FixtureTable')
+    fireEvent.click(screen.getByText('Resolve'))
+    screen.getByText('mock location conflict modal')
+  })
+
+  it('should render ModulesAndDeckMapViewModal when tapping map view button', () => {
+    render()
+    fireEvent.click(screen.getByText('Map View'))
+    screen.getByText('mock ModulesAndDeckMapViewModal')
   })
 })

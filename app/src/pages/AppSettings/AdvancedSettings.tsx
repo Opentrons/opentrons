@@ -1,14 +1,12 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
-import { css } from 'styled-components'
 
 import {
   Flex,
   Box,
   Link,
   Icon,
-  RadioGroup,
   SPACING_AUTO,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
@@ -25,7 +23,6 @@ import {
 
 import * as Config from '../../redux/config'
 import * as ProtocolAnalysis from '../../redux/protocol-analysis'
-import * as Calibration from '../../redux/calibration'
 import * as CustomLabware from '../../redux/custom-labware'
 import {
   clearDiscoveryCache,
@@ -52,26 +49,18 @@ import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { useToaster } from '../../organisms/ToasterOven'
+import {
+  EnableDevTools,
+  OT2AdvancedSettings,
+} from '../../organisms/AdvancedSettings'
 
 import type { Dispatch, State } from '../../redux/types'
 
-const ALWAYS_BLOCK: 'always-block' = 'always-block'
-const ALWAYS_TRASH: 'always-trash' = 'always-trash'
-const ALWAYS_PROMPT: 'always-prompt' = 'always-prompt'
 const REALTEK_URL = 'https://www.realtek.com/en/'
-
-type BlockSelection =
-  | typeof ALWAYS_BLOCK
-  | typeof ALWAYS_TRASH
-  | typeof ALWAYS_PROMPT
 
 export function AdvancedSettings(): JSX.Element {
   const { t } = useTranslation(['app_settings', 'shared'])
-  const useTrashSurfaceForTipCal = useSelector((state: State) =>
-    Config.getUseTrashSurfaceForTipCal(state)
-  )
   const trackEvent = useTrackEvent()
-  const devToolsOn = useSelector(Config.getDevtoolsEnabled)
   const channel = useSelector(Config.getUpdateChannel)
   const channelOptions: SelectOption[] = useSelector(
     Config.getUpdateChannelOptions
@@ -114,20 +103,6 @@ export function AdvancedSettings(): JSX.Element {
     cancel: cancelExit,
   } = useConditionalConfirm(handleDeleteUnavailRobots, true)
 
-  const handleUseTrashSelection = (selection: BlockSelection): void => {
-    switch (selection) {
-      case ALWAYS_PROMPT:
-        dispatch(Calibration.resetUseTrashSurfaceForTipCal())
-        break
-      case ALWAYS_BLOCK:
-        dispatch(Calibration.setUseTrashSurfaceForTipCal(false))
-        break
-      case ALWAYS_TRASH:
-        dispatch(Calibration.setUseTrashSurfaceForTipCal(true))
-        break
-    }
-  }
-
   const device = useSelector(getU2EAdapterDevice)
   const driverOutdated = useSelector((state: State) => {
     const status = getU2EWindowsDriverStatus(state)
@@ -159,8 +134,6 @@ export function AdvancedSettings(): JSX.Element {
       properties: {},
     })
   }
-
-  const toggleDevtools = (): unknown => dispatch(Config.toggleDevtools())
   const handleChannel = (_: string, value: string): void => {
     dispatch(Config.updateConfigValue('update.channel', value))
   }
@@ -211,7 +184,7 @@ export function AdvancedSettings(): JSX.Element {
                     <Btn
                       onClick={cancelExit}
                       textTransform={TYPOGRAPHY.textTransformCapitalize}
-                      color={COLORS.blueEnabled}
+                      color={COLORS.blue50}
                       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                       marginRight={SPACING.spacing32}
                     >
@@ -275,7 +248,7 @@ export function AdvancedSettings(): JSX.Element {
             <StyledText
               as="h6"
               textTransform={TYPOGRAPHY.textTransformUppercase}
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.grey50}
               paddingBottom={SPACING.spacing4}
             >
               {t('additional_folder_location')}
@@ -284,7 +257,7 @@ export function AdvancedSettings(): JSX.Element {
               <Link
                 role="button"
                 css={TYPOGRAPHY.pRegular}
-                color={COLORS.darkBlackEnabled}
+                color={COLORS.black90}
                 onClick={() =>
                   dispatch(CustomLabware.openCustomLabwareDirectory())
                 }
@@ -435,7 +408,7 @@ export function AdvancedSettings(): JSX.Element {
             <StyledText
               as="h6"
               textTransform={TYPOGRAPHY.textTransformUppercase}
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.grey50}
               paddingBottom={SPACING.spacing4}
             >
               {t('override_path')}
@@ -444,7 +417,7 @@ export function AdvancedSettings(): JSX.Element {
               <Link
                 role="button"
                 css={TYPOGRAPHY.pRegular}
-                color={COLORS.darkBlackEnabled}
+                color={COLORS.black90}
                 onClick={() =>
                   dispatch(ProtocolAnalysis.openPythonInterpreterDirectory())
                 }
@@ -482,69 +455,9 @@ export function AdvancedSettings(): JSX.Element {
           )}
         </Flex>
         <Divider marginY={SPACING.spacing24} />
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box width="70%">
-            <StyledText
-              css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing8}
-              id="AdvancedSettings_devTools"
-            >
-              {t('enable_dev_tools')}
-            </StyledText>
-            <StyledText as="p">{t('enable_dev_tools_description')}</StyledText>
-          </Box>
-          <ToggleButton
-            label="enable_dev_tools"
-            toggledOn={devToolsOn}
-            onClick={toggleDevtools}
-            id="AdvancedSettings_devTooltoggle"
-          />
-        </Flex>
+        <EnableDevTools />
         <Divider marginY={SPACING.spacing24} />
-        <StyledText
-          css={TYPOGRAPHY.h3SemiBold}
-          paddingBottom={SPACING.spacing24}
-          id="OT-2_Advanced_Settings"
-        >
-          {t('ot2_advanced_settings')}
-        </StyledText>
-        <Box>
-          <StyledText
-            css={TYPOGRAPHY.h3SemiBold}
-            paddingBottom={SPACING.spacing8}
-            id="AdvancedSettings_tipLengthCalibration"
-          >
-            {t('tip_length_cal_method')}
-          </StyledText>
-          <RadioGroup
-            useBlueChecked
-            css={css`
-              ${TYPOGRAPHY.pRegular}
-              line-height: ${TYPOGRAPHY.lineHeight20};
-            `}
-            value={
-              useTrashSurfaceForTipCal === true
-                ? ALWAYS_TRASH
-                : useTrashSurfaceForTipCal === false
-                ? ALWAYS_BLOCK
-                : ALWAYS_PROMPT
-            }
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              // you know this is a limited-selection field whose values are only
-              // the elements of BlockSelection; i know this is a limited-selection
-              // field whose values are only the elements of BlockSelection; but sadly,
-              // neither of us can get Flow to know it
-              handleUseTrashSelection(
-                event.currentTarget.value as BlockSelection
-              )
-            }}
-            options={[
-              { name: t('cal_block'), value: ALWAYS_BLOCK },
-              { name: t('trash_bin'), value: ALWAYS_TRASH },
-              { name: t('prompt'), value: ALWAYS_PROMPT },
-            ]}
-          />
-        </Box>
+        <OT2AdvancedSettings />
         <Divider marginY={SPACING.spacing24} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box>
@@ -561,14 +474,14 @@ export function AdvancedSettings(): JSX.Element {
             {driverOutdated && (
               <Banner type="warning" marginTop={SPACING.spacing16}>
                 <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-                  <StyledText as="p" color={COLORS.darkBlackEnabled}>
+                  <StyledText as="p" color={COLORS.black90}>
                     {t('usb_to_ethernet_adapter_toast_message')}
                   </StyledText>
                   <Link
                     external
                     href={REALTEK_URL}
                     css={TYPOGRAPHY.pRegular}
-                    color={COLORS.darkBlackEnabled}
+                    color={COLORS.black90}
                     textDecoration={TYPOGRAPHY.textDecorationUnderline}
                     id="AdvancedSettings_realtekLink"
                   >

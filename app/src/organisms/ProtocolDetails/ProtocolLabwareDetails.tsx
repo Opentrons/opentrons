@@ -21,7 +21,7 @@ import { Portal } from '../../App/portal'
 import { LabwareDetails } from '../LabwareDetails'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 
-import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data'
 import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
 
 interface ProtocolLabwareDetailsProps {
@@ -118,7 +118,7 @@ export const ProtocolLabwareDetailItem = (
         >
           {namespace === 'opentrons' ? (
             <Icon
-              color={COLORS.blueEnabled}
+              color={COLORS.blue50}
               name="check-decagram"
               height="0.75rem"
               minHeight="0.75rem"

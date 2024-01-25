@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { useEstopQuery } from '@opentrons/react-api-client'
+import { fireEvent } from '@testing-library/react'
+
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
@@ -76,7 +78,7 @@ describe('EmergencyStop', () => {
     } as any
     mockUseEstopQuery.mockReturnValue({ data: mockConnectedEstop } as any)
     const [{ getByRole }] = render()
-    getByRole('button').click()
+    fireEvent.click(getByRole('button'))
     expect(mockPush).toHaveBeenCalledWith('/robot-settings/rename-robot')
   })
 })

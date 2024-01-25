@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { act, waitFor } from '@testing-library/react'
+import { act, screen, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import {
   useInstrumentsQuery,
@@ -41,6 +41,8 @@ describe('FirmwareUpdateModal', () => {
       proceed: jest.fn(),
       description: 'A firmware update is required, instrument is updating',
       subsystem: 'pipette_left',
+      proceedDescription: 'Firmware is up to date.',
+      isOnDevice: true,
     }
     mockUseInstrumentQuery.mockReturnValue({
       data: {
@@ -72,7 +74,7 @@ describe('FirmwareUpdateModal', () => {
       updateSubsystem,
     } as any)
   })
-  it('calls proceed if no update is needed', () => {
+  it('initially renders a spinner and text', () => {
     mockUseInstrumentQuery.mockReturnValue({
       data: {
         data: [
@@ -82,22 +84,92 @@ describe('FirmwareUpdateModal', () => {
           } as PipetteData,
         ],
       },
+      refetch,
     } as any)
-    mockUseSubsystemUpdateQuery.mockReturnValue({} as any)
-    const { getByText } = render(props)
-    getByText('A firmware update is required, instrument is updating')
-    expect(props.proceed).toHaveBeenCalled()
+    mockUseSubsystemUpdateQuery.mockReturnValue({
+      data: {
+        data: {
+          id: 'update id',
+          updateStatus: null,
+        } as any,
+      } as SubsystemUpdateProgressData,
+    } as any)
+    const { getByText, getByLabelText } = render(props)
+    getByLabelText('spinner')
+    getByText('Checking for updates...')
+  })
+  it('calls proceed if no update is needed', async () => {
+    mockUseInstrumentQuery.mockReturnValue({
+      data: {
+        data: [
+          {
+            subsystem: 'pipette_left',
+            ok: true,
+          } as PipetteData,
+        ],
+      },
+      refetch,
+    } as any)
+    mockUseSubsystemUpdateQuery.mockReturnValue({
+      data: {
+        data: {
+          id: 'update id',
+          updateStatus: null,
+        } as any,
+      } as SubsystemUpdateProgressData,
+    } as any)
+    jest.useFakeTimers()
+    render(props)
+    act(() => {
+      jest.advanceTimersByTime(3000)
+    })
+    screen.getByText('Firmware is up to date.')
+    act(() => {
+      jest.advanceTimersByTime(3000)
+    })
+    await waitFor(() => expect(props.proceed).toHaveBeenCalled())
+  })
+  it('does not render text or a progress bar until instrument update status is known', () => {
+    mockUseSubsystemUpdateQuery.mockReturnValue({
+      data: {
+        data: {
+          id: 'update id',
+          updateStatus: undefined,
+        } as any,
+      } as SubsystemUpdateProgressData,
+    } as any)
+    mockUseInstrumentQuery.mockReturnValue({
+      data: undefined,
+      refetch,
+    } as any)
+    render(props)
+    expect(
+      screen.queryByText(
+        'A firmware update is required, instrument is updating'
+      )
+    ).not.toBeInTheDocument()
   })
   it('calls update subsystem if update is needed', () => {
-    mockUseSubsystemUpdateQuery.mockReturnValue({} as any)
-    const { getByText } = render(props)
-    getByText('A firmware update is required, instrument is updating')
+    mockUseSubsystemUpdateQuery.mockReturnValue({
+      data: {
+        data: {
+          id: 'update id',
+          updateStatus: 'in progress',
+        } as any,
+      } as SubsystemUpdateProgressData,
+    } as any)
+    jest.useFakeTimers()
+    render(props)
+    act(() => {
+      jest.advanceTimersByTime(3000)
+    })
+    screen.getByText('A firmware update is required, instrument is updating')
     expect(updateSubsystem).toHaveBeenCalled()
   })
   it('calls refetch instruments and then proceed once update is complete', async () => {
     jest.useFakeTimers()
-    const { getByText } = render(props)
-    getByText('A firmware update is required, instrument is updating')
+    render(props)
+    screen.getByText('A firmware update is required, instrument is updating')
     await waitFor(() => expect(refetch).toHaveBeenCalled())
     act(() => {
       jest.advanceTimersByTime(10000)

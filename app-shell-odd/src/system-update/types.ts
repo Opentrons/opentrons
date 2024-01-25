@@ -13,7 +13,7 @@ export interface ReleaseManifest {
 
 export interface ReleaseSetFilepaths {
   system: string
-  releaseNotes: string
+  releaseNotes: string | null
 }
 
 // shape of VERSION.json in update file

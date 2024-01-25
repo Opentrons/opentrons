@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
-import map from 'lodash/map'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -17,10 +16,7 @@ import {
   JUSTIFY_SPACE_EVENLY,
   LabwareRender,
   LocationIcon,
-  Module,
   MODULE_ICON_NAME_BY_TYPE,
-  RobotWorkSpace,
-  SlotLabels,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -30,10 +26,8 @@ import {
   getLabwareDefURI,
   getLabwareDisplayName,
   HEATERSHAKER_MODULE_TYPE,
-  inferModuleOrientationFromXCoordinate,
   LoadLabwareRunTimeCommand,
   RunTimeCommand,
-  THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { parseInitialLoadedLabwareByAdapter } from '@opentrons/api-client'
 import {
@@ -51,7 +45,6 @@ import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostR
 import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
 import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { getAttachedProtocolModuleMatches } from '../ProtocolSetupModulesAndDeck/utils'
-import { getLabwareRenderInfo } from '../Devices/ProtocolRun/utils/getLabwareRenderInfo'
 import {
   getNestedLabwareInfo,
   NestedLabwareInfo,
@@ -66,17 +59,9 @@ import type {
 } from '@opentrons/shared-data'
 import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
 import type { LabwareSetupItem } from '../../pages/Protocols/utils'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
-import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import type { SetupScreens } from '../../pages/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'
-
-const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
-  'DECK_BASE',
-  'BARCODE_COVERS',
-  'SLOT_SCREWS',
-  'SLOT_10_EXPANSION',
-  'CALIBRATION_CUTOUTS',
-]
+import { LabwareMapViewModal } from './LabwareMapViewModal'
 
 const MODULE_REFETCH_INTERVAL = 5000
 
@@ -114,10 +99,6 @@ export function ProtocolSetupLabware({
   const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(
     mostRecentAnalysis?.commands ?? []
   )
-  const labwareRenderInfo =
-    mostRecentAnalysis != null
-      ? getLabwareRenderInfo(mostRecentAnalysis, deckDef)
-      : {}
   const moduleQuery = useModulesQuery({
     refetchInterval: MODULE_REFETCH_INTERVAL,
   })
@@ -161,6 +142,14 @@ export function ProtocolSetupLabware({
     'slotName' in selectedLabware?.location
   ) {
     location = <LocationIcon slotName={selectedLabware?.location.slotName} />
+  } else if (
+    selectedLabware != null &&
+    typeof selectedLabware.location === 'object' &&
+    'addressableAreaName' in selectedLabware?.location
+  ) {
+    location = (
+      <LocationIcon slotName={selectedLabware?.location.addressableAreaName} />
+    )
   } else if (
     selectedLabware != null &&
     typeof selectedLabware.location === 'object' &&
@@ -219,120 +208,19 @@ export function ProtocolSetupLabware({
       }
     }
   }
-
-  const modalHeader: ModalHeaderBaseProps = {
-    title: t('map_view'),
-    hasExitIcon: true,
-  }
-
   const selectedLabwareLocation = selectedLabware?.location
   return (
     <>
       <Portal level="top">
         {showDeckMapModal ? (
-          <Modal
-            header={modalHeader}
-            modalSize="large"
-            onOutsideClick={() => setShowDeckMapModal(false)}
-          >
-            <RobotWorkSpace
-              deckDef={deckDef}
-              deckLayerBlocklist={OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
-              deckFill={COLORS.light1}
-              trashSlotName="A3"
-              id="LabwareSetup_deckMap"
-              trashColor={COLORS.darkGreyEnabled}
-            >
-              {() => (
-                <>
-                  {map(
-                    attachedProtocolModuleMatches,
-                    ({
-                      x,
-                      y,
-                      moduleDef,
-                      nestedLabwareDef,
-                      nestedLabwareId,
-                      moduleId,
-                    }) => {
-                      const labwareInAdapterInMod =
-                        nestedLabwareId != null
-                          ? initialLoadedLabwareByAdapter[nestedLabwareId]
-                          : null
-                      //  only rendering the labware on top most layer so
-                      //  either the adapter or the labware are rendered but not both
-                      const topLabwareDefinition =
-                        labwareInAdapterInMod?.result?.definition ??
-                        nestedLabwareDef
-                      const topLabwareId =
-                        labwareInAdapterInMod?.result?.labwareId ??
-                        nestedLabwareId
-
-                      return (
-                        <Module
-                          key={`LabwareSetup_Module_${moduleId}_${x}${y}`}
-                          x={x}
-                          y={y}
-                          orientation={inferModuleOrientationFromXCoordinate(x)}
-                          def={moduleDef}
-                          innerProps={
-                            moduleDef.model === THERMOCYCLER_MODULE_V1
-                              ? { lidMotorState: 'open' }
-                              : {}
-                          }
-                        >
-                          {topLabwareDefinition != null &&
-                          topLabwareId != null ? (
-                            <React.Fragment
-                              key={`LabwareSetup_Labware_${topLabwareId}_${x}${y}`}
-                            >
-                              <LabwareRender
-                                definition={topLabwareDefinition}
-                                onLabwareClick={() =>
-                                  handleLabwareClick(
-                                    topLabwareDefinition,
-                                    topLabwareId
-                                  )
-                                }
-                              />
-                            </React.Fragment>
-                          ) : null}
-                        </Module>
-                      )
-                    }
-                  )}
-                  {map(labwareRenderInfo, ({ x, y, labwareDef }, labwareId) => {
-                    const labwareInAdapter =
-                      initialLoadedLabwareByAdapter[labwareId]
-                    //  only rendering the labware on top most layer so
-                    //  either the adapter or the labware are rendered but not both
-                    const topLabwareDefinition =
-                      labwareInAdapter?.result?.definition ?? labwareDef
-                    const topLabwareId =
-                      labwareInAdapter?.result?.labwareId ?? labwareId
-                    return (
-                      <React.Fragment
-                        key={`LabwareSetup_Labware_${topLabwareId}_${x}${y}`}
-                      >
-                        <g transform={`translate(${x},${y})`}>
-                          <LabwareRender
-                            definition={topLabwareDefinition}
-                            onLabwareClick={() =>
-                              handleLabwareClick(
-                                topLabwareDefinition,
-                                topLabwareId
-                              )
-                            }
-                          />
-                        </g>
-                      </React.Fragment>
-                    )
-                  })}
-                  <SlotLabels robotType={FLEX_ROBOT_TYPE} />
-                </>
-              )}
-            </RobotWorkSpace>
-          </Modal>
+          <LabwareMapViewModal
+            mostRecentAnalysis={mostRecentAnalysis}
+            deckDef={deckDef}
+            attachedProtocolModuleMatches={attachedProtocolModuleMatches}
+            handleLabwareClick={handleLabwareClick}
+            onCloseClick={() => setShowDeckMapModal(false)}
+            initialLoadedLabwareByAdapter={initialLoadedLabwareByAdapter}
+          />
         ) : null}
         {showLabwareDetailsModal && selectedLabware != null ? (
           <Modal
@@ -359,7 +247,7 @@ export function ProtocolSetupLabware({
                 >
                   {getLabwareDisplayName(selectedLabware)}
                 </StyledText>
-                <StyledText as="p" color={COLORS.darkBlack70}>
+                <StyledText as="p" color={COLORS.grey60}>
                   {selectedLabware.nickName}
                   {selectedLabwareLocation != null &&
                   selectedLabwareLocation !== 'offDeck' &&
@@ -387,7 +275,7 @@ export function ProtocolSetupLabware({
       >
         <Flex
           gridGap={SPACING.spacing8}
-          color={COLORS.darkBlack70}
+          color={COLORS.grey60}
           fontSize={TYPOGRAPHY.fontSize22}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           lineHeight={TYPOGRAPHY.lineHeight28}
@@ -428,7 +316,7 @@ export function ProtocolSetupLabware({
 
 const labwareLatchStyles = css`
   &:active {
-    background-color: ${COLORS.mediumBluePressed};
+    background-color: ${COLORS.blue40};
   }
 `
 
@@ -521,14 +409,10 @@ function LabwareLatch({
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
-      backgroundColor={COLORS.mediumBlueEnabled}
+      backgroundColor={COLORS.blue35}
       borderRadius={BORDERS.borderRadiusSize3}
       css={labwareLatchStyles}
-      color={
-        isLatchLoading
-          ? `${COLORS.darkBlack100}${COLORS.opacity60HexCode}`
-          : COLORS.darkBlackEnabled
-      }
+      color={isLatchLoading ? COLORS.grey60 : COLORS.black90}
       height="6.5rem"
       alignSelf={ALIGN_CENTER}
       flexDirection={DIRECTION_COLUMN}
@@ -558,7 +442,7 @@ function LabwareLatch({
               size="2.5rem"
               color={
                 commandType === 'heaterShaker/closeLabwareLatch'
-                  ? COLORS.blueEnabled
+                  ? COLORS.blue50
                   : ''
               }
             />
@@ -610,6 +494,9 @@ function RowLabware({
   } else if ('slotName' in initialLocation) {
     slotName = initialLocation.slotName
     location = <LocationIcon slotName={initialLocation.slotName} />
+  } else if ('addressableAreaName' in initialLocation) {
+    slotName = initialLocation.addressableAreaName
+    location = <LocationIcon slotName={initialLocation.addressableAreaName} />
   } else if (matchedModuleType != null && matchedModule?.slotName != null) {
     slotName = matchedModule.slotName
     location = (
@@ -655,7 +542,7 @@ function RowLabware({
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={COLORS.light1}
+      backgroundColor={COLORS.grey35}
       borderRadius={BORDERS.borderRadiusSize3}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       gridGap={SPACING.spacing32}
@@ -678,13 +565,13 @@ function RowLabware({
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {getLabwareDisplayName(definition)}
             </StyledText>
-            <StyledText color={COLORS.darkBlack70} as="p">
+            <StyledText color={COLORS.grey60} as="p">
               {nickName}
             </StyledText>
           </Flex>
           {nestedLabwareInfo != null ? (
             <Box
-              borderBottom={`1px solid ${COLORS.darkBlack70}`}
+              borderBottom={`1px solid ${COLORS.grey60}`}
               marginY={SPACING.spacing16}
               width="33rem"
             />
@@ -695,7 +582,7 @@ function RowLabware({
               <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {nestedLabwareInfo.nestedLabwareDisplayName}
               </StyledText>
-              <StyledText as="p" color={COLORS.darkBlack70}>
+              <StyledText as="p" color={COLORS.grey60}>
                 {nestedLabwareInfo.nestedLabwareNickName}
               </StyledText>
             </Flex>

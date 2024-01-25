@@ -20,7 +20,7 @@ import { SubmitPrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
 import type { HeaterShakerModule } from '../../redux/modules/types'
-import type { HeaterShakerSetTargetTemperatureCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
+import type { HeaterShakerSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
 
 interface HeaterShakerSlideoutProps {
   module: HeaterShakerModule
@@ -110,7 +110,7 @@ export const HeaterShakerSlideout = (
         <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
-          color={COLORS.darkGrey}
+          color={COLORS.grey50}
           marginBottom={SPACING.spacing8}
         >
           {t('set_block_temp')}

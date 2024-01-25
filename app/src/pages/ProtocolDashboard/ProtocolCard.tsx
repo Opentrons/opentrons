@@ -15,6 +15,7 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
+  SIZE_2,
   SPACING,
   TYPOGRAPHY,
   useLongPress,
@@ -34,6 +35,8 @@ import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+
+const REFETCH_INTERVAL = 5000
 
 export function ProtocolCard(props: {
   protocol: ProtocolResource
@@ -61,12 +64,14 @@ export function ProtocolCard(props: {
   const queryClient = useQueryClient()
   const host = useHost()
 
-  const {
-    data: mostRecentAnalysis,
-  } = useProtocolAnalysisAsDocumentQuery(
+  const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(
     protocol.id,
     last(protocol.analysisSummaries)?.id ?? null,
-    { enabled: protocol != null }
+    {
+      enabled: protocol != null,
+      refetchInterval: analysisData =>
+        analysisData == null ? REFETCH_INTERVAL : false,
+    }
   )
 
   const isFailedAnalysis =
@@ -75,6 +80,8 @@ export function ProtocolCard(props: {
       (mostRecentAnalysis.result === 'error' ||
         mostRecentAnalysis.result === 'not-ok')) ??
     false
+
+  const isPendingAnalysis = mostRecentAnalysis == null
 
   const handleProtocolClick = (
     longpress: UseLongPressResult,
@@ -139,15 +146,15 @@ export function ProtocolCard(props: {
       background-color: ${longpress.isLongPressed
         ? ''
         : isFailedAnalysis
-        ? COLORS.red3Pressed
-        : COLORS.darkBlack40};
+        ? COLORS.red40
+        : COLORS.grey50};
     }
   `
 
   return (
     <Flex
       alignItems={isFailedAnalysis ? ALIGN_END : ALIGN_CENTER}
-      backgroundColor={isFailedAnalysis ? COLORS.red3 : COLORS.light1}
+      backgroundColor={isFailedAnalysis ? COLORS.red35 : COLORS.grey35}
       borderRadius={BORDERS.borderRadiusSize4}
       marginBottom={SPACING.spacing8}
       gridGap={SPACING.spacing48}
@@ -156,6 +163,16 @@ export function ProtocolCard(props: {
       ref={longpress.ref}
       css={PUSHED_STATE_STYLE}
     >
+      {isPendingAnalysis ? (
+        <Icon
+          name="ot-spinner"
+          aria-label="Protocol is loading"
+          spin
+          size={SIZE_2}
+          marginY={'-1.5rem'}
+          opacity={0.7}
+        />
+      ) : null}
       <Flex
         width="28.9375rem"
         overflowWrap="anywhere"
@@ -164,7 +181,7 @@ export function ProtocolCard(props: {
       >
         {isFailedAnalysis ? (
           <Flex
-            color={COLORS.red1}
+            color={COLORS.red60}
             flexDirection={DIRECTION_ROW}
             gridGap={SPACING.spacing8}
           >
@@ -178,12 +195,16 @@ export function ProtocolCard(props: {
             </StyledText>
           </Flex>
         ) : null}
-        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <StyledText
+          as="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          opacity={isPendingAnalysis ? 0.7 : 1}
+        >
           {protocolName}
         </StyledText>
       </Flex>
       <Flex width="9.25rem">
-        <StyledText as="p" color={COLORS.darkBlack70}>
+        <StyledText as="p" color={COLORS.grey60}>
           {lastRun != null
             ? formatDistance(new Date(lastRun), new Date(), {
                 addSuffix: true,
@@ -192,7 +213,7 @@ export function ProtocolCard(props: {
         </StyledText>
       </Flex>
       <Flex width="12.5rem" whiteSpace="nowrap">
-        <StyledText as="p" color={COLORS.darkBlack70}>
+        <StyledText as="p" color={COLORS.grey60}>
           {formatTimeWithUtcLabel(protocol.createdAt)}
         </StyledText>
         {longpress.isLongPressed && !isFailedAnalysis && (

@@ -26,16 +26,11 @@ import {
   getModuleDisplayName,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
-  LabwareDefinition2,
-  LoadModuleRunTimeCommand,
   MAGNETIC_MODULE_TYPE,
-  ModuleType,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
-  RunTimeCommand,
-  LoadLabwareRunTimeCommand,
 } from '@opentrons/shared-data'
 
 import { ToggleButton } from '../../../../atoms/buttons'
@@ -45,7 +40,12 @@ import { SecureLabwareModal } from './SecureLabwareModal'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
+  RunTimeCommand,
+  ModuleType,
+  LabwareDefinition2,
+  LoadModuleRunTimeCommand,
+  LoadLabwareRunTimeCommand,
+} from '@opentrons/shared-data'
 import type { ModuleRenderInfoForProtocol } from '../../hooks'
 import type { LabwareSetupItem } from '../../../../pages/Protocols/utils'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
@@ -56,7 +56,7 @@ const LabwareRow = styled.div`
   grid-template-columns: 1fr 6fr 5.9fr;
   border-style: ${BORDERS.styleSolid};
   border-width: 1px;
-  border-color: ${COLORS.medGreyEnabled};
+  border-color: ${COLORS.grey30};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing16};
 `
@@ -93,10 +93,18 @@ export function LabwareListItem(
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const [isLatchLoading, setIsLatchLoading] = React.useState<boolean>(false)
   const [isLatchClosed, setIsLatchClosed] = React.useState<boolean>(false)
-  let slotInfo: string | null =
-    initialLocation !== 'offDeck' && 'slotName' in initialLocation
-      ? initialLocation.slotName
-      : null
+
+  let slotInfo: string | null = null
+
+  if (initialLocation !== 'offDeck' && 'slotName' in initialLocation) {
+    slotInfo = initialLocation.slotName
+  } else if (
+    initialLocation !== 'offDeck' &&
+    'addressableAreaName' in initialLocation
+  ) {
+    slotInfo = initialLocation.addressableAreaName
+  }
+
   let moduleDisplayName: string | null = null
   let extraAttentionText: JSX.Element | null = null
   let isCorrectHeaterShakerAttached: boolean = false
@@ -153,10 +161,10 @@ export function LabwareListItem(
           extraAttentionText = (
             <Btn
               css={css`
-                color: ${COLORS.darkGreyEnabled};
+                color: ${COLORS.grey50};
 
                 &:hover {
-                  color: ${COLORS.darkBlackEnabled};
+                  color: ${COLORS.black90};
                 }
               `}
               onClick={() => setSecureLabwareModalType(moduleType)}
@@ -182,7 +190,7 @@ export function LabwareListItem(
       case HEATERSHAKER_MODULE_TYPE:
         isHeaterShakerInProtocol = true
         extraAttentionText = (
-          <StyledText as="p" color={COLORS.darkGreyEnabled} maxWidth="15.25rem">
+          <StyledText as="p" color={COLORS.grey50} maxWidth="15.25rem">
             {t('heater_shaker_labware_list_view')}
           </StyledText>
         )
@@ -263,7 +271,7 @@ export function LabwareListItem(
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {labwareDisplayName}
             </StyledText>
-            <StyledText as="p" color={COLORS.darkGreyEnabled}>
+            <StyledText as="p" color={COLORS.grey50}>
               {nickName}
             </StyledText>
           </Flex>
@@ -285,7 +293,7 @@ export function LabwareListItem(
               <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {nestedLabwareInfo.nestedLabwareDisplayName}
               </StyledText>
-              <StyledText as="p" color={COLORS.darkGreyEnabled}>
+              <StyledText as="p" color={COLORS.grey50}>
                 {nestedLabwareInfo.nestedLabwareNickName}
               </StyledText>
             </Flex>

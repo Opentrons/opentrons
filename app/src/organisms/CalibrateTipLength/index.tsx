@@ -1,8 +1,10 @@
 // Tip Length Calibration Orchestration Component
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useQueryClient } from 'react-query'
 import { css } from 'styled-components'
 
+import { useHost } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { useConditionalConfirm } from '@opentrons/components'
 
@@ -69,8 +71,13 @@ export function CalibrateTipLength(
     dispatchRequests,
     isJogging,
     offsetInvalidationHandler,
+    allowChangeTipRack = false,
   } = props
-  const { currentStep, instrument, labware } = session?.details ?? {}
+  const { currentStep, instrument, labware, supportedCommands } =
+    session?.details ?? {}
+
+  const queryClient = useQueryClient()
+  const host = useHost()
 
   const isMulti = React.useMemo(() => {
     const spec =
@@ -96,6 +103,11 @@ export function CalibrateTipLength(
   }
 
   function cleanUpAndExit(): void {
+    queryClient
+      .invalidateQueries([host, 'calibration'])
+      .catch((e: Error) =>
+        console.error(`error invalidating calibration queries: ${e.message}`)
+      )
     if (session?.id != null) {
       dispatchRequests(
         Sessions.createSessionCommand(robotName, session.id, {
@@ -161,7 +173,9 @@ export function CalibrateTipLength(
             calBlock={calBlock}
             currentStep={currentStep}
             sessionType={session.sessionType}
+            supportedCommands={supportedCommands}
             calInvalidationHandler={offsetInvalidationHandler}
+            allowChangeTipRack={allowChangeTipRack}
           />
         )}
       </LegacyModalShell>

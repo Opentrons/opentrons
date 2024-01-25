@@ -25,7 +25,6 @@ import {
   RESTART_PATH,
   RESTART_STATUS_CHANGED,
   RESTART_SUCCEEDED_STATUS,
-  RESTART_TIMED_OUT_STATUS,
   restartRobotSuccess,
 } from '../robot-admin'
 
@@ -63,6 +62,7 @@ import {
   ROBOTUPDATE_FILE_INFO,
   ROBOTUPDATE_CREATE_SESSION,
   ROBOTUPDATE_CREATE_SESSION_SUCCESS,
+  DOWNLOAD_FILE,
 } from './constants'
 
 import type { Observable } from 'rxjs'
@@ -93,7 +93,6 @@ const UNABLE_TO_CANCEL_UPDATE_SESSION =
 const UNABLE_TO_COMMIT_UPDATE = 'Unable to commit update'
 const UNABLE_TO_RESTART_ROBOT = 'Unable to restart robot'
 const ROBOT_RECONNECTED_WITH_VERSION = 'Robot reconnected with version'
-const ROBOT_DID_NOT_RECONNECT = 'Robot did not successfully reconnect'
 const BUT_WE_EXPECTED = 'but we expected'
 const UNKNOWN = 'unknown'
 const CHECK_TO_VERIFY_UPDATE =
@@ -145,6 +144,19 @@ export const startUpdateEpic: Epic = (action$, state$) =>
       }
     })
   )
+
+export const startUpdateAfterFileDownload: Epic = (_, state$) => {
+  return state$.pipe(
+    filter(passActiveSession({ step: DOWNLOAD_FILE, stage: DONE })),
+    switchMap(stateWithSession => {
+      const host: ViewableRobot = getRobotUpdateRobot(stateWithSession) as any
+      const robotModel =
+        host?.serverHealth?.robotModel === 'OT-3 Standard' ? 'flex' : 'ot2'
+
+      return of(readSystemRobotUpdateFile(robotModel))
+    })
+  )
+}
 
 // listen for a the active robot to come back with capabilities after premigration
 export const retryAfterPremigrationEpic: Epic = (_, state$) => {
@@ -221,7 +233,16 @@ export const createSessionEpic: Epic = action$ => {
         )
       }
 
-      return of(unexpectedRobotUpdateError(UNABLE_TO_START_UPDATE_SESSION))
+      return fetchRobotApi(host, {
+        method: POST,
+        path: `${pathPrefix}/cancel`,
+      }).pipe(
+        map(cancelResp => {
+          return cancelResp.ok
+            ? createSession(host, path)
+            : unexpectedRobotUpdateError(UNABLE_TO_START_UPDATE_SESSION)
+        })
+      )
     })
   )
 }
@@ -241,12 +262,12 @@ export const statusPollEpic: Epic = (action$, state$) => {
             state$.pipe(
               filter(state => {
                 const session = getRobotUpdateSession(state)
-                return (
+                const willReturn =
                   session?.stage === READY_FOR_RESTART ||
                   // @ts-expect-error TODO: `session?.error === true` always returns false, remove it?
                   session?.error === true ||
                   session === null
-                )
+                return willReturn
               })
             )
           ),
@@ -277,8 +298,6 @@ const passActiveSession = (props: Partial<RobotUpdateSession>) => (
   return (
     robot !== null &&
     !session?.error &&
-    typeof session?.pathPrefix === 'string' &&
-    typeof session?.token === 'string' &&
     every(
       props,
       (value, key) => session?.[key as keyof RobotUpdateSession] === value
@@ -375,8 +394,7 @@ export const finishAfterRestartEpic: Epic = (action$, state$) => {
       const session = getRobotUpdateSession(state)
       const robot = getRobotUpdateRobot(state)
       const restartDone =
-        action.payload.restartStatus === RESTART_SUCCEEDED_STATUS ||
-        action.payload.restartStatus === RESTART_TIMED_OUT_STATUS
+        action.payload.restartStatus === RESTART_SUCCEEDED_STATUS
 
       return (
         restartDone &&
@@ -393,7 +411,6 @@ export const finishAfterRestartEpic: Epic = (action$, state$) => {
       )
 
       const robotVersion = getRobotApiVersion(robot)
-      const timedOut = action.payload.restartStatus === RESTART_TIMED_OUT_STATUS
       const actual = robotVersion ?? UNKNOWN
       const expected = targetVersion ?? UNKNOWN
       let finishAction
@@ -404,10 +421,6 @@ export const finishAfterRestartEpic: Epic = (action$, state$) => {
         robotVersion === targetVersion
       ) {
         finishAction = setRobotUpdateSessionStep(FINISHED)
-      } else if (timedOut) {
-        finishAction = unexpectedRobotUpdateError(
-          `${ROBOT_DID_NOT_RECONNECT}. ${CHECK_TO_VERIFY_UPDATE}.`
-        )
       } else {
         finishAction = unexpectedRobotUpdateError(
           `${ROBOT_RECONNECTED_WITH_VERSION} ${actual}, ${BUT_WE_EXPECTED} ${expected}. ${CHECK_TO_VERIFY_UPDATE}.`
@@ -448,6 +461,7 @@ export const removeMigratedRobotsEpic: Epic = (_, state$) => {
 
 export const robotUpdateEpic = combineEpics<Epic>(
   startUpdateEpic,
+  startUpdateAfterFileDownload,
   retryAfterPremigrationEpic,
   startSessionAfterFileInfoEpic,
   createSessionEpic,

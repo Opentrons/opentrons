@@ -31,7 +31,7 @@ import {
   minDispenseAirGapVolume,
 } from './warnings'
 
-import { StepType } from '../../form-types'
+import { HydratedFormdata, StepType } from '../../form-types'
 export { handleFormChange } from './handleFormChange'
 export { createBlankForm } from './createBlankForm'
 export { getDefaultsForStepType } from './getDefaultsForStepType'
@@ -46,7 +46,7 @@ export { getNextDefaultEngageHeight } from './getNextDefaultEngageHeight'
 export { stepFormToArgs } from './stepFormToArgs'
 export type { FormError, FormWarning, FormWarningType }
 interface FormHelpers {
-  getErrors?: (arg: unknown) => FormError[]
+  getErrors?: (arg: HydratedFormdata) => FormError[]
   getWarnings?: (arg: unknown) => FormWarning[]
 }
 const stepFormHelperMap: Partial<Record<StepType, FormHelpers>> = {
@@ -95,7 +95,7 @@ const stepFormHelperMap: Partial<Record<StepType, FormHelpers>> = {
 }
 export const getFormErrors = (
   stepType: StepType,
-  formData: unknown
+  formData: HydratedFormdata
 ): FormError[] => {
   const formErrorGetter =
     // @ts-expect-error(sa, 2021-6-20): not a valid type narrow

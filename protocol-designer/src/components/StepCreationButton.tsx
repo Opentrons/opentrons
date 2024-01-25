@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import {
   Tooltip,
   DeprecatedPrimaryButton,
@@ -14,7 +15,6 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { i18n } from '../localization'
 import { actions as stepsActions, getIsMultiSelectMode } from '../ui/steps'
 import {
   selectors as stepFormSelectors,
@@ -27,6 +27,8 @@ import {
 import { Portal } from './portals/MainPageModalPortal'
 import { stepIconsByType, StepType } from '../form-types'
 import styles from './listButtons.css'
+import { ThunkDispatch } from 'redux-thunk'
+import { BaseState } from '../types'
 
 interface StepButtonComponentProps {
   children: React.ReactNode
@@ -40,6 +42,7 @@ interface StepButtonComponentProps {
 export const StepCreationButtonComponent = (
   props: StepButtonComponentProps
 ): JSX.Element => {
+  const { t } = useTranslation(['tooltip', 'button'])
   const { children, expanded, setExpanded, disabled } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP,
@@ -52,16 +55,14 @@ export const StepCreationButtonComponent = (
       {...targetProps}
     >
       {disabled && (
-        <Tooltip {...tooltipProps}>
-          {i18n.t(`tooltip.disabled_step_creation`)}
-        </Tooltip>
+        <Tooltip {...tooltipProps}>{t(`disabled_step_creation`)}</Tooltip>
       )}
       <DeprecatedPrimaryButton
         id="StepCreationButton"
         onClick={() => setExpanded(!expanded)}
         disabled={disabled}
       >
-        {i18n.t('button.add_step')}
+        {t('button:add_step')}
       </DeprecatedPrimaryButton>
 
       <div className={styles.buttons_popover}>{expanded && children}</div>
@@ -76,11 +77,12 @@ export interface StepButtonItemProps {
 
 export function StepButtonItem(props: StepButtonItemProps): JSX.Element {
   const { onClick, stepType } = props
+  const { t } = useTranslation(['tooltip', 'application'])
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_RIGHT,
     strategy: TOOLTIP_FIXED,
   })
-  const tooltipMessage = i18n.t(`tooltip.step_description.${stepType}`)
+  const tooltipMessage = t(`step_description.${stepType}`)
   return (
     <>
       <div {...targetProps}>
@@ -88,7 +90,7 @@ export function StepButtonItem(props: StepButtonItemProps): JSX.Element {
           onClick={onClick}
           iconName={stepIconsByType[stepType]}
         >
-          {i18n.t(`application.stepType.${stepType}`, stepType)}
+          {t(`application:stepType.${stepType}`, stepType)}
         </DeprecatedPrimaryButton>
       </div>
       <Tooltip {...tooltipProps}>{tooltipMessage}</Tooltip>
@@ -137,7 +139,7 @@ export const StepCreationButton = (): JSX.Element => {
     enqueuedStepType,
     setEnqueuedStepType,
   ] = React.useState<StepType | null>(null)
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
 
   const addStep = (
     stepType: StepType

@@ -24,15 +24,10 @@ import {
   GRIPPER_V1_2,
   EXTENSION,
   MAGNETIC_BLOCK_V1,
-  STAGING_AREA_LOAD_NAME,
-  STANDARD_SLOT_LOAD_NAME,
-  TRASH_BIN_LOAD_NAME,
-  WASTE_CHUTE_LOAD_NAME,
 } from './constants'
-import type { INode } from 'svgson'
-import type { RunTimeCommand } from '../protocol'
+import type { RunTimeCommand, LabwareLocation } from '../command/types'
+import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 import type { PipetteName } from './pipettes'
-import type { LabwareLocation } from '../protocol/types/schemaV7/command/setup'
 
 export type RobotType = 'OT-2 Standard' | 'OT-3 Standard'
 
@@ -133,16 +128,19 @@ export interface LabwareBrand {
   links?: string[]
 }
 
+export interface CircularWellShapeProperties {
+  shape: 'circular'
+  diameter: number
+}
+export interface RectangularWellShapeProperties {
+  shape: 'rectangular'
+  xDimension: number
+  yDimension: number
+}
+
 export type LabwareWellShapeProperties =
-  | {
-      shape: 'circular'
-      diameter: number
-    }
-  | {
-      shape: 'rectangular'
-      xDimension: number
-      yDimension: number
-    }
+  | CircularWellShapeProperties
+  | RectangularWellShapeProperties
 
 // well without x,y,z
 export type LabwareWellProperties = LabwareWellShapeProperties & {
@@ -232,18 +230,6 @@ export type ModuleModelWithLegacy =
   | typeof MAGDECK
   | typeof TEMPDECK
 
-export type FixtureLoadName =
-  | typeof STAGING_AREA_LOAD_NAME
-  | typeof STANDARD_SLOT_LOAD_NAME
-  | typeof TRASH_BIN_LOAD_NAME
-  | typeof WASTE_CHUTE_LOAD_NAME
-
-export interface DeckOffset {
-  x: number
-  y: number
-  z: number
-}
-
 export interface Dimensions {
   xDimension: number
   yDimension: number
@@ -252,13 +238,6 @@ export interface Dimensions {
 
 export interface DeckRobot {
   model: RobotType
-}
-
-export interface DeckFixture {
-  id: string
-  slot: string
-  labware: string
-  displayName: string
 }
 
 export type CoordinateTuple = [number, number, number]
@@ -284,15 +263,56 @@ export interface DeckCalibrationPoint {
   displayName: string
 }
 
-export interface DeckLocations {
-  orderedSlots: DeckSlot[]
-  calibrationPoints: DeckCalibrationPoint[]
-  fixtures: DeckFixture[]
+export interface CutoutFixture {
+  id: CutoutFixtureId
+  mayMountTo: CutoutId[]
+  displayName: string
+  providesAddressableAreas: Record<CutoutId, AddressableAreaName[]>
+  height: number
+}
+
+type AreaType =
+  | 'slot'
+  | 'movableTrash'
+  | 'wasteChute'
+  | 'fixedTrash'
+  | 'stagingSlot'
+
+export interface AddressableArea {
+  id: AddressableAreaName
+  areaType: AreaType
+  offsetFromCutoutFixture: CoordinateTuple
+  boundingBox: Dimensions
+  displayName: string
+  compatibleModuleTypes: ModuleType[]
+  ableToDropLabware?: boolean
+  ableToDropTips?: boolean
+  matingSurfaceUnitVector?: UnitVectorTuple
 }
 
 export interface DeckMetadata {
   displayName: string
   tags: string[]
+}
+
+export interface DeckCutout {
+  id: CutoutId
+  position: CoordinateTuple
+  displayName: string
+}
+
+export interface LegacyFixture {
+  id: string
+  slot: string
+  labware: string
+  displayName: string
+}
+
+export interface DeckLocations {
+  addressableAreas: AddressableArea[]
+  calibrationPoints: DeckCalibrationPoint[]
+  cutouts: DeckCutout[]
+  legacyFixtures: LegacyFixture[]
 }
 
 export interface DeckDefinition {
@@ -302,7 +322,7 @@ export interface DeckDefinition {
   robot: DeckRobot
   locations: DeckLocations
   metadata: DeckMetadata
-  layers: INode[]
+  cutoutFixtures: CutoutFixture[]
 }
 
 export interface ModuleDimensions {
@@ -340,7 +360,7 @@ export interface ModuleDefinition {
   quirks: string[]
   slotTransforms: SlotTransforms
   compatibleWith: ModuleModel[]
-  twoDimensionalRendering: INode
+  twoDimensionalRendering: any // deprecated SVGson INode use Module SVG Components instead
 }
 
 export type AffineTransformMatrix = number[][]
@@ -448,6 +468,7 @@ export interface AnalysisError {
   createdAt: string
 }
 
+// TODO(BC, 10/25/2023): this type (and others in this file) probably belong in api-client, not here
 export interface CompletedProtocolAnalysis {
   id: string
   status?: 'completed'
@@ -458,7 +479,7 @@ export interface CompletedProtocolAnalysis {
   liquids: Liquid[]
   commands: RunTimeCommand[]
   errors: AnalysisError[]
-  robotType?: RobotType
+  robotType?: RobotType | null
 }
 
 export interface ResourceFile {
@@ -519,6 +540,7 @@ export interface GripperDefinition {
     pinOneOffsetFromBase: [number, number, number]
     pinTwoOffsetFromBase: [number, number, number]
     jawWidth: { min: number; max: number }
+    maxAllowedGripError: number
   }
 }
 
@@ -531,25 +553,9 @@ export type StatusBarAnimation =
 
 export type StatusBarAnimations = StatusBarAnimation[]
 
-// TODO(bh, 2023-09-28): refine types when settled
-export type Cutout =
-  | 'A1'
-  | 'B1'
-  | 'C1'
-  | 'D1'
-  | 'A2'
-  | 'B2'
-  | 'C2'
-  | 'D2'
-  | 'A3'
-  | 'B3'
-  | 'C3'
-  | 'D3'
-
-export interface Fixture {
-  fixtureId: string
-  fixtureLocation: Cutout
-  loadName: FixtureLoadName
+export interface CutoutConfig {
+  cutoutId: CutoutId
+  cutoutFixtureId: CutoutFixtureId | null
 }
 
-export type DeckConfiguration = Fixture[]
+export type DeckConfiguration = CutoutConfig[]

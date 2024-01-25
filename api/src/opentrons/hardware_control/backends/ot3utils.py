@@ -105,16 +105,7 @@ def axis_nodes() -> List["NodeId"]:
 
 
 def node_axes() -> List[Axis]:
-    return [
-        Axis.X,
-        Axis.Y,
-        Axis.Z_L,
-        Axis.Z_R,
-        Axis.P_L,
-        Axis.P_R,
-        Axis.Z_G,
-        Axis.G,
-    ]
+    return Axis.node_axes()
 
 
 def home_axes() -> List[Axis]:

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -40,13 +41,13 @@ describe('RestartRobotConfirmationModal', () => {
 
   it('should call a mock function when tapping go back button', () => {
     const [{ getByText }] = render(props)
-    getByText('Go back').click()
+    fireEvent.click(getByText('Go back'))
     expect(mockFunc).toHaveBeenCalled()
   })
 
   it('should call mock restart function when tapping restart', () => {
     const [{ getByText }] = render(props)
-    getByText('Restart').click()
+    fireEvent.click(getByText('Restart'))
     expect(mockRestartRobot).toHaveBeenCalled()
   })
 })

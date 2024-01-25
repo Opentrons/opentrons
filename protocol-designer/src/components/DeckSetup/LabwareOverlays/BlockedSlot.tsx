@@ -1,6 +1,6 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
-import { i18n } from '../../../localization'
 import styles from './LabwareOverlays.css'
 
 type BlockedSlotMessage =
@@ -17,6 +17,7 @@ interface Props {
 }
 
 export const BlockedSlot = (props: Props): JSX.Element => {
+  const { t } = useTranslation('deck')
   const { x, y, width, height, message } = props
   return (
     <g>
@@ -36,7 +37,7 @@ export const BlockedSlot = (props: Props): JSX.Element => {
           className: styles.blocked_slot_content,
         }}
       >
-        {i18n.t(`deck.blocked_slot.${message}`)}
+        {t(`blocked_slot.${message}`)}
       </RobotCoordsForeignDiv>
     </g>
   )

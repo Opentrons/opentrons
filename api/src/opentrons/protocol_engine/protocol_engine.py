@@ -12,8 +12,6 @@ from opentrons_shared_data.errors import (
     EnumeratedError,
 )
 
-from opentrons.util.broker import ReadOnlyBroker
-
 from .errors import ProtocolCommandFailedError, ErrorOccurrence
 from .errors.exceptions import EStopActivatedError
 from . import commands, slot_standardization
@@ -26,6 +24,7 @@ from .types import (
     Liquid,
     HexColor,
     PostRunHardwareState,
+    DeckConfigurationType,
 )
 from .execution import (
     QueueWorker,
@@ -131,47 +130,17 @@ class ProtocolEngine:
         """Get an interface to retrieve calculated state values."""
         return self._state_store
 
-    @property
-    def state_update_broker(self) -> ReadOnlyBroker[None]:
-        """Return a broker that you can use to get notified of all state updates.
-
-        For example, you can use this to do something any time a new command starts running.
-
-        `ProtocolEngine` will publish a message to this broker (with the placeholder value `None`)
-        any time its state updates. Then, when you receive that message, you can get the latest
-        state through `state_view` and inspect it to see whether something happened that you care
-        about.
-
-        Warning:
-            Use this mechanism sparingly, because it has several footguns:
-
-            * Your callbacks will run synchronously, on every state update.
-              If they take a long time, they will harm analysis and run speed.
-
-            * Your callbacks will run in the thread and asyncio event loop that own this
-              `ProtocolEngine`. (See the concurrency notes in the `ProtocolEngine` docstring.)
-              If your callbacks interact with things in other threads or event loops,
-              take appropriate precautions to keep them concurrency-safe.
-
-            * Currently, if your callback raises an exception, it will propagate into
-              `ProtocolEngine` and be treated like any other internal error. This will probably
-              stop the run. If you expect your code to raise exceptions and don't want
-              that to happen, consider catching and logging them at the top level of your callback,
-              before they propagate into `ProtocolEngine`.
-        """
-        return self._state_store.update_broker
-
     def add_plugin(self, plugin: AbstractPlugin) -> None:
         """Add a plugin to the engine to customize behavior."""
         self._plugin_starter.start(plugin)
 
-    def play(self) -> None:
+    def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
         """Start or resume executing commands in the queue."""
         requested_at = self._model_utils.get_timestamp()
         # TODO(mc, 2021-08-05): if starting, ensure plungers motors are
         # homed if necessary
         action = self._state_store.commands.validate_action_allowed(
-            PlayAction(requested_at=requested_at)
+            PlayAction(requested_at=requested_at, deck_configuration=deck_configuration)
         )
         self._action_dispatcher.dispatch(action)
 
@@ -324,6 +293,15 @@ class ProtocolEngine:
         action = self._state_store.commands.validate_action_allowed(StopAction())
         self._action_dispatcher.dispatch(action)
         self._queue_worker.cancel()
+        if self._hardware_api.is_movement_execution_taskified():
+            # We 'taskify' hardware controller movement functions when running protocols
+            # that are not backed by the engine. Such runs cannot be stopped by cancelling
+            # the queue worker and hence need to be stopped via the execution manager.
+            # `cancel_execution_and_running_tasks()` sets the execution manager in a CANCELLED state
+            # and cancels the running tasks, which raises an error and gets us out of the
+            # run function execution, just like `_queue_worker.cancel()` does for
+            # engine-backed runs.
+            await self._hardware_api.cancel_execution_and_running_tasks()
 
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.
@@ -412,7 +390,6 @@ class ProtocolEngine:
         # order will be backwards because the stack is first-in-last-out.
         exit_stack = AsyncExitStack()
         exit_stack.push_async_callback(self._plugin_starter.stop)  # Last step.
-
         exit_stack.push_async_callback(
             # Cleanup after hardware halt and reset the hardware controller
             self._hardware_stopper.do_stop_and_recover,
@@ -432,7 +409,6 @@ class ProtocolEngine:
             disengage_before_stopping=disengage_before_stopping,
         )
         exit_stack.push_async_callback(self._queue_worker.join)  # First step.
-
         try:
             # If any teardown steps failed, this will raise something.
             await exit_stack.aclose()

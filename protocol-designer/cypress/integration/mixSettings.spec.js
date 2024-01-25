@@ -10,7 +10,6 @@ function importProtocol() {
       mimeType: 'application/json',
       encoding: 'utf8',
     })
-    cy.get('[data-test="ComputingSpinner"]').should('exist')
     cy.get('div')
       .contains(
         'Your protocol will be automatically updated to the latest version.'
@@ -310,24 +309,24 @@ describe('Advanced Settings for Mix Form', () => {
     // Exit batch edit mode
     cy.get('button').contains('exit batch edit').click()
 
-    // Click on step 2 to verify that blowout has trash selected
+    // Click on step 2 to verify that blowout has dest well selected
     cy.get('[data-test="StepItem_2"]').click()
     cy.get('button[id="AspDispSection_settings_button_aspirate"]').click()
 
-    // Verify trash is selected
+    // Verify dest well is selected
     cy.get('[id=BlowoutLocationField_dropdown]').should($input => {
       const value = $input.val()
-      const expectedSubstring = 'opentrons/opentrons_1_trash_1100ml_fixed/1'
+      const expectedSubstring = 'trashBin'
       expect(value).to.include(expectedSubstring)
     })
     // Click on step 3 to verify the batch editing
     cy.get('[data-test="StepItem_3"]').click()
     cy.get('button[id="AspDispSection_settings_button_aspirate"]').click()
 
-    // Verify that trash is selected for the blowout option
+    // Verify that dest well is selected for the blowout option
     cy.get('[id=BlowoutLocationField_dropdown]').should($input => {
       const value = $input.val()
-      const expectedSubstring = 'opentrons/opentrons_1_trash_1100ml_fixed/1'
+      const expectedSubstring = 'trashBin'
       expect(value).to.include(expectedSubstring)
     })
   })

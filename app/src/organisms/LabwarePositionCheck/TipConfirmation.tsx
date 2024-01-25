@@ -8,6 +8,7 @@ import {
   SPACING,
   ALIGN_CENTER,
   COLORS,
+  JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 
@@ -34,10 +35,15 @@ export function TipConfirmation(props: TipConfirmationProps): JSX.Element {
   return isOnDevice ? (
     <SimpleWizardBody
       isSuccess={false}
-      iconColor={COLORS.warningEnabled}
+      iconColor={COLORS.yellow50}
       header={t('did_pipette_pick_up_tip')}
     >
-      <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
+      <Flex
+        alignItems={ALIGN_CENTER}
+        gridGap={SPACING.spacing8}
+        justifyContent={JUSTIFY_FLEX_END}
+        flex="1"
+      >
         <SmallButton
           buttonText={i18n.format(t('try_again'), 'capitalize')}
           buttonType="secondary"

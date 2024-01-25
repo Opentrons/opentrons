@@ -3,7 +3,7 @@ import type { PauseArgs, CommandCreator } from '../../types'
 import type {
   WaitForDurationCreateCommand,
   WaitForResumeCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV7'
+} from '@opentrons/shared-data'
 export const delay: CommandCreator<PauseArgs> = (
   args,
   invariantContext,

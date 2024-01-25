@@ -41,7 +41,9 @@ import {
 
 import { SubstepIdentifier } from '../steplist/types'
 import { StepIdType } from '../form-types'
-import { ThunkAction } from '../types'
+import { BaseState, ThunkAction } from '../types'
+import { getAdditionalEquipmentEntities } from '../step-forms/selectors'
+import { ThunkDispatch } from 'redux-thunk'
 
 interface Props {
   stepId: StepIdType
@@ -101,6 +103,9 @@ export const ConnectedStepItem = (props: Props): JSX.Element => {
   const labwareNicknamesById = useSelector(
     uiLabwareSelectors.getLabwareNicknamesById
   )
+  const additionalEquipmentEntities = useSelector(
+    getAdditionalEquipmentEntities
+  )
   const currentFormIsPresaved = useSelector(
     stepFormSelectors.getCurrentFormIsPresaved
   )
@@ -112,7 +117,7 @@ export const ConnectedStepItem = (props: Props): JSX.Element => {
   )
 
   // Actions
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
 
   const highlightSubstep = (payload: SubstepIdentifier): HoverOnSubstepAction =>
     dispatch(stepsActions.hoverOnSubstep(payload))
@@ -215,6 +220,7 @@ export const ConnectedStepItem = (props: Props): JSX.Element => {
     substeps,
     ingredNames,
     labwareNicknamesById,
+    additionalEquipmentEntities,
     highlightSubstep,
     hoveredSubstep,
   }

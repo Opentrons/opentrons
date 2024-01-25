@@ -11,9 +11,9 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
-import { ROBOT_ANALYTICS_SETTING_ID } from '../../pages/OnDeviceDisplay/RobotDashboard/AnalyticsOptInModal'
-import { RobotSettingButton } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
-import { OnOffToggle } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingsList'
+import { ROBOT_ANALYTICS_SETTING_ID } from '../../pages/RobotDashboard/AnalyticsOptInModal'
+import { RobotSettingButton } from '../../pages/RobotSettingsDashboard/RobotSettingButton'
+import { OnOffToggle } from '../../pages/RobotSettingsDashboard/RobotSettingsList'
 import {
   getAnalyticsOptedIn,
   toggleAnalyticsOptedIn,
@@ -21,7 +21,7 @@ import {
 import { getRobotSettings, updateSetting } from '../../redux/robot-settings'
 
 import type { Dispatch, State } from '../../redux/types'
-import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SetSettingOption } from '../../pages/RobotSettingsDashboard'
 
 interface PrivacyProps {
   robotName: string

@@ -1,48 +1,99 @@
+import { getTopMostLabwareInSlots } from '@opentrons/components'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
-import { STANDARD_SLOT_LOAD_NAME } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  getAddressableAreasInProtocol,
+  getCutoutFixturesForCutoutId,
+  getCutoutIdForAddressableArea,
+  getDeckDefFromRobotType,
+  getLabwareDisplayName,
+  SINGLE_SLOT_FIXTURES,
+} from '@opentrons/shared-data'
 
-import type { Fixture, LoadFixtureRunTimeCommand } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  CutoutConfigProtocolSpec,
+  CutoutFixtureId,
+  ProtocolAnalysisOutput,
+  RobotType,
+} from '@opentrons/shared-data'
 
-export const CONFIGURED = 'configured'
-export const CONFLICTING = 'conflicting'
-export const NOT_CONFIGURED = 'not configured'
+const DECK_CONFIG_REFETCH_INTERVAL = 5000
 
-type LoadedFixtureConfigurationStatus =
-  | typeof CONFIGURED
-  | typeof CONFLICTING
-  | typeof NOT_CONFIGURED
-
-type LoadedFixtureConfiguration = LoadFixtureRunTimeCommand & {
-  configurationStatus: LoadedFixtureConfigurationStatus
+export interface CutoutConfigAndCompatibility extends CutoutConfigProtocolSpec {
+  compatibleCutoutFixtureIds: CutoutFixtureId[]
+  // the missing on-deck labware display name for a single slot cutout
+  missingLabwareDisplayName: string | null
 }
+export function useDeckConfigurationCompatibility(
+  robotType: RobotType,
+  protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
+): CutoutConfigAndCompatibility[] {
+  const deckConfig =
+    useDeckConfigurationQuery({ refetchInterval: DECK_CONFIG_REFETCH_INTERVAL })
+      .data ?? []
+  if (robotType !== FLEX_ROBOT_TYPE) return []
+  const deckDef = getDeckDefFromRobotType(robotType)
+  const allAddressableAreas =
+    protocolAnalysis != null
+      ? getAddressableAreasInProtocol(protocolAnalysis, deckDef)
+      : []
+  const labwareInSlots =
+    protocolAnalysis != null ? getTopMostLabwareInSlots(protocolAnalysis) : []
 
-export function useLoadedFixturesConfigStatus(
-  loadedFixtures: LoadFixtureRunTimeCommand[]
-): LoadedFixtureConfiguration[] {
-  const deckConfig = useDeckConfigurationQuery().data ?? []
+  return deckConfig.reduce<CutoutConfigAndCompatibility[]>(
+    (acc, { cutoutId, cutoutFixtureId }) => {
+      const fixturesThatMountToCutoutId = getCutoutFixturesForCutoutId(
+        cutoutId,
+        deckDef.cutoutFixtures
+      )
+      const requiredAddressableAreasForCutoutId = allAddressableAreas.filter(
+        aa =>
+          getCutoutIdForAddressableArea(aa, fixturesThatMountToCutoutId) ===
+          cutoutId
+      )
 
-  return loadedFixtures.map(loadedFixture => {
-    const deckConfigurationAtLocation = deckConfig.find(
-      (deckFixture: Fixture) =>
-        deckFixture.fixtureLocation === loadedFixture.params.location.cutout
-    )
+      const compatibleCutoutFixtureIds = fixturesThatMountToCutoutId
+        .filter(cf =>
+          requiredAddressableAreasForCutoutId.every(aa =>
+            cf.providesAddressableAreas[cutoutId].includes(aa)
+          )
+        )
+        .map(cf => cf.id)
 
-    let configurationStatus: LoadedFixtureConfigurationStatus = NOT_CONFIGURED
-    if (
-      deckConfigurationAtLocation != null &&
-      deckConfigurationAtLocation.loadName === loadedFixture.params.loadName
-    ) {
-      configurationStatus = CONFIGURED
-      //  special casing this for now until we know what the backend will give us. It is only
-      //  conflicting if the current deck configuration fixture is not the desired or standard slot
-    } else if (
-      deckConfigurationAtLocation != null &&
-      deckConfigurationAtLocation.loadName !== loadedFixture.params.loadName &&
-      deckConfigurationAtLocation.loadName !== STANDARD_SLOT_LOAD_NAME
-    ) {
-      configurationStatus = CONFLICTING
-    }
+      // get the on-deck labware name for a missing single-slot addressable area
+      const missingSingleSlotLabware =
+        cutoutFixtureId != null &&
+        // fixture mismatch
+        !compatibleCutoutFixtureIds.includes(cutoutFixtureId) &&
+        compatibleCutoutFixtureIds[0] != null &&
+        // compatible fixture is single-slot
+        SINGLE_SLOT_FIXTURES.includes(compatibleCutoutFixtureIds[0])
+          ? labwareInSlots.find(
+              ({ location }) =>
+                // match the addressable area to an on-deck labware
+                requiredAddressableAreasForCutoutId[0] === location.slotName
+            )
+          : null
 
-    return { ...loadedFixture, configurationStatus }
-  })
+      const missingLabwareDisplayName =
+        missingSingleSlotLabware != null
+          ? missingSingleSlotLabware.labwareNickName ??
+            getLabwareDisplayName(missingSingleSlotLabware.labwareDef) ??
+            null
+          : null
+
+      return [
+        ...acc,
+        {
+          cutoutId,
+          cutoutFixtureId: cutoutFixtureId,
+          requiredAddressableAreas: requiredAddressableAreasForCutoutId,
+          compatibleCutoutFixtureIds,
+          missingLabwareDisplayName,
+        },
+      ]
+    },
+    []
+  )
 }

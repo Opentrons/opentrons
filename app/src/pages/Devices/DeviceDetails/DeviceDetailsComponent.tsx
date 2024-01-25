@@ -16,7 +16,6 @@ import { RecentProtocolRuns } from '../../../organisms/Devices/RecentProtocolRun
 import { EstopBanner } from '../../../organisms/Devices/EstopBanner'
 import { DISENGAGED, useEstopContext } from '../../../organisms/EmergencyStop'
 import { useIsFlex } from '../../../organisms/Devices/hooks'
-import { useFeatureFlag } from '../../../redux/config'
 
 interface DeviceDetailsComponentProps {
   robotName: string
@@ -30,7 +29,6 @@ export function DeviceDetailsComponent({
     enabled: isFlex,
   })
   const { isEmergencyStopModalDismissed } = useEstopContext()
-  const enableDeckConfiguration = useFeatureFlag('enableDeckConfiguration')
 
   return (
     <Box
@@ -51,7 +49,7 @@ export function DeviceDetailsComponent({
       <Flex
         alignItems={ALIGN_CENTER}
         backgroundColor={COLORS.white}
-        border={`1px solid ${String(COLORS.medGreyEnabled)}`}
+        border={`1px solid ${String(COLORS.grey30)}`}
         borderRadius="3px"
         flexDirection={DIRECTION_COLUMN}
         marginBottom={SPACING.spacing16}
@@ -62,9 +60,7 @@ export function DeviceDetailsComponent({
         <RobotOverview robotName={robotName} />
         <InstrumentsAndModules robotName={robotName} />
       </Flex>
-      {isFlex && enableDeckConfiguration ? (
-        <DeviceDetailsDeckConfiguration robotName={robotName} />
-      ) : null}
+      {isFlex ? <DeviceDetailsDeckConfiguration robotName={robotName} /> : null}
       <RecentProtocolRuns robotName={robotName} />
     </Box>
   )

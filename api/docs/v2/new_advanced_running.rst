@@ -14,10 +14,7 @@ Jupyter Notebook
 
 The Flex and OT-2 run `Jupyter Notebook <https://jupyter.org>`_ servers on port 48888, which you can connect to with your web browser. This is a convenient environment for writing and debugging protocols, since you can define different parts of your protocol in different notebook cells and run a single cell at a time.
 
-.. note::
-    Currently, the Jupyter Notebook server does not work with Python Protocol API versions 2.14 and 2.15. It does work with API versions 2.13 and earlier. Use the Opentrons App to run protocols that require functionality added in newer versions.
-
-Access your robot's Jupyter Notebook by either:
+Access your robot’s Jupyter Notebook by either:
 
 - Going to the **Advanced** tab of Robot Settings and clicking **Launch Jupyter Notebook**.
 - Going directly to ``http://<robot-ip>:48888`` in your web browser (if you know your robot's IP address).
@@ -32,9 +29,10 @@ Jupyter Notebook is structured around `cells`: discrete chunks of code that can 
 Rather than writing a  ``run`` function and embedding commands within it, start your notebook by importing ``opentrons.execute`` and calling :py:meth:`opentrons.execute.get_protocol_api`. This function also replaces the ``metadata`` block of a standalone protocol by taking the minimum :ref:`API version <v2-versioning>` as its argument. Then you can call :py:class:`~opentrons.protocol_api.ProtocolContext` methods in subsequent lines or cells:
 
 .. code-block:: python
+    :substitutions:
 
     import opentrons.execute
-    protocol = opentrons.execute.get_protocol_api("2.13")
+    protocol = opentrons.execute.get_protocol_api("|apiLevel|")
     protocol.home()
 
 The first command you execute should always be :py:meth:`~opentrons.protocol_api.ProtocolContext.home`. If you try to execute other commands first, you will get a ``MustHomeError``. (When running protocols through the Opentrons App, the robot homes automatically.)
@@ -57,8 +55,9 @@ You can also use Jupyter to run a protocol that you have already written. To do 
 Since a typical protocol only `defines` the ``run`` function but doesn't `call` it, this won't immediately cause the robot to move. To begin the run, instantiate a :py:class:`.ProtocolContext` and pass it to the ``run`` function you just defined:
 
 .. code-block:: python
+    :substitutions:
 
-    protocol = opentrons.execute.get_protocol_api("2.13")
+    protocol = opentrons.execute.get_protocol_api("|apiLevel|")
     run(protocol)  # your protocol will now run
 
 .. _using_lpc:
@@ -78,7 +77,7 @@ Creating the dummy protocol requires you to:
     1. Use the ``metadata`` or ``requirements`` dictionary to specify the API version. (See :ref:`v2-versioning` for details.) Use the same API version as you did in :py:meth:`opentrons.execute.get_protocol_api`.
     2. Define a ``run()`` function.
     3. Load all of your labware in their initial locations.
-    4. Load your smallest capacity pipette and specify its ``tipracks``.
+    4. Load your smallest capacity pipette and specify its ``tip_racks``.
     5. Call ``pick_up_tip()``. Labware Position Check can't run if you don't pick up a tip.
     
 For example, the following dummy protocol will use a P300 Single-Channel GEN2 pipette to enable Labware Position Check for an OT-2 tip rack, NEST reservoir, and NEST flat well plate.
@@ -117,13 +116,13 @@ This automatically generated code uses generic names for the loaded labware. If 
     
 .. versionadded:: 2.12
 
-Once you've executed this code in Jupyter Notebook, all subsequent positional calculations for this reservoir in slot D2 will be adjusted 0.1 mm to the right, 0.2 mm to the back, and 0.3 mm up.
+Once you've executed this code in Jupyter Notebook, all subsequent positional calculations for this reservoir in slot 2 will be adjusted 0.1 mm to the right, 0.2 mm to the back, and 0.3 mm up.
 
-Remember, you should only add ``.set_offset()`` commands to protocols run outside of the Opentrons App. And you should follow the behavior of Labware Position Check, i.e., *do not* reuse offset measurements unless they apply to the *same labware* in the *same deck slot* on the *same robot*.
+Remember, you should only add ``set_offset()`` commands to protocols run outside of the Opentrons App. And you should follow the behavior of Labware Position Check, i.e., *do not* reuse offset measurements unless they apply to the *same labware* in the *same deck slot* on the *same robot*.
 
 .. warning::
 
-	Improperly reusing offset data may cause your robot to move to an unexpected position or crash against other labware, which can lead to incorrect protocol execution or damage your equipment. The same applies when running protocols with ``.set_offset()`` commands in the Opentrons App. When in doubt: run Labware Position Check again and update your code!
+	Improperly reusing offset data may cause your robot to move to an unexpected position or crash against labware, which can lead to incorrect protocol execution or damage your equipment. The same applies when running protocols with ``set_offset()`` commands in the Opentrons App. When in doubt: run Labware Position Check again and update your code!
 
 Using Custom Labware
 --------------------
@@ -145,6 +144,7 @@ To disable the robot server, open a Jupyter terminal session by going to **New >
 Command Line
 ------------
 
+.. TODO update with separate links to OT-2 and Flex setup, when new Flex process is in manual or on help site
 The robot's command line is accessible either by going to **New > Terminal** in Jupyter or `via SSH <https://support.opentrons.com/s/article/Connecting-to-your-OT-2-with-SSH>`_.
 
 To execute a protocol from the robot's command line, copy the protocol file to the robot with ``scp`` and then run the protocol with ``opentrons_execute``:

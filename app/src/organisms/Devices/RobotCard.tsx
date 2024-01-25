@@ -132,7 +132,7 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
       <StyledText
         as="h6"
         textTransform={TYPOGRAPHY.textTransformUppercase}
-        color={COLORS.darkGreyEnabled}
+        color={COLORS.grey50}
       >
         {t('modules')}
       </StyledText>
@@ -185,7 +185,7 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
       gridGap={SPACING.spacing4}
       minWidth="24rem"
     >
-      <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+      <StyledText as="h6" color={COLORS.grey50}>
         {t('shared:instruments')}
       </StyledText>
 

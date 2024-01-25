@@ -13,10 +13,12 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  getCutoutDisplayName,
   getFixtureDisplayName,
   getModuleDisplayName,
   getModuleType,
   getPipetteNameSpecs,
+  SINGLE_SLOT_FIXTURES,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
@@ -27,10 +29,11 @@ import { getRobotTypeDisplayName } from '../ProtocolsLanding/utils'
 import { getSlotsForThermocycler } from './utils'
 
 import type {
+  CutoutConfigProtocolSpec,
   LoadModuleRunTimeCommand,
-  LoadFixtureRunTimeCommand,
   PipetteName,
   RobotType,
+  SingleSlotCutoutFixtureId,
 } from '@opentrons/shared-data'
 
 interface RobotConfigurationDetailsProps {
@@ -38,7 +41,7 @@ interface RobotConfigurationDetailsProps {
   rightMountPipetteName: PipetteName | null
   extensionInstrumentName: string | null
   requiredModuleDetails: LoadModuleRunTimeCommand[]
-  requiredFixtureDetails: LoadFixtureRunTimeCommand[]
+  requiredFixtureDetails: CutoutConfigProtocolSpec[]
   isLoading: boolean
   robotType: RobotType | null
 }
@@ -64,25 +67,7 @@ export const RobotConfigurationDetails = (
     </StyledText>
   )
 
-  // TODO(bh, 2022-10-18): insert 96-channel display name
-  // const leftAndRightMountsPipetteDisplayName = 'P20 96-Channel GEN1'
-  const leftAndRightMountsPipetteDisplayName = null
-  const leftAndRightMountsItem =
-    leftAndRightMountsPipetteDisplayName != null ? (
-      <RobotConfigurationDetailsItem
-        label={t('left_and_right_mounts')}
-        item={
-          isLoading ? (
-            loadingText
-          ) : (
-            <InstrumentContainer
-              displayName={leftAndRightMountsPipetteDisplayName}
-            />
-          )
-        }
-      />
-    ) : null
-
+  const is96PipetteUsed = leftMountPipetteName === 'p1000_96'
   const leftMountPipetteDisplayName =
     getPipetteNameSpecs(leftMountPipetteName as PipetteName)?.displayName ??
     null
@@ -110,6 +95,14 @@ export const RobotConfigurationDetails = (
       emptyText
     )
 
+  // filter out single slot fixtures
+  const nonStandardRequiredFixtureDetails = requiredFixtureDetails.filter(
+    fixture =>
+      !SINGLE_SLOT_FIXTURES.includes(
+        fixture.cutoutFixtureId as SingleSlotCutoutFixtureId
+      )
+  )
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN} paddingBottom={SPACING.spacing24}>
       <RobotConfigurationDetailsItem
@@ -123,12 +116,12 @@ export const RobotConfigurationDetails = (
         }
       />
       <Divider marginY={SPACING.spacing12} width="100%" />
-      {leftAndRightMountsItem ?? (
+      <RobotConfigurationDetailsItem
+        label={is96PipetteUsed ? t('both_mounts') : t('left_mount')}
+        item={isLoading ? loadingText : leftMountItem}
+      />
+      {!is96PipetteUsed && (
         <>
-          <RobotConfigurationDetailsItem
-            label={t('left_mount')}
-            item={isLoading ? loadingText : leftMountItem}
-          />
           <Divider marginY={SPACING.spacing12} width="100%" />
           <RobotConfigurationDetailsItem
             label={t('right_mount')}
@@ -162,7 +155,7 @@ export const RobotConfigurationDetails = (
                     moduleType={getModuleType(module.params.model)}
                     marginRight={SPACING.spacing4}
                     alignSelf={ALIGN_CENTER}
-                    color={COLORS.darkGreyEnabled}
+                    color={COLORS.grey50}
                     height={SIZE_1}
                     minWidth={SIZE_1}
                     minHeight={SIZE_1}
@@ -176,15 +169,15 @@ export const RobotConfigurationDetails = (
           </React.Fragment>
         )
       })}
-      {requiredFixtureDetails.map((fixture, index) => {
+      {nonStandardRequiredFixtureDetails.map((fixture, index) => {
         return (
           <React.Fragment key={`fixture_${index}`}>
             <Divider marginY={SPACING.spacing12} width="100%" />
             <RobotConfigurationDetailsItem
-              label={fixture.params.location.cutout}
+              label={getCutoutDisplayName(fixture.cutoutId)}
               item={
                 <StyledText as="p">
-                  {getFixtureDisplayName(fixture.params.loadName)}
+                  {getFixtureDisplayName(fixture.cutoutFixtureId)}
                 </StyledText>
               }
             />
@@ -215,7 +208,7 @@ export const RobotConfigurationDetailsItem = (
         flex="0 0 auto"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         marginRight={SPACING.spacing16}
-        color={COLORS.darkGreyEnabled}
+        color={COLORS.grey50}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
         width="4.625rem"
       >

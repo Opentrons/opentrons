@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { Form, Formik, useField, useFormikContext } from 'formik'
 import {
@@ -17,17 +18,17 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_FLEX_END,
   JUSTIFY_END,
+  DropdownOption,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
-  WASTE_CHUTE_SLOT,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { i18n } from '../../localization'
-import { OUTER_SLOTS_FLEX } from '../../modules'
-import { createContainer, deleteContainer } from '../../labware-ingred/actions'
-import { FLEX_TRASH_DEF_URI } from '../../constants'
-import { createDeckFixture } from '../../step-forms/actions/additionalItems'
+import {
+  createDeckFixture,
+  deleteDeckFixture,
+} from '../../step-forms/actions/additionalItems'
 import { getSlotIsEmpty } from '../../step-forms'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { SlotDropdown } from '../modals/EditModulesModal/SlotDropdown'
@@ -37,8 +38,44 @@ export interface TrashValues {
   selectedSlot: string
 }
 
+export const MOVABLE_TRASH_CUTOUTS: DropdownOption[] = [
+  {
+    name: 'Slot A1',
+    value: 'cutoutA1',
+  },
+  {
+    name: 'Slot A3',
+    value: 'cutoutA3',
+  },
+  {
+    name: 'Slot B1',
+    value: 'cutoutB1',
+  },
+  {
+    name: 'Slot B3',
+    value: 'cutoutB3',
+  },
+  {
+    name: 'Slot C1',
+    value: 'cutoutC1',
+  },
+  {
+    name: 'Slot C3',
+    value: 'cutoutC3',
+  },
+  {
+    name: 'Slot D1',
+    value: 'cutoutD1',
+  },
+  {
+    name: 'Slot D3',
+    value: 'cutoutD3',
+  },
+]
+
 const TrashModalComponent = (props: TrashModalProps): JSX.Element => {
   const { onCloseClick, trashName } = props
+  const { t } = useTranslation(['alert', 'button'])
   const { values } = useFormikContext<TrashValues>()
   const initialDeckSetup = useSelector(getInitialDeckSetup)
   const isSlotEmpty = getSlotIsEmpty(
@@ -48,6 +85,7 @@ const TrashModalComponent = (props: TrashModalProps): JSX.Element => {
   )
   const flexDeck = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const [field] = useField('selectedSlot')
+  const slotFromCutout = field.value.replace('cutout', '')
 
   return (
     <Form>
@@ -65,7 +103,7 @@ const TrashModalComponent = (props: TrashModalProps): JSX.Element => {
                 <Box width="8rem">
                   <SlotDropdown
                     fieldName="selectedSlot"
-                    options={OUTER_SLOTS_FLEX}
+                    options={MOVABLE_TRASH_CUTOUTS}
                     disabled={false}
                     tabIndex={1}
                   />
@@ -78,9 +116,7 @@ const TrashModalComponent = (props: TrashModalProps): JSX.Element => {
             {!isSlotEmpty ? (
               <PDAlert
                 alertType="warning"
-                title={i18n.t(
-                  `alert.deck_config_placement.SLOT_OCCUPIED.${trashName}`
-                )}
+                title={t(`deck_config_placement.SLOT_OCCUPIED.${trashName}`)}
                 description={''}
               />
             ) : null}
@@ -90,7 +126,7 @@ const TrashModalComponent = (props: TrashModalProps): JSX.Element => {
         <Flex height="20rem" justifyContent={JUSTIFY_CENTER}>
           <DeckLocationSelect
             deckDef={flexDeck}
-            selectedLocation={{ slotName: field.value }}
+            selectedLocation={{ slotName: slotFromCutout }}
             theme="grey"
           />
         </Flex>
@@ -103,10 +139,10 @@ const TrashModalComponent = (props: TrashModalProps): JSX.Element => {
         gridGap={SPACING.spacing8}
       >
         <OutlineButton onClick={onCloseClick}>
-          {i18n.t('button.cancel')}
+          {t('button:cancel')}
         </OutlineButton>
         <OutlineButton disabled={!isSlotEmpty} type={BUTTON_TYPE_SUBMIT}>
-          {i18n.t('button.save')}
+          {t('button:save')}
         </OutlineButton>
       </Flex>
     </Form>
@@ -122,29 +158,16 @@ export interface TrashModalProps {
 export const TrashModal = (props: TrashModalProps): JSX.Element => {
   const { onCloseClick, trashName, trashBinId } = props
   const dispatch = useDispatch()
+  const { t } = useTranslation('modules')
 
   const onSaveClick = (values: TrashValues): void => {
     if (trashName === 'trashBin' && trashBinId == null) {
-      dispatch(
-        createContainer({
-          labwareDefURI: FLEX_TRASH_DEF_URI,
-          slot: values.selectedSlot,
-        })
-      )
+      dispatch(createDeckFixture('trashBin', values.selectedSlot))
     } else if (trashName === 'trashBin' && trashBinId != null) {
-      dispatch(
-        deleteContainer({
-          labwareId: trashBinId,
-        })
-      )
-      dispatch(
-        createContainer({
-          labwareDefURI: FLEX_TRASH_DEF_URI,
-          slot: values.selectedSlot,
-        })
-      )
+      dispatch(deleteDeckFixture(trashBinId))
+      dispatch(createDeckFixture('trashBin', values.selectedSlot))
     } else if (trashName === 'wasteChute') {
-      dispatch(createDeckFixture('wasteChute', WASTE_CHUTE_SLOT))
+      dispatch(createDeckFixture('wasteChute', WASTE_CHUTE_CUTOUT))
     }
 
     onCloseClick()
@@ -154,13 +177,14 @@ export const TrashModal = (props: TrashModalProps): JSX.Element => {
     <Formik
       onSubmit={onSaveClick}
       initialValues={{
-        selectedSlot: trashName === 'trashBin' ? 'A3' : WASTE_CHUTE_SLOT,
+        selectedSlot:
+          trashName === 'trashBin' ? 'cutoutA3' : WASTE_CHUTE_CUTOUT,
       }}
     >
       <ModalShell width="48rem">
         <Box marginTop={SPACING.spacing32} paddingX={SPACING.spacing32}>
           <Text as="h2">
-            {i18n.t(`modules.additional_equipment_display_names.${trashName}`)}
+            {t(`additional_equipment_display_names.${trashName}`)}
           </Text>
         </Box>
         <TrashModalComponent

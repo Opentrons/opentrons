@@ -55,6 +55,7 @@ interface CheckItemProps extends Omit<CheckLabwareStep, 'section'> {
   handleJog: Jog
   isRobotMoving: boolean
   robotType: RobotType
+  shouldUseMetalProbe: boolean
 }
 export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const {
@@ -73,6 +74,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     existingOffsets,
     setFatalError,
     robotType,
+    shouldUseMetalProbe,
   } = props
   const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
   const isOnDevice = useSelector(getIsOnDevice)
@@ -327,7 +329,18 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         ]
 
   const handleConfirmPosition = (): void => {
-    let confirmPositionCommands: CreateCommand[] = [
+    const heaterShakerPrepCommands: CreateCommand[] =
+      moduleId != null &&
+      moduleType != null &&
+      moduleType === HEATERSHAKER_MODULE_TYPE
+        ? [
+            {
+              commandType: 'heaterShaker/openLabwareLatch',
+              params: { moduleId },
+            },
+          ]
+        : []
+    const confirmPositionCommands: CreateCommand[] = [
       {
         commandType: 'retractAxis' as const,
         params: {
@@ -342,23 +355,10 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         commandType: 'retractAxis' as const,
         params: { axis: 'y' },
       },
+      ...heaterShakerPrepCommands,
       ...moveLabwareOffDeck,
     ]
 
-    if (
-      moduleId != null &&
-      moduleType != null &&
-      moduleType === HEATERSHAKER_MODULE_TYPE
-    ) {
-      confirmPositionCommands = [
-        confirmPositionCommands[0],
-        {
-          commandType: 'heaterShaker/openLabwareLatch',
-          params: { moduleId },
-        },
-        confirmPositionCommands[1],
-      ]
-    }
     chainRunCommands(
       [
         { commandType: 'savePosition', params: { pipetteId } },
@@ -433,9 +433,17 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
               t={t}
               i18nKey={
                 isOnDevice
-                  ? 'ensure_nozzle_is_above_tip_odd'
-                  : 'ensure_nozzle_is_above_tip_desktop'
+                  ? 'ensure_nozzle_position_odd'
+                  : 'ensure_nozzle_position_desktop'
               }
+              values={{
+                tip_type: shouldUseMetalProbe
+                  ? t('calibration_probe')
+                  : t('pipette_nozzle'),
+                item_location: isTiprack
+                  ? t('check_tip_location')
+                  : t('check_well_location'),
+              }}
               components={{ block: <StyledText as="p" />, bold: <strong /> }}
             />
           }
@@ -446,6 +454,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           handleJog={handleJog}
           initialPosition={initialPosition}
           existingOffset={existingOffset}
+          shouldUseMetalProbe={shouldUseMetalProbe}
         />
       ) : (
         <PrepareSpace
@@ -456,11 +465,15 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           })}
           body={
             <UnorderedList
-              items={[t('clear_all_slots'), placeItemInstruction]}
+              items={[
+                isOnDevice ? t('clear_all_slots_odd') : t('clear_all_slots'),
+                placeItemInstruction,
+              ]}
             />
           }
           labwareDef={labwareDef}
           confirmPlacement={handleConfirmPlacement}
+          robotType={robotType}
         />
       )}
     </Flex>

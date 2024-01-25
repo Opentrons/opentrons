@@ -30,9 +30,11 @@ Pause Until Resumed
 
 Call the :py:meth:`.ProtocolContext.pause` method to stop a protocol at a specific step. Unlike a delay, :py:meth:`~.ProtocolContext.pause` does not restart your protocol automatically. To resume, you'll respond to a prompt on the touchscreen or in the Opentrons App. This method also lets you specify an optional message that provides on-screen or in-app instructions on how to proceed. This example inserts a pause and includes a brief message::
 
-    protocol.pause('Remember to get more pipette tips')
+    protocol.pause("Remember to get more pipette tips")
 
 .. versionadded:: 2.0
+
+.. _utility-homing:
 
 Homing
 ======
@@ -45,12 +47,12 @@ To home the gantry, call :py:meth:`.ProtocolContext.home`::
 
 To home a specific pipette's Z axis and plunger, call :py:meth:`.InstrumentContext.home`::
 
-    pipette = protocol.load_instrument('flex_1channel_1000', 'right')
+    pipette = protocol.load_instrument("flex_1channel_1000", "right")
     pipette.home()
 
 To home a specific pipette's plunger only, you can call :py:meth:`.InstrumentContext.home_plunger`::
 
-    pipette = protocol.load_instrument('flex_1channel_1000', 'right')
+    pipette = protocol.load_instrument("flex_1channel_1000", "right")
     pipette.home_plunger()
 
 .. versionadded:: 2.0
@@ -60,7 +62,7 @@ Comment
 
 Call the :py:meth:`.ProtocolContext.comment` method if you want to write and display a brief message in the Opentrons App during a protocol run::
 
-    protocol.comment('Hello, world!')
+    protocol.comment("Hello, world!")
 
 .. versionadded:: 2.0
 

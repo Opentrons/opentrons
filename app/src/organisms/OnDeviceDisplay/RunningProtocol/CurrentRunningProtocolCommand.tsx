@@ -30,6 +30,7 @@ import {
 
 import type {
   CompletedProtocolAnalysis,
+  RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { RunStatus } from '@opentrons/api-client'
@@ -54,7 +55,7 @@ to {
 `
 
 const TITLE_TEXT_STYLE = css`
-  color: ${COLORS.darkBlack70};
+  color: ${COLORS.grey60};
   font-size: 1.75rem;
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   line-height: 2.25rem;
@@ -70,7 +71,7 @@ const RUN_TIMER_STYLE = css`
   font-size: 2rem;
   font-weight: ${TYPOGRAPHY.fontWeightBold};
   line-height: 2.625rem;
-  color: ${COLORS.darkBlackEnabled};
+  color: ${COLORS.black90};
 `
 
 const COMMAND_ROW_STYLE_ANIMATED = css`
@@ -111,6 +112,7 @@ interface RunTimerInfo {
 interface CurrentRunningProtocolCommandProps {
   runStatus: RunStatus | null
   robotSideAnalysis: CompletedProtocolAnalysis | null
+  robotType: RobotType
   runTimerInfo: RunTimerInfo
   playRun: () => void
   pauseRun: () => void
@@ -132,6 +134,7 @@ export function CurrentRunningProtocolCommand({
   setShowConfirmCancelRunModal,
   trackProtocolRunEvent,
   robotAnalyticsData,
+  robotType,
   protocolName,
   currentRunCommandIndex,
   lastAnimatedCommand,
@@ -222,7 +225,7 @@ export function CurrentRunningProtocolCommand({
       </Flex>
       <Flex
         padding={`${SPACING.spacing12} ${SPACING.spacing24}`}
-        backgroundColor={COLORS.mediumBlueEnabled}
+        backgroundColor={COLORS.blue35}
         borderRadius={BORDERS.borderRadiusSize2}
         justifyContent={JUSTIFY_CENTER}
         css={shouldAnimate ? COMMAND_ROW_STYLE_ANIMATED : COMMAND_ROW_STYLE}
@@ -231,6 +234,8 @@ export function CurrentRunningProtocolCommand({
           <CommandText
             command={currentCommand}
             robotSideAnalysis={robotSideAnalysis}
+            robotType={robotType}
+            isOnDevice={true}
           />
         ) : null}
       </Flex>

@@ -1,28 +1,27 @@
-import * as React from 'react'
 import { UseQueryResult } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
+import omitBy from 'lodash/omitBy'
 
 import {
   useProtocolQuery,
+  useProtocolAnalysisAsDocumentQuery,
   useInstrumentsQuery,
   useModulesQuery,
-  useProtocolAnalysisAsDocumentQuery,
   useDeckConfigurationQuery,
 } from '@opentrons/react-api-client'
 import {
   CompletedProtocolAnalysis,
+  DeckConfiguration,
+  FLEX_SIMPLEST_DECK_CONFIG,
   LabwareDefinition2,
-  WASTE_CHUTE_LOAD_NAME,
-  WASTE_CHUTE_SLOT,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
-import { useFeatureFlag } from '../../../../redux/config'
-import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import { useRequiredProtocolLabware, useMissingProtocolHardware } from '..'
+import { useMissingProtocolHardware, useRequiredProtocolLabware } from '..'
 
 import type { Protocol } from '@opentrons/api-client'
-import type { DeckConfiguration } from '@opentrons/shared-data'
+import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../organisms/Devices/hooks')
@@ -33,20 +32,17 @@ const PROTOCOL_ID = 'fake_protocol_id'
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
 >
-const mockUseProtocolAnalysisAsDocumentQuery = useProtocolAnalysisAsDocumentQuery as jest.MockedFunction<
-  typeof useProtocolAnalysisAsDocumentQuery
+const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
+  typeof useInstrumentsQuery
 >
 const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
   typeof useModulesQuery
 >
-const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
-  typeof useInstrumentsQuery
->
 const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
   typeof useDeckConfigurationQuery
 >
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
+const mockUseProtocolAnalysisAsDocumentQuery = useProtocolAnalysisAsDocumentQuery as jest.MockedFunction<
+  typeof useProtocolAnalysisAsDocumentQuery
 >
 const mockLabwareDef = fixture_tiprack_300_ul as LabwareDefinition2
 const PROTOCOL_ANALYSIS = {
@@ -65,10 +61,27 @@ const PROTOCOL_ANALYSIS = {
   commands: [
     {
       key: 'CommandKey0',
+      commandType: 'loadModule',
+      params: {
+        model: 'heaterShakerModuleV1',
+        location: { slotName: 'D3' },
+      },
+      result: {
+        moduleId: 'modId',
+      },
+      id: 'CommandId0',
+      status: 'succeeded',
+      error: null,
+      createdAt: 'fakeCreatedAtTimestamp',
+      startedAt: 'fakeStartedAtTimestamp',
+      completedAt: 'fakeCompletedAtTimestamp',
+    },
+    {
+      key: 'CommandKey1',
       commandType: 'loadLabware',
       params: {
         labwareId: 'firstLabwareId',
-        location: { slotName: 'D3' },
+        location: { moduleId: 'modId' },
         displayName: 'first labware nickname',
       },
       result: {
@@ -76,7 +89,7 @@ const PROTOCOL_ANALYSIS = {
         definition: mockLabwareDef,
         offset: { x: 0, y: 0, z: 0 },
       },
-      id: 'CommandId0',
+      id: 'CommandId1',
       status: 'succeeded',
       error: null,
       createdAt: 'fakeCreatedAtTimestamp',
@@ -160,7 +173,7 @@ describe('useRequiredProtocolLabware', () => {
 })
 
 describe('useMissingProtocolHardware', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     mockUseInstrumentsQuery.mockReturnValue({
       data: { data: [] },
@@ -181,7 +194,6 @@ describe('useMissingProtocolHardware', () => {
     mockUseDeckConfigurationQuery.mockReturnValue({
       data: [{}],
     } as UseQueryResult<DeckConfiguration>)
-    mockUseFeatureFlag.mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -216,9 +228,8 @@ describe('useMissingProtocolHardware', () => {
     mockUseDeckConfigurationQuery.mockReturnValue(({
       data: [
         {
-          fixtureId: 'mockFixtureId',
-          fixtureLocation: WASTE_CHUTE_SLOT,
-          loadName: WASTE_CHUTE_LOAD_NAME,
+          cutoutId: 'cutoutD3',
+          cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
         },
       ],
     } as any) as UseQueryResult<DeckConfiguration>)
@@ -241,6 +252,14 @@ describe('useMissingProtocolHardware', () => {
           moduleModel: 'heaterShakerModuleV1',
           slot: 'D3',
           connected: false,
+          hasSlotConflict: true,
+        },
+        {
+          hardwareType: 'fixture',
+          cutoutFixtureId: 'singleRightSlot',
+          location: {
+            cutout: 'cutoutD3',
+          },
           hasSlotConflict: true,
         },
       ],
@@ -274,6 +293,59 @@ describe('useMissingProtocolHardware', () => {
       missingProtocolHardware: [],
       isLoading: false,
       conflictedSlots: [],
+    })
+  })
+  it('should return conflicting slot when module location is configured with something other than single slot fixture', () => {
+    mockUseInstrumentsQuery.mockReturnValue({
+      data: {
+        data: [
+          {
+            mount: 'left',
+            instrumentType: 'pipette',
+            instrumentName: 'p1000_multi_flex',
+            ok: true,
+          },
+        ],
+      },
+      isLoading: false,
+    } as any)
+
+    mockUseModulesQuery.mockReturnValue({
+      data: { data: [mockHeaterShaker] },
+      isLoading: false,
+    } as any)
+
+    mockUseDeckConfigurationQuery.mockReturnValue({
+      data: [
+        omitBy(
+          FLEX_SIMPLEST_DECK_CONFIG,
+          ({ cutoutId }) => cutoutId === 'cutoutD3'
+        ),
+        {
+          cutoutId: 'cutoutD3',
+          cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+        },
+      ],
+      isLoading: false,
+    } as any)
+
+    const { result } = renderHook(
+      () => useMissingProtocolHardware(PROTOCOL_ANALYSIS.id),
+      { wrapper }
+    )
+    expect(result.current).toEqual({
+      missingProtocolHardware: [
+        {
+          hardwareType: 'fixture',
+          cutoutFixtureId: 'singleRightSlot',
+          location: {
+            cutout: 'cutoutD3',
+          },
+          hasSlotConflict: true,
+        },
+      ],
+      isLoading: false,
+      conflictedSlots: ['D3'],
     })
   })
 })

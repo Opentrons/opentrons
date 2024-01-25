@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -20,6 +20,10 @@ from opentrons_shared_data.errors.exceptions import (
     UnexpectedTipRemovalError,
     UnexpectedTipAttachError,
 )
+
+from ..._trash_bin import TrashBin
+from ..._waste_chute import WasteChute
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
 
 from ..instrument import AbstractInstrument
 
@@ -104,7 +108,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
                         "cause over aspiration if the previous command is a "
                         "blow_out."
                     )
-                self.prepare_for_aspirate()
+                self.prepare_to_aspirate()
             self.move_to(location=location, well_core=well_core)
         elif location != self._protocol_interface.get_last_location():
             self.move_to(location=location, well_core=well_core)
@@ -119,7 +123,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
 
     def dispense(
         self,
-        location: types.Location,
+        location: Union[types.Location, TrashBin, WasteChute],
         well_core: Optional[LegacyWellCore],
         volume: float,
         rate: float,
@@ -127,6 +131,10 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         in_place: bool,
         push_out: Optional[float],
     ) -> None:
+        if isinstance(location, (TrashBin, WasteChute)):
+            raise APIVersionError(
+                "Dispense in Moveable Trash or Waste Chute are not supported in this API Version."
+            )
         if not in_place:
             self.move_to(location=location, well_core=well_core)
         self._raise_if_no_tip(HardwareAction.DISPENSE.name)
@@ -134,10 +142,14 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
 
     def blow_out(
         self,
-        location: types.Location,
+        location: Union[types.Location, TrashBin, WasteChute],
         well_core: Optional[LegacyWellCore],
         in_place: bool,
     ) -> None:
+        if isinstance(location, (TrashBin, WasteChute)):
+            raise APIVersionError(
+                "Blow Out in Moveable Trash or Waste Chute are not supported in this API Version."
+            )
         if not in_place:
             self.move_to(location=location, well_core=well_core)
         self._raise_if_no_tip(HardwareAction.BLOWOUT.name)
@@ -250,6 +262,13 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
                     f"Could not return tip to {labware_core.get_display_name()}"
                 )
 
+    def drop_tip_in_disposal_location(
+        self, disposal_location: Union[TrashBin, WasteChute], home_after: Optional[bool]
+    ) -> None:
+        raise APIVersionError(
+            "Dropping tips in a trash bin or waste chute is not supported in this API Version."
+        )
+
     def home(self) -> None:
         self._protocol_interface.set_last_location(None)
 
@@ -258,13 +277,18 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
 
     def move_to(
         self,
-        location: types.Location,
+        location: Union[types.Location, TrashBin, WasteChute],
         well_core: Optional[LegacyWellCore] = None,
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
         speed: Optional[float] = None,
     ) -> None:
         """Simulation of only the motion planning portion of move_to."""
+        if isinstance(location, (TrashBin, WasteChute)):
+            raise APIVersionError(
+                "Move To Trash Bin and Waste Chute are not supported in this API Version."
+            )
+
         self.flag_unsafe_move(location)
 
         last_location = self._protocol_interface.get_last_location()
@@ -327,7 +351,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
     def is_ready_to_aspirate(self) -> bool:
         return self._pipette_dict["ready_to_aspirate"]
 
-    def prepare_for_aspirate(self) -> None:
+    def prepare_to_aspirate(self) -> None:
         self._raise_if_no_tip(HardwareAction.PREPARE_ASPIRATE.name)
 
     def get_return_height(self) -> float:
@@ -428,3 +452,20 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
     def configure_for_volume(self, volume: float) -> None:
         """This will never be called because it was added in API 2.15."""
         pass
+
+    def configure_nozzle_layout(
+        self,
+        style: NozzleLayout,
+        primary_nozzle: Optional[str],
+        front_right_nozzle: Optional[str],
+    ) -> None:
+        """This will never be called because it was added in API 2.15."""
+        pass
+
+    def get_active_channels(self) -> int:
+        """This will never be called because it was added in API 2.16."""
+        assert False, "get_active_channels only supported in API 2.16 & later"
+
+    def is_tip_tracking_available(self) -> bool:
+        # Tip tracking is always available in legacy context
+        return True

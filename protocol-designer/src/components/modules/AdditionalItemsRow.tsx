@@ -1,6 +1,10 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
-import { WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
+import {
+  getCutoutDisplayName,
+  WASTE_CHUTE_CUTOUT,
+} from '@opentrons/shared-data'
 import {
   OutlineButton,
   Flex,
@@ -14,14 +18,16 @@ import {
   TYPOGRAPHY,
   DIRECTION_ROW,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
 import gripperImage from '../../images/flex_gripper.png'
 import wasteChuteImage from '../../images/waste_chute.png'
+import trashBinImage from '../../images/flex_trash_bin.png'
 import { Portal } from '../portals/TopPortal'
 import { TrashModal } from './TrashModal'
 import { FlexSlotMap } from './FlexSlotMap'
 
 import styles from './styles.css'
+
+import type { CutoutId } from '@opentrons/shared-data'
 
 interface AdditionalItemsRowProps {
   handleAttachment: () => void
@@ -43,6 +49,7 @@ export function AdditionalItemsRow(
     trashBinId,
     hasWasteChute,
   } = props
+  const { t } = useTranslation(['modules', 'shared', 'tooltip'])
   const [targetProps, tooltipProps] = useHoverTooltip()
   const [trashModal, openTrashModal] = React.useState<boolean>(false)
   const addTrash = name !== 'gripper' && !isEquipmentAdded
@@ -53,6 +60,8 @@ export function AdditionalItemsRow(
   let imageSrc: string = gripperImage
   if (name === 'wasteChute') {
     imageSrc = wasteChuteImage
+  } else if (name === 'trashBin') {
+    imageSrc = trashBinImage
   }
 
   return (
@@ -68,13 +77,13 @@ export function AdditionalItemsRow(
       ) : null}
       <Flex flexDirection={DIRECTION_COLUMN}>
         <h4 className={styles.row_title}>
-          {i18n.t(`modules.additional_equipment_display_names.${name}`)}
+          {t(`additional_equipment_display_names.${name}`)}
         </h4>
 
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <AdditionalItemImage
             src={imageSrc}
-            alt={i18n.t(`modules.additional_equipment_display_names.${name}`)}
+            alt={t(`additional_equipment_display_names.${name}`)}
           />
 
           <div
@@ -84,7 +93,7 @@ export function AdditionalItemsRow(
             {isEquipmentAdded && name === 'gripper' ? (
               <LabeledValue
                 label="Model"
-                value={i18n.t(`modules.model_display_name.gripperV1`)}
+                value={t(`model_display_name.gripperV1`)}
               />
             ) : null}
           </div>
@@ -94,9 +103,11 @@ export function AdditionalItemsRow(
               <div className={styles.module_col}>
                 <LabeledValue
                   label="Position"
-                  value={`Slot ${
-                    name === 'trashBin' ? trashBinSlot : WASTE_CHUTE_SLOT
-                  }`}
+                  value={`${getCutoutDisplayName(
+                    (name === 'trashBin'
+                      ? trashBinSlot ?? ''
+                      : WASTE_CHUTE_CUTOUT) as CutoutId
+                  )}`}
                 />
               </div>
               <div className={styles.slot_map}>
@@ -104,7 +115,7 @@ export function AdditionalItemsRow(
                   selectedSlots={
                     name === 'trashBin'
                       ? [trashBinSlot ?? '']
-                      : [WASTE_CHUTE_SLOT]
+                      : [WASTE_CHUTE_CUTOUT]
                   }
                 />
               </div>
@@ -121,7 +132,7 @@ export function AdditionalItemsRow(
                 onClick={() => openTrashModal(true)}
                 className={styles.module_button}
               >
-                {i18n.t('shared.edit')}
+                {t('shared:edit')}
               </OutlineButton>
             ) : null}
             <Box
@@ -137,9 +148,7 @@ export function AdditionalItemsRow(
                   addTrash ? () => openTrashModal(true) : handleAttachment
                 }
               >
-                {isEquipmentAdded
-                  ? i18n.t('shared.remove')
-                  : i18n.t('shared.add')}
+                {isEquipmentAdded ? t('shared:remove') : t('shared:add')}
               </OutlineButton>
             </Box>
             {disabledRemoveButton ? (
@@ -148,7 +157,7 @@ export function AdditionalItemsRow(
                 width="10rem"
                 textAlign={TYPOGRAPHY.textAlignCenter}
               >
-                {i18n.t(`tooltip.disabled_cannot_delete_trash`)}
+                {t(`tooltip:disabled_cannot_delete_trash`)}
               </Tooltip>
             ) : null}
           </Box>

@@ -1,6 +1,7 @@
 import * as React from 'react'
-import i18n from 'i18next'
+import { fireEvent, screen } from '@testing-library/react'
 import { DeckConfigurator, renderWithProviders } from '@opentrons/components'
+import { i18n } from '../../../localization'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { getSlotIsEmpty } from '../../../step-forms'
 import { StagingAreasModal } from '../StagingAreasModal'
@@ -42,10 +43,10 @@ describe('StagingAreasModal', () => {
     mockDeckConfigurator.mockReturnValue(<div>mock deck config</div>)
   })
   it('renders the deck, header, and buttons work as expected', () => {
-    const { getByText, getByRole } = render(props)
-    getByText('mock deck config')
-    getByText('Staging Areas')
-    getByRole('button', { name: 'cancel' }).click()
+    render(props)
+    screen.getByText('mock deck config')
+    screen.getByText('Staging Area Slots')
+    fireEvent.click(screen.getByRole('button', { name: 'cancel' }))
     expect(props.onCloseClick).toHaveBeenCalled()
   })
 })

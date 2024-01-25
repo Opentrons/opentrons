@@ -10,17 +10,10 @@ import {
   parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
   parseInitialLoadedLabwareByAdapter,
-  parseInitialLoadedFixturesByCutout,
 } from '../utils'
 import { simpleAnalysisFileFixture } from '../__fixtures__'
 
-import {
-  LoadFixtureRunTimeCommand,
-  RunTimeCommand,
-  STAGING_AREA_LOAD_NAME,
-  STANDARD_SLOT_LOAD_NAME,
-  WASTE_CHUTE_LOAD_NAME,
-} from '@opentrons/shared-data'
+import { RunTimeCommand } from '@opentrons/shared-data'
 
 const mockRunTimeCommands: RunTimeCommand[] = simpleAnalysisFileFixture.commands as any
 const mockLoadLiquidRunTimeCommands = [
@@ -268,7 +261,7 @@ describe('parseInitialLoadedLabwareByAdapter', () => {
   })
 })
 describe('parseInitialLoadedLabwareBySlot', () => {
-  it('returns only labware loaded in slots', () => {
+  it('returns labware loaded in slots', () => {
     const expected = {
       2: mockRunTimeCommands.find(
         c =>
@@ -288,6 +281,48 @@ describe('parseInitialLoadedLabwareBySlot', () => {
     expect(parseInitialLoadedLabwareBySlot(mockRunTimeCommands)).toEqual(
       expected
     )
+  })
+  it('returns labware loaded in addressable areas', () => {
+    const mockAddressableAreaLoadedLabwareCommand = ([
+      {
+        id: 'commands.LOAD_LABWARE-3',
+        createdAt: '2022-04-01T15:46:01.745870+00:00',
+        commandType: 'loadLabware',
+        key: 'commands.LOAD_LABWARE-3',
+        status: 'succeeded',
+        params: {
+          location: {
+            addressableAreaName: 'D4',
+          },
+          loadName: 'nest_96_wellplate_100ul_pcr_full_skirt',
+          namespace: 'opentrons',
+          version: 1,
+          labwareId: null,
+          displayName: 'NEST 96 Well Plate 100 µL PCR Full Skirt',
+        },
+        result: {
+          labwareId: 'labware-3',
+          definition: {},
+          offsetId: null,
+        },
+        error: null,
+        startedAt: '2022-04-01T15:46:01.745870+00:00',
+        completedAt: '2022-04-01T15:46:01.745870+00:00',
+      },
+    ] as any) as RunTimeCommand[]
+
+    const expected = {
+      D4: mockAddressableAreaLoadedLabwareCommand.find(
+        c =>
+          c.commandType === 'loadLabware' &&
+          typeof c.params.location === 'object' &&
+          'addressableAreaName' in c.params?.location &&
+          c.params?.location?.addressableAreaName === 'D4'
+      ),
+    }
+    expect(
+      parseInitialLoadedLabwareBySlot(mockAddressableAreaLoadedLabwareCommand)
+    ).toEqual(expected)
   })
 })
 describe('parseInitialLoadedLabwareByModuleId', () => {
@@ -362,53 +397,6 @@ describe('parseInitialLoadedModulesBySlot', () => {
       ),
     }
     expect(parseInitialLoadedModulesBySlot(mockRunTimeCommands)).toEqual(
-      expected
-    )
-  })
-})
-describe('parseInitialLoadedFixturesByCutout', () => {
-  it('returns fixtures loaded in cutouts', () => {
-    const loadFixtureCommands: LoadFixtureRunTimeCommand[] = [
-      {
-        id: 'fakeId1',
-        commandType: 'loadFixture',
-        params: {
-          loadName: STAGING_AREA_LOAD_NAME,
-          location: { cutout: 'B3' },
-        },
-        createdAt: 'fake_timestamp',
-        startedAt: 'fake_timestamp',
-        completedAt: 'fake_timestamp',
-        status: 'succeeded',
-      },
-      {
-        id: 'fakeId2',
-        commandType: 'loadFixture',
-        params: { loadName: WASTE_CHUTE_LOAD_NAME, location: { cutout: 'D3' } },
-        createdAt: 'fake_timestamp',
-        startedAt: 'fake_timestamp',
-        completedAt: 'fake_timestamp',
-        status: 'succeeded',
-      },
-      {
-        id: 'fakeId3',
-        commandType: 'loadFixture',
-        params: {
-          loadName: STANDARD_SLOT_LOAD_NAME,
-          location: { cutout: 'C3' },
-        },
-        createdAt: 'fake_timestamp',
-        startedAt: 'fake_timestamp',
-        completedAt: 'fake_timestamp',
-        status: 'succeeded',
-      },
-    ]
-    const expected = {
-      B3: loadFixtureCommands[0],
-      D3: loadFixtureCommands[1],
-      C3: loadFixtureCommands[2],
-    }
-    expect(parseInitialLoadedFixturesByCutout(loadFixtureCommands)).toEqual(
       expected
     )
   })

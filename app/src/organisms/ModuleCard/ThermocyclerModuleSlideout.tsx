@@ -25,7 +25,7 @@ import type { ThermocyclerModule } from '../../redux/modules/types'
 import type {
   TCSetTargetBlockTemperatureCreateCommand,
   TCSetTargetLidTemperatureCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
+} from '@opentrons/shared-data'
 
 interface ThermocyclerModuleSlideoutProps {
   module: ThermocyclerModule
@@ -130,7 +130,7 @@ export const ThermocyclerModuleSlideout = (
         <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey50}
           paddingBottom={SPACING.spacing8}
         >
           {t(isSecondaryTemp ? 'set_lid_temperature' : 'set_block_temperature')}

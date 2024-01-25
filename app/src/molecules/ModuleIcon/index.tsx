@@ -14,7 +14,7 @@ import type { AttachedModule } from '../../redux/modules/types'
 
 const MODULE_ICON_STYLE = css`
   &:hover {
-    color: ${COLORS.darkBlackEnabled};
+    color: ${COLORS.black90};
   }
 `
 interface ModuleIconProps {
@@ -33,7 +33,7 @@ export function ModuleIcon(props: ModuleIconProps): JSX.Element {
           moduleType={module.moduleType}
           size={SPACING.spacing16}
           marginX={SPACING.spacing2}
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey50}
           css={MODULE_ICON_STYLE}
         />
       </Flex>

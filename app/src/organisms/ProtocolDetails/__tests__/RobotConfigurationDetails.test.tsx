@@ -3,7 +3,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { OT2_STANDARD_MODEL, FLEX_STANDARD_MODEL } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { RobotConfigurationDetails } from '../RobotConfigurationDetails'
-import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data'
 
 const mockRequiredModuleDetails = [
   {
@@ -83,7 +83,7 @@ describe('RobotConfigurationDetails', () => {
     getByText('OT-2')
   })
 
-  it('renders a robot section showing the intended robot model for an OT-3 protocol', () => {
+  it('renders a robot section showing the intended robot model for a Flex protocol', () => {
     props = {
       leftMountPipetteName: 'p10_single',
       rightMountPipetteName: null,

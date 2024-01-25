@@ -21,7 +21,7 @@ export function NoProtocols(): JSX.Element {
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={COLORS.darkBlack20}
+      backgroundColor={COLORS.grey35}
       flexDirection={DIRECTION_COLUMN}
       height="27.25rem"
       justifyContent={JUSTIFY_CENTER}
@@ -41,7 +41,7 @@ export function NoProtocols(): JSX.Element {
       >
         {t('nothing_here_yet')}
       </StyledText>
-      <StyledText as="h4" color={COLORS.darkBlack70}>
+      <StyledText as="h4" color={COLORS.grey60}>
         {t('send_a_protocol_to_store')}
       </StyledText>
     </Flex>

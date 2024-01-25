@@ -5,7 +5,7 @@ import {
 } from '../../../../steplist/formLevel'
 import { getFieldErrors } from '../../../../steplist/fieldLevel'
 import * as stepEditFormUtils from '../../utils'
-import { FormData } from '../../../../form-types'
+import { HydratedFormdata } from '../../../../form-types'
 jest.mock('../../../../steplist/formLevel')
 jest.mock('../../../../steplist/fieldLevel')
 
@@ -59,7 +59,7 @@ describe('makeSingleEditFieldProps', () => {
     }
 
     getDisabledFieldsMock.mockImplementation(
-      (form: FormData): Set<string> => {
+      (form: HydratedFormdata): Set<string> => {
         expect(form).toBe(formData)
         const disabled = new Set<string>()
         disabled.add('disabled_field')
@@ -101,7 +101,9 @@ describe('makeSingleEditFieldProps', () => {
     const result = makeSingleEditFieldProps(
       focusHandlers,
       formData,
-      handleChangeFormInput
+      handleChangeFormInput,
+      formData,
+      []
     )
     expect(result).toEqual({
       some_field: {

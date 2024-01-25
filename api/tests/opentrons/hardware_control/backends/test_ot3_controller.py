@@ -49,8 +49,6 @@ from opentrons.hardware_control.types import (
     SubSystemState,
     UpdateStatus,
     UpdateState,
-    TipStateType,
-    FailedTipStateCheck,
     EstopState,
     CurrentConfig,
 )
@@ -79,7 +77,7 @@ from opentrons_hardware.hardware_control.tools.types import (
     GripperInformation,
 )
 
-from opentrons.hardware_control.estop_state import EstopStateMachine
+from opentrons.hardware_control.backends.estop_state import EstopStateMachine
 
 from opentrons_shared_data.errors.exceptions import (
     EStopActivatedError,
@@ -1075,30 +1073,6 @@ async def test_monitor_pressure(
 
 
 @pytest.mark.parametrize(
-    "tip_state_type, mocked_ejector_response, expectation",
-    [
-        [TipStateType.PRESENT, {0: 1, 1: 1}, does_not_raise()],
-        [TipStateType.ABSENT, {0: 0, 1: 0}, does_not_raise()],
-        [TipStateType.PRESENT, {0: 0, 1: 0}, pytest.raises(FailedTipStateCheck)],
-        [TipStateType.ABSENT, {0: 1, 1: 1}, pytest.raises(FailedTipStateCheck)],
-    ],
-)
-async def test_get_tip_present(
-    controller: OT3Controller,
-    tip_state_type: TipStateType,
-    mocked_ejector_response: Dict[int, int],
-    expectation: ContextManager[None],
-) -> None:
-    mount = OT3Mount.LEFT
-    with mock.patch(
-        "opentrons.hardware_control.backends.ot3controller.get_tip_ejector_state",
-        return_value=mocked_ejector_response,
-    ):
-        with expectation:
-            await controller.check_for_tip_presence(mount, tip_state_type)
-
-
-@pytest.mark.parametrize(
     "estop_state, expectation",
     [
         [EstopState.DISENGAGED, does_not_raise()],
@@ -1163,3 +1137,75 @@ async def test_motor_current(
                             mock.call({Axis.X: 0.0}),
                         ],
                     )
+
+
+@pytest.mark.parametrize(
+    ["axes", "expected_tip_nodes", "expected_normal_nodes"],
+    [
+        [
+            [Axis.X, Axis.Z_L, Axis.Q],
+            {NodeId.pipette_left},
+            {NodeId.gantry_x, NodeId.head_l},
+        ],
+        [[Axis.X, Axis.Z_L], {}, {NodeId.gantry_x, NodeId.head_l}],
+        [[Axis.Q], {NodeId.pipette_left}, {}],
+        [
+            [Axis.X, Axis.Z_L, Axis.P_L, Axis.Q],
+            {NodeId.pipette_left},
+            {NodeId.gantry_x, NodeId.head_l, NodeId.pipette_left},
+        ],
+    ],
+)
+async def test_engage_motors(
+    controller: OT3Controller,
+    axes: List[Axis],
+    expected_tip_nodes: Set[NodeId],
+    expected_normal_nodes: Set[NodeId],
+) -> None:
+    """Test that engaging/disengaging motors works."""
+
+    with mock.patch(
+        "opentrons.hardware_control.backends.ot3controller.set_enable_motor",
+        autospec=True,
+    ) as set_normal_axes:
+        with mock.patch(
+            "opentrons.hardware_control.backends.ot3controller.set_enable_tip_motor",
+            autospec=True,
+        ) as set_tip_axes:
+            await controller.engage_axes(axes=axes)
+
+            if len(expected_normal_nodes) > 0:
+                set_normal_axes.assert_awaited_with(
+                    controller._messenger, expected_normal_nodes
+                )
+            else:
+                set_normal_axes.assert_not_awaited()
+            if len(expected_tip_nodes) > 0:
+                set_tip_axes.assert_awaited_with(
+                    controller._messenger, expected_tip_nodes
+                )
+            else:
+                set_tip_axes.assert_not_awaited()
+
+    with mock.patch(
+        "opentrons.hardware_control.backends.ot3controller.set_disable_motor",
+        autospec=True,
+    ) as set_normal_axes:
+        with mock.patch(
+            "opentrons.hardware_control.backends.ot3controller.set_disable_tip_motor",
+            autospec=True,
+        ) as set_tip_axes:
+            await controller.disengage_axes(axes=axes)
+
+            if len(expected_normal_nodes) > 0:
+                set_normal_axes.assert_awaited_with(
+                    controller._messenger, expected_normal_nodes
+                )
+            else:
+                set_normal_axes.assert_not_awaited()
+            if len(expected_tip_nodes) > 0:
+                set_tip_axes.assert_awaited_with(
+                    controller._messenger, expected_tip_nodes
+                )
+            else:
+                set_tip_axes.assert_not_awaited()

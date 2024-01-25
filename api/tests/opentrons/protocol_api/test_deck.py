@@ -1,11 +1,11 @@
 """Tests for opentrons.legacy.Deck."""
 import inspect
-from typing import cast
+from typing import cast, Dict
 
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
 
 from opentrons.motion_planning import adjacent_slots_getters as mock_adjacent_slots
 from opentrons.protocols.api_support.types import APIVersion
@@ -23,17 +23,21 @@ from opentrons.types import DeckSlotName, Point
 
 
 @pytest.fixture
-def deck_definition() -> DeckDefinitionV3:
+def deck_definition() -> DeckDefinitionV4:
     """Get a deck definition value object."""
     return cast(
-        DeckDefinitionV3, {"locations": {"orderedSlots": [], "calibrationPoints": []}}
+        DeckDefinitionV4,
+        {
+            "locations": {"addressableAreas": [], "calibrationPoints": []},
+            "cutoutFixtures": {},
+        },
     )
 
 
 @pytest.fixture
 def api_version() -> APIVersion:
     """Get a dummy `APIVersion` with which to configure the subject."""
-    return APIVersion(123, 456)
+    return APIVersion(1, 234)
 
 
 @pytest.fixture(autouse=True)
@@ -63,15 +67,35 @@ def mock_core_map(decoy: Decoy) -> LoadedCoreMap:
 
 
 @pytest.fixture
+def slot_definitions_by_name() -> Dict[str, SlotDefV3]:
+    """Get a dictionary of slot names to slot definitions."""
+    return {"1": {}}
+
+
+@pytest.fixture
+def staging_slot_definitions_by_name() -> Dict[str, SlotDefV3]:
+    """Get a dictionary of staging slot names to slot definitions."""
+    return {"2": {}}
+
+
+@pytest.fixture
 def subject(
     decoy: Decoy,
-    deck_definition: DeckDefinitionV3,
+    deck_definition: DeckDefinitionV4,
     mock_protocol_core: ProtocolCore,
     mock_core_map: LoadedCoreMap,
     api_version: APIVersion,
+    slot_definitions_by_name: Dict[str, SlotDefV3],
+    staging_slot_definitions_by_name: Dict[str, SlotDefV3],
 ) -> Deck:
     """Get a Deck test subject with its dependencies mocked out."""
     decoy.when(mock_protocol_core.get_deck_definition()).then_return(deck_definition)
+    decoy.when(mock_protocol_core.get_slot_definitions()).then_return(
+        slot_definitions_by_name
+    )
+    decoy.when(mock_protocol_core.get_staging_slot_definitions()).then_return(
+        staging_slot_definitions_by_name
+    )
 
     return Deck(
         protocol_core=mock_protocol_core,
@@ -225,18 +249,16 @@ def test_delitem_raises_if_slot_has_module(
 
 
 @pytest.mark.parametrize(
-    "deck_definition",
-    [
-        {
-            "locations": {
-                "orderedSlots": [
-                    {"id": "1"},
-                    {"id": "2"},
-                    {"id": "3"},
-                ],
-                "calibrationPoints": [],
-            }
-        },
+    argnames=["slot_definitions_by_name", "staging_slot_definitions_by_name"],
+    argvalues=[
+        (
+            {
+                "1": {},
+                "2": {},
+                "3": {},
+            },
+            {"4": {}},
+        )
     ],
 )
 def test_slot_keys_iter(subject: Deck) -> None:
@@ -248,18 +270,39 @@ def test_slot_keys_iter(subject: Deck) -> None:
 
 
 @pytest.mark.parametrize(
-    "deck_definition",
+    argnames=[
+        "slot_definitions_by_name",
+        "staging_slot_definitions_by_name",
+        "api_version",
+    ],
+    argvalues=[
+        (
+            {
+                "1": {},
+                "2": {},
+                "3": {},
+            },
+            {"4": {}},
+            APIVersion(2, 16),
+        )
+    ],
+)
+def test_slot_keys_iter_with_staging_slots(subject: Deck) -> None:
+    """It should provide an iterable interface to deck slots."""
+    result = list(subject)
+
+    assert len(subject) == 4
+    assert result == ["1", "2", "3", "4"]
+
+
+@pytest.mark.parametrize(
+    "slot_definitions_by_name",
     [
         {
-            "locations": {
-                "orderedSlots": [
-                    {"id": "fee"},
-                    {"id": "foe"},
-                    {"id": "fum"},
-                ],
-                "calibrationPoints": [],
-            }
-        },
+            "1": {"id": "fee"},
+            "2": {"id": "foe"},
+            "3": {"id": "fum"},
+        }
     ],
 )
 def test_slots_property(subject: Deck) -> None:
@@ -272,16 +315,14 @@ def test_slots_property(subject: Deck) -> None:
 
 
 @pytest.mark.parametrize(
-    "deck_definition",
+    "slot_definitions_by_name",
     [
         {
-            "locations": {
-                "orderedSlots": [
-                    {"id": DeckSlotName.SLOT_2.id, "displayName": "foobar"},
-                ],
-                "calibrationPoints": [],
+            "2": {
+                "id": DeckSlotName.SLOT_2.id,
+                "displayName": "foobar",
             }
-        },
+        }
     ],
 )
 def test_get_slot_definition(
@@ -303,17 +344,8 @@ def test_get_slot_definition(
 
 
 @pytest.mark.parametrize(
-    "deck_definition",
-    [
-        {
-            "locations": {
-                "orderedSlots": [
-                    {"id": DeckSlotName.SLOT_3.id, "position": [1.0, 2.0, 3.0]},
-                ],
-                "calibrationPoints": [],
-            }
-        },
-    ],
+    "slot_definitions_by_name",
+    [{"3": {"position": [1.0, 2.0, 3.0]}}],
 )
 def test_get_position_for(
     decoy: Decoy,

@@ -1,87 +1,164 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+
 import {
+  Btn,
   Flex,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  ALIGN_CENTER,
   RESPONSIVENESS,
   JUSTIFY_SPACE_BETWEEN,
+  JUSTIFY_CENTER,
+  ALIGN_FLEX_END,
+  ALIGN_CENTER,
   PrimaryButton,
   useDeckLocationSelect,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { NeedHelpLink } from '../CalibrationPanels'
+import { getDeckDefFromRobotType } from '@opentrons/shared-data'
+
+import { SmallButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
+import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+// import { NeedHelpLink } from '../CalibrationPanels'
 import { TwoUpTileLayout } from '../LabwarePositionCheck/TwoUpTileLayout'
-import { RobotType, getDeckDefFromRobotType } from '@opentrons/shared-data'
+
+import type { CommandData } from '@opentrons/api-client'
+import type { AddressableAreaName, RobotType } from '@opentrons/shared-data'
 
 // TODO: get help link article URL
-const NEED_HELP_URL = ''
+// const NEED_HELP_URL = ''
 
 interface ChooseLocationProps {
   handleProceed: () => void
+  handleGoBack: () => void
   title: string
   body: string | JSX.Element
   robotType: RobotType
-  moveToXYCoordinate: (x: number, y: number) => Promise<void>
+  moveToAddressableArea: (
+    addressableArea: AddressableAreaName
+  ) => Promise<CommandData | null>
+  isRobotMoving: boolean
+  isOnDevice: boolean
+  setErrorMessage: (arg0: string) => void
 }
 
 export const ChooseLocation = (
   props: ChooseLocationProps
 ): JSX.Element | null => {
-  const { handleProceed, title, body, robotType, moveToXYCoordinate } = props
-  const { t } = useTranslation(['drop_tip_wizard', 'shared'])
+  const {
+    handleProceed,
+    handleGoBack,
+    title,
+    body,
+    robotType,
+    moveToAddressableArea,
+    isRobotMoving,
+    isOnDevice,
+    setErrorMessage,
+  } = props
+  const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const deckDef = getDeckDefFromRobotType(robotType)
   const { DeckLocationSelect, selectedLocation } = useDeckLocationSelect(
     robotType
   )
 
-  const handleConfirmPosition: React.MouseEventHandler = () => {
-    const deckLocation = deckDef.locations.orderedSlots.find(
+  const handleConfirmPosition = (): void => {
+    const deckSlot = deckDef.locations.addressableAreas.find(
       l => l.id === selectedLocation.slotName
-    )
-    const slotX = deckLocation?.position[0]
-    const slotY = deckLocation?.position[1]
-    const xDimension = deckLocation?.boundingBox.xDimension
-    const yDimension = deckLocation?.boundingBox.yDimension
-    if (
-      slotX != null &&
-      slotY != null &&
-      xDimension != null &&
-      yDimension != null
-    ) {
-      const targetX = slotX + xDimension / 2
-      const targetY = slotY + yDimension / 2
-      console.log(
-        'MOVE TO selected location: ',
-        selectedLocation,
-        targetX,
-        targetY
-      )
-      moveToXYCoordinate(targetX, targetY).then(handleProceed)
+    )?.id
+
+    if (deckSlot != null) {
+      moveToAddressableArea(deckSlot)
+        .then(() => handleProceed())
+        .catch(e => setErrorMessage(`${e.message}`))
     }
   }
-  return (
-    <Flex css={TILE_CONTAINER_STYLE}>
-      <TwoUpTileLayout
-        title={title}
-        body={body}
-        rightElement={DeckLocationSelect}
-        footer={
+
+  if (isRobotMoving) {
+    return <InProgressModal description={t('stand_back_exiting')} />
+  }
+
+  if (isOnDevice) {
+    return (
+      <Flex
+        padding={SPACING.spacing32}
+        flexDirection={DIRECTION_COLUMN}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        flex="1"
+      >
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          gridGap={SPACING.spacing24}
+          flex="1"
+        >
           <Flex
-            flexDirection={DIRECTION_ROW}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-            alignItems={ALIGN_CENTER}
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing8}
+            width="100%"
+            flex="1"
           >
-            <NeedHelpLink href={NEED_HELP_URL} />
-            <PrimaryButton onClick={handleConfirmPosition}>
-              {t('shared:confirm_position')}
-            </PrimaryButton>
+            <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              {title}
+            </StyledText>
+            <StyledText as="p">{body}</StyledText>
           </Flex>
-        }
-      />
-    </Flex>
-  )
+          <Flex
+            flex="1"
+            justifyContent={JUSTIFY_CENTER}
+            paddingLeft={SPACING.spacing24}
+          >
+            {DeckLocationSelect}
+          </Flex>
+        </Flex>
+        <Flex
+          width="100%"
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          css={ALIGN_BUTTONS}
+          gridGap={SPACING.spacing8}
+        >
+          <Btn onClick={() => handleGoBack()}>
+            <StyledText css={GO_BACK_BUTTON_STYLE}>
+              {t('shared:go_back')}
+            </StyledText>
+          </Btn>
+          <SmallButton
+            buttonText={i18n.format(t('move_to_slot'), 'capitalize')}
+            onClick={handleConfirmPosition}
+          />
+        </Flex>
+      </Flex>
+    )
+  } else {
+    return (
+      <Flex css={TILE_CONTAINER_STYLE}>
+        <TwoUpTileLayout
+          title={title}
+          body={body}
+          rightElement={DeckLocationSelect}
+          footer={
+            <Flex
+              width="100%"
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+              gridGap={SPACING.spacing8}
+            >
+              <Btn onClick={() => handleGoBack()}>
+                <StyledText css={GO_BACK_BUTTON_STYLE}>
+                  {t('shared:go_back')}
+                </StyledText>
+              </Btn>
+              <PrimaryButton onClick={handleConfirmPosition}>
+                {i18n.format(t('move_to_slot'), 'capitalize')}
+              </PrimaryButton>
+            </Flex>
+          }
+        />
+      </Flex>
+    )
+  }
 }
 
 const TILE_CONTAINER_STYLE = css`
@@ -90,5 +167,30 @@ const TILE_CONTAINER_STYLE = css`
   height: 24.625rem;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     height: 29.5rem;
+  }
+`
+const GO_BACK_BUTTON_STYLE = css`
+  ${TYPOGRAPHY.pSemiBold};
+  color: ${COLORS.grey50};
+
+  &:hover {
+    opacity: 70%;
+  }
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+    font-size: ${TYPOGRAPHY.fontSize22};
+    padding-left: 0rem;
+    &:hover {
+      opacity: 100%;
+    }
+  }
+`
+
+const ALIGN_BUTTONS = css`
+  align-items: ${ALIGN_FLEX_END};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    align-items: ${ALIGN_CENTER};
   }
 `

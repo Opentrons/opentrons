@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { fireEvent, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import { STAGING_AREA_RIGHT_SLOT_FIXTURE } from '@opentrons/shared-data'
 import { i18n } from '../../../../../i18n'
 import {
   mockMagneticModule as mockMagneticModuleFixture,
@@ -12,7 +13,6 @@ import {
   mockMagneticModuleGen2,
   mockThermocycler,
 } from '../../../../../redux/modules/__fixtures__'
-import { useFeatureFlag } from '../../../../../redux/config'
 import { useChainLiveCommands } from '../../../../../resources/runs/hooks'
 import { ModuleSetupModal } from '../../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../../ModuleWizardFlows'
@@ -28,11 +28,7 @@ import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
 import { SetupModulesList } from '../SetupModulesList'
 import { LocationConflictModal } from '../LocationConflictModal'
 
-import {
-  ModuleModel,
-  ModuleType,
-  STAGING_AREA_LOAD_NAME,
-} from '@opentrons/shared-data'
+import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../hooks')
@@ -75,9 +71,7 @@ const mockUseChainLiveCommands = useChainLiveCommands as jest.MockedFunction<
 const mockLocationConflictModal = LocationConflictModal as jest.MockedFunction<
   typeof LocationConflictModal
 >
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
+
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
 const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
@@ -146,9 +140,6 @@ describe('SetupModulesList', () => {
       .mockReturnValue({
         complete: true,
       })
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(false)
     mockModuleWizardFlows.mockReturnValue(<div>mock ModuleWizardFlows</div>)
     mockUseChainLiveCommands.mockReturnValue({
       chainLiveCommands: mockChainLiveCommands,
@@ -162,12 +153,12 @@ describe('SetupModulesList', () => {
   it('should render the list view headers', () => {
     when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(ROBOT_NAME, RUN_ID)
+      .calledWith(RUN_ID)
       .mockReturnValue({})
-    const { getByText } = render(props)
-    getByText('Module')
-    getByText('Location')
-    getByText('Status')
+    render(props)
+    screen.getByText('Module')
+    screen.getByText('Location')
+    screen.getByText('Status')
   })
 
   it('should render a magnetic module that is connected', () => {
@@ -189,10 +180,10 @@ describe('SetupModulesList', () => {
       },
     } as any)
 
-    const { getByText } = render(props)
-    getByText('Magnetic Module')
-    getByText('1')
-    getByText('Connected')
+    render(props)
+    screen.getByText('Magnetic Module')
+    screen.getByText('1')
+    screen.getByText('Connected')
   })
 
   it('should render a magnetic module that is NOT connected', () => {
@@ -211,10 +202,10 @@ describe('SetupModulesList', () => {
       },
     } as any)
 
-    const { getByText } = render(props)
-    getByText('Magnetic Module')
-    getByText('1')
-    getByText('Not connected')
+    render(props)
+    screen.getByText('Magnetic Module')
+    screen.getByText('1')
+    screen.getByText('Not connected')
   })
 
   it('should render a thermocycler module that is connected, OT2', () => {
@@ -243,10 +234,10 @@ describe('SetupModulesList', () => {
     } as any)
     mockUseIsFlex.mockReturnValue(false)
 
-    const { getByText } = render(props)
-    getByText('Thermocycler Module')
-    getByText('7,8,10,11')
-    getByText('Connected')
+    render(props)
+    screen.getByText('Thermocycler Module')
+    screen.getByText('7,8,10,11')
+    screen.getByText('Connected')
   })
 
   it('should render a thermocycler module that is connected but not calibrated, OT3', async () => {
@@ -272,12 +263,12 @@ describe('SetupModulesList', () => {
     } as any)
     mockUseIsFlex.mockReturnValue(true)
 
-    const { getByText, getByRole } = render(props)
-    getByText('Thermocycler Module')
-    getByText('A1+B1')
-    getByRole('button', { name: 'Calibrate now' }).click()
+    render(props)
+    screen.getByText('Thermocycler Module')
+    screen.getByText('A1+B1')
+    fireEvent.click(screen.getByRole('button', { name: 'Calibrate now' }))
     await waitFor(() => {
-      getByText('mock ModuleWizardFlows')
+      screen.getByText('mock ModuleWizardFlows')
     })
   })
 
@@ -310,8 +301,8 @@ describe('SetupModulesList', () => {
     } as any)
     mockUseIsFlex.mockReturnValue(true)
 
-    const { getByRole } = render(props)
-    expect(getByRole('button', { name: 'Calibrate now' })).toBeDisabled()
+    render(props)
+    expect(screen.getByRole('button', { name: 'Calibrate now' })).toBeDisabled()
   })
 
   it('should render a thermocycler module that is connected, OT3', () => {
@@ -340,10 +331,10 @@ describe('SetupModulesList', () => {
     } as any)
     mockUseIsFlex.mockReturnValue(true)
 
-    const { getByText } = render(props)
-    getByText('Thermocycler Module')
-    getByText('A1+B1')
-    getByText('Connected')
+    render(props)
+    screen.getByText('Thermocycler Module')
+    screen.getByText('A1+B1')
+    screen.getByText('Connected')
   })
 
   it('should render the MoaM component when Moam is attached', () => {
@@ -358,7 +349,7 @@ describe('SetupModulesList', () => {
     const dupModPort = 10
     const dupModHub = 2
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(ROBOT_NAME, RUN_ID)
+      .calledWith(RUN_ID)
       .mockReturnValue({
         [mockMagneticModule.moduleId]: {
           moduleId: mockMagneticModule.moduleId,
@@ -375,6 +366,7 @@ describe('SetupModulesList', () => {
             model: mockMagneticModule.model,
           } as any,
           slotName: '1',
+          conflictedFixture: null,
         },
         [dupModId]: {
           moduleId: dupModId,
@@ -395,12 +387,13 @@ describe('SetupModulesList', () => {
             },
           } as any,
           slotName: '3',
+          conflictedFixture: null,
         },
       })
-    const { getByText, getByTestId } = render(props)
-    const help = getByTestId('Banner_close-button')
+    render(props)
+    const help = screen.getByTestId('Banner_close-button')
     fireEvent.click(help)
-    getByText('mock Moam modal')
+    screen.getByText('mock Moam modal')
   })
   it('should render the module unmatching banner', () => {
     when(mockUseUnmatchedModulesForProtocol)
@@ -409,8 +402,8 @@ describe('SetupModulesList', () => {
         missingModuleIds: ['moduleId'],
         remainingAttachedModules: [mockHeaterShaker],
       })
-    const { getByText } = render(props)
-    getByText('mock unmatched module Banner')
+    render(props)
+    screen.getByText('mock unmatched module Banner')
   })
   it('should render the heater shaker text when hs is attached', () => {
     mockUseModuleRenderInfoForProtocolById.mockReturnValue({
@@ -447,15 +440,13 @@ describe('SetupModulesList', () => {
         attachedModuleMatch: null,
       },
     } as any)
-    const { getByText } = render(props)
-    const moduleSetup = getByText('View setup instructions')
+    render(props)
+    const moduleSetup = screen.getByText('View setup instructions')
     fireEvent.click(moduleSetup)
-    getByText('mockModuleSetupModal')
+    screen.getByText('mockModuleSetupModal')
   })
-  it('shoulde render a magnetic block with a conflicted fixture', () => {
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(true)
+  it('should render a magnetic block with a conflicted fixture', () => {
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
     mockUseModuleRenderInfoForProtocolById.mockReturnValue({
       [mockMagneticBlock.id]: {
         moduleId: mockMagneticBlock.id,
@@ -471,20 +462,19 @@ describe('SetupModulesList', () => {
         nestedLabwareDef: null,
         nestedLabwareId: null,
         protocolLoadOrder: 0,
-        slotName: '1',
+        slotName: 'B3',
         attachedModuleMatch: null,
         conflictedFixture: {
-          fixtureId: 'mockId',
-          fixtureLocation: '1',
-          loadName: STAGING_AREA_LOAD_NAME,
+          cutoutId: 'cutoutB3',
+          cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
         },
       },
     } as any)
-    const { getByText, getByRole } = render(props)
-    getByText('No USB connection required')
-    getByText('Location conflict')
-    getByText('Magnetic Block GEN1')
-    getByRole('button', { name: 'Update deck' }).click()
-    getByText('mock location conflict modal')
+    render(props)
+    screen.getByText('No USB connection required')
+    screen.getByText('Location conflict')
+    screen.getByText('Magnetic Block GEN1')
+    fireEvent.click(screen.getByRole('button', { name: 'Resolve' }))
+    screen.getByText('mock location conflict modal')
   })
 })

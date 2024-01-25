@@ -34,6 +34,7 @@ function PipetteGroup(props: Props): JSX.Element {
   const robotType = useSelector(getRobotType)
   const leftSpecs =
     leftPipette && getPipetteNameSpecs(leftPipette as PipetteName)
+  const has96Channel = leftPipette === 'p1000_96'
   const rightSpecs =
     rightPipette && getPipetteNameSpecs(rightPipette as PipetteName)
   return (
@@ -52,9 +53,14 @@ function PipetteGroup(props: Props): JSX.Element {
           }
         />
       ) : (
-        <div className={styles.left_pipette} />
+        <div
+          className={styles.left_pipette}
+          style={{
+            marginLeft: robotType === FLEX_ROBOT_TYPE ? '7rem' : '0rem',
+          }}
+        />
       )}
-      {rightPipette && rightSpecs ? (
+      {rightPipette && rightSpecs && !has96Channel ? (
         <InstrumentDiagram
           pipetteSpecs={rightSpecs}
           className={styles.right_pipette}
@@ -62,7 +68,7 @@ function PipetteGroup(props: Props): JSX.Element {
           imageStyle={
             robotType === FLEX_ROBOT_TYPE
               ? css`
-                  right: -1.5rem;
+                  right: -5rem;
                   position: absolute;
                 `
               : undefined

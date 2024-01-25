@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent } from '@testing-library/react'
 
 import {
   useInstrumentsQuery,
@@ -94,7 +95,7 @@ describe('ProtocolSetupInstruments', () => {
 
   it('correctly navigates with the nav buttons', () => {
     const [{ getAllByRole }] = render()
-    getAllByRole('button')[0].click()
+    fireEvent.click(getAllByRole('button')[0])
     expect(mockSetSetupScreen).toHaveBeenCalledWith('prepare to run')
   })
 })

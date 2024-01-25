@@ -18,10 +18,8 @@ import {
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { Divider } from '../../../atoms/structure'
 
-import type {
-  Mount,
-  PipetteSettingsFieldsMap,
-} from '../../../redux/pipettes/types'
+import type { Mount } from '../../../redux/pipettes/types'
+import type { PipetteSettingsFieldsMap } from '@opentrons/api-client'
 
 interface PipetteOverflowMenuProps {
   pipetteSpecs: PipetteModelSpecs | null
@@ -102,7 +100,7 @@ export const PipetteOverflowMenu = (
             <MenuItem onClick={() => handleAboutSlideout()}>
               {t('about_pipette')}
             </MenuItem>
-            <MenuItem onClick={() => handleDropTip()}>
+            <MenuItem onClick={() => handleDropTip()} disabled={isRunActive}>
               {i18n.format(t('drop_tips'), 'capitalize')}
             </MenuItem>
             <Divider marginY="0" />

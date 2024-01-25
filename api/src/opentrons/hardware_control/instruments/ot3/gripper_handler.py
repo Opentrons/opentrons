@@ -133,7 +133,7 @@ class GripperHandler:
                 message=f"Cannot {command} gripper jaw before homing",
                 detail={
                     "command": command,
-                    "jaw_state": gripper.state,
+                    "jaw_state": str(gripper.state),
                 },
             )
 

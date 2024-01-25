@@ -1,11 +1,8 @@
+import 'jest-styled-components'
 import * as React from 'react'
 import { renderWithProviders } from '../../../testing/utils'
-import {
-  COLORS,
-  BORDERS,
-  TYPOGRAPHY,
-  SPACING,
-} from '../../../ui-style-constants'
+import { BORDERS, TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
+import { COLORS } from '../../../helix-design-system'
 
 import { SecondaryButton } from '../SecondaryButton'
 
@@ -36,7 +33,7 @@ describe('SecondaryButton', () => {
     expect(button).toHaveStyle(
       `text-transform: ${TYPOGRAPHY.textTransformNone}`
     )
-    expect(button).toHaveStyle(`color: ${COLORS.blueEnabled}`)
+    expect(button).toHaveStyle(`color: ${COLORS.blue50}`)
   })
 
   it('renders secondary button with text and disabled', () => {
@@ -61,19 +58,15 @@ describe('SecondaryButton', () => {
   it('applies the correct states to the button - focus-visible', () => {
     const { getByText } = render(props)
     const button = getByText('secondary button')
-    expect(button).toHaveStyleRule(
-      'box-shadow',
-      `0 0 0 3px ${COLORS.warningEnabled}`,
-      {
-        modifier: ':focus-visible',
-      }
-    )
+    expect(button).toHaveStyleRule('box-shadow', `0 0 0 3px ${COLORS.blue50}`, {
+      modifier: ':focus-visible',
+    })
   })
 
   it('renders secondary button with text and different background color', () => {
-    props.color = COLORS.errorEnabled
+    props.color = COLORS.red50
     const { getByText } = render(props)
     const button = getByText('secondary button')
-    expect(button).toHaveStyle(`color: ${COLORS.errorEnabled}`)
+    expect(button).toHaveStyle(`color: ${COLORS.red50}`)
   })
 })

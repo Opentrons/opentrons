@@ -201,91 +201,90 @@
         ]
       },
       {
-        "id": "fixedTrash",
-        "areaType": "fixedTrash",
+        "id": "12",
+        "areaType": "slot",
         "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
         "boundingBox": {
-          "xDimension": 172.86,
-          "yDimension": 165.86,
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot 12",
+        "compatibleModuleTypes": []
+      },
+      {
+        "id": "fixedTrash",
+        "areaType": "fixedTrash",
+        "offsetFromCutoutFixture": [29.285, -2.835, 0],
+        "boundingBox": {
+          "xDimension": 107.11,
+          "yDimension": 165.67,
           "zDimension": 82
         },
         "displayName": "Slot 12/Fixed Trash",
-        "ableToDropTips": true,
-        "dropTipsOffset": [82.84, 80.0, 82.0]
+        "ableToDropTips": true
       }
     ],
     "cutouts": [
       {
-        "id": "1",
+        "id": "cutout1",
         "position": [0.0, 0.0, 0.0],
-        "displayName": "Cutout 1",
-        "compatibleFixtureTypes": ["singleStandardSlot"]
+        "displayName": "Cutout 1"
       },
       {
-        "id": "2",
+        "id": "cutout2",
         "position": [132.5, 0.0, 0.0],
-        "displayName": "Cutout 2",
-        "compatibleFixtureTypes": ["singleStandardSlot"]
+        "displayName": "Cutout 2"
       },
       {
-        "id": "3",
+        "id": "cutout3",
         "position": [265.0, 0.0, 0.0],
-        "displayName": "Cutout 3",
-        "compatibleFixtureTypes": ["singleStandardSlot"]
+        "displayName": "Cutout 3"
       },
       {
-        "id": "4",
+        "id": "cutout4",
         "position": [0.0, 90.5, 0.0],
-        "displayName": "Cutout 4",
-        "compatibleFixtureTypes": ["singleStandardSlot"]
+        "displayName": "Cutout 4"
       },
       {
-        "id": "5",
+        "id": "cutout5",
         "position": [132.5, 90.5, 0.0],
-        "displayName": "Cutout 5",
-        "compatibleFixtureTypes": ["singleStandardSlot"]
+        "displayName": "Cutout 5"
       },
       {
-        "id": "6",
+        "id": "cutout6",
         "position": [265.0, 90.5, 0.0],
-        "displayName": "Cutout 6",
-        "compatibleFixtureTypes": ["singleStandardSlot"]
+        "displayName": "Cutout 6"
       },
       {
-        "id": "7",
+        "id": "cutout7",
         "position": [0.0, 181.0, 0.0],
-        "displayName": "Cutout 7",
-        "compatibleFixtureTypes": ["singleStandardSlot"]
+        "displayName": "Cutout 7"
       },
       {
-        "id": "8",
+        "id": "cutout8",
         "position": [132.5, 181.0, 0.0],
-        "displayName": "Cutout 8",
-        "compatibleFixtureTypes": ["singleStandardSlot"]
+        "displayName": "Cutout 8"
       },
       {
-        "id": "9",
+        "id": "cutout9",
         "position": [265.0, 181.0, 0.0],
-        "displayName": "Cutout 9",
-        "compatibleFixtureTypes": ["singleStandardSlot"]
+        "displayName": "Cutout 9"
       },
       {
-        "id": "10",
+        "id": "cutout10",
         "position": [0.0, 271.5, 0.0],
-        "displayName": "Slot 10",
-        "compatibleFixtureTypes": ["singleStandardSlot"]
+        "displayName": "Slot 10"
       },
       {
-        "id": "11",
+        "id": "cutout11",
         "position": [132.5, 271.5, 0.0],
-        "displayName": "Cutout 11",
-        "compatibleFixtureTypes": ["singleStandardSlot"]
+        "displayName": "Cutout 11"
       },
       {
-        "id": "12",
+        "id": "cutout12",
         "position": [265.0, 271.5, 0.0],
-        "displayName": "Cutout 12",
-        "compatibleFixtureTypes": ["fixedTrashSlot"]
+        "displayName": "Cutout 12"
       }
     ],
     "calibrationPoints": [
@@ -349,34 +348,58 @@
         "position": [248.37, 351.5, 0.0],
         "displayName": "Slot 11 Top Right Dot"
       }
+    ],
+    "legacyFixtures": [
+      {
+        "id": "fixedTrash",
+        "slot": "12",
+        "labware": "opentrons_1_trash_1100ml_fixed",
+        "displayName": "Fixed Trash"
+      }
     ]
   },
   "cutoutFixtures": [
     {
       "id": "singleStandardSlot",
-      "mayMountTo": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"],
+      "mayMountTo": [
+        "cutout1",
+        "cutout2",
+        "cutout3",
+        "cutout4",
+        "cutout5",
+        "cutout6",
+        "cutout7",
+        "cutout8",
+        "cutout9",
+        "cutout10",
+        "cutout11",
+        "cutout12"
+      ],
       "displayName": "Standard Slot",
       "providesAddressableAreas": {
-        "1": ["1"],
-        "2": ["2"],
-        "3": ["3"],
-        "4": ["4"],
-        "5": ["5"],
-        "6": ["6"],
-        "7": ["7"],
-        "8": ["8"],
-        "9": ["9"],
-        "10": ["10"],
-        "11": ["11"]
-      }
+        "cutout1": ["1"],
+        "cutout2": ["2"],
+        "cutout3": ["3"],
+        "cutout4": ["4"],
+        "cutout5": ["5"],
+        "cutout6": ["6"],
+        "cutout7": ["7"],
+        "cutout8": ["8"],
+        "cutout9": ["9"],
+        "cutout10": ["10"],
+        "cutout11": ["11"],
+        "cutout12": ["12"]
+      },
+      "height": 0
     },
     {
       "id": "fixedTrashSlot",
-      "mayMountTo": ["12"],
+      "mayMountTo": ["cutout12"],
       "displayName": "Fixed Trash",
       "providesAddressableAreas": {
-        "12": ["fixedTrash"]
-      }
+        "cutout12": ["fixedTrash"]
+      },
+      "height": 82
     }
   ]
 }
