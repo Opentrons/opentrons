@@ -838,18 +838,24 @@ class OT3API(
             axes = list(Axis.ot3_mount_axes())
         await self.home(axes)
 
-    async def home_gripper_jaw(self) -> None:
-        """
-        Home the jaw of the gripper.
-        """
-        try:
-            gripper = self._gripper_handler.get_gripper()
-            self._log.info("Homing gripper jaw.")
-
-            dc = self._gripper_handler.get_duty_cycle_by_grip_force(
-                gripper.default_home_force
-            )
+    async def _do_home_and_maybe_calibrate_gripper_jaw(self) -> None:
+        gripper = self._gripper_handler.get_gripper()
+        self._log.info("Homing gripper jaw.")
+        dc = self._gripper_handler.get_duty_cycle_by_grip_force(
+            gripper.default_home_force
+        )
+        await self._ungrip(duty_cycle=dc)
+        if not gripper.has_jaw_width_calibration:
+            self._log.info("Calibrating gripper jaw.")
+            await self._grip(duty_cycle=dc)
+            jaw_at_closed = (await self._cache_encoder_position())[Axis.G]
+            gripper.update_jaw_open_position_from_closed_position(jaw_at_closed)
             await self._ungrip(duty_cycle=dc)
+
+    async def home_gripper_jaw(self) -> None:
+        """Home the jaw of the gripper."""
+        try:
+            await self._do_home_and_maybe_calibrate_gripper_jaw()
         except GripperNotPresentError:
             pass
 

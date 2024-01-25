@@ -1118,12 +1118,15 @@ async def test_raise_error_if_gripper_pickup_failed(
         ot3_hardware.raise_error_if_gripper_pickup_failed(85)
 
 
+@pytest.mark.parametrize("needs_calibration", [True, False])
 async def test_gripper_action_works_with_gripper(
     ot3_hardware: ThreadManager[OT3API],
+    managed_obj: OT3API,
     mock_grip: AsyncMock,
     mock_ungrip: AsyncMock,
     mock_hold_jaw_width: AsyncMock,
     gripper_present: None,
+    needs_calibration: bool,
 ) -> None:
 
     gripper_config = gc.load(GripperModel.v1)
@@ -1138,11 +1141,26 @@ async def test_gripper_action_works_with_gripper(
         CommandPreconditionViolated, match="Cannot grip gripper jaw before homing"
     ):
         await ot3_hardware.grip(5.0)
+    gripper = managed_obj._gripper_handler._gripper
+    assert gripper
+    gripper._jaw_max_offset = None if needs_calibration else 5
     await ot3_hardware.home_gripper_jaw()
-    mock_ungrip.assert_called_once()
+    if needs_calibration:
+        assert mock_ungrip.call_count == 2
+        mock_grip.assert_called_once()
+    else:
+        mock_ungrip.assert_called_once()
     mock_ungrip.reset_mock()
+    mock_grip.reset_mock()
+    gripper._jaw_max_offset = None if needs_calibration else 5
     await ot3_hardware.home([Axis.G])
-    mock_ungrip.assert_called_once()
+    if needs_calibration:
+        assert mock_ungrip.call_count == 2
+        mock_grip.assert_called_once()
+    else:
+        mock_ungrip.assert_called_once()
+
+    mock_grip.reset_mock()
     mock_ungrip.reset_mock()
     await ot3_hardware.grip(5.0)
     mock_grip.assert_called_once_with(
