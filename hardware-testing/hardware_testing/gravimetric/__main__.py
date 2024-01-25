@@ -186,8 +186,8 @@ class RunArgs:
             engine.state_view._labware_store._add_labware_offset(offset)
         return _ctx
 
-    @classmethod
-    def build_run_args(cls, args: argparse.Namespace) -> "RunArgs":  # noqa: C901
+    @classmethod  # noqa: C901
+    def build_run_args(cls, args: argparse.Namespace) -> "RunArgs":
         """Build."""
         _ctx = RunArgs._get_protocol_context(args)
         operator_name = helpers._get_operator_name(_ctx.is_simulating())
