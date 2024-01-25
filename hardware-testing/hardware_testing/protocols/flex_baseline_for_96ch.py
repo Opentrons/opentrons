@@ -1,4 +1,4 @@
-"""Flex: Diluent for 96ch."""
+"""Flex: Baseline for 96ch."""
 from math import pi
 from typing import List, Optional, Dict, Tuple
 
@@ -10,17 +10,17 @@ from opentrons.protocol_api import ProtocolContext, InstrumentContext, Labware
 
 # FIXME: make these variables configurable through RUNTIME-VARIABLES
 
-metadata = {"protocolName": "Flex: Diluent for 96ch"}
+metadata = {"protocolName": "Flex: Baseline for 96ch"}
 requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 RETURN_TIP = False
-FILL_MULTIPLE_PLATES = True
+FILL_MULTIPLE_PLATES = False
 
-LIQUID_NAME = "Diluent"
-LIQUID_DESCRIPTION = "Artel MVS Diluent"
-LIQUID_COLOR = "#0000FF"
+LIQUID_NAME = "Baseline"
+LIQUID_DESCRIPTION = "Artel MVS Baseline"
+LIQUID_COLOR = "#00FF00"
 
-TARGET_VOLUME = 195
+TARGET_VOLUME = 200
 TARGET_PUSH_OUT = 15
 TARGET_SOURCES = [
     {
