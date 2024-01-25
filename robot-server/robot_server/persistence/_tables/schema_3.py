@@ -120,7 +120,8 @@ run_command_table = sqlalchemy.Table(
     sqlalchemy.Column("command_id", sqlalchemy.String, nullable=False),
     sqlalchemy.Column(
         "command",
-        # TODO: Should be JSON.
+        # TODO(mm, 2024-01-25): This should be JSON instead of a pickle. See:
+        # https://opentrons.atlassian.net/browse/RSS-98.
         sqlalchemy.PickleType(pickler=legacy_pickle, protocol=PICKLE_PROTOCOL_VERSION),
         nullable=False,
     ),
