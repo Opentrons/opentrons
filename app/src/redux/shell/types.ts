@@ -8,7 +8,13 @@ export interface Remote {
     send: (channel: string, ...args: unknown[]) => void
     on: (
       channel: string,
-      listener: (event: IpcMainEvent, data: string, ...args: unknown[]) => void
+      listener: (
+        event: IpcMainEvent,
+        hostname: string,
+        topic: NotifyTopic,
+        message: string | Object,
+        ...args: unknown[]
+      ) => void
     ) => void
   }
 }

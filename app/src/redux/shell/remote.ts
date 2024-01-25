@@ -43,45 +43,19 @@ export function appShellListener(
   topic: NotifyTopic
 ): EventEmitter {
   const eventEmitter = new EventEmitter()
-  remote.ipcRenderer.on('notify', (_, message) => {
-    const {
-      shellHostname,
-      shellTopic,
-      shellMessage,
-    } = deserializeNotifyMessage(message)
+  remote.ipcRenderer.on(
+    'notify',
+    (_, shellHostname, shellTopic, shellMessage) => {
+      console.log('Received notification data from main via IPC', {
+        hostname: shellHostname,
+        topic: shellTopic,
+        message: shellMessage,
+      })
 
-    if (hostname === shellHostname && topic === shellTopic) {
-      eventEmitter.emit('data', shellMessage)
+      if (hostname === shellHostname && topic === shellTopic) {
+        eventEmitter.emit('data', shellMessage)
+      }
     }
-  })
+  )
   return eventEmitter
-
-  function deserializeNotifyMessage(
-    message: string
-  ): {
-    shellHostname: string
-    shellTopic: NotifyTopic
-    shellMessage: string | Object
-  } {
-    const delimiter = ':'
-    const firstIndex = message.indexOf(delimiter)
-    const secondIndex = message.indexOf(delimiter, firstIndex + 1)
-
-    const shellHostname = message.substring(0, firstIndex)
-    const shellTopic = message.substring(
-      firstIndex + 1,
-      secondIndex
-    ) as NotifyTopic
-    const serializedShellMessage = message.substring(secondIndex + 1)
-
-    let shellMessage: Object | string
-
-    try {
-      shellMessage = JSON.parse(serializedShellMessage)
-    } catch {
-      shellMessage = serializedShellMessage
-    }
-
-    return { shellHostname, shellTopic, shellMessage }
-  }
 }

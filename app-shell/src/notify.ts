@@ -91,10 +91,12 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
           client.subscribe(topic, subscribeOptions, (error, result) => {
             if (error != null) {
               log.warn(`Failed to subscribe on ${hostname} to topic: ${topic}`)
-              browserWindow.webContents.send(
-                'notify',
-                `${hostname}:${topic}:ECONNFAILED`
-              )
+              sendToBrowserDeserialized({
+                browserWindow,
+                hostname,
+                topic,
+                message: 'ECONNFAILED',
+              })
               handleDecrementSubscriptionCount(hostname, topic)
             } else {
               log.info(
@@ -112,10 +114,12 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
           ? 'ECONNREFUSED'
           : 'ECONNFAILED'
 
-        browserWindow.webContents.send(
-          'notify',
-          `${hostname}:${topic}:${failureMessage}`
-        )
+        sendToBrowserDeserialized({
+          browserWindow,
+          hostname,
+          topic,
+          message: failureMessage,
+        })
         if (hostname in connectionStore) delete connectionStore[hostname]
       })
   }
@@ -217,13 +221,18 @@ function establishListeners({
   hostname,
   topic,
 }: ListenerParams): void {
-  client.on('message', (topic, message, packet) => {
-    browserWindow.webContents.send(
-      'notify',
-      `${hostname}:${topic}:${message.toString()}`
-    )
-    log.debug(`Received message: ${hostname}:${topic}:${message.toString()}`)
-  })
+  client.on(
+    'message',
+    (topic: NotifyTopic, message: Buffer, packet: mqtt.IPublishPacket) => {
+      log.debug(`Received message for ${hostname} on ${topic}}`)
+      sendToBrowserDeserialized({
+        browserWindow,
+        hostname,
+        topic,
+        message: message.toString(),
+      })
+    }
+  )
 
   client.on('reconnect', () => {
     log.info(`Attempting to reconnect to ${hostname}`)
@@ -231,7 +240,12 @@ function establishListeners({
   // handles transport layer errors only
   client.on('error', error => {
     log.warn(`Error - ${error.name}: ${error.message}`)
-    browserWindow.webContents.send('notify', `${hostname}:${topic}:ECONNFAILED`)
+    sendToBrowserDeserialized({
+      browserWindow,
+      hostname,
+      topic,
+      message: 'ECONNFAILED',
+    })
     client.end()
   })
 
@@ -257,4 +271,28 @@ export function closeAllNotifyConnections(): Promise<unknown[]> {
     })
   })
   return Promise.all(closeConnections)
+}
+
+interface SendToBrowserParams {
+  browserWindow: BrowserWindow
+  hostname: string
+  topic: NotifyTopic
+  message: string
+}
+
+function sendToBrowserDeserialized({
+  browserWindow,
+  hostname,
+  topic,
+  message,
+}: SendToBrowserParams): void {
+  let deserializedMessage: string | Object
+
+  try {
+    deserializedMessage = JSON.parse(message)
+  } catch {
+    deserializedMessage = message
+  }
+
+  browserWindow.webContents.send('notify', hostname, topic, deserializedMessage)
 }
