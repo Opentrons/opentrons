@@ -30,6 +30,8 @@ export type WellLabelOption = keyof typeof WELL_LABEL_OPTIONS
 export interface LabwareRenderProps {
   /** Labware definition to render */
   definition: LabwareDefinition2
+  /** Opional Prop for labware on heater shakers sitting on right side of the deck */
+  shouldRotateAdapterOrientation: boolean
   /** option to show well labels inside or outside of labware outline */
   wellLabelOption?: WellLabelOption
   /** wells to highlight */
@@ -62,15 +64,35 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
   const { gRef } = props
   const cornerOffsetFromSlot = props.definition.cornerOffsetFromSlot
   const labwareLoadName = props.definition.parameters.loadName
+
   if (labwareAdapterLoadNames.includes(labwareLoadName)) {
+    const { shouldRotateAdapterOrientation } = props
+    const {
+      xDimension,
+      yDimension,
+      footprintXDimension,
+      footprintYDimension,
+    } = props.definition.dimensions
+
+    const rotationCenterX = (footprintXDimension ?? xDimension) / 2
+    const rotationCenterY = (footprintYDimension ?? yDimension) / 2
+
     return (
       <g
-        transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
-        ref={gRef}
+        transform={
+          shouldRotateAdapterOrientation
+            ? `rotate(180, ${rotationCenterX}, ${rotationCenterY})`
+            : 'rotate(0, 0, 0)'
+        }
       >
-        <LabwareAdapter
-          labwareLoadName={labwareLoadName as LabwareAdapterLoadName}
-        />
+        <g
+          transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
+          ref={gRef}
+        >
+          <LabwareAdapter
+            labwareLoadName={labwareLoadName as LabwareAdapterLoadName}
+          />
+        </g>
       </g>
     )
   }

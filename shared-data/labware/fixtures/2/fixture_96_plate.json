@@ -30,7 +30,7 @@
   "parameters": {
     "format": "96Standard",
     "isTiprack": false,
-    "loadName": "fixture_96_plate",
+    "loadName": "opentrons_96_flat_bottom_adapter",
     "isMagneticModuleCompatible": false
   },
   "wells": {
@@ -1008,8 +1008,8 @@
     }
   ],
   "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
+    "x": 8.5,
+    "y": 5.5,
     "z": 0
   }
 }

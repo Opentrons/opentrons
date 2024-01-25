@@ -74,7 +74,7 @@ export const BaseDeck: Story = {
         nestedLabwareDef: fixture_96_plate as LabwareDefinition2,
       },
       {
-        moduleLocation: { slotName: 'B3' },
+        moduleLocation: { slotName: 'C1' },
         moduleModel: HEATERSHAKER_MODULE_V1,
         nestedLabwareDef: fixture_96_plate as LabwareDefinition2,
       },

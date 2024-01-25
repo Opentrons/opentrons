@@ -3,7 +3,7 @@ import { COLORS } from '../../../helix-design-system'
 
 export function OpentronsUniversalFlatAdapter(): JSX.Element {
   return (
-    <svg viewBox="0 0 127.4 75.01">
+    <svg>
       <path
         fill="none"
         stroke={COLORS.black90}
