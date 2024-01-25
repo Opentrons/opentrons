@@ -13,7 +13,7 @@ import styles from './AnnouncementModal.css'
 
 export const AnnouncementModal = (): JSX.Element => {
   const { t } = useTranslation(['modal', 'button'])
-  const announcements = getAnnouncements(t)
+  const announcements = getAnnouncements({ t })
 
   const { announcementKey, message, heading, image } = announcements[
     announcements.length - 1

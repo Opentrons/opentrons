@@ -48,14 +48,16 @@ export const getAnnouncements = (props: AnnouncementProps): Announcement[] => {
           />
         </div>
       ),
-      heading: t('header', { pd: PD }),
+      heading: t('announcements.header', { pd: PD }),
       message: (
         <>
-          <p>{t('modulesRequireRunAppUpdate.body1', { pd: PD })}</p>
+          <p>
+            {t('announcements.modulesRequireRunAppUpdate.body1', { pd: PD })}
+          </p>
           <p>
             <Trans
               t={t}
-              i18nKey={'modulesRequireRunAppUpdate.body2'}
+              i18nKey={'announcements.modulesRequireRunAppUpdate.body2'}
               components={{ bold: <strong /> }}
               values={{ app: APP }}
             />
@@ -73,14 +75,14 @@ export const getAnnouncements = (props: AnnouncementProps): Announcement[] => {
           />
         </div>
       ),
-      heading: t('header', { pd: PD }),
+      heading: t('announcements.header', { pd: PD }),
       message: (
         <>
-          <p>{t('thermocyclerSupport.body1', { pd: PD })}</p>
+          <p>{t('announcements.thermocyclerSupport.body1', { pd: PD })}</p>
           <p>
             <Trans
               t={t}
-              i18nKey={'thermocyclerSupport.body2'}
+              i18nKey={'announcements.thermocyclerSupport.body2'}
               components={{ strong: <strong /> }}
               values={{ app: APP }}
             />
@@ -90,15 +92,15 @@ export const getAnnouncements = (props: AnnouncementProps): Announcement[] => {
     },
     {
       announcementKey: 'airGapDelaySettings',
-      heading: t('header', { pd: PD }),
+      heading: t('announcements.header', { pd: PD }),
       image: null,
       message: (
         <>
-          <p>{t('airGapDelaySettings.body1', { pd: PD })}</p>
+          <p>{t('announcements.airGapDelaySettings.body1', { pd: PD })}</p>
           <p>
             <Trans
               t={t}
-              i18nKey={'airGapDelaySettings.body2'}
+              i18nKey={'announcements.airGapDelaySettings.body2'}
               components={{ strong: <strong /> }}
               values={{ app: APP }}
             />
@@ -117,24 +119,24 @@ export const getAnnouncements = (props: AnnouncementProps): Announcement[] => {
           <img src={require('../../../images/announcements/batch_edit.gif')} />
         </Flex>
       ),
-      heading: t('header', { pd: PD }),
+      heading: t('announcements.header', { pd: PD }),
       message: (
         <>
-          <p>{t('batchEditTransfer.body1')}</p>
+          <p>{t('announcements.batchEditTransfer.body1')}</p>
           <ul>
-            <li>{t('batchEditTransfer.body2')}</li>
-            <li>{t('batchEditTransfer.body3')}</li>
+            <li>{t('announcements.batchEditTransfer.body2')}</li>
+            <li>{t('announcements.batchEditTransfer.body3')}</li>
           </ul>
 
           <p>
             <Trans
               t={t}
-              i18nKey={'batchEditTransfer.body4'}
+              i18nKey={'announcements.batchEditTransfer.body4'}
               components={{ strong: <strong /> }}
             />
           </p>
 
-          <p>{t('batchEditTransfer.body5')}</p>
+          <p>{t('announcements.batchEditTransfer.body5')}</p>
         </>
       ),
     },
@@ -148,14 +150,18 @@ export const getAnnouncements = (props: AnnouncementProps): Announcement[] => {
           />
         </div>
       ),
-      heading: t('header', { pd: PD }),
+      heading: t('announcements.header', { pd: PD }),
       message: (
         <>
-          <p>{t('heaterShakerSupport.body1', { opd: OPENTRONS_PD })}</p>
+          <p>
+            {t('announcements.heaterShakerSupport.body1', {
+              opd: OPENTRONS_PD,
+            })}
+          </p>
           <p>
             <Trans
               t={t}
-              i18nKey={'heaterShakerSupport.body2'}
+              i18nKey={'announcements.heaterShakerSupport.body2'}
               components={{ strong: <strong /> }}
               values={{ app: APP }}
             />
@@ -173,14 +179,18 @@ export const getAnnouncements = (props: AnnouncementProps): Announcement[] => {
           />
         </div>
       ),
-      heading: t('header', { pd: PD }),
+      heading: t('announcements.header', { pd: PD }),
       message: (
         <>
-          <p>{t('thermocyclerGen2Support.body1', { opd: OPENTRONS_PD })}</p>
+          <p>
+            {t('announcements.thermocyclerGen2Support.body1', {
+              opd: OPENTRONS_PD,
+            })}
+          </p>
           <p>
             <Trans
               t={t}
-              i18nKey={'thermocyclerGen2Support.body2'}
+              i18nKey={'announcements.thermocyclerGen2Support.body2'}
               components={{ strong: <strong /> }}
               values={{ app: APP }}
             />
@@ -198,14 +208,18 @@ export const getAnnouncements = (props: AnnouncementProps): Announcement[] => {
           />
         </div>
       ),
-      heading: t('header', { pd: PD }),
+      heading: t('announcements.header', { pd: PD }),
       message: (
         <>
-          <p>{t('liquidColorEnhancements.body1', { opd: OPENTRONS_PD })}</p>
+          <p>
+            {t('announcements.liquidColorEnhancements.body1', {
+              opd: OPENTRONS_PD,
+            })}
+          </p>
           <p>
             <Trans
               t={t}
-              i18nKey={'liquidColorEnhancements.body2'}
+              i18nKey={'announcements.liquidColorEnhancements.body2'}
               components={{ strong: <strong /> }}
               values={{ app: APP }}
             />
@@ -224,14 +238,19 @@ export const getAnnouncements = (props: AnnouncementProps): Announcement[] => {
           />
         </Flex>
       ),
-      heading: t('header', { pd: PD }),
+      heading: t('announcements.header', { pd: PD }),
       message: (
         <>
-          <p>{t('flexSupport7.0.body1', { pd: PD, flex: 'Opentrons Flex' })}</p>
+          <p>
+            {t('announcements.flexSupport.body1', {
+              pd: PD,
+              flex: 'Opentrons Flex',
+            })}
+          </p>
           <p>
             <Trans
               t={t}
-              i18nKey={'flexSupport7.0.body2'}
+              i18nKey={'announcements.flexSupport.body2'}
               components={{ strong: <strong /> }}
               values={{ app: APP }}
             />
@@ -249,14 +268,14 @@ export const getAnnouncements = (props: AnnouncementProps): Announcement[] => {
           />
         </Flex>
       ),
-      heading: t('header', { pd: PD }),
+      heading: t('announcements.header', { pd: PD }),
       message: (
         <>
-          <p>{t('deckConfigAnd96Channel8.0.body1', { pd: PD })}</p>
+          <p>{t('announcements.deckConfigAnd96Channel.body1', { pd: PD })}</p>
           <p>
             <Trans
               t={t}
-              i18nKey={'deckConfigAnd96Channel8.0.body2'}
+              i18nKey={'announcements.deckConfigAnd96Channel.body2'}
               components={{ strong: <strong /> }}
               values={{ app: APP }}
             />

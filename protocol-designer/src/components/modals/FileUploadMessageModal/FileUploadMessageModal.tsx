@@ -13,22 +13,25 @@ import modalStyles from '../modal.css'
 export function FileUploadMessageModal(): JSX.Element | null {
   const message = useSelector(loadFileSelectors.getFileUploadMessages)
   const dispatch = useDispatch()
-  const { t } = useTranslation('button')
+  const { t } = useTranslation(['modal', 'button'])
 
   const dismissModal = (): void => {
     dispatch(loadFileActions.dismissFileUploadMessage())
   }
   if (!message) return null
 
-  const { title, body, okButtonText } = getModalContents(message)
+  const { title, body, okButtonText } = getModalContents({
+    uploadResponse: message,
+    t,
+  })
   let buttons = [
     {
-      children: t('cancel'),
+      children: t('button:cancel'),
       onClick: () => dispatch(loadFileActions.undoLoadFile()),
       className: modalStyles.bottom_button,
     },
     {
-      children: okButtonText || 'ok',
+      children: okButtonText || t('button:ok'),
       onClick: dismissModal,
       className: modalStyles.button_medium,
     },
@@ -36,7 +39,7 @@ export function FileUploadMessageModal(): JSX.Element | null {
   if (title === 'Incorrect file type' || title === 'Invalid JSON file') {
     buttons = [
       {
-        children: okButtonText || 'ok',
+        children: okButtonText || t('button:ok'),
         onClick: dismissModal,
         className: modalStyles.button_medium,
       },
