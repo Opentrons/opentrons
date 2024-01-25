@@ -1,6 +1,8 @@
 """Typing protocols describing a hardware controller."""
 from typing_extensions import Protocol
 
+from opentrons.hardware_control.types import Axis
+
 from .module_provider import ModuleProvider
 from .hardware_manager import HardwareManager
 from .chassis_accessory_manager import ChassisAccessoryManager
@@ -42,6 +44,12 @@ class HardwareControlInterface(
     """
 
     ...
+
+    def motor_status_ok(self, axis: Axis) -> bool:
+        ...
+
+    def encoder_status_ok(self, axis: Axis) -> bool:
+        ...
 
 
 __all__ = [

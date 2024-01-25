@@ -1037,6 +1037,12 @@ class OT3API(
                 detail={"axes": axes_str},
             )
 
+    def motor_status_ok(self, axis: Axis) -> bool:
+        return self._backend.check_motor_status([axis])
+
+    def encoder_status_ok(self, axis: Axis) -> bool:
+        return self._backend.check_encoder_status([axis])
+
     async def encoder_current_position(
         self,
         mount: Union[top_types.Mount, OT3Mount],
