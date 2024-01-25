@@ -20,7 +20,7 @@ def run(ctx: ProtocolContext) -> None:
     tipracks = [
         # FIXME: use official tip-racks once available
         ctx.load_labware(
-            f"opentrons_flex_96_tiprack_{size}uL_adp", slot, namespace="custom_beta"
+            load_name=f"opentrons_flex_96_tiprack_{size}uL", location = slot, adapter="opentrons_flex_96_tiprack_adapter"
         )
         for size, slots in SLOTS_TIPRACK.items()
         for slot in slots
