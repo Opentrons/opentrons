@@ -89,7 +89,7 @@ function Input(props: InputFieldProps): JSX.Element {
     background-color: ${COLORS.white};
     border-radius: ${SPACING.spacing4};
     padding: ${SPACING.spacing8};
-    border: 1px ${BORDERS.styleSolid} ${error ? COLORS.red50 : COLORS.grey30};
+    border: 1px ${BORDERS.styleSolid} ${error ? COLORS.red50 : COLORS.grey50};
     font-size: ${TYPOGRAPHY.fontSizeP};
 
     &:active {
@@ -110,9 +110,11 @@ function Input(props: InputFieldProps): JSX.Element {
 
     &:hover {
       border: 1px ${BORDERS.styleSolid} ${error ? COLORS.red50 : COLORS.grey60};
+      outline: 2px ${BORDERS.styleSolid} ${COLORS.blue50};
+      outline-offset: 3px;
     }
     &:focus {
-      border: 1px ${BORDERS.styleSolid} ${COLORS.blue50};
+      border: 1px ${BORDERS.styleSolid} ${error ? COLORS.red50 : COLORS.grey60};
     }
     &:disabled {
       border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
@@ -153,7 +155,7 @@ function Input(props: InputFieldProps): JSX.Element {
             display={DISPLAY_INLINE_BLOCK}
             textAlign={TEXT_ALIGN_RIGHT}
             alignSelf={ALIGN_CENTER}
-            color={COLORS.grey50}
+            color={props.disabled ? COLORS.grey30 : COLORS.grey50}
             fontSize={TYPOGRAPHY.fontSizeLabel}
           >
             {props.units}

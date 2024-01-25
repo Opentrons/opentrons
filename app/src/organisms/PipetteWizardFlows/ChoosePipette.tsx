@@ -60,7 +60,8 @@ const UNSELECTED_OPTIONS_STYLE = css`
   grid-gap: ${SPACING.spacing8}
 
   &:hover {
-    border: 1px solid ${COLORS.grey60};
+    border: 1px solid ${COLORS.grey35};
+    background-color: ${COLORS.grey10}
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
@@ -85,7 +86,7 @@ const SELECTED_OPTIONS_STYLE = css`
 
   &:hover {
     border: 1px solid ${COLORS.blue50};
-    background-color: ${COLORS.blue10};
+    background-color: ${COLORS.blue30};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
