@@ -253,7 +253,8 @@ def _pipette_with_liquid_settings(  # noqa: C901
 
     def _aspirate_on_retract() -> None:
         # add trailing-air-gap
-        pipette.air_gap(liquid_class.aspirate.trailing_air_gap, height=0)
+        if not blank:
+            pipette.air_gap(liquid_class.aspirate.trailing_air_gap, height=0)
 
     def _dispense_on_approach() -> None:
         # remove trailing-air-gap
