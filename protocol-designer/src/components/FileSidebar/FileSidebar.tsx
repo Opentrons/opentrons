@@ -282,7 +282,7 @@ export function FileSidebar(): JSX.Element {
   const loadFile = (
     fileChangeEvent: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    if (!hasUnsavedChanges || window.confirm(t('window.confirm_import'))) {
+    if (!hasUnsavedChanges || window.confirm(t('confirm_import'))) {
       dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
     }
   }

@@ -36,7 +36,7 @@ export function FileUploadMessageModal(): JSX.Element | null {
       className: modalStyles.button_medium,
     },
   ]
-  if (title === 'Incorrect file type' || title === 'Invalid JSON file') {
+  if (title === t('incorrect_file.header') || title === t('invalid.header')) {
     buttons = [
       {
         children: okButtonText || t('button:ok'),

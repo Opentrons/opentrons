@@ -8,12 +8,12 @@ import styles from './modalContents.css'
 
 const PD = 'Protocol Designer'
 
-interface InvalidModalProps {
+interface ModalProps {
   t: any
   errorMessage?: string | null
 }
 
-const getInvalidFileType = (props: InvalidModalProps): ModalContents => {
+const getInvalidFileType = (props: ModalProps): ModalContents => {
   const { t } = props
   return {
     title: t('incorrect_file.header'),
@@ -26,7 +26,7 @@ const getInvalidFileType = (props: InvalidModalProps): ModalContents => {
   }
 }
 
-const invalidJsonModal = (props: InvalidModalProps): ModalContents => {
+const invalidJsonModal = (props: ModalProps): ModalContents => {
   const { t, errorMessage } = props
   return {
     title: t('invalid.header'),
@@ -45,7 +45,11 @@ const invalidJsonModal = (props: InvalidModalProps): ModalContents => {
   }
 }
 
-export const getGenericDidMigrateMessage = (t: any): ModalContents => {
+export const getGenericDidMigrateMessage = (
+  props: ModalProps
+): ModalContents => {
+  const { t } = props
+
   return {
     title: t('migrations.header', { pd: PD }),
     body: (
@@ -58,7 +62,11 @@ export const getGenericDidMigrateMessage = (t: any): ModalContents => {
   }
 }
 
-export const getNoBehaviorChangeMessage = (t: any): ModalContents => {
+export const getNoBehaviorChangeMessage = (
+  props: ModalProps
+): ModalContents => {
+  const { t } = props
+
   return {
     title: t('migrations.header', { pd: PD }),
     body: (
@@ -71,7 +79,9 @@ export const getNoBehaviorChangeMessage = (t: any): ModalContents => {
   }
 }
 
-export const getToV8MigrationMessage = (t: any): ModalContents => {
+export const getToV8MigrationMessage = (props: ModalProps): ModalContents => {
+  const { t } = props
+
   return {
     title: t('migrations.header', { pd: PD }),
     body: (
@@ -87,7 +97,9 @@ export const getToV8MigrationMessage = (t: any): ModalContents => {
   }
 }
 
-export const getToV3MigrationMessage = (t: any): ModalContents => {
+export const getToV3MigrationMessage = (props: ModalProps): ModalContents => {
+  const { t } = props
+
   return {
     title: t('migrations.toV3Migration.title'),
     okButtonText: t('migrations.toV3Migration.button'),
