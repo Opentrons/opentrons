@@ -8,7 +8,7 @@ interface LabwareNameProps {
   labwareOnDeck: LabwareOnDeck
 }
 
-export const LabwareName = (props: LabwareNameProps): JSX.Element => {
+export function LabwareName(props: LabwareNameProps): JSX.Element {
   const { labwareOnDeck } = props
   const nicknames = useSelector(uiLabwareSelectors.getLabwareNicknamesById)
   const nickname = nicknames[labwareOnDeck.id]

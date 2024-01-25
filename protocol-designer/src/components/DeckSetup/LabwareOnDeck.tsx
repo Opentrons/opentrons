@@ -16,7 +16,7 @@ interface LabwareOnDeckProps {
   y: number
 }
 
-export const LabwareOnDeck = (props: LabwareOnDeckProps): JSX.Element => {
+export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
   const { labwareOnDeck, x, y, className } = props
   const missingTipsByLabwareId = useSelector(
     tipContentsSelectors.getMissingTipsByLabwareId

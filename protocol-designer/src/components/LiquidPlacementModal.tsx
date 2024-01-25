@@ -19,7 +19,7 @@ import { WellSelectionInstructions } from './WellSelectionInstructions'
 
 import styles from './LiquidPlacementModal.css'
 
-export const LiquidPlacementModal = (): JSX.Element => {
+export function LiquidPlacementModal(): JSX.Element {
   const [highlightedWells, setHighlightedWells] = React.useState<
     WellGroup | {}
   >({})

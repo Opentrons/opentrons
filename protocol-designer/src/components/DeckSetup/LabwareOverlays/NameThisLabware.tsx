@@ -15,7 +15,7 @@ interface NameThisLabwareProps {
   editLiquids: () => void
 }
 
-export const NameThisLabware = (props: NameThisLabwareProps): JSX.Element => {
+export function NameThisLabware(props: NameThisLabwareProps): JSX.Element {
   const { labwareOnDeck } = props
   const dispatch: ThunkDispatch<any> = useDispatch()
   const [inputValue, setInputValue] = React.useState<string>('')

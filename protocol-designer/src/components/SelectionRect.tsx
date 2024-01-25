@@ -11,7 +11,7 @@ interface SelectionRectProps {
   originYOffset?: number
 }
 
-export const SelectionRect = (props: SelectionRectProps): JSX.Element => {
+export function SelectionRect(props: SelectionRectProps): JSX.Element {
   const {
     onSelectionMove,
     onSelectionDone,

@@ -14,7 +14,7 @@ import { Portal } from '../../portals/MainPageModalPortal'
 import styles from '../SettingsPage.css'
 import modalStyles from '../../modals/modal.css'
 
-export const FeatureFlagCard = (): JSX.Element => {
+export function FeatureFlagCard(): JSX.Element {
   const flags = useSelector(featureFlagSelectors.getFeatureFlagData)
   const dispatch = useDispatch()
 

@@ -141,7 +141,7 @@ export const getLabwareIsRecommended = (
       : false
   }
 }
-export const LabwareSelectionModal = (): JSX.Element | null => {
+export function LabwareSelectionModal(): JSX.Element | null {
   const { t } = useTranslation(['modules', 'modal', 'button', 'alert'])
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const selectedLabwareSlot = useSelector(

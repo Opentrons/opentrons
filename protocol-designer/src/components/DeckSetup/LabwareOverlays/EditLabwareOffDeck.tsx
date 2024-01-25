@@ -62,9 +62,9 @@ interface EditLabwareOffDeckProps {
   labwareEntity: LabwareEntity
 }
 
-export const EditLabwareOffDeck = (
+export function EditLabwareOffDeck(
   props: EditLabwareOffDeckProps
-): JSX.Element => {
+): JSX.Element {
   const { labwareEntity } = props
   const { t } = useTranslation('deck')
   const dispatch = useDispatch<ThunkDispatch<any>>()

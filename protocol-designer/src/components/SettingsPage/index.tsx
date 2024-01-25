@@ -6,7 +6,7 @@ import { SettingsApp } from './SettingsApp'
 
 export { SettingsSidebar } from './SettingsSidebar'
 
-export const SettingsPage = (): JSX.Element => {
+export function SettingsPage(): JSX.Element {
   const currentPage = useSelector(selectors.getCurrentPage)
   switch (currentPage) {
     // TODO: Ian 2019-08-21 when we have other pages, put them here
