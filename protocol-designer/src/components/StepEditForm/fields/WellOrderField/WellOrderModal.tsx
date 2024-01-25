@@ -9,12 +9,12 @@ import {
   FormGroup,
   DropdownField,
 } from '@opentrons/components'
-import modalStyles from '../../../modals/modal.css'
-import { WellOrderOption } from '../../../../form-types'
-
 import { WellOrderViz } from './WellOrderViz'
-import styles from './WellOrderInput.css'
+import type { WellOrderOption } from '../../../../form-types'
+
+import modalStyles from '../../../modals/modal.css'
 import stepEditStyles from '../../StepEditForm.css'
+import styles from './WellOrderInput.css'
 
 const DEFAULT_FIRST: WellOrderOption = 't2b'
 const DEFAULT_SECOND: WellOrderOption = 'l2r'
@@ -37,9 +37,6 @@ export interface WellOrderModalProps {
     firstValue?: WellOrderOption | null,
     secondValue?: WellOrderOption | null
   ) => void
-  //  TODO(jr, 1/18/24): The newest i18next versions only support TypeScript v5
-  //  so need to type all ts as any for now https://www.i18next.com/overview/typescript
-  t: any
 }
 
 interface State {
@@ -86,27 +83,24 @@ export const DoneButton = (props: { onClick: () => void }): JSX.Element => {
     </DeprecatedPrimaryButton>
   )
 }
-export class WellOrderModal extends React.Component<
-  WellOrderModalProps,
-  State
-> {
-  constructor(props: WellOrderModalProps) {
-    super(props)
-    const {
-      initialFirstValue,
-      initialSecondValue,
-    } = this.getInitialFirstValues()
-    this.state = {
-      firstValue: initialFirstValue,
-      secondValue: initialSecondValue,
-    }
-  }
 
-  getInitialFirstValues: () => {
+export const WellOrderModal = (
+  props: WellOrderModalProps
+): JSX.Element | null => {
+  const { t } = useTranslation(['form', 'modal'])
+  const {
+    isOpen,
+    closeModal,
+    firstName,
+    secondName,
+    updateValues,
+    firstValue,
+    secondValue,
+  } = props
+  const getInitialFirstValues: () => {
     initialFirstValue: WellOrderOption
     initialSecondValue: WellOrderOption
   } = () => {
-    const { firstValue, secondValue } = this.props
     if (firstValue == null || secondValue == null) {
       return {
         initialFirstValue: DEFAULT_FIRST,
@@ -119,136 +113,133 @@ export class WellOrderModal extends React.Component<
     }
   }
 
-  applyChanges: () => void = () => {
-    this.props.updateValues(this.state.firstValue, this.state.secondValue)
+  const [wellOrder, setWellOrder] = React.useState<State>({
+    firstValue: DEFAULT_FIRST,
+    secondValue: DEFAULT_SECOND,
+  })
+
+  React.useEffect(() => {
+    if (firstValue != null && secondValue != null) {
+      setWellOrder({
+        firstValue: firstValue,
+        secondValue: secondValue,
+      })
+    }
+  }, [firstValue, secondValue])
+
+  const applyChanges = (): void => {
+    updateValues(wellOrder.firstValue, wellOrder.secondValue)
   }
 
-  handleReset: () => void = () => {
-    this.setState(
-      { firstValue: DEFAULT_FIRST, secondValue: DEFAULT_SECOND },
-      this.applyChanges
-    )
-    this.props.closeModal()
+  const handleReset = (): void => {
+    setWellOrder({ firstValue: DEFAULT_FIRST, secondValue: DEFAULT_SECOND })
+    applyChanges()
+    closeModal()
   }
 
-  handleCancel: () => void = () => {
-    const {
-      initialFirstValue,
-      initialSecondValue,
-    } = this.getInitialFirstValues()
-    this.setState({
+  const handleCancel = (): void => {
+    const { initialFirstValue, initialSecondValue } = getInitialFirstValues()
+    setWellOrder({
       firstValue: initialFirstValue,
       secondValue: initialSecondValue,
     })
-    this.props.closeModal()
+    closeModal()
   }
 
-  handleDone: () => void = () => {
-    this.applyChanges()
-    this.props.closeModal()
+  const handleDone = (): void => {
+    applyChanges()
+    closeModal()
   }
 
-  makeOnChange: (
-    ordinality: 'first' | 'second'
-  ) => (
+  const makeOnChange = (ordinality: 'first' | 'second') => (
     event: React.ChangeEvent<HTMLSelectElement>
-  ) => void = ordinality => event => {
+  ): void => {
     const { value } = event.currentTarget
     // @ts-expect-error (ce, 2021-06-22) missing one prop or the other
     let nextState: State = { [`${ordinality}Value`]: value }
     if (ordinality === 'first') {
       if (
         VERTICAL_VALUES.includes(value as WellOrderOption) &&
-        VERTICAL_VALUES.includes(this.state.secondValue)
+        VERTICAL_VALUES.includes(wellOrder.secondValue)
       ) {
         nextState = { ...nextState, secondValue: HORIZONTAL_VALUES[0] }
       } else if (
         HORIZONTAL_VALUES.includes(value as WellOrderOption) &&
-        HORIZONTAL_VALUES.includes(this.state.secondValue)
+        HORIZONTAL_VALUES.includes(wellOrder.secondValue)
       ) {
         nextState = { ...nextState, secondValue: VERTICAL_VALUES[0] }
       }
     }
-    this.setState(nextState)
+    setWellOrder(nextState)
   }
 
-  isSecondOptionDisabled: (wellOrderOption: WellOrderOption) => boolean = (
-    value: WellOrderOption
-  ) => {
-    if (VERTICAL_VALUES.includes(this.state.firstValue)) {
+  const isSecondOptionDisabled = (value: WellOrderOption): boolean => {
+    if (VERTICAL_VALUES.includes(wellOrder.firstValue)) {
       return VERTICAL_VALUES.includes(value)
-    } else if (HORIZONTAL_VALUES.includes(this.state.firstValue)) {
+    } else if (HORIZONTAL_VALUES.includes(wellOrder.firstValue)) {
       return HORIZONTAL_VALUES.includes(value)
     } else {
       return false
     }
   }
 
-  render(): React.ReactNode | null {
-    if (!this.props.isOpen) return null
+  if (!isOpen) return null
 
-    const { firstValue, secondValue } = this.state
-    const { firstName, secondName, t } = this.props
-
-    return (
-      <Portal>
-        <Modal
-          className={modalStyles.modal}
-          contentsClassName={cx(modalStyles.modal_contents)}
-          onCloseClick={this.handleCancel}
-        >
-          <div className={styles.modal_header}>
-            <h4>{t('modal:well_order.title')}</h4>
-            <p>{t('modal:well_order.body')}</p>
-          </div>
-          <div className={styles.main_row}>
-            <FormGroup label={t('modal:well_order.field_label')}>
-              <div className={styles.field_row}>
-                <DropdownField
-                  name={firstName}
-                  value={firstValue}
-                  className={cx(
-                    stepEditStyles.field,
-                    styles.well_order_dropdown
-                  )}
-                  onChange={this.makeOnChange('first')}
-                  options={WELL_ORDER_VALUES.map(value => ({
-                    value,
-                    name: t(`step_edit_form.field.well_order.option.${value}`),
-                  }))}
-                />
-                <span className={styles.field_spacer}>
-                  {t('modal:well_order.then')}
-                </span>
-                <DropdownField
-                  name={secondName}
-                  value={secondValue}
-                  className={cx(
-                    stepEditStyles.field,
-                    styles.well_order_dropdown
-                  )}
-                  onChange={this.makeOnChange('second')}
-                  options={WELL_ORDER_VALUES.map(value => ({
-                    value,
-                    name: t(`step_edit_form.field.well_order.option.${value}`),
-                    disabled: this.isSecondOptionDisabled(value),
-                  }))}
-                />
-              </div>
-            </FormGroup>
-            <FormGroup label={t('well_order.viz_label')}>
-              <WellOrderViz firstValue={firstValue} secondValue={secondValue} />
-            </FormGroup>
-          </div>
-          <div className={modalStyles.button_row_divided}>
-            <ResetButton onClick={this.handleReset} />
-            <div>
-              <CancelButton onClick={this.handleCancel} />
-              <DoneButton onClick={this.handleDone} />
+  return (
+    <Portal>
+      <Modal
+        className={modalStyles.modal}
+        contentsClassName={cx(modalStyles.modal_contents)}
+        onCloseClick={handleCancel}
+      >
+        <div className={styles.modal_header}>
+          <h4>{t('modal:well_order.title')}</h4>
+          <p>{t('modal:well_order.body')}</p>
+        </div>
+        <div className={styles.main_row}>
+          <FormGroup label={t('modal:well_order.field_label')}>
+            <div className={styles.field_row}>
+              <DropdownField
+                name={firstName}
+                value={wellOrder.firstValue}
+                className={cx(stepEditStyles.field, styles.well_order_dropdown)}
+                onChange={makeOnChange('first')}
+                options={WELL_ORDER_VALUES.map(value => ({
+                  value,
+                  name: t(`step_edit_form.field.well_order.option.${value}`),
+                }))}
+              />
+              <span className={styles.field_spacer}>
+                {t('modal:well_order.then')}
+              </span>
+              <DropdownField
+                name={secondName}
+                value={wellOrder.secondValue}
+                className={cx(stepEditStyles.field, styles.well_order_dropdown)}
+                onChange={makeOnChange('second')}
+                options={WELL_ORDER_VALUES.map(value => ({
+                  value,
+                  name: t(`step_edit_form.field.well_order.option.${value}`),
+                  disabled: isSecondOptionDisabled(value),
+                }))}
+              />
             </div>
+          </FormGroup>
+          <FormGroup label={t('well_order.viz_label')}>
+            <WellOrderViz
+              firstValue={wellOrder.firstValue}
+              secondValue={wellOrder.secondValue}
+            />
+          </FormGroup>
+        </div>
+        <div className={modalStyles.button_row_divided}>
+          <ResetButton onClick={handleReset} />
+          <div>
+            <CancelButton onClick={handleCancel} />
+            <DoneButton onClick={handleDone} />
           </div>
-        </Modal>
-      </Portal>
-    )
-  }
+        </div>
+      </Modal>
+    </Portal>
+  )
 }

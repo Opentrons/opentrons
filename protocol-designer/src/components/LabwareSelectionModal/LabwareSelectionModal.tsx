@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import startCase from 'lodash/startCase'
 import reduce from 'lodash/reduce'
@@ -23,13 +24,26 @@ import {
   ModuleModel,
   getModuleType,
   THERMOCYCLER_MODULE_V2,
+  getAreSlotsHorizontallyAdjacent,
 } from '@opentrons/shared-data'
+import {
+  closeLabwareSelector,
+  createContainer,
+} from '../../labware-ingred/actions'
+import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
+import {
+  actions as labwareDefActions,
+  selectors as labwareDefSelectors,
+} from '../../labware-defs'
+import { selectors as stepFormSelectors, ModuleOnDeck } from '../../step-forms'
 import { SPAN7_8_10_11_SLOT } from '../../constants'
 import {
   getLabwareIsCompatible as _getLabwareIsCompatible,
   getLabwareCompatibleWithAdapter,
   ADAPTER_96_CHANNEL,
 } from '../../utils/labwareModuleCompatibility'
+import { getPipetteEntities } from '../../step-forms/selectors'
+import { getHas96Channel } from '../../utils'
 import { getOnlyLatestDefs } from '../../labware-defs/utils'
 import { Portal } from '../portals/TopPortal'
 import { PDTitledList } from '../lists'
@@ -39,7 +53,7 @@ import { LabwareItem } from './LabwareItem'
 import { LabwarePreview } from './LabwarePreview'
 import styles from './styles.css'
 
-import type { DeckSlot } from '../../types'
+import type { DeckSlot, ThunkDispatch } from '../../types'
 import type { LabwareDefByDefURI } from '../../labware-defs'
 
 export interface Props {
@@ -127,21 +141,61 @@ export const getLabwareIsRecommended = (
       : false
   }
 }
-export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
-  const {
-    customLabwareDefs,
-    permittedTipracks,
-    onClose,
-    onUploadLabware,
-    slot,
-    parentSlot,
-    moduleModel,
-    selectLabware,
-    isNextToHeaterShaker,
-    adapterLoadName,
-    has96Channel,
-  } = props
+export function LabwareSelectionModal(): JSX.Element | null {
   const { t } = useTranslation(['modules', 'modal', 'button', 'alert'])
+  const dispatch = useDispatch<ThunkDispatch<any>>()
+  const selectedLabwareSlot = useSelector(
+    labwareIngredSelectors.selectedAddLabwareSlot
+  )
+  const pipetteEntities = useSelector(getPipetteEntities)
+  const permittedTipracks = useSelector(stepFormSelectors.getPermittedTipracks)
+  const customLabwareDefs = useSelector(
+    labwareDefSelectors.getCustomLabwareDefsByURI
+  )
+  const deckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
+  const has96Channel = getHas96Channel(pipetteEntities)
+  const modulesById = deckSetup.modules
+  const labwareById = deckSetup.labware
+  const slot = selectedLabwareSlot === false ? null : selectedLabwareSlot
+
+  const onClose = (): void => {
+    dispatch(closeLabwareSelector())
+  }
+  const selectLabware = (labwareDefURI: string): void => {
+    if (slot) {
+      dispatch(
+        createContainer({
+          slot: slot,
+          labwareDefURI,
+        })
+      )
+    }
+  }
+
+  const onUploadLabware = (
+    fileChangeEvent: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    dispatch(labwareDefActions.createCustomLabwareDef(fileChangeEvent))
+  }
+
+  const initialModules: ModuleOnDeck[] = Object.keys(modulesById).map(
+    moduleId => modulesById[moduleId]
+  )
+  const parentModule =
+    (slot != null &&
+      initialModules.find(moduleOnDeck => moduleOnDeck.id === slot)) ||
+    null
+  const parentSlot = parentModule != null ? parentModule.slot : null
+  const moduleModel = parentModule != null ? parentModule.model : null
+  const isNextToHeaterShaker = initialModules.some(
+    hardwareModule =>
+      hardwareModule.type === HEATERSHAKER_MODULE_TYPE &&
+      getAreSlotsHorizontallyAdjacent(hardwareModule.slot, parentSlot ?? slot)
+  )
+  const adapterLoadName = Object.values(labwareById)
+    .filter(labwareOnDeck => slot === labwareOnDeck.id)
+    .map(labwareOnDeck => labwareOnDeck.def.parameters.loadName)[0]
+
   const defs = getOnlyLatestDefs()
   const moduleType = moduleModel != null ? getModuleType(moduleModel) : null
   const URIs = Object.keys(defs)
@@ -154,10 +208,12 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
   const [filterRecommended, setFilterRecommended] = React.useState<boolean>(
     false
   )
+
   const [filterHeight, setFilterHeight] = React.useState<boolean>(false)
   const [enqueuedLabwareType, setEnqueuedLabwareType] = React.useState<
     string | null
   >(null)
+
   const blockingCustomLabwareHint = useBlockingHint({
     enabled: enqueuedLabwareType !== null,
     hintKey: 'custom_labware_with_modules',
