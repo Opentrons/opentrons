@@ -136,6 +136,9 @@ class ProtocolCore(
     ) -> None:
         """Append a disposal location object to the core"""
         if isinstance(disposal_location, TrashBin):
+            self._engine_client.state.addressable_areas.raise_if_area_not_in_deck_configuration(
+                disposal_location.area_name
+            )
             deck_conflict.check(
                 engine_state=self._engine_client.state,
                 new_trash_bin=disposal_location,
@@ -147,6 +150,7 @@ class ProtocolCore(
                 existing_labware_ids=list(self._labware_cores_by_id.keys()),
                 existing_module_ids=list(self._module_cores_by_id.keys()),
             )
+            self._engine_client.add_addressable_area(disposal_location.area_name)
         self._disposal_locations.append(disposal_location)
 
     def get_disposal_locations(self) -> List[Union[Labware, TrashBin, WasteChute]]:
