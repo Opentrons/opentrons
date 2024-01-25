@@ -34,6 +34,8 @@ from ..types import (
 if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 
+_GRIPPER_HOMED_POSITION_Z = 166.125  # Height of the center of the gripper critical point from the deck when homed
+
 
 # TODO (spp, 2022-10-20): name this GripperMovementHandler if it doesn't handle
 #  any non-gripper implementations
@@ -79,7 +81,7 @@ class LabwareMovementHandler:
             )
         )
 
-    async def move_labware_with_gripper(  # noqa: C901
+    async def move_labware_with_gripper(
         self,
         labware_id: str,
         current_location: OnDeckLabwareLocation,
@@ -92,20 +94,11 @@ class LabwareMovementHandler:
 
         if use_virtual_gripper:
             # During Analysis we will pass in hard coded estimates for certain positions only accessible during execution
-            # Estimated gripper homed Z position: 166.125 mm
-            attached_tips = self._state_store.pipettes.get_all_attached_tips()
-            if attached_tips:
-                for pipette_id, tip in attached_tips:
-                    if not self._state_store.geometry.validate_gripper_labware_tip_collision(
-                        gripper_homed_position_z=166.125,
-                        tip=tip,
-                        pipette_id=pipette_id,
-                        labware_id=labware_id,
-                        current_location=current_location,
-                    ):
-                        raise LabwareMovementNotAllowedError(
-                            f"Cannot move labware '{self._state_store.labware.get(labware_id).loadName}' when {int(tip.volume)} ul tips are attached."
-                        )
+            self._state_store.geometry.check_gripper_labware_tip_collision(
+                gripper_homed_position_z=_GRIPPER_HOMED_POSITION_Z,
+                labware_id=labware_id,
+                current_location=current_location,
+            )
             return
 
         ot3api = ensure_ot3_hardware(
@@ -129,19 +122,11 @@ class LabwareMovementHandler:
         gripper_homed_position = await ot3api.gantry_position(mount=gripper_mount)
 
         # Verify that no tip collisions will occur during the move
-        attached_tips = self._state_store.pipettes.get_all_attached_tips()
-        if attached_tips:
-            for pipette_id, tip in attached_tips:
-                if not self._state_store.geometry.validate_gripper_labware_tip_collision(
-                    gripper_homed_position_z=gripper_homed_position.z,
-                    tip=tip,
-                    pipette_id=pipette_id,
-                    labware_id=labware_id,
-                    current_location=current_location,
-                ):
-                    raise LabwareMovementNotAllowedError(
-                        f"Cannot move labware '{self._state_store.labware.get(labware_id).loadName}' when {int(tip.volume)} ul tips are attached."
-                    )
+        self._state_store.geometry.check_gripper_labware_tip_collision(
+            gripper_homed_position_z=gripper_homed_position.z,
+            labware_id=labware_id,
+            current_location=current_location,
+        )
 
         async with self._thermocycler_plate_lifter.lift_plate_for_labware_movement(
             labware_location=current_location

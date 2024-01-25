@@ -8,7 +8,11 @@ from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
 
 from .. import errors
-from ..errors import LabwareNotLoadedOnLabwareError, LabwareNotLoadedOnModuleError
+from ..errors import (
+    LabwareNotLoadedOnLabwareError,
+    LabwareNotLoadedOnModuleError,
+    LabwareMovementNotAllowedError,
+)
 from ..resources import fixture_validation
 from ..types import (
     OFF_DECK_LOCATION,
@@ -46,6 +50,9 @@ from opentrons_shared_data.pipette.dev_types import ChannelCount
 
 
 SLOT_WIDTH = 128
+_PIPETTE_HOMED_POSITION_Z = (
+    248.0  # Height of the bottom of the nozzle without the tip attached when homed
+)
 
 
 class _TipDropSection(enum.Enum):
@@ -978,30 +985,35 @@ class GeometryView:
                     ).dropOffset
                 )
 
-    def validate_gripper_labware_tip_collision(
+    def check_gripper_labware_tip_collision(
         self,
         gripper_homed_position_z: float,
-        tip: TipGeometry,
-        pipette_id: str,
         labware_id: str,
         current_location: OnDeckLabwareLocation,
-    ) -> bool:
+    ) -> None:
         """Check for potential collision of tips against labware to be lifted."""
-        pipette_home_z = 248.0
-        # TODO(mm, 2024-01-22): Remove the 1 and 8 channel special case once we are doing X axis validation
-        if self._pipettes.get_channels(pipette_id) in [1, 8]:
-            return True
+        # TODO(cb, 2024-01-22): Remove the 1 and 8 channel special case once we are doing X axis validation
+        pipettes = self._pipettes.get_all()
+        for pipette in pipettes:
+            if self._pipettes.get_channels(pipette.id) in [1, 8]:
+                return
 
-        labware_top_z_when_gripped = gripper_homed_position_z + (
-            self.get_labware_highest_z(labware_id=labware_id)
-            - self.get_labware_grip_point(
-                labware_id=labware_id, location=current_location
-            ).z
-        )
-        # TODO(mm, 2024-01-18): Utilizing the nozzle map and labware X coordinates verify if collisions will occur on the X axis (analysis will use hard coded data to measure from the gripper critical point to the pipette mount)
-        if (pipette_home_z - tip.length) < labware_top_z_when_gripped:
-            return False
-        return True
+            tip = self._pipettes.get_attached_tip(pipette.id)
+            if tip:
+                labware_top_z_when_gripped = gripper_homed_position_z + (
+                    self.get_labware_highest_z(labware_id=labware_id)
+                    - self.get_labware_grip_point(
+                        labware_id=labware_id, location=current_location
+                    ).z
+                )
+                # TODO(cb, 2024-01-18): Utilizing the nozzle map and labware X coordinates verify if collisions will occur on the X axis (analysis will use hard coded data to measure from the gripper critical point to the pipette mount)
+                if (
+                    _PIPETTE_HOMED_POSITION_Z - tip.length
+                ) < labware_top_z_when_gripped:
+                    raise LabwareMovementNotAllowedError(
+                        f"Cannot move labware '{self._labware.get(labware_id).loadName}' when {int(tip.volume)} ul tips are attached."
+                    )
+        return
 
     def _nominal_gripper_offsets_for_location(
         self, location: OnDeckLabwareLocation
