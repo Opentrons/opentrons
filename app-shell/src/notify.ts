@@ -264,13 +264,21 @@ function establishListeners({
 }
 
 export function closeAllNotifyConnections(): Promise<unknown[]> {
-  log.debug('Stopping notify service connections')
-  const closeConnections = Object.values(connectionStore).map(({ client }) => {
-    return new Promise((resolve, reject) => {
-      client?.end(true, {}, () => resolve(null))
-    })
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      reject('Failed to close all connections within the time limit.')
+    }, 2000)
+
+    log.debug('Stopping notify service connections')
+    const closeConnections = Object.values(connectionStore).map(
+      ({ client }) => {
+        return new Promise((resolve, reject) => {
+          client?.end(true, {}, () => resolve(null))
+        })
+      }
+    )
+    Promise.all(closeConnections).then(resolve).catch(reject)
   })
-  return Promise.all(closeConnections)
 }
 
 interface SendToBrowserParams {
