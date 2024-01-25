@@ -979,10 +979,10 @@ class InstrumentContext(publisher.CommandPublisher):
             - As a :py:class:`~.types.Location`. For example, to drop a tip from an
               unusually large height above the tip rack, you could call
               ``pipette.drop_tip(tip_rack["A1"].top(z=10))``.
-            - As a ``TrashBin``. This uses a default location relative to the
+            - As a :py:class:`.TrashBin`. This uses a default location relative to the
               ``TrashBin`` object. For example,
               ``pipette.drop_tip(location=trash_bin)``.
-            - As a ``WasteChute``. This uses a default location relative to
+            - As a :py:class:`.WasteChute`. This uses a default location relative to
               the ``WasteChute`` object. For example,
               ``pipette.drop_tip(location=waste_chute)``.
 
@@ -1543,7 +1543,7 @@ class InstrumentContext(publisher.CommandPublisher):
         This is the property used to determine where to drop tips and blow out liquids
         when calling :py:meth:`drop_tip` or :py:meth:`blow_out` without arguments.
 
-        You can set this to a :py:obj:`Labware`, ``TrashBin``, or ``WasteChute``.
+        You can set this to a :py:obj:`Labware`, :py:class:`.TrashBin`, or :py:class:`.WasteChute`.
 
         The default value depends on the robot type and API version:
 
