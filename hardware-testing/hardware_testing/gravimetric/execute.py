@@ -641,7 +641,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                 resources.pipette,
                 return_tip=False,
                 minimum_z_height=_minimum_z_height(cfg),
-                offset=_get_channel_offset(cfg,0)
+                offset=_get_channel_offset(cfg, 0),
             )  # always trash calibration tips
         calibration_tip_in_use = False
         trial_count = 0
@@ -739,8 +739,10 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                     if not cfg.same_tip:
                         resources.pipette._retract()  # retract to top of gantry
                         _drop_tip(
-                            resources.pipette, cfg.return_tip, _minimum_z_height(cfg),
-							_get_channel_offset(cfg,run_trial.channel)
+                            resources.pipette,
+                            cfg.return_tip,
+                            _minimum_z_height(cfg),
+                            _get_channel_offset(cfg, run_trial.channel),
                         )
 
                 ui.print_header(f"{volume} uL channel {channel + 1} CALCULATIONS")
