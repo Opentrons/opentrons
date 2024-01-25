@@ -1,28 +1,38 @@
 import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import sortBy from 'lodash/sortBy'
 import { ContinueModal, Card, ToggleButton } from '@opentrons/components'
 import { resetScrollElements } from '../../../ui/steps/utils'
+import {
+  userFacingFlags,
+  FlagTypes,
+  actions as featureFlagActions,
+  selectors as featureFlagSelectors,
+} from '../../../feature-flags'
 import { Portal } from '../../portals/MainPageModalPortal'
 import styles from '../SettingsPage.css'
 import modalStyles from '../../modals/modal.css'
-import { userFacingFlags, Flags, FlagTypes } from '../../../feature-flags'
 
-export interface Props {
-  flags: Flags
-  setFeatureFlags: (flags: Flags) => unknown
-}
+export function FeatureFlagCard(): JSX.Element {
+  const flags = useSelector(featureFlagSelectors.getFeatureFlagData)
+  const dispatch = useDispatch()
 
-export const FeatureFlagCard = (props: Props): JSX.Element => {
   const [modalFlagName, setModalFlagName] = React.useState<FlagTypes | null>(
     null
   )
   const { t } = useTranslation(['modal', 'card', 'feature_flags'])
 
-  const prereleaseModeEnabled = props.flags.PRERELEASE_MODE === true
+  const setFeatureFlags = (
+    flags: Partial<Record<FlagTypes, boolean | null | undefined>>
+  ): void => {
+    dispatch(featureFlagActions.setFeatureFlags(flags))
+  }
+
+  const prereleaseModeEnabled = flags.PRERELEASE_MODE === true
 
   // @ts-expect-error(sa, 2021-6-21): Object.keys not smart enough to take keys from props.flags
-  const allFlags: FlagTypes[] = sortBy(Object.keys(props.flags))
+  const allFlags: FlagTypes[] = sortBy(Object.keys(flags))
 
   const userFacingFlagNames = allFlags.filter(flagName =>
     userFacingFlags.includes(flagName)
@@ -59,7 +69,7 @@ export const FeatureFlagCard = (props: Props): JSX.Element => {
         </p>
         <ToggleButton
           className={styles.toggle_button}
-          toggledOn={Boolean(props.flags[flagName])}
+          toggledOn={Boolean(flags[flagName])}
           onClick={() => {
             resetScrollElements()
             setModalFlagName(flagName)
@@ -85,7 +95,7 @@ export const FeatureFlagCard = (props: Props): JSX.Element => {
   let flagSwitchDirection: string = 'on'
 
   if (modalFlagName) {
-    const isFlagOn: boolean | null | undefined = props.flags[modalFlagName]
+    const isFlagOn: boolean | null | undefined = flags[modalFlagName]
     flagSwitchDirection = isFlagOn ? 'off' : 'on'
   }
   return (
@@ -100,8 +110,8 @@ export const FeatureFlagCard = (props: Props): JSX.Element => {
             )}
             onCancelClick={() => setModalFlagName(null)}
             onContinueClick={() => {
-              props.setFeatureFlags({
-                [modalFlagName as string]: !props.flags[modalFlagName],
+              setFeatureFlags({
+                [modalFlagName as string]: !flags[modalFlagName],
               })
               setModalFlagName(null)
             }}

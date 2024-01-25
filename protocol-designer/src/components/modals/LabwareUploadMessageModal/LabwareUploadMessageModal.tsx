@@ -1,10 +1,15 @@
 import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import assert from 'assert'
 import cx from 'classnames'
 import { AlertModal, OutlineButton, ButtonProps } from '@opentrons/components'
+import {
+  selectors as labwareDefSelectors,
+  actions as labwareDefActions,
+  LabwareUploadMessage,
+} from '../../../labware-defs'
 import modalStyles from '../modal.css'
-import { LabwareUploadMessage } from '../../../labware-defs'
 
 const MessageBody = (props: {
   message: LabwareUploadMessage
@@ -85,11 +90,32 @@ export interface LabwareUploadMessageModalProps {
   overwriteLabwareDef?: () => unknown
 }
 
-export const LabwareUploadMessageModal = (
-  props: LabwareUploadMessageModalProps
-): JSX.Element | null => {
-  const { message, dismissModal, overwriteLabwareDef } = props
+export const LabwareUploadMessageModal = (): JSX.Element | null => {
+  const message = useSelector(labwareDefSelectors.getLabwareUploadMessage)
+  const dispatch = useDispatch()
   const { t } = useTranslation('modal')
+  const dismissModal = (): void => {
+    dispatch(labwareDefActions.dismissLabwareUploadMessage())
+  }
+  const overwriteLabwareDef = (): void => {
+    if (message && message.messageType === 'ASK_FOR_LABWARE_OVERWRITE') {
+      dispatch(
+        labwareDefActions.replaceCustomLabwareDef({
+          defURIToOverwrite: message.defURIToOverwrite,
+          newDef: message.newDef,
+          isOverwriteMismatched: message.isOverwriteMismatched,
+        })
+      )
+    } else {
+      assert(
+        false,
+        `labware def should only be overwritten when messageType is ASK_FOR_LABWARE_OVERWRITE. Got ${String(
+          message?.messageType
+        )}`
+      )
+    }
+  }
+
   if (!message) return null
 
   let buttons: ButtonProps[] = [{ children: 'OK', onClick: dismissModal }]
