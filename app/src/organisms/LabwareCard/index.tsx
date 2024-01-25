@@ -6,7 +6,6 @@ import { format } from 'date-fns'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
-  BORDERS,
   Box,
   COLORS,
   DIRECTION_COLUMN,
@@ -40,7 +39,6 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
       role="link"
       backgroundColor={COLORS.white}
       color={COLORS.black90}
-      css={BORDERS.cardOutlineBorder}
       paddingLeft={SPACING.spacing16}
       paddingY={SPACING.spacing16}
       height="auto"
