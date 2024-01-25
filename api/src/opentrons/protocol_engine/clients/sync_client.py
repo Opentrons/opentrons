@@ -72,7 +72,7 @@ class SyncClient:
         )
 
     def add_addressable_area(self, addressable_area_name: str) -> None:
-        """Add an addresable area to the engine's state."""
+        """Add an addressable area to the engine's state."""
         self._transport.call_method(
             "add_addressable_area", addressable_area_name=addressable_area_name
         )

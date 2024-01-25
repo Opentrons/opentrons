@@ -484,7 +484,7 @@ class ProtocolEngine:
         return liquid
 
     def add_addressable_area(self, addressable_area_name: str) -> None:
-        """Add an addresable area to state."""
+        """Add an addressable area to state."""
         area = AddressableAreaLocation(addressableAreaName=addressable_area_name)
         self._action_dispatcher.dispatch(
             AddAddressableAreaAction(addressable_area=area)

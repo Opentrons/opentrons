@@ -161,7 +161,7 @@ class AddLiquidAction:
 
 @dataclass(frozen=True)
 class AddAddressableAreaAction:
-    """Add an addresable area to state."""
+    """Add an addressable area to state."""
 
     addressable_area: AddressableAreaLocation
 
