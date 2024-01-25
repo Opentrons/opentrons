@@ -1868,7 +1868,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 )
             if start not in types.ALLOWED_PRIMARY_NOZZLES:
                 raise ValueError(
-                    f"Starting nozzle specified is not of {types.ALLOWED_PRIMARY_NOZZLES}"
+                    f"Starting nozzle specified is not one of {types.ALLOWED_PRIMARY_NOZZLES}"
                 )
         if style == NozzleLayout.QUADRANT:
             if front_right is None:
