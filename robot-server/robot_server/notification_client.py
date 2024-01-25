@@ -28,20 +28,19 @@ class NotificationClient:  # noqa: D101
         retain_message: bool = False,
     ) -> None:
         """Returns a configured MQTT client."""
-        self.client.on_connect = self._on_connect
-        self.client.on_disconnect = self._on_disconnect
         self.host = host
         self.port = port
         self.keepalive = keepalive
         self.default_qos = default_qos
         self.retain_message = retain_message
-
         # MQTT is somewhat particular about the client_id format and will connect erratically
         # if an unexpected string is supplied. This clientId is derived from the paho-mqtt library.
         self.client_id: str = f"robot-server-{random.randint(0, 1000000)}"
         self.client: mqtt.Client = mqtt.Client(
             client_id=self.client_id, protocol=protocol_version
         )
+        self.client.on_connect = self._on_connect
+        self.client.on_disconnect = self._on_disconnect
 
     def connect(self) -> None:
         """Connect the client to the MQTT broker."""
