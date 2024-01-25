@@ -5,7 +5,6 @@ import { useHistory } from 'react-router-dom'
 
 import {
   ALIGN_START,
-  BORDERS,
   Box,
   COLORS,
   DIRECTION_COLUMN,
