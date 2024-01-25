@@ -70,7 +70,6 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       padding={SPACING.spacing16}
       position={POSITION_RELATIVE}
       onClick={() => history.push(`/devices/${robotName}`)}
-      css={BORDERS.cardOutlineBorder}
     >
       <img
         src={robotModel === 'OT-2' ? OT2_PNG : FLEX_PNG}
@@ -132,7 +131,7 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
       <StyledText
         as="h6"
         textTransform={TYPOGRAPHY.textTransformUppercase}
-        color={COLORS.grey50}
+        color={COLORS.grey60}
       >
         {t('modules')}
       </StyledText>
@@ -185,7 +184,7 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
       gridGap={SPACING.spacing4}
       minWidth="24rem"
     >
-      <StyledText as="h6" color={COLORS.grey50}>
+      <StyledText as="h6" color={COLORS.grey60}>
         {t('shared:instruments')}
       </StyledText>
 
