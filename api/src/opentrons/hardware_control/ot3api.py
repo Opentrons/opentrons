@@ -1305,23 +1305,59 @@ class OT3API(
         except GripperNotPresentError:
             pass
 
-    def raise_error_if_gripper_pickup_failed(self, labware_width: float) -> None:
-        """Ensure that a gripper pickup succeeded."""
-        # check if the gripper is at an acceptable position after attempting to
-        #  pick up labware
-        assert self.hardware_gripper
-        expected_gripper_position = labware_width
-        current_gripper_position = self.hardware_gripper.jaw_width
-        if (
-            abs(current_gripper_position - expected_gripper_position)
-            > self.hardware_gripper.max_allowed_grip_error
-        ):
+    @staticmethod
+    def _check_gripper_position_within_bounds(
+        expected_grip_width: float,
+        grip_width_uncertainty_wider: float,
+        grip_width_uncertainty_narrower: float,
+        jaw_width: float,
+        max_allowed_grip_error: float,
+    ) -> None:
+        expected_gripper_position_min = expected_grip_width - grip_width_uncertainty_narrower
+        expected_gripper_position_max = expected_grip_width + grip_width_uncertainty_wider
+        current_gripper_position = jaw_width
+        if (current_gripper_position - expected_gripper_position_min < -max_allowed_grip_error):
             raise FailedGripperPickupError(
+                message='Failed to grip: jaws closed too far',
                 details={
-                    "expected jaw width": expected_gripper_position,
-                    "actual jaw width": current_gripper_position,
+                    "failure-type": "jaws-more-closed-than-expected",
+                    "lower-bound-labware-width": expected_grip_width - grip_width_uncertainty_narrower,
+                    "actual-jaw-width": current_gripper_position,
                 },
             )
+        if (current_gripper_position - expected_gripper_position_max > max_allowed_grip_error):
+            raise FailedGripperPickupError(
+                message='Failed to grip: jaws could not close far enough',
+                details={
+                    'failure-type': "jaws-more-open-than-expected",
+                    "upper-bound-labware-width": expected_grip_width - grip_width_uncertainty_narrower,
+                    "actual-jaw-width": current_gripper_position,
+                }
+            )
+
+    def raise_error_if_gripper_pickup_failed(
+            self,
+            expected_grip_width: float,
+            grip_width_uncertainty_wider: float,
+            grip_width_uncertainty_narrower: float) -> None:
+        """Ensure that a gripper pickup succeeded.
+
+        The labware width is the width of the labware at the point of the grip, as closely as it is known.
+        The uncertainty values should be specified to handle the case where the labware definition does not
+        provide that information.
+
+        Both values should be positive; their direcitonal sense is determined by which argument they are.
+        """
+        # check if the gripper is at an acceptable position after attempting to
+        #  pick up labware
+        gripper = self._gripper_handler.get_gripper()
+        self._check_gripper_position_within_bounds(
+            expected_grip_width,
+            grip_width_uncertainty_wider,
+            grip_width_uncertainty_narrower,
+            gripper.jaw_width,
+            gripper.max_allowed_grip_error
+        )
 
     def gripper_jaw_can_home(self) -> bool:
         return self._gripper_handler.is_ready_for_jaw_home()

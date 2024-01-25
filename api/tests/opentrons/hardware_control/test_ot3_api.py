@@ -1084,40 +1084,6 @@ async def test_gripper_action_fails_with_no_gripper(
         await ot3_hardware.ungrip()
     mock_ungrip.assert_not_called()
 
-
-@pytest.mark.parametrize(
-    argnames=["jaw_width_val", "error_context"],
-    argvalues=[
-        (89, nullcontext()),
-        (100, pytest.raises(FailedGripperPickupError)),
-        (50, pytest.raises(FailedGripperPickupError)),
-        (85, nullcontext()),
-    ],
-)
-async def test_raise_error_if_gripper_pickup_failed(
-    ot3_hardware: ThreadManager[OT3API],
-    mock_jaw_width: Any,
-    mock_max_grip_error: Any,
-    jaw_width_val: float,
-    error_context: Any,
-) -> None:
-    """Test that FailedGripperPickupError is raised correctly."""
-    #  This should only be triggered when the difference between the
-    #  gripper jaw and labware widths is greater than the max allowed error.
-
-    gripper_config = gc.load(GripperModel.v1)
-    instr_data = AttachedGripper(config=gripper_config, id="test")
-    ot3_hardware._backend._attached_instruments[OT3Mount.GRIPPER] = {
-        "model": GripperModel.v1,
-        "id": "test",
-    }
-    await ot3_hardware.cache_gripper(instr_data)
-    mock_jaw_width.return_value = jaw_width_val
-    mock_max_grip_error.return_value = 6
-    with error_context:
-        ot3_hardware.raise_error_if_gripper_pickup_failed(85)
-
-
 @pytest.mark.parametrize("needs_calibration", [True, False])
 async def test_gripper_action_works_with_gripper(
     ot3_hardware: ThreadManager[OT3API],
@@ -1985,3 +1951,31 @@ async def test_stop_only_home_necessary_axes(
     await ot3_hardware.stop(home_after=True)
     if jaw_state == GripperJawState.GRIPPING:
         mock_home.assert_called_once_with(skip=[Axis.G])
+
+@pytest.mark.parametrize(
+    'expected_grip_width,actual_grip_width,wider,narrower,allowed_error,raise_error',
+    [
+        (80,80,0,0,0,False),
+        (80,81,0,0,0,True),
+        (80,79,0,0,0,True),
+        (80,81,1,0,0,False),
+        (80,79,0,1,0,False),
+        (80,81,0,0,1,False),
+        (80,79,0,0,1,False),
+    ])
+def test_grip_error_detection(
+        expected_grip_width: float,
+        actual_grip_width: float,
+        wider: float,
+        narrower: float,
+        allowed_error: float,
+        raise_error: bool) -> None:
+    context = pytest.raises(FailedGripperPickupError) if raise_error else nullcontext()
+    with context:
+        OT3API._check_gripper_position_within_bounds(
+            expected_grip_width,
+            wider,
+            narrower,
+            actual_grip_width,
+            allowed_error
+        )
