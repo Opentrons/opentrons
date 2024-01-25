@@ -180,7 +180,7 @@ First, tip tracking is not available with column 1. You must always specify a ``
     pipette.pick_up_tip(row_a.pop())  # pick up A11-H11
     pipette.drop_tip()
 
-This code first constructs a list of all the wells in row A of the tip rack. Then, when picking up a tip, instead of referencing one of those wells directly, the ``location`` is set to ``row_a.pop()``. This uses the built-in :py:meth:`pop` method to get the last item from the list and remove it from the list. If you keep using this approach to pick up tips, you'll get an error once the tip rack is empty — not from the API, but from Python itself, since you're trying to ``pop`` an item from an empty list.
+This code first constructs a list of all the wells in row A of the tip rack. Then, when picking up a tip, instead of referencing one of those wells directly, the ``location`` is set to ``row_a.pop()``. This uses the `built-in pop method <https://docs.python.org/3/tutorial/datastructures.html#more-on-lists>`_ to get the last item from the list and remove it from the list. If you keep using this approach to pick up tips, you'll get an error once the tip rack is empty — not from the API, but from Python itself, since you're trying to ``pop`` an item from an empty list.
 
 Second, the API does not provide the same collision detection for the column 1 layout that it does for column 12.
 

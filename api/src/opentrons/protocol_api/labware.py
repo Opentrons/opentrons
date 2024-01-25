@@ -393,17 +393,17 @@ class Labware:
             If the labware is directly on the robot's deck, the ``str`` name of the deck slot,
             like ``"D1"`` (Flex) or ``"1"`` (OT-2). See :ref:`deck-slots`.
 
-            If the labware is on a module, a :py:class:`ModuleContext`.
+            If the labware is on a module, a module context.
 
             If the labware is on a labware or adapter, a :py:class:`Labware`.
 
             If the labware is off-deck, :py:obj:`OFF_DECK`.
 
         .. versionchanged:: 2.14
-            Return type for module parent changed to :py:class:`ModuleContext`.
-            Prior to this version, an internal geometry interface is returned.
+            Return type for module parent changed.
+            Prior to this version, an internal geometry interface was returned.
         .. versionchanged:: 2.15
-            Will return a :py:class:`Labware` if the labware was loaded onto a labware/adapter.
+            Will return a :py:class:`Labware` if the labware is loaded onto a labware/adapter.
             Will now return :py:obj:`OFF_DECK` if the labware is off-deck.
             Formerly, if the labware was removed by using ``del`` on :py:obj:`.deck`,
             this would return where it was before its removal.
