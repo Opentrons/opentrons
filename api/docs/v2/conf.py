@@ -433,7 +433,6 @@ sphinx_tabs_disable_tab_closing = True
 # The goal here is to pass through any warnings for bad targets of MANUALLY
 # created links.
 nitpick_ignore_regex = [
-    ("py:class", r".*\._.*"),  # anything private
     ("py:class", r".*Optional\[.*"),  # any Optional with bad members
     ("py:class", r".*commands\.types.*"),
     ("py:class", r".*hardware_control.*"),
@@ -445,5 +444,6 @@ nitpick_ignore_regex = [
     ("py:class", r".*protocol_api\.deck.*"),
     ("py:class", r".*protocol_api\.config.*"),
     ("py:class", r".*opentrons_shared_data.*"),
+    ("py:class", r".*types\.DeckSlotName.*"),  # TODO: RTC-386
     ("py:class", r'.*AbstractLabware|APIVersion|LabwareLike|LoadedCoreMap|ModuleTypes|NoneType|OffDeckType|ProtocolCore|WellCore'),  # laundry list of not fully qualified things
 ]
