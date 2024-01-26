@@ -47,7 +47,9 @@ import {
   useAttachedModules,
   useLPCDisabledReason,
   useModuleCalibrationStatus,
+  useRobotAnalyticsData,
   useRobotType,
+  useTrackProtocolRunEvent,
 } from '../../organisms/Devices/hooks'
 import {
   useRequiredProtocolHardwareFromAnalysis,
@@ -75,8 +77,9 @@ import { useIsHeaterShakerInProtocol } from '../../organisms/ModuleCard/hooks'
 import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
 import { getLocalRobot } from '../../redux/discovery'
 import {
-  useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+  ANALYTICS_PROTOCOL_RUN_START,
+  useTrackEvent,
 } from '../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../redux/config'
 import { ConfirmAttachedModal } from '../../pages/ProtocolSetup/ConfirmAttachedModal'
@@ -338,6 +341,10 @@ function PrepareToRun({
     robotType,
     mostRecentAnalysis
   )
+
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
+  const robotAnalyticsData = useRobotAnalyticsData(robotName)
+
   const requiredDeckConfigCompatibility = getRequiredDeckConfig(
     deckConfigCompatibility
   )
@@ -448,6 +455,10 @@ function PrepareToRun({
       } else {
         if (isReadyToRun) {
           play()
+          trackProtocolRunEvent({
+            name: ANALYTICS_PROTOCOL_RUN_START,
+            properties: robotAnalyticsData != null ? robotAnalyticsData : {},
+          })
         } else {
           makeSnackbar(
             i18n.format(t('complete_setup_before_proceeding'), 'capitalize')
