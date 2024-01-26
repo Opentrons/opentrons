@@ -67,12 +67,9 @@ def _migrate_db(
         order_by_rowid=True,
     )
 
-    copy_rows_unmodified(
-        schema_2.analysis_table,
-        schema_3.analysis_table,
+    _migrate_analysis_table(
         source_transaction,
         dest_transaction,
-        order_by_rowid=True,
     )
 
     _migrate_run_table(
@@ -141,3 +138,29 @@ def _migrate_run_table(
             # SQLAlchemy misinterprets this as inserting a single row with all default
             # values.
             dest_transaction.execute(insert_new_command, new_command_rows)
+
+
+def _migrate_analysis_table(
+    source_connection: sqlalchemy.engine.Connection,
+    dest_connection: sqlalchemy.engine.Connection,
+) -> None:
+    select_old_analyses = sqlalchemy.select(schema_2.analysis_table).order_by(
+        sqlite_rowid
+    )
+    insert_new_analysis = sqlalchemy.insert(schema_3.analysis_table)
+    for row in (
+        # The table is missing an explicit sequence number column, so we need
+        # sqlite_rowid to retain order across this copy.
+        source_connection.execute(select_old_analyses).all()
+    ):
+        dest_connection.execute(
+            insert_new_analysis,
+            # The new `completed_analysis` column has the data that used to be in
+            # `completed_analysis_as_document`. The separate
+            # `completed_analysis_as_document` column is dropped.
+            completed_analysis=row.completed_analysis_as_document,
+            # The remaining columns are unchanged:
+            id=row.id,
+            protocol_id=row.protocol_id,
+            analyzer_version=row.analyzer_version,
+        )

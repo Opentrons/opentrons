@@ -38,8 +38,7 @@ EXPECTED_STATEMENTS_LATEST = [
         id VARCHAR NOT NULL,
         protocol_id VARCHAR NOT NULL,
         analyzer_version VARCHAR NOT NULL,
-        completed_analysis BLOB NOT NULL,
-        completed_analysis_as_document VARCHAR,
+        completed_analysis VARCHAR NOT NULL,
         PRIMARY KEY (id),
         FOREIGN KEY(protocol_id) REFERENCES protocol (id)
     )
