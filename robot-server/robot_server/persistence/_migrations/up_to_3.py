@@ -4,7 +4,11 @@ from typing import Any, Dict, List
 
 import sqlalchemy
 
-from .._database import create_schema_2_sql_engine, create_schema_3_sql_engine
+from .._database import (
+    create_schema_2_sql_engine,
+    create_schema_3_sql_engine,
+    sqlite_rowid,
+)
 from .._folder_migrator import Migration
 from .._tables import schema_2, schema_3
 from ._util import copy_rows_unmodified, copy_if_exists, copytree_if_exists
@@ -76,11 +80,11 @@ def _migrate_run_table(
     source_transaction: sqlalchemy.engine.Connection,
     dest_transaction: sqlalchemy.engine.Connection,
 ) -> None:
-    select_old_run = sqlalchemy.select(schema_2.run_table)
+    select_old_runs = sqlalchemy.select(schema_2.run_table).order_by(sqlite_rowid)
     insert_new_run = sqlalchemy.insert(schema_3.run_table)
     insert_new_command = sqlalchemy.insert(schema_3.run_command_table)
 
-    for old_run_row in source_transaction.execute(select_old_run).all():
+    for old_run_row in source_transaction.execute(select_old_runs).all():
         dest_transaction.execute(
             insert_new_run,
             id=old_run_row.id,
