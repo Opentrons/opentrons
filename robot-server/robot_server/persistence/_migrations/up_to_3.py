@@ -2,9 +2,18 @@
 
 Summary of changes from schema 2:
 
-- Run commands were formerly stored as monolithic blobs in the run table,
+- Run commands were formerly stored as monolithic blobs in the `run` table,
   with each row storing an entire list. This has been split out into a new
-  run_command table, where each individual command gets its own row.
+  `run_command` table, where each individual command gets its own row.
+
+- All columns that were storing binary pickles have been converted to storing
+  JSON strings:
+  - `analysis.completed_analysis`
+  - `run.state_summary`
+  - `run_commands.command` (formerly `run.commands`; see above)
+
+- `analysis.completed_analysis_as_document` has been removed,
+  since the updated `analysis.completed_analysis` (see above) replaces it.
 """
 
 
