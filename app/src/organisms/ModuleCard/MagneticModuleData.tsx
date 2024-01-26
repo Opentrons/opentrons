@@ -26,7 +26,7 @@ export const MagneticModuleData = (
       <StatusLabel
         status={moduleStatus}
         backgroundColor={COLORS.blue30}
-        iconColor={COLORS.blue50}
+        iconColor={COLORS.blue60}
         pulse={moduleStatus === 'engaged'}
       />
       <StyledText

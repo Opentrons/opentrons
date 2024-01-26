@@ -1,72 +1,48 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
-import { LabwareRender, WellGroup } from '@opentrons/components'
+import { useSelector } from 'react-redux'
+import { LabwareRender } from '@opentrons/components'
 
 import { selectors } from '../../labware-ingred/selectors'
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import * as highlightSelectors from '../../top-selectors/substep-highlight'
 import * as tipContentsSelectors from '../../top-selectors/tip-contents'
 import { LabwareOnDeck as LabwareOnDeckType } from '../../step-forms'
-import { ContentsByWell } from '../../labware-ingred/types'
-import { BaseState } from '../../types'
 import { wellFillFromWellContents } from '../labware/utils'
 
-interface OP {
+interface LabwareOnDeckProps {
   className?: string
   labwareOnDeck: LabwareOnDeckType
   x: number
   y: number
 }
 
-interface SP {
-  wellContents: ContentsByWell
-  liquidDisplayColors: string[]
-  missingTips?: WellGroup | null
-  highlightedWells?: WellGroup | null
-}
-
-type Props = OP & SP
-
-const LabwareOnDeckComponent = (props: Props): JSX.Element => (
-  <g
-    transform={`translate(${props.x}, ${props.y})`}
-    className={props.className}
-  >
-    <LabwareRender
-      definition={props.labwareOnDeck.def}
-      wellFill={wellFillFromWellContents(
-        props.wellContents,
-        props.liquidDisplayColors
-      )}
-      highlightedWells={props.highlightedWells}
-      missingTips={props.missingTips}
-    />
-  </g>
-)
-
-const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
-  const { labwareOnDeck } = ownProps
-
-  const missingTipsByLabwareId = tipContentsSelectors.getMissingTipsByLabwareId(
-    state
+export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
+  const { labwareOnDeck, x, y, className } = props
+  const missingTipsByLabwareId = useSelector(
+    tipContentsSelectors.getMissingTipsByLabwareId
   )
-
-  const allWellContentsForActiveItem = wellContentsSelectors.getAllWellContentsForActiveItem(
-    state
+  const allWellContentsForActiveItem = useSelector(
+    wellContentsSelectors.getAllWellContentsForActiveItem
   )
-
-  return {
-    wellContents: allWellContentsForActiveItem
-      ? allWellContentsForActiveItem[labwareOnDeck.id]
-      : null,
-    highlightedWells: highlightSelectors.wellHighlightsByLabwareId(state)[
-      labwareOnDeck.id
-    ],
-    missingTips: missingTipsByLabwareId
-      ? missingTipsByLabwareId[labwareOnDeck.id]
-      : null,
-    liquidDisplayColors: selectors.getLiquidDisplayColors(state),
-  }
+  const allHighlightedWells = useSelector(
+    highlightSelectors.wellHighlightsByLabwareId
+  )
+  const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
+  const wellContents = allWellContentsForActiveItem
+    ? allWellContentsForActiveItem[labwareOnDeck.id]
+    : null
+  const highlightedWells = allHighlightedWells[labwareOnDeck.id]
+  const missingTips = missingTipsByLabwareId
+    ? missingTipsByLabwareId[labwareOnDeck.id]
+    : null
+  return (
+    <g transform={`translate(${x}, ${y})`} className={className}>
+      <LabwareRender
+        definition={labwareOnDeck.def}
+        wellFill={wellFillFromWellContents(wellContents, liquidDisplayColors)}
+        highlightedWells={highlightedWells}
+        missingTips={missingTips}
+      />
+    </g>
+  )
 }
-
-export const LabwareOnDeck = connect(mapStateToProps)(LabwareOnDeckComponent)

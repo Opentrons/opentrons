@@ -36,23 +36,23 @@ const INLINE_NOTIFICATION_PROPS_BY_TYPE: Record<
 > = {
   alert: {
     icon: { name: 'ot-alert' },
-    backgroundColor: COLORS.yellow35,
-    color: COLORS.yellow50,
+    backgroundColor: COLORS.yellow30,
+    color: COLORS.yellow60,
   },
   error: {
     icon: { name: 'ot-alert' },
-    backgroundColor: COLORS.red35,
-    color: COLORS.red50,
+    backgroundColor: COLORS.red30,
+    color: COLORS.red60,
   },
   neutral: {
     icon: { name: 'information' },
-    backgroundColor: COLORS.grey35,
-    color: COLORS.black90,
+    backgroundColor: COLORS.grey30,
+    color: COLORS.grey60,
   },
   success: {
     icon: { name: 'ot-check' },
-    backgroundColor: COLORS.green35,
-    color: COLORS.green50,
+    backgroundColor: COLORS.green30,
+    color: COLORS.green60,
   },
 }
 

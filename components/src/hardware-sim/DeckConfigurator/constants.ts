@@ -2,7 +2,7 @@ import { css } from 'styled-components'
 
 import { COLORS } from '../../helix-design-system'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
-import { BORDERS, SPACING } from '../../ui-style-constants'
+import { BORDERS, RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 
 /**
  * These are Flex deck configurator-only values to position a foreign object
@@ -30,6 +30,9 @@ export const CONFIG_STYLE_READ_ONLY = css`
   grid-gap: ${SPACING.spacing8};
   justify-content: ${JUSTIFY_CENTER};
   width: 100%;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    background-color: ${COLORS.grey55};
+  }
 `
 
 export const CONFIG_STYLE_EDITABLE = css`
@@ -44,6 +47,10 @@ export const CONFIG_STYLE_EDITABLE = css`
   }
 
   &:focus-visible {
-    border: 3px solid ${COLORS.blue50};
+    border: 3px solid ${COLORS.yellow50};
+    background-color: ${COLORS.grey55};
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      background-color: ${COLORS.grey60};
+    }
   }
 `

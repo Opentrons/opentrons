@@ -37,11 +37,6 @@ i18n.use(initReactI18next).init(
       },
     },
     saveMissing: true,
-    missingKeyHandler: (lng, ns, key) => {
-      process.env.NODE_ENV === 'test'
-        ? console.error(`Missing ${lng} Translation: key={${key}} ns={${ns}}`)
-        : console.warn(`Missing ${lng} Translation: key={${key}} ns={${ns}}`)
-    },
   },
   err => {
     if (err) {

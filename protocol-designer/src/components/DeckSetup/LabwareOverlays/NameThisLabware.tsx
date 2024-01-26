@@ -1,31 +1,32 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { connect } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import cx from 'classnames'
 import { Icon, useOnClickOutside } from '@opentrons/components'
 import { renameLabware } from '../../../labware-ingred/actions'
 import styles from './LabwareOverlays.css'
+
 import type { LabwareEntity } from '@opentrons/step-generation'
 import type { ThunkDispatch } from '../../../types'
 import type { LabwareOnDeck } from '../../../step-forms'
 
-interface OP {
+interface NameThisLabwareProps {
   labwareOnDeck: LabwareOnDeck | LabwareEntity
-  editLiquids: () => unknown
+  editLiquids: () => void
 }
 
-interface DP {
-  setLabwareName: (name: string | null | undefined) => unknown
-}
-
-type Props = OP & DP
-
-const NameThisLabwareComponent = (props: Props): JSX.Element => {
-  const [inputValue, setInputValue] = React.useState('')
+export function NameThisLabware(props: NameThisLabwareProps): JSX.Element {
+  const { labwareOnDeck } = props
+  const dispatch: ThunkDispatch<any> = useDispatch()
+  const [inputValue, setInputValue] = React.useState<string>('')
   const { t } = useTranslation('deck')
 
+  const setLabwareName = (name: string | null | undefined): void => {
+    dispatch(renameLabware({ labwareId: labwareOnDeck.id, name }))
+  }
+
   const saveNickname = (): void => {
-    props.setLabwareName(inputValue || null)
+    setLabwareName(inputValue ?? null)
   }
   const wrapperRef: React.RefObject<HTMLDivElement> = useOnClickOutside({
     onClickOutside: saveNickname,
@@ -67,16 +68,3 @@ const NameThisLabwareComponent = (props: Props): JSX.Element => {
     </div>
   )
 }
-
-const mapDispatchToProps = (dispatch: ThunkDispatch<any>, ownProps: OP): DP => {
-  const { id } = ownProps.labwareOnDeck
-  return {
-    setLabwareName: (name: string | null | undefined) =>
-      dispatch(renameLabware({ labwareId: id, name })),
-  }
-}
-
-export const NameThisLabware = connect(
-  null,
-  mapDispatchToProps
-)(NameThisLabwareComponent)

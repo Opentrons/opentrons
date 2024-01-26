@@ -25,27 +25,21 @@ describe('TertiaryButton', () => {
   it('renders tertiary button with text', () => {
     const { getByText } = render(props)
     const button = getByText('tertiary button')
-    expect(button).toHaveStyle(`background-color: ${String(COLORS.blue50)}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.blue50}`)
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16}`
     )
-    expect(button).toHaveStyle(`font-size: ${String(TYPOGRAPHY.fontSizeLabel)}`)
+    expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeLabel}`)
+    expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
+    expect(button).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight12}`)
+    expect(button).toHaveStyle(`border-radius: ${BORDERS.radiusRoundEdge}`)
     expect(button).toHaveStyle(
-      `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
-    )
-    expect(button).toHaveStyle(
-      `line-height: ${String(TYPOGRAPHY.lineHeight12)}`
-    )
-    expect(button).toHaveStyle(
-      `border-radius: ${String(BORDERS.radiusRoundEdge)}`
-    )
-    expect(button).toHaveStyle(
-      `text-transform: ${String(TYPOGRAPHY.textTransformNone)}`
+      `text-transform: ${TYPOGRAPHY.textTransformNone}`
     )
     expect(button).toHaveStyle('box-shadow: none')
     expect(button).toHaveStyle('overflow: no-wrap')
     expect(button).toHaveStyle('white-space: nowrap')
-    expect(button).toHaveStyle(`color: ${String(COLORS.grey10)}`)
+    expect(button).toHaveStyle(`color: ${COLORS.white}`)
   })
 
   it('renders tertiary button with text and disabled', () => {
@@ -53,20 +47,16 @@ describe('TertiaryButton', () => {
     const { getByText } = render(props)
     const button = getByText('tertiary button')
     expect(button).toBeDisabled()
-    expect(button).toHaveStyle(`background-color: ${String(COLORS.grey30)}`)
-    expect(button).toHaveStyle(`color: ${String(COLORS.grey40)}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.grey30}`)
+    expect(button).toHaveStyle(`color: ${COLORS.grey40}`)
   })
 
   it('applies the correct states to the button - hover', () => {
     const { getByText } = render(props)
     const button = getByText('tertiary button')
-    expect(button).toHaveStyleRule(
-      'background-color',
-      `${String(COLORS.blue55)}`,
-      {
-        modifier: ':hover',
-      }
-    )
+    expect(button).toHaveStyleRule('background-color', `${COLORS.blue55}`, {
+      modifier: ':hover',
+    })
     expect(button).toHaveStyleRule('box-shadow', 'none', {
       modifier: ':hover',
     })
@@ -75,13 +65,9 @@ describe('TertiaryButton', () => {
   it('applies the correct states to the button - active', () => {
     const { getByText } = render(props)
     const button = getByText('tertiary button')
-    expect(button).toHaveStyleRule(
-      'background-color',
-      `${String(COLORS.blue60)}`,
-      {
-        modifier: ':active',
-      }
-    )
+    expect(button).toHaveStyleRule('background-color', `${COLORS.blue60}`, {
+      modifier: ':active',
+    })
   })
 
   it('applies the correct states to the button - focus-visible', () => {
@@ -89,7 +75,7 @@ describe('TertiaryButton', () => {
     const button = getByText('tertiary button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${String(COLORS.yellow50)}`,
+      `0 0 0 3px ${COLORS.yellow50}`,
       {
         modifier: ':focus-visible',
       }
@@ -100,7 +86,7 @@ describe('TertiaryButton', () => {
     props.backgroundColor = COLORS.red50
     const { getByText } = render(props)
     const button = getByText('tertiary button')
-    expect(button).toHaveStyle(`background-color: ${String(COLORS.red50)}`)
-    expect(button).toHaveStyle(`color: ${String(COLORS.grey10)}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.red50}`)
+    expect(button).toHaveStyle(`color: ${COLORS.white}`)
   })
 })

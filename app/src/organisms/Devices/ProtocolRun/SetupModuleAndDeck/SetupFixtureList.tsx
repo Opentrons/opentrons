@@ -112,8 +112,8 @@ export function FixtureListItem({
             ? t('location_conflict')
             : t('not_configured')
         }
-        backgroundColor={COLORS.yellow20}
-        iconColor={COLORS.yellow50}
+        backgroundColor={COLORS.yellow30}
+        iconColor={COLORS.yellow60}
         textColor={COLORS.yellow60}
       />
     )
@@ -121,8 +121,8 @@ export function FixtureListItem({
     statusLabel = (
       <StatusLabel
         status={t('configured')}
-        backgroundColor={COLORS.green20}
-        iconColor={COLORS.green50}
+        backgroundColor={COLORS.green30}
+        iconColor={COLORS.green60}
         textColor={COLORS.green60}
       />
     )

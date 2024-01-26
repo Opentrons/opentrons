@@ -111,12 +111,7 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
 
   const handleClearWells: () => void = () => {
     if (labwareId && selectedWells && selectionHasLiquids) {
-      // TODO: Ian 2018-10-22 replace with modal later on if we like this UX
-      if (
-        global.confirm(
-          'Are you sure you want to remove liquids from all selected wells?'
-        )
-      ) {
+      if (global.confirm(t('application:are_you_sure'))) {
         dispatch(
           removeWellsContents({
             labwareId: labwareId,
