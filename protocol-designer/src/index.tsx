@@ -17,19 +17,14 @@ initialize(store)
 // initialize analytics
 initializeMixpanel(store.getState())
 
-console.log({pdMeta: import.meta})
-
 const render = (Component: any): void => {
   ReactDOM.render(
     <Provider store={store}>
-      <AppContainer>
         <I18nextProvider i18n={i18n as any}>
           <Component />
         </I18nextProvider>
-      </AppContainer>
     </Provider>,
     document.getElementById('root')
   )
 }
-console.log('ABOUT TO RENDER')
 render(App)

@@ -35,4 +35,7 @@ export default defineConfig({
       )}/index.ts`,
     },
   },
+  // worker: {
+  //   format: 'es',
+  // },
 })

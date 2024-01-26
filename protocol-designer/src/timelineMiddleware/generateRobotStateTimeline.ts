@@ -1,12 +1,12 @@
 import takeWhile from 'lodash/takeWhile'
-import { movableTrashCommandsUtil } from '@opentrons/step-generation'
+import {
+  movableTrashCommandsUtil,
+  dropTipInPlace,
+  moveToAddressableArea,
+} from '@opentrons/step-generation'
 import * as StepGeneration from '@opentrons/step-generation'
 import { commandCreatorFromStepArgs } from '../file-data/selectors/commands'
 import type { StepArgsAndErrorsById } from '../steplist/types'
-import {
-  dropTipInPlace,
-  moveToAddressableArea,
-} from '@opentrons/step-generation/src/commandCreators/atomic'
 
 export interface GenerateRobotStateTimelineArgs {
   allStepArgsAndErrors: StepArgsAndErrorsById
@@ -32,7 +32,6 @@ export const generateRobotStateTimeline = (
       )
     }
   )
-  // @ts-expect-error(sa, 2021-7-6): stepArgs might be null (see code above). this was incorrectly typed from before the TS migration and requires source code changes
   const continuousStepArgs: StepGeneration.CommandCreatorArgs[] = takeWhile(
     allStepArgs,
     stepArgs => stepArgs
@@ -63,12 +62,9 @@ export const generateRobotStateTimeline = (
       if (pipetteId != null && dropTipLocation != null) {
         const nextStepArgsForPipette = continuousStepArgs
           .slice(stepIndex + 1)
-          // @ts-expect-error(sa, 2021-6-20): not a valid type narrow, use in operator
           .find(stepArgs => stepArgs.pipette && stepArgs.pipette === pipetteId)
         const willReuseTip =
-          // @ts-expect-error(sa, 2021-6-20): not a valid type narrow, use in operator
           nextStepArgsForPipette?.changeTip &&
-          // @ts-expect-error(sa, 2021-6-20): not a valid type narrow, use in operator
           nextStepArgsForPipette.changeTip === 'never'
 
         const isWasteChute =

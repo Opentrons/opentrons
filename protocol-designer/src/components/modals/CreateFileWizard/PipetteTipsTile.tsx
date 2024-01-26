@@ -180,8 +180,6 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
   React.useEffect(() => {
     if (currentValue === undefined) {
       setTimeout(() => {
-        console.log('updating field value')
-        console.log({ nameAccessor, tiprack: tiprackOptions[0]?.value ?? '' })
         setFieldValue(nameAccessor, tiprackOptions[0]?.value ?? '')
       })
     }
