@@ -7,7 +7,6 @@ import {
   Box,
   Flex,
   ALIGN_START,
-  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -70,7 +69,6 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       padding={SPACING.spacing16}
       position={POSITION_RELATIVE}
       onClick={() => history.push(`/devices/${robotName}`)}
-      css={BORDERS.cardOutlineBorder}
     >
       <img
         src={robotModel === 'OT-2' ? OT2_PNG : FLEX_PNG}

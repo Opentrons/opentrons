@@ -160,7 +160,9 @@ export const LocationConflictModal = (
                     {t('protocol_specifies')}
                   </StyledText>
 
-                  <StyledText as="p">{protocolSpecifiesDisplayName}</StyledText>
+                  <StyledText as="p" color={COLORS.grey60}>
+                    {protocolSpecifiesDisplayName}
+                  </StyledText>
                 </Flex>
                 <Flex
                   padding={SPACING.spacing24}
@@ -174,7 +176,9 @@ export const LocationConflictModal = (
                     {t('currently_configured')}
                   </StyledText>
 
-                  <StyledText as="p">{currentFixtureDisplayName}</StyledText>
+                  <StyledText as="p" color={COLORS.grey60}>
+                    {currentFixtureDisplayName}
+                  </StyledText>
                 </Flex>
               </Flex>
             </Flex>
@@ -249,7 +253,7 @@ export const LocationConflictModal = (
                   alignItems={ALIGN_CENTER}
                 >
                   <Box width="107px">
-                    <StyledText as="label">
+                    <StyledText as="label" color={COLORS.grey60}>
                       {t('protocol_specifies')}
                     </StyledText>
                   </Box>
