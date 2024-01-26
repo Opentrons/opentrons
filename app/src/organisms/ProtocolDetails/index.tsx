@@ -130,7 +130,11 @@ function MetadataDetails({
         {filteredMetaData.map((item, index) => {
           return (
             <React.Fragment key={index}>
-              <StyledText as="h6" marginTop={SPACING.spacing8}>
+              <StyledText
+                as="h6"
+                marginTop={SPACING.spacing8}
+                color={COLORS.grey60}
+              >
                 {startCase(item.label)}
               </StyledText>
               <StyledText as="p">{item.value}</StyledText>
@@ -388,7 +392,6 @@ export function ProtocolDetails(
 
           <Flex
             backgroundColor={COLORS.white}
-            border={`1px solid ${COLORS.grey30}`}
             borderRadius={BORDERS.radiusSoftCorners}
             position={POSITION_RELATIVE}
             flexDirection={DIRECTION_ROW}
@@ -536,8 +539,7 @@ export function ProtocolDetails(
               flex={`0 0 ${String(SIZE_5)}`}
               flexDirection={DIRECTION_COLUMN}
               backgroundColor={COLORS.white}
-              border={`1px solid ${String(COLORS.grey30)}`}
-              borderRadius={BORDERS.radiusSoftCorners}
+              borderRadius={BORDERS.borderRadiusSize2}
               height="100%"
               data-testid="ProtocolDetails_deckMap"
             >
@@ -617,15 +619,14 @@ export function ProtocolDetails(
               </Flex>
               <Box
                 backgroundColor={COLORS.white}
-                border={BORDERS.lineBorder}
                 // remove left upper corner border radius when first tab is active
                 borderRadius={`${
                   currentTab === 'robot_config'
                     ? '0'
-                    : String(BORDERS.radiusSoftCorners)
-                } ${String(BORDERS.radiusSoftCorners)} ${String(
+                    : BORDERS.radiusSoftCorners
+                } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
                   BORDERS.radiusSoftCorners
-                )} ${String(BORDERS.radiusSoftCorners)}`}
+                }`}
                 padding={`${SPACING.spacing16} ${SPACING.spacing16} 0 ${SPACING.spacing16}`}
               >
                 {contentsByTabName[currentTab]}

@@ -4,12 +4,12 @@ import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 
 import {
-  Box,
-  Flex,
   ALIGN_START,
+  Box,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
   POSITION_ABSOLUTE,
@@ -130,7 +130,7 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
       <StyledText
         as="h6"
         textTransform={TYPOGRAPHY.textTransformUppercase}
-        color={COLORS.grey50}
+        color={COLORS.grey60}
       >
         {t('modules')}
       </StyledText>
@@ -183,7 +183,7 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
       gridGap={SPACING.spacing4}
       minWidth="24rem"
     >
-      <StyledText as="h6" color={COLORS.grey50}>
+      <StyledText as="h6" color={COLORS.grey60}>
         {t('shared:instruments')}
       </StyledText>
 

@@ -8,7 +8,6 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   ALIGN_STRETCH,
-  BORDERS,
   Btn,
   COLORS,
   DIRECTION_COLUMN,
@@ -388,8 +387,6 @@ const SplashFrame = styled(Flex)`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
-  border: ${BORDERS.borderRadiusSize2} solid ${COLORS.white}${COLORS.opacity20HexCode};
-  border-radius: ${BORDERS.borderRadiusSize3};
   grid-gap: ${SPACING.spacing40};
 `
 

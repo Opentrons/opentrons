@@ -14,7 +14,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
-import { useRunStatuses } from '../../Devices/hooks'
+import { useIsRobotViewable, useRunStatuses } from '../../Devices/hooks'
 import { DeckFixtureSetupInstructionsModal } from '../DeckFixtureSetupInstructionsModal'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 import { DeviceDetailsDeckConfiguration } from '../'
@@ -60,6 +60,9 @@ const mockUseCurrentMaintenanceRun = useCurrentMaintenanceRun as jest.MockedFunc
 const mockUseIsEstopNotDisengaged = useIsEstopNotDisengaged as jest.MockedFunction<
   typeof useIsEstopNotDisengaged
 >
+const mockUseIsRobotViewable = useIsRobotViewable as jest.MockedFunction<
+  typeof useIsRobotViewable
+>
 
 const render = (
   props: React.ComponentProps<typeof DeviceDetailsDeckConfiguration>
@@ -91,6 +94,7 @@ describe('DeviceDetailsDeckConfiguration', () => {
     when(mockUseIsEstopNotDisengaged)
       .calledWith(ROBOT_NAME)
       .mockReturnValue(false)
+    when(mockUseIsRobotViewable).calledWith(ROBOT_NAME).mockReturnValue(true)
   })
 
   afterEach(() => {
@@ -154,7 +158,13 @@ describe('DeviceDetailsDeckConfiguration', () => {
     when(mockDeckConfigurator)
       .calledWith(partialComponentPropsMatcher({ readOnly: true }))
       .mockReturnValue(<div>disabled mock DeckConfigurator</div>)
-    const [{ getByText }] = render(props)
-    getByText('disabled mock DeckConfigurator')
+    render(props)
+    screen.getByText('disabled mock DeckConfigurator')
+  })
+
+  it('should render not viewable text when robot is not viewable', () => {
+    when(mockUseIsRobotViewable).calledWith(ROBOT_NAME).mockReturnValue(false)
+    render(props)
+    screen.getByText('Robot must be on the network to see deck configuration')
   })
 })

@@ -50,9 +50,6 @@ import { ViewportListRef } from 'react-viewport-list'
 const baseRoundTabStyling = css`
   ${TYPOGRAPHY.pSemiBold}
   border-radius: ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} 0 0;
-  border-top: ${BORDERS.transparentLineBorder};
-  border-left: ${BORDERS.transparentLineBorder};
-  border-right: ${BORDERS.transparentLineBorder};
   padding: ${SPACING.spacing8} ${SPACING.spacing16};
   position: ${POSITION_RELATIVE};
 `
@@ -67,9 +64,6 @@ const RoundNavLink = styled(NavLink)`
 
   &.active {
     background-color: ${COLORS.white};
-    border-top: ${BORDERS.lineBorder};
-    border-left: ${BORDERS.lineBorder};
-    border-right: ${BORDERS.lineBorder};
     color: ${COLORS.blue50};
 
     &:hover {
@@ -239,15 +233,12 @@ function PageContents(props: PageContentsProps): JSX.Element {
       </Flex>
       <Box
         backgroundColor={COLORS.white}
-        border={`1px ${BORDERS.styleSolid} ${COLORS.grey30}`}
         // remove left upper corner border radius when first tab is active
         borderRadius={`${
-          protocolRunDetailsTab === 'setup'
-            ? '0'
-            : String(BORDERS.radiusSoftCorners)
-        } ${String(BORDERS.radiusSoftCorners)} ${String(
+          protocolRunDetailsTab === 'setup' ? '0' : BORDERS.radiusSoftCorners
+        } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
           BORDERS.radiusSoftCorners
-        )} ${String(BORDERS.radiusSoftCorners)}`}
+        }`}
       >
         {protocolRunDetailsContent}
       </Box>

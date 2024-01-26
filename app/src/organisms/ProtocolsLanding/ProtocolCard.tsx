@@ -99,7 +99,6 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
       padding={SPACING.spacing16}
       position="relative"
       onClick={() => history.push(`/protocols/${protocolKey}`)}
-      css={BORDERS.cardOutlineBorder}
     >
       <ErrorBoundary fallback={UnknownAttachmentError}>
         <AnalysisInfo
@@ -217,7 +216,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing4}
               >
-                <StyledText as="h6" color={COLORS.grey50}>
+                <StyledText as="h6" color={COLORS.grey60}>
                   {t('robot')}
                 </StyledText>
                 <StyledText as="p">
@@ -231,7 +230,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 data-testid={`ProtocolCard_instruments_${protocolDisplayName}`}
                 minWidth="10.625rem"
               >
-                <StyledText as="h6" color={COLORS.grey50}>
+                <StyledText as="h6" color={COLORS.grey60}>
                   {t('shared:instruments')}
                 </StyledText>
                 {
@@ -276,14 +275,14 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               >
                 {requiredModuleTypes.length > 0 ? (
                   <>
-                    <StyledText as="h6" color={COLORS.grey50}>
+                    <StyledText as="h6" color={COLORS.grey60}>
                       {t('modules')}
                     </StyledText>
                     <Flex>
                       {requiredModuleTypes.map((moduleType, index) => (
                         <ModuleIcon
                           key={index}
-                          color={COLORS.grey50}
+                          color={COLORS.grey60}
                           moduleType={moduleType}
                           height="1rem"
                           marginRight={SPACING.spacing8}

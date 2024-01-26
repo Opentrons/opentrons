@@ -1,4 +1,6 @@
 {
+  "are_you_sure": "Are you sure you want to remove liquids from all selected wells?",
+  "are_you_sure_delete_well": "Are you sure you want to delete well {{well}}?",
   "exit_batch_edit": "exit batch edit",
   "go_back": "Go back",
   "labware": "labware",
