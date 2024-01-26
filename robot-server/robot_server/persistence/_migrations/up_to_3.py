@@ -17,6 +17,7 @@ Summary of changes from schema 2:
 """
 
 
+import logging
 import concurrent.futures
 import multiprocessing
 from contextlib import contextmanager
@@ -37,6 +38,8 @@ from .._folder_migrator import Migration
 from .._tables import schema_2, schema_3
 from ._util import copy_rows_unmodified, copy_if_exists, copytree_if_exists
 
+
+_log = logging.getLogger(__name__)
 
 # TODO: Define a single source of truth somewhere for these paths.
 _DECK_CONFIGURATION_FILE = "deck_configuration.json"
@@ -228,6 +231,7 @@ def _migrate_commands_for_run(
     with _schema_2_engine(source_db_file) as source_engine, _schema_3_engine(
         dest_db_file
     ) as dest_engine:
+        _log.error(f"Retrieving commands for {run_id}")
         old_commands: Optional[List[Dict[str, Any]]] = source_engine.execute(
             sqlalchemy.select(schema_2.run_table.c.commands).where(
                 schema_2.run_table.c.id == run_id
@@ -236,6 +240,7 @@ def _migrate_commands_for_run(
         if old_commands is None:
             old_commands = []
 
+        _log.error(f"Parsing commands for {run_id}")
         pydantic_old_commands: Iterable[Command] = (
             pydantic.parse_obj_as(
                 Command,  # type: ignore[arg-type]
@@ -243,6 +248,7 @@ def _migrate_commands_for_run(
             )
             for c in old_commands
         )
+        _log.error(f"Reserializing commands for {run_id}")
         new_command_rows = [
             {
                 "run_id": run_id,
@@ -252,7 +258,7 @@ def _migrate_commands_for_run(
             }
             for index_in_run, pydantic_command in enumerate(pydantic_old_commands)
         ]
-
+        _log.error(f"Inserting commands for {run_id}")
         insert_new_command = sqlalchemy.insert(schema_3.run_command_table)
         with insertion_lock, dest_engine.begin() as dest_transaction:
             # Insert all the commands for this run in one go, to avoid the overhead of
@@ -263,3 +269,5 @@ def _migrate_commands_for_run(
                 # SQLAlchemy misinterprets this as inserting a single row with all default
                 # values.
                 dest_transaction.execute(insert_new_command, new_command_rows)
+
+        _log.error(f"Done with commands for {run_id}")
