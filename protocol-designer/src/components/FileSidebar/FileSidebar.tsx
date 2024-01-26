@@ -132,7 +132,6 @@ function getWarningContent({
     .map(moduleOnDeck => t(`modules:module_long_names.${moduleOnDeck.type}`))
     .join(' and ')
 
-  console.log('modules without step', modulesWithoutStep)
   if (pipettesWithoutStep.length > 0 && modulesWithoutStep.length > 0) {
     return {
       content: (
@@ -363,7 +362,6 @@ export function FileSidebar(): JSX.Element {
       dispatch(loadFileActions.saveProtocolFile())
     },
   })
-  console.log(warning)
   return (
     <>
       {blockingExportHint}
