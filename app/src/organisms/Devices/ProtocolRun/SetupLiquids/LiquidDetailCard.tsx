@@ -132,12 +132,14 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           marginTop={SPACING.spacing16}
           width="max-content"
         >
-          <StyledText as="bodyTextRegular">
-            {/* {`${Object.values(volumeByWell).reduce(
-              (prev, curr) => prev + curr,
-              0
-            )} ${MICRO_LITERS} ${t('total_vol')}`} */}
-            {'beep boop'}
+          <StyledText
+            fontSize={TYPOGRAPHY.fontSize22}
+            lineHeight={TYPOGRAPHY.lineHeight28}
+            fontWeight={TYPOGRAPHY.fontWeightRegular}
+            color={COLORS.black90}
+          >
+            {Object.values(volumeByWell).reduce((prev, curr) => prev + curr, 0)}{' '}
+            {MICRO_LITERS} {t('total_vol')}
           </StyledText>
         </Flex>
       </Flex>
@@ -226,9 +228,14 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           paddingX={SPACING.spacing8}
           marginTop={SPACING.spacing8}
         >
-          <StyledText as="p">
+          <StyledText
+            fontSize={TYPOGRAPHY.fontSizeH4}
+            lineHeight={TYPOGRAPHY.lineHeight20}
+            fontWeight={TYPOGRAPHY.fontWeightRegular}
+            color={COLORS.black90}
+          >
             {Object.values(volumeByWell).reduce((prev, curr) => prev + curr, 0)}{' '}
-            {MICRO_LITERS}
+            {MICRO_LITERS} {t('total_vol')}
           </StyledText>
         </Flex>
       </Flex>
