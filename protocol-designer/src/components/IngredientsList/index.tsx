@@ -143,9 +143,7 @@ function IngredIndividual(props: IndividProps): JSX.Element {
           className={styles.close_icon}
           name="close"
           onClick={() =>
-            window.confirm(
-              `Are you sure you want to delete well ${wellName} ?`
-            ) &&
+            window.confirm(t('are_you_sure_delete_well', { well: wellName })) &&
             removeWellsContents({ liquidGroupId: groupId, wells: [wellName] })
           }
         />

@@ -282,7 +282,7 @@ export function FileSidebar(): JSX.Element {
   const loadFile = (
     fileChangeEvent: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    if (!hasUnsavedChanges || window.confirm(t('window.confirm_import'))) {
+    if (!hasUnsavedChanges || window.confirm(t('confirm_import'))) {
       dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
     }
   }
@@ -376,11 +376,11 @@ export function FileSidebar(): JSX.Element {
             onCloseClick={cancelModal}
             buttons={[
               {
-                children: 'CANCEL',
+                children: t('cancel'),
                 onClick: cancelModal,
               },
               {
-                children: 'CONTINUE WITH EXPORT',
+                children: t('continue_with_export'),
                 className: modalStyles.long_button,
                 onClick: () => {
                   setShowExportWarningModal(false)
@@ -396,11 +396,11 @@ export function FileSidebar(): JSX.Element {
       <SidePanel title="Protocol File">
         <div className={styles.file_sidebar}>
           <OutlineButton onClick={createNewFile} className={styles.button}>
-            Create New
+            {t('create_new')}
           </OutlineButton>
 
           <OutlineButton Component="label" className={cx(styles.upload_button)}>
-            Import
+            {t('import')}
             <input type="file" onChange={loadFile} />
           </OutlineButton>
 
@@ -417,7 +417,7 @@ export function FileSidebar(): JSX.Element {
               }}
               disabled={!canDownload}
             >
-              Export
+              {t('export')}
             </DeprecatedPrimaryButton>
           </div>
         </div>
