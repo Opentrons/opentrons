@@ -266,7 +266,7 @@ function establishListeners({
 export function closeAllNotifyConnections(): Promise<unknown[]> {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      reject('Failed to close all connections within the time limit.')
+      reject(Error('Failed to close all connections within the time limit.'))
     }, 2000)
 
     log.debug('Stopping notify service connections')
