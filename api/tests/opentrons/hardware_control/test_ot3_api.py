@@ -19,7 +19,6 @@ import pytest
 from decoy import Decoy
 from mock import AsyncMock, patch, Mock, PropertyMock, MagicMock
 from hypothesis import given, strategies, settings, HealthCheck, assume, example
-from contextlib import nullcontext, AbstractContextManager
 
 from opentrons.calibration_storage.types import CalibrationStatus, SourceType
 from opentrons.config.types import (
@@ -74,7 +73,6 @@ from opentrons_shared_data.errors.exceptions import (
     GripperNotPresentError,
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
-    FailedGripperPickupError,
 )
 from opentrons_shared_data.gripper.gripper_definition import GripperModel
 from opentrons_shared_data.pipette.types import (
@@ -1952,43 +1950,3 @@ async def test_stop_only_home_necessary_axes(
     await ot3_hardware.stop(home_after=True)
     if jaw_state == GripperJawState.GRIPPING:
         mock_home.assert_called_once_with(skip=[Axis.G])
-
-
-@pytest.mark.parametrize(
-    "expected_grip_width,actual_grip_width,wider,narrower,allowed_error,hard_max,hard_min,raise_error",
-    [
-        (80, 80, 0, 0, 0, 92, 60, False),
-        (80, 81, 0, 0, 0, 92, 60, True),
-        (80, 79, 0, 0, 0, 92, 60, True),
-        (80, 81, 1, 0, 0, 92, 60, False),
-        (80, 79, 0, 1, 0, 92, 60, False),
-        (80, 81, 0, 0, 1, 92, 60, False),
-        (80, 79, 0, 0, 1, 92, 60, False),
-        (80, 45, 40, 0, 1, 92, 60, True),
-        (80, 100, 0, 40, 0, 92, 60, True),
-    ],
-)
-def test_grip_error_detection(
-    expected_grip_width: float,
-    actual_grip_width: float,
-    wider: float,
-    narrower: float,
-    allowed_error: float,
-    hard_max: float,
-    hard_min: float,
-    raise_error: bool,
-) -> None:
-    context = cast(
-        AbstractContextManager[None],
-        pytest.raises(FailedGripperPickupError) if raise_error else nullcontext(),
-    )
-    with context:
-        OT3API._check_gripper_position_within_bounds(
-            expected_grip_width,
-            wider,
-            narrower,
-            actual_grip_width,
-            allowed_error,
-            hard_max,
-            hard_min,
-        )

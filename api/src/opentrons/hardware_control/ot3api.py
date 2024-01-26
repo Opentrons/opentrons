@@ -21,7 +21,6 @@ from typing import (
     Mapping,
     Awaitable,
 )
-from numpy import isclose
 from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
 )
@@ -36,7 +35,6 @@ from opentrons_shared_data.pipette import (
 from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.errors.exceptions import (
     StallOrCollisionDetectedError,
-    FailedGripperPickupError,
 )
 
 from opentrons import types as top_types
@@ -848,7 +846,9 @@ class OT3API(
         await self._ungrip(duty_cycle=dc)
         if not gripper.has_jaw_width_calibration:
             self._log.info("Calibrating gripper jaw.")
-            await self._grip(duty_cycle=dc)
+            await self._grip(
+                duty_cycle=dc, expected_displacement=gripper.max_jaw_displacement()
+            )
             jaw_at_closed = (await self._cache_encoder_position())[Axis.G]
             gripper.update_jaw_open_position_from_closed_position(jaw_at_closed)
             await self._ungrip(duty_cycle=dc)
@@ -1306,66 +1306,6 @@ class OT3API(
         except GripperNotPresentError:
             pass
 
-    @staticmethod
-    def _check_gripper_position_within_bounds(
-        expected_grip_width: float,
-        grip_width_uncertainty_wider: float,
-        grip_width_uncertainty_narrower: float,
-        jaw_width: float,
-        max_allowed_grip_error: float,
-        hard_limit_lower: float,
-        hard_limit_upper: float,
-    ) -> None:
-        expected_gripper_position_min = (
-            expected_grip_width - grip_width_uncertainty_narrower
-        )
-        expected_gripper_position_max = (
-            expected_grip_width + grip_width_uncertainty_wider
-        )
-        current_gripper_position = jaw_width
-        if isclose(current_gripper_position, hard_limit_lower):
-            raise FailedGripperPickupError(
-                message="Failed to grip: jaws all the way closed",
-                details={
-                    "failure-type": "jaws-all-the-way-closed",
-                    "actual-jaw-width": current_gripper_position,
-                },
-            )
-        if isclose(current_gripper_position, hard_limit_upper):
-            raise FailedGripperPickupError(
-                message="Failed to grip: jaws all the way open",
-                details={
-                    "failure-type": "jaws-all-the-way-open",
-                    "actual-jaw-width": current_gripper_position,
-                },
-            )
-        if (
-            current_gripper_position - expected_gripper_position_min
-            < -max_allowed_grip_error
-        ):
-            raise FailedGripperPickupError(
-                message="Failed to grip: jaws closed too far",
-                details={
-                    "failure-type": "jaws-more-closed-than-expected",
-                    "lower-bound-labware-width": expected_grip_width
-                    - grip_width_uncertainty_narrower,
-                    "actual-jaw-width": current_gripper_position,
-                },
-            )
-        if (
-            current_gripper_position - expected_gripper_position_max
-            > max_allowed_grip_error
-        ):
-            raise FailedGripperPickupError(
-                message="Failed to grip: jaws could not close far enough",
-                details={
-                    "failure-type": "jaws-more-open-than-expected",
-                    "upper-bound-labware-width": expected_grip_width
-                    - grip_width_uncertainty_narrower,
-                    "actual-jaw-width": current_gripper_position,
-                },
-            )
-
     def raise_error_if_gripper_pickup_failed(
         self,
         expected_grip_width: float,
@@ -1383,7 +1323,7 @@ class OT3API(
         # check if the gripper is at an acceptable position after attempting to
         #  pick up labware
         gripper = self._gripper_handler.get_gripper()
-        self._check_gripper_position_within_bounds(
+        self._backend.check_gripper_position_within_bounds(
             expected_grip_width,
             grip_width_uncertainty_wider,
             grip_width_uncertainty_narrower,
@@ -1699,11 +1639,15 @@ class OT3API(
         self._backend.update_feature_flags(self._feature_flags)
 
     @ExecutionManagerProvider.wait_for_running
-    async def _grip(self, duty_cycle: float, stay_engaged: bool = True) -> None:
+    async def _grip(
+        self, duty_cycle: float, expected_displacement: float, stay_engaged: bool = True
+    ) -> None:
         """Move the gripper jaw inward to close."""
         try:
             await self._backend.gripper_grip_jaw(
-                duty_cycle=duty_cycle, stay_engaged=stay_engaged
+                duty_cycle=duty_cycle,
+                expected_displacement=self._gripper_handler.get_gripper().max_jaw_displacement(),
+                stay_engaged=stay_engaged,
             )
             await self._cache_encoder_position()
             self._gripper_handler.set_jaw_state(await self._backend.get_jaw_state())
@@ -1747,7 +1691,11 @@ class OT3API(
         dc = self._gripper_handler.get_duty_cycle_by_grip_force(
             force_newtons or self._gripper_handler.get_gripper().default_grip_force
         )
-        await self._grip(duty_cycle=dc, stay_engaged=stay_engaged)
+        await self._grip(
+            duty_cycle=dc,
+            expected_displacement=self._gripper_handler.get_gripper().max_jaw_displacement(),
+            stay_engaged=stay_engaged,
+        )
 
     async def ungrip(self, force_newtons: Optional[float] = None) -> None:
         """

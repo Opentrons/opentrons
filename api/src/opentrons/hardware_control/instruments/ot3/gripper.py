@@ -129,7 +129,7 @@ class Gripper(AbstractInstrument[GripperDefinition]):
 
     @current_jaw_displacement.setter
     def current_jaw_displacement(self, mm: float) -> None:
-        max_mm = self._max_jaw_displacement() + 2.0
+        max_mm = self.max_jaw_displacement() + 2.0
         if mm > max_mm:
             self._log.warning(
                 f"jaw displacement {round(mm, 1)} mm exceeds max expected value: "
@@ -149,7 +149,7 @@ class Gripper(AbstractInstrument[GripperDefinition]):
     def default_home_force(self) -> float:
         return self.grip_force_profile.default_home_force
 
-    def _max_jaw_displacement(self) -> float:
+    def max_jaw_displacement(self) -> float:
         geometry = self._config.geometry
         return (self.max_jaw_width - geometry.jaw_width["min"]) / 2
 
