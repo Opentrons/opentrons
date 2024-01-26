@@ -113,6 +113,7 @@ action_table = sqlalchemy.Table(
 run_command_table = sqlalchemy.Table(
     "run_command",
     metadata,
+    sqlalchemy.Column("row_id", sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column(
         "run_id", sqlalchemy.String, sqlalchemy.ForeignKey("run.id"), nullable=False
     ),
@@ -125,7 +126,12 @@ run_command_table = sqlalchemy.Table(
         sqlalchemy.PickleType(pickler=legacy_pickle, protocol=PICKLE_PROTOCOL_VERSION),
         nullable=False,
     ),
-    sqlalchemy.PrimaryKeyConstraint("run_id", "command_id"),
+    sqlalchemy.Index(
+        "ix_run_run_id_command_id",  # An arbitrary name for the index.
+        "run_id",
+        "command_id",
+        unique=True,
+    ),
     sqlalchemy.Index(
         "ix_run_run_id_index_in_run",  # An arbitrary name for the index.
         "run_id",
