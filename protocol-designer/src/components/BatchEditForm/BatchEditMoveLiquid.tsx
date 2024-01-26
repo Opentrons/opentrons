@@ -158,7 +158,6 @@ export interface BatchEditMoveLiquidProps {
 export const BatchEditMoveLiquid = (
   props: BatchEditMoveLiquidProps
 ): JSX.Element => {
-  console.log('propsForFields', props.propsForFields)
   const { t } = useTranslation(['button', 'tooltip'])
   const { propsForFields, handleCancel, handleSave } = props
   const [cancelButtonTargetProps, cancelButtonTooltipProps] = useHoverTooltip({
