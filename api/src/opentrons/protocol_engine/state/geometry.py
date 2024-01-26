@@ -1011,7 +1011,7 @@ class GeometryView:
                     _PIPETTE_HOMED_POSITION_Z - tip.length
                 ) < labware_top_z_when_gripped:
                     raise LabwareMovementNotAllowedError(
-                        f"Cannot move labware '{self._labware.get(labware_id).loadName}' when {int(tip.volume)} ul tips are attached."
+                        f"Cannot move labware '{self._labware.get(labware_id).loadName}' when {int(tip.volume)} µL tips are attached."
                     )
         return
 
