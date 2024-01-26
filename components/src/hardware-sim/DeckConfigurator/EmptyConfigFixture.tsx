@@ -4,7 +4,7 @@ import { css } from 'styled-components'
 import { Icon } from '../../icons'
 import { Btn } from '../../primitives'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
-import { BORDERS } from '../../ui-style-constants'
+import { BORDERS, RESPONSIVENESS } from '../../ui-style-constants'
 import { COLORS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
@@ -75,10 +75,14 @@ const EMPTY_CONFIG_STYLE = css`
   display: ${DISPLAY_FLEX};
   align-items: ${ALIGN_CENTER};
   justify-content: ${JUSTIFY_CENTER};
-  background-color: ${COLORS.blue35};
+  background-color: ${COLORS.blue30};
   border: 3px dashed ${COLORS.blue50};
   border-radius: ${BORDERS.radiusSoftCorners};
   width: 100%;
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    background-color: ${COLORS.blue35};
+  }
 
   &:active {
     border: 3px solid ${COLORS.blue50};
@@ -91,10 +95,15 @@ const EMPTY_CONFIG_STYLE = css`
   }
 
   &:hover {
-    background-color: ${COLORS.blue40};
+    background-color: ${COLORS.blue35};
   }
 
   &:focus-visible {
     border: 3px solid ${COLORS.blue50};
+    background-color: ${COLORS.blue35};
+
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      background-color: ${COLORS.blue40};
+    }
   }
 `

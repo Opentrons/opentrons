@@ -4,19 +4,19 @@ import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 
 import {
-  SPACING_AUTO,
-  Flex,
-  useMountEffect,
-  Box,
-  Link,
-  DIRECTION_ROW,
   ALIGN_CENTER,
+  ALIGN_START,
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
+  Link,
+  SPACING_AUTO,
   SPACING,
   TYPOGRAPHY,
-  COLORS,
-  ALIGN_START,
-  DIRECTION_COLUMN,
+  useMountEffect,
 } from '@opentrons/components'
 
 import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
@@ -174,7 +174,7 @@ export function GeneralSettings(): JSX.Element {
               <StyledText
                 fontSize={TYPOGRAPHY.fontSizeLabel}
                 lineHeight={TYPOGRAPHY.lineHeight12}
-                color={COLORS.grey50}
+                color={COLORS.grey60}
                 paddingY={SPACING.spacing24}
               >
                 {t('up_to_date')}

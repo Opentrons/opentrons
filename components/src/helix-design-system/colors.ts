@@ -80,3 +80,4 @@ export const transparent = 'transparent'
 export const opacity20HexCode = '33' // 20% opacity
 export const opacity40HexCode = '66' // 40% opacity
 export const opacity60HexCode = '99' // 60% opacity
+export const opacity90HexCode = 'E6' // 90% opacity

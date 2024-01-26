@@ -13,9 +13,6 @@ import { Btn } from '../primitives'
 const defaultTabStyle = css`
   ${TYPOGRAPHY.pSemiBold}
   border-radius: ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} 0 0;
-  border-top: ${BORDERS.transparentLineBorder};
-  border-left: ${BORDERS.transparentLineBorder};
-  border-right: ${BORDERS.transparentLineBorder};
   padding: ${SPACING.spacing8} ${SPACING.spacing16};
   position: ${POSITION_RELATIVE};
 `
@@ -32,9 +29,6 @@ const inactiveTabStyle = css`
 const currentTabStyle = css`
   ${TYPOGRAPHY.pSemiBold}
   background-color: ${COLORS.white};
-  border-top: ${BORDERS.lineBorder};
-  border-left: ${BORDERS.lineBorder};
-  border-right: ${BORDERS.lineBorder};
   color: ${COLORS.blue50};
 
   /* extend below the tab when active to flow into the content */
