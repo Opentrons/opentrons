@@ -133,8 +133,11 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           width="max-content"
         >
           <StyledText as="bodyTextRegular">
-            {Object.values(volumeByWell).reduce((prev, curr) => prev + curr, 0)}{' '}
-            {MICRO_LITERS} {t('total_vol')}
+            {/* {`${Object.values(volumeByWell).reduce(
+              (prev, curr) => prev + curr,
+              0
+            )} ${MICRO_LITERS} ${t('total_vol')}`} */}
+            {'beep boop'}
           </StyledText>
         </Flex>
       </Flex>
