@@ -132,7 +132,8 @@ function getWarningContent({
     .map(moduleOnDeck => t(`modules:module_long_names.${moduleOnDeck.type}`))
     .join(' and ')
 
-  if (pipettesWithoutStep.length && modulesWithoutStep.length) {
+  console.log('modules without step', modulesWithoutStep)
+  if (pipettesWithoutStep.length > 0 && modulesWithoutStep.length > 0) {
     return {
       content: (
         <>
@@ -149,7 +150,7 @@ function getWarningContent({
     }
   }
 
-  if (pipettesWithoutStep.length) {
+  if (pipettesWithoutStep.length > 0) {
     return {
       content: (
         <>
@@ -165,7 +166,7 @@ function getWarningContent({
     }
   }
 
-  if (modulesWithoutStep.length) {
+  if (modulesWithoutStep.length > 0) {
     const moduleCase =
       modulesWithoutStep.length > 1 ? 'unused_modules' : 'unused_module'
     return {
@@ -318,7 +319,6 @@ export function FileSidebar(): JSX.Element {
     'moduleId',
     robotType
   )
-
   const gripperWithoutStep = isGripperAttached && !gripperInUse
 
   const hasWarning =
@@ -363,7 +363,7 @@ export function FileSidebar(): JSX.Element {
       dispatch(loadFileActions.saveProtocolFile())
     },
   })
-
+  console.log(warning)
   return (
     <>
       {blockingExportHint}

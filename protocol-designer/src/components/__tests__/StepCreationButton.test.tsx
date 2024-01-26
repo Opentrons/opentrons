@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { fireEvent, getByText, screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import {
   getCurrentFormHasUnsavedChanges,
   getCurrentFormIsPresaved,
