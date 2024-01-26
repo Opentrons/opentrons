@@ -2,8 +2,6 @@
 
 import sqlalchemy
 
-from robot_server.persistence import legacy_pickle
-from robot_server.persistence.pickle_protocol_version import PICKLE_PROTOCOL_VERSION
 from robot_server.persistence._utc_datetime import UTCDateTime
 
 metadata = sqlalchemy.MetaData()
@@ -83,7 +81,7 @@ run_table = sqlalchemy.Table(
     # column added in schema v1
     sqlalchemy.Column(
         "state_summary",
-        sqlalchemy.PickleType(pickler=legacy_pickle, protocol=PICKLE_PROTOCOL_VERSION),
+        sqlalchemy.String,
         nullable=True,
     ),
     # column added in schema v1
@@ -119,13 +117,7 @@ run_command_table = sqlalchemy.Table(
     ),
     sqlalchemy.Column("index_in_run", sqlalchemy.Integer, nullable=False),
     sqlalchemy.Column("command_id", sqlalchemy.String, nullable=False),
-    sqlalchemy.Column(
-        "command",
-        # TODO(mm, 2024-01-25): This should be JSON instead of a pickle. See:
-        # https://opentrons.atlassian.net/browse/RSS-98.
-        sqlalchemy.PickleType(pickler=legacy_pickle, protocol=PICKLE_PROTOCOL_VERSION),
-        nullable=False,
-    ),
+    sqlalchemy.Column("command", sqlalchemy.String, nullable=False),
     sqlalchemy.Index(
         "ix_run_run_id_command_id",  # An arbitrary name for the index.
         "run_id",

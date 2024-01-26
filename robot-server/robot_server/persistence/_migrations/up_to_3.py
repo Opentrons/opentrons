@@ -10,10 +10,13 @@ Summary of changes from schema 2:
 
 from contextlib import ExitStack
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, Iterable, List
 
+from opentrons.protocol_engine import Command, StateSummary
+import pydantic
 import sqlalchemy
 
+from ..pydantic import pydantic_to_json
 from .._database import (
     create_schema_2_sql_engine,
     create_schema_3_sql_engine,
@@ -95,25 +98,40 @@ def _migrate_run_table(
     insert_new_command = sqlalchemy.insert(schema_3.run_command_table)
 
     for old_run_row in source_transaction.execute(select_old_runs).all():
+        old_state_summary = old_run_row.state_summary
+        new_state_summary = (
+            None
+            if old_run_row.state_summary is None
+            else pydantic_to_json(
+                pydantic.parse_obj_as(StateSummary, old_state_summary)
+            )
+        )
         dest_transaction.execute(
             insert_new_run,
             id=old_run_row.id,
             created_at=old_run_row.created_at,
             protocol_id=old_run_row.protocol_id,
-            state_summary=old_run_row.state_summary,
+            state_summary=new_state_summary,
             engine_status=old_run_row.engine_status,
             _updated_at=old_run_row._updated_at,
         )
 
-        commands: List[Dict[str, Any]] = old_run_row.commands or []
+        old_commands: List[Dict[str, Any]] = old_run_row.commands or []
+        pydantic_old_commands: Iterable[Command] = (
+            pydantic.parse_obj_as(
+                Command,  # type: ignore[arg-type]
+                c,
+            )
+            for c in old_commands
+        )
         new_command_rows = [
             {
                 "run_id": old_run_row.id,
                 "index_in_run": index_in_run,
-                "command_id": command["id"],
-                "command": command,
+                "command_id": pydantic_command.id,
+                "command": pydantic_to_json(pydantic_command),
             }
-            for index_in_run, command in enumerate(commands)
+            for index_in_run, pydantic_command in enumerate(pydantic_old_commands)
         ]
         # Insert all the commands for this run in one go, to avoid the overhead of
         # separate statements, and since we had to bring them all into memory at once
