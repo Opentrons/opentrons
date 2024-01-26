@@ -1,3 +1,13 @@
+"""Migrate the persistence directory from schema 2 to 3.
+
+Summary of changes from schema 2:
+
+- Run commands were formerly stored as monolithic blobs in the run table,
+  with each row storing an entire list. This has been split out into a new
+  run_command table, where each individual command gets its own row.
+"""
+
+
 from contextlib import ExitStack
 from pathlib import Path
 from typing import Any, Dict, List
