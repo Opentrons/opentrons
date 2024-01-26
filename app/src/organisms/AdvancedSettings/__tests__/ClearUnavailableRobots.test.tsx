@@ -39,8 +39,6 @@ const mockConfirm = jest.fn()
 const mockCancel = jest.fn()
 
 describe('ClearUnavailableRobots', () => {
-  let props: React.ComponentProps<typeof ClearUnavailableRobots>
-
   beforeEach(() => {
     mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
     mockGetReachableRobots.mockReturnValue([mockReachableRobot])
