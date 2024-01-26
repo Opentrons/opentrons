@@ -151,6 +151,13 @@ class ProtocolCore(
                 existing_module_ids=list(self._module_cores_by_id.keys()),
             )
             self._engine_client.add_addressable_area(disposal_location.area_name)
+        elif isinstance(disposal_location, WasteChute):
+            # TODO(jbl 2024-01-25) hardcoding this specific addressable area should be refactored
+            #   when analysis is fixed up
+            self._engine_client.state.addressable_areas.raise_if_area_not_in_deck_configuration(
+                "1ChannelWasteChute"
+            )
+            self._engine_client.add_addressable_area("1ChannelWasteChute")
         self._disposal_locations.append(disposal_location)
 
     def get_disposal_locations(self) -> List[Union[Labware, TrashBin, WasteChute]]:
