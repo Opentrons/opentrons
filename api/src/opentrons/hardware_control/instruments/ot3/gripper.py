@@ -3,7 +3,7 @@ from __future__ import annotations
 """ Classes and functions for gripper state tracking
 """
 import logging
-from typing import Any, Optional, Set, Dict, Tuple
+from typing import Any, Optional, Set, Dict, Tuple, Final
 
 from opentrons.types import Point
 from opentrons.config import gripper_config
@@ -24,6 +24,7 @@ from ..instrument_abc import AbstractInstrument
 from opentrons.hardware_control.dev_types import AttachedGripper, GripperDict
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
+    MotionFailedError,
 )
 
 from opentrons_shared_data.gripper import (
@@ -34,6 +35,7 @@ from opentrons_shared_data.gripper import (
 
 RECONFIG_KEYS = {"quirks"}
 
+MAX_ACCEPTABLE_JAW_DISPLACEMENT: Final = 20
 
 mod_log = logging.getLogger(__name__)
 
@@ -190,6 +192,19 @@ class Gripper(AbstractInstrument[GripperDefinition]):
         """
         jaw_min = self._config.geometry.jaw_width["min"]
         jaw_nominal_max = self._config.geometry.jaw_width["max"]
+        if (
+            abs((jaw_at_closed * 2) - (jaw_nominal_max - jaw_min))
+            > MAX_ACCEPTABLE_JAW_DISPLACEMENT
+        ):
+            raise MotionFailedError(
+                message="Gripper jaw calibration out of bounds",
+                detail={
+                    "type": "gripper-jaw-calibration-out-of-bounds",
+                    "actual-displacement": str(jaw_at_closed * 2),
+                    "nominal-displacement": str(jaw_nominal_max - jaw_min),
+                },
+            )
+
         self._jaw_max_offset = jaw_min - (jaw_nominal_max - (jaw_at_closed * 2))
         self._log.info(
             f"Gripper max jaw offset is now {self._jaw_max_offset} from input position {jaw_at_closed}"
