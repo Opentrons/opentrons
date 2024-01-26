@@ -1,8 +1,8 @@
 diff --git a/api/src/opentrons/config/feature_flags.py b/api/src/opentrons/config/feature_flags.py
-index 5bf289a49d..dabdcff855 100644
+index 583dae0b14..a6c2fff7e1 100644
 --- a/api/src/opentrons/config/feature_flags.py
 +++ b/api/src/opentrons/config/feature_flags.py
-@@ -74,6 +74,4 @@ def tip_presence_detection_enabled() -> bool:
+@@ -67,6 +67,4 @@ def status_bar_enabled() -> bool:
  
  def require_estop() -> bool:
      """Whether the OT3 should allow gantry movements with no Estop plugged in."""
@@ -11,7 +11,7 @@ index 5bf289a49d..dabdcff855 100644
 -    )
 +    return False
 diff --git a/hardware/opentrons_hardware/hardware_control/motion_planning/move_utils.py b/hardware/opentrons_hardware/hardware_control/motion_planning/move_utils.py
-index 4c2a664c60..8e0d2d49c6 100644
+index 8792d9fb59..0119278a39 100644
 --- a/hardware/opentrons_hardware/hardware_control/motion_planning/move_utils.py
 +++ b/hardware/opentrons_hardware/hardware_control/motion_planning/move_utils.py
 @@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
