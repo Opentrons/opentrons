@@ -7,7 +7,7 @@ import {
   selectors as loadFileSelectors,
   actions as loadFileActions,
 } from '../../../load-file'
-import { getModalContents } from './modalContents'
+import { useModalContents } from './modalContents'
 import modalStyles from '../modal.css'
 
 export function FileUploadMessageModal(): JSX.Element | null {
@@ -18,12 +18,13 @@ export function FileUploadMessageModal(): JSX.Element | null {
   const dismissModal = (): void => {
     dispatch(loadFileActions.dismissFileUploadMessage())
   }
-  if (!message) return null
-
-  const { title, body, okButtonText } = getModalContents({
+  const modalContents = useModalContents({
     uploadResponse: message,
-    t,
   })
+
+  if (modalContents == null) return null
+
+  const { title, body, okButtonText } = modalContents
   let buttons = [
     {
       children: t('button:cancel'),

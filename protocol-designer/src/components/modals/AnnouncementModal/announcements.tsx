@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Trans } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
   Flex,
@@ -17,10 +17,6 @@ export interface Announcement {
   message: React.ReactNode
 }
 
-interface AnnouncementProps {
-  t: any
-}
-
 const batchEditStyles = css`
   justify-content: ${JUSTIFY_SPACE_AROUND};
   padding: ${SPACING.spacing16};
@@ -34,8 +30,8 @@ const PD = 'Protocol Designer'
 const APP = 'Opentrons App'
 const OPENTRONS_PD = 'Opentrons Protocol Designer'
 
-export const getAnnouncements = (props: AnnouncementProps): Announcement[] => {
-  const { t } = props
+export const useAnnouncements = (): Announcement[] => {
+  const { t } = useTranslation('modal')
 
   return [
     {

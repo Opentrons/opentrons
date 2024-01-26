@@ -376,7 +376,7 @@ export function FileSidebar(): JSX.Element {
             onCloseClick={cancelModal}
             buttons={[
               {
-                children: t('Cancel'),
+                children: t('cancel'),
                 onClick: cancelModal,
               },
               {

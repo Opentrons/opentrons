@@ -7,13 +7,13 @@ import {
   getLocalStorageItem,
   localStorageAnnouncementKey,
 } from '../../../persist'
-import { getAnnouncements } from './announcements'
+import { useAnnouncements } from './announcements'
 import modalStyles from '../modal.css'
 import styles from './AnnouncementModal.css'
 
 export const AnnouncementModal = (): JSX.Element => {
   const { t } = useTranslation(['modal', 'button'])
-  const announcements = getAnnouncements({ t })
+  const announcements = useAnnouncements()
 
   const { announcementKey, message, heading, image } = announcements[
     announcements.length - 1

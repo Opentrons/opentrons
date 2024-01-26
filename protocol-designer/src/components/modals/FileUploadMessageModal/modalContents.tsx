@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Trans } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import assert from 'assert'
 import { FileUploadMessage } from '../../../load-file'
 import type { ModalContents } from './types'
@@ -53,11 +53,11 @@ export const getGenericDidMigrateMessage = (
   return {
     title: t('migrations.header', { pd: PD }),
     body: (
-      <>
+      <div>
         <p>{t('migrations.generic.body1', { pd: PD })}</p>
         <p>{t('migrations.generic.body2', { pd: PD })}</p>
         <p>{t('migrations.generic.body3')}</p>
-      </>
+      </div>
     ),
   }
 }
@@ -133,9 +133,9 @@ interface MigrationMessageProps {
   t: any
 }
 
-export function getMigrationMessage(
+export const getMigrationMessage = (
   props: MigrationMessageProps
-): ModalContents {
+): ModalContents => {
   const { t, migrationsRan } = props
 
   if (migrationsRan.includes('3.0.0')) {
@@ -160,11 +160,16 @@ export function getMigrationMessage(
 }
 
 interface ModalContentsProps {
-  uploadResponse: FileUploadMessage
-  t: any
+  uploadResponse?: FileUploadMessage | null
 }
-export function getModalContents(props: ModalContentsProps): ModalContents {
-  const { t, uploadResponse } = props
+export function useModalContents(
+  props: ModalContentsProps
+): ModalContents | null {
+  const { uploadResponse } = props
+  const { t } = useTranslation('modal')
+
+  if (uploadResponse == null) return null
+
   if (uploadResponse.isError) {
     switch (uploadResponse.errorType) {
       case 'INVALID_FILE_TYPE':
