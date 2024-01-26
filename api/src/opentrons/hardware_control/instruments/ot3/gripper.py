@@ -113,6 +113,10 @@ class Gripper(AbstractInstrument[GripperDefinition]):
         return self._config.geometry.jaw_width["max"] + (self._jaw_max_offset or 0)
 
     @property
+    def min_jaw_width(self) -> float:
+        return self._config.geometry.jaw_width["min"]
+
+    @property
     def jaw_width(self) -> float:
         return self.max_jaw_width - (self.current_jaw_displacement * 2.0)
 

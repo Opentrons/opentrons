@@ -21,6 +21,7 @@ from typing import (
     Mapping,
     Awaitable,
 )
+from numpy import isclose
 from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
 )
@@ -1312,34 +1313,65 @@ class OT3API(
         grip_width_uncertainty_narrower: float,
         jaw_width: float,
         max_allowed_grip_error: float,
+        hard_limit_lower: float,
+        hard_limit_upper: float,
     ) -> None:
-        expected_gripper_position_min = expected_grip_width - grip_width_uncertainty_narrower
-        expected_gripper_position_max = expected_grip_width + grip_width_uncertainty_wider
+        expected_gripper_position_min = (
+            expected_grip_width - grip_width_uncertainty_narrower
+        )
+        expected_gripper_position_max = (
+            expected_grip_width + grip_width_uncertainty_wider
+        )
         current_gripper_position = jaw_width
-        if (current_gripper_position - expected_gripper_position_min < -max_allowed_grip_error):
+        if isclose(current_gripper_position, hard_limit_lower):
             raise FailedGripperPickupError(
-                message='Failed to grip: jaws closed too far',
+                message="Failed to grip: jaws all the way closed",
                 details={
-                    "failure-type": "jaws-more-closed-than-expected",
-                    "lower-bound-labware-width": expected_grip_width - grip_width_uncertainty_narrower,
+                    "failure-type": "jaws-all-the-way-closed",
                     "actual-jaw-width": current_gripper_position,
                 },
             )
-        if (current_gripper_position - expected_gripper_position_max > max_allowed_grip_error):
+        if isclose(current_gripper_position, hard_limit_upper):
             raise FailedGripperPickupError(
-                message='Failed to grip: jaws could not close far enough',
+                message="Failed to grip: jaws all the way open",
                 details={
-                    'failure-type': "jaws-more-open-than-expected",
-                    "upper-bound-labware-width": expected_grip_width - grip_width_uncertainty_narrower,
+                    "failure-type": "jaws-all-the-way-open",
                     "actual-jaw-width": current_gripper_position,
-                }
+                },
+            )
+        if (
+            current_gripper_position - expected_gripper_position_min
+            < -max_allowed_grip_error
+        ):
+            raise FailedGripperPickupError(
+                message="Failed to grip: jaws closed too far",
+                details={
+                    "failure-type": "jaws-more-closed-than-expected",
+                    "lower-bound-labware-width": expected_grip_width
+                    - grip_width_uncertainty_narrower,
+                    "actual-jaw-width": current_gripper_position,
+                },
+            )
+        if (
+            current_gripper_position - expected_gripper_position_max
+            > max_allowed_grip_error
+        ):
+            raise FailedGripperPickupError(
+                message="Failed to grip: jaws could not close far enough",
+                details={
+                    "failure-type": "jaws-more-open-than-expected",
+                    "upper-bound-labware-width": expected_grip_width
+                    - grip_width_uncertainty_narrower,
+                    "actual-jaw-width": current_gripper_position,
+                },
             )
 
     def raise_error_if_gripper_pickup_failed(
-            self,
-            expected_grip_width: float,
-            grip_width_uncertainty_wider: float,
-            grip_width_uncertainty_narrower: float) -> None:
+        self,
+        expected_grip_width: float,
+        grip_width_uncertainty_wider: float,
+        grip_width_uncertainty_narrower: float,
+    ) -> None:
         """Ensure that a gripper pickup succeeded.
 
         The labware width is the width of the labware at the point of the grip, as closely as it is known.
@@ -1356,7 +1388,9 @@ class OT3API(
             grip_width_uncertainty_wider,
             grip_width_uncertainty_narrower,
             gripper.jaw_width,
-            gripper.max_allowed_grip_error
+            gripper.max_allowed_grip_error,
+            gripper.max_jaw_width,
+            gripper.min_jaw_width,
         )
 
     def gripper_jaw_can_home(self) -> bool:
