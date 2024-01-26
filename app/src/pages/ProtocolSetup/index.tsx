@@ -17,6 +17,7 @@ import {
   Icon,
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_WRAP_ANYWHERE,
   POSITION_STICKY,
   SPACING,
   TEXT_ALIGN_RIGHT,
@@ -609,7 +610,7 @@ function PrepareToRun({
                   as="h4"
                   color={COLORS.grey50}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  overflowWrap="anywhere"
+                  overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                 >
                   {truncateString(protocolName, 100)}
                 </StyledText>

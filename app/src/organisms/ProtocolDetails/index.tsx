@@ -10,27 +10,28 @@ import { useDispatch, useSelector } from 'react-redux'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import {
-  Box,
-  Btn,
-  Flex,
-  Icon,
-  Link,
   ALIGN_CENTER,
   BORDERS,
+  Box,
+  Btn,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
+  Flex,
+  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  Link,
+  OVERFLOW_WRAP_ANYWHERE,
   POSITION_RELATIVE,
+  PrimaryButton,
+  ProtocolDeck,
+  RoundTab,
   SIZE_1,
   SIZE_5,
   SPACING,
-  RoundTab,
   TYPOGRAPHY,
-  PrimaryButton,
-  ProtocolDeck,
 } from '@opentrons/components'
 import {
   parseInitialPipetteNamesByMount,
@@ -412,7 +413,7 @@ export function ProtocolDetails(
                 css={TYPOGRAPHY.h2SemiBold}
                 marginBottom={SPACING.spacing16}
                 data-testid={`ProtocolDetails_${protocolDisplayName}`}
-                overflowWrap="anywhere"
+                overflowWrap={OVERFLOW_WRAP_ANYWHERE}
               >
                 {protocolDisplayName}
               </StyledText>
@@ -483,7 +484,7 @@ export function ProtocolDetails(
                   <StyledText
                     as="p"
                     marginRight={SPACING.spacing20}
-                    overflowWrap="anywhere"
+                    overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                   >
                     {analysisStatus === 'loading'
                       ? t('shared:loading')

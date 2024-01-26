@@ -8,20 +8,21 @@ import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
-  SPACING,
-  SIZE_1,
-  TYPOGRAPHY,
   ALIGN_CENTER,
-  JUSTIFY_CENTER,
-  Box,
-  Flex,
   BORDERS,
+  Box,
+  COLORS,
   DIRECTION_COLUMN,
   DISPLAY_BLOCK,
+  Flex,
   Icon,
+  JUSTIFY_CENTER,
+  OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
-  COLORS,
   ProtocolDeck,
+  SIZE_1,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { useLogger } from '../../logger'
@@ -229,7 +230,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                   <StyledText
                     as="p"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    overflowWrap="anywhere"
+                    overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                   >
                     {storedProtocol.mostRecentAnalysis?.metadata
                       ?.protocolName ??
@@ -253,7 +254,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
               <StyledText
                 as="label"
                 color={COLORS.red60}
-                overflowWrap="anywhere"
+                overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                 display={DISPLAY_BLOCK}
                 marginTop={`-${SPACING.spacing8}`}
                 marginBottom={SPACING.spacing8}

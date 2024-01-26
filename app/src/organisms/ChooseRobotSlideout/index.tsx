@@ -5,21 +5,22 @@ import { NavLink } from 'react-router-dom'
 import { css } from 'styled-components'
 
 import {
-  SPACING,
-  Icon,
-  Flex,
-  Link,
-  COLORS,
-  BORDERS,
-  DIRECTION_COLUMN,
-  DISPLAY_INLINE_BLOCK,
-  TYPOGRAPHY,
-  SIZE_1,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
-  JUSTIFY_CENTER,
-  SIZE_4,
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
+  DISPLAY_INLINE_BLOCK,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
+  Link,
+  OVERFLOW_WRAP_ANYWHERE,
+  SIZE_1,
+  SIZE_4,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -252,7 +253,7 @@ export function ChooseRobotSlideout(
                   <StyledText
                     as="label"
                     color={COLORS.red60}
-                    overflowWrap="anywhere"
+                    overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                     display={DISPLAY_INLINE_BLOCK}
                     marginTop={`-${SPACING.spacing8}`}
                     marginBottom={SPACING.spacing8}

@@ -7,18 +7,19 @@ import styled from 'styled-components'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
-  Btn,
-  Flex,
-  Icon,
-  useHoverTooltip,
-  useInterval,
   ALIGN_CENTER,
+  Btn,
   COLORS,
   DIRECTION_COLUMN,
+  Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_WRAP_ANYWHERE,
   SPACING,
-  TYPOGRAPHY,
   truncateString,
+  TYPOGRAPHY,
+  useHoverTooltip,
+  useInterval,
 } from '@opentrons/components'
 
 import { QuaternaryButton } from '../../atoms/buttons'
@@ -78,7 +79,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
         <StyledText
           as="label"
           paddingRight={SPACING.spacing8}
-          overflowWrap="anywhere"
+          overflowWrap={OVERFLOW_WRAP_ANYWHERE}
         >
           {`${truncateString(displayName, 68)}; ${i18n.format(
             t(`run_details:status_${currentRunStatus}`),

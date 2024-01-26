@@ -4,19 +4,20 @@ import startCase from 'lodash/startCase'
 import { format } from 'date-fns'
 
 import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
+  BORDERS,
   Box,
+  COLORS,
+  DIRECTION_COLUMN,
   Flex,
   Icon,
+  JUSTIFY_SPACE_BETWEEN,
   LabwareRender,
+  OVERFLOW_WRAP_ANYWHERE,
   RobotWorkSpace,
   SPACING,
   TYPOGRAPHY,
-  BORDERS,
-  COLORS,
-  JUSTIFY_SPACE_BETWEEN,
-  DIRECTION_COLUMN,
-  ALIGN_FLEX_END,
-  ALIGN_CENTER,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -110,7 +111,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
               {t('api_name')}
             </StyledText>
 
-            <Box overflowWrap="anywhere">
+            <Box overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
               <StyledText as="p">{apiName}</StyledText>
             </Box>
           </Box>
