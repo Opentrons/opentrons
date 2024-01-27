@@ -1,6 +1,6 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
-import { i18n } from '../../localization'
 import { RobotCoordsForeignDiv, TYPOGRAPHY } from '@opentrons/components'
 import type { ModuleOrientation } from '@opentrons/shared-data'
 
@@ -27,7 +27,7 @@ export const SlotWarning = (props: Props): JSX.Element => {
   const { x, y, xDimension, yDimension, orientation, warningType } = props
   const rectXOffset = orientation === 'left' ? -OVERHANG : 0
   const textXOffset = orientation === 'left' ? -1 * OVERHANG : xDimension
-
+  const { t } = useTranslation('deck')
   return (
     <g>
       <StyledRect
@@ -51,7 +51,7 @@ export const SlotWarning = (props: Props): JSX.Element => {
         width={OVERHANG}
         height={yDimension}
       >
-        {i18n.t(`deck.warning.${warningType}`)}
+        {t(`warning.${warningType}`)}
       </RobotCoordsForeignDiv>
     </g>
   )

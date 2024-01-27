@@ -1,12 +1,22 @@
 import * as React from 'react'
 import cx from 'classnames'
+import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import {
   DeprecatedPrimaryButton,
   AlertModal,
   OutlineButton,
   SidePanel,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
+import {
+  actions as loadFileActions,
+  selectors as loadFileSelectors,
+} from '../../load-file'
+import { actions, selectors } from '../../navigation'
+import { selectors as fileDataSelectors } from '../../file-data'
+import { selectors as stepFormSelectors } from '../../step-forms'
+import { getRobotType } from '../../file-data/selectors'
+import { getAdditionalEquipment } from '../../step-forms/selectors'
 import { resetScrollElements } from '../../ui/steps/utils'
 import { Portal } from '../portals/MainPageModalPortal'
 import { useBlockingHint } from '../Hints/useBlockingHint'
@@ -19,6 +29,11 @@ import {
 import modalStyles from '../modals/modal.css'
 import styles from './FileSidebar.css'
 
+import type {
+  CreateCommand,
+  ProtocolFile,
+  RobotType,
+} from '@opentrons/shared-data'
 import type { HintKey } from '../../tutorial'
 import type {
   InitialDeckSetup,
@@ -26,11 +41,7 @@ import type {
   ModuleOnDeck,
   PipetteOnDeck,
 } from '../../step-forms'
-import type {
-  CreateCommand,
-  ProtocolFile,
-  RobotType,
-} from '@opentrons/shared-data'
+import type { ThunkDispatch } from '../../types'
 
 export interface AdditionalEquipment {
   [additionalEquipmentId: string]: {
@@ -69,6 +80,7 @@ interface MissingContent {
   modulesWithoutStep: ModuleOnDeck[]
   gripperWithoutStep: boolean
   fixtureWithoutStep: Fixture
+  t: any
 }
 
 const LOAD_COMMANDS: Array<CreateCommand['commandType']> = [
@@ -84,19 +96,20 @@ function getWarningContent({
   modulesWithoutStep,
   gripperWithoutStep,
   fixtureWithoutStep,
+  t,
 }: MissingContent): WarningContent | null {
   if (noCommands) {
     return {
       content: (
         <>
-          <p>{i18n.t('alert.export_warnings.no_commands.body1')}</p>
+          <p>{t('export_warnings.no_commands.body1')}</p>
           <p>
-            {i18n.t('alert.export_warnings.no_commands.body2')}
+            {t('export_warnings.no_commands.body2')}
             <KnowledgeBaseLink to="protocolSteps">here</KnowledgeBaseLink>.
           </p>
         </>
       ),
-      heading: i18n.t('alert.export_warnings.no_commands.heading'),
+      heading: t('export_warnings.no_commands.heading'),
     }
   }
 
@@ -104,11 +117,11 @@ function getWarningContent({
     return {
       content: (
         <>
-          <p>{i18n.t('alert.export_warnings.unused_gripper.body1')}</p>
-          <p>{i18n.t('alert.export_warnings.unused_gripper.body2')}</p>
+          <p>{t('export_warnings.unused_gripper.body1')}</p>
+          <p>{t('export_warnings.unused_gripper.body2')}</p>
         </>
       ),
-      heading: i18n.t('alert.export_warnings.unused_gripper.heading'),
+      heading: t('export_warnings.unused_gripper.heading'),
     }
   }
 
@@ -116,9 +129,7 @@ function getWarningContent({
     .map(pipette => `${pipette.mount} ${pipette.spec.displayName}`)
     .join(' and ')
   const modulesDetails = modulesWithoutStep
-    .map(moduleOnDeck =>
-      i18n.t(`modules.module_long_names.${moduleOnDeck.type}`)
-    )
+    .map(moduleOnDeck => t(`modules:module_long_names.${moduleOnDeck.type}`))
     .join(' and ')
 
   if (pipettesWithoutStep.length && modulesWithoutStep.length) {
@@ -126,19 +137,15 @@ function getWarningContent({
       content: (
         <>
           <p>
-            {i18n.t('alert.export_warnings.unused_pipette_and_module.body1', {
+            {t('export_warnings.unused_pipette_and_module.body1', {
               modulesDetails,
               pipettesDetails,
             })}
           </p>
-          <p>
-            {i18n.t('alert.export_warnings.unused_pipette_and_module.body2')}
-          </p>
+          <p>{t('export_warnings.unused_pipette_and_module.body2')}</p>
         </>
       ),
-      heading: i18n.t(
-        'alert.export_warnings.unused_pipette_and_module.heading'
-      ),
+      heading: t('export_warnings.unused_pipette_and_module.heading'),
     }
   }
 
@@ -147,14 +154,14 @@ function getWarningContent({
       content: (
         <>
           <p>
-            {i18n.t('alert.export_warnings.unused_pipette.body1', {
+            {t('export_warnings.unused_pipette.body1', {
               pipettesDetails,
             })}
           </p>
-          <p>{i18n.t('alert.export_warnings.unused_pipette.body2')}</p>
+          <p>{t('export_warnings.unused_pipette.body2')}</p>
         </>
       ),
-      heading: i18n.t('alert.export_warnings.unused_pipette.heading'),
+      heading: t('export_warnings.unused_pipette.heading'),
     }
   }
 
@@ -165,14 +172,14 @@ function getWarningContent({
       content: (
         <>
           <p>
-            {i18n.t(`alert.export_warnings.${moduleCase}.body1`, {
+            {t(`export_warnings.${moduleCase}.body1`, {
               modulesDetails,
             })}
           </p>
-          <p>{i18n.t(`alert.export_warnings.${moduleCase}.body2`)}</p>
+          <p>{t(`export_warnings.${moduleCase}.body2`)}</p>
         </>
       ),
-      heading: i18n.t(`alert.export_warnings.${moduleCase}.heading`),
+      heading: t(`export_warnings.${moduleCase}.heading`),
     }
   }
 
@@ -182,19 +189,19 @@ function getWarningContent({
         (fixtureWithoutStep.trashBin && !fixtureWithoutStep.wasteChute) ||
         (!fixtureWithoutStep.trashBin && fixtureWithoutStep.wasteChute) ? (
           <p>
-            {i18n.t('alert.export_warnings.unused_trash.body', {
+            {t('export_warnings.unused_trash.body', {
               name: fixtureWithoutStep.trashBin ? 'trash bin' : 'waste chute',
             })}
           </p>
         ) : (
           <p>
-            {i18n.t('alert.export_warnings.unused_trash.body_both', {
+            {t('export_warnings.unused_trash.body_both', {
               trashName: 'trash bin',
               wasteName: 'waste chute',
             })}
           </p>
         ),
-      heading: i18n.t('alert.export_warnings.unused_trash.heading'),
+      heading: t('export_warnings.unused_trash.heading'),
     }
   }
 
@@ -203,52 +210,55 @@ function getWarningContent({
       content: (
         <>
           <p>
-            {i18n.t('alert.export_warnings.unused_staging_area.body1', {
+            {t('export_warnings.unused_staging_area.body1', {
               count: fixtureWithoutStep.stagingAreaSlots.length,
               slot: fixtureWithoutStep.stagingAreaSlots,
             })}
           </p>
           <p>
-            {i18n.t('alert.export_warnings.unused_staging_area.body2', {
+            {t('export_warnings.unused_staging_area.body2', {
               count: fixtureWithoutStep.stagingAreaSlots.length,
             })}
           </p>
         </>
       ),
-      heading: i18n.t('alert.export_warnings.unused_staging_area.heading'),
+      heading: t('export_warnings.unused_staging_area.heading'),
     }
   }
 
   return null
 }
 
-export const v8WarningContent: JSX.Element = (
-  <div>
-    <p>
-      {i18n.t(`alert.hint.export_v8_protocol_7_1.body1`)}{' '}
-      <strong>{i18n.t(`alert.hint.export_v8_protocol_7_1.body2`)}</strong>
-      {i18n.t(`alert.hint.export_v8_protocol_7_1.body3`)}
-    </p>
-  </div>
-)
+export function v8WarningContent(t: any): JSX.Element {
+  return (
+    <div>
+      <p>
+        {t(`hint.export_v8_protocol_7_1.body1`)}{' '}
+        <strong>{t(`hint.export_v8_protocol_7_1.body2`)}</strong>
+        {t(`hint.export_v8_protocol_7_1.body3`)}
+      </p>
+    </div>
+  )
+}
+export function FileSidebar(): JSX.Element {
+  const fileData = useSelector(fileDataSelectors.createFile)
+  const canDownload = useSelector(selectors.getCurrentPage)
+  const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
+  const modulesOnDeck = initialDeckSetup.modules
+  const pipettesOnDeck = initialDeckSetup.pipettes
+  const robotType = useSelector(getRobotType)
+  const additionalEquipment = useSelector(getAdditionalEquipment)
+  const savedStepForms = useSelector(stepFormSelectors.getSavedStepForms)
+  const newProtocolModal = useSelector(selectors.getNewProtocolModal)
+  const hasUnsavedChanges = useSelector(loadFileSelectors.getHasUnsavedChanges)
+  const canCreateNew = !newProtocolModal
+  const dispatch: ThunkDispatch<any> = useDispatch()
 
-export function FileSidebar(props: Props): JSX.Element {
-  const {
-    canDownload,
-    fileData,
-    loadFile,
-    createNewFile,
-    onDownload,
-    modulesOnDeck,
-    pipettesOnDeck,
-    savedStepForms,
-    robotType,
-    additionalEquipment,
-  } = props
   const [
     showExportWarningModal,
     setShowExportWarningModal,
   ] = React.useState<boolean>(false)
+  const { t } = useTranslation(['alert', 'modules'])
   const isGripperAttached = Object.values(additionalEquipment).some(
     equipment => equipment?.name === 'gripper'
   )
@@ -268,6 +278,20 @@ export function FileSidebar(props: Props): JSX.Element {
   const [showBlockingHint, setShowBlockingHint] = React.useState<boolean>(false)
 
   const cancelModal = (): void => setShowExportWarningModal(false)
+
+  const loadFile = (
+    fileChangeEvent: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    if (!hasUnsavedChanges || window.confirm(t('confirm_import'))) {
+      dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
+    }
+  }
+
+  const createNewFile = (): void => {
+    if (canCreateNew) {
+      dispatch(actions.toggleNewProtocolModal(true))
+    }
+  }
 
   const nonLoadCommands =
     fileData?.commands.filter(
@@ -314,6 +338,7 @@ export function FileSidebar(props: Props): JSX.Element {
       modulesWithoutStep,
       gripperWithoutStep,
       fixtureWithoutStep,
+      t,
     })
 
   const getExportHintContent = (): {
@@ -322,7 +347,7 @@ export function FileSidebar(props: Props): JSX.Element {
   } => {
     return {
       hintKey: 'export_v8_protocol_7_1',
-      content: v8WarningContent,
+      content: v8WarningContent(t),
     }
   }
 
@@ -335,7 +360,7 @@ export function FileSidebar(props: Props): JSX.Element {
     handleCancel: () => setShowBlockingHint(false),
     handleContinue: () => {
       setShowBlockingHint(false)
-      onDownload()
+      dispatch(loadFileActions.saveProtocolFile())
     },
   })
 
@@ -351,11 +376,11 @@ export function FileSidebar(props: Props): JSX.Element {
             onCloseClick={cancelModal}
             buttons={[
               {
-                children: 'CANCEL',
+                children: t('cancel'),
                 onClick: cancelModal,
               },
               {
-                children: 'CONTINUE WITH EXPORT',
+                children: t('continue_with_export'),
                 className: modalStyles.long_button,
                 onClick: () => {
                   setShowExportWarningModal(false)
@@ -371,11 +396,11 @@ export function FileSidebar(props: Props): JSX.Element {
       <SidePanel title="Protocol File">
         <div className={styles.file_sidebar}>
           <OutlineButton onClick={createNewFile} className={styles.button}>
-            Create New
+            {t('create_new')}
           </OutlineButton>
 
           <OutlineButton Component="label" className={cx(styles.upload_button)}>
-            Import
+            {t('import')}
             <input type="file" onChange={loadFile} />
           </OutlineButton>
 
@@ -392,7 +417,7 @@ export function FileSidebar(props: Props): JSX.Element {
               }}
               disabled={!canDownload}
             >
-              Export
+              {t('export')}
             </DeprecatedPrimaryButton>
           </div>
         </div>

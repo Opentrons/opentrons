@@ -1,19 +1,19 @@
 import * as React from 'react'
 import {
-  Flex,
+  ALIGN_CENTER,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  SPACING,
-  ALIGN_CENTER,
+  Flex,
   JUSTIFY_CENTER,
+  SPACING,
   TYPOGRAPHY,
-  BORDERS,
 } from '@opentrons/components'
 
-import type { Story, Meta } from '@storybook/react'
-
 import { StyledText } from '../../atoms/text'
+
+import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'Design Tokens/Colors',
@@ -24,9 +24,7 @@ interface ColorsStorybookProps {
 }
 
 const Template: Story<ColorsStorybookProps> = args => {
-  const targetColors = args.colors.filter(
-    c => (!c[0].includes('opacity') || c.length > 2) && typeof c[1] === 'string'
-  )
+  const targetColors = args.colors
 
   const [copiedColor, setCopiedColor] = React.useState<string | null>(null)
 

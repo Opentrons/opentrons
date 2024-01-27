@@ -92,8 +92,8 @@ export const RunPreviewComponent = (
         {(command, index) => {
           const isCurrent = index === currentRunCommandIndex
           const borderColor = isCurrent ? COLORS.blue50 : COLORS.transparent
-          const backgroundColor = isCurrent ? COLORS.blue10 : COLORS.grey10
-          const contentColor = isCurrent ? COLORS.black90 : COLORS.grey50
+          const backgroundColor = isCurrent ? COLORS.blue35 : COLORS.grey10
+          const contentColor = isCurrent ? COLORS.blue60 : COLORS.grey50
           return (
             <Flex
               key={command.id}

@@ -1,7 +1,7 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { FormGroup } from '@opentrons/components'
-import { i18n } from '../../../../localization'
 import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors'
 import { StepFieldName } from '../../../../steplist/fieldLevel'
 import { LabwareField, WellSelectionField } from '../../fields'
@@ -33,11 +33,12 @@ export const SourceDestHeaders = (props: Props): JSX.Element => {
     propsForFields,
     formData,
   } = props
+  const { t } = useTranslation('form')
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
-  const labwareLabel = i18n.t(`form.step_edit_form.labwareLabel.${prefix}`)
+  const labwareLabel = t(`step_edit_form.labwareLabel.${prefix}`)
   const trashOrLabwareId = formData[addFieldNamePrefix('labware')]
   const isDisposalLocation =
     additionalEquipmentEntities[trashOrLabwareId]?.name === 'wasteChute' ||

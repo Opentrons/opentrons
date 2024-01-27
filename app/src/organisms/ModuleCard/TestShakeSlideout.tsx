@@ -168,14 +168,14 @@ export const TestShakeSlideout = (
       <Flex
         borderRadius={BORDERS.radiusSoftCorners}
         marginBottom={SPACING.spacing8}
-        backgroundColor={COLORS.grey10}
+        backgroundColor={COLORS.blue30}
         paddingY={SPACING.spacing16}
         paddingLeft={SPACING.spacing4}
         paddingRight={SPACING.spacing16}
         flexDirection={DIRECTION_ROW}
         data-testid="test_shake_slideout_banner_info"
       >
-        <Flex color={COLORS.grey50}>
+        <Flex color={COLORS.blue60}>
           <Icon
             name="information"
             size={SPACING.spacing32}

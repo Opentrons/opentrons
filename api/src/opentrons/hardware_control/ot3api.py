@@ -4,7 +4,6 @@ import contextlib
 from functools import partial, lru_cache, wraps
 from dataclasses import replace
 import logging
-from copy import deepcopy
 from collections import OrderedDict
 from typing import (
     AsyncIterator,
@@ -49,14 +48,7 @@ from opentrons.config.types import (
     LiquidProbeSettings,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort, PortGroup
-from opentrons_hardware.hardware_control.motion_planning import (
-    Move,
-    MoveManager,
-    MoveTarget,
-    ZeroLengthMoveError,
-)
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
-from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_shared_data.errors.exceptions import (
     EnumeratedError,
     PythonException,
@@ -76,15 +68,7 @@ from .instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
     PipetteOffsetSummary,
 )
-from .backends.ot3controller import OT3Controller
-from .backends.ot3simulator import OT3Simulator
-from .backends.ot3utils import (
-    axis_convert,
-    get_system_constraints,
-    get_system_constraints_for_calibration,
-    get_system_constraints_for_plunger_acceleration,
-)
-from .backends.errors import SubsystemUpdating
+
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
@@ -110,7 +94,6 @@ from .types import (
     SubSystemState,
     TipStateType,
     EstopOverallStatus,
-    EstopAttachLocation,
     EstopStateNotification,
     EstopState,
     HardwareFeatureFlags,
@@ -156,9 +139,11 @@ from .dev_types import (
     InstrumentDict,
     GripperDict,
 )
+from .backends.types import HWStopCondition
+from .backends.flex_protocol import FlexBackend
+from .backends.ot3simulator import OT3Simulator
+from .backends.errors import SubsystemUpdating
 
-
-from .status_bar_state import StatusBarStateController
 
 mod_log = logging.getLogger(__name__)
 
@@ -221,7 +206,7 @@ class OT3API(
 
     def __init__(
         self,
-        backend: Union[OT3Simulator, OT3Controller],
+        backend: FlexBackend,
         loop: asyncio.AbstractEventLoop,
         config: OT3Config,
         feature_flags: HardwareFeatureFlags,
@@ -241,7 +226,7 @@ class OT3API(
             self._update_estop_state(event)
 
         self._feature_flags = feature_flags
-        backend.estop_state_machine.add_listener(estop_cb)
+        backend.add_estop_callback(estop_cb)
 
         self._callbacks: Set[HardwareEventHandler] = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
@@ -257,18 +242,9 @@ class OT3API(
         self._motion_lock = asyncio.Lock()
         self._door_state = DoorState.CLOSED
         self._pause_manager = PauseManager()
-        self._gantry_load = GantryLoad.LOW_THROUGHPUT
-        self._move_manager = MoveManager(
-            constraints=get_system_constraints(
-                self._config.motion_settings, self._gantry_load
-            )
-        )
-        self._status_bar_controller = StatusBarStateController(
-            self._backend.status_bar_interface()
-        )
-
         self._pipette_handler = OT3PipetteHandler({m: None for m in OT3Mount})
         self._gripper_handler = GripperHandler(gripper=None)
+        self._gantry_load = GantryLoad.LOW_THROUGHPUT
         OT3RobotCalibrationProvider.__init__(self, self._config)
         ExecutionManagerProvider.__init__(self, isinstance(backend, OT3Simulator))
 
@@ -287,42 +263,28 @@ class OT3API(
     async def set_gantry_load(self, gantry_load: GantryLoad) -> None:
         mod_log.info(f"Setting gantry load to {gantry_load}")
         self._gantry_load = gantry_load
-        self._move_manager.update_constraints(
-            get_system_constraints(self._config.motion_settings, gantry_load)
-        )
+        self._backend.update_constraints_for_gantry_load(gantry_load)
         await self._backend.update_to_default_current_settings(gantry_load)
 
     async def get_serial_number(self) -> Optional[str]:
         return await self._backend.get_serial_number()
 
     async def set_system_constraints_for_calibration(self) -> None:
-        self._move_manager.update_constraints(
-            get_system_constraints_for_calibration(
-                self._config.motion_settings, self._gantry_load
-            )
-        )
-        mod_log.debug(
-            f"Set system constraints for calibration: {self._move_manager.get_constraints()}"
+        self._backend.update_constraints_for_calibration_with_gantry_load(
+            self._gantry_load
         )
 
     async def set_system_constraints_for_plunger_acceleration(
         self, mount: OT3Mount, acceleration: float
     ) -> None:
-        new_constraints = get_system_constraints_for_plunger_acceleration(
-            self._config.motion_settings, self._gantry_load, mount, acceleration
+        self._backend.update_constraints_for_plunger_acceleration(
+            mount, acceleration, self._gantry_load
         )
-        self._move_manager.update_constraints(new_constraints)
 
     @contextlib.asynccontextmanager
     async def restore_system_constrants(self) -> AsyncIterator[None]:
-        old_system_constraints = deepcopy(self._move_manager.get_constraints())
-        try:
+        async with self._backend.restore_system_constraints():
             yield
-        finally:
-            self._move_manager.update_constraints(old_system_constraints)
-            mod_log.debug(
-                f"Restore previous system constraints: {old_system_constraints}"
-            )
 
     def _update_door_state(self, door_state: DoorState) -> None:
         mod_log.info(f"Updating the window switch status: {door_state}")
@@ -395,6 +357,8 @@ class OT3API(
             checked_config = robot_configs.load_ot3()
         else:
             checked_config = config
+        from .backends.ot3controller import OT3Controller
+
         backend = await OT3Controller.build(
             checked_config,
             use_usb_bus,
@@ -452,6 +416,7 @@ class OT3API(
             checked_config = robot_configs.load_ot3()
         else:
             checked_config = config
+
         backend = await OT3Simulator.build(
             {OT3Mount.from_mount(k): v for k, v in attached_instruments.items()}
             if attached_instruments
@@ -565,13 +530,13 @@ class OT3API(
         await self.set_lights(button=True)
 
     async def set_status_bar_state(self, state: StatusBarState) -> None:
-        await self._status_bar_controller.set_status_bar_state(state)
+        await self._backend.set_status_bar_state(state)
 
     async def set_status_bar_enabled(self, enabled: bool) -> None:
-        await self._status_bar_controller.set_enabled(enabled)
+        await self._backend.set_status_bar_enabled(enabled)
 
     def get_status_bar_state(self) -> StatusBarState:
-        return self._status_bar_controller.get_current_state()
+        return self._backend.get_status_bar_state()
 
     @ExecutionManagerProvider.wait_for_running
     async def delay(self, duration_s: float) -> None:
@@ -910,16 +875,14 @@ class OT3API(
 
         max_distance = self._backend.axis_bounds[Axis.Q][1]
         # if position is not known, move toward limit switch at a constant velocity
-        if len(self._backend.gear_motor_position.keys()) == 0:
+        if self._backend.gear_motor_position is None:
             await self._backend.home_tip_motors(
                 distance=max_distance,
                 velocity=homing_velocity,
             )
             return
 
-        current_pos_float = axis_convert(self._backend.gear_motor_position, 0.0)[
-            Axis.P_L
-        ]
+        current_pos_float = self._backend.gear_motor_position or 0.0
 
         # We filter out a distance more than `max_distance` because, if the tip motor was stopped during
         # a slow-home motion, the position may be stuck at an enormous large value.
@@ -928,16 +891,14 @@ class OT3API(
             and current_pos_float < max_distance
         ):
 
-            fast_home_moves = self._build_moves(
-                {Axis.Q: current_pos_float}, {Axis.Q: self._config.safe_home_distance}
-            )
             # move toward home until a safe distance
-            await self._backend.tip_action(moves=fast_home_moves[0])
+            await self._backend.tip_action(
+                origin={Axis.Q: current_pos_float},
+                targets=[({Axis.Q: self._config.safe_home_distance}, 400)],
+            )
 
             # update current position
-            current_pos_float = axis_convert(self._backend.gear_motor_position, 0.0)[
-                Axis.P_L
-            ]
+            current_pos_float = self._backend.gear_motor_position or 0.0
 
         # move until the limit switch is triggered, with no acceleration
         await self._backend.home_tip_motors(
@@ -1040,6 +1001,12 @@ class OT3API(
                 detail={"axes": axes_str},
             )
 
+    def motor_status_ok(self, axis: Axis) -> bool:
+        return self._backend.check_motor_status([axis])
+
+    def encoder_status_ok(self, axis: Axis) -> bool:
+        return self._backend.check_encoder_status([axis])
+
     async def encoder_current_position(
         self,
         mount: Union[top_types.Mount, OT3Mount],
@@ -1106,9 +1073,7 @@ class OT3API(
             plunger_ax: carriage_position[plunger_ax],
         }
         if self._gantry_load == GantryLoad.HIGH_THROUGHPUT:
-            effector_pos[Axis.Q] = axis_convert(self._backend.gear_motor_position, 0.0)[
-                Axis.P_L
-            ]
+            effector_pos[Axis.Q] = self._backend.gear_motor_position or 0.0
 
         return effector_pos
 
@@ -1305,9 +1270,25 @@ class OT3API(
         (and :py:attr:`_last_moved_mount` exists) then retract the mount
         in :py:attr:`_last_moved_mount`. Also unconditionally update
         :py:attr:`_last_moved_mount` to contain `mount`.
+
+        Disengage the 96-channel and gripper mount if retracted.
         """
         if mount != self._last_moved_mount and self._last_moved_mount:
             await self.retract(self._last_moved_mount, 10)
+
+            # disengage Axis.Z_L motor and engage the brake to lower power
+            # consumption and reduce the chance of the 96-channel pipette dropping
+            if (
+                self.gantry_load == GantryLoad.HIGH_THROUGHPUT
+                and self._last_moved_mount == OT3Mount.LEFT
+            ):
+                await self.disengage_axes([Axis.Z_L])
+
+            # disegnage Axis.Z_G when we can to reduce the chance of
+            # the gripper dropping
+            if self._last_moved_mount == OT3Mount.GRIPPER:
+                await self.disengage_axes([Axis.Z_G])
+
         if mount != OT3Mount.GRIPPER:
             await self.idle_gripper()
         self._last_moved_mount = mount
@@ -1345,21 +1326,6 @@ class OT3API(
     def gripper_jaw_can_home(self) -> bool:
         return self._gripper_handler.is_ready_for_jaw_home()
 
-    def _build_moves(
-        self,
-        origin: Dict[Axis, float],
-        target: Dict[Axis, float],
-        speed: Optional[float] = None,
-    ) -> List[List[Move[Axis]]]:
-        """Build move with Move Manager with machine positions."""
-        # TODO: (2022-02-10) Use actual max speed for MoveTarget
-        checked_speed = speed or 400
-        move_target = MoveTarget.build(position=target, max_speed=checked_speed)
-        _, moves = self._move_manager.plan_motion(
-            origin=origin, target_list=[move_target]
-        )
-        return moves
-
     @ExecutionManagerProvider.wait_for_running
     async def _move(
         self,
@@ -1385,27 +1351,17 @@ class OT3API(
             if ax in Axis.gantry_axes()
         }
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
-
+        self._log.info(f"Move: deck {target_position} becomes machine {machine_pos}")
         origin = await self._backend.update_position()
-        try:
-            moves = self._build_moves(origin, machine_pos, speed)
-        except ZeroLengthMoveError as zero_length_error:
-            self._log.info(f"{str(zero_length_error)}, ignoring")
-            return
-        self._log.info(
-            f"move: deck {target_position} becomes machine {machine_pos} from {origin} "
-            f"requiring {moves}"
-        )
         async with contextlib.AsyncExitStack() as stack:
             if acquire_lock:
                 await stack.enter_async_context(self._motion_lock)
             try:
                 await self._backend.move(
                     origin,
-                    moves[0],
-                    MoveStopCondition.stall
-                    if expect_stalls
-                    else MoveStopCondition.none,
+                    machine_pos,
+                    speed or 400.0,
+                    HWStopCondition.stall if expect_stalls else HWStopCondition.none,
                 )
             except Exception:
                 self._log.exception("Move failed")
@@ -1432,9 +1388,6 @@ class OT3API(
         if encoder_ok and motor_ok:
             if origin[axis] - target_pos[axis] > self._config.safe_home_distance:
                 target_pos[axis] += self._config.safe_home_distance
-                moves = self._build_moves(
-                    origin, target_pos, instr.config.plunger_homing_configurations.speed
-                )
                 async with self._backend.motor_current(
                     run_currents={
                         axis: instr.config.plunger_homing_configurations.current
@@ -1442,8 +1395,9 @@ class OT3API(
                 ):
                     await self._backend.move(
                         origin,
-                        moves[0],
-                        MoveStopCondition.none,
+                        target_pos,
+                        instr.config.plunger_homing_configurations.speed,
+                        HWStopCondition.none,
                     )
                     await self._backend.home([axis], self.gantry_load)
         else:
@@ -1508,12 +1462,12 @@ class OT3API(
                 axis_home_dist = 20.0
             if origin[axis] - target_pos[axis] > axis_home_dist:
                 target_pos[axis] += axis_home_dist
-                moves = self._build_moves(origin, target_pos)
                 try:
                     await self._backend.move(
                         origin,
-                        moves[0],
-                        MoveStopCondition.none,
+                        target_pos,
+                        speed=400,
+                        stop_condition=HWStopCondition.none,
                     )
                 except StallOrCollisionDetectedError:
                     self._log.warning(
@@ -1537,9 +1491,6 @@ class OT3API(
                         await self._backend.home([axis], self.gantry_load)
                     else:
                         await self._home_axis(axis)
-                except ZeroLengthMoveError:
-                    self._log.info(f"{axis} already at home position, skip homing")
-                    continue
                 except BaseException as e:
                     self._log.exception(f"Homing failed: {e}")
                     self._current_position.clear()
@@ -1625,11 +1576,7 @@ class OT3API(
             # we can move to the home position without checking the limit switch
             origin = await self._backend.update_position()
             target_pos = {axis: self._backend.home_position()[axis]}
-            try:
-                moves = self._build_moves(origin, target_pos)
-                await self._backend.move(origin, moves[0], MoveStopCondition.none)
-            except ZeroLengthMoveError:
-                self._log.info(f"{axis} already at home position, skip retract")
+            await self._backend.move(origin, target_pos, 400, HWStopCondition.none)
         else:
             # home the axis
             await self._home_axis(axis)
@@ -2010,16 +1957,14 @@ class OT3API(
         if self._backend.gear_motor_position is None:
             await self.home_gear_motors()
 
-        tip_motor_pos_float = axis_convert(self._backend.gear_motor_position, 0.0)[
-            Axis.of_main_tool_actuator(OT3Mount.LEFT)
-        ]
+        tip_motor_pos_float = self._backend.gear_motor_position or 0.0
 
         # only move tip motors if they are not already below the sensor
         if tip_motor_pos_float < tip_presence_check_target:
-            clamp_moves = self._build_moves(
-                {Axis.Q: tip_motor_pos_float}, {Axis.Q: tip_presence_check_target}
+            await self._backend.tip_action(
+                origin={Axis.Q: tip_motor_pos_float},
+                targets=[({Axis.Q: tip_presence_check_target}, 400)],
             )
-            await self._backend.tip_action(moves=clamp_moves[0])
         try:
             yield
         finally:
@@ -2074,27 +2019,18 @@ class OT3API(
         currents = pipette_spec[0].currents
         # Move to pickup position
         async with self._backend.motor_current(run_currents=currents):
-            if not any(self._backend.gear_motor_position):
+            if self._backend.gear_motor_position is None:
                 # home gear motor if position not known
                 await self.home_gear_motors()
-            pipette_axis = Axis.of_main_tool_actuator(mount)
-            gear_origin_float = axis_convert(self._backend.gear_motor_position, 0.0)[
-                pipette_axis
-            ]
+            gear_origin_float = self._backend.gear_motor_position or 0.0
 
             move_targets = [
-                MoveTarget.build(
-                    position={Axis.Q: move_segment.distance},
-                    max_speed=move_segment.speed or 400,
-                )
+                ({Axis.Q: move_segment.distance}, move_segment.speed or 400)
                 for move_segment in pipette_spec
             ]
-
-            _, moves = self._move_manager.plan_motion(
-                origin={Axis.Q: gear_origin_float}, target_list=move_targets
+            await self._backend.tip_action(
+                origin={Axis.Q: gear_origin_float}, targets=move_targets
             )
-            await self._backend.tip_action(moves=moves[0])
-
             await self.home_gear_motors()
 
     async def pick_up_tip(
@@ -2673,22 +2609,14 @@ class OT3API(
 
     @property
     def estop_status(self) -> EstopOverallStatus:
-        return EstopOverallStatus(
-            state=self._backend.estop_state_machine.state,
-            left_physical_state=self._backend.estop_state_machine.get_physical_status(
-                EstopAttachLocation.LEFT
-            ),
-            right_physical_state=self._backend.estop_state_machine.get_physical_status(
-                EstopAttachLocation.RIGHT
-            ),
-        )
+        return self._backend.estop_status
 
     def estop_acknowledge_and_clear(self) -> EstopOverallStatus:
         """Attempt to acknowledge an Estop event and clear the status.
 
         Returns the estop status after clearing the status."""
-        self._backend.estop_state_machine.acknowledge_and_clear()
+        self._backend.estop_acknowledge_and_clear()
         return self.estop_status
 
     def get_estop_state(self) -> EstopState:
-        return self._backend.estop_state_machine.state
+        return self._backend.get_estop_state()

@@ -1,12 +1,15 @@
 import * as React from 'react'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import { when, resetAllWhenMocks } from 'jest-when'
 
 import { i18n } from '../../../../i18n'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
 import { useChainLiveCommands } from '../../../../resources/runs/hooks'
 import { mockThermocyclerGen2 } from '../../../../redux/modules/__fixtures__'
 import { useRunStatuses } from '../../../Devices/hooks'
+import { useIsEstopNotDisengaged } from '../../../../resources/devices/hooks/useIsEstopNotDisengaged'
+
 import { ModuleCalibrationOverflowMenu } from '../ModuleCalibrationOverflowMenu'
 
 import type { Mount } from '@opentrons/components'
@@ -15,6 +18,8 @@ jest.mock('@opentrons/react-api-client')
 jest.mock('../../../ModuleWizardFlows')
 jest.mock('../../../Devices/hooks')
 jest.mock('../../../../resources/runs/hooks')
+jest.mock('../../../../resources/devices/hooks/useIsEstopNotDisengaged')
+
 const mockPipetteOffsetCalibrations = [
   {
     modelName: 'mockPipetteModelLeft',
@@ -92,6 +97,9 @@ const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
 const mockUseChainLiveCommands = useChainLiveCommands as jest.MockedFunction<
   typeof useChainLiveCommands
 >
+const mockUseIsEstopNotDisengaged = useIsEstopNotDisengaged as jest.MockedFunction<
+  typeof useIsEstopNotDisengaged
+>
 
 const render = (
   props: React.ComponentProps<typeof ModuleCalibrationOverflowMenu>
@@ -100,6 +108,8 @@ const render = (
     i18nInstance: i18n,
   })
 }
+
+const ROBOT_NAME = 'mockRobot'
 
 describe('ModuleCalibrationOverflowMenu', () => {
   let props: React.ComponentProps<typeof ModuleCalibrationOverflowMenu>
@@ -111,6 +121,7 @@ describe('ModuleCalibrationOverflowMenu', () => {
       attachedModule: mockThermocyclerGen2,
       updateRobotStatus: jest.fn(),
       formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrations,
+      robotName: ROBOT_NAME,
     }
     mockChainLiveCommands = jest.fn()
     mockChainLiveCommands.mockResolvedValue(null)
@@ -124,10 +135,14 @@ describe('ModuleCalibrationOverflowMenu', () => {
     mockUseChainLiveCommands.mockReturnValue({
       chainLiveCommands: mockChainLiveCommands,
     } as any)
+    when(mockUseIsEstopNotDisengaged)
+      .calledWith(ROBOT_NAME)
+      .mockReturnValue(false)
   })
 
   afterEach(() => {
     jest.clearAllMocks()
+    resetAllWhenMocks()
   })
 
   it('should render overflow menu buttons - not calibrated', () => {
@@ -289,5 +304,13 @@ describe('ModuleCalibrationOverflowMenu', () => {
     render(props)
     fireEvent.click(screen.getByLabelText('ModuleCalibrationOverflowMenu'))
     expect(screen.getByText('Calibrate module')).toBeDisabled()
+  })
+
+  it('should be disabled when e-stop button is pressed', () => {
+    when(mockUseIsEstopNotDisengaged)
+      .calledWith(ROBOT_NAME)
+      .mockReturnValue(true)
+    const [{ getByLabelText }] = render(props)
+    expect(getByLabelText('ModuleCalibrationOverflowMenu')).toBeDisabled()
   })
 })

@@ -1,13 +1,19 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import { FormGroup, Tooltip, useHoverTooltip } from '@opentrons/components'
-import { i18n } from '../../../../localization'
+import { selectors as stepFormSelectors } from '../../../../step-forms'
 import SINGLE_IMAGE from '../../../../images/path_single_transfers.svg'
 import MULTI_DISPENSE_IMAGE from '../../../../images/path_multi_dispense.svg'
 import MULTI_ASPIRATE_IMAGE from '../../../../images/path_multi_aspirate.svg'
 import { PathOption } from '../../../../form-types'
 import { FieldProps } from '../../types'
-import { DisabledPathMap, ValuesForPath } from './getDisabledPathMap'
+import {
+  DisabledPathMap,
+  getDisabledPathMap,
+  ValuesForPath,
+} from './getDisabledPathMap'
 import styles from '../../StepEditForm.css'
 
 const PATH_ANIMATION_IMAGES = {
@@ -31,10 +37,7 @@ const ALL_PATH_OPTIONS: Array<{ name: PathOption; image: string }> = [
   },
 ]
 
-type PathFieldProps = FieldProps &
-  ValuesForPath & {
-    disabledPathMap: DisabledPathMap
-  }
+type PathFieldProps = FieldProps & ValuesForPath
 
 interface ButtonProps {
   children?: React.ReactNode
@@ -57,11 +60,11 @@ const PathButton = (buttonProps: ButtonProps): JSX.Element => {
     subtitle,
   } = buttonProps
   const [targetProps, tooltipProps] = useHoverTooltip()
-
+  const { t } = useTranslation('form')
   const tooltip = (
     <Tooltip {...tooltipProps}>
       <div className={styles.path_tooltip_title}>
-        {i18n.t(`form.step_edit_form.field.path.title.${path}`)}
+        {t(`step_edit_form.field.path.title.${path}`)}
       </div>
       <img
         className={styles.path_tooltip_image}
@@ -103,8 +106,33 @@ const getSubtitle = (
   return reasonForDisabled || ''
 }
 
-export const Path = (props: PathFieldProps): JSX.Element => {
-  const { disabledPathMap, value, updateValue } = props
+export const PathField = (props: PathFieldProps): JSX.Element => {
+  const {
+    aspirate_airGap_checkbox,
+    aspirate_airGap_volume,
+    aspirate_wells,
+    changeTip,
+    dispense_wells,
+    pipette,
+    volume,
+    value,
+    updateValue,
+  } = props
+  const { t } = useTranslation('form')
+  const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
+  const disabledPathMap = getDisabledPathMap(
+    {
+      aspirate_airGap_checkbox,
+      aspirate_airGap_volume,
+      aspirate_wells,
+      changeTip,
+      dispense_wells,
+      pipette,
+      volume,
+    },
+    pipetteEntities,
+    t
+  )
   return (
     <FormGroup label="Path">
       <ul className={styles.path_options}>

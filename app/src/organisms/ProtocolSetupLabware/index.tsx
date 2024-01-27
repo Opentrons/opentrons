@@ -316,7 +316,7 @@ export function ProtocolSetupLabware({
 
 const labwareLatchStyles = css`
   &:active {
-    background-color: ${COLORS.blue40};
+    background-color: ${COLORS.blue35};
   }
 `
 
@@ -443,7 +443,7 @@ function LabwareLatch({
               color={
                 commandType === 'heaterShaker/closeLabwareLatch'
                   ? COLORS.blue50
-                  : ''
+                  : COLORS.black90
               }
             />
           </>

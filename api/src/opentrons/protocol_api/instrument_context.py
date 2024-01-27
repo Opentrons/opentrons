@@ -980,10 +980,10 @@ class InstrumentContext(publisher.CommandPublisher):
               unusually large height above the tip rack, you could call
               ``pipette.drop_tip(tip_rack["A1"].top(z=10))``.
             - As a :py:class:`.TrashBin`. This uses a default location relative to the
-              TrashBin object. For example,
+              ``TrashBin`` object. For example,
               ``pipette.drop_tip(location=trash_bin)``.
             - As a :py:class:`.WasteChute`. This uses a default location relative to
-              the WasteChute object. For example,
+              the ``WasteChute`` object. For example,
               ``pipette.drop_tip(location=waste_chute)``.
 
         :param location:
@@ -1543,7 +1543,7 @@ class InstrumentContext(publisher.CommandPublisher):
         This is the property used to determine where to drop tips and blow out liquids
         when calling :py:meth:`drop_tip` or :py:meth:`blow_out` without arguments.
 
-        You can set this to a :py:obj:`Labware`, :py:obj:`TrashBin`, or :py:obj:`WasteChute`.
+        You can set this to a :py:obj:`Labware`, :py:class:`.TrashBin`, or :py:class:`.WasteChute`.
 
         The default value depends on the robot type and API version:
 
@@ -1868,7 +1868,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 )
             if start not in types.ALLOWED_PRIMARY_NOZZLES:
                 raise ValueError(
-                    f"Starting nozzle specified is not of {types.ALLOWED_PRIMARY_NOZZLES}"
+                    f"Starting nozzle specified is not one of {types.ALLOWED_PRIMARY_NOZZLES}"
                 )
         if style == NozzleLayout.QUADRANT:
             if front_right is None:

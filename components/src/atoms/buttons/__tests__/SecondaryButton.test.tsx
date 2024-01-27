@@ -41,15 +41,11 @@ describe('SecondaryButton', () => {
     const { getByText } = render(props)
     const button = getByText('secondary button')
     expect(button).toBeDisabled()
-    expect(button).toHaveStyle(`opacity: 50%`)
   })
 
   it('applies the correct states to the button - hover', () => {
     const { getByText } = render(props)
     const button = getByText('secondary button')
-    expect(button).toHaveStyleRule('opacity', '70%', {
-      modifier: ':hover',
-    })
     expect(button).toHaveStyleRule('box-shadow', '0 0 0', {
       modifier: ':hover',
     })

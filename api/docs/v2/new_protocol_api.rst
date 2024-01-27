@@ -30,6 +30,11 @@ Labware
    :members:
    :exclude-members: next_tip, use_tips, previous_tip, return_tips
 
+.. autoclass:: opentrons.protocol_api.TrashBin
+
+.. autoclass:: opentrons.protocol_api.WasteChute
+
+
 Wells and Liquids
 =================
 .. autoclass:: opentrons.protocol_api.Well

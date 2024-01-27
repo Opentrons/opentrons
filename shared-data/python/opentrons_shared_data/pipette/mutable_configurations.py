@@ -3,6 +3,7 @@ import json
 import re
 from pathlib import Path
 from typing import Optional, List, Dict, Any, cast
+from enum import Enum
 
 from .pipette_definition import PipetteConfigurations, PipetteModelVersionType
 from .model_constants import (
@@ -165,14 +166,14 @@ def _get_default_value_for(config: Dict[str, Any], keypath: List[str]) -> Any:
             rest = keypath[1:]
             if first == "##EACHTIP##":
                 tip_list = list(remaining_config.keys())
-                tip_list.sort(key=lambda o: o.value)
+                tip_list.sort(key=lambda o: o.value if isinstance(o, Enum) else o)
                 return _do_get_default_value_for(remaining_config[tip_list[-1]], rest)
             else:
                 return _do_get_default_value_for(remaining_config[first], rest)
         else:
-            if first == "###EACHTIP##":
+            if first == "##EACHTIP##":
                 tip_list = list(remaining_config.keys())
-                tip_list.sort(key=lambda o: o.value)
+                tip_list.sort(key=lambda o: o.value if isinstance(o, Enum) else o)
                 return remaining_config[tip_list[-1]]
             elif first == "currentByTipCount":
                 # return the value for the most tips at a time
@@ -330,9 +331,15 @@ def load_with_mutable_configurations(
         except FileNotFoundError:
             pass
         else:
-            base_configurations = _migrate_to_v2_configurations(
-                base_configurations, override
-            )
+            try:
+                base_configurations = _migrate_to_v2_configurations(
+                    base_configurations, override
+                )
+            except BaseException:
+                log.exception(
+                    "Failed to migrate mutable configurations. Please report this as it is a bug."
+                )
+
     # the ulPerMm functions are structured in pipetteModelSpecs.json as
     # a list sorted from oldest to newest. That means the latest functions
     # are always the last element and, as of right now, the older ones are
