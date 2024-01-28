@@ -48,6 +48,7 @@ import {
   OT2AdvancedSettings,
   PreventRobotCaching,
   U2EInformation,
+  ShowLabwareOffsetSnippets,
 } from '../../organisms/AdvancedSettings'
 
 import type { Dispatch, State } from '../../redux/types'
@@ -60,9 +61,6 @@ export function AdvancedSettings(): JSX.Element {
     Config.getUpdateChannelOptions
   )
   const labwarePath = useSelector(CustomLabware.getCustomLabwareDirectory)
-  const isLabwareOffsetCodeSnippetsOn = useSelector(
-    Config.getIsLabwareOffsetCodeSnippetsOn
-  )
   const isHeaterShakerAttachmentModalVisible = useSelector(
     Config.getIsHeaterShakerAttached
   )
@@ -96,15 +94,6 @@ export function AdvancedSettings(): JSX.Element {
     showConfirmation: showConfirmDeleteUnavailRobots,
     cancel: cancelExit,
   } = useConditionalConfirm(handleDeleteUnavailRobots, true)
-
-  const toggleLabwareOffsetData = (): void => {
-    dispatch(
-      Config.updateConfigValue(
-        'labware.showLabwareOffsetCodeSnippets',
-        Boolean(!isLabwareOffsetCodeSnippetsOn)
-      )
-    )
-  }
 
   const toggleHeaterShakerModalVisibilty = (): void => {
     dispatch(
@@ -325,26 +314,7 @@ export function AdvancedSettings(): JSX.Element {
           />
         </Flex>
         <Divider marginY={SPACING.spacing24} />
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box width="70%">
-            <StyledText
-              css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing8}
-              id="AdvancedSettings_showLink"
-            >
-              {t('show_labware_offset_snippets')}
-            </StyledText>
-            <StyledText as="p">
-              {t('show_labware_offset_snippets_description')}
-            </StyledText>
-          </Box>
-          <ToggleButton
-            label="show_link_to_get_labware_offset_data"
-            toggledOn={isLabwareOffsetCodeSnippetsOn}
-            onClick={toggleLabwareOffsetData}
-            id="AdvancedSettings_showLinkToggleButton"
-          />
-        </Flex>
+        <ShowLabwareOffsetSnippets />
         <Divider marginY={SPACING.spacing24} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
