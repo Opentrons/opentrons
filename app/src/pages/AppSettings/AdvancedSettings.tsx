@@ -39,15 +39,9 @@ import {
   ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
   ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
 } from '../../redux/analytics'
-// import {
-//   getU2EAdapterDevice,
-//   getU2EWindowsDriverStatus,
-//   OUTDATED,
-// } from '../../redux/system-info'
 import { Divider } from '../../atoms/structure'
 import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
-// import { Banner } from '../../atoms/Banner'
 import { useToaster } from '../../organisms/ToasterOven'
 import {
   EnableDevTools,
@@ -57,8 +51,6 @@ import {
 } from '../../organisms/AdvancedSettings'
 
 import type { Dispatch, State } from '../../redux/types'
-
-// const REALTEK_URL = 'https://www.realtek.com/en/'
 
 export function AdvancedSettings(): JSX.Element {
   const { t } = useTranslation(['app_settings', 'shared'])
@@ -104,12 +96,6 @@ export function AdvancedSettings(): JSX.Element {
     showConfirmation: showConfirmDeleteUnavailRobots,
     cancel: cancelExit,
   } = useConditionalConfirm(handleDeleteUnavailRobots, true)
-
-  // const device = useSelector(getU2EAdapterDevice)
-  // const driverOutdated = useSelector((state: State) => {
-  //   const status = getU2EWindowsDriverStatus(state)
-  //   return status === OUTDATED
-  // })
 
   const toggleLabwareOffsetData = (): void => {
     dispatch(
