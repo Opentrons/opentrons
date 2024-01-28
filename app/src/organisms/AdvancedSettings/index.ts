@@ -1,4 +1,5 @@
 export * from './EnableDevTools'
 export * from './OT2AdvancedSettings'
+export * from './OverridePathToPython'
 export * from './PreventRobotCaching'
 export * from './U2EInformation'

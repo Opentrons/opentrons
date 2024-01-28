@@ -22,7 +22,6 @@ import {
 } from '@opentrons/components'
 
 import * as Config from '../../redux/config'
-import * as ProtocolAnalysis from '../../redux/protocol-analysis'
 import * as CustomLabware from '../../redux/custom-labware'
 import {
   clearDiscoveryCache,
@@ -36,29 +35,21 @@ import { SelectField } from '../../atoms/SelectField'
 import { ERROR_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
 import {
   useTrackEvent,
-  ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
   ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
 } from '../../redux/analytics'
-// import {
-//   getU2EAdapterDevice,
-//   getU2EWindowsDriverStatus,
-//   OUTDATED,
-// } from '../../redux/system-info'
 import { Divider } from '../../atoms/structure'
 import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
-// import { Banner } from '../../atoms/Banner'
 import { useToaster } from '../../organisms/ToasterOven'
 import {
   EnableDevTools,
   OT2AdvancedSettings,
+  OverridePathToPython,
   PreventRobotCaching,
   U2EInformation,
 } from '../../organisms/AdvancedSettings'
 
 import type { Dispatch, State } from '../../redux/types'
-
-// const REALTEK_URL = 'https://www.realtek.com/en/'
 
 export function AdvancedSettings(): JSX.Element {
   const { t } = useTranslation(['app_settings', 'shared'])
@@ -74,7 +65,6 @@ export function AdvancedSettings(): JSX.Element {
   const isHeaterShakerAttachmentModalVisible = useSelector(
     Config.getIsHeaterShakerAttached
   )
-  const pathToPythonInterpreter = useSelector(Config.getPathToPythonOverride)
 
   const dispatch = useDispatch<Dispatch>()
   const { makeToast } = useToaster()
@@ -105,12 +95,6 @@ export function AdvancedSettings(): JSX.Element {
     cancel: cancelExit,
   } = useConditionalConfirm(handleDeleteUnavailRobots, true)
 
-  // const device = useSelector(getU2EAdapterDevice)
-  // const driverOutdated = useSelector((state: State) => {
-  //   const status = getU2EWindowsDriverStatus(state)
-  //   return status === OUTDATED
-  // })
-
   const toggleLabwareOffsetData = (): void => {
     dispatch(
       Config.updateConfigValue(
@@ -129,13 +113,6 @@ export function AdvancedSettings(): JSX.Element {
     )
   }
 
-  const handleClickPythonDirectoryChange: React.MouseEventHandler<HTMLButtonElement> = _event => {
-    dispatch(ProtocolAnalysis.changePythonPathOverrideConfig())
-    trackEvent({
-      name: ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
-      properties: {},
-    })
-  }
   const handleChannel = (_: string, value: string): void => {
     dispatch(Config.updateConfigValue('update.channel', value))
   }
@@ -360,67 +337,7 @@ export function AdvancedSettings(): JSX.Element {
           />
         </Flex>
         <Divider marginY={SPACING.spacing24} />
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box width="70%">
-            <StyledText
-              css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing8}
-              id="AdvancedSettings_overridePathToPython"
-            >
-              {t('override_path_to_python')}
-            </StyledText>
-            <StyledText as="p" paddingBottom={SPACING.spacing8}>
-              {t('opentrons_app_will_use_interpreter')}
-            </StyledText>
-            <StyledText
-              as="h6"
-              textTransform={TYPOGRAPHY.textTransformUppercase}
-              color={COLORS.grey50}
-              paddingBottom={SPACING.spacing4}
-            >
-              {t('override_path')}
-            </StyledText>
-            {pathToPythonInterpreter !== null ? (
-              <Link
-                role="button"
-                css={TYPOGRAPHY.pRegular}
-                color={COLORS.black90}
-                onClick={() =>
-                  dispatch(ProtocolAnalysis.openPythonInterpreterDirectory())
-                }
-                id="AdvancedSettings_sourceFolderLinkPython"
-              >
-                {pathToPythonInterpreter}
-                <Icon
-                  height="0.75rem"
-                  marginLeft={SPACING.spacing8}
-                  name="open-in-new"
-                />
-              </Link>
-            ) : (
-              <StyledText as="p">{t('no_specified_folder')}</StyledText>
-            )}
-          </Box>
-          {pathToPythonInterpreter !== null ? (
-            <TertiaryButton
-              marginLeft={SPACING_AUTO}
-              onClick={() =>
-                dispatch(Config.resetConfigValue('python.pathToPythonOverride'))
-              }
-              id="AdvancedSettings_changePythonInterpreterSource"
-            >
-              {t('reset_to_default')}
-            </TertiaryButton>
-          ) : (
-            <TertiaryButton
-              marginLeft={SPACING_AUTO}
-              onClick={handleClickPythonDirectoryChange}
-              id="AdvancedSettings_changePythonInterpreterSource"
-            >
-              {t('add_override_path')}
-            </TertiaryButton>
-          )}
-        </Flex>
+        <OverridePathToPython />
         <Divider marginY={SPACING.spacing24} />
         <EnableDevTools />
         <Divider marginY={SPACING.spacing24} />

@@ -17,15 +17,14 @@ import {
 } from '../../../redux/discovery/__fixtures__'
 import {
   useTrackEvent,
-  ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
   ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
 } from '../../../redux/analytics'
 import * as CustomLabware from '../../../redux/custom-labware'
 import * as Config from '../../../redux/config'
-import * as ProtocolAnalysis from '../../../redux/protocol-analysis'
 import {
   EnableDevTools,
   OT2AdvancedSettings,
+  OverridePathToPython,
   PreventRobotCaching,
   U2EInformation,
 } from '../../../organisms/AdvancedSettings'
@@ -77,14 +76,6 @@ const mockGetIsHeaterShakerAttached = Config.getIsHeaterShakerAttached as jest.M
   typeof Config.getIsHeaterShakerAttached
 >
 
-const mockGetPathToPythonOverride = Config.getPathToPythonOverride as jest.MockedFunction<
-  typeof Config.getPathToPythonOverride
->
-
-const mockOpenPythonInterpreterDirectory = ProtocolAnalysis.openPythonInterpreterDirectory as jest.MockedFunction<
-  typeof ProtocolAnalysis.openPythonInterpreterDirectory
->
-
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
@@ -100,6 +91,9 @@ const mockEnableDevTools = EnableDevTools as jest.MockedFunction<
 >
 const mockU2EInformation = U2EInformation as jest.MockedFunction<
   typeof U2EInformation
+>
+const mockOverridePathToPython = OverridePathToPython as jest.MockedFunction<
+  typeof OverridePathToPython
 >
 
 let mockTrackEvent: jest.Mock
@@ -130,6 +124,9 @@ describe('AdvancedSettings', () => {
     mockOT2AdvancedSettings.mockReturnValue(<div>mock OT2AdvancedSettings</div>)
     mockEnableDevTools.mockReturnValue(<div>mock EnableDevTools</div>)
     mockU2EInformation.mockReturnValue(<div>mock U2EInformation</div>)
+    mockOverridePathToPython.mockReturnValue(
+      <div>mock OverridePathToPython</div>
+    )
   })
 
   afterEach(() => {
@@ -227,37 +224,9 @@ describe('AdvancedSettings', () => {
     expect(toggleButton.getAttribute('aria-checked')).toBe('true')
   })
 
-  it('renders the path to python override text and button with no default path', () => {
-    mockGetPathToPythonOverride.mockReturnValue(null)
-    const [{ getByText, getByRole }] = render()
-    getByText('Override Path to Python')
-    getByText(
-      'If specified, the Opentrons App will use the Python interpreter at this path instead of the default bundled Python interpreter.'
-    )
-    getByText('override path')
-    getByText('No path specified')
-    const button = getByRole('button', { name: 'Add override path' })
-    fireEvent.click(button)
-    expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
-      properties: {},
-    })
-  })
-
-  it('renders the path to python override text and button with a selected path', () => {
-    mockGetPathToPythonOverride.mockReturnValue('otherPath')
-    const [{ getByText, getByRole }] = render()
-    getByText('Override Path to Python')
-    getByText(
-      'If specified, the Opentrons App will use the Python interpreter at this path instead of the default bundled Python interpreter.'
-    )
-    getByText('override path')
-    const specifiedPath = getByText('otherPath')
-    const button = getByRole('button', { name: 'Reset to default' })
-    fireEvent.click(button)
-    expect(mockGetPathToPythonOverride).toHaveBeenCalled()
-    fireEvent.click(specifiedPath)
-    expect(mockOpenPythonInterpreterDirectory).toHaveBeenCalled()
+  it('should render mock OverridePathToPython section', () => {
+    render()
+    screen.getByText('mock OverridePathToPython')
   })
 
   it('renders the clear unavailable robots section', () => {
