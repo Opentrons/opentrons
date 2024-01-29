@@ -55,11 +55,11 @@ class DeckItem(Protocol):
 class Deck(UserDict):  # type: ignore[type-arg]
     data: Dict[int, Optional[DeckItem]]
 
-    def __init__(
-        self, deck_type: str, version: int = DEFAULT_LEGACY_DECK_DEFINITION_VERSION
-    ) -> None:
+    def __init__(self, deck_type: str) -> None:
         super().__init__()
-        self._definition = load_deck(name=deck_type, version=version)
+        self._definition = load_deck(
+            name=deck_type, version=DEFAULT_LEGACY_DECK_DEFINITION_VERSION
+        )
         self._positions = {}
         for slot in self._definition["locations"]["orderedSlots"]:
             self.data[int(slot["id"])] = None
