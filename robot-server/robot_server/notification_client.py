@@ -19,8 +19,7 @@ log: logging.Logger = logging.getLogger(__name__)
 
 
 class MQTT_QOS(Enum):
-    """
-    MQTT Quality of Service.
+    """MQTT Quality of Service.
 
     Represents the level of delivery
     guarantee for a specific message.
