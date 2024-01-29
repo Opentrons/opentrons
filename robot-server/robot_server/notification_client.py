@@ -1,6 +1,7 @@
 # noqa: D100
 
 from typing import Any, Dict, Optional
+from enum import Enum
 import random
 import logging
 import paho.mqtt.client as mqtt
@@ -17,6 +18,12 @@ from server_utils.fastapi_utils.app_state import (
 log: logging.Logger = logging.getLogger(__name__)
 
 
+class MQTT_QOS(Enum):
+    QOS_0 = 0
+    QOS_1 = 1
+    QOS_2 = 2
+
+
 class NotificationClient:  # noqa: D101
     def __init__(
         self,
@@ -24,20 +31,20 @@ class NotificationClient:  # noqa: D101
         port: int = 1883,
         keepalive: int = 60,
         protocol_version: int = mqtt.MQTTv5,
-        default_qos: int = 1,
+        default_qos: MQTT_QOS = MQTT_QOS.QOS_1,
         retain_message: bool = False,
     ) -> None:
         """Returns a configured MQTT client."""
-        self.host = host
-        self.port = port
-        self.keepalive = keepalive
-        self.default_qos = default_qos
-        self.retain_message = retain_message
+        self._host = host
+        self._port = port
+        self._keepalive = keepalive
+        self._default_qos = default_qos.value
+        self._retain_message = retain_message
         # MQTT is somewhat particular about the client_id format and will connect erratically
         # if an unexpected string is supplied. This clientId is derived from the paho-mqtt library.
-        self.client_id: str = f"robot-server-{random.randint(0, 1000000)}"
+        self._client_id: str = f"robot-server-{random.randint(0, 1000000)}"
         self.client: mqtt.Client = mqtt.Client(
-            client_id=self.client_id, protocol=protocol_version
+            client_id=self._client_id, protocol=protocol_version
         )
         self.client.on_connect = self._on_connect
         self.client.on_disconnect = self._on_disconnect
@@ -47,7 +54,7 @@ class NotificationClient:  # noqa: D101
         self.client.on_connect = self._on_connect
         self.client.on_disconnect = self._on_disconnect
 
-        self.client.connect(host=self.host, port=self.port, keepalive=self.keepalive)
+        self.client.connect(host=self._host, port=self._port, keepalive=self._keepalive)
         self.client.loop_start()
 
     async def disconnect(self) -> None:
@@ -77,8 +84,8 @@ class NotificationClient:  # noqa: D101
         self.client.publish(
             topic=topic,
             payload=payload,
-            qos=self.default_qos,
-            retain=self.retain_message,
+            qos=self._default_qos,
+            retain=self._retain_message,
         )
 
     def _on_connect(
