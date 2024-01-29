@@ -182,7 +182,8 @@ class ProtocolContext(CommandPublisher):
         is initialized. 
 
           - When the context is the argument of ``run()``, the ``"apiLevel"`` key of the
-            metadata or requirements dictionary determines ``api_version``.
+            :ref:`metadata <tutorial-metadata>` or :ref:`requirements
+            <tutorial-requirements>` dictionary determines ``api_version``.
           - When the context is instantiated with
             :py:meth:`opentrons.execute.get_protocol_api` or
             :py:meth:`opentrons.simulate.get_protocol_api`, the value of its ``version``
@@ -209,10 +210,10 @@ class ProtocolContext(CommandPublisher):
     def bundled_data(self) -> Dict[str, bytes]:
         """Accessor for data files bundled with this protocol, if any.
 
-        This is a dictionary mapping the filenames of bundled datafiles, with
-        extensions but without paths (e.g. if a file is stored in the bundle as
-        ``data/mydata/aspirations.csv`` it will be in the dict as
-        ``'aspirations.csv'``) to the bytes contents of the files.
+        This is a dictionary mapping the filenames of bundled datafiles to the bytes
+        contents of the files. The filename keys are formatted with extensions but
+        without paths. For example, a file stored in the bundle as
+        ``data/mydata/aspirations.csv`` will have the key ``"aspirations.csv"``.
         """
         return self._bundled_data
 
@@ -279,7 +280,7 @@ class ProtocolContext(CommandPublisher):
         far. For example, "Aspirating 123 µL from well A1 of 96 well plate in slot 1."
 
         The exact format of these entries is not guaranteed. The format here may differ from other
-        places that show the run log, such as the Opentrons App.
+        places that show the run log, such as the Opentrons App or touchscreen.
         """
         return self._commands
 
@@ -309,6 +310,20 @@ class ProtocolContext(CommandPublisher):
 
     @requires_version(2, 0)
     def is_simulating(self) -> bool:
+        """Returns ``True`` if the protocol is running in simulation.
+        
+        Returns ``False`` if the protocol is running on actual hardware.
+        
+        You can evaluate the result of this method in an ``if`` statement to make your
+        protocol behave differently in different environments. For example, you could
+        refer to a data file on your computer when simulating and refer to a data file
+        stored on the robot when not simulating.
+        
+        You can also use it to skip time-consuming aspects of your protocol. Most Python
+        Protocol API methods, like :py:meth:`.delay`, are designed to evaluate
+        instantaneously in simulation. But external methods, like those from the
+        :py:mod:`time` module, will run at normal speed if not skipped.
+        """
         return self._core.is_simulating()
 
     @requires_version(2, 0)
@@ -563,7 +578,7 @@ class ProtocolContext(CommandPublisher):
             definition, and you want to explicitly choose one or the other.
 
         :param version: The version of the labware definition. You should normally
-            leave this unspecified to let the implementation choose a good default.
+            leave this unspecified to let ``load_adapter()`` choose a version automatically.
         """
         load_name = validation.ensure_lowercase_name(load_name)
         load_location: Union[OffDeckType, DeckSlotName, StagingSlotName]
@@ -841,29 +856,32 @@ class ProtocolContext(CommandPublisher):
         tip_racks: Optional[List[Labware]] = None,
         replace: bool = False,
     ) -> InstrumentContext:
-        """Load a specific instrument required by the protocol.
+        """Load a specific instrument for use in the protocol.
 
-        This value will actually be checked when the protocol runs, to
-        ensure that the correct instrument is attached in the specified
-        location.
+        When analyzing the protocol on the robot, instruments loaded with this method
+        are compared against the instruments attached to the robot. You won't be able to
+        start the protocol until the correct instruments are attached and calibrated.
+        
+        Currently, this method only loads pipettes. You do not need to load the Flex
+        Gripper to use it in protocols. See :ref:`automatic-manual-moves`.
 
-        :param str instrument_name: Which instrument you want to load. See :ref:`new-pipette-models`
+        :param str instrument_name: The instrument to load. See :ref:`new-pipette-models`
                                     for the valid values.
-        :param mount: The mount where this instrument should be attached.
-                      This can either be an instance of the enum type
-                      :py:class:`.types.Mount` or one of the strings ``"left"``
-                      or ``"right"``. If you're loading a Flex 96-Channel Pipette
-                      (``instrument_name="flex_96channel_1000"``), you can leave this unspecified,
-                      since it always occupies both mounts; if you do specify a value, it will be
-                      ignored.
+        :param mount: The mount where the instrument should be attached.
+                      This can either be an instance of :py:class:`.types.Mount` or one
+                      of the strings ``"left"`` or ``"right"``. When loading a Flex
+                      96-Channel Pipette (``instrument_name="flex_96channel_1000"``),
+                      you can leave this unspecified, since it always occupies both
+                      mounts; if you do specify a value, it will be ignored.
         :type mount: types.Mount or str or ``None``
-        :param tip_racks: A list of tip racks from which to pick tips if
-                          :py:meth:`.InstrumentContext.pick_up_tip` is called
-                          without arguments.
+        :param tip_racks: A list of tip racks from which to pick tips when calling
+                          :py:meth:`.InstrumentContext.pick_up_tip` without arguments.
         :type tip_racks: List[:py:class:`.Labware`]
-        :param bool replace: Indicate that the currently-loaded instrument in
-                             `mount` (if such an instrument exists) should be
-                             replaced by `instrument_name`.
+        :param bool replace: If ``True``, replace the currently loaded instrument in
+                             ``mount``, if any. This is intended for :ref:`advanced
+                             control <advanced-control>` applications. You cannot
+                             replace an instrument in the middle of a protocol being run
+                             from the Opentrons App or touchscreen.
         """
         instrument_name = validation.ensure_lowercase_name(instrument_name)
         checked_instrument_name = validation.ensure_pipette_name(instrument_name)
@@ -880,7 +898,7 @@ class ProtocolContext(CommandPublisher):
         if is_96_channel and on_right_mount is not None:
             raise RuntimeError(
                 f"Instrument already present on right:"
-                f" {on_right_mount.name}. In order to load a 96 channel pipette both mounts need to be available."
+                f" {on_right_mount.name}. In order to load a 96-channel pipette, both mounts need to be available."
             )
 
         existing_instrument = self._instruments[checked_mount]
@@ -993,12 +1011,15 @@ class ProtocolContext(CommandPublisher):
     @requires_version(2, 0)
     def comment(self, msg: str) -> None:
         """
-        Add a user-readable comment string that will be echoed to the Opentrons
-        app.
+        Add a user-readable message to the run log.
+        
+        The message is visible anywhere you can view the run log, including the Opentrons App and the touchscreen on Flex.
 
-        The value of the message is computed during protocol simulation,
-        so cannot be used to communicate real-time information from the robot's
-        actual run.
+        .. note::
+        
+            The value of the message is computed during protocol analysis,
+            so ``comment()`` can't communicate real-time information during the
+            actual protocol run.
         """
         self._core.comment(msg=msg)
 
@@ -1012,17 +1033,17 @@ class ProtocolContext(CommandPublisher):
     ) -> None:
         """Delay protocol execution for a specific amount of time.
 
-        :param float seconds: A time to delay in seconds
-        :param float minutes: A time to delay in minutes
+        :param float seconds: The time to delay in seconds.
+        :param float minutes: The time to delay in minutes.
 
-        If both `seconds` and `minutes` are specified, they will be added.
+        If both ``seconds`` and ``minutes`` are specified, they will be added together.
         """
         delay_time = seconds + minutes * 60
         self._core.delay(seconds=delay_time, msg=msg)
 
     @requires_version(2, 0)
     def home(self) -> None:
-        """Homes the robot."""
+        """Home the movement system of the robot."""
         self._core.home()
 
     @property
@@ -1038,10 +1059,10 @@ class ProtocolContext(CommandPublisher):
     @requires_version(2, 0)
     def deck(self) -> Deck:
         """An interface to provide information about what's currently loaded on the deck.
-        This object is useful for determining if a slot in the deck is free.
+        This object is useful for determining if a slot on the deck is free.
 
         This object behaves like a dictionary whose keys are the deck slot names.
-        For instance, ``protocol.deck[1]``, ``protocol.deck["1"]``, and ``protocol.deck["D1"]``
+        For instance, ``deck[1]``, ``deck["1"]``, and ``deck["D1"]``
         will all return the object loaded in the front-left slot. (See :ref:`deck-slots`.)
 
         The value will be a :py:obj:`~opentrons.protocol_api.Labware` if the slot contains a
@@ -1151,7 +1172,7 @@ class ProtocolContext(CommandPublisher):
     @property
     @requires_version(2, 5)
     def door_closed(self) -> bool:
-        """Returns True if the robot door is closed"""
+        """Returns ``True`` if the front door of the robot is closed."""
         return self._core.door_closed()
 
 
