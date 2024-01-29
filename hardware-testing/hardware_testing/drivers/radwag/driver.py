@@ -16,8 +16,9 @@ from .commands import (
     radwag_command_format,
 )
 from .responses import RadwagResponse, RadwagResponseCodes, radwag_response_parse
-#sys.path.insert(0, os.path.abspath('../../'))
-#from data import get_testing_data_directory
+
+# sys.path.insert(0, os.path.abspath('../../'))
+# from data import get_testing_data_directory
 
 
 class RadwagScaleBase(ABC):
@@ -97,7 +98,7 @@ class RadwagScale(RadwagScaleBase):
     def __init__(self, connection: Serial) -> None:
         """Constructor."""
         self._connection = connection
-        #_raw_file_path = get_testing_data_directory() / "scale_raw.txt
+        # _raw_file_path = get_testing_data_directory() / "scale_raw.txt
         _raw_file_path = "demofile.txt"
         self._raw_log = open(_raw_file_path, "w")
 
