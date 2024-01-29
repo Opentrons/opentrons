@@ -224,8 +224,7 @@ export function DeviceDetailsDeckConfiguration({
                   ))
                 ) : (
                   <Flex
-                    key={fixture.cutoutId}
-                    backgroundColor={COLORS.grey20}
+                    backgroundColor={COLORS.grey10}
                     gridGap={SPACING.spacing60}
                     padding={SPACING.spacing8}
                     width="100%"
@@ -233,18 +232,8 @@ export function DeviceDetailsDeckConfiguration({
                   >
                     <StyledText>{t('no_deck_fixtures')}</StyledText>
                   </Flex>
-                ))
-              ) : (
-                <Flex
-                  backgroundColor={COLORS.grey20}
-                  gridGap={SPACING.spacing60}
-                  padding={SPACING.spacing8}
-                  width="100%"
-                  css={TYPOGRAPHY.labelRegular}
-                >
-                  <StyledText>{t('no_deck_fixtures')}</StyledText>
-                </Flex>
-              )}
+                )}
+              </Flex>
             </Flex>
           </Flex>
         ) : (
