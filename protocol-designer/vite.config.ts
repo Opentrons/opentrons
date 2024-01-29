@@ -5,6 +5,7 @@ import postCssImport from 'postcss-import'
 import postCssApply from 'postcss-apply'
 import postColorModFunction from 'postcss-color-mod-function'
 import postCssPresetEnv from 'postcss-preset-env'
+import lostCss from 'lost'
 
 export default defineConfig({
   build: {
@@ -12,7 +13,6 @@ export default defineConfig({
     outDir: 'dist',
   },
   plugins: [
-    // TODO: uncomment out these lines once we figure out how to disable HMR in the web worker context
     react({
       include: '**/*.tsx',
       babel: {
@@ -33,6 +33,7 @@ export default defineConfig({
         postCssApply(),
         postColorModFunction(),
         postCssPresetEnv({ stage: 0 }),
+        lostCss()
       ],
     },
   },
