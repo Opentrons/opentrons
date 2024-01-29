@@ -67,21 +67,13 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
 
   if (labwareAdapterLoadNames.includes(labwareLoadName)) {
     const { shouldRotateAdapterOrientation } = props
-    const {
-      xDimension,
-      yDimension,
-      footprintXDimension,
-      footprintYDimension,
-    } = props.definition.dimensions
-
-    const rotationCenterX = (footprintXDimension ?? xDimension) / 2
-    const rotationCenterY = (footprintYDimension ?? yDimension) / 2
+    const { xDimension, yDimension } = props.definition.dimensions
 
     return (
       <g
         transform={
           shouldRotateAdapterOrientation
-            ? `rotate(180, ${rotationCenterX}, ${rotationCenterY})`
+            ? `rotate(180, ${xDimension / 2}, ${yDimension / 2})`
             : 'rotate(0, 0, 0)'
         }
       >
