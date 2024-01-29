@@ -35,7 +35,7 @@ import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 import { useCreateRunFromProtocol } from '../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-
+import { getAnalysisStatus } from '../ProtocolsLanding/utils'
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
@@ -58,9 +58,16 @@ export function ChooseProtocolSlideoutComponent(
     selectedProtocol,
     setSelectedProtocol,
   ] = React.useState<StoredProtocolData | null>(null)
+  const analysisStatus = getAnalysisStatus(
+    false,
+    selectedProtocol?.mostRecentAnalysis
+  )
+  const missingAnalysisData = analysisStatus !== 'complete'
+
   const [shouldApplyOffsets, setShouldApplyOffsets] = React.useState(true)
   const offsetCandidates = useOffsetCandidatesForAnalysis(
-    selectedProtocol?.mostRecentAnalysis ?? null,
+    (!missingAnalysisData ? selectedProtocol?.mostRecentAnalysis : null) ??
+      null,
     robot.ip
   )
 
@@ -134,9 +141,21 @@ export function ChooseProtocolSlideoutComponent(
             offsetCandidates={offsetCandidates}
             shouldApplyOffsets={shouldApplyOffsets}
             setShouldApplyOffsets={setShouldApplyOffsets}
-            commands={selectedProtocol?.mostRecentAnalysis?.commands ?? []}
-            labware={selectedProtocol?.mostRecentAnalysis?.labware ?? []}
-            modules={selectedProtocol?.mostRecentAnalysis?.modules ?? []}
+            commands={
+              (!missingAnalysisData
+                ? selectedProtocol?.mostRecentAnalysis?.commands
+                : []) ?? []
+            }
+            labware={
+              (!missingAnalysisData
+                ? selectedProtocol?.mostRecentAnalysis?.labware
+                : []) ?? []
+            }
+            modules={
+              (!missingAnalysisData
+                ? selectedProtocol?.mostRecentAnalysis?.modules
+                : []) ?? []
+            }
           />
           <PrimaryButton
             onClick={handleProceed}
@@ -204,6 +223,11 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
         const isSelected =
           selectedProtocol != null &&
           storedProtocol.protocolKey === selectedProtocol.protocolKey
+        const analysisStatus = getAnalysisStatus(
+          false,
+          storedProtocol.mostRecentAnalysis
+        )
+        const missingAnalysisData = analysisStatus !== 'complete'
         return (
           <React.Fragment key={storedProtocol.protocolKey}>
             <Flex flexDirection={DIRECTION_COLUMN}>
@@ -220,7 +244,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                     height="4.25rem"
                     width="4.75rem"
                   >
-                    {storedProtocol.mostRecentAnalysis != null ? (
+                    {!missingAnalysisData ? (
                       <ProtocolDeck
                         protocolAnalysis={storedProtocol.mostRecentAnalysis}
                       />
