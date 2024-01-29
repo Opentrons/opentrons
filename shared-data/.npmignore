@@ -1,3 +1,5 @@
 dist
 python
 *.tgz
+js/
+!lib/js
