@@ -16,22 +16,25 @@ import re
 class uv_Driver:
     def __init__(self, port='/dev/ttyUSB0', baudrate=115200,
                 parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
-                    bytesize=serial.EIGHTBITS, timeout=1):
-
-        self.port = port
-        self.baudrate = baudrate
-        self.timeout = timeout
-        self.particle_counter = serial.Serial(port = self.port,
-                                    baudrate = self.baudrate,
-                                    timeout = self.timeout)
+                    bytesize=serial.EIGHTBITS, timeout=1,simulate=False):
+        if simulate:
+            self.particle_counter = None
+        else:
+            self.port = port
+            self.baudrate = baudrate
+            self.timeout = timeout
+            self.particle_counter = serial.Serial(port = self.port,
+                                        baudrate = self.baudrate,
+                                        timeout = self.timeout)
        
     
     def get_uv_(self):
+        """获取UV值和温度值"""
         self.particle_counter.flush()
         self.particle_counter.flushInput()
         try:
             # Modbus RTU 请求帧数据（示例数据） 
-            # 01 04 01 C4 00 04 B1 C8 高位
+            # 01 04 01 C4 00 04 B1 C8 
             request_frame = bytearray([0x01, 0x04, 0x01, 0xC4, 0x00, 0x04,0xB1, 0xC8])
             # 发送请求
             self.particle_counter.write(request_frame)
@@ -58,6 +61,10 @@ class uv_Driver:
 
         uvdata = int.from_bytes(uvdatahex, byteorder='big', signed=False)  # 将数据转换为十进制
         Tempval = int.from_bytes(Tempvalhex, byteorder='big', signed=False)  # 将数据转换为十进制
+        if uvdata != 0:
+            uvdata = round(int(str(uvdata)[:-4]) / 100,1)
+        if Tempval != 0:
+            Tempval = round(int(str(Tempval)[:-4]) / 100,1)
 
         crc = int.from_bytes(modbus_data_bytes[-2:], byteorder='big')  # 获取 CRC 校验值
 
@@ -73,10 +80,10 @@ class uv_Driver:
 
 if __name__ == '__main__':
     port = "/dev/tty.usbserial-130"
-    a = uv_Driver(port)
+    a = uv_Driver(port,simulate=True)
     # modbus_data_hex = a.get_uv_()
     # 解析 Modbus 数据
-    cccc = "0104080000000000E30000D5FB"
+    cccc = "0104080897000000ca0000e35c"
     parsed_data = a.parse_modbus_data(cccc)
 
     # 打印解析结果

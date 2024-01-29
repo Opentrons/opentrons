@@ -36,6 +36,7 @@ async def _main(simulating: bool) -> None:
     await api.move_to(OT3Mount.LEFT, attach_pos._replace(z=current_pos.z),)
     HEPASN = input("Enter HEPA/UV Barcode Number:: ").strip()
     instrument = BuildAsairGT521S()
+    uvinstrument = BuildAsairUV()
     INTSN = instrument.serial_number().strip("SS").replace(' ', '')
     csv_props, csv_cb = _create_csv_and_get_callbacks(HEPASN)
     csv_cb.write(["INSTRUMENT SN:", INTSN])
@@ -121,6 +122,13 @@ async def _main(simulating: bool) -> None:
                 # grip once to center the thing
                 await api.grip(20)
                 await api.ungrip()
+
+                #获取数据
+                alldata = uvinstrument.get_uv_()
+                intdatadict = uvinstrument.parse_modbus_data(alldata)
+
+
+
             # LOOP THROUGH FORCES
     except:
         pass
@@ -214,15 +222,15 @@ def BuildAsairUV():
         try:
             print(f"Trying to connect to env sensor on port {port}")
             sensor = uv_instrument.uv_Driver(port)
-            ser_id = sensor.serial_number().strip("SS").replace(' ', '')
+            ser_id = sensor.get_uv_()
             if len(ser_id) != 0:
-                print(f"Found GT-521S {ser_id} on port {port} SN: {ser_id}")
+                print(f"Found uv {ser_id} on port {port}")
                 return sensor
         except:  # noqa: E722
             pass
     port = list_ports_and_select(device_name="Asair GT-521S")
-    sensor = particle_instrument.GT521S_Driver(port)
-    print(f"Found GT-521S on port {port}")
+    sensor = uv_instrument.uv_Driver(port)
+    print(f"Found uv on port {port}")
     return sensor
 
 def list_ports_and_select(device_name: str = "") -> str:
