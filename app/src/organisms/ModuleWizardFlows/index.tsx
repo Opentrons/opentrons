@@ -1,16 +1,14 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
-import {
-  useDeleteMaintenanceRunMutation,
-  useCurrentMaintenanceRun,
-} from '@opentrons/react-api-client'
+import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 import { COLORS } from '@opentrons/components'
 import {
   CreateCommand,
   getModuleType,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
+
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { StyledText } from '../../atoms/text'
@@ -31,6 +29,7 @@ import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
 import { DetachProbe } from './DetachProbe'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
 
@@ -92,7 +91,7 @@ export const ModuleWizardFlows = (
     setMonitorMaintenanceRunForDeletion,
   ] = React.useState<boolean>(false)
 
-  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
     enabled: createdMaintenanceRunId != null,
   })

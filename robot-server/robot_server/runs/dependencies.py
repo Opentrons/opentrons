@@ -21,6 +21,7 @@ from robot_server.persistence import get_sql_engine
 from robot_server.service.task_runner import get_task_runner, TaskRunner
 from robot_server.settings import get_settings
 from robot_server.deletion_planner import RunDeletionPlanner
+from robot_server.notification_client import get_notification_client, NotificationClient
 
 from .run_auto_deleter import RunAutoDeleter
 from .engine_store import EngineStore, NoRunnerEnginePairError
@@ -139,12 +140,14 @@ async def get_run_data_manager(
     task_runner: TaskRunner = Depends(get_task_runner),
     engine_store: EngineStore = Depends(get_engine_store),
     run_store: RunStore = Depends(get_run_store),
+    notification_client: NotificationClient = Depends(get_notification_client),
 ) -> RunDataManager:
     """Get a run data manager to keep track of current/historical run data."""
     return RunDataManager(
         task_runner=task_runner,
         engine_store=engine_store,
         run_store=run_store,
+        notification_client=notification_client,
     )
 
 

@@ -22,6 +22,7 @@ import {
 } from './config'
 import systemd from './systemd'
 import { watchForMassStorage } from './usb'
+import { registerNotify, closeAllNotifyConnections } from './notify'
 
 import type { BrowserWindow } from 'electron'
 import type { Dispatch, Logger } from './types'
@@ -49,7 +50,14 @@ if (config.devtools) app.once('ready', installDevtools)
 
 app.once('window-all-closed', () => {
   log.debug('all windows closed, quitting the app')
-  app.quit()
+  closeAllNotifyConnections()
+    .then(() => {
+      app.quit()
+    })
+    .catch(error => {
+      log.warn('Failed to properly close MQTT connections:', error)
+      app.quit()
+    })
 })
 
 function startUp(): void {
@@ -95,6 +103,7 @@ function startUp(): void {
     registerRobotSystemUpdate(dispatch),
     registerAppRestart(),
     registerUpdateBrightness(),
+    registerNotify(dispatch, mainWindow),
   ]
 
   ipcMain.on('dispatch', (_, action) => {
