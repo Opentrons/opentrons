@@ -173,10 +173,18 @@ class LabwareMovementHandler:
                     # we only want to check position after the gripper has opened and
                     # should be holding labware
                     if holding_labware:
+                        labware_bbox = self._state_store.labware.get_dimensions(
+                            labware_id
+                        )
+                        well_bbox = self._state_store.labware.get_well_bbox(labware_id)
                         ot3api.raise_error_if_gripper_pickup_failed(
-                            labware_width=self._state_store.labware.get_dimensions(
-                                labware_id
-                            ).y
+                            expected_grip_width=labware_bbox.y,
+                            grip_width_uncertainty_wider=abs(
+                                max(well_bbox.y - labware_bbox.y, 0)
+                            ),
+                            grip_width_uncertainty_narrower=abs(
+                                min(well_bbox.y - labware_bbox.y, 0)
+                            ),
                         )
                 await ot3api.move_to(
                     mount=gripper_mount, abs_position=waypoint_data.position
