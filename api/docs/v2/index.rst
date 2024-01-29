@@ -36,7 +36,7 @@ Getting Started
 
 If you want to **dive right into code**, take a look at our :ref:`new-examples` and the comprehensive :ref:`protocol-api-reference`.
 
-When you're ready to **try out a protocol**, download the `Opentrons App <https://www.opentrons.com/ot-app>`_, import the protocol file, and run it on your robot.
+When you're ready to **try out a protocol**, download the `Opentrons App <https://www.opentrons.com/ot-app>`__, import the protocol file, and run it on your robot.
 
 
 .. _overview-section-v2:
@@ -123,7 +123,7 @@ For example, if we wanted to transfer liquid from well A1 to well B1 on a plate,
             }
 
             # requirements
-            requirements = {"robotType": "OT-2", "apiLevel": "2.14"}
+            requirements = {"robotType": "OT-2", "apiLevel": "|apiLevel|"}
 
             # protocol run function
             def run(protocol: protocol_api.ProtocolContext):
@@ -149,7 +149,7 @@ For example, if we wanted to transfer liquid from well A1 to well B1 on a plate,
         This example proceeds completely linearly. Following it line-by-line, you can see that it has the following effects:
 
         1. Gives the name, contact information, and a brief description for the protocol.
-        2. Indicates the protocol should run on an OT-2 robot, using API version 2.14.
+        2. Indicates the protocol should run on an OT-2 robot, using API version |apiLevel|.
         3. Tells the robot that there is:
             a. A 96-well flat plate in slot 1.
             b. A rack of 300 µL tips in slot 2.
@@ -170,7 +170,7 @@ More Resources
 Opentrons App
 +++++++++++++
 
-The `Opentrons App <https://opentrons.com/ot-app/>`_ is the easiest way to run your Python protocols. The app `supports <https://support.opentrons.com/en/articles/2687536-get-started-supported-operating-systems-for-the-opentrons-app>`_ the latest versions of macOS, Windows, and Ubuntu.
+The `Opentrons App <https://opentrons.com/ot-app/>`__ is the easiest way to run your Python protocols. The app `supports <https://support.opentrons.com/en/articles/2687536-get-started-supported-operating-systems-for-the-opentrons-app>`_ the latest versions of macOS, Windows, and Ubuntu.
 
 Support
 +++++++

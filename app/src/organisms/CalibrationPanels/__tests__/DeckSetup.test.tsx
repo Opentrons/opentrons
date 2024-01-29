@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import { i18n } from '../../../i18n'
@@ -22,42 +23,41 @@ const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
 >
 
 describe('DeckSetup', () => {
-  let render: (
-    props?: Partial<React.ComponentProps<typeof DeckSetup>>
-  ) => ReturnType<typeof renderWithProviders>
-
   const mockSendCommands = jest.fn()
   const mockDeleteSession = jest.fn()
 
+  const render = (
+    props: Partial<React.ComponentProps<typeof DeckSetup>> = {}
+  ) => {
+    const {
+      mount = 'left',
+      isMulti = false,
+      tipRack = mockDeckCalTipRack,
+      calBlock = null,
+      sendCommands = mockSendCommands,
+      cleanUpAndExit = mockDeleteSession,
+      currentStep = Sessions.DECK_STEP_LABWARE_LOADED,
+      sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION,
+      activePipette,
+    } = props
+    return renderWithProviders(
+      <DeckSetup
+        isMulti={isMulti}
+        mount={mount}
+        tipRack={tipRack}
+        calBlock={calBlock}
+        sendCommands={sendCommands}
+        cleanUpAndExit={cleanUpAndExit}
+        currentStep={currentStep}
+        sessionType={sessionType}
+        activePipette={activePipette}
+      />,
+      { i18nInstance: i18n }
+    )
+  }
+
   beforeEach(() => {
     mockGetDeckDefinitions.mockReturnValue({})
-    render = (props = {}) => {
-      const {
-        mount = 'left',
-        isMulti = false,
-        tipRack = mockDeckCalTipRack,
-        calBlock = null,
-        sendCommands = mockSendCommands,
-        cleanUpAndExit = mockDeleteSession,
-        currentStep = Sessions.DECK_STEP_LABWARE_LOADED,
-        sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION,
-        activePipette,
-      } = props
-      return renderWithProviders(
-        <DeckSetup
-          isMulti={isMulti}
-          mount={mount}
-          tipRack={tipRack}
-          calBlock={calBlock}
-          sendCommands={sendCommands}
-          cleanUpAndExit={cleanUpAndExit}
-          currentStep={currentStep}
-          sessionType={sessionType}
-          activePipette={activePipette}
-        />,
-        { i18nInstance: i18n }
-      )
-    }
   })
 
   afterEach(() => {
@@ -65,9 +65,8 @@ describe('DeckSetup', () => {
   })
 
   it('clicking continue proceeds to next step', () => {
-    const { getByRole } = render()[0]
-
-    getByRole('button', { name: 'Confirm placement' }).click()
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm placement' }))
 
     expect(mockSendCommands).toHaveBeenCalledWith({
       command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK,
@@ -75,60 +74,64 @@ describe('DeckSetup', () => {
   })
 
   it('copy is correct if cal block present for tlc', () => {
-    const { getByText, getByRole, queryByText } = render({
+    render({
       sessionType: Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
       calBlock: mockTipLengthCalBlock,
-    })[0]
+    })
 
-    getByRole('heading', { name: 'Prepare the space' })
-    getByText('Place a full 300ul Tiprack FIXTURE into slot 8')
-    getByText("Place the Calibration Block into it's designated slot")
-    expect(queryByText('To check the left pipette:')).toBeNull()
-    expect(queryByText('Clear all other deck slots')).toBeNull()
+    screen.getByRole('heading', { name: 'Prepare the space' })
+    screen.getByText('Place a full 300ul Tiprack FIXTURE into slot 8')
+    screen.getByText("Place the Calibration Block into it's designated slot")
+    expect(screen.queryByText('To check the left pipette:')).toBeNull()
+    expect(screen.queryByText('Clear all other deck slots')).toBeNull()
   })
 
   it('copy is correct if cal block not present for tlc', () => {
-    const { getByText, getByRole, queryByText } = render({
+    render({
       sessionType: Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
       calBlock: null,
-    })[0]
+    })
 
-    getByRole('heading', { name: 'Prepare the space' })
-    getByText('Place a full 300ul Tiprack FIXTURE into slot 8')
+    screen.getByRole('heading', { name: 'Prepare the space' })
+    screen.getByText('Place a full 300ul Tiprack FIXTURE into slot 8')
     expect(
-      queryByText("Place the Calibration Block into it's designated slot")
+      screen.queryByText(
+        "Place the Calibration Block into it's designated slot"
+      )
     ).toBeNull()
-    expect(queryByText('To check the left pipette:')).toBeNull()
-    expect(queryByText('Clear all other deck slots')).toBeNull()
+    expect(screen.queryByText('To check the left pipette:')).toBeNull()
+    expect(screen.queryByText('Clear all other deck slots')).toBeNull()
   })
 
   it('copy is correct if cal block present for health check', () => {
-    const { getByText, getByRole } = render({
+    render({
       sessionType: Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
       calBlock: mockTipLengthCalBlock,
       activePipette: mockRobotCalibrationCheckSessionDetails.activePipette,
-    })[0]
+    })
 
-    getByRole('heading', { name: 'Prepare the space' })
-    getByText('Place a full fake tiprack display name into slot 8')
-    getByText("Place the Calibration Block into it's designated slot")
-    getByText('To check the left pipette:')
-    getByText('Clear all other deck slots')
+    screen.getByRole('heading', { name: 'Prepare the space' })
+    screen.getByText('Place a full fake tiprack display name into slot 8')
+    screen.getByText("Place the Calibration Block into it's designated slot")
+    screen.getByText('To check the left pipette:')
+    screen.getByText('Clear all other deck slots')
   })
 
   it('copy is correct if cal block not present for health check', () => {
-    const { getByText, getByRole, queryByText } = render({
+    render({
       sessionType: Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
       calBlock: null,
       activePipette: mockRobotCalibrationCheckSessionDetails.activePipette,
-    })[0]
+    })
 
-    getByRole('heading', { name: 'Prepare the space' })
-    getByText('Place a full fake tiprack display name into slot 8')
-    getByText('To check the left pipette:')
-    getByText('Clear all other deck slots')
+    screen.getByRole('heading', { name: 'Prepare the space' })
+    screen.getByText('Place a full fake tiprack display name into slot 8')
+    screen.getByText('To check the left pipette:')
+    screen.getByText('Clear all other deck slots')
     expect(
-      queryByText("Place the Calibration Block into it's designated slot")
+      screen.queryByText(
+        "Place the Calibration Block into it's designated slot"
+      )
     ).toBeNull()
   })
 })

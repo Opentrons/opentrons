@@ -11,7 +11,6 @@ import {
   CutoutFixtureId,
   RobotType,
 } from '@opentrons/shared-data'
-import { i18n } from '../localization'
 import { WellGroup } from '@opentrons/components'
 import { BoundingRect, GenericRect } from '../collision-types'
 import type {
@@ -19,6 +18,7 @@ import type {
   LabwareEntities,
   PipetteEntities,
 } from '@opentrons/step-generation'
+import { INTERACTIVE_WELL_DATA_ATTRIBUTE } from '@opentrons/components/src/hardware-sim/Labware/labwareInternals/Well'
 
 export const uuid: () => string = uuidv1
 // Collision detection for SelectionRect / SelectableLabware
@@ -38,10 +38,7 @@ export function clientRectToBoundingRect(rect: ClientRect): BoundingRect {
     height: rect.height,
   }
 }
-export const getCollidingWells = (
-  rectPositions: GenericRect,
-  selectableClassname: string
-): WellGroup => {
+export const getCollidingWells = (rectPositions: GenericRect): WellGroup => {
   // Returns set of selected wells under a collision rect
   const { x0, y0, x1, y1 } = rectPositions
   const selectionBoundingRect = {
@@ -51,9 +48,10 @@ export const getCollidingWells = (
     height: Math.abs(y1 - y0),
   }
   // NOTE: querySelectorAll returns a NodeList, so you need to unpack it as an Array to do .filter
-  // @ts-expect-error(sa, 2021-6-21): there is no option to query by class selector in HTMLElementTagNameMap (see type of querySelectorAll)
   const selectableElems: HTMLElement[] = [
-    ...document.querySelectorAll('.' + selectableClassname),
+    ...document.querySelectorAll<HTMLElement>(
+      `[${INTERACTIVE_WELL_DATA_ATTRIBUTE}]`
+    ),
   ]
   const collidedElems = selectableElems.filter((selectableElem, i) =>
     rectCollision(
@@ -63,11 +61,11 @@ export const getCollidingWells = (
   )
   const collidedWellData = collidedElems.reduce(
     (acc: WellGroup, elem): WellGroup => {
-      // TODO IMMEDIATELY no magic string 'wellname'
-      if ('wellname' in elem.dataset) {
+      if (
+        INTERACTIVE_WELL_DATA_ATTRIBUTE.replace('data-', '') in elem.dataset
+      ) {
         const wellName = elem.dataset.wellname
-        // @ts-expect-error(sa, 2021-6-21): wellName might be undefined
-        return { ...acc, [wellName]: null }
+        return wellName != null ? { ...acc, [wellName]: null } : acc
       }
 
       return acc
@@ -76,7 +74,6 @@ export const getCollidingWells = (
   )
   return collidedWellData
 }
-// TODO IMMEDIATELY use where appropriate
 export const arrayToWellGroup = (w: string[]): WellGroup =>
   w.reduce((acc, wellName) => ({ ...acc, [wellName]: null }), {})
 // cross-PD memoization of well set utils
@@ -92,30 +89,35 @@ export {
   getWellSetForMultichannel,
 }
 export const makeTemperatureText = (
-  temperature: number | string | null
+  temperature: number | string | null,
+  t: any
 ): string =>
   temperature === null
-    ? i18n.t('modules.status.deactivated')
-    : `${temperature} ${i18n.t('application.units.degrees')}`
-export const makeLidLabelText = (lidOpen: boolean): string =>
-  i18n.t(`modules.lid_label`, {
-    lidStatus: i18n.t(lidOpen ? 'modules.lid_open' : 'modules.lid_closed'),
+    ? t('modules:status.deactivated')
+    : `${temperature} ${t('application:units.degrees')}`
+export const makeLidLabelText = (lidOpen: boolean, t: any): string =>
+  t(`modules:lid_label`, {
+    lidStatus: t(lidOpen ? 'modules:lid_open' : 'modules:lid_closed'),
   })
 
-export const makeSpeedText = (targetSpeed: number | string | null): string =>
+export const makeSpeedText = (
+  targetSpeed: number | string | null,
+  t: any
+): string =>
   targetSpeed === null
-    ? i18n.t('modules.status.deactivated')
-    : `${targetSpeed} ${i18n.t('application.units.rpm')}`
+    ? t('modules:status.deactivated')
+    : `${targetSpeed} ${t('application:units.rpm')}`
 
 export const makeTimerText = (
   targetMinutes: number | string | null,
-  targetSeconds: number | string | null
+  targetSeconds: number | string | null,
+  t: any
 ): string | null =>
   targetMinutes === null && targetSeconds === null
     ? null
-    : `${targetMinutes}  ${i18n.t(
-        'application.units.minutes'
-      )} ${targetSeconds}  ${i18n.t('application.units.seconds')} timer`
+    : `${targetMinutes}  ${t(
+        'application:units.minutes'
+      )} ${targetSeconds}  ${t('application:units.seconds')} timer`
 
 export const getIsAdapter = (
   labwareId: string,

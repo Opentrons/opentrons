@@ -539,6 +539,7 @@ stages:
                 status: succeeded
                 params:
                   pipetteId: pipetteId
+                  failOnNotHomed: true
                 result:
                   positionId: !anystr
                   position:
@@ -571,6 +572,7 @@ stages:
                 params:
                   pipetteId: pipetteId
                   positionId: positionId
+                  failOnNotHomed: true
                 result:
                   positionId: positionId
                   position:

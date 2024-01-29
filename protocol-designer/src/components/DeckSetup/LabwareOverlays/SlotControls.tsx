@@ -1,11 +1,11 @@
 import assert from 'assert'
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
 import noop from 'lodash/noop'
 import { DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd'
 import cx from 'classnames'
 import { Icon, RobotCoordsForeignDiv } from '@opentrons/components'
-import { i18n } from '../../../localization'
 import { DND_TYPES } from '../../../constants'
 import {
   getLabwareIsCompatible,
@@ -21,6 +21,7 @@ import {
 } from '../../../labware-defs'
 import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../../../steplist'
 import { BlockedSlot } from './BlockedSlot'
+import styles from './LabwareOverlays.module.css'
 
 import type {
   CoordinateTuple,
@@ -29,7 +30,6 @@ import type {
 } from '@opentrons/shared-data'
 import type { BaseState, DeckSlot, ThunkDispatch } from '../../../types'
 import type { LabwareOnDeck } from '../../../step-forms'
-import styles from './LabwareOverlays.module.css'
 
 interface DNDP {
   isOver: boolean
@@ -74,6 +74,7 @@ export const SlotControlsComponent = (
     itemType,
     customLabwareDefs,
   } = props
+  const { t } = useTranslation('deck')
   if (
     selectedTerminalItemId !== START_TERMINAL_ITEM_ID ||
     (itemType !== DND_TYPES.LABWARE && itemType !== null) ||
@@ -134,7 +135,7 @@ export const SlotControlsComponent = (
         >
           <a className={styles.overlay_button} onClick={addLabware}>
             {!isOver && <Icon className={styles.overlay_icon} name="plus" />}
-            {i18n.t(`deck.overlay.slot.${isOver ? 'place_here' : overlayText}`)}
+            {t(`overlay.slot.${isOver ? 'place_here' : overlayText}`)}
           </a>
         </RobotCoordsForeignDiv>
       )}
@@ -191,6 +192,7 @@ const collectSlotTarget = (
   connect: DropTargetConnector,
   monitor: DropTargetMonitor
 ): React.ReactNode => ({
+  // @ts-expect-error(BC, 12-13-2023): react dnd needs to be updated or removed to include proper type
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver(),
   draggedItem: monitor.getItem(),

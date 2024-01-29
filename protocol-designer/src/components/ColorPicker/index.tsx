@@ -1,7 +1,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { ColorResult, TwitterPicker } from 'react-color'
-import { COLORS } from '@opentrons/components'
+import { DEFAULT_LIQUID_COLORS } from '@opentrons/shared-data'
 
 import styles from './ColorPicker.module.css'
 
@@ -38,7 +38,7 @@ export function ColorPicker(props: ColorPickerProps): JSX.Element {
               onClick={() => setShowColorPicker(false)}
             />
             <TwitterPicker
-              colors={COLORS.liquidColors}
+              colors={DEFAULT_LIQUID_COLORS}
               color={props.value}
               onChange={(color, event) => {
                 props.onChange(color.hex)

@@ -8,7 +8,8 @@ import {
 import { Icon } from '../../icons'
 import { Flex, Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
-import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { BORDERS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
 
 import type { RobotType } from '@opentrons/shared-data'

@@ -1,6 +1,6 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { Icon, SPACING_3 } from '@opentrons/components'
-import { i18n } from '../../localization'
 import collisionImage from '../../images/modules/module_pipette_collision_warning.png'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import styles from './styles.module.css'
@@ -20,31 +20,30 @@ type TempMagCollisonProps = Pick<
 >
 
 const HeaterShakerPipetteCollisions = (): JSX.Element | null => {
+  const { t } = useTranslation('alert')
   return (
     <>
       <li>
-        <strong>8-Channel</strong> {i18n.t(`alert.crash.pipettes_east_west`)}{' '}
+        <strong>8-Channel</strong> {t(`crash.pipettes_east_west`)}{' '}
         <strong>Heater-Shaker Module GEN1.</strong>
       </li>
       <li style={{ marginTop: SPACING_3 }}>
-        <strong>8-Channel</strong>{' '}
-        {i18n.t(`alert.crash.pipettes_can_access_north_south`)}{' '}
-        <strong>Heater-Shaker Module GEN1</strong>{' '}
-        {i18n.t(`alert.crash.slot_has_tiprack`)}
+        <strong>8-Channel</strong> {t(`crash.pipettes_can_access_north_south`)}{' '}
+        <strong>Heater-Shaker Module GEN1</strong> {t(`crash.slot_has_tiprack`)}
       </li>
     </>
   )
 }
 
 const TempMagCollisions = (props: TempMagCollisonProps): JSX.Element => {
+  const { t } = useTranslation('alert')
   const moduleMessage = getCrashableModulesCopy(props) || ''
   return (
     <li style={{ marginTop: SPACING_3 }}>
       <strong>8-Channel GEN1</strong>{' '}
-      {i18n.t(`alert.crash.pipettes_cannot_access_north_south`)} {moduleMessage}
-      .{' '}
+      {t(`crash.pipettes_cannot_access_north_south`)} {moduleMessage}.{' '}
       <KnowledgeBaseLink to="pipetteGen1MultiModuleCollision">
-        {i18n.t(`alert.crash.read_more_here`)}
+        {t(`crash.read_more_here`)}
       </KnowledgeBaseLink>
     </li>
   )
@@ -79,14 +78,14 @@ const PipetteModuleCollisions = (props: Props): JSX.Element | null => {
 const ModuleLabwareCollisions = (
   props: Pick<Props, 'showHeaterShakerLabwareCollisions'>
 ): JSX.Element | null => {
+  const { t } = useTranslation('alert')
   if (!props.showHeaterShakerLabwareCollisions) return null
   const title = 'Potential module-labware collisions'
   const body = (
     <li>
-      {i18n.t(`alert.crash.no_labware_over`)} <strong>53 mm</strong>{' '}
-      {i18n.t(`alert.crash.labware_east_west`)}{' '}
-      <strong>Heater-Shaker Module GEN1</strong>{' '}
-      {i18n.t(`alert.crash.latch_collision`)}{' '}
+      {t(`crash.no_labware_over`)} <strong>53 mm</strong>{' '}
+      {t(`crash.labware_east_west`)} <strong>Heater-Shaker Module GEN1</strong>{' '}
+      {t(`crash.latch_collision`)}{' '}
     </li>
   )
   return <CollisionCard title={title} body={body} />
@@ -94,11 +93,13 @@ const ModuleLabwareCollisions = (
 const ModuleModuleCollisions = (
   props: Pick<Props, 'showHeaterShakerModuleCollisions'>
 ): JSX.Element | null => {
+  const { t } = useTranslation('alert')
+
   if (!props.showHeaterShakerModuleCollisions) return null
   const title = 'Potential module-module collisions'
   const body = (
     <li>
-      {i18n.t(`alert.crash.modules_north_south`)}{' '}
+      {t(`crash.modules_north_south`)}{' '}
       <strong>Heater-Shaker Module GEN1.</strong>
     </li>
   )

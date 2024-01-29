@@ -2,7 +2,6 @@
 import asyncio
 from typing import List, Union, cast
 
-from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import MessageId
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
@@ -13,6 +12,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 from opentrons_hardware.firmware_bindings.constants import NodeId
 
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.backends.ot3controller import OT3Controller
 
 from hardware_testing.data import ui
 from hardware_testing.data.csv_report import (
@@ -40,7 +40,7 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
 
 async def get_tip_status(api: OT3API) -> bool:
     """Get the tip status for the 96 channel."""
-    can_messenger: CanMessenger = api._backend._messenger  # type: ignore[union-attr]
+    can_messenger = cast(OT3Controller, api._backend)._messenger
     node: NodeId = NodeId.pipette_left
     event = asyncio.Event()
     value = 0

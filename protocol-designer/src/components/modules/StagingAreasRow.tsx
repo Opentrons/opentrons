@@ -1,5 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
+import { useTranslation } from 'react-i18next'
 import {
   OutlineButton,
   Flex,
@@ -12,7 +13,6 @@ import {
   DIRECTION_ROW,
 } from '@opentrons/components'
 import { getCutoutDisplayName } from '@opentrons/shared-data'
-import { i18n } from '../../localization'
 import stagingAreaImage from '../../images/staging_area.png'
 import { getStagingAreaSlots } from '../../utils'
 import { Portal } from '../portals/TopPortal'
@@ -20,7 +20,7 @@ import { StagingAreasModal } from './StagingAreasModal'
 import { FlexSlotMap } from './FlexSlotMap'
 
 import styles from './styles.module.css'
-import type { Cutout } from '@opentrons/shared-data'
+import type { CutoutId } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 
 interface StagingAreasRowProps {
@@ -30,6 +30,7 @@ interface StagingAreasRowProps {
 
 export function StagingAreasRow(props: StagingAreasRowProps): JSX.Element {
   const { handleAttachment, stagingAreas } = props
+  const { t } = useTranslation(['modules', 'shared'])
   const hasStagingAreas = stagingAreas.length > 0
   const [stagingAreaModal, openStagingAreaModal] = React.useState<boolean>(
     false
@@ -48,15 +49,13 @@ export function StagingAreasRow(props: StagingAreasRowProps): JSX.Element {
       ) : null}
       <Flex flexDirection={DIRECTION_COLUMN}>
         <h4 className={styles.row_title}>
-          {i18n.t(`modules.additional_equipment_display_names.stagingAreas`)}
+          {t(`additional_equipment_display_names.stagingAreas`)}
         </h4>
 
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <StagingAreaImage
             src={stagingAreaImage}
-            alt={i18n.t(
-              `modules.additional_equipment_display_names.stagingAreas`
-            )}
+            alt={t(`additional_equipment_display_names.stagingAreas`)}
           />
           <div
             className={styles.module_col}
@@ -68,7 +67,7 @@ export function StagingAreasRow(props: StagingAreasRowProps): JSX.Element {
                 <LabeledValue
                   label="Position"
                   value={`${stagingAreaLocations.map(location =>
-                    getCutoutDisplayName(location as Cutout)
+                    getCutoutDisplayName(location as CutoutId)
                   )}`}
                 />
               </div>
@@ -88,7 +87,7 @@ export function StagingAreasRow(props: StagingAreasRowProps): JSX.Element {
                 onClick={() => openStagingAreaModal(true)}
                 className={styles.module_button}
               >
-                {i18n.t('shared.edit')}
+                {t('shared:edit')}
               </OutlineButton>
             ) : null}
             <Box
@@ -104,9 +103,7 @@ export function StagingAreasRow(props: StagingAreasRowProps): JSX.Element {
                     : () => openStagingAreaModal(true)
                 }
               >
-                {hasStagingAreas
-                  ? i18n.t('shared.remove')
-                  : i18n.t('shared.add')}
+                {hasStagingAreas ? t('shared:remove') : t('shared:add')}
               </OutlineButton>
             </Box>
           </Box>

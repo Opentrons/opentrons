@@ -9,80 +9,66 @@ interface Props {
   saveEdit: (newValue: string) => unknown
 }
 
-interface State {
-  editing: boolean
-  transientValue?: string | null
-}
+export function EditableTextField(props: Props): JSX.Element {
+  const { className, value, saveEdit } = props
+  const [editing, setEditing] = React.useState<boolean>(false)
+  const [transientValue, setTransientValue] = React.useState<
+    string | null | undefined
+  >(value)
 
-export class EditableTextField extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props)
-    this.state = {
-      editing: false,
-      transientValue: this.props.value,
-    }
+  const enterEditMode = (): void => {
+    setEditing(true)
+    setTransientValue(value)
+  }
+  const handleCancel = (): void => {
+    setEditing(false)
+    setTransientValue(value)
   }
 
-  enterEditMode: () => void = () =>
-    this.setState({ editing: true, transientValue: this.props.value })
-
-  handleCancel: () => void = () => {
-    this.setState({
-      editing: false,
-      transientValue: this.props.value,
-    })
-  }
-
-  handleKeyUp: (e: React.KeyboardEvent) => void = e => {
+  const handleKeyUp = (e: React.KeyboardEvent): void => {
     if (e.key === 'Escape') {
-      this.handleCancel()
+      handleCancel()
     }
   }
 
-  handleFormSubmit: (e: React.FormEvent) => void = e => {
+  const handleSubmit = (): void => {
+    setEditing(false)
+    saveEdit(transientValue ?? '')
+  }
+  const handleFormSubmit = (e: React.FormEvent): void => {
     e.preventDefault() // avoid 'form is not connected' warning
-    this.handleSubmit()
+    handleSubmit()
   }
 
-  handleSubmit: () => void = () => {
-    this.setState({ editing: false }, () =>
-      this.props.saveEdit(this.state.transientValue || '')
-    )
+  const updateValue = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    setTransientValue(e.currentTarget.value)
   }
-
-  updateValue: (e: React.ChangeEvent<HTMLInputElement>) => void = e => {
-    this.setState({ transientValue: e.currentTarget.value })
-  }
-
-  render(): React.ReactNode {
-    const { className, value } = this.props
-    if (this.state.editing) {
-      return (
-        <ClickOutside onClickOutside={this.handleSubmit}>
-          {({ ref }) => (
-            <form
-              className={className}
-              onKeyUp={this.handleKeyUp}
-              onSubmit={this.handleFormSubmit}
-              ref={ref}
-            >
-              <InputField
-                autoFocus
-                value={this.state.transientValue}
-                onChange={this.updateValue}
-                units={<Icon name="pencil" className={styles.edit_icon} />}
-              />
-            </form>
-          )}
-        </ClickOutside>
-      )
-    }
-
+  if (editing) {
     return (
-      <div onClick={this.enterEditMode} className={className}>
-        <div className={styles.static_value}>{value}</div>
-        <Icon name="pencil" className={styles.edit_icon_right} />
-      </div>
+      <ClickOutside onClickOutside={handleSubmit}>
+        {({ ref }) => (
+          <form
+            className={className}
+            onKeyUp={handleKeyUp}
+            onSubmit={handleFormSubmit}
+            ref={ref}
+          >
+            <InputField
+              autoFocus
+              value={transientValue}
+              onChange={updateValue}
+              units={<Icon name="pencil" className={styles.edit_icon} />}
+            />
+          </form>
+        )}
+      </ClickOutside>
     )
   }
+
+  return (
+    <div onClick={enterEditMode} className={className}>
+      <div className={styles.static_value}>{value}</div>
+      <Icon name="pencil" className={styles.edit_icon_right} />
+    </div>
+  )
 }

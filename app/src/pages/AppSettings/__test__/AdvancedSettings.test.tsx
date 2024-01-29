@@ -1,8 +1,7 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { resetAllWhenMocks } from 'jest-when'
-import { fireEvent } from '@testing-library/react'
-import '@testing-library/jest-dom'
+import { fireEvent, screen } from '@testing-library/react'
 import {
   renderWithProviders,
   useConditionalConfirm,
@@ -24,8 +23,12 @@ import {
 import * as CustomLabware from '../../../redux/custom-labware'
 import * as Config from '../../../redux/config'
 import * as ProtocolAnalysis from '../../../redux/protocol-analysis'
-import * as SystemInfo from '../../../redux/system-info'
-import * as Fixtures from '../../../redux/system-info/__fixtures__'
+import {
+  EnableDevTools,
+  OT2AdvancedSettings,
+  PreventRobotCaching,
+  U2EInformation,
+} from '../../../organisms/AdvancedSettings'
 
 import { AdvancedSettings } from '../AdvancedSettings'
 
@@ -37,6 +40,7 @@ jest.mock('../../../redux/protocol-analysis')
 jest.mock('../../../redux/system-info')
 jest.mock('@opentrons/components/src/hooks')
 jest.mock('../../../redux/analytics')
+jest.mock('../../../organisms/AdvancedSettings')
 
 const render = (): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(
@@ -69,14 +73,6 @@ const mockGetIsLabwareOffsetCodeSnippetsOn = Config.getIsLabwareOffsetCodeSnippe
   typeof Config.getIsLabwareOffsetCodeSnippetsOn
 >
 
-const mockGetU2EAdapterDevice = SystemInfo.getU2EAdapterDevice as jest.MockedFunction<
-  typeof SystemInfo.getU2EAdapterDevice
->
-
-const mockGetU2EWindowsDriverStatus = SystemInfo.getU2EWindowsDriverStatus as jest.MockedFunction<
-  typeof SystemInfo.getU2EWindowsDriverStatus
->
-
 const mockGetIsHeaterShakerAttached = Config.getIsHeaterShakerAttached as jest.MockedFunction<
   typeof Config.getIsHeaterShakerAttached
 >
@@ -91,6 +87,19 @@ const mockOpenPythonInterpreterDirectory = ProtocolAnalysis.openPythonInterprete
 
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
+>
+const mockPreventRobotCaching = PreventRobotCaching as jest.MockedFunction<
+  typeof PreventRobotCaching
+>
+
+const mockOT2AdvancedSettings = OT2AdvancedSettings as jest.MockedFunction<
+  typeof OT2AdvancedSettings
+>
+const mockEnableDevTools = EnableDevTools as jest.MockedFunction<
+  typeof EnableDevTools
+>
+const mockU2EInformation = U2EInformation as jest.MockedFunction<
+  typeof U2EInformation
 >
 
 let mockTrackEvent: jest.Mock
@@ -110,16 +119,19 @@ describe('AdvancedSettings', () => {
       { label: 'Beta', value: 'beta' },
       { label: 'Alpha', value: 'alpha' },
     ])
-    mockGetU2EAdapterDevice.mockReturnValue(Fixtures.mockWindowsRealtekDevice)
     mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
     mockGetReachableRobots.mockReturnValue([mockReachableRobot])
-    mockGetU2EWindowsDriverStatus.mockReturnValue(SystemInfo.OUTDATED)
     mockUseConditionalConfirm.mockReturnValue({
       confirm: mockConfirm,
       showConfirmation: true,
       cancel: mockCancel,
     })
+    mockPreventRobotCaching.mockReturnValue(<div>mock PreventRobotCaching</div>)
+    mockOT2AdvancedSettings.mockReturnValue(<div>mock OT2AdvancedSettings</div>)
+    mockEnableDevTools.mockReturnValue(<div>mock EnableDevTools</div>)
+    mockU2EInformation.mockReturnValue(<div>mock U2EInformation</div>)
   })
+
   afterEach(() => {
     jest.resetAllMocks()
     resetAllWhenMocks()
@@ -129,13 +141,9 @@ describe('AdvancedSettings', () => {
     const [{ getByText }] = render()
     getByText('Update Channel')
     getByText('Additional Custom Labware Source Folder')
-    getByText('Prevent Robot Caching')
     getByText('Clear Unavailable Robots')
-    getByText('Developer Tools')
-    getByText('OT-2 Advanced Settings')
-    getByText('Tip Length Calibration Method')
-    getByText('USB-to-Ethernet Adapter Information')
   })
+
   it('renders the update channel combobox and section', () => {
     const [{ getByText, getByRole }] = render()
     getByText(
@@ -143,6 +151,7 @@ describe('AdvancedSettings', () => {
     )
     getByRole('combobox', { name: '' })
   })
+
   it('renders the custom labware section with source folder selected', () => {
     getCustomLabwarePath.mockReturnValue('/mock/custom-labware-path')
     const [{ getByText, getByRole }] = render()
@@ -152,6 +161,7 @@ describe('AdvancedSettings', () => {
     getByText('Additional Source Folder')
     getByRole('button', { name: 'Change labware source folder' })
   })
+
   it('renders the custom labware section with no source folder selected', () => {
     const [{ getByText, getByRole }] = render()
     getByText('No additional source folder specified')
@@ -162,84 +172,19 @@ describe('AdvancedSettings', () => {
       properties: {},
     })
   })
-  it('renders the tip length cal section', () => {
-    const [{ getByRole }] = render()
-    getByRole('radio', { name: 'Always use calibration block to calibrate' })
-    getByRole('radio', { name: 'Always use trash bin to calibrate' })
-    getByRole('radio', {
-      name: 'Always show the prompt to choose calibration block or trash bin',
-    })
-  })
-  it('renders the robot caching section', () => {
-    const [{ queryByText, getByRole }] = render()
-    queryByText(
-      'The app will immediately clear unavailable robots and will not remember unavailable robots while this is enabled. On networks with many robots, preventing caching may improve network performance at the expense of slower and less reliable robot discovery on app launch.'
-    )
-    getByRole('switch', { name: 'display_unavailable_robots' })
+  it('should render mock OT-2 Advanced Settings Tip Length Calibration Method section', () => {
+    render()
+    screen.getByText('mock OT2AdvancedSettings')
   })
 
-  it('render the usb-to-ethernet adapter information', () => {
-    const [{ getByText }] = render()
-    getByText('USB-to-Ethernet Adapter Information')
-    getByText(
-      'Some OT-2s have an internal USB-to-Ethernet adapter. If your OT-2 uses this adapter, it will be added to your computer’s device list when you make a wired connection. If you have a Realtek adapter, it is essential that the driver is up to date.'
-    )
-    getByText('Description')
-    getByText('Manufacturer')
-    getByText('Driver Version')
+  it('should render mock robot caching section', () => {
+    render()
+    screen.getByText('mock PreventRobotCaching')
   })
 
-  it('renders the test data of the usb-to-ethernet adapter information with mac', () => {
-    mockGetU2EAdapterDevice.mockReturnValue({
-      ...Fixtures.mockRealtekDevice,
-    })
-    mockGetU2EWindowsDriverStatus.mockReturnValue(SystemInfo.NOT_APPLICABLE)
-    const [{ getByText, queryByText }] = render()
-    getByText('USB 10/100 LAN')
-    getByText('Realtek')
-    getByText('Unknown')
-    expect(
-      queryByText(
-        'An update is available for Realtek USB-to-Ethernet adapter driver'
-      )
-    ).not.toBeInTheDocument()
-    expect(queryByText('go to Realtek.com')).not.toBeInTheDocument()
-  })
-
-  it('renders the test data of the outdated usb-to-ethernet adapter information with windows', () => {
-    const [{ getByText }] = render()
-    getByText('Realtek USB FE Family Controller')
-    getByText('Realtek')
-    getByText('1.2.3')
-    getByText(
-      'An update is available for Realtek USB-to-Ethernet adapter driver'
-    )
-    const targetLink = 'https://www.realtek.com/en/'
-    const link = getByText('go to Realtek.com')
-    expect(link.closest('a')).toHaveAttribute('href', targetLink)
-  })
-
-  it('renders the test data of the updated usb-to-ethernet adapter information with windows', () => {
-    mockGetU2EWindowsDriverStatus.mockReturnValue(SystemInfo.UP_TO_DATE)
-    const [{ getByText, queryByText }] = render()
-    getByText('Realtek USB FE Family Controller')
-    getByText('Realtek')
-    getByText('1.2.3')
-    expect(
-      queryByText(
-        'An update is available for Realtek USB-to-Ethernet adapter driver'
-      )
-    ).not.toBeInTheDocument()
-    expect(queryByText('go to Realtek.com')).not.toBeInTheDocument()
-  })
-
-  it('renders the not connected message and not display item titles when USB-to-Ethernet is not connected', () => {
-    mockGetU2EAdapterDevice.mockReturnValue(null)
-    const [{ getByText, queryByText }] = render()
-    expect(queryByText('Description')).not.toBeInTheDocument()
-    expect(queryByText('Manufacturer')).not.toBeInTheDocument()
-    expect(queryByText('Driver Version')).not.toBeInTheDocument()
-    getByText('No USB-to-Ethernet adapter connected')
+  it('should render mock U2EInformation', () => {
+    render()
+    expect(screen.getByText('mock U2EInformation'))
   })
 
   it('renders the display show link to get labware offset data section', () => {
@@ -339,11 +284,9 @@ describe('AdvancedSettings', () => {
     fireEvent.click(proceedBtn)
     expect(mockConfirm).toHaveBeenCalled()
   })
-  it('renders the developer tools section', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText(
-      'Enabling this setting opens Developer Tools on app launch, enables additional logging and gives access to feature flags.'
-    )
-    getByRole('switch', { name: 'enable_dev_tools' })
+
+  it('should render mock developer tools section', () => {
+    render()
+    screen.getByText('mock EnableDevTools')
   })
 })

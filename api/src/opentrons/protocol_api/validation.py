@@ -21,7 +21,7 @@ from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.types import Mount, DeckSlotName, Location
+from opentrons.types import Mount, DeckSlotName, StagingSlotName, Location
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     MagneticModuleModel,
@@ -31,7 +31,9 @@ from opentrons.hardware_control.modules.types import (
     MagneticBlockModel,
     ThermocyclerStep,
 )
-from ._types import StagingSlotName
+
+from ._trash_bin import TrashBin
+from ._waste_chute import WasteChute
 
 if TYPE_CHECKING:
     from .labware import Well
@@ -82,7 +84,31 @@ class LabwareDefinitionIsNotLabwareError(ValueError):
     """An error raised when a labware is not loaded using `load_labware`."""
 
 
-def ensure_mount(mount: Union[str, Mount]) -> Mount:
+class InvalidTrashBinLocationError(ValueError):
+    """An error raised when attempting to load trash bins in invalid slots."""
+
+
+def ensure_mount_for_pipette(
+    mount: Union[str, Mount, None], pipette: PipetteNameType
+) -> Mount:
+    """Ensure that an input value represents a valid mount, and is valid for the given pipette."""
+    if pipette == PipetteNameType.P1000_96:
+        # Always validate the raw mount input, even if the pipette is a 96-channel and we're not going
+        # to use the mount value.
+        if mount is not None:
+            _ensure_mount(mount)
+        # Internal layers treat the 96-channel as being on the left mount.
+        return Mount.LEFT
+    else:
+        if mount is None:
+            raise InvalidPipetteMountError(
+                f"You must specify a left or right mount to load {pipette.value}."
+            )
+        else:
+            return _ensure_mount(mount)
+
+
+def _ensure_mount(mount: Union[str, Mount]) -> Mount:
     """Ensure that an input value represents a valid Mount."""
     if mount in [Mount.EXTENSION, "extension"]:
         # This would cause existing protocols that might be iterating over mount types
@@ -182,7 +208,7 @@ def ensure_and_convert_deck_slot(
 
 
 def internal_slot_to_public_string(
-    slot_name: DeckSlotName, robot_type: RobotType
+    slot_name: Union[DeckSlotName, StagingSlotName], robot_type: RobotType
 ) -> str:
     """Convert an internal `DeckSlotName` to a user-facing Python Protocol API string.
 
@@ -190,7 +216,11 @@ def internal_slot_to_public_string(
     Flexes. This probably won't change anything because the internal `DeckSlotName` should already
     match the robot's native format, but it's nice to have an explicit interface barrier.
     """
-    return slot_name.to_equivalent_for_robot_type(robot_type).id
+    if isinstance(slot_name, DeckSlotName):
+        return slot_name.to_equivalent_for_robot_type(robot_type).id
+    else:
+        # No need to convert staging slot names per robot type, since they only exist on Flex.
+        return slot_name.id
 
 
 def ensure_lowercase_name(name: str) -> str:
@@ -259,6 +289,48 @@ def ensure_module_model(load_name: str) -> ModuleModel:
         )
 
     return model
+
+
+def ensure_and_convert_trash_bin_location(
+    deck_slot: Union[int, str], api_version: APIVersion, robot_type: RobotType
+) -> str:
+    """Ensure trash bin load location is valid.
+
+    Also, convert the deck slot to a valid trash bin addressable area.
+    """
+
+    if robot_type == "OT-2 Standard":
+        raise InvalidTrashBinLocationError("Cannot load trash on OT-2.")
+
+    # map trash bin location to addressable area
+    trash_bin_slots = [
+        DeckSlotName(slot) for slot in ["A1", "B1", "C1", "D1", "A3", "B3", "C3", "D3"]
+    ]
+    trash_bin_addressable_areas = [
+        "movableTrashA1",
+        "movableTrashB1",
+        "movableTrashC1",
+        "movableTrashD1",
+        "movableTrashA3",
+        "movableTrashB3",
+        "movableTrashC3",
+        "movableTrashD3",
+    ]
+    map_trash_bin_addressable_area = {
+        slot: addressable_area
+        for slot, addressable_area in zip(trash_bin_slots, trash_bin_addressable_areas)
+    }
+
+    slot_name_ot3 = ensure_and_convert_deck_slot(deck_slot, api_version, robot_type)
+    if not isinstance(slot_name_ot3, DeckSlotName):
+        raise ValueError("Staging areas not permitted for trash bin.")
+    if slot_name_ot3 not in trash_bin_slots:
+        raise InvalidTrashBinLocationError(
+            f"Invalid location for trash bin: {slot_name_ot3}.\n"
+            f"Valid slots: Any slot in column 1 or 3."
+        )
+
+    return map_trash_bin_addressable_area[slot_name_ot3]
 
 
 def ensure_hold_time_seconds(
@@ -357,8 +429,9 @@ class LocationTypeError(TypeError):
 
 
 def validate_location(
-    location: Union[Location, Well, None], last_location: Optional[Location]
-) -> Union[WellTarget, PointTarget]:
+    location: Union[Location, Well, TrashBin, WasteChute, None],
+    last_location: Optional[Location],
+) -> Union[WellTarget, PointTarget, TrashBin, WasteChute]:
     """Validate a given location for a liquid handling command.
 
     Args:
@@ -380,10 +453,13 @@ def validate_location(
     if target_location is None:
         raise NoLocationError()
 
-    if not isinstance(target_location, (Location, Well)):
+    if not isinstance(target_location, (Location, Well, TrashBin, WasteChute)):
         raise LocationTypeError(
-            f"location should be a Well or Location, but it is {location}"
+            f"location should be a Well, Location, TrashBin or WasteChute, but it is {location}"
         )
+
+    if isinstance(target_location, (TrashBin, WasteChute)):
+        return target_location
 
     in_place = target_location == last_location
 

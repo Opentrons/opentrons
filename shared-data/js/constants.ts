@@ -101,6 +101,12 @@ export const MODULE_MODELS = [
   ...MAGNETIC_BLOCK_MODELS,
 ]
 
+export const MODULE_MODELS_OT2_ONLY = [
+  ...MAGNETIC_MODULE_MODELS,
+  TEMPERATURE_MODULE_V1,
+  THERMOCYCLER_MODULE_V1,
+]
+
 export const MODULE_TYPES = [
   TEMPERATURE_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -184,6 +190,17 @@ export const TC_MODULE_LOCATION_OT3: 'A1+B1' = 'A1+B1'
 
 export const WEIGHT_OF_96_CHANNEL: '~10kg' = '~10kg'
 
+export const MOVABLE_TRASH_CUTOUTS: CutoutId[] = [
+  'cutoutA1',
+  'cutoutB1',
+  'cutoutC1',
+  'cutoutD1',
+  'cutoutA3',
+  'cutoutB3',
+  'cutoutC3',
+  'cutoutD3',
+]
+
 export const SINGLE_LEFT_CUTOUTS: CutoutId[] = [
   'cutoutA1',
   'cutoutB1',
@@ -248,12 +265,40 @@ export const MOVABLE_TRASH_D1_ADDRESSABLE_AREA: 'movableTrashD1' =
 export const MOVABLE_TRASH_D3_ADDRESSABLE_AREA: 'movableTrashD3' =
   'movableTrashD3'
 
-export const ONE_AND_EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA: '1and8ChannelWasteChute' =
-  '1and8ChannelWasteChute'
+export const ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA: '1ChannelWasteChute' =
+  '1ChannelWasteChute'
+export const EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA: '8ChannelWasteChute' =
+  '8ChannelWasteChute'
 export const NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA: '96ChannelWasteChute' =
   '96ChannelWasteChute'
 export const GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA: 'gripperWasteChute' =
   'gripperWasteChute'
+
+export const ADDRESSABLE_AREA_1: '1' = '1'
+export const ADDRESSABLE_AREA_2: '2' = '2'
+export const ADDRESSABLE_AREA_3: '3' = '3'
+export const ADDRESSABLE_AREA_4: '4' = '4'
+export const ADDRESSABLE_AREA_5: '5' = '5'
+export const ADDRESSABLE_AREA_6: '6' = '6'
+export const ADDRESSABLE_AREA_7: '7' = '7'
+export const ADDRESSABLE_AREA_8: '8' = '8'
+export const ADDRESSABLE_AREA_9: '9' = '9'
+export const ADDRESSABLE_AREA_10: '10' = '10'
+export const ADDRESSABLE_AREA_11: '11' = '11'
+
+export const OT2_SINGLE_SLOT_ADDRESSABLE_AREAS: AddressableAreaName[] = [
+  ADDRESSABLE_AREA_1,
+  ADDRESSABLE_AREA_2,
+  ADDRESSABLE_AREA_3,
+  ADDRESSABLE_AREA_4,
+  ADDRESSABLE_AREA_5,
+  ADDRESSABLE_AREA_6,
+  ADDRESSABLE_AREA_7,
+  ADDRESSABLE_AREA_8,
+  ADDRESSABLE_AREA_9,
+  ADDRESSABLE_AREA_10,
+  ADDRESSABLE_AREA_11,
+]
 
 export const FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   A1_ADDRESSABLE_AREA,
@@ -289,7 +334,8 @@ export const MOVABLE_TRASH_ADDRESSABLE_AREAS: AddressableAreaName[] = [
 ]
 
 export const WASTE_CHUTE_ADDRESSABLE_AREAS: AddressableAreaName[] = [
-  ONE_AND_EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
 ]
@@ -336,3 +382,24 @@ export const WASTE_CHUTE_STAGING_AREA_FIXTURES: CutoutFixtureId[] = [
 ]
 
 export const LOW_VOLUME_PIPETTES = ['p50_single_flex', 'p50_multi_flex']
+
+// default hex values for liquid colors
+const electricPurple = '#b925ff'
+const goldenYellow = '#ffd600'
+const aquamarine = '#9dffd8'
+const orangePeel = '#ff9900'
+const skyBlue = '#50d5ff'
+const popPink = '#ff80f5'
+const springGreen = '#7eff42'
+const tartRed = '#ff4f4f'
+export const DEFAULT_LIQUID_COLORS = [
+  electricPurple,
+  goldenYellow,
+  aquamarine,
+  orangePeel,
+  skyBlue,
+  popPink,
+  springGreen,
+  tartRed,
+]
+export const DEPRECATED_WHALE_GREY = '#9395a0'

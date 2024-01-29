@@ -26,6 +26,14 @@ Database schema versions:
     - Column("commands", sqlalchemy.PickleType, nullable=True)
     - Column("engine_status", sqlalchemy.String, nullable=True)
     - Column("_updated_at", sqlalchemy.DateTime, nullable=True)
+
+- Version 2:
+    This migration adds the following nullable column to the analysis table:
+
+    - Column("completed_analysis_as_document", sqlalchemy.String, nullable=True)
+
+    It then populates the column with data converted from elsewhere in the table,
+    so entries should never be NULL in practice even though nullable=True.
 """
 import logging
 from datetime import datetime, timezone

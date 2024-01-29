@@ -8,6 +8,7 @@ export interface LabwareNameOverlayProps {
   className?: string
 }
 
+/** @deprecated use LabwareDisplayName or custom RobotCoordsForeignDiv */
 export function LabwareNameOverlay(
   props: LabwareNameOverlayProps
 ): JSX.Element {

@@ -104,18 +104,14 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     createRunFromProtocolSource({ files: srcFileObjects, protocolKey })
   }
 
-  const isSelectedRobotOnWrongVersionOfSoftware = [
+  const { autoUpdateAction } = useSelector((state: State) =>
+    getRobotUpdateDisplayInfo(state, selectedRobot?.name ?? '')
+  )
+
+  const isSelectedRobotOnDifferentSoftwareVersion = [
     'upgrade',
     'downgrade',
-  ].includes(
-    useSelector((state: State) => {
-      const value =
-        selectedRobot != null
-          ? getRobotUpdateDisplayInfo(state, selectedRobot.name)
-          : { autoUpdateAction: '' }
-      return value
-    })?.autoUpdateAction
-  )
+  ].includes(autoUpdateAction)
 
   if (
     protocolKey == null ||
@@ -135,9 +131,18 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     first(srcFileNames) ??
     protocolKey
 
+  // intentionally show both robot types if analysis has any error
+  const robotType =
+    mostRecentAnalysis != null && mostRecentAnalysis.errors.length === 0
+      ? mostRecentAnalysis?.robotType ?? null
+      : null
+
   return (
     <ChooseRobotSlideout
       isExpanded={showSlideout}
+      isSelectedRobotOnDifferentSoftwareVersion={
+        isSelectedRobotOnDifferentSoftwareVersion
+      }
       onCloseClick={onCloseClick}
       title={t('choose_robot_to_run', {
         protocol_name: protocolDisplayName,
@@ -158,7 +163,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
             disabled={
               isCreatingRun ||
               selectedRobot == null ||
-              isSelectedRobotOnWrongVersionOfSoftware
+              isSelectedRobotOnDifferentSoftwareVersion
             }
           >
             {isCreatingRun ? (
@@ -171,10 +176,12 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       }
       selectedRobot={selectedRobot}
       setSelectedRobot={setSelectedRobot}
+      robotType={robotType}
       isCreatingRun={isCreatingRun}
       reset={resetCreateRun}
       runCreationError={runCreationError}
       runCreationErrorCode={runCreationErrorCode}
+      showIdleOnly={true}
     />
   )
 }

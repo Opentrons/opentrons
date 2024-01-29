@@ -1,41 +1,46 @@
-import { i18n } from '../../../localization'
 import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import { AlertModal, OutlineButton } from '@opentrons/components'
 import modalStyles from '../modal.module.css'
-import { getModalContents } from './modalContents'
-import { FileUploadMessage } from '../../../load-file'
+import {
+  selectors as loadFileSelectors,
+  actions as loadFileActions,
+} from '../../../load-file'
+import { useModalContents } from './modalContents'
 
-export interface FileUploadMessageModalProps {
-  message?: FileUploadMessage | null
-  cancelProtocolMigration: (event: React.MouseEvent) => unknown
-  dismissModal: (event: React.MouseEvent) => unknown
-}
+export function FileUploadMessageModal(): JSX.Element | null {
+  const message = useSelector(loadFileSelectors.getFileUploadMessages)
+  const dispatch = useDispatch()
+  const { t } = useTranslation(['modal', 'button'])
 
-export function FileUploadMessageModal(
-  props: FileUploadMessageModalProps
-): JSX.Element | null {
-  const { message, cancelProtocolMigration, dismissModal } = props
+  const dismissModal = (): void => {
+    dispatch(loadFileActions.dismissFileUploadMessage())
+  }
+  const modalContents = useModalContents({
+    uploadResponse: message,
+  })
 
-  if (!message) return null
+  if (modalContents == null) return null
 
-  const { title, body, okButtonText } = getModalContents(message)
+  const { title, body, okButtonText } = modalContents
   let buttons = [
     {
-      children: i18n.t('button.cancel'),
-      onClick: cancelProtocolMigration,
+      children: t('button:cancel'),
+      onClick: () => dispatch(loadFileActions.undoLoadFile()),
       className: modalStyles.bottom_button,
     },
     {
-      children: okButtonText || 'ok',
+      children: okButtonText || t('button:ok'),
       onClick: dismissModal,
       className: modalStyles.button_medium,
     },
   ]
-  if (title === 'Incorrect file type' || title === 'Invalid JSON file') {
+  if (title === t('incorrect_file.header') || title === t('invalid.header')) {
     buttons = [
       {
-        children: okButtonText || 'ok',
+        children: okButtonText || t('button:ok'),
         onClick: dismissModal,
         className: modalStyles.button_medium,
       },

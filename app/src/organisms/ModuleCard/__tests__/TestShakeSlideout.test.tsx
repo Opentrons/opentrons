@@ -224,6 +224,8 @@ describe('TestShakeSlideout', () => {
           },
         },
       })
+    })
+    await waitFor(() => {
       expect(mockCreateLiveCommand).toHaveBeenCalledWith({
         command: {
           commandType: 'heaterShaker/setAndWaitForShakeSpeed',

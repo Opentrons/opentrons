@@ -61,6 +61,7 @@ interface PipetteCardProps {
   pipetteIsBad: boolean
   updatePipette: () => void
   isRunActive: boolean
+  isEstopNotDisengaged: boolean
 }
 const BANNER_LINK_STYLE = css`
   text-decoration: underline;
@@ -78,7 +79,7 @@ const INSTRUMENT_CARD_STYLE = css`
   }
 `
 
-const SUBSYSTEM_UPDATE_POLL_MS = 5000
+const POLL_DURATION_MS = 5000
 
 export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const { t, i18n } = useTranslation(['device_details', 'protocol_setup'])
@@ -92,6 +93,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     pipetteIsBad,
     updatePipette,
     isRunActive,
+    isEstopNotDisengaged,
   } = props
   const {
     menuOverlay,
@@ -116,16 +118,36 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const [showAttachPipette, setShowAttachPipette] = React.useState(false)
   const [showAboutSlideout, setShowAboutSlideout] = React.useState(false)
   const subsystem = mount === LEFT ? 'pipette_left' : 'pipette_right'
+  const [pollForSubsystemUpdate, setPollForSubsystemUpdate] = React.useState(
+    false
+  )
   const { data: subsystemUpdateData } = useCurrentSubsystemUpdateQuery(
     subsystem,
     {
-      enabled: isFlex && pipetteIsBad,
-      refetchInterval: SUBSYSTEM_UPDATE_POLL_MS,
+      enabled: pollForSubsystemUpdate,
+      refetchInterval: POLL_DURATION_MS,
     }
   )
+  // we should poll for a subsystem update from the time a bad instrument is
+  // detected until the update has been done for 5 seconds
+  // this gives the instruments endpoint time to start reporting
+  // a good instrument
+  React.useEffect(() => {
+    if (pipetteIsBad && isFlex) {
+      setPollForSubsystemUpdate(true)
+    } else if (
+      subsystemUpdateData != null &&
+      subsystemUpdateData.data.updateStatus === 'done'
+    ) {
+      setTimeout(() => {
+        setPollForSubsystemUpdate(false)
+      }, POLL_DURATION_MS)
+    }
+  }, [pipetteIsBad, subsystemUpdateData, isFlex])
+
   const settings =
     usePipetteSettingsQuery({
-      refetchInterval: 5000,
+      refetchInterval: POLL_DURATION_MS,
       enabled: pipetteId != null,
     })?.data?.[pipetteId ?? '']?.fields ?? null
 
@@ -162,7 +184,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   }
   return (
     <Flex
-      backgroundColor={COLORS.fundamentalsBackground}
+      backgroundColor={COLORS.grey10}
       borderRadius={BORDERS.radiusSoftCorners}
       width="100%"
       data-testid={`PipetteCard_${String(pipetteDisplayName)}`}
@@ -248,28 +270,34 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               >
                 {isFlexPipetteAttached && !isPipetteCalibrated ? (
                   <Banner type="error" marginBottom={SPACING.spacing4}>
-                    <Trans
-                      t={t}
-                      i18nKey="calibration_needed"
-                      components={{
-                        calLink: (
-                          <StyledText
-                            as="p"
-                            css={css`
-                              text-decoration: underline;
-                              cursor: pointer;
-                              margin-left: 0.5rem;
-                            `}
-                            onClick={handleCalibrate}
-                          />
-                        ),
-                      }}
-                    />
+                    {isEstopNotDisengaged ? (
+                      <StyledText as="p">
+                        {t('calibration_needed_without_link')}
+                      </StyledText>
+                    ) : (
+                      <Trans
+                        t={t}
+                        i18nKey="calibration_needed"
+                        components={{
+                          calLink: (
+                            <StyledText
+                              as="p"
+                              css={css`
+                                text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
+                                cursor: pointer;
+                                margin-left: ${SPACING.spacing8};
+                              `}
+                              onClick={handleCalibrate}
+                            />
+                          ),
+                        }}
+                      />
+                    )}
                   </Banner>
                 ) : null}
                 <StyledText
                   textTransform={TYPOGRAPHY.textTransformUppercase}
-                  color={COLORS.darkGreyEnabled}
+                  color={COLORS.grey50}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   fontSize={TYPOGRAPHY.fontSizeH6}
                   paddingBottom={SPACING.spacing4}
@@ -303,11 +331,16 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               pipetteDisplayName
             )}`}
           >
-            <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
+            <OverflowBtn
+              aria-label="overflow"
+              onClick={handleOverflowClick}
+              disabled={isEstopNotDisengaged}
+            />
           </Box>
         </>
       )}
-      {(pipetteIsBad || subsystemUpdateData != null) && (
+      {(pipetteIsBad ||
+        (subsystemUpdateData != null && pollForSubsystemUpdate)) && (
         <InstrumentCard
           label={i18n.format(t('mount', { side: mount }), 'capitalize')}
           css={INSTRUMENT_CARD_STYLE}
@@ -336,6 +369,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               />
             </Banner>
           }
+          isEstopNotDisengaged={isEstopNotDisengaged}
         />
       )}
       {showOverflowMenu && (

@@ -1,5 +1,5 @@
 import React from 'react'
-import '@testing-library/jest-dom'
+import { screen } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import { renderWithProviders } from '@opentrons/components'
@@ -43,15 +43,15 @@ describe('ModuleInfo', () => {
   })
 
   it('should show module not connected', () => {
-    const { getByText } = render(props)
-    getByText('Not connected')
+    render(props)
+    screen.getByText('Not connected')
   })
 
   it('should show module connected and no USB number', () => {
     props = { ...props, isAttached: true }
-    const { getByText } = render(props)
-    getByText('Connected')
-    getByText('USB Port Connected')
+    render(props)
+    screen.getByText('Connected')
+    screen.getByText('USB Port Connected')
   })
 
   it('should show module connected and USB number', () => {
@@ -60,9 +60,9 @@ describe('ModuleInfo', () => {
       physicalPort: { port: 1, hub: false, portGroup: 'unknown', path: '' },
       isAttached: true,
     }
-    const { getByText } = render(props)
-    getByText('Connected')
-    getByText('USB Port 1')
+    render(props)
+    screen.getByText('Connected')
+    screen.getByText('USB Port 1')
   })
 
   it('should not show module connected when run has started', () => {
@@ -73,9 +73,9 @@ describe('ModuleInfo', () => {
       runId: MOCK_RUN_ID,
     }
     when(mockUseRunHasStarted).calledWith(MOCK_RUN_ID).mockReturnValue(true)
-    const { getByText, queryByText } = render(props)
-    expect(queryByText('Connected')).toBeNull()
-    getByText('Connection info not available once run has started')
+    render(props)
+    expect(screen.queryByText('Connected')).toBeNull()
+    screen.getByText('Connection info not available once run has started')
   })
 
   it('should show the correct information when the magnetic block is in the protocol', () => {
@@ -83,8 +83,8 @@ describe('ModuleInfo', () => {
       ...props,
       moduleModel: 'magneticBlockV1',
     }
-    const { getByText, queryByText } = render(props)
-    getByText('No USB required')
-    expect(queryByText('Connected')).toBeNull()
+    render(props)
+    screen.getByText('No USB required')
+    expect(screen.queryByText('Connected')).toBeNull()
   })
 })

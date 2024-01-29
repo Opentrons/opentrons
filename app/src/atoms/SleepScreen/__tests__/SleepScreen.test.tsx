@@ -14,6 +14,6 @@ describe('SleepScreen', () => {
     const touchScreen = getByTestId('Touchscreen_SleepScreen')
     expect(touchScreen).toHaveStyle('width: 100vw')
     expect(touchScreen).toHaveStyle('height: 100vh')
-    expect(touchScreen).toHaveStyle(`background-color: ${COLORS.black}`)
+    expect(touchScreen).toHaveStyle(`background-color: ${COLORS.black90}`)
   })
 })

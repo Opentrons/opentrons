@@ -1,11 +1,11 @@
-import cx from 'classnames'
 import * as React from 'react'
+import cx from 'classnames'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { FormGroup } from '@opentrons/components'
 import { MAGNETIC_MODULE_V1 } from '@opentrons/shared-data'
 import { selectors as uiModuleSelectors } from '../../../ui/modules'
 import { selectors as stepFormSelectors } from '../../../step-forms'
-import { i18n } from '../../../localization'
 import { maskField } from '../../../steplist/fieldLevel'
 import { TextField, RadioGroupField } from '../fields'
 import styles from '../StepEditForm.module.css'
@@ -16,6 +16,7 @@ export const MagnetForm = (props: StepFormProps): JSX.Element => {
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getMagneticLabwareOptions
   )
+  const { t } = useTranslation(['application', 'form'])
 
   const moduleEntities = useSelector(stepFormSelectors.getModuleEntities)
   const { magnetAction, moduleId } = props.formData
@@ -39,28 +40,26 @@ export const MagnetForm = (props: StepFormProps): JSX.Element => {
     <div className={styles.form_wrapper}>
       <div className={styles.section_header}>
         <span className={styles.section_header_text}>
-          {i18n.t('application.stepType.magnet')}
+          {t('stepType.magnet')}
         </span>
       </div>
 
       <div className={styles.magnet_section_wrapper}>
         <FormGroup
-          label={i18n.t('form.step_edit_form.field.moduleActionLabware.label')}
+          label={t('form:step_edit_form.field.moduleActionLabware.label')}
           className={styles.magnet_form_group}
         >
           <p className={styles.module_labware_text}>{moduleOption}</p>
         </FormGroup>
         <FormGroup
-          label={i18n.t('form.step_edit_form.field.magnetAction.label')}
+          label={t('form:step_edit_form.field.magnetAction.label')}
           className={styles.magnet_form_group}
         >
           <RadioGroupField
             {...propsForFields.magnetAction}
             options={[
               {
-                name: i18n.t(
-                  'form.step_edit_form.field.magnetAction.options.engage'
-                ),
+                name: t('step_edit_form.field.magnetAction.options.engage'),
                 value: 'engage',
               },
             ]}
@@ -69,9 +68,7 @@ export const MagnetForm = (props: StepFormProps): JSX.Element => {
             {...propsForFields.magnetAction}
             options={[
               {
-                name: i18n.t(
-                  'form.step_edit_form.field.magnetAction.options.disengage'
-                ),
+                name: t('step_edit_form.field.magnetAction.options.disengage'),
                 value: 'disengage',
               },
             ]}
@@ -79,7 +76,7 @@ export const MagnetForm = (props: StepFormProps): JSX.Element => {
         </FormGroup>
         {magnetAction === 'engage' && (
           <FormGroup
-            label={i18n.t('form.step_edit_form.field.engageHeight.label')}
+            label={t('step_edit_form.field.engageHeight.label')}
             className={styles.magnet_form_group}
           >
             <TextField

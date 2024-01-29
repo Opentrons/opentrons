@@ -1,7 +1,7 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import { OutlineButton, DeprecatedPrimaryButton } from '@opentrons/components'
-import { i18n } from '../../../localization'
 
 import modalStyles from '../../modals/modal.module.css'
 import styles from './styles.module.css'
@@ -22,18 +22,18 @@ export const ButtonRow = (props: ButtonRowProps): JSX.Element => {
     handleSave,
     canSave,
   } = props
-
+  const { t } = useTranslation('button')
   return (
     <div className={cx(modalStyles.button_row_divided, styles.form_wrapper)}>
       <div>
         <OutlineButton className={styles.form_button} onClick={handleDelete}>
-          {i18n.t('button.delete')}
+          {t('delete')}
         </OutlineButton>
         <OutlineButton
           className={styles.form_button}
           onClick={handleClickMoreOptions}
         >
-          {i18n.t('button.notes')}
+          {t('notes')}
         </OutlineButton>
       </div>
       <div>
@@ -41,14 +41,14 @@ export const ButtonRow = (props: ButtonRowProps): JSX.Element => {
           className={styles.form_button}
           onClick={handleClose}
         >
-          {i18n.t('button.close')}
+          {t('close')}
         </DeprecatedPrimaryButton>
         <DeprecatedPrimaryButton
           className={styles.form_button}
           disabled={!canSave}
           onClick={handleSave}
         >
-          {i18n.t('button.save')}
+          {t('save')}
         </DeprecatedPrimaryButton>
       </div>
     </div>

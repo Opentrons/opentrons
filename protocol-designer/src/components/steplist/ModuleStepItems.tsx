@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import {
   Tooltip,
@@ -6,7 +7,6 @@ import {
   TOOLTIP_FIXED,
   UseHoverTooltipTargetProps,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
 import { PDListItem } from '../lists'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
 import styles from './StepItem.module.css'
@@ -42,6 +42,7 @@ interface Props {
 }
 
 export const ModuleStepItems = (props: Props): JSX.Element => {
+  const { t } = useTranslation('modules')
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'bottom-start',
     strategy: TOOLTIP_FIXED,
@@ -50,7 +51,7 @@ export const ModuleStepItems = (props: Props): JSX.Element => {
     <>
       {!props.hideHeader && (
         <li className={styles.substep_header}>
-          <span>{i18n.t(`modules.module_long_names.${props.moduleType}`)}</span>
+          <span>{t(`module_long_names.${props.moduleType}`)}</span>
           <span>{props.action}</span>
         </li>
       )}

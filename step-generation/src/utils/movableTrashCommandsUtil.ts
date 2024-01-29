@@ -9,6 +9,7 @@ import {
   dispenseInPlace,
   dropTipInPlace,
   moveToAddressableArea,
+  moveToAddressableAreaForDropTip,
 } from '../commandCreators/atomic'
 import { curryCommandCreator } from './curryCommandCreator'
 import type { AddressableAreaName, CutoutId } from '@opentrons/shared-data'
@@ -68,93 +69,96 @@ export const movableTrashCommandsUtil = (
       )?.providesAddressableAreas ?? null
   }
 
-  const addressableAreaName = (trashLocation != null && cutouts != null
-    ? cutouts[trashLocation] ?? ['']
-    : [''])[0]
+  let inPlaceCommands: CurriedCommandCreator[] = []
 
-  if (addressableAreaName === '') {
+  const addressableAreaName =
+    trashLocation != null && cutouts != null
+      ? cutouts[trashLocation]?.[0] ?? null
+      : null
+
+  if (addressableAreaName == null) {
     console.error(
       `expected to find addressableAreaName with trashLocation ${trashLocation} but could not`
     )
+  } else {
+    switch (type) {
+      case 'airGap': {
+        inPlaceCommands =
+          flowRate != null && volume != null
+            ? [
+                curryCommandCreator(moveToAddressableArea, {
+                  pipetteId,
+                  addressableAreaName,
+                }),
+                curryCommandCreator(aspirateInPlace, {
+                  pipetteId,
+                  volume,
+                  flowRate,
+                }),
+              ]
+            : []
+
+        break
+      }
+      case 'dropTip': {
+        inPlaceCommands =
+          prevRobotState != null && !prevRobotState.tipState.pipettes[pipetteId]
+            ? []
+            : [
+                curryCommandCreator(moveToAddressableAreaForDropTip, {
+                  pipetteId,
+                  addressableAreaName,
+                }),
+                curryCommandCreator(dropTipInPlace, {
+                  pipetteId,
+                }),
+              ]
+
+        break
+      }
+      case 'dispense': {
+        inPlaceCommands =
+          flowRate != null && volume != null
+            ? [
+                curryCommandCreator(moveToAddressableArea, {
+                  pipetteId,
+                  addressableAreaName,
+                }),
+                curryCommandCreator(dispenseInPlace, {
+                  pipetteId,
+                  volume,
+                  flowRate,
+                }),
+              ]
+            : []
+        break
+      }
+      case 'blowOut': {
+        inPlaceCommands =
+          flowRate != null
+            ? [
+                curryCommandCreator(moveToAddressableArea, {
+                  pipetteId,
+                  addressableAreaName,
+                }),
+                curryCommandCreator(blowOutInPlace, {
+                  pipetteId,
+                  flowRate,
+                }),
+              ]
+            : []
+        break
+      }
+      case 'moveToWell': {
+        inPlaceCommands = [
+          curryCommandCreator(moveToAddressableArea, {
+            pipetteId,
+            addressableAreaName,
+          }),
+        ]
+      }
+    }
   }
 
-  let inPlaceCommands: CurriedCommandCreator[] = []
-  switch (type) {
-    case 'airGap': {
-      inPlaceCommands =
-        flowRate != null && volume != null
-          ? [
-              curryCommandCreator(moveToAddressableArea, {
-                pipetteId,
-                addressableAreaName,
-              }),
-              curryCommandCreator(aspirateInPlace, {
-                pipetteId,
-                volume,
-                flowRate,
-              }),
-            ]
-          : []
-
-      break
-    }
-    case 'dropTip': {
-      inPlaceCommands =
-        prevRobotState != null && !prevRobotState.tipState.pipettes[pipetteId]
-          ? []
-          : [
-              curryCommandCreator(moveToAddressableArea, {
-                pipetteId,
-                addressableAreaName,
-              }),
-              curryCommandCreator(dropTipInPlace, {
-                pipetteId,
-              }),
-            ]
-
-      break
-    }
-    case 'dispense': {
-      inPlaceCommands =
-        flowRate != null && volume != null
-          ? [
-              curryCommandCreator(moveToAddressableArea, {
-                pipetteId,
-                addressableAreaName,
-              }),
-              curryCommandCreator(dispenseInPlace, {
-                pipetteId,
-                volume,
-                flowRate,
-              }),
-            ]
-          : []
-      break
-    }
-    case 'blowOut': {
-      inPlaceCommands =
-        flowRate != null
-          ? [
-              curryCommandCreator(moveToAddressableArea, {
-                pipetteId,
-                addressableAreaName,
-              }),
-              curryCommandCreator(blowOutInPlace, {
-                pipetteId,
-                flowRate,
-              }),
-            ]
-          : []
-      break
-    }
-    case 'moveToWell': {
-      inPlaceCommands = [
-        curryCommandCreator(moveToAddressableArea, {
-          pipetteId,
-          addressableAreaName,
-        }),
-      ]
-    }
-  }
   return inPlaceCommands
 }

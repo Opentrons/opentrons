@@ -1,7 +1,7 @@
 import * as React from 'react'
 import cx from 'classnames'
+import { useTranslation } from 'react-i18next'
 
-import { i18n } from '../../../../localization'
 import { FormGroup } from '@opentrons/components'
 import { ToggleRowField, TextField } from '../../fields'
 import styles from '../../StepEditForm.module.css'
@@ -17,7 +17,7 @@ interface Props {
 
 export const StateFields = (props: Props): JSX.Element => {
   const { isEndingHold, propsForFields, formData } = props
-
+  const { t } = useTranslation(['form', 'application'])
   // Append 'Hold' to field names if component is used for an ending hold in a TC profile
   const blockActiveName = isEndingHold ? 'blockIsActiveHold' : 'blockIsActive'
   const blockTempName = isEndingHold ? 'blockTargetTempHold' : 'blockTargetTemp'
@@ -28,20 +28,16 @@ export const StateFields = (props: Props): JSX.Element => {
   return (
     <div className={styles.form_row}>
       <FormGroup
-        label={i18n.t(
-          'form.step_edit_form.field.thermocyclerState.block.label'
-        )}
+        label={t('step_edit_form.field.thermocyclerState.block.label')}
         className={styles.toggle_form_group}
       >
         <div className={styles.toggle_row}>
           <ToggleRowField
             {...propsForFields[blockActiveName]}
-            offLabel={i18n.t(
-              'form.step_edit_form.field.thermocyclerState.block.toggleOff'
+            offLabel={t(
+              'step_edit_form.field.thermocyclerState.block.toggleOff'
             )}
-            onLabel={i18n.t(
-              'form.step_edit_form.field.thermocyclerState.block.toggleOn'
-            )}
+            onLabel={t('step_edit_form.field.thermocyclerState.block.toggleOn')}
           />
           {formData[blockActiveName] === true && (
             <TextField
@@ -50,25 +46,21 @@ export const StateFields = (props: Props): JSX.Element => {
                 styles.small_field,
                 styles.toggle_temperature_field
               )}
-              units={i18n.t('application.units.degrees')}
+              units={t('application:units.degrees')}
             />
           )}
         </div>
       </FormGroup>
 
       <FormGroup
-        label={i18n.t('form.step_edit_form.field.thermocyclerState.lid.label')}
+        label={t('step_edit_form.field.thermocyclerState.lid.label')}
         className={styles.toggle_form_group}
       >
         <div className={styles.toggle_row}>
           <ToggleRowField
             {...propsForFields[lidActiveName]}
-            offLabel={i18n.t(
-              'form.step_edit_form.field.thermocyclerState.lid.toggleOff'
-            )}
-            onLabel={i18n.t(
-              'form.step_edit_form.field.thermocyclerState.lid.toggleOn'
-            )}
+            offLabel={t('step_edit_form.field.thermocyclerState.lid.toggleOff')}
+            onLabel={t('step_edit_form.field.thermocyclerState.lid.toggleOn')}
           />
           {formData[lidActiveName] === true && (
             <TextField
@@ -77,25 +69,23 @@ export const StateFields = (props: Props): JSX.Element => {
                 styles.small_field,
                 styles.toggle_temperature_field
               )}
-              units={i18n.t('application.units.degrees')}
+              units={t('application:units.degrees')}
             />
           )}
         </div>
       </FormGroup>
 
       <FormGroup
-        label={i18n.t(
-          'form.step_edit_form.field.thermocyclerState.lidPosition.label'
-        )}
+        label={t('step_edit_form.field.thermocyclerState.lidPosition.label')}
         className={styles.toggle_form_group}
       >
         <ToggleRowField
           {...propsForFields[lidOpenName]}
-          offLabel={i18n.t(
-            'form.step_edit_form.field.thermocyclerState.lidPosition.toggleOff'
+          offLabel={t(
+            'step_edit_form.field.thermocyclerState.lidPosition.toggleOff'
           )}
-          onLabel={i18n.t(
-            'form.step_edit_form.field.thermocyclerState.lidPosition.toggleOn'
+          onLabel={t(
+            'step_edit_form.field.thermocyclerState.lidPosition.toggleOn'
           )}
         />
       </FormGroup>

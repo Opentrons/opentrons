@@ -559,6 +559,7 @@ async def test_get_protocol_analyses(
     """It should get all analyses of a protocol."""
     analysis = CompletedAnalysis(
         id="analysis-id",
+        status=AnalysisStatus.COMPLETED,
         result=AnalysisResult.OK,
         labware=[],
         pipettes=[],

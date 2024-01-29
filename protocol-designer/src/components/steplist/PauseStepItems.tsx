@@ -1,6 +1,6 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { PauseArgs } from '@opentrons/step-generation'
-import { i18n } from '../../localization'
 import styles from './StepItem.module.css'
 interface Props {
   pauseArgs: PauseArgs
@@ -8,6 +8,7 @@ interface Props {
 
 export function PauseStepItems(props: Props): JSX.Element | null {
   const { pauseArgs } = props
+  const { t } = useTranslation('application')
   if (!pauseArgs.meta) {
     // No message or time, show nothing
     return null
@@ -23,13 +24,13 @@ export function PauseStepItems(props: Props): JSX.Element | null {
           </li>
           <li className={styles.substep_content}>
             <span className={styles.substep_time}>
-              {hours} {i18n.t('application.units.hours')}
+              {hours} {t('units.hours')}
             </span>
             <span className={styles.substep_time}>
-              {minutes} {i18n.t('application.units.minutes')}
+              {minutes} {t('units.minutes')}
             </span>
             <span className={styles.substep_time}>
-              {seconds} {i18n.t('application.units.seconds')}
+              {seconds} {t('units.seconds')}
             </span>
           </li>
         </>

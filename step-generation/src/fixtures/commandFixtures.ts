@@ -1,8 +1,10 @@
 import { tiprackWellNamesFlat } from './data'
-import type {
+import {
+  AddressableAreaName,
   AspDispAirgapParams,
   BlowoutParams,
   CreateCommand,
+  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   TouchTipParams,
 } from '@opentrons/shared-data'
 import type { CommandsAndWarnings, CommandCreatorErrorResponse } from '../types'
@@ -298,6 +300,27 @@ export const delayWithOffset = (
 // =================
 export const dropTipHelper = (pipette?: string): CreateCommand[] => [
   {
+    commandType: 'moveToAddressableAreaForDropTip',
+    key: expect.any(String),
+    params: {
+      pipetteId: pipette ?? DEFAULT_PIPETTE,
+      addressableAreaName: 'movableTrashA3',
+      offset: { x: 0, y: 0, z: 0 },
+      alternateDropLocation: true,
+    },
+  },
+  {
+    commandType: 'dropTipInPlace',
+    key: expect.any(String),
+    params: {
+      pipetteId: pipette ?? DEFAULT_PIPETTE,
+    },
+  },
+]
+export const dropTipIntoWasteChuteHelper = (
+  pipette?: string
+): CreateCommand[] => [
+  {
     commandType: 'moveToAddressableArea',
     key: expect.any(String),
     params: {
@@ -342,13 +365,13 @@ export const dropTipInPlaceHelper = (params?: {
 })
 export const moveToAddressableAreaHelper = (params?: {
   pipetteId?: string
-  addressableAreaName: string
+  addressableAreaName: AddressableAreaName
 }): CreateCommand => ({
   commandType: 'moveToAddressableArea',
   key: expect.any(String),
   params: {
     pipetteId: DEFAULT_PIPETTE,
-    addressableAreaName: '1and8ChannelWasteChute',
+    addressableAreaName: ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
     offset: { x: 0, y: 0, z: 0 },
     ...params,
   },

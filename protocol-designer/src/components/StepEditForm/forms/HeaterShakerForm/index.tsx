@@ -1,5 +1,6 @@
 import * as React from 'react'
 import cx from 'classnames'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import {
   FormGroup,
@@ -9,7 +10,6 @@ import {
   Tooltip,
   TOOLTIP_BOTTOM,
 } from '@opentrons/components'
-import { i18n } from '../../../../localization'
 import { getHeaterShakerLabwareOptions } from '../../../../ui/modules/selectors'
 import {
   ToggleRowField,
@@ -26,15 +26,16 @@ export const HeaterShakerForm = (props: StepFormProps): JSX.Element | null => {
   const [targetLatchProps, tooltipLatchProps] = useHoverTooltip({
     placement: TOOLTIP_BOTTOM,
   })
+  const { t } = useTranslation(['application', 'form'])
   const { propsForFields, formData } = props
 
   return (
     <div>
       <span className={styles.section_header_text}>
-        {i18n.t('application.stepType.heaterShaker')}
+        {t('stepType.heaterShaker')}
       </span>
       <FormGroup
-        label={i18n.t('form.step_edit_form.field.moduleActionLabware.label')}
+        label={t('form:step_edit_form.field.moduleActionLabware.label')}
         className={styles.temperature_form_group}
       >
         <StepFormDropdown
@@ -45,19 +46,19 @@ export const HeaterShakerForm = (props: StepFormProps): JSX.Element | null => {
 
       <div className={styles.form_row}>
         <FormGroup
-          label={i18n.t(
-            'form.step_edit_form.field.heaterShaker.temperature.setTemperature'
+          label={t(
+            'form:step_edit_form.field.heaterShaker.temperature.setTemperature'
           )}
           className={styles.toggle_form_group}
         >
           <div className={styles.toggle_row}>
             <ToggleRowField
               {...propsForFields.setHeaterShakerTemperature}
-              offLabel={i18n.t(
-                'form.step_edit_form.field.heaterShaker.temperature.toggleOff'
+              offLabel={t(
+                'form:step_edit_form.field.heaterShaker.temperature.toggleOff'
               )}
-              onLabel={i18n.t(
-                'form.step_edit_form.field.heaterShaker.temperature.toggleOn'
+              onLabel={t(
+                'form:step_edit_form.field.heaterShaker.temperature.toggleOn'
               )}
             />
             {formData.setHeaterShakerTemperature === true && (
@@ -67,26 +68,24 @@ export const HeaterShakerForm = (props: StepFormProps): JSX.Element | null => {
                   styles.small_field,
                   styles.toggle_temperature_field
                 )}
-                units={i18n.t('application.units.degrees')}
+                units={t('units.degrees')}
               />
             )}
           </div>
         </FormGroup>
 
         <FormGroup
-          label={i18n.t(
-            'form.step_edit_form.field.heaterShaker.shaker.setShake'
-          )}
+          label={t('form:step_edit_form.field.heaterShaker.shaker.setShake')}
           className={styles.toggle_form_group}
         >
           <div className={styles.toggle_row}>
             <ToggleRowField
               {...propsForFields.setShake}
-              offLabel={i18n.t(
-                'form.step_edit_form.field.heaterShaker.shaker.toggleOff'
+              offLabel={t(
+                'form:step_edit_form.field.heaterShaker.shaker.toggleOff'
               )}
-              onLabel={i18n.t(
-                'form.step_edit_form.field.heaterShaker.shaker.toggleOn'
+              onLabel={t(
+                'form:step_edit_form.field.heaterShaker.shaker.toggleOn'
               )}
             />
             {formData.setShake === true && (
@@ -96,25 +95,23 @@ export const HeaterShakerForm = (props: StepFormProps): JSX.Element | null => {
                   styles.small_field,
                   styles.toggle_temperature_field
                 )}
-                units={i18n.t('application.units.rpm')}
+                units={t('units.rpm')}
               />
             )}
           </div>
         </FormGroup>
         <Flex {...targetLatchProps}>
           <FormGroup
-            label={i18n.t(
-              'form.step_edit_form.field.heaterShaker.latch.setLatch'
-            )}
+            label={t('form:step_edit_form.field.heaterShaker.latch.setLatch')}
             className={styles.set_plate_latch_form_group}
           >
             <ToggleRowField
               {...propsForFields.latchOpen}
-              offLabel={i18n.t(
-                'form.step_edit_form.field.heaterShaker.latch.toggleOff'
+              offLabel={t(
+                'form:step_edit_form.field.heaterShaker.latch.toggleOff'
               )}
-              onLabel={i18n.t(
-                'form.step_edit_form.field.heaterShaker.latch.toggleOn'
+              onLabel={t(
+                'form:step_edit_form.field.heaterShaker.latch.toggleOn'
               )}
             />
           </FormGroup>
@@ -126,19 +123,19 @@ export const HeaterShakerForm = (props: StepFormProps): JSX.Element | null => {
             tooltipPlacement={TOOLTIP_BOTTOM}
             {...propsForFields.heaterShakerSetTimer}
             className={styles.small_field}
-            label={i18n.t(
-              'form.step_edit_form.field.heaterShaker.timer.heaterShakerSetTimer'
+            label={t(
+              'form:step_edit_form.field.heaterShaker.timer.heaterShakerSetTimer'
             )}
           >
             <TextField
               {...propsForFields.heaterShakerTimerMinutes}
               className={styles.small_field}
-              units={i18n.t('application.units.minutes')}
+              units={t('units.minutes')}
             />
             <TextField
               {...propsForFields.heaterShakerTimerSeconds}
               className={styles.small_field}
-              units={i18n.t('application.units.seconds')}
+              units={t('units.seconds')}
             />
           </CheckboxRowField>
         </Flex>

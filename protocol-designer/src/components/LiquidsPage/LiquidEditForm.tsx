@@ -1,8 +1,8 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { Field, Formik, FormikProps } from 'formik'
 import * as Yup from 'yup'
-import { i18n } from '../../localization'
 import { swatchColors } from '../swatchColors'
 import {
   Card,
@@ -14,8 +14,8 @@ import {
   Flex,
   JUSTIFY_END,
   TYPOGRAPHY,
-  COLORS,
 } from '@opentrons/components'
+import { DEPRECATED_WHALE_GREY } from '@opentrons/shared-data'
 import { selectors } from '../../labware-ingred/selectors'
 import styles from './LiquidEditForm.module.css'
 import formStyles from '../forms/forms.module.css'
@@ -48,17 +48,13 @@ function checkColor(hex: string): boolean {
   return luminance < 0.1 || luminance > 0.9
 }
 
-const INVALID_DISPLAY_COLORS = ['#000000', '#ffffff', COLORS.whaleGrey]
+const INVALID_DISPLAY_COLORS = ['#000000', '#ffffff', DEPRECATED_WHALE_GREY]
 
 export const liquidEditFormSchema: Yup.Schema<
   { name: string; description: string; serialize: boolean } | undefined,
   any
 > = Yup.object().shape({
-  name: Yup.string().required(
-    i18n.t('form.generic.error.required', {
-      name: i18n.t('form.liquid_edit.name'),
-    })
-  ),
+  name: Yup.string().required('liquid name is required'),
   displayColor: Yup.string().test(
     'disallowed-color',
     'Invalid display color',
@@ -80,7 +76,7 @@ export function LiquidEditForm(props: Props): JSX.Element {
   const selectedLiquid = useSelector(selectors.getSelectedLiquidGroupState)
   const nextGroupId = useSelector(selectors.getNextLiquidGroupId)
   const liquidId = selectedLiquid.liquidGroupId ?? nextGroupId
-
+  const { t } = useTranslation(['form', 'button'])
   const initialValues: LiquidEditFormValues = {
     name: props.name || '',
     displayColor: props.displayColor ?? swatchColors(liquidId),
@@ -117,11 +113,11 @@ export function LiquidEditForm(props: Props): JSX.Element {
             <form onSubmit={handleSubmit}>
               <section className={styles.section}>
                 <div className={formStyles.header}>
-                  {i18n.t('form.liquid_edit.details')}
+                  {t('liquid_edit.details')}
                 </div>
                 <div className={formStyles.row_container}>
                   <FormGroup
-                    label={i18n.t('form.liquid_edit.name')}
+                    label={t('liquid_edit.name')}
                     className={formStyles.column}
                   >
                     <InputField
@@ -133,7 +129,7 @@ export function LiquidEditForm(props: Props): JSX.Element {
                     />
                   </FormGroup>
                   <FormGroup
-                    label={i18n.t('form.liquid_edit.description')}
+                    label={t('liquid_edit.description')}
                     className={formStyles.column}
                   >
                     <InputField
@@ -142,7 +138,7 @@ export function LiquidEditForm(props: Props): JSX.Element {
                       onChange={handleChange}
                     />
                   </FormGroup>
-                  <FormGroup label={i18n.t('form.liquid_edit.displayColor')}>
+                  <FormGroup label={t('liquid_edit.displayColor')}>
                     <Field
                       name="displayColor"
                       component={ColorPicker}
@@ -165,14 +161,14 @@ export function LiquidEditForm(props: Props): JSX.Element {
               </section>
               <section className={styles.section}>
                 <div className={formStyles.header}>
-                  {i18n.t('form.liquid_edit.serialize_title')}
+                  {t('liquid_edit.serialize_title')}
                 </div>
                 <p className={styles.info_text}>
-                  {i18n.t('form.liquid_edit.serialize_explanation')}
+                  {t('liquid_edit.serialize_explanation')}
                 </p>
                 <DeprecatedCheckboxField
                   name="serialize"
-                  label={i18n.t('form.liquid_edit.serialize')}
+                  label={t('liquid_edit.serialize')}
                   value={values.serialize}
                   onChange={handleChange}
                 />
@@ -183,10 +179,10 @@ export function LiquidEditForm(props: Props): JSX.Element {
                   onClick={deleteLiquidGroup}
                   disabled={!canDelete}
                 >
-                  {i18n.t('button.delete')}
+                  {t('button:delete')}
                 </OutlineButton>
                 <DeprecatedPrimaryButton onClick={cancelForm}>
-                  {i18n.t('button.cancel')}
+                  {t('button:cancel')}
                 </DeprecatedPrimaryButton>
                 <DeprecatedPrimaryButton
                   disabled={
@@ -194,7 +190,7 @@ export function LiquidEditForm(props: Props): JSX.Element {
                   }
                   type="submit"
                 >
-                  {i18n.t('button.save')}
+                  {t('button:save')}
                 </DeprecatedPrimaryButton>
               </div>
             </form>

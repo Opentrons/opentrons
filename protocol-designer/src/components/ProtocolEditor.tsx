@@ -4,15 +4,15 @@ import { DragDropContext } from 'react-dnd'
 import MouseBackEnd from 'react-dnd-mouse-backend'
 import { ComputingSpinner } from '../components/ComputingSpinner'
 import { ConnectedNav } from '../containers/ConnectedNav'
-import { ConnectedSidebar } from '../containers/ConnectedSidebar'
+import { Sidebar } from '../containers/ConnectedSidebar'
 import { ConnectedTitleBar } from '../containers/ConnectedTitleBar'
-import { ConnectedMainPanel } from '../containers/ConnectedMainPanel'
+import { MainPanel } from '../containers/ConnectedMainPanel'
 import { PortalRoot as MainPageModalPortalRoot } from '../components/portals/MainPageModalPortal'
 import { MAIN_CONTENT_FORCED_SCROLL_CLASSNAME } from '../ui/steps/utils'
 import { PrereleaseModeIndicator } from './PrereleaseModeIndicator'
 import { PortalRoot as TopPortalRoot } from './portals/TopPortal'
-import { FileUploadMessageModal } from './modals/FileUploadMessageModal'
-import { LabwareUploadMessageModal } from './modals/LabwareUploadMessageModal'
+import { FileUploadMessageModal } from './modals/FileUploadMessageModal/FileUploadMessageModal'
+import { LabwareUploadMessageModal } from './modals/LabwareUploadMessageModal/LabwareUploadMessageModal'
 import { GateModal } from './modals/GateModal'
 import { AnnouncementModal } from './modals/AnnouncementModal'
 import styles from './ProtocolEditor.module.css'
@@ -30,7 +30,7 @@ function ProtocolEditorComponent(): JSX.Element {
       <PrereleaseModeIndicator />
       <div className={styles.wrapper}>
         <ConnectedNav />
-        <ConnectedSidebar />
+        <Sidebar />
         <div className={styles.main_page_wrapper}>
           <ConnectedTitleBar />
 
@@ -47,7 +47,7 @@ function ProtocolEditorComponent(): JSX.Element {
 
             <MainPageModalPortalRoot />
             <LabwareUploadMessageModal />
-            <ConnectedMainPanel />
+            <MainPanel />
           </div>
         </div>
       </div>

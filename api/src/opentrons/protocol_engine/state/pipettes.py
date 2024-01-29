@@ -27,6 +27,7 @@ from ..commands import (
     Command,
     LoadPipetteResult,
     AspirateResult,
+    AspirateInPlaceResult,
     DispenseResult,
     DispenseInPlaceResult,
     MoveLabwareResult,
@@ -34,12 +35,14 @@ from ..commands import (
     MoveToWellResult,
     MoveRelativeResult,
     MoveToAddressableAreaResult,
+    MoveToAddressableAreaForDropTipResult,
     PickUpTipResult,
     DropTipResult,
     DropTipInPlaceResult,
     HomeResult,
     RetractAxisResult,
     BlowOutResult,
+    BlowOutInPlaceResult,
     TouchTipResult,
     thermocycler,
     heater_shaker,
@@ -174,9 +177,11 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.attached_tip_by_id[pipette_id] = None
             self._state.nozzle_configuration_by_id[pipette_id] = None
 
-        elif isinstance(command.result, AspirateResult):
+        elif isinstance(command.result, (AspirateResult, AspirateInPlaceResult)):
             pipette_id = command.params.pipetteId
             previous_volume = self._state.aspirated_volume_by_id[pipette_id] or 0
+            # PipetteHandler will have clamped command.result.volume for us, so
+            # next_volume should always be in bounds.
             next_volume = previous_volume + command.result.volume
 
             self._state.aspirated_volume_by_id[pipette_id] = next_volume
@@ -184,7 +189,9 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         elif isinstance(command.result, (DispenseResult, DispenseInPlaceResult)):
             pipette_id = command.params.pipetteId
             previous_volume = self._state.aspirated_volume_by_id[pipette_id] or 0
-            next_volume = max(0.0, previous_volume - command.result.volume)
+            # PipetteHandler will have clamped command.result.volume for us, so
+            # next_volume should always be in bounds.
+            next_volume = previous_volume - command.result.volume
             self._state.aspirated_volume_by_id[pipette_id] = next_volume
 
         elif isinstance(command.result, PickUpTipResult):
@@ -235,7 +242,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
                     default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
                 )
-        elif isinstance(command.result, BlowOutResult):
+        elif isinstance(command.result, (BlowOutResult, BlowOutInPlaceResult)):
             pipette_id = command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = None
 
@@ -264,7 +271,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 well_name=command.params.wellName,
             )
 
-        elif isinstance(command.result, MoveToAddressableAreaResult):
+        elif isinstance(
+            command.result,
+            (MoveToAddressableAreaResult, MoveToAddressableAreaForDropTipResult),
+        ):
             self._state.current_location = CurrentAddressableArea(
                 pipette_id=command.params.pipetteId,
                 addressable_area_name=command.params.addressableAreaName,
@@ -324,6 +334,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 MoveToCoordinatesResult,
                 MoveRelativeResult,
                 MoveToAddressableAreaResult,
+                MoveToAddressableAreaForDropTipResult,
                 PickUpTipResult,
                 DropTipResult,
                 AspirateResult,
@@ -637,3 +648,8 @@ class PipetteView(HasState[PipetteState]):
     def get_is_partially_configured(self, pipette_id: str) -> bool:
         """Determine if the provided pipette is partially configured."""
         return self.get_nozzle_layout_type(pipette_id) != NozzleConfigurationType.FULL
+
+    def get_primary_nozzle(self, pipette_id: str) -> Optional[str]:
+        """Get the primary nozzle, if any, related to the given pipette's nozzle configuration."""
+        nozzle_map = self._state.nozzle_configuration_by_id.get(pipette_id)
+        return nozzle_map.starting_nozzle if nozzle_map else None

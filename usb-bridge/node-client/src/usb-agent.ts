@@ -1,6 +1,6 @@
 import * as http from 'http'
 import agent from 'agent-base'
-import type { Duplex } from 'stream'
+import { Duplex } from 'stream'
 
 import { SerialPort } from 'serialport'
 
@@ -8,6 +8,9 @@ import type { AgentOptions } from 'http'
 import type { Socket } from 'net'
 import type { PortInfo } from '@serialport/bindings-cpp'
 import type { Logger, LogLevel } from './types'
+
+const MAX_SOCKET_CREATE_RETRIES = 10
+const SOCKET_OPEN_RETRY_TIME_MS = 100
 
 export type { PortInfo }
 
@@ -34,7 +37,6 @@ interface SerialPortListMonitorOptions {
 }
 
 export function buildUSBAgent(opts: { serialPort: string }): http.Agent {
-  console.log(`path is ${opts.serialPort}`)
   const port = new SerialPort({ path: opts.serialPort, baudRate: 115200 })
   const usbAgent = agent(
     (req: http.ClientRequest, opts: http.RequestOptions): Duplex => {
@@ -108,21 +110,95 @@ export function createSerialPortListMonitor(
   return { start, stop }
 }
 
-const SOCKET_OPEN_RETRY_TIME = 10000
-class SerialPortSocket extends SerialPort {
-  // allow node socket destroy
-  destroy(): void {}
-
-  // added these to squash keepAlive errors
-  setKeepAlive(): void {}
-  unref(): void {}
-  setTimeout(): void {}
-  ref(): void {}
-}
-
 interface SerialPortHttpAgentOptions extends AgentOptions {
   path: string
   logger: Logger
+}
+
+function socketEmulatorFromPort(port: SerialPort): Socket {
+  // build a duplex stream to act as a socket that we can give to node https internals, linked
+  // to an open usb serial port.
+  //
+  // this is a separate stream rather than just passing in the port so that we can sever the
+  // lifetimes and lifecycles of the socket and the port. sockets want to be closed and opened all
+  // the time by node http internals, and we don't want that for the port since opening and closing it
+  // can take a while. this lets us open and close and create and destroy sockets at will while not
+  // affecting the port.
+
+  // unfortunately, because we need to sever the lifecycles, we can't use node stream pipelining
+  // since half the point of node stream pipelining is to link stream lifecycles. instead, we do a
+  // custom duplex implementation whose lower interface talks to the upper interface of the port...
+  // which is something that's really annoying without using pipelining, which we can't use. so
+  // this closed-over mutable doRead has to stand in for the pause event propagating down; we have to
+  // add or remove data listeners to the port stream to propagate read backpressure.
+  let doRead = false
+  const socket = new Duplex({
+    write(chunk, encoding, cb) {
+      return port.write(chunk, encoding, cb)
+    },
+    read() {
+      if (!doRead) {
+        port.on('data', dataForwarder)
+        doRead = true
+      }
+    },
+  }) as Socket
+
+  const dataForwarder = (chunk: any): void => {
+    if (doRead) {
+      doRead = socket.push(chunk)
+      if (!doRead) {
+        port.removeListener('data', dataForwarder)
+      }
+    }
+  }
+
+  // since this socket is independent from the port, we can do stuff like "have an activity timeout"
+  // without worrying that it will kill the socket
+  let currentTimeout: NodeJS.Timeout | null = null
+  const refreshTimeout = (): void => {
+    currentTimeout?.refresh()
+  }
+  socket.on('data', refreshTimeout)
+  socket.setTimeout = (timeout, callable?) => {
+    currentTimeout !== null && clearTimeout(currentTimeout)
+    if (timeout === 0 && currentTimeout !== null) {
+      currentTimeout = null
+    } else if (timeout !== 0) {
+      currentTimeout = setTimeout(() => {
+        console.log('socket timed out')
+        socket.emit('timeout')
+      }, timeout)
+      if (callable != null) {
+        socket.once('timeout', callable)
+      }
+    }
+
+    return socket
+  }
+  // important: without this we'll leak sockets since the port event emitter will hold a ref to dataForwarder which
+  // closes over the socket
+  socket.on('close', () => {
+    port.removeListener('data', dataForwarder)
+  })
+
+  // some little functions to have the right shape for the http internals
+  socket.ref = () => socket
+  socket.unref = () => socket
+  socket.setKeepAlive = () => {
+    return socket
+  }
+  socket.setNoDelay = () => {
+    return socket
+  }
+
+  socket.on('finish', () => {
+    socket.emit('close')
+  })
+  socket.on('close', () => {
+    currentTimeout && clearTimeout(currentTimeout)
+  })
+  return socket
 }
 
 const kOnKeylog = Symbol.for('onkeylog')
@@ -132,23 +208,74 @@ class SerialPortHttpAgent extends http.Agent {
   declare sockets: NodeJS.Dict<Socket[]>
   declare emit: (
     event: string,
-    socket: SerialPortSocket,
+    socket: Socket,
     options: NodeJS.Dict<unknown>
   ) => void
 
   declare getName: (options: NodeJS.Dict<unknown>) => string
-  declare removeSocket: (
-    socket: SerialPortSocket,
-    options: NodeJS.Dict<unknown>
-  ) => void;
+  declare removeSocket: (socket: Socket, options: NodeJS.Dict<unknown>) => void;
 
   // node can assign a keylogger to the agent for debugging, this allows adding the keylog listener to the event
   declare [kOnKeylog]: (...args: unknown[]) => void
 
-  constructor(options: SerialPortHttpAgentOptions) {
+  constructor(
+    options: SerialPortHttpAgentOptions,
+    onComplete: (err: Error | null, agent?: SerialPortHttpAgent) => void
+  ) {
     super(options)
     this.options = options
+    const openRetryer: (err: Error | null) => void = err => {
+      if (err != null) {
+        if (this.remainingRetries > 0 && !this.destroyed) {
+          const message = err?.message ?? err
+          this.log(
+            'info',
+            `Failed to open port: ${message} , retrying ${this.remainingRetries} more times`
+          )
+          this.remainingRetries--
+          setTimeout(
+            () => this.port.open(openRetryer),
+            SOCKET_OPEN_RETRY_TIME_MS
+          )
+        } else if (!this.destroyed) {
+          const message = err?.message ?? err
+          this.log(
+            'info',
+            `Failed to open port after ${this.remainingRetries} attempts: ${message}`
+          )
+          this.destroy()
+          onComplete(err)
+        } else {
+          this.log(
+            'info',
+            `Cancelling open attempts because the agent was destroyed`
+          )
+          onComplete(new Error('Agent destroyed while opening'))
+        }
+      } else if (!this.destroyed) {
+        this.log('info', `Port ${this.options.path} now open`)
+        onComplete(null, this)
+      } else {
+        this.log('info', `Port was opened but agent is now destroyed, closing`)
+        if (this.port.isOpen) {
+          this.port.close()
+        }
+        onComplete(new Error('Agent destroyed while opening'))
+      }
+    }
+    this.log(
+      'info',
+      `creating and opening serial port for ${this.options.path}`
+    )
+    this.port = new SerialPort(
+      { path: this.options.path, baudRate: 1152000, autoOpen: true },
+      openRetryer
+    )
   }
+
+  port: SerialPort
+  remainingRetries: number = MAX_SOCKET_CREATE_RETRIES
+  destroyed: boolean = false
 
   // TODO: add method to close port (or destroy agent)
 
@@ -166,75 +293,60 @@ class SerialPortHttpAgent extends http.Agent {
       this.options.logger[level](msg, meta)
   }
 
-  // copied from _http_agent.js, replacing this.createConnection
+  destroy(): void {
+    this.destroyed = true
+    this.port.destroy(new Error('Agent was destroyed'))
+  }
+
   createSocket(
     req: http.ClientRequest,
     options: NodeJS.Dict<unknown>,
-    cb: Function
+    cb: (err: Error | string | null, stream?: Duplex) => void
   ): void {
-    this.log('info', `creating usb socket at ${this.options.path}`)
+    // copied from _http_agent.js, replacing this.createConnection
+    this.log('info', `creating usb socket wrapper to ${this.options.path}`)
     options = { __proto__: null, ...options, ...this.options }
     const name = this.getName(options)
     options._agentKey = name
     options.encoding = null
-    const oncreate = once((err, s) => {
-      if (err != null) return cb(err)
-      if (this.sockets[name] == null) {
-        this.sockets[name] = []
-      }
-      this.sockets[name]?.push(s as Socket)
-      this.totalSocketCount++
-      this.log(
-        'debug',
-        `sockets ${name} ${this.sockets[name]?.length ?? ''} ${
-          this.totalSocketCount
-        }`
-      )
-      installListeners(this, s as SerialPortSocket, options)
-      cb(null, s)
-    })
-
-    const socket = new SerialPortSocket({
-      path: this.options.path,
-      baudRate: 1152000,
-    })
-    if (!socket.isOpen && !socket.opening) {
-      socket.open(error => {
-        this.log(
-          'error',
-          `could not open serialport socket: ${error?.message}. Retrying in ${SOCKET_OPEN_RETRY_TIME} ms`
-        )
-        setTimeout(() => {
-          socket.open()
-        }, SOCKET_OPEN_RETRY_TIME)
-      })
+    if (this.totalSocketCount >= 1) {
+      this.log('error', `tried to create more than one socket wrapper`)
+      cb(new Error('Cannot create more than one USB port wrapper'))
+      return
     }
-    if (socket != null) oncreate(null, socket)
-  }
-}
+    if (!this.port.isOpen) {
+      this.log('error', `tried to create usb socket wrapper with closed port`)
+      cb(new Error('Underlying USB port is closed'))
+      return
+    }
 
-// js function from internal/util.js
-function once<T extends (this: unknown, ...args: unknown[]) => T, U>(
-  callback: T
-  // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-): (this: unknown, ...args: U[]) => T | void {
-  let called = false
-  return function (...args) {
-    if (called) return
-    called = true
-    return Reflect.apply(callback, this, args)
+    const wrapper = socketEmulatorFromPort(this.port)
+    this.totalSocketCount++
+    installListeners(this, wrapper, options)
+    this.log('info', `created usb socket wrapper writable: ${wrapper.writable}`)
+    cb(null, wrapper)
+    setImmediate(() => {
+      wrapper.emit('connect')
+      wrapper.emit('ready')
+    })
   }
 }
 
 // most copied from _http_agent.js; onData and onFinish listeners added to log and close serial port
 function installListeners(
   agent: SerialPortHttpAgent,
-  s: SerialPortSocket,
+  s: Socket,
   options: { [k: string]: unknown }
 ): void {
-  function onFree(): void {
+  const onFree: () => void = () => {
+    // The node http-client and node http-agent conspire to jam this random
+    // _httpMessage attribute onto the sockets they use so they can get to a
+    // message from the socket that it was on. We need to make sure that the socket
+    // has this message and that message says it should be kept alive to make the
+    // agent's removeSocket function not destroy the socket instead. We could override
+    // the function, but we need the entire thing except like one conditional so we do this.
+
     agent.log('debug', 'CLIENT socket onFree')
-    // need to emit free to attach listeners to serialport
     agent.emit('free', s, options)
   }
   s.on('free', onFree)
@@ -246,30 +358,13 @@ function installListeners(
 
   function onClose(): void {
     agent.log('debug', 'CLIENT socket onClose')
-    // This is the only place where sockets get removed from the Agent.
-    // If you want to remove a socket from the pool, just close it.
-    // All socket errors end in a close event anyway.
     agent.totalSocketCount--
     agent.removeSocket(s, options)
   }
   s.on('close', onClose)
 
-  function onTimeout(): void {
-    agent.log(
-      'debug',
-      'CLIENT socket onTimeout, closing and reopening the socket'
-    )
-
-    s.close()
-    setTimeout(() => {
-      s.open()
-    }, 3000)
-  }
-  s.on('timeout', onTimeout)
-
   function onFinish(): void {
-    agent.log('info', 'socket finishing: closing serialport')
-    s.close()
+    agent.log('info', 'socket finishing')
   }
   s.on('finish', onFinish)
 
@@ -286,7 +381,6 @@ function installListeners(
     agent.removeSocket(s, options)
     s.removeListener('close', onClose)
     s.removeListener('free', onFree)
-    s.removeListener('timeout', onTimeout)
     s.removeListener('finish', onFinish)
     s.removeListener('agentRemove', onRemove)
     if (agent[kOnKeylog] != null) {

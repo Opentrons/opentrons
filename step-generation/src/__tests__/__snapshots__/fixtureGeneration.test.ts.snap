@@ -9099,6 +9099,11 @@ Object {
           "min": 3,
           "value": 7.85,
         },
+        "defaultBlowOutFlowRate": Object {
+          "max": 812,
+          "min": 3,
+          "value": 80,
+        },
         "defaultDispenseFlowRate": Object {
           "max": 812,
           "min": 3,
@@ -10254,6 +10259,11 @@ Object {
           "min": 0.001,
           "value": 5,
         },
+        "defaultBlowOutFlowRate": Object {
+          "max": 1000,
+          "min": 5,
+          "value": 1000,
+        },
         "defaultDispenseFlowRate": Object {
           "max": 50,
           "min": 0.001,
@@ -11402,6 +11412,11 @@ Object {
           "max": 50,
           "min": 0.001,
           "value": 5,
+        },
+        "defaultBlowOutFlowRate": Object {
+          "max": 1000,
+          "min": 5,
+          "value": 1000,
         },
         "defaultDispenseFlowRate": Object {
           "max": 50,
@@ -12552,6 +12567,11 @@ Object {
           "min": 0.001,
           "value": 150,
         },
+        "defaultBlowOutFlowRate": Object {
+          "max": 275,
+          "min": 1,
+          "value": 94,
+        },
         "defaultDispenseFlowRate": Object {
           "max": 600,
           "min": 0.001,
@@ -13694,6 +13714,11 @@ Object {
           "max": 600,
           "min": 0.001,
           "value": 150,
+        },
+        "defaultBlowOutFlowRate": Object {
+          "max": 1000,
+          "min": 5,
+          "value": 1000,
         },
         "defaultDispenseFlowRate": Object {
           "max": 600,

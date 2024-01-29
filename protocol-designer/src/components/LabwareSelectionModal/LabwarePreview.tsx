@@ -1,5 +1,6 @@
 import * as React from 'react'
 import reduce from 'lodash/reduce'
+import { useTranslation } from 'react-i18next'
 import {
   Icon,
   LabwareRender,
@@ -11,7 +12,6 @@ import {
   getLabwareDefIsStandard,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
-import { i18n } from '../../localization'
 import styles from './styles.module.css'
 
 interface Props {
@@ -25,6 +25,7 @@ interface Props {
 
 export const LabwarePreview = (props: Props): JSX.Element | null => {
   const { labwareDef, moduleCompatibility } = props
+  const { t } = useTranslation(['modal', 'application'])
   if (!labwareDef) return null
   const maxVolumes = reduce(
     labwareDef.wells,
@@ -32,7 +33,7 @@ export const LabwarePreview = (props: Props): JSX.Element | null => {
     new Set()
   )
   const formattedVolumes = Array.from(maxVolumes)
-    .map(vol => `${vol}${i18n.t('application.units.microliter')}`)
+    .map(vol => `${vol}${t('application:units.microliter')}`)
     .join(', ')
 
   // NOTE: this is a temporary magic value that positions the preview component
@@ -51,9 +52,7 @@ export const LabwarePreview = (props: Props): JSX.Element | null => {
             {moduleCompatibility === 'recommended' ? (
               <Icon className={styles.icon} name="check-decagram" />
             ) : null}
-            {i18n.t(
-              `modal.labware_selection.module_compatibility.${moduleCompatibility}`
-            )}
+            {t(`labware_selection.module_compatibility.${moduleCompatibility}`)}
           </div>
         ) : null}
         <div className={styles.labware_detail_row}>
@@ -67,17 +66,17 @@ export const LabwarePreview = (props: Props): JSX.Element | null => {
           <div className={styles.labware_detail_column}>
             {getLabwareDefIsStandard(labwareDef) && (
               <LabeledValue
-                label={i18n.t('modal.labware_selection.measurements')}
-                value={i18n.t('modal.labware_selection.see_details')}
+                label={t('labware_selection.measurements')}
+                value={t('labware_selection.see_details')}
               />
             )}
             <div className={styles.labware_detail_row}>
               <LabeledValue
-                label={i18n.t('modal.labware_selection.well_count')}
+                label={t('labware_selection.well_count')}
                 value={Object.keys(labwareDef.wells).length}
               />
               <LabeledValue
-                label={i18n.t('modal.labware_selection.max_vol')}
+                label={t('labware_selection.max_vol')}
                 value={formattedVolumes}
               />
             </div>

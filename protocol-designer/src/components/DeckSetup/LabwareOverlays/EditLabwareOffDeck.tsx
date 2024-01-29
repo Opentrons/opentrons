@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
   ALIGN_FLEX_START,
@@ -12,7 +13,6 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { i18n } from '../../../localization'
 import {
   deleteContainer,
   duplicateLabware,
@@ -23,7 +23,7 @@ import { NameThisLabware } from './NameThisLabware'
 import styles from './LabwareOverlays.module.css'
 
 import type { LabwareEntity } from '@opentrons/step-generation'
-import type { BaseState, ThunkDispatch } from '../../../types'
+import type { ThunkDispatch } from '../../../types'
 
 const NAME_LABWARE_OVERLAY_STYLE = css`
   z-index: 1;
@@ -40,7 +40,7 @@ const NAME_LABWARE_OVERLAY_STYLE = css`
 const REGULAR_OVERLAY_STYLE = css`
   z-index: 1;
   padding: ${SPACING.spacing8};
-  background-color: ${COLORS.darkBlack90};
+  background-color: ${COLORS.black90}${COLORS.opacity90HexCode};
   flex-direction: ${DIRECTION_COLUMN};
   color: ${COLORS.white};
   display: flex;
@@ -58,30 +58,26 @@ const REGULAR_OVERLAY_STYLE = css`
   }
 `
 
-interface OP {
+interface EditLabwareOffDeckProps {
   labwareEntity: LabwareEntity
 }
-interface SP {
-  isYetUnnamed: boolean
-}
-interface DP {
-  editLiquids: () => void
-  duplicateLabware: () => void
-  deleteLabware: () => void
-}
 
-type Props = OP & SP & DP
-
-const EditLabwareOffDeckComponent = (props: Props): JSX.Element => {
-  const {
-    labwareEntity,
-    isYetUnnamed,
-    editLiquids,
-    deleteLabware,
-    duplicateLabware,
-  } = props
-
+export function EditLabwareOffDeck(
+  props: EditLabwareOffDeckProps
+): JSX.Element {
+  const { labwareEntity } = props
+  const { t } = useTranslation('deck')
+  const dispatch = useDispatch<ThunkDispatch<any>>()
+  const allSavedLabware = useSelector(labwareIngredSelectors.getSavedLabware)
+  const hasName = allSavedLabware[labwareEntity.id]
   const { isTiprack } = labwareEntity.def.parameters
+
+  const isYetUnnamed = isTiprack && !hasName
+
+  const editLiquids = (): void => {
+    dispatch(openIngredientSelector(labwareEntity.id))
+  }
+
   if (isYetUnnamed && !isTiprack) {
     return (
       <div css={NAME_LABWARE_OVERLAY_STYLE}>
@@ -97,49 +93,32 @@ const EditLabwareOffDeckComponent = (props: Props): JSX.Element => {
         {!isTiprack ? (
           <a className={styles.overlay_button} onClick={editLiquids}>
             <Icon className={styles.overlay_icon} name="pencil" />
-            {i18n.t('deck.overlay.edit.name_and_liquids')}
+            {t('overlay.edit.name_and_liquids')}
           </a>
         ) : (
           <div className={styles.button_spacer} />
         )}
-        <a className={styles.overlay_button} onClick={duplicateLabware}>
+        <a
+          className={styles.overlay_button}
+          onClick={() => dispatch(duplicateLabware(labwareEntity.id))}
+        >
           <Icon className={styles.overlay_icon} name="content-copy" />
-          {i18n.t('deck.overlay.edit.duplicate')}
+          {t('overlay.edit.duplicate')}
         </a>
-        <a className={styles.overlay_button} onClick={deleteLabware}>
+        <a
+          className={styles.overlay_button}
+          onClick={() => {
+            window.confirm(
+              t('warning.cancelForSure', {
+                adapterName: getLabwareDisplayName(labwareEntity.def),
+              })
+            ) && dispatch(deleteContainer({ labwareId: labwareEntity.id }))
+          }}
+        >
           <Icon className={styles.overlay_icon} name="close" />
-          {i18n.t('deck.overlay.edit.delete')}
+          {t('overlay.edit.delete')}
         </a>
       </div>
     )
   }
 }
-
-const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
-  const { id } = ownProps.labwareEntity
-  const hasName = labwareIngredSelectors.getSavedLabware(state)[id]
-  return {
-    isYetUnnamed: !ownProps.labwareEntity.def.parameters.isTiprack && !hasName,
-  }
-}
-
-const mapDispatchToProps = (
-  dispatch: ThunkDispatch<any>,
-  ownProps: OP
-): DP => ({
-  editLiquids: () =>
-    dispatch(openIngredientSelector(ownProps.labwareEntity.id)),
-  duplicateLabware: () => dispatch(duplicateLabware(ownProps.labwareEntity.id)),
-  deleteLabware: () => {
-    window.confirm(
-      `Are you sure you want to permanently delete this ${getLabwareDisplayName(
-        ownProps.labwareEntity.def
-      )}?`
-    ) && dispatch(deleteContainer({ labwareId: ownProps.labwareEntity.id }))
-  },
-})
-
-export const EditLabwareOffDeck = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(EditLabwareOffDeckComponent)

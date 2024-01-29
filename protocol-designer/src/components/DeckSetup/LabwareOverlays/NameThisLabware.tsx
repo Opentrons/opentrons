@@ -1,31 +1,32 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import cx from 'classnames'
 import { Icon, useOnClickOutside } from '@opentrons/components'
 import { renameLabware } from '../../../labware-ingred/actions'
-import { i18n } from '../../../localization'
-import styles from './LabwareOverlays.module.css'
+import styles from './LabwareOverlays.css'
+
 import type { LabwareEntity } from '@opentrons/step-generation'
 import type { ThunkDispatch } from '../../../types'
 import type { LabwareOnDeck } from '../../../step-forms'
 
-interface OP {
+interface NameThisLabwareProps {
   labwareOnDeck: LabwareOnDeck | LabwareEntity
-  editLiquids: () => unknown
+  editLiquids: () => void
 }
 
-interface DP {
-  // TODO Ian 2018-02-16 type these fns elsewhere and import the type
-  setLabwareName: (name: string | null | undefined) => unknown
-}
+export function NameThisLabware(props: NameThisLabwareProps): JSX.Element {
+  const { labwareOnDeck } = props
+  const dispatch: ThunkDispatch<any> = useDispatch()
+  const [inputValue, setInputValue] = React.useState<string>('')
+  const { t } = useTranslation('deck')
 
-type Props = OP & DP
-
-const NameThisLabwareComponent = (props: Props): JSX.Element => {
-  const [inputValue, setInputValue] = React.useState('')
+  const setLabwareName = (name: string | null | undefined): void => {
+    dispatch(renameLabware({ labwareId: labwareOnDeck.id, name }))
+  }
 
   const saveNickname = (): void => {
-    props.setLabwareName(inputValue || null)
+    setLabwareName(inputValue ?? null)
   }
   const wrapperRef: React.RefObject<HTMLDivElement> = useOnClickOutside({
     onClickOutside: saveNickname,
@@ -52,31 +53,18 @@ const NameThisLabwareComponent = (props: Props): JSX.Element => {
           className={styles.name_input}
           onChange={handleChange}
           onKeyUp={handleKeyUp}
-          placeholder={i18n.t('deck.overlay.name_labware.nickname_placeholder')}
+          placeholder={t('overlay.name_labware.nickname_placeholder')}
           value={inputValue}
         />
       </div>
       <a className={styles.overlay_button} onClick={addLiquids}>
         <Icon className={styles.overlay_icon} name="water" />
-        {i18n.t('deck.overlay.name_labware.add_liquids')}
+        {t('overlay.name_labware.add_liquids')}
       </a>
       <a className={styles.overlay_button} onClick={saveNickname}>
         <Icon className={styles.overlay_icon} name="ot-water-outline" />
-        {i18n.t('deck.overlay.name_labware.leave_empty')}
+        {t('overlay.name_labware.leave_empty')}
       </a>
     </div>
   )
 }
-
-const mapDispatchToProps = (dispatch: ThunkDispatch<any>, ownProps: OP): DP => {
-  const { id } = ownProps.labwareOnDeck
-  return {
-    setLabwareName: (name: string | null | undefined) =>
-      dispatch(renameLabware({ labwareId: id, name })),
-  }
-}
-
-export const NameThisLabware = connect(
-  null,
-  mapDispatchToProps
-)(NameThisLabwareComponent)

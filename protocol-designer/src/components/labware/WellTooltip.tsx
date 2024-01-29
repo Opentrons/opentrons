@@ -5,8 +5,8 @@ import cx from 'classnames'
 import { Portal } from '../portals/TopPortal'
 import { PillTooltipContents } from '../steplist/SubstepRow'
 import styles from './labware.module.css'
-import { LocationLiquidState } from '@opentrons/step-generation'
-import { WellIngredientNames } from '../../steplist/types'
+import type { LocationLiquidState } from '@opentrons/step-generation'
+import type { WellIngredientNames } from '../../steplist/types'
 
 const DEFAULT_TOOLTIP_OFFSET = 22
 const WELL_BORDER_WIDTH = 4
@@ -20,7 +20,7 @@ interface WellTooltipParams {
   tooltipWellName?: string | null
 }
 
-interface Props {
+interface WellTooltipProps {
   children: (wellTooltipParams: WellTooltipParams) => React.ReactNode
   ingredNames: WellIngredientNames
 }
@@ -32,7 +32,7 @@ interface State {
   tooltipWellIngreds?: LocationLiquidState | null
   tooltipOffset?: number | null
 }
-const initialState: State = {
+const initialTooltipState: State = {
   tooltipX: null,
   tooltipY: null,
   tooltipWellName: null,
@@ -40,10 +40,13 @@ const initialState: State = {
   tooltipOffset: DEFAULT_TOOLTIP_OFFSET,
 }
 
-export class WellTooltip extends React.Component<Props, State> {
-  state: State = initialState
+export const WellTooltip = (props: WellTooltipProps): JSX.Element => {
+  const { children, ingredNames } = props
+  const [tooltipState, setTooltipState] = React.useState<State>(
+    initialTooltipState
+  )
 
-  makeHandleMouseEnterWell: (
+  const makeHandleMouseEnterWell: (
     wellName: string,
     wellIngreds: LocationLiquidState
   ) => (e: React.MouseEvent) => void = (wellName, wellIngreds) => e => {
@@ -52,7 +55,7 @@ export class WellTooltip extends React.Component<Props, State> {
       const wellBoundingRect = target.getBoundingClientRect()
       const { left, top, height, width } = wellBoundingRect
       if (Object.keys(wellIngreds).length > 0 && left && top) {
-        this.setState({
+        setTooltipState({
           tooltipX: left + width / 2,
           tooltipY: top + height / 2,
           tooltipWellName: wellName,
@@ -63,69 +66,73 @@ export class WellTooltip extends React.Component<Props, State> {
     }
   }
 
-  handleMouseLeaveWell: () => void = () => {
-    this.setState(initialState)
+  const handleMouseLeaveWell = (): void => {
+    setTooltipState(initialTooltipState)
   }
 
-  render(): React.ReactNode {
-    const { tooltipX, tooltipY, tooltipOffset } = this.state
+  const {
+    tooltipX,
+    tooltipY,
+    tooltipOffset,
+    tooltipWellIngreds,
+    tooltipWellName,
+  } = tooltipState
 
-    return (
-      <React.Fragment>
-        <Manager>
-          <Reference>
-            {({ ref }) => (
-              <Portal>
-                <div
-                  ref={ref}
-                  className={styles.virtual_reference}
-                  // @ts-expect-error(sa, 2021-6-21): can't use null as top and left, default to undefined
-                  style={{ top: tooltipY, left: tooltipX }}
-                />
-              </Portal>
-            )}
-          </Reference>
-          {this.props.children({
-            makeHandleMouseEnterWell: this.makeHandleMouseEnterWell,
-            handleMouseLeaveWell: this.handleMouseLeaveWell,
-            tooltipWellName: this.state.tooltipWellName,
-          })}
-          {this.state.tooltipWellName && (
-            <Popper
-              modifiers={{
-                offset: {
-                  // @ts-expect-error(sa, 2021-6-21): tooltipOffset might be null or undefined
-                  offset: `0, ${tooltipOffset + WELL_BORDER_WIDTH * 2}`,
-                },
-              }}
-            >
-              {({ ref, style, placement, arrowProps }) => {
-                return (
-                  <Portal>
-                    <div
-                      style={style}
-                      ref={ref}
-                      data-placement={placement}
-                      className={styles.tooltip_box}
-                    >
-                      <PillTooltipContents
-                        well={this.state.tooltipWellName || ''}
-                        ingredNames={this.props.ingredNames}
-                        ingreds={this.state.tooltipWellIngreds || {}}
-                      />
-                      <div
-                        className={cx(styles.arrow, styles[placement])}
-                        ref={arrowProps.ref}
-                        style={arrowProps.style}
-                      />
-                    </div>
-                  </Portal>
-                )
-              }}
-            </Popper>
+  return (
+    <>
+      <Manager>
+        <Reference>
+          {({ ref }) => (
+            <Portal>
+              <div
+                ref={ref}
+                className={styles.virtual_reference}
+                // @ts-expect-error(sa, 2021-6-21): can't use null as top and left, default to undefined
+                style={{ top: tooltipY, left: tooltipX }}
+              />
+            </Portal>
           )}
-        </Manager>
-      </React.Fragment>
-    )
-  }
+        </Reference>
+        {children({
+          makeHandleMouseEnterWell: makeHandleMouseEnterWell,
+          handleMouseLeaveWell: handleMouseLeaveWell,
+          tooltipWellName: tooltipWellName,
+        })}
+        {tooltipWellName && (
+          <Popper
+            modifiers={{
+              offset: {
+                // @ts-expect-error(sa, 2021-6-21): tooltipOffset might be null or undefined
+                offset: `0, ${tooltipOffset + WELL_BORDER_WIDTH * 2}`,
+              },
+            }}
+          >
+            {({ ref, style, placement, arrowProps }) => {
+              return (
+                <Portal>
+                  <div
+                    style={style}
+                    ref={ref}
+                    data-placement={placement}
+                    className={styles.tooltip_box}
+                  >
+                    <PillTooltipContents
+                      well={tooltipWellName || ''}
+                      ingredNames={ingredNames}
+                      ingreds={tooltipWellIngreds || {}}
+                    />
+                    <div
+                      className={cx(styles.arrow, styles[placement])}
+                      ref={arrowProps.ref}
+                      style={arrowProps.style}
+                    />
+                  </div>
+                </Portal>
+              )
+            }}
+          </Popper>
+        )}
+      </Manager>
+    </>
+  )
 }

@@ -1,8 +1,7 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom/client'
 import { Provider } from 'react-redux'
 import { I18nextProvider } from 'react-i18next'
-import { AppContainer } from 'react-hot-loader'
 
 import { configureStore } from './configureStore'
 import { App } from './components/App'
@@ -17,14 +16,17 @@ initialize(store)
 // initialize analytics
 initializeMixpanel(store.getState())
 
+const container = document.getElementById('root')
+if (container == null) throw new Error('Failed to find the root element')
+const root = ReactDOM.createRoot(container)
+
 const render = (Component: any): void => {
-  ReactDOM.render(
+  root.render(
     <Provider store={store}>
-        <I18nextProvider i18n={i18n as any}>
-          <Component />
-        </I18nextProvider>
-    </Provider>,
-    document.getElementById('root')
+      <I18nextProvider i18n={i18n}>
+        <Component />
+      </I18nextProvider>
+    </Provider>
   )
 }
 render(App)

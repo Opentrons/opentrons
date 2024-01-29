@@ -68,7 +68,9 @@ export function AlertItem(props: AlertItemProps): JSX.Element {
     <div className={className}>
       <div className={styles.title_bar}>
         <Icon {...iconProps} />
-        <span className={styles.title}>{props.title}</span>
+        <span className={styles.title} data-testid="alert_item_title">
+          {props.title}
+        </span>
         {props.onCloseClick && (
           <IconButton
             name="close"

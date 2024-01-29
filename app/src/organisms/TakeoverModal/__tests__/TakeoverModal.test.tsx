@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { TakeoverModal } from '../TakeoverModal'
@@ -21,12 +22,12 @@ describe('TakeoverModal', () => {
   })
 
   it('renders information for Robot is busy modal', () => {
-    const { getByText } = render(props)
-    getByText('Robot is busy')
-    getByText(
+    render(props)
+    screen.getByText('Robot is busy')
+    screen.getByText(
       'A computer with the Opentrons App is currently controlling this robot.'
     )
-    getByText('Terminate remote activity').click()
+    fireEvent.click(screen.getByText('Terminate remote activity'))
     expect(props.setShowConfirmTerminateModal).toHaveBeenCalled()
   })
 
@@ -35,16 +36,14 @@ describe('TakeoverModal', () => {
       ...props,
       showConfirmTerminateModal: true,
     }
-    const { getByText, getByLabelText } = render(props)
-    getByText('Terminate remote activity?')
-    getByText(
+    render(props)
+    screen.getByText('Terminate remote activity?')
+    screen.getByText(
       'This will immediately stop the activity begun on a computer. You, or another user, may lose progress or see an error in the Opentrons App.'
     )
-    getByText('Continue activity')
-    getByText('Terminate activity')
-    getByLabelText('SmallButton_primary').click()
+    fireEvent.click(screen.getByText('Continue activity'))
     expect(props.setShowConfirmTerminateModal).toHaveBeenCalled()
-    getByLabelText('SmallButton_alert').click()
+    fireEvent.click(screen.getByText('Terminate activity'))
     expect(props.confirmTerminate).toHaveBeenCalled()
   })
 })

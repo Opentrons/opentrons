@@ -7,6 +7,7 @@ import fixtureTiprack1000ul from '../labware/fixtures/2/fixture_flex_96_tiprack_
 import fixtureTiprackAdapter from '../labware/fixtures/2/fixture_flex_96_tiprack_adapter.json'
 import { getLabwareDefURI } from './helpers/index'
 
+// v2 labware definitions
 import agilent1Reservoir290MlV1Uncasted from '../labware/definitions/2/agilent_1_reservoir_290ml/1.json'
 import appliedbiosystemsmicroamp384Wellplate40UlV1Uncasted from '../labware/definitions/2/appliedbiosystemsmicroamp_384_wellplate_40ul/1.json'
 import armadillo96Wellplate200UlPcrFullSkirtV1Uncasted from '../labware/definitions/2/armadillo_96_wellplate_200ul_pcr_full_skirt/1.json'
@@ -113,8 +114,72 @@ import tipone96Tiprack200UlV1Uncasted from '../labware/definitions/2/tipone_96_t
 import usascientific12Reservoir22MlV1Uncasted from '../labware/definitions/2/usascientific_12_reservoir_22ml/1.json'
 import usascientific96Wellplate24MlDeepV1Uncasted from '../labware/definitions/2/usascientific_96_wellplate_2.4ml_deep/1.json'
 
-import type { LabwareDefByDefURI, LabwareDefinition2 } from './types'
+// v1 legacy labware definitions
 
+import wellPlate12Uncasted from '../labware/definitions/1/12-well-plate.json'
+import vial24RackUncasted from '../labware/definitions/1/24-vial-rack.json'
+import well24PlateUncasted from '../labware/definitions/1/24-well-plate.json'
+import plate384Uncasted from '../labware/definitions/1/384-plate.json'
+import vialPlate48Uncasted from '../labware/definitions/1/48-vial-plate.json'
+import wellPlate48Uncasted from '../labware/definitions/1/48-well-plate.json'
+import tuberack5Ml3X4Uncasted from '../labware/definitions/1/5ml-3x4.json'
+import wellPlate6Uncasted from '../labware/definitions/1/6-well-plate.json'
+import pcr96FlatUncasted from '../labware/definitions/1/96-PCR-flat.json'
+import pcr96PTallUncasted from '../labware/definitions/1/96-PCR-tall.json'
+import deepWell96Uncasted from '../labware/definitions/1/96-deep-well.json'
+import flat96Uncasted from '../labware/definitions/1/96-flat.json'
+import wellPlate20Mm96Uncasted from '../labware/definitions/1/96-well-plate-20mm.json'
+import maldiPlateUncasted from '../labware/definitions/1/MALDI-plate.json'
+import pcrStripTallUncasted from '../labware/definitions/1/PCR-strip-tall.json'
+import t25FlaskUncasted from '../labware/definitions/1/T25-flask.json'
+import t75FlaskUncasted from '../labware/definitions/1/T75-flask.json'
+import alumBlockPcrStripsUncasted from '../labware/definitions/1/alum-block-pcr-strips.json'
+import bioradHardshell96PcrUncasted from '../labware/definitions/1/biorad-hardshell-96-PCR.json'
+import eGelgolUncasted from '../labware/definitions/1/e-gelgol.json'
+import fixedTrashUncasted from '../labware/definitions/1/fixed-trash.json'
+import hampton1MlDeepBlockUncasted from '../labware/definitions/1/hampton-1ml-deep-block.json'
+import opentronsAluminumBlock2MlEppendorfUncasted from '../labware/definitions/1/opentrons-aluminum-block-2ml-eppendorf.json'
+import opentronsAluminumBlock2MlScrewcapUncasted from '../labware/definitions/1/opentrons-aluminum-block-2ml-screwcap.json'
+import opentronsAluminumBlock96PcrPlateUncasted from '../labware/definitions/1/opentrons-aluminum-block-96-PCR-plate.json'
+import opentronsAluminumBlockPcrStrips200UlUncasted from '../labware/definitions/1/opentrons-aluminum-block-PCR-strips-200ul.json'
+import opentronsTiprack10UlUncasted from '../labware/definitions/1/opentrons-tiprack-10ul.json'
+import opentronsTiprack300UlUncasted from '../labware/definitions/1/opentrons-tiprack-300ul.json'
+import opentronsTuberack15MlEppendorfUncasted from '../labware/definitions/1/opentrons-tuberack-1.5ml-eppendorf.json'
+import opentronsTuberack1550MlUncasted from '../labware/definitions/1/opentrons-tuberack-15_50ml.json'
+import opentronsTuberack15MlUncasted from '../labware/definitions/1/opentrons-tuberack-15ml.json'
+import opentronsTuberack2MlEppendorfUncasted from '../labware/definitions/1/opentrons-tuberack-2ml-eppendorf.json'
+import opentronsTuberack2MlScrewcapUncasted from '../labware/definitions/1/opentrons-tuberack-2ml-screwcap.json'
+import opentronsTuberack50MlUncasted from '../labware/definitions/1/opentrons-tuberack-50ml.json'
+import pointUncasted from '../labware/definitions/1/point.json'
+import rigakuCompactCrystallizationPlateUncasted from '../labware/definitions/1/rigaku-compact-crystallization-plate.json'
+import smallVialRack16X45Uncasted from '../labware/definitions/1/small_vial_rack_16x45.json'
+import tallFixedTrashUncasted from '../labware/definitions/1/tall-fixed-trash.json'
+import tiprack1000UlHUncasted from '../labware/definitions/1/tiprack-1000ul-H.json'
+import tiprack1000UlChemUncasted from '../labware/definitions/1/tiprack-1000ul-chem.json'
+import tiprack1000UlUncasted from '../labware/definitions/1/tiprack-1000ul.json'
+import tiprack10UlHUncasted from '../labware/definitions/1/tiprack-10ul-H.json'
+import tiprack10UlUncasted from '../labware/definitions/1/tiprack-10ul.json'
+import tiprack200UlUncasted from '../labware/definitions/1/tiprack-200ul.json'
+import trashBoxUncasted from '../labware/definitions/1/trash-box.json'
+import trough12RowShortUncasted from '../labware/definitions/1/trough-12row-short.json'
+import trough12RowUncasted from '../labware/definitions/1/trough-12row.json'
+import trough1Row25MlUncasted from '../labware/definitions/1/trough-1row-25ml.json'
+import tubeRack75MlUncasted from '../labware/definitions/1/tube-rack-.75ml.json'
+import tubeRack1550MlUncasted from '../labware/definitions/1/tube-rack-15_50ml.json'
+import tubeRack2Ml9X9Uncasted from '../labware/definitions/1/tube-rack-2ml-9x9.json'
+import tubeRack2MlUncasted from '../labware/definitions/1/tube-rack-2ml.json'
+import tubeRack5Ml96Uncasted from '../labware/definitions/1/tube-rack-5ml-96.json'
+import tubeRack80WellUncasted from '../labware/definitions/1/tube-rack-80well.json'
+import wheatonVialRackUncasted from '../labware/definitions/1/wheaton_vial_rack.json'
+
+import type {
+  LabwareDefByDefURI,
+  LabwareDefinition1,
+  LabwareDefinition2,
+  LegacyLabwareDefByName,
+} from './types'
+
+// cast v2 defs
 const agilent1Reservoir290MlV1 = agilent1Reservoir290MlV1Uncasted as LabwareDefinition2
 const appliedbiosystemsmicroamp384Wellplate40UlV1 = appliedbiosystemsmicroamp384Wellplate40UlV1Uncasted as LabwareDefinition2
 const armadillo96Wellplate200UlPcrFullSkirtV2 = armadillo96Wellplate200UlPcrFullSkirtV2Uncasted as LabwareDefinition2
@@ -220,6 +285,64 @@ const thermoscientificnunc96Wellplate2000UlV1 = thermoscientificnunc96Wellplate2
 const tipone96Tiprack200UlV1 = tipone96Tiprack200UlV1Uncasted as LabwareDefinition2
 const usascientific12Reservoir22MlV1 = usascientific12Reservoir22MlV1Uncasted as LabwareDefinition2
 const usascientific96Wellplate24MlDeepV1 = usascientific96Wellplate24MlDeepV1Uncasted as LabwareDefinition2
+
+//cast v1 defs
+
+const wellPlate12 = wellPlate12Uncasted as LabwareDefinition1
+const vial24Rack = vial24RackUncasted as LabwareDefinition1
+const well24Plate = well24PlateUncasted as LabwareDefinition1
+const plate384 = plate384Uncasted as LabwareDefinition1
+const vialPlate48 = vialPlate48Uncasted as LabwareDefinition1
+const wellPlate48 = wellPlate48Uncasted as LabwareDefinition1
+const tuberack5Ml3X4 = tuberack5Ml3X4Uncasted as LabwareDefinition1
+const wellPlate6 = wellPlate6Uncasted as LabwareDefinition1
+const pcr96Flat = pcr96FlatUncasted as LabwareDefinition1
+const pcr96PTall = pcr96PTallUncasted as LabwareDefinition1
+const deepWell96 = deepWell96Uncasted as LabwareDefinition1
+const flat96 = flat96Uncasted as LabwareDefinition1
+const wellPlate20Mm96 = wellPlate20Mm96Uncasted as LabwareDefinition1
+const maldiPlate = maldiPlateUncasted as LabwareDefinition1
+const pcrStripTall = pcrStripTallUncasted as LabwareDefinition1
+const t25Flask = t25FlaskUncasted as LabwareDefinition1
+const t75Flask = t75FlaskUncasted as LabwareDefinition1
+const alumBlockPcrStrips = alumBlockPcrStripsUncasted as LabwareDefinition1
+const bioradHardshell96Pcr = bioradHardshell96PcrUncasted as LabwareDefinition1
+const eGelgol = eGelgolUncasted as LabwareDefinition1
+const fixedTrash = (fixedTrashUncasted as unknown) as LabwareDefinition1
+const hampton1MlDeepBlock = hampton1MlDeepBlockUncasted as LabwareDefinition1
+const opentronsAluminumBlock2MlEppendorf = opentronsAluminumBlock2MlEppendorfUncasted as LabwareDefinition1
+const opentronsAluminumBlock2MlScrewcap = opentronsAluminumBlock2MlScrewcapUncasted as LabwareDefinition1
+const opentronsAluminumBlock96PcrPlate = opentronsAluminumBlock96PcrPlateUncasted as LabwareDefinition1
+const opentronsAluminumBlockPcrStrips200Ul = opentronsAluminumBlockPcrStrips200UlUncasted as LabwareDefinition1
+const opentronsTiprack10Ul = (opentronsTiprack10UlUncasted as unknown) as LabwareDefinition1
+const opentronsTiprack300Ul = (opentronsTiprack300UlUncasted as unknown) as LabwareDefinition1
+const opentronsTuberack15MlEppendorf = opentronsTuberack15MlEppendorfUncasted as LabwareDefinition1
+const opentronsTuberack1550Ml = opentronsTuberack1550MlUncasted as LabwareDefinition1
+const opentronsTuberack15Ml = opentronsTuberack15MlUncasted as LabwareDefinition1
+const opentronsTuberack2MlEppendorf = opentronsTuberack2MlEppendorfUncasted as LabwareDefinition1
+const opentronsTuberack2MlScrewcap = opentronsTuberack2MlScrewcapUncasted as LabwareDefinition1
+const opentronsTuberack50Ml = opentronsTuberack50MlUncasted as LabwareDefinition1
+const point = pointUncasted as LabwareDefinition1
+const rigakuCompactCrystallizationPlate = rigakuCompactCrystallizationPlateUncasted as LabwareDefinition1
+const smallVialRack16X45 = smallVialRack16X45Uncasted as LabwareDefinition1
+const tallFixedTrash = (tallFixedTrashUncasted as unknown) as LabwareDefinition1
+const tiprack1000UlH = (tiprack1000UlHUncasted as unknown) as LabwareDefinition1
+const tiprack1000UlChem = (tiprack1000UlChemUncasted as unknown) as LabwareDefinition1
+const tiprack1000Ul = (tiprack1000UlUncasted as unknown) as LabwareDefinition1
+const tiprack10UlH = (tiprack10UlHUncasted as unknown) as LabwareDefinition1
+const tiprack10Ul = (tiprack10UlUncasted as unknown) as LabwareDefinition1
+const tiprack200Ul = (tiprack200UlUncasted as unknown) as LabwareDefinition1
+const trashBox = (trashBoxUncasted as unknown) as LabwareDefinition1
+const trough12RowShort = trough12RowShortUncasted as LabwareDefinition1
+const trough12Row = trough12RowUncasted as LabwareDefinition1
+const trough1Row25Ml = trough1Row25MlUncasted as LabwareDefinition1
+const tubeRack75Ml = tubeRack75MlUncasted as LabwareDefinition1
+const tubeRack1550Ml = tubeRack1550MlUncasted as LabwareDefinition1
+const tubeRack2Ml9X9 = tubeRack2Ml9X9Uncasted as LabwareDefinition1
+const tubeRack2Ml = tubeRack2MlUncasted as LabwareDefinition1
+const tubeRack5Ml96 = tubeRack5Ml96Uncasted as LabwareDefinition1
+const tubeRack80Well = tubeRack80WellUncasted as LabwareDefinition1
+const wheatonVialRack = wheatonVialRackUncasted as LabwareDefinition1
 
 // labware definitions
 const getAllLabwareDefs = (): Record<string, LabwareDefinition2> => ({
@@ -330,8 +453,66 @@ const getAllLabwareDefs = (): Record<string, LabwareDefinition2> => ({
   usascientific96Wellplate24MlDeepV1,
 })
 
-let _definitions: LabwareDefByDefURI | null = null
+const getAllLegacyDefs = (): Record<string, LabwareDefinition1> => ({
+  wellPlate12,
+  vial24Rack,
+  well24Plate,
+  plate384,
+  vialPlate48,
+  wellPlate48,
+  tuberack5Ml3X4,
+  wellPlate6,
+  pcr96Flat,
+  pcr96PTall,
+  deepWell96,
+  flat96,
+  wellPlate20Mm96,
+  maldiPlate,
+  pcrStripTall,
+  t25Flask,
+  t75Flask,
+  alumBlockPcrStrips,
+  bioradHardshell96Pcr,
+  eGelgol,
+  fixedTrash,
+  hampton1MlDeepBlock,
+  opentronsAluminumBlock2MlEppendorf,
+  opentronsAluminumBlock2MlScrewcap,
+  opentronsAluminumBlock96PcrPlate,
+  opentronsAluminumBlockPcrStrips200Ul,
+  opentronsTiprack10Ul,
+  opentronsTiprack300Ul,
+  opentronsTuberack15MlEppendorf,
+  opentronsTuberack1550Ml,
+  opentronsTuberack15Ml,
+  opentronsTuberack2MlEppendorf,
+  opentronsTuberack2MlScrewcap,
+  opentronsTuberack50Ml,
+  point,
+  rigakuCompactCrystallizationPlate,
+  smallVialRack16X45,
+  tallFixedTrash,
+  tiprack1000UlH,
+  tiprack1000UlChem,
+  tiprack1000Ul,
+  tiprack10UlH,
+  tiprack10Ul,
+  tiprack200Ul,
+  trashBox,
+  trough12RowShort,
+  trough12Row,
+  trough1Row25Ml,
+  tubeRack75Ml,
+  tubeRack1550Ml,
+  tubeRack2Ml9X9,
+  tubeRack2Ml,
+  tubeRack5Ml96,
+  tubeRack80Well,
+  wheatonVialRack,
+})
 
+let _definitions: LabwareDefByDefURI | null = null
+let _legacyDefinitions: LegacyLabwareDefByName | null = null
 export function getAllDefinitions(
   blockList: string[] = []
 ): LabwareDefByDefURI {
@@ -347,6 +528,17 @@ export function getAllDefinitions(
   }
 
   return _definitions
+}
+
+export function getAllLegacyDefinitions(): LegacyLabwareDefByName {
+  if (_legacyDefinitions == null) {
+    _legacyDefinitions = Object.values(
+      getAllLegacyDefs()
+    ).reduce<LegacyLabwareDefByName>((acc, labwareDef: LabwareDefinition1) => {
+      return { ...acc, [labwareDef.metadata.name]: labwareDef }
+    }, {})
+  }
+  return _legacyDefinitions
 }
 
 export {

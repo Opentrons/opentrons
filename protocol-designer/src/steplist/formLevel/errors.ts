@@ -148,6 +148,7 @@ export const incompatibleLabware = (
 ): FormError | null => {
   const { labware, pipette } = fields
   if (!labware || !pipette) return null
+  //  trashBin and wasteChute cannot mix into a labware
   return !canPipetteUseLabware(pipette.spec, labware.def)
     ? INCOMPATIBLE_LABWARE
     : null
@@ -170,6 +171,7 @@ export const incompatibleAspirateLabware = (
 ): FormError | null => {
   const { aspirate_labware, pipette } = fields
   if (!aspirate_labware || !pipette) return null
+  //  trashBin and wasteChute cannot aspirate into a labware
   return !canPipetteUseLabware(pipette.spec, aspirate_labware.def)
     ? INCOMPATIBLE_ASPIRATE_LABWARE
     : null

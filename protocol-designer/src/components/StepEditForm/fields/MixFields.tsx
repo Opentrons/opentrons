@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { i18n } from '../../../localization'
+import { useTranslation } from 'react-i18next'
 import { CheckboxRowField, TextField } from './'
 import { FieldPropsByName } from '../types'
 import styles from '../StepEditForm.module.css'
@@ -10,6 +10,7 @@ export const MixFields = (props: {
   volumeFieldName: string
   timesFieldName: string
 }): JSX.Element => {
+  const { t } = useTranslation(['form', 'application'])
   const {
     propsForFields,
     checkboxFieldName,
@@ -20,18 +21,18 @@ export const MixFields = (props: {
   return (
     <CheckboxRowField
       {...propsForFields[checkboxFieldName]}
-      label={i18n.t('form.step_edit_form.field.mix.label')}
+      label={t('step_edit_form.field.mix.label')}
       className={styles.small_field}
     >
       <TextField
         {...propsForFields[volumeFieldName]}
         className={styles.small_field}
-        units={i18n.t('application.units.microliter')}
+        units={t('application:units.microliter')}
       />
       <TextField
         {...propsForFields[timesFieldName]}
         className={styles.small_field}
-        units={i18n.t('application.units.times')}
+        units={t('application:units.times')}
       />
     </CheckboxRowField>
   )

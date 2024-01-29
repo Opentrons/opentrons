@@ -1,14 +1,22 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders, BaseDeck } from '@opentrons/components'
-import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
+import {
+  useDeckConfigurationQuery,
+  useUpdateDeckConfigurationMutation,
+} from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolSetupDeckConfiguration } from '..'
 
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type { UseQueryResult } from 'react-query'
+import type {
+  CompletedProtocolAnalysis,
+  DeckConfiguration,
+} from '@opentrons/shared-data'
 
 jest.mock('@opentrons/components/src/hardware-sim/BaseDeck/index')
 jest.mock('@opentrons/react-api-client')
@@ -33,6 +41,9 @@ const mockUseUpdateDeckConfigurationMutation = useUpdateDeckConfigurationMutatio
   typeof useUpdateDeckConfigurationMutation
 >
 const mockBaseDeck = BaseDeck as jest.MockedFunction<typeof BaseDeck>
+const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
+  typeof useDeckConfigurationQuery
+>
 
 const render = (
   props: React.ComponentProps<typeof ProtocolSetupDeckConfiguration>
@@ -59,6 +70,9 @@ describe('ProtocolSetupDeckConfiguration', () => {
     mockUseUpdateDeckConfigurationMutation.mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
+    mockUseDeckConfigurationQuery.mockReturnValue(({
+      data: [],
+    } as unknown) as UseQueryResult<DeckConfiguration>)
   })
 
   afterEach(() => {
@@ -74,13 +88,13 @@ describe('ProtocolSetupDeckConfiguration', () => {
 
   it('should call a mock function when tapping the back button', () => {
     const [{ getByTestId }] = render(props)
-    getByTestId('ChildNavigation_Back_Button').click()
+    fireEvent.click(getByTestId('ChildNavigation_Back_Button'))
     expect(mockSetSetupScreen).toHaveBeenCalledWith('modules')
   })
 
   it('should call a mock function when tapping confirm button', () => {
     const [{ getByText }] = render(props)
-    getByText('Confirm').click()
+    fireEvent.click(getByText('Confirm'))
     expect(mockUpdateDeckConfiguration).toHaveBeenCalled()
   })
 })

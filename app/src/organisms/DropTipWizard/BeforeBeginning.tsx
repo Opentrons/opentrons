@@ -1,6 +1,7 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+
 import {
   Flex,
   SPACING,
@@ -17,37 +18,25 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   JUSTIFY_FLEX_END,
-  POSITION_ABSOLUTE,
   JUSTIFY_SPACE_AROUND,
 } from '@opentrons/components'
+
 import { StyledText } from '../../atoms/text'
 import { SmallButton, MediumButton } from '../../atoms/buttons'
+import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 // import { NeedHelpLink } from '../CalibrationPanels'
 
 import blowoutVideo from '../../assets/videos/droptip-wizard/Blowout-Liquid.webm'
 import droptipVideo from '../../assets/videos/droptip-wizard/Drop-tip.webm'
-
-import type { UseMutateFunction } from 'react-query'
-import type { AxiosError } from 'axios'
-import type {
-  CreateMaintenanceRunData,
-  MaintenanceRun,
-} from '@opentrons/api-client'
 
 // TODO: get help link article URL
 // const NEED_HELP_URL = ''
 
 interface BeforeBeginningProps {
   setShouldDispenseLiquid: (shouldDispenseLiquid: boolean) => void
-  createMaintenanceRun: UseMutateFunction<
-    MaintenanceRun,
-    AxiosError<any>,
-    CreateMaintenanceRunData,
-    unknown
-  >
   createdMaintenanceRunId: string | null
-  isCreateLoading: boolean
   isOnDevice: boolean
+  isRobotMoving: boolean
 }
 
 export const BeforeBeginning = (
@@ -55,10 +44,9 @@ export const BeforeBeginning = (
 ): JSX.Element | null => {
   const {
     setShouldDispenseLiquid,
-    createMaintenanceRun,
     createdMaintenanceRunId,
-    isCreateLoading,
     isOnDevice,
+    isRobotMoving,
   } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const [flowType, setFlowType] = React.useState<
@@ -69,11 +57,17 @@ export const BeforeBeginning = (
     setShouldDispenseLiquid(flowType === 'liquid_and_tips')
   }
 
-  React.useEffect(() => {
-    if (createdMaintenanceRunId == null) {
-      createMaintenanceRun({})
-    }
-  }, [])
+  if (isRobotMoving || createdMaintenanceRunId == null) {
+    return (
+      <InProgressModal
+        description={
+          createdMaintenanceRunId == null
+            ? t('getting_ready')
+            : t('stand_back_exiting')
+        }
+      />
+    )
+  }
 
   if (isOnDevice) {
     return (
@@ -119,7 +113,7 @@ export const BeforeBeginning = (
           <SmallButton
             buttonText={i18n.format(t('shared:continue'), 'capitalize')}
             onClick={handleProceed}
-            disabled={isCreateLoading || flowType == null}
+            disabled={flowType == null}
           />
         </Flex>
       </Flex>
@@ -144,7 +138,6 @@ export const BeforeBeginning = (
                 : UNSELECTED_OPTIONS_STYLE
             }
           >
-            <Flex height="100%" width="100%" position={POSITION_ABSOLUTE} />
             <video
               css={css`
                 max-width: 8.96rem;
@@ -182,10 +175,7 @@ export const BeforeBeginning = (
         </Flex>
         <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_FLEX_END}>
           {/* <NeedHelpLink href={NEED_HELP_URL} /> */}
-          <PrimaryButton
-            disabled={isCreateLoading || flowType == null}
-            onClick={handleProceed}
-          >
+          <PrimaryButton disabled={flowType == null} onClick={handleProceed}>
             {i18n.format(t('shared:continue'), 'capitalize')}
           </PrimaryButton>
         </Flex>
@@ -196,7 +186,7 @@ export const BeforeBeginning = (
 
 const UNSELECTED_OPTIONS_STYLE = css`
   background-color: ${COLORS.white};
-  border: 1px solid ${COLORS.medGreyEnabled};
+  border: 1px solid ${COLORS.grey30};
   border-radius: ${BORDERS.radiusSoftCorners};
   height: 12.5625rem;
   width: 14.5625rem;
@@ -207,14 +197,14 @@ const UNSELECTED_OPTIONS_STYLE = css`
   grid-gap: ${SPACING.spacing8}
 
   &:hover {
-    border: 1px solid ${COLORS.medGreyHover};
+    border: 1px solid ${COLORS.grey60};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     flex-direction: ${DIRECTION_ROW};
     justify-content: ${JUSTIFY_FLEX_START};
-    background-color: ${COLORS.mediumBlueEnabled};
-    border-width: 0; 
+    background-color: ${COLORS.blue35};
+    border-width: 0;
     border-radius: ${BORDERS.borderRadiusSize4};
     padding: ${SPACING.spacing24};
     height: 5.25rem;
@@ -227,20 +217,20 @@ const UNSELECTED_OPTIONS_STYLE = css`
 `
 const SELECTED_OPTIONS_STYLE = css`
   ${UNSELECTED_OPTIONS_STYLE}
-  border: 1px solid ${COLORS.blueEnabled};
+  border: 1px solid ${COLORS.blue50};
 
   &:hover {
-    border: 1px solid ${COLORS.blueEnabled};
+    border: 1px solid ${COLORS.blue50};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     border-width: 0px;
-    background-color: ${COLORS.blueEnabled};
+    background-color: ${COLORS.blue50};
     color: ${COLORS.white};
 
     &:hover {
       border-width: 0px;
-      background-color: ${COLORS.blueEnabled};
+      background-color: ${COLORS.blue50};
     }
   }
 `

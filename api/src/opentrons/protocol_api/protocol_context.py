@@ -16,14 +16,17 @@ from typing import (
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
-from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
+from opentrons.types import Mount, Location, DeckLocation, DeckSlotName, StagingSlotName
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import MagneticBlockModel
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support import instrument as instrument_support
-from opentrons.protocols.api_support.deck_type import NoTrashDefinedError
+from opentrons.protocols.api_support.deck_type import (
+    NoTrashDefinedError,
+    should_load_fixed_trash_for_python_protocol,
+)
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
@@ -31,7 +34,7 @@ from opentrons.protocols.api_support.util import (
     APIVersionError,
 )
 
-from ._types import OffDeckType, StagingSlotName
+from ._types import OffDeckType
 from .core.common import ModuleCore, LabwareCore, ProtocolCore
 from .core.core_map import LoadedCoreMap
 from .core.engine.module_core import NonConnectedModuleCore
@@ -47,6 +50,7 @@ from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 
 from . import validation
 from ._liquid import Liquid
+from ._trash_bin import TrashBin
 from ._waste_chute import WasteChute
 from .deck import Deck
 from .instrument_context import InstrumentContext
@@ -137,13 +141,32 @@ class ProtocolContext(CommandPublisher):
             mount: None for mount in Mount
         }
         self._bundled_data: Dict[str, bytes] = bundled_data or {}
+
+        # With the addition of Moveable Trashes and Waste Chute support, it is not necessary
+        # to ensure that the list of "disposal locations", essentially the list of trashes,
+        # is initialized correctly on protocols utilizing former API versions prior to 2.16
+        # and also to ensure that any protocols after 2.16 intialize a Fixed Trash for OT-2
+        # protocols so that no load trash bin behavior is required within the protocol itself.
+        # Protocols prior to 2.16 expect the Fixed Trash to exist as a Labware object, while
+        # protocols after 2.16 expect trash to exist as either a TrashBin or WasteChute object.
+
         self._load_fixed_trash()
+        if should_load_fixed_trash_for_python_protocol(self._api_version):
+            self._core.append_disposal_location(self.fixed_trash)
+        elif (
+            self._api_version >= APIVersion(2, 16)
+            and self._core.robot_type == "OT-2 Standard"
+        ):
+            _fixed_trash_trashbin = TrashBin(
+                location=DeckSlotName.FIXED_TRASH, addressable_area_name="fixedTrash"
+            )
+            self._core.append_disposal_location(_fixed_trash_trashbin)
 
         self._commands: List[str] = []
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
         self.clear_commands()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def api_version(self) -> APIVersion:
         """Return the API version supported by this protocol context.
@@ -165,7 +188,7 @@ class ProtocolContext(CommandPublisher):
         )
         return HardwareManager(hardware=self._core.get_hardware())
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def bundled_data(self) -> Dict[str, bytes]:
         """Accessor for data files bundled with this protocol, if any.
@@ -187,7 +210,7 @@ class ProtocolContext(CommandPublisher):
         if getattr(self, "_unsubscribe_commands", None):
             self._unsubscribe_commands()  # type: ignore
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def max_speeds(self) -> AxisMaxSpeeds:
         """Per-axis speed limits when moving this instrument.
@@ -439,18 +462,52 @@ class ProtocolContext(CommandPublisher):
         )
 
     @requires_version(2, 16)
-    # TODO: Confirm official naming of "waste chute".
+    def load_trash_bin(self, location: DeckLocation) -> TrashBin:
+        """Load a trash bin on the deck of a Flex.
+
+        See :ref:`configure-trash-bin` for details.
+
+        If you try to load a trash bin on an OT-2, the API will raise an error.
+
+        :param location: The :ref:`deck slot <deck-slots>` where the trash bin is. The
+            location can be any unoccupied slot in column 1 or 3.
+
+            If you try to load a trash bin in column 2 or 4, the API will raise an error.
+        """
+        slot_name = validation.ensure_and_convert_deck_slot(
+            location,
+            api_version=self._api_version,
+            robot_type=self._core.robot_type,
+        )
+        if not isinstance(slot_name, DeckSlotName):
+            raise ValueError("Staging areas not permitted for trash bin.")
+        addressable_area_name = validation.ensure_and_convert_trash_bin_location(
+            location,
+            api_version=self._api_version,
+            robot_type=self._core.robot_type,
+        )
+        trash_bin = TrashBin(
+            location=slot_name, addressable_area_name=addressable_area_name
+        )
+        self._core.append_disposal_location(trash_bin)
+        return trash_bin
+
+    @requires_version(2, 16)
     def load_waste_chute(
         self,
-        *,
-        # TODO: Confirm official naming of "staging area slot".
-        with_staging_area_slot_d4: bool = False,
     ) -> WasteChute:
-        if with_staging_area_slot_d4:
-            raise NotImplementedError(
-                "The waste chute staging area slot is not currently implemented."
-            )
-        return WasteChute(with_staging_area_slot_d4=with_staging_area_slot_d4)
+        """Load the waste chute on the deck.
+
+        See :ref:`configure-waste-chute` for details, including the deck configuration
+        variants of the waste chute.
+
+        The deck plate adapter for the waste chute can only go in slot D3. If you try to
+        load another item in slot D3 after loading the waste chute, or vice versa, the
+        API will raise an error.
+        """
+        waste_chute = WasteChute()
+        self._core.append_disposal_location(waste_chute)
+        return waste_chute
 
     @requires_version(2, 15)
     def load_adapter(
@@ -520,7 +577,7 @@ class ProtocolContext(CommandPublisher):
 
     # TODO(mm, 2023-06-07): Figure out what to do with this, now that the Flex has non-integer
     # slot names and labware can be stacked. https://opentrons.atlassian.net/browse/RLAB-354
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def loaded_labwares(self) -> Dict[int, Labware]:
         """Get the labwares that have been loaded into the protocol context.
@@ -739,7 +796,7 @@ class ProtocolContext(CommandPublisher):
 
     # TODO(mm, 2023-06-07): Figure out what to do with this, now that the Flex has non-integer
     # slot names and labware can be stacked. https://opentrons.atlassian.net/browse/RLAB-354
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def loaded_modules(self) -> Dict[int, ModuleTypes]:
         """Get the modules loaded into the protocol context.
@@ -764,7 +821,7 @@ class ProtocolContext(CommandPublisher):
     def load_instrument(
         self,
         instrument_name: str,
-        mount: Union[Mount, str],
+        mount: Union[Mount, str, None] = None,
         tip_racks: Optional[List[Labware]] = None,
         replace: bool = False,
     ) -> InstrumentContext:
@@ -774,15 +831,16 @@ class ProtocolContext(CommandPublisher):
         ensure that the correct instrument is attached in the specified
         location.
 
-        :param str instrument_name: The name of the instrument model, or a
-                                    prefix. For instance, 'p10_single' may be
-                                    used to request a P10 single regardless of
-                                    the version.
-        :param mount: The mount in which this instrument should be attached.
+        :param str instrument_name: Which instrument you want to load. See :ref:`new-pipette-models`
+                                    for the valid values.
+        :param mount: The mount where this instrument should be attached.
                       This can either be an instance of the enum type
-                      :py:class:`.types.Mount` or one of the strings `'left'`
-                      and `'right'`.
-        :type mount: types.Mount or str
+                      :py:class:`.types.Mount` or one of the strings ``"left"``
+                      or ``"right"``. If you're loading a Flex 96-Channel Pipette
+                      (``instrument_name="flex_96channel_1000"``), you can leave this unspecified,
+                      since it always occupies both mounts; if you do specify a value, it will be
+                      ignored.
+        :type mount: types.Mount or str or ``None``
         :param tip_racks: A list of tip racks from which to pick tips if
                           :py:meth:`.InstrumentContext.pick_up_tip` is called
                           without arguments.
@@ -793,9 +851,11 @@ class ProtocolContext(CommandPublisher):
         """
         instrument_name = validation.ensure_lowercase_name(instrument_name)
         checked_instrument_name = validation.ensure_pipette_name(instrument_name)
-        is_96_channel = checked_instrument_name == PipetteNameType.P1000_96
+        checked_mount = validation.ensure_mount_for_pipette(
+            mount, checked_instrument_name
+        )
 
-        checked_mount = Mount.LEFT if is_96_channel else validation.ensure_mount(mount)
+        is_96_channel = checked_instrument_name == PipetteNameType.P1000_96
 
         tip_racks = tip_racks or []
 
@@ -831,10 +891,10 @@ class ProtocolContext(CommandPublisher):
                 log=logger,
             )
 
-        trash: Optional[Labware]
+        trash: Optional[Union[Labware, TrashBin]]
         try:
             trash = self.fixed_trash
-        except NoTrashDefinedError:
+        except (NoTrashDefinedError, APIVersionError):
             trash = None
 
         instrument = InstrumentContext(
@@ -851,7 +911,7 @@ class ProtocolContext(CommandPublisher):
 
         return instrument
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def loaded_instruments(self) -> Dict[str, InstrumentContext]:
         """Get the instruments that have been loaded into the protocol.
@@ -958,7 +1018,7 @@ class ProtocolContext(CommandPublisher):
     def location_cache(self, loc: Optional[Location]) -> None:
         self._core.set_last_location(loc)
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def deck(self) -> Deck:
         """An interface to provide information about what's currently loaded on the deck.
@@ -969,7 +1029,7 @@ class ProtocolContext(CommandPublisher):
         will all return the object loaded in the front-left slot. (See :ref:`deck-slots`.)
 
         The value will be a :py:obj:`~opentrons.protocol_api.Labware` if the slot contains a
-        labware, a :py:obj:`~opentrons.protocol_api.ModuleContext` if the slot contains a hardware
+        labware, a module context if the slot contains a hardware
         module, or ``None`` if the slot doesn't contain anything.
 
         Rather than filtering the objects in the deck map yourself,
@@ -992,19 +1052,39 @@ class ProtocolContext(CommandPublisher):
         """
         return self._deck
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
-    def fixed_trash(self) -> Labware:
-        """The trash fixed to slot 12 of the robot deck.
+    def fixed_trash(self) -> Union[Labware, TrashBin]:
+        """The trash fixed to slot 12 of an OT-2's deck.
 
-        It has one well and should be accessed like labware in your protocol.
-        e.g. ``protocol.fixed_trash['A1']``
+        In API version 2.15 and earlier, the fixed trash is a :py:class:`.Labware` object with one well. Access it like labware in your protocol. For example, ``protocol.fixed_trash['A1']``.
+
+        In API version 2.15 only, Flex protocols have a fixed trash in slot A3.
+
+        In API version 2.16 and later, the fixed trash only exists in OT-2 protocols. It is a :py:class:`.TrashBin` object, which doesn't have any wells. Trying to access ``fixed_trash`` in a Flex protocol will raise an error. See :ref:`configure-trash-bin` for details on using the movable trash in Flex protocols.
+
+        .. versionchanged:: 2.16
+            Returns a ``TrashBin`` object.
         """
+        if self._api_version >= APIVersion(2, 16):
+            if self._core.robot_type == "OT-3 Standard":
+                raise APIVersionError(
+                    "Fixed Trash is not supported on Flex protocols in API Version 2.16 and above."
+                )
+            disposal_locations = self._core.get_disposal_locations()
+            if len(disposal_locations) == 0:
+                raise NoTrashDefinedError(
+                    "No trash container has been defined in this protocol."
+                )
+            if isinstance(disposal_locations[0], TrashBin):
+                return disposal_locations[0]
+
         fixed_trash = self._core_map.get(self._core.fixed_trash)
         if fixed_trash is None:
             raise NoTrashDefinedError(
                 "No trash container has been defined in this protocol."
             )
+
         return fixed_trash
 
     def _load_fixed_trash(self) -> None:
@@ -1046,13 +1126,13 @@ class ProtocolContext(CommandPublisher):
             display_color=display_color,
         )
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 5)
     def rail_lights_on(self) -> bool:
         """Returns True if the rail lights are on"""
         return self._core.get_rail_lights_on()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 5)
     def door_closed(self) -> bool:
         """Returns True if the robot door is closed"""

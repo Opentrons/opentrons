@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { Form, Formik, useFormikContext } from 'formik'
 import {
@@ -10,11 +11,11 @@ import {
   DIRECTION_ROW,
   Box,
   Text,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
   JUSTIFY_FLEX_END,
   JUSTIFY_END,
   DeckConfigurator,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 import {
   CutoutId,
@@ -24,7 +25,6 @@ import {
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 import { getStagingAreaSlots } from '../../utils'
-import { i18n } from '../../localization'
 import {
   createDeckFixture,
   deleteDeckFixture,
@@ -41,20 +41,23 @@ export interface StagingAreasValues {
 const StagingAreasModalComponent = (
   props: StagingAreasModalProps
 ): JSX.Element => {
+  const { t } = useTranslation(['button', 'alert'])
   const { onCloseClick, stagingAreas } = props
   const { values, setFieldValue } = useFormikContext<StagingAreasValues>()
   const initialDeckSetup = useSelector(getInitialDeckSetup)
-  const areSlotsEmpty = values.selectedSlots.map(slot =>
-    getSlotIsEmpty(initialDeckSetup, slot)
-  )
   const hasWasteChute =
     Object.values(initialDeckSetup.additionalEquipmentOnDeck).find(
       aE => aE.name === 'wasteChute'
     ) != null
-  const hasConflictedSlot =
-    hasWasteChute && values.selectedSlots.find(slot => slot === 'cutoutD3')
-      ? false
-      : areSlotsEmpty.includes(false)
+  const areSlotsEmpty = values.selectedSlots.map(slot => {
+    if (slot === 'cutoutD3' && hasWasteChute) {
+      return true
+    } else {
+      return getSlotIsEmpty(initialDeckSetup, slot)
+    }
+  })
+
+  const hasConflictedSlot = areSlotsEmpty.includes(false)
 
   const mappedStagingAreas: DeckConfiguration = stagingAreas.flatMap(area => {
     return area.location != null
@@ -120,50 +123,42 @@ const StagingAreasModalComponent = (
 
   return (
     <Form>
-      <Box paddingX={SPACING.spacing32}>
+      <Flex height="23rem" flexDirection={DIRECTION_COLUMN}>
         <Flex
           justifyContent={JUSTIFY_END}
           alignItems={ALIGN_CENTER}
-          height="3.125rem"
+          height="4rem"
+          paddingX={SPACING.spacing32}
         >
           <Box>
             {hasConflictedSlot ? (
               <PDAlert
                 alertType="warning"
-                title={i18n.t(
-                  'alert.deck_config_placement.SLOT_OCCUPIED.staging_area'
+                title={t(
+                  'alert:deck_config_placement.SLOT_OCCUPIED.staging_area'
                 )}
                 description={''}
               />
             ) : null}
           </Box>
         </Flex>
-
-        <Flex
-          height="20rem"
-          marginTop="-2.5rem"
-          justifyContent={JUSTIFY_CENTER}
-        >
-          <DeckConfigurator
-            deckConfig={updatedSlots}
-            handleClickAdd={handleClickAdd}
-            handleClickRemove={handleClickRemove}
-          />
-        </Flex>
-      </Box>
+        <DeckConfigurator
+          deckConfig={updatedSlots}
+          handleClickAdd={handleClickAdd}
+          handleClickRemove={handleClickRemove}
+          showExpansion={false}
+        />
+      </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_FLEX_END}
-        paddingTop="4rem"
         paddingRight={SPACING.spacing32}
         paddingBottom={SPACING.spacing32}
         gridGap={SPACING.spacing8}
       >
-        <OutlineButton onClick={onCloseClick}>
-          {i18n.t('button.cancel')}
-        </OutlineButton>
+        <OutlineButton onClick={onCloseClick}>{t('cancel')}</OutlineButton>
         <OutlineButton type={BUTTON_TYPE_SUBMIT} disabled={hasConflictedSlot}>
-          {i18n.t('button.save')}
+          {t('save')}
         </OutlineButton>
       </Flex>
     </Form>
@@ -179,6 +174,7 @@ export const StagingAreasModal = (
   props: StagingAreasModalProps
 ): JSX.Element => {
   const { onCloseClick, stagingAreas } = props
+  const { t } = useTranslation('modules')
   const dispatch = useDispatch()
   const stagingAreaLocations = getStagingAreaSlots(stagingAreas)
 
@@ -207,7 +203,7 @@ export const StagingAreasModal = (
       <ModalShell width="48rem">
         <Box marginTop={SPACING.spacing32} paddingX={SPACING.spacing32}>
           <Text as="h2">
-            {i18n.t(`modules.additional_equipment_display_names.stagingAreas`)}
+            {t(`additional_equipment_display_names.stagingAreas`)}
           </Text>
         </Box>
         <StagingAreasModalComponent

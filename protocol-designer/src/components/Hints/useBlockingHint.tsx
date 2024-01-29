@@ -2,9 +2,10 @@
 // Instances of BlockingHint need to be individually placed by whatever component
 // is controlling the flow that this modal will block, via useBlockingHint.
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { actions, selectors, HintKey } from '../../tutorial'
 import { ContinueModal, DeprecatedCheckboxField } from '@opentrons/components'
+import { actions, selectors, HintKey } from '../../tutorial'
 import { Portal } from '../portals/MainPageModalPortal'
 import { i18n } from '../../localization'
 import styles from './hints.module.css'
@@ -18,6 +19,7 @@ export interface HintProps {
 
 // This component handles the checkbox and dispatching `removeHint` action on continue/cancel
 export const BlockingHint = (props: HintProps): JSX.Element => {
+  const { t } = useTranslation('alert')
   const { hintKey, handleCancel, handleContinue } = props
   const dispatch = useDispatch()
 
@@ -43,7 +45,7 @@ export const BlockingHint = (props: HintProps): JSX.Element => {
     <Portal>
       <ContinueModal
         alertOverlay
-        heading={i18n.t(`alert.hint.${hintKey}.title`)}
+        heading={t(`hint.${hintKey}.title`)}
         onCancelClick={onCancelClick}
         onContinueClick={onContinueClick}
       >
@@ -51,7 +53,7 @@ export const BlockingHint = (props: HintProps): JSX.Element => {
         <div>
           <DeprecatedCheckboxField
             className={styles.dont_show_again}
-            label={i18n.t('alert.hint.dont_show_again')}
+            label={t('hint.dont_show_again')}
             onChange={toggleRememberDismissal}
             value={rememberDismissal}
           />

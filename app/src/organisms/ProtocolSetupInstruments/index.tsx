@@ -12,14 +12,14 @@ import {
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
-import { PipetteRecalibrationODDWarning } from '../../pages/OnDeviceDisplay/PipetteRealibrationODDWarning'
+import { PipetteRecalibrationODDWarning } from '../../pages/InstrumentsDashboard/PipetteRecalibrationODDWarning'
 import { getShowPipetteCalibrationWarning } from '../Devices/utils'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolInstrumentMountItem } from '../InstrumentMountItem'
 
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
-import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import type { SetupScreens } from '../../pages/ProtocolSetup'
 import { isGripperInCommands } from '../../resources/protocols/utils'
 
 export interface ProtocolSetupInstrumentsProps {
@@ -85,7 +85,6 @@ export function ProtocolSetupInstruments({
             mount={loadedPipette.mount}
             speccedName={loadedPipette.pipetteName}
             attachedInstrument={attachedPipetteMatch}
-            mostRecentAnalysis={mostRecentAnalysis}
             instrumentsRefetch={refetch}
           />
         )
@@ -107,5 +106,5 @@ const ColumnLabel = styled.p`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
-  color: ${COLORS.darkBlack70};
+  color: ${COLORS.grey60};
 `

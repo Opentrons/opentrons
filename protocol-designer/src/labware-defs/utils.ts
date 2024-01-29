@@ -2,10 +2,21 @@ import groupBy from 'lodash/groupBy'
 import {
   getLabwareDefURI,
   PD_DO_NOT_LIST,
+  LabwareDefinition1,
   LabwareDefinition2,
   getAllDefinitions as _getAllDefinitions,
+  getAllLegacyDefinitions,
 } from '@opentrons/shared-data'
 import { LabwareDefByDefURI } from './types'
+
+export function getLegacyLabwareDef(
+  loadName: string | null | undefined
+): LabwareDefinition1 | null {
+  if (loadName != null) {
+    return getAllLegacyDefinitions()[loadName]
+  }
+  return null
+}
 
 let _definitions: LabwareDefByDefURI | null = null
 export function getAllDefinitions(): LabwareDefByDefURI {

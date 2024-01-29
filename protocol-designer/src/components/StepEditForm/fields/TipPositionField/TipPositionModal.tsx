@@ -1,5 +1,6 @@
 import * as React from 'react'
 import cx from 'classnames'
+import { useTranslation } from 'react-i18next'
 import round from 'lodash/round'
 import {
   AlertModal,
@@ -10,7 +11,6 @@ import {
   OutlineButton,
   RadioGroup,
 } from '@opentrons/components'
-import { i18n } from '../../../../localization'
 import { Portal } from '../../../portals/MainPageModalPortal'
 import modalStyles from '../../../modals/modal.module.css'
 import { TipPositionZAxisViz } from './TipPositionZAxisViz'
@@ -45,13 +45,14 @@ const getErrorText = (args: {
   maxMmFromBottom: number
   minMmFromBottom: number
   isPristine: boolean
+  t: any
 }): string | null => {
-  const { errors, minMmFromBottom, maxMmFromBottom, isPristine } = args
+  const { errors, minMmFromBottom, maxMmFromBottom, isPristine, t } = args
 
   if (errors.includes(TOO_MANY_DECIMALS)) {
-    return i18n.t('modal.tip_position.errors.TOO_MANY_DECIMALS')
+    return t('tip_position.errors.TOO_MANY_DECIMALS')
   } else if (!isPristine && errors.includes(OUT_OF_BOUNDS)) {
-    return i18n.t('modal.tip_position.errors.OUT_OF_BOUNDS', {
+    return t('tip_position.errors.OUT_OF_BOUNDS', {
       minMmFromBottom,
       maxMmFromBottom,
     })
@@ -89,7 +90,7 @@ const getErrors = (args: {
 
 export const TipPositionModal = (props: Props): JSX.Element => {
   const { isIndeterminate, name, wellDepthMm } = props
-
+  const { t } = useTranslation(['modal', 'button'])
   const defaultMmFromBottom = utils.getDefaultMmFromBottom({
     name,
     wellDepthMm,
@@ -135,6 +136,7 @@ export const TipPositionModal = (props: Props): JSX.Element => {
     maxMmFromBottom,
     minMmFromBottom,
     isPristine,
+    t,
   })
 
   const handleDone = (): void => {
@@ -234,10 +236,10 @@ export const TipPositionModal = (props: Props): JSX.Element => {
         <AlertModal
           alertOverlay
           buttons={[
-            { onClick: handleCancel, children: i18n.t('button.cancel') },
+            { onClick: handleCancel, children: t('button:cancel') },
             {
               onClick: handleDone,
-              children: i18n.t('button.done'),
+              children: t('button:done'),
               disabled: hasVisibleErrors,
             },
           ]}
@@ -246,8 +248,8 @@ export const TipPositionModal = (props: Props): JSX.Element => {
           onCloseClick={handleCancel}
         >
           <div className={styles.modal_header}>
-            <h4>{i18n.t('modal.tip_position.title')}</h4>
-            <p>{i18n.t(`modal.tip_position.body.${name}`)}</p>
+            <h4>{t('tip_position.title')}</h4>
+            <p>{t(`tip_position.body.${name}`)}</p>
           </div>
           <div className={styles.main_row}>
             <Flex alignItems="flex-start">

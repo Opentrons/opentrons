@@ -1,6 +1,6 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { IconButton, Tooltip, useHoverTooltip } from '@opentrons/components'
-import { i18n } from '../../../localization'
 import styles from '../StepEditForm.module.css'
 
 interface Props {
@@ -14,6 +14,7 @@ interface Props {
 export const AspDispSection = (props: Props): JSX.Element => {
   const { children, className, collapsed, toggleCollapsed, prefix } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
+  const { t } = useTranslation('tooltip')
   return (
     // @ts-expect-error(sa, 2021-7-2): className might be null
     <div className={className}>
@@ -23,7 +24,7 @@ export const AspDispSection = (props: Props): JSX.Element => {
           {...tooltipProps}
           key={collapsed ? 'collapsed' : 'expanded'} // NOTE: without this key, the IconButton will not re-render unless clicked
         >
-          {i18n.t('tooltip.advanced_settings')}
+          {t('advanced_settings')}
         </Tooltip>
         <div
           {...targetProps}

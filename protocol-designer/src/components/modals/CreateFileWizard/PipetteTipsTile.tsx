@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
 import { FormikProps } from 'formik'
@@ -24,7 +25,6 @@ import {
   JUSTIFY_END,
 } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import { i18n } from '../../../localization'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { getAllowAllTipracks } from '../../../feature-flags/selectors'
@@ -35,6 +35,8 @@ import { HandleEnter } from './HandleEnter'
 
 import type { PipetteName } from '@opentrons/shared-data'
 import type { FormState, WizardTileProps } from './types'
+import { ThunkDispatch } from 'redux-thunk'
+import { BaseState } from '../../../types'
 
 export function FirstPipetteTipsTile(props: WizardTileProps): JSX.Element {
   return <PipetteTipsTile {...props} mount="left" />
@@ -62,18 +64,16 @@ interface PipetteTipsTileProps extends WizardTileProps {
 }
 export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
   const { proceed, goBack, mount, values } = props
+  const { t } = useTranslation(['modal', 'application'])
 
   const firstPipetteName = values.pipettesByMount[mount].pipetteName
-  const tileHeader = i18n.t(
-    'modal.create_file_wizard.choose_tips_for_pipette',
-    {
-      pipetteName:
-        firstPipetteName != null
-          ? getPipetteNameSpecs(firstPipetteName as PipetteName)?.displayName ??
-            ''
-          : '',
-    }
-  )
+  const tileHeader = t('choose_tips_for_pipette', {
+    pipetteName:
+      firstPipetteName != null
+        ? getPipetteNameSpecs(firstPipetteName as PipetteName)?.displayName ??
+          ''
+        : '',
+  })
   return (
     <HandleEnter onEnter={proceed}>
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
@@ -93,7 +93,7 @@ export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
         >
           <GoBack onClick={() => goBack()} />
           <PrimaryButton onClick={() => proceed()}>
-            {i18n.t('application.next')}
+            {t('application:next')}
           </PrimaryButton>
         </Flex>
       </Flex>
@@ -102,10 +102,10 @@ export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
 }
 
 const INPUT_STYLE = css`
-  background-color: ${COLORS.blueEnabled};
+  background-color: ${COLORS.blue50};
   border-radius: ${BORDERS.radiusRoundEdge};
   box-shadow: none;
-  color: ${COLORS.fundamentalsBackground};
+  color: ${COLORS.grey10};
   overflow: no-wrap;
   padding-left: ${SPACING.spacing16};
   padding-right: ${SPACING.spacing16};
@@ -122,22 +122,22 @@ const INPUT_STYLE = css`
   }
 
   &:hover {
-    background-color: ${COLORS.blueHover};
+    background-color: ${COLORS.blue55};
     box-shadow: none;
   }
 
   &:active {
-    background-color: ${COLORS.bluePressed};
+    background-color: ${COLORS.blue60};
   }
 `
 
 const ACCORDION_STYLE = css`
   border-radius: 50%;
   &:hover {
-    background: ${COLORS.lightGreyHover};
+    background: ${COLORS.grey30};
   }
   &:active {
-    background: ${COLORS.lightGreyPressed};
+    background: ${COLORS.grey35};
   }
 `
 interface PipetteTipsFieldProps extends FormikProps<FormState> {
@@ -146,8 +146,9 @@ interface PipetteTipsFieldProps extends FormikProps<FormState> {
 
 function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
   const { mount, values, setFieldValue } = props
+  const { t } = useTranslation('modal')
   const allowAllTipracks = useSelector(getAllowAllTipracks)
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const [showCustomTipracks, setShowCustomTipracks] = React.useState<boolean>(
     false
   )
@@ -179,6 +180,9 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
 
   React.useEffect(() => {
     if (currentValue === undefined) {
+      // this timeout avoids an infinite loop caused by Formik and React 18 not playing nice
+      // see https://github.com/downshift-js/downshift/issues/1511
+      // TODO: migrate away from formik
       setTimeout(() => {
         setFieldValue(nameAccessor, tiprackOptions[0]?.value ?? '')
       })
@@ -224,9 +228,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
-            <Text as="h4">
-              {i18n.t('modal.create_file_wizard.custom_tiprack')}
-            </Text>
+            <Text as="h4">{t('custom_tiprack')}</Text>
 
             <OutlineButton Component="label" css={INPUT_STYLE}>
               <Flex
@@ -235,7 +237,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
                 gridGap={SPACING.spacing2}
               >
                 <Icon name="plus" size="1rem" />
-                {i18n.t('modal.create_file_wizard.upload')}
+                {t('upload')}
               </Flex>
               <input
                 type="file"
@@ -270,7 +272,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
               alignItems={ALIGN_CENTER}
               width="100%"
               height="8.5rem"
-              backgroundColor={COLORS.darkBlack20}
+              backgroundColor={COLORS.grey35}
               padding={SPACING.spacing8}
               border={BORDERS.lineBorder}
               borderRadius={BORDERS.borderRadiusSize2}
@@ -278,9 +280,9 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
               <Text
                 as="h4"
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
-                color={COLORS.darkBlack70}
+                color={COLORS.grey60}
               >
-                {i18n.t('modal.create_file_wizard.upload_tiprack')}
+                {t('upload_tiprack')}
               </Text>
             </Flex>
           )}
