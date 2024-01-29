@@ -26,12 +26,17 @@ export function Gallery(props: GalleryProps): JSX.Element {
     dimensions: dims,
     cornerOffsetFromSlot,
   } = definition
+  const xDimension =
+    params.loadName === 'opentrons_universal_flat_adapter'
+      ? 127.4
+      : dims.xDimension
+
   const [currentImage, setCurrentImage] = React.useState<number>(0)
   const render = (
     <Box width="100%">
       <RobotWorkSpace
         key="center"
-        viewBox={`${cornerOffsetFromSlot.x} ${cornerOffsetFromSlot.y} ${dims.xDimension} ${dims.yDimension}`}
+        viewBox={`${cornerOffsetFromSlot.x} ${cornerOffsetFromSlot.y} ${xDimension} ${dims.yDimension}`}
       >
         {() => <LabwareRender definition={definition} />}
       </RobotWorkSpace>
