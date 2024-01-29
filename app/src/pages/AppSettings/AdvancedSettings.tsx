@@ -3,22 +3,22 @@ import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 
 import {
-  Flex,
-  Box,
-  Link,
-  Icon,
-  SPACING_AUTO,
+  AlertPrimaryButton,
   ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
+  Box,
+  Btn,
   COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_FLEX_END,
+  JUSTIFY_SPACE_BETWEEN,
+  Link,
+  SPACING_AUTO,
   SPACING,
   TYPOGRAPHY,
-  DIRECTION_COLUMN,
   useConditionalConfirm,
-  JUSTIFY_FLEX_END,
-  Btn,
-  AlertPrimaryButton,
-  DIRECTION_ROW,
 } from '@opentrons/components'
 
 import * as Config from '../../redux/config'
@@ -39,26 +39,19 @@ import {
   ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
   ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
 } from '../../redux/analytics'
-// import {
-//   getU2EAdapterDevice,
-//   getU2EWindowsDriverStatus,
-//   OUTDATED,
-// } from '../../redux/system-info'
 import { Divider } from '../../atoms/structure'
 import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
-// import { Banner } from '../../atoms/Banner'
 import { useToaster } from '../../organisms/ToasterOven'
 import {
   EnableDevTools,
   OT2AdvancedSettings,
   PreventRobotCaching,
+  ShowHeaterShakerAttachmentModal,
   U2EInformation,
 } from '../../organisms/AdvancedSettings'
 
 import type { Dispatch, State } from '../../redux/types'
-
-// const REALTEK_URL = 'https://www.realtek.com/en/'
 
 export function AdvancedSettings(): JSX.Element {
   const { t } = useTranslation(['app_settings', 'shared'])
@@ -70,9 +63,6 @@ export function AdvancedSettings(): JSX.Element {
   const labwarePath = useSelector(CustomLabware.getCustomLabwareDirectory)
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     Config.getIsLabwareOffsetCodeSnippetsOn
-  )
-  const isHeaterShakerAttachmentModalVisible = useSelector(
-    Config.getIsHeaterShakerAttached
   )
   const pathToPythonInterpreter = useSelector(Config.getPathToPythonOverride)
 
@@ -105,26 +95,11 @@ export function AdvancedSettings(): JSX.Element {
     cancel: cancelExit,
   } = useConditionalConfirm(handleDeleteUnavailRobots, true)
 
-  // const device = useSelector(getU2EAdapterDevice)
-  // const driverOutdated = useSelector((state: State) => {
-  //   const status = getU2EWindowsDriverStatus(state)
-  //   return status === OUTDATED
-  // })
-
   const toggleLabwareOffsetData = (): void => {
     dispatch(
       Config.updateConfigValue(
         'labware.showLabwareOffsetCodeSnippets',
         Boolean(!isLabwareOffsetCodeSnippetsOn)
-      )
-    )
-  }
-
-  const toggleHeaterShakerModalVisibilty = (): void => {
-    dispatch(
-      Config.updateConfigValue(
-        'modules.heaterShaker.isAttached',
-        Boolean(!isHeaterShakerAttachmentModalVisible)
       )
     )
   }
@@ -318,26 +293,7 @@ export function AdvancedSettings(): JSX.Element {
           </TertiaryButton>
         </Flex>
         <Divider marginY={SPACING.spacing24} />
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box width="70%">
-            <StyledText
-              css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing8}
-              id="AdvancedSettings_showHeaterShakerAttachmentModal"
-            >
-              {t('heater_shaker_attach_visible')}
-            </StyledText>
-            <StyledText as="p">
-              {t('heater_shaker_attach_description')}
-            </StyledText>
-          </Box>
-          <ToggleButton
-            label="show_heater_shaker_modal"
-            toggledOn={!isHeaterShakerAttachmentModalVisible}
-            onClick={toggleHeaterShakerModalVisibilty}
-            id="AdvancedSettings_showHeaterShakerAttachmentBtn"
-          />
-        </Flex>
+        <ShowHeaterShakerAttachmentModal />
         <Divider marginY={SPACING.spacing24} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">

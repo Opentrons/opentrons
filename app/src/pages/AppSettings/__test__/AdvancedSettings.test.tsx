@@ -28,6 +28,7 @@ import {
   OT2AdvancedSettings,
   PreventRobotCaching,
   U2EInformation,
+  ShowHeaterShakerAttachmentModal,
 } from '../../../organisms/AdvancedSettings'
 
 import { AdvancedSettings } from '../AdvancedSettings'
@@ -101,6 +102,9 @@ const mockEnableDevTools = EnableDevTools as jest.MockedFunction<
 const mockU2EInformation = U2EInformation as jest.MockedFunction<
   typeof U2EInformation
 >
+const mockShowHeaterShakerAttachmentModal = ShowHeaterShakerAttachmentModal as jest.MockedFunction<
+  typeof ShowHeaterShakerAttachmentModal
+>
 
 let mockTrackEvent: jest.Mock
 const mockConfirm = jest.fn()
@@ -130,6 +134,9 @@ describe('AdvancedSettings', () => {
     mockOT2AdvancedSettings.mockReturnValue(<div>mock OT2AdvancedSettings</div>)
     mockEnableDevTools.mockReturnValue(<div>mock EnableDevTools</div>)
     mockU2EInformation.mockReturnValue(<div>mock U2EInformation</div>)
+    mockShowHeaterShakerAttachmentModal.mockReturnValue(
+      <div>mock ShowHeaterShakerAttachmentModal</div>
+    )
   })
 
   afterEach(() => {
@@ -205,26 +212,9 @@ describe('AdvancedSettings', () => {
     expect(toggleButton.getAttribute('aria-checked')).toBe('true')
   })
 
-  it('renders the toggle button on when showing heater shaker modal as false', () => {
-    mockGetIsHeaterShakerAttached.mockReturnValue(true)
-    const [{ getByRole, getByText }] = render()
-    getByText('Confirm Heater-Shaker Module Attachment')
-    getByText(
-      'Display a reminder to attach the Heater-Shaker properly before running a test shake or using it in a protocol.'
-    )
-    const toggleButton = getByRole('switch', {
-      name: 'show_heater_shaker_modal',
-    })
-    expect(toggleButton.getAttribute('aria-checked')).toBe('false')
-  })
-
-  it('renders the toggle button on when showing heater shaker modal as true', () => {
-    mockGetIsHeaterShakerAttached.mockReturnValue(false)
-    const [{ getByRole }] = render()
-    const toggleButton = getByRole('switch', {
-      name: 'show_heater_shaker_modal',
-    })
-    expect(toggleButton.getAttribute('aria-checked')).toBe('true')
+  it('should render mock ShowHeaterShakerAttachmentModal section', () => {
+    render()
+    screen.getByText('mock ShowHeaterShakerAttachmentModal')
   })
 
   it('renders the path to python override text and button with no default path', () => {
