@@ -87,17 +87,24 @@ class HardwareManager(NamedTuple):
 
 
 class ProtocolContext(CommandPublisher):
-    """The Context class is a container for the state of a protocol.
+    """A context for the state of a protocol.
+    
+    The ``ProtocolContext`` class provides the objects, attributes, and methods that
+    allow you to configure and control the protocol. 
+    
+    Methods generally fall into one of two categories.
+    
+      - They can change the state of the ``ProtocolContext`` object, such as adding
+        pipettes, hardware modules, or labware to your protocol.
+      - They can control the flow of a running protocol, such as pausing, displaying
+        messages, or controlling built-in robot hardware like the ambient lighting.
+      
+    Do not instantiate a ``ProtocolContext`` directly for protocols that you plan to run
+    via the Opentrons App or touchscreen. The ``run()`` function of your protocol does
+    that for you. See the :ref:`Tutorial <run-function>` for more information.
 
-    It encapsulates many of the methods formerly found in the Robot class,
-    including labware, instrument, and module loading, as well as core
-    functions like pause and resume.
-
-    Unlike the old robot class, it is designed to be ephemeral. The lifetime
-    of a particular instance should be about the same as the lifetime of a
-    protocol. The only exception is the one stored in
-    ``.legacy_api.api.robot``, which is provided only for back
-    compatibility and should be used less and less as time goes by.
+    Use :py:meth:`opentrons.execute.get_protocol_api` to instantiate a ``ProtocolContext`` when
+    using Jupyter Notebook. See :ref:`advanced-control`.
 
     .. versionadded:: 2.0
 
@@ -169,10 +176,16 @@ class ProtocolContext(CommandPublisher):
     @property
     @requires_version(2, 0)
     def api_version(self) -> APIVersion:
-        """Return the API version supported by this protocol context.
+        """Return the API version specified for this protocol context.
 
-        The supported API version was specified when the protocol context
-        was initialized. It may be lower than the highest version supported
+        This value is set when the protocol context
+        is initialized. 
+        
+          - When the context is the argument of ``run()``, the ``"apiLevel"`` key of the metadata or requirements dictionary determines ``api_version``. 
+          - When the context is instantiated with :py:meth:`opentrons.execute.get_protocol_api` or :py:meth:`opentrons.simulate.get_protocol_api`, the value of its ``version`` argument determines ``api_version``.
+        
+        
+        It may be lower than the highest version supported
         by the robot software. For the highest version supported by the
         robot software, see ``protocol_api.MAX_SUPPORTED_VERSION``.
         """
