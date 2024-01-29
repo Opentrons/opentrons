@@ -46,7 +46,7 @@ const SORT_BY_BUTTON_STYLE = css`
   }
   &:active,
   &:focus {
-    background-color: ${COLORS.grey30};
+    background-color: ${COLORS.grey40};
   }
 `
 const FLEX = 'Flex'
@@ -186,6 +186,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               </StyledText>
               <Icon
                 paddingRight={SPACING.spacing8}
+                color={COLORS.black90}
                 height={TYPOGRAPHY.lineHeight16}
                 name={showSortByMenu ? 'chevron-up' : 'chevron-down'}
               />

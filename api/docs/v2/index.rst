@@ -36,7 +36,7 @@ Getting Started
 
 If you want to **dive right into code**, take a look at our :ref:`new-examples` and the comprehensive :ref:`protocol-api-reference`.
 
-When you're ready to **try out a protocol**, download the `Opentrons App <https://www.opentrons.com/ot-app>`_, import the protocol file, and run it on your robot.
+When you're ready to **try out a protocol**, download the `Opentrons App <https://www.opentrons.com/ot-app>`__, import the protocol file, and run it on your robot.
 
 
 .. _overview-section-v2:
@@ -170,7 +170,7 @@ More Resources
 Opentrons App
 +++++++++++++
 
-The `Opentrons App <https://opentrons.com/ot-app/>`_ is the easiest way to run your Python protocols. The app `supports <https://support.opentrons.com/en/articles/2687536-get-started-supported-operating-systems-for-the-opentrons-app>`_ the latest versions of macOS, Windows, and Ubuntu.
+The `Opentrons App <https://opentrons.com/ot-app/>`__ is the easiest way to run your Python protocols. The app `supports <https://support.opentrons.com/en/articles/2687536-get-started-supported-operating-systems-for-the-opentrons-app>`_ the latest versions of macOS, Windows, and Ubuntu.
 
 Support
 +++++++

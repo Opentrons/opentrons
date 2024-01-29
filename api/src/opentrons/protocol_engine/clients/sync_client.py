@@ -71,6 +71,12 @@ class SyncClient:
             definition=definition,
         )
 
+    def add_addressable_area(self, addressable_area_name: str) -> None:
+        """Add an addressable area to the engine's state."""
+        self._transport.call_method(
+            "add_addressable_area", addressable_area_name=addressable_area_name
+        )
+
     def add_liquid(
         self, name: str, color: Optional[str], description: Optional[str]
     ) -> Liquid:

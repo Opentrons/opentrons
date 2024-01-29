@@ -121,7 +121,6 @@ function BreadcrumbsComponent(): JSX.Element | null {
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.white}
-      borderBottom={`1px solid ${String(COLORS.grey30)}`}
       css={TYPOGRAPHY.labelRegular}
       flexDirection={DIRECTION_ROW}
       padding={`${SPACING.spacing4} 0 ${SPACING.spacing4} ${SPACING.spacing8}`}

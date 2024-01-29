@@ -17,17 +17,26 @@ const mockIpAddress = '1.1.1.1'
 const mockLink = `http://${mockIpAddress}:48888`
 const trackEvent = jest.fn()
 
-const render = () => {
+global.window = Object.create(window)
+Object.defineProperty(window, 'open', { writable: true, configurable: true })
+window.open = jest.fn()
+
+const render = (props: React.ComponentProps<typeof OpenJupyterControl>) => {
   return renderWithProviders(
     <MemoryRouter>
-      <OpenJupyterControl robotIp={mockIpAddress} />
+      <OpenJupyterControl {...props} />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )
 }
 
 describe('RobotSettings OpenJupyterControl', () => {
+  let props: React.ComponentProps<typeof OpenJupyterControl>
   beforeEach(() => {
+    props = {
+      robotIp: mockIpAddress,
+      isEstopNotDisengaged: false,
+    }
     mockUseTrackEvent.mockReturnValue(trackEvent)
   })
 
@@ -36,7 +45,7 @@ describe('RobotSettings OpenJupyterControl', () => {
   })
 
   it('should render title, description and button', () => {
-    render()
+    render(props)
     screen.getByText('Jupyter Notebook')
     screen.getByText(
       'Open the Jupyter Notebook running on this robot in the web browser. This is an experimental feature.'
@@ -44,25 +53,33 @@ describe('RobotSettings OpenJupyterControl', () => {
     screen.getByText('Learn more about using Jupyter notebook')
     screen.getByText('Launch Jupyter Notebook')
     expect(
-      screen.getByRole('link', { name: 'Launch Jupyter Notebook' })
+      screen.getByRole('button', { name: 'Launch Jupyter Notebook' })
     ).toBeInTheDocument()
   })
 
-  it('should render jupyter notebook link', () => {
-    render()
-    const link = screen.getByRole('link', { name: 'Launch Jupyter Notebook' })
-    expect(link).toHaveAttribute('href', mockLink)
-    expect(link).toHaveAttribute('target', '_blank')
-    expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+  it('should render jupyter notebook button', () => {
+    render(props)
+    const button = screen.getByRole('button', {
+      name: 'Launch Jupyter Notebook',
+    })
+    fireEvent.click(button)
+    expect(window.open).toHaveBeenCalledWith(mockLink, '_blank')
   })
 
-  it('should send and analytics event on link click', () => {
-    const [{ getByRole }] = render()
-    const button = getByRole('link', { name: 'Launch Jupyter Notebook' })
+  it('should send and analytics event on button click', () => {
+    const [{ getByRole }] = render(props)
+    const button = getByRole('button', { name: 'Launch Jupyter Notebook' })
     fireEvent.click(button)
     expect(trackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_JUPYTER_OPEN,
       properties: {},
     })
+  })
+
+  it('should render disabled button when e-stop button is pressed', () => {
+    props = { ...props, isEstopNotDisengaged: true }
+    const [{ getByRole }] = render(props)
+    const button = getByRole('button', { name: 'Launch Jupyter Notebook' })
+    expect(button).toBeDisabled()
   })
 })

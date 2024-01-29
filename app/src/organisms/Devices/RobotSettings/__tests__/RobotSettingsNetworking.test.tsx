@@ -19,6 +19,7 @@ import {
 import * as Fixtures from '../../../../redux/networking/__fixtures__'
 import { useIsFlex, useIsRobotBusy } from '../../hooks'
 import { DisconnectModal } from '../ConnectNetwork/DisconnectModal'
+import { useIsEstopNotDisengaged } from '../../../../resources/devices/hooks/useIsEstopNotDisengaged'
 import { RobotSettingsNetworking } from '../RobotSettingsNetworking'
 
 import type { DiscoveryClientRobotAddress } from '../../../../redux/discovery/types'
@@ -31,6 +32,7 @@ jest.mock('../../../../redux/robot-api/selectors')
 jest.mock('../../../../resources/networking/hooks')
 jest.mock('../../hooks')
 jest.mock('../ConnectNetwork/DisconnectModal')
+jest.mock('../../../../resources/devices/hooks/useIsEstopNotDisengaged')
 
 const mockUpdateRobotStatus = jest.fn()
 
@@ -51,6 +53,9 @@ const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
 >
 const mockDisconnectModal = DisconnectModal as jest.MockedFunction<
   typeof DisconnectModal
+>
+const mockUseIsEstopNotDisengaged = useIsEstopNotDisengaged as jest.MockedFunction<
+  typeof useIsEstopNotDisengaged
 >
 
 const ROBOT_NAME = 'otie'
@@ -119,6 +124,9 @@ describe('RobotSettingsNetworking', () => {
     when(mockUseIsRobotBusy).calledWith({ poll: true }).mockReturnValue(false)
     when(mockUseCanDisconnect).calledWith(ROBOT_NAME).mockReturnValue(false)
     mockDisconnectModal.mockReturnValue(<div>mock disconnect modal</div>)
+    when(mockUseIsEstopNotDisengaged)
+      .calledWith(ROBOT_NAME)
+      .mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -390,5 +398,17 @@ describe('RobotSettingsNetworking', () => {
     expect(
       screen.queryAllByTestId('RobotSettings_Networking_check_circle')
     ).toHaveLength(0)
+  })
+
+  it('should not render disabled Disconnect from Wi-Fi button when e-stop is pressed', () => {
+    when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue([])
+    when(mockUseCanDisconnect).calledWith(ROBOT_NAME).mockReturnValue(true)
+    when(mockUseIsEstopNotDisengaged)
+      .calledWith(ROBOT_NAME)
+      .mockReturnValue(true)
+    const [{ queryByRole }] = render()
+    expect(
+      queryByRole('button', { name: 'Disconnect from Wi-Fi' })
+    ).toBeDisabled()
   })
 })
