@@ -8,6 +8,7 @@ from hardware_testing.opentrons_api.types import (
 )
 from serial.tools.list_ports import comports  # type: ignore[import]
 import particle_instrument
+import uv_instrument
 from typing import Optional, Callable, List, Any, Tuple, Dict  
 from dataclasses import dataclass, fields 
 from hardware_testing import data 
@@ -104,9 +105,13 @@ async def _main(simulating: bool) -> None:
         for width, slot in  SLOT_WIDTH_GAUGE:
             await api.ungrip()
             if slot is not None:
+                z_ax = Axis.Z_G
+                g_ax = Axis.G
+                mount = OT3Mount.GRIPPER
+                print("homing Z and G...")
+                await api.home([z_ax, g_ax])
                 hover_pos, target_pos = _get_width_hover_and_grip_positions(api, slot)
                 # MOVE TO SLOT
-                mount = OT3Mount.GRIPPER
                 await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos)
                 # OPERATOR SETS UP GAUGE
                 
@@ -174,18 +179,41 @@ def pause():
         print('Time: ', time_suspend, ' (s)' , end='')
         print('\r', end='')
     print('')
-
+ports = comports()
 def BuildAsairGT521S():
     """Try to find and return an GT-521S, if not found return FALSE."""
     print("Connecting to GT-521S")
 
-    ports = comports()
+    
     assert ports
     for _port in ports:
         port = _port.device  # type: ignore[attr-defined]
         try:
             print(f"Trying to connect to env sensor on port {port}")
             sensor = particle_instrument.GT521S_Driver(port)
+            ser_id = sensor.serial_number().strip("SS").replace(' ', '')
+            if len(ser_id) != 0:
+                print(f"Found GT-521S {ser_id} on port {port} SN: {ser_id}")
+                ports.remove(_port)
+                return sensor
+        except:  # noqa: E722
+            pass
+    port = list_ports_and_select(device_name="Asair GT-521S")
+    sensor = particle_instrument.GT521S_Driver(port)
+    print(f"Found GT-521S on port {port}")
+    return sensor
+
+def BuildAsairUV():
+    """Try to find and return an UV, if not found return FALSE."""
+    print("Connecting to UV")
+
+    
+    assert ports
+    for _port in ports:
+        port = _port.device  # type: ignore[attr-defined]
+        try:
+            print(f"Trying to connect to env sensor on port {port}")
+            sensor = uv_instrument.uv_Driver(port)
             ser_id = sensor.serial_number().strip("SS").replace(' ', '')
             if len(ser_id) != 0:
                 print(f"Found GT-521S {ser_id} on port {port} SN: {ser_id}")
