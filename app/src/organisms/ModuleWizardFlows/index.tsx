@@ -80,8 +80,8 @@ export const ModuleWizardFlows = (
       getModuleType(attachedModule.moduleModel)
     ]?.filter(
       slot =>
-        !Object.keys(occupiedCutouts).some(
-          occCutout => occCutout === FLEX_CUTOUT_BY_SLOT_ID[slot]
+        !occupiedCutouts.some(
+          occCutout => occCutout.cutoutId === FLEX_CUTOUT_BY_SLOT_ID[slot]
         )
     ) ?? []
 

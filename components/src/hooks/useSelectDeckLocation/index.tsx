@@ -3,11 +3,12 @@ import isEqual from 'lodash/isEqual'
 import { css } from 'styled-components'
 import {
   CutoutConfig,
-  CutoutFixtureId,
   FLEX_CUTOUT_BY_SLOT_ID,
+  FLEX_SLOT_BY_CUTOUT_ID,
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   getPositionFromSlotId,
+  getFixtureDisplayName,
   isAddressableAreaStandardSlot,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
@@ -76,7 +77,8 @@ interface DeckLocationSelectProps {
   selectedLocation: ModuleLocation
   theme?: DeckLocationSelectThemes
   setSelectedLocation?: (loc: ModuleLocation) => void
-  disabledLocations?: CutoutConfig[]
+  availableSlotNames?: string[]
+  occupiedCutouts?: CutoutConfig[]
   isThermocycler?: boolean
   showTooltipOnDisabled?: boolean
 }
@@ -84,7 +86,8 @@ export function DeckLocationSelect({
   deckDef,
   selectedLocation,
   setSelectedLocation,
-  disabledLocations = [],
+  availableSlotNames = [],
+  occupiedCutouts = [],
   theme = 'default',
   isThermocycler = false,
   showTooltipOnDisabled = false,
@@ -109,10 +112,11 @@ export function DeckLocationSelect({
           // eslint-disable-next-line react-hooks/rules-of-hooks
           const [targetProps, tooltipProps] = useHoverTooltip()
           const slotLocation = { slotName: slot.id }
-          const isDisabled = disabledLocations.some(
-            l =>
-              typeof l === 'object' && 'slotName' in l && l.slotName === slot.id
-          )
+          const isDisabled = !availableSlotNames.some(l => l === slot.id)
+          const disabledReason =
+            occupiedCutouts.find(
+              cutout => FLEX_SLOT_BY_CUTOUT_ID[cutout.cutoutId] === slot.id
+            )?.cutoutFixtureId ?? null
           const isSelected = isEqual(selectedLocation, slotLocation)
           let fill =
             theme === 'default'
@@ -180,19 +184,26 @@ export function DeckLocationSelect({
                     <RobotCoordsForeignDiv
                       x={slotPosition[0]}
                       y={slotPosition[1]}
-                      width={200}
-                      height={100}
+                      width={slot.boundingBox.xDimension}
+                      height={slot.boundingBox.yDimension}
                       innerDivProps={INNER_DIV_PROPS}
-                      css={css`
-                        z-index: 1;
-                      `}
                     >
-                      <Flex height={100} width={200} {...targetProps} />
-                      <Tooltip {...tooltipProps}>
-                        <Text color={COLORS.white} fontSize="1.5rem">
-                          {`Slot ${slot.id} disabled because of xyz`}
-                        </Text>
-                      </Tooltip>
+                      <Flex
+                        width={slot.boundingBox.xDimension + 100}
+                        height={slot.boundingBox.yDimension + 100}
+                        {...targetProps}
+                      >
+                        <Tooltip
+                          {...tooltipProps}
+                          css={TYPOGRAPHY.labelRegular}
+                        >
+                          {disabledReason != null
+                            ? `A ${getFixtureDisplayName(
+                                disabledReason
+                              )} is currently specified here on the deck configuration`
+                            : 'Slot unavailable'}
+                        </Tooltip>
+                      </Flex>
                     </RobotCoordsForeignDiv>
                   )}
                 </>
