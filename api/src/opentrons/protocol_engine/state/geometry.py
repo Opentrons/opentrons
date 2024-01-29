@@ -692,10 +692,9 @@ class GeometryView:
                 slot_name
             )
 
-            if maybe_fixture is None:
-                maybe_module = self._modules.get_by_slot(
-                    slot_name=slot_name,
-                )
+            maybe_module = self._modules.get_by_slot(
+                slot_name=slot_name,
+            )
         else:
             # Modules and fixtures can't be loaded on staging slots
             maybe_fixture = None
