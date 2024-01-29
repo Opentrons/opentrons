@@ -1439,7 +1439,14 @@ class OT3API(
 
         if encoder_ok:
             # ensure stepper position can be updated after boot
-            await self.engage_axes([axis])
+            if axis == Axis.Z_L and self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
+                # we're here if the left mount has been idle and the brake is engaged
+                # we want to temporarily increase its hold current to prevent the z
+                # stage from dropping when switching off the ebrake
+                async with self._backend.increase_z_l_hold_current():
+                    await self.engage_axes([axis])
+            else:
+                await self.engage_axes([axis])
             await self._update_position_estimation([axis])
             # refresh motor and encoder statuses after position estimation update
             motor_ok = self._backend.check_motor_status([axis])

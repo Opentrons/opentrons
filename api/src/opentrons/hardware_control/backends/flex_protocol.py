@@ -266,6 +266,14 @@ class FlexBackend(Protocol):
         """
         ...
 
+    @asynccontextmanager
+    def increase_z_l_hold_current(self) -> AsyncIterator[None]:
+        """
+        Temporarily increase the hold current when engaging the Z_L axis
+        while the 96-channel is attached
+        """
+        ...
+
     async def watch(self, loop: asyncio.AbstractEventLoop) -> None:
         ...
 

@@ -1088,6 +1088,24 @@ class OT3Controller(FlexBackend):
                 {Axis.Z_R: high_throughput_settings[Axis.Z_R].run_current}
             )
 
+    @asynccontextmanager
+    async def increase_z_l_hold_current(self) -> AsyncIterator[None]:
+        """
+        Temporarily increase the hold current when engaging the Z_L axis
+        while the 96-channel is attached
+        """
+        assert self._current_settings
+        high_throughput_settings = deepcopy(self._current_settings)
+        await self.set_hold_current(
+            {Axis.Z_L: high_throughput_settings[Axis.Z_L].run_current}
+        )
+        try:
+            yield
+        finally:
+            await self.set_hold_current(
+                {Axis.Z_L: high_throughput_settings[Axis.Z_L].hold_current}
+            )
+
     @staticmethod
     def _build_event_watcher() -> aionotify.Watcher:
         watcher = aionotify.Watcher()

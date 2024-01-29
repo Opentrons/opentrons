@@ -575,6 +575,14 @@ class OT3Simulator(FlexBackend):
         """
         yield
 
+    @asynccontextmanager
+    async def increase_z_l_hold_current(self) -> AsyncIterator[None]:
+        """
+        Temporarily increase the hold current when engaging the Z_L axis
+        while the 96-channel is attached
+        """
+        yield
+
     @ensure_yield
     async def watch(self, loop: asyncio.AbstractEventLoop) -> None:
         new_mods_at_ports = [
