@@ -88,17 +88,17 @@ class HardwareManager(NamedTuple):
 
 class ProtocolContext(CommandPublisher):
     """A context for the state of a protocol.
-    
+
     The ``ProtocolContext`` class provides the objects, attributes, and methods that
-    allow you to configure and control the protocol. 
-    
+    allow you to configure and control the protocol.
+
     Methods generally fall into one of two categories.
-    
+
       - They can change the state of the ``ProtocolContext`` object, such as adding
         pipettes, hardware modules, or labware to your protocol.
       - They can control the flow of a running protocol, such as pausing, displaying
         messages, or controlling built-in robot hardware like the ambient lighting.
-      
+
     Do not instantiate a ``ProtocolContext`` directly for protocols that you plan to run
     via the Opentrons App or touchscreen. The ``run()`` function of your protocol does
     that for you. See the :ref:`Tutorial <run-function>` for more information.
@@ -179,7 +179,7 @@ class ProtocolContext(CommandPublisher):
         """Return the API version specified for this protocol context.
 
         This value is set when the protocol context
-        is initialized. 
+        is initialized.
 
           - When the context is the argument of ``run()``, the ``"apiLevel"`` key of the
             :ref:`metadata <tutorial-metadata>` or :ref:`requirements
@@ -296,14 +296,14 @@ class ProtocolContext(CommandPublisher):
     @requires_version(2, 0)
     def is_simulating(self) -> bool:
         """Returns ``True`` if the protocol is running in simulation.
-        
+
         Returns ``False`` if the protocol is running on actual hardware.
-        
+
         You can evaluate the result of this method in an ``if`` statement to make your
         protocol behave differently in different environments. For example, you could
         refer to a data file on your computer when simulating and refer to a data file
         stored on the robot when not simulating.
-        
+
         You can also use it to skip time-consuming aspects of your protocol. Most Python
         Protocol API methods, like :py:meth:`.delay`, are designed to evaluate
         instantaneously in simulation. But external methods, like those from the
@@ -639,8 +639,8 @@ class ProtocolContext(CommandPublisher):
         pick_up_offset: Optional[Mapping[str, float]] = None,
         drop_offset: Optional[Mapping[str, float]] = None,
     ) -> None:
-        """Move a loaded labware to a new location. 
-        
+        """Move a loaded labware to a new location.
+
         See :ref:`moving-labware` for more details.
 
         :param labware: The labware to move. It should be a labware already loaded
@@ -851,7 +851,7 @@ class ProtocolContext(CommandPublisher):
         When analyzing the protocol on the robot, instruments loaded with this method
         are compared against the instruments attached to the robot. You won't be able to
         start the protocol until the correct instruments are attached and calibrated.
-        
+
         Currently, this method only loads pipettes. You do not need to load the Flex
         Gripper to use it in protocols. See :ref:`automatic-manual-moves`.
 
@@ -998,11 +998,11 @@ class ProtocolContext(CommandPublisher):
     def comment(self, msg: str) -> None:
         """
         Add a user-readable message to the run log.
-        
+
         The message is visible anywhere you can view the run log, including the Opentrons App and the touchscreen on Flex.
 
         .. note::
-        
+
             The value of the message is computed during protocol analysis,
             so ``comment()`` can't communicate real-time information during the
             actual protocol run.
