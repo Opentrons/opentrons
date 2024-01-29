@@ -2379,7 +2379,7 @@ class OT3API(
             OT3Mount.from_mount(mount), carriage_pos, critical_point
         )
 
-        return pos_at_home[Axis.by_mount(mount)] - self._config.z_retract_distance
+        return pos_at_home[Axis.by_mount(mount)]
 
     async def update_nozzle_configuration_for_mount(
         self,
