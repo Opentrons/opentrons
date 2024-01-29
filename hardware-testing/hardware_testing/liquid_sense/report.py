@@ -68,7 +68,9 @@ def build_trials_section(trials: int, tips: List[int]) -> CSVSection:
     return CSVSection(
         title="TRIALS",
         lines=[
-            CSVLine(f"trial-{t + 1}-{tip}ul", [float, float, float, float])
+            CSVLine(
+                f"trial-{t + 1}-{tip}ul", [float, float, float, float, float, float]
+            )
             for tip in tips
             for t in range(trials)
         ],
@@ -137,10 +139,14 @@ def store_trial(
     plunger_pos: float,
     humidity: float,
     temp: float,
+    z_travel: float,
+    plunger_travel: float,
 ) -> None:
     """Report Trial."""
     report(
-        "TRIALS", f"trial-{trial + 1}-{tip}ul", [height, plunger_pos, humidity, temp]
+        "TRIALS",
+        f"trial-{trial + 1}-{tip}ul",
+        [height, plunger_pos, humidity, temp, z_travel, plunger_travel],
     )
 
 
@@ -168,3 +174,24 @@ def build_ls_report(
         run_id=run_id,
         start_time=0.0,
     )
+
+
+"""
+def store_sensor_data(test_name: str, run_id: str, trial: int, tip: int,
+ pressure_list: List[Tuple[int, float]]): -> None
+    sensor_report = CSVReport(
+        test_name=f"{test_name}-{trial}-{tip}",
+        sections[
+            CSVSection(
+            title="SensorData",
+            lines=[
+                CSVLine(f"trial-{trial + 1}-{tip}ul-{point}", [int, float])
+                for point in range(pressure_list)
+            ],
+        )
+    for point in range(pressure_list):
+        sensor = pressure_list[point][0]
+        pressure = pressure_list[point][1]
+        sensor_report("SensorData",f"trial-{trial + 1}-{tip}ul-{point}",[sensor, pressure])
+    sensor_report.save_to_disk()
+"""
