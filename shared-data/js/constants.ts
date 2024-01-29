@@ -403,3 +403,8 @@ export const DEFAULT_LIQUID_COLORS = [
   tartRed,
 ]
 export const DEPRECATED_WHALE_GREY = '#9395a0'
+
+// this can't go in @opentrons/components because its used in a utility
+// method in PD (not react code) and we do not want non react code loading
+// react code because the web worker context does not play nicely with react
+export const INTERACTIVE_WELL_DATA_ATTRIBUTE = 'data-wellname'

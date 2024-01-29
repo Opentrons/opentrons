@@ -6,7 +6,7 @@ import {
   movableTrashCommandsUtil,
 } from '@opentrons/step-generation'
 import * as StepGeneration from '@opentrons/step-generation'
-import { commandCreatorFromStepArgs } from '../file-data/selectors/commands'
+import { commandCreatorFromStepArgs } from '../file-data/helpers'
 import type { StepArgsAndErrorsById } from '../steplist/types'
 
 export interface GenerateRobotStateTimelineArgs {
@@ -18,6 +18,7 @@ export interface GenerateRobotStateTimelineArgs {
 export const generateRobotStateTimeline = (
   args: GenerateRobotStateTimelineArgs
 ): StepGeneration.Timeline => {
+  console.log('got to generateRobotStateTimeline')
   const {
     allStepArgsAndErrors,
     orderedStepIds,

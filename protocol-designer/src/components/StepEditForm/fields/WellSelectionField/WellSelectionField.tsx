@@ -11,7 +11,7 @@ import {
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { Portal } from '../../../portals/MainPageModalPortal'
 import { WellSelectionModal } from './WellSelectionModal'
-import styles from '../../StepEditForm.css'
+import styles from '../../StepEditForm.module.css'
 
 import type { NozzleType } from '../../../../types'
 import type { FieldProps } from '../../types'

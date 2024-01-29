@@ -45,6 +45,8 @@ export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
     type: 'module',
   })
 
+  console.log({worker})
+
   let prevTimelineArgs: GenerateRobotStateTimelineArgs | null = null // caches results of dependent selectors, eg {[selectorIndex]: lastCachedSelectorValue}
 
   let prevSubstepsArgs: SubstepsArgsNoTimeline | null = null
@@ -102,6 +104,7 @@ export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
       if (prevTimelineArgs !== null && prevSubstepsArgs !== null) {
         const timelineArgs: GenerateRobotStateTimelineArgs = prevTimelineArgs
         const substepsArgs: SubstepsArgsNoTimeline = prevSubstepsArgs
+        console.log('about to post worker message')
         worker.postMessage({
           needsTimeline: true,
           timelineArgs,

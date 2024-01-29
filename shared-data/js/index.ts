@@ -1,4 +1,5 @@
 export * from './constants'
+export * from './deck'
 export * from './labware'
 export * from './getLabware'
 export * from './helpers'

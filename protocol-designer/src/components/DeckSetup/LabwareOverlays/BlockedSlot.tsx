@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
-import styles from './LabwareOverlays.css'
+import styles from './LabwareOverlays.module.css'
 
 type BlockedSlotMessage =
   | 'MODULE_INCOMPATIBLE_SINGLE_LABWARE'

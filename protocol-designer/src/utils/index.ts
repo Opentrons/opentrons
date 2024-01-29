@@ -10,15 +10,15 @@ import {
   isAddressableAreaStandardSlot,
   CutoutFixtureId,
   RobotType,
+  INTERACTIVE_WELL_DATA_ATTRIBUTE
 } from '@opentrons/shared-data'
-import { WellGroup } from '@opentrons/components'
 import { BoundingRect, GenericRect } from '../collision-types'
 import type {
   AdditionalEquipmentEntity,
   LabwareEntities,
   PipetteEntities,
 } from '@opentrons/step-generation'
-import { INTERACTIVE_WELL_DATA_ATTRIBUTE } from '@opentrons/components/src/hardware-sim/Labware/labwareInternals/Well'
+import type { WellGroup } from '@opentrons/components'
 
 export const uuid: () => string = uuidv1
 // Collision detection for SelectionRect / SelectableLabware

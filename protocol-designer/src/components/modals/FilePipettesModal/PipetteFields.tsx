@@ -16,7 +16,6 @@ import {
   OT3_PIPETTES,
   RIGHT,
   RobotType,
-  RIGHT
 } from '@opentrons/shared-data'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'

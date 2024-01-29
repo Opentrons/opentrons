@@ -11,7 +11,7 @@ import {
 } from '@opentrons/components'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { StepFormDropdown } from './StepFormDropdownField'
-import styles from '../StepEditForm.css'
+import styles from '../StepEditForm.module.css'
 
 export function Configure96ChannelField(
   props: Omit<React.ComponentProps<typeof StepFormDropdown>, 'options'>

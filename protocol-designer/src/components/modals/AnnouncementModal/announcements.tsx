@@ -8,6 +8,16 @@ import {
   SPACING,
 } from '@opentrons/components'
 
+import magTempCombined from '../../../images/modules/magdeck_tempdeck_combined.png'
+import thermocycler from '../../../images/modules/thermocycler.jpg'
+import multiSelect from '../../../images/announcements/multi_select.gif'
+import batchEdit from '../../../images/announcements/batch_edit.gif'
+import heaterShaker from '../../../images/modules/heatershaker.png'
+import thermocyclerGen2 from '../../../images/modules/thermocycler_gen2.png'
+import liquidEnhancements from '../../../images/announcements/liquid-enhancements.gif'
+import opentronsFlex from '../../../images/OpentronsFlex.png'
+import deckConfigutation from '../../../images/deck_configuration.png'
+
 import styles from './AnnouncementModal.module.css'
 
 export interface Announcement {
@@ -38,10 +48,7 @@ export const useAnnouncements = (): Announcement[] => {
       announcementKey: 'modulesRequireRunAppUpdate',
       image: (
         <div className={styles.modules_diagrams_row}>
-          <img
-            className={styles.modules_diagram}
-            src={require('../../../images/modules/magdeck_tempdeck_combined.png')}
-          />
+          <img className={styles.modules_diagram} src={magTempCombined} />
         </div>
       ),
       heading: t('announcements.header', { pd: PD }),
@@ -65,10 +72,7 @@ export const useAnnouncements = (): Announcement[] => {
       announcementKey: 'thermocyclerSupport',
       image: (
         <div className={styles.thermocycler_diagram_row}>
-          <img
-            className={styles.modules_diagram}
-            src={require('../../../images/modules/thermocycler.jpg')}
-          />
+          <img className={styles.modules_diagram} src={thermocycler} />
         </div>
       ),
       heading: t('announcements.header', { pd: PD }),
@@ -108,11 +112,9 @@ export const useAnnouncements = (): Announcement[] => {
       announcementKey: 'batchEditTransfer',
       image: (
         <Flex css={batchEditStyles}>
-          <img
-            src={require('../../../images/announcements/multi_select.gif')}
-          />
+          <img src={multiSelect} />
 
-          <img src={require('../../../images/announcements/batch_edit.gif')} />
+          <img src={batchEdit} />
         </Flex>
       ),
       heading: t('announcements.header', { pd: PD }),
@@ -140,10 +142,7 @@ export const useAnnouncements = (): Announcement[] => {
       announcementKey: 'heaterShakerSupport',
       image: (
         <div className={styles.modules_diagrams_row}>
-          <img
-            className={styles.modules_diagram}
-            src={require('../../../images/modules/heatershaker.png')}
-          />
+          <img className={styles.modules_diagram} src={heaterShaker} />
         </div>
       ),
       heading: t('announcements.header', { pd: PD }),
@@ -169,10 +168,7 @@ export const useAnnouncements = (): Announcement[] => {
       announcementKey: 'thermocyclerGen2Support',
       image: (
         <div className={styles.modules_diagrams_row}>
-          <img
-            className={styles.modules_diagram}
-            src={require('../../../images/modules/thermocycler_gen2.png')}
-          />
+          <img className={styles.modules_diagram} src={thermocyclerGen2} />
         </div>
       ),
       heading: t('announcements.header', { pd: PD }),
@@ -198,10 +194,7 @@ export const useAnnouncements = (): Announcement[] => {
       announcementKey: 'liquidColorEnhancements',
       image: (
         <div className={styles.modules_diagrams_color_enhancements}>
-          <img
-            className={styles.modules_diagram}
-            src={require('../../../images/announcements/liquid-enhancements.gif')}
-          />
+          <img className={styles.modules_diagram} src={liquidEnhancements} />
         </div>
       ),
       heading: t('announcements.header', { pd: PD }),
@@ -227,11 +220,7 @@ export const useAnnouncements = (): Announcement[] => {
       announcementKey: 'flexSupport7.0',
       image: (
         <Flex justifyContent={JUSTIFY_CENTER}>
-          <img
-            height="240"
-            width="240"
-            src={require('../../../images/OpentronsFlex.png')}
-          />
+          <img height="240" width="240" src={opentronsFlex} />
         </Flex>
       ),
       heading: t('announcements.header', { pd: PD }),
@@ -258,10 +247,7 @@ export const useAnnouncements = (): Announcement[] => {
       announcementKey: 'deckConfigAnd96Channel8.0',
       image: (
         <Flex justifyContent={JUSTIFY_CENTER} paddingTop={SPACING.spacing8}>
-          <img
-            width="340"
-            src={require('../../../images/deck_configuration.png')}
-          />
+          <img width="340" src={deckConfigutation} />
         </Flex>
       ),
       heading: t('announcements.header', { pd: PD }),

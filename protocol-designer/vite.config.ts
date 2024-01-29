@@ -13,20 +13,18 @@ export default defineConfig({
   },
   plugins: [
     // TODO: uncomment out these lines once we figure out how to disable HMR in the web worker context
-    // react({
-    //   include: '**/*.tsx',
-    //   babel: {
-    //     // Use babel.config.js files
-    //     configFile: true,
-    //   },
-    // }),
-    // reactWorker(),
+    react({
+      include: '**/*.tsx',
+      babel: {
+        // Use babel.config.js files
+        configFile: true,
+      },
+    }),
   ],
   optimizeDeps: {
     esbuildOptions: {
       target: 'es2020',
     },
-    include: ['@opentrons/shared-data', '@opentrons/step-generation'],
   },
   css: {
     postcss: {
