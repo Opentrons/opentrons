@@ -10,22 +10,24 @@ import {
   fixtureP10Multi as _fixtureP10Multi,
   fixtureP300Single as _fixtureP300Single,
   fixtureP300Multi as _fixtureP300Multi,
+  fixtureP100096 as _fixtureP100096,
 } from '@opentrons/shared-data/pipette/fixtures/name'
-import _fixtureTrash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
 import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import _fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
 import _fixtureTiprack10ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import _fixtureTiprack300ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import _fixtureTiprack1000ul from '@opentrons/shared-data/labware/fixtures/2/fixture_flex_96_tiprack_1000ul.json'
+import _fixtureTiprackAdapter from '@opentrons/shared-data/labware/fixtures/2/fixture_flex_96_tiprack_adapter.json'
 import {
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
   FIXED_TRASH_ID,
-  OT_2_TRASH_DEF_URI,
 } from '../constants'
 import {
   DEFAULT_PIPETTE,
   MULTI_PIPETTE,
+  PIPETTE_96,
   SOURCE_LABWARE,
   DEST_LABWARE,
   TROUGH_LABWARE,
@@ -47,12 +49,14 @@ const fixtureP10Single = _fixtureP10Single
 const fixtureP10Multi = _fixtureP10Multi
 const fixtureP300Single = _fixtureP300Single
 const fixtureP300Multi = _fixtureP300Multi
+const fixtureP100096 = _fixtureP100096
 
-const fixtureTrash = _fixtureTrash as LabwareDefinition2
 const fixture96Plate = _fixture96Plate as LabwareDefinition2
 const fixture12Trough = _fixture12Trough as LabwareDefinition2
 const fixtureTiprack10ul = _fixtureTiprack10ul as LabwareDefinition2
 const fixtureTiprack300ul = _fixtureTiprack300ul as LabwareDefinition2
+const fixtureTiprack1000ul = _fixtureTiprack1000ul as LabwareDefinition2
+const fixtureTiprackAdapter = _fixtureTiprackAdapter as LabwareDefinition2
 
 export const DEFAULT_CONFIG: Config = {
   OT_PD_DISABLE_MODULE_RESTRICTIONS: false,
@@ -78,12 +82,6 @@ export function getTipColumn<T>(index: number, filled: T): Record<string, T> {
 // standard context fixtures to use across tests
 export function makeContext(): InvariantContext {
   const labwareEntities = {
-    [FIXED_TRASH_ID]: {
-      id: FIXED_TRASH_ID,
-
-      labwareDefURI: OT_2_TRASH_DEF_URI,
-      def: fixtureTrash,
-    },
     [SOURCE_LABWARE]: {
       id: SOURCE_LABWARE,
 
@@ -120,9 +118,39 @@ export function makeContext(): InvariantContext {
       labwareDefURI: getLabwareDefURI(fixtureTiprack300ul),
       def: fixtureTiprack300ul,
     },
+    tiprack4AdapterId: {
+      id: 'tiprack4AdapterId',
+
+      labwareDefURI: getLabwareDefURI(fixtureTiprackAdapter),
+      def: fixtureTiprackAdapter,
+    },
+    tiprack5AdapterId: {
+      id: 'tiprack5AdapterId',
+
+      labwareDefURI: getLabwareDefURI(fixtureTiprackAdapter),
+      def: fixtureTiprackAdapter,
+    },
+    tiprack4Id: {
+      id: 'tiprack4Id',
+
+      labwareDefURI: getLabwareDefURI(fixtureTiprack1000ul),
+      def: fixtureTiprack1000ul,
+    },
+    tiprack5Id: {
+      id: 'tiprack5Id',
+
+      labwareDefURI: getLabwareDefURI(fixtureTiprack1000ul),
+      def: fixtureTiprack1000ul,
+    },
   }
   const moduleEntities: ModuleEntities = {}
-  const additionalEquipmentEntities: AdditionalEquipmentEntities = {}
+  const additionalEquipmentEntities: AdditionalEquipmentEntities = {
+    [FIXED_TRASH_ID]: {
+      id: FIXED_TRASH_ID,
+      name: 'trashBin',
+      location: 'cutoutA3',
+    },
+  }
   const pipetteEntities: PipetteEntities = {
     p10SingleId: {
       name: 'p10_single',
@@ -155,6 +183,14 @@ export function makeContext(): InvariantContext {
       tiprackDefURI: getLabwareDefURI(fixtureTiprack300ul),
       tiprackLabwareDef: fixtureTiprack300ul,
       spec: fixtureP300Multi,
+    },
+    [PIPETTE_96]: {
+      name: 'p1000_96',
+      id: PIPETTE_96,
+
+      tiprackDefURI: getLabwareDefURI(fixtureTiprack1000ul),
+      tiprackLabwareDef: fixtureTiprack1000ul,
+      spec: fixtureP100096,
     },
   }
   return {
@@ -213,14 +249,23 @@ export const makeStateArgsStandard = (): StandardMakeStateArgs => ({
     tiprack2Id: {
       slot: '5',
     },
+    tiprack4AdapterId: {
+      slot: '7',
+    },
+    tiprack5AdapterId: {
+      slot: '8',
+    },
+    tiprack4Id: {
+      slot: 'tiprack4AdapterId',
+    },
+    tiprack5Id: {
+      slot: 'tiprack5AdapterId',
+    },
     sourcePlateId: {
       slot: '2',
     },
     destPlateId: {
       slot: '3',
-    },
-    fixedTrash: {
-      slot: '12',
     },
   },
   moduleLocations: {},
@@ -246,9 +291,6 @@ export const makeStateArgsLabwareOffDeck = (): StandardMakeStateArgs => ({
     },
     destPlateId: {
       slot: 'C2',
-    },
-    fixedTrash: {
-      slot: 'A3',
     },
   },
   moduleLocations: {},

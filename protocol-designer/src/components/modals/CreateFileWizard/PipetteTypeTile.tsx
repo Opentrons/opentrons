@@ -1,6 +1,6 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { useSelector } from 'react-redux'
 import { FormikProps } from 'formik'
 import {
   DIRECTION_COLUMN,
@@ -11,8 +11,6 @@ import {
   ALIGN_CENTER,
   PrimaryButton,
   JUSTIFY_SPACE_BETWEEN,
-  LEFT,
-  RIGHT,
   InstrumentDiagram,
 } from '@opentrons/components'
 import {
@@ -22,10 +20,10 @@ import {
   OT3_PIPETTES,
   getAllPipetteNames,
   getPipetteNameSpecs,
+  LEFT,
+  RIGHT,
 } from '@opentrons/shared-data'
-import { getAllow96Channel } from '../../../feature-flags/selectors'
 
-import { i18n } from '../../../localization'
 import { GoBack } from './GoBack'
 import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
@@ -38,15 +36,15 @@ export function FirstPipetteTypeTile(
     'mount' | 'allowNoPipette' | 'display96Channel' | 'tileHeader'
   >
 ): JSX.Element {
+  const { t } = useTranslation('modal')
   const mount = LEFT
-  const allow96Channel = useSelector(getAllow96Channel)
   return (
     <PipetteTypeTile
       {...props}
       mount={mount}
       allowNoPipette={false}
-      display96Channel={allow96Channel}
-      tileHeader={i18n.t('modal.create_file_wizard.choose_first_pipette')}
+      display96Channel={true}
+      tileHeader={t('choose_left_pipette')}
     />
   )
 }
@@ -56,6 +54,7 @@ export function SecondPipetteTypeTile(
     'mount' | 'allowNoPipette' | 'display96Channel' | 'tileHeader'
   >
 ): JSX.Element | null {
+  const { t } = useTranslation('modal')
   if (props.values.pipettesByMount.left.pipetteName === 'p1000_96') {
     props.proceed(2)
     return null
@@ -66,7 +65,7 @@ export function SecondPipetteTypeTile(
         mount={RIGHT}
         allowNoPipette
         display96Channel={false}
-        tileHeader={i18n.t('modal.create_file_wizard.choose_second_pipette')}
+        tileHeader={t('choose_right_pipette')}
       />
     )
   }
@@ -85,6 +84,7 @@ export function PipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
     proceed,
     goBack,
   } = props
+  const { t } = useTranslation('application')
 
   return (
     <HandleEnter onEnter={proceed}>
@@ -112,9 +112,7 @@ export function PipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
           width="100%"
         >
           <GoBack onClick={() => goBack()} />
-          <PrimaryButton onClick={() => proceed()}>
-            {i18n.t('application.next')}
-          </PrimaryButton>
+          <PrimaryButton onClick={() => proceed()}>{t('next')}</PrimaryButton>
         </Flex>
       </Flex>
     </HandleEnter>
@@ -136,7 +134,6 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
     display96Channel,
   } = props
   const robotType = values.fields.robotType
-  const allow96Channel = useSelector(getAllow96Channel)
   const pipetteOptions = React.useMemo(() => {
     const allPipetteOptions = getAllPipetteNames('maxVolume', 'channels')
       .filter(name =>
@@ -149,7 +146,7 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
         name: getPipetteNameSpecs(name)?.displayName ?? '',
       }))
     const noneOption = allowNoPipette ? [{ name: 'None', value: '' }] : []
-    return allow96Channel && display96Channel
+    return display96Channel
       ? [...allPipetteOptions, ...noneOption]
       : [
           ...allPipetteOptions.filter(o => o.value !== 'p1000_96'),
@@ -165,13 +162,7 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
         allowNoPipette ? '' : pipetteOptions[0]?.value ?? ''
       )
     }
-  }, [
-    currentValue,
-    setFieldValue,
-    nameAccessor,
-    allowNoPipette,
-    pipetteOptions,
-  ])
+  }, [])
 
   return (
     <Flex

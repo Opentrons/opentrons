@@ -1,5 +1,4 @@
 import * as React from 'react'
-import type { MatcherFunction } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
@@ -7,23 +6,18 @@ import { ReturnTip } from '../ReturnTip'
 import { SECTIONS } from '../constants'
 import { mockCompletedAnalysis } from '../__fixtures__'
 import { useProtocolMetadata } from '../../Devices/hooks'
+import { getIsOnDevice } from '../../../redux/config'
+import { fireEvent, screen } from '@testing-library/react'
 
 jest.mock('../../Devices/hooks')
+jest.mock('../../../redux/config')
 
 const mockUseProtocolMetaData = useProtocolMetadata as jest.MockedFunction<
   typeof useProtocolMetadata
 >
-
-const matchTextWithSpans: (text: string) => MatcherFunction = (
-  text: string
-) => (_content, node) => {
-  const nodeHasText = node?.textContent === text
-  const childrenDontHaveText = Array.from(node?.children ?? []).every(
-    child => child?.textContent !== text
-  )
-
-  return nodeHasText && childrenDontHaveText
-}
+const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
+  typeof getIsOnDevice
+>
 
 const render = (props: React.ComponentProps<typeof ReturnTip>) => {
   return renderWithProviders(<ReturnTip {...props} />, {
@@ -37,10 +31,12 @@ describe('ReturnTip', () => {
 
   beforeEach(() => {
     mockChainRunCommands = jest.fn().mockImplementation(() => Promise.resolve())
+    mockGetIsOnDevice.mockReturnValue(false)
     props = {
       section: SECTIONS.RETURN_TIP,
       pipetteId: mockCompletedAnalysis.pipettes[0].id,
       labwareId: mockCompletedAnalysis.labware[0].id,
+      definitionUri: mockCompletedAnalysis.labware[0].definitionUri,
       location: { slotName: 'D1' },
       protocolData: mockCompletedAnalysis,
       proceed: jest.fn(),
@@ -55,20 +51,35 @@ describe('ReturnTip', () => {
   afterEach(() => {
     jest.restoreAllMocks()
   })
-  it('renders correct copy', () => {
-    const { getByText, getByRole } = render(props)
-    getByRole('heading', { name: 'Return tip rack to Slot D1' })
-    getByText('Clear all deck slots of labware, leaving modules in place')
-    getByText(
-      matchTextWithSpans(
-        'Place the Mock TipRack Definition that you used before back into Slot D1. The pipette will return tips to their original location in the rack.'
-      )
+  it('renders correct copy on desktop', () => {
+    render(props)
+    screen.getByRole('heading', { name: 'Return tip rack to Slot D1' })
+    screen.getByText(
+      'Clear all deck slots of labware, leaving modules in place'
     )
-    getByRole('link', { name: 'Need help?' })
+    screen.getByText(/Mock TipRack Definition/i)
+    screen.getByText(/that you used before back into/i)
+    screen.getByText('Slot D1')
+    screen.getByText(
+      /The pipette will return tips to their original location in the rack./i
+    )
+    screen.getByRole('link', { name: 'Need help?' })
+  })
+  it('renders correct copy on device', () => {
+    mockGetIsOnDevice.mockReturnValue(true)
+    render(props)
+    screen.getByRole('heading', { name: 'Return tip rack to Slot D1' })
+    screen.getByText('Clear all deck slots of labware')
+    screen.getByText(/Mock TipRack Definition/i)
+    screen.getByText(/that you used before back into/i)
+    screen.getByText('Slot D1')
+    screen.getByText(
+      /The pipette will return tips to their original location in the rack./i
+    )
   })
   it('executes correct chained commands when CTA is clicked', async () => {
-    const { getByRole } = render(props)
-    await getByRole('button', { name: 'Confirm placement' }).click()
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm placement' }))
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
@@ -117,8 +128,8 @@ describe('ReturnTip', () => {
       ...props,
       tipPickUpOffset: { x: 10, y: 11, z: 12 },
     }
-    const { getByRole } = render(props)
-    await getByRole('button', { name: 'Confirm placement' }).click()
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm placement' }))
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
@@ -187,8 +198,8 @@ describe('ReturnTip', () => {
         ],
       },
     }
-    const { getByRole } = render(props)
-    await getByRole('button', { name: 'Confirm placement' }).click()
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm placement' }))
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [

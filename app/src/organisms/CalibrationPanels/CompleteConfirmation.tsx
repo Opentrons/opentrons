@@ -44,7 +44,7 @@ export function CompleteConfirmation(
         {visualAid != null ? (
           visualAid
         ) : (
-          <Icon name="ot-check" size={SIZE_3} color={COLORS.successEnabled} />
+          <Icon name="ot-check" size={SIZE_3} color={COLORS.green50} />
         )}
         <StyledText as="h1" marginTop={SPACING.spacing24}>
           {t('flow_complete', { flowName })}

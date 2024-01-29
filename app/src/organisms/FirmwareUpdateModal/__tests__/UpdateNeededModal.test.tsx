@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
+
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import {
   useInstrumentsQuery,
@@ -9,6 +11,7 @@ import { i18n } from '../../../i18n'
 import { UpdateNeededModal } from '../UpdateNeededModal'
 import { UpdateInProgressModal } from '../UpdateInProgressModal'
 import { UpdateResultsModal } from '../UpdateResultsModal'
+
 import type {
   BadPipette,
   SubsystemUpdateProgressData,
@@ -43,11 +46,22 @@ const render = (props: React.ComponentProps<typeof UpdateNeededModal>) => {
 describe('UpdateNeededModal', () => {
   let props: React.ComponentProps<typeof UpdateNeededModal>
   const refetch = jest.fn(() => Promise.resolve())
-  const updateSubsystem = jest.fn(() => Promise.resolve())
+  const updateSubsystem = jest.fn(() =>
+    Promise.resolve({
+      data: {
+        data: {
+          id: 'update id',
+          updateStatus: 'updating',
+          updateProgress: 20,
+        } as any,
+      },
+    })
+  )
   beforeEach(() => {
     props = {
-      setShowUpdateModal: jest.fn(),
+      onClose: jest.fn(),
       subsystem: 'pipette_left',
+      shouldExit: true,
       setInitiatedSubsystemUpdate: jest.fn(),
     }
     mockUseInstrumentQuery.mockReturnValue({
@@ -70,13 +84,6 @@ describe('UpdateNeededModal', () => {
       } as SubsystemUpdateProgressData,
     } as any)
     mockUseUpdateSubsystemMutation.mockReturnValue({
-      data: {
-        data: {
-          id: 'update id',
-          updateStatus: 'updating',
-          updateProgress: 20,
-        } as any,
-      } as SubsystemUpdateProgressData,
       updateSubsystem,
     } as any)
     mockUpdateInProgressModal.mockReturnValue(
@@ -93,8 +100,8 @@ describe('UpdateNeededModal', () => {
         'The firmware for Left Pipette is out of date. You need to update it before running protocols that use this instrument'
       )
     )
-    getByText('Update firmware').click()
-    expect(mockUseUpdateSubsystemMutation).toHaveBeenCalled()
+    fireEvent.click(getByText('Update firmware'))
+    expect(updateSubsystem).toHaveBeenCalled()
   })
   it('renders the update in progress modal when update is pending', () => {
     const { getByText } = render(props)
@@ -108,16 +115,6 @@ describe('UpdateNeededModal', () => {
           updateStatus: 'done',
         } as any,
       } as SubsystemUpdateProgressData,
-    } as any)
-    mockUseUpdateSubsystemMutation.mockReturnValue({
-      data: {
-        data: {
-          id: 'update id',
-          updateStatus: 'done',
-          updateProgress: 100,
-        } as any,
-      } as SubsystemUpdateProgressData,
-      updateSubsystem,
     } as any)
     const { getByText } = render(props)
     getByText('Mock Update Results Modal')

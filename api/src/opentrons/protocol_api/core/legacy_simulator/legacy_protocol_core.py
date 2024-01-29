@@ -2,6 +2,11 @@ import logging
 from typing import Dict, Optional
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.pipette_load_name_conversions import (
+    convert_to_pipette_name_type,
+)
+from opentrons_shared_data.pipette.types import PipetteGenerationType
+
 from opentrons.types import Mount
 
 from ..protocol import AbstractProtocol
@@ -27,6 +32,16 @@ class LegacyProtocolCoreSimulator(
         self, instrument_name: PipetteNameType, mount: Mount
     ) -> LegacyInstrumentCoreSimulator:
         """Create a simulating instrument context."""
+        pipette_generation = convert_to_pipette_name_type(
+            instrument_name.value
+        ).pipette_generation
+
+        if pipette_generation not in [
+            PipetteGenerationType.GEN1,
+            PipetteGenerationType.GEN2,
+        ]:
+            raise ValueError(f"{instrument_name} is not a valid OT-2 pipette.")
+
         existing_instrument = self._instruments[mount]
 
         if (

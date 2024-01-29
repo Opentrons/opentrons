@@ -19,6 +19,10 @@ from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 
 from robot_server import app
+from robot_server.deck_configuration.fastapi_dependencies import (
+    get_deck_configuration_store,
+)
+from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.persistence import PersistenceResetter, get_persistence_resetter
 
 
@@ -115,7 +119,9 @@ def mock_pipette_data():
 def mock_known_pipettes(decoy: Decoy) -> Decoy:
     with patch(
         "opentrons_shared_data.pipette.mutable_configurations.known_pipettes",
-        new=decoy.mock(),
+        new=decoy.mock(
+            name="opentrons_shared_data.pipette.mutable_configurations.known_pipettes"
+        ),
     ) as m:
         yield m
 
@@ -124,7 +130,9 @@ def mock_known_pipettes(decoy: Decoy) -> Decoy:
 def mock_list_mutable_configs(decoy: Decoy) -> Decoy:
     with patch(
         "opentrons_shared_data.pipette.mutable_configurations.list_mutable_configs",
-        new=decoy.mock(),
+        new=decoy.mock(
+            name="opentrons_shared_data.pipette.mutable_configurations.list_mutable_configs"
+        ),
     ) as m:
         yield m
 
@@ -133,7 +141,9 @@ def mock_list_mutable_configs(decoy: Decoy) -> Decoy:
 def mock_list_mutable_configs_with_defaults(decoy: Decoy) -> Decoy:
     with patch(
         "opentrons_shared_data.pipette.mutable_configurations.list_mutable_configs_with_defaults",
-        new=decoy.mock(),
+        new=decoy.mock(
+            name="opentrons_shared_data.pipette.mutable_configurations.list_mutable_configs_with_defaults"
+        ),
     ) as m:
         yield m
 
@@ -142,7 +152,9 @@ def mock_list_mutable_configs_with_defaults(decoy: Decoy) -> Decoy:
 def mock_save_overrides(decoy: Decoy) -> Decoy:
     with patch(
         "opentrons_shared_data.pipette.mutable_configurations.save_overrides",
-        new=decoy.mock(),
+        new=decoy.mock(
+            name="opentrons_shared_data.pipette.mutable_configurations.save_overrides"
+        ),
     ) as m:
         yield m
 
@@ -151,7 +163,9 @@ def mock_save_overrides(decoy: Decoy) -> Decoy:
 def mock_get_opentrons_dir(decoy: Decoy) -> Decoy:
     with patch(
         "robot_server.service.legacy.routers.settings.get_opentrons_path",
-        new=decoy.mock(),
+        new=decoy.mock(
+            name="robot_server.service.legacy.routers.settings.get_opentrons_path"
+        ),
     ) as m:
         yield m
 
@@ -511,6 +525,7 @@ def test_available_resets(api_client):
     assert sorted(
         [
             "deckCalibration",
+            "deckConfiguration",
             "pipetteOffsetCalibrations",
             "bootScripts",
             "tipLengthCalibrations",
@@ -538,6 +553,22 @@ def mock_persistence_resetter(
     app.dependency_overrides[get_persistence_resetter] = mock_get_persistence_resetter
     yield mock_persistence_resetter
     del app.dependency_overrides[get_persistence_resetter]
+
+
+@pytest.fixture
+def mock_deck_configuration_store(
+    decoy: Decoy,
+) -> Generator[DeckConfigurationStore, None, None]:
+    mock_deck_configuration_store = decoy.mock(cls=DeckConfigurationStore)
+
+    async def mock_get_deck_configuration_store() -> DeckConfigurationStore:
+        return mock_deck_configuration_store
+
+    app.dependency_overrides[
+        get_deck_configuration_store
+    ] = mock_get_deck_configuration_store
+    yield mock_deck_configuration_store
+    del app.dependency_overrides[get_deck_configuration_store]
 
 
 @pytest.mark.parametrize(
@@ -575,8 +606,9 @@ def mock_persistence_resetter(
                 ResetOptionId.pipette_offset,
                 ResetOptionId.tip_length_calibrations,
                 # TODO(mm, 2022-10-25): Verify that the subject endpoint function calls
-                # PersistenceResetter.mark_directory_reset(). Currently blocked by
-                # mark_directory_reset() being an async method, and api_client having
+                # PersistenceResetter.mark_directory_reset() and
+                # DeckConfigurationStore.reset().
+                # Currently blocked by those methods being async, and api_client having
                 # its own event loop that interferes with making this test async.
                 ResetOptionId.runs_history,
                 ResetOptionId.authorized_keys,
@@ -589,14 +621,21 @@ def mock_persistence_resetter(
     ],
 )
 def test_reset_success(
-    api_client, mock_reset, mock_persistence_resetter, body, called_with
+    api_client,
+    mock_reset,
+    mock_persistence_resetter: PersistenceResetter,
+    mock_deck_configuration_store: DeckConfigurationStore,
+    body,
+    called_with,
 ):
     resp = api_client.post("/settings/reset", json=body)
     assert resp.status_code == 200
     mock_reset.assert_called_once_with(called_with, RobotTypeEnum.OT2)
 
 
-def test_reset_invalid_option(api_client, mock_reset, mock_persistence_resetter):
+def test_reset_invalid_option(
+    api_client, mock_reset, mock_persistence_resetter, mock_deck_configuration_store
+):
     resp = api_client.post("/settings/reset", json={"aksgjajhadjasl": False})
     assert resp.status_code == 422
     body = resp.json()

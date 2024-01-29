@@ -10,26 +10,27 @@ import { useDispatch, useSelector } from 'react-redux'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import {
-  Box,
-  Btn,
-  Flex,
-  Icon,
-  Link,
   ALIGN_CENTER,
   BORDERS,
+  Box,
+  Btn,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
+  Flex,
+  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  Link,
   POSITION_RELATIVE,
+  PrimaryButton,
+  ProtocolDeck,
+  RoundTab,
   SIZE_1,
   SIZE_5,
   SPACING,
-  RoundTab,
   TYPOGRAPHY,
-  PrimaryButton,
 } from '@opentrons/components'
 import {
   parseInitialPipetteNamesByMount,
@@ -37,17 +38,15 @@ import {
   parseInitialLoadedLabwareBySlot,
   parseInitialLoadedLabwareByModuleId,
   parseInitialLoadedLabwareByAdapter,
-  parseInitialLoadedFixturesByCutout,
 } from '@opentrons/api-client'
 import {
-  WASTE_CHUTE_LOAD_NAME,
   getGripperDisplayName,
+  getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 
 import { Portal } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
-import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import {
   useTrackEvent,
@@ -59,7 +58,7 @@ import {
 } from '../../redux/protocol-storage'
 import { useFeatureFlag } from '../../redux/config'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
-import { SendProtocolToOT3Slideout } from '../SendProtocolToOT3Slideout'
+import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import {
   getAnalysisStatus,
@@ -72,11 +71,7 @@ import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
 import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
 import { RobotConfigurationDetails } from './RobotConfigurationDetails'
 
-import type {
-  JsonConfig,
-  LoadFixtureRunTimeCommand,
-  PythonConfig,
-} from '@opentrons/shared-data'
+import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State, Dispatch } from '../../redux/types'
 
@@ -89,16 +84,16 @@ const GRID_STYLE = css`
 const ZOOM_ICON_STYLE = css`
   border-radius: ${BORDERS.radiusSoftCorners};
   &:hover {
-    background: ${COLORS.lightGreyHover};
+    background: ${COLORS.grey30};
   }
   &:active {
-    background: ${COLORS.lightGreyPressed};
+    background: ${COLORS.grey35};
   }
   &:disabled {
     background: ${COLORS.white};
   }
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
+    box-shadow: 0 0 0 3px ${COLORS.blue50};
   }
 `
 
@@ -134,7 +129,11 @@ function MetadataDetails({
         {filteredMetaData.map((item, index) => {
           return (
             <React.Fragment key={index}>
-              <StyledText as="h6" marginTop={SPACING.spacing8}>
+              <StyledText
+                as="h6"
+                marginTop={SPACING.spacing8}
+                color={COLORS.grey60}
+              >
                 {startCase(item.label)}
               </StyledText>
               <StyledText as="p">{item.value}</StyledText>
@@ -205,8 +204,8 @@ export function ProtocolDetails(
     setShowChooseRobotToRunProtocolSlideout,
   ] = React.useState<boolean>(false)
   const [
-    showSendProtocolToOT3Slideout,
-    setShowSendProtocolToOT3Slideout,
+    showSendProtocolToFlexSlideout,
+    setShowSendProtocolToFlexSlideout,
   ] = React.useState<boolean>(false)
   const [showDeckViewModal, setShowDeckViewModal] = React.useState(false)
 
@@ -237,29 +236,9 @@ export function ProtocolDetails(
       ? map(parseInitialLoadedModulesBySlot(mostRecentAnalysis.commands))
       : []
 
-  // TODO: IMMEDIATELY remove stubbed fixture as soon as PE supports loadFixture
-  const STUBBED_LOAD_FIXTURE: LoadFixtureRunTimeCommand = {
-    id: 'stubbed_load_fixture',
-    commandType: 'loadFixture',
-    params: {
-      fixtureId: 'stubbedFixtureId',
-      loadName: WASTE_CHUTE_LOAD_NAME,
-      location: { cutout: 'D3' },
-    },
-    createdAt: 'fakeTimestamp',
-    startedAt: 'fakeTimestamp',
-    completedAt: 'fakeTimestamp',
-    status: 'succeeded',
-  }
-  const requiredFixtureDetails =
-    mostRecentAnalysis?.commands != null
-      ? [
-          ...map(
-            parseInitialLoadedFixturesByCutout(mostRecentAnalysis.commands)
-          ),
-          STUBBED_LOAD_FIXTURE,
-        ]
-      : []
+  const requiredFixtureDetails = getSimplestDeckConfigForProtocol(
+    mostRecentAnalysis
+  )
 
   const requiredLabwareDetails =
     mostRecentAnalysis != null
@@ -349,23 +328,15 @@ export function ProtocolDetails(
     ) : null,
   }
 
-  const deckThumbnail = (
-    <DeckThumbnail
-      commands={mostRecentAnalysis?.commands ?? []}
-      labware={mostRecentAnalysis?.labware ?? []}
-      liquids={
-        mostRecentAnalysis?.liquids != null ? mostRecentAnalysis?.liquids : []
-      }
-    />
-  )
+  const deckMap = <ProtocolDeck protocolAnalysis={mostRecentAnalysis} />
 
   const deckViewByAnalysisStatus = {
-    missing: <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />,
-    loading: <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />,
-    error: <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />,
+    missing: <Box size="14rem" backgroundColor={COLORS.grey30} />,
+    loading: <Box size="14rem" backgroundColor={COLORS.grey30} />,
+    error: <Box size="14rem" backgroundColor={COLORS.grey30} />,
     complete: (
       <Box size="14rem" height="auto">
-        {deckThumbnail}
+        {deckMap}
       </Box>
     ),
   }
@@ -378,8 +349,8 @@ export function ProtocolDetails(
     setShowChooseRobotToRunProtocolSlideout(true)
   }
 
-  const UNKNOWN_ATTACHMENT_ERROR = `${protocolDisplayName} protocol uses 
-  instruments or modules from a future version of Opentrons software. Please update 
+  const UNKNOWN_ATTACHMENT_ERROR = `${protocolDisplayName} protocol uses
+  instruments or modules from a future version of Opentrons software. Please update
   the app to the most recent version to run this protocol.`
 
   const UnknownAttachmentError = (
@@ -397,7 +368,7 @@ export function ProtocolDetails(
             title={t('deck_view')}
             onClose={() => setShowDeckViewModal(false)}
           >
-            {deckThumbnail}
+            {deckMap}
           </LegacyModal>
         ) : null}
       </Portal>
@@ -412,15 +383,14 @@ export function ProtocolDetails(
             showSlideout={showChooseRobotToRunProtocolSlideout}
             storedProtocolData={props}
           />
-          <SendProtocolToOT3Slideout
-            isExpanded={showSendProtocolToOT3Slideout}
-            onCloseClick={() => setShowSendProtocolToOT3Slideout(false)}
+          <SendProtocolToFlexSlideout
+            isExpanded={showSendProtocolToFlexSlideout}
+            onCloseClick={() => setShowSendProtocolToFlexSlideout(false)}
             storedProtocolData={props}
           />
 
           <Flex
             backgroundColor={COLORS.white}
-            border={`1px solid ${COLORS.medGreyEnabled}`}
             borderRadius={BORDERS.radiusSoftCorners}
             position={POSITION_RELATIVE}
             flexDirection={DIRECTION_ROW}
@@ -454,7 +424,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_creationMethod"
                 >
-                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  <StyledText as="h6" color={COLORS.grey50}>
                     {t('creation_method')}
                   </StyledText>
                   <StyledText as="p">
@@ -467,7 +437,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_lastUpdated"
                 >
-                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  <StyledText as="h6" color={COLORS.grey50}>
                     {t('last_updated')}
                   </StyledText>
                   <StyledText as="p">
@@ -480,7 +450,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_lastAnalyzed"
                 >
-                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  <StyledText as="h6" color={COLORS.grey50}>
                     {t('last_analyzed')}
                   </StyledText>
                   <StyledText as="p">
@@ -510,7 +480,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_author"
                 >
-                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  <StyledText as="h6" color={COLORS.grey50}>
                     {t('org_or_author')}
                   </StyledText>
                   <StyledText
@@ -527,7 +497,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_description"
                 >
-                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  <StyledText as="h6" color={COLORS.grey50}>
                     {t('description')}
                   </StyledText>
                   {analysisStatus === 'loading' ? (
@@ -551,8 +521,8 @@ export function ProtocolDetails(
                 handleRunProtocol={() =>
                   setShowChooseRobotToRunProtocolSlideout(true)
                 }
-                handleSendProtocolToOT3={() =>
-                  setShowSendProtocolToOT3Slideout(true)
+                handleSendProtocolToFlex={() =>
+                  setShowSendProtocolToFlexSlideout(true)
                 }
                 storedProtocolData={props}
                 data-testid="ProtocolDetails_overFlowMenu"
@@ -562,13 +532,13 @@ export function ProtocolDetails(
           <Flex
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
+            marginBottom={SPACING.spacing16}
           >
             <Flex
               flex={`0 0 ${String(SIZE_5)}`}
               flexDirection={DIRECTION_COLUMN}
               backgroundColor={COLORS.white}
-              border={`1px solid ${String(COLORS.medGreyEnabled)}`}
-              borderRadius={BORDERS.radiusSoftCorners}
+              borderRadius={BORDERS.borderRadiusSize2}
               height="100%"
               data-testid="ProtocolDetails_deckMap"
             >
@@ -648,15 +618,14 @@ export function ProtocolDetails(
               </Flex>
               <Box
                 backgroundColor={COLORS.white}
-                border={BORDERS.lineBorder}
                 // remove left upper corner border radius when first tab is active
                 borderRadius={`${
                   currentTab === 'robot_config'
                     ? '0'
-                    : String(BORDERS.radiusSoftCorners)
-                } ${String(BORDERS.radiusSoftCorners)} ${String(
+                    : BORDERS.radiusSoftCorners
+                } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
                   BORDERS.radiusSoftCorners
-                )} ${String(BORDERS.radiusSoftCorners)}`}
+                }`}
                 padding={`${SPACING.spacing16} ${SPACING.spacing16} 0 ${SPACING.spacing16}`}
               >
                 {contentsByTabName[currentTab]}

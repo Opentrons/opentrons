@@ -4,6 +4,7 @@ from opentrons.protocol_engine.types import (
     LabwareLocation,
     ModuleLocation,
     OnLabwareLocation,
+    AddressableAreaLocation,
 )
 
 
@@ -42,13 +43,19 @@ def _labware_location_string(
         labware_on_string = _labware_location_string(engine_client, labware_on)
         return f"{labware_name} on {labware_on_string}"
 
+    elif isinstance(location, AddressableAreaLocation):
+        # In practice this will always be a deck slot or staging slot
+        return f"slot {location.addressableAreaName}"
+
     elif location == "offDeck":
         return "[off-deck]"
 
 
 def _labware_name(engine_client: SyncClient, labware_id: str) -> str:
     """Return the user-specified labware label, or fall back to the display name from the def."""
-    user_name = engine_client.state.labware.get_display_name(labware_id=labware_id)
+    user_name = engine_client.state.labware.get_user_specified_display_name(
+        labware_id=labware_id
+    )
     definition_name = engine_client.state.labware.get_definition(
         labware_id=labware_id
     ).metadata.displayName

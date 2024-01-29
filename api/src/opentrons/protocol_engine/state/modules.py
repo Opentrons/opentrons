@@ -9,7 +9,6 @@ from typing import (
     NamedTuple,
     Optional,
     Sequence,
-    Set,
     Type,
     TypeVar,
     Union,
@@ -43,7 +42,6 @@ from ..types import (
     LabwareOffsetVector,
     HeaterShakerLatchStatus,
     HeaterShakerMovementRestrictors,
-    ModuleLocation,
     DeckType,
     LabwareMovementOffsetData,
 )
@@ -493,17 +491,15 @@ class ModuleView(HasState[ModuleState]):
         """Get a list of all module entries in state."""
         return [self.get(mod_id) for mod_id in self._state.slot_by_module_id.keys()]
 
-    # TODO(mc, 2022-12-09): enforce data integrity (e.g. one module per slot)
-    # rather than shunting this work to callers via `allowed_ids`.
-    # This has larger implications and is tied up in splitting LPC out of the protocol run
     def get_by_slot(
-        self, slot_name: DeckSlotName, allowed_ids: Set[str]
+        self,
+        slot_name: DeckSlotName,
     ) -> Optional[LoadedModule]:
         """Get the module located in a given slot, if any."""
         slots_by_id = reversed(list(self._state.slot_by_module_id.items()))
 
         for module_id, module_slot in slots_by_id:
-            if module_slot == slot_name and module_id in allowed_ids:
+            if module_slot == slot_name:
                 return self.get(module_id)
 
         return None
@@ -681,7 +677,7 @@ class ModuleView(HasState[ModuleState]):
 
         # Apply the slot transform, if any
         xform = array(xforms_ser_offset)
-        xformed = dot(xform, pre_transform)  # type: ignore[no-untyped-call]
+        xformed = dot(xform, pre_transform)
         return LabwareOffsetVector(
             x=xformed[0],
             y=xformed[1],
@@ -705,6 +701,41 @@ class ModuleView(HasState[ModuleState]):
     def get_height_over_labware(self, module_id: str) -> float:
         """Get the height of module parts above module labware base."""
         return self.get_dimensions(module_id).overLabwareHeight
+
+    def get_module_highest_z(self, module_id: str, deck_type: DeckType) -> float:
+        """Get the highest z point of the module, as placed on the robot.
+
+        The highest Z of a module, unlike the bare overall height, depends on
+        the robot it is on. We will calculate this value using the info we already have
+        about the transformation of the module's placement, based on the deck it is on.
+
+        This value is calculated as:
+        highest_z = ( nominal_robot_transformed_labware_offset_z
+                      + z_difference_between_default_labware_offset_point_and_overall_height
+                      + module_calibration_offset_z
+        )
+
+        For OT2, the default_labware_offset point is the same as nominal_robot_transformed_labware_offset_z
+        and hence the highest z will equal to the overall height of the module.
+
+        For Flex, since those two offsets are not the same, the final highest z will be
+        transformed the same amount as the labware offset point is.
+
+        Note: For thermocycler, the lid height is not taken into account.
+        """
+        module_height = self.get_overall_height(module_id)
+        default_lw_offset_point = self.get_definition(module_id).labwareOffset.z
+        z_difference = module_height - default_lw_offset_point
+
+        nominal_transformed_lw_offset_z = self.get_nominal_module_offset(
+            module_id=module_id, deck_type=deck_type
+        ).z
+        calibration_offset = self.get_module_calibration_offset(module_id)
+        return (
+            nominal_transformed_lw_offset_z
+            + z_difference
+            + (calibration_offset.moduleOffsetVector.z if calibration_offset else 0)
+        )
 
     # TODO(mc, 2022-01-19): this method is missing unit test coverage and
     # is also unused. Remove or add tests.
@@ -932,7 +963,8 @@ class ModuleView(HasState[ModuleState]):
         return hs_restrictors
 
     def raise_if_module_in_location(
-        self, location: Union[DeckSlotLocation, ModuleLocation]
+        self,
+        location: DeckSlotLocation,
     ) -> None:
         """Raise if the given location has a module in it."""
         for module in self.get_all():

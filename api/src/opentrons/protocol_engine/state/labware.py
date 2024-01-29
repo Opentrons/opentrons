@@ -9,25 +9,24 @@ from typing import (
     Mapping,
     Optional,
     Sequence,
-    Set,
-    Union,
     Tuple,
     NamedTuple,
     cast,
+    Union,
 )
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
 from opentrons_shared_data.gripper.constants import LABWARE_GRIP_FORCE
 from opentrons_shared_data.labware.labware_definition import LabwareRole
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
-from opentrons.types import DeckSlotName, Point, MountType
+from opentrons.types import DeckSlotName, StagingSlotName, MountType
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.models import LabwareDefinition, WellDefinition
 from opentrons.calibration_storage.helpers import uri_from_details
 
 from .. import errors
-from ..resources import DeckFixedLabware, labware_validation
+from ..resources import DeckFixedLabware, labware_validation, fixture_validation
 from ..commands import (
     Command,
     LoadLabwareResult,
@@ -36,6 +35,7 @@ from ..commands import (
 from ..types import (
     DeckSlotLocation,
     OnLabwareLocation,
+    AddressableAreaLocation,
     NonStackedLocation,
     Dimensions,
     LabwareOffset,
@@ -47,6 +47,8 @@ from ..types import (
     ModuleModel,
     OverlapOffset,
     LabwareMovementOffsetData,
+    OnDeckLabwareLocation,
+    OFF_DECK_LOCATION,
 )
 from ..actions import (
     Action,
@@ -203,6 +205,13 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             new_offset_id = command.result.offsetId
 
             self._state.labware_by_id[labware_id].offsetId = new_offset_id
+            if isinstance(
+                new_location, AddressableAreaLocation
+            ) and fixture_validation.is_gripper_waste_chute(
+                new_location.addressableAreaName
+            ):
+                # If a labware has been moved into a waste chute it's been chuted away and is now technically off deck
+                new_location = OFF_DECK_LOCATION
             self._state.labware_by_id[labware_id].location = new_location
 
     def _add_labware_offset(self, labware_offset: LabwareOffset) -> None:
@@ -275,20 +284,20 @@ class LabwareView(HasState[LabwareState]):
                     f"Cannot move to labware {labware_id}, labware has other labware stacked on top."
                 )
 
-    # TODO(mc, 2022-12-09): enforce data integrity (e.g. one labware per slot)
-    # rather than shunting this work to callers via `allowed_ids`.
-    # This has larger implications and is tied up in splitting LPC out of the protocol run
     def get_by_slot(
-        self, slot_name: DeckSlotName, allowed_ids: Set[str]
+        self,
+        slot_name: Union[DeckSlotName, StagingSlotName],
     ) -> Optional[LoadedLabware]:
         """Get the labware located in a given slot, if any."""
-        loaded_labware = reversed(list(self._state.labware_by_id.values()))
+        loaded_labware = list(self._state.labware_by_id.values())
 
         for labware in loaded_labware:
             if (
                 isinstance(labware.location, DeckSlotLocation)
-                and labware.location.slotName == slot_name
-                and labware.id in allowed_ids
+                and labware.location.slotName.id == slot_name.id
+            ) or (
+                isinstance(labware.location, AddressableAreaLocation)
+                and labware.location.addressableAreaName == slot_name.id
             ):
                 return labware
 
@@ -300,89 +309,24 @@ class LabwareView(HasState[LabwareState]):
             LabwareUri(self.get(labware_id).definitionUri)
         )
 
-    def get_display_name(self, labware_id: str) -> Optional[str]:
+    def get_user_specified_display_name(self, labware_id: str) -> Optional[str]:
         """Get the labware's user-specified display name, if set."""
         return self.get(labware_id).displayName
+
+    def get_display_name(self, labware_id: str) -> str:
+        """Get the labware's display name.
+
+        If a user-specified display name exists, will return that, else will return
+        display name from the definition.
+        """
+        return (
+            self.get_user_specified_display_name(labware_id)
+            or self.get_definition(labware_id).metadata.displayName
+        )
 
     def get_deck_definition(self) -> DeckDefinitionV4:
         """Get the current deck definition."""
         return self._state.deck_definition
-
-    def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV3:
-        """Get the definition of a slot in the deck."""
-        deck_def = self.get_deck_definition()
-
-        # TODO(jbl 2023-10-19 this is all incredibly hacky and ultimately we should get rid of SlotDefV3, and maybe
-        #   move all this to another store/provider. However for now, this can be more or less equivalent and not break
-        #   things TM TM TM
-
-        for cutout in deck_def["locations"]["cutouts"]:
-            if cutout["id"] == slot.id:
-                base_position = cutout["position"]
-                break
-        else:
-            raise errors.SlotDoesNotExistError(
-                f"Slot ID {slot.id} does not exist in deck {deck_def['otId']}"
-            )
-
-        slot_def: SlotDefV3
-        # Slot 12/fixed trash for ot2 is a little weird so if its that just return some hardcoded stuff
-        if slot.id == "12":
-            slot_def = {
-                "id": "12",
-                "position": base_position,
-                "boundingBox": {
-                    "xDimension": 128.0,
-                    "yDimension": 86.0,
-                    "zDimension": 0,
-                },
-                "displayName": "Slot 12",
-                "compatibleModuleTypes": [],
-            }
-            return slot_def
-
-        for area in deck_def["locations"]["addressableAreas"]:
-            if area["id"] == slot.id:
-                offset = area["offsetFromCutoutFixture"]
-                position = [
-                    offset[0] + base_position[0],
-                    offset[1] + base_position[1],
-                    offset[2] + base_position[2],
-                ]
-                slot_def = {
-                    "id": area["id"],
-                    "position": position,
-                    "boundingBox": area["boundingBox"],
-                    "displayName": area["displayName"],
-                    "compatibleModuleTypes": area["compatibleModuleTypes"],
-                }
-                if area.get("matingSurfaceUnitVector"):
-                    slot_def["matingSurfaceUnitVector"] = area[
-                        "matingSurfaceUnitVector"
-                    ]
-                return slot_def
-
-        raise errors.SlotDoesNotExistError(
-            f"Slot ID {slot.id} does not exist in deck {deck_def['otId']}"
-        )
-
-    def get_slot_position(self, slot: DeckSlotName) -> Point:
-        """Get the position of a deck slot."""
-        slot_def = self.get_slot_definition(slot)
-        position = slot_def["position"]
-
-        return Point(x=position[0], y=position[1], z=position[2])
-
-    def get_slot_center_position(self, slot: DeckSlotName) -> Point:
-        """Get the (x, y, z) position of the center of the slot."""
-        slot_def = self.get_slot_definition(slot)
-        position = slot_def["position"]
-
-        return Point(
-            x=position[0] + slot_def["boundingBox"]["xDimension"] / 2,
-            y=position[1] + slot_def["boundingBox"]["yDimension"] / 2,
-            z=position[2] + slot_def["boundingBox"]["zDimension"] / 2,
-        )
 
     def get_definition_by_uri(self, uri: LabwareUri) -> LabwareDefinition:
         """Get the labware definition matching loadName namespace and version."""
@@ -436,6 +380,28 @@ class LabwareView(HasState[LabwareState]):
         """Get a labware's quirks."""
         definition = self.get_definition(labware_id)
         return definition.parameters.quirks or []
+
+    def get_should_center_column_on_target_well(self, labware_id: str) -> bool:
+        """True if a pipette moving to this labware should center its active column on the target.
+
+        This is true for labware that have wells spanning entire columns.
+        """
+        has_quirk = self.get_has_quirk(labware_id, "centerMultichannelOnWells")
+        return has_quirk and (
+            len(self.get_definition(labware_id).wells) > 1
+            and len(self.get_definition(labware_id).wells) < 96
+        )
+
+    def get_should_center_pipette_on_target_well(self, labware_id: str) -> bool:
+        """True if a pipette moving to a well of this labware should center its body on the target.
+
+        This is true for 1-well reservoirs no matter the pipette, and for large plates.
+        """
+        has_quirk = self.get_has_quirk(labware_id, "centerMultichannelOnWells")
+        return has_quirk and (
+            len(self.get_definition(labware_id).wells) == 1
+            or len(self.get_definition(labware_id).wells) >= 96
+        )
 
     def get_well_definition(
         self,
@@ -722,15 +688,34 @@ class LabwareView(HasState[LabwareState]):
                 DeckSlotName.SLOT_A3,
             }:
                 return labware.id
-
         return None
 
     def is_fixed_trash(self, labware_id: str) -> bool:
         """Check if labware is fixed trash."""
-        return self.get_fixed_trash_id() == labware_id
+        return self.get_has_quirk(labware_id, "fixedTrash")
+
+    def raise_if_labware_inaccessible_by_pipette(self, labware_id: str) -> None:
+        """Raise an error if the specified location cannot be reached via a pipette."""
+        labware = self.get(labware_id)
+        labware_location = labware.location
+        if isinstance(labware_location, OnLabwareLocation):
+            return self.raise_if_labware_inaccessible_by_pipette(
+                labware_location.labwareId
+            )
+        elif isinstance(labware_location, AddressableAreaLocation):
+            if fixture_validation.is_staging_slot(labware_location.addressableAreaName):
+                raise errors.LocationNotAccessibleByPipetteError(
+                    f"Cannot move pipette to {labware.loadName},"
+                    f" labware is on staging slot {labware_location.addressableAreaName}"
+                )
+        elif labware_location == OFF_DECK_LOCATION:
+            raise errors.LocationNotAccessibleByPipetteError(
+                f"Cannot move pipette to {labware.loadName}, labware is off-deck."
+            )
 
     def raise_if_labware_in_location(
-        self, location: Union[DeckSlotLocation, ModuleLocation]
+        self,
+        location: OnDeckLabwareLocation,
     ) -> None:
         """Raise an error if the specified location has labware in it."""
         for labware in self.get_all():

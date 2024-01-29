@@ -96,7 +96,14 @@ export function ProtocolDashboard(): JSX.Element {
   }
 
   const runData = runs.data?.data != null ? runs.data?.data : []
-  const sortedProtocols = sortProtocols(sortBy, unpinnedProtocols, runData)
+  const allRunsNewestFirst = runData.sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  )
+  const sortedProtocols = sortProtocols(
+    sortBy,
+    unpinnedProtocols,
+    allRunsNewestFirst
+  )
   const handleProtocolsBySortKey = (
     sortKey: ProtocolsOnDeviceSortKey
   ): void => {
@@ -154,7 +161,7 @@ export function ProtocolDashboard(): JSX.Element {
               <StyledText
                 as="p"
                 marginBottom={SPACING.spacing8}
-                color={COLORS.darkBlack70}
+                color={COLORS.grey60}
               >
                 {t('pinned_protocols')}
               </StyledText>

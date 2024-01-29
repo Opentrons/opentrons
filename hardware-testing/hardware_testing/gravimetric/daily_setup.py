@@ -102,7 +102,6 @@ def _test_stability(recorder: GravimetricRecorder, hw: SyncHardwareAPI) -> None:
             OT3Mount.LEFT, Point(x=MOVE_X_MM, y=MOVE_Y_MM), speed=GANTRY_MAX_SPEED
         )
     _check_unstable_count(tag)
-
     hw.set_status_bar_state(COLOR_STATES["idle"])
 
     # WALKING
@@ -114,13 +113,12 @@ def _test_stability(recorder: GravimetricRecorder, hw: SyncHardwareAPI) -> None:
     if not hw.is_simulator:
         ui.get_user_ready("prepare to WALK")
     tag = "WALKING"
+    hw.set_status_bar_state(COLOR_STATES["walking"])
     with recorder.samples_of_tag(tag):
-        num_disco_cycles = int(WALKING_SECONDS / 5)
-        for _ in range(num_disco_cycles):
-            hw.set_status_bar_state(COLOR_STATES["walking"])
-            if not hw.is_simulator:
-                sleep(5)
+        if not hw.is_simulator:
+            sleep(WALKING_SECONDS)
     _check_unstable_count(tag)
+    hw.set_status_bar_state(COLOR_STATES["idle"])
 
 
 def _wait_for_stability(
@@ -155,7 +153,10 @@ def _wait_for_stability(
 
 
 def _run(
-    hw_api: SyncHardwareAPI, recorder: GravimetricRecorder, skip_stability: bool
+    hw_api: SyncHardwareAPI,
+    recorder: GravimetricRecorder,
+    skip_stability: bool,
+    calibrate: bool = False,
 ) -> None:
     ui.print_title("GRAVIMETRIC DAILY SETUP")
     ui.print_info(f"Scale: {recorder.max_capacity}g (SN:{recorder.serial_number})")
@@ -185,13 +186,15 @@ def _run(
     _record()
     hw_api.set_status_bar_state(COLOR_STATES["interact"])
     if not hw_api.is_simulator:
-        ui.get_user_ready("INSTALL Radwag's default weighing pan")
+        if calibrate:
+            ui.get_user_ready("INSTALL Radwag's default weighing pan")
         ui.get_user_ready("REMOVE all weights, vials, and labware from scale")
         ui.get_user_ready("CLOSE door and step away from fixture")
     hw_api.set_status_bar_state(COLOR_STATES["idle"])
 
     ui.print_header("TEST STABILITY")
     if not skip_stability:
+        print("homing...")
         hw_api.home()
         _wait_for_stability(recorder, hw_api, tag="stability")
         _test_stability(recorder, hw_api)
@@ -204,12 +207,13 @@ def _run(
     _wait_for_stability(recorder, hw_api, tag="zero")
     _zero()
 
-    ui.print_header("CALIBRATE SCALE")
-    if hw_api.is_simulator or ui.get_user_answer("calibrate (ADJUST) this scale"):
-        if not hw_api.is_simulator:
-            ui.get_user_ready("about to CALIBRATE the scale:")
-        _wait_for_stability(recorder, hw_api, tag="calibrate")
-        _calibrate()
+    if calibrate:
+        ui.print_header("CALIBRATE SCALE")
+        if hw_api.is_simulator or ui.get_user_answer("calibrate (ADJUST) this scale"):
+            if not hw_api.is_simulator:
+                ui.get_user_ready("about to CALIBRATE the scale:")
+            _wait_for_stability(recorder, hw_api, tag="calibrate")
+            _calibrate()
 
     ui.print_header("TEST ACCURACY")
     if hw_api.is_simulator:
@@ -242,6 +246,7 @@ def _run(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
+    parser.add_argument("--calibrate", action="store_true")
     parser.add_argument("--skip-stability", action="store_true")
     args = parser.parse_args()
     _ctx = helpers.get_api_context(
@@ -263,15 +268,19 @@ if __name__ == "__main__":
         simulate=_hw.is_simulator,
     )
     try:
-        _run(_hw, _rec, args.skip_stability)
+        _run(_hw, _rec, args.skip_stability, args.calibrate)
         _hw.set_status_bar_state(COLOR_STATES["pass"])
         ui.print_header("Result: PASS")
+        if not args.simulate:
+            ui.get_user_ready("test done")
+    except KeyboardInterrupt:
+        ui.print_header("Result: EXITED EARLY")
     except Exception as e:
         _hw.set_status_bar_state(COLOR_STATES["fail"])
         ui.print_header("Result: FAIL")
-        raise e
-    finally:
         if not args.simulate:
             ui.get_user_ready("test done")
+        raise e
+    finally:
         _rec.stop()
         _hw.set_status_bar_state(COLOR_STATES["idle"])

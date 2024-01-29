@@ -27,6 +27,6 @@ runs:
     - shell: bash
       run: |
         npm install --global shx@0.3.3
-        $OT_PYTHON -m pip install pipenv==2021.5.29
+        $OT_PYTHON -m pip install pipenv==2023.11.15
     - shell: bash
       run: 'make -C ${{ inputs.project }} setup'

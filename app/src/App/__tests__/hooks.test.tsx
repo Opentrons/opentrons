@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
@@ -12,7 +12,7 @@ import type { Store } from 'redux'
 import type { State } from '../../redux/types'
 
 describe('useSoftwareUpdatePoll', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   let store: Store<State>
   beforeEach(() => {
     jest.useFakeTimers()

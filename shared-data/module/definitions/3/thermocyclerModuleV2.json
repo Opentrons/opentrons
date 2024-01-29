@@ -8,7 +8,7 @@
     "z": 108.96
   },
   "dimensions": {
-    "bareOverallHeight": 98.0,
+    "bareOverallHeight": 108.96,
     "overLabwareHeight": 0.0,
     "lidHeight": 61.7,
     "xDimension": 172,
@@ -44,7 +44,7 @@
       "dropOffset": {
         "x": 0,
         "y": 0,
-        "z": 4.6
+        "z": 5.6
       }
     }
   },

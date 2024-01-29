@@ -1,8 +1,6 @@
 import cookie from 'cookie'
 
 import { initializeMixpanel, mixpanelOptIn, mixpanelOptOut } from './mixpanel'
-import { initializeFullstory } from './initializeFullstory'
-import { shutdownFullstory } from './fullstory'
 import type { AnalyticsState } from './types'
 
 const COOKIE_KEY_NAME = 'ot_ll_analytics' // NOTE: cookie is named "LL" but only LC uses it now
@@ -62,16 +60,12 @@ export const getAnalyticsState = (): AnalyticsState => {
   return state
 }
 
-// NOTE: Fullstory has no opt-in/out, control by adding/removing it completely
-
 export const persistAnalyticsState = (state: AnalyticsState): void => {
   persistAnalyticsCookie(state)
 
   if (state.optedIn) {
     mixpanelOptIn()
-    initializeFullstory()
   } else {
     mixpanelOptOut()
-    shutdownFullstory()
   }
 }

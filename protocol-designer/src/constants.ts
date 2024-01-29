@@ -16,7 +16,6 @@ import {
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
-import { i18n } from './localization'
 import type { DeckSlot, WellVolumes } from './types'
 import type { ModuleType, ModuleModel } from '@opentrons/shared-data'
 
@@ -96,43 +95,43 @@ export const MODELS_FOR_MODULE_TYPE: Record<
 > = {
   [MAGNETIC_MODULE_TYPE]: [
     {
-      name: i18n.t(`modules.model_display_name.${MAGNETIC_MODULE_V1}`),
+      name: 'Magnetic',
       value: MAGNETIC_MODULE_V1,
     },
     {
-      name: i18n.t(`modules.model_display_name.${MAGNETIC_MODULE_V2}`),
+      name: 'Magnetic',
       value: MAGNETIC_MODULE_V2,
     },
   ],
   [TEMPERATURE_MODULE_TYPE]: [
     {
-      name: i18n.t(`modules.model_display_name.${TEMPERATURE_MODULE_V1}`),
+      name: 'Temperature',
       value: TEMPERATURE_MODULE_V1,
     },
     {
-      name: i18n.t(`modules.model_display_name.${TEMPERATURE_MODULE_V2}`),
+      name: 'Temperature',
       value: TEMPERATURE_MODULE_V2,
     },
   ],
   [THERMOCYCLER_MODULE_TYPE]: [
     {
-      name: i18n.t(`modules.model_display_name.${THERMOCYCLER_MODULE_V1}`),
+      name: 'Thermocycler',
       value: THERMOCYCLER_MODULE_V1,
     },
     {
-      name: i18n.t(`modules.model_display_name.${THERMOCYCLER_MODULE_V2}`),
+      name: 'Thermocycler',
       value: THERMOCYCLER_MODULE_V2,
     },
   ],
   [HEATERSHAKER_MODULE_TYPE]: [
     {
-      name: i18n.t(`modules.model_display_name.${HEATERSHAKER_MODULE_V1}`),
+      name: 'Heater-Shaker',
       value: HEATERSHAKER_MODULE_V1,
     },
   ],
   [MAGNETIC_BLOCK_TYPE]: [
     {
-      name: i18n.t(`modules.model_display_name.${MAGNETIC_BLOCK_V1}`),
+      name: 'Magnetic Block',
       value: MAGNETIC_BLOCK_V1,
     },
   ],
@@ -156,6 +155,3 @@ export const DND_TYPES = {
 // Values for TC fields
 export const THERMOCYCLER_STATE: 'thermocyclerState' = 'thermocyclerState'
 export const THERMOCYCLER_PROFILE: 'thermocyclerProfile' = 'thermocyclerProfile'
-
-export const OT_2_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_1100ml_fixed/1'
-export const FLEX_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_3200ml_fixed/1'

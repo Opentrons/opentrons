@@ -1,12 +1,13 @@
 """Test Capacitance."""
 from asyncio import sleep
-from typing import List, Union, Tuple, Optional
+from typing import List, Union, Tuple, Optional, cast
 
 from opentrons_hardware.hardware_control.tool_sensors import capacitive_probe
 from opentrons_hardware.firmware_bindings.constants import NodeId, SensorId
 
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.backends.ot3utils import sensor_id_for_instrument
+from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.types import InstrumentProbeType
 
 
@@ -168,7 +169,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             if api.is_simulator:
                 return 0.0
             pos = await capacitive_probe(
-                api._backend._messenger,  # type: ignore[union-attr]
+                cast(OT3Controller, api._backend)._messenger,
                 NodeId.pipette_left,
                 NodeId.head_l,
                 distance=distance,
@@ -225,7 +226,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         else:
             print("skipping deck-pf")
 
-        await api.home_z()
+        await api.home_z(OT3Mount.LEFT)
         if not api.is_simulator:
             ui.get_user_ready("REMOVE probe")
         await api.remove_tip(OT3Mount.LEFT)

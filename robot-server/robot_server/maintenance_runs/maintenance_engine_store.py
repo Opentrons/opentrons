@@ -24,6 +24,8 @@ from opentrons.protocol_engine import (
     create_protocol_engine,
 )
 
+from opentrons.protocol_engine.types import DeckConfigurationType
+
 
 class EngineConflictError(RuntimeError):
     """An error raised if an active engine is already initialized.
@@ -31,6 +33,10 @@ class EngineConflictError(RuntimeError):
     The store will not create a new engine unless the "current" runner/engine
     pair is idle.
     """
+
+
+class NoRunnerEnginePairError(RuntimeError):
+    """Raised if you try to get the current engine or runner while there is none."""
 
 
 class RunnerEnginePair(NamedTuple):
@@ -90,13 +96,15 @@ class MaintenanceEngineStore:
     @property
     def engine(self) -> ProtocolEngine:
         """Get the "current" ProtocolEngine."""
-        assert self._runner_engine_pair is not None, "Engine not yet created."
+        if self._runner_engine_pair is None:
+            raise NoRunnerEnginePairError()
         return self._runner_engine_pair.engine
 
     @property
     def runner(self) -> LiveRunner:
         """Get the "current" ProtocolRunner."""
-        assert self._runner_engine_pair is not None, "Runner not yet created."
+        if self._runner_engine_pair is None:
+            raise NoRunnerEnginePairError()
         return self._runner_engine_pair.runner
 
     @property
@@ -119,6 +127,7 @@ class MaintenanceEngineStore:
         run_id: str,
         created_at: datetime,
         labware_offsets: List[LabwareOffsetCreate],
+        deck_configuration: Optional[DeckConfigurationType] = [],
     ) -> StateSummary:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
 
@@ -144,6 +153,7 @@ class MaintenanceEngineStore:
                     RobotTypeEnum.robot_literal_to_enum(self._robot_type)
                 ),
             ),
+            deck_configuration=deck_configuration,
         )
 
         # Using LiveRunner as the runner to allow for future refactor of maintenance runs

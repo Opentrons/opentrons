@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
-from typing import Any, Generic, Optional, TypeVar
+from typing import Any, Generic, Optional, TypeVar, Union
 
 from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import FlowRates
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
 
+from .._trash_bin import TrashBin
 from .._waste_chute import WasteChute
 from .well import WellCoreType
 
@@ -46,7 +48,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
     @abstractmethod
     def dispense(
         self,
-        location: types.Location,
+        location: Union[types.Location, TrashBin, WasteChute],
         well_core: Optional[WellCoreType],
         volume: float,
         rate: float,
@@ -69,7 +71,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
     @abstractmethod
     def blow_out(
         self,
-        location: types.Location,
+        location: Union[types.Location, TrashBin, WasteChute],
         well_core: Optional[WellCoreType],
         in_place: bool,
     ) -> None:
@@ -134,9 +136,15 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
-    def drop_tip_in_waste_chute(
-        self, waste_chute: WasteChute, home_after: Optional[bool]
+    def drop_tip_in_disposal_location(
+        self, disposal_location: Union[TrashBin, WasteChute], home_after: Optional[bool]
     ) -> None:
+        """Move to and drop tip into a TrashBin or WasteChute.
+
+        Args:
+            disposal_location: The disposal location object we're dropping to.
+            home_after: Whether to home the pipette after the tip is dropped.
+        """
         ...
 
     @abstractmethod
@@ -150,7 +158,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
     @abstractmethod
     def move_to(
         self,
-        location: types.Location,
+        location: Union[types.Location, TrashBin, WasteChute],
         well_core: Optional[WellCoreType],
         force_direct: bool,
         minimum_z_height: Optional[float],
@@ -204,6 +212,10 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
+    def get_active_channels(self) -> int:
+        ...
+
+    @abstractmethod
     def has_tip(self) -> bool:
         ...
 
@@ -239,12 +251,31 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         """Configure the pipette for a specific volume.
 
         Args:
-            volume: The volume to preppare to handle.
+            volume: The volume to prepare to handle.
         """
         ...
 
     def prepare_to_aspirate(self) -> None:
         """Prepare the pipette to aspirate."""
+        ...
+
+    def configure_nozzle_layout(
+        self,
+        style: NozzleLayout,
+        primary_nozzle: Optional[str],
+        front_right_nozzle: Optional[str],
+    ) -> None:
+        """Configure the pipette to a specific nozzle layout.
+
+        Args:
+            style: The type of configuration you wish to build.
+            primary_nozzle: The nozzle that will determine a pipette's critical point.
+            front_right_nozzle: The front right most nozzle in the requested layout.
+        """
+        ...
+
+    def is_tip_tracking_available(self) -> bool:
+        """Return whether auto tip tracking is available for the pipette's current nozzle configuration."""
         ...
 
 

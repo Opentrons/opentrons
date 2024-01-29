@@ -6,6 +6,7 @@ import { modulePipetteCollision } from './modulePipetteCollision'
 import { thermocyclerPipetteCollision } from './thermocyclerPipetteCollision'
 import { isValidSlot } from './isValidSlot'
 import { getLabwareSlot } from './getLabwareSlot'
+
 export {
   commandCreatorsTimeline,
   curryCommandCreator,
@@ -16,6 +17,9 @@ export {
   getLabwareSlot,
 }
 export * from './commandCreatorArgsGetters'
-export * from './misc'
 export * from './heaterShakerCollision'
+export * from './misc'
+export * from './movableTrashCommandsUtil'
+export * from './ninetySixChannelCollision'
+export * from './wasteChuteCommandsUtil'
 export const uuid: () => string = uuidv4

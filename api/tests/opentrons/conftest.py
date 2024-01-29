@@ -88,7 +88,7 @@ class Bundle(TypedDict):
     filelike: io.BytesIO
     binary_zipfile: bytes
     metadata: Dict[str, str]
-    bundled_data: Dict[str, str]
+    bundled_data: Dict[str, bytes]
     bundled_labware: Dict[str, LabwareDefinition]
     bundled_python: Dict[str, Any]
 
@@ -308,6 +308,8 @@ def _make_ot3_pe_ctx(
             use_virtual_pipettes=True,
             use_virtual_modules=True,
             use_virtual_gripper=True,
+            # TODO figure out if we will want to use a "real" deck config here or if we are fine with simulated
+            use_simulated_deck_config=True,
             block_on_door_open=False,
         ),
         drop_tips_after_run=False,
@@ -496,7 +498,7 @@ def get_bundle_fixture() -> Callable[[str], Bundle]:
         if fixture_name == "simple_bundle":
             with open(fixture_dir / "protocol.py", "r") as f:
                 result["contents"] = f.read()
-            with open(fixture_dir / "data.txt", "rb") as f:  # type: ignore[assignment]
+            with open(fixture_dir / "data.txt", "rb") as f:
                 result["bundled_data"] = {"data.txt": f.read()}
             with open(fixture_dir / "custom_labware.json", "r") as f:
                 custom_labware = json.load(f)

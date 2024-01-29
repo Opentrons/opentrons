@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
-import { renderHook } from '@testing-library/react-hooks'
-import { waitFor } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
 import { createStore, Store } from 'redux'
 import { Provider } from 'react-redux'
 import { QueryClient, QueryClientProvider } from 'react-query'
@@ -41,7 +40,7 @@ const mockFormatInterval = formatInterval as jest.MockedFunction<
   typeof formatInterval
 >
 
-let wrapper: React.FunctionComponent<{}>
+let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 let store: Store<any> = createStore(jest.fn(), {})
 
 const RUN_ID = '1'

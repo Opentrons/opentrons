@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import upperFirst from 'lodash/upperFirst'
 import {
@@ -16,18 +17,17 @@ import {
   FLEX_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { i18n } from '../../localization'
 import { actions as stepFormActions, ModuleOnDeck } from '../../step-forms'
 import {
   SPAN7_8_10_11_SLOT,
   DEFAULT_MODEL_FOR_MODULE_TYPE,
 } from '../../constants'
 import { ModuleDiagram } from './ModuleDiagram'
+import { FlexSlotMap } from './FlexSlotMap'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
 
 import type { ModuleType, RobotType } from '@opentrons/shared-data'
-import { FlexSlotMap } from './FlexSlotMap'
 
 interface Props {
   robotType?: RobotType
@@ -44,6 +44,7 @@ export function ModuleRow(props: Props): JSX.Element {
     showCollisionWarnings,
     robotType,
   } = props
+  const { t } = useTranslation(['modules', 'tooltip'])
   const type: ModuleType = moduleOnDeck?.type || props.type
   const isFlex = robotType === FLEX_ROBOT_TYPE
   const model = moduleOnDeck?.model
@@ -68,17 +69,17 @@ export function ModuleRow(props: Props): JSX.Element {
   // If this module is in a deck slot + is not TC spanning Slot
   // add to occupiedSlots
   if (slot && slot !== SPAN7_8_10_11_SLOT) {
-    slotDisplayName = `Slot ${slot}`
+    slotDisplayName = slot
     occupiedSlotsForMap = [slot]
   }
   // If this Module is a TC deck slot and spanning
   // populate all 4 slots individually
   if (slot === SPAN7_8_10_11_SLOT) {
-    slotDisplayName = 'Slot 7,8,10,11'
+    slotDisplayName = '7,8,10,11'
     occupiedSlotsForMap = ['7', '8', '10', '11']
     //  TC on Flex
   } else if (isFlex && type === THERMOCYCLER_MODULE_TYPE && slot === 'B1') {
-    slotDisplayName = 'Slot A1+B1'
+    slotDisplayName = 'A1+B1'
     occupiedSlotsForMap = ['A1', 'B1']
   }
   // If collisionSlots are populated, check which slot is occupied
@@ -86,12 +87,12 @@ export function ModuleRow(props: Props): JSX.Element {
   // default module slot placement magnet = Slot1 temperature = Slot3
   let collisionTooltipText = null
   if (collisionSlots && collisionSlots.includes('4')) {
-    collisionTooltipText = i18n.t(
-      `tooltip.edit_module_card.magnetic_module_collision`
+    collisionTooltipText = t(
+      `tooltip:edit_module_card.magnetic_module_collision`
     )
   } else if (collisionSlots && collisionSlots.includes('6')) {
-    collisionTooltipText = i18n.t(
-      `tooltip.edit_module_card.temperature_module_collision`
+    collisionTooltipText = t(
+      `tooltip:edit_module_card.temperature_module_collision`
     )
   }
 
@@ -126,7 +127,7 @@ export function ModuleRow(props: Props): JSX.Element {
           color={C_DARK_GRAY}
           marginRight={SPACING.spacing4}
         />
-        {i18n.t(`modules.module_display_names.${type}`)}
+        {t(`module_display_names.${type}`)}
       </h4>
       <div className={styles.module_row}>
         <div className={styles.module_diagram_container}>
@@ -139,7 +140,7 @@ export function ModuleRow(props: Props): JSX.Element {
           {model && (
             <LabeledValue
               label="Model"
-              value={i18n.t(`modules.model_display_name.${model}`)}
+              value={t(`model_display_name.${model}`)}
             />
           )}
         </div>

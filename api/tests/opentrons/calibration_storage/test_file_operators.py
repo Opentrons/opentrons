@@ -1,8 +1,16 @@
-import pytest
 import json
 import typing
 from pathlib import Path
+
+import pydantic
+import pytest
+
 from opentrons.calibration_storage import file_operators as io
+
+
+class DummyModel(pydantic.BaseModel):
+    integer_field: int
+    aliased_field: str = pydantic.Field(alias="! aliased field !")
 
 
 @pytest.fixture
@@ -70,3 +78,26 @@ def test_malformed_calibration(
     )
     with pytest.raises(AssertionError):
         io.read_cal_file(malformed_calibration_path)
+
+
+def test_deserialize_pydantic_model_valid() -> None:
+    serialized = b'{"integer_field": 123, "! aliased field !": "abc"}'
+    assert io.deserialize_pydantic_model(
+        serialized, DummyModel
+    ) == DummyModel.construct(integer_field=123, aliased_field="abc")
+
+
+def test_deserialize_pydantic_model_invalid_as_json() -> None:
+    serialized = "😾".encode("utf-8")
+    assert io.deserialize_pydantic_model(serialized, DummyModel) is None
+    # Ideally we would assert that the subject logged a message saying "not valid JSON",
+    # but the opentrons.simulate and opentrons.execute tests interfere with the process's logger
+    # settings and prevent that message from showing up in pytest's caplog fixture.
+
+
+def test_read_pydantic_model_from_file_invalid_model(tmp_path: Path) -> None:
+    serialized = b'{"integer_field": "not an integer"}'
+    assert io.deserialize_pydantic_model(serialized, DummyModel) is None
+    # Ideally we would assert that the subject logged a message saying "does not match model",
+    # but the opentrons.simulate and opentrons.execute tests interfere with the process's logger
+    # settings and prevent that message from showing up in pytest's caplog fixture.

@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { getWellsDepth } from '@opentrons/shared-data'
+import { getWellsDepth, LabwareDefinition2 } from '@opentrons/shared-data'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
@@ -17,6 +17,7 @@ import type {
   InnerMixArgs,
 } from '@opentrons/step-generation'
 type MoveLiquidFields = HydratedMoveLiquidFormData['fields']
+
 // NOTE(sa, 2020-08-11): leaving this as fn so it can be expanded later for dispense air gap
 export function getAirGapData(
   hydratedFormData: MoveLiquidFields,
@@ -76,6 +77,7 @@ export const moveLiquidFormToArgs = (
     dispense_wells: destWellsUnordered,
     dropTip_location: dropTipLocation,
     path,
+    nozzles,
   } = fields
   let sourceWells = getOrderedWells(
     fields.aspirate_wells,
@@ -83,21 +85,43 @@ export const moveLiquidFormToArgs = (
     fields.aspirate_wellOrder_first,
     fields.aspirate_wellOrder_second
   )
-  let destWells = getOrderedWells(
-    fields.dispense_wells,
-    destLabware.def,
-    fields.dispense_wellOrder_first,
-    fields.dispense_wellOrder_second
-  )
+
+  const isDispensingIntoDisposalLocation =
+    'name' in destLabware &&
+    (destLabware.name === 'wasteChute' || destLabware.name === 'trashBin')
+
+  let def: LabwareDefinition2 | null = null
+  let dispWells: string[] = []
+
+  if ('def' in destLabware) {
+    def = destLabware.def
+    dispWells = destWellsUnordered
+  }
+  let destWells =
+    !isDispensingIntoDisposalLocation && def != null
+      ? getOrderedWells(
+          dispWells,
+          def,
+          fields.dispense_wellOrder_first,
+          fields.dispense_wellOrder_second
+        )
+      : null
 
   // 1:many with single path: spread well array of length 1 to match other well array
-  if (path === 'single' && sourceWells.length !== destWells.length) {
-    if (sourceWells.length === 1) {
-      sourceWells = Array(destWells.length).fill(sourceWells[0])
-    } else if (destWells.length === 1) {
-      destWells = Array(sourceWells.length).fill(destWells[0])
+  // distribute 1:many can not happen into the waste chute or trash bin
+  if (destWells != null && !isDispensingIntoDisposalLocation) {
+    if (path === 'single' && sourceWells.length !== destWells.length) {
+      if (sourceWells.length === 1) {
+        sourceWells = Array(destWells.length).fill(sourceWells[0])
+      } else if (destWells.length === 1) {
+        destWells = Array(sourceWells.length).fill(destWells[0])
+      }
     }
   }
+  const wellDepth =
+    'def' in destLabware && destWells != null
+      ? getWellsDepth(destLabware.def, destWells)
+      : 0
 
   const disposalVolume = fields.disposalVolume_checkbox
     ? fields.disposalVolume_volume
@@ -110,8 +134,7 @@ export const moveLiquidFormToArgs = (
   const touchTipAfterDispense = Boolean(fields.dispense_touchTip_checkbox)
   const touchTipAfterDispenseOffsetMmFromBottom =
     fields.dispense_touchTip_mmFromBottom ||
-    getWellsDepth(fields.dispense_labware.def, destWells) +
-      DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
+    wellDepth + DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
   const mixBeforeAspirate = getMixData(
     fields,
     'aspirate_mix_checkbox',
@@ -163,7 +186,7 @@ export const moveLiquidFormToArgs = (
     dispenseOffsetFromBottomMm:
       fields.dispense_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_DISPENSE,
     blowoutFlowRateUlSec:
-      fields.dispense_flowRate || pipetteSpec.defaultDispenseFlowRate.value,
+      fields.dispense_flowRate || pipetteSpec.defaultBlowOutFlowRate.value,
     blowoutOffsetFromTopMm,
     changeTip: fields.changeTip,
     preWetTip: Boolean(fields.preWetTip),
@@ -178,17 +201,11 @@ export const moveLiquidFormToArgs = (
     description: hydratedFormData.description,
     name: hydratedFormData.stepName,
     dropTipLocation,
+    nozzles,
   }
   assert(
     sourceWellsUnordered.length > 0,
     'expected sourceWells to have length > 0'
-  )
-  assert(destWellsUnordered.length > 0, 'expected destWells to have length > 0')
-  assert(
-    sourceWellsUnordered.length === 1 ||
-      destWellsUnordered.length === 1 ||
-      sourceWellsUnordered.length === destWellsUnordered.length,
-    `cannot do moveLiquidFormToArgs. Mismatched wells (not 1:N, N:1, or N:N!) for path="single". Neither source (${sourceWellsUnordered.length}) nor dest (${destWellsUnordered.length}) equal 1`
   )
   assert(
     !(
@@ -196,6 +213,15 @@ export const moveLiquidFormToArgs = (
       blowoutLocation === DEST_WELL_BLOWOUT_DESTINATION
     ),
     'blowout location for multiDispense cannot be destination well'
+  )
+
+  if (!isDispensingIntoDisposalLocation && dispWells.length === 0) {
+    console.error('expected to have destWells.length > 0 but got none')
+  }
+
+  assert(
+    !(path === 'multiDispense' && destWells == null),
+    'cannot distribute when destWells is null'
   )
 
   switch (path) {
@@ -220,7 +246,7 @@ export const moveLiquidFormToArgs = (
         mixFirstAspirate: mixBeforeAspirate,
         mixInDestination,
         sourceWells,
-        destWell: destWells[0],
+        destWell: destWells != null ? destWells[0] : null,
       }
       return consolidateStepArguments
     }
@@ -234,7 +260,9 @@ export const moveLiquidFormToArgs = (
         blowoutLocation: fields.blowout_location,
         mixBeforeAspirate,
         sourceWell: sourceWells[0],
-        destWells,
+        // cannot distribute into a waste chute so if destWells is null
+        // there is an error
+        destWells: destWells ?? [],
       }
       return distributeStepArguments
     }

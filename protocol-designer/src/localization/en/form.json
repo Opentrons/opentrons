@@ -49,6 +49,13 @@
       "wells": "wells"
     },
     "field": {
+      "nozzles": {
+        "label": "nozzles",
+        "option": { "ALL": "All", "COLUMN": "Column" },
+        "option_tooltip": {
+          "COLUMN": "To use column partial tip pickup, a tiprack without an adapter must be placed on the deck."
+        }
+      },
       "airGap": { "label": "air gap" },
       "blowout": { "label": "blowout" },
       "location": {

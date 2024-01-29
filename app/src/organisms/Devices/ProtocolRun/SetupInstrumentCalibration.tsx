@@ -53,7 +53,7 @@ export function SetupInstrumentCalibration({
   )
   const attachedGripperMatch = usesGripper
     ? (instrumentsQueryData?.data ?? []).find(
-        (i): i is GripperData => i.instrumentType === 'gripper'
+        (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
       ) ?? null
     : null
 
@@ -63,7 +63,7 @@ export function SetupInstrumentCalibration({
         <PipetteRecalibrationWarning />
       )}
       <StyledText
-        color={COLORS.black}
+        color={COLORS.black90}
         css={TYPOGRAPHY.pSemiBold}
         id="PipetteCalibration_requiredPipettesTitle"
       >

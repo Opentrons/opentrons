@@ -4,29 +4,30 @@ verify_ssl = true
 name = "pypi"
 
 [requires]
-python_version = "3.7"
+python_version = "3.10"
 
 [dev-packages]
-robot-server = { editable = true, path = "." }
 # pytest dependencies on windows, spec'd here to force lockfile inclusion
 # https://github.com/pypa/pipenv/issues/4408#issuecomment-668324177
-atomicwrites = { version = "==1.4.0", sys_platform = "== 'win32'" }
-colorama = { version = "==0.4.4", sys_platform = "== 'win32'" }
-pytest = "~=6.1"
-pytest-asyncio = "~=0.18"
+atomicwrites = { version = "==1.4.0", markers="sys_platform=='win32'" }
+colorama = { version = "==0.4.4", markers="sys_platform=='win32'" }
+# pytest 7.3.0 dropped attrs, and tavern 1.x at least has some pytest hooks
+# that implicitly require the use of attrs in pytest internals
+pytest = "<7.3.0,>=7.1.0"
+tavern = "~=1.6"
+pytest-asyncio = "~=0.16"
 pytest-cov = "==2.10.1"
 pytest-lazy-fixture = "==0.6.3"
-pytest-xdist = "~=2.2.1"
-requests = "==2.26.0"
-tavern = "~=1.6"
-graphviz = "==0.17"
-mock = "~=4.0.2"
-mypy = "==0.910"
+pytest-xdist = "~=2.5.0"
+requests = "==2.27.1"
+graphviz = "==0.19"
+mock = "~=4.0.3"
+mypy = "==0.981"
 flake8 = "~=3.9.0"
 flake8-annotations = "~=2.6.2"
 flake8-docstrings = "~=1.6.0"
 flake8-noqa = "~=1.2.1"
-decoy = "~=1.10"
+decoy = "~=2.1"
 httpx = "==0.18.*"
 black = "==22.3.0"
 types-requests = "==2.25.6"
@@ -35,26 +36,24 @@ sqlalchemy2-stubs = "==0.0.2a21"
 python-box = "==5.4.1"
 
 [packages]
-opentrons = { editable = true, path = "../api" }
-opentrons-shared-data = { editable = true, path = "../shared-data/python" }
-notify-server = { editable = true, path = "../notify-server" }
-anyio = "==3.3.0"
+anyio = "==3.6.1"
 fastapi = "==0.68.1"
 python-dotenv = "==0.19.0"
 python-multipart = "==0.0.5"
-pydantic = "==1.8.2"
+pydantic = "==1.9.2"
 typing-extensions = ">=4.0.0,<5"
 uvicorn = "==0.14.0"
 wsproto = "==1.0.0"
-systemd-python = { version = "==234", sys_platform = "== 'linux'" }
-idna = "==3.2"
-click = "==8.0.1"
-# TODO(mc, 2022-04-04): this dep is newer than the OT-2 for dev environment reasons
-# remove this TODO when Opentrons/buildroot has updated to newer numpy
-# https://github.com/Opentrons/buildroot/pull/148
-numpy = "==1.21.2"
+systemd-python = { version = "==234", markers="sys_platform == 'linux'" }
+idna = "==3.3"
+click = "==8.1.2"
+numpy = "==1.23.3"
 zipp = "==3.5.0"
-opentrons-hardware = { editable = true, path = "./../hardware" }
 sqlalchemy = "==1.4.32"
 aiosqlite = "==0.17.0"
+opentrons-hardware = {editable = true, path='../hardware', extras=['FLEX']}
+opentrons = { editable = true, path = "../api"}
+opentrons-shared-data = { editable = true, path = "../shared-data/python" }
+notify-server = { editable = true, path = "../notify-server"}
 server-utils = {editable = true, path = "./../server-utils"}
+robot-server = { editable = true, path = "."}

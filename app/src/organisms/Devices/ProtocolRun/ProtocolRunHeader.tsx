@@ -25,31 +25,30 @@ import {
 } from '@opentrons/react-api-client'
 import {
   getPipetteModelSpecs,
-  HEATERSHAKER_MODULE_TYPE,
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import {
+  ALIGN_CENTER,
+  BORDERS,
   Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  DISPLAY_FLEX,
   Flex,
   Icon,
   IconName,
-  useHoverTooltip,
-  ALIGN_CENTER,
-  DIRECTION_COLUMN,
-  DISPLAY_FLEX,
   JUSTIFY_CENTER,
+  JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
-  SIZE_1,
-  BORDERS,
-  COLORS,
-  SPACING,
-  TYPOGRAPHY,
+  Link as LinkButton,
   PrimaryButton,
   SecondaryButton,
+  SIZE_1,
+  SPACING,
+  TYPOGRAPHY,
   useConditionalConfirm,
-  JUSTIFY_FLEX_END,
-  Link as LinkButton,
+  useHoverTooltip,
 } from '@opentrons/components'
 
 import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
@@ -103,6 +102,10 @@ import { EMPTY_TIMESTAMP } from '../constants'
 import { getHighestPriorityError } from '../../OnDeviceDisplay/RunningProtocol'
 import { RunFailedModal } from './RunFailedModal'
 import { RunProgressMeter } from '../../RunProgressMeter'
+import { getIsFixtureMismatch } from '../../../resources/deck_configuration/utils'
+import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
+import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentRunId } from '../../ProtocolUpload/hooks/useMostRecentRunId'
 
 import type { Run, RunError } from '@opentrons/api-client'
 import type { State } from '../../../redux/types'
@@ -158,6 +161,7 @@ export function ProtocolRunHeader({
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const { data: attachedInstruments } = useInstrumentsQuery()
   const isRunCurrent = Boolean(useRunQuery(runId)?.data?.data?.current)
+  const mostRecentRunId = useMostRecentRunId()
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const [showRunFailedModal, setShowRunFailedModal] = React.useState(false)
@@ -175,10 +179,18 @@ export function ProtocolRunHeader({
   const robotSettings = useSelector((state: State) =>
     getRobotSettings(state, robotName)
   )
+  const isFlex = useIsFlex(robotName)
+  const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
+  const robotType = isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
+  const deckConfigCompatibility = useDeckConfigurationCompatibility(
+    robotType,
+    robotProtocolAnalysis
+  )
+  const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)
+
   const doorSafetySetting = robotSettings.find(
     setting => setting.id === 'enableDoorSafetySwitch'
   )
-  const isFlex = useIsFlex(robotName)
   const { data: doorStatus } = useDoorQuery({
     refetchInterval: EQUIPMENT_POLL_MS,
   })
@@ -192,33 +204,35 @@ export function ProtocolRunHeader({
   }
 
   React.useEffect(() => {
-    // Reset drop tip state when a new run occurs.
-    if (runStatus === RUN_STATUS_IDLE) {
-      setShowDropTipBanner(true)
-      setPipettesWithTip([])
-    } else if (runStatus != null && RUN_OVER_STATUSES.includes(runStatus)) {
-      getPipettesWithTipAttached({
-        host,
-        runId,
-        runRecord,
-        attachedInstruments,
-        isFlex,
-      })
-        .then(pipettesWithTipAttached => {
-          const newPipettesWithTipAttached = pipettesWithTipAttached.map(
-            pipette => {
-              const specs = getPipetteModelSpecs(pipette.instrumentModel)
-              return {
-                specs,
-                mount: pipette.mount,
+    if (isFlex) {
+      // Reset drop tip state when a new run occurs.
+      if (runStatus === RUN_STATUS_IDLE) {
+        setShowDropTipBanner(true)
+        setPipettesWithTip([])
+      } else if (runStatus != null && RUN_OVER_STATUSES.includes(runStatus)) {
+        getPipettesWithTipAttached({
+          host,
+          runId,
+          runRecord,
+          attachedInstruments,
+          isFlex,
+        })
+          .then(pipettesWithTipAttached => {
+            const newPipettesWithTipAttached = pipettesWithTipAttached.map(
+              pipette => {
+                const specs = getPipetteModelSpecs(pipette.instrumentModel)
+                return {
+                  specs,
+                  mount: pipette.mount,
+                }
               }
-            }
-          )
-          setPipettesWithTip(() => newPipettesWithTipAttached)
-        })
-        .catch(e => {
-          console.log(`Error checking pipette tip attachement state: ${e}`)
-        })
+            )
+            setPipettesWithTip(() => newPipettesWithTipAttached)
+          })
+          .catch(e => {
+            console.log(`Error checking pipette tip attachement state: ${e}`)
+          })
+      }
     }
   }, [runStatus, attachedInstruments, host, runId, runRecord, isFlex])
 
@@ -299,8 +313,7 @@ export function ProtocolRunHeader({
       <Flex
         ref={protocolRunHeaderRef}
         backgroundColor={COLORS.white}
-        border={BORDERS.lineBorder}
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius={BORDERS.borderRadiusSize2}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing16}
         marginBottom={SPACING.spacing16}
@@ -322,7 +335,7 @@ export function ProtocolRunHeader({
               <StyledText
                 as="h2"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                color={COLORS.blueEnabled}
+                color={COLORS.blue50}
               >
                 {displayName}
               </StyledText>
@@ -349,7 +362,7 @@ export function ProtocolRunHeader({
         CANCELLABLE_STATUSES.includes(runStatus) ? (
           <Banner type="warning">{t('shared:close_robot_door')}</Banner>
         ) : null}
-        {isRunCurrent ? (
+        {mostRecentRunId === runId ? (
           <TerminalRunBanner
             {...{
               runStatus,
@@ -360,7 +373,9 @@ export function ProtocolRunHeader({
             }}
           />
         ) : null}
-        {isRunCurrent && showDropTipBanner && pipettesWithTip.length !== 0 ? (
+        {mostRecentRunId === runId &&
+        showDropTipBanner &&
+        pipettesWithTip.length !== 0 ? (
           <ProtocolDropTipBanner
             onLaunchWizardClick={setShowDropTipWizard}
             onCloseClick={() => {
@@ -390,12 +405,13 @@ export function ProtocolRunHeader({
                 protocolData == null || !!isProtocolAnalyzing
               }
               isDoorOpen={isDoorOpen}
+              isFixtureMismatch={isFixtureMismatch}
             />
           </Flex>
         </Box>
         {runStatus != null ? (
           <Box
-            backgroundColor={COLORS.fundamentalsBackground}
+            backgroundColor={COLORS.grey10}
             display="grid"
             gridTemplateColumns="4fr 6fr 4fr"
             padding={SPACING.spacing8}
@@ -437,7 +453,7 @@ export function ProtocolRunHeader({
         ) : null}
         {showDropTipWizard &&
         pipettesWithTip[0]?.specs != null &&
-        isRunCurrent ? (
+        mostRecentRunId === runId ? (
           <DropTipWizard
             robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
             mount={pipettesWithTip[0].mount}
@@ -465,7 +481,9 @@ interface LabeledValueProps {
 function LabeledValue(props: LabeledValueProps): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-      <StyledText as="h6">{props.label}</StyledText>
+      <StyledText as="h6" color={COLORS.grey60}>
+        {props.label}
+      </StyledText>
       {typeof props.value === 'string' ? (
         <StyledText as="p">{props.value}</StyledText>
       ) : (
@@ -486,14 +504,14 @@ function DisplayRunStatus(props: DisplayRunStatusProps): JSX.Element {
       {props.runStatus === RUN_STATUS_RUNNING ? (
         <Icon
           name="circle"
-          color={COLORS.blueEnabled}
+          color={COLORS.blue50}
           size={SPACING.spacing4}
           marginRight={SPACING.spacing4}
           data-testid="running_circle"
         >
           <animate
             attributeName="fill"
-            values={`${COLORS.blueEnabled}; transparent`}
+            values={`${COLORS.blue50}; transparent`}
             dur="1s"
             calcMode="discrete"
             repeatCount="indefinite"
@@ -531,9 +549,17 @@ interface ActionButtonProps {
   runStatus: RunStatus | null
   isProtocolAnalyzing: boolean
   isDoorOpen: boolean
+  isFixtureMismatch: boolean
 }
 function ActionButton(props: ActionButtonProps): JSX.Element {
-  const { runId, robotName, runStatus, isProtocolAnalyzing, isDoorOpen } = props
+  const {
+    runId,
+    robotName,
+    runStatus,
+    isProtocolAnalyzing,
+    isDoorOpen,
+    isFixtureMismatch,
+  } = props
   const history = useHistory()
   const { t } = useTranslation(['run_details', 'shared'])
   const attachedModules =
@@ -588,6 +614,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     isResetRunLoading ||
     isOtherRunCurrent ||
     isProtocolAnalyzing ||
+    isFixtureMismatch ||
     (runStatus != null && DISABLED_STATUSES.includes(runStatus)) ||
     isRobotOnWrongVersionOfSoftware ||
     (isDoorOpen &&
@@ -614,15 +641,14 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
   const activeHeaterShaker = attachedModules.find(
     (module): module is HeaterShakerModule =>
-      module.moduleType === HEATERSHAKER_MODULE_TYPE &&
+      module.moduleType === 'heaterShakerModuleType' &&
       module?.data != null &&
       module.data.speedStatus !== 'idle'
   )
   const isHeaterShakerShaking = attachedModules
-    .filter(
-      (module): module is HeaterShakerModule =>
-        module.moduleType === HEATERSHAKER_MODULE_TYPE
-    )
+    .filter((module): module is HeaterShakerModule => {
+      return module.moduleType === 'heaterShakerModuleType'
+    })
     .some(module => module?.data != null && module.data.speedStatus !== 'idle')
 
   let buttonText: string = ''
@@ -630,7 +656,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   let buttonIconName: IconName | null = null
   let disableReason = null
 
-  if (currentRunId === runId && !isSetupComplete) {
+  if (currentRunId === runId && (!isSetupComplete || isFixtureMismatch)) {
     disableReason = t('setup_incomplete')
   } else if (isOtherRunCurrent) {
     disableReason = t('shared:robot_is_busy')

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
 import { renderWithProviders } from '@opentrons/components'
@@ -75,22 +76,24 @@ describe('WifiConnectionDetails', () => {
   })
 
   it('should render title and description', () => {
-    const [{ getByText }] = render(props)
-    getByText('Wi-Fi')
-    getByText('Successfully connected to mockWifi!')
-    getByText('View network details')
-    getByText('Continue')
+    render(props)
+    screen.getByText('Wi-Fi')
+    screen.getByText('Successfully connected to mockWifi!')
+    screen.getByText('View network details')
+    screen.getByText('Continue')
   })
 
   it('should render network details when tapping view network details', () => {
-    const [{ getByText }] = render(props)
-    getByText('View network details').click()
-    getByText('mock NetworkDetailsModal')
+    render(props)
+    fireEvent.click(screen.getByText('View network details'))
+    screen.getByText('mock NetworkDetailsModal')
   })
 
   it('when clicking Check for updates button, should call mock function', () => {
-    const [{ getByText }] = render(props)
-    getByText('Continue').click()
-    expect(mockPush).toHaveBeenCalledWith('/robot-settings/update-robot')
+    render(props)
+    fireEvent.click(screen.getByText('Continue'))
+    expect(mockPush).toHaveBeenCalledWith(
+      '/robot-settings/update-robot-during-onboarding'
+    )
   })
 })

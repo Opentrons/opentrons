@@ -2,6 +2,48 @@
   "browse_labware": {
     "instructions": "Hover on a well to see contents"
   },
+  "announcements": {
+    "header": "We've updated the {{pd}}",
+    "modulesRequireRunAppUpdate": {
+      "body1": "{{pd}} Beta now includes support for Temperature and Magnetic modules.",
+      "body2": "Note: Protocols with modules <bold>may require an app and robot update to run</bold>. You will need to have the {{app}} and robot on the latest versions ( <bold>3.17 or higher</bold>)"
+    },
+    "thermocyclerSupport": {
+      "body1": "{{pd}} Beta now includes support for the Thermocycler!",
+      "body2": "Note: Protocols with modules <strong>may require an app and robot update to run</strong>. You will need to have the {{app}} and robot on the latest versions (<strong>3.18 or higher</strong>)."
+    },
+    "airGapDelaySettings": {
+      "body1": "{{pd}} Beta now includes support for more pipetting settings: Air gap and Delay.",
+      "body2": "Note: Protocols using new features <strong>may require an app and robot update to run.</strong> You will need to have the {{app}} and orbot on the latest versions (<strong>3.20 or higher</strong>)."
+    },
+    "batchEditTransfer": {
+      "body1": "Starting today, you’ll be able to:",
+      "body2": "Select, delete, and duplicate multiple steps at once",
+      "body3": "Edit advanced settings for multiple Transfer or Mix steps at once",
+      "body4": "To enter multi-select mode, simply hold <strong>SHIFT</strong> or <strong>CTRL/CMND</strong> and click on a step.",
+      "body5": "From here, you can access the control bar at the top of the protocol timeline, or edit advanced settings for Transfer or Mix steps!"
+    },
+    "heaterShakerSupport": {
+      "body1": "The {{opd}} now supports our Heater-Shaker Module!",
+      "body2": "All protocols now require {{app}} version <strong> 6.1+ </strong> to run."
+    },
+    "thermocyclerGen2Support": {
+      "body1": "The {{opd}} now supports our Thermocycler Module GEN2!",
+      "body2": "All protocols now require {{app}} version <strong> 6.2+ </strong> to run."
+    },
+    "liquidColorEnhancements": {
+      "body1": "The {{opd}} now lets you customize liquid colors!",
+      "body2": "All protocols now require {{app}} version <strong> 6.2+ </strong> to run."
+    },
+    "flexSupport": {
+      "body1": "Introducing the {{pd}} 7.0 with {{flex}} support!",
+      "body2": "All protocols now require {{app}} version <strong> 7.0+ </strong> to run."
+    },
+    "deckConfigAnd96Channel": {
+      "body1": "Introducing the {{pd}} 8.0 with deck configuration and 96-channel pipette support!",
+      "body2": "All protocols now require {{app}} version <strong> 7.1+ </strong> to run."
+    }
+  },
   "labware_selection": {
     "measurements": "Labware Measurements",
     "well_count": "# of wells",
@@ -69,28 +111,27 @@
       "PROTOCOL_MODULES": "Add Modules"
     }
   },
-  "create_file_wizard": {
-    "choose_additional_items": "Choose additional items",
-    "add_optional_info": "Add more information, if you like (you can change this later).",
-    "choose_at_least_one_tip_rack": "Choose at least one tiprack for this pipette",
-    "choose_first_pipette": "Choose first pipette",
-    "choose_second_pipette": "Choose second pipette",
-    "choose_robot_type": "Choose robot type",
-    "choose_tips_for_pipette": "Choose tips for {{pipetteName}}",
-    "create_new_protocol": "Create New Protocol",
-    "custom_tiprack": "Custom tips",
-    "name_your_protocol": "Name your protocol.",
-    "description": "Description",
-    "organization_or_author": "Organization/Author",
-    "pipette_type": "Pipette Type",
-    "protocol_name": "Protocol Name",
-    "protocol_name_and_description": "Protocol name and description",
-    "review_file_details": "Review file details",
-    "robot_type": "Robot Type",
-    "upload_tiprack": "Upload a custom tiprack to select its definition",
-    "upload": "Upload",
-    "staging_areas": "Staging area slots"
-  },
+
+  "add_optional_info": "Add more information, if you like (you can change this later).",
+  "choose_additional_items": "Choose additional items",
+  "choose_at_least_one_tip_rack": "Choose at least one tiprack for this pipette",
+  "choose_left_pipette": "Choose left pipette",
+  "choose_right_pipette": "Choose right pipette",
+  "choose_robot_type": "Choose robot type",
+  "choose_tips_for_pipette": "Choose tips for {{pipetteName}}",
+  "create_new_protocol": "Create New Protocol",
+  "custom_tiprack": "Custom tips",
+  "description": "Description",
+  "name_your_protocol": "Name your protocol.",
+  "organization_or_author": "Organization/Author",
+  "pipette_type": "Pipette Type",
+  "protocol_name_and_description": "Protocol name and description",
+  "protocol_name": "Protocol Name",
+  "review_file_details": "Review file details",
+  "robot_type": "Robot Type",
+  "staging_areas": "Staging area slots",
+  "upload_tiprack": "Upload a custom tiprack to select its definition",
+  "upload": "Upload",
   "well_order": {
     "title": "Well Order",
     "body": "Change the order in which the robot aspirates from the selected wells",
@@ -102,7 +143,9 @@
     "left_pipette": "Left Pipette",
     "right_pipette": "Right Pipette",
     "left_tiprack": "Left Tiprack*",
-    "right_tiprack": "Right Tiprack*"
+    "right_tiprack": "Right Tiprack*",
+    "pipette": "Pipette",
+    "tiprack": "Tiprack*"
   },
   "edit_pipettes": {
     "title": "Change Pipette Selection",
@@ -187,5 +230,46 @@
   },
   "step_notes": {
     "title": "Step Notes"
+  },
+  "invalid": {
+    "header": "Invalid JSON file",
+    "body1": "This file is either missing information it needs to import properly or contains sections that the {{pd}} cannot read.",
+    "body2": "At this time we do not support JSON files created outside of the {{pd}}.",
+    "body3": "If this is a {{pd}} file that you have edited outside of this tool you may have introduced errors.",
+    "error": "Error message:"
+  },
+  "incorrect_file": {
+    "header": "Incorrect file type",
+    "body1": "Only JSON files created in the {{pd}} can be imported.",
+    "body2": "At this time Python protocol files are not supported."
+  },
+  "migrations": {
+    "header": "Your protocol was made in an older version of {{pd}}",
+    "noBehaviorChange": {
+      "body1": "Your protocol will be automatically updated to the latest version.",
+      "body2": "We have added new features since the last time this protocol was updated, but have not made any changes to existing protocol behavior. Because of this we do not expect any changes in how the robot will execute this protocol. To be safe we will still recommend keeping a separate copy of the file you just imported.",
+      "body3": "As always, please contact us with any questions or feedback."
+    },
+    "toV8Migration": {
+      "body1": "Your protocol will be automatically updated to the latest version.",
+      "body2": "{{pd}} no longer supports aspirate or mix actions in a trash bin. If your protocol contains these actions, an error icon will appear next to them in the Protocol Timeline. To resolve the error, choose another location for aspirating or mixing.",
+      "body3": "Additionally, we have addressed a bug where blow out speeds were slower than expected. Your protocol will automatically update the flow rates unless they were specifically initialized.",
+      "body4": "As always, please contact us with any questions or feedback."
+    },
+    "generic": {
+      "body1": "Your protocol will be automatically updated to the latest version. Please note that the updated file will be incompatible with older versions of the {{pd}}. We recommend making a separate copy of the file that you just imported before continuing.",
+      "body2": "Updating the file may make changes to liquid handling actions. Please review your file in the {{pd}}",
+      "body3": "As always, please contact us with any questions or feedback."
+    },
+    "toV3Migration": {
+      "title": "Update protocol to use new labware definitions",
+      "button": "update protocol",
+      "body1": "<strong>To import your file successfully, you must update your protocol to use the new labware definitions. </strong>Your protocol was made using an older version of Protocol Designer. Since then, Protocol Designer has been improved to include new labware definitions which are more accurate and reliable.",
+      "body2": "What this means for you protocol",
+      "body3": "Updating your protocol to use the new labware definitions will consequently require you to re-calibrate all labware in your protocol prior to running it on your robot. We recommend you try a dry run or one with water to ensure everything is working as expected.",
+      "body4": "What happens if you don't update",
+      "body5": "If you choose not to update, you will still be able to run your protocol as usual with older labware, however you will not be able to make further updates to this protocol using the Protocol Designer.",
+      "body6": "Please note that in order to run the updated protocol on your robot successfully, the OT-2 App and robot are required to be updated to version 3.10.0 or higher."
+    }
   }
 }

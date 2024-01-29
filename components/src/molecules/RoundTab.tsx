@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { TYPOGRAPHY, BORDERS, SPACING, COLORS } from '../ui-style-constants'
+import { TYPOGRAPHY, BORDERS, SPACING } from '../ui-style-constants'
+import { COLORS } from '../helix-design-system'
 import {
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,
@@ -12,29 +13,23 @@ import { Btn } from '../primitives'
 const defaultTabStyle = css`
   ${TYPOGRAPHY.pSemiBold}
   border-radius: ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} 0 0;
-  border-top: ${BORDERS.transparentLineBorder};
-  border-left: ${BORDERS.transparentLineBorder};
-  border-right: ${BORDERS.transparentLineBorder};
   padding: ${SPACING.spacing8} ${SPACING.spacing16};
   position: ${POSITION_RELATIVE};
 `
 
 const inactiveTabStyle = css`
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50};
 
   &:hover {
-    color: ${COLORS.darkGreyEnabled};
-    background-color: ${COLORS.fundamentalsBackgroundShade};
+    color: ${COLORS.grey50};
+    background-color: ${COLORS.grey20};
   }
 `
 
 const currentTabStyle = css`
   ${TYPOGRAPHY.pSemiBold}
   background-color: ${COLORS.white};
-  border-top: ${BORDERS.lineBorder};
-  border-left: ${BORDERS.lineBorder};
-  border-right: ${BORDERS.lineBorder};
-  color: ${COLORS.blueEnabled};
+  color: ${COLORS.blue50};
 
   /* extend below the tab when active to flow into the content */
   &:after {

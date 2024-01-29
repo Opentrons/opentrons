@@ -12,12 +12,12 @@ The examples below will use the following set-up:
 
     from opentrons import robot, labware, instruments
 
-    plate = labware.load('96-flat', '1')
+    plate = labware.load("96-flat", "1")
 
-    tiprack = labware.load('opentrons_96_tiprack_300ul', '2')
+    tiprack = labware.load("opentrons_96_tiprack_300ul", "2")
 
     pipette = instruments.P300_Single(
-        mount='left',
+        mount="left",
         tip_racks=[tiprack])
 
 You could simulate the protocol using our protocol simulator, which can be installed by following the instructions `here. <https://github.com/Opentrons/opentrons/tree/edge/api#simulating-protocols>`_
@@ -33,11 +33,11 @@ For transferring with a multi-channel, please refer to the :ref:`multi-channel-l
 Basic
 -----
 
-The example below will transfer 100 uL from well ``'A1'`` to well ``'B1'``, automatically picking up a new tip and then disposing it when finished.
+The example below will transfer 100 uL from well ``"A1"`` to well ``"B1"``, automatically picking up a new tip and then disposing it when finished.
 
 .. code-block:: python
 
-    pipette.transfer(100, plate.wells('A1'), plate.wells('B1'))
+    pipette.transfer(100, plate.wells("A1"), plate.wells("B1"))
 
 Transfer commands will automatically create entire series of ``aspirate()``, ``dispense()``, and other ``Pipette`` commands.
 
@@ -49,7 +49,7 @@ Volumes larger than the pipette's ``max_volume`` will automatically divide into 
 
 .. code-block:: python
 
-    pipette.transfer(700, plate.wells('A2'), plate.wells('B2'))
+    pipette.transfer(700, plate.wells("A2"), plate.wells("B2"))
 
 will have the steps...
 
@@ -72,7 +72,7 @@ Transfer commands are most useful when moving liquid between multiple wells.
 
 .. code-block:: python
 
-    pipette.transfer(100, plate.cols('1'), plate.cols('2'))
+    pipette.transfer(100, plate.cols("1"), plate.cols("2"))
 
 will have the steps...
 
@@ -105,7 +105,7 @@ You can transfer from a single source to multiple destinations, and the other wa
 
 .. code-block:: python
 
-    pipette.transfer(100, plate.wells('A1'), plate.cols('2'))
+    pipette.transfer(100, plate.wells("A1"), plate.cols("2"))
 
 
 will have the steps...
@@ -141,8 +141,8 @@ What happens if, for example, you tell your pipette to transfer from 2 source we
 
     pipette.transfer(
         100,
-        plate.wells('A1', 'A2'),
-        plate.wells('B1', 'B2', 'B3', 'B4'))
+        plate.wells("A1", "A2"),
+        plate.wells("B1", "B2", "B3", "B4"))
 
 will have the steps...
 
@@ -169,8 +169,8 @@ Instead of applying a single volume amount to all source/destination wells, you 
 
     pipette.transfer(
         [20, 40, 60],
-        plate.wells('A1'),
-        plate.wells('B1', 'B2', 'B3'))
+        plate.wells("A1"),
+        plate.wells("B1", "B2", "B3"))
 
 
 will have the steps...
@@ -196,8 +196,8 @@ Create a linear gradient between a start and ending volume (uL). The start and e
 
     pipette.transfer(
         (100, 30),
-        plate.wells('A1'),
-        plate.cols('2'))
+        plate.wells("A1"),
+        plate.cols("2"))
 
 
 will have the steps...
@@ -238,7 +238,7 @@ Volumes going to the same destination well are combined within the same tip, so 
 
 .. code-block:: python
 
-    pipette.consolidate(30, plate.cols('2'), plate.wells('A1'))
+    pipette.consolidate(30, plate.cols("2"), plate.wells("A1"))
 
 will have the steps...
 
@@ -262,7 +262,7 @@ If there are multiple destination wells, the pipette will never combine their vo
 
 .. code-block:: python
 
-    pipette.consolidate(30, plate.cols('1'), plate.wells('A1', 'A2'))
+    pipette.consolidate(30, plate.cols("1"), plate.wells("A1", "A2"))
 
 
 will have the steps...
@@ -291,7 +291,7 @@ Volumes from the same source well are combined within the same tip, so that one 
 
 .. code-block:: python
 
-    pipette.distribute(55, plate.wells('A1'), plate.rows('A'))
+    pipette.distribute(55, plate.wells("A1"), plate.rows("A"))
 
 
 will have the steps...
@@ -326,7 +326,7 @@ If there are multiple source wells, the pipette will never combine their volumes
 
 .. code-block:: python
 
-    pipette.distribute(30, plate.wells('A1', 'A2'), plate.rows('A'))
+    pipette.distribute(30, plate.wells("A1", "A2"), plate.rows("A"))
 
 will have the steps...
 
@@ -362,8 +362,8 @@ When dispensing multiple times from the same tip, it is recommended to aspirate 
 
     pipette.distribute(
         30,
-        plate.wells('A1', 'A2'),
-        plate.cols('2'),
+        plate.wells("A1", "A2"),
+        plate.cols("2"),
         disposal_vol=10)   # include extra liquid to make dispenses more accurate
 
 
@@ -406,9 +406,9 @@ The pipette can optionally get a new tip at the beginning of each aspirate, to h
 
     pipette.transfer(
         100,
-        plate.wells('A1', 'A2', 'A3'),
-        plate.wells('B1', 'B2', 'B3'),
-        new_tip='always')    # always pick up a new tip
+        plate.wells("A1", "A2", "A3"),
+        plate.wells("B1", "B2", "B3"),
+        new_tip="always")    # always pick up a new tip
 
 
 will have the steps...
@@ -440,9 +440,9 @@ For scenarios where you instead are calling ``pick_up_tip()`` and ``drop_tip()``
     ...
     pipette.transfer(
         100,
-        plate.wells('A1', 'A2', 'A3'),
-        plate.wells('B1', 'B2', 'B3'),
-        new_tip='never')    # never pick up or drop a tip
+        plate.wells("A1", "A2", "A3"),
+        plate.wells("B1", "B2", "B3"),
+        new_tip="never")    # never pick up or drop a tip
     ...
     pipette.drop_tip()
 
@@ -473,9 +473,9 @@ The default behavior of complex commands is to use one tip:
 
     pipette.transfer(
         100,
-        plate.wells('A1', 'A2', 'A3'),
-        plate.wells('B1', 'B2', 'B3'),
-        new_tip='once')    # use one tip (default behavior)
+        plate.wells("A1", "A2", "A3"),
+        plate.wells("B1", "B2", "B3"),
+        new_tip="once")    # use one tip (default behavior)
 
 will have the steps...
 
@@ -500,8 +500,8 @@ By default, the transfer command will drop the pipette's tips in the trash conta
 
     pipette.transfer(
         100,
-        plate.wells('A1'),
-        plate.wells('B1'),
+        plate.wells("A1"),
+        plate.wells("B1"),
         trash=False)       # do not trash tip
 
 
@@ -525,8 +525,8 @@ A touch-tip can be performed after every aspirate and dispense by setting ``touc
 
     pipette.transfer(
         100,
-        plate.wells('A1'),
-        plate.wells('A2'),
+        plate.wells("A1"),
+        plate.wells("A2"),
         touch_tip=True)     # touch tip to each well's edge
 
 
@@ -551,8 +551,8 @@ A blow-out can be performed after every dispense that leaves the tip empty by se
 
     pipette.transfer(
         100,
-        plate.wells('A1'),
-        plate.wells('A2'),
+        plate.wells("A1"),
+        plate.wells("A2"),
         blow_out=True)      # blow out droplets when tip is empty
 
 
@@ -576,8 +576,8 @@ A mix can be performed before every aspirate by setting ``mix_before=``. The val
 
     pipette.transfer(
         100,
-        plate.wells('A1'),
-        plate.wells('A2'),
+        plate.wells("A1"),
+        plate.wells("A2"),
         mix_before=(2, 50), # mix 2 times with 50uL before aspirating
         mix_after=(3, 75))  # mix 3 times with 75uL after dispensing
 
@@ -613,8 +613,8 @@ An air gap can be performed after every aspirate by setting ``air_gap=int``, whe
 
     pipette.transfer(
         100,
-        plate.wells('A1'),
-        plate.wells('A2'),
+        plate.wells("A1"),
+        plate.wells("A2"),
         air_gap=20)         # add 20uL of air after each aspirate
 
 
@@ -648,14 +648,14 @@ We will be using the code-block below to perform our examples.
 
     from opentrons import robot, labware, instruments
 
-    plate_96 = labware.load('96-flat', '1')
-    plate_384 = labware.load('384-plate', '3')
-    trough = labware.load('trough-12row', '4')
+    plate_96 = labware.load("96-flat", "1")
+    plate_384 = labware.load("384-plate", "3")
+    trough = labware.load("trough-12row", "4")
 
-    tiprack = labware.load('opentrons_96_tiprack_300ul', '2')
+    tiprack = labware.load("opentrons_96_tiprack_300ul", "2")
 
     multi_pipette = instruments.P300_Multi(
-        mount='left',
+        mount="left",
         tip_racks=[tiprack])
 
 Transfer in a 96 Well Plate
@@ -666,7 +666,7 @@ following:
 
 .. code-block:: python
 
-    multi_pipette.transfer(50, plate_96.columns('1'), plate_96.columns('2', to='12'))
+    multi_pipette.transfer(50, plate_96.columns("1"), plate_96.columns("2", to="12"))
 
 will have the steps
 
@@ -702,7 +702,7 @@ or
 
 .. code-block:: python
 
-    multi_pipette.transfer(50, plate_96.wells('A1'), plate_96.columns('2', to='12'))
+    multi_pipette.transfer(50, plate_96.wells("A1"), plate_96.columns("2", to="12"))
 
 will have the steps
 
@@ -740,14 +740,14 @@ will have the steps
 
     .. code-block:: python
 
-        multi_pipette.transfer(50, plate_96.wells('A1'), plate_96.wells())
+        multi_pipette.transfer(50, plate_96.wells("A1"), plate_96.wells())
 
     The multi-channel would visit **every** well in the plate and dispense liquid
     outside of the plate boundaries so be careful!
 
     .. code-block:: python
 
-        multi_pipette.transfer(50, plate_96.wells('A1'), plate_96.rows('A'))
+        multi_pipette.transfer(50, plate_96.wells("A1"), plate_96.rows("A"))
 
     In this scenario, the multi-channel would only visit the first column of the plate.
 
@@ -755,8 +755,8 @@ will have the steps
 Transfer in a 384 Well Plate
 ----------------------------
 
-In a 384 Well plate, there are 2 sets of 'columns' that the multi-channel can
-dispense into ['A1', 'C1'...'A2', 'C2'...] and ['B1', 'D1'...'B2', 'D2'].
+In a 384 Well plate, there are 2 sets of "columns" that the multi-channel can
+dispense into ["A1", "C1"..."A2", "C2"...] and ["B1", "D1"..."B2", "D2"].
 
 If you want to transfer to a 384 well plate in order, you can do:
 
@@ -764,9 +764,9 @@ If you want to transfer to a 384 well plate in order, you can do:
 
     alternating_wells = []
     for row in plate_384.rows():
-        alternating_wells.append(row.wells('A'))
-        alternating_wells.append(row.wells('B'))
-    multi_pipette.transfer(50, trough.wells('A1'), alternating_wells)
+        alternating_wells.append(row.wells("A"))
+        alternating_wells.append(row.wells("B"))
+    multi_pipette.transfer(50, trough.wells("A1"), alternating_wells)
 
 
 or you can choose to dispense by row first, moving first through row A
@@ -774,5 +774,5 @@ and then through row B of the 384 well plate.
 
 .. code-block:: python
 
-    list_of_wells = [for well in plate_384.rows('A')] + [for well in plate_384.rows('B')]
-    multi_pipette.transfer(50, trough.wells('A1'), list_of_wells)
+    list_of_wells = [for well in plate_384.rows("A")] + [for well in plate_384.rows("B")]
+    multi_pipette.transfer(50, trough.wells("A1"), list_of_wells)

@@ -142,6 +142,8 @@ def _clean_server_state(base_url: str) -> None:
 
             await _delete_all_sessions(robot_client)
 
+            await _reset_deck_configuration(robot_client)
+
     asyncio.run(_clean_server_state_async())
 
 
@@ -166,3 +168,7 @@ async def _delete_all_sessions(robot_client: RobotClient) -> None:
     session_ids = [s["id"] for s in all_sessions_response.json()["data"]]
     for session_id in session_ids:
         await robot_client.delete_session(session_id)
+
+
+async def _reset_deck_configuration(robot_client: RobotClient) -> None:
+    await robot_client.post_setting_reset_options({"deckConfiguration": True})

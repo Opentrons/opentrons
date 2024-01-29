@@ -57,6 +57,7 @@ from .types import (
     EstopState,
     SubSystem,
     SubSystemState,
+    HardwareFeatureFlags,
 )
 from . import modules
 from .robot_calibration import (
@@ -87,7 +88,7 @@ class API(
     # of methods that are present in the protocol will call the (empty,
     # do-nothing) methods in the protocol. This will happily make all the
     # tests fail.
-    HardwareControlInterface[RobotCalibration],
+    HardwareControlInterface[RobotCalibration, top_types.Mount, RobotConfig],
 ):
     """This API is the primary interface to the hardware controller.
 
@@ -111,6 +112,7 @@ class API(
         backend: Union[Controller, Simulator],
         loop: asyncio.AbstractEventLoop,
         config: RobotConfig,
+        feature_flags: Optional[HardwareFeatureFlags] = None,
     ) -> None:
         """Initialize an API instance.
 
@@ -122,6 +124,8 @@ class API(
         self._config = config
         self._backend = backend
         self._loop = loop
+        # If no feature flag set is defined, we will use the default values
+        self._feature_flags = feature_flags or HardwareFeatureFlags()
 
         self._callbacks: Set[HardwareEventHandler] = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
@@ -163,13 +167,14 @@ class API(
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
 
-    @classmethod  # noqa: C901
-    async def build_hardware_controller(
+    @classmethod
+    async def build_hardware_controller(  # noqa: C901
         cls,
         config: Union[RobotConfig, OT3Config, None] = None,
         port: Optional[str] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         firmware: Optional[Tuple[pathlib.Path, str]] = None,
+        feature_flags: Optional[HardwareFeatureFlags] = None,
     ) -> "API":
         """Build a hardware controller that will actually talk to hardware.
 
@@ -221,7 +226,12 @@ class API(
                 mod_log.error(msg)
                 raise RuntimeError(msg)
 
-            api_instance = cls(backend, loop=checked_loop, config=checked_config)
+            api_instance = cls(
+                backend,
+                loop=checked_loop,
+                config=checked_config,
+                feature_flags=feature_flags,
+            )
             await api_instance.cache_instruments()
             module_controls = await AttachedModulesControl.build(
                 api_instance, board_revision=backend.board_revision
@@ -249,6 +259,7 @@ class API(
         config: Optional[Union[RobotConfig, OT3Config]] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
+        feature_flags: Optional[HardwareFeatureFlags] = None,
     ) -> "API":
         """Build a simulating hardware controller.
 
@@ -274,7 +285,12 @@ class API(
             checked_loop,
             strict_attached_instruments,
         )
-        api_instance = cls(backend, loop=checked_loop, config=checked_config)
+        api_instance = cls(
+            backend,
+            loop=checked_loop,
+            config=checked_config,
+            feature_flags=feature_flags,
+        )
         await api_instance.cache_instruments()
         module_controls = await AttachedModulesControl.build(
             api_instance, board_revision=backend.board_revision
@@ -410,6 +426,9 @@ class API(
             firmware_file, checked_loop, explicit_modeset
         )
 
+    def has_gripper(self) -> bool:
+        return False
+
     async def cache_instruments(
         self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
     ) -> None:
@@ -435,6 +454,7 @@ class API(
                 req_instr,
                 pip_id,
                 pip_offset_cal,
+                self._feature_flags.use_old_aspiration_functions,
             )
             self._attached_instruments[mount] = p
             if req_instr and p:
@@ -618,7 +638,7 @@ class API(
             if any(unsupported):
                 raise UnsupportedHardwareCommand(
                     message=f"At least one axis in {axes} is not supported on the OT2.",
-                    detail={"unsupported_axes": unsupported},
+                    detail={"unsupported_axes": str(unsupported)},
                 )
         self._reset_last_mount()
         # Initialize/update current_position
@@ -661,14 +681,14 @@ class API(
                 raise PositionUnknownError(
                     message=f"Current position of {str(mount)} pipette is unknown,"
                     " please home.",
-                    detail={"mount": str(mount), "missing_axes": position_axes},
+                    detail={"mount": str(mount), "missing_axes": str(position_axes)},
                 )
             axes_str = [ot2_axis_to_string(a) for a in position_axes]
             if not self._backend.is_homed(axes_str):
                 unhomed = self._backend._unhomed_axes(axes_str)
                 raise PositionUnknownError(
                     message=f"{str(mount)} pipette axes ({unhomed}) must be homed.",
-                    detail={"mount": str(mount), "unhomed_axes": unhomed},
+                    detail={"mount": str(mount), "unhomed_axes": str(unhomed)},
                 )
         elif not self._current_position and not refresh:
             raise PositionUnknownError(
@@ -755,7 +775,7 @@ class API(
         """
         raise UnsupportedHardwareCommand(
             message="move_axes is not supported on the OT-2.",
-            detail={"axes_commanded": list(position.keys())},
+            detail={"axes_commanded": str(list(position.keys()))},
         )
 
     async def move_rel(
@@ -781,7 +801,7 @@ class API(
                     " is unknown.",
                     detail={
                         "mount": str(mount),
-                        "fail_on_not_homed": fail_on_not_homed,
+                        "fail_on_not_homed": str(fail_on_not_homed),
                     },
                 )
             else:
@@ -797,7 +817,7 @@ class API(
             unhomed = self._backend._unhomed_axes(axes_str)
             raise PositionUnknownError(
                 message=f"{str(mount)} pipette axes ({unhomed}) must be homed.",
-                detail={"mount": str(mount), "unhomed_axes": unhomed},
+                detail={"mount": str(mount), "unhomed_axes": str(unhomed)},
             )
 
         await self._cache_and_maybe_retract_mount(mount)
@@ -961,6 +981,14 @@ class API(
         """
         self._config = replace(self._config, **kwargs)
 
+    @property
+    def hardware_feature_flags(self) -> HardwareFeatureFlags:
+        return self._feature_flags
+
+    @hardware_feature_flags.setter
+    def hardware_feature_flags(self, feature_flags: HardwareFeatureFlags) -> None:
+        self._feature_flags = feature_flags
+
     async def update_deck_calibration(self, new_transform: RobotCalibration) -> None:
         pass
 
@@ -1083,6 +1111,38 @@ class API(
         finally:
             blowout_spec.instr.set_current_volume(0)
             blowout_spec.instr.ready_to_aspirate = False
+
+    async def update_nozzle_configuration_for_mount(
+        self,
+        mount: top_types.Mount,
+        back_left_nozzle: Optional[str],
+        front_right_nozzle: Optional[str],
+        starting_nozzle: Optional[str] = None,
+    ) -> None:
+        """
+        Update a nozzle configuration for a given pipette.
+
+        The expectation of this function is that the back_left_nozzle/front_right_nozzle are the two corners
+        of a rectangle of nozzles. A call to this function that does not follow that schema will result
+        in an error.
+
+        :param mount: A robot mount that the instrument is on.
+        :param back_left_nozzle: A string representing a nozzle name of the form <LETTER><NUMBER> such as 'A1'.
+        :param front_right_nozzle: A string representing a nozzle name of the form <LETTER><NUMBER> such as 'A1'.
+        :param starting_nozzle: A string representing the starting nozzle which will be used as the critical point
+        of the pipette nozzle configuration. By default, the back left nozzle will be the starting nozzle if
+        none is provided.
+        :return: None.
+
+        If none of the nozzle parameters are provided, the nozzle configuration will be reset to default.
+        """
+        if not back_left_nozzle and not front_right_nozzle and not starting_nozzle:
+            await self.reset_nozzle_configuration(mount)
+        else:
+            assert back_left_nozzle and front_right_nozzle
+            await self.update_nozzle_configuration(
+                mount, back_left_nozzle, front_right_nozzle, starting_nozzle
+            )
 
     async def pick_up_tip(
         self,

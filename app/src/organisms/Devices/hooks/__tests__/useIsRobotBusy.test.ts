@@ -3,6 +3,7 @@ import {
   useAllSessionsQuery,
   useAllRunsQuery,
   useEstopQuery,
+  useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
 import {
   DISENGAGED,
@@ -14,6 +15,7 @@ import { useIsRobotBusy } from '../useIsRobotBusy'
 import { useIsFlex } from '../useIsFlex'
 
 import type { Sessions, Runs } from '@opentrons/api-client'
+import type { AxiosError } from 'axios'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../ProtocolUpload/hooks')
@@ -33,6 +35,9 @@ const mockUseAllSessionsQuery = useAllSessionsQuery as jest.MockedFunction<
 const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
   typeof useAllRunsQuery
 >
+const mockUseCurrentMaintenanceRun = useCurrentMaintenanceRun as jest.MockedFunction<
+  typeof useCurrentMaintenanceRun
+>
 const mockUseEstopQuery = useEstopQuery as jest.MockedFunction<
   typeof useEstopQuery
 >
@@ -49,7 +54,10 @@ describe('useIsRobotBusy', () => {
           current: {},
         },
       },
-    } as UseQueryResult<Runs, Error>)
+    } as UseQueryResult<Runs, AxiosError>)
+    mockUseCurrentMaintenanceRun.mockReturnValue({
+      data: {},
+    } as any)
     mockUseEstopQuery.mockReturnValue({ data: mockEstopStatus } as any)
     mockUseIsFlex.mockReturnValue(false)
   })
@@ -179,15 +187,15 @@ describe('useIsRobotBusy', () => {
     expect(result).toBe(false)
   })
 
-  // TODO: kj 07/13/2022 This test is temporary pending but should be solved by another PR.
-  // it('should poll the run and sessions if poll option is true', async () => {
-  //   const result = useIsRobotBusy({ poll: true })
-  //   expect(result).toBe(true)
-
-  //   act(() => {
-  //     jest.advanceTimersByTime(30000)
-  //   })
-  //   expect(mockUseAllRunsQuery).toHaveBeenCalled()
-  //   expect(mockUseAllSessionsQuery).toHaveBeenCalled()
-  // })
+  it('returns true when a maintenance run exists', () => {
+    mockUseCurrentMaintenanceRun.mockReturnValue({
+      data: {
+        data: {
+          id: '123',
+        },
+      },
+    } as any)
+    const result = useIsRobotBusy()
+    expect(result).toBe(true)
+  })
 })

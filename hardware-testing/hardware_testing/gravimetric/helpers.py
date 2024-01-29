@@ -1,5 +1,6 @@
 """Opentrons helper methods."""
 import asyncio
+from random import random, randint
 from types import MethodType
 from typing import Any, List, Dict, Optional, Tuple
 from statistics import stdev
@@ -320,10 +321,14 @@ def _get_volumes(
         test_volumes = get_volume_increments(
             pipette_channels, pipette_volume, tip_volume, mode=mode
         )
-    elif user_volumes and not ctx.is_simulating():
-        _inp = input(
-            f'Enter desired volumes for tip{tip_volume}, comma separated (eg: "10,100,1000") :'
-        )
+    elif user_volumes:
+        if ctx.is_simulating():
+            rand_vols = [round(random() * tip_volume, 1) for _ in range(randint(1, 3))]
+            _inp = ",".join([str(r) for r in rand_vols])
+        else:
+            _inp = input(
+                f'Enter desired volumes for tip{tip_volume}, comma separated (eg: "10,100,1000") :'
+            )
         test_volumes = [
             float(vol_str) for vol_str in _inp.strip().split(",") if vol_str
         ]
@@ -347,6 +352,7 @@ def _load_pipette(
     pipette_volume: int,
     pipette_mount: str,
     increment: bool,
+    photometric: bool,
     gantry_speed: Optional[int] = None,
 ) -> InstrumentContext:
     pip_name = f"flex_{pipette_channels}channel_{pipette_volume}"
@@ -367,11 +373,13 @@ def _load_pipette(
 
     # NOTE: 8ch QC testing means testing 1 channel at a time,
     #       so we need to decrease the pick-up current to work with 1 tip.
-    if pipette.channels == 8 and not increment:
+    if pipette.channels == 8 and not increment and not photometric:
         hwapi = get_sync_hw_api(ctx)
         mnt = OT3Mount.LEFT if pipette_mount == "left" else OT3Mount.RIGHT
         hwpipette: Pipette = hwapi.hardware_pipettes[mnt.to_mount()]
-        hwpipette.pick_up_configurations.current = 0.2
+        hwpipette._config.pick_up_tip_configurations.press_fit.current_by_tip_count[
+            8
+        ] = 0.2
     return pipette
 
 

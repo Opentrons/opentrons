@@ -1,4 +1,5 @@
 import merge from 'lodash/merge'
+import { COLUMN } from '@opentrons/shared-data'
 import {
   getInitialRobotStateStandard,
   makeContext,
@@ -7,6 +8,8 @@ import {
   getSuccessResult,
   pickUpTipHelper,
   dropTipHelper,
+  dropTipInPlaceHelper,
+  moveToAddressableAreaHelper,
   DEFAULT_PIPETTE,
 } from '../fixtures'
 import { FIXED_TRASH_ID } from '..'
@@ -15,8 +18,12 @@ import type { InvariantContext, RobotState } from '../types'
 
 const tiprack1Id = 'tiprack1Id'
 const tiprack2Id = 'tiprack2Id'
+const tiprack4Id = 'tiprack4Id'
+const tiprack5Id = 'tiprack5Id'
 const p300SingleId = DEFAULT_PIPETTE
 const p300MultiId = 'p300MultiId'
+const p100096Id = 'p100096Id'
+const wasteChuteId = 'wasteChuteId'
 describe('replaceTip', () => {
   let invariantContext: InvariantContext
   let initialRobotState: RobotState
@@ -104,7 +111,10 @@ describe('replaceTip', () => {
         initialTestRobotState
       )
       const res = getSuccessResult(result)
-      expect(res.commands).toEqual([dropTipHelper('A1'), pickUpTipHelper('B1')])
+      expect(res.commands).toEqual([
+        ...dropTipHelper(p300SingleId),
+        pickUpTipHelper('B1'),
+      ])
     })
     it('Single-channel: used all tips in first rack, move to second rack', () => {
       const initialTestRobotState = merge({}, initialRobotState, {
@@ -130,6 +140,44 @@ describe('replaceTip', () => {
         pickUpTipHelper('A1', {
           labwareId: tiprack2Id,
         }),
+      ])
+    })
+    it('Single-channel: dropping tips in waste chute', () => {
+      invariantContext = {
+        ...invariantContext,
+        additionalEquipmentEntities: {
+          wasteChuteId: {
+            name: 'wasteChute',
+            id: wasteChuteId,
+            location: 'cutoutD3',
+          },
+        },
+      }
+      const initialTestRobotState = merge({}, initialRobotState, {
+        tipState: {
+          tipracks: {
+            [tiprack1Id]: {
+              A1: false,
+            },
+          },
+          pipettes: {
+            p300SingleId: true,
+          },
+        },
+      })
+      const result = replaceTip(
+        {
+          pipette: p300SingleId,
+          dropTipLocation: 'wasteChuteId',
+        },
+        invariantContext,
+        initialTestRobotState
+      )
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        moveToAddressableAreaHelper(),
+        dropTipInPlaceHelper(),
+        pickUpTipHelper('B1'),
       ])
     })
   })
@@ -196,11 +244,59 @@ describe('replaceTip', () => {
       )
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
-        dropTipHelper('A1', {
-          pipetteId: p300MultiId,
-        }),
+        ...dropTipHelper(p300MultiId),
         pickUpTipHelper('A1', {
           pipetteId: p300MultiId,
+        }),
+      ])
+    })
+  })
+  describe('replaceTip: 96-channel', () => {
+    it('96-channel, dropping 1 column of tips in waste chute', () => {
+      invariantContext = {
+        ...invariantContext,
+
+        additionalEquipmentEntities: {
+          wasteChuteId: {
+            name: 'wasteChute',
+            id: wasteChuteId,
+            location: 'cutoutD3',
+          },
+        },
+      }
+      initialRobotState = {
+        ...initialRobotState,
+        pipettes: { p100096Id: { mount: 'left', nozzles: COLUMN } },
+        tipState: {
+          tipracks: {
+            [tiprack4Id]: getTiprackTipstate(false),
+            [tiprack5Id]: getTiprackTipstate(true),
+          },
+          pipettes: {
+            p100096Id: true,
+          },
+        },
+      }
+
+      const result = replaceTip(
+        {
+          pipette: p100096Id,
+          dropTipLocation: 'wasteChuteId',
+          nozzles: COLUMN,
+        },
+        invariantContext,
+        initialRobotState
+      )
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        moveToAddressableAreaHelper({
+          pipetteId: p100096Id,
+          addressableAreaName: '96ChannelWasteChute',
+        }),
+        dropTipInPlaceHelper({ pipetteId: p100096Id }),
+        pickUpTipHelper('A1', {
+          pipetteId: p100096Id,
+          labwareId: tiprack5Id,
         }),
       ])
     })

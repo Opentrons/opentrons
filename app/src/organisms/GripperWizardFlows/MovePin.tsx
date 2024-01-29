@@ -247,7 +247,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
   return errorMessage != null ? (
     <SimpleWizardBody
       isSuccess={false}
-      iconColor={COLORS.errorEnabled}
+      iconColor={COLORS.red50}
       header={t('shared:error_encountered')}
       subHeader={
         <Trans

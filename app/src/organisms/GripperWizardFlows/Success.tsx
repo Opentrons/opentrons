@@ -47,11 +47,11 @@ export const Success = (
   } = {
     [SUCCESSFULLY_ATTACHED_AND_CALIBRATED]: {
       header: t('gripper_successfully_attached_and_calibrated'),
-      buttonText: t('shared:exit'),
+      buttonText: i18n.format(t('shared:exit'), 'capitalize'),
     },
     [SUCCESSFULLY_CALIBRATED]: {
       header: t('gripper_successfully_calibrated'),
-      buttonText: t('shared:exit'),
+      buttonText: i18n.format(t('shared:exit'), 'capitalize'),
     },
     [SUCCESSFULLY_ATTACHED]: {
       header: t('gripper_successfully_attached'),
@@ -73,7 +73,7 @@ export const Success = (
 
   return (
     <SimpleWizardBody
-      iconColor={COLORS.successEnabled}
+      iconColor={COLORS.green50}
       header={header}
       isSuccess
       css={HEADER_STYLE}

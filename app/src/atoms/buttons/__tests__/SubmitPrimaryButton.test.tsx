@@ -1,3 +1,4 @@
+import 'jest-styled-components'
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import {
@@ -31,9 +32,7 @@ describe('SubmitPrimaryButton', () => {
   it('renders submit primary button with text', () => {
     const { getByText } = render(props)
     const button = getByText('submit primary button')
-    expect(button).toHaveStyle(
-      `background-color: ${String(COLORS.blueEnabled)}`
-    )
+    expect(button).toHaveStyle(`background-color: ${String(COLORS.blue50)}`)
     expect(button).toHaveStyle(
       `border-radius: ${String(BORDERS.radiusSoftCorners)}`
     )
@@ -62,10 +61,8 @@ describe('SubmitPrimaryButton', () => {
     const { getByText } = render(props)
     const button = getByText('submit primary button')
     expect(button).toBeDisabled()
-    expect(button).toHaveStyle(
-      `background-color: ${String(COLORS.darkGreyDisabled)}`
-    )
-    expect(button).toHaveStyle(`color: ${String(COLORS.successDisabled)}`)
+    expect(button).toHaveStyle(`background-color: ${String(COLORS.grey30)}`)
+    expect(button).toHaveStyle(`color: ${String(COLORS.grey40)}`)
   })
 
   it('calls mock function when clicking the button', () => {
@@ -80,7 +77,7 @@ describe('SubmitPrimaryButton', () => {
     const button = getByText('submit primary button')
     expect(button).toHaveStyleRule(
       'background-color',
-      `${String(COLORS.blueHover)}`,
+      `${String(COLORS.blue55)}`,
       {
         modifier: ':hover',
       }
@@ -95,7 +92,7 @@ describe('SubmitPrimaryButton', () => {
     const button = getByText('submit primary button')
     expect(button).toHaveStyleRule(
       'background-color',
-      `${String(COLORS.bluePressed)}`,
+      `${String(COLORS.blue60)}`,
       {
         modifier: ':active',
       }
@@ -107,7 +104,7 @@ describe('SubmitPrimaryButton', () => {
     const button = getByText('submit primary button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${String(COLORS.warningEnabled)}`,
+      `0 0 0 3px ${String(COLORS.yellow50)}`,
       {
         modifier: ':focus-visible',
       }

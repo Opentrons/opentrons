@@ -6,6 +6,48 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## Opentrons App Changes in 7.1.1
+
+Welcome to the v7.1.1 release of the Opentrons App!
+
+### Bug Fixes
+
+- The app properly displays Flex 1-Channel 1000 µL pipettes.
+
+---
+
+## Opentrons App Changes in 7.1.0
+
+Welcome to the v7.1.0 release of the Opentrons App! This release includes new deck and pipette functionality for Opentrons Flex, a new workflow for dropping tips after a protocol is canceled, and other improvements.
+
+### New Features
+
+- Specify the deck configuration of Flex, including the movable trash bin, waste chute, and staging area slots.
+- Resolve conflicts between the hardware a protocol requires and the current deck configuration as part of run setup.
+- Run protocols that use the Flex 96-Channel Pipette, including partial tip pickup.
+- Choose where to dispense liquid and drop tips held by a pipette when a protocol is canceled.
+
+### Improved Features
+
+- Labware Position Check on Flex uses the pipette calibration probe, instead of a tip, for greater accuracy.
+
+### Bug Fixes
+
+- Labware Position Check no longer tries to check the same labware in the same position twice, which was leading to errors.
+
+---
+
+## Opentrons App Changes in 7.0.2
+
+Welcome to the v7.0.2 release of the Opentrons App!
+
+### Bug Fixes
+
+- Fixes an issue where robot system updates over USB were stalling
+- Fixes an issue where app protocol analysis would fail if you had Python 3.10 installed on your computer and installed the opentrons package there
+
+---
+
 ## Opentrons App Changes in 7.0.1
 
 Welcome to the v7.0.1 release of the Opentrons App! This release builds on the major release that added support for Opentrons Flex.

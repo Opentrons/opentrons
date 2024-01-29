@@ -58,6 +58,34 @@ def overrides_fixture(
     return types.MutableConfig.build(**TMPFILE_DATA["pickUpSpeed"], name="pickUpSpeed")
 
 
+def test_load_old_overrides_regression(
+    TMPFILE_DATA: Dict[str, Any], override_configuration_path: Path
+) -> None:
+    TMPFILE_DATA["pickUpCurrent"] = {
+        "value": 0.15,
+        "min": 0.08,
+        "max": 0.2,
+        "units": "amps",
+        "type": "float",
+        "default": 0.1,
+    }
+    json.dump(
+        TMPFILE_DATA, open(override_configuration_path / "P20SV222021040709.json", "w")
+    )
+    configs = mutable_configurations.load_with_mutable_configurations(
+        pipette_definition.PipetteModelVersionType(
+            pipette_type=types.PipetteModelType.p20,
+            pipette_channels=types.PipetteChannelType.SINGLE_CHANNEL,
+            pipette_version=types.PipetteVersionType(2, 2),
+        ),
+        override_configuration_path,
+        "P20SV222021040709",
+    )
+    assert configs.pick_up_tip_configurations.press_fit.current_by_tip_count == {
+        1: 0.15
+    }
+
+
 def test_list_mutable_configs_unknown_pipette_id(
     override_configuration_path: Path,
 ) -> None:
@@ -241,7 +269,7 @@ def test_load_with_overrides(
 
     if serial_number == TEST_SERIAL_NUMBER:
         dict_loaded_configs = loaded_base_configurations.dict(by_alias=True)
-        dict_loaded_configs["pickUpTipConfigurations"]["speed"] = 5.0
+        dict_loaded_configs["pickUpTipConfigurations"]["pressFit"]["speed"] = 5.0
         updated_configurations_dict = updated_configurations.dict(by_alias=True)
         assert set(dict_loaded_configs.pop("quirks")) == set(
             updated_configurations_dict.pop("quirks")

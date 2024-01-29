@@ -8,7 +8,7 @@ module.exports = {
       plugins: ['babel-plugin-styled-components', 'babel-plugin-unassert'],
     },
     development: {
-      plugins: ['babel-plugin-styled-components', 'react-hot-loader/babel'],
+      plugins: ['babel-plugin-styled-components'],
     },
     test: {
       plugins: [
@@ -53,17 +53,14 @@ module.exports = {
     },
     {
       test: 'app-shell/**/*',
-      plugins: [['react-hot-loader/babel', false]],
       presets: [['@babel/preset-env', { targets: { electron: '6' } }]],
     },
     {
       test: 'app-shell-odd/**/*',
-      plugins: [['react-hot-loader/babel', false]],
       presets: [['@babel/preset-env', { targets: { electron: '6' } }]],
     },
     {
       test: ['discovery-client/**/*'],
-      plugins: [['react-hot-loader/babel', false]],
       presets: [['@babel/preset-env', { targets: { node: '8' } }]],
     },
     // apps that should be polyfilled

@@ -1,3 +1,10 @@
+import {
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  TRASH_BIN_ADAPTER_FIXTURE,
+  WASTE_CHUTE_ONLY_FIXTURES,
+  WASTE_CHUTE_STAGING_AREA_FIXTURES,
+} from '@opentrons/shared-data'
+
 import magneticModule from '../../../../assets/images/magnetic_module_gen_2_transparent.png'
 import temperatureModule from '../../../../assets/images/temp_deck_gen_2_transparent.png'
 import thermoModuleGen1 from '../../../../assets/images/thermocycler_closed.png'
@@ -7,9 +14,9 @@ import magneticBlockGen1 from '../../../../assets/images/magnetic_block_gen_1.pn
 import trashBin from '../../../../assets/images/flex_trash_bin.png'
 import stagingArea from '../../../../assets/images/staging_area_slot.png'
 import wasteChute from '../../../../assets/images/waste_chute.png'
-//  TODO(jr, 10/17/23): figure out if we need this asset, I'm stubbing it in for now
-// import wasteChuteStagingArea from '../../../../assets/images/waste_chute_with_staging_area.png'
-import type { FixtureLoadName, ModuleModel } from '@opentrons/shared-data'
+import wasteChuteStagingArea from '../../../../assets/images/waste_chute_with_staging_area.png'
+
+import type { CutoutFixtureId, ModuleModel } from '@opentrons/shared-data'
 
 export function getModuleImage(model: ModuleModel): string {
   switch (model) {
@@ -32,22 +39,16 @@ export function getModuleImage(model: ModuleModel): string {
   }
 }
 
-//  TODO(jr, 10/4/23): add correct assets for trashBin, standardSlot, wasteChuteAndStagingArea
-export function getFixtureImage(fixture: FixtureLoadName): string {
-  switch (fixture) {
-    case 'stagingArea': {
-      return stagingArea
-    }
-    case 'wasteChute': {
-      return wasteChute
-    }
-    case 'standardSlot': {
-      return stagingArea
-    }
-    case 'trashBin': {
-      return trashBin
-    }
-    default:
-      return 'Error: unknown fixture'
+export function getFixtureImage(cutoutFixtureId: CutoutFixtureId): string {
+  if (cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
+    return stagingArea
+  } else if (WASTE_CHUTE_ONLY_FIXTURES.includes(cutoutFixtureId)) {
+    return wasteChute
+  } else if (WASTE_CHUTE_STAGING_AREA_FIXTURES.includes(cutoutFixtureId)) {
+    return wasteChuteStagingArea
+  } else if (cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE) {
+    return trashBin
+  } else {
+    return 'Error: unknown fixture'
   }
 }

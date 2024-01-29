@@ -45,7 +45,7 @@ export const ProtocolLiquidsDetails = (
       overflowY="auto"
       data-testid="LiquidsDetailsTab"
     >
-      {liquids.length > 0 ? (
+      {liquidsInLoadOrder.length > 0 ? (
         liquidsInLoadOrder?.map((liquid, index) => {
           return (
             <React.Fragment key={liquid.id}>
@@ -74,7 +74,7 @@ export const ProtocolLiquidsDetails = (
           flexDirection={DIRECTION_COLUMN}
         >
           <Icon
-            color={COLORS.medGreyEnabled}
+            color={COLORS.grey30}
             alignSelf={ALIGN_CENTER}
             size="1.25rem"
             name="ot-alert"

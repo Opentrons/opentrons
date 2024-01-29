@@ -137,20 +137,28 @@ export function registerRobotUpdate(dispatch: Dispatch): Dispatch {
 
       case 'robotUpdate:READ_USER_FILE': {
         const { systemFile } = action.payload as { systemFile: string }
-        readFileAndDispatchInfo(dispatch, systemFile, true)
-        break
+        return readFileAndDispatchInfo(dispatch, systemFile, true)
       }
 
       case 'robotUpdate:READ_SYSTEM_FILE': {
         const { target } = action.payload
         const filename = updateSet[target]?.system
+
         if (filename == null) {
-          return dispatch({
-            type: 'robotUpdate:UNEXPECTED_ERROR',
-            payload: { message: 'Robot update file not downloaded' },
-          })
+          if (checkingForUpdates) {
+            dispatch({
+              type: 'robotUpdate:CHECKING_FOR_UPDATE',
+              payload: target,
+            })
+          } else {
+            // If the file was downloaded but deleted from robot-update-cache.
+            dispatch({
+              type: 'robotUpdate:UNEXPECTED_ERROR',
+              payload: { message: 'Robot update file not downloaded' },
+            })
+          }
         } else {
-          readFileAndDispatchInfo(dispatch, filename)
+          return readFileAndDispatchInfo(dispatch, filename)
         }
       }
     }
@@ -171,13 +179,6 @@ export function getRobotSystemUpdateUrls(
     )
     .then(manifest => {
       const urls = getReleaseSet(manifest, CURRENT_VERSION)
-
-      if (urls === null) {
-        log.warn('No release files in manifest', {
-          version: CURRENT_VERSION,
-          manifest,
-        })
-      }
 
       return urls
     })
@@ -213,7 +214,7 @@ export function checkForRobotUpdate(
     const handleProgress = (progress: DownloadProgress): void => {
       const { downloaded, size } = progress
       if (size !== null) {
-        const percentDone = Math.round(downloaded / size) * 100
+        const percentDone = Math.round((downloaded / size) * 100)
         if (percentDone - prevPercentDone > 0) {
           dispatch({
             type: 'robotUpdate:DOWNLOAD_PROGRESS',
@@ -227,7 +228,15 @@ export function checkForRobotUpdate(
     const targetDownloadDir = cacheDirForMachineFiles(target)
 
     return ensureDir(targetDownloadDir)
-      .then(() => getReleaseFiles(urls, targetDownloadDir, handleProgress))
+      .then(() =>
+        getReleaseFiles(
+          urls,
+          targetDownloadDir,
+          dispatch,
+          target,
+          handleProgress
+        )
+      )
       .then(filepaths => cacheUpdateSet(filepaths, target))
       .then(updateInfo =>
         dispatch({ type: 'robotUpdate:UPDATE_INFO', payload: updateInfo })

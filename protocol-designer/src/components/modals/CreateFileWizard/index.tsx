@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import reduce from 'lodash/reduce'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
@@ -8,7 +8,6 @@ import uniq from 'lodash/uniq'
 import { Formik, FormikProps } from 'formik'
 import * as Yup from 'yup'
 import { ModalShell } from '@opentrons/components'
-import { OT_2_TRASH_DEF_URI } from '@opentrons/step-generation'
 import {
   ModuleType,
   ModuleModel,
@@ -26,7 +25,7 @@ import {
   MAGNETIC_MODULE_V2,
   THERMOCYCLER_MODULE_V2,
   TEMPERATURE_MODULE_V2,
-  WASTE_CHUTE_SLOT,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import {
   actions as stepFormActions,
@@ -34,10 +33,7 @@ import {
   FormPipette,
   PipetteOnDeck,
 } from '../../../step-forms'
-import {
-  FLEX_TRASH_DEF_URI,
-  INITIAL_DECK_SETUP_STEP_ID,
-} from '../../../constants'
+import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import { uuid } from '../../../utils'
 import { actions as navigationActions } from '../../../navigation'
 import { getNewProtocolModal } from '../../../navigation/selectors'
@@ -49,7 +45,6 @@ import * as labwareDefSelectors from '../../../labware-defs/selectors'
 import * as labwareDefActions from '../../../labware-defs/actions'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { actions as steplistActions } from '../../../steplist'
-import { getEnableDeckModification } from '../../../feature-flags/selectors'
 import {
   createDeckFixture,
   toggleIsGripperRequired,
@@ -64,6 +59,8 @@ import { StagingAreaTile } from './StagingAreaTile'
 import { getTrashSlot } from './utils'
 
 import type { NormalizedPipette } from '@opentrons/step-generation'
+import type { ThunkDispatch } from 'redux-thunk'
+import type { BaseState } from '../../../types'
 import type { FormState } from './types'
 
 type WizardStep =
@@ -98,14 +95,12 @@ export const adapter96ChannelDefUri =
   'opentrons/opentrons_flex_96_tiprack_adapter/1'
 
 export function CreateFileWizard(): JSX.Element | null {
-  const { t } = useTranslation()
+  const { t } = useTranslation(['modal', 'alert'])
   const showWizard = useSelector(getNewProtocolModal)
   const hasUnsavedChanges = useSelector(loadFileSelectors.getHasUnsavedChanges)
   const customLabware = useSelector(
     labwareDefSelectors.getCustomLabwareDefsByURI
   )
-  const enableDeckModification = useSelector(getEnableDeckModification)
-
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const [wizardSteps, setWizardSteps] = React.useState<WizardStep[]>(
     WIZARD_STEPS
@@ -118,7 +113,7 @@ export function CreateFileWizard(): JSX.Element | null {
     }
   }, [showWizard])
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
 
   const handleCancel = (): void => {
     dispatch(navigationActions.toggleNewProtocolModal(false))
@@ -169,10 +164,7 @@ export function CreateFileWizard(): JSX.Element | null {
     }
     const newProtocolFields = values.fields
 
-    if (
-      !hasUnsavedChanges ||
-      window.confirm(t('alert.window.confirm_create_new'))
-    ) {
+    if (!hasUnsavedChanges || window.confirm(t('alert:confirm_create_new'))) {
       dispatch(fileActions.createNewProtocol(newProtocolFields))
       const pipettesById: Record<string, PipetteOnDeck> = pipettes.reduce(
         (acc, pipette) => ({ ...acc, [uuid()]: pipette }),
@@ -213,38 +205,27 @@ export function CreateFileWizard(): JSX.Element | null {
       )
 
       //  add trash
-      if (
-        (enableDeckModification &&
-          values.additionalEquipment.includes('trashBin')) ||
-        !enableDeckModification
-      ) {
+      if (values.additionalEquipment.includes('trashBin')) {
         // defaulting trash to appropriate locations
         dispatch(
-          labwareIngredActions.createContainer({
-            labwareDefURI:
-              values.fields.robotType === FLEX_ROBOT_TYPE
-                ? FLEX_TRASH_DEF_URI
-                : OT_2_TRASH_DEF_URI,
-            slot:
-              values.fields.robotType === FLEX_ROBOT_TYPE
-                ? getTrashSlot(values)
-                : '12',
-          })
+          createDeckFixture(
+            'trashBin',
+            values.fields.robotType === FLEX_ROBOT_TYPE
+              ? getTrashSlot(values)
+              : 'cutout12'
+          )
         )
       }
 
       // add waste chute
-      if (
-        enableDeckModification &&
-        values.additionalEquipment.includes('wasteChute')
-      ) {
-        dispatch(createDeckFixture('wasteChute', WASTE_CHUTE_SLOT))
+      if (values.additionalEquipment.includes('wasteChute')) {
+        dispatch(createDeckFixture('wasteChute', WASTE_CHUTE_CUTOUT))
       }
       //  add staging areas
       const stagingAreas = values.additionalEquipment.filter(equipment =>
         equipment.includes('stagingArea')
       )
-      if (enableDeckModification && stagingAreas.length > 0) {
+      if (stagingAreas.length > 0) {
         stagingAreas.forEach(stagingArea => {
           const [, location] = stagingArea.split('_')
           dispatch(createDeckFixture('stagingArea', location))
@@ -263,9 +244,15 @@ export function CreateFileWizard(): JSX.Element | null {
       const newTiprackModels: string[] = uniq(
         pipettes.map(pipette => pipette.tiprackDefURI)
       )
-      newTiprackModels.forEach(tiprackDefURI => {
+      newTiprackModels.forEach((tiprackDefURI, index) => {
+        const ot2Slots = index === 0 ? '2' : '5'
+        const flexSlots = index === 0 ? 'C2' : 'B2'
         dispatch(
           labwareIngredActions.createContainer({
+            slot:
+              values.fields.robotType === FLEX_ROBOT_TYPE
+                ? flexSlots
+                : ot2Slots,
             labwareDefURI: tiprackDefURI,
             adapterUnderLabwareDefURI:
               values.pipettesByMount.left.pipetteName === 'p1000_96'
@@ -278,7 +265,7 @@ export function CreateFileWizard(): JSX.Element | null {
   }
   const wizardHeader = (
     <WizardHeader
-      title={t('modal.create_file_wizard.create_new_protocol')}
+      title={t('create_new_protocol')}
       currentStep={currentStepIndex}
       totalSteps={wizardSteps.length - 1}
       onExit={handleCancel}

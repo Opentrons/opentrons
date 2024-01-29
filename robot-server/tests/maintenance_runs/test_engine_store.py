@@ -19,6 +19,7 @@ from opentrons.protocol_runner import LiveRunner, RunResult
 from robot_server.maintenance_runs.maintenance_engine_store import (
     MaintenanceEngineStore,
     EngineConflictError,
+    NoRunnerEnginePairError,
     get_estop_listener,
 )
 
@@ -105,16 +106,16 @@ async def test_clear_engine(subject: MaintenanceEngineStore) -> None:
     await subject.create(
         run_id="run-id", labware_offsets=[], created_at=datetime(2023, 5, 1)
     )
-    await subject.runner.run()
+    await subject.runner.run(deck_configuration=[])
     result = await subject.clear()
 
     assert subject.current_run_id is None
     assert isinstance(result, RunResult)
 
-    with pytest.raises(AssertionError):
+    with pytest.raises(NoRunnerEnginePairError):
         subject.engine
 
-    with pytest.raises(AssertionError):
+    with pytest.raises(NoRunnerEnginePairError):
         subject.runner
 
 
@@ -142,9 +143,9 @@ async def test_clear_idle_engine(subject: MaintenanceEngineStore) -> None:
     await subject.clear()
 
     # TODO: test engine finish is called
-    with pytest.raises(AssertionError):
+    with pytest.raises(NoRunnerEnginePairError):
         subject.engine
-    with pytest.raises(AssertionError):
+    with pytest.raises(NoRunnerEnginePairError):
         subject.runner
 
 

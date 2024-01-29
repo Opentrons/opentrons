@@ -5,6 +5,7 @@ from typing import cast, Tuple, Union, List, Callable, Dict, TypeVar, Type
 from typing_extensions import Literal
 from opentrons import types as top_types
 from opentrons_shared_data.pipette.types import PipetteChannelType
+from opentrons.config import feature_flags
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -36,6 +37,10 @@ class OT3Mount(enum.Enum):
         if self.value == self.GRIPPER.value:
             return top_types.Mount.EXTENSION
         return top_types.Mount[self.name]
+
+    @classmethod
+    def pipette_mounts(cls) -> List["Literal[OT3Mount.LEFT, OT3Mount.RIGHT]"]:
+        return [cls.LEFT, cls.RIGHT]
 
 
 class OT3AxisKind(enum.Enum):
@@ -227,6 +232,13 @@ class Axis(enum.Enum):
         """
         return cls.of_main_tool_actuator(mount)
 
+    @classmethod
+    def node_axes(cls) -> List["Axis"]:
+        """
+        Get a list of axes that are backed by flex canbus nodes.
+        """
+        return [cls.X, cls.Y, cls.Z_L, cls.Z_R, cls.P_L, cls.P_R, cls.Z_G, cls.G]
+
 
 class SubSystem(enum.Enum):
     """An enumeration of ot3 components.
@@ -407,6 +419,7 @@ HardwareEvent = Union[
 ]
 
 HardwareEventHandler = Callable[[HardwareEvent], None]
+HardwareEventUnsubscriber = Callable[[], None]
 
 
 RevisionLiteral = Literal["2.1", "A", "B", "C", "UNKNOWN"]
@@ -498,6 +511,16 @@ class CriticalPoint(enum.Enum):
     """
     The center of the bottom face of a calibration pin inserted in the gripper's
     back calibration pin slot.
+    """
+
+    Y_CENTER = enum.auto()
+    """
+    Y_CENTER means the critical point under consideration is at the same X
+    coordinate as the default nozzle point (i.e. TIP | NOZZLE | FRONT_NOZZLE)
+    but halfway in between the Y axis bounding box of the pipette - it is the
+    XY center of the first column in the pipette. It's really only relevant for
+    the 96; it will produce the same position as XY_CENTER on an eight or one
+    channel pipette.
     """
 
 
@@ -600,6 +623,40 @@ class TipStateType(enum.Enum):
 
     def __str__(self) -> str:
         return self.name
+
+
+@dataclass
+class HardwareFeatureFlags:
+    """
+    Hardware configuration options that can be passed to API instances.
+    Some options may not be relevant to every robot.
+
+    These generally map to the feature flag options in the opentrons.config
+    module.
+    """
+
+    use_old_aspiration_functions: bool = (
+        False  # To support pipette backwards compatability
+    )
+    require_estop: bool = True
+    stall_detection_enabled: bool = True
+    overpressure_detection_enabled: bool = True
+
+    @classmethod
+    def build_from_ff(cls) -> "HardwareFeatureFlags":
+        """Build from the feature flags configuration file on disc.
+
+        Note that, if this class is built from the default constructor, the values
+        of all of the flags are just the default values instead of the values in the
+        feature_flags file or environment variables. Use this constructor to ensure
+        the right values are pulled in.
+        """
+        return HardwareFeatureFlags(
+            use_old_aspiration_functions=feature_flags.use_old_aspiration_functions(),
+            require_estop=feature_flags.require_estop(),
+            stall_detection_enabled=feature_flags.stall_detection_enabled(),
+            overpressure_detection_enabled=feature_flags.overpressure_detection_enabled(),
+        )
 
 
 class EarlyLiquidSenseTrigger(RuntimeError):

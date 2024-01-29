@@ -1,23 +1,42 @@
-import { v4 as uuidv4 } from 'uuid'
+import { FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS } from '@opentrons/shared-data'
 
-import { parseInitialLoadedFixturesByCutout } from '@opentrons/api-client'
-import { STANDARD_SLOT_DECK_CONFIG_FIXTURE } from '@opentrons/components'
+import type { CutoutFixtureId } from '@opentrons/shared-data'
+import type { CutoutConfigAndCompatibility } from './hooks'
 
-import type { DeckConfiguration, RunTimeCommand } from '@opentrons/shared-data'
-
-export function getDeckConfigFromProtocolCommands(
-  protocolAnalysisCommands: RunTimeCommand[]
-): DeckConfiguration {
-  const loadedFixtureCommands = Object.values(
-    parseInitialLoadedFixturesByCutout(protocolAnalysisCommands)
+export function getRequiredDeckConfig(
+  deckConfigProtocolSpec: CutoutConfigAndCompatibility[]
+): CutoutConfigAndCompatibility[] {
+  const nonSingleSlotDeckConfigCompatibility = deckConfigProtocolSpec.filter(
+    ({ missingLabwareDisplayName, requiredAddressableAreas }) =>
+      // required AA list includes a non-single-slot AA or a missing labware display name
+      !requiredAddressableAreas.every(aa =>
+        FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS.includes(aa)
+      ) || missingLabwareDisplayName != null
+  )
+  // fixture includes at least 1 required AA
+  const requiredDeckConfigProtocolSpec = nonSingleSlotDeckConfigCompatibility.filter(
+    fixture => fixture.requiredAddressableAreas.length > 0
   )
 
-  const deckConfig = loadedFixtureCommands.map(command => ({
-    fixtureId: command.params.fixtureId ?? uuidv4(),
-    fixtureLocation: command.params.location.cutout,
-    loadName: command.params.loadName,
-  }))
+  return requiredDeckConfigProtocolSpec
+}
 
-  // TODO(bh, 2023-10-18): remove stub when load fixture commands available
-  return deckConfig.length > 0 ? deckConfig : STANDARD_SLOT_DECK_CONFIG_FIXTURE
+export function getIsFixtureMismatch(
+  deckConfigProtocolSpec: CutoutConfigAndCompatibility[]
+): boolean {
+  const isFixtureMismatch = !deckConfigProtocolSpec.every(
+    ({ cutoutFixtureId, compatibleCutoutFixtureIds }) =>
+      isMatchedFixture(cutoutFixtureId, compatibleCutoutFixtureIds)
+  )
+  return isFixtureMismatch
+}
+
+function isMatchedFixture(
+  cutoutFixtureId: CutoutFixtureId | null,
+  compatibleCutoutFixtureIds: CutoutFixtureId[]
+): boolean {
+  return (
+    cutoutFixtureId == null ||
+    compatibleCutoutFixtureIds.includes(cutoutFixtureId)
+  )
 }

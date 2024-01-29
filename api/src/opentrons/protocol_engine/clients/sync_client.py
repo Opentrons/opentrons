@@ -23,6 +23,8 @@ from ..types import (
     LabwareOffsetVector,
     MotorAxis,
     Liquid,
+    NozzleLayoutConfigurationType,
+    AddressableOffsetVector,
 )
 from .transports import ChildThreadTransport
 
@@ -67,6 +69,12 @@ class SyncClient:
         return self._transport.call_method(
             "add_labware_definition",
             definition=definition,
+        )
+
+    def add_addressable_area(self, addressable_area_name: str) -> None:
+        """Add an addressable area to the engine's state."""
+        self._transport.call_method(
+            "add_addressable_area", addressable_area_name=addressable_area_name
         )
 
     def add_liquid(
@@ -178,6 +186,56 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
 
         return cast(commands.MoveToWellResult, result)
+
+    def move_to_addressable_area(
+        self,
+        pipette_id: str,
+        addressable_area_name: str,
+        offset: AddressableOffsetVector,
+        minimum_z_height: Optional[float],
+        force_direct: bool,
+        speed: Optional[float],
+    ) -> commands.MoveToAddressableAreaResult:
+        """Execute a MoveToAddressableArea command and return the result."""
+        request = commands.MoveToAddressableAreaCreate(
+            params=commands.MoveToAddressableAreaParams(
+                pipetteId=pipette_id,
+                addressableAreaName=addressable_area_name,
+                offset=offset,
+                forceDirect=force_direct,
+                minimumZHeight=minimum_z_height,
+                speed=speed,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+
+        return cast(commands.MoveToAddressableAreaResult, result)
+
+    def move_to_addressable_area_for_drop_tip(
+        self,
+        pipette_id: str,
+        addressable_area_name: str,
+        offset: AddressableOffsetVector,
+        minimum_z_height: Optional[float],
+        force_direct: bool,
+        speed: Optional[float],
+        alternate_drop_location: Optional[bool],
+    ) -> commands.MoveToAddressableAreaForDropTipResult:
+        """Execute a MoveToAddressableArea command and return the result."""
+        request = commands.MoveToAddressableAreaForDropTipCreate(
+            params=commands.MoveToAddressableAreaForDropTipParams(
+                pipetteId=pipette_id,
+                addressableAreaName=addressable_area_name,
+                offset=offset,
+                forceDirect=force_direct,
+                minimumZHeight=minimum_z_height,
+                speed=speed,
+                alternateDropLocation=alternate_drop_location,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+
+        return cast(commands.MoveToAddressableAreaForDropTipResult, result)
 
     def move_to_coordinates(
         self,
@@ -291,6 +349,20 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.PrepareToAspirateResult, result)
+
+    def configure_nozzle_layout(
+        self,
+        pipette_id: str,
+        configuration_params: NozzleLayoutConfigurationType,
+    ) -> commands.ConfigureNozzleLayoutResult:
+        """Execute a ConfigureForVolume command."""
+        request = commands.ConfigureNozzleLayoutCreate(
+            params=commands.ConfigureNozzleLayoutParams(
+                pipetteId=pipette_id, configurationParams=configuration_params
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.ConfigureNozzleLayoutResult, result)
 
     def aspirate(
         self,

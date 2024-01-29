@@ -32,6 +32,7 @@ from opentrons.protocol_engine import (
 )
 
 from robot_server.protocols import ProtocolResource
+from opentrons.protocol_engine.types import DeckConfigurationType
 
 
 class EngineConflictError(RuntimeError):
@@ -40,6 +41,10 @@ class EngineConflictError(RuntimeError):
     The store will not create a new engine unless the "current" runner/engine
     pair is idle.
     """
+
+
+class NoRunnerEnginePairError(RuntimeError):
+    """Raised if you try to get the current engine or runner while there is none."""
 
 
 class RunnerEnginePair(NamedTuple):
@@ -91,13 +96,15 @@ class EngineStore:
     @property
     def engine(self) -> ProtocolEngine:
         """Get the "current" persisted ProtocolEngine."""
-        assert self._runner_engine_pair is not None, "Engine not yet created."
+        if self._runner_engine_pair is None:
+            raise NoRunnerEnginePairError()
         return self._runner_engine_pair.engine
 
     @property
     def runner(self) -> AnyRunner:
         """Get the "current" persisted ProtocolRunner."""
-        assert self._runner_engine_pair is not None, "Runner not yet created."
+        if self._runner_engine_pair is None:
+            raise NoRunnerEnginePairError()
         return self._runner_engine_pair.runner
 
     @property
@@ -144,6 +151,7 @@ class EngineStore:
         self,
         run_id: str,
         labware_offsets: List[LabwareOffsetCreate],
+        deck_configuration: DeckConfigurationType,
         protocol: Optional[ProtocolResource],
     ) -> StateSummary:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
@@ -175,11 +183,18 @@ class EngineStore:
                 ),
             ),
             load_fixed_trash=load_fixed_trash,
+            deck_configuration=deck_configuration,
         )
+
+        post_run_hardware_state = PostRunHardwareState.HOME_AND_STAY_ENGAGED
+        drop_tips_after_run = True
+
         runner = create_protocol_runner(
             protocol_engine=engine,
             hardware_api=self._hardware_api,
             protocol_config=protocol.source.config if protocol else None,
+            post_run_hardware_state=post_run_hardware_state,
+            drop_tips_after_run=drop_tips_after_run,
         )
 
         if self._runner_engine_pair is not None:

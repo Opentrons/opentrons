@@ -1,92 +1,77 @@
 import * as React from 'react'
-import { ThunkDispatch, BaseState } from '../types'
-import { connect } from 'react-redux'
-
+import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import { KNOWLEDGEBASE_ROOT_URL } from '../components/KnowledgeBaseLink'
 import { NavTab, TabbedNavBar, OutsideLinkTab } from '@opentrons/components'
-import { i18n } from '../localization'
 import { Page, actions, selectors } from '../navigation'
 import { selectors as fileSelectors } from '../file-data'
 
-interface SP {
-  currentPage: Page
-  currentProtocolExists: boolean
-}
+export function ConnectedNav(): JSX.Element {
+  const { t } = useTranslation('nav')
 
-interface DP {
-  handleClick: (page: Page) => React.MouseEventHandler
-}
+  const currentPage = useSelector(selectors.getCurrentPage)
+  const currentProtocolExists = useSelector(
+    fileSelectors.getCurrentProtocolExists
+  )
+  const dispatch = useDispatch()
 
-type Props = SP & DP
+  const handleClick = React.useMemo(
+    () => (pageName: Page) => () => {
+      dispatch(actions.navigateToPage(pageName))
+    },
+    [dispatch]
+  )
 
-function Nav(props: Props): JSX.Element {
-  const noCurrentProtocol = !props.currentProtocolExists
+  const noCurrentProtocol = !currentProtocolExists
+
   return (
     <TabbedNavBar
       topChildren={
-        <React.Fragment>
+        <>
           <NavTab
             id="NavTab_file"
             iconName="ot-file"
-            title={i18n.t('nav.tab_name.file')}
+            title={t('tab_name.file')}
             selected={
-              props.currentPage === 'file-splash' ||
-              props.currentPage === 'file-detail'
+              currentPage === 'file-splash' || currentPage === 'file-detail'
             }
-            onClick={props.handleClick(
+            onClick={handleClick(
               noCurrentProtocol ? 'file-splash' : 'file-detail'
             )}
           />
           <NavTab
             id="NavTab_liquids"
             iconName="water"
-            title={i18n.t('nav.tab_name.liquids')}
+            title={t('tab_name.liquids')}
             disabled={noCurrentProtocol}
-            selected={props.currentPage === 'liquids'}
-            onClick={props.handleClick('liquids')}
+            selected={currentPage === 'liquids'}
+            onClick={handleClick('liquids')}
           />
           <NavTab
             id="NavTab_design"
             iconName="ot-design"
-            title={i18n.t('nav.tab_name.design')}
+            title={t('tab_name.design')}
             disabled={noCurrentProtocol}
-            selected={props.currentPage === 'steplist'}
-            onClick={props.handleClick('steplist')}
+            selected={currentPage === 'steplist'}
+            onClick={handleClick('steplist')}
           />
-        </React.Fragment>
+        </>
       }
       bottomChildren={
-        <React.Fragment>
+        <>
           <OutsideLinkTab
             iconName="help-circle"
-            title={i18n.t('nav.tab_name.help')}
+            title={t('tab_name.help')}
             to={KNOWLEDGEBASE_ROOT_URL}
           />
           <NavTab
             iconName="settings"
-            title={i18n.t('nav.tab_name.settings')}
-            selected={props.currentPage === 'settings-app'}
-            onClick={props.handleClick('settings-app')}
+            title={t('tab_name.settings')}
+            selected={currentPage === 'settings-app'}
+            onClick={handleClick('settings-app')}
           />
-        </React.Fragment>
+        </>
       }
     />
   )
 }
-
-function mapStateToProps(state: BaseState): SP {
-  return {
-    currentPage: selectors.getCurrentPage(state),
-    currentProtocolExists: fileSelectors.getCurrentProtocolExists(state),
-  }
-}
-
-function mapDispatchToProps(dispatch: ThunkDispatch<any>): DP {
-  return {
-    handleClick: (pageName: Page) => () => {
-      dispatch(actions.navigateToPage(pageName))
-    },
-  }
-}
-
-export const ConnectedNav = connect(mapStateToProps, mapDispatchToProps)(Nav)

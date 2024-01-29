@@ -130,14 +130,11 @@ format:
 	$(python) -m black src tests setup.py
 
 docs/build/html/v%: docs/v%
-	$(sphinx_build_allow_warnings) -b html -d docs/build/doctrees -n $< $@
-# sphinx wont automatically do this because it's only in a template
-	$(SHX) cp docs/img/lightbulb.jpg $@/_images/
+	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
 
 docs/build/html/hardware: docs/hardware src/opentrons/hardware_control
 	$(sphinx_build_allow_warnings) -b html -d docs/build/doctrees -n $< $@
 	$(SHX) mkdir $@/_images/
-	$(SHX) cp docs/img/lightbulb.jpg $@/_images/
 
 docs/dist/v%: docs/build/html/v%
 	$(SHX) mkdir -p $@
@@ -184,7 +181,8 @@ push-no-restart-ot3: sdist
 	echo $(sdist_file)
 	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,opentrons,src,,$(version_file))
 	ssh $(ssh_helper) root@$(host) "mount -o remount,rw / && mkdir -p /usr/local/bin"
-	scp $(ssh_helper) ./src/opentrons/hardware_control/scripts/{ot3repl,ot3gripper} root@$(host):/usr/local/bin/
+	scp $(ssh_helper) ./src/opentrons/hardware_control/scripts/ot3repl root@$(host):/usr/local/bin/
+	scp $(ssh_helper) ./src/opentrons/hardware_control/scripts/ot3gripper root@$(host):/usr/local/bin/
 	ssh $(ssh_helper) root@$(host) "mount -o remount,ro /"
 
 .PHONY: push-ot3

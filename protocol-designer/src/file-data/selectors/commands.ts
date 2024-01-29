@@ -55,16 +55,16 @@ export const getInitialRobotState: (
   stepFormSelectors.getInvariantContext,
   getLabwareLiquidState,
   (initialDeckSetup, invariantContext, labwareLiquidState) => {
-    const labware: Record<string, LabwareTemporalProperties> = mapValues(
-      initialDeckSetup.labware,
-      (l: LabwareOnDeck): LabwareTemporalProperties => ({
-        slot: l.slot,
-      })
-    )
     const pipettes: Record<string, PipetteTemporalProperties> = mapValues(
       initialDeckSetup.pipettes,
       (p: PipetteOnDeck): PipetteTemporalProperties => ({
         mount: p.mount,
+      })
+    )
+    const labware: Record<string, LabwareTemporalProperties> = mapValues(
+      initialDeckSetup.labware,
+      (l: LabwareOnDeck): LabwareTemporalProperties => ({
+        slot: l.slot,
       })
     )
     const modules: Record<string, ModuleTemporalProperties> = mapValues(

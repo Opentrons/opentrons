@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
 
 import {
   Flex,
@@ -17,9 +16,13 @@ import {
 import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 
-export function NoUpdateFound(): JSX.Element {
+export interface NoUpdateFoundProps {
+  onContinue: () => void
+}
+
+export function NoUpdateFound(props: NoUpdateFoundProps): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
-  const history = useHistory()
+  const { onContinue } = props
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -28,7 +31,7 @@ export function NoUpdateFound(): JSX.Element {
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        backgroundColor={COLORS.green3}
+        backgroundColor={COLORS.green35}
         height="25.75rem"
         gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}
@@ -39,7 +42,7 @@ export function NoUpdateFound(): JSX.Element {
         <Icon
           name="ot-check"
           size="3.75rem"
-          color={COLORS.green2}
+          color={COLORS.green50}
           data-testid="NoUpdateFound_check_circle_icon"
         />
         <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
@@ -48,7 +51,7 @@ export function NoUpdateFound(): JSX.Element {
       </Flex>
       <MediumButton
         buttonText={i18n.format(t('shared:continue'), 'capitalize')}
-        onClick={() => history.push('/emergency-stop')}
+        onClick={onContinue}
       />
     </Flex>
   )

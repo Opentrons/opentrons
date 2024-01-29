@@ -23,6 +23,7 @@
     "jawWidth": {
       "min": 60.0,
       "max": 92.0
-    }
+    },
+    "maxAllowedGripError": 12.0
   }
 }

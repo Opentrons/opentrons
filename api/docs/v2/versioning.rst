@@ -30,11 +30,11 @@ You must specify the API version you are targeting in your Python protocol. In a
    from opentrons import protocol_api
 
    metadata = {
-       'apiLevel': '|apiLevel|',
-       'author': 'A. Biologist'}
+       "apiLevel": "|apiLevel|",
+       "author": "A. Biologist"}
 
    def run(protocol: protocol_api.ProtocolContext):
-       protocol.comment('Hello, world!')
+       protocol.comment("Hello, world!")
        
 From version 2.15 onward, you can specify ``apiLevel`` in the ``requirements`` dictionary instead:
 
@@ -43,11 +43,11 @@ From version 2.15 onward, you can specify ``apiLevel`` in the ``requirements`` d
 
    from opentrons import protocol_api
 
-   metadata = {'author': 'A. Biologist'}
-   requirements = {'apiLevel': '2.15', 'robotType': 'Flex'}
+   metadata = {"author": "A. Biologist"}
+   requirements = {"apiLevel": "|apiLevel|", "robotType": "Flex"}
 
    def run(protocol: protocol_api.ProtocolContext):
-       protocol.comment('Hello, Flex!')
+       protocol.comment("Hello, Flex!")
 
 Choose only one of these places to specify ``apiLevel``. If you put it in neither or both places, you will not be able to simulate or run your protocol.
 
@@ -66,9 +66,9 @@ The maximum supported API version for your robot is listed in the Opentrons App 
 
 If you upload a protocol that specifies a higher API level than the maximum supported, your robot won't be able to analyze or run your protocol. You can increase the maximum supported version by updating your robot software and Opentrons App. 
 
-Opentrons robots running the latest software (7.0.0) support the following version ranges: 
+Opentrons robots running the latest software (7.1.0) support the following version ranges: 
 
-    * **Flex:** version 2.15.
+    * **Flex:** version 2.15–|apiLevel|.
     * **OT-2:** versions 2.0–|apiLevel|.
 
 
@@ -82,6 +82,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+------------------------------+
 | API Version | Introduced in Robot Software |
 +=============+==============================+
+|     2.16    |          7.1.0               |
++-------------+------------------------------+
 |     2.15    |          7.0.0               |
 +-------------+------------------------------+
 |     2.14    |          6.3.0               |
@@ -122,6 +124,37 @@ This table lists the correspondence between Protocol API versions and robot soft
 Changes in API Versions
 =======================
 
+Version 2.17
+------------
+
+- :py:meth:`.dispense` will now raise an error if you try to dispense more than is available.
+
+Version 2.16
+------------
+
+This version introduces new features for Flex and adds and improves methods for aspirating and dispensing. Note that when updating Flex protocols to version 2.16, you *must* load a trash container before dropping tips.
+
+- New features
+
+  - Use :py:meth:`.configure_nozzle_layout` to pick up a single column of tips with the 96-channel pipette. See :ref:`Partial Tip Pickup <partial-tip-pickup>`.
+  - Specify the trash containers attached to your Flex with :py:meth:`.load_waste_chute` and :py:meth:`.load_trash_bin`.
+  - Dispense, blow out, drop tips, and dispose labware in the waste chute. Disposing labware requires the gripper and calling :py:meth:`.move_labware` with ``use_gripper=True``.
+  - Perform actions in staging area slots by referencing slots A4 through D4. See :ref:`deck-slots`.
+  - Explicitly command a pipette to :py:meth:`.prepare_to_aspirate`. The API usually prepares pipettes to aspirate automatically, but this is useful for certain applications, like pre-wetting routines.
+
+- Improved features
+
+  - :py:meth:`.aspirate`, :py:meth:`.dispense`, and :py:meth:`.mix` will not move any liquid when called with ``volume=0``.
+
+- Other changes
+
+  - :py:obj:`.ProtocolContext.fixed_trash` and :py:obj:`.InstrumentContext.trash_container` now return :py:class:`.TrashBin` objects instead of :py:class:`.Labware` objects.
+  - Flex will no longer automatically drop tips in the trash at the end of a protocol. You can add a :py:meth:`.drop_tip()` command to your protocol or use the Opentrons App to drop the tips.
+  
+- Known issues
+
+  - It's possible to load a Thermocycler and then load another item in slot A1. Don't do this, as it could lead to unexpected pipetting behavior and crashes.
+
 Version 2.15
 ------------
 
@@ -149,13 +182,13 @@ This version introduces support for the Opentrons Flex robot, instruments, modul
 
   - Use coordinates or numbers to specify :ref:`deck slots <deck-slots>`. These formats match physical labels on Flex and OT-2, but you can use either system, regardless of ``robotType``.
   
-  - The new :py:meth:`.load_adapter` method lets you load adapters and labware separately on modules, and lets you load adapters directly in deck slots. See :ref:`labware-on-adapters`.
+  - The new module context ``load_adapter()`` methods let you load adapters and labware separately on modules, and :py:meth:`.ProtocolContext.load_adapter` lets you load adapters directly in deck slots. See :ref:`labware-on-adapters`.
   
   - Move labware manually using :py:meth:`.move_labware`, without having to stop your protocol. 
   
   - Manual labware moves support moving to or from the new :py:obj:`~.protocol_api.OFF_DECK` location (outside of the robot).
   
-  - :py:meth:`.load_labware` also accepts :py:obj:`~.protocol_api.OFF_DECK` as a location. This lets you prepare labware to be moved onto the deck later in a protocol.  
+  - :py:meth:`.ProtocolContext.load_labware` also accepts :py:obj:`~.protocol_api.OFF_DECK` as a location. This lets you prepare labware to be moved onto the deck later in a protocol.
   
   - The new ``push_out`` parameter of the :py:meth:`.dispense` method helps ensure that the pipette dispenses all of its liquid when working with very small volumes.
   
@@ -211,10 +244,10 @@ If you specify an API version of ``2.13`` or lower, your protocols will continue
     because the plunger's speed is a stepwise function of the volume.
     Use :py:attr:`.InstrumentContext.flow_rate` to set the flow rate in µL/s, instead.
 
-  - ``ModuleContext.load_labware_object`` was removed as an unnecessary internal method.
+  - ``load_labware_object()`` was removed from module contexts as an unnecessary internal method.
 
-  - ``ModuleContext.geometry`` was removed in favor of
-    :py:attr:`.ModuleContext.model` and :py:attr:`.ModuleContext.type`
+  - ``geometry`` was removed from module contexts in favor of
+    ``model`` and ``type`` attributes.
 
   - ``Well.geometry`` was removed as unnecessary.
 
@@ -304,7 +337,7 @@ Version 2.8
 Version 2.7
 -----------
 
-- Added :py:meth:`.InstrumentContext.pair_with`, an experimental feature for moving both pipettes simultaneously.
+- Added ``InstrumentContext.pair_with()``, an experimental feature for moving both pipettes simultaneously.
 
   .. note::
 

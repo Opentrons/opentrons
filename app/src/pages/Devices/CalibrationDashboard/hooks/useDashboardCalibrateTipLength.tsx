@@ -180,6 +180,7 @@ export function useDashboardCalibrateTipLength(
         dispatchRequests={dispatchRequests}
         isJogging={isJogging}
         offsetInvalidationHandler={invalidateHandlerRef.current}
+        allowChangeTipRack={sessionParams.current?.tipRackDefinition == null}
       />
     </Portal>
   )

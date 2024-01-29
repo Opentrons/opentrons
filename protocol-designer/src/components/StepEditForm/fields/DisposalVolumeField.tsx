@@ -1,23 +1,22 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import cx from 'classnames'
+
 import {
   FormGroup,
   DeprecatedCheckboxField,
   DropdownField,
   Options,
 } from '@opentrons/components'
-import { connect } from 'react-redux'
-import cx from 'classnames'
-
-import { i18n } from '../../../localization'
 import { getMaxDisposalVolumeForMultidispense } from '../../../steplist/formLevel/handleFormChange/utils'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { getBlowoutLocationOptionsForForm } from '../utils'
 import { TextField } from './TextField'
 
-import { FieldProps, FieldPropsByName } from '../types'
-import { PathOption, StepType } from '../../../form-types'
-import { BaseState } from '../../../types'
+import type { FieldProps, FieldPropsByName } from '../types'
+import type { PathOption, StepType } from '../../../form-types'
 
 import styles from '../StepEditForm.css'
 
@@ -37,29 +36,54 @@ const DropdownFormField = (props: DropdownFormFieldProps): JSX.Element => {
     />
   )
 }
-
-interface SP {
-  disposalDestinationOptions: Options
-  maxDisposalVolume?: number | null
-}
-interface OP {
-  aspirate_airGap_checkbox?: boolean | null
-  aspirate_airGap_volume?: string | null
+interface DisposalVolumeFieldProps {
   path: PathOption
   pipette: string | null
   propsForFields: FieldPropsByName
   stepType: StepType
   volume: string | null
+  aspirate_airGap_checkbox?: boolean | null
+  aspirate_airGap_volume?: string | null
 }
-type Props = SP & OP
 
-const DisposalVolumeFieldComponent = (props: Props): JSX.Element => {
-  const { propsForFields } = props
+export const DisposalVolumeField = (
+  props: DisposalVolumeFieldProps
+): JSX.Element => {
+  const {
+    path,
+    stepType,
+    volume,
+    pipette,
+    propsForFields,
+    aspirate_airGap_checkbox,
+    aspirate_airGap_volume,
+  } = props
+  const { t } = useTranslation(['application', 'form'])
 
-  const { maxDisposalVolume } = props
+  const disposalOptions = useSelector(uiLabwareSelectors.getDisposalOptions)
+  const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
+  const blowoutLocationOptions = getBlowoutLocationOptionsForForm({
+    path,
+    stepType,
+  })
+  const maxDisposalVolume = getMaxDisposalVolumeForMultidispense(
+    {
+      aspirate_airGap_checkbox,
+      aspirate_airGap_volume,
+      path,
+      pipette,
+      volume,
+    },
+    pipetteEntities
+  )
+  const disposalDestinationOptions = [
+    ...disposalOptions,
+    ...blowoutLocationOptions,
+  ]
+
   const volumeBoundsCaption =
     maxDisposalVolume != null
-      ? `max ${maxDisposalVolume} ${i18n.t('application.units.microliter')}`
+      ? `max ${maxDisposalVolume} ${t('units.microliter')}`
       : null
 
   const volumeField = (
@@ -68,7 +92,7 @@ const DisposalVolumeFieldComponent = (props: Props): JSX.Element => {
         {...propsForFields.disposalVolume_volume}
         caption={volumeBoundsCaption}
         className={cx(styles.small_field, styles.orphan_field)}
-        units={i18n.t('application.units.microliter')}
+        units={t('units.microliter')}
       />
     </div>
   )
@@ -76,7 +100,7 @@ const DisposalVolumeFieldComponent = (props: Props): JSX.Element => {
   const { value, updateValue } = propsForFields.disposalVolume_checkbox
 
   return (
-    <FormGroup label={i18n.t('form.step_edit_form.multiDispenseOptionsLabel')}>
+    <FormGroup label={t('form:step_edit_form.multiDispenseOptionsLabel')}>
       <>
         <div
           // @ts-expect-error(sa, 2021-6-22): I think volumeBoundsCaption needs to be casted to a boolean to be fed into a class name
@@ -98,7 +122,7 @@ const DisposalVolumeFieldComponent = (props: Props): JSX.Element => {
             <DropdownFormField
               {...propsForFields.blowout_location}
               className={styles.large_field}
-              options={props.disposalDestinationOptions}
+              options={disposalDestinationOptions}
             />
           </div>
         ) : null}
@@ -106,43 +130,3 @@ const DisposalVolumeFieldComponent = (props: Props): JSX.Element => {
     </FormGroup>
   )
 }
-const mapSTP = (state: BaseState, ownProps: OP): SP => {
-  const {
-    aspirate_airGap_checkbox,
-    aspirate_airGap_volume,
-    path,
-    pipette,
-    stepType,
-    volume,
-  } = ownProps
-
-  const blowoutLocationOptions = getBlowoutLocationOptionsForForm({
-    path,
-    stepType,
-  })
-
-  const disposalLabwareOptions = uiLabwareSelectors.getDisposalLabwareOptions(
-    state
-  )
-
-  const maxDisposalVolume = getMaxDisposalVolumeForMultidispense(
-    {
-      aspirate_airGap_checkbox,
-      aspirate_airGap_volume,
-      path,
-      pipette,
-      volume,
-    },
-    stepFormSelectors.getPipetteEntities(state)
-  )
-
-  return {
-    maxDisposalVolume,
-    disposalDestinationOptions: [
-      ...disposalLabwareOptions,
-      ...blowoutLocationOptions,
-    ],
-  }
-}
-
-export const DisposalVolumeField = connect(mapSTP)(DisposalVolumeFieldComponent)

@@ -65,8 +65,11 @@ export const PipetteWizardFlows = (
 
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
   const memoizedPipetteInfo = React.useMemo(() => props.pipetteInfo ?? null, [])
-  const isGantryEmpty =
-    attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null
+  const isGantryEmpty = React.useMemo(
+    () => attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null,
+    []
+  )
+
   const pipetteWizardSteps = React.useMemo(
     () =>
       memoizedPipetteInfo == null
@@ -101,6 +104,7 @@ export const PipetteWizardFlows = (
     attachedPipettes: memoizedAttachedPipettes,
     pipetteInfo: memoizedPipetteInfo,
   })
+  const memoizedWizardTitle = React.useMemo(() => wizardTitle, [])
   const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = React.useState<
     string | null
   >(null)
@@ -344,7 +348,9 @@ export const PipetteWizardFlows = (
     modalContent = (
       <FirmwareUpdateModal
         proceed={proceed}
-        subsystem={mount === LEFT ? 'pipette_left' : 'pipette_right'}
+        subsystem={
+          currentStep.mount === LEFT ? 'pipette_left' : 'pipette_right'
+        }
         description={t('firmware_updating')}
         proceedDescription={t('firmware_up_to_date')}
         isOnDevice={isOnDevice}
@@ -391,7 +397,7 @@ export const PipetteWizardFlows = (
   const wizardHeader = (
     <WizardHeader
       exitDisabled={isRobotMoving || isFetchingPipettes}
-      title={wizardTitle}
+      title={memoizedWizardTitle}
       currentStep={
         progressBarForCalError ? currentStepIndex - 1 : currentStepIndex
       }

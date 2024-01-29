@@ -50,30 +50,24 @@ import { ViewportListRef } from 'react-viewport-list'
 const baseRoundTabStyling = css`
   ${TYPOGRAPHY.pSemiBold}
   border-radius: ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} 0 0;
-  border-top: ${BORDERS.transparentLineBorder};
-  border-left: ${BORDERS.transparentLineBorder};
-  border-right: ${BORDERS.transparentLineBorder};
   padding: ${SPACING.spacing8} ${SPACING.spacing16};
   position: ${POSITION_RELATIVE};
 `
 
 const RoundNavLink = styled(NavLink)`
   ${baseRoundTabStyling}
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50};
 
   &:hover {
-    background-color: ${COLORS.fundamentalsBackgroundShade};
+    background-color: ${COLORS.grey20};
   }
 
   &.active {
     background-color: ${COLORS.white};
-    border-top: ${BORDERS.lineBorder};
-    border-left: ${BORDERS.lineBorder};
-    border-right: ${BORDERS.lineBorder};
-    color: ${COLORS.blueEnabled};
+    color: ${COLORS.blue50};
 
     &:hover {
-      color: ${COLORS.blueHover};
+      color: ${COLORS.blue55};
     }
 
     /* extend below the tab when active to flow into the content */
@@ -108,7 +102,7 @@ function RoundTab({
   return disabled ? (
     <>
       <StyledText
-        color={COLORS.successDisabled}
+        color={COLORS.grey40}
         css={baseRoundTabStyling}
         {...targetProps}
       >
@@ -239,15 +233,12 @@ function PageContents(props: PageContentsProps): JSX.Element {
       </Flex>
       <Box
         backgroundColor={COLORS.white}
-        border={`1px ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
         // remove left upper corner border radius when first tab is active
         borderRadius={`${
-          protocolRunDetailsTab === 'setup'
-            ? '0'
-            : String(BORDERS.radiusSoftCorners)
-        } ${String(BORDERS.radiusSoftCorners)} ${String(
+          protocolRunDetailsTab === 'setup' ? '0' : BORDERS.radiusSoftCorners
+        } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
           BORDERS.radiusSoftCorners
-        )} ${String(BORDERS.radiusSoftCorners)}`}
+        }`}
       >
         {protocolRunDetailsContent}
       </Box>
@@ -300,7 +291,6 @@ const ModuleControlsTab = (
   const { t } = useTranslation('run_details')
   const currentRunId = useCurrentRunId()
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
-    robotName,
     runId
   )
   const { isRunStill } = useRunStatuses()

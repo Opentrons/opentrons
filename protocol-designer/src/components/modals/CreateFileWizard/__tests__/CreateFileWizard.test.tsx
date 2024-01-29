@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { LabwareDefinition2 } from '@opentrons/shared-data'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import { i18n } from '../../../../localization'
 import { getNewProtocolModal } from '../../../../navigation/selectors'
 import {
   getCustomLabwareDefsByURI,
@@ -17,10 +18,7 @@ import {
   toggleIsGripperRequired,
   createDeckFixture,
 } from '../../../../step-forms/actions/additionalItems'
-import {
-  getAllowAllTipracks,
-  getEnableDeckModification,
-} from '../../../../feature-flags/selectors'
+import { getAllowAllTipracks } from '../../../../feature-flags/selectors'
 import { getTiprackOptions } from '../../utils'
 import { CreateFileWizard } from '..'
 
@@ -76,11 +74,8 @@ const mockCreateModule = createModule as jest.MockedFunction<
 const mockCreateDeckFixture = createDeckFixture as jest.MockedFunction<
   typeof createDeckFixture
 >
-const mockGetEnableDeckModification = getEnableDeckModification as jest.MockedFunction<
-  typeof getEnableDeckModification
->
 const render = () => {
-  return renderWithProviders(<CreateFileWizard />)[0]
+  return renderWithProviders(<CreateFileWizard />, { i18nInstance: i18n })[0]
 }
 
 const fixtureTipRack10ul = {
@@ -91,7 +86,6 @@ const ten = '10uL'
 
 describe('CreateFileWizard', () => {
   beforeEach(() => {
-    mockGetEnableDeckModification.mockReturnValue(false)
     mockGetNewProtocolModal.mockReturnValue(true)
     mockGetAllowAllTipracks.mockReturnValue(false)
     mockGetLabwareDefsByURI.mockReturnValue({
@@ -109,53 +103,54 @@ describe('CreateFileWizard', () => {
     ])
   })
   it('renders the wizard for an OT-2', () => {
-    const { getByText, getByRole, getByLabelText } = render()
-    getByText('Create New Protocol')
+    render()
+    screen.getByText('Create New Protocol')
     //  select OT-2
-    getByText('OT-2').click()
-    let next = getByRole('button', { name: 'Next' })
-    next.click()
+    fireEvent.click(screen.getByText('OT-2'))
+    let next = screen.getByRole('button', { name: 'Next' })
+    fireEvent.click(next)
     //  add protocol name
-    getByText('Step 1 / 6')
-    const inputField = getByLabelText('MetadataTile_protocolName')
+    screen.getByText('Step 1 / 6')
+    const inputField = screen.getByLabelText('MetadataTile_protocolName')
     fireEvent.change(inputField, { target: { value: 'mockName' } })
-    next = getByRole('button', { name: 'Next' })
-    next.click()
-    getByText('Step 2 / 6')
+    next = screen.getByRole('button', { name: 'Next' })
+    fireEvent.click(next)
+    screen.getByText('Step 2 / 6')
     //  select P20 Single-Channel GEN2
-    getByLabelText('EquipmentOption_flex_P20 Single-Channel GEN2').click()
-    next = getByRole('button', { name: 'Next' })
-    next.click()
-    getByText('Step 3 / 6')
+    fireEvent.click(
+      screen.getByLabelText('EquipmentOption_flex_P20 Single-Channel GEN2')
+    )
+    next = screen.getByRole('button', { name: 'Next' })
+    fireEvent.click(next)
+    screen.getByText('Step 3 / 6')
     //  select 10uL tipracks
-    getByLabelText('EquipmentOption_flex_10uL tipracks').click()
-    next = getByRole('button', { name: 'Next' })
-    next.click()
-    getByText('Step 4 / 6')
+    fireEvent.click(screen.getByLabelText('EquipmentOption_flex_10uL tipracks'))
+    next = screen.getByRole('button', { name: 'Next' })
+    fireEvent.click(next)
+    screen.getByText('Step 4 / 6')
     //  select none for 2nd pipette
-    getByLabelText('EquipmentOption_flex_None').click()
-    next = getByRole('button', { name: 'Next' })
-    next.click()
-    getByText('Step 6 / 6')
+    fireEvent.click(screen.getByLabelText('EquipmentOption_flex_None'))
+    next = screen.getByRole('button', { name: 'Next' })
+    fireEvent.click(next)
+    screen.getByText('Step 6 / 6')
     //  no modules and continue
-    getByRole('button', { name: 'Review file details' }).click()
+    fireEvent.click(screen.getByRole('button', { name: 'Review file details' }))
     expect(mockCreateNewProtocol).toHaveBeenCalled()
     expect(mockCreatePipettes).toHaveBeenCalled()
     expect(mockCreateModule).not.toHaveBeenCalled()
     expect(mockCreateContainer).toHaveBeenCalled()
   })
   it('renders the wizard and clicking on the exit button calls correct selector', () => {
-    const { getByText, getByRole } = render()
-    getByText('Create New Protocol')
+    render()
+    screen.getByText('Create New Protocol')
     //  select OT-2
-    getByText('OT-2').click()
-    const next = getByRole('button', { name: 'Next' })
-    next.click()
-    getByText('exit').click()
+    fireEvent.click(screen.getByText('OT-2'))
+    const next = screen.getByRole('button', { name: 'Next' })
+    fireEvent.click(next)
+    fireEvent.click(screen.getByText('exit'))
     expect(mockToggleNewProtocolModal).toHaveBeenCalled()
   })
   it('renders the wizard for a Flex with custom tiprack', () => {
-    mockGetEnableDeckModification.mockReturnValue(true)
     const Custom = 'custom'
     mockGetCustomLabwareDefsByURI.mockReturnValue({
       [Custom]: fixtureTipRack10ul,
@@ -174,49 +169,55 @@ describe('CreateFileWizard', () => {
         value: 'custom_beta_blah_blah_blah',
       },
     ])
-    const { getByText, getByRole, getByLabelText } = render()
-    getByText('Create New Protocol')
+    render()
+    screen.getByText('Create New Protocol')
     //  select Flex
-    getByText('Opentrons Flex').click()
-    let next = getByRole('button', { name: 'Next' })
-    next.click()
+    fireEvent.click(screen.getByText('Opentrons Flex'))
+    let next = screen.getByRole('button', { name: 'Next' })
+    fireEvent.click(next)
     //  add protocol name
-    getByText('Step 1 / 7')
-    const inputField = getByLabelText('MetadataTile_protocolName')
+    screen.getByText('Step 1 / 7')
+    const inputField = screen.getByLabelText('MetadataTile_protocolName')
     fireEvent.change(inputField, { target: { value: 'mockName' } })
-    next = getByRole('button', { name: 'Next' })
-    next.click()
-    getByText('Step 2 / 7')
+    next = screen.getByRole('button', { name: 'Next' })
+    fireEvent.click(next)
+    screen.getByText('Step 2 / 7')
     //  select flex pipette
-    getByLabelText('EquipmentOption_flex_Flex 1-Channel 50 μL').click()
-    next = getByRole('button', { name: 'Next' })
-    next.click()
-    getByText('Step 3 / 7')
+    fireEvent.click(
+      screen.getByLabelText('EquipmentOption_flex_Flex 1-Channel 50 μL')
+    )
+    next = screen.getByRole('button', { name: 'Next' })
+    fireEvent.click(next)
+    screen.getByText('Step 3 / 7')
     //  select flex 200uL tipracks
-    getByLabelText('EquipmentOption_flex_200uL Flex tipracks').click()
-    next = getByRole('button', { name: 'Next' })
-    next.click()
-    getByText('Step 4 / 7')
+    fireEvent.click(
+      screen.getByLabelText('EquipmentOption_flex_200uL Flex tipracks')
+    )
+    next = screen.getByRole('button', { name: 'Next' })
+    fireEvent.click(next)
+    screen.getByText('Step 4 / 7')
     //  select 2nd pipette
-    getByLabelText('EquipmentOption_flex_Flex 1-Channel 50 μL').click()
-    next = getByRole('button', { name: 'Next' })
-    next.click()
+    fireEvent.click(
+      screen.getByLabelText('EquipmentOption_flex_Flex 1-Channel 50 μL')
+    )
+    next = screen.getByRole('button', { name: 'Next' })
+    fireEvent.click(next)
     //  select custom tip
-    getByText('Step 5 / 7')
-    getByLabelText('PipetteTipsTile_customTipButton').click()
-    getByLabelText('EquipmentOption_flex_Custom').click()
-    next = getByRole('button', { name: 'Next' })
-    next.click()
-    getByText('Step 6 / 7')
+    screen.getByText('Step 5 / 7')
+    fireEvent.click(screen.getByLabelText('PipetteTipsTile_customTipButton'))
+    fireEvent.click(screen.getByLabelText('EquipmentOption_flex_Custom'))
+    next = screen.getByRole('button', { name: 'Next' })
+    fireEvent.click(next)
+    screen.getByText('Step 6 / 7')
     //  select a staging area
-    getByText('Staging area slots')
-    next = getByRole('button', { name: 'Next' })
-    next.click()
-    getByText('Step 7 / 7')
+    screen.getByText('Staging area slots')
+    next = screen.getByRole('button', { name: 'Next' })
+    fireEvent.click(next)
+    screen.getByText('Step 7 / 7')
     //  select gripper and waste chute
-    getByLabelText('EquipmentOption_flex_Gripper').click()
-    getByLabelText('EquipmentOption_flex_Waste Chute').click()
-    getByRole('button', { name: 'Review file details' }).click()
+    fireEvent.click(screen.getByLabelText('EquipmentOption_flex_Gripper'))
+    fireEvent.click(screen.getByLabelText('EquipmentOption_flex_Waste Chute'))
+    fireEvent.click(screen.getByRole('button', { name: 'Review file details' }))
     expect(mockCreateNewProtocol).toHaveBeenCalled()
     expect(mockCreatePipettes).toHaveBeenCalled()
     expect(mockCreateCustomLabwareDefAction).toHaveBeenCalled()

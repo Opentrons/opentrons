@@ -1,4 +1,5 @@
 import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
+import type { AddressableAreaName } from '../../deck'
 import type {
   Coordinates,
   MotorAxes,
@@ -77,23 +78,37 @@ export interface RetractAxisRunTimeCommand
   result?: {}
 }
 
+export interface MoveToAddressableAreaCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'moveToAddressableArea'
+  params: MoveToAddressableAreaParams
+}
+export interface MoveToAddressableAreaRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    MoveToAddressableAreaCreateCommand {
+  //  TODO(jr, 11/6/23): add to result type
+  result?: {}
+}
+
 export type GantryRunTimeCommand =
+  | HomeRunTimeCommand
+  | MoveRelativeRunTimeCommand
+  | MoveToAddressableAreaRunTimeCommand
+  | MoveToCoordinatesRunTimeCommand
   | MoveToSlotRunTimeCommand
   | MoveToWellRunTimeCommand
-  | MoveToCoordinatesRunTimeCommand
-  | MoveRelativeRunTimeCommand
-  | SavePositionRunTimeCommand
-  | HomeRunTimeCommand
   | RetractAxisRunTimeCommand
+  | SavePositionRunTimeCommand
 
 export type GantryCreateCommand =
+  | HomeCreateCommand
+  | MoveRelativeCreateCommand
+  | MoveToAddressableAreaCreateCommand
+  | MoveToCoordinatesCreateCommand
   | MoveToSlotCreateCommand
   | MoveToWellCreateCommand
-  | MoveToCoordinatesCreateCommand
-  | MoveRelativeCreateCommand
-  | SavePositionCreateCommand
-  | HomeCreateCommand
   | RetractAxisCreateCommand
+  | SavePositionCreateCommand
 interface MoveToSlotParams {
   pipetteId: string
   slotName: string
@@ -142,6 +157,7 @@ interface MoveRelativeParams {
 interface SavePositionParams {
   pipetteId: string // pipette to use in measurement
   positionId?: string // position ID, auto-assigned if left blank
+  failOnNotHomed?: boolean // Defaults to true if blank. Require every possible axis to be homed to save.
 }
 
 interface HomeParams {
@@ -151,4 +167,19 @@ interface HomeParams {
 
 interface RetractAxisParams {
   axis: MotorAxis
+}
+
+interface AddressableOffsetVector {
+  x: number
+  y: number
+  z: number
+}
+export interface MoveToAddressableAreaParams {
+  pipetteId: string
+  addressableAreaName: AddressableAreaName
+  offset: AddressableOffsetVector
+  speed?: number
+  minimumZHeight?: number
+  forceDirect?: boolean
+  stayAtHighestPossibleZ?: boolean
 }

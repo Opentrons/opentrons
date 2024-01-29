@@ -31,15 +31,14 @@ import {
   getProfileFormErrors,
 } from '../../steplist/formLevel/profileErrors'
 import { getMoveLabwareFormErrors } from '../../steplist/formLevel/moveLabwareFormErrors'
-import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
+import { getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 import * as featureFlagSelectors from '../../feature-flags/selectors'
-import { denormalizePipetteEntities } from '../utils'
+import { denormalizePipetteEntities, getHydratedForm } from '../utils'
 import {
   selectors as labwareDefSelectors,
   LabwareDefByDefURI,
 } from '../../labware-defs'
-import { i18n } from '../../localization'
 import { InstrumentGroup } from '@opentrons/components'
 import type {
   DropdownOption,
@@ -51,7 +50,6 @@ import type {
   LabwareEntity,
   LabwareEntities,
   ModuleEntities,
-  ModuleEntity,
   PipetteEntities,
 } from '@opentrons/step-generation'
 import type { FormWarning } from '../../steplist/formLevel'
@@ -230,11 +228,15 @@ const _getInitialDeckSetup = (
     (initialSetupStep && initialSetupStep.pipetteLocationUpdate) || {}
 
   // filtering only the additionalEquipmentEntities that are rendered on the deck
-  // which for now is wasteChute and stagingArea
+  // which for now is wasteChute, trashBin, and stagingArea
   const additionalEquipmentEntitiesOnDeck = Object.values(
     additionalEquipmentEntities
   ).reduce((aeEntities: AdditionalEquipmentEntities, ae) => {
-    if (ae.name === 'wasteChute' || ae.name === 'stagingArea') {
+    if (
+      ae.name === 'wasteChute' ||
+      ae.name === 'stagingArea' ||
+      ae.name === 'trashBin'
+    ) {
       aeEntities[ae.id] = ae
     }
     return aeEntities
@@ -373,7 +375,7 @@ export const getEquippedPipetteOptions: Selector<
   return reduce(
     pipettes,
     (acc: DropdownOption[], pipette: PipetteOnDeck, id: string) => {
-      const mountLabel = i18n.t(`form.pipette_mount_label.${pipette.mount}`)
+      const mountLabel = pipette.mount === 'left' ? '(L)' : '(R)'
       const nextOption = {
         name: pipettesSame
           ? `${_getPipetteDisplayName(pipette.name)} ${mountLabel}`
@@ -508,38 +510,6 @@ export const getBatchEditFormHasUnsavedChanges: Selector<
   boolean
 > = createSelector(getBatchEditFieldChanges, changes => !isEmpty(changes))
 
-const getModuleEntity = (state: InvariantContext, id: string): ModuleEntity => {
-  return state.moduleEntities[id]
-}
-
-// TODO: Ian 2019-01-25 type with hydrated form type, see #3161
-function _getHydratedForm(
-  rawForm: FormData,
-  invariantContext: InvariantContext
-): FormData {
-  const hydratedForm = mapValues(rawForm, (value, name) =>
-    hydrateField(invariantContext, name, value)
-  )
-  // TODO(IL, 2020-03-23): separate hydrated/denormalized fields from the other fields.
-  // It's confusing that pipette is an ID string before this,
-  // but a PipetteEntity object after this.
-  // For `moduleId` field, it would be surprising to be a ModuleEntity!
-  // Consider nesting all additional fields under 'meta' key,
-  // following what we're doing with 'module'.
-  // See #3161
-  hydratedForm.meta = {}
-
-  if (rawForm?.moduleId != null) {
-    // @ts-expect-error(sa, 2021-6-14): type this properly in #3161
-    hydratedForm.meta.module = getModuleEntity(
-      invariantContext,
-      rawForm.moduleId
-    )
-  }
-  // @ts-expect-error(sa, 2021-6-14):type this properly in #3161
-  return hydratedForm
-}
-
 // TODO type with hydrated form type
 const _formLevelErrors = (hydratedForm: FormData): StepFormErrors => {
   return getFormErrors(hydratedForm.stepType, hydratedForm)
@@ -653,7 +623,7 @@ export const getHydratedUnsavedForm: Selector<
   (unsavedForm, invariantContext) => {
     if (unsavedForm == null) return null
 
-    const hydratedForm = _getHydratedForm(unsavedForm, invariantContext)
+    const hydratedForm = getHydratedForm(unsavedForm, invariantContext)
 
     return hydratedForm ?? null
   }
@@ -699,7 +669,7 @@ export const getArgsAndErrorsByStepId: Selector<
     return reduce(
       stepForms,
       (acc, stepForm) => {
-        const hydratedForm = _getHydratedForm(stepForm, contextualState)
+        const hydratedForm = getHydratedForm(stepForm, contextualState)
 
         const errors = _formHasErrors(hydratedForm, contextualState)
         const nextStepData = !errors
@@ -753,7 +723,7 @@ export const getFormLevelWarningsForUnsavedForm: Selector<
   (unsavedForm, contextualState) => {
     if (!unsavedForm) return []
 
-    const hydratedForm = _getHydratedForm(unsavedForm, contextualState)
+    const hydratedForm = getHydratedForm(unsavedForm, contextualState)
 
     return getFormWarnings(unsavedForm.stepType, hydratedForm)
   }
@@ -768,7 +738,7 @@ export const getFormLevelWarningsPerStep: Selector<
     mapValues(forms, (form, stepId) => {
       if (!form) return []
 
-      const hydratedForm = _getHydratedForm(form, contextualState)
+      const hydratedForm = getHydratedForm(form, contextualState)
 
       return getFormWarnings(form.stepType, hydratedForm)
     })

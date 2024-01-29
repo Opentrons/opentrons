@@ -5,9 +5,9 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { DeckConfigurator, renderWithProviders } from '@opentrons/components'
 import {
   useDeckConfigurationQuery,
-  useCreateDeckConfigurationMutation,
+  useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
-import { TRASH_BIN_LOAD_NAME } from '@opentrons/shared-data'
+import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
 import { DeckFixtureSetupInstructionsModal } from '../../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
@@ -16,8 +16,9 @@ import { DeckConfigurationEditor } from '..'
 
 import type { UseQueryResult } from 'react-query'
 import type { DeckConfiguration } from '@opentrons/shared-data'
+import { fireEvent, screen } from '@testing-library/react'
 
-const mockCreateDeckConfiguration = jest.fn()
+const mockUpdateDeckConfiguration = jest.fn()
 const mockGoBack = jest.fn()
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
@@ -29,9 +30,8 @@ jest.mock('react-router-dom', () => {
 
 const mockDeckConfig = [
   {
-    fixtureId: 'mockFixtureIdC3',
-    fixtureLocation: 'C3',
-    loadName: TRASH_BIN_LOAD_NAME,
+    cutoutId: 'cutoutC3',
+    cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
   },
 ]
 
@@ -56,8 +56,8 @@ const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFu
 const mockDeckConfigurationDiscardChangesModal = DeckConfigurationDiscardChangesModal as jest.MockedFunction<
   typeof DeckConfigurationDiscardChangesModal
 >
-const mockUseCreateDeckConfigurationMutation = useCreateDeckConfigurationMutation as jest.MockedFunction<
-  typeof useCreateDeckConfigurationMutation
+const mockUseUpdateDeckConfigurationMutation = useUpdateDeckConfigurationMutation as jest.MockedFunction<
+  typeof useUpdateDeckConfigurationMutation
 >
 
 const render = () => {
@@ -83,8 +83,8 @@ describe('DeckConfigurationEditor', () => {
     mockDeckConfigurationDiscardChangesModal.mockReturnValue(
       <div>mock DeckConfigurationDiscardChangesModal</div>
     )
-    when(mockUseCreateDeckConfigurationMutation).mockReturnValue({
-      createDeckConfiguration: mockCreateDeckConfiguration,
+    when(mockUseUpdateDeckConfigurationMutation).mockReturnValue({
+      updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
   })
 
@@ -93,38 +93,38 @@ describe('DeckConfigurationEditor', () => {
   })
 
   it('should render text, button and DeckConfigurator', () => {
-    const [{ getByText }] = render()
-    getByText('Deck configuration')
-    getByText('Setup Instructions')
-    getByText('Confirm')
-    getByText('mock DeckConfigurator')
+    render()
+    screen.getByText('Deck configuration')
+    screen.getByText('Setup Instructions')
+    screen.getByText('Confirm')
+    screen.getByText('mock DeckConfigurator')
   })
 
   it('should display setup instructions modal when tapping setup instructions button', () => {
-    const [{ getByText }] = render()
-    getByText('Setup Instructions').click()
-    getByText('mock DeckFixtureSetupInstructionsModal')
+    render()
+    fireEvent.click(screen.getByText('Setup Instructions'))
+    screen.getByText('mock DeckFixtureSetupInstructionsModal')
   })
 
   it('should call a mock function when tapping confirm', () => {
     // (kk:10/26/2023)
     // Once get approval, I will be able to update this case
-    // const [{ getByText }] = render()
-    // getByText('Confirm').click()
+    // render()
+    // screen.getByText('Confirm').click()
     // expect(mockUpdateDeckConfiguration).toHaveBeenCalled()
   })
 
   it('should call a mock function when tapping back button if there is no change', () => {
-    const [{ getByTestId }] = render()
-    getByTestId('ChildNavigation_Back_Button').click()
+    render()
+    fireEvent.click(screen.getByTestId('ChildNavigation_Back_Button'))
     expect(mockGoBack).toHaveBeenCalled()
   })
 
   it('should render modal when tapping back button if there is a change', () => {
     // (kk:10/26/2023)
     // Once get approval, I will be able to update this case
-    // const [{ getByTestId }] = render()
-    // getByTestId('ChildNavigation_Back_Button').click()
+    // render()
+    // screen.getByTestId('ChildNavigation_Back_Button').click()
     // expect(mockGoBack).toHaveBeenCalled()
   })
 })

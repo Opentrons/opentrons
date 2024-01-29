@@ -326,19 +326,25 @@ action_allowed_specs: List[ActionAllowedSpec] = [
     # play is allowed if the engine is idle
     ActionAllowedSpec(
         subject=get_command_view(queue_status=QueueStatus.SETUP),
-        action=PlayAction(requested_at=datetime(year=2021, month=1, day=1)),
+        action=PlayAction(
+            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
+        ),
         expected_error=None,
     ),
     # play is allowed if engine is idle, even if door is blocking
     ActionAllowedSpec(
         subject=get_command_view(is_door_blocking=True, queue_status=QueueStatus.SETUP),
-        action=PlayAction(requested_at=datetime(year=2021, month=1, day=1)),
+        action=PlayAction(
+            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
+        ),
         expected_error=None,
     ),
     # play is allowed if the engine is paused
     ActionAllowedSpec(
         subject=get_command_view(queue_status=QueueStatus.PAUSED),
-        action=PlayAction(requested_at=datetime(year=2021, month=1, day=1)),
+        action=PlayAction(
+            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
+        ),
         expected_error=None,
     ),
     # pause is allowed if the engine is running
@@ -369,13 +375,17 @@ action_allowed_specs: List[ActionAllowedSpec] = [
         subject=get_command_view(
             is_door_blocking=True, queue_status=QueueStatus.PAUSED
         ),
-        action=PlayAction(requested_at=datetime(year=2021, month=1, day=1)),
+        action=PlayAction(
+            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
+        ),
         expected_error=errors.RobotDoorOpenError,
     ),
     # play is disallowed if stop has been requested
     ActionAllowedSpec(
         subject=get_command_view(run_result=RunResult.STOPPED),
-        action=PlayAction(requested_at=datetime(year=2021, month=1, day=1)),
+        action=PlayAction(
+            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
+        ),
         expected_error=errors.RunStoppedError,
     ),
     # pause is disallowed if stop has been requested

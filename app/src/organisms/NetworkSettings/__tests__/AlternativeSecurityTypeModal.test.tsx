@@ -1,5 +1,5 @@
 import * as React from 'react'
-
+import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
@@ -44,13 +44,13 @@ describe('AlternativeSecurityTypeModal', () => {
   it('should call mock function when tapping close button', () => {
     const [{ getByLabelText }] = render(props)
     const button = getByLabelText('closeIcon')
-    button.click()
+    fireEvent.click(button)
     expect(mockFunc).toHaveBeenCalled()
   })
   it('should call mock function when tapping connect via usb button', () => {
     const [{ getByText }] = render(props)
     const button = getByText('Connect via USB')
-    button.click()
+    fireEvent.click(button)
     expect(mockFunc).toHaveBeenCalled()
     expect(mockPush).toHaveBeenCalledWith('/network-setup/usb')
   })

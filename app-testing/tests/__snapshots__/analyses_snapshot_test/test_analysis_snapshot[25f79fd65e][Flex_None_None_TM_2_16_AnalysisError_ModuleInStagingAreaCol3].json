@@ -1,0 +1,625 @@
+{
+  "commands": [
+    {
+      "commandType": "home",
+      "params": {},
+      "result": {},
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadLabware",
+      "params": {
+        "loadName": "nest_1_reservoir_290ml",
+        "location": {
+          "addressableAreaName": "C4"
+        },
+        "namespace": "opentrons",
+        "version": 1
+      },
+      "result": {
+        "definition": {
+          "allowedRoles": [],
+          "brand": {
+            "brand": "NEST",
+            "brandId": [
+              "360206",
+              "360266"
+            ],
+            "links": [
+              "https://www.nest-biotech.com/reagent-reserviors"
+            ]
+          },
+          "cornerOffsetFromSlot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "dimensions": {
+            "xDimension": 127.76,
+            "yDimension": 85.47,
+            "zDimension": 44.4
+          },
+          "gripperOffsets": {},
+          "groups": [
+            {
+              "metadata": {
+                "wellBottomShape": "v"
+              },
+              "wells": [
+                "A1"
+              ]
+            }
+          ],
+          "metadata": {
+            "displayCategory": "reservoir",
+            "displayName": "NEST 1 Well Reservoir 290 mL",
+            "displayVolumeUnits": "mL",
+            "tags": []
+          },
+          "namespace": "opentrons",
+          "ordering": [
+            [
+              "A1"
+            ]
+          ],
+          "parameters": {
+            "format": "trough",
+            "isMagneticModuleCompatible": false,
+            "isTiprack": false,
+            "loadName": "nest_1_reservoir_290ml",
+            "quirks": [
+              "centerMultichannelOnWells",
+              "touchTipDisabled"
+            ]
+          },
+          "schemaVersion": 2,
+          "stackingOffsetWithLabware": {},
+          "stackingOffsetWithModule": {},
+          "version": 1,
+          "wells": {
+            "A1": {
+              "depth": 39.55,
+              "shape": "rectangular",
+              "totalLiquidVolume": 290000,
+              "x": 63.88,
+              "xDimension": 106.8,
+              "y": 42.74,
+              "yDimension": 71.2,
+              "z": 4.85
+            }
+          }
+        }
+      },
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadModule",
+      "params": {
+        "location": {
+          "slotName": "C3"
+        },
+        "model": "temperatureModuleV2"
+      },
+      "result": {
+        "definition": {
+          "calibrationPoint": {
+            "x": 11.7,
+            "y": 8.75,
+            "z": 80.09
+          },
+          "compatibleWith": [
+            "temperatureModuleV1"
+          ],
+          "dimensions": {
+            "bareOverallHeight": 84.0,
+            "overLabwareHeight": 0.0
+          },
+          "displayName": "Temperature Module GEN2",
+          "gripperOffsets": {
+            "default": {
+              "dropOffset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 1.0
+              },
+              "pickUpOffset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            }
+          },
+          "labwareOffset": {
+            "x": -1.45,
+            "y": -0.15,
+            "z": 80.09
+          },
+          "model": "temperatureModuleV2",
+          "moduleType": "temperatureModuleType",
+          "otSharedSchema": "module/schemas/2",
+          "quirks": [],
+          "slotTransforms": {
+            "ot2_short_trash": {
+              "3": {
+                "labwareOffset": [
+                  [
+                    -1,
+                    -0.15,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              "6": {
+                "labwareOffset": [
+                  [
+                    -1,
+                    -0.15,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              "9": {
+                "labwareOffset": [
+                  [
+                    -1,
+                    -0.15,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "ot2_standard": {
+              "3": {
+                "labwareOffset": [
+                  [
+                    -1,
+                    -0.3,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              "6": {
+                "labwareOffset": [
+                  [
+                    -1,
+                    -0.3,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              "9": {
+                "labwareOffset": [
+                  [
+                    -1,
+                    -0.3,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "ot3_standard": {
+              "A1": {
+                "labwareOffset": [
+                  [
+                    -71.09,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0.15,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    1,
+                    1.45
+                  ]
+                ]
+              },
+              "A3": {
+                "labwareOffset": [
+                  [
+                    -71.09,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0.15,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    1,
+                    1.45
+                  ]
+                ]
+              },
+              "B1": {
+                "labwareOffset": [
+                  [
+                    -71.09,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0.15,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    1,
+                    1.45
+                  ]
+                ]
+              },
+              "B3": {
+                "labwareOffset": [
+                  [
+                    -71.09,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0.15,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    1,
+                    1.45
+                  ]
+                ]
+              },
+              "C1": {
+                "labwareOffset": [
+                  [
+                    -71.09,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0.15,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    1,
+                    1.45
+                  ]
+                ]
+              },
+              "C3": {
+                "labwareOffset": [
+                  [
+                    -71.09,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0.15,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    1,
+                    1.45
+                  ]
+                ]
+              },
+              "D1": {
+                "labwareOffset": [
+                  [
+                    -71.09,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0.15,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    1,
+                    1.45
+                  ]
+                ]
+              },
+              "D3": {
+                "labwareOffset": [
+                  [
+                    -71.09,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0.15,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    1,
+                    1.45
+                  ]
+                ]
+              }
+            }
+          }
+        },
+        "model": "temperatureModuleV2"
+      },
+      "status": "succeeded"
+    }
+  ],
+  "config": {
+    "apiVersion": [
+      2,
+      16
+    ],
+    "protocolType": "python"
+  },
+  "errors": [
+    {
+      "detail": "DeckConflictError [line 17]: nest_1_reservoir_290ml in slot C4 prevents temperatureModuleV2 from using slot C3.",
+      "errorCode": "4000",
+      "errorInfo": {},
+      "errorType": "ExceptionInProtocolError",
+      "wrappedErrors": [
+        {
+          "detail": "opentrons.motion_planning.deck_conflict.DeckConflictError: nest_1_reservoir_290ml in slot C4 prevents temperatureModuleV2 from using slot C3.",
+          "errorCode": "4000",
+          "errorInfo": {
+            "args": "('nest_1_reservoir_290ml in slot C4 prevents temperatureModuleV2 from using slot C3.',)",
+            "class": "DeckConflictError",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 69, in run_python\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_None_None_TM_2_16_AnalysisError_ModuleInStagingAreaCol3.py\", line 17, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line 383, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/protocol_context.py\", line 779, in load_module\n    module_core = self._core.load_module(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/protocol.py\", line 414, in load_module\n    deck_conflict.check(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/deck_conflict.py\", line 185, in check\n    wrapped_deck_conflict.check(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/motion_planning/deck_conflict.py\", line 224, in check\n    raise DeckConflictError(\n"
+          },
+          "errorType": "PythonException",
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "name": "Flex_None_None_TM_2_16_AnalysisError_ModuleInStagingAreaCol3.py",
+      "role": "main"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    }
+  ],
+  "labware": [
+    {
+      "definitionUri": "opentrons/nest_1_reservoir_290ml/1",
+      "loadName": "nest_1_reservoir_290ml",
+      "location": {
+        "addressableAreaName": "C4"
+      }
+    }
+  ],
+  "liquids": [],
+  "metadata": {
+    "author": "Derek Maggio <derek.maggio@opentrons.com>",
+    "protocolName": "QA Protocol - Analysis Error - Module in Staging Area Column 3"
+  },
+  "modules": [
+    {
+      "location": {
+        "slotName": "C3"
+      },
+      "model": "temperatureModuleV2"
+    }
+  ],
+  "pipettes": [],
+  "robotType": "OT-3 Standard"
+}
