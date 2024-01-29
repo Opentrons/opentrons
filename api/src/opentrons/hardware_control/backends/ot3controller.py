@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from functools import wraps
 import logging
 from copy import deepcopy
+from numpy import isclose
 from typing import (
     Any,
     Awaitable,
@@ -182,6 +183,7 @@ from opentrons_shared_data.errors.exceptions import (
     EStopNotPresentError,
     PipetteOverpressureError,
     FirmwareUpdateRequiredError,
+    FailedGripperPickupError,
 )
 
 from .subsystem_manager import SubsystemManager
@@ -853,6 +855,7 @@ class OT3Controller(FlexBackend):
     async def gripper_grip_jaw(
         self,
         duty_cycle: float,
+        expected_displacement: float,  # not used on real hardware
         stop_condition: HWStopCondition = HWStopCondition.none,
         stay_engaged: bool = True,
     ) -> None:
@@ -1474,3 +1477,69 @@ class OT3Controller(FlexBackend):
 
     def add_estop_callback(self, cb: HardwareEventHandler) -> HardwareEventUnsubscriber:
         return self._estop_state_machine.add_listener(cb)
+
+    def check_gripper_position_within_bounds(
+        self,
+        expected_grip_width: float,
+        grip_width_uncertainty_wider: float,
+        grip_width_uncertainty_narrower: float,
+        jaw_width: float,
+        max_allowed_grip_error: float,
+        hard_limit_lower: float,
+        hard_limit_upper: float,
+    ) -> None:
+        """
+        Check if the gripper is at the expected location.
+
+        While this doesn't seem like it belongs here, it needs to act differently
+        when we're simulating, so it does.
+        """
+        expected_gripper_position_min = (
+            expected_grip_width - grip_width_uncertainty_narrower
+        )
+        expected_gripper_position_max = (
+            expected_grip_width + grip_width_uncertainty_wider
+        )
+        current_gripper_position = jaw_width
+        if isclose(current_gripper_position, hard_limit_lower):
+            raise FailedGripperPickupError(
+                message="Failed to grip: jaws all the way closed",
+                details={
+                    "failure-type": "jaws-all-the-way-closed",
+                    "actual-jaw-width": current_gripper_position,
+                },
+            )
+        if isclose(current_gripper_position, hard_limit_upper):
+            raise FailedGripperPickupError(
+                message="Failed to grip: jaws all the way open",
+                details={
+                    "failure-type": "jaws-all-the-way-open",
+                    "actual-jaw-width": current_gripper_position,
+                },
+            )
+        if (
+            current_gripper_position - expected_gripper_position_min
+            < -max_allowed_grip_error
+        ):
+            raise FailedGripperPickupError(
+                message="Failed to grip: jaws closed too far",
+                details={
+                    "failure-type": "jaws-more-closed-than-expected",
+                    "lower-bound-labware-width": expected_grip_width
+                    - grip_width_uncertainty_narrower,
+                    "actual-jaw-width": current_gripper_position,
+                },
+            )
+        if (
+            current_gripper_position - expected_gripper_position_max
+            > max_allowed_grip_error
+        ):
+            raise FailedGripperPickupError(
+                message="Failed to grip: jaws could not close far enough",
+                details={
+                    "failure-type": "jaws-more-open-than-expected",
+                    "upper-bound-labware-width": expected_grip_width
+                    - grip_width_uncertainty_narrower,
+                    "actual-jaw-width": current_gripper_position,
+                },
+            )

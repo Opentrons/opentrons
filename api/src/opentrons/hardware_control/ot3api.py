@@ -35,7 +35,6 @@ from opentrons_shared_data.pipette import (
 from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.errors.exceptions import (
     StallOrCollisionDetectedError,
-    FailedGripperPickupError,
 )
 
 from opentrons import types as top_types
@@ -838,18 +837,26 @@ class OT3API(
             axes = list(Axis.ot3_mount_axes())
         await self.home(axes)
 
-    async def home_gripper_jaw(self) -> None:
-        """
-        Home the jaw of the gripper.
-        """
-        try:
-            gripper = self._gripper_handler.get_gripper()
-            self._log.info("Homing gripper jaw.")
-
-            dc = self._gripper_handler.get_duty_cycle_by_grip_force(
-                gripper.default_home_force
+    async def _do_home_and_maybe_calibrate_gripper_jaw(self) -> None:
+        gripper = self._gripper_handler.get_gripper()
+        self._log.info("Homing gripper jaw.")
+        dc = self._gripper_handler.get_duty_cycle_by_grip_force(
+            gripper.default_home_force
+        )
+        await self._ungrip(duty_cycle=dc)
+        if not gripper.has_jaw_width_calibration:
+            self._log.info("Calibrating gripper jaw.")
+            await self._grip(
+                duty_cycle=dc, expected_displacement=gripper.max_jaw_displacement()
             )
+            jaw_at_closed = (await self._cache_encoder_position())[Axis.G]
+            gripper.update_jaw_open_position_from_closed_position(jaw_at_closed)
             await self._ungrip(duty_cycle=dc)
+
+    async def home_gripper_jaw(self) -> None:
+        """Home the jaw of the gripper."""
+        try:
+            await self._do_home_and_maybe_calibrate_gripper_jaw()
         except GripperNotPresentError:
             pass
 
@@ -1305,23 +1312,32 @@ class OT3API(
         except GripperNotPresentError:
             pass
 
-    def raise_error_if_gripper_pickup_failed(self, labware_width: float) -> None:
-        """Ensure that a gripper pickup succeeded."""
+    def raise_error_if_gripper_pickup_failed(
+        self,
+        expected_grip_width: float,
+        grip_width_uncertainty_wider: float,
+        grip_width_uncertainty_narrower: float,
+    ) -> None:
+        """Ensure that a gripper pickup succeeded.
+
+        The labware width is the width of the labware at the point of the grip, as closely as it is known.
+        The uncertainty values should be specified to handle the case where the labware definition does not
+        provide that information.
+
+        Both values should be positive; their direcitonal sense is determined by which argument they are.
+        """
         # check if the gripper is at an acceptable position after attempting to
         #  pick up labware
-        assert self.hardware_gripper
-        expected_gripper_position = labware_width
-        current_gripper_position = self.hardware_gripper.jaw_width
-        if (
-            abs(current_gripper_position - expected_gripper_position)
-            > self.hardware_gripper.max_allowed_grip_error
-        ):
-            raise FailedGripperPickupError(
-                details={
-                    "expected jaw width": expected_gripper_position,
-                    "actual jaw width": current_gripper_position,
-                },
-            )
+        gripper = self._gripper_handler.get_gripper()
+        self._backend.check_gripper_position_within_bounds(
+            expected_grip_width,
+            grip_width_uncertainty_wider,
+            grip_width_uncertainty_narrower,
+            gripper.jaw_width,
+            gripper.max_allowed_grip_error,
+            gripper.max_jaw_width,
+            gripper.min_jaw_width,
+        )
 
     def gripper_jaw_can_home(self) -> bool:
         return self._gripper_handler.is_ready_for_jaw_home()
@@ -1629,11 +1645,15 @@ class OT3API(
         self._backend.update_feature_flags(self._feature_flags)
 
     @ExecutionManagerProvider.wait_for_running
-    async def _grip(self, duty_cycle: float, stay_engaged: bool = True) -> None:
+    async def _grip(
+        self, duty_cycle: float, expected_displacement: float, stay_engaged: bool = True
+    ) -> None:
         """Move the gripper jaw inward to close."""
         try:
             await self._backend.gripper_grip_jaw(
-                duty_cycle=duty_cycle, stay_engaged=stay_engaged
+                duty_cycle=duty_cycle,
+                expected_displacement=self._gripper_handler.get_gripper().max_jaw_displacement(),
+                stay_engaged=stay_engaged,
             )
             await self._cache_encoder_position()
             self._gripper_handler.set_jaw_state(await self._backend.get_jaw_state())
@@ -1677,7 +1697,11 @@ class OT3API(
         dc = self._gripper_handler.get_duty_cycle_by_grip_force(
             force_newtons or self._gripper_handler.get_gripper().default_grip_force
         )
-        await self._grip(duty_cycle=dc, stay_engaged=stay_engaged)
+        await self._grip(
+            duty_cycle=dc,
+            expected_displacement=self._gripper_handler.get_gripper().max_jaw_displacement(),
+            stay_engaged=stay_engaged,
+        )
 
     async def ungrip(self, force_newtons: Optional[float] = None) -> None:
         """
