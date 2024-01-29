@@ -1108,7 +1108,8 @@ async def test_gripper_action_works_with_gripper(
         await ot3_hardware.grip(5.0)
     gripper = managed_obj._gripper_handler._gripper
     assert gripper
-    gripper._jaw_max_offset = None if needs_calibration else 5
+    calibration_offset = 5
+    gripper._jaw_max_offset = None if needs_calibration else calibration_offset
     await ot3_hardware.home_gripper_jaw()
     if needs_calibration:
         assert mock_ungrip.call_count == 2
@@ -1128,8 +1129,12 @@ async def test_gripper_action_works_with_gripper(
     mock_grip.reset_mock()
     mock_ungrip.reset_mock()
     await ot3_hardware.grip(5.0)
+    expected_displacement = 16.0
+    if not needs_calibration:
+        expected_displacement += calibration_offset / 2
     mock_grip.assert_called_once_with(
-        gc.duty_cycle_by_force(5.0, gripper_config.grip_force_profile),
+        duty_cycle=gc.duty_cycle_by_force(5.0, gripper_config.grip_force_profile),
+        expected_displacement=expected_displacement,
         stay_engaged=True,
     )
 
