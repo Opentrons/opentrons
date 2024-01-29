@@ -230,36 +230,21 @@ class ProtocolContext(CommandPublisher):
     @property
     @requires_version(2, 0)
     def max_speeds(self) -> AxisMaxSpeeds:
-        """Per-axis speed limits when moving this instrument.
+        """Per-axis speed limits for moving instruments.
 
-        Changing this value changes the speed limit for each non-plunger
-        axis of the robot, when moving this pipette. Note that this does
-        only sets a limit on how fast movements can be; movements can
-        still be slower than this. However, it is useful if you require
-        the robot to move much more slowly than normal when using this
-        pipette.
+        Changing values within this property sets the speed limit for each non-plunger
+        axis of the robot. Note that this property only sets upper limits on movement
+        speed.
 
-        This is a dictionary mapping string names of axes to float values
-        limiting speeds. To change a speed, set that axis's value. To
+        This property is a dict mapping string names of axes to float values
+        of maximum speeds in mm/s. To change a speed, set that axis's value. To
         reset an axis's speed to default, delete the entry for that axis
         or assign it to ``None``.
 
-        For instance,
-
-        .. code-block:: py
-
-            def run(protocol):
-                protocol.comment(str(right.max_speeds))  # '{}' - all default
-                protocol.max_speeds['A'] = 10  # limit max speed of
-                                               # right pipette Z to 10mm/s
-                del protocol.max_speeds['A']  # reset to default
-                protocol.max_speeds['X'] = 10  # limit max speed of x to
-                                               # 10 mm/s
-                protocol.max_speeds['X'] = None  # reset to default
+        See :ref:`axis_speed_limits` for examples.
 
         .. caution::
-            This property is not yet supported on
-            :ref:`API version <v2-versioning>` 2.14 or higher.
+            This property is not yet supported in API version 2.14 or higher.
         """
         if self._api_version >= ENGINE_CORE_API_VERSION:
             # TODO(mc, 2023-02-23): per-axis max speeds not yet supported on the engine
@@ -333,19 +318,18 @@ class ProtocolContext(CommandPublisher):
         location: Union[DeckLocation, OffDeckType],
         label: Optional[str] = None,
     ) -> Labware:
-        """Specify the presence of a piece of labware on the OT2 deck.
+        """Specify the presence of a labware on the deck.
 
-        This function loads the labware definition specified by `labware_def`
-        to the location specified by `location`.
+        This function loads the labware definition specified by ``labware_def``
+        to the location specified by ``location``.
 
-        :param labware_def: The labware definition to load
+        :param labware_def: The labware's definition.
         :param location: The slot into which to load the labware,
                          such as ``1``, ``"1"``, or ``"D1"``. See :ref:`deck-slots`.
         :type location: int or str or :py:obj:`OFF_DECK`
-        :param str label: An optional special name to give the labware. If
-                          specified, this is the name the labware will appear
-                          as in the run log and the calibration view in the
-                          Opentrons app.
+        :param str label: An optional special name to give the labware. If specified,
+            this is how the labware will appear in the run log, Labware Position
+            Check, and elsewhere in the Opentrons App and on the touchscreen.
         """
         load_params = self._core.add_labware_definition(labware_def)
 
@@ -369,7 +353,7 @@ class ProtocolContext(CommandPublisher):
     ) -> Labware:
         """Load a labware onto a location.
 
-        For labware already defined by Opentrons, this is a convenient way
+        For Opentrons-verified labware, this is a convenient way
         to collapse the two stages of labware initialization (creating
         the labware and adding it to the protocol) into one.
 
@@ -377,8 +361,8 @@ class ProtocolContext(CommandPublisher):
         later in the protocol.
 
         :param str load_name: A string to use for looking up a labware definition.
-            You can find the ``load_name`` for any standard labware on the Opentrons
-            `Labware Library <https://labware.opentrons.com>`_.
+            You can find the ``load_name`` for any Opentrons-verified labware on the
+            `Labware Library <https://labware.opentrons.com>`__.
 
         :param location: Either a :ref:`deck slot <deck-slots>`,
             like ``1``, ``"1"``, or ``"D1"``, or the special value :py:obj:`OFF_DECK`.
@@ -388,25 +372,30 @@ class ProtocolContext(CommandPublisher):
 
         :type location: int or str or :py:obj:`OFF_DECK`
 
-        :param str label: An optional special name to give the labware. If specified, this
-            is the name the labware will appear as in the run log and the calibration
-            view in the Opentrons app.
+        :param str label: An optional special name to give the labware. If specified,
+            this is how the labware will appear in the run log, Labware Position
+            Check, and elsewhere in the Opentrons App and on the touchscreen.
 
         :param str namespace: The namespace that the labware definition belongs to.
-            If unspecified, will search both:
+            If unspecified, the API will automatically search two namespaces:
 
-              * ``"opentrons"``, to load standard Opentrons labware definitions.
-              * ``"custom_beta"``, to load custom labware definitions created with the
-                `Custom Labware Creator <https://labware.opentrons.com/create>`_.
+              - ``"opentrons"``, to load standard Opentrons labware definitions.
+              - ``"custom_beta"``, to load custom labware definitions created with the
+                `Custom Labware Creator <https://labware.opentrons.com/create>`__.
 
             You might need to specify an explicit ``namespace`` if you have a custom
-            definition whose ``load_name`` is the same as an Opentrons standard
+            definition whose ``load_name`` is the same as an Opentrons-verified
             definition, and you want to explicitly choose one or the other.
 
         :param version: The version of the labware definition. You should normally
-            leave this unspecified to let the implementation choose a good default.
-        :param adapter: Load name of an adapter to load the labware on top of. The adapter
-            will be loaded from the same given namespace, but version will be automatically chosen.
+            leave this unspecified to let ``load_labware()`` choose a version
+            automatically.
+        :param adapter: An adapter to load the labware on top of. Accepts the same
+            values as the ``load_name`` parameter of :py:meth:`.load_adapter`. The
+            adapter will use the same namespace as the labware, and the API will
+            choose the adapter's version automatically.
+
+                        .. versionadded:: 2.15
         """
         if isinstance(location, OffDeckType) and self._api_version < APIVersion(2, 15):
             raise APIVersionError(
@@ -527,7 +516,7 @@ class ProtocolContext(CommandPublisher):
     def load_waste_chute(
         self,
     ) -> WasteChute:
-        """Load the waste chute on the deck.
+        """Load the waste chute on the deck of a Flex.
 
         See :ref:`configure-waste-chute` for details, including the deck configuration
         variants of the waste chute.
@@ -650,7 +639,9 @@ class ProtocolContext(CommandPublisher):
         pick_up_offset: Optional[Mapping[str, float]] = None,
         drop_offset: Optional[Mapping[str, float]] = None,
     ) -> None:
-        """Move a loaded labware to a new location. See :ref:`moving-labware` for more details.
+        """Move a loaded labware to a new location. 
+        
+        See :ref:`moving-labware` for more details.
 
         :param labware: The labware to move. It should be a labware already loaded
                         using :py:meth:`load_labware`.
@@ -666,9 +657,9 @@ class ProtocolContext(CommandPublisher):
 
         :param use_gripper: Whether to use the Flex Gripper for this movement.
 
-                * If ``True``, will use the gripper to perform an automatic
+                * If ``True``, use the gripper to perform an automatic
                   movement. This will raise an error on an OT-2 protocol.
-                * If ``False``, will pause protocol execution until the user
+                * If ``False``, pause protocol execution until the user
                   performs the movement. Protocol execution remains paused until
                   the user presses **Confirm and resume**.
 
@@ -738,8 +729,8 @@ class ProtocolContext(CommandPublisher):
         context, which will be a different class depending on the kind of
         module loaded.
 
-        A map of deck positions to loaded modules can be accessed later
-        by using :py:attr:`loaded_modules`.
+        After loading modules, you can access a map of deck positions to loaded modules
+        with :py:attr:`loaded_modules`.
 
         :param str module_name: The name or model of the module.
             See :ref:`available_modules` for possible values.
@@ -756,7 +747,7 @@ class ProtocolContext(CommandPublisher):
             .. versionchanged:: 2.15
                 You can now specify a deck slot as a coordinate, like ``"D1"``.
 
-        :param configuration: Configure a thermocycler to be in the ``semi`` position.
+        :param configuration: Configure a Thermocycler to be in the ``semi`` position.
             This parameter does not work. Do not use it.
 
             .. versionchanged:: 2.14
@@ -832,16 +823,15 @@ class ProtocolContext(CommandPublisher):
     def loaded_modules(self) -> Dict[int, ModuleTypes]:
         """Get the modules loaded into the protocol context.
 
-        This is a map of deck positions to modules loaded by previous calls
-        to :py:meth:`load_module`. It is not necessarily the same as the
-        modules attached to the robot - for instance, if the robot has a
-        Magnetic Module and a Temperature Module attached, but the protocol
-        has only loaded the Temperature Module with :py:meth:`load_module`,
-        only the Temperature Module will be present.
+        This is a map of deck positions to modules loaded by previous calls to
+        :py:meth:`load_module`. It does not reflect what modules are actually attached
+        to the robot. For example, if the robot has a Magnetic Module and a Temperature
+        Module attached, but the protocol has only loaded the Temperature Module with
+        :py:meth:`load_module`, only the Temperature Module will be included in
+        ``loaded_modules``.
 
-        :returns Dict[int, ModuleContext]: Dict mapping slot name to module
-                                           contexts. The elements may not be
-                                           ordered by slot number.
+        :returns: Dict mapping slot name to module contexts. The elements may not be
+            ordered by slot number.
         """
         return {
             core.get_deck_slot().as_int(): self._core_map.get(core)
@@ -951,17 +941,15 @@ class ProtocolContext(CommandPublisher):
         """Get the instruments that have been loaded into the protocol.
 
         This is a map of mount name to instruments previously loaded with
-        :py:meth:`load_instrument`. It is not necessarily the same as the
-        instruments attached to the robot - for instance, if the robot has
-        an instrument in both mounts but your protocol has only loaded one
-        of them with :py:meth:`load_instrument`, the unused one will not
-        be present.
+        :py:meth:`load_instrument`. It does not reflect what instruments are actually
+        installed on the robot. For example, if the robot has instruments installed on
+        both mounts but your protocol has only loaded one of them with
+        :py:meth:`load_instrument`, the unused one will not be included in
+        ``loaded_instruments``.
 
-        :returns: A dict mapping mount name
-                  (``'left'`` or ``'right'``)
-                  to the instrument in that mount.
-                  If a mount has no loaded instrument,
-                  that key will be missing from the dict.
+        :returns: A dict mapping mount name (``"left"`` or ``"right"``) to the
+            instrument in that mount. If a mount has no loaded instrument, that key
+            will be missing from the dict.
         """
         return {
             mount.name.lower(): instr
@@ -974,14 +962,13 @@ class ProtocolContext(CommandPublisher):
     def pause(self, msg: Optional[str] = None) -> None:
         """Pause execution of the protocol until it's resumed.
 
-        A human can resume the protocol through the Opentrons App.
+        A human can resume the protocol in the Opentrons App or on the touchscreen.
 
         This function returns immediately, but the next function call that
         is blocked by a paused robot (anything that involves moving) will
         not return until the protocol is resumed.
 
-        :param str msg: An optional message to show to connected clients. The
-            Opentrons App will show this in the run log.
+        :param str msg: An optional message to show in the run log entry for the pause step.
         """
         self._core.pause(msg=msg)
 
@@ -992,7 +979,6 @@ class ProtocolContext(CommandPublisher):
 
         .. deprecated:: 2.12
            The Python Protocol API supports no safe way for a protocol to resume itself.
-           See https://github.com/Opentrons/opentrons/issues/8209.
            If you're looking for a way for your protocol to resume automatically
            after a period of time, use :py:meth:`delay`.
         """
@@ -1138,9 +1124,9 @@ class ProtocolContext(CommandPublisher):
     @requires_version(2, 5)
     def set_rail_lights(self, on: bool) -> None:
         """
-        Controls the robot rail lights
+        Controls the robot's ambient lighting (rail lights).
 
-        :param bool on: If true, turn on rail lights; otherwise, turn off.
+        :param bool on: If ``True``, turn on the lights; otherwise, turn them off.
         """
         self._core.set_rail_lights(on=on)
 
@@ -1166,7 +1152,7 @@ class ProtocolContext(CommandPublisher):
     @property
     @requires_version(2, 5)
     def rail_lights_on(self) -> bool:
-        """Returns True if the rail lights are on"""
+        """Returns ``True`` if the robot's ambient lighting is on."""
         return self._core.get_rail_lights_on()
 
     @property
