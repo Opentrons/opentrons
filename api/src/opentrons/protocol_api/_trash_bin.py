@@ -2,7 +2,7 @@ from opentrons.types import DeckSlotName
 
 
 class TrashBin:
-    """Represents a Flex trash bin.
+    """Represents a Flex or OT-2 trash bin.
 
     See :py:meth:`.ProtocolContext.load_trash_bin`.
     """
