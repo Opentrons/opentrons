@@ -33,8 +33,6 @@ from ..types import (
     OnDeckLabwareLocation,
     AddressableAreaLocation,
     AddressableOffsetVector,
-    AddressableArea,
-    PotentialCutoutFixture,
 )
 from .config import Config
 from .labware import LabwareView
