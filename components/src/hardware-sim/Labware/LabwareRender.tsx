@@ -31,7 +31,7 @@ export interface LabwareRenderProps {
   /** Labware definition to render */
   definition: LabwareDefinition2
   /** Opional Prop for labware on heater shakers sitting on right side of the deck */
-  shouldRotateAdapterOrientation: boolean
+  shouldRotateAdapterOrientation?: boolean
   /** option to show well labels inside or outside of labware outline */
   wellLabelOption?: WellLabelOption
   /** wells to highlight */
