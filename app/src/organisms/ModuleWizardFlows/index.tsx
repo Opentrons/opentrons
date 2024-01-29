@@ -13,6 +13,7 @@ import {
   getModuleDisplayName,
   FLEX_CUTOUT_BY_SLOT_ID,
 } from '@opentrons/shared-data'
+
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { StyledText } from '../../atoms/text'
@@ -33,6 +34,7 @@ import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
 import { DetachProbe } from './DetachProbe'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type { SingleSlotCutoutFixtureId } from '@opentrons/shared-data'
@@ -110,7 +112,7 @@ export const ModuleWizardFlows = (
     setMonitorMaintenanceRunForDeletion,
   ] = React.useState<boolean>(false)
 
-  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
     enabled: createdMaintenanceRunId != null,
   })
