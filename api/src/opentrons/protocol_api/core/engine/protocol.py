@@ -154,6 +154,12 @@ class ProtocolCore(
         elif isinstance(disposal_location, WasteChute):
             # TODO(jbl 2024-01-25) hardcoding this specific addressable area should be refactored
             #   when analysis is fixed up
+            #
+            # We want to tell Protocol Engine that there's a waste chute in the waste chute location when it's loaded,
+            # so analysis can prevent the user from doing anything that would collide with it. At the same time, we
+            # do not want to create a false negative when it comes to addressable area conflict. We therefore use the
+            # addressable area `1ChannelWasteChute` because every waste chute cutout fixture provides it and it will
+            # provide the engine with the information it needs.
             self._engine_client.state.addressable_areas.raise_if_area_not_in_deck_configuration(
                 "1ChannelWasteChute"
             )
