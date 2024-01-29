@@ -18,7 +18,7 @@ import type { NotifyTopic } from '../redux/shell/types'
 
 export interface QueryOptionsWithPolling<TData, Error>
   extends UseQueryOptions<TData, Error> {
-  refetchInterval: number
+  refetchInterval: number | false
   forceHttpPolling?: boolean
 }
 
