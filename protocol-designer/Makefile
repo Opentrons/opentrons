@@ -35,7 +35,7 @@ clean:
 .PHONY: build
 build: export NODE_ENV := production
 build:
-	NODE_OPTIONS=--openssl-legacy-provider && webpack --profile
+	export NODE_OPTIONS=--openssl-legacy-provider && webpack --profile
 	git rev-parse HEAD > dist/.commit
 
 # development
@@ -51,7 +51,7 @@ benchmarks:
 .PHONY: dev
 dev: export NODE_ENV := development
 dev:
-	NODE_OPTIONS=--openssl-legacy-provider && webpack-dev-server --hot
+	export NODE_OPTIONS=--openssl-legacy-provider && webpack-dev-server --hot
 
 # production assets server
 .PHONY: serve
@@ -61,7 +61,7 @@ serve: all
 # end to end tests
 .PHONY: test-e2e
 test-e2e:
-	NODE_OPTIONS=--openssl-legacy-provider concurrently --no-color --kill-others --success first --names "protocol-designer-server,protocol-designer-tests" \
+	export NODE_OPTIONS=--openssl-legacy-provider concurrently --no-color --kill-others --success first --names "protocol-designer-server,protocol-designer-tests" \
 	"$(MAKE) dev CYPRESS=1" \
 	"wait-on http://localhost:8080/ && cypress run --browser chrome --headless --record false"
 
