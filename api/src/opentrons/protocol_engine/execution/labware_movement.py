@@ -34,6 +34,8 @@ from ..types import (
 if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 
+_GRIPPER_HOMED_POSITION_Z = 166.125  # Height of the center of the gripper critical point from the deck when homed
+
 
 # TODO (spp, 2022-10-20): name this GripperMovementHandler if it doesn't handle
 #  any non-gripper implementations
@@ -89,8 +91,16 @@ class LabwareMovementHandler:
     ) -> None:
         """Move a loaded labware from one location to another using gripper."""
         use_virtual_gripper = self._state_store.config.use_virtual_gripper
+
         if use_virtual_gripper:
+            # During Analysis we will pass in hard coded estimates for certain positions only accessible during execution
+            self._state_store.geometry.check_gripper_labware_tip_collision(
+                gripper_homed_position_z=_GRIPPER_HOMED_POSITION_Z,
+                labware_id=labware_id,
+                current_location=current_location,
+            )
             return
+
         ot3api = ensure_ot3_hardware(
             hardware_api=self._hardware_api,
             error_msg="Gripper is only available on Opentrons Flex",
@@ -110,6 +120,13 @@ class LabwareMovementHandler:
         # Retract all mounts
         await ot3api.home(axes=[Axis.Z_L, Axis.Z_R, Axis.Z_G])
         gripper_homed_position = await ot3api.gantry_position(mount=gripper_mount)
+
+        # Verify that no tip collisions will occur during the move
+        self._state_store.geometry.check_gripper_labware_tip_collision(
+            gripper_homed_position_z=gripper_homed_position.z,
+            labware_id=labware_id,
+            current_location=current_location,
+        )
 
         async with self._thermocycler_plate_lifter.lift_plate_for_labware_movement(
             labware_location=current_location
