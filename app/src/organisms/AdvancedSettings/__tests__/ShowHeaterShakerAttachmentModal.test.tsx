@@ -4,13 +4,19 @@ import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import { getIsHeaterShakerAttached } from '../../../redux/config'
+import {
+  getIsHeaterShakerAttached,
+  updateConfigValue,
+} from '../../../redux/config'
 import { ShowHeaterShakerAttachmentModal } from '../ShowHeaterShakerAttachmentModal'
 
 jest.mock('../../../redux/config')
 
 const mockGetIsHeaterShakerAttached = getIsHeaterShakerAttached as jest.MockedFunction<
   typeof getIsHeaterShakerAttached
+>
+const mockUpdateConfigValue = updateConfigValue as jest.MockedFunction<
+  typeof updateConfigValue
 >
 
 const render = () => {
@@ -20,8 +26,11 @@ const render = () => {
 }
 
 describe('ShowHeaterShakerAttachmentModal', () => {
-  it('renders the toggle button on when showing heater shaker modal as false', () => {
+  beforeEach(() => {
     mockGetIsHeaterShakerAttached.mockReturnValue(true)
+  })
+
+  it('renders the toggle button on when showing heater shaker modal as false', () => {
     render()
     screen.getByText('Confirm Heater-Shaker Module Attachment')
     screen.getByText(
@@ -40,5 +49,17 @@ describe('ShowHeaterShakerAttachmentModal', () => {
       name: 'show_heater_shaker_modal',
     })
     expect(toggleButton.getAttribute('aria-checked')).toBe('true')
+  })
+
+  it('should call mock function when clicking toggle button', () => {
+    render()
+    const toggleButton = screen.getByRole('switch', {
+      name: 'show_heater_shaker_modal',
+    })
+    fireEvent.click(toggleButton)
+    expect(mockUpdateConfigValue).toHaveBeenCalledWith(
+      'modules.heaterShaker.isAttached',
+      false
+    )
   })
 })

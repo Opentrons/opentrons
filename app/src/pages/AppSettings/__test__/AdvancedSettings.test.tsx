@@ -74,10 +74,6 @@ const mockGetIsLabwareOffsetCodeSnippetsOn = Config.getIsLabwareOffsetCodeSnippe
   typeof Config.getIsLabwareOffsetCodeSnippetsOn
 >
 
-const mockGetIsHeaterShakerAttached = Config.getIsHeaterShakerAttached as jest.MockedFunction<
-  typeof Config.getIsHeaterShakerAttached
->
-
 const mockGetPathToPythonOverride = Config.getPathToPythonOverride as jest.MockedFunction<
   typeof Config.getPathToPythonOverride
 >
