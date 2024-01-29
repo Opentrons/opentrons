@@ -11,8 +11,11 @@ from hardware_testing.data import ui, get_testing_data_directory
 from opentrons.hardware_control.types import InstrumentProbeType, OT3Mount, Axis
 
 from hardware_testing.gravimetric.measurement.scale import Scale
-
-from hardware_testing.gravimetric.measurement.record import GravimetricRecorder
+from .measurement.record import (
+    GravimetricRecorder,
+    GravimetricRecorderConfig,
+    GravimetricRecording,
+)
 from opentrons.protocol_api._types import OffDeckType
 
 from opentrons.protocol_api import ProtocolContext, Well, Labware
