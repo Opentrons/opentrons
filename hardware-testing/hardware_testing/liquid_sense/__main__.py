@@ -11,7 +11,6 @@ from hardware_testing.gravimetric import helpers, workarounds
 from hardware_testing.data.csv_report import CSVReport
 from hardware_testing.gravimetric.measurement.record import GravimetricRecorder
 from hardware_testing.gravimetric.measurement.scale import Scale
-from hardware_testing.gravimetric.execute import _load_scale
 from hardware_testing.drivers import asair_sensor
 from hardware_testing.data import (
     ui,
@@ -155,7 +154,7 @@ class RunArgs:
             tip_volumes = [args.tip]
 
         scale = Scale.build(simulate=_ctx.is_simulating())
-        recorder: GravimetricRecorder = _load_scale(
+        recorder: GravimetricRecorder = execute._load_scale(
             name, scale, run_id, pipette_tag, start_time, _ctx.is_simulating()
         )
         print(f"pipette_tag {pipette_tag}")
@@ -216,7 +215,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--liquid", type=str, choices=["water", "glycerol", "alchohol"], default="water"
     )
-    parser.add_argument("--z-speed", type=float, default=0)
+    parser.add_argument("--z-speed", type=float, default=5)
     parser.add_argument(
         "--plunger-direction",
         type=str,
@@ -241,7 +240,7 @@ if __name__ == "__main__":
         sleep(1)
     hw = run_args.ctx._core.get_hardware()
     try:
-        if not run_args.ctx.is_simulating() and not args.photometric:
+        if not run_args.ctx.is_simulating():
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
         ui.print_info("homing...")
         run_args.ctx.home()

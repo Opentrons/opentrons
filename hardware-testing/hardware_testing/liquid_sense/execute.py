@@ -10,6 +10,9 @@ from hardware_testing.gravimetric.tips import get_unused_tips
 from hardware_testing.data import ui, get_testing_data_directory
 from opentrons.hardware_control.types import InstrumentProbeType, OT3Mount, Axis
 
+from hardware_testing.gravimetric.measurement.scale import Scale
+
+from hardware_testing.gravimetric.measurement.record import GravimetricRecorder
 from opentrons.protocol_api._types import OffDeckType
 
 from opentrons.protocol_api import ProtocolContext, Well, Labware
@@ -90,6 +93,40 @@ def _load_test_well(run_args: RunArgs) -> Labware:
     )
     return labware_on_scale
 
+def _load_scale(
+    name: str,
+    scale: Scale,
+    run_id: str,
+    pipette_tag: str,
+    start_time: float,
+    simulating: bool,
+) -> GravimetricRecorder:
+    ui.print_header("LOAD SCALE")
+    ui.print_info(
+        "Some Radwag settings cannot be controlled remotely.\n"
+        "Listed below are the things the must be done using the touchscreen:\n"
+        "  1) Set profile to USER\n"
+        "  2) Set screensaver to NONE\n"
+    )
+    recorder = GravimetricRecorder(
+        GravimetricRecorderConfig(
+            test_name=name,
+            run_id=run_id,
+            tag=pipette_tag,
+            start_time=start_time,
+            duration=0,
+            frequency=1000 if simulating else 50,
+            stable=False,
+        ),
+        scale,
+        simulate=simulating,
+    )
+    ui.print_info(f'found scale "{recorder.serial_number}"')
+    if simulating:
+        recorder.set_simulation_mass(0)
+    recorder.record(in_thread=True)
+    ui.print_info(f'scale is recording to "{recorder.file_name}"')
+    return recorder
 
 def run(tip: int, run_args: RunArgs) -> None:
     """Run a liquid probe test."""
@@ -103,10 +140,14 @@ def run(tip: int, run_args: RunArgs) -> None:
     for trial in range(run_args.trials):
         print(f"Picking up {tip}ul tip")
         run_args.pipette.pick_up_tip(tips.pop(0))
+        run_args.pipette.move_to(test_well.top())
+
+        start_pos = hw_api.current_position_ot3(OT3Mount.LEFT)
         print(f"Running liquid probe test with tip {tip}")
         height = _run_trial(run_args, tip, test_well, trial)
-        plunger_pos = hw_api.current_position_ot3(OT3Mount.LEFT)[Axis.P_L]
+        end_pos = hw_api.current_position_ot3(OT3Mount.LEFT)
         print("Droping tip")
+        run_args.pipette.blow_out()
         if run_args.return_tip:
             run_args.pipette.return_tip()
         else:
@@ -118,10 +159,14 @@ def run(tip: int, run_args: RunArgs) -> None:
             trial,
             tip,
             height,
-            plunger_pos,
+            end_pos[Axis.P_L],
             env_data.relative_humidity,
             env_data.temperature,
+            start_pos[Axis.Z_L] - end_pos[Axis.Z_L],
+            start_pos[Axis.P_L] - end_pos[Axis.P_L],
         )
+        print(f"\n\nstart pos{start_pos[Axis.Z_L]} end pos {end_pos[Axis.Z_L]}")
+        print(f"start pos{start_pos[Axis.P_L]} end pos {end_pos[Axis.P_L]}\n\n")
 
     # fake this for now
     expected_height = 40.0
@@ -136,7 +181,7 @@ def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
     ][tip]
     data_dir = get_testing_data_directory()
     data_file = (
-        f"{data_dir}/{run_args.name}/{run_args.run_id}/pressure_sensor_data-{trial}.csv"
+        f"{data_dir}/{run_args.name}/{run_args.run_id}/pressure_sensor_data-trial{trial}-tip{tip}.csv"
     )
     ui.print_info(f"logging pressure data to {data_file}")
     lps = LiquidProbeSettings(
@@ -153,7 +198,7 @@ def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
         num_baseline_reads=10,
         data_file=data_file,
     )
-    run_args.pipette.move_to(well.top())
+
 
     hw_mount = OT3Mount.LEFT if run_args.pipette.mount == "left" else OT3Mount.RIGHT
     run_args.recorder.set_sample_tag(f"trial-{trial}-{tip}ul")
