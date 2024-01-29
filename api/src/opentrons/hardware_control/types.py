@@ -638,7 +638,6 @@ class HardwareFeatureFlags:
     use_old_aspiration_functions: bool = (
         False  # To support pipette backwards compatability
     )
-    tip_presence_detection_enabled: bool = True
     require_estop: bool = True
     stall_detection_enabled: bool = True
     overpressure_detection_enabled: bool = True
@@ -654,7 +653,6 @@ class HardwareFeatureFlags:
         """
         return HardwareFeatureFlags(
             use_old_aspiration_functions=feature_flags.use_old_aspiration_functions(),
-            tip_presence_detection_enabled=feature_flags.tip_presence_detection_enabled(),
             require_estop=feature_flags.require_estop(),
             stall_detection_enabled=feature_flags.stall_detection_enabled(),
             overpressure_detection_enabled=feature_flags.overpressure_detection_enabled(),
