@@ -59,9 +59,10 @@ export function useNotifyService<TData>({
   const queryClient = useQueryClient()
   const isNotifyError = React.useRef(false)
   const doTrackEvent = useTrackEvent()
+  const { enabled, refetchInterval, forceHttpPolling } = options
 
   React.useEffect(() => {
-    if (!options.forceHttpPolling) {
+    if (!forceHttpPolling && refetchInterval !== false) {
       const hostname = host?.hostname ?? null
       const eventEmitter = appShellListener(hostname, topic)
 
@@ -90,6 +91,7 @@ export function useNotifyService<TData>({
       staleTime: Infinity,
       refetchInterval: false,
       onError: () => null,
+      enabled: enabled && refetchInterval !== false,
     }
   )
 
