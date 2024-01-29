@@ -209,17 +209,14 @@ export function ProtocolDetails(
   ] = React.useState<boolean>(false)
   const [showDeckViewModal, setShowDeckViewModal] = React.useState(false)
 
-  React.useEffect(() => {
-    if (mostRecentAnalysis != null && !('liquids' in mostRecentAnalysis)) {
-      dispatch(analyzeProtocol(protocolKey))
-    }
-  }, [])
-
   const isAnalyzing = useSelector((state: State) =>
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
-  if (analysisStatus === 'missing') return null
+
+  if (analysisStatus === 'stale') {
+    dispatch(analyzeProtocol(protocolKey))
+  } else if (analysisStatus === 'missing') return null
 
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
     mostRecentAnalysis != null
@@ -237,7 +234,9 @@ export function ProtocolDetails(
       : []
 
   const requiredFixtureDetails = getSimplestDeckConfigForProtocol(
-    mostRecentAnalysis
+    analysisStatus !== 'stale' && analysisStatus !== 'loading'
+      ? mostRecentAnalysis
+      : null
   )
 
   const requiredLabwareDetails =

@@ -8,7 +8,6 @@ export function getAnalysisStatus(
   isAnalyzing: boolean,
   analysis?: ProtocolAnalysisOutput | null
 ): AnalysisStatus {
-  // return 'stale'
   if (isAnalyzing) {
     return 'loading'
   } else if (analysis?.liquids == null) {
