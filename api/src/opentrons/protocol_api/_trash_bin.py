@@ -17,7 +17,7 @@ class TrashBin:
 
         :meta private:
 
-        This is intended for Opentrons internal use only and is not a guarenteed API.
+        This is intended for Opentrons internal use only and is not a guaranteed API.
         """
         return self._location
 
@@ -27,6 +27,6 @@ class TrashBin:
 
         :meta private:
 
-        This is intended for Opentrons internal use only and is not a guarenteed API.
+        This is intended for Opentrons internal use only and is not a guaranteed API.
         """
         return self._addressable_area_name
