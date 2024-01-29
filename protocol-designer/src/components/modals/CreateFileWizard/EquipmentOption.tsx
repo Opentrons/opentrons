@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import {
   Flex,
   Text,
@@ -14,7 +15,6 @@ import {
   useHoverTooltip,
   Tooltip,
 } from '@opentrons/components'
-import { css } from 'styled-components'
 
 const EQUIPMENT_OPTION_STYLE = css`
   background-color: ${COLORS.white};

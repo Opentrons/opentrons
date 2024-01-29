@@ -155,7 +155,7 @@ function Input(props: InputFieldProps): JSX.Element {
             display={DISPLAY_INLINE_BLOCK}
             textAlign={TEXT_ALIGN_RIGHT}
             alignSelf={ALIGN_CENTER}
-            color={props.disabled ? COLORS.grey30 : COLORS.grey50}
+            color={props.disabled ? COLORS.grey40 : COLORS.grey50}
             fontSize={TYPOGRAPHY.fontSizeLabel}
           >
             {props.units}

@@ -124,7 +124,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           {description != null ? description : null}
         </StyledText>
         <Flex
-          backgroundColor={COLORS.black90 + COLORS.opacity20HexCode}
+          backgroundColor={`${COLORS.black90}${COLORS.opacity20HexCode}`}
           borderRadius={BORDERS.radiusSoftCorners}
           height="2.75rem"
           padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
@@ -135,7 +135,6 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           <StyledText
             fontSize={TYPOGRAPHY.fontSize22}
             lineHeight={TYPOGRAPHY.lineHeight28}
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
             color={COLORS.black90}
           >
             {Object.values(volumeByWell).reduce((prev, curr) => prev + curr, 0)}{' '}
@@ -166,7 +165,6 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
                   <StyledText
                     lineHeight={TYPOGRAPHY.lineHeight28}
                     fontSize={TYPOGRAPHY.fontSize22}
-                    color={COLORS.black90}
                   >
                     {well.wellName}
                   </StyledText>
@@ -231,8 +229,6 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           <StyledText
             fontSize={TYPOGRAPHY.fontSizeH4}
             lineHeight={TYPOGRAPHY.lineHeight20}
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-            color={COLORS.black90}
           >
             {Object.values(volumeByWell).reduce((prev, curr) => prev + curr, 0)}{' '}
             {MICRO_LITERS} {t('total_vol')}
@@ -262,15 +258,10 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
                   as="p"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   marginRight={SPACING.spacing4}
-                  color={COLORS.black90}
                 >
                   {well.wellName}
                 </StyledText>
-                <StyledText
-                  as="p"
-                  fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={COLORS.black90}
-                >
+                <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
                   {well.volume} {MICRO_LITERS}
                 </StyledText>
               </Flex>

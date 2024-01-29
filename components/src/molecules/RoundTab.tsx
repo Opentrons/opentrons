@@ -42,14 +42,11 @@ const disabledTabStyle = css`
 interface RoundTabProps extends React.ComponentProps<typeof Btn> {
   isCurrent: boolean
   disabled?: boolean
-  tabDisabledReason?: string
-  to?: string
 }
 export function RoundTab({
   isCurrent,
   children,
   disabled = false,
-  tabDisabledReason,
   ...restProps
 }: RoundTabProps): JSX.Element {
   let tabStyle = defaultTabStyle
