@@ -9,7 +9,7 @@ import type { MaintenanceRun } from '@opentrons/api-client'
 import type { QueryOptionsWithPolling } from '../useNotifyService'
 
 export function useNotifyCurrentMaintenanceRun(
-  options: QueryOptionsWithPolling<MaintenanceRun, Error>
+  options?: QueryOptionsWithPolling<MaintenanceRun, Error>
 ): UseQueryResult<MaintenanceRun> | UseQueryResult<MaintenanceRun, Error> {
   const host = useHost()
   const [refetchUsingHTTP, setRefetchUsingHTTP] = React.useState(true)
@@ -23,14 +23,14 @@ export function useNotifyCurrentMaintenanceRun(
     refetchUsingHTTP: () => setRefetchUsingHTTP(true),
     options: {
       ...options,
-      enabled: host !== null && options.enabled !== false,
+      enabled: host !== null && options?.enabled !== false,
     },
   })
 
-  const isNotifyEnabled = !isNotifyError && !options.forceHttpPolling
+  const isNotifyEnabled = !isNotifyError && !options?.forceHttpPolling
   if (!isNotifyEnabled && !refetchUsingHTTP) setRefetchUsingHTTP(true)
   const isHTTPEnabled =
-    host !== null && options.enabled !== false && refetchUsingHTTP
+    host !== null && options?.enabled !== false && refetchUsingHTTP
 
   const httpQueryResult = useCurrentMaintenanceRun({
     ...options,

@@ -18,7 +18,6 @@ import type { NotifyTopic } from '../redux/shell/types'
 
 export interface QueryOptionsWithPolling<TData, Error>
   extends UseQueryOptions<TData, Error> {
-  refetchInterval: number | false
   forceHttpPolling?: boolean
 }
 
@@ -60,9 +59,11 @@ export function useNotifyService<TData>({
   const isNotifyError = React.useRef(false)
   const doTrackEvent = useTrackEvent()
   const { enabled, refetchInterval, forceHttpPolling } = options
+  const isRefetchEnabled =
+    refetchInterval !== undefined && refetchInterval !== false
 
   React.useEffect(() => {
-    if (!forceHttpPolling && refetchInterval !== false) {
+    if (!forceHttpPolling && isRefetchEnabled) {
       const hostname = host?.hostname ?? null
       const eventEmitter = appShellListener(hostname, topic)
 
@@ -91,7 +92,7 @@ export function useNotifyService<TData>({
       staleTime: Infinity,
       refetchInterval: false,
       onError: () => null,
-      enabled: enabled && refetchInterval !== false,
+      enabled: enabled && isRefetchEnabled,
     }
   )
 

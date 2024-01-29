@@ -10,7 +10,7 @@ import type { QueryOptionsWithPolling } from '../useNotifyService'
 
 export function useNotifyLastRunCommandKey(
   runId: string,
-  options: QueryOptionsWithPolling<CommandsData, Error>
+  options?: QueryOptionsWithPolling<CommandsData, Error>
 ): string | null {
   const host = useHost()
   const [refetchUsingHTTP, setRefetchUsingHTTP] = React.useState(true)
@@ -20,7 +20,7 @@ export function useNotifyLastRunCommandKey(
       topic: 'robot-server/runs/current_command',
       queryKey: [host, 'runs', 'current_command'],
       refetchUsingHTTP: () => setRefetchUsingHTTP(true),
-      options,
+      options: options != null ? options : {},
     }
   )
   const notifyQueryResponseData =
@@ -30,9 +30,9 @@ export function useNotifyLastRunCommandKey(
         null
       : null
 
-  const isNotifyEnabled = !isNotifyError && !options.forceHttpPolling
+  const isNotifyEnabled = !isNotifyError && !options?.forceHttpPolling
   if (!isNotifyEnabled && !refetchUsingHTTP) setRefetchUsingHTTP(true)
-  const isHTTPEnabled = options.enabled !== false && refetchUsingHTTP
+  const isHTTPEnabled = options?.enabled !== false && refetchUsingHTTP
 
   const httpResponse = useLastRunCommandKey(runId, {
     ...options,
