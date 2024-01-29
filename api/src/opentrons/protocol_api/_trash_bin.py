@@ -20,3 +20,13 @@ class TrashBin:
         This is intended for Opentrons internal use only and is not a guarenteed API.
         """
         return self._location
+
+    @property
+    def area_name(self) -> str:
+        """Addressable area name of the trash bin.
+
+        :meta private:
+
+        This is intended for Opentrons internal use only and is not a guarenteed API.
+        """
+        return self._addressable_area_name
