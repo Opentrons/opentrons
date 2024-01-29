@@ -2,7 +2,7 @@ from opentrons.types import DeckSlotName
 
 
 class TrashBin:
-    """Represents a Flex trash bin.
+    """Represents a Flex or OT-2 trash bin.
 
     See :py:meth:`.ProtocolContext.load_trash_bin`.
     """
@@ -17,7 +17,7 @@ class TrashBin:
 
         :meta private:
 
-        This is intended for Opentrons internal use only and is not a guarenteed API.
+        This is intended for Opentrons internal use only and is not a guaranteed API.
         """
         return self._location
 
@@ -27,6 +27,6 @@ class TrashBin:
 
         :meta private:
 
-        This is intended for Opentrons internal use only and is not a guarenteed API.
+        This is intended for Opentrons internal use only and is not a guaranteed API.
         """
         return self._addressable_area_name
