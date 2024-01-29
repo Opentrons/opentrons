@@ -180,14 +180,17 @@ class ProtocolContext(CommandPublisher):
 
         This value is set when the protocol context
         is initialized. 
-        
-          - When the context is the argument of ``run()``, the ``"apiLevel"`` key of the metadata or requirements dictionary determines ``api_version``. 
-          - When the context is instantiated with :py:meth:`opentrons.execute.get_protocol_api` or :py:meth:`opentrons.simulate.get_protocol_api`, the value of its ``version`` argument determines ``api_version``.
-        
-        
-        It may be lower than the highest version supported
-        by the robot software. For the highest version supported by the
-        robot software, see ``protocol_api.MAX_SUPPORTED_VERSION``.
+
+          - When the context is the argument of ``run()``, the ``"apiLevel"`` key of the
+            metadata or requirements dictionary determines ``api_version``.
+          - When the context is instantiated with
+            :py:meth:`opentrons.execute.get_protocol_api` or
+            :py:meth:`opentrons.simulate.get_protocol_api`, the value of its ``version``
+            argument determines ``api_version``.
+
+        It may be lower than the :ref:`maximum version <max-version>` supported by the
+        robot software, which is accessible via the
+        ``protocol_api.MAX_SUPPORTED_VERSION`` constant.
         """
         return self._api_version
 
