@@ -19,20 +19,16 @@ import { HandleEnter } from './HandleEnter'
 import type { WizardTileProps } from './types'
 
 export function MetadataTile(props: WizardTileProps): JSX.Element {
-  const {
-    handleChange,
-    handleBlur,
-    values,
-    goBack,
-    proceed,
-    errors,
-    touched,
-  } = props
   const { t } = useTranslation(['modal', 'application'])
+  const { formState, goBack, proceed, register, watch } = props
+  const name = watch('fields.name')
+
+  const { errors, touchedFields } = formState
+
   const disableProceed =
-    values.fields.name == null ||
-    values.fields.name === '' ||
-    !Boolean(touched?.fields?.name) ||
+    name == null ||
+    name === '' ||
+    !Boolean(touchedFields?.fields?.name) ||
     errors?.fields?.name != null
 
   return (
@@ -59,15 +55,11 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
               <InputField
                 aria-label="MetadataTile_protocolName"
                 autoFocus
-                name="fields.name"
-                value={values.fields.name}
-                onChange={handleChange}
-                onBlur={handleBlur}
+                register={register}
+                fieldName="name"
                 error={
-                  touched?.fields?.name &&
-                  values.fields.name &&
-                  values.fields.name.length > 1
-                    ? errors?.fields?.name ?? null
+                  touchedFields?.fields?.name && name && name.length > 1
+                    ? errors?.fields?.name?.message ?? null
                     : null
                 }
               />
@@ -86,10 +78,7 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
               </Text>
               <DescriptionField
                 aira-label="MetadataTile_descriptionField"
-                name="fields.description"
-                value={values.fields.description ?? ''}
-                onChange={handleChange}
-                onBlur={handleBlur}
+                {...register('fields.description')}
               />
             </Flex>
             <Flex
@@ -102,10 +91,8 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
               </Text>
               <InputField
                 aria-label="MetadataTile_orgOrAuth"
-                name="fields.organizationOrAuthor"
-                value={values.fields.organizationOrAuthor}
-                onChange={handleChange}
-                onBlur={handleBlur}
+                fieldName="organizationOrAuthor"
+                register={register}
               />
             </Flex>
           </Flex>
