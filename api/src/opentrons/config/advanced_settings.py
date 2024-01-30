@@ -17,7 +17,6 @@ from typing import (
 )
 
 from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
-from opentrons.system import log_control
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 if TYPE_CHECKING:
@@ -108,22 +107,6 @@ class DisableLogIntegrationSettingDefinition(SettingDefinition):
             " troubleshoot robot issues and spot error trends.",
             robot_type=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
         )
-
-    async def on_change(self, value: Optional[bool]) -> None:
-        """Special side effect for this setting"""
-        if ARCHITECTURE == SystemArchitecture.BUILDROOT:
-            code, stdout, stderr = await log_control.set_syslog_level(
-                "emerg" if value else "info"
-            )
-            if code != 0:
-                log.error(
-                    f"Could not set log control: {code}: stdout={stdout}"
-                    f" stderr={stderr}"
-                )
-                raise SettingException(
-                    f"Failed to set log upstreaming: {code}", "log-config-failure"
-                )
-        await super().on_change(value)
 
 
 class Setting(NamedTuple):

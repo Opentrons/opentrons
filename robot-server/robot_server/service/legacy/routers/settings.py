@@ -11,7 +11,6 @@ from opentrons.hardware_control import (
     dev_types as hardware_dev_types,
 )
 from opentrons.hardware_control.types import HardwareFeatureFlags
-from opentrons.system import log_control
 from opentrons_shared_data.pipette import (
     mutable_configurations,
     types as pip_types,
@@ -36,7 +35,6 @@ from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models.settings import (
     AdvancedSettingsResponse,
     LogLevel,
-    LogLevels,
     FactoryResetOptions,
     PipetteSettings,
     PipetteSettingsUpdate,
@@ -170,44 +168,13 @@ async def post_log_level_local(
         " syslog-ng to Opentrons. Only available on"
         " a real robot."
     ),
-    response_model=V1BasicResponse,
-    responses={
-        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": LegacyErrorResponse},
-    },
+    response_model=LegacyErrorResponse,
 )
 async def post_log_level_upstream(log_level: LogLevel) -> V1BasicResponse:
-    log_level_value = log_level.log_level
-    log_level_name = None if log_level_value is None else log_level_value.name
-    ok_syslogs = {
-        LogLevels.error.name: "err",
-        LogLevels.warning.name: "warning",
-        LogLevels.info.name: "info",
-        LogLevels.debug.name: "debug",
-    }
-
-    syslog_level = "emerg"
-    if log_level_name is not None:
-        syslog_level = ok_syslogs[log_level_name]
-
-    code, stdout, stderr = await log_control.set_syslog_level(syslog_level)
-
-    if code != 0:
-        msg = f"Could not reload config: {stdout} {stderr}"
-        log.error(msg)
-        raise LegacyErrorResponse(
-            message=msg, errorCode=ErrorCodes.GENERAL_ERROR.value.code
-        ).as_error(
-            status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
-
-    if log_level_name:
-        result = f"Upstreaming log level changed to {log_level_name}"
-        getattr(log, log_level_name)(result)
-    else:
-        result = "Upstreaming logs disabled"
-        log.info(result)
-
-    return V1BasicResponse(message=result)
+    raise LegacyErrorResponse(
+        message="API Discontinued - log streaming removed",
+        errorCode=str(ErrorCodes.API_REMOVED),
+    ).as_error(status.HTTP_410_GONE)
 
 
 @router.get(
