@@ -307,8 +307,7 @@ class MoveGroupRunner:
             )
             return HomeRequest(payload=home_payload)
         elif step.move_type == MoveType.sensor:
-            # stop_condition = step.stop_condition.value
-            stop_condition = MoveStopCondition.sync_line
+            stop_condition = step.stop_condition.value
             sensor_move_payload = AddSensorLinearMoveBasePayload(
                 request_stop_condition=MoveStopConditionField(stop_condition),
                 group_id=UInt8Field(group),
