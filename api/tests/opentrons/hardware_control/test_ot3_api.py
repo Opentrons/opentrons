@@ -19,7 +19,6 @@ import pytest
 from decoy import Decoy
 from mock import AsyncMock, patch, Mock, PropertyMock, MagicMock
 from hypothesis import given, strategies, settings, HealthCheck, assume, example
-from contextlib import nullcontext
 
 from opentrons.calibration_storage.types import CalibrationStatus, SourceType
 from opentrons.config.types import (
@@ -74,7 +73,6 @@ from opentrons_shared_data.errors.exceptions import (
     GripperNotPresentError,
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
-    FailedGripperPickupError,
 )
 from opentrons_shared_data.gripper.gripper_definition import GripperModel
 from opentrons_shared_data.pipette.types import (
@@ -1085,45 +1083,15 @@ async def test_gripper_action_fails_with_no_gripper(
     mock_ungrip.assert_not_called()
 
 
-@pytest.mark.parametrize(
-    argnames=["jaw_width_val", "error_context"],
-    argvalues=[
-        (89, nullcontext()),
-        (100, pytest.raises(FailedGripperPickupError)),
-        (50, pytest.raises(FailedGripperPickupError)),
-        (85, nullcontext()),
-    ],
-)
-async def test_raise_error_if_gripper_pickup_failed(
-    ot3_hardware: ThreadManager[OT3API],
-    mock_jaw_width: Any,
-    mock_max_grip_error: Any,
-    jaw_width_val: float,
-    error_context: Any,
-) -> None:
-    """Test that FailedGripperPickupError is raised correctly."""
-    #  This should only be triggered when the difference between the
-    #  gripper jaw and labware widths is greater than the max allowed error.
-
-    gripper_config = gc.load(GripperModel.v1)
-    instr_data = AttachedGripper(config=gripper_config, id="test")
-    ot3_hardware._backend._attached_instruments[OT3Mount.GRIPPER] = {
-        "model": GripperModel.v1,
-        "id": "test",
-    }
-    await ot3_hardware.cache_gripper(instr_data)
-    mock_jaw_width.return_value = jaw_width_val
-    mock_max_grip_error.return_value = 6
-    with error_context:
-        ot3_hardware.raise_error_if_gripper_pickup_failed(85)
-
-
+@pytest.mark.parametrize("needs_calibration", [True, False])
 async def test_gripper_action_works_with_gripper(
     ot3_hardware: ThreadManager[OT3API],
+    managed_obj: OT3API,
     mock_grip: AsyncMock,
     mock_ungrip: AsyncMock,
     mock_hold_jaw_width: AsyncMock,
     gripper_present: None,
+    needs_calibration: bool,
 ) -> None:
 
     gripper_config = gc.load(GripperModel.v1)
@@ -1138,15 +1106,35 @@ async def test_gripper_action_works_with_gripper(
         CommandPreconditionViolated, match="Cannot grip gripper jaw before homing"
     ):
         await ot3_hardware.grip(5.0)
+    gripper = managed_obj._gripper_handler._gripper
+    assert gripper
+    calibration_offset = 5
+    gripper._jaw_max_offset = None if needs_calibration else calibration_offset
     await ot3_hardware.home_gripper_jaw()
-    mock_ungrip.assert_called_once()
+    if needs_calibration:
+        assert mock_ungrip.call_count == 2
+        mock_grip.assert_called_once()
+    else:
+        mock_ungrip.assert_called_once()
     mock_ungrip.reset_mock()
+    mock_grip.reset_mock()
+    gripper._jaw_max_offset = None if needs_calibration else 5
     await ot3_hardware.home([Axis.G])
-    mock_ungrip.assert_called_once()
+    if needs_calibration:
+        assert mock_ungrip.call_count == 2
+        mock_grip.assert_called_once()
+    else:
+        mock_ungrip.assert_called_once()
+
+    mock_grip.reset_mock()
     mock_ungrip.reset_mock()
     await ot3_hardware.grip(5.0)
+    expected_displacement = 16.0
+    if not needs_calibration:
+        expected_displacement += calibration_offset / 2
     mock_grip.assert_called_once_with(
-        gc.duty_cycle_by_force(5.0, gripper_config.grip_force_profile),
+        duty_cycle=gc.duty_cycle_by_force(5.0, gripper_config.grip_force_profile),
+        expected_displacement=expected_displacement,
         stay_engaged=True,
     )
 
