@@ -118,11 +118,12 @@ def _load_scale(
             tag=pipette_tag,
             start_time=start_time,
             duration=0,
-            frequency=1000 if simulating else 50,
+            frequency=1000 if simulating else 150,
             stable=False,
         ),
         scale,
         simulate=simulating,
+        start_graph=False,
     )
     ui.print_info(f'found scale "{recorder.serial_number}"')
     if simulating:
@@ -157,6 +158,8 @@ def run(tip: int, run_args: RunArgs) -> None:
             run_args.pipette.drop_tip()
         results.append(height)
         env_data = run_args.environment_sensor.get_reading()
+        hw_pipette = hw_api.hardware_pipettes[OT3Mount.LEFT]
+        plunger_start = hw_pipette.plunger_positions.bottom if run_args.aspirate else hw_pipette.plunger_positions.top
         store_trial(
             run_args.test_report,
             trial,
@@ -166,11 +169,13 @@ def run(tip: int, run_args: RunArgs) -> None:
             env_data.relative_humidity,
             env_data.temperature,
             start_pos[Axis.Z_L] - end_pos[Axis.Z_L],
-            start_pos[Axis.P_L] - end_pos[Axis.P_L],
+            plunger_start - end_pos[Axis.P_L],
         )
-        print(f"\n\nstart pos{start_pos[Axis.Z_L]} end pos {end_pos[Axis.Z_L]}")
-        print(f"start pos{start_pos[Axis.P_L]} end pos {end_pos[Axis.P_L]}\n\n")
+        print(f"\n\n Z axis start pos {start_pos[Axis.Z_L]} end pos {end_pos[Axis.Z_L]}")
+        print(f"plunger start pos {plunger_start} end pos {end_pos[Axis.P_L]}\n\n")
 
+
+    print(f"RESULTS: \n{results}")
     # fake this for now
     expected_height = 40.0
     average, cv, d = _calculate_stats(results, expected_height)
@@ -188,7 +193,7 @@ def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
     )
     ui.print_info(f"logging pressure data to {data_file}")
     lps = LiquidProbeSettings(
-        starting_mount_height=well.top().point.z,
+        starting_mount_height=well.top().point.z + run_args.start_height_offset,
         max_z_distance=min(well.depth, lqid_cfg["max_z_distance"]),
         min_z_distance=lqid_cfg["min_z_distance"],
         mount_speed=run_args.z_speed,
@@ -196,13 +201,13 @@ def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
         sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
         expected_liquid_height=110,
         log_pressure=True,
-        aspirate_while_sensing=True,
+        aspirate_while_sensing=run_args.aspirate,
         auto_zero_sensor=True,
         num_baseline_reads=10,
         data_file=data_file,
     )
 
-
+    ui.print_info(f"liquid probe settings \n {lps}")
     hw_mount = OT3Mount.LEFT if run_args.pipette.mount == "left" else OT3Mount.RIGHT
     run_args.recorder.set_sample_tag(f"trial-{trial}-{tip}ul")
     # TODO add in stuff for secondary probe
