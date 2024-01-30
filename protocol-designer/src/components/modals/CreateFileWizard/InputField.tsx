@@ -11,16 +11,26 @@ import {
   RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
+  DISPLAY_INLINE_BLOCK,
+  TEXT_ALIGN_RIGHT,
 } from '@opentrons/components'
-import type { FormState } from './types'
 
 export interface InputFieldProps {
-  register: UseFormRegister<FormState>
-  fieldName: 'name' | 'organizationOrAuthor'
+  register: UseFormRegister<any>
+  fieldName:
+    | 'fields.name'
+    | 'fields.organizationOrAuthor'
+    | 'protocolName'
+    | 'author'
+    | 'description'
   /** optional ID of <input> element */
   id?: string
+  /** placeholder text */
+  placeholder?: string
   /** if included, InputField will use error style and display error instead of caption */
   error?: string | null
+  /** optional suffix component, appears to the right of input text */
+  units?: React.ReactNode
   autoFocus?: boolean
 }
 
@@ -92,8 +102,20 @@ function Input(props: InputFieldProps): JSX.Element {
         <input
           data-testid={props.id}
           autoFocus={props.autoFocus}
-          {...props.register(`fields.${props.fieldName}`)}
+          placeholder={props.placeholder}
+          {...props.register(props.fieldName)}
         />
+        {props.units != null && (
+          <Flex
+            display={DISPLAY_INLINE_BLOCK}
+            textAlign={TEXT_ALIGN_RIGHT}
+            alignSelf={ALIGN_CENTER}
+            color={COLORS.grey50}
+            fontSize={TYPOGRAPHY.fontSizeLabel}
+          >
+            {props.units}
+          </Flex>
+        )}{' '}
       </Flex>
     </Flex>
   )
