@@ -8,16 +8,15 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import {
   useTrackEvent,
-  ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
   ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
 } from '../../../redux/analytics'
 import * as CustomLabware from '../../../redux/custom-labware'
 import * as Config from '../../../redux/config'
-import * as ProtocolAnalysis from '../../../redux/protocol-analysis'
 import {
   ClearUnavailableRobots,
   EnableDevTools,
   OT2AdvancedSettings,
+  OverridePathToPython,
   PreventRobotCaching,
   U2EInformation,
   ShowHeaterShakerAttachmentModal,
@@ -57,14 +56,6 @@ const mockGetIsLabwareOffsetCodeSnippetsOn = Config.getIsLabwareOffsetCodeSnippe
   typeof Config.getIsLabwareOffsetCodeSnippetsOn
 >
 
-const mockGetPathToPythonOverride = Config.getPathToPythonOverride as jest.MockedFunction<
-  typeof Config.getPathToPythonOverride
->
-
-const mockOpenPythonInterpreterDirectory = ProtocolAnalysis.openPythonInterpreterDirectory as jest.MockedFunction<
-  typeof ProtocolAnalysis.openPythonInterpreterDirectory
->
-
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
@@ -83,6 +74,8 @@ const mockU2EInformation = U2EInformation as jest.MockedFunction<
 >
 const mockClearUnavailableRobots = ClearUnavailableRobots as jest.MockedFunction<
   typeof ClearUnavailableRobots
+const mockOverridePathToPython = OverridePathToPython as jest.MockedFunction<
+  typeof OverridePathToPython
 >
 const mockShowHeaterShakerAttachmentModal = ShowHeaterShakerAttachmentModal as jest.MockedFunction<
   typeof ShowHeaterShakerAttachmentModal
@@ -108,7 +101,9 @@ describe('AdvancedSettings', () => {
     mockEnableDevTools.mockReturnValue(<div>mock EnableDevTools</div>)
     mockU2EInformation.mockReturnValue(<div>mock U2EInformation</div>)
     mockClearUnavailableRobots.mockReturnValue(
-      <div>mock ClearUnavailableRobots</div>
+      <div>mock ClearUnavailableRobots</div>)
+    mockOverridePathToPython.mockReturnValue(
+      <div>mock OverridePathToPython</div>
     )
     mockShowHeaterShakerAttachmentModal.mockReturnValue(
       <div>mock ShowHeaterShakerAttachmentModal</div>
@@ -192,37 +187,9 @@ describe('AdvancedSettings', () => {
     screen.getByText('mock ShowHeaterShakerAttachmentModal')
   })
 
-  it('renders the path to python override text and button with no default path', () => {
-    mockGetPathToPythonOverride.mockReturnValue(null)
-    const [{ getByText, getByRole }] = render()
-    getByText('Override Path to Python')
-    getByText(
-      'If specified, the Opentrons App will use the Python interpreter at this path instead of the default bundled Python interpreter.'
-    )
-    getByText('override path')
-    getByText('No path specified')
-    const button = getByRole('button', { name: 'Add override path' })
-    fireEvent.click(button)
-    expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
-      properties: {},
-    })
-  })
-
-  it('renders the path to python override text and button with a selected path', () => {
-    mockGetPathToPythonOverride.mockReturnValue('otherPath')
-    const [{ getByText, getByRole }] = render()
-    getByText('Override Path to Python')
-    getByText(
-      'If specified, the Opentrons App will use the Python interpreter at this path instead of the default bundled Python interpreter.'
-    )
-    getByText('override path')
-    const specifiedPath = getByText('otherPath')
-    const button = getByRole('button', { name: 'Reset to default' })
-    fireEvent.click(button)
-    expect(mockGetPathToPythonOverride).toHaveBeenCalled()
-    fireEvent.click(specifiedPath)
-    expect(mockOpenPythonInterpreterDirectory).toHaveBeenCalled()
+  it('should render mock OverridePathToPython section', () => {
+    render()
+    screen.getByText('mock OverridePathToPython')
   })
 
   it('should render mock clear unavailable robots section', () => {
