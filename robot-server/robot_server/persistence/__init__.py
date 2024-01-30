@@ -14,6 +14,7 @@ from ._tables import (
     protocol_table,
     analysis_table,
     run_table,
+    run_command_table,
     action_table,
 )
 
@@ -26,6 +27,7 @@ __all__ = [
     "protocol_table",
     "analysis_table",
     "run_table",
+    "run_command_table",
     "action_table",
     # initialization and teardown
     "start_initializing_persistence",

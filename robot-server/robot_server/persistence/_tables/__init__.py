@@ -6,6 +6,7 @@ from .schema_3 import (
     protocol_table,
     analysis_table,
     run_table,
+    run_command_table,
     action_table,
 )
 
@@ -15,5 +16,6 @@ __all__ = [
     "protocol_table",
     "analysis_table",
     "run_table",
+    "run_command_table",
     "action_table",
 ]

@@ -87,12 +87,6 @@ run_table = sqlalchemy.Table(
         nullable=True,
     ),
     # column added in schema v1
-    sqlalchemy.Column(
-        "commands",
-        sqlalchemy.PickleType(pickler=legacy_pickle, protocol=PICKLE_PROTOCOL_VERSION),
-        nullable=True,
-    ),
-    # column added in schema v1
     sqlalchemy.Column("engine_status", sqlalchemy.String, nullable=True),
     # column added in schema v1
     sqlalchemy.Column("_updated_at", UTCDateTime, nullable=True),
@@ -113,5 +107,35 @@ action_table = sqlalchemy.Table(
         sqlalchemy.String,
         sqlalchemy.ForeignKey("run.id"),
         nullable=False,
+    ),
+)
+
+run_command_table = sqlalchemy.Table(
+    "run_command",
+    metadata,
+    sqlalchemy.Column("row_id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column(
+        "run_id", sqlalchemy.String, sqlalchemy.ForeignKey("run.id"), nullable=False
+    ),
+    sqlalchemy.Column("index_in_run", sqlalchemy.Integer, nullable=False),
+    sqlalchemy.Column("command_id", sqlalchemy.String, nullable=False),
+    sqlalchemy.Column(
+        "command",
+        # TODO(mm, 2024-01-25): This should be JSON instead of a pickle. See:
+        # https://opentrons.atlassian.net/browse/RSS-98.
+        sqlalchemy.PickleType(pickler=legacy_pickle, protocol=PICKLE_PROTOCOL_VERSION),
+        nullable=False,
+    ),
+    sqlalchemy.Index(
+        "ix_run_run_id_command_id",  # An arbitrary name for the index.
+        "run_id",
+        "command_id",
+        unique=True,
+    ),
+    sqlalchemy.Index(
+        "ix_run_run_id_index_in_run",  # An arbitrary name for the index.
+        "run_id",
+        "index_in_run",
+        unique=True,
     ),
 )

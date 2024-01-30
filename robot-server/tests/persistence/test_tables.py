@@ -53,7 +53,6 @@ EXPECTED_STATEMENTS_LATEST = [
         created_at DATETIME NOT NULL,
         protocol_id VARCHAR,
         state_summary BLOB,
-        commands BLOB,
         engine_status VARCHAR,
         _updated_at DATETIME,
         PRIMARY KEY (id),
@@ -69,6 +68,23 @@ EXPECTED_STATEMENTS_LATEST = [
         PRIMARY KEY (id),
         FOREIGN KEY(run_id) REFERENCES run (id)
     )
+    """,
+    """
+    CREATE TABLE run_command (
+        row_id INTEGER NOT NULL,
+        run_id VARCHAR NOT NULL,
+        index_in_run INTEGER NOT NULL,
+        command_id VARCHAR NOT NULL,
+        command BLOB NOT NULL,
+        PRIMARY KEY (row_id),
+        FOREIGN KEY(run_id) REFERENCES run (id)
+    )
+    """,
+    """
+    CREATE UNIQUE INDEX ix_run_run_id_command_id ON run_command (run_id, command_id)
+    """,
+    """
+    CREATE UNIQUE INDEX ix_run_run_id_index_in_run ON run_command (run_id, index_in_run)
     """,
 ]
 
@@ -178,4 +194,7 @@ def test_creating_tables_emits_expected_statements(
     normalized_actual = [_normalize_statement(s) for s in actual_statements]
     normalized_expected = [_normalize_statement(s) for s in expected_statements]
 
-    assert normalized_actual == normalized_expected
+    # Compare ignoring order. SQLAlchemy appears to emit CREATE INDEX statements in a
+    # nondeterministic order that varies across runs. Although statement order
+    # theoretically matters, it's unlikely to matter in practice for our purposes here.
+    assert set(normalized_actual) == set(normalized_expected)
