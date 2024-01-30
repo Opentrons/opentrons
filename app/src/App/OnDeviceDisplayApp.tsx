@@ -41,6 +41,7 @@ import { InstrumentDetail } from '../pages/InstrumentDetail'
 import { Welcome } from '../pages/Welcome'
 import { InitialLoadingScreen } from '../pages/InitialLoadingScreen'
 import { DeckConfigurationEditor } from '../pages/DeckConfiguration'
+import { DevSandbox } from '../pages/DevSandbox'
 import { PortalRoot as ModalPortalRoot } from './portal'
 import { getOnDeviceDisplaySettings, updateConfigValue } from '../redux/config'
 import { updateBrightness } from '../redux/shell'
@@ -211,6 +212,12 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     exact: true,
     name: 'App Settings',
     path: '/app-settings',
+  },
+  {
+    Component: DevSandbox,
+    exact: true,
+    name: 'Dev Sandbox',
+    path: '/dev-sandbox',
   },
 ]
 

@@ -29,6 +29,7 @@
   "connect_ip": "Connect to a Robot via IP Address",
   "connect_ip_button": "Done",
   "connect_ip_link": "Learn more about connecting a robot manually",
+  "developer_sandbox": "Developer Sandbox",
   "discovery_timeout": "Discovery timed out.",
   "download_update": "Downloading update...",
   "enable_dev_tools": "Developer Tools",

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 
 import {
   Flex,
@@ -189,7 +189,12 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           rightElement={<OnOffToggle isOn={devToolsOn} />}
           onClick={() => dispatch(toggleDevtools())}
         />
-        {devToolsOn ? <FeatureFlags /> : null}
+        {devToolsOn ? (
+          <>
+            <FeatureFlags />
+            <DeveloperSandboxLink />
+          </>
+        ) : null}
       </Flex>
     </Flex>
   )
@@ -240,6 +245,46 @@ function FeatureFlags(): JSX.Element {
         </Btn>
       ))}
     </>
+  )
+}
+
+function DeveloperSandboxLink(): JSX.Element {
+  const { t } = useTranslation('app_settings')
+  const { push } = useHistory()
+  return (
+    <Btn
+      key='dev-sandbox'
+      width="100%"
+      marginBottom={SPACING.spacing8}
+      backgroundColor={COLORS.grey35}
+      padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
+      borderRadius={BORDERS.borderRadiusSize4}
+      display={DISPLAY_FLEX}
+      flexDirection={DIRECTION_ROW}
+      gridGap={SPACING.spacing24}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      alignItems={ALIGN_CENTER}
+      onClick={() => push('dev-sandbox')}
+    >
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        gridGap={SPACING.spacing24}
+        alignItems={ALIGN_CENTER}
+      >
+        <Icon name="alert-circle" size="3rem" color={COLORS.black90} />
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing2}
+          alignItems={ALIGN_FLEX_START}
+          justifyContent={JUSTIFY_CENTER}
+          width="46.25rem"
+        >
+          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            {t('developer_sandbox')}
+          </StyledText>
+        </Flex>
+      </Flex>
+    </Btn>
   )
 }
 
