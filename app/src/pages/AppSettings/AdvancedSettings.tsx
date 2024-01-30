@@ -25,7 +25,7 @@ import {
   ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
 } from '../../redux/analytics'
 import { Divider } from '../../atoms/structure'
-import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
+import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import {
   ClearUnavailableRobots,
@@ -35,6 +35,7 @@ import {
   PreventRobotCaching,
   ShowHeaterShakerAttachmentModal,
   U2EInformation,
+  ShowLabwareOffsetSnippets,
 } from '../../organisms/AdvancedSettings'
 
 import type { Dispatch } from '../../redux/types'
@@ -47,19 +48,7 @@ export function AdvancedSettings(): JSX.Element {
     Config.getUpdateChannelOptions
   )
   const labwarePath = useSelector(CustomLabware.getCustomLabwareDirectory)
-  const isLabwareOffsetCodeSnippetsOn = useSelector(
-    Config.getIsLabwareOffsetCodeSnippetsOn
-  )
   const dispatch = useDispatch<Dispatch>()
-  const toggleLabwareOffsetData = (): void => {
-    dispatch(
-      Config.updateConfigValue(
-        'labware.showLabwareOffsetCodeSnippets',
-        Boolean(!isLabwareOffsetCodeSnippetsOn)
-      )
-    )
-  }
-
   const handleChannel = (_: string, value: string): void => {
     dispatch(Config.updateConfigValue('update.channel', value))
   }
@@ -186,26 +175,7 @@ export function AdvancedSettings(): JSX.Element {
         <Divider marginY={SPACING.spacing24} />
         <ShowHeaterShakerAttachmentModal />
         <Divider marginY={SPACING.spacing24} />
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box width="70%">
-            <StyledText
-              css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing8}
-              id="AdvancedSettings_showLink"
-            >
-              {t('show_labware_offset_snippets')}
-            </StyledText>
-            <StyledText as="p">
-              {t('show_labware_offset_snippets_description')}
-            </StyledText>
-          </Box>
-          <ToggleButton
-            label="show_link_to_get_labware_offset_data"
-            toggledOn={isLabwareOffsetCodeSnippetsOn}
-            onClick={toggleLabwareOffsetData}
-            id="AdvancedSettings_showLinkToggleButton"
-          />
-        </Flex>
+        <ShowLabwareOffsetSnippets />
         <Divider marginY={SPACING.spacing24} />
         <OverridePathToPython />
         <Divider marginY={SPACING.spacing24} />

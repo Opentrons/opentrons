@@ -18,6 +18,7 @@ import {
   OT2AdvancedSettings,
   OverridePathToPython,
   PreventRobotCaching,
+  ShowLabwareOffsetSnippets,
   U2EInformation,
   ShowHeaterShakerAttachmentModal,
 } from '../../../organisms/AdvancedSettings'
@@ -52,10 +53,6 @@ const getChannelOptions = Config.getUpdateChannelOptions as jest.MockedFunction<
   typeof Config.getUpdateChannelOptions
 >
 
-const mockGetIsLabwareOffsetCodeSnippetsOn = Config.getIsLabwareOffsetCodeSnippetsOn as jest.MockedFunction<
-  typeof Config.getIsLabwareOffsetCodeSnippetsOn
->
-
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
@@ -71,6 +68,9 @@ const mockEnableDevTools = EnableDevTools as jest.MockedFunction<
 >
 const mockU2EInformation = U2EInformation as jest.MockedFunction<
   typeof U2EInformation
+>
+const mockShowLabwareOffsetSnippets = ShowLabwareOffsetSnippets as jest.MockedFunction<
+  typeof ShowLabwareOffsetSnippets
 >
 const mockClearUnavailableRobots = ClearUnavailableRobots as jest.MockedFunction<
   typeof ClearUnavailableRobots
@@ -101,6 +101,9 @@ describe('AdvancedSettings', () => {
     mockOT2AdvancedSettings.mockReturnValue(<div>mock OT2AdvancedSettings</div>)
     mockEnableDevTools.mockReturnValue(<div>mock EnableDevTools</div>)
     mockU2EInformation.mockReturnValue(<div>mock U2EInformation</div>)
+    mockShowLabwareOffsetSnippets.mockReturnValue(
+      <div>mock ShowLabwareOffsetSnippets</div>
+    )
     mockClearUnavailableRobots.mockReturnValue(
       <div>mock ClearUnavailableRobots</div>
     )
@@ -166,22 +169,9 @@ describe('AdvancedSettings', () => {
     expect(screen.getByText('mock U2EInformation'))
   })
 
-  it('renders the display show link to get labware offset data section', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText('Show Labware Offset data code snippets')
-    getByText(
-      'Only for users who need to apply Labware Offset data outside of the Opentrons App. When enabled, code snippets for Jupyter Notebook and SSH are available during protocol setup.'
-    )
-    getByRole('switch', { name: 'show_link_to_get_labware_offset_data' })
-  })
-
-  it('renders the toggle button on when show link to labware offset data setting is true', () => {
-    mockGetIsLabwareOffsetCodeSnippetsOn.mockReturnValue(true)
-    const [{ getByRole }] = render()
-    const toggleButton = getByRole('switch', {
-      name: 'show_link_to_get_labware_offset_data',
-    })
-    expect(toggleButton.getAttribute('aria-checked')).toBe('true')
+  it('should render mock show link to get labware offset data section', () => {
+    render()
+    screen.getByText('mock ShowLabwareOffsetSnippets')
   })
 
   it('should render mock ShowHeaterShakerAttachmentModal section', () => {
