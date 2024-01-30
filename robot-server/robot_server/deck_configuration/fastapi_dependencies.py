@@ -14,7 +14,7 @@ from server_utils.fastapi_utils.app_state import (
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.hardware import get_deck_type
-from robot_server.persistence import get_persistence_directory
+from robot_server.persistence import get_active_persistence_directory
 
 
 # This needs to be kept in sync with opentrons.execute, which reads this file.
@@ -27,7 +27,7 @@ _accessor = AppStateAccessor[DeckConfigurationStore]("deck_configuration_store")
 async def get_deck_configuration_store(
     app_state: AppState = fastapi.Depends(get_app_state),
     deck_type: DeckType = fastapi.Depends(get_deck_type),
-    persistence_directory: Path = fastapi.Depends(get_persistence_directory),
+    persistence_directory: Path = fastapi.Depends(get_active_persistence_directory),
 ) -> DeckConfigurationStore:
     """Return the server's singleton `DeckConfigurationStore`."""
     # It's important that this dependency doesn't do anything that might fail, like reading
