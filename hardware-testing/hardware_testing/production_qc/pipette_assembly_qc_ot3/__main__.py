@@ -834,9 +834,9 @@ async def _test_diagnostics_encoder(
     print("homing plunger")
     await api.home([pip_axis])
     pip_pos, pip_enc = await _get_plunger_pos_and_encoder()
-    if pip_pos != 0.0 or abs(pip_enc) > 0.01:
+    if abs(pip_pos) > 0.005 or abs(pip_enc) > 0.005:
         print(
-            f"FAIL: plunger ({pip_pos}) or encoder ({pip_enc}) is not 0.0 after homing"
+            f"FAIL: plunger ({pip_pos}) or encoder ({pip_enc}) is not near 0.0 after homing"
         )
         encoder_home_pass = False
     write_cb(["encoder-home", pip_pos, pip_enc, _bool_to_pass_fail(encoder_home_pass)])
