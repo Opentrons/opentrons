@@ -209,3 +209,8 @@ class ResponseList(BaseModel, Generic[ResponseDataT]):
     """A response that returns a list resource."""
 
     __root__: List[ResponseDataT]
+
+
+class NotifyRefetchBody(BaseResponseBody):
+    "A notification response that returns a flag for refetching via HTTP."
+    refetchUsingHTTP: bool = True

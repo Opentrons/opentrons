@@ -832,3 +832,87 @@ class LabwareView(HasState[LabwareState]):
             if recommended_height is not None
             else self.get_dimensions(labware_id).z / 2
         )
+
+    @staticmethod
+    def _max_x_of_well(well_defn: WellDefinition) -> float:
+        if well_defn.shape == "rectangular":
+            return well_defn.x + (well_defn.xDimension or 0) / 2
+        elif well_defn.shape == "circular":
+            return well_defn.x + (well_defn.diameter or 0) / 2
+        else:
+            return well_defn.x
+
+    @staticmethod
+    def _min_x_of_well(well_defn: WellDefinition) -> float:
+        if well_defn.shape == "rectangular":
+            return well_defn.x - (well_defn.xDimension or 0) / 2
+        elif well_defn.shape == "circular":
+            return well_defn.x - (well_defn.diameter or 0) / 2
+        else:
+            return 0
+
+    @staticmethod
+    def _max_y_of_well(well_defn: WellDefinition) -> float:
+        if well_defn.shape == "rectangular":
+            return well_defn.y + (well_defn.yDimension or 0) / 2
+        elif well_defn.shape == "circular":
+            return well_defn.y + (well_defn.diameter or 0) / 2
+        else:
+            return 0
+
+    @staticmethod
+    def _min_y_of_well(well_defn: WellDefinition) -> float:
+        if well_defn.shape == "rectangular":
+            return well_defn.y - (well_defn.yDimension or 0) / 2
+        elif well_defn.shape == "circular":
+            return well_defn.y - (well_defn.diameter or 0) / 2
+        else:
+            return 0
+
+    @staticmethod
+    def _max_z_of_well(well_defn: WellDefinition) -> float:
+        return well_defn.z + well_defn.depth
+
+    def get_well_bbox(self, labware_id: str) -> Dimensions:
+        """Get the bounding box implied by the wells.
+
+        The bounding box of the labware that is implied by the wells is that required
+        to contain the bounds of the wells - the y-span from the min-y bound of the min-y
+        well to the max-y bound of the max-y well, x ditto, z from labware 0 to the max-z
+        well top.
+
+        This is used for the specific purpose of finding the reasonable uncertainty bounds of
+        where and how a gripper will interact with a labware.
+        """
+        defn = self.get_definition(labware_id)
+        max_x: Optional[float] = None
+        min_x: Optional[float] = None
+        max_y: Optional[float] = None
+        min_y: Optional[float] = None
+        max_z: Optional[float] = None
+
+        for well in defn.wells.values():
+            well_max_x = self._max_x_of_well(well)
+            well_min_x = self._min_x_of_well(well)
+            well_max_y = self._max_y_of_well(well)
+            well_min_y = self._min_y_of_well(well)
+            well_max_z = self._max_z_of_well(well)
+            if (max_x is None) or (well_max_x > max_x):
+                max_x = well_max_x
+            if (max_y is None) or (well_max_y > max_y):
+                max_y = well_max_y
+            if (min_x is None) or (well_min_x < min_x):
+                min_x = well_min_x
+            if (min_y is None) or (well_min_y < min_y):
+                min_y = well_min_y
+            if (max_z is None) or (well_max_z > max_z):
+                max_z = well_max_z
+        if (
+            max_x is None
+            or max_y is None
+            or min_x is None
+            or min_y is None
+            or max_z is None
+        ):
+            return Dimensions(0, 0, 0)
+        return Dimensions(max_x - min_x, max_y - min_y, max_z)

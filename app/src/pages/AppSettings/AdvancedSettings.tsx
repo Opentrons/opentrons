@@ -3,22 +3,22 @@ import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 
 import {
-  Flex,
-  Box,
-  Link,
-  Icon,
-  SPACING_AUTO,
+  AlertPrimaryButton,
   ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
+  Box,
+  Btn,
   COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_FLEX_END,
+  JUSTIFY_SPACE_BETWEEN,
+  Link,
+  SPACING_AUTO,
   SPACING,
   TYPOGRAPHY,
-  DIRECTION_COLUMN,
   useConditionalConfirm,
-  JUSTIFY_FLEX_END,
-  Btn,
-  AlertPrimaryButton,
-  DIRECTION_ROW,
 } from '@opentrons/components'
 
 import * as Config from '../../redux/config'
@@ -46,6 +46,7 @@ import {
   OT2AdvancedSettings,
   OverridePathToPython,
   PreventRobotCaching,
+  ShowHeaterShakerAttachmentModal,
   U2EInformation,
 } from '../../organisms/AdvancedSettings'
 
@@ -62,10 +63,6 @@ export function AdvancedSettings(): JSX.Element {
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     Config.getIsLabwareOffsetCodeSnippetsOn
   )
-  const isHeaterShakerAttachmentModalVisible = useSelector(
-    Config.getIsHeaterShakerAttached
-  )
-
   const dispatch = useDispatch<Dispatch>()
   const { makeToast } = useToaster()
   const reachableRobots = useSelector((state: State) =>
@@ -100,15 +97,6 @@ export function AdvancedSettings(): JSX.Element {
       Config.updateConfigValue(
         'labware.showLabwareOffsetCodeSnippets',
         Boolean(!isLabwareOffsetCodeSnippetsOn)
-      )
-    )
-  }
-
-  const toggleHeaterShakerModalVisibilty = (): void => {
-    dispatch(
-      Config.updateConfigValue(
-        'modules.heaterShaker.isAttached',
-        Boolean(!isHeaterShakerAttachmentModalVisible)
       )
     )
   }
@@ -295,26 +283,7 @@ export function AdvancedSettings(): JSX.Element {
           </TertiaryButton>
         </Flex>
         <Divider marginY={SPACING.spacing24} />
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box width="70%">
-            <StyledText
-              css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing8}
-              id="AdvancedSettings_showHeaterShakerAttachmentModal"
-            >
-              {t('heater_shaker_attach_visible')}
-            </StyledText>
-            <StyledText as="p">
-              {t('heater_shaker_attach_description')}
-            </StyledText>
-          </Box>
-          <ToggleButton
-            label="show_heater_shaker_modal"
-            toggledOn={!isHeaterShakerAttachmentModalVisible}
-            onClick={toggleHeaterShakerModalVisibilty}
-            id="AdvancedSettings_showHeaterShakerAttachmentBtn"
-          />
-        </Flex>
+        <ShowHeaterShakerAttachmentModal />
         <Divider marginY={SPACING.spacing24} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">

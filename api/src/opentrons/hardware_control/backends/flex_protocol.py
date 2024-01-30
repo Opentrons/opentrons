@@ -188,6 +188,7 @@ class FlexBackend(Protocol):
     async def gripper_grip_jaw(
         self,
         duty_cycle: float,
+        expected_displacement: float,
         stop_condition: HWStopCondition = HWStopCondition.none,
         stay_engaged: bool = True,
     ) -> None:
@@ -263,6 +264,14 @@ class FlexBackend(Protocol):
         """
         Temporarily restore the active current ONLY when homing or
         retracting the Z_R axis while the 96-channel is attached.
+        """
+        ...
+
+    @asynccontextmanager
+    def increase_z_l_hold_current(self) -> AsyncIterator[None]:
+        """
+        Temporarily increase the hold current when engaging the Z_L axis
+        while the 96-channel is attached
         """
         ...
 
@@ -395,4 +404,16 @@ class FlexBackend(Protocol):
         ...
 
     def add_estop_callback(self, cb: HardwareEventHandler) -> HardwareEventUnsubscriber:
+        ...
+
+    def check_gripper_position_within_bounds(
+        self,
+        expected_grip_width: float,
+        grip_width_uncertainty_wider: float,
+        grip_width_uncertainty_narrower: float,
+        jaw_width: float,
+        max_allowed_grip_error: float,
+        hard_limit_lower: float,
+        hard_limit_upper: float,
+    ) -> None:
         ...

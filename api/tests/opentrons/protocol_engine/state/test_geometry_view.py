@@ -11,6 +11,12 @@ from opentrons_shared_data.pipette import pipette_definition
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import Point, DeckSlotName, MountType
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.labware.labware_definition import (
+    Dimensions as LabwareDimensions,
+    Parameters as LabwareDefinitionParameters,
+    CornerOffsetFromSlot,
+)
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
@@ -37,6 +43,8 @@ from opentrons.protocol_engine.types import (
     CurrentAddressableArea,
     CurrentPipetteLocation,
     LabwareMovementOffsetData,
+    LoadedPipette,
+    TipGeometry,
 )
 from opentrons.protocol_engine.state import move_types
 from opentrons.protocol_engine.state.config import Config
@@ -2055,3 +2063,96 @@ def test_get_stacked_labware_total_nominal_offset_default(
         move_type=_GripperMoveType.DROP_LABWARE,
     )
     assert result2 == LabwareOffsetVector(x=333, y=222, z=111)
+
+
+def test_check_gripper_labware_tip_collision(
+    decoy: Decoy,
+    mock_pipette_view: PipetteView,
+    labware_view: LabwareView,
+    addressable_area_view: AddressableAreaView,
+    subject: GeometryView,
+) -> None:
+    """It should raise a labware movement error if attached tips will collide with the labware during a gripper lift."""
+    pipettes = [
+        LoadedPipette(
+            id="pipette-id",
+            mount=MountType.LEFT,
+            pipetteName=PipetteNameType.P1000_96,
+        )
+    ]
+    decoy.when(mock_pipette_view.get_all()).then_return(pipettes)
+    decoy.when(mock_pipette_view.get_attached_tip("pipette-id")).then_return(
+        TipGeometry(
+            length=1000,
+            diameter=1000,
+            volume=1000,
+        )
+    )
+
+    definition = LabwareDefinition.construct(  # type: ignore[call-arg]
+        namespace="hello",
+        dimensions=LabwareDimensions.construct(
+            yDimension=1, zDimension=2, xDimension=3
+        ),
+        version=1,
+        parameters=LabwareDefinitionParameters.construct(
+            format="96Standard",
+            loadName="labware-id",
+            isTiprack=True,
+            isMagneticModuleCompatible=False,
+        ),
+        cornerOffsetFromSlot=CornerOffsetFromSlot.construct(x=1, y=2, z=3),
+        ordering=[],
+    )
+
+    labware_data = LoadedLabware(
+        id="labware-id",
+        loadName="b",
+        definitionUri=uri_from_details(
+            namespace="hello", load_name="labware-id", version=1
+        ),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        offsetId=None,
+    )
+
+    decoy.when(labware_view.get_definition("labware-id")).then_return(definition)
+    decoy.when(labware_view.get("labware-id")).then_return(labware_data)
+
+    decoy.when(
+        addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_1.id)
+    ).then_return(Point(1, 2, 3))
+
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
+        calibration_offset
+    )
+    decoy.when(subject.get_labware_origin_position("labware-id")).then_return(
+        Point(1, 2, 3)
+    )
+    decoy.when(labware_view.get_definition("labware-id")).then_return(definition)
+    decoy.when(subject._get_highest_z_from_labware_data(labware_data)).then_return(1000)
+
+    decoy.when(labware_view.get_definition("labware-id")).then_return(definition)
+    decoy.when(subject.get_labware_highest_z("labware-id")).then_return(100.0)
+    decoy.when(
+        addressable_area_view.get_addressable_area_center(
+            addressable_area_name=DeckSlotName.SLOT_1.id
+        )
+    ).then_return(Point(x=11, y=22, z=33))
+    decoy.when(
+        labware_view.get_grip_height_from_labware_bottom("labware-id")
+    ).then_return(1.0)
+    decoy.when(labware_view.get_definition("labware-id")).then_return(definition)
+    decoy.when(
+        subject.get_labware_grip_point(
+            labware_id="labware-id",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        )
+    ).then_return(Point(x=100.0, y=100.0, z=0.0))
+
+    with pytest.raises(errors.LabwareMovementNotAllowedError):
+        subject.check_gripper_labware_tip_collision(
+            gripper_homed_position_z=166.125,
+            labware_id="labware-id",
+            current_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        )
