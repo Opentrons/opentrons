@@ -26,14 +26,6 @@ from robot_server.persistence._tables import (
 # Whitespace and formatting changes, on the other hand, are allowed.
 EXPECTED_STATEMENTS_LATEST = [
     """
-    CREATE TABLE migration (
-        id INTEGER NOT NULL,
-        created_at DATETIME NOT NULL,
-        version INTEGER NOT NULL,
-        PRIMARY KEY (id)
-    )
-    """,
-    """
     CREATE TABLE protocol (
         id VARCHAR NOT NULL,
         created_at DATETIME NOT NULL,

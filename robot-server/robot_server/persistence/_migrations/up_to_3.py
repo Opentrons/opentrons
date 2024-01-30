@@ -41,20 +41,6 @@ def _migrate_db(
     source_transaction: sqlalchemy.engine.Connection,
     dest_transaction: sqlalchemy.engine.Connection,
 ) -> None:
-    # TODO: This migration table is what we used to use to keep track of what schema
-    # the database is at. It's not needed anymore now that we have this
-    # subdirectory-based migration infrastructure.
-    #
-    # We should either drop this table entirely from schema 3 and up, or, if we
-    # want to keep it, we should add a row here to stamp it with schema "3".
-    copy_rows_unmodified(
-        schema_2.migration_table,
-        schema_3.migration_table,
-        source_transaction,
-        dest_transaction,
-        order_by_rowid=False,
-    )
-
     copy_rows_unmodified(
         schema_2.protocol_table,
         schema_3.protocol_table,

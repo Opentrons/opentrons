@@ -11,7 +11,6 @@ from ._fastapi_dependencies import (
 )
 from ._persistence_directory import PersistenceResetter
 from ._tables import (
-    migration_table,
     protocol_table,
     analysis_table,
     run_table,
@@ -24,7 +23,6 @@ __all__ = [
     "create_schema_3_sql_engine",
     "sqlite_rowid",
     # database tables
-    "migration_table",
     "protocol_table",
     "analysis_table",
     "run_table",

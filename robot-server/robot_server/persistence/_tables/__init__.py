@@ -3,7 +3,6 @@
 # Re-export the latest schema.
 from .schema_3 import (
     metadata,
-    migration_table,
     protocol_table,
     analysis_table,
     run_table,
@@ -13,7 +12,6 @@ from .schema_3 import (
 
 __all__ = [
     "metadata",
-    "migration_table",
     "protocol_table",
     "analysis_table",
     "run_table",

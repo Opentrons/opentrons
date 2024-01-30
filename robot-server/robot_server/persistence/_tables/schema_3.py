@@ -8,18 +8,6 @@ from robot_server.persistence._utc_datetime import UTCDateTime
 
 metadata = sqlalchemy.MetaData()
 
-migration_table = sqlalchemy.Table(
-    "migration",
-    metadata,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("created_at", UTCDateTime, nullable=False),
-    sqlalchemy.Column(
-        "version",
-        sqlalchemy.Integer,
-        nullable=False,
-    ),
-)
-
 protocol_table = sqlalchemy.Table(
     "protocol",
     metadata,
