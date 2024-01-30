@@ -2,32 +2,25 @@ import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { resetAllWhenMocks } from 'jest-when'
 import { fireEvent, screen } from '@testing-library/react'
-import {
-  renderWithProviders,
-  useConditionalConfirm,
-} from '@opentrons/components'
-import {
-  getReachableRobots,
-  getUnreachableRobots,
-} from '../../../redux/discovery'
+
+import { renderWithProviders } from '@opentrons/components'
+
 import { i18n } from '../../../i18n'
 import {
-  mockReachableRobot,
-  mockUnreachableRobot,
-} from '../../../redux/discovery/__fixtures__'
-import {
   useTrackEvent,
-  ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
   ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
 } from '../../../redux/analytics'
 import * as CustomLabware from '../../../redux/custom-labware'
 import * as Config from '../../../redux/config'
-import * as ProtocolAnalysis from '../../../redux/protocol-analysis'
 import {
+  ClearUnavailableRobots,
   EnableDevTools,
   OT2AdvancedSettings,
+  OverridePathToPython,
   PreventRobotCaching,
+  ShowLabwareOffsetSnippets,
   U2EInformation,
+  ShowHeaterShakerAttachmentModal,
 } from '../../../organisms/AdvancedSettings'
 
 import { AdvancedSettings } from '../AdvancedSettings'
@@ -53,36 +46,11 @@ const render = (): ReturnType<typeof renderWithProviders> => {
   )
 }
 
-const mockGetUnreachableRobots = getUnreachableRobots as jest.MockedFunction<
-  typeof getUnreachableRobots
->
-const mockGetReachableRobots = getReachableRobots as jest.MockedFunction<
-  typeof getReachableRobots
->
-const mockUseConditionalConfirm = useConditionalConfirm as jest.MockedFunction<
-  typeof useConditionalConfirm
->
 const getCustomLabwarePath = CustomLabware.getCustomLabwareDirectory as jest.MockedFunction<
   typeof CustomLabware.getCustomLabwareDirectory
 >
 const getChannelOptions = Config.getUpdateChannelOptions as jest.MockedFunction<
   typeof Config.getUpdateChannelOptions
->
-
-const mockGetIsLabwareOffsetCodeSnippetsOn = Config.getIsLabwareOffsetCodeSnippetsOn as jest.MockedFunction<
-  typeof Config.getIsLabwareOffsetCodeSnippetsOn
->
-
-const mockGetIsHeaterShakerAttached = Config.getIsHeaterShakerAttached as jest.MockedFunction<
-  typeof Config.getIsHeaterShakerAttached
->
-
-const mockGetPathToPythonOverride = Config.getPathToPythonOverride as jest.MockedFunction<
-  typeof Config.getPathToPythonOverride
->
-
-const mockOpenPythonInterpreterDirectory = ProtocolAnalysis.openPythonInterpreterDirectory as jest.MockedFunction<
-  typeof ProtocolAnalysis.openPythonInterpreterDirectory
 >
 
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
@@ -101,10 +69,20 @@ const mockEnableDevTools = EnableDevTools as jest.MockedFunction<
 const mockU2EInformation = U2EInformation as jest.MockedFunction<
   typeof U2EInformation
 >
+const mockShowLabwareOffsetSnippets = ShowLabwareOffsetSnippets as jest.MockedFunction<
+  typeof ShowLabwareOffsetSnippets
+>
+const mockClearUnavailableRobots = ClearUnavailableRobots as jest.MockedFunction<
+  typeof ClearUnavailableRobots
+>
+const mockOverridePathToPython = OverridePathToPython as jest.MockedFunction<
+  typeof OverridePathToPython
+>
+const mockShowHeaterShakerAttachmentModal = ShowHeaterShakerAttachmentModal as jest.MockedFunction<
+  typeof ShowHeaterShakerAttachmentModal
+>
 
 let mockTrackEvent: jest.Mock
-const mockConfirm = jest.fn()
-const mockCancel = jest.fn()
 
 describe('AdvancedSettings', () => {
   beforeEach(() => {
@@ -119,17 +97,22 @@ describe('AdvancedSettings', () => {
       { label: 'Beta', value: 'beta' },
       { label: 'Alpha', value: 'alpha' },
     ])
-    mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
-    mockGetReachableRobots.mockReturnValue([mockReachableRobot])
-    mockUseConditionalConfirm.mockReturnValue({
-      confirm: mockConfirm,
-      showConfirmation: true,
-      cancel: mockCancel,
-    })
     mockPreventRobotCaching.mockReturnValue(<div>mock PreventRobotCaching</div>)
     mockOT2AdvancedSettings.mockReturnValue(<div>mock OT2AdvancedSettings</div>)
     mockEnableDevTools.mockReturnValue(<div>mock EnableDevTools</div>)
     mockU2EInformation.mockReturnValue(<div>mock U2EInformation</div>)
+    mockShowLabwareOffsetSnippets.mockReturnValue(
+      <div>mock ShowLabwareOffsetSnippets</div>
+    )
+    mockClearUnavailableRobots.mockReturnValue(
+      <div>mock ClearUnavailableRobots</div>
+    )
+    mockOverridePathToPython.mockReturnValue(
+      <div>mock OverridePathToPython</div>
+    )
+    mockShowHeaterShakerAttachmentModal.mockReturnValue(
+      <div>mock ShowHeaterShakerAttachmentModal</div>
+    )
   })
 
   afterEach(() => {
@@ -141,7 +124,6 @@ describe('AdvancedSettings', () => {
     const [{ getByText }] = render()
     getByText('Update Channel')
     getByText('Additional Custom Labware Source Folder')
-    getByText('Clear Unavailable Robots')
   })
 
   it('renders the update channel combobox and section', () => {
@@ -187,102 +169,24 @@ describe('AdvancedSettings', () => {
     expect(screen.getByText('mock U2EInformation'))
   })
 
-  it('renders the display show link to get labware offset data section', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText('Show Labware Offset data code snippets')
-    getByText(
-      'Only for users who need to apply Labware Offset data outside of the Opentrons App. When enabled, code snippets for Jupyter Notebook and SSH are available during protocol setup.'
-    )
-    getByRole('switch', { name: 'show_link_to_get_labware_offset_data' })
+  it('should render mock show link to get labware offset data section', () => {
+    render()
+    screen.getByText('mock ShowLabwareOffsetSnippets')
   })
 
-  it('renders the toggle button on when show link to labware offset data setting is true', () => {
-    mockGetIsLabwareOffsetCodeSnippetsOn.mockReturnValue(true)
-    const [{ getByRole }] = render()
-    const toggleButton = getByRole('switch', {
-      name: 'show_link_to_get_labware_offset_data',
-    })
-    expect(toggleButton.getAttribute('aria-checked')).toBe('true')
+  it('should render mock ShowHeaterShakerAttachmentModal section', () => {
+    render()
+    screen.getByText('mock ShowHeaterShakerAttachmentModal')
   })
 
-  it('renders the toggle button on when showing heater shaker modal as false', () => {
-    mockGetIsHeaterShakerAttached.mockReturnValue(true)
-    const [{ getByRole, getByText }] = render()
-    getByText('Confirm Heater-Shaker Module Attachment')
-    getByText(
-      'Display a reminder to attach the Heater-Shaker properly before running a test shake or using it in a protocol.'
-    )
-    const toggleButton = getByRole('switch', {
-      name: 'show_heater_shaker_modal',
-    })
-    expect(toggleButton.getAttribute('aria-checked')).toBe('false')
+  it('should render mock OverridePathToPython section', () => {
+    render()
+    screen.getByText('mock OverridePathToPython')
   })
 
-  it('renders the toggle button on when showing heater shaker modal as true', () => {
-    mockGetIsHeaterShakerAttached.mockReturnValue(false)
-    const [{ getByRole }] = render()
-    const toggleButton = getByRole('switch', {
-      name: 'show_heater_shaker_modal',
-    })
-    expect(toggleButton.getAttribute('aria-checked')).toBe('true')
-  })
-
-  it('renders the path to python override text and button with no default path', () => {
-    mockGetPathToPythonOverride.mockReturnValue(null)
-    const [{ getByText, getByRole }] = render()
-    getByText('Override Path to Python')
-    getByText(
-      'If specified, the Opentrons App will use the Python interpreter at this path instead of the default bundled Python interpreter.'
-    )
-    getByText('override path')
-    getByText('No path specified')
-    const button = getByRole('button', { name: 'Add override path' })
-    fireEvent.click(button)
-    expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
-      properties: {},
-    })
-  })
-
-  it('renders the path to python override text and button with a selected path', () => {
-    mockGetPathToPythonOverride.mockReturnValue('otherPath')
-    const [{ getByText, getByRole }] = render()
-    getByText('Override Path to Python')
-    getByText(
-      'If specified, the Opentrons App will use the Python interpreter at this path instead of the default bundled Python interpreter.'
-    )
-    getByText('override path')
-    const specifiedPath = getByText('otherPath')
-    const button = getByRole('button', { name: 'Reset to default' })
-    fireEvent.click(button)
-    expect(mockGetPathToPythonOverride).toHaveBeenCalled()
-    fireEvent.click(specifiedPath)
-    expect(mockOpenPythonInterpreterDirectory).toHaveBeenCalled()
-  })
-
-  it('renders the clear unavailable robots section', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText(
-      'Clear the list of unavailable robots on the Devices page. This action cannot be undone.'
-    )
-    const btn = getByRole('button', {
-      name: 'Clear unavailable robots list',
-    })
-    fireEvent.click(btn)
-    getByText('Clear unavailable robots?')
-    getByText(
-      'Clearing the list of unavailable robots on the Devices page cannot be undone.'
-    )
-    const closeBtn = getByRole('button', {
-      name: 'cancel',
-    })
-    const proceedBtn = getByRole('button', {
-      name: 'Clear unavailable robots',
-    })
-    fireEvent.click(closeBtn)
-    expect(mockCancel).toHaveBeenCalled()
-    fireEvent.click(proceedBtn)
-    expect(mockConfirm).toHaveBeenCalled()
+  it('should render mock clear unavailable robots section', () => {
+    render()
+    screen.getByText('mock ClearUnavailableRobots')
   })
 
   it('should render mock developer tools section', () => {

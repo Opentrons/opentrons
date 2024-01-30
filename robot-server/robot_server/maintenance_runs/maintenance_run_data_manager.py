@@ -16,6 +16,8 @@ from .maintenance_run_models import MaintenanceRun, MaintenanceRunNotFoundError
 
 from opentrons.protocol_engine.types import DeckConfigurationType
 
+from ..notification_client import NotificationClient
+
 
 def _build_run(
     run_id: str,
@@ -62,8 +64,13 @@ class MaintenanceRunDataManager:
         engine_store: In-memory store of the current run's ProtocolEngine.
     """
 
-    def __init__(self, engine_store: MaintenanceEngineStore) -> None:
+    def __init__(
+        self,
+        engine_store: MaintenanceEngineStore,
+        notification_client: NotificationClient,
+    ) -> None:
         self._engine_store = engine_store
+        self._notification_client = notification_client
 
     @property
     def current_run_id(self) -> Optional[str]:
@@ -97,11 +104,17 @@ class MaintenanceRunDataManager:
             deck_configuration=deck_configuration,
         )
 
-        return _build_run(
+        maintenance_run_data = _build_run(
             run_id=run_id,
             created_at=created_at,
             state_summary=state_summary,
         )
+
+        await self._notification_client.publish(
+            topic="robot-server/maintenance_runs",
+        )
+
+        return maintenance_run_data
 
     def get(self, run_id: str) -> MaintenanceRun:
         """Get a maintenance run resource.
@@ -140,6 +153,11 @@ class MaintenanceRunDataManager:
         """
         if run_id == self._engine_store.current_run_id:
             await self._engine_store.clear()
+
+            await self._notification_client.publish(
+                topic="robot-server/maintenance_runs",
+            )
+
         else:
             raise MaintenanceRunNotFoundError(run_id=run_id)
 
@@ -192,5 +210,4 @@ class MaintenanceRunDataManager:
         return self._engine_store.engine.state_view.commands.get(command_id=command_id)
 
     def _get_state_summary(self, run_id: str) -> Optional[StateSummary]:
-
         return self._engine_store.engine.state_view.get_summary()

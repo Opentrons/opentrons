@@ -16,6 +16,7 @@ import { registerProtocolStorage } from './protocol-storage'
 import { getConfig, getStore, getOverrides, registerConfig } from './config'
 import { registerUsb } from './usb'
 import { createUsbDeviceMonitor } from './system-info/usb-devices'
+import { registerNotify, closeAllNotifyConnections } from './notify'
 
 import type { BrowserWindow } from 'electron'
 import type { Dispatch, Logger } from './types'
@@ -49,6 +50,14 @@ app.once('window-all-closed', () => {
   webusb.removeEventListener('connect', () => createUsbDeviceMonitor())
   webusb.removeEventListener('disconnect', () => createUsbDeviceMonitor())
   app.quit()
+  closeAllNotifyConnections()
+    .then(() => {
+      app.quit()
+    })
+    .catch(error => {
+      log.warn('Failed to properly close MQTT connections:', error)
+      app.quit()
+    })
 })
 
 function startUp(): void {
@@ -94,6 +103,7 @@ function startUp(): void {
     registerSystemInfo(dispatch),
     registerProtocolStorage(dispatch),
     registerUsb(dispatch),
+    registerNotify(dispatch, mainWindow),
     registerReloadUi(mainWindow),
   ]
 

@@ -240,6 +240,8 @@ jobs:
           yarn config set cache-folder ./.yarn-cache
           yarn config set network-timeout 60000
           yarn
+      - name: 'build typescript'
+        run: make build-ts
       - name: 'build library'
         run: |
           make -C shared-data lib-js
