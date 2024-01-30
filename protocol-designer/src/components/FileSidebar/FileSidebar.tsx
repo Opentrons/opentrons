@@ -132,7 +132,7 @@ function getWarningContent({
     .map(moduleOnDeck => t(`modules:module_long_names.${moduleOnDeck.type}`))
     .join(' and ')
 
-  if (pipettesWithoutStep.length > 0 && modulesWithoutStep.length > 0) {
+  if (pipettesWithoutStep.length && modulesWithoutStep.length) {
     return {
       content: (
         <>
@@ -149,7 +149,7 @@ function getWarningContent({
     }
   }
 
-  if (pipettesWithoutStep.length > 0) {
+  if (pipettesWithoutStep.length) {
     return {
       content: (
         <>
@@ -165,7 +165,7 @@ function getWarningContent({
     }
   }
 
-  if (modulesWithoutStep.length > 0) {
+  if (modulesWithoutStep.length) {
     const moduleCase =
       modulesWithoutStep.length > 1 ? 'unused_modules' : 'unused_module'
     return {
@@ -205,7 +205,7 @@ function getWarningContent({
     }
   }
 
-  if (fixtureWithoutStep.stagingAreaSlots.length > 0) {
+  if (fixtureWithoutStep.stagingAreaSlots.length) {
     return {
       content: (
         <>
