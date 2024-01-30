@@ -90,7 +90,7 @@ def _build_pass_step(
         #   will be the same
         duration=float64(abs(distance[movers[0]] / speed[movers[0]])),
         present_nodes=movers,
-        stop_condition=MoveStopCondition.none,
+        stop_condition=MoveStopCondition.sync_line,
     )
     pipette_move = create_step(
         distance={ax: float64(abs(distance[ax])) for ax in movers},
