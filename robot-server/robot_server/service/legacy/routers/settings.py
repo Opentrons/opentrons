@@ -165,8 +165,8 @@ async def post_log_level_local(
     path="/settings/log_level/upstream",
     description=(
         "Set the minimum level of logs sent upstream via"
-        " syslog-ng to Opentrons. Only available on"
-        " a real robot."
+        " syslog-ng to Opentrons."
+        " Removed in robot software v7.2.0."
     ),
     response_model=LegacyErrorResponse,
 )
