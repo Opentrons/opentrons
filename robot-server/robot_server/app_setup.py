@@ -10,7 +10,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from opentrons import __version__
 
 from .errors import exception_handlers
-from .hardware import start_initializing_hardware, clean_up_hardware
+from .hardware import (
+    start_initializing_hardware,
+    clean_up_hardware,
+    start_blinking_front_button_light,
+    stop_blinking_front_button_light,
+)
 from .persistence import start_initializing_persistence, clean_up_persistence
 from .router import router
 from .service import initialize_logging
@@ -74,12 +79,17 @@ async def on_startup() -> None:
     start_initializing_hardware(
         app_state=app.state,
         callbacks=[
+            # Flex light control:
             (start_light_control_task, True),
             (mark_light_control_startup_finished, False),
+            # OT-2 light control:
+            (start_blinking_front_button_light, True),
         ],
     )
     start_initializing_persistence(
-        app_state=app.state, persistence_directory_root=persistence_directory
+        app_state=app.state,
+        persistence_directory_root=persistence_directory,
+        done_callbacks=[stop_blinking_front_button_light],
     )
     initialize_notification_client(
         app_state=app.state,

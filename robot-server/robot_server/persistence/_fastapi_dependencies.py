@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Awaitable, Callable, Iterable, Optional
 from typing_extensions import Literal
 
 from sqlalchemy.engine import Engine as SQLEngine
@@ -57,7 +57,9 @@ class DatabaseFailedToInitialize(ErrorDetails):
 
 
 def start_initializing_persistence(  # noqa: C901
-    app_state: AppState, persistence_directory_root: Optional[Path]
+    app_state: AppState,
+    persistence_directory_root: Optional[Path],
+    done_callbacks: Iterable[Callable[[AppState], Awaitable[None]]],
 ) -> None:
     """Initialize the persistence layer to get it ready for use by endpoint functions.
 
@@ -135,6 +137,15 @@ def start_initializing_persistence(  # noqa: C901
     _sql_engine_init_task_accessor.set_on(
         app_state=app_state, value=sql_engine_init_task
     )
+
+    async def wait_until_done_then_trigger_callbacks() -> None:
+        try:
+            await sql_engine_init_task
+        finally:
+            for callback in done_callbacks:
+                await callback(app_state)
+
+    asyncio.create_task(wait_until_done_then_trigger_callbacks())
 
 
 async def clean_up_persistence(app_state: AppState) -> None:
