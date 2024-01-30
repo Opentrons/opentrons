@@ -907,7 +907,6 @@ class API(
         return self.get_engaged_axes()
 
     async def disengage_axes(self, which: List[Axis]) -> None:
-        # Should this have wait_for_running decorator too?
         await self._backend.disengage_axes([ot2_axis_to_string(ax) for ax in which])
 
     @ExecutionManagerProvider.wait_for_running
