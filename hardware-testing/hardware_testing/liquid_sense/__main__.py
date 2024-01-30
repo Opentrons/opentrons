@@ -5,8 +5,10 @@ from json import load as json_load
 from pathlib import Path
 import subprocess
 from time import sleep
+import os
 from typing import List, Any
 
+from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.gravimetric import helpers, workarounds
 from hardware_testing.data.csv_report import CSVReport
 from hardware_testing.gravimetric.measurement.record import GravimetricRecorder
@@ -84,6 +86,8 @@ class RunArgs:
     ctx: ProtocolContext
     protocol_cfg: Any
     test_report: CSVReport
+    start_height_offset: float
+    aspirate: bool
 
     @classmethod
     def _get_protocol_context(cls, args: argparse.Namespace) -> ProtocolContext:
@@ -200,6 +204,8 @@ class RunArgs:
             ctx=_ctx,
             protocol_cfg=protocol_cfg,
             test_report=report,
+            start_height_offset=args.start_height_offset,
+            aspirate=args.plunger_direction == "aspirate"
         )
 
 
@@ -229,17 +235,17 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
-    if not run_args.ctx.is_simulating():
-        data_dir = get_testing_data_directory()
-        data_file = f"/{data_dir}/{run_args.name}/{run_args.run_id}/serial.log"
-        ui.print_info(f"logging can data to {data_file}")
-        serial_logger = subprocess.Popen(
-            [f"python3 -m opentrons_hardware.scripts.can_mon > {data_file}"],
-            shell=True,
-        )
-        sleep(1)
-    hw = run_args.ctx._core.get_hardware()
     try:
+        if not run_args.ctx.is_simulating():
+            data_dir = get_testing_data_directory()
+            data_file = f"/{data_dir}/{run_args.name}/{run_args.run_id}/serial.log"
+            ui.print_info(f"logging can data to {data_file}")
+            serial_logger = subprocess.Popen(
+                [f"python3 -m opentrons_hardware.scripts.can_mon > {data_file}"],
+                shell=True,
+            )
+            sleep(1)
+        hw = run_args.ctx._core.get_hardware()
         if not run_args.ctx.is_simulating():
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
         ui.print_info("homing...")
@@ -255,7 +261,12 @@ if __name__ == "__main__":
             run_args.recorder.stop()
             run_args.recorder.deactivate()
         if not run_args.ctx.is_simulating():
+            ui.print_info("killing serial log")
             serial_logger.terminate()
         run_args.test_report.save_to_disk()
         run_args.test_report.print_results()
-    ui.print_info("done\n\n")
+        ui.print_info("done\n\n")
+        run_args.ctx.cleanup()
+        helpers_ot3.restart_server_ot3()
+        os._exit(os.EX_OK)
+
