@@ -25,7 +25,6 @@ storybook-static
 api/**
 update-server/**
 robot-server/**
-notify-server/**
 shared-data/python/**
 hardware-testing/**
 

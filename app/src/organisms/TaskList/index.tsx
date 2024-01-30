@@ -142,11 +142,11 @@ function ProgressTrackerItem({
                     isTaskListComplete || isPastSubTask
                       ? COLORS.blue50
                       : subTask.isComplete === true
-                      ? COLORS.grey60
+                      ? COLORS.grey40
                       : 'initial'
                   }
                   border={BORDERS.lineBorder}
-                  borderColor={isFutureSubTask ? COLORS.grey60 : COLORS.blue50}
+                  borderColor={isFutureSubTask ? COLORS.grey40 : COLORS.blue50}
                   borderWidth={SPACING.spacing2}
                   color={COLORS.white}
                   margin={SPACING.spacing16}

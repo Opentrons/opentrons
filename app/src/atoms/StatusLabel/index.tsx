@@ -22,6 +22,7 @@ interface StatusLabelProps {
   iconSize?: string
   pulse?: boolean
   id?: string
+  capitalizeStatus?: boolean
 }
 
 export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
@@ -35,6 +36,7 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
     pulse,
     showIcon = true,
     id,
+    capitalizeStatus = true,
   } = props
 
   return (
@@ -76,7 +78,7 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
           fontWeight={fontWeight ?? TYPOGRAPHY.fontWeightRegular}
           color={textColor ?? COLORS.blue60}
         >
-          {capitalize(status)}
+          {capitalizeStatus ? capitalize(status) : status}
         </StyledText>
       </Flex>
     </Flex>

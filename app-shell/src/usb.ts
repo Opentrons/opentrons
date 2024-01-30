@@ -157,9 +157,9 @@ function tryCreateAndStartUsbHttpRequests(dispatch: Dispatch): void {
           }) === 0
       )
 
-      // retry if no OT-3 serial port found - usb-detection and serialport packages have race condition
+      // retry if no Flex serial port found - usb-detection and serialport packages have race condition
       if (ot3UsbSerialPort == null) {
-        usbLog.debug('no OT-3 serial port found')
+        usbLog.debug('No Flex serial port found.')
         return
       }
       if (usbHttpAgent == null) {

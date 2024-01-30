@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Flex, POSITION_RELATIVE, useHoverTooltip } from '@opentrons/components'
 
+import { MODULE_MODELS_OT2_ONLY } from '@opentrons/shared-data'
 import { MenuList } from '../../atoms/MenuList'
 import { Tooltip } from '../../atoms/Tooltip'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
@@ -81,7 +82,10 @@ export const ModuleOverflowMenu = (
   return (
     <Flex position={POSITION_RELATIVE}>
       <MenuList>
-        {isFlex ? (
+        {isFlex &&
+        !MODULE_MODELS_OT2_ONLY.some(
+          modModel => modModel === module.moduleModel
+        ) ? (
           <>
             <MenuItem
               onClick={handleCalibrateClick}
