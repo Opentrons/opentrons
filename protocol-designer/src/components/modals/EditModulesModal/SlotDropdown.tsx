@@ -1,8 +1,13 @@
 import * as React from 'react'
-import { useField } from 'formik'
 import { DropdownField } from '@opentrons/components'
+import type {
+  ControllerFieldState,
+  ControllerRenderProps,
+} from 'react-hook-form'
 
 export interface SlotDropdownProps {
+  field: ControllerRenderProps<any, any>
+  fieldState: ControllerFieldState
   fieldName: string
   disabled: boolean
   tabIndex: number
@@ -14,18 +19,17 @@ export interface SlotDropdownProps {
 }
 
 export const SlotDropdown = (props: SlotDropdownProps): JSX.Element => {
-  const { fieldName, options, disabled, tabIndex } = props
-  const [field, meta] = useField(props.fieldName)
+  const { field, fieldState } = props
   return (
     <DropdownField
-      tabIndex={tabIndex}
-      options={options}
-      name={fieldName}
+      tabIndex={props.tabIndex}
+      options={props.options}
+      name={props.fieldName}
       value={field.value}
-      disabled={disabled}
-      onChange={field.onChange}
+      disabled={props.disabled}
+      onChange={value => field.onChange(value)}
       onBlur={field.onBlur}
-      error={meta.error}
+      error={fieldState.error?.message}
     />
   )
 }
