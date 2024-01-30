@@ -34,6 +34,7 @@ types-requests = "==2.25.6"
 types-mock = "==4.0.1"
 sqlalchemy2-stubs = "==0.0.2a21"
 python-box = "==5.4.1"
+types-paho-mqtt = "==1.6.0.20240106"
 
 [packages]
 anyio = "==3.6.1"
