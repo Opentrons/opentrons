@@ -78,9 +78,7 @@ def _build_pass_step(
     speed: Dict[NodeId, float],
     stop_condition: MoveStopCondition = MoveStopCondition.sync_line,
 ) -> MoveGroupStep:
-    pipette_nodes = [
-        i for i in movers if i in [NodeId.pipette_left, NodeId.pipette_right]
-    ]
+    pipette_nodes = [i for i in movers if i in [NodeId.pipette_left, NodeId.pipette_right]]
 
     move_group = create_step(
         distance={ax: float64(abs(distance[ax])) for ax in movers},
@@ -92,7 +90,7 @@ def _build_pass_step(
         #   will be the same
         duration=float64(abs(distance[movers[0]] / speed[movers[0]])),
         present_nodes=movers,
-        stop_condition=stop_condition,
+        stop_condition=MoveStopCondition.none,
     )
     pipette_move = create_step(
         distance={ax: float64(abs(distance[ax])) for ax in movers},
