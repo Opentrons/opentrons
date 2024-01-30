@@ -1,25 +1,22 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { resetAllWhenMocks } from 'jest-when'
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import {
-  useTrackEvent,
-  ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
-} from '../../../redux/analytics'
+import { useTrackEvent } from '../../../redux/analytics'
 import * as CustomLabware from '../../../redux/custom-labware'
 import {
+  AdditionalCustomLabwareSourceFolder,
   ClearUnavailableRobots,
   EnableDevTools,
   OT2AdvancedSettings,
   OverridePathToPython,
   PreventRobotCaching,
+  ShowHeaterShakerAttachmentModal,
   ShowLabwareOffsetSnippets,
   U2EInformation,
-  ShowHeaterShakerAttachmentModal,
   UpdatedChannel,
 } from '../../../organisms/AdvancedSettings'
 
@@ -46,12 +43,8 @@ const render = (): ReturnType<typeof renderWithProviders> => {
   )
 }
 
-const getCustomLabwarePath = CustomLabware.getCustomLabwareDirectory as jest.MockedFunction<
-  typeof CustomLabware.getCustomLabwareDirectory
->
-
-const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
-  typeof useTrackEvent
+const mockAdditionalCustomLabwareSourceFolder = AdditionalCustomLabwareSourceFolder as jest.MockedFunction<
+  typeof AdditionalCustomLabwareSourceFolder
 >
 const mockPreventRobotCaching = PreventRobotCaching as jest.MockedFunction<
   typeof PreventRobotCaching
@@ -82,13 +75,8 @@ const mockUpdatedChannel = UpdatedChannel as jest.MockedFunction<
   typeof UpdatedChannel
 >
 
-let mockTrackEvent: jest.Mock
-
 describe('AdvancedSettings', () => {
   beforeEach(() => {
-    mockTrackEvent = jest.fn()
-    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
-    getCustomLabwarePath.mockReturnValue('')
     mockPreventRobotCaching.mockReturnValue(<div>mock PreventRobotCaching</div>)
     mockOT2AdvancedSettings.mockReturnValue(<div>mock OT2AdvancedSettings</div>)
     mockEnableDevTools.mockReturnValue(<div>mock EnableDevTools</div>)
@@ -106,11 +94,13 @@ describe('AdvancedSettings', () => {
       <div>mock ShowHeaterShakerAttachmentModal</div>
     )
     mockUpdatedChannel.mockReturnValue(<div>mock UpdatedChannel</div>)
+    mockAdditionalCustomLabwareSourceFolder.mockReturnValue(
+      <div>mock AdditionalCustomLabwareSourceFolder</div>
+    )
   })
 
   afterEach(() => {
     jest.resetAllMocks()
-    resetAllWhenMocks()
   })
 
   it('should render mock UpdatedChannel section', () => {
@@ -118,26 +108,11 @@ describe('AdvancedSettings', () => {
     screen.getByText('mock UpdatedChannel')
   })
 
-  it('renders the custom labware section with source folder selected', () => {
-    getCustomLabwarePath.mockReturnValue('/mock/custom-labware-path')
-    const [{ getByText, getByRole }] = render()
-    getByText(
-      'If you want to specify a folder to manually manage Custom Labware files, you can add the directory here.'
-    )
-    getByText('Additional Source Folder')
-    getByRole('button', { name: 'Change labware source folder' })
+  it('should render mock OT-2 Advanced Settings Tip Length Calibration Method section', () => {
+    render()
+    screen.getByText('mock AdditionalCustomLabwareSourceFolder')
   })
 
-  it('renders the custom labware section with no source folder selected', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText('No additional source folder specified')
-    const btn = getByRole('button', { name: 'Add labware source folder' })
-    fireEvent.click(btn)
-    expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
-      properties: {},
-    })
-  })
   it('should render mock OT-2 Advanced Settings Tip Length Calibration Method section', () => {
     render()
     screen.getByText('mock OT2AdvancedSettings')

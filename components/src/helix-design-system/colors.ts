@@ -60,7 +60,7 @@ export const grey50 = '#9C9C9C'
 export const grey40 = '#D0D0D0'
 export const grey35 = '#CBCCCC'
 export const grey30 = '#DEDEDE'
-export const grey20 = '#ECECEC'
+export const grey20 = '#E9E9E9'
 export const grey10 = '#F8F8F8'
 
 /**

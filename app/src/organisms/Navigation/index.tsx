@@ -147,7 +147,7 @@ const NavigationLink = (props: { to: string; name: string }): JSX.Element => (
 
 const TouchNavLink = styled(NavLink)`
   ${TYPOGRAPHY.level3HeaderSemiBold}
-  color: ${COLORS.grey60};
+  color: ${COLORS.grey50};
   height: 3.5rem;
   display: flex;
   flex-direction: ${DIRECTION_COLUMN};
@@ -170,8 +170,11 @@ const IconButton = styled('button')`
   max-height: 100%;
   background-color: ${COLORS.white};
 
-  &:active {
+  &:hover {
     background-color: ${COLORS.grey35};
+  }
+  &:active {
+    background-color: ${COLORS.grey30};
   }
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
