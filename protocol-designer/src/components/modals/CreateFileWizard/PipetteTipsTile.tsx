@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
-import { FormikProps } from 'formik'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -35,8 +34,9 @@ import { HandleEnter } from './HandleEnter'
 
 import type { PipetteName } from '@opentrons/shared-data'
 import type { FormState, WizardTileProps } from './types'
-import { ThunkDispatch } from 'redux-thunk'
-import { BaseState } from '../../../types'
+import type { ThunkDispatch } from 'redux-thunk'
+import type { BaseState } from '../../../types'
+import type { UseFormReturn } from 'react-hook-form'
 
 export function FirstPipetteTipsTile(props: WizardTileProps): JSX.Element {
   return <PipetteTipsTile {...props} mount="left" />
@@ -44,9 +44,10 @@ export function FirstPipetteTipsTile(props: WizardTileProps): JSX.Element {
 export function SecondPipetteTipsTile(
   props: WizardTileProps
 ): JSX.Element | null {
-  const { values, proceed } = props
-  const leftPipetteName = values.pipettesByMount.left.pipetteName
-  const rightPipetteName = values.pipettesByMount.right.pipetteName
+  const { proceed, watch } = props
+  const pipettesByMount = watch('pipettesByMount')
+  const leftPipetteName = pipettesByMount.left.pipetteName
+  const rightPipetteName = pipettesByMount.right.pipetteName
 
   const shouldProceed =
     leftPipetteName === 'p1000_96' || rightPipetteName === ''
@@ -63,9 +64,10 @@ interface PipetteTipsTileProps extends WizardTileProps {
   mount: Mount
 }
 export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
-  const { proceed, goBack, mount, values } = props
+  const { proceed, goBack, mount, watch } = props
+  const pipettesByMount = watch('pipettesByMount')
 
-  const firstPipetteName = values.pipettesByMount[mount].pipetteName
+  const firstPipetteName = pipettesByMount[mount].pipetteName
   const tileHeader = i18n.t(
     'modal.create_file_wizard.choose_tips_for_pipette',
     {
@@ -142,19 +144,20 @@ const ACCORDION_STYLE = css`
     background: ${COLORS.grey35};
   }
 `
-interface PipetteTipsFieldProps extends FormikProps<FormState> {
+interface PipetteTipsFieldProps extends UseFormReturn<FormState> {
   mount: Mount
 }
 
 function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
-  const { mount, values, setFieldValue } = props
+  const { mount, watch, setValue } = props
+  const pipettesByMount = watch('pipettesByMount')
   const allowAllTipracks = useSelector(getAllowAllTipracks)
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const [showCustomTipracks, setShowCustomTipracks] = React.useState<boolean>(
     false
   )
   const allLabware = useSelector(getLabwareDefsByURI)
-  const selectedPipetteName = values.pipettesByMount[mount].pipetteName
+  const selectedPipetteName = pipettesByMount[mount].pipetteName
   const selectedPipetteDefaultTipracks =
     selectedPipetteName != null
       ? getPipetteNameSpecs(selectedPipetteName as PipetteName)
@@ -176,19 +179,16 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
     option.value.includes('custom_beta')
   )
 
-  const nameAccessor = `pipettesByMount.${mount}.tiprackDefURI`
-  const currentValue = values.pipettesByMount[mount].tiprackDefURI
+  const currentValue = pipettesByMount[mount].tiprackDefURI
 
   React.useEffect(() => {
     if (currentValue === undefined) {
-      // this timeout avoids an infinite loop caused by Formik and React 18 not playing nice
-      // see https://github.com/downshift-js/downshift/issues/1511
-      // TODO: migrate away from formik
-      setTimeout(() => {
-        setFieldValue(nameAccessor, tiprackOptions[0]?.value ?? '')
-      })
+      setValue(
+        `pipettesByMount.${mount}.tiprackDefURI`,
+        tiprackOptions[0]?.value ?? ''
+      )
     }
-  }, [currentValue, setFieldValue, nameAccessor, tiprackOptions])
+  }, [currentValue, setValue, tiprackOptions])
 
   return (
     <Flex
@@ -203,7 +203,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
             isSelected={currentValue === o.value}
             text={o.name}
             onClick={() => {
-              setFieldValue(nameAccessor, o.value)
+              setValue(`pipettesByMount.${mount}.tiprackDefURI`, o.value)
             }}
             width="21.75rem"
             minHeight="4rem"
@@ -262,7 +262,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
                   isSelected={currentValue === o.value}
                   text={o.name}
                   onClick={() => {
-                    setFieldValue(nameAccessor, o.value)
+                    setValue(`pipettesByMount.${mount}.tiprackDefURI`, o.value)
                   }}
                   width="21.75rem"
                   minHeight="4rem"

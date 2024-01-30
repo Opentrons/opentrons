@@ -33,7 +33,6 @@ import { BaseState } from '../../../types'
 export interface Props {
   initialTabIndex?: number
   values: FormPipettesByMount
-  // TODO 2020-3-20 use formik typing here after we update the def in flow-typed
   errors:
     | null
     | string

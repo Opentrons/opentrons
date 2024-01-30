@@ -1,6 +1,12 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Form, Formik, useFormikContext } from 'formik'
+import {
+  Control,
+  Controller,
+  ControllerRenderProps,
+  useForm,
+  useWatch,
+} from 'react-hook-form'
 import {
   BUTTON_TYPE_SUBMIT,
   OutlineButton,
@@ -38,17 +44,27 @@ export interface StagingAreasValues {
   selectedSlots: string[]
 }
 
+interface StagingAreaModalComponentProps extends StagingAreasModalProps {
+  control: Control<StagingAreasValues, 'selectedSlots'>
+  stagingAreaLocations: string[] | null
+}
+
 const StagingAreasModalComponent = (
-  props: StagingAreasModalProps
+  props: StagingAreaModalComponentProps
 ): JSX.Element => {
-  const { onCloseClick, stagingAreas } = props
-  const { values, setFieldValue } = useFormikContext<StagingAreasValues>()
+  const { onCloseClick, stagingAreas, control, stagingAreaLocations } = props
   const initialDeckSetup = useSelector(getInitialDeckSetup)
   const hasWasteChute =
     Object.values(initialDeckSetup.additionalEquipmentOnDeck).find(
       aE => aE.name === 'wasteChute'
     ) != null
-  const areSlotsEmpty = values.selectedSlots.map(slot => {
+  const selectedSlots = useWatch({
+    control,
+    name: 'selectedSlots',
+    defaultValue: stagingAreaLocations ?? [],
+  })
+
+  const areSlotsEmpty = selectedSlots.map(slot => {
     if (slot === 'cutoutD3' && hasWasteChute) {
       return true
     } else {
@@ -91,7 +107,10 @@ const StagingAreasModalComponent = (
     selectableSlots
   )
 
-  const handleClickAdd = (cutoutId: string): void => {
+  const handleClickAdd = (
+    cutoutId: string,
+    field: ControllerRenderProps<StagingAreasValues, 'selectedSlots'>
+  ): void => {
     const modifiedSlots: DeckConfiguration = updatedSlots.map(slot => {
       if (slot.cutoutId === cutoutId) {
         return {
@@ -102,11 +121,14 @@ const StagingAreasModalComponent = (
       return slot
     })
     setUpdatedSlots(modifiedSlots)
-    const updatedSelectedSlots = [...values.selectedSlots, cutoutId]
-    setFieldValue('selectedSlots', updatedSelectedSlots)
+    const updatedSelectedSlots = [...selectedSlots, cutoutId]
+    field.onChange(updatedSelectedSlots)
   }
 
-  const handleClickRemove = (cutoutId: string): void => {
+  const handleClickRemove = (
+    cutoutId: string,
+    field: ControllerRenderProps<StagingAreasValues, 'selectedSlots'>
+  ): void => {
     const modifiedSlots: DeckConfiguration = updatedSlots.map(slot => {
       if (slot.cutoutId === cutoutId) {
         return { ...slot, cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE }
@@ -114,14 +136,12 @@ const StagingAreasModalComponent = (
       return slot
     })
     setUpdatedSlots(modifiedSlots)
-    setFieldValue(
-      'selectedSlots',
-      values.selectedSlots.filter(item => item !== cutoutId)
-    )
+
+    field.onChange(selectedSlots.filter(item => item !== cutoutId))
   }
 
   return (
-    <Form>
+    <>
       <Flex height="23rem" flexDirection={DIRECTION_COLUMN}>
         <Flex
           justifyContent={JUSTIFY_END}
@@ -141,12 +161,19 @@ const StagingAreasModalComponent = (
             ) : null}
           </Box>
         </Flex>
-        <DeckConfigurator
-          deckConfig={updatedSlots}
-          handleClickAdd={handleClickAdd}
-          handleClickRemove={handleClickRemove}
-          showExpansion={false}
-        />
+        <Controller
+          name="selectedSlots"
+          control={control}
+          defaultValue={stagingAreaLocations ?? []}
+          render={({ field }) => (
+            <DeckConfigurator
+              deckConfig={updatedSlots}
+              handleClickAdd={cutoutId => handleClickAdd(cutoutId, field)}
+              handleClickRemove={cutoutId => handleClickRemove(cutoutId, field)}
+              showExpansion={false}
+            />
+          )}
+        ></Controller>
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -162,7 +189,7 @@ const StagingAreasModalComponent = (
           {i18n.t('button.save')}
         </OutlineButton>
       </Flex>
-    </Form>
+    </>
   )
 }
 
@@ -176,30 +203,26 @@ export const StagingAreasModal = (
 ): JSX.Element => {
   const { onCloseClick, stagingAreas } = props
   const dispatch = useDispatch()
+  const { control, handleSubmit } = useForm<StagingAreasValues>()
   const stagingAreaLocations = getStagingAreaSlots(stagingAreas)
 
-  const onSaveClick = (values: StagingAreasValues): void => {
+  const onSaveClick = (data: StagingAreasValues): void => {
     onCloseClick()
 
-    values.selectedSlots.forEach(slot => {
+    data.selectedSlots.forEach(slot => {
       if (!stagingAreaLocations?.includes(slot)) {
         dispatch(createDeckFixture('stagingArea', slot))
       }
     })
     Object.values(stagingAreas).forEach(area => {
-      if (!values.selectedSlots.includes(area.location as string)) {
+      if (!data.selectedSlots.includes(area.location as string)) {
         dispatch(deleteDeckFixture(area.id))
       }
     })
   }
 
   return (
-    <Formik
-      onSubmit={onSaveClick}
-      initialValues={{
-        selectedSlots: stagingAreaLocations ?? [],
-      }}
-    >
+    <form onSubmit={handleSubmit(onSaveClick)}>
       <ModalShell width="48rem">
         <Box marginTop={SPACING.spacing32} paddingX={SPACING.spacing32}>
           <Text as="h2">
@@ -209,8 +232,10 @@ export const StagingAreasModal = (
         <StagingAreasModalComponent
           onCloseClick={onCloseClick}
           stagingAreas={stagingAreas}
+          control={control}
+          stagingAreaLocations={stagingAreaLocations}
         />
       </ModalShell>
-    </Formik>
+    </form>
   )
 }

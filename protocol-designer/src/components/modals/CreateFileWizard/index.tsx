@@ -2,9 +2,10 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import reduce from 'lodash/reduce'
 import mapValues from 'lodash/mapValues'
+import { useForm, UseFormReturn } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
 import omit from 'lodash/omit'
 import uniq from 'lodash/uniq'
-import { Formik, FormikProps } from 'formik'
 import * as Yup from 'yup'
 import { ModalShell } from '@opentrons/components'
 import {
@@ -32,6 +33,7 @@ import {
   FormPipette,
   PipetteOnDeck,
 } from '../../../step-forms'
+import { i18n } from '../../../localization'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import { uuid } from '../../../utils'
 import { actions as navigationActions } from '../../../navigation'
@@ -59,9 +61,8 @@ import { getTrashSlot } from './utils'
 
 import type { NormalizedPipette } from '@opentrons/step-generation'
 import type { FormState } from './types'
-import { i18n } from '../../../localization'
-import { ThunkDispatch } from 'redux-thunk'
-import { BaseState } from '../../../types'
+import type { ThunkDispatch } from 'redux-thunk'
+import type { BaseState } from '../../../types'
 
 type WizardStep =
   | 'robotType'
@@ -358,8 +359,8 @@ const pipetteValidationShape = Yup.object().shape({
     .nullable()
     .when('pipetteName', {
       is: (val: string | null): boolean => Boolean(val),
-      then: Yup.string().required('Required'),
-      otherwise: null,
+      then: schema => schema.required('Required'),
+      otherwise: schema => schema.nullable(),
     }),
 })
 // any typing this because TS says there are too many possibilities of what this could be
@@ -369,8 +370,8 @@ const moduleValidationShape: any = Yup.object().shape({
     .nullable()
     .when('onDeck', {
       is: true,
-      then: Yup.string().required('Required'),
-      otherwise: null,
+      then: schema => schema.required('Required'),
+      otherwise: schema => schema.nullable(),
     }),
   slot: Yup.string(),
 })
@@ -393,7 +394,7 @@ const validationSchema = Yup.object().shape({
     [TEMPERATURE_MODULE_TYPE]: moduleValidationShape,
     [THERMOCYCLER_MODULE_TYPE]: moduleValidationShape,
   }),
-})
+}) as any
 
 interface CreateFileFormProps {
   currentWizardStep: WizardStep
@@ -411,6 +412,10 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     goBack,
     setWizardSteps,
   } = props
+  const { ...formProps } = useForm<FormState>({
+    defaultValues: initialFormState,
+    resolver: yupResolver(validationSchema),
+  })
 
   const handleProceedRobotType = (robotType: string): void => {
     if (robotType === OT2_ROBOT_TYPE) {
@@ -420,71 +425,55 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     }
   }
 
-  const contentsByWizardStep: {
-    [wizardStep in WizardStep]: (
-      formikProps: FormikProps<FormState>
-    ) => JSX.Element
-  } = {
-    robotType: (formikProps: FormikProps<FormState>) => (
-      <RobotTypeTile
-        {...formikProps}
-        goBack={goBack}
-        proceed={() => {
-          handleProceedRobotType(formikProps.values.fields.robotType)
-          proceed()
-        }}
-      />
-    ),
-    metadata: (formikProps: FormikProps<FormState>) => (
-      <MetadataTile {...formikProps} proceed={proceed} goBack={goBack} />
-    ),
-    first_pipette_type: (formikProps: FormikProps<FormState>) => (
-      <FirstPipetteTypeTile {...{ ...formikProps, proceed, goBack }} />
-    ),
-    first_pipette_tips: (formikProps: FormikProps<FormState>) => (
-      <FirstPipetteTipsTile {...{ ...formikProps, proceed, goBack }} />
-    ),
-    second_pipette_type: (formikProps: FormikProps<FormState>) => (
-      <SecondPipetteTypeTile {...{ ...formikProps, proceed, goBack }} />
-    ),
-    second_pipette_tips: (formikProps: FormikProps<FormState>) => (
-      <SecondPipetteTipsTile {...{ ...formikProps, proceed, goBack }} />
-    ),
-    staging_area: (formikProps: FormikProps<FormState>) => (
-      <StagingAreaTile {...{ ...formikProps, proceed, goBack }} />
-    ),
-    modulesAndOther: (formikProps: FormikProps<FormState>) => (
-      <ModulesAndOtherTile
-        {...formikProps}
-        proceed={() => createProtocolFile(formikProps.values)}
-        goBack={goBack}
-      />
-    ),
-  }
-
   return (
-    <Formik
-      enableReinitialize
-      initialValues={initialFormState}
-      onSubmit={() => {}}
-      validationSchema={validationSchema}
-    >
-      {(formikProps: FormikProps<FormState>) => {
-        const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-          const { name, value } = e.target
-          formikProps.setFieldValue(name, value)
-          formikProps.setFieldTouched(name, true)
+    <form onSubmit={formProps.handleSubmit(() => {})}>
+      {(() => {
+        switch (currentWizardStep) {
+          case 'robotType':
+            return (
+              <RobotTypeTile
+                {...formProps}
+                goBack={goBack}
+                proceed={() => {
+                  handleProceedRobotType(formProps.getValues().fields.robotType)
+                  proceed()
+                }}
+              />
+            )
+          case 'metadata':
+            return (
+              <MetadataTile {...formProps} proceed={proceed} goBack={goBack} />
+            )
+          case 'first_pipette_type':
+            return (
+              <FirstPipetteTypeTile {...{ ...formProps, proceed, goBack }} />
+            )
+          case 'first_pipette_tips':
+            return (
+              <FirstPipetteTipsTile {...{ ...formProps, proceed, goBack }} />
+            )
+          case 'second_pipette_type':
+            return (
+              <SecondPipetteTypeTile {...{ ...formProps, proceed, goBack }} />
+            )
+          case 'second_pipette_tips':
+            return (
+              <SecondPipetteTipsTile {...{ ...formProps, proceed, goBack }} />
+            )
+          case 'staging_area':
+            return <StagingAreaTile {...{ ...formProps, proceed, goBack }} />
+          case 'modulesAndOther':
+            return (
+              <ModulesAndOtherTile
+                {...formProps}
+                proceed={() => createProtocolFile(formProps.getValues())}
+                goBack={goBack}
+              />
+            )
+          default:
+            return null
         }
-
-        return currentWizardStep === 'metadata'
-          ? contentsByWizardStep.metadata({
-              ...formikProps,
-              handleChange,
-            })
-          : contentsByWizardStep[currentWizardStep]({
-              ...formikProps,
-            })
-      }}
-    </Formik>
+      })()}
+    </form>
   )
 }

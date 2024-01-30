@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -16,11 +17,10 @@ import {
   PrimaryButton,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
-import { i18n } from '../../../localization'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-import { css } from 'styled-components'
 import opentronsFlexImage from '../../../images/OpentronsFlex.png'
 import OT2Image from '../../../images/OT2.png'
+import { i18n } from '../../../localization'
 import { HandleEnter } from './HandleEnter'
 
 import type { RobotType } from '@opentrons/shared-data'
@@ -29,7 +29,11 @@ import type { WizardTileProps } from './types'
 const ROBOT_TYPES: RobotType[] = [OT2_ROBOT_TYPE, FLEX_ROBOT_TYPE]
 
 export function RobotTypeTile(props: WizardTileProps): JSX.Element {
-  const { values, setFieldValue, proceed } = props
+  const { setValue, proceed, watch } = props
+  const [liveRobotType] = watch(['fields.robotType'], {
+    fields: { robotType: OT2_ROBOT_TYPE },
+  })
+
   return (
     <HandleEnter onEnter={proceed}>
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
@@ -49,9 +53,9 @@ export function RobotTypeTile(props: WizardTileProps): JSX.Element {
             {ROBOT_TYPES.map(robotType => (
               <RobotTypeOption
                 key={robotType}
-                isSelected={values.fields.robotType === robotType}
+                isSelected={liveRobotType === robotType}
                 onClick={() => {
-                  setFieldValue('fields.robotType', robotType)
+                  setValue('fields.robotType', robotType)
                 }}
                 robotType={robotType}
               />
