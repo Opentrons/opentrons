@@ -74,6 +74,7 @@ const mockU2EInformation = U2EInformation as jest.MockedFunction<
 >
 const mockClearUnavailableRobots = ClearUnavailableRobots as jest.MockedFunction<
   typeof ClearUnavailableRobots
+>
 const mockOverridePathToPython = OverridePathToPython as jest.MockedFunction<
   typeof OverridePathToPython
 >
@@ -101,7 +102,8 @@ describe('AdvancedSettings', () => {
     mockEnableDevTools.mockReturnValue(<div>mock EnableDevTools</div>)
     mockU2EInformation.mockReturnValue(<div>mock U2EInformation</div>)
     mockClearUnavailableRobots.mockReturnValue(
-      <div>mock ClearUnavailableRobots</div>)
+      <div>mock ClearUnavailableRobots</div>
+    )
     mockOverridePathToPython.mockReturnValue(
       <div>mock OverridePathToPython</div>
     )
