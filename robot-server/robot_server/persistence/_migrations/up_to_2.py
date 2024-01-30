@@ -42,8 +42,8 @@ from typing_extensions import Final
 
 import sqlalchemy
 
-from ._tables import analysis_table, migration_table, run_table
-from . import legacy_pickle
+from .._tables.schema_2 import analysis_table, migration_table, run_table
+from .. import legacy_pickle
 
 
 _LATEST_SCHEMA_VERSION: Final = 2

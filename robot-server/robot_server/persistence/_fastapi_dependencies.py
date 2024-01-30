@@ -16,7 +16,7 @@ from server_utils.fastapi_utils.app_state import (
 )
 from robot_server.errors import ErrorDetails
 
-from ._database import create_sql_engine
+from ._database import create_schema_3_sql_engine
 from ._persistence_directory import (
     PersistenceResetter,
     prepare_active_subdirectory,
@@ -100,7 +100,7 @@ def start_initializing_persistence(  # noqa: C901
             prepared_subdirectory = await subdirectory_prep_task
 
             sql_engine = await to_thread.run_sync(
-                create_sql_engine, prepared_subdirectory / _DATABASE_FILE
+                create_schema_3_sql_engine, prepared_subdirectory / _DATABASE_FILE
             )
             return sql_engine
 
@@ -161,7 +161,13 @@ async def clean_up_persistence(app_state: AppState) -> None:
 async def get_sql_engine(
     app_state: AppState = Depends(get_app_state),
 ) -> SQLEngine:
-    """Return the server's singleton SQLAlchemy Engine for accessing the database."""
+    """Return the server's singleton SQLAlchemy Engine for accessing the database.
+
+    This is initialized in the background, starting when the server boots.
+    Initialization can entail time-consuming migrations.
+    If this is called before that initialization completes, this will raise an
+    appropriate HTTP-facing error to indicate that the server is busy.
+    """
     initialize_task = _sql_engine_init_task_accessor.get_from(app_state)
     assert (
         initialize_task is not None
