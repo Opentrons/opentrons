@@ -244,7 +244,7 @@ class ProtocolContext(CommandPublisher):
 
         See :ref:`axis_speed_limits` for examples.
 
-        .. caution::
+        .. note::
             This property is not yet supported in API version 2.14 or higher.
         """
         if self._api_version >= ENGINE_CORE_API_VERSION:
@@ -557,7 +557,7 @@ class ProtocolContext(CommandPublisher):
         :type location: int or str or :py:obj:`OFF_DECK`
 
         :param str namespace: The namespace that the labware definition belongs to.
-            If unspecified, will search both:
+            If unspecified, the API will automatically search two namespaces:
 
               * ``"opentrons"``, to load standard Opentrons labware definitions.
               * ``"custom_beta"``, to load custom labware definitions created with the
@@ -612,7 +612,7 @@ class ProtocolContext(CommandPublisher):
             be no entry for that slot in this value. That means you should not
             use ``loaded_labwares`` to determine if a slot is available or not,
             only to get a list of labwares. If you want a data structure of all
-            objects on the deck regardless of type, see :py:attr:`deck`.
+            objects on the deck regardless of type, use :py:attr:`deck`.
 
 
         :returns: Dict mapping deck slot number to labware, sorted in order of
@@ -659,7 +659,7 @@ class ProtocolContext(CommandPublisher):
         :param use_gripper: Whether to use the Flex Gripper for this movement.
 
                 * If ``True``, use the gripper to perform an automatic
-                  movement. This will raise an error on an OT-2 protocol.
+                  movement. This will raise an error in an OT-2 protocol.
                 * If ``False``, pause protocol execution until the user
                   performs the movement. Protocol execution remains paused until
                   the user presses **Confirm and resume**.
@@ -1048,9 +1048,9 @@ class ProtocolContext(CommandPublisher):
         """An interface to provide information about what's currently loaded on the deck.
         This object is useful for determining if a slot on the deck is free.
 
-        This object behaves like a dictionary whose keys are the deck slot names.
+        This object behaves like a dictionary whose keys are the :ref:`deck slot <deck-slots>` names.
         For instance, ``deck[1]``, ``deck["1"]``, and ``deck["D1"]``
-        will all return the object loaded in the front-left slot. (See :ref:`deck-slots`.)
+        will all return the object loaded in the front-left slot.
 
         The value will be a :py:obj:`~opentrons.protocol_api.Labware` if the slot contains a
         labware, a module context if the slot contains a hardware
@@ -1062,7 +1062,7 @@ class ProtocolContext(CommandPublisher):
 
         For :ref:`advanced-control` *only*, you can delete an element of the ``deck`` dict.
         This only works for deck slots that contain labware objects. For example, if slot
-        1 contains a labware, ``del protocol.deck['1']`` will free the slot so you can
+        1 contains a labware, ``del protocol.deck["1"]`` will free the slot so you can
         load another labware there.
 
         .. warning::
@@ -1081,7 +1081,7 @@ class ProtocolContext(CommandPublisher):
     def fixed_trash(self) -> Union[Labware, TrashBin]:
         """The trash fixed to slot 12 of an OT-2's deck.
 
-        In API version 2.15 and earlier, the fixed trash is a :py:class:`.Labware` object with one well. Access it like labware in your protocol. For example, ``protocol.fixed_trash['A1']``.
+        In API version 2.15 and earlier, the fixed trash is a :py:class:`.Labware` object with one well. Access it like labware in your protocol. For example, ``protocol.fixed_trash["A1"]``.
 
         In API version 2.15 only, Flex protocols have a fixed trash in slot A3.
 
