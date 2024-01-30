@@ -42,6 +42,13 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
+LOG = logging.getLogger(__name__)
+
+logging.getLogger("opentrons.hardware_control.ot3api.OT3API").setLevel(logging.INFO)
+logging.getLogger("opentrons.hardware_control.ot3api").setLevel(logging.INFO)
+loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
+print(loggers)
+
 asyncio.run(set_adv_setting('disableOverpressureDetection', True))
 
 FLOW_TO_SPEED = 1.0/15.9 # mm/uL
