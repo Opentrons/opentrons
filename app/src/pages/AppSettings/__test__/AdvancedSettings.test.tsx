@@ -5,8 +5,6 @@ import { screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import { useTrackEvent } from '../../../redux/analytics'
-import * as CustomLabware from '../../../redux/custom-labware'
 import {
   AdditionalCustomLabwareSourceFolder,
   ClearUnavailableRobots,
