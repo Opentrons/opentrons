@@ -63,7 +63,16 @@ export function FirmwareUpdateTakeover(): JSX.Element {
   )
 
   React.useEffect(() => {
+    // in case instruments are updated elsewhere in the app, clear update needed list
+    // when all instruments are ok but array has elements
     if (
+      instrumentsData?.find(instrument => !instrument.ok) == null &&
+      !showUpdateNeededModal &&
+      instrumentsToUpdate.length > 0
+    ) {
+      setInstrumentsToUpdate([])
+      setIndexToUpdate(0)
+    } else if (
       instrumentsToUpdate.length > indexToUpdate &&
       instrumentsToUpdate[indexToUpdate]?.subsystem != null &&
       maintenanceRunData == null &&
@@ -73,11 +82,13 @@ export function FirmwareUpdateTakeover(): JSX.Element {
       setShowUpdateNeededModal(true)
     }
   }, [
-    instrumentsToUpdate,
-    indexToUpdate,
-    maintenanceRunData,
-    isUnboxingFlowOngoing,
     externalSubsystemUpdate,
+    indexToUpdate,
+    instrumentsToUpdate,
+    instrumentsData,
+    isUnboxingFlowOngoing,
+    maintenanceRunData,
+    showUpdateNeededModal,
   ])
 
   return (
@@ -88,10 +99,12 @@ export function FirmwareUpdateTakeover(): JSX.Element {
         <UpdateNeededModal
           subsystem={instrumentsToUpdate[indexToUpdate]?.subsystem}
           onClose={() => {
-            // if no more instruments need updating, close the modal
+            // if no more instruments need updating, close the modal and clear data
             // otherwise start over with next instrument
             if (instrumentsToUpdate.length <= indexToUpdate + 1) {
               setShowUpdateNeededModal(false)
+              setInstrumentsToUpdate([])
+              setIndexToUpdate(0)
             } else {
               setIndexToUpdate(prevIndexToUpdate => prevIndexToUpdate + 1)
             }
