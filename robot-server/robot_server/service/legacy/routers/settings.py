@@ -169,6 +169,7 @@ async def post_log_level_local(
         " Removed in robot software v7.2.0."
     ),
     response_model=LegacyErrorResponse,
+    deprecated=True,
 )
 async def post_log_level_upstream(log_level: LogLevel) -> V1BasicResponse:
     raise LegacyErrorResponse(
