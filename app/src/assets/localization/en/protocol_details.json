@@ -41,7 +41,7 @@
   "proceed_to_setup": "Proceed to setup",
   "protocol_designer_version": "Protocol Designer {{version}}",
   "protocol_failed_app_analysis": "This protocol failed in-app analysis. It may be unusable on robots without custom software configurations.",
-  "protocol_outdated_app_analysis": "This protocol has an out of date in-app analysis. If the protocol has changed since its last analysis, results may differ.",
+  "protocol_outdated_app_analysis": "This protocol's analysis is out of date. It may produce different results if you run it now.",
   "python_api_version": "Python API {{version}}",
   "quantity": "Quantity",
   "read_less": "read less",
