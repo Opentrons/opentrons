@@ -75,7 +75,6 @@ export function UpdatedChannel(): JSX.Element {
           formatOptionLabel={formatOptionLabel}
           isSearchable={false}
           width="10rem"
-          data-testid="update-channel-selector"
         />
       </Flex>
     </Flex>
