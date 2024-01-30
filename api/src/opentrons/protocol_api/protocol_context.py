@@ -210,10 +210,11 @@ class ProtocolContext(CommandPublisher):
     def bundled_data(self) -> Dict[str, bytes]:
         """Accessor for data files bundled with this protocol, if any.
 
-        This is a dictionary mapping the filenames of bundled datafiles to the bytes
-        contents of the files. The filename keys are formatted with extensions but
-        without paths. For example, a file stored in the bundle as
-        ``data/mydata/aspirations.csv`` will have the key ``"aspirations.csv"``.
+        This is a dictionary mapping the filenames of bundled datafiles to their
+        contents. The filename keys are formatted with extensions but without paths. For
+        example, a file stored in the bundle as ``data/mydata/aspirations.csv`` will
+        have the key ``"aspirations.csv"``. The values are :py:class:`bytes` objects
+        representing the contents of the files.
         """
         return self._bundled_data
 
