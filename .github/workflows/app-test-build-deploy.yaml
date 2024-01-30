@@ -61,7 +61,8 @@ jobs:
       - uses: 'actions/checkout@v3'
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '18.19.0'      - name: 'install udev'
+          node-version: '18.19.0'
+      - name: 'install udev'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
@@ -109,7 +110,8 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '18.19.0'      - uses: actions/setup-python@v4
+          node-version: '18.19.0'
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
       - name: 'downgrade npm version'
@@ -241,7 +243,8 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '18.19.0'      - uses: actions/setup-python@v4
+          node-version: '18.19.0'
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
       - name: 'downgrade npm version'
@@ -424,7 +427,8 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '18.19.0'      - name: 'install udev'
+          node-version: '18.19.0'
+      - name: 'install udev'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'

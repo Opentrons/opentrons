@@ -24,7 +24,8 @@ jobs:
           fetch-depth: 0
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '18.19.0'      - name: 'cache yarn cache'
+          node-version: '18.19.0'
+      - name: 'cache yarn cache'
         uses: actions/cache@v3
         with:
           path: |
