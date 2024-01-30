@@ -11,7 +11,6 @@ import {
   ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
 } from '../../../redux/analytics'
 import * as CustomLabware from '../../../redux/custom-labware'
-import * as Config from '../../../redux/config'
 import {
   ClearUnavailableRobots,
   EnableDevTools,
@@ -21,6 +20,7 @@ import {
   ShowLabwareOffsetSnippets,
   U2EInformation,
   ShowHeaterShakerAttachmentModal,
+  UpdatedChannel,
 } from '../../../organisms/AdvancedSettings'
 
 import { AdvancedSettings } from '../AdvancedSettings'
@@ -48,9 +48,6 @@ const render = (): ReturnType<typeof renderWithProviders> => {
 
 const getCustomLabwarePath = CustomLabware.getCustomLabwareDirectory as jest.MockedFunction<
   typeof CustomLabware.getCustomLabwareDirectory
->
-const getChannelOptions = Config.getUpdateChannelOptions as jest.MockedFunction<
-  typeof Config.getUpdateChannelOptions
 >
 
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
@@ -81,6 +78,9 @@ const mockOverridePathToPython = OverridePathToPython as jest.MockedFunction<
 const mockShowHeaterShakerAttachmentModal = ShowHeaterShakerAttachmentModal as jest.MockedFunction<
   typeof ShowHeaterShakerAttachmentModal
 >
+const mockUpdatedChannel = UpdatedChannel as jest.MockedFunction<
+  typeof UpdatedChannel
+>
 
 let mockTrackEvent: jest.Mock
 
@@ -89,14 +89,6 @@ describe('AdvancedSettings', () => {
     mockTrackEvent = jest.fn()
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
     getCustomLabwarePath.mockReturnValue('')
-    getChannelOptions.mockReturnValue([
-      {
-        label: 'Stable',
-        value: 'latest',
-      },
-      { label: 'Beta', value: 'beta' },
-      { label: 'Alpha', value: 'alpha' },
-    ])
     mockPreventRobotCaching.mockReturnValue(<div>mock PreventRobotCaching</div>)
     mockOT2AdvancedSettings.mockReturnValue(<div>mock OT2AdvancedSettings</div>)
     mockEnableDevTools.mockReturnValue(<div>mock EnableDevTools</div>)
@@ -113,6 +105,7 @@ describe('AdvancedSettings', () => {
     mockShowHeaterShakerAttachmentModal.mockReturnValue(
       <div>mock ShowHeaterShakerAttachmentModal</div>
     )
+    mockUpdatedChannel.mockReturnValue(<div>mock UpdatedChannel</div>)
   })
 
   afterEach(() => {
@@ -120,18 +113,9 @@ describe('AdvancedSettings', () => {
     resetAllWhenMocks()
   })
 
-  it('renders correct titles', () => {
-    const [{ getByText }] = render()
-    getByText('Update Channel')
-    getByText('Additional Custom Labware Source Folder')
-  })
-
-  it('renders the update channel combobox and section', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText(
-      'Stable receives the latest stable releases. Beta allows you to try out new in-progress features before they launch in Stable channel, but they have not completed testing yet.'
-    )
-    getByRole('combobox', { name: '' })
+  it('should render mock UpdatedChannel section', () => {
+    render()
+    screen.getByText('mock UpdatedChannel')
   })
 
   it('renders the custom labware section with source folder selected', () => {
