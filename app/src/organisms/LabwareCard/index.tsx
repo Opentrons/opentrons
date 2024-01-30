@@ -20,6 +20,7 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
+import { UNIVERSAL_FLAT_ADAPTER_X_DIMENSION } from '../LabwareDetails/Gallery'
 import { CustomLabwareOverflowMenu } from './CustomLabwareOverflowMenu'
 import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
 
@@ -37,7 +38,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const isCustomDefinition = definition.namespace !== 'opentrons'
   const xDimensionOverride =
     definition.parameters.loadName === 'opentrons_universal_flat_adapter'
-      ? 127.4
+      ? UNIVERSAL_FLAT_ADAPTER_X_DIMENSION
       : definition.dimensions.xDimension
 
   return (

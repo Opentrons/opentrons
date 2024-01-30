@@ -61,9 +61,10 @@ export interface LabwareRenderProps {
 }
 
 export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
-  const { gRef } = props
-  const cornerOffsetFromSlot = props.definition.cornerOffsetFromSlot
-  const labwareLoadName = props.definition.parameters.loadName
+  const { gRef, definition } = props
+
+  const cornerOffsetFromSlot = definition.cornerOffsetFromSlot
+  const labwareLoadName = definition.parameters.loadName
 
   if (labwareAdapterLoadNames.includes(labwareLoadName)) {
     const { shouldRotateAdapterOrientation } = props

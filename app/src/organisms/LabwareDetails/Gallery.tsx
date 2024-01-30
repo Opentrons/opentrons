@@ -15,6 +15,8 @@ import { labwareImages } from './labware-images'
 
 import type { LabwareDefinition } from '../../pages/Labware/types'
 
+export const UNIVERSAL_FLAT_ADAPTER_X_DIMENSION = 127.4
+
 export interface GalleryProps {
   definition: LabwareDefinition
 }
