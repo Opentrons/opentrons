@@ -482,10 +482,10 @@ class BindSensorOutputResponsePayload(SensorPayload):
 
 
 @dataclass(eq=False)
-class AddSensorLinearMoveBasePayload(AddLinearMoveRequestPayload, SensorPayload):
+class AddSensorLinearMoveBasePayload(AddLinearMoveRequestPayload):
     """A request to add a linear move that also requires sensor reading for its duration."""
-    
-    report_freq: utils.UInt32Field
+
+    sensor_id: SensorIdField
 
 
 @dataclass(eq=False)

@@ -22,6 +22,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     ErrorSeverity,
     GearMotorId,
     MoveAckId,
+    SensorId,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
@@ -38,6 +39,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     TipActionResponse,
     ErrorMessage,
     StopRequest,
+    AddSensorLinearMoveRequest,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     AddLinearMoveRequestPayload,
@@ -46,6 +48,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     GripperMoveRequestPayload,
     TipActionRequestPayload,
     EmptyPayload,
+    AddSensorLinearMoveBasePayload,
 )
 from .constants import (
     interrupts_per_sec,
@@ -69,6 +72,7 @@ from opentrons_hardware.firmware_bindings.utils import (
 from opentrons_hardware.firmware_bindings.messages.fields import (
     PipetteTipActionTypeField,
     MoveStopConditionField,
+    SensorIdField,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control.motor_position_status import (
@@ -299,6 +303,30 @@ class MoveGroupRunner:
                 ),
             )
             return HomeRequest(payload=home_payload)
+        elif step.move_type == MoveType.sensor:
+            stop_condition = step.stop_condition.value
+            sensor_move_payload = AddSensorLinearMoveBasePayload(
+                request_stop_condition=MoveStopConditionField(stop_condition),
+                group_id=UInt8Field(group),
+                seq_id=UInt8Field(seq),
+                duration=UInt32Field(int(step.duration_sec * interrupts_per_sec)),
+                acceleration_um=Int32Field(
+                    int(
+                        (
+                            step.acceleration_mm_sec_sq
+                            * 1000.0
+                            / interrupts_per_sec
+                            / interrupts_per_sec
+                        )
+                        * (2**31)
+                    )
+                ),
+                velocity_mm=Int32Field(
+                    int((step.velocity_mm_sec / interrupts_per_sec) * (2**31))
+                ),
+                sensor_id=SensorIdField(SensorId.S0),
+            )
+            return AddSensorLinearMoveRequest(payload=sensor_move_payload)
         else:
             stop_cond = step.stop_condition.value
             if self._ignore_stalls:

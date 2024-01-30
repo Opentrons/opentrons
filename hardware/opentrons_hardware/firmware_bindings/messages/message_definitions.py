@@ -911,4 +911,3 @@ class AddSensorLinearMoveRequest(BaseMessage):
     message_id: Literal[
         MessageId.add_sensor_move_request
     ] = MessageId.add_sensor_move_request
-

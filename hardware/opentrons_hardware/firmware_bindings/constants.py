@@ -395,6 +395,7 @@ class MoveStopCondition(int, Enum):
     stall = 0x10
     ignore_stalls = 0x20
     limit_switch_backoff = 0x40
+    sensor_report = 0x80
 
 
 @unique
