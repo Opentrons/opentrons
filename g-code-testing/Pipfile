@@ -5,7 +5,6 @@ name = "pypi"
 
 [packages]
 opentrons = { editable = true, path = "./../api" }
-notify-server = { editable = true, path = "./../notify-server" }
 robot-server = { editable = true, path = "./../robot-server" }
 server-utils = { editable = true, path = "./../server-utils" }
 opentrons-shared-data = { editable = true, path = "../shared-data/python" }
