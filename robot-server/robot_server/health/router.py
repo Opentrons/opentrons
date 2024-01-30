@@ -23,7 +23,7 @@ def get_door_switch_required() -> bool:
 
 @health_router.get(path='/version', status_code=status.HTTP_200_OK)
 async def get_version():
-    return {"version": "using firerock-stable-6.3.1"}
+    return {"version": "burning-rock-2024-01-30"}
 
 @health_router.get(
         "/robot/door/status",
