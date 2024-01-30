@@ -30,23 +30,12 @@ import formStyles from '../components/forms/forms.css'
 
 import type { ModuleType } from '@opentrons/shared-data'
 import type { FileMetadataFields } from '../file-data'
-import type { ModulesForEditModulesCard } from '../step-forms'
-
-export interface Props {
-  formValues: FileMetadataFields
-  instruments: React.ComponentProps<typeof InstrumentGroup>
-  goToNextPage: () => unknown
-  saveFileMetadata: (fileMetaDataFields: FileMetadataFields) => void
-  swapPipettes: () => unknown
-  modules: ModulesForEditModulesCard
-  t: any
-}
 
 // TODO(mc, 2020-02-28): explore l10n for these dates
 const DATE_ONLY_FORMAT = 'MMM dd, yyyy'
 const DATETIME_FORMAT = 'MMM dd, yyyy | h:mm a'
 export const FilePage = (): JSX.Element => {
-  const { t } = useTranslation('button')
+  const { t } = useTranslation(['button', 'application'])
   const dispatch = useDispatch()
 
   const formValues = useSelector(fileSelectors.getFileMetadata)
@@ -95,7 +84,7 @@ export const FilePage = (): JSX.Element => {
 
   return (
     <div className={styles.file_page}>
-      <Card title="Information">
+      <Card title={t('application:information')}>
         <Formik
           enableReinitialize
           initialValues={formValues}
@@ -116,14 +105,14 @@ export const FilePage = (): JSX.Element => {
                 )}
               >
                 <FormGroup
-                  label="Date Created"
+                  label={t('application:date_created')}
                   className={formStyles.column_1_2}
                 >
                   {values.created && format(values.created, DATE_ONLY_FORMAT)}
                 </FormGroup>
 
                 <FormGroup
-                  label="Last Exported"
+                  label={t('application:last_exported')}
                   className={formStyles.column_1_2}
                 >
                   {values.lastModified &&
@@ -135,7 +124,7 @@ export const FilePage = (): JSX.Element => {
                 className={cx(formStyles.row_wrapper, formStyles.stacked_row)}
               >
                 <FormGroup
-                  label="Protocol Name"
+                  label={t('application:protocol_name')}
                   className={formStyles.column_1_2}
                 >
                   <InputField
@@ -147,7 +136,7 @@ export const FilePage = (): JSX.Element => {
                 </FormGroup>
 
                 <FormGroup
-                  label="Organization/Author"
+                  label={t('application:organization_author')}
                   className={formStyles.column_1_2}
                 >
                   <InputField
@@ -158,7 +147,10 @@ export const FilePage = (): JSX.Element => {
                 </FormGroup>
               </div>
 
-              <FormGroup label="Description" className={formStyles.stacked_row}>
+              <FormGroup
+                label={t('application:description')}
+                className={formStyles.stacked_row}
+              >
                 <InputField
                   name="description"
                   value={values.description}
@@ -171,7 +163,7 @@ export const FilePage = (): JSX.Element => {
                   className={styles.update_button}
                   disabled={!dirty}
                 >
-                  {dirty ? 'UPDATE' : 'UPDATED'}
+                  {dirty ? t('application:update') : t('application:updated')}
                 </OutlineButton>
               </div>
             </form>
@@ -179,14 +171,14 @@ export const FilePage = (): JSX.Element => {
         </Formik>
       </Card>
 
-      <Card title="Pipettes">
+      <Card title={t('application:pipettes')}>
         <div className={styles.card_content}>
           <InstrumentGroup {...instruments} showMountLabel />
           <div className={styles.pipette_button_row}>
             <DeprecatedPrimaryButton
               onClick={openEditPipetteModal}
               className={styles.edit_button}
-              name={'editPipettes'}
+              name="editPipettes"
             >
               {t('edit')}
             </DeprecatedPrimaryButton>
@@ -203,7 +195,7 @@ export const FilePage = (): JSX.Element => {
               }
               className={styles.swap_button}
               iconName="swap-horizontal"
-              name={'swapPipettes'}
+              name="swapPipettes"
               disabled={instruments?.left?.pipetteSpecs?.channels === 96}
             >
               {t('swap')}
@@ -222,7 +214,7 @@ export const FilePage = (): JSX.Element => {
           onClick={() => dispatch(navActions.navigateToPage('liquids'))}
           className={styles.continue_button}
           iconName="arrow-right"
-          name={'continueToLiquids'}
+          name="continueToLiquids"
         >
           {t('continue_to_liquids')}
         </DeprecatedPrimaryButton>
