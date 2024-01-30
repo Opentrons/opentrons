@@ -38,8 +38,7 @@ EXPECTED_STATEMENTS_LATEST = [
         id VARCHAR NOT NULL,
         protocol_id VARCHAR NOT NULL,
         analyzer_version VARCHAR NOT NULL,
-        completed_analysis BLOB NOT NULL,
-        completed_analysis_as_document VARCHAR,
+        completed_analysis VARCHAR NOT NULL,
         PRIMARY KEY (id),
         FOREIGN KEY(protocol_id) REFERENCES protocol (id)
     )
@@ -52,7 +51,7 @@ EXPECTED_STATEMENTS_LATEST = [
         id VARCHAR NOT NULL,
         created_at DATETIME NOT NULL,
         protocol_id VARCHAR,
-        state_summary BLOB,
+        state_summary VARCHAR,
         engine_status VARCHAR,
         _updated_at DATETIME,
         PRIMARY KEY (id),
@@ -75,7 +74,7 @@ EXPECTED_STATEMENTS_LATEST = [
         run_id VARCHAR NOT NULL,
         index_in_run INTEGER NOT NULL,
         command_id VARCHAR NOT NULL,
-        command BLOB NOT NULL,
+        command VARCHAR NOT NULL,
         PRIMARY KEY (row_id),
         FOREIGN KEY(run_id) REFERENCES run (id)
     )

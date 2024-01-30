@@ -7,7 +7,7 @@ from functools import lru_cache
 from typing import Dict, List, Optional
 
 import sqlalchemy
-from pydantic import parse_obj_as, ValidationError
+from pydantic import ValidationError
 
 from opentrons.util.helpers import utc_now
 from opentrons.protocol_engine import StateSummary, CommandSlice
@@ -19,6 +19,7 @@ from robot_server.persistence import (
     action_table,
     sqlite_rowid,
 )
+from robot_server.persistence.pydantic import json_to_pydantic, pydantic_to_json
 from robot_server.protocols import ProtocolNotFoundError
 
 from .action_models import RunAction, RunActionType
@@ -114,7 +115,7 @@ class RunStore:
                         "run_id": run_id,
                         "index_in_run": command_index,
                         "command_id": command.id,
-                        "command": command.dict(),
+                        "command": pydantic_to_json(command),
                     },
                 )
 
@@ -278,7 +279,7 @@ class RunStore:
 
         try:
             return (
-                StateSummary.parse_obj(row.state_summary)
+                json_to_pydantic(StateSummary, row.state_summary)
                 if row.state_summary is not None
                 else None
             )
@@ -336,7 +337,7 @@ class RunStore:
             slice_result = transaction.execute(select_slice).all()
 
         sliced_commands: List[Command] = [
-            parse_obj_as(Command, row.command)  # type: ignore[arg-type]
+            json_to_pydantic(Command, row.command)  # type: ignore[arg-type]
             for row in slice_result
         ]
 
@@ -374,7 +375,7 @@ class RunStore:
             if command is None:
                 raise CommandNotFoundError(command_id=command_id)
 
-        return parse_obj_as(Command, command)  # type: ignore[arg-type]
+        return json_to_pydantic(Command, command)  # type: ignore[arg-type]
 
     def remove(self, run_id: str) -> None:
         """Remove a run by its unique identifier.
@@ -473,7 +474,7 @@ def _convert_state_to_sql_values(
     engine_status: str,
 ) -> Dict[str, object]:
     return {
-        "state_summary": state_summary.dict(),
+        "state_summary": pydantic_to_json(state_summary),
         "engine_status": engine_status,
         "_updated_at": utc_now(),
     }
