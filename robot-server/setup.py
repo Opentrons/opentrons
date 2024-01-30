@@ -66,6 +66,7 @@ INSTALL_REQUIRES = [
     "systemd-python==234; sys_platform=='linux'",
     "sqlalchemy==1.4.32",
     "aiosqlite==0.17.0",
+    "paho-mqtt==1.6.1",
 ]
 
 
