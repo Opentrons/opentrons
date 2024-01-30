@@ -47,4 +47,11 @@ describe('UpdatedChannel', () => {
     screen.getByRole('combobox', { name: '' })
     screen.getByText('beta')
   })
+
+  it('should call a mock function when selecting a channel', () => {
+    render()
+    const selectedOption = screen.getByRole('combobox')
+    fireEvent.change(selectedOption, { target: { value: 'alpha' } })
+    expect(mockGetUpdateChannel).toHaveBeenCalled()
+  })
 })
