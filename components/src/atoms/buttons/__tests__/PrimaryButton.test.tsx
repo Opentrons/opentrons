@@ -1,12 +1,8 @@
 import 'jest-styled-components'
 import * as React from 'react'
 import { renderWithProviders } from '../../../testing/utils'
-import {
-  COLORS,
-  BORDERS,
-  TYPOGRAPHY,
-  SPACING,
-} from '../../../ui-style-constants'
+import { COLORS } from '../../../helix-design-system'
+import { BORDERS, TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
 import { PrimaryButton } from '../PrimaryButton'
 
 const render = (props: React.ComponentProps<typeof PrimaryButton>) => {
@@ -25,7 +21,7 @@ describe('PrimaryButton', () => {
   it('renders primary button with text', () => {
     const { getByText } = render(props)
     const button = getByText('primary button')
-    expect(button).toHaveStyle(`background-color: ${COLORS.blueEnabled}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.blue50}`)
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16}`
     )
@@ -45,14 +41,14 @@ describe('PrimaryButton', () => {
     const { getByText } = render(props)
     const button = getByText('primary button')
     expect(button).toBeDisabled()
-    expect(button).toHaveStyle(`background-color: ${COLORS.darkGreyDisabled}`)
-    expect(button).toHaveStyle(`color: ${COLORS.errorDisabled}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.grey30}`)
+    expect(button).toHaveStyle(`color: ${COLORS.grey50}`)
   })
 
   it('applies the correct states to the button - focus', () => {
     const { getByText } = render(props)
     const button = getByText('primary button')
-    expect(button).toHaveStyleRule('background-color', `${COLORS.blueHover}`, {
+    expect(button).toHaveStyleRule('background-color', `${COLORS.blue55}`, {
       modifier: ':focus',
     })
   })
@@ -60,7 +56,7 @@ describe('PrimaryButton', () => {
   it('applies the correct states to the button - hover', () => {
     const { getByText } = render(props)
     const button = getByText('primary button')
-    expect(button).toHaveStyleRule('background-color', `${COLORS.blueHover}`, {
+    expect(button).toHaveStyleRule('background-color', `${COLORS.blue55}`, {
       modifier: ':hover',
     })
   })
@@ -68,13 +64,9 @@ describe('PrimaryButton', () => {
   it('applies the correct states to the button - active', () => {
     const { getByText } = render(props)
     const button = getByText('primary button')
-    expect(button).toHaveStyleRule(
-      'background-color',
-      `${COLORS.bluePressed}`,
-      {
-        modifier: ':active',
-      }
-    )
+    expect(button).toHaveStyleRule('background-color', `${COLORS.blue60}`, {
+      modifier: ':active',
+    })
   })
 
   it('applies the correct states to the button - focus-visible', () => {
@@ -82,7 +74,7 @@ describe('PrimaryButton', () => {
     const button = getByText('primary button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${COLORS.warningEnabled}`,
+      `0 0 0 3px ${COLORS.yellow50}`,
       {
         modifier: ':focus-visible',
       }
@@ -90,10 +82,10 @@ describe('PrimaryButton', () => {
   })
 
   it('renders primary button with text and different background color', () => {
-    props.backgroundColor = COLORS.errorEnabled
+    props.backgroundColor = COLORS.red50
     const { getByText } = render(props)
     const button = getByText('primary button')
-    expect(button).toHaveStyle(`background-color: ${COLORS.errorEnabled}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.red50}`)
     expect(button).toHaveStyle(`color: ${COLORS.white}`)
   })
 })

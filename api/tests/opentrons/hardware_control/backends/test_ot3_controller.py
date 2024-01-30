@@ -2,8 +2,9 @@ import mock
 import pytest
 from decoy import Decoy
 
-from contextlib import nullcontext as does_not_raise
+from contextlib import nullcontext as does_not_raise, AbstractContextManager
 from typing import (
+    cast,
     Dict,
     List,
     Optional,
@@ -77,12 +78,13 @@ from opentrons_hardware.hardware_control.tools.types import (
     GripperInformation,
 )
 
-from opentrons.hardware_control.estop_state import EstopStateMachine
+from opentrons.hardware_control.backends.estop_state import EstopStateMachine
 
 from opentrons_shared_data.errors.exceptions import (
     EStopActivatedError,
     EStopNotPresentError,
     FirmwareUpdateRequiredError,
+    FailedGripperPickupError,
 )
 
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
@@ -574,7 +576,7 @@ async def test_gripper_home_jaw(
 async def test_gripper_grip(
     controller: OT3Controller, mock_move_group_run: mock.AsyncMock
 ) -> None:
-    await controller.gripper_grip_jaw(duty_cycle=50)
+    await controller.gripper_grip_jaw(duty_cycle=50, expected_displacement=0)
     for call in mock_move_group_run.call_args_list:
         move_group_runner = call[0][0]
         for move_group in move_group_runner._move_groups:
@@ -1209,3 +1211,44 @@ async def test_engage_motors(
                 )
             else:
                 set_tip_axes.assert_not_awaited()
+
+
+@pytest.mark.parametrize(
+    "expected_grip_width,actual_grip_width,wider,narrower,allowed_error,hard_max,hard_min,raise_error",
+    [
+        (80, 80, 0, 0, 0, 92, 60, False),
+        (80, 81, 0, 0, 0, 92, 60, True),
+        (80, 79, 0, 0, 0, 92, 60, True),
+        (80, 81, 1, 0, 0, 92, 60, False),
+        (80, 79, 0, 1, 0, 92, 60, False),
+        (80, 81, 0, 0, 1, 92, 60, False),
+        (80, 79, 0, 0, 1, 92, 60, False),
+        (80, 45, 40, 0, 1, 92, 60, True),
+        (80, 100, 0, 40, 0, 92, 60, True),
+    ],
+)
+def test_grip_error_detection(
+    controller: OT3Controller,
+    expected_grip_width: float,
+    actual_grip_width: float,
+    wider: float,
+    narrower: float,
+    allowed_error: float,
+    hard_max: float,
+    hard_min: float,
+    raise_error: bool,
+) -> None:
+    context = cast(
+        AbstractContextManager[None],
+        pytest.raises(FailedGripperPickupError) if raise_error else does_not_raise(),
+    )
+    with context:
+        controller.check_gripper_position_within_bounds(
+            expected_grip_width,
+            wider,
+            narrower,
+            actual_grip_width,
+            allowed_error,
+            hard_max,
+            hard_min,
+        )

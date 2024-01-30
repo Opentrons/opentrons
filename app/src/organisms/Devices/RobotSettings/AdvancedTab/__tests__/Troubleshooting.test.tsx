@@ -16,7 +16,7 @@ import { useRobot } from '../../../hooks'
 import { Troubleshooting } from '../Troubleshooting'
 
 import type { HostConfig } from '@opentrons/api-client'
-import { ToasterContextType } from '../../../../ToasterOven/ToasterContext'
+import type { ToasterContextType } from '../../../../ToasterOven/ToasterContext'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../../organisms/ToasterOven')
@@ -32,18 +32,25 @@ const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const MOCK_MAKE_TOAST = jest.fn()
 const MOCK_EAT_TOAST = jest.fn()
 
-const render = (robotName = ROBOT_NAME) => {
+const render = (props: React.ComponentProps<typeof Troubleshooting>) => {
   return renderWithProviders(
     <MemoryRouter>
-      <Troubleshooting robotName={robotName} />
+      <Troubleshooting {...props} />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )
 }
 
 describe('RobotSettings Troubleshooting', () => {
+  let props: React.ComponentProps<typeof Troubleshooting>
   beforeEach(() => {
-    when(mockUseRobot).calledWith('otie').mockReturnValue(mockConnectableRobot)
+    props = {
+      robotName: ROBOT_NAME,
+      isEstopNotDisengaged: false,
+    }
+    when(mockUseRobot)
+      .calledWith(ROBOT_NAME)
+      .mockReturnValue(mockConnectableRobot)
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockUseToaster)
       .calledWith()
@@ -57,7 +64,7 @@ describe('RobotSettings Troubleshooting', () => {
     resetAllWhenMocks()
   })
   it('should render title, description, and button', () => {
-    const [{ getByText, getByRole, getByTestId }] = render()
+    const [{ getByText, getByRole, getByTestId }] = render(props)
     getByText('Troubleshooting')
     getByTestId('RobotSettings_Troubleshooting')
     getByRole('button', { name: 'Download logs' })
@@ -65,13 +72,13 @@ describe('RobotSettings Troubleshooting', () => {
 
   it('should be disabled when logs are not available', () => {
     when(mockUseRobot).calledWith('otie').mockReturnValue(mockUnreachableRobot)
-    const [{ getByRole }] = render()
+    const [{ getByRole }] = render(props)
     const downloadLogsButton = getByRole('button', { name: 'Download logs' })
     expect(downloadLogsButton).toBeDisabled()
   })
 
   it('should initiate log download when clicking Download logs button', async () => {
-    const [{ getByRole, queryByText }] = render()
+    const [{ getByRole, queryByText }] = render(props)
     const downloadLogsButton = getByRole('button', { name: 'Download logs' })
     act(() => {
       downloadLogsButton.click()
@@ -87,5 +94,11 @@ describe('RobotSettings Troubleshooting', () => {
     await waitFor(() => {
       expect(downloadLogsButton).not.toBeDisabled()
     })
+  })
+
+  it('should make donwload button disabled when e-stop is pressed', () => {
+    props = { ...props, isEstopNotDisengaged: true }
+    const [{ getByRole }] = render(props)
+    expect(getByRole('button', { name: 'Download logs' })).toBeDisabled()
   })
 })

@@ -81,11 +81,11 @@ async def _move_and_interrupt_with_signal(api: OT3API, sig_name: str) -> None:
         backend: OT3Controller = api._backend  # type: ignore[assignment]
         messenger = backend._messenger
         if sig_name == "nsync":
-            engage = api._backend.release_sync  # type: ignore[union-attr]
-            release = api._backend.engage_sync  # type: ignore[union-attr]
+            engage = backend.release_sync
+            release = backend.engage_sync
         elif sig_name == "estop":
-            engage = api._backend.engage_estop  # type: ignore[union-attr]
-            release = api._backend.release_estop  # type: ignore[union-attr]
+            engage = backend.engage_estop
+            release = backend.release_estop
 
         async def _sleep_then_activate_stop_signal() -> None:
             if "external" in sig_name:

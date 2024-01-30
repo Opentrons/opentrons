@@ -42,20 +42,25 @@ const getChannelsFromNozleType = (nozzleType: NozzleType): ChannelType => {
   }
 }
 
-export class SelectableLabware extends React.Component<Props> {
-  _getWellsFromRect: (rect: GenericRect) => WellGroup = rect => {
-    const selectedWells = getCollidingWells(rect)
-    return this._wellsFromSelected(selectedWells)
-  }
+export const SelectableLabware = (props: Props): JSX.Element => {
+  const {
+    labwareProps,
+    selectedPrimaryWells,
+    selectWells,
+    deselectWells,
+    updateHighlightedWells,
+    nozzleType,
+    ingredNames,
+    wellContents,
+  } = props
+  const labwareDef = labwareProps.definition
 
-  _wellsFromSelected: (
+  const _wellsFromSelected: (
     selectedWells: WellGroup
   ) => WellGroup = selectedWells => {
-    const labwareDef = this.props.labwareProps.definition
-
     // Returns PRIMARY WELLS from the selection.
-    if (this.props.nozzleType != null) {
-      const channels = getChannelsFromNozleType(this.props.nozzleType)
+    if (nozzleType != null) {
+      const channels = getChannelsFromNozleType(nozzleType)
       // for the wells that have been highlighted,
       // get all 8-well well sets and merge them
       const primaryWells: WellGroup = reduce(
@@ -78,15 +83,19 @@ export class SelectableLabware extends React.Component<Props> {
     return selectedWells
   }
 
-  handleSelectionMove: (e: MouseEvent, rect: GenericRect) => void = (
+  const _getWellsFromRect: (rect: GenericRect) => WellGroup = rect => {
+    const selectedWells = getCollidingWells(rect)
+    return _wellsFromSelected(selectedWells)
+  }
+
+  const handleSelectionMove: (e: MouseEvent, rect: GenericRect) => void = (
     e,
     rect
   ) => {
-    const labwareDef = this.props.labwareProps.definition
     if (!e.shiftKey) {
-      if (this.props.nozzleType != null) {
-        const channels = getChannelsFromNozleType(this.props.nozzleType)
-        const selectedWells = this._getWellsFromRect(rect)
+      if (nozzleType != null) {
+        const channels = getChannelsFromNozleType(nozzleType)
+        const selectedWells = _getWellsFromRect(rect)
         const allWellsForMulti: WellGroup = reduce(
           selectedWells,
           (acc: WellGroup, _, wellName: string): WellGroup => {
@@ -100,104 +109,90 @@ export class SelectableLabware extends React.Component<Props> {
           },
           {}
         )
-        this.props.updateHighlightedWells(allWellsForMulti)
+        updateHighlightedWells(allWellsForMulti)
       } else {
-        this.props.updateHighlightedWells(this._getWellsFromRect(rect))
+        updateHighlightedWells(_getWellsFromRect(rect))
       }
     }
   }
 
-  handleSelectionDone: (e: MouseEvent, rect: GenericRect) => void = (
+  const handleSelectionDone: (e: MouseEvent, rect: GenericRect) => void = (
     e,
     rect
   ) => {
-    const wells = this._wellsFromSelected(this._getWellsFromRect(rect))
+    const wells = _wellsFromSelected(_getWellsFromRect(rect))
     if (e.shiftKey) {
-      this.props.deselectWells(wells)
+      deselectWells(wells)
     } else {
-      this.props.selectWells(wells)
+      selectWells(wells)
     }
   }
 
-  handleMouseEnterWell: (args: WellMouseEvent) => void = args => {
-    if (this.props.nozzleType != null) {
-      const channels = getChannelsFromNozleType(this.props.nozzleType)
-      const labwareDef = this.props.labwareProps.definition
+  const handleMouseEnterWell: (args: WellMouseEvent) => void = args => {
+    if (nozzleType != null) {
+      const channels = getChannelsFromNozleType(nozzleType)
       const wellSet = getWellSetForMultichannel(
         labwareDef,
         args.wellName,
         channels
       )
       const nextHighlightedWells = arrayToWellGroup(wellSet || [])
-      nextHighlightedWells &&
-        this.props.updateHighlightedWells(nextHighlightedWells)
+      nextHighlightedWells && updateHighlightedWells(nextHighlightedWells)
     } else {
-      this.props.updateHighlightedWells({ [args.wellName]: null })
+      updateHighlightedWells({ [args.wellName]: null })
     }
   }
 
-  handleMouseLeaveWell: (args: WellMouseEvent) => void = args => {
-    this.props.updateHighlightedWells({})
-  }
+  // For rendering, show all wells not just primary wells
+  const allSelectedWells =
+    nozzleType != null
+      ? reduce<WellGroup, WellGroup>(
+          selectedPrimaryWells,
+          (acc, _, wellName): WellGroup => {
+            const channels = getChannelsFromNozleType(nozzleType)
+            const wellSet = getWellSetForMultichannel(
+              labwareDef,
+              wellName,
+              channels
+            )
+            if (!wellSet) return acc
+            return { ...acc, ...arrayToWellGroup(wellSet) }
+          },
+          {}
+        )
+      : selectedPrimaryWells
 
-  render(): React.ReactNode {
-    const {
-      labwareProps,
-      ingredNames,
-      wellContents,
-      nozzleType,
-      selectedPrimaryWells,
-    } = this.props
-    // For rendering, show all wells not just primary wells
-    const allSelectedWells =
-      nozzleType != null
-        ? reduce<WellGroup, WellGroup>(
-            selectedPrimaryWells,
-            (acc, _, wellName): WellGroup => {
-              const channels = getChannelsFromNozleType(nozzleType)
-              const wellSet = getWellSetForMultichannel(
-                this.props.labwareProps.definition,
-                wellName,
-                channels
-              )
-              if (!wellSet) return acc
-              return { ...acc, ...arrayToWellGroup(wellSet) }
-            },
-            {}
-          )
-        : selectedPrimaryWells
-
-    return (
-      <SelectionRect
-        onSelectionMove={this.handleSelectionMove}
-        onSelectionDone={this.handleSelectionDone}
-      >
-        <WellTooltip ingredNames={ingredNames}>
-          {({
-            makeHandleMouseEnterWell,
-            handleMouseLeaveWell,
-            tooltipWellName,
-          }) => (
-            <SingleLabware
-              {...labwareProps}
-              selectedWells={allSelectedWells}
-              onMouseLeaveWell={mouseEventArgs => {
-                this.handleMouseLeaveWell(mouseEventArgs)
-                handleMouseLeaveWell(mouseEventArgs.event)
-              }}
-              onMouseEnterWell={({ wellName, event }) => {
-                if (wellContents !== null) {
-                  this.handleMouseEnterWell({ wellName, event })
-                  makeHandleMouseEnterWell(
-                    wellName,
-                    wellContents[wellName]?.ingreds
-                  )(event)
-                }
-              }}
-            />
-          )}
-        </WellTooltip>
-      </SelectionRect>
-    )
-  }
+  return (
+    <SelectionRect
+      onSelectionMove={handleSelectionMove}
+      onSelectionDone={handleSelectionDone}
+    >
+      <WellTooltip ingredNames={ingredNames}>
+        {({
+          makeHandleMouseEnterWell,
+          handleMouseLeaveWell,
+          tooltipWellName,
+        }) => (
+          <SingleLabware
+            {...labwareProps}
+            selectedWells={allSelectedWells}
+            onMouseLeaveWell={mouseEventArgs => {
+              handleMouseLeaveWell(mouseEventArgs)
+              updateHighlightedWells({})
+              handleMouseLeaveWell(mouseEventArgs.event)
+            }}
+            onMouseEnterWell={({ wellName, event }) => {
+              if (wellContents !== null) {
+                handleMouseEnterWell({ wellName, event })
+                makeHandleMouseEnterWell(
+                  wellName,
+                  wellContents[wellName]?.ingreds
+                )(event)
+              }
+            }}
+          />
+        )}
+      </WellTooltip>
+    </SelectionRect>
+  )
 }

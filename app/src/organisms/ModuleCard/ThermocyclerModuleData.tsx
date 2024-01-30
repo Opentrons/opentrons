@@ -34,35 +34,35 @@ export const ThermocyclerModuleData = (
     textColor: string
   } => {
     const StatusLabelProps = {
-      backgroundColor: COLORS.medGreyEnabled,
-      iconColor: COLORS.darkGreyEnabled,
-      textColor: COLORS.bluePressed,
+      backgroundColor: COLORS.grey30,
+      iconColor: COLORS.grey60,
+      textColor: COLORS.blue60,
       pulse: false,
     }
 
     switch (status) {
       case 'idle': {
-        StatusLabelProps.backgroundColor = COLORS.medGreyEnabled
-        StatusLabelProps.iconColor = COLORS.darkGreyEnabled
-        StatusLabelProps.textColor = COLORS.darkBlackEnabled
+        StatusLabelProps.backgroundColor = COLORS.grey30
+        StatusLabelProps.iconColor = COLORS.grey60
+        StatusLabelProps.textColor = COLORS.grey60
         break
       }
       case 'holding at target': {
-        StatusLabelProps.backgroundColor = COLORS.medBlue
-        StatusLabelProps.iconColor = COLORS.blueEnabled
+        StatusLabelProps.backgroundColor = COLORS.blue30
+        StatusLabelProps.iconColor = COLORS.blue60
         break
       }
       case 'cooling':
       case 'heating': {
-        StatusLabelProps.backgroundColor = COLORS.medBlue
-        StatusLabelProps.iconColor = COLORS.darkGreyEnabled
+        StatusLabelProps.backgroundColor = COLORS.blue30
+        StatusLabelProps.iconColor = COLORS.blue60
         StatusLabelProps.pulse = true
         break
       }
       case 'error': {
-        StatusLabelProps.backgroundColor = COLORS.warningBackgroundLight
-        StatusLabelProps.iconColor = COLORS.warningEnabled
-        StatusLabelProps.textColor = COLORS.warningText
+        StatusLabelProps.backgroundColor = COLORS.yellow30
+        StatusLabelProps.iconColor = COLORS.yellow60
+        StatusLabelProps.textColor = COLORS.yellow60
       }
     }
     return StatusLabelProps
@@ -77,7 +77,7 @@ export const ThermocyclerModuleData = (
       >
         <StyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey50}
           fontSize={TYPOGRAPHY.fontSizeCaption}
           marginTop={SPACING.spacing8}
         >
@@ -88,8 +88,8 @@ export const ThermocyclerModuleData = (
           <Box marginRight={SPACING.spacing4}>
             <StatusLabel
               status={data.lidStatus === 'in_between' ? 'open' : data.lidStatus}
-              backgroundColor={COLORS.medGreyEnabled}
-              textColor={COLORS.darkBlackEnabled}
+              backgroundColor={COLORS.grey30}
+              textColor={COLORS.grey60}
               showIcon={false}
               key="lidStatus"
               id="lidStatus"
@@ -122,7 +122,7 @@ export const ThermocyclerModuleData = (
       >
         <StyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey50}
           fontWeight={FONT_WEIGHT_REGULAR}
           fontSize={TYPOGRAPHY.fontSizeCaption}
           marginTop={SPACING.spacing8}

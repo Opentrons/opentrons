@@ -36,7 +36,7 @@ export function DeckFixtureSetupInstructionsModal({
   const modalHeader: ModalHeaderBaseProps = {
     title: t('deck_fixture_setup_instructions'),
     iconName: 'information',
-    iconColor: COLORS.darkBlack100,
+    iconColor: COLORS.black90,
     hasExitIcon: true,
     onClick: () => setShowSetupInstructionsModal(false),
   }

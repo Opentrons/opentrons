@@ -111,7 +111,12 @@ class Controller:
         watcher.watch(
             alias="modules",
             path="/dev",
-            flags=(aionotify.Flags.CREATE | aionotify.Flags.DELETE),
+            flags=(
+                aionotify.Flags.CREATE
+                | aionotify.Flags.DELETE
+                | aionotify.Flags.MOVED_FROM
+                | aionotify.Flags.MOVED_TO
+            ),
         )
         return watcher
 

@@ -295,7 +295,7 @@ class ThreadManager(Generic[WrappedObj]):
     def __repr__(self) -> str:
         return "<ThreadManager>"
 
-    def clean_up(self) -> None:
+    def clean_up_tm(self) -> None:
         try:
             loop = object.__getattribute__(self, "_loop")
             loop.call_soon_threadsafe(loop.stop)
@@ -348,7 +348,7 @@ class ThreadManager(Generic[WrappedObj]):
             wrapped_cleanup = getattr(
                 object.__getattribute__(self, "bridged_obj"), "clean_up"
             )
-            our_cleanup = object.__getattribute__(self, "clean_up")
+            our_cleanup = object.__getattribute__(self, "clean_up_tm")
 
             def call_both() -> None:
                 # the wrapped cleanup wants to happen in the managed thread,

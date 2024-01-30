@@ -29,26 +29,26 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import {
+  ALIGN_CENTER,
+  BORDERS,
   Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  DISPLAY_FLEX,
   Flex,
   Icon,
   IconName,
-  useHoverTooltip,
-  ALIGN_CENTER,
-  DIRECTION_COLUMN,
-  DISPLAY_FLEX,
   JUSTIFY_CENTER,
+  JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
-  SIZE_1,
-  BORDERS,
-  COLORS,
-  SPACING,
-  TYPOGRAPHY,
+  Link as LinkButton,
   PrimaryButton,
   SecondaryButton,
+  SIZE_1,
+  SPACING,
+  TYPOGRAPHY,
   useConditionalConfirm,
-  JUSTIFY_FLEX_END,
-  Link as LinkButton,
+  useHoverTooltip,
 } from '@opentrons/components'
 
 import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
@@ -313,8 +313,7 @@ export function ProtocolRunHeader({
       <Flex
         ref={protocolRunHeaderRef}
         backgroundColor={COLORS.white}
-        border={BORDERS.lineBorder}
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius={BORDERS.borderRadiusSize2}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing16}
         marginBottom={SPACING.spacing16}
@@ -336,7 +335,7 @@ export function ProtocolRunHeader({
               <StyledText
                 as="h2"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                color={COLORS.blueEnabled}
+                color={COLORS.blue50}
               >
                 {displayName}
               </StyledText>
@@ -412,7 +411,7 @@ export function ProtocolRunHeader({
         </Box>
         {runStatus != null ? (
           <Box
-            backgroundColor={COLORS.fundamentalsBackground}
+            backgroundColor={COLORS.grey10}
             display="grid"
             gridTemplateColumns="4fr 6fr 4fr"
             padding={SPACING.spacing8}
@@ -482,7 +481,9 @@ interface LabeledValueProps {
 function LabeledValue(props: LabeledValueProps): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-      <StyledText as="h6">{props.label}</StyledText>
+      <StyledText as="h6" color={COLORS.grey60}>
+        {props.label}
+      </StyledText>
       {typeof props.value === 'string' ? (
         <StyledText as="p">{props.value}</StyledText>
       ) : (
@@ -503,14 +504,14 @@ function DisplayRunStatus(props: DisplayRunStatusProps): JSX.Element {
       {props.runStatus === RUN_STATUS_RUNNING ? (
         <Icon
           name="circle"
-          color={COLORS.blueEnabled}
+          color={COLORS.blue50}
           size={SPACING.spacing4}
           marginRight={SPACING.spacing4}
           data-testid="running_circle"
         >
           <animate
             attributeName="fill"
-            values={`${COLORS.blueEnabled}; transparent`}
+            values={`${COLORS.blue50}; transparent`}
             dur="1s"
             calcMode="discrete"
             repeatCount="indefinite"

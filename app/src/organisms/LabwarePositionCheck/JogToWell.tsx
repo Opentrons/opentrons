@@ -97,14 +97,17 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
   }, [])
 
   let wellsToHighlight: string[] = []
-  if (getPipetteNameSpecs(pipetteName)?.channels === 8) {
+  if (
+    getPipetteNameSpecs(pipetteName)?.channels === 8 &&
+    !shouldUseMetalProbe
+  ) {
     wellsToHighlight = labwareDef.ordering[0]
   } else {
     wellsToHighlight = ['A1']
   }
 
   const wellStroke: WellStroke = wellsToHighlight.reduce(
-    (acc, wellName) => ({ ...acc, [wellName]: COLORS.blueEnabled }),
+    (acc, wellName) => ({ ...acc, [wellName]: COLORS.blue50 }),
     {}
   )
 
@@ -144,12 +147,13 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
                   wellStroke={wellStroke}
                   wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_OUTSIDE}
                   highlightedWellLabels={{ wells: wellsToHighlight }}
-                  labwareStroke={COLORS.medGreyEnabled}
-                  wellLabelColor={COLORS.medGreyEnabled}
+                  labwareStroke={COLORS.grey30}
+                  wellLabelColor={COLORS.grey30}
                 />
                 <PipetteRender
                   labwareDef={labwareDef}
                   pipetteName={pipetteName}
+                  usingMetalProbe={shouldUseMetalProbe}
                 />
               </>
             )}

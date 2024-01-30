@@ -1,6 +1,6 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
-import { i18n } from '../../../../localization'
 import { THERMOCYCLER_STATE, THERMOCYCLER_PROFILE } from '../../../../constants'
 
 import { ProfileItemRows, RadioGroupField } from '../../fields'
@@ -11,12 +11,12 @@ import { StepFormProps } from '../../types'
 
 export const ThermocyclerForm = (props: StepFormProps): JSX.Element => {
   const { focusHandlers, propsForFields, formData } = props
-
+  const { t } = useTranslation(['application', 'form'])
   return (
     <div className={styles.form_wrapper}>
       <div className={styles.section_header}>
         <span className={styles.section_header_text}>
-          {i18n.t('application.stepType.thermocycler')}
+          {t('stepType.thermocycler')}
         </span>
       </div>
       <div className={styles.tc_step_group}>
@@ -26,8 +26,8 @@ export const ThermocyclerForm = (props: StepFormProps): JSX.Element => {
             className={styles.tc_step_option}
             options={[
               {
-                name: i18n.t(
-                  'form.step_edit_form.field.thermocyclerAction.options.state'
+                name: t(
+                  'form:step_edit_form.field.thermocyclerAction.options.state'
                 ),
                 value: THERMOCYCLER_STATE,
               },
@@ -43,8 +43,8 @@ export const ThermocyclerForm = (props: StepFormProps): JSX.Element => {
             className={styles.tc_step_option}
             options={[
               {
-                name: i18n.t(
-                  'form.step_edit_form.field.thermocyclerAction.options.profile'
+                name: t(
+                  'form:step_edit_form.field.thermocyclerAction.options.profile'
                 ),
                 value: THERMOCYCLER_PROFILE,
               },
@@ -57,13 +57,13 @@ export const ThermocyclerForm = (props: StepFormProps): JSX.Element => {
         <div className={styles.profile_form}>
           <div className={styles.section_header}>
             <span className={styles.section_header_text}>
-              {i18n.t('application.stepType.profile_settings')}
+              {t('stepType.profile_settings')}
             </span>
           </div>
           <ProfileSettings propsForFields={propsForFields} />
           <div className={styles.section_header}>
             <span className={styles.section_header_text}>
-              {i18n.t('application.stepType.profile_steps')}
+              {t('stepType.profile_steps')}
             </span>
           </div>
           <ProfileItemRows
@@ -73,7 +73,7 @@ export const ThermocyclerForm = (props: StepFormProps): JSX.Element => {
           />
           <div className={styles.section_header}>
             <span className={styles.section_header_text}>
-              {i18n.t('application.stepType.ending_hold')}
+              {t('stepType.ending_hold')}
             </span>
           </div>
           <StateFields

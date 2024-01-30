@@ -219,6 +219,12 @@
             "markers": "python_version >= '3.7'",
             "version": "==23.2"
         },
+        "paho-mqtt": {
+            "hashes": [
+                "sha256:2a8291c81623aec00372b5a85558a372c747cbca8e9934dfe218638b8eefc26f"
+            ],
+            "version": "==1.6.1"
+        },
         "pydantic": {
             "hashes": [
                 "sha256:1061c6ee6204f4f5a27133126854948e3b3d51fcc16ead2e5d04378c199b2f44",
@@ -872,12 +878,6 @@
             "markers": "python_version >= '3.7'",
             "version": "==23.2"
         },
-        "paho-mqtt": {
-            "hashes": [
-                "sha256:9feb068e822be7b3a116324e01fb6028eb1d66412bf98595ae72698965cb1cae"
-            ],
-            "version": "==1.5.1"
-        },
         "pathspec": {
             "hashes": [
                 "sha256:a0d503e138a4c123b27490a4f7beda6a01c6f288df0e4a8b79c7eb0dc7b4cc08",
@@ -1274,6 +1274,12 @@
             ],
             "index": "pypi",
             "version": "==4.0.1"
+        },
+        "types-paho-mqtt": {
+            "hashes": [
+                "sha256:6b486b9e4438c856cc0ac8312bf6a81c2bca1697bf36cde6d2ecddb44513550e"
+            ],
+            "version": "==1.6.0.20240106"
         },
         "types-requests": {
             "hashes": [

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { Form, Formik, useField, useFormikContext } from 'formik'
 import some from 'lodash/some'
@@ -37,7 +38,6 @@ import {
   OT2_ROBOT_TYPE,
   getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../localization'
 import {
   getSlotIdsBlockedBySpanning,
   getSlotIsEmpty,
@@ -70,10 +70,10 @@ import type { ModelModuleInfo } from '../../EditModules'
 export interface EditModulesModalProps {
   moduleType: ModuleType
   moduleOnDeck: ModuleOnDeck | null
-  onCloseClick: () => unknown
-  editModuleModel: (model: ModuleModel) => unknown
-  editModuleSlot: (slot: string) => unknown
-  displayModuleWarning: (module: ModelModuleInfo) => unknown
+  onCloseClick: () => void
+  editModuleModel: (model: ModuleModel) => void
+  editModuleSlot: (slot: string) => void
+  displayModuleWarning: (module: ModelModuleInfo) => void
 }
 
 type EditModulesModalComponentProps = EditModulesModalProps & {
@@ -94,6 +94,7 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
     onCloseClick,
     moduleOnDeck,
   } = props
+  const { t } = useTranslation('alert')
   const robotType = useSelector(getRobotType)
   const supportedModuleSlot =
     robotType === OT2_STANDARD_MODEL
@@ -132,11 +133,12 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
   }: EditModulesFormValues): Record<string, any> => {
     const errors: Record<string, any> = {}
     if (!selectedModel) {
-      errors.selectedModel = i18n.t('alert.field.required')
+      errors.selectedModel = t('field.required')
     }
     const isModuleAdjacentToHeaterShaker =
       // if the module is a heater shaker, it can't be adjacent to another heater shaker
       // because PD does not support MoaM
+      robotType === OT2_ROBOT_TYPE &&
       moduleOnDeck?.type !== HEATERSHAKER_MODULE_TYPE &&
       some(
         initialDeckSetup.modules,
@@ -146,8 +148,8 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
       )
 
     if (isModuleAdjacentToHeaterShaker) {
-      errors.selectedSlot = i18n.t(
-        'alert.module_placement.HEATER_SHAKER_ADJACENT_TO_MODULE.body',
+      errors.selectedSlot = t(
+        'module_placement.HEATER_SHAKER_ADJACENT_TO_MODULE.body',
         { selectedSlot }
       )
     } else if (
@@ -163,8 +165,8 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
           hwModule.type !== HEATERSHAKER_MODULE_TYPE
       )
       if (isHeaterShakerAdjacentToAnotherModule) {
-        errors.selectedSlot = i18n.t(
-          'alert.module_placement.HEATER_SHAKER_ADJACENT_TO_ANOTHER_MODULE.body',
+        errors.selectedSlot = t(
+          'module_placement.HEATER_SHAKER_ADJACENT_TO_ANOTHER_MODULE.body',
           { selectedSlot }
         )
       }
@@ -175,13 +177,12 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
       (selectedModel === THERMOCYCLER_MODULE_V2 && hasSlotIssue('A1')) ||
       hasSlotIssue(selectedSlot)
     ) {
-      errors.selectedSlot = i18n.t(
-        'alert.module_placement.SLOT_OCCUPIED.body',
-        { selectedSlot }
-      )
+      errors.selectedSlot = t('module_placement.SLOT_OCCUPIED.body', {
+        selectedSlot,
+      })
     } else if (!selectedSlot) {
       // in the event that we remove auto selecting selected slot
-      errors.selectedSlot = i18n.t('alert.field.required')
+      errors.selectedSlot = t('field.required')
     }
 
     return errors
@@ -247,6 +248,7 @@ const EditModulesModalComponent = (
   props: EditModulesModalComponentProps
 ): JSX.Element => {
   const { moduleType, onCloseClick, supportedModuleSlot } = props
+  const { t } = useTranslation(['tooltip', 'modules', 'alert', 'button'])
   const { values, errors, isValid } = useFormikContext<EditModulesFormValues>()
   const { selectedModel } = values
   const disabledModuleRestriction = useSelector(
@@ -263,7 +265,7 @@ const EditModulesModalComponent = (
 
   const slotOptionTooltip = (
     <div className={styles.slot_tooltip}>
-      {i18n.t('tooltip.edit_module_modal.slot_selection')}
+      {t('edit_module_modal.slot_selection')}
     </div>
   )
 
@@ -301,7 +303,7 @@ const EditModulesModalComponent = (
   return (
     <ModalShell width="48rem" paddingTop={SPACING.spacing32}>
       <Box paddingX={SPACING.spacing32}>
-        <Text as="h2">{i18n.t(`modules.module_long_names.${moduleType}`)}</Text>
+        <Text as="h2">{t(`modules:module_long_names.${moduleType}`)}</Text>
       </Box>
       <Form>
         <Box paddingX={SPACING.spacing32} paddingTop={SPACING.spacing16}>
@@ -353,7 +355,7 @@ const EditModulesModalComponent = (
               {slotIssue ? (
                 <PDAlert
                   alertType="warning"
-                  title={i18n.t('alert.module_placement.SLOT_OCCUPIED.title')}
+                  title={t('alert:module_placement.SLOT_OCCUPIED.title')}
                   description={''}
                 />
               ) : null}
@@ -397,14 +399,14 @@ const EditModulesModalComponent = (
             className={styles.button_margin}
             onClick={onCloseClick}
           >
-            {i18n.t('button.cancel')}
+            {t('button:cancel')}
           </OutlineButton>
           <OutlineButton
             className={styles.button_margin}
             disabled={!isValid}
             type={BUTTON_TYPE_SUBMIT}
           >
-            {i18n.t('button.save')}
+            {t('button:save')}
           </OutlineButton>
         </Flex>
       </Form>
