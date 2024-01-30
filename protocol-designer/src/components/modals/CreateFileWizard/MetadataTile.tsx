@@ -56,7 +56,7 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
                 aria-label="MetadataTile_protocolName"
                 autoFocus
                 register={register}
-                fieldName="name"
+                fieldName="fields.name"
                 error={
                   touchedFields?.fields?.name && name && name.length > 1
                     ? errors?.fields?.name?.message ?? null
@@ -91,7 +91,7 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
               </Text>
               <InputField
                 aria-label="MetadataTile_orgOrAuth"
-                fieldName="organizationOrAuthor"
+                fieldName="fields.organizationOrAuthor"
                 register={register}
               />
             </Flex>

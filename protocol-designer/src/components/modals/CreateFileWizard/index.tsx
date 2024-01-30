@@ -375,7 +375,7 @@ const moduleValidationShape: any = Yup.object().shape({
   slot: Yup.string(),
 })
 
-const validationSchema = Yup.object().shape({
+const validationSchema: any = Yup.object().shape({
   fields: Yup.object().shape({
     name: Yup.string().required('Required'),
   }),
@@ -393,7 +393,7 @@ const validationSchema = Yup.object().shape({
     [TEMPERATURE_MODULE_TYPE]: moduleValidationShape,
     [THERMOCYCLER_MODULE_TYPE]: moduleValidationShape,
   }),
-}) as any
+})
 
 interface CreateFileFormProps {
   currentWizardStep: WizardStep
