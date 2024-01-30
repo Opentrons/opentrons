@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { TYPOGRAPHY, SPACING, BORDERS } from '@opentrons/components'
+import { TYPOGRAPHY, SPACING, BORDERS, COLORS } from '@opentrons/components'
 import { createSnippet } from './createSnippet'
 import type { LabwareOffsetCreateData } from '@opentrons/api-client'
 import type {
@@ -12,8 +12,7 @@ import type {
 const JsonTextArea = styled.textarea`
   min-height: 28vh;
   width: 100%;
-  background-color: #f8f8f8;
-  border: ${BORDERS.lineBorder};
+  background-color: ${COLORS.grey30};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing8};
   margin: ${SPACING.spacing16} 0;

@@ -1,4 +1,4 @@
-"""Flex: Diluent for 96ch.."""
+"""Flex: Diluent for 96ch."""
 from math import pi
 from typing import List, Optional, Dict, Tuple
 
@@ -8,14 +8,21 @@ from opentrons.protocol_api import ProtocolContext, InstrumentContext, Labware
 #                EDIT - START                #
 ##############################################
 
+# FIXME: make these variables configurable through RUNTIME-VARIABLES
+
 metadata = {"protocolName": "Flex: Diluent for 96ch"}
 requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 RETURN_TIP = False
+FILL_MULTIPLE_PLATES = True
 
-DILUENT_VOLUME = 195
-DILUENT_PUSH_OUT = 15
-DILUENT_SOURCES = [
+LIQUID_NAME = "Diluent"
+LIQUID_DESCRIPTION = "Artel MVS Diluent"
+LIQUID_COLOR = "#0000FF"
+
+TARGET_VOLUME = 195
+TARGET_PUSH_OUT = 15
+TARGET_SOURCES = [
     {
         "source": "A1",
         "destinations": ["A1", "A2", "A3", "A4", "A5", "A6"],
@@ -146,20 +153,20 @@ def _assign_starting_volumes(
     pipette: InstrumentContext,
     reservoir: Labware,
 ) -> None:
-    diluent = ctx.define_liquid(
-        name="Diluent",
-        description="Artel MVS Diluent",
-        display_color="#0000FF",
+    liquid = ctx.define_liquid(
+        name=LIQUID_NAME,
+        description=LIQUID_DESCRIPTION,
+        display_color=LIQUID_COLOR,
     )
-    for test in DILUENT_SOURCES:
+    for test in TARGET_SOURCES:
         src_ul_per_trial = _start_volumes_per_trial(
-            DILUENT_VOLUME,
+            TARGET_VOLUME,
             reservoir.load_name,
             pipette.channels,
             len(test["destinations"]),
         )
         first_trial_ul = src_ul_per_trial[0]
-        reservoir[str(test["source"])].load_liquid(diluent, first_trial_ul)
+        reservoir[str(test["source"])].load_liquid(liquid, first_trial_ul)
 
 
 def _transfer(
@@ -215,18 +222,18 @@ def run(ctx: ProtocolContext) -> None:
     pipette = ctx.load_instrument("flex_8channel_1000", "left", tip_racks=[tips])
     _assign_starting_volumes(ctx, pipette, reservoir)
     for i in range(12):
-        pipette.configure_for_volume(DILUENT_VOLUME)
+        pipette.configure_for_volume(TARGET_VOLUME)
         pipette.pick_up_tip()
-        for test in DILUENT_SOURCES:
+        for test in TARGET_SOURCES:
             _transfer(
                 ctx,
-                DILUENT_VOLUME,
+                TARGET_VOLUME,
                 pipette,
                 reservoir,
                 plate,
                 test["source"],  # type: ignore[arg-type]
                 test["destinations"],  # type: ignore[arg-type]
-                push_out=DILUENT_PUSH_OUT,
+                push_out=TARGET_PUSH_OUT,
                 touch_tip=True,
                 volume_already_in_plate=0,
             )
@@ -234,5 +241,7 @@ def run(ctx: ProtocolContext) -> None:
             pipette.return_tip()
         else:
             pipette.drop_tip()
+        if not FILL_MULTIPLE_PLATES:
+            break
         if i < 11:
-            ctx.pause("refresh Diluent to start volumes, and add new Plate")
+            ctx.pause("refresh liquid to start volumes, and add new Plate")

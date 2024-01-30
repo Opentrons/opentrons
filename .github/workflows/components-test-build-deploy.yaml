@@ -191,6 +191,8 @@ jobs:
           yarn config set cache-folder ./.yarn-cache
           yarn config set network-timeout 60000
           yarn
+      - name: 'build typescript'
+        run: make build-ts
       - name: 'build library'
         run: |
           make -C components lib
@@ -210,6 +212,3 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           cd ./components && echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ./.npmrc && npm publish --access public
-          
-
-      

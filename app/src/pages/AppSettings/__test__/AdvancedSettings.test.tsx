@@ -2,32 +2,25 @@ import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { resetAllWhenMocks } from 'jest-when'
 import { fireEvent, screen } from '@testing-library/react'
-import {
-  renderWithProviders,
-  useConditionalConfirm,
-} from '@opentrons/components'
-import {
-  getReachableRobots,
-  getUnreachableRobots,
-} from '../../../redux/discovery'
+
+import { renderWithProviders } from '@opentrons/components'
+
 import { i18n } from '../../../i18n'
 import {
-  mockReachableRobot,
-  mockUnreachableRobot,
-} from '../../../redux/discovery/__fixtures__'
-import {
   useTrackEvent,
-  ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
   ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
 } from '../../../redux/analytics'
 import * as CustomLabware from '../../../redux/custom-labware'
 import * as Config from '../../../redux/config'
-import * as ProtocolAnalysis from '../../../redux/protocol-analysis'
-import * as SystemInfo from '../../../redux/system-info'
-import * as Fixtures from '../../../redux/system-info/__fixtures__'
 import {
+  ClearUnavailableRobots,
   EnableDevTools,
   OT2AdvancedSettings,
+  OverridePathToPython,
+  PreventRobotCaching,
+  ShowLabwareOffsetSnippets,
+  U2EInformation,
+  ShowHeaterShakerAttachmentModal,
 } from '../../../organisms/AdvancedSettings'
 
 import { AdvancedSettings } from '../AdvancedSettings'
@@ -53,15 +46,6 @@ const render = (): ReturnType<typeof renderWithProviders> => {
   )
 }
 
-const mockGetUnreachableRobots = getUnreachableRobots as jest.MockedFunction<
-  typeof getUnreachableRobots
->
-const mockGetReachableRobots = getReachableRobots as jest.MockedFunction<
-  typeof getReachableRobots
->
-const mockUseConditionalConfirm = useConditionalConfirm as jest.MockedFunction<
-  typeof useConditionalConfirm
->
 const getCustomLabwarePath = CustomLabware.getCustomLabwareDirectory as jest.MockedFunction<
   typeof CustomLabware.getCustomLabwareDirectory
 >
@@ -69,32 +53,11 @@ const getChannelOptions = Config.getUpdateChannelOptions as jest.MockedFunction<
   typeof Config.getUpdateChannelOptions
 >
 
-const mockGetIsLabwareOffsetCodeSnippetsOn = Config.getIsLabwareOffsetCodeSnippetsOn as jest.MockedFunction<
-  typeof Config.getIsLabwareOffsetCodeSnippetsOn
->
-
-const mockGetU2EAdapterDevice = SystemInfo.getU2EAdapterDevice as jest.MockedFunction<
-  typeof SystemInfo.getU2EAdapterDevice
->
-
-const mockGetU2EWindowsDriverStatus = SystemInfo.getU2EWindowsDriverStatus as jest.MockedFunction<
-  typeof SystemInfo.getU2EWindowsDriverStatus
->
-
-const mockGetIsHeaterShakerAttached = Config.getIsHeaterShakerAttached as jest.MockedFunction<
-  typeof Config.getIsHeaterShakerAttached
->
-
-const mockGetPathToPythonOverride = Config.getPathToPythonOverride as jest.MockedFunction<
-  typeof Config.getPathToPythonOverride
->
-
-const mockOpenPythonInterpreterDirectory = ProtocolAnalysis.openPythonInterpreterDirectory as jest.MockedFunction<
-  typeof ProtocolAnalysis.openPythonInterpreterDirectory
->
-
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
+>
+const mockPreventRobotCaching = PreventRobotCaching as jest.MockedFunction<
+  typeof PreventRobotCaching
 >
 
 const mockOT2AdvancedSettings = OT2AdvancedSettings as jest.MockedFunction<
@@ -103,10 +66,23 @@ const mockOT2AdvancedSettings = OT2AdvancedSettings as jest.MockedFunction<
 const mockEnableDevTools = EnableDevTools as jest.MockedFunction<
   typeof EnableDevTools
 >
+const mockU2EInformation = U2EInformation as jest.MockedFunction<
+  typeof U2EInformation
+>
+const mockShowLabwareOffsetSnippets = ShowLabwareOffsetSnippets as jest.MockedFunction<
+  typeof ShowLabwareOffsetSnippets
+>
+const mockClearUnavailableRobots = ClearUnavailableRobots as jest.MockedFunction<
+  typeof ClearUnavailableRobots
+>
+const mockOverridePathToPython = OverridePathToPython as jest.MockedFunction<
+  typeof OverridePathToPython
+>
+const mockShowHeaterShakerAttachmentModal = ShowHeaterShakerAttachmentModal as jest.MockedFunction<
+  typeof ShowHeaterShakerAttachmentModal
+>
 
 let mockTrackEvent: jest.Mock
-const mockConfirm = jest.fn()
-const mockCancel = jest.fn()
 
 describe('AdvancedSettings', () => {
   beforeEach(() => {
@@ -121,18 +97,24 @@ describe('AdvancedSettings', () => {
       { label: 'Beta', value: 'beta' },
       { label: 'Alpha', value: 'alpha' },
     ])
-    mockGetU2EAdapterDevice.mockReturnValue(Fixtures.mockWindowsRealtekDevice)
-    mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
-    mockGetReachableRobots.mockReturnValue([mockReachableRobot])
-    mockGetU2EWindowsDriverStatus.mockReturnValue(SystemInfo.OUTDATED)
-    mockUseConditionalConfirm.mockReturnValue({
-      confirm: mockConfirm,
-      showConfirmation: true,
-      cancel: mockCancel,
-    })
+    mockPreventRobotCaching.mockReturnValue(<div>mock PreventRobotCaching</div>)
     mockOT2AdvancedSettings.mockReturnValue(<div>mock OT2AdvancedSettings</div>)
     mockEnableDevTools.mockReturnValue(<div>mock EnableDevTools</div>)
+    mockU2EInformation.mockReturnValue(<div>mock U2EInformation</div>)
+    mockShowLabwareOffsetSnippets.mockReturnValue(
+      <div>mock ShowLabwareOffsetSnippets</div>
+    )
+    mockClearUnavailableRobots.mockReturnValue(
+      <div>mock ClearUnavailableRobots</div>
+    )
+    mockOverridePathToPython.mockReturnValue(
+      <div>mock OverridePathToPython</div>
+    )
+    mockShowHeaterShakerAttachmentModal.mockReturnValue(
+      <div>mock ShowHeaterShakerAttachmentModal</div>
+    )
   })
+
   afterEach(() => {
     jest.resetAllMocks()
     resetAllWhenMocks()
@@ -142,10 +124,8 @@ describe('AdvancedSettings', () => {
     const [{ getByText }] = render()
     getByText('Update Channel')
     getByText('Additional Custom Labware Source Folder')
-    getByText('Prevent Robot Caching')
-    getByText('Clear Unavailable Robots')
-    getByText('USB-to-Ethernet Adapter Information')
   })
+
   it('renders the update channel combobox and section', () => {
     const [{ getByText, getByRole }] = render()
     getByText(
@@ -153,6 +133,7 @@ describe('AdvancedSettings', () => {
     )
     getByRole('combobox', { name: '' })
   })
+
   it('renders the custom labware section with source folder selected', () => {
     getCustomLabwarePath.mockReturnValue('/mock/custom-labware-path')
     const [{ getByText, getByRole }] = render()
@@ -162,6 +143,7 @@ describe('AdvancedSettings', () => {
     getByText('Additional Source Folder')
     getByRole('button', { name: 'Change labware source folder' })
   })
+
   it('renders the custom labware section with no source folder selected', () => {
     const [{ getByText, getByRole }] = render()
     getByText('No additional source folder specified')
@@ -176,175 +158,37 @@ describe('AdvancedSettings', () => {
     render()
     screen.getByText('mock OT2AdvancedSettings')
   })
-  it('renders the robot caching section', () => {
-    const [{ queryByText, getByRole }] = render()
-    queryByText(
-      'The app will immediately clear unavailable robots and will not remember unavailable robots while this is enabled. On networks with many robots, preventing caching may improve network performance at the expense of slower and less reliable robot discovery on app launch.'
-    )
-    getByRole('switch', { name: 'display_unavailable_robots' })
+
+  it('should render mock robot caching section', () => {
+    render()
+    screen.getByText('mock PreventRobotCaching')
   })
 
-  it('render the usb-to-ethernet adapter information', () => {
-    const [{ getByText }] = render()
-    getByText('USB-to-Ethernet Adapter Information')
-    getByText(
-      'Some OT-2s have an internal USB-to-Ethernet adapter. If your OT-2 uses this adapter, it will be added to your computer’s device list when you make a wired connection. If you have a Realtek adapter, it is essential that the driver is up to date.'
-    )
-    getByText('Description')
-    getByText('Manufacturer')
-    getByText('Driver Version')
+  it('should render mock U2EInformation', () => {
+    render()
+    expect(screen.getByText('mock U2EInformation'))
   })
 
-  it('renders the test data of the usb-to-ethernet adapter information with mac', () => {
-    mockGetU2EAdapterDevice.mockReturnValue({
-      ...Fixtures.mockRealtekDevice,
-    })
-    mockGetU2EWindowsDriverStatus.mockReturnValue(SystemInfo.NOT_APPLICABLE)
-    const [{ getByText, queryByText }] = render()
-    getByText('USB 10/100 LAN')
-    getByText('Realtek')
-    getByText('Unknown')
-    expect(
-      queryByText(
-        'An update is available for Realtek USB-to-Ethernet adapter driver'
-      )
-    ).not.toBeInTheDocument()
-    expect(queryByText('go to Realtek.com')).not.toBeInTheDocument()
+  it('should render mock show link to get labware offset data section', () => {
+    render()
+    screen.getByText('mock ShowLabwareOffsetSnippets')
   })
 
-  it('renders the test data of the outdated usb-to-ethernet adapter information with windows', () => {
-    const [{ getByText }] = render()
-    getByText('Realtek USB FE Family Controller')
-    getByText('Realtek')
-    getByText('1.2.3')
-    getByText(
-      'An update is available for Realtek USB-to-Ethernet adapter driver'
-    )
-    const targetLink = 'https://www.realtek.com/en/'
-    const link = getByText('go to Realtek.com')
-    expect(link.closest('a')).toHaveAttribute('href', targetLink)
+  it('should render mock ShowHeaterShakerAttachmentModal section', () => {
+    render()
+    screen.getByText('mock ShowHeaterShakerAttachmentModal')
   })
 
-  it('renders the test data of the updated usb-to-ethernet adapter information with windows', () => {
-    mockGetU2EWindowsDriverStatus.mockReturnValue(SystemInfo.UP_TO_DATE)
-    const [{ getByText, queryByText }] = render()
-    getByText('Realtek USB FE Family Controller')
-    getByText('Realtek')
-    getByText('1.2.3')
-    expect(
-      queryByText(
-        'An update is available for Realtek USB-to-Ethernet adapter driver'
-      )
-    ).not.toBeInTheDocument()
-    expect(queryByText('go to Realtek.com')).not.toBeInTheDocument()
+  it('should render mock OverridePathToPython section', () => {
+    render()
+    screen.getByText('mock OverridePathToPython')
   })
 
-  it('renders the not connected message and not display item titles when USB-to-Ethernet is not connected', () => {
-    mockGetU2EAdapterDevice.mockReturnValue(null)
-    const [{ getByText, queryByText }] = render()
-    expect(queryByText('Description')).not.toBeInTheDocument()
-    expect(queryByText('Manufacturer')).not.toBeInTheDocument()
-    expect(queryByText('Driver Version')).not.toBeInTheDocument()
-    getByText('No USB-to-Ethernet adapter connected')
+  it('should render mock clear unavailable robots section', () => {
+    render()
+    screen.getByText('mock ClearUnavailableRobots')
   })
 
-  it('renders the display show link to get labware offset data section', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText('Show Labware Offset data code snippets')
-    getByText(
-      'Only for users who need to apply Labware Offset data outside of the Opentrons App. When enabled, code snippets for Jupyter Notebook and SSH are available during protocol setup.'
-    )
-    getByRole('switch', { name: 'show_link_to_get_labware_offset_data' })
-  })
-
-  it('renders the toggle button on when show link to labware offset data setting is true', () => {
-    mockGetIsLabwareOffsetCodeSnippetsOn.mockReturnValue(true)
-    const [{ getByRole }] = render()
-    const toggleButton = getByRole('switch', {
-      name: 'show_link_to_get_labware_offset_data',
-    })
-    expect(toggleButton.getAttribute('aria-checked')).toBe('true')
-  })
-
-  it('renders the toggle button on when showing heater shaker modal as false', () => {
-    mockGetIsHeaterShakerAttached.mockReturnValue(true)
-    const [{ getByRole, getByText }] = render()
-    getByText('Confirm Heater-Shaker Module Attachment')
-    getByText(
-      'Display a reminder to attach the Heater-Shaker properly before running a test shake or using it in a protocol.'
-    )
-    const toggleButton = getByRole('switch', {
-      name: 'show_heater_shaker_modal',
-    })
-    expect(toggleButton.getAttribute('aria-checked')).toBe('false')
-  })
-
-  it('renders the toggle button on when showing heater shaker modal as true', () => {
-    mockGetIsHeaterShakerAttached.mockReturnValue(false)
-    const [{ getByRole }] = render()
-    const toggleButton = getByRole('switch', {
-      name: 'show_heater_shaker_modal',
-    })
-    expect(toggleButton.getAttribute('aria-checked')).toBe('true')
-  })
-
-  it('renders the path to python override text and button with no default path', () => {
-    mockGetPathToPythonOverride.mockReturnValue(null)
-    const [{ getByText, getByRole }] = render()
-    getByText('Override Path to Python')
-    getByText(
-      'If specified, the Opentrons App will use the Python interpreter at this path instead of the default bundled Python interpreter.'
-    )
-    getByText('override path')
-    getByText('No path specified')
-    const button = getByRole('button', { name: 'Add override path' })
-    fireEvent.click(button)
-    expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
-      properties: {},
-    })
-  })
-
-  it('renders the path to python override text and button with a selected path', () => {
-    mockGetPathToPythonOverride.mockReturnValue('otherPath')
-    const [{ getByText, getByRole }] = render()
-    getByText('Override Path to Python')
-    getByText(
-      'If specified, the Opentrons App will use the Python interpreter at this path instead of the default bundled Python interpreter.'
-    )
-    getByText('override path')
-    const specifiedPath = getByText('otherPath')
-    const button = getByRole('button', { name: 'Reset to default' })
-    fireEvent.click(button)
-    expect(mockGetPathToPythonOverride).toHaveBeenCalled()
-    fireEvent.click(specifiedPath)
-    expect(mockOpenPythonInterpreterDirectory).toHaveBeenCalled()
-  })
-
-  it('renders the clear unavailable robots section', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText(
-      'Clear the list of unavailable robots on the Devices page. This action cannot be undone.'
-    )
-    const btn = getByRole('button', {
-      name: 'Clear unavailable robots list',
-    })
-    fireEvent.click(btn)
-    getByText('Clear unavailable robots?')
-    getByText(
-      'Clearing the list of unavailable robots on the Devices page cannot be undone.'
-    )
-    const closeBtn = getByRole('button', {
-      name: 'cancel',
-    })
-    const proceedBtn = getByRole('button', {
-      name: 'Clear unavailable robots',
-    })
-    fireEvent.click(closeBtn)
-    expect(mockCancel).toHaveBeenCalled()
-    fireEvent.click(proceedBtn)
-    expect(mockConfirm).toHaveBeenCalled()
-  })
   it('should render mock developer tools section', () => {
     render()
     screen.getByText('mock EnableDevTools')

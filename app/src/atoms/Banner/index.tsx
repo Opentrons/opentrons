@@ -49,28 +49,28 @@ const BANNER_PROPS_BY_TYPE: Record<
 > = {
   success: {
     icon: { name: 'check-circle' },
-    backgroundColor: COLORS.green20,
-    color: COLORS.green50,
+    backgroundColor: COLORS.green30,
+    color: COLORS.green60,
   },
   error: {
     icon: { name: 'alert-circle' },
-    backgroundColor: COLORS.red20,
-    color: COLORS.red50,
+    backgroundColor: COLORS.red30,
+    color: COLORS.red60,
   },
   warning: {
     icon: { name: 'alert-circle' },
-    backgroundColor: COLORS.yellow20,
-    color: COLORS.yellow50,
+    backgroundColor: COLORS.yellow30,
+    color: COLORS.yellow60,
   },
   updating: {
     icon: { name: 'ot-spinner' },
     backgroundColor: COLORS.grey30,
-    color: COLORS.grey50,
+    color: COLORS.grey60,
   },
   informing: {
     icon: { name: 'information' },
-    backgroundColor: COLORS.grey10,
-    color: COLORS.grey50,
+    backgroundColor: COLORS.blue30,
+    color: COLORS.blue60,
   },
 }
 
@@ -97,7 +97,6 @@ export function Banner(props: BannerProps): JSX.Element {
     color: BANNER_PROPS_BY_TYPE[type].color,
   }
   const BANNER_STYLE = css`
-    border: 1px ${BORDERS.styleSolid} ${BANNER_PROPS_BY_TYPE[type].color};
     font-size: ${TYPOGRAPHY.fontSizeP};
     font-weight: ${TYPOGRAPHY.fontWeightRegular};
     border-radius: ${SPACING.spacing4};
@@ -105,7 +104,6 @@ export function Banner(props: BannerProps): JSX.Element {
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       font-size: 1.25rem;
       font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-      border: none;
       background-color: ${COLORS.yellow35};
       border-radius: ${BORDERS.borderRadiusSize3};
       line-height: 1.5rem;

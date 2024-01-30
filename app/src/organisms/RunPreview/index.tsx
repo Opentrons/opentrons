@@ -19,14 +19,16 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useNotifyLastRunCommandKey } from '../../resources/runs/useNotifyLastRunCommandKey'
 import { CommandText } from '../CommandText'
 import { Divider } from '../../atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
-import { useLastRunCommandKey } from '../Devices/hooks/useLastRunCommandKey'
 import { CommandIcon } from './CommandIcon'
 import type { RobotType } from '@opentrons/shared-data'
 
 const COLOR_FADE_MS = 500
+const LIVE_RUN_COMMANDS_POLL_MS = 3000
+
 interface RunPreviewProps {
   runId: string
   robotType: RobotType
@@ -40,7 +42,9 @@ export const RunPreviewComponent = (
   const { t } = useTranslation('run_details')
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
-  const currentRunCommandKey = useLastRunCommandKey(runId)
+  const currentRunCommandKey = useNotifyLastRunCommandKey(runId, {
+    refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
+  })
   const [
     isCurrentCommandVisible,
     setIsCurrentCommandVisible,
@@ -92,8 +96,8 @@ export const RunPreviewComponent = (
         {(command, index) => {
           const isCurrent = index === currentRunCommandIndex
           const borderColor = isCurrent ? COLORS.blue50 : COLORS.transparent
-          const backgroundColor = isCurrent ? COLORS.blue10 : COLORS.grey10
-          const contentColor = isCurrent ? COLORS.black90 : COLORS.grey50
+          const backgroundColor = isCurrent ? COLORS.blue35 : COLORS.grey10
+          const contentColor = isCurrent ? COLORS.blue60 : COLORS.grey50
           return (
             <Flex
               key={command.id}

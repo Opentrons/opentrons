@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   Card,
@@ -16,29 +16,20 @@ import {
   selectors as tutorialSelectors,
 } from '../../tutorial'
 import { OLDEST_MIGRATEABLE_VERSION } from '../../load-file/migration'
-import { FeatureFlagCard } from './FeatureFlagCard'
+import { FeatureFlagCard } from './FeatureFlagCard/FeatureFlagCard'
+
 import styles from './SettingsPage.css'
-import { BaseState, ThunkDispatch } from '../../types'
 
-interface Props {
-  canClearHintDismissals: boolean
-  hasOptedIn: boolean | null
-  restoreHints: () => unknown
-  toggleOptedIn: () => unknown
-}
+export function SettingsApp(): JSX.Element {
+  const dispatch = useDispatch()
+  const hasOptedIn = useSelector(analyticsSelectors.getHasOptedIn)
+  const canClearHintDismissals = useSelector(
+    tutorialSelectors.getCanClearHintDismissals
+  )
+  const _toggleOptedIn = hasOptedIn
+    ? analyticsActions.optOut
+    : analyticsActions.optIn
 
-interface SP {
-  canClearHintDismissals: Props['canClearHintDismissals']
-  hasOptedIn: Props['hasOptedIn']
-}
-
-function SettingsAppComponent(props: Props): JSX.Element {
-  const {
-    canClearHintDismissals,
-    hasOptedIn,
-    restoreHints,
-    toggleOptedIn,
-  } = props
   const { t } = useTranslation(['card', 'application', 'button'])
   return (
     <>
@@ -64,7 +55,9 @@ function SettingsAppComponent(props: Props): JSX.Element {
               <OutlineButton
                 className={styles.button}
                 disabled={!canClearHintDismissals}
-                onClick={restoreHints}
+                onClick={() =>
+                  dispatch(tutorialActions.clearAllHintDismissals())
+                }
               >
                 {canClearHintDismissals
                   ? t('button:restore')
@@ -82,7 +75,7 @@ function SettingsAppComponent(props: Props): JSX.Element {
               <ToggleButton
                 className={styles.toggle_button}
                 toggledOn={Boolean(hasOptedIn)}
-                onClick={toggleOptedIn}
+                onClick={() => dispatch(_toggleOptedIn())}
               />
             </div>
 
@@ -99,33 +92,3 @@ function SettingsAppComponent(props: Props): JSX.Element {
     </>
   )
 }
-
-function mapStateToProps(state: BaseState): SP {
-  return {
-    hasOptedIn: analyticsSelectors.getHasOptedIn(state),
-    canClearHintDismissals: tutorialSelectors.getCanClearHintDismissals(state),
-  }
-}
-
-function mergeProps(
-  stateProps: SP,
-  dispatchProps: { dispatch: ThunkDispatch<any> }
-): Props {
-  const { dispatch } = dispatchProps
-  const { hasOptedIn } = stateProps
-
-  const _toggleOptedIn = hasOptedIn
-    ? analyticsActions.optOut
-    : analyticsActions.optIn
-  return {
-    ...stateProps,
-    toggleOptedIn: () => dispatch(_toggleOptedIn()),
-    restoreHints: () => dispatch(tutorialActions.clearAllHintDismissals()),
-  }
-}
-
-export const SettingsApp = connect(
-  mapStateToProps,
-  null,
-  mergeProps
-)(SettingsAppComponent)

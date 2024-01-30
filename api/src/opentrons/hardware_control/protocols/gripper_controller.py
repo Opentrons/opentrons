@@ -33,7 +33,12 @@ class GripperController(Protocol):
         """
         ...
 
-    def raise_error_if_gripper_pickup_failed(self, labware_width: float) -> None:
+    def raise_error_if_gripper_pickup_failed(
+        self,
+        expected_grip_width: float,
+        grip_width_uncertainty_wider: float,
+        grip_width_uncertainty_narrower: float,
+    ) -> None:
         """Ensure that a gripper pickup succeeded."""
 
     @property
