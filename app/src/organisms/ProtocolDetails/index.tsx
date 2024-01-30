@@ -10,27 +10,27 @@ import { useDispatch, useSelector } from 'react-redux'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import {
-  Box,
-  Btn,
-  Flex,
-  Icon,
-  Link,
   ALIGN_CENTER,
   BORDERS,
+  Box,
+  Btn,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
+  Flex,
+  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  Link,
   POSITION_RELATIVE,
+  PrimaryButton,
+  ProtocolDeck,
+  RoundTab,
   SIZE_1,
   SIZE_5,
   SPACING,
-  RoundTab,
   TYPOGRAPHY,
-  PrimaryButton,
-  ProtocolDeck,
 } from '@opentrons/components'
 import {
   parseInitialPipetteNamesByMount,
@@ -84,16 +84,16 @@ const GRID_STYLE = css`
 const ZOOM_ICON_STYLE = css`
   border-radius: ${BORDERS.radiusSoftCorners};
   &:hover {
-    background: ${COLORS.lightGreyHover};
+    background: ${COLORS.grey30};
   }
   &:active {
-    background: ${COLORS.lightGreyPressed};
+    background: ${COLORS.grey35};
   }
   &:disabled {
     background: ${COLORS.white};
   }
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
+    background: ${COLORS.grey35};
   }
 `
 
@@ -129,7 +129,11 @@ function MetadataDetails({
         {filteredMetaData.map((item, index) => {
           return (
             <React.Fragment key={index}>
-              <StyledText as="h6" marginTop={SPACING.spacing8}>
+              <StyledText
+                as="h6"
+                marginTop={SPACING.spacing8}
+                color={COLORS.grey60}
+              >
                 {startCase(item.label)}
               </StyledText>
               <StyledText as="p">{item.value}</StyledText>
@@ -327,9 +331,9 @@ export function ProtocolDetails(
   const deckMap = <ProtocolDeck protocolAnalysis={mostRecentAnalysis} />
 
   const deckViewByAnalysisStatus = {
-    missing: <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />,
-    loading: <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />,
-    error: <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />,
+    missing: <Box size="14rem" backgroundColor={COLORS.grey30} />,
+    loading: <Box size="14rem" backgroundColor={COLORS.grey30} />,
+    error: <Box size="14rem" backgroundColor={COLORS.grey30} />,
     complete: (
       <Box size="14rem" height="auto">
         {deckMap}
@@ -345,8 +349,8 @@ export function ProtocolDetails(
     setShowChooseRobotToRunProtocolSlideout(true)
   }
 
-  const UNKNOWN_ATTACHMENT_ERROR = `${protocolDisplayName} protocol uses 
-  instruments or modules from a future version of Opentrons software. Please update 
+  const UNKNOWN_ATTACHMENT_ERROR = `${protocolDisplayName} protocol uses
+  instruments or modules from a future version of Opentrons software. Please update
   the app to the most recent version to run this protocol.`
 
   const UnknownAttachmentError = (
@@ -387,7 +391,6 @@ export function ProtocolDetails(
 
           <Flex
             backgroundColor={COLORS.white}
-            border={`1px solid ${COLORS.medGreyEnabled}`}
             borderRadius={BORDERS.radiusSoftCorners}
             position={POSITION_RELATIVE}
             flexDirection={DIRECTION_ROW}
@@ -421,7 +424,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_creationMethod"
                 >
-                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  <StyledText as="h6" color={COLORS.grey50}>
                     {t('creation_method')}
                   </StyledText>
                   <StyledText as="p">
@@ -434,7 +437,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_lastUpdated"
                 >
-                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  <StyledText as="h6" color={COLORS.grey50}>
                     {t('last_updated')}
                   </StyledText>
                   <StyledText as="p">
@@ -447,7 +450,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_lastAnalyzed"
                 >
-                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  <StyledText as="h6" color={COLORS.grey50}>
                     {t('last_analyzed')}
                   </StyledText>
                   <StyledText as="p">
@@ -477,7 +480,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_author"
                 >
-                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  <StyledText as="h6" color={COLORS.grey50}>
                     {t('org_or_author')}
                   </StyledText>
                   <StyledText
@@ -494,7 +497,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_description"
                 >
-                  <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  <StyledText as="h6" color={COLORS.grey50}>
                     {t('description')}
                   </StyledText>
                   {analysisStatus === 'loading' ? (
@@ -535,8 +538,7 @@ export function ProtocolDetails(
               flex={`0 0 ${String(SIZE_5)}`}
               flexDirection={DIRECTION_COLUMN}
               backgroundColor={COLORS.white}
-              border={`1px solid ${String(COLORS.medGreyEnabled)}`}
-              borderRadius={BORDERS.radiusSoftCorners}
+              borderRadius={BORDERS.borderRadiusSize2}
               height="100%"
               data-testid="ProtocolDetails_deckMap"
             >
@@ -558,7 +560,15 @@ export function ProtocolDetails(
                   css={ZOOM_ICON_STYLE}
                   onClick={() => setShowDeckViewModal(true)}
                 >
-                  <Icon name="union" size={SIZE_1} />
+                  <Icon
+                    name="union"
+                    size={SIZE_1}
+                    color={
+                      analysisStatus !== 'complete'
+                        ? COLORS.grey40
+                        : COLORS.grey50
+                    }
+                  />
                 </Btn>
               </Flex>
               <Box padding={SPACING.spacing16} backgroundColor={COLORS.white}>
@@ -571,8 +581,9 @@ export function ProtocolDetails(
               height="100%"
               flexDirection={DIRECTION_COLUMN}
               marginLeft={SPACING.spacing16}
+              gridGap={SPACING.spacing8}
             >
-              <Flex>
+              <Flex gridGap={SPACING.spacing8}>
                 <RoundTab
                   data-testid="ProtocolDetails_robotConfig"
                   isCurrent={currentTab === 'robot_config'}
@@ -616,15 +627,14 @@ export function ProtocolDetails(
               </Flex>
               <Box
                 backgroundColor={COLORS.white}
-                border={BORDERS.lineBorder}
                 // remove left upper corner border radius when first tab is active
                 borderRadius={`${
                   currentTab === 'robot_config'
                     ? '0'
-                    : String(BORDERS.radiusSoftCorners)
-                } ${String(BORDERS.radiusSoftCorners)} ${String(
+                    : BORDERS.radiusSoftCorners
+                } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
                   BORDERS.radiusSoftCorners
-                )} ${String(BORDERS.radiusSoftCorners)}`}
+                }`}
                 padding={`${SPACING.spacing16} ${SPACING.spacing16} 0 ${SPACING.spacing16}`}
               >
                 {contentsByTabName[currentTab]}

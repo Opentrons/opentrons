@@ -89,6 +89,7 @@ describe('PipetteCard', () => {
       pipetteIsBad: false,
       updatePipette: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     when(mockUseIsFlex).calledWith(mockRobotName).mockReturnValue(false)
     when(mockAboutPipettesSlideout).mockReturnValue(
@@ -133,6 +134,7 @@ describe('PipetteCard', () => {
       pipetteIsBad: false,
       updatePipette: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     render(props)
     screen.getByText('left Mount')
@@ -149,6 +151,7 @@ describe('PipetteCard', () => {
       pipetteIsBad: false,
       updatePipette: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     render(props)
     screen.getByText('Both Mounts')
@@ -159,6 +162,29 @@ describe('PipetteCard', () => {
     expect(overflowButton).not.toBeDisabled()
     screen.getByText('mock pipette overflow menu')
   })
+
+  it('renders information for a 96 channel pipette with overflow menu button disabled when e-stop is pressed', () => {
+    props = {
+      pipetteModelSpecs: mockLeftSpecs,
+      mount: LEFT,
+      robotName: mockRobotName,
+      pipetteId: 'id',
+      pipetteIs96Channel: true,
+      isPipetteCalibrated: false,
+      pipetteIsBad: false,
+      updatePipette: jest.fn(),
+      isRunActive: false,
+      isEstopNotDisengaged: true,
+    }
+    render(props)
+    screen.getByText('Both Mounts')
+    const overflowButton = screen.getByRole('button', {
+      name: /overflow/i,
+    })
+    fireEvent.click(overflowButton)
+    expect(overflowButton).toBeDisabled()
+  })
+
   it('renders information for a right pipette', () => {
     props = {
       pipetteModelSpecs: mockRightSpecs,
@@ -170,6 +196,7 @@ describe('PipetteCard', () => {
       pipetteIsBad: false,
       updatePipette: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     render(props)
     screen.getByText('right Mount')
@@ -185,6 +212,7 @@ describe('PipetteCard', () => {
       pipetteIsBad: false,
       updatePipette: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     render(props)
     screen.getByText('right Mount')
@@ -200,6 +228,7 @@ describe('PipetteCard', () => {
       pipetteIsBad: false,
       updatePipette: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     render(props)
     screen.getByText('left Mount')
@@ -216,6 +245,7 @@ describe('PipetteCard', () => {
       pipetteIsBad: false,
       updatePipette: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     render(props)
     expect(screen.queryByText('Calibrate now')).toBeNull()
@@ -231,6 +261,7 @@ describe('PipetteCard', () => {
       pipetteIsBad: false,
       updatePipette: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     render(props)
     screen.getByText('Calibrate now')
@@ -245,6 +276,7 @@ describe('PipetteCard', () => {
       pipetteIsBad: false,
       updatePipette: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     render(props)
 
@@ -268,6 +300,7 @@ describe('PipetteCard', () => {
       pipetteIsBad: true,
       updatePipette: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     render(props)
     screen.getByText('Right mount')
@@ -289,6 +322,7 @@ describe('PipetteCard', () => {
       pipetteIsBad: true,
       updatePipette: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     render(props)
     screen.getByText('Right mount')

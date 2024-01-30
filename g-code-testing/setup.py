@@ -52,7 +52,6 @@ PACKAGES = find_packages(where=".", exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
     f"opentrons=={VERSION}",
     f"robot-server=={VERSION}",
-    f"notify-server=={VERSION}",
 ]
 
 

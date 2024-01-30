@@ -30,7 +30,7 @@ import {
 
 import { StepMeter } from '../../atoms/StepMeter'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useLastRunCommandKey } from '../../organisms/Devices/hooks/useLastRunCommandKey'
+import { useNotifyLastRunCommandKey } from '../../resources/runs/useNotifyLastRunCommandKey'
 import { InterventionModal } from '../../organisms/InterventionModal'
 import { isInterventionCommand } from '../../organisms/InterventionModal/utils'
 import {
@@ -55,6 +55,7 @@ import { OpenDoorAlertModal } from '../../organisms/OpenDoorAlertModal'
 import type { OnDeviceRouteParams } from '../../App/types'
 
 const RUN_STATUS_REFETCH_INTERVAL = 5000
+const LIVE_RUN_COMMANDS_POLL_MS = 3000
 interface BulletProps {
   isActive: boolean
 }
@@ -64,7 +65,7 @@ const Bullet = styled.div`
   border-radius: 50%;
   z-index: 2;
   background: ${(props: BulletProps) =>
-    props.isActive ? COLORS.darkBlack60 : COLORS.darkBlack40};
+    props.isActive ? COLORS.grey50 : COLORS.grey50};
   transform: ${(props: BulletProps) =>
     props.isActive ? 'scale(2)' : 'scale(1)'};
 `
@@ -89,7 +90,9 @@ export function RunningProtocol(): JSX.Element {
   const lastAnimatedCommand = React.useRef<string | null>(null)
   const swipe = useSwipe()
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
-  const currentRunCommandKey = useLastRunCommandKey(runId)
+  const currentRunCommandKey = useNotifyLastRunCommandKey(runId, {
+    refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
+  })
   const totalIndex = robotSideAnalysis?.commands.length
   const currentRunCommandIndex = robotSideAnalysis?.commands.findIndex(
     c => c.key === currentRunCommandKey

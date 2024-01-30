@@ -1,15 +1,19 @@
 import * as React from 'react'
-import { css } from 'styled-components'
 
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
-import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
-import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { TYPOGRAPHY } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
+  COLUMN_1_X_ADJUSTMENT,
+  COLUMN_3_X_ADJUSTMENT,
+  CONFIG_STYLE_EDITABLE,
+  CONFIG_STYLE_READ_ONLY,
   FIXTURE_HEIGHT,
   SINGLE_SLOT_FIXTURE_WIDTH,
   TRASH_BIN_DISPLAY_NAME,
+  Y_ADJUSTMENT,
 } from './constants'
 
 import type { CutoutId, DeckDefinition } from '@opentrons/shared-data'
@@ -36,15 +40,17 @@ export function TrashBinConfigFixture(
    */
   const [xSlotPosition = 0, ySlotPosition = 0] = trashBinCutout?.position ?? []
 
-  const isLeftSideofDeck =
+  const isColumnOne =
     fixtureLocation === 'cutoutA1' ||
     fixtureLocation === 'cutoutB1' ||
     fixtureLocation === 'cutoutC1' ||
     fixtureLocation === 'cutoutD1'
-  const xAdjustment = isLeftSideofDeck ? -101.5 : -17
+  const xAdjustment = isColumnOne
+    ? COLUMN_1_X_ADJUSTMENT
+    : COLUMN_3_X_ADJUSTMENT
   const x = xSlotPosition + xAdjustment
-  const yAdjustment = -10
-  const y = ySlotPosition + yAdjustment
+
+  const y = ySlotPosition + Y_ADJUSTMENT
 
   return (
     <RobotCoordsForeignObject
@@ -58,8 +64,8 @@ export function TrashBinConfigFixture(
       <Btn
         css={
           handleClickRemove != null
-            ? TRASH_BIN_CONFIG_STYLE_EDTIABLE
-            : TRASH_BIN_CONFIG_STYLE_READ_ONLY
+            ? CONFIG_STYLE_EDITABLE
+            : CONFIG_STYLE_READ_ONLY
         }
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
         onClick={
@@ -78,29 +84,3 @@ export function TrashBinConfigFixture(
     </RobotCoordsForeignObject>
   )
 }
-
-const TRASH_BIN_CONFIG_STYLE_READ_ONLY = css`
-  display: ${DISPLAY_FLEX};
-  align-items: ${ALIGN_CENTER};
-  background-color: ${COLORS.grey2};
-  border-radius: ${BORDERS.borderRadiusSize1};
-  color: ${COLORS.white};
-  justify-content: ${JUSTIFY_CENTER};
-  grid-gap: ${SPACING.spacing8};
-  width: 100%;
-`
-
-const TRASH_BIN_CONFIG_STYLE_EDTIABLE = css`
-  ${TRASH_BIN_CONFIG_STYLE_READ_ONLY}
-
-  &:active {
-    background-color: ${COLORS.darkBlack90};
-  }
-
-  &:hover {
-    background-color: ${COLORS.grey1};
-  }
-
-  &:focus-visible {
-  }
-`

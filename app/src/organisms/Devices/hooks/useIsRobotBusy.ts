@@ -3,8 +3,9 @@ import {
   useAllRunsQuery,
   useEstopQuery,
   useHost,
-  useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
+
+import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 import { DISENGAGED } from '../../EmergencyStop'
 import { useIsFlex } from './useIsFlex'
 
@@ -20,7 +21,9 @@ export function useIsRobotBusy(
   const queryOptions = poll ? { refetchInterval: ROBOT_STATUS_POLL_MS } : {}
   const robotHasCurrentRun =
     useAllRunsQuery({}, queryOptions)?.data?.links?.current != null
-  const { data: maintenanceRunData } = useCurrentMaintenanceRun(queryOptions)
+  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
+    refetchInterval: poll ? ROBOT_STATUS_POLL_MS : false,
+  })
   const isMaintenanceRunExisting = maintenanceRunData?.data?.id != null
   const allSessionsQueryResponse = useAllSessionsQuery(queryOptions)
   const host = useHost()

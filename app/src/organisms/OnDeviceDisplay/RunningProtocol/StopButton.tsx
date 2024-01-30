@@ -14,29 +14,29 @@ import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
 const STOP_BUTTON_STYLE = css`
   -webkit-tap-highlight-color: transparent;
   display: flex;
-  background-color: ${COLORS.red2};
+  background-color: ${COLORS.red50};
   border-radius: 50%;
 
   &:focus {
-    background-color: ${COLORS.red2Pressed};
+    background-color: ${COLORS.red55};
     box-shadow: none;
   }
   &:hover {
     border: none;
     box-shadow: none;
-    background-color: ${COLORS.red2};
+    background-color: ${COLORS.red50};
     color: ${COLORS.white};
   }
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.red2};
+    background-color: ${COLORS.red50};
   }
   &:active {
-    background-color: ${COLORS.red2};
+    background-color: ${COLORS.red50};
   }
   &:disabled {
-    background-color: ${COLORS.darkBlack20};
-    color: ${COLORS.darkBlack60};
+    background-color: ${COLORS.grey35};
+    color: ${COLORS.grey50};
   }
 `
 

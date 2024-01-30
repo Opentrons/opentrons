@@ -8,7 +8,7 @@ from dataclasses import dataclass, fields
 import os
 from pathlib import Path
 from time import time
-from typing import Optional, Callable, List, Any, Tuple, Dict
+from typing import Optional, Callable, List, Any, Tuple, Dict, cast
 from typing_extensions import Final
 
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
@@ -32,6 +32,7 @@ from opentrons.hardware_control.ot3_calibration import (
     EarlyCapacitiveSenseTrigger,
     CalibrationStructureNotFoundError,
 )
+from opentrons.hardware_control.backends.ot3controller import OT3Controller
 
 from hardware_testing import data
 from hardware_testing.drivers.pressure_fixture import (
@@ -1493,7 +1494,7 @@ async def _wait_for_tip_presence_state_change(
             if isinstance(message, PushTipPresenceNotification):
                 event.set()
 
-        messenger = api._backend._messenger  # type: ignore[union-attr]
+        messenger = cast(OT3Controller, api._backend)._messenger
         messenger.add_listener(_listener)
         try:
             for i in range(seconds_to_wait):

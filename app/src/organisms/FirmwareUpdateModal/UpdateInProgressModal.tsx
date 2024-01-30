@@ -21,7 +21,7 @@ interface UpdateInProgressModalProps {
 }
 
 const OUTER_STYLES = css`
-  background: ${COLORS.medGreyEnabled};
+  background: ${COLORS.grey30};
   width: 100%;
 `
 
@@ -36,7 +36,7 @@ export function UpdateInProgressModal(
       <Flex
         height="17.25rem"
         width="100%"
-        backgroundColor={COLORS.darkBlack20}
+        backgroundColor={COLORS.grey35}
         borderRadius={BORDERS.borderRadiusSize3}
         flexDirection={DIRECTION_COLUMN}
         padding={SPACING.spacing32}

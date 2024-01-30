@@ -273,10 +273,10 @@ export function ModulesListItem({
       <Btn
         marginLeft={SPACING.spacing20}
         css={css`
-          color: ${COLORS.blueEnabled};
+          color: ${COLORS.blue50};
 
           &:hover {
-            color: ${COLORS.blueHover};
+            color: ${COLORS.blue55};
           }
         `}
         marginTop={SPACING.spacing4}
@@ -296,11 +296,7 @@ export function ModulesListItem({
     )
   } else if (moduleModel === MAGNETIC_BLOCK_V1) {
     subText = (
-      <StyledText
-        as="p"
-        marginLeft={SPACING.spacing20}
-        color={COLORS.darkGreyEnabled}
-      >
+      <StyledText as="p" marginLeft={SPACING.spacing20} color={COLORS.grey50}>
         {t('no_usb_connection_required')}
       </StyledText>
     )
@@ -319,9 +315,9 @@ export function ModulesListItem({
   let renderModuleStatus: JSX.Element = (
     <StatusLabel
       status={moduleConnectionStatus}
-      backgroundColor={COLORS.successBackgroundLight}
-      iconColor={COLORS.successEnabled}
-      textColor={COLORS.successText}
+      backgroundColor={COLORS.green30}
+      iconColor={COLORS.green60}
+      textColor={COLORS.green60}
     />
   )
 
@@ -351,9 +347,9 @@ export function ModulesListItem({
     renderModuleStatus = (
       <StatusLabel
         status={moduleConnectionStatus}
-        backgroundColor={COLORS.warningBackgroundLight}
-        iconColor={COLORS.warningEnabled}
-        textColor={COLORS.warningText}
+        backgroundColor={COLORS.yellow30}
+        iconColor={COLORS.yellow60}
+        textColor={COLORS.yellow60}
       />
     )
   }
@@ -383,7 +379,7 @@ export function ModulesListItem({
       ) : null}
       <Box
         border={BORDERS.styleSolid}
-        borderColor={COLORS.medGreyEnabled}
+        borderColor={COLORS.grey30}
         borderWidth="1px"
         borderRadius={BORDERS.radiusSoftCorners}
         padding={SPACING.spacing16}
@@ -433,9 +429,9 @@ export function ModulesListItem({
               >
                 <StatusLabel
                   status={t('location_conflict')}
-                  backgroundColor={COLORS.warningBackgroundLight}
-                  iconColor={COLORS.warningEnabled}
-                  textColor={COLORS.warningText}
+                  backgroundColor={COLORS.yellow30}
+                  iconColor={COLORS.yellow60}
+                  textColor={COLORS.yellow60}
                 />
                 <TertiaryButton
                   width="max-content"
@@ -447,7 +443,13 @@ export function ModulesListItem({
                 </TertiaryButton>
               </Flex>
             ) : moduleModel === MAGNETIC_BLOCK_V1 ? (
-              <StyledText as="p"> {t('n_a')}</StyledText>
+              <StatusLabel
+                status={t('n_a')}
+                backgroundColor={COLORS.grey30}
+                textColor={COLORS.grey50}
+                showIcon={false}
+                capitalizeStatus={false}
+              />
             ) : (
               renderModuleStatus
             )}

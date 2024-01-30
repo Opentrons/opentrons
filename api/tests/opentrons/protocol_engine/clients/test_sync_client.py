@@ -68,6 +68,23 @@ def test_add_labware_definition(
     assert result == expected_labware_uri
 
 
+def test_add_addressable_area(
+    decoy: Decoy,
+    transport: ChildThreadTransport,
+    subject: SyncClient,
+) -> None:
+    """It should add an addressable area."""
+    subject.add_addressable_area(addressable_area_name="cool-area")
+
+    decoy.verify(
+        transport.call_method(
+            "add_addressable_area",
+            addressable_area_name="cool-area",
+        ),
+        times=1,
+    )
+
+
 def test_add_liquid(
     decoy: Decoy,
     transport: ChildThreadTransport,

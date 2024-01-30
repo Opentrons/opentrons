@@ -55,6 +55,8 @@ const mockCalibratedModule = {
   },
 }
 
+const ROBOT_NAME = 'mockRobot'
+
 const render = (
   props: React.ComponentProps<typeof ModuleCalibrationItems>
 ): ReturnType<typeof renderWithProviders> => {
@@ -71,6 +73,7 @@ describe('ModuleCalibrationItems', () => {
       attachedModules: mockFetchModulesSuccessActionPayloadModules,
       updateRobotStatus: jest.fn(),
       formattedPipetteOffsetCalibrations: [],
+      robotName: ROBOT_NAME,
     }
     mockModuleCalibrationOverflowMenu.mockReturnValue(
       <div>mock ModuleCalibrationOverflowMenu</div>

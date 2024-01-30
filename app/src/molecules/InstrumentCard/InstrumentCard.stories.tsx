@@ -28,6 +28,7 @@ Attached.args = {
       onClick: () => console.log('item click 2'),
     },
   ],
+  isEstopNotDisengaged: false,
 }
 
 export const Divider = Template.bind({})
@@ -47,6 +48,7 @@ Divider.args = {
       onClick: () => console.log('item click 2'),
     },
   ],
+  isEstopNotDisengaged: false,
 }
 
 export const Empty = Template.bind({})
@@ -67,4 +69,5 @@ Empty.args = {
       onClick: () => console.log('item click 2'),
     },
   ],
+  isEstopNotDisengaged: false,
 }

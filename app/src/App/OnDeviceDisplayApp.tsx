@@ -256,7 +256,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     }
 
     &::-webkit-scrollbar-thumb {
-      background: ${COLORS.darkBlack40};
+      background: ${COLORS.grey50};
       border-radius: 11px;
     }
   `

@@ -1,33 +1,19 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { LabwareNameOverlay, truncateString } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { BaseState } from '../../../types'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { LabwareOnDeck } from '../../../step-forms'
-interface OP {
+interface LabwareNameProps {
   labwareOnDeck: LabwareOnDeck
 }
 
-interface SP {
-  nickname?: string | null
-}
-
-type Props = OP & SP
-
-const NameOverlay = (props: Props): JSX.Element => {
-  const { labwareOnDeck, nickname } = props
+export function LabwareName(props: LabwareNameProps): JSX.Element {
+  const { labwareOnDeck } = props
+  const nicknames = useSelector(uiLabwareSelectors.getLabwareNicknamesById)
+  const nickname = nicknames[labwareOnDeck.id]
   const truncatedNickName =
     nickname != null ? truncateString(nickname, 75, 25) : null
   const title = truncatedNickName ?? getLabwareDisplayName(labwareOnDeck.def)
   return <LabwareNameOverlay title={title} />
 }
-
-const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
-  const { id } = ownProps.labwareOnDeck
-  return {
-    nickname: uiLabwareSelectors.getLabwareNicknamesById(state)[id],
-  }
-}
-
-export const LabwareName = connect(mapStateToProps)(NameOverlay)

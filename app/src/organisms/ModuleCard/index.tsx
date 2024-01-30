@@ -5,19 +5,19 @@ import last from 'lodash/last'
 import { useHistory } from 'react-router-dom'
 
 import {
-  Box,
-  Flex,
-  DIRECTION_ROW,
   ALIGN_START,
+  Box,
+  COLORS,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  IconProps,
+  ModuleIcon,
   SPACING,
   TYPOGRAPHY,
-  useOnClickOutside,
-  IconProps,
   useHoverTooltip,
-  COLORS,
-  Icon,
-  ModuleIcon,
+  useOnClickOutside,
 } from '@opentrons/components'
 import {
   getModuleDisplayName,
@@ -68,6 +68,7 @@ import { getModuleCardImage } from './utils'
 import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
 import { ErrorInfo } from './ErrorInfo'
 import { ModuleSetupModal } from './ModuleSetupModal'
+import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type {
   AttachedModule,
@@ -140,6 +141,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const latestRequest = useSelector<State, RequestState | null>(state =>
     latestRequestId ? getRequestById(state, latestRequestId) : null
   )
+  const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
 
   const handleCloseErrorModal = (): void => {
     if (latestRequestId != null) {
@@ -245,7 +247,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
   return (
     <Flex
-      backgroundColor={COLORS.fundamentalsBackground}
+      backgroundColor={COLORS.grey10}
       borderRadius={SPACING.spacing4}
       width="100%"
       data-testid={`ModuleCard_${module.serialNumber}`}
@@ -382,7 +384,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               <>
                 <StyledText
                   textTransform={TYPOGRAPHY.textTransformUppercase}
-                  color={COLORS.darkGreyEnabled}
+                  color={COLORS.grey60}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   fontSize={TYPOGRAPHY.fontSizeH6}
                   paddingBottom={SPACING.spacing4}
@@ -407,7 +409,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                     moduleType={module.moduleType}
                     size="1rem"
                     marginRight={SPACING.spacing2}
-                    color={COLORS.darkGreyEnabled}
+                    color={COLORS.grey60}
                   />
                   <StyledText>
                     {getModuleDisplayName(module.moduleModel)}
@@ -433,7 +435,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       >
         <OverflowBtn
           aria-label="overflow"
-          disabled={isOverflowBtnDisabled}
+          disabled={isOverflowBtnDisabled || isEstopNotDisengaged}
           {...targetProps}
           onClick={handleOverflowClick}
         />
