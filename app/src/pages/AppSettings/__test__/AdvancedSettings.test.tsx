@@ -2,19 +2,10 @@ import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { resetAllWhenMocks } from 'jest-when'
 import { fireEvent, screen } from '@testing-library/react'
-import {
-  renderWithProviders,
-  useConditionalConfirm,
-} from '@opentrons/components'
-import {
-  getReachableRobots,
-  getUnreachableRobots,
-} from '../../../redux/discovery'
+
+import { renderWithProviders } from '@opentrons/components'
+
 import { i18n } from '../../../i18n'
-import {
-  mockReachableRobot,
-  mockUnreachableRobot,
-} from '../../../redux/discovery/__fixtures__'
 import {
   useTrackEvent,
   ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
@@ -22,6 +13,7 @@ import {
 import * as CustomLabware from '../../../redux/custom-labware'
 import * as Config from '../../../redux/config'
 import {
+  ClearUnavailableRobots,
   EnableDevTools,
   OT2AdvancedSettings,
   OverridePathToPython,
@@ -53,15 +45,6 @@ const render = (): ReturnType<typeof renderWithProviders> => {
   )
 }
 
-const mockGetUnreachableRobots = getUnreachableRobots as jest.MockedFunction<
-  typeof getUnreachableRobots
->
-const mockGetReachableRobots = getReachableRobots as jest.MockedFunction<
-  typeof getReachableRobots
->
-const mockUseConditionalConfirm = useConditionalConfirm as jest.MockedFunction<
-  typeof useConditionalConfirm
->
 const getCustomLabwarePath = CustomLabware.getCustomLabwareDirectory as jest.MockedFunction<
   typeof CustomLabware.getCustomLabwareDirectory
 >
@@ -89,6 +72,9 @@ const mockEnableDevTools = EnableDevTools as jest.MockedFunction<
 const mockU2EInformation = U2EInformation as jest.MockedFunction<
   typeof U2EInformation
 >
+const mockClearUnavailableRobots = ClearUnavailableRobots as jest.MockedFunction<
+  typeof ClearUnavailableRobots
+>
 const mockOverridePathToPython = OverridePathToPython as jest.MockedFunction<
   typeof OverridePathToPython
 >
@@ -97,8 +83,6 @@ const mockShowHeaterShakerAttachmentModal = ShowHeaterShakerAttachmentModal as j
 >
 
 let mockTrackEvent: jest.Mock
-const mockConfirm = jest.fn()
-const mockCancel = jest.fn()
 
 describe('AdvancedSettings', () => {
   beforeEach(() => {
@@ -113,17 +97,13 @@ describe('AdvancedSettings', () => {
       { label: 'Beta', value: 'beta' },
       { label: 'Alpha', value: 'alpha' },
     ])
-    mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
-    mockGetReachableRobots.mockReturnValue([mockReachableRobot])
-    mockUseConditionalConfirm.mockReturnValue({
-      confirm: mockConfirm,
-      showConfirmation: true,
-      cancel: mockCancel,
-    })
     mockPreventRobotCaching.mockReturnValue(<div>mock PreventRobotCaching</div>)
     mockOT2AdvancedSettings.mockReturnValue(<div>mock OT2AdvancedSettings</div>)
     mockEnableDevTools.mockReturnValue(<div>mock EnableDevTools</div>)
     mockU2EInformation.mockReturnValue(<div>mock U2EInformation</div>)
+    mockClearUnavailableRobots.mockReturnValue(
+      <div>mock ClearUnavailableRobots</div>
+    )
     mockOverridePathToPython.mockReturnValue(
       <div>mock OverridePathToPython</div>
     )
@@ -141,7 +121,6 @@ describe('AdvancedSettings', () => {
     const [{ getByText }] = render()
     getByText('Update Channel')
     getByText('Additional Custom Labware Source Folder')
-    getByText('Clear Unavailable Robots')
   })
 
   it('renders the update channel combobox and section', () => {
@@ -215,29 +194,9 @@ describe('AdvancedSettings', () => {
     screen.getByText('mock OverridePathToPython')
   })
 
-  it('renders the clear unavailable robots section', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText(
-      'Clear the list of unavailable robots on the Devices page. This action cannot be undone.'
-    )
-    const btn = getByRole('button', {
-      name: 'Clear unavailable robots list',
-    })
-    fireEvent.click(btn)
-    getByText('Clear unavailable robots?')
-    getByText(
-      'Clearing the list of unavailable robots on the Devices page cannot be undone.'
-    )
-    const closeBtn = getByRole('button', {
-      name: 'cancel',
-    })
-    const proceedBtn = getByRole('button', {
-      name: 'Clear unavailable robots',
-    })
-    fireEvent.click(closeBtn)
-    expect(mockCancel).toHaveBeenCalled()
-    fireEvent.click(proceedBtn)
-    expect(mockConfirm).toHaveBeenCalled()
+  it('should render mock clear unavailable robots section', () => {
+    render()
+    screen.getByText('mock ClearUnavailableRobots')
   })
 
   it('should render mock developer tools section', () => {

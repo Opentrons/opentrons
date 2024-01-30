@@ -3,36 +3,23 @@ import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   Box,
-  Btn,
   COLORS,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
   Flex,
   Icon,
-  JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
   Link,
   SPACING_AUTO,
   SPACING,
   TYPOGRAPHY,
-  useConditionalConfirm,
 } from '@opentrons/components'
 
 import * as Config from '../../redux/config'
 import * as CustomLabware from '../../redux/custom-labware'
-import {
-  clearDiscoveryCache,
-  getReachableRobots,
-  getUnreachableRobots,
-} from '../../redux/discovery'
-import { LegacyModal } from '../../molecules/LegacyModal'
-import { Portal } from '../../App/portal'
 import { SelectOption } from '../../atoms/SelectField/Select'
 import { SelectField } from '../../atoms/SelectField'
-import { ERROR_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
 import {
   useTrackEvent,
   ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
@@ -40,8 +27,8 @@ import {
 import { Divider } from '../../atoms/structure'
 import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
-import { useToaster } from '../../organisms/ToasterOven'
 import {
+  ClearUnavailableRobots,
   EnableDevTools,
   OT2AdvancedSettings,
   OverridePathToPython,
@@ -50,7 +37,7 @@ import {
   U2EInformation,
 } from '../../organisms/AdvancedSettings'
 
-import type { Dispatch, State } from '../../redux/types'
+import type { Dispatch } from '../../redux/types'
 
 export function AdvancedSettings(): JSX.Element {
   const { t } = useTranslation(['app_settings', 'shared'])
@@ -64,34 +51,6 @@ export function AdvancedSettings(): JSX.Element {
     Config.getIsLabwareOffsetCodeSnippetsOn
   )
   const dispatch = useDispatch<Dispatch>()
-  const { makeToast } = useToaster()
-  const reachableRobots = useSelector((state: State) =>
-    getReachableRobots(state)
-  )
-  const unreachableRobots = useSelector((state: State) =>
-    getUnreachableRobots(state)
-  )
-  const recentlySeenRobots = reachableRobots.filter(
-    robot => robot.healthStatus !== 'ok'
-  )
-  const isUnavailableRobots =
-    unreachableRobots.length > 0 || recentlySeenRobots.length > 0
-
-  const handleDeleteUnavailRobots = (): void => {
-    if (isUnavailableRobots) {
-      dispatch(clearDiscoveryCache())
-      makeToast(t('successfully_deleted_unavail_robots'), SUCCESS_TOAST)
-    } else {
-      makeToast(t('no_unavail_robots_to_clear'), ERROR_TOAST)
-    }
-  }
-
-  const {
-    confirm: confirmDeleteUnavailRobots,
-    showConfirmation: showConfirmDeleteUnavailRobots,
-    cancel: cancelExit,
-  } = useConditionalConfirm(handleDeleteUnavailRobots, true)
-
   const toggleLabwareOffsetData = (): void => {
     dispatch(
       Config.updateConfigValue(
@@ -128,42 +87,6 @@ export function AdvancedSettings(): JSX.Element {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           gridGap={SPACING.spacing40}
         >
-          {showConfirmDeleteUnavailRobots ? (
-            <Portal level="top">
-              <LegacyModal
-                type="warning"
-                title={t('clear_unavailable_robots')}
-                onClose={cancelExit}
-              >
-                <StyledText as="p">{t('clearing_cannot_be_undone')}</StyledText>
-                <Flex
-                  flexDirection={DIRECTION_ROW}
-                  paddingTop={SPACING.spacing32}
-                  justifyContent={JUSTIFY_FLEX_END}
-                >
-                  <Flex
-                    paddingRight={SPACING.spacing4}
-                    data-testid="AdvancedSettings_ConfirmClear_Cancel"
-                  >
-                    <Btn
-                      onClick={cancelExit}
-                      textTransform={TYPOGRAPHY.textTransformCapitalize}
-                      color={COLORS.blue50}
-                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                      marginRight={SPACING.spacing32}
-                    >
-                      {t('shared:cancel')}
-                    </Btn>
-                  </Flex>
-                  <Flex data-testid="AdvancedSettings_ConfirmClear_Proceed">
-                    <AlertPrimaryButton onClick={confirmDeleteUnavailRobots}>
-                      {t('clear_confirm')}
-                    </AlertPrimaryButton>
-                  </Flex>
-                </Flex>
-              </LegacyModal>
-            </Portal>
-          ) : null}
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText
               css={TYPOGRAPHY.h3SemiBold}
@@ -259,29 +182,7 @@ export function AdvancedSettings(): JSX.Element {
         <Divider marginY={SPACING.spacing24} />
         <PreventRobotCaching />
         <Divider marginY={SPACING.spacing24} />
-        <Flex
-          alignItems={ALIGN_CENTER}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          gridGap={SPACING.spacing40}
-        >
-          <Box>
-            <StyledText
-              css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing8}
-              id="AdvancedSettings_clearRobots"
-            >
-              {t('clear_unavail_robots')}
-            </StyledText>
-            <StyledText as="p">{t('clear_robots_description')}</StyledText>
-          </Box>
-          <TertiaryButton
-            marginLeft={SPACING_AUTO}
-            onClick={confirmDeleteUnavailRobots}
-            id="AdvancedSettings_clearUnavailableRobots"
-          >
-            {t('clear_robots_button')}
-          </TertiaryButton>
-        </Flex>
+        <ClearUnavailableRobots />
         <Divider marginY={SPACING.spacing24} />
         <ShowHeaterShakerAttachmentModal />
         <Divider marginY={SPACING.spacing24} />
