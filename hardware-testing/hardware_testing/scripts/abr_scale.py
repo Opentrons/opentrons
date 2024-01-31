@@ -74,6 +74,14 @@ if __name__ == "__main__":
         pid = 41207
         scale = RadwagScale.create(port=find_port(vid=vid, pid=pid))
         scale.connect()
+        grams, is_stable = scale.read_mass()
+        print(f"Scale reading: grams={grams}, is_stable={is_stable}")
+        grams, is_stable = scale.read_mass()
+        print(f"Scale reading: grams={grams}, is_stable={is_stable}")
+        grams, is_stable = scale.read_mass()
+        print(f"Scale reading: grams={grams}, is_stable={is_stable}")
+        grams, is_stable = scale.read_mass()
+        print(f"Scale reading: grams={grams}, is_stable={is_stable}")
         # Get user input to label data entry correctly
         scale_measurement = 'ABR-Liquids-'
         robot_to_filter = get_user_input(robot_list, "Robot: ")
@@ -96,8 +104,9 @@ if __name__ == "__main__":
             test_name=test_name, run_id=run_id, file_name=file_name, data=header_str
         )
         results_list = []
-        grams, is_stable = scale.read_mass()
-        print(f"Scale reading: grams={grams}, is_stable={is_stable}")
+        is_stable = "False"
+        grams = 0
+        print(is_stable, grams)
         while not(is_stable == "True"):
             grams, is_stable = scale.read_mass()
             print(f"Scale reading: grams={grams}, is_stable={is_stable}")
@@ -120,6 +129,9 @@ if __name__ == "__main__":
                     print(f"Line count is {line_count}. Check file.")
         else:
             print("File did not save.")
+        grams = 0
+        is_stable = "False"
+        scale.disconnect()
     except Exception:
         scale.disconnect()
     except KeyboardInterrupt:
