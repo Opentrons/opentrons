@@ -19,7 +19,8 @@ const unselectedOptionStyles = css`
   cursor: pointer;
 
   &:hover {
-    border: 1px solid ${COLORS.grey60};
+    background-color: ${COLORS.grey10};
+    border: 1px solid ${COLORS.grey35};
   }
 `
 const selectedOptionStyles = css`

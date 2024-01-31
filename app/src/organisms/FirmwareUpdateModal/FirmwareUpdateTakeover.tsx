@@ -2,10 +2,10 @@ import * as React from 'react'
 
 import {
   useInstrumentsQuery,
-  useCurrentMaintenanceRun,
   useCurrentAllSubsystemUpdatesQuery,
   useSubsystemUpdateQuery,
 } from '@opentrons/react-api-client'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 import { Portal } from '../../App/portal'
 import { useIsUnboxingFlowOngoing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
 import { UpdateInProgressModal } from './UpdateInProgressModal'
@@ -42,7 +42,7 @@ export function FirmwareUpdateTakeover(): JSX.Element {
   })
   const [indexToUpdate, setIndexToUpdate] = React.useState(0)
 
-  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: POLL_INTERVAL_MS,
   })
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()

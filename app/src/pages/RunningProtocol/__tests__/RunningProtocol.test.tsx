@@ -34,6 +34,7 @@ import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { OpenDoorAlertModal } from '../../../organisms/OpenDoorAlertModal'
 import { RunningProtocol } from '..'
+import { useNotifyLastRunCommandKey } from '../../../resources/runs/useNotifyLastRunCommandKey'
 
 import type { ProtocolAnalyses } from '@opentrons/api-client'
 
@@ -51,6 +52,7 @@ jest.mock(
   '../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
 )
 jest.mock('../../../organisms/OpenDoorAlertModal')
+jest.mock('../../../resources/runs/useNotifyLastRunCommandKey')
 
 const mockUseProtocolAnalysesQuery = useProtocolAnalysesQuery as jest.MockedFunction<
   typeof useProtocolAnalysesQuery
@@ -91,6 +93,9 @@ const mockUseAllCommandsQuery = useAllCommandsQuery as jest.MockedFunction<
 >
 const mockOpenDoorAlertModal = OpenDoorAlertModal as jest.MockedFunction<
   typeof OpenDoorAlertModal
+>
+const mockUseNotifyLastRunCommandKey = useNotifyLastRunCommandKey as jest.MockedFunction<
+  typeof useNotifyLastRunCommandKey
 >
 
 const RUN_ID = 'run_id'
@@ -180,6 +185,9 @@ describe('RunningProtocol', () => {
       .calledWith(RUN_ID, { cursor: null, pageLength: 1 })
       .mockReturnValue(mockUseAllCommandsResponseNonDeterministic)
     mockOpenDoorAlertModal.mockReturnValue(<div>mock OpenDoorAlertModal</div>)
+    mockUseNotifyLastRunCommandKey.mockReturnValue({
+      data: {},
+    } as any)
   })
 
   afterEach(() => {

@@ -174,7 +174,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
               {downloading ? t('download_update') : t('restarting_app')}
             </StyledText>
             <ProgressBar
-              percentComplete={downloadPercentage}
+              percentComplete={downloaded ? 100 : downloadPercentage}
               outerStyles={UPDATE_PROGRESS_BAR_STYLE}
             />
           </Flex>

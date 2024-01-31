@@ -29,7 +29,7 @@ from ..types import (
     PotentialCutoutFixture,
     DeckConfigurationType,
 )
-from ..actions import Action, UpdateCommandAction, PlayAction
+from ..actions import Action, UpdateCommandAction, PlayAction, AddAddressableAreaAction
 from .config import Config
 from .abstract_store import HasState, HandlesActions
 
@@ -175,7 +175,9 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
         """Modify state in reaction to an action."""
         if isinstance(action, UpdateCommandAction):
             self._handle_command(action.command)
-        if isinstance(action, PlayAction):
+        elif isinstance(action, AddAddressableAreaAction):
+            self._check_location_is_addressable_area(action.addressable_area)
+        elif isinstance(action, PlayAction):
             current_state = self._state
             if (
                 action.deck_configuration is not None

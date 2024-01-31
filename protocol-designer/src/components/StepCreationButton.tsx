@@ -34,7 +34,7 @@ interface StepButtonComponentProps {
   children: React.ReactNode
   expanded: boolean
   disabled: boolean
-  setExpanded: (expanded: boolean) => unknown
+  setExpanded: (expanded: boolean) => void
 }
 
 // TODO: Ian 2019-01-17 move out to centralized step info file - see #2926
@@ -71,7 +71,7 @@ export const StepCreationButtonComponent = (
 }
 
 export interface StepButtonItemProps {
-  onClick: () => unknown
+  onClick: () => void
   stepType: StepType
 }
 
@@ -133,7 +133,6 @@ export const StepCreationButton = (): JSX.Element => {
     thermocycler: getIsModuleOnDeck(modules, THERMOCYCLER_MODULE_TYPE),
     heaterShaker: getIsModuleOnDeck(modules, HEATERSHAKER_MODULE_TYPE),
   }
-
   const [expanded, setExpanded] = React.useState<boolean>(false)
   const [
     enqueuedStepType,
@@ -177,7 +176,7 @@ export const StepCreationButton = (): JSX.Element => {
                 setEnqueuedStepType(null)
               }
             }}
-          ></ConfirmDeleteModal>
+          />
         </Portal>
       )}
       <StepCreationButtonComponent

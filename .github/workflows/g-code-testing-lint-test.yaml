@@ -1,5 +1,5 @@
 # This workflow runs test and lint on branch pushes that touch the
-# notify-server project or its dependencies
+# g-code-testing project or its dependencies
 
 name: 'G-Code Testing Lint & Test'
 

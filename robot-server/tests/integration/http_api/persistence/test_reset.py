@@ -42,6 +42,8 @@ async def _assert_reset_was_successful(
     expected_files_and_directories = {
         persistence_directory / "robot_server.db",
         persistence_directory / "protocols",
+        persistence_directory / "3",
+        persistence_directory / "3" / "robot_server.db",
     }
     assert all_files_and_directories == expected_files_and_directories
 

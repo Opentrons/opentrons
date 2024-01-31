@@ -94,7 +94,7 @@ const ZOOM_ICON_STYLE = css`
     background: ${COLORS.white};
   }
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.blue50};
+    background: ${COLORS.grey35};
   }
 `
 
@@ -561,7 +561,15 @@ export function ProtocolDetails(
                   css={ZOOM_ICON_STYLE}
                   onClick={() => setShowDeckViewModal(true)}
                 >
-                  <Icon name="union" size={SIZE_1} />
+                  <Icon
+                    name="union"
+                    size={SIZE_1}
+                    color={
+                      analysisStatus !== 'complete'
+                        ? COLORS.grey40
+                        : COLORS.grey50
+                    }
+                  />
                 </Btn>
               </Flex>
               <Box padding={SPACING.spacing16} backgroundColor={COLORS.white}>
@@ -574,8 +582,9 @@ export function ProtocolDetails(
               height="100%"
               flexDirection={DIRECTION_COLUMN}
               marginLeft={SPACING.spacing16}
+              gridGap={SPACING.spacing8}
             >
-              <Flex>
+              <Flex gridGap={SPACING.spacing8}>
                 <RoundTab
                   data-testid="ProtocolDetails_robotConfig"
                   isCurrent={currentTab === 'robot_config'}

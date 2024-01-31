@@ -19,7 +19,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  useCurrentMaintenanceRun,
   useDeckConfigurationQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
@@ -32,6 +31,7 @@ import {
   SINGLE_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
@@ -68,10 +68,10 @@ export function DeviceDetailsDeckConfiguration({
       .data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const { isRunRunning } = useRunStatuses()
-  const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
-  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
   })
+  const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
   const isMaintenanceRunExisting = maintenanceRunData?.data?.id != null
   const isRobotViewable = useIsRobotViewable(robotName)
 
@@ -208,7 +208,7 @@ export function DeviceDetailsDeckConfiguration({
                   fixtureDisplayList.map(fixture => (
                     <Flex
                       key={fixture.cutoutId}
-                      backgroundColor={COLORS.grey10}
+                      backgroundColor={COLORS.grey20}
                       gridGap={SPACING.spacing60}
                       padding={SPACING.spacing8}
                       width="100%"
@@ -224,7 +224,7 @@ export function DeviceDetailsDeckConfiguration({
                   ))
                 ) : (
                   <Flex
-                    backgroundColor={COLORS.grey10}
+                    backgroundColor={COLORS.grey20}
                     gridGap={SPACING.spacing60}
                     padding={SPACING.spacing8}
                     width="100%"

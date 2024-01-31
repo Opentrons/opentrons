@@ -1,13 +1,17 @@
 import * as React from 'react'
 import { screen } from '@testing-library/react'
-import { i18n } from '../../../i18n'
-import { when } from 'jest-when'
+
 import { renderWithProviders } from '@opentrons/components'
-import { useMaintenanceRunTakeover as mockUseMaintenanceRunTakeover } from '../useMaintenanceRunTakeover'
+
+import { i18n } from '../../../i18n'
+import { useMaintenanceRunTakeover } from '../useMaintenanceRunTakeover'
 import { MaintenanceRunTakeover } from '../MaintenanceRunTakeover'
+import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
+
 import type { MaintenanceRunStatus } from '../MaintenanceRunStatusProvider'
 
 jest.mock('../useMaintenanceRunTakeover')
+jest.mock('../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
 
 const MOCK_MAINTENANCE_RUN: MaintenanceRunStatus = {
   getRunIds: () => ({
@@ -17,8 +21,11 @@ const MOCK_MAINTENANCE_RUN: MaintenanceRunStatus = {
   setOddRunIds: () => null,
 }
 
-const useMaintenanceRunTakeover = mockUseMaintenanceRunTakeover as jest.MockedFunction<
-  typeof mockUseMaintenanceRunTakeover
+const mockUseMaintenanceRunTakeover = useMaintenanceRunTakeover as jest.MockedFunction<
+  typeof useMaintenanceRunTakeover
+>
+const useMockNotifyCurrentMaintenanceRun = useNotifyCurrentMaintenanceRun as jest.MockedFunction<
+  typeof useNotifyCurrentMaintenanceRun
 >
 
 const render = (props: React.ComponentProps<typeof MaintenanceRunTakeover>) => {
@@ -33,9 +40,14 @@ describe('MaintenanceRunTakeover', () => {
 
   beforeEach(() => {
     props = { children: [testComponent] }
-    when(useMaintenanceRunTakeover)
-      .calledWith()
-      .mockReturnValue(MOCK_MAINTENANCE_RUN)
+    mockUseMaintenanceRunTakeover.mockReturnValue(MOCK_MAINTENANCE_RUN)
+    useMockNotifyCurrentMaintenanceRun.mockReturnValue({
+      data: {
+        data: {
+          id: 'test',
+        },
+      },
+    } as any)
   })
 
   it('renders child components successfuly', () => {
@@ -58,7 +70,7 @@ describe('MaintenanceRunTakeover', () => {
       }),
     }
 
-    when(useMaintenanceRunTakeover).calledWith().mockReturnValue(MOCK_ODD_RUN)
+    mockUseMaintenanceRunTakeover.mockReturnValue(MOCK_ODD_RUN)
 
     render(props)
     expect(screen.queryByText('Robot is busy')).not.toBeInTheDocument()
@@ -73,9 +85,7 @@ describe('MaintenanceRunTakeover', () => {
       }),
     }
 
-    when(useMaintenanceRunTakeover)
-      .calledWith()
-      .mockReturnValue(MOCK_DESKTOP_RUN)
+    mockUseMaintenanceRunTakeover.mockReturnValue(MOCK_DESKTOP_RUN)
 
     render(props)
     screen.getByText('Robot is busy')

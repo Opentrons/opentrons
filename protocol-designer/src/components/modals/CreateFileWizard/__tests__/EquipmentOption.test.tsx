@@ -27,7 +27,7 @@ describe('EquipmentOption', () => {
     }
     const { getByLabelText } = render(props)
     expect(getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
-      `background-color: ${COLORS.grey30}`
+      `background-color: ${COLORS.white}`
     )
   })
   it('renders the equipment option without check not selected and image', () => {
