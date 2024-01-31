@@ -7,9 +7,9 @@ from typing import Dict, List
 
 ### VARIABLES ###
 # Test Variables
-test_type_list = {"E", "P"}
-step_list = {"1", "2", "3"}
-robot_list = {
+test_type_list = ["E", "P"]
+step_list = ["1", "2", "3"]
+robot_list = [
     "DVT1ABR1",
     "DVT1ABR2",
     "DVT1ABR3",
@@ -22,7 +22,7 @@ robot_list = {
     "PVT1ABR10",
     "PVT1ABR11",
     "PVT1ABR12",
-}
+]
 # Labware per Robot
 labware_DVT1ABR4 = [
     "Sample Plate",

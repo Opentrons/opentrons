@@ -3,27 +3,27 @@ import os
 from datetime import datetime
 from hardware_testing import data
 import csv
+from typing import List
 
 
-def get_user_input(list, some_string):
+def _get_user_input(list: List, some_string: str) -> str:
     variable = input(some_string)
     while variable not in list:
         print(
-            f"Your input was {variable}. 
-            Expected input is one of the following: {list}"
+            f"Your input was {variable}. Expected input is one of the following: {list}"
         )
         variable = input(some_string)
     return variable
 
 
 if __name__ == "__main__":
-    ## Format Results Sheet
+    # Format Results Sheet
     header = ["Date", "File Name", "Plate State", "Robot", "Mass (g)", "Sample"]
     time_now = datetime.now().date()
-    ## Get data folders
+    # Get data folders
     current_dir = data.get_testing_data_directory()
     file_list = os.listdir(current_dir)
-    folder_of_interest = get_user_input(
+    folder_of_interest = _get_user_input(
         file_list, f"Folder List, Expected Values: {file_list}: "
     )
     robot = folder_of_interest.split("-")[2]
@@ -37,7 +37,6 @@ if __name__ == "__main__":
         csv_writer.writerow(header)
     file_list_2 = os.listdir(dir_2)
     for file in file_list_2:
-        # TODO:  read through files pull out csvs analyze without pandas
         dir_3 = os.path.join(file, dir_2)
         raw_data = os.listdir(dir_3)
         raw_data_folder = os.path.join(dir_3, raw_data[0])
