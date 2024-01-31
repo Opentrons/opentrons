@@ -38,7 +38,6 @@ from ..types import (
     OnDeckLabwareLocation,
     AddressableAreaLocation,
     AddressableOffsetVector,
-    PotentialCutoutFixture,
 )
 from .config import Config
 from .labware import LabwareView
@@ -167,10 +166,6 @@ class GeometryView:
         elif isinstance(slot_item, LoadedLabware):
             # get stacked heights of all labware in the slot
             return self.get_highest_z_of_labware_stack(slot_item.id)
-        elif isinstance(slot_item, PotentialCutoutFixture):
-            return self._addressable_areas.get_fixture_height(
-                slot_item.cutout_fixture_id
-            )
         else:
             return 0
 
@@ -692,33 +687,21 @@ class GeometryView:
 
     def get_slot_item(
         self, slot_name: Union[DeckSlotName, StagingSlotName]
-    ) -> Union[LoadedLabware, LoadedModule, PotentialCutoutFixture, None]:
+    ) -> Union[LoadedLabware, LoadedModule, None]:
         """Get the item present in a deck slot, if any."""
         maybe_labware = self._labware.get_by_slot(
             slot_name=slot_name,
         )
 
         if isinstance(slot_name, DeckSlotName):
-            maybe_fixture = self._addressable_areas.get_fixture_by_deck_slot_name(
-                slot_name
-            )
-            # Ignore generic single slot fixtures
-            if maybe_fixture and maybe_fixture.cutout_fixture_id in {
-                "singleLeftSlot",
-                "singleCenterSlot",
-                "singleRightSlot",
-            }:
-                maybe_fixture = None
-
             maybe_module = self._modules.get_by_slot(
                 slot_name=slot_name,
             )
         else:
-            # Modules and fixtures can't be loaded on staging slots
-            maybe_fixture = None
+            # Modules can't be loaded on staging slots
             maybe_module = None
 
-        return maybe_labware or maybe_module or maybe_fixture or None
+        return maybe_labware or maybe_module or None
 
     @staticmethod
     def get_slot_column(slot_name: DeckSlotName) -> int:
