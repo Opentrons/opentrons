@@ -20,6 +20,7 @@ from ..errors import (
     AreaNotInDeckConfigurationError,
     SlotDoesNotExistError,
     AddressableAreaDoesNotExistError,
+    CutoutDoesNotExistError,
 )
 from ..resources import deck_configuration_provider
 from ..types import (
@@ -137,6 +138,9 @@ CUTOUT_TO_DECK_SLOT_MAP: Dict[str, DeckSlotName] = {
     "cutoutD1": DeckSlotName.SLOT_D1,
     "cutoutD2": DeckSlotName.SLOT_D2,
     "cutoutD3": DeckSlotName.SLOT_D3,
+}
+DECK_SLOT_TO_CUTOUT_MAP = {
+    deck_slot: cutout for cutout, deck_slot in CUTOUT_TO_DECK_SLOT_MAP.items()
 }
 
 
@@ -467,16 +471,21 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         deck_config = self.state.deck_configuration
         potential_fixtures = self.state.potential_cutout_fixtures_by_cutout_id
         if deck_config:
-            cutout_id = list(CUTOUT_TO_DECK_SLOT_MAP.keys())[
-                list(CUTOUT_TO_DECK_SLOT_MAP.values()).index(slot_name)
-            ]
-            deck_items = {
-                deck_item for deck_item in deck_config if cutout_id in deck_item
-            }
-            for item in deck_items:
-                for fixture in potential_fixtures[cutout_id]:
-                    if fixture.cutout_fixture_id == item[1]:
-                        return fixture
+            slot_cutout_id = DECK_SLOT_TO_CUTOUT_MAP[slot_name]
+            slot_cutout_fixture_id = None
+            # This will only ever be one under current assumptions
+            for cutout_id, cutout_fixture_id in deck_config:
+                if cutout_id == slot_cutout_id:
+                    slot_cutout_fixture_id = cutout_fixture_id
+                    break
+            if slot_cutout_fixture_id is None:
+                raise CutoutDoesNotExistError(
+                    f"No Cutout was found in the Deck that matched provided slot {slot_name}."
+                )
+
+            for fixture in potential_fixtures[slot_cutout_id]:
+                if fixture.cutout_fixture_id == slot_cutout_fixture_id:
+                    return fixture
         return None
 
     def get_fixture_height(self, cutout_fixture_name: str) -> float:
