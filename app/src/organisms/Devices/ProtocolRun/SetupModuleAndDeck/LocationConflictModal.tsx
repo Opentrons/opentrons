@@ -247,7 +247,7 @@ export const LocationConflictModal = (
               >
                 <Flex
                   padding={SPACING.spacing8}
-                  backgroundColor={COLORS.grey10}
+                  backgroundColor={COLORS.grey20}
                   flexDirection={DIRECTION_ROW}
                   gridGap={SPACING.spacing20}
                   alignItems={ALIGN_CENTER}

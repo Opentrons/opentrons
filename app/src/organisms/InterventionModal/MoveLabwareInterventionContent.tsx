@@ -54,7 +54,7 @@ const LABWARE_DESCRIPTION_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   grid-gap: ${SPACING.spacing8};
   padding: ${SPACING.spacing16};
-  background-color: ${COLORS.grey10};
+  background-color: ${COLORS.grey20};
   border-radius: ${BORDERS.radiusSoftCorners};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     background-color: ${COLORS.grey35};
