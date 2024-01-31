@@ -11,6 +11,7 @@ from opentrons import __version__
 
 from .errors import exception_handlers
 from .hardware import (
+    fbl_init,
     fbl_mark_hardware_init_complete,
     fbl_mark_persistence_init_complete,
     start_initializing_hardware,
@@ -78,6 +79,7 @@ async def on_startup() -> None:
 
     initialize_logging()
     initialize_task_runner(app_state=app.state)
+    fbl_init(app_state=app.state)
     start_initializing_hardware(
         app_state=app.state,
         callbacks=[
