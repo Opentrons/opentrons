@@ -12,7 +12,7 @@ import {
 
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 import type { Action, Dispatch } from '../types'
-import type { UsbDeviceMonitor, Device } from './usb-devices'
+import type { UsbDeviceMonitor } from './usb-devices'
 import type {
   NetworkInterface,
   NetworkInterfaceMonitor,
@@ -26,15 +26,36 @@ const IFACE_POLL_INTERVAL_MS = 30000
 
 const log = createLogger('system-info')
 
-const addDriverVersion = (device: Device): Promise<UsbDevice> => {
-  if (isWindows() && RE_REALTEK.test(device.manufacturer)) {
+// format USBDevice to UsbDevice type
+const createUsbDevice = (device: USBDevice): UsbDevice => {
+  return {
+    vendorId: device.vendorId,
+    productId: device.productId,
+    productName: device.productName != null ? device.productName : 'no name',
+    manufacturerName:
+      device.manufacturerName != null
+        ? device.manufacturerName
+        : 'no manufacture',
+    serialNumber:
+      device.serialNumber != null ? device.serialNumber : 'no serial',
+  }
+}
+const createUsbDevices = (devices: USBDevice[]): UsbDevice[] =>
+  devices.map((device: USBDevice) => createUsbDevice(device))
+
+const addDriverVersion = (device: UsbDevice): Promise<UsbDevice> => {
+  if (
+    isWindows() &&
+    device.manufacturerName != null &&
+    RE_REALTEK.test(device.manufacturerName)
+  ) {
     return getWindowsDriverVersion(device).then(windowsDriverVersion => ({
       ...device,
       windowsDriverVersion,
     }))
   }
 
-  return Promise.resolve({ ...device })
+  return Promise.resolve(device)
 }
 
 export function registerSystemInfo(
@@ -43,13 +64,13 @@ export function registerSystemInfo(
   let usbMonitor: UsbDeviceMonitor
   let ifaceMonitor: NetworkInterfaceMonitor
 
-  const handleDeviceAdd = (device: Device): void => {
+  const handleDeviceAdd = (device: UsbDevice): void => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     addDriverVersion(device).then(d => dispatch(SystemInfo.usbDeviceAdded(d)))
   }
 
-  const handleDeviceRemove = (d: Device): void => {
-    dispatch(SystemInfo.usbDeviceRemoved({ ...d }))
+  const handleDeviceRemove = (d: UsbDevice): void => {
+    dispatch(SystemInfo.usbDeviceRemoved(d))
   }
 
   const handleIfacesChanged = (interfaces: NetworkInterface[]): void => {
@@ -89,7 +110,9 @@ export function registerSystemInfo(
 
         usbMonitor
           .getAllDevices()
-          .then(devices => Promise.all(devices.map(addDriverVersion)))
+          .then(devices =>
+            Promise.all(createUsbDevices(devices).map(addDriverVersion))
+          )
           .then(devices => {
             dispatch(SystemInfo.initialized(devices, getActiveInterfaces()))
           })
