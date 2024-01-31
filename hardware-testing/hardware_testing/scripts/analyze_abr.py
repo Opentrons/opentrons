@@ -1,5 +1,5 @@
-from ast import Try
-import sys, os, time
+"""ABR Scale Measurement Analyzer."""
+import os 
 from datetime import datetime
 from hardware_testing import data
 import csv
@@ -9,7 +9,8 @@ def get_user_input(list, some_string):
     variable = input(some_string)
     while variable not in list:
         print(
-            f"Your input was {variable}. Expected input is one of the following: {list}"
+            f"Your input was {variable}. 
+            Expected input is one of the following: {list}"
         )
         variable = input(some_string)
     return variable

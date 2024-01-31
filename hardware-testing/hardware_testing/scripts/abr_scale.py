@@ -1,4 +1,4 @@
-from ast import Try
+"""ABR Scale Reader."""
 import os, datetime
 from hardware_testing import data
 from hardware_testing.drivers import find_port
@@ -60,7 +60,7 @@ for i in range(len(labware)):
     robot_labware["Labware"].extend(labware[i])
 
 
-def get_user_input(list, some_string) -> str:
+def _get_user_input(list: List, some_string:str ) -> str:
     variable = input(some_string)
     while variable not in list:
         print(
@@ -90,8 +90,8 @@ if __name__ == "__main__":
         print(f"Scale reading: grams={grams}, is_stable={is_stable}")
         # Get user input to label data entry correctly
         scale_measurement = "ABR-Liquids-"
-        robot_to_filter = get_user_input(robot_list, "Robot: ")
-        test_type = get_user_input(test_type_list, "Test Type (E/P): ")
+        robot_to_filter = _get_user_input(robot_list, "Robot: ")
+        test_type = _get_user_input(test_type_list, "Test Type (E/P): ")
         test_name = scale_measurement + robot_to_filter + "-" + test_type
         run_id = data.create_run_id()
         filtered_robot_labware = {
@@ -107,10 +107,10 @@ if __name__ == "__main__":
             ],
         }
         labware_list = filtered_robot_labware["Labware"]
-        l = get_user_input(labware_list, f"Labware, Expected Values: {labware_list}: ")
-        step = get_user_input(step_list, "Testing Step (1, 2, 3): ")
+        labware_input = _get_user_input(labware_list, f"Labware, Expected Values: {labware_list}: ")
+        step = _get_user_input(step_list, "Testing Step (1, 2, 3): ")
         # Set up .csv file
-        tag = l + "-" + str(step)
+        tag = labware_input + "-" + str(step)
         file_name = data.create_file_name(test_name, run_id, tag)
         header = ["Date", "Labware", "Step", "Robot", "Scale Reading", "Stable"]
         header_str = ",".join(header) + "\n"
@@ -124,7 +124,7 @@ if __name__ == "__main__":
             time_now = datetime.datetime.now()
             row = [time_now, labware, step, robot_to_filter, grams, is_stable]
             results_list.append(row)
-            if is_stable:
+            if is_stable is True:
                 print("is stable")
                 break
         result_string = ""
