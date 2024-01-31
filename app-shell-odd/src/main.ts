@@ -1,5 +1,6 @@
 // electron main entry point
 import { app, ipcMain } from 'electron'
+import dns from 'dns'
 import fse from 'fs-extra'
 import path from 'path'
 import { createUi } from './ui'
@@ -26,6 +27,15 @@ import { registerNotify, closeAllNotifyConnections } from './notify'
 
 import type { BrowserWindow } from 'electron'
 import type { Dispatch, Logger } from './types'
+
+/**
+ * node 17 introduced a change to default IP resolving to prefer IPv6 which causes localhost requests to fail
+ * setting the default to IPv4 fixes the issue
+ * https://github.com/node-fetch/node-fetch/issues/1624
+ */
+// TODO(bh, 2024-1-30): @types/node needs to be updated to address this type error. updating @types/node will also require updating our typescript version
+// @ts-expect-error
+dns.setDefaultResultOrder('ipv4first')
 
 systemd.sendStatus('starting app')
 const config = getConfig()
