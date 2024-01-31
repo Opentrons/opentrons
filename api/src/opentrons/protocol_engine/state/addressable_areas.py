@@ -323,6 +323,22 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         else:
             return self._get_addressable_area_from_deck_data(addressable_area_name)
 
+    def get_addressable_area_by_deck_slot_name(
+        self, slot_name: DeckSlotName
+    ) -> AddressableArea:
+        """Get addressable area by Deck Slot Name."""
+        areas = self.get_all()
+        for area in areas:
+            if self.get_addressable_area_base_slot(area) == slot_name:
+                if not self._state.use_simulated_deck_config:
+                    return self._get_loaded_addressable_area(area)
+                else:
+                    return self._get_addressable_area_from_deck_data(area)
+
+        raise AddressableAreaDoesNotExistError(
+            f"No Addressable Area could be found for provided slot {slot_name}"
+        )
+
     def get_all(self) -> List[str]:
         """Get a list of all loaded addressable area names."""
         return list(self._state.loaded_addressable_areas_by_name)

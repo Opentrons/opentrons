@@ -177,7 +177,13 @@ class MotionView:
             destination = base_destination + Point(offset.x, offset.y, offset.z)
 
         # TODO(jbl 11-28-2023) This may need to change for partial tip configurations on a 96
-        destination_cp = CriticalPoint.XY_CENTER
+        # if the addressable area belongs to a trashbin or waste chute:
+        if any(
+            area in addressable_area_name for area in ["moveableTrash", "WasteChute"]
+        ):
+            destination_cp = None
+        else:
+            destination_cp = CriticalPoint.XY_CENTER
 
         all_labware_highest_z = self._geometry.get_all_obstacle_highest_z()
         if minimum_z_height is None:
