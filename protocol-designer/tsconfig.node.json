@@ -2,9 +2,8 @@
   "compilerOptions": {
     "composite": true,
     "skipLibCheck": true,
-    "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "node",
     "allowSyntheticDefaultImports": true
   },
-  "include": ["vite.config.ts, postcss.config.ts"]
+  "include": ["vite.config.ts"]
 }

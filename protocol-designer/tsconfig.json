@@ -5,28 +5,15 @@
       "path": "./tsconfig-data.json"
     },
     {
-      "path": "../components"
+      "path": "../shared-data"
     },
     {
-      "path": "../shared-data"
+      "path": "../components"
     },
     {
       "path": "../step-generation"
     },
     { "path": "./tsconfig.node.json" }
   ],
-  "compilerOptions": {
-    "module": "es2020",
-    "moduleResolution": "Node",
-    "composite": true,
-    "noErrorTruncation": true,
-    "rootDir": "src",
-    "outDir": "lib",
-    "paths": {
-      "@opentrons/shared-data": ["../shared-data"]
-    }
-  },
-  "module": "ESNext",
-  "types": ["vite/client"],
   "include": ["typings", "src", "vite.config.ts"]
 }
