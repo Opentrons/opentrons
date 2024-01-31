@@ -1,18 +1,23 @@
 # noqa: D100
 
-from typing import Any, Dict, Optional
-from enum import Enum
 import random
 import logging
 import paho.mqtt.client as mqtt
+import asyncio
 from anyio import to_thread
 from fastapi import Depends
+from typing import Any, Dict, Optional, Union, Callable
+from enum import Enum
 
 from ..json_api import NotifyRefetchBody
 from server_utils.fastapi_utils.app_state import (
     AppState,
     AppStateAccessor,
     get_app_state,
+)
+
+from opentrons.protocol_engine import (
+    CurrentCommand,
 )
 
 log: logging.Logger = logging.getLogger(__name__)
@@ -49,28 +54,29 @@ class NotificationClient:  # noqa: D101
         # MQTT is somewhat particular about the client_id format and will connect erratically
         # if an unexpected string is supplied. This clientId is derived from the paho-mqtt library.
         self._client_id: str = f"robot-server-{random.randint(0, 1000000)}"
-        self._client: mqtt.Client = mqtt.Client(
+        self.client: mqtt.Client = mqtt.Client(
             client_id=self._client_id, protocol=protocol_version
         )
-        self._client.on_connect = self._on_connect
-        self._client.on_disconnect = self._on_disconnect
+        self.client.on_connect = self._on_connect
+        self.client.on_disconnect = self._on_disconnect
+
+        self._run_data_manager_polling = asyncio.Event()
+        self._previous_current_command: Union[CurrentCommand, None] = None
 
     def connect(self) -> None:
         """Connect the client to the MQTT broker."""
-        self._client.on_connect = self._on_connect
-        self._client.on_disconnect = self._on_disconnect
+        self.client.on_connect = self._on_connect
+        self.client.on_disconnect = self._on_disconnect
 
-        self._client.connect(
-            host=self._host, port=self._port, keepalive=self._keepalive
-        )
-        self._client.loop_start()
+        self.client.connect(host=self._host, port=self._port, keepalive=self._keepalive)
+        self.client.loop_start()
 
     async def disconnect(self) -> None:
         """Disconnect the client from the MQTT broker."""
-        self._client.loop_stop()
-        await to_thread.run_sync(self._client.disconnect)
+        self.client.loop_stop()
+        await to_thread.run_sync(self.client.disconnect)
 
-    async def publish(
+    async def publish_async(
         self, topic: str, message: NotifyRefetchBody = NotifyRefetchBody()
     ) -> None:
         """Asynchronously Publish a message on a specific topic to the MQTT broker.
@@ -79,9 +85,11 @@ class NotificationClient:  # noqa: D101
             topic: The topic to publish the message on.
             message: The message to be published, in the format of NotifyRefetchBody.
         """
-        await to_thread.run_sync(self._publish, topic, message)
+        await to_thread.run_sync(self.publish, topic, message)
 
-    def _publish(self, topic: str, message: NotifyRefetchBody) -> None:
+    def publish(
+        self, topic: str, message: NotifyRefetchBody = NotifyRefetchBody()
+    ) -> None:
         """Publish a message on a specific topic to the MQTT broker.
 
         Args:
@@ -89,7 +97,7 @@ class NotificationClient:  # noqa: D101
             message: The message to be published.
         """
         payload = message.json()
-        self._client.publish(
+        self.client.publish(
             topic=topic,
             payload=payload,
             qos=self._default_qos,
