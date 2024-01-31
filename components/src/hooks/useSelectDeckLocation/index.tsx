@@ -263,6 +263,7 @@ export function DeckLocationSelect({
         />
       ) : null}
       <SlotLabels robotType={robotType} color={COLORS.darkGreyEnabled} />
+      {/* put tooltip here, determine positioning and content based on custom event handler above in which state is managed for a) whcih slot is being hovered and b) whether the slot is disabled */}
     </RobotCoordinateSpace>
   )
 }
