@@ -151,22 +151,25 @@ async def clean_up_hardware(app_state: AppState) -> None:
 
 # TODO(mm, 2024-01-30): Consider merging this with the Flex's LightController.
 class _FrontButtonLightBlinker:
-    def __init__(self, hardware: HardwareControlAPI) -> None:
-        self._hardware = hardware
-        self._task: "Optional[asyncio.Task[None]]" = None
+    def __init__(self) -> None:
+        self._hardware_and_task: Optional[
+            Tuple[HardwareControlAPI, "asyncio.Task[None]"]
+        ] = None
         self._hardware_init_complete = False
         self._persistence_init_complete = False
 
-    def start(self) -> None:
-        if self._task is None:
+    async def set_hardware(self, hardware: HardwareControlAPI) -> None:
+        assert self._hardware_and_task is None, "hardware should only be set once."
 
-            async def blink_forever() -> None:
-                await self._hardware.set_lights(button=True)
-                await asyncio.sleep(0.5)
-                await self._hardware.set_lights(button=False)
-                await asyncio.sleep(0.5)
+        async def blink_forever() -> None:
+            await hardware.set_lights(button=True)
+            await asyncio.sleep(0.5)
+            await hardware.set_lights(button=False)
+            await asyncio.sleep(0.5)
 
-            self._task = asyncio.create_task(blink_forever())
+        task = asyncio.create_task(blink_forever())
+
+        self._hardware_and_task = (hardware, task)
 
     async def mark_hardware_init_complete(self) -> None:
         self._hardware_init_complete = True
@@ -177,24 +180,34 @@ class _FrontButtonLightBlinker:
         await self._maybe_stop_blinking()
 
     async def clean_up(self) -> None:
-        if self._task is not None:
-            self._task.cancel()
+        if self._hardware_and_task is not None:
+            _, task = self._hardware_and_task
+            task.cancel()
             with suppress(asyncio.CancelledError):
-                await self._task
+                await task
 
     async def _maybe_stop_blinking(self) -> None:
-        if (
-            self._task is not None
-            and self._hardware_init_complete
-            and self._persistence_init_complete
-        ):
-            self._task.cancel()
+        if self._hardware_and_task is not None and self._all_complete():
+            # We're currently blinking, but we should stop.
+            hardware, task = self._hardware_and_task
+            task.cancel()
             with suppress(asyncio.CancelledError):
-                await self._task
-            await self._hardware.set_lights(button=True)
+                await task
+            await hardware.set_lights(button=True)
+
+    def _all_complete(self) -> bool:
+        return self._persistence_init_complete and self._hardware_init_complete
 
 
-async def fbl_start_blinking(app_state: AppState, hardware: HardwareControlAPI) -> None:
+def fbl_init(app_state: AppState) -> None:
+    if should_use_ot3():
+        # This is only for the OT-2's front button light.
+        # The Flex's status bar is handled elsewhere -- see LightController.
+        return
+    _front_button_light_blinker_accessor.set_on(app_state, _FrontButtonLightBlinker())
+
+
+async def fbl_set_hardware(app_state: AppState, hardware: HardwareControlAPI) -> None:
     """Start blinking the OT-2's front button light.
 
     This is intended to be called during server startup, while slow things like homing
@@ -207,14 +220,9 @@ async def fbl_start_blinking(app_state: AppState, hardware: HardwareControlAPI) 
     2. build_hardware_controller() blinks the light internally while it's doing hardware
        initialization.
     """
-    if should_use_ot3():
-        # This is only for the OT-2's front button light.
-        # The Flex's status bar is handled elsewhere -- see LightController.
-        return
-
-    blinker = _FrontButtonLightBlinker(hardware)
-    _front_button_light_blinker_accessor.set_on(app_state, blinker)
-    blinker.start()
+    blinker = _front_button_light_blinker_accessor.get_from(app_state)
+    if blinker is not None:  # May be None on a Flex.
+        await blinker.set_hardware(hardware)
 
 
 async def fbl_mark_hardware_init_complete(
@@ -227,19 +235,15 @@ async def fbl_mark_hardware_init_complete(
     completed.
     """
     blinker = _front_button_light_blinker_accessor.get_from(app_state)
-    assert (
-        blinker is not None
-    ), "Front button light blinker was not initialized. Forgot to initialize it during server startup?"
-    await blinker.mark_hardware_init_complete()
+    if blinker is not None:  # May be None on a Flex.
+        await blinker.mark_hardware_init_complete()
 
 
 async def fbl_mark_persistence_init_complete(app_state: AppState) -> None:
     """See `fbl_mark_hardware_init_complete()`."""
     blinker = _front_button_light_blinker_accessor.get_from(app_state)
-    assert (
-        blinker is not None
-    ), "Front button light blinker was not initialized. Forgot to initialize it during server startup?"
-    await blinker.mark_persistence_init_complete()
+    if blinker is not None:  # May be None on a Flex.
+        await blinker.mark_persistence_init_complete()
 
 
 async def fbl_clean_up(app_state: AppState) -> None:

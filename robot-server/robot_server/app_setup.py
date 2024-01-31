@@ -15,7 +15,7 @@ from .hardware import (
     fbl_mark_persistence_init_complete,
     start_initializing_hardware,
     clean_up_hardware,
-    fbl_start_blinking,
+    fbl_set_hardware,
     fbl_clean_up,
 )
 from .persistence import start_initializing_persistence, clean_up_persistence
@@ -85,14 +85,19 @@ async def on_startup() -> None:
             (start_light_control_task, True),
             (mark_light_control_startup_finished, False),
             # OT-2 light control:
-            (fbl_start_blinking, True),
+            (fbl_set_hardware, True),
             (fbl_mark_hardware_init_complete, False),
         ],
     )
     start_initializing_persistence(
         app_state=app.state,
         persistence_directory_root=persistence_directory,
-        done_callbacks=[fbl_mark_persistence_init_complete],
+        done_callbacks=[
+            # For OT-2 light control only. The Flex status bar isn't handled here
+            # because it's currently tied to hardware and run status, not to
+            # initialization of the persistence layer.
+            fbl_mark_persistence_init_complete
+        ],
     )
     initialize_notification_client(
         app_state=app.state,
