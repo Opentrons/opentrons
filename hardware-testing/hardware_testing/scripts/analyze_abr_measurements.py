@@ -1,7 +1,6 @@
 from ast import Try
 import sys, os, time, datetime
-import pandas as pd
-import plotly.express as px
+from hardware_testing import data
 import csv
 
 if __name__ == "__main__":

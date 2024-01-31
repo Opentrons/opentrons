@@ -2,9 +2,6 @@
 from abc import ABC, abstractmethod
 from typing import Tuple, Optional
 import datetime
-import os
-import sys
-from pandas import Int64Dtype
 from serial import Serial  # type: ignore[import]
 
 from .commands import (
@@ -17,8 +14,7 @@ from .commands import (
 )
 from .responses import RadwagResponse, RadwagResponseCodes, radwag_response_parse
 
-# sys.path.insert(0, os.path.abspath('../../'))
-# from data import get_testing_data_directory
+from hardware_testing.data import get_testing_data_directory
 
 
 class RadwagScaleBase(ABC):
@@ -98,8 +94,9 @@ class RadwagScale(RadwagScaleBase):
     def __init__(self, connection: Serial) -> None:
         """Constructor."""
         self._connection = connection
-        # _raw_file_path = get_testing_data_directory() / "scale_raw.txt
-        _raw_file_path = "demofile.txt"
+        # _raw_file_path = get_testing_data_directory()
+        _raw_file_path = get_testing_data_directory() / "scale_raw.txt"
+
         self._raw_log = open(_raw_file_path, "w")
 
     @classmethod
@@ -282,7 +279,7 @@ class RadwagScale(RadwagScaleBase):
             res.code == RadwagResponseCodes.CARRIED_OUT
         ), f"Unexpected response code: {res.code}"
 
-    def read_mass(self) -> Tuple[Int64Dtype, bool]:
+    def read_mass(self) -> Tuple[float, bool]:
         """Read the mass, in grams."""
         cmd = RadwagCommand.GET_MEASUREMENT_BASIC_UNIT
         res = self._write_command_and_read_response(cmd)
