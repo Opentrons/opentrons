@@ -16,7 +16,7 @@ from opentrons.protocol_engine import (
 
 from robot_server.protocols import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
-from robot_server.notification_client import NotificationClient
+from robot_server.service.notifications import NotificationClient
 
 from .engine_store import EngineStore
 from .run_store import RunResource, RunStore

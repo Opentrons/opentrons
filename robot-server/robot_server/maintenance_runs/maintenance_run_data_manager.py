@@ -16,7 +16,7 @@ from .maintenance_run_models import MaintenanceRun, MaintenanceRunNotFoundError
 
 from opentrons.protocol_engine.types import DeckConfigurationType
 
-from ..notification_client import NotificationClient
+from robot_server.service.notifications import NotificationClient
 
 
 def _build_run(

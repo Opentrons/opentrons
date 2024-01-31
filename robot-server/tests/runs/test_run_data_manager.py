@@ -31,7 +31,7 @@ from robot_server.runs.run_store import (
     CommandNotFoundError,
 )
 from robot_server.service.task_runner import TaskRunner
-from robot_server.notification_client import NotificationClient
+from robot_server.service.notifications import NotificationClient
 
 from opentrons.protocol_engine import Liquid
 

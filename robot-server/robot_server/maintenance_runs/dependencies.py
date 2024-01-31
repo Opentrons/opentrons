@@ -15,7 +15,10 @@ from robot_server.hardware import get_hardware, get_deck_type, get_robot_type
 
 from .maintenance_engine_store import MaintenanceEngineStore
 from .maintenance_run_data_manager import MaintenanceRunDataManager
-from ..notification_client import NotificationClient, get_notification_client
+from robot_server.service.notifications import (
+    NotificationClient,
+    get_notification_client,
+)
 
 _engine_store_accessor = AppStateAccessor[MaintenanceEngineStore](
     "maintenance_engine_store"

@@ -28,7 +28,7 @@ from robot_server.maintenance_runs.maintenance_run_models import (
     MaintenanceRun,
     MaintenanceRunNotFoundError,
 )
-from robot_server.notification_client import (
+from robot_server.service.notifications import (
     NotificationClient,
 )
 

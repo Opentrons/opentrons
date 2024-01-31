@@ -21,7 +21,10 @@ from robot_server.persistence import get_sql_engine
 from robot_server.service.task_runner import get_task_runner, TaskRunner
 from robot_server.settings import get_settings
 from robot_server.deletion_planner import RunDeletionPlanner
-from robot_server.notification_client import get_notification_client, NotificationClient
+from robot_server.service.notifications import (
+    get_notification_client,
+    NotificationClient,
+)
 
 from .run_auto_deleter import RunAutoDeleter
 from .engine_store import EngineStore, NoRunnerEnginePairError
