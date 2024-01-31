@@ -15,7 +15,7 @@ from opentrons.protocol_engine import (
 
 from robot_server.protocols import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
-from robot_server.service.notifications import NotificationClient
+from robot_server.service.notifications import RunsPublisher
 
 from .engine_store import EngineStore
 from .run_store import RunResource, RunStore
@@ -78,12 +78,12 @@ class RunDataManager:
         engine_store: EngineStore,
         run_store: RunStore,
         task_runner: TaskRunner,
-        notification_client: NotificationClient,
+        runs_publisher: RunsPublisher,
     ) -> None:
         self._engine_store = engine_store
         self._run_store = run_store
         self._task_runner = task_runner
-        self._notification_client = notification_client
+        self._runs_publisher = runs_publisher
 
     @property
     def current_run_id(self) -> Optional[str]:
@@ -132,7 +132,7 @@ class RunDataManager:
             created_at=created_at,
             protocol_id=protocol.protocol_id if protocol is not None else None,
         )
-        await self._notification_client.begin_polling_engine_store(
+        await self._runs_publisher.begin_polling_engine_store(
             get_current_command=self.get_current_command, run_id=run_id
         )
 
@@ -219,7 +219,7 @@ class RunDataManager:
         """
         if run_id == self._engine_store.current_run_id:
             await self._engine_store.clear()
-            await self._notification_client.stop_polling_engine_store()
+            await self._runs_publisher.stop_polling_engine_store()
 
         self._run_store.remove(run_id=run_id)
 

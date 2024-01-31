@@ -3,10 +3,9 @@
 import random
 import logging
 import paho.mqtt.client as mqtt
-import asyncio
 from anyio import to_thread
 from fastapi import Depends
-from typing import Any, Dict, Optional, Union, Callable
+from typing import Any, Dict, Optional
 from enum import Enum
 
 from ..json_api import NotifyRefetchBody
@@ -14,10 +13,6 @@ from server_utils.fastapi_utils.app_state import (
     AppState,
     AppStateAccessor,
     get_app_state,
-)
-
-from opentrons.protocol_engine import (
-    CurrentCommand,
 )
 
 log: logging.Logger = logging.getLogger(__name__)
@@ -59,9 +54,6 @@ class NotificationClient:  # noqa: D101
         )
         self.client.on_connect = self._on_connect
         self.client.on_disconnect = self._on_disconnect
-
-        self._run_data_manager_polling = asyncio.Event()
-        self._previous_current_command: Union[CurrentCommand, None] = None
 
     def connect(self) -> None:
         """Connect the client to the MQTT broker."""

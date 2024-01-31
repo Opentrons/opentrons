@@ -1,11 +1,14 @@
 from .maintenance_runs_publisher import (
-    MaintenanceRunsPublisherr,
-    get_maintenance_runs_publisherr,
+    MaintenanceRunsPublisher,
+    get_maintenance_runs_publisher,
 )
+from .runs_publisher import RunsPublisher, get_runs_publisher
 
 __all__ = [
     # publish "route" equivalents
-    "MaintenanceRunsPublisherr",
+    "MaintenanceRunsPublisher",
+    "RunsPublisher",
     # for use by FastAPI
-    "get_maintenance_runs_publisherr",
+    "get_maintenance_runs_publisher",
+    "get_runs_publisher",
 ]
