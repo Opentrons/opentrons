@@ -326,7 +326,6 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
   const onSave: (args: {
     newProtocolFields: NewProtocolFields
     pipettes: PipetteFieldsData[]
-    modules: ModuleCreationArgs[]
   }) => void = makeUpdatePipettes(
     prevPipettes,
     orderedStepIds,
@@ -373,37 +372,9 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
       },
       []
     )
-
-    // NOTE: this is extra-explicit for flow. Reduce fns won't cooperate
-    // with enum-typed key like `{[ModuleType]: ___}`
-    // @ts-expect-error(sa, 2021-6-21): TS not smart enough to take real type from Object.keys
-    const moduleTypes: ModuleType[] = Object.keys(values.modulesByType)
-    const modules: ModuleCreationArgs[] = moduleTypes.reduce<
-      ModuleCreationArgs[]
-    >((acc, moduleType) => {
-      const formModule = values.modulesByType[moduleType]
-      return formModule?.onDeck
-        ? [
-            ...acc,
-            {
-              type: moduleType,
-              model: formModule.model || ('' as ModuleModel), // TODO: we need to validate that module models are of type ModuleModel
-              slot: formModule.slot,
-            },
-          ]
-        : acc
-    }, [])
-    const heaterShakerIndex = modules.findIndex(
-      hwModule => hwModule.type === HEATERSHAKER_MODULE_TYPE
-    )
-    const magModIndex = modules.findIndex(
-      hwModule => hwModule.type === MAGNETIC_MODULE_TYPE
-    )
-    if (heaterShakerIndex > -1 && magModIndex > -1) {
-      // if both are present, move the Mag mod to slot 9, since both can't be in slot 1
-      modules[magModIndex].slot = '9'
-    }
-    onSave({ newProtocolFields, modules, pipettes })
+    console.log('pipettes', pipettes)
+    console.log('new protoocl fields', newProtocolFields)
+    onSave({ newProtocolFields, pipettes })
   }
 
   const getInitialValues: () => FormState = () => {
@@ -421,23 +392,20 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
 
   const {
     handleSubmit,
-    formState: { errors, isDirty, touchedFields },
+    formState,
     control,
-    watch,
     setValue,
     trigger,
+    getValues,
   } = useForm<FormState>({
     defaultValues: getInitialValues(),
     resolver: yupResolver(validationSchema),
   })
-  const modulesByType = watch('modulesByType')
-  const pipettesByMount = watch('pipettesByMount')
+  const { modulesByType, pipettesByMount } = getValues()
 
   const { left, right } = pipettesByMount
-
-  const pipetteSelectionIsValid =
-    // at least one must not be none (empty string)
-    left.pipetteName || right.pipetteName
+  // at least one must not be none (empty string)
+  const pipetteSelectionIsValid = left.pipetteName || right.pipetteName
 
   const hasCrashableMagnetModuleSelected = getCrashableModuleSelected(
     modulesByType,
@@ -481,26 +449,13 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
             <h2 className={styles.new_file_modal_title}>
               {t('edit_pipettes.title')}
             </h2>
-            <Controller
+            <PipetteFields
+              values={pipettesByMount}
+              setValue={setValue}
+              formState={formState}
+              trigger={trigger}
+              robotType={robotType}
               control={control}
-              name="pipettesByMount"
-              render={({ field }) => (
-                <PipetteFields
-                  initialTabIndex={1}
-                  values={pipettesByMount}
-                  onFieldChange={field.onChange}
-                  onSetFieldValue={(name, value) =>
-                    setValue(name as any, value)
-                  }
-                  onBlur={field.onBlur}
-                  // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module tiprackDefURI inside of pipettesByMount exists, because it could be undefined
-                  errors={errors.pipettesByMount ?? null}
-                  // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module tiprackDefURI inside of pipettesByMount exists, because it could be undefined
-                  touched={touchedFields.pipettesByMount ?? null}
-                  onSetFieldTouched={name => trigger(name as any)}
-                  robotType={robotType}
-                />
-              )}
             />
             {!moduleRestrictionsDisabled && (
               <CrashInfoBox

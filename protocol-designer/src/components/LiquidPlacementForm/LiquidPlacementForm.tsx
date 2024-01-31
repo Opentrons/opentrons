@@ -1,9 +1,9 @@
 import * as React from 'react'
+import { Controller, useForm } from 'react-hook-form'
 import isEmpty from 'lodash/isEmpty'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import assert from 'assert'
-import * as Yup from 'yup'
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import * as fieldProcessors from '../../steplist/fieldLevel/processing'
 import {
@@ -25,8 +25,6 @@ import { selectors as labwareIngredSelectors } from '../../labware-ingred/select
 import styles from './LiquidPlacementForm.css'
 import formStyles from '../forms/forms.css'
 import stepEditFormStyles from '../StepEditForm/StepEditForm.css'
-import { useController, useForm } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
 
 interface ValidFormValues {
   selectedLiquidId: string
@@ -71,31 +69,10 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
   const getInitialValues: () => ValidFormValues = () => {
     return {
       selectedLiquidId: commonSelectedLiquidId || '',
-      volume: commonSelectedVolume != null ? String(commonSelectedVolume) : '',
+      volume:
+        commonSelectedVolume != null ? commonSelectedVolume.toString() : '',
     }
   }
-
-  const validationSchema: any = Yup.object().shape({
-    selectedLiquidId: Yup.string().required(
-      t('generic.error.required', {
-        name: t('liquid_placement.liquid'),
-      })
-    ),
-    volume: Yup.number()
-      .nullable()
-      .required(
-        t('generic.error.required', {
-          name: t('liquid_placement.volume'),
-        })
-      )
-      .moreThan(0, t('generic.error.more_than_zero'))
-      .max(
-        selectedWellsMaxVolume,
-        t('liquid_placement.volume_exceeded', {
-          volume: selectedWellsMaxVolume,
-        })
-      ),
-  })
 
   const {
     handleSubmit,
@@ -105,10 +82,10 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
     formState: { errors, touchedFields },
   } = useForm<LiquidPlacementFormValues>({
     defaultValues: getInitialValues(),
-    resolver: yupResolver(validationSchema),
   })
-  const selectedLiquidId = watch('selectedLiquidId')
-  const { field } = useController({ control, name: 'selectedLiquidId' })
+
+  const [selectedLiquidId, volume] = watch(['selectedLiquidId', 'volume'])
+
   const handleCancelForm = (): void => {
     dispatch(deselectAllWells())
   }
@@ -126,9 +103,9 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
     }
   }
 
-  const handleChangeVolume: () => (
-    e: React.ChangeEvent<any>
-  ) => void = () => e => {
+  const handleChangeVolume: (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => void = e => {
     const value: string | null | undefined = e.currentTarget.value
     const masked = fieldProcessors.composeMaskers(
       fieldProcessors.maskToFloat,
@@ -181,6 +158,18 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
   }
 
   if (!showForm) return null
+
+  let volumeErrors: string | null = null
+  if (touchedFields.volume) {
+    if (volume == null || volume === '0') {
+      volumeErrors = t('generic.error.more_than_zero')
+    } else if (parseInt(volume) > selectedWellsMaxVolume) {
+      volumeErrors = t('liquid_placement.volume_exceeded', {
+        volume: selectedWellsMaxVolume,
+      })
+    }
+  }
+
   return (
     <div className={formStyles.form}>
       <form onSubmit={handleSubmit(handleSaveSubmit)}>
@@ -189,29 +178,49 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
             label={t('liquid_placement.liquid')}
             className={styles.liquid_field}
           >
-            <DropdownField
+            <Controller
               name="selectedLiquidId"
-              className={stepEditFormStyles.large_field}
-              options={liquidSelectionOptions}
-              error={
-                touchedFields.selectedLiquidId
-                  ? errors.selectedLiquidId?.message
-                  : null
-              }
-              value={selectedLiquidId}
-              onChange={field.onChange}
-              onBlur={field.onBlur}
+              control={control}
+              rules={{
+                required: true,
+              }}
+              render={({ field }) => (
+                <DropdownField
+                  name="selectedLiquidId"
+                  className={stepEditFormStyles.large_field}
+                  options={liquidSelectionOptions}
+                  error={
+                    touchedFields.selectedLiquidId
+                      ? errors.selectedLiquidId?.message
+                      : null
+                  }
+                  value={selectedLiquidId}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                />
+              )}
             />
           </FormGroup>
           <FormGroup
             label={t('liquid_placement.volume')}
             className={styles.volume_field}
           >
-            <InputField
+            <Controller
               name="volume"
-              units={t('application:units.microliter')}
-              error={touchedFields.volume ? errors.volume?.message : null}
-              onChange={handleChangeVolume}
+              control={control}
+              rules={{
+                required: true,
+              }}
+              render={({ field }) => (
+                <InputField
+                  name="volume"
+                  units={t('application:units.microliter')}
+                  value={volume}
+                  error={volumeErrors}
+                  onBlur={field.onBlur}
+                  onChange={handleChangeVolume}
+                />
+              )}
             />
           </FormGroup>
         </div>
@@ -226,7 +235,10 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
           <OutlineButton onClick={handleCancelForm}>
             {t('button:cancel')}
           </OutlineButton>
-          <DeprecatedPrimaryButton type="submit">
+          <DeprecatedPrimaryButton
+            type="submit"
+            disabled={volumeErrors != null || volume == null || volume === ''}
+          >
             {t('button:save')}
           </DeprecatedPrimaryButton>
         </div>

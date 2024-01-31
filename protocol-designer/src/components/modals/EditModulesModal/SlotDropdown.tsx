@@ -27,7 +27,7 @@ export const SlotDropdown = (props: SlotDropdownProps): JSX.Element => {
       name={props.fieldName}
       value={field.value}
       disabled={props.disabled}
-      onChange={value => field.onChange(value)}
+      onChange={field.onChange}
       onBlur={field.onBlur}
       error={fieldState.error?.message}
     />

@@ -9,7 +9,6 @@ import {
   useController,
   useForm,
   UseFormWatch,
-  useWatch,
 } from 'react-hook-form'
 
 import {
@@ -48,7 +47,6 @@ import {
   OT2_ROBOT_TYPE,
   getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../localization'
 import {
   getSlotIdsBlockedBySpanning,
   getSlotIsEmpty,
@@ -91,6 +89,7 @@ type EditModulesModalComponentProps = EditModulesModalProps & {
   watch: UseFormWatch<EditModulesFormValues>
   formState: FormState<EditModulesFormValues>
   control: Control<EditModulesFormValues, any>
+  validator: (data: EditModulesFormValues) => Record<string, any>
 }
 
 export interface EditModulesFormValues {
@@ -205,7 +204,7 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
     formState,
   } = useForm<EditModulesFormValues>({
     resolver: async data => {
-      const validationErrors = validator(data)
+      const validationErrors = await validator(data)
       const mappedErrors = Object.keys(validationErrors).reduce((acc, key) => {
         acc[key as keyof typeof validationErrors] = {
           type: 'required',
@@ -213,7 +212,6 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
         }
         return acc
       }, {} as Record<string, any>)
-      console.log('mappedErrors', mappedErrors)
       return {
         values: {},
         errors: mappedErrors,
@@ -221,7 +219,7 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
     },
     defaultValues: initialValues,
   })
-  console.log('formstate.errors', Object.keys(formState.errors))
+
   const onSaveClick = (): void => {
     const selectedModel = watch('selectedModel')
     const selectedSlot = watch('selectedSlot')
@@ -271,6 +269,7 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
         supportedModuleSlot={supportedModuleSlot}
         watch={watch}
         control={control}
+        validator={validator}
       />
     </form>
   )
@@ -280,21 +279,23 @@ const EditModulesModalComponent = (
   props: EditModulesModalComponentProps
 ): JSX.Element => {
   const {
-    moduleType,
-    supportedModuleSlot,
-    onCloseClick,
-    watch,
     control,
     formState,
+    moduleType,
+    onCloseClick,
+    supportedModuleSlot,
+    validator,
+    watch,
   } = props
   const { t } = useTranslation(['tooltip', 'modules', 'alert', 'button'])
   const selectedSlot = watch('selectedSlot')
   const selectedModel = watch('selectedModel')
-  const { field } = useController({
+  const validation = validator({ selectedModel, selectedSlot })
+  const { field, fieldState } = useController({
     name: 'selectedModel',
     control,
   })
-  console.log('field', field)
+
   const disabledModuleRestriction = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
@@ -313,11 +314,8 @@ const EditModulesModalComponent = (
     </div>
   )
 
+  const slotIssue = validation['selectedSlot'] != null
   const showSlotOption = moduleType !== THERMOCYCLER_MODULE_TYPE
-
-  // NOTE: selectedSlot error could either be required field (though the field is auto-populated)
-  // or occupied slot error. `slotIssue` is only for occupied slot error.
-  const slotIssue = 'required' in formState.errors
 
   const prevSelectedModel = usePrevious(selectedModel)
 
@@ -359,7 +357,7 @@ const EditModulesModalComponent = (
   return (
     <ModalShell width="48rem" paddingTop={SPACING.spacing32}>
       <Box paddingX={SPACING.spacing32}>
-      <Text as="h2">{t(`modules:module_long_names.${moduleType}`)}</Text>
+        <Text as="h2">{t(`modules:module_long_names.${moduleType}`)}</Text>
       </Box>
 
       <Box paddingX={SPACING.spacing32} paddingTop={SPACING.spacing16}>
@@ -371,22 +369,15 @@ const EditModulesModalComponent = (
           <Flex gridGap={SPACING.spacing8}>
             <FormGroup label="Model">
               <Box width="4rem">
-                <Controller
-                  name="selectedModel"
-                  control={control}
-                  defaultValue={formState.defaultValues?.selectedModel}
-                  render={({ field, fieldState }) => (
-                    <ModelDropdown
-                      fieldName="selectedModel"
-                      tabIndex={0}
-                      options={getModuleOptionsForRobotType(
-                        MODELS_FOR_MODULE_TYPE[moduleType],
-                        robotType
-                      )}
-                      field={field}
-                      fieldState={fieldState}
-                    />
+                <ModelDropdown
+                  fieldName="selectedModel"
+                  tabIndex={0}
+                  options={getModuleOptionsForRobotType(
+                    MODELS_FOR_MODULE_TYPE[moduleType],
+                    robotType
                   )}
+                  field={field}
+                  fieldState={fieldState}
                 />
               </Box>
             </FormGroup>
@@ -404,7 +395,6 @@ const EditModulesModalComponent = (
                       <Controller
                         name="selectedSlot"
                         control={control}
-                        defaultValue={formState.defaultValues?.selectedSlot}
                         render={({ field, fieldState }) => (
                           <SlotDropdown
                             fieldName="selectedSlot"
@@ -429,7 +419,7 @@ const EditModulesModalComponent = (
             {slotIssue ? (
               <PDAlert
                 alertType="warning"
-                title={t('alert:module_placement.SLOT_OCCUPIED.title')}
+                title={validation['selectedSlot']}
                 description={''}
               />
             ) : null}
@@ -440,7 +430,6 @@ const EditModulesModalComponent = (
           <Controller
             name="selectedSlot"
             control={control}
-            defaultValue={formState.defaultValues?.selectedSlot}
             render={({ field, fieldState }) =>
               moduleType === THERMOCYCLER_MODULE_TYPE ? (
                 <Flex
@@ -477,14 +466,14 @@ const EditModulesModalComponent = (
         paddingBottom={SPACING.spacing32}
       >
         <OutlineButton className={styles.button_margin} onClick={onCloseClick}>
-        {t('button:cancel')}
+          {t('button:cancel')}
         </OutlineButton>
         <OutlineButton
           className={styles.button_margin}
           disabled={!formState.isValid}
           type={BUTTON_TYPE_SUBMIT}
         >
-            {t('button:save')}
+          {t('button:save')}
         </OutlineButton>
       </Flex>
     </ModalShell>

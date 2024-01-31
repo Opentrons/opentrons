@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import mapValues from 'lodash/mapValues'
@@ -12,11 +12,11 @@ import {
   InstrumentGroup,
   OutlineButton,
   DeprecatedPrimaryButton,
+  InputField,
 } from '@opentrons/components'
 import { resetScrollElements } from '../ui/steps/utils'
 import { Portal } from './portals/MainPageModalPortal'
 import { EditModulesCard } from './modules'
-import { InputField } from './modals/CreateFileWizard/InputField'
 import { EditModules } from './EditModules'
 import { actions, selectors as fileSelectors } from '../file-data'
 import { actions as navActions } from '../navigation'
@@ -86,10 +86,17 @@ export const FilePage = (): JSX.Element => {
     handleSubmit,
     watch,
     register,
+    control,
     formState: { isDirty },
   } = useForm<FileMetadataFields>({ defaultValues: formValues })
 
-  const [created, lastModified] = watch(['created', 'lastModified'])
+  const [created, lastModified, protocolName, author, description] = watch([
+    'created',
+    'lastModified',
+    'protocolName',
+    'author',
+    'description',
+  ])
 
   return (
     <div className={styles.file_page}>
@@ -121,10 +128,17 @@ export const FilePage = (): JSX.Element => {
               label={t('application:protocol_name')}
               className={formStyles.column_1_2}
             >
-              <InputField
-                placeholder="Untitled"
-                fieldName="protocolName"
-                register={register}
+              <Controller
+                control={control}
+                name="protocolName"
+                render={({ field }) => (
+                  <InputField
+                    placeholder="Untitled"
+                    name="protocolName"
+                    value={protocolName}
+                    onChange={field.onChange}
+                  />
+                )}
               />
             </FormGroup>
 
@@ -132,7 +146,17 @@ export const FilePage = (): JSX.Element => {
               label={t('application:organization_author')}
               className={formStyles.column_1_2}
             >
-              <InputField fieldName="author" register={register} />
+              <Controller
+                control={control}
+                name="author"
+                render={({ field }) => (
+                  <InputField
+                    name="author"
+                    value={author}
+                    onChange={field.onChange}
+                  />
+                )}
+              />
             </FormGroup>
           </div>
 
@@ -140,7 +164,17 @@ export const FilePage = (): JSX.Element => {
             label={t('application:description')}
             className={formStyles.stacked_row}
           >
-            <InputField fieldName="description" register={register} />
+            <Controller
+              control={control}
+              name="description"
+              render={({ field }) => (
+                <InputField
+                  name="description"
+                  value={description}
+                  onChange={field.onChange}
+                />
+              )}
+            />
           </FormGroup>
           <div className={modalStyles.button_row}>
             <OutlineButton

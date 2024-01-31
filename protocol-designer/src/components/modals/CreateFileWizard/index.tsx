@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import reduce from 'lodash/reduce'
 import mapValues from 'lodash/mapValues'
-import { useForm, UseFormReturn } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import omit from 'lodash/omit'
 import uniq from 'lodash/uniq'
@@ -34,7 +34,6 @@ import {
   FormPipette,
   PipetteOnDeck,
 } from '../../../step-forms'
-import { i18n } from '../../../localization'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import { uuid } from '../../../utils'
 import { actions as navigationActions } from '../../../navigation'

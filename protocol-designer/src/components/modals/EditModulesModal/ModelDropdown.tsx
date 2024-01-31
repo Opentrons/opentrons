@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { DropdownField } from '@opentrons/components'
 import { ControllerFieldState, ControllerRenderProps } from 'react-hook-form'
+import { EditModulesFormValues } from './index'
 
 export interface ModelDropdownProps {
-  field: ControllerRenderProps<any, any>
+  field: ControllerRenderProps<EditModulesFormValues, "selectedModel">
   fieldState: ControllerFieldState
   fieldName: string
   tabIndex: number
