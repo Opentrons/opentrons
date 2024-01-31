@@ -37,7 +37,7 @@ dist:
 .PHONY: dev
 dev: export NODE_ENV := development
 dev:
-	webpack-dev-server --hot
+	webpack-dev-server --hot --host=::
 
 .PHONY: test
 test:
