@@ -58,12 +58,17 @@ for i in range(len(labware)):
     robot_labware["Robot"].extend([abr[i]] * len(labware[i]))
     robot_labware["Labware"].extend(labware[i])
 
+
 def get_user_input(list, some_string):
     variable = input(some_string)
     while variable not in list:
-        print(f"Your input was {variable}. Expected input is one of the following: {list}")
+        print(
+            f"Your input was {variable}. Expected input is one of the following: {list}"
+        )
         variable = input(some_string)
     return variable
+
+
 if __name__ == "__main__":
     try:
         # find port using known VID:PID, then connect
@@ -83,17 +88,27 @@ if __name__ == "__main__":
         grams, is_stable = scale.read_mass()
         print(f"Scale reading: grams={grams}, is_stable={is_stable}")
         # Get user input to label data entry correctly
-        scale_measurement = 'ABR-Liquids-'
+        scale_measurement = "ABR-Liquids-"
         robot_to_filter = get_user_input(robot_list, "Robot: ")
         test_type = get_user_input(test_type_list, "Test Type (E/P): ")
-        test_name = scale_measurement + robot_to_filter + '-' + test_type
+        test_name = scale_measurement + robot_to_filter + "-" + test_type
         run_id = data.create_run_id()
         filtered_robot_labware = {
-            "Robot": [robot for robot in robot_labware["Robot"] if robot.upper() == robot_to_filter.upper()],
-            "Labware": [labware for i, labware in enumerate(robot_labware["Labware"]) if robot_labware["Robot"][i].upper() == robot_to_filter.upper()]
+            "Robot": [
+                robot
+                for robot in robot_labware["Robot"]
+                if robot.upper() == robot_to_filter.upper()
+            ],
+            "Labware": [
+                labware
+                for i, labware in enumerate(robot_labware["Labware"])
+                if robot_labware["Robot"][i].upper() == robot_to_filter.upper()
+            ],
         }
-        labware_list = filtered_robot_labware['Labware']
-        labware = get_user_input(labware_list, f"Labware, Expected Values: {labware_list}: ")
+        labware_list = filtered_robot_labware["Labware"]
+        labware = get_user_input(
+            labware_list, f"Labware, Expected Values: {labware_list}: "
+        )
         step = get_user_input(step_list, "Testing Step (1, 2, 3): ")
         # Set up .csv file
         tag = labware + "-" + str(step)
@@ -107,22 +122,24 @@ if __name__ == "__main__":
         is_stable = "False"
         grams = 0
         print(is_stable, grams)
-        while not(is_stable == "True"):
+        while not (is_stable == "True"):
             grams, is_stable = scale.read_mass()
             print(f"Scale reading: grams={grams}, is_stable={is_stable}")
             time_now = datetime.datetime.now()
             row = [time_now, labware, step, robot_to_filter, grams, is_stable]
             results_list.append(row)
             if bool(is_stable) == 1:
-                print("is stable")  
+                print("is stable")
                 break
         result_string = ""
         for sublist in results_list:
             row_str = ", ".join(map(str, sublist)) + "\n"
             result_string += row_str
-        file_path = data.append_data_to_file(test_name, run_id, file_name, result_string)
+        file_path = data.append_data_to_file(
+            test_name, run_id, file_name, result_string
+        )
         if os.path.exists(file_path):
-            print('File saved')
+            print("File saved")
             with open(file_path, "r") as file:
                 line_count = sum(1 for line in file)
                 if line_count < 2:
