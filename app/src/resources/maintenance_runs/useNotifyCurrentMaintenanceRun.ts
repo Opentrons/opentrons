@@ -18,7 +18,7 @@ export function useNotifyCurrentMaintenanceRun(
     notifyQueryResponse,
     isNotifyError,
   } = useNotifyService<MaintenanceRun>({
-    topic: 'robot-server/maintenance_runs',
+    topic: 'robot-server/maintenance_runs/current_run',
     queryKey: [host, 'maintenance_runs', 'current_run'],
     refetchUsingHTTP: () => setRefetchUsingHTTP(true),
     options: {
