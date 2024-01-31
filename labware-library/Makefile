@@ -45,7 +45,7 @@ serve: all
 test-e2e:
 	concurrently --no-color --kill-others --success first --names "labware-library-server,labware-library-tests" \
 	"$(MAKE) dev CYPRESS=1 GTM_ID=''" \
-	"wait-on http://localhost:8080/ && cypress run --browser chrome --headless --record false"
+	"wait-on http://localhost:8080/ && echo \"Running cypress at $(date)\" && cypress run --browser chrome --headless --record false"
 
 # unit tests
 .PHONY: test
