@@ -1,8 +1,9 @@
 from ast import Try
-import sys, os, time, datetime
+import os, datetime
 from hardware_testing import data
 from hardware_testing.drivers import find_port
 from hardware_testing.drivers.radwag import RadwagScale
+from typing import Dict, List
 
 ### VARIABLES ###
 # Test Variables
@@ -53,13 +54,13 @@ labware = [
     labware_PVT1ABR7,
 ]
 abr = ["DVT1ABR4", "PVT1ABR9", "PVT1ABR10", "PVT1ABR11", "DVT1ABR3", "PVT1ABR7"]
-robot_labware = {"Robot": [], "Labware": []}
+robot_labware: Dict[str, List[str]] = {"Robot": [], "Labware": []}
 for i in range(len(labware)):
     robot_labware["Robot"].extend([abr[i]] * len(labware[i]))
     robot_labware["Labware"].extend(labware[i])
 
 
-def get_user_input(list, some_string):
+def get_user_input(list, some_string) -> str:
     variable = input(some_string)
     while variable not in list:
         print(
@@ -100,18 +101,18 @@ if __name__ == "__main__":
                 if robot.upper() == robot_to_filter.upper()
             ],
             "Labware": [
-                labware
-                for i, labware in enumerate(robot_labware["Labware"])
+                labware1
+                for i, labware1 in enumerate(robot_labware["Labware"])
                 if robot_labware["Robot"][i].upper() == robot_to_filter.upper()
             ],
         }
         labware_list = filtered_robot_labware["Labware"]
-        labware = get_user_input(
+        l = get_user_input(
             labware_list, f"Labware, Expected Values: {labware_list}: "
         )
         step = get_user_input(step_list, "Testing Step (1, 2, 3): ")
         # Set up .csv file
-        tag = labware + "-" + str(step)
+        tag = l + "-" + str(step)
         file_name = data.create_file_name(test_name, run_id, tag)
         header = ["Date", "Labware", "Step", "Robot", "Scale Reading", "Stable"]
         header_str = ",".join(header) + "\n"
@@ -119,16 +120,13 @@ if __name__ == "__main__":
             test_name=test_name, run_id=run_id, file_name=file_name, data=header_str
         )
         results_list = []
-        is_stable = "False"
-        grams = 0
-        print(is_stable, grams)
-        while not (is_stable == "True"):
+        while not (is_stable == True):
             grams, is_stable = scale.read_mass()
             print(f"Scale reading: grams={grams}, is_stable={is_stable}")
             time_now = datetime.datetime.now()
             row = [time_now, labware, step, robot_to_filter, grams, is_stable]
             results_list.append(row)
-            if bool(is_stable) == 1:
+            if is_stable:
                 print("is stable")
                 break
         result_string = ""
@@ -146,10 +144,6 @@ if __name__ == "__main__":
                     print(f"Line count is {line_count}. Check file.")
         else:
             print("File did not save.")
-        grams = 0
-        is_stable = "False"
+    finally:
         scale.disconnect()
-    except Exception:
-        scale.disconnect()
-    except KeyboardInterrupt:
-        scale.disconnect()
+

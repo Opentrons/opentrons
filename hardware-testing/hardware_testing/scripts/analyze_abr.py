@@ -1,5 +1,5 @@
 from ast import Try
-import sys, os, time, datetime
+import sys, os, time
 from datetime import datetime
 from hardware_testing import data
 import csv
@@ -45,10 +45,10 @@ if __name__ == "__main__":
         sample = raw_data_file_csv.split("_")[-1].split("-")[0]
         raw_data_file_csv_path = os.path.join(raw_data_folder, raw_data_file_csv)
         try:
-            with open(raw_data_file_csv_path, "r") as file:
+            with open(raw_data_file_csv_path, "r") as f:
                 # Read or process the file here
                 print("read")
-                lines = file.readlines()
+                lines = f.readlines()
                 if lines:
                     # Get the last line
                     last_line = lines[-1].strip()
