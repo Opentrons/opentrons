@@ -183,6 +183,10 @@ class _FrontButtonLightBlinker:
 
 
 def fbl_init(app_state: AppState) -> None:
+    """Prepare to blink the OT-2's front button light.
+
+    This should be called once during server startup.
+    """
     if should_use_ot3():
         # This is only for the OT-2's front button light.
         # The Flex's status bar is handled elsewhere -- see LightController.
@@ -190,11 +194,11 @@ def fbl_init(app_state: AppState) -> None:
     _front_button_light_blinker_accessor.set_on(app_state, _FrontButtonLightBlinker())
 
 
-async def fbl_set_hardware(app_state: AppState, hardware: HardwareControlAPI) -> None:
+async def fbl_start_blinking(app_state: AppState, hardware: HardwareControlAPI) -> None:
     """Start blinking the OT-2's front button light.
 
-    This is intended to be called during server startup, while slow things like homing
-    and database initialization are ongoing.
+    This should be called once during server startup, as soon as the hardware is
+    initialized enough to support the front button light.
 
     Note that this is preceded by two other visually indistinguishable stages of
     blinking:
@@ -202,6 +206,9 @@ async def fbl_set_hardware(app_state: AppState, hardware: HardwareControlAPI) ->
        interpreter is initializing.
     2. build_hardware_controller() blinks the light internally while it's doing hardware
        initialization.
+
+    Blinking will continue until `fbl_mark_hardware_init_complete()` and
+    `fbl_mark_persistence_init_complete()` have both been called.
     """
     blinker = _front_button_light_blinker_accessor.get_from(app_state)
     if blinker is not None:  # May be None on a Flex.
@@ -211,19 +218,14 @@ async def fbl_set_hardware(app_state: AppState, hardware: HardwareControlAPI) ->
 async def fbl_mark_hardware_init_complete(
     app_state: AppState, hardware: HardwareControlAPI
 ) -> None:
-    """Mark hardware initialization as having completed, for the purposes of blinking
-    the OT-2's front button light.
-
-    We stop blinking the light when all the slow parts of server startup have
-    completed.
-    """
+    """See `fbl_start_blinking()`."""
     blinker = _front_button_light_blinker_accessor.get_from(app_state)
     if blinker is not None:  # May be None on a Flex.
         await blinker.mark_hardware_init_complete()
 
 
 async def fbl_mark_persistence_init_complete(app_state: AppState) -> None:
-    """See `fbl_mark_hardware_init_complete()`."""
+    """See `fbl_start_blinking()`."""
     blinker = _front_button_light_blinker_accessor.get_from(app_state)
     if blinker is not None:  # May be None on a Flex.
         await blinker.mark_persistence_init_complete()
