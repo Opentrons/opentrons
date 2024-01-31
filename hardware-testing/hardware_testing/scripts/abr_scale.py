@@ -107,9 +107,7 @@ if __name__ == "__main__":
             ],
         }
         labware_list = filtered_robot_labware["Labware"]
-        l = get_user_input(
-            labware_list, f"Labware, Expected Values: {labware_list}: "
-        )
+        l = get_user_input(labware_list, f"Labware, Expected Values: {labware_list}: ")
         step = get_user_input(step_list, "Testing Step (1, 2, 3): ")
         # Set up .csv file
         tag = l + "-" + str(step)
@@ -146,4 +144,3 @@ if __name__ == "__main__":
             print("File did not save.")
     finally:
         scale.disconnect()
-
