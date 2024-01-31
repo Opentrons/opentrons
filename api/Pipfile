@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-jsonschema = "==4.21.1"
+jsonschema = "==4.17.3"
 pydantic = "==1.10.12"
 anyio = "==3.7.1"
 opentrons-shared-data = { editable = true, path = "../shared-data/python" }
