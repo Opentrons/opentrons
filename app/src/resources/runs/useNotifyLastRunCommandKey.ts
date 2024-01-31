@@ -40,5 +40,5 @@ export function useNotifyLastRunCommandKey(
     onSettled: isNotifyEnabled ? () => setRefetchUsingHTTP(false) : undefined,
   })
 
-  return isHTTPEnabled ? notifyQueryResponseData : httpResponse
+  return isHTTPEnabled ? httpResponse : notifyQueryResponseData
 }
