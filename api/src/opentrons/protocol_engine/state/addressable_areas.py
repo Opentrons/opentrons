@@ -460,17 +460,23 @@ class AddressableAreaView(HasState[AddressableAreaState]):
             z=position.z,
         )
 
-    def get_fixture_by_deck_slot_name(self, slot_name: DeckSlotName) -> (str | None):
-        """Get the Cutout Fixture ID of a fixture currently loaded into a specific Deck Slot, if one exists."""
-        for cutout in CUTOUT_TO_DECK_SLOT_MAP:
-            if CUTOUT_TO_DECK_SLOT_MAP[cutout] == slot_name:
-                deck_config = (
-                    self.state.deck_configuration
-                )  # we need to use that get cutout fixture by id thing
-                if deck_config:
-                    for deck_item in deck_config:
-                        if cutout in deck_item:
-                            return deck_item[1]
+    def get_fixture_by_deck_slot_name(
+        self, slot_name: DeckSlotName
+    ) -> Optional[PotentialCutoutFixture]:
+        """Get the Potential Cutout Fixture of a fixture currently loaded into a specific Deck Slot."""
+        deck_config = self.state.deck_configuration
+        potential_fixtures = self.state.potential_cutout_fixtures_by_cutout_id
+        if deck_config:
+            cutout_id = list(CUTOUT_TO_DECK_SLOT_MAP.keys())[
+                list(CUTOUT_TO_DECK_SLOT_MAP.values()).index(slot_name)
+            ]
+            deck_items = {
+                deck_item for deck_item in deck_config if cutout_id in deck_item
+            }
+            for item in deck_items:
+                for fixture in potential_fixtures[cutout_id]:
+                    if fixture.cutout_fixture_id == item[1]:
+                        return fixture
         return None
 
     def get_fixture_height(self, cutout_fixture_name: str) -> float:
