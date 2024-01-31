@@ -4,14 +4,13 @@ import logging
 from pathlib import Path
 from fastapi import Depends, status
 from typing import (
-    Callable,
-    Optional,
-    Union,
     TYPE_CHECKING,
     cast,
     Awaitable,
+    Callable,
     Iterator,
     Iterable,
+    Optional,
     Tuple,
 )
 from uuid import uuid4  # direct to avoid import cycles in service.dependencies
@@ -31,20 +30,11 @@ from opentrons.config import (
 from opentrons.util.helpers import utc_now
 from opentrons.hardware_control import ThreadManagedHardware, HardwareControlAPI, API
 from opentrons.hardware_control.simulator_setup import load_simulator_thread_manager
-from opentrons.hardware_control.types import (
-    HardwareEvent,
-    DoorStateNotification,
-    StatusBarState,
-)
+from opentrons.hardware_control.types import StatusBarState
 from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )
 from opentrons.protocol_engine import DeckType
-
-from notify_server.clients import publisher
-from notify_server.settings import Settings as NotifyServerSettings
-from notify_server.models import event, topics
-from notify_server.models.hardware_event import DoorStatePayload
 
 from server_utils.fastapi_utils.app_state import (
     AppState,
@@ -89,9 +79,6 @@ _front_button_light_blinker_accessor = AppStateAccessor["_FrontButtonLightBlinke
 _postinit_task_accessor = AppStateAccessor["asyncio.Task[None]"](
     "hardware_postinit_task"
 )
-_event_unsubscribe_accessor = AppStateAccessor[Callable[[], None]](
-    "hardware_event_unsubscribe"
-)
 _firmware_update_manager_accessor = AppStateAccessor[FirmwareUpdateManager](
     "firmware_update_manager"
 )
@@ -126,12 +113,10 @@ async def clean_up_hardware(app_state: AppState) -> None:
     """Shutdown the HardwareAPI singleton and remove it from global state."""
     initialize_task = _init_task_accessor.get_from(app_state)
     thread_manager = _hw_api_accessor.get_from(app_state)
-    unsubscribe_from_events = _event_unsubscribe_accessor.get_from(app_state)
     postinit_task = _postinit_task_accessor.get_from(app_state)
     _init_task_accessor.set_on(app_state, None)
     _postinit_task_accessor.set_on(app_state, None)
     _hw_api_accessor.set_on(app_state, None)
-    _event_unsubscribe_accessor.set_on(app_state, None)
 
     if initialize_task is not None:
         initialize_task.cancel()
@@ -141,9 +126,6 @@ async def clean_up_hardware(app_state: AppState) -> None:
     if postinit_task is not None:
         postinit_task.cancel()
         await asyncio.gather(postinit_task, return_exceptions=True)
-
-    if unsubscribe_from_events is not None:
-        unsubscribe_from_events()
 
     if thread_manager is not None:
         thread_manager.clean_up()
@@ -607,7 +589,6 @@ async def _initialize_hardware_api(
                 app_state, app_settings, systemd_available
             )
 
-        _initialize_event_watchers(app_state, hardware)
         _hw_api_accessor.set_on(app_state, hardware)
 
         for callback in callbacks:
@@ -647,32 +628,3 @@ async def _initialize_hardware_api(
         # should be removed,
         log.exception("Exception during hardware background initialization.")
         raise
-
-
-# TODO(mc, 2021-09-01): if we're ever going to actually use the notification
-# server, this logic needs to be in its own unit and not tucked away here in
-# test-less wrapper module
-def _initialize_event_watchers(
-    app_state: AppState,
-    hardware_api: ThreadManagedHardware,
-) -> None:
-    """Initialize notification publishing for hardware events."""
-    notify_server_settings = NotifyServerSettings()
-    hw_event_publisher = publisher.create(
-        notify_server_settings.publisher_address.connection_string()
-    )
-
-    def _publish_hardware_event(hw_event: Union[str, HardwareEvent]) -> None:
-        if isinstance(hw_event, DoorStateNotification):
-            payload = DoorStatePayload(state=hw_event.new_state)
-        else:
-            return
-
-        topic = topics.RobotEventTopics.HARDWARE_EVENTS
-        hw_event_publisher.send_nowait(
-            topic,
-            event.Event(createdOn=utc_now(), publisher=__name__, data=payload),
-        )
-
-    unsubscribe = hardware_api.register_callback(_publish_hardware_event)
-    _event_unsubscribe_accessor.set_on(app_state, unsubscribe)

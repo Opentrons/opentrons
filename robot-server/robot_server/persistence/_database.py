@@ -5,8 +5,8 @@ import sqlalchemy
 
 from server_utils import sql_utils
 
-from ._tables import add_tables_to_db
-from ._migrations import migrate
+from ._tables import schema_2, schema_3
+from ._migrations.up_to_2 import migrate
 
 
 # A reference to SQLite's built-in ROWID column.
@@ -24,8 +24,10 @@ from ._migrations import migrate
 sqlite_rowid = sqlalchemy.column("_ROWID_")
 
 
-def create_sql_engine(path: Path) -> sqlalchemy.engine.Engine:
-    """Create a SQL engine with tables and migrations.
+def create_schema_2_sql_engine(path: Path) -> sqlalchemy.engine.Engine:
+    """Create a SQL engine for a schema 2 database.
+
+    If provided a schema 0 or 1 database, this will migrate it in-place to schema 2.
 
     Warning:
         Migrations can take several minutes. If calling this from an async function,
@@ -36,8 +38,29 @@ def create_sql_engine(path: Path) -> sqlalchemy.engine.Engine:
     try:
         sql_utils.enable_foreign_key_constraints(sql_engine)
         sql_utils.fix_transactions(sql_engine)
-        add_tables_to_db(sql_engine)
+        schema_2.metadata.create_all(sql_engine)
+
         migrate(sql_engine)
+
+    except Exception:
+        sql_engine.dispose()
+        raise
+
+    return sql_engine
+
+
+def create_schema_3_sql_engine(path: Path) -> sqlalchemy.engine.Engine:
+    """Create a SQL engine for a schema 3 database.
+
+    Unlike `create_schema_2_sql_engine()`, this assumes the database is already
+    at schema 3. Migration is done through other mechanisms.
+    """
+    sql_engine = sqlalchemy.create_engine(sql_utils.get_connection_url(path))
+
+    try:
+        sql_utils.enable_foreign_key_constraints(sql_engine)
+        sql_utils.fix_transactions(sql_engine)
+        schema_3.metadata.create_all(sql_engine)
 
     except Exception:
         sql_engine.dispose()

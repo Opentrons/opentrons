@@ -1,27 +1,14 @@
-"""SQLite table schemas."""
+"""v3 of our SQLite schema."""
+
 import sqlalchemy
 
-from . import legacy_pickle
-from .pickle_protocol_version import PICKLE_PROTOCOL_VERSION
-from ._utc_datetime import UTCDateTime
+from robot_server.persistence._utc_datetime import UTCDateTime
 
-_metadata = sqlalchemy.MetaData()
-
-migration_table = sqlalchemy.Table(
-    "migration",
-    _metadata,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("created_at", UTCDateTime, nullable=False),
-    sqlalchemy.Column(
-        "version",
-        sqlalchemy.Integer,
-        nullable=False,
-    ),
-)
+metadata = sqlalchemy.MetaData()
 
 protocol_table = sqlalchemy.Table(
     "protocol",
-    _metadata,
+    metadata,
     sqlalchemy.Column(
         "id",
         sqlalchemy.String,
@@ -37,7 +24,7 @@ protocol_table = sqlalchemy.Table(
 
 analysis_table = sqlalchemy.Table(
     "analysis",
-    _metadata,
+    metadata,
     sqlalchemy.Column(
         "id",
         sqlalchemy.String,
@@ -57,25 +44,15 @@ analysis_table = sqlalchemy.Table(
     ),
     sqlalchemy.Column(
         "completed_analysis",
-        # Stores a pickled dict. See CompletedAnalysisStore.
-        # TODO(mm, 2023-08-30): Remove this. See https://opentrons.atlassian.net/browse/RSS-98.
-        sqlalchemy.LargeBinary,
-        nullable=False,
-    ),
-    sqlalchemy.Column(
-        "completed_analysis_as_document",
-        # Stores the same data as completed_analysis, but serialized as a JSON string.
+        # Stores a JSON string. See CompletedAnalysisStore.
         sqlalchemy.String,
-        # This column should never be NULL in practice.
-        # It needs to be nullable=True because of limitations in SQLite and our migration code.
-        nullable=True,
+        nullable=False,
     ),
 )
 
-
 run_table = sqlalchemy.Table(
     "run",
-    _metadata,
+    metadata,
     sqlalchemy.Column(
         "id",
         sqlalchemy.String,
@@ -95,13 +72,7 @@ run_table = sqlalchemy.Table(
     # column added in schema v1
     sqlalchemy.Column(
         "state_summary",
-        sqlalchemy.PickleType(pickler=legacy_pickle, protocol=PICKLE_PROTOCOL_VERSION),
-        nullable=True,
-    ),
-    # column added in schema v1
-    sqlalchemy.Column(
-        "commands",
-        sqlalchemy.PickleType(pickler=legacy_pickle, protocol=PICKLE_PROTOCOL_VERSION),
+        sqlalchemy.String,
         nullable=True,
     ),
     # column added in schema v1
@@ -112,7 +83,7 @@ run_table = sqlalchemy.Table(
 
 action_table = sqlalchemy.Table(
     "action",
-    _metadata,
+    metadata,
     sqlalchemy.Column(
         "id",
         sqlalchemy.String,
@@ -128,11 +99,26 @@ action_table = sqlalchemy.Table(
     ),
 )
 
-
-def add_tables_to_db(sql_engine: sqlalchemy.engine.Engine) -> None:
-    """Create the necessary database tables to back all data stores.
-
-    Params:
-        sql_engine: An engine for a blank SQL database, to put the tables in.
-    """
-    _metadata.create_all(sql_engine)
+run_command_table = sqlalchemy.Table(
+    "run_command",
+    metadata,
+    sqlalchemy.Column("row_id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column(
+        "run_id", sqlalchemy.String, sqlalchemy.ForeignKey("run.id"), nullable=False
+    ),
+    sqlalchemy.Column("index_in_run", sqlalchemy.Integer, nullable=False),
+    sqlalchemy.Column("command_id", sqlalchemy.String, nullable=False),
+    sqlalchemy.Column("command", sqlalchemy.String, nullable=False),
+    sqlalchemy.Index(
+        "ix_run_run_id_command_id",  # An arbitrary name for the index.
+        "run_id",
+        "command_id",
+        unique=True,
+    ),
+    sqlalchemy.Index(
+        "ix_run_run_id_index_in_run",  # An arbitrary name for the index.
+        "run_id",
+        "index_in_run",
+        unique=True,
+    ),
+)

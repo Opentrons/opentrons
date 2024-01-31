@@ -80,6 +80,7 @@ SUBSYSTEM_NODEID: Dict[SubSystem, NodeId] = {
     SubSystem.pipette_left: NodeId.pipette_left,
     SubSystem.pipette_right: NodeId.pipette_right,
     SubSystem.gripper: NodeId.gripper,
+    SubSystem.hepa_uv: NodeId.hepa_uv,
 }
 
 NODEID_SUBSYSTEM = {node: subsystem for subsystem, node in SUBSYSTEM_NODEID.items()}

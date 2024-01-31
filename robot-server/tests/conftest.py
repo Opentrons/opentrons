@@ -40,7 +40,7 @@ from robot_server import app
 from robot_server.hardware import get_hardware, get_ot2_hardware
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
 from robot_server.service.session.manager import SessionManager
-from robot_server.persistence import get_sql_engine, create_sql_engine
+from robot_server.persistence import get_sql_engine, create_schema_3_sql_engine
 from robot_server.health.router import ComponentVersions, get_versions
 
 test_router = routing.APIRouter()
@@ -389,6 +389,6 @@ def clear_custom_tiprack_def_dir() -> Iterator[None]:
 def sql_engine(tmp_path: Path) -> Generator[SQLEngine, None, None]:
     """Return a set-up database to back the store."""
     db_file_path = tmp_path / "test.db"
-    sql_engine = create_sql_engine(db_file_path)
+    sql_engine = create_schema_3_sql_engine(db_file_path)
     yield sql_engine
     sql_engine.dispose()

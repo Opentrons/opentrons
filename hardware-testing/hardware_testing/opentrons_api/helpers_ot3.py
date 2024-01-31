@@ -600,6 +600,11 @@ async def move_plunger_absolute_ot3(
             await _move_coro
 
 
+async def home_tip_motors(api: OT3API, back_off: bool = True) -> None:
+    """Homes the tip motors with backoff option broken out."""
+    await api._backend.home_tip_motors(distance=50, velocity=5, back_off=back_off)
+
+
 async def move_tip_motor_relative_ot3(
     api: OT3API,
     distance: float,

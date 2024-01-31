@@ -16,6 +16,7 @@ import { TYPOGRAPHY, SPACING } from '../../ui-style-constants'
 import { COLORS } from '../../helix-design-system'
 
 const labwareDisplayNameStyle = css`
+  ${TYPOGRAPHY.labelSemiBold}
   overflow: hidden;
   white-space: initial;
   text-overflow: ellipsis;
