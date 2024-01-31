@@ -94,9 +94,7 @@ class RadwagScale(RadwagScaleBase):
     def __init__(self, connection: Serial) -> None:
         """Constructor."""
         self._connection = connection
-        # _raw_file_path = get_testing_data_directory()
         _raw_file_path = get_testing_data_directory() / "scale_raw.txt"
-
         self._raw_log = open(_raw_file_path, "w")
 
     @classmethod

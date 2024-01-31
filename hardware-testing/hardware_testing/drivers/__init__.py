@@ -29,7 +29,6 @@ def list_ports_and_select(device_name: str = "") -> str:
 def find_port(vid: int, pid: int) -> str:
     """Find COM port from provided VIP:PID."""
     for port in comports():
-        print(port.device, port.pid, port.vid)
         if port.pid == pid and port.vid == vid:
             return port.device
     raise RuntimeError(f"Unable to find serial " f"port for VID:PID={vid}:{pid}")
