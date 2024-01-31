@@ -144,10 +144,11 @@ class _FrontButtonLightBlinker:
         assert self._hardware_and_task is None, "hardware should only be set once."
 
         async def blink_forever() -> None:
-            await hardware.set_lights(button=True)
-            await asyncio.sleep(0.5)
-            await hardware.set_lights(button=False)
-            await asyncio.sleep(0.5)
+            while True:
+                await hardware.set_lights(button=True)
+                await asyncio.sleep(0.5)
+                await hardware.set_lights(button=False)
+                await asyncio.sleep(0.5)
 
         task = asyncio.create_task(blink_forever())
 
