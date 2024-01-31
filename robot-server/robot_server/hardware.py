@@ -16,7 +16,7 @@ from typing import (
 )
 from uuid import uuid4  # direct to avoid import cycles in service.dependencies
 from traceback import format_exception_only, TracebackException
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 
 from opentrons_shared_data import deck
 from opentrons_shared_data.robot.dev_types import RobotType, RobotTypeEnum
@@ -154,6 +154,8 @@ class _FrontButtonLightBlinker:
     def __init__(self, hardware: HardwareControlAPI) -> None:
         self._hardware = hardware
         self._task: "Optional[asyncio.Task[None]]" = None
+        self._hardware_init_complete = False
+        self._persistence_init_complete = False
 
     def start(self) -> None:
         if self._task is None:
@@ -166,20 +168,33 @@ class _FrontButtonLightBlinker:
 
             self._task = asyncio.create_task(blink_forever())
 
-    async def stop(self) -> None:
+    async def mark_hardware_init_complete(self) -> None:
+        self._hardware_init_complete = True
+        await self._maybe_stop_blinking()
+
+    async def mark_persistence_init_complete(self) -> None:
+        self._persistence_init_complete = True
+        await self._maybe_stop_blinking()
+
+    async def clean_up(self) -> None:
         if self._task is not None:
             self._task.cancel()
-            try:
+            with suppress(asyncio.CancelledError):
                 await self._task
-            except asyncio.CancelledError:
-                pass
-            self._task = None
+
+    async def _maybe_stop_blinking(self) -> None:
+        if (
+            self._task is not None
+            and self._hardware_init_complete
+            and self._persistence_init_complete
+        ):
+            self._task.cancel()
+            with suppress(asyncio.CancelledError):
+                await self._task
             await self._hardware.set_lights(button=True)
 
 
-async def start_blinking_front_button_light(
-    app_state: AppState, hardware: HardwareControlAPI
-) -> None:
+async def fbl_start_blinking(app_state: AppState, hardware: HardwareControlAPI) -> None:
     """Start blinking the OT-2's front button light.
 
     This is intended to be called during server startup, while slow things like homing
@@ -202,11 +217,36 @@ async def start_blinking_front_button_light(
     blinker.start()
 
 
-async def stop_blinking_front_button_light(app_state: AppState) -> None:
-    """Stop blinking the OT-2's front button light."""
+async def fbl_mark_hardware_init_complete(
+    app_state: AppState, hardware: HardwareControlAPI
+) -> None:
+    """Mark hardware initialization as having completed, for the purposes of blinking
+    the OT-2's front button light.
+
+    We stop blinking the light when all the slow parts of server startup have
+    completed.
+    """
+    blinker = _front_button_light_blinker_accessor.get_from(app_state)
+    assert (
+        blinker is not None
+    ), "Front button light blinker was not initialized. Forgot to initialize it during server startup?"
+    await blinker.mark_hardware_init_complete()
+
+
+async def fbl_mark_persistence_init_complete(app_state: AppState) -> None:
+    """See `fbl_mark_hardware_init_complete()`."""
+    blinker = _front_button_light_blinker_accessor.get_from(app_state)
+    assert (
+        blinker is not None
+    ), "Front button light blinker was not initialized. Forgot to initialize it during server startup?"
+    await blinker.mark_persistence_init_complete()
+
+
+async def fbl_clean_up(app_state: AppState) -> None:
+    """Clean up the background task that blinks the OT-2's front button light."""
     blinker = _front_button_light_blinker_accessor.get_from(app_state)
     if blinker is not None:
-        await blinker.stop()
+        await blinker.clean_up()
 
 
 # TODO(mm, 2022-10-18): Deduplicate this background initialization infrastructure

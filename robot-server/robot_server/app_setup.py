@@ -11,10 +11,12 @@ from opentrons import __version__
 
 from .errors import exception_handlers
 from .hardware import (
+    fbl_mark_hardware_init_complete,
+    fbl_mark_persistence_init_complete,
     start_initializing_hardware,
     clean_up_hardware,
-    start_blinking_front_button_light,
-    stop_blinking_front_button_light,
+    fbl_start_blinking,
+    fbl_clean_up,
 )
 from .persistence import start_initializing_persistence, clean_up_persistence
 from .router import router
@@ -83,13 +85,14 @@ async def on_startup() -> None:
             (start_light_control_task, True),
             (mark_light_control_startup_finished, False),
             # OT-2 light control:
-            (start_blinking_front_button_light, True),
+            (fbl_start_blinking, True),
+            (fbl_mark_hardware_init_complete, False),
         ],
     )
     start_initializing_persistence(
         app_state=app.state,
         persistence_directory_root=persistence_directory,
-        done_callbacks=[stop_blinking_front_button_light],
+        done_callbacks=[fbl_mark_persistence_init_complete],
     )
     initialize_notification_client(
         app_state=app.state,
@@ -99,7 +102,12 @@ async def on_startup() -> None:
 @app.on_event("shutdown")
 async def on_shutdown() -> None:
     """Handle app shutdown."""
+    # FIXME(mm, 2024-01-31): Cleaning up everything concurrently like this is prone to
+    # race conditions, e.g if we clean up hardware before we clean up the background
+    # task that's blinking the front button light (which uses the hardware).
+    # Startup and shutdown should be in FILO order.
     shutdown_results = await asyncio.gather(
+        fbl_clean_up(app.state),
         clean_up_hardware(app.state),
         clean_up_persistence(app.state),
         clean_up_task_runner(app.state),
