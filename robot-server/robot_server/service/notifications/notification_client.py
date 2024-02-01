@@ -118,7 +118,13 @@ class NotificationClient:  # noqa: D101
         else:
             log.info(f"Failed to connect to MQTT broker with reason code: {rc}")
 
-    def _on_disconnect(self, client: mqtt.Client, userdata: Any, rc: int) -> None:
+    def _on_disconnect(
+        self,
+        client: mqtt.Client,
+        userdata: Any,
+        rc: int,
+        properties: Optional[mqtt.Properties] = None,
+    ) -> None:
         """Callback invoked when the client is disconnected from the MQTT broker.
 
         Args:

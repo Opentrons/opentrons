@@ -15,6 +15,7 @@ from opentrons.protocol_engine.commands import Command
 
 from robot_server.persistence import run_table, action_table, sqlite_rowid
 from robot_server.protocols import ProtocolNotFoundError
+from robot_server.service.notifications import RunsPublisher
 
 from .action_models import RunAction, RunActionType
 from .run_models import RunNotFoundError
@@ -49,9 +50,14 @@ class CommandNotFoundError(ValueError):
 class RunStore:
     """Methods for storing and retrieving run resources."""
 
-    def __init__(self, sql_engine: sqlalchemy.engine.Engine) -> None:
-        """Initialize a RunStore with sql engine."""
+    def __init__(
+        self,
+        sql_engine: sqlalchemy.engine.Engine,
+        runs_publisher: RunsPublisher,
+    ) -> None:
+        """Initialize a RunStore with sql engine and notification client."""
         self._sql_engine = sql_engine
+        self._runs_publisher = runs_publisher
 
     def update_run_state(
         self,
@@ -103,6 +109,7 @@ class RunStore:
             action_rows = transaction.execute(select_actions).all()
 
         self._clear_caches()
+        self._runs_publisher.publish_runs(run_id=run_id)
         return _convert_row_to_run(row=run_row, action_rows=action_rows)
 
     def insert_action(self, run_id: str, action: RunAction) -> None:
@@ -126,6 +133,7 @@ class RunStore:
                 raise RunNotFoundError(run_id=run_id) from e
 
         self._clear_caches()
+        self._runs_publisher.publish_runs(run_id=run_id)
 
     def insert(
         self,
@@ -167,6 +175,7 @@ class RunStore:
                 raise ProtocolNotFoundError(protocol_id=run.protocol_id)
 
         self._clear_caches()
+        self._runs_publisher.publish_runs(run_id=run_id)
         return run
 
     @lru_cache(maxsize=_CACHE_ENTRIES)

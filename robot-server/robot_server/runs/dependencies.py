@@ -43,12 +43,13 @@ _light_control_accessor = AppStateAccessor[LightController]("light_controller")
 async def get_run_store(
     app_state: AppState = Depends(get_app_state),
     sql_engine: SQLEngine = Depends(get_sql_engine),
+    runs_publisher: RunsPublisher = Depends(get_runs_publisher),
 ) -> RunStore:
     """Get a singleton RunStore to keep track of created runs."""
     run_store = _run_store_accessor.get_from(app_state)
 
     if run_store is None:
-        run_store = RunStore(sql_engine=sql_engine)
+        run_store = RunStore(sql_engine=sql_engine, runs_publisher=runs_publisher)
         _run_store_accessor.set_on(app_state, run_store)
 
     return run_store

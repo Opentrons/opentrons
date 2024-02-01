@@ -44,6 +44,10 @@ class RunsPublisher:
         self._run_data_manager_polling.set()
         await self.publish_async(topic=Topics.RUNS_CURRENT_COMMAND.value)
 
+    def publish_runs(self, run_id: str):
+        self._client.publish(topic=Topics.RUNS.value)
+        self._client.publish(topic=f"{Topics.RUNS.value}/{run_id}")
+
     async def _poll_engine_store(
         self,
         get_current_command: Callable[[str], Optional[CurrentCommand]],
