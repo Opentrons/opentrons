@@ -30,13 +30,16 @@ import {
   ANALYTICS_PROTOCOL_RUN_PAUSE,
 } from '../../../redux/analytics'
 
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  RobotType,
+} from '@opentrons/shared-data'
 import type { RunStatus } from '@opentrons/api-client'
 import type { TrackProtocolRunEvent } from '../../Devices/hooks'
 import type { RobotAnalyticsData } from '../../../redux/analytics/types'
 
 const TITLE_TEXT_STYLE = css`
-  color: ${COLORS.darkBlack70};
+  color: ${COLORS.grey60};
   font-size: ${TYPOGRAPHY.fontSize28};
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   line-height: ${TYPOGRAPHY.lineHeight36};
@@ -69,9 +72,15 @@ const COMMAND_ROW_STYLE = css`
 //   backdrop-filter: blur(1.5px);
 // `
 
+interface VisibleIndexRange {
+  lowestVisibleIndex: number
+  highestVisibleIndex: number
+}
+
 interface RunningProtocolCommandListProps {
   runStatus: RunStatus | null
   robotSideAnalysis: CompletedProtocolAnalysis | null
+  robotType: RobotType
   playRun: () => void
   pauseRun: () => void
   setShowConfirmCancelRunModal: (showConfirmCancelRunModal: boolean) => void
@@ -84,6 +93,7 @@ interface RunningProtocolCommandListProps {
 export function RunningProtocolCommandList({
   runStatus,
   robotSideAnalysis,
+  robotType,
   playRun,
   pauseRun,
   setShowConfirmCancelRunModal,
@@ -100,6 +110,10 @@ export function RunningProtocolCommandList({
     if (runStatus === RUN_STATUS_RUNNING) pauseRun()
     setShowConfirmCancelRunModal(true)
   }
+  const [visibleRange, setVisibleRange] = React.useState<VisibleIndexRange>({
+    lowestVisibleIndex: 0,
+    highestVisibleIndex: 0,
+  })
 
   const onTogglePlayPause = (): void => {
     if (runStatus === RUN_STATUS_RUNNING) {
@@ -119,6 +133,27 @@ export function RunningProtocolCommandList({
       })
     }
   }
+
+  React.useEffect(() => {
+    // Note (kk:09/25/2023) Need -1 because the element of highestVisibleIndex cannot really readable
+    // due to limited space
+    const isCurrentCommandVisible =
+      currentRunCommandIndex != null &&
+      currentRunCommandIndex >= visibleRange.lowestVisibleIndex &&
+      currentRunCommandIndex <= visibleRange.highestVisibleIndex - 1
+
+    if (
+      ref.current != null &&
+      !isCurrentCommandVisible &&
+      currentRunCommandIndex != null
+    ) {
+      ref.current.scrollToIndex(currentRunCommandIndex)
+    }
+  }, [
+    currentRunCommandIndex,
+    visibleRange.highestVisibleIndex,
+    visibleRange.lowestVisibleIndex,
+  ])
 
   return (
     <Flex
@@ -162,14 +197,26 @@ export function RunningProtocolCommandList({
             viewportRef={viewPortRef}
             ref={ref}
             items={robotSideAnalysis?.commands}
+            onViewportIndexesChange={([
+              lowestVisibleIndex,
+              highestVisibleIndex,
+            ]) => {
+              if (
+                currentRunCommandIndex != null &&
+                currentRunCommandIndex >= 0
+              ) {
+                setVisibleRange({
+                  lowestVisibleIndex,
+                  highestVisibleIndex,
+                })
+              }
+            }}
             initialIndex={currentRunCommandIndex}
             margin={0}
           >
             {(command, index) => {
               const backgroundColor =
-                index === currentRunCommandIndex
-                  ? COLORS.mediumBlueEnabled
-                  : COLORS.light1
+                index === currentRunCommandIndex ? COLORS.blue35 : COLORS.grey35
               return (
                 <Flex
                   key={command.id}
@@ -185,12 +232,15 @@ export function RunningProtocolCommandList({
                     lineHeight="1.75rem"
                     fontWeight={TYPOGRAPHY.fontWeightRegular}
                     borderRadius={BORDERS.borderRadiusSize2}
+                    gridGap="0.875rem"
                   >
-                    <CommandIcon command={command} />
+                    <CommandIcon command={command} size="2rem" />
                     <CommandText
                       command={command}
                       robotSideAnalysis={robotSideAnalysis}
+                      robotType={robotType}
                       css={COMMAND_ROW_STYLE}
+                      isOnDevice={true}
                     />
                   </Flex>
                 </Flex>

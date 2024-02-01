@@ -14,9 +14,14 @@ from opentrons.hardware_control.modules import LiveData
 
 from opentrons_shared_data.errors import EnumeratedError
 
-from ..resources import pipette_data_provider
-from ..commands import Command, CommandCreate
-from ..types import LabwareOffsetCreate, ModuleDefinition, Liquid
+from ..commands import Command, CommandCreate, CommandPrivateResult
+from ..types import (
+    LabwareOffsetCreate,
+    ModuleDefinition,
+    Liquid,
+    DeckConfigurationType,
+    AddressableAreaLocation,
+)
 
 
 @dataclass(frozen=True)
@@ -24,6 +29,7 @@ class PlayAction:
     """Start or resume processing commands in the engine."""
 
     requested_at: datetime
+    deck_configuration: Optional[DeckConfigurationType]
 
 
 class PauseSource(str, Enum):
@@ -111,6 +117,7 @@ class UpdateCommandAction:
     """Update a given command."""
 
     command: Command
+    private_result: CommandPrivateResult
 
 
 @dataclass(frozen=True)
@@ -153,6 +160,18 @@ class AddLiquidAction:
 
 
 @dataclass(frozen=True)
+class AddAddressableAreaAction:
+    """Add a single addressable area to state.
+
+    This differs from the deck configuration in PlayAction which sends over a mapping of cutout fixtures.
+    This action will only load one addressable area and that should be pre-validated before being sent via
+    the action.
+    """
+
+    addressable_area: AddressableAreaLocation
+
+
+@dataclass(frozen=True)
 class AddModuleAction:
     """Add an attached module directly to state without a location."""
 
@@ -180,15 +199,6 @@ class SetPipetteMovementSpeedAction:
     speed: Optional[float]
 
 
-@dataclass(frozen=True)
-class AddPipetteConfigAction:
-    """Adds a pipette's static config to the state store."""
-
-    pipette_id: str
-    serial_number: str
-    config: pipette_data_provider.LoadedStaticPipetteData
-
-
 Action = Union[
     PlayAction,
     PauseAction,
@@ -202,8 +212,8 @@ Action = Union[
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
     AddModuleAction,
+    AddAddressableAreaAction,
     AddLiquidAction,
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
-    AddPipetteConfigAction,
 ]

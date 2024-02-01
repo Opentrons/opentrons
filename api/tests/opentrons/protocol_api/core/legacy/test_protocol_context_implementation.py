@@ -9,18 +9,18 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition as Labware
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 
-from opentrons.types import DeckSlotName, Location, Mount, Point
-from opentrons.protocol_api import OFF_DECK
-from opentrons.equipment_broker import EquipmentBroker
+from opentrons.types import DeckSlotName, StagingSlotName, Location, Mount, Point
+from opentrons.util.broker import Broker
+
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
-
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
+
 from opentrons.protocols import labware as mock_labware
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION, OFF_DECK
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 
 from opentrons.protocol_api.core.legacy.deck import Deck
@@ -102,16 +102,16 @@ def mock_labware_offset_provider(decoy: Decoy) -> AbstractLabwareOffsetProvider:
 
 
 @pytest.fixture
-def mock_equipment_broker(decoy: Decoy) -> EquipmentBroker[LoadInfo]:
+def mock_equipment_broker(decoy: Decoy) -> Broker[LoadInfo]:
     """Get a mock equipment broker."""
-    return decoy.mock(cls=EquipmentBroker)
+    return decoy.mock(cls=Broker)
 
 
 @pytest.fixture
 def subject(
     mock_sync_hardware_api: SyncHardwareAPI,
     mock_labware_offset_provider: AbstractLabwareOffsetProvider,
-    mock_equipment_broker: EquipmentBroker[LoadInfo],
+    mock_equipment_broker: Broker[LoadInfo],
     mock_deck: Deck,
 ) -> LegacyProtocolCore:
     """Get a legacy protocol implementation core with mocked out dependencies."""
@@ -127,7 +127,7 @@ def subject(
 def test_load_instrument(
     decoy: Decoy,
     mock_sync_hardware_api: SyncHardwareAPI,
-    mock_equipment_broker: EquipmentBroker[LoadInfo],
+    mock_equipment_broker: Broker[LoadInfo],
     subject: LegacyProtocolCore,
 ) -> None:
     """It should load an instrument core."""
@@ -179,11 +179,25 @@ def test_load_labware_off_deck_raises(
         )
 
 
+def test_load_labware_on_staging_slot_raises(
+    subject: LegacyProtocolCore,
+) -> None:
+    """It should raise an api error when loading onto a staging slot."""
+    with pytest.raises(APIVersionError):
+        subject.load_labware(
+            load_name="cool load name",
+            location=StagingSlotName.SLOT_B4,
+            label="cool label",
+            namespace="cool namespace",
+            version=1337,
+        )
+
+
 def test_load_labware(
     decoy: Decoy,
     mock_deck: Deck,
     mock_labware_offset_provider: AbstractLabwareOffsetProvider,
-    mock_equipment_broker: EquipmentBroker[LoadInfo],
+    mock_equipment_broker: Broker[LoadInfo],
     subject: LegacyProtocolCore,
 ) -> None:
     """It should load a labware core."""
@@ -278,7 +292,7 @@ def test_load_adapter_raises(
 def test_load_labware_on_module(
     decoy: Decoy,
     mock_labware_offset_provider: AbstractLabwareOffsetProvider,
-    mock_equipment_broker: EquipmentBroker[LoadInfo],
+    mock_equipment_broker: Broker[LoadInfo],
     subject: LegacyProtocolCore,
 ) -> None:
     """It should load a labware core."""
@@ -377,7 +391,7 @@ def test_load_module(
     decoy: Decoy,
     mock_deck: Deck,
     mock_sync_hardware_api: SyncHardwareAPI,
-    mock_equipment_broker: EquipmentBroker[LoadInfo],
+    mock_equipment_broker: Broker[LoadInfo],
     subject: LegacyProtocolCore,
 ) -> None:
     """It should load a module core.

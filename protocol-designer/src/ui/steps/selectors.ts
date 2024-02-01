@@ -143,6 +143,11 @@ export const getHoveredStepLabware: Selector<string[]> = createSelector(
       return labware ? [labware.id] : []
     }
 
+    if (stepArgs.commandCreatorFnName === 'moveLabware') {
+      const src = stepArgs.labware
+      return [src]
+    }
+
     // step types that have no labware that gets highlighted
     if (!(stepArgs.commandCreatorFnName === 'delay')) {
       // TODO Ian 2018-05-08 use assert here

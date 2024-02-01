@@ -5,7 +5,7 @@
     "brandId": []
   },
   "metadata": {
-    "displayName": "Opentrons Universal Flat Adapter",
+    "displayName": "Opentrons Universal Flat Heater-Shaker Adapter",
     "displayCategory": "adapter",
     "displayVolumeUnits": "\u00b5L",
     "tags": []
@@ -51,7 +51,7 @@
         "z": 0
       }
     },
-    "SLOT_A1": {
+    "A1": {
       "pickUpOffset": {
         "x": 0,
         "y": 0,
@@ -63,7 +63,7 @@
         "z": 0
       }
     },
-    "SLOT_B1": {
+    "B1": {
       "pickUpOffset": {
         "x": 0,
         "y": 0,
@@ -75,7 +75,7 @@
         "z": 0
       }
     },
-    "SLOT_C1": {
+    "C1": {
       "pickUpOffset": {
         "x": 0,
         "y": 0,
@@ -87,7 +87,7 @@
         "z": 0
       }
     },
-    "SLOT_D1": {
+    "D1": {
       "pickUpOffset": {
         "x": 0,
         "y": 0,
@@ -99,7 +99,7 @@
         "z": 0
       }
     },
-    "SLOT_A3": {
+    "A3": {
       "pickUpOffset": {
         "x": 0,
         "y": 0,
@@ -111,7 +111,7 @@
         "z": 0
       }
     },
-    "SLOT_B3": {
+    "B3": {
       "pickUpOffset": {
         "x": 0,
         "y": 0,
@@ -123,7 +123,7 @@
         "z": 0
       }
     },
-    "SLOT_C3": {
+    "C3": {
       "pickUpOffset": {
         "x": 0,
         "y": 0,
@@ -135,7 +135,7 @@
         "z": 0
       }
     },
-    "SLOT_D3": {
+    "D3": {
       "pickUpOffset": {
         "x": 0,
         "y": 0,

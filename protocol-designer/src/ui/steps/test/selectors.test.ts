@@ -1,5 +1,4 @@
 import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
-import { i18n } from '../../../localization'
 import {
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
@@ -40,6 +39,7 @@ function createArgsForStepId(
 const hoveredStepId = 'hoveredStepId'
 const labware = 'well plate'
 const mixCommand = 'mix'
+const moveLabwareCommand = 'moveLabware'
 describe('getHoveredStepLabware', () => {
   let initialDeckState: any
   beforeEach(() => {
@@ -119,6 +119,22 @@ describe('getHoveredStepLabware', () => {
   it('labware is returned when command is mix', () => {
     const stepArgs = {
       commandCreatorFnName: mixCommand,
+      labware,
+    }
+    const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
+    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
+    const result = getHoveredStepLabware.resultFunc(
+      argsByStepId,
+      hoveredStepId,
+      initialDeckState
+    )
+
+    expect(result).toEqual([labware])
+  })
+
+  it('correct labware is returned when command is moveLabware', () => {
+    const stepArgs = {
+      commandCreatorFnName: moveLabwareCommand,
       labware,
     }
     const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
@@ -558,6 +574,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: 'some_pipette_id',
         },
+        nozzles: {
+          isIndeterminate: false,
+          value: undefined,
+        },
         volume: {
           isIndeterminate: false,
           value: '30',
@@ -565,6 +585,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
         path: {
           isIndeterminate: false,
           value: 'single',
+        },
+        dropTip_location: {
+          value: 'fixedTrash',
+          isIndeterminate: false,
         },
       })
     })
@@ -607,6 +631,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
           // same thing with dispense_touchTip_mmFromBottom
           blowout_checkbox: false,
           // same thing here with blowout location
+          nozzles: null,
         },
       }
     })
@@ -761,9 +786,16 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: 'some_pipette_id',
         },
+        nozzles: {
+          isIndeterminate: true,
+        },
         volume: {
           isIndeterminate: false,
           value: '30',
+        },
+        dropTip_location: {
+          value: 'fixedTrash',
+          isIndeterminate: false,
         },
       })
     })
@@ -809,6 +841,11 @@ describe('_getSavedMultiSelectFieldValues', () => {
         dispense_delay_seconds: { value: '1', isIndeterminate: false },
         mix_touchTip_checkbox: { value: false, isIndeterminate: false },
         mix_touchTip_mmFromBottom: { value: null, isIndeterminate: false },
+        nozzles: { value: undefined, isIndeterminate: false },
+        dropTip_location: {
+          value: 'fixedTrash',
+          isIndeterminate: false,
+        },
       })
     })
   })
@@ -840,6 +877,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
           dispense_delay_seconds: '3',
           mix_touchTip_checkbox: true,
           mix_touchTip_mmFromBottom: '14',
+          nozzles: null,
         },
       }
 
@@ -872,6 +910,11 @@ describe('_getSavedMultiSelectFieldValues', () => {
         dispense_delay_seconds: { isIndeterminate: true },
         mix_touchTip_checkbox: { isIndeterminate: true },
         mix_touchTip_mmFromBottom: { isIndeterminate: true },
+        nozzles: { isIndeterminate: true },
+        dropTip_location: {
+          value: 'fixedTrash',
+          isIndeterminate: false,
+        },
       })
     })
   })
@@ -904,27 +947,6 @@ describe('getMultiSelectFieldValues', () => {
 })
 
 describe('getMultiSelectDisabledFields', () => {
-  describe('disabled field tooltips', () => {
-    it('should exist', () => {
-      const baseText = 'tooltip.step_fields.batch_edit.disabled'
-      const disabledReasons = [
-        'pipette-different',
-        'aspirate-labware-different',
-        'dispense-labware-different',
-        'multi-aspirate-present',
-        'multi-aspirate-present-pipette-different',
-        'multi-dispense-present',
-        'multi-dispense-present-pipette-different',
-      ]
-
-      expect.assertions(7)
-      disabledReasons.forEach(reason => {
-        const searchText = `${baseText}.${reason}`
-        expect(i18n.t(`${baseText}.${reason}`) !== searchText).toBe(true)
-      })
-    })
-  })
-
   describe('when all forms are of type moveLiquid', () => {
     let mockSavedStepForms: Record<string, FormData>
     let mockmultiSelectItemIds: string[]
@@ -971,42 +993,18 @@ describe('getMultiSelectDisabledFields', () => {
             mockmultiSelectItemIds
           )
         ).toEqual({
-          aspirate_mix_checkbox: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
-          aspirate_mix_volume: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
-          aspirate_mix_times: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
-          aspirate_flowRate: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
-          aspirate_airGap_checkbox: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
-          aspirate_airGap_volume: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
-          dispense_mix_checkbox: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
-          dispense_mix_volume: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
-          dispense_mix_times: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
-          dispense_flowRate: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
-          dispense_airGap_checkbox: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
-          dispense_airGap_volume: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
+          aspirate_mix_checkbox: 'Incompatible with current path',
+          aspirate_mix_volume: 'Incompatible with current path',
+          aspirate_mix_times: 'Incompatible with current path',
+          aspirate_flowRate: 'Incompatible with current path',
+          aspirate_airGap_checkbox: 'Incompatible with current path',
+          aspirate_airGap_volume: 'Incompatible with current path',
+          dispense_mix_checkbox: 'Incompatible with current path',
+          dispense_mix_volume: 'Incompatible with current path',
+          dispense_mix_times: 'Incompatible with current path',
+          dispense_flowRate: 'Incompatible with current path',
+          dispense_airGap_checkbox: 'Incompatible with current path',
+          dispense_airGap_volume: 'Incompatible with current path',
         })
       })
     })
@@ -1022,9 +1020,7 @@ describe('getMultiSelectDisabledFields', () => {
         }
       })
       it('should return fields being disabled with associated reasons', () => {
-        const aspirateLabwareDifferentText = i18n.t(
-          'tooltip.step_fields.batch_edit.disabled.aspirate-labware-different'
-        )
+        const aspirateLabwareDifferentText = 'Incompatible with current path'
 
         expect(
           // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
@@ -1054,9 +1050,8 @@ describe('getMultiSelectDisabledFields', () => {
         }
       })
       it('should return fields being disabled with associated reasons', () => {
-        const dispenseLabwareDifferentText = i18n.t(
-          'tooltip.step_fields.batch_edit.disabled.dispense-labware-different'
-        )
+        const dispenseLabwareDifferentText = 'Incompatible with current path'
+
         expect(
           // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
           getMultiSelectDisabledFields.resultFunc(
@@ -1092,15 +1087,9 @@ describe('getMultiSelectDisabledFields', () => {
             mockmultiSelectItemIds
           )
         ).toEqual({
-          aspirate_mix_checkbox: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.multi-aspirate-present'
-          ),
-          aspirate_mix_volume: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.multi-aspirate-present'
-          ),
-          aspirate_mix_times: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.multi-aspirate-present'
-          ),
+          aspirate_mix_checkbox: 'Incompatible with current path',
+          aspirate_mix_volume: 'Incompatible with current path',
+          aspirate_mix_times: 'Incompatible with current path',
         })
       })
     })
@@ -1123,21 +1112,11 @@ describe('getMultiSelectDisabledFields', () => {
             mockmultiSelectItemIds
           )
         ).toEqual({
-          dispense_mix_checkbox: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.multi-dispense-present'
-          ),
-          dispense_mix_volume: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.multi-dispense-present'
-          ),
-          dispense_mix_times: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.multi-dispense-present'
-          ),
-          blowout_checkbox: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.multi-dispense-present'
-          ),
-          blowout_location: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.multi-dispense-present'
-          ),
+          dispense_mix_checkbox: 'Incompatible with current path',
+          dispense_mix_volume: 'Incompatible with current path',
+          dispense_mix_times: 'Incompatible with current path',
+          blowout_checkbox: 'Incompatible with current path',
+          blowout_location: 'Incompatible with current path',
         })
       })
     })
@@ -1162,15 +1141,9 @@ describe('getMultiSelectDisabledFields', () => {
           )
         ).toEqual(
           expect.objectContaining({
-            aspirate_mix_checkbox: i18n.t(
-              'tooltip.step_fields.batch_edit.disabled.multi-aspirate-present-pipette-different'
-            ),
-            aspirate_mix_volume: i18n.t(
-              'tooltip.step_fields.batch_edit.disabled.multi-aspirate-present-pipette-different'
-            ),
-            aspirate_mix_times: i18n.t(
-              'tooltip.step_fields.batch_edit.disabled.multi-aspirate-present-pipette-different'
-            ),
+            aspirate_mix_checkbox: 'Incompatible with current path',
+            aspirate_mix_volume: 'Incompatible with current path',
+            aspirate_mix_times: 'Incompatible with current path',
           })
         )
       })
@@ -1196,15 +1169,9 @@ describe('getMultiSelectDisabledFields', () => {
           )
         ).toEqual(
           expect.objectContaining({
-            dispense_mix_checkbox: i18n.t(
-              'tooltip.step_fields.batch_edit.disabled.multi-dispense-present-pipette-different'
-            ),
-            dispense_mix_volume: i18n.t(
-              'tooltip.step_fields.batch_edit.disabled.multi-dispense-present-pipette-different'
-            ),
-            dispense_mix_times: i18n.t(
-              'tooltip.step_fields.batch_edit.disabled.multi-dispense-present-pipette-different'
-            ),
+            dispense_mix_checkbox: 'Incompatible with current path',
+            dispense_mix_volume: 'Incompatible with current path',
+            dispense_mix_times: 'Incompatible with current path',
           })
         )
       })
@@ -1253,12 +1220,8 @@ describe('getMultiSelectDisabledFields', () => {
             mockmultiSelectItemIds
           )
         ).toEqual({
-          aspirate_flowRate: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
-          dispense_flowRate: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
+          aspirate_flowRate: 'Incompatible with current path',
+          dispense_flowRate: 'Incompatible with current path',
         })
       })
     })
@@ -1274,9 +1237,7 @@ describe('getMultiSelectDisabledFields', () => {
         }
       })
       it('should return fields being disabled with associated reasons', () => {
-        const labwareDifferentText = i18n.t(
-          'tooltip.step_fields.batch_edit.disabled.labware-different'
-        )
+        const labwareDifferentText = 'Incompatible with current path'
 
         expect(
           // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 
@@ -12,66 +13,54 @@ import {
 } from '../constants'
 
 describe('Success', () => {
-  let render: (
-    props?: Partial<React.ComponentProps<typeof Success>>
-  ) => ReturnType<typeof renderWithProviders>
-
   const mockProceed = jest.fn()
-
-  beforeEach(() => {
-    render = (props = {}) => {
-      return renderWithProviders(
-        <Success
-          proceed={mockProceed}
-          section={SECTIONS.SUCCESS}
-          successfulAction={SUCCESSFULLY_ATTACHED_AND_CALIBRATED}
-          isRobotMoving={false}
-          {...props}
-        />,
-        { i18nInstance: i18n }
-      )
-    }
-  })
+  const render = (
+    props: Partial<React.ComponentProps<typeof Success>> = {}
+  ) => {
+    return renderWithProviders(
+      <Success
+        proceed={mockProceed}
+        section={SECTIONS.SUCCESS}
+        successfulAction={SUCCESSFULLY_ATTACHED_AND_CALIBRATED}
+        isRobotMoving={false}
+        {...props}
+      />,
+      { i18nInstance: i18n }
+    )
+  }
 
   afterEach(() => {
     jest.resetAllMocks()
   })
 
   it('clicking confirm proceed calls proceed', () => {
-    const { getByRole } = render()[0]
-    getByRole('button', { name: 'exit' }).click()
+    render()
+    const exitButton = screen.getByRole('button', { name: 'Exit' })
+    fireEvent.click(exitButton)
     expect(mockProceed).toHaveBeenCalled()
   })
 
   it('renders correct text for attached and calibrated', () => {
-    const { getByRole, getByText } = render({
-      successfulAction: SUCCESSFULLY_ATTACHED_AND_CALIBRATED,
-    })[0]
-    getByText('Flex Gripper Successfully Attached and Calibrated')
-    getByRole('button', { name: 'exit' })
+    render({ successfulAction: SUCCESSFULLY_ATTACHED_AND_CALIBRATED })
+    screen.getByText('Flex Gripper successfully attached and calibrated')
+    screen.getByRole('button', { name: 'Exit' })
   })
 
   it('renders correct text for calibrated', () => {
-    const { getByRole, getByText } = render({
-      successfulAction: SUCCESSFULLY_CALIBRATED,
-    })[0]
-    getByText('Flex Gripper Successfully Calibrated')
-    getByRole('button', { name: 'exit' })
+    render({ successfulAction: SUCCESSFULLY_CALIBRATED })
+    screen.getByText('Flex Gripper successfully calibrated')
+    screen.getByRole('button', { name: 'Exit' })
   })
 
   it('renders correct text for attached', () => {
-    const { getByRole, getByText } = render({
-      successfulAction: SUCCESSFULLY_ATTACHED,
-    })[0]
-    getByText('Flex Gripper Successfully Attached')
-    getByRole('button', { name: 'Calibrate gripper' })
+    render({ successfulAction: SUCCESSFULLY_ATTACHED })
+    screen.getByText('Gripper successfully attached')
+    screen.getByRole('button', { name: 'Calibrate Gripper' })
   })
 
   it('renders correct text for detached', () => {
-    const { getByText, getByRole } = render({
-      successfulAction: SUCCESSFULLY_DETACHED,
-    })[0]
-    getByText('Flex Gripper Successfully Detached')
-    getByRole('button', { name: 'exit' })
+    render({ successfulAction: SUCCESSFULLY_DETACHED })
+    screen.getByText('Flex Gripper successfully detached')
+    screen.getByRole('button', { name: 'Exit' })
   })
 })

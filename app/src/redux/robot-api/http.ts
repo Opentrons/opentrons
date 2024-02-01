@@ -4,6 +4,7 @@ import { map, switchMap, catchError } from 'rxjs/operators'
 import mapValues from 'lodash/mapValues'
 import toString from 'lodash/toString'
 import omitBy from 'lodash/omitBy'
+import inRange from 'lodash/inRange'
 
 import { OPENTRONS_USB } from '../../redux/discovery'
 import { appShellRequestor } from '../../redux/shell/remote'
@@ -59,6 +60,7 @@ export function fetchRobotApi(
           headers: options.headers,
           method,
           url,
+          data: options.body,
         })
       ).pipe(
         map(response => ({
@@ -68,7 +70,7 @@ export function fetchRobotApi(
           body: response?.data,
           status: response?.status,
           // appShellRequestor eventually calls axios.request, which doesn't provide an ok boolean in the response
-          ok: response?.statusText === 'OK',
+          ok: inRange(response?.status, 200, 300),
         }))
       )
     : from(fetch(url, options)).pipe(

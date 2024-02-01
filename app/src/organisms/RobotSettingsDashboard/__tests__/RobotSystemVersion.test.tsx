@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent } from '@testing-library/react'
+
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
@@ -34,6 +36,7 @@ describe('RobotSystemVersion', () => {
       currentVersion: 'mock7.0.0',
       isUpdateAvailable: false,
       setCurrentOption: mockBack,
+      robotUpdateInfo: null,
     }
     mockRobotSystemVersionModal.mockReturnValue(
       <div>mock RobotSystemVersionModal</div>
@@ -50,7 +53,7 @@ describe('RobotSystemVersion', () => {
     getByText(
       'View latest release notes at https://github.com/Opentrons/opentrons/releases'
     )
-    getByText('Current Version:')
+    getByText('Current Version')
     getByText('mock7.0.0')
   })
 
@@ -58,6 +61,11 @@ describe('RobotSystemVersion', () => {
     props = {
       ...props,
       isUpdateAvailable: true,
+      robotUpdateInfo: {
+        target: 'flex',
+        version: 'mock1.2.3',
+        releaseNotes: null,
+      },
     }
     const [{ getByText }] = render(props)
     getByText('Update available')
@@ -70,13 +78,13 @@ describe('RobotSystemVersion', () => {
       isUpdateAvailable: true,
     }
     const [{ getByText }] = render(props)
-    getByText('View update').click()
+    fireEvent.click(getByText('View update'))
     getByText('mock RobotSystemVersionModal')
   })
 
   it('should call a mock function when tapping Back button', () => {
     const [{ getByRole }] = render(props)
-    getByRole('button').click()
+    fireEvent.click(getByRole('button'))
     expect(mockBack).toHaveBeenCalled()
   })
 })

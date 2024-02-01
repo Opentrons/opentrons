@@ -33,7 +33,6 @@ import {
   getModuleDisplayName,
   getModuleType,
   getOccludedSlotCountForModule,
-  getRobotTypeFromLoadedLabware,
 } from '@opentrons/shared-data'
 import {
   getRunLabwareRenderInfo,
@@ -49,15 +48,16 @@ import {
   getLoadedModule,
 } from '../CommandText/utils/accessors'
 import type { RunData } from '@opentrons/api-client'
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 
 const LABWARE_DESCRIPTION_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   grid-gap: ${SPACING.spacing8};
   padding: ${SPACING.spacing16};
-  background-color: ${COLORS.fundamentalsBackground};
+  background-color: ${COLORS.grey10};
   border-radius: ${BORDERS.radiusSoftCorners};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    background-color: ${COLORS.light1};
+    background-color: ${COLORS.grey35};
     border-radius: ${BORDERS.borderRadiusSize3};
   }
 `
@@ -70,10 +70,10 @@ const LABWARE_NAME_TITLE_STYLE = css`
 `
 
 const LABWARE_NAME_STYLE = css`
-  color: ${COLORS.errorDisabled};
+  color: ${COLORS.grey40};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     ${TYPOGRAPHY.bodyTextBold}
-    color: ${COLORS.darkBlack100};
+    color: ${COLORS.black90};
   }
 `
 
@@ -103,6 +103,7 @@ export interface MoveLabwareInterventionProps {
   command: MoveLabwareRunTimeCommand
   analysis: CompletedProtocolAnalysis | null
   run: RunData
+  robotType: RobotType
   isOnDevice: boolean
 }
 
@@ -110,14 +111,15 @@ export function MoveLabwareInterventionContent({
   command,
   analysis,
   run,
+  robotType,
   isOnDevice,
 }: MoveLabwareInterventionProps): JSX.Element | null {
   const { t } = useTranslation(['protocol_setup', 'protocol_command_text'])
 
   const analysisCommands = analysis?.commands ?? []
   const labwareDefsByUri = getLoadedLabwareDefinitionsByUri(analysisCommands)
-  const robotType = getRobotTypeFromLoadedLabware(run.labware)
   const deckDef = getDeckDefFromRobotType(robotType)
+  const deckConfig = useDeckConfigurationQuery().data ?? []
 
   const moduleRenderInfo = getRunModuleRenderInfo(
     run,
@@ -144,7 +146,6 @@ export function MoveLabwareInterventionContent({
     movedLabwareDefUri != null
       ? labwareDefsByUri?.[movedLabwareDefUri] ?? null
       : null
-
   if (oldLabwareLocation == null || movedLabwareDef == null) return null
   return (
     <Flex
@@ -191,20 +192,27 @@ export function MoveLabwareInterventionContent({
             <MoveLabwareOnDeck
               key={command.id} // important so that back to back move labware commands bust the cache
               robotType={robotType}
-              deckFill={isOnDevice ? COLORS.light1 : '#e6e6e6'}
+              deckFill={isOnDevice ? COLORS.grey35 : '#e6e6e6'}
               initialLabwareLocation={oldLabwareLocation}
               finalLabwareLocation={command.params.newLocation}
               movedLabwareDef={movedLabwareDef}
               loadedModules={run.modules}
               loadedLabware={run.labware}
-              // TODO(bh, 2023-07-19): read trash slot name from protocol
-              trashSlotName={robotType === 'OT-3 Standard' ? 'A3' : undefined}
+              deckConfig={deckConfig}
               backgroundItems={
                 <>
                   {moduleRenderInfo.map(
-                    ({ x, y, moduleId, moduleDef, nestedLabwareDef }) => (
+                    ({
+                      x,
+                      y,
+                      moduleId,
+                      moduleDef,
+                      nestedLabwareDef,
+                      nestedLabwareId,
+                    }) => (
                       <Module key={moduleId} def={moduleDef} x={x} y={y}>
-                        {nestedLabwareDef != null ? (
+                        {nestedLabwareDef != null &&
+                        nestedLabwareId !== command.params.labwareId ? (
                           <LabwareRender definition={nestedLabwareDef} />
                         ) : null}
                       </Module>
@@ -214,7 +222,10 @@ export function MoveLabwareInterventionContent({
                     .filter(l => l.labwareId !== command.params.labwareId)
                     .map(({ x, y, labwareDef, labwareId }) => (
                       <g key={labwareId} transform={`translate(${x},${y})`}>
-                        <LabwareRender definition={labwareDef} />
+                        {labwareDef != null &&
+                        labwareId !== command.params.labwareId ? (
+                          <LabwareRender definition={labwareDef} />
+                        ) : null}
                       </g>
                     ))}
                 </>
@@ -244,6 +255,8 @@ function LabwareDisplayLocation(
     displayLocation = <LocationIcon slotName={String(t('offdeck'))} />
   } else if ('slotName' in location) {
     displayLocation = <LocationIcon slotName={location.slotName} />
+  } else if ('addressableAreaName' in location) {
+    displayLocation = <LocationIcon slotName={location.addressableAreaName} />
   } else if ('moduleId' in location) {
     const moduleModel = getModuleModelFromRunData(
       protocolData,
@@ -281,6 +294,11 @@ function LabwareDisplayLocation(
       displayLocation = t('adapter_in_slot', {
         adapter: adapterDisplayName,
         slot_name: adapter.location.slotName,
+      })
+    } else if ('addressableAreaName' in adapter.location) {
+      return t('adapter_in_slot', {
+        adapter: adapterDisplayName,
+        slot: adapter.location.addressableAreaName,
       })
     } else if ('moduleId' in adapter.location) {
       const moduleIdUnderAdapter = adapter.location.moduleId

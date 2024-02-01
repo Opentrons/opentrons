@@ -35,7 +35,7 @@ import {
 } from '../../../../../redux/analytics'
 import {
   useDeckCalibrationData,
-  useIsOT3,
+  useIsFlex,
   usePipetteOffsetCalibrations,
   useTipLengthCalibrations,
   useRobot,
@@ -64,7 +64,7 @@ export function DeviceResetSlideout({
   const dispatch = useDispatch<Dispatch>()
   const [resetOptions, setResetOptions] = React.useState<ResetConfigRequest>({})
   const runsQueryResponse = useAllRunsQuery()
-  const isOT3 = useIsOT3(robotName)
+  const isFlex = useIsFlex(robotName)
 
   // Calibration data
   const deckCalibrationData = useDeckCalibrationData(robotName)
@@ -81,13 +81,12 @@ export function DeviceResetSlideout({
       ? options.filter(
           opt =>
             opt.id === 'pipetteOffsetCalibrations' ||
-            opt.id === 'gripperOffsetCalibrations'
-          // ||
-          // opt.id === 'moduleCalibrations'
+            opt.id === 'gripperOffsetCalibrations' ||
+            opt.id === 'moduleCalibration'
         )
       : []
 
-  const calibrationOptions = isOT3
+  const calibrationOptions = isFlex
     ? flexCalibrationOptions
     : ot2CalibrationOptions
 
@@ -95,6 +94,10 @@ export function DeviceResetSlideout({
     options != null ? options.filter(opt => opt.id.includes('bootScript')) : []
   const runHistoryOption =
     options != null ? options.filter(opt => opt.id.includes('runsHistory')) : []
+  const sshKeyOption =
+    options != null
+      ? options.filter(opt => opt.id.includes('authorizedKeys'))
+      : []
 
   React.useEffect(() => {
     dispatch(fetchResetConfigOptions(robotName))
@@ -139,7 +142,8 @@ export function DeviceResetSlideout({
   ).length
 
   // filtering out ODD setting because this gets implicitly cleared if all settings are selected
-  const allOptionsWithoutODD = options.filter(o => o.id !== 'onDeviceDisplay')
+  const allOptionsWithoutODD =
+    options != null ? options.filter(o => o.id !== 'onDeviceDisplay') : []
 
   const isEveryOptionSelected =
     totalOptionsSelected > 0 &&
@@ -164,21 +168,21 @@ export function DeviceResetSlideout({
         <Flex
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_CENTER}
-          backgroundColor={COLORS.warningBackgroundLight}
+          backgroundColor={COLORS.yellow20}
           borderRadius={BORDERS.borderRadiusSize1}
           padding={SPACING.spacing8}
-          border={`1px solid ${COLORS.warningEnabled}`}
+          border={`1px solid ${COLORS.yellow50}`}
           marginBottom={SPACING.spacing24}
         >
           <Icon
             name="alert-circle"
             size="1rem"
             marginRight={SPACING.spacing8}
-            color={COLORS.warningEnabled}
+            color={COLORS.yellow50}
           />
           <StyledText as="p">{t('resets_cannot_be_undone')}</StyledText>
         </Flex>
-        {isOT3 ? (
+        {isFlex ? (
           <>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing20}>
               <Flex flexDirection={DIRECTION_COLUMN}>
@@ -249,7 +253,7 @@ export function DeviceResetSlideout({
                 {calibrationOptions.map(opt => {
                   let calibrationName = ''
                   if (opt.id === 'pipetteOffsetCalibrations') {
-                    calibrationName = isOT3
+                    calibrationName = isFlex
                       ? t('clear_option_pipette_calibrations')
                       : t(`clear_option_${snakeCase(opt.id)}`)
                   } else {
@@ -313,6 +317,28 @@ export function DeviceResetSlideout({
                 {t('boot_scripts')}
               </StyledText>
               {bootScriptOption.map(opt => (
+                <CheckboxField
+                  key={opt.id}
+                  onChange={() =>
+                    setResetOptions({
+                      ...resetOptions,
+                      [opt.id]: !(resetOptions[opt.id] ?? false),
+                    })
+                  }
+                  value={resetOptions[opt.id]}
+                  label={t(`clear_option_${snakeCase(opt.id)}`)}
+                />
+              ))}
+            </Box>
+            <Box>
+              <StyledText
+                as="p"
+                css={TYPOGRAPHY.pSemiBold}
+                marginBottom={SPACING.spacing8}
+              >
+                {t('ssh_public_keys')}
+              </StyledText>
+              {sshKeyOption.map(opt => (
                 <CheckboxField
                   key={opt.id}
                   onChange={() =>

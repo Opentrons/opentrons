@@ -19,7 +19,7 @@ describe('Divider', () => {
     const { getByTestId } = render(props)
     const divider = getByTestId('divider')
     expect(divider).toHaveStyle(
-      `borderBottom: 1px solid ${String(COLORS.medGreyEnabled)}`
+      `borderBottom: 1px solid ${String(COLORS.grey30)}`
     )
     expect(divider).toHaveStyle('width: 80%')
     expect(divider).toHaveStyle(`margin-top: ${SPACING.spacing4}`)
@@ -30,13 +30,13 @@ describe('Divider', () => {
     props = {
       ...props,
       width: '100%',
-      color: COLORS.blueEnabled,
+      color: COLORS.blue50,
       marginY: 0,
       paddingX: SPACING.spacing4,
     }
     const { getByTestId } = render(props)
     const divider = getByTestId('divider')
-    expect(divider).toHaveStyle(`color: ${String(COLORS.blueEnabled)}`)
+    expect(divider).toHaveStyle(`color: ${String(COLORS.blue50)}`)
     expect(divider).toHaveStyle('width: 100%')
     expect(divider).toHaveStyle('margin-top: 0')
     expect(divider).toHaveStyle('margin-bottom: 0')

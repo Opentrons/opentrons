@@ -4,17 +4,15 @@ from dataclasses import replace
 import pytest
 import json
 from math import isclose
-from typing import Iterator, Tuple
-from typing_extensions import Literal
+from typing import AsyncIterator, Iterator, Tuple, Any, Literal
 from mock import patch, AsyncMock, Mock, call as mock_call
 from opentrons.hardware_control import ThreadManager
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control.types import OT3Mount, Axis
+from opentrons.hardware_control.types import OT3Mount, Axis, InstrumentProbeType
 from opentrons.config.types import OT3CalibrationSettings
 from opentrons.hardware_control.ot3_calibration import (
     find_edge_binary,
     find_axis_center,
-    EarlyCapacitiveSenseTrigger,
     find_calibration_structure_height,
     find_slot_center_binary,
     find_slot_center_noncontact,
@@ -23,30 +21,35 @@ from opentrons.hardware_control.ot3_calibration import (
     _edges_from_data,
     _probe_deck_at,
     _verify_edge_pos,
-    InaccurateNonContactSweepError,
-    CalibrationStructureNotFoundError,
-    EdgeNotFoundError,
     PREP_OFFSET_DEPTH,
     EDGES,
 )
 from opentrons.types import Point
 from opentrons_shared_data.deck import get_calibration_square_position_in_slot
+from opentrons_shared_data.errors.exceptions import (
+    CalibrationStructureNotFoundError,
+    EdgeNotFoundError,
+    EarlyCapacitiveSenseTrigger,
+    InaccurateNonContactSweepError,
+)
 
 
 @pytest.fixture(autouse=True)
-def mock_save_json():
+def mock_save_json() -> Iterator[Mock]:
     with patch("json.dump", Mock(spec=json.dump)) as jd:
         yield jd
 
 
 @pytest.fixture
 def mock_move_to(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    managed = ot3_hardware.managed_obj
+    assert managed
     with patch.object(
-        ot3_hardware.managed_obj,
+        managed,
         "move_to",
         AsyncMock(
-            spec=ot3_hardware.managed_obj.move_to,
-            wraps=ot3_hardware.managed_obj.move_to,
+            spec=managed.move_to,
+            wraps=managed.move_to,
         ),
     ) as mock_move:
         yield mock_move
@@ -54,12 +57,14 @@ def mock_move_to(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
 
 @pytest.fixture
 def mock_capacitive_probe(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    managed = ot3_hardware.managed_obj
+    assert managed
     with patch.object(
-        ot3_hardware.managed_obj,
+        managed,
         "capacitive_probe",
         AsyncMock(
-            spec=ot3_hardware.managed_obj.capacitive_probe,
-            wraps=ot3_hardware.managed_obj.capacitive_probe,
+            spec=managed.capacitive_probe,
+            wraps=managed.capacitive_probe,
         ),
     ) as mock_probe:
         yield mock_probe
@@ -79,12 +84,14 @@ def mock_probe_deck() -> Iterator[AsyncMock]:
 
 @pytest.fixture
 def mock_capacitive_sweep(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    managed = ot3_hardware.managed_obj
+    assert managed
     with patch.object(
-        ot3_hardware.managed_obj,
+        managed,
         "capacitive_sweep",
         AsyncMock(
-            spec=ot3_hardware.managed_obj.capacitive_sweep,
-            wraps=ot3_hardware.managed_obj.capacitive_sweep,
+            spec=managed.capacitive_sweep,
+            wraps=managed.capacitive_sweep,
         ),
     ) as mock_sweep:
         yield mock_sweep
@@ -111,13 +118,15 @@ def mock_data_analysis() -> Iterator[Mock]:
 
 
 def _update_edge_sense_config(
-    old: OT3CalibrationSettings, **new_edge_sense_settings
+    old: OT3CalibrationSettings, **new_edge_sense_settings: Any
 ) -> OT3CalibrationSettings:
     return replace(old, edge_sense=replace(old.edge_sense, **new_edge_sense_settings))
 
 
 @pytest.fixture
-async def override_cal_config(ot3_hardware: ThreadManager[OT3API]) -> Iterator[None]:
+async def override_cal_config(
+    ot3_hardware: ThreadManager[OT3API],
+) -> AsyncIterator[None]:
     old_calibration = copy.deepcopy(ot3_hardware.config.calibration)
     await ot3_hardware.update_config(
         calibration=_update_edge_sense_config(
@@ -142,19 +151,24 @@ def _other_axis_val(point: Tuple[float, float, float], main_axis: Axis) -> float
     raise KeyError(main_axis)
 
 
+# Mock Capacitive Probe Result (found_position[float], hit_deck[bool])
+_HIT = (1, True)
+_MISS = (-1, False)
+
+
 @pytest.mark.parametrize(
-    "search_axis,direction_if_hit,probe_results,search_result",
+    "direction_if_hit,probe_results,search_result",
     [
         # For each axis and direction, test
         # 1. hit-miss-miss
         # 2. miss-hit-hit
         # 3. miss-hit-miss
-        (Axis.X, -1, (1, -1, -1), -1),
-        (Axis.X, -1, (-1, 1, 1), 1),
-        (Axis.X, -1, (-1, 1, -1), 3),
-        (Axis.X, 1, (1, -1, -1), 1),
-        (Axis.X, 1, (-1, 1, 1), -1),
-        (Axis.X, 1, (-1, 1, -1), -3),
+        (-1, (_HIT, _MISS, _MISS), -1),
+        (-1, (_MISS, _HIT, _HIT), 1),
+        (-1, (_MISS, _HIT, _MISS), 3),
+        (1, (_HIT, _MISS, _MISS), 1),
+        (1, (_MISS, _HIT, _HIT), -1),
+        (1, (_MISS, _HIT, _MISS), -3),
     ],
 )
 async def test_find_edge(
@@ -163,7 +177,6 @@ async def test_find_edge(
     override_cal_config: None,
     mock_verify_edge: AsyncMock,
     mock_move_to: AsyncMock,
-    search_axis: Axis,
     direction_if_hit: Literal[1, -1],
     probe_results: Tuple[float, float, float],
     search_result: float,
@@ -174,26 +187,26 @@ async def test_find_edge(
         ot3_hardware,
         OT3Mount.RIGHT,
         Point(0, 0, 0),
-        search_axis,
+        Axis.X,
         direction_if_hit,
         False,
     )
-    assert search_axis.of_point(result) == search_result
+    assert Axis.X.of_point(result) == search_result
     # the first move is in z only to the cal height
     checked_calls = mock_move_to.call_args_list[1:]
     # all other moves should only move in the search axis
     for call in checked_calls:
         assert call[0][0] == OT3Mount.RIGHT
-        assert _other_axis_val(call[0][1], search_axis) == pytest.approx(
-            _other_axis_val(Point(0, 0, 0), search_axis)
+        assert _other_axis_val(call[0][1], Axis.X) == pytest.approx(
+            _other_axis_val(Point(0, 0, 0), Axis.X)
         )
 
 
 @pytest.mark.parametrize(
     "search_axis,direction_if_hit,probe_results",
     [
-        (Axis.X, -1, (1, 1)),
-        (Axis.Y, -1, (-1, -1)),
+        (Axis.X, -1, (_HIT, _HIT)),
+        (Axis.Y, -1, (_MISS, _MISS)),
     ],
 )
 async def test_edge_not_found(
@@ -201,7 +214,7 @@ async def test_edge_not_found(
     mock_capacitive_probe: AsyncMock,
     override_cal_config: None,
     mock_move_to: AsyncMock,
-    search_axis: Axis,
+    search_axis: Literal[Axis.X, Axis.Y],
     direction_if_hit: Literal[1, -1],
     probe_results: Tuple[float, float, float],
 ) -> None:
@@ -224,7 +237,7 @@ async def test_find_edge_early_trigger(
     override_cal_config: None,
 ) -> None:
     await ot3_hardware.home()
-    mock_capacitive_probe.side_effect = (3,)
+    mock_capacitive_probe.side_effect = ((3, True), ())
     with pytest.raises(EarlyCapacitiveSenseTrigger):
         await find_edge_binary(
             ot3_hardware,
@@ -241,7 +254,7 @@ async def test_deck_not_found(
     override_cal_config: None,
 ) -> None:
     await ot3_hardware.home()
-    mock_capacitive_probe.side_effect = (-25,)
+    mock_capacitive_probe.side_effect = ((-25, False), ())
     with pytest.raises(CalibrationStructureNotFoundError):
         await find_calibration_structure_height(
             ot3_hardware,
@@ -263,7 +276,7 @@ async def test_find_deck_checks_z_only(
 ) -> None:
     await ot3_hardware.home()
     here = await ot3_hardware.gantry_position(mount)
-    mock_capacitive_probe.side_effect = (-1.8,)
+    mock_capacitive_probe.side_effect = ((-1.8, True),)
     await find_calibration_structure_height(ot3_hardware, mount, target)
 
     z_prep_loc = target + PREP_OFFSET_DEPTH
@@ -273,6 +286,7 @@ async def test_find_deck_checks_z_only(
         mount,
         z_prep_loc,
         ot3_hardware.config.calibration.z_offset.pass_settings,
+        probe=InstrumentProbeType.PRIMARY,
     )
     # first we move only to safe height from current position
     first_move_point = mock_move_to.call_args_list[0][0][1]
@@ -289,6 +303,8 @@ async def test_method_enum(
     ot3_hardware: ThreadManager[OT3API],
     override_cal_config: None,
 ) -> None:
+    managed = ot3_hardware.managed_obj
+    assert managed
     with patch(
         "opentrons.hardware_control.ot3_calibration.find_slot_center_binary",
         AsyncMock(spec=find_slot_center_binary),
@@ -302,9 +318,9 @@ async def test_method_enum(
         "opentrons.hardware_control.ot3_calibration.find_calibration_structure_height",
         AsyncMock(spec=find_calibration_structure_height),
     ) as find_deck, patch.object(
-        ot3_hardware.managed_obj, "reset_instrument_offset", AsyncMock()
+        managed, "reset_instrument_offset", AsyncMock()
     ) as reset_instrument_offset, patch.object(
-        ot3_hardware.managed_obj, "save_instrument_offset", AsyncMock()
+        managed, "save_instrument_offset", AsyncMock()
     ) as save_instrument_offset:
         find_deck.return_value = 10
         calibration_target.return_value = Point(0.0, 0.0, 0.0)
@@ -342,10 +358,12 @@ async def test_method_enum(
 async def test_calibrate_mount_errors(
     ot3_hardware: ThreadManager[OT3API], mock_data_analysis: Mock
 ) -> None:
+    managed = ot3_hardware.managed_obj
+    assert managed
     with patch.object(
-        ot3_hardware.managed_obj, "reset_instrument_offset", AsyncMock()
+        managed, "reset_instrument_offset", AsyncMock()
     ) as reset_instrument_offset, patch.object(
-        ot3_hardware.managed_obj, "save_instrument_offset", AsyncMock()
+        managed, "save_instrument_offset", AsyncMock()
     ) as save_instrument_offset, patch(
         "opentrons.hardware_control.ot3_calibration.find_calibration_structure_height",
         AsyncMock(spec=find_calibration_structure_height),

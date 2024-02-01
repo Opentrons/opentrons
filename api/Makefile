@@ -49,10 +49,12 @@ test_opts ?=
 pypi_username ?=
 pypi_password ?=
 
-# Host key location for buildroot robot
-br_ssh_key ?= $(default_ssh_key)
-# Other SSH args for buildroot robots
+# Host key location for robot
+ssh_key ?= $(default_ssh_key)
+# Other SSH args for robot
 ssh_opts ?= $(default_ssh_opts)
+# Helper to safely bundle ssh options
+ssh_helper = $(if $(ssh_key),-i $(ssh_key)) $(ssh_opts)
 
 twine_auth_args := --username $(pypi_username) --password $(pypi_password)
 twine_repository_url ?= $(pypi_test_upload_url)
@@ -77,7 +79,7 @@ setup:
 .PHONY: setup-ot2
 setup-ot2:
 	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip uninstall -y opentrons_hardware
+	$(pipenv) run pip uninstall -y python-can
 	$(pipenv) run pip freeze
 
 .PHONY: clean
@@ -128,14 +130,11 @@ format:
 	$(python) -m black src tests setup.py
 
 docs/build/html/v%: docs/v%
-	$(sphinx_build_allow_warnings) -b html -d docs/build/doctrees -n $< $@
-# sphinx wont automatically do this because it's only in a template
-	$(SHX) cp docs/img/lightbulb.jpg $@/_images/
+	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
 
 docs/build/html/hardware: docs/hardware src/opentrons/hardware_control
 	$(sphinx_build_allow_warnings) -b html -d docs/build/doctrees -n $< $@
 	$(SHX) mkdir $@/_images/
-	$(SHX) cp docs/img/lightbulb.jpg $@/_images/
 
 docs/dist/v%: docs/build/html/v%
 	$(SHX) mkdir -p $@
@@ -171,24 +170,24 @@ local-shell:
 
 .PHONY: push-no-restart
 push-no-restart: wheel
-	$(call push-python-package,$(host),$(br_ssh_key),$(ssh_opts),$(wheel_file))
+	$(call push-python-package,$(host),$(ssh_key),$(ssh_opts),$(wheel_file))
 
 .PHONY: push
 push: push-no-restart
-	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),"jupyter-notebook opentrons-robot-server")
+	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"jupyter-notebook opentrons-robot-server")
 
 .PHONY: push-no-restart-ot3
 push-no-restart-ot3: sdist
 	echo $(sdist_file)
-	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,opentrons,src,,$(version_file))
-	ssh $(ssh_opts) root@$(host) "mount -o remount,rw / && mkdir -p /usr/local/bin"
-	scp $(ssh_opts) ./src/opentrons/hardware_control/scripts/ot3repl root@$(host):/usr/local/bin/ot3repl
-	scp $(ssh_opts) ./src/opentrons/hardware_control/scripts/ot3gripper root@$(host):/usr/local/bin/ot3gripper
-	ssh $(ssh_opts) root@$(host) "mount -o remount,ro /"
+	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,opentrons,src,,$(version_file))
+	ssh $(ssh_helper) root@$(host) "mount -o remount,rw / && mkdir -p /usr/local/bin"
+	scp $(ssh_helper) ./src/opentrons/hardware_control/scripts/ot3repl root@$(host):/usr/local/bin/
+	scp $(ssh_helper) ./src/opentrons/hardware_control/scripts/ot3gripper root@$(host):/usr/local/bin/
+	ssh $(ssh_helper) root@$(host) "mount -o remount,ro /"
 
 .PHONY: push-ot3
 push-ot3: push-no-restart-ot3
-	$(call restart-server,$(host),,$(ssh_opts),"opentrons-robot-server")
+	$(call restart-server,$(host),$(host),$(ssh_opts),"opentrons-robot-server")
 
 .PHONY: simulate
 simulate:
@@ -206,7 +205,7 @@ deploy: wheel
 # User must currently specify host, e.g.: `make term host=169.254.202.176`
 .PHONY: term
 term:
-	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host)
+	ssh $(ssh_helper) root@$(host)
 
 .PHONY: plot-session
 plot-session:

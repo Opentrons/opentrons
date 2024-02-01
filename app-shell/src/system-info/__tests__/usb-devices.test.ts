@@ -1,14 +1,14 @@
 import execa from 'execa'
-import usbDetection from 'usb-detection'
+import { webusb } from 'usb'
 
 import * as Fixtures from '@opentrons/app/src/redux/system-info/__fixtures__'
 import { createUsbDeviceMonitor, getWindowsDriverVersion } from '../usb-devices'
 
 jest.mock('execa')
-jest.mock('usb-detection')
+jest.mock('usb')
 
-const usbDetectionFind = usbDetection.find as jest.MockedFunction<
-  typeof usbDetection.find
+const usbGetDeviceList = webusb.getDevices as jest.MockedFunction<
+  typeof webusb.getDevices
 >
 
 const execaCommand = execa.command as jest.MockedFunction<typeof execa.command>
@@ -19,26 +19,14 @@ describe('app-shell::system-info::usb-devices', () => {
     jest.resetAllMocks()
   })
 
-  it('can create a usb device monitor', () => {
-    expect(usbDetection.startMonitoring).toHaveBeenCalledTimes(0)
-    createUsbDeviceMonitor()
-    expect(usbDetection.startMonitoring).toHaveBeenCalledTimes(1)
-  })
-
-  it('usb device monitor can be stopped', () => {
-    const monitor = createUsbDeviceMonitor()
-    monitor.stop()
-    expect(usbDetection.stopMonitoring).toHaveBeenCalledTimes(1)
-  })
-
   it('can return the list of all devices', async () => {
     const mockDevices = [
       { ...mockDevice, deviceName: 'foo' },
       { ...mockDevice, deviceName: 'bar' },
       { ...mockDevice, deviceName: 'baz' },
-    ]
+    ] as any
 
-    usbDetectionFind.mockResolvedValueOnce(mockDevices)
+    usbGetDeviceList.mockResolvedValueOnce(mockDevices)
 
     const monitor = createUsbDeviceMonitor()
     const result = monitor.getAllDevices()
@@ -49,8 +37,8 @@ describe('app-shell::system-info::usb-devices', () => {
   it('can notify when devices are added', () => {
     const onDeviceAdd = jest.fn()
     createUsbDeviceMonitor({ onDeviceAdd })
-
-    usbDetection.emit('add', mockDevice)
+    webusb.removeEventListener('connect', onDeviceAdd(mockDevice))
+    webusb.addEventListener('connect', onDeviceAdd(mockDevice))
 
     expect(onDeviceAdd).toHaveBeenCalledWith(mockDevice)
   })
@@ -58,8 +46,8 @@ describe('app-shell::system-info::usb-devices', () => {
   it('can notify when devices are removed', () => {
     const onDeviceRemove = jest.fn()
     createUsbDeviceMonitor({ onDeviceRemove })
-
-    usbDetection.emit('remove', mockDevice)
+    webusb.removeEventListener('disconnect', onDeviceRemove(mockDevice))
+    webusb.addEventListener('disconnect', onDeviceRemove(mockDevice))
 
     expect(onDeviceRemove).toHaveBeenCalledWith(mockDevice)
   })

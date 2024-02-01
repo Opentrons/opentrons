@@ -1,12 +1,11 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Link,
-  Flex,
   ALIGN_CENTER,
+  Box,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  Box,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -24,14 +23,21 @@ const JUPYTER_NOTEBOOK_LINK =
 
 export interface OpenJupyterControlProps {
   robotIp: string
+  isEstopNotDisengaged: boolean
 }
 
 export function OpenJupyterControl({
   robotIp,
+  isEstopNotDisengaged,
 }: OpenJupyterControlProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const href = `http://${robotIp}:48888`
+  const targetURL = `http://${robotIp}:48888`
   const trackEvent = useTrackEvent()
+
+  const handleClick = (): void => {
+    trackEvent(EVENT_JUPYTER_OPEN)
+    window.open(targetURL, '_blank')
+  }
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -51,11 +57,9 @@ export function OpenJupyterControl({
         </ExternalLink>
       </Box>
       <TertiaryButton
-        onClick={() => trackEvent(EVENT_JUPYTER_OPEN)}
-        as={Link}
-        href={href}
+        disabled={isEstopNotDisengaged}
+        onClick={handleClick}
         marginLeft={SPACING.spacing32}
-        external
       >
         {t('launch_jupyter_notebook')}
       </TertiaryButton>

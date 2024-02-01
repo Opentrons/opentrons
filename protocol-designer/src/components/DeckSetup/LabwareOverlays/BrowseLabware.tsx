@@ -1,47 +1,40 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
-import { connect } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Icon } from '@opentrons/components'
-import { i18n } from '../../../localization'
-import { ThunkDispatch } from '../../../types'
-import { LabwareOnDeck } from '../../../step-forms'
 import { drillDownOnLabware } from '../../../labware-ingred/actions'
 import { resetScrollElements } from '../../../ui/steps/utils'
 import styles from './LabwareOverlays.css'
 
-interface OP {
-  labwareOnDeck: LabwareOnDeck
+import type { LabwareEntity } from '@opentrons/step-generation'
+import type { LabwareOnDeck } from '../../../step-forms'
+
+interface Props {
+  labwareOnDeck: LabwareOnDeck | LabwareEntity
 }
 
-interface DP {
-  drillDown: () => unknown
-}
+export function BrowseLabware(props: Props): JSX.Element | null {
+  const { t } = useTranslation('deck')
+  const { labwareOnDeck } = props
+  const dispatch = useDispatch()
 
-type Props = OP & DP
+  const drillDown = (): void => {
+    resetScrollElements()
+    dispatch(drillDownOnLabware(labwareOnDeck.id))
+  }
 
-function BrowseLabwareOverlay(props: Props): JSX.Element | null {
-  if (props.labwareOnDeck.def.parameters.isTiprack) return null
+  if (
+    props.labwareOnDeck.def.parameters.isTiprack ||
+    props.labwareOnDeck.def.allowedRoles?.includes('adapter')
+  )
+    return null
   return (
     <div className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
-      <a className={styles.overlay_button} onClick={props.drillDown}>
+      <a className={styles.overlay_button} onClick={drillDown}>
         <Icon className={styles.overlay_icon} name="water" />
-        {i18n.t('deck.overlay.browse.view_liquids')}
+        {t('overlay.browse.view_liquids')}
       </a>
     </div>
   )
 }
-
-const mapDispatchToProps = (
-  dispatch: ThunkDispatch<any>,
-  ownProps: OP
-): DP => ({
-  drillDown: () => {
-    resetScrollElements()
-    dispatch(drillDownOnLabware(ownProps.labwareOnDeck.id))
-  },
-})
-
-export const BrowseLabware = connect(
-  null,
-  mapDispatchToProps
-)(BrowseLabwareOverlay)

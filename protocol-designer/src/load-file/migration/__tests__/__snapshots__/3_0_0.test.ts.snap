@@ -80,7 +80,7 @@ Object {
         "18113c80-92a6-11e9-ac62-1b173f839d9e": Object {
           "aspirate_flowRate": 8,
           "blowout_checkbox": true,
-          "blowout_location": "dest_well",
+          "blowout_location": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
           "changeTip": "always",
           "dispense_flowRate": 7,
           "id": "18113c80-92a6-11e9-ac62-1b173f839d9e",

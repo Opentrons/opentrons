@@ -47,6 +47,7 @@ export const getMockMoveLiquidStep = (): SavedStepFormState => ({
     stepType: 'moveLiquid',
     stepName: 'transfer',
     stepDetails: '',
+    dropTip_location: 'fixedTrash',
   },
 })
 export const getMockMixStep = (): SavedStepFormState => ({
@@ -74,5 +75,6 @@ export const getMockMixStep = (): SavedStepFormState => ({
     dispense_delay_seconds: '1',
     mix_touchTip_checkbox: false,
     mix_touchTip_mmFromBottom: null,
+    dropTip_location: 'fixedTrash',
   },
 })

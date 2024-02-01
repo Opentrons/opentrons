@@ -1,18 +1,28 @@
 import flatMap from 'lodash/flatMap'
+import { LOW_VOLUME_PIPETTES, COLUMN } from '@opentrons/shared-data'
 import {
   repeatArray,
   blowoutUtil,
   curryCommandCreator,
   reduceCommandCreators,
+  getIsTallLabwareWestOf96Channel,
 } from '../../utils'
 import * as errorCreators from '../../errorCreators'
+import {
+  aspirate,
+  configureForVolume,
+  configureNozzleLayout,
+  delay,
+  dispense,
+  replaceTip,
+  touchTip,
+} from '../atomic'
+
 import type {
   MixArgs,
   CommandCreator,
   CurriedCommandCreator,
 } from '../../types'
-import { aspirate, dispense, delay, replaceTip, touchTip } from '../atomic'
-
 /** Helper fn to make mix command creators w/ minimal arguments */
 export function mixUtil(args: {
   pipette: string
@@ -108,7 +118,11 @@ export const mix: CommandCreator<MixArgs> = (
     dispenseFlowRateUlSec,
     blowoutFlowRateUlSec,
     blowoutOffsetFromTopMm,
+    dropTipLocation,
   } = data
+
+  const is96Channel =
+    invariantContext.pipetteEntities[pipette]?.spec.channels === 96
 
   // Errors
   if (
@@ -137,6 +151,55 @@ export const mix: CommandCreator<MixArgs> = (
     }
   }
 
+  if (
+    !dropTipLocation ||
+    !invariantContext.additionalEquipmentEntities[dropTipLocation]
+  ) {
+    return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
+  }
+
+  if (
+    is96Channel &&
+    data.nozzles === COLUMN &&
+    getIsTallLabwareWestOf96Channel(
+      prevRobotState,
+      invariantContext,
+      labware,
+      pipette
+    )
+  ) {
+    return {
+      errors: [
+        errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
+          source: 'mix',
+          labware:
+            invariantContext.labwareEntities[labware].def.metadata.displayName,
+        }),
+      ],
+    }
+  }
+  const stateNozzles = prevRobotState.pipettes[pipette].nozzles
+  const configureNozzleLayoutCommand: CurriedCommandCreator[] =
+    //  only emit the command if previous nozzle state is different
+    is96Channel && data.nozzles != null && data.nozzles !== stateNozzles
+      ? [
+          curryCommandCreator(configureNozzleLayout, {
+            nozzles: data.nozzles,
+            pipetteId: pipette,
+          }),
+        ]
+      : []
+
+  const configureForVolumeCommand: CurriedCommandCreator[] = LOW_VOLUME_PIPETTES.includes(
+    invariantContext.pipetteEntities[pipette].name
+  )
+    ? [
+        curryCommandCreator(configureForVolume, {
+          pipetteId: pipette,
+          volume: volume,
+        }),
+      ]
+    : []
   // Command generation
   const commandCreators = flatMap(
     wells,
@@ -147,6 +210,8 @@ export const mix: CommandCreator<MixArgs> = (
         tipCommands = [
           curryCommandCreator(replaceTip, {
             pipette,
+            dropTipLocation,
+            nozzles: data.nozzles ?? undefined,
           }),
         ]
       }
@@ -171,6 +236,7 @@ export const mix: CommandCreator<MixArgs> = (
         flowRate: blowoutFlowRateUlSec,
         offsetFromTopMm: blowoutOffsetFromTopMm,
         invariantContext,
+        prevRobotState,
       })
       const mixCommands = mixUtil({
         pipette,
@@ -186,7 +252,9 @@ export const mix: CommandCreator<MixArgs> = (
         dispenseDelaySeconds,
       })
       return [
+        ...configureNozzleLayoutCommand,
         ...tipCommands,
+        ...configureForVolumeCommand,
         ...mixCommands,
         ...blowoutCommand,
         ...touchTipCommands,

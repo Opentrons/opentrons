@@ -23,8 +23,8 @@ def test_reading(subject: AsairSensor, connection: MagicMock) -> None:
     connection.read.return_value = data
     connection.inWaiting.return_value = len(data)
     assert subject.get_reading() == Reading(
-        1.0,
         3.0,
+        1.0,
     )
 
     connection.write.assert_called_once_with(b"\x01\x03\x00\x00\x00\x02\xC4\x0b")

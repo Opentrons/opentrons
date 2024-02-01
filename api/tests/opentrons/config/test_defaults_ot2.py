@@ -1,5 +1,5 @@
 from opentrons.config.types import CurrentDict
-from opentrons.config import robot_configs, defaults_ot2
+from opentrons.config import defaults_ot2
 
 
 def test_load_currents() -> None:
@@ -19,7 +19,4 @@ def test_load_currents() -> None:
         defaults_ot2._build_hw_versioned_current_dict(default_different_vals, default)
         == default_different_vals
     )
-    assert (
-        robot_configs.defaults_ot2._build_hw_versioned_current_dict(None, default)
-        == default
-    )
+    assert defaults_ot2._build_hw_versioned_current_dict(None, default) == default

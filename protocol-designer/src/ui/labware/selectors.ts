@@ -1,19 +1,19 @@
 import { createSelector } from 'reselect'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
-import {
-  getIsTiprack,
-  getLabwareDisplayName,
-  getLabwareHasQuirk,
-} from '@opentrons/shared-data'
-import { FIXED_TRASH_ID } from '../../constants'
-import { i18n } from '../../localization'
+import { getIsTiprack, getLabwareDisplayName } from '@opentrons/shared-data'
+import { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 import * as stepFormSelectors from '../../step-forms/selectors'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import { getModuleUnderLabware } from '../modules/utils'
-import { Options } from '@opentrons/components'
-import { LabwareEntity } from '@opentrons/step-generation'
-import { Selector } from '../../types'
+import { getModuleShortNames, getModuleUnderLabware } from '../modules/utils'
+import { getLabwareOffDeck, getLabwareInColumn4 } from './utils'
+
+import type { LabwareEntity } from '@opentrons/step-generation'
+import type { DropdownOption, Options } from '@opentrons/components'
+import type { Selector } from '../../types'
+
+const TRASH = 'Trash Bin'
+
 export const getLabwareNicknamesById: Selector<
   Record<string, string>
 > = createSelector(
@@ -28,46 +28,86 @@ export const getLabwareNicknamesById: Selector<
 )
 export const _sortLabwareDropdownOptions = (options: Options): Options =>
   options.sort((a, b) => {
-    // special case for fixed trash (always at the bottom of the list)
-    if (a.value === FIXED_TRASH_ID) return 1
-    if (b.value === FIXED_TRASH_ID) return -1
+    // special case for trash (always at the bottom of the list)
+    if (a.name === TRASH) return 1
+    if (b.name === TRASH) return -1
     // sort by name everything else by name
     return a.name.localeCompare(b.name)
   })
 
-/** Returns options for labware dropdowns, excluding tiprack labware.
- * Ordered by display name / nickname, but with fixed trash at the bottom.
+/** Returns options for labware dropdowns.
+ * Ordered by display name / nickname, but with trash at the bottom.
  */
 export const getLabwareOptions: Selector<Options> = createSelector(
   stepFormSelectors.getLabwareEntities,
   getLabwareNicknamesById,
   stepFormSelectors.getInitialDeckSetup,
   stepFormSelectors.getPresavedStepForm,
-  (labwareEntities, nicknamesById, initialDeckSetup, presavedStepForm) => {
+  stepFormSelectors.getSavedStepForms,
+  stepFormSelectors.getAdditionalEquipmentEntities,
+  (
+    labwareEntities,
+    nicknamesById,
+    initialDeckSetup,
+    presavedStepForm,
+    savedStepForms,
+    additionalEquipmentEntities
+  ) => {
     const moveLabwarePresavedStep = presavedStepForm?.stepType === 'moveLabware'
-    const options = reduce(
+    const wasteChuteLocation = Object.values(additionalEquipmentEntities).find(
+      aE => aE.name === 'wasteChute'
+    )?.location
+
+    const labwareOptions = reduce(
       labwareEntities,
       (
         acc: Options,
         labwareEntity: LabwareEntity,
         labwareId: string
       ): Options => {
+        const isLabwareInWasteChute = Object.values(savedStepForms).find(
+          form =>
+            form.stepType === 'moveLabware' &&
+            form.labware === labwareId &&
+            form.newLocation === wasteChuteLocation
+        )
+
         const isAdapter = labwareEntity.def.allowedRoles?.includes('adapter')
-        const isAdapterOrAluminumBlock =
-          isAdapter ||
-          labwareEntity.def.metadata.displayCategory === 'aluminumBlock'
-        const moduleOnDeck = getModuleUnderLabware(initialDeckSetup, labwareId)
-        const prefix = moduleOnDeck
-          ? i18n.t(
-              `form.step_edit_form.field.moduleLabwarePrefix.${moduleOnDeck.type}`
-            )
-          : null
-        const nickName = prefix
-          ? `${prefix} ${nicknamesById[labwareId]}`
-          : nicknamesById[labwareId]
+        const isOffDeck = getLabwareOffDeck(
+          initialDeckSetup,
+          savedStepForms ?? {},
+          labwareId
+        )
+
+        const moduleOnDeck = getModuleUnderLabware(
+          initialDeckSetup,
+          savedStepForms ?? {},
+          labwareId
+        )
+        const module =
+          moduleOnDeck != null ? getModuleShortNames(moduleOnDeck.type) : null
+
+        const isLabwareInColumn4 = getLabwareInColumn4(
+          initialDeckSetup,
+          savedStepForms ?? {},
+          labwareId
+        )
+
+        let nickName = nicknamesById[labwareId]
+        if (module != null) {
+          nickName = `${nicknamesById[labwareId]} in ${module}`
+        } else if (isOffDeck) {
+          nickName = `${nicknamesById[labwareId]} off-deck`
+        } else if (isLabwareInColumn4) {
+          nickName = `${nicknamesById[labwareId]} in staging area slot`
+        }
 
         if (!moveLabwarePresavedStep) {
-          return getIsTiprack(labwareEntity.def) || isAdapter
+          //  filter out tip racks, adapters, and labware in waste chute
+          //  for aspirating/dispensing/mixing into
+          return getIsTiprack(labwareEntity.def) ||
+            isAdapter ||
+            isLabwareInWasteChute
             ? acc
             : [
                 ...acc,
@@ -77,9 +117,9 @@ export const getLabwareOptions: Selector<Options> = createSelector(
                 },
               ]
         } else {
-          //  TODO(jr, 7/17/23): filter out moving trash for now in MoveLabware step type
-          //  remove this when we support other slots for trash
-          return nickName === 'Trash' || isAdapterOrAluminumBlock
+          //  filter out moving trash, adapters, and labware in
+          //  waste chute for moveLabware
+          return isAdapter || isLabwareInWasteChute
             ? acc
             : [
                 ...acc,
@@ -92,27 +132,52 @@ export const getLabwareOptions: Selector<Options> = createSelector(
       },
       []
     )
-    return _sortLabwareDropdownOptions(options)
+
+    return _sortLabwareDropdownOptions(labwareOptions)
   }
 )
 
-/** Returns options for disposal (e.g. fixed trash and trash box) */
-export const getDisposalLabwareOptions: Selector<Options> = createSelector(
-  stepFormSelectors.getLabwareEntities,
-  getLabwareNicknamesById,
-  (labwareEntities, names) =>
-    reduce(
-      labwareEntities,
-      (acc: Options, labware: LabwareEntity, labwareId): Options =>
-        getLabwareHasQuirk(labware.def, 'fixedTrash')
+/** Returns waste chute option */
+export const getWasteChuteOption: Selector<DropdownOption | null> = createSelector(
+  stepFormSelectors.getAdditionalEquipmentEntities,
+  additionalEquipmentEntities => {
+    const wasteChuteEntity = Object.values(additionalEquipmentEntities).find(
+      aE => aE.name === 'wasteChute'
+    )
+    const wasteChuteOption: DropdownOption | null =
+      wasteChuteEntity != null
+        ? {
+            name: 'Waste Chute',
+            value: wasteChuteEntity.id,
+          }
+        : null
+
+    return wasteChuteOption
+  }
+)
+
+/** Returns options for disposal (e.g. trash) */
+export const getDisposalOptions: Selector<Options> = createSelector(
+  stepFormSelectors.getAdditionalEquipment,
+  getWasteChuteOption,
+  (additionalEquipment, wasteChuteOption) => {
+    const trashBins = reduce(
+      additionalEquipment,
+      (acc: Options, additionalEquipment: AdditionalEquipmentEntity): Options =>
+        additionalEquipment.name === 'trashBin'
           ? [
               ...acc,
               {
-                name: names[labwareId],
-                value: labwareId,
+                name: TRASH,
+                value: additionalEquipment.id ?? '',
               },
             ]
           : acc,
       []
     )
+
+    return wasteChuteOption != null
+      ? ([...trashBins, wasteChuteOption] as DropdownOption[])
+      : trashBins
+  }
 )

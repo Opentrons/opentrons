@@ -27,7 +27,7 @@ import { useDispatchApiRequest } from '../../redux/robot-api'
 
 import type { Dispatch, State } from '../../redux/types'
 import type { ResetConfigRequest } from '../../redux/robot-admin/types'
-import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SetSettingOption } from '../../pages/RobotSettingsDashboard'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface LabelProps {
@@ -42,9 +42,9 @@ const OptionLabel = styled.label<LabelProps>`
   padding: ${SPACING.spacing16} ${SPACING.spacing24};
   border-radius: ${BORDERS.borderRadiusSize4};
   color: ${({ isSelected }) =>
-    isSelected === true ? COLORS.white : COLORS.darkBlack100};
+    isSelected === true ? COLORS.white : COLORS.black90};
   background: ${({ isSelected }) =>
-    isSelected === true ? COLORS.blueEnabled : COLORS.mediumBlueEnabled};
+    isSelected === true ? COLORS.blue50 : COLORS.blue35};
 `
 
 interface DeviceResetProps {
@@ -52,8 +52,6 @@ interface DeviceResetProps {
   setCurrentOption: SetSettingOption
 }
 
-// ToDo (kk:08/30/2023) lines that are related to module calibration will be activated when the be is ready.
-// The tests for that will be added.
 export function DeviceReset({
   robotName,
   setCurrentOption,
@@ -68,33 +66,40 @@ export function DeviceReset({
   const targetOptionsOrder = [
     'pipetteOffsetCalibrations',
     'gripperOffsetCalibrations',
-    // 'moduleCalibrations',
+    'moduleCalibration',
     'runsHistory',
   ]
+
   const availableOptions = options
     // filtering out ODD setting because this gets implicitly cleared if all settings are selected
     // filtering out boot scripts since product doesn't want this exposed to ODD users
-    .filter(({ id }) => !['onDeviceDisplay', 'bootScripts'].includes(id))
+    .filter(
+      ({ id }) =>
+        !['onDeviceDisplay', 'bootScripts', 'deckConfiguration'].includes(id)
+    )
     .sort(
       (a, b) =>
         targetOptionsOrder.indexOf(a.id) - targetOptionsOrder.indexOf(b.id)
     )
   const dispatch = useDispatch<Dispatch>()
 
+  const availableOptionsToDisplay = availableOptions.filter(
+    ({ id }) => !['authorizedKeys'].includes(id)
+  )
+
+  const isEveryOptionSelected = (obj: ResetConfigRequest): boolean => {
+    for (const key of targetOptionsOrder) {
+      if (obj != null && !obj[key]) {
+        return false
+      }
+    }
+    return true
+  }
+
   const handleClick = (): void => {
     if (resetOptions != null) {
-      // remove clearAllStoredData since its not a setting on the backend
-      const { clearAllStoredData, ...serverResetOptions } = resetOptions
-      if (Boolean(clearAllStoredData)) {
-        dispatchRequest(
-          resetConfig(robotName, {
-            ...serverResetOptions,
-            onDeviceDisplay: true,
-          })
-        )
-      } else {
-        dispatchRequest(resetConfig(robotName, serverResetOptions))
-      }
+      const { ...serverResetOptions } = resetOptions
+      dispatchRequest(resetConfig(robotName, serverResetOptions))
     }
   }
 
@@ -116,9 +121,9 @@ export function DeviceReset({
       case 'gripperOffsetCalibrations':
         optionText = t('clear_option_gripper_calibration')
         break
-      // case 'moduleCalibrations':
-      //   optionText = t('clear_option_module_calibrations')
-      //   break
+      case 'moduleCalibration':
+        optionText = t('clear_option_module_calibration')
+        break
       case 'runsHistory':
         optionText = t('clear_option_runs_history')
         subText = t('clear_option_runs_history_subtext')
@@ -139,6 +144,38 @@ export function DeviceReset({
   React.useEffect(() => {
     dispatch(fetchResetConfigOptions(robotName))
   }, [dispatch, robotName])
+
+  React.useEffect(() => {
+    if (
+      isEveryOptionSelected(resetOptions) &&
+      (!resetOptions.authorizedKeys ||
+        !resetOptions.onDeviceDisplay ||
+        !resetOptions.deckConfiguration)
+    ) {
+      setResetOptions({
+        ...resetOptions,
+        authorizedKeys: true,
+        onDeviceDisplay: true,
+        deckConfiguration: true,
+      })
+    }
+  }, [resetOptions])
+
+  React.useEffect(() => {
+    if (
+      !isEveryOptionSelected(resetOptions) &&
+      resetOptions.authorizedKeys &&
+      resetOptions.onDeviceDisplay &&
+      resetOptions.deckConfiguration
+    ) {
+      setResetOptions({
+        ...resetOptions,
+        authorizedKeys: false,
+        onDeviceDisplay: false,
+        deckConfiguration: false,
+      })
+    }
+  }, [resetOptions])
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
@@ -163,7 +200,7 @@ export function DeviceReset({
         marginTop="7.75rem"
       >
         <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-          {availableOptions.map(option => {
+          {availableOptionsToDisplay.map(option => {
             const { optionText, subText } = renderText(option.id)
             return (
               <React.Fragment key={option.id}>
@@ -195,7 +232,7 @@ export function DeviceReset({
                         color={
                           resetOptions[option.id] ?? false
                             ? COLORS.white
-                            : COLORS.darkBlack70
+                            : COLORS.grey60
                         }
                       >
                         {subText}
@@ -213,7 +250,8 @@ export function DeviceReset({
             value="clearAllStoredData"
             onChange={() => {
               setResetOptions(
-                Boolean(resetOptions.clearAllStoredData)
+                (resetOptions.authorizedKeys ?? false) &&
+                  (resetOptions.onDeviceDisplay ?? false)
                   ? {}
                   : availableOptions.reduce(
                       (acc, val) => {
@@ -222,14 +260,18 @@ export function DeviceReset({
                           [val.id]: true,
                         }
                       },
-                      { clearAllStoredData: true }
+                      { authorizedKeys: true, onDeviceDisplay: true }
                     )
               )
             }}
           />
           <OptionLabel
             htmlFor="clearAllStoredData"
-            isSelected={resetOptions.clearAllStoredData}
+            isSelected={
+              ((resetOptions.authorizedKeys ?? false) &&
+                (resetOptions.onDeviceDisplay ?? false)) ||
+              isEveryOptionSelected(resetOptions)
+            }
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
@@ -238,9 +280,11 @@ export function DeviceReset({
               <StyledText
                 as="p"
                 color={
-                  resetOptions.clearAllStoredData === true
+                  ((resetOptions.authorizedKeys ?? false) &&
+                    (resetOptions.onDeviceDisplay ?? false)) ||
+                  isEveryOptionSelected(resetOptions)
                     ? COLORS.white
-                    : COLORS.darkBlack70
+                    : COLORS.grey60
                 }
               >
                 {t('clear_all_stored_data_description')}
@@ -281,7 +325,7 @@ export const ConfirmClearDataModal = ({
     title: t('confirm_device_reset_heading'),
     hasExitIcon: false,
     iconName: 'ot-alert',
-    iconColor: COLORS.yellow2,
+    iconColor: COLORS.yellow50,
   }
   return (
     <Modal

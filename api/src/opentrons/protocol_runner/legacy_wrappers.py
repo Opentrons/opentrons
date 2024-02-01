@@ -9,8 +9,6 @@ from opentrons_shared_data.labware.dev_types import (
 )
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from opentrons.broker import Broker
-from opentrons.equipment_broker import EquipmentBroker
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules.types import (
@@ -20,8 +18,10 @@ from opentrons.hardware_control.modules.types import (
     ThermocyclerModuleModel as LegacyThermocyclerModuleModel,
     HeaterShakerModuleModel as LegacyHeaterShakerModuleModel,
 )
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_reader import ProtocolSource, ProtocolFileRole
+from opentrons.util.broker import Broker
 
 from opentrons.protocol_api import (
     ProtocolContext as LegacyProtocolContext,
@@ -124,8 +124,8 @@ class LegacyContextCreator:
     def create(
         self,
         protocol: LegacyProtocol,
-        broker: Optional[Broker],
-        equipment_broker: Optional[EquipmentBroker[LegacyLoadInfo]],
+        broker: Optional[LegacyBroker],
+        equipment_broker: Optional[Broker[LegacyLoadInfo]],
     ) -> LegacyProtocolContext:
         """Create a Protocol API v2 context."""
         extra_labware = (

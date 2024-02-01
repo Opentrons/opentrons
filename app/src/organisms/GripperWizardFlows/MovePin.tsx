@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import { EXTENSION } from '@opentrons/shared-data'
-import { COLORS, TYPOGRAPHY } from '@opentrons/components'
+import { COLORS, TYPOGRAPHY, SPACING, Flex } from '@opentrons/components'
 import { css } from 'styled-components'
 import { StyledText } from '../../atoms/text'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
@@ -67,28 +67,22 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
           createRunCommand({
             maintenanceRunId,
             command: {
-              commandType: 'calibration/calibrateGripper' as const,
-              params:
-                jaw === 'rear' && frontJawOffset != null
-                  ? { jaw, otherJawOffset: frontJawOffset }
-                  : { jaw },
+              commandType: 'home' as const,
+              params: {
+                skipIfMountPositionOk: 'extension',
+              },
             },
             waitUntilComplete: true,
           })
             .then(({ data }) => {
-              if (data.status === 'failed') {
-                setErrorMessage(data.error?.detail ?? null)
-              }
-              if (jaw === 'front' && data?.result?.jawOffset != null) {
-                setFrontJawOffset(data.result.jawOffset)
-              }
               createRunCommand({
                 maintenanceRunId,
                 command: {
-                  commandType: 'calibration/moveToMaintenancePosition' as const,
-                  params: {
-                    mount: EXTENSION,
-                  },
+                  commandType: 'calibration/calibrateGripper' as const,
+                  params:
+                    jaw === 'rear' && frontJawOffset != null
+                      ? { jaw, otherJawOffset: frontJawOffset }
+                      : { jaw },
                 },
                 waitUntilComplete: true,
               })
@@ -96,7 +90,26 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
                   if (data.status === 'failed') {
                     setErrorMessage(data.error?.detail ?? null)
                   }
-                  proceed()
+                  if (jaw === 'front' && data?.result?.jawOffset != null) {
+                    setFrontJawOffset(data.result.jawOffset)
+                  }
+                  createRunCommand({
+                    maintenanceRunId,
+                    command: {
+                      commandType: 'calibration/moveToMaintenancePosition' as const,
+                      params: {
+                        mount: EXTENSION,
+                      },
+                    },
+                    waitUntilComplete: true,
+                  })
+                    .then(({ data }) => {
+                      if (data.status === 'failed') {
+                        setErrorMessage(data.error?.detail ?? null)
+                      }
+                      proceed()
+                    })
+                    .catch(error => setErrorMessage(error.message))
                 })
                 .catch(error => setErrorMessage(error.message))
             })
@@ -118,18 +131,20 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
     [MOVE_PIN_TO_FRONT_JAW]: {
       inProgressText: t('stand_back_gripper_is_calibrating'),
       inProgressImage: (
-        <video
-          css={css`
-            max-width: 100%;
-            max-height: 20rem;
-          `}
-          autoPlay={true}
-          loop={true}
-          controls={false}
-          aria-label="calibrating front jaw"
-        >
-          <source src={calibratingFrontJaw} />
-        </video>
+        <Flex height="10.2rem" paddingTop={SPACING.spacing4}>
+          <video
+            css={css`
+              max-width: 100%;
+              max-height: 100%;
+            `}
+            autoPlay={true}
+            loop={true}
+            controls={false}
+            aria-label="calibrating front jaw"
+          >
+            <source src={calibratingFrontJaw} />
+          </video>
+        </Flex>
       ),
       header: t('insert_pin_into_front_jaw'),
       body: t('move_pin_from_storage_to_front_jaw'),
@@ -152,22 +167,24 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
     [MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW]: {
       inProgressText: t('stand_back_gripper_is_calibrating'),
       inProgressImage: (
-        <video
-          css={css`
-            max-width: 100%;
-            max-height: 20rem;
-          `}
-          autoPlay={true}
-          loop={true}
-          controls={false}
-          aria-label="calibrating rear jaw"
-        >
-          <source src={calibratingRearJaw} />
-        </video>
+        <Flex height="10.2rem" paddingTop={SPACING.spacing4}>
+          <video
+            css={css`
+              max-width: 100%;
+              max-height: 100%;
+            `}
+            autoPlay={true}
+            loop={true}
+            controls={false}
+            aria-label="calibrating rear jaw"
+          >
+            <source src={calibratingRearJaw} />
+          </video>
+        </Flex>
       ),
       header: t('insert_pin_into_rear_jaw'),
       body: t('move_pin_from_front_to_rear_jaw'),
-      buttonText: t('continue'),
+      buttonText: t('continue_calibration'),
       prepImage: (
         <video
           css={css`
@@ -226,10 +243,11 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
         }
       />
     )
+
   return errorMessage != null ? (
     <SimpleWizardBody
       isSuccess={false}
-      iconColor={COLORS.errorEnabled}
+      iconColor={COLORS.red50}
       header={t('shared:error_encountered')}
       subHeader={
         <Trans
@@ -253,7 +271,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       proceedButtonText={buttonText}
       proceed={handleOnClick}
       proceedIsDisabled={maintenanceRunId == null}
-      back={goBack}
+      back={movement !== MOVE_PIN_TO_FRONT_JAW ? goBack : undefined}
     />
   )
 }

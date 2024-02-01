@@ -39,6 +39,11 @@ class BaseResponseBody(BaseModel):
         kwargs["exclude_none"] = True
         return super().dict(*args, **kwargs)
 
+    def json(self, *args: Any, **kwargs: Any) -> str:
+        """See notes in `.dict()`."""
+        kwargs["exclude_none"] = True
+        return super().json(*args, **kwargs)
+
 
 class SimpleBody(BaseResponseBody, GenericModel, Generic[ResponseDataT]):
     """A response that returns a single resource."""
@@ -204,3 +209,8 @@ class ResponseList(BaseModel, Generic[ResponseDataT]):
     """A response that returns a list resource."""
 
     __root__: List[ResponseDataT]
+
+
+class NotifyRefetchBody(BaseResponseBody):
+    "A notification response that returns a flag for refetching via HTTP."
+    refetchUsingHTTP: bool = True

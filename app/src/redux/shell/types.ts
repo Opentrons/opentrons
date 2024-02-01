@@ -1,3 +1,4 @@
+import type { IpcMainEvent } from 'electron'
 import type { Error } from '../types'
 import type { RobotSystemAction } from './is-ready/types'
 
@@ -5,6 +6,16 @@ export interface Remote {
   ipcRenderer: {
     invoke: (channel: string, ...args: unknown[]) => Promise<any>
     send: (channel: string, ...args: unknown[]) => void
+    on: (
+      channel: string,
+      listener: (
+        event: IpcMainEvent,
+        hostname: string,
+        topic: NotifyTopic,
+        message: string | Object,
+        ...args: unknown[]
+      ) => void
+    ) => void
   }
 }
 
@@ -34,7 +45,7 @@ export type ShellUpdateAction =
   | { type: 'shell:CHECK_UPDATE'; meta: { shell: true } }
   | {
       type: 'shell:CHECK_UPDATE_RESULT'
-      payload: { available?: boolean; info?: UpdateInfo; error?: Error }
+      payload: { available?: boolean; info?: UpdateInfo | null; error?: Error }
     }
   | { type: 'shell:DOWNLOAD_UPDATE'; meta: { shell: true } }
   | { type: 'shell:DOWNLOAD_UPDATE_RESULT'; payload: { error?: Error } }
@@ -63,6 +74,14 @@ export interface AppRestartAction {
   meta: { shell: true }
 }
 
+export interface ReloadUiAction {
+  type: 'shell:RELOAD_UI'
+  payload: {
+    message: string
+  }
+  meta: { shell: true }
+}
+
 export interface SendLogAction {
   type: 'shell:SEND_LOG'
   payload: {
@@ -79,11 +98,66 @@ export interface UpdateBrightnessAction {
   meta: { shell: true }
 }
 
+export interface RobotMassStorageDeviceAdded {
+  type: 'shell:ROBOT_MASS_STORAGE_DEVICE_ADDED'
+  payload: {
+    rootPath: string
+  }
+  meta: { shell: true }
+}
+
+export interface RobotMassStorageDeviceEnumerated {
+  type: 'shell:ROBOT_MASS_STORAGE_DEVICE_ENUMERATED'
+  payload: {
+    rootPath: string
+    filePaths: string[]
+  }
+  meta: { shell: true }
+}
+
+export interface RobotMassStorageDeviceRemoved {
+  type: 'shell:ROBOT_MASS_STORAGE_DEVICE_REMOVED'
+  payload: {
+    rootPath: string
+  }
+  meta: { shell: true }
+}
+
+export type NotifyTopic =
+  | 'robot-server/maintenance_runs'
+  | 'robot-server/runs/current_command'
+
+export type NotifyAction = 'subscribe' | 'unsubscribe'
+
+export interface NotifySubscribeAction {
+  type: 'shell:NOTIFY_SUBSCRIBE'
+  payload: {
+    hostname: string
+    topic: NotifyTopic
+  }
+  meta: { shell: true }
+}
+
+export interface NotifyUnsubscribeAction {
+  type: 'shell:NOTIFY_UNSUBSCRIBE'
+  payload: {
+    hostname: string
+    topic: NotifyTopic
+  }
+  meta: { shell: true }
+}
+
 export type ShellAction =
   | UiInitializedAction
   | ShellUpdateAction
   | RobotSystemAction
   | UsbRequestsAction
   | AppRestartAction
+  | ReloadUiAction
   | SendLogAction
   | UpdateBrightnessAction
+  | RobotMassStorageDeviceAdded
+  | RobotMassStorageDeviceEnumerated
+  | RobotMassStorageDeviceRemoved
+  | NotifySubscribeAction
+  | NotifyUnsubscribeAction

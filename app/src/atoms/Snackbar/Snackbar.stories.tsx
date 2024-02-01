@@ -9,12 +9,15 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { StyledText } from '../text'
+import { touchScreenViewport } from '../../DesignTokens/constants'
+
 import { Snackbar } from './index'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'ODD/Atoms/Snackbar',
   component: Snackbar,
+  parameters: touchScreenViewport,
 } as Meta
 
 const DefaultTemplate: Story<React.ComponentProps<typeof Snackbar>> = args => {

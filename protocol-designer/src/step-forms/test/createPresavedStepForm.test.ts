@@ -49,6 +49,9 @@ beforeEach(() => {
         labwareOnMagModule,
       },
     },
+    additionalEquipmentEntities: {
+      mockTrash: { name: 'trashBin', id: 'mockTrash', location: 'A3' },
+    },
     savedStepForms: {},
     orderedStepIds: [],
     initialDeckSetup: {
@@ -122,13 +125,15 @@ describe('createPresavedStepForm', () => {
       })
     })
   })
-  it(`should call handleFormChange with a default pipette for "moveLiquid" step`, () => {
+  it(`should call handleFormChange with a default pipette and drop tip location for "moveLiquid" step`, () => {
     const args = { ...defaultArgs, stepType: 'moveLiquid' }
     expect(createPresavedStepForm(args)).toEqual({
       id: stepId,
       pipette: 'leftPipetteId',
+      nozzles: null,
       stepType: 'moveLiquid',
       // default fields
+      dropTip_location: 'mockTrash',
       aspirate_airGap_checkbox: false,
       aspirate_airGap_volume: '1',
       aspirate_delay_checkbox: false,
@@ -150,7 +155,7 @@ describe('createPresavedStepForm', () => {
       aspirate_wells: [],
       aspirate_wells_grouped: false,
       blowout_checkbox: false,
-      blowout_location: 'fixedTrash',
+      blowout_location: null,
       changeTip: 'always',
       dispense_airGap_checkbox: false,
       dispense_airGap_volume: '1',
@@ -175,7 +180,7 @@ describe('createPresavedStepForm', () => {
     })
   })
   describe('mix step', () => {
-    it('should call handleFormChange with a default pipette for mix step', () => {
+    it('should call handleFormChange with a default pipette and drop tip location for mix step', () => {
       const args = { ...defaultArgs, stepType: 'mix' }
       expect(createPresavedStepForm(args)).toEqual({
         id: stepId,
@@ -183,6 +188,8 @@ describe('createPresavedStepForm', () => {
         stepType: 'mix',
         // default fields
         labware: null,
+        nozzles: null,
+        dropTip_location: 'mockTrash',
         wells: [],
         aspirate_delay_checkbox: false,
         aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
@@ -193,7 +200,7 @@ describe('createPresavedStepForm', () => {
         mix_wellOrder_first: 't2b',
         mix_wellOrder_second: 'l2r',
         blowout_checkbox: false,
-        blowout_location: 'fixedTrash',
+        blowout_location: null,
         changeTip: 'always',
         stepDetails: '',
         stepName: 'mix',

@@ -13,6 +13,7 @@ from typing import (
     Callable,
     AsyncIterator,
     Union,
+    List,
 )
 
 from opentrons_hardware.hardware_control import network, tools
@@ -143,6 +144,10 @@ class SubsystemManager:
     @property
     def update_required(self) -> bool:
         return bool(self._updates_required)
+
+    @property
+    def subsystems_to_update(self) -> List[SubSystem]:
+        return [target_to_subsystem(t) for t in self._updates_required.keys()]
 
     async def start(self) -> None:
         await self._probe_network_and_cache_fw_updates(

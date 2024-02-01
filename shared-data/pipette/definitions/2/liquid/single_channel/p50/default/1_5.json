@@ -27,12 +27,7 @@
           ]
         }
       },
-      "dispense": {
-        "default": {
-          "1": [[50.0, 0.0, 2.931601299]]
-        }
-      },
-      "defaultBlowoutVolume": 4.712,
+      "dispense": { "default": { "1": [[50.0, 0.0, 2.931601299]] } },
       "defaultPushOutVolume": 0
     },
     "t200": {
@@ -61,12 +56,7 @@
           ]
         }
       },
-      "dispense": {
-        "default": {
-          "1": [[50.0, 0.0, 2.931601299]]
-        }
-      },
-      "defaultBlowoutVolume": 4.712,
+      "dispense": { "default": { "1": [[50.0, 0.0, 2.931601299]] } },
       "defaultPushOutVolume": 0
     },
     "t300": {
@@ -95,12 +85,7 @@
           ]
         }
       },
-      "dispense": {
-        "default": {
-          "1": [[50.0, 0.0, 2.931601299]]
-        }
-      },
-      "defaultBlowoutVolume": 4.712,
+      "dispense": { "default": { "1": [[50.0, 0.0, 2.931601299]] } },
       "defaultPushOutVolume": 0
     }
   },

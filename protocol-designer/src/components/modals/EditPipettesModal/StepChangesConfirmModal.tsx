@@ -1,7 +1,6 @@
 import * as React from 'react'
-
+import { useTranslation } from 'react-i18next'
 import { AlertModal, OutlineButton } from '@opentrons/components'
-import { i18n } from '../../../localization'
 
 import styles from './StepChangesConfirmModal.css'
 import modalStyles from '../modal.css'
@@ -13,67 +12,55 @@ interface Props {
 
 export const StepChangesConfirmModal = (props: Props): JSX.Element => {
   const { onCancel, onConfirm } = props
-
+  const { t } = useTranslation(['modal', 'button'])
   return (
     <AlertModal
       alertOverlay
       className={modalStyles.modal}
-      heading={i18n.t('modal.global_step_changes.heading')}
+      heading={t('global_step_changes.heading')}
     >
-      <p>{i18n.t('modal.global_step_changes.switch_pipettes.body')}</p>
+      <p>{t('global_step_changes.switch_pipettes.body')}</p>
       <ul className={styles.cause_effect_list}>
         <li className={styles.cause_effect_item}>
           <p className={styles.cause}>
-            {i18n.t('modal.global_step_changes.switch_pipettes.cause.any')}
+            {t('global_step_changes.switch_pipettes.cause.any')}
+          </p>
+          <p>{t('global_step_changes.switch_pipettes.effect.any')}</p>
+        </li>
+        <li className={styles.cause_effect_item}>
+          <p className={styles.cause}>
+            {t('global_step_changes.switch_pipettes.cause.multi_to_single')}
           </p>
           <p>
-            {i18n.t('modal.global_step_changes.switch_pipettes.effect.any')}
+            {t('global_step_changes.switch_pipettes.effect.multi_to_single')}
           </p>
         </li>
         <li className={styles.cause_effect_item}>
           <p className={styles.cause}>
-            {i18n.t(
-              'modal.global_step_changes.switch_pipettes.cause.multi_to_single'
-            )}
+            {t('global_step_changes.switch_pipettes.cause.single_to_multi')}
           </p>
           <p>
-            {i18n.t(
-              'modal.global_step_changes.switch_pipettes.effect.multi_to_single'
-            )}
+            {t('global_step_changes.switch_pipettes.effect.single_to_multi')}
           </p>
         </li>
         <li className={styles.cause_effect_item}>
           <p className={styles.cause}>
-            {i18n.t(
-              'modal.global_step_changes.switch_pipettes.cause.single_to_multi'
+            {t(
+              'global_step_changes.switch_pipettes.cause.next_pipette_smaller'
             )}
           </p>
           <p>
-            {i18n.t(
-              'modal.global_step_changes.switch_pipettes.effect.single_to_multi'
-            )}
-          </p>
-        </li>
-        <li className={styles.cause_effect_item}>
-          <p className={styles.cause}>
-            {i18n.t(
-              'modal.global_step_changes.switch_pipettes.cause.next_pipette_smaller'
-            )}
-          </p>
-          <p>
-            {i18n.t(
-              'modal.global_step_changes.switch_pipettes.effect.next_pipette_smaller'
+            {t(
+              'global_step_changes.switch_pipettes.effect.next_pipette_smaller'
             )}
           </p>
         </li>
       </ul>
 
       <div className={modalStyles.button_row}>
-        <OutlineButton onClick={onCancel}>
-          {i18n.t('button.cancel')}
-        </OutlineButton>
+        <OutlineButton onClick={onCancel}>{t('button:cancel')}</OutlineButton>
         <OutlineButton className={styles.continue_button} onClick={onConfirm}>
-          {i18n.t('button.continue')}
+          {t('button:continue')}
         </OutlineButton>
       </div>
     </AlertModal>

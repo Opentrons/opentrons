@@ -13,9 +13,12 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  getCutoutDisplayName,
+  getFixtureDisplayName,
   getModuleDisplayName,
   getModuleType,
   getPipetteNameSpecs,
+  SINGLE_SLOT_FIXTURES,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
@@ -25,14 +28,20 @@ import { StyledText } from '../../atoms/text'
 import { getRobotTypeDisplayName } from '../ProtocolsLanding/utils'
 import { getSlotsForThermocycler } from './utils'
 
-import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
-import type { PipetteName, RobotType } from '@opentrons/shared-data'
+import type {
+  CutoutConfigProtocolSpec,
+  LoadModuleRunTimeCommand,
+  PipetteName,
+  RobotType,
+  SingleSlotCutoutFixtureId,
+} from '@opentrons/shared-data'
 
 interface RobotConfigurationDetailsProps {
   leftMountPipetteName: PipetteName | null
   rightMountPipetteName: PipetteName | null
   extensionInstrumentName: string | null
-  requiredModuleDetails: LoadModuleRunTimeCommand[] | null
+  requiredModuleDetails: LoadModuleRunTimeCommand[]
+  requiredFixtureDetails: CutoutConfigProtocolSpec[]
   isLoading: boolean
   robotType: RobotType | null
 }
@@ -45,6 +54,7 @@ export const RobotConfigurationDetails = (
     rightMountPipetteName,
     extensionInstrumentName,
     requiredModuleDetails,
+    requiredFixtureDetails,
     isLoading,
     robotType,
   } = props
@@ -57,25 +67,7 @@ export const RobotConfigurationDetails = (
     </StyledText>
   )
 
-  // TODO(bh, 2022-10-18): insert 96-channel display name
-  // const leftAndRightMountsPipetteDisplayName = 'P20 96-Channel GEN1'
-  const leftAndRightMountsPipetteDisplayName = null
-  const leftAndRightMountsItem =
-    leftAndRightMountsPipetteDisplayName != null ? (
-      <RobotConfigurationDetailsItem
-        label={t('left_and_right_mounts')}
-        item={
-          isLoading ? (
-            loadingText
-          ) : (
-            <InstrumentContainer
-              displayName={leftAndRightMountsPipetteDisplayName}
-            />
-          )
-        }
-      />
-    ) : null
-
+  const is96PipetteUsed = leftMountPipetteName === 'p1000_96'
   const leftMountPipetteDisplayName =
     getPipetteNameSpecs(leftMountPipetteName as PipetteName)?.displayName ??
     null
@@ -103,6 +95,14 @@ export const RobotConfigurationDetails = (
       emptyText
     )
 
+  // filter out single slot fixtures
+  const nonStandardRequiredFixtureDetails = requiredFixtureDetails.filter(
+    fixture =>
+      !SINGLE_SLOT_FIXTURES.includes(
+        fixture.cutoutFixtureId as SingleSlotCutoutFixtureId
+      )
+  )
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN} paddingBottom={SPACING.spacing24}>
       <RobotConfigurationDetailsItem
@@ -116,12 +116,12 @@ export const RobotConfigurationDetails = (
         }
       />
       <Divider marginY={SPACING.spacing12} width="100%" />
-      {leftAndRightMountsItem ?? (
+      <RobotConfigurationDetailsItem
+        label={is96PipetteUsed ? t('both_mounts') : t('left_mount')}
+        item={isLoading ? loadingText : leftMountItem}
+      />
+      {!is96PipetteUsed && (
         <>
-          <RobotConfigurationDetailsItem
-            label={t('left_mount')}
-            item={isLoading ? loadingText : leftMountItem}
-          />
           <Divider marginY={SPACING.spacing12} width="100%" />
           <RobotConfigurationDetailsItem
             label={t('right_mount')}
@@ -138,41 +138,52 @@ export const RobotConfigurationDetails = (
           />
         </>
       ) : null}
-      {requiredModuleDetails != null
-        ? requiredModuleDetails.map((module, index) => {
-            return (
-              <React.Fragment key={index}>
-                <Divider marginY={SPACING.spacing12} width="100%" />
-                <RobotConfigurationDetailsItem
-                  label={t('run_details:module_slot_number', {
-                    slot_number:
-                      getModuleType(module.params.model) ===
-                      THERMOCYCLER_MODULE_TYPE
-                        ? getSlotsForThermocycler(robotType)
-                        : module.params.location.slotName,
-                  })}
-                  item={
-                    <>
-                      <ModuleIcon
-                        key={index}
-                        moduleType={getModuleType(module.params.model)}
-                        marginRight={SPACING.spacing4}
-                        alignSelf={ALIGN_CENTER}
-                        color={COLORS.darkGreyEnabled}
-                        height={SIZE_1}
-                        minWidth={SIZE_1}
-                        minHeight={SIZE_1}
-                      />
-                      <StyledText as="p">
-                        {getModuleDisplayName(module.params.model)}
-                      </StyledText>
-                    </>
-                  }
-                />
-              </React.Fragment>
-            )
-          })
-        : null}
+      {requiredModuleDetails.map((module, index) => {
+        return (
+          <React.Fragment key={`module_${index}`}>
+            <Divider marginY={SPACING.spacing12} width="100%" />
+            <RobotConfigurationDetailsItem
+              label={
+                getModuleType(module.params.model) === THERMOCYCLER_MODULE_TYPE
+                  ? getSlotsForThermocycler(robotType)
+                  : module.params.location.slotName
+              }
+              item={
+                <>
+                  <ModuleIcon
+                    key={index}
+                    moduleType={getModuleType(module.params.model)}
+                    marginRight={SPACING.spacing4}
+                    alignSelf={ALIGN_CENTER}
+                    color={COLORS.grey60}
+                    height={SIZE_1}
+                    minWidth={SIZE_1}
+                    minHeight={SIZE_1}
+                  />
+                  <StyledText as="p">
+                    {getModuleDisplayName(module.params.model)}
+                  </StyledText>
+                </>
+              }
+            />
+          </React.Fragment>
+        )
+      })}
+      {nonStandardRequiredFixtureDetails.map((fixture, index) => {
+        return (
+          <React.Fragment key={`fixture_${index}`}>
+            <Divider marginY={SPACING.spacing12} width="100%" />
+            <RobotConfigurationDetailsItem
+              label={getCutoutDisplayName(fixture.cutoutId)}
+              item={
+                <StyledText as="p">
+                  {getFixtureDisplayName(fixture.cutoutFixtureId)}
+                </StyledText>
+              }
+            />
+          </React.Fragment>
+        )
+      })}
     </Flex>
   )
 }
@@ -197,7 +208,7 @@ export const RobotConfigurationDetailsItem = (
         flex="0 0 auto"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         marginRight={SPACING.spacing16}
-        color={COLORS.darkGreyEnabled}
+        color={COLORS.grey50}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
         width="4.625rem"
       >

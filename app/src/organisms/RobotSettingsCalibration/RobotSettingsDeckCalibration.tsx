@@ -62,7 +62,7 @@ export function RobotSettingsDeckCalibration({
         {t('deck_calibration_title')}
       </StyledText>
       <StyledText as="p">{t('deck_calibration_description')}</StyledText>
-      <StyledText as="label" color={COLORS.darkGreyEnabled}>
+      <StyledText as="label" color={COLORS.grey50}>
         {deckLastModified}
       </StyledText>
     </Flex>

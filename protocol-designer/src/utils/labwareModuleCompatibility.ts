@@ -40,6 +40,7 @@ export const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
     'opentrons_24_aluminumblock_nest_2ml_snapcap',
     'opentrons_24_aluminumblock_nest_0.5ml_screwcap',
     'opentrons_96_well_aluminum_block',
+    'opentrons_aluminum_flat_bottom_plate',
   ],
   [MAGNETIC_MODULE_TYPE]: [
     'biorad_96_wellplate_200ul_pcr',
@@ -51,6 +52,7 @@ export const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
   [THERMOCYCLER_MODULE_TYPE]: [
     'biorad_96_wellplate_200ul_pcr',
     'nest_96_wellplate_100ul_pcr_full_skirt',
+    'opentrons_96_wellplate_200ul_pcr_full_skirt',
   ],
   [HEATERSHAKER_MODULE_TYPE]: [
     'opentrons_96_deep_well_adapter',
@@ -62,6 +64,8 @@ export const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
     'nest_96_wellplate_100ul_pcr_full_skirt',
     'nest_96_wellplate_2ml_deep',
     'opentrons_96_wellplate_200ul_pcr_full_skirt',
+    'armadillo_96_wellplate_200ul_pcr_full_skirt',
+    'biorad_96_wellplate_200ul_pcr',
   ],
 }
 export const getLabwareIsCompatible = (
@@ -82,24 +86,51 @@ const FLAT_BOTTOM_ADAPTER_LOADNAME = 'opentrons_96_flat_bottom_adapter'
 const PCR_ADAPTER_LOADNAME = 'opentrons_96_pcr_adapter'
 const UNIVERSAL_FLAT_ADAPTER_LOADNAME = 'opentrons_universal_flat_adapter'
 const ALUMINUM_BLOCK_96_LOADNAME = 'opentrons_96_well_aluminum_block'
+const ALUMINUM_FLAT_BOTTOM_PLATE = 'opentrons_aluminum_flat_bottom_plate'
+export const ADAPTER_96_CHANNEL = 'opentrons_flex_96_tiprack_adapter'
 
 export const COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER: Record<
   string,
   string[]
 > = {
-  [DEEP_WELL_ADAPTER_LOADNAME]: [
-    'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2',
-  ],
+  [DEEP_WELL_ADAPTER_LOADNAME]: ['opentrons/nest_96_wellplate_2ml_deep/2'],
   [FLAT_BOTTOM_ADAPTER_LOADNAME]: ['opentrons/nest_96_wellplate_200ul_flat/2'],
   [PCR_ADAPTER_LOADNAME]: [
     'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2',
+    'opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/2',
+    'opentrons/biorad_96_wellplate_200ul_pcr/2',
   ],
   [UNIVERSAL_FLAT_ADAPTER_LOADNAME]: [
     'opentrons/corning_384_wellplate_112ul_flat/2',
+    'opentrons/corning_96_wellplate_360ul_flat/2',
+    //  TODO(jr, 9/18/23): comment this out for now until these labwares are compatible
+    //  with this adapter from the API side
+    // 'opentrons/corning_48_wellplate_1.6ml_flat/2',
+    // 'opentrons/corning_24_wellplate_3.4ml_flat/2',
+    // 'opentrons/corning_12_wellplate_6.9ml_flat/2',
+    // 'opentrons/corning_6_wellplate_16.8ml_flat/2',
+    // 'opentrons/nest_96_wellplate_200ul_flat/2',
   ],
   [ALUMINUM_BLOCK_96_LOADNAME]: [
     'opentrons/biorad_96_wellplate_200ul_pcr/2',
     'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2',
+  ],
+  [ALUMINUM_FLAT_BOTTOM_PLATE]: [
+    'opentrons/corning_384_wellplate_112ul_flat/2',
+    'opentrons/corning_96_wellplate_360ul_flat/2',
+    'opentrons/corning_48_wellplate_1.6ml_flat/2',
+    'opentrons/corning_24_wellplate_3.4ml_flat/2',
+    'opentrons/corning_12_wellplate_6.9ml_flat/2',
+    'opentrons/corning_6_wellplate_16.8ml_flat/2',
+    'opentrons/nest_96_wellplate_200ul_flat/2',
+  ],
+  [ADAPTER_96_CHANNEL]: [
+    'opentrons/opentrons_flex_96_tiprack_50ul/1',
+    'opentrons/opentrons_flex_96_tiprack_200ul/1',
+    'opentrons/opentrons_flex_96_tiprack_1000ul/1',
+    'opentrons/opentrons_flex_96_filtertiprack_50ul/1',
+    'opentrons/opentrons_flex_96_filtertiprack_200ul/1',
+    'opentrons/opentrons_flex_96_filtertiprack_1000ul/1',
   ],
 }
 
@@ -125,6 +156,31 @@ export const getAdapterLabwareIsAMatch = (
   const loadName = Object.values(allLabware).find(lab => lab.id === labwareId)
     ?.def.parameters.loadName
 
+  const flatBottomLabwares = [
+    'corning_384_wellplate_112ul_flat',
+    'corning_96_wellplate_360ul_flat',
+    'corning_6_wellplate_16.8ml_flat',
+    'corning_384_wellplate_112ul_flat',
+    'corning_96_wellplate_360ul_flat',
+    'corning_6_wellplate_16.8ml_flat',
+    'nest_96_wellplate_200ul_flat',
+  ]
+
+  const adapter96Tipracks = [
+    'opentrons_flex_96_tiprack_50ul',
+    'opentrons_flex_96_tiprack_200ul',
+    'opentrons_flex_96_tiprack_1000ul',
+    'opentrons_flex_96_filtertiprack_50ul',
+    'opentrons_flex_96_filtertiprack_200ul',
+    'opentrons_flex_96_filtertiprack_1000ul',
+  ]
+
+  const pcrLabwares = [
+    'biorad_96_wellplate_200ul_pcr',
+    'nest_96_wellplate_100ul_pcr_full_skirt',
+    'opentrons_96_wellplate_200ul_pcr_full_skirt',
+  ]
+
   const deepWellPair =
     loadName === DEEP_WELL_ADAPTER_LOADNAME &&
     draggedLabwareLoadname === 'nest_96_wellplate_2ml_deep'
@@ -133,21 +189,30 @@ export const getAdapterLabwareIsAMatch = (
     draggedLabwareLoadname === 'nest_96_wellplate_200ul_flat'
   const pcrPair =
     loadName === PCR_ADAPTER_LOADNAME &&
-    draggedLabwareLoadname === 'nest_96_wellplate_100ul_pcr_full_skirt'
+    pcrLabwares.includes(draggedLabwareLoadname)
   const universalPair =
     loadName === UNIVERSAL_FLAT_ADAPTER_LOADNAME &&
-    draggedLabwareLoadname === 'corning_384_wellplate_112ul_flat'
+    (draggedLabwareLoadname === 'corning_384_wellplate_112ul_flat' ||
+      draggedLabwareLoadname === 'corning_96_wellplate_360ul_flat')
   const aluminumBlock96Pairs =
     loadName === ALUMINUM_BLOCK_96_LOADNAME &&
     (draggedLabwareLoadname === 'biorad_96_wellplate_200ul_pcr' ||
       draggedLabwareLoadname === 'nest_96_wellplate_100ul_pcr_full_skirt')
+  const aluminumFlatBottomPlatePairs =
+    loadName === ALUMINUM_FLAT_BOTTOM_PLATE &&
+    flatBottomLabwares.includes(draggedLabwareLoadname)
+  const adapter96ChannelPairs =
+    loadName === ADAPTER_96_CHANNEL &&
+    adapter96Tipracks.includes(draggedLabwareLoadname)
 
   if (
     deepWellPair ||
     flatBottomPair ||
     pcrPair ||
     universalPair ||
-    aluminumBlock96Pairs
+    aluminumBlock96Pairs ||
+    aluminumFlatBottomPlatePairs ||
+    adapter96ChannelPairs
   ) {
     return true
   } else {

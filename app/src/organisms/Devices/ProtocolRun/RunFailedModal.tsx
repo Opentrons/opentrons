@@ -1,5 +1,4 @@
 import * as React from 'react'
-import isEmpty from 'lodash/isEmpty'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
@@ -87,7 +86,7 @@ export function RunFailedModal({
           marginTop={SPACING.spacing8}
           marginBottom={SPACING.spacing16}
           padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
-          backgroundColor={COLORS.fundamentalsBackground}
+          backgroundColor={COLORS.grey10}
           borderRadius={BORDERS.borderRadiusSize1}
           overflowWrap="anywhere"
           border={BORDERS.lineBorder}
@@ -95,11 +94,6 @@ export function RunFailedModal({
           <StyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
             {highestPriorityError.detail}
           </StyledText>
-          {!isEmpty(highestPriorityError.errorInfo) && (
-            <StyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
-              {JSON.stringify(highestPriorityError.errorInfo)}
-            </StyledText>
-          )}
         </Flex>
         <StyledText as="p">
           {t('run_failed_modal_description_desktop')}

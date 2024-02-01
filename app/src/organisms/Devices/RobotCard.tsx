@@ -4,13 +4,12 @@ import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 
 import {
-  Box,
-  Flex,
   ALIGN_START,
-  BORDERS,
+  Box,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
   POSITION_ABSOLUTE,
@@ -38,7 +37,7 @@ import { StyledText } from '../../atoms/text'
 import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
-import { useIsOT3 } from './hooks'
+import { useIsFlex } from './hooks'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
 import { RobotStatusHeader } from './RobotStatusHeader'
@@ -70,7 +69,6 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       padding={SPACING.spacing16}
       position={POSITION_RELATIVE}
       onClick={() => history.push(`/devices/${robotName}`)}
-      css={BORDERS.cardOutlineBorder}
     >
       <img
         src={robotModel === 'OT-2' ? OT2_PNG : FLEX_PNG}
@@ -132,7 +130,7 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
       <StyledText
         as="h6"
         textTransform={TYPOGRAPHY.textTransformUppercase}
-        color={COLORS.darkGreyEnabled}
+        color={COLORS.grey60}
       >
         {t('modules')}
       </StyledText>
@@ -153,7 +151,7 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
 
 function AttachedInstruments(props: { robotName: string }): JSX.Element {
   const { t } = useTranslation('devices_landing')
-  const isOT3 = useIsOT3(props.robotName)
+  const isFlex = useIsFlex(props.robotName)
   const {
     data: pipettesData,
     isLoading: isPipetteQueryLoading,
@@ -162,7 +160,7 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
   const {
     data: attachedInstruments,
     isLoading: isInstrumentsQueryLoading,
-  } = useInstrumentsQuery({ enabled: isOT3 })
+  } = useInstrumentsQuery({ enabled: isFlex })
   const attachedGripper =
     (attachedInstruments?.data ?? []).find(
       (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
@@ -185,7 +183,7 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
       gridGap={SPACING.spacing4}
       minWidth="24rem"
     >
-      <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+      <StyledText as="h6" color={COLORS.grey60}>
         {t('shared:instruments')}
       </StyledText>
 

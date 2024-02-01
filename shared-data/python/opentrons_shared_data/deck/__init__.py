@@ -1,11 +1,11 @@
 """
 opentrons_shared_data.deck: types and bindings for deck definitions
 """
-from typing import Dict, NamedTuple, cast, overload, TYPE_CHECKING
+from typing import Dict, List, NamedTuple, cast, overload, TYPE_CHECKING
 from typing_extensions import Final
 import json
 
-from .. import load_shared_data
+from .. import get_shared_data_root, load_shared_data
 
 if TYPE_CHECKING:
     from .dev_types import (
@@ -13,9 +13,11 @@ if TYPE_CHECKING:
         DeckDefinition,
         DeckDefinitionV3,
         DeckSchemaVersion3,
+        DeckDefinitionV4,
+        DeckSchemaVersion4,
     )
 
-DEFAULT_DECK_DEFINITION_VERSION = 3
+DEFAULT_DECK_DEFINITION_VERSION: Final = 4
 
 
 class Offset(NamedTuple):
@@ -37,23 +39,33 @@ CALIBRATION_SQUARE_EDGES: Dict[str, Offset] = {
 
 
 @overload
-def load(name: str, version: "DeckSchemaVersion3") -> "DeckDefinitionV3":
+def load(name: str, version: "DeckSchemaVersion4") -> "DeckDefinitionV4":
     ...
 
 
 @overload
-def load(name: str, version: int) -> "DeckDefinition":
+def load(name: str, version: "DeckSchemaVersion3") -> "DeckDefinitionV3":
     ...
 
 
-def load(name: str, version: int = DEFAULT_DECK_DEFINITION_VERSION) -> object:
-    return json.loads(load_shared_data(f"deck/definitions/{version}/{name}.json"))
+def load(name: str, version: int = DEFAULT_DECK_DEFINITION_VERSION) -> "DeckDefinition":
+    return json.loads(  # type: ignore[no-any-return]
+        load_shared_data(f"deck/definitions/{version}/{name}.json")
+    )
 
 
 def load_schema(version: int) -> "DeckSchema":
     return cast(
         "DeckSchema", json.loads(load_shared_data(f"deck/schemas/{version}.json"))
     )
+
+
+def list_names(version: int) -> List[str]:
+    """Return all loadable deck definition names, for the given schema version."""
+    definitions_directory = (
+        get_shared_data_root() / "deck" / "definitions" / f"{version}"
+    )
+    return [file.stem for file in definitions_directory.iterdir()]
 
 
 def get_calibration_square_position_in_slot(slot: int) -> Offset:

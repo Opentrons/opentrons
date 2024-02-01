@@ -5,7 +5,6 @@ from pathlib import Path
 from fastapi import Depends, status
 from typing import (
     Callable,
-    Union,
     TYPE_CHECKING,
     cast,
     Awaitable,
@@ -16,7 +15,9 @@ from typing import (
 from uuid import uuid4  # direct to avoid import cycles in service.dependencies
 from traceback import format_exception_only, TracebackException
 from contextlib import contextmanager
-from opentrons_shared_data.robot.dev_types import RobotType
+
+from opentrons_shared_data import deck
+from opentrons_shared_data.robot.dev_types import RobotType, RobotTypeEnum
 
 from opentrons import initialize as initialize_api, should_use_ot3
 from opentrons.config import (
@@ -26,22 +27,13 @@ from opentrons.config import (
     feature_flags as ff,
 )
 from opentrons.util.helpers import utc_now
-from opentrons.hardware_control import ThreadManagedHardware, HardwareControlAPI
+from opentrons.hardware_control import ThreadManagedHardware, HardwareControlAPI, API
 from opentrons.hardware_control.simulator_setup import load_simulator_thread_manager
-from opentrons.hardware_control.types import (
-    HardwareEvent,
-    DoorStateNotification,
-    StatusBarState,
-)
+from opentrons.hardware_control.types import StatusBarState
 from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )
 from opentrons.protocol_engine import DeckType
-
-from notify_server.clients import publisher
-from notify_server.settings import Settings as NotifyServerSettings
-from notify_server.models import event, topics
-from notify_server.models.hardware_event import DoorStatePayload
 
 from server_utils.fastapi_utils.app_state import (
     AppState,
@@ -50,6 +42,7 @@ from server_utils.fastapi_utils.app_state import (
 )
 from .errors.robot_errors import (
     NotSupportedOnOT2,
+    NotSupportedOnFlex,
     HardwareNotYetInitialized,
     HardwareFailedToInitialize,
 )
@@ -81,9 +74,6 @@ _hw_api_accessor = AppStateAccessor[ThreadManagedHardware]("hardware_api")
 _init_task_accessor = AppStateAccessor["asyncio.Task[None]"]("hardware_init_task")
 _postinit_task_accessor = AppStateAccessor["asyncio.Task[None]"](
     "hardware_postinit_task"
-)
-_event_unsubscribe_accessor = AppStateAccessor[Callable[[], None]](
-    "hardware_event_unsubscribe"
 )
 _firmware_update_manager_accessor = AppStateAccessor[FirmwareUpdateManager](
     "firmware_update_manager"
@@ -119,12 +109,10 @@ async def clean_up_hardware(app_state: AppState) -> None:
     """Shutdown the HardwareAPI singleton and remove it from global state."""
     initialize_task = _init_task_accessor.get_from(app_state)
     thread_manager = _hw_api_accessor.get_from(app_state)
-    unsubscribe_from_events = _event_unsubscribe_accessor.get_from(app_state)
     postinit_task = _postinit_task_accessor.get_from(app_state)
     _init_task_accessor.set_on(app_state, None)
     _postinit_task_accessor.set_on(app_state, None)
     _hw_api_accessor.set_on(app_state, None)
-    _event_unsubscribe_accessor.set_on(app_state, None)
 
     if initialize_task is not None:
         initialize_task.cancel()
@@ -134,9 +122,6 @@ async def clean_up_hardware(app_state: AppState) -> None:
     if postinit_task is not None:
         postinit_task.cancel()
         await asyncio.gather(postinit_task, return_exceptions=True)
-
-    if unsubscribe_from_events is not None:
-        unsubscribe_from_events()
 
     if thread_manager is not None:
         thread_manager.clean_up()
@@ -226,6 +211,17 @@ def get_ot3_hardware(
     return cast(OT3API, thread_manager.wrapped())
 
 
+def get_ot2_hardware(
+    thread_manager: ThreadManagedHardware = Depends(get_thread_manager),
+) -> "API":
+    """Get an OT2 hardware controller."""
+    if not thread_manager.wraps_instance(API):
+        raise NotSupportedOnFlex(
+            detail="This route is only available on an OT-2."
+        ).as_error(status.HTTP_403_FORBIDDEN)
+    return cast(API, thread_manager.wrapped())
+
+
 async def get_firmware_update_manager(
     app_state: AppState = Depends(get_app_state),
     thread_manager: ThreadManagedHardware = Depends(get_thread_manager),
@@ -262,9 +258,21 @@ async def get_robot_type() -> RobotType:
     return "OT-3 Standard" if should_use_ot3() else "OT-2 Standard"
 
 
+async def get_robot_type_enum() -> RobotTypeEnum:
+    """Return what kind of robot this server is running on."""
+    return RobotTypeEnum.FLEX if should_use_ot3() else RobotTypeEnum.OT2
+
+
 async def get_deck_type() -> DeckType:
     """Return what kind of deck the robot that this server is running on has."""
     return DeckType(guess_deck_type_from_global_config())
+
+
+async def get_deck_definition(
+    deck_type: DeckType = Depends(get_deck_type),
+) -> deck.dev_types.DeckDefinitionV4:
+    """Return this robot's deck definition."""
+    return deck.load(deck_type, version=4)
 
 
 async def _postinit_ot2_tasks(
@@ -493,7 +501,6 @@ async def _initialize_hardware_api(
                 app_state, app_settings, systemd_available
             )
 
-        _initialize_event_watchers(app_state, hardware)
         _hw_api_accessor.set_on(app_state, hardware)
 
         for callback in callbacks:
@@ -533,32 +540,3 @@ async def _initialize_hardware_api(
         # should be removed,
         log.exception("Exception during hardware background initialization.")
         raise
-
-
-# TODO(mc, 2021-09-01): if we're ever going to actually use the notification
-# server, this logic needs to be in its own unit and not tucked away here in
-# test-less wrapper module
-def _initialize_event_watchers(
-    app_state: AppState,
-    hardware_api: ThreadManagedHardware,
-) -> None:
-    """Initialize notification publishing for hardware events."""
-    notify_server_settings = NotifyServerSettings()
-    hw_event_publisher = publisher.create(
-        notify_server_settings.publisher_address.connection_string()
-    )
-
-    def _publish_hardware_event(hw_event: Union[str, HardwareEvent]) -> None:
-        if isinstance(hw_event, DoorStateNotification):
-            payload = DoorStatePayload(state=hw_event.new_state)
-        else:
-            return
-
-        topic = topics.RobotEventTopics.HARDWARE_EVENTS
-        hw_event_publisher.send_nowait(
-            topic,
-            event.Event(createdOn=utc_now(), publisher=__name__, data=payload),
-        )
-
-    unsubscribe = hardware_api.register_callback(_publish_hardware_event)
-    _event_unsubscribe_accessor.set_on(app_state, unsubscribe)

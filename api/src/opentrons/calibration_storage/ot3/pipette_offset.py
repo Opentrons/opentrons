@@ -85,7 +85,7 @@ def get_pipette_offset(
             **io.read_cal_file(pipette_calibration_filepath)
         )
     except FileNotFoundError:
-        log.warning(f"Calibrations for {pipette_id} on {mount} does not exist.")
+        log.debug(f"Calibrations for {pipette_id} on {mount} does not exist.")
         return None
     except (json.JSONDecodeError, ValidationError):
         log.warning(

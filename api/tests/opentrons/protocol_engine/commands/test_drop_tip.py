@@ -87,10 +87,15 @@ async def test_drop_tip_implementation(
     )
 
     decoy.when(
+        mock_state_view.pipettes.get_is_partially_configured(pipette_id="abc")
+    ).then_return(False)
+
+    decoy.when(
         mock_state_view.geometry.get_checked_tip_drop_location(
             pipette_id="abc",
             labware_id="123",
             well_location=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
+            partially_configured=False,
         )
     ).then_return(WellLocation(offset=WellOffset(x=4, y=5, z=6)))
 
@@ -143,8 +148,15 @@ async def test_drop_tip_with_alternating_locations(
     ).then_return(drop_location)
 
     decoy.when(
+        mock_state_view.pipettes.get_is_partially_configured(pipette_id="abc")
+    ).then_return(False)
+
+    decoy.when(
         mock_state_view.geometry.get_checked_tip_drop_location(
-            pipette_id="abc", labware_id="123", well_location=drop_location
+            pipette_id="abc",
+            labware_id="123",
+            well_location=drop_location,
+            partially_configured=False,
         )
     ).then_return(WellLocation(offset=WellOffset(x=4, y=5, z=6)))
 

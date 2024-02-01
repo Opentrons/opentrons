@@ -40,17 +40,20 @@ CLASSIFIERS = [
     "Intended Audience :: Science/Research",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.10",
     "Topic :: Scientific/Engineering",
 ]
 KEYWORDS = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 DESCRIPTION = "Hardware control for Opentrons Robots."
 PACKAGES = find_packages(where=".", exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
-    "python-can==3.3.4",
     "pyserial==3.5",
     f"opentrons_shared_data=={VERSION}",
 ]
+
+EXTRAS = {
+    "FLEX": ["python-can==4.2.2"],
+}
 
 
 def read(*parts: str) -> str:
@@ -64,7 +67,7 @@ def read(*parts: str) -> str:
 
 if __name__ == "__main__":
     setup(
-        python_requires=">=3.7",
+        python_requires="~=3.10",
         name=DISTNAME,
         description=DESCRIPTION,
         license=LICENSE,
@@ -80,6 +83,7 @@ if __name__ == "__main__":
         zip_safe=False,
         classifiers=CLASSIFIERS,
         install_requires=INSTALL_REQUIRES,
+        extras_require=EXTRAS,
         include_package_data=True,
         package_data={
             "opentrons_hardware": ["py.typed", "opentrons_hardware.cmakefind"]

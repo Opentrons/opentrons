@@ -1,3 +1,5 @@
+:og:description: How to engage and disengage the Magnetic Module for the OT-2 in a Python protocol.
+
 .. _magnetic-module:
 
 ***************
@@ -5,7 +7,7 @@ Magnetic Module
 ***************
 
 .. note::
-   The Magnetic Module is compatible with the OT-2 only. If you have a Flex, use the :ref:`magnetic-block`.
+   The Magnetic Module is compatible with the OT-2 only. If you have a Flex, use the :ref:`Magnetic Block <magnetic-block>`.
 
 The Magnetic Module controls a set of permanent magnets which can move vertically to induce a magnetic field in the labware loaded on the module. 
 
@@ -17,10 +19,10 @@ The examples in this section apply to an OT-2 with a Magnetic Module GEN2 loaded
 
     def run(protocol: protocol_api.ProtocolContext):
         mag_mod = protocol.load_module(
-          module_name='magnetic module gen2',
-          location='6')
+          module_name="magnetic module gen2",
+          location="6")
         plate = mag_mod.load_labware(
-          name='nest_96_wellplate_100ul_pcr_full_skirt')
+          name="nest_96_wellplate_100ul_pcr_full_skirt")
 
 .. versionadded:: 2.3
 

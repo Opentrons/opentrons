@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook } from '@testing-library/react-hooks'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { updateRobotName } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useUpdateRobotNameMutation } from '..'
@@ -28,11 +28,13 @@ const UPDATE_ROBOT_NAME_RESPONSE = {
 }
 
 describe('useUpdatedRobotNameMutation, hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
     wrapper = clientProvider
@@ -47,14 +49,14 @@ describe('useUpdatedRobotNameMutation, hook', () => {
       .calledWith(HOST_CONFIG, newRobotName)
       .mockRejectedValue('error')
 
-    const { result, waitFor } = renderHook(() => useUpdateRobotNameMutation(), {
+    const { result } = renderHook(() => useUpdateRobotNameMutation(), {
       wrapper,
     })
 
     expect(result.current.data).toBeUndefined()
-    result.current.updateRobotName(newRobotName)
+    act(() => result.current.updateRobotName(newRobotName))
     await waitFor(() => {
-      return result.current.status !== 'loading'
+      expect(result.current.data).toBeUndefined()
     })
   })
 
@@ -66,13 +68,13 @@ describe('useUpdatedRobotNameMutation, hook', () => {
         data: UPDATE_ROBOT_NAME_RESPONSE,
       } as Response<UpdatedRobotName>)
 
-    const { result, waitFor } = renderHook(() => useUpdateRobotNameMutation(), {
+    const { result } = renderHook(() => useUpdateRobotNameMutation(), {
       wrapper,
     })
     act(() => result.current.updateRobotName(newRobotName))
 
-    await waitFor(() => result.current.data != null)
-
-    expect(result.current.data).toEqual(UPDATE_ROBOT_NAME_RESPONSE)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(UPDATE_ROBOT_NAME_RESPONSE)
+    })
   })
 })

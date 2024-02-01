@@ -69,29 +69,29 @@ class ModuleSetup:
     def get_module_setup_text_locator(self) -> WebElement:
         """Locator for module setup text."""
         toggle: WebElement = self.base.clickable_wrapper(ModuleSetup.module_setup_text_locator)
-        actions = ActionChains(self.base.driver)  # type: ignore
-        actions.move_to_element(toggle).perform()  # type: ignore
+        actions = ActionChains(self.base.driver)
+        actions.move_to_element(toggle).perform()
         return toggle
 
     def get_magnetic_module(self) -> WebElement:
         """Locator for magnetic module on deckmap."""
         toggle: WebElement = self.base.clickable_wrapper(ModuleSetup.magnetic_module)
-        actions = ActionChains(self.base.driver)  # type: ignore
-        actions.move_to_element(toggle).perform()  # type: ignore
+        actions = ActionChains(self.base.driver)
+        actions.move_to_element(toggle).perform()
         return toggle
 
     def get_proceed_to_labware_setup(self) -> WebElement:
         """Locator for proceed to labware setup."""
         toggle: WebElement = self.base.clickable_wrapper(ModuleSetup.proceed_to_labware_setup)
-        actions = ActionChains(self.base.driver)  # type: ignore
-        actions.move_to_element(toggle).perform()  # type: ignore
+        actions = ActionChains(self.base.driver)
+        actions.move_to_element(toggle).perform()
         return toggle
 
     def click_proceed_to_labware_setup(self) -> None:
         """Proceed to labware setup."""
         toggle: WebElement = self.base.clickable_wrapper(ModuleSetup.proceed_to_labware_setup)
-        actions = ActionChains(self.base.driver)  # type: ignore
-        actions.move_to_element(toggle).perform()  # type: ignore
+        actions = ActionChains(self.base.driver)
+        actions.move_to_element(toggle).perform()
         self.base.click(ModuleSetup.proceed_to_labware_setup)
 
     def click_proceed_to_module_setup(self) -> None:
@@ -101,6 +101,6 @@ class ModuleSetup:
     def click_module_setup_text(self) -> None:
         """Click module setup text."""
         toggle: WebElement = self.base.clickable_wrapper(ModuleSetup.module_setup_text_locator)
-        actions = ActionChains(self.base.driver)  # type: ignore
-        actions.move_to_element(toggle).perform()  # type: ignore
+        actions = ActionChains(self.base.driver)
+        actions.move_to_element(toggle).perform()
         self.base.click(ModuleSetup.module_setup_text_locator)

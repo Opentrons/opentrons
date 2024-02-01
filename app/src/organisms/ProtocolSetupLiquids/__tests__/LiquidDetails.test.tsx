@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { screen, fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
@@ -54,14 +55,14 @@ describe('LiquidDetails', () => {
   })
 
   it('renders the total volume of the liquid, sample display name, clicking on arrow renders the modal', () => {
-    const [{ getByText, getByLabelText }] = render(props)
-    getByText('4')
-    getByText('mock labware name')
-    getByText('Location')
-    getByText('Labware Name')
-    getByText('Volume')
-    getByText('50 µL')
-    getByLabelText('LiquidDetails_0').click()
-    getByText('mock modal')
+    render(props)
+    screen.getByText('4')
+    screen.getByText('mock labware name')
+    screen.getByText('Location')
+    screen.getByText('Labware name')
+    screen.getByText('Volume')
+    screen.getByText('50 µL')
+    fireEvent.click(screen.getByLabelText('LiquidDetails_0'))
+    screen.getByText('mock modal')
   })
 })

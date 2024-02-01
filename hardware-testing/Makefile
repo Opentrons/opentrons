@@ -25,10 +25,13 @@ tests ?= tests
 cov_opts ?= --cov=hardware_testing --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
 test_opts ?=
 
-# Host key location for buildroot robot
-br_ssh_key ?= $(default_ssh_key)
-# Other SSH args for buildroot robots
+# Host key location for robot
+ssh_key ?= $(default_ssh_key)
+# Other SSH args for robot
 ssh_opts ?= $(default_ssh_opts)
+# Helper to safely bundle ssh options
+ssh_helper = $(if $(ssh_key),-i $(ssh_key)) $(ssh_opts)
+ssh_helper_ot3 = $(ssh_helper) -o HostkeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa
 
 # Source discovery
 # For the python sources
@@ -86,6 +89,20 @@ test-cov:
 	$(pytest) $(tests) $(test_opts) $(cov_opts)
 	-$(MAKE) remove-patches-gravimetric
 
+.PHONY: test-photometric-single
+test-photometric-single:
+	-$(MAKE) apply-patches-gravimetric
+	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 50 --channels 1 --tip 50
+	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 50 --channels 1 --tip 50 --photoplate-col-offset 3
+	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 50 --channels 1 --tip 50 --dye-well-col-offset 3
+	-$(MAKE) remove-patches-gravimetric
+
+.PHONY: test-photometric-multi
+test-photometric-multi:
+	-$(MAKE) apply-patches-gravimetric
+	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 50 --channels 8 --tip 50
+	-$(MAKE) remove-patches-gravimetric
+
 .PHONY: test-photometric
 test-photometric:
 	-$(MAKE) apply-patches-gravimetric
@@ -95,28 +112,35 @@ test-photometric:
 
 .PHONY: test-gravimetric-single
 test-gravimetric-single:
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --trials 1
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --extra --no-blank
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1 --no-blank
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --trials 1 --increment --no-blank
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --extra --no-blank --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1 --no-blank --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1 --no-blank --trials 1 --increment --tip 50
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --trials 1 --increment --no-blank --tip 50
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --trials 1 --increment --no-blank --tip 200
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --trials 1 --increment --no-blank --tip 1000
 
 .PHONY: test-gravimetric-multi
 test-gravimetric-multi:
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --tip 50 --trials 1 --no-blank
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --trials 1 --no-blank --extra
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 8 --tip 50 --trials 1 --increment --no-blank
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 1000 --trials 1 --no-blank
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 200 --trials 1 --extra --no-blank
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 50 --trials 1 --no-blank
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --no-blank --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --trials 1 --extra --no-blank
 
 .PHONY: test-gravimetric-96
 test-gravimetric-96:
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 96 --tip 1000 --trials 1 --no-blank
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 96 --trials 2 --no-blank
 
 .PHONY: test-gravimetric
 test-gravimetric:
 	-$(MAKE) apply-patches-gravimetric
+	$(python) -m hardware_testing.gravimetric.daily_setup --simulate
+	$(python) -m hardware_testing.gravimetric.daily_setup --simulate --calibrate
 	$(MAKE) test-gravimetric-single
 	$(MAKE) test-gravimetric-multi
+	$(MAKE) test-gravimetric-96
+	$(MAKE) test-photometric
 	-$(MAKE) remove-patches-gravimetric
 
 .PHONY: test-production-qc
@@ -159,43 +183,45 @@ format:
 	$(python) -m black hardware_testing tests setup.py
 
 define move-plot-webpage-ot3
-ssh -i $(2) $(3) root@$(1) \
+ssh $(ssh_helper_ot3) root@$(1) \
 "function cleanup () { mount -o remount,ro / ; } ;\
 mount -o remount,rw / &&\
 mv /data/plot/index.html /opt/opentrons-robot-server/hardware_testing/tools/plot &&\
 mv /data/plot/index.js /opt/opentrons-robot-server/hardware_testing/tools/plot &&\
+mv /data/plot/plotly-2.12.1.min.js /opt/opentrons-robot-server/hardware_testing/tools/plot &&\
+mv /data/plot/favicon.png /opt/opentrons-robot-server/hardware_testing/tools/plot &&\
 rm -rf /data/plot &&\
 cleanup || cleanup"
 endef
 
 .PHONY: push-plot-webpage-ot3
 push-plot-webpage-ot3:
-	scp -r hardware_testing/tools/plot root@$(host):/data
-	$(call move-plot-webpage-ot3,$(host),$(br_ssh_key),$(ssh_opts))
+	scp $(ssh_helper_ot3) -r hardware_testing/tools/plot root@$(host):/data
+	$(call move-plot-webpage-ot3,$(host),$(ssh_key),$(ssh_opts))
 
 .PHONY: push-description-ot3
 push-description-ot3:
 	$(python) -c "from hardware_testing.data import create_git_description_file; create_git_description_file()"
-	scp ./.hardware-testing-description root@$(host):/data/.hardware-testing-description
+	scp $(ssh_helper_ot3) ./.hardware-testing-description root@$(host):/data/
 
 .PHONY: restart
 restart:
-	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),"opentrons-robot-server")
+	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
 
 .PHONY: push-no-restart
 push-no-restart: wheel
-	$(call push-python-package,$(host),$(br_ssh_key),$(ssh_opts),$(wheel_file))
+	$(call push-python-package,$(host),$(ssh_key),$(ssh_opts),$(wheel_file))
 
 .PHONY: push
 push: push-no-restart restart
 
 .PHONY: restart-ot3
 restart-ot3:
-	$(call restart-server,$(host),,$(ssh_opts),"opentrons-robot-server")
+	$(call restart-server,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
 
 .PHONY: push-no-restart-ot3
 push-no-restart-ot3: sdist Pipfile.lock
-	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,"hardware_testing",,,$(version_file))
+	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,"hardware_testing",,,$(version_file))
 
 .PHONY: push-ot3
 push-ot3: push-no-restart-ot3 push-plot-webpage-ot3 push-description-ot3
@@ -205,7 +231,7 @@ push-all: clean wheel push-no-restart push-plot-webpage
 
 .PHONY: term
 term:
-	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host)
+	ssh $(ssh_helper_ot3) root@$(host)
 
 .PHONY: list-ports
 list-ports:
@@ -221,23 +247,23 @@ push-all-and-term: push-all term
 .PHONY: pull-data-ot3
 pull-data-ot3:
 	mkdir -p "./.pulled-data"
-	scp -r "root@$(host):/data/testing_data/$(test)" "./.pulled-data"
+	scp $(ssh_helper_ot3) -r "root@$(host):/data/testing_data/$(test)" "./.pulled-data"
 
 define delete-test-data-cmd
-ssh -i $(2) $(3) root@$(1) \
+ssh $(ssh_helper_ot3) root@$(1) \
 "rm -rf /data/testing_data/$(4)"
 endef
 
 .PHONY: delete-data-ot3
 delete-data-ot3:
-	$(call delete-test-data-cmd,$(host),$(br_ssh_key),$(ssh_opts),$(test))
+	$(call delete-test-data-cmd,$(host),$(ssh_key),$(ssh_opts),$(test))
 
 define push-and-update-fw
-scp $(2) root@$(1):/tmp
-ssh root@$(1) \
-"function cleanup () { (rm -rf /tmp/$(2) || true) && mount -o remount,ro / ; } ;\
+scp $(ssh_helper_ot3) $(4) root@$(1):/tmp/
+ssh $(ssh_helper_ot3) root@$(1) \
+"function cleanup () { (rm -rf /tmp/$(4) || true) && mount -o remount,ro / ; } ;\
 mount -o remount,rw / &&\
-(unzip -o /tmp/$(2) -d /usr/lib/firmware || cleanup) &&\
+(unzip -o /tmp/$(4) -d /usr/lib/firmware || cleanup) &&\
 python3 -m json.tool /usr/lib/firmware/opentrons-firmware.json &&\
 cleanup"
 endef
@@ -246,9 +272,25 @@ endef
 sync-sw-ot3: push-ot3
 	cd .. && $(MAKE) push-ot3 host=$(host)
 
+.PHONY: push-ot3-fixture
+push-ot3-fixture:
+	$(MAKE) apply-patches-fixture
+	-$(MAKE) sync-sw-ot3
+	$(MAKE) remove-patches-fixture
+
+
+.PHONY: apply-patches-fixture
+apply-patches-fixture:
+	cd ../ && git apply ./hardware-testing/fixture_overrides/*.patch --allow-empty
+
+.PHONY: remove-patches-fixture
+remove-patches-fixture:
+	cd ../ && git apply ./hardware-testing/fixture_overrides/*.patch --reverse --allow-empty
+
+
 .PHONY: sync-fw-ot3
 sync-fw-ot3:
-	$(call push-and-update-fw,$(host),$(zip))
+	$(call push-and-update-fw,$(host),$(ssh_key),$(ssh_opts),$(zip))
 
 .PHONY: sync-ot3
 sync-ot3: sync-sw-ot3 sync-fw-ot3
@@ -257,19 +299,16 @@ sync-ot3: sync-sw-ot3 sync-fw-ot3
 push-ot3-gravimetric:
 	$(MAKE) apply-patches-gravimetric
 	-$(MAKE) sync-sw-ot3
+	scp $(ssh_helper_ot3) -r hardware_testing/labware root@$(host):/data/labware/v2/custom_definitions/custom_beta/
 	$(MAKE) remove-patches-gravimetric
-	scp -r -O hardware_testing/labware/opentrons_flex_96_tiprack_50ul_adp/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
-	scp -r -O hardware_testing/labware/opentrons_flex_96_tiprack_200ul_adp/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
-	scp -r -O hardware_testing/labware/opentrons_flex_96_tiprack_1000ul_adp/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
-	scp -r -O hardware_testing/labware/radwag_pipette_calibration_vial/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
 
 .PHONY: apply-patches-gravimetric
 apply-patches-gravimetric:
-	cd ../ && git apply ./hardware-testing/hardware_testing/gravimetric/overrides/*.patch --allow-empty
+	cd ../ && git apply ./hardware-testing/hardware_testing/gravimetric/overrides/*.patch --allow-empty || true
 
 .PHONY: remove-patches-gravimetric
 remove-patches-gravimetric:
-	cd ../ && git apply ./hardware-testing/hardware_testing/gravimetric/overrides/*.patch --reverse --allow-empty
+	cd ../ && git apply ./hardware-testing/hardware_testing/gravimetric/overrides/*.patch --reverse --allow-empty || true
 
 upstream ?= origin/edge
 .PHONY: update-patches-gravimetric
@@ -283,11 +322,28 @@ update-patches-gravimetric:
 
 .PHONY: push-photometric-ot2
 push-photometric-ot2:
-	scp -r -O photometric-ot2/photometric_ot2 root@$(host):/data/user_storage
+	scp $(ssh_helper_ot3) -r -O photometric-ot2/photometric_ot2 root@$(host):/data/user_storage
 
 .PHONY: get-latest-tag
 get-latest-tag:
 	git tag -l --sort=-v:refname "ot3@*" --merged | (head -n 1 || Select -First 1)
+
+
+.PHONY:	create-ssh-key
+create-ssh-key:
+	ssh-keygen -t rsa -b 4096 -f ~/.ssh/robot_key -N ""
+	echo "ssh key generated"
+
+
+.PHONY: push-ssh-key
+push-ssh-key:
+	echo "make sure USB drive with your public key is connected to Flex"
+	curl --location --request POST "http://$(host):31950/server/ssh_keys/from_local" --header "opentrons-version: 3"
+
+
+.PHONY: term-ot3
+term-ot3:
+	ssh $(ssh_helper_ot3) root@$(host)
 
 
 # Creates a tarball of the hardware-testing module that can be deployed to a thumb-drive

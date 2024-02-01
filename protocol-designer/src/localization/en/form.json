@@ -29,7 +29,8 @@
   "step_edit_form": {
     "section": {
       "sterility": "sterility",
-      "sterility&motion": "sterility & motion"
+      "sterility&motion": "sterility & motion",
+      "dropTip": "drop tip"
     },
     "labwareLabel": {
       "aspirate": "source",
@@ -37,7 +38,7 @@
       "mixLabware": "labware",
       "movedLabware": "labware",
       "errors": {
-        "labwareSlotIncompatible": "The selected labware and new location are incompatible"
+        "labwareSlotIncompatible": "The {{labwareName}} in {{slot}} is incompatible"
       }
     },
     "mixVolumeLabel": "mix volume",
@@ -48,8 +49,18 @@
       "wells": "wells"
     },
     "field": {
+      "nozzles": {
+        "label": "nozzles",
+        "option": { "ALL": "All", "COLUMN": "Column" },
+        "option_tooltip": {
+          "COLUMN": "To use column partial tip pickup, a tiprack without an adapter must be placed on the deck."
+        }
+      },
       "airGap": { "label": "air gap" },
       "blowout": { "label": "blowout" },
+      "location": {
+        "label": "location"
+      },
       "change_tip": {
         "label": "change tip",
         "option": {
@@ -114,11 +125,11 @@
       "touchTip": { "label": "touch tip" },
       "moduleActionLabware": { "label": "module" },
       "moduleLabwarePrefix": {
-        "magneticModuleType": "MAG",
-        "temperatureModuleType": "TEMP",
-        "thermocyclerModuleType": "THERMO",
-        "heaterShakerModuleType": "HS",
-        "magneticBlockType": "MAG"
+        "magneticModuleType": "Magnetic Module",
+        "temperatureModuleType": "Temperature Module",
+        "thermocyclerModuleType": "Thermocycler",
+        "heaterShakerModuleType": "Heater-Shaker",
+        "magneticBlockType": "Magnetic Block"
       },
       "magnetAction": {
         "label": "Magnet action",

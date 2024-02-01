@@ -19,11 +19,12 @@ Welcome
     robot_position
     new_advanced_running
     new_examples
+    adapting_ot2_flex
     new_protocol_api
 
-The OT-2 Python Protocol API is a Python framework designed to make it easy to write automated biology lab protocols that use the OT-2 robot and optional hardware modules. We've designed the API to be accessible to anyone with basic Python and wet-lab skills. 
+The Opentrons Python Protocol API is a Python framework designed to make it easy to write automated biology lab protocols. Python protocols can control Opentrons Flex and OT-2 robots, their pipettes, and optional hardware modules. We've designed the API to be accessible to anyone with basic Python and wet-lab skills. 
 
-As a bench scientist, you should be able to code your protocols in a way that reads like a lab notebook. You can :ref:`write a fully functional protocol <writing>` just by listing the equipment you'll use (modules, labware, and pipettes) and the exact sequence of movements the robot should make.
+As a bench scientist, you should be able to code your protocols in a way that reads like a lab notebook. You can write a fully functional protocol just by listing the equipment you'll use (modules, labware, and pipettes) and the exact sequence of movements the robot should make.
 
 As a programmer, you can leverage the full power of Python for advanced automation in your protocols. Perform calculations, manage external data, use built-in and imported Python modules, and more to implement your custom lab workflow.
 
@@ -33,9 +34,9 @@ Getting Started
 
 **New to Python protocols?** Check out the :ref:`tutorial` to learn about the different parts of a protocol file and build a working protocol from scratch. 
 
-If you want to **dive right into code**, take a look at our :ref:`new-examples` page and the comprehensive :ref:`protocol-api-reference`.
+If you want to **dive right into code**, take a look at our :ref:`new-examples` and the comprehensive :ref:`protocol-api-reference`.
 
-When you're ready to **try out a protocol**, you can :ref:`simulate it on your computer <simulate-block>` — regardless of whether you're connected to an OT-2 robot. To run your protocol on a robot, download and use our latest `desktop app <https://www.opentrons.com/ot-app>`_.
+When you're ready to **try out a protocol**, download the `Opentrons App <https://www.opentrons.com/ot-app>`__, import the protocol file, and run it on your robot.
 
 
 .. _overview-section-v2:
@@ -160,7 +161,7 @@ For example, if we wanted to transfer liquid from well A1 to well B1 on a plate,
             d. Dropping the tip in the trash.
 
 	
-There is much more that the OT-2 robot and the API can do! The :ref:`v2-atomic-commands`, :ref:`v2-complex-commands`, and :ref:`new_modules` pages cover many of these functions.
+There is much more that Opentrons robots and the API can do! The :ref:`v2-atomic-commands`, :ref:`v2-complex-commands`, and :ref:`new_modules` pages cover many of these functions.
 
 
 More Resources
@@ -169,17 +170,17 @@ More Resources
 Opentrons App
 +++++++++++++
 
-The `Opentrons App <https://opentrons.com/ot-app/>`_ is the easiest way to run your Python protocols. The app `supports <https://support.opentrons.com/en/articles/2687536-get-started-supported-operating-systems-for-the-opentrons-app>`_ the latest versions of macOS, Windows, and Ubuntu.
+The `Opentrons App <https://opentrons.com/ot-app/>`__ is the easiest way to run your Python protocols. The app `supports <https://support.opentrons.com/en/articles/2687536-get-started-supported-operating-systems-for-the-opentrons-app>`_ the latest versions of macOS, Windows, and Ubuntu.
 
 Support
 +++++++
 
-Questions about `setting up your OT-2 <https://support.opentrons.com/s/ot2-get-started>`_, `using Opentrons software <https://support.opentrons.com/s/ot2-software>`_, or `troubleshooting <https://support.opentrons.com/s/ot2-troubleshooting>`_? Check out our `support articles <https://support.opentrons.com/s/>`_ or `get in touch directly <https://support.opentrons.com/s/article/Getting-help-from-Opentrons-Support>`_ with Opentrons Support.
+Questions about setting up your robot, using Opentrons software, or troubleshooting? Check out our `support articles <https://support.opentrons.com/s/>`_ or `get in touch directly <https://support.opentrons.com/s/article/Getting-help-from-Opentrons-Support>`_ with Opentrons Support.
 
 Custom Protocol Service
 +++++++++++++++++++++++
 
-Don't have the time or resources to write your own protocols? The `Opentrons Custom Protocols <https://shop.opentrons.com/opentrons-custom-protocol-1-expedite-workflow/>`_ service can get you set up in as little as a week. 
+Don't have the time or resources to write your own protocols? The `Opentrons Custom Protocols <https://shop.opentrons.com/opentrons-remote-custom-protocol-development/>`_ service can get you set up in as little as a week. 
 
 Contributing
 ++++++++++++

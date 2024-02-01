@@ -7,6 +7,7 @@ import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { i18n } from '../../../../i18n'
 import { mockRobotSideAnalysis } from '../../../CommandText/__fixtures__'
 import { CurrentRunningProtocolCommand } from '../CurrentRunningProtocolCommand'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 const mockPlayRun = jest.fn()
 const mockPauseRun = jest.fn()
@@ -45,6 +46,7 @@ describe('CurrentRunningProtocolCommand', () => {
       currentRunCommandIndex: 0,
       lastAnimatedCommand: null,
       updateLastAnimatedCommand: mockUpdateLastAnimatedCommand,
+      robotType: FLEX_ROBOT_TYPE,
     }
   })
 

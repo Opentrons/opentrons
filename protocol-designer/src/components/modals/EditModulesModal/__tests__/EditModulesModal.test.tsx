@@ -1,377 +1,173 @@
-import React from 'react'
-import { Provider } from 'react-redux'
-import { mount } from 'enzyme'
-import { act } from 'react-dom/test-utils'
-import * as Formik from 'formik'
-import { OutlineButton, SlotMap } from '@opentrons/components'
+import * as React from 'react'
+import { fireEvent, screen } from '@testing-library/react'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  MAGNETIC_MODULE_V2,
-  TEMPERATURE_MODULE_V2,
-  getIsLabwareAboveHeight,
-  FLEX_ROBOT_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-  MAGNETIC_BLOCK_TYPE,
-} from '@opentrons/shared-data'
-import {
-  getMockDeckSetup,
-  getMockMagneticModule,
-  getMockTemperatureModule,
-  getMockHeaterShakerModule,
-  // @ts-expect-error(sa, 2021-6-27): TODO: add another ts config for /fixtures, or move them into src
-} from '../../../../../fixtures/state/deck'
-import {
-  actions as stepFormActions,
-  selectors as stepFormSelectors,
-} from '../../../../step-forms'
-import {
-  getLabwareOnSlot,
-  getSlotIdsBlockedBySpanning,
-  getSlotIsEmpty,
-} from '../../../../step-forms/utils'
-import * as moduleData from '../../../../modules/moduleData'
-import { MODELS_FOR_MODULE_TYPE } from '../../../../constants'
-import { selectors as featureSelectors } from '../../../../feature-flags'
+  DeckLocationSelect,
+  renderWithProviders,
+  SlotMap,
+} from '@opentrons/components'
+import { i18n } from '../../../../localization'
 import { getRobotType } from '../../../../file-data/selectors'
+import { getInitialDeckSetup } from '../../../../step-forms/selectors'
 import { getLabwareIsCompatible } from '../../../../utils/labwareModuleCompatibility'
-import { isModuleWithCollisionIssue } from '../../../modules/utils'
-import { PDAlert } from '../../../alerts/PDAlert'
-import { EditModulesModal, EditModulesModalProps } from '..'
-import { ModelDropdown } from '../ModelDropdown'
-import { SlotDropdown } from '../SlotDropdown'
+import { getDisableModuleRestrictions } from '../../../../feature-flags/selectors'
 import { ConnectedSlotMap } from '../ConnectedSlotMap'
+import { EditModulesModal } from '../index'
+import type { ModuleOnDeck } from '../../../../step-forms'
 
-jest.mock('@opentrons/shared-data', () => {
-  const actualSharedData = jest.requireActual('@opentrons/shared-data')
-  return {
-    ...actualSharedData,
-    getIsLabwareAboveHeight: jest.fn(),
-  }
-})
-jest.mock('../../../../utils/labwareModuleCompatibility')
-jest.mock('../../../../feature-flags')
-jest.mock('../../../../step-forms/selectors')
-jest.mock('../../../modules/utils')
-jest.mock('../../../../step-forms/utils')
-jest.mock('../form-state')
+jest.mock('../ConnectedSlotMap')
 jest.mock('../../../../file-data/selectors')
+jest.mock('../../../../step-forms/selectors')
+jest.mock('../../../../utils/labwareModuleCompatibility')
+jest.mock('../../../../feature-flags/selectors')
+jest.mock('@opentrons/components/src/hooks/useSelectDeckLocation/index')
+jest.mock('@opentrons/components/src/slotmap/SlotMap')
 
-const MODEL_FIELD = 'selectedModel'
-const SLOT_FIELD = 'selectedSlot'
+const mockGetRobotType = getRobotType as jest.MockedFunction<
+  typeof getRobotType
+>
+const mockGetInitialDeckSetup = getInitialDeckSetup as jest.MockedFunction<
+  typeof getInitialDeckSetup
+>
+const mockDeckLocationSelect = DeckLocationSelect as jest.MockedFunction<
+  typeof DeckLocationSelect
+>
 
-const getInitialDeckSetupMock: jest.MockedFunction<any> =
-  stepFormSelectors.getInitialDeckSetup
+const mockGetLabwareIsCompatible = getLabwareIsCompatible as jest.MockedFunction<
+  typeof getLabwareIsCompatible
+>
+const mockGetDisableModuleRestrictions = getDisableModuleRestrictions as jest.MockedFunction<
+  typeof getDisableModuleRestrictions
+>
+const mockConnectedSlotMap = ConnectedSlotMap as jest.MockedFunction<
+  typeof ConnectedSlotMap
+>
+const mockSlotMap = SlotMap as jest.MockedFunction<typeof SlotMap>
+const render = (props: React.ComponentProps<typeof EditModulesModal>) => {
+  return renderWithProviders(<EditModulesModal {...props} />, {
+    i18nInstance: i18n,
+  })[0]
+}
 
-const getLabwareIsCompatibleMock: jest.MockedFunction<any> = getLabwareIsCompatible
+const mockTemp: ModuleOnDeck = {
+  id: 'temperatureId',
+  type: 'temperatureModuleType',
+  model: 'temperatureModuleV2',
+  slot: 'C3',
+  moduleState: {} as any,
+}
 
-const getDisableModuleRestrictionsMock: jest.MockedFunction<any> =
-  featureSelectors.getDisableModuleRestrictions
+const mockTC: ModuleOnDeck = {
+  id: 'thermocyclerId',
+  type: 'thermocyclerModuleType',
+  model: 'thermocyclerModuleV2',
+  slot: '10',
+  moduleState: {} as any,
+}
 
-const isModuleWithCollisionIssueMock: jest.MockedFunction<any> = isModuleWithCollisionIssue
-
-const getSlotIdsBlockedBySpanningMock: jest.MockedFunction<any> = getSlotIdsBlockedBySpanning
-
-const getSlotIsEmptyMock: jest.MockedFunction<any> = getSlotIsEmpty
-
-const getLabwareOnSlotMock: jest.MockedFunction<any> = getLabwareOnSlot
-
-const getIsLabwareAboveHeightMock: jest.MockedFunction<any> = getIsLabwareAboveHeight
-
-const getRobotTypeMock: jest.MockedFunction<any> = getRobotType
+const mockHS: ModuleOnDeck = {
+  id: 'heaterShakerId',
+  type: 'heaterShakerModuleType',
+  model: 'heaterShakerModuleV1',
+  moduleState: {} as any,
+  slot: 'A3',
+}
 
 describe('Edit Modules Modal', () => {
-  let mockStore: any
-  let props: EditModulesModalProps
+  let props: React.ComponentProps<typeof EditModulesModal>
   beforeEach(() => {
-    getRobotTypeMock.mockReturnValue('OT-2 Standard')
-    getInitialDeckSetupMock.mockReturnValue(getMockDeckSetup())
-    getSlotIdsBlockedBySpanningMock.mockReturnValue([])
-    getLabwareOnSlotMock.mockReturnValue({})
-    getIsLabwareAboveHeightMock.mockReturnValue(false)
     props = {
-      moduleOnDeck: null,
-      moduleType: MAGNETIC_MODULE_TYPE,
+      moduleType: 'temperatureModuleType',
+      moduleOnDeck: mockTemp,
       onCloseClick: jest.fn(),
       editModuleModel: jest.fn(),
       editModuleSlot: jest.fn(),
       displayModuleWarning: jest.fn(),
     }
-    mockStore = {
-      dispatch: jest.fn(),
-      subscribe: jest.fn(),
-      getState: () => ({}),
-    }
+    mockGetRobotType.mockReturnValue(FLEX_ROBOT_TYPE)
+    mockGetInitialDeckSetup.mockReturnValue({
+      modules: {
+        heaterShakerId: mockHS,
+        temperatureId: mockTemp,
+      },
+      labware: {},
+      additionalEquipmentOnDeck: {},
+      pipettes: {},
+    })
+    mockGetLabwareIsCompatible.mockReturnValue(true)
+    mockGetDisableModuleRestrictions.mockReturnValue(false)
+    mockDeckLocationSelect.mockReturnValue(<div>mock DeckLocationSelect</div>)
+    mockConnectedSlotMap.mockReturnValue(<div>mock ConnectedSlotMap</div>)
+    mockSlotMap.mockReturnValue(<div>mock SlotMap</div>)
   })
-
-  afterEach(() => {
-    jest.clearAllMocks()
+  it('renders the edit modules modal for a temp on a flex', () => {
+    render(props)
+    screen.getByText('Temperature module')
+    screen.getByText('mock DeckLocationSelect')
+    fireEvent.click(screen.getByRole('button', { name: 'cancel' }))
+    expect(props.onCloseClick).toHaveBeenCalled()
+    screen.getByRole('button', { name: 'save' })
   })
-  const render = (props: EditModulesModalProps) =>
-    mount(
-      <Provider store={mockStore}>
-        <EditModulesModal {...props} />
-      </Provider>
-    )
-
-  describe('PD alert', () => {
-    beforeEach(() => {
-      getDisableModuleRestrictionsMock.mockReturnValue(false)
+  it('renders the edit modules modal for temp gen2 on an ot-2 and selects other model', () => {
+    mockGetRobotType.mockReturnValue(OT2_ROBOT_TYPE)
+    render(props)
+    screen.getByText('Temperature module')
+    screen.getByText('mock ConnectedSlotMap')
+    fireEvent.click(screen.getByRole('button', { name: 'cancel' }))
+    expect(props.onCloseClick).toHaveBeenCalled()
+    screen.getByRole('button', { name: 'save' })
+    //  click on Temp GEN 1 from model dropdown
+    const comboboxes = screen.getAllByRole('combobox')
+    const selectModel = comboboxes[0]
+    fireEvent.change(selectModel, {
+      target: { value: 'temperatureModuleV1' },
     })
-    afterEach(() => {
-      jest.clearAllMocks()
-    })
-    it('does NOT render when labware is compatible', () => {
-      getLabwareIsCompatibleMock.mockReturnValue(true)
-      const wrapper = render(props)
-      expect(wrapper.find(PDAlert)).toHaveLength(0)
-    })
-
-    it('renders when labware is incompatible', () => {
-      getLabwareIsCompatibleMock.mockReturnValue(false)
-      const wrapper = render(props)
-      expect(wrapper.find(PDAlert)).toHaveLength(1)
-    })
+    fireEvent.click(selectModel)
   })
-
-  describe('Slot Dropdown', () => {
-    it('should pass the correct options and field name', () => {
-      const mockSlots = [{ value: 'mockSlots', name: 'mockSlots' }]
-      jest
-        .spyOn(moduleData, 'getAllModuleSlotsByType')
-        .mockImplementation(() => mockSlots)
-
-      const wrapper = render(props)
-      expect(wrapper.find(SlotDropdown).prop('options')).toBe(mockSlots)
-      expect(wrapper.find(SlotDropdown).prop('fieldName')).toBe(SLOT_FIELD)
+  it('renders the TC for an ot-2 and there is a slot conflict', () => {
+    mockGetRobotType.mockReturnValue(OT2_ROBOT_TYPE)
+    mockGetInitialDeckSetup.mockReturnValue({
+      modules: {
+        heaterShakerId: {
+          id: 'heaterShakerId',
+          type: 'heaterShakerModuleType',
+          model: 'heaterShakerModuleV1',
+          moduleState: {} as any,
+          slot: '7',
+        } as any,
+        temperatureId: mockTemp,
+      },
+      labware: {},
+      additionalEquipmentOnDeck: {},
+      pipettes: {},
     })
-    it('should be enabled when there is no collision issue', () => {
-      props.moduleOnDeck = getMockMagneticModule()
-      isModuleWithCollisionIssueMock.mockReturnValueOnce(false)
-      const wrapper = render(props)
-      expect(wrapper.find(SlotDropdown).prop('disabled')).toBe(false)
-    })
-
-    it('should be disabled when there is no collision issue', () => {
-      isModuleWithCollisionIssueMock.mockReturnValue(true)
-      const wrapper = render(props)
-      expect(wrapper.find(SlotDropdown).prop('disabled')).toBe(true)
-    })
-
-    it('should error when labware is incompatible', () => {
-      getLabwareIsCompatibleMock.mockReturnValue(false)
-      const wrapper = render(props)
-      expect(wrapper.find(SlotDropdown).childAt(0).prop('error')).toMatch(
-        'labware incompatible'
-      )
-    })
-
-    it('should error when slot is empty but blocked', () => {
-      getSlotIsEmptyMock.mockReturnValueOnce(true)
-      getSlotIdsBlockedBySpanningMock.mockReturnValue(['1']) // 1 is default slot
-      const wrapper = render(props)
-      expect(wrapper.find(SlotDropdown).childAt(0).prop('error')).toMatch(
-        'labware incompatible'
-      )
-    })
-
-    it('should error when selecting a heater shaker and there is a module adjacent', () => {
-      const initialDeckSetup = getMockDeckSetup()
-      getInitialDeckSetupMock.mockReturnValue({
-        ...initialDeckSetup,
-        modules: {
-          ...initialDeckSetup.modules,
-          mag_mod: {
-            // move the mag mod to slot 2 (next to H-S)
-            slot: '2',
-          },
-        },
-      })
-      props.moduleOnDeck = getMockHeaterShakerModule()
-      const wrapper = render(props)
-      expect(wrapper.find(SlotDropdown).childAt(0).prop('error')).toMatch(
-        'The Heater-Shaker cannot be placed in front of or behind another module'
-      )
-    })
-    it('should NOT error when moving a heater shaker adjacent to a slot it is in', () => {
-      // initial deck setup has HS in slot 1
-      getInitialDeckSetupMock.mockReturnValue(getMockDeckSetup())
-      // move heater shaker to slot 2
-      props.moduleOnDeck = { ...getMockHeaterShakerModule(), slot: '2' }
-      const wrapper = render(props)
-      expect(wrapper.find(SlotDropdown).childAt(0).prop('error')).toBeFalsy()
-    })
-    it('should error when selecting a module when there is a heater shaker adjacent', () => {
-      const initialDeckSetup = getMockDeckSetup()
-      getInitialDeckSetupMock.mockReturnValue({
-        ...initialDeckSetup,
-        modules: {
-          ...initialDeckSetup.modules,
-          hs_mod: { ...getMockHeaterShakerModule(), slot: '10' },
-        },
-      })
-      props.moduleOnDeck = getMockMagneticModule()
-      const wrapper = render(props)
-      expect(wrapper.find(SlotDropdown).childAt(0).prop('error')).toMatch(
-        'Other modules cannot be placed in front of or behind a Heater-Shaker.'
-      )
-    })
-    it('should NOT error when labware is compatible', () => {
-      getLabwareIsCompatibleMock.mockReturnValue(true)
-      const wrapper = render(props)
-      expect(wrapper.find(SlotDropdown).childAt(0).prop('error')).toBeFalsy()
-    })
+    props.moduleType = 'thermocyclerModuleType'
+    props.moduleOnDeck = mockTC
+    render(props)
+    screen.getByText('Thermocycler module')
+    screen.getByText('warning')
+    screen.getByText('Cannot place module')
+    screen.getByText('mock SlotMap')
   })
-
-  describe('Model Dropdown', () => {
-    it('should pass the correct props for magnetic module for Ot-2', () => {
-      props.moduleType = MAGNETIC_MODULE_TYPE
-      const wrapper = render(props)
-      const expectedProps = {
-        fieldName: MODEL_FIELD,
-        options: MODELS_FOR_MODULE_TYPE[MAGNETIC_MODULE_TYPE],
-        tabIndex: 0,
-      }
-      expect(wrapper.find(ModelDropdown).props()).toEqual(expectedProps)
+  it('renders a heater-shaker for flex and can select different slots', () => {
+    mockGetInitialDeckSetup.mockReturnValue({
+      modules: {
+        heaterShakerId: mockHS,
+      },
+      labware: {},
+      additionalEquipmentOnDeck: {},
+      pipettes: {},
     })
-    it('should pass the correct props for temperature module for Ot-2', () => {
-      props.moduleType = TEMPERATURE_MODULE_TYPE
-      const wrapper = render(props)
-      const expectedProps = {
-        fieldName: MODEL_FIELD,
-        options: MODELS_FOR_MODULE_TYPE[TEMPERATURE_MODULE_TYPE],
-        tabIndex: 0,
-      }
-      expect(wrapper.find(ModelDropdown).props()).toEqual(expectedProps)
+    props.moduleType = 'heaterShakerModuleType'
+    props.moduleOnDeck = mockHS
+    render(props)
+    screen.getByText('Heater-Shaker module')
+    //  click on slot B3 from slot dropdown
+    const comboboxes = screen.getAllByRole('combobox')
+    const selectSlot = comboboxes[0]
+    fireEvent.change(selectSlot, {
+      target: { value: 'B3' },
     })
-    it('should pass the correct props for temperature module for Flex', () => {
-      getRobotTypeMock.mockReturnValue(FLEX_ROBOT_TYPE)
-      props.moduleType = TEMPERATURE_MODULE_TYPE
-      const wrapper = render(props)
-      const expectedProps = {
-        fieldName: MODEL_FIELD,
-        options: [{ name: 'GEN2', value: 'temperatureModuleV2' }],
-        tabIndex: 0,
-      }
-      expect(wrapper.find(ModelDropdown).props()).toEqual(expectedProps)
-    })
-    it('should pass the correct props for thermocycler module for Flex', () => {
-      getRobotTypeMock.mockReturnValue(FLEX_ROBOT_TYPE)
-      props.moduleType = THERMOCYCLER_MODULE_TYPE
-      const wrapper = render(props)
-      const expectedProps = {
-        fieldName: MODEL_FIELD,
-        options: [{ name: 'GEN2', value: 'thermocyclerModuleV2' }],
-        tabIndex: 0,
-      }
-      expect(wrapper.find(ModelDropdown).props()).toEqual(expectedProps)
-    })
-    it('should pass the correct props for magnetic block module for Flex', () => {
-      getRobotTypeMock.mockReturnValue(FLEX_ROBOT_TYPE)
-      props.moduleType = MAGNETIC_BLOCK_TYPE
-      const wrapper = render(props)
-      const expectedProps = {
-        fieldName: MODEL_FIELD,
-        options: MODELS_FOR_MODULE_TYPE[MAGNETIC_BLOCK_TYPE],
-        tabIndex: 0,
-      }
-      expect(wrapper.find(ModelDropdown).props()).toEqual(expectedProps)
-    })
-  })
-
-  describe('Connected Slot Map', () => {
-    it('should pass the selected slot field name', () => {
-      const wrapper = render(props)
-      expect(wrapper.find(ConnectedSlotMap).prop('fieldName')).toBe(
-        'selectedSlot'
-      )
-    })
-    it('should pass an error if the labware is not compatible', () => {
-      getLabwareIsCompatibleMock.mockReturnValue(false)
-      const wrapper = render(props)
-      expect(wrapper.find(SlotMap).prop('isError')).toBeTruthy()
-    })
-    it('should NOT pass an error if the labware is compatible', () => {
-      getLabwareIsCompatibleMock.mockReturnValue(true)
-      const wrapper = render(props)
-      expect(wrapper.find(SlotMap).prop('isError')).toBeFalsy()
-    })
-  })
-
-  describe('Cancel Button', () => {
-    it('calls onCloseClick when pressed', () => {
-      const wrapper = render(props)
-      wrapper.find(OutlineButton).at(0).prop('onClick')?.(
-        {} as React.MouseEvent
-      )
-      expect(props.onCloseClick).toHaveBeenCalled()
-    })
-  })
-  describe('Form Submission', () => {
-    it('sets module change warning info when model has changed and is magnetic module', () => {
-      props.moduleOnDeck = getMockMagneticModule()
-      const wrapper = render(props)
-      const formik = wrapper.find(Formik.Formik)
-      const mockValues = {
-        selectedSlot: '1',
-        selectedModel: MAGNETIC_MODULE_V2,
-      }
-      act(() => {
-        // @ts-expect-error (ce, 2021-06-22) expects 2 args
-        formik.invoke('onSubmit')(mockValues)
-      })
-      expect(props.displayModuleWarning).toHaveBeenCalledWith({
-        model: mockValues.selectedModel,
-        slot: mockValues.selectedSlot,
-      })
-    })
-
-    it('edits the model and slot if module is not magnetic module', () => {
-      props.moduleOnDeck = getMockTemperatureModule()
-      const wrapper = render(props)
-      const formik = wrapper.find(Formik.Formik)
-      const mockValues = {
-        selectedSlot: '1',
-        selectedModel: TEMPERATURE_MODULE_V2,
-      }
-      act(() => {
-        // @ts-expect-error (ce, 2021-06-22) expects 2 args
-        formik.invoke('onSubmit')(mockValues)
-      })
-      expect(props.editModuleModel).toHaveBeenCalledWith(TEMPERATURE_MODULE_V2)
-      expect(props.editModuleSlot).toHaveBeenCalledWith('1')
-    })
-
-    it('creates a new module if no module is registered', () => {
-      props.moduleOnDeck = null
-      const wrapper = render(props)
-      const formik = wrapper.find(Formik.Formik)
-      const mockValues = {
-        selectedSlot: '1',
-        selectedModel: MAGNETIC_MODULE_V2,
-      }
-      act(() => {
-        // @ts-expect-error (ce, 2021-06-22) expects 2 args
-        formik.invoke('onSubmit')(mockValues)
-      })
-
-      const params = {
-        slot: '1',
-        type: MAGNETIC_MODULE_TYPE,
-        model: MAGNETIC_MODULE_V2,
-      }
-
-      const createModuleAction = stepFormActions.createModule(params)
-
-      const expected = {
-        ...createModuleAction,
-        payload: {
-          ...createModuleAction.payload,
-          id: expect.stringContaining(MAGNETIC_MODULE_TYPE), // need to do this because exact id is created on the fly
-        },
-      }
-
-      expect(mockStore.dispatch).toHaveBeenCalledWith(expected)
-    })
+    fireEvent.click(selectSlot)
   })
 })

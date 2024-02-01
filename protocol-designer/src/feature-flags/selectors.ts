@@ -15,11 +15,11 @@ export const getDisableModuleRestrictions: Selector<
   getFeatureFlagData,
   flags => flags.OT_PD_DISABLE_MODULE_RESTRICTIONS
 )
-export const getEnabledOT3: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_OT_3 ?? false
-)
 export const getAllowAllTipracks: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ALLOW_ALL_TIPRACKS ?? false
+)
+export const getEnableMultiTip: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_MULTI_TIP ?? false
 )

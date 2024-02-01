@@ -2092,6 +2092,29 @@ smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M204 S10000.0 A1500.0 B200.0 C200.0 X3000.0 Y2000.0 Z1500.0 -> Setting acceleration for the following axes: Default: 10000.0 X-Axis: 3000.0 Y-Axis: 2000.0 Left Pipette Arm: 1500.0 Right Pipette Arm: 1500.0 Left Pipette Suction: 200.0 Right Pipette Suction: 200.0 ->
 smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M999 -> Resetting OT-2 from error state ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G28.6 -> Getting homing status for all axes -> The homing status of the robot is: A Axis: 1 B Axis: 1 C Axis: 1 X Axis: 1 Y Axis: 1 Z Axis: 1
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M999 -> Resetting OT-2 from error state ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G28.6 -> Getting homing status for all axes -> The homing status of the robot is: A Axis: 1 B Axis: 1 C Axis: 1 X Axis: 1 Y Axis: 1 Z Axis: 1
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M92 X80.0 Y80.0 Z400.0 A400.0 -> Setting the following axes steps per mm: X-Axis: 80.0 steps per mm Y-Axis: 80.0 steps per mm Z-Axis: 400.0 steps per mm A-Axis: 400.0 steps per mm -> Current set steps per mm:
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M92 B768.0 C768.0 -> Setting the following axes steps per mm: B-Axis: 768.0 steps per mm C-Axis: 768.0 steps per mm -> Current set steps per mm:
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G90 -> Switching to Absolute Coordinate Mode ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 102.5 B Axis: -14.5 C Axis: -8.5 X Axis: 347.84 Y Axis: 351.5 Z Axis: 218.0
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M203.1 A125.0 B40.0 C40.0 X600.0 Y400.0 Z125.0 -> Setting the max speed for the following axes: X-Axis: 600.0 Y-Axis: 400.0 Z-Axis: 125.0 A-Axis: 125.0 B-Axis: 40.0 C-Axis: 40.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: G0 F24000.0 -> Setting speed to 24000.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
+smoothie: M204 S10000.0 A1500.0 B200.0 C200.0 X3000.0 Y2000.0 Z1500.0 -> Setting acceleration for the following axes: Default: 10000.0 X-Axis: 3000.0 Y-Axis: 2000.0 Left Pipette Arm: 1500.0 Right Pipette Arm: 1500.0 Left Pipette Suction: 200.0 Right Pipette Suction: 200.0 ->
+smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M18 Z A B C -> Disengaging motor for the following axes: Z, A, B, C ->
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: G4 P0.1 -> Pausing movement for 0.1ms ->

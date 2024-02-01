@@ -102,6 +102,22 @@
       "detail": "Misaligned Gantry",
       "category": "roboticsControlError"
     },
+    "2012": {
+      "detail": "Unmatched tip presence states",
+      "category": "roboticsControlError"
+    },
+    "2013": {
+      "detail": "Position Unknown",
+      "category": "roboticsControlError"
+    },
+    "2014": {
+      "detail": "Execution Cancelled",
+      "category": "roboticsControlError"
+    },
+    "2015": {
+      "detail": "Gripper Pickup Failed",
+      "category": "roboticsControlError"
+    },
     "3000": {
       "detail": "A robotics interaction error occurred.",
       "category": "roboticsInteractionError"
@@ -166,6 +182,14 @@
       "detail": "Invalid Instrument Data",
       "category": "roboticsInteractionError"
     },
+    "3017": {
+      "detail": "Invalid Liquid Class Name",
+      "category": "roboticsInteractionError"
+    },
+    "3018": {
+      "detail": "Tip Detector Not Created",
+      "category": "roboticsInteractionError"
+    },
     "4000": {
       "detail": "Unknown or Uncategorized Error",
       "category": "generalError"
@@ -180,6 +204,22 @@
     },
     "4003": {
       "detail": "Not supported on this robot type",
+      "category": "generalError"
+    },
+    "4004": {
+      "detail": "Command Precondition Violated",
+      "category": "generalError"
+    },
+    "4005": {
+      "detail": "Command Parameter Limit Violated",
+      "category": "generalError"
+    },
+    "4006": {
+      "detail": "Invalid Protocol Data",
+      "category": "generalError"
+    },
+    "4007": {
+      "detail": "API Command is misconfigured",
       "category": "generalError"
     }
   }

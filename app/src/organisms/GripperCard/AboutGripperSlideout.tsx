@@ -45,14 +45,14 @@ export const AboutGripperSlideout = (
             <StyledText
               as="h6"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.grey50}
             >
-              {t('current_version')}
+              {i18n.format(t('current_version'), 'upperCase')}
             </StyledText>
             <StyledText
               as="p"
               paddingTop={SPACING.spacing4}
-              paddingBottom={SPACING.spacing12}
+              paddingBottom={SPACING.spacing16}
             >
               {firmwareVersion}
             </StyledText>
@@ -61,8 +61,7 @@ export const AboutGripperSlideout = (
         <StyledText
           as="h6"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={COLORS.darkGreyEnabled}
-          textTransform={TYPOGRAPHY.textTransformUppercase}
+          color={COLORS.grey50}
         >
           {i18n.format(t('serial_number'), 'upperCase')}
         </StyledText>

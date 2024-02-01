@@ -63,6 +63,7 @@ describe('ProtocolLiquidsDetails', () => {
   })
   it('renders the correct info for no liquids in the protocol', () => {
     props.liquids = []
+    mockParseLiquidsInLoadOrder.mockReturnValue([])
     const [{ getByText, getByLabelText }] = render(props)
     getByText('No liquids are specified for this protocol')
     getByLabelText('ProtocolLIquidsDetails_noLiquidsIcon')

@@ -1,15 +1,26 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
-import { Form, Formik, useFormikContext } from 'formik'
+import { Form, Formik, useField, useFormikContext } from 'formik'
 import some from 'lodash/some'
-import cx from 'classnames'
 import {
-  Modal,
   FormGroup,
   BUTTON_TYPE_SUBMIT,
   OutlineButton,
   Tooltip,
   useHoverTooltip,
+  ModalShell,
+  Flex,
+  SPACING,
+  DIRECTION_ROW,
+  Box,
+  DeckLocationSelect,
+  Text,
+  JUSTIFY_CENTER,
+  ALIGN_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  JUSTIFY_FLEX_END,
+  SlotMap,
 } from '@opentrons/components'
 import {
   getAreSlotsAdjacent,
@@ -23,8 +34,10 @@ import {
   TEMPERATURE_MODULE_V1,
   RobotType,
   FLEX_ROBOT_TYPE,
+  THERMOCYCLER_MODULE_V2,
+  OT2_ROBOT_TYPE,
+  getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../localization'
 import {
   getSlotIdsBlockedBySpanning,
   getSlotIsEmpty,
@@ -42,26 +55,25 @@ import {
 } from '../../../modules/moduleData'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { MODELS_FOR_MODULE_TYPE } from '../../../constants'
+import { getRobotType } from '../../../file-data/selectors'
 import { PDAlert } from '../../alerts/PDAlert'
 import { isModuleWithCollisionIssue } from '../../modules'
-import modalStyles from '../modal.css'
-import styles from './EditModules.css'
 import { ModelDropdown } from './ModelDropdown'
 import { SlotDropdown } from './SlotDropdown'
 import { ConnectedSlotMap } from './ConnectedSlotMap'
 import { useResetSlotOnModelChange } from './form-state'
+import styles from './EditModules.css'
 
-import { ModuleOnDeck } from '../../../step-forms/types'
-import { ModelModuleInfo } from '../../EditModules'
-import { getRobotType } from '../../../file-data/selectors'
+import type { ModuleOnDeck } from '../../../step-forms/types'
+import type { ModelModuleInfo } from '../../EditModules'
 
 export interface EditModulesModalProps {
   moduleType: ModuleType
   moduleOnDeck: ModuleOnDeck | null
-  onCloseClick: () => unknown
-  editModuleModel: (model: ModuleModel) => unknown
-  editModuleSlot: (slot: string) => unknown
-  displayModuleWarning: (module: ModelModuleInfo) => unknown
+  onCloseClick: () => void
+  editModuleModel: (model: ModuleModel) => void
+  editModuleSlot: (slot: string) => void
+  displayModuleWarning: (module: ModelModuleInfo) => void
 }
 
 type EditModulesModalComponentProps = EditModulesModalProps & {
@@ -82,11 +94,13 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
     onCloseClick,
     moduleOnDeck,
   } = props
+  const { t } = useTranslation('alert')
   const robotType = useSelector(getRobotType)
   const supportedModuleSlot =
     robotType === OT2_STANDARD_MODEL
       ? SUPPORTED_MODULE_SLOTS_OT2[moduleType][0].value
       : SUPPORTED_MODULE_SLOTS_FLEX[moduleType][0].value
+
   const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const dispatch = useDispatch()
 
@@ -96,7 +110,7 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
     const isSlotBlocked = getSlotIdsBlockedBySpanning(
       initialDeckSetup
     ).includes(selectedSlot)
-    const isSlotEmpty = getSlotIsEmpty(initialDeckSetup, selectedSlot)
+    const isSlotEmpty = getSlotIsEmpty(initialDeckSetup, selectedSlot, true)
     const labwareOnSlot = getLabwareOnSlot(initialDeckSetup, selectedSlot)
     const isLabwareCompatible =
       labwareOnSlot && getLabwareIsCompatible(labwareOnSlot.def, moduleType)
@@ -119,11 +133,12 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
   }: EditModulesFormValues): Record<string, any> => {
     const errors: Record<string, any> = {}
     if (!selectedModel) {
-      errors.selectedModel = i18n.t('alert.field.required')
+      errors.selectedModel = t('field.required')
     }
     const isModuleAdjacentToHeaterShaker =
       // if the module is a heater shaker, it can't be adjacent to another heater shaker
       // because PD does not support MoaM
+      robotType === OT2_ROBOT_TYPE &&
       moduleOnDeck?.type !== HEATERSHAKER_MODULE_TYPE &&
       some(
         initialDeckSetup.modules,
@@ -133,8 +148,8 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
       )
 
     if (isModuleAdjacentToHeaterShaker) {
-      errors.selectedSlot = i18n.t(
-        'alert.module_placement.HEATER_SHAKER_ADJACENT_TO_MODULE.body',
+      errors.selectedSlot = t(
+        'module_placement.HEATER_SHAKER_ADJACENT_TO_MODULE.body',
         { selectedSlot }
       )
     } else if (
@@ -150,19 +165,24 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
           hwModule.type !== HEATERSHAKER_MODULE_TYPE
       )
       if (isHeaterShakerAdjacentToAnotherModule) {
-        errors.selectedSlot = i18n.t(
-          'alert.module_placement.HEATER_SHAKER_ADJACENT_TO_ANOTHER_MODULE.body',
+        errors.selectedSlot = t(
+          'module_placement.HEATER_SHAKER_ADJACENT_TO_ANOTHER_MODULE.body',
           { selectedSlot }
         )
       }
-    } else if (hasSlotIssue(selectedSlot)) {
-      errors.selectedSlot = i18n.t(
-        'alert.module_placement.SLOT_OCCUPIED.body',
-        { selectedSlot }
-      )
+    } else if (
+      //  TODO(jr, 8/31/23): this is a bit hacky since the TCGEN2 slot is only B1 instead of B1 and A1
+      //  so we have to manually check if slot A1 has issues as well as looking at selectedSlot
+      //  this probably deserves a more elegant refactor
+      (selectedModel === THERMOCYCLER_MODULE_V2 && hasSlotIssue('A1')) ||
+      hasSlotIssue(selectedSlot)
+    ) {
+      errors.selectedSlot = t('module_placement.SLOT_OCCUPIED.body', {
+        selectedSlot,
+      })
     } else if (!selectedSlot) {
       // in the event that we remove auto selecting selected slot
-      errors.selectedSlot = i18n.t('alert.field.required')
+      errors.selectedSlot = t('field.required')
     }
 
     return errors
@@ -228,12 +248,15 @@ const EditModulesModalComponent = (
   props: EditModulesModalComponentProps
 ): JSX.Element => {
   const { moduleType, onCloseClick, supportedModuleSlot } = props
+  const { t } = useTranslation(['tooltip', 'modules', 'alert', 'button'])
   const { values, errors, isValid } = useFormikContext<EditModulesFormValues>()
   const { selectedModel } = values
   const disabledModuleRestriction = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
+
   const robotType = useSelector(getRobotType)
+  const flexDeck = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
   const noCollisionIssue =
     selectedModel && !isModuleWithCollisionIssue(selectedModel)
@@ -242,7 +265,7 @@ const EditModulesModalComponent = (
 
   const slotOptionTooltip = (
     <div className={styles.slot_tooltip}>
-      {i18n.t('tooltip.edit_module_modal.slot_selection')}
+      {t('edit_module_modal.slot_selection')}
     </div>
   )
 
@@ -275,73 +298,118 @@ const EditModulesModalComponent = (
     return filteredOptions
   }
 
+  const [field] = useField('selectedSlot')
+
   return (
-    <Modal
-      heading={i18n.t(`modules.module_long_names.${moduleType}`)}
-      className={cx(modalStyles.modal, styles.edit_module_modal)}
-      contentsClassName={styles.modal_contents}
-    >
-      <>
-        {slotIssue && (
-          <PDAlert
-            alertType="warning"
-            title={i18n.t('alert.module_placement.SLOT_OCCUPIED.title')}
-            description={''}
-          />
-        )}
-        <Form>
-          <div className={styles.form_row}>
-            <FormGroup label="Model" className={styles.option_model}>
-              <ModelDropdown
-                fieldName="selectedModel"
-                tabIndex={0}
-                options={getModuleOptionsForRobotType(
-                  MODELS_FOR_MODULE_TYPE[moduleType],
-                  robotType
-                )}
-              />
-            </FormGroup>
-            {showSlotOption && (
-              <>
-                {!enableSlotSelection && (
-                  <Tooltip {...tooltipProps}>{slotOptionTooltip}</Tooltip>
-                )}
+    <ModalShell width="48rem" paddingTop={SPACING.spacing32}>
+      <Box paddingX={SPACING.spacing32}>
+        <Text as="h2">{t(`modules:module_long_names.${moduleType}`)}</Text>
+      </Box>
+      <Form>
+        <Box paddingX={SPACING.spacing32} paddingTop={SPACING.spacing16}>
+          <Flex
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            height="3.125rem"
+            alignItems={ALIGN_CENTER}
+          >
+            <Flex gridGap={SPACING.spacing8}>
+              <FormGroup label="Model">
+                <Box width="4rem">
+                  <ModelDropdown
+                    fieldName="selectedModel"
+                    tabIndex={0}
+                    options={getModuleOptionsForRobotType(
+                      MODELS_FOR_MODULE_TYPE[moduleType],
+                      robotType
+                    )}
+                  />
+                </Box>
+              </FormGroup>
+              {showSlotOption && (
+                <>
+                  {!enableSlotSelection && (
+                    <Tooltip {...tooltipProps}>{slotOptionTooltip}</Tooltip>
+                  )}
 
-                <div {...targetProps} className={styles.option_slot}>
-                  <FormGroup label="Position">
-                    <SlotDropdown
-                      fieldName="selectedSlot"
-                      options={getAllModuleSlotsByType(moduleType, robotType)}
-                      disabled={!enableSlotSelection}
-                      tabIndex={1}
-                    />
-                  </FormGroup>
-                </div>
-
-                <ConnectedSlotMap
-                  fieldName="selectedSlot"
-                  robotType={robotType}
+                  <Box {...targetProps} height="3.125rem">
+                    <FormGroup label="Position">
+                      <Box
+                        width={robotType === FLEX_ROBOT_TYPE ? '8rem' : '18rem'}
+                      >
+                        <SlotDropdown
+                          fieldName="selectedSlot"
+                          options={getAllModuleSlotsByType(
+                            moduleType,
+                            robotType
+                          )}
+                          disabled={!enableSlotSelection}
+                          tabIndex={1}
+                        />
+                      </Box>
+                    </FormGroup>
+                  </Box>
+                </>
+              )}
+            </Flex>
+            <Box>
+              {slotIssue ? (
+                <PDAlert
+                  alertType="warning"
+                  title={t('alert:module_placement.SLOT_OCCUPIED.title')}
+                  description={''}
                 />
-              </>
-            )}
-          </div>
-          <div className={modalStyles.button_row}>
-            <OutlineButton
-              className={styles.button_margin}
-              onClick={onCloseClick}
-            >
-              {i18n.t('button.cancel')}
-            </OutlineButton>
-            <OutlineButton
-              className={styles.button_margin}
-              disabled={!isValid}
-              type={BUTTON_TYPE_SUBMIT}
-            >
-              {i18n.t('button.save')}
-            </OutlineButton>
-          </div>
-        </Form>
-      </>
-    </Modal>
+              ) : null}
+            </Box>
+          </Flex>
+
+          {robotType === OT2_ROBOT_TYPE ? (
+            moduleType === THERMOCYCLER_MODULE_TYPE ? (
+              <Flex
+                height="16rem"
+                justifyContent={JUSTIFY_CENTER}
+                paddingY={SPACING.spacing16}
+              >
+                <SlotMap occupiedSlots={['7', '8', '10', '11']} />
+              </Flex>
+            ) : (
+              <ConnectedSlotMap
+                fieldName="selectedSlot"
+                robotType={OT2_ROBOT_TYPE}
+                isModal
+              />
+            )
+          ) : (
+            <Flex height="20rem" justifyContent={JUSTIFY_CENTER}>
+              <DeckLocationSelect
+                deckDef={flexDeck}
+                selectedLocation={{ slotName: field.value }}
+                theme="grey"
+                isThermocycler={moduleType === THERMOCYCLER_MODULE_TYPE}
+              />
+            </Flex>
+          )}
+        </Box>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          justifyContent={JUSTIFY_FLEX_END}
+          paddingRight={SPACING.spacing32}
+          paddingBottom={SPACING.spacing32}
+        >
+          <OutlineButton
+            className={styles.button_margin}
+            onClick={onCloseClick}
+          >
+            {t('button:cancel')}
+          </OutlineButton>
+          <OutlineButton
+            className={styles.button_margin}
+            disabled={!isValid}
+            type={BUTTON_TYPE_SUBMIT}
+          >
+            {t('button:save')}
+          </OutlineButton>
+        </Flex>
+      </Form>
+    </ModalShell>
   )
 }

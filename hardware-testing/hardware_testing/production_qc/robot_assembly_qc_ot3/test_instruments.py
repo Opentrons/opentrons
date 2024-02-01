@@ -108,7 +108,7 @@ async def _probe_mount_and_record_result(
     if not api.is_simulator:
         ui.get_user_ready("about to probe DOWN")
     print("touch with your finger to stop the probing motion")
-    height_of_probe_stopped = await api.capacitive_probe(
+    height_of_probe_stopped, _ = await api.capacitive_probe(
         mount, z_ax, height_of_probe_full_travel, PROBE_SETTINGS
     )
 

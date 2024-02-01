@@ -1,6 +1,7 @@
 """Manage current and historical run data."""
+import asyncio
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
@@ -15,10 +16,13 @@ from opentrons.protocol_engine import (
 
 from robot_server.protocols import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
+from robot_server.notification_client import NotificationClient
 
 from .engine_store import EngineStore
 from .run_store import RunResource, RunStore
 from .run_models import Run
+
+from opentrons.protocol_engine.types import DeckConfigurationType
 
 
 def _build_run(
@@ -71,11 +75,17 @@ class RunDataManager:
     """
 
     def __init__(
-        self, engine_store: EngineStore, run_store: RunStore, task_runner: TaskRunner
+        self,
+        engine_store: EngineStore,
+        run_store: RunStore,
+        task_runner: TaskRunner,
+        notification_client: NotificationClient,
     ) -> None:
         self._engine_store = engine_store
         self._run_store = run_store
         self._task_runner = task_runner
+        self._notification_client = notification_client
+        self._stop_polling_event = asyncio.Event()
 
     @property
     def current_run_id(self) -> Optional[str]:
@@ -87,6 +97,7 @@ class RunDataManager:
         run_id: str,
         created_at: datetime,
         labware_offsets: List[LabwareOffsetCreate],
+        deck_configuration: DeckConfigurationType,
         protocol: Optional[ProtocolResource],
     ) -> Run:
         """Create a new, current run.
@@ -115,6 +126,7 @@ class RunDataManager:
         state_summary = await self._engine_store.create(
             run_id=run_id,
             labware_offsets=labware_offsets,
+            deck_configuration=deck_configuration,
             protocol=protocol,
         )
         run_resource = self._run_store.insert(
@@ -122,6 +134,8 @@ class RunDataManager:
             created_at=created_at,
             protocol_id=protocol.protocol_id if protocol is not None else None,
         )
+
+        asyncio.create_task(self._poll_current_command(run_id))
 
         return _build_run(
             run_resource=run_resource,
@@ -206,6 +220,11 @@ class RunDataManager:
         """
         if run_id == self._engine_store.current_run_id:
             await self._engine_store.clear()
+            self._stop_polling_event.set()
+            await self._notification_client.publish(
+                topic="robot-server/runs/current_command"
+            )
+
         self._run_store.remove(run_id=run_id)
 
     async def update(self, run_id: str, current: Optional[bool]) -> Run:
@@ -310,3 +329,22 @@ class RunDataManager:
             result = self._run_store.get_state_summary(run_id=run_id)
 
         return result
+
+    async def _poll_current_command(self, run_id: str) -> None:
+        """Continuously poll for the current command.
+
+        Args:
+            run_id: ID of the run.
+        """
+        previous_current_command: Union[CurrentCommand, None] = None
+        while True:
+            current_command = self.get_current_command(run_id)
+            if (
+                current_command is not None
+                and previous_current_command != current_command
+            ):
+                await self._notification_client.publish(
+                    topic="robot-server/runs/current_command"
+                )
+                previous_current_command = current_command
+            await asyncio.sleep(3)

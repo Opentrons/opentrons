@@ -14,7 +14,7 @@ import { useMissingProtocolHardware } from '../../../../pages/Protocols/hooks'
 import { useTrackProtocolRunEvent } from '../../../Devices/hooks'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { useCloneRun } from '../../../ProtocolUpload/hooks'
-import { useMissingHardwareText } from '../hooks'
+import { useHardwareStatusText } from '../hooks'
 import { RecentRunProtocolCard } from '../'
 
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
@@ -90,8 +90,8 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
 const mockUseCloneRun = useCloneRun as jest.MockedFunction<typeof useCloneRun>
-const mockUseMissingHardwareText = useMissingHardwareText as jest.MockedFunction<
-  typeof useMissingHardwareText
+const mockUseHardwareStatusText = useHardwareStatusText as jest.MockedFunction<
+  typeof useHardwareStatusText
 >
 const mockSkeleton = Skeleton as jest.MockedFunction<typeof Skeleton>
 
@@ -121,11 +121,12 @@ describe('RecentRunProtocolCard', () => {
       () => new Promise(resolve => resolve({}))
     )
     mockSkeleton.mockReturnValue(<div>mock Skeleton</div>)
-    mockUseMissingHardwareText.mockReturnValue('Ready to run')
+    mockUseHardwareStatusText.mockReturnValue('Ready to run')
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
     mockUseMissingProtocolHardware.mockReturnValue({
       missingProtocolHardware: [],
       isLoading: false,
+      conflictedSlots: [],
     })
     mockUseAllRunsQuery.mockReturnValue({
       data: { data: [mockRunData] },
@@ -165,18 +166,31 @@ describe('RecentRunProtocolCard', () => {
     mockUseMissingProtocolHardware.mockReturnValue({
       missingProtocolHardware: mockMissingPipette,
       isLoading: false,
+      conflictedSlots: [],
     })
-    mockUseMissingHardwareText.mockReturnValue('Missing 1 pipette')
+    mockUseHardwareStatusText.mockReturnValue('Missing 1 pipette')
     const [{ getByText }] = render(props)
     getByText('Missing 1 pipette')
+  })
+
+  it('should render missing chip when conflicted fixture', () => {
+    mockUseMissingProtocolHardware.mockReturnValue({
+      missingProtocolHardware: [],
+      isLoading: false,
+      conflictedSlots: ['cutoutD3'],
+    })
+    mockUseHardwareStatusText.mockReturnValue('Location conflicts')
+    const [{ getByText }] = render(props)
+    getByText('Location conflicts')
   })
 
   it('should render missing chip when missing a module', () => {
     mockUseMissingProtocolHardware.mockReturnValue({
       missingProtocolHardware: mockMissingModule,
       isLoading: false,
+      conflictedSlots: [],
     })
-    mockUseMissingHardwareText.mockReturnValue('Missing 1 module')
+    mockUseHardwareStatusText.mockReturnValue('Missing 1 module')
     const [{ getByText }] = render(props)
     getByText('Missing 1 module')
   })
@@ -185,8 +199,9 @@ describe('RecentRunProtocolCard', () => {
     mockUseMissingProtocolHardware.mockReturnValue({
       missingProtocolHardware: missingBoth,
       isLoading: false,
+      conflictedSlots: [],
     })
-    mockUseMissingHardwareText.mockReturnValue('Missing hardware')
+    mockUseHardwareStatusText.mockReturnValue('Missing hardware')
     const [{ getByText }] = render(props)
     getByText('Missing hardware')
   })
@@ -194,7 +209,7 @@ describe('RecentRunProtocolCard', () => {
   it('when tapping a card, mock functions is called and loading state is activated', () => {
     const [{ getByLabelText }] = render(props)
     const button = getByLabelText('RecentRunProtocolCard')
-    expect(button).toHaveStyle(`background-color: ${COLORS.green3}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.green35}`)
     fireEvent.click(button)
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: 'proceedToRun',
@@ -203,7 +218,7 @@ describe('RecentRunProtocolCard', () => {
     // TODO(BC, 08/30/23): reintroduce check for tracking when tracking is reintroduced lazily
     // expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
     getByLabelText('icon_ot-spinner')
-    expect(button).toHaveStyle(`background-color: ${COLORS.green3Pressed}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.green40}`)
   })
 
   it('should render the skeleton when react query is loading', () => {

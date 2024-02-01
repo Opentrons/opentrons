@@ -1,6 +1,6 @@
 import * as React from 'react'
-import '@testing-library/jest-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
+import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -61,13 +61,13 @@ describe('App', () => {
 
   it('renders a DesktopApp component when not on device', () => {
     when(mockGetIsOnDevice).calledWith(MOCK_STATE).mockReturnValue(false)
-    const [{ getByText }] = render()
-    getByText('mock DesktopApp')
+    render()
+    screen.getByText('mock DesktopApp')
   })
 
   it('renders an OnDeviceDisplayApp component when on device', () => {
     when(mockGetIsOnDevice).calledWith(MOCK_STATE).mockReturnValue(true)
-    const [{ getByText }] = render()
-    getByText('mock OnDeviceDisplayApp')
+    render()
+    screen.getByText('mock OnDeviceDisplayApp')
   })
 })

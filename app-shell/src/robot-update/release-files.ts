@@ -3,12 +3,17 @@ import assert from 'assert'
 import path from 'path'
 import { promisify } from 'util'
 import tempy from 'tempy'
-import { move, readdir, remove } from 'fs-extra'
+import { move, readdir, remove, readFile } from 'fs-extra'
 import StreamZip from 'node-stream-zip'
 import getStream from 'get-stream'
 
+import { RobotUpdateTarget } from '@opentrons/app/src/redux/robot-update/types'
+
 import { createLogger } from '../log'
 import { fetchToFile } from '../http'
+import { Dispatch } from '../types'
+import { CURRENT_VERSION } from '../update'
+
 import type { DownloadProgress } from '../http'
 import type { ReleaseSetUrls, ReleaseSetFilepaths, UserFileInfo } from './types'
 
@@ -23,6 +28,8 @@ const outPath = (dir: string, url: string): string =>
 export function getReleaseFiles(
   urls: ReleaseSetUrls,
   directory: string,
+  dispatch: Dispatch,
+  target: RobotUpdateTarget,
   onProgress: (progress: DownloadProgress) => unknown
 ): Promise<ReleaseSetFilepaths> {
   return readdir(directory)
@@ -44,41 +51,65 @@ export function getReleaseFiles(
         return { system, releaseNotes }
       }
 
-      return downloadReleaseFiles(urls, directory, onProgress)
+      return Promise.all([
+        downloadAndNotify(true, urls.releaseNotes, directory, dispatch, target),
+        downloadAndNotify(
+          false,
+          urls.system,
+          directory,
+          dispatch,
+          target,
+          onProgress
+        ),
+      ]).then(([releaseNotes, system]) => ({ releaseNotes, system }))
     })
 }
 
-// downloads the entire release set to a temporary directory, and once they're
-// all successfully downloaded, renames the directory to `directory`
+// downloads robot update files to a temporary directory, and once
+// successfully downloaded, renames the directory to `directory`
 // TODO(mc, 2019-07-09): DRY this up if/when more than 2 files are required
-export function downloadReleaseFiles(
-  urls: ReleaseSetUrls,
+export function downloadAndNotify(
+  isReleaseNotesDownload: boolean,
+  url: ReleaseSetUrls['releaseNotes' | 'system'],
   directory: string,
+  dispatch: Dispatch,
+  target: RobotUpdateTarget,
   // `onProgress` will be called with download progress as the files are read
-  onProgress: (progress: DownloadProgress) => unknown
-): Promise<ReleaseSetFilepaths> {
+  onProgress?: (progress: DownloadProgress) => unknown
+): Promise<string> {
   const tempDir: string = tempy.directory()
-  const tempSystemPath = outPath(tempDir, urls.system)
-  const tempNotesPath = outPath(tempDir, urls.releaseNotes)
+  const tempPath = outPath(tempDir, url)
+  const path = outPath(directory, tempPath)
+  const logMessage = isReleaseNotesDownload ? 'release notes' : 'system files'
 
-  log.debug('directory created for robot update downloads', { tempDir })
+  log.debug('directory created for ' + logMessage, { tempDir })
 
   // downloads are streamed directly to the filesystem to avoid loading them
   // all into memory simultaneously
-  const systemReq = fetchToFile(urls.system, tempSystemPath, { onProgress })
-  const notesReq = fetchToFile(urls.releaseNotes, tempNotesPath)
+  const req = fetchToFile(url, tempPath, {
+    onProgress,
+  })
 
-  return Promise.all([systemReq, notesReq]).then(results => {
-    const [systemTemp, releaseNotesTemp] = results
-    const systemPath = outPath(directory, systemTemp)
-    const notesPath = outPath(directory, releaseNotesTemp)
-
-    log.debug('renaming directory', { from: tempDir, to: directory })
-
-    return move(tempDir, directory, { overwrite: true }).then(() => ({
-      system: systemPath,
-      releaseNotes: notesPath,
-    }))
+  return req.then(() => {
+    return move(tempPath, path, { overwrite: true })
+      .then(() => {
+        if (isReleaseNotesDownload) {
+          return readFile(path, 'utf8').then(releaseNotes =>
+            dispatch({
+              type: 'robotUpdate:UPDATE_INFO',
+              payload: { releaseNotes, target, version: CURRENT_VERSION },
+            })
+          )
+        }
+        // This action will only have an effect if the user is actively waiting for the download to complete.
+        else {
+          return dispatch({
+            type: 'robotUpdate:DOWNLOAD_DONE',
+            payload: target,
+          })
+        }
+      })
+      .then(() => path)
   })
 }
 

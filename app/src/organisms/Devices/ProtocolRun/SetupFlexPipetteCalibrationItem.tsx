@@ -20,7 +20,7 @@ import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 import type { PipetteData } from '@opentrons/api-client'
-import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data'
 import type { Mount } from '../../../redux/pipettes/types'
 
 interface SetupInstrumentCalibrationItemProps {
@@ -122,7 +122,11 @@ export function SetupFlexPipetteCalibrationItem({
         button={button}
         calibratedDate={pipetteCalDate}
         subText={subText}
-        label={t(`devices_landing:${mount}_mount`)}
+        label={
+          requestedPipetteSpecs?.channels === 96
+            ? t('devices_landing:ninety_six_mount')
+            : t(`devices_landing:${mount}_mount`)
+        }
         title={requestedPipetteSpecs?.displayName}
         id={`PipetteCalibration_${mount}MountTitle`}
         runId={runId}

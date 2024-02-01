@@ -1,16 +1,19 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
 import {
   ConfirmDeleteModal,
   DELETE_STEP_FORM,
 } from '../modals/ConfirmDeleteModal'
-import { i18n } from '../../localization'
 import { actions as stepsActions, getIsMultiSelectMode } from '../../ui/steps'
 import { actions as steplistActions } from '../../steplist'
 import { Portal } from '../portals/TopPortal'
 import styles from './StepItem.css'
 import { StepIdType } from '../../form-types'
+import { getSavedStepForms } from '../../step-forms/selectors'
+import { ThunkDispatch } from 'redux-thunk'
+import { BaseState } from '../../types'
 
 const MENU_OFFSET_PX = 5
 
@@ -28,7 +31,8 @@ interface Position {
 }
 
 export const ContextMenu = (props: Props): JSX.Element => {
-  const dispatch = useDispatch()
+  const { t } = useTranslation('context_menu')
+  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const deleteStep = (
     stepId: StepIdType
   ): ReturnType<typeof steplistActions.deleteStep> =>
@@ -47,6 +51,9 @@ export const ContextMenu = (props: Props): JSX.Element => {
   const menuRoot = React.useRef<HTMLDivElement | null>(null)
 
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
+  const allSavedSteps = useSelector(getSavedStepForms)
+  const isMoveLabwareStepType =
+    stepId != null ? allSavedSteps[stepId].stepType === 'moveLabware' : null
 
   React.useEffect(() => {
     global.addEventListener('click', handleClick)
@@ -78,7 +85,6 @@ export const ContextMenu = (props: Props): JSX.Element => {
     setStepId(stepId)
     setPosition({ left, top })
   }
-
   const handleClick = (event: MouseEvent): void => {
     const wasOutside = !(
       event.target instanceof Node && menuRoot.current?.contains(event.target)
@@ -128,24 +134,24 @@ export const ContextMenu = (props: Props): JSX.Element => {
       })}
       {!showDeleteConfirmation && visible && (
         <Portal>
-          <React.Fragment>
-            <div
-              ref={menuRoot}
-              // @ts-expect-error(sa, 2021-7-5): position cannot be null, cast to undefined
-              style={{ left: position.left, top: position.top }}
-              className={styles.context_menu}
-            >
+          <div
+            ref={menuRoot}
+            // @ts-expect-error(sa, 2021-7-5): position cannot be null, cast to undefined
+            style={{ left: position.left, top: position.top }}
+            className={styles.context_menu}
+          >
+            {isMoveLabwareStepType ? null : (
               <div
                 onClick={handleDuplicate}
                 className={styles.context_menu_item}
               >
-                {i18n.t('context_menu.step.duplicate')}
+                {t('duplicate')}
               </div>
-              <div onClick={confirmDelete} className={styles.context_menu_item}>
-                {i18n.t('context_menu.step.delete')}
-              </div>
+            )}
+            <div onClick={confirmDelete} className={styles.context_menu_item}>
+              {t('delete')}
             </div>
-          </React.Fragment>
+          </div>
         </Portal>
       )}
     </div>

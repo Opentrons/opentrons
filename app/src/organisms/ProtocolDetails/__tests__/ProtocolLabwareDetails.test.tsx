@@ -3,7 +3,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { ProtocolLabwareDetails } from '../ProtocolLabwareDetails'
 
-import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data'
 
 const mockRequiredLabwareDetails = [
   {
@@ -72,7 +72,7 @@ describe('ProtocolLabwareDetails', () => {
 
   it('should render an opentrons labware', () => {
     const { getByText } = render(props)
-    getByText('Labware Name')
+    getByText('Labware name')
     getByText('NEST 96 Well Plate 100 µL PCR Full Skirt')
     getByText('Quantity')
     getByText('1')
@@ -129,7 +129,7 @@ describe('ProtocolLabwareDetails', () => {
     } as LoadLabwareRunTimeCommand)
 
     const { getByText } = render(props)
-    getByText('Labware Name')
+    getByText('Labware name')
     getByText('NEST 96 Well Plate 100 µL PCR Full Skirt')
     getByText('Quantity')
     getByText('2')

@@ -80,6 +80,12 @@ class MoveToMaintenancePositionImplementation(
         ot3_api = ensure_ot3_hardware(
             self._hardware_api,
         )
+        # the 96-channel mount is disengaged during gripper calibration and
+        #  must be homed before the gantry position can be called
+        if ot3_api.encoder_status_ok(Axis.Z_L) and not ot3_api.motor_status_ok(
+            Axis.Z_L
+        ):
+            await ot3_api.home([Axis.Z_L])
         current_position_mount = await ot3_api.gantry_position(
             Mount.LEFT, critical_point=CriticalPoint.MOUNT
         )
@@ -107,6 +113,13 @@ class MoveToMaintenancePositionImplementation(
             )
 
         if params.mount != MountType.EXTENSION:
+
+            # disengage the gripper z to enable the e-brake, this prevents the gripper
+            # z from dropping when the right mount carriage gets released from the
+            # mount during 96-channel detach flow
+            if ot3_api.has_gripper():
+                await ot3_api.disengage_axes([Axis.Z_G])
+
             if params.maintenancePosition == MaintenancePosition.ATTACH_INSTRUMENT:
                 mount_to_axis = Axis.by_mount(params.mount.to_hw_mount())
                 await ot3_api.move_axes(

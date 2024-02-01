@@ -2,12 +2,19 @@
 const path = require('path')
 const { versionForProject } = require('../scripts/git-version')
 
-const { OT_APP_DEPLOY_BUCKET, OT_APP_DEPLOY_FOLDER } = process.env
+const {
+  OT_APP_DEPLOY_BUCKET,
+  OT_APP_DEPLOY_FOLDER,
+  APPLE_TEAM_ID,
+} = process.env
 const DEV_MODE = process.env.NODE_ENV !== 'production'
 const USE_PYTHON = process.env.NO_PYTHON !== 'true'
 const project = process.env.OPENTRONS_PROJECT ?? 'robot-stack'
 
-const ot3PublishConfig =
+// this will generate either
+// https://builds.opentrons.com/app/ or https://ot3-development.builds.opentrons.com/app/
+// because these environment variables are provided by ci
+const publishConfig =
   OT_APP_DEPLOY_BUCKET && OT_APP_DEPLOY_FOLDER
     ? {
         provider: 'generic',
@@ -15,19 +22,10 @@ const ot3PublishConfig =
       }
     : null
 
-const robotStackPublishConfig =
-  OT_APP_DEPLOY_BUCKET && OT_APP_DEPLOY_FOLDER
-    ? {
-        provider: 's3',
-        bucket: OT_APP_DEPLOY_BUCKET,
-        path: OT_APP_DEPLOY_FOLDER,
-      }
-    : null
-
 module.exports = async () => ({
   appId:
     project === 'robot-stack' ? 'com.opentrons.app' : 'com.opentrons.appot3',
-  electronVersion: '21.3.1',
+  electronVersion: '23.3.13',
   npmRebuild: false,
   releaseInfo: {
     releaseNotesFile:
@@ -62,6 +60,9 @@ module.exports = async () => ({
     icon: project === 'robot-stack' ? 'build/icon.icns' : 'build/three.icns',
     forceCodeSigning: !DEV_MODE,
     gatekeeperAssess: true,
+    notarize: {
+      teamId: APPLE_TEAM_ID,
+    },
   },
   dmg: {
     icon: null,
@@ -80,7 +81,7 @@ module.exports = async () => ({
     category: 'Science',
     icon: project === 'robot-stack' ? 'build/icon.icns' : 'build/three.icns',
   },
-  publish: project === 'ot3' ? ot3PublishConfig : robotStackPublishConfig,
+  publish: publishConfig,
   generateUpdatesFilesForAllChannels: true,
   beforePack: path.join(__dirname, './scripts/before-pack.js'),
 })

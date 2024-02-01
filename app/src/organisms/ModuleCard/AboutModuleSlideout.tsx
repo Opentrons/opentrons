@@ -37,7 +37,7 @@ export const AboutModuleSlideout = (
   props: AboutModuleSlideoutProps
 ): JSX.Element | null => {
   const { module, isExpanded, onCloseClick, firmwareUpdateClick } = props
-  const { t } = useTranslation(['device_details', 'shared'])
+  const { i18n, t } = useTranslation(['device_details', 'shared'])
   const moduleName = getModuleDisplayName(module.moduleModel)
   const runStatus = useCurrentRunStatus()
   const [showBanner, setShowBanner] = React.useState<boolean>(true)
@@ -97,26 +97,35 @@ export const AboutModuleSlideout = (
           <Flex
             flexDirection={DIRECTION_COLUMN}
             data-testid={`alert_item_version_${String(module.moduleModel)}`}
-            color={COLORS.darkGreyEnabled}
           >
-            <StyledText as="h6">{t('current_version')}</StyledText>
-            <StyledText as="p" paddingTop={SPACING.spacing4}>
-              {t('version', { version: module.firmwareVersion })}
+            <StyledText
+              as="h6"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              color={COLORS.grey50}
+            >
+              {i18n.format(t('current_version'), 'upperCase')}
+            </StyledText>
+            <StyledText
+              as="p"
+              paddingTop={SPACING.spacing4}
+              paddingBottom={SPACING.spacing16}
+            >
+              {module.firmwareVersion}
             </StyledText>
           </Flex>
         </Flex>
         <StyledText
-          paddingTop={SPACING.spacing16}
           as="h6"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          color={COLORS.grey50}
           data-testid={`alert_item_serial_number_text_${String(
             module.moduleModel
           )}`}
-          color={COLORS.darkBlackEnabled}
         >
-          {t('serial_number')}
+          {i18n.format(t('serial_number'), 'upperCase')}
         </StyledText>
         <StyledText
-          as="h6"
+          as="p"
           paddingTop={SPACING.spacing4}
           data-testid={`alert_item_serial_${String(module.moduleModel)}`}
         >

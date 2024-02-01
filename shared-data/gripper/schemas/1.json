@@ -35,7 +35,7 @@
     "GripperModel": {
       "title": "GripperModel",
       "description": "Gripper models.",
-      "enum": ["gripperV1"],
+      "enum": ["gripperV1", "gripperV1.1", "gripperV1.2"],
       "type": "string"
     },
     "Geometry": {
@@ -109,6 +109,11 @@
           "additionalProperties": {
             "type": "number"
           }
+        },
+        "maxAllowedGripError": {
+          "title": "MaxAllowedGripError",
+          "minimum": 0.0,
+          "type": "number"
         }
       },
       "required": [
@@ -147,6 +152,11 @@
           "minimum": 0.0,
           "type": "number"
         },
+        "defaultIdleForce": {
+          "title": "Defaultidleforce",
+          "minimum": 0.0,
+          "type": "number"
+        },
         "defaultHomeForce": {
           "title": "Defaulthomeforce",
           "minimum": 0.0,
@@ -166,6 +176,7 @@
       "required": [
         "polynomial",
         "defaultGripForce",
+        "defaultIdleForce",
         "defaultHomeForce",
         "min",
         "max"

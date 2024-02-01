@@ -170,10 +170,10 @@ class BasePipetteSettingFields(BaseModel):
 # A dynamic model of the possible fields in pipette configuration. It's
 # generated from pipette_config module. It's derived from an object with the
 # 'quirks` member.
-PipetteSettingsFields = create_model(
+PipetteSettingsFields = create_model(  # type: ignore[call-overload]
     "PipetteSettingsFields",
     __base__=BasePipetteSettingFields,
-    **{  # type: ignore[arg-type]
+    **{
         conf: (PipetteSettingsField, None)
         for conf in model_constants.MUTABLE_CONFIGS_V1
         if conf != "quirks"

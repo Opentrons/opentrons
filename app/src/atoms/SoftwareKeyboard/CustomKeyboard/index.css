@@ -1,0 +1,33 @@
+/* stylelint-disable */
+
+.simple-keyboard.oddTheme1.hg-theme-default {
+  width: 100%;
+  height: 100%;
+  background-color: #cbcccc; /* grey35 */
+  font-family: 'Public Sans', sans-serif;
+  padding: 8px;
+  font-size: 28px;
+}
+
+.simple-keyboard.oddTheme1
+  .hg-row:not(:last-child)
+  .hg-button:not(:last-child) {
+  margin-right: 8px;
+  margin-bottom: 3px;
+}
+
+.simple-keyboard.simple-keyboard.oddTheme1 .hg-button {
+  height: 48px;
+}
+
+.simple-keyboard .hg-button:active {
+  color: #16212d;
+  background-color: #e3e3e3;
+}
+
+/* Numeric keyboard in custom keyboard */
+.hg-layout-numbers button.hg-button.hg-button-backspace,
+.hg-layout-numbers button.hg-button.hg-button-abc,
+.hg-layout-numbers button.hg-button.hg-standardBtn {
+  flex: 1;
+}

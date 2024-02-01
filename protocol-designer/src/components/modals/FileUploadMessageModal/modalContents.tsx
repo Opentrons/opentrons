@@ -1,146 +1,184 @@
 import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import assert from 'assert'
-import semver from 'semver'
-import styles from './modalContents.css'
-import { ModalContents } from './types'
 import { FileUploadMessage } from '../../../load-file'
+import type { ModalContents } from './types'
 
-const INVALID_FILE_TYPE: ModalContents = {
-  title: 'Incorrect file type',
-  body: (
-    <>
-      <p>Only JSON files created in the Protocol Designer can be imported.</p>
-      <p>At this time Python protocol files are not supported.</p>
-    </>
-  ),
+import styles from './modalContents.css'
+
+const PD = 'Protocol Designer'
+
+interface ModalProps {
+  t: any
+  errorMessage?: string | null
 }
 
-const invalidJsonModal = (errorMessage?: string | null): ModalContents => ({
-  title: 'Invalid JSON file',
-  body: (
-    <>
-      <p>
-        This file is either missing information it needs to import properly or
-        contains sections that the Protocol Designer cannot read.
-      </p>
-      <p>
-        At this time we do not support JSON files created outside of the
-        Protocol Designer.
-      </p>
-      <p>
-        If this is a Protocol Designer file that you have edited outside of this
-        tool you may have introduced errors.
-      </p>
-
-      <div className={styles.error_wrapper}>
-        <p>Error message:</p>
-        <p className={styles.error_text}>{errorMessage}</p>
-      </div>
-    </>
-  ),
-})
-
-export const genericDidMigrateMessage: ModalContents = {
-  title: 'Your protocol was made in an older version of Protocol Designer',
-  body: (
-    <>
-      <p>
-        Your protocol will be automatically updated to the latest version.
-        Please note that the updated file will be incompatible with older
-        versions of the Protocol Designer. We recommend making a separate copy
-        of the file that you just imported before continuing.
-      </p>
-      <p>
-        Updating the file may make changes to liquid handling actions. Please
-        review your file in the Protocol Designer as well as with a water run on
-        the robot.
-      </p>
-      <p>As always, please contact us with any questions or feedback.</p>
-    </>
-  ),
+const getInvalidFileType = (props: ModalProps): ModalContents => {
+  const { t } = props
+  return {
+    title: t('incorrect_file.header'),
+    body: (
+      <>
+        <p>{t('incorrect_file.body1', { pd: PD })}</p>
+        <p>{t('incorrect_file.body2')}.</p>
+      </>
+    ),
+  }
 }
 
-export const noBehaviorChangeMessage: ModalContents = {
-  title: 'Your protocol was made in an older version of Protocol Designer',
-  body: (
-    <div className={styles.migration_message}>
-      <p>Your protocol will be automatically updated to the latest version.</p>
-      <p>
-        We have added new features since the last time this protocol was
-        updated, but have not made any changes to existing protocol behavior.
-        Because of this we do not expect any changes in how the robot will
-        execute this protocol. To be safe we will still recommend keeping a
-        separate copy of the file you just imported.
-      </p>
-      <p>As always, please contact us with any questions or feedback.</p>
-    </div>
-  ),
+const invalidJsonModal = (props: ModalProps): ModalContents => {
+  const { t, errorMessage } = props
+  return {
+    title: t('invalid.header'),
+    body: (
+      <>
+        <p>{t('invalid.body1', { pd: PD })}</p>
+        <p>{t('invalid.body2', { pd: PD })}</p>
+        <p>{t('invalid.body3', { pd: PD })}</p>
+
+        <div className={styles.error_wrapper}>
+          <p>{t('invalid.error')}</p>
+          <p className={styles.error_text}>{errorMessage}</p>
+        </div>
+      </>
+    ),
+  }
 }
 
-export const toV3MigrationMessage: ModalContents = {
-  title: 'Update protocol to use new labware definitions',
-  okButtonText: 'update protocol',
-  body: (
-    <div className={styles.migration_message}>
-      <p>
-        <strong>
-          To import your file successfully, you must update your protocol to use
-          the new labware definitions.
-        </strong>{' '}
-        Your protocol was made using an older version of Protocol Designer.
-        Since then, Protocol Designer has been improved to include new labware
-        definitions which are more accurate and reliable.
-      </p>
+export const getGenericDidMigrateMessage = (
+  props: ModalProps
+): ModalContents => {
+  const { t } = props
 
-      <div className={styles.section_header}>
-        What this means for your protocol
-      </div>
-      <p>
-        Updating your protocol to use the new labware definitions will
-        consequently require you to re-calibrate all labware in your protocol
-        prior to running it on your robot. We recommend you try a dry run or one
-        with water to ensure everything is working as expected.
-      </p>
-
-      <div className={styles.section_header}>
-        {"What happens if you don't update"}
-      </div>
+  return {
+    title: t('migrations.header', { pd: PD }),
+    body: (
       <div>
+        <p>{t('migrations.generic.body1', { pd: PD })}</p>
+        <p>{t('migrations.generic.body2', { pd: PD })}</p>
+        <p>{t('migrations.generic.body3')}</p>
+      </div>
+    ),
+  }
+}
+
+export const getNoBehaviorChangeMessage = (
+  props: ModalProps
+): ModalContents => {
+  const { t } = props
+
+  return {
+    title: t('migrations.header', { pd: PD }),
+    body: (
+      <div className={styles.migration_message}>
+        <p>{t('migrations.noBehaviorChange.body1')}</p>
+        <p>{t('migrations.noBehaviorChange.body2')}</p>
+        <p>{t('migrations.noBehaviorChange.body3')}</p>
+      </div>
+    ),
+  }
+}
+
+export const getToV8MigrationMessage = (props: ModalProps): ModalContents => {
+  const { t } = props
+
+  return {
+    title: t('migrations.header', { pd: PD }),
+    body: (
+      <div className={styles.migration_message}>
         <p>
-          If you choose not to update, you will still be able to run your
-          protocol as usual with older labware, however you will not be able to
-          make further updates to this protocol using the Protocol Designer.
+          <p>{t('migrations.toV8Migration.body1')}</p>
         </p>
+        <p>{t('migrations.toV8Migration.body2', { pd: PD })}</p>
+        <p>{t('migrations.toV8Migration.body3')}</p>
+        <p>{t('migrations.toV8Migration.body4')}</p>
       </div>
-
-      <div className={styles.note}>
-        Please note that in order to run the updated protocol on your robot
-        successfully, the OT-2 App and robot are required to be updated to
-        version 3.10.0 or higher.
-      </div>
-    </div>
-  ),
+    ),
+  }
 }
 
-export function getMigrationMessage(migrationsRan: string[]): ModalContents {
+export const getToV3MigrationMessage = (props: ModalProps): ModalContents => {
+  const { t } = props
+
+  return {
+    title: t('migrations.toV3Migration.title'),
+    okButtonText: t('migrations.toV3Migration.button'),
+    body: (
+      <div className={styles.migration_message}>
+        <p>
+          <Trans
+            t={t}
+            i18nKey="migrations.toV3Migration.body1"
+            components={{ strong: <strong /> }}
+          />
+        </p>
+        <div className={styles.section_header}>
+          {t('migrations.toV3Migration.body2')}
+        </div>
+        <p>{t('migrations.toV3Migration.body3')}</p>
+        <div className={styles.section_header}>
+          {t('migrations.toV3Migration.body4')}
+        </div>
+        <div>
+          <p>{t('migrations.toV3Migration.body5')}</p>
+        </div>
+        <div className={styles.note}>{t('migrations.toV3Migration.body6')}</div>
+      </div>
+    ),
+  }
+}
+
+interface MigrationMessageProps {
+  migrationsRan: string[]
+  t: any
+}
+
+export const getMigrationMessage = (
+  props: MigrationMessageProps
+): ModalContents => {
+  const { t, migrationsRan } = props
+
   if (migrationsRan.includes('3.0.0')) {
-    return toV3MigrationMessage
+    return getToV3MigrationMessage({ t })
   }
-  if (migrationsRan.every(migration => semver.gt(migration, '4.0.0'))) {
-    return noBehaviorChangeMessage
+  const noBehaviorMigrations = [
+    ['5.0.0'],
+    ['5.0.0', '5.1.0'],
+    ['5.0.0', '5.1.0', '5.2.0'],
+  ]
+  if (
+    noBehaviorMigrations.some(migrationList =>
+      migrationsRan.every(migration => migrationList.includes(migration))
+    )
+  ) {
+    return getNoBehaviorChangeMessage({ t })
   }
-  return genericDidMigrateMessage
+  if (migrationsRan.includes('8.0.0')) {
+    return getToV8MigrationMessage({ t })
+  }
+  return getGenericDidMigrateMessage({ t })
 }
 
-export function getModalContents(
-  uploadResponse: FileUploadMessage
-): ModalContents {
+interface ModalContentsProps {
+  uploadResponse?: FileUploadMessage | null
+}
+export function useModalContents(
+  props: ModalContentsProps
+): ModalContents | null {
+  const { uploadResponse } = props
+  const { t } = useTranslation('modal')
+
+  if (uploadResponse == null) return null
+
   if (uploadResponse.isError) {
     switch (uploadResponse.errorType) {
       case 'INVALID_FILE_TYPE':
-        return INVALID_FILE_TYPE
+        return getInvalidFileType({ t })
       case 'INVALID_JSON_FILE':
-        return invalidJsonModal(uploadResponse.errorMessage)
+        return invalidJsonModal({
+          errorMessage: uploadResponse.errorMessage,
+          t,
+        })
       default: {
         console.warn('Invalid error type specified for modal')
         return { title: 'Error', body: 'Error' }
@@ -149,7 +187,10 @@ export function getModalContents(
   }
   switch (uploadResponse.messageKey) {
     case 'DID_MIGRATE':
-      return getMigrationMessage(uploadResponse.migrationsRan)
+      return getMigrationMessage({
+        migrationsRan: uploadResponse.migrationsRan,
+        t,
+      })
     default: {
       assert(
         false,

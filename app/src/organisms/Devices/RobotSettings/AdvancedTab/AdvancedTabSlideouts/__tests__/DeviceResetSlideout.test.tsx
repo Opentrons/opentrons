@@ -4,7 +4,7 @@ import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../../i18n'
 import { getResetConfigOptions } from '../../../../../../redux/robot-admin'
-import { useIsOT3 } from '../../../../hooks'
+import { useIsFlex } from '../../../../hooks'
 import { DeviceResetSlideout } from '../DeviceResetSlideout'
 
 jest.mock('../../../../../../redux/config')
@@ -19,7 +19,7 @@ const mockUpdateResetStatus = jest.fn()
 const mockGetResetConfigOptions = getResetConfigOptions as jest.MockedFunction<
   typeof getResetConfigOptions
 >
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 
 const mockResetConfigOptions = [
   {
@@ -52,6 +52,16 @@ const mockResetConfigOptions = [
     name: 'tip length FooBar',
     description: 'tip length fooBar description',
   },
+  {
+    id: 'moduleCalibration',
+    name: 'module calibration FooBar',
+    description: 'moduleCalibration fooBar description',
+  },
+  {
+    id: 'authorizedKeys',
+    name: 'SSH Keys Foo',
+    description: 'SSH Keys foo description',
+  },
 ]
 
 const render = () => {
@@ -71,7 +81,7 @@ const render = () => {
 describe('RobotSettings DeviceResetSlideout', () => {
   beforeEach(() => {
     mockGetResetConfigOptions.mockReturnValue(mockResetConfigOptions)
-    mockUseIsOT3.mockReturnValue(false)
+    mockUseIsFlex.mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -92,6 +102,7 @@ describe('RobotSettings DeviceResetSlideout', () => {
     getByText('Clear protocol run history')
     getByText('Boot scripts')
     getByText('Clear custom boot scripts')
+    getByText('Clear SSH public keys')
     const downloads = getAllByText('Download')
     expect(downloads.length).toBe(2)
     getByRole('checkbox', { name: 'Clear deck calibration' })
@@ -99,16 +110,17 @@ describe('RobotSettings DeviceResetSlideout', () => {
     getByRole('checkbox', { name: 'Clear tip length calibrations' })
     getByRole('checkbox', { name: 'Clear protocol run history' })
     getByRole('checkbox', { name: 'Clear custom boot scripts' })
+    getByRole('checkbox', { name: 'Clear SSH public keys' })
     getByRole('button', { name: 'Clear data and restart robot' })
     getByTestId('Slideout_icon_close_Device Reset')
   })
 
   it('should change some options and text for Flex', () => {
-    mockUseIsOT3.mockReturnValue(true)
+    mockUseIsFlex.mockReturnValue(true)
     const [{ getByText, getByRole, queryByRole, queryByText }] = render()
     getByText('Clear all data')
     getByText(
-      'Resets all settings. You’ll have to redo initial setup before using the robot again.'
+      'Clears calibrations, protocols, and all settings except robot name and network settings.'
     )
     expect(queryByText('Clear deck calibration')).toBeNull()
     getByText('Clear pipette calibration')
@@ -116,6 +128,7 @@ describe('RobotSettings DeviceResetSlideout', () => {
     getByText('Clear gripper calibration')
     getByRole('checkbox', { name: 'Clear pipette calibration' })
     getByRole('checkbox', { name: 'Clear gripper calibration' })
+    getByRole('checkbox', { name: 'Clear module calibration' })
     expect(
       queryByRole('checkbox', { name: 'Clear deck calibration' })
     ).toBeNull()

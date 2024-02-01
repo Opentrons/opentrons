@@ -64,8 +64,15 @@ export function PinnedProtocol(props: {
   cardSize?: CardSizeType
   lastRun?: string
   setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
+  setTargetProtocolId: (targetProtocolId: string) => void
 }): JSX.Element {
-  const { lastRun, protocol, longPress, setShowDeleteConfirmationModal } = props
+  const {
+    lastRun,
+    protocol,
+    longPress,
+    setShowDeleteConfirmationModal,
+    setTargetProtocolId,
+  } = props
   const cardSize = props.cardSize ?? 'full'
   const history = useHistory()
   const longpress = useLongPress()
@@ -88,14 +95,14 @@ export function PinnedProtocol(props: {
 
   const PUSHED_STATE_STYLE = css`
     &:active {
-      background-color: ${longpress.isLongPressed ? '' : COLORS.darkBlack40};
+      background-color: ${longpress.isLongPressed ? '' : COLORS.grey50};
     }
   `
 
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
-      backgroundColor={COLORS.light1}
+      backgroundColor={COLORS.grey35}
       borderRadius={BORDERS.borderRadiusSize4}
       css={PUSHED_STATE_STYLE}
       flexDirection={DIRECTION_COLUMN}
@@ -122,7 +129,7 @@ export function PinnedProtocol(props: {
         gridGap={SPACING.spacing8}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         width="100%"
-        color={COLORS.darkBlack70}
+        color={COLORS.grey60}
       >
         <StyledText as="p">
           {lastRun !== undefined
@@ -139,6 +146,7 @@ export function PinnedProtocol(props: {
         <LongPressModal
           longpress={longpress}
           protocolId={protocol.id}
+          setTargetProtocolId={setTargetProtocolId}
           setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
         />
       )}

@@ -1,22 +1,61 @@
 from typing import Optional
 from typing_extensions import Protocol
 
-from opentrons.types import Mount
+from .types import MountArgType, CalibrationType, ConfigType
 
 from .instrument_configurer import InstrumentConfigurer
 from .motion_controller import MotionController
 from .configurable import Configurable
-from .calibratable import Calibratable, CalibrationType
+from .calibratable import Calibratable
 
 
 class LiquidHandler(
-    InstrumentConfigurer,
-    MotionController,
-    Configurable,
+    InstrumentConfigurer[MountArgType],
+    MotionController[MountArgType],
+    Configurable[ConfigType],
     Calibratable[CalibrationType],
-    Protocol[CalibrationType],
+    Protocol[CalibrationType, MountArgType, ConfigType],
 ):
-    async def prepare_for_aspirate(self, mount: Mount, rate: float = 1.0) -> None:
+    async def update_nozzle_configuration_for_mount(
+        self,
+        mount: MountArgType,
+        back_left_nozzle: Optional[str],
+        front_right_nozzle: Optional[str],
+        starting_nozzle: Optional[str] = None,
+    ) -> None:
+        """
+        The expectation of this function is that the back_left_nozzle/front_right_nozzle are the two corners
+        of a rectangle of nozzles. A call to this function that does not follow that schema will result
+        in an error.
+
+        :param mount: A robot mount that the instrument is on.
+        :param back_left_nozzle: A string representing a nozzle name of the form <LETTER><NUMBER> such as 'A1'.
+        :param front_right_nozzle: A string representing a nozzle name of the form <LETTER><NUMBER> such as 'A1'.
+        :param starting_nozzle: A string representing the starting nozzle which will be used as the critical point
+        of the pipette nozzle configuration. By default, the back left nozzle will be the starting nozzle if
+        none is provided.
+
+        If none of the nozzle parameters are provided, the nozzle configuration will be reset to default.
+        :return: None.
+        """
+        ...
+
+    async def configure_for_volume(self, mount: MountArgType, volume: float) -> None:
+        """
+        Configure a pipette to handle the specified volume.
+
+        Some pipettes need to switch modes to handle different volumes of liquid. Calling
+        this ensures they do so. If the pipette does not need to switch modes, or the pipette
+        is already in the specified mode, nothing will happen.
+
+        If the pipette does need to switch modes, it will likely be unready for aspiration and
+        you will need to call :py:meth:`prepare_for_aspirate` afterwards.
+        """
+        ...
+
+    async def prepare_for_aspirate(
+        self, mount: MountArgType, rate: float = 1.0
+    ) -> None:
         """
         Prepare the pipette for aspiration.
 
@@ -38,7 +77,7 @@ class LiquidHandler(
 
     async def aspirate(
         self,
-        mount: Mount,
+        mount: MountArgType,
         volume: Optional[float] = None,
         rate: float = 1.0,
     ) -> None:
@@ -65,7 +104,7 @@ class LiquidHandler(
 
     async def dispense(
         self,
-        mount: Mount,
+        mount: MountArgType,
         volume: Optional[float] = None,
         rate: float = 1.0,
         push_out: Optional[float] = None,
@@ -82,7 +121,9 @@ class LiquidHandler(
         """
         ...
 
-    async def blow_out(self, mount: Mount, volume: Optional[float] = None) -> None:
+    async def blow_out(
+        self, mount: MountArgType, volume: Optional[float] = None
+    ) -> None:
         """
         Force any remaining liquid to dispense. The liquid will be dispensed at
         the current location of pipette
@@ -91,7 +132,7 @@ class LiquidHandler(
 
     async def pick_up_tip(
         self,
-        mount: Mount,
+        mount: MountArgType,
         tip_length: float,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
@@ -117,7 +158,7 @@ class LiquidHandler(
 
     async def drop_tip(
         self,
-        mount: Mount,
+        mount: MountArgType,
         home_after: bool = True,
     ) -> None:
         """

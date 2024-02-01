@@ -27,8 +27,8 @@ export const getU2EDeviceAnalyticsProps: (
     'U2E Vendor ID': device.vendorId,
     'U2E Product ID': device.productId,
     'U2E Serial Number': device.serialNumber,
-    'U2E Manufacturer': device.manufacturer,
-    'U2E Device Name': device.deviceName,
+    'U2E Manufacturer': device.manufacturerName,
+    'U2E Device Name': device.productName,
   }
 
   if (device.windowsDriverVersion) {

@@ -7,6 +7,7 @@ from hardware_testing.gravimetric.measurement.record import (
     GravimetricRecorder,
     GravimetricRecorderConfig,
 )
+from hardware_testing.gravimetric.measurement.scale import Scale  # type: ignore[import]
 
 metadata = {"protocolName": "gravimetric-rnd", "apiLevel": "2.12"}
 CALIBRATE_SCALE = False
@@ -26,9 +27,14 @@ def _run(is_simulating: bool) -> None:
             frequency=5,
             stable=False,
         ),
+        scale=Scale.build(simulate=is_simulating),
         simulate=is_simulating,
     )
+    print(f"Scale: {_rec.max_capacity}g (SN:{_rec.serial_number})")
     if CALIBRATE_SCALE:
+        input("Press ENTER to ZERO the scale:")
+        _rec.zero_scale()
+        input("Press ENTER to CALIBRATE the scale:")
         _rec.calibrate_scale()
     while True:
         input("Press ENTER to Record:")

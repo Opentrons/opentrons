@@ -4707,6 +4707,11 @@
       "x": 0,
       "y": 0,
       "z": 8.32
+    },
+    "opentrons_aluminum_flat_bottom_plate": {
+      "x": 0,
+      "y": 0,
+      "z": 4.4
     }
   }
 }

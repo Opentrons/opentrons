@@ -28,6 +28,7 @@ from opentrons.protocol_engine.types import (
     ModuleModel,
     Liquid,
     PostRunHardwareState,
+    AddressableAreaLocation,
 )
 from opentrons.protocol_engine.execution import (
     QueueWorker,
@@ -43,6 +44,7 @@ from opentrons.protocol_engine.actions import (
     ActionDispatcher,
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
+    AddAddressableAreaAction,
     AddLiquidAction,
     AddModuleAction,
     PlayAction,
@@ -343,15 +345,23 @@ def test_play(
     )
     decoy.when(
         state_store.commands.validate_action_allowed(
-            PlayAction(requested_at=datetime(year=2021, month=1, day=1))
+            PlayAction(
+                requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
+            )
         ),
-    ).then_return(PlayAction(requested_at=datetime(year=2022, month=2, day=2)))
+    ).then_return(
+        PlayAction(
+            requested_at=datetime(year=2022, month=2, day=2), deck_configuration=[]
+        )
+    )
 
-    subject.play()
+    subject.play(deck_configuration=[])
 
     decoy.verify(
         action_dispatcher.dispatch(
-            PlayAction(requested_at=datetime(year=2022, month=2, day=2))
+            PlayAction(
+                requested_at=datetime(year=2022, month=2, day=2), deck_configuration=[]
+            )
         ),
         hardware_api.resume(HardwarePauseType.PAUSE),
     )
@@ -371,17 +381,25 @@ def test_play_blocked_by_door(
     )
     decoy.when(
         state_store.commands.validate_action_allowed(
-            PlayAction(requested_at=datetime(year=2021, month=1, day=1))
+            PlayAction(
+                requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
+            )
         ),
-    ).then_return(PlayAction(requested_at=datetime(year=2022, month=2, day=2)))
+    ).then_return(
+        PlayAction(
+            requested_at=datetime(year=2022, month=2, day=2), deck_configuration=[]
+        )
+    )
     decoy.when(state_store.commands.get_is_door_blocking()).then_return(True)
 
-    subject.play()
+    subject.play(deck_configuration=[])
 
     decoy.verify(hardware_api.resume(HardwarePauseType.PAUSE), times=0)
     decoy.verify(
         action_dispatcher.dispatch(
-            PlayAction(requested_at=datetime(year=2022, month=2, day=2))
+            PlayAction(
+                requested_at=datetime(year=2022, month=2, day=2), deck_configuration=[]
+            )
         ),
         hardware_api.pause(HardwarePauseType.PAUSE),
     )
@@ -670,7 +688,7 @@ async def test_stop(
     state_store: StateStore,
     subject: ProtocolEngine,
 ) -> None:
-    """It should be able to stop the engine and halt the hardware."""
+    """It should be able to stop the engine and run execution."""
     expected_action = StopAction()
 
     decoy.when(
@@ -682,6 +700,33 @@ async def test_stop(
     decoy.verify(
         action_dispatcher.dispatch(expected_action),
         queue_worker.cancel(),
+    )
+
+
+async def test_stop_for_legacy_core_protocols(
+    decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
+    queue_worker: QueueWorker,
+    hardware_stopper: HardwareStopper,
+    hardware_api: HardwareControlAPI,
+    state_store: StateStore,
+    subject: ProtocolEngine,
+) -> None:
+    """It should be able to stop the engine & run execution and cancel movement tasks."""
+    expected_action = StopAction()
+
+    decoy.when(
+        state_store.commands.validate_action_allowed(expected_action),
+    ).then_return(expected_action)
+
+    decoy.when(hardware_api.is_movement_execution_taskified()).then_return(True)
+
+    await subject.stop()
+
+    decoy.verify(
+        action_dispatcher.dispatch(expected_action),
+        queue_worker.cancel(),
+        await hardware_api.cancel_execution_and_running_tasks(),
     )
 
 
@@ -876,6 +921,25 @@ def test_add_labware_definition(
     result = subject.add_labware_definition(well_plate_def)
 
     assert result == "some/definition/uri"
+
+
+def test_add_addressable_area(
+    decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
+    subject: ProtocolEngine,
+) -> None:
+    """It should dispatch an AddAddressableArea action."""
+    subject.add_addressable_area(addressable_area_name="my_funky_area")
+
+    decoy.verify(
+        action_dispatcher.dispatch(
+            AddAddressableAreaAction(
+                addressable_area=AddressableAreaLocation(
+                    addressableAreaName="my_funky_area"
+                )
+            )
+        )
+    )
 
 
 def test_add_liquid(

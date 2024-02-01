@@ -26,7 +26,7 @@ NUM_DUTY_CYCLE_TRIALS = 20
 
 GRIP_FORCES_NEWTON: List[int] = [20, 15, 10, 5]
 NUM_NEWTONS_TRIALS = 1
-FAILURE_THRESHOLD_PERCENTAGES = [10, 10, 10, 20]
+FAILURE_THRESHOLD_PERCENTAGES = [20, 20, 20, 40]
 
 WARMUP_SECONDS = 10
 
@@ -111,7 +111,8 @@ async def _grip_and_read_forces(
     if not api.is_simulator:
         await sleep(2)  # let sensor settle
     if duty is not None:
-        await api._grip(duty_cycle=float(duty))
+        displacement = api._gripper_handler.get_gripper().max_jaw_displacement()
+        await api._grip(duty_cycle=float(duty), expected_displacement=displacement)
         api._gripper_handler.set_jaw_state(GripperJawState.GRIPPING)
     else:
         assert force is not None

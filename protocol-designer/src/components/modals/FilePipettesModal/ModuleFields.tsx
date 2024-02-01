@@ -4,7 +4,6 @@ import {
   DropdownField,
   FormGroup,
 } from '@opentrons/components'
-import { i18n } from '../../../localization'
 import {
   DEFAULT_MODEL_FOR_MODULE_TYPE,
   MODELS_FOR_MODULE_TYPE,
@@ -13,6 +12,7 @@ import { FormModulesByType } from '../../../step-forms'
 import { ModuleDiagram } from '../../modules'
 import styles from './FilePipettesModal.css'
 import { MAGNETIC_BLOCK_TYPE, ModuleType } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
 
 export interface ModuleFieldsProps {
   // TODO 2020-3-20 use formik typing here after we update the def in flow-typed
@@ -58,7 +58,6 @@ export interface ModuleFieldsProps {
       }
   values: FormModulesByType
   onFieldChange: (event: React.ChangeEvent) => unknown
-  onSetFieldValue: (field: string, value: string | null) => void
   onSetFieldTouched: (field: string, touched: boolean) => void
   onBlur: (event: React.FocusEvent<HTMLSelectElement>) => unknown
 }
@@ -66,14 +65,13 @@ export interface ModuleFieldsProps {
 export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
   const {
     onFieldChange,
-    onSetFieldValue,
     onSetFieldTouched,
     onBlur,
     values,
     errors,
     touched,
   } = props
-
+  const { t } = useTranslation('modules')
   // TODO(BC, 2023-05-11): REMOVE THIS MAG BLOCK FILTER BEFORE LAUNCH TO INCLUDE IT AMONG MODULE OPTIONS
   // @ts-expect-error(sa, 2021-6-21): Object.keys not smart enough to take the keys of FormModulesByType
   const modules: ModuleType[] = Object.keys(values).filter(
@@ -81,15 +79,7 @@ export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
   )
   const handleOnDeckChange = (type: ModuleType) => (e: React.ChangeEvent) => {
     const targetToClear = `modulesByType.${type}.model`
-
     onFieldChange(e)
-
-    if (
-      targetToClear !== 'modulesByType.thermocyclerModuleType.model' &&
-      targetToClear !== 'modulesByType.heaterShakerModuleType.model'
-    ) {
-      onSetFieldValue(targetToClear, null)
-    }
     onSetFieldTouched(targetToClear, false)
   }
 
@@ -97,7 +87,7 @@ export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
     <div className={styles.modules_row}>
       {modules.map((moduleType, i) => {
         const moduleTypeAccessor = `modulesByType.${moduleType}`
-        const label = i18n.t(`modules.module_display_names.${moduleType}`)
+        const label = t(`module_display_names.${moduleType}`)
         const defaultModel = DEFAULT_MODEL_FOR_MODULE_TYPE[moduleType]
         const selectedModel = values[moduleType].model
         return (

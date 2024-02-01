@@ -26,7 +26,6 @@ const Template: Story<BorderRadiusStorybookProps> = args => {
   const targetBorderRadiuses = args.borderRadius.filter(s =>
     s[0].includes('borderRadiusSize')
   )
-  console.log(targetBorderRadiuses)
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -49,7 +48,7 @@ const Template: Story<BorderRadiusStorybookProps> = args => {
           <Box
             width="10rem"
             height="4rem"
-            backgroundColor={COLORS.blueEnabled}
+            backgroundColor={COLORS.blue50}
             borderRadius={br[1]}
           />
         </Flex>

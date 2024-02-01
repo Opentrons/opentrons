@@ -1,50 +1,49 @@
 import assert from 'assert'
 import execa from 'execa'
-import usbDetection from 'usb-detection'
+import { usb, WebUSB } from 'usb'
 import { isWindows } from '../os'
 import { createLogger } from '../log'
 
-import type { Device } from 'usb-detection'
-
-export type { Device }
+import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 
 export type UsbDeviceMonitorOptions = Partial<{
-  onDeviceAdd?: (device: Device) => unknown
-  onDeviceRemove?: (device: Device) => unknown
+  onDeviceAdd?: (device: UsbDevice) => void
+  onDeviceRemove?: (device: UsbDevice) => void
 }>
 
 export interface UsbDeviceMonitor {
-  getAllDevices: () => Promise<Device[]>
+  getAllDevices: () => Promise<USBDevice[]>
   stop: () => void
 }
 
 const log = createLogger('usb-devices')
+const webusb = new WebUSB({
+  allowAllDevices: true,
+})
 
 export function createUsbDeviceMonitor(
   options: UsbDeviceMonitorOptions = {}
 ): UsbDeviceMonitor {
   const { onDeviceAdd, onDeviceRemove } = options
-  usbDetection.startMonitoring()
 
   if (typeof onDeviceAdd === 'function') {
-    usbDetection.on('add', onDeviceAdd)
+    usb.on('attach', device => onDeviceAdd)
   }
 
   if (typeof onDeviceRemove === 'function') {
-    usbDetection.on('remove', onDeviceRemove)
+    usb.on('detach', device => onDeviceRemove)
   }
 
   return {
-    getAllDevices: () => usbDetection.find(),
+    getAllDevices: () => Promise.resolve(webusb.getDevices()),
     stop: () => {
       if (typeof onDeviceAdd === 'function') {
-        usbDetection.off('add', onDeviceAdd)
+        usb.removeAllListeners('attach')
       }
       if (typeof onDeviceRemove === 'function') {
-        usbDetection.off('remove', onDeviceRemove)
+        usb.removeAllListeners('detach')
       }
 
-      usbDetection.stopMonitoring()
       log.debug('usb detection monitoring stopped')
     },
   }
@@ -54,10 +53,16 @@ const decToHex = (number: number): string =>
   number.toString(16).toUpperCase().padStart(4, '0')
 
 export function getWindowsDriverVersion(
-  device: Device
+  device: UsbDevice
 ): Promise<string | null> {
+  console.log('getWindowsDriverVersion', device)
   const { vendorId: vidDecimal, productId: pidDecimal, serialNumber } = device
   const [vid, pid] = [decToHex(vidDecimal), decToHex(pidDecimal)]
+
+  // USBDevice serialNumber is  string | undefined
+  if (serialNumber == null) {
+    return Promise.resolve(null)
+  }
 
   assert(
     isWindows() || process.env.NODE_ENV === 'test',

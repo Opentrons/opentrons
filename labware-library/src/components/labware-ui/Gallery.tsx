@@ -34,7 +34,7 @@ export function Gallery(props: GalleryProps): JSX.Element {
     labwareImages[params.loadName] || []
   ).map((src, key) => <img key={key} src={src} />)
 
-  const images = [render, ...staticImages]
+  const images = [...staticImages, render]
 
   return (
     <div className={className}>

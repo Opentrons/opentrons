@@ -4,14 +4,33 @@
   "model": "p50",
   "displayCategory": "FLEX",
   "pickUpTipConfigurations": {
-    "current": 0.5,
-    "presses": 1,
-    "speed": 10,
-    "increment": 0.0,
-    "distance": 13.0
+    "pressFit": {
+      "presses": 1,
+      "speed": 10,
+      "increment": 0.0,
+      "distance": 13.0,
+      "currentByTipCount": {
+        "1": 0.15,
+        "2": 0.13,
+        "3": 0.19,
+        "4": 0.25,
+        "5": 0.31,
+        "6": 0.38,
+        "7": 0.44,
+        "8": 0.5
+      }
+    }
   },
-  "dropTipConfigurations": { "current": 1.0, "speed": 10 },
-  "plungerMotorConfigurations": { "idle": 0.3, "run": 1.0 },
+  "dropTipConfigurations": {
+    "plungerEject": {
+      "current": 1.0,
+      "speed": 10
+    }
+  },
+  "plungerMotorConfigurations": {
+    "idle": 0.3,
+    "run": 1.0
+  },
   "plungerPositionsConfigurations": {
     "default": {
       "top": 0.5,
@@ -21,16 +40,22 @@
     },
     "lowVolumeDefault": {
       "top": 0.5,
-      "bottom": 57.0,
+      "bottom": 61.5,
       "blowout": 76.5,
       "drop": 92.5
     }
   },
   "availableSensors": {
     "sensors": ["pressure", "capacitive", "environment"],
-    "pressure": { "count": 2 },
-    "capacitive": { "count": 2 },
-    "environment": { "count": 1 }
+    "pressure": {
+      "count": 2
+    },
+    "capacitive": {
+      "count": 2
+    },
+    "environment": {
+      "count": 1
+    }
   },
   "partialTipConfigurations": {
     "partialTipSupported": true,
@@ -41,5 +66,9 @@
   "shaftDiameter": 1.0,
   "shaftULperMM": 0.785,
   "backlashDistance": 0.1,
-  "quirks": []
+  "quirks": [],
+  "plungerHomingConfigurations": {
+    "current": 1.0,
+    "speed": 30
+  }
 }

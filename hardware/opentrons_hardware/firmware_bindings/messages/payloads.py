@@ -229,8 +229,8 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
 class MotorPositionResponse(EmptyPayload):
     """Read Encoder Position."""
 
-    current_position: utils.UInt32Field
-    encoder_position: utils.Int32Field
+    current_position_um: utils.UInt32Field
+    encoder_position_um: utils.Int32Field
     position_flags: MotorPositionFlagsField
 
 
@@ -319,13 +319,13 @@ class FirmwareUpdateData(FirmwareUpdateWithAddress):
             raise InternalMessageFormatError(
                 f"FirmwareUpdateData: Data address needs to be doubleword aligned."
                 f" {address} mod 8 equals {address % 8} and should be 0",
-                detail={"address": address},
+                detail={"address": str(address)},
             )
         if data_length > FirmwareUpdateDataField.NUM_BYTES:
             raise InternalMessageFormatError(
                 f"FirmwareUpdateData: Data cannot be more than"
                 f" {FirmwareUpdateDataField.NUM_BYTES} bytes got {data_length}.",
-                detail={"size": data_length},
+                detail={"size": str(data_length)},
             )
 
     @classmethod
@@ -528,6 +528,13 @@ class GripperJawStatePayload(EmptyPayload):
 
 
 @dataclass(eq=False)
+class GripperJawHoldoffPayload(EmptyPayload):
+    """A respones carrying info about the jaw holdoff value of a gripper."""
+
+    holdoff_ms: utils.UInt32Field
+
+
+@dataclass(eq=False)
 class GripperMoveRequestPayload(AddToMoveGroupRequestPayload):
     """A request to move gripper."""
 
@@ -545,40 +552,10 @@ class GripperErrorTolerancePayload(EmptyPayload):
 
 
 @dataclass(eq=False)
-class _PushTipPresenceNotificationPayloadBase(EmptyPayload):
-    ejector_flag_status: utils.UInt8Field
-
-
-@dataclass(eq=False)
-class PushTipPresenceNotificationPayload(_PushTipPresenceNotificationPayloadBase):
+class PushTipPresenceNotificationPayload(EmptyPayload):
     """A notification that the ejector flag status has changed."""
 
-    @classmethod
-    def build(cls, data: bytes) -> "PushTipPresenceNotificationPayload":
-        """Build a response payload from incoming bytes."""
-        consumed_by_super = _PushTipPresenceNotificationPayloadBase.get_size()
-        superdict = asdict(_PushTipPresenceNotificationPayloadBase.build(data))
-        message_index = superdict.pop("message_index")
-
-        # we want to parse this by adding extra 0s that may not be necessary,
-        # which is annoying and complex, so let's wrap it in an iterator
-        def _data_for_optionals(consumed: int, buf: bytes) -> Iterator[bytes]:
-            extended = buf + b"\x00\x00"
-            yield extended[consumed:]
-            consumed += 2
-            extended = extended + b"\x00"
-            yield extended[consumed : consumed + 1]
-
-        optionals_yielder = _data_for_optionals(consumed_by_super, data)
-        inst = cls(
-            **superdict,
-            sensor_id=SensorIdField.build(
-                int.from_bytes(next(optionals_yielder), "big")
-            ),
-        )
-        inst.message_index = message_index
-        return inst
-
+    ejector_flag_status: utils.UInt8Field
     sensor_id: SensorIdField
 
 

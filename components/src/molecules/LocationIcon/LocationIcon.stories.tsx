@@ -4,6 +4,7 @@ import { Flex, SPACING } from '@opentrons/components'
 import { ICON_DATA_BY_NAME } from '@opentrons/components/src/icons/icon-data'
 
 import { GlobalStyle } from '../../../../app/src/atoms/GlobalStyle'
+import { customViewports } from '../../../../.storybook/preview'
 import { LocationIcon } from '.'
 
 import type { Story, Meta } from '@storybook/react'
@@ -28,7 +29,7 @@ const slots = [
 ]
 
 export default {
-  title: 'Odd/Molecules/LocationIcon',
+  title: 'ODD/Molecules/LocationIcon',
   argTypes: {
     iconName: {
       control: {
@@ -46,6 +47,13 @@ export default {
     },
   },
   component: LocationIcon,
+  // Note (kk:08/29/2023) this component is located in components so avoid importing const from app
+  parameters: {
+    viewport: {
+      viewports: customViewports,
+      defaultViewport: 'onDeviceDisplay',
+    },
+  },
   decorators: [
     Story => (
       <>

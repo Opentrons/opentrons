@@ -28,7 +28,7 @@ import type { BadGripper, GripperData } from '@opentrons/api-client'
 
 const GO_BACK_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50};
   padding-left: ${SPACING.spacing32};
 
   &:hover {
@@ -57,7 +57,7 @@ const ALIGN_BUTTONS = css`
 export const MountGripper = (
   props: GripperWizardStepProps
 ): JSX.Element | null => {
-  const { proceed, isRobotMoving, goBack } = props
+  const { proceed, isRobotMoving } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   const isOnDevice = useSelector(getIsOnDevice)
   const [showUnableToDetect, setShowUnableToDetect] = React.useState(false)
@@ -90,7 +90,7 @@ export const MountGripper = (
   return showUnableToDetect ? (
     <SimpleWizardBody
       header={t('unable_to_detect_gripper')}
-      iconColor={COLORS.errorEnabled}
+      iconColor={COLORS.red50}
       isSuccess={false}
     >
       <Flex
@@ -140,7 +140,6 @@ export const MountGripper = (
       proceedButtonText={t('continue')}
       proceedIsDisabled={isPending}
       proceed={handleOnClick}
-      back={goBack}
     />
   )
 }

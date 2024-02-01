@@ -13,14 +13,20 @@ import {
   PrimaryButton,
   COLORS,
 } from '@opentrons/components'
-import { useRunQuery } from '@opentrons/react-api-client'
+import { useRunQuery, useProtocolQuery } from '@opentrons/react-api-client'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useLPCSuccessToast } from '../../hooks/useLPCSuccessToast'
 import { Tooltip } from '../../../../atoms/Tooltip'
-import { useLPCDisabledReason, useStoredProtocolAnalysis } from '../../hooks'
+import {
+  useRobotType,
+  useLPCDisabledReason,
+  useStoredProtocolAnalysis,
+} from '../../hooks'
 import { CurrentOffsetsTable } from './CurrentOffsetsTable'
 import { useLaunchLPC } from '../../../LabwarePositionCheck/useLaunchLPC'
 import { StyledText } from '../../../../atoms/text'
+import type { LabwareOffset } from '@opentrons/api-client'
+import { getLatestCurrentOffsets } from './utils'
 
 interface SetupLabwarePositionCheckProps {
   expandLabwareStep: () => void
@@ -34,8 +40,34 @@ export function SetupLabwarePositionCheck(
   const { robotName, runId, expandLabwareStep } = props
   const { t, i18n } = useTranslation('protocol_setup')
 
+  const robotType = useRobotType(robotName)
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
+  const { data: protocolRecord } = useProtocolQuery(
+    runRecord?.data.protocolId ?? null,
+    {
+      staleTime: Infinity,
+    }
+  )
+  const protocolName =
+    protocolRecord?.data.metadata.protocolName ??
+    protocolRecord?.data.files[0].name ??
+    ''
   const currentOffsets = runRecord?.data?.labwareOffsets ?? []
+  const sortedOffsets: LabwareOffset[] =
+    currentOffsets.length > 0
+      ? currentOffsets
+          .map(offset => ({
+            ...offset,
+            //  convert into date to sort
+            createdAt: new Date(offset.createdAt),
+          }))
+          .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+          .map(offset => ({
+            ...offset,
+            //   convert back into string
+            createdAt: offset.createdAt.toISOString(),
+          }))
+      : []
   const lpcDisabledReason = useLPCDisabledReason({ robotName, runId })
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
@@ -46,7 +78,9 @@ export function SetupLabwarePositionCheck(
 
   const { setIsShowingLPCSuccessToast } = useLPCSuccessToast()
 
-  const { launchLPC, LPCWizard } = useLaunchLPC(runId)
+  const { launchLPC, LPCWizard } = useLaunchLPC(runId, robotType, protocolName)
+
+  const nonIdentityOffsets = getLatestCurrentOffsets(sortedOffsets)
 
   return (
     <Flex
@@ -54,9 +88,9 @@ export function SetupLabwarePositionCheck(
       marginTop={SPACING.spacing16}
       gridGap={SPACING.spacing16}
     >
-      {currentOffsets.length > 0 ? (
+      {nonIdentityOffsets.length > 0 ? (
         <CurrentOffsetsTable
-          currentOffsets={currentOffsets}
+          currentOffsets={nonIdentityOffsets}
           commands={protocolData?.commands ?? []}
           labware={protocolData?.labware ?? []}
           modules={protocolData?.modules ?? []}
@@ -65,7 +99,7 @@ export function SetupLabwarePositionCheck(
         <Flex
           paddingY={SPACING.spacing8}
           marginY={SPACING.spacing24}
-          backgroundColor={COLORS.fundamentalsBackground}
+          backgroundColor={COLORS.grey10}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
         >

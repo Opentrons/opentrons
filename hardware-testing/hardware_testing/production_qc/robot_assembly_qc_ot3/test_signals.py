@@ -81,11 +81,11 @@ async def _move_and_interrupt_with_signal(api: OT3API, sig_name: str) -> None:
         backend: OT3Controller = api._backend  # type: ignore[assignment]
         messenger = backend._messenger
         if sig_name == "nsync":
-            engage = api._backend.release_sync  # type: ignore[union-attr]
-            release = api._backend.engage_sync  # type: ignore[union-attr]
+            engage = backend.release_sync
+            release = backend.engage_sync
         elif sig_name == "estop":
-            engage = api._backend.engage_estop  # type: ignore[union-attr]
-            release = api._backend.release_estop  # type: ignore[union-attr]
+            engage = backend.engage_estop
+            release = backend.release_estop
 
         async def _sleep_then_activate_stop_signal() -> None:
             if "external" in sig_name:
@@ -117,7 +117,6 @@ async def _move_and_interrupt_with_signal(api: OT3API, sig_name: str) -> None:
         move_coro = _do_the_moving()
         stop_coro = _sleep_then_activate_stop_signal()
         await asyncio.gather(stop_coro, move_coro)
-    await api.refresh_positions()
 
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
@@ -152,7 +151,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         await _move_and_interrupt_with_signal(api, sig_name)
         if not api.is_simulator and "external" in sig_name:
             ui.get_user_ready("release the E-STOP")
-        stop_pos = await api.gantry_position(mount)
+        if "external" in sig_name or "estop" in sig_name:
+            await api._update_position_estimation([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R])
+        stop_pos = await api.gantry_position(mount, refresh=True)
         report(
             section,
             f"{sig_name}-stop-pos",

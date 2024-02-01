@@ -15,6 +15,9 @@ PORT ?= 8090
 # TODO(mc, 2018-08-07): figure out a better way to do this
 ui_dir := ../app
 
+# Path of source package
+SRC_PATH = app-shell
+
 # cross-platform noop command
 noop := cd .
 
@@ -23,7 +26,15 @@ dist_files = $(if $(filter $(1),robot-stack),"dist/**/Opentrons-*","dist/**/Open
 update_files := "dist/@(alpha|beta|latest)*.@(yml|json)"
 publish_dir := dist/publish
 
-# Other SSH args for buildroot robots
+# These variables can be overriden when make is invoked to customize the
+# behavior of jest. For instance,
+# make test tests=src/__tests__/http.test.ts would run only the
+# specified test
+tests ?= $(SRC_PATH)/src
+cov_opts ?= --coverage=true --ci=true --collectCoverageFrom='app-shell/src/**/*.(js|ts|tsx)'
+test_opts ?=
+
+# Other SSH args for robot
 ssh_opts ?= $(default_ssh_opts)
 
 # TODO(mc, 2018-03-27): move all this to some sort of envfile
@@ -48,7 +59,7 @@ no_python_bundle ?=
 
 builder := yarn electron-builder \
 	--config electron-builder.config.js \
-	--config.electronVersion=21.3.1 \
+	--config.electronVersion=23.3.13 \
 	--publish never
 
 
@@ -86,7 +97,7 @@ clean:
 .PHONY: lib
 lib: export NODE_ENV := production
 lib:
-	webpack --profile
+	NODE_OPTIONS=--openssl-legacy-provider webpack --profile
 
 .PHONY: deps
 deps:
@@ -171,5 +182,9 @@ dev-app-update.yml:
 dev: export NODE_ENV := development
 dev: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
 dev: clean-dev-autoupdate ./dev-app-update.yml
-	webpack
+	NODE_OPTIONS=--openssl-legacy-provider webpack
 	$(electron)
+
+.PHONY: test
+test:
+	$(MAKE) -C .. test-js-app-shell

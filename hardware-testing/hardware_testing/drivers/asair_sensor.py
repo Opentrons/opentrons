@@ -16,6 +16,8 @@ import serial  # type: ignore[import]
 from serial.serialutil import SerialException  # type: ignore[import]
 from hardware_testing.data import ui
 
+from serial.tools.list_ports import comports  # type: ignore[import]
+
 log = logging.getLogger(__name__)
 
 USB_VID = 0x0403
@@ -33,6 +35,7 @@ addrs = {
     "08": "C492",
     "09": "C543",
     "10": "C74A",
+    "0A": "48d9",
 }
 
 
@@ -65,18 +68,38 @@ class AsairSensorBase(ABC):
         """Get a temp and humidity reading."""
         ...
 
+    @abc.abstractmethod
+    def get_serial(self) -> str:
+        """Read the device ID register."""
+        ...
 
-def BuildAsairSensor(simulate: bool) -> AsairSensorBase:
+
+def BuildAsairSensor(simulate: bool, autosearch: bool = True) -> AsairSensorBase:
     """Try to find and return an Asair sensor, if not found return a simulator."""
     ui.print_title("Connecting to Environmental sensor")
     if not simulate:
-        port = list_ports_and_select(device_name="Asair environmental sensor")
-        try:
+        if not autosearch:
+            port = list_ports_and_select(device_name="Asair environmental sensor")
             sensor = AsairSensor.connect(port)
             ui.print_info(f"Found sensor on port {port}")
             return sensor
-        except SerialException:
-            pass
+        else:
+            ports = comports()
+            assert ports
+            for _port in ports:
+                port = _port.device  # type: ignore[attr-defined]
+                try:
+                    ui.print_info(f"Trying to connect to env sensor on port {port}")
+                    sensor = AsairSensor.connect(port)
+                    ser_id = sensor.get_serial()
+                    ui.print_info(f"Found env sensor {ser_id} on port {port}")
+                    return sensor
+                except:  # noqa: E722
+                    pass
+            use_sim = ui.get_user_answer("No env sensor found, use simulator?")
+            if not use_sim:
+                raise SerialException("No sensor found")
+    ui.print_info("no sensor found returning simulator")
     return SimAsairSensor()
 
 
@@ -144,8 +167,8 @@ class AsairSensor(AsairSensorBase):
             log.debug(f"received {res}")
 
             res = codecs.encode(res, "hex")
-            temp = res[6:10]
-            relative_hum = res[10:14]
+            relative_hum = res[6:10]
+            temp = res[10:14]
             log.info(f"Temp: {temp}, RelativeHum: {relative_hum}")
 
             temp = float(int(temp, 16)) / 10
@@ -160,9 +183,41 @@ class AsairSensor(AsairSensorBase):
             error_msg = "Asair Sensor not connected. Check if port number is correct."
             raise AsairSensorError(error_msg)
 
+    def get_serial(self) -> str:
+        """Read the device ID register."""
+        data_packet = "{}0300000002{}".format(
+            self._sensor_address, addrs[self._sensor_address]
+        )
+        log.debug(f"sending {data_packet}")
+        command_bytes = codecs.decode(data_packet.encode(), "hex")
+        try:
+            self._th_sensor.flushInput()
+            self._th_sensor.flushOutput()
+            self._th_sensor.write(command_bytes)
+            time.sleep(0.1)
+
+            length = self._th_sensor.inWaiting()
+            res = self._th_sensor.read(length)
+            res = codecs.encode(res, "hex")
+            log.debug(f"received {res}")
+            dev_id = res[6:14]
+            return dev_id.decode()
+
+        except (IndexError, ValueError) as e:
+            log.exception("Bad value read")
+            raise AsairSensorError(str(e))
+        except SerialException:
+            log.exception("Communication error")
+            error_msg = "Asair Sensor not connected. Check if port number is correct."
+            raise AsairSensorError(error_msg)
+
 
 class SimAsairSensor(AsairSensorBase):
     """Simulating Asair sensor driver."""
+
+    def get_serial(self) -> str:
+        """Read the device ID register."""
+        return "0102030405060708"
 
     def get_reading(self) -> Reading:
         """Get a reading."""

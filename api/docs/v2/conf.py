@@ -71,8 +71,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'OT-2 API V2'
-copyright = '2010, Opentrons'
+project = 'Python Protocol API v2'
+copyright = '2010–23, Opentrons'
 author = 'Opentrons Labworks'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -96,13 +96,10 @@ release = _vers
 # setup the code block substitution extension to auto-update apiLevel
 extensions += ['sphinx-prompt', 'sphinx_substitution_extensions']
 
-# get the max API level
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION  # noqa
-max_apiLevel = str(MAX_SUPPORTED_VERSION)
-
 # use rst_prolog to hold the subsitution
+# update the apiLevel value whenever a new minor version is released
 rst_prolog = f"""
-.. |apiLevel| replace:: {max_apiLevel}
+.. |apiLevel| replace:: 2.16
 .. |release| replace:: {release}
 """
 
@@ -176,7 +173,8 @@ html_theme_options = {
     'font_family': "'Open Sans', sans-serif",
     'head_font_family': "'AkkoPro-Regular', 'Open Sans'",
     'sidebar_collapse': 'True',
-    'fixed_sidebar': 'False',
+    'fixed_sidebar': 'True',
+    'sidebar_width': '270px',
     'github_user': 'opentrons',
     'github_repo': 'opentrons',
     'github_button': True,
@@ -204,7 +202,7 @@ html_title = 'Opentrons Python API V2 Documentation'
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
 #
-html_logo = '../img/logo.png'
+# html_logo = '../img/logo.png'
 
 # The name of an image file (relative to this directory) to use as a favicon of
 # the docs.  This file should be a Windows icon file (.ico) being 16x16 or
@@ -426,3 +424,25 @@ ogp_enable_meta_description = False
 # -- Options for tabs -----------------------------------------------------
 
 sphinx_tabs_disable_tab_closing = True
+
+# -- Suppress autodoc warnings --------------------------------------------
+
+# Ignore warnings for deliberately missing/undocumented things that appear
+# in automatically generated type signatures.
+#
+# The goal here is to pass through any warnings for bad targets of MANUALLY
+# created links.
+nitpick_ignore_regex = [
+    ("py:class", r".*Optional\[.*"),  # any Optional with bad members
+    ("py:class", r".*commands\.types.*"),
+    ("py:class", r".*hardware_control.*"),
+    ("py:class", r".*legacy_broker.*"),
+    ("py:class", r".*protocol_api\.core.*"),
+    ("py:class", r".*api_support.*"),
+    ("py:class", r".*duration\.estimator.*"),
+    ("py:class", r".*protocols\.types.*"),
+    ("py:class", r".*protocol_api\.deck.*"),
+    ("py:class", r".*protocol_api\.config.*"),
+    ("py:class", r".*opentrons_shared_data.*"),
+    ("py:class", r'.*AbstractLabware|APIVersion|LabwareLike|LoadedCoreMap|ModuleTypes|NoneType|OffDeckType|ProtocolCore|WellCore'),  # laundry list of not fully qualified things
+]

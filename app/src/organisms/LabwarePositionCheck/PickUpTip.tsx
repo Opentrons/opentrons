@@ -16,6 +16,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   IDENTITY_VECTOR,
   MoveLabwareCreateCommand,
+  RobotType,
 } from '@opentrons/shared-data'
 import { useChainRunCommands } from '../../resources/runs/hooks'
 import { UnorderedList } from '../../molecules/UnorderedList'
@@ -34,6 +35,8 @@ import type {
   WorkingOffset,
 } from './types'
 import type { LabwareOffset } from '@opentrons/api-client'
+import { useSelector } from 'react-redux'
+import { getIsOnDevice } from '../../redux/config'
 
 interface PickUpTipProps extends PickUpTipStep {
   protocolData: CompletedProtocolAnalysis
@@ -45,6 +48,9 @@ interface PickUpTipProps extends PickUpTipStep {
   existingOffsets: LabwareOffset[]
   handleJog: Jog
   isRobotMoving: boolean
+  robotType: RobotType
+  protocolHasModules: boolean
+  currentStepIndex: number
 }
 export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
   const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
@@ -62,9 +68,12 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     workingOffsets,
     setFatalError,
     adapterId,
+    robotType,
+    protocolHasModules,
+    currentStepIndex,
   } = props
   const [showTipConfirmation, setShowTipConfirmation] = React.useState(false)
-
+  const isOnDevice = useSelector(getIsOnDevice)
   const labwareDef = getLabwareDef(labwareId, protocolData)
   const pipette = protocolData.pipettes.find(p => p.id === pipetteId)
   const pipetteName = pipette?.pipetteName
@@ -82,7 +91,10 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
   )
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
   const instructions = [
-    t('clear_all_slots'),
+    ...(protocolHasModules && currentStepIndex === 1
+      ? [t('place_modules')]
+      : []),
+    isOnDevice ? t('clear_all_slots_odd') : t('clear_all_slots'),
     <Trans
       key="place_a_full_tip_rack_in_location"
       t={t}
@@ -391,7 +403,19 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
             location: displayLocation,
           })}
           body={
-            <StyledText as="p">{t('ensure_nozzle_is_above_tip')}</StyledText>
+            <Trans
+              t={t}
+              i18nKey={
+                isOnDevice
+                  ? 'ensure_nozzle_position_odd'
+                  : 'ensure_nozzle_position_desktop'
+              }
+              components={{ block: <StyledText as="p" />, bold: <strong /> }}
+              values={{
+                tip_type: t('pipette_nozzle'),
+                item_location: t('check_tip_location'),
+              }}
+            />
           }
           labwareDef={labwareDef}
           pipetteName={pipetteName}
@@ -400,6 +424,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           handleJog={handleJog}
           initialPosition={initialPosition}
           existingOffset={existingOffset}
+          shouldUseMetalProbe={false}
         />
       ) : (
         <PrepareSpace
@@ -411,6 +436,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           body={<UnorderedList items={instructions} />}
           labwareDef={labwareDef}
           confirmPlacement={handleConfirmPlacement}
+          robotType={robotType}
         />
       )}
     </Flex>

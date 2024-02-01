@@ -10,7 +10,7 @@ from opentrons.config import robot_configs
 from opentrons.config.types import RobotConfig, OT3Config
 from opentrons.types import Mount
 from opentrons.hardware_control import API, HardwareControlAPI, ThreadManager
-from opentrons.hardware_control.types import OT3Mount
+from opentrons.hardware_control.types import OT3Mount, HardwareFeatureFlags
 
 
 # Name and kwargs for a module function
@@ -56,6 +56,7 @@ async def _simulator_for_setup(
             config=setup.config,
             strict_attached_instruments=setup.strict_attached_instruments,
             loop=loop,
+            feature_flags=HardwareFeatureFlags.build_from_ff(),
         )
     else:
         from opentrons.hardware_control.ot3api import OT3API
@@ -66,6 +67,7 @@ async def _simulator_for_setup(
             config=setup.config,
             strict_attached_instruments=setup.strict_attached_instruments,
             loop=loop,
+            feature_flags=HardwareFeatureFlags.build_from_ff(),
         )
 
 
@@ -100,6 +102,7 @@ def _thread_manager_for_setup(
             attached_modules=list(setup.attached_modules.keys()),
             config=setup.config,
             strict_attached_instruments=setup.strict_attached_instruments,
+            feature_flags=HardwareFeatureFlags.build_from_ff(),
         )
     else:
         from opentrons.hardware_control.ot3api import OT3API
@@ -110,6 +113,7 @@ def _thread_manager_for_setup(
             attached_modules=list(setup.attached_modules.keys()),
             config=setup.config,
             strict_attached_instruments=setup.strict_attached_instruments,
+            feature_flags=HardwareFeatureFlags.build_from_ff(),
         )
 
 

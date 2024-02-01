@@ -27,7 +27,10 @@ The file is made up of the following keys:values which are all optional.
 }
 ```
 
-See [pipette](../../api/src/opentrons/config/pipette_config.py) for available fields
+For available fields, see:
+
+* [simulator.py](../../api/src/opentrons/hardware_control/backends/simulator.py)
+* [ot3simulator.py](../../api/src/opentrons/hardware_control/backends/ot3simulator.py)
 
 ### Attached modules
 ```

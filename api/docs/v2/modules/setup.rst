@@ -1,3 +1,5 @@
+:og:description: How to load Opentrons hardware modules with adapters and labware in a Python protocol.
+
 .. _module-setup:
 
 ************
@@ -20,18 +22,18 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.
 
             from opentrons import protocol_api
 
-            requirements = {'robotType': 'Flex', 'apiLevel': '|apiLevel|'}
+            requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
 
             def run(protocol: protocol_api.ProtocolContext): 
                 # Load a Heater-Shaker Module GEN1 in deck slot D1.
                 heater_shaker = protocol.load_module(
-                  module_name='heaterShakerModuleV1', location='D1')
+                  module_name="heaterShakerModuleV1", location="D1")
          
                 # Load a Temperature Module GEN2 in deck slot D3.
                 temperature_module = protocol.load_module(
-                  module_name='temperature module gen2', location='D3')
+                  module_name="temperature module gen2", location="D3")
 
-        After the ``load_module()`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.HeaterShakerContext` and :py:class:`~opentrons.protocol_api.TemperatureModuleContext` objects.
+        After the ``load_module()`` method loads the modules into your protocol, it returns the :py:class:`~opentrons.protocol_api.HeaterShakerContext` and :py:class:`~opentrons.protocol_api.TemperatureModuleContext` objects.
         
     .. tab:: OT-2
         
@@ -40,18 +42,18 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.
 
             from opentrons import protocol_api
             
-            metadata = {'apiLevel': '2.13'}
+            metadata = {"apiLevel": "|apiLevel|"}
             
             def run(protocol: protocol_api.ProtocolContext): 
                 # Load a Magnetic Module GEN2 in deck slot 1.
                 magnetic_module = protocol.load_module(
-                  module_name='magnetic module gen2', location=1)
+                  module_name="magnetic module gen2", location=1)
          
                 # Load a Temperature Module GEN1 in deck slot 3.
                 temperature_module = protocol.load_module(
-                  module_name='temperature module', location=3)
+                  module_name="temperature module", location=3)
 
-        After the ``load_module()`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticModuleContext` and :py:class:`~opentrons.protocol_api.TemperatureModuleContext` objects.
+        After the ``load_module()`` method loads the modules into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticModuleContext` and :py:class:`~opentrons.protocol_api.TemperatureModuleContext` objects.
 
 
 .. versionadded:: 2.0
@@ -94,7 +96,7 @@ The first parameter of :py:meth:`.ProtocolContext.load_module` is the module's  
    | GEN1               |                               |                           |
    +--------------------+-------------------------------+---------------------------+
 
-Some modules were added to our Python API later than others, and others span multiple hardware generations. When writing a protocol that requires a module, make sure your ``requirements`` or ``metadata`` code block specifies a :ref:`Protocol API version <v2-versioning>` high enough to support all the module generations you want to use.
+Some modules were added to our Python API later than others, and others span multiple hardware generations. When writing a protocol that requires a module, make sure your ``requirements`` or ``metadata`` code block specifies an :ref:`API version <v2-versioning>` high enough to support all the module generations you want to use.
 
 .. _load-labware-module:
 
@@ -115,7 +117,7 @@ Use the ``load_labware()`` method on the module context to load labware on a mod
 
 When you load labware on a module, you don’t need to specify the deck slot. In the above example, the ``load_module()`` method already specifies where the module is on the deck: ``location= "D1"``.
 
-Any :ref:`v2-custom-labware` added to your Opentrons App is also accessible when loading labware onto a module. You can find and copy its load name by going to its card on the Labware page.
+Any :ref:`custom labware <v2-custom-labware>` added to your Opentrons App is also accessible when loading labware onto a module. You can find and copy its load name by going to its card on the Labware page.
 
 .. versionadded:: 2.1
 

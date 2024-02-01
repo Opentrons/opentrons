@@ -49,10 +49,7 @@ export function ProtocolDashboard(): JSX.Element {
     showDeleteConfirmationModal,
     setShowDeleteConfirmationModal,
   ] = React.useState<boolean>(false)
-  const [
-    targetProtocol,
-    setTargetProtocol,
-  ] = React.useState<ProtocolResource | null>(null)
+  const [targetProtocolId, setTargetProtocolId] = React.useState<string>('')
   const sortBy = useSelector(getProtocolsOnDeviceSortKey) ?? 'alphabetical'
   const protocolsData = protocols.data?.data ?? []
   let unpinnedProtocols: ProtocolResource[] = protocolsData
@@ -99,7 +96,14 @@ export function ProtocolDashboard(): JSX.Element {
   }
 
   const runData = runs.data?.data != null ? runs.data?.data : []
-  const sortedProtocols = sortProtocols(sortBy, unpinnedProtocols, runData)
+  const allRunsNewestFirst = runData.sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  )
+  const sortedProtocols = sortProtocols(
+    sortBy,
+    unpinnedProtocols,
+    allRunsNewestFirst
+  )
   const handleProtocolsBySortKey = (
     sortKey: ProtocolsOnDeviceSortKey
   ): void => {
@@ -134,12 +138,7 @@ export function ProtocolDashboard(): JSX.Element {
     <>
       {showDeleteConfirmationModal ? (
         <DeleteProtocolConfirmationModal
-          protocolId={targetProtocol?.id}
-          protocolName={
-            targetProtocol?.metadata.protocolName != null
-              ? targetProtocol.metadata.protocolName
-              : targetProtocol?.files[0].name
-          }
+          protocolId={targetProtocolId}
           setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
         />
       ) : null}
@@ -162,7 +161,7 @@ export function ProtocolDashboard(): JSX.Element {
               <StyledText
                 as="p"
                 marginBottom={SPACING.spacing8}
-                color={COLORS.darkBlack70}
+                color={COLORS.grey60}
               >
                 {t('pinned_protocols')}
               </StyledText>
@@ -170,6 +169,7 @@ export function ProtocolDashboard(): JSX.Element {
                 pinnedProtocols={pinnedProtocols}
                 longPress={setLongPressModalOpened}
                 setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
+                setTargetProtocolId={setTargetProtocolId}
               />
             </Flex>
           )}
@@ -263,7 +263,7 @@ export function ProtocolDashboard(): JSX.Element {
                       setShowDeleteConfirmationModal={
                         setShowDeleteConfirmationModal
                       }
-                      setTargetProtocol={setTargetProtocol}
+                      setTargetProtocolId={setTargetProtocolId}
                     />
                   )
                 })}

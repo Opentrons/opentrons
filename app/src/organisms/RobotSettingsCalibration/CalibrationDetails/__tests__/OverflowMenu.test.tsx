@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { saveAs } from 'file-saver'
 import { OT3_PIPETTES } from '@opentrons/shared-data'
 import { renderWithProviders, Mount } from '@opentrons/components'
@@ -19,12 +20,12 @@ import {
   useAttachedPipettesFromInstrumentsQuery,
 } from '../../../Devices/hooks'
 import { mockAttachedPipetteInformation } from '../../../../redux/pipettes/__fixtures__'
-
-import { OverflowMenu } from '../OverflowMenu'
 import {
   mockPipetteOffsetCalibrationsResponse,
   mockTipLengthCalibrationResponse,
 } from '../__fixtures__'
+import { useIsEstopNotDisengaged } from '../../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { OverflowMenu } from '../OverflowMenu'
 
 const render = (
   props: React.ComponentProps<typeof OverflowMenu>
@@ -51,6 +52,7 @@ jest.mock(
 jest.mock('../../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../../../PipetteWizardFlows')
+jest.mock('../../../../resources/devices/hooks/useIsEstopNotDisengaged')
 
 const mockPipetteWizardFlow = PipetteWizardFlows as jest.MockedFunction<
   typeof PipetteWizardFlows
@@ -75,6 +77,9 @@ const mockUseAttachedPipettesFromInstrumentsQuery = useAttachedPipettesFromInstr
 >
 const mockUseDeleteCalibrationMutation = useDeleteCalibrationMutation as jest.MockedFunction<
   typeof useDeleteCalibrationMutation
+>
+const mockUseIsEstopNotDisengaged = useIsEstopNotDisengaged as jest.MockedFunction<
+  typeof useIsEstopNotDisengaged
 >
 
 const RUN_STATUSES = {
@@ -123,10 +128,14 @@ describe('OverflowMenu', () => {
         data: [mockTipLengthCalibrationResponse],
       },
     } as any)
+    when(mockUseIsEstopNotDisengaged)
+      .calledWith(ROBOT_NAME)
+      .mockReturnValue(false)
   })
 
   afterEach(() => {
     jest.resetAllMocks()
+    resetAllWhenMocks()
   })
 
   it('should render Overflow menu buttons - pipette offset calibrations', () => {
@@ -135,7 +144,7 @@ describe('OverflowMenu', () => {
       'CalibrationOverflowMenu_button_pipetteOffset'
     )
     fireEvent.click(button)
-    getByText('Download calibration data')
+    getByText('Download calibration logs')
     getByText('Delete calibration data')
   })
 
@@ -145,7 +154,7 @@ describe('OverflowMenu', () => {
       'CalibrationOverflowMenu_button_pipetteOffset'
     )
     fireEvent.click(button)
-    const downloadButton = getByText('Download calibration data')
+    const downloadButton = getByText('Download calibration logs')
     fireEvent.click(downloadButton)
     expect(saveAs).toHaveBeenCalled()
   })
@@ -157,7 +166,7 @@ describe('OverflowMenu', () => {
     )
     fireEvent.click(button)
     fireEvent.click(button)
-    expect(queryByText('Download calibration data')).not.toBeInTheDocument()
+    expect(queryByText('Download calibration logs')).not.toBeInTheDocument()
   })
 
   it('should render Overflow menu buttons - tip length calibrations', () => {
@@ -168,7 +177,7 @@ describe('OverflowMenu', () => {
     const [{ getByText, getByLabelText }] = render(props)
     const button = getByLabelText('CalibrationOverflowMenu_button_tipLength')
     fireEvent.click(button)
-    getByText('Download calibration data')
+    getByText('Download calibration logs')
     getByText('Delete calibration data')
   })
 
@@ -179,7 +188,7 @@ describe('OverflowMenu', () => {
     })
     const button = getByLabelText('CalibrationOverflowMenu_button_tipLength')
     fireEvent.click(button)
-    const downloadButton = getByText('Download calibration data')
+    const downloadButton = getByText('Download calibration logs')
     fireEvent.click(downloadButton)
     expect(saveAs).toHaveBeenCalled()
   })
@@ -201,7 +210,7 @@ describe('OverflowMenu', () => {
     fireEvent.click(button)
     const cal = getByText('Recalibrate pipette')
     expect(
-      screen.queryByText('Download calibration data')
+      screen.queryByText('Download calibration logs')
     ).not.toBeInTheDocument()
     fireEvent.click(cal)
     getByText('mock pipette wizard flows')
@@ -295,5 +304,15 @@ describe('OverflowMenu', () => {
     const deleteBtn = getByText('Delete calibration data')
     fireEvent.click(deleteBtn)
     expect(mockDeleteCalibration).toHaveBeenCalledTimes(0)
+  })
+
+  it('should make overflow menu disabled when e-stop is pressed', () => {
+    when(mockUseIsEstopNotDisengaged)
+      .calledWith(ROBOT_NAME)
+      .mockReturnValue(true)
+    const [{ getByLabelText }] = render(props)
+    expect(
+      getByLabelText('CalibrationOverflowMenu_button_pipetteOffset')
+    ).toBeDisabled()
   })
 })

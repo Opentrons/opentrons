@@ -51,4 +51,21 @@ describe('StepMeter', () => {
     const bar = getByTestId('StepMeter_StepMeterBar')
     expect(bar).toHaveStyle('width: 100%')
   })
+
+  it('should transition with style when progressing forward and no style if progressing backward', () => {
+    props = {
+      ...props,
+      currentStep: 2,
+    }
+    const { getByTestId } = render(props)
+    getByTestId('StepMeter_StepMeterContainer')
+    const bar = getByTestId('StepMeter_StepMeterBar')
+    expect(bar).toHaveStyle('transition: width 0.5s ease-in-out;')
+
+    props = {
+      ...props,
+      currentStep: 1,
+    }
+    expect(bar).not.toHaveStyle('transition: ;')
+  })
 })

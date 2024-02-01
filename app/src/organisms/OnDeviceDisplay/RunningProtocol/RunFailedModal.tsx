@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
-import isEmpty from 'lodash/isEmpty'
 import { css } from 'styled-components'
 
 import {
@@ -90,7 +89,7 @@ export function RunFailedModal({
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing8}
             maxHeight="11rem"
-            backgroundColor={COLORS.light1}
+            backgroundColor={COLORS.grey35}
             borderRadius={BORDERS.borderRadiusSize3}
             padding={`${SPACING.spacing16} ${SPACING.spacing20}`}
           >
@@ -98,14 +97,15 @@ export function RunFailedModal({
               <StyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
                 {highestPriorityError.detail}
               </StyledText>
-              {!isEmpty(highestPriorityError.errorInfo) && (
-                <StyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
-                  {JSON.stringify(highestPriorityError.errorInfo)}
-                </StyledText>
-              )}
             </Flex>
           </Flex>
-          <StyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
+          <StyledText
+            as="p"
+            textAlign={TYPOGRAPHY.textAlignLeft}
+            css={css`
+              word-break: break-word;
+            `}
+          >
             {t('contact_information')}
           </StyledText>
         </Flex>
@@ -126,7 +126,7 @@ const SCROLL_BAR_STYLE = css`
 
   &::-webkit-scrollbar {
     width: 0.75rem;
-    background-color: ${COLORS.light1};
+    background-color: ${COLORS.grey35};
   }
 
   &::-webkit-scrollbar-track {
@@ -135,7 +135,7 @@ const SCROLL_BAR_STYLE = css`
   }
 
   &::-webkit-scrollbar-thumb {
-    background: ${COLORS.darkBlack40};
+    background: ${COLORS.grey50};
     border-radius: 11px;
   }
 `

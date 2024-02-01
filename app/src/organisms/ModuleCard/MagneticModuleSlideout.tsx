@@ -28,8 +28,10 @@ import { SubmitPrimaryButton } from '../../atoms/buttons'
 
 import type { TFunctionResult } from 'i18next'
 import type { MagneticModule } from '../../redux/modules/types'
-import type { MagneticModuleModel } from '@opentrons/shared-data'
-import type { MagneticModuleEngageMagnetCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
+import type {
+  MagneticModuleEngageMagnetCreateCommand,
+  MagneticModuleModel,
+} from '@opentrons/shared-data'
 
 interface ModelContents {
   version: string
@@ -152,7 +154,7 @@ export const MagneticModuleSlideout = (
       </StyledText>
       <StyledText
         fontSize={TYPOGRAPHY.fontSizeH6}
-        color={COLORS.darkGreyEnabled}
+        color={COLORS.grey50}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         paddingTop={SPACING.spacing16}
         textTransform={TYPOGRAPHY.textTransformUppercase}
@@ -162,7 +164,7 @@ export const MagneticModuleSlideout = (
         {t('height_ranges', { gen: info.version })}
       </StyledText>
       <Flex
-        backgroundColor={COLORS.fundamentalsBackground}
+        backgroundColor={COLORS.grey10}
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
@@ -209,7 +211,7 @@ export const MagneticModuleSlideout = (
         <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey50}
           paddingBottom={SPACING.spacing8}
         >
           {t('set_engage_height')}

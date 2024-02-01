@@ -12,7 +12,11 @@ from hardware_testing.drivers.radwag.commands import (
     RadwagWorkingMode,
     RadwagFilter,
     RadwagValueRelease,
+    RadwagAmbiant,
 )
+
+from hardware_testing.data import ui
+from serial.tools.list_ports import comports  # type: ignore[import]
 
 
 @dataclass
@@ -25,6 +29,7 @@ class ScaleConfig:
     filter: RadwagFilter
     value_release: RadwagValueRelease
     tare: float
+    ambiant: RadwagAmbiant
 
 
 DEFAULT_SCALE_CONFIG = ScaleConfig(
@@ -34,6 +39,7 @@ DEFAULT_SCALE_CONFIG = ScaleConfig(
     filter=RadwagFilter.very_fast,
     value_release=RadwagValueRelease.fast,
     tare=0.0,
+    ambiant=RadwagAmbiant.stable,
 )
 
 
@@ -64,6 +70,21 @@ class Scale:
     @classmethod
     def find_port(cls) -> str:
         """Find port."""
+        ports = comports()
+        assert ports
+        for port in ports:
+            try:
+                ui.print_info(f"Checking port {port.device} for scale")
+                radwag = Scale(scale=RadwagScale.create(port.device))
+                radwag.connect()
+                radwag.initialize()
+                scale_serial = radwag.read_serial_number()
+                radwag.disconnect()
+                ui.print_info(f"found scale {scale_serial} on port {port.device}")
+                return port.device
+            except:  # noqa: E722
+                pass
+        ui.print_info("Unable to find the scale: please connect")
         return list_ports_and_select(device_name="scale")
 
     @property
@@ -102,15 +123,24 @@ class Scale:
         self._scale.working_mode(mode=cfg.working_mode)
         self._scale.filter(cfg.filter)
         self._scale.value_release(cfg.value_release)
+        self._scale.ambiant(cfg.ambiant)
         self.tare(cfg.tare)
 
     def tare(self, grams: float) -> None:
         """Tare."""
         self._scale.set_tare(grams)
 
+    def read_max_capacity(self) -> float:
+        """Read max capacity."""
+        return self._scale.read_max_capacity()
+
     def read_serial_number(self) -> str:
         """Read serial number."""
         return self._scale.read_serial_number()
+
+    def zero(self) -> None:
+        """Zero."""
+        self._scale.zero()
 
     def calibrate(self) -> None:
         """Calibrate."""

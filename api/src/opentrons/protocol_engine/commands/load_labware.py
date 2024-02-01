@@ -6,7 +6,15 @@ from typing_extensions import Literal
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from ..types import LabwareLocation, OnLabwareLocation
+from ..errors import LabwareIsNotAllowedInLocationError
+from ..resources import labware_validation, fixture_validation
+from ..types import (
+    LabwareLocation,
+    OnLabwareLocation,
+    DeckSlotLocation,
+    AddressableAreaLocation,
+)
+
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -90,21 +98,50 @@ class LoadLabwareImplementation(
 
     async def execute(self, params: LoadLabwareParams) -> LoadLabwareResult:
         """Load definition and calibration data necessary for a labware."""
+        # TODO (tz, 8-15-2023): extend column validation to column 1 when working
+        # on https://opentrons.atlassian.net/browse/RSS-258 and completing
+        # https://opentrons.atlassian.net/browse/RSS-255
+        if (
+            labware_validation.is_flex_trash(params.loadName)
+            and isinstance(params.location, DeckSlotLocation)
+            and self._state_view.geometry.get_slot_column(params.location.slotName) != 3
+        ):
+            raise LabwareIsNotAllowedInLocationError(
+                f"{params.loadName} is not allowed in slot {params.location.slotName}"
+            )
+
+        if isinstance(params.location, AddressableAreaLocation):
+            area_name = params.location.addressableAreaName
+            if not fixture_validation.is_deck_slot(params.location.addressableAreaName):
+                raise LabwareIsNotAllowedInLocationError(
+                    f"Cannot load {params.loadName} onto addressable area {area_name}"
+                )
+            self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
+                area_name
+            )
+        elif isinstance(params.location, DeckSlotLocation):
+            self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
+                params.location.slotName.id
+            )
+
+        verified_location = self._state_view.geometry.ensure_location_not_occupied(
+            params.location
+        )
         loaded_labware = await self._equipment.load_labware(
             load_name=params.loadName,
             namespace=params.namespace,
             version=params.version,
-            location=params.location,
+            location=verified_location,
             labware_id=params.labwareId,
         )
 
         # TODO(jbl 2023-06-23) these validation checks happen after the labware is loaded, because they rely on
         #   on the definition. In practice this will not cause any issues since they will raise protocol ending
         #   exception, but for correctness should be refactored to do this check beforehand.
-        if isinstance(params.location, OnLabwareLocation):
+        if isinstance(verified_location, OnLabwareLocation):
             self._state_view.labware.raise_if_labware_cannot_be_stacked(
                 top_labware_definition=loaded_labware.definition,
-                bottom_labware_id=params.location.labwareId,
+                bottom_labware_id=verified_location.labwareId,
             )
 
         return LoadLabwareResult(

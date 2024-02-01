@@ -13,28 +13,30 @@ import {
 import { ProgressBar } from '../../atoms/ProgressBar'
 import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
+import { Subsystem } from '@opentrons/api-client'
 
 interface UpdateInProgressModalProps {
   percentComplete: number
+  subsystem: Subsystem
 }
 
 const OUTER_STYLES = css`
-  background: ${COLORS.medGreyEnabled};
+  background: ${COLORS.grey30};
   width: 100%;
 `
 
 export function UpdateInProgressModal(
   props: UpdateInProgressModalProps
 ): JSX.Element {
-  const { percentComplete } = props
-  const { i18n, t } = useTranslation('firmware_update')
+  const { percentComplete, subsystem } = props
+  const { t } = useTranslation('firmware_update')
 
   return (
     <Modal>
       <Flex
         height="17.25rem"
         width="100%"
-        backgroundColor={COLORS.darkBlack20}
+        backgroundColor={COLORS.grey35}
         borderRadius={BORDERS.borderRadiusSize3}
         flexDirection={DIRECTION_COLUMN}
         padding={SPACING.spacing32}
@@ -47,7 +49,7 @@ export function UpdateInProgressModal(
           marginBottom={SPACING.spacing4}
           fontWeight={TYPOGRAPHY.fontWeightBold}
         >
-          {i18n.format(t('updating_firmware'), 'capitalize')}
+          {t('updating_firmware', { subsystem: t(subsystem) })}
         </StyledText>
         <ProgressBar
           percentComplete={percentComplete}
