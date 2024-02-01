@@ -567,7 +567,9 @@ def test_move_to_moveable_trash_addressable_area(
     subject: MotionView,
 ) -> None:
     """Ensure that a move request to a moveableTrash addressable executes with no destination critical point."""
-    location = CurrentAddressableArea(pipette_id="123", addressable_area_name="moveableTrashA1")
+    location = CurrentAddressableArea(
+        pipette_id="123", addressable_area_name="moveableTrashA1"
+    )
 
     decoy.when(pipette_view.get_current_location()).then_return(location)
     decoy.when(
@@ -583,11 +585,7 @@ def test_move_to_moveable_trash_addressable_area(
         geometry_view.get_extra_waypoints(location, DeckSlotName.SLOT_1)
     ).then_return([])
 
-    waypoints = [
-        motion_planning.Waypoint(
-            position=Point(1, 2, 3), critical_point=None
-        )
-    ]
+    waypoints = [motion_planning.Waypoint(position=Point(1, 2, 3), critical_point=None)]
 
     decoy.when(
         motion_planning.get_waypoints(
