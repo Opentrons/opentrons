@@ -1,6 +1,5 @@
 import * as React from 'react'
 import isEqual from 'lodash/isEqual'
-import { css } from 'styled-components'
 import {
   CutoutConfig,
   FLEX_CUTOUT_BY_SLOT_ID,
@@ -11,8 +10,9 @@ import {
   getFixtureDisplayName,
   isAddressableAreaStandardSlot,
   OT2_ROBOT_TYPE,
+  AddressableArea,
+  CoordinateTuple,
 } from '@opentrons/shared-data'
-import { Tooltip, useHoverTooltip } from '../../tooltips'
 import {
   DeckFromLayers,
   LegacyDeckSlotLocation,
@@ -24,7 +24,7 @@ import {
   SlotLabels,
 } from '../../hardware-sim'
 import { Icon } from '../../icons'
-import { Flex, Text } from '../../primitives'
+import { Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
 import { COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
@@ -94,6 +94,32 @@ export function DeckLocationSelect({
 }: DeckLocationSelectProps): JSX.Element {
   const robotType = deckDef.robot.model
 
+  const [hoveredData, setHoveredData] = React.useState<any>(null)
+
+  const handleMouseEnter = (
+    slot: AddressableArea,
+    isDisabled: boolean,
+    disabledReason: string | null,
+    slotPosition: CoordinateTuple | null
+  ): void => {
+    if (isDisabled) {
+      setHoveredData({
+        slot: slot,
+        isDisabled: isDisabled,
+        disabledReason: disabledReason,
+        slotPosition: slotPosition,
+      })
+    } else {
+      setHoveredData(null)
+    }
+  }
+
+  console.log(hoveredData)
+
+  const handleMouseLeave = (): void => {
+    setHoveredData(null)
+  }
+
   return (
     <RobotCoordinateSpace
       viewBox={`${deckDef.cornerOffsetFromOrigin[0] + X_CROP_MM} ${
@@ -110,7 +136,6 @@ export function DeckLocationSelect({
         )
         .map(slot => {
           // eslint-disable-next-line react-hooks/rules-of-hooks
-          const [targetProps, tooltipProps] = useHoverTooltip()
           const slotLocation = { slotName: slot.id }
           const isDisabled = !availableSlotNames.some(l => l === slot.id)
           const disabledReason =
@@ -179,33 +204,16 @@ export function DeckLocationSelect({
                         : 'pointer'
                     }
                     deckDefinition={deckDef}
+                    onMouseEnter={() =>
+                      handleMouseEnter(
+                        slot,
+                        isDisabled,
+                        disabledReason,
+                        slotPosition
+                      )
+                    }
+                    onMouseLeave={handleMouseLeave}
                   />
-                  {isDisabled && showTooltipOnDisabled && slotPosition != null && (
-                    <RobotCoordsForeignDiv
-                      x={slotPosition[0]}
-                      y={slotPosition[1]}
-                      width={slot.boundingBox.xDimension}
-                      height={slot.boundingBox.yDimension}
-                      innerDivProps={INNER_DIV_PROPS}
-                    >
-                      <Flex
-                        width={slot.boundingBox.xDimension + 100}
-                        height={slot.boundingBox.yDimension + 100}
-                        {...targetProps}
-                      >
-                        <Tooltip
-                          {...tooltipProps}
-                          css={TYPOGRAPHY.labelRegular}
-                        >
-                          {disabledReason != null
-                            ? `A ${getFixtureDisplayName(
-                                disabledReason
-                              )} is currently specified here on the deck configuration`
-                            : 'Slot unavailable'}
-                        </Tooltip>
-                      </Flex>
-                    </RobotCoordsForeignDiv>
-                  )}
                 </>
               ) : (
                 <LegacyDeckSlotLocation
@@ -263,7 +271,49 @@ export function DeckLocationSelect({
         />
       ) : null}
       <SlotLabels robotType={robotType} color={COLORS.darkGreyEnabled} />
-      {/* put tooltip here, determine positioning and content based on custom event handler above in which state is managed for a) whcih slot is being hovered and b) whether the slot is disabled */}
+      {hoveredData != null &&
+        hoveredData.isDisabled &&
+        hoveredData.slotPosition != null &&
+        showTooltipOnDisabled && (
+          <RobotCoordsForeignDiv
+            x={
+              hoveredData.slot.id === 'A3'
+                ? hoveredData.slotPosition[0] - 50
+                : hoveredData.slotPosition[0] - 20
+            }
+            y={
+              hoveredData.slotPosition[1] +
+              hoveredData.slot.boundingBox.yDimension +
+              10
+            }
+            innerDivProps={
+              hoveredData.slot.id[0] === 'A'
+                ? {
+                    maxWidth: '25rem',
+                    maxHeight: '10rem',
+                    width: 'fit-content',
+                  }
+                : {
+                    maxWidth: '20rem',
+                    width: 'fit-content',
+                  }
+            }
+          >
+            <Text
+              color={COLORS.white}
+              fontSize="1.5rem"
+              backgroundColor={COLORS.darkBlack90}
+              padding={SPACING.spacing8}
+              borderRadius="3px"
+            >
+              {hoveredData.disabledReason != null
+                ? `A ${getFixtureDisplayName(
+                    hoveredData.disabledReason
+                  ).toLowerCase()} is currently specified here on the deck configuration`
+                : 'Slot unavailable'}
+            </Text>
+          </RobotCoordsForeignDiv>
+        )}
     </RobotCoordinateSpace>
   )
 }
