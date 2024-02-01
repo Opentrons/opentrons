@@ -22,17 +22,19 @@ clean:
 	shx rm -rf dist
 
 # production assets
+# override webpack's default hashing algorithm for node 18: https://github.com/webpack/webpack/issues/14532
 .PHONY: dist
 dist: export NODE_ENV := production
 dist:
-	webpack --profile
+	export NODE_OPTIONS=--openssl-legacy-provider && webpack --profile
 	node ./renderStatic.js
 
 # development assets server
 .PHONY: dev
 dev: export NODE_ENV := development
+dev: export NODE_OPTIONS := --openssl-legacy-provider
 dev:
-	webpack-dev-server --hot
+	webpack-dev-server --hot --host=::
 
 # production assets server
 .PHONY: serve
@@ -44,7 +46,8 @@ serve: all
 test-e2e:
 	concurrently --no-color --kill-others --success first --names "labware-library-server,labware-library-tests" \
 	"$(MAKE) dev CYPRESS=1 GTM_ID=''" \
-	"wait-on http://localhost:8080/ && cypress run --browser chrome --headless --record false"
+	"wait-on http://localhost:8080/ && echo \"Running cypress at $(date)\" && cypress run --browser chrome --headless --record false"
+
 # unit tests
 .PHONY: test
 test:
