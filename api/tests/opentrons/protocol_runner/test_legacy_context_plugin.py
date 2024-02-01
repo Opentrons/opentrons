@@ -93,7 +93,9 @@ async def test_broker_subscribe_unsubscribe(
     subject: LegacyContextPlugin,
 ) -> None:
     """It should subscribe to the brokers on setup and unsubscribe on teardown."""
-    command_broker_unsubscribe: Callable[[], None] = decoy.mock()
+    command_broker_unsubscribe: Callable[[], None] = decoy.mock(
+        name="command_broker_unsubscribe"
+    )
     equipment_broker_subscription_context = decoy.mock(cls=_ContextManager)
 
     decoy.when(
@@ -132,7 +134,7 @@ async def test_command_broker_messages(
     command_handler_captor = matchers.Captor()
     decoy.when(
         mock_legacy_broker.subscribe(topic="command", handler=command_handler_captor)
-    ).then_return(decoy.mock())
+    ).then_return(decoy.mock(name="command_broker_unsubscribe"))
     decoy.when(
         mock_equipment_broker.subscribed(callback=matchers.Anything())
     ).then_enter_with(None)
@@ -185,7 +187,7 @@ async def test_equipment_broker_messages(
     labware_handler_captor = matchers.Captor()
     decoy.when(
         mock_legacy_broker.subscribe(topic="command", handler=matchers.Anything())
-    ).then_return(decoy.mock())
+    ).then_return(decoy.mock(name="command_broker_unsubscribe"))
     decoy.when(
         mock_equipment_broker.subscribed(callback=labware_handler_captor)
     ).then_enter_with(None)

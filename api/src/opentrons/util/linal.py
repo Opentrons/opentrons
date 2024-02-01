@@ -152,7 +152,7 @@ def add_matrices(
     """
     Simple method to convert tuples to numpy arrays and add them.
     """
-    return tuple(np.asarray(t1) + np.asarray(t2))  # type: ignore
+    return tuple(np.asarray(t1) + np.asarray(t2))
 
 
 def apply_transform(
@@ -167,7 +167,7 @@ def apply_transform(
     :param pos: XYZ point in space A
     :return: corresponding XYZ point in space B
     """
-    return tuple(dot(t, list(pos))[:3])  # type: ignore
+    return tuple(dot(t, list(pos))[:3])
 
 
 def apply_reverse(

@@ -599,7 +599,7 @@ class GeometryView:
             self._labware.raise_if_labware_in_location(location)
         if isinstance(location, DeckSlotLocation):
             self._modules.raise_if_module_in_location(location)
-        return cast(_LabwareLocation, location)
+        return location
 
     def get_labware_grip_point(
         self,

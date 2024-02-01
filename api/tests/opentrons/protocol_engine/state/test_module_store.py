@@ -1,6 +1,6 @@
 """Module state store tests."""
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import commands, actions

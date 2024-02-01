@@ -23,12 +23,13 @@ from typing import (
 from typing_extensions import TypedDict
 
 import pytest
+from _pytest.fixtures import SubRequest
 from decoy import Decoy
 
 from opentrons.protocol_engine.types import PostRunHardwareState
 
 try:
-    import aionotify  # type: ignore[import]
+    import aionotify  # type: ignore[import-untyped]
 except (OSError, ModuleNotFoundError):
     aionotify = None
 
@@ -156,11 +157,11 @@ def virtual_smoothie_env(monkeypatch: pytest.MonkeyPatch) -> None:
 
 @pytest.fixture(params=["ot2", "ot3"])
 async def machine_variant_ffs(
-    request: pytest.FixtureRequest,
+    request: SubRequest,
     decoy: Decoy,
     mock_feature_flags: None,
 ) -> None:
-    device_param = request.param  # type: ignore[attr-defined]
+    device_param = request.param
 
     if request.node.get_closest_marker("ot3_only") and device_param == "ot2":
         pytest.skip()
@@ -229,7 +230,7 @@ async def robot_model(
     mock_feature_flags: None,
     virtual_smoothie_env: None,
 ) -> AsyncGenerator[RobotModel, None]:
-    which_machine = cast(RobotModel, request.param)  # type: ignore[attr-defined]
+    which_machine = cast(RobotModel, request.param)
     if request.node.get_closest_marker("ot2_only") and which_machine == "OT-3 Standard":
         pytest.skip("test requests only ot-2")
     if request.node.get_closest_marker("ot3_only") and which_machine == "OT-2 Standard":
@@ -266,7 +267,7 @@ def legacy_deck_definition(deck_definition_name: str) -> DeckDefinitionV3:
 
 @pytest.fixture()
 async def hardware(
-    request: pytest.FixtureRequest,
+    request: SubRequest,
     decoy: Decoy,
     mock_feature_flags: None,
     virtual_smoothie_env: None,
