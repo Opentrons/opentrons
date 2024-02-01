@@ -16,7 +16,6 @@ import { PipetteTipsTile } from '../PipetteTipsTile'
 import { EquipmentOption } from '../EquipmentOption'
 import type { FormPipettesByMount } from '../../../../step-forms'
 import type { FormState, WizardTileProps } from '../types'
-import { UseFormWatch } from 'react-hook-form'
 
 jest.mock('../../../../labware-defs/selectors')
 jest.mock('../../../../feature-flags/selectors')
