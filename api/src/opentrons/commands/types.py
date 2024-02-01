@@ -3,6 +3,8 @@ from __future__ import annotations
 from typing_extensions import Literal, Final, TypedDict
 from typing import Optional, List, Sequence, TYPE_CHECKING, Union
 from opentrons.hardware_control.modules import ThermocyclerStep
+from opentrons.protocol_api._trash_bin import TrashBin
+from opentrons.protocol_api._waste_chute import WasteChute
 
 if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext
@@ -32,6 +34,7 @@ DISTRIBUTE: Final = "command.DISTRIBUTE"
 TRANSFER: Final = "command.TRANSFER"
 PICK_UP_TIP: Final = "command.PICK_UP_TIP"
 DROP_TIP: Final = "command.DROP_TIP"
+DROP_TIP_IN_DISPOSAL_LOCATION: Final = "command.DROP_TIP_IN_DISPOSAL_LOCATION"
 BLOW_OUT: Final = "command.BLOW_OUT"
 AIR_GAP: Final = "command.AIR_GAP"
 TOUCH_TIP: Final = "command.TOUCH_TIP"
@@ -476,6 +479,15 @@ class DropTipCommand(TypedDict):
     payload: DropTipCommandPayload
 
 
+class DropTipInDisposalLocationCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
+    location: Union[TrashBin, WasteChute]
+
+
+class DropTipInDisposalLocationCommand(TypedDict):
+    name: Literal["command.DROP_TIP_IN_DISPOSAL_LOCATION"]
+    payload: DropTipInDisposalLocationCommandPayload
+
+
 class MoveToCommand(TypedDict):
     name: Literal["command.MOVE_TO"]
     payload: MoveToCommandPayload
@@ -487,6 +499,7 @@ class MoveToCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
 
 Command = Union[
     DropTipCommand,
+    DropTipInDisposalLocationCommand,
     PickUpTipCommand,
     ReturnTipCommand,
     AirGapCommand,
@@ -556,6 +569,7 @@ CommandPayload = Union[
     AirGapCommandPayload,
     ReturnTipCommandPayload,
     DropTipCommandPayload,
+    DropTipInDisposalLocationCommandPayload,
     PickUpTipCommandPayload,
     TouchTipCommandPayload,
     BlowOutCommandPayload,
@@ -589,6 +603,10 @@ class MoveToMessage(CommandMessageFields, MoveToCommand):
 
 
 class DropTipMessage(CommandMessageFields, DropTipCommand):
+    pass
+
+
+class DropTipInDisposalLocationMessage(CommandMessageFields, DropTipInDisposalLocationCommand):
     pass
 
 
@@ -786,6 +804,7 @@ class CommentMessage(CommandMessageFields, CommentCommand):
 
 CommandMessage = Union[
     DropTipMessage,
+    DropTipInDisposalLocationMessage,
     PickUpTipMessage,
     ReturnTipMessage,
     AirGapMessage,

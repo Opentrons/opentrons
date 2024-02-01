@@ -2,6 +2,8 @@ from typing import List, Union
 
 from opentrons.protocol_api.labware import Well
 from opentrons.types import Location
+from opentrons.protocol_api._trash_bin import TrashBin
+from opentrons.protocol_api._waste_chute import WasteChute
 
 
 CommandLocation = Union[Location, Well]
@@ -36,3 +38,10 @@ def _stringify_new_loc(loc: CommandLocation) -> str:
 def stringify_location(location: Union[CommandLocation, List[CommandLocation]]) -> str:
     loc_str_list = [_stringify_new_loc(loc) for loc in listify(location)]
     return ", ".join(loc_str_list)
+
+
+def stringify_disposal_location(location: Union[TrashBin, WasteChute]) -> str:
+    if isinstance(location, TrashBin):
+        return f"Trash Bin on slot {location.location.id}"
+    else:
+        return "Waste Chute"

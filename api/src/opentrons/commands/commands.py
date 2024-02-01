@@ -2,10 +2,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List, Union, overload
 
 
-from .helpers import stringify_location, listify
+from .helpers import stringify_location, stringify_disposal_location, listify
 from . import types as command_types
 
 from opentrons.types import Location
+from opentrons.protocol_api._trash_bin import TrashBin
+from opentrons.protocol_api._waste_chute import WasteChute
 
 if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext
@@ -227,6 +229,17 @@ def drop_tip(
     text = "Dropping tip into {location}".format(location=location_text)
     return {
         "name": command_types.DROP_TIP,
+        "payload": {"instrument": instrument, "location": location, "text": text},
+    }
+
+
+def drop_tip_in_disposal_location(
+    instrument: InstrumentContext, location: Union[TrashBin, WasteChute]
+) -> command_types.DropTipInDisposalLocationCommand:
+    location_text = stringify_disposal_location(location)
+    text = f"Dropping tip into {location_text}"
+    return {
+        "name": command_types.DROP_TIP_IN_DISPOSAL_LOCATION,
         "payload": {"instrument": instrument, "location": location, "text": text},
     }
 
