@@ -1744,13 +1744,10 @@
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-2.0.2.tgz#d9fae00a2d5cb40f92cfe64b47ad749fbc38f917"
   integrity sha512-6EwiSjwWYP7pTckG6I5eyFANjPhmPjUX9JRLUSfNPC7FX7zK9gyZAfUEaECL6ALTpGX5AjnBq3C9XmVWPitNpw==
-"@hookform/resolvers@3.1.1":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@hookform/resolvers/-/resolvers-3.1.1.tgz#b374d33e356428fff9c6ef3c933441fe15e40784"
   integrity sha512-tS16bAUkqjITNSvbJuO1x7MXbn7Oe8ZziDTJdA9mMvsoYthnOOiznOTGBYwbdlYBgU+tgpI/BtTU3paRbCuSlg==
 
-"@hutson/parse-repository-url@^3.0.0":
-  version "3.0.2"
   resolved "https://registry.yarnpkg.com/@hutson/parse-repository-url/-/parse-repository-url-3.0.2.tgz#98c23c950a3d9b6c8f0daed06da6c3af06981340"
   integrity sha512-H9XAx3hc0BQHY6l+IFSWHDySypcXsvsuLhgYLUGywmJ5pswRVQJUHpOsobnLYp2ZUaUlKiKDrgWWhosOwAEM8Q==
 
@@ -9386,6 +9383,16 @@ eslint-plugin-import@^2.29.1:
     object.values "^1.1.7"
     semver "^6.3.1"
     tsconfig-paths "^3.15.0"
+<<<<<<< HEAD
+=======
+
+eslint-plugin-jest@^27.6.3:
+  version "27.6.3"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-27.6.3.tgz#8acb8b1e45597fe1f4d4cf25163d90119efc12be"
+  integrity sha512-+YsJFVH6R+tOiO3gCJon5oqn4KWc+mDq2leudk8mrp8RFubLOo9CVyi3cib4L7XMpxExmkmBZQTPDYVBzgpgOA==
+  dependencies:
+    "@typescript-eslint/utils" "^5.10.0"
+>>>>>>> da07cb6d8d (chore: update typescript to 5.3.3)
 
 eslint-plugin-jest@^27.6.3:
   version "27.6.3"
@@ -9394,6 +9401,7 @@ eslint-plugin-jest@^27.6.3:
   dependencies:
     "@typescript-eslint/utils" "^5.10.0"
 
+<<<<<<< HEAD
 eslint-plugin-json@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-json/-/eslint-plugin-json-3.1.0.tgz#251108ba1681c332e0a442ef9513bd293619de67"
@@ -9402,6 +9410,8 @@ eslint-plugin-json@^3.1.0:
     lodash "^4.17.21"
     vscode-json-languageservice "^4.1.6"
 
+=======
+>>>>>>> da07cb6d8d (chore: update typescript to 5.3.3)
 eslint-plugin-n@^16.6.2:
   version "16.6.2"
   resolved "https://registry.yarnpkg.com/eslint-plugin-n/-/eslint-plugin-n-16.6.2.tgz#6a60a1a376870064c906742272074d5d0b412b0b"
@@ -10894,6 +10904,13 @@ glob-parent@^5.1.0, glob-parent@^5.1.2, glob-parent@~5.1.2:
   integrity sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==
   dependencies:
     is-glob "^4.0.1"
+
+glob-parent@^6.0.2:
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/glob-parent/-/glob-parent-6.0.2.tgz#6d237d99083950c79290f24c7642a3de9a28f9e3"
+  integrity sha512-XxwI8EOhVQgWp6iDL+3b0r86f4d6AX6zSU55HfB4ydCEuXLXc5FcYeOu+nnGftS4TEju/11rt4KJPTMgbfmv4A==
+  dependencies:
+    is-glob "^4.0.3"
 
 glob-parent@^6.0.2:
   version "6.0.2"
