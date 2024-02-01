@@ -33,8 +33,6 @@ import type { Dispatch, Logger } from './types'
  * setting the default to IPv4 fixes the issue
  * https://github.com/node-fetch/node-fetch/issues/1624
  */
-// TODO(bh, 2024-1-30): @types/node needs to be updated to address this type error. updating @types/node will also require updating our typescript version
-// @ts-expect-error
 dns.setDefaultResultOrder('ipv4first')
 
 systemd.sendStatus('starting app')

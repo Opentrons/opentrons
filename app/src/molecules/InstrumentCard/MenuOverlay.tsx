@@ -40,7 +40,7 @@ export function MenuOverlay(props: MenuOverlayProps): JSX.Element {
       right="0"
       whiteSpace="nowrap"
       zIndex={10}
-      onClick={e => {
+      onClick={(e: React.MouseEvent) => {
         e.preventDefault()
         e.stopPropagation()
         setShowMenuOverlay(false)

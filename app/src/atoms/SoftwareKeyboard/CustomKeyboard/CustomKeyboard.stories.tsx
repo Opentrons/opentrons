@@ -35,7 +35,7 @@ const Template: Story<React.ComponentProps<typeof CustomKeyboard>> = args => {
       <Flex position={POSITION_ABSOLUTE} top="20%" width="55rem">
         {showKeyboard && (
           <CustomKeyboard
-            onChange={e => e != null && setValue(String(e))}
+            onChange={(e: string) => e != null && setValue(String(e))}
             keyboardRef={keyboardRef}
           />
         )}

@@ -52,7 +52,7 @@ export function LegacyModalShell(props: LegacyModalShellProps): JSX.Element {
   return (
     <Overlay
       aria-label="BackgroundOverlay_ModalShell"
-      onClick={e => {
+      onClick={(e: React.MouseEvent) => {
         e.stopPropagation()
         if (onOutsideClick != null) onOutsideClick(e)
       }}
@@ -61,7 +61,7 @@ export function LegacyModalShell(props: LegacyModalShellProps): JSX.Element {
         <ModalArea
           aria-label="ModalShell_ModalArea"
           isFullPage={fullPage}
-          onClick={e => {
+          onClick={(e: React.MouseEvent) => {
             e.stopPropagation()
           }}
           {...styleProps}

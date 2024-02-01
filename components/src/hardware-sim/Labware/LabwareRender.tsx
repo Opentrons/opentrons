@@ -14,7 +14,7 @@ import type {
   WellFill,
   WellStroke,
   WellGroup,
-} from './LabwareInternals/types'
+} from './labwareInternals/types'
 import type { CSSProperties } from 'styled-components'
 
 export const WELL_LABEL_OPTIONS = {
