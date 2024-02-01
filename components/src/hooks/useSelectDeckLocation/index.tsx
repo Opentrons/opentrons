@@ -12,6 +12,7 @@ import {
   OT2_ROBOT_TYPE,
   AddressableArea,
   CoordinateTuple,
+  CutoutFixtureId,
 } from '@opentrons/shared-data'
 import {
   DeckFromLayers,
@@ -82,6 +83,7 @@ interface DeckLocationSelectProps {
   isThermocycler?: boolean
   showTooltipOnDisabled?: boolean
 }
+
 export function DeckLocationSelect({
   deckDef,
   selectedLocation,
@@ -94,27 +96,30 @@ export function DeckLocationSelect({
 }: DeckLocationSelectProps): JSX.Element {
   const robotType = deckDef.robot.model
 
-  const [hoveredData, setHoveredData] = React.useState<any>(null)
+  const [hoveredData, setHoveredData] = React.useState<{
+    slot: AddressableArea
+    slotPosition: CoordinateTuple | null
+    isDisabled: boolean
+    disabledReason?: CutoutFixtureId | null
+  } | null>(null)
 
   const handleMouseEnter = (
     slot: AddressableArea,
+    slotPosition: CoordinateTuple | null,
     isDisabled: boolean,
-    disabledReason: string | null,
-    slotPosition: CoordinateTuple | null
+    disabledReason?: CutoutFixtureId | null
   ): void => {
     if (isDisabled) {
       setHoveredData({
         slot: slot,
+        slotPosition: slotPosition,
         isDisabled: isDisabled,
         disabledReason: disabledReason,
-        slotPosition: slotPosition,
       })
     } else {
       setHoveredData(null)
     }
   }
-
-  console.log(hoveredData)
 
   const handleMouseLeave = (): void => {
     setHoveredData(null)
@@ -207,9 +212,9 @@ export function DeckLocationSelect({
                     onMouseEnter={() =>
                       handleMouseEnter(
                         slot,
+                        slotPosition,
                         isDisabled,
-                        disabledReason,
-                        slotPosition
+                        disabledReason
                       )
                     }
                     onMouseLeave={handleMouseLeave}
