@@ -224,7 +224,6 @@ function establishListeners({
   client.on(
     'message',
     (topic: NotifyTopic, message: Buffer, packet: mqtt.IPublishPacket) => {
-      log.debug(`Received message for ${hostname} on ${topic}}`)
       sendToBrowserDeserialized({
         browserWindow,
         hostname,
@@ -301,6 +300,11 @@ function sendToBrowserDeserialized({
   } catch {
     deserializedMessage = message
   }
+
+  log.info('Received notification data from main via IPC', {
+    hostname,
+    topic,
+  })
 
   browserWindow.webContents.send('notify', hostname, topic, deserializedMessage)
 }
