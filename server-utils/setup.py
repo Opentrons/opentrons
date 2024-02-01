@@ -51,17 +51,17 @@ KEYWORDS = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 DESCRIPTION = "Common utilities for various Opentrons Python servers."
 PACKAGES = find_packages(where=".", exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
-    "anyio==3.6.1",
-    "fastapi==0.68.1",
-    "python-dotenv==0.19.0",
-    "python-multipart==0.0.5",
-    "pydantic==1.9.2",
+    "anyio==3.7.1",
+    "fastapi==0.99.1",
+    "python-dotenv==1.0.1",
+    "python-multipart==0.0.6",
+    "pydantic==1.10.12",
     "typing-extensions>=4.0.0,<5",
-    "uvicorn==0.14.0",
-    "wsproto==1.0.0",
+    "uvicorn==0.27.0.post1",
+    "wsproto==1.2.0",
     "systemd-python==234; sys_platform=='linux'",
-    "sqlalchemy==1.4.32",
-    "aiosqlite==0.17.0",
+    "sqlalchemy==1.4.51",
+    "aiosqlite==0.19.0",
 ]
 
 
