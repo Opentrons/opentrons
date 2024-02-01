@@ -177,10 +177,7 @@ class MotionView:
             destination = base_destination + Point(offset.x, offset.y, offset.z)
 
         # TODO(jbl 11-28-2023) This may need to change for partial tip configurations on a 96
-        # if the addressable area belongs to a trashbin or waste chute:
-        if any(
-            area in addressable_area_name for area in ["moveableTrash", "WasteChute"]
-        ):
+        if "moveableTrash" in addressable_area_name:
             destination_cp = None
         else:
             destination_cp = CriticalPoint.XY_CENTER
