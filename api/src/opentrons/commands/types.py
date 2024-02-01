@@ -42,6 +42,7 @@ AIR_GAP: Final = "command.AIR_GAP"
 TOUCH_TIP: Final = "command.TOUCH_TIP"
 RETURN_TIP: Final = "command.RETURN_TIP"
 MOVE_TO: Final = "command.MOVE_TO"
+MOVE_TO_DISPOSAL_LOCATION: Final = "command.MOVE_TO_DISPOSAL_LOCATION"
 
 # Modules #
 
@@ -512,13 +513,22 @@ class DropTipInDisposalLocationCommand(TypedDict):
     payload: DropTipInDisposalLocationCommandPayload
 
 
+class MoveToCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
+    location: Location
+
+
 class MoveToCommand(TypedDict):
     name: Literal["command.MOVE_TO"]
     payload: MoveToCommandPayload
 
 
-class MoveToCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
-    location: Location
+class MoveToDisposalLocationCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
+    location: Union[TrashBin, WasteChute]
+
+
+class MoveToDisposalLocationCommand(TypedDict):
+    name: Literal["command.MOVE_TO_DISPOSAL_LOCATION"]
+    payload: MoveToDisposalLocationCommandPayload
 
 
 Command = Union[
@@ -567,6 +577,7 @@ Command = Union[
     DelayCommand,
     CommentCommand,
     MoveToCommand,
+    MoveToDisposalLocationCommand,
 ]
 
 
@@ -614,6 +625,7 @@ CommandPayload = Union[
     PauseCommandPayload,
     DelayCommandPayload,
     MoveToCommandPayload,
+    MoveToDisposalLocationCommandPayload,
 ]
 
 
@@ -627,6 +639,12 @@ CommandMessageFields = TypedDict(
 
 
 class MoveToMessage(CommandMessageFields, MoveToCommand):
+    pass
+
+
+class MoveToDisposalLocationMessage(
+    CommandMessageFields, MoveToDisposalLocationCommand
+):
     pass
 
 
@@ -889,4 +907,5 @@ CommandMessage = Union[
     PauseMessage,
     ResumeMessage,
     MoveToMessage,
+    MoveToDisposalLocationMessage,
 ]

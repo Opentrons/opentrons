@@ -1439,19 +1439,27 @@ class InstrumentContext(publisher.CommandPublisher):
         :param publish: Whether to list this function call in the run preview.
                         Default is ``True``.
         """
-
-        if isinstance(location, (TrashBin, WasteChute)):
-            self._core.move_to(
-                location=location,
-                well_core=None,
-                force_direct=force_direct,
-                minimum_z_height=minimum_z_height,
-                speed=speed,
-            )
-            # TODO handle publish
-            return self
-
         with ExitStack() as contexts:
+            if isinstance(location, (TrashBin, WasteChute)):
+                if publish:
+                    contexts.enter_context(
+                        publisher.publish_context(
+                            broker=self.broker,
+                            command=cmds.move_to_disposal_location(
+                                instrument=self, location=location
+                            ),
+                        )
+                    )
+
+                self._core.move_to(
+                    location=location,
+                    well_core=None,
+                    force_direct=force_direct,
+                    minimum_z_height=minimum_z_height,
+                    speed=speed,
+                )
+                return self
+
             if publish:
                 contexts.enter_context(
                     publisher.publish_context(

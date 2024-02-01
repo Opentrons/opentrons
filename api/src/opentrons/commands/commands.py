@@ -288,3 +288,15 @@ def move_to(
         "name": command_types.MOVE_TO,
         "payload": {"instrument": instrument, "location": location, "text": text},
     }
+
+
+def move_to_disposal_location(
+    instrument: InstrumentContext,
+    location: Union[TrashBin, WasteChute],
+) -> command_types.MoveToDisposalLocationCommand:
+    location_text = stringify_disposal_location(location)
+    text = f"Moving to {location_text}"
+    return {
+        "name": command_types.MOVE_TO_DISPOSAL_LOCATION,
+        "payload": {"instrument": instrument, "location": location, "text": text},
+    }
