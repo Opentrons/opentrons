@@ -28,6 +28,7 @@ COMMENT: Final = "command.COMMENT"
 
 ASPIRATE: Final = "command.ASPIRATE"
 DISPENSE: Final = "command.DISPENSE"
+DISPENSE_IN_DISPOSAL_LOCATION: Final = "command.DISPENSE_IN_DISPOSAL_LOCATION"
 MIX: Final = "command.MIX"
 CONSOLIDATE: Final = "command.CONSOLIDATE"
 DISTRIBUTE: Final = "command.DISTRIBUTE"
@@ -376,6 +377,19 @@ class DispenseCommand(TypedDict):
     payload: AspirateDispenseCommandPayload
 
 
+class DispenseInDisposalLocationCommandPayload(
+    TextOnlyPayload, SingleInstrumentPayload
+):
+    location: Union[TrashBin, WasteChute]
+    volume: float
+    rate: float
+
+
+class DispenseInDisposalLocationCommand(TypedDict):
+    name: Literal["command.DISPENSE_IN_DISPOSAL_LOCATION"]
+    payload: DispenseInDisposalLocationCommandPayload
+
+
 class ConsolidateCommandPayload(
     TextOnlyPayload, MultiLocationPayload, SingleInstrumentPayload
 ):
@@ -521,6 +535,7 @@ Command = Union[
     DistributeCommand,
     ConsolidateCommand,
     DispenseCommand,
+    DispenseInDisposalLocationCommand,
     AspirateCommand,
     HomeCommand,
     HeaterShakerSetTargetTemperatureCommand,
@@ -590,6 +605,7 @@ CommandPayload = Union[
     DistributeCommandPayload,
     ConsolidateCommandPayload,
     AspirateDispenseCommandPayload,
+    DispenseInDisposalLocationCommandPayload,
     HomeCommandPayload,
     ThermocyclerExecuteProfileCommandPayload,
     ThermocyclerSetBlockTempCommandPayload,
@@ -667,6 +683,12 @@ class ConsolidateMessage(CommandMessageFields, ConsolidateCommand):
 
 
 class DispenseMessage(CommandMessageFields, DispenseCommand):
+    pass
+
+
+class DispenseInDisposalLocationMessage(
+    CommandMessageFields, DispenseInDisposalLocationCommand
+):
     pass
 
 
@@ -836,6 +858,7 @@ CommandMessage = Union[
     DistributeMessage,
     ConsolidateMessage,
     DispenseMessage,
+    DispenseInDisposalLocationMessage,
     AspirateMessage,
     HomeMessage,
     HeaterShakerSetTargetTemperatureMessage,

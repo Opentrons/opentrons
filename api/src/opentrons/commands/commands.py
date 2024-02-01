@@ -65,6 +65,28 @@ def dispense(
     }
 
 
+def dispense_in_disposal_location(
+    instrument: InstrumentContext,
+    volume: float,
+    location: Union[TrashBin, WasteChute],
+    flow_rate: float,
+    rate: float,
+) -> command_types.DispenseInDisposalLocationCommand:
+    location_text = stringify_disposal_location(location)
+    text = f"Dispensing {float(volume)} uL into {location_text} at {flow_rate} uL/sec"
+
+    return {
+        "name": command_types.DISPENSE_IN_DISPOSAL_LOCATION,
+        "payload": {
+            "instrument": instrument,
+            "volume": volume,
+            "location": location,
+            "rate": rate,
+            "text": text,
+        },
+    }
+
+
 def consolidate(
     instrument: InstrumentContext,
     volume: Union[float, List[float]],
