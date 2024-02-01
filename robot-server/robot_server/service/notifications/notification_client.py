@@ -33,7 +33,7 @@ class MQTT_QOS(Enum):
 class NotificationClient:  # noqa: D101
     def __init__(
         self,
-        host: str = "broker.emqx.io",
+        host: str = "127.0.0.1",
         port: int = 1883,
         keepalive: int = 60,
         protocol_version: int = mqtt.MQTTv5,

@@ -1,5 +1,6 @@
 """Tests for the ProtocolStore interface."""
 import pytest
+from decoy import Decoy
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -23,6 +24,7 @@ from robot_server.protocols.protocol_store import (
 from robot_server.runs.run_store import RunStore
 
 from sqlalchemy.engine import Engine as SQLEngine
+from robot_server.service.notifications import RunsPublisher
 
 
 @pytest.fixture
@@ -39,10 +41,16 @@ def subject(sql_engine: SQLEngine) -> ProtocolStore:
     return ProtocolStore.create_empty(sql_engine=sql_engine)
 
 
+@pytest.fixture()
+def mock_runs_publisher(decoy: Decoy) -> RunsPublisher:
+    """Get a mock RunsPublisher."""
+    return decoy.mock(cls=RunsPublisher)
+
+
 @pytest.fixture
-def run_store(sql_engine: SQLEngine) -> RunStore:
+def run_store(sql_engine: SQLEngine, runs_publisher: RunsPublisher) -> RunStore:
     """Get a RunStore linked to the same database as the subject ProtocolStore."""
-    return RunStore(sql_engine=sql_engine)
+    return RunStore(sql_engine=sql_engine, runs_publisher=runs_publisher)
 
 
 async def test_insert_and_get_protocol(
