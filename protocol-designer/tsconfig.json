@@ -15,5 +15,5 @@
     },
     { "path": "./tsconfig.node.json" }
   ],
-  "include": ["typings", "src", "vite.config.ts"]
+  "include": ["typings", "src"]
 }

@@ -3,7 +3,6 @@ import {
   getAllDefinitions as getLatestDefinitions,
   type LabwareDefinition1,
   type LabwareDefinition2,
-  type LabwareDefByDefURI,
 } from '@opentrons/shared-data'
 
 export function getLegacyLabwareDef(
