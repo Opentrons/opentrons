@@ -483,7 +483,8 @@ class AddressableAreaView(HasState[AddressableAreaState]):
                     f"No Cutout was found in the Deck that matched provided slot {slot_name}."
                 )
 
-            for fixture in potential_fixtures[slot_cutout_id]:
+            slot_fixtures = potential_fixtures[slot_cutout_id]
+            for fixture in slot_fixtures:
                 if fixture.cutout_fixture_id == slot_cutout_fixture_id:
                     return fixture
         return None
