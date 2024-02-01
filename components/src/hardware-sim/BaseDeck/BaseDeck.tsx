@@ -14,6 +14,7 @@ import {
   WASTE_CHUTE_CUTOUT,
   WASTE_CHUTE_ONLY_FIXTURES,
   WASTE_CHUTE_STAGING_AREA_FIXTURES,
+  HEATERSHAKER_MODULE_V1,
 } from '@opentrons/shared-data'
 
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
@@ -248,6 +249,10 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                     definition={nestedLabwareDef}
                     onLabwareClick={onLabwareClick}
                     wellFill={nestedLabwareWellFill}
+                    shouldRotateAdapterOrientation={
+                      inferModuleOrientationFromXCoordinate(slotPosition[0]) ===
+                        'left' && moduleModel === HEATERSHAKER_MODULE_V1
+                    }
                   />
                 ) : null}
                 {moduleChildren}
