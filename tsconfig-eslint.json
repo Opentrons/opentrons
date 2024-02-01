@@ -33,6 +33,9 @@
     "protocol-library-kludge/typings",
     "api-client/src",
     "react-api-client/src",
-    "usb-bridge/node-client/src"
+    "usb-bridge/node-client/src",
+    "**/*.js",
+    "*.js",
+    ".*.js"
   ]
 }
