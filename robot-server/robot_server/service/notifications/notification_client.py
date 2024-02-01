@@ -1,5 +1,3 @@
-# noqa: D100
-
 import random
 import logging
 import paho.mqtt.client as mqtt
@@ -30,7 +28,18 @@ class MQTT_QOS(Enum):
     QOS_2 = 2
 
 
-class NotificationClient:  # noqa: D101
+class NotificationClient:
+    """Methods for managing interactions with the MQTT broker.
+
+    Args:
+        host: Address of the MQTT broker.
+        port: Port used to communicate with the broker.
+        keepalive: Interval for transmitting a keepalive packet.
+        protocol_version: MQTT protocol version.
+        default_qos: Default quality of service. QOS 1 is "at least once".
+        retain_message: Whether the broker should hold a copy of the message for new clients.
+    """
+
     def __init__(
         self,
         host: str = "127.0.0.1",

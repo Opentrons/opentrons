@@ -13,6 +13,7 @@ class MaintenanceRunsPublisher:
     """Publishes maintenance run topics."""
 
     def __init__(self, client: NotificationClient) -> None:
+        """Returns a configured Maintenance Runs Publisher."""
         self._client = client
 
     async def publish_current_maintenance_run(

@@ -5,10 +5,9 @@ _TOPIC_BASE = "robot-server"
 
 
 class Topics(Enum):
-    """MQTT Quality of Service.
+    """Notification Topics
 
-    Represents the level of delivery
-    guarantee for a specific message.
+    MQTT functional equivalent of endpoints.
     """
 
     MAINTENANCE_RUNS_CURRENT_RUN = f"{_TOPIC_BASE}/maintenance_runs/current_run"
