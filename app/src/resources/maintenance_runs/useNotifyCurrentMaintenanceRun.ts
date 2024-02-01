@@ -34,5 +34,6 @@ export function useNotifyCurrentMaintenanceRun(
     enabled: isHTTPEnabled,
     onSettled: isNotifyEnabled ? () => setRefetchUsingHTTP(false) : undefined,
   })
+
   return httpQueryResult
 }
