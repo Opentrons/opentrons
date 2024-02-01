@@ -56,6 +56,7 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
         labwareByLiquidId
       ),
       moduleChildren:
+        showLabwareInfo &&
         nestedLabwareDef != null &&
         !(nestedLabwareDef.allowedRoles ?? []).includes('adapter') ? (
           <LabwareInfo def={nestedLabwareDef}>
