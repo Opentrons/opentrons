@@ -6,7 +6,11 @@ import {
   StrokedWells,
   StaticLabware,
 } from './labwareInternals'
-
+import {
+  LabwareAdapter,
+  LabwareAdapterLoadName,
+  labwareAdapterLoadNames,
+} from './LabwareAdapter'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   HighlightedWellLabels,
@@ -16,7 +20,6 @@ import type {
   WellGroup,
 } from './labwareInternals/types'
 import type { CSSProperties } from 'styled-components'
-
 export const WELL_LABEL_OPTIONS = {
   SHOW_LABEL_INSIDE: 'SHOW_LABEL_INSIDE',
   SHOW_LABEL_OUTSIDE: 'SHOW_LABEL_OUTSIDE',
@@ -27,6 +30,8 @@ export type WellLabelOption = keyof typeof WELL_LABEL_OPTIONS
 export interface LabwareRenderProps {
   /** Labware definition to render */
   definition: LabwareDefinition2
+  /** Opional Prop for labware on heater shakers sitting on right side of the deck */
+  shouldRotateAdapterOrientation?: boolean
   /** option to show well labels inside or outside of labware outline */
   wellLabelOption?: WellLabelOption
   /** wells to highlight */
@@ -56,8 +61,34 @@ export interface LabwareRenderProps {
 }
 
 export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
-  const { gRef } = props
-  const cornerOffsetFromSlot = props.definition.cornerOffsetFromSlot
+  const { gRef, definition } = props
+
+  const cornerOffsetFromSlot = definition.cornerOffsetFromSlot
+  const labwareLoadName = definition.parameters.loadName
+
+  if (labwareAdapterLoadNames.includes(labwareLoadName)) {
+    const { shouldRotateAdapterOrientation } = props
+    const { xDimension, yDimension } = props.definition.dimensions
+
+    return (
+      <g
+        transform={
+          shouldRotateAdapterOrientation
+            ? `rotate(180, ${xDimension / 2}, ${yDimension / 2})`
+            : 'rotate(0, 0, 0)'
+        }
+      >
+        <g
+          transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
+          ref={gRef}
+        >
+          <LabwareAdapter
+            labwareLoadName={labwareLoadName as LabwareAdapterLoadName}
+          />
+        </g>
+      </g>
+    )
+  }
 
   return (
     <g
