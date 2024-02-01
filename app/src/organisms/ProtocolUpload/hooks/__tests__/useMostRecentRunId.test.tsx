@@ -1,12 +1,13 @@
 import { when, resetAllWhenMocks } from 'jest-when'
 import { renderHook } from '@testing-library/react'
-import { useAllRunsQuery } from '@opentrons/react-api-client'
+
+import { useNotifyAllRunsQuery } from '../../../../resources/runs/useNotifyAllRunsQuery'
 import { useMostRecentRunId } from '../useMostRecentRunId'
 
-jest.mock('@opentrons/react-api-client')
+jest.mock('../../../../resources/runs/useNotifyAllRunsQuery')
 
-const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
-  typeof useAllRunsQuery
+const mockUseNotifyAllRunsQuery = useNotifyAllRunsQuery as jest.MockedFunction<
+  typeof useNotifyAllRunsQuery
 >
 
 describe('useMostRecentRunId hook', () => {
@@ -15,7 +16,7 @@ describe('useMostRecentRunId hook', () => {
   })
 
   it('should return the first run if any runs exist', async () => {
-    when(mockUseAllRunsQuery)
+    when(mockUseNotifyAllRunsQuery)
       .calledWith()
       .mockReturnValue({ data: { data: [{ id: 'some_run_id' }] } } as any)
 
@@ -25,7 +26,7 @@ describe('useMostRecentRunId hook', () => {
   })
 
   it('should return null if no runs exist', async () => {
-    when(mockUseAllRunsQuery)
+    when(mockUseNotifyAllRunsQuery)
       .calledWith()
       .mockReturnValue({ data: { data: [] } } as any)
 
@@ -34,7 +35,7 @@ describe('useMostRecentRunId hook', () => {
     expect(result.current).toBeNull()
   })
   it('should return null if no run data exists', async () => {
-    when(mockUseAllRunsQuery)
+    when(mockUseNotifyAllRunsQuery)
       .calledWith()
       .mockReturnValue({ data: { data: null } } as any)
 

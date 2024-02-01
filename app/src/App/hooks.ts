@@ -8,7 +8,6 @@ import { useDispatch } from 'react-redux'
 import { useInterval, truncateString } from '@opentrons/components'
 import {
   useAllProtocolIdsQuery,
-  useAllRunsQuery,
   useHost,
   useRunQuery,
   useCreateLiveCommandMutation,
@@ -25,6 +24,7 @@ import {
 
 import { checkShellUpdate } from '../redux/shell'
 import { useToaster } from '../organisms/ToasterOven'
+import { useNotifyAllRunsQuery } from '../resources/runs/useNotifyAllRunsQuery'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { Dispatch } from '../redux/types'
@@ -127,7 +127,7 @@ export function useProtocolReceiptToast(): void {
 }
 
 export function useCurrentRunRoute(): string | null {
-  const { data: allRuns } = useAllRunsQuery(
+  const { data: allRuns } = useNotifyAllRunsQuery(
     { pageLength: 1 },
     { refetchInterval: CURRENT_RUN_POLL }
   )

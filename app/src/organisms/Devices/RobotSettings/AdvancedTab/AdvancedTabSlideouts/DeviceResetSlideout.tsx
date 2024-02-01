@@ -19,7 +19,6 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useAllRunsQuery } from '@opentrons/react-api-client'
 
 import { Slideout } from '../../../../../atoms/Slideout'
 import { StyledText } from '../../../../../atoms/text'
@@ -40,6 +39,7 @@ import {
   useTipLengthCalibrations,
   useRobot,
 } from '../../../hooks'
+import { useNotifyAllRunsQuery } from '../../../../../resources/runs/useNotifyAllRunsQuery'
 
 import type { State, Dispatch } from '../../../../../redux/types'
 import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
@@ -63,7 +63,7 @@ export function DeviceResetSlideout({
   const robot = useRobot(robotName)
   const dispatch = useDispatch<Dispatch>()
   const [resetOptions, setResetOptions] = React.useState<ResetConfigRequest>({})
-  const runsQueryResponse = useAllRunsQuery()
+  const runsQueryResponse = useNotifyAllRunsQuery()
   const isFlex = useIsFlex(robotName)
 
   // Calibration data
