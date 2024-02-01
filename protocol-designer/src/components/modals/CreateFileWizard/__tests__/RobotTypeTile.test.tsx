@@ -13,25 +13,19 @@ const render = (props: React.ComponentProps<typeof RobotTypeTile>) => {
 }
 
 const values = {
-  handleChange: jest.fn(),
-  handleBlur: jest.fn(),
-  goBack: jest.fn(),
-  proceed: jest.fn(),
-  setFieldValue: jest.fn(),
-  values: {
-    fields: {
-      name: 'mockName',
-      description: 'mockDescription',
-      organizationOrAuthor: 'mockOrganizationOrAuthor',
-      robotType: FLEX_ROBOT_TYPE,
-    },
-  } as FormState,
-}
+  fields: {
+    name: 'mockName',
+    description: 'mockDescription',
+    organizationOrAuthor: 'mockOrganizationOrAuthor',
+    robotType: FLEX_ROBOT_TYPE,
+  },
+} as FormState
 
 const mockWizardTileProps: Partial<WizardTileProps> = {
   proceed: jest.fn(),
   setValue: jest.fn(),
-  //  @ts-expect-error: need TS 4.3 or higher!!
+  //  @ts-expect-error: ts can't tell that its a nested key
+  //  in values
   watch: jest.fn(() => values['fields.robotType']),
 }
 

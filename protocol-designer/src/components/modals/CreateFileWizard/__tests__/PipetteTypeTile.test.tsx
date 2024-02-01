@@ -45,8 +45,7 @@ const mockWizardTileProps: Partial<WizardTileProps> = {
   goBack: jest.fn(),
   proceed: jest.fn(),
   setValue: jest.fn(),
-  //  @ts-expect-error: need TS 4.3 or higher!!
-  watch: jest.fn(name => values[name]),
+  watch: jest.fn((name: keyof typeof values) => values[name]) as any,
 }
 
 describe('PipetteTypeTile', () => {
@@ -106,8 +105,7 @@ describe('PipetteTypeTile', () => {
     const mockWizardTileProps: Partial<WizardTileProps> = {
       proceed: jest.fn(),
       setValue: jest.fn(),
-      //  @ts-expect-error: need TS 4.3 or higher!!
-      watch: jest.fn(name => values[name]),
+      watch: jest.fn((name: keyof typeof values) => values[name]) as any,
     }
     props = {
       ...props,

@@ -16,6 +16,7 @@ import { PipetteTipsTile } from '../PipetteTipsTile'
 import { EquipmentOption } from '../EquipmentOption'
 import type { FormPipettesByMount } from '../../../../step-forms'
 import type { FormState, WizardTileProps } from '../types'
+import { UseFormWatch } from 'react-hook-form'
 
 jest.mock('../../../../labware-defs/selectors')
 jest.mock('../../../../feature-flags/selectors')
@@ -66,8 +67,7 @@ const values = {
 const mockWizardTileProps: Partial<WizardTileProps> = {
   goBack: jest.fn(),
   proceed: jest.fn(),
-  //  @ts-expect-error: need TS 4.3 or higher!!
-  watch: jest.fn(name => values[name]),
+  watch: jest.fn((name: keyof typeof values) => values[name]) as any,
 }
 
 const fixtureTipRack10ul = {
@@ -176,8 +176,7 @@ describe('PipetteTipsTile', () => {
     const mockWizardTileProps: Partial<WizardTileProps> = {
       goBack: jest.fn(),
       proceed: jest.fn(),
-      //  @ts-expect-error: need TS 4.3 or higher!!
-      watch: jest.fn(name => values[name]),
+      watch: jest.fn((name: keyof typeof values) => values[name]) as any,
     }
 
     props = {

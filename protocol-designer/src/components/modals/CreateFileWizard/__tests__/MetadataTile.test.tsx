@@ -24,8 +24,7 @@ const values = {
 const mockWizardTileProps: Partial<WizardTileProps> = {
   goBack: jest.fn(),
   proceed: jest.fn(),
-  //  @ts-expect-error: need TS 4.3 or higher!!
-  watch: jest.fn(name => values[name]),
+  watch: jest.fn((name: keyof typeof values) => values[name]) as any,
   register: jest.fn(),
   formState: {
     errors: { fields: { name: null } },

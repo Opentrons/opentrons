@@ -29,10 +29,8 @@ const mockWizardTileProps: Partial<WizardTileProps> = {
   goBack: jest.fn(),
   proceed: jest.fn(),
   setValue: jest.fn(),
-  //  @ts-expect-error: need TS 4.3 or higher!!
-  watch: jest.fn(name => values[name]),
-  //  @ts-expect-error: need TS 4.3 or higher!!
-  getValues: jest.fn(() => values),
+  watch: jest.fn((name: keyof typeof values) => values[name]) as any,
+  getValues: jest.fn(() => values) as any,
 }
 
 describe('StagingAreaTile', () => {
@@ -61,10 +59,8 @@ describe('StagingAreaTile', () => {
       goBack: jest.fn(),
       proceed: jest.fn(),
       setValue: jest.fn(),
-      //  @ts-expect-error: need TS 4.3 or higher!!
-      watch: jest.fn(name => values[name]),
-      //  @ts-expect-error: need TS 4.3 or higher!!
-      getValues: jest.fn(() => values),
+      watch: jest.fn((name: keyof typeof values) => values[name]) as any,
+      getValues: jest.fn(() => values) as any,
     }
 
     props = {

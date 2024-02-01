@@ -56,14 +56,12 @@ const values = {
 } as FormState
 
 const mockWizardTileProps: Partial<WizardTileProps> = {
-  //  @ts-expect-error: need TS 4.3 or higher!!
-  watch: jest.fn(name => values[name]),
+  watch: jest.fn((name: keyof typeof values) => values[name]) as any,
   trigger: jest.fn(),
   goBack: jest.fn(),
   proceed: jest.fn(),
   setValue: jest.fn(),
-  //  @ts-expect-error: need TS 4.3 or higher!!
-  getValues: jest.fn(() => values),
+  getValues: jest.fn(() => values) as any,
   formState: {} as any,
 }
 
@@ -97,8 +95,7 @@ describe('ModulesAndOtherTile', () => {
     }
     props = {
       ...props,
-      //  @ts-expect-error: need TS 4.3 or higher!!
-      getValues: jest.fn(() => newValues),
+      getValues: jest.fn(() => newValues) as any,
     }
     render(props)
     screen.getByText('Choose additional items')
@@ -131,8 +128,7 @@ describe('ModulesAndOtherTile', () => {
         errors: { modulesByType: {} },
         touchedFields: { modulesByType: {} },
       } as any,
-      //  @ts-expect-error: need TS 4.3 or higher!!
-      getValues: jest.fn(() => values),
+      getValues: jest.fn(() => values) as any,
     }
     props = {
       ...props,
