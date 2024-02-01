@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { LabwareDefinition2 } from '@opentrons/shared-data'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
@@ -102,7 +102,7 @@ describe('CreateFileWizard', () => {
       },
     ])
   })
-  it('renders the wizard for an OT-2', () => {
+  it('renders the wizard for an OT-2', async () => {
     render()
     screen.getByText('Create New Protocol')
     //  select OT-2
@@ -111,7 +111,7 @@ describe('CreateFileWizard', () => {
     fireEvent.click(next)
     //  add protocol name
     screen.getByText('Step 1 / 6')
-    const inputField = screen.getByLabelText('MetadataTile_protocolName')
+    const inputField = screen.getByTestId('MetadataTile_protocolName')
     fireEvent.change(inputField, { target: { value: 'mockName' } })
     next = screen.getByRole('button', { name: 'Next' })
     fireEvent.click(next)
@@ -177,7 +177,7 @@ describe('CreateFileWizard', () => {
     fireEvent.click(next)
     //  add protocol name
     screen.getByText('Step 1 / 7')
-    const inputField = screen.getByLabelText('MetadataTile_protocolName')
+    const inputField = screen.getByTestId('MetadataTile_protocolName')
     fireEvent.change(inputField, { target: { value: 'mockName' } })
     next = screen.getByRole('button', { name: 'Next' })
     fireEvent.click(next)
