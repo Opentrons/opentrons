@@ -118,7 +118,7 @@ export const RobotOverviewOverflowMenu = (
           top="2.25rem"
           right={0}
           flexDirection={DIRECTION_COLUMN}
-          onClick={e => {
+          onClick={(e: React.MouseEvent) => {
             e.preventDefault()
             e.stopPropagation()
             setShowOverflowMenu(false)

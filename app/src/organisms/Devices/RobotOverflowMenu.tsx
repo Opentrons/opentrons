@@ -141,7 +141,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
       data-testid={`RobotCard_${String(robot.name)}_overflowMenu`}
       flexDirection={DIRECTION_COLUMN}
       position={POSITION_RELATIVE}
-      onClick={e => {
+      onClick={(e: React.MouseEvent) => {
         e.stopPropagation()
       }}
       {...styleProps}

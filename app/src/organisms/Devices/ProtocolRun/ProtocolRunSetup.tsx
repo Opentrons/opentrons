@@ -401,7 +401,7 @@ function LearnAboutLPC(): JSX.Element {
       <Link
         css={TYPOGRAPHY.linkPSemiBold}
         marginRight={SPACING.spacing16}
-        onClick={e => {
+        onClick={(e: React.MouseEvent) => {
           // clicking link shouldn't toggle step expanded state
           e.preventDefault()
           e.stopPropagation()

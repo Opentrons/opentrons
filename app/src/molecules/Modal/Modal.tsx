@@ -63,7 +63,7 @@ export function Modal(props: ModalProps): JSX.Element {
         margin={SPACING.spacing32}
         flexDirection={DIRECTION_COLUMN}
         aria-label={`modal_${modalSize}`}
-        onClick={e => {
+        onClick={(e: React.MouseEvent) => {
           e.stopPropagation()
         }}
       >

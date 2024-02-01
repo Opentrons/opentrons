@@ -245,7 +245,6 @@ export const ConnectedStepItem = (props: Props): JSX.Element => {
         />
       )}
       <StepItem {...stepItemProps} onStepContextMenu={props.onStepContextMenu}>
-        {/* @ts-expect-error(sa, 2021-6-21): StepItemContents might return a list of JSX elements */}
         <StepItemContents {...stepItemContentsProps} />
       </StepItem>
     </>

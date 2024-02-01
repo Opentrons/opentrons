@@ -109,7 +109,7 @@ export function ProtocolOverflowMenu(
     <Flex
       flexDirection={DIRECTION_COLUMN}
       position={POSITION_RELATIVE}
-      onClick={e => e.stopPropagation()}
+      onClick={(e: React.MouseEvent) => e.stopPropagation()}
     >
       <OverflowBtn
         alignSelf={ALIGN_FLEX_END}
