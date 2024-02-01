@@ -1,4 +1,3 @@
-import takeWhile from 'lodash/takeWhile'
 import {
   dropTipInPlace,
   moveToAddressableArea,
@@ -25,18 +24,11 @@ export const generateRobotStateTimeline = (
     initialRobotState,
     invariantContext,
   } = args
-  const allStepArgs: Array<StepGeneration.CommandCreatorArgs | null> = orderedStepIds.map(
-    stepId => {
-      return (
-        (allStepArgsAndErrors[stepId] &&
-          allStepArgsAndErrors[stepId].stepArgs) ||
-        null
-      )
-    }
-  )
-  const continuousStepArgs: StepGeneration.CommandCreatorArgs[] = takeWhile(
-    allStepArgs,
-    stepArgs => stepArgs
+  const continuousStepArgs = orderedStepIds.reduce<StepGeneration.CommandCreatorArgs[]>(
+    (acc, stepId) => {
+      const {stepArgs } = allStepArgsAndErrors?.[stepId]
+      return stepArgs != null ? [...acc, stepArgs] : acc
+    }, []
   )
   const curriedCommandCreators = continuousStepArgs.reduce(
     (
@@ -64,21 +56,22 @@ export const generateRobotStateTimeline = (
       if (pipetteId != null && dropTipLocation != null) {
         const nextStepArgsForPipette = continuousStepArgs
           .slice(stepIndex + 1)
-          .find(stepArgs => stepArgs.pipette && stepArgs.pipette === pipetteId)
+          .find(stepArgs => 'pipette' in stepArgs && stepArgs.pipette === pipetteId)
         const willReuseTip =
-          nextStepArgsForPipette?.changeTip &&
+          nextStepArgsForPipette != null &&
+          'changeTip' in nextStepArgsForPipette &&
           nextStepArgsForPipette.changeTip === 'never'
 
         const isWasteChute =
           invariantContext.additionalEquipmentEntities[dropTipLocation] !=
-            null &&
+          null &&
           invariantContext.additionalEquipmentEntities[dropTipLocation].name ===
-            'wasteChute'
+          'wasteChute'
         const isTrashBin =
           invariantContext.additionalEquipmentEntities[dropTipLocation] !=
-            null &&
+          null &&
           invariantContext.additionalEquipmentEntities[dropTipLocation].name ===
-            'trashBin'
+          'trashBin'
 
         const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
         const addressableAreaName = getWasteChuteAddressableAreaNamePip(

@@ -19,7 +19,6 @@ export const remote: Remote = new Proxy(emptyRemote, {
       propName in global.APP_SHELL_REMOTE,
       `Expected APP_SHELL_REMOTE.${propName} to exist, is app-shell/src/preload.js properly configured?`
     )
-    // @ts-expect-error TODO we know that propName is 'ipcRenderer' but TS can't narrow it down
     return global.APP_SHELL_REMOTE[propName] as Remote
   },
 })
