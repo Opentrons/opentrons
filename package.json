@@ -61,7 +61,7 @@
     "@types/lodash": "^4.14.191",
     "@types/multer": "^1.4.5",
     "@types/netmask": "^1.0.30",
-    "@types/react": "18.0.21",
+    "@types/react": "18.2.51",
     "@types/react-color": "^3.0.6",
     "@types/react-dom": "18.2.0",
     "@types/react-redux": "7.1.32",
@@ -163,5 +163,7 @@
     "webpack-merge": "^4.2.2",
     "webpack-node-externals": "^1.7.2",
     "worker-plugin": "^5.0.0"
+  },
+  "resolutions": {
   }
 }
