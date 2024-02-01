@@ -205,7 +205,7 @@ function getWarningContent({
     }
   }
 
-  if (fixtureWithoutStep.stagingAreaSlots.length > 0) {
+  if (fixtureWithoutStep.stagingAreaSlots.length) {
     return {
       content: (
         <>
@@ -318,7 +318,6 @@ export function FileSidebar(): JSX.Element {
     'moduleId',
     robotType
   )
-
   const gripperWithoutStep = isGripperAttached && !gripperInUse
 
   const hasWarning =
@@ -363,7 +362,6 @@ export function FileSidebar(): JSX.Element {
       dispatch(loadFileActions.saveProtocolFile())
     },
   })
-
   return (
     <>
       {blockingExportHint}

@@ -25,6 +25,7 @@ from .types import (
     HexColor,
     PostRunHardwareState,
     DeckConfigurationType,
+    AddressableAreaLocation,
 )
 from .execution import (
     QueueWorker,
@@ -46,6 +47,7 @@ from .actions import (
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
     AddLiquidAction,
+    AddAddressableAreaAction,
     AddModuleAction,
     HardwareStoppedAction,
     ResetTipsAction,
@@ -480,6 +482,13 @@ class ProtocolEngine:
 
         self._action_dispatcher.dispatch(AddLiquidAction(liquid=liquid))
         return liquid
+
+    def add_addressable_area(self, addressable_area_name: str) -> None:
+        """Add an addressable area to state."""
+        area = AddressableAreaLocation(addressableAreaName=addressable_area_name)
+        self._action_dispatcher.dispatch(
+            AddAddressableAreaAction(addressable_area=area)
+        )
 
     def reset_tips(self, labware_id: str) -> None:
         """Reset the tip state of a given labware."""

@@ -12,8 +12,8 @@ import styles from './hints.module.css'
 
 export interface HintProps {
   hintKey: HintKey
-  handleCancel: () => unknown
-  handleContinue: () => unknown
+  handleCancel: () => void
+  handleContinue: () => void
   content: React.ReactNode
 }
 
@@ -70,8 +70,8 @@ export interface HintArgs {
   enabled: boolean
   hintKey: HintKey
   content: React.ReactNode
-  handleCancel: () => unknown
-  handleContinue: () => unknown
+  handleCancel: () => void
+  handleContinue: () => void
 }
 
 export const useBlockingHint = (args: HintArgs): JSX.Element | null => {

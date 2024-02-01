@@ -107,6 +107,7 @@
   "no_recent_runs_description": "After you run some protocols, they will appear here.",
   "no_recent_runs": "No recent runs",
   "num_units": "{{num}} mm",
+  "offline_deck_configuration": "Robot must be on the network to see deck configuration",
   "offline_instruments_and_modules": "Robot must be on the network to see connected instruments and modules",
   "offline_recent_protocol_runs": "Robot must be on the network to see protocol runs",
   "open_lid": "Open lid",

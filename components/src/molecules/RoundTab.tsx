@@ -2,71 +2,59 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { TYPOGRAPHY, BORDERS, SPACING } from '../ui-style-constants'
 import { COLORS } from '../helix-design-system'
-import {
-  POSITION_RELATIVE,
-  POSITION_ABSOLUTE,
-  DISPLAY_BLOCK,
-  SIZE_1,
-} from '../styles'
+import { POSITION_RELATIVE } from '../styles'
 import { Btn } from '../primitives'
 
 const defaultTabStyle = css`
   ${TYPOGRAPHY.pSemiBold}
-  border-radius: ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} 0 0;
+  color: ${COLORS.black90};
+  background-color: ${COLORS.purple30};
+  border: 0px ${BORDERS.styleSolid} ${COLORS.purple30};
+  border-radius: ${BORDERS.borderRadiusSize2};
   padding: ${SPACING.spacing8} ${SPACING.spacing16};
   position: ${POSITION_RELATIVE};
-`
-
-const inactiveTabStyle = css`
-  color: ${COLORS.grey50};
 
   &:hover {
-    color: ${COLORS.grey50};
-    background-color: ${COLORS.grey20};
+    background-color: ${COLORS.purple35};
+  }
+
+  &:focus-visible {
+    outline: 2px ${BORDERS.styleSolid} ${COLORS.yellow50};
   }
 `
 
 const currentTabStyle = css`
-  ${TYPOGRAPHY.pSemiBold}
-  background-color: ${COLORS.white};
-  color: ${COLORS.blue50};
+  ${defaultTabStyle}
+  color: ${COLORS.white};
+  background-color: ${COLORS.purple50};
 
-  /* extend below the tab when active to flow into the content */
-  &:after {
-    position: ${POSITION_ABSOLUTE};
-    display: ${DISPLAY_BLOCK};
-    content: '';
-    background-color: ${COLORS.white};
-    top: 100;
-    left: 0;
-    height: ${SIZE_1};
-    width: 100%;
+  &:hover {
+    background-color: ${COLORS.purple55};
   }
+`
+
+const disabledTabStyle = css`
+  ${defaultTabStyle}
+  background-color: ${COLORS.grey30};
+  color: ${COLORS.grey40};
 `
 
 interface RoundTabProps extends React.ComponentProps<typeof Btn> {
   isCurrent: boolean
+  disabled?: boolean
 }
 export function RoundTab({
   isCurrent,
   children,
+  disabled = false,
   ...restProps
 }: RoundTabProps): JSX.Element {
+  let tabStyle = defaultTabStyle
+  if (disabled) tabStyle = disabledTabStyle
+  else if (isCurrent) tabStyle = currentTabStyle
+
   return (
-    <Btn
-      {...restProps}
-      css={
-        isCurrent
-          ? css`
-              ${defaultTabStyle}
-              ${currentTabStyle}
-            `
-          : css`
-              ${defaultTabStyle}
-              ${inactiveTabStyle}
-            `
-      }
-    >
+    <Btn {...restProps} css={tabStyle}>
       {children}
     </Btn>
   )

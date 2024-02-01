@@ -136,6 +136,9 @@ class ProtocolCore(
     ) -> None:
         """Append a disposal location object to the core"""
         if isinstance(disposal_location, TrashBin):
+            self._engine_client.state.addressable_areas.raise_if_area_not_in_deck_configuration(
+                disposal_location.area_name
+            )
             deck_conflict.check(
                 engine_state=self._engine_client.state,
                 new_trash_bin=disposal_location,
@@ -147,6 +150,20 @@ class ProtocolCore(
                 existing_labware_ids=list(self._labware_cores_by_id.keys()),
                 existing_module_ids=list(self._module_cores_by_id.keys()),
             )
+            self._engine_client.add_addressable_area(disposal_location.area_name)
+        elif isinstance(disposal_location, WasteChute):
+            # TODO(jbl 2024-01-25) hardcoding this specific addressable area should be refactored
+            #   when analysis is fixed up
+            #
+            # We want to tell Protocol Engine that there's a waste chute in the waste chute location when it's loaded,
+            # so analysis can prevent the user from doing anything that would collide with it. At the same time, we
+            # do not want to create a false negative when it comes to addressable area conflict. We therefore use the
+            # addressable area `1ChannelWasteChute` because every waste chute cutout fixture provides it and it will
+            # provide the engine with the information it needs.
+            self._engine_client.state.addressable_areas.raise_if_area_not_in_deck_configuration(
+                "1ChannelWasteChute"
+            )
+            self._engine_client.add_addressable_area("1ChannelWasteChute")
         self._disposal_locations.append(disposal_location)
 
     def get_disposal_locations(self) -> List[Union[Labware, TrashBin, WasteChute]]:

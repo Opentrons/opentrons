@@ -70,10 +70,10 @@ import type { ModelModuleInfo } from '../../EditModules'
 export interface EditModulesModalProps {
   moduleType: ModuleType
   moduleOnDeck: ModuleOnDeck | null
-  onCloseClick: () => unknown
-  editModuleModel: (model: ModuleModel) => unknown
-  editModuleSlot: (slot: string) => unknown
-  displayModuleWarning: (module: ModelModuleInfo) => unknown
+  onCloseClick: () => void
+  editModuleModel: (model: ModuleModel) => void
+  editModuleSlot: (slot: string) => void
+  displayModuleWarning: (module: ModelModuleInfo) => void
 }
 
 type EditModulesModalComponentProps = EditModulesModalProps & {
@@ -138,6 +138,7 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
     const isModuleAdjacentToHeaterShaker =
       // if the module is a heater shaker, it can't be adjacent to another heater shaker
       // because PD does not support MoaM
+      robotType === OT2_ROBOT_TYPE &&
       moduleOnDeck?.type !== HEATERSHAKER_MODULE_TYPE &&
       some(
         initialDeckSetup.modules,
