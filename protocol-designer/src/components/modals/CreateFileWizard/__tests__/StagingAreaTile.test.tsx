@@ -47,7 +47,7 @@ describe('StagingAreaTile', () => {
   })
   it('renders null when robot type is ot-2', () => {
     render(props)
-    expect(screen.getByText('Staging area slots')).toBeNull()
+    expect(screen.queryByText('Staging area slots')).not.toBeInTheDocument()
   })
   it('renders header and deck configurator', () => {
     const values = {

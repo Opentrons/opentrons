@@ -21,15 +21,12 @@ import type { WizardTileProps } from './types'
 export function MetadataTile(props: WizardTileProps): JSX.Element {
   const { t } = useTranslation(['modal', 'application'])
   const { formState, goBack, proceed, register, watch } = props
-  const name = watch('fields.name')
+  const fields = watch('fields')
+  const name = fields.name
 
   const { errors, touchedFields } = formState
 
-  const disableProceed =
-    name == null ||
-    name === '' ||
-    !Boolean(touchedFields?.fields?.name) ||
-    errors?.fields?.name != null
+  const disableProceed = name == null || name === ''
 
   return (
     <HandleEnter onEnter={proceed} disabled={disableProceed}>
@@ -53,11 +50,13 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
                 {`${t('protocol_name')} *`}
               </Text>
               <InputField
-                aria-label="MetadataTile_protocolName"
+                id="MetadataTile_protocolName"
                 autoFocus
                 register={register}
                 fieldName="fields.name"
                 error={
+                  //  TODO(jr, 2/1/24): wire up errors for this field
+                  //  need to wire it up in the parent component
                   touchedFields?.fields?.name && name && name.length > 1
                     ? errors?.fields?.name?.message ?? null
                     : null
