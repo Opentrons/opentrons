@@ -87,7 +87,6 @@ export interface EditModulesModalProps {
 type EditModulesModalComponentProps = EditModulesModalProps & {
   supportedModuleSlot: string
   watch: UseFormWatch<EditModulesFormValues>
-  formState: FormState<EditModulesFormValues>
   control: Control<EditModulesFormValues, any>
   validator: (data: EditModulesFormValues) => Record<string, any>
 }
@@ -201,22 +200,7 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
     control,
     handleSubmit,
     watch,
-    formState,
   } = useForm<EditModulesFormValues>({
-    resolver: async data => {
-      const validationErrors = await validator(data)
-      const mappedErrors = Object.keys(validationErrors).reduce((acc, key) => {
-        acc[key as keyof typeof validationErrors] = {
-          type: 'required',
-          message: validationErrors[key],
-        }
-        return acc
-      }, {} as Record<string, any>)
-      return {
-        values: {},
-        errors: mappedErrors,
-      }
-    },
     defaultValues: initialValues,
   })
 
@@ -265,7 +249,6 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
     <form onSubmit={handleSubmit(onSaveClick)}>
       <EditModulesModalComponent
         {...props}
-        formState={formState}
         supportedModuleSlot={supportedModuleSlot}
         watch={watch}
         control={control}
@@ -280,7 +263,6 @@ const EditModulesModalComponent = (
 ): JSX.Element => {
   const {
     control,
-    formState,
     moduleType,
     onCloseClick,
     supportedModuleSlot,
@@ -470,7 +452,7 @@ const EditModulesModalComponent = (
         </OutlineButton>
         <OutlineButton
           className={styles.button_margin}
-          disabled={!formState.isValid}
+          disabled={slotIssue || validation['selectedModel'] != null}
           type={BUTTON_TYPE_SUBMIT}
         >
           {t('button:save')}

@@ -128,14 +128,16 @@ interface OT2FieldProps extends UseFormReturn<FormState> {
 
 function PipetteField(props: OT2FieldProps): JSX.Element {
   const { mount, watch, allowNoPipette, setValue, display96Channel } = props
-  const robotType = watch('fields.robotType')
+  const fields = watch('fields')
   const pipettesByMount = watch('pipettesByMount')
+
   const pipetteOptions = React.useMemo(() => {
     const allPipetteOptions = getAllPipetteNames('maxVolume', 'channels')
       .filter(name =>
-        (robotType === OT2_ROBOT_TYPE ? OT2_PIPETTES : OT3_PIPETTES).includes(
-          name
-        )
+        (fields.robotType === OT2_ROBOT_TYPE
+          ? OT2_PIPETTES
+          : OT3_PIPETTES
+        ).includes(name)
       )
       .map(name => ({
         value: name,
@@ -148,7 +150,7 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
           ...allPipetteOptions.filter(o => o.value !== 'p1000_96'),
           ...noneOption,
         ]
-  }, [robotType])
+  }, [fields.robotType])
 
   const currentValue = pipettesByMount[mount].pipetteName
   React.useEffect(() => {
