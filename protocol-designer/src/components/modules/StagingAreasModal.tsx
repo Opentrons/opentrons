@@ -122,7 +122,7 @@ const StagingAreasModalComponent = (
   }
 
   return (
-    <Form>
+    <Form placeholder="">
       <Flex height="23rem" flexDirection={DIRECTION_COLUMN}>
         <Flex
           justifyContent={JUSTIFY_END}

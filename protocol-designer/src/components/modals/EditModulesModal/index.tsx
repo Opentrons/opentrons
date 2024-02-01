@@ -305,7 +305,7 @@ const EditModulesModalComponent = (
       <Box paddingX={SPACING.spacing32}>
         <Text as="h2">{t(`modules:module_long_names.${moduleType}`)}</Text>
       </Box>
-      <Form>
+      <Form placeholder="">
         <Box paddingX={SPACING.spacing32} paddingTop={SPACING.spacing16}>
           <Flex
             justifyContent={JUSTIFY_SPACE_BETWEEN}

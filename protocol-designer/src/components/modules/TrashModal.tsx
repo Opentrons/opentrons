@@ -88,7 +88,7 @@ const TrashModalComponent = (props: TrashModalProps): JSX.Element => {
   const slotFromCutout = field.value.replace('cutout', '')
 
   return (
-    <Form>
+    <Form placeholder="">
       <Box paddingX={SPACING.spacing32} paddingTop={SPACING.spacing16}>
         <Flex
           justifyContent={

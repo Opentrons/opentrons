@@ -76,7 +76,7 @@ export const FormModal = (props: FormModalProps): JSX.Element => {
       ]}
     >
       <StyledCopy>{body}</StyledCopy>
-      <StyledForm id={id}>
+      <StyledForm id={id} placeholder="">
         {fields.map(fieldProps => {
           const { name } = fieldProps
           const fieldId = `${id}__${name}`

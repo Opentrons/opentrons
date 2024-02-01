@@ -3,27 +3,26 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
-import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 
 import { i18n } from '../../../i18n'
 import * as Sessions from '../../../redux/sessions'
 import { mockDeckCalibrationSessionAttributes } from '../../../redux/sessions/__fixtures__'
+import { getDeckDefinitions } from '@opentrons/shared-data'
 
 import { CalibrateDeck } from '../index'
 import type { DeckCalibrationStep } from '../../../redux/sessions/types'
 import type { DispatchRequestsType } from '../../../redux/robot-api'
 
-jest.mock('@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions')
-jest.mock('../../../redux/sessions/selectors')
-jest.mock('../../../redux/robot-api/selectors')
-jest.mock('../../../redux/config')
+vi.mock('../../../redux/sessions/selectors')
+vi.mock('../../../redux/robot-api/selectors')
+vi.mock('../../../redux/config')
 
 interface CalibrateDeckSpec {
   heading: string
   currentStep: DeckCalibrationStep
 }
 
-const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
+const mockGetDeckDefinitions = getDeckDefinitions as vi.MockedFunction<
   typeof getDeckDefinitions
 >
 

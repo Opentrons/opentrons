@@ -210,7 +210,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
           }
           return (
             <Box overflowY={OVERFLOW_AUTO}>
-              <Form id={formId}>
+              <Form id={formId} placeholder="">
                 <ConfigFormResetButton
                   onClick={handleReset}
                   disabled={updateInProgress}
