@@ -325,6 +325,7 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
 
   const onSave: (args: {
     newProtocolFields: NewProtocolFields
+    modules: ModuleCreationArgs[]
     pipettes: PipetteFieldsData[]
   }) => void = makeUpdatePipettes(
     prevPipettes,
@@ -372,9 +373,37 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
       },
       []
     )
-    console.log('pipettes', pipettes)
-    console.log('new protoocl fields', newProtocolFields)
-    onSave({ newProtocolFields, pipettes })
+
+    // NOTE: this is extra-explicit for flow. Reduce fns won't cooperate
+    // with enum-typed key like `{[ModuleType]: ___}`
+    // @ts-expect-error(sa, 2021-6-21): TS not smart enough to take real type from Object.keys
+    const moduleTypes: ModuleType[] = Object.keys(values.modulesByType)
+    const modules: ModuleCreationArgs[] = moduleTypes.reduce<
+      ModuleCreationArgs[]
+    >((acc, moduleType) => {
+      const formModule = values.modulesByType[moduleType]
+      return formModule?.onDeck
+        ? [
+            ...acc,
+            {
+              type: moduleType,
+              model: formModule.model || ('' as ModuleModel), // TODO: we need to validate that module models are of type ModuleModel
+              slot: formModule.slot,
+            },
+          ]
+        : acc
+    }, [])
+    const heaterShakerIndex = modules.findIndex(
+      hwModule => hwModule.type === HEATERSHAKER_MODULE_TYPE
+    )
+    const magModIndex = modules.findIndex(
+      hwModule => hwModule.type === MAGNETIC_MODULE_TYPE
+    )
+    if (heaterShakerIndex > -1 && magModIndex > -1) {
+      // if both are present, move the Mag mod to slot 9, since both can't be in slot 1
+      modules[magModIndex].slot = '9'
+    }
+    onSave({ newProtocolFields, modules, pipettes })
   }
 
   const getInitialValues: () => FormState = () => {
@@ -396,12 +425,14 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
     control,
     setValue,
     trigger,
+    watch,
     getValues,
   } = useForm<FormState>({
     defaultValues: getInitialValues(),
     resolver: yupResolver(validationSchema),
   })
-  const { modulesByType, pipettesByMount } = getValues()
+  const pipettesByMount = watch('pipettesByMount')
+  const { modulesByType } = getValues()
 
   const { left, right } = pipettesByMount
   // at least one must not be none (empty string)
