@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { useFormik } from 'formik'
+import { useForm } from 'react-hook-form'
 import styled from 'styled-components'
 
 import {
@@ -55,8 +55,14 @@ const StyledInput = styled.input`
   }
 `
 
-interface FormikErrors {
-  ip?: string
+interface FormErrors {
+  ip?: {
+    type: string
+    message: string
+  }
+}
+interface FormValues {
+  ip: string
 }
 interface ManualIpHostnameFormProps {
   setMostRecentAddition: (ip: string) => void
@@ -71,32 +77,38 @@ export function ManualIpHostnameForm({
     dispatch(addManualIp(ip))
     dispatch(startDiscovery())
   }
-  const formik = useFormik({
-    initialValues: {
+
+  const validateForm = (data: FormValues): any => {
+    const errors: FormErrors = {}
+    const ip = data.ip.trim()
+    // ToDo: kj 12/19/2022 for this, the best way is to use the regex because invisible unicode characters
+    if (!ip) {
+      errors.ip = { type: 'required', message: t('add_ip_error') }
+    }
+    return errors
+  }
+
+  const { formState, handleSubmit, register, reset } = useForm<FormValues>({
+    defaultValues: {
       ip: '',
     },
-    onSubmit: (values, { resetForm }) => {
-      const ip = values.ip.trim()
-      const inputForm = document.getElementById('ip')
-      if (inputForm != null)
-        inputForm.style.border = `1px solid ${String(COLORS.grey30)}`
-      addManualIpAndHostname(ip)
-      resetForm()
-      setMostRecentAddition(ip)
-    },
-    validate: values => {
-      const errors: FormikErrors = {}
-      const ip = values.ip.trim()
-      // ToDo: kj 12/19/2022 for this, the best way is to use the regex because invisible unicode characters
-      if (!ip) {
-        errors.ip = t('add_ip_error')
-        const inputForm = document.getElementById('ip')
-        if (inputForm != null)
-          inputForm.style.border = `1px solid ${String(COLORS.red50)}`
-      }
-      return errors
+    resolver: data => {
+      return validateForm(data)
     },
   })
+
+  const onSubmit = (data: FormValues): void => {
+    const trimmedIp = data.ip.trim()
+    const inputForm = document.getElementById('ip')
+
+    if (inputForm !== null) {
+      inputForm.style.border = `1px solid ${COLORS.grey30}`
+    }
+
+    addManualIpAndHostname(trimmedIp)
+    reset()
+    setMostRecentAddition(trimmedIp)
+  }
 
   return (
     <Flex
@@ -104,14 +116,11 @@ export function ManualIpHostnameForm({
       margin={`${SPACING.spacing4} 0`}
       height={SPACING.spacing32}
     >
-      <FlexForm onSubmit={formik.handleSubmit}>
+      <FlexForm onSubmit={handleSubmit(onSubmit)}>
         <StyledInput
           id="ip"
-          name="ip"
           type="text"
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          value={formik.values.ip}
+          {...register('ip')}
           data-testid="manual-ip-hostname-input"
         />
         <TertiaryButton
@@ -124,13 +133,13 @@ export function ManualIpHostnameForm({
           {t('add_ip_button')}
         </TertiaryButton>
       </FlexForm>
-      {formik.errors.ip != null && (
+      {formState.errors?.ip != null && (
         <StyledText
           as="label"
           marginTop={SPACING.spacing4}
           color={COLORS.red50}
         >
-          {formik.errors.ip}
+          {formState.errors.ip}
         </StyledText>
       )}
     </Flex>
