@@ -568,12 +568,17 @@ class InstrumentContext(publisher.CommandPublisher):
         elif isinstance(target, validation.PointTarget):
             move_to_location = target.location
         elif isinstance(target, (TrashBin, WasteChute)):
-            # TODO handle publish info
-            self._core.blow_out(
-                location=target,
-                well_core=None,
-                in_place=False,
-            )
+            with publisher.publish_context(
+                broker=self.broker,
+                command=cmds.blow_out_in_disposal_location(
+                    instrument=self, location=target
+                ),
+            ):
+                self._core.blow_out(
+                    location=target,
+                    well_core=None,
+                    in_place=False,
+                )
             return self
 
         with publisher.publish_context(

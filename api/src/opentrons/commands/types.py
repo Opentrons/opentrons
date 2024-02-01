@@ -36,6 +36,7 @@ PICK_UP_TIP: Final = "command.PICK_UP_TIP"
 DROP_TIP: Final = "command.DROP_TIP"
 DROP_TIP_IN_DISPOSAL_LOCATION: Final = "command.DROP_TIP_IN_DISPOSAL_LOCATION"
 BLOW_OUT: Final = "command.BLOW_OUT"
+BLOW_OUT_IN_DISPOSAL_LOCATION: Final = "command.BLOW_OUT_IN_DISPOSAL_LOCATION"
 AIR_GAP: Final = "command.AIR_GAP"
 TOUCH_TIP: Final = "command.TOUCH_TIP"
 RETURN_TIP: Final = "command.RETURN_TIP"
@@ -434,6 +435,15 @@ class BlowOutCommand(TypedDict):
     payload: BlowOutCommandPayload
 
 
+class BlowOutInDisposalLocationCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
+    location: Union[TrashBin, WasteChute]
+
+
+class BlowOutInDisposalLocationCommand(TypedDict):
+    name: Literal["command.BLOW_OUT_IN_DISPOSAL_LOCATION"]
+    payload: BlowOutInDisposalLocationCommandPayload
+
+
 class TouchTipCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
     pass
 
@@ -505,6 +515,7 @@ Command = Union[
     AirGapCommand,
     TouchTipCommand,
     BlowOutCommand,
+    BlowOutInDisposalLocationCommand,
     MixCommand,
     TransferCommand,
     DistributeCommand,
@@ -573,6 +584,7 @@ CommandPayload = Union[
     PickUpTipCommandPayload,
     TouchTipCommandPayload,
     BlowOutCommandPayload,
+    BlowOutInDisposalLocationCommandPayload,
     MixCommandPayload,
     TransferCommandPayload,
     DistributeCommandPayload,
@@ -606,7 +618,9 @@ class DropTipMessage(CommandMessageFields, DropTipCommand):
     pass
 
 
-class DropTipInDisposalLocationMessage(CommandMessageFields, DropTipInDisposalLocationCommand):
+class DropTipInDisposalLocationMessage(
+    CommandMessageFields, DropTipInDisposalLocationCommand
+):
     pass
 
 
@@ -627,6 +641,12 @@ class TouchTipMessage(CommandMessageFields, TouchTipCommand):
 
 
 class BlowOutMessage(CommandMessageFields, BlowOutCommand):
+    pass
+
+
+class BlowOutInDisposalLocationMessage(
+    CommandMessageFields, BlowOutInDisposalLocationCommand
+):
     pass
 
 
@@ -810,6 +830,7 @@ CommandMessage = Union[
     AirGapMessage,
     TouchTipMessage,
     BlowOutMessage,
+    BlowOutInDisposalLocationMessage,
     MixMessage,
     TransferMessage,
     DistributeMessage,

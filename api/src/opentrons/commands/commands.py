@@ -192,6 +192,18 @@ def blow_out(
     }
 
 
+def blow_out_in_disposal_location(
+    instrument: InstrumentContext, location: Union[TrashBin, WasteChute]
+) -> command_types.BlowOutInDisposalLocationCommand:
+    location_text = stringify_disposal_location(location)
+    text = f"Blowing out into {location_text}"
+
+    return {
+        "name": command_types.BLOW_OUT_IN_DISPOSAL_LOCATION,
+        "payload": {"instrument": instrument, "location": location, "text": text},
+    }
+
+
 def touch_tip(instrument: InstrumentContext) -> command_types.TouchTipCommand:
     text = "Touching tip"
 
