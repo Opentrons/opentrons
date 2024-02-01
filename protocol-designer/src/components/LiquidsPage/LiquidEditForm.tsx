@@ -92,7 +92,8 @@ export function LiquidEditForm(props: Props): JSX.Element {
     defaultValues: initialValues,
     resolver: yupResolver(liquidEditFormSchema),
   })
-  const [name, description] = watch(['name', 'description'])
+  const name = watch('name')
+  const description = watch('description')
 
   const handleLiquidEdits = (values: LiquidEditFormValues): void => {
     saveForm({
@@ -177,7 +178,7 @@ export function LiquidEditForm(props: Props): JSX.Element {
           </p>
           <Controller
             control={control}
-            name='serialize'
+            name="serialize"
             render={({ field }) => (
               <DeprecatedCheckboxField
                 name="serialize"
