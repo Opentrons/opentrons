@@ -8,7 +8,7 @@ from hardware_testing.gravimetric.helpers import _calculate_stats
 from hardware_testing.gravimetric.config import LIQUID_PROBE_SETTINGS
 from hardware_testing.gravimetric.tips import get_unused_tips
 from hardware_testing.data import ui, get_testing_data_directory
-from opentrons.hardware_control.types import InstrumentProbeType, OT3Mount, Axis
+from opentrons.hardware_control.types import InstrumentProbeType, OT3Mount, Axis, top_types
 
 from hardware_testing.gravimetric.measurement.scale import Scale
 from hardware_testing.gravimetric.measurement.record import (
@@ -118,7 +118,7 @@ def _load_scale(
             tag=pipette_tag,
             start_time=start_time,
             duration=0,
-            frequency=1000 if simulating else 150,
+            frequency=1000 if simulating else 60,
             stable=False,
         ),
         scale,
@@ -158,7 +158,9 @@ def run(tip: int, run_args: RunArgs) -> None:
             run_args.pipette.drop_tip()
         results.append(height)
         env_data = run_args.environment_sensor.get_reading()
-        hw_pipette = hw_api.hardware_pipettes[OT3Mount.LEFT]
+        ui.print_info("hwpipette")
+        hw_pipette = hw_api.hardware_pipettes[top_types.Mount.LEFT]
+        ui.print_info("p start")
         plunger_start = hw_pipette.plunger_positions.bottom if run_args.aspirate else hw_pipette.plunger_positions.top
         store_trial(
             run_args.test_report,
@@ -212,5 +214,6 @@ def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
     run_args.recorder.set_sample_tag(f"trial-{trial}-{tip}ul")
     # TODO add in stuff for secondary probe
     height = hw_api.liquid_probe(hw_mount, lps, InstrumentProbeType.PRIMARY)
+    ui.print_info(f"Trial {trial} complete")
     run_args.recorder.clear_sample_tag()
     return height

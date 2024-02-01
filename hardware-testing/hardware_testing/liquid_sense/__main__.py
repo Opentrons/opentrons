@@ -132,7 +132,7 @@ class RunArgs:
         _ctx = RunArgs._get_protocol_context(args)
         robot_serial = helpers._get_robot_serial(_ctx.is_simulating())
         run_id, start_time = create_run_id_and_start_time()
-        environment_sensor = asair_sensor.BuildAsairSensor(_ctx.is_simulating())
+        environment_sensor = asair_sensor.BuildAsairSensor(_ctx.is_simulating() or args.ignore_env)
         git_description = get_git_description()
         protocol_cfg = LIQUID_SENSE_CFG[args.pipette][args.channels]
         name = protocol_cfg.metadata["protocolName"]  # type: ignore[attr-defined]
@@ -157,9 +157,9 @@ class RunArgs:
         else:
             tip_volumes = [args.tip]
 
-        scale = Scale.build(simulate=_ctx.is_simulating())
+        scale = Scale.build(simulate=_ctx.is_simulating() or args.ignore_scale)
         recorder: GravimetricRecorder = execute._load_scale(
-            name, scale, run_id, pipette_tag, start_time, _ctx.is_simulating()
+            name, scale, run_id, pipette_tag, start_time, _ctx.is_simulating() or args.ignore_scale
         )
         print(f"pipette_tag {pipette_tag}")
         report = build_ls_report(name, run_id, trials, tip_volumes)
@@ -232,6 +232,8 @@ if __name__ == "__main__":
     parser.add_argument("--plunger-speed", type=float, default=-1.0)
     parser.add_argument("--isolate-plungers", action="store_true")
     parser.add_argument("--start-height-offset", type=float, default=0)
+    parser.add_argument("--ignore-scale", action="store_true")
+    parser.add_argument("--ignore-env", action="store_true")
 
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
@@ -254,7 +256,8 @@ if __name__ == "__main__":
             if args.channels == 96 and not run_args.ctx.is_simulating():
                 ui.alert_user_ready(f"prepare the {tip}ul tipracks", hw)
             execute.run(tip, run_args)
-
+    except Exception as e:
+        ui.print_info(f"got error {e}")
     finally:
         if run_args.recorder is not None:
             ui.print_info("ending recording")
