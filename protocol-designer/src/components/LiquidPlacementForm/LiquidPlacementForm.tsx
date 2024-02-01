@@ -84,7 +84,8 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
     defaultValues: getInitialValues(),
   })
 
-  const [selectedLiquidId, volume] = watch(['selectedLiquidId', 'volume'])
+  const selectedLiquidId = watch('selectedLiquidId')
+  const volume = watch('volume')
 
   const handleCancelForm = (): void => {
     dispatch(deselectAllWells())
