@@ -44,6 +44,17 @@ from opentrons_hardware.sensors.types import (
     SensorDataType,
     sensor_fixed_point_conversion,
 )
+from opentrons_hardware.firmware_bindings.messages.payloads import (
+    BindSensorOutputRequestPayload,
+)
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    BindSensorOutputRequest,
+)
+from opentrons_hardware.firmware_bindings.messages.fields import (
+    SensorOutputBindingField,
+    SensorTypeField,
+    SensorIdField,
+)
 from opentrons_hardware.sensors.sensor_types import SensorInformation, PressureSensor
 from opentrons_hardware.sensors.scheduler import SensorScheduler
 from opentrons_hardware.sensors.utils import SensorThresholdInformation
@@ -78,7 +89,9 @@ def _build_pass_step(
     speed: Dict[NodeId, float],
     stop_condition: MoveStopCondition = MoveStopCondition.sync_line,
 ) -> MoveGroupStep:
-    pipette_nodes = [i for i in movers if i in [NodeId.pipette_left, NodeId.pipette_right]]
+    pipette_nodes = [
+        i for i in movers if i in [NodeId.pipette_left, NodeId.pipette_right]
+    ]
 
     move_group = create_step(
         distance={ax: float64(abs(distance[ax])) for ax in movers},
@@ -90,7 +103,7 @@ def _build_pass_step(
         #   will be the same
         duration=float64(abs(distance[movers[0]] / speed[movers[0]])),
         present_nodes=movers,
-        stop_condition=MoveStopCondition.sync_line,
+        stop_condition=stop_condition,
     )
     pipette_move = create_step(
         distance={ax: float64(abs(distance[ax])) for ax in movers},
@@ -104,8 +117,10 @@ def _build_pass_step(
         present_nodes=pipette_nodes,
         stop_condition=MoveStopCondition.sensor_report,
     )
+    print(f"Move group for probe {move_group}")
     for node in pipette_nodes:
         move_group[node] = pipette_move[node]
+    print(f"Move group for probe {move_group}")
     return move_group
 
 
