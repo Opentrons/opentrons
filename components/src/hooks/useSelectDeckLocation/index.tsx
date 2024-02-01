@@ -25,7 +25,7 @@ import {
   SlotLabels,
 } from '../../hardware-sim'
 import { Icon } from '../../icons'
-import { Flex, Text } from '../../primitives'
+import { Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { COLORS } from '../../helix-design-system'
