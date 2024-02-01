@@ -1,12 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  Control,
-  Controller,
-  useForm,
-  UseFormWatch,
-  useWatch,
-} from 'react-hook-form'
+import { Control, Controller, useForm, useWatch } from 'react-hook-form'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   FormGroup,
@@ -185,7 +179,7 @@ export const TrashModal = (props: TrashModalProps): JSX.Element => {
   const dispatch = useDispatch()
   const { t } = useTranslation('modules')
 
-  const onSaveClick = (data: TrashValues) => {
+  const onSaveClick = (data: TrashValues): void => {
     if (trashName === 'trashBin' && trashBinId == null) {
       dispatch(createDeckFixture('trashBin', data.selectedSlot))
     } else if (trashName === 'trashBin' && trashBinId != null) {

@@ -1,5 +1,7 @@
 import * as React from 'react'
 import assert from 'assert'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
 import reduce from 'lodash/reduce'
 import isEmpty from 'lodash/isEmpty'
 import last from 'lodash/last'
@@ -54,8 +56,6 @@ import modalStyles from '../modal.css'
 import type { DeckSlot, ThunkDispatch } from '../../../types'
 import type { NormalizedPipette } from '@opentrons/step-generation'
 import type { StepIdType } from '../../../form-types'
-import { Controller, useForm } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
 
 export type PipetteFieldsData = Omit<
   PipetteOnDeck,

@@ -46,8 +46,8 @@ describe('StagingAreaTile', () => {
     mockDeckConfigurator.mockReturnValue(<div>mock deck configurator</div>)
   })
   it('renders null when robot type is ot-2', () => {
-    const { container } = render(props)
-    expect(container.firstChild).toBeNull()
+    render(props)
+    expect(screen.getByText('Staging area slots')).toBeNull()
   })
   it('renders header and deck configurator', () => {
     const values = {

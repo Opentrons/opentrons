@@ -8,7 +8,6 @@ import { EquipmentOption } from '../EquipmentOption'
 
 import type { FormPipettesByMount } from '../../../../step-forms'
 import type { FormState, WizardTileProps } from '../types'
-import { UseFormGetValues } from 'react-hook-form'
 
 jest.mock('../EquipmentOption')
 
