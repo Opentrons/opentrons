@@ -1,7 +1,7 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
-import { i18n } from '../../../../localization'
 import { getPipetteEntities } from '../../../../step-forms/selectors'
 import {
   VolumeField,
@@ -23,7 +23,7 @@ import type { StepFormProps } from '../../types'
 export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
   const [collapsed, _setCollapsed] = React.useState<boolean>(true)
   const pipettes = useSelector(getPipetteEntities)
-
+  const { t } = useTranslation(['application', 'form'])
   const toggleCollapsed = (): void => _setCollapsed(!collapsed)
 
   const { propsForFields, formData } = props
@@ -36,7 +36,7 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
     <div className={styles.form_wrapper}>
       <div className={styles.section_header}>
         <span className={styles.section_header_text}>
-          {i18n.t('application.stepType.moveLiquid')}
+          {t('stepType.moveLiquid')}
         </span>
       </div>
       <div className={styles.form_row}>
@@ -46,7 +46,7 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
         ) : null}
         <VolumeField
           {...propsForFields.volume}
-          label={i18n.t('form.step_edit_form.field.volume.label')}
+          label={t('form:step_edit_form.field.volume.label')}
           stepType={stepType}
           className={styles.large_field}
         />
@@ -92,7 +92,7 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
 
       <div className={styles.section_header}>
         <span className={styles.section_header_text}>
-          {i18n.t('form.step_edit_form.section.sterility&motion')}
+          {t('form:step_edit_form.section.sterility&motion')}
         </span>
       </div>
       <div className={styles.section_wrapper}>
@@ -131,7 +131,7 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
       </div>
       <div className={styles.section_header}>
         <span className={styles.section_header_text}>
-          {i18n.t('form.step_edit_form.section.dropTip')}
+          {t('form:step_edit_form.section.dropTip')}
         </span>
       </div>
       <div className={cx(styles.form_row, styles.section_column)}>

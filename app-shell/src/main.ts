@@ -2,7 +2,7 @@
 import { app, ipcMain } from 'electron'
 import contextMenu from 'electron-context-menu'
 
-import { createUi } from './ui'
+import { createUi, registerReloadUi } from './ui'
 import { initializeMenu } from './menu'
 import { createLogger } from './log'
 import { registerProtocolAnalysis } from './protocol-analysis'
@@ -14,6 +14,7 @@ import { registerSystemInfo } from './system-info'
 import { registerProtocolStorage } from './protocol-storage'
 import { getConfig, getStore, getOverrides, registerConfig } from './config'
 import { registerUsb } from './usb'
+import { registerNotify, closeAllNotifyConnections } from './notify'
 
 import type { BrowserWindow } from 'electron'
 import type { Dispatch, Logger } from './types'
@@ -44,7 +45,14 @@ if (config.devtools) app.once('ready', installDevtools)
 
 app.once('window-all-closed', () => {
   log.debug('all windows closed, quitting the app')
-  app.quit()
+  closeAllNotifyConnections()
+    .then(() => {
+      app.quit()
+    })
+    .catch(error => {
+      log.warn('Failed to properly close MQTT connections:', error)
+      app.quit()
+    })
 })
 
 function startUp(): void {
@@ -88,6 +96,8 @@ function startUp(): void {
     registerSystemInfo(dispatch),
     registerProtocolStorage(dispatch),
     registerUsb(dispatch),
+    registerNotify(dispatch, mainWindow),
+    registerReloadUi(mainWindow),
   ]
 
   ipcMain.on('dispatch', (_, action) => {

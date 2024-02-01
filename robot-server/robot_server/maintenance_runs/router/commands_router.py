@@ -42,6 +42,17 @@ _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
 commands_router = APIRouter()
 
 
+class RequestModelWithCommandCreate(RequestModel[pe_commands.CommandCreate]):
+    """Equivalent to RequestModel[CommandCreate].
+
+    This works around a Pydantic v<2 bug where RequestModel[CommandCreate]
+    doesn't parse using the CommandCreate union discriminator.
+    https://github.com/pydantic/pydantic/issues/3782
+    """
+
+    data: pe_commands.CommandCreate
+
+
 class CommandNotFound(ErrorDetails):
     """An error if a given run command is not found."""
 
@@ -125,7 +136,7 @@ async def get_current_run_engine_from_url(
     },
 )
 async def create_run_command(
-    request_body: RequestModel[pe_commands.CommandCreate],
+    request_body: RequestModelWithCommandCreate,
     waitUntilComplete: bool = Query(
         default=False,
         description=(

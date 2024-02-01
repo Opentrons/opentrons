@@ -13,8 +13,8 @@ import {
 import {
   useCreateMaintenanceCommandMutation,
   useDeleteMaintenanceRunMutation,
-  useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
@@ -84,7 +84,7 @@ export function GripperWizardFlows(
     },
   })
 
-  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
     enabled: createdMaintenanceRunId != null,
   })

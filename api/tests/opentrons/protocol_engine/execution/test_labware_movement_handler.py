@@ -127,10 +127,6 @@ async def set_up_decoy_hardware_gripper(
     ).then_return({Axis.G: 4.0})
 
     decoy.when(
-        state_store.labware.get_dimensions(labware_id="my-teleporting-labware")
-    ).then_return(Dimensions(x=100, y=85, z=0))
-
-    decoy.when(
         ot3_hardware_api.hardware_gripper.geometry.max_allowed_grip_error
     ).then_return(6.0)
 
@@ -177,7 +173,7 @@ def subject(
 
 
 @pytest.mark.ot3_only
-async def test_check_labware_pickup(
+async def test_raise_error_if_gripper_pickup_failed(
     decoy: Decoy,
     state_store: StateStore,
     thermocycler_plate_lifter: ThermocyclerPlateLifter,
@@ -226,7 +222,13 @@ async def test_check_labware_pickup(
         )
     ).then_return(Point(201, 202, 219.5))
 
-    decoy.when(ot3_hardware_api.hardware_gripper.check_labware_pickup(85)).then_return()
+    decoy.when(
+        state_store.labware.get_dimensions(labware_id="my-teleporting-labware")
+    ).then_return(Dimensions(x=100, y=85, z=0))
+
+    decoy.when(
+        state_store.labware.get_well_bbox(labware_id="my-teleporting-labware")
+    ).then_return(Dimensions(x=99, y=80, z=1))
 
     await subject.move_labware_with_gripper(
         labware_id="my-teleporting-labware",
@@ -242,11 +244,23 @@ async def test_check_labware_pickup(
         await ot3_hardware_api.grip(force_newtons=100),
         await ot3_hardware_api.ungrip(),
         await ot3_hardware_api.grip(force_newtons=100),
-        ot3_hardware_api.hardware_gripper.check_labware_pickup(labware_width=85),
+        ot3_hardware_api.raise_error_if_gripper_pickup_failed(
+            expected_grip_width=85,
+            grip_width_uncertainty_wider=0,
+            grip_width_uncertainty_narrower=5,
+        ),
         await ot3_hardware_api.grip(force_newtons=100),
-        ot3_hardware_api.hardware_gripper.check_labware_pickup(labware_width=85),
+        ot3_hardware_api.raise_error_if_gripper_pickup_failed(
+            expected_grip_width=85,
+            grip_width_uncertainty_wider=0,
+            grip_width_uncertainty_narrower=5,
+        ),
         await ot3_hardware_api.grip(force_newtons=100),
-        ot3_hardware_api.hardware_gripper.check_labware_pickup(labware_width=85),
+        ot3_hardware_api.raise_error_if_gripper_pickup_failed(
+            expected_grip_width=85,
+            grip_width_uncertainty_wider=0,
+            grip_width_uncertainty_narrower=5,
+        ),
         await ot3_hardware_api.disengage_axes([Axis.Z_G]),
         await ot3_hardware_api.ungrip(),
         await ot3_hardware_api.ungrip(),
@@ -310,6 +324,14 @@ async def test_move_labware_with_gripper(
             additional_offset_vector=user_offset_data,
         )
     ).then_return(final_offset_data)
+
+    decoy.when(
+        state_store.labware.get_dimensions(labware_id="my-teleporting-labware")
+    ).then_return(Dimensions(x=100, y=85, z=0))
+
+    decoy.when(
+        state_store.labware.get_well_bbox(labware_id="my-teleporting-labware")
+    ).then_return(Dimensions(x=99, y=80, z=1))
 
     decoy.when(
         state_store.geometry.get_labware_grip_point(

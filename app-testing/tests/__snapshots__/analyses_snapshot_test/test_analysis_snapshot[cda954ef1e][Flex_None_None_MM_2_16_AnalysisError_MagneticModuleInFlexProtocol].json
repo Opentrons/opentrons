@@ -1,0 +1,73 @@
+{
+  "commands": [
+    {
+      "commandType": "home",
+      "params": {},
+      "result": {},
+      "status": "succeeded"
+    }
+  ],
+  "config": {
+    "apiVersion": [
+      2,
+      16
+    ],
+    "protocolType": "python"
+  },
+  "errors": [
+    {
+      "detail": "ValueError [line 15]: A magneticModuleType cannot be loaded into slot C1",
+      "errorCode": "4000",
+      "errorInfo": {},
+      "errorType": "ExceptionInProtocolError",
+      "wrappedErrors": [
+        {
+          "detail": "ValueError: A magneticModuleType cannot be loaded into slot C1",
+          "errorCode": "4000",
+          "errorInfo": {
+            "args": "('A magneticModuleType cannot be loaded into slot C1',)",
+            "class": "ValueError",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 69, in run_python\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_None_None_MM_2_16_AnalysisError_MagneticModuleInFlexProtocol.py\", line 15, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line 383, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/protocol_context.py\", line 779, in load_module\n    module_core = self._core.load_module(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/protocol.py\", line 402, in load_module\n    self._ensure_module_location(normalized_deck_slot, module_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/protocol.py\", line 576, in _ensure_module_location\n    raise ValueError(f\"A {module_type.value} cannot be loaded into slot {slot}\")\n"
+          },
+          "errorType": "PythonException",
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "name": "Flex_None_None_MM_2_16_AnalysisError_MagneticModuleInFlexProtocol.py",
+      "role": "main"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    }
+  ],
+  "labware": [],
+  "liquids": [],
+  "metadata": {
+    "author": "Derek Maggio <derek.maggio@opentrons.com>",
+    "protocolName": "QA Protocol - Analysis Error - Magnetic Module in Flex Protocol"
+  },
+  "modules": [],
+  "pipettes": [],
+  "robotType": "OT-3 Standard"
+}

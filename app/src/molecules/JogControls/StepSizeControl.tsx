@@ -50,7 +50,7 @@ const DEFAULT_BUTTON_STYLE = css`
   background-color: ${COLORS.white};
   border: 1px ${COLORS.white} solid;
   height: 3.62rem;
-  color: ${COLORS.black};
+  color: ${COLORS.black90};
 
   &:focus {
     background-color: ${COLORS.white};
@@ -58,30 +58,33 @@ const DEFAULT_BUTTON_STYLE = css`
 
   &:hover {
     background-color: ${COLORS.white};
-    color: ${COLORS.black};
+    color: ${COLORS.black90};
     box-shadow: 0 0 0;
-    border: 1px ${COLORS.lightGreyHover} solid;
+    border: 1px ${COLORS.grey30} solid;
+    outline: 2px ${BORDERS.styleSolid} ${COLORS.blue50};
+    outline-offset: 3px;
   }
 
   &:active {
     background-color: ${COLORS.white};
-    color: ${COLORS.blueEnabled};
-    border: 1px ${COLORS.blueEnabled} solid;
+    color: ${COLORS.blue50};
+    border: 1px ${COLORS.blue50} solid;
   }
 
   &:disabled {
     background-color: inherit;
-    color: ${COLORS.errorDisabled};
+    color: ${COLORS.grey40};
   }
 `
 const ACTIVE_BUTTON_STYLE = css`
   ${DEFAULT_BUTTON_STYLE}
-  color: ${COLORS.blueEnabled};
-  border: 1px ${COLORS.blueEnabled} solid;
+  color: ${COLORS.blue50};
+  border: 1px ${COLORS.blue50} solid;
 
   &:hover {
-    color: ${COLORS.blueHover};
-    border: 1px ${COLORS.blueHover} solid;
+    color: ${COLORS.blue55};
+    border: 1px ${COLORS.blue55} solid;
+    outline: 0;
   }
 `
 interface StepSizeControlProps {
@@ -132,10 +135,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
               {t('jump_size')}
             </StyledText>
           </Flex>
-          <StyledText
-            color={COLORS.darkGreyEnabled}
-            css={TYPOGRAPHY.labelRegular}
-          >
+          <StyledText color={COLORS.grey60} css={TYPOGRAPHY.labelRegular}>
             {JUMP_SIZE_SUBTITLE}
           </StyledText>
           <Box css={BUTTON_WRAPPER_STYLE}>
@@ -153,7 +153,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
                 >
                   {t(stepSizeTranslationKeyByStep[stepSize])}
                   <StyledText
-                    color={COLORS.darkGreyEnabled}
+                    color={COLORS.grey50}
                     css={TYPOGRAPHY.labelRegular}
                   >{`${stepSize} mm`}</StyledText>
                 </PrimaryButton>
@@ -173,7 +173,7 @@ export function TouchStepSizeControl(props: StepSizeControlProps): JSX.Element {
     <Flex
       flex="3"
       flexDirection={DIRECTION_COLUMN}
-      border={`1px solid ${COLORS.darkBlack40}`}
+      border={`1px solid ${COLORS.grey50}`}
       borderRadius={BORDERS.borderRadiusSize4}
       padding={SPACING.spacing16}
       gridGap={SPACING.spacing16}
@@ -198,13 +198,13 @@ export function TouchStepSizeControl(props: StepSizeControlProps): JSX.Element {
               <StyledText
                 as="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                color={selected ? COLORS.white : COLORS.darkBlackEnabled}
+                color={selected ? COLORS.white : COLORS.black90}
               >
                 {t(stepSizeTranslationKeyByStep[stepSize])}
               </StyledText>
               <StyledText
                 as="p"
-                color={selected ? COLORS.white : COLORS.darkBlack70}
+                color={selected ? COLORS.white : COLORS.grey60}
               >
                 {`${stepSize} mm`}
               </StyledText>

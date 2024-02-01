@@ -6,7 +6,9 @@ import {
   getPositionFromSlotId,
   inferModuleOrientationFromXCoordinate,
   OT2_ROBOT_TYPE,
+  MOVABLE_TRASH_CUTOUTS,
   SINGLE_SLOT_FIXTURES,
+  STAGING_AREA_CUTOUTS,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
@@ -20,7 +22,7 @@ import { LabwareRender } from '../Labware'
 import { FlexTrash } from '../Deck/FlexTrash'
 import { DeckFromLayers } from '../Deck/DeckFromLayers'
 import { SlotLabels } from '../Deck'
-import { COLORS } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 
 import { Svg } from '../../primitives'
 import { SingleSlotFixture } from './SingleSlotFixture'
@@ -44,8 +46,6 @@ export interface LabwareOnDeck {
   labwareLocation: LabwareLocation
   definition: LabwareDefinition2
   wellFill?: WellFill
-  /** user defined name for this instance of the labware */
-  displayName?: string | null
   /** generic prop to render self-positioned children for each labware */
   labwareChildren?: React.ReactNode
   onLabwareClick?: () => void
@@ -56,8 +56,6 @@ export interface ModuleOnDeck {
   moduleLocation: ModuleLocation
   nestedLabwareDef?: LabwareDefinition2 | null
   nestedLabwareWellFill?: WellFill
-  /** user defined name for this instance of the nested labware */
-  nestedLabwareDisplayName?: string | null
   innerProps?: React.ComponentProps<typeof Module>['innerProps']
   /** generic prop to render self-positioned children for each module */
   moduleChildren?: React.ReactNode
@@ -86,9 +84,9 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
     robotType,
     modulesOnDeck = [],
     labwareOnDeck = [],
-    lightFill = COLORS.light1,
-    mediumFill = COLORS.grey2,
-    darkFill = COLORS.darkBlack70,
+    lightFill = COLORS.grey35,
+    mediumFill = COLORS.grey50,
+    darkFill = COLORS.grey60,
     deckLayerBlocklist = [],
     deckConfig,
     showExpansion = true,
@@ -105,10 +103,14 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
       SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId)
   )
   const stagingAreaFixtures = deckConfig.filter(
-    fixture => fixture.cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE
+    fixture =>
+      fixture.cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE &&
+      STAGING_AREA_CUTOUTS.includes(fixture.cutoutId)
   )
   const trashBinFixtures = deckConfig.filter(
-    fixture => fixture.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
+    fixture =>
+      fixture.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE &&
+      MOVABLE_TRASH_CUTOUTS.includes(fixture.cutoutId)
   )
   const wasteChuteOnlyFixtures = deckConfig.filter(
     fixture =>
@@ -139,7 +141,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           {showSlotLabels ? (
             <SlotLabels
               robotType={robotType}
-              color={COLORS.darkBlackEnabled}
+              color={COLORS.black90}
               show4thColumn={
                 stagingAreaFixtures.length > 0 ||
                 wasteChuteStagingAreaFixtures.length > 0
@@ -159,7 +161,6 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           {stagingAreaFixtures.map(fixture => (
             <StagingAreaFixture
               key={fixture.cutoutId}
-              // TODO(bh, 2023-10-09): typeguard fixture location
               cutoutId={fixture.cutoutId as StagingAreaLocation}
               deckDefinition={deckDef}
               slotClipColor={darkFill}
@@ -177,33 +178,42 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               <FlexTrash
                 robotType={robotType}
                 trashIconColor={lightFill}
-                // TODO(bh, 2023-10-09): typeguard fixture location
                 trashCutoutId={fixture.cutoutId as TrashCutoutId}
                 backgroundColor={mediumFill}
               />
             </React.Fragment>
           ))}
-          {wasteChuteOnlyFixtures.map(fixture => (
-            <WasteChuteFixture
-              key={fixture.cutoutId}
-              // TODO(bh, 2023-10-09): typeguard fixture location
-              cutoutId={fixture.cutoutId as typeof WASTE_CHUTE_CUTOUT}
-              deckDefinition={deckDef}
-              fixtureBaseColor={lightFill}
-              wasteChuteColor={mediumFill}
-            />
-          ))}
-          {wasteChuteStagingAreaFixtures.map(fixture => (
-            <WasteChuteStagingAreaFixture
-              key={fixture.cutoutId}
-              // TODO(bh, 2023-10-09): typeguard fixture location
-              cutoutId={fixture.cutoutId as typeof WASTE_CHUTE_CUTOUT}
-              deckDefinition={deckDef}
-              slotClipColor={darkFill}
-              fixtureBaseColor={lightFill}
-              wasteChuteColor={mediumFill}
-            />
-          ))}
+          {wasteChuteOnlyFixtures.map(fixture => {
+            if (fixture.cutoutId === WASTE_CHUTE_CUTOUT) {
+              return (
+                <WasteChuteFixture
+                  key={fixture.cutoutId}
+                  cutoutId={fixture.cutoutId}
+                  deckDefinition={deckDef}
+                  fixtureBaseColor={lightFill}
+                  wasteChuteColor={mediumFill}
+                />
+              )
+            } else {
+              return null
+            }
+          })}
+          {wasteChuteStagingAreaFixtures.map(fixture => {
+            if (fixture.cutoutId === WASTE_CHUTE_CUTOUT) {
+              return (
+                <WasteChuteStagingAreaFixture
+                  key={fixture.cutoutId}
+                  cutoutId={fixture.cutoutId}
+                  deckDefinition={deckDef}
+                  slotClipColor={darkFill}
+                  fixtureBaseColor={lightFill}
+                  wasteChuteColor={mediumFill}
+                />
+              )
+            } else {
+              return null
+            }
+          })}
         </>
       )}
       <>
@@ -221,7 +231,6 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               moduleLocation.slotName,
               deckDef
             )
-
             const moduleDef = getModuleDef2(moduleModel)
             return slotPosition != null ? (
               <Module

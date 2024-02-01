@@ -54,7 +54,6 @@ PACKAGES = find_packages(where=".", exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
     f"opentrons=={VERSION}",
     f"opentrons-shared-data=={VERSION}",
-    f"notify-server=={VERSION}",
     f"server-utils=={VERSION}",
     "anyio==3.6.1",
     "fastapi==0.68.1",
@@ -67,6 +66,7 @@ INSTALL_REQUIRES = [
     "systemd-python==234; sys_platform=='linux'",
     "sqlalchemy==1.4.32",
     "aiosqlite==0.17.0",
+    "paho-mqtt==1.6.1",
 ]
 
 

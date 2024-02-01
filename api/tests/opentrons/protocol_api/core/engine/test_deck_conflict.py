@@ -9,6 +9,9 @@ from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons.motion_planning import deck_conflict as wrapped_deck_conflict
+from opentrons.protocol_api._trash_bin import TrashBin
+from opentrons.protocol_api._waste_chute import WasteChute
+from opentrons.protocol_api.labware import Labware
 from opentrons.protocol_api.core.engine import deck_conflict
 from opentrons.protocol_engine import Config, DeckSlotLocation, ModuleModel, StateView
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
@@ -83,6 +86,7 @@ def test_maps_labware_on_deck(decoy: Decoy, mock_state_view: StateView) -> None:
         engine_state=mock_state_view,
         existing_labware_ids=["labware-id"],
         existing_module_ids=[],
+        existing_disposal_locations=[],
         new_labware_id="labware-id",
     )
     decoy.verify(
@@ -137,6 +141,7 @@ def test_maps_module_without_labware(decoy: Decoy, mock_state_view: StateView) -
         engine_state=mock_state_view,
         existing_labware_ids=[],
         existing_module_ids=["module-id"],
+        existing_disposal_locations=[],
         new_module_id="module-id",
     )
     decoy.verify(
@@ -190,6 +195,7 @@ def test_maps_module_with_labware(decoy: Decoy, mock_state_view: StateView) -> N
         engine_state=mock_state_view,
         existing_labware_ids=[],
         existing_module_ids=["module-id"],
+        existing_disposal_locations=[],
         new_module_id="module-id",
     )
     decoy.verify(
@@ -227,6 +233,11 @@ def test_maps_different_module_models(
         expected_name_for_errors = module_model.value
         if module_model is ModuleModel.HEATER_SHAKER_MODULE_V1:
             return wrapped_deck_conflict.HeaterShakerModule(
+                name_for_errors=expected_name_for_errors,
+                highest_z_including_labware=3.14159,
+            )
+        elif module_model is ModuleModel.MAGNETIC_BLOCK_V1:
+            return wrapped_deck_conflict.MagneticBlockModule(
                 name_for_errors=expected_name_for_errors,
                 highest_z_including_labware=3.14159,
             )
@@ -268,6 +279,7 @@ def test_maps_different_module_models(
         engine_state=mock_state_view,
         existing_labware_ids=[],
         existing_module_ids=[],
+        existing_disposal_locations=[],
         new_module_id="module-id",
     )
     decoy.verify(
@@ -275,6 +287,46 @@ def test_maps_different_module_models(
             existing_items={},
             new_item=expected_mapping_result,
             new_location=DeckSlotName.SLOT_5,
+            robot_type=mock_state_view.config.robot_type,
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    ("robot_type", "deck_type"),
+    [
+        ("OT-2 Standard", DeckType.OT2_STANDARD),
+        ("OT-3 Standard", DeckType.OT3_STANDARD),
+    ],
+)
+def test_maps_trash_bins(decoy: Decoy, mock_state_view: StateView) -> None:
+    """It should correctly map disposal locations."""
+    mock_trash_lw = decoy.mock(cls=Labware)
+
+    deck_conflict.check(
+        engine_state=mock_state_view,
+        existing_labware_ids=[],
+        existing_module_ids=[],
+        existing_disposal_locations=[
+            TrashBin(location=DeckSlotName.SLOT_B1, addressable_area_name="blah"),
+            WasteChute(),
+            mock_trash_lw,
+        ],
+        new_trash_bin=TrashBin(
+            location=DeckSlotName.SLOT_A1, addressable_area_name="blah"
+        ),
+    )
+    decoy.verify(
+        wrapped_deck_conflict.check(
+            existing_items={
+                DeckSlotName.SLOT_B1: wrapped_deck_conflict.TrashBin(
+                    name_for_errors="trash bin",
+                )
+            },
+            new_item=wrapped_deck_conflict.TrashBin(
+                name_for_errors="trash bin",
+            ),
+            new_location=DeckSlotName.SLOT_A1,
             robot_type=mock_state_view.config.robot_type,
         )
     )
@@ -322,7 +374,7 @@ module = LoadedModule(
         ),
         # Out-of-bounds error
         (
-            Point(x=-10, y=100, z=60),
+            Point(x=-12, y=100, z=60),
             pytest.raises(
                 deck_conflict.PartialTipMovementNotAllowedError,
                 match="outside of robot bounds",

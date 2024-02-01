@@ -1,18 +1,19 @@
 import { UseQueryResult } from 'react-query'
+
 import {
   useAllSessionsQuery,
   useAllRunsQuery,
   useEstopQuery,
-  useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
+
 import {
   DISENGAGED,
   NOT_PRESENT,
   PHYSICALLY_ENGAGED,
 } from '../../../EmergencyStop'
-
 import { useIsRobotBusy } from '../useIsRobotBusy'
 import { useIsFlex } from '../useIsFlex'
+import { useNotifyCurrentMaintenanceRun } from '../../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 
 import type { Sessions, Runs } from '@opentrons/api-client'
 import type { AxiosError } from 'axios'
@@ -20,6 +21,9 @@ import type { AxiosError } from 'axios'
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../ProtocolUpload/hooks')
 jest.mock('../useIsFlex')
+jest.mock(
+  '../../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
+)
 
 const mockEstopStatus = {
   data: {
@@ -35,8 +39,8 @@ const mockUseAllSessionsQuery = useAllSessionsQuery as jest.MockedFunction<
 const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
   typeof useAllRunsQuery
 >
-const mockUseCurrentMaintenanceRun = useCurrentMaintenanceRun as jest.MockedFunction<
-  typeof useCurrentMaintenanceRun
+const mockUseNotifyCurrentMaintenanceRun = useNotifyCurrentMaintenanceRun as jest.MockedFunction<
+  typeof useNotifyCurrentMaintenanceRun
 >
 const mockUseEstopQuery = useEstopQuery as jest.MockedFunction<
   typeof useEstopQuery
@@ -55,7 +59,7 @@ describe('useIsRobotBusy', () => {
         },
       },
     } as UseQueryResult<Runs, AxiosError>)
-    mockUseCurrentMaintenanceRun.mockReturnValue({
+    mockUseNotifyCurrentMaintenanceRun.mockReturnValue({
       data: {},
     } as any)
     mockUseEstopQuery.mockReturnValue({ data: mockEstopStatus } as any)
@@ -188,7 +192,7 @@ describe('useIsRobotBusy', () => {
   })
 
   it('returns true when a maintenance run exists', () => {
-    mockUseCurrentMaintenanceRun.mockReturnValue({
+    mockUseNotifyCurrentMaintenanceRun.mockReturnValue({
       data: {
         data: {
           id: '123',

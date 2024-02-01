@@ -36,7 +36,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
   const terminateHeader: ModalHeaderBaseProps = {
     title: t('terminate') + '?',
     iconName: 'ot-alert',
-    iconColor: COLORS.yellow2,
+    iconColor: COLORS.yellow50,
   }
 
   return (
@@ -76,10 +76,10 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
           >
             <Flex
               height="12.5rem"
-              backgroundColor={COLORS.darkBlack20}
+              backgroundColor={COLORS.grey35}
               borderRadius={BORDERS.borderRadiusSize3}
               flexDirection={DIRECTION_COLUMN}
-              color={COLORS.darkBlack90}
+              color={COLORS.grey60}
               padding={SPACING.spacing24}
               alignItems={ALIGN_CENTER}
             >

@@ -49,10 +49,10 @@ const MODAL_STYLE = css`
   }
 `
 const SPINNER_STYLE = css`
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50};
   opacity: 100%;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    color: ${COLORS.darkBlackEnabled};
+    color: ${COLORS.black90};
     opacity: 70%;
   }
 `

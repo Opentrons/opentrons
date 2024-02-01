@@ -25,9 +25,10 @@ storybook-static
 api/**
 update-server/**
 robot-server/**
-notify-server/**
 shared-data/python/**
 hardware-testing/**
 
 # app-testing don't format the json protocols
 app-testing/files
+# app testing don't format the snapshots
+app-testing/tests/__snapshots__

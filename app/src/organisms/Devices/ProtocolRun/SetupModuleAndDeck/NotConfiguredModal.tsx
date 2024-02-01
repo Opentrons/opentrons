@@ -61,7 +61,7 @@ export const NotConfiguredModal = (
           <Flex paddingTop={SPACING.spacing16} flexDirection={DIRECTION_COLUMN}>
             <Flex
               padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
-              backgroundColor={COLORS.medGreyEnabled}
+              backgroundColor={COLORS.grey30}
               borderRadius={BORDERS.radiusSoftCorners}
               alignItems={ALIGN_CENTER}
               justifyContent={JUSTIFY_SPACE_BETWEEN}

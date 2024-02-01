@@ -6,6 +6,19 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## Opentrons Robot Software Changes in [!!EDIT ME WITH THE ACTUAL NUMBER OF THE NEXT RELEASE!!]
+
+### HTTP API
+
+- In the `/runs/commands`, `/maintenance_runs/commands`, and `/protocols` endpoints, the `dispense` command will now return an error if you try to dispense more than you've aspirated, instead of silently clamping.
+- The `/notifications/subscribe` WebSocket endpoint has been removed. See https://github.com/Opentrons/opentrons/pull/14280 for details.
+
+### Other Changes
+
+- The `notify_server` Python package has been removed. See https://github.com/Opentrons/opentrons/pull/14280 for details.
+
+---
+
 ## Opentrons Robot Software Changes in 7.1.1
 
 Welcome to the v7.1.1 release of the Opentrons robot software!

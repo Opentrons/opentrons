@@ -318,6 +318,7 @@ def test_load_labware(
             engine_state=mock_engine_client.state,
             existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="abc123",
         )
     )
@@ -389,22 +390,20 @@ def test_load_labware_on_staging_slot(
             engine_state=mock_engine_client.state,
             existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="abc123",
         )
     )
 
-    # TODO(jbl 11-17-2023) this is not hooked up yet to staging slots/addressable areas
-    # decoy.when(
-    #     mock_engine_client.state.geometry.get_slot_item(
-    #         slot_name=StagingSlotName.SLOT_B4,
-    #         allowed_labware_ids={"fixed-trash-123", "abc123"},
-    #         allowed_module_ids=set(),
-    #     )
-    # ).then_return(
-    #     LoadedLabware.construct(id="abc123")  # type: ignore[call-arg]
-    # )
-    #
-    # assert subject.get_slot_item(StagingSlotName.SLOT_B4) is result
+    decoy.when(
+        mock_engine_client.state.geometry.get_slot_item(
+            slot_name=StagingSlotName.SLOT_B4,
+        )
+    ).then_return(
+        LoadedLabware.construct(id="abc123")  # type: ignore[call-arg]
+    )
+
+    assert subject.get_slot_item(StagingSlotName.SLOT_B4) is result
 
 
 def test_load_labware_on_labware(
@@ -470,6 +469,7 @@ def test_load_labware_on_labware(
             engine_state=mock_engine_client.state,
             existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="abc123",
         )
     )
@@ -533,6 +533,7 @@ def test_load_labware_off_deck(
             engine_state=mock_engine_client.state,
             existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="abc123",
         )
     )
@@ -592,6 +593,7 @@ def test_load_adapter(
             engine_state=mock_engine_client.state,
             existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="abc123",
         )
     )
@@ -661,22 +663,20 @@ def test_load_adapter_on_staging_slot(
             engine_state=mock_engine_client.state,
             existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="abc123",
         )
     )
 
-    # TODO(jbl 11-17-2023) this is not hooked up yet to staging slots/addressable areas
-    # decoy.when(
-    #     mock_engine_client.state.geometry.get_slot_item(
-    #         slot_name=StagingSlotName.SLOT_B4,
-    #         allowed_labware_ids={"fixed-trash-123", "abc123"},
-    #         allowed_module_ids=set(),
-    #     )
-    # ).then_return(
-    #     LoadedLabware.construct(id="abc123")  # type: ignore[call-arg]
-    # )
-    #
-    # assert subject.get_slot_item(StagingSlotName.SLOT_B4) is result
+    decoy.when(
+        mock_engine_client.state.geometry.get_slot_item(
+            slot_name=StagingSlotName.SLOT_B4,
+        )
+    ).then_return(
+        LoadedLabware.construct(id="abc123")  # type: ignore[call-arg]
+    )
+
+    assert subject.get_slot_item(StagingSlotName.SLOT_B4) is result
 
 
 @pytest.mark.parametrize(
@@ -730,7 +730,14 @@ def test_move_labware(
             if pick_up_offset
             else None,
             drop_offset=LabwareOffsetVector(x=4, y=5, z=6) if drop_offset else None,
-        )
+        ),
+        deck_conflict.check(
+            engine_state=mock_engine_client.state,
+            existing_labware_ids=[],
+            existing_module_ids=[],
+            existing_disposal_locations=[],
+            new_labware_id="labware-id",
+        ),
     )
 
 
@@ -762,7 +769,14 @@ def test_move_labware_on_staging_slot(
             strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
             pick_up_offset=None,
             drop_offset=None,
-        )
+        ),
+        deck_conflict.check(
+            engine_state=mock_engine_client.state,
+            existing_labware_ids=[],
+            existing_module_ids=[],
+            existing_disposal_locations=[],
+            new_labware_id="labware-id",
+        ),
     )
 
 
@@ -799,7 +813,14 @@ def test_move_labware_on_non_connected_module(
             strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
             pick_up_offset=None,
             drop_offset=None,
-        )
+        ),
+        deck_conflict.check(
+            engine_state=mock_engine_client.state,
+            existing_labware_ids=[],
+            existing_module_ids=[],
+            existing_disposal_locations=[],
+            new_labware_id="labware-id",
+        ),
     )
 
 
@@ -832,7 +853,14 @@ def test_move_labware_off_deck(
             strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
             pick_up_offset=None,
             drop_offset=None,
-        )
+        ),
+        deck_conflict.check(
+            engine_state=mock_engine_client.state,
+            existing_labware_ids=[],
+            existing_module_ids=[],
+            existing_disposal_locations=[],
+            new_labware_id="labware-id",
+        ),
     )
 
 
@@ -900,6 +928,7 @@ def test_load_labware_on_module(
             engine_state=mock_engine_client.state,
             existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="abc123",
         )
     )
@@ -973,6 +1002,7 @@ def test_load_labware_on_non_connected_module(
             engine_state=mock_engine_client.state,
             existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="abc123",
         )
     )
@@ -1126,6 +1156,7 @@ def test_load_module(
             engine_state=mock_engine_client.state,
             existing_labware_ids=["fixed-trash-123"],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_module_id="abc123",
         )
     )
@@ -1290,6 +1321,7 @@ def test_load_mag_block(
             engine_state=mock_engine_client.state,
             existing_labware_ids=["fixed-trash-123"],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_module_id="abc123",
         )
     )
@@ -1375,6 +1407,7 @@ def test_load_module_thermocycler_with_no_location(
             engine_state=mock_engine_client.state,
             existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_module_id="abc123",
         )
     )

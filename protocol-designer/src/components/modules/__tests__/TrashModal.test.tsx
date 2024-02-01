@@ -1,9 +1,8 @@
 import * as React from 'react'
-import i18n from 'i18next'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import { renderWithProviders } from '@opentrons/components'
-
+import { i18n } from '../../../localization'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { getSlotIsEmpty } from '../../../step-forms'
 import {

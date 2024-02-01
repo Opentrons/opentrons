@@ -1,8 +1,8 @@
 import * as React from 'react'
-import i18n from 'i18next'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { i18n } from '../../../../localization'
 import { PipetteTypeTile } from '../PipetteTypeTile'
 import { EquipmentOption } from '../EquipmentOption'
 

@@ -2,6 +2,7 @@
 
 
 from opentrons import protocol_api, simulate
+from opentrons.protocols.api_support.types import APIVersion
 
 import contextlib
 from typing import ContextManager, Optional, Type
@@ -122,16 +123,6 @@ def test_trash_search() -> None:
             "2.16",
             "OT-2",
             False,
-            # This should ideally raise, matching OT-2 behavior on prior Protocol API versions.
-            # It currently does not because Protocol API v2.15's trashes are implemented as
-            # addressable areas, not labware--and they're only brought into existence
-            # *on first use,* not at the beginning of a protocol.
-            #
-            # The good news is that even though the conflicting load will not raise like we want,
-            # something in the protocol will eventually raise, e.g. when a pipette goes to drop a
-            # tip in the fixed trash and finds that a fixed trash can't exist there because there's
-            # a labware.
-            marks=pytest.mark.xfail(strict=True, raises=pytest.fail.Exception),
         ),
         pytest.param(
             "2.16",
@@ -156,10 +147,17 @@ def test_fixed_trash_load_conflicts(
     if expect_load_to_succeed:
         expected_error: ContextManager[object] = contextlib.nullcontext()
     else:
+        # If we're expecting an error, it'll be a LocationIsOccupied for 2.15 and below, otherwise
+        # it will fail with an IncompatibleAddressableAreaError, since slot 12 will not be in the deck config
+        if APIVersion.from_string(version) < APIVersion(2, 16):
+            error_name = "LocationIsOccupiedError"
+        else:
+            error_name = "IncompatibleAddressableAreaError"
+
         expected_error = pytest.raises(
             Exception,
-            # Exact message doesn't matter, as long as it's definitely a labware load conflict.
-            match="LocationIsOccupiedError",
+            # Exact message doesn't matter, as long as it's definitely a labware load or addressable area conflict.
+            match=error_name,
         )
 
     with expected_error:

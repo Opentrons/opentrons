@@ -7,21 +7,15 @@ import {
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from './constants'
-import type { CutoutFixtureId } from '../deck'
-import type {
-  AddressableArea,
-  CoordinateTuple,
-  Cutout,
-  DeckDefinition,
-  OT2Cutout,
-} from './types'
+import type { CutoutFixtureId, CutoutId, OT2CutoutId } from '../deck'
+import type { AddressableArea, CoordinateTuple, DeckDefinition } from './types'
 
-export function getCutoutDisplayName(cutout: Cutout): string {
+export function getCutoutDisplayName(cutout: CutoutId): string {
   return cutout.replace('cutout', '')
 }
 
 // mapping of OT-2 deck slots to cutouts
-export const OT2_CUTOUT_BY_SLOT_ID: { [slotId: string]: OT2Cutout } = {
+export const OT2_CUTOUT_BY_SLOT_ID: { [slotId: string]: OT2CutoutId } = {
   1: 'cutout1',
   2: 'cutout2',
   3: 'cutout3',
@@ -37,7 +31,7 @@ export const OT2_CUTOUT_BY_SLOT_ID: { [slotId: string]: OT2Cutout } = {
 }
 
 // mapping of Flex deck slots to cutouts
-export const FLEX_CUTOUT_BY_SLOT_ID: { [slotId: string]: Cutout } = {
+export const FLEX_CUTOUT_BY_SLOT_ID: { [slotId: string]: CutoutId } = {
   A1: 'cutoutA1',
   A2: 'cutoutA2',
   A3: 'cutoutA3',

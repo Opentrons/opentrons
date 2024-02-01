@@ -56,10 +56,7 @@ def test_app_settings(
         == "https://support.opentrons.com/s/article/Uninstall-the-Opentrons-App"
     )
     assert app_settings.get_link_to_previous_releases().is_displayed()
-    assert (
-        app_settings.get_link_to_previous_releases().get_attribute("href")
-        == "https://github.com/Opentrons/opentrons/releases"
-    )
+    assert app_settings.get_link_to_previous_releases().get_attribute("href") == "https://github.com/Opentrons/opentrons/releases"
     app_settings.click_close_previous_software_modal()
 
     assert app_settings.get_link_app_robot_sync().is_displayed()

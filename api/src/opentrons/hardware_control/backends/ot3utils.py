@@ -80,6 +80,7 @@ SUBSYSTEM_NODEID: Dict[SubSystem, NodeId] = {
     SubSystem.pipette_left: NodeId.pipette_left,
     SubSystem.pipette_right: NodeId.pipette_right,
     SubSystem.gripper: NodeId.gripper,
+    SubSystem.hepa_uv: NodeId.hepa_uv,
 }
 
 NODEID_SUBSYSTEM = {node: subsystem for subsystem, node in SUBSYSTEM_NODEID.items()}
@@ -105,16 +106,7 @@ def axis_nodes() -> List["NodeId"]:
 
 
 def node_axes() -> List[Axis]:
-    return [
-        Axis.X,
-        Axis.Y,
-        Axis.Z_L,
-        Axis.Z_R,
-        Axis.P_L,
-        Axis.P_R,
-        Axis.Z_G,
-        Axis.G,
-    ]
+    return Axis.node_axes()
 
 
 def home_axes() -> List[Axis]:

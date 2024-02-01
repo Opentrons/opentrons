@@ -18,11 +18,15 @@ export function useCurrentAllSubsystemUpdatesQuery<TError = Error>(
         response => response.data
       ),
     {
-      ...options,
       enabled: host !== null,
       onError: () => {
-        queryClient.resetQueries([host, '/subsystems/updates/current'])
+        queryClient.setQueryData(
+          [host, '/subsystems/updates/current'],
+          undefined
+        )
       },
+      retry: false,
+      ...options,
     }
   )
 

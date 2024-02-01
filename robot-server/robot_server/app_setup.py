@@ -24,6 +24,11 @@ from .runs.dependencies import (
     mark_light_control_startup_finished,
 )
 
+from .notification_client import (
+    initialize_notification_client,
+    clean_up_notification_client,
+)
+
 log = logging.getLogger(__name__)
 
 
@@ -74,7 +79,10 @@ async def on_startup() -> None:
         ],
     )
     start_initializing_persistence(
-        app_state=app.state, persistence_directory=persistence_directory
+        app_state=app.state, persistence_directory_root=persistence_directory
+    )
+    initialize_notification_client(
+        app_state=app.state,
     )
 
 
@@ -85,6 +93,7 @@ async def on_shutdown() -> None:
         clean_up_hardware(app.state),
         clean_up_persistence(app.state),
         clean_up_task_runner(app.state),
+        clean_up_notification_client(app.state),
         return_exceptions=True,
     )
 

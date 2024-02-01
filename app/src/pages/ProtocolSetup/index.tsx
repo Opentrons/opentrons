@@ -118,9 +118,9 @@ export function ProtocolSetupStep({
   disabledReason,
 }: ProtocolSetupStepProps): JSX.Element {
   const backgroundColorByStepStatus = {
-    ready: COLORS.green3,
-    'not ready': COLORS.yellow3,
-    general: COLORS.light1,
+    ready: COLORS.green35,
+    'not ready': COLORS.yellow35,
+    general: COLORS.blue35,
   }
   const { makeSnackbar } = useToaster()
 
@@ -134,13 +134,13 @@ export function ProtocolSetupStep({
   if (!disabled) {
     switch (status) {
       case 'general':
-        backgroundColor = COLORS.darkBlack40
+        backgroundColor = COLORS.blue35
         break
       case 'ready':
-        backgroundColor = COLORS.green3Pressed
+        backgroundColor = COLORS.green40
         break
       default:
-        backgroundColor = COLORS.yellow3Pressed
+        backgroundColor = COLORS.yellow40
     }
   } else backgroundColor = ''
 
@@ -160,7 +160,7 @@ export function ProtocolSetupStep({
       <Flex
         alignItems={ALIGN_CENTER}
         backgroundColor={
-          disabled ? COLORS.light1 : backgroundColorByStepStatus[status]
+          disabled ? COLORS.blue35 : backgroundColorByStepStatus[status]
         }
         borderRadius={BORDERS.borderRadiusSize4}
         gridGap={SPACING.spacing16}
@@ -169,7 +169,7 @@ export function ProtocolSetupStep({
       >
         {status !== 'general' && !disabled ? (
           <Icon
-            color={status === 'ready' ? COLORS.green2 : COLORS.yellow2}
+            color={status === 'ready' ? COLORS.green50 : COLORS.yellow50}
             size="2rem"
             name={status === 'ready' ? 'ot-check' : 'ot-alert'}
           />
@@ -177,7 +177,7 @@ export function ProtocolSetupStep({
         <StyledText
           as="h4"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={disabled ? COLORS.darkBlack60 : COLORS.darkBlack100}
+          color={disabled ? COLORS.grey50 : COLORS.black90}
         >
           {title}
         </StyledText>
@@ -185,7 +185,7 @@ export function ProtocolSetupStep({
           <StyledText
             as="p"
             textAlign={TEXT_ALIGN_RIGHT}
-            color={disabled ? COLORS.darkBlack60 : COLORS.darkBlack100}
+            color={disabled ? COLORS.grey50 : COLORS.black90}
           >
             {detail}
             {subDetail != null && detail != null ? <br /> : null}
@@ -607,7 +607,7 @@ function PrepareToRun({
                 </StyledText>
                 <StyledText
                   as="h4"
-                  color={COLORS.darkGreyEnabled}
+                  color={COLORS.grey50}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   overflowWrap="anywhere"
                 >

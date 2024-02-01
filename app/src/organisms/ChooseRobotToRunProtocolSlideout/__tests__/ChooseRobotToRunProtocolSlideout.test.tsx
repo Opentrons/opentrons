@@ -5,10 +5,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import { i18n } from '../../../i18n'
-import {
-  useProtocolDetailsForRun,
-  useTrackCreateProtocolRunEvent,
-} from '../../../organisms/Devices/hooks'
+import { useTrackCreateProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import {
   useCloseCurrentRun,
   useCurrentRunId,
@@ -33,7 +30,6 @@ import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
 import { useOffsetCandidatesForAnalysis } from '../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { ChooseRobotToRunProtocolSlideout } from '../'
 
-import type { ProtocolDetails } from '../../../organisms/Devices/hooks'
 import type { State } from '../../../redux/types'
 
 jest.mock('../../../organisms/Devices/hooks')
@@ -77,9 +73,6 @@ const mockUseCurrentRunStatus = useCurrentRunStatus as jest.MockedFunction<
   typeof useCurrentRunStatus
 >
 
-const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
-  typeof useProtocolDetailsForRun
->
 const mockUseCreateRunFromProtocol = useCreateRunFromProtocol as jest.MockedFunction<
   typeof useCreateRunFromProtocol
 >
@@ -132,9 +125,6 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     })
     mockUseCurrentRunId.mockReturnValue(null)
     mockUseCurrentRunStatus.mockReturnValue(null)
-    mockUseProtocolDetailsForRun.mockReturnValue({
-      displayName: 'A Protocol for Otie',
-    } as ProtocolDetails)
     when(mockUseCreateRunFromProtocol)
       .calledWith(
         expect.any(Object),

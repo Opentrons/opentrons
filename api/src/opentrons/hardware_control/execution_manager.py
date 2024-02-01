@@ -1,9 +1,18 @@
 import asyncio
 import functools
-from typing import Set, TypeVar, Type, cast, Callable, Any, overload
+from typing import (
+    Set,
+    TypeVar,
+    Type,
+    cast,
+    Callable,
+    Any,
+    Coroutine,
+    ParamSpec,
+    Concatenate,
+)
 from .types import ExecutionState
 from opentrons_shared_data.errors.exceptions import ExecutionCancelledError
-from collections.abc import Coroutine
 
 TaskContents = TypeVar("TaskContents")
 
@@ -73,15 +82,9 @@ class ExecutionManager:
                 pass
 
 
-DecoratedReturn = TypeVar("DecoratedReturn")
-DecoratedMethodReturningValue = TypeVar(
-    "DecoratedMethodReturningValue",
-    bound=Callable[..., Coroutine[None, None, DecoratedReturn]],
-)
-DecoratedMethodNoReturn = TypeVar(
-    "DecoratedMethodNoReturn", bound=Callable[..., Coroutine[None, None, None]]
-)
 SubclassInstance = TypeVar("SubclassInstance", bound="ExecutionManagerProvider")
+DecoratedMethodParams = ParamSpec("DecoratedMethodParams")
+DecoratedReturn = TypeVar("DecoratedReturn")
 
 
 class ExecutionManagerProvider:
@@ -108,31 +111,22 @@ class ExecutionManagerProvider:
     def execution_manager(self) -> ExecutionManager:
         return self._execution_manager
 
-    @overload
     @classmethod
     def wait_for_running(
-        cls: Type[SubclassInstance], decorated: DecoratedMethodReturningValue
-    ) -> DecoratedMethodReturningValue:
-        ...
-
-    @overload
-    @classmethod
-    def wait_for_running(
-        cls: Type[SubclassInstance], decorated: DecoratedMethodNoReturn
-    ) -> DecoratedMethodNoReturn:
-        ...
-
-    # this type ignore and the overloads are because mypy requires that a function
-    # whose signature declares it returns None not have a return statement, whereas
-    # this function's implementation relies on python having None actually be the
-    # thing you return, and it's mad at that
-    @classmethod  # type: ignore
-    def wait_for_running(
-        cls: Type[SubclassInstance], decorated: DecoratedMethodReturningValue
-    ) -> DecoratedMethodReturningValue:
+        cls: Type["ExecutionManagerProvider"],
+        decorated: Callable[
+            Concatenate[SubclassInstance, DecoratedMethodParams],
+            Coroutine[Any, Any, DecoratedReturn],
+        ],
+    ) -> Callable[
+        Concatenate[SubclassInstance, DecoratedMethodParams],
+        Coroutine[Any, Any, DecoratedReturn],
+    ]:
         @functools.wraps(decorated)
         async def replace(
-            inst: SubclassInstance, *args: Any, **kwargs: Any
+            inst: SubclassInstance,
+            *args: DecoratedMethodParams.args,
+            **kwargs: DecoratedMethodParams.kwargs,
         ) -> DecoratedReturn:
             if not inst._em_simulate:
                 await inst.execution_manager.wait_for_is_running()
@@ -149,7 +143,13 @@ class ExecutionManagerProvider:
             else:
                 return await decorated(inst, *args, **kwargs)
 
-        return cast(DecoratedMethodReturningValue, replace)
+        return cast(
+            Callable[
+                Concatenate[SubclassInstance, DecoratedMethodParams],
+                Coroutine[Any, Any, DecoratedReturn],
+            ],
+            replace,
+        )
 
     async def do_delay(self, duration_s: float) -> None:
         if not self._em_simulate:

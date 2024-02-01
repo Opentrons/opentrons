@@ -43,7 +43,6 @@ export function RecentProtocolRuns({
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.white}
-      border={BORDERS.lineBorder}
       borderRadius={BORDERS.radiusSoftCorners}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing16}
@@ -146,7 +145,7 @@ export function RecentProtocolRuns({
           <StyledText
             as="p"
             alignItems={ALIGN_CENTER}
-            color={COLORS.errorDisabled}
+            color={COLORS.grey40}
             display={DISPLAY_FLEX}
             flex="1 0"
             id="RecentProtocolRuns_offline"
