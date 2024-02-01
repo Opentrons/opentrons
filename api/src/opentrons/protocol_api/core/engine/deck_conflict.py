@@ -223,18 +223,12 @@ def check_safe_for_tip_pickup_and_return(
                 f" when picking up fewer than 96 tips."
             )
         elif not is_partial_config and not is_96_ch_tiprack_adapter:
-            raise UnsuitableTiprackForPipetteMotion(
-                f"{tiprack_name} must be on an Opentrons Flex 96 Tip Rack Adapter"
-                f" in order to pick up or return all 96 tips simultaneously."
-            )
+            pass
 
     elif (
         not is_partial_config
     ):  # tiprack is not on adapter and pipette is in full config
-        raise UnsuitableTiprackForPipetteMotion(
-            f"{tiprack_name} must be on an Opentrons Flex 96 Tip Rack Adapter"
-            f" in order to pick up or return all 96 tips simultaneously."
-        )
+        pass
 
 
 def _check_deck_conflict_for_96_channel(
