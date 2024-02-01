@@ -1,3 +1,4 @@
+import { vi, beforeEach, afterEach, it, expect, describe } from 'vitest'
 // json protocol file validator tests
 import fixtureV1JsonProtocol from '../../../protocol/fixtures/1/simple.json'
 import fixtureV3JsonProtocol from '../../../protocol/fixtures/3/simple.json'
@@ -10,17 +11,18 @@ import {
   validateJsonProtocolFileContents,
   parseProtocolData,
 } from '../parseProtocolData'
+import type { Mock } from 'vitest'
 
 describe('validateJsonProtocolFileContents', () => {
-  let handleError: jest.MockedFunction<any>
+  let handleError: Mock 
   // beforeAll
 
   beforeEach(() => {
-    handleError = jest.fn()
+    handleError = vi.fn()
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it(`should validate schemaV3 JSON protocol`, () => {
@@ -62,7 +64,7 @@ describe('validateJsonProtocolFileContents', () => {
   })
 
   it('should call handleError with INVALID_JSON_FILE if json is not parseable', () => {
-    const parseSpy = jest.spyOn(JSON, 'parse')
+    const parseSpy = vi.spyOn(JSON, 'parse')
     parseSpy.mockImplementation(() => {
       throw new Error('not parseable as JSON')
     })
@@ -118,13 +120,13 @@ describe('file extension validators', () => {
 })
 
 describe('parseProtocolData', () => {
-  let handleError: jest.MockedFunction<any>
+  let handleError: Mock
   beforeEach(() => {
-    handleError = jest.fn()
+    handleError = vi.fn()
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it(`should return null if not JSON and metadata not given`, () => {
