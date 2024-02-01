@@ -8,6 +8,7 @@ import { EquipmentOption } from '../EquipmentOption'
 
 import type { FormPipettesByMount } from '../../../../step-forms'
 import type { FormState, WizardTileProps } from '../types'
+import { UseFormGetValues } from 'react-hook-form'
 
 jest.mock('../EquipmentOption')
 
@@ -21,31 +22,32 @@ const render = (props: React.ComponentProps<typeof PipetteTypeTile>) => {
   })[0]
 }
 
+const values = {
+  fields: {
+    name: 'mockName',
+    description: 'mockDescription',
+    organizationOrAuthor: 'mockOrganizationOrAuthor',
+    robotType: FLEX_ROBOT_TYPE,
+  },
+  pipettesByMount: {
+    left: { pipetteName: null, tiprackDefURI: null },
+    right: { pipetteName: null, tiprackDefURI: null },
+  } as FormPipettesByMount,
+  modulesByType: {
+    heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
+    magneticBlockType: { onDeck: false, model: null, slot: '2' },
+    temperatureModuleType: { onDeck: false, model: null, slot: '3' },
+    thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
+  },
+  additionalEquipment: ['gripper'],
+} as FormState
+
 const mockWizardTileProps: Partial<WizardTileProps> = {
-  handleChange: jest.fn(),
-  handleBlur: jest.fn(),
   goBack: jest.fn(),
   proceed: jest.fn(),
-  setFieldValue: jest.fn(),
-  values: {
-    fields: {
-      name: 'mockName',
-      description: 'mockDescription',
-      organizationOrAuthor: 'mockOrganizationOrAuthor',
-      robotType: FLEX_ROBOT_TYPE,
-    },
-    pipettesByMount: {
-      left: { pipetteName: null, tiprackDefURI: null },
-      right: { pipetteName: null, tiprackDefURI: null },
-    } as FormPipettesByMount,
-    modulesByType: {
-      heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
-      magneticBlockType: { onDeck: false, model: null, slot: '2' },
-      temperatureModuleType: { onDeck: false, model: null, slot: '3' },
-      thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
-    },
-    additionalEquipment: ['gripper'],
-  } as FormState,
+  setValue: jest.fn(),
+  //  @ts-expect-error: need TS 4.3 or higher!!
+  watch: jest.fn(name => values[name]),
 }
 
 describe('PipetteTypeTile', () => {
@@ -82,26 +84,31 @@ describe('PipetteTypeTile', () => {
     expect(screen.getAllByText('mock EquipmentOption')).toHaveLength(5)
   })
   it('renders correct pipettes for ot-2 with no empty pip allowed', () => {
+    const values = {
+      fields: {
+        name: 'mockName',
+        description: 'mockDescription',
+        organizationOrAuthor: 'mockOrganizationOrAuthor',
+        robotType: OT2_ROBOT_TYPE,
+      },
+      pipettesByMount: {
+        left: { pipetteName: null, tiprackDefURI: null },
+        right: { pipetteName: null, tiprackDefURI: null },
+      } as FormPipettesByMount,
+      modulesByType: {
+        heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
+        magneticBlockType: { onDeck: false, model: null, slot: '2' },
+        temperatureModuleType: { onDeck: false, model: null, slot: '3' },
+        thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
+      },
+      additionalEquipment: ['gripper'],
+    } as FormState
+
     const mockWizardTileProps: Partial<WizardTileProps> = {
-      values: {
-        fields: {
-          name: 'mockName',
-          description: 'mockDescription',
-          organizationOrAuthor: 'mockOrganizationOrAuthor',
-          robotType: OT2_ROBOT_TYPE,
-        },
-        pipettesByMount: {
-          left: { pipetteName: null, tiprackDefURI: null },
-          right: { pipetteName: null, tiprackDefURI: null },
-        } as FormPipettesByMount,
-        modulesByType: {
-          heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
-          magneticBlockType: { onDeck: false, model: null, slot: '2' },
-          temperatureModuleType: { onDeck: false, model: null, slot: '3' },
-          thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
-        },
-        additionalEquipment: ['gripper'],
-      } as FormState,
+      proceed: jest.fn(),
+      setValue: jest.fn(),
+      //  @ts-expect-error: need TS 4.3 or higher!!
+      watch: jest.fn(name => values[name]),
     }
     props = {
       ...props,

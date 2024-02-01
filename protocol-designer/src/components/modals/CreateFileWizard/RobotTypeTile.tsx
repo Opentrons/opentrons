@@ -31,9 +31,8 @@ const ROBOT_TYPES: RobotType[] = [OT2_ROBOT_TYPE, FLEX_ROBOT_TYPE]
 export function RobotTypeTile(props: WizardTileProps): JSX.Element {
   const { setValue, proceed, watch } = props
   const { t } = useTranslation(['modal', 'application'])
-  const [liveRobotType] = watch(['fields.robotType'], {
-    fields: { robotType: OT2_ROBOT_TYPE },
-  })
+  const fields = watch('fields')
+  const liveRobotType = fields?.robotType ?? OT2_ROBOT_TYPE
 
   return (
     <HandleEnter onEnter={proceed}>
