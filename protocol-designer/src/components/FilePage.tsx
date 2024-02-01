@@ -85,7 +85,6 @@ export const FilePage = (): JSX.Element => {
   const {
     handleSubmit,
     watch,
-    register,
     control,
     formState: { isDirty },
   } = useForm<FileMetadataFields>({ defaultValues: formValues })

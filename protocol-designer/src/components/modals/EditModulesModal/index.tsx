@@ -5,7 +5,6 @@ import some from 'lodash/some'
 import {
   Control,
   Controller,
-  FormState,
   useController,
   useForm,
   UseFormWatch,
@@ -196,11 +195,7 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
     return errors
   }
 
-  const {
-    control,
-    handleSubmit,
-    watch,
-  } = useForm<EditModulesFormValues>({
+  const { control, handleSubmit, watch } = useForm<EditModulesFormValues>({
     defaultValues: initialValues,
   })
 
@@ -296,7 +291,7 @@ const EditModulesModalComponent = (
     </div>
   )
 
-  const slotIssue = validation['selectedSlot'] != null
+  const slotIssue = validation.selectedSlot != null
   const showSlotOption = moduleType !== THERMOCYCLER_MODULE_TYPE
 
   const prevSelectedModel = usePrevious(selectedModel)
@@ -401,7 +396,7 @@ const EditModulesModalComponent = (
             {slotIssue ? (
               <PDAlert
                 alertType="warning"
-                title={validation['selectedSlot']}
+                title={validation.selectedSlot}
                 description={''}
               />
             ) : null}
@@ -452,7 +447,7 @@ const EditModulesModalComponent = (
         </OutlineButton>
         <OutlineButton
           className={styles.button_margin}
-          disabled={slotIssue || validation['selectedModel'] != null}
+          disabled={slotIssue || validation.selectedModel != null}
           type={BUTTON_TYPE_SUBMIT}
         >
           {t('button:save')}
