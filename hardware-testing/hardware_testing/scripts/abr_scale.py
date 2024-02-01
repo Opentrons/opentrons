@@ -1,11 +1,13 @@
 """ABR Scale Reader."""
-import os, datetime
+import os
+import datetime
 from hardware_testing import data
 from hardware_testing.drivers import find_port
 from hardware_testing.drivers.radwag import RadwagScale
-from typing import Dict, List
+from typing import Dict
+from typing import List
 
-### VARIABLES ###
+
 # Test Variables
 test_type_list = ["E", "P"]
 step_list = ["1", "2", "3"]
@@ -143,7 +145,7 @@ if __name__ == "__main__":
                 if line_count < 2:
                     print(f"Line count is {line_count}. Re-weigh.")
                     grams, is_stable = scale.read_mass()
-                    while not (is_stable == True):
+                    while is_stable is False:
                         grams, is_stable = scale.read_mass()
                         print(f"Scale reading: grams={grams}, is_stable={is_stable}")
                         time_now = datetime.datetime.now()
