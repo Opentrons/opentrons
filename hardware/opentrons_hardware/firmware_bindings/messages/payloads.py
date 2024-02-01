@@ -626,4 +626,12 @@ class GetMotorUsageResponsePayload(_GetMotorUsageResponsePayloadBase):
         inst.message_index = message_index
         return inst
 
+
+@dataclass(eq=False)
+class HepaUVInfoResponsePayload(EmptyPayload):
+    """A response carrying data about an attached gripper."""
+
+    model: utils.UInt16Field
+    serial: SerialDataCodeField
+
     usage_elements: List[MotorUsageTypeField]
