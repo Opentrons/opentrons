@@ -1,10 +1,10 @@
-import styled, { css } from 'styled-components'
+import styled, { StyledComponent, css } from 'styled-components'
 
 import * as Styles from '../styles'
 import { styleProps, isntStyleProp } from './style-props'
 
-import type { PrimitiveComponent } from './types'
 import { RESPONSIVENESS } from '../ui-style-constants'
+import type { StyleProps } from './types'
 
 export const BUTTON_TYPE_SUBMIT: 'submit' = 'submit'
 export const BUTTON_TYPE_RESET: 'reset' = 'reset'
@@ -43,14 +43,13 @@ const BUTTON_VARIANT_STYLE = css`
   text-transform: ${Styles.TEXT_TRANSFORM_UPPERCASE};
 `
 
-type BtnComponent = PrimitiveComponent<'button'>
 
 /**
  * Button primitive
  *
  * @component
  */
-export const Btn: BtnComponent = styled.button
+export const Btn: StyledComponent<'button', any, StyleProps, any> = styled.button
   .withConfig({
     shouldForwardProp: isntStyleProp,
   })

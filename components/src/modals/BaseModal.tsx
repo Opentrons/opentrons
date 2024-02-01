@@ -96,7 +96,7 @@ export function BaseModal(props: BaseModalProps): JSX.Element {
       zIndex="1"
       backgroundColor={overlayColor}
       cursor="default"
-      onClick={e => {
+      onClick={(e: React.MouseEvent) => {
         e.stopPropagation()
         if (onOutsideClick) onOutsideClick(e)
       }}
@@ -105,7 +105,7 @@ export function BaseModal(props: BaseModalProps): JSX.Element {
         <Box
           {...MODAL_STYLE}
           {...styleProps}
-          onClick={e => {
+          onClick={(e: React.MouseEvent) => {
             e.stopPropagation()
           }}
         >

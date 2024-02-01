@@ -24,4 +24,5 @@ export function RobotCoordinateSpace(
 /**
  * These animated components needs to be split out because react-spring and styled-components don't play nice
  * @see https://github.com/pmndrs/react-spring/issues/1515 */
-const AnimatedSvg = styled(animated.svg)<any>``
+// @ts-expect-error
+const AnimatedSvg = styled(animated.svg)<typeof animated.svg>``
