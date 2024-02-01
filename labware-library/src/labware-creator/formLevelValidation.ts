@@ -93,11 +93,7 @@ const partialCast = <TKey extends keyof LabwareFields>(
     // ignore them. We can sniff if something is a Yup error by checking error.name.
     // See https://github.com/jquense/yup#validationerrorerrors-string--arraystring-value-any-path-string
     // and https://github.com/formium/formik/blob/2d613c11a67b1c1f5189e21b8d61a9dd8a2d0a2e/packages/formik/src/Formik.tsx
-    if (
-      error instanceof Error &&
-      error.name !== 'ValidationError' &&
-      error.name !== 'TypeError'
-    ) {
+    if (error.name !== 'ValidationError' && error.name !== 'TypeError') {
       // TODO(IL, 2021-05-19): why are missing values for required fields giving TypeError instead of ValidationError?
       // Is this partial schema (from `pick`) not handing requireds correctly??
       throw error

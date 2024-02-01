@@ -3,7 +3,7 @@
 
 import pick from 'lodash/pick'
 
-import type * as Types from './types'
+import * as Types from './types'
 
 import type { CSSObject } from 'styled-components'
 
@@ -164,8 +164,8 @@ const layoutStyles = (props: Types.StyleProps): CSSObject => {
   const { size, ...styles } = pick(props, LAYOUT_PROPS) as CSSObject
 
   if (size != null) {
-    styles.width = styles.width ?? ((size as unknown) as typeof styles.width)
-    styles.height = styles.height ?? ((size as unknown) as typeof styles.height)
+    styles.width = styles.width ?? (size as typeof styles.width)
+    styles.height = styles.height ?? (size as typeof styles.height)
   }
 
   return styles

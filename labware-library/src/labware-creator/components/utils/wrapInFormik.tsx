@@ -10,5 +10,4 @@ import { Formik, FormikConfig } from 'formik'
 export const wrapInFormik = <Values,>(
   component: JSX.Element,
   formikConfig: FormikConfig<Values>
-  // @ts-expect-error
 ): JSX.Element => <Formik {...formikConfig}>{() => component}</Formik>

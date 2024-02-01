@@ -47,17 +47,15 @@ function getRootReducer(): Reducer<BaseState, Action> {
           return rootReducer(resetState, action)
         } catch (e) {
           console.error(e)
-          if (e instanceof Error) {
-            // something in the reducers went wrong, show it to the user for bug report
-            return rootReducer(
-              state,
-              fileUploadMessage({
-                isError: true,
-                errorType: 'INVALID_JSON_FILE',
-                errorMessage: e.message,
-              })
-            )
-          }
+          // something in the reducers went wrong, show it to the user for bug report
+          return rootReducer(
+            state,
+            fileUploadMessage({
+              isError: true,
+              errorType: 'INVALID_JSON_FILE',
+              errorMessage: e.message,
+            })
+          )
         }
       }
 

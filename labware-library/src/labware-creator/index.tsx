@@ -198,12 +198,10 @@ export const LabwareCreator = (): JSX.Element => {
             parsedLabwareDef = JSON.parse(result as string)
           } catch (error) {
             console.error(error)
-            if (error instanceof Error) {
-              setImportError({
-                key: 'INVALID_JSON_FILE',
-                messages: [error.message],
-              })
-            }
+            setImportError({
+              key: 'INVALID_JSON_FILE',
+              messages: [error.message],
+            })
             return
           }
 

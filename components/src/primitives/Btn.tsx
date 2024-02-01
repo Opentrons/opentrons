@@ -66,7 +66,7 @@ export const Btn: BtnComponent = styled.button
  *
  * @component
  */
-export const PrimaryBtn = styled(Btn)`
+export const PrimaryBtn: BtnComponent = styled(Btn)`
   ${BUTTON_VARIANT_STYLE}
   background-color: ${Styles.C_DARK_GRAY};
   color: ${Styles.C_WHITE};
@@ -96,7 +96,7 @@ export const PrimaryBtn = styled(Btn)`
  *
  * @component
  */
-export const SecondaryBtn = styled(Btn)`
+export const SecondaryBtn: BtnComponent = styled(Btn)`
   ${BUTTON_VARIANT_STYLE}
   background-color: ${Styles.C_WHITE};
   border-width: ${Styles.BORDER_WIDTH_DEFAULT};
@@ -125,7 +125,7 @@ export const SecondaryBtn = styled(Btn)`
  *
  * @component
  */
-export const NewPrimaryBtn = styled(PrimaryBtn)`
+export const NewPrimaryBtn: BtnComponent = styled(PrimaryBtn)`
   background-color: ${Styles.C_BLUE};
   color: ${Styles.C_WHITE};
 
@@ -155,7 +155,7 @@ export const NewPrimaryBtn = styled(PrimaryBtn)`
  *
  * @component
  */
-export const NewSecondaryBtn = styled(SecondaryBtn)`
+export const NewSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
   background-color: ${Styles.C_WHITE};
   color: ${Styles.C_BLUE};
 
@@ -190,7 +190,7 @@ export const NewSecondaryBtn = styled(SecondaryBtn)`
  *
  * @component
  */
-export const NewAlertPrimaryBtn = styled(NewPrimaryBtn)`
+export const NewAlertPrimaryBtn: BtnComponent = styled(NewPrimaryBtn)`
   background-color: ${Styles.C_ERROR_DARK};
 
   &:hover,
@@ -210,7 +210,7 @@ export const NewAlertPrimaryBtn = styled(NewPrimaryBtn)`
  *
  * @component
  */
-export const NewAlertSecondaryBtn = styled(NewSecondaryBtn)`
+export const NewAlertSecondaryBtn: BtnComponent = styled(NewSecondaryBtn)`
   color: ${Styles.C_ERROR_DARK};
 
   &:hover,
@@ -230,7 +230,7 @@ export const NewAlertSecondaryBtn = styled(NewSecondaryBtn)`
  *
  * @component
  */
-export const LightSecondaryBtn = styled(SecondaryBtn)`
+export const LightSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
   background-color: ${Styles.C_TRANSPARENT};
   color: ${Styles.C_WHITE};
 
@@ -257,6 +257,6 @@ export const LightSecondaryBtn = styled(SecondaryBtn)`
  *
  * @component
  */
-export const TertiaryBtn = styled(LightSecondaryBtn)`
+export const TertiaryBtn: BtnComponent = styled(LightSecondaryBtn)`
   border-width: 0;
 `

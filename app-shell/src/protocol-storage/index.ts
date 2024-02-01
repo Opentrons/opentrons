@@ -20,15 +20,13 @@ export const getUnixTimeFromAnalysisPath = (analysisPath: string): number =>
 
 export const getParsedAnalysisFromPath = (
   analysisPath: string
-): ProtocolAnalysisOutput | undefined => {
+): ProtocolAnalysisOutput => {
   try {
     return fse.readJsonSync(analysisPath)
   } catch (error) {
-    const errorMessage =
-      error instanceof Error && error?.message != null
-        ? error.message
-        : 'protocol analysis file cannot be parsed'
-    return createFailedAnalysis(errorMessage)
+    return createFailedAnalysis(
+      error?.message ?? 'protocol analysis file cannot be parsed'
+    )
   }
 }
 
@@ -137,7 +135,7 @@ export const fetchProtocols = (
         }, null)
         const mostRecentAnalysis =
           mostRecentAnalysisFilePath != null
-            ? getParsedAnalysisFromPath(mostRecentAnalysisFilePath) ?? null
+            ? getParsedAnalysisFromPath(mostRecentAnalysisFilePath)
             : null
 
         return {

@@ -65,9 +65,7 @@ export const loadProtocolFile = (
         parsedProtocol && dispatch(loadFileAction(parsedProtocol))
       } catch (error) {
         console.error(error)
-        if (error instanceof Error) {
-          fileError('INVALID_JSON_FILE', error.message)
-        }
+        fileError('INVALID_JSON_FILE', error.message)
       }
     }
 

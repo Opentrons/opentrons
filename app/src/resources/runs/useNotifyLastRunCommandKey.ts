@@ -15,12 +15,20 @@ export function useNotifyLastRunCommandKey(
   const host = useHost()
   const [refetchUsingHTTP, setRefetchUsingHTTP] = React.useState(true)
 
-  const { isNotifyError } = useNotifyService<CommandsData>({
-    topic: 'robot-server/runs/current_command',
-    queryKey: [host, 'runs', 'current_command'],
-    refetchUsingHTTP: () => setRefetchUsingHTTP(true),
-    options: options != null ? options : {},
-  })
+  const { notifyQueryResponse, isNotifyError } = useNotifyService<CommandsData>(
+    {
+      topic: 'robot-server/runs/current_command',
+      queryKey: [host, 'runs', 'current_command'],
+      refetchUsingHTTP: () => setRefetchUsingHTTP(true),
+      options: options != null ? options : {},
+    }
+  )
+  const notifyQueryResponseData =
+    notifyQueryResponse.data?.data?.[0]?.intent !== 'setup'
+      ? notifyQueryResponse.data?.links?.current?.meta?.key ??
+        notifyQueryResponse.data?.data?.[0]?.key ??
+        null
+      : null
 
   const isNotifyEnabled = !isNotifyError && !options?.forceHttpPolling
   if (!isNotifyEnabled && !refetchUsingHTTP) setRefetchUsingHTTP(true)
@@ -32,5 +40,5 @@ export function useNotifyLastRunCommandKey(
     onSettled: isNotifyEnabled ? () => setRefetchUsingHTTP(false) : undefined,
   })
 
-  return httpResponse
+  return isHTTPEnabled ? httpResponse : notifyQueryResponseData
 }

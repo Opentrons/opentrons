@@ -93,7 +93,6 @@ describe('syncSystemTimeEpic', () => {
       )
 
       expect(
-        // @ts-expect-error
         Math.abs(differenceInSeconds(new Date(), parseISO(updatedTime)))
       ).toBe(0)
     })

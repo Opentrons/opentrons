@@ -120,14 +120,12 @@ const _createCustomLabwareDef: (
       parsedLabwareDef = JSON.parse((result as any) as string)
     } catch (error) {
       console.error(error)
-      if (error instanceof Error) {
-        return dispatch(
-          labwareUploadMessage({
-            messageType: 'INVALID_JSON_FILE',
-            errorText: error.message,
-          })
-        )
-      }
+      return dispatch(
+        labwareUploadMessage({
+          messageType: 'INVALID_JSON_FILE',
+          errorText: error.message,
+        })
+      )
     }
 
     const valid: boolean | PromiseLike<any> =
