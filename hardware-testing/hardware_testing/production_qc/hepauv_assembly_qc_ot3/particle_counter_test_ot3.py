@@ -123,9 +123,15 @@ async def _main(simulating: bool) -> None:
                 await api.grip(20)
                 await api.ungrip()
 
+
+                #等待10s
+                await asyncio.sleep(11)
+
                 #获取数据
                 alldata = uvinstrument.get_uv_()
                 intdatadict = uvinstrument.parse_modbus_data(alldata)
+
+                
 
 
 
