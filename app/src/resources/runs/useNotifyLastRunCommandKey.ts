@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useQueryClient } from 'react-query'
 
 import { useHost } from '@opentrons/react-api-client'
 import { useNotifyService } from '../useNotifyService'
@@ -14,13 +13,11 @@ export function useNotifyLastRunCommandKey(
   options?: QueryOptionsWithPolling<CommandsData, Error>
 ): string | null {
   const host = useHost()
-  const queryClient = useQueryClient()
   const [refetchUsingHTTP, setRefetchUsingHTTP] = React.useState(true)
-  const queryKey = [host, 'maintenance_runs', 'current_run']
 
   const { isNotifyError } = useNotifyService<CommandsData>({
     topic: 'robot-server/runs/current_command',
-    queryKey,
+    queryKey: [host, 'runs', 'current_command'],
     refetchUsingHTTP: () => setRefetchUsingHTTP(true),
     options: options != null ? options : {},
   })
@@ -35,14 +32,5 @@ export function useNotifyLastRunCommandKey(
     onSettled: isNotifyEnabled ? () => setRefetchUsingHTTP(false) : undefined,
   })
 
-  const currentCachedResponse =
-    queryClient.getQueryData<string | null>(queryKey) ?? null
-
-  if (httpResponse !== currentCachedResponse) {
-    queryClient.setQueryData(queryKey, httpResponse)
-  }
-  const httpResponseData =
-    queryClient.getQueryData<string | null>(queryKey) ?? null
-
-  return httpResponseData
+  return httpResponse
 }
