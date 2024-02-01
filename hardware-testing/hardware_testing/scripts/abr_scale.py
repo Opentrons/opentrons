@@ -122,7 +122,7 @@ if __name__ == "__main__":
             test_name=test_name, run_id=run_id, file_name=file_name, data=header_str
         )
         results_list = []
-        while not (is_stable == True):
+        while is_stable is False:
             grams, is_stable = scale.read_mass()
             print(f"Scale reading: grams={grams}, is_stable={is_stable}")
             time_now = datetime.datetime.now()
