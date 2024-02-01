@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
 import {
   useDeleteMaintenanceRunMutation,
-  useCurrentMaintenanceRun,
   useDeckConfigurationQuery,
 } from '@opentrons/react-api-client'
 import { COLORS } from '@opentrons/components'
@@ -12,8 +11,8 @@ import {
   getModuleType,
   getModuleDisplayName,
   FLEX_CUTOUT_BY_SLOT_ID,
+  CutoutConfig,
 } from '@opentrons/shared-data'
-
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { StyledText } from '../../atoms/text'
@@ -38,6 +37,7 @@ import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type { SingleSlotCutoutFixtureId } from '@opentrons/shared-data'
+import type { CutoutId } from '@opentrons/shared-data'
 
 interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
@@ -72,7 +72,7 @@ export const ModuleWizardFlows = (
   const moduleCalibrationSteps = getModuleCalibrationSteps()
   const deckConfig = useDeckConfigurationQuery().data ?? []
   const occupiedCutouts = deckConfig.filter(
-    fixture =>
+    (fixture: CutoutConfig) =>
       !(fixture.cutoutFixtureId as SingleSlotCutoutFixtureId)?.includes(
         'single'
       )
@@ -83,7 +83,8 @@ export const ModuleWizardFlows = (
     ]?.filter(
       slot =>
         !occupiedCutouts.some(
-          occCutout => occCutout.cutoutId === FLEX_CUTOUT_BY_SLOT_ID[slot]
+          (occCutout: CutoutConfig) =>
+            occCutout.cutoutId === FLEX_CUTOUT_BY_SLOT_ID[slot]
         )
     ) ?? []
 
