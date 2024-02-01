@@ -60,7 +60,7 @@ for i in range(len(labware)):
     robot_labware["Labware"].extend(labware[i])
 
 
-def _get_user_input(list: List, some_string:str ) -> str:
+def _get_user_input(list: List, some_string: str) -> str:
     variable = input(some_string)
     while variable not in list:
         print(
@@ -107,7 +107,9 @@ if __name__ == "__main__":
             ],
         }
         labware_list = filtered_robot_labware["Labware"]
-        labware_input = _get_user_input(labware_list, f"Labware, Expected Values: {labware_list}: ")
+        labware_input = _get_user_input(
+            labware_list, f"Labware, Expected Values: {labware_list}: "
+        )
         step = _get_user_input(step_list, "Testing Step (1, 2, 3): ")
         # Set up .csv file
         tag = labware_input + "-" + str(step)
@@ -139,7 +141,31 @@ if __name__ == "__main__":
             with open(file_path, "r") as file:
                 line_count = sum(1 for line in file)
                 if line_count < 2:
-                    print(f"Line count is {line_count}. Check file.")
+                    print(f"Line count is {line_count}. Re-weigh.")
+                    grams, is_stable = scale.read_mass()
+                    while not (is_stable == True):
+                        grams, is_stable = scale.read_mass()
+                        print(f"Scale reading: grams={grams}, is_stable={is_stable}")
+                        time_now = datetime.datetime.now()
+                        row = [
+                            time_now,
+                            labware_input,
+                            step,
+                            robot_to_filter,
+                            grams,
+                            is_stable,
+                        ]
+                        results_list.append(row)
+                        if is_stable is True:
+                            print("is stable")
+                            break
+                    result_string = ""
+                    for sublist in results_list:
+                        row_str = ", ".join(map(str, sublist)) + "\n"
+                        result_string += row_str
+                    file_path = data.append_data_to_file(
+                        test_name, run_id, file_name, result_string
+                    )
         else:
             print("File did not save.")
     finally:
