@@ -1,6 +1,8 @@
 // electron main entry point
 import { app, ipcMain } from 'electron'
+import dns from 'dns'
 import contextMenu from 'electron-context-menu'
+import { webusb } from 'usb'
 
 import { createUi, registerReloadUi } from './ui'
 import { initializeMenu } from './menu'
@@ -14,10 +16,20 @@ import { registerSystemInfo } from './system-info'
 import { registerProtocolStorage } from './protocol-storage'
 import { getConfig, getStore, getOverrides, registerConfig } from './config'
 import { registerUsb } from './usb'
+import { createUsbDeviceMonitor } from './system-info/usb-devices'
 import { registerNotify, closeAllNotifyConnections } from './notify'
 
 import type { BrowserWindow } from 'electron'
 import type { Dispatch, Logger } from './types'
+
+/**
+ * node 17 introduced a change to default IP resolving to prefer IPv6 which causes localhost requests to fail
+ * setting the default to IPv4 fixes the issue
+ * https://github.com/node-fetch/node-fetch/issues/1624
+ */
+// TODO(bh, 2024-1-30): @types/node needs to be updated to address this type error. updating @types/node will also require updating our typescript version
+// @ts-expect-error
+dns.setDefaultResultOrder('ipv4first')
 
 const config = getConfig()
 const log = createLogger('main')
@@ -45,6 +57,9 @@ if (config.devtools) app.once('ready', installDevtools)
 
 app.once('window-all-closed', () => {
   log.debug('all windows closed, quitting the app')
+  webusb.removeEventListener('connect', () => createUsbDeviceMonitor())
+  webusb.removeEventListener('disconnect', () => createUsbDeviceMonitor())
+  app.quit()
   closeAllNotifyConnections()
     .then(() => {
       app.quit()
@@ -62,6 +77,8 @@ function startUp(): void {
     log.error('Uncaught Promise rejection: ', { reason })
   )
 
+  webusb.addEventListener('connect', () => createUsbDeviceMonitor())
+  webusb.addEventListener('disconnect', () => createUsbDeviceMonitor())
   mainWindow = createUi()
   rendererLogger = createRendererLogger()
 
