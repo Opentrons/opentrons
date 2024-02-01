@@ -626,6 +626,8 @@ class GetMotorUsageResponsePayload(_GetMotorUsageResponsePayloadBase):
         inst.message_index = message_index
         return inst
 
+    usage_elements: List[MotorUsageTypeField]
+
 
 @dataclass(eq=False)
 class HepaUVInfoResponsePayload(EmptyPayload):
@@ -633,5 +635,3 @@ class HepaUVInfoResponsePayload(EmptyPayload):
 
     model: utils.UInt16Field
     serial: SerialDataCodeField
-
-    usage_elements: List[MotorUsageTypeField]
