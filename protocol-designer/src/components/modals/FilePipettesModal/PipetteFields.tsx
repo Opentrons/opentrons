@@ -142,7 +142,10 @@ export function PipetteFields(props: Props): JSX.Element {
             options={tiprackOptions}
             value={values[mount].tiprackDefURI}
             name={`pipettesByMount.${mount}.tiprackDefURI`}
-            onChange={field.onChange}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+              field.onChange(e)
+              trigger(`pipettesByMount.${mount}.tiprackDefURI`)
+            }}
             onBlur={field.onBlur}
           />
         )}
