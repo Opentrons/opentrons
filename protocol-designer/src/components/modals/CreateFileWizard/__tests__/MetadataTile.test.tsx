@@ -14,7 +14,7 @@ const render = (props: React.ComponentProps<typeof MetadataTile>) => {
 
 const values = {
   fields: {
-    name: 'mockName',
+    name: '',
     description: 'mockDescription',
     organizationOrAuthor: 'mockOrganizationOrAuthor',
     robotType: FLEX_ROBOT_TYPE,
