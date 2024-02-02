@@ -83,7 +83,6 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
   if (connectionStore[hostname] == null) {
     connectionStore[hostname] = {
       client: null,
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       subscriptions: { [topic]: 1 } as Record<NotifyTopic, number>,
     }
     return connectAsync(`mqtt://${hostname}`)
@@ -114,21 +113,25 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
   }
   // true if the connection store has an entry for the hostname.
   else {
-    const topicCount = connectionStore[hostname].subscriptions[topic]
-    topicCount > 0
-      ? (connectionStore[hostname].subscriptions[topic] += 1)
-      : (connectionStore[hostname].subscriptions[topic] = 1)
-
-    return new Promise<void>(() => checkIfClientConnected()).catch(() => {
-      log.warn(`Failed to subscribe on ${hostname} to topic: ${topic}`)
-      sendToBrowserDeserialized({
-        browserWindow,
-        hostname,
-        topic,
-        message: 'ECONNFAILED',
+    const subscriptions = connectionStore[hostname]?.subscriptions
+    if (subscriptions && subscriptions[topic] > 0) {
+      subscriptions[topic] += 1
+      return Promise.resolve()
+    } else {
+      if (subscriptions) {
+        subscriptions[topic] = 1
+      }
+      return new Promise<void>(() => checkIfClientConnected()).catch(() => {
+        log.warn(`Failed to subscribe on ${hostname} to topic: ${topic}`)
+        sendToBrowserDeserialized({
+          browserWindow,
+          hostname,
+          topic,
+          message: 'ECONNFAILED',
+        })
+        handleDecrementSubscriptionCount(hostname, topic)
       })
-      handleDecrementSubscriptionCount(hostname, topic)
-    })
+    }
   }
 
   function subscribeCb(error: Error, result: mqtt.ISubscriptionGrant[]): void {
@@ -185,16 +188,25 @@ function unsubscribe(notifyParams: NotifyParams): Promise<void> {
   return new Promise<void>(() => {
     if (hostname in connectionStore) {
       const { client } = connectionStore[hostname]
-      client?.unsubscribe(topic, {}, (error, result) => {
-        if (error != null) {
-          log.warn(`Failed to unsubscribe on ${hostname} from topic: ${topic}`)
-        } else {
-          log.info(
-            `Successfully unsubscribed on ${hostname} from topic: ${topic}`
-          )
-          handleDecrementSubscriptionCount(hostname, topic)
-        }
-      })
+      const subscriptions = connectionStore[hostname]?.subscriptions
+      const isLastSubscription = subscriptions[topic] <= 1
+
+      if (isLastSubscription) {
+        client?.unsubscribe(topic, {}, (error, result) => {
+          if (error != null) {
+            log.warn(
+              `Failed to unsubscribe on ${hostname} from topic: ${topic}`
+            )
+          } else {
+            log.info(
+              `Successfully unsubscribed on ${hostname} from topic: ${topic}`
+            )
+            handleDecrementSubscriptionCount(hostname, topic)
+          }
+        })
+      } else {
+        subscriptions[topic] -= 1
+      }
     } else {
       log.info(
         `Attempted to unsubscribe from unconnected hostname: ${hostname}`
