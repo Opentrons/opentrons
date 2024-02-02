@@ -81,10 +81,19 @@ export function FirmwareUpdateTakeover(): JSX.Element {
     ) {
       setShowUpdateNeededModal(true)
     }
+    // close modal if update is no longer needed
+    else if (
+      instrumentsData?.find(instrument => !instrument.ok) == null &&
+      initiatedSubsystemUpdate == null &&
+      showUpdateNeededModal
+    ) {
+      setShowUpdateNeededModal(false)
+    }
   }, [
     externalSubsystemUpdate,
     indexToUpdate,
     instrumentsToUpdate,
+    initiatedSubsystemUpdate,
     instrumentsData,
     isUnboxingFlowOngoing,
     maintenanceRunData,
