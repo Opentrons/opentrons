@@ -695,7 +695,7 @@ def mock_set_adv_setting():
 
 def validate_response_body(body, restart):
     settings_list = body.get("settings")
-    assert type(settings_list) == list
+    assert isinstance(settings_list, list)
     for obj in settings_list:
         assert "id" in obj, '"id" field not found in settings object'
         assert "title" in obj, '"title" not found for {}'.format(obj["id"])

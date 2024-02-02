@@ -1,4 +1,5 @@
 """Tests for the /protocols router."""
+import io
 import pytest
 from datetime import datetime
 from decoy import Decoy, matchers
@@ -322,11 +323,11 @@ async def test_create_protocol(
 ) -> None:
     """It should store an uploaded protocol file."""
     protocol_directory = Path("/dev/null")
+    content = bytes("some_content", encoding="utf-8")
+    uploaded_file = io.BytesIO(content)
 
-    protocol_file = UploadFile(filename="foo.json")
-    buffered_file = BufferedFile(
-        name="blah", contents=bytes("some_content", encoding="utf-8"), path=None
-    )
+    protocol_file = UploadFile(filename="foo.json", file=uploaded_file)
+    buffered_file = BufferedFile(name="blah", contents=content, path=None)
 
     protocol_source = ProtocolSource(
         directory=Path("/dev/null"),

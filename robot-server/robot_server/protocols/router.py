@@ -115,7 +115,8 @@ class ProtocolLinks(BaseModel):
 protocols_router = APIRouter()
 
 
-@protocols_router.post(
+@PydanticResponse.wrap_route(
+    protocols_router.post,
     path="/protocols",
     summary="Upload a protocol",
     description=dedent(
@@ -271,7 +272,8 @@ async def create_protocol(
     )
 
 
-@protocols_router.get(
+@PydanticResponse.wrap_route(
+    protocols_router.get,
     path="/protocols",
     summary="Get uploaded protocols",
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[Protocol]}},
@@ -308,7 +310,8 @@ async def get_protocols(
     )
 
 
-@protocols_router.get(
+@PydanticResponse.wrap_route(
+    protocols_router.get,
     path="/protocols/ids",
     summary="[Internal] Get uploaded protocol IDs",
     description=(
@@ -337,7 +340,8 @@ async def get_protocol_ids(
     )
 
 
-@protocols_router.get(
+@PydanticResponse.wrap_route(
+    protocols_router.get,
     path="/protocols/{protocolId}",
     summary="Get an uploaded protocol",
     responses={
@@ -394,7 +398,8 @@ async def get_protocol_by_id(
     )
 
 
-@protocols_router.delete(
+@PydanticResponse.wrap_route(
+    protocols_router.delete,
     path="/protocols/{protocolId}",
     summary="Delete an uploaded protocol",
     responses={
@@ -428,7 +433,8 @@ async def delete_protocol_by_id(
     )
 
 
-@protocols_router.get(
+@PydanticResponse.wrap_route(
+    protocols_router.get,
     path="/protocols/{protocolId}/analyses",
     summary="Get a protocol's analyses",
     responses={
@@ -465,7 +471,8 @@ async def get_protocol_analyses(
     )
 
 
-@protocols_router.get(
+@PydanticResponse.wrap_route(
+    protocols_router.get,
     path="/protocols/{protocolId}/analyses/{analysisId}",
     summary="Get one of a protocol's analyses",
     responses={
