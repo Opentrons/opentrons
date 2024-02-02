@@ -848,7 +848,7 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('does not render banners when a run is resetting', () => {
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
         data: { data: mockFailedRun },

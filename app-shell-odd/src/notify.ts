@@ -83,6 +83,7 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
   if (connectionStore[hostname] == null) {
     connectionStore[hostname] = {
       client: null,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       subscriptions: { [topic]: 1 } as Record<NotifyTopic, number>,
     }
     return connectAsync(`mqtt://${hostname}`)
