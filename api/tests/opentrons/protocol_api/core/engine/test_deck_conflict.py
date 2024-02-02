@@ -13,7 +13,13 @@ from opentrons.protocol_api._trash_bin import TrashBin
 from opentrons.protocol_api._waste_chute import WasteChute
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocol_api.core.engine import deck_conflict
-from opentrons.protocol_engine import Config, DeckSlotLocation, ModuleModel, StateView
+from opentrons.protocol_engine import (
+    Config,
+    DeckSlotLocation,
+    ModuleModel,
+    StateView,
+    AddressableOffsetVector,
+)
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 from opentrons.types import DeckSlotName, Point
 
@@ -28,6 +34,8 @@ from opentrons.protocol_engine.types import (
     OnDeckLabwareLocation,
     OnLabwareLocation,
     Dimensions,
+    AddressableArea,
+    AreaType,
 )
 
 
@@ -443,6 +451,22 @@ def test_deck_conflict_raises_for_bad_partial_96_channel_move(
     decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
         TipGeometry(length=10, diameter=100, volume=0)
     )
+
+    area = AddressableArea(
+        area_name="area",
+        area_type=AreaType.SLOT,
+        base_slot=DeckSlotName.SLOT_C2,
+        display_name="area_name",
+        bounding_box=Dimensions(x=1, y=2, z=3),
+        position=AddressableOffsetVector(x=1, y=2, z=3),
+        compatible_module_types=[],
+    )
+
+    decoy.when(
+        mock_state_view.addressable_areas.get_addressable_area_by_deck_slot_name(
+            DeckSlotName.SLOT_C2
+        )
+    ).then_return(area)
 
     with expected_raise:
         deck_conflict.check_safe_for_pipette_movement(
