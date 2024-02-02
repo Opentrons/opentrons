@@ -21,7 +21,8 @@ from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import MagneticBlockModel
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
-from opentrons.commands.publisher import CommandPublisher, publish
+from opentrons.commands.helpers import stringify_labware_movement_command
+from opentrons.commands.publisher import CommandPublisher, publish, publish_context
 from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.deck_type import (
     NoTrashDefinedError,
@@ -683,14 +684,22 @@ class ProtocolContext(CommandPublisher):
             if drop_offset
             else None
         )
-        self._core.move_labware(
-            labware_core=labware._core,
-            new_location=location,
-            use_gripper=use_gripper,
-            pause_for_manual_move=True,
-            pick_up_offset=_pick_up_offset,
-            drop_offset=_drop_offset,
-        )
+        with publish_context(
+            broker=self.broker,
+            command=cmds.move_labware(
+                text=stringify_labware_movement_command(
+                    labware, new_location, use_gripper
+                )
+            ),
+        ):
+            self._core.move_labware(
+                labware_core=labware._core,
+                new_location=location,
+                use_gripper=use_gripper,
+                pause_for_manual_move=True,
+                pick_up_offset=_pick_up_offset,
+                drop_offset=_drop_offset,
+            )
 
     @requires_version(2, 0)
     def load_module(

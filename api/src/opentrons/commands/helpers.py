@@ -1,9 +1,11 @@
 from typing import List, Union
 
-from opentrons.protocol_api.labware import Well
-from opentrons.types import Location
+from opentrons.protocol_api.labware import Well, Labware
+from opentrons.protocol_api.module_contexts import ModuleContext
 from opentrons.protocol_api._trash_bin import TrashBin
 from opentrons.protocol_api._waste_chute import WasteChute
+from opentrons.protocol_api._types import OffDeckType
+from opentrons.types import Location, DeckLocation
 
 
 CommandLocation = Union[Location, Well]
@@ -43,5 +45,31 @@ def stringify_location(location: Union[CommandLocation, List[CommandLocation]]) 
 def stringify_disposal_location(location: Union[TrashBin, WasteChute]) -> str:
     if isinstance(location, TrashBin):
         return f"Trash Bin on slot {location.location.id}"
-    else:
+    elif isinstance(location, WasteChute):
         return "Waste Chute"
+
+
+def _stringify_labware_movement_location(
+    location: Union[DeckLocation, OffDeckType, Labware, ModuleContext, WasteChute]
+) -> str:
+    if isinstance(location, (int, str)):
+        return f"Slot {location}"
+    elif isinstance(location, OffDeckType):
+        return "off-deck"
+    elif isinstance(location, Labware):
+        return location.name
+    elif isinstance(location, ModuleContext):
+        return str(location)
+    elif isinstance(location, WasteChute):
+        return "Waste Chute"
+
+
+def stringify_labware_movement_command(
+    source_labware: Labware,
+    destination: Union[DeckLocation, OffDeckType, Labware, ModuleContext, WasteChute],
+    use_gripper: bool,
+) -> str:
+    source_labware_text = _stringify_labware_movement_location(source_labware)
+    destination_text = _stringify_labware_movement_location(destination)
+    gripper_text = " with gripper" if use_gripper else ""
+    return f"Moving {source_labware_text} to {destination_text}{gripper_text}"
