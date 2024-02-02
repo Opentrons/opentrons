@@ -20,7 +20,7 @@ PRESSURE_DATA_CACHE = []
 FINAL_TEST_RESULTS = []
 GRIP_HEIGHT_MM = 48
 GAUGE_HEIGHT_MM = 75
-SLOT_WIDTH_GAUGE: List[Optional[int]] = [None, 3, 9]
+SLOT_WIDTH_GAUGE: List[Optional[int]] = [[], [], []]
 
 async def _main(simulating: bool) -> None:
 
@@ -61,7 +61,7 @@ async def _main(simulating: bool) -> None:
         pause()
         instrument.initialize_connection()
         instrument.clear_data()
-        instrument.set_number_of_samples(args.samples)
+        instrument.set_number_of_samples(6)
         instrument.start_sampling()
         time.sleep(1)
         #Determines if the MetOne Device is running
@@ -99,7 +99,7 @@ async def _main(simulating: bool) -> None:
             test_data['Sample Time(sec)']=record_dict['Sample Time']
             test_data['PASS/FAIL'] = test_result
             csv_cb.write(test_data)
-            final_result.append(test_result)
+            
         print(f"CSV: {csv_props.name}")
 
         #test uv
@@ -130,8 +130,11 @@ async def _main(simulating: bool) -> None:
                 #获取数据
                 alldata = uvinstrument.get_uv_()
                 intdatadict = uvinstrument.parse_modbus_data(alldata)
+                test_data['Tempval']=intdatadict['Tempval']
+                test_data['uvdata']=intdatadict['uvdata']
+                csv_cb.write(test_data)
 
-                
+
 
 
 

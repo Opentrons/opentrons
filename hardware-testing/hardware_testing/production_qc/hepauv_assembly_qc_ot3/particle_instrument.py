@@ -93,7 +93,7 @@ class GT521S_Driver:
 
     def available_records(self):
         #Data gets output in a list of 12 elements
-        total_samples = 3
+        total_samples = 7
         self.particle_counter.flush()
         self.particle_counter.flushInput()
         self.particle_counter.write('2\r\n'.encode("utf-8"))
@@ -244,12 +244,12 @@ if __name__ == '__main__':
     #         operation = False
     PARTICLE_COUNTER.initialize_connection()
     PARTICLE_COUNTER.clear_data()
-    PARTICLE_COUNTER.set_number_of_samples(3)
+    PARTICLE_COUNTER.set_number_of_samples(6)
     PARTICLE_COUNTER.start_sampling()
-    time.sleep()
+    time.sleep(185)
     header, data = PARTICLE_COUNTER.available_records()
-    #print(header)
-    #print(data)
+    print(header)
+    print(data)
     new_dict = {}
     for key, value in zip(header.items(), data[0]):
         for x in key:
