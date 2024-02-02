@@ -30,7 +30,8 @@ black = "==22.3.0"
 types-requests = "~=2.31.0"
 types-mock = "~=5.1.0"
 sqlalchemy2-stubs = "==0.0.2a21"
-python-box = "==5.4.1"
+# the same version as robot-server, which is limited by tavern
+python-box = "==6.1.0"
 
 [packages]
 idna = "==3.3"

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "c2f77be0ed9755db82baee7cc970bdcc0ad13c6052ebbb6d92f0639365612c2f"
+            "sha256": "5c9bee178723885363cdb4a226e6c1b7988731c23ae83fdde921d4ebb510090e"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -600,12 +600,27 @@
         },
         "python-box": {
             "hashes": [
-                "sha256:60ae9156de34cf92b899bd099580950df70a5b0813e67a3310a1cdd1976457fa",
-                "sha256:b68e0f8abc86f3deda751b3390f64df64a0989459de51ba4db949662a7b4d8ac"
+                "sha256:11cbe62f0dace8a6e2a10d210a5e87b99ad1a1286865568862516794c923a988",
+                "sha256:1d29eafaa287857751e27fbe9a08dd856480f0037fe988b221eba4dac33e5852",
+                "sha256:3638d3559f19ece7fa29f6a6550bc64696cd3b65e3d4154df07a3d06982252ff",
+                "sha256:3f0036f91e13958d2b37d2bc74c1197aa36ffd66755342eb64910f63d8a2990f",
+                "sha256:53998c3b95e31d1f31e46279ef1d27ac30b137746927260901ee61457f8468a0",
+                "sha256:594b0363b187df855ff8649488b1301dddbbeea769629b7caeb584efe779b841",
+                "sha256:6e7c243b356cb36e2c0f0e5ed7850969fede6aa812a7f501de7768996c7744d7",
+                "sha256:7b73f26e40a7adc57b9e39f5687d026dfa8a336f48aefaf852a223b4e37392ad",
+                "sha256:9dbd92b67c443a97326273c9239fce04d3b6958be815d293f96ab65bc4a9dae7",
+                "sha256:ab13208b053525ef154a36a4a52873b98a12b18b946edd4c939a4d5080e9a218",
+                "sha256:ac44b3b85714a4575cc273b5dbd39ef739f938ef6c522d6757704a29e7797d16",
+                "sha256:af6bcee7e1abe9251e9a41ca9ab677e1f679f6059321cfbae7e78a3831e0b736",
+                "sha256:bdec0a5f5a17b01fc538d292602a077aa8c641fb121e1900dff0591791af80e8",
+                "sha256:c14aa4e72bf30f4d573e62ff8030a86548603a100c3fb534561dbedf4a83f454",
+                "sha256:d199cd289b4f4d053770eadd70217c76214aac30b92a23adfb9627fd8558d300",
+                "sha256:ed6d7fe47d756dc2d9dea448702cea103716580a2efee7c859954929295fe28e",
+                "sha256:fa4696b5e09ccf695bf05c16bb5ca1fcc95a141a71a31eb262eee8e2ac07189a"
             ],
             "index": "pypi",
-            "markers": "python_version >= '3.6'",
-            "version": "==5.4.1"
+            "markers": "python_version >= '3.7'",
+            "version": "==6.1.0"
         },
         "python-dotenv": {
             "hashes": [
