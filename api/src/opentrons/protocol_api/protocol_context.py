@@ -234,8 +234,8 @@ class ProtocolContext(CommandPublisher):
         """Per-axis speed limits for moving instruments.
 
         Changing values within this property sets the speed limit for each non-plunger
-        axis of the robot. Note that this property only sets upper limits on movement
-        speed.
+        axis of the robot. Note that this property only sets upper limits and can't
+        exceed the physical speed limits of the movement system.
 
         This property is a dict mapping string names of axes to float values
         of maximum speeds in mm/s. To change a speed, set that axis's value. To
