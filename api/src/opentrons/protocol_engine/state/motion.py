@@ -177,7 +177,7 @@ class MotionView:
             destination = base_destination + Point(offset.x, offset.y, offset.z)
 
         # TODO(jbl 11-28-2023) This may need to change for partial tip configurations on a 96
-        if "moveableTrash" in addressable_area_name:
+        if "movableTrash" in addressable_area_name:
             destination_cp = None
         else:
             destination_cp = CriticalPoint.XY_CENTER

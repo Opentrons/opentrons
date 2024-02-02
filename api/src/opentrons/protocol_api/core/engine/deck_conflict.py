@@ -330,7 +330,7 @@ def _check_deck_conflict_for_96_channel(  # noqa: C901
             labware_slot
         )
     )
-    if "moveableTrash" not in addressable_area.area_name:
+    if "movableTrash" not in addressable_area.area_name:
         if primary_nozzle == "A12":
             adjacent_slot_num = get_west_slot(destination_slot_num)
         elif primary_nozzle == "A1":
