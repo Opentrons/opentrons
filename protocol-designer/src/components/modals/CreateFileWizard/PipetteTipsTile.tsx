@@ -77,7 +77,6 @@ export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
         : '',
   })
 
-
   return (
     <HandleEnter onEnter={proceed}>
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>

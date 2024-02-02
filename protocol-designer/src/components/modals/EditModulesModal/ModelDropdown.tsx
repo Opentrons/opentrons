@@ -4,7 +4,7 @@ import { ControllerFieldState, ControllerRenderProps } from 'react-hook-form'
 import { EditModulesFormValues } from './index'
 
 export interface ModelDropdownProps {
-  field: ControllerRenderProps<EditModulesFormValues, "selectedModel">
+  field: ControllerRenderProps<EditModulesFormValues, 'selectedModel'>
   fieldState: ControllerFieldState
   fieldName: string
   tabIndex: number
