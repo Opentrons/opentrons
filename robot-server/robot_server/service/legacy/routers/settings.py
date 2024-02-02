@@ -9,6 +9,7 @@ from opentrons_shared_data.errors import ErrorCodes
 from opentrons.hardware_control import (
     HardwareControlAPI,
     dev_types as hardware_dev_types,
+    API,
 )
 from opentrons.hardware_control.types import HardwareFeatureFlags
 from opentrons_shared_data.pipette import (
@@ -29,7 +30,12 @@ from robot_server.deck_configuration.fastapi_dependencies import (
 from robot_server.deck_configuration.store import DeckConfigurationStore
 
 from robot_server.errors import LegacyErrorResponse
-from robot_server.hardware import get_hardware, get_robot_type, get_robot_type_enum
+from robot_server.hardware import (
+    get_hardware,
+    get_robot_type,
+    get_robot_type_enum,
+    get_ot2_hardware,
+)
 from robot_server.service.legacy import reset_odd
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models.settings import (
@@ -258,13 +264,13 @@ async def get_robot_settings(
 
 @router.get(
     "/settings/pipettes",
-    description="List all settings for all known pipettes by id",
+    description="List all settings for all known pipettes by id. Only available on OT-2.",
     response_model=MultiPipetteSettings,
     response_model_by_alias=True,
     response_model_exclude_unset=True,
 )
 async def get_pipette_settings(
-    hardware: HardwareControlAPI = Depends(get_hardware),
+    hardware: API = Depends(get_ot2_hardware),
 ) -> MultiPipetteSettings:
     res = {}
     attached_pipettes = hardware.attached_pipettes
@@ -286,7 +292,7 @@ async def get_pipette_settings(
 
 @router.get(
     path="/settings/pipettes/{pipette_id}",
-    description="Get the settings of a specific pipette by ID",
+    description="Get the settings of a specific pipette by ID. Only available on OT-2.",
     response_model=PipetteSettings,
     response_model_by_alias=True,
     response_model_exclude_unset=True,
@@ -295,7 +301,7 @@ async def get_pipette_settings(
     },
 )
 async def get_pipette_setting(
-    pipette_id: str, hardware: HardwareControlAPI = Depends(get_hardware)
+    pipette_id: str, hardware: API = Depends(get_ot2_hardware)
 ) -> PipetteSettings:
     attached_pipettes = hardware.attached_pipettes
     known_ids = mutable_configurations.known_pipettes(
@@ -314,7 +320,7 @@ async def get_pipette_setting(
 
 @router.patch(
     path="/settings/pipettes/{pipette_id}",
-    description="Change the settings of a specific pipette",
+    description="Change the settings of a specific pipette. Only available on OT-2.",
     response_model=PipetteSettings,
     response_model_by_alias=True,
     response_model_exclude_unset=True,
@@ -323,7 +329,9 @@ async def get_pipette_setting(
     },
 )
 async def patch_pipette_setting(
-    pipette_id: str, settings_update: PipetteSettingsUpdate
+    pipette_id: str,
+    settings_update: PipetteSettingsUpdate,
+    hardware: None = Depends(get_ot2_hardware),
 ) -> PipetteSettings:
     # Convert fields to dict of field name to value
     fields = settings_update.setting_fields or {}
