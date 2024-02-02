@@ -24,6 +24,7 @@ class RunsPublisher:
         self._run_data_manager_polling = asyncio.Event()
         self._previous_current_command: Union[CurrentCommand, None] = None
 
+    # TODO(jh, 2023-02-02): Instead of polling, emit current_commands directly from PE.
     async def begin_polling_engine_store(
         self,
         get_current_command: Callable[[str], Optional[CurrentCommand]],
