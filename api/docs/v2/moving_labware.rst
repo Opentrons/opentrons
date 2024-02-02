@@ -31,6 +31,7 @@ When the move step is complete, the API updates the labware's location, so you c
     
 For the first move, the API knows to find the plate in its initial load location, slot D1. For the second move, the API knows to find the plate in D2.
 
+.. _automatic-manual-moves:
 
 Automatic vs Manual Moves
 =========================
