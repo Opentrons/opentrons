@@ -374,7 +374,7 @@ class Labware:
     def uri(self) -> str:
         """A string fully identifying the labware.
 
-        :returns: The URI, ``"namespace/loadname/version"``
+        The URI has three parts and follows the pattern ``"namespace/load_name/version"``.
         """
         return self._core.get_uri()
 
@@ -557,7 +557,7 @@ class Labware:
 
     def set_calibration(self, delta: Point) -> None:
         """
-        An internal, deprecated method used for updating the offset on the object.
+        An internal, deprecated method used for updating the labware offset.
 
         .. deprecated:: 2.14
         """
@@ -577,21 +577,19 @@ class Labware:
         (see :ref:`protocol-api-deck-coords`) that the motion system
         will add to any movement targeting this labware instance.
 
-        The offset *will not* apply to any other labware instances,
+        The offset *will not apply* to any other labware instances,
         even if those labware are of the same type.
 
-        .. caution::
-            This method is *only* for use with mechanisms like
-            :obj:`opentrons.execute.get_protocol_api`, which lack an interactive way
-            to adjust labware offsets. (See :ref:`advanced-control`.)
+        This method is *only* for use with mechanisms like
+        :obj:`opentrons.execute.get_protocol_api`, which lack an interactive way
+        to adjust labware offsets. (See :ref:`advanced-control`.)
+
+        .. warning::
 
             If you're uploading a protocol via the Opentrons App, don't use this method,
             because it will produce undefined behavior.
-            Instead, use Labware Position Check in the app.
+            Instead, use Labware Position Check in the app or on the touchscreen.
 
-            Because protocols using :ref:`API version <v2-versioning>` 2.14 or higher
-            can currently *only* be uploaded via the Opentrons App, it doesn't make
-            sense to use this method with them. Trying to do so will raise an exception.
         """
         if self._api_version >= ENGINE_CORE_API_VERSION:
             # TODO(mm, 2023-02-13): See Jira RCORE-535.
@@ -633,14 +631,20 @@ class Labware:
     @requires_version(2, 0)
     def wells(self, *args: Union[str, int]) -> List[Well]:
         """
-        Accessor function that generates a list of wells in a top down,
-        left to right order. This is representative of moving down rows and
-        across columns (i.e., A1, B1, C1…A2, B2, C2…).
+        Accessor function to navigate a labware top to bottom, left to right.
 
-        With indexing one can treat it as a typical python
-        list. For example, access well A1 with ``labware.wells()[0]``.
+        i.e., this method returns a list ordered A1, B1, C1…A2, B2, C2….
 
-        Note that this method takes args for backward-compatibility. But using args is deprecated and will be removed in future versions. Args can be either strings or integers, but must all be the same type. For example, ``self.columns(1, 4, 8)`` or ``self.columns('1', '2')`` are valid, but ``self.columns('1', 4)`` is not.
+        Use indexing to access individual wells contained in the list.
+        For example, access well A1 with ``labware.wells()[0]``.
+
+        .. note::
+            This method takes args for backward compatibility, but using args is
+            deprecated and will be removed in a future versions of the API.
+
+            Args can be either strings or integers, but not a mix of the two. For
+            example, ``.wells(1, 4)`` or ``.wells("1", "4")`` is valid, but
+            ``.wells("1", 4)`` is not.
 
         :return: Ordered list of all wells in a labware.
         """
@@ -664,11 +668,10 @@ class Labware:
     @requires_version(2, 0)
     def wells_by_name(self) -> Dict[str, Well]:
         """
-        Accessor function used to create a look-up table of wells by name.
+        Accessor function used to navigate through a labware by well name.
 
-        With indexing one can treat it as a typical Python
-        dictionary whose keys are well names. For example, access well A1
-        with ``labware.wells_by_name()['A1']``.
+        Use indexing to access individual wells contained in the dictionary.
+        For example, access well A1 with ``labware.wells_by_name()["A1"]``.
 
         :return: Dictionary of :py:class:`.Well` objects keyed by well name.
         """
@@ -688,13 +691,19 @@ class Labware:
     @requires_version(2, 0)
     def rows(self, *args: Union[int, str]) -> List[List[Well]]:
         """
-        Accessor function used to navigate through a labware by row.
+        Accessor function to navigate through a labware by row.
 
-        With indexing one can treat it as a typical python nested list.
-        For example, access row A with ``labware.rows()[0]``. This
-        will output ``['A1', 'A2', 'A3', 'A4'...]``.
+        Use indexing to access individual rows or wells contained in the nested list.
+        On a standard 96-well plate, this will output a list of :py:class:`.Well`
+        objects containing A1 through A12.
 
-        Note that this method takes args for backward-compatibility. But using args is deprecated and will be removed in future versions. Args can be either strings or integers, but must all be the same type. For example, ``self.columns(1, 4, 8)`` or ``self.columns('1', '2')`` are valid, but ``self.columns('1', 4)`` is not.
+        .. note::
+            This method takes args for backward compatibility, but using args is
+            deprecated and will be removed in a future versions of the API.
+
+            Args can be either strings or integers, but not a mix of the two. For
+            example, ``.rows(1, 4)`` or ``.rows("1", "4")`` is valid, but
+            ``.rows("1", 4)`` is not.
 
         :return: A list of row lists.
         """
@@ -721,11 +730,12 @@ class Labware:
     @requires_version(2, 0)
     def rows_by_name(self) -> Dict[str, List[Well]]:
         """
-        Accessor function used to navigate through a labware by row name.
+        Accessor function to navigate through a labware by row name.
 
-        With indexing one can treat it as a typical python dictionary.
-        For example, access row A with ``labware.rows_by_name()['A']``.
-        This will output ``['A1', 'A2', 'A3', 'A4'...]``.
+        Use indexing to access individual rows or wells contained in the dictionary.
+        For example, access row A with ``labware.rows_by_name()["A"]``.
+        On a standard 96-well plate, this will output a list of :py:class:`.Well`
+        objects containing A1 through A12.
 
         :return: Dictionary of :py:class:`.Well` lists keyed by row name.
         """
@@ -749,7 +759,7 @@ class Labware:
         Accessor function to navigate through a labware by column.
 
         Use indexing to access individual columns or wells contained in the nested list.
-        For example, access column A with ``labware.columns()[0]``.
+        For example, access column 1 with ``labware.columns()[0]``.
         On a standard 96-well plate, this will output a list of :py:class:`.Well`
         objects containing A1 through H1.
 
@@ -786,7 +796,7 @@ class Labware:
     @requires_version(2, 0)
     def columns_by_name(self) -> Dict[str, List[Well]]:
         """
-        Accessor function used to navigate through a labware by column name.
+        Accessor function to navigate through a labware by column name.
 
         Use indexing to access individual columns or wells contained in the dictionary.
         For example, access column 1 with ``labware.columns_by_name()["1"]``.
@@ -847,6 +857,12 @@ class Labware:
     @property
     @requires_version(2, 0)
     def tip_length(self) -> float:
+        """For a tip rack labware, the length of the tips it holds, in mm.
+
+        This is taken from the ``tipLength`` property of the ``parameters`` object in the labware definition.
+
+        This method will raise an exception if you call it on a labware that isn’t a tip rack.
+        """
         return self._core.get_tip_length()
 
     @tip_length.setter
