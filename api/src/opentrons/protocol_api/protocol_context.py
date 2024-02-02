@@ -99,9 +99,9 @@ class ProtocolContext(CommandPublisher):
       - They can control the flow of a running protocol, such as pausing, displaying
         messages, or controlling built-in robot hardware like the ambient lighting.
 
-    Do not instantiate a ``ProtocolContext`` directly for protocols that you plan to run
-    via the Opentrons App or touchscreen. The ``run()`` function of your protocol does
-    that for you. See the :ref:`Tutorial <run-function>` for more information.
+    Do not instantiate a ``ProtocolContext`` directly.
+    The ``run()`` function of your protocol does that for you.
+    See the :ref:`Tutorial <run-function>` for more information.
 
     Use :py:meth:`opentrons.execute.get_protocol_api` to instantiate a ``ProtocolContext`` when
     using Jupyter Notebook. See :ref:`advanced-control`.
