@@ -87,6 +87,7 @@ interface ChooseRobotSlideoutProps
   selectedRobot: Robot | null
   setSelectedRobot: (robot: Robot | null) => void
   isAnalysisError?: boolean
+  isAnalysisStale?: boolean
   showIdleOnly?: boolean
 }
 
@@ -100,6 +101,7 @@ export function ChooseRobotSlideout(
     title,
     footer,
     isAnalysisError = false,
+    isAnalysisStale = false,
     isCreatingRun = false,
     isSelectedRobotOnDifferentSoftwareVersion,
     reset: resetCreateRun,
@@ -178,6 +180,9 @@ export function ChooseRobotSlideout(
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
         {isAnalysisError ? (
           <Banner type="warning">{t('protocol_failed_app_analysis')}</Banner>
+        ) : null}
+        {isAnalysisStale ? (
+          <Banner type="warning">{t('protocol_outdated_app_analysis')}</Banner>
         ) : null}
         <Flex alignSelf={ALIGN_FLEX_END} marginY={SPACING.spacing4}>
           {isScanning ? (

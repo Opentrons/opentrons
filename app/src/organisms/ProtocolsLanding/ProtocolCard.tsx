@@ -41,6 +41,7 @@ import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { StyledText } from '../../atoms/text'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
+import { ProtocolAnalysisStale } from '../ProtocolAnalysisFailure/ProtocolAnalysisStale'
 import {
   getAnalysisStatus,
   getProtocolDisplayName,
@@ -169,6 +170,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             missing: <Icon name="ot-spinner" spin size={SIZE_3} />,
             loading: <Icon name="ot-spinner" spin size={SIZE_3} />,
             error: <Box size="6rem" backgroundColor={COLORS.grey30} />,
+            stale: <Box size="6rem" backgroundColor={COLORS.grey30} />,
             complete:
               mostRecentAnalysis != null ? (
                 <ProtocolDeck protocolAnalysis={mostRecentAnalysis} />
@@ -190,6 +192,9 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               protocolKey={protocolKey}
               errors={mostRecentAnalysis?.errors.map(e => e.detail) ?? []}
             />
+          ) : null}
+          {analysisStatus === 'stale' ? (
+            <ProtocolAnalysisStale protocolKey={protocolKey} />
           ) : null}
           <StyledText
             as="h3"
@@ -237,6 +242,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                     missing: <StyledText as="p">{t('no_data')}</StyledText>,
                     loading: <StyledText as="p">{t('no_data')}</StyledText>,
                     error: <StyledText as="p">{t('no_data')}</StyledText>,
+                    stale: <StyledText as="p">{t('no_data')}</StyledText>,
                     complete: (
                       <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>
                         {/* TODO(bh, 2022-10-14): insert 96-channel pipette if found */}
