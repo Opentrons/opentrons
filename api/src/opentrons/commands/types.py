@@ -3,12 +3,12 @@ from __future__ import annotations
 from typing_extensions import Literal, Final, TypedDict
 from typing import Optional, List, Sequence, TYPE_CHECKING, Union
 from opentrons.hardware_control.modules import ThermocyclerStep
-from opentrons.protocol_api._trash_bin import TrashBin
-from opentrons.protocol_api._waste_chute import WasteChute
 
 if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext
     from opentrons.protocol_api.labware import Well
+    from opentrons.protocol_api._trash_bin import TrashBin
+    from opentrons.protocol_api._waste_chute import WasteChute
 
 from opentrons.types import Location
 
