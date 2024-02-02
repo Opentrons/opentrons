@@ -489,7 +489,8 @@ class AddressableAreaView(HasState[AddressableAreaState]):
                 raise CutoutDoesNotExistError(
                     f"No Cutout was found in the Deck that matched provided slot {slot_name}."
                 )
-        return slot_cutout_fixture
+            return slot_cutout_fixture
+        return None
 
     def get_fixture_height(self, cutout_fixture_name: str) -> float:
         """Get the z height of a cutout fixture."""
