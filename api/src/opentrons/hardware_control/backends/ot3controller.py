@@ -1228,10 +1228,12 @@ class OT3Controller(FlexBackend):
             if loop.is_running() and self._event_watcher:
                 self._event_watcher.close()
 
-        if messenger := getattr(self, "_messenger", None):
+        messenger = getattr(self, "_messenger", None)
+        if messenger:
             await messenger.stop()
 
-        if usb_messenger := getattr(self, "_usb_messenger", None):
+        usb_messenger = getattr(self, "_usb_messenger", None)
+        if usb_messenger:
             await usb_messenger.stop()
 
         return None
