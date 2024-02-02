@@ -1458,25 +1458,24 @@ class InstrumentContext(publisher.CommandPublisher):
                     minimum_z_height=minimum_z_height,
                     speed=speed,
                 )
-                return self
-
-            if publish:
-                contexts.enter_context(
-                    publisher.publish_context(
-                        broker=self.broker,
-                        command=cmds.move_to(instrument=self, location=location),
+            else:
+                if publish:
+                    contexts.enter_context(
+                        publisher.publish_context(
+                            broker=self.broker,
+                            command=cmds.move_to(instrument=self, location=location),
+                        )
                     )
+
+                _, well = location.labware.get_parent_labware_and_well()
+
+                self._core.move_to(
+                    location=location,
+                    well_core=well._core if well is not None else None,
+                    force_direct=force_direct,
+                    minimum_z_height=minimum_z_height,
+                    speed=speed,
                 )
-
-            _, well = location.labware.get_parent_labware_and_well()
-
-            self._core.move_to(
-                location=location,
-                well_core=well._core if well is not None else None,
-                force_direct=force_direct,
-                minimum_z_height=minimum_z_height,
-                speed=speed,
-            )
 
         return self
 
