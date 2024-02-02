@@ -687,6 +687,7 @@ class ProtocolContext(CommandPublisher):
         with publish_context(
             broker=self.broker,
             command=cmds.move_labware(
+                # This needs to be called from protocol context and not the command for import loop reasons
                 text=stringify_labware_movement_command(
                     labware, new_location, use_gripper
                 )

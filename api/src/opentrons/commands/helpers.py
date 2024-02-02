@@ -53,7 +53,7 @@ def _stringify_labware_movement_location(
     location: Union[DeckLocation, OffDeckType, Labware, ModuleContext, WasteChute]
 ) -> str:
     if isinstance(location, (int, str)):
-        return f"Slot {location}"
+        return f"slot {location}"
     elif isinstance(location, OffDeckType):
         return "off-deck"
     elif isinstance(location, Labware):
