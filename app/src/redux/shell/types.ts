@@ -127,6 +127,7 @@ export type NotifyTopic =
   | 'robot-server/maintenance_runs/current_run'
   | 'robot-server/runs/current_command'
   | 'robot-server/runs'
+  | `robot-server/runs/${string}`
 
 export type NotifyAction = 'subscribe' | 'unsubscribe'
 

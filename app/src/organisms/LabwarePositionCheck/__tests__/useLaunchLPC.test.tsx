@@ -9,27 +9,32 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
 import { QueryClient, QueryClientProvider } from 'react-query'
+
+import { renderWithProviders } from '@opentrons/components'
 import {
   useCreateMaintenanceRunLabwareDefinitionMutation,
   useDeleteMaintenanceRunMutation,
-  useRunQuery,
 } from '@opentrons/react-api-client'
+
 import { useCreateTargetedMaintenanceRunMutation } from '../../../resources/runs/hooks'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
-
+import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
 import { useLaunchLPC } from '../useLaunchLPC'
 import { LabwarePositionCheck } from '..'
 
 import type { LabwareOffset } from '@opentrons/api-client'
-import { FLEX_ROBOT_TYPE, LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  FLEX_ROBOT_TYPE,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 
 jest.mock('../')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../resources/runs/hooks')
 jest.mock('../useMostRecentCompletedAnalysis')
+jest.mock('../../../resources/runs/useNotifyRunQuery')
 
 const mockUseCreateTargetedMaintenanceRunMutation = useCreateTargetedMaintenanceRunMutation as jest.MockedFunction<
   typeof useCreateTargetedMaintenanceRunMutation
@@ -40,7 +45,9 @@ const mockUseCreateMaintenanceRunLabwareDefinitionMutation = useCreateMaintenanc
 const mockUseDeleteMaintenanceRunMutation = useDeleteMaintenanceRunMutation as jest.MockedFunction<
   typeof useDeleteMaintenanceRunMutation
 >
-const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
+const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
+  typeof useNotifyRunQuery
+>
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
 >
@@ -105,7 +112,7 @@ describe('useLaunchLPC hook', () => {
         exit
       </div>
     ))
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(MOCK_RUN_ID, { staleTime: Infinity })
       .mockReturnValue({
         data: {

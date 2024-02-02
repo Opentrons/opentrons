@@ -9,7 +9,6 @@ import { useInterval, truncateString } from '@opentrons/components'
 import {
   useAllProtocolIdsQuery,
   useHost,
-  useRunQuery,
   useCreateLiveCommandMutation,
 } from '@opentrons/react-api-client'
 import {
@@ -25,6 +24,7 @@ import {
 import { checkShellUpdate } from '../redux/shell'
 import { useToaster } from '../organisms/ToasterOven'
 import { useNotifyAllRunsQuery } from '../resources/runs/useNotifyAllRunsQuery'
+import { useNotifyRunQuery } from '../resources/runs/useNotifyRunQuery'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { Dispatch } from '../redux/types'
@@ -141,7 +141,7 @@ export function useCurrentRunRoute(): string | null {
         ) // trim link path down to only runId
       : null
   const currentRunId = currentRun?.id ?? null
-  const { data: runRecord } = useRunQuery(currentRunId, {
+  const { data: runRecord } = useNotifyRunQuery(currentRunId, {
     staleTime: Infinity,
     enabled: currentRunId != null,
   })

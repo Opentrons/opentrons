@@ -8,7 +8,6 @@ import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   useAllPipetteOffsetCalibrationsQuery,
   useInstrumentsQuery,
-  useRunQuery,
   useProtocolQuery,
   useDoorQuery,
   useModulesQuery,
@@ -50,6 +49,7 @@ import { useIsHeaterShakerInProtocol } from '../../../organisms/ModuleCard/hooks
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
 import { ConfirmAttachedModal } from '../../../pages/ProtocolSetup/ConfirmAttachedModal'
 import { ProtocolSetup } from '../../../pages/ProtocolSetup'
+import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
 
 import type { UseQueryResult } from 'react-query'
 import type {
@@ -88,6 +88,7 @@ jest.mock('../../../redux/discovery/selectors')
 jest.mock('../ConfirmAttachedModal')
 jest.mock('../../../organisms/ToasterOven')
 jest.mock('../../../resources/deck_configuration/hooks')
+jest.mock('../../../resources/runs/useNotifyRunQuery')
 
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
@@ -119,7 +120,9 @@ const mockUseRunStatus = useRunStatus as jest.MockedFunction<
 const mockProtocolSetupLiquids = ProtocolSetupLiquids as jest.MockedFunction<
   typeof ProtocolSetupLiquids
 >
-const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
+const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
+  typeof useNotifyRunQuery
+>
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
 >
@@ -287,7 +290,7 @@ describe('ProtocolSetup', () => {
     when(mockGetDeckDefFromRobotType)
       .calledWith('OT-3 Standard')
       .mockReturnValue(ot3StandardDeckDef as any)
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID, { staleTime: Infinity })
       .mockReturnValue({
         data: {
