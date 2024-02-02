@@ -154,9 +154,6 @@ export function ProtocolRunHeader({
     protocolKey,
     isProtocolAnalyzing,
   } = useProtocolDetailsForRun(runId)
-  console.log('🚀 ~ runId:', runId)
-  console.log('🚀 ~ protocolData:', protocolData)
-  console.log('🚀 ~ isProtocolAnalyzing:', isProtocolAnalyzing)
 
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
@@ -174,6 +171,7 @@ export function ProtocolRunHeader({
   const [pipettesWithTip, setPipettesWithTip] = React.useState<
     PipettesWithTip[]
   >([])
+  const isResetRunLoadingRef = React.useRef(false)
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const highestPriorityError =
     runRecord?.data.errors?.[0] != null
@@ -375,6 +373,7 @@ export function ProtocolRunHeader({
               setShowRunFailedModal,
               highestPriorityError,
             }}
+            isResetRunLoading={isResetRunLoadingRef.current}
           />
         ) : null}
         {mostRecentRunId === runId &&
@@ -410,6 +409,7 @@ export function ProtocolRunHeader({
               }
               isDoorOpen={isDoorOpen}
               isFixtureMismatch={isFixtureMismatch}
+              isResetRunLoadingRef={isResetRunLoadingRef}
             />
           </Flex>
         </Box>
@@ -554,7 +554,9 @@ interface ActionButtonProps {
   isProtocolAnalyzing: boolean
   isDoorOpen: boolean
   isFixtureMismatch: boolean
+  isResetRunLoadingRef: React.MutableRefObject<boolean>
 }
+
 function ActionButton(props: ActionButtonProps): JSX.Element {
   const {
     runId,
@@ -563,6 +565,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     isProtocolAnalyzing,
     isDoorOpen,
     isFixtureMismatch,
+    isResetRunLoadingRef,
   } = props
   const history = useHistory()
   const { t } = useTranslation(['run_details', 'shared'])
@@ -587,6 +590,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
     )
   )
+  isResetRunLoadingRef.current = isResetRunLoading
   const { missingModuleIds } = useUnmatchedModulesForProtocol(robotName, runId)
   const { complete: isCalibrationComplete } = useRunCalibrationStatus(
     robotName,
@@ -782,6 +786,7 @@ interface TerminalRunProps {
   handleClearClick: () => void
   isClosingCurrentRun: boolean
   setShowRunFailedModal: (showRunFailedModal: boolean) => void
+  isResetRunLoading: boolean
   highestPriorityError?: RunError | null
 }
 function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
@@ -791,6 +796,7 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
     isClosingCurrentRun,
     setShowRunFailedModal,
     highestPriorityError,
+    isResetRunLoading,
   } = props
   const { t } = useTranslation('run_details')
 
@@ -799,7 +805,10 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
     setShowRunFailedModal(true)
   }
 
-  if (runStatus === RUN_STATUS_FAILED || runStatus === RUN_STATUS_SUCCEEDED) {
+  if (
+    isResetRunLoading === false &&
+    (runStatus === RUN_STATUS_FAILED || runStatus === RUN_STATUS_SUCCEEDED)
+  ) {
     return (
       <>
         {runStatus === RUN_STATUS_SUCCEEDED ? (

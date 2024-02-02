@@ -55,6 +55,5 @@ aiosqlite = "==0.17.0"
 opentrons-hardware = {editable = true, path='../hardware', extras=['FLEX']}
 opentrons = { editable = true, path = "../api"}
 opentrons-shared-data = { editable = true, path = "../shared-data/python" }
-notify-server = { editable = true, path = "../notify-server"}
 server-utils = {editable = true, path = "./../server-utils"}
 robot-server = { editable = true, path = "."}

@@ -19,6 +19,7 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
+import { UNIVERSAL_FLAT_ADAPTER_X_DIMENSION } from '../LabwareDetails/Gallery'
 import { CustomLabwareOverflowMenu } from './CustomLabwareOverflowMenu'
 import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
 
@@ -34,6 +35,11 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const displayName = definition?.metadata.displayName
   const displayCategory = startCase(definition.metadata.displayCategory)
   const isCustomDefinition = definition.namespace !== 'opentrons'
+  const xDimensionOverride =
+    definition.parameters.loadName === 'opentrons_universal_flat_adapter'
+      ? UNIVERSAL_FLAT_ADAPTER_X_DIMENSION
+      : definition.dimensions.xDimension
+
   return (
     <Box
       role="link"
@@ -52,7 +58,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
     >
       <Box id="LabwareCard_labwareImage" marginRight={SPACING.spacing24}>
         <RobotWorkSpace
-          viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}
+          viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${xDimensionOverride} ${definition.dimensions.yDimension}`}
         >
           {() => <LabwareRender definition={definition} />}
         </RobotWorkSpace>

@@ -54,7 +54,6 @@ PACKAGES = find_packages(where=".", exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
     f"opentrons=={VERSION}",
     f"opentrons-shared-data=={VERSION}",
-    f"notify-server=={VERSION}",
     f"server-utils=={VERSION}",
     "anyio==3.6.1",
     "fastapi==0.68.1",

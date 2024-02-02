@@ -129,7 +129,9 @@ async function usbListener(
       statusText: response.statusText,
     }
   } catch (e) {
-    console.log(`axios request error ${e?.message ?? 'unknown'}`)
+    if (e instanceof Error) {
+      console.log(`axios request error ${e?.message ?? 'unknown'}`)
+    }
   }
 }
 

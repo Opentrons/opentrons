@@ -254,6 +254,7 @@ class SubSystem(enum.Enum):
     gripper = 5
     rear_panel = 6
     motor_controller_board = 7
+    hepa_uv = 8
 
     def __str__(self) -> str:
         return self.name
