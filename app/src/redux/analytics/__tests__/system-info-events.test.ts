@@ -16,8 +16,8 @@ const MOCK_ANALYTICS_PROPS = {
   'U2E Vendor ID': Fixtures.mockRealtekDevice.vendorId,
   'U2E Product ID': Fixtures.mockRealtekDevice.productId,
   'U2E Serial Number': Fixtures.mockRealtekDevice.serialNumber,
-  'U2E Manufacturer': Fixtures.mockRealtekDevice.manufacturer,
-  'U2E Device Name': Fixtures.mockRealtekDevice.deviceName,
+  'U2E Manufacturer': Fixtures.mockRealtekDevice.manufacturerName,
+  'U2E Device Name': Fixtures.mockRealtekDevice.productName,
   'U2E IPv4 Address': '10.0.0.1',
 }
 
