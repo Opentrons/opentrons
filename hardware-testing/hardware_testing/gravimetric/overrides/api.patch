@@ -1,194 +1,111 @@
+diff --git a/api/src/opentrons/hardware_control/instruments/ot3/pipette.py b/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
+index 2d36460ca6..8578768930 100644
+--- a/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
++++ b/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
+@@ -427,11 +427,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
+ 
+     def set_current_volume(self, new_volume: float) -> None:
+         assert new_volume >= 0
+-        assert new_volume <= self.working_volume
++        # assert new_volume <= self.working_volume
+         self._current_volume = new_volume
+ 
+     def add_current_volume(self, volume_incr: float) -> None:
+-        assert self.ok_to_add_volume(volume_incr)
++        # assert self.ok_to_add_volume(volume_incr)
+         self._current_volume += volume_incr
+ 
+     def remove_current_volume(self, volume_incr: float) -> None:
+@@ -439,7 +439,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
+         self._current_volume -= volume_incr
+ 
+     def ok_to_add_volume(self, volume_incr: float) -> bool:
+-        return self.current_volume + volume_incr <= self.working_volume
++        # return self.current_volume + volume_incr <= self.working_volume
++        return True
+ 
+     def ok_to_push_out(self, push_out_dist_mm: float) -> bool:
+         return push_out_dist_mm <= (
 diff --git a/api/src/opentrons/protocol_api/core/engine/deck_conflict.py b/api/src/opentrons/protocol_api/core/engine/deck_conflict.py
-index 031ad46acb..c0210b89dc 100644
+index 7ef2cfcbea..a89548afea 100644
 --- a/api/src/opentrons/protocol_api/core/engine/deck_conflict.py
 +++ b/api/src/opentrons/protocol_api/core/engine/deck_conflict.py
-@@ -281,7 +281,7 @@ def check_safe_for_tip_pickup_and_return(
+@@ -223,18 +223,12 @@ def check_safe_for_tip_pickup_and_return(
+                 f" when picking up fewer than 96 tips."
+             )
+         elif not is_partial_config and not is_96_ch_tiprack_adapter:
+-            raise UnsuitableTiprackForPipetteMotion(
+-                f"{tiprack_name} must be on an Opentrons Flex 96 Tip Rack Adapter"
+-                f" in order to pick up or return all 96 tips simultaneously."
+-            )
++            pass
+ 
+     elif (
+         not is_partial_config
+     ):  # tiprack is not on adapter and pipette is in full config
+-        raise UnsuitableTiprackForPipetteMotion(
+-            f"{tiprack_name} must be on an Opentrons Flex 96 Tip Rack Adapter"
+-            f" in order to pick up or return all 96 tips simultaneously."
+-        )
++        pass
+ 
+ 
+ def _check_deck_conflict_for_96_channel(
+diff --git a/api/src/opentrons/protocol_api/core/legacy/deck.py b/api/src/opentrons/protocol_api/core/legacy/deck.py
+index 9a9092af5a..33aa5941ce 100644
+--- a/api/src/opentrons/protocol_api/core/legacy/deck.py
++++ b/api/src/opentrons/protocol_api/core/legacy/deck.py
+@@ -55,11 +55,11 @@ class DeckItem(Protocol):
+ class Deck(UserDict):  # type: ignore[type-arg]
+     data: Dict[int, Optional[DeckItem]]
+ 
+-    def __init__(self, deck_type: str) -> None:
++    def __init__(
++        self, deck_type: str, version: int = DEFAULT_LEGACY_DECK_DEFINITION_VERSION
++    ) -> None:
+         super().__init__()
+-        self._definition = load_deck(
+-            name=deck_type, version=DEFAULT_LEGACY_DECK_DEFINITION_VERSION
+-        )
++        self._definition = load_deck(name=deck_type, version=version)
+         self._positions = {}
+         for slot in self._definition["locations"]["orderedSlots"]:
+             self.data[int(slot["id"])] = None
+diff --git a/api/src/opentrons/protocol_api/create_protocol_context.py b/api/src/opentrons/protocol_api/create_protocol_context.py
+index 5a64e70cf9..7d5047cc4b 100644
+--- a/api/src/opentrons/protocol_api/create_protocol_context.py
++++ b/api/src/opentrons/protocol_api/create_protocol_context.py
+@@ -22,6 +22,7 @@ from .deck import Deck
+ 
+ from .core.common import ProtocolCore as AbstractProtocolCore
+ from .core.legacy.deck import Deck as LegacyDeck
++from opentrons_shared_data.deck import DEFAULT_DECK_DEFINITION_VERSION
+ from .core.legacy.legacy_protocol_core import LegacyProtocolCore
+ from .core.legacy.labware_offset_provider import (
+     AbstractLabwareOffsetProvider,
+@@ -52,6 +53,7 @@ def create_protocol_context(
+     extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
+     bundled_labware: Optional[Dict[str, LabwareDefinition]] = None,
+     bundled_data: Optional[Dict[str, bytes]] = None,
++    deck_version: int = DEFAULT_DECK_DEFINITION_VERSION,
+ ) -> ProtocolContext:
+     """Create a ProtocolContext for use in a Python protocol.
+ 
+@@ -121,7 +123,7 @@ def create_protocol_context(
+ 
+     # TODO(mc, 2022-8-22): remove `disable_fast_protocol_upload`
+     elif use_simulating_core and not feature_flags.disable_fast_protocol_upload():
+-        legacy_deck = LegacyDeck(deck_type=deck_type)
++        legacy_deck = LegacyDeck(deck_type=deck_type, version=deck_version)
+         core = LegacyProtocolCoreSimulator(
+             sync_hardware=sync_hardware,
+             labware_offset_provider=labware_offset_provider,
+@@ -133,7 +135,7 @@ def create_protocol_context(
          )
  
- 
--def _check_deck_conflict_for_96_channel(
-+def _check_deck_conflict_for_96_channel(  # noqa: C901
-     engine_state: StateView,
-     pipette_id: str,
-     labware_id: str,
-@@ -324,10 +324,17 @@ def _check_deck_conflict_for_96_channel(
-     adjacent_slot_num = None
-     # TODO (spp, 2023-12-18): change this eventually to "column 1"/"column 12"
-     #  via the column mappings in the pipette geometry definitions.
--    if primary_nozzle == "A12":
--        adjacent_slot_num = get_west_slot(destination_slot_num)
--    elif primary_nozzle == "A1":
--        adjacent_slot_num = get_east_slot(destination_slot_num)
-+    # if we are handling commands in the trash or in the waste chute, skip these checks
-+    addressable_area = (
-+        engine_state.addressable_areas.get_addressable_area_by_deck_slot_name(
-+            labware_slot
-+        )
-+    )
-+    if "moveableTrash" not in addressable_area.area_name:
-+        if primary_nozzle == "A12":
-+            adjacent_slot_num = get_west_slot(destination_slot_num)
-+        elif primary_nozzle == "A1":
-+            adjacent_slot_num = get_east_slot(destination_slot_num)
- 
-     def _check_conflict_with_slot_item(
-         adjacent_slot: DeckSlotName,
-diff --git a/api/src/opentrons/protocol_engine/state/addressable_areas.py b/api/src/opentrons/protocol_engine/state/addressable_areas.py
-index a24b643c90..f90cf4c4b1 100644
---- a/api/src/opentrons/protocol_engine/state/addressable_areas.py
-+++ b/api/src/opentrons/protocol_engine/state/addressable_areas.py
-@@ -323,6 +323,22 @@ class AddressableAreaView(HasState[AddressableAreaState]):
-         else:
-             return self._get_addressable_area_from_deck_data(addressable_area_name)
- 
-+    def get_addressable_area_by_deck_slot_name(
-+        self, slot_name: DeckSlotName
-+    ) -> AddressableArea:
-+        """Get addressable area by Deck Slot Name."""
-+        areas = self.get_all()
-+        for area in areas:
-+            if self.get_addressable_area_base_slot(area) == slot_name:
-+                if not self._state.use_simulated_deck_config:
-+                    return self._get_loaded_addressable_area(area)
-+                else:
-+                    return self._get_addressable_area_from_deck_data(area)
-+
-+        raise AddressableAreaDoesNotExistError(
-+            f"No Addressable Area could be found for provided slot {slot_name}"
-+        )
-+
-     def get_all(self) -> List[str]:
-         """Get a list of all loaded addressable area names."""
-         return list(self._state.loaded_addressable_areas_by_name)
-diff --git a/api/src/opentrons/protocol_engine/state/motion.py b/api/src/opentrons/protocol_engine/state/motion.py
-index edd4cca2cc..4b0b7d5b5d 100644
---- a/api/src/opentrons/protocol_engine/state/motion.py
-+++ b/api/src/opentrons/protocol_engine/state/motion.py
-@@ -177,7 +177,10 @@ class MotionView:
-             destination = base_destination + Point(offset.x, offset.y, offset.z)
- 
-         # TODO(jbl 11-28-2023) This may need to change for partial tip configurations on a 96
--        destination_cp = CriticalPoint.XY_CENTER
-+        if "moveableTrash" in addressable_area_name:
-+            destination_cp = None
-+        else:
-+            destination_cp = CriticalPoint.XY_CENTER
- 
-         all_labware_highest_z = self._geometry.get_all_obstacle_highest_z()
-         if minimum_z_height is None:
-diff --git a/api/tests/opentrons/protocol_api/core/engine/test_deck_conflict.py b/api/tests/opentrons/protocol_api/core/engine/test_deck_conflict.py
-index 5f07cb3a38..1161f91dbe 100644
---- a/api/tests/opentrons/protocol_api/core/engine/test_deck_conflict.py
-+++ b/api/tests/opentrons/protocol_api/core/engine/test_deck_conflict.py
-@@ -13,7 +13,13 @@ from opentrons.protocol_api._trash_bin import TrashBin
- from opentrons.protocol_api._waste_chute import WasteChute
- from opentrons.protocol_api.labware import Labware
- from opentrons.protocol_api.core.engine import deck_conflict
--from opentrons.protocol_engine import Config, DeckSlotLocation, ModuleModel, StateView
-+from opentrons.protocol_engine import (
-+    Config,
-+    DeckSlotLocation,
-+    ModuleModel,
-+    StateView,
-+    AddressableOffsetVector,
-+)
- from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
- from opentrons.types import DeckSlotName, Point
- 
-@@ -28,6 +34,8 @@ from opentrons.protocol_engine.types import (
-     OnDeckLabwareLocation,
-     OnLabwareLocation,
-     Dimensions,
-+    AddressableArea,
-+    AreaType,
- )
- 
- 
-@@ -444,6 +452,22 @@ def test_deck_conflict_raises_for_bad_partial_96_channel_move(
-         TipGeometry(length=10, diameter=100, volume=0)
-     )
- 
-+    area = AddressableArea(
-+        area_name="area",
-+        area_type=AreaType.SLOT,
-+        base_slot=DeckSlotName.SLOT_C2,
-+        display_name="area_name",
-+        bounding_box=Dimensions(x=1, y=2, z=3),
-+        position=AddressableOffsetVector(x=1, y=2, z=3),
-+        compatible_module_types=[],
-+    )
-+
-+    decoy.when(
-+        mock_state_view.addressable_areas.get_addressable_area_by_deck_slot_name(
-+            DeckSlotName.SLOT_C2
-+        )
-+    ).then_return(area)
-+
-     with expected_raise:
-         deck_conflict.check_safe_for_pipette_movement(
-             engine_state=mock_state_view,
-diff --git a/api/tests/opentrons/protocol_engine/state/test_motion_view.py b/api/tests/opentrons/protocol_engine/state/test_motion_view.py
-index 0b76a55f7a..b49a720852 100644
---- a/api/tests/opentrons/protocol_engine/state/test_motion_view.py
-+++ b/api/tests/opentrons/protocol_engine/state/test_motion_view.py
-@@ -559,6 +559,60 @@ def test_get_movement_waypoints_to_addressable_area(
-     assert result == waypoints
- 
- 
-+def test_move_to_moveable_trash_addressable_area(
-+    decoy: Decoy,
-+    pipette_view: PipetteView,
-+    addressable_area_view: AddressableAreaView,
-+    geometry_view: GeometryView,
-+    subject: MotionView,
-+) -> None:
-+    """Ensure that a move request to a moveableTrash addressable executes with no destination critical point."""
-+    location = CurrentAddressableArea(
-+        pipette_id="123", addressable_area_name="moveableTrashA1"
-+    )
-+
-+    decoy.when(pipette_view.get_current_location()).then_return(location)
-+    decoy.when(
-+        addressable_area_view.get_addressable_area_move_to_location("moveableTrashA1")
-+    ).then_return(Point(x=3, y=3, z=3))
-+    decoy.when(geometry_view.get_all_obstacle_highest_z()).then_return(42)
-+
-+    decoy.when(
-+        addressable_area_view.get_addressable_area_base_slot("moveableTrashA1")
-+    ).then_return(DeckSlotName.SLOT_1)
-+
-+    decoy.when(
-+        geometry_view.get_extra_waypoints(location, DeckSlotName.SLOT_1)
-+    ).then_return([])
-+
-+    waypoints = [motion_planning.Waypoint(position=Point(1, 2, 3), critical_point=None)]
-+
-+    decoy.when(
-+        motion_planning.get_waypoints(
-+            move_type=motion_planning.MoveType.DIRECT,
-+            origin=Point(x=1, y=2, z=3),
-+            origin_cp=CriticalPoint.MOUNT,
-+            max_travel_z=1337,
-+            min_travel_z=123,
-+            dest=Point(x=4, y=5, z=6),
-+            dest_cp=None,
-+            xy_waypoints=[],
-+        )
-+    ).then_return(waypoints)
-+
-+    result = subject.get_movement_waypoints_to_addressable_area(
-+        addressable_area_name="moveableTrashA1",
-+        offset=AddressableOffsetVector(x=1, y=2, z=3),
-+        origin=Point(x=1, y=2, z=3),
-+        origin_cp=CriticalPoint.MOUNT,
-+        max_travel_z=1337,
-+        force_direct=True,
-+        minimum_z_height=123,
-+    )
-+
-+    assert result == waypoints
-+
-+
- def test_get_movement_waypoints_to_addressable_area_stay_at_max_travel_z(
-     decoy: Decoy,
-     pipette_view: PipetteView,
+     else:
+-        legacy_deck = LegacyDeck(deck_type=deck_type)
++        legacy_deck = LegacyDeck(deck_type=deck_type, version=deck_version)
+         core = LegacyProtocolCore(
+             sync_hardware=sync_hardware,
+             labware_offset_provider=labware_offset_provider,
