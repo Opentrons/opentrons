@@ -48,6 +48,8 @@ export function useNotifyService<TData, TError = Error>({
     refetchInterval !== undefined && refetchInterval !== false
 
   React.useEffect(() => {
+    //Always fetch on initial mount.
+    refetchUsingHTTP()
     if (!forceHttpPolling && isRefetchEnabled && enabled !== false) {
       const hostname = host?.hostname ?? null
       const eventEmitter = appShellListener(hostname, topic)
@@ -67,7 +69,7 @@ export function useNotifyService<TData, TError = Error>({
         }
       }
     }
-  }, [])
+  }, [topic])
 
   return { isNotifyError: isNotifyError.current }
 

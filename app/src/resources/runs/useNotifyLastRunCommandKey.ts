@@ -10,7 +10,7 @@ export function useNotifyLastRunCommandKey(
   runId: string,
   options?: QueryOptionsWithPolling<CommandsData, Error>
 ): string | null {
-  const [refetchUsingHTTP, setRefetchUsingHTTP] = React.useState(true)
+  const [refetchUsingHTTP, setRefetchUsingHTTP] = React.useState(false)
 
   const { isNotifyError } = useNotifyService({
     topic: 'robot-server/runs/current_command',

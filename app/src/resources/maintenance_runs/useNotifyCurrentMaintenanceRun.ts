@@ -12,7 +12,7 @@ export function useNotifyCurrentMaintenanceRun(
   options?: QueryOptionsWithPolling<MaintenanceRun, Error>
 ): UseQueryResult<MaintenanceRun> | UseQueryResult<MaintenanceRun, Error> {
   const host = useHost()
-  const [refetchUsingHTTP, setRefetchUsingHTTP] = React.useState(true)
+  const [refetchUsingHTTP, setRefetchUsingHTTP] = React.useState(false)
 
   const { isNotifyError } = useNotifyService<MaintenanceRun, Error>({
     topic: 'robot-server/maintenance_runs/current_run',

@@ -15,7 +15,7 @@ export function useNotifyAllRunsQuery(
   options: QueryOptionsWithPolling<UseAllRunsQueryOptions, AxiosError> = {},
   hostOverride?: HostConfig | null
 ): UseQueryResult<Runs, AxiosError> {
-  const [refetchUsingHTTP, setRefetchUsingHTTP] = React.useState(true)
+  const [refetchUsingHTTP, setRefetchUsingHTTP] = React.useState(false)
 
   const { isNotifyError } = useNotifyService<
     UseAllRunsQueryOptions,
@@ -23,7 +23,7 @@ export function useNotifyAllRunsQuery(
   >({
     topic: 'robot-server/runs',
     refetchUsingHTTP: () => setRefetchUsingHTTP(true),
-    options: options != null ? options : {},
+    options,
   })
 
   const isNotifyEnabled = !isNotifyError && !options?.forceHttpPolling
