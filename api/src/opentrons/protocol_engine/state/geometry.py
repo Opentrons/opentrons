@@ -6,6 +6,8 @@ from typing import Optional, List, Tuple, Union, cast, TypeVar, Dict
 from opentrons.types import Point, DeckSlotName, StagingSlotName, MountType
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
+from opentrons_shared_data.deck.dev_types import CutoutFixture
+
 from .. import errors
 from ..errors import LabwareNotLoadedOnLabwareError, LabwareNotLoadedOnModuleError
 from ..resources import fixture_validation
@@ -33,7 +35,6 @@ from ..types import (
     OnDeckLabwareLocation,
     AddressableAreaLocation,
     AddressableOffsetVector,
-    PotentialCutoutFixture,
 )
 from .config import Config
 from .labware import LabwareView
@@ -159,10 +160,8 @@ class GeometryView:
         elif isinstance(slot_item, LoadedLabware):
             # get stacked heights of all labware in the slot
             return self.get_highest_z_of_labware_stack(slot_item.id)
-        elif isinstance(slot_item, PotentialCutoutFixture):
-            return self._addressable_areas.get_fixture_height(
-                slot_item.cutout_fixture_id
-            )
+        elif type(slot_item) == CutoutFixture:
+            return self._addressable_areas.get_fixture_height(slot_item["id"])
         else:
             return 0
 
@@ -684,7 +683,7 @@ class GeometryView:
 
     def get_slot_item(
         self, slot_name: Union[DeckSlotName, StagingSlotName]
-    ) -> Union[LoadedLabware, LoadedModule, PotentialCutoutFixture, None]:
+    ) -> Union[LoadedLabware, LoadedModule, CutoutFixture, None]:
         """Get the item present in a deck slot, if any."""
         maybe_labware = self._labware.get_by_slot(
             slot_name=slot_name,
@@ -695,7 +694,7 @@ class GeometryView:
                 slot_name
             )
             # Ignore generic single slot fixtures
-            if maybe_fixture and maybe_fixture.cutout_fixture_id in {
+            if maybe_fixture and maybe_fixture["id"] in {
                 "singleLeftSlot",
                 "singleCenterSlot",
                 "singleRightSlot",

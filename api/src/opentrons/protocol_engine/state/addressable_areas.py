@@ -3,7 +3,11 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Set, Union
 
 from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
+from opentrons_shared_data.deck.dev_types import (
+    DeckDefinitionV4,
+    SlotDefV3,
+    CutoutFixture,
+)
 
 from opentrons.types import Point, DeckSlotName
 
@@ -466,28 +470,26 @@ class AddressableAreaView(HasState[AddressableAreaState]):
 
     def get_fixture_by_deck_slot_name(
         self, slot_name: DeckSlotName
-    ) -> Optional[PotentialCutoutFixture]:
-        """Get the Potential Cutout Fixture of a fixture currently loaded into a specific Deck Slot."""
+    ) -> Optional[CutoutFixture]:
+        """Get the Cutout Fixture of a fixture currently loaded into a specific Deck Slot."""
         deck_config = self.state.deck_configuration
-        potential_fixtures = self.state.potential_cutout_fixtures_by_cutout_id
         if deck_config:
             slot_cutout_id = DECK_SLOT_TO_CUTOUT_MAP[slot_name]
-            slot_cutout_fixture_id = None
+            slot_cutout_fixture = None
             # This will only ever be one under current assumptions
             for cutout_id, cutout_fixture_id in deck_config:
                 if cutout_id == slot_cutout_id:
-                    slot_cutout_fixture_id = cutout_fixture_id
+                    slot_cutout_fixture = (
+                        deck_configuration_provider.get_cutout_fixture(
+                            cutout_fixture_id, self.state.deck_definition
+                        )
+                    )
                     break
-            if slot_cutout_fixture_id is None:
+            if slot_cutout_fixture is None:
                 raise CutoutDoesNotExistError(
                     f"No Cutout was found in the Deck that matched provided slot {slot_name}."
                 )
-
-            slot_fixtures = potential_fixtures[slot_cutout_id]
-            for fixture in slot_fixtures:
-                if fixture.cutout_fixture_id == slot_cutout_fixture_id:
-                    return fixture
-        return None
+        return slot_cutout_fixture
 
     def get_fixture_height(self, cutout_fixture_name: str) -> float:
         """Get the z height of a cutout fixture."""
