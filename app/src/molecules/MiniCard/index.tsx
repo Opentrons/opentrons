@@ -9,6 +9,7 @@ interface MiniCardProps extends StyleProps {
   isSelected: boolean
   children: React.ReactNode
   isError?: boolean
+  isWarning?: boolean
 }
 const unselectedOptionStyles = css`
   background-color: ${COLORS.white};
@@ -44,15 +45,34 @@ const errorOptionStyles = css`
   }
 `
 
-export function MiniCard(props: MiniCardProps): JSX.Element {
-  const { children, onClick, isSelected, isError = false } = props
+const warningOptionStyles = css`
+  ${selectedOptionStyles}
+  border: 1px solid ${COLORS.yellow50};
+  background-color: ${COLORS.yellow20};
 
-  const selectedWrapperStyles = isError
-    ? errorOptionStyles
-    : selectedOptionStyles
-  const wrapperStyles = isSelected
-    ? selectedWrapperStyles
-    : unselectedOptionStyles
+  &:hover {
+    border: 1px solid ${COLORS.yellow50};
+    background-color: ${COLORS.yellow20};
+  }
+`
+
+export function MiniCard(props: MiniCardProps): JSX.Element {
+  const {
+    children,
+    onClick,
+    isSelected,
+    isError = false,
+    isWarning = false,
+  } = props
+
+  let wrapperStyles = unselectedOptionStyles
+  if (isSelected && isError) {
+    wrapperStyles = errorOptionStyles
+  } else if (isSelected && isWarning) {
+    wrapperStyles = warningOptionStyles
+  } else if (isSelected) {
+    wrapperStyles = selectedOptionStyles
+  }
 
   return (
     <Flex onClick={onClick} css={wrapperStyles}>

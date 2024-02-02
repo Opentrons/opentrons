@@ -62,7 +62,8 @@ export function ChooseProtocolSlideoutComponent(
     false,
     selectedProtocol?.mostRecentAnalysis
   )
-  const missingAnalysisData = analysisStatus !== 'complete'
+  const missingAnalysisData =
+    analysisStatus === 'error' || analysisStatus === 'stale'
 
   const [shouldApplyOffsets, setShouldApplyOffsets] = React.useState(true)
   const offsetCandidates = useOffsetCandidatesForAnalysis(
@@ -227,13 +228,15 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
           false,
           storedProtocol.mostRecentAnalysis
         )
-        const missingAnalysisData = analysisStatus !== 'complete'
+        const missingAnalysisData =
+          analysisStatus === 'error' || analysisStatus === 'stale'
         return (
           <React.Fragment key={storedProtocol.protocolKey}>
             <Flex flexDirection={DIRECTION_COLUMN}>
               <MiniCard
                 isSelected={isSelected}
                 isError={runCreationError != null}
+                isWarning={missingAnalysisData}
                 onClick={() => handleSelectProtocol(storedProtocol)}
               >
                 <Box display="grid" gridTemplateColumns="1fr 3fr">
@@ -261,13 +264,18 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                       storedProtocol.protocolKey}
                   </StyledText>
                 </Box>
-                {runCreationError != null && isSelected ? (
+                {(runCreationError != null || missingAnalysisData) &&
+                isSelected ? (
                   <>
                     <Box flex="1 1 auto" />
                     <Icon
                       name="alert-circle"
                       size="1.25rem"
-                      color={COLORS.red50}
+                      color={
+                        runCreationError != null
+                          ? COLORS.red50
+                          : COLORS.yellow50
+                      }
                     />
                   </>
                 ) : null}
@@ -301,6 +309,37 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 ) : (
                   runCreationError
                 )}
+              </StyledText>
+            ) : null}
+            {missingAnalysisData && isSelected ? (
+              <StyledText
+                as="label"
+                color={COLORS.yellow60}
+                overflowWrap="anywhere"
+                display={DISPLAY_BLOCK}
+                marginTop={`-${SPACING.spacing8}`}
+                marginBottom={SPACING.spacing8}
+              >
+                {analysisStatus === 'stale'
+                  ? t('protocol_analysis_stale')
+                  : t('protocol_analysis_failed')}
+                {
+                  <Trans
+                    t={t}
+                    i18nKey="protocol_details_page_reanalyze"
+                    components={{
+                      navlink: (
+                        <Link
+                          to="/protocols"
+                          css={css`
+                            color: ${COLORS.yellow60};
+                            text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
+                          `}
+                        />
+                      ),
+                    }}
+                  />
+                }
               </StyledText>
             ) : null}
           </React.Fragment>
