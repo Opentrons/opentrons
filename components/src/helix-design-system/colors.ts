@@ -48,6 +48,7 @@ export const blue55 = '#0056C8'
 export const blue40 = '#A9CEFD'
 export const blue35 = '#BFDCFD'
 export const blue30 = '#D0E6FE'
+export const blue20 = '#E1EFFF'
 export const blue10 = '#F1F8FF'
 
 /**
@@ -59,7 +60,7 @@ export const grey50 = '#9C9C9C'
 export const grey40 = '#D0D0D0'
 export const grey35 = '#CBCCCC'
 export const grey30 = '#DEDEDE'
-export const grey20 = '#ECECEC'
+export const grey20 = '#E9E9E9'
 export const grey10 = '#F8F8F8'
 
 /**
@@ -79,3 +80,4 @@ export const transparent = 'transparent'
 export const opacity20HexCode = '33' // 20% opacity
 export const opacity40HexCode = '66' // 40% opacity
 export const opacity60HexCode = '99' // 60% opacity
+export const opacity90HexCode = 'E6' // 90% opacity

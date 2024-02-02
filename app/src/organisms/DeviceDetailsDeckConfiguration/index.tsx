@@ -11,13 +11,14 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   Link,
+  SIZE_4,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  useCurrentMaintenanceRun,
   useDeckConfigurationQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
@@ -30,11 +31,13 @@ import {
   SINGLE_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
 import { AddFixtureModal } from './AddFixtureModal'
-import { useRunStatuses } from '../Devices/hooks'
+import { useIsRobotViewable, useRunStatuses } from '../Devices/hooks'
+import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { CutoutId } from '@opentrons/shared-data'
 
@@ -65,10 +68,12 @@ export function DeviceDetailsDeckConfiguration({
       .data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const { isRunRunning } = useRunStatuses()
-  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
   })
+  const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
   const isMaintenanceRunExisting = maintenanceRunData?.data?.id != null
+  const isRobotViewable = useIsRobotViewable(robotName)
 
   const handleClickAdd = (cutoutId: CutoutId): void => {
     setTargetCutoutId(cutoutId)
@@ -113,7 +118,6 @@ export function DeviceDetailsDeckConfiguration({
       <Flex
         alignItems={ALIGN_FLEX_START}
         backgroundColor={COLORS.white}
-        border={BORDERS.lineBorder}
         borderRadius={BORDERS.radiusSoftCorners}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing16}
@@ -143,88 +147,115 @@ export function DeviceDetailsDeckConfiguration({
             {t('setup_instructions')}
           </Link>
         </Flex>
-        <Flex
-          gridGap={SPACING.spacing16}
-          paddingX={SPACING.spacing16}
-          paddingBottom={SPACING.spacing32}
-          paddingTop={
-            isRunRunning || isMaintenanceRunExisting
-              ? undefined
-              : SPACING.spacing32
-          }
-          width="100%"
-          flexDirection={DIRECTION_COLUMN}
-        >
-          {isRunRunning ? (
-            <Banner type="warning">
-              {t('deck_configuration_is_not_available_when_run_is_in_progress')}
-            </Banner>
-          ) : null}
-          {isMaintenanceRunExisting ? (
-            <Banner type="warning">
-              {t('deck_configuration_is_not_available_when_robot_is_busy')}
-            </Banner>
-          ) : null}
-          <Flex css={DECK_CONFIG_SECTION_STYLE}>
-            <Flex
-              // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-              marginLeft={`-${SPACING.spacing32}`}
-              // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-              marginTop={`-${SPACING.spacing6}`}
-              flexDirection={DIRECTION_COLUMN}
-            >
-              <DeckConfigurator
-                readOnly={isRunRunning || isMaintenanceRunExisting}
-                deckConfig={deckConfig}
-                handleClickAdd={handleClickAdd}
-                handleClickRemove={handleClickRemove}
-              />
-            </Flex>
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing8}
-              width="32rem"
-            >
+        {isRobotViewable ? (
+          <Flex
+            gridGap={SPACING.spacing16}
+            paddingX={SPACING.spacing16}
+            paddingBottom={SPACING.spacing32}
+            paddingTop={
+              isRunRunning || isMaintenanceRunExisting
+                ? undefined
+                : SPACING.spacing32
+            }
+            width="100%"
+            flexDirection={DIRECTION_COLUMN}
+          >
+            {isRunRunning ? (
+              <Banner type="warning">
+                {t(
+                  'deck_configuration_is_not_available_when_run_is_in_progress'
+                )}
+              </Banner>
+            ) : null}
+            {isMaintenanceRunExisting ? (
+              <Banner type="warning">
+                {t('deck_configuration_is_not_available_when_robot_is_busy')}
+              </Banner>
+            ) : null}
+            <Flex css={DECK_CONFIG_SECTION_STYLE}>
               <Flex
-                gridGap={SPACING.spacing32}
-                paddingLeft={SPACING.spacing8}
-                css={TYPOGRAPHY.labelSemiBold}
+                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                marginLeft={`-${SPACING.spacing32}`}
+                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                marginTop={`-${SPACING.spacing6}`}
+                flexDirection={DIRECTION_COLUMN}
               >
-                <StyledText>{t('location')}</StyledText>
-                <StyledText>{t('fixture')}</StyledText>
+                <DeckConfigurator
+                  readOnly={
+                    isRunRunning ||
+                    isMaintenanceRunExisting ||
+                    isEstopNotDisengaged
+                  }
+                  deckConfig={deckConfig}
+                  handleClickAdd={handleClickAdd}
+                  handleClickRemove={handleClickRemove}
+                />
               </Flex>
-              {fixtureDisplayList.length > 0 ? (
-                fixtureDisplayList.map(fixture => (
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                gridGap={SPACING.spacing8}
+                width="32rem"
+              >
+                <Flex
+                  gridGap={SPACING.spacing32}
+                  paddingLeft={SPACING.spacing8}
+                  css={TYPOGRAPHY.labelSemiBold}
+                >
+                  <StyledText>{t('location')}</StyledText>
+                  <StyledText>{t('fixture')}</StyledText>
+                </Flex>
+                {fixtureDisplayList.length > 0 ? (
+                  fixtureDisplayList.map(fixture => (
+                    <Flex
+                      key={fixture.cutoutId}
+                      backgroundColor={COLORS.grey20}
+                      gridGap={SPACING.spacing60}
+                      padding={SPACING.spacing8}
+                      width="100%"
+                      css={TYPOGRAPHY.labelRegular}
+                    >
+                      <StyledText>
+                        {getCutoutDisplayName(fixture.cutoutId)}
+                      </StyledText>
+                      <StyledText>
+                        {getFixtureDisplayName(fixture.cutoutFixtureId)}
+                      </StyledText>
+                    </Flex>
+                  ))
+                ) : (
                   <Flex
-                    key={fixture.cutoutId}
-                    backgroundColor={COLORS.grey10}
+                    backgroundColor={COLORS.grey20}
                     gridGap={SPACING.spacing60}
                     padding={SPACING.spacing8}
                     width="100%"
                     css={TYPOGRAPHY.labelRegular}
                   >
-                    <StyledText>
-                      {getCutoutDisplayName(fixture.cutoutId)}
-                    </StyledText>
-                    <StyledText>
-                      {getFixtureDisplayName(fixture.cutoutFixtureId)}
-                    </StyledText>
+                    <StyledText>{t('no_deck_fixtures')}</StyledText>
                   </Flex>
-                ))
-              ) : (
-                <Flex
-                  backgroundColor={COLORS.grey10}
-                  gridGap={SPACING.spacing60}
-                  padding={SPACING.spacing8}
-                  width="100%"
-                  css={TYPOGRAPHY.labelRegular}
-                >
-                  <StyledText>{t('no_deck_fixtures')}</StyledText>
-                </Flex>
-              )}
+                )}
+              </Flex>
             </Flex>
           </Flex>
-        </Flex>
+        ) : (
+          <Flex
+            alignItems={ALIGN_CENTER}
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing12}
+            justifyContent={JUSTIFY_CENTER}
+            minHeight={SIZE_4}
+            padding={SPACING.spacing12}
+            paddingBottom={SPACING.spacing24}
+            width="100%"
+          >
+            <StyledText
+              as="p"
+              color={COLORS.grey40}
+              id="InstrumentsAndModules_offline"
+            >
+              {t('offline_deck_configuration')}
+            </StyledText>
+          </Flex>
+        )}
       </Flex>
     </>
   )

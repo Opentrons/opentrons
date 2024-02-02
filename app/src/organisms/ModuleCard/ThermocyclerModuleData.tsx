@@ -35,7 +35,7 @@ export const ThermocyclerModuleData = (
   } => {
     const StatusLabelProps = {
       backgroundColor: COLORS.grey30,
-      iconColor: COLORS.grey50,
+      iconColor: COLORS.grey60,
       textColor: COLORS.blue60,
       pulse: false,
     }
@@ -43,25 +43,25 @@ export const ThermocyclerModuleData = (
     switch (status) {
       case 'idle': {
         StatusLabelProps.backgroundColor = COLORS.grey30
-        StatusLabelProps.iconColor = COLORS.grey50
-        StatusLabelProps.textColor = COLORS.black90
+        StatusLabelProps.iconColor = COLORS.grey60
+        StatusLabelProps.textColor = COLORS.grey60
         break
       }
       case 'holding at target': {
         StatusLabelProps.backgroundColor = COLORS.blue30
-        StatusLabelProps.iconColor = COLORS.blue50
+        StatusLabelProps.iconColor = COLORS.blue60
         break
       }
       case 'cooling':
       case 'heating': {
         StatusLabelProps.backgroundColor = COLORS.blue30
-        StatusLabelProps.iconColor = COLORS.grey50
+        StatusLabelProps.iconColor = COLORS.blue60
         StatusLabelProps.pulse = true
         break
       }
       case 'error': {
-        StatusLabelProps.backgroundColor = COLORS.yellow20
-        StatusLabelProps.iconColor = COLORS.yellow50
+        StatusLabelProps.backgroundColor = COLORS.yellow30
+        StatusLabelProps.iconColor = COLORS.yellow60
         StatusLabelProps.textColor = COLORS.yellow60
       }
     }
@@ -89,7 +89,7 @@ export const ThermocyclerModuleData = (
             <StatusLabel
               status={data.lidStatus === 'in_between' ? 'open' : data.lidStatus}
               backgroundColor={COLORS.grey30}
-              textColor={COLORS.black90}
+              textColor={COLORS.grey60}
               showIcon={false}
               key="lidStatus"
               id="lidStatus"

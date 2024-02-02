@@ -1,3 +1,4 @@
+import type { IpcMainEvent } from 'electron'
 import type { Error } from '../types'
 import type { RobotSystemAction } from './is-ready/types'
 
@@ -5,6 +6,16 @@ export interface Remote {
   ipcRenderer: {
     invoke: (channel: string, ...args: unknown[]) => Promise<any>
     send: (channel: string, ...args: unknown[]) => void
+    on: (
+      channel: string,
+      listener: (
+        event: IpcMainEvent,
+        hostname: string,
+        topic: NotifyTopic,
+        message: string | Object,
+        ...args: unknown[]
+      ) => void
+    ) => void
   }
 }
 
@@ -112,6 +123,30 @@ export interface RobotMassStorageDeviceRemoved {
   meta: { shell: true }
 }
 
+export type NotifyTopic =
+  | 'robot-server/maintenance_runs'
+  | 'robot-server/runs/current_command'
+
+export type NotifyAction = 'subscribe' | 'unsubscribe'
+
+export interface NotifySubscribeAction {
+  type: 'shell:NOTIFY_SUBSCRIBE'
+  payload: {
+    hostname: string
+    topic: NotifyTopic
+  }
+  meta: { shell: true }
+}
+
+export interface NotifyUnsubscribeAction {
+  type: 'shell:NOTIFY_UNSUBSCRIBE'
+  payload: {
+    hostname: string
+    topic: NotifyTopic
+  }
+  meta: { shell: true }
+}
+
 export type ShellAction =
   | UiInitializedAction
   | ShellUpdateAction
@@ -124,3 +159,5 @@ export type ShellAction =
   | RobotMassStorageDeviceAdded
   | RobotMassStorageDeviceEnumerated
   | RobotMassStorageDeviceRemoved
+  | NotifySubscribeAction
+  | NotifyUnsubscribeAction

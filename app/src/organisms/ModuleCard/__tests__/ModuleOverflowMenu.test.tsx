@@ -517,6 +517,7 @@ describe('ModuleOverflowMenu', () => {
     mockUseIsFlex.mockReturnValue(true)
     props = {
       ...props,
+      module: mockHeaterShaker,
       isPipetteReady: false,
     }
     const { getByRole } = render(props)
@@ -529,6 +530,7 @@ describe('ModuleOverflowMenu', () => {
     mockUseIsFlex.mockReturnValue(true)
     props = {
       ...props,
+      module: mockHeaterShaker,
       isTooHot: true,
     }
     const { getByRole } = render(props)
@@ -541,6 +543,7 @@ describe('ModuleOverflowMenu', () => {
     mockUseIsFlex.mockReturnValue(true)
     props = {
       ...props,
+      module: mockHeaterShaker,
       isPipetteReady: true,
     }
     const { getByRole } = render(props)

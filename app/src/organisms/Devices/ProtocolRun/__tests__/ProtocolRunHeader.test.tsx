@@ -844,6 +844,30 @@ describe('ProtocolRunHeader', () => {
     screen.getByText('mock RunFailedModal')
   })
 
+  it('does not render banners when a run is resetting', () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: { data: mockFailedRun },
+      } as UseQueryResult<Run>)
+    when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_FAILED)
+    when(mockUseRunControls)
+      .calledWith(RUN_ID, expect.anything())
+      .mockReturnValue({
+        play: () => {},
+        pause: () => {},
+        stop: () => {},
+        reset: () => {},
+        isPlayRunActionLoading: false,
+        isPauseRunActionLoading: false,
+        isStopRunActionLoading: false,
+        isResetRunLoading: true,
+      })
+    render()
+
+    expect(screen.queryByText('mock RunFailedModal')).not.toBeInTheDocument()
+  })
+
   it('renders a clear protocol banner when run has been canceled', () => {
     when(mockUseRunStatus)
       .calledWith(RUN_ID)

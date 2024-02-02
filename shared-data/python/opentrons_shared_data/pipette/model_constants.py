@@ -60,7 +60,12 @@ _MAP_KEY_TO_V2: Dict[str, List[str]] = {
     "bottom": ["plungerPositionsConfigurations", "default", "bottom"],
     "blowout": ["plungerPositionsConfigurations", "default", "blowout"],
     "dropTip": ["plungerPositionsConfigurations", "default", "drop"],
-    "pickUpCurrent": ["pickUpTipConfigurations", "pressFit", "currentByTipCount"],
+    "pickUpCurrent": [
+        "pickUpTipConfigurations",
+        "pressFit",
+        "currentByTipCount",
+        "##EACHTIP##",
+    ],
     "pickUpDistance": ["pickUpTipConfigurations", "pressFit", "distance"],
     "pickUpIncrement": ["pickUpTipConfigurations", "pressFit", "increment"],
     "pickUpPresses": ["pickUpTipConfigurations", "pressFit", "presses"],

@@ -59,6 +59,8 @@ When choosing an API level, consider what features you need and how widely you p
 
 On the one hand, using the highest available version will give your protocol access to all the latest :ref:`features and fixes <version-notes>`. On the other hand, using the lowest possible version lets the protocol work on a wider range of robot software versions. For example, a protocol that uses the Heater-Shaker and specifies version 2.13 of the API should work equally well on a robot running version 6.1.0 or 6.2.0 of the robot software. Specifying version 2.14 would limit the protocol to robots running 6.2.0 or higher.
 
+.. _max-version:
+
 Maximum Supported Versions
 ==========================
 
@@ -182,13 +184,13 @@ This version introduces support for the Opentrons Flex robot, instruments, modul
 
   - Use coordinates or numbers to specify :ref:`deck slots <deck-slots>`. These formats match physical labels on Flex and OT-2, but you can use either system, regardless of ``robotType``.
   
-  - The new :py:meth:`.load_adapter` method lets you load adapters and labware separately on modules, and lets you load adapters directly in deck slots. See :ref:`labware-on-adapters`.
+  - The new module context ``load_adapter()`` methods let you load adapters and labware separately on modules, and :py:meth:`.ProtocolContext.load_adapter` lets you load adapters directly in deck slots. See :ref:`labware-on-adapters`.
   
   - Move labware manually using :py:meth:`.move_labware`, without having to stop your protocol. 
   
   - Manual labware moves support moving to or from the new :py:obj:`~.protocol_api.OFF_DECK` location (outside of the robot).
   
-  - :py:meth:`.load_labware` also accepts :py:obj:`~.protocol_api.OFF_DECK` as a location. This lets you prepare labware to be moved onto the deck later in a protocol.  
+  - :py:meth:`.ProtocolContext.load_labware` also accepts :py:obj:`~.protocol_api.OFF_DECK` as a location. This lets you prepare labware to be moved onto the deck later in a protocol.
   
   - The new ``push_out`` parameter of the :py:meth:`.dispense` method helps ensure that the pipette dispenses all of its liquid when working with very small volumes.
   
@@ -244,10 +246,10 @@ If you specify an API version of ``2.13`` or lower, your protocols will continue
     because the plunger's speed is a stepwise function of the volume.
     Use :py:attr:`.InstrumentContext.flow_rate` to set the flow rate in µL/s, instead.
 
-  - ``ModuleContext.load_labware_object`` was removed as an unnecessary internal method.
+  - ``load_labware_object()`` was removed from module contexts as an unnecessary internal method.
 
-  - ``ModuleContext.geometry`` was removed in favor of
-    :py:attr:`.ModuleContext.model` and :py:attr:`.ModuleContext.type`
+  - ``geometry`` was removed from module contexts in favor of
+    ``model`` and ``type`` attributes.
 
   - ``Well.geometry`` was removed as unnecessary.
 
@@ -337,7 +339,7 @@ Version 2.8
 Version 2.7
 -----------
 
-- Added :py:meth:`.InstrumentContext.pair_with`, an experimental feature for moving both pipettes simultaneously.
+- Added ``InstrumentContext.pair_with()``, an experimental feature for moving both pipettes simultaneously.
 
   .. note::
 

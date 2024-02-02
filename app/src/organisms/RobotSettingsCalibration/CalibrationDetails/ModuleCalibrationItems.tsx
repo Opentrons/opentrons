@@ -16,12 +16,14 @@ interface ModuleCalibrationItemsProps {
   attachedModules: AttachedModule[]
   updateRobotStatus: (isRobotBusy: boolean) => void
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
+  robotName: string
 }
 
 export function ModuleCalibrationItems({
   attachedModules,
   updateRobotStatus,
   formattedPipetteOffsetCalibrations,
+  robotName,
 }: ModuleCalibrationItemsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -64,6 +66,7 @@ export function ModuleCalibrationItems({
                 formattedPipetteOffsetCalibrations={
                   formattedPipetteOffsetCalibrations
                 }
+                robotName={robotName}
               />
             </StyledTableCell>
           </StyledTableRow>

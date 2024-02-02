@@ -75,7 +75,6 @@ DEFAULT_CARRIAGE_OFFSET: Final[Offset] = (477.20, 493.8, 253.475)
 DEFAULT_LEFT_MOUNT_OFFSET: Final[Offset] = (-13.5, -60.5, 255.675)
 DEFAULT_RIGHT_MOUNT_OFFSET: Final[Offset] = (40.5, -60.5, 255.675)
 DEFAULT_GRIPPER_MOUNT_OFFSET: Final[Offset] = (84.55, -12.75, 93.85)
-DEFAULT_Z_RETRACT_DISTANCE: Final = 2
 DEFAULT_SAFE_HOME_DISTANCE: Final = 5
 DEFAULT_CALIBRATION_AXIS_MAX_SPEED: Final = 30
 
@@ -380,9 +379,6 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
                 current_settings.get("run_current", {}),
                 DEFAULT_RUN_CURRENT,
             ),
-        ),
-        z_retract_distance=robot_settings.get(
-            "z_retract_distance", DEFAULT_Z_RETRACT_DISTANCE
         ),
         safe_home_distance=robot_settings.get(
             "safe_home_distance", DEFAULT_SAFE_HOME_DISTANCE

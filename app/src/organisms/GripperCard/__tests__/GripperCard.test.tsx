@@ -47,6 +47,7 @@ describe('GripperCard', () => {
       isCalibrated: true,
       setSubsystemToUpdate: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     mockGripperWizardFlows.mockReturnValue(<>wizard flow launched</>)
     mockAboutGripperSlideout.mockReturnValue(<>about gripper</>)
@@ -89,11 +90,38 @@ describe('GripperCard', () => {
       isCalibrated: false,
       setSubsystemToUpdate: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
 
     render(props)
     screen.getByText('Calibration needed.')
+    screen.getByText('Calibrate now')
   })
+
+  it('renders recalibrate banner without calibrate now when no calibration data is present and e-stop is pressed', () => {
+    props = {
+      attachedGripper: {
+        instrumentModel: 'gripperV1.1',
+        serialNumber: '123',
+        firmwareVersion: '12',
+        ok: true,
+        data: {
+          calibratedOffset: {
+            last_modified: undefined,
+          },
+        },
+      } as GripperData,
+      isCalibrated: false,
+      setSubsystemToUpdate: jest.fn(),
+      isRunActive: false,
+      isEstopNotDisengaged: true,
+    }
+
+    render(props)
+    screen.getByText('Calibration needed.')
+    expect(screen.queryByText('Calibrate now')).not.toBeInTheDocument()
+  })
+
   it('opens the about gripper slideout when button is pressed', () => {
     render(props)
     const overflowButton = screen.getByRole('button', {
@@ -130,6 +158,7 @@ describe('GripperCard', () => {
       isCalibrated: false,
       setSubsystemToUpdate: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     render(props)
     const overflowButton = screen.getByRole('button', {
@@ -148,6 +177,7 @@ describe('GripperCard', () => {
       isCalibrated: false,
       setSubsystemToUpdate: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     render(props)
     screen.getByText('Extension mount')
@@ -167,6 +197,7 @@ describe('GripperCard', () => {
       isCalibrated: true,
       setSubsystemToUpdate: jest.fn(),
       isRunActive: false,
+      isEstopNotDisengaged: false,
     }
     render(props)
     screen.getByText('Extension mount')

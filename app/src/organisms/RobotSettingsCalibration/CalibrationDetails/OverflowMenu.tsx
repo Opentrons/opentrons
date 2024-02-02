@@ -33,6 +33,7 @@ import {
 } from '../../../organisms/Devices/hooks'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
+import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { PipetteName } from '@opentrons/shared-data'
 import type { DeleteCalRequestParams } from '@opentrons/api-client'
@@ -82,6 +83,7 @@ export function OverflowMenu({
     showPipetteWizardFlows,
     setShowPipetteWizardFlows,
   ] = React.useState<boolean>(false)
+  const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
   const isPipetteForFlex = isFlexPipette(pipetteName as PipetteName)
   const ot3PipCal =
     useAttachedPipettesFromInstrumentsQuery()[mount]?.data?.calibratedOffset
@@ -174,6 +176,7 @@ export function OverflowMenu({
         alignSelf={ALIGN_FLEX_END}
         aria-label={`CalibrationOverflowMenu_button_${calType}`}
         onClick={handleOverflowClick}
+        disabled={isEstopNotDisengaged}
       />
       {showPipetteWizardFlows ? (
         <PipetteWizardFlows

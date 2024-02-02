@@ -17,7 +17,7 @@ import { InterventionModal } from '../../InterventionModal'
 import { ProgressBar } from '../../../atoms/ProgressBar'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useLastRunCommandKey } from '../../Devices/hooks/useLastRunCommandKey'
+import { useNotifyLastRunCommandKey } from '../../../resources/runs/useNotifyLastRunCommandKey'
 import { useDownloadRunLog } from '../../Devices/hooks'
 import {
   mockUseAllCommandsResponseNonDeterministic,
@@ -34,7 +34,7 @@ import { RunProgressMeter } from '..'
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../RunTimeControl/hooks')
 jest.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-jest.mock('../../Devices/hooks/useLastRunCommandKey')
+jest.mock('../../../resources/runs/useNotifyLastRunCommandKey')
 jest.mock('../../Devices/hooks')
 jest.mock('../../../atoms/ProgressBar')
 jest.mock('../../InterventionModal')
@@ -55,8 +55,8 @@ const mockUseCommandQuery = useCommandQuery as jest.MockedFunction<
 const mockUseDownloadRunLog = useDownloadRunLog as jest.MockedFunction<
   typeof useDownloadRunLog
 >
-const mockUseLastRunCommandKey = useLastRunCommandKey as jest.MockedFunction<
-  typeof useLastRunCommandKey
+const mockUseNotifyLastRunCommandKey = useNotifyLastRunCommandKey as jest.MockedFunction<
+  typeof useNotifyLastRunCommandKey
 >
 const mockProgressBar = ProgressBar as jest.MockedFunction<typeof ProgressBar>
 const mockInterventionModal = InterventionModal as jest.MockedFunction<
@@ -91,8 +91,8 @@ describe('RunProgressMeter', () => {
       downloadRunLog: jest.fn(),
       isRunLogLoading: false,
     })
-    when(mockUseLastRunCommandKey)
-      .calledWith(NON_DETERMINISTIC_RUN_ID)
+    when(mockUseNotifyLastRunCommandKey)
+      .calledWith(NON_DETERMINISTIC_RUN_ID, { refetchInterval: 1000 })
       .mockReturnValue(NON_DETERMINISTIC_COMMAND_KEY)
     mockUseRunQuery.mockReturnValue({ data: null } as any)
 

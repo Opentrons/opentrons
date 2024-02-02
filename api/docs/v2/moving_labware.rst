@@ -31,6 +31,7 @@ When the move step is complete, the API updates the labware's location, so you c
     
 For the first move, the API knows to find the plate in its initial load location, slot D1. For the second move, the API knows to find the plate in D2.
 
+.. _automatic-manual-moves:
 
 Automatic vs Manual Moves
 =========================
@@ -61,7 +62,7 @@ The ``use_gripper`` parameter of :py:meth:`~.ProtocolContext.move_labware` deter
 .. note::
     Don't add a ``pause()`` command before ``move_labware()``. When ``use_gripper`` is unset or ``False``, the protocol pauses when it reaches the movement step. The Opentrons App or the touchscreen on Flex shows an animation of the labware movement that you need to perform manually. The protocol only resumes when you press **Confirm and resume**.
 
-The above example is a complete and valid ``run()`` function. You don't have to load the gripper as an instrument, and there is no ``InstrumentContext`` for the gripper. All you have to do to specify that a protocol requires the gripper is to include at least one ``move_labware()`` command with ``use_labware=True``.
+The above example is a complete and valid ``run()`` function. You don't have to load the gripper as an instrument, and there is no ``InstrumentContext`` for the gripper. All you have to do to specify that a protocol requires the gripper is to include at least one ``move_labware()`` command with ``use_gripper=True``.
 
 If you attempt to use the gripper to move labware in an OT-2 protocol, the API will raise an error.
 
@@ -132,7 +133,7 @@ If the labware is inaccessible, the API will raise an error.
 Movement into the Waste Chute
 =============================
 
-Move used tip racks and well plates to the waste chute to dispose of them. This requires you to first :ref:`configure the waste chute <configure-waste-chute>` in your protocol. Then use the loaded :py:class:`WasteChute` object as the value of ``new_location``::
+Move used tip racks and well plates to the waste chute to dispose of them. This requires you to first :ref:`configure the waste chute <configure-waste-chute>` in your protocol. Then use the loaded :py:class:`.WasteChute` object as the value of ``new_location``::
 
     chute = protocol.load_waste_chute()
     protocol.move_labware(

@@ -1,15 +1,15 @@
-import { useEffect } from 'react'
+import * as React from 'react'
 import { useFormikContext } from 'formik'
 import { usePrevious } from '@opentrons/components'
 import { isModuleWithCollisionIssue } from '../../modules/utils'
-import { EditModulesFormValues } from '.'
+import { EditModulesFormValues } from './index'
 export const useResetSlotOnModelChange = (
   supportedModuleSlot: string
 ): void => {
   const { values, setValues } = useFormikContext<EditModulesFormValues>()
   const selectedModel = values.selectedModel
   const prevSelectedModel = usePrevious(selectedModel)
-  useEffect(() => {
+  React.useEffect(() => {
     if (
       prevSelectedModel &&
       prevSelectedModel !== selectedModel &&

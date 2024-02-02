@@ -315,8 +315,8 @@ export function ModulesListItem({
   let renderModuleStatus: JSX.Element = (
     <StatusLabel
       status={moduleConnectionStatus}
-      backgroundColor={COLORS.green20}
-      iconColor={COLORS.green50}
+      backgroundColor={COLORS.green30}
+      iconColor={COLORS.green60}
       textColor={COLORS.green60}
     />
   )
@@ -347,8 +347,8 @@ export function ModulesListItem({
     renderModuleStatus = (
       <StatusLabel
         status={moduleConnectionStatus}
-        backgroundColor={COLORS.yellow20}
-        iconColor={COLORS.yellow50}
+        backgroundColor={COLORS.yellow30}
+        iconColor={COLORS.yellow60}
         textColor={COLORS.yellow60}
       />
     )
@@ -429,8 +429,8 @@ export function ModulesListItem({
               >
                 <StatusLabel
                   status={t('location_conflict')}
-                  backgroundColor={COLORS.yellow20}
-                  iconColor={COLORS.yellow50}
+                  backgroundColor={COLORS.yellow30}
+                  iconColor={COLORS.yellow60}
                   textColor={COLORS.yellow60}
                 />
                 <TertiaryButton
@@ -443,7 +443,13 @@ export function ModulesListItem({
                 </TertiaryButton>
               </Flex>
             ) : moduleModel === MAGNETIC_BLOCK_V1 ? (
-              <StyledText as="p"> {t('n_a')}</StyledText>
+              <StatusLabel
+                status={t('n_a')}
+                backgroundColor={COLORS.grey30}
+                textColor={COLORS.grey50}
+                showIcon={false}
+                capitalizeStatus={false}
+              />
             ) : (
               renderModuleStatus
             )}

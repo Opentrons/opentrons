@@ -11,6 +11,18 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 ### HTTP API
 
 - In the `/runs/commands`, `/maintenance_runs/commands`, and `/protocols` endpoints, the `dispense` command will now return an error if you try to dispense more than you've aspirated, instead of silently clamping.
+- The `/notifications/subscribe` WebSocket endpoint has been removed. See https://github.com/Opentrons/opentrons/pull/14280 for details.
+- The `/runs/commands` endpoints are significantly faster when you request a small number of commands from a stored run.
+
+### Other Changes
+
+- The `notify_server` Python package has been removed. See https://github.com/Opentrons/opentrons/pull/14280 for details.
+
+### Upgrade Notes
+
+This update may take longer than usual if your robot has a lot of long protocols and runs stored on it. Allow **approximately 25 minutes** for your robot to restart. This delay will only happen once.
+
+If you don't care about preserving your labware offsets and run history, you can avoid the delay. Clear your runs and protocols before starting this update. Go to **Robot Settings** > **Device Reset** and select **Clear protocol run history**.
 
 ---
 

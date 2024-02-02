@@ -28,6 +28,9 @@ from robot_server.maintenance_runs.maintenance_run_models import (
     MaintenanceRun,
     MaintenanceRunNotFoundError,
 )
+from robot_server.notification_client import (
+    NotificationClient,
+)
 
 from opentrons.protocol_engine import Liquid
 
@@ -37,6 +40,13 @@ def mock_maintenance_engine_store(decoy: Decoy) -> MaintenanceEngineStore:
     """Get a mock MaintenanceEngineStore."""
     mock = decoy.mock(cls=MaintenanceEngineStore)
     decoy.when(mock.current_run_id).then_return(None)
+    return mock
+
+
+@pytest.fixture
+def mock_notification_client(decoy: Decoy) -> NotificationClient:
+    """Get a mock NotificationClient."""
+    mock = decoy.mock(cls=NotificationClient)
     return mock
 
 
@@ -69,10 +79,12 @@ def run_command() -> commands.Command:
 @pytest.fixture
 def subject(
     mock_maintenance_engine_store: MaintenanceEngineStore,
+    mock_notification_client: NotificationClient,
 ) -> MaintenanceRunDataManager:
     """Get a MaintenanceRunDataManager test subject."""
     return MaintenanceRunDataManager(
         engine_store=mock_maintenance_engine_store,
+        notification_client=mock_notification_client,
     )
 
 
