@@ -898,3 +898,12 @@ class GetMotorUsageResponse(BaseMessage):
     message_id: Literal[
         MessageId.get_motor_usage_response
     ] = MessageId.get_motor_usage_response
+
+
+@dataclass
+class HepaUVInfoResponse(BaseMessage):  # noqa: D101
+    payload: payloads.HepaUVInfoResponsePayload
+    payload_type: Type[
+        payloads.HepaUVInfoResponsePayload
+    ] = payloads.HepaUVInfoResponsePayload
+    message_id: Literal[MessageId.hepauv_info_response] = MessageId.hepauv_info_response

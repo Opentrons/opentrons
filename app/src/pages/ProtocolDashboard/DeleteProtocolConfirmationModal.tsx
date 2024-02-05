@@ -5,14 +5,15 @@ import styled from 'styled-components'
 
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import {
-  Flex,
+  ALIGN_CENTER,
+  Box,
   COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  OVERFLOW_WRAP_ANYWHERE,
   SPACING,
   TYPOGRAPHY,
-  DIRECTION_ROW,
-  DIRECTION_COLUMN,
-  Box,
-  ALIGN_CENTER,
 } from '@opentrons/components'
 import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
 
@@ -124,7 +125,7 @@ const ProtocolNameText = styled.span`
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   overflow: hidden;
-  overflow-wrap: anywhere;
+  overflow-wrap: ${OVERFLOW_WRAP_ANYWHERE};
   font-weight: ${TYPOGRAPHY.fontWeightBold};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};

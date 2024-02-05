@@ -3,17 +3,18 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
-  Flex,
   ALIGN_CENTER,
-  DIRECTION_COLUMN,
-  JUSTIFY_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  COLORS,
-  JUSTIFY_SPACE_AROUND,
-  TYPOGRAPHY,
-  Box,
   BORDERS,
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_CENTER,
+  JUSTIFY_SPACE_AROUND,
+  JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_WRAP_ANYWHERE,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '../../redux/config'
@@ -64,7 +65,7 @@ export function WizardRequiredEquipmentList(
                 <StyledText
                   fontSize={TYPOGRAPHY.fontSize20}
                   paddingY={SPACING.spacing12}
-                  overflowWrap="anywhere"
+                  overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                 >
                   {requiredEquipmentProps.displayName}
                 </StyledText>

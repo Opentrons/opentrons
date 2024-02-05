@@ -12,6 +12,7 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_WRAP_ANYWHERE,
   SPACING,
   TYPOGRAPHY,
   useLongPress,
@@ -112,7 +113,7 @@ export function PinnedProtocol(props: {
       maxWidth={cardStyleBySize[cardSize].width}
       minWidth={cardStyleBySize[cardSize].width}
       onClick={() => handleProtocolClick(longpress, protocol.id)}
-      overflowWrap="anywhere"
+      overflowWrap={OVERFLOW_WRAP_ANYWHERE}
       padding={SPACING.spacing24}
       ref={longpress.ref}
     >
@@ -160,7 +161,7 @@ const ProtocolNameText = styled(StyledText)`
   -webkit-line-clamp: ${(props: { cardSize: CardSizeType }) =>
     props.cardSize === 'full' ? 1 : 2};
   overflow: hidden;
-  overflow-wrap: anywhere;
+  overflow-wrap: ${OVERFLOW_WRAP_ANYWHERE};
   font-size: ${(props: { cardSize: CardSizeType }) =>
     cardStyleBySize[props.cardSize].fontSize};
   font-weight: ${(props: { cardSize: CardSizeType }) =>

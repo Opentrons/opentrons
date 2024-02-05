@@ -46,12 +46,6 @@ export function appShellListener(
   remote.ipcRenderer.on(
     'notify',
     (_, shellHostname, shellTopic, shellMessage) => {
-      console.log('Received notification data from main via IPC', {
-        hostname: shellHostname,
-        topic: shellTopic,
-        message: shellMessage,
-      })
-
       if (hostname === shellHostname && topic === shellTopic) {
         eventEmitter.emit('data', shellMessage)
       }

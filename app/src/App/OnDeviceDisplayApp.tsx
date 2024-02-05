@@ -235,8 +235,12 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   }
   const dispatch = useDispatch<Dispatch>()
   const isIdle = useIdle(sleepTime, options)
-  const scrollRef = React.useRef(null)
-  const isScrolling = useScrolling(scrollRef)
+  const [currentNode, setCurrentNode] = React.useState<null | HTMLElement>(null)
+  const scrollRef = React.useCallback(
+    (node: HTMLElement | null) => setCurrentNode(node),
+    []
+  )
+  const isScrolling = useScrolling(currentNode)
 
   const TOUCH_SCREEN_STYLE = css`
     position: ${POSITION_RELATIVE};
@@ -246,13 +250,8 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     overflow-y: ${OVERFLOW_AUTO};
 
     &::-webkit-scrollbar {
-      display: ${isScrolling ? undefined : 'none'};
+      display: ${isScrolling ? 'block' : 'none'};
       width: 0.75rem;
-    }
-
-    &::-webkit-scrollbar-track {
-      margin-top: 170px;
-      margin-bottom: 170px;
     }
 
     &::-webkit-scrollbar-thumb {

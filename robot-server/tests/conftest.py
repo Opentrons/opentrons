@@ -150,7 +150,7 @@ def _override_version_with_mock(versions: MagicMock) -> Iterator[None]:
 def _override_ot2_hardware_with_mock(hardware: MagicMock) -> Iterator[None]:
     async def get_ot2_hardware_override() -> API:
         """Override for the get_ot2_hardware FastAPI dependency."""
-        return MagicMock(spec=API)
+        return hardware
 
     app.dependency_overrides[get_ot2_hardware] = get_ot2_hardware_override
     yield

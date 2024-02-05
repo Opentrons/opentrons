@@ -19,21 +19,14 @@ import { HandleEnter } from './HandleEnter'
 import type { WizardTileProps } from './types'
 
 export function MetadataTile(props: WizardTileProps): JSX.Element {
-  const {
-    handleChange,
-    handleBlur,
-    values,
-    goBack,
-    proceed,
-    errors,
-    touched,
-  } = props
   const { t } = useTranslation(['modal', 'application'])
-  const disableProceed =
-    values.fields.name == null ||
-    values.fields.name === '' ||
-    !Boolean(touched?.fields?.name) ||
-    errors?.fields?.name != null
+  const { formState, goBack, proceed, register, watch } = props
+  const fields = watch('fields')
+  const name = fields.name
+
+  const { errors, touchedFields } = formState
+
+  const disableProceed = name == null || name === ''
 
   return (
     <HandleEnter onEnter={proceed} disabled={disableProceed}>
@@ -57,17 +50,15 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
                 {`${t('protocol_name')} *`}
               </Text>
               <InputField
-                aria-label="MetadataTile_protocolName"
+                id="MetadataTile_protocolName"
                 autoFocus
-                name="fields.name"
-                value={values.fields.name}
-                onChange={handleChange}
-                onBlur={handleBlur}
+                register={register}
+                fieldName="fields.name"
                 error={
-                  touched?.fields?.name &&
-                  values.fields.name &&
-                  values.fields.name.length > 1
-                    ? errors?.fields?.name ?? null
+                  //  TODO(jr, 2/1/24): wire up errors for this field
+                  //  need to wire it up in the parent component
+                  touchedFields?.fields?.name && name && name.length > 1
+                    ? errors?.fields?.name?.message ?? null
                     : null
                 }
               />
@@ -86,10 +77,7 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
               </Text>
               <DescriptionField
                 aira-label="MetadataTile_descriptionField"
-                name="fields.description"
-                value={values.fields.description ?? ''}
-                onChange={handleChange}
-                onBlur={handleBlur}
+                {...register('fields.description')}
               />
             </Flex>
             <Flex
@@ -102,10 +90,8 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
               </Text>
               <InputField
                 aria-label="MetadataTile_orgOrAuth"
-                name="fields.organizationOrAuthor"
-                value={values.fields.organizationOrAuthor}
-                onChange={handleChange}
-                onBlur={handleBlur}
+                fieldName="fields.organizationOrAuthor"
+                register={register}
               />
             </Flex>
           </Flex>

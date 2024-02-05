@@ -18,11 +18,13 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_HIDDEN,
+  OVERFLOW_WRAP_ANYWHERE,
+  OVERFLOW_WRAP_BREAK_WORD,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
-  WRAP,
   SPACING,
   TYPOGRAPHY,
+  WRAP,
 } from '@opentrons/components'
 import {
   RUN_STATUS_FAILED,
@@ -32,7 +34,6 @@ import {
 import {
   useHost,
   useProtocolQuery,
-  useRunQuery,
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
 
@@ -63,6 +64,7 @@ import { handleTipsAttachedModal } from '../../organisms/DropTipWizard/TipsAttac
 import { getPipettesWithTipAttached } from '../../organisms/DropTipWizard/getPipettesWithTipAttached'
 import { getPipetteModelSpecs, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { useMostRecentRunId } from '../../organisms/ProtocolUpload/hooks/useMostRecentRunId'
+import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
@@ -77,7 +79,7 @@ export function RunSummary(): JSX.Element {
   const { t } = useTranslation('run_details')
   const history = useHistory()
   const host = useHost()
-  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
+  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const isRunCurrent = Boolean(runRecord?.data?.current)
   const mostRecentRunId = useMostRecentRunId()
   const { data: attachedInstruments } = useInstrumentsQuery()
@@ -362,7 +364,7 @@ const SplashBody = styled.h4`
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 4;
   overflow: hidden;
-  overflow-wrap: break-word;
+  overflow-wrap: ${OVERFLOW_WRAP_BREAK_WORD};
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   text-align: ${TYPOGRAPHY.textAlignCenter};
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
@@ -398,7 +400,7 @@ const ProtocolName = styled.h4`
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  overflow-wrap: anywhere;
+  overflow-wrap: ${OVERFLOW_WRAP_ANYWHERE};
   height: max-content;
 `
 

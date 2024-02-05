@@ -28,6 +28,9 @@
   "engines": {
     "node": "^18.19.0"
   },
+  "resolutions": {
+    "@storybook/react-docgen-typescript-plugin": "1.0.6--canary.9.cd77847.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.12.10",
     "@babel/eslint-parser": "^7.12.1",
@@ -97,7 +100,7 @@
     "eslint-plugin-cypress": "^2.11.2",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-jest": "^27.6.3",
-    "eslint-plugin-json": "^2.1.2",
+    "eslint-plugin-json": "^3.1.0",
     "eslint-plugin-n": "^16.6.2",
     "eslint-plugin-promise": "^4.3.1",
     "eslint-plugin-react": "^7.22.0",
@@ -162,7 +165,5 @@
     "webpack-merge": "^4.2.2",
     "webpack-node-externals": "^1.7.2",
     "worker-plugin": "^5.0.0"
-  },
-  "resolutions": {
   }
 }

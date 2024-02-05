@@ -4,21 +4,22 @@ import { format } from 'date-fns'
 import { css } from 'styled-components'
 
 import {
-  Box,
-  Link,
-  Icon,
-  Flex,
-  SPACING,
-  COLORS,
-  TYPOGRAPHY,
+  ALIGN_CENTER,
   BORDERS,
+  Box,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
-  ALIGN_CENTER,
+  Link,
+  OVERFLOW_WRAP_ANYWHERE,
   SIZE_1,
-  useHoverTooltip,
+  SPACING,
   TOOLTIP_TOP_START,
+  TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 import { getUniqueWellProperties } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
@@ -170,7 +171,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           role="button"
           aria-label="copy"
         >
-          <Flex overflowWrap="anywhere">
+          <Flex overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
             <Box fontSize={TYPOGRAPHY.fontSizeP} color={COLORS.black90}>
               {apiName}
               <span {...targetProps}>

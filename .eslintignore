@@ -5,6 +5,7 @@
 **/build/**
 **/venv/**
 .opentrons_config
+**/tsconfig*.json
 
 # prettier
 **/package.json

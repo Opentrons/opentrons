@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { screen } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { DeckConfigurator, renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../localization'
@@ -17,18 +18,19 @@ const render = (props: React.ComponentProps<typeof StagingAreaTile>) => {
   })[0]
 }
 
+const values = {
+  fields: {
+    robotType: OT2_ROBOT_TYPE,
+  },
+  additionalEquipment: ['gripper'],
+} as FormState
+
 const mockWizardTileProps: Partial<WizardTileProps> = {
-  handleChange: jest.fn(),
-  handleBlur: jest.fn(),
   goBack: jest.fn(),
   proceed: jest.fn(),
-  setFieldValue: jest.fn(),
-  values: {
-    fields: {
-      robotType: OT2_ROBOT_TYPE,
-    },
-    additionalEquipment: ['gripper'],
-  } as FormState,
+  setValue: jest.fn(),
+  watch: jest.fn((name: keyof typeof values) => values[name]) as any,
+  getValues: jest.fn(() => values) as any,
 }
 
 describe('StagingAreaTile', () => {
@@ -42,13 +44,31 @@ describe('StagingAreaTile', () => {
     mockDeckConfigurator.mockReturnValue(<div>mock deck configurator</div>)
   })
   it('renders null when robot type is ot-2', () => {
-    const { container } = render(props)
-    expect(container.firstChild).toBeNull()
+    render(props)
+    expect(screen.queryByText('Staging area slots')).not.toBeInTheDocument()
   })
   it('renders header and deck configurator', () => {
-    props.values.fields.robotType = FLEX_ROBOT_TYPE
-    const { getByText } = render(props)
-    getByText('Staging area slots')
-    getByText('mock deck configurator')
+    const values = {
+      fields: {
+        robotType: FLEX_ROBOT_TYPE,
+      },
+      additionalEquipment: ['gripper'],
+    } as FormState
+
+    const mockWizardTileProps: Partial<WizardTileProps> = {
+      goBack: jest.fn(),
+      proceed: jest.fn(),
+      setValue: jest.fn(),
+      watch: jest.fn((name: keyof typeof values) => values[name]) as any,
+      getValues: jest.fn(() => values) as any,
+    }
+
+    props = {
+      ...props,
+      ...mockWizardTileProps,
+    } as WizardTileProps
+    render(props)
+    screen.getByText('Staging area slots')
+    screen.getByText('mock deck configurator')
   })
 })

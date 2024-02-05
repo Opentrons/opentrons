@@ -1,5 +1,7 @@
 import * as React from 'react'
 import assert from 'assert'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
 import reduce from 'lodash/reduce'
 import isEmpty from 'lodash/isEmpty'
 import last from 'lodash/last'
@@ -8,7 +10,6 @@ import mapValues from 'lodash/mapValues'
 import cx from 'classnames'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
-import { Formik, FormikProps } from 'formik'
 import * as Yup from 'yup'
 
 import { Modal, OutlineButton } from '@opentrons/components'
@@ -122,8 +123,8 @@ const pipetteValidationShape = Yup.object().shape({
     .nullable()
     .when('pipetteName', {
       is: (val: string | null): boolean => Boolean(val),
-      then: Yup.string().required('Required'),
-      otherwise: null,
+      then: schema => schema.required('Required'),
+      otherwise: schema => schema.nullable(),
     }),
 })
 // any typing this because TS says there are too many possibilities of what this could be
@@ -133,13 +134,13 @@ const moduleValidationShape: any = Yup.object().shape({
     .nullable()
     .when('onDeck', {
       is: true,
-      then: Yup.string().required('Required'),
-      otherwise: null,
+      then: schema => schema.required('Required'),
+      otherwise: schema => schema.nullable(),
     }),
   slot: Yup.string(),
 })
 
-const validationSchema = Yup.object().shape({
+const validationSchema: any = Yup.object().shape({
   fields: Yup.object().shape({
     name: Yup.string(),
   }),
@@ -323,8 +324,8 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
 
   const onSave: (args: {
     newProtocolFields: NewProtocolFields
-    pipettes: PipetteFieldsData[]
     modules: ModuleCreationArgs[]
+    pipettes: PipetteFieldsData[]
   }) => void = makeUpdatePipettes(
     prevPipettes,
     orderedStepIds,
@@ -345,7 +346,7 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
     return crashableModuleOnDeck
   }
 
-  const handleSubmit: (values: FormState) => void = values => {
+  const handleFormSubmit: (values: FormState) => void = values => {
     if (!showEditPipetteConfirmation) {
       setShowEditPipetteConfirmation(true)
     }
@@ -417,6 +418,53 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
     }
   }
 
+  const {
+    handleSubmit,
+    formState,
+    control,
+    setValue,
+    trigger,
+    watch,
+    getValues,
+  } = useForm<FormState>({
+    defaultValues: getInitialValues(),
+    resolver: yupResolver(validationSchema),
+  })
+  const pipettesByMount = watch('pipettesByMount')
+  const { modulesByType } = getValues()
+
+  const { left, right } = pipettesByMount
+  // at least one must not be none (empty string)
+  const pipetteSelectionIsValid = left.pipetteName || right.pipetteName
+
+  const hasCrashableMagnetModuleSelected = getCrashableModuleSelected(
+    modulesByType,
+    MAGNETIC_MODULE_TYPE
+  )
+  const hasCrashableTemperatureModuleSelected = getCrashableModuleSelected(
+    modulesByType,
+    TEMPERATURE_MODULE_TYPE
+  )
+  const hasHeaterShakerSelected = Boolean(
+    modulesByType[HEATERSHAKER_MODULE_TYPE].onDeck
+  )
+
+  const showHeaterShakerPipetteCollisions =
+    hasHeaterShakerSelected &&
+    [
+      getPipetteNameSpecs(left.pipetteName as PipetteName),
+      getPipetteNameSpecs(right.pipetteName as PipetteName),
+    ].some(pipetteSpecs => pipetteSpecs && pipetteSpecs.channels !== 1)
+
+  const crashablePipetteSelected = getIsCrashablePipetteSelected(
+    pipettesByMount
+  )
+
+  const showTempPipetteCollisons =
+    crashablePipetteSelected && hasCrashableTemperatureModuleSelected
+  const showMagPipetteCollisons =
+    crashablePipetteSelected && hasCrashableMagnetModuleSelected
+
   return (
     <Modal
       contentsClassName={cx(
@@ -427,126 +475,55 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
     >
       <div className={modalStyles.scrollable_modal_wrapper}>
         <div className={modalStyles.scrollable_modal_scroll}>
-          <Formik
-            enableReinitialize
-            initialValues={getInitialValues()}
-            onSubmit={handleSubmit}
-            validationSchema={validationSchema}
-            validateOnChange={false}
-          >
-            {({
-              handleChange,
-              handleSubmit,
-              errors,
-              setFieldValue,
-              touched,
-              values,
-              handleBlur,
-              setFieldTouched,
-            }: FormikProps<FormState>) => {
-              const { left, right } = values.pipettesByMount
+          <form onSubmit={handleSubmit(handleFormSubmit)}>
+            <h2 className={styles.new_file_modal_title}>
+              {t('edit_pipettes.title')}
+            </h2>
+            <PipetteFields
+              values={pipettesByMount}
+              setValue={setValue}
+              formState={formState}
+              trigger={trigger}
+              robotType={robotType}
+              control={control}
+            />
+            {!moduleRestrictionsDisabled && (
+              <CrashInfoBox
+                showDiagram
+                showMagPipetteCollisons={showMagPipetteCollisons}
+                showTempPipetteCollisons={showTempPipetteCollisons}
+                showHeaterShakerLabwareCollisions={hasHeaterShakerSelected}
+                showHeaterShakerModuleCollisions={hasHeaterShakerSelected}
+                showHeaterShakerPipetteCollisions={
+                  showHeaterShakerPipetteCollisions
+                }
+              />
+            )}
+            <div className={modalStyles.button_row}>
+              <OutlineButton
+                onClick={props.closeModal}
+                tabIndex={7}
+                className={styles.button}
+              >
+                {t('button:cancel')}
+              </OutlineButton>
+              <OutlineButton
+                disabled={!pipetteSelectionIsValid}
+                onClick={handleSubmit(handleFormSubmit)}
+                tabIndex={6}
+                className={styles.button}
+              >
+                {t('button:save')}
+              </OutlineButton>
+            </div>
+          </form>
 
-              const pipetteSelectionIsValid =
-                // at least one must not be none (empty string)
-                left.pipetteName || right.pipetteName
-
-              const hasCrashableMagnetModuleSelected = getCrashableModuleSelected(
-                values.modulesByType,
-                MAGNETIC_MODULE_TYPE
-              )
-              const hasCrashableTemperatureModuleSelected = getCrashableModuleSelected(
-                values.modulesByType,
-                TEMPERATURE_MODULE_TYPE
-              )
-              const hasHeaterShakerSelected = Boolean(
-                values.modulesByType[HEATERSHAKER_MODULE_TYPE].onDeck
-              )
-
-              const showHeaterShakerPipetteCollisions =
-                hasHeaterShakerSelected &&
-                [
-                  getPipetteNameSpecs(left.pipetteName as PipetteName),
-                  getPipetteNameSpecs(right.pipetteName as PipetteName),
-                ].some(
-                  pipetteSpecs => pipetteSpecs && pipetteSpecs.channels !== 1
-                )
-
-              const crashablePipetteSelected = getIsCrashablePipetteSelected(
-                values.pipettesByMount
-              )
-
-              const showTempPipetteCollisons =
-                crashablePipetteSelected &&
-                hasCrashableTemperatureModuleSelected
-              const showMagPipetteCollisons =
-                crashablePipetteSelected && hasCrashableMagnetModuleSelected
-
-              return (
-                <>
-                  <form onSubmit={handleSubmit}>
-                    <h2 className={styles.new_file_modal_title}>
-                      {t('edit_pipettes.title')}
-                    </h2>
-
-                    <PipetteFields
-                      initialTabIndex={1}
-                      values={values.pipettesByMount}
-                      onFieldChange={handleChange}
-                      onSetFieldValue={setFieldValue}
-                      onBlur={handleBlur}
-                      // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module tiprackDefURI inside of pipettesByMount exists, because it could be undefined
-                      errors={errors.pipettesByMount ?? null}
-                      // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module tiprackDefURI inside of pipettesByMount exists, because it could be undefined
-                      touched={touched.pipettesByMount ?? null}
-                      onSetFieldTouched={setFieldTouched}
-                      robotType={robotType}
-                    />
-                    {!moduleRestrictionsDisabled && (
-                      <CrashInfoBox
-                        showDiagram
-                        showMagPipetteCollisons={showMagPipetteCollisons}
-                        showTempPipetteCollisons={showTempPipetteCollisons}
-                        showHeaterShakerLabwareCollisions={
-                          hasHeaterShakerSelected
-                        }
-                        showHeaterShakerModuleCollisions={
-                          hasHeaterShakerSelected
-                        }
-                        showHeaterShakerPipetteCollisions={
-                          showHeaterShakerPipetteCollisions
-                        }
-                      />
-                    )}
-                    <div className={modalStyles.button_row}>
-                      <OutlineButton
-                        onClick={props.closeModal}
-                        tabIndex={7}
-                        className={styles.button}
-                      >
-                        {t('button:cancel')}
-                      </OutlineButton>
-                      <OutlineButton
-                        disabled={!pipetteSelectionIsValid}
-                        // @ts-expect-error(sa, 2021-6-21): Formik handleSubmit type not cooporating with OutlineButton onClick type
-                        onClick={handleSubmit}
-                        tabIndex={6}
-                        className={styles.button}
-                      >
-                        {t('button:save')}
-                      </OutlineButton>
-                    </div>
-                  </form>
-
-                  {showEditPipetteConfirmation ? (
-                    <StepChangesConfirmModal
-                      onCancel={() => setShowEditPipetteConfirmation(false)}
-                      onConfirm={handleSubmit}
-                    />
-                  ) : null}
-                </>
-              )
-            }}
-          </Formik>
+          {showEditPipetteConfirmation ? (
+            <StepChangesConfirmModal
+              onCancel={() => setShowEditPipetteConfirmation(false)}
+              onConfirm={handleSubmit(handleFormSubmit)}
+            />
+          ) : null}
         </div>
       </div>
     </Modal>
