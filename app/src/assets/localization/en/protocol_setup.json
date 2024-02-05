@@ -53,6 +53,7 @@
   "deck_cal_description_bullet_2": "Redo Deck Calibration if you relocate your robot.",
   "deck_cal_description": "This measures the deck X and Y values relative to the gantry. Deck Calibration is the foundation for Tip Length Calibration and Pipette Offset Calibration.",
   "deck_calibration_title": "Deck Calibration",
+  "deck_conflict_info_thermocycler": "<block>Update the deck configuration by removing the fixtures in locations <strong>A1 and B1</strong>. Either remove the fixtures from the deck configuration or update the protocol.</block>",
   "deck_conflict_info": "<block>Update the deck configuration by removing the <strong>{{currentFixture}}</strong> in location <strong>{{cutout}}</strong>. Either remove the fixture from the deck configuration or update the protocol.</block>",
   "deck_conflict": "Deck location conflict",
   "deck_map": "Deck Map",
