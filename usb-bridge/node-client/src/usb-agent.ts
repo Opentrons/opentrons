@@ -206,11 +206,6 @@ const kOnKeylog = Symbol.for('onkeylog')
 class SerialPortHttpAgent extends http.Agent {
   declare totalSocketCount: number
   declare sockets: NodeJS.Dict<Socket[]>
-  declare emit: (
-    event: string,
-    socket: Socket,
-    options: NodeJS.Dict<unknown>
-  ) => void
 
   declare getName: (options: NodeJS.Dict<unknown>) => string
   declare removeSocket: (socket: Socket, options: NodeJS.Dict<unknown>) => void;

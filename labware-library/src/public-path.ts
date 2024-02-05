@@ -9,8 +9,6 @@ if (location.hostname.startsWith('sandbox')) {
   _publicPath = `/${basePath}/`
 }
 
-__webpack_public_path__ = _publicPath // eslint-disable-line no-undef
-
 export function getPublicPath(): string {
   return _publicPath
 }

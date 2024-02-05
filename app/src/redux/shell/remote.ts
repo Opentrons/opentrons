@@ -1,4 +1,5 @@
 // access main process remote modules via attachments to `global`
+
 import assert from 'assert'
 import { EventEmitter } from 'events'
 
@@ -11,15 +12,15 @@ const emptyRemote: Remote = {} as any
 export const remote: Remote = new Proxy(emptyRemote, {
   get(_target, propName: string): unknown {
     assert(
-      global.APP_SHELL_REMOTE,
-      'Expected APP_SHELL_REMOTE to be attached to global scope; is app-shell/src/preload.js properly configured?'
+      (global as any).APP_SHELL_REMOTE,
+      'Expected APP_SHELL_REMOTE to be attached to global scope; is app-shell/src/preload.ts properly configured?'
     )
 
     assert(
-      propName in global.APP_SHELL_REMOTE,
-      `Expected APP_SHELL_REMOTE.${propName} to exist, is app-shell/src/preload.js properly configured?`
+      propName in (global as any).APP_SHELL_REMOTE,
+      `Expected APP_SHELL_REMOTE.${propName} to exist, is app-shell/src/preload.ts properly configured?`
     )
-    return global.APP_SHELL_REMOTE[propName] as Remote
+    return (global as any).APP_SHELL_REMOTE[propName] as Remote
   },
 })
 

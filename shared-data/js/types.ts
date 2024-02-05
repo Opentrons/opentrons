@@ -188,8 +188,10 @@ export interface LabwareDefinition2 {
   allowedRoles?: LabwareRoles[]
 }
 
-export type LabwareDefByDefURI = { [defUri: string]: LabwareDefinition2 }
-export type LegacyLabwareDefByName = {
+export interface LabwareDefByDefURI {
+  [defUri: string]: LabwareDefinition2
+}
+export interface LegacyLabwareDefByName {
   [name: string]: LabwareDefinition1
 }
 

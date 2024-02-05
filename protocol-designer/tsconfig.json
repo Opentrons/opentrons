@@ -15,5 +15,9 @@
     },
     { "path": "./tsconfig.node.json" }
   ],
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib"
+  },
   "include": ["typings", "src"]
 }

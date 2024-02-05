@@ -6,5 +6,6 @@ declare const global: typeof globalThis & {
     // from electron makes this ambient type declaration a module instead of
     // a script, which typescript does not like
     ipcRenderer: any
+    [key: string]: any
   }
 }
