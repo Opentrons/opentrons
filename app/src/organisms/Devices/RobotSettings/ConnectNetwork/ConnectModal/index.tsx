@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { Control, useForm, Resolver } from 'react-hook-form'
 
 import { useResetFormOnSecurityChange } from './form-state'
 import {
@@ -16,16 +17,18 @@ import type {
   WifiKey,
   EapOption,
 } from '../types'
-import { Control, useForm } from 'react-hook-form'
 
 export interface ConnectModalProps {
   robotName: string
   network: WifiNetwork | null
   wifiKeys: WifiKey[]
   eapOptions: EapOption[]
-  isValid: boolean
   onConnect: (r: WifiConfigureRequest) => void
   onCancel: () => void
+}
+
+interface ConnectModalComponentProps extends ConnectModalProps {
+  isValid: boolean
   values: ConnectFormValues
   control: Control<ConnectFormValues, any>
 }
@@ -38,10 +41,11 @@ export const ConnectModal = (props: ConnectModalProps): JSX.Element => {
     if (request) onConnect(request)
   }
 
-  const handleValidate = (
-    data: ConnectFormValues
-  ): ReturnType<typeof validateConnectFormFields> => {
-    return validateConnectFormFields(network, eapOptions, data)
+  const handleValidate: Resolver<ConnectFormValues> = values => {
+    let errors = {}
+
+    errors = validateConnectFormFields(network, eapOptions, values, errors)
+    return { values, errors }
   }
 
   const {
@@ -69,7 +73,7 @@ export const ConnectModal = (props: ConnectModalProps): JSX.Element => {
 }
 
 export const ConnectModalComponent = (
-  props: ConnectModalProps
+  props: ConnectModalComponentProps
 ): JSX.Element => {
   const {
     robotName,

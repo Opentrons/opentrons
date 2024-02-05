@@ -1,4 +1,4 @@
-import type { FieldError } from 'react-hook-form'
+import { FieldError } from 'react-hook-form'
 import type {
   WifiNetwork,
   EapOption,
@@ -45,7 +45,7 @@ export type ConnectFormValues = Partial<{
   }
 }>
 
-export type ConnectFormErrors = Partial<FieldError<ConnectFormValues>>
+export type ConnectFormErrors = ConnectFormValues & FieldError
 
 interface ConnectFormFieldCommon {
   name: string

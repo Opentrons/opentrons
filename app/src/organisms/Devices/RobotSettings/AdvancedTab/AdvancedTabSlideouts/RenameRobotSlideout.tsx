@@ -159,9 +159,7 @@ export function RenameRobotSlideout({
     })
     handleSubmit(onSubmit)
   }
-  console.log('isDirety', isDirty)
-  console.log('errors', errors)
-  console.log('isvalid', isValid)
+
   return (
     <Slideout
       title={t('rename_robot_title')}
