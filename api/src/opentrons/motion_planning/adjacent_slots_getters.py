@@ -1,6 +1,6 @@
 """Getters for specific adjacent slots."""
 
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Union
 
 from opentrons.types import DeckSlotName, StagingSlotName
 
@@ -37,6 +37,56 @@ def get_west_slot(slot: int) -> Optional[int]:
         return slot - 1
 
 
+def get_north_west_slot(slot: int) -> Optional[int]:
+    """Get the slot that's north-west of the given slot."""
+    if slot in [1, 4, 7, 10, 11, 12]:
+        return None
+    else:
+        north_slot = get_north_slot(slot)
+        return north_slot - 1 if north_slot else None
+
+
+def get_north_east_slot(slot: int) -> Optional[int]:
+    """Get the slot that's north-east of the given slot."""
+    if slot in [3, 6, 9, 10, 11, 12]:
+        return None
+    else:
+        north_slot = get_north_slot(slot)
+        return north_slot + 1 if north_slot else None
+
+
+def get_south_west_slot(slot: int) -> Optional[int]:
+    """Get the slot that's south-west of the given slot."""
+    if slot in [1, 2, 3, 4, 7, 10]:
+        return None
+    else:
+        south_slot = get_south_slot(slot)
+        return south_slot - 1 if south_slot else None
+
+
+def get_south_east_slot(slot: int) -> Optional[int]:
+    """Get the slot that's south-east of the given slot."""
+    if slot in [1, 2, 3, 6, 9, 12]:
+        return None
+    else:
+        south_slot = get_south_slot(slot)
+        return south_slot + 1 if south_slot else None
+
+
+def get_surrounding_slots(slot: int) -> List[int]:
+    """Get all the surrounding slots, i.e., adjacent slots as well as corner slots."""
+    corner_slots: List[Union[int, None]] = [
+        get_north_west_slot(slot),
+        get_north_east_slot(slot),
+        get_south_west_slot(slot),
+        get_south_east_slot(slot),
+    ]
+
+    return get_adjacent_slots(slot) + [
+        maybe_slot for maybe_slot in corner_slots if maybe_slot is not None
+    ]
+
+
 _WEST_OF_STAGING_SLOT_MAP: Dict[StagingSlotName, DeckSlotName] = {
     StagingSlotName.SLOT_A4: DeckSlotName.SLOT_A3,
     StagingSlotName.SLOT_B4: DeckSlotName.SLOT_B3,
@@ -50,6 +100,22 @@ _EAST_OF_FLEX_COLUMN_3_MAP: Dict[DeckSlotName, StagingSlotName] = {
 }
 
 
+_SURROUNDING_STAGING_SLOTS_MAP: Dict[DeckSlotName, List[StagingSlotName]] = {
+    DeckSlotName.SLOT_D3: [StagingSlotName.SLOT_D4, StagingSlotName.SLOT_C4],
+    DeckSlotName.SLOT_C3: [
+        StagingSlotName.SLOT_D4,
+        StagingSlotName.SLOT_C4,
+        StagingSlotName.SLOT_B4,
+    ],
+    DeckSlotName.SLOT_B3: [
+        StagingSlotName.SLOT_C4,
+        StagingSlotName.SLOT_B4,
+        StagingSlotName.SLOT_A4,
+    ],
+    DeckSlotName.SLOT_A3: [StagingSlotName.SLOT_B4, StagingSlotName.SLOT_A4],
+}
+
+
 def get_west_of_staging_slot(staging_slot: StagingSlotName) -> DeckSlotName:
     """Get slot west of a staging slot."""
     return _WEST_OF_STAGING_SLOT_MAP[staging_slot]
@@ -58,6 +124,11 @@ def get_west_of_staging_slot(staging_slot: StagingSlotName) -> DeckSlotName:
 def get_adjacent_staging_slot(deck_slot: DeckSlotName) -> Optional[StagingSlotName]:
     """Get the adjacent staging slot if the deck slot is in the third column."""
     return _EAST_OF_FLEX_COLUMN_3_MAP.get(deck_slot)
+
+
+def get_surrounding_staging_slots(deck_slot: DeckSlotName) -> List[StagingSlotName]:
+    """Get the staging slots surrounding the given deck slot."""
+    return _SURROUNDING_STAGING_SLOTS_MAP.get(deck_slot, [])
 
 
 def get_east_west_slots(slot: int) -> List[int]:

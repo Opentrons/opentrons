@@ -6,7 +6,6 @@ from typing import Optional, List, Tuple, Union, cast, TypeVar, Dict
 from opentrons.types import Point, DeckSlotName, StagingSlotName, MountType
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
-
 from .. import errors
 from ..errors import (
     LabwareNotLoadedOnLabwareError,

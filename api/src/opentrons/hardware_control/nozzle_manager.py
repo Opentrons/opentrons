@@ -156,6 +156,20 @@ class NozzleMap:
         return self.map_store[front_left]
 
     @property
+    def front_right_nozzle_offset(self) -> Point:
+        """The offset for the front_right nozzle."""
+        # Front-right-most nozzle of the 96 channel in a given configuration
+        # and Front-most nozzle of the 8-channel
+        return self.map_store[self.front_right]
+
+    @property
+    def back_left_nozzle_offset(self) -> Point:
+        """The offset for the back_left nozzle."""
+        # Back-left-most nozzle of the 96-channel in a given configuration
+        # and back-most nozzle of the 8-channel
+        return self.map_store[self.back_left]
+
+    @property
     def tip_count(self) -> int:
         """The total number of active nozzles in the configuration, and thus the number of tips that will be picked up."""
         return len(self.map_store)

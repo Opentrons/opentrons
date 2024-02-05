@@ -28,6 +28,7 @@ from ..types import (
     AddressableArea,
     PotentialCutoutFixture,
     DeckConfigurationType,
+    Dimensions,
 )
 from ..actions import Action, UpdateCommandAction, PlayAction, AddAddressableAreaAction
 from .config import Config
@@ -437,6 +438,20 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         )
         position = addressable_area.position
         return Point(x=position.x, y=position.y, z=position.z)
+
+    def get_addressable_area_bounding_box(
+        self, addressable_area_name: str
+    ) -> Dimensions:
+        """Get the bounding box of an addressable area.
+
+        This does not require the addressable area to be in the deck configuration.
+        For movement purposes, this should only be called for
+        areas that have been pre-validated, otherwise there could be the risk of collision.
+        """
+        addressable_area = self._get_addressable_area_from_deck_data(
+            addressable_area_name
+        )
+        return addressable_area.bounding_box
 
     def get_addressable_area_move_to_location(
         self, addressable_area_name: str
