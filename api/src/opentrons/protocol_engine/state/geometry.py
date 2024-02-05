@@ -167,7 +167,7 @@ class GeometryView:
         elif isinstance(slot_item, LoadedLabware):
             # get stacked heights of all labware in the slot
             return self.get_highest_z_of_labware_stack(slot_item.id)
-        elif type(slot_item) == CutoutFixture:
+        elif type(slot_item) is dict:
             return self._addressable_areas.get_fixture_height(slot_item["id"])
         else:
             return 0
