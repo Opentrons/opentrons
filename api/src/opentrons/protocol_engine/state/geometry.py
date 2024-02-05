@@ -168,6 +168,8 @@ class GeometryView:
             # get stacked heights of all labware in the slot
             return self.get_highest_z_of_labware_stack(slot_item.id)
         elif type(slot_item) is dict:
+            # TODO (cb, 2024-02-05): Eventually this logic should become the responsibility of bounding box
+            # conflict checking, as fixtures may not always be considered as items from slots.
             return self._addressable_areas.get_fixture_height(slot_item["id"])
         else:
             return 0
