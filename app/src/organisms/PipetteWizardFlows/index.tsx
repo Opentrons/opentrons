@@ -414,19 +414,7 @@ export const PipetteWizardFlows = (
           {modalContent}
         </LegacyModalShell>
       ) : (
-        <LegacyModalShell
-          width="47rem"
-          height={
-            //  changing modal height for now on BeforeBeginning 96 channel attach flow
-            //  until we do design qa to normalize the modal sizes
-            currentStep.section === SECTIONS.BEFORE_BEGINNING &&
-            selectedPipette === NINETY_SIX_CHANNEL &&
-            flowType === FLOWS.ATTACH
-              ? '70%'
-              : 'auto'
-          }
-          header={wizardHeader}
-        >
+        <LegacyModalShell width="47rem" header={wizardHeader}>
           {modalContent}
         </LegacyModalShell>
       )}
