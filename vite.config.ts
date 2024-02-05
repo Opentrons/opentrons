@@ -10,10 +10,10 @@ import postCssPresetEnv from 'postcss-preset-env'
 import lostCss from 'lost'
 
 export default defineConfig({
-  build: {
-    // Relative to the root
-    outDir: 'dist',
-  },
+  // build: {
+  //   // Relative to the root
+  //   outDir: 'dist',
+  // },
   plugins: [
     react({
       include: '**/*.tsx',
@@ -45,10 +45,10 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@opentrons/components/styles': path.resolve('../components/src/index.module.css'),
-      '@opentrons/components': path.resolve('../components/src/index.ts'),
-      '@opentrons/shared-data': path.resolve('../shared-data/js/index.ts'),
-      '@opentrons/step-generation': path.resolve('../step-generation/src/index.ts'),
+      '@opentrons/components/styles': path.resolve('./components/src/index.module.css'),
+      '@opentrons/components': path.resolve('./components/src/index.ts'),
+      '@opentrons/shared-data': path.resolve('./shared-data/js/index.ts'),
+      '@opentrons/step-generation': path.resolve('./step-generation/src/index.ts'),
     },
   },
 })

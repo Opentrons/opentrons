@@ -8,13 +8,14 @@ import {
   getLabwareDefURI,
   getIsTiprack,
   OPENTRONS_LABWARE_NAMESPACE,
-  LabwareDefinition2,
-  protocolSchemaV2
+  protocolSchemaV2,
 } from '@opentrons/shared-data'
 import { getAllWellSetsForLabware } from '../utils'
 import * as labwareDefSelectors from './selectors'
 import type { ThunkAction } from '../types'
 import type { LabwareUploadMessage } from './types'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+
 export interface LabwareUploadMessageAction {
   type: 'LABWARE_UPLOAD_MESSAGE'
   payload: LabwareUploadMessage

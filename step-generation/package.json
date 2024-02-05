@@ -12,8 +12,9 @@
   "private": true,
   "version": "0.0.0-dev",
   "description": "Step generation",
-  "main": "lib/index.js",
+  "main": "src/index.ts",
   "types": "lib/index.d.ts",
+  "module": "src/index.ts",
   "bugs": {
     "url": "https://github.com/Opentrons/opentrons/issues"
   },

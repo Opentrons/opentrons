@@ -1,26 +1,18 @@
 import * as React from 'react'
 import { screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { vi, beforeEach, describe, it } from 'vitest'
 import { i18n } from '../../localization'
-import { getDismissedHints } from '../../tutorial/selectors'
-import { HintKey } from '../../tutorial'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
+import { getDismissedHints } from '../../tutorial/selectors'
 import { EditModules } from '../EditModules'
 import { EditModulesModal } from '../modals/EditModulesModal'
+import { renderWithProviders } from '../../__testing-utils__'
 
-jest.mock('../../step-forms/selectors')
-jest.mock('../modals/EditModulesModal')
-jest.mock('../../tutorial/selectors')
+import type { HintKey } from '../../tutorial'
 
-const mockGetInitialDeckSetup = getInitialDeckSetup as jest.MockedFunction<
-  typeof getInitialDeckSetup
->
-const mockEditModulesModal = EditModulesModal as jest.MockedFunction<
-  typeof EditModulesModal
->
-const mockGetDismissedHints = getDismissedHints as jest.MockedFunction<
-  typeof getDismissedHints
->
+vi.mock('../../step-forms/selectors')
+vi.mock('../modals/EditModulesModal')
+vi.mock('../../tutorial/selectors')
 
 const render = (props: React.ComponentProps<typeof EditModules>) => {
   return renderWithProviders(<EditModules {...props} />, {
@@ -36,13 +28,13 @@ describe('EditModules', () => {
 
   beforeEach(() => {
     props = {
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       moduleToEdit: {
         moduleType: 'heaterShakerModuleType',
         moduleId: mockId,
       },
     }
-    mockGetInitialDeckSetup.mockReturnValue({
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
       modules: {
         [mockId]: {
           id: mockId,
@@ -56,8 +48,8 @@ describe('EditModules', () => {
       labware: {},
       additionalEquipmentOnDeck: {},
     })
-    mockEditModulesModal.mockReturnValue(<div>mock EditModulesModal</div>)
-    mockGetDismissedHints.mockReturnValue([hintKey])
+    vi.mocked(EditModulesModal).mockReturnValue(<div>mock EditModulesModal</div>)
+    vi.mocked(getDismissedHints).mockReturnValue([hintKey])
   })
 
   it('renders the edit modules modal', () => {
