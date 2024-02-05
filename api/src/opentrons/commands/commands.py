@@ -2,10 +2,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List, Union, overload
 
 
-from .helpers import stringify_location, listify
+from .helpers import stringify_location, stringify_disposal_location, listify
 from . import types as command_types
 
 from opentrons.types import Location
+from opentrons.protocol_api._trash_bin import TrashBin
+from opentrons.protocol_api._waste_chute import WasteChute
 
 if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext
@@ -53,6 +55,28 @@ def dispense(
 
     return {
         "name": command_types.DISPENSE,
+        "payload": {
+            "instrument": instrument,
+            "volume": volume,
+            "location": location,
+            "rate": rate,
+            "text": text,
+        },
+    }
+
+
+def dispense_in_disposal_location(
+    instrument: InstrumentContext,
+    volume: float,
+    location: Union[TrashBin, WasteChute],
+    flow_rate: float,
+    rate: float,
+) -> command_types.DispenseInDisposalLocationCommand:
+    location_text = stringify_disposal_location(location)
+    text = f"Dispensing {float(volume)} uL into {location_text} at {flow_rate} uL/sec"
+
+    return {
+        "name": command_types.DISPENSE_IN_DISPOSAL_LOCATION,
         "payload": {
             "instrument": instrument,
             "volume": volume,
@@ -190,6 +214,18 @@ def blow_out(
     }
 
 
+def blow_out_in_disposal_location(
+    instrument: InstrumentContext, location: Union[TrashBin, WasteChute]
+) -> command_types.BlowOutInDisposalLocationCommand:
+    location_text = stringify_disposal_location(location)
+    text = f"Blowing out into {location_text}"
+
+    return {
+        "name": command_types.BLOW_OUT_IN_DISPOSAL_LOCATION,
+        "payload": {"instrument": instrument, "location": location, "text": text},
+    }
+
+
 def touch_tip(instrument: InstrumentContext) -> command_types.TouchTipCommand:
     text = "Touching tip"
 
@@ -231,6 +267,17 @@ def drop_tip(
     }
 
 
+def drop_tip_in_disposal_location(
+    instrument: InstrumentContext, location: Union[TrashBin, WasteChute]
+) -> command_types.DropTipInDisposalLocationCommand:
+    location_text = stringify_disposal_location(location)
+    text = f"Dropping tip into {location_text}"
+    return {
+        "name": command_types.DROP_TIP_IN_DISPOSAL_LOCATION,
+        "payload": {"instrument": instrument, "location": location, "text": text},
+    }
+
+
 def move_to(
     instrument: InstrumentContext,
     location: Location,
@@ -239,5 +286,17 @@ def move_to(
     text = "Moving to {location}".format(location=location_text)
     return {
         "name": command_types.MOVE_TO,
+        "payload": {"instrument": instrument, "location": location, "text": text},
+    }
+
+
+def move_to_disposal_location(
+    instrument: InstrumentContext,
+    location: Union[TrashBin, WasteChute],
+) -> command_types.MoveToDisposalLocationCommand:
+    location_text = stringify_disposal_location(location)
+    text = f"Moving to {location_text}"
+    return {
+        "name": command_types.MOVE_TO_DISPOSAL_LOCATION,
         "payload": {"instrument": instrument, "location": location, "text": text},
     }
