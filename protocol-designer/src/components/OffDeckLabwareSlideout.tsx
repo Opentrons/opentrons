@@ -92,21 +92,16 @@ export const OffDeckLabwareSlideout = (
     >
       {offDeck == null ? (
         <Flex
-          borderRadius={BORDERS.borderRadiusSize3}
+          borderRadius={BORDERS.borderRadiusSize2}
           alignItems={ALIGN_CENTER}
-          backgroundColor={COLORS.grey35}
+          backgroundColor={COLORS.grey30}
           flexDirection={DIRECTION_COLUMN}
-          padding={SPACING.spacing16}
+          padding={`${SPACING.spacing40} ${SPACING.spacing16}`}
           textAlign={TYPOGRAPHY.textAlignCenter}
-          height="100%"
           justifyContent={JUSTIFY_CENTER}
+          gridGap={SPACING.spacing12}
         >
-          <Icon
-            name="ot-alert"
-            size="2rem"
-            color={COLORS.grey60}
-            marginBottom={SPACING.spacing32}
-          />
+          <Icon name="ot-alert" size="1.25rem" color={COLORS.grey60} />
           <Text>{t('off_deck.slideout_empty_state')}</Text>
         </Flex>
       ) : (

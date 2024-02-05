@@ -15,6 +15,8 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
+  OVERFLOW_WRAP_ANYWHERE,
+  OVERFLOW_WRAP_BREAK_WORD,
   SIZE_2,
   SPACING,
   TYPOGRAPHY,
@@ -175,7 +177,7 @@ export function ProtocolCard(props: {
       ) : null}
       <Flex
         width="28.9375rem"
-        overflowWrap="anywhere"
+        overflowWrap={OVERFLOW_WRAP_ANYWHERE}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
       >
@@ -253,7 +255,7 @@ export function ProtocolCard(props: {
                           -webkit-box-orient: vertical;
                           -webkit-line-clamp: 3;
                           overflow: hidden;
-                          overflow-wrap: break-word;
+                          overflow-wrap: ${OVERFLOW_WRAP_BREAK_WORD};
                           height: max-content;
                         `}
                       />

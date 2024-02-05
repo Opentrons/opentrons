@@ -375,6 +375,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   name="ot-spinner"
                   spin
                   aria-label="ot-spinner"
+                  color={COLORS.grey60}
                 />
                 <StyledText marginLeft={SPACING.spacing8}>
                   {t('updating_firmware')}

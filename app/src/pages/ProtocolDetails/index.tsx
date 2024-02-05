@@ -13,13 +13,14 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  JUSTIFY_SPACE_BETWEEN,
   Icon,
+  JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_WRAP_ANYWHERE,
+  POSITION_STICKY,
   SPACING,
   truncateString,
   TYPOGRAPHY,
-  POSITION_STICKY,
-  JUSTIFY_CENTER,
 } from '@opentrons/components'
 import {
   useCreateRunMutation,
@@ -129,7 +130,7 @@ const ProtocolHeader = ({
               as="h2"
               fontWeight={TYPOGRAPHY.fontWeightBold}
               onClick={toggleTruncate}
-              overflowWrap="anywhere"
+              overflowWrap={OVERFLOW_WRAP_ANYWHERE}
             >
               {displayedTitle}
             </StyledText>

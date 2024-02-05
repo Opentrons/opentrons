@@ -23,6 +23,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   Link,
+  OVERFLOW_WRAP_ANYWHERE,
   POSITION_RELATIVE,
   PrimaryButton,
   ProtocolDeck,
@@ -415,7 +416,7 @@ export function ProtocolDetails(
                 css={TYPOGRAPHY.h2SemiBold}
                 marginBottom={SPACING.spacing16}
                 data-testid={`ProtocolDetails_${protocolDisplayName}`}
-                overflowWrap="anywhere"
+                overflowWrap={OVERFLOW_WRAP_ANYWHERE}
               >
                 {protocolDisplayName}
               </StyledText>
@@ -486,7 +487,7 @@ export function ProtocolDetails(
                   <StyledText
                     as="p"
                     marginRight={SPACING.spacing20}
-                    overflowWrap="anywhere"
+                    overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                   >
                     {analysisStatus === 'loading'
                       ? t('shared:loading')

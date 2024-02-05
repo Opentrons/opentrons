@@ -215,7 +215,7 @@ export function AddFixtureModal({
                         alignItems={ALIGN_CENTER}
                         justifyContent={JUSTIFY_SPACE_BETWEEN}
                         padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
-                        backgroundColor={COLORS.grey30}
+                        backgroundColor={COLORS.grey20}
                         borderRadius={BORDERS.borderRadiusSize1}
                       >
                         <StyledText css={TYPOGRAPHY.pSemiBold}>

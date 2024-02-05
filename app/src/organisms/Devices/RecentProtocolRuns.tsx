@@ -143,7 +143,7 @@ export function RecentProtocolRuns({
           <StyledText
             as="p"
             alignItems={ALIGN_CENTER}
-            color={COLORS.grey40}
+            color={COLORS.grey50}
             display={DISPLAY_FLEX}
             flex="1 0"
             id="RecentProtocolRuns_offline"

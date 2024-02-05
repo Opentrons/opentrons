@@ -18,11 +18,13 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_HIDDEN,
+  OVERFLOW_WRAP_ANYWHERE,
+  OVERFLOW_WRAP_BREAK_WORD,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
-  WRAP,
   SPACING,
   TYPOGRAPHY,
+  WRAP,
 } from '@opentrons/components'
 import {
   RUN_STATUS_FAILED,
@@ -362,7 +364,7 @@ const SplashBody = styled.h4`
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 4;
   overflow: hidden;
-  overflow-wrap: break-word;
+  overflow-wrap: ${OVERFLOW_WRAP_BREAK_WORD};
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   text-align: ${TYPOGRAPHY.textAlignCenter};
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
@@ -398,7 +400,7 @@ const ProtocolName = styled.h4`
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  overflow-wrap: anywhere;
+  overflow-wrap: ${OVERFLOW_WRAP_ANYWHERE};
   height: max-content;
 `
 

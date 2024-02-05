@@ -13,22 +13,23 @@ import {
   getGripperDisplayName,
 } from '@opentrons/shared-data'
 import {
-  Box,
-  Flex,
-  Icon,
-  ModuleIcon,
   ALIGN_FLEX_START,
   BORDERS,
+  Box,
   COLORS,
   DIRECTION_COLUMN,
+  Flex,
+  Icon,
   JUSTIFY_FLEX_END,
+  ModuleIcon,
+  OVERFLOW_WRAP_ANYWHERE,
   POSITION_ABSOLUTE,
+  ProtocolDeck,
   SIZE_2,
   SIZE_3,
   SPACING,
   TYPOGRAPHY,
   WRAP,
-  ProtocolDeck,
 } from '@opentrons/components'
 
 import {
@@ -200,7 +201,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             as="h3"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             data-testid={`ProtocolCard_${protocolDisplayName}`}
-            overflowWrap="anywhere"
+            overflowWrap={OVERFLOW_WRAP_ANYWHERE}
           >
             {protocolDisplayName}
           </StyledText>

@@ -65,7 +65,7 @@ const Bullet = styled.div`
   border-radius: 50%;
   z-index: 2;
   background: ${(props: BulletProps) =>
-    props.isActive ? COLORS.grey50 : COLORS.grey50};
+    props.isActive ? COLORS.grey50 : COLORS.grey40};
   transform: ${(props: BulletProps) =>
     props.isActive ? 'scale(2)' : 'scale(1)'};
 `
