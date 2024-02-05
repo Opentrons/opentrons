@@ -65,7 +65,6 @@ INSTALL_REQUIRES = [
     "wsproto==1.2.0",
     "systemd-python==234; sys_platform=='linux'",
     "sqlalchemy==1.4.51",
-    "aiosqlite==0.19.0",
     "paho-mqtt==1.6.1",
 ]
 

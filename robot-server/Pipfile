@@ -56,7 +56,6 @@ numpy = "==1.22.3"
 zipp = "==3.5.0"
 # breaking changes above this version of sqlalchemy
 sqlalchemy = "==1.4.51"
-aiosqlite = "==0.19.0"
 opentrons-hardware = {editable = true, path='../hardware', extras=['FLEX']}
 opentrons = { editable = true, path = "../api"}
 opentrons-shared-data = { editable = true, path = "../shared-data/python" }
