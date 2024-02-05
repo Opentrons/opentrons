@@ -325,16 +325,10 @@ def _check_deck_conflict_for_96_channel(  # noqa: C901
     # TODO (spp, 2023-12-18): change this eventually to "column 1"/"column 12"
     #  via the column mappings in the pipette geometry definitions.
     # if we are handling commands in the trash or in the waste chute, skip these checks
-    addressable_area = (
-        engine_state.addressable_areas.get_addressable_area_by_deck_slot_name(
-            labware_slot
-        )
-    )
-    if "movableTrash" not in addressable_area.area_name:
-        if primary_nozzle == "A12":
-            adjacent_slot_num = get_west_slot(destination_slot_num)
-        elif primary_nozzle == "A1":
-            adjacent_slot_num = get_east_slot(destination_slot_num)
+    if primary_nozzle == "A12":
+        adjacent_slot_num = get_west_slot(destination_slot_num)
+    elif primary_nozzle == "A1":
+        adjacent_slot_num = get_east_slot(destination_slot_num)
 
     def _check_conflict_with_slot_item(
         adjacent_slot: DeckSlotName,

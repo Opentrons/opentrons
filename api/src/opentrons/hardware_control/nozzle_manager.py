@@ -103,6 +103,11 @@ class NozzleMap:
     configuration: NozzleConfigurationType
     #: The kind of configuration this is
 
+    full_instrument_map_store: Dict[str, Point]
+    #: A map of all of the nozzles of an instrument
+    full_instrument_rows: Dict[str, List[str]]
+    #: A map of all the rows of an instrument
+
     def __str__(self) -> str:
         return f"back_left_nozzle: {self.back_left} front_right_nozzle: {self.front_right} configuration: {self.configuration}"
 
@@ -123,6 +128,23 @@ class NozzleMap:
         Note: This is the value relevant for this configuration, not the physical pipette. See the note on back_left.
         """
         return next(reversed(list(self.rows.values())))[-1]
+    
+    @property
+    def full_instrument_back_left(self) -> str:
+        """The backest, leftest (i.e. back if it's a column, left if it's a row) nozzle of the full instrument.
+
+        Note: This value represents the back left nozzle of the underlying physical pipette. For instance, 
+        the back-left nozzle of a 96-Channel pipette is A1.
+        """
+        return next(iter(self.full_instrument_rows.values()))[0]
+
+    @property
+    def full_instrument_front_right(self) -> str:
+        """The frontest, rightest (i.e. front if it's a column, right if it's a row) nozzle of the full instrument.
+
+        Note: This value represents the front right nozzle of the physical pipette. See the note on full_instrument_back_left.
+        """
+        return next(reversed(list(self.full_instrument_rows.values())))[-1]
 
     @property
     def starting_nozzle_offset(self) -> Point:
@@ -133,13 +155,26 @@ class NozzleMap:
     def xy_center_offset(self) -> Point:
         """The position of the geometrical center of all nozzles in the configuration.
 
-        Note: This is the value relevant fro this configuration, not the physical pipette. See the note on back_left.
+        Note: This is the value relevant for this configuration, not the physical pipette. See the note on back_left.
         """
-        difference = self.map_store[self.front_right] - self.map_store[self.back_left]
+        difference = self.full_instrument_map_store[self.front_right] - self.full_instrument_map_store[self.back_left]
         return self.map_store[self.back_left] + Point(
             difference[0] / 2, difference[1] / 2, 0
         )
+    
+    @property
+    def instrument_xy_center_offset(self) -> Point:
+        """The position of the geometrical center of all nozzles for the entire instrument.
 
+        Note: This the value reflects the center of the maximum number of nozzles of the physical pipette.
+        This would be the same as a full configuration.
+        """
+        difference = self.full_instrument_map_store[self.full_instrument_front_right] - self.full_instrument_map_store[self.full_instrument_back_left]
+        return self.full_instrument_map_store[self.full_instrument_back_left] + Point(
+            difference[0] / 2, difference[1] / 2, 0
+        )
+
+    
     @property
     def y_center_offset(self) -> Point:
         """The position in the center of the primary column of the map."""
@@ -169,6 +204,7 @@ class NozzleMap:
         starting_nozzle: str,
         back_left_nozzle: str,
         front_right_nozzle: str,
+
     ) -> "NozzleMap":
         try:
             back_left_row_index, back_left_column_index = _row_col_indices_for_nozzle(
@@ -215,6 +251,7 @@ class NozzleMap:
         map_store = OrderedDict(
             (nozzle, physical_nozzles[nozzle]) for nozzle in chain(*rows.values())
         )
+
 
         return cls(
             starting_nozzle=starting_nozzle,
@@ -324,7 +361,9 @@ class NozzleConfigurationManager:
         cp_override: Optional[CriticalPoint],
         tip_length: float = 0.0,
     ) -> Point:
-        if cp_override == CriticalPoint.XY_CENTER:
+        if cp_override == CriticalPoint.INSTRUMENT_XY_CENTER:
+            current_nozzle = self._current_nozzle_configuration.
+        elif cp_override == CriticalPoint.XY_CENTER:
             current_nozzle = self._current_nozzle_configuration.xy_center_offset
         elif cp_override == CriticalPoint.Y_CENTER:
             current_nozzle = self._current_nozzle_configuration.y_center_offset

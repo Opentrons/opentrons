@@ -220,6 +220,7 @@ class SyncClient:
         force_direct: bool,
         speed: Optional[float],
         alternate_drop_location: Optional[bool],
+        ignore_tip_configuration: Optional[bool] = False,
     ) -> commands.MoveToAddressableAreaForDropTipResult:
         """Execute a MoveToAddressableArea command and return the result."""
         request = commands.MoveToAddressableAreaForDropTipCreate(
@@ -231,6 +232,7 @@ class SyncClient:
                 minimumZHeight=minimum_z_height,
                 speed=speed,
                 alternateDropLocation=alternate_drop_location,
+                ignoreTipConfiguration=ignore_tip_configuration,
             )
         )
         result = self._transport.execute_command(request=request)

@@ -64,6 +64,15 @@ class MoveToAddressableAreaForDropTipParams(PipetteIdMixin, MovementMixin):
             " If False, the tip will be dropped at the top center of the area."
         ),
     )
+    ignoreTipConfiguration: Optional[bool] = Field(
+        False,
+        description=(
+            "Whether to utilize the critical point of the tip configuraiton when moving to an addressable area."
+            " If True, this command will ignore the tip configuration and use the center of the entire instrument"
+            " of the entire instrument as the critical point for movement."
+            " If False, this command will use the critical point provided by the current tip configuration."
+        ),
+    )
 
 
 class MoveToAddressableAreaForDropTipResult(DestinationPositionResult):
