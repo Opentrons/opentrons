@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
+import { useProtocolQuery } from '@opentrons/react-api-client'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   Btn,
@@ -33,6 +33,7 @@ import {
   OPENTRONS_USB,
 } from '../../redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
+import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
 
 import type { IconName, StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
@@ -63,7 +64,9 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   const isFlex = useIsFlex(name)
   const currentRunId = useCurrentRunId()
   const currentRunStatus = useCurrentRunStatus()
-  const { data: runRecord } = useRunQuery(currentRunId, { staleTime: Infinity })
+  const { data: runRecord } = useNotifyRunQuery(currentRunId, {
+    staleTime: Infinity,
+  })
   const protocolId = runRecord?.data?.protocolId ?? null
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,

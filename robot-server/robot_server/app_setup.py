@@ -24,7 +24,7 @@ from .runs.dependencies import (
     mark_light_control_startup_finished,
 )
 
-from .notification_client import (
+from .service.notifications import (
     initialize_notification_client,
     clean_up_notification_client,
 )

@@ -26,7 +26,6 @@ import {
 } from '@opentrons/components'
 import {
   useProtocolQuery,
-  useRunQuery,
   useInstrumentsQuery,
   useDoorQuery,
   useProtocolAnalysisAsDocumentQuery,
@@ -84,6 +83,7 @@ import { getLatestCurrentOffsets } from '../../organisms/Devices/ProtocolRun/Set
 import { CloseButton, PlayButton } from '../../pages/ProtocolSetup/Buttons'
 import { useDeckConfigurationCompatibility } from '../../resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '../../resources/deck_configuration/utils'
+import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
 
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '../../App/types'
@@ -236,7 +236,7 @@ function PrepareToRun({
     observer.observe(scrollRef.current)
   }
 
-  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
+  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data?.protocolId ?? null
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,

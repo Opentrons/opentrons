@@ -32,7 +32,6 @@ import {
 import {
   useHost,
   useProtocolQuery,
-  useRunQuery,
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
 
@@ -63,6 +62,7 @@ import { handleTipsAttachedModal } from '../../organisms/DropTipWizard/TipsAttac
 import { getPipettesWithTipAttached } from '../../organisms/DropTipWizard/getPipettesWithTipAttached'
 import { getPipetteModelSpecs, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { useMostRecentRunId } from '../../organisms/ProtocolUpload/hooks/useMostRecentRunId'
+import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
@@ -77,7 +77,7 @@ export function RunSummary(): JSX.Element {
   const { t } = useTranslation('run_details')
   const history = useHistory()
   const host = useHost()
-  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
+  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const isRunCurrent = Boolean(runRecord?.data?.current)
   const mostRecentRunId = useMostRecentRunId()
   const { data: attachedInstruments } = useInstrumentsQuery()

@@ -1,8 +1,6 @@
 import * as React from 'react'
-import inRange from 'lodash/inRange'
 
 import { useDispatch } from 'react-redux'
-import { useQuery, useQueryClient } from 'react-query'
 
 import { useHost } from '@opentrons/react-api-client'
 
@@ -13,15 +11,13 @@ import {
   ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
 } from '../redux/analytics'
 
-import type { UseQueryResult, UseQueryOptions, QueryKey } from 'react-query'
+import type { UseQueryOptions } from 'react-query'
 import type { NotifyTopic } from '../redux/shell/types'
 
-export interface QueryOptionsWithPolling<TData, Error>
-  extends UseQueryOptions<TData, Error> {
+export interface QueryOptionsWithPolling<TData, TError = Error>
+  extends UseQueryOptions<TData, TError> {
   forceHttpPolling?: boolean
 }
-
-type DataWithStatusCode<TData> = TData & { statusCode: number }
 
 interface NotifyRefetchData {
   refetchUsingHTTP: boolean
@@ -30,32 +26,21 @@ interface NotifyRefetchData {
 
 export type NotifyNetworkError = 'ECONNFAILED' | 'ECONNREFUSED'
 
-type NotifyResponseData<TData> =
-  | DataWithStatusCode<TData>
-  | NotifyRefetchData
-  | NotifyNetworkError
+type NotifyResponseData = NotifyRefetchData | NotifyNetworkError
 
-interface UseNotifyServiceProps<TData, Error> {
+interface UseNotifyServiceProps<TData, TError = Error> {
   topic: NotifyTopic
-  queryKey: QueryKey
   refetchUsingHTTP: () => void
-  options: QueryOptionsWithPolling<TData, Error>
+  options: QueryOptionsWithPolling<TData, TError>
 }
 
-interface UseNotifyServiceReturn<TData> {
-  notifyQueryResponse: UseQueryResult<TData>
-  isNotifyError: boolean
-}
-
-export function useNotifyService<TData>({
+export function useNotifyService<TData, TError = Error>({
   topic,
-  queryKey,
   refetchUsingHTTP,
   options,
-}: UseNotifyServiceProps<TData, Error>): UseNotifyServiceReturn<TData> {
+}: UseNotifyServiceProps<TData, TError>): { isNotifyError: boolean } {
   const dispatch = useDispatch()
   const host = useHost()
-  const queryClient = useQueryClient()
   const isNotifyError = React.useRef(false)
   const doTrackEvent = useTrackEvent()
   const { enabled, refetchInterval, forceHttpPolling } = options
@@ -63,7 +48,9 @@ export function useNotifyService<TData>({
     refetchInterval !== undefined && refetchInterval !== false
 
   React.useEffect(() => {
-    if (!forceHttpPolling && isRefetchEnabled) {
+    // Always fetch on initial mount.
+    refetchUsingHTTP()
+    if (!forceHttpPolling && isRefetchEnabled && enabled !== false) {
       const hostname = host?.hostname ?? null
       const eventEmitter = appShellListener(hostname, topic)
 
@@ -82,23 +69,11 @@ export function useNotifyService<TData>({
         }
       }
     }
-  }, [])
+  }, [topic])
 
-  const query = useQuery(
-    queryKey,
-    () => queryClient.getQueryData(queryKey) as TData,
-    {
-      ...options,
-      staleTime: Infinity,
-      refetchInterval: false,
-      onError: () => null,
-      enabled: enabled && isRefetchEnabled,
-    }
-  )
+  return { isNotifyError: isNotifyError.current }
 
-  return { notifyQueryResponse: query, isNotifyError: isNotifyError.current }
-
-  function onDataListener(data: NotifyResponseData<TData>): void {
+  function onDataListener(data: NotifyResponseData): void {
     if (!isNotifyError.current) {
       if (data === 'ECONNFAILED' || data === 'ECONNREFUSED') {
         isNotifyError.current = true
@@ -111,18 +86,7 @@ export function useNotifyService<TData>({
       } else if ('refetchUsingHTTP' in data) {
         refetchUsingHTTP()
       } else {
-        // Emulate React Query's implict onError behavior when passed an error status code.
-        if (options.onError != null && inRange(data.statusCode, 400, 600)) {
-          const err = new Error(
-            `NotifyService received status code: ${data.statusCode}`
-          )
-          console.error(err)
-          options.onError(err)
-        }
-        // Prefer setQueryData() and manual callback invocation within onDataListener
-        // as opposed to invalidateQueries() and manual callback invocation/cache logic
-        // within the query function. The former is signficantly more performant: ~25ms vs ~1.5s.
-        else queryClient.setQueryData(queryKey, data)
+        console.log('Unexpected data received from notify service.')
       }
     }
   }
