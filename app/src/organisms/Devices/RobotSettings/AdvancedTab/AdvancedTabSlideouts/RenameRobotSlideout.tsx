@@ -200,13 +200,13 @@ export function RenameRobotSlideout({
               id="newRobotName"
               name="newRobotName"
               type="text"
-              onChange={field.onChange}
-              value={field.value}
-              error={fieldState.error?.message && ' '}
-              onBlur={() => {
-                field.onBlur()
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                field.onChange(e)
                 trigger('newRobotName')
               }}
+              value={field.value}
+              error={fieldState.error?.message && ' '}
+              onBlur={field.onBlur}
             />
           )}
         />

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent, waitFor, screen } from '@testing-library/react'
+import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../../i18n'
 import {
@@ -124,19 +124,19 @@ describe('RobotSettings RenameRobotSlideout', () => {
     })
   })
 
-  it.only('button should be disabled and render the error message when a user types invalid character/characters', async () => {
-    render()
-    const input = screen.getByRole('textbox')
+  it('button should be disabled and render the error message when a user types invalid character/characters', async () => {
+    const [{ getByRole, findByText }] = render()
+    const input = getByRole('textbox')
     fireEvent.change(input, { target: { value: 'mockInput@@@' } })
     expect(input).toHaveValue('mockInput@@@')
-    const renameButton = screen.getByRole('button', { name: 'Rename robot' })
-    fireEvent.click(renameButton)
-    expect(renameButton).toBeDisabled()
-
+    const renameButton = getByRole('button', { name: 'Rename robot' })
+    const error = await findByText(
+      'Oops! Robot name must follow the character count and limitations.'
+    )
     await waitFor(() => {
-      const error = screen.findByText(
-        'Oops! Robot name must follow the character count and limitations.'
-      )
+      expect(renameButton).toBeDisabled()
+    })
+    await waitFor(() => {
       expect(error).toBeInTheDocument()
     })
   })

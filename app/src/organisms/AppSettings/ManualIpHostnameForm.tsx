@@ -84,7 +84,7 @@ export function ManualIpHostnameForm({
     }
     return {
       ...errors,
-      ['ip']: {
+      ip: {
         type: 'error',
         message: message,
       },

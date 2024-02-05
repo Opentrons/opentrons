@@ -89,6 +89,7 @@ export const FormModal = (props: FormModalProps): JSX.Element => {
           if (fieldProps.type === FIELD_TYPE_SECURITY) {
             return (
               <Controller
+                key={name}
                 control={control}
                 //  @ts-expect-error: name is correct type
                 name={name}
@@ -106,6 +107,7 @@ export const FormModal = (props: FormModalProps): JSX.Element => {
           if (fieldProps.type === FIELD_TYPE_KEY_FILE) {
             return (
               <Controller
+                key={name}
                 control={control}
                 //  @ts-expect-error: name is correct type
                 name={name}
@@ -118,6 +120,7 @@ export const FormModal = (props: FormModalProps): JSX.Element => {
 
           return (
             <Controller
+              key={name}
               control={control}
               //  @ts-expect-error: name is correct type
               name={name}

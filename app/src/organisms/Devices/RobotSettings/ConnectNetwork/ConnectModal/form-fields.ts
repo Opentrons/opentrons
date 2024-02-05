@@ -19,6 +19,8 @@ import type {
   ConnectFormSecurityField,
 } from '../types'
 
+type Errors = Record<string, FieldError>
+
 export const renderLabel = (label: string, required: boolean): string =>
   `${required ? '* ' : ''}${label}`
 
@@ -140,8 +142,8 @@ export function validateConnectFormFields(
   network: WifiNetwork | null,
   eapOptions: EapOption[],
   values: ConnectFormValues,
-  errors: Record<string, FieldError>
-): Record<string, FieldError> {
+  errors: Errors
+): Errors {
   const {
     ssid: formSsid,
     securityType: formSecurityType,
@@ -208,12 +210,12 @@ export function validateConnectFormFields(
       )
       .reduce(
         (
-          acc,
+          acc: Errors,
           { name, displayName }: Pick<EapOption, 'name' | 'displayName'>
         ) => {
-          const fieldName = getEapFieldName(name) as keyof typeof errors
-          //  @ts-expect-error: displayName is possibly null
-          const errorMessage = Copy.FIELD_IS_REQUIRED(displayName)
+          const fieldName = getEapFieldName(name)
+          const errorMessage =
+            displayName != null ? Copy.FIELD_IS_REQUIRED(displayName) : ''
 
           if (errorMessage != null) {
             acc[fieldName] = {
@@ -224,7 +226,7 @@ export function validateConnectFormFields(
 
           return acc
         },
-        {} as Record<string, FieldError>
+        {}
       )
 
     return Object.keys(eapFieldErrors).length > 0

@@ -100,7 +100,7 @@ export function NameRobot(): JSX.Element {
     }
     return {
       ...errors,
-      ['newRobotName']: {
+      newRobotName: {
         type: 'error',
         message: message,
       },
@@ -116,10 +116,10 @@ export function NameRobot(): JSX.Element {
   const {
     handleSubmit,
     control,
-    formState: { isDirty, isValid, errors },
+    formState: { errors },
     reset,
-    watch,
     trigger,
+    watch,
   } = useForm({
     defaultValues: {
       newRobotName: '',
@@ -251,8 +251,11 @@ export function NameRobot(): JSX.Element {
                     id="newRobotName"
                     name="newRobotName"
                     type="text"
-                    onChange={field.onChange}
-                    value={name}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      field.onChange(e)
+                      trigger('newRobotName')
+                    }}
+                    value={field.value}
                     error={fieldState.error?.message && ''}
                     css={INPUT_FIELD_ODD_STYLE}
                   />
