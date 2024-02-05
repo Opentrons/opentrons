@@ -1,5 +1,6 @@
 import * as React from 'react'
 import isEqual from 'lodash/isEqual'
+import { useTranslation } from 'react-i18next'
 import {
   CutoutConfig,
   FLEX_CUTOUT_BY_SLOT_ID,
@@ -97,6 +98,8 @@ export function DeckLocationSelect({
 }: DeckLocationSelectProps): JSX.Element {
   const robotType = deckDef.robot.model
 
+  const { t } = useTranslation('module_wizard_flows')
+
   const [hoveredData, setHoveredData] = React.useState<{
     slot: AddressableArea
     slotPosition: CoordinateTuple | null
@@ -141,9 +144,10 @@ export function DeckLocationSelect({
             addressableArea.id === 'fixedTrash'
         )
         .map(slot => {
-          // eslint-disable-next-line react-hooks/rules-of-hooks
           const slotLocation = { slotName: slot.id }
-          const isDisabled = !availableSlotNames.some(l => l === slot.id)
+          const isDisabled = !availableSlotNames.some(
+            slotName => slotName === slot.id
+          )
           const disabledReason =
             occupiedCutouts.find(
               cutout => FLEX_SLOT_BY_CUTOUT_ID[cutout.cutoutId] === slot.id
@@ -307,9 +311,11 @@ export function DeckLocationSelect({
               borderRadius="3px"
             >
               {hoveredData.disabledReason != null
-                ? `A ${getFixtureDisplayName(
-                    hoveredData.disabledReason
-                  ).toLowerCase()} is currently specified here on the deck configuration`
+                ? t('location_occupied', {
+                    fixture: getFixtureDisplayName(
+                      hoveredData.disabledReason
+                    ).toLowerCase(),
+                  })
                 : 'Slot unavailable'}
             </Text>
           </RobotCoordsForeignDiv>

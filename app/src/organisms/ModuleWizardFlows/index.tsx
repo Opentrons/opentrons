@@ -8,11 +8,9 @@ import {
 } from '@opentrons/react-api-client'
 import { COLORS } from '@opentrons/components'
 import {
-  CreateCommand,
   getModuleType,
   getModuleDisplayName,
   FLEX_CUTOUT_BY_SLOT_ID,
-  CutoutConfig,
 } from '@opentrons/shared-data'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
@@ -36,7 +34,11 @@ import { Success } from './Success'
 import { DetachProbe } from './DetachProbe'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
-import type { SingleSlotCutoutFixtureId } from '@opentrons/shared-data'
+import type {
+  CreateCommand,
+  CutoutConfig,
+  SingleSlotCutoutFixtureId,
+} from '@opentrons/shared-data'
 
 interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
@@ -125,7 +127,9 @@ export const ModuleWizardFlows = (
     createTargetedMaintenanceRun,
     isLoading: isCreateLoading,
   } = useCreateTargetedMaintenanceRunMutation({
-    onSuccess: (response: { data: { id: any } }) => {
+    onSuccess: (response: {
+      data: { id: React.SetStateAction<string | null> }
+    }) => {
       setCreatedMaintenanceRunId(response.data.id)
     },
   })
@@ -170,8 +174,12 @@ export const ModuleWizardFlows = (
   }
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
-    onSuccess: () => handleClose(),
-    onError: () => handleClose(),
+    onSuccess: () => {
+      handleClose()
+    },
+    onError: () => {
+      handleClose()
+    },
   })
 
   const handleCleanUpAndClose = (): void => {
@@ -179,7 +187,7 @@ export const ModuleWizardFlows = (
     if (maintenanceRunData?.data.id == null) handleClose()
     else {
       chainRunCommands(
-        maintenanceRunData?.data.id,
+        maintenanceRunData?.data.id as string,
         [{ commandType: 'home' as const, params: {} }],
         false
       )
@@ -211,7 +219,7 @@ export const ModuleWizardFlows = (
       continuePastCommandFailure: boolean
     ): Promise<CommandData[]> =>
       chainRunCommands(
-        maintenanceRunData?.data.id,
+        maintenanceRunData?.data.id as string,
         commands,
         continuePastCommandFailure
       )
