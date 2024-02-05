@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { BORDERS, COLORS, renderWithProviders } from '@opentrons/components'
+import { BORDERS, COLORS } from '@opentrons/components'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { EquipmentOption } from '../EquipmentOption'
 
 const render = (props: React.ComponentProps<typeof EquipmentOption>) => {

@@ -2,10 +2,10 @@ import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { when } from 'jest-when'
 import {
-  partialComponentPropsMatcher,
   renderWithProviders,
-  RobotCoordsForeignDiv,
-} from '@opentrons/components'
+  partialComponentPropsMatcher,
+} from '../../../__testing-utils__'
+import { RobotCoordsForeignDiv } from '@opentrons/components'
 import { FlexModuleTag } from '../FlexModuleTag'
 import type { ModuleDimensions } from '@opentrons/shared-data'
 

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__' 
 import { Ot2ModuleTag } from '../Ot2ModuleTag'
 import type { ModuleDimensions } from '@opentrons/shared-data'
 

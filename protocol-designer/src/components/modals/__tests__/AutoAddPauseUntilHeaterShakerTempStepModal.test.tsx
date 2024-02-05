@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../localization'
 import { AutoAddPauseUntilHeaterShakerTempStepModal } from '../AutoAddPauseUntilHeaterShakerTempStepModal'
 

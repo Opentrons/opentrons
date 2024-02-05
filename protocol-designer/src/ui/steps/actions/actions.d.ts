@@ -1,0 +1,25 @@
+import { AnalyticsEventAction } from '../../../analytics/actions';
+import { TerminalItemId, SubstepIdentifier } from '../../../steplist/types';
+import { Timeline } from '@opentrons/step-generation';
+import { StepIdType, StepType } from '../../../form-types';
+import { ThunkAction } from '../../../types';
+import { AddStepAction, ExpandAddStepButtonAction, ToggleStepCollapsedAction, ExpandMultipleStepsAction, CollapseMultipleStepsAction, HoverOnStepAction, HoverOnSubstepAction, SelectTerminalItemAction, HoverOnTerminalItemAction, SetWellSelectionLabwareKeyAction, ClearWellSelectionLabwareKeyAction, SelectStepAction, SelectMultipleStepsAction } from './types';
+export declare const addStep: (args: {
+    stepType: StepType;
+    robotStateTimeline: Timeline;
+}) => AddStepAction;
+export declare const expandAddStepButton: (payload: boolean) => ExpandAddStepButtonAction;
+export declare const toggleStepCollapsed: (stepId: StepIdType) => ToggleStepCollapsedAction;
+export declare const expandMultipleSteps: (stepIds: StepIdType[]) => ExpandMultipleStepsAction;
+export declare const collapseMultipleSteps: (stepIds: StepIdType[]) => CollapseMultipleStepsAction;
+export declare const hoverOnSubstep: (payload: SubstepIdentifier) => HoverOnSubstepAction;
+export declare const selectTerminalItem: (terminalId: TerminalItemId) => SelectTerminalItemAction;
+export declare const hoverOnStep: (stepId: StepIdType | null | undefined) => HoverOnStepAction;
+export declare const hoverOnTerminalItem: (terminalId: TerminalItemId | null | undefined) => HoverOnTerminalItemAction;
+export declare const setWellSelectionLabwareKey: (labwareName: string | null | undefined) => SetWellSelectionLabwareKeyAction;
+export declare const clearWellSelectionLabwareKey: () => ClearWellSelectionLabwareKeyAction;
+export declare const selectStep: (stepId: StepIdType) => ThunkAction<any>;
+export declare const selectMultipleSteps: (stepIds: StepIdType[], lastSelected: StepIdType) => ThunkAction<SelectMultipleStepsAction>;
+export declare const selectAllSteps: () => ThunkAction<SelectMultipleStepsAction | AnalyticsEventAction>;
+export declare const EXIT_BATCH_EDIT_MODE_BUTTON_PRESS: 'EXIT_BATCH_EDIT_MODE_BUTTON_PRESS';
+export declare const deselectAllSteps: (meta?: typeof EXIT_BATCH_EDIT_MODE_BUTTON_PRESS) => ThunkAction<SelectStepAction | AnalyticsEventAction>;

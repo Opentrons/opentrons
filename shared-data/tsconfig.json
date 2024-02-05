@@ -13,7 +13,7 @@
     "protocol",
     "pipette",
     "deck",
-    "command/types",
+    "command",
     "liquid/types",
     "commandAnnotation/types",
   ]

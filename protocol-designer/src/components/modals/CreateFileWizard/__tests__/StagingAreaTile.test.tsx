@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-import { DeckConfigurator, renderWithProviders } from '@opentrons/components'
+import { DeckConfigurator } from '@opentrons/components'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../localization'
 import { StagingAreaTile } from '../StagingAreaTile'
 

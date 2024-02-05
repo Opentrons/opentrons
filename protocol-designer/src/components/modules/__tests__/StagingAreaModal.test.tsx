@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { DeckConfigurator, renderWithProviders } from '@opentrons/components'
+import { DeckConfigurator } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../localization'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { getSlotIsEmpty } from '../../../step-forms'

@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../__testing-utils__' 
 import { i18n } from '../../../localization'
 import { AdditionalItemsRow } from '../AdditionalItemsRow'
 import { FlexSlotMap } from '../FlexSlotMap'

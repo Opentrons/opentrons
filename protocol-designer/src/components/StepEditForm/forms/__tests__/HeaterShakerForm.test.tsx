@@ -1,14 +1,11 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
-import {
-  DropdownOption,
-  renderWithProviders,
-  partialComponentPropsMatcher,
-} from '@opentrons/components'
+import { renderWithProviders, partialComponentPropsMatcher  } from '../../../../__testing-utils__'
 import { getHeaterShakerLabwareOptions } from '../../../../ui/modules/selectors'
 import { i18n } from '../../../../localization'
 import { StepFormDropdown, TextField, ToggleRowField } from '../../fields'
 import { HeaterShakerForm } from '../HeaterShakerForm'
+import type { DropdownOption } from '@opentrons/components'
 
 jest.mock('../../../../ui/modules/selectors')
 jest.mock('../../fields/', () => {

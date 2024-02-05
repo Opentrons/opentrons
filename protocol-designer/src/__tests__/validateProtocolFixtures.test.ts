@@ -1,16 +1,19 @@
+import { describe, it, expect } from 'vitest'
 import Ajv from 'ajv'
 import glob from 'glob'
 import last from 'lodash/last'
 import path from 'path'
-import protocolV1Schema from '@opentrons/shared-data/protocol/schemas/1.json'
-import protocolV3Schema from '@opentrons/shared-data/protocol/schemas/3.json'
-import protocolV4Schema from '@opentrons/shared-data/protocol/schemas/4.json'
-import protocolV5Schema from '@opentrons/shared-data/protocol/schemas/5.json'
-import protocolV6Schema from '@opentrons/shared-data/protocol/schemas/6.json'
-import protocolV7Schema from '@opentrons/shared-data/protocol/schemas/7.json'
-import protocolV8Schema from '@opentrons/shared-data/protocol/schemas/8.json'
-import labwareV2Schema from '@opentrons/shared-data/labware/schemas/2.json'
-import commandV7Schema from '@opentrons/shared-data/command/schemas/7.json'
+import { 
+  protocolSchemaV1,
+  protocolSchemaV3,
+  protocolSchemaV4,
+  protocolSchemaV5,
+  protocolSchemaV6,
+  protocolSchemaV7,
+  protocolSchemaV8,
+  labwareSchemaV2,
+  commandSchemaV7,
+ } from '@opentrons/shared-data'
 
 // TODO: copied from createFile.test.js
 const getAjvValidator = (_protocolSchema: object) => {
@@ -19,8 +22,8 @@ const getAjvValidator = (_protocolSchema: object) => {
     jsonPointers: true,
   })
   // v3 and v4 protocol schema contain reference to v2 labware schema, so give AJV access to it
-  ajv.addSchema(labwareV2Schema)
-  ajv.addSchema(commandV7Schema)
+  ajv.addSchema(labwareSchemaV2)
+  ajv.addSchema(commandSchemaV7)
 
   const validateProtocol = ajv.compile(_protocolSchema)
   return validateProtocol
@@ -59,19 +62,19 @@ const getSchemaDefForProtocol = (protocol: any): any => {
 
   switch (n) {
     case '1':
-      return protocolV1Schema
+      return protocolSchemaV1
     case '3':
-      return protocolV3Schema
+      return protocolSchemaV3
     case '4':
-      return protocolV4Schema
+      return protocolSchemaV4
     case '5':
-      return protocolV5Schema
+      return protocolSchemaV5
     case '6':
-      return protocolV6Schema
+      return protocolSchemaV6
     case '7':
-      return protocolV7Schema
+      return protocolSchemaV7
     case '8':
-      return protocolV8Schema
+      return protocolSchemaV8
   }
 
   const errorMessage = `bad schema for protocol!: ${

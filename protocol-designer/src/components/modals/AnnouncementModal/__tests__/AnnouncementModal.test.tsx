@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../../__testing-utils__' 
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../../localization'
 import { getLocalStorageItem, setLocalStorageItem } from '../../../../persist'

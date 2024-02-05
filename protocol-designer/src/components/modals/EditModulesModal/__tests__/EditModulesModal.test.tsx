@@ -1,11 +1,8 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-import {
-  DeckLocationSelect,
-  renderWithProviders,
-  SlotMap,
-} from '@opentrons/components'
+import { DeckLocationSelect, SlotMap } from '@opentrons/components'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../localization'
 import { getRobotType } from '../../../../file-data/selectors'
 import { getInitialDeckSetup } from '../../../../step-forms/selectors'

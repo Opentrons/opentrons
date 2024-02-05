@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders, nestedTextMatcher } from '@opentrons/components'
+import { renderWithProviders, nestedTextMatcher } from '../../../__testing-utils__'
 import {
   getIsLabwareAboveHeight,
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
