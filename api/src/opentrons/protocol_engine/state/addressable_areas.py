@@ -473,7 +473,7 @@ class AddressableAreaView(HasState[AddressableAreaState]):
     def get_fixture_by_deck_slot_name(
         self, slot_name: DeckSlotName
     ) -> Optional[CutoutFixture]:
-        """Get the Cutout Fixture of a fixture currently loaded into a specific Deck Slot."""
+        """Get the Cutout Fixture currently loaded where a specific Deck Slot would be."""
         deck_config = self.state.deck_configuration
         if deck_config:
             slot_cutout_id = DECK_SLOT_TO_CUTOUT_MAP[slot_name]
@@ -486,12 +486,14 @@ class AddressableAreaView(HasState[AddressableAreaState]):
                             cutout_fixture_id, self.state.deck_definition
                         )
                     )
-                    break
+                    return slot_cutout_fixture
             if slot_cutout_fixture is None:
+                # If this happens, it's a bug. Either DECK_SLOT_TO_CUTOUT_MAP
+                # is missing an entry for the slot, or the deck configuration is missing
+                # an entry for the cutout.
                 raise CutoutDoesNotExistError(
                     f"No Cutout was found in the Deck that matched provided slot {slot_name}."
                 )
-            return slot_cutout_fixture
         return None
 
     def get_fixture_height(self, cutout_fixture_name: str) -> float:
