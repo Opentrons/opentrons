@@ -24,10 +24,7 @@ export type RobotSettingsTab =
   | 'advanced'
   | 'feature-flags'
 
-export type AppSettingsTab =
-  | 'general'
-  | 'advanced'
-  | 'feature-flags'
+export type AppSettingsTab = 'general' | 'advanced' | 'feature-flags'
 
 export type ProtocolRunDetailsTab = 'setup' | 'module-controls' | 'run-preview'
 
