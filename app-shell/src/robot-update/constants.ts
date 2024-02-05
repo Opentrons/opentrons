@@ -15,7 +15,8 @@ const UPDATE_MANIFEST_URLS_INTERNAL_RELEASE = {
 }
 
 export const getUpdateManifestUrls = (): UpdateManifestUrls =>
-  _OPENTRONS_PROJECT_.includes('robot-stack')
+// @ts-expect-error can't get TS to recognize global.d.ts
+  global._OPENTRONS_PROJECT_.includes('robot-stack')
     ? UPDATE_MANIFEST_URLS_RELEASE
     : UPDATE_MANIFEST_URLS_INTERNAL_RELEASE
 

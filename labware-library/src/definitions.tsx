@@ -4,21 +4,12 @@ import * as React from 'react'
 import { Route } from 'react-router-dom'
 import groupBy from 'lodash/groupBy'
 import uniq from 'lodash/uniq'
-import { LABWAREV2_DO_NOT_LIST } from '@opentrons/shared-data'
+import { LABWAREV2_DO_NOT_LIST, getAllDefinitions as _getAllDefinitions } from '@opentrons/shared-data'
 import { getPublicPath } from './public-path'
 
 import type { RouteComponentProps } from 'react-router-dom'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { LabwareList, LabwareDefinition } from './types'
-
-// require all definitions in the labware/definitions/2 directory
-// require.context is webpack-specific method
-const definitionsContext = require.context(
-  '@opentrons/shared-data/labware/definitions/2',
-  true, // traverse subdirectories
-  /\.json$/, // import filter
-  'sync' // load every definition into one synchronous chunk
-)
 
 const getOnlyLatestDefs = (labwareList: LabwareList): LabwareList => {
   // group by namespace + loadName
@@ -39,7 +30,7 @@ const getOnlyLatestDefs = (labwareList: LabwareList): LabwareList => {
 }
 
 function _getAllDefs(): LabwareDefinition2[] {
-  return definitionsContext.keys().map(name => definitionsContext(name))
+  return Object.values(_getAllDefinitions())
 }
 
 let allLoadNames: string[] | null = null

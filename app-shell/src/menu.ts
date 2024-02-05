@@ -27,7 +27,8 @@ const helpMenu: MenuItemConstructorOptions = {
       },
     },
     {
-      label: `View ${_PKG_PRODUCT_NAME_} App Logs`,
+      // @ts-expect-error can't get TS to recognize global.d.ts
+      label: `View ${global._PKG_PRODUCT_NAME_} App Logs`,
       click: () => {
         require('electron').shell.openPath(LOG_DIR)
       },
@@ -36,7 +37,8 @@ const helpMenu: MenuItemConstructorOptions = {
       label: 'Report an Issue',
       click: () => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        require('electron').shell.openExternal(_PKG_BUGS_URL_)
+        // @ts-expect-error can't get TS to recognize global.d.ts
+        require('electron').shell.openExternal(global._PKG_BUGS_URL_)
       },
     },
   ],

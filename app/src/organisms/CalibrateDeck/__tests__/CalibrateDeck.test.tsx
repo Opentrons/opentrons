@@ -1,4 +1,5 @@
 import * as React from 'react'
+import * as Vitest from 'vitest'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { fireEvent, screen } from '@testing-library/react'
 
@@ -22,7 +23,7 @@ interface CalibrateDeckSpec {
   currentStep: DeckCalibrationStep
 }
 
-const mockGetDeckDefinitions = getDeckDefinitions as vi.MockedFunction<
+const mockGetDeckDefinitions = getDeckDefinitions as Vitest.MockedFunction<
   typeof getDeckDefinitions
 >
 
