@@ -1,18 +1,18 @@
 import * as React from 'react'
+import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import mapValues from 'lodash/mapValues'
-import { Formik, FormikProps } from 'formik'
 import { format } from 'date-fns'
 import cx from 'classnames'
 
 import {
   Card,
   FormGroup,
-  InputField,
   InstrumentGroup,
   OutlineButton,
   DeprecatedPrimaryButton,
+  InputField,
 } from '@opentrons/components'
 import { resetScrollElements } from '../ui/steps/utils'
 import { Portal } from './portals/MainPageModalPortal'
@@ -82,93 +82,109 @@ export const FilePage = (): JSX.Element => {
     dispatch(actions.saveFileMetadata(nextFormValues))
   }
 
+  const {
+    handleSubmit,
+    watch,
+    control,
+    formState: { isDirty },
+  } = useForm<FileMetadataFields>({ defaultValues: formValues })
+
+  const [created, lastModified, protocolName, author, description] = watch([
+    'created',
+    'lastModified',
+    'protocolName',
+    'author',
+    'description',
+  ])
+
   return (
     <div className={styles.file_page}>
       <Card title={t('application:information')}>
-        <Formik
-          enableReinitialize
-          initialValues={formValues}
-          onSubmit={saveFileMetadata}
+        <form
+          onSubmit={handleSubmit(saveFileMetadata)}
+          className={styles.card_content}
         >
-          {({
-            handleChange,
-            handleSubmit,
-            dirty,
-            touched,
-            values,
-          }: FormikProps<FileMetadataFields>) => (
-            <form onSubmit={handleSubmit} className={styles.card_content}>
-              <div
-                className={cx(
-                  formStyles.row_wrapper,
-                  formStyles.stacked_row_large
-                )}
-              >
-                <FormGroup
-                  label={t('application:date_created')}
-                  className={formStyles.column_1_2}
-                >
-                  {values.created && format(values.created, DATE_ONLY_FORMAT)}
-                </FormGroup>
+          <div
+            className={cx(formStyles.row_wrapper, formStyles.stacked_row_large)}
+          >
+            <FormGroup
+              label={t('application:date_created')}
+              className={formStyles.column_1_2}
+            >
+              {created && format(created, DATE_ONLY_FORMAT)}
+            </FormGroup>
 
-                <FormGroup
-                  label={t('application:last_exported')}
-                  className={formStyles.column_1_2}
-                >
-                  {values.lastModified &&
-                    format(values.lastModified, DATETIME_FORMAT)}
-                </FormGroup>
-              </div>
+            <FormGroup
+              label={t('application:last_exported')}
+              className={formStyles.column_1_2}
+            >
+              {lastModified && format(lastModified, DATETIME_FORMAT)}
+            </FormGroup>
+          </div>
 
-              <div
-                className={cx(formStyles.row_wrapper, formStyles.stacked_row)}
-              >
-                <FormGroup
-                  label={t('application:protocol_name')}
-                  className={formStyles.column_1_2}
-                >
+          <div className={cx(formStyles.row_wrapper, formStyles.stacked_row)}>
+            <FormGroup
+              label={t('application:protocol_name')}
+              className={formStyles.column_1_2}
+            >
+              <Controller
+                control={control}
+                name="protocolName"
+                render={({ field }) => (
                   <InputField
                     placeholder="Untitled"
                     name="protocolName"
-                    onChange={handleChange}
-                    value={values.protocolName}
+                    value={protocolName}
+                    onChange={field.onChange}
                   />
-                </FormGroup>
+                )}
+              />
+            </FormGroup>
 
-                <FormGroup
-                  label={t('application:organization_author')}
-                  className={formStyles.column_1_2}
-                >
+            <FormGroup
+              label={t('application:organization_author')}
+              className={formStyles.column_1_2}
+            >
+              <Controller
+                control={control}
+                name="author"
+                render={({ field }) => (
                   <InputField
                     name="author"
-                    onChange={handleChange}
-                    value={values.author}
+                    value={author}
+                    onChange={field.onChange}
                   />
-                </FormGroup>
-              </div>
+                )}
+              />
+            </FormGroup>
+          </div>
 
-              <FormGroup
-                label={t('application:description')}
-                className={formStyles.stacked_row}
-              >
+          <FormGroup
+            label={t('application:description')}
+            className={formStyles.stacked_row}
+          >
+            <Controller
+              control={control}
+              name="description"
+              render={({ field }) => (
                 <InputField
                   name="description"
-                  value={values.description}
-                  onChange={handleChange}
+                  value={description}
+                  onChange={field.onChange}
                 />
-              </FormGroup>
-              <div className={modalStyles.button_row}>
-                <OutlineButton
-                  type="submit"
-                  className={styles.update_button}
-                  disabled={!dirty}
-                >
-                  {dirty ? t('application:update') : t('application:updated')}
-                </OutlineButton>
-              </div>
-            </form>
-          )}
-        </Formik>
+              )}
+            />
+          </FormGroup>
+          <div className={modalStyles.button_row}>
+            <OutlineButton
+              type="submit"
+              className={styles.update_button}
+              disabled={!isDirty}
+            >
+              {isDirty ? t('application:update') : t('application:updated')}
+            </OutlineButton>
+          </div>
+        </form>
       </Card>
 
       <Card title={t('application:pipettes')}>

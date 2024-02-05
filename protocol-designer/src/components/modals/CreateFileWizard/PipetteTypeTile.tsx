@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { FormikProps } from 'formik'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -29,6 +28,7 @@ import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
 
 import type { FormState, WizardTileProps } from './types'
+import type { UseFormReturn } from 'react-hook-form'
 
 export function FirstPipetteTypeTile(
   props: Omit<
@@ -55,7 +55,8 @@ export function SecondPipetteTypeTile(
   >
 ): JSX.Element | null {
   const { t } = useTranslation('modal')
-  if (props.values.pipettesByMount.left.pipetteName === 'p1000_96') {
+  const pipettesByMount = props.watch('pipettesByMount')
+  if (pipettesByMount.left.pipetteName === 'p1000_96') {
     props.proceed(2)
     return null
   } else {
@@ -119,27 +120,24 @@ export function PipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
   )
 }
 
-interface OT2FieldProps extends FormikProps<FormState> {
+interface OT2FieldProps extends UseFormReturn<FormState> {
   mount: Mount
   allowNoPipette: boolean
   display96Channel: boolean
 }
 
 function PipetteField(props: OT2FieldProps): JSX.Element {
-  const {
-    mount,
-    values,
-    setFieldValue,
-    allowNoPipette,
-    display96Channel,
-  } = props
-  const robotType = values.fields.robotType
+  const { mount, watch, allowNoPipette, setValue, display96Channel } = props
+  const fields = watch('fields')
+  const pipettesByMount = watch('pipettesByMount')
+
   const pipetteOptions = React.useMemo(() => {
     const allPipetteOptions = getAllPipetteNames('maxVolume', 'channels')
       .filter(name =>
-        (robotType === OT2_ROBOT_TYPE ? OT2_PIPETTES : OT3_PIPETTES).includes(
-          name
-        )
+        (fields.robotType === OT2_ROBOT_TYPE
+          ? OT2_PIPETTES
+          : OT3_PIPETTES
+        ).includes(name)
       )
       .map(name => ({
         value: name,
@@ -152,13 +150,13 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
           ...allPipetteOptions.filter(o => o.value !== 'p1000_96'),
           ...noneOption,
         ]
-  }, [robotType])
-  const nameAccessor = `pipettesByMount.${mount}.pipetteName`
-  const currentValue = values.pipettesByMount[mount].pipetteName
+  }, [fields.robotType])
+
+  const currentValue = pipettesByMount[mount].pipetteName
   React.useEffect(() => {
     if (currentValue === undefined) {
-      setFieldValue(
-        nameAccessor,
+      setValue(
+        `pipettesByMount.${mount}.pipetteName`,
         allowNoPipette ? '' : pipetteOptions[0]?.value ?? ''
       )
     }
@@ -188,7 +186,7 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
           }
           text={o.name}
           onClick={() => {
-            setFieldValue(nameAccessor, o.value)
+            setValue(`pipettesByMount.${mount}.pipetteName`, o.value)
           }}
           width={pipetteOptions.length > 5 ? '14.5rem' : '21.75rem'}
           minHeight="4rem"
