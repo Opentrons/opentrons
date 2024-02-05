@@ -104,7 +104,7 @@ export const getHoveredStepId: Selector<StepIdType | null> = createSelector(
 )
 
 /** Array of labware (labwareId's) involved in hovered Step, or [] */
-export const getHoveredStepLabware: Selector<string[]> = createSelector(
+export const getHoveredStepLabware = createSelector(
   stepFormSelectors.getArgsAndErrorsByStepId,
   getHoveredStepId,
   stepFormSelectors.getInitialDeckSetup,

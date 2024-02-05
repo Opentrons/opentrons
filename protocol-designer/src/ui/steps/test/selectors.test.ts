@@ -1,4 +1,5 @@
 import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import {
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
@@ -23,15 +24,21 @@ import {
 import { getMockMoveLiquidStep, getMockMixStep } from '../__fixtures__'
 
 import * as utils from '../../modules/utils'
-import { FormData } from '../../../form-types'
+
+import type { FormData } from '../../../form-types'
+import type { StepArgsAndErrorsById } from '../../../steplist/types'
+import { AllTemporalPropertiesForTimelineFrame } from '../../../step-forms'
+
+vi.mock('../../modules/utils')
 
 function createArgsForStepId(
   stepId: string,
   stepArgs: any
-): Record<string, Record<string, any>> {
+): StepArgsAndErrorsById {
   return {
     [stepId]: {
       stepArgs,
+      errors: false
     },
   }
 }
@@ -41,13 +48,13 @@ const labware = 'well plate'
 const mixCommand = 'mix'
 const moveLabwareCommand = 'moveLabware'
 describe('getHoveredStepLabware', () => {
-  let initialDeckState: any
+  let initialDeckState: AllTemporalPropertiesForTimelineFrame
   beforeEach(() => {
     initialDeckState = {
       labware: {},
       pipettes: {},
       modules: {},
-    }
+    } as any
   })
 
   it('no labware is returned when no hovered step', () => {
@@ -57,7 +64,6 @@ describe('getHoveredStepLabware', () => {
     }
     const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
     const hoveredStep = null
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = getHoveredStepLabware.resultFunc(
       argsByStepId,
       hoveredStep,
@@ -74,7 +80,6 @@ describe('getHoveredStepLabware', () => {
     }
     const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
     const hoveredStep = 'another-step'
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = getHoveredStepLabware.resultFunc(
       argsByStepId,
       hoveredStep,
@@ -87,7 +92,6 @@ describe('getHoveredStepLabware', () => {
   it('no labware is returned when no step arguments', () => {
     const stepArgs = null
     const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = getHoveredStepLabware.resultFunc(
       argsByStepId,
       hoveredStepId,
@@ -96,25 +100,24 @@ describe('getHoveredStepLabware', () => {
 
     expect(result).toEqual([])
   })
-  ;['consolidate', 'distribute', 'transfer'].forEach(command => {
-    it(`source and destination labware is returned when ${command}`, () => {
-      const sourceLabware = 'test tube'
-      const stepArgs = {
-        commandCreatorFnName: command,
-        destLabware: labware,
-        sourceLabware,
-      }
-      const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
-      // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
-      const result = getHoveredStepLabware.resultFunc(
-        argsByStepId,
-        hoveredStepId,
-        initialDeckState
-      )
+    ;['consolidate', 'distribute', 'transfer'].forEach(command => {
+      it(`source and destination labware is returned when ${command}`, () => {
+        const sourceLabware = 'test tube'
+        const stepArgs = {
+          commandCreatorFnName: command,
+          destLabware: labware,
+          sourceLabware,
+        }
+        const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
+        const result = getHoveredStepLabware.resultFunc(
+          argsByStepId,
+          hoveredStepId,
+          initialDeckState
+        )
 
-      expect(result).toEqual([sourceLabware, labware])
+        expect(result).toEqual([sourceLabware, labware])
+      })
     })
-  })
 
   it('labware is returned when command is mix', () => {
     const stepArgs = {
@@ -122,7 +125,6 @@ describe('getHoveredStepLabware', () => {
       labware,
     }
     const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = getHoveredStepLabware.resultFunc(
       argsByStepId,
       hoveredStepId,
@@ -138,7 +140,6 @@ describe('getHoveredStepLabware', () => {
       labware,
     }
     const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = getHoveredStepLabware.resultFunc(
       argsByStepId,
       hoveredStepId,
@@ -172,18 +173,16 @@ describe('getHoveredStepLabware', () => {
             },
           },
         },
-      }
+      } as any
     })
 
     it('labware on module is returned when module id exists', () => {
-      // @ts-expect-error(sa, 2021-6-15): members of utils are readonly
-      utils.getLabwareOnModule = jest.fn().mockReturnValue({ id: labware })
+      vi.mocked(utils.getLabwareOnModule).mockReturnValue({ id: labware } as any)
       const stepArgs = {
         commandCreatorFnName: setTempCommand,
         module: type,
       }
       const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
-      // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
       const result = getHoveredStepLabware.resultFunc(
         argsByStepId,
         hoveredStepId,
@@ -194,14 +193,12 @@ describe('getHoveredStepLabware', () => {
     })
 
     it('no labware is returned when no labware on module', () => {
-      // @ts-expect-error(sa, 2021-6-15): members of utils are readonly
-      utils.getLabwareOnModule = jest.fn().mockReturnValue(null)
+      vi.mocked(utils.getLabwareOnModule).mockReturnValue(null)
       const stepArgs = {
         commandCreatorFnName: setTempCommand,
         module: type,
       }
       const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
-      // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
       const result = getHoveredStepLabware.resultFunc(
         argsByStepId,
         hoveredStepId,
@@ -372,7 +369,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
       'another_move_liquid_step_id',
     ]
   })
-  afterEach(() => {})
+  afterEach(() => { })
 
   it('should return null if any of the forms are an unhandled type', () => {
     const savedStepForms = {

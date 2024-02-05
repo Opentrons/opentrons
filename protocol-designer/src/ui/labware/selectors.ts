@@ -157,7 +157,7 @@ export const getWasteChuteOption: Selector<DropdownOption | null> = createSelect
 )
 
 /** Returns options for disposal (e.g. trash) */
-export const getDisposalOptions: Selector<Options> = createSelector(
+export const getDisposalOptions = createSelector(
   stepFormSelectors.getAdditionalEquipment,
   getWasteChuteOption,
   (additionalEquipment, wasteChuteOption) => {

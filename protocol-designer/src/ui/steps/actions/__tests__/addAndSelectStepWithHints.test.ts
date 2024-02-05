@@ -1,50 +1,29 @@
+import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { addAndSelectStepWithHints } from '../thunks'
 import { PRESAVED_STEP_ID } from '../../../../steplist/types'
 import { addHint } from '../../../../tutorial/actions'
 import * as uiModuleSelectors from '../../../../ui/modules/selectors'
 import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
 import * as fileDataSelectors from '../../../../file-data/selectors'
-import { StepType } from '../../../../form-types'
-jest.mock('../../../../tutorial/actions')
-jest.mock('../../../../ui/modules/selectors')
-jest.mock('../../../../labware-ingred/selectors')
-jest.mock('../../../../file-data/selectors')
-const dispatch = jest.fn()
-const getState = jest.fn()
-const addHintMock = addHint as jest.MockedFunction<typeof addHint>
-const mockGetDeckHasLiquid = labwareIngredSelectors.getDeckHasLiquid as jest.MockedFunction<
-  typeof labwareIngredSelectors.getDeckHasLiquid
->
-const mockGetMagnetModuleHasLabware = uiModuleSelectors.getMagnetModuleHasLabware as jest.MockedFunction<
-  typeof uiModuleSelectors.getMagnetModuleHasLabware
->
-const mockGetTemperatureModuleHasLabware = uiModuleSelectors.getTemperatureModuleHasLabware as jest.MockedFunction<
-  typeof uiModuleSelectors.getTemperatureModuleHasLabware
->
-const mockGetThermocyclerModuleHasLabware = uiModuleSelectors.getThermocyclerModuleHasLabware as jest.MockedFunction<
-  typeof uiModuleSelectors.getThermocyclerModuleHasLabware
->
-const mockGetSingleTemperatureModuleId = uiModuleSelectors.getSingleTemperatureModuleId as jest.MockedFunction<
-  typeof uiModuleSelectors.getSingleTemperatureModuleId
->
-const mockGetSingleThermocyclerModuleId = uiModuleSelectors.getSingleThermocyclerModuleId as jest.MockedFunction<
-  typeof uiModuleSelectors.getSingleThermocyclerModuleId
->
-const mockGetRobotStateTimeline = fileDataSelectors.getRobotStateTimeline as jest.MockedFunction<
-  typeof fileDataSelectors.getRobotStateTimeline
->
+import type { StepType } from '../../../../form-types'
+
+vi.mock('../../../../tutorial/actions')
+vi.mock('../../../../ui/modules/selectors')
+vi.mock('../../../../labware-ingred/selectors')
+vi.mock('../../../../file-data/selectors')
+const dispatch = vi.fn()
+const getState = vi.fn()
+
 beforeEach(() => {
-  jest.clearAllMocks()
-  // @ts-expect-error(sa, 2021-6-17): not a valid AddHintAction
-  addHintMock.mockReturnValue('addHintReturnValue')
-  mockGetDeckHasLiquid.mockReturnValue(true)
-  mockGetMagnetModuleHasLabware.mockReturnValue(false)
-  mockGetTemperatureModuleHasLabware.mockReturnValue(false)
-  mockGetThermocyclerModuleHasLabware.mockReturnValue(false)
-  mockGetSingleTemperatureModuleId.mockReturnValue(null)
-  mockGetSingleThermocyclerModuleId.mockReturnValue(null)
-  // @ts-expect-error(sa, 2021-6-17): not a valid Timeline
-  mockGetRobotStateTimeline.mockReturnValue('mockGetRobotStateTimelineValue')
+  vi.clearAllMocks()
+  vi.mocked(addHint).mockReturnValue('addHintReturnValue' as any)
+  vi.mocked(labwareIngredSelectors.getDeckHasLiquid).mockReturnValue(true)
+  vi.mocked(uiModuleSelectors.getMagnetModuleHasLabware).mockReturnValue(false)
+  vi.mocked(uiModuleSelectors.getTemperatureModuleHasLabware).mockReturnValue(false)
+  vi.mocked(uiModuleSelectors.getThermocyclerModuleHasLabware).mockReturnValue(false)
+  vi.mocked(uiModuleSelectors.getSingleTemperatureModuleId).mockReturnValue(null)
+  vi.mocked(uiModuleSelectors.getSingleThermocyclerModuleId).mockReturnValue(null)
+  vi.mocked(fileDataSelectors.getRobotStateTimeline).mockReturnValue('mockGetRobotStateTimelineValue' as any)
 })
 describe('addAndSelectStepWithHints', () => {
   it('should dispatch addStep thunk, and no hints when no hints are applicable (eg pause step)', () => {
@@ -73,10 +52,10 @@ describe('addAndSelectStepWithHints', () => {
     const payload = {
       stepType,
     }
-    mockGetDeckHasLiquid.mockReturnValue(false) // no liquid!
+    vi.mocked(labwareIngredSelectors.getDeckHasLiquid).mockReturnValue(false) // no liquid!
 
     addAndSelectStepWithHints(payload)(dispatch, getState)
-    expect(addHintMock.mock.calls).toEqual([['add_liquids_and_labware']])
+    expect(vi.mocked(addHint).mock.calls).toEqual([['add_liquids_and_labware']])
     expect(dispatch.mock.calls).toEqual([
       [
         {
@@ -130,26 +109,26 @@ describe('addAndSelectStepWithHints', () => {
       },
     ].forEach(({ testName, stepType, selectorValues }) => {
       it(`should be dispatched (after addStep thunk is dispatched) for ${testName}`, () => {
-        mockGetMagnetModuleHasLabware.mockReturnValue(
+        vi.mocked(uiModuleSelectors.getMagnetModuleHasLabware).mockReturnValue(
           selectorValues.getMagnetModuleHasLabware
         )
-        mockGetTemperatureModuleHasLabware.mockReturnValue(
+        vi.mocked(uiModuleSelectors.getTemperatureModuleHasLabware).mockReturnValue(
           selectorValues.getTemperatureModuleHasLabware
         )
-        mockGetThermocyclerModuleHasLabware.mockReturnValue(
+        vi.mocked(uiModuleSelectors.getThermocyclerModuleHasLabware).mockReturnValue(
           selectorValues.getThermocyclerModuleHasLabware
         )
-        mockGetSingleTemperatureModuleId.mockReturnValue(
+        vi.mocked(uiModuleSelectors.getSingleTemperatureModuleId).mockReturnValue(
           selectorValues.getSingleTemperatureModuleId
         )
-        mockGetSingleThermocyclerModuleId.mockReturnValue(
+        vi.mocked(uiModuleSelectors.getSingleThermocyclerModuleId).mockReturnValue(
           selectorValues.getSingleThermocyclerModuleId
         )
         const payload = {
           stepType,
         }
         addAndSelectStepWithHints(payload)(dispatch, getState)
-        expect(addHintMock.mock.calls).toEqual([['module_without_labware']])
+        expect(vi.mocked(addHint).mock.calls).toEqual([['module_without_labware']])
         expect(dispatch.mock.calls).toEqual([
           [
             {

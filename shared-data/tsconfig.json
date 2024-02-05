@@ -12,6 +12,7 @@
     "js",
     "protocol",
     "pipette",
+    "labware",
     "deck",
     "command",
     "liquid/types",

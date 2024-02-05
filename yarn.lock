@@ -22051,6 +22051,11 @@ vite@^5.0, vite@^5.0.0:
   optionalDependencies:
     fsevents "~2.3.3"
 
+vitest-when@0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/vitest-when/-/vitest-when-0.3.1.tgz#72db1c0a8e76fae81f8fc21c6da3c769f8e7f8bb"
+  integrity sha512-qZt4VmuvGtkLEqUpq5AJHQtdfhU8wJH+eXHk+WBo8kFT5zdfVV06+vFgYzvuSOq73srlCEsJ4VJqX7uBtOwWLg==
+
 vitest@1.2.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/vitest/-/vitest-1.2.2.tgz#9e29ad2a74a5df553c30c5798c57a062d58ce299"

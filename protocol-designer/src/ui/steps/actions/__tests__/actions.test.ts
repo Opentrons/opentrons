@@ -1,7 +1,8 @@
 import last from 'lodash/last'
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
+import { when } from 'vitest-when'
 import * as utils from '../../../../utils'
 import * as stepFormSelectors from '../../../../step-forms/selectors'
 import { getRobotStateTimeline } from '../../../../file-data/selectors'
@@ -15,33 +16,11 @@ import {
 } from '../thunks'
 import type { Timeline, RobotState } from '@opentrons/step-generation/src/types'
 
-jest.mock('../../../../step-forms/selectors')
-jest.mock('../../selectors')
-jest.mock('../../../../file-data/selectors')
+vi.mock('../../../../step-forms/selectors')
+vi.mock('../../selectors')
+vi.mock('../../../../file-data/selectors')
 
 const mockStore = configureMockStore([thunk])
-const mockGetSavedStepForms = stepFormSelectors.getSavedStepForms as jest.MockedFunction<
-  typeof stepFormSelectors.getSavedStepForms
->
-const mockGetOrderedStepIds = stepFormSelectors.getOrderedStepIds as jest.MockedFunction<
-  typeof stepFormSelectors.getOrderedStepIds
->
-const mockGetMultiSelectLastSelected = getMultiSelectLastSelected as jest.MockedFunction<
-  typeof getMultiSelectLastSelected
->
-
-const mockGetUnsavedForm = stepFormSelectors.getUnsavedForm as jest.MockedFunction<
-  typeof stepFormSelectors.getUnsavedForm
->
-const mockGetUnsavedFormIsPristineHeaterShakerForm = stepFormSelectors.getUnsavedFormIsPristineHeaterShakerForm as jest.MockedFunction<
-  typeof stepFormSelectors.getUnsavedFormIsPristineHeaterShakerForm
->
-const mockGetUnsavedFormIsPristineSetTempForm = stepFormSelectors.getUnsavedFormIsPristineSetTempForm as jest.MockedFunction<
-  typeof stepFormSelectors.getUnsavedFormIsPristineSetTempForm
->
-const mockGetRobotStateTimeline = getRobotStateTimeline as jest.MockedFunction<
-  typeof getRobotStateTimeline
->
 
 const initialRobotState: RobotState = {
   labware: {
@@ -76,16 +55,16 @@ describe('steps actions', () => {
   describe('selectStep', () => {
     const stepId = 'stepId'
     beforeEach(() => {
-      when(mockGetSavedStepForms)
+      when(vi.mocked(stepFormSelectors.getSavedStepForms))
         .calledWith(expect.anything())
-        .mockReturnValue({
+        .thenReturn({
           stepId: {
             foo: 'getSavedStepFormsResult',
           } as any,
         })
     })
     afterEach(() => {
-      resetAllWhenMocks()
+      vi.resetAllMocks()
     })
     // TODO(IL, 2020-04-17): also test scroll to top behavior
     it('should select the step and populate the form', () => {
@@ -109,12 +88,12 @@ describe('steps actions', () => {
     let ids: string[]
     beforeEach(() => {
       ids = ['id_1', 'id_2']
-      when(mockGetOrderedStepIds)
+      when(vi.mocked(stepFormSelectors.getOrderedStepIds))
         .calledWith(expect.anything())
-        .mockReturnValue(ids)
+        .thenReturn(ids)
     })
     afterEach(() => {
-      resetAllWhenMocks()
+      vi.resetAllMocks()
     })
     it('should select all of the steps', () => {
       const store: any = mockStore()
@@ -142,12 +121,12 @@ describe('steps actions', () => {
   describe('deselectAllSteps', () => {
     const id = 'some_id'
     beforeEach(() => {
-      when(mockGetMultiSelectLastSelected)
+      when(vi.mocked(getMultiSelectLastSelected))
         .calledWith(expect.anything())
-        .mockReturnValue(id)
+        .thenReturn(id)
     })
     afterEach(() => {
-      resetAllWhenMocks()
+      vi.resetAllMocks()
     })
     it('should deselect all of the steps', () => {
       const store: any = mockStore()
@@ -180,10 +159,10 @@ describe('steps actions', () => {
       })
     })
     it('should console warn when NOT in multi select mode', () => {
-      when(mockGetMultiSelectLastSelected)
+      when(vi.mocked(getMultiSelectLastSelected))
         .calledWith(expect.anything())
-        .mockReturnValue(null)
-      const consoleWarnSpy = jest
+        .thenReturn(null)
+      const consoleWarnSpy = vi
         .spyOn(global.console, 'warn')
         .mockImplementation(() => null)
       const store: any = mockStore()
@@ -196,10 +175,10 @@ describe('steps actions', () => {
   })
   describe('duplicateStep', () => {
     afterEach(() => {
-      jest.restoreAllMocks()
+      vi.restoreAllMocks()
     })
     it('should duplicate a step with a new step id', () => {
-      jest.spyOn(utils, 'uuid').mockReturnValue('duplicate_id')
+      vi.spyOn(utils, 'uuid').mockReturnValue('duplicate_id')
       const store: any = mockStore()
       store.dispatch(duplicateStep('id_1'))
       expect(store.getActions()).toEqual([
@@ -217,19 +196,19 @@ describe('steps actions', () => {
     let ids
     beforeEach(() => {
       ids = ['id_1', 'id_2', 'id_3']
-      when(mockGetOrderedStepIds)
+      when(vi.mocked(stepFormSelectors.getOrderedStepIds))
         .calledWith(expect.anything())
-        .mockReturnValue(ids)
-      when(mockGetMultiSelectLastSelected)
+        .thenReturn(ids)
+      when(vi.mocked(getMultiSelectLastSelected))
         .calledWith(expect.anything())
-        .mockReturnValue('id_3')
+        .thenReturn('id_3')
     })
     afterEach(() => {
-      resetAllWhenMocks()
-      jest.restoreAllMocks()
+      vi.resetAllMocks()
+      vi.restoreAllMocks()
     })
     it('should duplicate multiple steps with a new step ids, and select the new duplicated steps', () => {
-      jest
+      vi 
         .spyOn(utils, 'uuid')
         .mockReturnValueOnce('dup_1')
         .mockReturnValueOnce('dup_2')
@@ -269,7 +248,7 @@ describe('steps actions', () => {
       ])
     })
     it('should duplicate multiple steps with a new step ids, and select the new duplicated steps even when provided in a non linear order', () => {
-      jest
+      vi 
         .spyOn(utils, 'uuid')
         .mockReturnValueOnce('dup_1')
         .mockReturnValueOnce('dup_2')
@@ -331,18 +310,18 @@ describe('steps actions', () => {
     }
 
     beforeEach(() => {
-      when(mockGetUnsavedForm)
+      when(vi.mocked(stepFormSelectors.getUnsavedForm))
         .calledWith(expect.anything())
-        .mockReturnValue({
+        .thenReturn({
           stepType: 'heaterShaker',
           targetHeaterShakerTemperature: '10',
         } as any)
-      mockGetUnsavedFormIsPristineHeaterShakerForm.mockReturnValue(true)
-      mockGetRobotStateTimeline.mockReturnValue(mockRobotStateTimeline)
+      vi.mocked(stepFormSelectors.getUnsavedFormIsPristineHeaterShakerForm).mockReturnValue(true)
+      vi.mocked(getRobotStateTimeline).mockReturnValue(mockRobotStateTimeline)
     })
 
     afterEach(() => {
-      jest.restoreAllMocks()
+      vi.restoreAllMocks()
     })
 
     it('should save heater shaker step with a pause until temp is reached', () => {
@@ -470,20 +449,20 @@ describe('steps actions', () => {
     }
 
     beforeEach(() => {
-      when(mockGetUnsavedForm)
+      when(vi.mocked(stepFormSelectors.getUnsavedForm))
         .calledWith(expect.anything())
-        .mockReturnValue({
+        .thenReturn({
           stepType: 'temperature',
           setTemperature: 'true',
           targetTemperature: 10,
           moduleId: 'mockTemp',
         } as any)
-      mockGetUnsavedFormIsPristineSetTempForm.mockReturnValue(true)
-      mockGetRobotStateTimeline.mockReturnValue(mockRobotStateTimeline)
+      vi.mocked(stepFormSelectors.getUnsavedFormIsPristineSetTempForm).mockReturnValue(true)
+      vi.mocked(getRobotStateTimeline).mockReturnValue(mockRobotStateTimeline)
     })
 
     afterEach(() => {
-      jest.restoreAllMocks()
+      vi.restoreAllMocks()
     })
 
     it('should save temperature step with a pause until temp is reached', () => {
