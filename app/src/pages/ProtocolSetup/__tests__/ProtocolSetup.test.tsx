@@ -29,11 +29,13 @@ import { mockRobotSideAnalysis } from '../../../organisms/CommandText/__fixtures
 import {
   useAttachedModules,
   useLPCDisabledReason,
-  useRunCreatedAtTimestamp,
   useModuleCalibrationStatus,
   useRobotType,
+  useRunCreatedAtTimestamp,
+  useTrackProtocolRunEvent,
 } from '../../../organisms/Devices/hooks'
 import { getLocalRobot } from '../../../redux/discovery'
+import { ANALYTICS_PROTOCOL_RUN_START } from '../../../redux/analytics'
 import { ProtocolSetupLiquids } from '../../../organisms/ProtocolSetupLiquids'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupModulesAndDeck } from '../../../organisms/ProtocolSetupModulesAndDeck'
@@ -169,6 +171,9 @@ const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
 const mockUseDeckConfigurationCompatibility = useDeckConfigurationCompatibility as jest.MockedFunction<
   typeof useDeckConfigurationCompatibility
 >
+const mockUseTrackProtocolRunEvent = useTrackProtocolRunEvent as jest.MockedFunction<
+  typeof useTrackProtocolRunEvent
+>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -241,6 +246,7 @@ const mockFixture = {
 }
 
 const MOCK_MAKE_SNACKBAR = jest.fn()
+const mockTrackProtocolRunEvent = jest.fn()
 
 describe('ProtocolSetup', () => {
   let mockLaunchLPC: jest.Mock
@@ -338,6 +344,9 @@ describe('ProtocolSetup', () => {
         makeSnackbar: MOCK_MAKE_SNACKBAR,
       } as unknown) as any)
     when(mockUseDeckConfigurationCompatibility).mockReturnValue([])
+    when(mockUseTrackProtocolRunEvent)
+      .calledWith(RUN_ID)
+      .mockReturnValue({ trackProtocolRunEvent: mockTrackProtocolRunEvent })
   })
 
   afterEach(() => {
@@ -442,5 +451,15 @@ describe('ProtocolSetup', () => {
     expect(MOCK_MAKE_SNACKBAR).toBeCalledWith(
       'Close the robot door before starting the run.'
     )
+  })
+
+  it('calls trackProtocolRunEvent when tapping play button', () => {
+    render(`/runs/${RUN_ID}/setup/`)
+    fireEvent.click(screen.getByRole('button', { name: 'play' }))
+    expect(mockTrackProtocolRunEvent).toBeCalledTimes(1)
+    expect(mockTrackProtocolRunEvent).toHaveBeenCalledWith({
+      name: ANALYTICS_PROTOCOL_RUN_START,
+      properties: {},
+    })
   })
 })
