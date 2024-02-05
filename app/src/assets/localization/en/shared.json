@@ -1,7 +1,9 @@
 {
   "a_software_update_is_available": "A software update is available for this robot. Update to run protocols.",
+  "acknowledge_privacy": "Acknowledge Privacy Policy",
   "add": "add",
   "alphabetical": "Alphabetical",
+  "agree": "I agree",
   "back": "Back",
   "before_you_begin": "Before you begin",
   "browse": "browse",
@@ -47,6 +49,8 @@
   "ok": "ok",
   "on": "On",
   "open": "open",
+  "opentrons_privacy_policy": "Opentrons privacy policy",
+  "privacy_body": "<block>By proceeding you are agreeing to share desktop app usage data. Opentrons uses this data to improve our products and services.</block> <block>To read more about our data collection policies, visit our Privacy Policy:</block>",
   "proceed_to_setup": "Proceed to setup",
   "protocol_run_general_error_msg": "Protocol run could not be created on the robot.",
   "reanalyze": "Reanalyze",
