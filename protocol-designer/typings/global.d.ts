@@ -1,11 +1,10 @@
-/* eslint-disable */
 declare global {
   interface Global {
     document: {
       getElementsByClassName: (val: string) => any[]
     }
+    enablePrereleaseMode: () => void
   }
-  enablePrereleaseMode: () => void
 }
 
 interface Window {
