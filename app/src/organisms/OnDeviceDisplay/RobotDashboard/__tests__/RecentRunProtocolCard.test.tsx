@@ -4,7 +4,7 @@ import { formatDistance } from 'date-fns'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { MemoryRouter } from 'react-router-dom'
 
-import { useAllRunsQuery, useProtocolQuery } from '@opentrons/react-api-client'
+import { useProtocolQuery } from '@opentrons/react-api-client'
 import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import { COLORS, renderWithProviders } from '@opentrons/components'
 
@@ -16,6 +16,7 @@ import { useTrackEvent } from '../../../../redux/analytics'
 import { useCloneRun } from '../../../ProtocolUpload/hooks'
 import { useHardwareStatusText } from '../hooks'
 import { RecentRunProtocolCard } from '../'
+import { useNotifyAllRunsQuery } from '../../../../resources/runs/useNotifyAllRunsQuery'
 
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
 
@@ -27,6 +28,7 @@ jest.mock('../../../../organisms/RunTimeControl/hooks')
 jest.mock('../../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../../redux/analytics')
 jest.mock('../hooks')
+jest.mock('../../../../resources/runs/useNotifyAllRunsQuery')
 
 const RUN_ID = 'mockRunId'
 
@@ -77,8 +79,8 @@ let mockCloneRun: jest.Mock
 const mockUseMissingProtocolHardware = useMissingProtocolHardware as jest.MockedFunction<
   typeof useMissingProtocolHardware
 >
-const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
-  typeof useAllRunsQuery
+const mockUseNotifyAllRunsQuery = useNotifyAllRunsQuery as jest.MockedFunction<
+  typeof useNotifyAllRunsQuery
 >
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
@@ -128,7 +130,7 @@ describe('RecentRunProtocolCard', () => {
       isLoading: false,
       conflictedSlots: [],
     })
-    mockUseAllRunsQuery.mockReturnValue({
+    mockUseNotifyAllRunsQuery.mockReturnValue({
       data: { data: [mockRunData] },
     } as any)
     mockUseProtocolQuery.mockReturnValue({

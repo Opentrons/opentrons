@@ -24,12 +24,12 @@ export const generateRobotStateTimeline = (
     initialRobotState,
     invariantContext,
   } = args
-  const continuousStepArgs = orderedStepIds.reduce<StepGeneration.CommandCreatorArgs[]>(
-    (acc, stepId) => {
-      const {stepArgs } = allStepArgsAndErrors?.[stepId]
-      return stepArgs != null ? [...acc, stepArgs] : acc
-    }, []
-  )
+  const continuousStepArgs = orderedStepIds.reduce<
+    StepGeneration.CommandCreatorArgs[]
+  >((acc, stepId) => {
+    const { stepArgs } = allStepArgsAndErrors?.[stepId]
+    return stepArgs != null ? [...acc, stepArgs] : acc
+  }, [])
   const curriedCommandCreators = continuousStepArgs.reduce(
     (
       acc: StepGeneration.CurriedCommandCreator[],
@@ -56,7 +56,9 @@ export const generateRobotStateTimeline = (
       if (pipetteId != null && dropTipLocation != null) {
         const nextStepArgsForPipette = continuousStepArgs
           .slice(stepIndex + 1)
-          .find(stepArgs => 'pipette' in stepArgs && stepArgs.pipette === pipetteId)
+          .find(
+            stepArgs => 'pipette' in stepArgs && stepArgs.pipette === pipetteId
+          )
         const willReuseTip =
           nextStepArgsForPipette != null &&
           'changeTip' in nextStepArgsForPipette &&
@@ -64,14 +66,14 @@ export const generateRobotStateTimeline = (
 
         const isWasteChute =
           invariantContext.additionalEquipmentEntities[dropTipLocation] !=
-          null &&
+            null &&
           invariantContext.additionalEquipmentEntities[dropTipLocation].name ===
-          'wasteChute'
+            'wasteChute'
         const isTrashBin =
           invariantContext.additionalEquipmentEntities[dropTipLocation] !=
-          null &&
+            null &&
           invariantContext.additionalEquipmentEntities[dropTipLocation].name ===
-          'trashBin'
+            'trashBin'
 
         const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
         const addressableAreaName = getWasteChuteAddressableAreaNamePip(

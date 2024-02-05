@@ -17,7 +17,6 @@ import {
   RunStatus,
 } from '@opentrons/api-client'
 import {
-  useRunQuery,
   useModulesQuery,
   useDoorQuery,
   useHost,
@@ -106,6 +105,7 @@ import { getIsFixtureMismatch } from '../../../resources/deck_configuration/util
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useMostRecentRunId } from '../../ProtocolUpload/hooks/useMostRecentRunId'
+import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
 
 import type { Run, RunError } from '@opentrons/api-client'
 import type { State } from '../../../redux/types'
@@ -154,13 +154,14 @@ export function ProtocolRunHeader({
     protocolKey,
     isProtocolAnalyzing,
   } = useProtocolDetailsForRun(runId)
+
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = useRunStatus(runId)
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const { data: attachedInstruments } = useInstrumentsQuery()
-  const isRunCurrent = Boolean(useRunQuery(runId)?.data?.data?.current)
+  const isRunCurrent = Boolean(useNotifyRunQuery(runId)?.data?.data?.current)
   const mostRecentRunId = useMostRecentRunId()
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
@@ -171,7 +172,7 @@ export function ProtocolRunHeader({
     PipettesWithTip[]
   >([])
   const isResetRunLoadingRef = React.useRef(false)
-  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
+  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const highestPriorityError =
     runRecord?.data.errors?.[0] != null
       ? getHighestPriorityError(runRecord?.data?.errors)
@@ -739,7 +740,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         boxShadow="none"
         display={DISPLAY_FLEX}
         padding={`${SPACING.spacing12} ${SPACING.spacing16}`}
-        disabled={false}
+        disabled={isRunControlButtonDisabled}
         onClick={handleButtonClick}
         id="ProtocolRunHeader_runControlButton"
         {...targetProps}

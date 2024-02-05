@@ -17,9 +17,15 @@ import {
 } from './getDisabledPathMap'
 
 const PATH_ANIMATION_IMAGES = {
-  single: require('../../../../images/path_single.gif'),
-  multiAspirate: require('../../../../images/path_multiAspirate.gif'),
-  multiDispense: require('../../../../images/path_multiDispense.gif'),
+  single: new URL('../../../../images/path_single.gif', import.meta.url).href,
+  multiAspirate: new URL(
+    '../../../../images/path_multiAspirate.gif',
+    import.meta.url
+  ).href,
+  multiDispense: new URL(
+    '../../../../images/path_multiDispense.gif',
+    import.meta.url
+  ).href,
 }
 
 const ALL_PATH_OPTIONS: Array<{ name: PathOption; image: string }> = [

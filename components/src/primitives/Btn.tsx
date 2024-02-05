@@ -43,13 +43,17 @@ const BUTTON_VARIANT_STYLE = css`
   text-transform: ${Styles.TEXT_TRANSFORM_UPPERCASE};
 `
 
-
 /**
  * Button primitive
  *
  * @component
  */
-export const Btn: StyledComponent<'button', any, StyleProps, any> = styled.button
+export const Btn: StyledComponent<
+  'button',
+  any,
+  StyleProps,
+  any
+> = styled.button
   .withConfig({
     shouldForwardProp: isntStyleProp,
   })

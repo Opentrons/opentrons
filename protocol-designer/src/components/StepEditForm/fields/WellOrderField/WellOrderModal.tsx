@@ -16,7 +16,6 @@ import stepEditStyles from '../../StepEditForm.module.css'
 import { WellOrderViz } from './WellOrderViz'
 import type { WellOrderOption } from '../../../../form-types'
 
-
 const DEFAULT_FIRST: WellOrderOption = 't2b'
 const DEFAULT_SECOND: WellOrderOption = 'l2r'
 const VERTICAL_VALUES: WellOrderOption[] = ['t2b', 'b2t']

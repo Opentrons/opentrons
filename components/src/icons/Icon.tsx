@@ -68,6 +68,7 @@ export function Icon(props: IconProps): JSX.Element | null {
       fill="currentColor"
       viewBox={viewBox}
       className={cx(className, { spin })}
+      css={spinStyle}
       {...svgProps}
       id={id}
     >

@@ -44,5 +44,7 @@ export function FilterManufacturerComponent(
     </label>
   )
 }
-
-export const FilterManufacturer = withRouter(FilterManufacturerComponent)
+// @ts-expect-error react router type not portable
+export const FilterManufacturer: (props: {
+  filters: FilterParams
+}) => JSX.Element = withRouter(FilterManufacturerComponent)

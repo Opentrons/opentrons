@@ -10,7 +10,7 @@ import {
   isAddressableAreaStandardSlot,
   CutoutFixtureId,
   RobotType,
-  INTERACTIVE_WELL_DATA_ATTRIBUTE
+  INTERACTIVE_WELL_DATA_ATTRIBUTE,
 } from '@opentrons/shared-data'
 import { BoundingRect, GenericRect } from '../collision-types'
 import type {

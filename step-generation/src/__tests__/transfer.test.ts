@@ -1,3 +1,4 @@
+/* eslint-disable jest/consistent-test-it */
 import {
   ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   WASTE_CHUTE_CUTOUT,

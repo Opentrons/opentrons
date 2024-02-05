@@ -17,5 +17,6 @@
     "command",
     "liquid/types",
     "commandAnnotation/types",
+    "vite.config.ts",
   ]
 }

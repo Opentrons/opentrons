@@ -46,7 +46,9 @@ export const parseProtocolRunAnalyticsData = (
       protocolAuthor: protocolAuthor !== '' ? protocolAuthor : '',
       protocolText: protocolText !== '' ? protocolText : '',
       robotType:
-        protocolAnalysis?.robotType != null ? protocolAnalysis?.robotType : '',
+        protocolAnalysis?.robotType != null
+          ? protocolAnalysis?.robotType
+          : storedProtocol?.mostRecentAnalysis?.robotType,
     },
     runTime:
       startedAt != null ? formatInterval(startedAt, Date()) : EMPTY_TIMESTAMP,

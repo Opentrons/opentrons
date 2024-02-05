@@ -13,20 +13,21 @@ const render = (props: React.ComponentProps<typeof RobotTypeTile>) => {
   })[0]
 }
 
+const values = {
+  fields: {
+    name: 'mockName',
+    description: 'mockDescription',
+    organizationOrAuthor: 'mockOrganizationOrAuthor',
+    robotType: FLEX_ROBOT_TYPE,
+  },
+} as FormState
+
 const mockWizardTileProps: Partial<WizardTileProps> = {
-  handleChange: jest.fn(),
-  handleBlur: jest.fn(),
-  goBack: jest.fn(),
   proceed: jest.fn(),
-  setFieldValue: jest.fn(),
-  values: {
-    fields: {
-      name: 'mockName',
-      description: 'mockDescription',
-      organizationOrAuthor: 'mockOrganizationOrAuthor',
-      robotType: FLEX_ROBOT_TYPE,
-    },
-  } as FormState,
+  setValue: jest.fn(),
+  //  @ts-expect-error: ts can't tell that its a nested key
+  //  in values
+  watch: jest.fn(() => values['fields.robotType']),
 }
 
 describe('RobotTypeTile', () => {
@@ -45,12 +46,12 @@ describe('RobotTypeTile', () => {
     screen.getByLabelText('OT2.png')
     const flex = screen.getByLabelText('RobotTypeTile_OT-3 Standard')
     fireEvent.click(flex)
-    expect(props.setFieldValue).toHaveBeenCalled()
-    expect(flex).toHaveStyle(`background-color: ${COLORS.blue10}`)
+    expect(props.setValue).toHaveBeenCalled()
+    expect(flex).toHaveStyle(`background-color: ${COLORS.white}`)
     const ot2 = screen.getByLabelText('RobotTypeTile_OT-2 Standard')
     fireEvent.click(ot2)
-    expect(props.setFieldValue).toHaveBeenCalled()
-    expect(ot2).toHaveStyle(`background-color: ${COLORS.white}`)
+    expect(props.setValue).toHaveBeenCalled()
+    expect(ot2).toHaveStyle(`background-color: ${COLORS.blue10}`)
     fireEvent.click(screen.getByRole('button', { name: 'Next' }))
     expect(props.proceed).toHaveBeenCalled()
   })

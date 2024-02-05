@@ -6,7 +6,6 @@ import { screen, fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import {
-  useRunQuery,
   useProtocolQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
@@ -23,6 +22,7 @@ import {
 } from '../../../hooks'
 import { SetupLabwarePositionCheck } from '..'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { useNotifyRunQuery } from '../../../../../resources/runs/useNotifyRunQuery'
 
 jest.mock('../../../../LabwarePositionCheck/useLaunchLPC')
 jest.mock('../../utils/getModuleTypesThatRequireExtraAttention')
@@ -31,6 +31,7 @@ jest.mock('../../../../../redux/config')
 jest.mock('../../../hooks')
 jest.mock('../../../hooks/useLPCSuccessToast')
 jest.mock('@opentrons/react-api-client')
+jest.mock('../../../../../resources/runs/useNotifyRunQuery')
 
 const mockGetModuleTypesThatRequireExtraAttention = getModuleTypesThatRequireExtraAttention as jest.MockedFunction<
   typeof getModuleTypesThatRequireExtraAttention
@@ -59,7 +60,9 @@ const mockUseLaunchLPC = useLaunchLPC as jest.MockedFunction<
 const mockUseRobotType = useRobotType as jest.MockedFunction<
   typeof useRobotType
 >
-const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
+const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
+  typeof useNotifyRunQuery
+>
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
 >
@@ -122,7 +125,7 @@ describe('SetupLabwarePositionCheck', () => {
         launchLPC: mockLaunchLPC,
         LPCWizard: <div>mock LPC Wizard</div>,
       })
-    when(mockUseRunQuery).mockReturnValue({
+    when(mockUseNotifyRunQuery).mockReturnValue({
       data: {
         data: { protocolId: 'fakeProtocolId' },
       },

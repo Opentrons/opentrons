@@ -143,7 +143,9 @@ describe('Edit Modules Modal', () => {
     render(props)
     screen.getByText('Thermocycler module')
     screen.getByText('warning')
-    screen.getByText('Cannot place module')
+    screen.getByText(
+      'Slot 10 is occupied by a Heater-Shaker. Other modules cannot be placed in front of or behind a Heater-Shaker.'
+    )
     screen.getByText('mock SlotMap')
   })
   it('renders a heater-shaker for flex and can select different slots', () => {

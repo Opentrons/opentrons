@@ -4,7 +4,10 @@ import * as React from 'react'
 import { Route } from 'react-router-dom'
 import groupBy from 'lodash/groupBy'
 import uniq from 'lodash/uniq'
-import { LABWAREV2_DO_NOT_LIST, getAllDefinitions as _getAllDefinitions } from '@opentrons/shared-data'
+import {
+  LABWAREV2_DO_NOT_LIST,
+  getAllDefinitions as _getAllDefinitions,
+} from '@opentrons/shared-data'
 import { getPublicPath } from './public-path'
 
 import type { RouteComponentProps } from 'react-router-dom'

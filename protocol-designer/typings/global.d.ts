@@ -1,6 +1,9 @@
-declare const global: typeof globalThis & {
-  document: {
-    getElementsByClassName: (val: string) => any[]
+/* eslint-disable */
+declare global {
+  interface Global {
+    document: {
+      getElementsByClassName: (val: string) => any[]
+    }
   }
   enablePrereleaseMode: () => void
 }

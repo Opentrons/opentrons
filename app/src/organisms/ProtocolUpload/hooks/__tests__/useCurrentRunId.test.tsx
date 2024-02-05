@@ -1,12 +1,13 @@
 import { when, resetAllWhenMocks } from 'jest-when'
 import { renderHook } from '@testing-library/react'
-import { useAllRunsQuery } from '@opentrons/react-api-client'
+
 import { useCurrentRunId } from '../useCurrentRunId'
+import { useNotifyAllRunsQuery } from '../../../../resources/runs/useNotifyAllRunsQuery'
 
-jest.mock('@opentrons/react-api-client')
+jest.mock('../../../../resources/runs/useNotifyAllRunsQuery')
 
-const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
-  typeof useAllRunsQuery
+const mockUseNotifyAllRunsQuery = useNotifyAllRunsQuery as jest.MockedFunction<
+  typeof useNotifyAllRunsQuery
 >
 
 describe('useCurrentRunId hook', () => {
@@ -15,7 +16,7 @@ describe('useCurrentRunId hook', () => {
   })
 
   it('should return the run id specified in the current link', async () => {
-    when(mockUseAllRunsQuery)
+    when(mockUseNotifyAllRunsQuery)
       .calledWith({ pageLength: 0 }, {})
       .mockReturnValue({
         data: { links: { current: { href: '/runs/run_id' } } },
@@ -27,7 +28,7 @@ describe('useCurrentRunId hook', () => {
   })
 
   it('should return null if no current run link', async () => {
-    when(mockUseAllRunsQuery)
+    when(mockUseNotifyAllRunsQuery)
       .calledWith({ pageLength: 0 }, {})
       .mockReturnValue({ data: { links: {} } } as any)
 
@@ -37,7 +38,7 @@ describe('useCurrentRunId hook', () => {
   })
 
   it('should pass through runs query options', async () => {
-    when(mockUseAllRunsQuery)
+    when(mockUseNotifyAllRunsQuery)
       .calledWith({ pageLength: 0 }, { enabled: true })
       .mockReturnValue({
         data: {

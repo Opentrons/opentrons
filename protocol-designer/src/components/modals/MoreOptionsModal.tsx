@@ -15,7 +15,6 @@ import styles from './MoreOptionsModal.module.css'
 import type { FormData } from '../../form-types'
 import type { ChangeFormPayload } from '../../steplist/actions'
 
-
 interface Props {
   close: (event?: React.MouseEvent) => unknown
   formData: FormData

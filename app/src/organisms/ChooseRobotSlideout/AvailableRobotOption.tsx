@@ -14,7 +14,6 @@ import {
   TYPOGRAPHY,
   SIZE_1,
 } from '@opentrons/components'
-import { useAllRunsQuery } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../atoms/text'
 import { MiniCard } from '../../molecules/MiniCard'
@@ -24,8 +23,10 @@ import { appShellRequestor } from '../../redux/shell/remote'
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import FLEX_PNG from '../../assets/images/FLEX.png'
 import { RobotBusyStatusAction } from '.'
+import { useNotifyAllRunsQuery } from '../../resources/runs/useNotifyAllRunsQuery'
 
 import type { IconName } from '@opentrons/components'
+import type { Runs } from '@opentrons/api-client'
 import type { Robot } from '../../redux/discovery/types'
 import type { Dispatch, State } from '../../redux/types'
 
@@ -58,11 +59,11 @@ export function AvailableRobotOption(
     getRobotModelByName(state, robotName)
   )
 
-  const { data: runsData } = useAllRunsQuery(
+  const { data: runsData } = useNotifyAllRunsQuery(
     { pageLength: 0 },
     {
       onSuccess: data => {
-        if (data?.links?.current != null)
+        if ((data as Runs)?.links?.current != null)
           registerRobotBusyStatus({ type: 'robotIsBusy', robotName })
         else {
           registerRobotBusyStatus({ type: 'robotIsIdle', robotName })

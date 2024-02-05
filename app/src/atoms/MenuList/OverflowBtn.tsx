@@ -2,7 +2,10 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { Btn, COLORS, SPACING } from '@opentrons/components'
 
-export const OverflowBtn = React.forwardRef(
+export const OverflowBtn: (
+  props: React.ComponentProps<typeof Btn>,
+  ref: React.ForwardedRef<HTMLInputElement>
+) => React.ReactNode = React.forwardRef(
   (
     props: React.ComponentProps<typeof Btn>,
     ref: React.ForwardedRef<HTMLInputElement>

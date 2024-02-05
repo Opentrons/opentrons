@@ -35,31 +35,34 @@ const render = (props: React.ComponentProps<typeof ModulesAndOtherTile>) => {
   })[0]
 }
 
+const values = {
+  fields: {
+    name: 'mockName',
+    description: 'mockDescription',
+    organizationOrAuthor: 'mockOrganizationOrAuthor',
+    robotType: FLEX_ROBOT_TYPE,
+  },
+  pipettesByMount: {
+    left: { pipetteName: 'mockPipetteName', tiprackDefURI: 'mocktip' },
+    right: { pipetteName: null, tiprackDefURI: null },
+  } as FormPipettesByMount,
+  modulesByType: {
+    heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
+    magneticBlockType: { onDeck: false, model: null, slot: '2' },
+    temperatureModuleType: { onDeck: false, model: null, slot: '3' },
+    thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
+  },
+  additionalEquipment: ['gripper'],
+} as FormState
+
 const mockWizardTileProps: Partial<WizardTileProps> = {
-  handleChange: jest.fn(),
-  handleBlur: jest.fn(),
+  watch: jest.fn((name: keyof typeof values) => values[name]) as any,
+  trigger: jest.fn(),
   goBack: jest.fn(),
   proceed: jest.fn(),
-  setFieldValue: jest.fn(),
-  values: {
-    fields: {
-      name: 'mockName',
-      description: 'mockDescription',
-      organizationOrAuthor: 'mockOrganizationOrAuthor',
-      robotType: FLEX_ROBOT_TYPE,
-    },
-    pipettesByMount: {
-      left: { pipetteName: 'mockPipetteName', tiprackDefURI: 'mocktip' },
-      right: { pipetteName: null, tiprackDefURI: null },
-    } as FormPipettesByMount,
-    modulesByType: {
-      heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
-      magneticBlockType: { onDeck: false, model: null, slot: '2' },
-      temperatureModuleType: { onDeck: false, model: null, slot: '3' },
-      thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
-    },
-    additionalEquipment: ['gripper'],
-  } as FormState,
+  setValue: jest.fn(),
+  getValues: jest.fn(() => values) as any,
+  formState: {} as any,
 }
 
 describe('ModulesAndOtherTile', () => {
@@ -86,13 +89,14 @@ describe('ModulesAndOtherTile', () => {
     expect(screen.getByText('Review file details')).toBeDisabled()
   })
   it('renders correct module, gripper and trash length for flex', () => {
+    const newValues = {
+      ...values,
+      additionalEquipment: ['trashBin'],
+    }
     props = {
       ...props,
-      values: {
-        ...mockWizardTileProps.values,
-        additionalEquipment: ['trashBin'],
-      },
-    } as WizardTileProps
+      getValues: jest.fn(() => newValues) as any,
+    }
     render(props)
     screen.getByText('Choose additional items')
     expect(screen.getAllByText('mock EquipmentOption')).toHaveLength(7)
@@ -103,24 +107,28 @@ describe('ModulesAndOtherTile', () => {
     expect(props.proceed).toHaveBeenCalled()
   })
   it('renders correct module length for ot-2', () => {
+    const values = {
+      fields: {
+        robotType: OT2_ROBOT_TYPE,
+      },
+      pipettesByMount: {
+        left: { pipetteName: 'p1000_single', tiprackDefURI: 'mocktip' },
+        right: { pipetteName: null, tiprackDefURI: null },
+      } as FormPipettesByMount,
+      modulesByType: {
+        heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
+        magneticModuleType: { onDeck: false, model: null, slot: '2' },
+        temperatureModuleType: { onDeck: false, model: null, slot: '3' },
+        thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
+      },
+    } as FormState
+
     const mockWizardTileProps: Partial<WizardTileProps> = {
-      errors: { modulesByType: {} },
-      touched: { modulesByType: {} },
-      values: {
-        fields: {
-          robotType: OT2_ROBOT_TYPE,
-        },
-        pipettesByMount: {
-          left: { pipetteName: 'p1000_single', tiprackDefURI: 'mocktip' },
-          right: { pipetteName: null, tiprackDefURI: null },
-        } as FormPipettesByMount,
-        modulesByType: {
-          heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
-          magneticModuleType: { onDeck: false, model: null, slot: '2' },
-          temperatureModuleType: { onDeck: false, model: null, slot: '3' },
-          thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
-        },
-      } as FormState,
+      formState: {
+        errors: { modulesByType: {} },
+        touchedFields: { modulesByType: {} },
+      } as any,
+      getValues: jest.fn(() => values) as any,
     }
     props = {
       ...props,
