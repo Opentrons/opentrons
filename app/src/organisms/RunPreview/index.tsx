@@ -96,7 +96,7 @@ export const RunPreviewComponent = (
         {(command, index) => {
           const isCurrent = index === currentRunCommandIndex
           const borderColor = isCurrent ? COLORS.blue50 : COLORS.transparent
-          const backgroundColor = isCurrent ? COLORS.blue35 : COLORS.grey10
+          const backgroundColor = isCurrent ? COLORS.blue30 : COLORS.grey10
           const contentColor = isCurrent ? COLORS.blue60 : COLORS.grey50
           return (
             <Flex
@@ -155,6 +155,11 @@ export const RunPreviewComponent = (
         >
           {t('view_current_step')}
         </PrimaryButton>
+      ) : null}
+      {currentRunCommandIndex === robotSideAnalysis.commands.length - 1 ? (
+        <StyledText as="h6" color={COLORS.grey60}>
+          {t('end_of_protocol')}
+        </StyledText>
       ) : null}
     </Flex>
   )

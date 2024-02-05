@@ -8,7 +8,6 @@ import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   useAllPipetteOffsetCalibrationsQuery,
   useInstrumentsQuery,
-  useRunQuery,
   useProtocolQuery,
   useDoorQuery,
   useModulesQuery,
@@ -30,11 +29,13 @@ import { mockRobotSideAnalysis } from '../../../organisms/CommandText/__fixtures
 import {
   useAttachedModules,
   useLPCDisabledReason,
-  useRunCreatedAtTimestamp,
   useModuleCalibrationStatus,
   useRobotType,
+  useRunCreatedAtTimestamp,
+  useTrackProtocolRunEvent,
 } from '../../../organisms/Devices/hooks'
 import { getLocalRobot } from '../../../redux/discovery'
+import { ANALYTICS_PROTOCOL_RUN_START } from '../../../redux/analytics'
 import { ProtocolSetupLiquids } from '../../../organisms/ProtocolSetupLiquids'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupModulesAndDeck } from '../../../organisms/ProtocolSetupModulesAndDeck'
@@ -50,6 +51,7 @@ import { useIsHeaterShakerInProtocol } from '../../../organisms/ModuleCard/hooks
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
 import { ConfirmAttachedModal } from '../../../pages/ProtocolSetup/ConfirmAttachedModal'
 import { ProtocolSetup } from '../../../pages/ProtocolSetup'
+import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
 
 import type { UseQueryResult } from 'react-query'
 import type {
@@ -88,6 +90,7 @@ jest.mock('../../../redux/discovery/selectors')
 jest.mock('../ConfirmAttachedModal')
 jest.mock('../../../organisms/ToasterOven')
 jest.mock('../../../resources/deck_configuration/hooks')
+jest.mock('../../../resources/runs/useNotifyRunQuery')
 
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
@@ -119,7 +122,9 @@ const mockUseRunStatus = useRunStatus as jest.MockedFunction<
 const mockProtocolSetupLiquids = ProtocolSetupLiquids as jest.MockedFunction<
   typeof ProtocolSetupLiquids
 >
-const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
+const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
+  typeof useNotifyRunQuery
+>
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
 >
@@ -165,6 +170,9 @@ const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
 >
 const mockUseDeckConfigurationCompatibility = useDeckConfigurationCompatibility as jest.MockedFunction<
   typeof useDeckConfigurationCompatibility
+>
+const mockUseTrackProtocolRunEvent = useTrackProtocolRunEvent as jest.MockedFunction<
+  typeof useTrackProtocolRunEvent
 >
 
 const render = (path = '/') => {
@@ -238,6 +246,7 @@ const mockFixture = {
 }
 
 const MOCK_MAKE_SNACKBAR = jest.fn()
+const mockTrackProtocolRunEvent = jest.fn()
 
 describe('ProtocolSetup', () => {
   let mockLaunchLPC: jest.Mock
@@ -287,7 +296,7 @@ describe('ProtocolSetup', () => {
     when(mockGetDeckDefFromRobotType)
       .calledWith('OT-3 Standard')
       .mockReturnValue(ot3StandardDeckDef as any)
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID, { staleTime: Infinity })
       .mockReturnValue({
         data: {
@@ -335,6 +344,9 @@ describe('ProtocolSetup', () => {
         makeSnackbar: MOCK_MAKE_SNACKBAR,
       } as unknown) as any)
     when(mockUseDeckConfigurationCompatibility).mockReturnValue([])
+    when(mockUseTrackProtocolRunEvent)
+      .calledWith(RUN_ID)
+      .mockReturnValue({ trackProtocolRunEvent: mockTrackProtocolRunEvent })
   })
 
   afterEach(() => {
@@ -439,5 +451,15 @@ describe('ProtocolSetup', () => {
     expect(MOCK_MAKE_SNACKBAR).toBeCalledWith(
       'Close the robot door before starting the run.'
     )
+  })
+
+  it('calls trackProtocolRunEvent when tapping play button', () => {
+    render(`/runs/${RUN_ID}/setup/`)
+    fireEvent.click(screen.getByRole('button', { name: 'play' }))
+    expect(mockTrackProtocolRunEvent).toBeCalledTimes(1)
+    expect(mockTrackProtocolRunEvent).toHaveBeenCalledWith({
+      name: ANALYTICS_PROTOCOL_RUN_START,
+      properties: {},
+    })
   })
 })

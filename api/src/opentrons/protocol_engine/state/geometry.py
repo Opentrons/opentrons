@@ -6,6 +6,7 @@ from typing import Optional, List, Tuple, Union, cast, TypeVar, Dict
 from opentrons.types import Point, DeckSlotName, StagingSlotName, MountType
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
+from opentrons_shared_data.deck.dev_types import CutoutFixture
 
 from .. import errors
 from ..errors import (
@@ -166,6 +167,10 @@ class GeometryView:
         elif isinstance(slot_item, LoadedLabware):
             # get stacked heights of all labware in the slot
             return self.get_highest_z_of_labware_stack(slot_item.id)
+        elif type(slot_item) is dict:
+            # TODO (cb, 2024-02-05): Eventually this logic should become the responsibility of bounding box
+            # conflict checking, as fixtures may not always be considered as items from slots.
+            return self._addressable_areas.get_fixture_height(slot_item["id"])
         else:
             return 0
 
@@ -687,21 +692,33 @@ class GeometryView:
 
     def get_slot_item(
         self, slot_name: Union[DeckSlotName, StagingSlotName]
-    ) -> Union[LoadedLabware, LoadedModule, None]:
+    ) -> Union[LoadedLabware, LoadedModule, CutoutFixture, None]:
         """Get the item present in a deck slot, if any."""
         maybe_labware = self._labware.get_by_slot(
             slot_name=slot_name,
         )
 
         if isinstance(slot_name, DeckSlotName):
+            maybe_fixture = self._addressable_areas.get_fixture_by_deck_slot_name(
+                slot_name
+            )
+            # Ignore generic single slot fixtures
+            if maybe_fixture and maybe_fixture["id"] in {
+                "singleLeftSlot",
+                "singleCenterSlot",
+                "singleRightSlot",
+            }:
+                maybe_fixture = None
+
             maybe_module = self._modules.get_by_slot(
                 slot_name=slot_name,
             )
         else:
-            # Modules can't be loaded on staging slots
+            # Modules and fixtures can't be loaded on staging slots
+            maybe_fixture = None
             maybe_module = None
 
-        return maybe_labware or maybe_module or None
+        return maybe_labware or maybe_module or maybe_fixture or None
 
     @staticmethod
     def get_slot_column(slot_name: DeckSlotName) -> int:

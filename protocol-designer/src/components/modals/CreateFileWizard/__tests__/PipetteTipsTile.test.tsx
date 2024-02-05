@@ -40,33 +40,35 @@ const render = (props: React.ComponentProps<typeof PipetteTipsTile>) => {
   })[0]
 }
 
+const values = {
+  fields: {
+    name: 'mockName',
+    description: 'mockDescription',
+    organizationOrAuthor: 'mockOrganizationOrAuthor',
+    robotType: FLEX_ROBOT_TYPE,
+  },
+  pipettesByMount: {
+    left: {
+      pipetteName: 'p50_single_flex',
+      tiprackDefURI: 'opentrons/opentrons_flex_96_tiprack_200ul/1',
+    },
+    right: { pipetteName: null, tiprackDefURI: null },
+  } as FormPipettesByMount,
+  modulesByType: {
+    heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
+    magneticBlockType: { onDeck: false, model: null, slot: '2' },
+    temperatureModuleType: { onDeck: false, model: null, slot: '3' },
+    thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
+  },
+  additionalEquipment: ['gripper'],
+} as FormState
+
 const mockWizardTileProps: Partial<WizardTileProps> = {
   goBack: jest.fn(),
   proceed: jest.fn(),
-
-  values: {
-    fields: {
-      name: 'mockName',
-      description: 'mockDescription',
-      organizationOrAuthor: 'mockOrganizationOrAuthor',
-      robotType: FLEX_ROBOT_TYPE,
-    },
-    pipettesByMount: {
-      left: {
-        pipetteName: 'p50_single_flex',
-        tiprackDefURI: 'opentrons/opentrons_flex_96_tiprack_200ul/1',
-      },
-      right: { pipetteName: null, tiprackDefURI: null },
-    } as FormPipettesByMount,
-    modulesByType: {
-      heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
-      magneticBlockType: { onDeck: false, model: null, slot: '2' },
-      temperatureModuleType: { onDeck: false, model: null, slot: '3' },
-      thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
-    },
-    additionalEquipment: ['gripper'],
-  } as FormState,
+  watch: jest.fn((name: keyof typeof values) => values[name]) as any,
 }
+
 const fixtureTipRack10ul = {
   ...fixture_tiprack_10_ul,
   version: 2,
@@ -150,30 +152,32 @@ describe('PipetteTipsTile', () => {
     expect(screen.getAllByText('mock EquipmentOption')).toHaveLength(2)
   })
   it('renders default options for 10uL ot-2 pipette', () => {
+    const values = {
+      fields: {
+        robotType: OT2_ROBOT_TYPE,
+      },
+      pipettesByMount: {
+        left: {
+          pipetteName: 'p10_single',
+          tiprackDefURI: 'opentrons/opentrons_96_tiprack_10ul/1',
+        },
+        right: { pipetteName: null, tiprackDefURI: null },
+      } as FormPipettesByMount,
+      modulesByType: {
+        heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
+        magneticBlockType: { onDeck: false, model: null, slot: '2' },
+        temperatureModuleType: { onDeck: false, model: null, slot: '3' },
+        thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
+      },
+      additionalEquipment: ['gripper'],
+    } as FormState
+
     const mockWizardTileProps: Partial<WizardTileProps> = {
       goBack: jest.fn(),
       proceed: jest.fn(),
-
-      values: {
-        fields: {
-          robotType: OT2_ROBOT_TYPE,
-        },
-        pipettesByMount: {
-          left: {
-            pipetteName: 'p10_single',
-            tiprackDefURI: 'opentrons/opentrons_96_tiprack_10ul/1',
-          },
-          right: { pipetteName: null, tiprackDefURI: null },
-        } as FormPipettesByMount,
-        modulesByType: {
-          heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
-          magneticBlockType: { onDeck: false, model: null, slot: '2' },
-          temperatureModuleType: { onDeck: false, model: null, slot: '3' },
-          thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
-        },
-        additionalEquipment: ['gripper'],
-      } as FormState,
+      watch: jest.fn((name: keyof typeof values) => values[name]) as any,
     }
+
     props = {
       ...props,
       ...mockWizardTileProps,

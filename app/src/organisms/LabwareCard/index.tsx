@@ -13,6 +13,7 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   LabwareRender,
+  OVERFLOW_WRAP_ANYWHERE,
   RobotWorkSpace,
   SPACING,
   TYPOGRAPHY,
@@ -114,7 +115,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
               {t('api_name')}
             </StyledText>
 
-            <Box overflowWrap="anywhere">
+            <Box overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
               <StyledText as="p">{apiName}</StyledText>
             </Box>
           </Box>

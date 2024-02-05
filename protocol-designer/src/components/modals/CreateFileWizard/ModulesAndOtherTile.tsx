@@ -64,40 +64,42 @@ export const FLEX_SUPPORTED_MODULE_MODELS: ModuleModel[] = [
 
 export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
   const {
-    handleChange,
-    handleBlur,
-    values,
-    setFieldValue,
-    errors,
-    touched,
-    setFieldTouched,
+    formState,
+    getValues,
+    setValue,
     goBack,
     proceed,
+    control,
+    trigger,
+    watch,
   } = props
   const { t } = useTranslation(['modal', 'tooltip'])
-  const robotType = values.fields.robotType
+  const { fields, pipettesByMount, additionalEquipment } = getValues()
+  const modulesByType = watch('modulesByType')
+  const { errors, touchedFields } = formState
+  const robotType = fields.robotType
   const moduleRestrictionsDisabled = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
   const [targetProps, tooltipProps] = useHoverTooltip()
   const hasATrash =
     robotType === FLEX_ROBOT_TYPE
-      ? values.additionalEquipment.includes('wasteChute') ||
-        values.additionalEquipment.includes('trashBin')
+      ? additionalEquipment.includes('wasteChute') ||
+        additionalEquipment.includes('trashBin')
       : true
 
-  const { left, right } = values.pipettesByMount
+  const { left, right } = pipettesByMount
 
   const hasCrashableMagnetModuleSelected = getCrashableModuleSelected(
-    values.modulesByType,
+    modulesByType,
     MAGNETIC_MODULE_TYPE
   )
   const hasCrashableTemperatureModuleSelected = getCrashableModuleSelected(
-    values.modulesByType,
+    modulesByType,
     TEMPERATURE_MODULE_TYPE
   )
   const hasHeaterShakerSelected = Boolean(
-    values.modulesByType[HEATERSHAKER_MODULE_TYPE].onDeck
+    modulesByType[HEATERSHAKER_MODULE_TYPE].onDeck
   )
 
   const showHeaterShakerPipetteCollisions =
@@ -108,7 +110,7 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
     ].some(pipetteSpecs => pipetteSpecs && pipetteSpecs.channels !== 1)
 
   const crashablePipetteSelected = getIsCrashablePipetteSelected(
-    values.pipettesByMount
+    pipettesByMount
   )
   const modCrashWarning = (
     <CrashInfoBox
@@ -136,15 +138,14 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
           <Text as="h2">{t('choose_additional_items')}</Text>
           {robotType === OT2_ROBOT_TYPE ? (
             <ModuleFields
-              //  @ts-expect-error
-              errors={errors.modulesByType ?? null}
-              values={values.modulesByType}
-              onFieldChange={handleChange}
-              onSetFieldValue={setFieldValue}
-              onBlur={handleBlur}
-              //  @ts-expect-error
-              touched={touched.modulesByType ?? null}
-              onSetFieldTouched={setFieldTouched}
+              // @ts-expect-error
+              errors={errors?.modulesByType ?? null}
+              values={modulesByType}
+              onSetFieldValue={setValue}
+              // @ts-expect-error
+              touched={touchedFields.modulesByType ?? null}
+              control={control}
+              trigger={trigger}
             />
           ) : (
             <FlexModuleFields {...props} />
@@ -162,7 +163,7 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
           <GoBack
             onClick={() => {
               if (robotType === OT2_ROBOT_TYPE) {
-                if (values.pipettesByMount.right.pipetteName === '') {
+                if (pipettesByMount.right.pipetteName === '') {
                   goBack(2)
                 } else {
                   goBack(1)
@@ -191,33 +192,29 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
 }
 
 function FlexModuleFields(props: WizardTileProps): JSX.Element {
-  const { values, setFieldValue } = props
-
-  const isFlex = values.fields.robotType === FLEX_ROBOT_TYPE
-  const trashBinDisabled = getTrashBinOptionDisabled(values)
+  const { getValues, watch, setValue } = props
+  const { fields } = getValues()
+  const modulesByType = watch('modulesByType')
+  const additionalEquipment = watch('additionalEquipment')
+  const isFlex = fields.robotType === FLEX_ROBOT_TYPE
+  const trashBinDisabled = getTrashBinOptionDisabled({
+    additionalEquipment,
+    modulesByType,
+  })
 
   const handleSetEquipmentOption = (equipment: AdditionalEquipment): void => {
-    if (values.additionalEquipment.includes(equipment)) {
-      setFieldValue(
-        'additionalEquipment',
-        without(values.additionalEquipment, equipment)
-      )
+    if (additionalEquipment.includes(equipment)) {
+      setValue('additionalEquipment', without(additionalEquipment, equipment))
     } else {
-      setFieldValue('additionalEquipment', [
-        ...values.additionalEquipment,
-        equipment,
-      ])
+      setValue('additionalEquipment', [...additionalEquipment, equipment])
     }
   }
 
   React.useEffect(() => {
     if (trashBinDisabled) {
-      setFieldValue(
-        'additionalEquipment',
-        without(values.additionalEquipment, 'trashBin')
-      )
+      setValue('additionalEquipment', without(additionalEquipment, 'trashBin'))
     }
-  }, [trashBinDisabled, setFieldValue])
+  }, [trashBinDisabled, setValue])
 
   return (
     <Flex flexWrap={WRAP} gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
@@ -226,21 +223,26 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
         return (
           <EquipmentOption
             key={moduleModel}
-            isSelected={values.modulesByType[moduleType].onDeck}
+            isSelected={modulesByType[moduleType].onDeck}
             image={<ModuleDiagram type={moduleType} model={moduleModel} />}
             text={getModuleDisplayName(moduleModel)}
-            disabled={getLastCheckedEquipment(values) === moduleType}
+            disabled={
+              getLastCheckedEquipment({
+                additionalEquipment,
+                modulesByType,
+              }) === moduleType
+            }
             onClick={() => {
-              if (values.modulesByType[moduleType].onDeck) {
-                setFieldValue(`modulesByType.${moduleType}.onDeck`, false)
-                setFieldValue(`modulesByType.${moduleType}.model`, null)
-                setFieldValue(`modulesByType.${moduleType}.slot`, null)
+              if (modulesByType[moduleType].onDeck) {
+                setValue(`modulesByType.${moduleType}.onDeck`, false)
+                setValue(`modulesByType.${moduleType}.model`, null)
+                setValue(`modulesByType.${moduleType}.slot`, '')
               } else {
-                setFieldValue(`modulesByType.${moduleType}.onDeck`, true)
-                setFieldValue(`modulesByType.${moduleType}.model`, moduleModel)
-                setFieldValue(
+                setValue(`modulesByType.${moduleType}.onDeck`, true)
+                setValue(`modulesByType.${moduleType}.model`, moduleModel)
+                setValue(
                   `modulesByType.${moduleType}.slot`,
-                  DEFAULT_SLOT_MAP[moduleModel]
+                  DEFAULT_SLOT_MAP[moduleModel] ?? ''
                 )
               }
             }}
@@ -250,7 +252,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
       })}
       <EquipmentOption
         onClick={() => handleSetEquipmentOption('gripper')}
-        isSelected={values.additionalEquipment.includes('gripper')}
+        isSelected={additionalEquipment.includes('gripper')}
         image={
           <AdditionalItemImage
             src={gripperImage}
@@ -264,7 +266,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
         <>
           <EquipmentOption
             onClick={() => handleSetEquipmentOption('wasteChute')}
-            isSelected={values.additionalEquipment.includes('wasteChute')}
+            isSelected={additionalEquipment.includes('wasteChute')}
             image={
               <AdditionalItemImage
                 src={wasteChuteImage}
@@ -276,7 +278,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
           />
           <EquipmentOption
             onClick={() => handleSetEquipmentOption('trashBin')}
-            isSelected={values.additionalEquipment.includes('trashBin')}
+            isSelected={additionalEquipment.includes('trashBin')}
             image={
               <AdditionalItemImage
                 src={trashBinImage}

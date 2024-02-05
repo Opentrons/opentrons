@@ -485,6 +485,83 @@ def test_deck_conflict_raises_for_bad_partial_96_channel_move(
 @pytest.mark.parametrize(
     ["destination_well_point", "expected_raise"],
     [
+        (
+            Point(x=100, y=100, z=10),
+            pytest.raises(
+                deck_conflict.PartialTipMovementNotAllowedError,
+                match="Moving to destination-labware in slot D2 with pipette column A1 nozzle configuration will result in collision with items in deck slot D3.",
+            ),
+        ),
+    ],
+)
+def test_deck_conflict_raises_for_bad_partial_96_channel_move_with_fixtures(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    destination_well_point: Point,
+    expected_raise: ContextManager[Any],
+) -> None:
+    """It should raise an error when moving to locations adjacent to fixtures with restrictions for partial tip 96-channel movement.
+
+    Test premise:
+    - we are using a pipette configured for COLUMN nozzle layout with primary nozzle A1
+    - there's a waste chute with in D3
+    - we are checking for conflicts when moving to column A12 of a labware in D2.
+    """
+    decoy.when(mock_state_view.pipettes.get_channels("pipette-id")).then_return(96)
+    decoy.when(
+        mock_state_view.labware.get_display_name("destination-labware-id")
+    ).then_return("destination-labware")
+    decoy.when(
+        mock_state_view.pipettes.get_nozzle_layout_type("pipette-id")
+    ).then_return(NozzleConfigurationType.COLUMN)
+    decoy.when(mock_state_view.pipettes.get_primary_nozzle("pipette-id")).then_return(
+        "A1"
+    )
+    decoy.when(
+        mock_state_view.geometry.get_well_position(
+            labware_id="destination-labware-id",
+            well_name="A12",
+            well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
+        )
+    ).then_return(destination_well_point)
+    decoy.when(
+        mock_state_view.geometry.get_ancestor_slot_name("destination-labware-id")
+    ).then_return(DeckSlotName.SLOT_D2)
+    decoy.when(
+        mock_state_view.addressable_areas.get_fixture_height(
+            "wasteChuteRightAdapterNoCover"
+        )
+    ).then_return(124.5)
+    decoy.when(
+        mock_state_view.geometry.get_highest_z_in_slot(
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_D3)
+        )
+    ).then_return(
+        mock_state_view.addressable_areas.get_fixture_height(
+            "wasteChuteRightAdapterNoCover"
+        )
+    )
+    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
+        TipGeometry(length=10, diameter=100, volume=0)
+    )
+
+    with expected_raise:
+        deck_conflict.check_safe_for_pipette_movement(
+            engine_state=mock_state_view,
+            pipette_id="pipette-id",
+            labware_id="destination-labware-id",
+            well_name="A12",
+            well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
+        )
+
+
+@pytest.mark.parametrize(
+    ("robot_type", "deck_type"),
+    [("OT-3 Standard", DeckType.OT3_STANDARD)],
+)
+@pytest.mark.parametrize(
+    ["destination_well_point", "expected_raise"],
+    [
         (Point(x=100, y=100, z=60), does_not_raise()),
         # Z-collisions
         (
