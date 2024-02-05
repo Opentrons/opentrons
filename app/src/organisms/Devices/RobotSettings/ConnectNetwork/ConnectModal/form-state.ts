@@ -36,7 +36,7 @@ export const useResetFormOnSecurityChange = (): void => {
     prevSecurityType,
     control,
     setValue,
-    trigger
+    trigger,
   ])
 }
 
