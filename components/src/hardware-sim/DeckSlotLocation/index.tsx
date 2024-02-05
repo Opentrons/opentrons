@@ -1,5 +1,9 @@
 import * as React from 'react'
-import { getPositionFromSlotId, OT2_ROBOT_TYPE, ot2DeckDefV4 } from '@opentrons/shared-data'
+import {
+  getPositionFromSlotId,
+  OT2_ROBOT_TYPE,
+  ot2DeckDefV4,
+} from '@opentrons/shared-data'
 
 import { SlotBase } from '../BaseDeck/SlotBase'
 

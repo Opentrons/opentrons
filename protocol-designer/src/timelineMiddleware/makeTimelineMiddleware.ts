@@ -45,7 +45,7 @@ export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
     type: 'module',
   })
 
-  console.log({worker})
+  console.log({ worker })
 
   let prevTimelineArgs: GenerateRobotStateTimelineArgs | null = null // caches results of dependent selectors, eg {[selectorIndex]: lastCachedSelectorValue}
 

@@ -9,7 +9,7 @@ import {
   getIsTiprack,
   OPENTRONS_LABWARE_NAMESPACE,
   LabwareDefinition2,
-  protocolSchemaV2
+  protocolSchemaV2,
 } from '@opentrons/shared-data'
 import { getAllWellSetsForLabware } from '../utils'
 import * as labwareDefSelectors from './selectors'

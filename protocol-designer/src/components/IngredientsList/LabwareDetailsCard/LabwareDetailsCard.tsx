@@ -13,7 +13,6 @@ import { EditableTextField } from '../../EditableTextField'
 import styles from './labwareDetailsCard.module.css'
 import type { ThunkDispatch } from '../../../types'
 
-
 export function LabwareDetailsCard(): JSX.Element {
   const { t } = useTranslation('form')
   const dispatch = useDispatch<ThunkDispatch<any>>()

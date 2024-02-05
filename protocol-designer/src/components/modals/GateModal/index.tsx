@@ -9,11 +9,6 @@ import {
 } from '../../../analytics'
 import settingsStyles from '../../SettingsPage/SettingsPage.module.css'
 import modalStyles from '../modal.module.css'
-interface Props {
-  hasOptedIn: boolean | null
-  optIn: () => unknown
-  optOut: () => unknown
-}
 
 export function GateModal(): JSX.Element | null {
   const { t } = useTranslation(['card', 'button'])

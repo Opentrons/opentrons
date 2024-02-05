@@ -1,3 +1,4 @@
+/* eslint-disable jest/consistent-test-it */
 import path from 'path'
 import glob from 'glob'
 import Ajv from 'ajv'

@@ -1,7 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-/// <reference types="vitest" />
-/// <reference types="vite/client" />
 var path_1 = require("path");
 var vite_1 = require("vite");
 var plugin_react_1 = require("@vitejs/plugin-react");

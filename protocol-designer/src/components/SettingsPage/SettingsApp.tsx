@@ -19,7 +19,6 @@ import { OLDEST_MIGRATEABLE_VERSION } from '../../load-file/migration'
 import styles from './SettingsPage.module.css'
 import { FeatureFlagCard } from './FeatureFlagCard/FeatureFlagCard'
 
-
 export function SettingsApp(): JSX.Element {
   const dispatch = useDispatch()
   const hasOptedIn = useSelector(analyticsSelectors.getHasOptedIn)

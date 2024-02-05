@@ -14,7 +14,7 @@ import {
 import type { Mock } from 'vitest'
 
 describe('validateJsonProtocolFileContents', () => {
-  let handleError: Mock 
+  let handleError: Mock
   // beforeAll
 
   beforeEach(() => {

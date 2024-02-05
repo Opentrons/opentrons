@@ -6,7 +6,7 @@
 **/venv/**
 .opentrons_config
 **/tsconfig*.json
-
+**/vite.config.ts
 # prettier
 **/package.json
 **/CHANGELOG.md

@@ -7,7 +7,6 @@ import { StepFormDropdown, RadioGroupField, TextField } from '../fields'
 import styles from '../StepEditForm.module.css'
 import type { StepFormProps } from '../types'
 
-
 export const TemperatureForm = (props: StepFormProps): JSX.Element => {
   const { t } = useTranslation(['application', 'form'])
   const moduleLabwareOptions = useSelector(

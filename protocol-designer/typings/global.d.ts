@@ -1,3 +1,4 @@
+/* eslint-disable */
 declare global {
   interface Global {
     document: {

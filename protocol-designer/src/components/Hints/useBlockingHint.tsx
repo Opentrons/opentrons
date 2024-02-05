@@ -7,7 +7,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { ContinueModal, DeprecatedCheckboxField } from '@opentrons/components'
 import { actions, selectors, HintKey } from '../../tutorial'
 import { Portal } from '../portals/MainPageModalPortal'
-import { i18n } from '../../localization'
 import styles from './hints.module.css'
 
 export interface HintProps {

@@ -78,7 +78,10 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
 
   const runningProtocolBanner: JSX.Element | null =
     currentRunId != null && currentRunStatus != null && displayName != null ? (
-      <Flex alignItems={ALIGN_CENTER} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+      <Flex
+        alignItems={ALIGN_CENTER}
+        onClick={(e: React.MouseEvent) => e.stopPropagation()}
+      >
         <StyledText
           as="label"
           paddingRight={SPACING.spacing8}

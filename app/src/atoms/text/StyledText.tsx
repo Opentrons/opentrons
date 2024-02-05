@@ -3,7 +3,7 @@ import styled, { FlattenSimpleInterpolation, css } from 'styled-components'
 import { Text, TYPOGRAPHY, RESPONSIVENESS } from '@opentrons/components'
 
 export interface Props extends React.ComponentProps<typeof Text> {
-  children: React.ReactNode
+  children?: React.ReactNode
 }
 
 const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
@@ -77,7 +77,7 @@ const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
   labelBold: TYPOGRAPHY.smallBodyTextBold,
 }
 
-export const StyledText = styled(Text)<Props>`
+export const StyledText: (props: Props) => JSX.Element = styled(Text)<Props>`
   ${props => {
     let fontWeight = ''
     if (props.fontWeight === TYPOGRAPHY.fontWeightSemiBold) {

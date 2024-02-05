@@ -13,7 +13,6 @@ import {
   DeprecatedPrimaryButton,
   InputField,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
 import styles from './LiquidPlacementForm.module.css'
 import formStyles from '../forms/forms.module.css'
 import stepEditFormStyles from '../StepEditForm/StepEditForm.module.css'

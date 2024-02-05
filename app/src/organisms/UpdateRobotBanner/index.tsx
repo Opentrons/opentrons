@@ -34,7 +34,10 @@ export function UpdateRobotBanner(
   return (autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade') &&
     robot !== null &&
     robot.healthStatus === 'ok' ? (
-    <Flex onClick={(e: React.MouseEvent) => e.stopPropagation()} flexDirection={DIRECTION_COLUMN}>
+    <Flex
+      onClick={(e: React.MouseEvent) => e.stopPropagation()}
+      flexDirection={DIRECTION_COLUMN}
+    >
       <Banner type="error" {...styleProps}>
         <StyledText as="p" marginRight={SPACING.spacing4}>
           {t('robot_software_update_required')}

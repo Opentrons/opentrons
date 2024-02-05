@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '@opentrons/components'
-import { i18n } from '../localization'
 import styles from './WellSelectionInstructions.module.css'
 
 export function WellSelectionInstructions(): JSX.Element {

@@ -96,7 +96,6 @@ export function configureStore(): StoreType {
   store.dispatch(rehydratePersistedAction())
   store.subscribe(makePersistSubscriber(store))
 
-
   global.enablePrereleaseMode = () => {
     store.dispatch({
       type: 'SET_FEATURE_FLAGS',

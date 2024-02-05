@@ -5,7 +5,6 @@ import { RobotType } from '@opentrons/shared-data'
 import styles from './EditModules.module.css'
 import type { EditModulesFormValues } from './index'
 
-
 interface ConnectedSlotMapProps {
   robotType: RobotType
   field: ControllerRenderProps<EditModulesFormValues, 'selectedSlot'>
