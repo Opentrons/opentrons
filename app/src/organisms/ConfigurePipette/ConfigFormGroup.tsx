@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Field } from 'formik'
+import { Control, Controller } from 'react-hook-form'
 import {
   FormGroup,
   Flex,
@@ -12,7 +12,6 @@ import { InputField } from '../../atoms/InputField'
 import { StyledText } from '../../atoms/text'
 import styles from './styles.css'
 
-import type { FieldProps } from 'formik'
 import type { DisplayFieldProps, DisplayQuirkFieldProps } from './ConfigForm'
 
 export interface FormColumnProps {
@@ -31,10 +30,11 @@ export interface ConfigFormGroupProps {
   groupLabel: string
   groupError?: string | null | undefined
   formFields: DisplayFieldProps[]
+  control: Control<FormValues, any>
 }
 
 export function ConfigFormGroup(props: ConfigFormGroupProps): JSX.Element {
-  const { groupLabel, groupError, formFields } = props
+  const { groupLabel, groupError, formFields, control } = props
   const formattedError =
     groupError &&
     groupError.split('\n').map(function (item, key) {
@@ -53,7 +53,9 @@ export function ConfigFormGroup(props: ConfigFormGroupProps): JSX.Element {
     >
       {groupError && <p className={styles.group_error}>{formattedError}</p>}
       {formFields.map((field, index) => {
-        return <ConfigInput field={field} key={index} />
+        return (
+          <ConfigInput displayField={field} key={index} control={control} />
+        )
       })}
     </FormGroup>
   )
@@ -89,55 +91,61 @@ export function ConfigFormRow(props: ConfigFormRowProps): JSX.Element {
 }
 
 export interface ConfigInputProps {
-  field: DisplayFieldProps
+  displayField: DisplayFieldProps
+  control: Control<FormValues, any>
 }
 
 export function ConfigInput(props: ConfigInputProps): JSX.Element {
-  const { field } = props
-  const { name, units, displayName } = field
-  const id = makeId(field.name)
-  const _default = field.default?.toString()
+  const { displayField, control } = props
+  const { name, units, displayName } = displayField
+  const id = makeId(name)
+  const _default = displayField.default.toString()
+
   return (
     <ConfigFormRow label={displayName} labelFor={id}>
-      <Field name={name}>
-        {(fieldProps: FieldProps<DisplayFieldProps>) => (
+      <Controller
+        control={control}
+        name={name}
+        render={({ field, fieldState }) => (
           <InputField
             placeholder={_default}
-            name={fieldProps.field.name}
-            value={String(fieldProps.field.value ?? '')}
-            onChange={fieldProps.field.onChange}
-            onBlur={fieldProps.field.onBlur}
-            // @ts-expect-error TODO: this error prop can't handle some formik error array types
-            error={fieldProps.form.errors[name]}
+            name={field.name}
+            value={typeof field.value === 'string' ? field.value : ''}
+            onChange={field.onChange}
+            onBlur={field.onBlur}
+            error={fieldState.error?.message}
             {...{
               units,
             }}
           />
         )}
-      </Field>
+      />
     </ConfigFormRow>
   )
 }
 
 export interface ConfigCheckboxProps {
-  field: DisplayQuirkFieldProps
+  displayQuirkField: DisplayQuirkFieldProps
+  control: Control<FormValues, any>
 }
 
 export function ConfigCheckbox(props: ConfigCheckboxProps): JSX.Element {
-  const { field } = props
-  const { name, displayName } = field
+  const { displayQuirkField, control } = props
+  const { name, displayName } = displayQuirkField
   const id = makeId(name)
   return (
     <Flex key={id} flexDirection="row" fontSize="11px">
-      <Field name={name} type="checkbox">
-        {(fieldProps: FieldProps) => (
+      <Controller
+        control={control}
+        name={name}
+        render={({ field }) => (
           <CheckboxField
-            name={fieldProps.field.name}
-            onChange={fieldProps.field.onChange}
-            value={fieldProps.field.checked}
+            name={field.name}
+            onChange={field.onChange}
+            value={typeof field.value === 'boolean' ? field.value : false}
           />
         )}
-      </Field>
+      />
       <StyledText paddingLeft={SPACING.spacing8} paddingTop={SPACING.spacing2}>
         {displayName}
       </StyledText>
@@ -147,14 +155,21 @@ export function ConfigCheckbox(props: ConfigCheckboxProps): JSX.Element {
 
 export interface ConfigQuirkGroupProps {
   quirks: DisplayQuirkFieldProps[]
+  control: Control<FormValues, any>
 }
 
 export function ConfigQuirkGroup(props: ConfigQuirkGroupProps): JSX.Element {
-  const { quirks } = props
+  const { quirks, control } = props
   return (
     <FormGroup className={styles.form_group}>
       {quirks.map((field, index) => {
-        return <ConfigCheckbox field={field} key={index} />
+        return (
+          <ConfigCheckbox
+            displayQuirkField={field}
+            key={index}
+            control={control}
+          />
+        )
       })}
     </FormGroup>
   )

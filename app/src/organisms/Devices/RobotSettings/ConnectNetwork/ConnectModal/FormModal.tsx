@@ -1,8 +1,12 @@
 import * as React from 'react'
-import { Form } from 'formik'
+import { Control, Controller } from 'react-hook-form'
 import styled, { css } from 'styled-components'
 
-import { FONT_SIZE_BODY_1, BUTTON_TYPE_SUBMIT } from '@opentrons/components'
+import {
+  FONT_SIZE_BODY_1,
+  BUTTON_TYPE_SUBMIT,
+  Flex,
+} from '@opentrons/components'
 import { ScrollableAlertModal } from '../../../../../molecules/modals'
 import { TextField } from './TextField'
 import { KeyFileField } from './KeyFileField'
@@ -10,7 +14,7 @@ import { SecurityField } from './SecurityField'
 import { FIELD_TYPE_KEY_FILE, FIELD_TYPE_SECURITY } from '../constants'
 import * as Copy from '../i18n'
 
-import type { ConnectFormField, WifiNetwork } from '../types'
+import type { ConnectFormField, ConnectFormValues, WifiNetwork } from '../types'
 
 const fieldStyle = css`
   min-width: 12rem;
@@ -19,7 +23,7 @@ const StyledCopy = styled.p`
   margin: 0 1rem 1rem;
 `
 
-const StyledForm = styled(Form)`
+const StyledFlex = styled(Flex)`
   font-size: ${FONT_SIZE_BODY_1};
   display: table;
   width: 80%;
@@ -43,11 +47,12 @@ export interface FormModalProps {
   network: WifiNetwork | null
   fields: ConnectFormField[]
   isValid: boolean
-  onCancel: () => unknown
+  onCancel: () => void
+  control: Control<ConnectFormValues, any>
 }
 
 export const FormModal = (props: FormModalProps): JSX.Element => {
-  const { id, network, fields, isValid, onCancel } = props
+  const { id, network, fields, isValid, onCancel, control } = props
 
   const heading =
     network !== null
@@ -76,26 +81,53 @@ export const FormModal = (props: FormModalProps): JSX.Element => {
       ]}
     >
       <StyledCopy>{body}</StyledCopy>
-      <StyledForm id={id}>
+      <StyledFlex id={id}>
         {fields.map(fieldProps => {
           const { name } = fieldProps
           const fieldId = `${id}__${name}`
 
           if (fieldProps.type === FIELD_TYPE_SECURITY) {
             return (
-              <StyledSecurityField key={name} id={fieldId} {...fieldProps} />
+              <Controller
+                control={control}
+                //  @ts-expect-error: name is correct type
+                name={name}
+                render={() => (
+                  <StyledSecurityField
+                    key={name}
+                    id={fieldId}
+                    {...fieldProps}
+                  />
+                )}
+              />
             )
           }
 
           if (fieldProps.type === FIELD_TYPE_KEY_FILE) {
             return (
-              <StyledKeyFileField key={name} id={fieldId} {...fieldProps} />
+              <Controller
+                control={control}
+                //  @ts-expect-error: name is correct type
+                name={name}
+                render={() => (
+                  <StyledKeyFileField key={name} id={fieldId} {...fieldProps} />
+                )}
+              />
             )
           }
 
-          return <StyledTextField key={name} id={fieldId} {...fieldProps} />
+          return (
+            <Controller
+              control={control}
+              //  @ts-expect-error: name is correct type
+              name={name}
+              render={() => (
+                <StyledTextField key={name} id={fieldId} {...fieldProps} />
+              )}
+            />
+          )
         })}
-      </StyledForm>
+      </StyledFlex>
     </ScrollableAlertModal>
   )
 }

@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { Formik, Form } from 'formik'
 
 import startCase from 'lodash/startCase'
 import mapValues from 'lodash/mapValues'
@@ -15,13 +14,13 @@ import {
   ConfigQuirkGroup,
 } from './ConfigFormGroup'
 
-import type { FormikProps } from 'formik'
 import type { FormValues } from './ConfigFormGroup'
 import type {
   PipetteSettingsField,
   PipetteSettingsFieldsMap,
   UpdatePipetteSettingsData,
 } from '@opentrons/api-client'
+import { FieldError, Resolver, useForm } from 'react-hook-form'
 
 export interface DisplayFieldProps extends PipetteSettingsField {
   name: string
@@ -47,11 +46,19 @@ const POWER_KEYS = ['plungerCurrent', 'pickUpCurrent', 'dropTipCurrent']
 const TIP_KEYS = ['dropTipSpeed', 'pickUpDistance']
 const QUIRK_KEY = 'quirks'
 
-export class ConfigForm extends React.Component<ConfigFormProps> {
-  getFieldsByKey(
+export const ConfigForm = (props: ConfigFormProps): JSX.Element => {
+  const {
+    updateInProgress,
+    formId,
+    settings,
+    updateSettings,
+    groupLabels,
+  } = props
+
+  const getFieldsByKey = (
     keys: string[],
     fields: PipetteSettingsFieldsMap
-  ): DisplayFieldProps[] {
+  ): DisplayFieldProps[] => {
     return keys.map(k => {
       const field = fields[k]
       const displayName = startCase(k)
@@ -64,8 +71,8 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
     })
   }
 
-  getKnownQuirks = (): DisplayQuirkFieldProps[] => {
-    const quirks = this.props.settings[QUIRK_KEY]
+  const getKnownQuirks = (): DisplayQuirkFieldProps[] => {
+    const quirks = settings[QUIRK_KEY]
     if (!quirks) return []
     const quirkKeys = Object.keys(quirks)
     return quirkKeys.map<DisplayQuirkFieldProps>((name: string) => {
@@ -79,22 +86,17 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
     })
   }
 
-  getVisibleFields: () => PipetteSettingsFieldsMap = () => {
-    return omit(this.props.settings, [QUIRK_KEY])
+  const getVisibleFields = (): PipetteSettingsFieldsMap => {
+    return omit(settings, [QUIRK_KEY])
   }
 
-  getUnknownKeys: () => string[] = () => {
+  const getUnknownKeys = (): string[] => {
     return keys(
-      omit(this.props.settings, [
-        ...PLUNGER_KEYS,
-        ...POWER_KEYS,
-        ...TIP_KEYS,
-        QUIRK_KEY,
-      ])
+      omit(settings, [...PLUNGER_KEYS, ...POWER_KEYS, ...TIP_KEYS, QUIRK_KEY])
     )
   }
 
-  handleSubmit: (values: FormValues) => void = values => {
+  const onSubmit: (values: FormValues) => void = values => {
     const fields = mapValues<
       FormValues,
       { value: PipetteSettingsField['value'] } | null
@@ -104,29 +106,31 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
       return { value: Number(v) }
     })
 
-    this.props.updateSettings({ fields })
+    updateSettings({ fields })
   }
 
-  getFieldValue(
+  const getFieldValue = (
     key: string,
     fields: DisplayFieldProps[],
     values: FormValues
-  ): number {
+  ): number => {
     const field = fields.find(f => f.name === key)
     const _default = field && field.default
     const value = values[key] || _default
     return Number(value)
   }
 
-  validate = (values: FormValues): {} => {
-    const errors = {}
-    const fields = this.getVisibleFields()
-    const plungerFields = this.getFieldsByKey(PLUNGER_KEYS, fields)
+  const validate = (
+    values: FormValues,
+    errors: Record<string, FieldError>
+  ): Record<string, FieldError> => {
+    const fields = getVisibleFields()
+    const plungerFields = getFieldsByKey(PLUNGER_KEYS, fields)
 
     // validate all visible fields with min and max
     forOwn(fields, (field, name) => {
       // @ts-expect-error TODO: value needs to be of type string here, but technically that's not prover
-      const value = values[name].trim()
+      const value = values[name]?.trim()
       const { min, max } = field
       if (value !== '') {
         const parsed = Number(value)
@@ -138,26 +142,38 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
           // TODO(bc, 2021-05-18): this should probably be (parsed < min || parsed > max) so we're not accidentally comparing a string to a number
           (parsed < min || value > max)
         ) {
-          set(errors, name, `Min ${min} / Max ${max}`)
+          set(errors, name, {
+            type: 'numberError',
+            message: `Min ${min} / Max ${max}`,
+          })
         }
       }
     })
 
     const plungerGroupError =
       'Please ensure the following: \n top > bottom > blowout > droptip'
-    const top = this.getFieldValue('top', plungerFields, values)
-    const bottom = this.getFieldValue('bottom', plungerFields, values)
-    const blowout = this.getFieldValue('blowout', plungerFields, values)
-    const dropTip = this.getFieldValue('dropTip', plungerFields, values)
+    const top = getFieldValue('top', plungerFields, values)
+    const bottom = getFieldValue('bottom', plungerFields, values)
+    const blowout = getFieldValue('blowout', plungerFields, values)
+    const dropTip = getFieldValue('dropTip', plungerFields, values)
     if (top <= bottom || bottom <= blowout || blowout <= dropTip) {
-      set(errors, 'plungerError', plungerGroupError)
+      set(errors, 'plungerError', {
+        type: 'plungerError',
+        message: plungerGroupError,
+      })
     }
 
     return errors
   }
 
-  getInitialValues: () => FormValues = () => {
-    const fields = this.getVisibleFields()
+  const resolver: Resolver<FormValues> = values => {
+    let errors = {}
+    errors = validate(values, errors)
+    return { values, errors }
+  }
+
+  const getInitialValues: () => FormValues = () => {
+    const fields = getVisibleFields()
     const initialFieldValues = mapValues<
       PipetteSettingsFieldsMap,
       string | boolean
@@ -166,7 +182,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
       // @ts-expect-error(sa, 2021-05-27): avoiding src code change, use optional chain to access f.value
       return f.value !== f.default ? f.value.toString() : ''
     })
-    const initialQuirkValues = this.props.settings[QUIRK_KEY]
+    const initialQuirkValues = settings[QUIRK_KEY]
     const initialValues = Object.assign(
       {},
       initialFieldValues,
@@ -176,68 +192,70 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
     return initialValues
   }
 
-  render(): JSX.Element {
-    const { updateInProgress, formId } = this.props
-    const fields = this.getVisibleFields()
-    const UNKNOWN_KEYS = this.getUnknownKeys()
-    const plungerFields = this.getFieldsByKey(PLUNGER_KEYS, fields)
-    const powerFields = this.getFieldsByKey(POWER_KEYS, fields)
-    const tipFields = this.getFieldsByKey(TIP_KEYS, fields)
-    const quirkFields = this.getKnownQuirks()
-    const quirksPresent = quirkFields.length > 0
-    const unknownFields = this.getFieldsByKey(UNKNOWN_KEYS, fields)
-    const initialValues = this.getInitialValues()
+  const fields = getVisibleFields()
+  const UNKNOWN_KEYS = getUnknownKeys()
+  const plungerFields = getFieldsByKey(PLUNGER_KEYS, fields)
+  const powerFields = getFieldsByKey(POWER_KEYS, fields)
+  const tipFields = getFieldsByKey(TIP_KEYS, fields)
+  const quirkFields = getKnownQuirks()
+  const quirksPresent = quirkFields.length > 0
+  const unknownFields = getFieldsByKey(UNKNOWN_KEYS, fields)
+  const initialValues = getInitialValues()
 
-    return (
-      <Formik
-        onSubmit={this.handleSubmit}
-        initialValues={initialValues}
-        validate={this.validate}
-        validateOnChange={false}
-      >
-        {(formProps: FormikProps<FormValues>) => {
-          const { errors, values } = formProps
-          const handleReset = (): void => {
-            const newValues = mapValues(values, v => {
-              if (typeof v === 'boolean') {
-                // NOTE: checkbox fields don't have defaults from the API b/c they come in from `quirks`
-                // For now, we'll reset all checkboxes to true
-                return true
-              }
-              return ''
-            })
-            formProps.resetForm({ values: newValues })
-          }
-          return (
-            <Box overflowY={OVERFLOW_AUTO}>
-              <Form id={formId}>
-                <ConfigFormResetButton
-                  onClick={handleReset}
-                  disabled={updateInProgress}
-                />
-                <FormColumn>
-                  <ConfigFormGroup
-                    groupLabel={this.props.groupLabels[0]}
-                    groupError={errors.plungerError}
-                    formFields={plungerFields}
-                  />
-                  <ConfigFormGroup
-                    groupLabel={this.props.groupLabels[1]}
-                    formFields={[...tipFields, ...unknownFields]}
-                  />
-                  {quirksPresent && <ConfigQuirkGroup quirks={quirkFields} />}
-                </FormColumn>
-                <FormColumn>
-                  <ConfigFormGroup
-                    groupLabel={this.props.groupLabels[2]}
-                    formFields={powerFields}
-                  />
-                </FormColumn>
-              </Form>
-            </Box>
-          )
-        }}
-      </Formik>
-    )
+  const {
+    handleSubmit,
+    reset,
+    getValues,
+    control,
+    formState: { errors },
+  } = useForm<FormValues>({
+    defaultValues: initialValues,
+    resolver: resolver,
+  })
+
+  const handleReset = (): void => {
+    const newValues = mapValues(getValues(), v => {
+      if (typeof v === 'boolean') {
+        // NOTE: checkbox fields don't have defaults from the API b/c they come in from `quirks`
+        // For now, we'll reset all checkboxes to true
+        return true
+      }
+      return ''
+    })
+    reset(newValues)
   }
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} id={formId}>
+      <Box overflowY={OVERFLOW_AUTO}>
+        <ConfigFormResetButton
+          onClick={handleReset}
+          disabled={updateInProgress}
+        />
+        <FormColumn>
+          <ConfigFormGroup
+            groupLabel={groupLabels[0]}
+            groupError={errors.plungerError?.message}
+            formFields={plungerFields}
+            control={control}
+          />
+          <ConfigFormGroup
+            groupLabel={groupLabels[1]}
+            formFields={[...tipFields, ...unknownFields]}
+            control={control}
+          />
+          {quirksPresent && (
+            <ConfigQuirkGroup quirks={quirkFields} control={control} />
+          )}
+        </FormColumn>
+        <FormColumn>
+          <ConfigFormGroup
+            groupLabel={groupLabels[2]}
+            control={control}
+            formFields={powerFields}
+          />
+        </FormColumn>
+      </Box>
+    </form>
+  )
 }

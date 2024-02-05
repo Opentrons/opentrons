@@ -1,30 +1,32 @@
-import { useEffect } from 'react'
-import { useFormikContext, useField } from 'formik'
+import * as React from 'react'
+import { useForm, useController } from 'react-hook-form'
 import { usePrevious } from '@opentrons/components'
 
 import type { ConnectFormValues, ConnectFormFieldProps } from '../types'
 
 export const useResetFormOnSecurityChange = (): void => {
   const {
-    values,
-    errors,
-    touched,
-    setValues,
-    setErrors,
-    setTouched,
-  } = useFormikContext<ConnectFormValues>()
+    control,
+    formState: { errors, touchedFields },
+    setValue,
+    getValues,
+    trigger,
+    clearErrors,
+  } = useForm<ConnectFormValues>()
 
-  const ssid = values.ssid
-  const ssidTouched = touched.ssid
+  const ssid = getValues('ssid')
+  const ssidTouched = touchedFields.ssid
   const ssidError = errors.ssid
-  const securityType = values.securityType
+  const securityType = getValues('securityType')
   const prevSecurityType = usePrevious(securityType)
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (prevSecurityType && securityType !== prevSecurityType) {
-      setErrors({ ssid: ssidError })
-      setTouched({ ssid: ssidTouched, securityType: true }, false)
-      setValues({ ssid, securityType })
+      clearErrors('ssid')
+      clearErrors('securityType')
+      setValue('ssid', ssid)
+      setValue('securityType', securityType)
+      trigger(['ssid', 'securityType'])
     }
   }, [
     ssid,
@@ -32,26 +34,26 @@ export const useResetFormOnSecurityChange = (): void => {
     ssidError,
     securityType,
     prevSecurityType,
-    setTouched,
-    setErrors,
-    setValues,
+    control,
+    setValue,
+    trigger
   ])
 }
 
 export const useConnectFormField = (name: string): ConnectFormFieldProps => {
-  const [fieldProps, fieldMeta, fieldHelpers] = useField<string | undefined>(
-    name
-  )
-  const { value, onChange, onBlur } = fieldProps
-  const { setValue, setTouched } = fieldHelpers
-  const error = fieldMeta.touched ? fieldMeta.error : null
+  const { field, fieldState } = useController({
+    name,
+    defaultValue: '',
+  })
+
+  const error = fieldState.error?.message
 
   return {
-    value: value ?? null,
+    value: field.value,
     error: error ?? null,
-    onChange,
-    onBlur,
-    setValue,
-    setTouched,
+    onChange: field.onChange,
+    onBlur: field.onBlur,
+    setValue: field.onChange,
+    setTouched: field.onBlur,
   }
 }

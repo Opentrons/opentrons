@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { useForm } from 'react-hook-form'
+import { FieldError, Resolver, useForm } from 'react-hook-form'
 import styled from 'styled-components'
 
 import {
@@ -55,12 +55,6 @@ const StyledInput = styled.input`
   }
 `
 
-interface FormErrors {
-  ip?: {
-    type: string
-    message: string
-  }
-}
 interface FormValues {
   ip: string
 }
@@ -78,23 +72,36 @@ export function ManualIpHostnameForm({
     dispatch(startDiscovery())
   }
 
-  const validateForm = (data: FormValues): any => {
-    const errors: FormErrors = {}
+  const validateForm = (
+    data: FormValues,
+    errors: Record<string, FieldError>
+  ): Record<string, FieldError> => {
     const ip = data.ip.trim()
+    let message: string | undefined
     // ToDo: kj 12/19/2022 for this, the best way is to use the regex because invisible unicode characters
     if (!ip) {
-      errors.ip = { type: 'required', message: t('add_ip_error') }
+      message = t('add_ip_error')
     }
-    return errors
+    return {
+      ...errors,
+      ['ip']: {
+        type: 'error',
+        message: message,
+      },
+    }
+  }
+
+  const resolver: Resolver<FormValues> = values => {
+    let errors = {}
+    errors = validateForm(values, errors)
+    return { values, errors }
   }
 
   const { formState, handleSubmit, register, reset } = useForm<FormValues>({
     defaultValues: {
       ip: '',
     },
-    resolver: data => {
-      return validateForm(data)
-    },
+    resolver: resolver,
   })
 
   const onSubmit = (data: FormValues): void => {
@@ -139,7 +146,7 @@ export function ManualIpHostnameForm({
           marginTop={SPACING.spacing4}
           color={COLORS.red50}
         >
-          {formState.errors.ip}
+          {formState.errors.ip.message}
         </StyledText>
       )}
     </Flex>
