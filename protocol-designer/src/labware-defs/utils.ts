@@ -21,7 +21,7 @@ export function getLegacyLabwareDef(
 let _definitions: LabwareDefByDefURI | null = null
 export function getAllDefinitions(): LabwareDefByDefURI {
   if (_definitions == null) {
-    _definitions = _getAllDefinitions()
+    _definitions = _getAllDefinitions(PD_DO_NOT_LIST)
   }
   return _definitions
 }

@@ -40,9 +40,9 @@ const allMigrationsByVersion: MigrationsByVersion = {
   '5.2.0': migrateFileFiveTwo,
   // @ts-expect-error fix MigrationsByVersion type (and the function signatures of the older migration functions above)
   '6.0.0': migrateFileSix,
-  // @ts-expect-error
+  // @ts-expect-error fix MigrationsByVersion type (and the function signatures of the older migration functions above)
   '7.0.0': migrateFileSeven,
-  // @ts-expect-error
+  // @ts-expect-error fix MigrationsByVersion type (and the function signatures of the older migration functions above)
   '8.0.0': migrateFileEight,
 }
 export const migration = (
