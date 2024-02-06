@@ -13,6 +13,7 @@ import {
   getAnalyticsOptInSeen,
   toggleAnalyticsOptedIn,
   setAnalyticsOptInSeen,
+  getAnalyticsOptedIn,
 } from '../../redux/analytics'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { LegacyModal } from '../../molecules/LegacyModal'
@@ -26,13 +27,14 @@ export function AnalyticsSettingsModal(): JSX.Element | null {
   const { t } = useTranslation('shared')
   const dispatch = useDispatch<Dispatch>()
   const seen = useSelector(getAnalyticsOptInSeen)
+  const hasOptedIn = useSelector(getAnalyticsOptedIn)
 
   const handleClick = (): void => {
     dispatch(setAnalyticsOptInSeen())
     dispatch(toggleAnalyticsOptedIn())
   }
 
-  return !seen ? (
+  return !seen || !hasOptedIn ? (
     <LegacyModal
       title={
         <StyledText css={TYPOGRAPHY.h3SemiBold}>
