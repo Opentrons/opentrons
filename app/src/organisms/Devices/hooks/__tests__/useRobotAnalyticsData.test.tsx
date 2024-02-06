@@ -12,6 +12,7 @@ import { getRobotSettings } from '../../../../redux/robot-settings'
 import {
   getRobotApiVersion,
   getRobotFirmwareVersion,
+  getRobotSerialNumber,
 } from '../../../../redux/discovery'
 
 import type { DiscoveredRobot } from '../../../../redux/discovery/types'
@@ -36,6 +37,9 @@ const mockGetRobotFirmwareVersion = getRobotFirmwareVersion as jest.MockedFuncti
 const mockGetAttachedPipettes = getAttachedPipettes as jest.MockedFunction<
   typeof getAttachedPipettes
 >
+const mockGetRobotSerialNumber = getRobotSerialNumber as jest.MockedFunction<
+  typeof getRobotSerialNumber
+>
 
 const ROBOT_SETTINGS = [
   { id: `setting1`, value: true, title: '', description: '' },
@@ -47,6 +51,7 @@ const ATTACHED_PIPETTES = {
   left: { id: '1', model: 'testModelLeft' },
   right: { id: '2', model: 'testModelRight' },
 }
+const ROBOT_SERIAL_NUMBER = 'OT123'
 
 let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 let store: Store<any> = createStore(jest.fn(), {})
@@ -70,6 +75,7 @@ describe('useProtocolAnalysisErrors hook', () => {
     mockGetAttachedPipettes.mockReturnValue(
       ATTACHED_PIPETTES as AttachedPipettesByMount
     )
+    mockGetRobotSerialNumber.mockReturnValue(ROBOT_SERIAL_NUMBER)
   })
 
   afterEach(() => {
@@ -99,6 +105,7 @@ describe('useProtocolAnalysisErrors hook', () => {
       robotLeftPipette: 'testModelLeft',
       robotRightPipette: 'testModelRight',
       robotSmoothieVersion: ROBOT_FIRMWARE_VERSION,
+      robotSerialNumber: ROBOT_SERIAL_NUMBER,
     })
   })
 })

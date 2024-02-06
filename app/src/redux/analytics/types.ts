@@ -28,6 +28,7 @@ export type RobotAnalyticsData = {
   robotSmoothieVersion: string
   robotLeftPipette: string
   robotRightPipette: string
+  robotSerialNumber: string
 } & {
   // feature flags
   // e.g. robotFF_settingName
