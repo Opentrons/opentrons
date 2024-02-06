@@ -27,6 +27,7 @@ import { ConnectViaWifi } from '../pages/ConnectViaWifi'
 import { EmergencyStop } from '../pages/EmergencyStop'
 import { NameRobot } from '../pages/NameRobot'
 import { NetworkSetupMenu } from '../pages/NetworkSetupMenu'
+import { PrivacyPolicy } from '../pages/PrivacyPolicy'
 import { ProtocolSetup } from '../pages/ProtocolSetup'
 import { RobotDashboard } from '../pages/RobotDashboard'
 import { RobotSettingsDashboard } from '../pages/RobotSettingsDashboard'
@@ -194,6 +195,12 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     exact: true,
     name: 'Emergency Stop',
     path: '/emergency-stop',
+  },
+  {
+    Component: PrivacyPolicy,
+    exact: true,
+    name: 'Privacy Policy',
+    path: '/privacy-policy',
   },
   {
     Component: DeckConfigurationEditor,
