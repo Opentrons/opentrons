@@ -69,7 +69,7 @@ class MoveToAddressableAreaForDropTipParams(PipetteIdMixin, MovementMixin):
         description=(
             "Whether to utilize the critical point of the tip configuraiton when moving to an addressable area."
             " If True, this command will ignore the tip configuration and use the center of the entire instrument"
-            " of the entire instrument as the critical point for movement."
+            " as the critical point for movement."
             " If False, this command will use the critical point provided by the current tip configuration."
         ),
     )
@@ -122,6 +122,7 @@ class MoveToAddressableAreaForDropTipImplementation(
             force_direct=params.forceDirect,
             minimum_z_height=params.minimumZHeight,
             speed=params.speed,
+            ignore_tip_configuration=params.ignoreTipConfiguration,
         )
 
         return MoveToAddressableAreaForDropTipResult(position=DeckPoint(x=x, y=y, z=z))
