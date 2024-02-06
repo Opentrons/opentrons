@@ -1,4 +1,3 @@
-
 import asyncio
 from concurrent.futures import Future
 import contextlib
@@ -493,7 +492,9 @@ class OT3API(
         # start the updates and yield the progress
         async with self._motion_lock:
             try:
-                async for update_status in self._backend.update_firmware(subsystems, force):
+                async for update_status in self._backend.update_firmware(
+                    subsystems, force
+                ):
                     yield update_status
             except SubsystemUpdating as e:
                 raise UpdateOngoingError(e.msg) from e
