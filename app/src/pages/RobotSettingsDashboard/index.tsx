@@ -9,7 +9,6 @@ import {
   TouchscreenBrightness,
   TouchScreenSleep,
   NetworkSettings,
-  Privacy,
   RobotName,
   RobotSettingsJoinOtherNetwork,
   RobotSettingsSelectAuthenticationType,
@@ -47,7 +46,6 @@ export type SettingOption =
   | 'TouchscreenSleep'
   | 'TouchscreenBrightness'
   | 'TextSize'
-  | 'Privacy'
   | 'DeviceReset'
   | 'UpdateChannel'
   | 'EthernetConnectionDetails'
@@ -150,10 +148,6 @@ export function RobotSettingsDashboard(): JSX.Element {
       return <TouchScreenSleep setCurrentOption={setCurrentOption} />
     case 'TouchscreenBrightness':
       return <TouchscreenBrightness setCurrentOption={setCurrentOption} />
-    case 'Privacy':
-      return (
-        <Privacy robotName={robotName} setCurrentOption={setCurrentOption} />
-      )
     // TODO(bh, 2023-6-9): TextSize does not appear to be active in the app yet
     // case 'TextSize':
     //   return <TextSize setCurrentOption={setCurrentOption} />

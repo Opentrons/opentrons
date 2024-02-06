@@ -24,7 +24,6 @@ const Template: Story<React.ComponentProps<typeof NavTab>> = args => (
   >
     <MemoryRouter initialEntries={['/general']}>
       <NavTab to="/general" tabName="General" />
-      <NavTab to="/privacy" tabName="Privacy" />
       <NavTab to="/advanced" tabName="Advanced" />
       <NavTab to="/feature-flags" tabName="Feature flags" />
     </MemoryRouter>

@@ -33,7 +33,6 @@ import { RobotSettingsCalibration } from '../../../organisms/RobotSettingsCalibr
 import { RobotSettingsAdvanced } from '../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'
 import { RobotSettingsNetworking } from '../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsFeatureFlags } from '../../../organisms/Devices/RobotSettings/RobotSettingsFeatureFlags'
-import { RobotSettingsPrivacy } from '../../../organisms/Devices/RobotSettings/RobotSettingsPrivacy'
 import { ReachableBanner } from '../../../organisms/Devices/ReachableBanner'
 
 import type { DesktopRouteParams, RobotSettingsTab } from '../../../App/types'
@@ -43,7 +42,6 @@ export function RobotSettings(): JSX.Element | null {
   const { robotName, robotSettingsTab } = useParams<DesktopRouteParams>()
   const robot = useRobot(robotName)
   const isCalibrationDisabled = robot?.status !== CONNECTABLE
-  const isPrivacyDisabled = robot?.status === UNREACHABLE
   const isNetworkingDisabled = robot?.status === UNREACHABLE
   const [showRobotBusyBanner, setShowRobotBusyBanner] = React.useState<boolean>(
     false
@@ -76,7 +74,6 @@ export function RobotSettings(): JSX.Element | null {
       />
     ),
     'feature-flags': <RobotSettingsFeatureFlags robotName={robotName} />,
-    privacy: <RobotSettingsPrivacy robotName={robotName} />,
   }
 
   const devToolsOn = useSelector(getDevtoolsEnabled)
@@ -93,8 +90,7 @@ export function RobotSettings(): JSX.Element | null {
     robotSettingsTab === 'calibration' && isCalibrationDisabled
   const cannotViewFeatureFlags =
     robotSettingsTab === 'feature-flags' && !devToolsOn
-  const cannotViewPrivacy = robotSettingsTab === 'privacy' && isPrivacyDisabled
-  if (cannotViewCalibration || cannotViewFeatureFlags || cannotViewPrivacy) {
+  if (cannotViewCalibration || cannotViewFeatureFlags) {
     return <Redirect to={`/devices/${robotName}/robot-settings/networking`} />
   }
 
@@ -144,11 +140,6 @@ export function RobotSettings(): JSX.Element | null {
               to={`/devices/${robotName}/robot-settings/networking`}
               tabName={t('networking')}
               disabled={isNetworkingDisabled}
-            />
-            <NavTab
-              to={`/devices/${robotName}/robot-settings/privacy`}
-              tabName={t('privacy')}
-              disabled={isPrivacyDisabled}
             />
             <NavTab
               to={`/devices/${robotName}/robot-settings/advanced`}
