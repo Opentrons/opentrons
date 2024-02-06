@@ -1,7 +1,8 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { fireEvent, screen, cleanup } from '@testing-library/react'
+import { fixture_tiprack_10_ul } from '@opentrons/shared-data/labware/fixtures/2'
 import { renderWithProviders } from '../../../../__testing-utils__' 
 import { i18n } from '../../../../localization'
 import { getNewProtocolModal } from '../../../../navigation/selectors'
@@ -22,58 +23,21 @@ import { getAllowAllTipracks } from '../../../../feature-flags/selectors'
 import { getTiprackOptions } from '../../utils'
 import { CreateFileWizard } from '..'
 
-jest.mock('../../../../navigation/selectors')
-jest.mock('../../../../load-file/selectors')
-jest.mock('../../../../labware-defs/selectors')
-jest.mock('../../../../navigation/actions')
-jest.mock('../../../../load-file/actions')
-jest.mock('../../../../labware-defs/actions')
-jest.mock('../../../../step-forms/actions')
-jest.mock('../../../../steplist/actions')
-jest.mock('../../../../step-forms/actions/additionalItems')
-jest.mock('../../../../feature-flags/selectors')
-jest.mock('../../../../labware-ingred/actions')
-jest.mock('../../utils')
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-const mockGetNewProtocolModal = getNewProtocolModal as jest.MockedFunction<
-  typeof getNewProtocolModal
->
-const mockGetCustomLabwareDefsByURI = getCustomLabwareDefsByURI as jest.MockedFunction<
-  typeof getCustomLabwareDefsByURI
->
-const mockToggleNewProtocolModal = toggleNewProtocolModal as jest.MockedFunction<
-  typeof toggleNewProtocolModal
->
-const mockCreateNewProtocol = createNewProtocol as jest.MockedFunction<
-  typeof createNewProtocol
->
-const mockCreateCustomLabwareDefAction = createCustomLabwareDefAction as jest.MockedFunction<
-  typeof createCustomLabwareDefAction
->
-const mockCreatePipettes = createPipettes as jest.MockedFunction<
-  typeof createPipettes
->
-const mockCreateContainer = createContainer as jest.MockedFunction<
-  typeof createContainer
->
-const mockToggleIsGripperRequired = toggleIsGripperRequired as jest.MockedFunction<
-  typeof toggleIsGripperRequired
->
-const mockGetAllowAllTipracks = getAllowAllTipracks as jest.MockedFunction<
-  typeof getAllowAllTipracks
->
-const mockGetLabwareDefsByURI = getLabwareDefsByURI as jest.MockedFunction<
-  typeof getLabwareDefsByURI
->
-const mockGetTiprackOptions = getTiprackOptions as jest.MockedFunction<
-  typeof getTiprackOptions
->
-const mockCreateModule = createModule as jest.MockedFunction<
-  typeof createModule
->
-const mockCreateDeckFixture = createDeckFixture as jest.MockedFunction<
-  typeof createDeckFixture
->
+vi.mock('../../../../navigation/selectors')
+vi.mock('../../../../load-file/selectors')
+vi.mock('../../../../labware-defs/selectors')
+vi.mock('../../../../navigation/actions')
+vi.mock('../../../../load-file/actions')
+vi.mock('../../../../labware-defs/actions')
+vi.mock('../../../../step-forms/actions')
+vi.mock('../../../../steplist/actions')
+vi.mock('../../../../step-forms/actions/additionalItems')
+vi.mock('../../../../feature-flags/selectors')
+vi.mock('../../../../labware-ingred/actions')
+vi.mock('../../utils')
+
 const render = () => {
   return renderWithProviders(<CreateFileWizard />, { i18nInstance: i18n })[0]
 }
@@ -86,12 +50,12 @@ const ten = '10uL'
 
 describe('CreateFileWizard', () => {
   beforeEach(() => {
-    mockGetNewProtocolModal.mockReturnValue(true)
-    mockGetAllowAllTipracks.mockReturnValue(false)
-    mockGetLabwareDefsByURI.mockReturnValue({
+    vi.mocked(getNewProtocolModal).mockReturnValue(true)
+    vi.mocked(getAllowAllTipracks).mockReturnValue(false)
+    vi.mocked(getLabwareDefsByURI).mockReturnValue({
       [ten]: fixtureTipRack10ul,
     })
-    mockGetTiprackOptions.mockReturnValue([
+    vi.mocked(getTiprackOptions).mockReturnValue([
       {
         name: '10uL tipracks',
         value: 'opentrons/opentrons_96_tiprack_10ul/1',
@@ -101,6 +65,9 @@ describe('CreateFileWizard', () => {
         value: 'opentrons/opentrons_96_tiprack_300ul/1',
       },
     ])
+  })
+  afterEach(() => {
+    cleanup()
   })
   it('renders the wizard for an OT-2', async () => {
     render()
@@ -135,10 +102,10 @@ describe('CreateFileWizard', () => {
     screen.getByText('Step 6 / 6')
     //  no modules and continue
     fireEvent.click(screen.getByRole('button', { name: 'Review file details' }))
-    expect(mockCreateNewProtocol).toHaveBeenCalled()
-    expect(mockCreatePipettes).toHaveBeenCalled()
-    expect(mockCreateModule).not.toHaveBeenCalled()
-    expect(mockCreateContainer).toHaveBeenCalled()
+    expect(vi.mocked(createNewProtocol)).toHaveBeenCalled()
+    expect(vi.mocked(createPipettes)).toHaveBeenCalled()
+    expect(vi.mocked(createModule)).not.toHaveBeenCalled()
+    expect(vi.mocked(createContainer)).toHaveBeenCalled()
   })
   it('renders the wizard and clicking on the exit button calls correct selector', () => {
     render()
@@ -148,14 +115,14 @@ describe('CreateFileWizard', () => {
     const next = screen.getByRole('button', { name: 'Next' })
     fireEvent.click(next)
     fireEvent.click(screen.getByText('exit'))
-    expect(mockToggleNewProtocolModal).toHaveBeenCalled()
+    expect(vi.mocked(toggleNewProtocolModal)).toHaveBeenCalled()
   })
   it('renders the wizard for a Flex with custom tiprack', () => {
     const Custom = 'custom'
-    mockGetCustomLabwareDefsByURI.mockReturnValue({
+    vi.mocked(getCustomLabwareDefsByURI).mockReturnValue({
       [Custom]: fixtureTipRack10ul,
     })
-    mockGetTiprackOptions.mockReturnValue([
+    vi.mocked(getTiprackOptions).mockReturnValue([
       {
         name: '200uL Flex tipracks',
         value: 'opentrons/opentrons_flex_96_tiprack_200ul/1',
@@ -218,10 +185,10 @@ describe('CreateFileWizard', () => {
     fireEvent.click(screen.getByLabelText('EquipmentOption_flex_Gripper'))
     fireEvent.click(screen.getByLabelText('EquipmentOption_flex_Waste Chute'))
     fireEvent.click(screen.getByRole('button', { name: 'Review file details' }))
-    expect(mockCreateNewProtocol).toHaveBeenCalled()
-    expect(mockCreatePipettes).toHaveBeenCalled()
-    expect(mockCreateCustomLabwareDefAction).toHaveBeenCalled()
-    expect(mockToggleIsGripperRequired).toHaveBeenCalled()
-    expect(mockCreateDeckFixture).toHaveBeenCalled()
+    expect(vi.mocked(createNewProtocol)).toHaveBeenCalled()
+    expect(vi.mocked(createPipettes)).toHaveBeenCalled()
+    expect(vi.mocked(createCustomLabwareDefAction)).toHaveBeenCalled()
+    expect(vi.mocked(toggleIsGripperRequired)).toHaveBeenCalled()
+    expect(vi.mocked(createDeckFixture)).toHaveBeenCalled()
   })
 })

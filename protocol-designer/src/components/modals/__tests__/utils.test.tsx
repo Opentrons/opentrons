@@ -1,8 +1,12 @@
-import { getTiprackOptions, TiprackOption } from '../utils'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import { describe, it, expect } from 'vitest'
+import {
+  fixture_tiprack_10_ul,
+  fixture_tiprack_300_ul
+} from '@opentrons/shared-data/labware/fixtures/2'
+import { getTiprackOptions } from '../utils'
 
-import { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { TiprackOption } from '../utils'
 
 const fixtureTipRack10ul = {
   ...fixture_tiprack_10_ul,

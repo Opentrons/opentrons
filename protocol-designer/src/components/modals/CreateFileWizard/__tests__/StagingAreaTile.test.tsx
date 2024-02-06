@@ -1,15 +1,22 @@
 import * as React from 'react'
 import { screen } from '@testing-library/react'
+import '@testing-library/jest-dom/vitest'
 import { vi, describe, beforeEach, expect, it } from 'vitest'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-import { DeckConfigurator } from '@opentrons/components'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../localization'
 import { StagingAreaTile } from '../StagingAreaTile'
 
+import type * as Components  from '@opentrons/components'
 import type { FormState, WizardTileProps } from '../types'
 
-vi.mock('@opentrons/components/src/hardware-sim/DeckConfigurator/index')
+vi.mock('@opentrons/components', async (importOriginal) => {
+  const actual = await importOriginal<typeof Components>()
+  return {
+    ...actual,
+    DeckConfigurator: () => (<div>mock deck configurator</div>)
+  }
+})
 
 
 const render = (props: React.ComponentProps<typeof StagingAreaTile>) => {
@@ -41,7 +48,6 @@ describe('StagingAreaTile', () => {
       ...props,
       ...mockWizardTileProps,
     } as WizardTileProps
-    vi.mocked(DeckConfigurator).mockReturnValue(<div>mock deck configurator</div>)
   })
   it('renders null when robot type is ot-2', () => {
     render(props)

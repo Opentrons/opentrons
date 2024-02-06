@@ -1,4 +1,7 @@
 import * as React from 'react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { screen, cleanup } from '@testing-library/react'
 import { BORDERS, COLORS } from '@opentrons/components'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { EquipmentOption } from '../EquipmentOption'
@@ -12,22 +15,25 @@ describe('EquipmentOption', () => {
 
   beforeEach(() => {
     props = {
-      onClick: jest.fn(),
+      onClick: vi.fn(),
       isSelected: false,
       text: 'mockText',
     }
   })
+  afterEach(() => {
+    cleanup()
+  })
   it('renders the equipment option without checkbox or image', () => {
-    const { getByText } = render(props)
-    getByText('mockText')
+    render(props)
+    screen.getByText('mockText')
   })
   it('renders the equipment option that is disabled', () => {
     props = {
       ...props,
       disabled: true,
     }
-    const { getByLabelText } = render(props)
-    expect(getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
+    render(props)
+    expect(screen.getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
       `background-color: ${COLORS.white}`
     )
   })
@@ -37,13 +43,13 @@ describe('EquipmentOption', () => {
       showCheckbox: true,
       image: <img src="img" />,
     }
-    const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('mockText')
-    getByRole('img')
+    render(props)
+    screen.getByText('mockText')
+    screen.getByRole('img')
     expect(
-      getByLabelText('EquipmentOption_checkbox-blank-outline')
+      screen.getByLabelText('EquipmentOption_checkbox-blank-outline')
     ).toHaveStyle(`color: ${COLORS.grey50}`)
-    expect(getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
+    expect(screen.getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
       `border: ${BORDERS.lineBorder}`
     )
   })
@@ -53,12 +59,12 @@ describe('EquipmentOption', () => {
       isSelected: true,
       showCheckbox: true,
     }
-    const { getByText, getByLabelText } = render(props)
-    getByText('mockText')
-    expect(getByLabelText('EquipmentOption_checkbox-marked')).toHaveStyle(
+    render(props)
+    screen.getByText('mockText')
+    expect(screen.getByLabelText('EquipmentOption_checkbox-marked')).toHaveStyle(
       `color: ${COLORS.blue50}`
     )
-    expect(getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
+    expect(screen.getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
       `border: ${BORDERS.activeLineBorder}`
     )
   })

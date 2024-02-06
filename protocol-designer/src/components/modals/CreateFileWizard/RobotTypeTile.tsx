@@ -18,7 +18,7 @@ import {
   PrimaryButton,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { FLEX_DISPLAY_NAME, FLEX_ROBOT_TYPE, OT2_DISPLAY_NAME, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import opentronsFlexImage from '../../../images/OpentronsFlex.png'
 import OT2Image from '../../../images/OT2.png'
 import { HandleEnter } from './HandleEnter'
@@ -95,15 +95,16 @@ interface RobotTypeOptionProps {
 function RobotTypeOption(props: RobotTypeOptionProps): JSX.Element {
   const { isSelected, onClick, robotType } = props
   const { displayName, imageSrc } = CONTENTS_BY_ROBOT_TYPE[robotType]
+  const robotDisplayName = robotType === FLEX_ROBOT_TYPE ? FLEX_DISPLAY_NAME : OT2_DISPLAY_NAME
   return (
     <Flex
-      aria-label={`RobotTypeTile_${robotType}`}
+      aria-label={`${robotDisplayName} option`}
       flex="1 0 auto"
       onClick={onClick}
       css={isSelected ? SELECTED_OPTIONS_STYLE : UNSELECTED_OPTIONS_STYLE}
     >
       <img
-        aria-label={imageSrc}
+        aria-label={`${robotDisplayName} image`}
         src={imageSrc}
         css={css`
           max-width: 11rem;

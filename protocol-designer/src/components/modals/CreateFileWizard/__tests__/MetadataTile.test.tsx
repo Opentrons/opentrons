@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { fireEvent, screen, cleanup } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../../__testing-utils__' 
 import { i18n } from '../../../../localization'
@@ -22,10 +24,10 @@ const values = {
 } as FormState
 
 const mockWizardTileProps: Partial<WizardTileProps> = {
-  goBack: jest.fn(),
-  proceed: jest.fn(),
-  watch: jest.fn((name: keyof typeof values) => values[name]) as any,
-  register: jest.fn(),
+  goBack: vi.fn(),
+  proceed: vi.fn(),
+  watch: vi.fn((name: keyof typeof values) => values[name]) as any,
+  register: vi.fn(),
   formState: {
     errors: { fields: { name: null } },
     touchedFields: { fields: { name: true } },
@@ -40,6 +42,9 @@ describe('MetadataTile', () => {
       ...props,
       ...mockWizardTileProps,
     } as WizardTileProps
+  })
+  afterEach(() => {
+    cleanup()
   })
   it('renders the tile with all the information, expect back to be clickable but proceed disabled', () => {
     render(props)

@@ -1,12 +1,11 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, cleanup } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
-  FLEX_ROBOT_TYPE,
-  LabwareDefinition2,
-  OT2_ROBOT_TYPE,
-} from '@opentrons/shared-data'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+  fixture_tiprack_10_ul,
+  fixture_tiprack_300_ul,
+} from '@opentrons/shared-data/labware/fixtures/2'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../localization'
 import { getLabwareDefsByURI } from '../../../../labware-defs/selectors'
@@ -14,24 +13,25 @@ import { getAllowAllTipracks } from '../../../../feature-flags/selectors'
 import { getTiprackOptions } from '../../utils'
 import { PipetteTipsTile } from '../PipetteTipsTile'
 import { EquipmentOption } from '../EquipmentOption'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { FormPipettesByMount } from '../../../../step-forms'
 import type { FormState, WizardTileProps } from '../types'
 
-jest.mock('../../../../labware-defs/selectors')
-jest.mock('../../../../feature-flags/selectors')
-jest.mock('../../utils')
-jest.mock('../EquipmentOption')
+vi.mock('../../../../labware-defs/selectors')
+vi.mock('../../../../feature-flags/selectors')
+vi.mock('../../utils')
+vi.mock('../EquipmentOption')
 
-const mockEquipmentOption = EquipmentOption as jest.MockedFunction<
+const mockEquipmentOption = EquipmentOption as vi.MockedFunction<
   typeof EquipmentOption
 >
-const mockGetAllowAllTipracks = getAllowAllTipracks as jest.MockedFunction<
+const mockGetAllowAllTipracks = getAllowAllTipracks as vi.MockedFunction<
   typeof getAllowAllTipracks
 >
-const mockGetLabwareDefsByURI = getLabwareDefsByURI as jest.MockedFunction<
+const mockGetLabwareDefsByURI = getLabwareDefsByURI as vi.MockedFunction<
   typeof getLabwareDefsByURI
 >
-const mockGetTiprackOptions = getTiprackOptions as jest.MockedFunction<
+const mockGetTiprackOptions = getTiprackOptions as vi.MockedFunction<
   typeof getTiprackOptions
 >
 const render = (props: React.ComponentProps<typeof PipetteTipsTile>) => {
@@ -64,9 +64,9 @@ const values = {
 } as FormState
 
 const mockWizardTileProps: Partial<WizardTileProps> = {
-  goBack: jest.fn(),
-  proceed: jest.fn(),
-  watch: jest.fn((name: keyof typeof values) => values[name]) as any,
+  goBack: vi.fn(),
+  proceed: vi.fn(),
+  watch: vi.fn((name: keyof typeof values) => values[name]) as any,
 }
 
 const fixtureTipRack10ul = {
@@ -106,6 +106,9 @@ describe('PipetteTipsTile', () => {
         value: 'opentrons/opentrons_flex_96_tiprack_1000ul/1',
       },
     ])
+  })
+  afterEach(() => {
+    cleanup()
   })
   it('renders default tiprack options for 50uL flex pipette and btn ctas work', () => {
     render(props)
@@ -173,9 +176,9 @@ describe('PipetteTipsTile', () => {
     } as FormState
 
     const mockWizardTileProps: Partial<WizardTileProps> = {
-      goBack: jest.fn(),
-      proceed: jest.fn(),
-      watch: jest.fn((name: keyof typeof values) => values[name]) as any,
+      goBack: vi.fn(),
+      proceed: vi.fn(),
+      watch: vi.fn((name: keyof typeof values) => values[name]) as any,
     }
 
     props = {

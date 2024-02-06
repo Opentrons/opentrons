@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { fireEvent, screen, cleanup } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../../__testing-utils__' 
 import { i18n } from '../../../../localization'
@@ -9,9 +11,9 @@ import { EquipmentOption } from '../EquipmentOption'
 import type { FormPipettesByMount } from '../../../../step-forms'
 import type { FormState, WizardTileProps } from '../types'
 
-jest.mock('../EquipmentOption')
+vi.mock('../EquipmentOption')
 
-const mockEquipmentOption = EquipmentOption as jest.MockedFunction<
+const mockEquipmentOption = EquipmentOption as vi.MockedFunction<
   typeof EquipmentOption
 >
 
@@ -42,10 +44,10 @@ const values = {
 } as FormState
 
 const mockWizardTileProps: Partial<WizardTileProps> = {
-  goBack: jest.fn(),
-  proceed: jest.fn(),
-  setValue: jest.fn(),
-  watch: jest.fn((name: keyof typeof values) => values[name]) as any,
+  goBack: vi.fn(),
+  proceed: vi.fn(),
+  setValue: vi.fn(),
+  watch: vi.fn((name: keyof typeof values) => values[name]) as any,
 }
 
 describe('PipetteTypeTile', () => {
@@ -61,6 +63,9 @@ describe('PipetteTypeTile', () => {
       display96Channel: true,
     }
     mockEquipmentOption.mockReturnValue(<div>mock EquipmentOption</div>)
+  })
+  afterEach(() => {
+    cleanup()
   })
   it('renders the correct pipettes for flex with no empty pip allowed and btn ctas work', () => {
     render(props)
@@ -103,9 +108,9 @@ describe('PipetteTypeTile', () => {
     } as FormState
 
     const mockWizardTileProps: Partial<WizardTileProps> = {
-      proceed: jest.fn(),
-      setValue: jest.fn(),
-      watch: jest.fn((name: keyof typeof values) => values[name]) as any,
+      proceed: vi.fn(),
+      setValue: vi.fn(),
+      watch: vi.fn((name: keyof typeof values) => values[name]) as any,
     }
     props = {
       ...props,

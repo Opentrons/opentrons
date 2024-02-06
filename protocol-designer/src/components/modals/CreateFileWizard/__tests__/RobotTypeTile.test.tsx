@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { fireEvent, screen, cleanup } from '@testing-library/react'
 import { COLORS } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../../__testing-utils__'
@@ -23,11 +25,11 @@ const values = {
 } as FormState
 
 const mockWizardTileProps: Partial<WizardTileProps> = {
-  proceed: jest.fn(),
-  setValue: jest.fn(),
+  proceed: vi.fn(),
+  setValue: vi.fn(),
   //  @ts-expect-error: ts can't tell that its a nested key
   //  in values
-  watch: jest.fn(() => values['fields.robotType']),
+  watch: vi.fn(() => values['fields.robotType']),
 }
 
 describe('RobotTypeTile', () => {
@@ -39,16 +41,19 @@ describe('RobotTypeTile', () => {
       ...mockWizardTileProps,
     } as WizardTileProps
   })
+  afterEach(() => {
+    cleanup()
+  })
 
   it('renders robot images and clicking on them changing the style', () => {
     render(props)
-    screen.getByLabelText('OpentronsFlex.png')
-    screen.getByLabelText('OT2.png')
-    const flex = screen.getByLabelText('RobotTypeTile_OT-3 Standard')
+    screen.getByLabelText('Opentrons Flex image')
+    screen.getByLabelText('Opentrons OT-2 image')
+    const flex = screen.getByLabelText('Opentrons Flex option')
     fireEvent.click(flex)
     expect(props.setValue).toHaveBeenCalled()
     expect(flex).toHaveStyle(`background-color: ${COLORS.white}`)
-    const ot2 = screen.getByLabelText('RobotTypeTile_OT-2 Standard')
+    const ot2 = screen.getByLabelText('Opentrons OT-2 option')
     fireEvent.click(ot2)
     expect(props.setValue).toHaveBeenCalled()
     expect(ot2).toHaveStyle(`background-color: ${COLORS.blue10}`)
