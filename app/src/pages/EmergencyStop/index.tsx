@@ -31,8 +31,8 @@ const ESTOP_STATUS_REFETCH_INTERVAL_MS = 10000
 export function EmergencyStop(): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
-  const seen = useSelector(getAnalyticsOptInSeen)
-  const hasOptedIn = useSelector(getAnalyticsOptedIn)
+  const seenOptIn = useSelector(getAnalyticsOptInSeen)
+  const optedIn = useSelector(getAnalyticsOptedIn)
 
   // Note here the touchscreen app is using status since status is linked to EstopPhysicalStatuses
   // left notPresent + right disengaged => disengaged
@@ -106,7 +106,7 @@ export function EmergencyStop(): JSX.Element {
           buttonText={i18n.format(t('shared:continue'), 'capitalize')}
           disabled={!isEstopConnected}
           onClick={() => {
-            seen && hasOptedIn
+            seenOptIn && optedIn
               ? history.push('/robot-settings/rename-robot')
               : history.push('/privacy-policy')
           }}

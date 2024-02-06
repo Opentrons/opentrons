@@ -35,8 +35,8 @@ export function PrivacyPolicy(): JSX.Element {
   const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
-  const hasOptedIn = useSelector(getAnalyticsOptedIn)
-  const seen = useSelector(getAnalyticsOptInSeen)
+  const seenOptedIn = useSelector(getAnalyticsOptInSeen)
+  const optedIn = useSelector(getAnalyticsOptedIn)
 
   const handleAgree = (): void => {
     dispatch(setAnalyticsOptInSeen())
@@ -44,14 +44,14 @@ export function PrivacyPolicy(): JSX.Element {
   }
 
   React.useEffect(() => {
-    if (hasOptedIn && seen) {
+    if (seenOptedIn && optedIn) {
       if (isUnboxingFlowOngoing) {
         history.push('/robot-settings/rename-robot')
       } else {
         history.push('/dashboard')
       }
     }
-  }, [hasOptedIn, seen])
+  }, [seenOptedIn, optedIn])
 
   return (
     <>
