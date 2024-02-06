@@ -132,6 +132,7 @@ module.exports = {
       env: { jest: true },
       extends: ['plugin:testing-library/react'],
       rules: {
+        'testing-library/no-manual-cleanup': 'off',
         'testing-library/prefer-screen-queries': 'warn',
       },
     },
