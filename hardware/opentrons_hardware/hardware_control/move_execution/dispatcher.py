@@ -50,7 +50,7 @@ log = logging.getLogger(__name__)
 
 
 
-class MoveExecutor:
+class MoveDispatcher:
     """A message listener that manages the sending of execute move group messages."""
 
     def __init__(self, move_groups: MoveGroups, start_at_index: int = 0) -> None:

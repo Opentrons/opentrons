@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Union, Tuple, List, Dict
+from typing import Union, Tuple, List, Dict, Set
 
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
@@ -16,8 +16,9 @@ from opentrons_hardware.firmware_bindings.utils import (
     Int32Field,
 )
 from opentrons_hardware.firmware_bindings.constants import (
-    MoveStopCondition,
+    GearMotorId,
     MoveAckId,
+    MoveStopCondition,
 )
 
 SchedulableMoves = Union[AddLinearMoveRequest, HomeRequest, GripperGripRequest, GripperHomeRequest, AddBrushedLinearMoveRequest, TipActionRequest]
@@ -36,11 +37,11 @@ STRICT_CONDITIONS = [
 class ScheduledMove:
 
     message_index: UInt32Field
-    group_id: int
     seq_id: int
     node_id: int
     stop_condition: MoveStopCondition
     duration: float
+    special_id: GearMotorId | None = None
 
     def accept_ack(self, ack: MoveAckId) -> bool:
         """Whether or not the ACK is acceptable for the move's stop condition."""
@@ -53,26 +54,20 @@ class ScheduledMove:
         ]
 
 
-
-@dataclass(order=True)
-class ScheduledTipActionMove(ScheduledMove):
-
-    tip_action_motors: List[GearMotorId] = field(default_factory=list)
-
-    def all_motors_repsonded(self) -> bool:
-        return not self.tip_action_motors
-
-
 @dataclass
 class ScheduledGroup:
+                                                                                                    
+    total_duration: float = 0.0
+    moves: Dict[int, List[ScheduledMove]] = field(init=False)
+    pending: Set[UInt32Field] = []
 
-    moves: Dict[int, ScheduledMove]
-    awaiting: List[UInt32Field] = field(init=False)
-    duration: float = field(init=False)
-
-    def __post_init__(self) -> None:
-        self.awaiting = list(m.message_index for m in self.moves.values())
-        self.duration = sum(m.duration for m in self.moves.values())
+    def add(self, group_id: int, move: ScheduledMove) -> None:
+        self.moves[group_id].append(move)
+        self.pending.add(move.message_index)
+        self.total_duration += move.duration
 
     def moves_completed(self) -> bool:
-        return not self.awaiting
+        return self.total_duration > 0.0 and not len(self.pending)
+
+    def handel_complete(self, message_index: UInt32Field):
+        self.pending.remove(message_index)

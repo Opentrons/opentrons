@@ -89,7 +89,7 @@ Completions = List[CompletionPacket]
 log = logging.getLogger(__name__)
 
 
-class MoveGroupRunner:
+class MoveRunner:
     """A Move command runner."""
     def __init__(
         self,
@@ -100,46 +100,34 @@ class MoveGroupRunner:
         self._scheduler = MoveScheduler(
             move_groups=move_groups,
             start_index=start_index,
-            ignore_stalls=ignore_stalls
-        )
-        self._is_prepped: bool = False
+            ignore_stalls=ignore_stalls)
+        self._dispatcher: Optional[MoveDispatcher] = None
+        self._scheduled = ScheduledGroup()
     
     @property
     def scheduler(self) -> MoveScheduler:
         return self._scheduler
-
-    @staticmethod
-    def _has_moves(move_groups: MoveGroups) -> bool:
-        for move_group in move_groups:
-            for move in move_group:
-                for node, step in move.items():
-                    return True
-        return False
+    
+    @property
+    def is_prepped(self) -> bool:
+        return self._scheduler.ready_for_executor
 
     async def schedule(self, can_messenger: CanMessenger) -> None:
         """Schedule the moves. The first thing that happens during run()."""
-        if not self._scheduler.has_moves():
-            log.debug("No moves. Nothing to do.")
-            return
-        await self._clear_groups(can_messenger)
-        await self._schedule_groups(can_messenger)
-        self._is_prepped = True
+        self._scheduled = await self._scheduler.schedule(can_messenger=can_messenger)
 
-    async def execute(
+    async def dispatch(
         self, can_messenger: CanMessenger
     ) -> NodeDict[MotorPositionStatus]:
         """Execute a pre-prepared move group. The second thing that run() does.
 
-        prep() and execute() can be used to replace a single call to run() to
+        schedule() and dispatch() can be used to replace a single call to run() to
         ensure tighter timing, if you want something else to start as soon as
         possible to the actual execution of the move.
         """
-        if not self._scheduler.has_moves():
-            log.debug("No moves. Nothing to do.")
-            return {}
-        if not self._is_prepped:
+        if not self._scheduled:
             raise GeneralError(
-                message="A move group must be prepped before it can be executed."
+                message="Cannot execute unscheduled move groups."
             )
         move_completion_data = await self._move(can_messenger, self._start_at_index)
         return self._accumulate_move_completions(move_completion_data)
@@ -155,15 +143,15 @@ class MoveGroupRunner:
             acknowledged completing moves.
 
         This function does two things:
-        1. Schedule by sending all the data for the moves over to the devices
+        1. Issue scheduled moves to the appropriate nodes
         2. Execute the coordinated moves
 
-        schedule() and execute() can be used to replace a single call to run() to
+        schedule() and dispatch() can be used to replace a single call to run() to
         ensure tighter timing, if you want something else to start as soon as
         possible to the actual execution of the move.
         """
         await self.schedule(can_messenger)
-        return await self.execute(can_messenger)
+        return await self.dispatch(can_messenger)
 
     @staticmethod
     def _accumulate_move_completions(
