@@ -566,7 +566,7 @@ def test_move_to_moveable_trash_addressable_area(
     geometry_view: GeometryView,
     subject: MotionView,
 ) -> None:
-    """Ensure that a move request to a moveableTrash addressable executes with no destination critical point."""
+    """Ensure that a move request to a moveableTrash addressable utilizes the Instrument Center critical point."""
     location = CurrentAddressableArea(
         pipette_id="123", addressable_area_name="moveableTrashA1"
     )
@@ -585,7 +585,11 @@ def test_move_to_moveable_trash_addressable_area(
         geometry_view.get_extra_waypoints(location, DeckSlotName.SLOT_1)
     ).then_return([])
 
-    waypoints = [motion_planning.Waypoint(position=Point(1, 2, 3), critical_point=None)]
+    waypoints = [
+        motion_planning.Waypoint(
+            position=Point(1, 2, 3), critical_point=CriticalPoint.INSTRUMENT_XY_CENTER
+        )
+    ]
 
     decoy.when(
         motion_planning.get_waypoints(
@@ -595,7 +599,7 @@ def test_move_to_moveable_trash_addressable_area(
             max_travel_z=1337,
             min_travel_z=123,
             dest=Point(x=4, y=5, z=6),
-            dest_cp=None,
+            dest_cp=CriticalPoint.INSTRUMENT_XY_CENTER,
             xy_waypoints=[],
         )
     ).then_return(waypoints)
@@ -608,6 +612,7 @@ def test_move_to_moveable_trash_addressable_area(
         max_travel_z=1337,
         force_direct=True,
         minimum_z_height=123,
+        ignore_tip_configuration=True,
     )
 
     assert result == waypoints
