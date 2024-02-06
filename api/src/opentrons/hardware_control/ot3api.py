@@ -1,3 +1,4 @@
+
 import asyncio
 from concurrent.futures import Future
 import contextlib
@@ -490,19 +491,20 @@ class OT3API(
         """Start the firmware update for one or more subsystems and return update progress iterator."""
         subsystems = subsystems or set()
         # start the updates and yield the progress
-        try:
-            async for update_status in self._backend.update_firmware(subsystems, force):
-                yield update_status
-        except SubsystemUpdating as e:
-            raise UpdateOngoingError(e.msg) from e
-        except EnumeratedError:
-            raise
-        except BaseException as e:
-            mod_log.exception("Firmware update failed")
-            raise FirmwareUpdateFailedError(
-                message="Update failed because of uncaught error",
-                wrapping=[PythonException(e)],
-            ) from e
+        async with self._motion_lock:
+            try:
+                async for update_status in self._backend.update_firmware(subsystems, force):
+                    yield update_status
+            except SubsystemUpdating as e:
+                raise UpdateOngoingError(e.msg) from e
+            except EnumeratedError:
+                raise
+            except BaseException as e:
+                mod_log.exception("Firmware update failed")
+                raise FirmwareUpdateFailedError(
+                    message="Update failed because of uncaught error",
+                    wrapping=[PythonException(e)],
+                ) from e
 
     # Incidentals (i.e. not motion) API
 
