@@ -148,6 +148,7 @@ settings = [
         " need consistency with pre-v3.7.0 results. This only"
         " affects GEN1 P10S, P10M, P50S, P50M, and P300S pipettes.",
         robot_type=[RobotTypeEnum.OT2],
+        restart_required=True,
     ),
     SettingDefinition(
         _id="enableDoorSafetySwitch",
@@ -195,6 +196,7 @@ settings = [
         title="Disable stall detection on the Flex.",
         description="This is an Opentrons-internal setting for hardware-testing.",
         robot_type=[RobotTypeEnum.FLEX],
+        restart_required=True,
     ),
     SettingDefinition(
         _id="disableStatusBar",
@@ -212,12 +214,14 @@ settings = [
         ),  # Configured so this only shows if it has been set by a user
         robot_type=[RobotTypeEnum.FLEX],
         internal_only=True,
+        restart_required=True,
     ),
     SettingDefinition(
         _id="disableOverpressureDetection",
         title="Disable Flex pipette pressure sensing.",
         description="When this setting is on, Flex will continue its activities regardless of pressure changes inside the pipette. Do not turn this setting on unless you are intentionally causing pressures over 8 kPa inside the pipette air channel.",
         robot_type=[RobotTypeEnum.FLEX],
+        restart_required=True,
     ),
 ]
 

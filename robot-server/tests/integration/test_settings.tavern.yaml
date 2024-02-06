@@ -34,7 +34,7 @@ stages:
             old_id: Null
             title: Use older aspirate behavior
             description: !re_search 'Aspirate with the less accurate volumetric calibrations'
-            restart_required: false
+            restart_required: true
             value: !anything
           - id: enableDoorSafetySwitch
             old_id: Null
