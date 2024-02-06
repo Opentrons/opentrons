@@ -41,6 +41,7 @@ from ..types import (
     OnDeckLabwareLocation,
     AddressableAreaLocation,
     AddressableOffsetVector,
+    StagingSlotLocation,
 )
 from .config import Config
 from .labware import LabwareView
@@ -148,7 +149,9 @@ class GeometryView:
             highest_fixture_z,
         )
 
-    def get_highest_z_in_slot(self, slot: DeckSlotLocation) -> float:
+    def get_highest_z_in_slot(
+        self, slot: Union[DeckSlotLocation, StagingSlotLocation]
+    ) -> float:
         """Get the highest Z-point of all items stacked in the given deck slot."""
         slot_item = self.get_slot_item(slot.slotName)
         if isinstance(slot_item, LoadedModule):

@@ -1,6 +1,5 @@
 """Tests for pipette state accessors in the protocol_engine state store."""
 from collections import OrderedDict
-from dataclasses import dataclass
 
 import pytest
 from typing import cast, Dict, List, Optional, Tuple, NamedTuple

@@ -1,7 +1,7 @@
 """Unit tests for the deck_conflict module."""
 
 import pytest
-from typing import ContextManager, Any, NamedTuple, List
+from typing import ContextManager, Any, NamedTuple, List, Tuple
 from decoy import Decoy
 from contextlib import nullcontext as does_not_raise
 from opentrons_shared_data.labware.dev_types import LabwareUri
@@ -354,7 +354,7 @@ module = LoadedModule(
     [("OT-3 Standard", DeckType.OT3_STANDARD)],
 )
 @pytest.mark.parametrize(
-    ["destination_well_point", "expected_raise"],
+    ["nozzle_bounds", "expected_raise"],
     [
         (Point(x=100, y=100, z=60), does_not_raise()),
         # Z-collisions
@@ -406,33 +406,36 @@ module = LoadedModule(
 def test_deck_conflict_raises_for_bad_partial_96_channel_move(
     decoy: Decoy,
     mock_state_view: StateView,
-    destination_well_point: Point,
+    nozzle_bounds: Tuple[Point, Point, Point, Point],
     expected_raise: ContextManager[Any],
 ) -> None:
     """It should raise errors when moving to locations with restrictions for partial tip 96-channel movement.
 
     Test premise:
     - we are using a pipette configured for COLUMN nozzle layout with primary nozzle A12
-    - there's a labware of height 50mm in C1
+    - there are labware of height 50mm in C1, D1 & D2
     - we are checking for conflicts when moving to a labware in C2.
       For each test case, we are moving to a different point in the destination labware,
-      with the same pipette and tip (tip length is 10mm)
+      with the same pipette and tip
     """
-    decoy.when(mock_state_view.pipettes.get_channels("pipette-id")).then_return(96)
-    decoy.when(
-        mock_state_view.pipettes.get_nozzle_layout_type("pipette-id")
-    ).then_return(NozzleConfigurationType.COLUMN)
+    # decoy.when(mock_state_view.pipettes.get_channels("pipette-id")).then_return(96)
+    # decoy.when(
+    #     mock_state_view.pipettes.get_nozzle_layout_type("pipette-id")
+    # ).then_return(NozzleConfigurationType.COLUMN)
+    destination_well_point = Point(x=123, y=123, z=123)
     decoy.when(mock_state_view.pipettes.get_primary_nozzle("pipette-id")).then_return(
         "A12"
     )
     decoy.when(
         mock_state_view.geometry.get_ancestor_slot_name("destination-labware-id")
     ).then_return(DeckSlotName.SLOT_C2)
-    decoy.when(
-        mock_state_view.geometry.get_highest_z_in_slot(
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_C1)
-        )
-    ).then_return(50)
+    for slot_name in [DeckSlotName.SLOT_C1, DeckSlotName.SLOT_D1, DeckSlotName.SLOT_D2]:
+        decoy.when(
+            mock_state_view.geometry.get_highest_z_in_slot(
+                DeckSlotLocation(slotName=slot_name)
+            )
+        ).then_return(50)
+
     decoy.when(
         mock_state_view.geometry.get_well_position(
             labware_id="destination-labware-id",
@@ -440,9 +443,11 @@ def test_deck_conflict_raises_for_bad_partial_96_channel_move(
             well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
         )
     ).then_return(destination_well_point)
-    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
-        TipGeometry(length=10, diameter=100, volume=0)
-    )
+    decoy.when(
+        mock_state_view.pipettes.get_nozzle_bounds_at_specified_move_to_position(
+            pipette_id="pipette-id", destination_position=destination_well_point
+        )
+    ).then_return(nozzle_bounds)
 
     with expected_raise:
         deck_conflict.check_safe_for_pipette_movement(
@@ -483,7 +488,7 @@ def test_deck_conflict_raises_for_bad_partial_96_channel_move_with_fixtures(
     - there's a waste chute with in D3
     - we are checking for conflicts when moving to column A12 of a labware in D2.
     """
-    decoy.when(mock_state_view.pipettes.get_channels("pipette-id")).then_return(96)
+    # decoy.when(mock_state_view.pipettes.get_channels("pipette-id")).then_return(96)
     decoy.when(
         mock_state_view.labware.get_display_name("destination-labware-id")
     ).then_return("destination-labware")
