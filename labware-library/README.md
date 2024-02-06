@@ -61,7 +61,7 @@ This project (along with our other front-end projects) uses [webpack][] to gener
 - Entry point is [`labware-library/src/index.tsx`][entry]
 - [Handlebars][] HTML template is [`labware-library/src/index.hbs`][template]
   - Post-build, the site is crawled and prerendered with [react-snap][]
-- Global CSS is [`labware-library/src/global.css`][global-style]
+- Global CSS is [`labware-library/src/global.module.css`][global-style]
   - All other CSS is used via [CSS Modules][]
 - All artifacts will be output to `labware-library/dist`
 
@@ -71,7 +71,7 @@ This project (along with our other front-end projects) uses [webpack][] to gener
 [base-config]: ../webpack-config
 [entry]: ./src/index.js
 [template]: ./src/index.hbs
-[global-style]: ./src/global.css
+[global-style]: ./src/global.module.css
 
 ### environment variables
 

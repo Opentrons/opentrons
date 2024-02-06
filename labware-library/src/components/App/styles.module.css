@@ -1,7 +1,7 @@
 /* app styles */
 @import '@opentrons/components/styles';
-@import '../../styles/breakpoints.css';
-@import '../../styles/spacing.css';
+@import '../../styles/breakpoints.module.css';
+@import '../../styles/spacing.module.css';
 
 .app {
   height: 100%;

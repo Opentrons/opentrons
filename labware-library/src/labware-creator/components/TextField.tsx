@@ -7,7 +7,7 @@ import { getLabel } from '../fields'
 import type { InputFieldProps } from '@opentrons/components'
 import type { LabwareFields } from '../fields'
 import type { FieldProps } from 'formik'
-import fieldStyles from './fieldStyles.css'
+import fieldStyles from './fieldStyles.module.css'
 
 interface Props {
   name: keyof LabwareFields

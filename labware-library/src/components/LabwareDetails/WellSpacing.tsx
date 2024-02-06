@@ -13,7 +13,7 @@ import {
   MM,
 } from '../../localization'
 
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 import { LabeledValueTable, LowercaseText } from '../ui'
 

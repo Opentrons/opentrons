@@ -4,7 +4,7 @@ import { getLabwareDefURI } from '@opentrons/shared-data'
 import { getFilteredDefinitions } from '../../filters'
 import { LabwareCard } from './LabwareCard'
 import { CustomLabwareCard } from './CustomLabwareCard'
-import styles from './styles.css'
+import styles from './styles.module.css'
 import type { FilterParams } from '../../types'
 
 export interface LabwareListProps {

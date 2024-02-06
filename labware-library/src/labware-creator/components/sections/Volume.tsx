@@ -7,7 +7,7 @@ import { FormAlerts } from '../alerts/FormAlerts'
 import { TextField } from '../TextField'
 import { SectionBody } from './SectionBody'
 
-import styles from '../../styles.css'
+import styles from '../../styles.module.css'
 
 const maskTo2Decimal = makeMaskToDecimal(2)
 

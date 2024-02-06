@@ -12,8 +12,8 @@ import { Field } from 'formik'
 import { reportFieldEdit } from '../analyticsUtils'
 import { getLabel, LabwareFields } from '../fields'
 import type { RichOption, RichOptions } from '../fields'
-import fieldStyles from './fieldStyles.css'
-import styles from './Dropdown.css'
+import fieldStyles from './fieldStyles.module.css'
+import styles from './Dropdown.module.css'
 
 export interface DropdownProps extends StyleProps {
   name: keyof LabwareFields

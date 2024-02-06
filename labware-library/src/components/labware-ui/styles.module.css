@@ -1,5 +1,5 @@
 @import '@opentrons/components/styles';
-@import '../../styles/spacing.css';
+@import '../../styles/spacing.module.css';
 
 .gallery_main {
   @apply --aspect-4-3;
