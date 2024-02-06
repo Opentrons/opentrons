@@ -1,3 +1,4 @@
+import { it, describe, expect } from 'vitest'
 import { maskToFloat, trimDecimals } from '../processing'
 describe('Value Casters', () => {
   describe('maskToFloat', () => {

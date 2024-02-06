@@ -22,18 +22,6 @@ vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../utils')
 vi.mock('../EquipmentOption')
 
-const mockEquipmentOption = EquipmentOption as vi.MockedFunction<
-  typeof EquipmentOption
->
-const mockGetAllowAllTipracks = getAllowAllTipracks as vi.MockedFunction<
-  typeof getAllowAllTipracks
->
-const mockGetLabwareDefsByURI = getLabwareDefsByURI as vi.MockedFunction<
-  typeof getLabwareDefsByURI
->
-const mockGetTiprackOptions = getTiprackOptions as vi.MockedFunction<
-  typeof getTiprackOptions
->
 const render = (props: React.ComponentProps<typeof PipetteTipsTile>) => {
   return renderWithProviders(<PipetteTipsTile {...props} />, {
     i18nInstance: i18n,
@@ -90,13 +78,13 @@ describe('PipetteTipsTile', () => {
       ...mockWizardTileProps,
       mount: 'left',
     }
-    mockGetAllowAllTipracks.mockReturnValue(false)
-    mockGetLabwareDefsByURI.mockReturnValue({
+    vi.mocked(getAllowAllTipracks).mockReturnValue(false)
+    vi.mocked(getLabwareDefsByURI).mockReturnValue({
       [ten]: fixtureTipRack10ul,
       [threeHundred]: fixtureTipRack300uL,
     })
-    mockEquipmentOption.mockReturnValue(<div>mock EquipmentOption</div>)
-    mockGetTiprackOptions.mockReturnValue([
+    vi.mocked(EquipmentOption).mockReturnValue(<div>mock EquipmentOption</div>)
+    vi.mocked(getTiprackOptions).mockReturnValue([
       {
         name: '200uL Flex tipracks',
         value: 'opentrons/opentrons_flex_96_tiprack_200ul/1',
@@ -128,7 +116,7 @@ describe('PipetteTipsTile', () => {
     screen.getByText('Upload a custom tiprack to select its definition')
   })
   it('renders the custom tip btn and section with a custom tip', () => {
-    mockGetTiprackOptions.mockReturnValue([
+    vi.mocked(getTiprackOptions).mockReturnValue([
       {
         name: '200uL Flex tipracks',
         value: 'opentrons/opentrons_flex_96_tiprack_200ul/1',
@@ -149,7 +137,7 @@ describe('PipetteTipsTile', () => {
     expect(screen.getAllByText('mock EquipmentOption')).toHaveLength(2)
   })
   it('renders all tiprack options for 50uL flex pipette when all tipracks are true', () => {
-    mockGetAllowAllTipracks.mockReturnValue(true)
+    vi.mocked(getAllowAllTipracks).mockReturnValue(true)
     render(props)
     screen.getByText('Choose tips for Flex 1-Channel 50 μL')
     expect(screen.getAllByText('mock EquipmentOption')).toHaveLength(2)
@@ -186,7 +174,7 @@ describe('PipetteTipsTile', () => {
       ...mockWizardTileProps,
       mount: 'left',
     }
-    mockGetTiprackOptions.mockReturnValue([
+    vi.mocked(getTiprackOptions).mockReturnValue([
       {
         name: '10uL tipracks',
         value: 'opentrons/opentrons_96_tiprack_10ul/1',

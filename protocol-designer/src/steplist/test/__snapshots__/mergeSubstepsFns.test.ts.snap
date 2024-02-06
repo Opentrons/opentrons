@@ -1,4 +1,1016 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`mergeSubstepRowsMultiChannel > mock consolidate 1`] = `
+[
+  [
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": undefined,
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 25,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "A1",
+      },
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": undefined,
+      "source": {
+        "postIngreds": undefined,
+        "preIngreds": undefined,
+        "well": undefined,
+      },
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": undefined,
+      "source": {
+        "postIngreds": undefined,
+        "preIngreds": undefined,
+        "well": undefined,
+      },
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": undefined,
+      "source": {
+        "postIngreds": undefined,
+        "preIngreds": undefined,
+        "well": undefined,
+      },
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": undefined,
+      "source": {
+        "postIngreds": undefined,
+        "preIngreds": undefined,
+        "well": undefined,
+      },
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": undefined,
+      "source": {
+        "postIngreds": undefined,
+        "preIngreds": undefined,
+        "well": undefined,
+      },
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": undefined,
+      "source": {
+        "postIngreds": undefined,
+        "preIngreds": undefined,
+        "well": undefined,
+      },
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": undefined,
+      "source": {
+        "postIngreds": undefined,
+        "preIngreds": undefined,
+        "well": undefined,
+      },
+      "volume": 5,
+    },
+  ],
+  [
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 10,
+        },
+        "preIngreds": {},
+        "well": "A12",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 31,
+        },
+        "preIngreds": {
+          "ingred1Id": 36,
+        },
+        "well": "A2",
+      },
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 10,
+        },
+        "preIngreds": {},
+        "well": "B12",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 31,
+        },
+        "preIngreds": {
+          "ingred1Id": 36,
+        },
+        "well": "B2",
+      },
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 10,
+        },
+        "preIngreds": {},
+        "well": "C12",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 31,
+        },
+        "preIngreds": {
+          "ingred1Id": 36,
+        },
+        "well": "C2",
+      },
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 10,
+        },
+        "preIngreds": {},
+        "well": "D12",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 31,
+        },
+        "preIngreds": {
+          "ingred1Id": 36,
+        },
+        "well": "D2",
+      },
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 10,
+        },
+        "preIngreds": {},
+        "well": "E12",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 31,
+        },
+        "preIngreds": {
+          "ingred1Id": 36,
+        },
+        "well": "E2",
+      },
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 10,
+        },
+        "preIngreds": {},
+        "well": "F12",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 31,
+        },
+        "preIngreds": {
+          "ingred1Id": 36,
+        },
+        "well": "F2",
+      },
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 10,
+        },
+        "preIngreds": {},
+        "well": "G12",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 31,
+        },
+        "preIngreds": {
+          "ingred1Id": 36,
+        },
+        "well": "G2",
+      },
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 10,
+        },
+        "preIngreds": {},
+        "well": "H12",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 31,
+        },
+        "preIngreds": {
+          "ingred1Id": 36,
+        },
+        "well": "H2",
+      },
+      "volume": 5,
+    },
+  ],
+]
+`;
+
+exports[`mergeSubstepRowsMultiChannel > mock distribute 1`] = `
+[
+  [
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 5,
+        },
+        "preIngreds": {},
+        "well": "A11",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "A1",
+      },
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 5,
+        },
+        "preIngreds": {},
+        "well": "B11",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "B1",
+      },
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 5,
+        },
+        "preIngreds": {},
+        "well": "C11",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "C1",
+      },
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 5,
+        },
+        "preIngreds": {},
+        "well": "D11",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "D1",
+      },
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 5,
+        },
+        "preIngreds": {},
+        "well": "E11",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "E1",
+      },
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 5,
+        },
+        "preIngreds": {},
+        "well": "F11",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "F1",
+      },
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 5,
+        },
+        "preIngreds": {},
+        "well": "G11",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "G1",
+      },
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 5,
+        },
+        "preIngreds": {},
+        "well": "H11",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "H1",
+      },
+      "volume": 5,
+    },
+  ],
+  [
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 5,
+        },
+        "preIngreds": {},
+        "well": "A12",
+      },
+      "source": undefined,
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 5,
+        },
+        "preIngreds": {},
+        "well": "B12",
+      },
+      "source": undefined,
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 5,
+        },
+        "preIngreds": {},
+        "well": "C12",
+      },
+      "source": undefined,
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 5,
+        },
+        "preIngreds": {},
+        "well": "D12",
+      },
+      "source": undefined,
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 5,
+        },
+        "preIngreds": {},
+        "well": "E12",
+      },
+      "source": undefined,
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 5,
+        },
+        "preIngreds": {},
+        "well": "F12",
+      },
+      "source": undefined,
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 5,
+        },
+        "preIngreds": {},
+        "well": "G12",
+      },
+      "source": undefined,
+      "volume": 5,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 5,
+        },
+        "preIngreds": {},
+        "well": "H12",
+      },
+      "source": undefined,
+      "volume": 5,
+    },
+  ],
+]
+`;
+
+exports[`mergeSubstepRowsMultiChannel > mock mix 1`] = `
+[
+  [
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "A1",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "A1",
+      },
+      "volume": 10,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "B1",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "B1",
+      },
+      "volume": 10,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "C1",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "C1",
+      },
+      "volume": 10,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "D1",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "D1",
+      },
+      "volume": 10,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "E1",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "E1",
+      },
+      "volume": 10,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "F1",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "F1",
+      },
+      "volume": 10,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "G1",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "G1",
+      },
+      "volume": 10,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "H1",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "H1",
+      },
+      "volume": 10,
+    },
+  ],
+]
+`;
+
+exports[`mergeSubstepRowsMultiChannel > mock transfer 1`] = `
+[
+  [
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 10,
+        },
+        "preIngreds": {},
+        "well": "A12",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "A1",
+      },
+      "volume": 10,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 10,
+        },
+        "preIngreds": {},
+        "well": "B12",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "B1",
+      },
+      "volume": 10,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 10,
+        },
+        "preIngreds": {},
+        "well": "C12",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "C1",
+      },
+      "volume": 10,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 10,
+        },
+        "preIngreds": {},
+        "well": "D12",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "D1",
+      },
+      "volume": 10,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 10,
+        },
+        "preIngreds": {},
+        "well": "E12",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "E1",
+      },
+      "volume": 10,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 10,
+        },
+        "preIngreds": {},
+        "well": "F12",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "F1",
+      },
+      "volume": 10,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 10,
+        },
+        "preIngreds": {},
+        "well": "G12",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "G1",
+      },
+      "volume": 10,
+    },
+    {
+      "activeTips": {
+        "labware": "someTiprackId",
+        "well": "A6",
+      },
+      "dest": {
+        "postIngreds": {
+          "ingred1Id": 10,
+        },
+        "preIngreds": {},
+        "well": "H12",
+      },
+      "source": {
+        "postIngreds": {
+          "ingred1Id": 20,
+        },
+        "preIngreds": {
+          "ingred1Id": 30,
+        },
+        "well": "H1",
+      },
+      "volume": 10,
+    },
+  ],
+]
+`;
 
 exports[`mergeSubstepRowsMultiChannel mock consolidate 1`] = `
 Array [

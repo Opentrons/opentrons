@@ -1,15 +1,16 @@
+import { describe, it, beforeEach, expect } from 'vitest'
 import {
   volumeInCapacityForMulti,
   volumeInCapacityForMultiAspirate,
   volumeInCapacityForMultiDispense,
 } from '../utils'
 import { fixtureP300Single } from '@opentrons/shared-data/pipette/fixtures/name'
-import _fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
-import { PipetteEntities } from '@opentrons/step-generation'
-import { FormData } from '../../../../form-types'
+import { fixture_tiprack_300_ul } from '@opentrons/shared-data/labware/fixtures/2'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { PipetteEntities } from '@opentrons/step-generation'
+import type { FormData } from '../../../../form-types'
 
-const fixtureTiprack300ul = _fixture_tiprack_300_ul as LabwareDefinition2
+const fixtureTiprack300ul = fixture_tiprack_300_ul as LabwareDefinition2
 
 describe('utils', () => {
   describe('volumeInCapacityForMulti', () => {

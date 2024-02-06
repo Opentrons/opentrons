@@ -1,5 +1,7 @@
+import { describe, it, expect } from 'vitest'
 import { getNextDefaultMagnetAction } from '../'
-import { StepType } from '../../../../form-types'
+import type { StepType } from '../../../../form-types'
+
 describe('getNextDefaultMagnetAction', () => {
   describe('no previous forms defaults to engage', () => {
     const testCases = [
@@ -32,13 +34,13 @@ describe('getNextDefaultMagnetAction', () => {
     ]
     testCases.forEach(({ testMsg, orderedStepIds, expected }) => {
       it(testMsg, () => {
-        const savedForms: {
-          [id: string]: {
+        const savedForms:
+          Record<string, {
             id: string
             stepType: StepType
             magnetAction: string
-          }
-        } = {
+          }>
+          = {
           e: {
             id: 'moduleId',
             stepType: 'magnet',

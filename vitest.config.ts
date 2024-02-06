@@ -17,6 +17,7 @@ export default mergeConfig(viteConfig, defineConfig({
     alias: {
       '@opentrons/components/styles': path.resolve('./components/src/index.module.css'),
       '@opentrons/components': path.resolve('./components/src/index.ts'),
+      '@opentrons/shared-data/pipette/fixtures/name': path.resolve('./shared-data/pipette/fixtures/name/index.ts'),
       '@opentrons/shared-data/labware/fixtures/1': path.resolve('./shared-data/labware/fixtures/1/index.ts'),
       '@opentrons/shared-data/labware/fixtures/2': path.resolve('./shared-data/labware/fixtures/2/index.ts'),
       '@opentrons/shared-data': path.resolve('./shared-data/js/index.ts'),

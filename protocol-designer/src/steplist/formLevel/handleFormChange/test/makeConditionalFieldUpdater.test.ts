@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { makeConditionalPatchUpdater } from '../makeConditionalPatchUpdater'
 describe('makeConditionalPatchUpdater', () => {
   const foodUpdateMap = [

@@ -1,8 +1,11 @@
 import assert from 'assert'
-import { getLabwareDefURI, LabwareDefinition2 } from '@opentrons/shared-data'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
-import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import {
+  fixture_12_trough,
+  fixture_96_plate
+} from '@opentrons/shared-data/labware/fixtures/2'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
 import {
   moveLiquidFormToArgs,
@@ -10,18 +13,15 @@ import {
   getMixData,
 } from '../moveLiquidFormToArgs'
 import { getOrderedWells } from '../../../utils'
-import { HydratedMoveLiquidFormData, PathOption } from '../../../../form-types'
 import { DEFAULT_MM_FROM_BOTTOM_ASPIRATE } from '../../../../constants'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { HydratedMoveLiquidFormData, PathOption } from '../../../../form-types'
 
-jest.mock('../../../utils')
-jest.mock('assert')
+vi.mock('../../../utils')
+vi.mock('assert')
 
 const ASPIRATE_WELL = 'A2' // default source is trough for these tests
 const DISPENSE_WELL = 'C3' // default dest in 96 flat for these tests
-
-const mockGetOrderedWells = getOrderedWells as jest.MockedFunction<
-  typeof getOrderedWells
->
 
 describe('move liquid step form -> command creator args', () => {
   let hydratedForm: HydratedMoveLiquidFormData
@@ -30,8 +30,8 @@ describe('move liquid step form -> command creator args', () => {
   const destLabwareDef = fixture_96_plate as LabwareDefinition2
   const destLabwareType = getLabwareDefURI(destLabwareDef)
   beforeEach(() => {
-    mockGetOrderedWells.mockClear()
-    mockGetOrderedWells.mockImplementation(wells => wells)
+    vi.mocked(getOrderedWells).mockClear()
+    vi.mocked(getOrderedWells).mockImplementation(wells => wells)
 
     // the "base case" is a 1 to 1 transfer, single path
     hydratedForm = {
@@ -100,20 +100,20 @@ describe('move liquid step form -> command creator args', () => {
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('moveLiquidFormToArgs calls getOrderedWells correctly', () => {
     moveLiquidFormToArgs(hydratedForm)
 
-    expect(mockGetOrderedWells).toHaveBeenCalledTimes(2)
-    expect(mockGetOrderedWells).toHaveBeenCalledWith(
+    expect(vi.mocked(getOrderedWells)).toHaveBeenCalledTimes(2)
+    expect(vi.mocked(getOrderedWells)).toHaveBeenCalledWith(
       [ASPIRATE_WELL],
       sourceLabwareDef,
       'l2r',
       't2b'
     )
-    expect(mockGetOrderedWells).toHaveBeenCalledWith(
+    expect(vi.mocked(getOrderedWells)).toHaveBeenCalledWith(
       [DISPENSE_WELL],
       destLabwareDef,
       'r2l',
@@ -134,8 +134,8 @@ describe('move liquid step form -> command creator args', () => {
       },
     })
 
-    expect(mockGetOrderedWells).toHaveBeenCalledTimes(1)
-    expect(mockGetOrderedWells).toHaveBeenCalledWith(
+    expect(vi.mocked(getOrderedWells)).toHaveBeenCalledTimes(1)
+    expect(vi.mocked(getOrderedWells)).toHaveBeenCalledWith(
       [ASPIRATE_WELL],
       sourceLabwareDef,
       'l2r',

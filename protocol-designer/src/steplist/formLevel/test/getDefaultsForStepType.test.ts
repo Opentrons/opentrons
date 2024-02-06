@@ -1,3 +1,4 @@
+import { vi, it, describe, expect, afterEach } from 'vitest'
 import {
   DEFAULT_CHANGE_TIP_OPTION,
   DEFAULT_DELAY_SECONDS,
@@ -9,7 +10,7 @@ import { getDefaultsForStepType } from '..'
 
 describe('getDefaultsForStepType', () => {
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
   describe('moveLiquid step', () => {
     it('should get the correct defaults', () => {

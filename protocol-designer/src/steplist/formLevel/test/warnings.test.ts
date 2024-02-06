@@ -1,4 +1,5 @@
-import fixture_24_tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
+import { describe, it, beforeEach, expect } from 'vitest'
+import { fixture_24_tuberack } from '@opentrons/shared-data/labware/fixtures/2'
 import {
   _minAirGapVolume,
   belowPipetteMinimumVolume,

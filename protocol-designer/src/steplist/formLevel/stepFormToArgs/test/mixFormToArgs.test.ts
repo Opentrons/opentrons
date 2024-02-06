@@ -1,22 +1,21 @@
-import { getLabwareDefURI, LabwareDefinition2 } from '@opentrons/shared-data'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
-import _fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import { fixture_96_plate } from '@opentrons/shared-data/labware/fixtures/2'
 import { mixFormToArgs } from '../mixFormToArgs'
 import { DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP } from '../../../../constants'
 import { getOrderedWells } from '../../../utils'
-import { HydratedMixFormDataLegacy } from '../../../../form-types'
-jest.mock('../../../utils')
+import type { HydratedMixFormDataLegacy } from '../../../../form-types'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-const getOrderedWellsMock = getOrderedWells as jest.MockedFunction<
-  typeof getOrderedWells
->
+vi.mock('../../../utils')
 
 let hydratedForm: HydratedMixFormDataLegacy
-const labwareDef = _fixture_96_plate as LabwareDefinition2
+const labwareDef = fixture_96_plate as LabwareDefinition2
 const labwareType = getLabwareDefURI(labwareDef)
 
 beforeEach(() => {
-  getOrderedWellsMock.mockImplementation(wells => wells)
+  vi.mocked(getOrderedWells).mockImplementation(wells => wells)
 
   hydratedForm = {
     id: 'stepId',
@@ -56,7 +55,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  jest.resetAllMocks()
+  vi.resetAllMocks()
 })
 
 describe('mix step form -> command creator args', () => {

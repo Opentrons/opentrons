@@ -1,24 +1,17 @@
+import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest'
+import { fixtureP10Single, fixtureP300Single } from '@opentrons/shared-data/pipette/fixtures/name'
 import {
-  fixtureP10Single,
-  fixtureP300Single,
-} from '@opentrons/shared-data/pipette/fixtures/name'
-import _fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import _fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
-import {
-  SOURCE_WELL_BLOWOUT_DESTINATION,
-  DEST_WELL_BLOWOUT_DESTINATION,
-  PipetteEntities,
-  LabwareEntities,
-} from '@opentrons/step-generation'
-import { FormData } from '../../../../form-types'
-import {
-  dependentFieldsUpdateMoveLiquid,
-  updatePatchBlowoutFields,
-} from '../dependentFieldsUpdateMoveLiquid'
+  fixture_tiprack_10_ul,
+  fixture_tiprack_300_ul
+} from '@opentrons/shared-data/labware/fixtures/2'
+import { SOURCE_WELL_BLOWOUT_DESTINATION, DEST_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
+import { dependentFieldsUpdateMoveLiquid, updatePatchBlowoutFields } from '../dependentFieldsUpdateMoveLiquid'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { PipetteEntities, LabwareEntities } from '@opentrons/step-generation'
+import type { FormData } from '../../../../form-types'
 
-const fixtureTiprack10ul = _fixture_tiprack_10_ul as LabwareDefinition2
-const fixtureTiprack300ul = _fixture_tiprack_300_ul as LabwareDefinition2
+const fixtureTiprack10ul = fixture_tiprack_10_ul as LabwareDefinition2
+const fixtureTiprack300ul = fixture_tiprack_300_ul as LabwareDefinition2
 
 let pipetteEntities: PipetteEntities
 let labwareEntities: LabwareEntities
@@ -55,7 +48,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  jest.resetAllMocks()
+  vi.resetAllMocks()
 })
 
 describe('no-op cases should pass through the patch unchanged', () => {

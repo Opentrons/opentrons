@@ -1,9 +1,7 @@
-import {
-  minFieldValue,
-  maxFieldValue,
-  temperatureRangeFieldValue,
-  ErrorChecker,
-} from '../errors'
+import { describe, it, beforeEach, expect } from 'vitest'
+import { minFieldValue, maxFieldValue, temperatureRangeFieldValue } from '../errors'
+import type  { ErrorChecker } from '../errors'
+
 describe('errors', () => {
   describe('minFieldValue', () => {
     const MIN = 4

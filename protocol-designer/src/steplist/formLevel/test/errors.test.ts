@@ -1,4 +1,5 @@
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import { it, describe, expect, beforeEach } from 'vitest'
+import { fixture_tiprack_10_ul } from '@opentrons/shared-data/labware/fixtures/2'
 import { volumeTooHigh } from '../errors'
 
 describe('volumeTooHigh', () => {
