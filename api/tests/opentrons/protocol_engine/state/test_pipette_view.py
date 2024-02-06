@@ -25,9 +25,15 @@ from opentrons.protocol_engine.state.pipettes import (
     CurrentDeckPoint,
     HardwarePipette,
     StaticPipetteConfig,
+    BoundingNozzlesOffsets,
 )
 from opentrons.hardware_control.nozzle_manager import NozzleMap, NozzleConfigurationType
 from opentrons.protocol_engine.errors import TipNotAttachedError, PipetteNotLoadedError
+
+
+_SAMPLE_NOZZLE_BOUNDS_OFFSETS = BoundingNozzlesOffsets(
+    back_left_offset=Point(x=10, y=20, z=30), front_right_offset=Point(x=40, y=50, z=60)
+)
 
 
 def get_pipette_view(
@@ -253,6 +259,7 @@ def test_get_pipette_working_volume(
                 nominal_tip_overlap={},
                 home_position=0,
                 nozzle_offset_z=0,
+                bounding_nozzle_offsets=_SAMPLE_NOZZLE_BOUNDS_OFFSETS,
             )
         },
     )
@@ -280,6 +287,7 @@ def test_get_pipette_working_volume_raises_if_tip_volume_is_none(
                 nominal_tip_overlap={},
                 home_position=0,
                 nozzle_offset_z=0,
+                bounding_nozzle_offsets=_SAMPLE_NOZZLE_BOUNDS_OFFSETS,
             )
         },
     )
@@ -316,6 +324,7 @@ def test_get_pipette_available_volume(
                 nominal_tip_overlap={},
                 home_position=0,
                 nozzle_offset_z=0,
+                bounding_nozzle_offsets=_SAMPLE_NOZZLE_BOUNDS_OFFSETS,
             ),
             "pipette-id-none": StaticPipetteConfig(
                 min_volume=1,
@@ -328,6 +337,7 @@ def test_get_pipette_available_volume(
                 nominal_tip_overlap={},
                 home_position=0,
                 nozzle_offset_z=0,
+                bounding_nozzle_offsets=_SAMPLE_NOZZLE_BOUNDS_OFFSETS,
             ),
         },
     )
@@ -436,6 +446,7 @@ def test_get_static_config(
         nominal_tip_overlap={},
         home_position=10.12,
         nozzle_offset_z=12.13,
+        bounding_nozzle_offsets=_SAMPLE_NOZZLE_BOUNDS_OFFSETS,
     )
 
     subject = get_pipette_view(
@@ -483,6 +494,7 @@ def test_get_nominal_tip_overlap(
         },
         home_position=0,
         nozzle_offset_z=0,
+        bounding_nozzle_offsets=_SAMPLE_NOZZLE_BOUNDS_OFFSETS,
     )
 
     subject = get_pipette_view(static_config_by_id={"pipette-id": config})
