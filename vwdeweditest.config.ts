@@ -1,11 +1,17 @@
 /// <reference types="vitest" />
 /// <reference types="vite/client" />
 import path from 'path'
-import { defineConfig } from 'vitest/config'
+import { configDefaults, defineConfig, mergeConfig } from 'vitest/config'
+import viteConfig from './vite.config'
 
-export default defineConfig({
+export default mergeConfig(viteConfig, defineConfig({
   test: {
-    environment: 'jsdom'
+    // environment: 'jsdom',
+    exclude: [
+      ...configDefaults.exclude,
+      '**/node_modules/**',
+      '**/dist/**'
+    ]
   },
   resolve: {
     alias: {
@@ -17,5 +23,5 @@ export default defineConfig({
       '@opentrons/step-generation': path.resolve('./step-generation/src/index.ts'),
     },
   },
-})
+}))
 

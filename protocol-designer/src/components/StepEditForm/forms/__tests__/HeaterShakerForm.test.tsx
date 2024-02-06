@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { describe, it, beforeEach, afterEach, vi } from 'vitest'
+import { screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { getHeaterShakerLabwareOptions } from '../../../../ui/modules/selectors'
 import { i18n } from '../../../../localization'
@@ -7,7 +8,7 @@ import { HeaterShakerForm } from '../HeaterShakerForm'
 import type { DropdownOption } from '@opentrons/components'
 
 vi.mock('../../../../ui/modules/selectors')
-vi.mock('../../fields/', async () => {
+vi.mock('../../fields', async () => {
   const actualFields = await vi.importActual('../../fields')
 
   return {
@@ -102,16 +103,16 @@ describe('HeaterShakerForm', () => {
     vi.resetAllMocks()
   })
   it('should render a title', () => {
-    const { getByText } = render(props)
-    getByText(/heater-shaker/i)
+    render(props)
+    screen.getByText(/heater-shaker/i)
   })
   it('should render a module dropdown field', () => {
-    const { getByText } = render(props)
-    getByText('mock step form dropdown field!')
+    render(props)
+    screen.getByText('mock step form dropdown field!')
   })
   it('should render a set temperature toggle', () => {
-    const { getByText } = render(props)
-    getByText('mock set temp toggle!')
+    render(props)
+    screen.getByText('mock set temp toggle!')
   })
   it('should render a temperature input when the temperature toggle is ON', () => {
     props.formData = {
@@ -119,12 +120,12 @@ describe('HeaterShakerForm', () => {
       setHeaterShakerTemperature: true,
     }
    
-    const { getByText } = render(props)
-    getByText('mock temp input!')
+    render(props)
+    screen.getByText('mock temp input!')
   })
   it('should render a set shake toggle', () => {
-    const { getByText } = render(props)
-    getByText('mock set shake toggle!')
+    render(props)
+    screen.getByText('mock set shake toggle!')
   })
   it('should render a RPM input when the set shake toggle is ON', () => {
     props.formData = {
@@ -132,11 +133,11 @@ describe('HeaterShakerForm', () => {
       setShake: true,
     }
     
-    const { getByText } = render(props)
-    getByText('mock RPM input!')
+    render(props)
+    screen.getByText('mock RPM input!')
   })
   it('should render a set latch toggle', () => {
-    const { getByText } = render(props)
-    getByText('mock set latch toggle!')
+    render(props)
+    screen.getByText('mock set latch toggle!')
   })
 })
