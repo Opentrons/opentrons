@@ -2,14 +2,9 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
 import {
-  ALIGN_CENTER,
   Flex,
-  Icon,
-  Link,
   SPACING,
-  COLORS,
   TYPOGRAPHY,
-  DIRECTION_ROW,
   DIRECTION_COLUMN,
   PrimaryButton,
   JUSTIFY_FLEX_END,
@@ -19,6 +14,7 @@ import {
   toggleAnalyticsOptedIn,
   setAnalyticsOptInSeen,
 } from '../../redux/analytics'
+import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { StyledText } from '../../atoms/text'
 import type { Dispatch } from '../../redux/types'
@@ -36,7 +32,7 @@ export function AnalyticsSettingsModal(): JSX.Element | null {
     dispatch(toggleAnalyticsOptedIn())
   }
 
-  return seen ? (
+  return !seen ? (
     <LegacyModal
       title={
         <StyledText css={TYPOGRAPHY.h3SemiBold}>
@@ -64,25 +60,9 @@ export function AnalyticsSettingsModal(): JSX.Element | null {
               components={{ block: <StyledText as="p" /> }}
             />
           </Flex>
-          <Link
-            external
-            fontSize={TYPOGRAPHY.fontSizeP}
-            css={TYPOGRAPHY.darkLinkLabelSemiBold}
-            href={PRIVACY_POLICY_LINK}
-          >
-            <Flex
-              flexDirection={DIRECTION_ROW}
-              alignItems={ALIGN_CENTER}
-              color={COLORS.blue50}
-            >
-              {t('opentrons_privacy_policy')}
-              <Icon
-                marginLeft={SPACING.spacing4}
-                name="external-link"
-                size="0.75rem"
-              />
-            </Flex>
-          </Link>
+          <ExternalLink href={PRIVACY_POLICY_LINK}>
+            {t('opentrons_privacy_policy')}
+          </ExternalLink>
         </Flex>
       </Flex>
     </LegacyModal>
