@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+import { updateConfigValue } from '../../redux/config'
 
 import {
   COLORS,
@@ -18,6 +20,7 @@ import { Modal } from '../../molecules/Modal'
 import welcomeModalImage from '../../assets/images/on-device-display/welcome_dashboard_modal.png'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
+import type { Dispatch } from '../../redux/types'
 
 interface WelcomeModalProps {
   setShowWelcomeModal: (showWelcomeModal: boolean) => void
@@ -29,6 +32,7 @@ export function WelcomeModal({
   const { t } = useTranslation(['device_details', 'shared'])
 
   const { createLiveCommand } = useCreateLiveCommandMutation()
+  const dispatch = useDispatch<Dispatch>()
   const animationCommand: SetStatusBarCreateCommand = {
     commandType: 'setStatusBar',
     params: { animation: 'disco' },
@@ -44,6 +48,12 @@ export function WelcomeModal({
   }
 
   const handleCloseModal = (): void => {
+    dispatch(
+      updateConfigValue(
+        'onDeviceDisplaySettings.unfinishedUnboxingFlowRoute',
+        null
+      )
+    )
     setShowWelcomeModal(false)
   }
 

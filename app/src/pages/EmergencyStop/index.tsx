@@ -15,7 +15,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useEstopQuery } from '@opentrons/react-api-client'
-import { getAnalyticsOptInSeen } from '../../redux/analytics'
+import {
+  getAnalyticsOptInSeen,
+  getAnalyticsOptedIn,
+} from '../../redux/analytics'
 
 import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
@@ -29,6 +32,7 @@ export function EmergencyStop(): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
   const seen = useSelector(getAnalyticsOptInSeen)
+  const hasOptedIn = useSelector(getAnalyticsOptedIn)
 
   // Note here the touchscreen app is using status since status is linked to EstopPhysicalStatuses
   // left notPresent + right disengaged => disengaged
@@ -102,7 +106,7 @@ export function EmergencyStop(): JSX.Element {
           buttonText={i18n.format(t('shared:continue'), 'capitalize')}
           disabled={!isEstopConnected}
           onClick={() => {
-            seen != null
+            seen && hasOptedIn
               ? history.push('/robot-settings/rename-robot')
               : history.push('/privacy-policy')
           }}

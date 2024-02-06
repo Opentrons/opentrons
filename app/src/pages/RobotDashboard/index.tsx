@@ -90,6 +90,8 @@ export function RobotDashboard(): JSX.Element {
     )
   }
 
+  console.log('🚀 ~ RobotDashboard ~ showWelcomeModal:', showWelcomeModal)
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />

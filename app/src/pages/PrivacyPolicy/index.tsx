@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
+import { Trans, useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 
 import {
@@ -8,12 +8,16 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   JUSTIFY_CENTER,
+  ALIGN_CENTER,
   TYPOGRAPHY,
+  COLORS,
 } from '@opentrons/components'
 
 import {
+  getAnalyticsOptedIn,
   toggleAnalyticsOptedIn,
   setAnalyticsOptInSeen,
+  getAnalyticsOptInSeen,
 } from '../../redux/analytics'
 import { useIsUnboxingFlowOngoing } from '../../organisms/RobotSettingsDashboard/NetworkSettings/hooks'
 import { StyledText } from '../../atoms/text'
@@ -31,37 +35,51 @@ export function PrivacyPolicy(): JSX.Element {
   const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
+  const hasOptedIn = useSelector(getAnalyticsOptedIn)
+  const seen = useSelector(getAnalyticsOptInSeen)
 
   const handleAgree = (): void => {
     dispatch(setAnalyticsOptInSeen())
     dispatch(toggleAnalyticsOptedIn())
-    if (isUnboxingFlowOngoing) {
-      history.push('/robot-settings/rename-robot')
-    } else {
-      history.push('/dashboard')
-    }
   }
+
+  React.useEffect(() => {
+    if (hasOptedIn && seen) {
+      if (isUnboxingFlowOngoing) {
+        history.push('/robot-settings/rename-robot')
+      } else {
+        history.push('/dashboard')
+      }
+    }
+  }, [hasOptedIn, seen])
 
   return (
     <>
-      <StepMeter totalSteps={6} currentStep={4} />
+      {isUnboxingFlowOngoing ? (
+        <StepMeter totalSteps={6} currentStep={4} />
+      ) : null}
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText
-          as="h2"
-          fontWeight="bold"
-          paddingX={SPACING.spacing40}
-          paddingY={SPACING.spacing32}
-          justifyContent={JUSTIFY_CENTER}
-        >
-          {t('acknowledge_privacy_policy')}
-        </StyledText>
+        <Flex justifyContent={JUSTIFY_CENTER} alignItems={ALIGN_CENTER}>
+          <StyledText
+            as="h2"
+            fontWeight={TYPOGRAPHY.fontWeightBold}
+            paddingX={SPACING.spacing40}
+            paddingY={SPACING.spacing32}
+          >
+            {t('acknowledge_privacy_policy')}
+          </StyledText>
+        </Flex>
         <Flex
           gridGap={SPACING.spacing40}
           paddingX={SPACING.spacing40}
           paddingBottom={SPACING.spacing40}
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-            <StyledText as="h4">{t('privacy_policy_description')}</StyledText>
+            <Trans
+              t={t}
+              i18nKey={'privacy_policy_description'}
+              components={{ block: <StyledText as="h4" /> }}
+            />
             <StyledText
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               fontSize={TYPOGRAPHY.fontSize22}
@@ -69,6 +87,7 @@ export function PrivacyPolicy(): JSX.Element {
               paddingX={SPACING.spacing24}
               paddingY={SPACING.spacing16}
               borderRadius={SPACING.spacing12}
+              backgroundColor={COLORS.grey35}
             >
               {PRIVACY_POLICY_URL}
             </StyledText>
@@ -80,7 +99,7 @@ export function PrivacyPolicy(): JSX.Element {
         <Flex padding={SPACING.spacing40} paddingTop={SPACING.spacing48}>
           <MediumButton
             flex="1"
-            buttonText={(t('agree'), 'capitalize')}
+            buttonText={t('agree')}
             onClick={handleAgree}
           />
         </Flex>
