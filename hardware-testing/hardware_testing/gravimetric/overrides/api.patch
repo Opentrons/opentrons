@@ -27,7 +27,7 @@ index 2d36460ca6..8578768930 100644
      def ok_to_push_out(self, push_out_dist_mm: float) -> bool:
          return push_out_dist_mm <= (
 diff --git a/api/src/opentrons/protocol_api/core/engine/deck_conflict.py b/api/src/opentrons/protocol_api/core/engine/deck_conflict.py
-index 8ba072492d..23d90b4fdb 100644
+index 1a756f751f..a739ec553c 100644
 --- a/api/src/opentrons/protocol_api/core/engine/deck_conflict.py
 +++ b/api/src/opentrons/protocol_api/core/engine/deck_conflict.py
 @@ -267,18 +267,12 @@ def check_safe_for_tip_pickup_and_return(
@@ -39,7 +39,7 @@ index 8ba072492d..23d90b4fdb 100644
 -                f" in order to pick up or return all 96 tips simultaneously."
 -            )
 +            pass
-
+ 
      elif (
          not is_partial_config
      ):  # tiprack is not on adapter and pipette is in full config
@@ -48,9 +48,9 @@ index 8ba072492d..23d90b4fdb 100644
 -            f" in order to pick up or return all 96 tips simultaneously."
 -        )
 +        pass
-
-
- def _check_deck_conflict_for_96_channel(  # noqa: C901
+ 
+ 
+ def _check_deck_conflict_for_96_channel(
 diff --git a/api/src/opentrons/protocol_api/core/legacy/deck.py b/api/src/opentrons/protocol_api/core/legacy/deck.py
 index 9a9092af5a..33aa5941ce 100644
 --- a/api/src/opentrons/protocol_api/core/legacy/deck.py
