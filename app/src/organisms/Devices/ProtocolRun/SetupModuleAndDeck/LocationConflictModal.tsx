@@ -27,6 +27,8 @@ import {
   SINGLE_RIGHT_CUTOUTS,
   SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_RIGHT_SLOT_FIXTURE,
+  THERMOCYCLER_MODULE_V1,
+  THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 import { Portal } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
@@ -67,10 +69,25 @@ export const LocationConflictModal = (
   const deckConfigurationAtLocationFixtureId = deckConfig.find(
     (deckFixture: CutoutConfig) => deckFixture.cutoutId === cutoutId
   )?.cutoutFixtureId
+
+  const isThermocycler =
+    requiredModule === THERMOCYCLER_MODULE_V1 ||
+    requiredModule === THERMOCYCLER_MODULE_V2
+
   const currentFixtureDisplayName =
     deckConfigurationAtLocationFixtureId != null
       ? getFixtureDisplayName(deckConfigurationAtLocationFixtureId)
       : ''
+
+  // get fixture display name at A1 for themocycler if B1 is slot
+  const deckConfigurationAtA1 = deckConfig.find(
+    (deckFixture: CutoutConfig) => deckFixture.cutoutId === 'cutoutA1'
+  )?.cutoutFixtureId
+
+  const currentThermocyclerFixtureDisplayName =
+    currentFixtureDisplayName === 'Slot' && deckConfigurationAtA1 != null
+      ? getFixtureDisplayName(deckConfigurationAtA1)
+      : currentFixtureDisplayName
 
   const handleUpdateDeck = (): void => {
     if (requiredFixtureId != null) {
@@ -93,7 +110,16 @@ export const LocationConflictModal = (
           : fixture
       )
 
-      updateDeckConfiguration(newSingleSlotDeckConfig)
+      // add A1 and B1 single slot config for thermocycler
+      const newThermocyclerDeckConfig = isThermocycler
+        ? newSingleSlotDeckConfig.map(fixture =>
+            fixture.cutoutId === 'cutoutA1' || fixture.cutoutId === 'cutoutB1'
+              ? { ...fixture, cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE }
+              : fixture
+          )
+        : newSingleSlotDeckConfig
+
+      updateDeckConfiguration(newThermocyclerDeckConfig)
     }
     onCloseClick()
   }
@@ -123,7 +149,11 @@ export const LocationConflictModal = (
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <Trans
               t={t}
-              i18nKey="deck_conflict_info"
+              i18nKey={
+                isThermocycler
+                  ? 'deck_conflict_info_thermocycler'
+                  : 'deck_conflict_info'
+              }
               values={{
                 currentFixture: currentFixtureDisplayName,
                 cutout: getCutoutDisplayName(cutoutId),
@@ -140,7 +170,9 @@ export const LocationConflictModal = (
                 paddingBottom={SPACING.spacing8}
               >
                 {t('slot_location', {
-                  slotName: getCutoutDisplayName(cutoutId),
+                  slotName: isThermocycler
+                    ? 'A1 + B1'
+                    : getCutoutDisplayName(cutoutId),
                 })}
               </StyledText>
               <Flex
@@ -221,7 +253,11 @@ export const LocationConflictModal = (
           <Flex flexDirection={DIRECTION_COLUMN}>
             <Trans
               t={t}
-              i18nKey="deck_conflict_info"
+              i18nKey={
+                isThermocycler
+                  ? 'deck_conflict_info_thermocycler'
+                  : 'deck_conflict_info'
+              }
               values={{
                 currentFixture: currentFixtureDisplayName,
                 cutout: getCutoutDisplayName(cutoutId),
@@ -237,7 +273,9 @@ export const LocationConflictModal = (
                 fontWeight={TYPOGRAPHY.fontWeightBold}
               >
                 {t('slot_location', {
-                  slotName: getCutoutDisplayName(cutoutId),
+                  slotName: isThermocycler
+                    ? 'A1 + B1'
+                    : getCutoutDisplayName(cutoutId),
                 })}
               </StyledText>
               <Flex
@@ -274,7 +312,9 @@ export const LocationConflictModal = (
                     </StyledText>
                   </Box>
                   <StyledText as="label">
-                    {currentFixtureDisplayName}
+                    {isThermocycler
+                      ? currentThermocyclerFixtureDisplayName
+                      : currentFixtureDisplayName}
                   </StyledText>
                 </Flex>
               </Flex>
