@@ -7,7 +7,7 @@ import JSZip from 'jszip'
 import { reportEvent } from '../analytics'
 import { reportErrors } from './analyticsUtils'
 import { AlertModal } from '@opentrons/components'
-import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
+import { labwareSchemaV2 as labwareSchema } from '@opentrons/shared-data'
 import {
   aluminumBlockAutofills,
   aluminumBlockChildTypeOptions,
