@@ -840,7 +840,7 @@ class API(
         """
         if mount != self._last_moved_mount and self._last_moved_mount:
             await self.retract(self._last_moved_mount, 10)
-    
+
     async def prepare_for_mount_movement(self, mount: top_types.Mount) -> None:
         await self._cache_and_maybe_retract_mount(mount)
 

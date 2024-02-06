@@ -112,8 +112,7 @@ class MovementHandler:
         origin_cp = pipette_location.critical_point
 
         origin = await self._gantry_mover.get_position(
-            pipette_id=pipette_id,
-            home_if_idle=True
+            pipette_id=pipette_id, home_if_idle=True
         )
         max_travel_z = self._gantry_mover.get_max_travel_z(pipette_id=pipette_id)
 
@@ -244,8 +243,7 @@ class MovementHandler:
     ) -> Point:
         """Move pipette to a given deck coordinate."""
         origin = await self._gantry_mover.get_position(
-            pipette_id=pipette_id,
-            home_if_idle=True
+            pipette_id=pipette_id, home_if_idle=True
         )
         max_travel_z = self._gantry_mover.get_max_travel_z(pipette_id=pipette_id)
 

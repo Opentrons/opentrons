@@ -90,6 +90,9 @@ class FlexHardwareControlInterface(
     def encoder_status_ok(self, axis: Axis) -> bool:
         ...
 
+    def is_high_throughput_idle_mount(self, mount: MountArgType) -> bool:
+        ...
+
 
 __all__ = [
     "HardwareControlAPI",

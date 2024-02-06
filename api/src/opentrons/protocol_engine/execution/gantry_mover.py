@@ -10,9 +10,10 @@ from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
 from opentrons.motion_planning import Waypoint
 
+from ..resources import ensure_ot3_hardware
 from ..state import StateView
 from ..types import MotorAxis, CurrentWell
-from ..errors import MustHomeError, InvalidAxisForRobotType
+from ..errors import MustHomeError, InvalidAxisForRobotType, HardwareNotSupportedError
 
 
 _MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
@@ -78,7 +79,7 @@ class GantryMover(TypingProtocol):
         """Retract the specified axis to its home position."""
         ...
 
-    async def prepare_for_pipette_movement(self, pipette_id: str) -> None:
+    async def prepare_for_pipette_movement(self, mount: Mount) -> None:
         """Retract the 'idle' mount if necessary."""
         ...
 
@@ -95,7 +96,7 @@ class HardwareGantryMover(GantryMover):
         pipette_id: str,
         current_well: Optional[CurrentWell] = None,
         fail_on_not_homed: bool = False,
-        home_if_idle: bool = False
+        home_if_idle: bool = False,
     ) -> Point:
         """Get the current position of the gantry.
 
@@ -111,11 +112,15 @@ class HardwareGantryMover(GantryMover):
         )
         hw_mount = pipette_location.mount.to_hw_mount()
 
-        if not self._state_view.config.robot_type == "OT-2 Standard":
-            # idle Z mounts on the OT3 in the high throughput configurations are disengaged,
-            # we must first home the motor before retrieving its current position
-            if home_if_idle and self._hardware_api.is_high_throughput_idle_mount(hw_mount):
-                await self._hardware_api.home_z(mount=hw_mount)
+        # idle Z mounts on the OT3 in the high throughput configurations are disengaged,
+        # we must first home the motor before retrieving its current position
+        try:
+            ot3api = ensure_ot3_hardware(self._hardware_api)
+            if home_if_idle and ot3api.is_high_throughput_idle_mount(hw_mount):
+                await ot3api.home_z(mount=hw_mount)
+        except HardwareNotSupportedError:
+            pass
+
         try:
             return await self._hardware_api.gantry_position(
                 mount=hw_mount,
@@ -226,7 +231,7 @@ class HardwareGantryMover(GantryMover):
                 f"{axis} is not valid for OT-2 Standard robot type"
             )
         await self._hardware_api.retract_axis(axis=hardware_axis)
-    
+
     async def prepare_for_pipette_movement(self, mount: Mount) -> None:
         """Retract the 'idle' mount if necessary."""
         await self._hardware_api.prepare_for_mount_movement(mount)
@@ -307,7 +312,7 @@ class VirtualGantryMover(GantryMover):
         """Retract the specified axis. No-op in virtual implementation."""
         pass
 
-    async def prepare_for_pipette_movement(self, pipette_id: str) -> None:
+    async def prepare_for_pipette_movement(self, mount: Mount) -> None:
         """Retract the 'idle' mount if necessary."""
         pass
 
