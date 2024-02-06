@@ -60,7 +60,6 @@ export function NameRobot(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const ipAddress = localRobot?.ip
   const previousName = localRobot?.name != null ? localRobot.name : null
-  const [name, setName] = React.useState<string>('')
   const [newName, setNewName] = React.useState<string>('')
   const [
     isShowConfirmRobotName,
@@ -84,13 +83,14 @@ export function NameRobot(): JSX.Element {
     data: FormValues,
     errors: Record<string, FieldError>
   ): Record<string, FieldError> => {
-    const newName = data.newRobotName.concat(name)
+    const newName = data.newRobotName
     let message: string | undefined
     // In ODD users cannot input letters and numbers from software keyboard
     // so the app only checks the length of input string
     if (newName.length < 1) {
       message = t('name_rule_error_name_length')
     }
+
     if (
       [...connectableRobots, ...reachableRobots].some(
         robot => newName === robot.name && robot.ip !== ipAddress
@@ -98,13 +98,18 @@ export function NameRobot(): JSX.Element {
     ) {
       message = t('name_rule_error_exist')
     }
-    return {
-      ...errors,
-      newRobotName: {
-        type: 'error',
-        message: message,
-      },
-    }
+
+    const updatedErrors =
+      message != null
+        ? {
+            ...errors,
+            newRobotName: {
+              type: 'error',
+              message: message,
+            },
+          }
+        : errors
+    return updatedErrors
   }
 
   const resolver: Resolver<FormValues> = values => {
@@ -126,10 +131,11 @@ export function NameRobot(): JSX.Element {
     },
     resolver: resolver,
   })
+
   const newRobotName = watch('newRobotName')
 
   const onSubmit = (data: FormValues): void => {
-    const newName = data.newRobotName.concat(name)
+    const newName = data.newRobotName
     const sameNameRobotInUnavailable = unreachableRobots.find(
       robot => robot.name === newName
     )
@@ -159,7 +165,9 @@ export function NameRobot(): JSX.Element {
     },
   })
 
-  const handleConfirm = (): void => {
+  const handleConfirm = async (): Promise<void> => {
+    await trigger('newRobotName')
+
     // check robot name in the same network
     trackEvent({
       name: ANALYTICS_RENAME_ROBOT,
@@ -251,10 +259,7 @@ export function NameRobot(): JSX.Element {
                     id="newRobotName"
                     name="newRobotName"
                     type="text"
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      field.onChange(e)
-                      trigger('newRobotName')
-                    }}
+                    readOnly
                     value={field.value}
                     error={fieldState.error?.message && ''}
                     css={INPUT_FIELD_ODD_STYLE}
@@ -281,9 +286,18 @@ export function NameRobot(): JSX.Element {
           </Flex>
 
           <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">
-            <CustomKeyboard
-              onChange={e => e != null && setName(e)}
-              keyboardRef={keyboardRef}
+            <Controller
+              control={control}
+              name="newRobotName"
+              render={({ field }) => (
+                <CustomKeyboard
+                  onChange={(input: string) => {
+                    field.onChange(input)
+                    trigger('newRobotName')
+                  }}
+                  keyboardRef={keyboardRef}
+                />
+              )}
             />
           </Flex>
         </>

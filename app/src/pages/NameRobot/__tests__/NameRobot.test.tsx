@@ -59,11 +59,15 @@ describe('NameRobot', () => {
   beforeEach(() => {
     mockTrackEvent = jest.fn()
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
-    mockConnectableRobot.name = 'connectableOtie'
-    mockReachableRobot.name = 'reachableOtie'
+    mockConnectableRobot.name = 'connect'
+    mockReachableRobot.name = 'reach'
     mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
     mockGetReachableRobots.mockReturnValue([mockReachableRobot])
     mockuseIsUnboxingFlowOngoing.mockReturnValue(true)
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
   })
 
   it('should render text, button and keyboard', () => {
@@ -79,13 +83,15 @@ describe('NameRobot', () => {
     screen.getByRole('button', { name: 'a' })
   })
 
-  it('should display a letter when typing a letter', () => {
+  it('should display a letter when typing a letter and confirming calls the track event', async () => {
     render()
     const input = screen.getByRole('textbox')
     fireEvent.click(screen.getByRole('button', { name: 'a' }))
     fireEvent.click(screen.getByRole('button', { name: 'b' }))
     fireEvent.click(screen.getByRole('button', { name: 'c' }))
     expect(input).toHaveValue('abc')
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+    await waitFor(() => expect(mockTrackEvent).toHaveBeenCalled())
   })
 
   it('should show an error message when tapping confirm without typing anything', async () => {
@@ -102,40 +108,37 @@ describe('NameRobot', () => {
   it('should show an error message when typing an existing name - connectable robot', async () => {
     render()
     const input = screen.getByRole('textbox')
-    fireEvent.change(input, {
-      target: { value: 'connectableOtie' },
-    })
+    fireEvent.click(screen.getByRole('button', { name: 'c' }))
+    fireEvent.click(screen.getByRole('button', { name: 'o' }))
+    fireEvent.click(screen.getByRole('button', { name: 'n' }))
+    fireEvent.click(screen.getByRole('button', { name: 'n' }))
+    fireEvent.click(screen.getByRole('button', { name: 'e' }))
+    fireEvent.click(screen.getByRole('button', { name: 'c' }))
+    fireEvent.click(screen.getByRole('button', { name: 't' }))
+    expect(input).toHaveValue('connect')
     fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
-    const error = await screen.findByText(
-      'Oops! Name is already in use. Choose a different name.'
+    await waitFor(() =>
+      screen.findByText(
+        'Oops! Name is already in use. Choose a different name.'
+      )
     )
-    await waitFor(() => {
-      expect(error).toBeInTheDocument()
-    })
   })
 
   it('should show an error message when typing an existing name - reachable robot', async () => {
     render()
     const input = screen.getByRole('textbox')
-    fireEvent.change(input, {
-      target: { value: 'reachableOtie' },
-    })
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
-    const error = await screen.findByText(
-      'Oops! Name is already in use. Choose a different name.'
-    )
-    await waitFor(() => {
-      expect(error).toBeInTheDocument()
-    })
-  })
-
-  it('should call a mock function when tapping the confirm button', () => {
-    render()
+    fireEvent.click(screen.getByRole('button', { name: 'r' }))
+    fireEvent.click(screen.getByRole('button', { name: 'e' }))
     fireEvent.click(screen.getByRole('button', { name: 'a' }))
-    fireEvent.click(screen.getByRole('button', { name: 'b' }))
     fireEvent.click(screen.getByRole('button', { name: 'c' }))
+    fireEvent.click(screen.getByRole('button', { name: 'h' }))
+    expect(input).toHaveValue('reach')
     fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
-    expect(mockTrackEvent).toHaveBeenCalled()
+    await waitFor(() =>
+      screen.findByText(
+        'Oops! Name is already in use. Choose a different name.'
+      )
+    )
   })
 
   it('should render text and button when coming from robot settings', () => {
