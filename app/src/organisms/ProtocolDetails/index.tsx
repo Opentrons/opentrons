@@ -23,6 +23,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   Link,
+  OVERFLOW_WRAP_ANYWHERE,
   POSITION_RELATIVE,
   PrimaryButton,
   ProtocolDeck,
@@ -209,17 +210,14 @@ export function ProtocolDetails(
   ] = React.useState<boolean>(false)
   const [showDeckViewModal, setShowDeckViewModal] = React.useState(false)
 
-  React.useEffect(() => {
-    if (mostRecentAnalysis != null && !('liquids' in mostRecentAnalysis)) {
-      dispatch(analyzeProtocol(protocolKey))
-    }
-  }, [])
-
   const isAnalyzing = useSelector((state: State) =>
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
-  if (analysisStatus === 'missing') return null
+
+  if (analysisStatus === 'stale') {
+    dispatch(analyzeProtocol(protocolKey))
+  } else if (analysisStatus === 'missing') return null
 
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
     mostRecentAnalysis != null
@@ -237,7 +235,9 @@ export function ProtocolDetails(
       : []
 
   const requiredFixtureDetails = getSimplestDeckConfigForProtocol(
-    mostRecentAnalysis
+    analysisStatus !== 'stale' && analysisStatus !== 'loading'
+      ? mostRecentAnalysis
+      : null
   )
 
   const requiredLabwareDetails =
@@ -331,6 +331,7 @@ export function ProtocolDetails(
   const deckMap = <ProtocolDeck protocolAnalysis={mostRecentAnalysis} />
 
   const deckViewByAnalysisStatus = {
+    stale: <Box size="14rem" backgroundColor={COLORS.grey30} />,
     missing: <Box size="14rem" backgroundColor={COLORS.grey30} />,
     loading: <Box size="14rem" backgroundColor={COLORS.grey30} />,
     error: <Box size="14rem" backgroundColor={COLORS.grey30} />,
@@ -415,7 +416,7 @@ export function ProtocolDetails(
                 css={TYPOGRAPHY.h2SemiBold}
                 marginBottom={SPACING.spacing16}
                 data-testid={`ProtocolDetails_${protocolDisplayName}`}
-                overflowWrap="anywhere"
+                overflowWrap={OVERFLOW_WRAP_ANYWHERE}
               >
                 {protocolDisplayName}
               </StyledText>
@@ -486,7 +487,7 @@ export function ProtocolDetails(
                   <StyledText
                     as="p"
                     marginRight={SPACING.spacing20}
-                    overflowWrap="anywhere"
+                    overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                   >
                     {analysisStatus === 'loading'
                       ? t('shared:loading')

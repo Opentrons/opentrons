@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { Control, Controller, UseFormTrigger } from 'react-hook-form'
 import {
   DeprecatedCheckboxField,
   DropdownField,
@@ -13,9 +14,9 @@ import { ModuleDiagram } from '../../modules'
 import styles from './FilePipettesModal.css'
 import { MAGNETIC_BLOCK_TYPE, ModuleType } from '@opentrons/shared-data'
 import { useTranslation } from 'react-i18next'
+import type { FormState } from '../CreateFileWizard/types'
 
 export interface ModuleFieldsProps {
-  // TODO 2020-3-20 use formik typing here after we update the def in flow-typed
   errors:
     | null
     | string
@@ -57,83 +58,82 @@ export interface ModuleFieldsProps {
         }
       }
   values: FormModulesByType
-  onFieldChange: (event: React.ChangeEvent) => unknown
-  onSetFieldTouched: (field: string, touched: boolean) => void
-  onBlur: (event: React.FocusEvent<HTMLSelectElement>) => unknown
+  control: Control<FormState, any>
+  trigger: UseFormTrigger<FormState>
 }
 
 export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
-  const {
-    onFieldChange,
-    onSetFieldTouched,
-    onBlur,
-    values,
-    errors,
-    touched,
-  } = props
   const { t } = useTranslation('modules')
+  const { values, errors, touched, control, trigger } = props
   // TODO(BC, 2023-05-11): REMOVE THIS MAG BLOCK FILTER BEFORE LAUNCH TO INCLUDE IT AMONG MODULE OPTIONS
   // @ts-expect-error(sa, 2021-6-21): Object.keys not smart enough to take the keys of FormModulesByType
   const modules: ModuleType[] = Object.keys(values).filter(
     k => k !== MAGNETIC_BLOCK_TYPE
   )
-  const handleOnDeckChange = (type: ModuleType) => (e: React.ChangeEvent) => {
-    const targetToClear = `modulesByType.${type}.model`
-    onFieldChange(e)
-    onSetFieldTouched(targetToClear, false)
-  }
 
   return (
     <div className={styles.modules_row}>
       {modules.map((moduleType, i) => {
-        const moduleTypeAccessor = `modulesByType.${moduleType}`
         const label = t(`module_display_names.${moduleType}`)
         const defaultModel = DEFAULT_MODEL_FOR_MODULE_TYPE[moduleType]
         const selectedModel = values[moduleType].model
         return (
           <div className={styles.module_form_group} key={`${moduleType}`}>
-            <DeprecatedCheckboxField
-              label={label}
-              name={`${moduleTypeAccessor}.onDeck`}
-              value={values[moduleType].onDeck}
-              onChange={handleOnDeckChange(moduleType)}
-              tabIndex={i}
+            <Controller
+              control={control}
+              name={`modulesByType.${moduleType}.onDeck`}
+              render={({ field }) => (
+                <DeprecatedCheckboxField
+                  label={label}
+                  name={`modulesByType.${moduleType}.onDeck`}
+                  value={field.value}
+                  onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
+                    const type: ModuleType = e.target.value as ModuleType
+                    field.onChange(e)
+                    await trigger(`modulesByType.${type}.onDeck`)
+                  }}
+                  tabIndex={i}
+                />
+              )}
             />
 
             <ModuleDiagram
               type={moduleType}
               model={selectedModel ?? defaultModel}
             />
-
-            <div className={styles.module_model}>
-              {values[moduleType].onDeck && (
-                <FormGroup label="Model*">
-                  <DropdownField
-                    error={
-                      // TODO JF 2020-3-19 allow dropdowns to take error
-                      // components from formik so we avoid manually doing this
-                      touched &&
-                      typeof touched !== 'boolean' &&
-                      touched[moduleType] &&
-                      // @ts-expect-error(sa, 2021-6-21): not a valid way to type narrow
-                      touched[moduleType].model &&
-                      errors !== null &&
-                      typeof errors !== 'string' &&
-                      errors[moduleType]
-                        ? // @ts-expect-error(sa, 2021-6-21): not a valid way to type narrow
-                          errors[moduleType].model
-                        : null
-                    }
-                    tabIndex={i}
-                    name={`${moduleTypeAccessor}.model`}
-                    options={MODELS_FOR_MODULE_TYPE[moduleType]}
-                    value={selectedModel ?? defaultModel}
-                    onChange={onFieldChange}
-                    onBlur={onBlur}
-                  />
-                </FormGroup>
+            <Controller
+              control={control}
+              name={`modulesByType.${moduleType}.model`}
+              render={({ field }) => (
+                <div className={styles.module_model}>
+                  {values[moduleType].onDeck && (
+                    <FormGroup label="Model*">
+                      <DropdownField
+                        error={
+                          touched &&
+                          typeof touched !== 'boolean' &&
+                          touched[moduleType] &&
+                          // @ts-expect-error(sa, 2021-6-21): not a valid way to type narrow
+                          touched[moduleType].model &&
+                          errors !== null &&
+                          typeof errors !== 'string' &&
+                          errors[moduleType]
+                            ? // @ts-expect-error(sa, 2021-6-21): not a valid way to type narrow
+                              errors[moduleType].model
+                            : null
+                        }
+                        tabIndex={i}
+                        name={`modulesByType.${moduleType}.model`}
+                        options={MODELS_FOR_MODULE_TYPE[moduleType]}
+                        value={selectedModel ?? defaultModel}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                      />
+                    </FormGroup>
+                  )}
+                </div>
               )}
-            </div>
+            />
           </div>
         )
       })}

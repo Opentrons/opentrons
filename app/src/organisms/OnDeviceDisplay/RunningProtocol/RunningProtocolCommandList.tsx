@@ -13,6 +13,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_HIDDEN,
+  OVERFLOW_WRAP_ANYWHERE,
   POSITION_RELATIVE,
   SPACING,
   TYPOGRAPHY,
@@ -47,7 +48,7 @@ const TITLE_TEXT_STYLE = css`
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  overflow-wrap: anywhere;
+  overflow-wrap: ${OVERFLOW_WRAP_ANYWHERE};
   height: max-content;
 `
 

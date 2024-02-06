@@ -4,7 +4,6 @@ import { renderWithProviders } from '@opentrons/components'
 import {
   useAllCommandsQuery,
   useCommandQuery,
-  useRunQuery,
 } from '@opentrons/react-api-client'
 import {
   RUN_STATUS_IDLE,
@@ -30,6 +29,7 @@ import {
   mockRunData,
 } from '../../InterventionModal/__fixtures__'
 import { RunProgressMeter } from '..'
+import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../RunTimeControl/hooks')
@@ -38,11 +38,14 @@ jest.mock('../../../resources/runs/useNotifyLastRunCommandKey')
 jest.mock('../../Devices/hooks')
 jest.mock('../../../atoms/ProgressBar')
 jest.mock('../../InterventionModal')
+jest.mock('../../../resources/runs/useNotifyRunQuery')
 
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
 >
-const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
+const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
+  typeof useNotifyRunQuery
+>
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
 >
@@ -94,7 +97,7 @@ describe('RunProgressMeter', () => {
     when(mockUseNotifyLastRunCommandKey)
       .calledWith(NON_DETERMINISTIC_RUN_ID, { refetchInterval: 1000 })
       .mockReturnValue(NON_DETERMINISTIC_COMMAND_KEY)
-    mockUseRunQuery.mockReturnValue({ data: null } as any)
+    mockUseNotifyRunQuery.mockReturnValue({ data: null } as any)
 
     props = {
       runId: NON_DETERMINISTIC_RUN_ID,
@@ -127,7 +130,9 @@ describe('RunProgressMeter', () => {
     mockUseAllCommandsQuery.mockReturnValue({
       data: { data: [mockPauseCommandWithStartTime], meta: { totalLength: 1 } },
     } as any)
-    mockUseRunQuery.mockReturnValue({ data: { data: { labware: [] } } } as any)
+    mockUseNotifyRunQuery.mockReturnValue({
+      data: { data: { labware: [] } },
+    } as any)
     mockUseCommandQuery.mockReturnValue({ data: null } as any)
     mockUseMostRecentCompletedAnalysis.mockReturnValue({} as any)
     const { findByText } = render(props)
@@ -141,7 +146,9 @@ describe('RunProgressMeter', () => {
         meta: { totalLength: 1 },
       },
     } as any)
-    mockUseRunQuery.mockReturnValue({ data: { data: mockRunData } } as any)
+    mockUseNotifyRunQuery.mockReturnValue({
+      data: { data: mockRunData },
+    } as any)
     mockUseCommandQuery.mockReturnValue({ data: null } as any)
     mockUseMostRecentCompletedAnalysis.mockReturnValue({} as any)
     const { findByText } = render(props)

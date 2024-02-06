@@ -238,6 +238,11 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
             ? inProgressText
             : t('shared:stand_back_robot_is_in_motion')
         }
+        body={
+          errorMessage == null && !isExiting
+            ? t('calibration_pin_touching', { slot: 'C2' })
+            : null
+        }
         alternativeSpinner={
           errorMessage == null && !isExiting ? inProgressImage : undefined
         }

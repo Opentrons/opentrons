@@ -5,21 +5,22 @@ import { NavLink } from 'react-router-dom'
 import { css } from 'styled-components'
 
 import {
-  SPACING,
-  Icon,
-  Flex,
-  Link,
-  COLORS,
-  BORDERS,
-  DIRECTION_COLUMN,
-  DISPLAY_INLINE_BLOCK,
-  TYPOGRAPHY,
-  SIZE_1,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
-  JUSTIFY_CENTER,
-  SIZE_4,
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
+  DISPLAY_INLINE_BLOCK,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
+  Link,
+  OVERFLOW_WRAP_ANYWHERE,
+  SIZE_1,
+  SIZE_4,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -87,6 +88,7 @@ interface ChooseRobotSlideoutProps
   selectedRobot: Robot | null
   setSelectedRobot: (robot: Robot | null) => void
   isAnalysisError?: boolean
+  isAnalysisStale?: boolean
   showIdleOnly?: boolean
 }
 
@@ -100,6 +102,7 @@ export function ChooseRobotSlideout(
     title,
     footer,
     isAnalysisError = false,
+    isAnalysisStale = false,
     isCreatingRun = false,
     isSelectedRobotOnDifferentSoftwareVersion,
     reset: resetCreateRun,
@@ -179,6 +182,9 @@ export function ChooseRobotSlideout(
         {isAnalysisError ? (
           <Banner type="warning">{t('protocol_failed_app_analysis')}</Banner>
         ) : null}
+        {isAnalysisStale ? (
+          <Banner type="warning">{t('protocol_outdated_app_analysis')}</Banner>
+        ) : null}
         <Flex alignSelf={ALIGN_FLEX_END} marginY={SPACING.spacing4}>
           {isScanning ? (
             <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
@@ -252,7 +258,7 @@ export function ChooseRobotSlideout(
                   <StyledText
                     as="label"
                     color={COLORS.red60}
-                    overflowWrap="anywhere"
+                    overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                     display={DISPLAY_INLINE_BLOCK}
                     marginTop={`-${SPACING.spacing8}`}
                     marginBottom={SPACING.spacing8}

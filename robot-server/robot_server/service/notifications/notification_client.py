@@ -1,14 +1,12 @@
-# noqa: D100
-
-from typing import Any, Dict, Optional
-from enum import Enum
 import random
 import logging
 import paho.mqtt.client as mqtt
 from anyio import to_thread
 from fastapi import Depends
+from typing import Any, Dict, Optional
+from enum import Enum
 
-from .service.json_api import NotifyRefetchBody
+from ..json_api import NotifyRefetchBody
 from server_utils.fastapi_utils.app_state import (
     AppState,
     AppStateAccessor,
@@ -30,7 +28,18 @@ class MQTT_QOS(Enum):
     QOS_2 = 2
 
 
-class NotificationClient:  # noqa: D101
+class NotificationClient:
+    """Methods for managing interactions with the MQTT broker.
+
+    Args:
+        host: Address of the MQTT broker.
+        port: Port used to communicate with the broker.
+        keepalive: Interval for transmitting a keepalive packet.
+        protocol_version: MQTT protocol version.
+        default_qos: Default quality of service. QOS 1 is "at least once".
+        retain_message: Whether the broker should hold a copy of the message for new clients.
+    """
+
     def __init__(
         self,
         host: str = "127.0.0.1",
@@ -68,7 +77,7 @@ class NotificationClient:  # noqa: D101
         self.client.loop_stop()
         await to_thread.run_sync(self.client.disconnect)
 
-    async def publish(
+    async def publish_async(
         self, topic: str, message: NotifyRefetchBody = NotifyRefetchBody()
     ) -> None:
         """Asynchronously Publish a message on a specific topic to the MQTT broker.
@@ -77,9 +86,11 @@ class NotificationClient:  # noqa: D101
             topic: The topic to publish the message on.
             message: The message to be published, in the format of NotifyRefetchBody.
         """
-        await to_thread.run_sync(self._publish, topic, message)
+        await to_thread.run_sync(self.publish, topic, message)
 
-    def _publish(self, topic: str, message: NotifyRefetchBody) -> None:
+    def publish(
+        self, topic: str, message: NotifyRefetchBody = NotifyRefetchBody()
+    ) -> None:
         """Publish a message on a specific topic to the MQTT broker.
 
         Args:
@@ -116,7 +127,13 @@ class NotificationClient:  # noqa: D101
         else:
             log.info(f"Failed to connect to MQTT broker with reason code: {rc}")
 
-    def _on_disconnect(self, client: mqtt.Client, userdata: Any, rc: int) -> None:
+    def _on_disconnect(
+        self,
+        client: mqtt.Client,
+        userdata: Any,
+        rc: int,
+        properties: Optional[mqtt.Properties] = None,
+    ) -> None:
         """Callback invoked when the client is disconnected from the MQTT broker.
 
         Args:

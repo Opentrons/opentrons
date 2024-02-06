@@ -13,7 +13,7 @@ import {
   PrimaryButton,
   COLORS,
 } from '@opentrons/components'
-import { useRunQuery, useProtocolQuery } from '@opentrons/react-api-client'
+import { useProtocolQuery } from '@opentrons/react-api-client'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useLPCSuccessToast } from '../../hooks/useLPCSuccessToast'
 import { Tooltip } from '../../../../atoms/Tooltip'
@@ -25,8 +25,10 @@ import {
 import { CurrentOffsetsTable } from './CurrentOffsetsTable'
 import { useLaunchLPC } from '../../../LabwarePositionCheck/useLaunchLPC'
 import { StyledText } from '../../../../atoms/text'
-import type { LabwareOffset } from '@opentrons/api-client'
 import { getLatestCurrentOffsets } from './utils'
+import { useNotifyRunQuery } from '../../../../resources/runs/useNotifyRunQuery'
+
+import type { LabwareOffset } from '@opentrons/api-client'
 
 interface SetupLabwarePositionCheckProps {
   expandLabwareStep: () => void
@@ -41,7 +43,7 @@ export function SetupLabwarePositionCheck(
   const { t, i18n } = useTranslation('protocol_setup')
 
   const robotType = useRobotType(robotName)
-  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
+  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const { data: protocolRecord } = useProtocolQuery(
     runRecord?.data.protocolId ?? null,
     {

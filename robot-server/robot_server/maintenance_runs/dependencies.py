@@ -15,7 +15,10 @@ from robot_server.hardware import get_hardware, get_deck_type, get_robot_type
 
 from .maintenance_engine_store import MaintenanceEngineStore
 from .maintenance_run_data_manager import MaintenanceRunDataManager
-from ..notification_client import NotificationClient, get_notification_client
+from robot_server.service.notifications import (
+    MaintenanceRunsPublisher,
+    get_maintenance_runs_publisher,
+)
 
 _engine_store_accessor = AppStateAccessor[MaintenanceEngineStore](
     "maintenance_engine_store"
@@ -42,9 +45,11 @@ async def get_maintenance_engine_store(
 
 async def get_maintenance_run_data_manager(
     engine_store: MaintenanceEngineStore = Depends(get_maintenance_engine_store),
-    notification_client: NotificationClient = Depends(get_notification_client),
+    maintenance_runs_publisher: MaintenanceRunsPublisher = Depends(
+        get_maintenance_runs_publisher
+    ),
 ) -> MaintenanceRunDataManager:
     """Get a maintenance run data manager to keep track of current run data."""
     return MaintenanceRunDataManager(
-        engine_store=engine_store, notification_client=notification_client
+        engine_store=engine_store, maintenance_runs_publisher=maintenance_runs_publisher
     )

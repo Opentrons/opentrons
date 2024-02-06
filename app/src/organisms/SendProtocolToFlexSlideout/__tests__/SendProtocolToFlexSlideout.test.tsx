@@ -8,10 +8,7 @@ import {
   mockOT3HealthResponse,
   mockOT3ServerHealthResponse,
 } from '@opentrons/discovery-client/src/__fixtures__'
-import {
-  useAllRunsQuery,
-  useCreateProtocolMutation,
-} from '@opentrons/react-api-client'
+import { useCreateProtocolMutation } from '@opentrons/react-api-client'
 
 import { mockSuccessQueryResults } from '../../../__fixtures__'
 import { i18n } from '../../../i18n'
@@ -35,6 +32,7 @@ import { getNetworkInterfaces } from '../../../redux/networking'
 import { getIsProtocolAnalysisInProgress } from '../../../redux/protocol-storage/selectors'
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
 import { SendProtocolToFlexSlideout } from '..'
+import { useNotifyAllRunsQuery } from '../../../resources/runs/useNotifyAllRunsQuery'
 
 import type { State } from '../../../redux/types'
 import { getValidCustomLabwareFiles } from '../../../redux/custom-labware'
@@ -46,6 +44,7 @@ jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/networking')
 jest.mock('../../../redux/custom-labware')
 jest.mock('../../../redux/protocol-storage/selectors')
+jest.mock('../../../resources/runs/useNotifyAllRunsQuery')
 
 const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
   typeof getRobotUpdateDisplayInfo
@@ -64,8 +63,8 @@ const mockStartDiscovery = startDiscovery as jest.MockedFunction<
   typeof startDiscovery
 >
 const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
-const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
-  typeof useAllRunsQuery
+const mockUseNotifyAllRunsQuery = useNotifyAllRunsQuery as jest.MockedFunction<
+  typeof useNotifyAllRunsQuery
 >
 const mockUseCreateProtocolMutation = useCreateProtocolMutation as jest.MockedFunction<
   typeof useCreateProtocolMutation
@@ -136,7 +135,7 @@ describe('SendProtocolToFlexSlideout', () => {
       makeToast: mockMakeToast,
       eatToast: mockEatToast,
     })
-    when(mockUseAllRunsQuery)
+    when(mockUseNotifyAllRunsQuery)
       .calledWith(expect.any(Object), expect.any(Object), expect.any(Object))
       .mockReturnValue(
         mockSuccessQueryResults({
@@ -186,7 +185,7 @@ describe('SendProtocolToFlexSlideout', () => {
     screen.getByText('2 unavailable robots are not listed.')
   })
   it('does render a robot option for a busy OT-3', () => {
-    when(mockUseAllRunsQuery)
+    when(mockUseNotifyAllRunsQuery)
       .calledWith(expect.any(Object), expect.any(Object), {
         hostname: mockConnectableOT3.ip,
       })

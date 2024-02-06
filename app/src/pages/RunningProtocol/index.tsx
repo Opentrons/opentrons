@@ -20,7 +20,6 @@ import {
 import {
   useAllCommandsQuery,
   useProtocolQuery,
-  useRunQuery,
   useRunActionMutations,
 } from '@opentrons/react-api-client'
 import {
@@ -51,6 +50,7 @@ import { CancelingRunModal } from '../../organisms/OnDeviceDisplay/RunningProtoc
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/ConfirmCancelRunModal'
 import { getLocalRobot } from '../../redux/discovery'
 import { OpenDoorAlertModal } from '../../organisms/OpenDoorAlertModal'
+import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 
@@ -65,7 +65,7 @@ const Bullet = styled.div`
   border-radius: 50%;
   z-index: 2;
   background: ${(props: BulletProps) =>
-    props.isActive ? COLORS.grey50 : COLORS.grey50};
+    props.isActive ? COLORS.grey50 : COLORS.grey40};
   transform: ${(props: BulletProps) =>
     props.isActive ? 'scale(2)' : 'scale(1)'};
 `
@@ -101,7 +101,7 @@ export function RunningProtocol(): JSX.Element {
     refetchInterval: RUN_STATUS_REFETCH_INTERVAL,
   })
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
-  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
+  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data.protocolId ?? null
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,

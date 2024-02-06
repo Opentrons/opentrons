@@ -5,14 +5,15 @@ import { useHistory } from 'react-router-dom'
 import { formatDistance } from 'date-fns'
 
 import {
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
   Flex,
   Icon,
-  COLORS,
+  JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_WRAP_BREAK_WORD,
   SPACING,
   TYPOGRAPHY,
-  DIRECTION_COLUMN,
-  BORDERS,
-  JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 import { useProtocolQuery } from '@opentrons/react-api-client'
 
@@ -110,7 +111,7 @@ export function ProtocolWithLastRun({
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 5;
     overflow: hidden;
-    overflow-wrap: break-word;
+    overflow-wrap: ${OVERFLOW_WRAP_BREAK_WORD};
     height: max-content;
   `
 

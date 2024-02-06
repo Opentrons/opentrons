@@ -1,20 +1,21 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import {
-  Box,
-  Flex,
-  DIRECTION_ROW,
-  DIRECTION_COLUMN,
-  Btn,
-  Icon,
-  SPACING,
-  JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
+  Box,
+  Btn,
   COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_WRAP_ANYWHERE,
   Overlay,
   POSITION_FIXED,
-  TYPOGRAPHY,
+  SPACING,
   Text,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 export interface SlideoutProps {
@@ -171,7 +172,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
             >
               <Text
                 as="h3"
-                overflowWrap="anywhere"
+                overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 data-testid={`Slideout_title_${title}`}
               >

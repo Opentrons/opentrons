@@ -59,6 +59,8 @@ When choosing an API level, consider what features you need and how widely you p
 
 On the one hand, using the highest available version will give your protocol access to all the latest :ref:`features and fixes <version-notes>`. On the other hand, using the lowest possible version lets the protocol work on a wider range of robot software versions. For example, a protocol that uses the Heater-Shaker and specifies version 2.13 of the API should work equally well on a robot running version 6.1.0 or 6.2.0 of the robot software. Specifying version 2.14 would limit the protocol to robots running 6.2.0 or higher.
 
+.. _max-version:
+
 Maximum Supported Versions
 ==========================
 

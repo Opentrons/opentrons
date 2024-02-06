@@ -143,13 +143,6 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           iconName="brightness"
         />
         <RobotSettingButton
-          settingName={t('app_settings:privacy')}
-          dataTestId="RobotSettingButton_privacy"
-          settingInfo={t('app_settings:choose_what_data_to_share')}
-          onClick={() => setCurrentOption('Privacy')}
-          iconName="privacy"
-        />
-        <RobotSettingButton
           settingName={t('apply_historic_offsets')}
           dataTestId="RobotSettingButton_apply_historic_offsets"
           settingInfo={t('historic_offsets_description')}

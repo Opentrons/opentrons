@@ -2,8 +2,9 @@ import last from 'lodash/last'
 import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
-  useRunQuery,
 } from '@opentrons/react-api-client'
+
+import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
 
 import { AnalysisError } from '@opentrons/shared-data'
 
@@ -14,7 +15,7 @@ export interface ProtocolAnalysisErrors {
 export function useProtocolAnalysisErrors(
   runId: string | null
 ): ProtocolAnalysisErrors {
-  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
+  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data?.protocolId ?? null
   const { data: protocolData } = useProtocolQuery(protocolId)
   const {

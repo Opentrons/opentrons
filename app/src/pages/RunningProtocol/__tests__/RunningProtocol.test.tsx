@@ -14,7 +14,6 @@ import {
   useAllCommandsQuery,
   useProtocolAnalysesQuery,
   useProtocolQuery,
-  useRunQuery,
   useRunActionMutations,
 } from '@opentrons/react-api-client'
 
@@ -35,6 +34,7 @@ import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositi
 import { OpenDoorAlertModal } from '../../../organisms/OpenDoorAlertModal'
 import { RunningProtocol } from '..'
 import { useNotifyLastRunCommandKey } from '../../../resources/runs/useNotifyLastRunCommandKey'
+import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
 
 import type { ProtocolAnalyses } from '@opentrons/api-client'
 
@@ -53,6 +53,7 @@ jest.mock(
 )
 jest.mock('../../../organisms/OpenDoorAlertModal')
 jest.mock('../../../resources/runs/useNotifyLastRunCommandKey')
+jest.mock('../../../resources/runs/useNotifyRunQuery')
 
 const mockUseProtocolAnalysesQuery = useProtocolAnalysesQuery as jest.MockedFunction<
   typeof useProtocolAnalysesQuery
@@ -63,7 +64,9 @@ const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
 >
-const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
+const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
+  typeof useNotifyRunQuery
+>
 const mockUseRunTimestamps = useRunTimestamps as jest.MockedFunction<
   typeof useRunTimestamps
 >
@@ -125,7 +128,7 @@ const render = (path = '/') => {
 
 describe('RunningProtocol', () => {
   beforeEach(() => {
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID, { staleTime: Infinity })
       .mockReturnValue({
         data: {

@@ -13,14 +13,16 @@ import {
   RUN_ACTION_TYPE_STOP,
   RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
-import { useRunQuery, useRunActionMutations } from '@opentrons/react-api-client'
+import { useRunActionMutations } from '@opentrons/react-api-client'
 
 import {
   useCloneRun,
   useCurrentRunId,
   useRunCommands,
 } from '../ProtocolUpload/hooks'
-import { UseQueryOptions } from 'react-query'
+import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
+
+import type { UseQueryOptions } from 'react-query'
 import type { RunAction, RunStatus, Run, RunData } from '@opentrons/api-client'
 
 export interface RunControls {
@@ -71,7 +73,7 @@ export function useRunStatus(
 ): RunStatus | null {
   const lastRunStatus = React.useRef<RunStatus | null>(null)
 
-  const { data } = useRunQuery(runId ?? null, {
+  const { data } = useNotifyRunQuery(runId ?? null, {
     refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
     enabled:
       lastRunStatus.current == null ||
@@ -120,7 +122,7 @@ const DEFAULT_RUN_QUERY_REFETCH_INTERVAL = 5000
 export function useRunTimestamps(runId: string | null): RunTimestamps {
   const runStatus = useRunStatus(runId)
   const { actions = [], errors = [] } =
-    useRunQuery(runId, {
+    useNotifyRunQuery(runId, {
       refetchInterval: DEFAULT_RUN_QUERY_REFETCH_INTERVAL,
     })?.data?.data ?? {}
   const runCommands =
@@ -175,7 +177,7 @@ export function useRunTimestamps(runId: string | null): RunTimestamps {
 }
 
 export function useRunErrors(runId: string | null): RunData['errors'] {
-  const { data: runRecord } = useRunQuery(runId, {
+  const { data: runRecord } = useNotifyRunQuery(runId, {
     refetchInterval: DEFAULT_RUN_QUERY_REFETCH_INTERVAL,
   })
 

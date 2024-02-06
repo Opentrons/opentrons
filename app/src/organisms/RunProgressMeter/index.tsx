@@ -28,7 +28,6 @@ import {
 import {
   useAllCommandsQuery,
   useCommandQuery,
-  useRunQuery,
 } from '@opentrons/react-api-client'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -42,6 +41,7 @@ import { ProgressBar } from '../../atoms/ProgressBar'
 import { useDownloadRunLog, useRobotType } from '../Devices/hooks'
 import { InterventionTicks } from './InterventionTicks'
 import { isInterventionCommand } from '../InterventionModal/utils'
+import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
 
 import type { RunStatus } from '@opentrons/api-client'
 
@@ -70,7 +70,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
   })
-  const { data: runRecord } = useRunQuery(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId)
   const runData = runRecord?.data ?? null
   const analysis = useMostRecentCompletedAnalysis(runId)
   const { data: allCommandsQueryData } = useAllCommandsQuery(runId, {
@@ -222,7 +222,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             css={css`
             ${TYPOGRAPHY.darkLinkH4SemiBold}
             &:hover {
-              color: ${downloadIsDisabled ? COLORS.grey50 : COLORS.black90};
+              color: ${downloadIsDisabled ? COLORS.grey40 : COLORS.black90};
             }
             cursor: ${downloadIsDisabled ? 'default' : 'pointer'};
           }
