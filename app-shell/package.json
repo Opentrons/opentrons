@@ -42,7 +42,7 @@
     "@types/fs-extra": "9.0.13",
     "@types/lodash": "^4.14.191",
     "@types/pump": "^1.1.0",
-    "@types/uuid": "^3.4.7",
+    "@types/uuid": "8.3.0",
     "ajv": "6.12.3",
     "dateformat": "3.0.3",
     "electron-context-menu": "3.6.1",
@@ -63,7 +63,7 @@
     "serialport": "10.5.0",
     "tempy": "1.0.1",
     "usb": "^2.11.0",
-    "uuid": "3.2.1",
+    "uuid": "8.3.2",
     "winston": "3.1.0",
     "yargs-parser": "13.1.2"
   }
