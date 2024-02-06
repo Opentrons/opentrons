@@ -7,7 +7,7 @@ import {
   PLURAL_CATEGORY_LABELS_BY_CATEGORY,
   CATEGORY,
 } from '../../localization'
-import styles from './styles.css'
+import styles from './styles.module.css'
 import type { FilterParams } from '../../types'
 
 export interface FilterCategoryProps {

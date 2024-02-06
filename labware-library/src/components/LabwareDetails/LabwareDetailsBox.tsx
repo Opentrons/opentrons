@@ -14,7 +14,7 @@ import { Dimensions } from './Dimensions'
 import { WellDimensions } from './WellDimensions'
 import { WellSpacing } from './WellSpacing'
 
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 import type { LabwareDefinition } from '../../types'
 

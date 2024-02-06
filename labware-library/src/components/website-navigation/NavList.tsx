@@ -6,7 +6,7 @@ import { NavMenu } from './NavMenu'
 import { ProductMenu } from './ProductMenu'
 import { ProtocolMenu } from './ProtocolMenu'
 import { SupportMenu } from './SupportMenu'
-import styles from './styles.css'
+import styles from './styles.module.css'
 import type { MenuName } from './types'
 
 interface State {

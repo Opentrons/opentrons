@@ -7,7 +7,7 @@ import { FormLevelErrorAlerts } from '../FormLevelErrorAlerts'
 
 import { SectionBody } from './SectionBody'
 
-import styles from '../../styles.css'
+import styles from '../../styles.module.css'
 
 export const PreviewInstructions = (props: {
   values: LabwareFields

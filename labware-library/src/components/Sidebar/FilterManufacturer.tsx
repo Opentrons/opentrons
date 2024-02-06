@@ -3,7 +3,7 @@ import * as React from 'react'
 import { withRouter } from 'react-router-dom'
 import { SelectField } from '@opentrons/components'
 import { getAllManufacturers, buildFiltersUrl } from '../../filters'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 import { MANUFACTURER, MANUFACTURER_VALUES } from '../../localization'
 

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useFormikContext } from 'formik'
 import { SectionBody } from './SectionBody'
-import styles from '../../styles.css'
+import styles from '../../styles.module.css'
 
 import type { LabwareFields } from '../../fields'
 

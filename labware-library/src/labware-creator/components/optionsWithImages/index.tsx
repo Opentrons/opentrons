@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { wellBottomShapeOptions, wellShapeOptions } from '../../fields'
 import type { Options } from '../../fields'
-import styles from './optionsWithImages.css'
+import styles from './optionsWithImages.module.css'
 
 const WELL_SHAPE_IMAGES = {
   rectangular: require('../../../images/rectangularWell.svg'),

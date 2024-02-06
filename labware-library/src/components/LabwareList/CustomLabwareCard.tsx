@@ -8,7 +8,7 @@ import {
   CUSTOM_LABWARE_SUPPORT_BTN,
   LABWARE_CREATOR_BTN,
 } from '../../localization'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 interface Props {
   isResultsEmpty?: boolean

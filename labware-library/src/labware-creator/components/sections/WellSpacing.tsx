@@ -9,7 +9,7 @@ import { TextField } from '../TextField'
 import { XYSpacingImg } from '../diagrams'
 import { SectionBody } from './SectionBody'
 
-import styles from '../../styles.css'
+import styles from '../../styles.module.css'
 
 const maskTo2Decimal = makeMaskToDecimal(2)
 

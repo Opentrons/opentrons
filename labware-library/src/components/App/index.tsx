@@ -9,7 +9,7 @@ import { Sidebar } from '../Sidebar'
 import { Page } from './Page'
 import { LabwareList } from '../LabwareList'
 import { LabwareDetails } from '../LabwareDetails'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 import type { DefinitionRouteRenderProps } from '../../definitions'
 

@@ -10,7 +10,7 @@ import { DepthImg } from '../diagrams'
 import { SectionBody } from './SectionBody'
 import { wellBottomShapeOptionsWithIcons } from '../optionsWithImages'
 
-import styles from '../../styles.css'
+import styles from '../../styles.module.css'
 import { getLabwareName } from '../../utils'
 
 const maskTo2Decimal = makeMaskToDecimal(2)
