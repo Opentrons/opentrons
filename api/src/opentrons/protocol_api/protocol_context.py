@@ -150,10 +150,10 @@ class ProtocolContext(CommandPublisher):
         }
         self._bundled_data: Dict[str, bytes] = bundled_data or {}
 
-        # With the addition of Moveable Trashes and Waste Chute support, it is not necessary
+        # With the addition of Movable Trashes and Waste Chute support, it is not necessary
         # to ensure that the list of "disposal locations", essentially the list of trashes,
         # is initialized correctly on protocols utilizing former API versions prior to 2.16
-        # and also to ensure that any protocols after 2.16 intialize a Fixed Trash for OT-2
+        # and also to ensure that any protocols after 2.16 initialize a Fixed Trash for OT-2
         # protocols so that no load trash bin behavior is required within the protocol itself.
         # Protocols prior to 2.16 expect the Fixed Trash to exist as a Labware object, while
         # protocols after 2.16 expect trash to exist as either a TrashBin or WasteChute object.
@@ -168,7 +168,13 @@ class ProtocolContext(CommandPublisher):
             _fixed_trash_trashbin = TrashBin(
                 location=DeckSlotName.FIXED_TRASH, addressable_area_name="fixedTrash"
             )
-            self._core.append_disposal_location(_fixed_trash_trashbin)
+            # We have to skip adding this fixed trash bin to engine because this __init__ is called in the main thread
+            # and any calls to sync client will cause a deadlock. This means that OT-2 fixed trashes are not added to
+            # the engine store until one is first referenced. This should have minimal consequences for OT-2 given that
+            # we do not need to worry about the 96 channel pipette and partial tip configuration with that pipette.
+            self._core.append_disposal_location(
+                _fixed_trash_trashbin, skip_add_to_engine=True
+            )
 
         self._commands: List[str] = []
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
