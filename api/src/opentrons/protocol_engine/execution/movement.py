@@ -147,7 +147,7 @@ class MovementHandler:
         minimum_z_height: Optional[float] = None,
         speed: Optional[float] = None,
         stay_at_highest_possible_z: bool = False,
-        ignore_tip_configuration: Optional[bool] = False,
+        ignore_tip_configuration: Optional[bool] = True,
     ) -> Point:
         """Move to a specific addressable area."""
         # Check for presence of heater shakers on deck, and if planned

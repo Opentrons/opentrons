@@ -220,7 +220,7 @@ class SyncClient:
         force_direct: bool,
         speed: Optional[float],
         alternate_drop_location: Optional[bool],
-        ignore_tip_configuration: Optional[bool] = False,
+        ignore_tip_configuration: Optional[bool] = True,
     ) -> commands.MoveToAddressableAreaForDropTipResult:
         """Execute a MoveToAddressableArea command and return the result."""
         request = commands.MoveToAddressableAreaForDropTipCreate(

@@ -150,7 +150,7 @@ class MotionView:
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
         stay_at_max_travel_z: bool = False,
-        ignore_tip_configuration: Optional[bool] = False,
+        ignore_tip_configuration: Optional[bool] = True,
     ) -> List[motion_planning.Waypoint]:
         """Calculate waypoints to a destination that's specified as an addressable area."""
         location = self._pipettes.get_current_location()
