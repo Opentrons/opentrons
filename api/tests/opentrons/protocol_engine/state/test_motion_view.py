@@ -554,6 +554,7 @@ def test_get_movement_waypoints_to_addressable_area(
         max_travel_z=1337,
         force_direct=True,
         minimum_z_height=123,
+        ignore_tip_configuration=False,
     )
 
     assert result == waypoints
@@ -683,6 +684,7 @@ def test_get_movement_waypoints_to_addressable_area_stay_at_max_travel_z(
         force_direct=True,
         minimum_z_height=123,
         stay_at_max_travel_z=True,
+        ignore_tip_configuration=False,
     )
 
     assert result == waypoints
