@@ -324,7 +324,6 @@ def _check_deck_conflict_for_96_channel(
     adjacent_slot_num = None
     # TODO (spp, 2023-12-18): change this eventually to "column 1"/"column 12"
     #  via the column mappings in the pipette geometry definitions.
-    # if we are handling commands in the trash or in the waste chute, skip these checks
     if primary_nozzle == "A12":
         adjacent_slot_num = get_west_slot(destination_slot_num)
     elif primary_nozzle == "A1":
