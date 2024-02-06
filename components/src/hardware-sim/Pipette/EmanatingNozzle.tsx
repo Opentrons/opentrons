@@ -26,26 +26,6 @@ export const EmanatingNozzle = (props: {
         strokeWidth={'2px'}
         fill={C_TRANSPARENT}
       >
-        <animate
-          data-testid="radius_animation"
-          attributeName="r"
-          from={5}
-          to={SINGLE_CHANNEL_PIPETTE_HEIGHT / 2}
-          begin={0}
-          dur={1.1}
-          calcMode="ease-out"
-          repeatCount="indefinite"
-        />
-        <animate
-          data-testid="opacity_animation"
-          attributeName="opacity"
-          from={0.7}
-          to={0}
-          begin={0}
-          dur={1.1}
-          calcMode="linear"
-          repeatCount="indefinite"
-        />
       </circle>
     </React.Fragment>
   )
