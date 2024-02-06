@@ -246,6 +246,10 @@ class OT3API(
         self._gantry_load = GantryLoad.LOW_THROUGHPUT
         OT3RobotCalibrationProvider.__init__(self, self._config)
         ExecutionManagerProvider.__init__(self, isinstance(backend, OT3Simulator))
+    
+    def is_high_throughput_idle_mount(self, mount: Union[top_types.Mount, OT3Mount]):
+        return self._gantry_load == GantryLoad.HIGH_THROUGHPUT and\
+            OT3Mount.from_mount(mount) != self._last_moved_mount
 
     @property
     def door_state(self) -> DoorState:
@@ -1150,13 +1154,13 @@ class OT3API(
         else:
             checked_max = None
 
-        await self._cache_and_maybe_retract_mount(realmount)
         await self._move(
             target_position,
             speed=speed,
             max_speeds=checked_max,
             expect_stalls=_expect_stalls,
         )
+        self._last_moved_mount = mount
 
     async def move_axes(  # noqa: C901
         self,
@@ -1261,7 +1265,6 @@ class OT3API(
             checked_max: Optional[OT3AxisMap[float]] = max_speeds
         else:
             checked_max = None
-        await self._cache_and_maybe_retract_mount(realmount)
         await self._move(
             target_position,
             speed=speed,
@@ -1269,6 +1272,7 @@ class OT3API(
             check_bounds=check_bounds,
             expect_stalls=_expect_stalls,
         )
+        self._last_moved_mount = mount
 
     async def _cache_and_maybe_retract_mount(self, mount: OT3Mount) -> None:
         """Retract the 'other' mount if necessary
@@ -1298,7 +1302,13 @@ class OT3API(
 
         if mount != OT3Mount.GRIPPER:
             await self.idle_gripper()
-        self._last_moved_mount = mount
+    
+    async def prepare_for_mount_movement(
+        self, mount: Union[top_types.Mount, OT3Mount]
+    ) -> None:
+        """Retract the idle mount if necessary."""
+        realmount = OT3Mount.from_mount(mount)
+        await self._cache_and_maybe_retract_mount(realmount)
 
     async def idle_gripper(self) -> None:
         """Move gripper to its idle, gripped position."""

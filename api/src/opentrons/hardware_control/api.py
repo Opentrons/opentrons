@@ -762,8 +762,8 @@ class API(
             top_types.Point(0, 0, 0),
         )
 
-        await self._cache_and_maybe_retract_mount(mount)
         await self._move(target_position, speed=speed, max_speeds=max_speeds)
+        self._last_moved_mount = mount
 
     async def move_axes(
         self,
@@ -822,13 +822,13 @@ class API(
                 detail={"mount": str(mount), "unhomed_axes": str(unhomed)},
             )
 
-        await self._cache_and_maybe_retract_mount(mount)
         await self._move(
             target_position,
             speed=speed,
             max_speeds=max_speeds,
             check_bounds=check_bounds,
         )
+        self._last_moved_mount = mount
 
     async def _cache_and_maybe_retract_mount(self, mount: top_types.Mount) -> None:
         """Retract the 'other' mount if necessary
@@ -840,7 +840,9 @@ class API(
         """
         if mount != self._last_moved_mount and self._last_moved_mount:
             await self.retract(self._last_moved_mount, 10)
-        self._last_moved_mount = mount
+    
+    async def prepare_for_mount_movement(self, mount: top_types.Mount) -> None:
+        await self._cache_and_maybe_retract_mount(mount)
 
     @ExecutionManagerProvider.wait_for_running
     async def _move(
