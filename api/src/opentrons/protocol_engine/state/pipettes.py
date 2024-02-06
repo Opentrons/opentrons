@@ -706,12 +706,12 @@ class PipetteView(HasState[PipetteState]):
         pip_back_left_bound = (
             primary_nozzle_position
             - primary_nozzle_offset
-            - bounding_nozzles_offsets.back_left_offset
+            + bounding_nozzles_offsets.back_left_offset
         )
         pip_front_right_bound = (
             primary_nozzle_position
             - primary_nozzle_offset
-            - bounding_nozzles_offsets.front_right_offset
+            + bounding_nozzles_offsets.front_right_offset
         )
         pip_back_right_bound = Point(
             pip_front_right_bound.x, pip_back_left_bound.y, pip_front_right_bound.z

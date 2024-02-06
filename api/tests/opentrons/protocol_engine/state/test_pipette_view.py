@@ -1,8 +1,9 @@
 """Tests for pipette state accessors in the protocol_engine state store."""
 from collections import OrderedDict
+from dataclasses import dataclass
 
 import pytest
-from typing import cast, Dict, List, Optional
+from typing import cast, Dict, List, Optional, Tuple, NamedTuple
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.pipette import pipette_definition
@@ -30,6 +31,14 @@ from opentrons.protocol_engine.state.pipettes import (
 from opentrons.hardware_control.nozzle_manager import NozzleMap, NozzleConfigurationType
 from opentrons.protocol_engine.errors import TipNotAttachedError, PipetteNotLoadedError
 
+from ..pipette_fixtures import (
+    NINETY_SIX_ROWS,
+    NINETY_SIX_COLS,
+    NINETY_SIX_MAP,
+    EIGHT_CHANNEL_ROWS,
+    EIGHT_CHANNEL_COLS,
+    EIGHT_CHANNEL_MAP,
+)
 
 _SAMPLE_NOZZLE_BOUNDS_OFFSETS = BoundingNozzlesOffsets(
     back_left_offset=Point(x=10, y=20, z=30), front_right_offset=Point(x=40, y=50, z=60)
@@ -542,3 +551,201 @@ def test_nozzle_configuration_getters() -> None:
     assert subject.get_nozzle_layout_type("pipette-id") == NozzleConfigurationType.FULL
     assert subject.get_is_partially_configured("pipette-id") is False
     assert subject.get_primary_nozzle("pipette-id") == "A1"
+
+
+class _PipetteSpecs(NamedTuple):
+    tip_length: float
+    bounding_nozzle_offsets: BoundingNozzlesOffsets
+    nozzle_map: NozzleMap
+    destination_position: Point
+    nozzle_bounds_result: Tuple[Point, Point, Point, Point]
+
+
+_pipette_spec_cases = [
+    _PipetteSpecs(
+        # 8-channel P300, full configuration
+        tip_length=42,
+        bounding_nozzle_offsets=BoundingNozzlesOffsets(
+            back_left_offset=Point(0.0, 31.5, 35.52),
+            front_right_offset=Point(0.0, -31.5, 35.52),
+        ),
+        nozzle_map=NozzleMap.build(
+            physical_nozzles=EIGHT_CHANNEL_MAP,
+            physical_rows=EIGHT_CHANNEL_ROWS,
+            physical_columns=EIGHT_CHANNEL_COLS,
+            starting_nozzle="A1",
+            back_left_nozzle="A1",
+            front_right_nozzle="H1",
+        ),
+        destination_position=Point(100, 200, 300),
+        nozzle_bounds_result=(
+            (
+                Point(x=100.0, y=200.0, z=342.0),
+                Point(x=100.0, y=137.0, z=342.0),
+                Point(x=100.0, y=200.0, z=342.0),
+                Point(x=100.0, y=137.0, z=342.0),
+            )
+        ),
+    ),
+    _PipetteSpecs(
+        # 8-channel P300, single configuration
+        tip_length=42,
+        bounding_nozzle_offsets=BoundingNozzlesOffsets(
+            back_left_offset=Point(0.0, 31.5, 35.52),
+            front_right_offset=Point(0.0, -31.5, 35.52),
+        ),
+        nozzle_map=NozzleMap.build(
+            physical_nozzles=EIGHT_CHANNEL_MAP,
+            physical_rows=EIGHT_CHANNEL_ROWS,
+            physical_columns=EIGHT_CHANNEL_COLS,
+            starting_nozzle="H1",
+            back_left_nozzle="H1",
+            front_right_nozzle="H1",
+        ),
+        destination_position=Point(100, 200, 300),
+        nozzle_bounds_result=(
+            (
+                Point(x=100.0, y=263.0, z=342.0),
+                Point(x=100.0, y=200.0, z=342.0),
+                Point(x=100.0, y=263.0, z=342.0),
+                Point(x=100.0, y=200.0, z=342.0),
+            )
+        ),
+    ),
+    _PipetteSpecs(
+        # 96-channel P1000, full configuration
+        tip_length=42,
+        bounding_nozzle_offsets=BoundingNozzlesOffsets(
+            back_left_offset=Point(-36.0, -25.5, -259.15),
+            front_right_offset=Point(63.0, -88.5, -259.15),
+        ),
+        nozzle_map=NozzleMap.build(
+            physical_nozzles=NINETY_SIX_MAP,
+            physical_rows=NINETY_SIX_ROWS,
+            physical_columns=NINETY_SIX_COLS,
+            starting_nozzle="A1",
+            back_left_nozzle="A1",
+            front_right_nozzle="H12",
+        ),
+        destination_position=Point(100, 200, 300),
+        nozzle_bounds_result=(
+            (
+                Point(x=100.0, y=200.0, z=342.0),
+                Point(x=199.0, y=137.0, z=342.0),
+                Point(x=199.0, y=200.0, z=342.0),
+                Point(x=100.0, y=137.0, z=342.0),
+            )
+        ),
+    ),
+    _PipetteSpecs(
+        # 96-channel P1000, A1 COLUMN configuration
+        tip_length=42,
+        bounding_nozzle_offsets=BoundingNozzlesOffsets(
+            back_left_offset=Point(-36.0, -25.5, -259.15),
+            front_right_offset=Point(63.0, -88.5, -259.15),
+        ),
+        nozzle_map=NozzleMap.build(
+            physical_nozzles=NINETY_SIX_MAP,
+            physical_rows=NINETY_SIX_ROWS,
+            physical_columns=NINETY_SIX_COLS,
+            starting_nozzle="A1",
+            back_left_nozzle="A1",
+            front_right_nozzle="H1",
+        ),
+        destination_position=Point(100, 200, 300),
+        nozzle_bounds_result=(
+            Point(100, 200, 342),
+            Point(199, 137, 342),
+            Point(199, 200, 342),
+            Point(100, 137, 342),
+        ),
+    ),
+    _PipetteSpecs(
+        # 96-channel P1000, A12 COLUMN configuration
+        tip_length=42,
+        bounding_nozzle_offsets=BoundingNozzlesOffsets(
+            back_left_offset=Point(-36.0, -25.5, -259.15),
+            front_right_offset=Point(63.0, -88.5, -259.15),
+        ),
+        nozzle_map=NozzleMap.build(
+            physical_nozzles=NINETY_SIX_MAP,
+            physical_rows=NINETY_SIX_ROWS,
+            physical_columns=NINETY_SIX_COLS,
+            starting_nozzle="A12",
+            back_left_nozzle="A12",
+            front_right_nozzle="H12",
+        ),
+        destination_position=Point(100, 200, 300),
+        nozzle_bounds_result=(
+            Point(1, 200, 342),
+            Point(100, 137, 342),
+            Point(100, 200, 342),
+            Point(1, 137, 342),
+        ),
+    ),
+    _PipetteSpecs(
+        # 96-channel P1000, ROW configuration
+        tip_length=42,
+        bounding_nozzle_offsets=BoundingNozzlesOffsets(
+            back_left_offset=Point(-36.0, -25.5, -259.15),
+            front_right_offset=Point(63.0, -88.5, -259.15),
+        ),
+        nozzle_map=NozzleMap.build(
+            physical_nozzles=NINETY_SIX_MAP,
+            physical_rows=NINETY_SIX_ROWS,
+            physical_columns=NINETY_SIX_COLS,
+            starting_nozzle="A1",
+            back_left_nozzle="A1",
+            front_right_nozzle="A12",
+        ),
+        destination_position=Point(100, 200, 300),
+        nozzle_bounds_result=(
+            Point(100, 200, 342),
+            Point(199, 137, 342),
+            Point(199, 200, 342),
+            Point(100, 137, 342),
+        ),
+    ),
+]
+
+
+@pytest.mark.parametrize(
+    argnames=_PipetteSpecs._fields,
+    argvalues=_pipette_spec_cases,
+)
+def test_get_nozzle_bounds_at_location(
+    tip_length: float,
+    bounding_nozzle_offsets: BoundingNozzlesOffsets,
+    nozzle_map: NozzleMap,
+    destination_position: Point,
+    nozzle_bounds_result: Tuple[Point, Point, Point, Point],
+) -> None:
+    """It should get the pipette's nozzle's bounds at the given location."""
+    subject = get_pipette_view(
+        nozzle_layout_by_id={"pipette-id": nozzle_map},
+        attached_tip_by_id={
+            "pipette-id": TipGeometry(length=tip_length, diameter=123, volume=123),
+        },
+        static_config_by_id={
+            "pipette-id": StaticPipetteConfig(
+                min_volume=1,
+                max_volume=9001,
+                channels=5,
+                model="blah",
+                display_name="bleh",
+                serial_number="",
+                tip_configuration_lookup_table={},
+                nominal_tip_overlap={},
+                home_position=0,
+                nozzle_offset_z=0,
+                bounding_nozzle_offsets=bounding_nozzle_offsets,
+            )
+        },
+    )
+    assert (
+        subject.get_nozzle_bounds_at_specified_move_to_position(
+            pipette_id="pipette-id",
+            destination_position=destination_position,
+        )
+        == nozzle_bounds_result
+    )
