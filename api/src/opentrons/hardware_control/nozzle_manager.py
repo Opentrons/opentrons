@@ -128,12 +128,12 @@ class NozzleMap:
         Note: This is the value relevant for this configuration, not the physical pipette. See the note on back_left.
         """
         return next(reversed(list(self.rows.values())))[-1]
-    
+
     @property
     def full_instrument_back_left(self) -> str:
         """The backest, leftest (i.e. back if it's a column, left if it's a row) nozzle of the full instrument.
 
-        Note: This value represents the back left nozzle of the underlying physical pipette. For instance, 
+        Note: This value represents the back left nozzle of the underlying physical pipette. For instance,
         the back-left nozzle of a 96-Channel pipette is A1.
         """
         return next(iter(self.full_instrument_rows.values()))[0]
@@ -157,11 +157,11 @@ class NozzleMap:
 
         Note: This is the value relevant for this configuration, not the physical pipette. See the note on back_left.
         """
-        difference = self.full_instrument_map_store[self.front_right] - self.full_instrument_map_store[self.back_left]
+        difference = self.map_store[self.front_right] - self.map_store[self.back_left]
         return self.map_store[self.back_left] + Point(
             difference[0] / 2, difference[1] / 2, 0
         )
-    
+
     @property
     def instrument_xy_center_offset(self) -> Point:
         """The position of the geometrical center of all nozzles for the entire instrument.
@@ -169,12 +169,14 @@ class NozzleMap:
         Note: This the value reflects the center of the maximum number of nozzles of the physical pipette.
         This would be the same as a full configuration.
         """
-        difference = self.full_instrument_map_store[self.full_instrument_front_right] - self.full_instrument_map_store[self.full_instrument_back_left]
+        difference = (
+            self.full_instrument_map_store[self.full_instrument_front_right]
+            - self.full_instrument_map_store[self.full_instrument_back_left]
+        )
         return self.full_instrument_map_store[self.full_instrument_back_left] + Point(
             difference[0] / 2, difference[1] / 2, 0
         )
 
-    
     @property
     def y_center_offset(self) -> Point:
         """The position in the center of the primary column of the map."""
@@ -204,7 +206,6 @@ class NozzleMap:
         starting_nozzle: str,
         back_left_nozzle: str,
         front_right_nozzle: str,
-
     ) -> "NozzleMap":
         try:
             back_left_row_index, back_left_column_index = _row_col_indices_for_nozzle(
@@ -252,11 +253,12 @@ class NozzleMap:
             (nozzle, physical_nozzles[nozzle]) for nozzle in chain(*rows.values())
         )
 
-
         return cls(
             starting_nozzle=starting_nozzle,
             map_store=map_store,
             rows=rows,
+            full_instrument_map_store=physical_nozzles,
+            full_instrument_rows=physical_rows,
             columns=columns,
             configuration=NozzleConfigurationType.determine_nozzle_configuration(
                 physical_rows, rows, physical_columns, columns
@@ -362,7 +364,9 @@ class NozzleConfigurationManager:
         tip_length: float = 0.0,
     ) -> Point:
         if cp_override == CriticalPoint.INSTRUMENT_XY_CENTER:
-            current_nozzle = self._current_nozzle_configuration.
+            current_nozzle = (
+                self._current_nozzle_configuration.instrument_xy_center_offset
+            )
         elif cp_override == CriticalPoint.XY_CENTER:
             current_nozzle = self._current_nozzle_configuration.xy_center_offset
         elif cp_override == CriticalPoint.Y_CENTER:

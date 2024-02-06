@@ -281,7 +281,7 @@ def check_safe_for_tip_pickup_and_return(
         )
 
 
-def _check_deck_conflict_for_96_channel(  # noqa: C901
+def _check_deck_conflict_for_96_channel(
     engine_state: StateView,
     pipette_id: str,
     labware_id: str,

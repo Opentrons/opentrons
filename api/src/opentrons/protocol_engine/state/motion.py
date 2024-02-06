@@ -179,6 +179,7 @@ class MotionView:
 
         # TODO(jbl 11-28-2023) This may need to change for partial tip configurations on a 96
         if ignore_tip_configuration:
+            #current issue: we should be calling here but instead we are always going to primary critical point
             destination_cp = CriticalPoint.INSTRUMENT_XY_CENTER
         else:
             destination_cp = CriticalPoint.XY_CENTER
