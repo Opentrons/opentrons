@@ -134,7 +134,9 @@ class LegacyProtocolCore(
         return self._sync_hardware.is_simulator  # type: ignore[no-any-return]
 
     def append_disposal_location(
-        self, disposal_location: Union[Labware, TrashBin, WasteChute]
+        self,
+        disposal_location: Union[Labware, TrashBin, WasteChute],
+        skip_add_to_engine: bool = False,
     ) -> None:
         if isinstance(disposal_location, (TrashBin, WasteChute)):
             raise APIVersionError(
