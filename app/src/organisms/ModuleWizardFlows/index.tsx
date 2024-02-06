@@ -11,6 +11,7 @@ import {
   getModuleType,
   getModuleDisplayName,
   FLEX_CUTOUT_BY_SLOT_ID,
+  SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
@@ -74,8 +75,8 @@ export const ModuleWizardFlows = (
   const deckConfig = useDeckConfigurationQuery().data ?? []
   const occupiedCutouts = deckConfig.filter(
     (fixture: CutoutConfig) =>
-      !(fixture.cutoutFixtureId as SingleSlotCutoutFixtureId)?.includes(
-        'single'
+      !SINGLE_SLOT_FIXTURES.includes(
+        fixture.cutoutFixtureId as SingleSlotCutoutFixtureId
       )
   )
   const availableSlotNames =

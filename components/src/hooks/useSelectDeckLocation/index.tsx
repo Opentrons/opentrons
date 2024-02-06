@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   CutoutConfig,
   FLEX_CUTOUT_BY_SLOT_ID,
-  FLEX_SLOT_BY_CUTOUT_ID,
+  FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   getPositionFromSlotId,
@@ -90,7 +90,7 @@ export function DeckLocationSelect({
   deckDef,
   selectedLocation,
   setSelectedLocation,
-  availableSlotNames = [],
+  availableSlotNames,
   occupiedCutouts = [],
   theme = 'default',
   isThermocycler = false,
@@ -145,12 +145,15 @@ export function DeckLocationSelect({
         )
         .map(slot => {
           const slotLocation = { slotName: slot.id }
-          const isDisabled = !availableSlotNames.some(
-            slotName => slotName === slot.id
-          )
+          const isDisabled =
+            availableSlotNames !== undefined
+              ? !availableSlotNames.some(slotName => slotName === slot.id)
+              : false
+
           const disabledReason =
             occupiedCutouts.find(
-              cutout => FLEX_SLOT_BY_CUTOUT_ID[cutout.cutoutId] === slot.id
+              cutout =>
+                FLEX_SINGLE_SLOT_BY_CUTOUT_ID[cutout.cutoutId] === slot.id
             )?.cutoutFixtureId ?? null
           const isSelected = isEqual(selectedLocation, slotLocation)
           let fill = theme === 'default' ? COLORS.purple35 : COLORS.grey35
