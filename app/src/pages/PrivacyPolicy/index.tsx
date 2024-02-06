@@ -15,6 +15,7 @@ import {
   toggleAnalyticsOptedIn,
   setAnalyticsOptInSeen,
 } from '../../redux/analytics'
+import { useIsUnboxingFlowOngoing } from '../../organisms/RobotSettingsDashboard/NetworkSettings/hooks'
 import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
@@ -29,11 +30,16 @@ export function PrivacyPolicy(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
+  const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
 
   const handleAgree = (): void => {
     dispatch(setAnalyticsOptInSeen())
     dispatch(toggleAnalyticsOptedIn())
-    history.push('/robot-settings/rename-robot')
+    if (isUnboxingFlowOngoing) {
+      history.push('/robot-settings/rename-robot')
+    } else {
+      history.push('/dashboard')
+    }
   }
 
   return (
