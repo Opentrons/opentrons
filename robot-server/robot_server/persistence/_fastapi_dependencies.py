@@ -220,7 +220,9 @@ async def get_active_persistence_directory(
     If this is called before that initialization completes, this will raise an
     appropriate HTTP-facing error to indicate that the server is busy.
     """
-    initialize_task = _root_persistence_directory_init_task_accessor.get_from(app_state)
+    initialize_task = _active_persistence_directory_init_task_accessor.get_from(
+        app_state
+    )
     assert (
         initialize_task is not None
     ), "Forgot to start persistence directory initialization as part of server startup?"
