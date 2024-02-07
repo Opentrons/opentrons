@@ -1,6 +1,6 @@
 """Input file value objects."""
 from __future__ import annotations
-from typing import BinaryIO, Protocol, Optional
+from typing import BinaryIO, Protocol
 
 
 class AbstractInputFile(Protocol):
