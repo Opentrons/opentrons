@@ -133,7 +133,9 @@ class RunDataManager:
             protocol_id=protocol.protocol_id if protocol is not None else None,
         )
         await self._runs_publisher.begin_polling_engine_store(
-            get_current_command=self.get_current_command, run_id=run_id
+            get_current_command=self.get_current_command,
+            get_state_summary=self._get_state_summary,
+            run_id=run_id,
         )
 
         return _build_run(

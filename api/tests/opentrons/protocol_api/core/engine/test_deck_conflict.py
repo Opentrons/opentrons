@@ -14,7 +14,12 @@ from opentrons.protocol_api._trash_bin import TrashBin
 from opentrons.protocol_api._waste_chute import WasteChute
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocol_api.core.engine import deck_conflict
-from opentrons.protocol_engine import Config, DeckSlotLocation, ModuleModel, StateView
+from opentrons.protocol_engine import (
+    Config,
+    DeckSlotLocation,
+    ModuleModel,
+    StateView,
+)
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 from opentrons.types import DeckSlotName, Point, StagingSlotName
 

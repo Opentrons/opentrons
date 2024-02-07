@@ -354,6 +354,7 @@ async def test_move_to_addressable_area(
             force_direct=True,
             minimum_z_height=12.3,
             stay_at_max_travel_z=True,
+            ignore_tip_configuration=False,
         )
     ).then_return(
         [Waypoint(Point(1, 2, 3), CriticalPoint.XY_CENTER), Waypoint(Point(4, 5, 6))]
@@ -378,6 +379,7 @@ async def test_move_to_addressable_area(
         minimum_z_height=12.3,
         speed=45.6,
         stay_at_highest_possible_z=True,
+        ignore_tip_configuration=False,
     )
 
     assert result == Point(x=4, y=5, z=6)

@@ -2,9 +2,7 @@ from fastapi import Depends
 import asyncio
 from typing import Union, Callable, Optional
 
-from opentrons.protocol_engine import (
-    CurrentCommand,
-)
+from opentrons.protocol_engine import CurrentCommand, StateSummary, EngineStatus
 
 from server_utils.fastapi_utils.app_state import (
     AppState,
@@ -23,11 +21,13 @@ class RunsPublisher:
         self._client = client
         self._run_data_manager_polling = asyncio.Event()
         self._previous_current_command: Union[CurrentCommand, None] = None
+        self._previous_state_summary_status: Union[EngineStatus, None] = None
 
     # TODO(jh, 2023-02-02): Instead of polling, emit current_commands directly from PE.
     async def begin_polling_engine_store(
         self,
         get_current_command: Callable[[str], Optional[CurrentCommand]],
+        get_state_summary: Callable[[str], Optional[StateSummary]],
         run_id: str,
     ) -> None:
         """Continuously poll the engine store for the current_command.
@@ -38,7 +38,9 @@ class RunsPublisher:
         """
         asyncio.create_task(
             self._poll_engine_store(
-                get_current_command=get_current_command, run_id=run_id
+                get_current_command=get_current_command,
+                run_id=run_id,
+                get_state_summary=get_state_summary,
             )
         )
 
@@ -59,6 +61,7 @@ class RunsPublisher:
     async def _poll_engine_store(
         self,
         get_current_command: Callable[[str], Optional[CurrentCommand]],
+        get_state_summary: Callable[[str], Optional[StateSummary]],
         run_id: str,
     ) -> None:
         """Asynchronously publish new current commands.
@@ -69,12 +72,23 @@ class RunsPublisher:
         """
         while not self._run_data_manager_polling.is_set():
             current_command = get_current_command(run_id)
+            current_state_summary = get_state_summary(run_id)
+            current_state_summary_status = (
+                current_state_summary.status if current_state_summary else None
+            )
             if (
                 current_command is not None
                 and self._previous_current_command != current_command
             ):
                 await self._publish_current_command()
                 self._previous_current_command = current_command
+
+            if (
+                current_state_summary_status is not None
+                and self._previous_state_summary_status != current_state_summary_status
+            ):
+                await self._publish_runs_async(run_id=run_id)
+                self._previous_state_summary_status = current_state_summary_status
             await asyncio.sleep(1)
 
     async def _publish_current_command(
@@ -82,6 +96,15 @@ class RunsPublisher:
     ) -> None:
         """Publishes the equivalent of GET /runs/:runId/commands?cursor=null&pageLength=1."""
         await self._client.publish_async(topic=Topics.RUNS_CURRENT_COMMAND.value)
+
+    async def _publish_runs_async(self, run_id: str) -> None:
+        """Asynchronously publishes the equivalent of GET /runs and GET /runs/:runId.
+
+        Args:
+            run_id: ID of the current run.
+        """
+        await self._client.publish_async(topic=Topics.RUNS.value)
+        await self._client.publish_async(topic=f"{Topics.RUNS.value}/{run_id}")
 
 
 _runs_publisher_accessor: AppStateAccessor[RunsPublisher] = AppStateAccessor[

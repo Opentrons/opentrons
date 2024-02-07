@@ -123,6 +123,16 @@ def test_trash_search() -> None:
             "2.16",
             "OT-2",
             False,
+            # This should ideally raise, matching OT-2 behavior on prior Protocol API versions.
+            # It currently does not because Protocol API v2.15's trashes are implemented as
+            # addressable areas, not labware--and they're only brought into existence
+            # *on first use,* not at the beginning of a protocol.
+            #
+            # The good news is that even though the conflicting load will not raise like we want,
+            # something in the protocol will eventually raise, e.g. when a pipette goes to drop a
+            # tip in the fixed trash and finds that a fixed trash can't exist there because there's
+            # a labware.
+            marks=pytest.mark.xfail(strict=True, raises=pytest.fail.Exception),
         ),
         pytest.param(
             "2.16",

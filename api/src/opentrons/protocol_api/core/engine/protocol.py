@@ -132,7 +132,9 @@ class ProtocolCore(
                 )
 
     def append_disposal_location(
-        self, disposal_location: Union[Labware, TrashBin, WasteChute]
+        self,
+        disposal_location: Union[Labware, TrashBin, WasteChute],
+        skip_add_to_engine: bool = False,
     ) -> None:
         """Append a disposal location object to the core"""
         if isinstance(disposal_location, TrashBin):
@@ -150,7 +152,8 @@ class ProtocolCore(
                 existing_labware_ids=list(self._labware_cores_by_id.keys()),
                 existing_module_ids=list(self._module_cores_by_id.keys()),
             )
-            self._engine_client.add_addressable_area(disposal_location.area_name)
+            if not skip_add_to_engine:
+                self._engine_client.add_addressable_area(disposal_location.area_name)
         elif isinstance(disposal_location, WasteChute):
             # TODO(jbl 2024-01-25) hardcoding this specific addressable area should be refactored
             #   when analysis is fixed up
@@ -163,7 +166,8 @@ class ProtocolCore(
             self._engine_client.state.addressable_areas.raise_if_area_not_in_deck_configuration(
                 "1ChannelWasteChute"
             )
-            self._engine_client.add_addressable_area("1ChannelWasteChute")
+            if not skip_add_to_engine:
+                self._engine_client.add_addressable_area("1ChannelWasteChute")
         self._disposal_locations.append(disposal_location)
 
     def get_disposal_locations(self) -> List[Union[Labware, TrashBin, WasteChute]]:
