@@ -30,7 +30,7 @@ import { useNotifyAllRunsQuery } from '../../resources/runs/useNotifyAllRunsQuer
 
 export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8
 
-export function RobotDashboard(): JSX.Element {
+export function RobotDashboard(): JSX.Element | null {
   const { t } = useTranslation('device_details')
   const {
     data: allRunsQueryData,
@@ -48,11 +48,10 @@ export function RobotDashboard(): JSX.Element {
   const hasOptedIn = useSelector(getAnalyticsOptedIn)
   const history = useHistory()
 
-  React.useEffect(() => {
-    if (!seen || !hasOptedIn) {
-      history.push('/privacy-policy')
-    }
-  }, [])
+  if (!seen || !hasOptedIn) {
+    history.push('/privacy-policy')
+    return null
+  }
 
   const recentRunsOfUniqueProtocols = (allRunsQueryData?.data ?? [])
     .reverse() // newest runs first
@@ -89,8 +88,6 @@ export function RobotDashboard(): JSX.Element {
       </>
     )
   }
-
-  console.log('🚀 ~ RobotDashboard ~ showWelcomeModal:', showWelcomeModal)
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>

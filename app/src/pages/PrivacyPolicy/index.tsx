@@ -30,7 +30,7 @@ import imgSrc from '../../assets/images/on-device-display/privacy_policy_qrcode.
 const PRIVACY_POLICY_URL = 'opentrons.com/privacy-policy/'
 const IMG_ALT = 'QR Code for Opentrons Privacy Policy'
 
-export function PrivacyPolicy(): JSX.Element {
+export function PrivacyPolicy(): JSX.Element | null {
   const { t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
@@ -43,15 +43,14 @@ export function PrivacyPolicy(): JSX.Element {
     dispatch(toggleAnalyticsOptedIn())
   }
 
-  React.useEffect(() => {
-    if (seenOptedIn && optedIn) {
-      if (isUnboxingFlowOngoing) {
-        history.push('/robot-settings/rename-robot')
-      } else {
-        history.push('/dashboard')
-      }
+  if (seenOptedIn && optedIn) {
+    if (isUnboxingFlowOngoing) {
+      history.push('/robot-settings/rename-robot')
+    } else {
+      history.push('/dashboard')
     }
-  }, [seenOptedIn, optedIn])
+    return null
+  }
 
   return (
     <>
@@ -81,9 +80,8 @@ export function PrivacyPolicy(): JSX.Element {
               components={{ block: <StyledText as="h4" /> }}
             />
             <StyledText
+              as="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              fontSize={TYPOGRAPHY.fontSize22}
-              lineHeight={TYPOGRAPHY.lineHeight28}
               paddingX={SPACING.spacing24}
               paddingY={SPACING.spacing16}
               borderRadius={SPACING.spacing12}
