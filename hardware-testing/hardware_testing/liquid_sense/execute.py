@@ -22,7 +22,6 @@ from hardware_testing.gravimetric.measurement.scale import Scale
 from hardware_testing.gravimetric.measurement.record import (
     GravimetricRecorder,
     GravimetricRecorderConfig,
-    GravimetricRecording,
 )
 from opentrons.protocol_api._types import OffDeckType
 
@@ -196,7 +195,7 @@ def run(tip: int, run_args: RunArgs) -> None:
             run_args.pipette.move_to(dial_well.top())
             run_args.pipette.move_to(dial_well.top(-1))
             dial_read = run_args.dial_indicator.read_stable()
-            tip_length_offset = (dial_read - 1)
+            tip_length_offset = dial_read - 1
             run_args.pipette._retract()
             print(f"Tip Offset  {tip_length_offset} {dial_read}")
         if run_args.return_tip:
@@ -239,13 +238,15 @@ def run(tip: int, run_args: RunArgs) -> None:
     average, cv, d = _calculate_stats(adjusted_results, target_height)
     print(f"adjusted: Average {average} cv {cv} d {d} target {target_height}")
 
+
 def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
     hw_api = get_sync_hw_api(run_args.ctx)
     lqid_cfg: Dict[str, int] = LIQUID_PROBE_SETTINGS[run_args.pipette_volume][
         run_args.pipette_channels
     ][tip]
     data_dir = get_testing_data_directory()
-    data_file = f"{data_dir}/{run_args.name}/{run_args.run_id}/pressure_sensor_data-trial{trial}-tip{tip}.csv"
+    data_filename = f"pressure_sensor_data-trial{trial}-tip{tip}.csv"
+    data_file = f"{data_dir}/{run_args.name}/{run_args.run_id}/{data_filename}"
     ui.print_info(f"logging pressure data to {data_file}")
     lps = LiquidProbeSettings(
         starting_mount_height=well.top().point.z + run_args.start_height_offset,

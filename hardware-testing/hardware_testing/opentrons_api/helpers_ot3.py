@@ -5,8 +5,6 @@ from datetime import datetime
 from enum import Enum
 from math import pi
 from subprocess import run, Popen
-import os
-import sys
 from time import time
 from typing import Callable, Coroutine, Dict, List, Optional, Tuple, Union, cast
 import atexit
