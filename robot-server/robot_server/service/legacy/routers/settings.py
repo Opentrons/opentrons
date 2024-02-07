@@ -1,6 +1,6 @@
 from dataclasses import asdict
 import logging
-from typing import cast, Any, Dict, Optional, Union
+from typing import cast, Any, Dict, List, Optional, Union
 
 from starlette import status
 from fastapi import APIRouter, Depends
@@ -206,6 +206,7 @@ async def get_settings_reset_options(
     description="Perform a factory reset of some robot data",
     responses={
         status.HTTP_403_FORBIDDEN: {"model": LegacyErrorResponse},
+        status.HTTP_503_SERVICE_UNAVAILABLE: {"model": LegacyErrorResponse},
     },
 )
 async def post_settings_reset_options(
@@ -230,6 +231,9 @@ async def post_settings_reset_options(
         ).as_error(status.HTTP_403_FORBIDDEN)
 
     options = set(k for k, v in factory_reset_commands.items() if v)
+
+    failed_commands: List[reset_util.ResetOptionId] = []
+
     reset_util.reset(options, robot_type)
 
     if factory_reset_commands.get(reset_util.ResetOptionId.runs_history, False):
@@ -242,18 +246,27 @@ async def post_settings_reset_options(
         if deck_configuration_store:
             await deck_configuration_store.delete()
         else:
-            log.warning(
-                "Deck configuration store is not available. Skipping its reset."
-            )
+            failed_commands.append(reset_util.ResetOptionId.deck_configuration)
 
-    # TODO (tz, 5-24-22): The order of a set is undefined because set's aren't ordered.
-    # The message returned to the client will be printed in the wrong order.
-    message = (
-        "Options '{}' were reset".format(", ".join(o.name for o in options))
-        if options
-        else "Nothing to do"
-    )
-    return V1BasicResponse(message=message)
+    if failed_commands:
+        raise LegacyErrorResponse(
+            message=f"Some options could not be reset: {failed_commands}",
+            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+        ).as_error(
+            # 503 because this condition can happen if someone tries to reset something
+            # before our persistence layer has fully initialized. It will start working
+            # after initialization finishes.
+            status.HTTP_503_SERVICE_UNAVAILABLE
+        )
+    else:
+        # TODO (tz, 5-24-22): The order of a set is undefined because set's aren't ordered.
+        # The message returned to the client will be printed in the wrong order.
+        message = (
+            "Options '{}' were reset".format(", ".join(o.name for o in options))
+            if options
+            else "Nothing to do"
+        )
+        return V1BasicResponse(message=message)
 
 
 @router.get(

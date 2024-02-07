@@ -148,17 +148,16 @@ stages:
   # We test this here even though there are separate Tavern tests for POST /settings/reset
   # because this is a convenient place to check that the reset actually takes effect.
   - name: Reset the deck configuration
-    # FIXME(mm, 2024-02-07): This delay is mitigating a race condition in the POST /settings/reset
-    # handler. If this request comes in before the server's persistence layer has fully initialized,
-    # the handler silently ignores the request. The handler should instead block or raise a 503 "busy"
-    # error.
-    delay_before: 2
     request:
       url: '{ot3_server_base_url}/settings/reset'
       method: POST
       json:
         deckConfiguration: true
     response: {} # Expecting any non-error response.
+    # Retry on failure because if this request comes in before the server's persistence
+    # layer has fully initialized, it will return 503.
+    max_retries: 5
+    delay_after: 0.5
 
   - name: Get the deck configuration after the reset and make sure it's immediately gone back to the default
     request:
