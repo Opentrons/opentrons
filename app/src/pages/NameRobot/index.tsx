@@ -153,7 +153,7 @@ export function NameRobot(): JSX.Element {
       ) : (
         <>
           {isUnboxingFlowOngoing ? (
-            <StepMeter totalSteps={6} currentStep={5} />
+            <StepMeter totalSteps={5} currentStep={4} />
           ) : null}
           <Flex
             flexDirection={DIRECTION_COLUMN}
@@ -168,20 +168,7 @@ export function NameRobot(): JSX.Element {
               }
               position={POSITION_RELATIVE}
             >
-              <Flex position={POSITION_ABSOLUTE} left="0">
-                <Btn
-                  data-testid="name_back_button"
-                  onClick={() => {
-                    if (isUnboxingFlowOngoing) {
-                      history.push('/emergency-stop')
-                    } else {
-                      history.push('/robot-settings')
-                    }
-                  }}
-                >
-                  <Icon name="back" size="3rem" color={COLORS.black90} />
-                </Btn>
-              </Flex>
+              <Flex position={POSITION_ABSOLUTE} left="0"></Flex>
               <Flex marginLeft={isUnboxingFlowOngoing ? '0' : '4rem'}>
                 <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
                   {isUnboxingFlowOngoing

@@ -54,7 +54,7 @@ export function PrivacyPolicy(): JSX.Element {
   return (
     <>
       {isUnboxingFlowOngoing ? (
-        <StepMeter totalSteps={6} currentStep={4} />
+        <StepMeter totalSteps={5} currentStep={3} />
       ) : null}
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Flex justifyContent={JUSTIFY_CENTER} alignItems={ALIGN_CENTER}>

@@ -45,7 +45,7 @@ export function EmergencyStop(): JSX.Element {
 
   return (
     <>
-      <StepMeter totalSteps={6} currentStep={3} />
+      <StepMeter totalSteps={5} currentStep={2} />
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}
