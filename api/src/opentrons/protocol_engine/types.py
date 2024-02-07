@@ -9,7 +9,7 @@ from typing import Optional, Union, List, Dict, Any, NamedTuple, Tuple, FrozenSe
 from typing_extensions import Literal, TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import MountType, DeckSlotName
+from opentrons.types import MountType, DeckSlotName, StagingSlotName
 from opentrons.hardware_control.types import TipStateType as HwTipStateType
 from opentrons.hardware_control.modules import (
     ModuleType as ModuleType,
@@ -52,6 +52,20 @@ class DeckSlotLocation(BaseModel):
             " It will automatically be converted to match the robot."
             "\n\n"
             "When one of these values is returned, it will always match the robot."
+        ),
+    )
+
+
+class StagingSlotLocation(BaseModel):
+    """The location of something placed in a single staging slot."""
+
+    slotName: StagingSlotName = Field(
+        ...,
+        description=(
+            # This description should be kept in sync with LabwareOffsetLocation.slotName.
+            "A slot on the robot's staging area."
+            "\n\n"
+            "These apply only to the Flex. The OT-2 has no staging slots."
         ),
     )
 

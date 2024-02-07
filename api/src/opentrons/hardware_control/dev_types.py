@@ -95,7 +95,7 @@ class PipetteDict(InstrumentDict):
     has_tip: bool
     default_push_out_volume: Optional[float]
     supported_tips: Dict[PipetteTipType, SupportedTipsDefinition]
-    current_nozzle_map: Optional[NozzleMap]
+    current_nozzle_map: NozzleMap  # spp: why was this Optional?
 
 
 class PipetteStateDict(TypedDict):

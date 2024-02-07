@@ -4,9 +4,11 @@ from numpy import array, dot
 from typing import Optional, List, Tuple, Union, cast, TypeVar, Dict
 
 from opentrons.types import Point, DeckSlotName, StagingSlotName, MountType
-from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
+from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.deck.dev_types import CutoutFixture
+from opentrons_shared_data.pipette import PIPETTE_X_SPAN
+from opentrons_shared_data.pipette.dev_types import ChannelCount
 
 from .. import errors
 from ..errors import (
@@ -39,15 +41,13 @@ from ..types import (
     OnDeckLabwareLocation,
     AddressableAreaLocation,
     AddressableOffsetVector,
+    StagingSlotLocation,
 )
 from .config import Config
 from .labware import LabwareView
 from .modules import ModuleView
 from .pipettes import PipetteView
 from .addressable_areas import AddressableAreaView
-
-from opentrons_shared_data.pipette import PIPETTE_X_SPAN
-from opentrons_shared_data.pipette.dev_types import ChannelCount
 
 
 SLOT_WIDTH = 128
@@ -149,7 +149,9 @@ class GeometryView:
             highest_fixture_z,
         )
 
-    def get_highest_z_in_slot(self, slot: DeckSlotLocation) -> float:
+    def get_highest_z_in_slot(
+        self, slot: Union[DeckSlotLocation, StagingSlotLocation]
+    ) -> float:
         """Get the highest Z-point of all items stacked in the given deck slot."""
         slot_item = self.get_slot_item(slot.slotName)
         if isinstance(slot_item, LoadedModule):
