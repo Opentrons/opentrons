@@ -1,6 +1,8 @@
 """Getters for specific adjacent slots."""
-
+from dataclasses import dataclass
 from typing import Optional, List, Dict, Union
+
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.types import DeckSlotName, StagingSlotName
 
@@ -73,7 +75,13 @@ def get_south_east_slot(slot: int) -> Optional[int]:
         return south_slot + 1 if south_slot else None
 
 
-def get_surrounding_slots(slot: int) -> List[int]:
+@dataclass
+class _MixedTypeSlots:
+    regular_slots: List[DeckSlotName]
+    staging_slots: List[StagingSlotName]
+
+
+def get_surrounding_slots(slot: int, robot_type: RobotType) -> _MixedTypeSlots:
     """Get all the surrounding slots, i.e., adjacent slots as well as corner slots."""
     corner_slots: List[Union[int, None]] = [
         get_north_west_slot(slot),
@@ -82,9 +90,19 @@ def get_surrounding_slots(slot: int) -> List[int]:
         get_south_east_slot(slot),
     ]
 
-    return get_adjacent_slots(slot) + [
+    surrounding_regular_slots_int = get_adjacent_slots(slot) + [
         maybe_slot for maybe_slot in corner_slots if maybe_slot is not None
     ]
+    surrounding_regular_slots = [
+        DeckSlotName.from_primitive(slot_int).to_equivalent_for_robot_type(robot_type)
+        for slot_int in surrounding_regular_slots_int
+    ]
+    surrounding_staging_slots = _SURROUNDING_STAGING_SLOTS_MAP.get(
+        DeckSlotName.from_primitive(slot).to_equivalent_for_robot_type(robot_type), []
+    )
+    return _MixedTypeSlots(
+        regular_slots=surrounding_regular_slots, staging_slots=surrounding_staging_slots
+    )
 
 
 _WEST_OF_STAGING_SLOT_MAP: Dict[StagingSlotName, DeckSlotName] = {
