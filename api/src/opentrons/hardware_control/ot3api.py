@@ -259,9 +259,10 @@ class OT3API(
         if not self._last_moved_mount or realmount == self._last_moved_mount:
             return False
 
-        return (realmount == OT3Mount.LEFT and self._gantry_load == GantryLoad.HIGH_THROUGHPUT) or (
-            realmount == OT3Mount.GRIPPER
-        )
+        return (
+            realmount == OT3Mount.LEFT
+            and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
+        ) or (realmount == OT3Mount.GRIPPER)
 
     @property
     def door_state(self) -> DoorState:
@@ -1307,7 +1308,10 @@ class OT3API(
 
             # disengage Axis.Z_L motor and engage the brake to lower power
             # consumption and reduce the chance of the 96-channel pipette dropping
-            if self.is_idle_mount(OT3Mount.LEFT):
+            if (
+                self.gantry_load == GantryLoad.HIGH_THROUGHPUT
+                and self._last_moved_mount == OT3Mount.LEFT
+            ):
                 await self.disengage_axes([Axis.Z_L])
 
             # disegnage Axis.Z_G when we can to reduce the chance of
