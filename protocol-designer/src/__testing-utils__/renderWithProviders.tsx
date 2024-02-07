@@ -52,10 +52,7 @@ export function renderWithProviders<State>(
   return [
     render(
       Component,
-      {
-        wrapper: ProviderWrapper,
-        container: document.body
-      }
+      { wrapper: ProviderWrapper }
     ),
     store
   ]

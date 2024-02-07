@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { vi, describe, expect, afterEach, beforeEach, it } from 'vitest'
-import { act, cleanup, fireEvent, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../__testing-utils__'
 import { i18n } from '../../localization'
 import { getFileMetadata } from '../../file-data/selectors'

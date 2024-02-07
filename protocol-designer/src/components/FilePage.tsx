@@ -240,7 +240,7 @@ export const FilePage = (): JSX.Element => {
       </div>
       {
         createPortal(
-          <div>
+          <>
             {isEditPipetteModalOpen && (
               <FilePipettesModal closeModal={closeEditPipetteModal} />
             )}
@@ -250,7 +250,7 @@ export const FilePage = (): JSX.Element => {
                 onCloseClick={closeEditModulesModal}
               />
             )}
-          </div>,
+          </>,
           getTopPortalEl() 
         )
       }

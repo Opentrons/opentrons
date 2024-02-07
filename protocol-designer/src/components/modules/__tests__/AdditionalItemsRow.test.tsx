@@ -1,13 +1,14 @@
 import * as React from 'react'
+import { vi, describe, expect, it, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../__testing-utils__' 
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../localization'
 import { AdditionalItemsRow } from '../AdditionalItemsRow'
 import { FlexSlotMap } from '../FlexSlotMap'
+import { getInitialDeckSetup } from '../../../step-forms/selectors'
 
-jest.mock('../FlexSlotMap')
-
-const mockFlexSlotMap = FlexSlotMap as jest.MockedFunction<typeof FlexSlotMap>
+vi.mock('../FlexSlotMap')
+vi.mock('../../../step-forms/selectors')
 
 const render = (props: React.ComponentProps<typeof AdditionalItemsRow>) => {
   return renderWithProviders(<AdditionalItemsRow {...props} />, {
@@ -19,11 +20,17 @@ describe('AdditionalItemsRow', () => {
   let props: React.ComponentProps<typeof AdditionalItemsRow>
   beforeEach(() => {
     props = {
-      handleAttachment: jest.fn(),
+      handleAttachment: vi.fn(),
       isEquipmentAdded: false,
       name: 'gripper',
     }
-    mockFlexSlotMap.mockReturnValue(<div>mock slot map</div>)
+    vi.mocked(FlexSlotMap).mockReturnValue(<div>mock slot map</div>)
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      modules: {},
+      pipettes: {},
+      additionalEquipmentOnDeck: {},
+      labware: {},
+    })
   })
   it('renders no gripper', () => {
     render(props)

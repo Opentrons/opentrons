@@ -25,7 +25,6 @@ interface Props {
 
 /** Link which opens a page on the knowledge base to a new tab/window */
 export function KnowledgeBaseLink(props: Props): JSX.Element {
-  console.log('IN KNOWLEDGE BASE LINK')
   return (
     <a
       target="_blank"

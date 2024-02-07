@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
+import { vi, describe, afterEach, beforeEach, it } from 'vitest'
+import { cleanup, fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../__testing-utils__'
 import {
   getCurrentFormHasUnsavedChanges,
@@ -10,21 +11,8 @@ import { getIsMultiSelectMode } from '../../ui/steps'
 import { i18n } from '../../localization'
 import { StepCreationButton } from '../StepCreationButton'
 
-jest.mock('../../step-forms/selectors')
-jest.mock('../../ui/steps')
-
-const mockGetCurrentFormIsPresaved = getCurrentFormIsPresaved as jest.MockedFunction<
-  typeof getCurrentFormIsPresaved
->
-const mockGetCurrentFormHasUnsavedChanges = getCurrentFormHasUnsavedChanges as jest.MockedFunction<
-  typeof getCurrentFormHasUnsavedChanges
->
-const mockGetIsMultiSelectMode = getIsMultiSelectMode as jest.MockedFunction<
-  typeof getIsMultiSelectMode
->
-const mockGetInitialDeckSetup = getInitialDeckSetup as jest.MockedFunction<
-  typeof getInitialDeckSetup
->
+vi.mock('../../step-forms/selectors')
+vi.mock('../../ui/steps')
 
 const render = () => {
   return renderWithProviders(<StepCreationButton />, { i18nInstance: i18n })[0]
@@ -32,15 +20,18 @@ const render = () => {
 
 describe('StepCreationButton', () => {
   beforeEach(() => {
-    mockGetCurrentFormIsPresaved.mockReturnValue(false)
-    mockGetCurrentFormHasUnsavedChanges.mockReturnValue(false)
-    mockGetIsMultiSelectMode.mockReturnValue(false)
-    mockGetInitialDeckSetup.mockReturnValue({
+    vi.mocked(getCurrentFormIsPresaved).mockReturnValue(false)
+    vi.mocked(getCurrentFormHasUnsavedChanges).mockReturnValue(false)
+    vi.mocked(getIsMultiSelectMode).mockReturnValue(false)
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
       modules: {},
       pipettes: {},
       additionalEquipmentOnDeck: {},
       labware: {},
     })
+  })
+  afterEach(() => {
+    cleanup()
   })
   it('renders the add step button and clicking on it reveals all the button option, no modules', () => {
     render()
@@ -52,7 +43,7 @@ describe('StepCreationButton', () => {
     screen.getByText('pause')
   })
   it('renders the add step button and clicking on it reveals all the button options, with modules', () => {
-    mockGetInitialDeckSetup.mockReturnValue({
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
       modules: {
         hs: { id: 'hs', type: 'heaterShakerModuleType' },
         mag: { id: 'mag', type: 'magneticModuleType' },

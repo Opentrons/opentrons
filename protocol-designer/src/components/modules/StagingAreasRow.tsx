@@ -15,13 +15,14 @@ import {
 import { getCutoutDisplayName } from '@opentrons/shared-data'
 import stagingAreaImage from '../../images/staging_area.png'
 import { getStagingAreaSlots } from '../../utils'
-import { Portal } from '../portals/TopPortal'
+import { getTopPortalEl } from '../portals/TopPortal'
 import { StagingAreasModal } from './StagingAreasModal'
 import { FlexSlotMap } from './FlexSlotMap'
 
 import styles from './styles.module.css'
 import type { CutoutId } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
+import { createPortal } from 'react-dom'
 
 interface StagingAreasRowProps {
   handleAttachment: () => void
@@ -40,12 +41,13 @@ export function StagingAreasRow(props: StagingAreasRowProps): JSX.Element {
   return (
     <>
       {stagingAreaModal ? (
-        <Portal>
+        createPortal(
           <StagingAreasModal
             onCloseClick={() => openStagingAreaModal(false)}
             stagingAreas={stagingAreas}
-          />
-        </Portal>
+          />,
+          getTopPortalEl()
+        )
       ) : null}
       <Flex flexDirection={DIRECTION_COLUMN}>
         <h4 className={styles.row_title}>

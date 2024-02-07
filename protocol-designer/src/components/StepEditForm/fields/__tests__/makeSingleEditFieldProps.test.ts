@@ -1,3 +1,4 @@
+import { vi, beforeEach, afterEach, expect, describe, it } from 'vitest'
 import { makeSingleEditFieldProps } from '../makeSingleEditFieldProps'
 import {
   getDisabledFields,
@@ -5,29 +6,20 @@ import {
 } from '../../../../steplist/formLevel'
 import { getFieldErrors } from '../../../../steplist/fieldLevel'
 import * as stepEditFormUtils from '../../utils'
-import { HydratedFormdata } from '../../../../form-types'
-jest.mock('../../../../steplist/formLevel')
-jest.mock('../../../../steplist/fieldLevel')
+import type { HydratedFormdata } from '../../../../form-types'
 
-const getFieldDefaultTooltipSpy = jest.spyOn(
+vi.mock('../../../../steplist/formLevel')
+vi.mock('../../../../steplist/fieldLevel')
+
+const getFieldDefaultTooltipSpy = vi.spyOn(
   stepEditFormUtils,
   'getFieldDefaultTooltip'
 )
 
-const getSingleSelectDisabledTooltipSpy = jest.spyOn(
+const getSingleSelectDisabledTooltipSpy = vi.spyOn(
   stepEditFormUtils,
   'getSingleSelectDisabledTooltip'
 )
-
-const getDisabledFieldsMock = getDisabledFields as jest.MockedFunction<
-  typeof getDisabledFields
->
-const getDefaultsForStepTypeMock = getDefaultsForStepType as jest.MockedFunction<
-  typeof getDefaultsForStepType
->
-const getFieldErrorsMock = getFieldErrors as jest.MockedFunction<
-  typeof getFieldErrors
->
 
 beforeEach(() => {
   getFieldDefaultTooltipSpy.mockImplementation(name => `tooltip for ${name}`)
@@ -37,7 +29,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  jest.restoreAllMocks()
+  vi.restoreAllMocks()
 })
 
 describe('makeSingleEditFieldProps', () => {
@@ -45,9 +37,9 @@ describe('makeSingleEditFieldProps', () => {
     const focusedField = 'focused_error_field'
     const dirtyFields = ['dirty_error_field', 'focused_error_field']
 
-    const focus: any = jest.fn()
-    const blur: any = jest.fn()
-    const handleChangeFormInput: any = jest.fn()
+    const focus: any = vi.fn()
+    const blur: any = vi.fn()
+    const handleChangeFormInput: any = vi.fn()
 
     const formData: any = {
       stepType: 'fakeStepType',
@@ -58,7 +50,7 @@ describe('makeSingleEditFieldProps', () => {
       focused_error_field: '',
     }
 
-    getDisabledFieldsMock.mockImplementation(
+    vi.mocked(getDisabledFields).mockImplementation(
       (form: HydratedFormdata): Set<string> => {
         expect(form).toBe(formData)
         const disabled = new Set<string>()
@@ -67,7 +59,7 @@ describe('makeSingleEditFieldProps', () => {
       }
     )
 
-    getDefaultsForStepTypeMock.mockImplementation(stepType => {
+    vi.mocked(getDefaultsForStepType).mockImplementation(stepType => {
       expect(stepType).toEqual('fakeStepType')
       return {
         some_field: 'default',
@@ -78,7 +70,7 @@ describe('makeSingleEditFieldProps', () => {
       }
     })
 
-    getFieldErrorsMock.mockImplementation((name, value) => {
+    vi.mocked(getFieldErrors).mockImplementation((name, value) => {
       // pretend all the '*_error_field' fields have errors
       // (though downstream of getFieldErrors, these errors won't be shown
       // in errorToShow if field is pristine/focused)
@@ -177,7 +169,7 @@ describe('makeSingleEditFieldProps', () => {
       updateValue('foo')
       expect(handleChangeFormInput).toHaveBeenCalledWith(name, 'foo')
 
-      expect(getFieldErrorsMock).toHaveBeenCalledWith(name, formData[name])
+      expect(vi.mocked(getFieldErrors)).toHaveBeenCalledWith(name, formData[name])
     })
   })
 })

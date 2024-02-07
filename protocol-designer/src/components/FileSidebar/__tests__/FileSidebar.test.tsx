@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { fireEvent, screen, cleanup } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../__testing-utils__' 
 import { createFile, getRobotType } from '../../../file-data/selectors'
@@ -23,51 +24,13 @@ import {
 } from '../utils'
 import { FileSidebar } from '../FileSidebar'
 
-jest.mock('../../../step-forms/selectors')
-jest.mock('../../../load-file/selectors')
-jest.mock('../../../navigation/actions')
-jest.mock('../../../navigation/selectors')
-jest.mock('../../../file-data/selectors')
-jest.mock('../../Hints/useBlockingHint')
-jest.mock('../utils')
-
-const mockCreateFile = createFile as jest.MockedFunction<typeof createFile>
-const mockGetCurrentPage = getCurrentPage as jest.MockedFunction<
-  typeof getCurrentPage
->
-const mockGetInitialDeckSetup = getInitialDeckSetup as jest.MockedFunction<
-  typeof getInitialDeckSetup
->
-const mockGetRobotType = getRobotType as jest.MockedFunction<
-  typeof getRobotType
->
-const mockGetAdditionalEquipment = getAdditionalEquipment as jest.MockedFunction<
-  typeof getAdditionalEquipment
->
-const mockGetSavedStepForms = getSavedStepForms as jest.MockedFunction<
-  typeof getSavedStepForms
->
-const mockGetNewProtocolModal = getNewProtocolModal as jest.MockedFunction<
-  typeof getNewProtocolModal
->
-const mockGetHasUnsavedChanges = getHasUnsavedChanges as jest.MockedFunction<
-  typeof getHasUnsavedChanges
->
-const mockGetUnusedTrash = getUnusedTrash as jest.MockedFunction<
-  typeof getUnusedTrash
->
-const mockGetUnusedStagingAreas = getUnusedStagingAreas as jest.MockedFunction<
-  typeof getUnusedStagingAreas
->
-const mockGetUnusedEntities = getUnusedEntities as jest.MockedFunction<
-  typeof getUnusedEntities
->
-const mockUseBlockingHint = useBlockingHint as jest.MockedFunction<
-  typeof useBlockingHint
->
-const mockToggleNewProtocolModal = toggleNewProtocolModal as jest.MockedFunction<
-  typeof toggleNewProtocolModal
->
+vi.mock('../../../step-forms/selectors')
+vi.mock('../../../load-file/selectors')
+vi.mock('../../../navigation/actions')
+vi.mock('../../../navigation/selectors')
+vi.mock('../../../file-data/selectors')
+vi.mock('../../Hints/useBlockingHint')
+vi.mock('../utils')
 
 const render = () => {
   return renderWithProviders(<FileSidebar />, { i18nInstance: i18n })[0]
@@ -75,26 +38,26 @@ const render = () => {
 
 describe('FileSidebar', () => {
   beforeEach(() => {
-    mockGetUnusedEntities.mockReturnValue([])
-    mockGetUnusedStagingAreas.mockReturnValue([])
-    mockGetUnusedTrash.mockReturnValue({
+    vi.mocked(getUnusedEntities).mockReturnValue([])
+    vi.mocked(getUnusedStagingAreas).mockReturnValue([])
+    vi.mocked(getUnusedTrash).mockReturnValue({
       trashBinUnused: false,
       wasteChuteUnused: false,
     })
-    mockGetInitialDeckSetup.mockReturnValue({
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
       modules: {},
       pipettes: {},
       additionalEquipmentOnDeck: {},
       labware: {},
     })
-    mockGetHasUnsavedChanges.mockReturnValue(false)
-    mockGetNewProtocolModal.mockReturnValue(false)
-    mockGetSavedStepForms.mockReturnValue({})
-    mockGetAdditionalEquipment.mockReturnValue({})
-    mockGetRobotType.mockReturnValue(FLEX_ROBOT_TYPE)
-    mockGetCurrentPage.mockReturnValue('settings-app')
-    mockUseBlockingHint.mockReturnValue(null)
-    mockCreateFile.mockReturnValue({
+    vi.mocked(getHasUnsavedChanges).mockReturnValue(false)
+    vi.mocked(getNewProtocolModal).mockReturnValue(false)
+    vi.mocked(getSavedStepForms).mockReturnValue({})
+    vi.mocked(getAdditionalEquipment).mockReturnValue({})
+    vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
+    vi.mocked(getCurrentPage).mockReturnValue('settings-app')
+    vi.mocked(useBlockingHint).mockReturnValue(null)
+    vi.mocked(createFile).mockReturnValue({
       commands: [
         {
           commandType: 'moveToAddressableArea',
@@ -108,19 +71,20 @@ describe('FileSidebar', () => {
     } as any)
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
+    cleanup()
   })
   it('renders the file sidebar and buttons work as expected with no warning upon export', () => {
     render()
     screen.getByText('Protocol File')
     fireEvent.click(screen.getByRole('button', { name: 'Create New' }))
-    expect(mockToggleNewProtocolModal).toHaveBeenCalled()
+    expect(vi.mocked(toggleNewProtocolModal)).toHaveBeenCalled()
     screen.getByText('Import')
     fireEvent.click(screen.getByRole('button', { name: 'Export' }))
-    expect(mockUseBlockingHint).toHaveBeenCalled()
+    expect(vi.mocked(useBlockingHint)).toHaveBeenCalled()
   })
   it('renders the no commands warning', () => {
-    mockCreateFile.mockReturnValue({
+    vi.mocked(createFile).mockReturnValue({
       commands: [],
     } as any)
     render()
@@ -128,7 +92,7 @@ describe('FileSidebar', () => {
     screen.getByText('Your protocol has no steps')
   })
   it('renders the unused pipette and module warning', () => {
-    mockGetUnusedEntities.mockReturnValue([
+    vi.mocked(getUnusedEntities).mockReturnValue([
       {
         mount: 'left',
         name: 'p1000_96',
@@ -145,7 +109,7 @@ describe('FileSidebar', () => {
     screen.getByText('Unused pipette and module')
   })
   it('renders the unused trash warning', () => {
-    mockGetUnusedTrash.mockReturnValue({
+    vi.mocked(getUnusedTrash).mockReturnValue({
       trashBinUnused: true,
       wasteChuteUnused: false,
     })
@@ -154,7 +118,7 @@ describe('FileSidebar', () => {
     screen.getByText('Unused trash')
   })
   it('renders the unused waste chute warning', () => {
-    mockGetUnusedTrash.mockReturnValue({
+    vi.mocked(getUnusedTrash).mockReturnValue({
       trashBinUnused: false,
       wasteChuteUnused: true,
     })
@@ -163,13 +127,13 @@ describe('FileSidebar', () => {
     screen.getByText('Unused trash')
   })
   it('renders the unused staging area slot warning', () => {
-    mockGetUnusedStagingAreas.mockReturnValue(['D4'])
+    vi.mocked(getUnusedStagingAreas).mockReturnValue(['D4'])
     render()
     fireEvent.click(screen.getByRole('button', { name: 'Export' }))
     screen.getByText('One or more staging area slots are unused')
   })
   it('renders the unused gripper warning', () => {
-    mockGetAdditionalEquipment.mockReturnValue({
+    vi.mocked(getAdditionalEquipment).mockReturnValue({
       gripperId: { name: 'gripper', id: 'gripperId' },
     })
     render()

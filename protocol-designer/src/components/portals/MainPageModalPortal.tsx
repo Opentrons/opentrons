@@ -3,12 +3,10 @@ import ReactDom from 'react-dom'
 
 const PORTAL_ROOT_ID = 'main-page-modal-portal-root'
 
+export const getMainPagePortalEl = (): HTMLElement => document.getElementById(PORTAL_ROOT_ID) ?? document.body
+
 export function PortalRoot(): JSX.Element {
   return <div id={PORTAL_ROOT_ID} />
-}
-
-export function getPortalElem(): HTMLElement | null {
-  return document.getElementById(PORTAL_ROOT_ID)
 }
 
 interface Props {
@@ -18,9 +16,9 @@ interface Props {
 /** The children of Portal are rendered into the
  * PortalRoot, if the PortalRoot exists in the DOM */
 export function Portal(props: Props): JSX.Element | null {
-  const modalRootElem = getPortalElem()
+  const modalRootElem = getMainPagePortalEl()
 
-  if (!modalRootElem) {
+  if (modalRootElem == null) {
     console.error('Confirm Modal root is not present, could not render modal')
     return null
   }

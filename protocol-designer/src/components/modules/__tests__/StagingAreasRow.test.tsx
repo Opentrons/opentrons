@@ -1,13 +1,14 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { fireEvent, screen, cleanup } from '@testing-library/react'
 import { renderWithProviders } from '../../../__testing-utils__' 
 import { i18n } from '../../../localization'
 import { FlexSlotMap } from '../FlexSlotMap'
 import { StagingAreasRow } from '../StagingAreasRow'
+import { getInitialDeckSetup } from '../../../step-forms/selectors'
 
-jest.mock('../FlexSlotMap')
-
-const mockFlexSlotMap = FlexSlotMap as jest.MockedFunction<typeof FlexSlotMap>
+vi.mock('../../../step-forms/selectors')
+vi.mock('../FlexSlotMap')
 
 const render = (props: React.ComponentProps<typeof StagingAreasRow>) => {
   return renderWithProviders(<StagingAreasRow {...props} />, {
@@ -19,10 +20,19 @@ describe('StagingAreasRow', () => {
   let props: React.ComponentProps<typeof StagingAreasRow>
   beforeEach(() => {
     props = {
-      handleAttachment: jest.fn(),
+      handleAttachment: vi.fn(),
       stagingAreas: [],
     }
-    mockFlexSlotMap.mockReturnValue(<div>mock slot map</div>)
+    vi.mocked(FlexSlotMap).mockReturnValue(<div>mock slot map</div>)
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      pipettes: {},
+      modules: {},
+      additionalEquipmentOnDeck: {},
+      labware: {},
+    })
+  })
+  afterEach(() => {
+    cleanup()
   })
   it('renders no staging areas', () => {
     render(props)

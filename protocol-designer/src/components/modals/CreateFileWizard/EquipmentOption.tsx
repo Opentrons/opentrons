@@ -10,11 +10,11 @@ import {
   BORDERS,
   JUSTIFY_CENTER,
   COLORS,
-  StyleProps,
   TYPOGRAPHY,
   useHoverTooltip,
   Tooltip,
 } from '@opentrons/components'
+import type { StyleProps } from '@opentrons/components'
 
 const EQUIPMENT_OPTION_STYLE = css`
   background-color: ${COLORS.white};
@@ -102,9 +102,8 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
       >
         {showCheckbox ? (
           <Icon
-            aria-label={`EquipmentOption_${
-              isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'
-            }`}
+            aria-label={`EquipmentOption_${isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'
+              }`}
             color={isSelected ? COLORS.blue50 : COLORS.grey50}
             size="1.5rem"
             name={isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'}

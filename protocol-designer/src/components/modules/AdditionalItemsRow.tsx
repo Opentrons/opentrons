@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import {
@@ -21,7 +22,7 @@ import {
 import gripperImage from '../../images/flex_gripper.png'
 import wasteChuteImage from '../../images/waste_chute.png'
 import trashBinImage from '../../images/flex_trash_bin.png'
-import { Portal } from '../portals/TopPortal'
+import { getTopPortalEl } from '../portals/TopPortal'
 import { TrashModal } from './TrashModal'
 import { FlexSlotMap } from './FlexSlotMap'
 
@@ -67,13 +68,14 @@ export function AdditionalItemsRow(
   return (
     <>
       {trashModal && name !== 'gripper' ? (
-        <Portal>
+        createPortal(
           <TrashModal
-            onCloseClick={() => openTrashModal(false)}
+            onCloseClick={() => { openTrashModal(false) }}
             trashName={name}
             trashBinId={trashBinId}
-          />
-        </Portal>
+          />,
+          getTopPortalEl()
+        )
       ) : null}
       <Flex flexDirection={DIRECTION_COLUMN}>
         <h4 className={styles.row_title}>

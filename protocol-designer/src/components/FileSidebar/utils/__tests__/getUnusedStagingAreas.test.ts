@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest'
 import { getUnusedStagingAreas } from '../getUnusedStagingAreas'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { AdditionalEquipment } from '../../FileSidebar'

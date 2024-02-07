@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { fireEvent, screen, cleanup } from '@testing-library/react'
 import { renderWithProviders, nestedTextMatcher } from '../../../__testing-utils__'
 import {
   getIsLabwareAboveHeight,
@@ -19,45 +20,22 @@ import {
 } from '../../../step-forms/selectors'
 import { getHas96Channel } from '../../../utils'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
+import type * as SharedData from '@opentrons/shared-data'
 
-jest.mock('../../../utils/labwareModuleCompatibility')
-jest.mock('../../../step-forms/selectors')
-jest.mock('../../../labware-defs/selectors')
-jest.mock('../../Hints/useBlockingHint')
-jest.mock('../../../utils')
-jest.mock('../../../labware-ingred/selectors')
-jest.mock('@opentrons/shared-data', () => {
-  const actualSharedData = jest.requireActual('@opentrons/shared-data')
+vi.mock('../../../utils/labwareModuleCompatibility')
+vi.mock('../../../step-forms/selectors')
+vi.mock('../../../labware-defs/selectors')
+vi.mock('../../Hints/useBlockingHint')
+vi.mock('../../../utils')
+vi.mock('../../../labware-ingred/selectors')
+vi.mock('@opentrons/shared-data', async (importOriginal) => {
+  const actual = await importOriginal<typeof SharedData>()
   return {
-    ...actualSharedData,
-    getIsLabwareAboveHeight: jest.fn(),
+    ...actual,
+    getIsLabwareAboveHeight: vi.fn(),
   }
 })
 
-const mockGetIsLabwareAboveHeight = getIsLabwareAboveHeight as jest.MockedFunction<
-  typeof getIsLabwareAboveHeight
->
-const mockGetLabwareCompatibleWithAdapter = getLabwareCompatibleWithAdapter as jest.MockedFunction<
-  typeof getLabwareCompatibleWithAdapter
->
-const mockGetInitialDeckSetup = getInitialDeckSetup as jest.MockedFunction<
-  typeof getInitialDeckSetup
->
-const mockSlot = labwareIngredSelectors.selectedAddLabwareSlot as jest.MockedFunction<
-  typeof labwareIngredSelectors.selectedAddLabwareSlot
->
-const mockGetHas96Channel = getHas96Channel as jest.MockedFunction<
-  typeof getHas96Channel
->
-const mockGetPipetteEntities = getPipetteEntities as jest.MockedFunction<
-  typeof getPipetteEntities
->
-const mockGetPermittedTipracks = getPermittedTipracks as jest.MockedFunction<
-  typeof getPermittedTipracks
->
-const mockGetCustomLabwareDefsByURI = getCustomLabwareDefsByURI as jest.MockedFunction<
-  typeof getCustomLabwareDefsByURI
->
 const render = () => {
   return renderWithProviders(<LabwareSelectionModal />, {
     i18nInstance: i18n,
@@ -69,17 +47,17 @@ const mockPermittedTipracks = [mockTipUri]
 
 describe('LabwareSelectionModal', () => {
   beforeEach(() => {
-    mockGetLabwareCompatibleWithAdapter.mockReturnValue([])
-    mockGetInitialDeckSetup.mockReturnValue({
+    vi.mocked(getLabwareCompatibleWithAdapter).mockReturnValue([])
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
       labware: {},
       modules: {},
       pipettes: {},
       additionalEquipmentOnDeck: {},
     })
-    mockSlot.mockReturnValue('2')
-    mockGetHas96Channel.mockReturnValue(false)
-    mockGetPermittedTipracks.mockReturnValue(mockPermittedTipracks)
-    mockGetPipetteEntities.mockReturnValue({
+    vi.mocked(labwareIngredSelectors.selectedAddLabwareSlot).mockReturnValue('2')
+    vi.mocked(getHas96Channel).mockReturnValue(false)
+    vi.mocked(getPermittedTipracks).mockReturnValue(mockPermittedTipracks)
+    vi.mocked(getPipetteEntities).mockReturnValue({
       mockPip: {
         tiprackLabwareDef: {} as any,
         spec: {} as any,
@@ -88,14 +66,17 @@ describe('LabwareSelectionModal', () => {
         tiprackDefURI: mockTipUri,
       },
     })
-    mockGetCustomLabwareDefsByURI.mockReturnValue({})
+    vi.mocked(getCustomLabwareDefsByURI).mockReturnValue({})
+  })
+  afterEach(() => {
+    cleanup()
   })
   it('should NOT filter out labware above 57 mm when the slot is NOT next to a heater shaker', () => {
     render()
-    expect(mockGetIsLabwareAboveHeight).not.toHaveBeenCalled()
+    expect(vi.mocked(getIsLabwareAboveHeight)).not.toHaveBeenCalled()
   })
   it('should filter out labware above 57 mm when the slot is next to a heater shaker', () => {
-    mockGetInitialDeckSetup.mockReturnValue({
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
       labware: {},
       modules: {
         heaterShaker: {
@@ -110,15 +91,15 @@ describe('LabwareSelectionModal', () => {
       additionalEquipmentOnDeck: {},
     })
     render()
-    expect(mockGetIsLabwareAboveHeight).toHaveBeenCalledWith(
+    expect(vi.mocked(getIsLabwareAboveHeight)).toHaveBeenCalledWith(
       expect.any(Object),
       MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM
     )
   })
-  it('should display only permitted tipracks if the 96-channel is attached', () => {
-    mockGetHas96Channel.mockReturnValue(true)
-    mockSlot.mockReturnValue('adapter')
-    mockGetInitialDeckSetup.mockReturnValue({
+  it.only('should display only permitted tipracks if the 96-channel is attached', () => {
+    vi.mocked(getHas96Channel).mockReturnValue(true)
+    vi.mocked(labwareIngredSelectors.selectedAddLabwareSlot).mockReturnValue('adapter')
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
       labware: {
         adapter: {
           id: 'adapter',

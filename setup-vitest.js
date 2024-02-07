@@ -1,8 +1,11 @@
 import '@testing-library/jest-dom/vitest'
+import { cleanup } from '@testing-library/react'
+import { vi, afterEach } from 'vitest'
 
-let portalRoot = document.getElementById("portal")
-if (!portalRoot) {
-  portalRoot = document.createElement('div')
-  portalRoot.setAttribute('id', 'top-portal-root')
-  document.body.appendChild(portalRoot)
-}
+vi.mock('protocol-designer/src/labware-defs/utils')
+
+process.env.OT_PD_VERSION = 'fake_PD_version'
+
+afterEach(() => {
+  cleanup()
+})
