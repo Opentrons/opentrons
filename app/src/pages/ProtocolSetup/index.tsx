@@ -124,7 +124,7 @@ export function ProtocolSetupStep({
   const backgroundColorByStepStatus = {
     ready: COLORS.green35,
     'not ready': COLORS.yellow35,
-    general: COLORS.grey35,
+    general: COLORS.blue35,
   }
   const { makeSnackbar } = useToaster()
 
@@ -138,7 +138,7 @@ export function ProtocolSetupStep({
   if (!disabled) {
     switch (status) {
       case 'general':
-        backgroundColor = COLORS.grey40
+        backgroundColor = COLORS.grey35
         break
       case 'ready':
         backgroundColor = COLORS.green40
@@ -164,7 +164,7 @@ export function ProtocolSetupStep({
       <Flex
         alignItems={ALIGN_CENTER}
         backgroundColor={
-          disabled ? COLORS.blue35 : backgroundColorByStepStatus[status]
+          disabled ? COLORS.grey35 : backgroundColorByStepStatus[status]
         }
         borderRadius={BORDERS.borderRadiusSize4}
         gridGap={SPACING.spacing16}
