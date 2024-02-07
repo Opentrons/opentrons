@@ -192,7 +192,9 @@ def version_from_string(vstr: str) -> APIVersion:
     return APIVersion(major=int(matches.group(1)), minor=int(matches.group(2)))
 
 
-def _parse_json(protocol_contents: str, filename: Optional[str] = None) -> JsonProtocol:
+def _parse_json(
+    protocol_contents: Union[str, bytes], filename: Optional[str] = None
+) -> JsonProtocol:
     """Parse a protocol known or at least suspected to be json"""
     protocol_json = json.loads(protocol_contents)
     version, validated = validate_json(protocol_json)
@@ -351,7 +353,7 @@ def parse(
 
         # our jsonschema says the top level json kind is object
         if protocol_file and protocol_file[0] in ("{", b"{"):
-            return _parse_json(protocol_str, filename)
+            return _parse_json(protocol_file, filename)
         else:
             return _parse_python(
                 protocol_contents=protocol_file,
