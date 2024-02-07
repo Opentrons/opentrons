@@ -6,14 +6,18 @@ from pathlib import Path
 import subprocess
 from time import sleep
 import os
-from typing import List, Any
+from typing import List, Any, Optional
 
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.gravimetric import helpers, workarounds
 from hardware_testing.data.csv_report import CSVReport
 from hardware_testing.gravimetric.measurement.record import GravimetricRecorder
 from hardware_testing.gravimetric.measurement.scale import Scale
-from hardware_testing.drivers import asair_sensor
+from hardware_testing.drivers import (
+    asair_sensor,
+    mitutoyo_digimatic_indicator,
+    list_ports_and_select,
+)
 from hardware_testing.data import (
     ui,
     create_run_id_and_start_time,
@@ -88,6 +92,7 @@ class RunArgs:
     test_report: CSVReport
     start_height_offset: float
     aspirate: bool
+    dial_indicator: Optional[mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator]
 
     @classmethod
     def _get_protocol_context(cls, args: argparse.Namespace) -> ProtocolContext:
@@ -132,7 +137,9 @@ class RunArgs:
         _ctx = RunArgs._get_protocol_context(args)
         robot_serial = helpers._get_robot_serial(_ctx.is_simulating())
         run_id, start_time = create_run_id_and_start_time()
-        environment_sensor = asair_sensor.BuildAsairSensor(_ctx.is_simulating() or args.ignore_env)
+        environment_sensor = asair_sensor.BuildAsairSensor(
+            _ctx.is_simulating() or args.ignore_env
+        )
         git_description = get_git_description()
         protocol_cfg = LIQUID_SENSE_CFG[args.pipette][args.channels]
         name = protocol_cfg.metadata["protocolName"]  # type: ignore[attr-defined]
@@ -159,8 +166,20 @@ class RunArgs:
 
         scale = Scale.build(simulate=_ctx.is_simulating() or args.ignore_scale)
         recorder: GravimetricRecorder = execute._load_scale(
-            name, scale, run_id, pipette_tag, start_time, _ctx.is_simulating() or args.ignore_scale
+            name,
+            scale,
+            run_id,
+            pipette_tag,
+            start_time,
+            _ctx.is_simulating() or args.ignore_scale,
         )
+        dial: Optional[mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator] = None
+        if not _ctx.is_simulating():
+            dial_port = list_ports_and_select("Dial Indicator")
+            dial = mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator(
+                port=dial_port
+            )
+            dial.connect()
         print(f"pipette_tag {pipette_tag}")
         report = build_ls_report(name, run_id, trials, tip_volumes)
         report.set_tag(name)
@@ -205,7 +224,8 @@ class RunArgs:
             protocol_cfg=protocol_cfg,
             test_report=report,
             start_height_offset=args.start_height_offset,
-            aspirate=args.plunger_direction == "aspirate"
+            aspirate=args.plunger_direction == "aspirate",
+            dial_indicator=dial,
         )
 
 
@@ -266,10 +286,11 @@ if __name__ == "__main__":
         if not run_args.ctx.is_simulating():
             ui.print_info("killing serial log")
             serial_logger.terminate()
+        if run_args.dial_indicator is not None:
+            run_args.dial_indicator.disconnect()
         run_args.test_report.save_to_disk()
         run_args.test_report.print_results()
         ui.print_info("done\n\n")
         run_args.ctx.cleanup()
         helpers_ot3.restart_server_ot3()
         os._exit(os.EX_OK)
-

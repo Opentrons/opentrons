@@ -69,7 +69,8 @@ def build_trials_section(trials: int, tips: List[int]) -> CSVSection:
         title="TRIALS",
         lines=[
             CSVLine(
-                f"trial-{t + 1}-{tip}ul", [float, float, float, float, float, float]
+                f"trial-{t + 1}-{tip}ul",
+                [float, float, float, float, float, float, float],
             )
             for tip in tips
             for t in range(trials)
@@ -141,12 +142,21 @@ def store_trial(
     temp: float,
     z_travel: float,
     plunger_travel: float,
+    tip_length_offset: float,
 ) -> None:
     """Report Trial."""
     report(
         "TRIALS",
         f"trial-{trial + 1}-{tip}ul",
-        [height, plunger_pos, humidity, temp, z_travel, plunger_travel],
+        [
+            height,
+            plunger_pos,
+            humidity,
+            temp,
+            z_travel,
+            plunger_travel,
+            tip_length_offset,
+        ],
     )
 
 
