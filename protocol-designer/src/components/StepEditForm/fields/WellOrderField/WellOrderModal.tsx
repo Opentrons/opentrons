@@ -1,7 +1,8 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import cx from 'classnames'
 import { useTranslation } from 'react-i18next'
-import { Portal } from '../../../portals/MainPageModalPortal'
+import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
 import {
   Modal,
   OutlineButton,
@@ -186,7 +187,7 @@ export const WellOrderModal = (
   if (!isOpen) return null
 
   return (
-    <Portal>
+    createPortal(
       <Modal
         className={modalStyles.modal}
         contentsClassName={cx(modalStyles.modal_contents)}
@@ -239,7 +240,8 @@ export const WellOrderModal = (
             <DoneButton onClick={handleDone} />
           </div>
         </div>
-      </Modal>
-    </Portal>
+      </Modal>,
+      getMainPagePortalEl()
+    )
   )
 }

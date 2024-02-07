@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { createPortal } from 'react-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   AlertModal,
@@ -8,12 +9,13 @@ import {
   OutlineButton,
   Text,
 } from '@opentrons/components'
-import { actions, selectors, HintKey } from '../../tutorial'
-import { Portal } from '../portals/MainPageModalPortal'
+import { actions, selectors } from '../../tutorial'
+import { getMainPagePortalEl } from '../portals/MainPageModalPortal'
 import styles from './hints.module.css'
 import EXAMPLE_ADD_LIQUIDS_IMAGE from '../../images/example_add_liquids.png'
 import EXAMPLE_WATCH_LIQUIDS_MOVE_IMAGE from '../../images/example_watch_liquids_move.png'
 import EXAMPLE_BATCH_EDIT_IMAGE from '../../images/announcements/multi_select.gif'
+import type { HintKey } from '../../tutorial'
 
 const HINT_IS_ALERT: HintKey[] = ['add_liquids_and_labware']
 
@@ -29,7 +31,7 @@ export const Hints = (): JSX.Element | null => {
   }
 
   const makeHandleCloseClick = (hintKey: HintKey): (() => void) => {
-    return () => removeHint(hintKey)
+    return () => { removeHint(hintKey) }
   }
 
   const renderHintContents = (hintKey: HintKey): JSX.Element | null => {
@@ -139,12 +141,12 @@ export const Hints = (): JSX.Element | null => {
     }
   }
 
-  if (!hintKey) return null
+  if (hintKey == null) return null
 
   const headingText = t(`hint.${hintKey}.title`)
   const hintIsAlert = HINT_IS_ALERT.includes(hintKey)
   return (
-    <Portal>
+    createPortal(
       <AlertModal alertOverlay heading={hintIsAlert ? headingText : null}>
         {!hintIsAlert ? (
           <div className={styles.heading}>{headingText}</div>
@@ -156,7 +158,7 @@ export const Hints = (): JSX.Element | null => {
           <DeprecatedCheckboxField
             className={styles.dont_show_again}
             label={t('hint.dont_show_again')}
-            onChange={() => toggleRememberDismissal(rememberDismissal)}
+            onChange={() => { toggleRememberDismissal(rememberDismissal) }}
             value={rememberDismissal}
           />
           <OutlineButton
@@ -166,7 +168,8 @@ export const Hints = (): JSX.Element | null => {
             {t('button:ok')}
           </OutlineButton>
         </div>
-      </AlertModal>
-    </Portal>
+      </AlertModal>,
+      getMainPagePortalEl()
+    )
   )
 }

@@ -1,8 +1,8 @@
 import * as React from 'react'
-
+import { createPortal } from 'react-dom'
 import { Popper, Reference, Manager } from 'react-popper'
 import cx from 'classnames'
-import { Portal } from '../portals/TopPortal'
+import { getTopPortalEl } from '../portals/TopPortal'
 import { PillTooltipContents } from '../steplist/SubstepRow'
 import styles from './labware.module.css'
 import type { LocationLiquidState } from '@opentrons/step-generation'
@@ -83,14 +83,15 @@ export const WellTooltip = (props: WellTooltipProps): JSX.Element => {
       <Manager>
         <Reference>
           {({ ref }) => (
-            <Portal>
+            createPortal(
               <div
                 ref={ref}
                 className={styles.virtual_reference}
                 // @ts-expect-error(sa, 2021-6-21): can't use null as top and left, default to undefined
                 style={{ top: tooltipY, left: tooltipX }}
-              />
-            </Portal>
+              />,
+              getTopPortalEl()
+            )
           )}
         </Reference>
         {children({
@@ -109,7 +110,7 @@ export const WellTooltip = (props: WellTooltipProps): JSX.Element => {
           >
             {({ ref, style, placement, arrowProps }) => {
               return (
-                <Portal>
+                createPortal(
                   <div
                     style={style}
                     ref={ref}
@@ -126,8 +127,9 @@ export const WellTooltip = (props: WellTooltipProps): JSX.Element => {
                       ref={arrowProps.ref}
                       style={arrowProps.style}
                     />
-                  </div>
-                </Portal>
+                  </div>,
+                  getTopPortalEl()
+                )
               )
             }}
           </Popper>

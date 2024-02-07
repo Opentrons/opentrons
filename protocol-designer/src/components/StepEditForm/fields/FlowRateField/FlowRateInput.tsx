@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import round from 'lodash/round'
 import { useTranslation } from 'react-i18next'
 import {
@@ -7,11 +8,11 @@ import {
   RadioGroup,
   InputField,
 } from '@opentrons/components'
-import { Portal } from '../../../portals/MainPageModalPortal'
+import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
 import modalStyles from '../../../modals/modal.module.css'
 import stepFormStyles from '../../StepEditForm.module.css'
 import styles from './FlowRateInput.module.css'
-import { FieldProps } from '../../types'
+import type { FieldProps } from '../../types'
 
 const DECIMALS_ALLOWED = 1
 
@@ -125,9 +126,8 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
   // and pristinity only masks the outOfBounds error, not the correctDecimals error
   if (!modalUseDefault) {
     if (!Number.isNaN(modalFlowRateNum) && !correctDecimals) {
-      errorMessage = `a max of ${DECIMALS_ALLOWED} decimal place${
-        DECIMALS_ALLOWED > 1 ? 's' : ''
-      } is allowed`
+      errorMessage = `a max of ${DECIMALS_ALLOWED} decimal place${DECIMALS_ALLOWED > 1 ? 's' : ''
+        } is allowed`
     } else if (!isPristine && outOfBounds) {
       errorMessage = `accepted range is ${displayMinFlowRate} to ${maxFlowRate}`
     }
@@ -147,7 +147,7 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
   )
 
   const FlowRateModal = pipetteDisplayName && (
-    <Portal>
+    createPortal(
       <AlertModal
         alertOverlay
         className={modalStyles.modal}
@@ -192,8 +192,9 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
             },
           ]}
         />
-      </AlertModal>
-    </Portal>
+      </AlertModal>,
+      getMainPagePortalEl()
+    )
   )
 
   return (

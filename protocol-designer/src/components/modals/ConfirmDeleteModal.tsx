@@ -1,7 +1,8 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { AlertModal } from '@opentrons/components'
-import { Portal } from '../portals/MainPageModalPortal'
+import { getMainPagePortalEl } from '../portals/MainPageModalPortal'
 import modalStyles from './modal.module.css'
 
 export const DELETE_PROFILE_CYCLE: 'deleteProfileCycle' = 'deleteProfileCycle'
@@ -47,7 +48,7 @@ export function ConfirmDeleteModal(props: Props): JSX.Element {
     },
   ]
   return (
-    <Portal>
+    createPortal(
       <AlertModal
         alertOverlay
         restrictOuterScroll={false}
@@ -57,7 +58,8 @@ export function ConfirmDeleteModal(props: Props): JSX.Element {
         heading={t(`confirm_delete_modal.${modalType}.title`)}
       >
         <p>{t(`confirm_delete_modal.${modalType}.body`)}</p>
-      </AlertModal>
-    </Portal>
+      </AlertModal>,
+      getMainPagePortalEl()
+    )
   )
 }

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import cx from 'classnames'
 import { useTranslation } from 'react-i18next'
 import round from 'lodash/round'
@@ -11,13 +12,14 @@ import {
   OutlineButton,
   RadioGroup,
 } from '@opentrons/components'
-import { Portal } from '../../../portals/MainPageModalPortal'
+import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
 import modalStyles from '../../../modals/modal.module.css'
+import { getIsTouchTipField } from '../../../../form-types'
 import { TipPositionZAxisViz } from './TipPositionZAxisViz'
 
 import styles from './TipPositionInput.module.css'
 import * as utils from './utils'
-import { getIsTouchTipField, StepFieldName } from '../../../../form-types'
+import type { StepFieldName } from '../../../../form-types'
 
 const SMALL_STEP_MM = 1
 const LARGE_STEP_MM = 10
@@ -207,7 +209,7 @@ export const TipPositionModal = (props: Props): JSX.Element => {
   const isMixAspDispField = name === 'mix_mmFromBottom'
 
   return (
-    <Portal>
+    createPortal(
       <HandleKeypress
         preventDefault
         handlers={[
@@ -305,7 +307,8 @@ export const TipPositionModal = (props: Props): JSX.Element => {
             </Flex>
           </div>
         </AlertModal>
-      </HandleKeypress>
-    </Portal>
+      </HandleKeypress>,
+      getMainPagePortalEl()
+    )
   )
 }

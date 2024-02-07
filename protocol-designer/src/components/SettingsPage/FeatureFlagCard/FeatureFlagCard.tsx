@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import sortBy from 'lodash/sortBy'
@@ -6,13 +7,13 @@ import { ContinueModal, Card, ToggleButton } from '@opentrons/components'
 import { resetScrollElements } from '../../../ui/steps/utils'
 import {
   userFacingFlags,
-  FlagTypes,
   actions as featureFlagActions,
   selectors as featureFlagSelectors,
 } from '../../../feature-flags'
-import { Portal } from '../../portals/MainPageModalPortal'
+import { getMainPagePortalEl } from '../../portals/MainPageModalPortal'
 import styles from '../SettingsPage.module.css'
 import modalStyles from '../../modals/modal.module.css'
+import type { FlagTypes } from '../../../feature-flags'
 
 export function FeatureFlagCard(): JSX.Element {
   const flags = useSelector(featureFlagSelectors.getFeatureFlagData)
@@ -101,7 +102,7 @@ export function FeatureFlagCard(): JSX.Element {
   return (
     <>
       {modalFlagName && (
-        <Portal>
+        createPortal(
           <ContinueModal
             alertOverlay
             className={modalStyles.modal}
@@ -122,8 +123,9 @@ export function FeatureFlagCard(): JSX.Element {
             <p>
               {t(`experimental_feature_warning.${flagSwitchDirection}.body2`)}
             </p>
-          </ContinueModal>
-        </Portal>
+          </ContinueModal>,
+          getMainPagePortalEl()
+        )
       )}
       <Card title={t('card:title.feature_flags')}>
         <div className={styles.card_content}>
