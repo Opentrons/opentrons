@@ -57,14 +57,10 @@ export function createUi(): BrowserWindow {
   mainWindow.loadURL(url, { extraHeaders: 'pragma: no-cache\n' })
 
   // open new windows (<a target="_blank" ...) in browser windows
-  mainWindow.webContents.setWindowOpenHandler(({ url, disposition }) => {
-    if (disposition === 'new-window' && url === 'about:blank') {
-      // eslint-disable-next-line no-void
-      void shell.openExternal(url)
-      return { action: 'deny' }
-    } else {
-      return { action: 'allow' }
-    }
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    // eslint-disable-next-line no-void
+    void shell.openExternal(url)
+    return { action: 'deny' }
   })
 
   return mainWindow
