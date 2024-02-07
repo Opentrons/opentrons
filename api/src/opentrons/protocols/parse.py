@@ -12,7 +12,7 @@ import re
 import traceback
 from io import BytesIO
 from zipfile import ZipFile
-from typing import Any, Dict, Optional, Union, Tuple, TYPE_CHECKING
+from typing import Any, Dict, Optional, Union, Tuple, TYPE_CHECKING, cast
 
 import jsonschema  # type: ignore
 
@@ -351,10 +351,25 @@ def parse(
                 bundled_data=extra_data,
             )
 
-        # our jsonschema says the top level json kind is object
-        if protocol_file and protocol_file[0] in ("{", b"{"):
+        # our jsonschema says the top level json kind is object so we can
+        # rely on it starting with a { if it's valid. that could either be
+        # a string or bytes.
+        #
+        # if it's a string, then if the protocol file starts with a { and
+        # we do protocol_file[0] then we get the string "{".
+        #
+        # if it's a bytes, then if the protocol file starts with the ascii or
+        # utf-8 representation of { and we do protocol_file[0] we get 123,
+        # because while single elements of strings are strings, single elements
+        # of bytes are the byte value as a number.
+        #
+        # to get that number we could either use ord() or do what we do here
+        # which I think is a little nicer, if any of the above can be called
+        # "nice".
+        if protocol_file and protocol_file[0] in ("{", b"{"[0]):
             return _parse_json(protocol_file, filename)
         else:
+            print(f'default assumption, file[0] is {protocol_file[0]}')
             return _parse_python(
                 protocol_contents=protocol_file,
                 python_parse_mode=python_parse_mode,
@@ -486,6 +501,17 @@ def _has_api_v1_imports(parsed: ast.Module) -> bool:
     return bool(v1_markers.intersection(opentrons_imports))
 
 
+def _strvalue_from_str_or_byte_dict(
+    dct: Union[Dict[str, str], Dict[bytes, bytes]], key: str
+) -> Optional[str]:
+    key_bytes = key.encode("utf-8")
+    val_bytes = cast(Dict[bytes, bytes], dct).get(key_bytes, None)
+    val_str = cast(Dict[str, str], dct).get(key, None)
+    if val_bytes:
+        return val_bytes.decode("utf-8")
+    return val_str
+
+
 def _version_from_static_python_info(
     static_python_info: StaticPythonInfo,
 ) -> Optional[APIVersion]:
@@ -494,8 +520,13 @@ def _version_from_static_python_info(
     If the protocol doesn't declare apiLevel at all, return None.
     If the protocol declares apiLevel incorrectly, raise a ValueError.
     """
-    from_requirements = (static_python_info.requirements or {}).get("apiLevel", None)
-    from_metadata = (static_python_info.metadata or {}).get("apiLevel", None)
+    from_requirements = _strvalue_from_str_or_byte_dict(
+        static_python_info.requirements or {}, "apiLevel"
+    )
+    from_metadata = _strvalue_from_str_or_byte_dict(
+        static_python_info.metadata or {}, "apiLevel"
+    )
+
     requested_level = from_requirements or from_metadata
     if requested_level is None:
         return None
@@ -523,7 +554,9 @@ def robot_type_from_python_identifier(python_robot_type: str) -> RobotType:
 def _robot_type_from_static_python_info(
     static_python_info: StaticPythonInfo,
 ) -> RobotType:
-    python_robot_type = (static_python_info.requirements or {}).get("robotType", None)
+    python_robot_type = _strvalue_from_str_or_byte_dict(
+        static_python_info.requirements or {}, "robotType"
+    )
     if python_robot_type is None:
         return "OT-2 Standard"
     else:
