@@ -124,7 +124,7 @@ export function ProtocolSetupStep({
   const backgroundColorByStepStatus = {
     ready: COLORS.green35,
     'not ready': COLORS.yellow35,
-    general: COLORS.blue35,
+    general: COLORS.grey35,
   }
   const { makeSnackbar } = useToaster()
 
