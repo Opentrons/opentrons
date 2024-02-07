@@ -406,9 +406,11 @@ describe('ProtocolRunHeader', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith(RUN_ID)
       .mockReturnValue(PROTOCOL_DETAILS)
-    when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
-      trackProtocolRunEvent: mockTrackProtocolRunEvent,
-    })
+    when(mockUseTrackProtocolRunEvent)
+      .calledWith(RUN_ID, ROBOT_NAME)
+      .mockReturnValue({
+        trackProtocolRunEvent: mockTrackProtocolRunEvent,
+      })
     when(mockUseDismissCurrentRunMutation)
       .calledWith()
       .mockReturnValue({

@@ -343,7 +343,7 @@ function PrepareToRun({
     mostRecentAnalysis
   )
 
-  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
 
   const requiredDeckConfigCompatibility = getRequiredDeckConfig(

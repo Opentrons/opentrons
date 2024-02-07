@@ -18,7 +18,8 @@ type TrackCreateProtocolRunEvent = (
 ) => void
 
 export function useTrackCreateProtocolRunEvent(
-  protocol: StoredProtocolData | null
+  protocol: StoredProtocolData | null,
+  robotName: string
 ): { trackCreateProtocolRunEvent: TrackCreateProtocolRunEvent } {
   const trackEvent = useTrackEvent()
 
@@ -29,7 +30,8 @@ export function useTrackCreateProtocolRunEvent(
   const getProtocolRunAnalyticsData = parseProtocolRunAnalyticsData(
     storedProtocolAnalysis,
     protocol,
-    null
+    null,
+    robotName
   )
 
   const trackCreateProtocolRunEvent: TrackCreateProtocolRunEvent = ({

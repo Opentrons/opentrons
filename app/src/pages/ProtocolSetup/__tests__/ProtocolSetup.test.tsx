@@ -345,7 +345,7 @@ describe('ProtocolSetup', () => {
       } as unknown) as any)
     when(mockUseDeckConfigurationCompatibility).mockReturnValue([])
     when(mockUseTrackProtocolRunEvent)
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, ROBOT_NAME)
       .mockReturnValue({ trackProtocolRunEvent: mockTrackProtocolRunEvent })
   })
 

@@ -31,6 +31,7 @@ jest.mock('../hooks')
 jest.mock('../../../../resources/runs/useNotifyAllRunsQuery')
 
 const RUN_ID = 'mockRunId'
+const ROBOT_NAME = 'otie'
 
 const mockMissingPipette = [
   {
@@ -136,9 +137,11 @@ describe('RecentRunProtocolCard', () => {
     mockUseProtocolQuery.mockReturnValue({
       data: { data: { metadata: { protocolName: 'mockProtocol' } } },
     } as any)
-    when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
-      trackProtocolRunEvent: mockTrackProtocolRunEvent,
-    })
+    when(mockUseTrackProtocolRunEvent)
+      .calledWith(RUN_ID, ROBOT_NAME)
+      .mockReturnValue({
+        trackProtocolRunEvent: mockTrackProtocolRunEvent,
+      })
     mockCloneRun = jest.fn()
     when(mockUseCloneRun)
       .calledWith(RUN_ID, expect.anything())

@@ -41,6 +41,7 @@ const render = (props: React.ComponentProps<typeof ConfirmCancelModal>) => {
 }
 
 const RUN_ID = 'mockRunId'
+const ROBOT_NAME = 'otie'
 let mockStopRun: jest.Mock
 let mockTrackEvent: jest.Mock
 let mockTrackProtocolRunEvent: jest.Mock
@@ -56,11 +57,13 @@ describe('ConfirmCancelModal', () => {
     mockUseStopRunMutation.mockReturnValue({ stopRun: mockStopRun } as any)
     mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
-    when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
-      trackProtocolRunEvent: mockTrackProtocolRunEvent,
-    })
+    when(mockUseTrackProtocolRunEvent)
+      .calledWith(RUN_ID, ROBOT_NAME)
+      .mockReturnValue({
+        trackProtocolRunEvent: mockTrackProtocolRunEvent,
+      })
 
-    props = { onClose: jest.fn(), runId: RUN_ID }
+    props = { onClose: jest.fn(), runId: RUN_ID, robotName: ROBOT_NAME }
   })
 
   afterEach(() => {

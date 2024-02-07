@@ -21,6 +21,7 @@ export interface ProtocolAnalyticsData {
   protocolText: string
   pipettes: string
   modules: string
+  robotSerialNumber: string
 }
 
 export type RobotAnalyticsData = {

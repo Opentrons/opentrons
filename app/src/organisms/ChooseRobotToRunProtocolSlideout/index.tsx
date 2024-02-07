@@ -49,11 +49,12 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     mostRecentAnalysis,
   } = storedProtocolData
 
+  const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
   const { trackCreateProtocolRunEvent } = useTrackCreateProtocolRunEvent(
-    storedProtocolData
+    storedProtocolData,
+    selectedRobot?.name ?? ''
   )
 
-  const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
   const offsetCandidates = useOffsetCandidatesForAnalysis(
     mostRecentAnalysis,
     selectedRobot?.ip ?? null

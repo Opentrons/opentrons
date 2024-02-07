@@ -129,7 +129,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     closeOverflowMenu(e)
   }
   const trackEvent = useTrackEvent()
-  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const { reset } = useRunControls(runId, onResetSuccess)
   const { deleteRun } = useDeleteRunMutation()
 
