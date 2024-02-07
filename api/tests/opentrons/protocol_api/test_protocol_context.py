@@ -754,6 +754,9 @@ def test_move_labware_to_module(
     mock_broker = decoy.mock(cls=LegacyBroker)
 
     decoy.when(mock_labware_core.get_well_columns()).then_return([])
+    decoy.when(mock_module_core.get_deck_slot()).then_return(DeckSlotName.SLOT_A1)
+    decoy.when(mock_core.get_labware_on_module(mock_module_core)).then_return(None)
+    decoy.when(mock_core_map.get(None)).then_return(None)
 
     movable_labware = Labware(
         core=mock_labware_core,

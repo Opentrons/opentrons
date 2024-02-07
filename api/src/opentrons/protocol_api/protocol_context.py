@@ -21,7 +21,8 @@ from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import MagneticBlockModel
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
-from opentrons.commands.publisher import CommandPublisher, publish
+from opentrons.commands.helpers import stringify_labware_movement_command
+from opentrons.commands.publisher import CommandPublisher, publish, publish_context
 from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.deck_type import (
     NoTrashDefinedError,
@@ -149,10 +150,10 @@ class ProtocolContext(CommandPublisher):
         }
         self._bundled_data: Dict[str, bytes] = bundled_data or {}
 
-        # With the addition of Moveable Trashes and Waste Chute support, it is not necessary
+        # With the addition of Movable Trashes and Waste Chute support, it is not necessary
         # to ensure that the list of "disposal locations", essentially the list of trashes,
         # is initialized correctly on protocols utilizing former API versions prior to 2.16
-        # and also to ensure that any protocols after 2.16 intialize a Fixed Trash for OT-2
+        # and also to ensure that any protocols after 2.16 initialize a Fixed Trash for OT-2
         # protocols so that no load trash bin behavior is required within the protocol itself.
         # Protocols prior to 2.16 expect the Fixed Trash to exist as a Labware object, while
         # protocols after 2.16 expect trash to exist as either a TrashBin or WasteChute object.
@@ -167,7 +168,13 @@ class ProtocolContext(CommandPublisher):
             _fixed_trash_trashbin = TrashBin(
                 location=DeckSlotName.FIXED_TRASH, addressable_area_name="fixedTrash"
             )
-            self._core.append_disposal_location(_fixed_trash_trashbin)
+            # We have to skip adding this fixed trash bin to engine because this __init__ is called in the main thread
+            # and any calls to sync client will cause a deadlock. This means that OT-2 fixed trashes are not added to
+            # the engine store until one is first referenced. This should have minimal consequences for OT-2 given that
+            # we do not need to worry about the 96 channel pipette and partial tip configuration with that pipette.
+            self._core.append_disposal_location(
+                _fixed_trash_trashbin, skip_add_to_engine=True
+            )
 
         self._commands: List[str] = []
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
@@ -706,14 +713,23 @@ class ProtocolContext(CommandPublisher):
             if drop_offset
             else None
         )
-        self._core.move_labware(
-            labware_core=labware._core,
-            new_location=location,
-            use_gripper=use_gripper,
-            pause_for_manual_move=True,
-            pick_up_offset=_pick_up_offset,
-            drop_offset=_drop_offset,
-        )
+        with publish_context(
+            broker=self.broker,
+            command=cmds.move_labware(
+                # This needs to be called from protocol context and not the command for import loop reasons
+                text=stringify_labware_movement_command(
+                    labware, new_location, use_gripper
+                )
+            ),
+        ):
+            self._core.move_labware(
+                labware_core=labware._core,
+                new_location=location,
+                use_gripper=use_gripper,
+                pause_for_manual_move=True,
+                pick_up_offset=_pick_up_offset,
+                drop_offset=_drop_offset,
+            )
 
     @requires_version(2, 0)
     def load_module(

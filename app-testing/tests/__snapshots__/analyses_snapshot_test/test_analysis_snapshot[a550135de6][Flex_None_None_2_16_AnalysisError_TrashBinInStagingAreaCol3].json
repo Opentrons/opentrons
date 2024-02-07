@@ -100,7 +100,23 @@
     ],
     "protocolType": "python"
   },
-  "errors": [],
+  "errors": [
+    {
+      "detail": "IncompatibleAddressableAreaError [line 16]: Error 4000 GENERAL_ERROR (IncompatibleAddressableAreaError): Cannot use Trash Bin in C3, not compatible with one or more of the following fixtures: Slot C4",
+      "errorCode": "4000",
+      "errorInfo": {},
+      "errorType": "ExceptionInProtocolError",
+      "wrappedErrors": [
+        {
+          "detail": "Cannot use Trash Bin in C3, not compatible with one or more of the following fixtures: Slot C4",
+          "errorCode": "4000",
+          "errorInfo": {},
+          "errorType": "IncompatibleAddressableAreaError",
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
   "files": [
     {
       "name": "Flex_None_None_2_16_AnalysisError_TrashBinInStagingAreaCol3.py",

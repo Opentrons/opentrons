@@ -77,11 +77,9 @@ export function useRunStatus(
     refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
     enabled:
       lastRunStatus.current == null ||
-      !([
-        RUN_STATUS_STOP_REQUESTED,
-        RUN_STATUS_FAILED,
-        RUN_STATUS_SUCCEEDED,
-      ] as RunStatus[]).includes(lastRunStatus.current),
+      !([RUN_STATUS_FAILED, RUN_STATUS_SUCCEEDED] as RunStatus[]).includes(
+        lastRunStatus.current
+      ),
     onSuccess: data => (lastRunStatus.current = data?.data?.status ?? null),
     ...options,
   })

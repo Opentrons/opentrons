@@ -758,7 +758,9 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         <StyledText css={TYPOGRAPHY.pSemiBold}>{buttonText}</StyledText>
       </PrimaryButton>
       {disableReason != null && (
-        <Tooltip tooltipProps={tooltipProps}>{disableReason}</Tooltip>
+        <Tooltip tooltipProps={tooltipProps} width="auto" maxWidth="8rem">
+          {disableReason}
+        </Tooltip>
       )}
       {showIsShakingModal &&
         activeHeaterShaker != null &&

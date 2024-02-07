@@ -489,6 +489,13 @@ class CriticalPoint(enum.Enum):
     point. This is the same as the GRIPPER_JAW_CENTER for grippers.
     """
 
+    INSTRUMENT_XY_CENTER = enum.auto()
+    """
+    The INSTRUMENT_XY_CENTER means the critical point under consideration is
+    the XY center of the entire pipette, regardless of configuration.
+    No pipettes, single or multi, will change their instrument center point.
+    """
+
     FRONT_NOZZLE = enum.auto()
     """
     The end of the front-most nozzle of a multipipette with a tip attached.

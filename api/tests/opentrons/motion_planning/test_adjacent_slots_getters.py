@@ -2,6 +2,8 @@
 import pytest
 from typing import List, Optional
 
+from opentrons_shared_data.robot.dev_types import RobotType
+
 from opentrons.types import DeckSlotName, StagingSlotName
 from opentrons.motion_planning.adjacent_slots_getters import (
     get_east_slot,
@@ -13,6 +15,8 @@ from opentrons.motion_planning.adjacent_slots_getters import (
     get_adjacent_slots,
     get_west_of_staging_slot,
     get_adjacent_staging_slot,
+    _MixedTypeSlots,
+    get_surrounding_slots,
 )
 
 
@@ -128,3 +132,78 @@ def test_get_adjacent_staging_slot(
 ) -> None:
     """It should find the adjacent slot east of a staging slot if it exists."""
     assert get_adjacent_staging_slot(slot) == expected_adjacent
+
+
+@pytest.mark.parametrize(
+    argnames=["slot", "robot_type", "expected_surrounding_slots"],
+    argvalues=[
+        (
+            2,
+            "OT-2 Standard",
+            _MixedTypeSlots(
+                regular_slots=[
+                    DeckSlotName.SLOT_3,
+                    DeckSlotName.SLOT_1,
+                    DeckSlotName.SLOT_5,
+                    DeckSlotName.SLOT_6,
+                    DeckSlotName.SLOT_4,
+                ],
+                staging_slots=[],
+            ),
+        ),
+        (
+            6,
+            "OT-2 Standard",
+            _MixedTypeSlots(
+                regular_slots=[
+                    DeckSlotName.SLOT_5,
+                    DeckSlotName.SLOT_9,
+                    DeckSlotName.SLOT_3,
+                    DeckSlotName.SLOT_8,
+                    DeckSlotName.SLOT_2,
+                ],
+                staging_slots=[],
+            ),
+        ),
+        (
+            6,
+            "OT-3 Standard",
+            _MixedTypeSlots(
+                regular_slots=[
+                    DeckSlotName.SLOT_C2,
+                    DeckSlotName.SLOT_B3,
+                    DeckSlotName.SLOT_D3,
+                    DeckSlotName.SLOT_B2,
+                    DeckSlotName.SLOT_D2,
+                ],
+                staging_slots=[
+                    StagingSlotName.SLOT_B4,
+                    StagingSlotName.SLOT_C4,
+                    StagingSlotName.SLOT_D4,
+                ],
+            ),
+        ),
+        (
+            10,
+            "OT-3 Standard",
+            _MixedTypeSlots(
+                regular_slots=[
+                    DeckSlotName.SLOT_A2,
+                    DeckSlotName.SLOT_B1,
+                    DeckSlotName.SLOT_B2,
+                ],
+                staging_slots=[],
+            ),
+        ),
+    ],
+)
+def test_get_surrounding_slots(
+    slot: int,
+    robot_type: RobotType,
+    expected_surrounding_slots: _MixedTypeSlots,
+) -> None:
+    """It should get the list of surrounding slots appropriate for the robot type."""
+    assert (
+        get_surrounding_slots(slot=slot, robot_type=robot_type)
+        == expected_surrounding_slots
+    )
