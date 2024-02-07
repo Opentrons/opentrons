@@ -41,14 +41,6 @@ describe('Carriage', () => {
     getByRole('button', { name: 'Continue' })
     expect(screen.queryByLabelText('back')).not.toBeInTheDocument()
   })
-  it('renders the correct button when is the on device display', () => {
-    props = {
-      ...props,
-      isOnDevice: true,
-    }
-    const { getByLabelText } = render(props)
-    getByLabelText('SmallButton_primary')
-  })
   it('returns the correct information, buttons work as expected when flow is detach', () => {
     props = {
       ...props,
@@ -64,7 +56,7 @@ describe('Carriage', () => {
     )
     getByTestId('Pipette_Zaxis_Detach_96.webm')
     getByRole('button', { name: 'Continue' })
-    getByLabelText('back').click()
+    fireEvent.click(getByLabelText('back'))
     expect(props.goBack).toHaveBeenCalled()
   })
   it('clicking on continue button executes the commands correctly', () => {

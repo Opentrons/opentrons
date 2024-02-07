@@ -75,6 +75,7 @@ MessageDefinition = Union[
     defs.HomeRequest,
     defs.PipetteInfoResponse,
     defs.GripperInfoResponse,
+    defs.HepaUVInfoResponse,
     defs.BindSensorOutputRequest,
     defs.TipActionRequest,
     defs.TipActionResponse,
@@ -96,6 +97,9 @@ MessageDefinition = Union[
     defs.GetMotorUsageResponse,
     defs.GripperJawStateRequest,
     defs.GripperJawStateResponse,
+    defs.SetGripperJawHoldoffRequest,
+    defs.GripperJawHoldoffRequest,
+    defs.GripperJawHoldoffResponse,
 ]
 
 

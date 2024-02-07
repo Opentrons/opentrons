@@ -5,14 +5,15 @@ import styled from 'styled-components'
 
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import {
-  Flex,
+  ALIGN_CENTER,
+  Box,
   COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  OVERFLOW_WRAP_ANYWHERE,
   SPACING,
   TYPOGRAPHY,
-  DIRECTION_ROW,
-  DIRECTION_COLUMN,
-  Box,
-  ALIGN_CENTER,
 } from '@opentrons/components'
 import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
 
@@ -37,7 +38,7 @@ export function DeleteProtocolConfirmationModal({
   const modalHeader: ModalHeaderBaseProps = {
     title: t('delete_this_protocol'),
     iconName: 'ot-alert',
-    iconColor: COLORS.yellow2,
+    iconColor: COLORS.yellow50,
   }
   const host = useHost()
   const queryClient = useQueryClient()
@@ -124,15 +125,15 @@ const ProtocolNameText = styled.span`
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   overflow: hidden;
-  overflow-wrap: anywhere;
+  overflow-wrap: ${OVERFLOW_WRAP_ANYWHERE};
   font-weight: ${TYPOGRAPHY.fontWeightBold};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
-  color: ${COLORS.darkBlack90};
+  color: ${COLORS.grey60};
 `
 const AdditionalText = styled.span`
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
-  color: ${COLORS.darkBlack90};
+  color: ${COLORS.grey60};
 `

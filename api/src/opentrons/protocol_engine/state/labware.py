@@ -309,9 +309,20 @@ class LabwareView(HasState[LabwareState]):
             LabwareUri(self.get(labware_id).definitionUri)
         )
 
-    def get_display_name(self, labware_id: str) -> Optional[str]:
+    def get_user_specified_display_name(self, labware_id: str) -> Optional[str]:
         """Get the labware's user-specified display name, if set."""
         return self.get(labware_id).displayName
+
+    def get_display_name(self, labware_id: str) -> str:
+        """Get the labware's display name.
+
+        If a user-specified display name exists, will return that, else will return
+        display name from the definition.
+        """
+        return (
+            self.get_user_specified_display_name(labware_id)
+            or self.get_definition(labware_id).metadata.displayName
+        )
 
     def get_deck_definition(self) -> DeckDefinitionV4:
         """Get the current deck definition."""
@@ -369,6 +380,28 @@ class LabwareView(HasState[LabwareState]):
         """Get a labware's quirks."""
         definition = self.get_definition(labware_id)
         return definition.parameters.quirks or []
+
+    def get_should_center_column_on_target_well(self, labware_id: str) -> bool:
+        """True if a pipette moving to this labware should center its active column on the target.
+
+        This is true for labware that have wells spanning entire columns.
+        """
+        has_quirk = self.get_has_quirk(labware_id, "centerMultichannelOnWells")
+        return has_quirk and (
+            len(self.get_definition(labware_id).wells) > 1
+            and len(self.get_definition(labware_id).wells) < 96
+        )
+
+    def get_should_center_pipette_on_target_well(self, labware_id: str) -> bool:
+        """True if a pipette moving to a well of this labware should center its body on the target.
+
+        This is true for 1-well reservoirs no matter the pipette, and for large plates.
+        """
+        has_quirk = self.get_has_quirk(labware_id, "centerMultichannelOnWells")
+        return has_quirk and (
+            len(self.get_definition(labware_id).wells) == 1
+            or len(self.get_definition(labware_id).wells) >= 96
+        )
 
     def get_well_definition(
         self,
@@ -655,7 +688,6 @@ class LabwareView(HasState[LabwareState]):
                 DeckSlotName.SLOT_A3,
             }:
                 return labware.id
-
         return None
 
     def is_fixed_trash(self, labware_id: str) -> bool:
@@ -800,3 +832,87 @@ class LabwareView(HasState[LabwareState]):
             if recommended_height is not None
             else self.get_dimensions(labware_id).z / 2
         )
+
+    @staticmethod
+    def _max_x_of_well(well_defn: WellDefinition) -> float:
+        if well_defn.shape == "rectangular":
+            return well_defn.x + (well_defn.xDimension or 0) / 2
+        elif well_defn.shape == "circular":
+            return well_defn.x + (well_defn.diameter or 0) / 2
+        else:
+            return well_defn.x
+
+    @staticmethod
+    def _min_x_of_well(well_defn: WellDefinition) -> float:
+        if well_defn.shape == "rectangular":
+            return well_defn.x - (well_defn.xDimension or 0) / 2
+        elif well_defn.shape == "circular":
+            return well_defn.x - (well_defn.diameter or 0) / 2
+        else:
+            return 0
+
+    @staticmethod
+    def _max_y_of_well(well_defn: WellDefinition) -> float:
+        if well_defn.shape == "rectangular":
+            return well_defn.y + (well_defn.yDimension or 0) / 2
+        elif well_defn.shape == "circular":
+            return well_defn.y + (well_defn.diameter or 0) / 2
+        else:
+            return 0
+
+    @staticmethod
+    def _min_y_of_well(well_defn: WellDefinition) -> float:
+        if well_defn.shape == "rectangular":
+            return well_defn.y - (well_defn.yDimension or 0) / 2
+        elif well_defn.shape == "circular":
+            return well_defn.y - (well_defn.diameter or 0) / 2
+        else:
+            return 0
+
+    @staticmethod
+    def _max_z_of_well(well_defn: WellDefinition) -> float:
+        return well_defn.z + well_defn.depth
+
+    def get_well_bbox(self, labware_id: str) -> Dimensions:
+        """Get the bounding box implied by the wells.
+
+        The bounding box of the labware that is implied by the wells is that required
+        to contain the bounds of the wells - the y-span from the min-y bound of the min-y
+        well to the max-y bound of the max-y well, x ditto, z from labware 0 to the max-z
+        well top.
+
+        This is used for the specific purpose of finding the reasonable uncertainty bounds of
+        where and how a gripper will interact with a labware.
+        """
+        defn = self.get_definition(labware_id)
+        max_x: Optional[float] = None
+        min_x: Optional[float] = None
+        max_y: Optional[float] = None
+        min_y: Optional[float] = None
+        max_z: Optional[float] = None
+
+        for well in defn.wells.values():
+            well_max_x = self._max_x_of_well(well)
+            well_min_x = self._min_x_of_well(well)
+            well_max_y = self._max_y_of_well(well)
+            well_min_y = self._min_y_of_well(well)
+            well_max_z = self._max_z_of_well(well)
+            if (max_x is None) or (well_max_x > max_x):
+                max_x = well_max_x
+            if (max_y is None) or (well_max_y > max_y):
+                max_y = well_max_y
+            if (min_x is None) or (well_min_x < min_x):
+                min_x = well_min_x
+            if (min_y is None) or (well_min_y < min_y):
+                min_y = well_min_y
+            if (max_z is None) or (well_max_z > max_z):
+                max_z = well_max_z
+        if (
+            max_x is None
+            or max_y is None
+            or min_x is None
+            or min_y is None
+            or max_z is None
+        ):
+            return Dimensions(0, 0, 0)
+        return Dimensions(max_x - min_x, max_y - min_y, max_z)

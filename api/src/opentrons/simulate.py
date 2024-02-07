@@ -195,7 +195,7 @@ class _CommandScraper:
             self._logger.setLevel(level)
 
             log_handler: Optional[_AccumulatingHandler] = _AccumulatingHandler(
-                level, log_queue
+                self._level.upper(), log_queue
             )
         else:
             log_handler = None

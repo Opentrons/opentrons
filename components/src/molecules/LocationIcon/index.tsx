@@ -4,13 +4,8 @@ import { css } from 'styled-components'
 import { Icon } from '../../icons'
 import { Flex, Text } from '../../primitives'
 import { ALIGN_CENTER } from '../../styles'
-import {
-  BORDERS,
-  COLORS,
-  RESPONSIVENESS,
-  SPACING,
-  TYPOGRAPHY,
-} from '../../ui-style-constants'
+import { BORDERS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 
 import type { IconName } from '../../icons'
 import type { StyleProps } from '../../primitives'
@@ -37,22 +32,16 @@ const LOCATION_ICON_STYLE = css<{
   width?: string
 }>`
   align-items: ${ALIGN_CENTER};
-  border: 2px solid ${props => props.color ?? COLORS.darkBlack100};
+  border: 2px solid ${props => props.color ?? COLORS.black90};
   border-radius: ${BORDERS.borderRadiusSize3};
   height: ${props => props.height ?? SPACING.spacing32};
-  padding: ${SPACING.spacing2} 0.375rem;
   width: ${props => props.width ?? 'max-content'};
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    padding: ${SPACING.spacing4}
-      ${props => (props.slotName != null ? SPACING.spacing8 : SPACING.spacing6)};
-  }
+  padding: ${SPACING.spacing4}
+    ${props => (props.slotName != null ? SPACING.spacing8 : SPACING.spacing6)};
 `
 
 const SLOT_NAME_TEXT_STYLE = css`
-  ${TYPOGRAPHY.pSemiBold}
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    ${TYPOGRAPHY.smallBodyTextBold}
-  }
+  ${TYPOGRAPHY.smallBodyTextBold}
 `
 
 export function LocationIcon({
@@ -75,7 +64,7 @@ export function LocationIcon({
         <Icon
           name={iconName}
           size="1.25rem"
-          color={color ?? COLORS.darkBlack100}
+          color={color ?? COLORS.black90}
           aria-label={iconName}
         />
       ) : (

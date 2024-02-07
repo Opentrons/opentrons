@@ -1,7 +1,7 @@
 from __future__ import annotations
 import enum
 from math import sqrt, isclose
-from typing import TYPE_CHECKING, Any, NamedTuple, Iterable, Union, List
+from typing import TYPE_CHECKING, Any, NamedTuple, Iterator, Union, List
 
 from opentrons_shared_data.robot.dev_types import RobotType
 
@@ -41,12 +41,12 @@ class Point(NamedTuple):
             return NotImplemented
         return Point(self.x - other.x, self.y - other.y, self.z - other.z)
 
-    def __mul__(self, other: Union[int, float]) -> Point:
+    def __mul__(self, other: Union[int, float]) -> Point:  # type: ignore[override]
         if not isinstance(other, (float, int)):
             return NotImplemented
         return Point(self.x * other, self.y * other, self.z * other)
 
-    def __rmul__(self, other: Union[int, float]) -> Point:
+    def __rmul__(self, other: Union[int, float]) -> Point:  # type: ignore[override]
         if not isinstance(other, (float, int)):
             return NotImplemented
         return Point(self.x * other, self.y * other, self.z * other)
@@ -132,14 +132,16 @@ class Location:
     def labware(self) -> LabwareLike:
         return self._labware
 
-    def __iter__(self) -> Iterable[Union[Point, LabwareLike]]:
-        """Iterable interface to support unpacking. Like a tuple."""
-        return iter(
-            (
-                self._point,
-                self._labware,
-            )
-        )
+    def __iter__(self) -> Iterator[Union[Point, LabwareLike]]:
+        """Iterable interface to support unpacking. Like a tuple.
+
+        .. note::
+           While type annotations cannot properly support this, it will work in practice:
+
+           point, labware = location
+           some_function_taking_both(*location)
+        """
+        return iter((self._point, self._labware))  # type: ignore [arg-type]
 
     def __eq__(self, other: object) -> bool:
         return (

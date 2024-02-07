@@ -14,7 +14,6 @@ import {
   TYPOGRAPHY,
   SIZE_1,
 } from '@opentrons/components'
-import { useAllRunsQuery } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../atoms/text'
 import { MiniCard } from '../../molecules/MiniCard'
@@ -24,8 +23,10 @@ import { appShellRequestor } from '../../redux/shell/remote'
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import FLEX_PNG from '../../assets/images/FLEX.png'
 import { RobotBusyStatusAction } from '.'
+import { useNotifyAllRunsQuery } from '../../resources/runs/useNotifyAllRunsQuery'
 
 import type { IconName } from '@opentrons/components'
+import type { Runs } from '@opentrons/api-client'
 import type { Robot } from '../../redux/discovery/types'
 import type { Dispatch, State } from '../../redux/types'
 
@@ -33,7 +34,7 @@ interface AvailableRobotOptionProps {
   robot: Robot
   onClick: () => void
   isSelected: boolean
-  isOnDifferentSoftwareVersion: boolean
+  isSelectedRobotOnDifferentSoftwareVersion: boolean
   registerRobotBusyStatus: React.Dispatch<RobotBusyStatusAction>
   isError?: boolean
   showIdleOnly?: boolean
@@ -47,7 +48,7 @@ export function AvailableRobotOption(
     onClick,
     isSelected,
     isError = false,
-    isOnDifferentSoftwareVersion,
+    isSelectedRobotOnDifferentSoftwareVersion,
     showIdleOnly = false,
     registerRobotBusyStatus,
   } = props
@@ -58,11 +59,11 @@ export function AvailableRobotOption(
     getRobotModelByName(state, robotName)
   )
 
-  const { data: runsData } = useAllRunsQuery(
+  const { data: runsData } = useNotifyAllRunsQuery(
     { pageLength: 0 },
     {
       onSuccess: data => {
-        if (data?.links?.current != null)
+        if ((data as Runs)?.links?.current != null)
           registerRobotBusyStatus({ type: 'robotIsBusy', robotName })
         else {
           registerRobotBusyStatus({ type: 'robotIsIdle', robotName })
@@ -99,7 +100,9 @@ export function AvailableRobotOption(
       <MiniCard
         onClick={onClick}
         isSelected={isSelected}
-        isError={(isError || isOnDifferentSoftwareVersion) && isSelected}
+        isError={
+          (isError || isSelectedRobotOnDifferentSoftwareVersion) && isSelected
+        }
       >
         <img
           src={robotModel === 'OT-2' ? OT2_PNG : FLEX_PNG}
@@ -134,26 +137,23 @@ export function AvailableRobotOption(
             </StyledText>
           </Box>
         </Flex>
-        {(isError || isOnDifferentSoftwareVersion) && isSelected ? (
+        {(isError || isSelectedRobotOnDifferentSoftwareVersion) &&
+        isSelected ? (
           <>
             <Box flex="1 1 auto" />
-            <Icon
-              name="alert-circle"
-              size="1.25rem"
-              color={COLORS.errorEnabled}
-            />
+            <Icon name="alert-circle" size="1.25rem" color={COLORS.red50} />
           </>
         ) : null}
       </MiniCard>
 
-      {isOnDifferentSoftwareVersion && isSelected ? (
+      {isSelectedRobotOnDifferentSoftwareVersion && isSelected ? (
         <StyledText
           as="label"
-          color={COLORS.errorText}
+          color={COLORS.red60}
           marginBottom={SPACING.spacing8}
           css={css`
             & > a {
-              color: ${COLORS.errorText};
+              color: ${COLORS.red60};
               text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
             }
           `}

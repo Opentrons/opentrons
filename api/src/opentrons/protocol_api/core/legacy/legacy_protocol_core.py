@@ -88,6 +88,7 @@ class LegacyProtocolCore(
         self._loaded_modules: Set["AbstractModule"] = set()
         self._module_cores: List[legacy_module_core.LegacyModuleCore] = []
         self._labware_cores: List[LegacyLabwareCore] = [self.fixed_trash]
+        self._disposal_locations: List[Union[Labware, TrashBin, WasteChute]] = []
 
     @property
     def api_version(self) -> APIVersion:
@@ -133,11 +134,15 @@ class LegacyProtocolCore(
         return self._sync_hardware.is_simulator  # type: ignore[no-any-return]
 
     def append_disposal_location(
-        self, disposal_location: Union[TrashBin, WasteChute]
+        self,
+        disposal_location: Union[Labware, TrashBin, WasteChute],
+        skip_add_to_engine: bool = False,
     ) -> None:
-        raise APIVersionError(
-            "Disposal locations are not supported in this API Version."
-        )
+        if isinstance(disposal_location, (TrashBin, WasteChute)):
+            raise APIVersionError(
+                "Trash Bin and Waste Chute Disposal locations are not supported in this API Version."
+            )
+        self._disposal_locations.append(disposal_location)
 
     def add_labware_definition(
         self,
@@ -383,10 +388,7 @@ class LegacyProtocolCore(
 
     def get_disposal_locations(self) -> List[Union[Labware, TrashBin, WasteChute]]:
         """Get valid disposal locations."""
-        trash = self._deck_layout["12"]
-        if isinstance(trash, Labware):
-            return [trash]
-        raise APIVersionError("No dynamically loadable disposal locations.")
+        return self._disposal_locations
 
     def pause(self, msg: Optional[str]) -> None:
         """Pause the protocol."""

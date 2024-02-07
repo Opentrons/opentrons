@@ -4,7 +4,7 @@ import { formatDistance } from 'date-fns'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { MemoryRouter } from 'react-router-dom'
 
-import { useAllRunsQuery, useProtocolQuery } from '@opentrons/react-api-client'
+import { useProtocolQuery } from '@opentrons/react-api-client'
 import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import { COLORS, renderWithProviders } from '@opentrons/components'
 
@@ -16,6 +16,7 @@ import { useTrackEvent } from '../../../../redux/analytics'
 import { useCloneRun } from '../../../ProtocolUpload/hooks'
 import { useHardwareStatusText } from '../hooks'
 import { RecentRunProtocolCard } from '../'
+import { useNotifyAllRunsQuery } from '../../../../resources/runs/useNotifyAllRunsQuery'
 
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
 
@@ -27,6 +28,7 @@ jest.mock('../../../../organisms/RunTimeControl/hooks')
 jest.mock('../../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../../redux/analytics')
 jest.mock('../hooks')
+jest.mock('../../../../resources/runs/useNotifyAllRunsQuery')
 
 const RUN_ID = 'mockRunId'
 
@@ -77,8 +79,8 @@ let mockCloneRun: jest.Mock
 const mockUseMissingProtocolHardware = useMissingProtocolHardware as jest.MockedFunction<
   typeof useMissingProtocolHardware
 >
-const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
-  typeof useAllRunsQuery
+const mockUseNotifyAllRunsQuery = useNotifyAllRunsQuery as jest.MockedFunction<
+  typeof useNotifyAllRunsQuery
 >
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
@@ -128,7 +130,7 @@ describe('RecentRunProtocolCard', () => {
       isLoading: false,
       conflictedSlots: [],
     })
-    mockUseAllRunsQuery.mockReturnValue({
+    mockUseNotifyAllRunsQuery.mockReturnValue({
       data: { data: [mockRunData] },
     } as any)
     mockUseProtocolQuery.mockReturnValue({
@@ -209,7 +211,7 @@ describe('RecentRunProtocolCard', () => {
   it('when tapping a card, mock functions is called and loading state is activated', () => {
     const [{ getByLabelText }] = render(props)
     const button = getByLabelText('RecentRunProtocolCard')
-    expect(button).toHaveStyle(`background-color: ${COLORS.green3}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.green35}`)
     fireEvent.click(button)
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: 'proceedToRun',
@@ -218,7 +220,7 @@ describe('RecentRunProtocolCard', () => {
     // TODO(BC, 08/30/23): reintroduce check for tracking when tracking is reintroduced lazily
     // expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
     getByLabelText('icon_ot-spinner')
-    expect(button).toHaveStyle(`background-color: ${COLORS.green3Pressed}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.green40}`)
   })
 
   it('should render the skeleton when react query is loading', () => {

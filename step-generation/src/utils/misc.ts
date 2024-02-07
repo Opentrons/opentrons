@@ -23,7 +23,10 @@ import {
 import { blowout } from '../commandCreators/atomic/blowout'
 import { curryCommandCreator } from './curryCommandCreator'
 import { movableTrashCommandsUtil } from './movableTrashCommandsUtil'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  AddressableAreaName,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
   AdditionalEquipmentEntities,
@@ -46,7 +49,7 @@ type trashOrLabware = 'wasteChute' | 'trashBin' | 'labware' | null
 
 export function getWasteChuteAddressableAreaNamePip(
   channels: PipetteChannels
-): string {
+): AddressableAreaName {
   switch (channels) {
     case 1: {
       return ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA

@@ -1,3 +1,4 @@
+import 'jest-styled-components'
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders, COLORS, SIZE_2 } from '@opentrons/components'
@@ -26,7 +27,7 @@ describe('ToggleButton', () => {
   it('renders toggle button - on', () => {
     const { getByLabelText } = render(props)
     const button = getByLabelText('toggle button')
-    expect(button).toHaveStyle(`color: ${String(COLORS.blueEnabled)}`)
+    expect(button).toHaveStyle(`color: ${String(COLORS.blue50)}`)
     expect(button).toHaveStyle(`height: ${String(SIZE_2)}`)
     expect(button).toHaveStyle(`width: ${String(SIZE_2)}`)
     expect(button).toHaveAttribute('aria-checked', 'true')
@@ -35,7 +36,7 @@ describe('ToggleButton', () => {
   it('applies the correct states to the toggle on- hover', () => {
     const { getByLabelText } = render(props)
     const button = getByLabelText('toggle button')
-    expect(button).toHaveStyleRule('color', `${String(COLORS.blueHover)}`, {
+    expect(button).toHaveStyleRule('color', `${String(COLORS.blue55)}`, {
       modifier: ':hover',
     })
   })
@@ -45,7 +46,7 @@ describe('ToggleButton', () => {
     const button = getByLabelText('toggle button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${String(COLORS.warningEnabled)}`,
+      `0 0 0 3px ${String(COLORS.yellow50)}`,
       {
         modifier: ':focus-visible',
       }
@@ -56,13 +57,9 @@ describe('ToggleButton', () => {
     props.disabled = true
     const { getByLabelText } = render(props)
     const button = getByLabelText('toggle button')
-    expect(button).toHaveStyleRule(
-      'color',
-      `${String(COLORS.darkGreyDisabled)}`,
-      {
-        modifier: ':disabled',
-      }
-    )
+    expect(button).toHaveStyleRule('color', `${String(COLORS.grey40)}`, {
+      modifier: ':disabled',
+    })
   })
 
   it('calls mock function when clicking the toggle button - on', () => {
@@ -76,7 +73,7 @@ describe('ToggleButton', () => {
     props.toggledOn = false
     const { getByLabelText } = render(props)
     const button = getByLabelText('toggle button')
-    expect(button).toHaveStyle(`color: ${String(COLORS.darkGreyEnabled)}`)
+    expect(button).toHaveStyle(`color: ${String(COLORS.grey50)}`)
     expect(button).toHaveStyle(`height: ${String(SIZE_2)}`)
     expect(button).toHaveStyle(`width: ${String(SIZE_2)}`)
     expect(button).toHaveAttribute('aria-checked', 'false')
@@ -86,7 +83,7 @@ describe('ToggleButton', () => {
     props.toggledOn = false
     const { getByLabelText } = render(props)
     const button = getByLabelText('toggle button')
-    expect(button).toHaveStyleRule('color', `${String(COLORS.darkGreyHover)}`, {
+    expect(button).toHaveStyleRule('color', `${String(COLORS.grey60)}`, {
       modifier: ':hover',
     })
   })
@@ -97,7 +94,7 @@ describe('ToggleButton', () => {
     const button = getByLabelText('toggle button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${String(COLORS.warningEnabled)}`,
+      `0 0 0 3px ${String(COLORS.yellow50)}`,
       {
         modifier: ':focus-visible',
       }
@@ -109,13 +106,9 @@ describe('ToggleButton', () => {
     props.disabled = true
     const { getByLabelText } = render(props)
     const button = getByLabelText('toggle button')
-    expect(button).toHaveStyleRule(
-      'color',
-      `${String(COLORS.darkGreyDisabled)}`,
-      {
-        modifier: ':disabled',
-      }
-    )
+    expect(button).toHaveStyleRule('color', `${String(COLORS.grey40)}`, {
+      modifier: ':disabled',
+    })
   })
 
   it('calls mock function when clicking the toggle button - off', () => {

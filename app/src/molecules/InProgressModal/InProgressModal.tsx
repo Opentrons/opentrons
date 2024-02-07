@@ -19,6 +19,7 @@ interface Props {
   //  optional override of the spinner
   alternativeSpinner?: React.ReactNode
   description?: string
+  body?: string
   children?: JSX.Element
 }
 
@@ -38,6 +39,14 @@ const DESCRIPTION_STYLE = css`
     line-height: ${TYPOGRAPHY.lineHeight42};
   }
 `
+const BODY_STYLE = css`
+  ${TYPOGRAPHY.pRegular}
+  text-align: ${TYPOGRAPHY.textAlignCenter};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    ${TYPOGRAPHY.level4HeaderRegular}
+    color: ${COLORS.grey60}
+    `
 const MODAL_STYLE = css`
   align-items: ${ALIGN_CENTER};
   flex-direction: ${DIRECTION_COLUMN};
@@ -49,16 +58,16 @@ const MODAL_STYLE = css`
   }
 `
 const SPINNER_STYLE = css`
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50};
   opacity: 100%;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    color: ${COLORS.darkBlackEnabled};
+    color: ${COLORS.black90};
     opacity: 70%;
   }
 `
 
 export function InProgressModal(props: Props): JSX.Element {
-  const { alternativeSpinner, children, description } = props
+  const { alternativeSpinner, children, description, body } = props
   const isOnDevice = useSelector(getIsOnDevice)
 
   return (
@@ -72,9 +81,17 @@ export function InProgressModal(props: Props): JSX.Element {
           spin
         />
       )}
-      {description != null && (
-        <StyledText css={DESCRIPTION_STYLE}>{description}</StyledText>
-      )}
+      <Flex
+        paddingX={isOnDevice ? SPACING.spacing40 : '6.5625rem'}
+        gridGap={isOnDevice ? SPACING.spacing4 : SPACING.spacing8}
+        flexDirection={DIRECTION_COLUMN}
+        alignItems={ALIGN_CENTER}
+      >
+        {description != null && (
+          <StyledText css={DESCRIPTION_STYLE}>{description}</StyledText>
+        )}
+        {body != null && <StyledText css={BODY_STYLE}>{body}</StyledText>}
+      </Flex>
       {children}
     </Flex>
   )

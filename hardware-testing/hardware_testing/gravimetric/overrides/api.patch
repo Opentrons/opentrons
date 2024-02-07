@@ -1,8 +1,8 @@
 diff --git a/api/src/opentrons/hardware_control/instruments/ot3/pipette.py b/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
-index 1f6dd0b4b5..1d0cb7b7e3 100644
+index 2d36460ca6..8578768930 100644
 --- a/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
 +++ b/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
-@@ -432,11 +432,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
+@@ -427,11 +427,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
  
      def set_current_volume(self, new_volume: float) -> None:
          assert new_volume >= 0
@@ -16,7 +16,7 @@ index 1f6dd0b4b5..1d0cb7b7e3 100644
          self._current_volume += volume_incr
  
      def remove_current_volume(self, volume_incr: float) -> None:
-@@ -444,7 +444,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
+@@ -439,7 +439,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
          self._current_volume -= volume_incr
  
      def ok_to_add_volume(self, volume_incr: float) -> bool:
@@ -26,11 +26,36 @@ index 1f6dd0b4b5..1d0cb7b7e3 100644
  
      def ok_to_push_out(self, push_out_dist_mm: float) -> bool:
          return push_out_dist_mm <= (
+diff --git a/api/src/opentrons/protocol_api/core/engine/deck_conflict.py b/api/src/opentrons/protocol_api/core/engine/deck_conflict.py
+index 1a756f751f..a739ec553c 100644
+--- a/api/src/opentrons/protocol_api/core/engine/deck_conflict.py
++++ b/api/src/opentrons/protocol_api/core/engine/deck_conflict.py
+@@ -267,18 +267,12 @@ def check_safe_for_tip_pickup_and_return(
+                 f" when picking up fewer than 96 tips."
+             )
+         elif not is_partial_config and not is_96_ch_tiprack_adapter:
+-            raise UnsuitableTiprackForPipetteMotion(
+-                f"{tiprack_name} must be on an Opentrons Flex 96 Tip Rack Adapter"
+-                f" in order to pick up or return all 96 tips simultaneously."
+-            )
++            pass
+ 
+     elif (
+         not is_partial_config
+     ):  # tiprack is not on adapter and pipette is in full config
+-        raise UnsuitableTiprackForPipetteMotion(
+-            f"{tiprack_name} must be on an Opentrons Flex 96 Tip Rack Adapter"
+-            f" in order to pick up or return all 96 tips simultaneously."
+-        )
++        pass
+ 
+ 
+ def _check_deck_conflict_for_96_channel(
 diff --git a/api/src/opentrons/protocol_api/core/legacy/deck.py b/api/src/opentrons/protocol_api/core/legacy/deck.py
-index ea4068934b..1b21cac251 100644
+index 9a9092af5a..33aa5941ce 100644
 --- a/api/src/opentrons/protocol_api/core/legacy/deck.py
 +++ b/api/src/opentrons/protocol_api/core/legacy/deck.py
-@@ -48,11 +48,11 @@ class DeckItem(Protocol):
+@@ -55,11 +55,11 @@ class DeckItem(Protocol):
  class Deck(UserDict):  # type: ignore[type-arg]
      data: Dict[int, Optional[DeckItem]]
  

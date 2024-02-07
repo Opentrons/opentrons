@@ -167,8 +167,8 @@ class API(
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
 
-    @classmethod  # noqa: C901
-    async def build_hardware_controller(
+    @classmethod
+    async def build_hardware_controller(  # noqa: C901
         cls,
         config: Union[RobotConfig, OT3Config, None] = None,
         port: Optional[str] = None,
@@ -347,6 +347,7 @@ class API(
     def board_revision(self) -> str:
         return str(self._backend.board_revision)
 
+    @property
     def attached_subsystems(self) -> Dict[SubSystem, SubSystemState]:
         return {}
 
@@ -618,6 +619,7 @@ class API(
                     home_flagged_axes=False,
                 )
 
+    @ExecutionManagerProvider.wait_for_running
     async def home_plunger(self, mount: top_types.Mount) -> None:
         """
         Home the plunger motor for a mount, and then return it to the 'bottom'
@@ -908,11 +910,11 @@ class API(
     async def disengage_axes(self, which: List[Axis]) -> None:
         await self._backend.disengage_axes([ot2_axis_to_string(ax) for ax in which])
 
+    @ExecutionManagerProvider.wait_for_running
     async def _fast_home(self, axes: Sequence[str], margin: float) -> Dict[str, float]:
         converted_axes = "".join(axes)
         return await self._backend.fast_home(converted_axes, margin)
 
-    @ExecutionManagerProvider.wait_for_running
     async def retract(self, mount: top_types.Mount, margin: float = 10) -> None:
         """Pull the specified mount up to its home position.
 
@@ -920,7 +922,6 @@ class API(
         """
         await self.retract_axis(Axis.by_mount(mount), margin)
 
-    @ExecutionManagerProvider.wait_for_running
     async def retract_axis(self, axis: Axis, margin: float = 10) -> None:
         """Pull the specified axis up to its home position.
 
@@ -1206,9 +1207,9 @@ class API(
                 home_flagged_axes=False,
             )
             if move.home_after:
-                smoothie_pos = await self._backend.fast_home(
-                    [ot2_axis_to_string(ax) for ax in move.home_axes],
-                    move.home_after_safety_margin,
+                smoothie_pos = await self._fast_home(
+                    axes=[ot2_axis_to_string(ax) for ax in move.home_axes],
+                    margin=move.home_after_safety_margin,
                 )
                 self._current_position = deck_from_machine(
                     machine_pos=self._axis_map_from_string_map(smoothie_pos),

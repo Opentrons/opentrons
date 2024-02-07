@@ -1,17 +1,19 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
 import {
   ConfirmDeleteModal,
   DELETE_STEP_FORM,
 } from '../modals/ConfirmDeleteModal'
-import { i18n } from '../../localization'
 import { actions as stepsActions, getIsMultiSelectMode } from '../../ui/steps'
 import { actions as steplistActions } from '../../steplist'
 import { Portal } from '../portals/TopPortal'
 import styles from './StepItem.css'
 import { StepIdType } from '../../form-types'
 import { getSavedStepForms } from '../../step-forms/selectors'
+import { ThunkDispatch } from 'redux-thunk'
+import { BaseState } from '../../types'
 
 const MENU_OFFSET_PX = 5
 
@@ -29,7 +31,8 @@ interface Position {
 }
 
 export const ContextMenu = (props: Props): JSX.Element => {
-  const dispatch = useDispatch()
+  const { t } = useTranslation('context_menu')
+  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const deleteStep = (
     stepId: StepIdType
   ): ReturnType<typeof steplistActions.deleteStep> =>
@@ -142,11 +145,11 @@ export const ContextMenu = (props: Props): JSX.Element => {
                 onClick={handleDuplicate}
                 className={styles.context_menu_item}
               >
-                {i18n.t('context_menu.step.duplicate')}
+                {t('duplicate')}
               </div>
             )}
             <div onClick={confirmDelete} className={styles.context_menu_item}>
-              {i18n.t('context_menu.step.delete')}
+              {t('delete')}
             </div>
           </div>
         </Portal>

@@ -63,7 +63,9 @@ class AbstractProtocol(
 
     @abstractmethod
     def append_disposal_location(
-        self, disposal_location: Union[TrashBin, WasteChute]
+        self,
+        disposal_location: Union[Labware, TrashBin, WasteChute],
+        skip_add_to_engine: bool = False,
     ) -> None:
         """Append a disposal location object to the core"""
         ...

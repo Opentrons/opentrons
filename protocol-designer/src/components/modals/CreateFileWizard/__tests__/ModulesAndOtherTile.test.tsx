@@ -1,7 +1,8 @@
 import * as React from 'react'
-import i18n from 'i18next'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { i18n } from '../../../../localization'
 import { getDisableModuleRestrictions } from '../../../../feature-flags/selectors'
 import { CrashInfoBox } from '../../../modules'
 import { ModuleFields } from '../../FilePipettesModal/ModuleFields'
@@ -34,31 +35,34 @@ const render = (props: React.ComponentProps<typeof ModulesAndOtherTile>) => {
   })[0]
 }
 
+const values = {
+  fields: {
+    name: 'mockName',
+    description: 'mockDescription',
+    organizationOrAuthor: 'mockOrganizationOrAuthor',
+    robotType: FLEX_ROBOT_TYPE,
+  },
+  pipettesByMount: {
+    left: { pipetteName: 'mockPipetteName', tiprackDefURI: 'mocktip' },
+    right: { pipetteName: null, tiprackDefURI: null },
+  } as FormPipettesByMount,
+  modulesByType: {
+    heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
+    magneticBlockType: { onDeck: false, model: null, slot: '2' },
+    temperatureModuleType: { onDeck: false, model: null, slot: '3' },
+    thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
+  },
+  additionalEquipment: ['gripper'],
+} as FormState
+
 const mockWizardTileProps: Partial<WizardTileProps> = {
-  handleChange: jest.fn(),
-  handleBlur: jest.fn(),
+  watch: jest.fn((name: keyof typeof values) => values[name]) as any,
+  trigger: jest.fn(),
   goBack: jest.fn(),
   proceed: jest.fn(),
-  setFieldValue: jest.fn(),
-  values: {
-    fields: {
-      name: 'mockName',
-      description: 'mockDescription',
-      organizationOrAuthor: 'mockOrganizationOrAuthor',
-      robotType: FLEX_ROBOT_TYPE,
-    },
-    pipettesByMount: {
-      left: { pipetteName: 'mockPipetteName', tiprackDefURI: 'mocktip' },
-      right: { pipetteName: null, tiprackDefURI: null },
-    } as FormPipettesByMount,
-    modulesByType: {
-      heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
-      magneticBlockType: { onDeck: false, model: null, slot: '2' },
-      temperatureModuleType: { onDeck: false, model: null, slot: '3' },
-      thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
-    },
-    additionalEquipment: ['gripper'],
-  } as FormState,
+  setValue: jest.fn(),
+  getValues: jest.fn(() => values) as any,
+  formState: {} as any,
 }
 
 describe('ModulesAndOtherTile', () => {
@@ -74,61 +78,67 @@ describe('ModulesAndOtherTile', () => {
     mockGetDisableModuleRestrictions.mockReturnValue(false)
     mockModuleFields.mockReturnValue(<div>mock ModuleFields</div>)
   })
+
   it('renders correct module, gripper and trash length for flex with disabled button', () => {
-    const { getByText, getAllByText, getByRole } = render(props)
-    getByText('Choose additional items')
-    expect(getAllByText('mock EquipmentOption')).toHaveLength(7)
-    getByText('Go back')
-    getByRole('button', { name: 'GoBack_button' }).click()
+    render(props)
+    screen.getByText('Choose additional items')
+    expect(screen.getAllByText('mock EquipmentOption')).toHaveLength(7)
+    screen.getByText('Go back')
+    fireEvent.click(screen.getByRole('button', { name: 'GoBack_button' }))
     expect(props.goBack).toHaveBeenCalled()
-    expect(getByText('Review file details')).toBeDisabled()
+    expect(screen.getByText('Review file details')).toBeDisabled()
   })
   it('renders correct module, gripper and trash length for flex', () => {
+    const newValues = {
+      ...values,
+      additionalEquipment: ['trashBin'],
+    }
     props = {
       ...props,
-      values: {
-        ...mockWizardTileProps.values,
-        additionalEquipment: ['trashBin'],
-      },
-    } as WizardTileProps
-    const { getByText, getAllByText, getByRole } = render(props)
-    getByText('Choose additional items')
-    expect(getAllByText('mock EquipmentOption')).toHaveLength(7)
-    getByText('Go back')
-    getByRole('button', { name: 'GoBack_button' }).click()
+      getValues: jest.fn(() => newValues) as any,
+    }
+    render(props)
+    screen.getByText('Choose additional items')
+    expect(screen.getAllByText('mock EquipmentOption')).toHaveLength(7)
+    screen.getByText('Go back')
+    fireEvent.click(screen.getByRole('button', { name: 'GoBack_button' }))
     expect(props.goBack).toHaveBeenCalled()
-    getByText('Review file details').click()
+    fireEvent.click(screen.getByText('Review file details'))
     expect(props.proceed).toHaveBeenCalled()
   })
   it('renders correct module length for ot-2', () => {
+    const values = {
+      fields: {
+        robotType: OT2_ROBOT_TYPE,
+      },
+      pipettesByMount: {
+        left: { pipetteName: 'p1000_single', tiprackDefURI: 'mocktip' },
+        right: { pipetteName: null, tiprackDefURI: null },
+      } as FormPipettesByMount,
+      modulesByType: {
+        heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
+        magneticModuleType: { onDeck: false, model: null, slot: '2' },
+        temperatureModuleType: { onDeck: false, model: null, slot: '3' },
+        thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
+      },
+    } as FormState
+
     const mockWizardTileProps: Partial<WizardTileProps> = {
-      errors: { modulesByType: {} },
-      touched: { modulesByType: {} },
-      values: {
-        fields: {
-          robotType: OT2_ROBOT_TYPE,
-        },
-        pipettesByMount: {
-          left: { pipetteName: 'p1000_single', tiprackDefURI: 'mocktip' },
-          right: { pipetteName: null, tiprackDefURI: null },
-        } as FormPipettesByMount,
-        modulesByType: {
-          heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
-          magneticModuleType: { onDeck: false, model: null, slot: '2' },
-          temperatureModuleType: { onDeck: false, model: null, slot: '3' },
-          thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
-        },
-      } as FormState,
+      formState: {
+        errors: { modulesByType: {} },
+        touchedFields: { modulesByType: {} },
+      } as any,
+      getValues: jest.fn(() => values) as any,
     }
     props = {
       ...props,
       ...mockWizardTileProps,
     } as WizardTileProps
-    const { getByText } = render(props)
-    getByText('Choose additional items')
-    getByText('mock ModuleFields')
-    getByText('mock CrashInfoBox')
-    getByText('Go back')
-    getByText('Review file details')
+    render(props)
+    screen.getByText('Choose additional items')
+    screen.getByText('mock ModuleFields')
+    screen.getByText('mock CrashInfoBox')
+    screen.getByText('Go back')
+    screen.getByText('Review file details')
   })
 })

@@ -11,6 +11,8 @@ on:
       - 'webpack-config/**'
       - 'package.json'
       - '.github/workflows/ll-test-build-deploy.yaml'
+      - '.github/actions/webstack/deploy-to-sandbox/**'
+      - '.github/workflows/utils.js'
   push:
     paths:
       - 'labware-library/**'
@@ -45,7 +47,7 @@ jobs:
       - uses: 'actions/checkout@v3'
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '16'
+          node-version: '18.19.0'
       # https://github.com/actions/checkout/issues/290
       - name: 'Fix actions/checkout odd handling of tags'
         if: startsWith(github.ref, 'refs/tags')
@@ -91,7 +93,7 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '16'
+          node-version: '18.19.0'
       - name: 'install libudev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
@@ -131,7 +133,7 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '16'
+          node-version: '18.19.0'
       - name: 'install libudev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
@@ -174,7 +176,7 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '16'
+          node-version: '18.19.0'
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'

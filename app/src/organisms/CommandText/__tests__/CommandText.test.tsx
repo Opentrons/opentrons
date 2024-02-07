@@ -1,28 +1,30 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import {
-  AspirateInPlaceRunTimeCommand,
-  BlowoutInPlaceRunTimeCommand,
-  DispenseInPlaceRunTimeCommand,
-  DropTipInPlaceRunTimeCommand,
   FLEX_ROBOT_TYPE,
-  MoveToAddressableAreaRunTimeCommand,
   OT2_ROBOT_TYPE,
-  PrepareToAspirateRunTimeCommand,
+  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+  MoveToAddressableAreaForDropTipRunTimeCommand,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { CommandText } from '../'
 import { mockRobotSideAnalysis } from '../__fixtures__'
 
 import type {
+  AspirateInPlaceRunTimeCommand,
+  BlowoutInPlaceRunTimeCommand,
   BlowoutRunTimeCommand,
   ConfigureForVolumeRunTimeCommand,
+  DispenseInPlaceRunTimeCommand,
   DispenseRunTimeCommand,
+  DropTipInPlaceRunTimeCommand,
   DropTipRunTimeCommand,
   LabwareDefinition2,
   LoadLabwareRunTimeCommand,
   LoadLiquidRunTimeCommand,
+  MoveToAddressableAreaRunTimeCommand,
   MoveToWellRunTimeCommand,
+  PrepareToAspirateRunTimeCommand,
   RunTimeCommand,
 } from '@opentrons/shared-data'
 
@@ -282,6 +284,27 @@ describe('CommandText', () => {
       { i18nInstance: i18n }
     )[0]
     getByText('Moving to Trash Bin in D3')
+  })
+  it('renders correct text for moveToAddressableAreaForDropTip for Trash Bin', () => {
+    const { getByText } = renderWithProviders(
+      <CommandText
+        robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={OT2_ROBOT_TYPE}
+        command={
+          {
+            id: 'aca688ed-4916-496d-aae8-ca0e6e56c47d',
+            commandType: 'moveToAddressableAreaForDropTip',
+            params: {
+              pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
+              addressableAreaName: 'movableTrashD3',
+              alternateDropLocation: true,
+            },
+          } as MoveToAddressableAreaForDropTipRunTimeCommand
+        }
+      />,
+      { i18nInstance: i18n }
+    )[0]
+    getByText('Dropping tip into Trash Bin in D3')
   })
   it('renders correct text for moveToAddressableArea for slots', () => {
     const { getByText } = renderWithProviders(
@@ -1278,6 +1301,37 @@ describe('CommandText', () => {
     )[0]
     getByText(
       'Moving Opentrons 96 Tip Rack 300 µL using gripper from Slot 9 to off deck'
+    )
+  })
+  it('renders correct text for move labware with gripper to waste chute', () => {
+    const { getByText } = renderWithProviders(
+      <CommandText
+        command={{
+          commandType: 'moveLabware',
+          params: {
+            strategy: 'usingGripper',
+            labwareId: mockRobotSideAnalysis.labware[2].id,
+            newLocation: {
+              addressableAreaName: GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+            },
+          },
+          id: 'def456',
+          result: { offsetId: 'fake_offset_id' },
+          status: 'queued',
+          error: null,
+          createdAt: 'fake_timestamp',
+          startedAt: null,
+          completedAt: null,
+        }}
+        robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
+      />,
+      {
+        i18nInstance: i18n,
+      }
+    )[0]
+    getByText(
+      'Moving Opentrons 96 Tip Rack 300 µL using gripper from Slot 9 to Waste Chute'
     )
   })
   it('renders correct text for move labware with gripper to module', () => {

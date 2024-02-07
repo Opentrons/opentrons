@@ -1,11 +1,12 @@
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import reduce from 'lodash/reduce'
 import mapValues from 'lodash/mapValues'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
 import omit from 'lodash/omit'
 import uniq from 'lodash/uniq'
-import { Formik, FormikProps } from 'formik'
 import * as Yup from 'yup'
 import { ModalShell } from '@opentrons/components'
 import {
@@ -59,6 +60,8 @@ import { StagingAreaTile } from './StagingAreaTile'
 import { getTrashSlot } from './utils'
 
 import type { NormalizedPipette } from '@opentrons/step-generation'
+import type { ThunkDispatch } from 'redux-thunk'
+import type { BaseState } from '../../../types'
 import type { FormState } from './types'
 
 type WizardStep =
@@ -93,7 +96,7 @@ export const adapter96ChannelDefUri =
   'opentrons/opentrons_flex_96_tiprack_adapter/1'
 
 export function CreateFileWizard(): JSX.Element | null {
-  const { t } = useTranslation()
+  const { t } = useTranslation(['modal', 'alert'])
   const showWizard = useSelector(getNewProtocolModal)
   const hasUnsavedChanges = useSelector(loadFileSelectors.getHasUnsavedChanges)
   const customLabware = useSelector(
@@ -111,7 +114,7 @@ export function CreateFileWizard(): JSX.Element | null {
     }
   }, [showWizard])
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
 
   const handleCancel = (): void => {
     dispatch(navigationActions.toggleNewProtocolModal(false))
@@ -162,10 +165,7 @@ export function CreateFileWizard(): JSX.Element | null {
     }
     const newProtocolFields = values.fields
 
-    if (
-      !hasUnsavedChanges ||
-      window.confirm(t('alert.window.confirm_create_new'))
-    ) {
+    if (!hasUnsavedChanges || window.confirm(t('alert:confirm_create_new'))) {
       dispatch(fileActions.createNewProtocol(newProtocolFields))
       const pipettesById: Record<string, PipetteOnDeck> = pipettes.reduce(
         (acc, pipette) => ({ ...acc, [uuid()]: pipette }),
@@ -266,7 +266,7 @@ export function CreateFileWizard(): JSX.Element | null {
   }
   const wizardHeader = (
     <WizardHeader
-      title={t('modal.create_file_wizard.create_new_protocol')}
+      title={t('create_new_protocol')}
       currentStep={currentStepIndex}
       totalSteps={wizardSteps.length - 1}
       onExit={handleCancel}
@@ -357,8 +357,8 @@ const pipetteValidationShape = Yup.object().shape({
     .nullable()
     .when('pipetteName', {
       is: (val: string | null): boolean => Boolean(val),
-      then: Yup.string().required('Required'),
-      otherwise: null,
+      then: schema => schema.required('Required'),
+      otherwise: schema => schema.nullable(),
     }),
 })
 // any typing this because TS says there are too many possibilities of what this could be
@@ -368,13 +368,13 @@ const moduleValidationShape: any = Yup.object().shape({
     .nullable()
     .when('onDeck', {
       is: true,
-      then: Yup.string().required('Required'),
-      otherwise: null,
+      then: schema => schema.required('Required'),
+      otherwise: schema => schema.nullable(),
     }),
   slot: Yup.string(),
 })
 
-const validationSchema = Yup.object().shape({
+const validationSchema: any = Yup.object().shape({
   fields: Yup.object().shape({
     name: Yup.string().required('Required'),
   }),
@@ -410,6 +410,10 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     goBack,
     setWizardSteps,
   } = props
+  const { ...formProps } = useForm<FormState>({
+    defaultValues: initialFormState,
+    resolver: yupResolver(validationSchema),
+  })
 
   const handleProceedRobotType = (robotType: string): void => {
     if (robotType === OT2_ROBOT_TYPE) {
@@ -419,71 +423,55 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     }
   }
 
-  const contentsByWizardStep: {
-    [wizardStep in WizardStep]: (
-      formikProps: FormikProps<FormState>
-    ) => JSX.Element
-  } = {
-    robotType: (formikProps: FormikProps<FormState>) => (
-      <RobotTypeTile
-        {...formikProps}
-        goBack={goBack}
-        proceed={() => {
-          handleProceedRobotType(formikProps.values.fields.robotType)
-          proceed()
-        }}
-      />
-    ),
-    metadata: (formikProps: FormikProps<FormState>) => (
-      <MetadataTile {...formikProps} proceed={proceed} goBack={goBack} />
-    ),
-    first_pipette_type: (formikProps: FormikProps<FormState>) => (
-      <FirstPipetteTypeTile {...{ ...formikProps, proceed, goBack }} />
-    ),
-    first_pipette_tips: (formikProps: FormikProps<FormState>) => (
-      <FirstPipetteTipsTile {...{ ...formikProps, proceed, goBack }} />
-    ),
-    second_pipette_type: (formikProps: FormikProps<FormState>) => (
-      <SecondPipetteTypeTile {...{ ...formikProps, proceed, goBack }} />
-    ),
-    second_pipette_tips: (formikProps: FormikProps<FormState>) => (
-      <SecondPipetteTipsTile {...{ ...formikProps, proceed, goBack }} />
-    ),
-    staging_area: (formikProps: FormikProps<FormState>) => (
-      <StagingAreaTile {...{ ...formikProps, proceed, goBack }} />
-    ),
-    modulesAndOther: (formikProps: FormikProps<FormState>) => (
-      <ModulesAndOtherTile
-        {...formikProps}
-        proceed={() => createProtocolFile(formikProps.values)}
-        goBack={goBack}
-      />
-    ),
-  }
-
   return (
-    <Formik
-      enableReinitialize
-      initialValues={initialFormState}
-      onSubmit={() => {}}
-      validationSchema={validationSchema}
-    >
-      {(formikProps: FormikProps<FormState>) => {
-        const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-          const { name, value } = e.target
-          formikProps.setFieldValue(name, value)
-          formikProps.setFieldTouched(name, true)
+    <form onSubmit={formProps.handleSubmit(() => {})}>
+      {(() => {
+        switch (currentWizardStep) {
+          case 'robotType':
+            return (
+              <RobotTypeTile
+                {...formProps}
+                goBack={goBack}
+                proceed={() => {
+                  handleProceedRobotType(formProps.getValues().fields.robotType)
+                  proceed()
+                }}
+              />
+            )
+          case 'metadata':
+            return (
+              <MetadataTile {...formProps} proceed={proceed} goBack={goBack} />
+            )
+          case 'first_pipette_type':
+            return (
+              <FirstPipetteTypeTile {...{ ...formProps, proceed, goBack }} />
+            )
+          case 'first_pipette_tips':
+            return (
+              <FirstPipetteTipsTile {...{ ...formProps, proceed, goBack }} />
+            )
+          case 'second_pipette_type':
+            return (
+              <SecondPipetteTypeTile {...{ ...formProps, proceed, goBack }} />
+            )
+          case 'second_pipette_tips':
+            return (
+              <SecondPipetteTipsTile {...{ ...formProps, proceed, goBack }} />
+            )
+          case 'staging_area':
+            return <StagingAreaTile {...{ ...formProps, proceed, goBack }} />
+          case 'modulesAndOther':
+            return (
+              <ModulesAndOtherTile
+                {...formProps}
+                proceed={() => createProtocolFile(formProps.getValues())}
+                goBack={goBack}
+              />
+            )
+          default:
+            return null
         }
-
-        return currentWizardStep === 'metadata'
-          ? contentsByWizardStep.metadata({
-              ...formikProps,
-              handleChange,
-            })
-          : contentsByWizardStep[currentWizardStep]({
-              ...formikProps,
-            })
-      }}
-    </Formik>
+      })()}
+    </form>
   )
 }

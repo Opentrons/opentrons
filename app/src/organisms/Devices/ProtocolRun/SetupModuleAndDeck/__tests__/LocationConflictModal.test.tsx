@@ -1,7 +1,9 @@
 import * as React from 'react'
 import { UseQueryResult } from 'react-query'
+import { screen, fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import {
+  SINGLE_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
@@ -50,17 +52,20 @@ describe('LocationConflictModal', () => {
       updateDeckConfiguration: mockUpdate,
     } as any)
   })
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
   it('should render the modal information for a fixture conflict', () => {
-    const { getByText, getAllByText, getByRole } = render(props)
-    getByText('Deck location conflict')
-    getByText('Slot B3')
-    getByText('Protocol specifies')
-    getByText('Currently configured')
-    getAllByText('Staging area slot')
-    getByText('Trash bin')
-    getByRole('button', { name: 'Cancel' }).click()
+    render(props)
+    screen.getByText('Deck location conflict')
+    screen.getByText('Slot B3')
+    screen.getByText('Protocol specifies')
+    screen.getByText('Currently configured')
+    screen.getAllByText('Staging area slot')
+    screen.getByText('Trash bin')
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(props.onCloseClick).toHaveBeenCalled()
-    getByRole('button', { name: 'Update deck' }).click()
+    fireEvent.click(screen.getByRole('button', { name: 'Update deck' }))
     expect(mockUpdate).toHaveBeenCalled()
   })
   it('should render the modal information for a module fixture conflict', () => {
@@ -69,13 +74,40 @@ describe('LocationConflictModal', () => {
       cutoutId: 'cutoutB3',
       requiredModule: 'heaterShakerModuleV1',
     }
-    const { getByText, getByRole } = render(props)
+    render(props)
+    screen.getByText('Protocol specifies')
+    screen.getByText('Currently configured')
+    screen.getByText('Heater-Shaker Module GEN1')
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(props.onCloseClick).toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'Update deck' }))
+    expect(mockUpdate).toHaveBeenCalled()
+  })
+  it('should render the modal information for a single slot fixture conflict', () => {
+    mockUseDeckConfigurationQuery.mockReturnValue({
+      data: [
+        {
+          cutoutId: 'cutoutB1',
+          cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+        },
+      ],
+    } as UseQueryResult<DeckConfiguration>)
+    props = {
+      onCloseClick: jest.fn(),
+      cutoutId: 'cutoutB1',
+      requiredFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
+      missingLabwareDisplayName: 'a tiprack',
+    }
+    const { getByText, getAllByText, getByRole } = render(props)
+    getByText('Deck location conflict')
+    getByText('Slot B1')
     getByText('Protocol specifies')
     getByText('Currently configured')
-    getByText('Heater-Shaker Module GEN1')
-    getByRole('button', { name: 'Cancel' }).click()
+    getAllByText('Trash bin')
+    getByText('a tiprack')
+    fireEvent.click(getByRole('button', { name: 'Cancel' }))
     expect(props.onCloseClick).toHaveBeenCalled()
-    getByRole('button', { name: 'Update deck' }).click()
+    fireEvent.click(getByRole('button', { name: 'Update deck' }))
     expect(mockUpdate).toHaveBeenCalled()
   })
   it('should render correct info for a odd', () => {
@@ -83,16 +115,16 @@ describe('LocationConflictModal', () => {
       ...props,
       isOnDevice: true,
     }
-    const { getByText, getAllByText } = render(props)
-    getByText('Deck location conflict')
-    getByText('Slot B3')
-    getByText('Protocol specifies')
-    getByText('Currently configured')
-    getAllByText('Staging area slot')
-    getByText('Trash bin')
-    getByText('Cancel').click()
+    render(props)
+    screen.getByText('Deck location conflict')
+    screen.getByText('Slot B3')
+    screen.getByText('Protocol specifies')
+    screen.getByText('Currently configured')
+    screen.getAllByText('Staging area slot')
+    screen.getByText('Trash bin')
+    fireEvent.click(screen.getByText('Cancel'))
     expect(props.onCloseClick).toHaveBeenCalled()
-    getByText('Update deck').click()
+    fireEvent.click(screen.getByText('Update deck'))
     expect(mockUpdate).toHaveBeenCalled()
   })
 })

@@ -220,13 +220,13 @@ const Table = styled('table')`
 `
 const TableHeader = styled('th')`
   text-transform: ${TYPOGRAPHY.textTransformUppercase};
-  color: ${COLORS.darkBlackEnabled};
+  color: ${COLORS.black90};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   font-size: ${TYPOGRAPHY.fontSizeCaption};
   padding: ${SPACING.spacing4};
 `
 const TableRow = styled('tr')`
-  background-color: ${COLORS.fundamentalsBackground};
+  background-color: ${COLORS.grey10};
 `
 
 const TableDatum = styled('td')`
@@ -404,7 +404,7 @@ const TerseHeader = styled('th')`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
 `
 const TerseTableRow = styled('tr')`
-  background-color: ${COLORS.light1};
+  background-color: ${COLORS.grey35};
 `
 
 const TerseTableDatum = styled('td')`

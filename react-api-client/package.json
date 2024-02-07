@@ -8,11 +8,11 @@
   "types": "lib/index.d.ts",
   "source": "src/index.ts",
   "peerDependencies": {
-    "react": "17.0.1"
+    "react": "18.2.0"
   },
   "dependencies": {
     "@opentrons/api-client": "link:../api-client",
     "@opentrons/shared-data": "link:../shared-data",
-    "react-query": "^3.34.8"
+    "react-query": "3.35.0"
   }
 }

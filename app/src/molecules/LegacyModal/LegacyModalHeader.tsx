@@ -22,7 +22,7 @@ export interface LegacyModalHeaderProps {
   backgroundColor?: string
   color?: string
   icon?: IconProps
-  closeButton?: JSX.Element
+  closeButton?: React.ReactNode
 }
 
 const closeIconStyles = css`
@@ -33,11 +33,11 @@ const closeIconStyles = css`
   width: 1.625rem;
   height: 1.625rem;
   &:hover {
-    background-color: ${COLORS.lightGreyHover};
+    background-color: ${COLORS.grey30};
   }
 
   &:active {
-    background-color: ${COLORS.lightGreyPressed};
+    background-color: ${COLORS.grey35};
   }
 `
 
@@ -66,7 +66,7 @@ export const LegacyModalHeader = (
           </StyledText>
         </Flex>
         {closeButton != null
-          ? { closeButton }
+          ? closeButton
           : onClose != null && (
               <Btn
                 onClick={onClose}

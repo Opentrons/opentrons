@@ -89,7 +89,7 @@ describe('DeviceReset', () => {
     getByText('Clears information about past runs of all protocols.')
     getByText('Clear all stored data')
     getByText(
-      'Resets all settings. You’ll have to redo initial setup before using the robot again.'
+      'Clears calibrations, protocols, and all settings except robot name and network settings.'
     )
     expect(queryByText('Clear the ssh authorized keys')).not.toBeInTheDocument()
     expect(getByTestId('DeviceReset_clear_data_button')).toBeDisabled()
@@ -128,10 +128,11 @@ describe('DeviceReset', () => {
       gripperOffsetCalibrations: true,
       authorizedKeys: true,
       onDeviceDisplay: true,
+      deckConfiguration: true,
     }
 
     const [{ getByText }] = render(props)
-    getByText('Clear all stored data').click()
+    fireEvent.click(getByText('Clear all stored data'))
     const clearButton = getByText('Clear data and restart robot')
     fireEvent.click(clearButton)
     getByText('Are you sure you want to reset your device?')
@@ -149,13 +150,14 @@ describe('DeviceReset', () => {
       gripperOffsetCalibrations: true,
       authorizedKeys: true,
       onDeviceDisplay: true,
+      deckConfiguration: true,
     }
 
     const [{ getByText }] = render(props)
-    getByText('Clear pipette calibration').click()
-    getByText('Clear gripper calibration').click()
-    getByText('Clear module calibration').click()
-    getByText('Clear protocol run history').click()
+    fireEvent.click(getByText('Clear pipette calibration'))
+    fireEvent.click(getByText('Clear gripper calibration'))
+    fireEvent.click(getByText('Clear module calibration'))
+    fireEvent.click(getByText('Clear protocol run history'))
     const clearButton = getByText('Clear data and restart robot')
     fireEvent.click(clearButton)
     getByText('Are you sure you want to reset your device?')
@@ -173,11 +175,12 @@ describe('DeviceReset', () => {
       gripperOffsetCalibrations: true,
       authorizedKeys: false,
       onDeviceDisplay: false,
+      deckConfiguration: false,
     }
 
     const [{ getByText }] = render(props)
-    getByText('Clear all stored data').click()
-    getByText('Clear pipette calibration').click()
+    fireEvent.click(getByText('Clear all stored data'))
+    fireEvent.click(getByText('Clear pipette calibration'))
     const clearButton = getByText('Clear data and restart robot')
     fireEvent.click(clearButton)
     getByText('Are you sure you want to reset your device?')

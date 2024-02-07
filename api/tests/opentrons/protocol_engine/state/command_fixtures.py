@@ -217,6 +217,29 @@ def create_aspirate_command(
     )
 
 
+def create_aspirate_in_place_command(
+    pipette_id: str,
+    volume: float,
+    flow_rate: float,
+) -> cmd.AspirateInPlace:
+    """Get a completed Aspirate command."""
+    params = cmd.AspirateInPlaceParams(
+        pipetteId=pipette_id,
+        volume=volume,
+        flowRate=flow_rate,
+    )
+    result = cmd.AspirateInPlaceResult(volume=volume)
+
+    return cmd.AspirateInPlace(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
+
+
 def create_dispense_command(
     pipette_id: str,
     volume: float,
@@ -458,6 +481,27 @@ def create_blow_out_command(
     result = cmd.BlowOutResult(position=destination)
 
     return cmd.BlowOut(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime(year=2022, month=1, day=1),
+        params=params,
+        result=result,
+    )
+
+
+def create_blow_out_in_place_command(
+    pipette_id: str,
+    flow_rate: float,
+) -> cmd.BlowOutInPlace:
+    """Get a completed blowOutInPlace command."""
+    params = cmd.BlowOutInPlaceParams(
+        pipetteId=pipette_id,
+        flowRate=flow_rate,
+    )
+    result = cmd.BlowOutInPlaceResult()
+
+    return cmd.BlowOutInPlace(
         id="command-id",
         key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,

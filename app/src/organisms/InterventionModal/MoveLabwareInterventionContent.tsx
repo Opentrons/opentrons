@@ -54,10 +54,10 @@ const LABWARE_DESCRIPTION_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   grid-gap: ${SPACING.spacing8};
   padding: ${SPACING.spacing16};
-  background-color: ${COLORS.fundamentalsBackground};
+  background-color: ${COLORS.grey20};
   border-radius: ${BORDERS.radiusSoftCorners};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    background-color: ${COLORS.light1};
+    background-color: ${COLORS.grey35};
     border-radius: ${BORDERS.borderRadiusSize3};
   }
 `
@@ -70,10 +70,10 @@ const LABWARE_NAME_TITLE_STYLE = css`
 `
 
 const LABWARE_NAME_STYLE = css`
-  color: ${COLORS.errorDisabled};
+  color: ${COLORS.grey40};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     ${TYPOGRAPHY.bodyTextBold}
-    color: ${COLORS.darkBlack100};
+    color: ${COLORS.black90};
   }
 `
 
@@ -192,7 +192,7 @@ export function MoveLabwareInterventionContent({
             <MoveLabwareOnDeck
               key={command.id} // important so that back to back move labware commands bust the cache
               robotType={robotType}
-              deckFill={isOnDevice ? COLORS.light1 : '#e6e6e6'}
+              deckFill={isOnDevice ? COLORS.grey35 : '#e6e6e6'}
               initialLabwareLocation={oldLabwareLocation}
               finalLabwareLocation={command.params.newLocation}
               movedLabwareDef={movedLabwareDef}
@@ -255,6 +255,8 @@ function LabwareDisplayLocation(
     displayLocation = <LocationIcon slotName={String(t('offdeck'))} />
   } else if ('slotName' in location) {
     displayLocation = <LocationIcon slotName={location.slotName} />
+  } else if ('addressableAreaName' in location) {
+    displayLocation = <LocationIcon slotName={location.addressableAreaName} />
   } else if ('moduleId' in location) {
     const moduleModel = getModuleModelFromRunData(
       protocolData,
@@ -292,6 +294,11 @@ function LabwareDisplayLocation(
       displayLocation = t('adapter_in_slot', {
         adapter: adapterDisplayName,
         slot_name: adapter.location.slotName,
+      })
+    } else if ('addressableAreaName' in adapter.location) {
+      return t('adapter_in_slot', {
+        adapter: adapterDisplayName,
+        slot: adapter.location.addressableAreaName,
       })
     } else if ('moduleId' in adapter.location) {
       const moduleIdUnderAdapter = adapter.location.moduleId

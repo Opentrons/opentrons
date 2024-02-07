@@ -9,9 +9,9 @@ from opentrons_shared_data.errors import ErrorCodes
 from opentrons.hardware_control import (
     HardwareControlAPI,
     dev_types as hardware_dev_types,
+    API,
 )
 from opentrons.hardware_control.types import HardwareFeatureFlags
-from opentrons.system import log_control
 from opentrons_shared_data.pipette import (
     mutable_configurations,
     types as pip_types,
@@ -30,13 +30,17 @@ from robot_server.deck_configuration.fastapi_dependencies import (
 from robot_server.deck_configuration.store import DeckConfigurationStore
 
 from robot_server.errors import LegacyErrorResponse
-from robot_server.hardware import get_hardware, get_robot_type, get_robot_type_enum
+from robot_server.hardware import (
+    get_hardware,
+    get_robot_type,
+    get_robot_type_enum,
+    get_ot2_hardware,
+)
 from robot_server.service.legacy import reset_odd
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models.settings import (
     AdvancedSettingsResponse,
     LogLevel,
-    LogLevels,
     FactoryResetOptions,
     PipetteSettings,
     PipetteSettingsUpdate,
@@ -167,47 +171,17 @@ async def post_log_level_local(
     path="/settings/log_level/upstream",
     description=(
         "Set the minimum level of logs sent upstream via"
-        " syslog-ng to Opentrons. Only available on"
-        " a real robot."
+        " syslog-ng to Opentrons."
+        " Removed in robot software v7.2.0."
     ),
-    response_model=V1BasicResponse,
-    responses={
-        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": LegacyErrorResponse},
-    },
+    response_model=LegacyErrorResponse,
+    deprecated=True,
 )
 async def post_log_level_upstream(log_level: LogLevel) -> V1BasicResponse:
-    log_level_value = log_level.log_level
-    log_level_name = None if log_level_value is None else log_level_value.name
-    ok_syslogs = {
-        LogLevels.error.name: "err",
-        LogLevels.warning.name: "warning",
-        LogLevels.info.name: "info",
-        LogLevels.debug.name: "debug",
-    }
-
-    syslog_level = "emerg"
-    if log_level_name is not None:
-        syslog_level = ok_syslogs[log_level_name]
-
-    code, stdout, stderr = await log_control.set_syslog_level(syslog_level)
-
-    if code != 0:
-        msg = f"Could not reload config: {stdout} {stderr}"
-        log.error(msg)
-        raise LegacyErrorResponse(
-            message=msg, errorCode=ErrorCodes.GENERAL_ERROR.value.code
-        ).as_error(
-            status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
-
-    if log_level_name:
-        result = f"Upstreaming log level changed to {log_level_name}"
-        getattr(log, log_level_name)(result)
-    else:
-        result = "Upstreaming logs disabled"
-        log.info(result)
-
-    return V1BasicResponse(message=result)
+    raise LegacyErrorResponse(
+        message="API Discontinued - log streaming removed",
+        errorCode=str(ErrorCodes.API_REMOVED),
+    ).as_error(status.HTTP_410_GONE)
 
 
 @router.get(
@@ -290,13 +264,13 @@ async def get_robot_settings(
 
 @router.get(
     "/settings/pipettes",
-    description="List all settings for all known pipettes by id",
+    description="List all settings for all known pipettes by id. Only available on OT-2.",
     response_model=MultiPipetteSettings,
     response_model_by_alias=True,
     response_model_exclude_unset=True,
 )
 async def get_pipette_settings(
-    hardware: HardwareControlAPI = Depends(get_hardware),
+    hardware: API = Depends(get_ot2_hardware),
 ) -> MultiPipetteSettings:
     res = {}
     attached_pipettes = hardware.attached_pipettes
@@ -318,7 +292,7 @@ async def get_pipette_settings(
 
 @router.get(
     path="/settings/pipettes/{pipette_id}",
-    description="Get the settings of a specific pipette by ID",
+    description="Get the settings of a specific pipette by ID. Only available on OT-2.",
     response_model=PipetteSettings,
     response_model_by_alias=True,
     response_model_exclude_unset=True,
@@ -327,7 +301,7 @@ async def get_pipette_settings(
     },
 )
 async def get_pipette_setting(
-    pipette_id: str, hardware: HardwareControlAPI = Depends(get_hardware)
+    pipette_id: str, hardware: API = Depends(get_ot2_hardware)
 ) -> PipetteSettings:
     attached_pipettes = hardware.attached_pipettes
     known_ids = mutable_configurations.known_pipettes(
@@ -346,7 +320,7 @@ async def get_pipette_setting(
 
 @router.patch(
     path="/settings/pipettes/{pipette_id}",
-    description="Change the settings of a specific pipette",
+    description="Change the settings of a specific pipette. Only available on OT-2.",
     response_model=PipetteSettings,
     response_model_by_alias=True,
     response_model_exclude_unset=True,
@@ -355,7 +329,9 @@ async def get_pipette_setting(
     },
 )
 async def patch_pipette_setting(
-    pipette_id: str, settings_update: PipetteSettingsUpdate
+    pipette_id: str,
+    settings_update: PipetteSettingsUpdate,
+    hardware: None = Depends(get_ot2_hardware),
 ) -> PipetteSettings:
     # Convert fields to dict of field name to value
     fields = settings_update.setting_fields or {}
@@ -390,7 +366,7 @@ def _pipette_settings_from_mutable_configs(
             converted_dict[k] = v.dict_for_encode()
         elif k == "quirks":
             converted_dict[k] = {q: b.dict_for_encode() for q, b in v.items()}
-    fields = PipetteSettingsFields(**converted_dict)  # type: ignore
+    fields = PipetteSettingsFields(**converted_dict)
 
     # TODO(mc, 2020-09-17): s/fields/setting_fields (?)
     # need model and name?

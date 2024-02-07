@@ -57,16 +57,17 @@ class Base:
 
         def apply_style(argument: str) -> None:
             """Execute the javascript to apply the style."""
-            self.driver.execute_script(
-                "arguments[0].setAttribute('style', arguments[1]);", finder(), argument
-            )  # type: ignore
+            self.driver.execute_script("arguments[0].setAttribute('style', arguments[1]);", finder(), argument)  # type: ignore
 
         original_style = finder().get_attribute("style")
         apply_style(f"border: {border_size_px}px solid {color};")
         if screenshot:
             self.take_screenshot(message=screenshot_message)
         time.sleep(effect_time_sec)
-        apply_style(original_style)
+        if original_style is None:
+            apply_style("")
+        else:
+            apply_style(original_style)
 
     def apply_border_to_element(
         self,
@@ -81,16 +82,17 @@ class Base:
 
         def apply_style(argument: str) -> None:
             """Execute the javascript to apply the style."""
-            self.driver.execute_script(
-                "arguments[0].setAttribute('style', arguments[1]);", element, argument
-            )  # type: ignore
+            self.driver.execute_script("arguments[0].setAttribute('style', arguments[1]);", element, argument)  # type: ignore
 
         original_style = element.get_attribute("style")
         apply_style(f"border: {border_size_px}px solid {color};")
         if screenshot:
             self.take_screenshot(message=screenshot_message)
         time.sleep(effect_time_sec)
-        apply_style(original_style)
+        if original_style is None:
+            apply_style("")
+        else:
+            apply_style(original_style)
 
     def highlight_element(self, finder: Callable[..., WebElement]) -> None:
         """Highlight an element."""
@@ -118,9 +120,7 @@ class Base:
             os.makedirs(directory_for_results)
         note = "" if (message == "") else f"_{message}".replace(" ", "_")
         file_name = (
-            f"{str(time.time_ns())[:-3]}_{self.execution_id}".replace("/", "_").replace("::", "__").replace(".py", "")
-            + note
-            + ".png"
+            f"{str(time.time_ns())[:-3]}_{self.execution_id}".replace("/", "_").replace("::", "__").replace(".py", "") + note + ".png"
         )
         screenshot_full_path: str = str(Path(directory_for_results, file_name))
         self.console.print(f"screenshot saved: {file_name}", style="white on blue")
@@ -188,9 +188,7 @@ class Base:
         )
 
         def finder() -> Any:
-            return WebDriverWait(self.driver, timeout_sec, ignored_exceptions=ignored_exceptions).until(
-                expected_condition(element.locator)
-            )
+            return WebDriverWait(self.driver, timeout_sec, ignored_exceptions=ignored_exceptions).until(expected_condition(element.locator))
 
         return finder
 

@@ -1,14 +1,14 @@
 import { when, resetAllWhenMocks } from 'jest-when'
 import { UseQueryResult } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 
 import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
-  useRunQuery,
 } from '@opentrons/react-api-client'
 
 import { useProtocolAnalysisErrors } from '..'
+import { useNotifyRunQuery } from '../../../../resources/runs/useNotifyRunQuery'
 
 import { RUN_ID_2 } from '../../../../organisms/RunTimeControl/__fixtures__'
 
@@ -19,8 +19,11 @@ import type {
 } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client')
+jest.mock('../../../../resources/runs/useNotifyRunQuery')
 
-const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
+const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
+  typeof useNotifyRunQuery
+>
 
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
@@ -31,7 +34,7 @@ const mockUseProtocolAnalysisAsDocumentQuery = useProtocolAnalysisAsDocumentQuer
 
 describe('useProtocolAnalysisErrors hook', () => {
   beforeEach(() => {
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(null, { staleTime: Infinity })
       .mockReturnValue({} as UseQueryResult<Run>)
     when(mockUseProtocolQuery)
@@ -49,7 +52,7 @@ describe('useProtocolAnalysisErrors hook', () => {
   })
 
   it('returns null when protocol id is null', () => {
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID_2, { staleTime: Infinity })
       .mockReturnValue({
         data: { data: { protocolId: null } } as any,
@@ -66,7 +69,7 @@ describe('useProtocolAnalysisErrors hook', () => {
       id: 'fake analysis',
       status: 'completed',
     } as CompletedProtocolAnalysis
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID_2, { staleTime: Infinity })
       .mockReturnValue({
         data: { data: { protocolId: PROTOCOL_ID } } as any,
@@ -95,7 +98,7 @@ describe('useProtocolAnalysisErrors hook', () => {
       id: 'fake analysis',
       status: 'pending',
     } as PendingProtocolAnalysis
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID_2, { staleTime: Infinity })
       .mockReturnValue({
         data: { data: { protocolId: PROTOCOL_ID } } as any,
@@ -125,7 +128,7 @@ describe('useProtocolAnalysisErrors hook', () => {
       status: 'completed',
       errors: [{ detail: 'fake error' }],
     } as CompletedProtocolAnalysis
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID_2, { staleTime: Infinity })
       .mockReturnValue({
         data: { data: { protocolId: PROTOCOL_ID } } as any,

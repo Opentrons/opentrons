@@ -18,7 +18,7 @@ import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { RobotSystemVersionModal } from './RobotSystemVersionModal'
 
 import type { RobotUpdateInfo } from '../../redux/robot-update/types'
-import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SetSettingOption } from '../../pages/RobotSettingsDashboard'
 
 const GITHUB_URL = 'https://github.com/Opentrons/opentrons/releases'
 
@@ -79,7 +79,7 @@ export function RobotSystemVersion({
               {t('view_latest_release_notes_at', { url: GITHUB_URL })}
             </StyledText>
             <Flex
-              backgroundColor={COLORS.light1}
+              backgroundColor={COLORS.grey35}
               flexDirection={DIRECTION_ROW}
               padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
               justifyContent={JUSTIFY_SPACE_BETWEEN}

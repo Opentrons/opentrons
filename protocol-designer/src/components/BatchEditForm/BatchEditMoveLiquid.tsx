@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Box,
   DeprecatedPrimaryButton,
@@ -8,7 +9,6 @@ import {
   TOOLTIP_TOP,
   TOOLTIP_FIXED,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
 import {
   BlowoutLocationField,
   CheckboxRowField,
@@ -35,6 +35,7 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
   propsForFields: FieldPropsByName
 }): JSX.Element => {
   const { prefix, propsForFields } = props
+  const { t } = useTranslation('form')
   const addFieldNamePrefix = (name: string): string => `${prefix}_${name}`
 
   const getLabwareIdForPositioningField = (name: string): string | null => {
@@ -60,9 +61,7 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
   }
 
   return (
-    <FormColumn
-      sectionHeader={i18n.t('form.batch_edit_form.settings_for', { prefix })}
-    >
+    <FormColumn sectionHeader={t('batch_edit_form.settings_for', { prefix })}>
       <Box className={styles.form_row}>
         <FlowRateField
           {...propsForFields[addFieldNamePrefix('flowRate')]}
@@ -77,7 +76,7 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
         />
         <WellOrderField
           prefix={prefix}
-          label={i18n.t('form.step_edit_form.field.well_order.label')}
+          label={t('step_edit_form.field.well_order.label')}
           firstValue={getWellOrderFieldValue(
             addFieldNamePrefix('wellOrder_first')
           )}
@@ -98,7 +97,7 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
       {prefix === 'aspirate' && (
         <CheckboxRowField
           {...propsForFields.preWetTip}
-          label={i18n.t('form.step_edit_form.field.preWetTip.label')}
+          label={t('step_edit_form.field.preWetTip.label')}
           className={styles.small_field}
         />
       )}
@@ -119,7 +118,7 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
       />
       <CheckboxRowField
         {...propsForFields[addFieldNamePrefix('touchTip_checkbox')]}
-        label={i18n.t('form.step_edit_form.field.touchTip.label')}
+        label={t('step_edit_form.field.touchTip.label')}
         className={styles.small_field}
       >
         <TipPositionField
@@ -133,7 +132,7 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
       {prefix === 'dispense' && (
         <CheckboxRowField
           {...propsForFields.blowout_checkbox}
-          label={i18n.t('form.step_edit_form.field.blowout.label')}
+          label={t('step_edit_form.field.blowout.label')}
           className={styles.small_field}
         >
           <BlowoutLocationField
@@ -153,12 +152,13 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
 export interface BatchEditMoveLiquidProps {
   batchEditFormHasChanges: boolean
   propsForFields: FieldPropsByName
-  handleCancel: () => unknown
-  handleSave: () => unknown
+  handleCancel: () => void
+  handleSave: () => void
 }
 export const BatchEditMoveLiquid = (
   props: BatchEditMoveLiquidProps
 ): JSX.Element => {
+  const { t } = useTranslation(['button', 'tooltip'])
   const { propsForFields, handleCancel, handleSave } = props
   const [cancelButtonTargetProps, cancelButtonTooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP,
@@ -194,10 +194,10 @@ export const BatchEditMoveLiquid = (
               onClick={handleCancel}
               className={buttonStyles.button_auto}
             >
-              {i18n.t('button.discard_changes')}
+              {t('discard_changes')}
             </OutlineButton>
             <Tooltip {...cancelButtonTooltipProps}>
-              {i18n.t('tooltip.cancel_batch_edit')}
+              {t('tooltip:cancel_batch_edit')}
             </Tooltip>
           </Box>
 
@@ -210,11 +210,11 @@ export const BatchEditMoveLiquid = (
               disabled={disableSave}
               onClick={handleSave}
             >
-              {i18n.t('button.save')}
+              {t('save')}
             </DeprecatedPrimaryButton>
             <Tooltip {...saveButtonTooltipProps}>
-              {i18n.t(
-                `tooltip.save_batch_edit.${
+              {t(
+                `tooltip:save_batch_edit.${
                   disableSave ? 'disabled' : 'enabled'
                 }`
               )}

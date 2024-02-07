@@ -1,5 +1,6 @@
 import * as React from 'react'
 import map from 'lodash/map'
+import { COLORS } from '../../../helix-design-system'
 import { Well } from './Well'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { CSSProperties } from 'styled-components'
@@ -22,6 +23,8 @@ function FilledWellsComponent(props: FilledWellsProps): JSX.Element {
               wellName={wellName}
               well={definition.wells[wellName]}
               fill={color}
+              stroke={COLORS.black90}
+              strokeWidth="0.6"
             />
           )
         }

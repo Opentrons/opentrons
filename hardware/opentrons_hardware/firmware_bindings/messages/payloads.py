@@ -528,6 +528,13 @@ class GripperJawStatePayload(EmptyPayload):
 
 
 @dataclass(eq=False)
+class GripperJawHoldoffPayload(EmptyPayload):
+    """A respones carrying info about the jaw holdoff value of a gripper."""
+
+    holdoff_ms: utils.UInt32Field
+
+
+@dataclass(eq=False)
 class GripperMoveRequestPayload(AddToMoveGroupRequestPayload):
     """A request to move gripper."""
 
@@ -620,3 +627,11 @@ class GetMotorUsageResponsePayload(_GetMotorUsageResponsePayloadBase):
         return inst
 
     usage_elements: List[MotorUsageTypeField]
+
+
+@dataclass(eq=False)
+class HepaUVInfoResponsePayload(EmptyPayload):
+    """A response carrying data about an attached gripper."""
+
+    model: utils.UInt16Field
+    serial: SerialDataCodeField

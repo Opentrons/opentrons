@@ -6,7 +6,7 @@ import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 import { ChildNavigation } from '../../../organisms/ChildNavigation'
 import { SetWifiSsid } from '../../../organisms/NetworkSettings/SetWifiSsid'
 
-import type { SetSettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SetSettingOption } from '../../../pages/RobotSettingsDashboard'
 
 interface RobotSettingsJoinOtherNetworkProps {
   setCurrentOption: SetSettingOption

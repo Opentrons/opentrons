@@ -232,6 +232,13 @@ class Axis(enum.Enum):
         """
         return cls.of_main_tool_actuator(mount)
 
+    @classmethod
+    def node_axes(cls) -> List["Axis"]:
+        """
+        Get a list of axes that are backed by flex canbus nodes.
+        """
+        return [cls.X, cls.Y, cls.Z_L, cls.Z_R, cls.P_L, cls.P_R, cls.Z_G, cls.G]
+
 
 class SubSystem(enum.Enum):
     """An enumeration of ot3 components.
@@ -247,6 +254,7 @@ class SubSystem(enum.Enum):
     gripper = 5
     rear_panel = 6
     motor_controller_board = 7
+    hepa_uv = 8
 
     def __str__(self) -> str:
         return self.name
@@ -412,6 +420,7 @@ HardwareEvent = Union[
 ]
 
 HardwareEventHandler = Callable[[HardwareEvent], None]
+HardwareEventUnsubscriber = Callable[[], None]
 
 
 RevisionLiteral = Literal["2.1", "A", "B", "C", "UNKNOWN"]
@@ -480,6 +489,13 @@ class CriticalPoint(enum.Enum):
     point. This is the same as the GRIPPER_JAW_CENTER for grippers.
     """
 
+    INSTRUMENT_XY_CENTER = enum.auto()
+    """
+    The INSTRUMENT_XY_CENTER means the critical point under consideration is
+    the XY center of the entire pipette, regardless of configuration.
+    No pipettes, single or multi, will change their instrument center point.
+    """
+
     FRONT_NOZZLE = enum.auto()
     """
     The end of the front-most nozzle of a multipipette with a tip attached.
@@ -503,6 +519,16 @@ class CriticalPoint(enum.Enum):
     """
     The center of the bottom face of a calibration pin inserted in the gripper's
     back calibration pin slot.
+    """
+
+    Y_CENTER = enum.auto()
+    """
+    Y_CENTER means the critical point under consideration is at the same X
+    coordinate as the default nozzle point (i.e. TIP | NOZZLE | FRONT_NOZZLE)
+    but halfway in between the Y axis bounding box of the pipette - it is the
+    XY center of the first column in the pipette. It's really only relevant for
+    the 96; it will produce the same position as XY_CENTER on an eight or one
+    channel pipette.
     """
 
 
@@ -620,7 +646,6 @@ class HardwareFeatureFlags:
     use_old_aspiration_functions: bool = (
         False  # To support pipette backwards compatability
     )
-    tip_presence_detection_enabled: bool = True
     require_estop: bool = True
     stall_detection_enabled: bool = True
     overpressure_detection_enabled: bool = True
@@ -636,7 +661,6 @@ class HardwareFeatureFlags:
         """
         return HardwareFeatureFlags(
             use_old_aspiration_functions=feature_flags.use_old_aspiration_functions(),
-            tip_presence_detection_enabled=feature_flags.tip_presence_detection_enabled(),
             require_estop=feature_flags.require_estop(),
             stall_detection_enabled=feature_flags.stall_detection_enabled(),
             overpressure_detection_enabled=feature_flags.overpressure_detection_enabled(),

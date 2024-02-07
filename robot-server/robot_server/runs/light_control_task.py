@@ -1,4 +1,4 @@
-"""Background task to drive the status bar."""
+"""Background task to drive the Flex's status bar."""
 from typing import Optional, List
 from logging import getLogger
 import asyncio
@@ -81,7 +81,7 @@ def _active_updates_to_status_bar(
 
 
 class LightController:
-    """LightController sets the status bar to match the protocol status."""
+    """LightController sets the Flex's status bar to match the protocol status."""
 
     def __init__(
         self, api: HardwareControlAPI, engine_store: Optional[EngineStore]

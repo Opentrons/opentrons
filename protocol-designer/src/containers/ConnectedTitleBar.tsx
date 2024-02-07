@@ -1,11 +1,10 @@
 import * as React from 'react'
-import { Dispatch } from 'redux'
-import { connect } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
-import { TitleBar, Icon, IconName, TitleBarProps } from '@opentrons/components'
+import { TitleBar, Icon, IconName } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import styles from './TitleBar.css'
-import { i18n } from '../localization'
 import { START_TERMINAL_TITLE, END_TERMINAL_TITLE } from '../constants'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import { selectors as uiLabwareSelectors } from '../ui/labware'
@@ -20,22 +19,7 @@ import { END_TERMINAL_ITEM_ID, START_TERMINAL_ITEM_ID } from '../steplist'
 import { selectors as fileDataSelectors } from '../file-data'
 import { closeIngredientSelector } from '../labware-ingred/actions'
 import { stepIconsByType } from '../form-types'
-import { selectors, Page } from '../navigation'
-
-import { BaseState } from '../types'
-
-type Props = React.ComponentProps<typeof TitleBar>
-
-interface DP {
-  onBackClick: Props['onBackClick']
-}
-
-type SP = Omit<Props, keyof DP> & {
-  _page: Page
-  _liquidPlacementMode?: boolean
-  _wellSelectionMode?: boolean
-}
-
+import { selectors } from '../navigation'
 interface TitleWithIconProps {
   iconName: IconName | null | undefined
   text: string | null | undefined
@@ -61,17 +45,25 @@ const Title = (props: TitleProps): JSX.Element => (
   </div>
 )
 
-function mapStateToProps(state: BaseState): SP {
-  const selectedLabwareId = labwareIngredSelectors.getSelectedLabwareId(state)
-  const _page = selectors.getCurrentPage(state)
-  const fileName = fileDataSelectors.protocolName(state)
-  const selectedStepInfo = getSelectedStepTitleInfo(state)
-  const selectedTerminalId = getSelectedTerminalItemId(state)
-  const labwareNames = uiLabwareSelectors.getLabwareNicknamesById(state)
-  const drilledDownLabwareId = labwareIngredSelectors.getDrillDownLabwareId(
-    state
+export const ConnectedTitleBar = (): JSX.Element => {
+  const { t } = useTranslation(['nav', 'application'])
+  const dispatch = useDispatch()
+  const selectedLabwareId = useSelector(
+    labwareIngredSelectors.getSelectedLabwareId
   )
-  const wellSelectionLabwareKey = getWellSelectionLabwareKey(state)
+  const page = useSelector(selectors.getCurrentPage)
+  const labwareNicknamesById = useSelector(
+    uiLabwareSelectors.getLabwareNicknamesById
+  )
+  const fileName = useSelector(fileDataSelectors.protocolName)
+  const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
+  const selectedStepInfo = useSelector(getSelectedStepTitleInfo)
+  const selectedTerminalId = useSelector(getSelectedTerminalItemId)
+  const labwareNames = useSelector(uiLabwareSelectors.getLabwareNicknamesById)
+  const drilledDownLabwareId = useSelector(
+    labwareIngredSelectors.getDrillDownLabwareId
+  )
+  const wellSelectionLabwareKey = useSelector(getWellSelectionLabwareKey)
 
   // TODO(mc, 2019-06-27): µL to uL replacement needed to handle CSS capitalization
   const labwareNickname =
@@ -79,61 +71,54 @@ function mapStateToProps(state: BaseState): SP {
       ? labwareNames[selectedLabwareId].replace('µL', 'uL')
       : null
   const labwareEntity =
-    selectedLabwareId != null
-      ? stepFormSelectors.getLabwareEntities(state)[selectedLabwareId]
-      : null
-  const liquidPlacementMode = selectedLabwareId != null
+    selectedLabwareId != null ? labwareEntities[selectedLabwareId] : null
 
-  switch (_page) {
+  const liquidPlacementMode: boolean = selectedLabwareId != null
+
+  let title
+  let subtitle: string | null = null
+  let backButtonLabel: string | undefined
+  let wellSelectionMode: boolean = false
+
+  switch (page) {
     case 'liquids':
-    case 'file-detail':
-      return {
-        _page,
-        title: i18n.t([`nav.title.${_page}`, fileName]),
-        subtitle: i18n.t([`nav.subtitle.${_page}`, '']),
-      }
+    case 'file-detail': {
+      title = <>{t([`title.${page}`, fileName])}</>
+      subtitle = t([`subtitle.${page}`, ''])
+      break
+    }
     case 'file-splash':
     case 'settings-features':
-    case 'settings-app':
-      return {
-        _page,
-        title: <Title text={i18n.t([`nav.title.${_page}`, fileName])} />,
-        subtitle: i18n.t([`nav.subtitle.${_page}`, '']),
-      }
+    case 'settings-app': {
+      title = <Title text={t([`title.${page}`, fileName])} />
+      subtitle = t([`subtitle.${page}`, ''])
+      break
+    }
     case 'steplist':
     default: {
       // NOTE: this default case error should never be reached, it's just a sanity check
-      if (_page !== 'steplist')
+      if (page !== 'steplist')
         console.error(
           'ConnectedTitleBar got an unsupported page, returning steplist instead'
         )
       if (liquidPlacementMode) {
-        return {
-          _page,
-          _liquidPlacementMode: liquidPlacementMode,
-          title: labwareNickname,
-          // TODO(mc, 2019-06-27): µL to uL replacement needed to handle CSS capitalization
-          subtitle:
-            labwareEntity &&
-            getLabwareDisplayName(labwareEntity.def).replace('µL', 'uL'),
-          backButtonLabel: 'Deck',
-        }
+        title = labwareNickname
+        // TODO(mc, 2019-06-27): µL to uL replacement needed to handle CSS capitalization
+        subtitle =
+          labwareEntity &&
+          getLabwareDisplayName(labwareEntity.def).replace('µL', 'uL')
+        backButtonLabel = 'Deck'
       }
-      let subtitle
-      let backButtonLabel
-      let title
+
       if (selectedTerminalId === START_TERMINAL_ITEM_ID) {
         subtitle = START_TERMINAL_TITLE
+        title = title || fileName || ''
       } else if (selectedTerminalId === END_TERMINAL_ITEM_ID) {
         subtitle = END_TERMINAL_TITLE
         if (drilledDownLabwareId) {
           backButtonLabel = 'Deck'
-          const labwareDef = stepFormSelectors.getLabwareEntities(state)[
-            drilledDownLabwareId
-          ].def
-          const nickname = uiLabwareSelectors.getLabwareNicknamesById(state)[
-            drilledDownLabwareId
-          ]
+          const labwareDef = labwareEntities[drilledDownLabwareId].def
+          const nickname = labwareNicknamesById[drilledDownLabwareId]
           // TODO(mc, 2019-06-27): µL to uL replacement needed to handle CSS capitalization
           title = nickname.replace('µL', 'uL')
           subtitle =
@@ -142,72 +127,45 @@ function mapStateToProps(state: BaseState): SP {
       } else if (selectedStepInfo) {
         const stepTitle =
           selectedStepInfo.stepName ||
-          i18n.t(`application.stepType.${selectedStepInfo.stepType}`)
+          t(`application:stepType.${selectedStepInfo.stepType}`)
         if (wellSelectionLabwareKey) {
           // well selection modal
-          return {
-            _page,
-            _wellSelectionMode: true,
-            title: (
-              <TitleWithIcon
-                iconName={stepIconsByType[selectedStepInfo.stepType]}
-                text={stepTitle}
-              />
-            ),
-            subtitle: labwareNames[wellSelectionLabwareKey],
-            backButtonLabel: 'Back',
-          }
+          wellSelectionMode = true
+          title = (
+            <TitleWithIcon
+              iconName={stepIconsByType[selectedStepInfo.stepType]}
+              text={stepTitle}
+            />
+          )
+
+          subtitle = labwareNames[wellSelectionLabwareKey]
+          backButtonLabel = 'Back'
         } else {
           subtitle = stepTitle
         }
       }
-      return {
-        _page: 'steplist',
-        title: title || fileName || '',
-        subtitle,
-        backButtonLabel,
-      }
     }
   }
-}
-
-function mergeProps(
-  stateProps: SP,
-  dispatchProps: { dispatch: Dispatch }
-): Props {
-  const {
-    _page,
-    _liquidPlacementMode,
-    _wellSelectionMode,
-    ...props
-  } = stateProps
-  const { dispatch } = dispatchProps
 
   let onBackClick
 
-  if (_page === 'steplist') {
-    if (_liquidPlacementMode) {
+  if (page === 'steplist') {
+    if (liquidPlacementMode) {
       onBackClick = () => dispatch(closeIngredientSelector())
-    } else if (_wellSelectionMode) {
+    } else if (wellSelectionMode) {
       onBackClick = () => dispatch(stepsActions.clearWellSelectionLabwareKey())
-    } else if (props.backButtonLabel) {
+    } else if (backButtonLabel) {
       onBackClick = () => {}
     }
   }
-
-  return {
-    ...props,
-    onBackClick,
-  }
+  return (
+    <TitleBar
+      id="TitleBar_main"
+      title={title}
+      subtitle={subtitle}
+      backButtonLabel={backButtonLabel}
+      onBackClick={onBackClick}
+      className={styles.sticky_bar}
+    />
+  )
 }
-
-const StickyTitleBar = (props: TitleBarProps): JSX.Element => (
-  <TitleBar id="TitleBar_main" {...props} className={styles.sticky_bar} />
-)
-
-export const ConnectedTitleBar = connect(
-  mapStateToProps,
-  // @ts-expect-error(sa, 2021-6-21): TODO: refactor to use hooks api
-  null,
-  mergeProps
-)(StickyTitleBar)

@@ -1,5 +1,6 @@
 import { tiprackWellNamesFlat } from './data'
 import {
+  AddressableAreaName,
   AspDispAirgapParams,
   BlowoutParams,
   CreateCommand,
@@ -299,6 +300,27 @@ export const delayWithOffset = (
 // =================
 export const dropTipHelper = (pipette?: string): CreateCommand[] => [
   {
+    commandType: 'moveToAddressableAreaForDropTip',
+    key: expect.any(String),
+    params: {
+      pipetteId: pipette ?? DEFAULT_PIPETTE,
+      addressableAreaName: 'movableTrashA3',
+      offset: { x: 0, y: 0, z: 0 },
+      alternateDropLocation: true,
+    },
+  },
+  {
+    commandType: 'dropTipInPlace',
+    key: expect.any(String),
+    params: {
+      pipetteId: pipette ?? DEFAULT_PIPETTE,
+    },
+  },
+]
+export const dropTipIntoWasteChuteHelper = (
+  pipette?: string
+): CreateCommand[] => [
+  {
     commandType: 'moveToAddressableArea',
     key: expect.any(String),
     params: {
@@ -343,7 +365,7 @@ export const dropTipInPlaceHelper = (params?: {
 })
 export const moveToAddressableAreaHelper = (params?: {
   pipetteId?: string
-  addressableAreaName: string
+  addressableAreaName: AddressableAreaName
 }): CreateCommand => ({
   commandType: 'moveToAddressableArea',
   key: expect.any(String),

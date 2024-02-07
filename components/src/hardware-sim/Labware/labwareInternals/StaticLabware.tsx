@@ -1,14 +1,15 @@
 // Render labware definition to SVG. XY is in robot coordinates.
-import assert from 'assert'
 import * as React from 'react'
+import styled from 'styled-components'
 import flatMap from 'lodash/flatMap'
 
 import { LabwareOutline } from './LabwareOutline'
 import { Well } from './Well'
-import styles from './StaticLabware.css'
 
 import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
 import type { WellMouseEvent } from './types'
+import { STYLE_BY_WELL_CONTENTS } from './StyledWells'
+import { COLORS } from '../../../helix-design-system'
 
 export interface StaticLabwareProps {
   /** Labware definition to render */
@@ -21,34 +22,42 @@ export interface StaticLabwareProps {
   onMouseEnterWell?: (e: WellMouseEvent) => unknown
   /** Optional callback to be executed when mouse leaves a well element */
   onMouseLeaveWell?: (e: WellMouseEvent) => unknown
-  /** [legacy] css class to be added to well component if it is selectable */
-  selectableWellClass?: string
 }
 
 const TipDecoration = React.memo(function TipDecoration(props: {
   well: LabwareWell
 }) {
   const { well } = props
-  if ('diameter' in well && well.diameter != null) {
+  if (well.shape === 'circular') {
     const radius = well.diameter / 2
     return (
-      <circle className={styles.tip} cx={well.x} cy={well.y} r={radius - 1} />
+      <circle
+        {...STYLE_BY_WELL_CONTENTS.tipPresent}
+        cx={well.x}
+        cy={well.y}
+        r={radius - 1}
+      />
     )
   }
-  assert(false, `TipDecoration expects a circular well with a diameter`)
   return null
 })
+
+const LabwareDetailGroup = styled.g`
+  fill: none;
+  stroke: ${COLORS.black90};
+  stroke-width: 1;
+`
 
 export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
   const { isTiprack } = props.definition.parameters
   return (
     <g onClick={props.onLabwareClick}>
-      <g className={styles.labware_detail_group}>
+      <LabwareDetailGroup>
         <LabwareOutline
           definition={props.definition}
           highlight={props.highlight}
         />
-      </g>
+      </LabwareDetailGroup>
       <g>
         {flatMap(
           props.definition.ordering,
@@ -57,19 +66,18 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
               return (
                 <React.Fragment key={wellName}>
                   <Well
-                    className={isTiprack ? styles.tip : null}
                     wellName={wellName}
                     well={props.definition.wells[wellName]}
                     onMouseEnterWell={props.onMouseEnterWell}
                     onMouseLeaveWell={props.onMouseLeaveWell}
-                    selectableWellClass={props.selectableWellClass}
+                    {...(isTiprack
+                      ? STYLE_BY_WELL_CONTENTS.tipPresent
+                      : STYLE_BY_WELL_CONTENTS.defaultWell)}
                   />
 
-                  {/* Tip inner circle decoration.
-                   TODO: Ian 2019-05-03 SOMEDAY, use WellDecoration and include decorations in the def */}
-                  {isTiprack && (
+                  {isTiprack ? (
                     <TipDecoration well={props.definition.wells[wellName]} />
-                  )}
+                  ) : null}
                 </React.Fragment>
               )
             })

@@ -1,7 +1,5 @@
-from typing import Optional, Callable, TYPE_CHECKING, Any, Generator
+from typing import Optional, Callable, TYPE_CHECKING
 import pytest
-from contextlib import nullcontext
-from unittest.mock import MagicMock, patch, PropertyMock
 
 from opentrons.types import Point
 from opentrons.calibration_storage import types as cal_types
@@ -9,7 +7,7 @@ from opentrons.hardware_control.instruments.ot3 import gripper, instrument_calib
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.config import gripper_config
 from opentrons_shared_data.gripper import GripperModel
-from opentrons_shared_data.errors.exceptions import FailedGripperPickupError
+from opentrons_shared_data.errors.exceptions import MotionFailedError
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
@@ -27,24 +25,6 @@ def fake_offset() -> "GripperCalibrationOffset":
     )
 
     return load_gripper_calibration_offset("fakeid123")
-
-
-@pytest.fixture
-def mock_jaw_width() -> Generator[MagicMock, None, None]:
-    with patch(
-        "opentrons.hardware_control.instruments.ot3.gripper.Gripper.jaw_width",
-        new_callable=PropertyMock,
-    ) as jaw_width:
-        yield jaw_width
-
-
-@pytest.fixture
-def mock_max_grip_error() -> Generator[MagicMock, None, None]:
-    with patch(
-        "opentrons.hardware_control.instruments.ot3.gripper.Gripper.max_allowed_grip_error",
-        new_callable=PropertyMock,
-    ) as max_error:
-        yield max_error
 
 
 @pytest.mark.ot3_only
@@ -89,32 +69,6 @@ def test_load_gripper_cal_offset(fake_offset: "GripperCalibrationOffset") -> Non
 
 
 @pytest.mark.ot3_only
-@pytest.mark.parametrize(
-    argnames=["jaw_width_val", "error_context"],
-    argvalues=[
-        (89, nullcontext()),
-        (100, pytest.raises(FailedGripperPickupError)),
-        (50, pytest.raises(FailedGripperPickupError)),
-        (85, nullcontext()),
-    ],
-)
-def test_check_labware_pickup(
-    mock_jaw_width: Any,
-    mock_max_grip_error: Any,
-    jaw_width_val: float,
-    error_context: Any,
-) -> None:
-    """Test that FailedGripperPickupError is raised correctly."""
-    #  This should only be triggered when the difference between the
-    #  gripper jaw and labware widths is greater than the max allowed error.
-    gripr = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
-    mock_jaw_width.return_value = jaw_width_val
-    mock_max_grip_error.return_value = 6
-    with error_context:
-        gripr.check_labware_pickup(85)
-
-
-@pytest.mark.ot3_only
 def test_reload_instrument_cal_ot3(fake_offset: "GripperCalibrationOffset") -> None:
     old_gripper = gripper.Gripper(
         fake_gripper_conf,
@@ -135,3 +89,24 @@ def test_reload_instrument_cal_ot3(fake_offset: "GripperCalibrationOffset") -> N
     assert new_gripper == old_gripper
     # we said upstream could skip
     assert skip
+
+
+@pytest.mark.ot3_only
+def test_jaw_calibration_error_checking() -> None:
+    subject = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
+    with pytest.raises(MotionFailedError):
+        subject.update_jaw_open_position_from_closed_position(0)
+
+
+@pytest.mark.ot3_only
+def test_jaw_calibration() -> None:
+    subject = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
+    subject.update_jaw_open_position_from_closed_position(
+        (
+            fake_gripper_conf.geometry.jaw_width["max"]
+            - fake_gripper_conf.geometry.jaw_width["min"]
+            + 2
+        )
+        / 2
+    )
+    assert subject.max_jaw_width == fake_gripper_conf.geometry.jaw_width["max"] + 2

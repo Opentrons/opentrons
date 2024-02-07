@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react-hooks'
+import { renderHook, act } from '@testing-library/react'
 import { useScrolling } from '../'
 
 describe('useScrolling', () => {
@@ -13,27 +13,27 @@ describe('useScrolling', () => {
   })
 
   it('returns false when there is no scrolling', () => {
-    const ref = { current: document.createElement('div') }
+    const ref = document.createElement('div')
     const { result } = renderHook(() => useScrolling(ref))
     expect(result.current).toBe(false)
   })
 
   it('returns true when scrolling', () => {
-    const ref = { current: document.createElement('div') }
+    const ref = document.createElement('div')
     const { result } = renderHook(() => useScrolling(ref))
-    ref.current.scrollTop = 10
+    ref.scrollTop = 10
     act(() => {
-      ref.current.dispatchEvent(new Event('scroll'))
+      ref.dispatchEvent(new Event('scroll'))
     })
     expect(result.current).toBe(true)
   })
 
   it('returns false after scrolling stops', () => {
-    const ref = { current: document.createElement('div') }
+    const ref = document.createElement('div')
     const { result } = renderHook(() => useScrolling(ref))
-    ref.current.scrollTop = 10
+    ref.scrollTop = 10
     act(() => {
-      ref.current.dispatchEvent(new Event('scroll'))
+      ref.dispatchEvent(new Event('scroll'))
     })
     expect(result.current).toBe(true)
     act(() => {

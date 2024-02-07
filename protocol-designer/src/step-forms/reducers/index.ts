@@ -18,6 +18,7 @@ import {
   LoadPipetteCreateCommand,
   MoveLabwareCreateCommand,
   MoveToAddressableAreaCreateCommand,
+  MoveToAddressableAreaForDropTipCreateCommand,
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
   PipetteName,
@@ -56,6 +57,7 @@ import {
   _getPipetteEntitiesRootState,
   _getLabwareEntitiesRootState,
   _getInitialDeckSetupRootState,
+  _getAdditionalEquipmentEntitiesRootState,
 } from '../selectors'
 import {
   CreateDeckFixtureAction,
@@ -189,6 +191,9 @@ export const unsavedForm = (
         orderedStepIds: rootState.orderedStepIds,
         initialDeckSetup: _getInitialDeckSetupRootState(rootState),
         robotStateTimeline: action.meta.robotStateTimeline,
+        additionalEquipmentEntities: _getAdditionalEquipmentEntitiesRootState(
+          rootState
+        ),
       })
     }
 
@@ -1393,12 +1398,17 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
       }, {})
 
       const trashBinCommand = Object.values(file.commands).find(
-        (command): command is MoveToAddressableAreaCreateCommand =>
-          command.commandType === 'moveToAddressableArea' &&
-          (MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
-            command.params.addressableAreaName
-          ) ||
-            command.params.addressableAreaName === 'fixedTrash')
+        (
+          command
+        ): command is
+          | MoveToAddressableAreaCreateCommand
+          | MoveToAddressableAreaForDropTipCreateCommand =>
+          (command.commandType === 'moveToAddressableArea' &&
+            (MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
+              command.params.addressableAreaName
+            ) ||
+              command.params.addressableAreaName === 'fixedTrash')) ||
+          command.commandType === 'moveToAddressableAreaForDropTip'
       )
       const trashAddressableAreaName =
         trashBinCommand?.params.addressableAreaName
@@ -1412,6 +1422,14 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
                   stepForm.dispense_labware.includes('trashBin') ||
                   stepForm.dropTip_location.includes('trashBin') ||
                   stepForm.blowout_location?.includes('trashBin'))
+            )
+          : null
+      const mixStepTrashBin =
+        savedStepForms != null
+          ? Object.values(savedStepForms).find(
+              stepForm =>
+                stepForm.stepType === 'mix' &&
+                stepForm.dropTip_location.includes('trashBin')
             )
           : null
 
@@ -1432,6 +1450,8 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
         ) {
           trashBinId = moveLiquidStepTrashBin.blowOut_location
         }
+      } else if (mixStepTrashBin != null) {
+        trashBinId = mixStepTrashBin.dropTip_location
       }
 
       const trashCutoutId =

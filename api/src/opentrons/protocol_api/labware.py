@@ -85,17 +85,18 @@ class Well:
         self._core = core
         self._api_version = api_version
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def api_version(self) -> APIVersion:
         return self._api_version
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def parent(self) -> Labware:
+        """The :py:class:`.Labware` object that the well is a part of."""
         return self._parent
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def has_tip(self) -> bool:
         """Whether this well contains a tip. Always ``False`` if the parent labware
@@ -113,6 +114,10 @@ class Well:
 
     @property
     def max_volume(self) -> float:
+        """The maximum volume, in µL, that the well can hold.
+
+        This amount is set by the JSON labware definition, specifically the ``totalLiquidVolume`` property of the particular well.
+        """
         return self._core.get_max_volume()
 
     @property
@@ -121,7 +126,7 @@ class Well:
             return self._core.geometry
         raise APIVersionError("Well.geometry has been deprecated.")
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def diameter(self) -> Optional[float]:
         """
@@ -130,7 +135,7 @@ class Well:
         """
         return self._core.diameter
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 9)
     def length(self) -> Optional[float]:
         """
@@ -139,7 +144,7 @@ class Well:
         """
         return self._core.length
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 9)
     def width(self) -> Optional[float]:
         """
@@ -148,7 +153,7 @@ class Well:
         """
         return self._core.width
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 9)
     def depth(self) -> float:
         """
@@ -159,11 +164,24 @@ class Well:
 
     @property
     def display_name(self) -> str:
+        """A human-readable name for the well, including labware and deck location.
+
+        For example, "A1 of Corning 96 Well Plate 360 µL Flat on slot D1". Run log
+        entries use this format for identifying wells. See
+        :py:meth:`.ProtocolContext.commands`.
+        """
         return self._core.get_display_name()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 7)
     def well_name(self) -> str:
+        """A string representing the well's coordinates.
+
+        For example, "A1" or "H12".
+
+        The format of strings that this property returns is the same format as the key
+        for :ref:`accessing wells in a dictionary <well-dictionary-access>`.
+        """
         return self._core.get_name()
 
     @requires_version(2, 0)
@@ -349,7 +367,7 @@ class Labware:
         )
         return False
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def api_version(self) -> APIVersion:
         return self._api_version
@@ -357,7 +375,7 @@ class Labware:
     def __getitem__(self, key: str) -> Well:
         return self.wells_by_name()[key]
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def uri(self) -> str:
         """A string fully identifying the labware.
@@ -366,7 +384,7 @@ class Labware:
         """
         return self._core.get_uri()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def parent(self) -> Union[str, Labware, ModuleTypes, OffDeckType]:
         """The parent of this labware---where this labware is loaded.
@@ -375,17 +393,17 @@ class Labware:
             If the labware is directly on the robot's deck, the ``str`` name of the deck slot,
             like ``"D1"`` (Flex) or ``"1"`` (OT-2). See :ref:`deck-slots`.
 
-            If the labware is on a module, a :py:class:`ModuleContext`.
+            If the labware is on a module, a module context.
 
             If the labware is on a labware or adapter, a :py:class:`Labware`.
 
             If the labware is off-deck, :py:obj:`OFF_DECK`.
 
         .. versionchanged:: 2.14
-            Return type for module parent changed to :py:class:`ModuleContext`.
-            Prior to this version, an internal geometry interface is returned.
+            Return type for module parent changed.
+            Prior to this version, an internal geometry interface was returned.
         .. versionchanged:: 2.15
-            Will return a :py:class:`Labware` if the labware was loaded onto a labware/adapter.
+            Will return a :py:class:`Labware` if the labware is loaded onto a labware/adapter.
             Will now return :py:obj:`OFF_DECK` if the labware is off-deck.
             Formerly, if the labware was removed by using ``del`` on :py:obj:`.deck`,
             this would return where it was before its removal.
@@ -403,7 +421,7 @@ class Labware:
 
         return labware_location
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def name(self) -> str:
         """Can either be the canonical name of the labware, which is used to
@@ -425,19 +443,19 @@ class Labware:
         assert isinstance(self._core, LegacyLabwareCore)
         cast(LegacyLabwareCore, self._core).set_name(new_name)
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def load_name(self) -> str:
         """The API load name of the labware definition."""
         return self._core.load_name
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def parameters(self) -> "LabwareParameters":
         """Internal properties of a labware including type and quirks."""
         return self._core.get_parameters()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def quirks(self) -> List[str]:
         """Quirks specific to this labware."""
@@ -446,7 +464,7 @@ class Labware:
     # TODO(mm, 2023-02-08):
     # Specify units and origin after we resolve RSS-110.
     # Remove warning once we resolve RSS-109 more broadly.
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def magdeck_engage_height(self) -> Optional[float]:
         """Return the default magnet engage height that
@@ -471,7 +489,7 @@ class Labware:
         else:
             return p["magneticModuleEngageHeight"]
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 15)
     def child(self) -> Optional[Labware]:
         """The labware (if any) present on this labware."""
@@ -589,7 +607,7 @@ class Labware:
         else:
             self._core.set_calibration(Point(x=x, y=y, z=z))
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def calibrated_offset(self) -> Point:
         return self._core.get_calibrated_offset()
@@ -780,7 +798,7 @@ class Labware:
         _log.warning("columns_by_index is deprecated. Use columns_by_name instead.")
         return self.columns_by_name()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def highest_z(self) -> float:
         """
@@ -796,17 +814,17 @@ class Labware:
         """as is_tiprack but not subject to version checking for speed"""
         return self._core.is_tip_rack()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def is_tiprack(self) -> bool:
         return self._is_tiprack
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 15)
     def is_adapter(self) -> bool:
         return self._core.is_adapter()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def tip_length(self) -> float:
         return self._core.get_tip_length()

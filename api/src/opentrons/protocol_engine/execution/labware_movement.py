@@ -34,6 +34,8 @@ from ..types import (
 if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 
+_GRIPPER_HOMED_POSITION_Z = 166.125  # Height of the center of the gripper critical point from the deck when homed
+
 
 # TODO (spp, 2022-10-20): name this GripperMovementHandler if it doesn't handle
 #  any non-gripper implementations
@@ -89,8 +91,16 @@ class LabwareMovementHandler:
     ) -> None:
         """Move a loaded labware from one location to another using gripper."""
         use_virtual_gripper = self._state_store.config.use_virtual_gripper
+
         if use_virtual_gripper:
+            # During Analysis we will pass in hard coded estimates for certain positions only accessible during execution
+            self._state_store.geometry.check_gripper_labware_tip_collision(
+                gripper_homed_position_z=_GRIPPER_HOMED_POSITION_Z,
+                labware_id=labware_id,
+                current_location=current_location,
+            )
             return
+
         ot3api = ensure_ot3_hardware(
             hardware_api=self._hardware_api,
             error_msg="Gripper is only available on Opentrons Flex",
@@ -110,6 +120,13 @@ class LabwareMovementHandler:
         # Retract all mounts
         await ot3api.home(axes=[Axis.Z_L, Axis.Z_R, Axis.Z_G])
         gripper_homed_position = await ot3api.gantry_position(mount=gripper_mount)
+
+        # Verify that no tip collisions will occur during the move
+        self._state_store.geometry.check_gripper_labware_tip_collision(
+            gripper_homed_position_z=gripper_homed_position.z,
+            labware_id=labware_id,
+            current_location=current_location,
+        )
 
         async with self._thermocycler_plate_lifter.lift_plate_for_labware_movement(
             labware_location=current_location
@@ -135,7 +152,7 @@ class LabwareMovementHandler:
                 post_drop_slide_offset=post_drop_slide_offset,
             )
             labware_grip_force = self._state_store.labware.get_grip_force(labware_id)
-            gripper_opened = False
+            holding_labware = False
             for waypoint_data in movement_waypoints:
                 if waypoint_data.jaw_open:
                     if waypoint_data.dropping:
@@ -146,7 +163,7 @@ class LabwareMovementHandler:
                         # on the side of a falling tiprack catches the jaw.
                         await ot3api.disengage_axes([Axis.Z_G])
                     await ot3api.ungrip()
-                    gripper_opened = True
+                    holding_labware = True
                     if waypoint_data.dropping:
                         # We lost the position estimation after disengaging the axis, so
                         # it is necessary to home it next
@@ -155,12 +172,19 @@ class LabwareMovementHandler:
                     await ot3api.grip(force_newtons=labware_grip_force)
                     # we only want to check position after the gripper has opened and
                     # should be holding labware
-                    if gripper_opened:
-                        assert ot3api.hardware_gripper
-                        ot3api.hardware_gripper.check_labware_pickup(
-                            labware_width=self._state_store.labware.get_dimensions(
-                                labware_id
-                            ).y
+                    if holding_labware:
+                        labware_bbox = self._state_store.labware.get_dimensions(
+                            labware_id
+                        )
+                        well_bbox = self._state_store.labware.get_well_bbox(labware_id)
+                        ot3api.raise_error_if_gripper_pickup_failed(
+                            expected_grip_width=labware_bbox.y,
+                            grip_width_uncertainty_wider=abs(
+                                max(well_bbox.y - labware_bbox.y, 0)
+                            ),
+                            grip_width_uncertainty_narrower=abs(
+                                min(well_bbox.y - labware_bbox.y, 0)
+                            ),
                         )
                 await ot3api.move_to(
                     mount=gripper_mount, abs_position=waypoint_data.position

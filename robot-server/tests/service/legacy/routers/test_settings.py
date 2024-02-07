@@ -26,52 +26,6 @@ from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.persistence import PersistenceResetter, get_persistence_resetter
 
 
-# TODO(isk: 3/20/20): test validation errors after refactor
-# return {message: string}
-@pytest.mark.parametrize(
-    "log_level, syslog_level, expected_message",
-    [
-        ("error", "err", {"message": "Upstreaming log level changed to error"}),
-        ("ERROR", "err", {"message": "Upstreaming log level changed to error"}),
-        ("warning", "warning", {"message": "Upstreaming log level changed to warning"}),
-        ("WARNING", "warning", {"message": "Upstreaming log level changed to warning"}),
-        ("info", "info", {"message": "Upstreaming log level changed to info"}),
-        ("INFO", "info", {"message": "Upstreaming log level changed to info"}),
-        ("debug", "debug", {"message": "Upstreaming log level changed to debug"}),
-        ("DEBUG", "debug", {"message": "Upstreaming log level changed to debug"}),
-        (None, "emerg", {"message": "Upstreaming logs disabled"}),
-        (None, "emerg", {"message": "Upstreaming logs disabled"}),
-    ],
-)
-def test_post_log_level_upstream(api_client, log_level, syslog_level, expected_message):
-    with patch("opentrons.system.log_control.set_syslog_level") as m:
-        m.return_value = 0, "stdout", "stderr"
-        response = api_client.post(
-            "/settings/log_level/upstream", json={"log_level": log_level}
-        )
-        body = response.json()
-        assert response.status_code == 200
-        assert body == expected_message
-        m.assert_called_once_with(syslog_level)
-
-
-def test_post_log_level_upstream_fails_reload(api_client):
-    log_level = "debug"
-
-    with patch("opentrons.system.log_control.set_syslog_level") as m:
-        m.return_value = 1, "stdout", "stderr"
-        response = api_client.post(
-            "/settings/log_level/upstream", json={"log_level": log_level}
-        )
-        body = response.json()
-        assert response.status_code == 500
-        assert body == {
-            "message": "Could not reload config: stdout stderr",
-            "errorCode": "4000",
-        }
-        m.assert_called_once_with(log_level)
-
-
 def test_get_robot_settings(api_client, hardware):
     Conf = make_dataclass("Conf", ["a", "b", "c"])
     hardware.config = Conf(a="test", b="this", c=5)
@@ -119,7 +73,9 @@ def mock_pipette_data():
 def mock_known_pipettes(decoy: Decoy) -> Decoy:
     with patch(
         "opentrons_shared_data.pipette.mutable_configurations.known_pipettes",
-        new=decoy.mock(),
+        new=decoy.mock(
+            name="opentrons_shared_data.pipette.mutable_configurations.known_pipettes"
+        ),
     ) as m:
         yield m
 
@@ -128,7 +84,9 @@ def mock_known_pipettes(decoy: Decoy) -> Decoy:
 def mock_list_mutable_configs(decoy: Decoy) -> Decoy:
     with patch(
         "opentrons_shared_data.pipette.mutable_configurations.list_mutable_configs",
-        new=decoy.mock(),
+        new=decoy.mock(
+            name="opentrons_shared_data.pipette.mutable_configurations.list_mutable_configs"
+        ),
     ) as m:
         yield m
 
@@ -137,7 +95,9 @@ def mock_list_mutable_configs(decoy: Decoy) -> Decoy:
 def mock_list_mutable_configs_with_defaults(decoy: Decoy) -> Decoy:
     with patch(
         "opentrons_shared_data.pipette.mutable_configurations.list_mutable_configs_with_defaults",
-        new=decoy.mock(),
+        new=decoy.mock(
+            name="opentrons_shared_data.pipette.mutable_configurations.list_mutable_configs_with_defaults"
+        ),
     ) as m:
         yield m
 
@@ -146,7 +106,9 @@ def mock_list_mutable_configs_with_defaults(decoy: Decoy) -> Decoy:
 def mock_save_overrides(decoy: Decoy) -> Decoy:
     with patch(
         "opentrons_shared_data.pipette.mutable_configurations.save_overrides",
-        new=decoy.mock(),
+        new=decoy.mock(
+            name="opentrons_shared_data.pipette.mutable_configurations.save_overrides"
+        ),
     ) as m:
         yield m
 
@@ -155,7 +117,9 @@ def mock_save_overrides(decoy: Decoy) -> Decoy:
 def mock_get_opentrons_dir(decoy: Decoy) -> Decoy:
     with patch(
         "robot_server.service.legacy.routers.settings.get_opentrons_path",
-        new=decoy.mock(),
+        new=decoy.mock(
+            name="robot_server.service.legacy.routers.settings.get_opentrons_path"
+        ),
     ) as m:
         yield m
 

@@ -4,21 +4,22 @@ import { format } from 'date-fns'
 import { css } from 'styled-components'
 
 import {
-  Box,
-  Link,
-  Icon,
-  Flex,
-  SPACING,
-  COLORS,
-  TYPOGRAPHY,
+  ALIGN_CENTER,
   BORDERS,
+  Box,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
-  ALIGN_CENTER,
+  Link,
+  OVERFLOW_WRAP_ANYWHERE,
   SIZE_1,
-  useHoverTooltip,
+  SPACING,
   TOOLTIP_TOP_START,
+  TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 import { getUniqueWellProperties } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
@@ -40,21 +41,21 @@ const CLOSE_ICON_STYLE = css`
   border-radius: 50%;
 
   &:hover {
-    background: ${COLORS.lightGreyHover};
+    background: ${COLORS.grey30};
   }
   &:active {
-    background: ${COLORS.lightGreyPressed};
+    background: ${COLORS.grey35};
   }
 `
 
 const COPY_ICON_STYLE = css`
   transform: translateY(${SPACING.spacing4});
   &:hover {
-    color: ${COLORS.blueEnabled};
+    color: ${COLORS.blue50};
   }
   &:active,
   &:focus {
-    color: ${COLORS.darkBlackEnabled};
+    color: ${COLORS.black90};
   }
 `
 
@@ -122,11 +123,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
       </Flex>
       {!isCustomDefinition && (
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-          <Icon
-            color={COLORS.blueEnabled}
-            name="check-decagram"
-            height=".7rem"
-          />{' '}
+          <Icon color={COLORS.blue50} name="check-decagram" height=".7rem" />{' '}
           <StyledText
             as="label"
             id="LabwareDetails_opentronsDef"
@@ -145,7 +142,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         >
           <StyledText
             as="label"
-            color={COLORS.darkGreyEnabled}
+            color={COLORS.grey50}
             id="LabwareDetails_dateAdded"
           >
             {t('last_updated')} {format(new Date(modified), 'MM/dd/yyyy')}
@@ -163,14 +160,19 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
     <Slideout onCloseClick={props.onClose} title={slideoutHeader} isExpanded>
       <Gallery definition={definition} />
       <Box
-        backgroundColor={COLORS.fundamentalsBackground}
+        backgroundColor={COLORS.grey10}
         padding={SPACING.spacing16}
         marginBottom={SPACING.spacing24}
       >
         <StyledText as="h6">{t('api_name')}</StyledText>
-        <Link css={TYPOGRAPHY.pRegular} onClick={handleCopy} role="button">
-          <Flex overflowWrap="anywhere">
-            <Box fontSize={TYPOGRAPHY.fontSizeP} color={COLORS.black}>
+        <Link
+          css={TYPOGRAPHY.pRegular}
+          onClick={handleCopy}
+          role="button"
+          aria-label="copy"
+        >
+          <Flex overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
+            <Box fontSize={TYPOGRAPHY.fontSizeP} color={COLORS.black90}>
               {apiName}
               <span {...targetProps}>
                 <Icon size={SIZE_1} name="copy-text" css={COPY_ICON_STYLE} />

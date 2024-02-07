@@ -3,7 +3,7 @@ import * as React from 'react'
 import { when } from 'jest-when'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { useCurrentProtocol } from '../../../ProtocolUpload/hooks'
 import { useProtocolMetadata } from '../useProtocolMetadata'
 
@@ -42,9 +42,9 @@ describe('useProtocolMetadata', () => {
   })
 
   it('should return author, lastUpdated, method, description, and robot type', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    )
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <Provider store={store}>{children}</Provider>
     const { result } = renderHook(useProtocolMetadata, { wrapper })
     const {
       author,

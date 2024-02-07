@@ -71,6 +71,12 @@ class SyncClient:
             definition=definition,
         )
 
+    def add_addressable_area(self, addressable_area_name: str) -> None:
+        """Add an addressable area to the engine's state."""
+        self._transport.call_method(
+            "add_addressable_area", addressable_area_name=addressable_area_name
+        )
+
     def add_liquid(
         self, name: str, color: Optional[str], description: Optional[str]
     ) -> Liquid:
@@ -204,6 +210,34 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
 
         return cast(commands.MoveToAddressableAreaResult, result)
+
+    def move_to_addressable_area_for_drop_tip(
+        self,
+        pipette_id: str,
+        addressable_area_name: str,
+        offset: AddressableOffsetVector,
+        minimum_z_height: Optional[float],
+        force_direct: bool,
+        speed: Optional[float],
+        alternate_drop_location: Optional[bool],
+        ignore_tip_configuration: Optional[bool] = True,
+    ) -> commands.MoveToAddressableAreaForDropTipResult:
+        """Execute a MoveToAddressableArea command and return the result."""
+        request = commands.MoveToAddressableAreaForDropTipCreate(
+            params=commands.MoveToAddressableAreaForDropTipParams(
+                pipetteId=pipette_id,
+                addressableAreaName=addressable_area_name,
+                offset=offset,
+                forceDirect=force_direct,
+                minimumZHeight=minimum_z_height,
+                speed=speed,
+                alternateDropLocation=alternate_drop_location,
+                ignoreTipConfiguration=ignore_tip_configuration,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+
+        return cast(commands.MoveToAddressableAreaForDropTipResult, result)
 
     def move_to_coordinates(
         self,

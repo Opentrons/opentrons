@@ -3,17 +3,18 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
-  Flex,
   ALIGN_CENTER,
-  DIRECTION_COLUMN,
-  JUSTIFY_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  COLORS,
-  JUSTIFY_SPACE_AROUND,
-  TYPOGRAPHY,
-  Box,
   BORDERS,
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_CENTER,
+  JUSTIFY_SPACE_AROUND,
+  JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_WRAP_ANYWHERE,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '../../redux/config'
@@ -61,13 +62,17 @@ export function WizardRequiredEquipmentList(
                 paddingY={SPACING.spacing4}
                 key={`${index}_${requiredEquipmentProps.loadName}`}
               >
-                <StyledText fontSize="1.25rem" paddingY={SPACING.spacing12}>
+                <StyledText
+                  fontSize={TYPOGRAPHY.fontSize20}
+                  paddingY={SPACING.spacing12}
+                  overflowWrap={OVERFLOW_WRAP_ANYWHERE}
+                >
                   {requiredEquipmentProps.displayName}
                 </StyledText>
                 {/* do not show divider after the last equipment in the list */}
                 {index + 1 === Object.keys(equipmentList).length ? null : (
                   <Box
-                    borderBottom={`1px solid ${COLORS.darkBlackEnabled}${COLORS.opacity20HexCode}`}
+                    borderBottom={`1px solid ${COLORS.black90}${COLORS.opacity20HexCode}`}
                   />
                 )}
               </Box>
@@ -94,7 +99,7 @@ export function WizardRequiredEquipmentList(
             <StyledText
               marginTop={SPACING.spacing8}
               as="label"
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.grey50}
             >
               {footer}
             </StyledText>
@@ -156,7 +161,7 @@ function RequiredEquipmentCard(props: RequiredEquipmentCardProps): JSX.Element {
         >
           <StyledText as="p">{displayName}</StyledText>
           {subtitle != null ? (
-            <StyledText as="p" color={COLORS.darkGreyEnabled}>
+            <StyledText as="p" color={COLORS.grey50}>
               {subtitle}
             </StyledText>
           ) : null}

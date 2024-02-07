@@ -88,7 +88,7 @@ export function ConfirmCancelModal(
               </Link>
             )}
             <AlertPrimaryButton
-              backgroundColor={COLORS.errorEnabled}
+              backgroundColor={COLORS.red50}
               onClick={cancelRun}
               disabled={isCanceling}
               minWidth="8rem"

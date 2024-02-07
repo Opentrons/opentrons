@@ -26,7 +26,6 @@ import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { Modal } from '../../molecules/Modal'
 import { getIsOnDevice } from '../../redux/config'
-import { DISENGAGED } from './constants'
 
 import type {
   ModalHeaderBaseProps,
@@ -79,7 +78,7 @@ function TouchscreenModal({
   const modalHeader: ModalHeaderBaseProps = {
     title: t('estop_pressed'),
     iconName: 'ot-alert',
-    iconColor: COLORS.red2,
+    iconColor: COLORS.red50,
   }
   const modalProps = {
     header: { ...modalHeader },
@@ -133,10 +132,7 @@ function DesktopModal({
 }: EstopPressedModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const [isResuming, setIsResuming] = React.useState<boolean>(false)
-  const {
-    acknowledgeEstopDisengage,
-    data,
-  } = useAcknowledgeEstopDisengageMutation()
+  const { acknowledgeEstopDisengage } = useAcknowledgeEstopDisengageMutation()
 
   const handleCloseModal = (): void => {
     if (setIsDismissedModal != null) {
@@ -155,20 +151,17 @@ function DesktopModal({
   }
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (e): void => {
+    e.preventDefault()
     setIsResuming(true)
     acknowledgeEstopDisengage({
-      onSuccess: () => {},
+      onSuccess: () => {
+        closeModal()
+      },
       onError: () => {
         setIsResuming(false)
       },
     })
   }
-
-  React.useEffect(() => {
-    if (data?.data.status === DISENGAGED) {
-      closeModal()
-    }
-  }, [data?.data.status, closeModal])
 
   return (
     <LegacyModal {...modalProps}>
@@ -176,7 +169,7 @@ function DesktopModal({
         <Banner type={isEngaged ? 'error' : 'success'}>
           {isEngaged ? t('estop_engaged') : t('estop_disengaged')}
         </Banner>
-        <StyledText as="p" color={COLORS.darkBlack90}>
+        <StyledText as="p" color={COLORS.grey60}>
           {t('estop_pressed_description')}
         </StyledText>
         <Flex justifyContent={JUSTIFY_FLEX_END}>

@@ -4,6 +4,37 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 [technical change log]: https://github.com/Opentrons/opentrons/releases
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
+---
+
+## Opentrons Robot Software Changes in [!!EDIT ME WITH THE ACTUAL NUMBER OF THE NEXT RELEASE!!]
+
+### HTTP API
+
+- In the `/runs/commands`, `/maintenance_runs/commands`, and `/protocols` endpoints, the `dispense` command will now return an error if you try to dispense more than you've aspirated, instead of silently clamping.
+- The `/notifications/subscribe` WebSocket endpoint has been removed. See https://github.com/Opentrons/opentrons/pull/14280 for details.
+- The `/runs/commands` endpoints are significantly faster when you request a small number of commands from a stored run.
+
+### Other Changes
+
+- The `notify_server` Python package has been removed. See https://github.com/Opentrons/opentrons/pull/14280 for details.
+
+### Upgrade Notes
+
+This update may take longer than usual if your robot has a lot of long protocols and runs stored on it. Allow **approximately 25 minutes** for your robot to restart. This delay will only happen once.
+
+If you don't care about preserving your labware offsets and run history, you can avoid the delay. Clear your runs and protocols before starting this update. Go to **Robot Settings** > **Device Reset** and select **Clear protocol run history**.
+
+---
+
+## Opentrons Robot Software Changes in 7.1.1
+
+Welcome to the v7.1.1 release of the Opentrons robot software!
+
+### Bug Fixes
+
+- Fixed an issue with the pipette definition for Flex 1-Channel 1000 µL pipettes.
+
+---
 
 ## Opentrons Robot Software Changes in 7.1.0
 
@@ -18,6 +49,7 @@ Welcome to the v7.1.0 release of the Opentrons robot software! This release incl
 
 ### Improved Features
 
+- The Ethernet port on Flex now supports direct connection to a computer.
 - Improves aspirate, dispense, and mix behavior with volumes set to zero.
 - The `opentrons_simulate` command-line tool now works with all Python API versions.
 

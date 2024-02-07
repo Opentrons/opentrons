@@ -1,11 +1,8 @@
+import 'jest-styled-components'
 import * as React from 'react'
 import { renderWithProviders } from '../../../testing/utils'
-import {
-  COLORS,
-  BORDERS,
-  TYPOGRAPHY,
-  SPACING,
-} from '../../../ui-style-constants'
+import { COLORS } from '../../../helix-design-system'
+import { BORDERS, TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
 
 import { AlertPrimaryButton } from '../AlertPrimaryButton'
 
@@ -25,7 +22,7 @@ describe('AlertPrimaryButton', () => {
   it('renders alert primary button with text', () => {
     const { getByText } = render(props)
     const button = getByText('alert primary button')
-    expect(button).toHaveStyle(`background-color: ${COLORS.errorEnabled}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.red50}`)
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16}`
     )

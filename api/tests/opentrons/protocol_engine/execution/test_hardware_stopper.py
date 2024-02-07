@@ -15,7 +15,12 @@ from opentrons.protocol_engine.execution import (
     TipHandler,
     HardwareStopper,
 )
-from opentrons.protocol_engine.types import MotorAxis, TipGeometry, PostRunHardwareState
+from opentrons.protocol_engine.types import (
+    MotorAxis,
+    TipGeometry,
+    PostRunHardwareState,
+    AddressableOffsetVector,
+)
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
@@ -91,7 +96,7 @@ async def test_hardware_stopping_sequence(
     post_run_hardware_state: PostRunHardwareState,
     expected_home_after: bool,
 ) -> None:
-    """It should stop the hardware, home the robot and perform drop tip if required."""
+    """It should stop the hardware, and home the robot. Flex no longer performs automatic drop tip.."""
     decoy.when(state_store.pipettes.get_all_attached_tips()).then_return(
         [
             ("pipette-id", TipGeometry(length=1.0, volume=2.0, diameter=3.0)),
@@ -99,7 +104,8 @@ async def test_hardware_stopping_sequence(
     )
 
     await subject.do_stop_and_recover(
-        drop_tips_after_run=True, post_run_hardware_state=post_run_hardware_state
+        drop_tips_after_run=True,
+        post_run_hardware_state=post_run_hardware_state,
     )
 
     decoy.verify(
@@ -107,16 +113,6 @@ async def test_hardware_stopping_sequence(
         await movement.home(
             axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
         ),
-        await mock_tip_handler.add_tip(
-            pipette_id="pipette-id",
-            tip=TipGeometry(length=1.0, volume=2.0, diameter=3.0),
-        ),
-        await movement.move_to_well(
-            pipette_id="pipette-id",
-            labware_id="fixedTrash",
-            well_name="A1",
-        ),
-        await mock_tip_handler.drop_tip(pipette_id="pipette-id", home_after=False),
         await hardware_api.stop(home_after=expected_home_after),
     )
 
@@ -210,7 +206,7 @@ async def test_hardware_stopping_sequence_with_gripper(
     movement: MovementHandler,
     mock_tip_handler: TipHandler,
 ) -> None:
-    """It should stop the hardware, home the robot and perform drop tip if required."""
+    """It should stop the hardware, and home the robot. Flex no longer performs automatic drop tip."""
     subject = HardwareStopper(
         hardware_api=ot3_hardware_api,
         state_store=state_store,
@@ -224,6 +220,46 @@ async def test_hardware_stopping_sequence_with_gripper(
     )
     decoy.when(state_store.config.use_virtual_gripper).then_return(False)
     decoy.when(ot3_hardware_api.has_gripper()).then_return(True)
+
+    await subject.do_stop_and_recover(
+        drop_tips_after_run=True,
+        post_run_hardware_state=PostRunHardwareState.HOME_AND_STAY_ENGAGED,
+    )
+
+    decoy.verify(
+        await ot3_hardware_api.stop(home_after=False),
+        await ot3_hardware_api.home_z(mount=OT3Mount.GRIPPER),
+        await movement.home(
+            axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
+        ),
+        await ot3_hardware_api.stop(home_after=True),
+    )
+
+
+@pytest.mark.ot3_only
+async def test_hardware_stopping_sequence_with_fixed_trash(
+    decoy: Decoy,
+    state_store: StateStore,
+    ot3_hardware_api: OT3API,
+    movement: MovementHandler,
+    mock_tip_handler: TipHandler,
+) -> None:
+    """It should stop the hardware, and home the robot. Flex no longer performs automatic drop tip."""
+    subject = HardwareStopper(
+        hardware_api=ot3_hardware_api,
+        state_store=state_store,
+        movement=movement,
+        tip_handler=mock_tip_handler,
+    )
+    decoy.when(state_store.pipettes.get_all_attached_tips()).then_return(
+        [
+            ("pipette-id", TipGeometry(length=1.0, volume=2.0, diameter=3.0)),
+        ]
+    )
+    decoy.when(state_store.labware.get_fixed_trash_id()).then_return("fixedTrash")
+    decoy.when(state_store.config.use_virtual_gripper).then_return(False)
+    decoy.when(ot3_hardware_api.has_gripper()).then_return(True)
+
     await subject.do_stop_and_recover(
         drop_tips_after_run=True,
         post_run_hardware_state=PostRunHardwareState.HOME_AND_STAY_ENGAGED,
@@ -249,4 +285,56 @@ async def test_hardware_stopping_sequence_with_gripper(
             home_after=False,
         ),
         await ot3_hardware_api.stop(home_after=True),
+    )
+
+
+async def test_hardware_stopping_sequence_with_OT2_addressable_area(
+    decoy: Decoy,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    movement: MovementHandler,
+    mock_tip_handler: TipHandler,
+) -> None:
+    """It should stop the hardware, and home the robot. Flex no longer performs automatic drop tip."""
+    subject = HardwareStopper(
+        hardware_api=hardware_api,
+        state_store=state_store,
+        movement=movement,
+        tip_handler=mock_tip_handler,
+    )
+    decoy.when(state_store.pipettes.get_all_attached_tips()).then_return(
+        [
+            ("pipette-id", TipGeometry(length=1.0, volume=2.0, diameter=3.0)),
+        ]
+    )
+    decoy.when(state_store.config.robot_type).then_return("OT-2 Standard")
+    decoy.when(state_store.config.use_virtual_gripper).then_return(False)
+
+    await subject.do_stop_and_recover(
+        drop_tips_after_run=True,
+        post_run_hardware_state=PostRunHardwareState.HOME_AND_STAY_ENGAGED,
+    )
+
+    decoy.verify(
+        await hardware_api.stop(home_after=False),
+        await movement.home(
+            axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
+        ),
+        await mock_tip_handler.add_tip(
+            pipette_id="pipette-id",
+            tip=TipGeometry(length=1.0, volume=2.0, diameter=3.0),
+        ),
+        await movement.move_to_addressable_area(
+            pipette_id="pipette-id",
+            addressable_area_name="fixedTrash",
+            offset=AddressableOffsetVector(x=0, y=0, z=0),
+            force_direct=False,
+            speed=None,
+            minimum_z_height=None,
+        ),
+        await mock_tip_handler.drop_tip(
+            pipette_id="pipette-id",
+            home_after=False,
+        ),
+        await hardware_api.stop(home_after=True),
     )

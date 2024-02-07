@@ -1,8 +1,9 @@
 """Test Width."""
-from typing import List, Union, Tuple, Optional
+from typing import List, Union, Tuple, Optional, cast
 
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons.hardware_control.backends.ot3controller import OT3Controller
 
 from hardware_testing.data import ui
 from hardware_testing.data.csv_report import (
@@ -64,7 +65,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         # fake the encoder to be in the right place, during simulation
         if api.is_simulator:
             sim_enc_pox = (max_width - width) / 2.0
-            api._backend._encoder_position[NodeId.gripper_g] = sim_enc_pox
+            cast(OT3Controller, api._backend)._encoder_position[
+                NodeId.gripper_g
+            ] = sim_enc_pox
             await api.refresh_positions()
         _width_actual = api._gripper_handler.get_gripper().jaw_width
         assert _width_actual is not None

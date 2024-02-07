@@ -27,6 +27,8 @@ import {
   SINGLE_RIGHT_CUTOUTS,
   SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_RIGHT_SLOT_FIXTURE,
+  THERMOCYCLER_MODULE_V1,
+  THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 import { Portal } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
@@ -44,6 +46,7 @@ import type {
 interface LocationConflictModalProps {
   onCloseClick: () => void
   cutoutId: CutoutId
+  missingLabwareDisplayName?: string | null
   requiredFixtureId?: CutoutFixtureId
   requiredModule?: ModuleModel
   isOnDevice?: boolean
@@ -55,6 +58,7 @@ export const LocationConflictModal = (
   const {
     onCloseClick,
     cutoutId,
+    missingLabwareDisplayName,
     requiredFixtureId,
     requiredModule,
     isOnDevice = false,
@@ -65,10 +69,25 @@ export const LocationConflictModal = (
   const deckConfigurationAtLocationFixtureId = deckConfig.find(
     (deckFixture: CutoutConfig) => deckFixture.cutoutId === cutoutId
   )?.cutoutFixtureId
+
+  const isThermocycler =
+    requiredModule === THERMOCYCLER_MODULE_V1 ||
+    requiredModule === THERMOCYCLER_MODULE_V2
+
   const currentFixtureDisplayName =
     deckConfigurationAtLocationFixtureId != null
       ? getFixtureDisplayName(deckConfigurationAtLocationFixtureId)
       : ''
+
+  // get fixture display name at A1 for themocycler if B1 is slot
+  const deckConfigurationAtA1 = deckConfig.find(
+    (deckFixture: CutoutConfig) => deckFixture.cutoutId === 'cutoutA1'
+  )?.cutoutFixtureId
+
+  const currentThermocyclerFixtureDisplayName =
+    currentFixtureDisplayName === 'Slot' && deckConfigurationAtA1 != null
+      ? getFixtureDisplayName(deckConfigurationAtA1)
+      : currentFixtureDisplayName
 
   const handleUpdateDeck = (): void => {
     if (requiredFixtureId != null) {
@@ -91,9 +110,27 @@ export const LocationConflictModal = (
           : fixture
       )
 
-      updateDeckConfiguration(newSingleSlotDeckConfig)
+      // add A1 and B1 single slot config for thermocycler
+      const newThermocyclerDeckConfig = isThermocycler
+        ? newSingleSlotDeckConfig.map(fixture =>
+            fixture.cutoutId === 'cutoutA1' || fixture.cutoutId === 'cutoutB1'
+              ? { ...fixture, cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE }
+              : fixture
+          )
+        : newSingleSlotDeckConfig
+
+      updateDeckConfiguration(newThermocyclerDeckConfig)
     }
     onCloseClick()
+  }
+
+  let protocolSpecifiesDisplayName = ''
+  if (missingLabwareDisplayName != null) {
+    protocolSpecifiesDisplayName = missingLabwareDisplayName
+  } else if (requiredFixtureId != null) {
+    protocolSpecifiesDisplayName = getFixtureDisplayName(requiredFixtureId)
+  } else if (requiredModule != null) {
+    protocolSpecifiesDisplayName = getModuleDisplayName(requiredModule)
   }
 
   return (
@@ -106,13 +143,17 @@ export const LocationConflictModal = (
             hasExitIcon: true,
             onClick: onCloseClick,
             iconName: 'ot-alert',
-            iconColor: COLORS.warningEnabled,
+            iconColor: COLORS.yellow50,
           }}
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <Trans
               t={t}
-              i18nKey="deck_conflict_info"
+              i18nKey={
+                isThermocycler
+                  ? 'deck_conflict_info_thermocycler'
+                  : 'deck_conflict_info'
+              }
               values={{
                 currentFixture: currentFixtureDisplayName,
                 cutout: getCutoutDisplayName(cutoutId),
@@ -129,7 +170,9 @@ export const LocationConflictModal = (
                 paddingBottom={SPACING.spacing8}
               >
                 {t('slot_location', {
-                  slotName: getCutoutDisplayName(cutoutId),
+                  slotName: isThermocycler
+                    ? 'A1 + B1'
+                    : getCutoutDisplayName(cutoutId),
                 })}
               </StyledText>
               <Flex
@@ -139,7 +182,7 @@ export const LocationConflictModal = (
               >
                 <Flex
                   padding={SPACING.spacing24}
-                  backgroundColor={COLORS.light1}
+                  backgroundColor={COLORS.grey35}
                   flexDirection={DIRECTION_ROW}
                   alignItems={ALIGN_CENTER}
                   justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -149,16 +192,13 @@ export const LocationConflictModal = (
                     {t('protocol_specifies')}
                   </StyledText>
 
-                  <StyledText as="p">
-                    {requiredFixtureId != null &&
-                      getFixtureDisplayName(requiredFixtureId)}
-                    {requiredModule != null &&
-                      getModuleDisplayName(requiredModule)}
+                  <StyledText as="p" color={COLORS.grey60}>
+                    {protocolSpecifiesDisplayName}
                   </StyledText>
                 </Flex>
                 <Flex
                   padding={SPACING.spacing24}
-                  backgroundColor={COLORS.light1}
+                  backgroundColor={COLORS.grey35}
                   flexDirection={DIRECTION_ROW}
                   justifyContent={JUSTIFY_SPACE_BETWEEN}
                   alignItems={ALIGN_CENTER}
@@ -168,7 +208,9 @@ export const LocationConflictModal = (
                     {t('currently_configured')}
                   </StyledText>
 
-                  <StyledText as="p">{currentFixtureDisplayName}</StyledText>
+                  <StyledText as="p" color={COLORS.grey60}>
+                    {currentFixtureDisplayName}
+                  </StyledText>
                 </Flex>
               </Flex>
             </Flex>
@@ -199,7 +241,7 @@ export const LocationConflictModal = (
               gridGap={SPACING.spacing10}
               alignItems={ALIGN_CENTER}
             >
-              <Icon name="ot-alert" size="1rem" color={COLORS.warningEnabled} />
+              <Icon name="ot-alert" size="1rem" color={COLORS.yellow50} />
               <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {t('deck_conflict')}
               </StyledText>
@@ -211,7 +253,11 @@ export const LocationConflictModal = (
           <Flex flexDirection={DIRECTION_COLUMN}>
             <Trans
               t={t}
-              i18nKey="deck_conflict_info"
+              i18nKey={
+                isThermocycler
+                  ? 'deck_conflict_info_thermocycler'
+                  : 'deck_conflict_info'
+              }
               values={{
                 currentFixture: currentFixtureDisplayName,
                 cutout: getCutoutDisplayName(cutoutId),
@@ -227,7 +273,9 @@ export const LocationConflictModal = (
                 fontWeight={TYPOGRAPHY.fontWeightBold}
               >
                 {t('slot_location', {
-                  slotName: getCutoutDisplayName(cutoutId),
+                  slotName: isThermocycler
+                    ? 'A1 + B1'
+                    : getCutoutDisplayName(cutoutId),
                 })}
               </StyledText>
               <Flex
@@ -237,26 +285,23 @@ export const LocationConflictModal = (
               >
                 <Flex
                   padding={SPACING.spacing8}
-                  backgroundColor={COLORS.fundamentalsBackground}
+                  backgroundColor={COLORS.grey20}
                   flexDirection={DIRECTION_ROW}
                   gridGap={SPACING.spacing20}
                   alignItems={ALIGN_CENTER}
                 >
                   <Box width="107px">
-                    <StyledText as="label">
+                    <StyledText as="label" color={COLORS.grey60}>
                       {t('protocol_specifies')}
                     </StyledText>
                   </Box>
                   <StyledText as="label">
-                    {requiredFixtureId != null &&
-                      getFixtureDisplayName(requiredFixtureId)}
-                    {requiredModule != null &&
-                      getModuleDisplayName(requiredModule)}
+                    {protocolSpecifiesDisplayName}
                   </StyledText>
                 </Flex>
                 <Flex
                   padding={SPACING.spacing8}
-                  backgroundColor={COLORS.fundamentalsBackground}
+                  backgroundColor={COLORS.grey10}
                   flexDirection={DIRECTION_ROW}
                   gridGap={SPACING.spacing20}
                   alignItems={ALIGN_CENTER}
@@ -267,7 +312,9 @@ export const LocationConflictModal = (
                     </StyledText>
                   </Box>
                   <StyledText as="label">
-                    {currentFixtureDisplayName}
+                    {isThermocycler
+                      ? currentThermocyclerFixtureDisplayName
+                      : currentFixtureDisplayName}
                   </StyledText>
                 </Flex>
               </Flex>

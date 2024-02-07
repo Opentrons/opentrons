@@ -3,17 +3,18 @@ import { css, keyframes } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  COLORS,
-  DIRECTION_ROW,
-  SPACING,
-  TYPOGRAPHY,
-  DIRECTION_COLUMN,
-  BORDERS,
-  JUSTIFY_SPACE_BETWEEN,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_WRAP_ANYWHERE,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
@@ -55,7 +56,7 @@ to {
 `
 
 const TITLE_TEXT_STYLE = css`
-  color: ${COLORS.darkBlack70};
+  color: ${COLORS.grey60};
   font-size: 1.75rem;
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   line-height: 2.25rem;
@@ -63,7 +64,7 @@ const TITLE_TEXT_STYLE = css`
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  overflow-wrap: anywhere;
+  overflow-wrap: ${OVERFLOW_WRAP_ANYWHERE};
   height: max-content;
 `
 
@@ -71,7 +72,7 @@ const RUN_TIMER_STYLE = css`
   font-size: 2rem;
   font-weight: ${TYPOGRAPHY.fontWeightBold};
   line-height: 2.625rem;
-  color: ${COLORS.darkBlackEnabled};
+  color: ${COLORS.black90};
 `
 
 const COMMAND_ROW_STYLE_ANIMATED = css`
@@ -225,7 +226,7 @@ export function CurrentRunningProtocolCommand({
       </Flex>
       <Flex
         padding={`${SPACING.spacing12} ${SPACING.spacing24}`}
-        backgroundColor={COLORS.mediumBlueEnabled}
+        backgroundColor={COLORS.blue35}
         borderRadius={BORDERS.borderRadiusSize2}
         justifyContent={JUSTIFY_CENTER}
         css={shouldAnimate ? COMMAND_ROW_STYLE_ANIMATED : COMMAND_ROW_STYLE}

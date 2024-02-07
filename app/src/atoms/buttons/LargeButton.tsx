@@ -43,21 +43,21 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     }
   > = {
     secondary: {
-      defaultColor: COLORS.darkBlackEnabled,
-      defaultBackgroundColor: COLORS.mediumBlueEnabled,
-      activeBackgroundColor: COLORS.mediumBluePressed,
-      iconColor: COLORS.blueEnabled,
+      defaultColor: COLORS.black90,
+      defaultBackgroundColor: COLORS.blue35,
+      activeBackgroundColor: COLORS.blue40,
+      iconColor: COLORS.blue50,
     },
     alert: {
-      defaultColor: COLORS.red1,
-      defaultBackgroundColor: COLORS.red3,
-      activeBackgroundColor: COLORS.red3Pressed,
-      iconColor: COLORS.red1,
+      defaultColor: COLORS.red60,
+      defaultBackgroundColor: COLORS.red35,
+      activeBackgroundColor: COLORS.red40,
+      iconColor: COLORS.red60,
     },
     primary: {
       defaultColor: COLORS.white,
-      defaultBackgroundColor: COLORS.blueEnabled,
-      activeBackgroundColor: COLORS.bluePressed,
+      defaultBackgroundColor: COLORS.blue50,
+      activeBackgroundColor: COLORS.blue60,
       iconColor: COLORS.white,
     },
   }
@@ -97,15 +97,14 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     }
 
     &:disabled {
-      background-color: ${COLORS.darkBlack20};
-      color: ${COLORS.darkBlack60};
+      background-color: ${COLORS.grey35};
+      color: ${COLORS.grey50};
     }
   `
   return (
     <Btn
       display={DISPLAY_FLEX}
       css={LARGE_BUTTON_STYLE}
-      aria-label={`LargeButton_${buttonType}`}
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       disabled={disabled}
@@ -120,10 +119,10 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       </StyledText>
       <Icon
         name={iconName}
-        aria-label={`LargeButton_${iconName}`}
+        aria-label={`${iconName} icon`}
         color={
           disabled
-            ? COLORS.darkBlack60
+            ? COLORS.grey50
             : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
         }
         size="5rem"

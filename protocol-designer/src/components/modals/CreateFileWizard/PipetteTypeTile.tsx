@@ -1,6 +1,6 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { FormikProps } from 'formik'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -10,8 +10,6 @@ import {
   ALIGN_CENTER,
   PrimaryButton,
   JUSTIFY_SPACE_BETWEEN,
-  LEFT,
-  RIGHT,
   InstrumentDiagram,
 } from '@opentrons/components'
 import {
@@ -21,14 +19,16 @@ import {
   OT3_PIPETTES,
   getAllPipetteNames,
   getPipetteNameSpecs,
+  LEFT,
+  RIGHT,
 } from '@opentrons/shared-data'
 
-import { i18n } from '../../../localization'
 import { GoBack } from './GoBack'
 import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
 
 import type { FormState, WizardTileProps } from './types'
+import type { UseFormReturn } from 'react-hook-form'
 
 export function FirstPipetteTypeTile(
   props: Omit<
@@ -36,6 +36,7 @@ export function FirstPipetteTypeTile(
     'mount' | 'allowNoPipette' | 'display96Channel' | 'tileHeader'
   >
 ): JSX.Element {
+  const { t } = useTranslation('modal')
   const mount = LEFT
   return (
     <PipetteTypeTile
@@ -43,7 +44,7 @@ export function FirstPipetteTypeTile(
       mount={mount}
       allowNoPipette={false}
       display96Channel={true}
-      tileHeader={i18n.t('modal.create_file_wizard.choose_left_pipette')}
+      tileHeader={t('choose_left_pipette')}
     />
   )
 }
@@ -53,7 +54,9 @@ export function SecondPipetteTypeTile(
     'mount' | 'allowNoPipette' | 'display96Channel' | 'tileHeader'
   >
 ): JSX.Element | null {
-  if (props.values.pipettesByMount.left.pipetteName === 'p1000_96') {
+  const { t } = useTranslation('modal')
+  const pipettesByMount = props.watch('pipettesByMount')
+  if (pipettesByMount.left.pipetteName === 'p1000_96') {
     props.proceed(2)
     return null
   } else {
@@ -63,7 +66,7 @@ export function SecondPipetteTypeTile(
         mount={RIGHT}
         allowNoPipette
         display96Channel={false}
-        tileHeader={i18n.t('modal.create_file_wizard.choose_right_pipette')}
+        tileHeader={t('choose_right_pipette')}
       />
     )
   }
@@ -82,6 +85,7 @@ export function PipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
     proceed,
     goBack,
   } = props
+  const { t } = useTranslation('application')
 
   return (
     <HandleEnter onEnter={proceed}>
@@ -109,36 +113,31 @@ export function PipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
           width="100%"
         >
           <GoBack onClick={() => goBack()} />
-          <PrimaryButton onClick={() => proceed()}>
-            {i18n.t('application.next')}
-          </PrimaryButton>
+          <PrimaryButton onClick={() => proceed()}>{t('next')}</PrimaryButton>
         </Flex>
       </Flex>
     </HandleEnter>
   )
 }
 
-interface OT2FieldProps extends FormikProps<FormState> {
+interface OT2FieldProps extends UseFormReturn<FormState> {
   mount: Mount
   allowNoPipette: boolean
   display96Channel: boolean
 }
 
 function PipetteField(props: OT2FieldProps): JSX.Element {
-  const {
-    mount,
-    values,
-    setFieldValue,
-    allowNoPipette,
-    display96Channel,
-  } = props
-  const robotType = values.fields.robotType
+  const { mount, watch, allowNoPipette, setValue, display96Channel } = props
+  const fields = watch('fields')
+  const pipettesByMount = watch('pipettesByMount')
+
   const pipetteOptions = React.useMemo(() => {
     const allPipetteOptions = getAllPipetteNames('maxVolume', 'channels')
       .filter(name =>
-        (robotType === OT2_ROBOT_TYPE ? OT2_PIPETTES : OT3_PIPETTES).includes(
-          name
-        )
+        (fields.robotType === OT2_ROBOT_TYPE
+          ? OT2_PIPETTES
+          : OT3_PIPETTES
+        ).includes(name)
       )
       .map(name => ({
         value: name,
@@ -151,23 +150,17 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
           ...allPipetteOptions.filter(o => o.value !== 'p1000_96'),
           ...noneOption,
         ]
-  }, [robotType])
-  const nameAccessor = `pipettesByMount.${mount}.pipetteName`
-  const currentValue = values.pipettesByMount[mount].pipetteName
+  }, [fields.robotType])
+
+  const currentValue = pipettesByMount[mount].pipetteName
   React.useEffect(() => {
     if (currentValue === undefined) {
-      setFieldValue(
-        nameAccessor,
+      setValue(
+        `pipettesByMount.${mount}.pipetteName`,
         allowNoPipette ? '' : pipetteOptions[0]?.value ?? ''
       )
     }
-  }, [
-    currentValue,
-    setFieldValue,
-    nameAccessor,
-    allowNoPipette,
-    pipetteOptions,
-  ])
+  }, [])
 
   return (
     <Flex
@@ -193,7 +186,7 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
           }
           text={o.name}
           onClick={() => {
-            setFieldValue(nameAccessor, o.value)
+            setValue(`pipettesByMount.${mount}.pipetteName`, o.value)
           }}
           width={pipetteOptions.length > 5 ? '14.5rem' : '21.75rem'}
           minHeight="4rem"

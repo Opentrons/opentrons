@@ -641,6 +641,35 @@ class GripperJawStateResponse(BaseMessage):  # noqa: D101
 
 
 @dataclass
+class SetGripperJawHoldoffRequest(BaseMessage):  # noqa: D101
+    payload: payloads.GripperJawHoldoffPayload
+    payload_type: Type[
+        payloads.GripperJawHoldoffPayload
+    ] = payloads.GripperJawHoldoffPayload
+    message_id: Literal[
+        MessageId.set_gripper_jaw_holdoff_request
+    ] = MessageId.set_gripper_jaw_holdoff_request
+
+
+@dataclass
+class GripperJawHoldoffResponse(BaseMessage):  # noqa: D101
+    payload: payloads.GripperJawHoldoffPayload
+    payload_type: Type[
+        payloads.GripperJawHoldoffPayload
+    ] = payloads.GripperJawHoldoffPayload
+    message_id: Literal[
+        MessageId.gripper_jaw_holdoff_response
+    ] = MessageId.gripper_jaw_holdoff_response
+
+
+@dataclass
+class GripperJawHoldoffRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[
+        MessageId.gripper_jaw_holdoff_request
+    ] = MessageId.gripper_jaw_holdoff_request
+
+
+@dataclass
 class GripperGripRequest(BaseMessage):  # noqa: D101
     payload: payloads.GripperMoveRequestPayload
     payload_type: Type[
@@ -869,3 +898,12 @@ class GetMotorUsageResponse(BaseMessage):
     message_id: Literal[
         MessageId.get_motor_usage_response
     ] = MessageId.get_motor_usage_response
+
+
+@dataclass
+class HepaUVInfoResponse(BaseMessage):  # noqa: D101
+    payload: payloads.HepaUVInfoResponsePayload
+    payload_type: Type[
+        payloads.HepaUVInfoResponsePayload
+    ] = payloads.HepaUVInfoResponsePayload
+    message_id: Literal[MessageId.hepauv_info_response] = MessageId.hepauv_info_response

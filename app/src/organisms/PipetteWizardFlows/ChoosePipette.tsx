@@ -49,7 +49,7 @@ import type { SelectablePipettes } from './types'
 
 const UNSELECTED_OPTIONS_STYLE = css`
   background-color: ${COLORS.white};
-  border: 1px solid ${COLORS.medGreyEnabled};
+  border: 1px solid ${COLORS.grey30};
   border-radius: ${BORDERS.radiusSoftCorners};
   height: 14.5625rem;
   width: 14.5625rem;
@@ -60,14 +60,15 @@ const UNSELECTED_OPTIONS_STYLE = css`
   grid-gap: ${SPACING.spacing8}
 
   &:hover {
-    border: 1px solid ${COLORS.medGreyHover};
+    border: 1px solid ${COLORS.grey35};
+    background-color: ${COLORS.grey10}
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     flex-direction: ${DIRECTION_ROW};
     justify-content: ${JUSTIFY_FLEX_START};
-    background-color: ${COLORS.mediumBlueEnabled};
-    border-width: 0; 
+    background-color: ${COLORS.blue35};
+    border-width: 0;
     border-radius: ${BORDERS.borderRadiusSize4};
     padding: ${SPACING.spacing24};
     height: 5.25rem;
@@ -80,22 +81,22 @@ const UNSELECTED_OPTIONS_STYLE = css`
 `
 const SELECTED_OPTIONS_STYLE = css`
   ${UNSELECTED_OPTIONS_STYLE}
-  border: 1px solid ${COLORS.blueEnabled};
-  background-color: ${COLORS.lightBlue};
+  border: 1px solid ${COLORS.blue50};
+  background-color: ${COLORS.blue10};
 
   &:hover {
-    border: 1px solid ${COLORS.blueEnabled};
-    background-color: ${COLORS.lightBlue};
+    border: 1px solid ${COLORS.blue50};
+    background-color: ${COLORS.blue30};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     border-width: 0px;
-    background-color: ${COLORS.blueEnabled};
+    background-color: ${COLORS.blue50};
     color: ${COLORS.white};
 
     &:hover {
       border-width: 0px;
-      background-color: ${COLORS.blueEnabled};
+      background-color: ${COLORS.blue50};
     }
   }
 `
@@ -289,6 +290,7 @@ function PipetteMountOption(props: PipetteMountOptionProps): JSX.Element {
     <Flex
       onClick={onClick}
       css={isSelected ? SELECTED_OPTIONS_STYLE : UNSELECTED_OPTIONS_STYLE}
+      role="radio"
       {...styleProps}
     >
       {children}

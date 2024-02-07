@@ -154,7 +154,7 @@ function DevicesLoadingState(): JSX.Element {
         size="3.25rem"
         marginTop={SPACING.spacing16}
         marginBottom={SPACING.spacing16}
-        color={COLORS.darkGreyEnabled}
+        color={COLORS.grey50}
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}

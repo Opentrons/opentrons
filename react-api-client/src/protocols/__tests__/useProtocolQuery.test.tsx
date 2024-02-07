@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook, waitFor } from '@testing-library/react'
 import { getProtocol } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useProtocolQuery } from '..'
@@ -29,11 +29,13 @@ const PROTOCOL_RESPONSE = {
 } as Protocol
 
 describe('useProtocolQuery hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -71,15 +73,12 @@ describe('useProtocolQuery hook', () => {
       .calledWith(HOST_CONFIG, PROTOCOL_ID)
       .mockResolvedValue({ data: PROTOCOL_RESPONSE } as Response<Protocol>)
 
-    const { result, waitFor } = renderHook(
-      () => useProtocolQuery(PROTOCOL_ID),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useProtocolQuery(PROTOCOL_ID), {
+      wrapper,
+    })
 
-    await waitFor(() => result.current.data != null)
-
-    expect(result.current.data).toEqual(PROTOCOL_RESPONSE)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(PROTOCOL_RESPONSE)
+    })
   })
 })

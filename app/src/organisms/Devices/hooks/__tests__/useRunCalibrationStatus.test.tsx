@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { mockTipRackDefinition } from '../../../../redux/custom-labware/__fixtures__'
 
@@ -10,6 +10,7 @@ import {
   useIsFlex,
   useRunPipetteInfoByMount,
 } from '..'
+import { useNotifyRunQuery } from '../../../../resources/runs/useNotifyRunQuery'
 
 import type { PipetteInfo } from '..'
 import { Provider } from 'react-redux'
@@ -18,6 +19,7 @@ import { createStore } from 'redux'
 jest.mock('../useDeckCalibrationStatus')
 jest.mock('../useIsFlex')
 jest.mock('../useRunPipetteInfoByMount')
+jest.mock('../../../../resources/runs/useNotifyRunQuery')
 
 const mockUseDeckCalibrationStatus = useDeckCalibrationStatus as jest.MockedFunction<
   typeof useDeckCalibrationStatus
@@ -26,7 +28,10 @@ const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockUseRunPipetteInfoByMount = useRunPipetteInfoByMount as jest.MockedFunction<
   typeof useRunPipetteInfoByMount
 >
-let wrapper: React.FunctionComponent<{}>
+const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
+  typeof useNotifyRunQuery
+>
+let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
 describe('useRunCalibrationStatus hook', () => {
   beforeEach(() => {
@@ -37,6 +42,7 @@ describe('useRunCalibrationStatus hook', () => {
       right: null,
     })
     when(mockUseIsFlex).calledWith('otie').mockReturnValue(false)
+    mockUseNotifyRunQuery.mockReturnValue({} as any)
 
     const store = createStore(jest.fn(), {})
     store.dispatch = jest.fn()
@@ -65,7 +71,7 @@ describe('useRunCalibrationStatus hook', () => {
       reason: 'calibrate_deck_failure_reason',
     })
   })
-  it('should ignore deck calibration status of an OT-3', () => {
+  it('should ignore deck calibration status of a Flex', () => {
     when(mockUseDeckCalibrationStatus)
       .calledWith('otie')
       .mockReturnValue('BAD_CALIBRATION')
@@ -161,7 +167,7 @@ describe('useRunCalibrationStatus hook', () => {
       reason: 'calibrate_tiprack_failure_reason',
     })
   })
-  it('should ignore tip rack calibration for the OT-3', () => {
+  it('should ignore tip rack calibration for the Flex', () => {
     when(mockUseRunPipetteInfoByMount)
       .calledWith('1')
       .mockReturnValue({

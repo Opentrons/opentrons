@@ -2,15 +2,15 @@ import * as React from 'react'
 
 import {
   useInstrumentsQuery,
-  useCurrentMaintenanceRun,
   useCurrentAllSubsystemUpdatesQuery,
   useSubsystemUpdateQuery,
 } from '@opentrons/react-api-client'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 import { Portal } from '../../App/portal'
 import { useIsUnboxingFlowOngoing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
 import { UpdateInProgressModal } from './UpdateInProgressModal'
 import { UpdateNeededModal } from './UpdateNeededModal'
-import type { Subsystem } from '@opentrons/api-client'
+import type { Subsystem, InstrumentData } from '@opentrons/api-client'
 
 const POLL_INTERVAL_MS = 5000
 
@@ -27,11 +27,22 @@ export function FirmwareUpdateTakeover(): JSX.Element {
   const instrumentsData = useInstrumentsQuery({
     refetchInterval: POLL_INTERVAL_MS,
   }).data?.data
-  const subsystemUpdateInstrument = instrumentsData?.find(
-    instrument => instrument.ok === false
-  )
+  const [instrumentsToUpdate, setInstrumentsToUpdate] = React.useState<
+    InstrumentData[]
+  >([])
+  instrumentsData?.forEach(instrument => {
+    if (
+      !instrument.ok &&
+      instrumentsToUpdate.find(
+        (i): i is InstrumentData => i.subsystem === instrument.subsystem
+      ) == null
+    ) {
+      setInstrumentsToUpdate([...instrumentsToUpdate, instrument])
+    }
+  })
+  const [indexToUpdate, setIndexToUpdate] = React.useState(0)
 
-  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: POLL_INTERVAL_MS,
   })
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
@@ -52,31 +63,62 @@ export function FirmwareUpdateTakeover(): JSX.Element {
   )
 
   React.useEffect(() => {
+    // in case instruments are updated elsewhere in the app, clear update needed list
+    // when all instruments are ok but array has elements
     if (
-      subsystemUpdateInstrument != null &&
+      instrumentsData?.find(instrument => !instrument.ok) == null &&
+      !showUpdateNeededModal &&
+      instrumentsToUpdate.length > 0
+    ) {
+      setInstrumentsToUpdate([])
+      setIndexToUpdate(0)
+    } else if (
+      instrumentsToUpdate.length > indexToUpdate &&
+      instrumentsToUpdate[indexToUpdate]?.subsystem != null &&
       maintenanceRunData == null &&
       !isUnboxingFlowOngoing &&
       externalSubsystemUpdate == null
     ) {
       setShowUpdateNeededModal(true)
     }
+    // close modal if update is no longer needed
+    else if (
+      instrumentsData?.find(instrument => !instrument.ok) == null &&
+      initiatedSubsystemUpdate == null &&
+      showUpdateNeededModal
+    ) {
+      setShowUpdateNeededModal(false)
+    }
   }, [
-    subsystemUpdateInstrument,
-    maintenanceRunData,
-    isUnboxingFlowOngoing,
     externalSubsystemUpdate,
+    indexToUpdate,
+    instrumentsToUpdate,
+    initiatedSubsystemUpdate,
+    instrumentsData,
+    isUnboxingFlowOngoing,
+    maintenanceRunData,
+    showUpdateNeededModal,
   ])
-  const memoizedSubsystem = React.useMemo(
-    () => subsystemUpdateInstrument?.subsystem,
-    []
-  )
 
   return (
     <>
-      {memoizedSubsystem != null && showUpdateNeededModal ? (
+      {instrumentsToUpdate.length > indexToUpdate &&
+      instrumentsToUpdate[indexToUpdate]?.subsystem != null &&
+      showUpdateNeededModal ? (
         <UpdateNeededModal
-          subsystem={memoizedSubsystem}
-          setShowUpdateModal={setShowUpdateNeededModal}
+          subsystem={instrumentsToUpdate[indexToUpdate]?.subsystem}
+          onClose={() => {
+            // if no more instruments need updating, close the modal and clear data
+            // otherwise start over with next instrument
+            if (instrumentsToUpdate.length <= indexToUpdate + 1) {
+              setShowUpdateNeededModal(false)
+              setInstrumentsToUpdate([])
+              setIndexToUpdate(0)
+            } else {
+              setIndexToUpdate(prevIndexToUpdate => prevIndexToUpdate + 1)
+            }
+          }}
+          shouldExit={instrumentsToUpdate.length <= indexToUpdate + 1}
           setInitiatedSubsystemUpdate={setInitiatedSubsystemUpdate}
         />
       ) : null}

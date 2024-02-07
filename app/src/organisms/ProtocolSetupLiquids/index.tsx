@@ -22,7 +22,7 @@ import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostR
 import { getTotalVolumePerLiquidId } from '../Devices/ProtocolRun/SetupLiquids/utils'
 import { LiquidDetails } from './LiquidDetails'
 import type { ParsedLiquid } from '@opentrons/api-client'
-import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import type { SetupScreens } from '../../pages/ProtocolSetup'
 
 export interface ProtocolSetupLiquidsProps {
   runId: string
@@ -77,7 +77,7 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
 
   return (
     <Flex
-      backgroundColor={COLORS.light1}
+      backgroundColor={COLORS.grey35}
       borderRadius={BORDERS.borderRadiusSize4}
       fontSize={TYPOGRAPHY.fontSize22}
       flexDirection={DIRECTION_COLUMN}
@@ -115,7 +115,7 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
         </Flex>
         <Flex justifyContent={JUSTIFY_FLEX_END} flex="1">
           <Flex
-            backgroundColor={COLORS.darkBlack20}
+            backgroundColor={COLORS.grey35}
             borderRadius={BORDERS.radiusSoftCorners}
             height="2.75rem"
             padding={`${SPACING.spacing8} ${SPACING.spacing12}`}

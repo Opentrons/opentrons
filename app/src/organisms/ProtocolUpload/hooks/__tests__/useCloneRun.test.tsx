@@ -1,20 +1,22 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import {
-  useRunQuery,
-  useHost,
-  useCreateRunMutation,
-} from '@opentrons/react-api-client'
+
+import { useHost, useCreateRunMutation } from '@opentrons/react-api-client'
+
 import { useCloneRun } from '../useCloneRun'
+import { useNotifyRunQuery } from '../../../../resources/runs/useNotifyRunQuery'
 
 import type { HostConfig } from '@opentrons/api-client'
 
 jest.mock('@opentrons/react-api-client')
+jest.mock('../../../../resources/runs/useNotifyRunQuery')
 
 const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
-const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
+const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
+  typeof useNotifyRunQuery
+>
 const mockUseCreateRunMutation = useCreateRunMutation as jest.MockedFunction<
   typeof useCreateRunMutation
 >
@@ -23,11 +25,11 @@ const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const RUN_ID: string = 'run_id'
 
 describe('useCloneRun hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   beforeEach(() => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
         data: {
@@ -43,7 +45,9 @@ describe('useCloneRun hook', () => {
       .mockReturnValue({ createRun: jest.fn() } as any)
 
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
     wrapper = clientProvider

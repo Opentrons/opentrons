@@ -1,6 +1,13 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
-import { Form, Formik, useFormikContext } from 'formik'
+import {
+  Control,
+  Controller,
+  ControllerRenderProps,
+  useForm,
+  useWatch,
+} from 'react-hook-form'
 import {
   BUTTON_TYPE_SUBMIT,
   OutlineButton,
@@ -24,7 +31,6 @@ import {
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 import { getStagingAreaSlots } from '../../utils'
-import { i18n } from '../../localization'
 import {
   createDeckFixture,
   deleteDeckFixture,
@@ -38,23 +44,36 @@ export interface StagingAreasValues {
   selectedSlots: string[]
 }
 
+interface StagingAreaModalComponentProps extends StagingAreasModalProps {
+  control: Control<StagingAreasValues, 'selectedSlots'>
+  stagingAreaLocations: string[] | null
+}
+
 const StagingAreasModalComponent = (
-  props: StagingAreasModalProps
+  props: StagingAreaModalComponentProps
 ): JSX.Element => {
-  const { onCloseClick, stagingAreas } = props
-  const { values, setFieldValue } = useFormikContext<StagingAreasValues>()
+  const { t } = useTranslation(['button', 'alert'])
+  const { onCloseClick, stagingAreas, control, stagingAreaLocations } = props
   const initialDeckSetup = useSelector(getInitialDeckSetup)
-  const areSlotsEmpty = values.selectedSlots.map(slot =>
-    getSlotIsEmpty(initialDeckSetup, slot)
-  )
   const hasWasteChute =
     Object.values(initialDeckSetup.additionalEquipmentOnDeck).find(
       aE => aE.name === 'wasteChute'
     ) != null
-  const hasConflictedSlot =
-    hasWasteChute && values.selectedSlots.find(slot => slot === 'cutoutD3')
-      ? false
-      : areSlotsEmpty.includes(false)
+  const selectedSlots = useWatch({
+    control,
+    name: 'selectedSlots',
+    defaultValue: stagingAreaLocations ?? [],
+  })
+
+  const areSlotsEmpty = selectedSlots.map(slot => {
+    if (slot === 'cutoutD3' && hasWasteChute) {
+      return true
+    } else {
+      return getSlotIsEmpty(initialDeckSetup, slot)
+    }
+  })
+
+  const hasConflictedSlot = areSlotsEmpty.includes(false)
 
   const mappedStagingAreas: DeckConfiguration = stagingAreas.flatMap(area => {
     return area.location != null
@@ -89,7 +108,10 @@ const StagingAreasModalComponent = (
     selectableSlots
   )
 
-  const handleClickAdd = (cutoutId: string): void => {
+  const handleClickAdd = (
+    cutoutId: string,
+    field: ControllerRenderProps<StagingAreasValues, 'selectedSlots'>
+  ): void => {
     const modifiedSlots: DeckConfiguration = updatedSlots.map(slot => {
       if (slot.cutoutId === cutoutId) {
         return {
@@ -100,11 +122,14 @@ const StagingAreasModalComponent = (
       return slot
     })
     setUpdatedSlots(modifiedSlots)
-    const updatedSelectedSlots = [...values.selectedSlots, cutoutId]
-    setFieldValue('selectedSlots', updatedSelectedSlots)
+    const updatedSelectedSlots = [...selectedSlots, cutoutId]
+    field.onChange(updatedSelectedSlots)
   }
 
-  const handleClickRemove = (cutoutId: string): void => {
+  const handleClickRemove = (
+    cutoutId: string,
+    field: ControllerRenderProps<StagingAreasValues, 'selectedSlots'>
+  ): void => {
     const modifiedSlots: DeckConfiguration = updatedSlots.map(slot => {
       if (slot.cutoutId === cutoutId) {
         return { ...slot, cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE }
@@ -112,15 +137,13 @@ const StagingAreasModalComponent = (
       return slot
     })
     setUpdatedSlots(modifiedSlots)
-    setFieldValue(
-      'selectedSlots',
-      values.selectedSlots.filter(item => item !== cutoutId)
-    )
+
+    field.onChange(selectedSlots.filter(item => item !== cutoutId))
   }
 
   return (
-    <Form>
-      <Flex height="20rem" flexDirection={DIRECTION_COLUMN}>
+    <>
+      <Flex height="23rem" flexDirection={DIRECTION_COLUMN}>
         <Flex
           justifyContent={JUSTIFY_END}
           alignItems={ALIGN_CENTER}
@@ -131,36 +154,41 @@ const StagingAreasModalComponent = (
             {hasConflictedSlot ? (
               <PDAlert
                 alertType="warning"
-                title={i18n.t(
-                  'alert.deck_config_placement.SLOT_OCCUPIED.staging_area'
+                title={t(
+                  'alert:deck_config_placement.SLOT_OCCUPIED.staging_area'
                 )}
                 description={''}
               />
             ) : null}
           </Box>
         </Flex>
-        <DeckConfigurator
-          deckConfig={updatedSlots}
-          handleClickAdd={handleClickAdd}
-          handleClickRemove={handleClickRemove}
-        />
+        <Controller
+          name="selectedSlots"
+          control={control}
+          defaultValue={stagingAreaLocations ?? []}
+          render={({ field }) => (
+            <DeckConfigurator
+              deckConfig={updatedSlots}
+              handleClickAdd={cutoutId => handleClickAdd(cutoutId, field)}
+              handleClickRemove={cutoutId => handleClickRemove(cutoutId, field)}
+              showExpansion={false}
+            />
+          )}
+        ></Controller>
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_FLEX_END}
-        paddingTop="4rem"
         paddingRight={SPACING.spacing32}
         paddingBottom={SPACING.spacing32}
         gridGap={SPACING.spacing8}
       >
-        <OutlineButton onClick={onCloseClick}>
-          {i18n.t('button.cancel')}
-        </OutlineButton>
+        <OutlineButton onClick={onCloseClick}>{t('cancel')}</OutlineButton>
         <OutlineButton type={BUTTON_TYPE_SUBMIT} disabled={hasConflictedSlot}>
-          {i18n.t('button.save')}
+          {t('save')}
         </OutlineButton>
       </Flex>
-    </Form>
+    </>
   )
 }
 
@@ -173,42 +201,41 @@ export const StagingAreasModal = (
   props: StagingAreasModalProps
 ): JSX.Element => {
   const { onCloseClick, stagingAreas } = props
+  const { t } = useTranslation('modules')
   const dispatch = useDispatch()
+  const { control, handleSubmit } = useForm<StagingAreasValues>()
   const stagingAreaLocations = getStagingAreaSlots(stagingAreas)
 
-  const onSaveClick = (values: StagingAreasValues): void => {
+  const onSaveClick = (data: StagingAreasValues): void => {
     onCloseClick()
 
-    values.selectedSlots.forEach(slot => {
+    data.selectedSlots.forEach(slot => {
       if (!stagingAreaLocations?.includes(slot)) {
         dispatch(createDeckFixture('stagingArea', slot))
       }
     })
     Object.values(stagingAreas).forEach(area => {
-      if (!values.selectedSlots.includes(area.location as string)) {
+      if (!data.selectedSlots.includes(area.location as string)) {
         dispatch(deleteDeckFixture(area.id))
       }
     })
   }
 
   return (
-    <Formik
-      onSubmit={onSaveClick}
-      initialValues={{
-        selectedSlots: stagingAreaLocations ?? [],
-      }}
-    >
+    <form onSubmit={handleSubmit(onSaveClick)}>
       <ModalShell width="48rem">
         <Box marginTop={SPACING.spacing32} paddingX={SPACING.spacing32}>
           <Text as="h2">
-            {i18n.t(`modules.additional_equipment_display_names.stagingAreas`)}
+            {t(`additional_equipment_display_names.stagingAreas`)}
           </Text>
         </Box>
         <StagingAreasModalComponent
           onCloseClick={onCloseClick}
           stagingAreas={stagingAreas}
+          control={control}
+          stagingAreaLocations={stagingAreaLocations}
         />
       </ModalShell>
-    </Formik>
+    </form>
   )
 }

@@ -8,7 +8,7 @@ router = APIRouter()
 
 IDENTIFIER_TO_SYSLOG_ID: Dict[LogIdentifier, str] = {
     LogIdentifier.api: "opentrons-api",
-    LogIdentifier.serial: "opentrons-api-serial",
+    LogIdentifier.serial: log_control.SERIAL_SPECIAL,
     LogIdentifier.server: "uvicorn",
     LogIdentifier.api_server: "opentrons-robot-server",
     LogIdentifier.touchscreen: "opentrons-robot-app",

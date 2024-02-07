@@ -1,9 +1,9 @@
-import { useRunQuery } from '@opentrons/react-api-client'
 import { formatTimestamp } from '../utils'
 import { EMPTY_TIMESTAMP } from '../constants'
+import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
 
 export function useRunCreatedAtTimestamp(runId: string | null): string {
-  const runRecord = useRunQuery(runId)
+  const runRecord = useNotifyRunQuery(runId)
 
   const createdAtTimestamp =
     runRecord?.data?.data.createdAt != null

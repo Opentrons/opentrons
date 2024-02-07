@@ -13,6 +13,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_HIDDEN,
+  OVERFLOW_WRAP_ANYWHERE,
   POSITION_RELATIVE,
   SPACING,
   TYPOGRAPHY,
@@ -39,7 +40,7 @@ import type { TrackProtocolRunEvent } from '../../Devices/hooks'
 import type { RobotAnalyticsData } from '../../../redux/analytics/types'
 
 const TITLE_TEXT_STYLE = css`
-  color: ${COLORS.darkBlack70};
+  color: ${COLORS.grey60};
   font-size: ${TYPOGRAPHY.fontSize28};
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   line-height: ${TYPOGRAPHY.lineHeight36};
@@ -47,7 +48,7 @@ const TITLE_TEXT_STYLE = css`
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  overflow-wrap: anywhere;
+  overflow-wrap: ${OVERFLOW_WRAP_ANYWHERE};
   height: max-content;
 `
 
@@ -216,9 +217,7 @@ export function RunningProtocolCommandList({
           >
             {(command, index) => {
               const backgroundColor =
-                index === currentRunCommandIndex
-                  ? COLORS.mediumBlueEnabled
-                  : COLORS.light1
+                index === currentRunCommandIndex ? COLORS.blue35 : COLORS.grey35
               return (
                 <Flex
                   key={command.id}
@@ -234,8 +233,9 @@ export function RunningProtocolCommandList({
                     lineHeight="1.75rem"
                     fontWeight={TYPOGRAPHY.fontWeightRegular}
                     borderRadius={BORDERS.borderRadiusSize2}
+                    gridGap="0.875rem"
                   >
-                    <CommandIcon command={command} />
+                    <CommandIcon command={command} size="2rem" />
                     <CommandText
                       command={command}
                       robotSideAnalysis={robotSideAnalysis}

@@ -69,16 +69,19 @@ class MotionView:
         critical_point = None
 
         # if the pipette was last used to move to a labware that requires
-        # centering, set the critical point to XY_CENTER
+        # centering, set the critical point to the appropriate center
         if (
             isinstance(current_location, CurrentWell)
             and current_location.pipette_id == pipette_id
-            and self._labware.get_has_quirk(
-                current_location.labware_id,
-                "centerMultichannelOnWells",
-            )
         ):
-            critical_point = CriticalPoint.XY_CENTER
+            if self._labware.get_should_center_column_on_target_well(
+                current_location.labware_id
+            ):
+                critical_point = CriticalPoint.Y_CENTER
+            elif self._labware.get_should_center_pipette_on_target_well(
+                current_location.labware_id
+            ):
+                critical_point = CriticalPoint.XY_CENTER
         return PipetteLocationData(mount=mount, critical_point=critical_point)
 
     def get_movement_waypoints_to_well(
@@ -97,17 +100,17 @@ class MotionView:
         """Calculate waypoints to a destination that's specified as a well."""
         location = current_well or self._pipettes.get_current_location()
 
-        center_destination = self._labware.get_has_quirk(
-            labware_id,
-            "centerMultichannelOnWells",
-        )
+        destination_cp: Optional[CriticalPoint] = None
+        if self._labware.get_should_center_column_on_target_well(labware_id):
+            destination_cp = CriticalPoint.Y_CENTER
+        elif self._labware.get_should_center_pipette_on_target_well(labware_id):
+            destination_cp = CriticalPoint.XY_CENTER
 
         destination = self._geometry.get_well_position(
             labware_id,
             well_name,
             well_location,
         )
-        destination_cp = CriticalPoint.XY_CENTER if center_destination else None
 
         move_type = move_types.get_move_type_to_well(
             pipette_id, labware_id, well_name, location, force_direct
@@ -146,6 +149,8 @@ class MotionView:
         max_travel_z: float,
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
+        stay_at_max_travel_z: bool = False,
+        ignore_tip_configuration: Optional[bool] = True,
     ) -> List[motion_planning.Waypoint]:
         """Calculate waypoints to a destination that's specified as an addressable area."""
         location = self._pipettes.get_current_location()
@@ -155,10 +160,28 @@ class MotionView:
                 addressable_area_name
             )
         )
-        destination = base_destination + Point(x=offset.x, y=offset.y, z=offset.z)
+        if stay_at_max_travel_z:
+            base_destination_at_max_z = Point(
+                base_destination.x,
+                base_destination.y,
+                # HACK(mm, 2023-12-18): We want to travel exactly at max_travel_z, but
+                # motion_planning.get_waypoints() won't let us--the highest we can go is this margin
+                # beneath max_travel_z. Investigate why motion_planning.get_waypoints() does not
+                # let us travel at max_travel_z, and whether it's safe to make it do that.
+                # Possibly related: https://github.com/Opentrons/opentrons/pull/6882#discussion_r514248062
+                max_travel_z - motion_planning.waypoints.MINIMUM_Z_MARGIN,
+            )
+            destination = base_destination_at_max_z + Point(
+                offset.x, offset.y, offset.z
+            )
+        else:
+            destination = base_destination + Point(offset.x, offset.y, offset.z)
 
         # TODO(jbl 11-28-2023) This may need to change for partial tip configurations on a 96
-        destination_cp = CriticalPoint.XY_CENTER
+        if ignore_tip_configuration:
+            destination_cp = CriticalPoint.INSTRUMENT_XY_CENTER
+        else:
+            destination_cp = CriticalPoint.XY_CENTER
 
         all_labware_highest_z = self._geometry.get_all_obstacle_highest_z()
         if minimum_z_height is None:
@@ -306,12 +329,12 @@ class MotionView:
         positions = move_types.get_edge_point_list(
             center_point, x_offset, y_offset, edge_path_type
         )
+        critical_point: Optional[CriticalPoint] = None
 
-        critical_point = (
-            CriticalPoint.XY_CENTER
-            if self._labware.get_has_quirk(labware_id, "centerMultichannelOnWells")
-            else None
-        )
+        if self._labware.get_should_center_column_on_target_well(labware_id):
+            critical_point = CriticalPoint.Y_CENTER
+        elif self._labware.get_should_center_pipette_on_target_well(labware_id):
+            critical_point = CriticalPoint.XY_CENTER
 
         return [
             motion_planning.Waypoint(position=p, critical_point=critical_point)
