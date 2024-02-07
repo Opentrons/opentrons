@@ -466,6 +466,9 @@ class CommandView(HasState[CommandState]):
                 cursor = commands_by_id[running_command_id].index
             elif len(queued_command_ids) > 0:
                 cursor = commands_by_id[queued_command_ids.head()].index - 1
+            elif self._state.run_result == RunResult.FAILED:
+                last_executed = next(k for k, v in self._state.commands_by_id.items() if v.command.error)
+                cursor = commands_by_id[last_executed].index
             else:
                 cursor = total_length - length
 
