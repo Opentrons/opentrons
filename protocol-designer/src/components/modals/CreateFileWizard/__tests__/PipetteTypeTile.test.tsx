@@ -13,10 +13,6 @@ import type { FormState, WizardTileProps } from '../types'
 
 vi.mock('../EquipmentOption')
 
-const mockEquipmentOption = EquipmentOption as vi.MockedFunction<
-  typeof EquipmentOption
->
-
 const render = (props: React.ComponentProps<typeof PipetteTypeTile>) => {
   return renderWithProviders(<PipetteTypeTile {...props} />, {
     i18nInstance: i18n,
@@ -62,7 +58,7 @@ describe('PipetteTypeTile', () => {
       tileHeader: 'header',
       display96Channel: true,
     }
-    mockEquipmentOption.mockReturnValue(<div>mock EquipmentOption</div>)
+    vi.mocked(EquipmentOption).mockReturnValue(<div>mock EquipmentOption</div>)
   })
   afterEach(() => {
     cleanup()
