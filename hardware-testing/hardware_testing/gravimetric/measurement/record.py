@@ -280,7 +280,11 @@ class GravimetricRecorder:
     """Gravimetric Recorder."""
 
     def __init__(
-        self, cfg: GravimetricRecorderConfig, scale: Scale, simulate: bool = False, start_graph: bool = True
+        self,
+        cfg: GravimetricRecorderConfig,
+        scale: Scale,
+        simulate: bool = False,
+        start_graph: bool = True,
     ) -> None:
         """Gravimetric Recorder."""
         self._cfg = cfg

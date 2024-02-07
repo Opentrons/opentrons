@@ -4,11 +4,19 @@ from .report import store_tip_results, store_trial
 from opentrons.config.types import LiquidProbeSettings
 from .__main__ import RunArgs
 from hardware_testing.gravimetric.workarounds import get_sync_hw_api
-from hardware_testing.gravimetric.helpers import _calculate_stats
+from hardware_testing.gravimetric.helpers import (
+    _calculate_stats,
+    _jog_to_find_liquid_height,
+)
 from hardware_testing.gravimetric.config import LIQUID_PROBE_SETTINGS
 from hardware_testing.gravimetric.tips import get_unused_tips
 from hardware_testing.data import ui, get_testing_data_directory
-from opentrons.hardware_control.types import InstrumentProbeType, OT3Mount, Axis, top_types
+from opentrons.hardware_control.types import (
+    InstrumentProbeType,
+    OT3Mount,
+    Axis,
+    top_types,
+)
 
 from hardware_testing.gravimetric.measurement.scale import Scale
 from hardware_testing.gravimetric.measurement.record import (
@@ -75,6 +83,22 @@ def _load_tipracks(
     return tipracks
 
 
+def _load_dial_indicator(run_args: RunArgs) -> Labware:
+    slot_dial = run_args.protocol_cfg.SLOT_DIAL  # type: ignore[union-attr]
+    dial_labware_name = "dial_indicator"
+    loaded_labwares = run_args.ctx.loaded_labwares
+    if (
+        slot_dial in loaded_labwares.keys()
+        and loaded_labwares[slot_dial].name == dial_labware_name
+    ):
+        return loaded_labwares[slot_dial]
+
+    dial_labware = run_args.ctx.load_labware(
+        dial_labware_name, location=slot_dial, namespace="custom_beta"
+    )
+    return dial_labware
+
+
 def _load_test_well(run_args: RunArgs) -> Labware:
     slot_scale = run_args.protocol_cfg.SLOT_SCALE  # type: ignore[union-attr]
     labware_on_scale = run_args.protocol_cfg.LABWARE_ON_SCALE  # type: ignore[union-attr]
@@ -95,6 +119,7 @@ def _load_test_well(run_args: RunArgs) -> Labware:
         labware_on_scale, location=slot_scale, namespace=namespace
     )
     return labware_on_scale
+
 
 def _load_scale(
     name: str,
@@ -132,15 +157,28 @@ def _load_scale(
     ui.print_info(f'scale is recording to "{recorder.file_name}"')
     return recorder
 
+
 def run(tip: int, run_args: RunArgs) -> None:
     """Run a liquid probe test."""
     test_labware: Labware = _load_test_well(run_args)
+    dial_indicator: Labware = _load_dial_indicator(run_args)
+    dial_well: Well = dial_indicator["A1"]
     hw_api = get_sync_hw_api(run_args.ctx)
     test_well: Well = test_labware["A1"]
     _load_tipracks(run_args.ctx, run_args.pipette_channels, run_args.protocol_cfg, tip)
     tips: List[Well] = get_unused_tips(run_args.ctx, tip)
     assert len(tips) >= run_args.trials
     results: List[float] = []
+    adjusted_results: List[float] = []
+    run_args.pipette.pick_up_tip(tips.pop(0))
+    target_height = _jog_to_find_liquid_height(
+        run_args.ctx, run_args.pipette, test_well
+    )
+    if run_args.return_tip:
+        run_args.pipette.return_tip()
+    else:
+        run_args.pipette.drop_tip()
+
     for trial in range(run_args.trials):
         print(f"Picking up {tip}ul tip")
         run_args.pipette.pick_up_tip(tips.pop(0))
@@ -152,16 +190,30 @@ def run(tip: int, run_args: RunArgs) -> None:
         end_pos = hw_api.current_position_ot3(OT3Mount.LEFT)
         print("Droping tip")
         run_args.pipette.blow_out()
+        if run_args.dial_indicator is not None:
+
+            run_args.pipette._retract()
+            run_args.pipette.move_to(dial_well.top())
+            run_args.pipette.move_to(dial_well.top(-1))
+            dial_read = run_args.dial_indicator.read_stable()
+            tip_length_offset = (dial_read - 1)
+            run_args.pipette._retract()
+            print(f"Tip Offset  {tip_length_offset} {dial_read}")
         if run_args.return_tip:
             run_args.pipette.return_tip()
         else:
             run_args.pipette.drop_tip()
         results.append(height)
+        adjusted_results.append(tip_length_offset)
         env_data = run_args.environment_sensor.get_reading()
         ui.print_info("hwpipette")
         hw_pipette = hw_api.hardware_pipettes[top_types.Mount.LEFT]
         ui.print_info("p start")
-        plunger_start = hw_pipette.plunger_positions.bottom if run_args.aspirate else hw_pipette.plunger_positions.top
+        plunger_start = (
+            hw_pipette.plunger_positions.bottom
+            if run_args.aspirate
+            else hw_pipette.plunger_positions.top
+        )
         store_trial(
             run_args.test_report,
             trial,
@@ -172,17 +224,20 @@ def run(tip: int, run_args: RunArgs) -> None:
             env_data.temperature,
             start_pos[Axis.Z_L] - end_pos[Axis.Z_L],
             plunger_start - end_pos[Axis.P_L],
+            tip_length_offset,
         )
-        print(f"\n\n Z axis start pos {start_pos[Axis.Z_L]} end pos {end_pos[Axis.Z_L]}")
+        print(
+            f"\n\n Z axis start pos {start_pos[Axis.Z_L]} end pos {end_pos[Axis.Z_L]}"
+        )
         print(f"plunger start pos {plunger_start} end pos {end_pos[Axis.P_L]}\n\n")
 
-
     print(f"RESULTS: \n{results}")
-    # fake this for now
-    expected_height = 40.0
-    average, cv, d = _calculate_stats(results, expected_height)
+    average, cv, d = _calculate_stats(results, target_height)
     store_tip_results(run_args.test_report, tip, average, cv, d)
-
+    print(f"Raw: Average {average} cv {cv} d {d} target {target_height}")
+    print(f"Adjusted RESULTS: \n{adjusted_results}")
+    average, cv, d = _calculate_stats(adjusted_results, target_height)
+    print(f"adjusted: Average {average} cv {cv} d {d} target {target_height}")
 
 def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
     hw_api = get_sync_hw_api(run_args.ctx)
@@ -190,9 +245,7 @@ def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
         run_args.pipette_channels
     ][tip]
     data_dir = get_testing_data_directory()
-    data_file = (
-        f"{data_dir}/{run_args.name}/{run_args.run_id}/pressure_sensor_data-trial{trial}-tip{tip}.csv"
-    )
+    data_file = f"{data_dir}/{run_args.name}/{run_args.run_id}/pressure_sensor_data-trial{trial}-tip{tip}.csv"
     ui.print_info(f"logging pressure data to {data_file}")
     lps = LiquidProbeSettings(
         starting_mount_height=well.top().point.z + run_args.start_height_offset,
