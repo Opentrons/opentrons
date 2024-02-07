@@ -369,7 +369,6 @@ def parse(
         if protocol_file and protocol_file[0] in ("{", b"{"[0]):
             return _parse_json(protocol_file, filename)
         else:
-            print(f"default assumption, file[0] is {protocol_file[0]}")
             return _parse_python(
                 protocol_contents=protocol_file,
                 python_parse_mode=python_parse_mode,
