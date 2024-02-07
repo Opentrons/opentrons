@@ -12283,6 +12283,7 @@
         "addressableAreaName": "movableTrashC1",
         "alternateDropLocation": true,
         "forceDirect": false,
+        "ignoreTipConfiguration": true,
         "offset": {
           "x": 0.0,
           "y": 0.0,
@@ -12527,6 +12528,7 @@
         "addressableAreaName": "movableTrashD1",
         "alternateDropLocation": true,
         "forceDirect": false,
+        "ignoreTipConfiguration": true,
         "offset": {
           "x": 0.0,
           "y": 0.0,
