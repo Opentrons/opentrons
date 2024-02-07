@@ -4,7 +4,6 @@ from hardware_testing import data
 from hardware_testing.drivers import asair_sensor
 import datetime
 import sys
-import os
 import time as t
 from typing import List
 
@@ -27,8 +26,8 @@ def _get_user_input(list: List, some_string: str) -> str:
     return variable
 
 
-class abr_asair_sensor:
-    def __init__(self, robot: str, duration: int, frequency: int):
+class _abr_asair_sensor:
+    def __init__(self, robot: str, duration: int, frequency: int) -> None:
         test_name = "ABR-Environment-Monitoring"
         run_id = data.create_run_id()
         file_name = data.create_file_name(test_name, run_id, robot)
@@ -81,14 +80,14 @@ class abr_asair_sensor:
             )
         except FileNotFoundError:
             print(
-                "There is no google sheets credentials. Make sure abr.json is in the robot's jupyter notebook"
+                "There is no google sheets credentials. Make sure credentials in jupyter notebook."
             )
         google_sheet.write_header(header)
         google_sheet.update_row_index()
         for n_row in range(len(results_list)):
             google_sheet.write_to_row(results_list[n_row])
         print(
-            f"Readings have finished. Ran for {duration} minutes and collected every {frequency} minutes."
+            f"Done. Ran for {duration} minutes and collected every {frequency} minutes."
         )
 
 
@@ -110,4 +109,4 @@ if __name__ == "__main__":
     robot = _get_user_input(robot_list, "Robot: ")
     duration = int(input("Duration (min): "))
     frequency = int(input("Frequency (min): "))
-    abr_asair_sensor(robot, duration, frequency)
+    _abr_asair_sensor(robot, duration, frequency)
