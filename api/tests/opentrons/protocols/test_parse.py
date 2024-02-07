@@ -457,7 +457,7 @@ def test_parse_json_details(
     get_json_protocol_fixture: Callable[..., Any],
     fixture_version: str,
     fixture_name: str,
-    protocol_text_kind: Literal['str', 'bytes'],
+    protocol_text_kind: Literal["str", "bytes"],
     filename: str,
 ) -> None:
     protocol = get_json_protocol_fixture(
