@@ -330,7 +330,10 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         if not self._state.use_simulated_deck_config:
             return self._get_loaded_addressable_area(addressable_area_name)
         else:
-            return self._get_addressable_area_from_deck_data(addressable_area_name)
+            return self._get_addressable_area_from_deck_data(
+                addressable_area_name=addressable_area_name,
+                do_compatibility_check=True,
+            )
 
     def get_all(self) -> List[str]:
         """Get a list of all loaded addressable area names."""
