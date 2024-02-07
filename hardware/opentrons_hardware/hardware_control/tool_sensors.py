@@ -46,9 +46,11 @@ from opentrons_hardware.sensors.types import (
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     BindSensorOutputRequestPayload,
+    SendAccumulatedPressureDataPayload,
 )
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     BindSensorOutputRequest,
+    SendAccumulatedPressureDataRequest,
 )
 from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorOutputBindingField,
