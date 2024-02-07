@@ -259,7 +259,7 @@ class OT3API(
         if not self._last_moved_mount or realmount == self._last_moved_mount:
             return False
 
-        return (self._gantry_load == GantryLoad.HIGH_THROUGHPUT) or (
+        return (realmount == OT3Mount.LEFT and self._gantry_load == GantryLoad.HIGH_THROUGHPUT) or (
             realmount == OT3Mount.GRIPPER
         )
 
