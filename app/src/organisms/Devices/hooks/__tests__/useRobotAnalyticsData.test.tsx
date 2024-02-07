@@ -9,6 +9,8 @@ import { useRobot } from '../'
 import { useRobotAnalyticsData } from '../useRobotAnalyticsData'
 import { getAttachedPipettes } from '../../../../redux/pipettes'
 import { getRobotSettings } from '../../../../redux/robot-settings'
+import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
+
 import {
   getRobotApiVersion,
   getRobotFirmwareVersion,
@@ -93,7 +95,13 @@ describe('useProtocolAnalysisErrors hook', () => {
   it('returns robot analytics data when robot exists', () => {
     when(mockUseRobot)
       .calledWith('otie')
-      .mockReturnValue({} as DiscoveredRobot)
+      .mockReturnValue({
+        ...mockConnectableRobot,
+        health: {
+          ...mockConnectableRobot.health,
+          robot_serial: ROBOT_SERIAL_NUMBER,
+        },
+      } as DiscoveredRobot)
 
     const { result } = renderHook(() => useRobotAnalyticsData('otie'), {
       wrapper,
