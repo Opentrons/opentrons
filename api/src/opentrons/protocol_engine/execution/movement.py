@@ -111,7 +111,9 @@ class MovementHandler:
         )
         origin_cp = pipette_location.critical_point
 
-        await self._gantry_mover.prepare_for_mount_movement(pipette_location.mount)
+        await self._gantry_mover.prepare_for_mount_movement(
+            pipette_location.mount.to_hw_mount()
+        )
         origin = await self._gantry_mover.get_position(pipette_id=pipette_id)
         max_travel_z = self._gantry_mover.get_max_travel_z(pipette_id=pipette_id)
 
@@ -181,7 +183,9 @@ class MovementHandler:
         )
         origin_cp = pipette_location.critical_point
 
-        await self._gantry_mover.prepare_for_mount_movement(pipette_location.mount)
+        await self._gantry_mover.prepare_for_mount_movement(
+            pipette_location.mount.to_hw_mount()
+        )
         origin = await self._gantry_mover.get_position(pipette_id=pipette_id)
         max_travel_z = self._gantry_mover.get_max_travel_z(pipette_id=pipette_id)
 
@@ -243,7 +247,9 @@ class MovementHandler:
         pipette_location = self._state_store.motion.get_pipette_location(
             pipette_id=pipette_id
         )
-        await self._gantry_mover.prepare_for_mount_movement(pipette_location.mount)
+        await self._gantry_mover.prepare_for_mount_movement(
+            pipette_location.mount.to_hw_mount()
+        )
         origin = await self._gantry_mover.get_position(pipette_id=pipette_id)
         max_travel_z = self._gantry_mover.get_max_travel_z(pipette_id=pipette_id)
 

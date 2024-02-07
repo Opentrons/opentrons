@@ -247,12 +247,20 @@ class OT3API(
         OT3RobotCalibrationProvider.__init__(self, self._config)
         ExecutionManagerProvider.__init__(self, isinstance(backend, OT3Simulator))
 
-    def is_high_throughput_idle_mount(
-        self, mount: Union[top_types.Mount, OT3Mount]
-    ) -> bool:
-        return (
-            self._gantry_load == GantryLoad.HIGH_THROUGHPUT
-            and OT3Mount.from_mount(mount) != self._last_moved_mount
+    def is_idle_mount(self, mount: Union[top_types.Mount, OT3Mount]) -> bool:
+        """Only the gripper mount or the 96-channel pipette mount would be idle
+        (disengaged).
+
+        If gripper mount is NOT the last moved mount, it's idle.
+        If a 96-channel pipette is attached, the mount is idle if it's not
+        the last moved mount.
+        """
+        realmount = OT3Mount.from_mount(mount)
+        if not self._last_moved_mount or realmount == self._last_moved_mount:
+            return False
+
+        return (self._gantry_load == GantryLoad.HIGH_THROUGHPUT) or (
+            realmount == OT3Mount.GRIPPER
         )
 
     @property
@@ -1290,7 +1298,7 @@ class OT3API(
         Disengage the 96-channel and gripper mount if retracted. Re-engage
         the 96-channel or gripper mount if it is about to move.
         """
-        if self.is_high_throughput_idle_mount(mount):
+        if self.is_idle_mount(mount):
             # home the left/gripper mount if it is current disengaged
             await self.home_z(mount)
 
@@ -1299,7 +1307,7 @@ class OT3API(
 
             # disengage Axis.Z_L motor and engage the brake to lower power
             # consumption and reduce the chance of the 96-channel pipette dropping
-            if self.is_high_throughput_idle_mount(OT3Mount.LEFT):
+            if self.is_idle_mount(OT3Mount.LEFT):
                 await self.disengage_axes([Axis.Z_L])
 
             # disegnage Axis.Z_G when we can to reduce the chance of
