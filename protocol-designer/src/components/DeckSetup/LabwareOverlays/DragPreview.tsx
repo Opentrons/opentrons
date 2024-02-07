@@ -1,32 +1,31 @@
 import * as React from 'react'
-import { DragLayer } from 'react-dnd'
+import { useDragLayer, XYCoord } from 'react-dnd'
 import { LabwareOnDeck } from '../LabwareOnDeck'
 import { DND_TYPES } from '../../../constants'
-import { LabwareOnDeck as LabwareOnDeckType } from '../../../step-forms'
 import { RobotWorkSpaceRenderProps } from '@opentrons/components'
 import styles from './DragPreview.css'
 
 interface DragPreviewProps {
-  isDragging: boolean
-  currentOffset?: { x: number; y: number }
-  item: { labwareOnDeck: LabwareOnDeckType }
-  itemType: string
   getRobotCoordsFromDOMCoords: RobotWorkSpaceRenderProps['getRobotCoordsFromDOMCoords']
 }
 
-const LabwareDragPreview = (props: DragPreviewProps): JSX.Element | null => {
-  const {
-    item,
-    itemType,
-    isDragging,
-    currentOffset,
-    getRobotCoordsFromDOMCoords,
-  } = props
-  if (itemType !== DND_TYPES.LABWARE || !isDragging || !currentOffset)
-    return null
-  const { x, y } = currentOffset
+export const DragPreview = (props: DragPreviewProps): JSX.Element | null => {
+  const { getRobotCoordsFromDOMCoords } = props
+  const { item, itemType, isDragging, currentOffset } = useDragLayer(
+    monitor => ({
+      item: monitor.getItem(),
+      itemType: monitor.getItemType(),
+      isDragging: monitor.isDragging(),
+      currentOffset: monitor.getSourceClientOffset(),
+    })
+  )
 
-  const cursor = getRobotCoordsFromDOMCoords(x, y)
+  if (!isDragging || !currentOffset || itemType !== DND_TYPES.LABWARE) {
+    return null
+  }
+
+  const { x, y } = currentOffset
+  const cursor: XYCoord = getRobotCoordsFromDOMCoords(x, y)
 
   return (
     <LabwareOnDeck
@@ -37,12 +36,3 @@ const LabwareDragPreview = (props: DragPreviewProps): JSX.Element | null => {
     />
   )
 }
-
-export const DragPreview = DragLayer<
-  Omit<DragPreviewProps, 'currentOffset' | 'isDragging' | 'itemType' | 'item'>
->(monitor => ({
-  currentOffset: monitor.getSourceClientOffset(),
-  isDragging: monitor.isDragging(),
-  itemType: monitor.getItemType(),
-  item: monitor.getItem(),
-}))(LabwareDragPreview)

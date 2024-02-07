@@ -265,7 +265,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
                   labwareOnDeck={labwareLoadedOnModule}
                 />
                 {isAdapter ? (
-                  // @ts-expect-error
                   <AdapterControls
                     allLabware={allLabware}
                     onDeck={false}
@@ -296,7 +295,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
             {labwareLoadedOnModule == null &&
             !shouldHideChildren &&
             !isAdapter ? (
-              // @ts-expect-error
               <SlotControls
                 key={moduleOnDeck.slot}
                 slotPosition={[0, 0, 0]} // Module Component already handles nested positioning
@@ -359,7 +357,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
         })
         .map(addressableArea => {
           return (
-            // @ts-expect-error
             <SlotControls
               key={addressableArea.id}
               slotPosition={getPositionFromSlotId(addressableArea.id, deckDef)}
@@ -404,7 +401,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
             />
             <g>
               {labwareIsAdapter ? (
-                //  @ts-expect-error
                 <AdapterControls
                   allLabware={allLabware}
                   onDeck={true}

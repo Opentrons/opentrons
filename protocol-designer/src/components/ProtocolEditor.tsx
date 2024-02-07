@@ -1,6 +1,6 @@
 import * as React from 'react'
 import cx from 'classnames'
-import { DragDropContext } from 'react-dnd'
+import { DndProvider } from 'react-dnd'
 import MouseBackEnd from 'react-dnd-mouse-backend'
 import { ComputingSpinner } from '../components/ComputingSpinner'
 import { ConnectedNav } from '../containers/ConnectedNav'
@@ -55,6 +55,8 @@ function ProtocolEditorComponent(): JSX.Element {
   )
 }
 
-export const ProtocolEditor = DragDropContext(MouseBackEnd)(
-  ProtocolEditorComponent
+export const ProtocolEditor = (): JSX.Element => (
+  <DndProvider backend={MouseBackEnd}>
+    <ProtocolEditorComponent />
+  </DndProvider>
 )

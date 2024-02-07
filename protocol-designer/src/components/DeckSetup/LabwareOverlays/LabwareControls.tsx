@@ -16,8 +16,8 @@ import type { CoordinateTuple } from '@opentrons/shared-data'
 interface LabwareControlsProps {
   labwareOnDeck: LabwareOnDeck
   slotPosition: CoordinateTuple
-  setHoveredLabware: (labware?: LabwareOnDeck | null) => unknown
-  setDraggedLabware: (labware?: LabwareOnDeck | null) => unknown
+  setHoveredLabware: (labware?: LabwareOnDeck | null) => void
+  setDraggedLabware: (labware?: LabwareOnDeck | null) => void
   swapBlocked: boolean
   selectedTerminalItemId?: TerminalItemId | null
 }
@@ -48,7 +48,6 @@ export const LabwareControls = (props: LabwareControlsProps): JSX.Element => {
       >
         <LabwareHighlight labwareOnDeck={labwareOnDeck} />
         {canEdit ? (
-          // @ts-expect-error(sa, 2021-6-21): react dnd type mismatch
           <EditLabware
             labwareOnDeck={labwareOnDeck}
             setHoveredLabware={setHoveredLabware}

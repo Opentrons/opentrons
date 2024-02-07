@@ -45,7 +45,7 @@ import { BaseState, ThunkAction } from '../types'
 import { getAdditionalEquipmentEntities } from '../step-forms/selectors'
 import { ThunkDispatch } from 'redux-thunk'
 
-interface Props {
+export interface ConnectedStepItemProps {
   stepId: StepIdType
   stepNumber: number
   onStepContextMenu?: () => void
@@ -66,7 +66,9 @@ const getMouseClickKeyInfo = (
   return { isShiftKeyPressed, isMetaKeyPressed }
 }
 
-export const ConnectedStepItem = (props: Props): JSX.Element => {
+export const ConnectedStepItem = (
+  props: ConnectedStepItemProps
+): JSX.Element => {
   const { stepId, stepNumber } = props
 
   const step = useSelector(stepFormSelectors.getSavedStepForms)[stepId]

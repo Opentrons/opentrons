@@ -1,9 +1,9 @@
 import assert from 'assert'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { connect } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import noop from 'lodash/noop'
-import { DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd'
+import { useDrop, DropTargetMonitor } from 'react-dnd'
 import cx from 'classnames'
 import { Icon, RobotCoordsForeignDiv } from '@opentrons/components'
 import { DND_TYPES } from '../../../constants'
@@ -15,10 +15,7 @@ import {
   moveDeckItem,
   openAddLabwareModal,
 } from '../../../labware-ingred/actions'
-import {
-  LabwareDefByDefURI,
-  selectors as labwareDefSelectors,
-} from '../../../labware-defs'
+import { selectors as labwareDefSelectors } from '../../../labware-defs'
 import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../../../steplist'
 import { BlockedSlot } from './BlockedSlot'
 
@@ -27,19 +24,10 @@ import type {
   Dimensions,
   ModuleType,
 } from '@opentrons/shared-data'
-import type { BaseState, DeckSlot, ThunkDispatch } from '../../../types'
 import type { LabwareOnDeck } from '../../../step-forms'
 
 import styles from './LabwareOverlays.css'
-
-interface DNDP {
-  isOver: boolean
-  connectDropTarget: (val: React.ReactNode) => JSX.Element
-  draggedItem: { labwareOnDeck: LabwareOnDeck } | null
-  itemType: string
-}
-
-interface OP {
+interface SlotControlsProps {
   slotPosition: CoordinateTuple | null
   slotBoundingBox: Dimensions
   //  NOTE: slotId can be either AddressableAreaName or moduleId
@@ -49,33 +37,59 @@ interface OP {
   handleDragHover?: () => unknown
 }
 
-interface DP {
-  addLabware: (e: React.MouseEvent<any>) => unknown
-  moveDeckItem: (item1: DeckSlot, item2: DeckSlot) => unknown
+interface DroppedItem {
+  labwareOnDeck: LabwareOnDeck
 }
 
-interface SP {
-  customLabwareDefs: LabwareDefByDefURI
-}
-
-export type SlotControlsProps = OP & DP & DNDP & SP
-
-export const SlotControlsComponent = (
-  props: SlotControlsProps
-): JSX.Element | null => {
+export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
   const {
     slotBoundingBox,
     slotPosition,
-    addLabware,
+    slotId,
     selectedTerminalItemId,
-    isOver,
-    connectDropTarget,
     moduleType,
-    draggedItem,
-    itemType,
-    customLabwareDefs,
+    handleDragHover,
   } = props
+  const customLabwareDefs = useSelector(
+    labwareDefSelectors.getCustomLabwareDefsByURI
+  )
+  const dispatch = useDispatch()
   const { t } = useTranslation('deck')
+
+  const [{ itemType, draggedItem, isOver }, drop] = useDrop(() => ({
+    accept: DND_TYPES.LABWARE,
+    canDrop: (item: DroppedItem) => {
+      const draggedDef = item?.labwareOnDeck?.def
+      assert(draggedDef, 'no labware def of dragged item, expected it on drop')
+
+      if (moduleType != null && draggedDef != null) {
+        // this is a module slot, prevent drop if the dragged labware is not compatible
+        const isCustomLabware = getLabwareIsCustom(
+          customLabwareDefs,
+          item.labwareOnDeck
+        )
+
+        return getLabwareIsCompatible(draggedDef, moduleType) || isCustomLabware
+      }
+      return true
+    },
+    drop: (item: DroppedItem) => {
+      if (item.labwareOnDeck) {
+        dispatch(moveDeckItem(item.labwareOnDeck.slot, slotId))
+      }
+    },
+    hover: () => {
+      if (handleDragHover) {
+        handleDragHover()
+      }
+    },
+    collect: (monitor: DropTargetMonitor) => ({
+      itemType: monitor.getItemType(),
+      isOver: !!monitor.isOver(),
+      draggedItem: monitor.getItem() as DroppedItem,
+    }),
+  }))
+
   if (
     selectedTerminalItemId !== START_TERMINAL_ITEM_ID ||
     (itemType !== DND_TYPES.LABWARE && itemType !== null) ||
@@ -84,6 +98,7 @@ export const SlotControlsComponent = (
     return null
 
   const draggedDef = draggedItem?.labwareOnDeck?.def
+
   const isCustomLabware = draggedItem
     ? getLabwareIsCustom(customLabwareDefs, draggedItem.labwareOnDeck)
     : false
@@ -111,8 +126,12 @@ export const SlotControlsComponent = (
     overlayText = 'add_labware'
   }
 
-  return connectDropTarget(
-    <g>
+  const addLabware = (): void => {
+    dispatch(openAddLabwareModal({ slot: slotId }))
+  }
+
+  return (
+    <g ref={drop}>
       {slotBlocked ? (
         <BlockedSlot
           x={slotPosition[0]}
@@ -143,70 +162,3 @@ export const SlotControlsComponent = (
     </g>
   )
 }
-
-const mapStateToProps = (state: BaseState): SP => {
-  return {
-    customLabwareDefs: labwareDefSelectors.getCustomLabwareDefsByURI(state),
-  }
-}
-
-const mapDispatchToProps = (
-  dispatch: ThunkDispatch<any>,
-  ownProps: OP
-): DP => ({
-  addLabware: () => dispatch(openAddLabwareModal({ slot: ownProps.slotId })),
-  moveDeckItem: (sourceSlot, destSlot) =>
-    dispatch(moveDeckItem(sourceSlot, destSlot)),
-})
-
-const slotTarget = {
-  drop: (props: SlotControlsProps, monitor: DropTargetMonitor) => {
-    const draggedItem = monitor.getItem()
-    if (draggedItem) {
-      props.moveDeckItem(draggedItem.labwareOnDeck.slot, props.slotId)
-    }
-  },
-  hover: (props: SlotControlsProps) => {
-    if (props.handleDragHover) {
-      props.handleDragHover()
-    }
-  },
-  canDrop: (props: SlotControlsProps, monitor: DropTargetMonitor) => {
-    const draggedItem = monitor.getItem()
-    const draggedDef = draggedItem?.labwareOnDeck?.def
-    const moduleType = props.moduleType
-    assert(draggedDef, 'no labware def of dragged item, expected it on drop')
-
-    if (moduleType != null && draggedDef != null) {
-      // this is a module slot, prevent drop if the dragged labware is not compatible
-      const isCustomLabware = getLabwareIsCustom(
-        props.customLabwareDefs,
-        draggedItem.labwareOnDeck
-      )
-
-      return getLabwareIsCompatible(draggedDef, moduleType) || isCustomLabware
-    }
-    return true
-  },
-}
-const collectSlotTarget = (
-  connect: DropTargetConnector,
-  monitor: DropTargetMonitor
-): React.ReactNode => ({
-  // @ts-expect-error(BC, 12-13-2023): react dnd needs to be updated or removed to include proper type
-  connectDropTarget: connect.dropTarget(),
-  isOver: monitor.isOver(),
-  draggedItem: monitor.getItem(),
-  itemType: monitor.getItemType(),
-})
-
-export const SlotControls = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(
-  DropTarget(
-    DND_TYPES.LABWARE,
-    slotTarget,
-    collectSlotTarget
-  )(SlotControlsComponent)
-)
