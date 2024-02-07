@@ -208,7 +208,7 @@ def _parse_json(protocol_contents: str, filename: Optional[str] = None) -> JsonP
 
 
 def _parse_python(
-    protocol_contents: str,
+    protocol_contents: Union[str, bytes],
     python_parse_mode: PythonParseMode,
     filename: Optional[str] = None,
     bundled_labware: Optional[Dict[str, "LabwareDefinition"]] = None,
@@ -338,16 +338,11 @@ def parse(
             )
         return result
     else:
-        if isinstance(protocol_file, bytes):
-            protocol_str = protocol_file.decode("utf-8")
-        else:
-            protocol_str = protocol_file
-
         if filename and filename.endswith(".json"):
-            return _parse_json(protocol_str, filename)
+            return _parse_json(protocol_file, filename)
         elif filename and filename.endswith(".py"):
             return _parse_python(
-                protocol_contents=protocol_str,
+                protocol_contents=protocol_file,
                 python_parse_mode=python_parse_mode,
                 filename=filename,
                 extra_labware=extra_labware,
@@ -355,11 +350,11 @@ def parse(
             )
 
         # our jsonschema says the top level json kind is object
-        if protocol_str and protocol_str[0] in ("{", b"{"):
+        if protocol_file and protocol_file[0] in ("{", b"{"):
             return _parse_json(protocol_str, filename)
         else:
             return _parse_python(
-                protocol_contents=protocol_str,
+                protocol_contents=protocol_file,
                 python_parse_mode=python_parse_mode,
                 filename=filename,
                 extra_labware=extra_labware,
