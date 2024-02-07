@@ -27,10 +27,10 @@ index 2d36460ca6..8578768930 100644
      def ok_to_push_out(self, push_out_dist_mm: float) -> bool:
          return push_out_dist_mm <= (
 diff --git a/api/src/opentrons/protocol_api/core/engine/deck_conflict.py b/api/src/opentrons/protocol_api/core/engine/deck_conflict.py
-index 7ef2cfcbea..a89548afea 100644
+index 0ba7e17621..4d6682f5e4 100644
 --- a/api/src/opentrons/protocol_api/core/engine/deck_conflict.py
 +++ b/api/src/opentrons/protocol_api/core/engine/deck_conflict.py
-@@ -223,18 +223,12 @@ def check_safe_for_tip_pickup_and_return(
+@@ -341,18 +341,12 @@ def check_safe_for_tip_pickup_and_return(
                  f" when picking up fewer than 96 tips."
              )
          elif not is_partial_config and not is_96_ch_tiprack_adapter:
@@ -50,7 +50,7 @@ index 7ef2cfcbea..a89548afea 100644
 +        pass
  
  
- def _check_deck_conflict_for_96_channel(
+ # TODO (spp, 2023-02-06): update the extents check to use all nozzle bounds instead of
 diff --git a/api/src/opentrons/protocol_api/core/legacy/deck.py b/api/src/opentrons/protocol_api/core/legacy/deck.py
 index 9a9092af5a..33aa5941ce 100644
 --- a/api/src/opentrons/protocol_api/core/legacy/deck.py
