@@ -14,10 +14,7 @@ import {
   SPACING,
   BORDERS,
 } from '@opentrons/components'
-import {
-  useCreateLiveCommandMutation,
-  useHost,
-} from '@opentrons/react-api-client'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../../../atoms/text'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
@@ -30,7 +27,7 @@ import {
 } from '../../../../redux/robot-update'
 import { useRobotUpdateInfo } from './useRobotUpdateInfo'
 import successIcon from '../../../../assets/images/icon_success.png'
-import { useRobotInitializationStatus } from '../../hooks'
+import { useRobotInitializationStatus, INIT_STATUS } from '../../hooks'
 
 import type { State } from '../../../../redux/types'
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol'
@@ -98,7 +95,7 @@ export function RobotUpdateProgressModal({
 
   const robotInitStatus = useRobotInitializationStatus()
   const hasRobotCompletedInit =
-    updateStep === 'finished' && robotInitStatus !== 'INITIALIZING'
+    updateStep === 'finished' && robotInitStatus !== INIT_STATUS.INITIALIZING
   const letUserExitUpdate = useAllowExitIfUpdateStalled(
     updateStep,
     progressPercent
@@ -332,6 +329,7 @@ function useGetModalText(
       if (letUserExitUpdate) {
         subProgressBarText = t('restart_taking_too_long', { robotName })
       }
+      break
     default:
       modalBodyText = t('installing_update')
   }

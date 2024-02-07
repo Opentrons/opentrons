@@ -13,6 +13,7 @@ import {
   getRobotUpdateDownloadError,
 } from '../../../../../redux/robot-update'
 import { useDispatchStartRobotUpdate } from '../../../../../redux/robot-update/hooks'
+import { useRobotInitializationStatus, INIT_STATUS } from '../../../hooks'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { RobotUpdateSession } from '../../../../../redux/robot-update/types'
@@ -21,6 +22,7 @@ jest.mock('@opentrons/react-api-client')
 jest.mock('../useRobotUpdateInfo')
 jest.mock('../../../../../redux/robot-update')
 jest.mock('../../../../../redux/robot-update/hooks')
+jest.mock('../../../hooks')
 
 const mockUseCreateLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
@@ -36,6 +38,9 @@ const mockUseDispatchStartRobotUpdate = useDispatchStartRobotUpdate as jest.Mock
 >
 const mockGetRobotUpdateDownloadError = getRobotUpdateDownloadError as jest.MockedFunction<
   typeof getRobotUpdateDownloadError
+>
+const mockUseRobotInitializationStatus = useRobotInitializationStatus as jest.MockedFunction<
+  typeof useRobotInitializationStatus
 >
 
 const render = (
@@ -78,6 +83,7 @@ describe('DownloadUpdateModal', () => {
     mockGetRobotSessionIsManualFile.mockReturnValue(false)
     mockUseDispatchStartRobotUpdate.mockReturnValue(jest.fn)
     mockGetRobotUpdateDownloadError.mockReturnValue(null)
+    mockUseRobotInitializationStatus.mockReturnValue(INIT_STATUS.SUCCEEDED)
   })
 
   afterEach(() => {
@@ -193,5 +199,16 @@ describe('DownloadUpdateModal', () => {
 
     screen.getByText(/Try restarting the update./i)
     screen.getByText(/This update is taking longer than usual/i)
+  })
+
+  it('renders alternative text if the robot is initializing', () => {
+    mockUseRobotInitializationStatus.mockReturnValue(INIT_STATUS.INITIALIZING)
+    mockUseRobotUpdateInfo.mockReturnValue({
+      updateStep: 'finished',
+      progressPercent: 100,
+    })
+    render(props)
+
+    screen.getByText(/Initializing robot.../i)
   })
 })

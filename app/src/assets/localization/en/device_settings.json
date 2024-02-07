@@ -234,6 +234,7 @@
   "returns_your_device_to_new_state": "This returns your device to a new state.",
   "robot_busy_protocol": "This robot cannot be updated while a protocol is running on it",
   "robot_calibration_data": "Robot Calibration Data",
+  "robot_initializing": "Initializing robot...",
   "robot_name": "Robot Name",
   "robot_operating_update_available": "Robot Operating System Update Available",
   "robot_serial_number": "Robot Serial Number",

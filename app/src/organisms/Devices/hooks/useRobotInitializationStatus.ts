@@ -4,7 +4,15 @@ import { useHealthQuery } from '@opentrons/react-api-client'
 
 const ROBOT_HEALTH_POLL_MS = 5000
 
-type RobotInitializationStatus = 'INITIALIZING' | 'SUCCEEDED' | 'FAILED' | null
+export const INIT_STATUS = {
+  INITIALIZING: 'INITIALIZING',
+  SUCCEEDED: 'SUCCEEDED',
+  FAILED: 'FAILED',
+} as const
+
+type RobotInitializationStatus =
+  | typeof INIT_STATUS[keyof typeof INIT_STATUS]
+  | null
 
 export function useRobotInitializationStatus(): RobotInitializationStatus {
   const responseStatusCode = React.useRef<number | null>(null)
@@ -19,13 +27,13 @@ export function useRobotInitializationStatus(): RobotInitializationStatus {
   let status: RobotInitializationStatus
   switch (responseStatusCode.current) {
     case 503:
-      status = 'INITIALIZING'
+      status = INIT_STATUS.INITIALIZING
       break
     case 200:
-      status = 'SUCCEEDED'
+      status = INIT_STATUS.SUCCEEDED
       break
     case 500:
-      status = 'FAILED'
+      status = INIT_STATUS.FAILED
       break
     default:
       status = null

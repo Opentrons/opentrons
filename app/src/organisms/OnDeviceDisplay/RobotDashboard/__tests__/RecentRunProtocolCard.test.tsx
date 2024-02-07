@@ -11,7 +11,11 @@ import { COLORS, renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { Skeleton } from '../../../../atoms/Skeleton'
 import { useMissingProtocolHardware } from '../../../../pages/Protocols/hooks'
-import { useTrackProtocolRunEvent } from '../../../Devices/hooks'
+import {
+  INIT_STATUS,
+  useTrackProtocolRunEvent,
+  useRobotInitializationStatus,
+} from '../../../Devices/hooks'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { useCloneRun } from '../../../ProtocolUpload/hooks'
 import { useHardwareStatusText } from '../hooks'
@@ -96,6 +100,9 @@ const mockUseHardwareStatusText = useHardwareStatusText as jest.MockedFunction<
   typeof useHardwareStatusText
 >
 const mockSkeleton = Skeleton as jest.MockedFunction<typeof Skeleton>
+const mockUseRobotInitializationStatus = useRobotInitializationStatus as jest.MockedFunction<
+  typeof useRobotInitializationStatus
+>
 
 const render = (props: React.ComponentProps<typeof RecentRunProtocolCard>) => {
   return renderWithProviders(
@@ -143,6 +150,7 @@ describe('RecentRunProtocolCard', () => {
     when(mockUseCloneRun)
       .calledWith(RUN_ID, expect.anything())
       .mockReturnValue({ cloneRun: mockCloneRun, isLoading: false })
+    mockUseRobotInitializationStatus.mockReturnValue(INIT_STATUS.SUCCEEDED)
   })
 
   afterEach(() => {
@@ -228,6 +236,12 @@ describe('RecentRunProtocolCard', () => {
       isLoading: true,
       data: { data: { metadata: { protocolName: 'mockProtocol' } } },
     } as any)
+    const [{ getByText }] = render(props)
+    getByText('mock Skeleton')
+  })
+
+  it('should render the skeleton when the robot server is initializing', () => {
+    mockUseRobotInitializationStatus.mockReturnValue(INIT_STATUS.INITIALIZING)
     const [{ getByText }] = render(props)
     getByText('mock Skeleton')
   })

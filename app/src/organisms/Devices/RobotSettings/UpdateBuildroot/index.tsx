@@ -11,8 +11,7 @@ import {
 } from '../../../../redux/robot-update'
 import { ViewUpdateModal } from './ViewUpdateModal'
 import { RobotUpdateProgressModal } from './RobotUpdateProgressModal'
-import { UNREACHABLE } from '../../../../redux/discovery'
-import { OPENTRONS_USB } from '../../../../redux/discovery'
+import { UNREACHABLE, OPENTRONS_USB } from '../../../../redux/discovery'
 import { appShellRequestor } from '../../../../redux/shell/remote'
 
 import type { Dispatch } from '../../../../redux/types'

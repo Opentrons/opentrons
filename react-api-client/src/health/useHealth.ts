@@ -1,6 +1,5 @@
-import * as React from 'react'
 import { HostConfig, getHealth } from '@opentrons/api-client'
-import { UseQueryResult, useQuery, useQueryClient } from 'react-query'
+import { UseQueryResult, useQuery } from 'react-query'
 import { useHost } from '../api'
 
 import type { UseQueryOptions } from 'react-query'

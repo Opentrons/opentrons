@@ -33,7 +33,7 @@ import { Skeleton } from '../../../atoms/Skeleton'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
 import { useHardwareStatusText } from './hooks'
-import { useRobotInitializationStatus } from '../../Devices/hooks'
+import { INIT_STATUS, useRobotInitializationStatus } from '../../Devices/hooks'
 
 import type { ProtocolResource } from '@opentrons/shared-data'
 
@@ -86,7 +86,7 @@ export function ProtocolWithLastRun({
     history.push(`runs/${createRunResponse.data.id}/setup`)
   const { cloneRun } = useCloneRun(runData.id, onResetSuccess)
   const robotInitStatus = useRobotInitializationStatus()
-  const isRobotInitializing = robotInitStatus === 'INITIALIZING'
+  const isRobotInitializing = robotInitStatus === INIT_STATUS.INITIALIZING
   const [showSpinner, setShowSpinner] = React.useState<boolean>(false)
 
   const protocolName =
