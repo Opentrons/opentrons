@@ -174,7 +174,7 @@ class RunArgs:
             _ctx.is_simulating() or args.ignore_scale,
         )
         dial: Optional[mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator] = None
-        if not _ctx.is_simulating():
+        if not _ctx.is_simulating() and not args.ignore_dial:
             dial_port = list_ports_and_select("Dial Indicator")
             dial = mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator(
                 port=dial_port
@@ -254,6 +254,7 @@ if __name__ == "__main__":
     parser.add_argument("--start-height-offset", type=float, default=0)
     parser.add_argument("--ignore-scale", action="store_true")
     parser.add_argument("--ignore-env", action="store_true")
+    parser.add_argument("--ignore-dial", action="store_true")
 
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
