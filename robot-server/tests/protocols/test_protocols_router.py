@@ -356,9 +356,14 @@ async def test_create_protocol(
         status=AnalysisStatus.PENDING,
     )
 
-    decoy.when(await file_reader_writer.read(files=[protocol_file])).then_return(
-        [buffered_file]
-    )
+    decoy.when(
+        await file_reader_writer.read(
+            # TODO(mm, 2024-02-07): Recent FastAPI upgrades mean protocol_file.filename
+            # is typed as possibly None. Investigate whether that can actually happen in
+            # practice and whether we need to account for it.
+            files=[protocol_file]  # type: ignore[list-item]
+        )
+    ).then_return([buffered_file])
 
     decoy.when(await file_hasher.hash(files=[buffered_file])).then_return("abc123")
 

@@ -180,7 +180,11 @@ async def create_protocol(
         analysis_id: Unique identifier to attach to the analysis resource.
         created_at: Timestamp to attach to the new resource.
     """
-    buffered_files = await file_reader_writer.read(files=files)
+    for file in files:
+        # TODO(mm, 2024-02-07): Investigate whether the filename can actually be None.
+        assert file.filename is not None
+    buffered_files = await file_reader_writer.read(files=files)  # type: ignore[arg-type]
+
     content_hash = await file_hasher.hash(buffered_files)
     cached_protocol_id = protocol_store.get_id_by_hash(content_hash)
 

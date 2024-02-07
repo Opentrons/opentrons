@@ -12,5 +12,5 @@ class AbstractInputFile(Protocol):
             providing the contents of the protocol to be read.
     """
 
-    filename: Optional[str]
+    filename: str
     file: BinaryIO
