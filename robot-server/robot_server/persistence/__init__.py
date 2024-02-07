@@ -7,6 +7,7 @@ from ._fastapi_dependencies import (
     clean_up_persistence,
     get_sql_engine,
     get_active_persistence_directory,
+    get_active_persistence_directory_failsafe,
     get_persistence_resetter,
 )
 from ._persistence_directory import PersistenceResetter
@@ -35,6 +36,7 @@ __all__ = [
     # dependencies and types for use by FastAPI endpoint functions
     "get_sql_engine",
     "get_active_persistence_directory",
+    "get_active_persistence_directory_failsafe",
     "PersistenceResetter",
     "get_persistence_resetter",
 ]
