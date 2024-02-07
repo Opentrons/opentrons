@@ -32,7 +32,7 @@ export function useRobotAnalyticsData(
     getRobotSettings(state, robotName)
   )
   const serialNumber =
-    robot != null ? useSelector(() => getRobotSerialNumber(robot)) : null
+    robot?.status != null ? getRobotSerialNumber(robot) : null
   const dispatch = useDispatch<Dispatch>()
 
   React.useEffect(() => {
