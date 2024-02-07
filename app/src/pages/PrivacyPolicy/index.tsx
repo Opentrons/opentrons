@@ -30,7 +30,7 @@ import imgSrc from '../../assets/images/on-device-display/privacy_policy_qrcode.
 const PRIVACY_POLICY_URL = 'opentrons.com/privacy-policy/'
 const IMG_ALT = 'QR Code for Opentrons Privacy Policy'
 
-export function PrivacyPolicy(): JSX.Element | null {
+export function PrivacyPolicy(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
@@ -49,7 +49,6 @@ export function PrivacyPolicy(): JSX.Element | null {
     } else {
       history.push('/dashboard')
     }
-    return null
   }
 
   return (

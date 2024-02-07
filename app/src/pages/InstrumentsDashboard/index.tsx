@@ -1,10 +1,4 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import {
-  getAnalyticsOptInSeen,
-  getAnalyticsOptedIn,
-} from '../../redux/analytics'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'
@@ -18,7 +12,7 @@ import type { GripperData, PipetteData } from '@opentrons/api-client'
 
 const FETCH_PIPETTE_CAL_POLL = 10000
 
-export const InstrumentsDashboard = (): JSX.Element | null => {
+export const InstrumentsDashboard = (): JSX.Element => {
   const { data: attachedInstruments } = useInstrumentsQuery({
     refetchInterval: FETCH_PIPETTE_CAL_POLL,
   })
@@ -27,15 +21,6 @@ export const InstrumentsDashboard = (): JSX.Element | null => {
     | React.ComponentProps<typeof PipetteWizardFlows>
     | null
   >(null)
-
-  const seen = useSelector(getAnalyticsOptInSeen)
-  const hasOptedIn = useSelector(getAnalyticsOptedIn)
-  const history = useHistory()
-
-  if (!seen || !hasOptedIn) {
-    history.push('/privacy-policy')
-    return null
-  }
 
   const leftInstrument =
     (attachedInstruments?.data ?? []).find(

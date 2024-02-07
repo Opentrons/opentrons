@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import last from 'lodash/last'
 
@@ -23,10 +22,6 @@ import {
   getRobotUpdateAvailable,
   getRobotUpdateInfoForRobot,
 } from '../../redux/robot-update'
-import {
-  getAnalyticsOptInSeen,
-  getAnalyticsOptedIn,
-} from '../../redux/analytics'
 import {
   getLocalRobot,
   getRobotApiVersion,
@@ -62,7 +57,7 @@ export type SettingOption =
 
 export type SetSettingOption = (option: SettingOption | null) => void
 
-export function RobotSettingsDashboard(): JSX.Element | null {
+export function RobotSettingsDashboard(): JSX.Element {
   const { i18n, t } = useTranslation('shared')
 
   // GENERAL ROBOT INFORMATION
@@ -127,15 +122,6 @@ export function RobotSettingsDashboard(): JSX.Element | null {
     currentOption,
     setCurrentOption,
   ] = React.useState<SettingOption | null>(null)
-
-  const seen = useSelector(getAnalyticsOptInSeen)
-  const hasOptedIn = useSelector(getAnalyticsOptedIn)
-  const history = useHistory()
-
-  if (!seen || !hasOptedIn) {
-    history.push('/privacy-policy')
-    return null
-  }
 
   switch (currentOption) {
     case 'RobotName':

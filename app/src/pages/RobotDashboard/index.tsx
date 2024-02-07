@@ -30,7 +30,7 @@ import { useNotifyAllRunsQuery } from '../../resources/runs/useNotifyAllRunsQuer
 
 export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8
 
-export function RobotDashboard(): JSX.Element | null {
+export function RobotDashboard(): JSX.Element {
   const { t } = useTranslation('device_details')
   const {
     data: allRunsQueryData,
@@ -50,7 +50,6 @@ export function RobotDashboard(): JSX.Element | null {
 
   if (!seen || !hasOptedIn) {
     history.push('/privacy-policy')
-    return null
   }
 
   const recentRunsOfUniqueProtocols = (allRunsQueryData?.data ?? [])

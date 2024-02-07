@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
@@ -25,10 +24,6 @@ import {
   getProtocolsOnDeviceSortKey,
   updateConfigValue,
 } from '../../redux/config'
-import {
-  getAnalyticsOptInSeen,
-  getAnalyticsOptedIn,
-} from '../../redux/analytics'
 import { PinnedProtocolCarousel } from './PinnedProtocolCarousel'
 import { sortProtocols } from './utils'
 import { ProtocolCard } from './ProtocolCard'
@@ -40,7 +35,7 @@ import type { Dispatch } from '../../redux/types'
 import type { ProtocolsOnDeviceSortKey } from '../../redux/config/types'
 import type { ProtocolResource } from '@opentrons/shared-data'
 
-export function ProtocolDashboard(): JSX.Element | null {
+export function ProtocolDashboard(): JSX.Element {
   const protocols = useAllProtocolsQuery()
   const runs = useNotifyAllRunsQuery()
   const { t } = useTranslation('protocol_info')
@@ -62,15 +57,6 @@ export function ProtocolDashboard(): JSX.Element | null {
   // The pinned protocols are stored as an array of IDs in config
   const pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const pinnedProtocols: ProtocolResource[] = []
-
-  const seen = useSelector(getAnalyticsOptInSeen)
-  const hasOptedIn = useSelector(getAnalyticsOptedIn)
-  const history = useHistory()
-
-  if (!seen || !hasOptedIn) {
-    history.push('/privacy-policy')
-    return null
-  }
 
   // We only need to grab out the pinned protocol data once all the protocols load
   // and if we have pinned ids stored in config.
