@@ -19,7 +19,6 @@ import {
   COLORS,
   TYPOGRAPHY,
   Icon,
-  Btn,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 
