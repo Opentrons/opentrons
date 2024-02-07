@@ -1,6 +1,6 @@
 from dataclasses import asdict
 import logging
-from typing import Dict, cast, Union, Any
+from typing import cast, Any, Dict, Optional, Union
 
 from starlette import status
 from fastapi import APIRouter, Depends
@@ -25,7 +25,7 @@ from opentrons.config import (
     get_opentrons_path,
 )
 from robot_server.deck_configuration.fastapi_dependencies import (
-    get_deck_configuration_store,
+    get_deck_configuration_store_failsafe,
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
 
@@ -211,8 +211,8 @@ async def get_settings_reset_options(
 async def post_settings_reset_options(
     factory_reset_commands: Dict[reset_util.ResetOptionId, bool],
     persistence_resetter: PersistenceResetter = Depends(get_persistence_resetter),
-    deck_configuration_store: DeckConfigurationStore = Depends(
-        get_deck_configuration_store
+    deck_configuration_store: Optional[DeckConfigurationStore] = Depends(
+        get_deck_configuration_store_failsafe
     ),
     robot_type: RobotTypeEnum = Depends(get_robot_type_enum),
 ) -> V1BasicResponse:
@@ -239,7 +239,12 @@ async def post_settings_reset_options(
         await reset_odd.mark_odd_for_reset_next_boot()
 
     if factory_reset_commands.get(reset_util.ResetOptionId.deck_configuration, False):
-        await deck_configuration_store.delete()
+        if deck_configuration_store:
+            await deck_configuration_store.delete()
+        else:
+            log.warning(
+                "Deck configuration store is not available. Skipping its reset."
+            )
 
     # TODO (tz, 5-24-22): The order of a set is undefined because set's aren't ordered.
     # The message returned to the client will be printed in the wrong order.

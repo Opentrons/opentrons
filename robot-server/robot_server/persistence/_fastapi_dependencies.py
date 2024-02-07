@@ -246,6 +246,28 @@ async def get_active_persistence_directory(
         ) from exception
 
 
+async def get_active_persistence_directory_failsafe(
+    app_state: AppState = Depends(get_app_state),
+) -> Optional[Path]:
+    """Return the path to the server's persistence directory.
+
+    This is the same as `get_active_persistence_directory()`, except this will return
+    `None` if the active persistence directory has failed to initialize or is not yet
+    ready, instead of raising an exception or blocking.
+    """
+    initialize_task = _active_persistence_directory_init_task_accessor.get_from(
+        app_state
+    )
+    assert (
+        initialize_task is not None
+    ), "Forgot to start persistence directory initialization as part of server startup?"
+
+    try:
+        return initialize_task.result()
+    except Exception:
+        return None
+
+
 async def _get_persistence_directory_root(
     app_state: AppState = Depends(get_app_state),
 ) -> Path:
