@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V2,
@@ -7,16 +8,15 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import { fixture_tiprack_10_ul } from '@opentrons/shared-data/labware/fixtures/2'
 import { getStateAndContextTempTCModules } from '@opentrons/step-generation'
 import {
   DEFAULT_DELAY_SECONDS,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
 } from '../../constants'
-import {
-  createPresavedStepForm,
-  CreatePresavedStepFormArgs,
-} from '../utils/createPresavedStepForm'
+import { createPresavedStepForm } from '../utils/createPresavedStepForm'
+import type { CreatePresavedStepFormArgs } from '../utils/createPresavedStepForm'
+
 const stepId = 'stepId123'
 const EXAMPLE_ENGAGE_HEIGHT = '18'
 let defaultArgs: any
@@ -96,34 +96,33 @@ beforeEach(() => {
   }
 })
 afterEach(() => {
-  jest.resetAllMocks()
+  vi.resetAllMocks()
 })
 describe('createPresavedStepForm', () => {
   ;[true, false].forEach(hasTempModule => {
-    it(`should populate initial values for a new pause step (with ${
-      hasTempModule ? '' : 'NO'
-    } temp module)`, () => {
-      const args: CreatePresavedStepFormArgs = {
-        ...defaultArgs,
-        stepType: 'pause',
-        initialDeckSetup: hasTempModule
-          ? defaultArgs.initialDeckSetup
-          : { ...defaultArgs.initialDeckSetup, modules: {} },
-      }
-      expect(createPresavedStepForm(args)).toEqual({
-        id: stepId,
-        stepType: 'pause',
-        moduleId: hasTempModule ? 'someTemperatureModuleId' : null,
-        pauseAction: null,
-        pauseHour: null,
-        pauseMessage: '',
-        pauseMinute: null,
-        pauseSecond: null,
-        pauseTemperature: null,
-        stepDetails: '',
-        stepName: 'pause',
+    it(`should populate initial values for a new pause step (with ${hasTempModule ? '' : 'NO'
+      } temp module)`, () => {
+        const args: CreatePresavedStepFormArgs = {
+          ...defaultArgs,
+          stepType: 'pause',
+          initialDeckSetup: hasTempModule
+            ? defaultArgs.initialDeckSetup
+            : { ...defaultArgs.initialDeckSetup, modules: {} },
+        }
+        expect(createPresavedStepForm(args)).toEqual({
+          id: stepId,
+          stepType: 'pause',
+          moduleId: hasTempModule ? 'someTemperatureModuleId' : null,
+          pauseAction: null,
+          pauseHour: null,
+          pauseMessage: '',
+          pauseMinute: null,
+          pauseSecond: null,
+          pauseTemperature: null,
+          stepDetails: '',
+          stepName: 'pause',
+        })
       })
-    })
   })
   it(`should call handleFormChange with a default pipette and drop tip location for "moveLiquid" step`, () => {
     const args = { ...defaultArgs, stepType: 'moveLiquid' }
@@ -292,84 +291,83 @@ describe('createPresavedStepForm', () => {
       stepDetails: '',
     })
   })
-  ;[true, false].forEach(timelineHasErrors => {
-    ;[true, false].forEach(isFirstThermocyclerStep => {
-      const testName = `should set a default thermocycler module and set TC state defaults when ${
-        isFirstThermocyclerStep
-          ? 'the first Thermocycler step is added'
-          : 'a following Thermocycler step is added'
-      }${timelineHasErrors ? ' and timeline has errors' : ''}`
-      it(testName, () => {
-        // mutate robot state in defaultArgs
-        if (timelineHasErrors) {
-          defaultArgs.robotStateTimeline = {
-            errors: ['OH NO!'],
-            timeline: [],
+    ;[true, false].forEach(timelineHasErrors => {
+      ;[true, false].forEach(isFirstThermocyclerStep => {
+        const testName = `should set a default thermocycler module and set TC state defaults when ${isFirstThermocyclerStep
+            ? 'the first Thermocycler step is added'
+            : 'a following Thermocycler step is added'
+          }${timelineHasErrors ? ' and timeline has errors' : ''}`
+        it(testName, () => {
+          // mutate robot state in defaultArgs
+          if (timelineHasErrors) {
+            defaultArgs.robotStateTimeline = {
+              errors: ['OH NO!'],
+              timeline: [],
+            }
+          } else {
+            const thermocyclerModuleState =
+              defaultArgs.robotStateTimeline.timeline[0].robotState.modules
+                .someThermocyclerModuleId
+            thermocyclerModuleState.moduleState = {
+              ...thermocyclerModuleState.moduleState,
+              blockTargetTemp: 42,
+              lidTargetTemp: 43,
+              lidOpen: true,
+            }
           }
-        } else {
-          const thermocyclerModuleState =
-            defaultArgs.robotStateTimeline.timeline[0].robotState.modules
-              .someThermocyclerModuleId
-          thermocyclerModuleState.moduleState = {
-            ...thermocyclerModuleState.moduleState,
-            blockTargetTemp: 42,
-            lidTargetTemp: 43,
-            lidOpen: true,
+
+          const args = { ...defaultArgs, stepType: 'thermocycler' }
+
+          if (isFirstThermocyclerStep) {
+            args.savedStepForms = {
+              prevStepId: {
+                stepType: 'thermocycler',
+                // TC Default fields (should all be ignored, robotState is used to populate the form)
+                stepName: 'thermocycler',
+                stepDetails: '',
+                thermocyclerFormType: 'thermocyclerState',
+                blockIsActive: false,
+                blockTargetTemp: null,
+                lidIsActive: false,
+                lidTargetTemp: null,
+                lidOpen: null,
+                profileVolume: null,
+                profileTargetLidTemp: null,
+                orderedProfileItems: [],
+                profileItemsById: {},
+                blockIsActiveHold: false,
+                blockTargetTempHold: null,
+                lidIsActiveHold: false,
+                lidTargetTempHold: null,
+                lidOpenHold: null,
+              },
+            }
+            args.orderedStepIds = ['prevStepId']
           }
-        }
 
-        const args = { ...defaultArgs, stepType: 'thermocycler' }
-
-        if (isFirstThermocyclerStep) {
-          args.savedStepForms = {
-            prevStepId: {
-              stepType: 'thermocycler',
-              // TC Default fields (should all be ignored, robotState is used to populate the form)
-              stepName: 'thermocycler',
-              stepDetails: '',
-              thermocyclerFormType: 'thermocyclerState',
-              blockIsActive: false,
-              blockTargetTemp: null,
-              lidIsActive: false,
-              lidTargetTemp: null,
-              lidOpen: null,
-              profileVolume: null,
-              profileTargetLidTemp: null,
-              orderedProfileItems: [],
-              profileItemsById: {},
-              blockIsActiveHold: false,
-              blockTargetTempHold: null,
-              lidIsActiveHold: false,
-              lidTargetTempHold: null,
-              lidOpenHold: null,
-            },
-          }
-          args.orderedStepIds = ['prevStepId']
-        }
-
-        expect(createPresavedStepForm(args)).toEqual({
-          blockIsActive: !timelineHasErrors,
-          blockIsActiveHold: false,
-          blockTargetTemp: timelineHasErrors ? null : 42,
-          blockTargetTempHold: null,
-          id: stepId,
-          lidIsActive: !timelineHasErrors,
-          lidIsActiveHold: false,
-          lidOpen: !timelineHasErrors,
-          lidOpenHold: null,
-          lidTargetTemp: timelineHasErrors ? null : 43,
-          lidTargetTempHold: null,
-          moduleId: 'someThermocyclerModuleId',
-          orderedProfileItems: [],
-          profileItemsById: {},
-          profileTargetLidTemp: null,
-          profileVolume: null,
-          stepDetails: '',
-          stepName: 'thermocycler',
-          stepType: 'thermocycler',
-          thermocyclerFormType: null,
+          expect(createPresavedStepForm(args)).toEqual({
+            blockIsActive: !timelineHasErrors,
+            blockIsActiveHold: false,
+            blockTargetTemp: timelineHasErrors ? null : 42,
+            blockTargetTempHold: null,
+            id: stepId,
+            lidIsActive: !timelineHasErrors,
+            lidIsActiveHold: false,
+            lidOpen: !timelineHasErrors,
+            lidOpenHold: null,
+            lidTargetTemp: timelineHasErrors ? null : 43,
+            lidTargetTempHold: null,
+            moduleId: 'someThermocyclerModuleId',
+            orderedProfileItems: [],
+            profileItemsById: {},
+            profileTargetLidTemp: null,
+            profileVolume: null,
+            stepDetails: '',
+            stepName: 'thermocycler',
+            stepType: 'thermocycler',
+            thermocyclerFormType: null,
+          })
         })
       })
     })
-  })
 })

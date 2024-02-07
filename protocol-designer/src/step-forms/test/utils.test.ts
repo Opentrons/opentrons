@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { getIdsInRange } from '../utils'
 describe('getIdsInRange', () => {
   it('gets id in array of length 1', () => {

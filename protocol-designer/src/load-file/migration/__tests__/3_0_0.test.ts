@@ -1,7 +1,8 @@
+import { describe, it, expect, vi } from 'vitest'
 import { migrateFile } from '../3_0_0'
 import example_1_1_0 from '../../../../fixtures/protocol/1/example_1_1_0.json'
-jest.mock('../../../labware-defs/utils')
-jest.mock('../utils/v1LabwareModelToV2Def')
+vi.mock('../../../labware-defs/utils')
+vi.mock('../utils/v1LabwareModelToV2Def')
 describe('migrate to 3.0.0', () => {
   it('snapshot test', () => {
     // @ts-expect-error paramater is not explicitly type PDProtocolFile

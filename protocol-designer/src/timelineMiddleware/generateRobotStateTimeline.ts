@@ -3,10 +3,15 @@ import {
   moveToAddressableArea,
   getWasteChuteAddressableAreaNamePip,
   movableTrashCommandsUtil,
+  curryCommandCreator,
+  dropTip,
+  reduceCommandCreators,
+  commandCreatorsTimeline,
+  getPipetteIdFromCCArgs
 } from '@opentrons/step-generation'
-import * as StepGeneration from '@opentrons/step-generation'
 import { commandCreatorFromStepArgs } from '../file-data/helpers'
 import type { StepArgsAndErrorsById } from '../steplist/types'
+import type * as StepGeneration from '@opentrons/step-generation'
 
 export interface GenerateRobotStateTimelineArgs {
   allStepArgsAndErrors: StepArgsAndErrorsById
@@ -48,7 +53,7 @@ export const generateRobotStateTimeline = (
       // - If we don't have a 'changeTip: never' step for this pipette in the future,
       // we know the current tip(s) aren't going to be reused, so we can drop them
       // immediately after the current step is done.
-      const pipetteId = StepGeneration.getPipetteIdFromCCArgs(args)
+      const pipetteId = getPipetteIdFromCCArgs(args)
       const dropTipLocation =
         'dropTipLocation' in args ? args.dropTipLocation : null
 
@@ -81,18 +86,18 @@ export const generateRobotStateTimeline = (
         )
 
         let dropTipCommands = [
-          StepGeneration.curryCommandCreator(StepGeneration.dropTip, {
+          curryCommandCreator(dropTip, {
             pipette: pipetteId,
             dropTipLocation,
           }),
         ]
         if (isWasteChute) {
           dropTipCommands = [
-            StepGeneration.curryCommandCreator(moveToAddressableArea, {
+            curryCommandCreator(moveToAddressableArea, {
               pipetteId,
               addressableAreaName,
             }),
-            StepGeneration.curryCommandCreator(dropTipInPlace, {
+            curryCommandCreator(dropTipInPlace, {
               pipetteId,
             }),
           ]
@@ -108,7 +113,7 @@ export const generateRobotStateTimeline = (
           return [
             ...acc,
             (_invariantContext, _prevRobotState) =>
-              StepGeneration.reduceCommandCreators(
+              reduceCommandCreators(
                 [curriedCommandCreator, ...dropTipCommands],
                 _invariantContext,
                 _prevRobotState
@@ -121,7 +126,7 @@ export const generateRobotStateTimeline = (
     },
     []
   )
-  const timeline = StepGeneration.commandCreatorsTimeline(
+  const timeline = commandCreatorsTimeline(
     curriedCommandCreators,
     invariantContext,
     initialRobotState

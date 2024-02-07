@@ -1,9 +1,9 @@
+import { describe, it, expect, vi } from 'vitest'
 import { getProfileFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
-jest.mock('../../steplist/fieldLevel')
-const mockGetProfileFieldErrors = getProfileFieldErrors as jest.MockedFunction<
-  typeof getProfileFieldErrors
->
+
+vi.mock('../../steplist/fieldLevel')
+
 describe('getProfileItemsHaveErrors', () => {
   const testCases = [
     {
@@ -27,7 +27,7 @@ describe('getProfileItemsHaveErrors', () => {
             field3: '3',
           },
         }
-        mockGetProfileFieldErrors.mockImplementation((name, value) => {
+        vi.mocked(getProfileFieldErrors).mockImplementation((name, value) => {
           expect(profileItems.itemA).toHaveProperty(name, value)
           return mockGetProfileFieldErrorsReturn
         })

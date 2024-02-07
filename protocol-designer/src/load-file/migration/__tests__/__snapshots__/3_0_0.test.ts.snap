@@ -1,4 +1,302 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`migrate to 3.0.0 > snapshot test 1`] = `
+{
+  "commands": [],
+  "designerApplication": {
+    "data": {
+      "dismissedWarnings": {
+        "form": {},
+        "timeline": {},
+      },
+      "ingredLocations": {
+        "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well": {
+          "A1": {
+            "0": {
+              "volume": 121,
+            },
+          },
+          "B1": {
+            "0": {
+              "volume": 121,
+            },
+          },
+          "C1": {
+            "0": {
+              "volume": 121,
+            },
+          },
+          "D1": {
+            "0": {
+              "volume": 121,
+            },
+          },
+          "E1": {
+            "0": {
+              "volume": 121,
+            },
+          },
+          "F1": {
+            "1": {
+              "volume": 44,
+            },
+          },
+          "G1": {
+            "1": {
+              "volume": 44,
+            },
+          },
+          "H1": {
+            "1": {
+              "volume": 44,
+            },
+          },
+        },
+      },
+      "ingredients": {
+        "0": {
+          "description": null,
+          "liquidGroupId": "0",
+          "name": "samples",
+          "serialize": false,
+        },
+        "1": {
+          "description": null,
+          "liquidGroupId": "1",
+          "name": "dna",
+          "serialize": false,
+        },
+      },
+      "orderedStepIds": [
+        "e7d36200-92a5-11e9-ac62-1b173f839d9e",
+        "18113c80-92a6-11e9-ac62-1b173f839d9e",
+        "2e622080-92a6-11e9-ac62-1b173f839d9e",
+      ],
+      "pipetteTiprackAssignments": {
+        "c6f45030-92a5-11e9-ac62-1b173f839d9e": "fixture/fixture_regular_example_1/1",
+        "c6f47740-92a5-11e9-ac62-1b173f839d9e": "fixture/fixture_regular_example_1/1",
+      },
+      "savedStepForms": {
+        "18113c80-92a6-11e9-ac62-1b173f839d9e": {
+          "aspirate_flowRate": 8,
+          "blowout_checkbox": true,
+          "blowout_location": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+          "changeTip": "always",
+          "dispense_flowRate": 7,
+          "id": "18113c80-92a6-11e9-ac62-1b173f839d9e",
+          "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+          "mix_mmFromBottom": 0.5,
+          "mix_touchTip_checkbox": true,
+          "mix_touchTip_mmFromBottom": 30.5,
+          "mix_wellOrder_first": "t2b",
+          "mix_wellOrder_second": "l2r",
+          "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+          "stepDetails": "",
+          "stepName": "mix",
+          "stepType": "mix",
+          "times": 3,
+          "volume": "5.5",
+          "wells": [
+            "F1",
+          ],
+        },
+        "2e622080-92a6-11e9-ac62-1b173f839d9e": {
+          "id": "2e622080-92a6-11e9-ac62-1b173f839d9e",
+          "pauseForAmountOfTime": "true",
+          "pauseHour": 1,
+          "pauseMessage": "Delay plz",
+          "pauseMinute": 2,
+          "pauseSecond": 3,
+          "stepDetails": "",
+          "stepName": "pause",
+          "stepType": "pause",
+        },
+        "__INITIAL_DECK_SETUP_STEP__": {
+          "id": "__INITIAL_DECK_SETUP_STEP__",
+          "labwareLocationUpdate": {
+            "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul": "1",
+            "c6f51380-92a5-11e9-ac62-1b173f839d9e:tiprack-200ul": "2",
+            "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well": "10",
+            "trashId": "12",
+          },
+          "pipetteLocationUpdate": {
+            "c6f45030-92a5-11e9-ac62-1b173f839d9e": "left",
+            "c6f47740-92a5-11e9-ac62-1b173f839d9e": "right",
+          },
+          "stepType": "manualIntervention",
+        },
+        "e7d36200-92a5-11e9-ac62-1b173f839d9e": {
+          "aspirate_flowRate": 0.6,
+          "aspirate_labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+          "aspirate_mix_checkbox": true,
+          "aspirate_mix_times": 3,
+          "aspirate_mix_volume": "2",
+          "aspirate_mmFromBottom": 1,
+          "aspirate_touchTip_checkbox": true,
+          "aspirate_touchTip_mmFromBottom": 28.5,
+          "aspirate_wellOrder_first": "t2b",
+          "aspirate_wellOrder_second": "l2r",
+          "aspirate_wells": [
+            "A1",
+          ],
+          "aspirate_wells_grouped": false,
+          "blowout_checkbox": true,
+          "blowout_location": "trashId",
+          "changeTip": "always",
+          "dispense_labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
+          "dispense_mix_checkbox": true,
+          "dispense_mix_times": 2,
+          "dispense_mix_volume": "3",
+          "dispense_mmFromBottom": 2.5,
+          "dispense_touchTip_checkbox": true,
+          "dispense_wellOrder_first": "b2t",
+          "dispense_wellOrder_second": "r2l",
+          "dispense_wells": [
+            "C6",
+            "D6",
+            "E6",
+            "C7",
+            "D7",
+            "E7",
+            "C8",
+            "D8",
+            "E8",
+          ],
+          "disposalVolume_checkbox": true,
+          "disposalVolume_volume": "1",
+          "id": "e7d36200-92a5-11e9-ac62-1b173f839d9e",
+          "path": "single",
+          "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
+          "preWetTip": false,
+          "stepDetails": "yeah notes",
+          "stepName": "transfer things",
+          "stepType": "moveLiquid",
+          "volume": "6",
+        },
+      },
+    },
+    "name": "opentrons/protocol-designer",
+    "version": "3.0.0",
+  },
+  "labware": {
+    "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul": {
+      "definitionId": "fixture/fixture_regular_example_1/1",
+      "displayName": "tiprack 10ul (1)",
+      "slot": "1",
+    },
+    "c6f51380-92a5-11e9-ac62-1b173f839d9e:tiprack-200ul": {
+      "definitionId": "fixture/fixture_regular_example_1/1",
+      "displayName": "tiprack 200ul (1)",
+      "slot": "2",
+    },
+    "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well": {
+      "definitionId": "fixture/fixture_regular_example_1/1",
+      "displayName": "96 deep well (1)",
+      "slot": "10",
+    },
+    "trashId": {
+      "definitionId": "fixture/fixture_regular_example_1/1",
+      "displayName": "Trash",
+      "slot": "12",
+    },
+  },
+  "labwareDefinitions": {
+    "fixture/fixture_regular_example_1/1": {
+      "brand": {
+        "brand": "opentrons",
+        "brandId": [
+          "t40u9sernisofsea",
+        ],
+      },
+      "cornerOffsetFromSlot": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+      },
+      "dimensions": {
+        "xDimension": 127.76,
+        "yDimension": 85.48,
+        "zDimension": 50,
+      },
+      "groups": [
+        {
+          "metadata": {},
+          "wells": [
+            "A1",
+            "A2",
+          ],
+        },
+      ],
+      "metadata": {
+        "displayCategory": "wellPlate",
+        "displayName": "fake labware",
+        "displayVolumeUnits": "µL",
+      },
+      "namespace": "fixture",
+      "ordering": [
+        [
+          "A1",
+        ],
+        [
+          "A2",
+        ],
+      ],
+      "parameters": {
+        "format": "96Standard",
+        "isMagneticModuleCompatible": false,
+        "isTiprack": false,
+        "loadName": "fixture_regular_example_1",
+      },
+      "schemaVersion": 2,
+      "version": 1,
+      "wells": {
+        "A1": {
+          "depth": 40,
+          "diameter": 30,
+          "shape": "circular",
+          "totalLiquidVolume": 100,
+          "x": 10,
+          "y": 75.48,
+          "z": 15,
+        },
+        "A2": {
+          "depth": 40,
+          "diameter": 30,
+          "shape": "circular",
+          "totalLiquidVolume": 100,
+          "x": 20,
+          "y": 75.48,
+          "z": 15,
+        },
+      },
+    },
+  },
+  "metadata": {
+    "author": "Author name",
+    "category": null,
+    "created": 1560957631666,
+    "description": "Description here",
+    "lastModified": undefined,
+    "protocolName": "Some name!",
+    "subcategory": null,
+    "tags": [],
+  },
+  "pipettes": {
+    "c6f45030-92a5-11e9-ac62-1b173f839d9e": {
+      "mount": "left",
+      "name": "p10_single",
+    },
+    "c6f47740-92a5-11e9-ac62-1b173f839d9e": {
+      "mount": "right",
+      "name": "p50_single",
+    },
+  },
+  "robot": {
+    "model": "OT-2 Standard",
+  },
+  "schemaVersion": 3,
+}
+`;
 
 exports[`migrate to 3.0.0 snapshot test 1`] = `
 Object {

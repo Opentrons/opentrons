@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -13,61 +14,22 @@ import {
   savedStepForms,
   unsavedForm,
   batchEditFormChanges,
-  SavedStepFormsActions,
-  UnsavedFormActions,
-  RootState,
-  PresavedStepFormState,
-  PresavedStepFormAction,
 } from '../reducers'
-import {
-  _getPipetteEntitiesRootState,
-  _getLabwareEntitiesRootState,
-  _getInitialDeckSetupRootState,
-} from '../selectors'
+import { _getPipetteEntitiesRootState, _getLabwareEntitiesRootState, _getInitialDeckSetupRootState } from '../selectors'
 import { handleFormChange } from '../../steplist/formLevel/handleFormChange'
 import { moveDeckItem } from '../../labware-ingred/actions'
-import {
-  INITIAL_DECK_SETUP_STEP_ID,
-  SPAN7_8_10_11_SLOT,
-  PAUSE_UNTIL_TEMP,
-} from '../../constants'
-import {
-  FormData,
-  PROFILE_CYCLE,
-  PROFILE_STEP,
-  StepType,
-} from '../../form-types'
+import { INITIAL_DECK_SETUP_STEP_ID, SPAN7_8_10_11_SLOT, PAUSE_UNTIL_TEMP } from '../../constants'
 import { PRESAVED_STEP_ID } from '../../steplist/types'
 import { createPresavedStepForm } from '../utils/createPresavedStepForm'
 import { createInitialProfileCycle } from '../utils/createInitialProfileItems'
 import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 import { uuid } from '../../utils'
-import { DeckSlot } from '../../types'
-import { DeleteContainerAction } from '../../labware-ingred/actions/actions'
-import {
-  DeletePipettesAction,
-  SubstituteStepFormPipettesAction,
-} from '../actions/pipettes'
-import {
-  CreateModuleAction,
-  DeleteModuleAction,
-  EditModuleAction,
-} from '../actions/modules'
-import { ModuleEntity } from '@opentrons/step-generation'
-import {
-  AddStepAction,
-  DuplicateMultipleStepsAction,
-  DuplicateStepAction,
-  SelectMultipleStepsAction,
-  SelectStepAction,
-  SelectTerminalItemAction,
-} from '../../ui/steps'
-import {
-  ChangeBatchEditFieldAction,
-  SaveStepFormsMultiAction,
-  ResetBatchEditFieldChangesAction,
-} from '../actions'
-import {
+import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
+
+import type { ModuleEntity } from '@opentrons/step-generation'
+import type { DeckSlot } from '../../types'
+import type { DeleteContainerAction } from '../../labware-ingred/actions/actions'
+import type {
   AddProfileCycleAction,
   AddProfileStepAction,
   ChangeFormInputAction,
@@ -77,34 +39,46 @@ import {
   EditProfileCycleAction,
   EditProfileStepAction,
 } from '../../steplist/actions'
+import type { FormData, StepType } from '../../form-types'
+import type {
+  SavedStepFormsActions,
+  UnsavedFormActions,
+  RootState,
+  PresavedStepFormState,
+  PresavedStepFormAction,
+} from '../reducers'
+import type {
+  DeletePipettesAction,
+  SubstituteStepFormPipettesAction,
+} from '../actions/pipettes'
+import type {
+  CreateModuleAction,
+  DeleteModuleAction,
+  EditModuleAction,
+} from '../actions/modules'
+import type {
+  AddStepAction,
+  DuplicateMultipleStepsAction,
+  DuplicateStepAction,
+  SelectMultipleStepsAction,
+  SelectStepAction,
+  SelectTerminalItemAction,
+} from '../../ui/steps'
+import type {
+  ChangeBatchEditFieldAction,
+  SaveStepFormsMultiAction,
+  ResetBatchEditFieldChangesAction,
+} from '../actions'
 
-jest.mock('../../labware-defs/utils')
-jest.mock('../selectors')
-jest.mock('../../steplist/formLevel/handleFormChange')
-jest.mock('../utils/createPresavedStepForm')
-jest.mock('../../utils/labwareModuleCompatibility')
-jest.mock('../../utils')
-const mockUuid = uuid as jest.MockedFunction<typeof uuid>
-const mockCreatePresavedStepForm = createPresavedStepForm as jest.MockedFunction<
-  typeof createPresavedStepForm
->
-const handleFormChangeMock = handleFormChange as jest.MockedFunction<
-  typeof handleFormChange
->
-const getLabwareIsCompatibleMock = getLabwareIsCompatible as jest.MockedFunction<
-  typeof getLabwareIsCompatible
->
-const mock_getPipetteEntitiesRootState = _getPipetteEntitiesRootState as jest.MockedFunction<
-  typeof _getPipetteEntitiesRootState
->
-const mock_getLabwareEntitiesRootState = _getLabwareEntitiesRootState as jest.MockedFunction<
-  typeof _getLabwareEntitiesRootState
->
-const mock_getInitialDeckSetupRootState = _getInitialDeckSetupRootState as jest.MockedFunction<
-  typeof _getInitialDeckSetupRootState
->
+vi.mock('../../labware-defs/utils')
+vi.mock('../selectors')
+vi.mock('../../steplist/formLevel/handleFormChange')
+vi.mock('../utils/createPresavedStepForm')
+vi.mock('../../utils/labwareModuleCompatibility')
+vi.mock('../../utils')
+
 afterEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 describe('orderedStepIds reducer', () => {
   it('should add a saved step when that step is new', () => {
@@ -428,30 +402,30 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       testName: string
       action: SavedStepFormsActions
     }> = [
-      {
-        testName: 'duplicate labware',
-        action: {
-          type: 'DUPLICATE_LABWARE',
-          payload: {
-            templateLabwareId: existingLabwareId,
-            duplicateLabwareId: newLabwareId,
-            duplicateLabwareNickname: 'new labware nickname',
-            slot: newSlot,
+        {
+          testName: 'duplicate labware',
+          action: {
+            type: 'DUPLICATE_LABWARE',
+            payload: {
+              templateLabwareId: existingLabwareId,
+              duplicateLabwareId: newLabwareId,
+              duplicateLabwareNickname: 'new labware nickname',
+              slot: newSlot,
+            },
           },
         },
-      },
-      {
-        testName: `create labware in slot ${newSlot}`,
-        action: {
-          type: 'CREATE_CONTAINER',
-          payload: {
-            slot: newSlot,
-            labwareDefURI: 'fixtures/foo/1',
-            id: newLabwareId,
+        {
+          testName: `create labware in slot ${newSlot}`,
+          action: {
+            type: 'CREATE_CONTAINER',
+            payload: {
+              slot: newSlot,
+              labwareDefURI: 'fixtures/foo/1',
+              id: newLabwareId,
+            },
           },
         },
-      },
-    ]
+      ]
     testCases.forEach(({ testName, action }) => {
       it(testName, () => {
         const prevRootState = makePrevRootState({
@@ -480,325 +454,325 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       expectedLabwareLocations?: Record<string, any>
       expectedModuleLocations?: Record<string, any>
     }> = [
-      {
-        testName: 'move labware to empty slot -> simple move',
-        sourceSlot: '1',
-        destSlot: '3',
-        makeStateArgs: {
-          labwareLocationUpdate: {
-            [existingLabwareId]: '1',
+        {
+          testName: 'move labware to empty slot -> simple move',
+          sourceSlot: '1',
+          destSlot: '3',
+          makeStateArgs: {
+            labwareLocationUpdate: {
+              [existingLabwareId]: '1',
+            },
+          },
+          expectedLabwareLocations: {
+            [existingLabwareId]: '3',
           },
         },
-        expectedLabwareLocations: {
-          [existingLabwareId]: '3',
-        },
-      },
-      {
-        testName: 'move labware to slot with labware -> swap labware',
-        sourceSlot: '1',
-        destSlot: '3',
-        makeStateArgs: {
-          labwareLocationUpdate: {
-            [existingLabwareId]: '1',
-            [otherLabwareId]: '3',
+        {
+          testName: 'move labware to slot with labware -> swap labware',
+          sourceSlot: '1',
+          destSlot: '3',
+          makeStateArgs: {
+            labwareLocationUpdate: {
+              [existingLabwareId]: '1',
+              [otherLabwareId]: '3',
+            },
+          },
+          expectedLabwareLocations: {
+            [existingLabwareId]: '3',
+            [otherLabwareId]: '1',
           },
         },
-        expectedLabwareLocations: {
-          [existingLabwareId]: '3',
-          [otherLabwareId]: '1',
-        },
-      },
-      {
-        testName: 'move labware empty module -> labware added to module',
-        sourceSlot: '1',
-        destSlot: moduleId,
-        makeStateArgs: {
-          labwareLocationUpdate: {
-            [existingLabwareId]: '1',
+        {
+          testName: 'move labware empty module -> labware added to module',
+          sourceSlot: '1',
+          destSlot: moduleId,
+          makeStateArgs: {
+            labwareLocationUpdate: {
+              [existingLabwareId]: '1',
+            },
+            moduleLocationUpdate: {
+              [moduleId]: '3',
+            },
           },
-          moduleLocationUpdate: {
+          expectedLabwareLocations: {
+            [existingLabwareId]: moduleId,
+          },
+          expectedModuleLocations: {
             [moduleId]: '3',
           },
         },
-        expectedLabwareLocations: {
-          [existingLabwareId]: moduleId,
-        },
-        expectedModuleLocations: {
-          [moduleId]: '3',
-        },
-      },
-      {
-        // NOTE: if labware is incompatible, it's up to the UI to block this.
-        testName:
-          'move labware to slot with occupied module -> swap labware, module stays',
-        sourceSlot: '1',
-        destSlot: moduleId,
-        makeStateArgs: {
-          labwareLocationUpdate: {
-            [existingLabwareId]: '1',
-            [labwareOnModuleId]: moduleId,
+        {
+          // NOTE: if labware is incompatible, it's up to the UI to block this.
+          testName:
+            'move labware to slot with occupied module -> swap labware, module stays',
+          sourceSlot: '1',
+          destSlot: moduleId,
+          makeStateArgs: {
+            labwareLocationUpdate: {
+              [existingLabwareId]: '1',
+              [labwareOnModuleId]: moduleId,
+            },
+            moduleLocationUpdate: {
+              [moduleId]: '3',
+            },
           },
-          moduleLocationUpdate: {
+          expectedLabwareLocations: {
+            [existingLabwareId]: moduleId,
+            [labwareOnModuleId]: '1',
+          },
+          expectedModuleLocations: {
             [moduleId]: '3',
           },
         },
-        expectedLabwareLocations: {
-          [existingLabwareId]: moduleId,
-          [labwareOnModuleId]: '1',
-        },
-        expectedModuleLocations: {
-          [moduleId]: '3',
-        },
-      },
-      {
-        testName: 'move empty module to empty slot -> simple move',
-        sourceSlot: '1',
-        destSlot: '3',
-        makeStateArgs: {
-          labwareLocationUpdate: {},
-          moduleLocationUpdate: {
-            [moduleId]: '1',
+        {
+          testName: 'move empty module to empty slot -> simple move',
+          sourceSlot: '1',
+          destSlot: '3',
+          makeStateArgs: {
+            labwareLocationUpdate: {},
+            moduleLocationUpdate: {
+              [moduleId]: '1',
+            },
+          },
+          expectedLabwareLocations: {},
+          expectedModuleLocations: {
+            [moduleId]: '3',
           },
         },
-        expectedLabwareLocations: {},
-        expectedModuleLocations: {
-          [moduleId]: '3',
-        },
-      },
-      {
-        testName:
-          'move empty module to slot with incompatible labware -> swap slots, do not add labware to module',
-        sourceSlot: '1',
-        destSlot: '3',
-        makeStateArgs: {
-          labwareLocationUpdate: {
-            [existingLabwareId]: '3',
+        {
+          testName:
+            'move empty module to slot with incompatible labware -> swap slots, do not add labware to module',
+          sourceSlot: '1',
+          destSlot: '3',
+          makeStateArgs: {
+            labwareLocationUpdate: {
+              [existingLabwareId]: '3',
+            },
+            moduleLocationUpdate: {
+              [moduleId]: '1',
+            },
           },
-          moduleLocationUpdate: {
-            [moduleId]: '1',
-          },
-        },
-        deckSetup: {
-          labware: {
-            [existingLabwareId]: {
-              id: existingLabwareId,
-              slot: '3',
-              def: {
-                foo: 'fake def',
+          deckSetup: {
+            labware: {
+              [existingLabwareId]: {
+                id: existingLabwareId,
+                slot: '3',
+                def: {
+                  foo: 'fake def',
+                },
+              },
+            },
+            pipettes: {},
+            modules: {
+              [moduleId]: {
+                id: moduleId,
+                type: MAGNETIC_MODULE_TYPE,
+                model: MAGNETIC_MODULE_V2,
+                slot: '1',
               },
             },
           },
-          pipettes: {},
-          modules: {
-            [moduleId]: {
-              id: moduleId,
-              type: MAGNETIC_MODULE_TYPE,
-              model: MAGNETIC_MODULE_V2,
-              slot: '1',
+          labwareIsCompatible: false,
+          expectedLabwareLocations: {
+            [existingLabwareId]: '1',
+          },
+          expectedModuleLocations: {
+            [moduleId]: '3',
+          },
+        },
+        {
+          testName:
+            'move empty module to slot with compatible labware -> put module under labware',
+          sourceSlot: '1',
+          destSlot: '3',
+          makeStateArgs: {
+            labwareLocationUpdate: {
+              [existingLabwareId]: '3',
+            },
+            moduleLocationUpdate: {
+              [moduleId]: '1',
             },
           },
-        },
-        labwareIsCompatible: false,
-        expectedLabwareLocations: {
-          [existingLabwareId]: '1',
-        },
-        expectedModuleLocations: {
-          [moduleId]: '3',
-        },
-      },
-      {
-        testName:
-          'move empty module to slot with compatible labware -> put module under labware',
-        sourceSlot: '1',
-        destSlot: '3',
-        makeStateArgs: {
-          labwareLocationUpdate: {
-            [existingLabwareId]: '3',
-          },
-          moduleLocationUpdate: {
-            [moduleId]: '1',
-          },
-        },
-        deckSetup: {
-          labware: {
-            [existingLabwareId]: {
-              id: existingLabwareId,
-              slot: '3',
-              def: {
-                foo: 'fake def',
+          deckSetup: {
+            labware: {
+              [existingLabwareId]: {
+                id: existingLabwareId,
+                slot: '3',
+                def: {
+                  foo: 'fake def',
+                },
+              },
+            },
+            pipettes: {},
+            modules: {
+              [moduleId]: {
+                id: moduleId,
+                type: MAGNETIC_MODULE_TYPE,
+                model: MAGNETIC_MODULE_V2,
+                slot: '1',
               },
             },
           },
-          pipettes: {},
-          modules: {
-            [moduleId]: {
-              id: moduleId,
-              type: MAGNETIC_MODULE_TYPE,
-              model: MAGNETIC_MODULE_V2,
-              slot: '1',
-            },
+          labwareIsCompatible: true,
+          expectedLabwareLocations: {
+            [existingLabwareId]: moduleId,
+          },
+          expectedModuleLocations: {
+            [moduleId]: '3',
           },
         },
-        labwareIsCompatible: true,
-        expectedLabwareLocations: {
-          [existingLabwareId]: moduleId,
-        },
-        expectedModuleLocations: {
-          [moduleId]: '3',
-        },
-      },
-      {
-        testName:
-          'move occupied module to slot with labware -> swap slots, do not change labware on module (even if compatible)',
-        sourceSlot: '1',
-        destSlot: '3',
-        makeStateArgs: {
-          labwareLocationUpdate: {
-            [existingLabwareId]: '3',
+        {
+          testName:
+            'move occupied module to slot with labware -> swap slots, do not change labware on module (even if compatible)',
+          sourceSlot: '1',
+          destSlot: '3',
+          makeStateArgs: {
+            labwareLocationUpdate: {
+              [existingLabwareId]: '3',
+              [labwareOnModuleId]: moduleId,
+            },
+            moduleLocationUpdate: {
+              [moduleId]: '1',
+            },
+          },
+          deckSetup: {
+            labware: {
+              [existingLabwareId]: {
+                id: existingLabwareId,
+                slot: '3',
+                def: {
+                  foo: 'fake def',
+                },
+              },
+              [labwareOnModuleId]: {
+                id: labwareOnModuleId,
+                slot: moduleId,
+                def: {
+                  foo: 'fake def',
+                },
+              },
+            },
+            pipettes: {},
+            modules: {
+              [moduleId]: {
+                id: moduleId,
+                type: MAGNETIC_MODULE_TYPE,
+                model: MAGNETIC_MODULE_V2,
+                slot: '1',
+              },
+            },
+          },
+          labwareIsCompatible: true,
+          expectedLabwareLocations: {
+            [existingLabwareId]: '1',
             [labwareOnModuleId]: moduleId,
           },
-          moduleLocationUpdate: {
+          expectedModuleLocations: {
+            [moduleId]: '3',
+          },
+        },
+        {
+          testName: 'move labware off of module to empty slot',
+          sourceSlot: moduleId,
+          destSlot: '3',
+          makeStateArgs: {
+            labwareLocationUpdate: {
+              [labwareOnModuleId]: moduleId,
+            },
+            moduleLocationUpdate: {
+              [moduleId]: '1',
+            },
+          },
+          expectedLabwareLocations: {
+            [labwareOnModuleId]: '3',
+          },
+          expectedModuleLocations: {
             [moduleId]: '1',
           },
         },
-        deckSetup: {
-          labware: {
-            [existingLabwareId]: {
-              id: existingLabwareId,
-              slot: '3',
-              def: {
-                foo: 'fake def',
-              },
+        {
+          testName: 'move empty module to occupied module -> swap, keep pairings',
+          sourceSlot: '1',
+          destSlot: '3',
+          makeStateArgs: {
+            labwareLocationUpdate: {
+              [labwareOnModuleId]: moduleId,
             },
-            [labwareOnModuleId]: {
-              id: labwareOnModuleId,
-              slot: moduleId,
-              def: {
-                foo: 'fake def',
-              },
+            moduleLocationUpdate: {
+              [moduleId]: '1',
+              [otherModuleId]: '3',
             },
           },
-          pipettes: {},
-          modules: {
-            [moduleId]: {
-              id: moduleId,
-              type: MAGNETIC_MODULE_TYPE,
-              model: MAGNETIC_MODULE_V2,
-              slot: '1',
-            },
-          },
-        },
-        labwareIsCompatible: true,
-        expectedLabwareLocations: {
-          [existingLabwareId]: '1',
-          [labwareOnModuleId]: moduleId,
-        },
-        expectedModuleLocations: {
-          [moduleId]: '3',
-        },
-      },
-      {
-        testName: 'move labware off of module to empty slot',
-        sourceSlot: moduleId,
-        destSlot: '3',
-        makeStateArgs: {
-          labwareLocationUpdate: {
+          expectedLabwareLocations: {
             [labwareOnModuleId]: moduleId,
           },
-          moduleLocationUpdate: {
-            [moduleId]: '1',
+          expectedModuleLocations: {
+            [moduleId]: '3',
+            [otherModuleId]: '1',
           },
         },
-        expectedLabwareLocations: {
-          [labwareOnModuleId]: '3',
-        },
-        expectedModuleLocations: {
-          [moduleId]: '1',
-        },
-      },
-      {
-        testName: 'move empty module to occupied module -> swap, keep pairings',
-        sourceSlot: '1',
-        destSlot: '3',
-        makeStateArgs: {
-          labwareLocationUpdate: {
-            [labwareOnModuleId]: moduleId,
+        {
+          testName: 'empty module to empty module -> swap',
+          sourceSlot: '1',
+          destSlot: '3',
+          makeStateArgs: {
+            labwareLocationUpdate: {},
+            moduleLocationUpdate: {
+              [moduleId]: '1',
+              [otherModuleId]: '3',
+            },
           },
-          moduleLocationUpdate: {
-            [moduleId]: '1',
-            [otherModuleId]: '3',
+          expectedLabwareLocations: {},
+          expectedModuleLocations: {
+            [moduleId]: '3',
+            [otherModuleId]: '1',
           },
         },
-        expectedLabwareLocations: {
-          [labwareOnModuleId]: moduleId,
-        },
-        expectedModuleLocations: {
-          [moduleId]: '3',
-          [otherModuleId]: '1',
-        },
-      },
-      {
-        testName: 'empty module to empty module -> swap',
-        sourceSlot: '1',
-        destSlot: '3',
-        makeStateArgs: {
-          labwareLocationUpdate: {},
-          moduleLocationUpdate: {
-            [moduleId]: '1',
-            [otherModuleId]: '3',
+        {
+          testName: 'occupied module to occupied module -> swap, keep pairings',
+          sourceSlot: '1',
+          destSlot: '3',
+          makeStateArgs: {
+            labwareLocationUpdate: {
+              [labwareOnModuleId]: moduleId,
+              [otherLabwareId]: otherModuleId,
+            },
+            moduleLocationUpdate: {
+              [moduleId]: '1',
+              [otherModuleId]: '3',
+            },
           },
-        },
-        expectedLabwareLocations: {},
-        expectedModuleLocations: {
-          [moduleId]: '3',
-          [otherModuleId]: '1',
-        },
-      },
-      {
-        testName: 'occupied module to occupied module -> swap, keep pairings',
-        sourceSlot: '1',
-        destSlot: '3',
-        makeStateArgs: {
-          labwareLocationUpdate: {
+          expectedLabwareLocations: {
             [labwareOnModuleId]: moduleId,
             [otherLabwareId]: otherModuleId,
           },
-          moduleLocationUpdate: {
-            [moduleId]: '1',
-            [otherModuleId]: '3',
+          expectedModuleLocations: {
+            [moduleId]: '3',
+            [otherModuleId]: '1',
           },
         },
-        expectedLabwareLocations: {
-          [labwareOnModuleId]: moduleId,
-          [otherLabwareId]: otherModuleId,
-        },
-        expectedModuleLocations: {
-          [moduleId]: '3',
-          [otherModuleId]: '1',
-        },
-      },
-      {
-        testName: 'occupied module to empty module -> swap, keep pairings',
-        sourceSlot: '1',
-        destSlot: '3',
-        makeStateArgs: {
-          labwareLocationUpdate: {
+        {
+          testName: 'occupied module to empty module -> swap, keep pairings',
+          sourceSlot: '1',
+          destSlot: '3',
+          makeStateArgs: {
+            labwareLocationUpdate: {
+              [labwareOnModuleId]: moduleId,
+            },
+            moduleLocationUpdate: {
+              [moduleId]: '1',
+              [otherModuleId]: '3',
+            },
+          },
+          expectedLabwareLocations: {
             [labwareOnModuleId]: moduleId,
           },
-          moduleLocationUpdate: {
-            [moduleId]: '1',
-            [otherModuleId]: '3',
+          expectedModuleLocations: {
+            [moduleId]: '3',
+            [otherModuleId]: '1',
           },
         },
-        expectedLabwareLocations: {
-          [labwareOnModuleId]: moduleId,
-        },
-        expectedModuleLocations: {
-          [moduleId]: '3',
-          [otherModuleId]: '1',
-        },
-      },
-    ]
+      ]
     testCases.forEach(
       ({
         testName,
@@ -811,8 +785,8 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         expectedModuleLocations,
       }) => {
         it(testName, () => {
-          mock_getInitialDeckSetupRootState.mockReturnValue(deckSetup)
-          getLabwareIsCompatibleMock.mockReturnValue(
+          vi.mocked(_getInitialDeckSetupRootState).mockReturnValue(deckSetup)
+          vi.mocked(getLabwareIsCompatible).mockReturnValue(
             labwareIsCompatible as boolean
           )
           const prevRootState = makePrevRootState(makeStateArgs)
@@ -976,91 +950,91 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         action: SavedStepFormsActions
         expectedModuleId: string
       }> = [
-        {
-          testName: 'create mag mod -> override mag step module id',
-          action: {
-            type: 'CREATE_MODULE',
-            payload: {
-              id: 'newMagdeckId',
-              slot: '1',
-              type: MAGNETIC_MODULE_TYPE,
-              model: 'magneticModuleV1',
+          {
+            testName: 'create mag mod -> override mag step module id',
+            action: {
+              type: 'CREATE_MODULE',
+              payload: {
+                id: 'newMagdeckId',
+                slot: '1',
+                type: MAGNETIC_MODULE_TYPE,
+                model: 'magneticModuleV1',
+              },
             },
+            expectedModuleId: 'newMagdeckId',
           },
-          expectedModuleId: 'newMagdeckId',
-        },
-        {
-          testName: 'create temp mod -> DO NOT override mag step module id',
-          action: {
-            type: 'CREATE_MODULE',
-            payload: {
-              id: 'tempdeckId',
-              slot: '1',
-              type: TEMPERATURE_MODULE_TYPE,
-              model: 'temperatureModuleV1',
+          {
+            testName: 'create temp mod -> DO NOT override mag step module id',
+            action: {
+              type: 'CREATE_MODULE',
+              payload: {
+                id: 'tempdeckId',
+                slot: '1',
+                type: TEMPERATURE_MODULE_TYPE,
+                model: 'temperatureModuleV1',
+              },
             },
+            expectedModuleId: 'magdeckId',
           },
-          expectedModuleId: 'magdeckId',
-        },
-        {
-          testName: 'create TC -> DO NOT override mag step module id',
-          action: {
-            type: 'CREATE_MODULE',
-            payload: {
-              id: 'ThermocyclerId',
-              slot: '1',
-              type: THERMOCYCLER_MODULE_TYPE,
-              model: 'thermocyclerModuleV1',
+          {
+            testName: 'create TC -> DO NOT override mag step module id',
+            action: {
+              type: 'CREATE_MODULE',
+              payload: {
+                id: 'ThermocyclerId',
+                slot: '1',
+                type: THERMOCYCLER_MODULE_TYPE,
+                model: 'thermocyclerModuleV1',
+              },
             },
+            expectedModuleId: 'magdeckId',
           },
-          expectedModuleId: 'magdeckId',
-        },
-      ]
+        ]
       const TCStepCases: Array<{
         testName: string
         action: SavedStepFormsActions
         expectedModuleId: string
       }> = [
-        {
-          testName: 'create TC -> override TC step module id',
-          action: {
-            type: 'CREATE_MODULE',
-            payload: {
-              id: 'NewTCId',
-              slot: SPAN7_8_10_11_SLOT,
-              type: THERMOCYCLER_MODULE_TYPE,
-              model: 'thermocyclerModuleV1',
+          {
+            testName: 'create TC -> override TC step module id',
+            action: {
+              type: 'CREATE_MODULE',
+              payload: {
+                id: 'NewTCId',
+                slot: SPAN7_8_10_11_SLOT,
+                type: THERMOCYCLER_MODULE_TYPE,
+                model: 'thermocyclerModuleV1',
+              },
             },
+            expectedModuleId: 'NewTCId',
           },
-          expectedModuleId: 'NewTCId',
-        },
-        {
-          testName: 'create temp mod -> DO NOT override TC step module id',
-          action: {
-            type: 'CREATE_MODULE',
-            payload: {
-              id: 'tempdeckId',
-              slot: '1',
-              type: TEMPERATURE_MODULE_TYPE,
-              model: 'temperatureModuleV1',
+          {
+            testName: 'create temp mod -> DO NOT override TC step module id',
+            action: {
+              type: 'CREATE_MODULE',
+              payload: {
+                id: 'tempdeckId',
+                slot: '1',
+                type: TEMPERATURE_MODULE_TYPE,
+                model: 'temperatureModuleV1',
+              },
             },
+            expectedModuleId: 'TCId',
           },
-          expectedModuleId: 'TCId',
-        },
-        {
-          testName: 'create magnetic mod -> DO NOT override TC step module id',
-          action: {
-            type: 'CREATE_MODULE',
-            payload: {
-              id: 'newMagdeckId',
-              slot: '1',
-              type: MAGNETIC_MODULE_TYPE,
-              model: 'magneticModuleV2',
+          {
+            testName: 'create magnetic mod -> DO NOT override TC step module id',
+            action: {
+              type: 'CREATE_MODULE',
+              payload: {
+                id: 'newMagdeckId',
+                slot: '1',
+                type: MAGNETIC_MODULE_TYPE,
+                model: 'magneticModuleV2',
+              },
             },
+            expectedModuleId: 'TCId',
           },
-          expectedModuleId: 'TCId',
-        },
-      ]
+        ]
       magneticStepCases.forEach(({ testName, action, expectedModuleId }) => {
         it(testName, () => {
           const result = savedStepForms(prevRootStateWithMagAndTCSteps, action)
@@ -1086,51 +1060,51 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       expectedLabwareLocations?: Record<string, any>
       expectedModuleLocations?: Record<string, any>
     }> = [
-      {
-        testName: 'delete unoccupied module',
-        makeStateArgs: {
-          moduleLocationUpdate: {
-            [moduleId]: '1',
+        {
+          testName: 'delete unoccupied module',
+          makeStateArgs: {
+            moduleLocationUpdate: {
+              [moduleId]: '1',
+              [otherModuleId]: '2',
+            },
+          },
+          expectedLabwareLocations: {},
+          expectedModuleLocations: {
             [otherModuleId]: '2',
           },
         },
-        expectedLabwareLocations: {},
-        expectedModuleLocations: {
-          [otherModuleId]: '2',
-        },
-      },
-      {
-        testName: 'delete occupied module -> labware goes into its slot',
-        makeStateArgs: {
-          labwareLocationUpdate: {
-            [labwareOnModuleId]: moduleId,
+        {
+          testName: 'delete occupied module -> labware goes into its slot',
+          makeStateArgs: {
+            labwareLocationUpdate: {
+              [labwareOnModuleId]: moduleId,
+            },
+            moduleLocationUpdate: {
+              [moduleId]: '3',
+            },
           },
-          moduleLocationUpdate: {
-            [moduleId]: '3',
+          expectedLabwareLocations: {
+            [labwareOnModuleId]: '3',
           },
+          expectedModuleLocations: {},
         },
-        expectedLabwareLocations: {
-          [labwareOnModuleId]: '3',
-        },
-        expectedModuleLocations: {},
-      },
-      {
-        testName:
-          'delete occupied module in span7_8_10_11 slot -> labware goes into slot 7',
-        makeStateArgs: {
-          labwareLocationUpdate: {
-            [labwareOnModuleId]: moduleId,
+        {
+          testName:
+            'delete occupied module in span7_8_10_11 slot -> labware goes into slot 7',
+          makeStateArgs: {
+            labwareLocationUpdate: {
+              [labwareOnModuleId]: moduleId,
+            },
+            moduleLocationUpdate: {
+              [moduleId]: SPAN7_8_10_11_SLOT,
+            },
           },
-          moduleLocationUpdate: {
-            [moduleId]: SPAN7_8_10_11_SLOT,
+          expectedLabwareLocations: {
+            [labwareOnModuleId]: '7',
           },
+          expectedModuleLocations: {},
         },
-        expectedLabwareLocations: {
-          [labwareOnModuleId]: '7',
-        },
-        expectedModuleLocations: {},
-      },
-    ]
+      ]
     testCases.forEach(
       ({
         testName,
@@ -1394,7 +1368,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
   })
   describe('EDIT_MODULE', () => {
     it('should set engageHeight to null for all Magnet > Engage steps when a magnet module has its model changed, unless height matches default', () => {
-      mock_getInitialDeckSetupRootState.mockReturnValue({
+      vi.mocked(_getInitialDeckSetupRootState).mockReturnValue({
         labware: {
           magPlateId: {
             id: 'magPlateId',
@@ -1560,21 +1534,21 @@ describe('unsavedForm reducer', () => {
         },
       },
     }
-    handleFormChangeMock.mockReturnValue({
+    vi.mocked(handleFormChange).mockReturnValue({
       someField: 42,
     })
-    mock_getPipetteEntitiesRootState.mockReturnValue(
+    vi.mocked(_getPipetteEntitiesRootState).mockReturnValue(
       // @ts-expect-error(sa, 2021-6-14): not a valid PipetteEntities Type
       'pipetteEntitiesPlaceholder'
     )
-    mock_getLabwareEntitiesRootState.mockReturnValue(
+    vi.mocked(_getLabwareEntitiesRootState).mockReturnValue(
       // @ts-expect-error(sa, 2021-6-14): not a valid LabwareEntities Type
       'labwareEntitiesPlaceholder'
     )
     const result = unsavedForm(rootState, action)
-    expect(mock_getPipetteEntitiesRootState.mock.calls).toEqual([[rootState]])
-    expect(mock_getLabwareEntitiesRootState.mock.calls).toEqual([[rootState]])
-    expect(handleFormChangeMock.mock.calls).toEqual([
+    expect(vi.mocked(_getPipetteEntitiesRootState).mock.calls).toEqual([[rootState]])
+    expect(vi.mocked(_getLabwareEntitiesRootState).mock.calls).toEqual([[rootState]])
+    expect(vi.mocked(handleFormChange).mock.calls).toEqual([
       [
         action.payload.update,
         rootState.unsavedForm,
@@ -1607,21 +1581,21 @@ describe('unsavedForm reducer', () => {
         otherField: 'blah',
       },
     }
-    handleFormChangeMock.mockReturnValue({
+    vi.mocked(handleFormChange).mockReturnValue({
       pipette: 'newPipetteId',
     })
-    mock_getPipetteEntitiesRootState.mockReturnValue(
+    vi.mocked(_getPipetteEntitiesRootState).mockReturnValue(
       // @ts-expect-error(sa, 2021-6-14): not a valid PipetteEntities Type
       'pipetteEntitiesPlaceholder'
     )
-    mock_getLabwareEntitiesRootState.mockReturnValue(
+    vi.mocked(_getLabwareEntitiesRootState).mockReturnValue(
       // @ts-expect-error(sa, 2021-6-14): not a valid LabwareEntities Type
       'labwareEntitiesPlaceholder'
     )
     const result = unsavedForm(rootState, action)
-    expect(mock_getPipetteEntitiesRootState.mock.calls).toEqual([[rootState]])
-    expect(mock_getLabwareEntitiesRootState.mock.calls).toEqual([[rootState]])
-    expect(handleFormChangeMock.mock.calls).toEqual([
+    expect(vi.mocked(_getPipetteEntitiesRootState).mock.calls).toEqual([[rootState]])
+    expect(vi.mocked(_getLabwareEntitiesRootState).mock.calls).toEqual([[rootState]])
+    expect(vi.mocked(handleFormChange).mock.calls).toEqual([
       [
         {
           pipette: 'newPipetteId',
@@ -1658,12 +1632,12 @@ describe('unsavedForm reducer', () => {
     })
   })
   it('should return the result createPresavedStepForm util upon ADD_STEP action', () => {
-    mockCreatePresavedStepForm.mockReturnValue(
+    vi.mocked(createPresavedStepForm).mockReturnValue(
       // @ts-expect-error(sa, 2021-6-14): not a valid FormData Type
       'createPresavedStepFormMockResult'
     )
     // @ts-expect-error(sa, 2021-6-14): not valid InitialDeckSetup state
-    mock_getInitialDeckSetupRootState.mockReturnValue('initalDeckSetupValue')
+    vi.mocked(_getInitialDeckSetupRootState).mockReturnValue('initalDeckSetupValue')
     const stateMock: RootState = {
       // @ts-expect-error(sa, 2021-6-14): not valid savedStepForms state
       savedStepForms: 'savedStepFormsValue',
@@ -1682,7 +1656,7 @@ describe('unsavedForm reducer', () => {
       },
     })
     expect(result).toEqual('createPresavedStepFormMockResult')
-    expect(mockCreatePresavedStepForm.mock.calls).toEqual([
+    expect(vi.mocked(createPresavedStepForm).mock.calls).toEqual([
       [
         {
           stepId: 'stepId123',
@@ -1707,8 +1681,8 @@ describe('unsavedForm reducer', () => {
     // NOTE: because we're using uuid() to create multiple different ids,
     // this test is sensitive to the order that uuid is called in and
     // assumes it's first for cycle id, then next for profile step id
-    mockUuid.mockReturnValueOnce(id)
-    mockUuid.mockReturnValueOnce(profileStepId)
+    vi.mocked(uuid).mockReturnValueOnce(id)
+    vi.mocked(uuid).mockReturnValueOnce(profileStepId)
     const state: RootState = {
       // @ts-expect-error(sa, 2021-6-14): add id to fixture
       unsavedForm: {
@@ -1735,7 +1709,7 @@ describe('unsavedForm reducer', () => {
         cycleId,
       },
     }
-    mockUuid.mockReturnValue(stepId)
+    vi.mocked(uuid).mockReturnValue(stepId)
     const state: RootState = {
       // @ts-expect-error(sa, 2021-6-14): add id to fixture
       unsavedForm: {

@@ -1,16 +1,16 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import Ajv from 'ajv'
-import protocolV8Schema from '@opentrons/shared-data/protocol/schemas/8.json'
-import commandV8Schema from '@opentrons/shared-data/command/schemas/8.json'
-import labwareV2Schema from '@opentrons/shared-data/labware/schemas/2.json'
-import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import { commandSchemaV8, labwareSchemaV2, protocolSchemaV8 } from '@opentrons/shared-data'
+import {
+  fixture_12_trough,
+  fixture_96_plate,
+  fixture_tiprack_10_ul,
+  fixture_tiprack_300_ul,
+} from '@opentrons/shared-data/labware/fixtures/2'
 import {
   fixtureP10Single,
   fixtureP300Single,
 } from '@opentrons/shared-data/pipette/fixtures/name'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
 import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
 import { createFile, getLabwareDefinitionsInUse } from '../selectors'
 import {
@@ -25,17 +25,14 @@ import {
   ot2Robot,
 } from '../__fixtures__/createFile/commonFields'
 import * as v7Fixture from '../__fixtures__/createFile/v7Fixture'
-import {
+import { type LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
   LabwareEntities,
   PipetteEntities,
 } from '../../../../step-generation/src/types'
-import { LabwareDefByDefURI } from '../../labware-defs'
+import type { LabwareDefByDefURI } from '../../labware-defs'
 
-jest.mock('../../load-file/migration/utils/getLoadLiquidCommands')
-
-const mockGetLoadLiquidCommands = getLoadLiquidCommands as jest.MockedFunction<
-  typeof getLoadLiquidCommands
->
+vi.mock('../../load-file/migration/utils/getLoadLiquidCommands')
 
 const ajv = new Ajv({
   allErrors: true,
@@ -43,10 +40,10 @@ const ajv = new Ajv({
 })
 // v3 and v4 protocol schema contain reference to v2 labware schema, so give AJV access to it
 // and add v8 command schema
-ajv.addSchema(labwareV2Schema)
-ajv.addSchema(commandV8Schema)
+ajv.addSchema(labwareSchemaV2)
+ajv.addSchema(commandSchemaV8)
 
-const validateProtocol = ajv.compile(protocolV8Schema)
+const validateProtocol = ajv.compile(protocolSchemaV8)
 
 const expectResultToMatchSchema = (result: any): void => {
   const valid = validateProtocol(result)
@@ -62,10 +59,10 @@ const expectResultToMatchSchema = (result: any): void => {
 
 describe('createFile selector', () => {
   beforeEach(() => {
-    mockGetLoadLiquidCommands.mockReturnValue([])
+    vi.mocked(getLoadLiquidCommands).mockReturnValue([])
   })
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
   it('should return a schema-valid JSON V8 protocol', () => {
     // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
@@ -88,7 +85,7 @@ describe('createFile selector', () => {
     )
     expectResultToMatchSchema(result)
 
-    expect(mockGetLoadLiquidCommands).toHaveBeenCalledWith(
+    expect(vi.mocked(getLoadLiquidCommands)).toHaveBeenCalledWith(
       ingredients,
       ingredLocations
     )
