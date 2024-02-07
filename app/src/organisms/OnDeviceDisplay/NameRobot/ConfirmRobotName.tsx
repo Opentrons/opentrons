@@ -34,7 +34,7 @@ export function ConfirmRobotName({
   }
   return (
     <>
-      <StepMeter totalSteps={6} currentStep={6} />
+      <StepMeter totalSteps={5} currentStep={5} />
       <Flex
         padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
         flexDirection={DIRECTION_COLUMN}

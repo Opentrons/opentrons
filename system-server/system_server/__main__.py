@@ -2,7 +2,7 @@
 import logging
 from . import systemd
 from .cli import build_root_parser
-import uvicorn  # type: ignore[import]
+import uvicorn
 
 LOG = logging.getLogger(__name__)
 

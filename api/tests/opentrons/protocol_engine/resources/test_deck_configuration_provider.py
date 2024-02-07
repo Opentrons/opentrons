@@ -2,7 +2,7 @@
 from typing import List, Set
 
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4

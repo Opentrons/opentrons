@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from io import BytesIO
-from typing import IO
+from typing import BinaryIO
 
 from opentrons.protocol_reader import AbstractInputFile
 
@@ -12,7 +12,7 @@ class InputFile(AbstractInputFile):
     """An implementation of AbstractInputFile to use for test input."""
 
     filename: str
-    file: IO[bytes]
+    file: BinaryIO
 
     @classmethod
     def make(cls, filename: str, contents: bytes) -> InputFile:

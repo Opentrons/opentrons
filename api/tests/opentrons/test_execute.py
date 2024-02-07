@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Generator, List, TextIO, cast
 
 import pytest
+from _pytest.fixtures import SubRequest
 
 from opentrons_shared_data import get_shared_data_root, load_shared_data
 from opentrons_shared_data.pipette.dev_types import PipetteModel
@@ -31,13 +32,13 @@ HERE = Path(__file__).parent
 
 
 @pytest.fixture(params=[APIVersion(2, 0), ENGINE_CORE_API_VERSION])
-def api_version(request: pytest.FixtureRequest) -> APIVersion:
+def api_version(request: SubRequest) -> APIVersion:
     """Return an API version to test with.
 
     Newer API versions execute through Protocol Engine, and older API versions don't.
     The two codepaths are very different, so we need to test them both.
     """
-    return request.param  # type: ignore[attr-defined,no-any-return]
+    return cast(APIVersion, request.param)
 
 
 @pytest.fixture

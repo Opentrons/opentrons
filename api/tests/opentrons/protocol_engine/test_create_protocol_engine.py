@@ -1,6 +1,6 @@
 """Smoke tests for the ProtocolEngine creation factory."""
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
 from opentrons_shared_data.robot.dev_types import RobotType

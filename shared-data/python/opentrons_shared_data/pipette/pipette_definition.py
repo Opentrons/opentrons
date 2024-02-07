@@ -253,7 +253,7 @@ class PartialTipDefinition(BaseModel):
         description="Whether partial tip pick up is supported.",
         alias="partialTipSupported",
     )
-    available_configurations: List[int] = Field(
+    available_configurations: Optional[List[int]] = Field(
         default=None,
         description="A list of the types of partial tip configurations supported, listed by channel ints",
         alias="availableConfigurations",

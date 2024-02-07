@@ -2,7 +2,7 @@
 import inspect
 
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
 
 from opentrons.legacy_broker import LegacyBroker

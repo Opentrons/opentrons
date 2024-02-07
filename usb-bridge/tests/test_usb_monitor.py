@@ -4,7 +4,7 @@ import pytest
 import mock
 from pathlib import Path
 import os
-import pyudev  # type: ignore[import]
+import pyudev  # type: ignore[import-untyped]
 from ot3usb import usb_monitor
 
 TEST_PHY_NAME = "usbphy123"
