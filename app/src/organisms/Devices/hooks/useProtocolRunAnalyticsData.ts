@@ -1,10 +1,13 @@
 import { useSelector } from 'react-redux'
 
 import { hash } from '../../../redux/analytics/hash'
-import { useRobot } from './'
 import { getStoredProtocol } from '../../../redux/protocol-storage'
 import { getRobotSerialNumber } from '../../../redux/discovery'
-import { useStoredProtocolAnalysis, useProtocolDetailsForRun } from './'
+import {
+  useRobot,
+  useStoredProtocolAnalysis,
+  useProtocolDetailsForRun,
+} from './'
 import { useProtocolMetadata } from './useProtocolMetadata'
 import { useRunTimestamps } from '../../RunTimeControl/hooks'
 import { formatInterval } from '../../RunTimeControl/utils'

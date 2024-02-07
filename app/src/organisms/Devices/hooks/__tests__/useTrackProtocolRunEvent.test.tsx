@@ -11,7 +11,6 @@ import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_RUN_START,
 } from '../../../../redux/analytics'
-import { RobotName } from '../../../RobotSettingsDashboard'
 
 jest.mock('../../hooks')
 jest.mock('../useProtocolRunAnalyticsData')
