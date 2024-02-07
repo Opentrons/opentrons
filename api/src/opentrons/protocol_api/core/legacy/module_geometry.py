@@ -440,7 +440,7 @@ def create_geometry(
     display_name = definition["displayName"]
 
     if module_model == ThermocyclerModuleModel.THERMOCYCLER_V2:
-        pre_transform = np.array(
+        pre_transform: NDArray[np.double] = np.array(
             (
                 OLD_TC_GEN2_LABWARE_OFFSET["x"],
                 OLD_TC_GEN2_LABWARE_OFFSET["y"],
@@ -449,7 +449,7 @@ def create_geometry(
             )
         )
     else:
-        pre_transform: NDArray[np.double] = np.array(
+        pre_transform = np.array(
             (
                 definition["labwareOffset"]["x"],
                 definition["labwareOffset"]["y"],
