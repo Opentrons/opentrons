@@ -2,7 +2,16 @@
 from __future__ import annotations
 import itertools
 import logging
-from typing import Collection, Dict, Optional, Tuple, overload, Union, TYPE_CHECKING
+from typing import (
+    Collection,
+    Dict,
+    Optional,
+    Tuple,
+    overload,
+    Union,
+    TYPE_CHECKING,
+    List,
+)
 
 from opentrons_shared_data.errors.exceptions import MotionPlanningFailureError
 
@@ -24,7 +33,7 @@ from opentrons.protocol_engine import (
     DropTipWellLocation,
 )
 from opentrons.protocol_engine.errors.exceptions import LabwareNotLoadedOnModuleError
-from opentrons.protocol_engine.types import StagingSlotLocation
+from opentrons.protocol_engine.types import StagingSlotLocation, Dimensions
 from opentrons.types import DeckSlotName, StagingSlotName, Point
 from ..._trash_bin import TrashBin
 from ..._waste_chute import WasteChute
@@ -197,6 +206,7 @@ def check_safe_for_pipette_movement(
     well_location: Union[WellLocation, DropTipWellLocation],
 ) -> None:
     """Check if the labware is safe to move to with a pipette in partial tip configuration.
+
     Args:
         engine_state: engine state view
         pipette_id: ID of the pipette to be moved
@@ -204,6 +214,9 @@ def check_safe_for_pipette_movement(
         well_name: Name of the well to move to
         well_location: exact location within the well to move to
     """
+    # TODO (spp, 2023-02-06): remove this check after thorough testing.
+    #  This function is capable of checking for movement conflict regardless of
+    #  nozzle configuration.
     if not engine_state.pipettes.get_is_partially_configured(pipette_id):
         return
 
@@ -235,6 +248,7 @@ def check_safe_for_pipette_movement(
             destination_position=well_location_point,
         )
     )
+
     surrounding_regular_slots = get_surrounding_slots(labware_slot.as_int())
     surrounding_staging_slots = get_surrounding_staging_slots(labware_slot)
 
@@ -244,10 +258,12 @@ def check_safe_for_pipette_movement(
         """Raises error if the pipette is expected to collide with adjacent slot items."""
         # Check if slot overlaps with pipette position
         slot_pos = engine_state.addressable_areas.get_addressable_area_position(
-            surrounding_slot.id
+            addressable_area_name=surrounding_slot.id,
+            do_compatibility_check=False,
         )
         slot_bounds = engine_state.addressable_areas.get_addressable_area_bounding_box(
-            surrounding_slot.id
+            addressable_area_name=surrounding_slot.id,
+            do_compatibility_check=False,
         )
         for bound_vertex in pipette_bounds_at_well_location:
             if not (
