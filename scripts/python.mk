@@ -69,7 +69,7 @@ endef
 # parameter 2: repository url
 # parameter 3: the wheel file to upload
 define python_upload_package
-$(python) -m twine upload --repository-url $(2) $(1) $(3)
+$(python) -m twine upload $(and $(CI),--verbose) --repository-url $(2) $(1) $(3)
 endef
 
 # Get an enhanced version dict of the project
