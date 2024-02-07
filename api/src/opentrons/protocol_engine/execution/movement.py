@@ -111,9 +111,8 @@ class MovementHandler:
         )
         origin_cp = pipette_location.critical_point
 
-        origin = await self._gantry_mover.get_position(
-            pipette_id=pipette_id, home_if_idle=True
-        )
+        await self._gantry_mover.prepare_for_mount_movement(pipette_location.mount)
+        origin = await self._gantry_mover.get_position(pipette_id=pipette_id)
         max_travel_z = self._gantry_mover.get_max_travel_z(pipette_id=pipette_id)
 
         # calculate the movement's waypoints
@@ -182,10 +181,8 @@ class MovementHandler:
         )
         origin_cp = pipette_location.critical_point
 
-        origin = await self._gantry_mover.get_position(
-            pipette_id=pipette_id,
-            home_if_idle=True,
-        )
+        await self._gantry_mover.prepare_for_mount_movement(pipette_location.mount)
+        origin = await self._gantry_mover.get_position(pipette_id=pipette_id)
         max_travel_z = self._gantry_mover.get_max_travel_z(pipette_id=pipette_id)
 
         # calculate the movement's waypoints
@@ -242,9 +239,12 @@ class MovementHandler:
         speed: Optional[float] = None,
     ) -> Point:
         """Move pipette to a given deck coordinate."""
-        origin = await self._gantry_mover.get_position(
-            pipette_id=pipette_id, home_if_idle=True
+        # get the pipette's mount, if applicable
+        pipette_location = self._state_store.motion.get_pipette_location(
+            pipette_id=pipette_id
         )
+        await self._gantry_mover.prepare_for_mount_movement(pipette_location.mount)
+        origin = await self._gantry_mover.get_position(pipette_id=pipette_id)
         max_travel_z = self._gantry_mover.get_max_travel_z(pipette_id=pipette_id)
 
         # calculate the movement's waypoints

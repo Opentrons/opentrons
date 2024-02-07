@@ -149,53 +149,6 @@ async def test_get_position_raises(
         await hardware_subject.get_position("pipette-id")
 
 
-@pytest.mark.ot3_only
-async def test_get_position_when_idle_ot3(
-    decoy: Decoy,
-    ot3_hardware_api: OT3API,
-    mock_state_view: StateView,
-) -> None:
-    """It should get the position of the pipette with the hardware API."""
-    subject = HardwareGantryMover(
-        state_view=mock_state_view, hardware_api=ot3_hardware_api
-    )
-    decoy.when(mock_state_view.config.robot_type).then_return("OT-3 Standard")
-    current_well = CurrentWell(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="B2",
-    )
-    decoy.when(
-        mock_state_view.motion.get_pipette_location("pipette-id", current_well)
-    ).then_return(
-        PipetteLocationData(
-            mount=MountType.RIGHT,
-            critical_point=CriticalPoint.XY_CENTER,
-        )
-    )
-    decoy.when(ot3_hardware_api.is_high_throughput_idle_mount(Mount.RIGHT)).then_return(
-        True
-    )
-    decoy.when(
-        await ot3_hardware_api.gantry_position(
-            mount=Mount.RIGHT,
-            critical_point=CriticalPoint.XY_CENTER,
-            fail_on_not_homed=True,
-        )
-    ).then_return(Point(1, 2, 3))
-
-    result = await subject.get_position(
-        "pipette-id",
-        current_well=current_well,
-        fail_on_not_homed=True,
-        home_if_idle=True,
-    )
-
-    assert result == Point(1, 2, 3)
-
-    decoy.verify(await ot3_hardware_api.home_z(mount=Mount.RIGHT))
-
-
 def test_get_max_travel_z(
     decoy: Decoy,
     mock_hardware_api: HardwareAPI,

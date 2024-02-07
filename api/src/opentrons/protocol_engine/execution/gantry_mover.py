@@ -10,10 +10,9 @@ from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
 from opentrons.motion_planning import Waypoint
 
-from ..resources import ensure_ot3_hardware
 from ..state import StateView
 from ..types import MotorAxis, CurrentWell
-from ..errors import MustHomeError, InvalidAxisForRobotType, HardwareNotSupportedError
+from ..errors import MustHomeError, InvalidAxisForRobotType
 
 
 _MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
@@ -47,7 +46,6 @@ class GantryMover(TypingProtocol):
         pipette_id: str,
         current_well: Optional[CurrentWell] = None,
         fail_on_not_homed: bool = False,
-        home_if_idle: bool = False,
     ) -> Point:
         """Get the current position of the gantry."""
         ...
@@ -79,7 +77,7 @@ class GantryMover(TypingProtocol):
         """Retract the specified axis to its home position."""
         ...
 
-    async def prepare_for_pipette_movement(self, mount: Mount) -> None:
+    async def prepare_for_mount_movement(self, mount: Mount) -> None:
         """Retract the 'idle' mount if necessary."""
         ...
 
@@ -96,7 +94,6 @@ class HardwareGantryMover(GantryMover):
         pipette_id: str,
         current_well: Optional[CurrentWell] = None,
         fail_on_not_homed: bool = False,
-        home_if_idle: bool = False,
     ) -> Point:
         """Get the current position of the gantry.
 
@@ -104,26 +101,14 @@ class HardwareGantryMover(GantryMover):
             pipette_id: Pipette ID to get location data for.
             current_well: Optional parameter for getting pipette location data, effects critical point.
             fail_on_not_homed: Raise PositionUnknownError if gantry position is not known.
-            home_if_idle: First home the pipette mount if it has been disengaged (FLEX-96 only)
         """
         pipette_location = self._state_view.motion.get_pipette_location(
             pipette_id=pipette_id,
             current_location=current_well,
         )
-        hw_mount = pipette_location.mount.to_hw_mount()
-
-        # idle Z mounts on the OT3 in the high throughput configurations are disengaged,
-        # we must first home the motor before retrieving its current position
-        try:
-            ot3api = ensure_ot3_hardware(self._hardware_api)
-            if home_if_idle and ot3api.is_high_throughput_idle_mount(hw_mount):
-                await ot3api.home_z(mount=hw_mount)
-        except HardwareNotSupportedError:
-            pass
-
         try:
             return await self._hardware_api.gantry_position(
-                mount=hw_mount,
+                mount=pipette_location.mount.to_hw_mount(),
                 critical_point=pipette_location.critical_point,
                 fail_on_not_homed=fail_on_not_homed,
             )
@@ -144,9 +129,9 @@ class HardwareGantryMover(GantryMover):
     ) -> Point:
         """Move the hardware gantry to a waypoint."""
         assert len(waypoints) > 0, "Must have at least one waypoint"
+
         hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
 
-        await self.prepare_for_pipette_movement(hw_mount)
         for waypoint in waypoints:
             await self._hardware_api.move_to(
                 mount=hw_mount,
@@ -176,7 +161,6 @@ class HardwareGantryMover(GantryMover):
         critical_point = pipette_location.critical_point
         hw_mount = pipette_location.mount.to_hw_mount()
         try:
-            await self.prepare_for_pipette_movement(hw_mount)
             await self._hardware_api.move_rel(
                 mount=hw_mount,
                 delta=delta,
@@ -232,7 +216,7 @@ class HardwareGantryMover(GantryMover):
             )
         await self._hardware_api.retract_axis(axis=hardware_axis)
 
-    async def prepare_for_pipette_movement(self, mount: Mount) -> None:
+    async def prepare_for_mount_movement(self, mount: Mount) -> None:
         """Retract the 'idle' mount if necessary."""
         await self._hardware_api.prepare_for_mount_movement(mount)
 
@@ -248,7 +232,6 @@ class VirtualGantryMover(GantryMover):
         pipette_id: str,
         current_well: Optional[CurrentWell] = None,
         fail_on_not_homed: bool = False,
-        home_if_idle: bool = False,
     ) -> Point:
         """Get the current position of the gantry.
 
@@ -312,7 +295,7 @@ class VirtualGantryMover(GantryMover):
         """Retract the specified axis. No-op in virtual implementation."""
         pass
 
-    async def prepare_for_pipette_movement(self, mount: Mount) -> None:
+    async def prepare_for_mount_movement(self, mount: Mount) -> None:
         """Retract the 'idle' mount if necessary."""
         pass
 

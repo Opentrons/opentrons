@@ -82,8 +82,7 @@ class MoveToMaintenancePositionImplementation(
         )
         # the 96-channel mount is disengaged during gripper calibration and
         #  must be homed before the gantry position can be called
-        if ot3_api.is_high_throughput_idle_mount(Mount.LEFT):
-            await ot3_api.home_z(Mount.LEFT)
+        await ot3_api.prepare_for_mount_movement(Mount.LEFT)
         current_position_mount = await ot3_api.gantry_position(
             Mount.LEFT, critical_point=CriticalPoint.MOUNT
         )

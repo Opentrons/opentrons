@@ -1158,13 +1158,13 @@ class OT3API(
         else:
             checked_max = None
 
+        await self.prepare_for_mount_movement(realmount)
         await self._move(
             target_position,
             speed=speed,
             max_speeds=checked_max,
             expect_stalls=_expect_stalls,
         )
-        self._last_moved_mount = realmount
 
     async def move_axes(  # noqa: C901
         self,
@@ -1269,6 +1269,8 @@ class OT3API(
             checked_max: Optional[OT3AxisMap[float]] = max_speeds
         else:
             checked_max = None
+
+        await self.prepare_for_mount_movement(realmount)
         await self._move(
             target_position,
             speed=speed,
@@ -1276,27 +1278,28 @@ class OT3API(
             check_bounds=check_bounds,
             expect_stalls=_expect_stalls,
         )
-        self._last_moved_mount = realmount
 
     async def _cache_and_maybe_retract_mount(self, mount: OT3Mount) -> None:
-        """Retract the 'other' mount if necessary
+        """Retract the 'other' mount if necessary.
 
         If `mount` does not match the value in :py:attr:`_last_moved_mount`
         (and :py:attr:`_last_moved_mount` exists) then retract the mount
         in :py:attr:`_last_moved_mount`. Also unconditionally update
         :py:attr:`_last_moved_mount` to contain `mount`.
 
-        Disengage the 96-channel and gripper mount if retracted.
+        Disengage the 96-channel and gripper mount if retracted. Re-engage
+        the 96-channel or gripper mount if it is about to move.
         """
+        if self.is_high_throughput_idle_mount(mount):
+            # home the left/gripper mount if it is current disengaged
+            await self.home_z(mount)
+
         if mount != self._last_moved_mount and self._last_moved_mount:
             await self.retract(self._last_moved_mount, 10)
 
             # disengage Axis.Z_L motor and engage the brake to lower power
             # consumption and reduce the chance of the 96-channel pipette dropping
-            if (
-                self.gantry_load == GantryLoad.HIGH_THROUGHPUT
-                and self._last_moved_mount == OT3Mount.LEFT
-            ):
+            if self.is_high_throughput_idle_mount(OT3Mount.LEFT):
                 await self.disengage_axes([Axis.Z_L])
 
             # disegnage Axis.Z_G when we can to reduce the chance of
@@ -1306,6 +1309,8 @@ class OT3API(
 
         if mount != OT3Mount.GRIPPER:
             await self.idle_gripper()
+
+        self._last_moved_mount = mount
 
     async def prepare_for_mount_movement(
         self, mount: Union[top_types.Mount, OT3Mount]

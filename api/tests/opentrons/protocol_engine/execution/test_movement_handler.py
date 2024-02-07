@@ -124,7 +124,6 @@ async def test_move_to_well(
     decoy.when(
         await mock_gantry_mover.get_position(
             pipette_id="pipette-id",
-            home_if_idle=True,
         )
     ).then_return(Point(1, 1, 1))
 
@@ -239,7 +238,6 @@ async def test_move_to_well_from_starting_location(
     decoy.when(
         await mock_gantry_mover.get_position(
             pipette_id="pipette-id",
-            home_if_idle=True,
         )
     ).then_return(Point(1, 2, 5))
 
@@ -333,7 +331,6 @@ async def test_move_to_addressable_area(
     decoy.when(
         await mock_gantry_mover.get_position(
             pipette_id="pipette-id",
-            home_if_idle=True,
         )
     ).then_return(Point(1, 1, 1))
 
@@ -479,10 +476,7 @@ async def test_move_to_coordinates(
     )
 
     decoy.when(
-        await mock_gantry_mover.get_position(
-            pipette_id="pipette-id",
-            home_if_idle=True,
-        )
+        await mock_gantry_mover.get_position(pipette_id="pipette-id")
     ).then_return(current_position)
 
     decoy.when(mock_gantry_mover.get_max_travel_z(pipette_id="pipette-id")).then_return(

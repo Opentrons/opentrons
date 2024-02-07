@@ -136,23 +136,12 @@ async def test_move(hardware_api):
         Axis.X: 60,
         Axis.Y: 40,
         Axis.Z: 208,
-        Axis.A: -20,
+        Axis.A: 218,  # The other instrument is retracted
         Axis.B: 19,
         Axis.C: 19,
     }
     await hardware_api.move_rel(mount2, rel_position)
     assert hardware_api._current_position == target_position2
-
-    target_position3 = {
-        Axis.X: 60,
-        Axis.Y: 40,
-        Axis.Z: 218,  # retracted when preparing the mount
-        Axis.A: -20,
-        Axis.B: 19,
-        Axis.C: 19,
-    }
-    await hardware_api.prepare_for_mount_movement(types.Mount.RIGHT)
-    assert hardware_api._current_position == target_position3
 
 
 async def test_move_extras_passed_through(hardware_api, monkeypatch):
@@ -394,7 +383,6 @@ async def test_other_mount_retracted(hardware_api, is_robot):
     await hardware_api.home()
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
     assert await hardware_api.gantry_position(types.Mount.RIGHT) == types.Point(0, 0, 0)
-    await hardware_api.prepare_for_mount_movement(types.Mount.LEFT)
     await hardware_api.move_to(types.Mount.LEFT, types.Point(20, 20, 0))
     assert await hardware_api.gantry_position(types.Mount.RIGHT) == types.Point(
         54, 20, 248
@@ -621,7 +609,6 @@ async def test_home_z_both_mounts(decoy: Decoy) -> None:
         {"X": 0, "Y": 0, "Z": 12.3, "A": 45.6, "B": 0, "C": 0}
     )
 
-    await subject.prepare_for_mount_movement(types.Mount.LEFT)
     await subject.move_rel(mount=types.Mount.LEFT, delta=types.Point(0, 0, 0))
     await subject.home_z(types.Mount.RIGHT)
 
