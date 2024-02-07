@@ -2,6 +2,8 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
+import { ApiHostProvider } from '@opentrons/react-api-client'
+
 import {
   setRobotUpdateSeen,
   robotUpdateIgnored,
@@ -10,6 +12,8 @@ import {
 import { ViewUpdateModal } from './ViewUpdateModal'
 import { RobotUpdateProgressModal } from './RobotUpdateProgressModal'
 import { UNREACHABLE } from '../../../../redux/discovery'
+import { OPENTRONS_USB } from '../../../../redux/discovery'
+import { appShellRequestor } from '../../../../redux/shell/remote'
 
 import type { Dispatch } from '../../../../redux/types'
 import type { DiscoveredRobot } from '../../../../redux/discovery/types'
@@ -50,11 +54,19 @@ const UpdateBuildroot = NiceModal.create(
 
     if (hasSeenSessionOnce.current)
       return (
-        <RobotUpdateProgressModal
-          robotName={robotName.current}
-          session={session}
-          closeUpdateBuildroot={modal.remove}
-        />
+        <ApiHostProvider
+          hostname={robot?.ip ?? null}
+          port={robot?.port ?? null}
+          requestor={
+            robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
+          }
+        >
+          <RobotUpdateProgressModal
+            robotName={robotName.current}
+            session={session}
+            closeUpdateBuildroot={modal.remove}
+          />
+        </ApiHostProvider>
       )
     else if (robot != null && robot.status !== UNREACHABLE)
       return (
