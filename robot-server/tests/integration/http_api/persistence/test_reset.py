@@ -1,5 +1,4 @@
 import asyncio
-import os
 import secrets
 from pathlib import Path
 from shutil import copytree
