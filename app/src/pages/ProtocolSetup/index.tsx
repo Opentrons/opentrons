@@ -138,7 +138,7 @@ export function ProtocolSetupStep({
   if (!disabled) {
     switch (status) {
       case 'general':
-        backgroundColor = COLORS.grey35
+        backgroundColor = COLORS.blue35
         break
       case 'ready':
         backgroundColor = COLORS.green40
