@@ -84,10 +84,10 @@ class _MixedTypeSlots:
 def get_surrounding_slots(slot: int, robot_type: RobotType) -> _MixedTypeSlots:
     """Get all the surrounding slots, i.e., adjacent slots as well as corner slots."""
     corner_slots: List[Union[int, None]] = [
-        get_north_west_slot(slot),
         get_north_east_slot(slot),
-        get_south_west_slot(slot),
+        get_north_west_slot(slot),
         get_south_east_slot(slot),
+        get_south_west_slot(slot),
     ]
 
     surrounding_regular_slots_int = get_adjacent_slots(slot) + [
@@ -119,18 +119,18 @@ _EAST_OF_FLEX_COLUMN_3_MAP: Dict[DeckSlotName, StagingSlotName] = {
 
 
 _SURROUNDING_STAGING_SLOTS_MAP: Dict[DeckSlotName, List[StagingSlotName]] = {
-    DeckSlotName.SLOT_D3: [StagingSlotName.SLOT_D4, StagingSlotName.SLOT_C4],
+    DeckSlotName.SLOT_D3: [StagingSlotName.SLOT_C4, StagingSlotName.SLOT_D4],
     DeckSlotName.SLOT_C3: [
-        StagingSlotName.SLOT_D4,
-        StagingSlotName.SLOT_C4,
         StagingSlotName.SLOT_B4,
+        StagingSlotName.SLOT_C4,
+        StagingSlotName.SLOT_D4,
     ],
     DeckSlotName.SLOT_B3: [
-        StagingSlotName.SLOT_C4,
-        StagingSlotName.SLOT_B4,
         StagingSlotName.SLOT_A4,
+        StagingSlotName.SLOT_B4,
+        StagingSlotName.SLOT_C4,
     ],
-    DeckSlotName.SLOT_A3: [StagingSlotName.SLOT_B4, StagingSlotName.SLOT_A4],
+    DeckSlotName.SLOT_A3: [StagingSlotName.SLOT_A4, StagingSlotName.SLOT_B4],
 }
 
 
