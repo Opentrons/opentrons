@@ -23,7 +23,7 @@ const showGateModal =
 
 function ProtocolEditorComponent(): JSX.Element {
   return (
-    <div>
+    <div id="protocol-editor">
       <ComputingSpinner />
       <TopPortalRoot />
       {showGateModal ? <GateModal /> : null}

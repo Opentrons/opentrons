@@ -1,4 +1,5 @@
-import { when, resetAllWhenMocks } from 'jest-when'
+import { vi, describe, expect, afterEach, beforeEach, it } from 'vitest'
+import { when } from 'vitest-when'
 import { reduxActionToAnalyticsEvent } from '../middleware'
 import { getFileMetadata } from '../../file-data/selectors'
 import {
@@ -6,38 +7,27 @@ import {
   getPipetteEntities,
   getSavedStepForms,
 } from '../../step-forms/selectors'
-import { SaveStepFormsMultiAction } from '../../step-forms/actions'
+import type { SaveStepFormsMultiAction } from '../../step-forms/actions'
 
-jest.mock('../../file-data/selectors')
-jest.mock('../../step-forms/selectors')
+vi.mock('../../file-data/selectors')
+vi.mock('../../step-forms/selectors')
 
-const getFileMetadataMock = getFileMetadata as jest.MockedFunction<
-  typeof getFileMetadata
->
-const getArgsAndErrorsByStepIdMock = getArgsAndErrorsByStepId as jest.MockedFunction<
-  typeof getArgsAndErrorsByStepId
->
-const getPipetteEntitiesMock = getPipetteEntities as jest.MockedFunction<
-  typeof getPipetteEntities
->
-const getSavedStepFormsMock = getSavedStepForms as jest.MockedFunction<
-  typeof getSavedStepForms
->
-let fooState: any
-beforeEach(() => {
-  fooState = {}
-  getFileMetadataMock.mockReturnValue({
-    protocolName: 'protocol name here',
-    created: 1600000000000, // 2020-09-13T12:26:40.000Z
-  })
-})
-
-afterEach(() => {
-  jest.restoreAllMocks()
-  resetAllWhenMocks()
-})
 
 describe('reduxActionToAnalyticsEvent', () => {
+  let fooState: any
+  beforeEach(() => {
+    fooState = {}
+    vi.mocked(getFileMetadata).mockReturnValue({
+      protocolName: 'protocol name here',
+      created: 1600000000000, // 2020-09-13T12:26:40.000Z
+    })
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+    vi.resetAllMocks()
+  })
+
   it('should return null for unhandled actions', () => {
     expect(
       reduxActionToAnalyticsEvent(fooState, { type: 'SOME_UNHANDLED_ACTION' })
@@ -52,7 +42,7 @@ describe('reduxActionToAnalyticsEvent', () => {
   })
 
   it('should convert a SAVE_STEP_FORM action into a saveStep action with additional properties', () => {
-    getArgsAndErrorsByStepIdMock.mockReturnValue({
+    vi.mocked(getArgsAndErrorsByStepId).mockReturnValue({
       stepId: {
         stepArgs: {
           // @ts-expect-error id is not on type CommandCreatorArgs
@@ -63,7 +53,7 @@ describe('reduxActionToAnalyticsEvent', () => {
         },
       },
     })
-    getPipetteEntitiesMock.mockReturnValue({
+    vi.mocked(getPipetteEntities).mockReturnValue({
       // @ts-expect-error 'some_pipette_spec_name' isn't a valid pipette type
       pipetteId: { name: 'some_pipette_spec_name' },
     })
@@ -112,9 +102,9 @@ describe('reduxActionToAnalyticsEvent', () => {
       }
     })
     it('should create a saveStepsMulti action with additional properties and stepType moveLiquid', () => {
-      when(getSavedStepFormsMock)
+      when(vi.mocked(getSavedStepForms))
         .calledWith(expect.anything())
-        .mockReturnValue({
+        .thenReturn({
           // @ts-expect-error missing fields from test object
           id_1: { stepType: 'moveLiquid' },
           // @ts-expect-error missing fields from test object
@@ -142,9 +132,9 @@ describe('reduxActionToAnalyticsEvent', () => {
       })
     })
     it('should create a saveStepsMulti action with additional properties and stepType mix', () => {
-      when(getSavedStepFormsMock)
+      when(vi.mocked(getSavedStepForms))
         .calledWith(expect.anything())
-        .mockReturnValue({
+        .thenReturn({
           // @ts-expect-error missing fields from test object
           id_1: { stepType: 'mix' },
           // @ts-expect-error missing fields from test object
@@ -172,9 +162,9 @@ describe('reduxActionToAnalyticsEvent', () => {
       })
     })
     it('should create a saveStepsMulti action with additional properties and null steptype (mixed case)', () => {
-      when(getSavedStepFormsMock)
+      when(vi.mocked(getSavedStepForms))
         .calledWith(expect.anything())
-        .mockReturnValue({
+        .thenReturn({
           // @ts-expect-error missing fields from test object
           id_1: { stepType: 'mix' },
           // @ts-expect-error missing fields from test object

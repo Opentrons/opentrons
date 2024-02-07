@@ -3,6 +3,8 @@ import ReactDom from 'react-dom'
 
 const PORTAL_ROOT_ID = 'top-portal-root'
 
+export const getTopPortalEl = (): HTMLElement => document.getElementById('top-portal-root') ?? document.body
+
 export function PortalRoot(): JSX.Element {
   return <div id={PORTAL_ROOT_ID} />
 }

@@ -12,6 +12,7 @@ export default mergeConfig(viteConfig, defineConfig({
       '**/node_modules/**',
       '**/dist/**'
     ],
+    setupFiles: ['./setup-vitest.js'] 
   },
   resolve: {
     alias: {

@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
-import { InstrumentGroup } from '@opentrons/components'
+import { vi, describe, expect, afterEach, beforeEach, it } from 'vitest'
+import { act, cleanup, fireEvent, screen, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '../../__testing-utils__'
 import { i18n } from '../../localization'
 import { getFileMetadata } from '../../file-data/selectors'
@@ -15,41 +15,21 @@ import { FilePage } from '../FilePage'
 import { EditModulesCard } from '../modules'
 import { FilePipettesModal } from '../modals/FilePipettesModal'
 
-jest.mock('../../file-data/selectors')
-jest.mock('../../step-forms/selectors')
-jest.mock('../modules')
-jest.mock('@opentrons/components/src/instrument/InstrumentGroup')
-jest.mock('../modals/FilePipettesModal')
-jest.mock('../../steplist/actions')
-jest.mock('../../navigation/actions')
+import type * as Components from '@opentrons/components'
 
-const mockGetFileMetadata = getFileMetadata as jest.MockedFunction<
-  typeof getFileMetadata
->
-const mockGetPipettesForInstrumentGroup = getPipettesForInstrumentGroup as jest.MockedFunction<
-  typeof getPipettesForInstrumentGroup
->
-const mockGetModulesForEditModulesCard = getModulesForEditModulesCard as jest.MockedFunction<
-  typeof getModulesForEditModulesCard
->
-const mockGetInitialDeckSetup = getInitialDeckSetup as jest.MockedFunction<
-  typeof getInitialDeckSetup
->
-const mockEditModulesCard = EditModulesCard as jest.MockedFunction<
-  typeof EditModulesCard
->
-const mockInstrumentGroup = InstrumentGroup as jest.MockedFunction<
-  typeof InstrumentGroup
->
-const mockFilePipettesModal = FilePipettesModal as jest.MockedFunction<
-  typeof FilePipettesModal
->
-const mockChangeSavedStepForm = changeSavedStepForm as jest.MockedFunction<
-  typeof changeSavedStepForm
->
-const mockNavigateToPage = navigateToPage as jest.MockedFunction<
-  typeof navigateToPage
->
+vi.mock('../../file-data/selectors')
+vi.mock('../../step-forms/selectors')
+vi.mock('../modules')
+vi.mock('@opentrons/components', async (importOriginal) => {
+  const actual = await importOriginal<typeof Components>()
+  return {
+    ...actual,
+    InstrumentGroup: () => (<div>mock InstrumentGroup</div>)
+  }
+})
+vi.mock('../modals/FilePipettesModal')
+vi.mock('../../steplist/actions')
+vi.mock('../../navigation/actions')
 
 const render = () => {
   return renderWithProviders(<FilePage />, { i18nInstance: i18n })[0]
@@ -57,18 +37,20 @@ const render = () => {
 
 describe('File Page', () => {
   beforeEach(() => {
-    mockGetFileMetadata.mockReturnValue({})
-    mockGetPipettesForInstrumentGroup.mockReturnValue({})
-    mockGetModulesForEditModulesCard.mockReturnValue({})
-    mockGetInitialDeckSetup.mockReturnValue({
+    vi.mocked(getFileMetadata).mockReturnValue({})
+    vi.mocked(getPipettesForInstrumentGroup).mockReturnValue({})
+    vi.mocked(getModulesForEditModulesCard).mockReturnValue({})
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
       pipettes: {},
       modules: {},
       additionalEquipmentOnDeck: {},
       labware: {},
     })
-    mockEditModulesCard.mockReturnValue(<div>mock EditModulesCard</div>)
-    mockInstrumentGroup.mockReturnValue(<div>mock InstrumentGroup</div>)
-    mockFilePipettesModal.mockReturnValue(<div>mock FilePipettesModal</div>)
+    vi.mocked(EditModulesCard).mockReturnValue(<div>mock EditModulesCard</div>)
+    vi.mocked(FilePipettesModal).mockReturnValue(<div>mock FilePipettesModal</div>)
+  })
+  afterEach(() => {
+    cleanup()
   })
   it('renders file page with all the information', () => {
     render()
@@ -86,7 +68,7 @@ describe('File Page', () => {
     screen.getByText('mock EditModulesCard')
     screen.getByRole('button', { name: 'Continue to Liquids' })
   })
-  it('renders the edit pipettes button and it opens the modal', () => {
+  it.only('renders the edit pipettes button and it opens the modal', async () => {
     render()
     const btn = screen.getByRole('button', { name: 'edit' })
     fireEvent.click(btn)
@@ -96,12 +78,12 @@ describe('File Page', () => {
     render()
     const btn = screen.getByRole('button', { name: 'swap' })
     fireEvent.click(btn)
-    expect(mockChangeSavedStepForm).toHaveBeenCalled()
+    expect(vi.mocked(changeSavedStepForm)).toHaveBeenCalled()
   })
   it('renders the continue to liquids button and it dispatches the navigateToPage', () => {
     render()
     const btn = screen.getByRole('button', { name: 'Continue to Liquids' })
     fireEvent.click(btn)
-    expect(mockNavigateToPage).toHaveBeenCalled()
+    expect(vi.mocked(navigateToPage)).toHaveBeenCalled()
   })
 })

@@ -31,6 +31,8 @@ import { FilePipettesModal } from './modals/FilePipettesModal'
 
 import type { ModuleType } from '@opentrons/shared-data'
 import type { FileMetadataFields } from '../file-data'
+import { createPortal } from 'react-dom'
+import { getTopPortalEl, topPortalRootEl } from './portals/TopPortal'
 
 // TODO(mc, 2020-02-28): explore l10n for these dates
 const DATE_ONLY_FORMAT = 'MMM dd, yyyy'
@@ -236,18 +238,22 @@ export const FilePage = (): JSX.Element => {
           {t('continue_to_liquids')}
         </DeprecatedPrimaryButton>
       </div>
-
-      <Portal>
-        {isEditPipetteModalOpen && (
-          <FilePipettesModal closeModal={closeEditPipetteModal} />
-        )}
-        {moduleToEdit != null && (
-          <EditModules
-            moduleToEdit={moduleToEdit}
-            onCloseClick={closeEditModulesModal}
-          />
-        )}
-      </Portal>
+      {
+        createPortal(
+          <div>
+            {isEditPipetteModalOpen && (
+              <FilePipettesModal closeModal={closeEditPipetteModal} />
+            )}
+            {moduleToEdit != null && (
+              <EditModules
+                moduleToEdit={moduleToEdit}
+                onCloseClick={closeEditModulesModal}
+              />
+            )}
+          </div>,
+          getTopPortalEl() 
+        )
+      }
     </div>
   )
 }
