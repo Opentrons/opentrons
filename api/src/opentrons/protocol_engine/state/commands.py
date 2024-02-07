@@ -4,7 +4,7 @@ from collections import OrderedDict
 from enum import Enum
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Mapping, Optional, Union
+from typing import Dict, List, Optional, Union
 
 from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonException
 
@@ -197,8 +197,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
     def handle_action(self, action: Action) -> None:  # noqa: C901
         """Modify state in reaction to an action."""
-        errors_by_id: Mapping[str, ErrorOccurrence]
-
         if isinstance(action, QueueCommandAction):
             assert action.command_id not in self._state.commands_by_id
 

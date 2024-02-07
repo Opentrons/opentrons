@@ -5,7 +5,7 @@ This module has functions that you can import to save robot or
 labware calibration to its designated file location.
 """
 import json
-from typing import Any, Union, List, Dict, TYPE_CHECKING, cast
+from typing import Any, Union, List, Dict, TYPE_CHECKING, cast, Tuple
 from dataclasses import is_dataclass, asdict
 
 
@@ -18,10 +18,7 @@ if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 
-DictionaryFactoryType = Union[List, Dict]
-
-
-def dict_filter_none(data: DictionaryFactoryType) -> Dict[str, Any]:
+def dict_filter_none(data: List[Tuple[str, Any]]) -> Dict[str, Any]:
     """
     Helper function to filter out None keys from a dataclass
     before saving to file.

@@ -876,46 +876,47 @@ def test_transfer_options(ctx, monkeypatch):
 
 
 def test_flow_rate(ctx, monkeypatch):
-    old_sfm = ctx._core.get_hardware()
+    instr = ctx.load_instrument("p300_single", Mount.RIGHT)
+    old_sfm = instr._core.set_flow_rate
 
-    def pass_on(mount, aspirate=None, dispense=None, blow_out=None):
-        old_sfm(mount, aspirate=None, dispense=None, blow_out=None)
+    def pass_on(aspirate=None, dispense=None, blow_out=None):
+        old_sfm(aspirate=aspirate, dispense=dispense, blow_out=blow_out)
 
     set_flow_rate = mock.Mock(side_effect=pass_on)
-    monkeypatch.setattr(ctx._core.get_hardware(), "set_flow_rate", set_flow_rate)
-    instr = ctx.load_instrument("p300_single", Mount.RIGHT)
+    monkeypatch.setattr(instr._core, "set_flow_rate", set_flow_rate)
 
     ctx.home()
     instr.flow_rate.aspirate = 1
-    assert set_flow_rate.called_once_with(Mount.RIGHT, aspirate=1)
+    set_flow_rate.assert_called_once_with(aspirate=1)
     set_flow_rate.reset_mock()
     instr.flow_rate.dispense = 10
-    assert set_flow_rate.called_once_with(Mount.RIGHT, dispense=10)
+    set_flow_rate.assert_called_once_with(dispense=10)
     set_flow_rate.reset_mock()
     instr.flow_rate.blow_out = 2
-    assert set_flow_rate.called_once_with(Mount.RIGHT, blow_out=2)
+    set_flow_rate.assert_called_once_with(blow_out=2)
     assert instr.flow_rate.aspirate == 1
     assert instr.flow_rate.dispense == 10
     assert instr.flow_rate.blow_out == 2
 
 
 def test_pipette_speed(ctx, monkeypatch):
-    old_sfm = ctx._core.get_hardware()
+    instr = ctx.load_instrument("p300_single", Mount.RIGHT)
+    old_sfm = instr._core.set_pipette_speed
 
-    def pass_on(mount, aspirate=None, dispense=None, blow_out=None):
-        old_sfm(aspirate=None, dispense=None, blow_out=None)
+    def pass_on(aspirate=None, dispense=None, blow_out=None):
+        old_sfm(aspirate=aspirate, dispense=dispense, blow_out=blow_out)
 
     set_speed = mock.Mock(side_effect=pass_on)
-    monkeypatch.setattr(ctx._core.get_hardware(), "set_pipette_speed", set_speed)
-    instr = ctx.load_instrument("p300_single", Mount.RIGHT)
-
+    monkeypatch.setattr(instr._core, "set_pipette_speed", set_speed)
     ctx.home()
     instr.speed.aspirate = 1
-    assert set_speed.called_once_with(Mount.RIGHT, dispense=1)
+    set_speed.assert_called_once_with(aspirate=1)
+    set_speed.reset_mock()
     instr.speed.dispense = 10
+    set_speed.assert_called_once_with(dispense=10)
+    set_speed.reset_mock()
     instr.speed.blow_out = 2
-    assert set_speed.called_with(Mount.RIGHT, dispense=10)
-    assert set_speed.called_with(Mount.RIGHT, blow_out=2)
+    set_speed.assert_called_once_with(blow_out=2)
     assert instr.speed.aspirate == 1
     assert instr.speed.dispense == 10
     assert instr.speed.blow_out == 2

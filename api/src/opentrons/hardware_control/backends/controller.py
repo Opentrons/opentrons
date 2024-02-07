@@ -19,7 +19,7 @@ from typing_extensions import Final
 from pathlib import Path
 
 try:
-    import aionotify  # type: ignore[import]
+    import aionotify  # type: ignore[import-untyped]
 except (OSError, ModuleNotFoundError):
     aionotify = None
 

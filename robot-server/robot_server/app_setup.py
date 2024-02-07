@@ -74,8 +74,7 @@ async def on_startup() -> None:
     if settings.persistence_directory == "automatically_make_temporary":
         persistence_directory: Optional[Path] = None
     else:
-        # mypy won't narrow out the sentinel literal from the above if, sadly
-        persistence_directory = settings.persistence_directory  # type: ignore[assignment]
+        persistence_directory = settings.persistence_directory
 
     initialize_logging()
     initialize_task_runner(app_state=app.state)
