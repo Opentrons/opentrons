@@ -349,6 +349,46 @@ async def _main() -> None:
         await update_pick_up_current(hw_api, mount, m_current)
         await update_pick_up_speed(hw_api, mount, pick_up_speed)
         await update_pick_up_distance(hw_api, mount, pick_up_distance)
+        if (args.calibrate):
+            cp = CriticalPoint.NOZZLE
+            home_w_tip = await hw_api.current_position_ot3(mount, cp)
+            initial_dial_loc = Point(
+                                deck_slot['deck_slot'][args.dial_slot]['X'],
+                                deck_slot['deck_slot'][args.dial_slot]['Y'],
+                                home_w_tip[Axis.by_mount(mount)]
+            )
+            print("Move Nozzle to Dial Indicator")
+            await move_to_point(hw_api, mount, initial_dial_loc, cp)
+            current_position = await hw_api.current_position_ot3(mount, cp)
+            nozzle_loc = await jog(hw_api, current_position_ot3(mount, cp))
+            number_of_channels = 96
+            for tip in range(1, number_of_channels + 1):
+                cp = CriticalPoint.NOZZLE
+                nozzle_count += 1
+                nozzle_position = Point(nozzle_loc[0] + x_offset,
+                                        nozzle_loc[1] + y_offset,
+                                        nozzle_loc[2])
+                await move_to_point(hw_api, mount, nozzle_position, cp)
+                await asyncio.sleep(1)
+                nozzle_measurement = gauge.read()
+                print("nozzle-",nozzle_count, "(mm): " , nozzle_measurement, end="")
+                print("\r", end="")
+                measurements.append(nozzle_measurement)
+                if tip_count % num_of_columns == 0:
+                    d_str = ''
+                    for m in measurements:
+                        d_str += str(m) + ','
+                    d_str = d_str[:-1] + '\n'
+                    print(f"{d_str}")
+                    data.append_data_to_file(test_n, test_f, d_str)
+                    # Reset Measurements list
+                    measurements = []
+                    print("\r\n")
+                x_offset -= 9
+                if tip_count % num_of_columns == 0:
+                    y_offset += 9
+                if tip_count % num_of_columns == 0:
+                    x_offset = 0
         # Calibrate to tiprack
         if (args.calibrate):
             pickup_loc, droptip_loc = await calibrate_tiprack(hw_api, home_position, mount)
