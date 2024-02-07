@@ -799,16 +799,22 @@ def test_get_slice_default_cursor_no_current_failed_command() -> None:
     """It should return a slice from the last executed command."""
     command_1 = create_failed_command(command_id="command-id-1")
     command_2 = create_failed_command(command_id="command-id-2")
-    command_3 = create_failed_command(command_id="command-id-3", error=ErrorOccurrence(
-        id="error-id",
-        errorType="ProtocolEngineError",
-        createdAt=datetime(year=2022, month=2, day=2),
-        detail="oh no",
-        errorCode=ErrorCodes.GENERAL_ERROR.value.code,
-    ))
+    command_3 = create_failed_command(
+        command_id="command-id-3",
+        error=ErrorOccurrence(
+            id="error-id",
+            errorType="ProtocolEngineError",
+            createdAt=datetime(year=2022, month=2, day=2),
+            detail="oh no",
+            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+        ),
+    )
     command_4 = create_failed_command(command_id="command-id-4")
 
-    subject = get_command_view(commands=[command_1, command_2, command_3, command_4], run_result=RunResult.FAILED)
+    subject = get_command_view(
+        commands=[command_1, command_2, command_3, command_4],
+        run_result=RunResult.FAILED,
+    )
 
     result = subject.get_slice(cursor=None, length=3)
 
