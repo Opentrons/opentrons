@@ -170,9 +170,10 @@ def run(tip: int, run_args: RunArgs) -> None:
     results: List[float] = []
     adjusted_results: List[float] = []
     run_args.pipette.pick_up_tip(tips.pop(0))
-    target_height = _jog_to_find_liquid_height(
+    liquid_height = _jog_to_find_liquid_height(
         run_args.ctx, run_args.pipette, test_well
     )
+    target_height = test_well.bottom(liquid_height).point.z
     if run_args.return_tip:
         run_args.pipette.return_tip()
     else:
@@ -189,6 +190,7 @@ def run(tip: int, run_args: RunArgs) -> None:
         end_pos = hw_api.current_position_ot3(OT3Mount.LEFT)
         print("Droping tip")
         run_args.pipette.blow_out()
+        tip_length_offset = 0
         if run_args.dial_indicator is not None:
 
             run_args.pipette._retract()
@@ -201,7 +203,7 @@ def run(tip: int, run_args: RunArgs) -> None:
         else:
             run_args.pipette.drop_tip()
         results.append(height)
-        adjusted_results.append(tip_length_offset)
+        adjusted_results.append(height-tip_length_offset)
         env_data = run_args.environment_sensor.get_reading()
         ui.print_info("hwpipette")
         hw_pipette = hw_api.hardware_pipettes[top_types.Mount.LEFT]
@@ -246,6 +248,8 @@ def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
     data_filename = f"pressure_sensor_data-trial{trial}-tip{tip}.csv"
     data_file = f"{data_dir}/{run_args.name}/{run_args.run_id}/{data_filename}"
     ui.print_info(f"logging pressure data to {data_file}")
+
+    plunger_speed = lqid_cfg["plunger_speed"] if run_args.plunger_speed == -1 else run_args.plunger_speed
     lps = LiquidProbeSettings(
         starting_mount_height=well.top().point.z + run_args.start_height_offset,
         max_z_distance=min(well.depth, lqid_cfg["max_z_distance"]),
