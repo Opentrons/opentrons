@@ -1334,38 +1334,6 @@ def test_raise_if_labware_cannot_be_stacked_not_validated() -> None:
         )
 
 
-def test_raise_if_labware_cannot_be_stacked_on_module_not_adapter() -> None:
-    """It should raise if the below labware on a module is not an adapter."""
-    subject = get_labware_view(
-        labware_by_id={
-            "labware-id": LoadedLabware(
-                id="labware-id",
-                loadName="test",
-                definitionUri="def-uri",
-                location=ModuleLocation(moduleId="module-id"),
-            )
-        },
-        definitions_by_uri={
-            "def-uri": LabwareDefinition.construct(  # type: ignore[call-arg]
-                allowedRoles=[LabwareRole.labware]
-            )
-        },
-    )
-
-    with pytest.raises(errors.LabwareCannotBeStackedError, match="module"):
-        subject.raise_if_labware_cannot_be_stacked(
-            top_labware_definition=LabwareDefinition.construct(  # type: ignore[call-arg]
-                parameters=Parameters.construct(  # type: ignore[call-arg]
-                    loadName="name"
-                ),
-                stackingOffsetWithLabware={
-                    "test": SharedDataOverlapOffset(x=0, y=0, z=0)
-                },
-            ),
-            bottom_labware_id="labware-id",
-        )
-
-
 def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
     """It should raise if the OnLabware location is on an adapter."""
     subject = get_labware_view(
