@@ -27,8 +27,7 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
     update_pick_up_current,
     update_pick_up_speed,
     update_pick_up_distance,
-    update_drop_tip_current,
-    update_drop_tip_speed,
+    # update_drop_tip_speed,
     _get_pipette_from_mount,
 )
 
@@ -485,8 +484,8 @@ async def _main() -> None:
                 await move_to_point(hw_api, mount, trough_loc, cp)
                 await hw_api.dispense(mount)
                 # await hw_api.home_z(mount)
-            hw_api.clamp_drop_tip_speed = float(input("Drop tip speed: "))
-            await update_drop_tip_speed(hw_api, mount, hw_api.clamp_drop_tip_speed )
+            # hw_api.clamp_drop_tip_speed = float(input("Drop tip speed: "))
+            # await update_drop_tip_speed(hw_api, mount, hw_api.clamp_drop_tip_speed )
             cp = CriticalPoint.TIP
             await move_to_point(hw_api, mount, droptip_loc, cp)
             input("Feel the Tip!")
