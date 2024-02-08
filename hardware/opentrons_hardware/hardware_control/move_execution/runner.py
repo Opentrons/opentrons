@@ -76,8 +76,8 @@ from opentrons_hardware.hardware_control.motor_position_status import (
 )
 
 from ..types import NodeDict, MotorPositionStatus
-from .scheduler import MoveScheduler
-from .dispatcher import MoveDispatcher
+from .scheduler import Scheduler
+from .dispatcher import MoveCoordinator
 
 log = logging.getLogger(__name__)
 
@@ -97,26 +97,37 @@ class MoveRunner:
         start_index: int = 0,
         ignore_stalls: bool = False,
     ) -> None:
-        self._scheduler = MoveScheduler(
-            move_groups=move_groups,
-            start_index=start_index,
-            ignore_stalls=ignore_stalls)
-        self._dispatcher: Optional[MoveDispatcher] = None
-        self._scheduled = ScheduledGroup()
-    
-    @property
-    def scheduler(self) -> MoveScheduler:
-        return self._scheduler
-    
-    @property
-    def is_prepped(self) -> bool:
-        return self._scheduler.ready_for_executor
+        scheduler = Scheduler(move_groups, start_index, ignore_stalls)
+        self._schedule: List[GroupSchedule] = list(scheduler.generate_schedule())
+        self._ready = False
+        
+    async def _clear_groups(self, can_messenger: CanMessenger) -> None:
+        """Send commands to clear all previously scheduled message groups.
+
+        Args:
+            can_messenger: a can messenger
+        """
+        error = await can_messenger.ensure_send(
+            node_id=NodeId.broadcast,
+            message=ClearAllMoveGroupsRequest(payload=EmptyPayload()),
+            expected_nodes=list(self._all_nodes),
+        )
+        if error != ErrorCode.ok:
+            log.warning("Clear move group failed")
 
     async def schedule(self, can_messenger: CanMessenger) -> None:
         """Schedule the moves. The first thing that happens during run()."""
-        self._scheduled = await self._scheduler.schedule(can_messenger=can_messenger)
+        await self._clear_groups(can_messenger)
 
-    async def dispatch(
+        for group in self._schedule:
+            for move in group:
+                await can_messenger.send(
+                    node=move.node,
+                    message=move.message
+                )
+        self._ready = True
+
+    async def coordinate(
         self, can_messenger: CanMessenger
     ) -> NodeDict[MotorPositionStatus]:
         """Execute a pre-prepared move group. The second thing that run() does.
@@ -125,10 +136,11 @@ class MoveRunner:
         ensure tighter timing, if you want something else to start as soon as
         possible to the actual execution of the move.
         """
-        if not self._scheduled:
+        if not self._ready:
             raise GeneralError(
                 message="Cannot execute unscheduled move groups."
             )
+
         move_completion_data = await self._move(can_messenger, self._start_at_index)
         return self._accumulate_move_completions(move_completion_data)
 
@@ -203,25 +215,11 @@ class MoveRunner:
 
     
 
-    
-
-    async def _send_groups(self, can_messenger: CanMessenger) -> None:
-        """Send commands to set up the message groups."""
-        for group_i, group in enumerate(self._move_groups):
-            for seq_i, sequence in enumerate(group):
-                for node, step in sequence.items():
-                    await can_messenger.send(
-                        node_id=node,
-                        message=self._get_message_type(
-                            step, group_i + self._start_at_index, seq_i
-                        ),
-                    )
 
     async def _move(
         self, can_messenger: CanMessenger, start_at_index: int
     ) -> Completions:
         """Run all the move groups."""
-        scheduler = MoveDispatcher(self._move_groups, start_at_index)
         try:
             can_messenger.add_listener(scheduler)
             completions = await scheduler.run(can_messenger)

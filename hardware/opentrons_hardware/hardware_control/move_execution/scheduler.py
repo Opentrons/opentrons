@@ -1,8 +1,9 @@
 """Move Scheduler."""
 import asyncio
+from dataclasses import dataclass, field
 from collections import defaultdict
 import logging
-from typing import List, Set, Tuple, Iterator, Union, Optional
+from typing import List, Set, Dict, Tuple, Iterator, Union, Optional, Generator
 import numpy as np
 import time
 
@@ -71,36 +72,22 @@ from opentrons_hardware.hardware_control.motor_position_status import (
     extract_motor_status_info,
 )
 
-from ..types import NodeDict, MotorPositionStatus
+from ..types import GroupSchedule, MoveSchedule
 from .dispatcher import MoveExecutor
 from .utils import move_message_from_step
 
 
 log = logging.getLogger(__name__)
 
+class Scheduler:
+    """Scheduler converts each move group step into a CAN move message"""
 
-class MoveScheduler:
-    """MoveScheduler converts each move group step into a CAN move message"""
+    move_groups: MoveGroups
+    start_index: int
+    ignore_stalls: bool
 
-    def __init__(
-        self,
-        move_groups: MoveGroups,
-        start_index: int = 0,
-        ignore_stalls: bool = False,
-    ) -> None:
-        self._move_groups = move_groups
-        self._start_index = start_index
-        self._ignore_stalls = ignore_stalls
-        self._all_nodes = self._get_all_nodes(move_groups)
-        self._scheduled_groups = []
-        self._ready_for_executor = False
-
-    def has_moves(self) -> bool:
-        for move_group in self._move_groups:
-            for move in move_group:
-                for node, step in move.items():
-                    return True
-        return False
+    def __post__init__(self):
+        self.all_nodes = self._get_all_nodes(self.move_groups)
 
     @staticmethod
     def _get_all_nodes(move_groups: MoveGroups) -> Set[NodeId]:
@@ -111,51 +98,14 @@ class MoveScheduler:
                 for node in sequence.keys():
                     node_set.add(node)
         return node_set
-
-    @property
-    def ready_for_executor(self) -> bool:
-        return self._ready_for_executor
     
-    async def run(self, can_messenger: CanMessenger) -> None:
-        """First clear existing moves sent to devices, then send new move groups."""
-        if self.has_moves():
-            await self._clear_groups(can_messenger)
-            await self._schedule_moves(can_messenger)
-
-    async def _clear_groups(self, can_messenger: CanMessenger) -> None:
-        """Send commands to clear all previously scheduled message groups.
-
-        Args:
-            can_messenger: a can messenger
-        """
-        error = await can_messenger.ensure_send(
-            node_id=NodeId.broadcast,
-            message=ClearAllMoveGroupsRequest(payload=EmptyPayload()),
-            expected_nodes=list(self._all_nodes),
-        )
-        if error != ErrorCode.ok:
-            log.warning("Clear move group failed")
-        
-    async def _schedule_moves(self, can_messenger: CanMessenger) -> None:
-        for group_id, group in enumerate(self._move_groups, self._start_index):
-            await self._schedule_move_group(group, group_id, can_messenger)
-
-    async def _schedule_move_group(
-        self,
-        group: MoveGroup,
-        group_id: int,
-        can_messenger: CanMessenger
-    ) -> None:
-        for seq_id, sequence in enumerate(group):
-            for node, step in sequence.items():
-                move_message = move_message_from_step(step, group_id, seq_id)
-                await can_messenger.send(
-                    node_id=node,
-                    message=move_message,
-                )
-                self._add_to_schedule(move_message)
-            
-            
-
-    def _add_to_schedule(step: SingleMoveStep, message_id: UInt32Field):
-        
+    def generate_schedule(self) -> Generator[GroupSchedule]:
+        for group_id, group in enumerate(self.move_groups, self.start_index):
+            moves: Dict[UInt32Field, MoveSchedule] = []
+            for seq_id, step_sequence in enumerate(group):
+                for node, step in step_sequence.values():
+                    message = move_message_from_step(step)
+                    index = message.payload.message_index
+                    moves[index] = MoveSchedule(message, node)
+            yield GroupSchedule(group_id=group_id, moves=moves)
+                    
