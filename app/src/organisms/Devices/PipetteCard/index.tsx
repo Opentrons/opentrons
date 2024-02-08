@@ -185,7 +185,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   return (
     <Flex
       backgroundColor={COLORS.grey10}
-      borderRadius={BORDERS.radiusSoftCorners}
+      borderRadius={BORDERS.borderRadiusSize2}
       width="100%"
       data-testid={`PipetteCard_${String(pipetteDisplayName)}`}
     >
@@ -252,22 +252,23 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
         <>
           <Box padding={SPACING.spacing16} width="100%">
             <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing8}>
-              <Flex alignItems={ALIGN_CENTER} width="3.75rem" height="3.375rem">
-                {pipetteModelSpecs !== null ? (
+              {pipetteModelSpecs !== null ? (
+                <Flex
+                  alignItems={ALIGN_CENTER}
+                  width="3.75rem"
+                  height="3.375rem"
+                  paddingRight={SPACING.spacing8}
+                >
                   <InstrumentDiagram
                     pipetteSpecs={pipetteModelSpecs}
                     mount={mount}
                     //  pipette images for Flex are slightly smaller so need to be scaled accordingly
                     transform="scale(0.3)"
-                    transformOrigin={isFlex ? '-10% 52%' : '20% 52%'}
+                    transformOrigin={isFlex ? '-5% 52%' : '20% 52%'}
                   />
-                ) : null}
-              </Flex>
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                flex="100%"
-                paddingLeft={SPACING.spacing8}
-              >
+                </Flex>
+              ) : null}
+              <Flex flexDirection={DIRECTION_COLUMN} flex="100%">
                 {isFlexPipetteAttached && !isPipetteCalibrated ? (
                   <Banner type="error" marginBottom={SPACING.spacing4}>
                     {isEstopNotDisengaged ? (
