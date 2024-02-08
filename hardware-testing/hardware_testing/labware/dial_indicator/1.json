@@ -12,7 +12,7 @@
   "dimensions": {
     "xDimension": 128,
     "yDimension": 86,
-    "zDimension": 86
+    "zDimension": 136
   },
   "parameters": {
     "format": "irregular",
@@ -27,9 +27,9 @@
       "totalLiquidVolume": 10,
       "shape": "circular",
       "diameter": 4,
-      "x": 55.8,
-      "y": 42,
-      "z": 123
+      "x": 60.8,
+      "y": 41.5,
+      "z": 135
     }
   },
   "brand": {

@@ -93,6 +93,7 @@ class RunArgs:
     start_height_offset: float
     aspirate: bool
     dial_indicator: Optional[mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator]
+    plunger_speed: bool
 
     @classmethod
     def _get_protocol_context(cls, args: argparse.Namespace) -> ProtocolContext:
@@ -226,6 +227,7 @@ class RunArgs:
             start_height_offset=args.start_height_offset,
             aspirate=args.plunger_direction == "aspirate",
             dial_indicator=dial,
+            plunger_speed=args.plunger_speed,
         )
 
 
