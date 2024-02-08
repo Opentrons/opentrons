@@ -16,12 +16,7 @@ import { useIsFlex } from '../useIsFlex'
 import { useNotifyCurrentMaintenanceRun } from '../../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 import { useNotifyAllRunsQuery } from '../../../../resources/runs/useNotifyAllRunsQuery'
 
-import type {
-  Sessions,
-  Runs,
-  Subsystem,
-  CurrentSubsystemUpdates,
-} from '@opentrons/api-client'
+import type { Sessions, Runs } from '@opentrons/api-client'
 import type { AxiosError } from 'axios'
 
 jest.mock('@opentrons/react-api-client')
