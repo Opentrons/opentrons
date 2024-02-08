@@ -672,6 +672,7 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
         commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
+        failed_command=None,
         latest_command_hash=None,
         stopped_by_estop=False,
     )

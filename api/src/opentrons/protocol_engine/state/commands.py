@@ -152,6 +152,9 @@ class CommandState:
     are stored on the individual commands themselves.
     """
 
+    failed_command: Optional[CommandEntry]
+    """The command, if any, that made the run fail."""
+
     finish_error: Optional[ErrorOccurrence]
     """The error that happened during the post-run finish steps (homing & dropping tips), if any."""
 
@@ -189,6 +192,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             commands_by_id=OrderedDict(),
             run_error=None,
             finish_error=None,
+            failed_command=None,
             run_completed_at=None,
             run_started_at=None,
             latest_command_hash=None,
@@ -283,6 +287,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 ),
             )
 
+            self._state.failed_command = prev_entry
             if prev_entry.command.intent == CommandIntent.SETUP:
                 other_command_ids_to_fail = [
                     *[i for i in self._state.queued_setup_command_ids],
@@ -466,14 +471,12 @@ class CommandView(HasState[CommandState]):
                 cursor = commands_by_id[running_command_id].index
             elif len(queued_command_ids) > 0:
                 cursor = commands_by_id[queued_command_ids.head()].index - 1
-            elif self._state.run_result and self._state.run_result == RunResult.FAILED:
-                # failed command only contains the error that occurred
-                last_executed = next(
-                    command_id
-                    for command_id, command in self._state.commands_by_id.items()
-                    if command.command.error
-                )
-                cursor = commands_by_id[last_executed].index
+            elif (
+                self._state.run_result
+                and self._state.run_result == RunResult.FAILED
+                and self._state.failed_command
+            ):
+                cursor = self._state.failed_command.index
             else:
                 cursor = total_length - length
 
