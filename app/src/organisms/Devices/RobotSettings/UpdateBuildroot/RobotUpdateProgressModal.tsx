@@ -33,6 +33,7 @@ import type { State } from '../../../../redux/types'
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol'
 import type { RobotUpdateSession } from '../../../../redux/robot-update/types'
 import type { UpdateStep } from './useRobotUpdateInfo'
+import type { RobotInitializationStatus } from '../../hooks'
 
 const UPDATE_PROGRESS_BAR_STYLE = css`
   margin-top: ${SPACING.spacing24};
@@ -98,12 +99,14 @@ export function RobotUpdateProgressModal({
     updateStep === 'finished' && robotInitStatus !== INIT_STATUS.INITIALIZING
   const letUserExitUpdate = useAllowExitIfUpdateStalled(
     updateStep,
-    progressPercent
+    progressPercent,
+    robotInitStatus
   )
   const { modalBodyText, subProgressBarText } = useGetModalText(
     updateStep,
     letUserExitUpdate,
-    robotName
+    robotName,
+    robotInitStatus
   )
 
   return (
@@ -219,11 +222,13 @@ function SuccessOrError({ errorMessage }: SuccessOrErrorProps): JSX.Element {
   )
 }
 
-export const TIME_BEFORE_ALLOWING_EXIT_MS = 600000 // 10 mins
+export const TIME_BEFORE_ALLOWING_EXIT = 600000 // 10 mins
+export const TIME_BEFORE_ALLOWING_EXIT_INIT = 2400000 // 40 mins. Account for tasks like DB migration.
 
 function useAllowExitIfUpdateStalled(
   updateStep: UpdateStep | null,
-  progressPercent: number
+  progressPercent: number,
+  robotInitStatus: RobotInitializationStatus
 ): boolean {
   const [letUserExitUpdate, setLetUserExitUpdate] = React.useState<boolean>(
     false
@@ -238,12 +243,16 @@ function useAllowExitIfUpdateStalled(
       if (exitTimeoutRef.current) clearTimeout(exitTimeoutRef.current)
       exitTimeoutRef.current = setTimeout(() => {
         setLetUserExitUpdate(true)
-      }, TIME_BEFORE_ALLOWING_EXIT_MS)
+      }, TIME_BEFORE_ALLOWING_EXIT)
 
       prevSeenUpdateProgress.current = progressPercent
       setLetUserExitUpdate(false)
+    } else if (robotInitStatus === INIT_STATUS.INITIALIZING) {
+      exitTimeoutRef.current = setTimeout(() => {
+        setLetUserExitUpdate(true)
+      }, TIME_BEFORE_ALLOWING_EXIT_INIT)
     }
-  }, [progressPercent, updateStep])
+  }, [progressPercent, updateStep, robotInitStatus])
 
   React.useEffect(() => {
     return () => {
@@ -301,12 +310,13 @@ function useCleanupRobotUpdateSessionOnDismount(): void {
 function useGetModalText(
   updateStep: UpdateStep | null,
   letUserExitUpdate: boolean,
-  robotName: string
+  robotName: string,
+  robotInitStatus: RobotInitializationStatus
 ): { modalBodyText: string; subProgressBarText: string } {
   const { t } = useTranslation('device_settings')
 
   let modalBodyText = ''
-  let subProgressBarText = t('do_not_turn_off')
+  let subProgressBarText = t('do_not_turn_off', { minutes: 15 })
   switch (updateStep) {
     case 'initial':
     case 'error':
@@ -319,13 +329,12 @@ function useGetModalText(
       modalBodyText = t('installing_update')
       break
     case 'restart':
-      modalBodyText = t('restarting_robot')
-      if (letUserExitUpdate) {
-        subProgressBarText = t('restart_taking_too_long', { robotName })
+      if (robotInitStatus === INIT_STATUS.INITIALIZING) {
+        modalBodyText = t('robot_initializing')
+        subProgressBarText = t('do_not_turn_off', { minutes: 40 })
+      } else {
+        modalBodyText = t('restarting_robot')
       }
-      break
-    case 'finished':
-      modalBodyText = t('robot_initializing')
       if (letUserExitUpdate) {
         subProgressBarText = t('restart_taking_too_long', { robotName })
       }

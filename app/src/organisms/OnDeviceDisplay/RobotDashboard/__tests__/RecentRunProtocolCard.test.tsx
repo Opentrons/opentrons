@@ -245,4 +245,10 @@ describe('RecentRunProtocolCard', () => {
     const [{ getByText }] = render(props)
     getByText('mock Skeleton')
   })
+
+  it('should render the skeleton when the robot server is unresponsive', () => {
+    mockUseRobotInitializationStatus.mockReturnValue(null)
+    const [{ getByText }] = render(props)
+    getByText('mock Skeleton')
+  })
 })

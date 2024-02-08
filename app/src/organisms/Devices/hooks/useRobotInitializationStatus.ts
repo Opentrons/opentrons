@@ -10,7 +10,7 @@ export const INIT_STATUS = {
   FAILED: 'FAILED',
 } as const
 
-type RobotInitializationStatus =
+export type RobotInitializationStatus =
   | typeof INIT_STATUS[keyof typeof INIT_STATUS]
   | null
 

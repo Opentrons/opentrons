@@ -5,7 +5,8 @@ import { renderWithProviders } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   RobotUpdateProgressModal,
-  TIME_BEFORE_ALLOWING_EXIT_MS,
+  TIME_BEFORE_ALLOWING_EXIT,
+  TIME_BEFORE_ALLOWING_EXIT_INIT,
 } from '../RobotUpdateProgressModal'
 import { useRobotUpdateInfo } from '../useRobotUpdateInfo'
 import {
@@ -194,7 +195,7 @@ describe('DownloadUpdateModal', () => {
     render(props)
 
     act(() => {
-      jest.advanceTimersByTime(TIME_BEFORE_ALLOWING_EXIT_MS)
+      jest.advanceTimersByTime(TIME_BEFORE_ALLOWING_EXIT)
     })
 
     screen.getByText(/Try restarting the update./i)
@@ -204,11 +205,32 @@ describe('DownloadUpdateModal', () => {
   it('renders alternative text if the robot is initializing', () => {
     mockUseRobotInitializationStatus.mockReturnValue(INIT_STATUS.INITIALIZING)
     mockUseRobotUpdateInfo.mockReturnValue({
-      updateStep: 'finished',
+      updateStep: 'restart',
       progressPercent: 100,
     })
     render(props)
 
     screen.getByText(/Initializing robot.../i)
+    screen.getByText(
+      "This could take up to 40 minutes. Don't turn off the robot."
+    )
+  })
+
+  it('renders alternative text if update takes too long while robot is initializing', () => {
+    jest.useFakeTimers()
+    mockUseRobotInitializationStatus.mockReturnValue(INIT_STATUS.INITIALIZING)
+    mockUseRobotUpdateInfo.mockReturnValue({
+      updateStep: 'restart',
+      progressPercent: 100,
+    })
+    render(props)
+
+    act(() => {
+      jest.advanceTimersByTime(TIME_BEFORE_ALLOWING_EXIT_INIT)
+    })
+
+    screen.getByText(
+      /Check the Advanced tab of its settings page to see whether it updated successfully./i
+    )
   })
 })

@@ -86,7 +86,8 @@ export function ProtocolWithLastRun({
     history.push(`runs/${createRunResponse.data.id}/setup`)
   const { cloneRun } = useCloneRun(runData.id, onResetSuccess)
   const robotInitStatus = useRobotInitializationStatus()
-  const isRobotInitializing = robotInitStatus === INIT_STATUS.INITIALIZING
+  const isRobotInitializing =
+    robotInitStatus === INIT_STATUS.INITIALIZING || robotInitStatus == null
   const [showSpinner, setShowSpinner] = React.useState<boolean>(false)
 
   const protocolName =
