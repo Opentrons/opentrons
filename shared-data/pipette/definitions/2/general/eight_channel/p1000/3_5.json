@@ -6,7 +6,7 @@
   "pickUpTipConfigurations": {
     "pressFit": {
       "presses": 1,
-      "speed": 10,
+      "speedByTipCount": 10,
       "increment": 0.0,
       "distance": 13.0,
       "currentByTipCount": {
