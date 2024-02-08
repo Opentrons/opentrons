@@ -36,6 +36,17 @@ class _abr_asair_sensor:
         header = ["Robot", "Date", "Time", "Temp (oC)", "Relative Humidity (%)"]
         header_str = ",".join(header) + "\n"
         data.append_data_to_file(test_name, run_id, file_name, header_str)
+        # Upload to google has passed
+        credentials_path = "/var/lib/jupyter/notebooks/abr.json"
+        try:
+            google_sheet = google_sheets_tool.google_sheet(
+                credentials_path, "ABR Ambient Conditions", tab_number=0
+            )
+            print("Connected to the google sheet.")
+        except FileNotFoundError:
+            print(
+                "There is no google sheets credentials. Make sure credentials in jupyter notebook."
+            )
         results_list = []  # type: List
         start_time = datetime.datetime.now()
         while True:
@@ -55,11 +66,18 @@ class _abr_asair_sensor:
                 str(rh),
             ]
             results_list.append(row)
-
             # Check if duration elapsed
             elapsed_time = datetime.datetime.now() - start_time
             if elapsed_time.total_seconds() >= duration * 60:
                 break
+            # write to google sheet
+            try:
+                written_header = google_sheet.write_header(header)
+                google_sheet.update_row_index()
+                google_sheet.write_to_row(row)
+                print("Wrote row")
+            except:
+                print("Did not write row.")
             # Delay for desired frequency minutes before the next iteration
             t.sleep(frequency * 60)  # seconds
 
@@ -71,21 +89,6 @@ class _abr_asair_sensor:
             file_path = data.append_data_to_file(
                 test_name, run_id, file_name, result_string
             )
-            print(file_path)
-        # Upload to google has passed
-        credentials_path = "/var/lib/jupyter/notebooks/abr.json"
-        try:
-            google_sheet = google_sheets_tool.google_sheet(
-                credentials_path, "ABR Ambient Conditions", tab_number=0
-            )
-        except FileNotFoundError:
-            print(
-                "There is no google sheets credentials. Make sure credentials in jupyter notebook."
-            )
-        google_sheet.write_header(header)
-        google_sheet.update_row_index()
-        for n_row in range(len(results_list)):
-            google_sheet.write_to_row(results_list[n_row])
         print(
             f"Done. Ran for {duration} minutes and collected every {frequency} minutes."
         )
