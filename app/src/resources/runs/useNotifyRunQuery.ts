@@ -19,7 +19,7 @@ export function useNotifyRunQuery<TError = Error>(
   const { isNotifyError } = useNotifyService({
     topic: `robot-server/runs/${runId}` as NotifyTopic,
     refetchUsingHTTP: () => setRefetchUsingHTTP(true),
-    options,
+    options: { ...options, enabled: options.enabled && runId != null },
   })
 
   const isNotifyEnabled = !isNotifyError && !options?.forceHttpPolling
