@@ -19,6 +19,7 @@ import {
   NINETY_SIX_CHANNEL,
   PipetteName,
   SINGLE_MOUNT_PIPETTES,
+  LoadedPipette,
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
@@ -49,6 +50,7 @@ interface ProtocolInstrumentMountItemProps {
   attachedInstrument: InstrumentData | null
   speccedName: PipetteName | GripperModel
   instrumentsRefetch?: () => void
+  pipetteInfo?: LoadedPipette[]
 }
 export function ProtocolInstrumentMountItem(
   props: ProtocolInstrumentMountItemProps
@@ -172,6 +174,7 @@ export function ProtocolInstrumentMountItem(
           closeFlow={() => setShowPipetteWizardFlow(false)}
           selectedPipette={selectedPipette}
           mount={mount as Mount}
+          pipetteInfo={props.pipetteInfo}
           onComplete={props.instrumentsRefetch}
         />
       ) : null}
