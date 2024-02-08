@@ -13,6 +13,10 @@ export type UseAllRunsQueryOptions = UseQueryOptions<
   Array<string | HostConfig>
 >
 
+/**
+ * @property {HostConfig | null | undefined} hostOverride:
+ * When using all runs query outside of the host context provider, we must specify the host manually.
+ */
 export function useAllRunsQuery(
   params: GetRunsParams = {},
   options: UseAllRunsQueryOptions = {},
