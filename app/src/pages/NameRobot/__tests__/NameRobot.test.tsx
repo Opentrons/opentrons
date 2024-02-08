@@ -8,11 +8,13 @@ import { useTrackEvent } from '../../../redux/analytics'
 import {
   getConnectableRobots,
   getReachableRobots,
+  getUnreachableRobots,
 } from '../../../redux/discovery'
 import { useIsUnboxingFlowOngoing } from '../../../organisms/RobotSettingsDashboard/NetworkSettings/hooks'
 import {
   mockConnectableRobot,
   mockReachableRobot,
+  mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
 
 import { NameRobot } from '..'
@@ -41,6 +43,9 @@ const mockGetReachableRobots = getReachableRobots as jest.MockedFunction<
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
+const mockGetUnreachableRobots = getUnreachableRobots as jest.MockedFunction<
+  typeof getUnreachableRobots
+>
 const mockuseIsUnboxingFlowOngoing = useIsUnboxingFlowOngoing as jest.MockedFunction<
   typeof useIsUnboxingFlowOngoing
 >
@@ -61,8 +66,10 @@ describe('NameRobot', () => {
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
     mockConnectableRobot.name = 'connect'
     mockReachableRobot.name = 'reach'
+    mockUnreachableRobot.name = 'unreachableOtie'
     mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
     mockGetReachableRobots.mockReturnValue([mockReachableRobot])
+    mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
     mockuseIsUnboxingFlowOngoing.mockReturnValue(true)
   })
 
