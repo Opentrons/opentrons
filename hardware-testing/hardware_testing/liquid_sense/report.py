@@ -1,8 +1,13 @@
 """Format the csv report for a liquid-sense run."""
 
 
-from hardware_testing.data.csv_report import CSVReport, CSVSection, CSVLine
-from typing import List
+from hardware_testing.data.csv_report import (
+    CSVReport,
+    CSVSection,
+    CSVLine,
+    CSVLineRepeating,
+)
+from typing import List, Union
 
 """
 CSV Test Report:
@@ -65,16 +70,23 @@ def build_config_section() -> CSVSection:
 
 def build_trials_section(trials: int, tips: List[int]) -> CSVSection:
     """Build section."""
-    return CSVSection(
-        title="TRIALS",
-        lines=[
+    lines: List[Union[CSVLine, CSVLineRepeating]] = [
+        CSVLine("trial number", ["str", "str", "str", "str", "str", "str", "str"])
+    ]
+    lines.extend(
+        [
             CSVLine(
                 f"trial-{t + 1}-{tip}ul",
                 [float, float, float, float, float, float, float],
             )
             for tip in tips
             for t in range(trials)
-        ],
+        ]
+    )
+
+    return CSVSection(
+        title="TRIALS",
+        lines=lines,
     )
 
 
@@ -173,7 +185,7 @@ def build_ls_report(
     test_name: str, run_id: str, trials: int, tips: List[int]
 ) -> CSVReport:
     """Generate a CSV Report."""
-    return CSVReport(
+    report = CSVReport(
         test_name=test_name,
         sections=[
             build_serial_number_section(),
@@ -184,6 +196,20 @@ def build_ls_report(
         run_id=run_id,
         start_time=0.0,
     )
+    report(
+        "TRIALS",
+        "trial number",
+        [
+            "height",
+            "plunger_pos",
+            "humidity",
+            "temp",
+            "z_travel",
+            "plunger_travel",
+            "tip_length_offset",
+        ],
+    )
+    return report
 
 
 """
