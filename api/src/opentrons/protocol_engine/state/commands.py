@@ -467,7 +467,7 @@ class CommandView(HasState[CommandState]):
             elif len(queued_command_ids) > 0:
                 cursor = commands_by_id[queued_command_ids.head()].index - 1
             elif self._state.run_result == RunResult.FAILED:
-                # failed command contains the error that occurred
+                # failed command only contains the error that occurred
                 last_executed = next(
                     command_id
                     for command_id, command in self._state.commands_by_id.items()
