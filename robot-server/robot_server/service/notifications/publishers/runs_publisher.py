@@ -12,10 +12,6 @@ from server_utils.fastapi_utils.app_state import (
 from ..notification_client import NotificationClient, get_notification_client
 from ..topics import Topics
 
-import logging
-
-log: logging.Logger = logging.getLogger(__name__)
-
 
 class RunsPublisher:
     """Publishes protocol runs topics."""
