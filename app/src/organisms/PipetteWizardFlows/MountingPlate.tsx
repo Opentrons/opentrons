@@ -47,7 +47,7 @@ export const MountingPlate = (
         setShowErrorMessage(error.message)
       })
   }
-  console.log(isRobotMoving)
+
   if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
   return errorMessage ? (
     <SimpleWizardBody
