@@ -82,13 +82,17 @@ export function ManualIpHostnameForm({
     if (!ip) {
       message = t('add_ip_error')
     }
-    return {
-      ...errors,
-      ip: {
-        type: 'error',
-        message: message,
-      },
-    }
+    const updatedErrors =
+      message != null
+        ? {
+            ...errors,
+            ip: {
+              type: 'error',
+              message: message,
+            },
+          }
+        : errors
+    return updatedErrors
   }
 
   const resolver: Resolver<FormValues> = values => {
@@ -103,7 +107,6 @@ export function ManualIpHostnameForm({
     },
     resolver: resolver,
   })
-console.log('errors', formState.errors)
 
   const onSubmit = (data: FormValues): void => {
     const trimmedIp = data.ip.trim()

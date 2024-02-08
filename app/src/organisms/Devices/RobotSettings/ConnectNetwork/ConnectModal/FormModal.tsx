@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Controller } from 'react-hook-form'
+import { Control, Controller } from 'react-hook-form'
 import styled, { css } from 'styled-components'
 
 import {
@@ -91,6 +91,7 @@ export const FormModal = (props: FormModalProps): JSX.Element => {
               <Controller
                 key={name}
                 control={control}
+                //  @ts-expect-error: ts can't tell that name is the correct value
                 name={name}
                 render={({ field, fieldState }) => (
                   <StyledSecurityField
@@ -110,6 +111,7 @@ export const FormModal = (props: FormModalProps): JSX.Element => {
               <Controller
                 key={name}
                 control={control}
+                //  @ts-expect-error: ts can't tell that name is the correct value
                 name={name}
                 render={({ field, fieldState }) => (
                   <StyledKeyFileField
@@ -128,6 +130,7 @@ export const FormModal = (props: FormModalProps): JSX.Element => {
             <Controller
               key={name}
               control={control}
+              //  @ts-expect-error: ts can't tell that name is the correct value
               name={name}
               render={({ field, fieldState }) => (
                 <StyledTextField
