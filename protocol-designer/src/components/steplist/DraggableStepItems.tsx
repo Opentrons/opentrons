@@ -25,18 +25,16 @@ interface DragDropStepItemProps extends ConnectedStepItemProps {
   stepNumber: number
   findStepIndex: (stepIdType: StepIdType) => number
   onDrag: () => void
-  moveStep: (stepId: StepIdType, value: number) => void
+  moveStep: (draggedId: StepIdType, value: number) => void
 }
 
 const DragDropStepItem = (props: DragDropStepItemProps): JSX.Element => {
   const { onDrag, stepId, findStepIndex, moveStep } = props
-  console.log('stepId', stepId)
+  const ref = React.useRef(null)
+
   const [{ isDragging }, drag] = useDrag(() => ({
     type: DND_TYPES.STEP_ITEM,
-    beginDrag: () => {
-      onDrag()
-      return { stepId: stepId }
-    },
+    item: { stepId },
     collect: (monitor: DragLayerMonitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -47,22 +45,24 @@ const DragDropStepItem = (props: DragDropStepItemProps): JSX.Element => {
     canDrop: () => {
       return false
     },
-    hover: (item: any) => {
-      console.log('item', item)
-      const draggedId = item.stepId
+    hover: (item: { stepId: StepIdType }) => {
+      const draggedId: StepIdType = item.stepId
+      const targetIndex = findStepIndex(stepId)
+      const draggedIndex = findStepIndex(draggedId)
+
+      const adjustedTargetIndex =
+        draggedIndex < targetIndex ? targetIndex - 1 : targetIndex
 
       if (draggedId !== stepId) {
-        const overIndex = findStepIndex(stepId)
-        moveStep(draggedId, overIndex)
+        moveStep(draggedId, adjustedTargetIndex)
       }
     },
   }))
 
+  drag(drop(ref))
   return (
-    <div ref={drop} style={{ opacity: isDragging ? 0.3 : 1 }}>
-      <div ref={drag}>
-        <ConnectedStepItem {...props} stepId={stepId} />
-      </div>
+    <div ref={ref} style={{ opacity: isDragging ? 0.3 : 1 }}>
+      <ConnectedStepItem {...props} stepId={stepId} />
     </div>
   )
 }
@@ -79,21 +79,17 @@ export const DraggableStepItems = (props: StepItemsProps): JSX.Element => {
     setStepIds(orderedStepIds)
   }
 
-  const submitReordering = (): void => {
-    if (
-      confirm(
-        'Are you sure you want to reorder these steps, it may cause errors?'
-      )
-    ) {
-      reorderSteps(stepIds)
-    }
-  }
-
   const [{ isOver }, drop] = useDrop(() => ({
     accept: DND_TYPES.STEP_ITEM,
     drop: () => {
       if (!isEqual(orderedStepIds, stepIds)) {
-        submitReordering()
+        if (
+          confirm(
+            'Are you sure you want to reorder these steps, it may cause errors?'
+          )
+        ) {
+          reorderSteps(stepIds)
+        }
       }
     },
     collect: (monitor: DropTargetMonitor) => ({
@@ -120,8 +116,7 @@ export const DraggableStepItems = (props: StepItemsProps): JSX.Element => {
     stepIds.findIndex(id => stepId === id)
 
   const currentIds = isOver ? stepIds : orderedStepIds
-  console.log('stepIds', stepIds)
-  console.log('currentStepIds', currentIds)
+
   return (
     <div ref={drop}>
       <ContextMenu>
