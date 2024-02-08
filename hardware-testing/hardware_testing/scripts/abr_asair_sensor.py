@@ -7,6 +7,7 @@ import sys
 import time as t
 from typing import List
 
+
 try:
     sys.path.insert(0, "/var/lib/jupyter/notebooks")
     import google_sheets_tool  # type: ignore[import]
@@ -33,7 +34,14 @@ class _abr_asair_sensor:
         file_name = data.create_file_name(test_name, run_id, robot)
         sensor = asair_sensor.BuildAsairSensor(False, True)
         env_data = sensor.get_reading()
-        header = ["Robot", "Date", "Time", "Temp (oC)", "Relative Humidity (%)"]
+        header = [
+            "Robot",
+            "Timestamp",
+            "Date",
+            "Time",
+            "Temp (oC)",
+            "Relative Humidity (%)",
+        ]
         header_str = ",".join(header) + "\n"
         data.append_data_to_file(test_name, run_id, file_name, header_str)
         # Upload to google has passed
@@ -52,18 +60,20 @@ class _abr_asair_sensor:
         while True:
             env_data = sensor.get_reading()
             timestamp = datetime.datetime.now()
-            date = timestamp.date()
-            time = timestamp.time()
+            new_timestamp = timestamp - datetime.timedelta(hours=5)
+            date = new_timestamp.date()
+            time = new_timestamp.time()
             temp = env_data.temperature
             print(temp)
             rh = env_data.relative_humidity
             print(rh)
             row = [
                 robot,
-                date.strftime("%m/%d/%Y"),
-                time.strftime("%H:%M:%S"),
-                str(temp),
-                str(rh),
+                str(new_timestamp),
+                str(date),
+                str(time),
+                temp,
+                rh,
             ]
             results_list.append(row)
             # Check if duration elapsed
