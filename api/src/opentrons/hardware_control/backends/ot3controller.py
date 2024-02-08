@@ -54,7 +54,7 @@ from .ot3utils import (
 from .tip_presence_manager import TipPresenceManager
 
 try:
-    import aionotify  # type: ignore[import]
+    import aionotify  # type: ignore[import-untyped]
 except (OSError, ModuleNotFoundError):
     aionotify = None
 
@@ -653,6 +653,7 @@ class OT3Controller(FlexBackend):
             if not self._feature_flags.stall_detection_enabled
             else False,
         )
+
         mounts_moving = [
             k
             for k in moving_axes_in_move_group(move_group)
@@ -1224,7 +1225,6 @@ class OT3Controller(FlexBackend):
 
     async def clean_up(self) -> None:
         """Clean up."""
-
         try:
             loop = asyncio.get_event_loop()
         except RuntimeError:
@@ -1233,6 +1233,15 @@ class OT3Controller(FlexBackend):
         if hasattr(self, "_event_watcher"):
             if loop.is_running() and self._event_watcher:
                 self._event_watcher.close()
+
+        messenger = getattr(self, "_messenger", None)
+        if messenger:
+            await messenger.stop()
+
+        usb_messenger = getattr(self, "_usb_messenger", None)
+        if usb_messenger:
+            await usb_messenger.stop()
+
         return None
 
     @staticmethod

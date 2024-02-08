@@ -88,7 +88,7 @@ class BinaryFieldBase(Generic[T]):
         Returns:
             New instance.
         """
-        ...
+        raise NotImplementedError()
 
     @property
     def value(self) -> T:

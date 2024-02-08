@@ -50,7 +50,11 @@ from opentrons.protocol_engine.state import move_types
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.modules import ModuleView
-from opentrons.protocol_engine.state.pipettes import PipetteView, StaticPipetteConfig
+from opentrons.protocol_engine.state.pipettes import (
+    PipetteView,
+    StaticPipetteConfig,
+    BoundingNozzlesOffsets,
+)
 from opentrons.protocol_engine.state.addressable_areas import AddressableAreaView
 from opentrons.protocol_engine.state.geometry import GeometryView, _GripperMoveType
 
@@ -1847,6 +1851,10 @@ def test_get_next_drop_tip_location(
             nominal_tip_overlap={},
             home_position=0,
             nozzle_offset_z=0,
+            bounding_nozzle_offsets=BoundingNozzlesOffsets(
+                back_left_offset=Point(x=10, y=20, z=30),
+                front_right_offset=Point(x=40, y=50, z=60),
+            ),
         )
     )
     decoy.when(mock_pipette_view.get_mount("pip-123")).then_return(pipette_mount)

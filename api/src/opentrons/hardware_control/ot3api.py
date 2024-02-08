@@ -247,6 +247,23 @@ class OT3API(
         OT3RobotCalibrationProvider.__init__(self, self._config)
         ExecutionManagerProvider.__init__(self, isinstance(backend, OT3Simulator))
 
+    def is_idle_mount(self, mount: Union[top_types.Mount, OT3Mount]) -> bool:
+        """Only the gripper mount or the 96-channel pipette mount would be idle
+        (disengaged).
+
+        If gripper mount is NOT the last moved mount, it's idle.
+        If a 96-channel pipette is attached, the mount is idle if it's not
+        the last moved mount.
+        """
+        realmount = OT3Mount.from_mount(mount)
+        if not self._last_moved_mount or realmount == self._last_moved_mount:
+            return False
+
+        return (
+            realmount == OT3Mount.LEFT
+            and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
+        ) or (realmount == OT3Mount.GRIPPER)
+
     @property
     def door_state(self) -> DoorState:
         return self._door_state
@@ -1153,7 +1170,7 @@ class OT3API(
         else:
             checked_max = None
 
-        await self._cache_and_maybe_retract_mount(realmount)
+        await self.prepare_for_mount_movement(realmount)
         await self._move(
             target_position,
             speed=speed,
@@ -1265,7 +1282,8 @@ class OT3API(
             checked_max: Optional[OT3AxisMap[float]] = max_speeds
         else:
             checked_max = None
-        await self._cache_and_maybe_retract_mount(realmount)
+
+        await self.prepare_for_mount_movement(realmount)
         await self._move(
             target_position,
             speed=speed,
@@ -1275,15 +1293,20 @@ class OT3API(
         )
 
     async def _cache_and_maybe_retract_mount(self, mount: OT3Mount) -> None:
-        """Retract the 'other' mount if necessary
+        """Retract the 'other' mount if necessary.
 
         If `mount` does not match the value in :py:attr:`_last_moved_mount`
         (and :py:attr:`_last_moved_mount` exists) then retract the mount
         in :py:attr:`_last_moved_mount`. Also unconditionally update
         :py:attr:`_last_moved_mount` to contain `mount`.
 
-        Disengage the 96-channel and gripper mount if retracted.
+        Disengage the 96-channel and gripper mount if retracted. Re-engage
+        the 96-channel or gripper mount if it is about to move.
         """
+        if self.is_idle_mount(mount):
+            # home the left/gripper mount if it is current disengaged
+            await self.home_z(mount)
+
         if mount != self._last_moved_mount and self._last_moved_mount:
             await self.retract(self._last_moved_mount, 10)
 
@@ -1302,7 +1325,15 @@ class OT3API(
 
         if mount != OT3Mount.GRIPPER:
             await self.idle_gripper()
+
         self._last_moved_mount = mount
+
+    async def prepare_for_mount_movement(
+        self, mount: Union[top_types.Mount, OT3Mount]
+    ) -> None:
+        """Retract the idle mount if necessary."""
+        realmount = OT3Mount.from_mount(mount)
+        await self._cache_and_maybe_retract_mount(realmount)
 
     async def idle_gripper(self) -> None:
         """Move gripper to its idle, gripped position."""

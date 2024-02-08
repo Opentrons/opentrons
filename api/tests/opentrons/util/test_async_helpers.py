@@ -85,7 +85,7 @@ class TestAsyncContextManagerInThread:
             ).result()
 
         # The loop should be closed and unusable now that the context manager has exited.
-        assert loop_in_thread.is_closed
+        assert loop_in_thread.is_closed()
         with pytest.raises(RuntimeError, match="Event loop is closed"):
             loop_in_thread.call_soon_threadsafe(lambda: None)
 

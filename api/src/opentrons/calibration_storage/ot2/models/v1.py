@@ -51,7 +51,7 @@ class DeckCalibrationModel(BaseModel):
     attitude: types.AttitudeMatrix = Field(
         ..., description="Attitude matrix for deck found from calibration."
     )
-    last_modified: datetime = Field(
+    last_modified: typing.Optional[datetime] = Field(
         default=None, description="The last time this deck was calibrated."
     )
     source: types.SourceType = Field(

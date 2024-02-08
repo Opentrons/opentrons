@@ -463,7 +463,7 @@ def test_validate_action_allowed(
     """It should validate allowed play/pause/stop actions."""
     expectation = pytest.raises(expected_error) if expected_error else does_not_raise()
 
-    with expectation:  # type: ignore[attr-defined]
+    with expectation:
         result = subject.validate_action_allowed(action)
 
     if expected_error is None:

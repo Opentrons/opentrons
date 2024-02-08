@@ -6,7 +6,7 @@ from typing import Optional
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.pipette import pipette_definition
 
-from opentrons.types import DeckSlotName, MountType
+from opentrons.types import DeckSlotName, MountType, Point
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.types import (
     DeckPoint,
@@ -27,6 +27,7 @@ from opentrons.protocol_engine.state.pipettes import (
     PipetteState,
     CurrentDeckPoint,
     StaticPipetteConfig,
+    BoundingNozzlesOffsets,
 )
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
@@ -681,6 +682,8 @@ def test_add_pipette_config(
             nominal_tip_overlap={"default": 5},
             home_position=8.9,
             nozzle_offset_z=10.11,
+            back_left_nozzle_offset=Point(x=1, y=2, z=3),
+            front_right_nozzle_offset=Point(x=4, y=5, z=6),
         ),
     )
     subject.handle_action(
@@ -698,6 +701,10 @@ def test_add_pipette_config(
         nominal_tip_overlap={"default": 5},
         home_position=8.9,
         nozzle_offset_z=10.11,
+        bounding_nozzle_offsets=BoundingNozzlesOffsets(
+            back_left_offset=Point(x=1, y=2, z=3),
+            front_right_offset=Point(x=4, y=5, z=6),
+        ),
     )
     assert subject.state.flow_rates_by_id["pipette-id"].default_aspirate == {"a": 1.0}
     assert subject.state.flow_rates_by_id["pipette-id"].default_dispense == {"b": 2.0}

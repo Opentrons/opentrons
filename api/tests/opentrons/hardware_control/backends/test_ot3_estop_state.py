@@ -1,6 +1,6 @@
 import pytest
 from decoy import Decoy
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, cast
 
 from opentrons.hardware_control.backends.estop_state import EstopStateMachine
 from opentrons_hardware.hardware_control.estop.detector import (
@@ -59,7 +59,7 @@ async def test_estop_state_no_detector(
 
     subject.subscribe_to_detector(detector=mock_estop_detector)
 
-    assert subject.state == EstopState.PHYSICALLY_ENGAGED
+    assert cast(EstopState, subject.state) == EstopState.PHYSICALLY_ENGAGED
     assert (
         subject.get_physical_status(EstopAttachLocation.LEFT)
         == EstopPhysicalStatus.NOT_PRESENT

@@ -1,14 +1,18 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
-import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
+import {
+  useDeleteMaintenanceRunMutation,
+  useCurrentMaintenanceRun,
+  useDeckConfigurationQuery,
+} from '@opentrons/react-api-client'
 import { COLORS } from '@opentrons/components'
 import {
-  CreateCommand,
   getModuleType,
   getModuleDisplayName,
+  FLEX_CUTOUT_BY_SLOT_ID,
+  SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
-
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { StyledText } from '../../atoms/text'
@@ -29,9 +33,13 @@ import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
 import { DetachProbe } from './DetachProbe'
-import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
+import type {
+  CreateCommand,
+  CutoutConfig,
+  SingleSlotCutoutFixtureId,
+} from '@opentrons/shared-data'
 
 interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
@@ -64,10 +72,26 @@ export const ModuleWizardFlows = (
       : attachedPipettes.right
 
   const moduleCalibrationSteps = getModuleCalibrationSteps()
+  const deckConfig = useDeckConfigurationQuery().data ?? []
+  const occupiedCutouts = deckConfig.filter(
+    (fixture: CutoutConfig) =>
+      !SINGLE_SLOT_FIXTURES.includes(
+        fixture.cutoutFixtureId as SingleSlotCutoutFixtureId
+      )
+  )
   const availableSlotNames =
-    FLEX_SLOT_NAMES_BY_MOD_TYPE[getModuleType(attachedModule.moduleModel)] ?? []
+    FLEX_SLOT_NAMES_BY_MOD_TYPE[
+      getModuleType(attachedModule.moduleModel)
+    ]?.filter(
+      slot =>
+        !occupiedCutouts.some(
+          (occCutout: CutoutConfig) =>
+            occCutout.cutoutId === FLEX_CUTOUT_BY_SLOT_ID[slot]
+        )
+    ) ?? []
+
   const [slotName, setSlotName] = React.useState(
-    initialSlotName != null ? initialSlotName : availableSlotNames?.[0] ?? 'D1'
+    initialSlotName != null ? initialSlotName : availableSlotNames?.[0] ?? null
   )
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const totalStepCount = moduleCalibrationSteps.length - 1
@@ -91,7 +115,7 @@ export const ModuleWizardFlows = (
     setMonitorMaintenanceRunForDeletion,
   ] = React.useState<boolean>(false)
 
-  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
+  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
     enabled: createdMaintenanceRunId != null,
   })
@@ -104,7 +128,9 @@ export const ModuleWizardFlows = (
     createTargetedMaintenanceRun,
     isLoading: isCreateLoading,
   } = useCreateTargetedMaintenanceRunMutation({
-    onSuccess: response => {
+    onSuccess: (response: {
+      data: { id: React.SetStateAction<string | null> }
+    }) => {
       setCreatedMaintenanceRunId(response.data.id)
     },
   })
@@ -149,8 +175,12 @@ export const ModuleWizardFlows = (
   }
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
-    onSuccess: () => handleClose(),
-    onError: () => handleClose(),
+    onSuccess: () => {
+      handleClose()
+    },
+    onError: () => {
+      handleClose()
+    },
   })
 
   const handleCleanUpAndClose = (): void => {
@@ -158,7 +188,7 @@ export const ModuleWizardFlows = (
     if (maintenanceRunData?.data.id == null) handleClose()
     else {
       chainRunCommands(
-        maintenanceRunData?.data.id,
+        maintenanceRunData?.data.id as string,
         [{ commandType: 'home' as const, params: {} }],
         false
       )
@@ -190,7 +220,7 @@ export const ModuleWizardFlows = (
       continuePastCommandFailure: boolean
     ): Promise<CommandData[]> =>
       chainRunCommands(
-        maintenanceRunData?.data.id,
+        maintenanceRunData?.data.id as string,
         commands,
         continuePastCommandFailure
       )
@@ -275,6 +305,7 @@ export const ModuleWizardFlows = (
         {...calibrateBaseProps}
         availableSlotNames={availableSlotNames}
         setSlotName={setSlotName}
+        occupiedCutouts={occupiedCutouts}
       />
     )
   } else if (currentStep.section === SECTIONS.PLACE_ADAPTER) {

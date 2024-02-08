@@ -1,5 +1,5 @@
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from typing import Dict, Generator, Optional
 from unittest.mock import MagicMock, patch
 
