@@ -75,6 +75,7 @@ For example, if we wanted to transfer liquid from well A1 to well B1 on a plate,
             # protocol run function
             def run(protocol: protocol_api.ProtocolContext):
                 # labware
+		trash = protocol.load_trash_bin("A3")
                 plate = protocol.load_labware(
                     "corning_96_wellplate_360ul_flat", location="D1"
                 )
