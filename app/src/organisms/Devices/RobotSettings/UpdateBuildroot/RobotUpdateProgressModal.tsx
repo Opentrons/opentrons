@@ -248,6 +248,7 @@ function useAllowExitIfUpdateStalled(
       prevSeenUpdateProgress.current = progressPercent
       setLetUserExitUpdate(false)
     } else if (robotInitStatus === INIT_STATUS.INITIALIZING) {
+      if (exitTimeoutRef.current) clearTimeout(exitTimeoutRef.current)
       exitTimeoutRef.current = setTimeout(() => {
         setLetUserExitUpdate(true)
       }, TIME_BEFORE_ALLOWING_EXIT_INIT)
