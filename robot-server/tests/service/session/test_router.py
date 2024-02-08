@@ -69,7 +69,7 @@ def test_get_session(mock_session_manager):
 
     session = router.get_session(mock_session_manager, session_id)
 
-    mock_session_manager.get_by_id.called_once_with(session_id)
+    mock_session_manager.get_by_id.assert_called_once_with(session_id)
 
     assert session is mock_session
 

@@ -1,5 +1,5 @@
 """USB Driver tests."""
-import serial  # type: ignore[import]
+import serial  # type: ignore[import-untyped]
 import time
 from contextlib import ExitStack
 import multiprocessing
@@ -157,7 +157,7 @@ async def test_recv(subject: SerialUsbDriver, test_port_host: SerialEmulator) ->
     length = test_port_host.write(b"\x00\x01\x00\x00")
     assert length == 4
     message = await subject.read()
-    assert type(message) == Ack
+    assert type(message) is Ack
 
     assert message == Ack()
 
@@ -179,11 +179,11 @@ async def test_recv_iterator(
             break
 
     assert len(messages) == 3
-    assert type(messages[0]) == Ack
+    assert type(messages[0]) is Ack
     assert messages[0] == Ack()
 
-    assert type(messages[1]) == AckFailed
+    assert type(messages[1]) is AckFailed
     assert messages[1] == AckFailed()
 
-    assert type(messages[2]) == EnterBootloaderRequest
+    assert type(messages[2]) is EnterBootloaderRequest
     assert messages[2] == EnterBootloaderRequest()

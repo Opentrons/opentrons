@@ -1,6 +1,8 @@
 """Test instrument context simulation."""
+from typing import cast
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from _pytest.fixtures import SubRequest
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
@@ -14,8 +16,8 @@ from opentrons.protocol_api.core.common import LabwareCore, ProtocolCore
         lazy_fixture("simulating_protocol_context"),
     ]
 )
-def subject(request: pytest.FixtureRequest) -> ProtocolCore:
-    return request.param  # type: ignore[attr-defined, no-any-return]
+def subject(request: SubRequest) -> ProtocolCore:
+    return cast(ProtocolCore, request.param)
 
 
 @pytest.mark.ot2_only

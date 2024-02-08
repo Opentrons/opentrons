@@ -251,7 +251,8 @@ async def _get_attached_instruments_ot2(
     )
 
 
-@instruments_router.get(
+@PydanticResponse.wrap_route(
+    instruments_router.get,
     path="/instruments",
     summary="Get attached instruments.",
     description="Get a list of all instruments (pipettes & gripper) currently attached"

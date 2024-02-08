@@ -160,7 +160,7 @@ class Parameters(BaseModel):
     loadName: str = Field(
         ...,
         description="Name used to reference a labware definition",
-        regex=SAFE_STRING_REGEX,
+        pattern=SAFE_STRING_REGEX,
     )
     isMagneticModuleCompatible: bool = Field(
         ...,
@@ -262,7 +262,7 @@ class LabwareDefinition(BaseModel):
         "(eg myPlate v1/v2/v3). An incrementing integer",
         ge=1.0,
     )
-    namespace: str = Field(..., regex=SAFE_STRING_REGEX)
+    namespace: str = Field(..., pattern=SAFE_STRING_REGEX)
     metadata: Metadata = Field(
         ..., description="Properties used for search and display"
     )

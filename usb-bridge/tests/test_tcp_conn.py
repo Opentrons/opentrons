@@ -3,6 +3,7 @@
 import pytest
 import mock
 import socket
+from typing import cast
 
 from ot3usb import default_config
 from ot3usb.tcp_conn import TCPConnection
@@ -71,7 +72,7 @@ def test_connect(
     assert subject.connected()
 
     # Now test error case
-    mock_sock = mock.MagicMock(socket.socket)
+    mock_sock = cast(mock.MagicMock, socket.socket)
     mock_sock.side_effect = Exception("Error!")
     monkeypatch.setattr("socket.socket", mock_sock)
 
