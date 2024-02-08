@@ -12,7 +12,6 @@ import termios
 import tty
 import json
 
-from opentrons.hardware_control.motion_utilities import target_position_from_plunger
 from hardware_testing.opentrons_api.types import (
     OT3Mount,
     Axis,
