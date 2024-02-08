@@ -46,7 +46,7 @@ from robot_server.health.router import ComponentVersions, get_versions
 test_router = routing.APIRouter()
 
 
-@test_router.get("/alwaysRaise")
+@test_router.get("/alwaysRaise", response_model=None)
 async def always_raise() -> NoReturn:
     raise RuntimeError
 
@@ -165,7 +165,9 @@ def api_client(
     _override_ot2_hardware_with_mock: None,
 ) -> TestClient:
     client = TestClient(app)
-    client.headers.update({API_VERSION_HEADER: LATEST_API_VERSION_HEADER_VALUE})
+    client.headers.update(
+        {API_VERSION_HEADER: cast(str, LATEST_API_VERSION_HEADER_VALUE)}
+    )
     return client
 
 
@@ -176,7 +178,9 @@ def api_client_no_errors(
     """An API client that won't raise server exceptions.
     Use only to test 500 pages; never use this for other tests."""
     client = TestClient(app, raise_server_exceptions=False)
-    client.headers.update({API_VERSION_HEADER: LATEST_API_VERSION_HEADER_VALUE})
+    client.headers.update(
+        {API_VERSION_HEADER: cast(str, LATEST_API_VERSION_HEADER_VALUE)}
+    )
     return client
 
 
