@@ -12,6 +12,10 @@ from server_utils.fastapi_utils.app_state import (
 from ..notification_client import NotificationClient, get_notification_client
 from ..topics import Topics
 
+import logging
+
+log: logging.Logger = logging.getLogger(__name__)
+
 
 class RunsPublisher:
     """Publishes protocol runs topics."""
@@ -22,6 +26,7 @@ class RunsPublisher:
         self._run_data_manager_polling = asyncio.Event()
         self._previous_current_command: Union[CurrentCommand, None] = None
         self._previous_state_summary_status: Union[EngineStatus, None] = None
+        self._isPollingAlready = False
 
     # TODO(jh, 2023-02-02): Instead of polling, emit current_commands directly from PE.
     async def begin_polling_engine_store(
@@ -36,18 +41,21 @@ class RunsPublisher:
             current_command: The currently executing command, if any.
             run_id: ID of the current run.
         """
-        asyncio.create_task(
-            self._poll_engine_store(
-                get_current_command=get_current_command,
-                run_id=run_id,
-                get_state_summary=get_state_summary,
+        if self._isPollingAlready is False:
+            self._isPollingAlready = True
+            asyncio.create_task(
+                self._poll_engine_store(
+                    get_current_command=get_current_command,
+                    run_id=run_id,
+                    get_state_summary=get_state_summary,
+                )
             )
-        )
 
     async def stop_polling_engine_store(self) -> None:
         """Stops polling the engine store."""
         self._run_data_manager_polling.set()
         await self._client.publish_async(topic=Topics.RUNS_CURRENT_COMMAND.value)
+        self._isPollingAlready = False
 
     def publish_runs(self, run_id: str) -> None:
         """Publishes the equivalent of GET /runs and GET /runs/:runId.
