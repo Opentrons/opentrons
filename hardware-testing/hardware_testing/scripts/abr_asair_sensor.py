@@ -72,11 +72,11 @@ class _abr_asair_sensor:
                 break
             # write to google sheet
             try:
-                written_header = google_sheet.write_header(header)
+                google_sheet.write_header(header)
                 google_sheet.update_row_index()
                 google_sheet.write_to_row(row)
                 print("Wrote row")
-            except:
+            except RuntimeError:
                 print("Did not write row.")
             # Delay for desired frequency minutes before the next iteration
             t.sleep(frequency * 60)  # seconds
@@ -86,9 +86,10 @@ class _abr_asair_sensor:
         for sublist in results_list:
             row_str = ", ".join(map(str, sublist)) + "\n"  # type: str
             result_string += row_str
-            file_path = data.append_data_to_file(
+            save_file_path = data.append_data_to_file(
                 test_name, run_id, file_name, result_string
             )
+        print(f"Saved to robot: f{save_file_path}.")
         print(
             f"Done. Ran for {duration} minutes and collected every {frequency} minutes."
         )
