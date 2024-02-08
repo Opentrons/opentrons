@@ -33,7 +33,10 @@ import { Skeleton } from '../../../atoms/Skeleton'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
 import { useHardwareStatusText } from './hooks'
-import { INIT_STATUS, useRobotInitializationStatus } from '../../Devices/hooks'
+import {
+  useRobotInitializationStatus,
+  INIT_STATUS,
+} from '../../../resources/health/hooks'
 
 import type { ProtocolResource } from '@opentrons/shared-data'
 

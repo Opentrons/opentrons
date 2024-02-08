@@ -27,13 +27,16 @@ import {
 } from '../../../../redux/robot-update'
 import { useRobotUpdateInfo } from './useRobotUpdateInfo'
 import successIcon from '../../../../assets/images/icon_success.png'
-import { useRobotInitializationStatus, INIT_STATUS } from '../../hooks'
+import {
+  useRobotInitializationStatus,
+  INIT_STATUS,
+} from '../../../../resources/health/hooks'
 
 import type { State } from '../../../../redux/types'
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol'
 import type { RobotUpdateSession } from '../../../../redux/robot-update/types'
 import type { UpdateStep } from './useRobotUpdateInfo'
-import type { RobotInitializationStatus } from '../../hooks'
+import type { RobotInitializationStatus } from '../../../../resources/health/hooks'
 
 const UPDATE_PROGRESS_BAR_STYLE = css`
   margin-top: ${SPACING.spacing24};

@@ -11,16 +11,16 @@ import { COLORS, renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { Skeleton } from '../../../../atoms/Skeleton'
 import { useMissingProtocolHardware } from '../../../../pages/Protocols/hooks'
-import {
-  INIT_STATUS,
-  useTrackProtocolRunEvent,
-  useRobotInitializationStatus,
-} from '../../../Devices/hooks'
+import { useTrackProtocolRunEvent } from '../../../Devices/hooks'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { useCloneRun } from '../../../ProtocolUpload/hooks'
 import { useHardwareStatusText } from '../hooks'
 import { RecentRunProtocolCard } from '../'
 import { useNotifyAllRunsQuery } from '../../../../resources/runs/useNotifyAllRunsQuery'
+import {
+  useRobotInitializationStatus,
+  INIT_STATUS,
+} from '../../../../resources/health/hooks'
 
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
 

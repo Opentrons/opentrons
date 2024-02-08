@@ -14,7 +14,10 @@ import {
   getRobotUpdateDownloadError,
 } from '../../../../../redux/robot-update'
 import { useDispatchStartRobotUpdate } from '../../../../../redux/robot-update/hooks'
-import { useRobotInitializationStatus, INIT_STATUS } from '../../../hooks'
+import {
+  useRobotInitializationStatus,
+  INIT_STATUS,
+} from '../../../../../resources/health/hooks'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { RobotUpdateSession } from '../../../../../redux/robot-update/types'
