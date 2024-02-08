@@ -12,7 +12,7 @@ import re
 import traceback
 from io import BytesIO
 from zipfile import ZipFile
-from typing import Any, Dict, Optional, Union, Tuple, TYPE_CHECKING, cast
+from typing import Any, Dict, Optional, Union, Tuple, TYPE_CHECKING
 
 import jsonschema  # type: ignore
 
@@ -500,17 +500,6 @@ def _has_api_v1_imports(parsed: ast.Module) -> bool:
     return bool(v1_markers.intersection(opentrons_imports))
 
 
-def _strvalue_from_str_or_byte_dict(
-    dct: Union[Dict[str, str], Dict[bytes, bytes]], key: str
-) -> Optional[str]:
-    key_bytes = key.encode("utf-8")
-    val_bytes = cast(Dict[bytes, bytes], dct).get(key_bytes, None)
-    val_str = cast(Dict[str, str], dct).get(key, None)
-    if val_bytes:
-        return val_bytes.decode("utf-8")
-    return val_str
-
-
 def _version_from_static_python_info(
     static_python_info: StaticPythonInfo,
 ) -> Optional[APIVersion]:
@@ -519,12 +508,8 @@ def _version_from_static_python_info(
     If the protocol doesn't declare apiLevel at all, return None.
     If the protocol declares apiLevel incorrectly, raise a ValueError.
     """
-    from_requirements = _strvalue_from_str_or_byte_dict(
-        static_python_info.requirements or {}, "apiLevel"
-    )
-    from_metadata = _strvalue_from_str_or_byte_dict(
-        static_python_info.metadata or {}, "apiLevel"
-    )
+    from_requirements = (static_python_info.requirements or {}).get("apiLevel", None)
+    from_metadata = (static_python_info.metadata or {}).get("apiLevel", None)
 
     requested_level = from_requirements or from_metadata
     if requested_level is None:
@@ -553,9 +538,7 @@ def robot_type_from_python_identifier(python_robot_type: str) -> RobotType:
 def _robot_type_from_static_python_info(
     static_python_info: StaticPythonInfo,
 ) -> RobotType:
-    python_robot_type = _strvalue_from_str_or_byte_dict(
-        static_python_info.requirements or {}, "robotType"
-    )
+    python_robot_type = (static_python_info.requirements or {}).get("robotType", None)
     if python_robot_type is None:
         return "OT-2 Standard"
     else:
