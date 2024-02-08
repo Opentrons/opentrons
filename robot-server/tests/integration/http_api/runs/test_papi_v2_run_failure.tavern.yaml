@@ -84,40 +84,9 @@ stages:
         links:
           current: !anydict
         meta:
-          cursor: 0
+          cursor: 3
           totalLength: 4
         data:
-          - id: !anystr
-            key: !anystr
-            commandType: home
-            createdAt: !anystr
-            startedAt: !anystr
-            completedAt: !anystr
-            status: succeeded
-            params: {}
-          - id: !anystr
-            key: !anystr
-            commandType: loadLabware
-            createdAt: !anystr
-            startedAt: !anystr
-            completedAt: !anystr
-            status: succeeded
-            params:
-              location:
-                slotName: '1'
-              loadName: opentrons_96_tiprack_300ul
-              namespace: opentrons
-              version: 1
-          - id: !anystr
-            key: !anystr
-            commandType: loadPipette
-            createdAt: !anystr
-            startedAt: !anystr
-            completedAt: !anystr
-            status: succeeded
-            params:
-              pipetteName: p300_single
-              mount: right
           - id: !anystr
             key: !anystr
             commandType: aspirate
