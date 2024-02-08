@@ -17,7 +17,6 @@ import {
   getModuleDisplayName,
   getModuleDef2,
   MAGNETIC_BLOCK_V1,
-  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { StyledText } from '../../atoms/text'
