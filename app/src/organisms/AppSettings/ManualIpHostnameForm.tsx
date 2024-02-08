@@ -103,6 +103,7 @@ export function ManualIpHostnameForm({
     },
     resolver: resolver,
   })
+console.log('errors', formState.errors)
 
   const onSubmit = (data: FormValues): void => {
     const trimmedIp = data.ip.trim()

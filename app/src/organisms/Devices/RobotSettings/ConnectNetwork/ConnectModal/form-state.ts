@@ -1,5 +1,10 @@
 import * as React from 'react'
-import { useForm, useController } from 'react-hook-form'
+import {
+  useForm,
+  ControllerFieldState,
+  ControllerRenderProps,
+  FieldValues,
+} from 'react-hook-form'
 import { usePrevious } from '@opentrons/components'
 
 import type { ConnectFormValues, ConnectFormFieldProps } from '../types'
@@ -40,12 +45,10 @@ export const useResetFormOnSecurityChange = (): void => {
   ])
 }
 
-export const useConnectFormField = (name: string): ConnectFormFieldProps => {
-  const { field, fieldState } = useController({
-    name,
-    defaultValue: '',
-  })
-
+export const useConnectFormField = (
+  field: ControllerRenderProps<FieldValues, any>,
+  fieldState: ControllerFieldState
+): ConnectFormFieldProps => {
   const error = fieldState.error?.message
 
   return {

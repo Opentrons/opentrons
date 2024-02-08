@@ -157,7 +157,7 @@ export function RenameRobotSlideout({
         newRobotName: newRobotName,
       },
     })
-    handleSubmit(onSubmit)
+    handleSubmit(onSubmit)()
   }
 
   return (

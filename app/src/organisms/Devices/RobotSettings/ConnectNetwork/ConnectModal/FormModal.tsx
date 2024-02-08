@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Control, Controller } from 'react-hook-form'
+import { Controller } from 'react-hook-form'
 import styled, { css } from 'styled-components'
 
 import {
@@ -91,13 +91,14 @@ export const FormModal = (props: FormModalProps): JSX.Element => {
               <Controller
                 key={name}
                 control={control}
-                //  @ts-expect-error: name is correct type
                 name={name}
-                render={() => (
+                render={({ field, fieldState }) => (
                   <StyledSecurityField
                     key={name}
                     id={fieldId}
                     {...fieldProps}
+                    field={field}
+                    fieldState={fieldState}
                   />
                 )}
               />
@@ -109,10 +110,15 @@ export const FormModal = (props: FormModalProps): JSX.Element => {
               <Controller
                 key={name}
                 control={control}
-                //  @ts-expect-error: name is correct type
                 name={name}
-                render={() => (
-                  <StyledKeyFileField key={name} id={fieldId} {...fieldProps} />
+                render={({ field, fieldState }) => (
+                  <StyledKeyFileField
+                    key={name}
+                    id={fieldId}
+                    {...fieldProps}
+                    field={field}
+                    fieldState={fieldState}
+                  />
                 )}
               />
             )
@@ -122,10 +128,15 @@ export const FormModal = (props: FormModalProps): JSX.Element => {
             <Controller
               key={name}
               control={control}
-              //  @ts-expect-error: name is correct type
               name={name}
-              render={() => (
-                <StyledTextField key={name} id={fieldId} {...fieldProps} />
+              render={({ field, fieldState }) => (
+                <StyledTextField
+                  key={name}
+                  id={fieldId}
+                  {...fieldProps}
+                  field={field}
+                  fieldState={fieldState}
+                />
               )}
             />
           )

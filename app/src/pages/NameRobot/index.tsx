@@ -176,7 +176,7 @@ export function NameRobot(): JSX.Element {
         newRobotName: newRobotName,
       },
     })
-    handleSubmit(onSubmit)
+    handleSubmit(onSubmit)()
   }
 
   return (
