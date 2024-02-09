@@ -183,6 +183,7 @@ context('Tubes and Rack', () => {
       cy.get("input[placeholder='somerackbrand_24_tuberack_1500ul']").should(
         'exist'
       )
+    })
 
     it('should export a file matching the fixture', () => {
       cy.fixture(expectedExportFixture).then(expectedExportLabwareDef => {
