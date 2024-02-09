@@ -5,7 +5,8 @@ metadata = {"protocolName": "liquid-sense-ot3-p1000-multi"}
 requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 SLOT_SCALE = 4
-SLOTS_TIPRACK = {50: [2], 200: [3], 1000: [5]}
+SLOT_DIAL = 5
+SLOTS_TIPRACK = {50: [2], 200: [3], 1000: [6]}
 LABWARE_ON_SCALE = "nest_1_reservoir_195ml"
 
 
