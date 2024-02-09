@@ -22,40 +22,63 @@ import styles from './StepItem.css'
 
 interface DragDropStepItemProps extends ConnectedStepItemProps {
   stepId: StepIdType
-  stepNumber: number
-  findStepIndex: (stepIdType: StepIdType) => number
-  onDrag: () => void
-  moveStep: (draggedId: StepIdType, value: number) => void
+  index: number
+  moveStep: (dragIndex: number, hoverIndex: number) => void
 }
 
 const DragDropStepItem = (props: DragDropStepItemProps): JSX.Element => {
-  const { onDrag, stepId, findStepIndex, moveStep } = props
-  const ref = React.useRef(null)
+  const { stepId, index, moveStep } = props
+  const ref = React.useRef<HTMLDivElement>(null)
 
-  const [{ isDragging }, drag] = useDrag(() => ({
+  const [{ isDragging }, drag] = useDrag({
     type: DND_TYPES.STEP_ITEM,
-    item: { stepId },
+    item: { stepId, index },
+
+    // beginDrag: () => {
+    //   console.log('you his the onDrag Begin')
+    //   onDragBegin()
+    //   return { stepId: stepId } // Ensure stepId is captured correctly
+    // },
     collect: (monitor: DragLayerMonitor) => ({
       isDragging: monitor.isDragging(),
     }),
-  }))
+  })
 
   const [, drop] = useDrop(() => ({
     accept: DND_TYPES.STEP_ITEM,
     canDrop: () => {
       return false
     },
-    hover: (item: { stepId: StepIdType }) => {
-      const draggedId: StepIdType = item.stepId
-      const targetIndex = findStepIndex(stepId)
-      const draggedIndex = findStepIndex(draggedId)
-
-      const adjustedTargetIndex =
-        draggedIndex < targetIndex ? targetIndex - 1 : targetIndex
-
-      if (draggedId !== stepId) {
-        moveStep(draggedId, adjustedTargetIndex)
+    hover: (item: { index?: number }, monitor: DropTargetMonitor) => {
+      if (!ref.current || !item.index) {
+        return
       }
+      const dragIndex = item.index
+      const hoverIndex = index
+
+      if (dragIndex === hoverIndex) {
+        return
+      }
+
+      const hoverBoundingRect = ref.current.getBoundingClientRect()
+      const hoverMiddleY =
+        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
+      const clientOffset = monitor.getClientOffset()
+      if (!clientOffset) {
+        return
+      }
+      const hoverClientY = clientOffset.y - hoverBoundingRect.top
+
+      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+        return
+      }
+      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+        return
+      }
+      console.log('dragIndex', dragIndex)
+      console.log('hoverINdex', hoverIndex)
+      moveStep(dragIndex, hoverIndex)
+      item.index = hoverIndex
     },
   }))
 
@@ -71,17 +94,17 @@ interface StepItemsProps {
   orderedStepIds: StepIdType[]
   reorderSteps: (steps: StepIdType[]) => void
 }
-export const DraggableStepItems = (props: StepItemsProps): JSX.Element => {
+export const DraggableStepItems = (
+  props: StepItemsProps
+): JSX.Element | null => {
   const { orderedStepIds, reorderSteps } = props
   const [stepIds, setStepIds] = React.useState<StepIdType[]>(orderedStepIds)
-
-  const onDrag = (): void => {
-    setStepIds(orderedStepIds)
-  }
+  const ref = React.useRef<HTMLDivElement>(null)
 
   const [{ isOver }, drop] = useDrop(() => ({
     accept: DND_TYPES.STEP_ITEM,
     drop: () => {
+      console.log('hit the drop')
       if (!isEqual(orderedStepIds, stepIds)) {
         if (
           confirm(
@@ -97,38 +120,26 @@ export const DraggableStepItems = (props: StepItemsProps): JSX.Element => {
     }),
   }))
 
-  // TODO: BC 2018-11-27 make util function for reordering and use it in hotkey implementation too
-  const moveStep = (stepId: StepIdType, targetIndex: number): void => {
-    const currentIndex = findStepIndex(stepId)
-    const currentRemoved = [
-      ...stepIds.slice(0, currentIndex),
-      ...stepIds.slice(currentIndex + 1, stepIds.length),
-    ]
-    const currentReinserted = [
-      ...currentRemoved.slice(0, targetIndex),
-      stepId,
-      ...currentRemoved.slice(targetIndex, currentRemoved.length),
-    ]
-    setStepIds(currentReinserted)
+  const moveStep = (dragIndex: number, hoverIndex: number): void => {
+    const updatedStepIds = [...stepIds]
+    const draggedStep = updatedStepIds.splice(dragIndex, 1)[0]
+    updatedStepIds.splice(hoverIndex, 0, draggedStep)
+    setStepIds(updatedStepIds)
   }
-
-  const findStepIndex = (stepId: StepIdType): number =>
-    stepIds.findIndex(id => stepId === id)
-
   const currentIds = isOver ? stepIds : orderedStepIds
 
+  drop(ref)
   return (
-    <div ref={drop}>
+    <div ref={ref}>
       <ContextMenu>
         {({ makeStepOnContextMenu }) =>
           currentIds.map((stepId: StepIdType, index: number) => (
             <DragDropStepItem
-              key={`${stepId}_${index}`}
+              key={stepId}
               stepNumber={index + 1}
               stepId={stepId}
+              index={index}
               onStepContextMenu={() => makeStepOnContextMenu(stepId)}
-              findStepIndex={findStepIndex}
-              onDrag={onDrag}
               moveStep={moveStep}
             />
           ))
