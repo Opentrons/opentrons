@@ -17,6 +17,10 @@ import { useCloneRun } from '../../../ProtocolUpload/hooks'
 import { useHardwareStatusText } from '../hooks'
 import { RecentRunProtocolCard } from '../'
 import { useNotifyAllRunsQuery } from '../../../../resources/runs/useNotifyAllRunsQuery'
+import {
+  useRobotInitializationStatus,
+  INIT_STATUS,
+} from '../../../../resources/health/hooks'
 
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
 
@@ -29,6 +33,7 @@ jest.mock('../../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../../redux/analytics')
 jest.mock('../hooks')
 jest.mock('../../../../resources/runs/useNotifyAllRunsQuery')
+jest.mock('../../../../resources/health/hooks')
 
 const RUN_ID = 'mockRunId'
 
@@ -96,6 +101,9 @@ const mockUseHardwareStatusText = useHardwareStatusText as jest.MockedFunction<
   typeof useHardwareStatusText
 >
 const mockSkeleton = Skeleton as jest.MockedFunction<typeof Skeleton>
+const mockUseRobotInitializationStatus = useRobotInitializationStatus as jest.MockedFunction<
+  typeof useRobotInitializationStatus
+>
 
 const render = (props: React.ComponentProps<typeof RecentRunProtocolCard>) => {
   return renderWithProviders(
@@ -143,6 +151,7 @@ describe('RecentRunProtocolCard', () => {
     when(mockUseCloneRun)
       .calledWith(RUN_ID, expect.anything())
       .mockReturnValue({ cloneRun: mockCloneRun, isLoading: false })
+    mockUseRobotInitializationStatus.mockReturnValue(INIT_STATUS.SUCCEEDED)
   })
 
   afterEach(() => {
@@ -228,6 +237,18 @@ describe('RecentRunProtocolCard', () => {
       isLoading: true,
       data: { data: { metadata: { protocolName: 'mockProtocol' } } },
     } as any)
+    const [{ getByText }] = render(props)
+    getByText('mock Skeleton')
+  })
+
+  it('should render the skeleton when the robot server is initializing', () => {
+    mockUseRobotInitializationStatus.mockReturnValue(INIT_STATUS.INITIALIZING)
+    const [{ getByText }] = render(props)
+    getByText('mock Skeleton')
+  })
+
+  it('should render the skeleton when the robot server is unresponsive', () => {
+    mockUseRobotInitializationStatus.mockReturnValue(null)
     const [{ getByText }] = render(props)
     getByText('mock Skeleton')
   })

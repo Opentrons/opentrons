@@ -16,6 +16,14 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useProtocolQuery } from '@opentrons/react-api-client'
+import {
+  RUN_STATUS_FAILED,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
+  Run,
+  RunData,
+  RunStatus,
+} from '@opentrons/api-client'
 
 import { StyledText } from '../../../atoms/text'
 import { Chip } from '../../../atoms/Chip'
@@ -26,13 +34,10 @@ import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
 import { useHardwareStatusText } from './hooks'
 import {
-  RUN_STATUS_FAILED,
-  RUN_STATUS_STOPPED,
-  RUN_STATUS_SUCCEEDED,
-  Run,
-  RunData,
-  RunStatus,
-} from '@opentrons/api-client'
+  useRobotInitializationStatus,
+  INIT_STATUS,
+} from '../../../resources/health/hooks'
+
 import type { ProtocolResource } from '@opentrons/shared-data'
 
 interface RecentRunProtocolCardProps {
@@ -83,6 +88,9 @@ export function ProtocolWithLastRun({
   const onResetSuccess = (createRunResponse: Run): void =>
     history.push(`runs/${createRunResponse.data.id}/setup`)
   const { cloneRun } = useCloneRun(runData.id, onResetSuccess)
+  const robotInitStatus = useRobotInitializationStatus()
+  const isRobotInitializing =
+    robotInitStatus === INIT_STATUS.INITIALIZING || robotInitStatus == null
   const [showSpinner, setShowSpinner] = React.useState<boolean>(false)
 
   const protocolName =
@@ -140,7 +148,7 @@ export function ProtocolWithLastRun({
     }
   ).replace('about ', '')
 
-  return isProtocolFetching || isLookingForHardware ? (
+  return isProtocolFetching || isLookingForHardware || isRobotInitializing ? (
     <Skeleton
       height="24.5rem"
       width="25.8125rem"

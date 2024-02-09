@@ -1,18 +1,28 @@
-import { HostConfig, Health, getHealth } from '@opentrons/api-client'
+import { HostConfig, getHealth } from '@opentrons/api-client'
 import { UseQueryResult, useQuery } from 'react-query'
 import { useHost } from '../api'
 
-export function useHealthQuery(): UseQueryResult<Health> {
+import type { UseQueryOptions } from 'react-query'
+import type { AxiosResponse, AxiosError } from 'axios'
+import type { Health } from '@opentrons/api-client'
+
+export function useHealthQuery(
+  options: UseQueryOptions<AxiosResponse<Health>, AxiosError> = {}
+): UseQueryResult<AxiosResponse<Health>, AxiosError> {
   const host = useHost()
-  const query = useQuery(
-    ['health', host],
-    () => getHealth(host as HostConfig).then(response => response.data),
-    { enabled: host !== null }
+  const queryKey = ['health', host]
+  const query = useQuery<AxiosResponse<Health>, AxiosError>(
+    queryKey,
+    () => getHealth(host as HostConfig),
+    {
+      ...options,
+      enabled: host !== null && options.enabled !== false,
+    }
   )
 
   return query
 }
 
 export function useHealth(): Health | undefined {
-  return useHealthQuery().data
+  return useHealthQuery().data?.data
 }
