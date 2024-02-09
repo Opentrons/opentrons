@@ -48,7 +48,7 @@ def _load_tipracks(
     )
     # If running multiple tests in one run, the labware may already be loaded
     loaded_labwares = ctx.loaded_labwares
-    print(f"Loaded labwares {loaded_labwares}")
+    ui.print_info(f"Loaded labwares {loaded_labwares}")
     pre_loaded_tips: List[Labware] = []
     for ls in tiprack_load_settings:
         if ls[0] in loaded_labwares.keys():
@@ -176,9 +176,10 @@ def run(tip: int, run_args: RunArgs) -> None:
     target_height = test_well.bottom(liquid_height).point.z
 
     run_args.pipette._retract()
-    run_args.pipette.move_to(dial_well.top())
-    calibration_tip_length_offset = run_args.dial_indicator.read_stable()
-    run_args.pipette._retract()
+    if run_args.dial_indicator is not None:
+        run_args.pipette.move_to(dial_well.top())
+        calibration_tip_length_offset = run_args.dial_indicator.read_stable()
+        run_args.pipette._retract()
     if run_args.return_tip:
         run_args.pipette.return_tip()
     else:
@@ -190,19 +191,21 @@ def run(tip: int, run_args: RunArgs) -> None:
         run_args.pipette.move_to(test_well.top())
 
         start_pos = hw_api.current_position_ot3(OT3Mount.LEFT)
-        print(f"Running liquid probe test with tip {tip}")
         height = _run_trial(run_args, tip, test_well, trial)
         end_pos = hw_api.current_position_ot3(OT3Mount.LEFT)
-        print("Droping tip")
         run_args.pipette.blow_out()
         tip_length_offset = 0.0
         if run_args.dial_indicator is not None:
 
             run_args.pipette._retract()
             run_args.pipette.move_to(dial_well.top())
-            tip_length_offset = calibration_tip_length_offset - run_args.dial_indicator.read_stable()
+            tip_length_offset = (
+                calibration_tip_length_offset - run_args.dial_indicator.read_stable()
+            )
             run_args.pipette._retract()
             print(f"Tip Offset  {tip_length_offset}")
+
+        ui.print_info("Droping tip")
         if run_args.return_tip:
             run_args.pipette.return_tip()
         else:
@@ -210,9 +213,7 @@ def run(tip: int, run_args: RunArgs) -> None:
         results.append(height)
         adjusted_results.append(height + tip_length_offset)
         env_data = run_args.environment_sensor.get_reading()
-        ui.print_info("hwpipette")
         hw_pipette = hw_api.hardware_pipettes[top_types.Mount.LEFT]
-        ui.print_info("p start")
         plunger_start = (
             hw_pipette.plunger_positions.bottom
             if run_args.aspirate
@@ -230,18 +231,20 @@ def run(tip: int, run_args: RunArgs) -> None:
             plunger_start - end_pos[Axis.P_L],
             tip_length_offset,
         )
-        print(
+        ui.print_info(
             f"\n\n Z axis start pos {start_pos[Axis.Z_L]} end pos {end_pos[Axis.Z_L]}"
         )
-        print(f"plunger start pos {plunger_start} end pos {end_pos[Axis.P_L]}\n\n")
+        ui.print_info(
+            f"plunger start pos {plunger_start} end pos {end_pos[Axis.P_L]}\n\n"
+        )
 
-    print(f"RESULTS: \n{results}")
+    ui.print_info(f"RESULTS: \n{results}")
     average, cv, d = _calculate_stats(results, target_height)
     store_tip_results(run_args.test_report, tip, average, cv, d)
-    print(f"Raw: Average {average} cv {cv} d {d} target {target_height}")
-    print(f"Adjusted RESULTS: \n{adjusted_results}")
+    ui.print_info(f"Raw: Average {average} cv {cv} d {d} target {target_height}")
+    ui.print_info(f"Adjusted RESULTS: \n{adjusted_results}")
     average, cv, d = _calculate_stats(adjusted_results, target_height)
-    print(f"adjusted: Average {average} cv {cv} d {d} target {target_height}")
+    ui.print_info(f"adjusted: Average {average} cv {cv} d {d} target {target_height}")
 
 
 def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
@@ -274,7 +277,6 @@ def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
         data_file=data_file,
     )
 
-    ui.print_info(f"liquid probe settings \n {lps}")
     hw_mount = OT3Mount.LEFT if run_args.pipette.mount == "left" else OT3Mount.RIGHT
     run_args.recorder.set_sample_tag(f"trial-{trial}-{tip}ul")
     # TODO add in stuff for secondary probe
