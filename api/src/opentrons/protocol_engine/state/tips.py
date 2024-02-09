@@ -21,6 +21,8 @@ from ..commands.configuring_common import (
     PipetteNozzleLayoutResultMixin,
 )
 
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+
 
 class TipRackWellState(Enum):
     """The state of a single tip in a tip rack's well."""
@@ -156,11 +158,52 @@ class TipView(HasState[TipState]):
     #  for example when using leftmost column config of 96-channel
     #  or backmost single nozzle configuration of an 8-channel.
     def get_next_tip(  # noqa: C901
-        self, labware_id: str, num_tips: int, starting_tip_name: Optional[str]
+        self, nozzle_map: NozzleMap, labware_id: str, num_tips: int, starting_tip_name: Optional[str]
     ) -> Optional[str]:
         """Get the next available clean tip."""
         wells = self._state.tips_by_labware_id.get(labware_id, {})
         columns = self._state.column_by_labware_id.get(labware_id, [])
+
+        # right now we handle 3 cases: column, full 96 pickup, or single tip pickup
+        # this needs to change (possibly altogether) to utilize all-quadrant pickup
+        # if we can, I'd like to remove all three checks
+        # instead we will take the number of tips needed, the primary tip, the back left tip and the front right tip
+        
+        #expect 4 types of layout
+        #in single channel config we can expect all 3 to be the same
+        #in column the back left and starting nozzle will be the same
+        #in row the back left and starting nozzle will be the same
+        #in quadrant all three could be different or the same
+
+        #we should not care if they are the same or different
+        #utilize their layout to identify which wells to scan
+
+        ###########
+        # start making use of the nozzle map here
+        ##########
+
+        #starting nozzle will determine the side of the tiprack we begin our scan from
+
+        #number of rows between back left and front right is how far down to scan
+        #number of cols between back left and front right is how far to scan to the side
+        #we always scan down the rows and right across the columns
+        #we will always begin on the leftmost possible column of our tip cluster selection
+        
+        if nozzle_map.starting_nozzle == "A1":
+            #begin scanning from A1 
+
+        elif nozzle_map.starting_nozzle == "A12":
+            #begin scanning from A12 - the column width
+
+        elif nozzle_map.starting_nozzle == "H1":
+            #begin scanning from H1 + the row height
+
+        elif nozzle_map.starting_nozzle == "H12":
+            #begin scanning from H12 - the column width + the row height
+        
+        else:
+            #raise - forbidden!
+
 
         if columns and num_tips == len(columns[0]):  # Get next tips for 8-channel
             column_head = [column[0] for column in columns]

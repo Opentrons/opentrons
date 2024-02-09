@@ -14,6 +14,7 @@ from opentrons.types import DeckSlotName, Point
 
 from ..labware import AbstractLabware, LabwareLoadParams
 from .well import WellCore
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 
 
 class LabwareCore(AbstractLabware[WellCore]):
@@ -122,9 +123,10 @@ class LabwareCore(AbstractLabware[WellCore]):
             raise TypeError(f"{self.get_display_name()} is not a tip rack.")
 
     def get_next_tip(
-        self, num_tips: int, starting_tip: Optional[WellCore]
+        self, nozzle_map: NozzleMap, num_tips: int, starting_tip: Optional[WellCore]
     ) -> Optional[str]:
         return self._engine_client.state.tips.get_next_tip(
+            nozzle_map=nozzle_map,
             labware_id=self._labware_id,
             num_tips=num_tips,
             starting_tip_name=(
