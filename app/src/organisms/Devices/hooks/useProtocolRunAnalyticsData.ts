@@ -2,7 +2,12 @@ import { useSelector } from 'react-redux'
 
 import { hash } from '../../../redux/analytics/hash'
 import { getStoredProtocol } from '../../../redux/protocol-storage'
-import { useStoredProtocolAnalysis, useProtocolDetailsForRun } from './'
+import { getRobotSerialNumber } from '../../../redux/discovery'
+import {
+  useRobot,
+  useStoredProtocolAnalysis,
+  useProtocolDetailsForRun,
+} from './'
 import { useProtocolMetadata } from './useProtocolMetadata'
 import { useRunTimestamps } from '../../RunTimeControl/hooks'
 import { formatInterval } from '../../RunTimeControl/utils'
@@ -16,12 +21,17 @@ import type { State } from '../../../redux/types'
 export const parseProtocolRunAnalyticsData = (
   protocolAnalysis: ProtocolAnalysisOutput | null,
   storedProtocol: StoredProtocolData | null,
-  startedAt: string | null
+  startedAt: string | null,
+  robotName: string
 ) => () => {
   const hashTasks = [
     hash(protocolAnalysis?.metadata?.author) ?? '',
     hash(storedProtocol?.srcFiles?.toString() ?? '') ?? '',
   ]
+
+  const robot = useRobot(robotName)
+  const serialNumber =
+    robot?.status != null ? getRobotSerialNumber(robot) : null
 
   return Promise.all(hashTasks).then(([protocolAuthor, protocolText]) => ({
     protocolRunAnalyticsData: {
@@ -49,6 +59,7 @@ export const parseProtocolRunAnalyticsData = (
         protocolAnalysis?.robotType != null
           ? protocolAnalysis?.robotType
           : storedProtocol?.mostRecentAnalysis?.robotType,
+      robotSerialNumber: serialNumber ?? '',
     },
     runTime:
       startedAt != null ? formatInterval(startedAt, Date()) : EMPTY_TIMESTAMP,
@@ -68,7 +79,8 @@ type GetProtocolRunAnalyticsData = () => Promise<{
  *          data properties for use in event trackEvent
  */
 export function useProtocolRunAnalyticsData(
-  runId: string | null
+  runId: string | null,
+  robotName: string
 ): {
   getProtocolRunAnalyticsData: GetProtocolRunAnalyticsData
 } {
@@ -96,7 +108,8 @@ export function useProtocolRunAnalyticsData(
   const getProtocolRunAnalyticsData = parseProtocolRunAnalyticsData(
     protocolAnalysis as ProtocolAnalysisOutput | null,
     storedProtocol,
-    startedAt
+    startedAt,
+    robotName
   )
 
   return { getProtocolRunAnalyticsData }

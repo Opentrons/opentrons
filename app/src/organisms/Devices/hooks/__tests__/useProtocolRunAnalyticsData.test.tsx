@@ -45,6 +45,7 @@ let store: Store<any> = createStore(jest.fn(), {})
 
 const RUN_ID = '1'
 const RUN_ID_2 = '2'
+const ROBOT_NAME = 'otie'
 
 const PIPETTES = [
   { id: '1', pipetteName: 'testModelLeft' },
@@ -111,9 +112,12 @@ describe('useProtocolAnalysisErrors hook', () => {
   })
 
   it('returns getProtocolRunAnalyticsData function', () => {
-    const { result } = renderHook(() => useProtocolRunAnalyticsData(RUN_ID), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useProtocolRunAnalyticsData(RUN_ID, ROBOT_NAME),
+      {
+        wrapper,
+      }
+    )
     expect(typeof result.current.getProtocolRunAnalyticsData).toEqual(
       'function'
     )
@@ -123,9 +127,12 @@ describe('useProtocolAnalysisErrors hook', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith(RUN_ID_2)
       .mockReturnValue({ protocolData: ROBOT_PROTOCOL_ANALYSIS } as any)
-    const { result } = renderHook(() => useProtocolRunAnalyticsData(RUN_ID_2), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useProtocolRunAnalyticsData(RUN_ID_2, ROBOT_NAME),
+      {
+        wrapper,
+      }
+    )
     const protocolRunAnalyticsData = await waitFor(() =>
       result.current.getProtocolRunAnalyticsData()
     )
@@ -142,15 +149,19 @@ describe('useProtocolAnalysisErrors hook', () => {
         protocolText: 'hashedString',
         protocolType: '',
         robotType: 'OT-2 Standard',
+        robotSerialNumber: '',
       },
       runTime: '1:00:00',
     })
   })
 
   it('getProtocolRunAnalyticsData returns fallback stored data when robot data unavailable', async () => {
-    const { result } = renderHook(() => useProtocolRunAnalyticsData(RUN_ID), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useProtocolRunAnalyticsData(RUN_ID, ROBOT_NAME),
+      {
+        wrapper,
+      }
+    )
     const protocolRunAnalyticsData = await waitFor(() =>
       result.current.getProtocolRunAnalyticsData()
     )
@@ -167,6 +178,7 @@ describe('useProtocolAnalysisErrors hook', () => {
         protocolText: 'hashedString',
         protocolType: 'json',
         robotType: 'OT-2 Standard',
+        robotSerialNumber: '',
       },
       runTime: '1:00:00',
     })
