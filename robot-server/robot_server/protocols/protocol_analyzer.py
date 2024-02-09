@@ -2,10 +2,13 @@
 import logging
 
 from opentrons import protocol_runner
+from opentrons.protocol_engine.errors import ErrorOccurrence
+import opentrons.util.helpers as datetime_helper
+
+import robot_server.errors.error_mappers as em
 
 from .protocol_store import ProtocolResource
 from .analysis_store import AnalysisStore
-
 
 log = logging.getLogger(__name__)
 
@@ -30,9 +33,31 @@ class ProtocolAnalyzer:
             robot_type=protocol_resource.source.robot_type,
             protocol_config=protocol_resource.source.config,
         )
-        result = await runner.run(
-            protocol_source=protocol_resource.source, deck_configuration=[]
-        )
+        try:
+            result = await runner.run(
+                protocol_source=protocol_resource.source, deck_configuration=[]
+            )
+        except BaseException as error:
+            internal_error = em.map_unexpected_error(error=error)
+            await self._analysis_store.update(
+                analysis_id=analysis_id,
+                robot_type=protocol_resource.source.robot_type,
+                commands=[],
+                labware=[],
+                modules=[],
+                pipettes=[],
+                errors=[
+                    ErrorOccurrence.from_failed(
+                        # TODO(tz, 2-15-24): replace with a different error type
+                        #  when we are able to support different errors.
+                        id="internal-error",
+                        createdAt=datetime_helper.utc_now(),
+                        error=internal_error,
+                    )
+                ],
+                liquids=[],
+            )
+            return
 
         log.info(f'Completed analysis "{analysis_id}".')
 
