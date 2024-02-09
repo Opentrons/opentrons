@@ -188,15 +188,62 @@ class TipView(HasState[TipState]):
         #number of cols between back left and front right is how far to scan to the side
         #we always scan down the rows and right across the columns
         #we will always begin on the leftmost possible column of our tip cluster selection
+
+        #we are looking for a critical tip within each cluster
+        num_nozzle_cols = len(nozzle_map.columns)
+        num_nozzle_rows = len(nozzle_map.rows)
+        def _inspect_tip_cluster(critical_column: int, critical_row: int) -> Optional[str]:
+            # The critical tip is always the back left well of a selected cluster on the tiprack
+            # Begin scanning from the critical tip down each row of a column, then over each column of a cluster
+            for i in range(num_nozzle_cols):
+                column = columns[critical_column + i]
+                for j in range(num_nozzle_rows):
+                    well = column[critical_row + j]
+                    if wells[well] == TipRackWellState.USED:
+                        return None
+            return columns[critical_column][critical_row]
         
         if nozzle_map.starting_nozzle == "A1":
-            #begin scanning from A1 
+
+            #enter the tiprack from the corner of H12
+            #identify the critical tip from here
+            
+            #since we know we're starting from H12, we know our column = columns[len(columns)-num_nozzle_cols]
+
+            #then our critical tip is column[len(column) - num_nozzle_rows]
+            
+            #change this logic to be a cirtical column pos and critical row pos
+            #those two criticals can be passed into a function that is doing this "searching"
+            #when that function returns a str, we have our critical well
+            #when that function returns none, we need to run again with a NEW critical col and critical row
+            # we will need a unique one of these for each of the four corner (they must each carve inward form a different starting pos)
+
+            
+                
+            
+            #Define the critical well by the position of the well relative to Tip Rack entry point H12
+            col_attempts = 0
+            row_attempts = 0
+            critical_column = len(columns) - num_nozzle_cols - col_attempts
+            critical_row = len(columns[critical_column]) - num_nozzle_rows - row_attempts
+
+            #if a well is found to be empty, we will need to break and start again at the next logical cluster
+
+            ###THE FOLLOW IS NOT CORRECT FOR ALL WELLS BUT THE IDEA IS GOING IN THE RIGHT DIRECTION
+            #when A1 is the starting nozzle, I'll need to go UP rows and move BACK columns when selecting the next slice
+            #DEFINING THE NEXT LOGICAL CLUSTER
+            #the next logical cluster begins one row below the last empty well
+            #if the amount of rows remaining is less than the number of nozzle rows then:
+            #shift over a column -1 if the current critical tip column held no empty tip slots within the first N rows (n begin the number of nozzle rows)
+
+            #begin scanning again from the next critical tip
+            #rinse and repeat until we pass with no used wells! the tip that succeeds is the critical tip to utilize
 
         elif nozzle_map.starting_nozzle == "A12":
-            #begin scanning from A12 - the column width
+            #begin scanning from A1 + the column width
 
         elif nozzle_map.starting_nozzle == "H1":
-            #begin scanning from H1 + the row height
+            #begin scanning from A12 + the row height
 
         elif nozzle_map.starting_nozzle == "H12":
             #begin scanning from H12 - the column width + the row height
