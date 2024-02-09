@@ -171,27 +171,27 @@ async def test_protocols_analyses_and_runs_available_from_older_persistence_dir(
                 else:
                     assert number_of_analyses > 0
 
-                all_runs = (await robot_client.get_runs()).json()
-                all_run_ids = [r["id"] for r in all_runs["data"]]
-                assert all_run_ids == [r.id for r in snapshot.expected_runs]
+            all_runs = (await robot_client.get_runs()).json()
+            all_run_ids = [r["id"] for r in all_runs["data"]]
+            assert all_run_ids == [r.id for r in snapshot.expected_runs]
 
-                for expected_run in snapshot.expected_runs:
-                    await robot_client.get_run(run_id=expected_run.id)
+            for expected_run in snapshot.expected_runs:
+                await robot_client.get_run(run_id=expected_run.id)
 
-                    all_command_summaries = (
-                        await robot_client.get_run_commands(
-                            run_id=expected_run.id,
-                            page_length=999999,  # Big enough to include all commands.
-                        )
-                    ).json()["data"]
+                all_command_summaries = (
+                    await robot_client.get_run_commands(
+                        run_id=expected_run.id,
+                        page_length=999999,  # Big enough to include all commands.
+                    )
+                ).json()["data"]
 
-                    # assert (
-                    #     len(all_command_summaries)
-                    #     == expected_run.expected_command_count
-                    # )
-                # Ideally, we would also fetch full commands via
-                # `GET /runs/{run_id}/commands/{command_id}`.
-                # We skip it for performance. Adds ~10+ seconds
+                # assert (
+                #     len(all_command_summaries)
+                #     == expected_run.expected_command_count
+                # )
+            # Ideally, we would also fetch full commands via
+            # `GET /runs/{run_id}/commands/{command_id}`.
+            # We skip it for performance. Adds ~10+ seconds
 
 
 # TODO(mm, 2023-08-12): We can remove this test when we remove special handling for these
