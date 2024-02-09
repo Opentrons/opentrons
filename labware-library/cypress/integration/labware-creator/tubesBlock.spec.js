@@ -504,7 +504,7 @@ context('Tubes and Block', () => {
           cy.get("input[placeholder='testpro_96_aluminumblock_10ul']").should(
             'exist'
           )
-          
+
           // All fields present
           cy.get('button[class*="_export_button_"]').click({ force: true })
           cy.contains(
