@@ -20,12 +20,13 @@ import concurrent.futures
 import multiprocessing
 from contextlib import ExitStack, contextmanager
 from pathlib import Path
-from typing import ContextManager, Dict, Generator, Iterable, List
+from typing import ContextManager, Dict, Generator, Iterable, List, Optional
 
 from opentrons.protocol_engine import Command, StateSummary
 import pydantic
 import sqlalchemy
 
+from .. import legacy_pickle
 from ..pydantic import pydantic_to_json
 from .._database import (
     create_schema_2_sql_engine,
@@ -251,9 +252,13 @@ def _migrate_db_commands_for_run(
         insert_new_command = sqlalchemy.insert(schema_3.run_command_table)
 
         with lock, source_engine.begin() as source_transaction:
-            old_commands: List[Dict[str, object]] = (
-                source_transaction.execute(select_old_commands).scalar_one() or []
-            )
+            old_commands_bytes: Optional[bytes] = source_transaction.execute(
+                select_old_commands
+            ).scalar_one()
+
+        old_commands: List[Dict[str, object]] = (
+            legacy_pickle.loads(old_commands_bytes) if old_commands_bytes else []
+        )
 
         parsed_commands: Iterable[Command] = (
             pydantic.parse_obj_as(
