@@ -1,4 +1,13 @@
 export {
+  getWasteChuteAddressableAreaNamePip,
+  movableTrashCommandsUtil,
+  curryCommandCreator,
+  reduceCommandCreators,
+  commandCreatorsTimeline,
+  getPipetteIdFromCCArgs
+} from './utils'
+
+export {
   aspirate,
   waitForTemperature,
   blowout,
@@ -25,7 +34,6 @@ export {
 
 export * from './robotStateSelectors'
 export * from './types'
-export * from './utils'
 export * from './constants'
 export * from './getNextRobotStateAndWarnings'
 export * from './fixtures'
