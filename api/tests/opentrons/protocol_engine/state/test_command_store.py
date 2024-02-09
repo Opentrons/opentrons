@@ -82,6 +82,7 @@ def test_initial_state(
         commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
+        failed_command=None,
         latest_command_hash=None,
         stopped_by_estop=False,
     )
@@ -700,6 +701,7 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
         commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
+        failed_command=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_command_hash=None,
         stopped_by_estop=False,
@@ -729,6 +731,7 @@ def test_command_store_handles_finish_action() -> None:
         commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
+        failed_command=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_command_hash=None,
         stopped_by_estop=False,
@@ -773,6 +776,7 @@ def test_command_store_handles_stop_action(from_estop: bool) -> None:
         commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
+        failed_command=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_command_hash=None,
         stopped_by_estop=from_estop,
@@ -801,6 +805,7 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
         commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
+        failed_command=None,
         run_started_at=None,
         latest_command_hash=None,
         stopped_by_estop=False,
@@ -931,6 +936,7 @@ def test_command_store_wraps_unknown_errors() -> None:
             },
         ),
         run_started_at=None,
+        failed_command=None,
         latest_command_hash=None,
         stopped_by_estop=False,
     )
@@ -990,6 +996,7 @@ def test_command_store_preserves_enumerated_errors() -> None:
             detail="yikes",
             errorCode=ErrorCodes.PIPETTE_NOT_PRESENT.value.code,
         ),
+        failed_command=None,
         run_started_at=None,
         latest_command_hash=None,
         stopped_by_estop=False,
@@ -1020,6 +1027,7 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
         commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
+        failed_command=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_command_hash=None,
         stopped_by_estop=False,
@@ -1050,6 +1058,7 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
         commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
+        failed_command=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_command_hash=None,
         stopped_by_estop=False,
@@ -1084,6 +1093,8 @@ def test_command_store_handles_command_failed() -> None:
             error=errors.ProtocolEngineError(message="oh no"),
         )
     )
+    print(subject.state.failed_command)
+    print(CommandEntry(index=0, command=expected_failed_command))
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.SETUP,
@@ -1099,6 +1110,7 @@ def test_command_store_handles_command_failed() -> None:
         },
         run_error=None,
         finish_error=None,
+        failed_command=CommandEntry(index=0, command=expected_failed_command),
         run_started_at=None,
         latest_command_hash=None,
         stopped_by_estop=False,
@@ -1125,6 +1137,7 @@ def test_handles_hardware_stopped() -> None:
         commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
+        failed_command=None,
         run_started_at=None,
         latest_command_hash=None,
         stopped_by_estop=False,
