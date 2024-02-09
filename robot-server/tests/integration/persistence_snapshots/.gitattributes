@@ -1,0 +1,7 @@
+# Disable Git's line ending normalization on snapshot contents
+# by treating any file in any subdirectory as binary, not text.
+#
+# These are supposed to be realistic snapshots of data found in the wild,
+# so we want to leave them alone.
+
+*/** -text
