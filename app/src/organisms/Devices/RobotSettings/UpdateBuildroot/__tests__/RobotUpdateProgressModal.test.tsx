@@ -26,7 +26,7 @@ jest.mock('@opentrons/react-api-client')
 jest.mock('../useRobotUpdateInfo')
 jest.mock('../../../../../redux/robot-update')
 jest.mock('../../../../../redux/robot-update/hooks')
-jest.mock('../../../hooks')
+jest.mock('../../../../../resources/health/hooks')
 
 const mockUseCreateLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation

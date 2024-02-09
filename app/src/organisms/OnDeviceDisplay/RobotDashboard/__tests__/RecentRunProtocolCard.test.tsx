@@ -33,6 +33,7 @@ jest.mock('../../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../../redux/analytics')
 jest.mock('../hooks')
 jest.mock('../../../../resources/runs/useNotifyAllRunsQuery')
+jest.mock('../../../../resources/health/hooks')
 
 const RUN_ID = 'mockRunId'
 
