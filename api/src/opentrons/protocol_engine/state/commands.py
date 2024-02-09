@@ -273,7 +273,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 error=action.error,
             )
             prev_entry = self._state.commands_by_id[action.command_id]
-            failed_command_entry = CommandEntry(
+            self._state.commands_by_id[action.command_id] = CommandEntry(
                 index=prev_entry.index,
                 # TODO(mc, 2022-06-06): add new "cancelled" status or similar
                 # and don't set `completedAt` in commands other than the
@@ -286,8 +286,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     }
                 ),
             )
-            self._state.commands_by_id[action.command_id] = failed_command_entry
-            self._state.failed_command = failed_command_entry
+
+            self._state.failed_command = prev_entry
             if prev_entry.command.intent == CommandIntent.SETUP:
                 other_command_ids_to_fail = [
                     *[i for i in self._state.queued_setup_command_ids],
