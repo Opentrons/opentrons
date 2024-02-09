@@ -153,7 +153,7 @@ class CommandState:
     """
 
     failed_command: Optional[CommandEntry]
-    """The command, if any, that made the run fail."""
+    """The command, if any, that made the run fail and the index in the command list."""
 
     finish_error: Optional[ErrorOccurrence]
     """The error that happened during the post-run finish steps (homing & dropping tips), if any."""
