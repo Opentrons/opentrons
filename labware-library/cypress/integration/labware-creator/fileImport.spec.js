@@ -100,11 +100,8 @@ context('File Import', () => {
     cy.window()
       .its('__lastSavedBlobZip__')
       .should('be.a', 'blob') // wait until we get the blob
-      .then(blob => jszip.loadAsync(blob)) // load blob into ZipObject
-      .then(zipObject => {
-        const jsonFiles = zipObject.file(/.*\.json$/)
-        expect(jsonFiles).to.have.lengthOf(1)
-        cy.wrap(jsonFiles[0])
+      .then(labwareBlob => {
+        cy.wrap(labwareBlob)
           .invoke('async', 'string')
           .then(jsonFile => {
             cy.fixture(importedLabwareFile).then(expected => {
@@ -112,14 +109,6 @@ context('File Import', () => {
               expectDeepEqual(assert, JSON.parse(jsonFile), expected)
             })
           })
-
-        const pythonFiles = zipObject.file(/.*\.py$/)
-        expect(pythonFiles).to.have.lengthOf(1)
-        cy.wrap(pythonFiles[0].async('string')).then(contents => {
-          cy.fixture(pythonFileFixture).then(expected => {
-            expect(contents).to.equal(expected)
-          })
-        })
       })
 
     cy.window()

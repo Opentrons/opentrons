@@ -193,10 +193,7 @@ context('Tubes and Rack', () => {
           .its('__lastSavedBlobZip__')
           .should('be.a', 'blob')
           .should(async blob => {
-            const zipObj = await JSZip.loadAsync(blob)
-            const labwareDefFile =
-              zipObj.files['somerackbrand_24_tuberack_1500ul.json']
-            const labwareDefText = await labwareDefFile.async('text')
+            const labwareDefText = await blob.async('text')
             const savedDef = JSON.parse(labwareDefText)
 
             expectDeepEqual(assert, savedDef, expectedExportLabwareDef)
