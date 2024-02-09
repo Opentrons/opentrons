@@ -1069,13 +1069,15 @@ class GeometryView:
         have non-default offsets that are specific to location of the module on deck,
         so, this code only checks for the presence of those known offsets.
         """
-        parent_location = self._labware.get_parent_location(labware_id)
+        parent_location = self._labware.get_location(labware_id)
         assert isinstance(
-            parent_location, (DeckSlotLocation, ModuleLocation)
+            parent_location, (DeckSlotLocation, ModuleLocation, OnLabwareLocation)
         ), "No gripper offsets for off-deck labware"
 
         if isinstance(parent_location, DeckSlotLocation):
             slot_name = parent_location.slotName
+        elif isinstance(parent_location, OnLabwareLocation):
+            slot_name = self._labware.get_parent_location(labware_id).slotName
         else:
             module_loc = self._modules.get_location(parent_location.moduleId)
             slot_name = module_loc.slotName
