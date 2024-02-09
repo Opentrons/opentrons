@@ -48,9 +48,11 @@ class RunsPublisher:
 
     async def stop_polling_engine_store(self) -> None:
         """Stops polling the engine store."""
-        self._run_data_manager_polling.set()
-        await self._client.publish_async(topic=Topics.RUNS_CURRENT_COMMAND.value)
-        self._poller = None
+        if self._poller is not None:
+            self._run_data_manager_polling.set()
+            await self._client.publish_async(topic=Topics.RUNS_CURRENT_COMMAND.value)
+            self._poller.cancel()
+            self._poller = None
 
     def publish_runs(self, run_id: str) -> None:
         """Publishes the equivalent of GET /runs and GET /runs/:runId.
