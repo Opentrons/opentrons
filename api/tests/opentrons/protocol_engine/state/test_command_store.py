@@ -1093,8 +1093,6 @@ def test_command_store_handles_command_failed() -> None:
             error=errors.ProtocolEngineError(message="oh no"),
         )
     )
-    print(subject.state.failed_command)
-    print(CommandEntry(index=0, command=expected_failed_command))
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.SETUP,
