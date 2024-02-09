@@ -166,7 +166,10 @@ def adapt_protocol_source(protocol: Protocol) -> Generator[ProtocolSource, None,
         # through the filesystem. https://opentrons.atlassian.net/browse/RSS-281
 
         main_file = pathlib.Path(temporary_directory) / main_file_name
-        main_file.write_text(protocol.text, encoding="utf-8")
+        if isinstance(protocol.text, str):
+            main_file.write_text(protocol.text, encoding="utf-8")
+        else:
+            main_file.write_bytes(protocol.text)
 
         labware_files: List[pathlib.Path] = []
         if isinstance(protocol, PythonProtocol) and protocol.extra_labware is not None:
