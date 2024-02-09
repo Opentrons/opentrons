@@ -128,7 +128,6 @@ class GetStatusResponsePayload(EmptyPayload):
     """Get status response."""
 
     status: utils.UInt8Field
-    data: utils.UInt32Field
 
 
 @dataclass(eq=False)
