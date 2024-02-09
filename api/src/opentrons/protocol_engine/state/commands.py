@@ -287,7 +287,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 ),
             )
 
-            self._state.failed_command = prev_entry
+            self._state.failed_command = self._state.commands_by_id[action.command_id]
             if prev_entry.command.intent == CommandIntent.SETUP:
                 other_command_ids_to_fail = [
                     *[i for i in self._state.queued_setup_command_ids],

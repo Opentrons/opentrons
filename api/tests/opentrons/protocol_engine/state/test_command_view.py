@@ -816,6 +816,7 @@ def test_get_slice_default_cursor_failed_command() -> None:
     subject = get_command_view(
         commands=[command_1, command_2, command_3, command_4],
         run_result=RunResult.FAILED,
+        failed_command=CommandEntry(index=2, command=command_3),
     )
 
     result = subject.get_slice(cursor=None, length=3)
