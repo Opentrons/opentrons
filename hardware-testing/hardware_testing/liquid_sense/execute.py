@@ -174,6 +174,11 @@ def run(tip: int, run_args: RunArgs) -> None:
         run_args.ctx, run_args.pipette, test_well
     )
     target_height = test_well.bottom(liquid_height).point.z
+
+    run_args.pipette._retract()
+    run_args.pipette.move_to(dial_well.top())
+    calibration_tip_length_offset = run_args.dial_indicator.read_stable()
+    run_args.pipette._retract()
     if run_args.return_tip:
         run_args.pipette.return_tip()
     else:
@@ -195,7 +200,7 @@ def run(tip: int, run_args: RunArgs) -> None:
 
             run_args.pipette._retract()
             run_args.pipette.move_to(dial_well.top())
-            tip_length_offset = run_args.dial_indicator.read_stable()
+            tip_length_offset = calibration_tip_length_offset - run_args.dial_indicator.read_stable()
             run_args.pipette._retract()
             print(f"Tip Offset  {tip_length_offset}")
         if run_args.return_tip:
@@ -203,7 +208,7 @@ def run(tip: int, run_args: RunArgs) -> None:
         else:
             run_args.pipette.drop_tip()
         results.append(height)
-        adjusted_results.append(height - tip_length_offset)
+        adjusted_results.append(height + tip_length_offset)
         env_data = run_args.environment_sensor.get_reading()
         ui.print_info("hwpipette")
         hw_pipette = hw_api.hardware_pipettes[top_types.Mount.LEFT]
