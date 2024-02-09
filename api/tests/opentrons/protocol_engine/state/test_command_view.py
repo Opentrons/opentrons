@@ -797,7 +797,7 @@ def test_get_slice_default_cursor_no_current() -> None:
     )
 
 
-def test_get_slice_default_cursor_no_current_failed_command() -> None:
+def test_get_slice_default_cursor_failed_command() -> None:
     """It should return a slice from the last executed command."""
     command_1 = create_failed_command(command_id="command-id-1")
     command_2 = create_failed_command(command_id="command-id-2")
