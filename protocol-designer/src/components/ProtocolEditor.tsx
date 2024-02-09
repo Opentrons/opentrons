@@ -1,60 +1,39 @@
 import * as React from 'react'
-import cx from 'classnames'
-import { DragDropContext } from 'react-dnd'
-import MouseBackEnd from 'react-dnd-mouse-backend'
-import { ComputingSpinner } from '../components/ComputingSpinner'
-import { ConnectedNav } from '../containers/ConnectedNav'
-import { Sidebar } from '../containers/ConnectedSidebar'
-import { ConnectedTitleBar } from '../containers/ConnectedTitleBar'
-import { MainPanel } from '../containers/ConnectedMainPanel'
-import { PortalRoot as MainPageModalPortalRoot } from '../components/portals/MainPageModalPortal'
-import { MAIN_CONTENT_FORCED_SCROLL_CLASSNAME } from '../ui/steps/utils'
-import { PrereleaseModeIndicator } from './PrereleaseModeIndicator'
-import { PortalRoot as TopPortalRoot } from './portals/TopPortal'
-import { FileUploadMessageModal } from './modals/FileUploadMessageModal/FileUploadMessageModal'
-import { LabwareUploadMessageModal } from './modals/LabwareUploadMessageModal/LabwareUploadMessageModal'
-import { GateModal } from './modals/GateModal'
-import { AnnouncementModal } from './modals/AnnouncementModal'
-import styles from './ProtocolEditor.css'
-import { CreateFileWizard } from './modals/CreateFileWizard'
+import validator from '@rjsf/validator-ajv8';
+import Form from '@rjsf/core'
+import commandSchemaV8 from '@opentrons/shared-data/command/schemas/8.json'
 
-const showGateModal =
-  process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
-
+const sanitized = {
+  ...commandSchemaV8,
+  definitions: Object.entries(commandSchemaV8.definitions).reduce((acc, [key, value]) => {
+    if (key.endsWith('Create')) {
+      return {
+        ...acc,
+        [key]: {
+          ...value,
+          properties: {
+            params: value.properties.params 
+          }
+        }
+      }
+    } else {
+      return { ...acc, [key]: value }
+    }
+  }, {})
+}
+console.log(sanitized)
 function ProtocolEditorComponent(): JSX.Element {
   return (
-    <div>
-      <ComputingSpinner />
-      <TopPortalRoot />
-      {showGateModal ? <GateModal /> : null}
-      <PrereleaseModeIndicator />
-      <div className={styles.wrapper}>
-        <ConnectedNav />
-        <Sidebar />
-        <div className={styles.main_page_wrapper}>
-          <ConnectedTitleBar />
-
-          <div
-            id="main-page"
-            className={cx(
-              styles.main_page_content,
-              MAIN_CONTENT_FORCED_SCROLL_CLASSNAME
-            )}
-          >
-            <AnnouncementModal />
-            <CreateFileWizard />
-            <FileUploadMessageModal />
-
-            <MainPageModalPortalRoot />
-            <LabwareUploadMessageModal />
-            <MainPanel />
-          </div>
-        </div>
-      </div>
+    <div id="protocol-editor">
+      <Form
+        schema={sanitized}
+        validator={validator}
+        onChange={() => { console.log('changed') }}
+        onSubmit={() => { console.log('submitted') }}
+        onError={() => { console.log('errors') }}
+      />
     </div>
   )
 }
 
-export const ProtocolEditor = DragDropContext(MouseBackEnd)(
-  ProtocolEditorComponent
-)
+export const ProtocolEditor = ProtocolEditorComponent
