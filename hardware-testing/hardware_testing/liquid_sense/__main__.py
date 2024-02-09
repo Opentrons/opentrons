@@ -116,6 +116,7 @@ class RunArgs:
             labware_dir = Path(__file__).parent.parent / "labware"
             custom_def_uris = [
                 "radwag_pipette_calibration_vial",
+                "dial_indicator",
             ]
             for def_uri in custom_def_uris:
                 with open(labware_dir / def_uri / "1.json", "r") as f:
@@ -181,7 +182,7 @@ class RunArgs:
                 port=dial_port
             )
             dial.connect()
-        print(f"pipette_tag {pipette_tag}")
+        ui.print_info(f"pipette_tag {pipette_tag}")
         report = build_ls_report(name, run_id, trials, tip_volumes)
         report.set_tag(name)
         # go ahead and store the meta data now
