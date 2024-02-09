@@ -16,13 +16,11 @@ Summary of changes from schema 2:
   since the updated `analysis.completed_analysis` (see above) replaces it.
 """
 
-
-import logging
 import concurrent.futures
 import multiprocessing
-from contextlib import contextmanager
+from contextlib import ExitStack, contextmanager
 from pathlib import Path
-from typing import Any, Dict, Generator, Iterable, List, Optional
+from typing import ContextManager, Dict, Generator, Iterable, List
 
 from opentrons.protocol_engine import Command, StateSummary
 import pydantic
@@ -38,8 +36,6 @@ from .._folder_migrator import Migration
 from .._tables import schema_2, schema_3
 from ._util import copy_rows_unmodified, copy_if_exists, copytree_if_exists
 
-
-_log = logging.getLogger(__name__)
 
 # TODO: Define a single source of truth somewhere for these paths.
 _DECK_CONFIGURATION_FILE = "deck_configuration.json"
@@ -60,19 +56,51 @@ class MigrationUpTo3(Migration):  # noqa: D101
         source_db_file = source_dir / _DB_FILE
         dest_db_file = dest_dir / _DB_FILE
 
-        # If the source is schema 0 or 1, this will migrate it to 2 in-place.
-        with _schema_2_engine(source_db_file) as source_db, _schema_3_engine(
-            dest_db_file
-        ) as dest_db:
-            with source_db.begin() as source_transaction, dest_db.begin() as dest_transaction:
-                _migrate_everything_except_commands(
-                    source_transaction, dest_transaction
-                )
+        with ExitStack() as exit_stack:
+            source_engine = exit_stack.enter_context(
+                # If the source is schema 0 or 1, this will migrate it to 2 in-place.
+                _schema_2_sql_engine(source_db_file)
+            )
+            dest_engine = exit_stack.enter_context(_schema_3_sql_engine(dest_db_file))
 
-        _migrate_commands(source_db_file, dest_db_file)
+            with source_engine.begin() as source_transaction, dest_engine.begin() as dest_transaction:
+                run_ids = _get_run_ids(schema_2_transaction=source_transaction)
+                _migrate_db_excluding_commands(source_transaction, dest_transaction)
+
+        _migrate_db_commands(source_db_file, dest_db_file, run_ids)
 
 
-def _migrate_everything_except_commands(
+@contextmanager
+def _schema_2_sql_engine(
+    db_file: Path,
+) -> Generator[sqlalchemy.engine.Engine, None, None]:
+    engine = create_schema_2_sql_engine(db_file)
+    try:
+        yield engine
+    finally:
+        engine.dispose()
+
+
+@contextmanager
+def _schema_3_sql_engine(
+    db_file: Path,
+) -> Generator[sqlalchemy.engine.Engine, None, None]:
+    engine = create_schema_3_sql_engine(db_file)
+    try:
+        yield engine
+    finally:
+        engine.dispose()
+
+
+def _get_run_ids(*, schema_2_transaction: sqlalchemy.engine.Connection) -> List[str]:
+    return (
+        schema_2_transaction.execute(sqlalchemy.select(schema_2.run_table.c.id))
+        .scalars()
+        .all()
+    )
+
+
+def _migrate_db_excluding_commands(
     source_transaction: sqlalchemy.engine.Connection,
     dest_transaction: sqlalchemy.engine.Connection,
 ) -> None:
@@ -89,7 +117,7 @@ def _migrate_everything_except_commands(
         dest_transaction,
     )
 
-    _migrate_run_table(
+    _migrate_run_table_excluding_commands(
         source_transaction,
         dest_transaction,
     )
@@ -103,17 +131,22 @@ def _migrate_everything_except_commands(
     )
 
 
-def _migrate_run_table(
+def _migrate_run_table_excluding_commands(
     source_transaction: sqlalchemy.engine.Connection,
     dest_transaction: sqlalchemy.engine.Connection,
 ) -> None:
-    select_old_runs = sqlalchemy.select(schema_2.run_table).order_by(sqlite_rowid)
+    select_old_runs = sqlalchemy.select(
+        schema_2.run_table.c.id,
+        schema_2.run_table.c.created_at,
+        schema_2.run_table.c.protocol_id,
+        schema_2.run_table.c.state_summary,
+        # schema_2.run_table.c.commands deliberately omitted
+        schema_2.run_table.c.engine_status,
+        schema_2.run_table.c._updated_at,
+    ).order_by(sqlite_rowid)
     insert_new_run = sqlalchemy.insert(schema_3.run_table)
 
-    old_run_rows = source_transaction.execute(select_old_runs).all()
-
-    # Migrate scalar run data:
-    for old_run_row in old_run_rows:
+    for old_run_row in source_transaction.execute(select_old_runs).all():
         old_state_summary = old_run_row.state_summary
         new_state_summary = (
             None
@@ -131,9 +164,6 @@ def _migrate_run_table(
             engine_status=old_run_row.engine_status,
             _updated_at=old_run_row._updated_at,
         )
-
-        # Migrate run commands. There are potentially a lot of these, so offload them
-        # to worker threads.
 
 
 def _migrate_analysis_table(
@@ -162,41 +192,24 @@ def _migrate_analysis_table(
         )
 
 
-@contextmanager
-def _schema_2_engine(db_file: Path) -> Generator[sqlalchemy.engine.Engine, None, None]:
-    engine = create_schema_2_sql_engine(db_file)
-    try:
-        yield engine
-    finally:
-        engine.dispose()
+def _migrate_db_commands(
+    source_db_file: Path, dest_db_file: Path, run_ids: List[str]
+) -> None:
+    """Migrate the run commands stored in the database.
 
-
-@contextmanager
-def _schema_3_engine(db_file: Path) -> Generator[sqlalchemy.engine.Engine, None, None]:
-    engine = create_schema_3_sql_engine(db_file)
-    try:
-        yield engine
-    finally:
-        engine.dispose()
-
-
-def _migrate_commands(source_db_file: Path, dest_db_file: Path) -> None:
-    engine = create_schema_2_sql_engine(source_db_file)
-    try:
-        run_ids = (
-            engine.execute(sqlalchemy.select(schema_2.run_table.c.id)).scalars().all()
-        )
-    finally:
-        engine.dispose()
-
-    # Each process could safely insert without this lock in the sense that SQLite
-    # can handle the concurrency and produce the correct result. However, I suspect
-    # it's slow. The World Wide Web has mentions of busy-retry loops if SQLite can't
-    # immediately acquire a transaction.
+    Because there are potentially tens or hundreds of thousands of commands in total,
+    this is the most computationally expensive part of the migration. We distribute
+    the work across subprocesses. Each subprocess extracts, migrates, and inserts
+    all of the commands for a single run.
+    """
+    # We'll use a lock to make sure only one process is accessing the database at once.
     #
-    # Straight up copy-paste from Stack Overflow:
+    # Concurrent access would be safe in the sense that SQLite would always provide
+    # isolation. But, when there are conflicts, we'd have to deal with SQLite retrying
+    # transactions or raising SQLITE_BUSY. A Python-level lock is simpler and more
+    # reliable.
     manager = multiprocessing.Manager()
-    insertion_lock = manager.Lock()
+    lock = manager.Lock()
 
     with concurrent.futures.ProcessPoolExecutor(
         # One worker per core of the OT-2's Raspberry Pi.
@@ -209,11 +222,11 @@ def _migrate_commands(source_db_file: Path, dest_db_file: Path) -> None:
     ) as pool:
         futures = [
             pool.submit(
-                _migrate_commands_for_run,
+                _migrate_db_commands_for_run,
                 source_db_file,
                 dest_db_file,
                 run_id,
-                insertion_lock,
+                lock,
             )
             for run_id in run_ids
         ]
@@ -222,52 +235,50 @@ def _migrate_commands(source_db_file: Path, dest_db_file: Path) -> None:
             future.result()
 
 
-def _migrate_commands_for_run(
+def _migrate_db_commands_for_run(
     source_db_file: Path,
     dest_db_file: Path,
     run_id: str,
-    insertion_lock: Any,  # multiprocessing.Lock can't be typed.
+    # This is a multiprocessing.Lock, which can't be a type annotation for some reason.
+    lock: ContextManager[object],
 ) -> None:
-    with _schema_2_engine(source_db_file) as source_engine, _schema_3_engine(
+    with _schema_2_sql_engine(source_db_file) as source_engine, _schema_3_sql_engine(
         dest_db_file
     ) as dest_engine:
-        _log.error(f"Retrieving commands for {run_id}")
-        old_commands: Optional[List[Dict[str, Any]]] = source_engine.execute(
-            sqlalchemy.select(schema_2.run_table.c.commands).where(
-                schema_2.run_table.c.id == run_id
-            )
-        ).scalar_one()
-        if old_commands is None:
-            old_commands = []
+        select_old_commands = sqlalchemy.select(schema_2.run_table.c.commands).where(
+            schema_2.run_table.c.id == run_id
+        )
+        insert_new_command = sqlalchemy.insert(schema_3.run_command_table)
 
-        _log.error(f"Parsing commands for {run_id}")
-        pydantic_old_commands: Iterable[Command] = (
+        with lock, source_engine.begin() as source_transaction:
+            old_commands: List[Dict[str, object]] = (
+                source_transaction.execute(select_old_commands).scalar_one() or []
+            )
+
+        parsed_commands: Iterable[Command] = (
             pydantic.parse_obj_as(
                 Command,  # type: ignore[arg-type]
                 c,
             )
             for c in old_commands
         )
-        _log.error(f"Reserializing commands for {run_id}")
+
         new_command_rows = [
             {
                 "run_id": run_id,
                 "index_in_run": index_in_run,
-                "command_id": pydantic_command.id,
-                "command": pydantic_to_json(pydantic_command),
+                "command_id": parsed_command.id,
+                "command": pydantic_to_json(parsed_command),
             }
-            for index_in_run, pydantic_command in enumerate(pydantic_old_commands)
+            for index_in_run, parsed_command in enumerate(parsed_commands)
         ]
-        _log.error(f"Inserting commands for {run_id}")
-        insert_new_command = sqlalchemy.insert(schema_3.run_command_table)
-        with insertion_lock, dest_engine.begin() as dest_transaction:
-            # Insert all the commands for this run in one go, to avoid the overhead of
-            # separate statements, and since we had to bring them all into memory at once
-            # in order to parse them anyway.
+
+        # Insert all the commands for this run in one go, to avoid the overhead of
+        # separate statements, and since we had to bring them all into memory at once
+        # in order to parse them anyway.
+        with lock, dest_engine.begin() as dest_transaction:
             if len(new_command_rows) > 0:
                 # This needs to be guarded by a len>0 check because if the list is empty,
                 # SQLAlchemy misinterprets this as inserting a single row with all default
                 # values.
                 dest_transaction.execute(insert_new_command, new_command_rows)
-
-        _log.error(f"Done with commands for {run_id}")
