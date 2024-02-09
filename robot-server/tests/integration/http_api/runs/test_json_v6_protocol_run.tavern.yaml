@@ -555,3 +555,47 @@ stages:
             completedAt: '{setup_command_completed_at}'
             status: succeeded
             params: {}
+
+  - name: Verify commands succeeded with pageLength and cursor
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}/commands?cursor=5&pageLength=2'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        links:
+          current: !anydict
+        meta:
+          cursor: 5
+          totalLength: 15
+        data:
+          - id: !anystr
+            key: !anystr
+            commandType: loadLabware
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params:
+              location:
+                moduleId: magneticModuleId
+              loadName: foo_8_plate_33ul
+              namespace: example
+              version: 1
+              labwareId: destPlateId
+              displayName: Sample Collection Plate
+          - id: !anystr
+            key: !anystr
+            commandType: loadLabware
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params:
+              location:
+                slotName: '8'
+              loadName: opentrons_96_tiprack_10ul
+              namespace: opentrons
+              version: 1
+              labwareId: tipRackId
+              displayName: Opentrons 96 Tip Rack 10 µL

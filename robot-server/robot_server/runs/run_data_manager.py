@@ -112,6 +112,11 @@ class RunDataManager:
             EngineConflictError: There is a currently active run that cannot
                 be superceded by this new run.
         """
+        await self._runs_publisher.begin_polling_engine_store(
+            get_current_command=self.get_current_command,
+            get_state_summary=self._get_state_summary,
+            run_id=run_id,
+        )
         prev_run_id = self._engine_store.current_run_id
         if prev_run_id is not None:
             prev_run_result = await self._engine_store.clear()
@@ -120,7 +125,6 @@ class RunDataManager:
                 summary=prev_run_result.state_summary,
                 commands=prev_run_result.commands,
             )
-
         state_summary = await self._engine_store.create(
             run_id=run_id,
             labware_offsets=labware_offsets,
@@ -131,11 +135,6 @@ class RunDataManager:
             run_id=run_id,
             created_at=created_at,
             protocol_id=protocol.protocol_id if protocol is not None else None,
-        )
-        await self._runs_publisher.begin_polling_engine_store(
-            get_current_command=self.get_current_command,
-            get_state_summary=self._get_state_summary,
-            run_id=run_id,
         )
 
         return _build_run(
