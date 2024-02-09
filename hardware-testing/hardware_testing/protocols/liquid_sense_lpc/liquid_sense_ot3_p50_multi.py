@@ -5,6 +5,7 @@ metadata = {"protocolName": "liquid_sense-ot3-p50-multi-50ul-tip"}
 requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 SLOT_SCALE = 4
+SLOT_DIAL = 5
 SLOTS_TIPRACK = {
     50: [3],
 }
