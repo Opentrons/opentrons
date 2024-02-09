@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from shutil import copytree
 from tempfile import TemporaryDirectory
-from typing import List, NamedTuple
+from typing import List
 
 import anyio
 import pytest
