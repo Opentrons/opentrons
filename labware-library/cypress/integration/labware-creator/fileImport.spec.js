@@ -1,8 +1,6 @@
-import jszip from 'jszip'
 import { expectDeepEqual } from '@opentrons/shared-data/js/cypressUtils'
 
 const importedLabwareFile = 'TestLabwareDefinition.json'
-const pythonFileFixture = 'TestLabwareProtocol.py'
 
 context('File Import', () => {
   before(() => {

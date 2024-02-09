@@ -1,5 +1,4 @@
 import 'cypress-file-upload'
-import JSZip from 'jszip'
 import { expectDeepEqual } from '@opentrons/shared-data/js/cypressUtils'
 
 const expectedExportFixture = '../fixtures/generic_1_tiprack_20ul.json'
