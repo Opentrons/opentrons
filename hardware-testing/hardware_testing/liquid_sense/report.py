@@ -71,7 +71,7 @@ def build_config_section() -> CSVSection:
 def build_trials_section(trials: int, tips: List[int]) -> CSVSection:
     """Build section."""
     lines: List[Union[CSVLine, CSVLineRepeating]] = [
-        CSVLine("trial number", ["str", "str", "str", "str", "str", "str", "str"])
+        CSVLine("trial_number", [str, str, str, str, str, str, str])
     ]
     lines.extend(
         [
@@ -198,7 +198,7 @@ def build_ls_report(
     )
     report(
         "TRIALS",
-        "trial number",
+        "trial_number",
         [
             "height",
             "plunger_pos",

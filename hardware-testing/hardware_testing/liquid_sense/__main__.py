@@ -295,5 +295,6 @@ if __name__ == "__main__":
         run_args.test_report.print_results()
         ui.print_info("done\n\n")
         run_args.ctx.cleanup()
-        helpers_ot3.restart_server_ot3()
+        if not args.simulate:
+            helpers_ot3.restart_server_ot3()
         os._exit(os.EX_OK)
