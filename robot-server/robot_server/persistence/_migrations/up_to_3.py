@@ -16,11 +16,10 @@ Summary of changes from schema 2:
   since the updated `analysis.completed_analysis` (see above) replaces it.
 """
 
-import concurrent.futures
 import multiprocessing
 from contextlib import ExitStack, contextmanager
 from pathlib import Path
-from typing import ContextManager, Dict, Generator, Iterable, List, Optional
+from typing import ContextManager, Dict, Generator, Iterable, List, Optional, Tuple
 
 from opentrons.protocol_engine import Command, StateSummary
 import pydantic
@@ -212,37 +211,33 @@ def _migrate_db_commands(
     manager = multiprocessing.Manager()
     lock = manager.Lock()
 
-    with concurrent.futures.ProcessPoolExecutor(
+    with multiprocessing.Pool(
         # One worker per core of the OT-2's Raspberry Pi.
+        # We're compute-bound, so more workers would just thrash.
         #
-        # This should be safe from a memory footprint point of view.
+        # Napkin math for the memory footprint:
         # Suppose a very large protocol has ~10MB of commands (see e.g. RQA-443).
         # The maximum number of runs at the time of writing is 20,
-        # so that's at most ~200MB total.
-        max_workers=4
+        # so that's at most ~200MB total, which should be fine.
+        processes=4
     ) as pool:
-        futures = [
-            pool.submit(
-                _migrate_db_commands_for_run,
-                source_db_file,
-                dest_db_file,
-                run_id,
-                lock,
-            )
-            for run_id in run_ids
-        ]
-        for future in futures:
-            # TODO: See if there's a better way to await all the results.
-            future.result()
+        pool.map(
+            _migrate_db_commands_for_run,
+            ((source_db_file, dest_db_file, run_id, lock) for run_id in run_ids),
+        )
 
 
 def _migrate_db_commands_for_run(
-    source_db_file: Path,
-    dest_db_file: Path,
-    run_id: str,
-    # This is a multiprocessing.Lock, which can't be a type annotation for some reason.
-    lock: ContextManager[object],
+    args: Tuple[
+        Path,
+        Path,
+        str,
+        # This is a multiprocessing.Lock, which can't be a type annotation for some reason.
+        ContextManager[object],
+    ]
 ) -> None:
+    source_db_file, dest_db_file, run_id, lock = args
+
     with _schema_2_sql_engine(source_db_file) as source_engine, _schema_3_sql_engine(
         dest_db_file
     ) as dest_engine:
