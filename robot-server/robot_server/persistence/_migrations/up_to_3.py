@@ -36,6 +36,8 @@ from .._tables import schema_2, schema_3
 from ._util import copy_rows_unmodified, copy_if_exists, copytree_if_exists
 from . import up_to_2
 
+from . import _up_to_3_worker
+
 
 # TODO: Define a single source of truth somewhere for these paths.
 _DECK_CONFIGURATION_FILE = "deck_configuration.json"
@@ -181,16 +183,19 @@ def _migrate_db_commands(
     the work across subprocesses. Each subprocess extracts, migrates, and inserts
     all of the commands for a single run.
     """
+    mp = multiprocessing.get_context("forkserver")
+    mp.set_forkserver_preload(_up_to_3_worker.imports)
+
     # We'll use a lock to make sure only one process is accessing the database at once.
     #
     # Concurrent access would be safe in the sense that SQLite would always provide
     # isolation. But, when there are conflicts, we'd have to deal with SQLite retrying
     # transactions or raising SQLITE_BUSY. A Python-level lock is simpler and more
     # reliable.
-    manager = multiprocessing.Manager()
+    manager = mp.Manager()
     lock = manager.Lock()
 
-    with multiprocessing.Pool(
+    with mp.Pool(
         # One worker per core of the OT-2's Raspberry Pi.
         # We're compute-bound, so more workers would just thrash.
         #
@@ -201,63 +206,6 @@ def _migrate_db_commands(
         processes=4
     ) as pool:
         pool.map(
-            _migrate_db_commands_for_run,
+            _up_to_3_worker.migrate_db_commands_for_run,
             ((source_db_file, dest_db_file, run_id, lock) for run_id in run_ids),
         )
-
-
-def _migrate_db_commands_for_run(
-    args: Tuple[
-        Path,
-        Path,
-        str,
-        # This is a multiprocessing.Lock, which can't be a type annotation for some reason.
-        ContextManager[object],
-    ]
-) -> None:
-    source_db_file, dest_db_file, run_id, lock = args
-
-    with sql_engine_ctx(source_db_file) as source_engine, sql_engine_ctx(
-        dest_db_file
-    ) as dest_engine:
-        select_old_commands = sqlalchemy.select(schema_2.run_table.c.commands).where(
-            schema_2.run_table.c.id == run_id
-        )
-        insert_new_command = sqlalchemy.insert(schema_3.run_command_table)
-
-        with lock, source_engine.begin() as source_transaction:
-            old_commands_bytes: Optional[bytes] = source_transaction.execute(
-                select_old_commands
-            ).scalar_one()
-
-        old_commands: List[Dict[str, object]] = (
-            legacy_pickle.loads(old_commands_bytes) if old_commands_bytes else []
-        )
-
-        parsed_commands: Iterable[Command] = (
-            pydantic.parse_obj_as(
-                Command,  # type: ignore[arg-type]
-                c,
-            )
-            for c in old_commands
-        )
-
-        new_command_rows = [
-            {
-                "run_id": run_id,
-                "index_in_run": index_in_run,
-                "command_id": parsed_command.id,
-                "command": pydantic_to_json(parsed_command),
-            }
-            for index_in_run, parsed_command in enumerate(parsed_commands)
-        ]
-
-        # Insert all the commands for this run in one go, to avoid the overhead of
-        # separate statements, and since we had to bring them all into memory at once
-        # in order to parse them anyway.
-        with lock, dest_engine.begin() as dest_transaction:
-            if len(new_command_rows) > 0:
-                # This needs to be guarded by a len>0 check because if the list is empty,
-                # SQLAlchemy misinterprets this as inserting a single row with all default
-                # values.
-                dest_transaction.execute(insert_new_command, new_command_rows)
