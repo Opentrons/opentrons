@@ -13,7 +13,7 @@ You will need the following tools installed to develop on the Opentrons platform
 - curl
 - ssh
 - Python v3.10
-- Node.js v16
+- Node.js v18
 
 ### macOS
 
@@ -82,10 +82,9 @@ Close and re-open your terminal to confirm `nvs` is installed.
 nvs --version
 ```
 
-Now we can use nvs to install Node.js v16 and switch on `auto` mode, which will make sure Node.js v16 is used any time we're in the `opentrons` project directory.
+Now we can use `nvs` to install the currently required Node.js version set in `.nvmrc`. We think it's easiest if you switch on `auto` mode which will make sure the correct version of Node.js is used any time we're in the `opentrons` project directory. ^[If you don't want to use `nvs` auto mode you'll have to manually run `use` or `install` when you want to work on the project.]
 
 ```shell
-nvs add 16
 nvs auto on
 ```
 
@@ -202,7 +201,7 @@ Once you are inside the repository for the first time, you should do two things:
 3. Run `python --version` to confirm your chosen version. If you get the incorrect version and you're using an Apple silicon Mac, try running `eval "$(pyenv init --path)"` and then `pyenv local 3.10.13`. Then check `python --version` again.
 
 ```shell
-# confirm Node v16
+# confirm Node v18
 node --version
 
 # set Python version, and confirm
