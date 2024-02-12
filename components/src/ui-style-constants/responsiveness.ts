@@ -5,5 +5,7 @@
 // is precisely 600x1024
 export const touchscreenMediaQuerySpecs = '(height: 600px) and (width: 1024px)'
 
-export const isTouchscreen = window.matchMedia(touchscreenMediaQuerySpecs)
-  .matches
+export const isTouchscreen =
+  typeof window === 'object' && window.matchMedia != null
+    ? window.matchMedia(touchscreenMediaQuerySpecs).matches
+    : false
