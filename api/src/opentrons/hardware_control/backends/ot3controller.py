@@ -86,6 +86,8 @@ from opentrons_hardware.hardware_control.motor_enable_disable import (
     set_disable_motor,
     set_enable_tip_motor,
     set_disable_tip_motor,
+    get_motor_enabled,
+    get_tip_motor_enabled,
 )
 from opentrons_hardware.hardware_control.motor_position_status import (
     get_motor_position,
@@ -259,6 +261,7 @@ class OT3Controller(FlexBackend):
     _encoder_position: Dict[NodeId, float]
     _motor_status: Dict[NodeId, MotorStatus]
     _subsystem_manager: SubsystemManager
+    _engaged_axes: OT3AxisMap[bool]
 
     @classmethod
     async def build(
@@ -334,6 +337,7 @@ class OT3Controller(FlexBackend):
         self._gear_motor_position: Dict[NodeId, float] = {}
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
+        self._engaged_axes = {}
         self._check_updates = check_updates
         self._initialized = False
         self._status_bar = status_bar.StatusBar(messenger=self._usb_messenger)
@@ -1157,7 +1161,7 @@ class OT3Controller(FlexBackend):
     def axis_bounds(self) -> OT3AxisMap[Tuple[float, float]]:
         """Get the axis bounds."""
         # TODO (AL, 2021-11-18): The bounds need to be defined
-        phony_bounds = (0, 500)
+        phony_bounds = (0, 300)
         return {
             Axis.Z_L: phony_bounds,
             Axis.Z_R: phony_bounds,
@@ -1171,23 +1175,46 @@ class OT3Controller(FlexBackend):
 
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""
-        return {}
+        return self._engaged_axes
+
+    async def update_engaged_axes(self) -> None:
+        """Update engaged axes."""
+        motor_nodes = self._motor_nodes()
+        for node in motor_nodes:
+            await self.is_motor_engaged(node_to_axis(node))
+
+    async def is_motor_engaged(self, axis: Axis) -> bool:
+        node = axis_to_node(axis)
+        if axis == Axis.Q:
+            result = await get_tip_motor_enabled(self._messenger, node)
+        else:
+            result = await get_motor_enabled(self._messenger, node)
+        self._engaged_axes.update({axis: result})
+        return result
 
     async def disengage_axes(self, axes: List[Axis]) -> None:
         """Disengage axes."""
         if Axis.Q in axes:
             await set_disable_tip_motor(self._messenger, {axis_to_node(Axis.Q)})
-        nodes = {axis_to_node(ax) for ax in axes if ax is not Axis.Q}
-        if len(nodes) > 0:
-            await set_disable_motor(self._messenger, nodes)
+            self._engaged_axes[Axis.Q] = False
+            axes = [ax for ax in axes if ax is not Axis.Q]
+
+        if len(axes) > 0:
+            await set_disable_motor(self._messenger, {axis_to_node(ax) for ax in axes})
+        for ax in axes:
+            self._engaged_axes[ax] = False
 
     async def engage_axes(self, axes: List[Axis]) -> None:
         """Engage axes."""
         if Axis.Q in axes:
             await set_enable_tip_motor(self._messenger, {axis_to_node(Axis.Q)})
-        nodes = {axis_to_node(ax) for ax in axes if ax is not Axis.Q}
-        if len(nodes) > 0:
-            await set_enable_motor(self._messenger, nodes)
+            self._engaged_axes[Axis.Q] = True
+            axes = [ax for ax in axes if ax is not Axis.Q]
+
+        if len(axes) > 0:
+            await set_enable_motor(self._messenger, {axis_to_node(ax) for ax in axes})
+        for ax in axes:
+            self._engaged_axes[ax] = True
 
     @requires_update
     async def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:

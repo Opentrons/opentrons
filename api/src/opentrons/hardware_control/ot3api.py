@@ -259,13 +259,13 @@ class OT3API(
         the last moved mount.
         """
         realmount = OT3Mount.from_mount(mount)
-        if not self._last_moved_mount or realmount == self._last_moved_mount:
-            return False
-
-        return (
+        if realmount == OT3Mount.GRIPPER or (
             realmount == OT3Mount.LEFT
             and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
-        ) or (realmount == OT3Mount.GRIPPER)
+        ):
+            return not self.engaged_axes[Axis.by_mount(realmount)]
+
+        return False
 
     @property
     def door_state(self) -> DoorState:
@@ -1500,9 +1500,9 @@ class OT3API(
 
         encoder_ok = self._backend.check_encoder_status([axis])
         motor_ok = self._backend.check_motor_status([axis])
+        motor_engaged = await self._backend.is_motor_engaged(axis)
 
-        if encoder_ok:
-            # ensure stepper position can be updated after boot
+        if encoder_ok and not motor_engaged:
             if axis == Axis.Z_L and self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
                 # we're here if the left mount has been idle and the brake is engaged
                 # we want to temporarily increase its hold current to prevent the z
@@ -1511,6 +1511,8 @@ class OT3API(
                     await self.engage_axes([axis])
             else:
                 await self.engage_axes([axis])
+
+        if encoder_ok:
             await self._update_position_estimation([axis])
             # refresh motor and encoder statuses after position estimation update
             motor_ok = self._backend.check_motor_status([axis])
