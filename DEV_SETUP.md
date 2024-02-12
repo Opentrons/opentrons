@@ -85,7 +85,7 @@ nvs --version
 Now we can use nvs to install Node.js v18 and switch on `auto` mode, which will make sure Node.js v18 is used any time we're in the `opentrons` project directory.
 
 ```shell
-nvs add 18.19.0
+nvs add 18
 nvs auto on
 ```
 
