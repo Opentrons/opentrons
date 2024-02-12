@@ -190,10 +190,16 @@ def _find_default(name: str, configs: Dict[str, Any]) -> MutableConfig:
     keypath = _MAP_KEY_TO_V2[name]
     nested_name = keypath[-1]
 
-    if name == "pickUpCurrent":
-        min_max_dict = _MIN_MAX_LOOKUP["current"]
-        type_lookup = _TYPE_LOOKUP["current"]
-        units_lookup = _UNITS_LOOKUP["current"]
+    name_to_lookup_key_map = {
+        "pickUpCurrent": "current",
+        "pickUpDistance": "distance",
+        "pickUpSpeed": "speed",
+    }
+    if name in name_to_lookup_key_map.keys():
+        lookup_key = name_to_lookup_key_map[name]
+        min_max_dict = _MIN_MAX_LOOKUP[lookup_key]
+        type_lookup = _TYPE_LOOKUP[lookup_key]
+        units_lookup = _UNITS_LOOKUP[lookup_key]
     else:
         min_max_dict = _MIN_MAX_LOOKUP[nested_name]
         type_lookup = _TYPE_LOOKUP[nested_name]
