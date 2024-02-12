@@ -129,6 +129,8 @@ describe('UpdateAppModal', () => {
       error: { name: 'Update Error' },
     } as ShellUpdateState)
     render(props)
-    expect(screen.getByTitle('Update Error')).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: 'Update Error' })
+    ).toBeInTheDocument()
   })
 })
