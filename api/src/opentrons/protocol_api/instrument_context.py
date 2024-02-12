@@ -290,8 +290,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         See :ref:`new-dispense` for more details and examples.
 
-        :param volume: The volume to dispense, measured in µL. If only a volume is
-                       passed, the pipette will dispense from its current position.
+        :param volume: The volume to dispense, measured in µL.
 
                          - If unspecified or ``None``, dispense the :py:attr:`current_volume`.
 
