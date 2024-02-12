@@ -6,11 +6,15 @@ import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../../i18n'
-import { getRobotUpdateDisplayInfo } from '../../../../../redux/robot-update'
+import {
+  getRobotUpdateDisplayInfo,
+  getRobotUpdateVersion,
+} from '../../../../../redux/robot-update'
 import { getDiscoverableRobotByName } from '../../../../../redux/discovery'
-import { UpdateRobotModal } from '../UpdateRobotModal'
-import type { Store } from 'redux'
+import { UpdateRobotModal, RELEASE_NOTES_URL_BASE } from '../UpdateRobotModal'
+import { useIsRobotBusy } from '../../../hooks'
 
+import type { Store } from 'redux'
 import type { State } from '../../../../../redux/types'
 
 jest.mock('../../../../../redux/robot-update')
@@ -18,12 +22,19 @@ jest.mock('../../../../../redux/discovery')
 jest.mock('../../../../UpdateAppModal', () => ({
   UpdateAppModal: () => null,
 }))
+jest.mock('../../../hooks')
 
 const mockGetRobotUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
   typeof getRobotUpdateDisplayInfo
 >
 const mockGetDiscoverableRobotByName = getDiscoverableRobotByName as jest.MockedFunction<
   typeof getDiscoverableRobotByName
+>
+const mockGetRobotUpdateVersion = getRobotUpdateVersion as jest.MockedFunction<
+  typeof getRobotUpdateVersion
+>
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
 >
 
 const render = (props: React.ComponentProps<typeof UpdateRobotModal>) => {
@@ -51,6 +62,8 @@ describe('UpdateRobotModal', () => {
       updateFromFileDisabledReason: 'test',
     })
     when(mockGetDiscoverableRobotByName).mockReturnValue(null)
+    when(mockGetRobotUpdateVersion).mockReturnValue('7.0.0')
+    when(mockUseIsRobotBusy).mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -91,6 +104,13 @@ describe('UpdateRobotModal', () => {
     expect(updateNow).toBeDisabled()
     fireEvent.click(remindMeLater)
     expect(props.closeModal).toHaveBeenCalled()
+  })
+
+  it('renders a release notes link pointing to the Github releases page', () => {
+    const [{ getByText }] = render(props)
+
+    const link = getByText('Release notes')
+    expect(link).toHaveAttribute('href', RELEASE_NOTES_URL_BASE + '7.0.0')
   })
 
   it('renders proper text when reinstalling', () => {

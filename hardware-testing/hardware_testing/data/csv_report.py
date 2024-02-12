@@ -411,7 +411,8 @@ class CSVReport:
     @property
     def parent(self) -> Path:
         """Parent directory of this report file."""
-        return data_io.create_folder_for_test_data(self._test_name)
+        test_path = data_io.create_folder_for_test_data(self._test_name)
+        return data_io.create_folder_for_test_data(test_path / self._run_id)
 
     @property
     def tag(self) -> str:
@@ -423,8 +424,7 @@ class CSVReport:
         """Get file-path."""
         if not self._file_name:
             raise RuntimeError("must set tag of report using `Report.set_tag()`")
-        test_path = data_io.create_folder_for_test_data(self._test_name)
-        return test_path / self._file_name
+        return self.parent / self._file_name
 
     def _cache_start_time(self, start_time: Optional[float] = None) -> None:
         checked_start_time = start_time if start_time else time()
@@ -484,7 +484,7 @@ class CSVReport:
         _report_str = str(self)
         assert self._file_name, "must set tag before saving to disk"
         return data_io.dump_data_to_file(
-            self._test_name, self._file_name, _report_str + "\n"
+            self._test_name, self._run_id, self._file_name, _report_str + "\n"
         )
 
     def print_results(self) -> None:

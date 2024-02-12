@@ -6,7 +6,7 @@ from typing import List, Optional, Union, cast
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleModel, ModuleType
 
-from opentrons.broker import Broker
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.modules import ThermocyclerStep
 from opentrons.commands import module_commands as cmds
 from opentrons.commands.publisher import CommandPublisher, publish
@@ -55,7 +55,7 @@ class ModuleContext(CommandPublisher):
         protocol_core: ProtocolCore,
         core_map: LoadedCoreMap,
         api_version: APIVersion,
-        broker: Broker,
+        broker: LegacyBroker,
     ) -> None:
         super().__init__(broker=broker)
         self._core = core
@@ -63,18 +63,18 @@ class ModuleContext(CommandPublisher):
         self._core_map = core_map
         self._api_version = api_version
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def api_version(self) -> APIVersion:
         return self._api_version
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 14)
     def model(self) -> ModuleModel:
         """Get the module's model identifier."""
         return cast(ModuleModel, self._core.get_model().value)
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 14)
     def type(self) -> ModuleType:
         """Get the module's general type identifier."""
@@ -265,14 +265,14 @@ class ModuleContext(CommandPublisher):
             version=load_params.version,
         )
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def labware(self) -> Optional[Labware]:
         """The labware (if any) present on this module."""
         labware_core = self._protocol_core.get_labware_on_module(self._core)
         return self._core_map.get(labware_core)
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 14)
     def parent(self) -> str:
         """The name of the slot the module is on.
@@ -282,7 +282,7 @@ class ModuleContext(CommandPublisher):
         """
         return self._core.get_deck_slot_id()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def geometry(self) -> LegacyModuleGeometry:
         """The object representing the module as an item on the deck.
@@ -319,7 +319,7 @@ class TemperatureModuleContext(ModuleContext):
 
     _core: TemperatureModuleCore
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 14)
     def serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
@@ -361,7 +361,7 @@ class TemperatureModuleContext(ModuleContext):
         """Stop heating or cooling, and turn off the fan."""
         self._core.deactivate()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def temperature(self) -> float:
         """The current temperature of the Temperature Module's deck in °C.
@@ -370,7 +370,7 @@ class TemperatureModuleContext(ModuleContext):
         """
         return self._core.get_current_temperature()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def target(self) -> Optional[float]:
         """The target temperature of the Temperature Module's deck in °C.
@@ -379,7 +379,7 @@ class TemperatureModuleContext(ModuleContext):
         """
         return self._core.get_target_temperature()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 3)
     def status(self) -> str:
         """One of four possible temperature statuses:
@@ -404,7 +404,7 @@ class MagneticModuleContext(ModuleContext):
 
     _core: MagneticModuleCore
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 14)
     def serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
@@ -493,7 +493,7 @@ class MagneticModuleContext(ModuleContext):
         """Lower the magnets back into the Magnetic Module."""
         self._core.disengage()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def status(self) -> str:
         """The status of the module, either ``engaged`` or ``disengaged``."""
@@ -511,7 +511,7 @@ class ThermocyclerContext(ModuleContext):
 
     _core: ThermocyclerCore
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 14)
     def serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
@@ -642,7 +642,7 @@ class ThermocyclerContext(ModuleContext):
         """Turn off both the well block temperature controller and the lid heater."""
         self._core.deactivate()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def lid_position(self) -> Optional[str]:
         """One of these possible lid statuses:
@@ -655,7 +655,7 @@ class ThermocyclerContext(ModuleContext):
         status = self._core.get_lid_position()
         return status.value if status is not None else None
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def block_temperature_status(self) -> str:
         """One of five possible temperature statuses:
@@ -669,7 +669,7 @@ class ThermocyclerContext(ModuleContext):
         """
         return self._core.get_block_temperature_status().value
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def lid_temperature_status(self) -> Optional[str]:
         """One of five possible temperature statuses:
@@ -685,61 +685,61 @@ class ThermocyclerContext(ModuleContext):
         status = self._core.get_lid_temperature_status()
         return status.value if status is not None else None
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def block_temperature(self) -> Optional[float]:
         """The current temperature of the well block in °C."""
         return self._core.get_block_temperature()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def block_target_temperature(self) -> Optional[float]:
         """The target temperature of the well block in °C."""
         return self._core.get_block_target_temperature()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def lid_temperature(self) -> Optional[float]:
         """The current temperature of the lid in °C."""
         return self._core.get_lid_temperature()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def lid_target_temperature(self) -> Optional[float]:
         """The target temperature of the lid in °C."""
         return self._core.get_lid_target_temperature()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def ramp_rate(self) -> Optional[float]:
         """The current ramp rate in °C/s."""
         return self._core.get_ramp_rate()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def hold_time(self) -> Optional[float]:
         """Remaining hold time in seconds."""
         return self._core.get_hold_time()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def total_cycle_count(self) -> Optional[int]:
         """Number of repetitions for current set cycle"""
         return self._core.get_total_cycle_count()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def current_cycle_index(self) -> Optional[int]:
         """Index of the current set cycle repetition"""
         return self._core.get_current_cycle_index()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def total_step_count(self) -> Optional[int]:
         """Number of steps within the current cycle"""
         return self._core.get_total_step_count()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def current_step_index(self) -> Optional[int]:
         """Index of the current step within the current cycle"""
@@ -757,13 +757,13 @@ class HeaterShakerContext(ModuleContext):
 
     _core: HeaterShakerCore
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 14)
     def serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
         return self._core.get_serial_number()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 13)
     def target_temperature(self) -> Optional[float]:
         """The target temperature of the Heater-Shaker's plate in °C.
@@ -772,7 +772,7 @@ class HeaterShakerContext(ModuleContext):
         """
         return self._core.get_target_temperature()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 13)
     def current_temperature(self) -> float:
         """The current temperature of the Heater-Shaker's plate in °C.
@@ -781,19 +781,19 @@ class HeaterShakerContext(ModuleContext):
         """
         return self._core.get_current_temperature()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 13)
     def current_speed(self) -> int:
         """The current speed of the Heater-Shaker's plate in rpm."""
         return self._core.get_current_speed()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 13)
     def target_speed(self) -> Optional[int]:
         """Target speed of the Heater-Shaker's plate in rpm."""
         return self._core.get_target_speed()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 13)
     def temperature_status(self) -> str:
         """One of five possible temperature statuses:
@@ -808,7 +808,7 @@ class HeaterShakerContext(ModuleContext):
         """
         return self._core.get_temperature_status().value
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 13)
     def speed_status(self) -> str:
         """One of five possible shaking statuses:
@@ -823,7 +823,7 @@ class HeaterShakerContext(ModuleContext):
         """
         return self._core.get_speed_status().value
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 13)
     def labware_latch_status(self) -> str:
         """One of six possible latch statuses:

@@ -45,7 +45,7 @@ gripper_sources = $(wildcard ../gripper/definitions/*.json) $(wildcard ../grippe
 
 json_sources = $(deck_sources) $(labware_sources) $(module_sources) $(pipette_sources) $(protocol_sources) $(gripper_sources)
 
-
+tests ?= tests
 
 twine_auth_args := --username $(pypi_username) --password $(pypi_password)
 twine_repository_url ?= $(pypi_test_upload_url)
@@ -118,12 +118,12 @@ push-ot3: push-no-restart-ot3
 	$(call restart-server,$(host),$(ssh_key),$(ssh_opts),opentrons-robot-server)
 
 .PHONY: deploy
-deploy: wheel
-	$(call python_upload_package,$(twine_auth_args),$(twine_repository_url),$(wheel_file))
+deploy: wheel sdist
+	$(call python_upload_package,$(twine_auth_args),$(twine_repository_url),$(wheel_file),$(sdist_file))
 
 .PHONY: test
 test:
-	$(python) -m pytest --cov=opentrons_shared_data --cov-report xml:coverage.xml tests
+	$(python) -m pytest --cov=opentrons_shared_data --cov-report xml:coverage.xml $(tests) $(test_opts)
 
 
 .PHONY: generate-schema

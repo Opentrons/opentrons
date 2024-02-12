@@ -6,7 +6,7 @@ from opentrons.types import Point, Mount
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import Axis as HardwareAxis
-from opentrons.hardware_control.errors import MustHomeError as HardwareMustHomeError
+from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
 from opentrons.motion_planning import Waypoint
 
@@ -75,6 +75,11 @@ class GantryMover(TypingProtocol):
 
     async def retract_axis(self, axis: MotorAxis) -> None:
         """Retract the specified axis to its home position."""
+        ...
+
+    async def prepare_for_mount_movement(self, mount: Mount) -> None:
+        """Retract the 'idle' mount if necessary."""
+        ...
 
 
 class HardwareGantryMover(GantryMover):
@@ -95,11 +100,11 @@ class HardwareGantryMover(GantryMover):
         Args:
             pipette_id: Pipette ID to get location data for.
             current_well: Optional parameter for getting pipette location data, effects critical point.
-            fail_on_not_homed: Raise HardwareMustHomeError if gantry position is not known.
+            fail_on_not_homed: Raise PositionUnknownError if gantry position is not known.
         """
         pipette_location = self._state_view.motion.get_pipette_location(
             pipette_id=pipette_id,
-            current_well=current_well,
+            current_location=current_well,
         )
         try:
             return await self._hardware_api.gantry_position(
@@ -107,8 +112,8 @@ class HardwareGantryMover(GantryMover):
                 critical_point=pipette_location.critical_point,
                 fail_on_not_homed=fail_on_not_homed,
             )
-        except HardwareMustHomeError as e:
-            raise MustHomeError(str(e)) from e
+        except PositionUnknownError as e:
+            raise MustHomeError(message=str(e), wrapping=[e])
 
     def get_max_travel_z(self, pipette_id: str) -> float:
         """Get the maximum allowed z-height for pipette movement.
@@ -167,8 +172,8 @@ class HardwareGantryMover(GantryMover):
                 critical_point=critical_point,
                 fail_on_not_homed=True,
             )
-        except HardwareMustHomeError as e:
-            raise MustHomeError(str(e)) from e
+        except PositionUnknownError as e:
+            raise MustHomeError(message=str(e), wrapping=[e])
 
         return point
 
@@ -210,6 +215,10 @@ class HardwareGantryMover(GantryMover):
                 f"{axis} is not valid for OT-2 Standard robot type"
             )
         await self._hardware_api.retract_axis(axis=hardware_axis)
+
+    async def prepare_for_mount_movement(self, mount: Mount) -> None:
+        """Retract the 'idle' mount if necessary."""
+        await self._hardware_api.prepare_for_mount_movement(mount)
 
 
 class VirtualGantryMover(GantryMover):
@@ -284,6 +293,10 @@ class VirtualGantryMover(GantryMover):
 
     async def retract_axis(self, axis: MotorAxis) -> None:
         """Retract the specified axis. No-op in virtual implementation."""
+        pass
+
+    async def prepare_for_mount_movement(self, mount: Mount) -> None:
+        """Retract the 'idle' mount if necessary."""
         pass
 
 

@@ -8,7 +8,7 @@ from dataclasses import dataclass, fields
 import os
 from pathlib import Path
 from time import time
-from typing import Optional, Callable, List, Any, Tuple, Dict
+from typing import Optional, Callable, List, Any, Tuple, Dict, cast
 from typing_extensions import Final
 
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
@@ -32,12 +32,12 @@ from opentrons.hardware_control.ot3_calibration import (
     EarlyCapacitiveSenseTrigger,
     CalibrationStructureNotFoundError,
 )
+from opentrons.hardware_control.backends.ot3controller import OT3Controller
 
 from hardware_testing import data
-from hardware_testing.drivers import list_ports_and_select
 from hardware_testing.drivers.pressure_fixture import (
-    PressureFixture,
-    SimPressureFixture,
+    PressureFixtureBase,
+    connect_to_fixture,
 )
 from .pressure import (  # type: ignore[import]
     PRESSURE_FIXTURE_TIP_VOLUME,
@@ -468,15 +468,10 @@ async def _aspirate_and_look_for_droplets(
     return leak_test_passed
 
 
-def _connect_to_fixture(test_config: TestConfig) -> PressureFixture:
-    if not test_config.simulate and not test_config.skip_fixture:
-        if not test_config.fixture_port:
-            _port = list_ports_and_select("pressure-fixture")
-        else:
-            _port = ""
-        fixture = PressureFixture.create(port=_port, slot_side=test_config.fixture_side)
-    else:
-        fixture = SimPressureFixture()  # type: ignore[assignment]
+def _connect_to_fixture(test_config: TestConfig) -> PressureFixtureBase:
+    fixture = connect_to_fixture(
+        test_config.simulate or test_config.skip_fixture, side=test_config.fixture_side
+    )
     fixture.connect()
     return fixture
 
@@ -485,7 +480,7 @@ async def _read_pressure_and_check_results(
     api: OT3API,
     pipette_channels: int,
     pipette_volume: int,
-    fixture: PressureFixture,
+    fixture: PressureFixtureBase,
     tag: PressureEvent,
     write_cb: Callable,
     accumulate_raw_data_cb: Callable,
@@ -599,7 +594,7 @@ async def _fixture_check_pressure(
     api: OT3API,
     mount: OT3Mount,
     test_config: TestConfig,
-    fixture: PressureFixture,
+    fixture: PressureFixtureBase,
     write_cb: Callable,
     accumulate_raw_data_cb: Callable,
 ) -> bool:
@@ -694,7 +689,7 @@ async def _test_for_leak(
     mount: OT3Mount,
     test_config: TestConfig,
     tip_volume: int,
-    fixture: Optional[PressureFixture],
+    fixture: Optional[PressureFixtureBase],
     write_cb: Optional[Callable],
     accumulate_raw_data_cb: Optional[Callable],
     droplet_wait_seconds: int = 30,
@@ -840,9 +835,9 @@ async def _test_diagnostics_encoder(
     print("homing plunger")
     await api.home([pip_axis])
     pip_pos, pip_enc = await _get_plunger_pos_and_encoder()
-    if pip_pos != 0.0 or abs(pip_enc) > 0.01:
+    if abs(pip_pos) > 0.005 or abs(pip_enc) > 0.005:
         print(
-            f"FAIL: plunger ({pip_pos}) or encoder ({pip_enc}) is not 0.0 after homing"
+            f"FAIL: plunger ({pip_pos}) or encoder ({pip_enc}) is not near 0.0 after homing"
         )
         encoder_home_pass = False
     write_cb(["encoder-home", pip_pos, pip_enc, _bool_to_pass_fail(encoder_home_pass)])
@@ -1202,7 +1197,7 @@ async def _jog_for_tip_state(
     async def _matches_state(_state: TipStateType) -> bool:
         try:
             await asyncio.sleep(0.2)
-            await api._backend.check_for_tip_presence(mount, _state)
+            await api.verify_tip_presence(mount, _state)
             return True
         except FailedTipStateCheck:
             return False
@@ -1430,8 +1425,9 @@ def _create_csv_and_get_callbacks(
     run_id = data.create_run_id()
     test_name = Path(__file__).parent.name.replace("_", "-")
     folder_path = data.create_folder_for_test_data(test_name)
+    run_path = data.create_folder_for_test_data(folder_path / run_id)
     file_name = data.create_file_name(test_name, run_id, pipette_sn)
-    csv_display_name = os.path.join(folder_path, file_name)
+    csv_display_name = os.path.join(run_path, file_name)
     print(f"CSV: {csv_display_name}")
     start_time = time()
 
@@ -1448,9 +1444,11 @@ def _create_csv_and_get_callbacks(
             data_list = [first_row_value] + data_list
         data_str = ",".join([str(d) for d in data_list])
         if line_number is None:
-            data.append_data_to_file(test_name, file_name, data_str + "\n")
+            data.append_data_to_file(test_name, run_id, file_name, data_str + "\n")
         else:
-            data.insert_data_to_file(test_name, file_name, data_str + "\n", line_number)
+            data.insert_data_to_file(
+                test_name, run_id, file_name, data_str + "\n", line_number
+            )
 
     def _cache_pressure_data_callback(
         d: List[Any], first_row_value: Optional[str] = None
@@ -1496,7 +1494,7 @@ async def _wait_for_tip_presence_state_change(
             if isinstance(message, PushTipPresenceNotification):
                 event.set()
 
-        messenger = api._backend._messenger  # type: ignore[union-attr]
+        messenger = cast(OT3Controller, api._backend)._messenger
         messenger.add_listener(_listener)
         try:
             for i in range(seconds_to_wait):

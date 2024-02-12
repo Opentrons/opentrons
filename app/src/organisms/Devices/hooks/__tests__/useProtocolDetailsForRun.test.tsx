@@ -1,21 +1,25 @@
 import { when, resetAllWhenMocks } from 'jest-when'
 import { UseQueryResult } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 
 import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
-  useRunQuery,
 } from '@opentrons/react-api-client'
 
 import { useProtocolDetailsForRun } from '..'
+import { useNotifyRunQuery } from '../../../../resources/runs/useNotifyRunQuery'
 
 import { RUN_ID_2 } from '../../../../organisms/RunTimeControl/__fixtures__'
 
 import type { Protocol, Run } from '@opentrons/api-client'
-import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import {
+  CompletedProtocolAnalysis,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client')
+jest.mock('../../../../resources/runs/useNotifyRunQuery')
 
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
@@ -23,7 +27,9 @@ const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
 const mockUseProtocolAnalysisAsDocumentQuery = useProtocolAnalysisAsDocumentQuery as jest.MockedFunction<
   typeof useProtocolAnalysisAsDocumentQuery
 >
-const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
+const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
+  typeof useNotifyRunQuery
+>
 
 const PROTOCOL_ID = 'fake_protocol_id'
 const PROTOCOL_ANALYSIS = {
@@ -39,12 +45,13 @@ const PROTOCOL_RESPONSE = {
     metadata: { protocolName: 'fake protocol' },
     analysisSummaries: [{ id: PROTOCOL_ANALYSIS.id, status: 'completed' }],
     key: 'fakeProtocolKey',
+    robotType: OT2_ROBOT_TYPE,
   },
 } as Protocol
 
 describe('useProtocolDetailsForRun hook', () => {
   beforeEach(() => {
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(null, { staleTime: Infinity })
       .mockReturnValue({} as UseQueryResult<Run>)
     when(mockUseProtocolQuery)
@@ -68,12 +75,12 @@ describe('useProtocolDetailsForRun hook', () => {
       protocolData: null,
       protocolKey: null,
       isProtocolAnalyzing: false,
-      robotType: 'OT-2 Standard',
+      robotType: 'OT-3 Standard',
     })
   })
 
   it('returns the protocol file when given a run id', async () => {
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID_2, { staleTime: Infinity })
       .mockReturnValue({
         data: { data: { protocolId: PROTOCOL_ID } } as any,

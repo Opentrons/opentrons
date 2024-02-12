@@ -8,6 +8,7 @@ import protocolV4Schema from '@opentrons/shared-data/protocol/schemas/4.json'
 import protocolV5Schema from '@opentrons/shared-data/protocol/schemas/5.json'
 import protocolV6Schema from '@opentrons/shared-data/protocol/schemas/6.json'
 import protocolV7Schema from '@opentrons/shared-data/protocol/schemas/7.json'
+import protocolV8Schema from '@opentrons/shared-data/protocol/schemas/8.json'
 import labwareV2Schema from '@opentrons/shared-data/labware/schemas/2.json'
 import commandV7Schema from '@opentrons/shared-data/command/schemas/7.json'
 
@@ -44,8 +45,8 @@ const expectResultToMatchSchema = (
 
 const getSchemaDefForProtocol = (protocol: any): any => {
   // For reference, possibilities are, from newest to oldest:
-  // "$otSharedSchema": "#/protocol/schemas/7"
-  // "schemaVersion": 7
+  // "$otSharedSchema": "#/protocol/schemas/8"
+  // "schemaVersion": 8
   // "protocol-schema": "1.0.0"
   let n
   if (typeof protocol.$otSharedSchema === 'string') {
@@ -69,6 +70,8 @@ const getSchemaDefForProtocol = (protocol: any): any => {
       return protocolV6Schema
     case '7':
       return protocolV7Schema
+    case '8':
+      return protocolV8Schema
   }
 
   const errorMessage = `bad schema for protocol!: ${

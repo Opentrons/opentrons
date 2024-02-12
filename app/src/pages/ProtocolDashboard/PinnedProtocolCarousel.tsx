@@ -5,7 +5,8 @@ import {
   Flex,
   SPACING,
 } from '@opentrons/components'
-import { useAllRunsQuery } from '@opentrons/react-api-client'
+
+import { useNotifyAllRunsQuery } from '../../resources/runs/useNotifyAllRunsQuery'
 import { PinnedProtocol } from './PinnedProtocol'
 
 import type { ProtocolResource } from '@opentrons/shared-data'
@@ -24,7 +25,7 @@ export function PinnedProtocolCarousel(props: {
     setShowDeleteConfirmationModal,
     setTargetProtocolId,
   } = props
-  const runs = useAllRunsQuery()
+  const runs = useNotifyAllRunsQuery()
   const cardSize = (): CardSizeType => {
     let size: CardSizeType = 'regular'
     if (pinnedProtocols.length < 3) {

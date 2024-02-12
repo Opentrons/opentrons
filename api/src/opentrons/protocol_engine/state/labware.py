@@ -9,25 +9,24 @@ from typing import (
     Mapping,
     Optional,
     Sequence,
-    Set,
-    Union,
     Tuple,
     NamedTuple,
     cast,
+    Union,
 )
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
 from opentrons_shared_data.gripper.constants import LABWARE_GRIP_FORCE
 from opentrons_shared_data.labware.labware_definition import LabwareRole
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
-from opentrons.types import DeckSlotName, Point, MountType
+from opentrons.types import DeckSlotName, StagingSlotName, MountType
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.models import LabwareDefinition, WellDefinition
 from opentrons.calibration_storage.helpers import uri_from_details
 
 from .. import errors
-from ..resources import DeckFixedLabware, labware_validation
+from ..resources import DeckFixedLabware, labware_validation, fixture_validation
 from ..commands import (
     Command,
     LoadLabwareResult,
@@ -36,6 +35,7 @@ from ..commands import (
 from ..types import (
     DeckSlotLocation,
     OnLabwareLocation,
+    AddressableAreaLocation,
     NonStackedLocation,
     Dimensions,
     LabwareOffset,
@@ -47,6 +47,8 @@ from ..types import (
     ModuleModel,
     OverlapOffset,
     LabwareMovementOffsetData,
+    OnDeckLabwareLocation,
+    OFF_DECK_LOCATION,
 )
 from ..actions import (
     Action,
@@ -104,7 +106,7 @@ class LabwareState:
     labware_offsets_by_id: Dict[str, LabwareOffset]
 
     definitions_by_uri: Dict[str, LabwareDefinition]
-    deck_definition: DeckDefinitionV3
+    deck_definition: DeckDefinitionV4
 
 
 class LabwareStore(HasState[LabwareState], HandlesActions):
@@ -114,7 +116,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
     def __init__(
         self,
-        deck_definition: DeckDefinitionV3,
+        deck_definition: DeckDefinitionV4,
         deck_fixed_labware: Sequence[DeckFixedLabware],
     ) -> None:
         """Initialize a labware store and its state."""
@@ -203,6 +205,13 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             new_offset_id = command.result.offsetId
 
             self._state.labware_by_id[labware_id].offsetId = new_offset_id
+            if isinstance(
+                new_location, AddressableAreaLocation
+            ) and fixture_validation.is_gripper_waste_chute(
+                new_location.addressableAreaName
+            ):
+                # If a labware has been moved into a waste chute it's been chuted away and is now technically off deck
+                new_location = OFF_DECK_LOCATION
             self._state.labware_by_id[labware_id].location = new_location
 
     def _add_labware_offset(self, labware_offset: LabwareOffset) -> None:
@@ -275,20 +284,20 @@ class LabwareView(HasState[LabwareState]):
                     f"Cannot move to labware {labware_id}, labware has other labware stacked on top."
                 )
 
-    # TODO(mc, 2022-12-09): enforce data integrity (e.g. one labware per slot)
-    # rather than shunting this work to callers via `allowed_ids`.
-    # This has larger implications and is tied up in splitting LPC out of the protocol run
     def get_by_slot(
-        self, slot_name: DeckSlotName, allowed_ids: Set[str]
+        self,
+        slot_name: Union[DeckSlotName, StagingSlotName],
     ) -> Optional[LoadedLabware]:
         """Get the labware located in a given slot, if any."""
-        loaded_labware = reversed(list(self._state.labware_by_id.values()))
+        loaded_labware = list(self._state.labware_by_id.values())
 
         for labware in loaded_labware:
             if (
                 isinstance(labware.location, DeckSlotLocation)
-                and labware.location.slotName == slot_name
-                and labware.id in allowed_ids
+                and labware.location.slotName.id == slot_name.id
+            ) or (
+                isinstance(labware.location, AddressableAreaLocation)
+                and labware.location.addressableAreaName == slot_name.id
             ):
                 return labware
 
@@ -300,43 +309,24 @@ class LabwareView(HasState[LabwareState]):
             LabwareUri(self.get(labware_id).definitionUri)
         )
 
-    def get_display_name(self, labware_id: str) -> Optional[str]:
+    def get_user_specified_display_name(self, labware_id: str) -> Optional[str]:
         """Get the labware's user-specified display name, if set."""
         return self.get(labware_id).displayName
 
-    def get_deck_definition(self) -> DeckDefinitionV3:
+    def get_display_name(self, labware_id: str) -> str:
+        """Get the labware's display name.
+
+        If a user-specified display name exists, will return that, else will return
+        display name from the definition.
+        """
+        return (
+            self.get_user_specified_display_name(labware_id)
+            or self.get_definition(labware_id).metadata.displayName
+        )
+
+    def get_deck_definition(self) -> DeckDefinitionV4:
         """Get the current deck definition."""
         return self._state.deck_definition
-
-    def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV3:
-        """Get the definition of a slot in the deck."""
-        deck_def = self.get_deck_definition()
-
-        for slot_def in deck_def["locations"]["orderedSlots"]:
-            if slot_def["id"] == slot.id:
-                return slot_def
-
-        raise errors.SlotDoesNotExistError(
-            f"Slot ID {slot.id} does not exist in deck {deck_def['otId']}"
-        )
-
-    def get_slot_position(self, slot: DeckSlotName) -> Point:
-        """Get the position of a deck slot."""
-        slot_def = self.get_slot_definition(slot)
-        position = slot_def["position"]
-
-        return Point(x=position[0], y=position[1], z=position[2])
-
-    def get_slot_center_position(self, slot: DeckSlotName) -> Point:
-        """Get the (x, y, z) position of the center of the slot."""
-        slot_def = self.get_slot_definition(slot)
-        position = slot_def["position"]
-
-        return Point(
-            x=position[0] + slot_def["boundingBox"]["xDimension"] / 2,
-            y=position[1] + slot_def["boundingBox"]["yDimension"] / 2,
-            z=position[2] + slot_def["boundingBox"]["zDimension"] / 2,
-        )
 
     def get_definition_by_uri(self, uri: LabwareUri) -> LabwareDefinition:
         """Get the labware definition matching loadName namespace and version."""
@@ -390,6 +380,28 @@ class LabwareView(HasState[LabwareState]):
         """Get a labware's quirks."""
         definition = self.get_definition(labware_id)
         return definition.parameters.quirks or []
+
+    def get_should_center_column_on_target_well(self, labware_id: str) -> bool:
+        """True if a pipette moving to this labware should center its active column on the target.
+
+        This is true for labware that have wells spanning entire columns.
+        """
+        has_quirk = self.get_has_quirk(labware_id, "centerMultichannelOnWells")
+        return has_quirk and (
+            len(self.get_definition(labware_id).wells) > 1
+            and len(self.get_definition(labware_id).wells) < 96
+        )
+
+    def get_should_center_pipette_on_target_well(self, labware_id: str) -> bool:
+        """True if a pipette moving to a well of this labware should center its body on the target.
+
+        This is true for 1-well reservoirs no matter the pipette, and for large plates.
+        """
+        has_quirk = self.get_has_quirk(labware_id, "centerMultichannelOnWells")
+        return has_quirk and (
+            len(self.get_definition(labware_id).wells) == 1
+            or len(self.get_definition(labware_id).wells) >= 96
+        )
 
     def get_well_definition(
         self,
@@ -560,10 +572,25 @@ class LabwareView(HasState[LabwareState]):
         """Get the labware's overlap with requested module model."""
         definition = self.get_definition(labware_id)
         stacking_overlap = definition.stackingOffsetWithModule.get(
-            str(module_model.value), OverlapOffset(x=0, y=0, z=0)
+            str(module_model.value)
         )
+        if not stacking_overlap:
+            if self._is_thermocycler_on_ot2(module_model):
+                return OverlapOffset(x=0, y=0, z=10.7)
+            else:
+                return OverlapOffset(x=0, y=0, z=0)
+
         return OverlapOffset(
             x=stacking_overlap.x, y=stacking_overlap.y, z=stacking_overlap.z
+        )
+
+    def _is_thermocycler_on_ot2(self, module_model: ModuleModel) -> bool:
+        """Whether the given module is a thermocycler with the current deck being an OT2 deck."""
+        robot_model = self.get_deck_definition()["robot"]["model"]
+        return (
+            module_model
+            in [ModuleModel.THERMOCYCLER_MODULE_V1, ModuleModel.THERMOCYCLER_MODULE_V2]
+            and robot_model == "OT-2 Standard"
         )
 
     def get_default_magnet_height(self, module_id: str, offset: float) -> float:
@@ -646,7 +673,7 @@ class LabwareView(HasState[LabwareState]):
 
         return None
 
-    def get_fixed_trash_id(self) -> str:
+    def get_fixed_trash_id(self) -> Optional[str]:
         """Get the identifier of labware loaded into the fixed trash location.
 
         Raises:
@@ -661,17 +688,34 @@ class LabwareView(HasState[LabwareState]):
                 DeckSlotName.SLOT_A3,
             }:
                 return labware.id
-
-        raise errors.LabwareNotLoadedError(
-            "No labware loaded into fixed trash location by this deck type."
-        )
+        return None
 
     def is_fixed_trash(self, labware_id: str) -> bool:
         """Check if labware is fixed trash."""
-        return self.get_fixed_trash_id() == labware_id
+        return self.get_has_quirk(labware_id, "fixedTrash")
+
+    def raise_if_labware_inaccessible_by_pipette(self, labware_id: str) -> None:
+        """Raise an error if the specified location cannot be reached via a pipette."""
+        labware = self.get(labware_id)
+        labware_location = labware.location
+        if isinstance(labware_location, OnLabwareLocation):
+            return self.raise_if_labware_inaccessible_by_pipette(
+                labware_location.labwareId
+            )
+        elif isinstance(labware_location, AddressableAreaLocation):
+            if fixture_validation.is_staging_slot(labware_location.addressableAreaName):
+                raise errors.LocationNotAccessibleByPipetteError(
+                    f"Cannot move pipette to {labware.loadName},"
+                    f" labware is on staging slot {labware_location.addressableAreaName}"
+                )
+        elif labware_location == OFF_DECK_LOCATION:
+            raise errors.LocationNotAccessibleByPipetteError(
+                f"Cannot move pipette to {labware.loadName}, labware is off-deck."
+            )
 
     def raise_if_labware_in_location(
-        self, location: Union[DeckSlotLocation, ModuleLocation]
+        self,
+        location: OnDeckLabwareLocation,
     ) -> None:
         """Raise an error if the specified location has labware in it."""
         for labware in self.get_all():
@@ -748,7 +792,16 @@ class LabwareView(HasState[LabwareState]):
         labware_id: str,
         slot_name: Optional[DeckSlotName],
     ) -> Optional[LabwareMovementOffsetData]:
-        """Get the labware's gripper offsets of the specified type."""
+        """Get the labware's gripper offsets of the specified type.
+
+        Returns:
+            If `slot_name` is provided, returns the gripper offsets that the labware definition
+            specifies just for that slot, or `None` if the labware definition doesn't have an
+            exact match.
+
+            If `slot_name` is `None`, returns the gripper offsets that the labware
+            definition designates as "default," or `None` if it doesn't designate any as such.
+        """
         parsed_offsets = self.get_definition(labware_id).gripperOffsets
         offset_key = slot_name.id if slot_name else "default"
 
@@ -779,3 +832,87 @@ class LabwareView(HasState[LabwareState]):
             if recommended_height is not None
             else self.get_dimensions(labware_id).z / 2
         )
+
+    @staticmethod
+    def _max_x_of_well(well_defn: WellDefinition) -> float:
+        if well_defn.shape == "rectangular":
+            return well_defn.x + (well_defn.xDimension or 0) / 2
+        elif well_defn.shape == "circular":
+            return well_defn.x + (well_defn.diameter or 0) / 2
+        else:
+            return well_defn.x
+
+    @staticmethod
+    def _min_x_of_well(well_defn: WellDefinition) -> float:
+        if well_defn.shape == "rectangular":
+            return well_defn.x - (well_defn.xDimension or 0) / 2
+        elif well_defn.shape == "circular":
+            return well_defn.x - (well_defn.diameter or 0) / 2
+        else:
+            return 0
+
+    @staticmethod
+    def _max_y_of_well(well_defn: WellDefinition) -> float:
+        if well_defn.shape == "rectangular":
+            return well_defn.y + (well_defn.yDimension or 0) / 2
+        elif well_defn.shape == "circular":
+            return well_defn.y + (well_defn.diameter or 0) / 2
+        else:
+            return 0
+
+    @staticmethod
+    def _min_y_of_well(well_defn: WellDefinition) -> float:
+        if well_defn.shape == "rectangular":
+            return well_defn.y - (well_defn.yDimension or 0) / 2
+        elif well_defn.shape == "circular":
+            return well_defn.y - (well_defn.diameter or 0) / 2
+        else:
+            return 0
+
+    @staticmethod
+    def _max_z_of_well(well_defn: WellDefinition) -> float:
+        return well_defn.z + well_defn.depth
+
+    def get_well_bbox(self, labware_id: str) -> Dimensions:
+        """Get the bounding box implied by the wells.
+
+        The bounding box of the labware that is implied by the wells is that required
+        to contain the bounds of the wells - the y-span from the min-y bound of the min-y
+        well to the max-y bound of the max-y well, x ditto, z from labware 0 to the max-z
+        well top.
+
+        This is used for the specific purpose of finding the reasonable uncertainty bounds of
+        where and how a gripper will interact with a labware.
+        """
+        defn = self.get_definition(labware_id)
+        max_x: Optional[float] = None
+        min_x: Optional[float] = None
+        max_y: Optional[float] = None
+        min_y: Optional[float] = None
+        max_z: Optional[float] = None
+
+        for well in defn.wells.values():
+            well_max_x = self._max_x_of_well(well)
+            well_min_x = self._min_x_of_well(well)
+            well_max_y = self._max_y_of_well(well)
+            well_min_y = self._min_y_of_well(well)
+            well_max_z = self._max_z_of_well(well)
+            if (max_x is None) or (well_max_x > max_x):
+                max_x = well_max_x
+            if (max_y is None) or (well_max_y > max_y):
+                max_y = well_max_y
+            if (min_x is None) or (well_min_x < min_x):
+                min_x = well_min_x
+            if (min_y is None) or (well_min_y < min_y):
+                min_y = well_min_y
+            if (max_z is None) or (well_max_z > max_z):
+                max_z = well_max_z
+        if (
+            max_x is None
+            or max_y is None
+            or min_x is None
+            or min_y is None
+            or max_z is None
+        ):
+            return Dimensions(0, 0, 0)
+        return Dimensions(max_x - min_x, max_y - min_y, max_z)

@@ -1,17 +1,22 @@
 // TODO: Ian 2018-10-09 figure out what belongs in LiquidsSidebar vs IngredientsList after #2427
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
 import { SingleLabwareLiquidState } from '@opentrons/step-generation'
 import { IconButton, SidePanel, truncateString } from '@opentrons/components'
 import { sortWells } from '@opentrons/shared-data'
-import { i18n } from '../../localization'
-import { selectors } from '../../labware-ingred/selectors'
+import * as wellSelectionSelectors from '../../top-selectors/well-contents'
+import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { PDTitledList, PDListItem } from '../lists'
 import { TitledListNotes } from '../TitledListNotes'
 import { swatchColors } from '../swatchColors'
-import { LabwareDetailsCard } from './LabwareDetailsCard'
-import { LiquidGroupsById, LiquidGroup } from '../../labware-ingred/types'
+import { LabwareDetailsCard } from './LabwareDetailsCard/LabwareDetailsCard'
+
 import styles from './IngredientsList.css'
+
+import type { SelectedContainerId } from '../../labware-ingred/reducers'
+import type { LiquidGroup } from '../../labware-ingred/types'
+import type { ThunkDispatch } from '../../types'
 
 type RemoveWellsContents = (args: {
   liquidGroupId: string
@@ -38,7 +43,7 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
     groupId,
     labwareWellContents,
   } = props
-
+  const { t } = useTranslation(['card', 'application'])
   const showName = ingredGroup.serialize
 
   const [expanded, setExpanded] = React.useState(true)
@@ -48,7 +53,9 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
   const wellsWithIngred = Object.keys(labwareWellContents)
     .sort(sortWells)
     .filter(well => labwareWellContents[well][groupId])
-  const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
+  const liquidDisplayColors = useSelector(
+    labwareIngredSelectors.getLiquidDisplayColors
+  )
 
   if (wellsWithIngred.length < 1) {
     // do not show liquid card if it has no instances for this labware
@@ -58,7 +65,7 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
     ingredGroup.name != null ? truncateString(ingredGroup.name, 25) : null
   return (
     <PDTitledList
-      title={truncatedName ?? i18n.t('card.unnamedLiquid')}
+      title={truncatedName ?? t('unnamedLiquid')}
       iconProps={{
         style: {
           fill: liquidDisplayColors[Number(groupId)] ?? swatchColors(groupId),
@@ -71,9 +78,9 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
       description={<TitledListNotes notes={ingredGroup.description} />}
     >
       <PDListItem className={styles.ingredient_row_header}>
-        <span>{i18n.t('card.well')}</span>
-        <span>{i18n.t('application.units.microliter')}</span>
-        {showName && <span>{i18n.t('card.name')}</span>}
+        <span>{t('well')}</span>
+        <span>{t('application:units.microliter')}</span>
+        {showName && <span>{t('name')}</span>}
         <span />
       </PDListItem>
 
@@ -125,22 +132,18 @@ function IngredIndividual(props: IndividProps): JSX.Element {
     groupId,
     removeWellsContents,
   } = props
-
+  const { t } = useTranslation('application')
   return (
     <PDListItem border hoverable>
       <span>{wellName}</span>
-      <span>
-        {volume ? volume + ` ${i18n.t('application.units.microliter')}` : '-'}
-      </span>
+      <span>{volume ? volume + ` ${t('units.microliter')}` : '-'}</span>
       {name && <span>{name}</span>}
       {canDelete && (
         <IconButton
           className={styles.close_icon}
           name="close"
           onClick={() =>
-            window.confirm(
-              `Are you sure you want to delete well ${wellName} ?`
-            ) &&
+            window.confirm(t('are_you_sure_delete_well', { well: wellName })) &&
             removeWellsContents({ liquidGroupId: groupId, wells: [wellName] })
           }
         />
@@ -149,28 +152,41 @@ function IngredIndividual(props: IndividProps): JSX.Element {
   )
 }
 
-type Props = CommonProps & {
-  liquidGroupsById: LiquidGroupsById
-  labwareWellContents: SingleLabwareLiquidState
-  selectedIngredientGroupId?: string | null
-}
+export function IngredientsList(): JSX.Element {
+  const selectedLabwareId = useSelector(
+    labwareIngredSelectors.getSelectedLabwareId
+  )
+  const allLabwareWellContents = useSelector(
+    labwareIngredSelectors.getLiquidsByLabwareId
+  )
 
-export function IngredientsList(props: Props): JSX.Element {
-  const {
-    labwareWellContents,
-    liquidGroupsById,
-    removeWellsContents,
-    selectedIngredientGroupId,
-  } = props
+  const liquidGroupsById = useSelector(
+    labwareIngredSelectors.getLiquidGroupsById
+  )
+  const selectedIngredientGroupId = useSelector(
+    wellSelectionSelectors.getSelectedWellsCommonIngredId
+  )
+  const { t } = useTranslation('nav')
+  const dispatch = useDispatch<ThunkDispatch<any>>()
 
+  const labwareWellContents =
+    (selectedLabwareId && allLabwareWellContents[selectedLabwareId]) || {}
+
+  const removeWellsContents = (
+    labwareId?: SelectedContainerId | null
+  ): void => {
+    if (labwareId != null) {
+      dispatch(removeWellsContents(selectedLabwareId))
+    }
+  }
   return (
-    <SidePanel title={i18n.t('nav.nameAndLiquids')}>
+    <SidePanel title={t('nameAndLiquids')}>
       <LabwareDetailsCard />
 
       {Object.keys(liquidGroupsById).map(groupIdForCard => (
         <LiquidGroupCard
           key={groupIdForCard}
-          removeWellsContents={removeWellsContents}
+          removeWellsContents={() => removeWellsContents(selectedLabwareId)}
           labwareWellContents={labwareWellContents}
           ingredGroup={liquidGroupsById[groupIdForCard]}
           groupId={groupIdForCard}

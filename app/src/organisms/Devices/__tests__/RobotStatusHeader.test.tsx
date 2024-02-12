@@ -4,7 +4,7 @@ import { when, resetAllWhenMocks } from 'jest-when'
 
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
-import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
+import { useProtocolQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
@@ -15,8 +15,9 @@ import {
   OPENTRONS_USB,
 } from '../../../redux/discovery'
 import { getNetworkInterfaces } from '../../../redux/networking'
-
+import { useIsFlex } from '../hooks'
 import { RobotStatusHeader } from '../RobotStatusHeader'
+import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
 
 import type { DiscoveryClientRobotAddress } from '../../../redux/discovery/types'
 import type { SimpleInterfaceStatus } from '../../../redux/networking/types'
@@ -28,6 +29,7 @@ jest.mock('../../../organisms/RunTimeControl/hooks')
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/networking')
 jest.mock('../hooks')
+jest.mock('../../../resources/runs/useNotifyRunQuery')
 
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
@@ -38,13 +40,16 @@ const mockUseCurrentRunStatus = useCurrentRunStatus as jest.MockedFunction<
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
 >
-const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
+const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
+  typeof useNotifyRunQuery
+>
 const mockGetNetworkInterfaces = getNetworkInterfaces as jest.MockedFunction<
   typeof getNetworkInterfaces
 >
 const mockGetRobotAddressesByName = getRobotAddressesByName as jest.MockedFunction<
   typeof getRobotAddressesByName
 >
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 
 const MOCK_OTIE = {
   name: 'otie',
@@ -77,10 +82,10 @@ describe('RobotStatusHeader', () => {
     props = MOCK_OTIE
     when(mockUseCurrentRunId).calledWith().mockReturnValue(null)
     when(mockUseCurrentRunStatus).calledWith().mockReturnValue(null)
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(null, { staleTime: Infinity })
       .mockReturnValue({} as any)
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith('fakeRunId', { staleTime: Infinity })
       .mockReturnValue({
         data: {
@@ -118,6 +123,7 @@ describe('RobotStatusHeader', () => {
           healthStatus: HEALTH_STATUS_OK,
         } as DiscoveryClientRobotAddress,
       ])
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -169,7 +175,7 @@ describe('RobotStatusHeader', () => {
 
     const [{ getByRole, getByText }] = render(props)
 
-    getByText('fake protocol name; Running')
+    getByText('fake protocol name; running')
 
     const runLink = getByRole('link', { name: 'Go to Run' })
     expect(runLink.getAttribute('href')).toEqual(
@@ -201,6 +207,19 @@ describe('RobotStatusHeader', () => {
     const [{ getByLabelText }] = render(props)
 
     getByLabelText('wifi')
+  })
+
+  it('renders a usb icon when OT-2 connected locally via USB-ethernet adapter', () => {
+    when(mockGetNetworkInterfaces)
+      .calledWith({} as State, 'otie')
+      .mockReturnValue({
+        wifi: null,
+        ethernet: { ipAddress: ETHERNET_IP } as SimpleInterfaceStatus,
+      })
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(false)
+    const [{ getByLabelText }] = render(props)
+
+    getByLabelText('usb')
   })
 
   it('renders a usb icon when only connected locally', () => {

@@ -9,13 +9,13 @@ from typing import (
     NamedTuple,
     Optional,
     Sequence,
-    Set,
     Type,
     TypeVar,
     Union,
     overload,
 )
-from numpy import array, dot
+from numpy import array, dot, double as npdouble
+from numpy.typing import NDArray
 
 from opentrons.hardware_control.modules.magdeck import (
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
@@ -35,6 +35,7 @@ from ..types import (
     LoadedModule,
     ModuleModel,
     ModuleOffsetVector,
+    ModuleOffsetData,
     ModuleType,
     ModuleDefinition,
     DeckSlotLocation,
@@ -42,7 +43,6 @@ from ..types import (
     LabwareOffsetVector,
     HeaterShakerLatchStatus,
     HeaterShakerMovementRestrictors,
-    ModuleLocation,
     DeckType,
     LabwareMovementOffsetData,
 )
@@ -144,7 +144,7 @@ class ModuleState:
     substate_by_module_id: Dict[str, ModuleSubStateType]
     """Information about each module that's specific to the module type."""
 
-    module_offset_by_serial: Dict[str, ModuleOffsetVector]
+    module_offset_by_serial: Dict[str, ModuleOffsetData]
     """Information about each modules offsets."""
 
 
@@ -154,7 +154,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     _state: ModuleState
 
     def __init__(
-        self, module_calibration_offsets: Optional[Dict[str, ModuleOffsetVector]] = None
+        self, module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None
     ) -> None:
         """Initialize a ModuleStore and its state."""
         self._state = ModuleState(
@@ -195,6 +195,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             self._update_module_calibration(
                 module_id=command.params.moduleId,
                 module_offset=command.result.moduleOffset,
+                location=command.result.location,
             )
 
         if isinstance(
@@ -289,7 +290,10 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             )
 
     def _update_module_calibration(
-        self, module_id: str, module_offset: ModuleOffsetVector
+        self,
+        module_id: str,
+        module_offset: ModuleOffsetVector,
+        location: DeckSlotLocation,
     ) -> None:
         module = self._state.hardware_by_module_id.get(module_id)
         if module:
@@ -297,7 +301,10 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             assert (
                 module_serial is not None
             ), "Expected a module SN and got None instead."
-            self._state.module_offset_by_serial[module_serial] = module_offset
+            self._state.module_offset_by_serial[module_serial] = ModuleOffsetData(
+                moduleOffsetVector=module_offset,
+                location=location,
+            )
 
     def _handle_heater_shaker_commands(
         self,
@@ -485,17 +492,15 @@ class ModuleView(HasState[ModuleState]):
         """Get a list of all module entries in state."""
         return [self.get(mod_id) for mod_id in self._state.slot_by_module_id.keys()]
 
-    # TODO(mc, 2022-12-09): enforce data integrity (e.g. one module per slot)
-    # rather than shunting this work to callers via `allowed_ids`.
-    # This has larger implications and is tied up in splitting LPC out of the protocol run
     def get_by_slot(
-        self, slot_name: DeckSlotName, allowed_ids: Set[str]
+        self,
+        slot_name: DeckSlotName,
     ) -> Optional[LoadedModule]:
         """Get the module located in a given slot, if any."""
         slots_by_id = reversed(list(self._state.slot_by_module_id.items()))
 
         for module_id, module_slot in slots_by_id:
-            if module_slot == slot_name and module_id in allowed_ids:
+            if module_slot == slot_name:
                 return self.get(module_id)
 
         return None
@@ -650,23 +655,14 @@ class ModuleView(HasState[ModuleState]):
         """Get the specified module's dimensions."""
         return self.get_definition(module_id).dimensions
 
-    def get_module_calibration_offset(self, module_id: str) -> ModuleOffsetVector:
-        """Get the stored module calibration offset."""
-        module_serial = self.get(module_id).serialNumber
-        if module_serial is not None:
-            offset = self._state.module_offset_by_serial.get(module_serial)
-            if offset:
-                return offset
-        return ModuleOffsetVector(x=0, y=0, z=0)
-
     def get_nominal_module_offset(
         self, module_id: str, deck_type: DeckType
     ) -> LabwareOffsetVector:
-        """Get the module's offset vector computed with slot transform."""
+        """Get the module's nominal offset vector computed with slot transform."""
         definition = self.get_definition(module_id)
         slot = self.get_location(module_id).slotName.id
 
-        pre_transform = array(
+        pre_transform: NDArray[npdouble] = array(
             (
                 definition.labwareOffset.x,
                 definition.labwareOffset.y,
@@ -681,27 +677,22 @@ class ModuleView(HasState[ModuleState]):
         xforms_ser_offset = xforms_ser["labwareOffset"]
 
         # Apply the slot transform, if any
-        xform = array(xforms_ser_offset)
-        xformed = dot(xform, pre_transform)  # type: ignore[no-untyped-call]
+        xform: NDArray[npdouble] = array(xforms_ser_offset)
+        xformed = dot(xform, pre_transform)
         return LabwareOffsetVector(
             x=xformed[0],
             y=xformed[1],
             z=xformed[2],
         )
 
-    def get_module_offset(
-        self, module_id: str, deck_type: DeckType
-    ) -> LabwareOffsetVector:
-        """Get the module's offset vector computed with slot transform and calibrated module offsets."""
-        offset_vector = self.get_nominal_module_offset(module_id, deck_type)
-
-        # add the calibrated module offset if there is one
-        cal_offset = self.get_module_calibration_offset(module_id)
-        return LabwareOffsetVector(
-            x=offset_vector.x + cal_offset.x,
-            y=offset_vector.y + cal_offset.y,
-            z=offset_vector.z + cal_offset.z,
-        )
+    def get_module_calibration_offset(
+        self, module_id: str
+    ) -> Optional[ModuleOffsetData]:
+        """Get the calibration module offset."""
+        module_serial = self.get(module_id).serialNumber
+        if module_serial:
+            return self._state.module_offset_by_serial.get(module_serial)
+        return None
 
     def get_overall_height(self, module_id: str) -> float:
         """Get the height of the module, excluding any labware loaded atop it."""
@@ -711,6 +702,41 @@ class ModuleView(HasState[ModuleState]):
     def get_height_over_labware(self, module_id: str) -> float:
         """Get the height of module parts above module labware base."""
         return self.get_dimensions(module_id).overLabwareHeight
+
+    def get_module_highest_z(self, module_id: str, deck_type: DeckType) -> float:
+        """Get the highest z point of the module, as placed on the robot.
+
+        The highest Z of a module, unlike the bare overall height, depends on
+        the robot it is on. We will calculate this value using the info we already have
+        about the transformation of the module's placement, based on the deck it is on.
+
+        This value is calculated as:
+        highest_z = ( nominal_robot_transformed_labware_offset_z
+                      + z_difference_between_default_labware_offset_point_and_overall_height
+                      + module_calibration_offset_z
+        )
+
+        For OT2, the default_labware_offset point is the same as nominal_robot_transformed_labware_offset_z
+        and hence the highest z will equal to the overall height of the module.
+
+        For Flex, since those two offsets are not the same, the final highest z will be
+        transformed the same amount as the labware offset point is.
+
+        Note: For thermocycler, the lid height is not taken into account.
+        """
+        module_height = self.get_overall_height(module_id)
+        default_lw_offset_point = self.get_definition(module_id).labwareOffset.z
+        z_difference = module_height - default_lw_offset_point
+
+        nominal_transformed_lw_offset_z = self.get_nominal_module_offset(
+            module_id=module_id, deck_type=deck_type
+        ).z
+        calibration_offset = self.get_module_calibration_offset(module_id)
+        return (
+            nominal_transformed_lw_offset_z
+            + z_difference
+            + (calibration_offset.moduleOffsetVector.z if calibration_offset else 0)
+        )
 
     # TODO(mc, 2022-01-19): this method is missing unit test coverage and
     # is also unused. Remove or add tests.
@@ -938,7 +964,8 @@ class ModuleView(HasState[ModuleState]):
         return hs_restrictors
 
     def raise_if_module_in_location(
-        self, location: Union[DeckSlotLocation, ModuleLocation]
+        self,
+        location: DeckSlotLocation,
     ) -> None:
         """Raise if the given location has a module in it."""
         for module in self.get_all():

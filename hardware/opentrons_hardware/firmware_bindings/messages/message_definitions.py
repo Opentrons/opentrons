@@ -641,6 +641,35 @@ class GripperJawStateResponse(BaseMessage):  # noqa: D101
 
 
 @dataclass
+class SetGripperJawHoldoffRequest(BaseMessage):  # noqa: D101
+    payload: payloads.GripperJawHoldoffPayload
+    payload_type: Type[
+        payloads.GripperJawHoldoffPayload
+    ] = payloads.GripperJawHoldoffPayload
+    message_id: Literal[
+        MessageId.set_gripper_jaw_holdoff_request
+    ] = MessageId.set_gripper_jaw_holdoff_request
+
+
+@dataclass
+class GripperJawHoldoffResponse(BaseMessage):  # noqa: D101
+    payload: payloads.GripperJawHoldoffPayload
+    payload_type: Type[
+        payloads.GripperJawHoldoffPayload
+    ] = payloads.GripperJawHoldoffPayload
+    message_id: Literal[
+        MessageId.gripper_jaw_holdoff_response
+    ] = MessageId.gripper_jaw_holdoff_response
+
+
+@dataclass
+class GripperJawHoldoffRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[
+        MessageId.gripper_jaw_holdoff_request
+    ] = MessageId.gripper_jaw_holdoff_request
+
+
+@dataclass
 class GripperGripRequest(BaseMessage):  # noqa: D101
     payload: payloads.GripperMoveRequestPayload
     payload_type: Type[
@@ -869,3 +898,82 @@ class GetMotorUsageResponse(BaseMessage):
     message_id: Literal[
         MessageId.get_motor_usage_response
     ] = MessageId.get_motor_usage_response
+
+
+@dataclass
+class HepaUVInfoResponse(BaseMessage):  # noqa: D101
+    payload: payloads.HepaUVInfoResponsePayload
+    payload_type: Type[
+        payloads.HepaUVInfoResponsePayload
+    ] = payloads.HepaUVInfoResponsePayload
+    message_id: Literal[MessageId.hepauv_info_response] = MessageId.hepauv_info_response
+
+
+@dataclass
+class SetHepaFanStateRequest(BaseMessage):
+    """Request to set the state and duty cycle of the hepa fan."""
+
+    payload: payloads.SetHepaFanStateRequestPayload
+    payload_type: Type[
+        payloads.SetHepaFanStateRequestPayload
+    ] = payloads.SetHepaFanStateRequestPayload
+    message_id: Literal[
+        MessageId.set_hepa_fan_state_request
+    ] = MessageId.set_hepa_fan_state_request
+
+
+@dataclass
+class GetHepaFanStateRequest(EmptyPayloadMessage):
+    """Request the Hepa/UV to send the state and duty cycle of the fan."""
+
+    message_id: Literal[
+        MessageId.get_hepa_fan_state_request
+    ] = MessageId.get_hepa_fan_state_request
+
+
+@dataclass
+class GetHepaFanStateResponse(BaseMessage):
+    """Hepa/UV response with the state and duty cycle of the fan."""
+
+    payload: payloads.GetHepaFanStatePayloadResponse
+    payload_type: Type[
+        payloads.GetHepaFanStatePayloadResponse
+    ] = payloads.GetHepaFanStatePayloadResponse
+    message_id: Literal[
+        MessageId.get_hepa_fan_state_response
+    ] = MessageId.get_hepa_fan_state_response
+
+
+@dataclass
+class SetHepaUVStateRequest(BaseMessage):
+    """Sets the state and timeout in seconds the UV light should stay on."""
+
+    payload: payloads.SetHepaUVStateRequestPayload
+    payload_type: Type[
+        payloads.SetHepaUVStateRequestPayload
+    ] = payloads.SetHepaUVStateRequestPayload
+    message_id: Literal[
+        MessageId.set_hepa_uv_state_request
+    ] = MessageId.set_hepa_uv_state_request
+
+
+@dataclass
+class GetHepaUVStateRequest(EmptyPayloadMessage):
+    """Request the Hepa/UV send the state and timeout in seconds for the UV light."""
+
+    message_id: Literal[
+        MessageId.get_hepa_uv_state_request
+    ] = MessageId.get_hepa_uv_state_request
+
+
+@dataclass
+class GetHepaUVStateResponse(BaseMessage):
+    """Response from the Hepa/UV state and timeout in seconds for the UV light."""
+
+    payload: payloads.GetHepaUVStatePayloadResponse
+    payload_type: Type[
+        payloads.GetHepaUVStatePayloadResponse
+    ] = payloads.GetHepaUVStatePayloadResponse
+    message_id: Literal[
+        MessageId.get_hepa_uv_state_response
+    ] = MessageId.get_hepa_uv_state_response

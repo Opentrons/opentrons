@@ -1,23 +1,27 @@
 import { UseQueryResult } from 'react-query'
-import {
-  useAllSessionsQuery,
-  useAllRunsQuery,
-  useEstopQuery,
-} from '@opentrons/react-api-client'
+
+import { useAllSessionsQuery, useEstopQuery } from '@opentrons/react-api-client'
+
 import {
   DISENGAGED,
   NOT_PRESENT,
   PHYSICALLY_ENGAGED,
 } from '../../../EmergencyStop'
-
 import { useIsRobotBusy } from '../useIsRobotBusy'
-import { useIsOT3 } from '../useIsOT3'
+import { useIsFlex } from '../useIsFlex'
+import { useNotifyCurrentMaintenanceRun } from '../../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
+import { useNotifyAllRunsQuery } from '../../../../resources/runs/useNotifyAllRunsQuery'
 
 import type { Sessions, Runs } from '@opentrons/api-client'
+import type { AxiosError } from 'axios'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../ProtocolUpload/hooks')
-jest.mock('../useIsOT3')
+jest.mock('../useIsFlex')
+jest.mock('../../../../resources/runs/useNotifyAllRunsQuery')
+jest.mock(
+  '../../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
+)
 
 const mockEstopStatus = {
   data: {
@@ -30,28 +34,34 @@ const mockEstopStatus = {
 const mockUseAllSessionsQuery = useAllSessionsQuery as jest.MockedFunction<
   typeof useAllSessionsQuery
 >
-const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
-  typeof useAllRunsQuery
+const mockUseNotifyAllRunsQuery = useNotifyAllRunsQuery as jest.MockedFunction<
+  typeof useNotifyAllRunsQuery
+>
+const mockUseNotifyCurrentMaintenanceRun = useNotifyCurrentMaintenanceRun as jest.MockedFunction<
+  typeof useNotifyCurrentMaintenanceRun
 >
 const mockUseEstopQuery = useEstopQuery as jest.MockedFunction<
   typeof useEstopQuery
 >
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 
 describe('useIsRobotBusy', () => {
   beforeEach(() => {
     mockUseAllSessionsQuery.mockReturnValue({
       data: {},
     } as UseQueryResult<Sessions, Error>)
-    mockUseAllRunsQuery.mockReturnValue({
+    mockUseNotifyAllRunsQuery.mockReturnValue({
       data: {
         links: {
           current: {},
         },
       },
-    } as UseQueryResult<Runs, Error>)
+    } as UseQueryResult<Runs, AxiosError>)
+    mockUseNotifyCurrentMaintenanceRun.mockReturnValue({
+      data: {},
+    } as any)
     mockUseEstopQuery.mockReturnValue({ data: mockEstopStatus } as any)
-    mockUseIsOT3.mockReturnValue(false)
+    mockUseIsFlex.mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -69,7 +79,7 @@ describe('useIsRobotBusy', () => {
   })
 
   it('returns false when current runId is null and sessions are empty', () => {
-    mockUseAllRunsQuery.mockReturnValue({
+    mockUseNotifyAllRunsQuery.mockReturnValue({
       data: {
         links: {
           current: null,
@@ -93,7 +103,7 @@ describe('useIsRobotBusy', () => {
   })
 
   it('returns false when Estop status is disengaged', () => {
-    mockUseAllRunsQuery.mockReturnValue({
+    mockUseNotifyAllRunsQuery.mockReturnValue({
       data: {
         links: {
           current: null,
@@ -117,8 +127,8 @@ describe('useIsRobotBusy', () => {
   })
 
   it('returns true when robot is a Flex and Estop status is engaged', () => {
-    mockUseIsOT3.mockReturnValue(true)
-    mockUseAllRunsQuery.mockReturnValue({
+    mockUseIsFlex.mockReturnValue(true)
+    mockUseNotifyAllRunsQuery.mockReturnValue({
       data: {
         links: {
           current: null,
@@ -148,8 +158,8 @@ describe('useIsRobotBusy', () => {
     expect(result).toBe(true)
   })
   it('returns false when robot is NOT a Flex and Estop status is engaged', () => {
-    mockUseIsOT3.mockReturnValue(false)
-    mockUseAllRunsQuery.mockReturnValue({
+    mockUseIsFlex.mockReturnValue(false)
+    mockUseNotifyAllRunsQuery.mockReturnValue({
       data: {
         links: {
           current: null,
@@ -179,15 +189,15 @@ describe('useIsRobotBusy', () => {
     expect(result).toBe(false)
   })
 
-  // TODO: kj 07/13/2022 This test is temporary pending but should be solved by another PR.
-  // it('should poll the run and sessions if poll option is true', async () => {
-  //   const result = useIsRobotBusy({ poll: true })
-  //   expect(result).toBe(true)
-
-  //   act(() => {
-  //     jest.advanceTimersByTime(30000)
-  //   })
-  //   expect(mockUseAllRunsQuery).toHaveBeenCalled()
-  //   expect(mockUseAllSessionsQuery).toHaveBeenCalled()
-  // })
+  it('returns true when a maintenance run exists', () => {
+    mockUseNotifyCurrentMaintenanceRun.mockReturnValue({
+      data: {
+        data: {
+          id: '123',
+        },
+      },
+    } as any)
+    const result = useIsRobotBusy()
+    expect(result).toBe(true)
+  })
 })

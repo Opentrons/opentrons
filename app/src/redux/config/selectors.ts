@@ -81,13 +81,6 @@ export const getIsOnDevice: (state: State) => boolean = createSelector(
   config => config?.isOnDevice ?? false
 )
 
-export const getSendAllProtocolsToOT3: (
-  state: State
-) => boolean = createSelector(
-  getConfig,
-  config => config?.protocols.sendAllProtocolsToOT3 ?? false
-)
-
 export const getProtocolsDesktopSortKey: (
   state: State
 ) => ProtocolSort | null = createSelector(
@@ -111,15 +104,22 @@ export const getPinnedProtocolIds: (
 
 export const getOnDeviceDisplaySettings: (
   state: State
-) => OnDeviceDisplaySettings = createSelector(
-  getConfig,
-  config =>
-    config?.onDeviceDisplaySettings ?? {
-      sleepMs: config?.onDeviceDisplaySettings?.sleepMs ?? SLEEP_NEVER_MS,
-      brightness: config?.onDeviceDisplaySettings?.brightness ?? 4,
-      textSize: config?.onDeviceDisplaySettings?.textSize ?? 1,
+) => OnDeviceDisplaySettings = createSelector(getConfig, config => {
+  if (config?.onDeviceDisplaySettings != null) {
+    return {
+      ...config.onDeviceDisplaySettings,
       unfinishedUnboxingFlowRoute:
-        config?.onDeviceDisplaySettings.unfinishedUnboxingFlowRoute ??
-        '/welcome',
+        // @ts-expect-error special casing 0 because there is no null type that gnu make can provide at build time
+        // see dev-shell-odd in app/Makefile (we provide 0 instead of null)
+        config.onDeviceDisplaySettings.unfinishedUnboxingFlowRoute !== 0
+          ? config?.onDeviceDisplaySettings.unfinishedUnboxingFlowRoute
+          : null,
     }
-)
+  }
+  return {
+    sleepMs: SLEEP_NEVER_MS,
+    brightness: 4,
+    textSize: 1,
+    unfinishedUnboxingFlowRoute: '/welcome',
+  }
+})

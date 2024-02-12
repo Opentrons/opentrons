@@ -7,7 +7,6 @@ import {
 
 export const SECTIONS = {
   BEFORE_BEGINNING: 'BEFORE_BEGINNING',
-  FIRMWARE_UPDATE: 'FIRMWARE_UPDATE',
   SELECT_LOCATION: 'SELECT_LOCATION',
   PLACE_ADAPTER: 'PLACE_ADAPTER',
   ATTACH_PROBE: 'ATTACH_PROBE',
@@ -25,8 +24,8 @@ export const SCREWDRIVER_LOADNAME = 'hex_screwdriver' as const
 export const FLEX_SLOT_NAMES_BY_MOD_TYPE: {
   [moduleType in ModuleType]?: string[]
 } = {
-  [HEATERSHAKER_MODULE_TYPE]: ['D1', 'C1', 'B1', 'A1', 'D3', 'C3', 'B3'],
-  [TEMPERATURE_MODULE_TYPE]: ['D1', 'C1', 'B1', 'A1', 'D3', 'C3', 'B3'],
-  [THERMOCYCLER_MODULE_TYPE]: ['A1'],
+  [HEATERSHAKER_MODULE_TYPE]: ['D1', 'C1', 'B1', 'A1', 'D3', 'C3', 'B3', 'A3'],
+  [TEMPERATURE_MODULE_TYPE]: ['D1', 'C1', 'B1', 'A1', 'D3', 'C3', 'B3', 'A3'],
+  [THERMOCYCLER_MODULE_TYPE]: ['B1'],
 }
 export const LEFT_SLOTS: string[] = ['A1', 'B1', 'C1', 'D1']

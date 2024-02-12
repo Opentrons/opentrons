@@ -12,7 +12,7 @@ import {
   Mount,
   useOnClickOutside,
 } from '@opentrons/components'
-import { isOT3Pipette, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
+import { isFlexPipette, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import {
   useDeleteCalibrationMutation,
   useAllPipetteOffsetCalibrationsQuery,
@@ -33,6 +33,7 @@ import {
 } from '../../../organisms/Devices/hooks'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
+import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { PipetteName } from '@opentrons/shared-data'
 import type { DeleteCalRequestParams } from '@opentrons/api-client'
@@ -82,7 +83,8 @@ export function OverflowMenu({
     showPipetteWizardFlows,
     setShowPipetteWizardFlows,
   ] = React.useState<boolean>(false)
-  const isFlexPipette = isOT3Pipette(pipetteName as PipetteName)
+  const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
+  const isPipetteForFlex = isFlexPipette(pipetteName as PipetteName)
   const ot3PipCal =
     useAttachedPipettesFromInstrumentsQuery()[mount]?.data?.calibratedOffset
       ?.last_modified ?? null
@@ -102,7 +104,7 @@ export function OverflowMenu({
     e.preventDefault()
     if (
       !isRunning &&
-      isFlexPipette &&
+      isPipetteForFlex &&
       calType === 'pipetteOffset' &&
       pipetteName != null
     ) {
@@ -174,6 +176,7 @@ export function OverflowMenu({
         alignSelf={ALIGN_FLEX_END}
         aria-label={`CalibrationOverflowMenu_button_${calType}`}
         onClick={handleOverflowClick}
+        disabled={isEstopNotDisengaged}
       />
       {showPipetteWizardFlows ? (
         <PipetteWizardFlows
@@ -199,7 +202,7 @@ export function OverflowMenu({
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
-          {isFlexPipette ? (
+          {isPipetteForFlex ? (
             <MenuItem onClick={handleRecalibrate}>
               {t(
                 ot3PipCal == null

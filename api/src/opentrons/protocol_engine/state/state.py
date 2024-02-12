@@ -4,15 +4,21 @@ from __future__ import annotations
 from dataclasses import dataclass
 from functools import partial
 from typing import Any, Callable, Dict, List, Optional, Sequence, TypeVar
-from opentrons.protocol_engine.types import ModuleOffsetVector
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
+
+from opentrons.protocol_engine.types import ModuleOffsetData
 
 from ..resources import DeckFixedLabware
 from ..actions import Action, ActionHandler
 from .abstract_store import HasState, HandlesActions
 from .change_notifier import ChangeNotifier
 from .commands import CommandState, CommandStore, CommandView
+from .addressable_areas import (
+    AddressableAreaState,
+    AddressableAreaStore,
+    AddressableAreaView,
+)
 from .labware import LabwareState, LabwareStore, LabwareView
 from .pipettes import PipetteState, PipetteStore, PipetteView
 from .modules import ModuleState, ModuleStore, ModuleView
@@ -22,6 +28,7 @@ from .geometry import GeometryView
 from .motion import MotionView
 from .config import Config
 from .state_summary import StateSummary
+from ..types import DeckConfigurationType
 
 ReturnT = TypeVar("ReturnT")
 
@@ -31,6 +38,7 @@ class State:
     """Underlying engine state."""
 
     commands: CommandState
+    addressable_areas: AddressableAreaState
     labware: LabwareState
     pipettes: PipetteState
     modules: ModuleState
@@ -43,6 +51,7 @@ class StateView(HasState[State]):
 
     _state: State
     _commands: CommandView
+    _addressable_areas: AddressableAreaView
     _labware: LabwareView
     _pipettes: PipetteView
     _modules: ModuleView
@@ -56,6 +65,11 @@ class StateView(HasState[State]):
     def commands(self) -> CommandView:
         """Get state view selectors for commands state."""
         return self._commands
+
+    @property
+    def addressable_areas(self) -> AddressableAreaView:
+        """Get state view selectors for addressable area state."""
+        return self._addressable_areas
 
     @property
     def labware(self) -> LabwareView:
@@ -100,6 +114,7 @@ class StateView(HasState[State]):
     def get_summary(self) -> StateSummary:
         """Get protocol run data."""
         error = self._commands.get_error()
+        # TODO maybe add summary here for AA
         return StateSummary.construct(
             status=self._commands.get_status(),
             errors=[] if error is None else [error],
@@ -125,11 +140,12 @@ class StateStore(StateView, ActionHandler):
         self,
         *,
         config: Config,
-        deck_definition: DeckDefinitionV3,
+        deck_definition: DeckDefinitionV4,
         deck_fixed_labware: Sequence[DeckFixedLabware],
         is_door_open: bool,
         change_notifier: Optional[ChangeNotifier] = None,
-        module_calibration_offsets: Optional[Dict[str, ModuleOffsetVector]] = None,
+        module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
+        deck_configuration: Optional[DeckConfigurationType] = None,
     ) -> None:
         """Initialize a StateStore and its substores.
 
@@ -142,9 +158,17 @@ class StateStore(StateView, ActionHandler):
             is_door_open: Whether the robot's door is currently open.
             change_notifier: Internal state change notifier.
             module_calibration_offsets: Module offsets to preload.
+            deck_configuration: The initial deck configuration the addressable area store will be instantiated with.
         """
         self._command_store = CommandStore(config=config, is_door_open=is_door_open)
         self._pipette_store = PipetteStore()
+        if deck_configuration is None:
+            deck_configuration = []
+        self._addressable_area_store = AddressableAreaStore(
+            deck_configuration=deck_configuration,
+            config=config,
+            deck_definition=deck_definition,
+        )
         self._labware_store = LabwareStore(
             deck_fixed_labware=deck_fixed_labware,
             deck_definition=deck_definition,
@@ -158,6 +182,7 @@ class StateStore(StateView, ActionHandler):
         self._substores: List[HandlesActions] = [
             self._command_store,
             self._pipette_store,
+            self._addressable_area_store,
             self._labware_store,
             self._module_store,
             self._liquid_store,
@@ -242,6 +267,7 @@ class StateStore(StateView, ActionHandler):
         """Get a new instance of the state value object."""
         return State(
             commands=self._command_store.state,
+            addressable_areas=self._addressable_area_store.state,
             labware=self._labware_store.state,
             pipettes=self._pipette_store.state,
             modules=self._module_store.state,
@@ -256,6 +282,7 @@ class StateStore(StateView, ActionHandler):
         # Base states
         self._state = state
         self._commands = CommandView(state.commands)
+        self._addressable_areas = AddressableAreaView(state.addressable_areas)
         self._labware = LabwareView(state.labware)
         self._pipettes = PipetteView(state.pipettes)
         self._modules = ModuleView(state.modules)
@@ -268,11 +295,13 @@ class StateStore(StateView, ActionHandler):
             labware_view=self._labware,
             module_view=self._modules,
             pipette_view=self._pipettes,
+            addressable_area_view=self._addressable_areas,
         )
         self._motion = MotionView(
             config=self._config,
             labware_view=self._labware,
             pipette_view=self._pipettes,
+            addressable_area_view=self._addressable_areas,
             geometry_view=self._geometry,
             module_view=self._modules,
         )
@@ -282,6 +311,7 @@ class StateStore(StateView, ActionHandler):
         next_state = self._get_next_state()
         self._state = next_state
         self._commands._state = next_state.commands
+        self._addressable_areas._state = next_state.addressable_areas
         self._labware._state = next_state.labware
         self._pipettes._state = next_state.pipettes
         self._modules._state = next_state.modules

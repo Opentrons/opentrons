@@ -8,13 +8,17 @@ from opentrons.calibration_storage import (
     get_robot_deck_attitude,
     save_robot_deck_attitude,
     get_custom_tiprack_definition_for_tlc,
-    load_tip_length_calibration,
-    save_tip_length_calibration,
-    create_tip_length_data,
-    get_pipette_offset,
-    save_pipette_calibration,
     mark_bad_calibration,
 )
+
+from opentrons.calibration_storage.ot2 import (
+    get_pipette_offset,
+    save_pipette_calibration,
+    load_tip_length_calibration,
+    create_tip_length_data,
+    save_tip_length_calibration,
+)
+
 from opentrons.calibration_storage.ot2 import models
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control import (
@@ -86,7 +90,7 @@ of the current calibration saved on a robot.
 """
 
 # TODO: BC 2020-07-08: type all command logic here with actual Model type
-COMMAND_HANDLER = Callable[..., Awaitable]
+COMMAND_HANDLER = Callable[..., Awaitable[None]]
 
 COMMAND_MAP = Dict[str, COMMAND_HANDLER]
 
@@ -340,6 +344,7 @@ class CheckCalibrationUserFlow:
         pipette_offsets = {
             m: get_pipette_offset(p.pipette_id, m)
             for m, p in self._filtered_hw_pips.items()
+            if p.pipette_id is not None
         }
         tip_lengths = {
             m: self._get_tip_length_from_pipette(m, p)
@@ -417,9 +422,11 @@ class CheckCalibrationUserFlow:
         mount: Optional[Mount] = None,
     ) -> models.v1.InstrumentOffsetModel:
         if not pipette or not mount:
-            pip_offset = get_pipette_offset(self.hw_pipette.pipette_id, self.mount)
+            pip_offset = get_pipette_offset(
+                self.hw_pipette.pipette_id or "", self.mount
+            )
         else:
-            pip_offset = get_pipette_offset(pipette.pipette_id, mount)
+            pip_offset = get_pipette_offset(pipette.pipette_id or "", mount)
         assert pip_offset, "No Pipette Offset Found"
         return pip_offset
 
@@ -545,7 +552,7 @@ class CheckCalibrationUserFlow:
                 tipRackUri=info_pip.tip_rack.uri,
                 rank=info_pip.rank.value,
                 mount=str(info_pip.mount),
-                serial=hw_pip.pipette_id,  # type: ignore[arg-type]
+                serial=hw_pip.pipette_id,
                 defaultTipracks=info_pip.default_tipracks,  # type: ignore[arg-type]
             )
             for hw_pip, info_pip in zip(hw_pips, info_pips)
@@ -568,7 +575,7 @@ class CheckCalibrationUserFlow:
             tipRackUri=self.active_pipette.tip_rack.uri,
             rank=self.active_pipette.rank.value,
             mount=str(self.mount),
-            serial=self.hw_pipette.pipette_id,  # type: ignore[arg-type]
+            serial=self.hw_pipette.pipette_id,
             defaultTipracks=(
                 self.active_pipette.default_tipracks  # type: ignore[arg-type]
             ),

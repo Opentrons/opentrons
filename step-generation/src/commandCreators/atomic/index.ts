@@ -1,32 +1,46 @@
 import { aspirate } from './aspirate'
-import { waitForTemperature } from './waitForTemperature'
+import { aspirateInPlace } from './aspirateInPlace'
 import { blowout } from './blowout'
+import { blowOutInPlace } from './blowOutInPlace'
+import { configureForVolume } from './configureForVolume'
+import { configureNozzleLayout } from './configureNozzleLayout'
 import { deactivateTemperature } from './deactivateTemperature'
 import { delay } from './delay'
 import { disengageMagnet } from './disengageMagnet'
 import { dispense } from './dispense'
-import { dropAllTips } from './dropAllTips'
+import { dispenseInPlace } from './dispenseInPlace'
 import { dropTip } from './dropTip'
+import { dropTipInPlace } from './dropTipInPlace'
 import { engageMagnet } from './engageMagnet'
+import { moveLabware } from './moveLabware'
+import { moveToAddressableArea } from './moveToAddressableArea'
+import { moveToAddressableAreaForDropTip } from './moveToAddressableAreaForDropTip'
+import { moveToWell } from './moveToWell'
 import { replaceTip } from './replaceTip'
 import { setTemperature } from './setTemperature'
 import { touchTip } from './touchTip'
-import { moveToWell } from './moveToWell'
-import { moveLabware } from './moveLabware'
+import { waitForTemperature } from './waitForTemperature'
 export {
   aspirate,
-  waitForTemperature,
+  aspirateInPlace,
   blowout,
+  blowOutInPlace,
+  configureForVolume,
+  configureNozzleLayout,
   deactivateTemperature,
   delay,
-  dispense,
   disengageMagnet,
-  dropAllTips,
+  dispense,
+  dispenseInPlace,
   dropTip,
+  dropTipInPlace,
   engageMagnet,
+  moveLabware,
+  moveToAddressableArea,
+  moveToAddressableAreaForDropTip,
+  moveToWell,
   replaceTip,
   setTemperature,
   touchTip,
-  moveToWell,
-  moveLabware,
+  waitForTemperature,
 }

@@ -68,10 +68,13 @@ class OutOfTipsError(Exception):
 
 class Well:
     """
-    The Well class represents a  single well in a :py:class:`Labware`
+    The Well class represents a single well in a :py:class:`Labware`. It provides parameters and functions for three major uses:
 
-    It provides functions to return positions used in operations on the well
-    such as :py:meth:`top`, :py:meth:`bottom`
+        - Calculating positions relative to the well. See :ref:`position-relative-labware` for details.
+
+        - Returning well measurements. See :ref:`new-labware-well-properties` for details.
+
+        - Specifying what liquid should be in the well at the beginning of a protocol. See :ref:`labeling-liquids` for details.
     """
 
     def __init__(self, parent: Labware, core: WellCore, api_version: APIVersion):
@@ -82,20 +85,22 @@ class Well:
         self._core = core
         self._api_version = api_version
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def api_version(self) -> APIVersion:
         return self._api_version
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def parent(self) -> Labware:
+        """The :py:class:`.Labware` object that the well is a part of."""
         return self._parent
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def has_tip(self) -> bool:
-        """If parent labware is a tip rack, whether this well contains a tip."""
+        """Whether this well contains a tip. Always ``False`` if the parent labware
+        isn't a tip rack."""
         return self._core.has_tip()
 
     @has_tip.setter
@@ -109,6 +114,10 @@ class Well:
 
     @property
     def max_volume(self) -> float:
+        """The maximum volume, in µL, that the well can hold.
+
+        This amount is set by the JSON labware definition, specifically the ``totalLiquidVolume`` property of the particular well.
+        """
         return self._core.get_max_volume()
 
     @property
@@ -117,97 +126,132 @@ class Well:
             return self._core.geometry
         raise APIVersionError("Well.geometry has been deprecated.")
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def diameter(self) -> Optional[float]:
+        """
+        The diameter, in mm, of a circular well. Returns ``None``
+        if the well is not circular.
+        """
         return self._core.diameter
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 9)
     def length(self) -> Optional[float]:
         """
-        The length of a well, if the labware has
-        square wells.
+        The length, in mm, of a rectangular well along the x-axis (left to right).
+        Returns ``None`` if the well is not rectangular.
         """
         return self._core.length
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 9)
     def width(self) -> Optional[float]:
         """
-        The width of a well, if the labware has
-        square wells.
+        The width, in mm, of a rectangular well along the y-axis (front to back).
+        Returns ``None`` if the well is not rectangular.
         """
         return self._core.width
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 9)
     def depth(self) -> float:
         """
-        The depth of a well in a labware.
+        The depth, in mm, of a well along the z-axis, from the very top of the well to
+        the very bottom.
         """
         return self._core.depth
 
     @property
     def display_name(self) -> str:
+        """A human-readable name for the well, including labware and deck location.
+
+        For example, "A1 of Corning 96 Well Plate 360 µL Flat on slot D1". Run log
+        entries use this format for identifying wells. See
+        :py:meth:`.ProtocolContext.commands`.
+        """
         return self._core.get_display_name()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 7)
     def well_name(self) -> str:
+        """A string representing the well's coordinates.
+
+        For example, "A1" or "H12".
+
+        The format of strings that this property returns is the same format as the key
+        for :ref:`accessing wells in a dictionary <well-dictionary-access>`.
+        """
         return self._core.get_name()
 
     @requires_version(2, 0)
     def top(self, z: float = 0.0) -> Location:
         """
-        :param z: the z distance in mm
-        :return: a Point corresponding to the absolute position of the
-                 top-center of the well relative to the deck (with the
-                 front-left corner of slot 1 as (0,0,0)). If z is specified,
-                 returns a point offset by z mm from top-center
+        :param z: An offset on the z-axis, in mm. Positive offsets are higher and
+            negative offsets are lower.
+
+        :return: A :py:class:`~opentrons.types.Location` corresponding to the
+            absolute position of the top-center of the well, plus the ``z`` offset
+            (if specified).
         """
         return Location(self._core.get_top(z_offset=z), self)
 
     @requires_version(2, 0)
     def bottom(self, z: float = 0.0) -> Location:
         """
-        :param z: the z distance in mm
-        :return: a Point corresponding to the absolute position of the
-                 bottom-center of the well (with the front-left corner of
-                 slot 1 as (0,0,0)). If z is specified, returns a point
-                 offset by z mm from bottom-center
+        :param z: An offset on the z-axis, in mm. Positive offsets are higher and
+            negative offsets are lower.
+
+        :return: A :py:class:`~opentrons.types.Location` corresponding to the
+            absolute position of the bottom-center of the well, plus the ``z`` offset
+            (if specified).
         """
         return Location(self._core.get_bottom(z_offset=z), self)
 
     @requires_version(2, 0)
     def center(self) -> Location:
         """
-        :return: a Point corresponding to the absolute position of the center
-                 of the well relative to the deck (with the front-left corner
-                 of slot 1 as (0,0,0))
+        :return: A :py:class:`~opentrons.types.Location` corresponding to the
+            absolute position of the center of the well (in all three dimensions).
         """
         return Location(self._core.get_center(), self)
 
     @requires_version(2, 8)
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:
         """
-        Specifies an arbitrary point in deck coordinates based
-        on percentages of the radius in each axis. For example, to specify the
-        back-right corner of a well at 1/4 of the well depth from the bottom,
-        the call would be ``from_center_cartesian(1, 1, -0.5)``.
+        Specifies a :py:class:`~opentrons.types.Point` based on fractions of the
+        distance from the center of the well to the edge along each axis.
 
-        No checks are performed to ensure that the resulting position will be
-        inside of the well.
+        For example, ``from_center_cartesian(0, 0, 0.5)`` specifies a point at the
+        well's center on the x- and y-axis, and half of the distance from the center of
+        the well to its top along the z-axis. To move the pipette to that location,
+        construct a :py:class:`~opentrons.types.Location` relative to the same well::
 
-        :param x: a float in the range [-1.0, 1.0] for a percentage of half of
-            the radius/length in the X axis
-        :param y: a float in the range [-1.0, 1.0] for a percentage of half of
-            the radius/width in the Y axis
-        :param z: a float in the range [-1.0, 1.0] for a percentage of half of
-            the height above/below the center
+            location = types.Location(
+                plate["A1"].from_center_cartesian(0, 0, 0.5), plate["A1"]
+            )
+            pipette.move_to(location)
 
-        :return: a :py:class:`opentrons.types.Point` representing the specified
-                 location in absolute deck coordinates
+        See :ref:`points-locations` for more information.
+
+        :param x: The fraction of the distance from the well's center to its edge
+            along the x-axis. Negative values are to the left, and positive values
+            are to the right.
+        :param y: The fraction of the distance from the well's center to its edge
+            along the y-axis. Negative values are to the front, and positive values
+            are to the back.
+        :param z: The fraction of the distance from the well's center to its edge
+            along the x-axis. Negative values are down, and positive values are up.
+
+        :return: A :py:class:`~opentrons.types.Point` representing the specified
+            position in absolute deck coordinates.
+
+        .. note:: Even if the absolute values of ``x``, ``y``, and ``z`` are all less
+            than 1, a location constructed from the well and the result of
+            ``from_center_cartesian`` may be outside of the physical well. For example,
+            ``from_center_cartesian(0.9, 0.9, 0)`` would be outside of a cylindrical
+            well, but inside a square well.
+
         """
         return self._core.from_center_cartesian(x, y, z)
 
@@ -323,7 +367,7 @@ class Labware:
         )
         return False
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def api_version(self) -> APIVersion:
         return self._api_version
@@ -331,35 +375,35 @@ class Labware:
     def __getitem__(self, key: str) -> Well:
         return self.wells_by_name()[key]
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def uri(self) -> str:
         """A string fully identifying the labware.
 
-        :returns: The uri, ``"namespace/loadname/version"``
+        :returns: The URI, ``"namespace/loadname/version"``
         """
         return self._core.get_uri()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def parent(self) -> Union[str, Labware, ModuleTypes, OffDeckType]:
         """The parent of this labware---where this labware is loaded.
 
         Returns:
-            If the labware is directly on the robot's deck, the `str` name of the deck slot,
+            If the labware is directly on the robot's deck, the ``str`` name of the deck slot,
             like ``"D1"`` (Flex) or ``"1"`` (OT-2). See :ref:`deck-slots`.
 
-            If the labware is on a module, a :py:class:`ModuleContext`.
+            If the labware is on a module, a module context.
 
             If the labware is on a labware or adapter, a :py:class:`Labware`.
 
             If the labware is off-deck, :py:obj:`OFF_DECK`.
 
         .. versionchanged:: 2.14
-            Return type for module parent changed to :py:class:`ModuleContext`.
-            Prior to this version, an internal geometry interface is returned.
+            Return type for module parent changed.
+            Prior to this version, an internal geometry interface was returned.
         .. versionchanged:: 2.15
-            Will return a :py:class:`Labware` if the labware was loaded onto a labware/adapter.
+            Will return a :py:class:`Labware` if the labware is loaded onto a labware/adapter.
             Will now return :py:obj:`OFF_DECK` if the labware is off-deck.
             Formerly, if the labware was removed by using ``del`` on :py:obj:`.deck`,
             this would return where it was before its removal.
@@ -377,7 +421,7 @@ class Labware:
 
         return labware_location
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def name(self) -> str:
         """Can either be the canonical name of the labware, which is used to
@@ -399,19 +443,19 @@ class Labware:
         assert isinstance(self._core, LegacyLabwareCore)
         cast(LegacyLabwareCore, self._core).set_name(new_name)
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def load_name(self) -> str:
-        """The API load name of the labware definition"""
+        """The API load name of the labware definition."""
         return self._core.load_name
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def parameters(self) -> "LabwareParameters":
-        """Internal properties of a labware including type and quirks"""
+        """Internal properties of a labware including type and quirks."""
         return self._core.get_parameters()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def quirks(self) -> List[str]:
         """Quirks specific to this labware."""
@@ -420,7 +464,7 @@ class Labware:
     # TODO(mm, 2023-02-08):
     # Specify units and origin after we resolve RSS-110.
     # Remove warning once we resolve RSS-109 more broadly.
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def magdeck_engage_height(self) -> Optional[float]:
         """Return the default magnet engage height that
@@ -445,7 +489,7 @@ class Labware:
         else:
             return p["magneticModuleEngageHeight"]
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 15)
     def child(self) -> Optional[Labware]:
         """The labware (if any) present on this labware."""
@@ -532,7 +576,7 @@ class Labware:
         (see :ref:`protocol-api-deck-coords`) that the motion system
         will add to any movement targeting this labware instance.
 
-        The offset will *not* apply to any other labware instances,
+        The offset *will not* apply to any other labware instances,
         even if those labware are of the same type.
 
         .. caution::
@@ -563,14 +607,14 @@ class Labware:
         else:
             self._core.set_calibration(Point(x=x, y=y, z=z))
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def calibrated_offset(self) -> Point:
         return self._core.get_calibrated_offset()
 
     @requires_version(2, 0)
     def well(self, idx: Union[int, str]) -> Well:
-        """Deprecated---use result of `wells` or `wells_by_name`"""
+        """Deprecated. Use result of :py:meth:`wells` or :py:meth:`wells_by_name`."""
         if isinstance(idx, int):
             return self.wells()[idx]
         elif isinstance(idx, str):
@@ -583,20 +627,16 @@ class Labware:
     @requires_version(2, 0)
     def wells(self, *args: Union[str, int]) -> List[Well]:
         """
-        Accessor function used to generate a list of wells in top -> down,
-        left -> right order. This is representative of moving down `rows` and
-        across `columns` (e.g. 'A1', 'B1', 'C1'...'A2', 'B2', 'C2')
+        Accessor function that generates a list of wells in a top down,
+        left to right order. This is representative of moving down rows and
+        across columns (i.e., A1, B1, C1…A2, B2, C2…).
 
         With indexing one can treat it as a typical python
-        list. To access well A1, for example, write: labware.wells()[0]
+        list. For example, access well A1 with ``labware.wells()[0]``.
 
-        Note that this method takes args for backward-compatibility, but use
-        of args is deprecated and will be removed in future versions. Args
-        can be either strings or integers, but must all be the same type (e.g.:
-        `self.wells(1, 4, 8)` or `self.wells('A1', 'B2')`, but
-        `self.wells('A1', 4)` is invalid.
+        Note that this method takes args for backward-compatibility. But using args is deprecated and will be removed in future versions. Args can be either strings or integers, but must all be the same type. For example, ``self.columns(1, 4, 8)`` or ``self.columns('1', '2')`` are valid, but ``self.columns('1', 4)`` is not.
 
-        :return: Ordered list of all wells in a labware
+        :return: Ordered list of all wells in a labware.
         """
         if not args:
             return list(self._wells_by_name.values())
@@ -618,13 +658,13 @@ class Labware:
     @requires_version(2, 0)
     def wells_by_name(self) -> Dict[str, Well]:
         """
-        Accessor function used to create a look-up table of Wells by name.
+        Accessor function used to create a look-up table of wells by name.
 
-        With indexing one can treat it as a typical python
-        dictionary whose keys are well names. To access well A1, for example,
-        write: labware.wells_by_name()['A1']
+        With indexing one can treat it as a typical Python
+        dictionary whose keys are well names. For example, access well A1
+        with ``labware.wells_by_name()['A1']``.
 
-        :return: Dictionary of well objects keyed by well name
+        :return: Dictionary of :py:class:`.Well` objects keyed by well name.
         """
         return dict(self._wells_by_name)
 
@@ -645,16 +685,12 @@ class Labware:
         Accessor function used to navigate through a labware by row.
 
         With indexing one can treat it as a typical python nested list.
-        To access row A for example, write: labware.rows()[0]. This
-        will output ['A1', 'A2', 'A3', 'A4'...]
+        For example, access row A with ``labware.rows()[0]``. This
+        will output ``['A1', 'A2', 'A3', 'A4'...]``.
 
-        Note that this method takes args for backward-compatibility, but use
-        of args is deprecated and will be removed in future versions. Args
-        can be either strings or integers, but must all be the same type (e.g.:
-        `self.rows(1, 4, 8)` or `self.rows('A', 'B')`, but  `self.rows('A', 4)`
-        is invalid.
+        Note that this method takes args for backward-compatibility. But using args is deprecated and will be removed in future versions. Args can be either strings or integers, but must all be the same type. For example, ``self.columns(1, 4, 8)`` or ``self.columns('1', '2')`` are valid, but ``self.columns('1', 4)`` is not.
 
-        :return: A list of row lists
+        :return: A list of row lists.
         """
         if not args:
             return [
@@ -682,10 +718,10 @@ class Labware:
         Accessor function used to navigate through a labware by row name.
 
         With indexing one can treat it as a typical python dictionary.
-        To access row A for example, write: labware.rows_by_name()['A']
-        This will output ['A1', 'A2', 'A3', 'A4'...].
+        For example, access row A with ``labware.rows_by_name()['A']``.
+        This will output ``['A1', 'A2', 'A3', 'A4'...]``.
 
-        :return: Dictionary of Well lists keyed by row name
+        :return: Dictionary of :py:class:`.Well` lists keyed by row name.
         """
         return {
             row_name: [self._wells_by_name[well_name] for well_name in row]
@@ -707,17 +743,15 @@ class Labware:
         Accessor function used to navigate through a labware by column.
 
         With indexing one can treat it as a typical python nested list.
-        To access row A for example,
-        write: labware.columns()[0]
-        This will output ['A1', 'B1', 'C1', 'D1'...].
+        For example, access row A with ``labware.columns()[0]``.
+        This will output ``['A1', 'B1', 'C1', 'D1'...]``.
 
-        Note that this method takes args for backward-compatibility, but use
-        of args is deprecated and will be removed in future versions. Args
-        can be either strings or integers, but must all be the same type (e.g.:
-        `self.columns(1, 4, 8)` or `self.columns('1', '2')`, but
-        `self.columns('1', 4)` is invalid.
+        Note that this method takes args for backward-compatibility. But using args is deprecated and will be removed in future versions. Args
+        can be either strings or integers, but must all be the same type. For example,
+        ``self.columns(1, 4, 8)`` or ``self.columns('1', '2')`` are valid, but
+        ``self.columns('1', 4)`` is not.
 
-        :return: A list of column lists
+        :return: A list of column lists.
         """
         if not args:
             return [
@@ -745,11 +779,10 @@ class Labware:
         Accessor function used to navigate through a labware by column name.
 
         With indexing one can treat it as a typical python dictionary.
-        To access row A for example,
-        write: labware.columns_by_name()['1']
-        This will output ['A1', 'B1', 'C1', 'D1'...].
+        For example, access row A with ``labware.columns_by_name()['1']``.
+        This will output ``['A1', 'B1', 'C1', 'D1'...]``.
 
-        :return: Dictionary of Well lists keyed by column name
+        :return: Dictionary of :py:class:`.Well` lists keyed by column name.
         """
         return {
             column_name: [self._wells_by_name[well_name] for well_name in column]
@@ -765,13 +798,13 @@ class Labware:
         _log.warning("columns_by_index is deprecated. Use columns_by_name instead.")
         return self.columns_by_name()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def highest_z(self) -> float:
         """
-        The z-coordinate of the tallest single point anywhere on the labware.
+        The z-coordinate of the highest single point anywhere on the labware.
 
-        This is drawn from the 'dimensions'/'zDimension' elements of the
+        This is taken from the ``zDimension`` property of the ``dimensions`` object in the
         labware definition and takes into account the calibration offset.
         """
         return self._core.highest_z
@@ -781,17 +814,17 @@ class Labware:
         """as is_tiprack but not subject to version checking for speed"""
         return self._core.is_tip_rack()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def is_tiprack(self) -> bool:
         return self._is_tiprack
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 15)
     def is_adapter(self) -> bool:
         return self._core.is_adapter()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def tip_length(self) -> float:
         return self._core.get_tip_length()
@@ -809,7 +842,7 @@ class Labware:
             raise APIVersionError("Labware.tip_length setter has been deprecated")
 
         # TODO(mc, 2023-02-06): this assert should be enough for mypy
-        # invvestigate if upgrading mypy allows the `cast` to be removed
+        # investigate if upgrading mypy allows the `cast` to be removed
         assert isinstance(self._core, LegacyLabwareCore)
         cast(LegacyLabwareCore, self._core).set_tip_length(length)
 
@@ -996,7 +1029,7 @@ def select_tiprack_from_list(
 
     if starting_point and starting_point.parent != first:
         raise TipSelectionError(
-            "The starting tip you selected " f"does not exist in {first}"
+            f"The starting tip you selected does not exist in {first}"
         )
     elif starting_point:
         first_well = starting_point

@@ -6,9 +6,10 @@ import json
 import textwrap
 import mock
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Generator, TextIO, cast
+from typing import TYPE_CHECKING, Any, Callable, Generator, List, TextIO, cast
 
 import pytest
+from _pytest.fixtures import SubRequest
 
 from opentrons_shared_data import get_shared_data_root, load_shared_data
 from opentrons_shared_data.pipette.dev_types import PipetteModel
@@ -21,6 +22,7 @@ from opentrons import execute, types
 from opentrons.hardware_control import Controller, api
 from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.util import entrypoint_util
 
 if TYPE_CHECKING:
     from tests.opentrons.conftest import Bundle, Protocol
@@ -30,13 +32,13 @@ HERE = Path(__file__).parent
 
 
 @pytest.fixture(params=[APIVersion(2, 0), ENGINE_CORE_API_VERSION])
-def api_version(request: pytest.FixtureRequest) -> APIVersion:
+def api_version(request: SubRequest) -> APIVersion:
     """Return an API version to test with.
 
     Newer API versions execute through Protocol Engine, and older API versions don't.
     The two codepaths are very different, so we need to test them both.
     """
-    return request.param  # type: ignore[attr-defined,no-any-return]
+    return cast(APIVersion, request.param)
 
 
 @pytest.fixture
@@ -59,23 +61,32 @@ def mock_get_attached_instr(  # noqa: D103
 
 
 @pytest.mark.parametrize(
-    ("protocol_file", "expect_run_log"),
+    ("protocol_file", "expected_entries"),
     [
-        ("testosaur_v2.py", True),
-        ("testosaur_v2_14.py", False),
-        # FIXME(mm, 2023-07-20): Support printing the run log when executing new protocols.
-        # Then, remove this expect_run_log parametrization (it should always be True).
-        pytest.param(
+        (
+            "testosaur_v2.py",
+            [
+                "Picking up tip from A1 of Opentrons OT-2 96 Tip Rack 1000 µL on 1",
+                "Aspirating 100.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on 2 at 500.0 uL/sec",
+                "Dispensing 100.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on 2 at 1000.0 uL/sec",
+                "Dropping tip into H12 of Opentrons OT-2 96 Tip Rack 1000 µL on 1",
+            ],
+        ),
+        (
             "testosaur_v2_14.py",
-            True,
-            marks=pytest.mark.xfail(strict=True, raises=NotImplementedError),
+            [
+                "Picking up tip from A1 of Opentrons OT-2 96 Tip Rack 1000 µL on slot 1",
+                "Aspirating 100.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on slot 2 at 500.0 uL/sec",
+                "Dispensing 100.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on slot 2 at 1000.0 uL/sec",
+                "Dropping tip into H12 of Opentrons OT-2 96 Tip Rack 1000 µL on slot 1",
+            ],
         ),
     ],
 )
 def test_execute_function_apiv2(
     protocol: Protocol,
     protocol_file: str,
-    expect_run_log: bool,
+    expected_entries: List[str],
     virtual_smoothie_env: None,
     mock_get_attached_instr: mock.AsyncMock,
 ) -> None:
@@ -109,21 +120,11 @@ def test_execute_function_apiv2(
         nonlocal entries
         entries.append(entry)
 
-    execute.execute(
-        protocol.filelike,
-        protocol.filename,
-        emit_runlog=(emit_runlog if expect_run_log else None),
-    )
+    execute.execute(protocol.filelike, protocol.filename, emit_runlog=emit_runlog)
 
-    if expect_run_log:
-        assert [
-            item["payload"]["text"] for item in entries if item["$"] == "before"
-        ] == [
-            "Picking up tip from A1 of Opentrons 96 Tip Rack 1000 µL on 1",
-            "Aspirating 100.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on 2 at 500.0 uL/sec",
-            "Dispensing 100.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on 2 at 1000.0 uL/sec",
-            "Dropping tip into H12 of Opentrons 96 Tip Rack 1000 µL on 1",
-        ]
+    assert [
+        item["payload"]["text"] for item in entries if item["$"] == "before"
+    ] == expected_entries
 
 
 def test_execute_function_json_v3(
@@ -273,17 +274,17 @@ def test_execute_function_bundle_apiv2(
     )
     assert [item["payload"]["text"] for item in entries if item["$"] == "before"] == [
         "Transferring 1.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1",
-        "Picking up tip from A1 of Opentrons 96 Tip Rack 10 µL on 3",
+        "Picking up tip from A1 of Opentrons OT-2 96 Tip Rack 10 µL on 3",
         "Aspirating 1.0 uL from A1 of FAKE example labware on 1 at" " 5.0 uL/sec",
         "Dispensing 1.0 uL into A4 of FAKE example labware on 1 at" " 10.0 uL/sec",
         "Dropping tip into A1 of Opentrons Fixed Trash on 12",
         "Transferring 2.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1",
-        "Picking up tip from B1 of Opentrons 96 Tip Rack 10 µL on 3",
+        "Picking up tip from B1 of Opentrons OT-2 96 Tip Rack 10 µL on 3",
         "Aspirating 2.0 uL from A1 of FAKE example labware on 1 at 5.0 uL/sec",
         "Dispensing 2.0 uL into A4 of FAKE example labware on 1 at" " 10.0 uL/sec",
         "Dropping tip into A1 of Opentrons Fixed Trash on 12",
         "Transferring 3.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1",
-        "Picking up tip from C1 of Opentrons 96 Tip Rack 10 µL on 3",
+        "Picking up tip from C1 of Opentrons OT-2 96 Tip Rack 10 µL on 3",
         "Aspirating 3.0 uL from A1 of FAKE example labware on 1 at 5.0 uL/sec",
         "Dispensing 3.0 uL into A4 of FAKE example labware on 1 at" " 10.0 uL/sec",
         "Dropping tip into A1 of Opentrons Fixed Trash on 12",
@@ -358,8 +359,12 @@ class TestExecutePythonLabware:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Putting labware in the Jupyter directory should make it available."""
-        monkeypatch.setattr(execute, "IS_ROBOT", True)
-        monkeypatch.setattr(execute, "JUPYTER_NOTEBOOK_LABWARE_DIR", self.LW_DIR)
+        # TODO(mm, 2023-10-06): This is monkeypatching a dependency of a dependency,
+        # which is too deep.
+        monkeypatch.setattr(entrypoint_util, "IS_ROBOT", True)
+        monkeypatch.setattr(
+            entrypoint_util, "JUPYTER_NOTEBOOK_LABWARE_DIR", self.LW_DIR
+        )
         execute.execute(protocol_file=protocol_filelike, protocol_name=protocol_name)
 
     @pytest.mark.xfail(
@@ -372,8 +377,12 @@ class TestExecutePythonLabware:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Passing any custom_labware_paths should prevent searching the Jupyter directory."""
-        monkeypatch.setattr(execute, "IS_ROBOT", True)
-        monkeypatch.setattr(execute, "JUPYTER_NOTEBOOK_LABWARE_DIR", self.LW_DIR)
+        # TODO(mm, 2023-10-06): This is monkeypatching a dependency of a dependency,
+        # which is too deep.
+        monkeypatch.setattr(entrypoint_util, "IS_ROBOT", True)
+        monkeypatch.setattr(
+            entrypoint_util, "JUPYTER_NOTEBOOK_LABWARE_DIR", self.LW_DIR
+        )
         with pytest.raises(Exception, match="Labware .+ not found"):
             execute.execute(
                 protocol_file=protocol_filelike,
@@ -388,9 +397,11 @@ class TestExecutePythonLabware:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """It should tolerate the Jupyter labware directory not existing on the filesystem."""
-        monkeypatch.setattr(execute, "IS_ROBOT", True)
+        # TODO(mm, 2023-10-06): This is monkeypatching a dependency of a dependency,
+        # which is too deep.
+        monkeypatch.setattr(entrypoint_util, "IS_ROBOT", True)
         monkeypatch.setattr(
-            execute, "JUPYTER_NOTEBOOK_LABWARE_DIR", HERE / "nosuchdirectory"
+            entrypoint_util, "JUPYTER_NOTEBOOK_LABWARE_DIR", HERE / "nosuchdirectory"
         )
         with pytest.raises(Exception, match="Labware .+ not found"):
             execute.execute(
@@ -436,9 +447,11 @@ class TestGetProtocolAPILabware:
         self, api_version: APIVersion, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Putting labware in the Jupyter directory should make it available."""
-        monkeypatch.setattr(execute, "IS_ROBOT", True)
+        # TODO(mm, 2023-10-06): This is monkeypatching a dependency of a dependency,
+        # which is too deep.
+        monkeypatch.setattr(entrypoint_util, "IS_ROBOT", True)
         monkeypatch.setattr(
-            execute,
+            entrypoint_util,
             "JUPYTER_NOTEBOOK_LABWARE_DIR",
             get_shared_data_root() / self.LW_FIXTURE_DIR,
         )
@@ -447,20 +460,19 @@ class TestGetProtocolAPILabware:
             load_name=self.LW_LOAD_NAME, location=1, namespace=self.LW_NAMESPACE
         )
 
-    @pytest.mark.xfail(
-        strict=True, raises=pytest.fail.Exception
-    )  # TODO(mm, 2023-07-14): Fix this bug.
     def test_jupyter_override(
         self, api_version: APIVersion, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Passing any extra_labware should prevent searching the Jupyter directory."""
-        monkeypatch.setattr(execute, "IS_ROBOT", True)
+        # TODO(mm, 2023-10-06): This is monkeypatching a dependency of a dependency,
+        # which is too deep.
+        monkeypatch.setattr(entrypoint_util, "IS_ROBOT", True)
         monkeypatch.setattr(
-            execute,
+            entrypoint_util,
             "JUPYTER_NOTEBOOK_LABWARE_DIR",
             get_shared_data_root() / self.LW_FIXTURE_DIR,
         )
-        context = execute.get_protocol_api(api_version)
+        context = execute.get_protocol_api(api_version, extra_labware={})
         with pytest.raises(Exception, match="Labware .+ not found"):
             context.load_labware(
                 load_name=self.LW_LOAD_NAME, location=1, namespace=self.LW_NAMESPACE
@@ -470,8 +482,11 @@ class TestGetProtocolAPILabware:
         self, api_version: APIVersion, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """It should tolerate the Jupyter labware directory not existing on the filesystem."""
+        # TODO(mm, 2023-10-06): This is monkeypatching a dependency of a dependency,
+        # which is too deep.
+        monkeypatch.setattr(entrypoint_util, "IS_ROBOT", True)
         monkeypatch.setattr(
-            execute, "JUPYTER_NOTEBOOK_LABWARE_DIR", HERE / "nosuchdirectory"
+            entrypoint_util, "JUPYTER_NOTEBOOK_LABWARE_DIR", HERE / "nosuchdirectory"
         )
         with_nonexistent_jupyter_extra_labware = execute.get_protocol_api(api_version)
         with pytest.raises(Exception, match="Labware .+ not found"):

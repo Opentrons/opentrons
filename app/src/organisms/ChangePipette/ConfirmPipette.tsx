@@ -13,10 +13,11 @@ import { CheckPipettesButton } from './CheckPipettesButton'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { LevelPipette } from './LevelPipette'
 
-import type {
+import {
   PipetteNameSpecs,
   PipetteModelSpecs,
   PipetteDisplayCategory,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import type { PipetteOffsetCalibration } from '../../redux/calibration/types'
 import type { Mount } from '../../redux/pipettes/types'
@@ -110,7 +111,8 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
   return !confirmPipetteLevel &&
     (wrongWantedPipette != null || (props.wantedPipette != null && success)) &&
     actualPipette != null &&
-    actualPipette.channels === 8 ? (
+    actualPipette.channels === 8 &&
+    actualPipette.displayCategory === 'GEN2' ? (
     <LevelPipette
       mount={mount}
       pipetteModelName={actualPipette.name}
@@ -123,12 +125,13 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
     <SimpleWizardBody
       iconColor={
         success || wrongWantedPipette || confirmPipetteLevel
-          ? COLORS.successEnabled
-          : COLORS.errorEnabled
+          ? COLORS.green50
+          : COLORS.red50
       }
       header={header}
       subHeader={subHeader}
       isSuccess={success || isWrongWantedPipette || confirmPipetteLevel}
+      robotType={OT2_ROBOT_TYPE}
     >
       <>
         {!success && !wrongWantedPipette && !confirmPipetteLevel && (

@@ -15,16 +15,12 @@ import { InProgressModal } from '../../../molecules/InProgressModal/InProgressMo
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { FLOWS } from '../constants'
 import { DetachPipette } from '../DetachPipette'
-import { CheckPipetteButton } from '../CheckPipetteButton'
 
 jest.mock('../CheckPipetteButton')
 jest.mock('../../../molecules/InProgressModal/InProgressModal')
 
 const mockInProgressModal = InProgressModal as jest.MockedFunction<
   typeof InProgressModal
->
-const mockCheckPipetteButton = CheckPipetteButton as jest.MockedFunction<
-  typeof CheckPipetteButton
 >
 const render = (props: React.ComponentProps<typeof DetachPipette>) => {
   return renderWithProviders(<DetachPipette {...props} />, {
@@ -52,7 +48,6 @@ describe('DetachPipette', () => {
       isOnDevice: false,
     }
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
-    mockCheckPipetteButton.mockReturnValue(<div>mock check pipette button</div>)
   })
   it('returns the correct information, buttons work as expected for single mount pipettes', () => {
     const { getByText, getByTestId, getByLabelText } = render(props)
@@ -61,7 +56,7 @@ describe('DetachPipette', () => {
       'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )
     getByTestId('Pipette_Detach_1_L.webm')
-    getByText('mock check pipette button')
+    getByText('Continue')
     const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
@@ -90,7 +85,7 @@ describe('DetachPipette', () => {
       'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )
     getByTestId('Pipette_Detach_96.webm')
-    getByText('mock check pipette button')
+    getByText('Continue')
     const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
@@ -118,8 +113,8 @@ describe('DetachPipette', () => {
       'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )
     getByTestId('Pipette_Detach_1_L.webm')
-    getByText('mock check pipette button')
-    getByLabelText('back').click()
+    getByText('Continue')
+    fireEvent.click(getByLabelText('back'))
     expect(props.goBack).toHaveBeenCalled()
   })
 })

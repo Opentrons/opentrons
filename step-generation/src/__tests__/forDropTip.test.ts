@@ -3,8 +3,8 @@ import {
   makeContext,
   makeState,
   DEFAULT_PIPETTE,
+  SOURCE_LABWARE,
 } from '../fixtures'
-import { FIXED_TRASH_ID } from '../constants'
 import { makeImmutableStateUpdater } from '../__utils__'
 import { forDropTip as _forDropTip } from '../getNextRobotStateAndWarnings/forDropTip'
 import { InvariantContext, RobotState } from '../types'
@@ -41,7 +41,7 @@ describe('dropTip', () => {
       })
       const params = {
         pipetteId: DEFAULT_PIPETTE,
-        labwareId: FIXED_TRASH_ID,
+        labwareId: SOURCE_LABWARE,
         wellName: 'A1',
       }
       const result = forDropTip(params, invariantContext, prevRobotState)
@@ -64,7 +64,7 @@ describe('dropTip', () => {
       })
       const params = {
         pipetteId: 'p300MultiId',
-        labwareId: FIXED_TRASH_ID,
+        labwareId: SOURCE_LABWARE,
         wellName: 'A1',
       }
       const result = forDropTip(params, invariantContext, prevRobotState)
@@ -85,7 +85,7 @@ describe('dropTip', () => {
       })
       const params = {
         pipetteId: 'p300MultiId',
-        labwareId: FIXED_TRASH_ID,
+        labwareId: SOURCE_LABWARE,
         wellName: 'A1',
       }
       prevRobotState.liquidState.pipettes.p300MultiId['0'] = {
@@ -107,7 +107,7 @@ describe('dropTip', () => {
               },
             },
             labware: {
-              [FIXED_TRASH_ID]: {
+              [SOURCE_LABWARE]: {
                 A1: {
                   ingred1: {
                     volume: 150,

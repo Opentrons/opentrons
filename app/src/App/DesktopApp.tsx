@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Redirect, Route, Switch, useRouteMatch } from 'react-router-dom'
+import { ErrorBoundary } from 'react-error-boundary'
 
 import {
   Box,
@@ -8,6 +9,7 @@ import {
   POSITION_RELATIVE,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
+import NiceModal from '@ebay/nice-modal-react'
 
 import { Alerts } from '../organisms/Alerts'
 import { Breadcrumbs } from '../organisms/Breadcrumbs'
@@ -26,8 +28,9 @@ import { Navbar } from './Navbar'
 import { EstopTakeover, EmergencyStopContext } from '../organisms/EmergencyStop'
 import { OPENTRONS_USB } from '../redux/discovery'
 import { appShellRequestor } from '../redux/shell/remote'
-import { useRobot, useIsOT3 } from '../organisms/Devices/hooks'
+import { useRobot, useIsFlex } from '../organisms/Devices/hooks'
 import { PortalRoot as ModalPortalRoot } from './portal'
+import { DesktopAppFallback } from './DesktopAppFallback'
 
 import type { RouteProps, DesktopRouteParams } from './types'
 
@@ -97,43 +100,47 @@ export const DesktopApp = (): JSX.Element => {
   ]
 
   return (
-    <>
-      <Navbar routes={desktopRoutes} />
-      <ToasterOven>
-        <EmergencyStopContext.Provider
-          value={{
-            isEmergencyStopModalDismissed,
-            setIsEmergencyStopModalDismissed,
-          }}
-        >
-          <Box width="100%">
-            <Alerts>
-              <Switch>
-                {desktopRoutes.map(({ Component, exact, path }: RouteProps) => {
-                  return (
-                    <Route key={path} exact={exact} path={path}>
-                      <Breadcrumbs />
-                      <Box
-                        position={POSITION_RELATIVE}
-                        width="100%"
-                        height="100%"
-                        backgroundColor={COLORS.fundamentalsBackground}
-                        overflow={OVERFLOW_AUTO}
-                      >
-                        <ModalPortalRoot />
-                        <Component />
-                      </Box>
-                    </Route>
-                  )
-                })}
-                <Redirect exact from="/" to="/protocols" />
-              </Switch>
-              <RobotControlTakeover />
-            </Alerts>
-          </Box>
-        </EmergencyStopContext.Provider>
-      </ToasterOven>
-    </>
+    <NiceModal.Provider>
+      <ErrorBoundary FallbackComponent={DesktopAppFallback}>
+        <Navbar routes={desktopRoutes} />
+        <ToasterOven>
+          <EmergencyStopContext.Provider
+            value={{
+              isEmergencyStopModalDismissed,
+              setIsEmergencyStopModalDismissed,
+            }}
+          >
+            <Box width="100%">
+              <Alerts>
+                <Switch>
+                  {desktopRoutes.map(
+                    ({ Component, exact, path }: RouteProps) => {
+                      return (
+                        <Route key={path} exact={exact} path={path}>
+                          <Breadcrumbs />
+                          <Box
+                            position={POSITION_RELATIVE}
+                            width="100%"
+                            height="100%"
+                            backgroundColor={COLORS.grey10}
+                            overflow={OVERFLOW_AUTO}
+                          >
+                            <ModalPortalRoot />
+                            <Component />
+                          </Box>
+                        </Route>
+                      )
+                    }
+                  )}
+                  <Redirect exact from="/" to="/protocols" />
+                </Switch>
+                <RobotControlTakeover />
+              </Alerts>
+            </Box>
+          </EmergencyStopContext.Provider>
+        </ToasterOven>
+      </ErrorBoundary>
+    </NiceModal.Provider>
   )
 }
 
@@ -142,10 +149,10 @@ function RobotControlTakeover(): JSX.Element | null {
   const params = deviceRouteMatch?.params as DesktopRouteParams
   const robotName = params?.robotName
   const robot = useRobot(robotName)
-  const isOT3 = useIsOT3(robotName)
+  const isFlex = useIsFlex(robotName)
 
   // E-stop is not supported on OT2
-  if (!isOT3) return null
+  if (!isFlex) return null
 
   if (deviceRouteMatch == null || robot == null || robotName == null)
     return null

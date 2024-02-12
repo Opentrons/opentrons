@@ -13,26 +13,15 @@ from opentrons.hardware_control.types import (
     GripperJawState,
     GripperProbe,
 )
-from opentrons.hardware_control.errors import (
-    InvalidMoveError,
-    GripperNotAttachedError,
+from opentrons.hardware_control.errors import InvalidCriticalPoint
+from opentrons_shared_data.errors.exceptions import (
+    GripperNotPresentError,
+    CommandPreconditionViolated,
 )
 from .gripper import Gripper
 
 
 MOD_LOG = logging.getLogger(__name__)
-
-
-class GripError(Exception):
-    """An error raised if a gripper action is blocked"""
-
-    pass
-
-
-class CalibrationError(Exception):
-    """An error raised if a gripper calibration is blocked"""
-
-    pass
 
 
 class GripperHandler:
@@ -48,8 +37,8 @@ class GripperHandler:
     def get_gripper(self) -> Gripper:
         gripper = self._gripper
         if not gripper:
-            raise GripperNotAttachedError(
-                "Cannot perform action without gripper attached"
+            raise GripperNotPresentError(
+                message="Cannot perform action without gripper attached"
             )
         return gripper
 
@@ -94,9 +83,13 @@ class GripperHandler:
 
     def get_critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
         if not self._gripper:
-            raise GripperNotAttachedError()
+            raise GripperNotPresentError()
         if cp_override == CriticalPoint.MOUNT:
-            raise InvalidMoveError("The gripper mount may not be moved directly.")
+            raise InvalidCriticalPoint(
+                cp_override.name,
+                "gripper",
+                "The gripper mount may not be moved directly.",
+            )
         return self._gripper.critical_point(cp_override)
 
     def get_gripper_dict(self) -> Optional[GripperDict]:
@@ -132,11 +125,17 @@ class GripperHandler:
         gripper = self.get_gripper()
         gripper.check_calibration_pin_location_is_accurate()
 
-    def check_ready_for_jaw_move(self) -> None:
+    def check_ready_for_jaw_move(self, command: str) -> None:
         """Raise an exception if it is not currently valid to move the jaw."""
         gripper = self.get_gripper()
         if gripper.state == GripperJawState.UNHOMED:
-            raise GripError("Gripper jaw must be homed before moving")
+            raise CommandPreconditionViolated(
+                message=f"Cannot {command} gripper jaw before homing",
+                detail={
+                    "command": command,
+                    "jaw_state": str(gripper.state),
+                },
+            )
 
     def is_ready_for_idle(self) -> bool:
         """Gripper can idle when the jaw is not currently gripping."""

@@ -44,12 +44,10 @@ describe('NavTab', () => {
     expect(tab).toHaveStyle(
       `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
     )
-    expect(tab).toHaveStyle(`color: ${String(COLORS.darkGreyEnabled)}`)
+    expect(tab).toHaveStyle(`color: ${String(COLORS.grey50)}`)
     fireEvent.click(tab)
-    expect(tab).toHaveStyle(`color: ${String(COLORS.darkBlackEnabled)}`)
-    expect(tab).toHaveStyle(
-      `border-bottom-color: ${String(COLORS.blueEnabled)}`
-    )
+    expect(tab).toHaveStyle(`color: ${String(COLORS.black90)}`)
+    expect(tab).toHaveStyle(`border-bottom-color: ${String(COLORS.purple50)}`)
     expect(tab).toHaveStyle(`border-bottom-width: 2px`)
     expect(tab).toHaveStyle(
       `border-bottom-style: ${String(BORDERS.styleSolid)}`
@@ -68,7 +66,7 @@ describe('NavTab', () => {
     expect(tab).toHaveStyle(
       `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
     )
-    expect(tab).toHaveStyle(`color: ${String(COLORS.errorDisabled)}`)
+    expect(tab).toHaveStyle(`color: ${String(COLORS.grey40)}`)
   })
 
   it('renders navtab when pass to / as to', () => {

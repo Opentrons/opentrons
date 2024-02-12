@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook } from '@testing-library/react-hooks'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { acknowledgeEstopDisengage } from '@opentrons/api-client'
 import { useAcknowledgeEstopDisengageMutation } from '..'
 
@@ -18,7 +18,7 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
 describe('useAcknowledgeEstopDisengageMutation hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   const updatedEstopPhysicalStatus: EstopStatus = {
     data: {
       status: 'disengaged',
@@ -29,7 +29,9 @@ describe('useAcknowledgeEstopDisengageMutation hook', () => {
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
     wrapper = clientProvider
@@ -44,16 +46,15 @@ describe('useAcknowledgeEstopDisengageMutation hook', () => {
     when(mockAcknowledgeEstopDisengage)
       .calledWith(HOST_CONFIG)
       .mockRejectedValue('oh no')
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () => useAcknowledgeEstopDisengageMutation(),
       { wrapper }
     )
     expect(result.current.data).toBeUndefined()
     result.current.acknowledgeEstopDisengage(null)
     await waitFor(() => {
-      return result.current.status !== 'loading'
+      expect(result.current.data).toBeUndefined()
     })
-    expect(result.current.data).toBeUndefined()
   })
 
   it('should update a estop status when calling the setEstopPhysicalStatus with empty payload', async () => {
@@ -64,12 +65,13 @@ describe('useAcknowledgeEstopDisengageMutation hook', () => {
         data: updatedEstopPhysicalStatus,
       } as Response<EstopStatus>)
 
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () => useAcknowledgeEstopDisengageMutation(),
       { wrapper }
     )
     act(() => result.current.acknowledgeEstopDisengage(null))
-    await waitFor(() => result.current.data != null)
-    expect(result.current.data).toEqual(updatedEstopPhysicalStatus)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(updatedEstopPhysicalStatus)
+    })
   })
 })

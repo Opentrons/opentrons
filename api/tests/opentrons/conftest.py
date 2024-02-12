@@ -23,19 +23,25 @@ from typing import (
 from typing_extensions import TypedDict
 
 import pytest
+from _pytest.fixtures import SubRequest
 from decoy import Decoy
 
 from opentrons.protocol_engine.types import PostRunHardwareState
 
 try:
-    import aionotify  # type: ignore[import]
+    import aionotify  # type: ignore[import-untyped]
 except (OSError, ModuleNotFoundError):
     aionotify = None
 
+from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 from opentrons_shared_data.protocol.dev_types import JsonProtocol
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
-from opentrons_shared_data.deck.dev_types import RobotModel, DeckDefinitionV3
+from opentrons_shared_data.deck.dev_types import (
+    RobotModel,
+    DeckDefinitionV3,
+    DeckDefinitionV4,
+)
 from opentrons_shared_data.deck import (
     load as load_deck,
     DEFAULT_DECK_DEFINITION_VERSION,
@@ -52,6 +58,9 @@ from opentrons.hardware_control import (
 )
 from opentrons.protocol_api import ProtocolContext, Labware, create_protocol_context
 from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
+from opentrons.protocol_api.core.legacy.deck import (
+    DEFAULT_LEGACY_DECK_DEFINITION_VERSION,
+)
 from opentrons.protocol_engine import (
     create_protocol_engine_in_thread,
     Config as ProtocolEngineConfig,
@@ -80,7 +89,7 @@ class Bundle(TypedDict):
     filelike: io.BytesIO
     binary_zipfile: bytes
     metadata: Dict[str, str]
-    bundled_data: Dict[str, str]
+    bundled_data: Dict[str, bytes]
     bundled_labware: Dict[str, LabwareDefinition]
     bundled_python: Dict[str, Any]
 
@@ -104,8 +113,12 @@ def is_robot(monkeypatch: pytest.MonkeyPatch) -> None:
 @pytest.fixture
 def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
     for name, func in inspect.getmembers(config.feature_flags, inspect.isfunction):
+        params = inspect.getfullargspec(func)
         mock_get_ff = decoy.mock(func=func)
-        decoy.when(mock_get_ff()).then_return(False)
+        if any("robot_type" in p for p in params.args):
+            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
+        else:
+            decoy.when(mock_get_ff()).then_return(False)
         monkeypatch.setattr(config.feature_flags, name, mock_get_ff)
 
 
@@ -129,16 +142,11 @@ def protocol_file() -> str:
 
 @pytest.fixture()
 def protocol(protocol_file: str) -> Generator[Protocol, None, None]:
-    root = protocol_file
-    filename = os.path.join(os.path.dirname(__file__), "data", root)
-
-    file = open(filename)
-    text = "".join(list(file))
-    file.seek(0)
-
-    yield Protocol(text=text, filename=filename, filelike=file)
-
-    file.close()
+    filename = os.path.join(os.path.dirname(__file__), "data", protocol_file)
+    with open(filename, encoding="utf-8") as file:
+        text = file.read()
+        file.seek(0)
+        yield Protocol(text=text, filename=filename, filelike=file)
 
 
 @pytest.fixture()
@@ -149,11 +157,11 @@ def virtual_smoothie_env(monkeypatch: pytest.MonkeyPatch) -> None:
 
 @pytest.fixture(params=["ot2", "ot3"])
 async def machine_variant_ffs(
-    request: pytest.FixtureRequest,
+    request: SubRequest,
     decoy: Decoy,
     mock_feature_flags: None,
 ) -> None:
-    device_param = request.param  # type: ignore[attr-defined]
+    device_param = request.param
 
     if request.node.get_closest_marker("ot3_only") and device_param == "ot2":
         pytest.skip()
@@ -222,7 +230,7 @@ async def robot_model(
     mock_feature_flags: None,
     virtual_smoothie_env: None,
 ) -> AsyncGenerator[RobotModel, None]:
-    which_machine = cast(RobotModel, request.param)  # type: ignore[attr-defined]
+    which_machine = cast(RobotModel, request.param)
     if request.node.get_closest_marker("ot2_only") and which_machine == "OT-3 Standard":
         pytest.skip("test requests only ot-2")
     if request.node.get_closest_marker("ot3_only") and which_machine == "OT-2 Standard":
@@ -248,13 +256,18 @@ def deck_definition_name(robot_model: RobotModel) -> str:
 
 
 @pytest.fixture
-def deck_definition(deck_definition_name: str) -> DeckDefinitionV3:
+def deck_definition(deck_definition_name: str) -> DeckDefinitionV4:
     return load_deck(deck_definition_name, DEFAULT_DECK_DEFINITION_VERSION)
+
+
+@pytest.fixture
+def legacy_deck_definition(deck_definition_name: str) -> DeckDefinitionV3:
+    return load_deck(deck_definition_name, DEFAULT_LEGACY_DECK_DEFINITION_VERSION)
 
 
 @pytest.fixture()
 async def hardware(
-    request: pytest.FixtureRequest,
+    request: SubRequest,
     decoy: Decoy,
     mock_feature_flags: None,
     virtual_smoothie_env: None,
@@ -296,10 +309,15 @@ def _make_ot3_pe_ctx(
             use_virtual_pipettes=True,
             use_virtual_modules=True,
             use_virtual_gripper=True,
+            # TODO figure out if we will want to use a "real" deck config here or if we are fine with simulated
+            use_simulated_deck_config=True,
             block_on_door_open=False,
         ),
         drop_tips_after_run=False,
         post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
+        # TODO(jbl 10-30-2023) load_fixed_trash being hardcoded to True will be refactored once we need tests to have
+        #   this be False
+        load_fixed_trash=True,
     ) as (
         engine,
         loop,
@@ -481,7 +499,7 @@ def get_bundle_fixture() -> Callable[[str], Bundle]:
         if fixture_name == "simple_bundle":
             with open(fixture_dir / "protocol.py", "r") as f:
                 result["contents"] = f.read()
-            with open(fixture_dir / "data.txt", "rb") as f:  # type: ignore[assignment]
+            with open(fixture_dir / "data.txt", "rb") as f:
                 result["bundled_data"] = {"data.txt": f.read()}
             with open(fixture_dir / "custom_labware.json", "r") as f:
                 custom_labware = json.load(f)

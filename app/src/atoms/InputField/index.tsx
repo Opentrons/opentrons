@@ -71,7 +71,7 @@ export function InputField(props: InputFieldProps): JSX.Element {
       lineHeight={1}
       fontSize={TYPOGRAPHY.fontSizeP}
       fontWeight={TYPOGRAPHY.fontWeightRegular}
-      color={props.error != null ? COLOR_WARNING_DARK : COLORS.darkBlackEnabled}
+      color={props.error != null ? COLOR_WARNING_DARK : COLORS.black90}
       opacity={props.disabled ?? false ? 0.5 : ''}
     >
       <Input {...props} />
@@ -89,17 +89,16 @@ function Input(props: InputFieldProps): JSX.Element {
     background-color: ${COLORS.white};
     border-radius: ${SPACING.spacing4};
     padding: ${SPACING.spacing8};
-    border: 1px ${BORDERS.styleSolid}
-      ${error ? COLORS.errorEnabled : COLORS.medGreyEnabled};
+    border: 1px ${BORDERS.styleSolid} ${error ? COLORS.red50 : COLORS.grey50};
     font-size: ${TYPOGRAPHY.fontSizeP};
 
     &:active {
-      border: 1px ${BORDERS.styleSolid} ${COLORS.darkGreyEnabled};
+      border: 1px ${BORDERS.styleSolid} ${COLORS.grey50};
     }
 
     & input {
       border-radius: inherit;
-      color: ${COLORS.darkBlackEnabled};
+      color: ${COLORS.black90};
       border: none;
       flex: 1 1 auto;
       width: 100%;
@@ -110,14 +109,15 @@ function Input(props: InputFieldProps): JSX.Element {
     }
 
     &:hover {
-      border: 1px ${BORDERS.styleSolid}
-        ${error ? COLORS.errorEnabled : COLORS.medGreyHover};
+      border: 1px ${BORDERS.styleSolid} ${error ? COLORS.red50 : COLORS.grey60};
+      outline: 2px ${BORDERS.styleSolid} ${COLORS.blue50};
+      outline-offset: 3px;
     }
     &:focus {
-      border: 1px ${BORDERS.styleSolid} ${COLORS.blueEnabled};
+      border: 1px ${BORDERS.styleSolid} ${error ? COLORS.red50 : COLORS.grey60};
     }
     &:disabled {
-      border: 1px ${BORDERS.styleSolid} ${COLORS.darkGreyDisabled};
+      border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
     }
     input[type='number']::-webkit-inner-spin-button,
     input[type='number']::-webkit-outer-spin-button {
@@ -134,10 +134,10 @@ function Input(props: InputFieldProps): JSX.Element {
   `
 
   const ERROR_TEXT_STYLE = css`
-    color: ${COLORS.errorEnabled};
+    color: ${COLORS.red50};
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       font-size: ${TYPOGRAPHY.fontSize22};
-      color: ${COLORS.red2};
+      color: ${COLORS.red50};
     }
   `
 
@@ -155,7 +155,7 @@ function Input(props: InputFieldProps): JSX.Element {
             display={DISPLAY_INLINE_BLOCK}
             textAlign={TEXT_ALIGN_RIGHT}
             alignSelf={ALIGN_CENTER}
-            color={COLORS.darkGreyEnabled}
+            color={props.disabled ? COLORS.grey40 : COLORS.grey50}
             fontSize={TYPOGRAPHY.fontSizeLabel}
           >
             {props.units}
@@ -163,7 +163,7 @@ function Input(props: InputFieldProps): JSX.Element {
         )}
       </Flex>
       <Flex
-        color={COLORS.darkGreyEnabled}
+        color={COLORS.grey50}
         fontSize={TYPOGRAPHY.fontSizeLabel}
         paddingTop={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}

@@ -1,5 +1,6 @@
 """Opentrons helper methods."""
 import asyncio
+from random import random, randint
 from types import MethodType
 from typing import Any, List, Dict, Optional, Tuple
 from statistics import stdev
@@ -97,13 +98,29 @@ def get_list_of_wells_affected(
     channels: int,
 ) -> List[Well]:
     """Get list of wells affected."""
-    if channels > 1 and not well_is_reservoir(well):
-        well_col = well.well_name[1:]  # the "1" in "A1"
-        wells_list = [w for w in well.parent.columns_by_name()[well_col]]
-        assert well in wells_list, "Well is not inside column"
-    else:
-        wells_list = [well]
-    return wells_list
+    labware = well.parent
+    num_rows = len(labware.rows())
+    num_cols = len(labware.columns())
+    if num_rows == 1 and num_cols == 1:
+        return [well]  # aka: 1-well reservoir
+    if channels == 1:
+        return [well]  # 1ch pipette
+    if channels == 8:
+        if num_rows == 1:
+            return [well]  # aka: 12-well reservoir
+        else:
+            assert (
+                num_rows == 8
+            ), f"8ch pipette cannot go to labware with {num_rows} rows"
+            well_col = well.well_name[1:]  # the "1" in "A1"
+            wells_list = [w for w in well.parent.columns_by_name()[well_col]]
+            assert well in wells_list, "Well is not inside column"
+            return wells_list
+    if channels == 96:
+        return labware.wells()
+    raise ValueError(
+        f"unable to find affected wells for {channels}ch pipette (well={well})"
+    )
 
 
 def get_pipette_unique_name(pipette: protocol_api.InstrumentContext) -> str:
@@ -147,17 +164,18 @@ def _sense_liquid_height(
     well: Well,
     cfg: config.VolumetricConfig,
 ) -> float:
-    if ctx.is_simulating():
-        return well.depth - 1
     hwapi = get_sync_hw_api(ctx)
     pipette.move_to(well.top())
     lps = config._get_liquid_probe_settings(cfg, well)
-    well_bottom_z = well.bottom().point.z
     # NOTE: very important that probing is done only 1x time,
     #       with a DRY tip, for reliability
-    liquid_z = well.top().point.z - hwapi.liquid_probe(OT3Mount.LEFT, lps)
-    liquid_depth = liquid_z - well_bottom_z
-    return liquid_depth
+    probed_z = hwapi.liquid_probe(OT3Mount.LEFT, lps)
+    if ctx.is_simulating():
+        probed_z = well.top().point.z - 1
+    liq_height = probed_z - well.bottom().point.z
+    if abs(liq_height - lps.max_z_distance) < 0.01:
+        raise RuntimeError("unable to probe liquid, reach max travel distance")
+    return liq_height
 
 
 def _calculate_average(volume_list: List[float]) -> float:
@@ -262,6 +280,8 @@ def _pick_up_tip(
         f"from slot #{location.labware.parent.parent}"
     )
     pipette.pick_up_tip(location)
+    if pipette.channels == 96:
+        get_sync_hw_api(ctx).retract(OT3Mount.LEFT)
     # NOTE: the accuracy-adjust function gets set on the Pipette
     #       each time we pick-up a new tip.
     if cfg.increment:
@@ -270,8 +290,6 @@ def _pick_up_tip(
             get_sync_hw_api(ctx)._obj_to_adapt,  # type: ignore[arg-type]
             OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT,
         )
-
-    pipette.home_plunger()
 
 
 def _drop_tip(
@@ -303,10 +321,14 @@ def _get_volumes(
         test_volumes = get_volume_increments(
             pipette_channels, pipette_volume, tip_volume, mode=mode
         )
-    elif user_volumes and not ctx.is_simulating():
-        _inp = input(
-            f'Enter desired volumes for tip{tip_volume}, comma separated (eg: "10,100,1000") :'
-        )
+    elif user_volumes:
+        if ctx.is_simulating():
+            rand_vols = [round(random() * tip_volume, 1) for _ in range(randint(1, 3))]
+            _inp = ",".join([str(r) for r in rand_vols])
+        else:
+            _inp = input(
+                f'Enter desired volumes for tip{tip_volume}, comma separated (eg: "10,100,1000") :'
+            )
         test_volumes = [
             float(vol_str) for vol_str in _inp.strip().split(",") if vol_str
         ]
@@ -330,6 +352,7 @@ def _load_pipette(
     pipette_volume: int,
     pipette_mount: str,
     increment: bool,
+    photometric: bool,
     gantry_speed: Optional[int] = None,
 ) -> InstrumentContext:
     pip_name = f"flex_{pipette_channels}channel_{pipette_volume}"
@@ -350,11 +373,13 @@ def _load_pipette(
 
     # NOTE: 8ch QC testing means testing 1 channel at a time,
     #       so we need to decrease the pick-up current to work with 1 tip.
-    if pipette.channels == 8 and not increment:
+    if pipette.channels == 8 and not increment and not photometric:
         hwapi = get_sync_hw_api(ctx)
         mnt = OT3Mount.LEFT if pipette_mount == "left" else OT3Mount.RIGHT
         hwpipette: Pipette = hwapi.hardware_pipettes[mnt.to_mount()]
-        hwpipette.pick_up_configurations.current = 0.2
+        hwpipette._config.pick_up_tip_configurations.press_fit.current_by_tip_count[
+            8
+        ] = 0.2
     return pipette
 
 

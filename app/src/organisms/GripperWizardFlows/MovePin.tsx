@@ -238,15 +238,21 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
             ? inProgressText
             : t('shared:stand_back_robot_is_in_motion')
         }
+        body={
+          errorMessage == null && !isExiting
+            ? t('calibration_pin_touching', { slot: 'C2' })
+            : null
+        }
         alternativeSpinner={
           errorMessage == null && !isExiting ? inProgressImage : undefined
         }
       />
     )
+
   return errorMessage != null ? (
     <SimpleWizardBody
       isSuccess={false}
-      iconColor={COLORS.errorEnabled}
+      iconColor={COLORS.red50}
       header={t('shared:error_encountered')}
       subHeader={
         <Trans
@@ -270,7 +276,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       proceedButtonText={buttonText}
       proceed={handleOnClick}
       proceedIsDisabled={maintenanceRunId == null}
-      back={goBack}
+      back={movement !== MOVE_PIN_TO_FRONT_JAW ? goBack : undefined}
     />
   )
 }

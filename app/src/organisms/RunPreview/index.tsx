@@ -19,26 +19,32 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useNotifyLastRunCommandKey } from '../../resources/runs/useNotifyLastRunCommandKey'
 import { CommandText } from '../CommandText'
 import { Divider } from '../../atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
-import { useLastRunCommandKey } from '../Devices/hooks/useLastRunCommandKey'
 import { CommandIcon } from './CommandIcon'
+import type { RobotType } from '@opentrons/shared-data'
 
 const COLOR_FADE_MS = 500
+const LIVE_RUN_COMMANDS_POLL_MS = 3000
+
 interface RunPreviewProps {
   runId: string
+  robotType: RobotType
   jumpedIndex: number | null
   makeHandleScrollToStep: (index: number) => () => void
 }
 export const RunPreviewComponent = (
-  { runId, jumpedIndex, makeHandleScrollToStep }: RunPreviewProps,
+  { runId, jumpedIndex, makeHandleScrollToStep, robotType }: RunPreviewProps,
   ref: React.ForwardedRef<ViewportListRef>
 ): JSX.Element | null => {
   const { t } = useTranslation('run_details')
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
-  const currentRunCommandKey = useLastRunCommandKey(runId)
+  const currentRunCommandKey = useNotifyLastRunCommandKey(runId, {
+    refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
+  })
   const [
     isCurrentCommandVisible,
     setIsCurrentCommandVisible,
@@ -62,7 +68,7 @@ export const RunPreviewComponent = (
         <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('run_preview')}
         </StyledText>
-        <StyledText as="label" color={COLORS.darkGreyEnabled}>
+        <StyledText as="label" color={COLORS.grey50}>
           {t('steps_total', { count: robotSideAnalysis.commands.length })}
         </StyledText>
       </Flex>
@@ -89,15 +95,9 @@ export const RunPreviewComponent = (
       >
         {(command, index) => {
           const isCurrent = index === currentRunCommandIndex
-          const borderColor = isCurrent
-            ? COLORS.blueEnabled
-            : COLORS.transparent
-          const backgroundColor = isCurrent
-            ? COLORS.lightBlue
-            : COLORS.fundamentalsBackground
-          const contentColor = isCurrent
-            ? COLORS.darkBlackEnabled
-            : COLORS.darkGreyEnabled
+          const borderColor = isCurrent ? COLORS.blue50 : COLORS.transparent
+          const backgroundColor = isCurrent ? COLORS.blue30 : COLORS.grey10
+          const contentColor = isCurrent ? COLORS.blue60 : COLORS.grey50
           return (
             <Flex
               key={command.id}
@@ -115,12 +115,12 @@ export const RunPreviewComponent = (
                 gridGap={SPACING.spacing4}
                 width="100%"
                 border={`solid 1px ${
-                  index === jumpedIndex ? COLORS.electricPurple : borderColor
+                  index === jumpedIndex ? COLORS.purple40 : borderColor
                 }`}
                 backgroundColor={
                   index === jumpedIndex ? '#F5E3FF' : backgroundColor
                 }
-                color={COLORS.darkBlackEnabled}
+                color={COLORS.black90}
                 borderRadius={BORDERS.radiusSoftCorners}
                 padding={SPACING.spacing8}
                 css={css`
@@ -133,6 +133,7 @@ export const RunPreviewComponent = (
                   <CommandText
                     command={command}
                     robotSideAnalysis={robotSideAnalysis}
+                    robotType={robotType}
                     color={contentColor}
                   />
                 </Flex>
@@ -154,6 +155,11 @@ export const RunPreviewComponent = (
         >
           {t('view_current_step')}
         </PrimaryButton>
+      ) : null}
+      {currentRunCommandIndex === robotSideAnalysis.commands.length - 1 ? (
+        <StyledText as="h6" color={COLORS.grey60}>
+          {t('end_of_protocol')}
+        </StyledText>
       ) : null}
     </Flex>
   )

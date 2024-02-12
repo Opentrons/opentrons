@@ -2,35 +2,33 @@
 from json import load as json_load
 from pathlib import Path
 import argparse
+from time import time
 from typing import List, Union, Dict, Optional, Any, Tuple
 from dataclasses import dataclass
+from opentrons.hardware_control.types import OT3Mount
 from opentrons.protocol_api import ProtocolContext
 from . import report
 import subprocess
 from time import sleep
 
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
-from hardware_testing.protocols import (
-    gravimetric_ot3_p50_single,
-    gravimetric_ot3_p50_multi,
-    gravimetric_ot3_p50_multi_50ul_tip_increment,
-    gravimetric_ot3_p1000_single,
+from hardware_testing.protocols.gravimetric_lpc.gravimetric import (
+    gravimetric_ot3_p1000_96,
     gravimetric_ot3_p1000_multi,
+    gravimetric_ot3_p1000_single,
+    gravimetric_ot3_p50_single,
     gravimetric_ot3_p1000_multi_50ul_tip_increment,
     gravimetric_ot3_p1000_multi_200ul_tip_increment,
+    gravimetric_ot3_p50_multi,
     gravimetric_ot3_p1000_multi_1000ul_tip_increment,
-    gravimetric_ot3_p1000_96,
-    gravimetric_ot3_p1000_96_50ul_tip,
-    gravimetric_ot3_p1000_96_200ul_tip,
-    gravimetric_ot3_p1000_96_1000ul_tip,
+    gravimetric_ot3_p50_multi_50ul_tip_increment,
 )
-from hardware_testing.protocols import (
-    photometric_ot3_p50_single,
-    photometric_ot3_p50_multi,
-    photometric_ot3_p1000_single,
+from hardware_testing.protocols.gravimetric_lpc.photometric import (
     photometric_ot3_p1000_multi,
-    photometric_ot3_p1000_96_50ul,
-    photometric_ot3_p1000_96_200ul,
+    photometric_ot3_p1000_single,
+    photometric_ot3_p50_multi,
+    photometric_ot3_p1000_96,
+    photometric_ot3_p50_single,
 )
 
 from . import execute, helpers, workarounds, execute_photometric
@@ -44,6 +42,7 @@ from .config import (
 from .measurement.record import GravimetricRecorder
 from .measurement import DELAY_FOR_MEASUREMENT
 from .measurement.scale import Scale
+from .measurement.environment import read_environment_data
 from .trial import TestResources, _change_pipettes
 from .tips import get_tips
 from hardware_testing.drivers import asair_sensor
@@ -84,9 +83,9 @@ GRAVIMETRIC_CFG_INCREMENT = {
             1000: gravimetric_ot3_p1000_multi_1000ul_tip_increment,
         },
         96: {
-            50: gravimetric_ot3_p1000_96_50ul_tip,
-            200: gravimetric_ot3_p1000_96_200ul_tip,
-            1000: gravimetric_ot3_p1000_96_1000ul_tip,
+            50: gravimetric_ot3_p1000_96,
+            200: gravimetric_ot3_p1000_96,
+            1000: gravimetric_ot3_p1000_96,
         },
     },
 }
@@ -111,7 +110,7 @@ PHOTOMETRIC_CFG = {
             200: photometric_ot3_p1000_multi,
             1000: photometric_ot3_p1000_multi,
         },
-        96: {50: photometric_ot3_p1000_96_50ul, 200: photometric_ot3_p1000_96_200ul},
+        96: {50: photometric_ot3_p1000_96, 200: photometric_ot3_p1000_96},
     },
 }
 
@@ -178,8 +177,8 @@ class RunArgs:
         )
         return _ctx
 
-    @classmethod  # noqa: C901
-    def build_run_args(cls, args: argparse.Namespace) -> "RunArgs":
+    @classmethod
+    def build_run_args(cls, args: argparse.Namespace) -> "RunArgs":  # noqa: C901
         """Build."""
         _ctx = RunArgs._get_protocol_context(args)
         operator_name = helpers._get_operator_name(_ctx.is_simulating())
@@ -196,6 +195,7 @@ class RunArgs:
             args.pipette,
             "left",
             args.increment,
+            args.photometric,
             args.gantry_speed if not args.photometric else None,
         )
         pipette_tag = helpers._get_tag_from_pipette(
@@ -282,7 +282,13 @@ class RunArgs:
             trials = args.trials
 
         if args.photometric:
-            protocol_cfg = PHOTOMETRIC_CFG[args.pipette][args.channels][args.tip]
+            _tip_cfg = max(tip_volumes)
+            if len(tip_volumes) > 0:
+                ui.print_info(
+                    f"WARNING: using source Protocol for {_tip_cfg} tip, "
+                    f"but test includes multiple tips ({tip_volumes})"
+                )
+            protocol_cfg = PHOTOMETRIC_CFG[args.pipette][args.channels][_tip_cfg]
             name = protocol_cfg.metadata["protocolName"]  # type: ignore[attr-defined]
             report = execute_photometric.build_pm_report(
                 test_volumes=volumes_list,
@@ -299,8 +305,13 @@ class RunArgs:
             )
         else:
             if args.increment:
+                assert len(tip_volumes) == 1, (
+                    f"tip must be specified "
+                    f"when running --increment test "
+                    f"with {args.channels}ch P{args.pipette}"
+                )
                 protocol_cfg = GRAVIMETRIC_CFG_INCREMENT[args.pipette][args.channels][
-                    args.tip
+                    tip_volumes[0]
                 ]
             else:
                 protocol_cfg = GRAVIMETRIC_CFG[args.pipette][args.channels]
@@ -558,6 +569,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--mode", type=str, choices=["", "default", "lowVolumeDefault"], default=""
     )
+    parser.add_argument("--pre-heat", action="store_true")
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
     if not run_args.ctx.is_simulating():
@@ -568,14 +580,51 @@ if __name__ == "__main__":
             shell=True,
         )
         sleep(1)
+    hw = run_args.ctx._core.get_hardware()
     try:
-        if not run_args.ctx.is_simulating():
+        if not run_args.ctx.is_simulating() and not args.photometric:
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
+        ui.print_info("homing...")
+        run_args.ctx.home()
+
+        if args.pre_heat:
+            ui.print_header("PRE-HEAT")
+            mnt = OT3Mount.LEFT
+            hw.add_tip(mnt, 1)
+            hw.prepare_for_aspirate(mnt)
+            env_data = read_environment_data(
+                mnt.name.lower(), hw.is_simulator, run_args.environment_sensor
+            )
+            start_temp = env_data.celsius_pipette
+            temp_limit = min(start_temp + 3.0, 28.0)
+            max_pre_heat_seconds = 60 * 10
+            now = time()
+            start_time = now
+            while (
+                now - start_time < max_pre_heat_seconds
+                and env_data.celsius_pipette < temp_limit
+            ):
+                ui.print_info(
+                    f"pre-heat {int(now - start_time)} seconds "
+                    f"({max_pre_heat_seconds} limit): "
+                    f"{round(env_data.celsius_pipette, 2)} C "
+                    f"({round(temp_limit, 2)} C limit)"
+                )
+                # NOTE: moving slowly helps make sure full current is sent to coils
+                hw.aspirate(mnt, rate=0.1)
+                hw.dispense(mnt, rate=0.1, push_out=0)
+                env_data = read_environment_data(
+                    mnt.name.lower(), hw.is_simulator, run_args.environment_sensor
+                )
+                if run_args.ctx.is_simulating():
+                    now += 1
+                else:
+                    now = time()
+            hw.remove_tip(mnt)
+
         for tip, volumes in run_args.volumes:
-            hw = run_args.ctx._core.get_hardware()
             if args.channels == 96 and not run_args.ctx.is_simulating():
-                delay = 0 if args.photometric else 30
-                ui.alert_user_ready(f"Load 9 {tip}ul tipracks", hw, delay)
+                ui.alert_user_ready(f"prepare the {tip}ul tipracks", hw)
             _main(args, run_args, tip, volumes)
     finally:
         if run_args.recorder is not None:
@@ -585,5 +634,5 @@ if __name__ == "__main__":
         _change_pipettes(run_args.ctx, run_args.pipette)
         if not run_args.ctx.is_simulating():
             serial_logger.terminate()
-            del run_args.ctx._core.get_hardware()._backend.eeprom_driver._gpio
+            del hw._backend.eeprom_driver._gpio
     print("done\n\n")

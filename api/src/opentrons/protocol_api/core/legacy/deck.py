@@ -3,20 +3,25 @@
 import functools
 import logging
 from collections import UserDict
-from typing import Dict, Optional, List, Union
-from typing_extensions import Protocol
+from typing import Dict, Optional, List, Union, Mapping
+from typing_extensions import Protocol, Final
 
-from opentrons_shared_data.deck import (
-    DEFAULT_DECK_DEFINITION_VERSION,
-    load as load_deck,
-)
+from opentrons_shared_data.deck import load as load_deck
+
 from opentrons_shared_data.deck.dev_types import SlotDefV3
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
 from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.motion_planning import deck_conflict
 from opentrons.protocols.api_support.labware_like import LabwareLike
-from opentrons.types import DeckLocation, Location, Mount, Point, DeckSlotName
+from opentrons.types import (
+    DeckLocation,
+    Location,
+    Mount,
+    Point,
+    DeckSlotName,
+    StagingSlotName,
+)
 
 from opentrons.protocol_api.core.labware import AbstractLabware
 from opentrons.protocol_api.deck import CalibrationPosition
@@ -32,6 +37,9 @@ _log = logging.getLogger(__name__)
 # Amount of slots in a single deck row
 ROW_LENGTH = 3
 FIXED_TRASH_ID = "fixedTrash"
+
+
+DEFAULT_LEGACY_DECK_DEFINITION_VERSION: Final = 3
 
 
 class DeckItem(Protocol):
@@ -50,7 +58,7 @@ class Deck(UserDict):  # type: ignore[type-arg]
     def __init__(self, deck_type: str) -> None:
         super().__init__()
         self._definition = load_deck(
-            name=deck_type, version=DEFAULT_DECK_DEFINITION_VERSION
+            name=deck_type, version=DEFAULT_LEGACY_DECK_DEFINITION_VERSION
         )
         self._positions = {}
         for slot in self._definition["locations"]["orderedSlots"]:
@@ -166,7 +174,9 @@ class Deck(UserDict):  # type: ignore[type-arg]
 
     def __setitem__(self, key: DeckLocation, val: DeckItem) -> None:
         slot_key_int = self._check_name(key)
-        existing_items = {
+        existing_items: Mapping[
+            Union[DeckSlotName, StagingSlotName], deck_conflict.DeckItem
+        ] = {
             DeckSlotName.from_primitive(slot): self._map_to_conflict_checker_item(item)
             for slot, item in self.data.items()
             if item is not None

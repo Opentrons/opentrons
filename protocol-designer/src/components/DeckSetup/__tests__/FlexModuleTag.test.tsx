@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { screen } from '@testing-library/react'
 import { when } from 'jest-when'
 import {
   partialComponentPropsMatcher,
@@ -28,7 +29,7 @@ describe('FlexModuleTag', () => {
       .calledWith(
         partialComponentPropsMatcher({
           width: 5,
-          height: 16,
+          height: 20,
         })
       )
       .mockImplementation(({ children }) => (
@@ -36,19 +37,19 @@ describe('FlexModuleTag', () => {
           {`rectangle with width 5 and height 16`} {children}
         </div>
       ))
-    const { getByText } = render({
+    render({
       dimensions: mockDimensions,
       displayName: 'mock Magnetic Block',
     })
-    getByText('mock Magnetic Block')
-    getByText('rectangle with width 5 and height 16')
+    screen.getByText('mock Magnetic Block')
+    screen.getByText('rectangle with width 5 and height 16')
   })
   it('renders the flex module tag for heater-shaker', () => {
     when(mockRobotCoordsForeignDiv)
       .calledWith(
         partialComponentPropsMatcher({
           width: 5,
-          height: 16,
+          height: 20,
         })
       )
       .mockImplementation(({ children }) => (
@@ -56,11 +57,11 @@ describe('FlexModuleTag', () => {
           {`rectangle with width 5 and height 16`} {children}
         </div>
       ))
-    const { getByText } = render({
+    render({
       dimensions: mockDimensions,
       displayName: 'mock Heater-shaker',
     })
-    getByText('mock Heater-shaker')
-    getByText('rectangle with width 5 and height 16')
+    screen.getByText('mock Heater-shaker')
+    screen.getByText('rectangle with width 5 and height 16')
   })
 })

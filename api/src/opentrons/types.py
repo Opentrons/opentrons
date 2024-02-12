@@ -1,7 +1,7 @@
 from __future__ import annotations
 import enum
 from math import sqrt, isclose
-from typing import TYPE_CHECKING, Any, NamedTuple, Iterable, Union, List
+from typing import TYPE_CHECKING, Any, NamedTuple, Iterator, Union, List
 
 from opentrons_shared_data.robot.dev_types import RobotType
 
@@ -41,12 +41,12 @@ class Point(NamedTuple):
             return NotImplemented
         return Point(self.x - other.x, self.y - other.y, self.z - other.z)
 
-    def __mul__(self, other: Union[int, float]) -> Point:
+    def __mul__(self, other: Union[int, float]) -> Point:  # type: ignore[override]
         if not isinstance(other, (float, int)):
             return NotImplemented
         return Point(self.x * other, self.y * other, self.z * other)
 
-    def __rmul__(self, other: Union[int, float]) -> Point:
+    def __rmul__(self, other: Union[int, float]) -> Point:  # type: ignore[override]
         if not isinstance(other, (float, int)):
             return NotImplemented
         return Point(self.x * other, self.y * other, self.z * other)
@@ -132,14 +132,16 @@ class Location:
     def labware(self) -> LabwareLike:
         return self._labware
 
-    def __iter__(self) -> Iterable[Union[Point, LabwareLike]]:
-        """Iterable interface to support unpacking. Like a tuple."""
-        return iter(
-            (
-                self._point,
-                self._labware,
-            )
-        )
+    def __iter__(self) -> Iterator[Union[Point, LabwareLike]]:
+        """Iterable interface to support unpacking. Like a tuple.
+
+        .. note::
+           While type annotations cannot properly support this, it will work in practice:
+
+           point, labware = location
+           some_function_taking_both(*location)
+        """
+        return iter((self._point, self._labware))  # type: ignore [arg-type]
 
     def __eq__(self, other: object) -> bool:
         return (
@@ -357,6 +359,38 @@ _ot2_to_ot3 = {ot2: ot3 for ot2, ot3 in _slot_equivalencies}
 _ot3_to_ot2 = {ot3: ot2 for ot2, ot3 in _slot_equivalencies}
 
 
+# TODO(jbl 11-17-2023) move this away from being an Enum and make this a NewType or something similar
+class StagingSlotName(enum.Enum):
+    """Staging slot identifiers."""
+
+    SLOT_A4 = "A4"
+    SLOT_B4 = "B4"
+    SLOT_C4 = "C4"
+    SLOT_D4 = "D4"
+
+    @classmethod
+    def from_primitive(cls, value: str) -> StagingSlotName:
+        str_val = value.upper()
+        return cls(str_val)
+
+    @property
+    def id(self) -> str:
+        """This slot's unique ID, as it appears in the deck definition.
+
+        This can be used to look up slot details in the deck definition.
+
+        This is preferred over `.value` or `.__str__()` for explicitness.
+        """
+        return self.value
+
+    def __str__(self) -> str:
+        """Stringify to the unique ID.
+
+        For explicitness, prefer using `.id` instead.
+        """
+        return self.id
+
+
 class TransferTipPolicy(enum.Enum):
     ONCE = enum.auto()
     NEVER = enum.auto()
@@ -364,3 +398,4 @@ class TransferTipPolicy(enum.Enum):
 
 
 DeckLocation = Union[int, str]
+ALLOWED_PRIMARY_NOZZLES = ["A1", "H1", "A12", "H12"]

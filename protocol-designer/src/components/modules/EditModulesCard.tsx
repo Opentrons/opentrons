@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Card } from '@opentrons/components'
+import { Box, Card, SPACING } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -9,7 +9,6 @@ import {
   PipetteName,
   getPipetteNameSpecs,
   FLEX_ROBOT_TYPE,
-  WASTE_CHUTE_SLOT,
 } from '@opentrons/shared-data'
 import {
   selectors as stepFormSelectors,
@@ -18,10 +17,8 @@ import {
 } from '../../step-forms'
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
-import { getEnableDeckModification } from '../../feature-flags/selectors'
 import { getAdditionalEquipment } from '../../step-forms/selectors'
 import {
-  createDeckFixture,
   deleteDeckFixture,
   toggleIsGripperRequired,
 } from '../../step-forms/actions/additionalItems'
@@ -31,25 +28,32 @@ import { ModuleRow } from './ModuleRow'
 import { AdditionalItemsRow } from './AdditionalItemsRow'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
+import { AdditionalEquipmentEntity } from '@opentrons/step-generation'
+import { StagingAreasRow } from './StagingAreasRow'
 
 export interface Props {
   modules: ModulesForEditModulesCard
-  openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => unknown
+  openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => void
 }
 
 export function EditModulesCard(props: Props): JSX.Element {
   const { modules, openEditModuleModal } = props
-  const enableDeckModification = useSelector(getEnableDeckModification)
   const pipettesByMount = useSelector(
     stepFormSelectors.getPipettesForEditPipetteForm
   )
   const additionalEquipment = useSelector(getAdditionalEquipment)
+  const trashBin = Object.values(additionalEquipment).find(
+    equipment => equipment?.name === 'trashBin'
+  )
   const isGripperAttached = Object.values(additionalEquipment).some(
     equipment => equipment?.name === 'gripper'
   )
   const wasteChute = Object.values(additionalEquipment).find(
     equipment => equipment?.name === 'wasteChute'
   )
+  const stagingAreas: AdditionalEquipmentEntity[] = Object.values(
+    additionalEquipment
+  ).filter(equipment => equipment?.name === 'stagingArea')
 
   const dispatch = useDispatch()
   const robotType = useSelector(getRobotType)
@@ -95,6 +99,12 @@ export function EditModulesCard(props: Props): JSX.Element {
         : moduleType !== 'magneticBlockType'
   )
 
+  const handleDeleteStagingAreas = (): void => {
+    stagingAreas.forEach(stagingArea => {
+      dispatch(deleteDeckFixture(stagingArea.id))
+    })
+  }
+
   return (
     <Card title={isFlex ? 'Additional Items' : 'Modules'}>
       <div className={styles.modules_card_content}>
@@ -109,6 +119,15 @@ export function EditModulesCard(props: Props): JSX.Element {
             }
           />
         )}
+        {isFlex ? (
+          <Box paddingBottom={SPACING.spacing16}>
+            <AdditionalItemsRow
+              handleAttachment={() => dispatch(toggleIsGripperRequired())}
+              isEquipmentAdded={isGripperAttached}
+              name="gripper"
+            />
+          </Box>
+        ) : null}
         {SUPPORTED_MODULE_TYPES_FILTERED.map((moduleType, i) => {
           const moduleData = modules[moduleType]
           if (moduleData) {
@@ -133,24 +152,34 @@ export function EditModulesCard(props: Props): JSX.Element {
           }
         })}
         {isFlex ? (
-          <AdditionalItemsRow
-            handleAttachment={() => dispatch(toggleIsGripperRequired())}
-            isEquipmentAdded={isGripperAttached}
-            name="gripper"
-          />
-        ) : null}
-        {enableDeckModification && isFlex ? (
-          <AdditionalItemsRow
-            handleAttachment={() =>
-              dispatch(
-                wasteChute != null
-                  ? deleteDeckFixture(wasteChute.id)
-                  : createDeckFixture('wasteChute', WASTE_CHUTE_SLOT)
-              )
-            }
-            isEquipmentAdded={wasteChute != null}
-            name="wasteChute"
-          />
+          <>
+            <StagingAreasRow
+              handleAttachment={handleDeleteStagingAreas}
+              stagingAreas={stagingAreas}
+            />
+            <AdditionalItemsRow
+              handleAttachment={() =>
+                trashBin != null
+                  ? dispatch(deleteDeckFixture(trashBin.id))
+                  : null
+              }
+              isEquipmentAdded={trashBin != null}
+              name="trashBin"
+              hasWasteChute={wasteChute != null}
+              trashBinSlot={trashBin?.location ?? undefined}
+              trashBinId={trashBin?.id}
+            />
+            <AdditionalItemsRow
+              handleAttachment={() => {
+                if (wasteChute != null)
+                  dispatch(deleteDeckFixture(wasteChute.id))
+              }}
+              isEquipmentAdded={wasteChute != null}
+              name="wasteChute"
+              hasWasteChute={wasteChute != null}
+              trashBinId={trashBin?.id}
+            />
+          </>
         ) : null}
       </div>
     </Card>

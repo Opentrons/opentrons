@@ -2,14 +2,16 @@ import last from 'lodash/last'
 import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
-  useRunQuery,
 } from '@opentrons/react-api-client'
-import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+
+import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
+
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 export function useMostRecentCompletedAnalysis(
   runId: string | null
 ): CompletedProtocolAnalysis | null {
-  const { data: runRecord } = useRunQuery(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId)
   const protocolId = runRecord?.data?.protocolId ?? null
   const { data: protocolData } = useProtocolQuery(protocolId, {
     enabled: protocolId != null,
@@ -20,5 +22,11 @@ export function useMostRecentCompletedAnalysis(
     { enabled: protocolData != null }
   )
 
-  return analysis ?? null
+  return analysis != null
+    ? {
+        ...analysis,
+        // NOTE: this is accounting for pre 7.1 robot-side protocol analysis that may not include the robotType key
+        robotType: analysis.robotType ?? protocolData?.data.robotType,
+      }
+    : null
 }

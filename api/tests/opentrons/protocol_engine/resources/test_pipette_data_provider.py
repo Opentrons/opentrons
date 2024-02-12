@@ -1,9 +1,12 @@
 """Test pipette data provider."""
+from collections import OrderedDict
+
 import pytest
 from opentrons_shared_data.pipette.dev_types import PipetteNameType, PipetteModel
 from opentrons_shared_data.pipette import pipette_definition, types as pip_types
 
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine.types import FlowRates
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
@@ -11,6 +14,7 @@ from opentrons.protocol_engine.resources.pipette_data_provider import (
 )
 
 from opentrons.protocol_engine.resources import pipette_data_provider as subject
+from opentrons.types import Point
 
 
 @pytest.fixture
@@ -50,6 +54,8 @@ def test_get_virtual_pipette_static_config(
             "opentrons/opentrons_96_tiprack_10ul/1": 8.25,
             "opentrons/opentrons_96_tiprack_20ul/1": 8.25,
         },
+        back_left_nozzle_offset=Point(x=0.0, y=0.0, z=10.45),
+        front_right_nozzle_offset=Point(x=0.0, y=0.0, z=10.45),
     )
 
 
@@ -75,6 +81,8 @@ def test_configure_virtual_pipette_for_volume(
         ),
         tip_configuration_lookup_table=result1.tip_configuration_lookup_table,
         nominal_tip_overlap=result1.nominal_tip_overlap,
+        back_left_nozzle_offset=Point(x=-8.0, y=-22.0, z=-259.15),
+        front_right_nozzle_offset=Point(x=-8.0, y=-22.0, z=-259.15),
     )
     subject_instance.configure_virtual_pipette_for_volume(
         "my-pipette", 1, result1.model
@@ -97,6 +105,8 @@ def test_configure_virtual_pipette_for_volume(
         ),
         tip_configuration_lookup_table=result2.tip_configuration_lookup_table,
         nominal_tip_overlap=result2.nominal_tip_overlap,
+        back_left_nozzle_offset=Point(x=-8.0, y=-22.0, z=-259.15),
+        front_right_nozzle_offset=Point(x=-8.0, y=-22.0, z=-259.15),
     )
 
 
@@ -122,7 +132,47 @@ def test_load_virtual_pipette_by_model_string(
         ),
         tip_configuration_lookup_table=result.tip_configuration_lookup_table,
         nominal_tip_overlap=result.nominal_tip_overlap,
+        back_left_nozzle_offset=Point(x=0.0, y=31.5, z=35.52),
+        front_right_nozzle_offset=Point(x=0.0, y=-31.5, z=35.52),
     )
+
+
+def test_load_virtual_pipette_nozzle_layout(
+    subject_instance: VirtualPipetteDataProvider,
+) -> None:
+    """It should return a NozzleMap object."""
+    subject_instance.configure_virtual_pipette_nozzle_layout(
+        "my-pipette", "p300_multi_v2.1", "A1", "E1", "A1"
+    )
+    result = subject_instance.get_nozzle_layout_for_pipette("my-pipette")
+    assert result.configuration.value == "COLUMN"
+    assert result.starting_nozzle == "A1"
+    assert result.front_right == "E1"
+    assert result.back_left == "A1"
+
+    subject_instance.configure_virtual_pipette_nozzle_layout(
+        "my-pipette", "p300_multi_v2.1"
+    )
+    result = subject_instance.get_nozzle_layout_for_pipette("my-pipette")
+    assert result.configuration.value == "FULL"
+
+    subject_instance.configure_virtual_pipette_nozzle_layout(
+        "my-96-pipette", "p1000_96_v3.5", "A1", "A12", "A1"
+    )
+    result = subject_instance.get_nozzle_layout_for_pipette("my-96-pipette")
+    assert result.configuration.value == "ROW"
+
+    subject_instance.configure_virtual_pipette_nozzle_layout(
+        "my-96-pipette", "p1000_96_v3.5", "A1", "A1"
+    )
+    result = subject_instance.get_nozzle_layout_for_pipette("my-96-pipette")
+    assert result.configuration.value == "SINGLE"
+
+    subject_instance.configure_virtual_pipette_nozzle_layout(
+        "my-96-pipette", "p1000_96_v3.5", "A1", "H1"
+    )
+    result = subject_instance.get_nozzle_layout_for_pipette("my-96-pipette")
+    assert result.configuration.value == "COLUMN"
 
 
 def test_get_pipette_static_config(
@@ -164,6 +214,14 @@ def test_get_pipette_static_config(
         "default_aspirate_speeds": {"2.0": 5.021202, "2.6": 10.042404},
         "default_push_out_volume": 3,
         "supported_tips": {pip_types.PipetteTipType.t300: supported_tip_fixture},
+        "current_nozzle_map": NozzleMap.build(
+            physical_nozzles=OrderedDict({"A1": Point(1, 2, 3), "B1": Point(4, 5, 6)}),
+            physical_rows=OrderedDict({"A": ["A1"], "B": ["B1"]}),
+            physical_columns=OrderedDict({"1": ["A1", "B1"]}),
+            starting_nozzle="A1",
+            back_left_nozzle="A1",
+            front_right_nozzle="B1",
+        ),
     }
 
     result = subject.get_pipette_static_config(pipette_dict)
@@ -189,4 +247,6 @@ def test_get_pipette_static_config(
         # https://opentrons.atlassian.net/browse/RCORE-655
         nozzle_offset_z=0,
         home_position=0,
+        back_left_nozzle_offset=Point(x=1, y=2, z=3),
+        front_right_nozzle_offset=Point(x=4, y=5, z=6),
     )

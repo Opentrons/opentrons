@@ -15,7 +15,7 @@ describe('CalibrationHealthCheckResults', () => {
   let props: React.ComponentProps<typeof CalibrationHealthCheckResults>
   beforeEach(() => {
     props = {
-      isCalibrationCompleted: true,
+      isCalibrationRecommended: false,
     }
   })
 
@@ -23,23 +23,23 @@ describe('CalibrationHealthCheckResults', () => {
     const { getByText, getByTestId } = render(props)
     getByText('Calibration Health Check Results')
     const statusLabel = getByText('Calibration complete')
-    expect(statusLabel).toHaveStyle(`color: ${String(COLORS.darkBlackEnabled)}`)
+    expect(statusLabel).toHaveStyle(`color: ${String(COLORS.black90)}`)
     expect(statusLabel).toHaveStyle(
       `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
     )
     expect(getByTestId('status_circle')).toHaveStyle(
-      `color: ${String(COLORS.successEnabled)}`
+      `color: ${String(COLORS.green50)}`
     )
     expect(getByTestId('status_circle')).toHaveStyle(`height: 0.3125rem`)
     expect(getByTestId('status_circle')).toHaveStyle(`width: 0.3125rem`)
   })
 
   it('should render title and warning StatusLabel when calibration results includes bad', () => {
-    props.isCalibrationCompleted = false
+    props.isCalibrationRecommended = true
     const { getByText, getByTestId } = render(props)
     getByText('Calibration recommended')
     expect(getByTestId('status_circle')).toHaveStyle(
-      `color: ${String(COLORS.warningEnabled)}`
+      `color: ${String(COLORS.yellow50)}`
     )
   })
 })

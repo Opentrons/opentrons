@@ -4,44 +4,44 @@ import { useSelector } from 'react-redux'
 import {
   OT2_BALENA,
   getRobotUpdateInfo,
-  getRobotUpdateDownloadProgress,
   getRobotUpdateDownloadError,
+  getRobotSystemType,
+  getRobotUpdateAvailable,
 } from '../../../../redux/robot-update'
 import { getAvailableShellUpdate } from '../../../../redux/shell'
 import { Portal } from '../../../../App/portal'
 import { UpdateAppModal } from '../../../../organisms/UpdateAppModal'
 import { MigrationWarningModal } from './MigrationWarningModal'
-import { RobotUpdateProgressModal } from './RobotUpdateProgressModal'
 import { UpdateRobotModal } from './UpdateRobotModal'
 
-import type {
-  RobotUpdateType,
-  RobotSystemType,
-} from '../../../../redux/robot-update/types'
 import type { State } from '../../../../redux/types'
+import { ReachableRobot, Robot } from '../../../../redux/discovery/types'
 
 export interface ViewUpdateModalProps {
   robotName: string
-  robotUpdateType: RobotUpdateType | null
-  robotSystemType: RobotSystemType | null
+  robot: Robot | ReachableRobot
   closeModal: () => void
 }
 
 export function ViewUpdateModal(
   props: ViewUpdateModalProps
 ): JSX.Element | null {
-  const { robotName, robotUpdateType, robotSystemType, closeModal } = props
+  const { robotName, robot, closeModal } = props
+  const [showAppUpdateModal, setShowAppUpdateModal] = React.useState(true)
 
   const updateInfo = useSelector((state: State) =>
     getRobotUpdateInfo(state, robotName)
   )
-  const downloadProgress = useSelector((state: State) =>
-    getRobotUpdateDownloadProgress(state, robotName)
-  )
   const downloadError = useSelector((state: State) =>
     getRobotUpdateDownloadError(state, robotName)
   )
-  const availableAppUpdateVersion = useSelector(getAvailableShellUpdate)
+  const robotUpdateType = useSelector((state: State) =>
+    getRobotUpdateAvailable(state, robot)
+  )
+  const robotSystemType = getRobotSystemType(robot)
+  const availableAppUpdateVersion = Boolean(
+    useSelector(getAvailableShellUpdate)
+  )
 
   const [
     showMigrationWarning,
@@ -54,12 +54,12 @@ export function ViewUpdateModal(
   }
 
   let releaseNotes = ''
-  if (updateInfo?.releaseNotes) releaseNotes = updateInfo.releaseNotes
+  if (updateInfo?.releaseNotes != null) releaseNotes = updateInfo.releaseNotes
 
-  if (availableAppUpdateVersion)
+  if (availableAppUpdateVersion && showAppUpdateModal)
     return (
       <Portal>
-        <UpdateAppModal closeModal={close} />
+        <UpdateAppModal closeModal={() => setShowAppUpdateModal(false)} />
       </Portal>
     )
 
@@ -72,16 +72,6 @@ export function ViewUpdateModal(
       />
     )
   }
-
-  if (updateInfo === null)
-    return (
-      <RobotUpdateProgressModal
-        robotName={robotName}
-        updateStep="download"
-        stepProgress={downloadProgress}
-        error={downloadError}
-      />
-    )
 
   if (robotSystemType != null)
     return (

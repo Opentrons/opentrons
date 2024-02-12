@@ -2,10 +2,13 @@
 import inspect
 
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
 
-from opentrons.broker import Broker
+from opentrons.legacy_broker import LegacyBroker
+from typing import ContextManager, Optional
+from contextlib import nullcontext as does_not_raise
+
 from opentrons.protocols.api_support import instrument as mock_instrument_support
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
@@ -26,7 +29,12 @@ from opentrons.protocol_api.core.common import InstrumentCore, ProtocolCore
 from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
     LegacyInstrumentCore,
 )
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.types import Location, Mount, Point
+
+from opentrons_shared_data.errors.exceptions import (
+    CommandPreconditionViolated,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -72,9 +80,9 @@ def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
 
 
 @pytest.fixture
-def mock_broker(decoy: Decoy) -> Broker:
+def mock_broker(decoy: Decoy) -> LegacyBroker:
     """Get a mock command message broker."""
-    return decoy.mock(cls=Broker)
+    return decoy.mock(cls=LegacyBroker)
 
 
 @pytest.fixture
@@ -93,7 +101,7 @@ def api_version() -> APIVersion:
 def subject(
     mock_instrument_core: InstrumentCore,
     mock_protocol_core: ProtocolCore,
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
     mock_trash: Labware,
     api_version: APIVersion,
 ) -> InstrumentContext:
@@ -113,6 +121,38 @@ def subject(
 def test_api_version(api_version: APIVersion, subject: InstrumentContext) -> None:
     """It should have an api_version property."""
     assert subject.api_version == api_version
+
+
+@pytest.mark.parametrize("channels_from_core", [1, 8, 96])
+def test_channels(
+    decoy: Decoy,
+    subject: InstrumentContext,
+    mock_instrument_core: InstrumentCore,
+    channels_from_core: int,
+) -> None:
+    """It should return the number of channels, as returned by the core."""
+    decoy.when(mock_instrument_core.get_channels()).then_return(channels_from_core)
+    assert subject.channels == channels_from_core
+
+
+@pytest.mark.parametrize(
+    ("channels_from_core", "expected_type"),
+    [
+        (1, "single"),
+        (8, "multi"),
+        (96, "multi"),
+    ],
+)
+def test_type(
+    decoy: Decoy,
+    subject: InstrumentContext,
+    mock_instrument_core: InstrumentCore,
+    channels_from_core: int,
+    expected_type: str,
+) -> None:
+    """It should map the number of channels from the core into the string "single" or "multi"."""
+    decoy.when(mock_instrument_core.get_channels()).then_return(channels_from_core)
+    assert subject.type == expected_type
 
 
 def test_trash_container(
@@ -472,7 +512,7 @@ def test_pick_up_tip_from_labware(
     mock_well = decoy.mock(cls=Well)
     top_location = Location(point=Point(1, 2, 3), labware=mock_well)
 
-    decoy.when(mock_instrument_core.get_channels()).then_return(123)
+    decoy.when(mock_instrument_core.get_active_channels()).then_return(123)
     decoy.when(
         labware.next_available_tip(
             starting_tip=None,
@@ -526,7 +566,7 @@ def test_pick_up_tip_from_labware_location(
     location = Location(point=Point(1, 2, 3), labware=mock_tip_rack)
     top_location = Location(point=Point(1, 2, 3), labware=mock_well)
 
-    decoy.when(mock_instrument_core.get_channels()).then_return(123)
+    decoy.when(mock_instrument_core.get_active_channels()).then_return(123)
     decoy.when(
         labware.next_available_tip(
             starting_tip=None,
@@ -560,7 +600,8 @@ def test_pick_up_from_associated_tip_racks(
     mock_well = decoy.mock(cls=Well)
     top_location = Location(point=Point(1, 2, 3), labware=mock_well)
 
-    decoy.when(mock_instrument_core.get_channels()).then_return(123)
+    decoy.when(mock_instrument_core.is_tip_tracking_available()).then_return(True)
+    decoy.when(mock_instrument_core.get_active_channels()).then_return(123)
     decoy.when(
         labware.next_available_tip(
             starting_tip=mock_starting_tip,
@@ -584,6 +625,22 @@ def test_pick_up_from_associated_tip_racks(
         ),
         times=1,
     )
+
+
+def test_pick_up_fails_when_tip_tracking_unavailable(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should raise an error if automatic tip tracking is not available.."""
+    mock_tip_rack_1 = decoy.mock(cls=Labware)
+
+    decoy.when(mock_instrument_core.is_tip_tracking_available()).then_return(False)
+    decoy.when(mock_instrument_core.get_active_channels()).then_return(123)
+
+    subject.tip_racks = [mock_tip_rack_1]
+    with pytest.raises(
+        CommandPreconditionViolated, match="Automatic tip tracking is not available"
+    ):
+        subject.pick_up_tip()
 
 
 def test_drop_tip_to_well(
@@ -912,3 +969,178 @@ def test_plunger_speed_removed(subject: InstrumentContext) -> None:
     """It should raise an error on PAPI >= v2.14."""
     with pytest.raises(APIVersionError):
         subject.speed
+
+
+def test_prepare_to_aspirate(
+    subject: InstrumentContext, decoy: Decoy, mock_instrument_core: InstrumentCore
+) -> None:
+    """It should call the core function."""
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
+    subject.prepare_to_aspirate()
+    decoy.verify(mock_instrument_core.prepare_to_aspirate(), times=1)
+
+
+def test_prepare_to_aspirate_checks_volume(
+    subject: InstrumentContext, decoy: Decoy, mock_instrument_core: InstrumentCore
+) -> None:
+    """It should raise an error if you prepare for aspirate with liquid in the pipette."""
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(10)
+    with pytest.raises(CommandPreconditionViolated):
+        subject.prepare_to_aspirate()
+
+
+@pytest.mark.parametrize(
+    argnames=["style", "primary_nozzle", "front_right_nozzle", "exception"],
+    argvalues=[
+        [NozzleLayout.COLUMN, "A1", "H1", does_not_raise()],
+        [NozzleLayout.SINGLE, None, None, pytest.raises(ValueError)],
+        [NozzleLayout.ROW, "E1", None, pytest.raises(ValueError)],
+    ],
+)
+def test_configure_nozzle_layout(
+    subject: InstrumentContext,
+    style: NozzleLayout,
+    primary_nozzle: Optional[str],
+    front_right_nozzle: Optional[str],
+    exception: ContextManager[None],
+) -> None:
+    """The correct model is passed to the engine client."""
+    with exception:
+        subject.configure_nozzle_layout(style, primary_nozzle, front_right_nozzle)
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
+def test_dispense_0_volume_means_dispense_everything(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should dispense all liquid to a well."""
+    input_location = Location(point=Point(2, 2, 2), labware=None)
+    decoy.when(
+        mock_validation.validate_location(location=input_location, last_location=None)
+    ).then_return(mock_validation.PointTarget(location=input_location, in_place=False))
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(100)
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(5.67)
+    subject.dispense(volume=0, location=input_location, rate=1.23, push_out=None)
+
+    decoy.verify(
+        mock_instrument_core.dispense(
+            location=input_location,
+            well_core=None,
+            in_place=False,
+            volume=100,
+            rate=1.23,
+            flow_rate=5.67,
+            push_out=None,
+        ),
+        times=1,
+    )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 16)])
+def test_dispense_0_volume_means_dispense_nothing(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should dispense no liquid to a well."""
+    input_location = Location(point=Point(2, 2, 2), labware=None)
+    decoy.when(
+        mock_validation.validate_location(location=input_location, last_location=None)
+    ).then_return(mock_validation.PointTarget(location=input_location, in_place=False))
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(5.67)
+    subject.dispense(volume=0, location=input_location, rate=1.23, push_out=None)
+
+    decoy.verify(
+        mock_instrument_core.dispense(
+            location=input_location,
+            well_core=None,
+            in_place=False,
+            volume=0,
+            rate=1.23,
+            flow_rate=5.67,
+            push_out=None,
+        ),
+        times=1,
+    )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
+def test_aspirate_0_volume_means_aspirate_everything(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should aspirate to a well."""
+    mock_well = decoy.mock(cls=Well)
+    input_location = Location(point=Point(2, 2, 2), labware=mock_well)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
+    )
+
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(WellTarget(well=mock_well, location=input_location, in_place=False))
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
+    decoy.when(mock_instrument_core.get_available_volume()).then_return(200)
+    subject.aspirate(volume=0, location=input_location, rate=1.23)
+
+    decoy.verify(
+        mock_instrument_core.aspirate(
+            location=input_location,
+            well_core=mock_well._core,
+            in_place=False,
+            volume=200,
+            rate=1.23,
+            flow_rate=5.67,
+        ),
+        times=1,
+    )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 16)])
+def test_aspirate_0_volume_means_aspirate_nothing(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should aspirate to a well."""
+    mock_well = decoy.mock(cls=Well)
+    input_location = Location(point=Point(2, 2, 2), labware=mock_well)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
+    )
+
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(WellTarget(well=mock_well, location=input_location, in_place=False))
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
+
+    subject.aspirate(volume=0, location=input_location, rate=1.23)
+
+    decoy.verify(
+        mock_instrument_core.aspirate(
+            location=input_location,
+            well_core=mock_well._core,
+            in_place=False,
+            volume=0,
+            rate=1.23,
+            flow_rate=5.67,
+        ),
+        times=1,
+    )

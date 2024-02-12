@@ -16,9 +16,15 @@ from typing import (
 from opentrons.calibration_storage import (
     helpers,
     types as cal_types,
-    clear_pipette_offset_calibrations,
+)
+
+from opentrons.calibration_storage.ot2.tip_length import (
     load_tip_length_calibration,
 )
+from opentrons.calibration_storage.ot2.pipette_offset import (
+    clear_pipette_offset_calibrations,
+)
+
 from opentrons.hardware_control import robot_calibration as robot_cal
 from opentrons.hardware_control import (
     HardwareControlAPI,
@@ -76,7 +82,7 @@ and gantry system.
 """
 
 # TODO: BC 2020-07-08: type all command logic here with actual Model type
-COMMAND_HANDLER = Callable[..., Awaitable]
+COMMAND_HANDLER = Callable[..., Awaitable[None]]
 
 COMMAND_MAP = Dict[str, COMMAND_HANDLER]
 
@@ -181,7 +187,7 @@ class DeckCalibrationUserFlow:
             name=self._hw_pipette.name,
             tipLength=self._hw_pipette.active_tip_settings.default_tip_length,
             mount=str(self._mount),
-            serial=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
+            serial=self._hw_pipette.pipette_id,
             defaultTipracks=self._default_tipracks,
         )
 

@@ -6,14 +6,14 @@
 Order of Operations
 *******************
 
-Complex commands perform a series of :ref:`v2-atomic-commands` in order. In fact, the run preview for your protocol in the Opentrons App lists all of these commands as separate steps. This lets you examine what effect your complex commands will have before running them. 
+Complex commands perform a series of :ref:`building block commands <v2-atomic-commands>` in order. In fact, the run preview for your protocol in the Opentrons App lists all of these commands as separate steps. This lets you examine what effect your complex commands will have before running them. 
 
 This page describes what steps you should expect the robot to perform when using different complex commands with different required and :ref:`optional <complex_params>` parameters.
 
 Step Sequence
 =============
 
-The order of steps is fixed within complex commands. Aspiration and dispensing are the only required actions. You can enable or disable all of the other actions with :ref:`complex_params`. A complex command designed to perform every possible action will proceed in this order:
+The order of steps is fixed within complex commands. Aspiration and dispensing are the only required actions. You can enable or disable all of the other actions with :ref:`complex liquid handling parameters <complex_params>`. A complex command designed to perform every possible action will proceed in this order:
 
     1. Pick up tip
     2. Mix at source

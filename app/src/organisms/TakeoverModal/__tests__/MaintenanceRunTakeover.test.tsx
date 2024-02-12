@@ -1,12 +1,17 @@
 import * as React from 'react'
-import { i18n } from '../../../i18n'
-import { when } from 'jest-when'
+import { screen } from '@testing-library/react'
+
 import { renderWithProviders } from '@opentrons/components'
-import { useMaintenanceRunTakeover as mockUseMaintenanceRunTakeover } from '../useMaintenanceRunTakeover'
+
+import { i18n } from '../../../i18n'
+import { useMaintenanceRunTakeover } from '../useMaintenanceRunTakeover'
 import { MaintenanceRunTakeover } from '../MaintenanceRunTakeover'
+import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
+
 import type { MaintenanceRunStatus } from '../MaintenanceRunStatusProvider'
 
 jest.mock('../useMaintenanceRunTakeover')
+jest.mock('../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
 
 const MOCK_MAINTENANCE_RUN: MaintenanceRunStatus = {
   getRunIds: () => ({
@@ -16,8 +21,11 @@ const MOCK_MAINTENANCE_RUN: MaintenanceRunStatus = {
   setOddRunIds: () => null,
 }
 
-const useMaintenanceRunTakeover = mockUseMaintenanceRunTakeover as jest.MockedFunction<
-  typeof mockUseMaintenanceRunTakeover
+const mockUseMaintenanceRunTakeover = useMaintenanceRunTakeover as jest.MockedFunction<
+  typeof useMaintenanceRunTakeover
+>
+const useMockNotifyCurrentMaintenanceRun = useNotifyCurrentMaintenanceRun as jest.MockedFunction<
+  typeof useNotifyCurrentMaintenanceRun
 >
 
 const render = (props: React.ComponentProps<typeof MaintenanceRunTakeover>) => {
@@ -32,20 +40,25 @@ describe('MaintenanceRunTakeover', () => {
 
   beforeEach(() => {
     props = { children: [testComponent] }
-    when(useMaintenanceRunTakeover)
-      .calledWith()
-      .mockReturnValue(MOCK_MAINTENANCE_RUN)
+    mockUseMaintenanceRunTakeover.mockReturnValue(MOCK_MAINTENANCE_RUN)
+    useMockNotifyCurrentMaintenanceRun.mockReturnValue({
+      data: {
+        data: {
+          id: 'test',
+        },
+      },
+    } as any)
   })
 
   it('renders child components successfuly', () => {
-    const [{ getByText }] = render(props)
-    getByText('Test Component')
+    render(props)
+    screen.getByText('Test Component')
   })
 
   it('does not render a takeover modal if no maintenance run has been initiated', () => {
-    const [{ queryByText }] = render(props)
+    render(props)
 
-    expect(queryByText('Robot is busy')).not.toBeInTheDocument()
+    expect(screen.queryByText('Robot is busy')).not.toBeInTheDocument()
   })
 
   it('does not render a takeover modal if a maintenance run has been initiated by the ODD', () => {
@@ -57,11 +70,10 @@ describe('MaintenanceRunTakeover', () => {
       }),
     }
 
-    when(useMaintenanceRunTakeover).calledWith().mockReturnValue(MOCK_ODD_RUN)
+    mockUseMaintenanceRunTakeover.mockReturnValue(MOCK_ODD_RUN)
 
-    const [{ queryByText }] = render(props)
-
-    expect(queryByText('Robot is busy')).not.toBeInTheDocument()
+    render(props)
+    expect(screen.queryByText('Robot is busy')).not.toBeInTheDocument()
   })
 
   it('renders a takeover modal if a maintenance run has been initiated by the desktop', () => {
@@ -73,12 +85,9 @@ describe('MaintenanceRunTakeover', () => {
       }),
     }
 
-    when(useMaintenanceRunTakeover)
-      .calledWith()
-      .mockReturnValue(MOCK_DESKTOP_RUN)
+    mockUseMaintenanceRunTakeover.mockReturnValue(MOCK_DESKTOP_RUN)
 
-    const [{ queryByText }] = render(props)
-
-    expect(queryByText('Robot is busy')).toBeInTheDocument()
+    render(props)
+    screen.getByText('Robot is busy')
   })
 })

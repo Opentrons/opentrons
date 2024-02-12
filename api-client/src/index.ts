@@ -1,5 +1,6 @@
 // api client entry point
 export * from './calibration'
+export * from './deck_configuration'
 export * from './health'
 export * from './instruments'
 export * from './maintenance_runs'

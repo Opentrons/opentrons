@@ -33,6 +33,7 @@ interface InstrumentCardProps extends StyleProps {
   // special casing the gripper at least for now
   isGripperAttached?: boolean
   banner?: React.ReactNode
+  isEstopNotDisengaged: boolean
 }
 
 /**
@@ -48,6 +49,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
     label,
     menuOverlayItems,
     banner,
+    isEstopNotDisengaged,
     ...styleProps
   } = props
 
@@ -61,7 +63,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
-      backgroundColor={COLORS.fundamentalsBackground}
+      backgroundColor={COLORS.grey10}
       borderRadius={BORDERS.radiusSoftCorners}
       gridGap={SPACING.spacing8}
       padding={SPACING.spacing16}
@@ -69,8 +71,13 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
       {...styleProps}
     >
       {isGripperAttached ? (
-        <Flex justifyContent={JUSTIFY_CENTER} size="3.75rem">
-          <img src={flexGripper} alt="flex gripper" />
+        <Flex justifyContent={JUSTIFY_CENTER} width="3.75rem" height="3.375rem">
+          <img
+            src={flexGripper}
+            alt="Flex Gripper"
+            max-width="100%"
+            max-height="100%"
+          />
         </Flex>
       ) : null}
       {instrumentDiagramProps?.pipetteSpecs != null ? (
@@ -92,7 +99,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
         {banner}
         <StyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey50}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
         >
@@ -111,6 +118,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
           <OverflowBtn
             onClick={handleOverflowClick}
             aria-label="InstrumentCard_overflowMenu"
+            disabled={isEstopNotDisengaged}
           />
           {menuOverlay}
           {showOverflowMenu ? (

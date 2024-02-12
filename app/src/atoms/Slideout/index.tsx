@@ -1,18 +1,19 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import {
-  Box,
-  Flex,
-  DIRECTION_ROW,
-  DIRECTION_COLUMN,
-  Btn,
-  Icon,
-  SPACING,
-  JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
+  Box,
+  Btn,
   COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_WRAP_ANYWHERE,
   Overlay,
   POSITION_FIXED,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -30,7 +31,6 @@ export interface SlideoutProps {
 
 const SHARED_STYLE = css`
   z-index: 2;
-  overflow: hidden;
   @keyframes slidein {
     from {
       transform: translateX(100%);
@@ -73,32 +73,37 @@ const EXPANDED_STYLE = css`
 const COLLAPSED_STYLE = css`
   ${SHARED_STYLE}
   animation: slideout 300ms forwards;
+  overflow: hidden;
 `
 const INITIALLY_COLLAPSED_STYLE = css`
   ${SHARED_STYLE}
   animation: slideout 0ms forwards;
+  overflow: hidden;
 `
 const OVERLAY_IN_STYLE = css`
   ${SHARED_STYLE}
   animation: overlayin 300ms forwards;
+  overflow: hidden;
 `
 const OVERLAY_OUT_STYLE = css`
   ${SHARED_STYLE}
   animation: overlayout 300ms forwards;
+  overflow: hidden;
 `
 const INITIALLY_OVERLAY_OUT_STYLE = css`
   ${SHARED_STYLE}
   animation: overlayout 0ms forwards;
+  overflow: hidden;
 `
 
 const CLOSE_ICON_STYLE = css`
   border-radius: 50%;
 
   &:hover {
-    background: ${COLORS.lightGreyHover};
+    background: ${COLORS.grey30};
   }
   &:active {
-    background: ${COLORS.lightGreyPressed};
+    background: ${COLORS.grey35};
   }
 `
 
@@ -133,6 +138,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
   const overlayOutStyle = hasBeenExpanded.current
     ? OVERLAY_OUT_STYLE
     : INITIALLY_OVERLAY_OUT_STYLE
+
   return (
     <>
       <Overlay
@@ -140,7 +146,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
         css={`
           ${isExpanded ?? false ? OVERLAY_IN_STYLE : overlayOutStyle}
         `}
-        backgroundColor={COLORS.darkBlackEnabled}
+        backgroundColor={COLORS.black90}
       />
       <Box
         css={isExpanded ?? false ? EXPANDED_STYLE : collapsedStyle}
@@ -170,7 +176,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
             >
               <StyledText
                 as="h2"
-                overflowWrap="anywhere"
+                overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 data-testid={`Slideout_title_${title}`}
               >
@@ -181,9 +187,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
                   size="1.5rem"
                   onClick={handleClose}
                   aria-label="exit"
-                  data-testid={`Slideout_icon_close_${
-                    typeof title === 'string' ? title : ''
-                  }`}
+                  data-testid={`Slideout_icon_close_${title}`}
                 >
                   <Icon name="close" css={CLOSE_ICON_STYLE} />
                 </Btn>
@@ -192,7 +196,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
           ) : (
             <>{title}</>
           )}
-          <Divider marginY={0} color={COLORS.medGreyEnabled} />
+          <Divider marginY={0} color={COLORS.grey30} />
           <Box
             padding={SPACING.spacing16}
             flex="1 1 auto"

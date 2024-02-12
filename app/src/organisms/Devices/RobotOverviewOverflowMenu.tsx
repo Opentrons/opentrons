@@ -22,7 +22,7 @@ import { Divider } from '../../atoms/structure'
 import { Tooltip } from '../../atoms/Tooltip'
 import { ChooseProtocolSlideout } from '../../organisms/ChooseProtocolSlideout'
 import { DisconnectModal } from '../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
-import { UpdateBuildroot } from '../../organisms/Devices/RobotSettings/UpdateBuildroot'
+import { handleUpdateBuildroot } from '../../organisms/Devices/RobotSettings/UpdateBuildroot'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { UNREACHABLE, CONNECTABLE, REACHABLE } from '../../redux/discovery'
@@ -30,10 +30,11 @@ import { checkShellUpdate } from '../../redux/shell'
 import { restartRobot } from '../../redux/robot-admin'
 import { home, ROBOT } from '../../redux/robot-controls'
 import { useIsRobotBusy } from './hooks'
+import { useCanDisconnect } from '../../resources/networking/hooks'
+import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { Dispatch, State } from '../../redux/types'
-import { useCanDisconnect } from '../../resources/networking/hooks'
 
 interface RobotOverviewOverflowMenuProps {
   robot: DiscoveredRobot
@@ -54,6 +55,7 @@ export const RobotOverviewOverflowMenu = (
   const isRobotBusy = useIsRobotBusy()
   const runId = useCurrentRunId()
   const [targetProps, tooltipProps] = useHoverTooltip()
+  const isEstopNotDisengaged = useIsEstopNotDisengaged(robot.name)
 
   const dispatch = useDispatch<Dispatch>()
 
@@ -65,10 +67,6 @@ export const RobotOverviewOverflowMenu = (
     dispatch(home(robot.name, ROBOT))
   }
 
-  const [
-    showSoftwareUpdateModal,
-    setShowSoftwareUpdateModal,
-  ] = React.useState<boolean>(false)
   const [
     showChooseProtocolSlideout,
     setShowChooseProtocolSlideout,
@@ -87,10 +85,6 @@ export const RobotOverviewOverflowMenu = (
     dispatch(checkShellUpdate())
   })
 
-  const handleClickUpdateBuildroot: React.MouseEventHandler = () => {
-    setShowSoftwareUpdateModal(true)
-  }
-
   const handleClickRun: React.MouseEventHandler<HTMLButtonElement> = () => {
     setShowChooseProtocolSlideout(true)
   }
@@ -105,14 +99,6 @@ export const RobotOverviewOverflowMenu = (
   return (
     <Flex data-testid="RobotOverview_overflowMenu" position={POSITION_RELATIVE}>
       <Portal level="top">
-        {showSoftwareUpdateModal &&
-        robot != null &&
-        robot.status !== UNREACHABLE ? (
-          <UpdateBuildroot
-            robot={robot}
-            close={() => setShowSoftwareUpdateModal(false)}
-          />
-        ) : null}
         {showDisconnectModal ? (
           <DisconnectModal
             onCancel={() => setShowDisconnectModal(false)}
@@ -138,9 +124,11 @@ export const RobotOverviewOverflowMenu = (
             setShowOverflowMenu(false)
           }}
         >
-          {isRobotOnWrongVersionOfSoftware && !isRobotUnavailable ? (
+          {isRobotOnWrongVersionOfSoftware &&
+          !isRobotUnavailable &&
+          !isEstopNotDisengaged ? (
             <MenuItem
-              onClick={handleClickUpdateBuildroot}
+              onClick={() => handleUpdateBuildroot(robot)}
               data-testid={`RobotOverviewOverflowMenu_updateSoftware_${String(
                 robot.name
               )}`}
@@ -153,7 +141,11 @@ export const RobotOverviewOverflowMenu = (
               <MenuItem
                 {...targetProps}
                 onClick={handleClickRun}
-                disabled={isRobotOnWrongVersionOfSoftware || isRobotBusy}
+                disabled={
+                  isRobotOnWrongVersionOfSoftware ||
+                  isRobotBusy ||
+                  isEstopNotDisengaged
+                }
                 data-testid={`RobotOverflowMenu_${robot.name}_runProtocol`}
               >
                 {t('run_a_protocol')}
@@ -166,7 +158,7 @@ export const RobotOverviewOverflowMenu = (
             </>
           ) : null}
           <MenuItem
-            disabled={isRobotUnavailable}
+            disabled={isRobotUnavailable || isEstopNotDisengaged}
             onClick={handleClickHomeGantry}
             data-testid={`RobotOverviewOverflowMenu_homeGantry_${String(
               robot.name
@@ -176,7 +168,7 @@ export const RobotOverviewOverflowMenu = (
           </MenuItem>
           {robot.status === CONNECTABLE ? (
             <MenuItem
-              disabled={isRobotBusy || !canDisconnect}
+              disabled={isRobotBusy || !canDisconnect || isEstopNotDisengaged}
               onClick={handleClickDisconnect}
             >
               {t('disconnect_from_network')}

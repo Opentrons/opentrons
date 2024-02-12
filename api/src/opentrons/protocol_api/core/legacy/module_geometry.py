@@ -13,9 +13,11 @@ from enum import Enum
 from typing import TYPE_CHECKING, Optional
 
 import numpy as np
+from numpy.typing import NDArray
 
 from opentrons_shared_data import module
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
+from opentrons_shared_data.module import OLD_TC_GEN2_LABWARE_OFFSET
 
 from opentrons.types import Location, Point, LocationLabware
 from opentrons.motion_planning.adjacent_slots_getters import (
@@ -29,8 +31,8 @@ from opentrons.hardware_control.modules.types import (
     ModuleModel,
     ModuleType,
     module_model_from_string,
+    ThermocyclerModuleModel,
 )
-
 
 if TYPE_CHECKING:
     from opentrons.protocol_api.labware import Labware
@@ -431,14 +433,30 @@ def create_geometry(
     The definition should be schema checked before being passed to this
     function; all definitions passed here are assumed to be valid.
     """
-    pre_transform = np.array(
-        (
-            definition["labwareOffset"]["x"],
-            definition["labwareOffset"]["y"],
-            definition["labwareOffset"]["z"],
-            1,
+    module_type = ModuleType(definition["moduleType"])
+    module_model = module_model_from_string(definition["model"])
+    overall_height = definition["dimensions"]["bareOverallHeight"]
+    height_over_labware = definition["dimensions"]["overLabwareHeight"]
+    display_name = definition["displayName"]
+
+    if module_model == ThermocyclerModuleModel.THERMOCYCLER_V2:
+        pre_transform: NDArray[np.double] = np.array(
+            (
+                OLD_TC_GEN2_LABWARE_OFFSET["x"],
+                OLD_TC_GEN2_LABWARE_OFFSET["y"],
+                OLD_TC_GEN2_LABWARE_OFFSET["z"],
+                1,
+            )
         )
-    )
+    else:
+        pre_transform = np.array(
+            (
+                definition["labwareOffset"]["x"],
+                definition["labwareOffset"]["y"],
+                definition["labwareOffset"]["z"],
+                1,
+            )
+        )
     if not parent.labware.is_slot:
         par = ""
         _log.warning(
@@ -462,29 +480,29 @@ def create_geometry(
     xform_ser = xforms_ser["labwareOffset"]
 
     # apply the slot transform if any
-    xform = np.array(xform_ser)
-    xformed = np.dot(xform, pre_transform)  # type: ignore[no-untyped-call]
-    module_type = ModuleType(definition["moduleType"])
+    xform: NDArray[np.double] = np.array(xform_ser)
+    xformed = np.dot(xform, pre_transform)
+    labware_offset = Point(xformed[0], xformed[1], xformed[2])
 
     if module_type == ModuleType.MAGNETIC or module_type == ModuleType.TEMPERATURE:
         return ModuleGeometry(
             parent=parent,
-            offset=Point(xformed[0], xformed[1], xformed[2]),
-            overall_height=definition["dimensions"]["bareOverallHeight"],
-            height_over_labware=definition["dimensions"]["overLabwareHeight"],
-            model=module_model_from_string(definition["model"]),
-            module_type=ModuleType(definition["moduleType"]),
-            display_name=definition["displayName"],
+            offset=labware_offset,
+            overall_height=overall_height,
+            height_over_labware=height_over_labware,
+            model=module_model,
+            module_type=module_type,
+            display_name=display_name,
         )
     elif module_type == ModuleType.THERMOCYCLER:
         return ThermocyclerGeometry(
             parent=parent,
-            offset=Point(xformed[0], xformed[1], xformed[2]),
-            overall_height=definition["dimensions"]["bareOverallHeight"],
-            height_over_labware=definition["dimensions"]["overLabwareHeight"],
-            model=module_model_from_string(definition["model"]),
-            module_type=ModuleType(definition["moduleType"]),
-            display_name=definition["displayName"],
+            offset=labware_offset,
+            overall_height=overall_height,
+            height_over_labware=height_over_labware,
+            model=module_model,
+            module_type=module_type,
+            display_name=display_name,
             lid_height=definition["dimensions"]["lidHeight"],
             configuration=(
                 ThermocyclerConfiguration(configuration)
@@ -495,14 +513,13 @@ def create_geometry(
     elif module_type == ModuleType.HEATER_SHAKER:
         return HeaterShakerGeometry(
             parent=parent,
-            offset=Point(xformed[0], xformed[1], xformed[2]),
-            overall_height=definition["dimensions"]["bareOverallHeight"],
-            height_over_labware=definition["dimensions"]["overLabwareHeight"],
-            model=module_model_from_string(definition["model"]),
-            module_type=ModuleType(definition["moduleType"]),
-            display_name=definition["displayName"],
+            offset=labware_offset,
+            overall_height=overall_height,
+            height_over_labware=height_over_labware,
+            model=module_model,
+            module_type=module_type,
+            display_name=display_name,
         )
-
     else:
         raise AssertionError(f"Module type {module_type} is invalid")
 

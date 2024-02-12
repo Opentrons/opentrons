@@ -2,7 +2,7 @@
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons.broker import Broker
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.modules import MagneticStatus
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
@@ -30,9 +30,9 @@ def mock_core_map(decoy: Decoy) -> LoadedCoreMap:
 
 
 @pytest.fixture
-def mock_broker(decoy: Decoy) -> Broker:
+def mock_broker(decoy: Decoy) -> LegacyBroker:
     """Get a mock command message broker."""
-    return decoy.mock(cls=Broker)
+    return decoy.mock(cls=LegacyBroker)
 
 
 @pytest.fixture
@@ -47,7 +47,7 @@ def subject(
     mock_core: MagneticModuleCore,
     mock_protocol_core: ProtocolCore,
     mock_core_map: LoadedCoreMap,
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
 ) -> MagneticModuleContext:
     """Get a magnetic module context with its dependencies mocked out."""
     return MagneticModuleContext(
@@ -62,7 +62,7 @@ def subject(
 def test_disengage(
     decoy: Decoy,
     mock_core: MagneticModuleCore,
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
     subject: MagneticModuleContext,
 ) -> None:
     """It should disengage magnets via the core."""
@@ -92,7 +92,7 @@ def test_get_status(
 @pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
 def test_engage_height_from_home_succeeds_on_low_version(
     decoy: Decoy,
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
     mock_core: MagneticModuleCore,
     subject: MagneticModuleContext,
 ) -> None:
@@ -136,7 +136,7 @@ def test_calibrate_raises_on_high_version(
 
 def test_engage_height_from_base(
     decoy: Decoy,
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
     mock_core: MagneticModuleCore,
     subject: MagneticModuleContext,
 ) -> None:
@@ -156,7 +156,7 @@ def test_engage_height_from_base(
 @pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
 def test_engage_offset_from_default(
     decoy: Decoy,
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
     mock_core: MagneticModuleCore,
     subject: MagneticModuleContext,
 ) -> None:

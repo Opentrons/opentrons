@@ -38,6 +38,17 @@ _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
 commands_router = APIRouter()
 
 
+class RequestModelWithCommandCreate(RequestModel[pe_commands.CommandCreate]):
+    """Equivalent to RequestModel[CommandCreate].
+
+    This works around a Pydantic v<2 bug where RequestModel[CommandCreate]
+    doesn't parse using the CommandCreate union discriminator.
+    https://github.com/pydantic/pydantic/issues/3782
+    """
+
+    data: pe_commands.CommandCreate
+
+
 class CommandNotFound(ErrorDetails):
     """An error if a given run command is not found."""
 
@@ -106,7 +117,8 @@ async def get_current_run_engine_from_url(
     return engine_store.engine
 
 
-@commands_router.post(
+@PydanticResponse.wrap_route(
+    commands_router.post,
     path="/runs/{runId}/commands",
     summary="Enqueue a command",
     description=textwrap.dedent(
@@ -146,7 +158,7 @@ async def get_current_run_engine_from_url(
     },
 )
 async def create_run_command(
-    request_body: RequestModel[pe_commands.CommandCreate],
+    request_body: RequestModelWithCommandCreate,
     waitUntilComplete: bool = Query(
         default=False,
         description=(
@@ -207,7 +219,7 @@ async def create_run_command(
     if waitUntilComplete:
         timeout_sec = None if timeout is None else timeout / 1000.0
         with move_on_after(timeout_sec):
-            await protocol_engine.wait_for_command(command.id),
+            await protocol_engine.wait_for_command(command.id)
 
     response_data = protocol_engine.state_view.commands.get(command.id)
 
@@ -217,7 +229,8 @@ async def create_run_command(
     )
 
 
-@commands_router.get(
+@PydanticResponse.wrap_route(
+    commands_router.get,
     path="/runs/{runId}/commands",
     summary="Get a list of all protocol commands in the run",
     description=(
@@ -309,7 +322,8 @@ async def get_run_commands(
     )
 
 
-@commands_router.get(
+@PydanticResponse.wrap_route(
+    commands_router.get,
     path="/runs/{runId}/commands/{commandId}",
     summary="Get full details about a specific command in the run",
     description=(

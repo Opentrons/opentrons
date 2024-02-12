@@ -21,7 +21,7 @@ export const MenuList = (props: MenuListProps): JSX.Element | null => {
   return isOnDevice && onClick != null ? (
     <LegacyModalShell
       borderRadius={BORDERS.borderRadiusSize4}
-      width="19.625rem"
+      width="max-content"
       onOutsideClick={onClick}
     >
       <Flex

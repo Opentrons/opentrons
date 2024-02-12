@@ -17,11 +17,16 @@ from opentrons.calibration_storage.ot3.pipette_offset import (
 )
 from opentrons.calibration_storage import (
     types as cal_top_types,
-    ot3_gripper_offset,
+    gripper_offset,
 )
 from opentrons.hardware_control.types import OT3Mount
 
 PIPETTE_OFFSET_CONSISTENCY_LIMIT: Final = 1.5
+
+# These type aliases aid typechecking in tests that work the same on this and
+# the hardware_control.instruments.ot2 variant
+SourceType = cal_top_types.SourceType
+CalibrationStatus = cal_top_types.CalibrationStatus
 
 
 @dataclass
@@ -41,8 +46,8 @@ class PipetteOffsetByPipetteMount:
     """
 
     offset: Point
-    source: cal_top_types.SourceType
-    status: cal_top_types.CalibrationStatus
+    source: SourceType
+    status: CalibrationStatus
     last_modified: typing.Optional[datetime] = None
 
 
@@ -63,8 +68,8 @@ class GripperCalibrationOffset:
     """
 
     offset: Point
-    source: cal_top_types.SourceType
-    status: cal_top_types.CalibrationStatus
+    source: SourceType
+    status: CalibrationStatus
     last_modified: typing.Optional[datetime] = None
 
 
@@ -74,8 +79,8 @@ def load_pipette_offset(
     # load default if pipette offset data do not exist
     pip_cal_obj = PipetteOffsetByPipetteMount(
         offset=Point(*default_pipette_offset()),
-        source=cal_top_types.SourceType.default,
-        status=cal_top_types.CalibrationStatus(),
+        source=SourceType.default,
+        status=CalibrationStatus(),
     )
     # TODO this can be removed once we switch to using
     # ot3 pipette types in the ot3 hardware controller.
@@ -90,7 +95,7 @@ def load_pipette_offset(
                 offset=pip_offset_data.offset,
                 last_modified=pip_offset_data.lastModified,
                 source=pip_offset_data.source,
-                status=cal_top_types.CalibrationStatus(
+                status=CalibrationStatus(
                     markedAt=pip_offset_data.status.markedAt,
                     markedBad=pip_offset_data.status.markedBad,
                     source=pip_offset_data.status.source,
@@ -118,11 +123,11 @@ def load_gripper_calibration_offset(
     # load default if gripper offset data do not exist
     grip_cal_obj = GripperCalibrationOffset(
         offset=Point(*default_gripper_calibration_offset()),
-        source=cal_top_types.SourceType.default,
-        status=cal_top_types.CalibrationStatus(),
+        source=SourceType.default,
+        status=CalibrationStatus(),
     )
     if gripper_id and ff.enable_ot3_hardware_controller():
-        grip_offset_data = ot3_gripper_offset.get_gripper_calibration_offset(gripper_id)
+        grip_offset_data = gripper_offset.get_gripper_calibration_offset(gripper_id)
         if grip_offset_data:
             return GripperCalibrationOffset(
                 offset=grip_offset_data.offset,
@@ -141,7 +146,7 @@ def save_gripper_calibration_offset(
     gripper_id: typing.Optional[str], delta: Point
 ) -> None:
     if gripper_id and ff.enable_ot3_hardware_controller():
-        ot3_gripper_offset.save_gripper_calibration(delta, gripper_id)
+        gripper_offset.save_gripper_calibration(delta, gripper_id)
 
 
 def check_instrument_offset_reasonability(

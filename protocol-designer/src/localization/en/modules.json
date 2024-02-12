@@ -1,6 +1,8 @@
 {
   "additional_equipment_display_names": {
     "gripper": "Flex Gripper",
+    "stagingAreas": "Staging Area Slots",
+    "trashBin": "Trash Bin",
     "wasteChute": "Waste Chute"
   },
   "module_display_names": {
@@ -15,7 +17,7 @@
     "magneticModuleType": "Magnetic module",
     "thermocyclerModuleType": "Thermocycler module",
     "heaterShakerModuleType": "Heater-Shaker module",
-    "magneticBlockType": "Magnetic Block"
+    "magneticBlockType": "Magnetic block"
   },
   "model_display_name": {
     "temperatureModuleV1": "GEN1",

@@ -1,17 +1,27 @@
+import { ALL, COLUMN, NozzleConfigurationStyle } from '@opentrons/shared-data'
 import { getNextTiprack } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
-import { dropTip } from './dropTip'
+import { COLUMN_4_SLOTS } from '../../constants'
+import { movableTrashCommandsUtil } from '../../utils/movableTrashCommandsUtil'
 import {
   curryCommandCreator,
-  getLabwareSlot,
-  reduceCommandCreators,
-  modulePipetteCollision,
-  uuid,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsTallLabwareWestOf96Channel,
+  getLabwareSlot,
+  modulePipetteCollision,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  reduceCommandCreators,
+  uuid,
+  wasteChuteCommandsUtil,
+  getWasteChuteAddressableAreaNamePip,
 } from '../../utils'
-import type { CurriedCommandCreator, CommandCreator } from '../../types'
+import { dropTip } from './dropTip'
+import type {
+  CommandCreator,
+  CommandCreatorError,
+  CurriedCommandCreator,
+} from '../../types'
 interface PickUpTipArgs {
   pipette: string
   tiprack: string
@@ -23,6 +33,17 @@ const _pickUpTip: CommandCreator<PickUpTipArgs> = (
   invariantContext,
   prevRobotState
 ) => {
+  const errors: CommandCreatorError[] = []
+  const tiprackSlot = prevRobotState.labware[args.tiprack].slot
+  if (COLUMN_4_SLOTS.includes(tiprackSlot)) {
+    errors.push(
+      errorCreators.pipettingIntoColumn4({ typeOfStep: 'pick up tip' })
+    )
+  }
+
+  if (errors.length > 0) {
+    return { errors }
+  }
   return {
     commands: [
       {
@@ -40,6 +61,8 @@ const _pickUpTip: CommandCreator<PickUpTipArgs> = (
 
 interface ReplaceTipArgs {
   pipette: string
+  dropTipLocation: string
+  nozzles?: NozzleConfigurationStyle
 }
 
 /**
@@ -52,18 +75,41 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { pipette } = args
-  const nextTiprack = getNextTiprack(pipette, invariantContext, prevRobotState)
+  const { pipette, dropTipLocation, nozzles } = args
+  const { nextTiprack, tipracks } = getNextTiprack(
+    pipette,
+    invariantContext,
+    prevRobotState,
+    nozzles
+  )
+  const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
+  const channels = pipetteSpec?.channels
+  const hasMoreTipracksOnDeck =
+    tipracks?.totalTipracks > tipracks?.filteredTipracks
+
+  const is96ChannelTipracksAvailable =
+    nextTiprack == null && channels === 96 && hasMoreTipracksOnDeck
+  if (nozzles === ALL && is96ChannelTipracksAvailable) {
+    return {
+      errors: [errorCreators.missingAdapter()],
+    }
+  }
+
+  if (nozzles === COLUMN && is96ChannelTipracksAvailable) {
+    return {
+      errors: [errorCreators.removeAdapter()],
+    }
+  }
+
   if (nextTiprack == null) {
     // no valid next tip / tiprack, bail out
     return {
       errors: [errorCreators.insufficientTips()],
     }
   }
-  const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
+
   const isFlexPipette =
-    (pipetteSpec?.displayCategory === 'FLEX' || pipetteSpec?.channels === 96) ??
-    false
+    (pipetteSpec?.displayCategory === 'FLEX' || channels === 96) ?? false
 
   if (!pipetteSpec)
     return {
@@ -77,6 +123,16 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   const labwareDef =
     invariantContext.labwareEntities[nextTiprack.tiprackId]?.def
 
+  const isWasteChute =
+    invariantContext.additionalEquipmentEntities[dropTipLocation] != null &&
+    invariantContext.additionalEquipmentEntities[dropTipLocation].name ===
+      'wasteChute'
+
+  const isTrashBin =
+    invariantContext.additionalEquipmentEntities[dropTipLocation] != null &&
+    invariantContext.additionalEquipmentEntities[dropTipLocation].name ===
+      'trashBin'
+
   if (!labwareDef) {
     return {
       errors: [
@@ -87,6 +143,34 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
       ],
     }
   }
+  if (
+    !args.dropTipLocation ||
+    !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
+  ) {
+    return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
+  }
+  if (
+    channels === 96 &&
+    nozzles === COLUMN &&
+    getIsTallLabwareWestOf96Channel(
+      prevRobotState,
+      invariantContext,
+      nextTiprack.tiprackId,
+      pipette
+    )
+  ) {
+    return {
+      errors: [
+        errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
+          source: 'tiprack',
+          labware:
+            invariantContext.labwareEntities[nextTiprack.tiprackId].def.metadata
+              .displayName,
+        }),
+      ],
+    }
+  }
+
   if (
     modulePipetteCollision({
       pipette,
@@ -131,9 +215,13 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
 
-  const commandCreators: CurriedCommandCreator[] = [
+  const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
+    channels
+  )
+  let commandCreators: CurriedCommandCreator[] = [
     curryCommandCreator(dropTip, {
       pipette,
+      dropTipLocation,
     }),
     curryCommandCreator(_pickUpTip, {
       pipette,
@@ -141,6 +229,36 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
       well: nextTiprack.well,
     }),
   ]
+  if (isWasteChute) {
+    commandCreators = [
+      ...wasteChuteCommandsUtil({
+        type: 'dropTip',
+        pipetteId: pipette,
+        addressableAreaName: addressableAreaNameWasteChute,
+        prevRobotState,
+      }),
+      curryCommandCreator(_pickUpTip, {
+        pipette,
+        tiprack: nextTiprack.tiprackId,
+        well: nextTiprack.well,
+      }),
+    ]
+  }
+  if (isTrashBin) {
+    commandCreators = [
+      ...movableTrashCommandsUtil({
+        type: 'dropTip',
+        pipetteId: pipette,
+        prevRobotState,
+        invariantContext,
+      }),
+      curryCommandCreator(_pickUpTip, {
+        pipette,
+        tiprack: nextTiprack.tiprackId,
+        well: nextTiprack.well,
+      }),
+    ]
+  }
 
   return reduceCommandCreators(
     commandCreators,

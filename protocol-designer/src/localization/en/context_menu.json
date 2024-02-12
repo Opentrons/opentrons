@@ -1,6 +1,4 @@
 {
-  "step": {
-    "duplicate": "Duplicate Step",
-    "delete": "Delete Step"
-  }
+  "duplicate": "Duplicate Step",
+  "delete": "Delete Step"
 }

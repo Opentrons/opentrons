@@ -16,9 +16,10 @@ from typing import (
     cast,
 )
 from typing_extensions import Final
+from pathlib import Path
 
 try:
-    import aionotify  # type: ignore[import]
+    import aionotify  # type: ignore[import-untyped]
 except (OSError, ModuleNotFoundError):
     aionotify = None
 
@@ -110,7 +111,12 @@ class Controller:
         watcher.watch(
             alias="modules",
             path="/dev",
-            flags=(aionotify.Flags.CREATE | aionotify.Flags.DELETE),
+            flags=(
+                aionotify.Flags.CREATE
+                | aionotify.Flags.DELETE
+                | aionotify.Flags.MOVED_FROM
+                | aionotify.Flags.MOVED_TO
+            ),
         )
         return watcher
 
@@ -132,6 +138,12 @@ class Controller:
     def module_controls(self, module_controls: AttachedModulesControl) -> None:
         self._module_controls = module_controls
 
+    async def get_serial_number(self) -> Optional[str]:
+        try:
+            return Path("/var/serial").read_text().strip()
+        except OSError:
+            return None
+
     def start_gpio_door_watcher(
         self,
         loop: asyncio.AbstractEventLoop,
@@ -145,11 +157,15 @@ class Controller:
         await self._smoothie_driver.update_position()
         return self._smoothie_driver.position
 
+    def _unhomed_axes(self, axes: Sequence[str]) -> List[str]:
+        return list(
+            axis
+            for axis in axes
+            if not self._smoothie_driver.homed_flags.get(axis, False)
+        )
+
     def is_homed(self, axes: Sequence[str]) -> bool:
-        for axis in axes:
-            if not self._smoothie_driver.homed_flags.get(axis, False):
-                return False
-        return True
+        return not any(self._unhomed_axes(axes))
 
     async def move(
         self,

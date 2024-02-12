@@ -1,17 +1,18 @@
 import * as React from 'react'
 import { when } from 'jest-when'
-import { renderHook } from '@testing-library/react-hooks'
-import { useAllRunsQuery } from '@opentrons/react-api-client'
+import { renderHook, waitFor } from '@testing-library/react'
+
+import { useNotifyAllRunsQuery } from '../../../../resources/runs/useNotifyAllRunsQuery'
 import { useHistoricRunDetails } from '../useHistoricRunDetails'
 import { mockRunningRun } from '../../../RunTimeControl/__fixtures__'
 import { mockSuccessQueryResults } from '../../../../__fixtures__'
 
 import type { RunData } from '@opentrons/api-client'
 
-jest.mock('@opentrons/react-api-client')
+jest.mock('../../../../resources/runs/useNotifyAllRunsQuery')
 
-const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
-  typeof useAllRunsQuery
+const mockuseNotifyAllRunsQuery = useNotifyAllRunsQuery as jest.MockedFunction<
+  typeof useNotifyAllRunsQuery
 >
 
 const MOCK_RUN_LATER: RunData = {
@@ -32,7 +33,7 @@ const MOCK_RUN_EARLIER: RunData = {
 }
 
 describe('useHistoricRunDetails', () => {
-  when(mockUseAllRunsQuery)
+  when(mockuseNotifyAllRunsQuery)
     .calledWith({}, {}, undefined)
     .mockReturnValue(
       mockSuccessQueryResults({
@@ -42,15 +43,16 @@ describe('useHistoricRunDetails', () => {
     )
 
   it('returns historical run details with newest first', async () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-      <div>{children}</div>
-    )
-    const { result, waitFor } = renderHook(useHistoricRunDetails, { wrapper })
-    await waitFor(() => result.current != null)
-    expect(result.current).toEqual([MOCK_RUN_LATER, MOCK_RUN_EARLIER])
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <div>{children}</div>
+    const { result } = renderHook(useHistoricRunDetails, { wrapper })
+    await waitFor(() => {
+      expect(result.current).toEqual([MOCK_RUN_LATER, MOCK_RUN_EARLIER])
+    })
   })
   it('returns historical run details with newest first to specific host', async () => {
-    when(mockUseAllRunsQuery)
+    when(mockuseNotifyAllRunsQuery)
       .calledWith({}, {}, { hostname: 'fakeIp' })
       .mockReturnValue(
         mockSuccessQueryResults({
@@ -58,18 +60,19 @@ describe('useHistoricRunDetails', () => {
           links: {},
         })
       )
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-      <div>{children}</div>
-    )
-    const { result, waitFor } = renderHook(
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <div>{children}</div>
+    const { result } = renderHook(
       () => useHistoricRunDetails({ hostname: 'fakeIp' }),
       { wrapper }
     )
-    await waitFor(() => result.current != null)
-    expect(result.current).toEqual([
-      MOCK_RUN_LATER,
-      MOCK_RUN_EARLIER,
-      MOCK_RUN_EARLIER,
-    ])
+    await waitFor(() => {
+      expect(result.current).toEqual([
+        MOCK_RUN_LATER,
+        MOCK_RUN_EARLIER,
+        MOCK_RUN_EARLIER,
+      ])
+    })
   })
 })

@@ -26,7 +26,7 @@ describe('determineMultiChannelSupport', () => {
   it('should allow multi channel when getWellNamePerMultiTip returns 8 wells', () => {
     const def: any = 'fakeDef'
     when(getWellNamePerMultiTipMock)
-      .calledWith(def, 'A1')
+      .calledWith(def, 'A1', 8)
       .mockReturnValue(['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1'])
     const result = determineMultiChannelSupport(def)
     expect(result).toEqual({
@@ -37,7 +37,9 @@ describe('determineMultiChannelSupport', () => {
 
   it('should NOT allow multi channel when getWellNamePerMultiTip does not return 8 wells', () => {
     const def: any = 'fakeDef'
-    when(getWellNamePerMultiTipMock).calledWith(def, 'A1').mockReturnValue(null)
+    when(getWellNamePerMultiTipMock)
+      .calledWith(def, 'A1', 8)
+      .mockReturnValue(null)
     const result = determineMultiChannelSupport(def)
     expect(result).toEqual({
       disablePipetteField: false,

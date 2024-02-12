@@ -5,7 +5,7 @@ from datetime import datetime
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
 
 from opentrons.protocol_engine.actions import PlayAction
 from opentrons.protocol_engine.state import State, StateStore, Config
@@ -32,7 +32,7 @@ def engine_config() -> Config:
 @pytest.fixture
 def subject(
     change_notifier: ChangeNotifier,
-    ot2_standard_deck_def: DeckDefinitionV3,
+    ot2_standard_deck_def: DeckDefinitionV4,
     engine_config: Config,
 ) -> StateStore:
     """Get a StateStore test subject."""
@@ -55,7 +55,11 @@ def test_has_state(subject: StateStore) -> None:
 def test_state_is_immutable(subject: StateStore) -> None:
     """It should treat the state as immutable."""
     result_1 = subject.state
-    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
+    subject.handle_action(
+        PlayAction(
+            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
+        )
+    )
     result_2 = subject.state
 
     assert result_1 is not result_2
@@ -68,7 +72,11 @@ def test_notify_on_state_change(
 ) -> None:
     """It should notify state changes when actions are handled."""
     decoy.verify(change_notifier.notify(), times=0)
-    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
+    subject.handle_action(
+        PlayAction(
+            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
+        )
+    )
     decoy.verify(change_notifier.notify(), times=1)
 
 
@@ -78,7 +86,7 @@ async def test_wait_for_state(
     subject: StateStore,
 ) -> None:
     """It should return an awaitable that signals state changes."""
-    check_condition: Callable[..., Optional[str]] = decoy.mock()
+    check_condition: Callable[..., Optional[str]] = decoy.mock(name="check_condition")
 
     decoy.when(check_condition("foo", bar="baz")).then_return(
         None,
@@ -98,7 +106,7 @@ async def test_wait_for_state_short_circuit(
     change_notifier: ChangeNotifier,
 ) -> None:
     """It should short-circuit the change notifier if condition is satisfied."""
-    check_condition: Callable[..., Optional[str]] = decoy.mock()
+    check_condition: Callable[..., Optional[str]] = decoy.mock(name="check_condition")
 
     decoy.when(check_condition("foo", bar="baz")).then_return("hello world")
 
@@ -110,14 +118,14 @@ async def test_wait_for_state_short_circuit(
 
 async def test_wait_for_already_true(decoy: Decoy, subject: StateStore) -> None:
     """It should signal immediately if condition is already met."""
-    check_condition = decoy.mock()
+    check_condition = decoy.mock(name="check_condition")
     decoy.when(check_condition()).then_return(True)
     await subject.wait_for(check_condition)
 
 
 async def test_wait_for_raises(decoy: Decoy, subject: StateStore) -> None:
     """It should raise if the condition function raises."""
-    check_condition = decoy.mock()
+    check_condition = decoy.mock(name="check_condition")
 
     decoy.when(check_condition()).then_raise(ValueError("oh no"))
 

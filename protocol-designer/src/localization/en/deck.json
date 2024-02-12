@@ -11,6 +11,10 @@
   "header": {
     "end": "Click on labware to inspect the result of your protocol"
   },
+  "off_deck": {
+    "slideout_title": "Off-deck labware",
+    "slideout_empty_state": "There is currently no off-deck labware in this step of the protocol"
+  },
   "overlay": {
     "name_labware": {
       "nickname_placeholder": "Add a nickname?",

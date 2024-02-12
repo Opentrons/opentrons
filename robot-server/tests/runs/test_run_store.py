@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from typing import List, Optional, Type
 
 import pytest
+from decoy import Decoy
 from sqlalchemy.engine import Engine
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -15,6 +16,7 @@ from robot_server.runs.run_store import (
 )
 from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.action_models import RunAction, RunActionType
+from robot_server.service.notifications import RunsPublisher
 
 from opentrons.protocol_engine import (
     commands as pe_commands,
@@ -28,10 +30,22 @@ from opentrons.protocol_engine import (
 from opentrons.types import MountType, DeckSlotName
 
 
+@pytest.fixture()
+def mock_runs_publisher(decoy: Decoy) -> RunsPublisher:
+    """Get a mock RunsPublisher."""
+    return decoy.mock(cls=RunsPublisher)
+
+
 @pytest.fixture
-def subject(sql_engine: Engine) -> RunStore:
+def subject(
+    sql_engine: Engine,
+    mock_runs_publisher: RunsPublisher,
+) -> RunStore:
     """Get a ProtocolStore test subject."""
-    return RunStore(sql_engine=sql_engine)
+    return RunStore(
+        sql_engine=sql_engine,
+        runs_publisher=mock_runs_publisher,
+    )
 
 
 @pytest.fixture
@@ -71,6 +85,46 @@ def state_summary() -> StateSummary:
     analysis_error = pe_errors.ErrorOccurrence(
         id="error-id",
         createdAt=datetime(year=2023, month=3, day=3),
+        errorType="BadError",
+        detail="oh no",
+    )
+
+    analysis_labware = pe_types.LoadedLabware(
+        id="labware-id",
+        loadName="load-name",
+        definitionUri="namespace/load-name/42",
+        location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        offsetId=None,
+    )
+
+    analysis_pipette = pe_types.LoadedPipette(
+        id="pipette-id",
+        pipetteName=PipetteNameType.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+
+    liquids = [Liquid(id="some-id", displayName="water", description="water desc")]
+
+    return StateSummary(
+        errors=[analysis_error],
+        labware=[analysis_labware],
+        pipettes=[analysis_pipette],
+        # TODO(mc, 2022-02-14): evaluate usage of modules in the analysis resp.
+        modules=[],
+        # TODO (tz 22-4-19): added the field to class. make sure what to initialize
+        labwareOffsets=[],
+        status=EngineStatus.IDLE,
+        liquids=liquids,
+    )
+
+
+@pytest.fixture
+def invalid_state_summary() -> StateSummary:
+    """Should fail pydantic validation."""
+    analysis_error = pe_errors.ErrorOccurrence.construct(
+        id="error-id",
+        # Invalid value here should fail analysis
+        createdAt=MountType.LEFT,  # type: ignore
         errorType="BadError",
         detail="oh no",
     )
@@ -365,6 +419,22 @@ def test_get_state_summary(subject: RunStore, state_summary: StateSummary) -> No
     subject.update_run_state(run_id="run-id", summary=state_summary, commands=[])
     result = subject.get_state_summary(run_id="run-id")
     assert result == state_summary
+
+
+def test_get_state_summary_failure(
+    subject: RunStore, invalid_state_summary: StateSummary
+) -> None:
+    """It should return None."""
+    subject.insert(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+    subject.update_run_state(
+        run_id="run-id", summary=invalid_state_summary, commands=[]
+    )
+    result = subject.get_state_summary(run_id="run-id")
+    assert result is None
 
 
 def test_get_state_summary_none(subject: RunStore) -> None:

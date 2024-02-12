@@ -97,6 +97,12 @@ test-photometric-single:
 	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 50 --channels 1 --tip 50 --dye-well-col-offset 3
 	-$(MAKE) remove-patches-gravimetric
 
+.PHONY: test-photometric-multi
+test-photometric-multi:
+	-$(MAKE) apply-patches-gravimetric
+	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 50 --channels 8 --tip 50
+	-$(MAKE) remove-patches-gravimetric
+
 .PHONY: test-photometric
 test-photometric:
 	-$(MAKE) apply-patches-gravimetric
@@ -129,6 +135,8 @@ test-gravimetric-96:
 .PHONY: test-gravimetric
 test-gravimetric:
 	-$(MAKE) apply-patches-gravimetric
+	$(python) -m hardware_testing.gravimetric.daily_setup --simulate
+	$(python) -m hardware_testing.gravimetric.daily_setup --simulate --calibrate
 	$(MAKE) test-gravimetric-single
 	$(MAKE) test-gravimetric-multi
 	$(MAKE) test-gravimetric-96
@@ -180,6 +188,8 @@ ssh $(ssh_helper_ot3) root@$(1) \
 mount -o remount,rw / &&\
 mv /data/plot/index.html /opt/opentrons-robot-server/hardware_testing/tools/plot &&\
 mv /data/plot/index.js /opt/opentrons-robot-server/hardware_testing/tools/plot &&\
+mv /data/plot/plotly-2.12.1.min.js /opt/opentrons-robot-server/hardware_testing/tools/plot &&\
+mv /data/plot/favicon.png /opt/opentrons-robot-server/hardware_testing/tools/plot &&\
 rm -rf /data/plot &&\
 cleanup || cleanup"
 endef
@@ -289,19 +299,16 @@ sync-ot3: sync-sw-ot3 sync-fw-ot3
 push-ot3-gravimetric:
 	$(MAKE) apply-patches-gravimetric
 	-$(MAKE) sync-sw-ot3
+	scp $(ssh_helper_ot3) -r hardware_testing/labware root@$(host):/data/labware/v2/custom_definitions/custom_beta/
 	$(MAKE) remove-patches-gravimetric
-	scp $(ssh_helper_ot3) -r hardware_testing/labware/opentrons_flex_96_tiprack_50ul_adp/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
-	scp $(ssh_helper_ot3) -r hardware_testing/labware/opentrons_flex_96_tiprack_200ul_adp/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
-	scp $(ssh_helper_ot3) -r hardware_testing/labware/opentrons_flex_96_tiprack_1000ul_adp/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
-	scp $(ssh_helper_ot3) -r hardware_testing/labware/radwag_pipette_calibration_vial/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
 
 .PHONY: apply-patches-gravimetric
 apply-patches-gravimetric:
-	cd ../ && git apply ./hardware-testing/hardware_testing/gravimetric/overrides/*.patch --allow-empty
+	cd ../ && git apply ./hardware-testing/hardware_testing/gravimetric/overrides/*.patch --allow-empty || true
 
 .PHONY: remove-patches-gravimetric
 remove-patches-gravimetric:
-	cd ../ && git apply ./hardware-testing/hardware_testing/gravimetric/overrides/*.patch --reverse --allow-empty
+	cd ../ && git apply ./hardware-testing/hardware_testing/gravimetric/overrides/*.patch --reverse --allow-empty || true
 
 upstream ?= origin/edge
 .PHONY: update-patches-gravimetric

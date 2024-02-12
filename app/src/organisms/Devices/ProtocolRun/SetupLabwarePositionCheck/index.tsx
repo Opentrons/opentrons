@@ -13,14 +13,21 @@ import {
   PrimaryButton,
   COLORS,
 } from '@opentrons/components'
-import { useRunQuery } from '@opentrons/react-api-client'
+import { useProtocolQuery } from '@opentrons/react-api-client'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useLPCSuccessToast } from '../../hooks/useLPCSuccessToast'
 import { Tooltip } from '../../../../atoms/Tooltip'
-import { useLPCDisabledReason, useStoredProtocolAnalysis } from '../../hooks'
+import {
+  useRobotType,
+  useLPCDisabledReason,
+  useStoredProtocolAnalysis,
+} from '../../hooks'
 import { CurrentOffsetsTable } from './CurrentOffsetsTable'
 import { useLaunchLPC } from '../../../LabwarePositionCheck/useLaunchLPC'
 import { StyledText } from '../../../../atoms/text'
+import { getLatestCurrentOffsets } from './utils'
+import { useNotifyRunQuery } from '../../../../resources/runs/useNotifyRunQuery'
+
 import type { LabwareOffset } from '@opentrons/api-client'
 
 interface SetupLabwarePositionCheckProps {
@@ -35,7 +42,18 @@ export function SetupLabwarePositionCheck(
   const { robotName, runId, expandLabwareStep } = props
   const { t, i18n } = useTranslation('protocol_setup')
 
-  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
+  const robotType = useRobotType(robotName)
+  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
+  const { data: protocolRecord } = useProtocolQuery(
+    runRecord?.data.protocolId ?? null,
+    {
+      staleTime: Infinity,
+    }
+  )
+  const protocolName =
+    protocolRecord?.data.metadata.protocolName ??
+    protocolRecord?.data.files[0].name ??
+    ''
   const currentOffsets = runRecord?.data?.labwareOffsets ?? []
   const sortedOffsets: LabwareOffset[] =
     currentOffsets.length > 0
@@ -62,7 +80,9 @@ export function SetupLabwarePositionCheck(
 
   const { setIsShowingLPCSuccessToast } = useLPCSuccessToast()
 
-  const { launchLPC, LPCWizard } = useLaunchLPC(runId)
+  const { launchLPC, LPCWizard } = useLaunchLPC(runId, robotType, protocolName)
+
+  const nonIdentityOffsets = getLatestCurrentOffsets(sortedOffsets)
 
   return (
     <Flex
@@ -70,9 +90,9 @@ export function SetupLabwarePositionCheck(
       marginTop={SPACING.spacing16}
       gridGap={SPACING.spacing16}
     >
-      {sortedOffsets.length > 0 ? (
+      {nonIdentityOffsets.length > 0 ? (
         <CurrentOffsetsTable
-          currentOffsets={sortedOffsets}
+          currentOffsets={nonIdentityOffsets}
           commands={protocolData?.commands ?? []}
           labware={protocolData?.labware ?? []}
           modules={protocolData?.modules ?? []}
@@ -81,7 +101,7 @@ export function SetupLabwarePositionCheck(
         <Flex
           paddingY={SPACING.spacing8}
           marginY={SPACING.spacing24}
-          backgroundColor={COLORS.fundamentalsBackground}
+          backgroundColor={COLORS.grey10}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
         >

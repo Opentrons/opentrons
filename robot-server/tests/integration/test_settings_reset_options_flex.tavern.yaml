@@ -2,7 +2,7 @@ test_name: GET Settings Reset Options for OT-3
 marks:
   - ot3_only
   - usefixtures:
-    - ot3_server_base_url
+      - ot3_server_base_url
 stages:
   - name: Reset Options GET request returns correct option
     request:
@@ -23,13 +23,19 @@ stages:
             description: !re_search 'Clear gripper offset calibrations'
           - id: runsHistory
             name: Clear Runs History
-            description: !re_search 'Erase this device''s stored history of protocols and runs'
+            description: !re_search "Erase this device's stored history of protocols and runs"
           - id: onDeviceDisplay
             name: On-Device Display Configuration
             description: !re_search 'on-device display'
+          - id: deckConfiguration
+            name: Deck Configuration
+            description: Clear deck configuration
           - id: moduleCalibration
             name: Module Calibrations
             description: !re_search 'Clear module offset calibrations'
+          - id: authorizedKeys
+            name: SSH Authorized Keys
+            description: !re_search 'Clear the ssh authorized keys'
 
   - name: POST Reset gripperOffsetCalibrations true on OT-3
     request:
@@ -42,7 +48,7 @@ stages:
       json:
         message: "Options 'gripper_offset' were reset"
 
-  # POSTing bootScripts, pipetteOffsetCalibrations, and runsHistory are untested here because they
+  # Common reset options like bootScripts, pipetteOffsetCalibrations, and runsHistory are untested here because they
   # should already be covered by the OT-2 test.
 
   # POSTing onDeviceDisplay is untested here because it writes to a part of the filesystem outside

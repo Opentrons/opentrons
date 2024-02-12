@@ -1,7 +1,7 @@
 from typing import AsyncGenerator
 
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
 from ...robot_client import RobotClient
 
@@ -174,7 +174,6 @@ async def test_deck_slot_standardization(
     run_summary = (await robot_client.get_run(run_id)).json()["data"]
     [run_summary_module] = run_summary["modules"]
     [
-        run_summary_fixed_trash_labware,
         run_summary_labware_1,
         run_summary_labware_2,
     ] = run_summary["labware"]

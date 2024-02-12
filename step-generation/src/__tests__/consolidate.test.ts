@@ -2,7 +2,6 @@ import { consolidate } from '../commandCreators/compound/consolidate'
 import { FIXED_TRASH_ID } from '../constants'
 import {
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-  blowoutHelper,
   DEFAULT_PIPETTE,
   delayCommand,
   delayWithOffset,
@@ -22,11 +21,12 @@ import {
   pickUpTipHelper,
   SOURCE_LABWARE,
   AIR_GAP_META,
+  blowoutInPlaceHelper,
 } from '../fixtures'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '../utils'
-import type { CreateCommand } from '@opentrons/shared-data'
-import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
+import type { AspDispAirgapParams, CreateCommand } from '@opentrons/shared-data'
 import type { ConsolidateArgs, InvariantContext, RobotState } from '../types'
+
 const airGapHelper = makeAirGapHelper({
   wellLocation: {
     origin: 'bottom',
@@ -38,9 +38,6 @@ const airGapHelper = makeAirGapHelper({
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()
 const touchTipHelper = makeTouchTipHelper()
-// TODO: Ian 2019-06-14 more elegant way to test the blowout offset calculation
-const BLOWOUT_OFFSET_ANY: any = expect.any(Number)
-
 function tripleMix(
   wellName: string,
   volume: number,
@@ -71,6 +68,7 @@ let mixinArgs: Partial<ConsolidateArgs>
 
 beforeEach(() => {
   invariantContext = makeContext()
+
   initialRobotState = getInitialRobotStateStandard(invariantContext)
   robotStatePickedUpOneTip = getRobotStatePickedUpTipStandard(invariantContext)
 
@@ -97,6 +95,7 @@ beforeEach(() => {
     touchTipAfterDispense: false,
     mixInDestination: null,
     blowoutLocation: null,
+    dropTipLocation: FIXED_TRASH_ID,
   }
 })
 
@@ -117,6 +116,39 @@ describe('consolidate single-channel', () => {
       aspirateHelper('A1', 50),
       aspirateHelper('A2', 50),
       dispenseHelper('B1', 100),
+    ])
+  })
+
+  it('Minimal single-channel: A1 A2 to B1, 50uL with p300, drop in waste chute', () => {
+    const data = {
+      ...mixinArgs,
+      sourceWells: ['A1', 'A2'],
+      volume: 50,
+      changeTip: 'once',
+      dropTipLocation: 'wasteChuteId',
+      dispenseAirGapVolume: 5,
+    } as ConsolidateArgs
+
+    invariantContext = {
+      ...invariantContext,
+      additionalEquipmentEntities: {
+        wasteChuteId: {
+          name: 'wasteChute',
+          id: 'wasteChuteId',
+          location: 'cutoutD3',
+        },
+      },
+    }
+
+    const result = consolidate(data, invariantContext, initialRobotState)
+    const res = getSuccessResult(result)
+
+    expect(res.commands).toEqual([
+      pickUpTipHelper('A1'),
+      aspirateHelper('A1', 50),
+      aspirateHelper('A2', 50),
+      dispenseHelper('B1', 100),
+      airGapHelper('B1', 5, { labwareId: 'destPlateId' }),
     ])
   })
 
@@ -156,7 +188,7 @@ describe('consolidate single-channel', () => {
       aspirateHelper('A1', 150),
       aspirateHelper('A2', 150),
       dispenseHelper('B1', 300),
-      dropTipHelper('A1'),
+      ...dropTipHelper(),
 
       pickUpTipHelper('B1'),
       aspirateHelper('A3', 150),
@@ -523,14 +555,7 @@ describe('consolidate single-channel', () => {
           },
         },
       }),
-      blowoutHelper(null, {
-        wellLocation: {
-          origin: 'bottom',
-          offset: {
-            z: BLOWOUT_OFFSET_ANY,
-          },
-        },
-      }),
+      ...blowoutInPlaceHelper(),
       aspirateHelper('A4', 100),
       dispenseHelper('B1', 100),
 
@@ -543,15 +568,7 @@ describe('consolidate single-channel', () => {
           },
         },
       }),
-
-      blowoutHelper(null, {
-        wellLocation: {
-          origin: 'bottom',
-          offset: {
-            z: BLOWOUT_OFFSET_ANY,
-          },
-        },
-      }),
+      ...blowoutInPlaceHelper(),
     ])
   })
 
@@ -1352,23 +1369,7 @@ describe('consolidate single-channel', () => {
         // for the next chunk
 
         // Blowout to trash
-        {
-          commandType: 'blowout',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'fixedTrash',
-            wellName: 'A1',
-            flowRate: 2.3,
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 80.3,
-              },
-            },
-          },
-        },
-
+        ...blowoutInPlaceHelper(),
         // Second chunk: source well A3
         // pre-wet
         {
@@ -1611,23 +1612,7 @@ describe('consolidate single-channel', () => {
         },
 
         // Blowout to trash
-        {
-          commandType: 'blowout',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'fixedTrash',
-            wellName: 'A1',
-            flowRate: 2.3,
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 80.3,
-              },
-            },
-          },
-        },
-
+        ...blowoutInPlaceHelper(),
         // Dispense > air gap in dest well
         {
           commandType: 'aspirate',
@@ -1656,15 +1641,7 @@ describe('consolidate single-channel', () => {
         },
 
         // we used dispense > air gap, so we will dispose of the tip
-        {
-          commandType: 'dropTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'fixedTrash',
-            wellName: 'A1',
-          },
-        },
+        ...dropTipHelper(),
       ])
     })
 
@@ -2334,17 +2311,6 @@ describe('consolidate single-channel', () => {
             seconds: 11,
           },
         },
-
-        // we used dispense > air gap, so we will dispose of the tip
-        {
-          commandType: 'dropTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'fixedTrash',
-            wellName: 'A1',
-          },
-        },
       ])
     })
 
@@ -2755,15 +2721,7 @@ describe('consolidate single-channel', () => {
           },
         },
         // replace tip
-        {
-          commandType: 'dropTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'fixedTrash',
-            wellName: 'A1',
-          },
-        },
+        ...dropTipHelper(),
         {
           commandType: 'pickUpTip',
           key: expect.any(String),
@@ -3057,17 +3015,6 @@ describe('consolidate single-channel', () => {
             seconds: 11,
           },
         },
-
-        // we used dispense > air gap, so we will dispose of the tip
-        {
-          commandType: 'dropTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'fixedTrash',
-            wellName: 'A1',
-          },
-        },
       ])
     })
   })
@@ -3092,7 +3039,7 @@ describe('consolidate multi-channel', () => {
     destWell: 'A12',
     sourceLabware: SOURCE_LABWARE,
     destLabware: DEST_LABWARE,
-
+    dropTipLocation: FIXED_TRASH_ID,
     // volume and changeTip should be explicit in tests
 
     preWetTip: false,

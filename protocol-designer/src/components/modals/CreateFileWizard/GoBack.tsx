@@ -1,6 +1,6 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { Btn, Text, TYPOGRAPHY } from '@opentrons/components'
-import { i18n } from '../../../localization'
 
 interface GoBackProps {
   onClick: React.MouseEventHandler
@@ -8,14 +8,14 @@ interface GoBackProps {
 
 export function GoBack(props: GoBackProps): JSX.Element {
   const { onClick } = props
-
+  const { t } = useTranslation('application')
   return (
     <Btn
       aria-label="GoBack_button"
       css={TYPOGRAPHY.darkLinkH4SemiBold}
       onClick={onClick}
     >
-      <Text>{i18n.t('application.go_back')}</Text>
+      <Text>{t('go_back')}</Text>
     </Btn>
   )
 }

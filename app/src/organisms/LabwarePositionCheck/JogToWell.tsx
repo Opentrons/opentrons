@@ -29,6 +29,8 @@ import {
 
 import levelWithTip from '../../assets/images/lpc_level_with_tip.svg'
 import levelWithLabware from '../../assets/images/lpc_level_with_labware.svg'
+import levelProbeWithTip from '../../assets/images/lpc_level_probe_with_tip.svg'
+import levelProbeWithLabware from '../../assets/images/lpc_level_probe_with_labware.svg'
 import { getIsOnDevice } from '../../redux/config'
 import { Portal } from '../../App/portal'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
@@ -57,6 +59,7 @@ interface JogToWellProps {
   body: React.ReactNode
   initialPosition: VectorOffset
   existingOffset: VectorOffset
+  shouldUseMetalProbe: boolean
 }
 export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
   const { t } = useTranslation(['labware_position_check', 'shared'])
@@ -70,6 +73,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
     handleJog,
     initialPosition,
     existingOffset,
+    shouldUseMetalProbe,
   } = props
 
   const [joggedPosition, setJoggedPosition] = React.useState<VectorOffset>(
@@ -93,14 +97,17 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
   }, [])
 
   let wellsToHighlight: string[] = []
-  if (getPipetteNameSpecs(pipetteName)?.channels === 8) {
+  if (
+    getPipetteNameSpecs(pipetteName)?.channels === 8 &&
+    !shouldUseMetalProbe
+  ) {
     wellsToHighlight = labwareDef.ordering[0]
   } else {
     wellsToHighlight = ['A1']
   }
 
   const wellStroke: WellStroke = wellsToHighlight.reduce(
-    (acc, wellName) => ({ ...acc, [wellName]: COLORS.blueEnabled }),
+    (acc, wellName) => ({ ...acc, [wellName]: COLORS.blue50 }),
     {}
   )
 
@@ -109,6 +116,10 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
     getVectorDifference(joggedPosition, initialPosition)
   )
   const isTipRack = getIsTiprack(labwareDef)
+  let levelSrc = isTipRack ? levelWithTip : levelWithLabware
+  if (shouldUseMetalProbe) {
+    levelSrc = isTipRack ? levelProbeWithTip : levelProbeWithLabware
+  }
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -136,12 +147,13 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
                   wellStroke={wellStroke}
                   wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_OUTSIDE}
                   highlightedWellLabels={{ wells: wellsToHighlight }}
-                  labwareStroke={COLORS.medGreyEnabled}
-                  wellLabelColor={COLORS.medGreyEnabled}
+                  labwareStroke={COLORS.grey30}
+                  wellLabelColor={COLORS.grey30}
                 />
                 <PipetteRender
                   labwareDef={labwareDef}
                   pipetteName={pipetteName}
+                  usingMetalProbe={shouldUseMetalProbe}
                 />
               </>
             )}
@@ -149,7 +161,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
           <img
             width="89px"
             height="145px"
-            src={isTipRack ? levelWithTip : levelWithLabware}
+            src={levelSrc}
             alt={`level with ${isTipRack ? 'tip' : 'labware'}`}
           />
         </Flex>

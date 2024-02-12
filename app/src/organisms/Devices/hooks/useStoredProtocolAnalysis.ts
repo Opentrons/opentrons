@@ -4,9 +4,10 @@ import {
   parseInitialLoadedLabwareEntity,
   parsePipetteEntity,
 } from '@opentrons/api-client'
-import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
+import { useProtocolQuery } from '@opentrons/react-api-client'
 
 import { getStoredProtocol } from '../../../redux/protocol-storage'
+import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'
@@ -36,7 +37,7 @@ export const parseProtocolAnalysisOutput = (
 export function useStoredProtocolAnalysis(
   runId: string | null
 ): ProtocolAnalysisOutput | null {
-  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
+  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data?.protocolId ?? null
 
   const { data: protocolRecord } = useProtocolQuery(protocolId, {

@@ -5,19 +5,19 @@ import last from 'lodash/last'
 import { useHistory } from 'react-router-dom'
 
 import {
-  Box,
-  Flex,
-  DIRECTION_ROW,
   ALIGN_START,
+  Box,
+  COLORS,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  IconProps,
+  ModuleIcon,
   SPACING,
   TYPOGRAPHY,
-  useOnClickOutside,
-  IconProps,
   useHoverTooltip,
-  COLORS,
-  Icon,
-  ModuleIcon,
+  useOnClickOutside,
 } from '@opentrons/components'
 import {
   getModuleDisplayName,
@@ -25,6 +25,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  MODULE_MODELS_OT2_ONLY,
 } from '@opentrons/shared-data'
 import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
@@ -47,6 +48,7 @@ import { Tooltip } from '../../atoms/Tooltip'
 import { StyledText } from '../../atoms/text'
 import { useChainLiveCommands } from '../../resources/runs/hooks'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
+import { useIsFlex } from '../../organisms/Devices/hooks'
 import { getModuleTooHot } from '../Devices/getModuleTooHot'
 import { useToaster } from '../ToasterOven'
 import { MagneticModuleData } from './MagneticModuleData'
@@ -66,6 +68,7 @@ import { getModuleCardImage } from './utils'
 import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
 import { ErrorInfo } from './ErrorInfo'
 import { ModuleSetupModal } from './ModuleSetupModal'
+import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type {
   AttachedModule,
@@ -79,6 +82,7 @@ interface ModuleCardProps {
   robotName: string
   isLoadedInRun: boolean
   attachPipetteRequired: boolean
+  calibratePipetteRequired: boolean
   updatePipetteFWRequired: boolean
   runId?: string
   slotName?: string
@@ -93,6 +97,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     runId,
     slotName,
     attachPipetteRequired,
+    calibratePipetteRequired,
     updatePipetteFWRequired,
   } = props
   const dispatch = useDispatch<Dispatch>()
@@ -123,13 +128,20 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       }
     },
   })
-  const requireModuleCalibration = module.moduleOffset == null
+  const isFlex = useIsFlex(robotName)
+  const requireModuleCalibration =
+    isFlex &&
+    !MODULE_MODELS_OT2_ONLY.some(modModel => modModel === module.moduleModel) &&
+    module.moduleOffset?.last_modified == null
   const isPipetteReady =
-    (!attachPipetteRequired ?? false) && (!updatePipetteFWRequired ?? false)
+    (!attachPipetteRequired ?? false) &&
+    (!calibratePipetteRequired ?? false) &&
+    (!updatePipetteFWRequired ?? false)
   const latestRequestId = last(requestIds)
   const latestRequest = useSelector<State, RequestState | null>(state =>
     latestRequestId ? getRequestById(state, latestRequestId) : null
   )
+  const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
 
   const handleCloseErrorModal = (): void => {
     if (latestRequestId != null) {
@@ -235,7 +247,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
   return (
     <Flex
-      backgroundColor={COLORS.fundamentalsBackground}
+      backgroundColor={COLORS.grey10}
       borderRadius={SPACING.spacing4}
       width="100%"
       data-testid={`ModuleCard_${module.serialNumber}`}
@@ -279,7 +291,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           onCloseClick={() => setShowTestShake(false)}
         />
       )}
-      <Box padding={`${SPACING.spacing16} ${SPACING.spacing8}`} width="100%">
+      <Box padding={SPACING.spacing16} width="100%">
         <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing8}>
           <Flex alignItems={ALIGN_START} opacity={isPending ? '50%' : '100%'}>
             <img
@@ -303,6 +315,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               />
             )}
             {attachPipetteRequired != null &&
+            calibratePipetteRequired != null &&
             updatePipetteFWRequired != null &&
             requireModuleCalibration &&
             !isPending ? (
@@ -313,6 +326,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 setShowBanner={() => null}
                 handleUpdateClick={handleCalibrateClick}
                 attachPipetteRequired={attachPipetteRequired}
+                calibratePipetteRequired={calibratePipetteRequired}
                 updatePipetteFWRequired={updatePipetteFWRequired}
                 isTooHot={isTooHot}
               />
@@ -361,6 +375,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   name="ot-spinner"
                   spin
                   aria-label="ot-spinner"
+                  color={COLORS.grey60}
                 />
                 <StyledText marginLeft={SPACING.spacing8}>
                   {t('updating_firmware')}
@@ -370,7 +385,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               <>
                 <StyledText
                   textTransform={TYPOGRAPHY.textTransformUppercase}
-                  color={COLORS.darkGreyEnabled}
+                  color={COLORS.grey60}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   fontSize={TYPOGRAPHY.fontSizeH6}
                   paddingBottom={SPACING.spacing4}
@@ -395,7 +410,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                     moduleType={module.moduleType}
                     size="1rem"
                     marginRight={SPACING.spacing2}
-                    color={COLORS.darkGreyEnabled}
+                    color={COLORS.grey60}
                   />
                   <StyledText>
                     {getModuleDisplayName(module.moduleModel)}
@@ -421,7 +436,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       >
         <OverflowBtn
           aria-label="overflow"
-          disabled={isOverflowBtnDisabled}
+          disabled={isOverflowBtnDisabled || isEstopNotDisengaged}
           {...targetProps}
           onClick={handleOverflowClick}
         />

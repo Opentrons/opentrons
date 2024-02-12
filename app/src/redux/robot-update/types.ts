@@ -7,6 +7,13 @@ export type RobotSystemType = 'ot2-balena' | 'ot2-buildroot' | 'flex'
 
 export type RobotUpdateTarget = 'ot2' | 'flex'
 
+export interface RobotUpdateInfoPayload {
+  version: string | null
+  target: RobotUpdateTarget
+  releaseNotes: string | null
+  force?: boolean
+}
+
 export interface RobotUpdateInfo {
   version: string
   target: RobotUpdateTarget
@@ -16,6 +23,7 @@ export interface RobotUpdateInfo {
 export interface RobotUpdateFileInfo {
   systemFile: string
   version: string
+  isManualFile: boolean
 }
 
 // stage response from API
@@ -32,6 +40,7 @@ export type UpdateSessionStage =
 export type UpdateSessionStep =
   | 'premigration'
   | 'premigrationRestart'
+  | 'downloadFile'
   | 'getToken'
   | 'uploadFile'
   | 'processFile'
@@ -41,7 +50,7 @@ export type UpdateSessionStep =
   | 'finished'
 
 export interface RobotUpdateSession {
-  robotName: string
+  robotName: string | null
   fileInfo: RobotUpdateFileInfo | null
   token: string | null
   pathPrefix: string | null
@@ -49,6 +58,7 @@ export interface RobotUpdateSession {
   stage: UpdateSessionStage | null
   progress: number | null
   error: string | null
+  target?: RobotUpdateTarget
 }
 
 export interface PerTargetRobotUpdateState {
@@ -56,6 +66,7 @@ export interface PerTargetRobotUpdateState {
   downloadError: string | null
   version: string | null
   releaseNotes: string | null
+  force: boolean
 }
 
 export type RobotUpdateState = Record<
@@ -121,14 +132,16 @@ export interface RobotUpdateDownloadErrorAction {
 export interface RobotUpdateAvailableAction {
   type: 'robotUpdate:UPDATE_VERSION'
   payload: {
-    version: string
+    version: string | null
     target: RobotUpdateTarget
+    force?: boolean
   }
 }
 
 export interface RobotUpdateFileInfoAction {
   type: 'robotUpdate:FILE_INFO'
   payload: RobotUpdateFileInfo
+  force?: boolean
 }
 
 export type RobotUpdateAction =
@@ -140,7 +153,7 @@ export type RobotUpdateAction =
   | RobotUpdateDownloadProgressAction
   | RobotUpdateDownloadErrorAction
   | RobotUpdateAvailableAction
-  | { type: 'robotUpdate:UPDATE_INFO'; payload: RobotUpdateInfo }
+  | { type: 'robotUpdate:UPDATE_INFO'; payload: RobotUpdateInfoPayload }
   | RobotUpdateFileInfoAction
   | { type: 'robotUpdate:CHANGELOG_SEEN'; meta: { robotName: string } }
   | { type: 'robotUpdate:UPDATE_IGNORED'; meta: { robotName: string } }
@@ -170,3 +183,6 @@ export type RobotUpdateAction =
   | { type: 'robotUpdate:SET_SESSION_STEP'; payload: UpdateSessionStep }
   | { type: 'robotUpdate:CLEAR_SESSION' }
   | { type: 'robotUpdate:SET_UPDATE_SEEN'; meta: { robotName: string } }
+  | { type: 'robotUpdate:FILE_UPLOAD_PROGRESS'; payload: number }
+  | { type: 'robotUpdate:CHECKING_FOR_UPDATE'; payload: RobotUpdateTarget }
+  | { type: 'robotUpdate:DOWNLOAD_DONE'; payload: RobotUpdateTarget }

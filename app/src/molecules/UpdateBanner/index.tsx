@@ -13,7 +13,8 @@ import {
 
 import { Banner } from '../../atoms/Banner'
 import { Tooltip } from '../../atoms/Tooltip'
-import { useIsOT3 } from '../../organisms/Devices/hooks'
+import { useIsFlex } from '../../organisms/Devices/hooks'
+import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 interface UpdateBannerProps {
   robotName: string
@@ -23,6 +24,7 @@ interface UpdateBannerProps {
   serialNumber: string
   isTooHot?: boolean
   attachPipetteRequired?: boolean
+  calibratePipetteRequired?: boolean
   updatePipetteFWRequired?: boolean
 }
 
@@ -33,6 +35,7 @@ export const UpdateBanner = ({
   setShowBanner,
   handleUpdateClick,
   attachPipetteRequired,
+  calibratePipetteRequired,
   updatePipetteFWRequired,
   isTooHot,
 }: UpdateBannerProps): JSX.Element | null => {
@@ -42,17 +45,24 @@ export const UpdateBanner = ({
   let bannerMessage: string
   let hyperlinkText: string
   let closeButtonRendered: false | undefined
+  const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
 
   if (updateType === 'calibration') {
     bannerType = isTooHot ? 'informing' : 'error'
     closeButtonRendered = false
     if (attachPipetteRequired)
       bannerMessage = t('module_calibration_required_no_pipette_attached')
+    else if (calibratePipetteRequired)
+      bannerMessage = t('module_calibration_required_no_pipette_calibrated')
     else if (updatePipetteFWRequired)
       bannerMessage = t('module_calibration_required_update_pipette_FW')
     else bannerMessage = t('module_calibration_required')
     hyperlinkText =
-      !attachPipetteRequired && !updatePipetteFWRequired && !isTooHot
+      !attachPipetteRequired &&
+      !updatePipetteFWRequired &&
+      !isTooHot &&
+      !calibratePipetteRequired &&
+      !isEstopNotDisengaged
         ? t('calibrate_now')
         : ''
   } else {
@@ -62,8 +72,8 @@ export const UpdateBanner = ({
     hyperlinkText = t('update_now')
   }
 
-  const isOT3 = useIsOT3(robotName)
-  if (!isOT3 && updateType === 'calibration') return null
+  const isFlex = useIsFlex(robotName)
+  if (!isFlex && updateType === 'calibration') return null
 
   return (
     <>

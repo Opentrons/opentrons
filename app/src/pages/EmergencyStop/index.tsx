@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 import {
   Icon,
@@ -14,6 +15,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useEstopQuery } from '@opentrons/react-api-client'
+import {
+  getAnalyticsOptInSeen,
+  getAnalyticsOptedIn,
+} from '../../redux/analytics'
 
 import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
@@ -26,6 +31,8 @@ const ESTOP_STATUS_REFETCH_INTERVAL_MS = 10000
 export function EmergencyStop(): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
+  const seenOptIn = useSelector(getAnalyticsOptInSeen)
+  const optedIn = useSelector(getAnalyticsOptedIn)
 
   // Note here the touchscreen app is using status since status is linked to EstopPhysicalStatuses
   // left notPresent + right disengaged => disengaged
@@ -38,7 +45,7 @@ export function EmergencyStop(): JSX.Element {
 
   return (
     <>
-      <StepMeter totalSteps={6} currentStep={4} />
+      <StepMeter totalSteps={5} currentStep={2} />
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}
@@ -56,9 +63,7 @@ export function EmergencyStop(): JSX.Element {
         <Flex
           flexDirection={DIRECTION_COLUMN}
           padding={`${SPACING.spacing40} ${SPACING.spacing80}`}
-          backgroundColor={
-            isEstopConnected ? COLORS.green3 : COLORS.darkBlack20
-          }
+          backgroundColor={isEstopConnected ? COLORS.green35 : COLORS.grey35}
           borderRadius={BORDERS.borderRadiusSize3}
           alignItems={ALIGN_CENTER}
         >
@@ -74,7 +79,7 @@ export function EmergencyStop(): JSX.Element {
                 <Icon
                   name="ot-check"
                   size="3rem"
-                  color={COLORS.green2}
+                  color={COLORS.green50}
                   data-testid="EmergencyStop_connected_icon"
                 />
                 <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
@@ -87,7 +92,7 @@ export function EmergencyStop(): JSX.Element {
                 <StyledText
                   as="h3"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  color={COLORS.darkBlack70}
+                  color={COLORS.grey60}
                   textAlign={TYPOGRAPHY.textAlignCenter}
                 >
                   {t('e_stop_not_connected')}
@@ -100,7 +105,11 @@ export function EmergencyStop(): JSX.Element {
           flex="1"
           buttonText={i18n.format(t('shared:continue'), 'capitalize')}
           disabled={!isEstopConnected}
-          onClick={() => history.push('/robot-settings/rename-robot')}
+          onClick={() => {
+            seenOptIn && optedIn
+              ? history.push('/robot-settings/rename-robot')
+              : history.push('/privacy-policy')
+          }}
         />
       </Flex>
     </>

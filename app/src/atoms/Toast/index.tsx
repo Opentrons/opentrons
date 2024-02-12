@@ -103,7 +103,7 @@ export function Toast(props: ToastProps): JSX.Element {
   const ODD_ANIMATION_OPTIMIZATIONS = `
   backface-visibility: hidden;
   perspective: 1000;
-  will-change: opacity, transform3d;
+  will-change: opacity, transform;
   `
   const DESKTOP_ANIMATION_SLIDE_UP_AND_IN = css`
     animation-duration: ${TOAST_ANIMATION_DURATION}ms;
@@ -163,11 +163,9 @@ export function Toast(props: ToastProps): JSX.Element {
 
     @keyframes slidedown {
       from {
-        transform: translate3d(0%, 0%, 0);
         filter: opacity(100%);
       }
       to {
-        transform: translate3d(0%, 50%, 0);
         filter: opacity(0);
       }
     }
@@ -180,11 +178,9 @@ export function Toast(props: ToastProps): JSX.Element {
 
     @keyframes fadeUpAndOut {
       from {
-        transform: translate3d(0%, 0%, 0);
         filter: opacity(100%);
       }
       to {
-        transform: translate3d(0%, -10%, 0);
         filter: opacity(0%);
       }
     }
@@ -193,7 +189,7 @@ export function Toast(props: ToastProps): JSX.Element {
   const ODD_ANIMATION_NONE = css``
 
   const TEXT_STYLE = css`
-    color: ${COLORS.darkBlackEnabled};
+    color: ${COLORS.black90};
     font-size: ${showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP};
     font-weight: ${showODDStyle
       ? TYPOGRAPHY.fontWeightSemiBold
@@ -231,31 +227,23 @@ export function Toast(props: ToastProps): JSX.Element {
   } = {
     [ERROR_TOAST]: {
       iconName: 'ot-alert',
-      color: `${showODDStyle ? COLORS.red2 : COLORS.errorEnabled}`,
-      backgroundColor: `${
-        showODDStyle ? COLORS.red4 : COLORS.errorBackgroundLight
-      }`,
+      color: COLORS.red60,
+      backgroundColor: `${showODDStyle ? COLORS.red30 : COLORS.red20}`,
     },
     [INFO_TOAST]: {
       iconName: 'information',
-      color: `${showODDStyle ? COLORS.grey2 : COLORS.darkGreyEnabled}`,
-      backgroundColor: `${
-        showODDStyle ? COLORS.grey4 : COLORS.darkGreyDisabled
-      }`,
+      color: COLORS.blue60,
+      backgroundColor: `${showODDStyle ? COLORS.blue30 : COLORS.blue20}`,
     },
     [SUCCESS_TOAST]: {
       iconName: 'ot-check',
-      color: `${showODDStyle ? COLORS.green2 : COLORS.successEnabled}`,
-      backgroundColor: `${
-        showODDStyle ? COLORS.green4 : COLORS.successBackgroundLight
-      }`,
+      color: COLORS.green60,
+      backgroundColor: `${showODDStyle ? COLORS.green30 : COLORS.green20}`,
     },
     [WARNING_TOAST]: {
       iconName: 'ot-alert',
-      color: `${showODDStyle ? COLORS.yellow2 : COLORS.warningEnabled}`,
-      backgroundColor: `${
-        showODDStyle ? COLORS.yellow4 : COLORS.warningBackgroundLight
-      }`,
+      color: `${COLORS.yellow60}`,
+      backgroundColor: `${showODDStyle ? COLORS.yellow30 : COLORS.yellow20}`,
     },
   }
 
@@ -362,7 +350,7 @@ export function Toast(props: ToastProps): JSX.Element {
         >
           {headingText.length > 0 ? (
             <StyledText
-              color={COLORS.darkBlackEnabled}
+              color={COLORS.black90}
               fontSize={
                 showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
               }
@@ -406,7 +394,7 @@ export function Toast(props: ToastProps): JSX.Element {
       {closeText ? (
         <Link role="button" onClick={() => onCloseHandler()}>
           <StyledText
-            color={COLORS.darkBlackEnabled}
+            color={COLORS.black90}
             fontSize={
               showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
             }

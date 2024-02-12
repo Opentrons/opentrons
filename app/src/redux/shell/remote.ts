@@ -1,9 +1,10 @@
 // access main process remote modules via attachments to `global`
 import assert from 'assert'
+import { EventEmitter } from 'events'
 
 import type { AxiosRequestConfig } from 'axios'
 import type { ResponsePromise } from '@opentrons/api-client'
-import type { Remote } from './types'
+import type { Remote, NotifyTopic } from './types'
 
 const emptyRemote: Remote = {} as any
 
@@ -35,4 +36,20 @@ export function appShellRequestor<Data>(
   const configProxy = { ...config, data: formDataProxy }
 
   return remote.ipcRenderer.invoke('usb:request', configProxy)
+}
+
+export function appShellListener(
+  hostname: string | null,
+  topic: NotifyTopic
+): EventEmitter {
+  const eventEmitter = new EventEmitter()
+  remote.ipcRenderer.on(
+    'notify',
+    (_, shellHostname, shellTopic, shellMessage) => {
+      if (hostname === shellHostname && topic === shellTopic) {
+        eventEmitter.emit('data', shellMessage)
+      }
+    }
+  )
+  return eventEmitter
 }

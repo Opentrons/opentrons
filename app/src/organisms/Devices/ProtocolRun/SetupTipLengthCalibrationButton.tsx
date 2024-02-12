@@ -89,7 +89,7 @@ export function SetupTipLengthCalibrationButton({
   const recalibrateLink = disableRecalibrate ? (
     <>
       <Box
-        color={COLORS.errorDisabled}
+        color={COLORS.grey40}
         css={TYPOGRAPHY.labelSemiBold}
         {...targetProps}
       >

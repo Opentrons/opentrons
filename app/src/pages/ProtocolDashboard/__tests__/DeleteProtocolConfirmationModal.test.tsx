@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { act } from '@testing-library/react'
+import { act, fireEvent, screen } from '@testing-library/react'
 
 import {
   getProtocol,
@@ -12,13 +12,16 @@ import { renderWithProviders } from '@opentrons/components'
 import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
+import { useToaster } from '../../../organisms/ToasterOven'
 import { DeleteProtocolConfirmationModal } from '../DeleteProtocolConfirmationModal'
 
 jest.mock('@opentrons/api-client')
 jest.mock('@opentrons/react-api-client')
+jest.mock('../../../organisms/ToasterOven')
 
 const mockFunc = jest.fn()
 const PROTOCOL_ID = 'mockProtocolId'
+const mockMakeSnackbar = jest.fn()
 const MOCK_HOST_CONFIG = {} as HostConfig
 const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const mockGetProtocol = getProtocol as jest.MockedFunction<typeof getProtocol>
@@ -29,6 +32,7 @@ const mockDeleteRun = deleteRun as jest.MockedFunction<typeof deleteRun>
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
 >
+const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
 
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
@@ -63,6 +67,11 @@ describe('DeleteProtocolConfirmationModal', () => {
           },
         },
       } as any)
+    when(mockUseToaster).calledWith().mockReturnValue({
+      makeSnackbar: mockMakeSnackbar,
+      makeToast: jest.fn(),
+      eatToast: jest.fn(),
+    })
   })
 
   afterEach(() => {
@@ -71,16 +80,16 @@ describe('DeleteProtocolConfirmationModal', () => {
   })
 
   it('should render text and buttons', () => {
-    const { getByText } = render(props)
-    getByText('Delete this protocol?')
-    getByText('and its run history will be permanently deleted.')
-    getByText('Cancel')
-    getByText('Delete')
+    render(props)
+    screen.getByText('Delete this protocol?')
+    screen.getByText('and its run history will be permanently deleted.')
+    screen.getByText('Cancel')
+    screen.getByText('Delete')
   })
 
   it('should close the modal when tapping cancel button', () => {
-    const { getByText } = render(props)
-    getByText('Cancel').click()
+    render(props)
+    fireEvent.click(screen.getByText('Cancel'))
     expect(mockFunc).toHaveBeenCalled()
   })
 
@@ -91,12 +100,10 @@ describe('DeleteProtocolConfirmationModal', () => {
         data: { links: { referencingRuns: [{ id: '1' }, { id: '2' }] } },
       } as any)
 
-    const { getByText } = render(props)
+    render(props)
     act(() => {
-      getByText('Delete').click()
+      screen.getByText('Delete').click()
     })
-    await new Promise(setImmediate)
-    getByText('Delete').click()
     await new Promise(setImmediate)
     expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '1')
     expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '2')
@@ -104,5 +111,6 @@ describe('DeleteProtocolConfirmationModal', () => {
       MOCK_HOST_CONFIG,
       PROTOCOL_ID
     )
+    expect(mockMakeSnackbar).toHaveBeenCalledWith('Protocol deleted')
   })
 })

@@ -7,13 +7,13 @@ import { mockDefinition } from '../../../../../redux/custom-labware/__fixtures__
 import { SetupLabwareList } from '../SetupLabwareList'
 import { LabwareListItem } from '../LabwareListItem'
 import type {
-  ProtocolAnalysisFile,
+  CompletedProtocolAnalysis,
   RunTimeCommand,
 } from '@opentrons/shared-data'
 
 jest.mock('../LabwareListItem')
 
-const protocolWithTC = (_uncastedProtocolWithTC as unknown) as ProtocolAnalysisFile
+const protocolWithTC = (_uncastedProtocolWithTC as unknown) as CompletedProtocolAnalysis
 
 const mockLabwareListItem = LabwareListItem as jest.MockedFunction<
   typeof LabwareListItem
@@ -178,7 +178,7 @@ describe('SetupLabwareList', () => {
         attachedModuleMatch: null,
         moduleId: 'moduleId',
       } as any,
-      isOt3: false,
+      isFlex: false,
     })
 
     getAllByText('mock labware list item')
@@ -197,7 +197,7 @@ describe('SetupLabwareList', () => {
         attachedModuleMatch: null,
         moduleId: 'moduleId',
       } as any,
-      isOt3: false,
+      isFlex: false,
     })
     expect(queryByText('Additional Off-Deck Labware')).not.toBeInTheDocument()
   })
@@ -207,7 +207,7 @@ describe('SetupLabwareList', () => {
       commands: mockOffDeckCommands,
       extraAttentionModules: [],
       attachedModuleInfo: {} as any,
-      isOt3: false,
+      isFlex: false,
     })
     getByText('Additional Off-Deck Labware')
     getAllByText('mock labware list item')

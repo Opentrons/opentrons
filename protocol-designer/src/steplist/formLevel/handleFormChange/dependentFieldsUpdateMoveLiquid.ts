@@ -451,8 +451,10 @@ const updatePatchOnPipetteChannelChange = (
       : null
   const { id, stepType, ...stepData } = rawForm
   const appliedPatch = { ...(stepData as FormPatch), ...patch, id, stepType }
-  const singleToMulti = prevChannels === 1 && nextChannels === 8
-  const multiToSingle = prevChannels === 8 && nextChannels === 1
+  const singleToMulti =
+    prevChannels === 1 && (nextChannels === 8 || nextChannels === 96)
+  const multiToSingle =
+    (prevChannels === 8 || prevChannels === 96) && nextChannels === 1
 
   if (patch.pipette === null || singleToMulti) {
     // reset all well selection
@@ -475,6 +477,10 @@ const updatePatchOnPipetteChannelChange = (
       }),
     }
   } else if (multiToSingle) {
+    let channels = 8
+    if (prevChannels === 96) {
+      channels = 96
+    }
     // multi-channel to single-channel: convert primary wells to all wells
     // @ts-expect-error(sa, 2021-06-14): appliedPatch.aspirate_labware is type ?unknown. Address in #3161
     const sourceLabwareId: string = appliedPatch.aspirate_labware
@@ -488,12 +494,14 @@ const updatePatchOnPipetteChannelChange = (
       aspirate_wells: getAllWellsFromPrimaryWells(
         // @ts-expect-error(sa, 2021-06-14): appliedPatch.aspirate_wells is type ?unknown. Address in #3161
         appliedPatch.aspirate_wells, // @ts-expect-error(sa, 2021-06-14): sourceLabwareDef is not typed properly. Address in #3161
-        sourceLabwareDef
+        sourceLabwareDef,
+        channels
       ),
       dispense_wells: getAllWellsFromPrimaryWells(
         // @ts-expect-error(sa, 2021-06-14): appliedPatch.dispense_wells is type ?unknown. Address in #3161
         appliedPatch.dispense_wells, // @ts-expect-error(sa, 2021-06-14): destLabwareDef is not typed properly. Address in #3161
-        destLabwareDef
+        destLabwareDef,
+        channels
       ),
     }
   }

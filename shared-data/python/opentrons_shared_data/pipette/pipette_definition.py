@@ -1,5 +1,5 @@
 import re
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 from pydantic import BaseModel, Field, validator
 from typing_extensions import Literal
 from dataclasses import dataclass
@@ -9,7 +9,9 @@ from . import types as pip_types, dev_types
 PLUNGER_CURRENT_MINIMUM = 0.1
 PLUNGER_CURRENT_MAXIMUM = 1.5
 
-NOZZLE_MAP_NAMES = re.compile(r"[A-Z]{1}[0-9]{1,2}")
+NOZZLE_MAP_NAMES = re.compile(r"(?P<row>[A-Z]+)(?P<column>[0-9]+)")
+COLUMN_NAMES = re.compile(r"[0-9]+")
+ROW_NAMES = re.compile(r"[A-Z]+")
 
 
 # TODO (lc 12-5-2022) Ideally we can deprecate this
@@ -141,25 +143,101 @@ class PlungerPositions(BaseModel):
 
 class PlungerHomingConfigurations(BaseModel):
     current: float = Field(
-        ...,
-        description="Either the z motor current needed for picking up tip or the plunger motor current for dropping tip off the nozzle.",
+        default=0.0,
+        description="The current to move the plunger axis for homing.",
     )
     speed: float = Field(
         ...,
-        description="The speed to move the z or plunger axis for tip pickup or drop off.",
+        description="The speed to move the plunger axis for homing.",
     )
 
 
-class TipHandlingConfigurations(PlungerHomingConfigurations):
+class PressFitPickUpTipConfiguration(BaseModel):
     presses: int = Field(
-        default=0.0, description="The number of tries required to force pick up a tip."
+        ...,
+        description="The number of times to force pickup (incrementally more each time by increment)",
     )
     increment: float = Field(
-        default=0.0,
-        description="The increment to move the pipette down for force tip pickup retries.",
+        ...,
+        description="The increment to move the pipette down on each force tip pickup press",
     )
     distance: float = Field(
-        default=0.0, description="The distance to begin a pick up tip from."
+        ..., description="The starting distance to begin a pick up tip from"
+    )
+    speed: float = Field(
+        ..., description="The speed to move the Z axis for each force pickup"
+    )
+    current_by_tip_count: Dict[int, float] = Field(
+        ...,
+        description="A current dictionary look-up by partial tip configuration.",
+        alias="currentByTipCount",
+    )
+
+
+class CamActionPickUpTipConfiguration(BaseModel):
+    distance: float = Field(..., description="How far to move the cams once engaged")
+    speed: float = Field(..., description="How fast to move the cams when engaged")
+    prep_move_distance: float = Field(
+        ..., description="How far to move the cams to engage the rack"
+    )
+    prep_move_speed: float = Field(
+        ..., description="How fast to move the cams when moving to the rack"
+    )
+    current_by_tip_count: Dict[int, float] = Field(
+        ...,
+        description="A current dictionary look-up by partial tip configuration.",
+        alias="currentByTipCount",
+    )
+    connect_tiprack_distance_mm: float = Field(
+        description="The distance to move the head down to connect with the tiprack before clamping.",
+        alias="connectTiprackDistanceMM",
+    )
+
+
+class PlungerEjectDropTipConfiguration(BaseModel):
+    current: float = Field(
+        ..., description="The current to use on the plunger motor when dropping a tip"
+    )
+    speed: float = Field(
+        ..., description="How fast to move the plunger motor when dropping a tip"
+    )
+
+
+class CamActionDropTipConfiguration(BaseModel):
+    current: float = Field(
+        ..., description="The current to use on the cam motors when dropping tips"
+    )
+    distance: float = Field(
+        ..., description="The distance to move the cams when dropping tips"
+    )
+    speed: float = Field(
+        ..., description="How fast to move the cams when dropping tips"
+    )
+    prep_move_distance: float = Field(
+        ..., description="How far to move the cams after disengaging"
+    )
+    prep_move_speed: float = Field(
+        ..., description="How fast to move the cams after disengaging"
+    )
+
+
+class DropTipConfigurations(BaseModel):
+    plunger_eject: Optional[PlungerEjectDropTipConfiguration] = Field(
+        description="Configuration for tip drop via plunger eject", alias="plungerEject"
+    )
+    cam_action: Optional[CamActionDropTipConfiguration] = Field(
+        description="Configuration for tip drop via cam action", alias="camAction"
+    )
+
+
+class PickUpTipConfigurations(BaseModel):
+    press_fit: PressFitPickUpTipConfiguration = Field(
+        description="Configuration for tip pickup via press fit", alias="pressFit"
+    )
+    cam_action: Optional[CamActionPickUpTipConfiguration] = Field(
+        default=None,
+        description="Configuration for tip pickup via cam action",
+        alias="camAction",
     )
 
 
@@ -175,15 +253,10 @@ class PartialTipDefinition(BaseModel):
         description="Whether partial tip pick up is supported.",
         alias="partialTipSupported",
     )
-    available_configurations: List[int] = Field(
+    available_configurations: Optional[List[int]] = Field(
         default=None,
         description="A list of the types of partial tip configurations supported, listed by channel ints",
         alias="availableConfigurations",
-    )
-    per_tip_pickup_current: float = Field(
-        default=0.5,
-        description="A current scale for pick up tip in a partial tip configuration",
-        alias="perTipPickupCurrent",
     )
 
 
@@ -208,10 +281,10 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
     display_category: pip_types.PipetteGenerationType = Field(
         ..., description="The product model of the pipette.", alias="displayCategory"
     )
-    pick_up_tip_configurations: TipHandlingConfigurations = Field(
+    pick_up_tip_configurations: PickUpTipConfigurations = Field(
         ..., alias="pickUpTipConfigurations"
     )
-    drop_tip_configurations: TipHandlingConfigurations = Field(
+    drop_tip_configurations: DropTipConfigurations = Field(
         ..., alias="dropTipConfigurations"
     )
     plunger_homing_configurations: PlungerHomingConfigurations = Field(
@@ -245,6 +318,17 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
     )
     quirks: List[pip_types.Quirks] = Field(
         ..., description="The list of quirks available for the loaded configuration"
+    )
+    tip_presence_check_distance_mm: float = Field(
+        default=0,
+        description="The distance the high throughput tip motors will travel to check tip status.",
+        alias="tipPresenceCheckDistanceMM",
+    )
+
+    end_tip_action_retract_distance_mm: float = Field(
+        default=0.0,
+        description="The distance to move the head up after a tip drop or pickup.",
+        alias="endTipActionRetractDistanceMM",
     )
 
     @validator("pipette_type", pre=True)
@@ -280,6 +364,28 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         }
 
 
+class PipetteRowDefinition(BaseModel):
+    key: str
+    ordered_nozzles: List[str] = Field(..., alias="orderedNozzles")
+
+    @validator("key")
+    def check_key_is_row(cls, v: str) -> str:
+        if not ROW_NAMES.search(v):
+            raise ValueError(f"{v} is not a valid row name")
+        return v
+
+
+class PipetteColumnDefinition(BaseModel):
+    key: str
+    ordered_nozzles: List[str] = Field(..., alias="orderedNozzles")
+
+    @validator("key")
+    def check_key_is_column(cls, v: str) -> str:
+        if not COLUMN_NAMES.search(v):
+            raise ValueError(f"{v} is not a valid column name")
+        return v
+
+
 class PipetteGeometryDefinition(BaseModel):
     """The geometry properties definition of a pipette."""
 
@@ -290,6 +396,8 @@ class PipetteGeometryDefinition(BaseModel):
         alias="pathTo3D",
     )
     nozzle_map: Dict[str, List[float]] = Field(..., alias="nozzleMap")
+    ordered_columns: List[PipetteColumnDefinition] = Field(..., alias="orderedColumns")
+    ordered_rows: List[PipetteRowDefinition] = Field(..., alias="orderedRows")
 
     @validator("nozzle_map", pre=True)
     def check_nonempty_strings(

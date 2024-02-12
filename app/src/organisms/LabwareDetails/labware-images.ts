@@ -210,4 +210,36 @@ export const labwareImages: Record<string, string[]> = {
   biorad_384_wellplate_50ul: [
     require('./images/biorad_384_wellplate_50ul.jpg'),
   ],
+  opentrons_96_deep_well_adapter: [
+    require('./images/deep_well_plate_adapter.jpg'),
+  ],
+  opentrons_96_flat_bottom_adapter: [
+    require('./images/flat_bottom_plate_adapter.jpg'),
+  ],
+  opentrons_96_pcr_adapter: [require('./images/pcr_plate_adapter.jpg')],
+  opentrons_universal_flat_adapter: [
+    require('./images/universal_flat_adapter.jpg'),
+  ],
+  opentrons_aluminum_flat_bottom_plate: [
+    require('./images/flat_bottom_aluminum.png'),
+  ],
+  opentrons_96_well_aluminum_block: [
+    require('./images/opentrons_96_aluminumblock_side_view.jpg'),
+  ],
+  opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep: [
+    require('./images/deep_well_plate_adapter.jpg'),
+    require('./images/nest_96_wellplate_2ml_deep.jpg'),
+  ],
+  opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat: [
+    require('./images/flat_bottom_plate_adapter.jpg'),
+    require('./images/nest_96_wellplate_200ul_flat_three_quarters.jpg'),
+  ],
+  opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt: [
+    require('./images/pcr_plate_adapter.jpg'),
+    require('./images/nest_96_wellplate_100ul_pcr_full_skirt_three_quarters.jpg'),
+  ],
+  opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat: [
+    require('./images/universal_flat_adapter.jpg'),
+    require('./images/corning_384_wellplate_112ul_flat_photo_three_quarters.jpg'),
+  ],
 }

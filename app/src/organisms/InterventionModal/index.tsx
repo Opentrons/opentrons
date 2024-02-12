@@ -20,7 +20,9 @@ import {
   ALIGN_FLEX_START,
   Icon,
   PrimaryButton,
-  JUSTIFY_FLEX_END,
+  JUSTIFY_SPACE_BETWEEN,
+  TYPOGRAPHY,
+  Link,
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
@@ -33,6 +35,10 @@ import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent
 import type { RunCommandSummary, RunData } from '@opentrons/api-client'
 import type { IconName } from '@opentrons/components'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import { useRobotType } from '../Devices/hooks'
+
+const LEARN_ABOUT_MANUAL_STEPS_URL =
+  'https://support.opentrons.com/s/article/Manual-protocol-steps'
 
 const BASE_STYLE = {
   position: POSITION_ABSOLUTE,
@@ -52,7 +58,7 @@ const MODAL_STYLE = {
   overflowY: OVERFLOW_AUTO,
   maxHeight: '100%',
   width: '47rem',
-  border: `6px ${BORDERS.styleSolid} ${COLORS.blueEnabled}`,
+  border: `6px ${BORDERS.styleSolid} ${COLORS.blue50}`,
   borderRadius: BORDERS.radiusSoftCorners,
   boxShadow: BORDERS.smallDropShadow,
 } as const
@@ -62,7 +68,7 @@ const HEADER_STYLE = {
   gridGap: SPACING.spacing12,
   padding: `${SPACING.spacing20} ${SPACING.spacing32}`,
   color: COLORS.white,
-  backgroundColor: COLORS.blueEnabled,
+  backgroundColor: COLORS.blue50,
   position: POSITION_STICKY,
   top: 0,
 } as const
@@ -82,7 +88,7 @@ const FOOTER_STYLE = {
   display: DISPLAY_FLEX,
   width: '100%',
   alignItems: ALIGN_CENTER,
-  justifyContent: JUSTIFY_FLEX_END,
+  justifyContent: JUSTIFY_SPACE_BETWEEN,
 } as const
 
 export interface InterventionModalProps {
@@ -103,6 +109,7 @@ export function InterventionModal({
   const { t } = useTranslation(['protocol_command_text', 'protocol_info'])
   const isOnDevice = useSelector(getIsOnDevice)
 
+  const robotType = useRobotType(robotName)
   const childContent = React.useMemo(() => {
     if (
       command.commandType === 'waitForResume' ||
@@ -117,7 +124,7 @@ export function InterventionModal({
     } else if (command.commandType === 'moveLabware') {
       return (
         <MoveLabwareInterventionContent
-          {...{ command, run, analysis }}
+          {...{ command, run, analysis, robotType }}
           isOnDevice={isOnDevice}
         />
       )
@@ -151,10 +158,10 @@ export function InterventionModal({
   // reimplement when design system shares a modal component between desktop/ODD
   return isOnDevice ? (
     <Modal
-      border={`8px ${BORDERS.styleSolid} ${COLORS.blueEnabled}`}
+      border={`8px ${BORDERS.styleSolid} ${COLORS.blue50}`}
       modalSize="large"
       header={{
-        backgroundColor: COLORS.blueEnabled,
+        backgroundColor: COLORS.blue50,
         color: COLORS.white,
         iconColor: COLORS.white,
         iconName: iconName ?? undefined,
@@ -183,7 +190,7 @@ export function InterventionModal({
       top="0"
       bottom="0"
       zIndex="1"
-      backgroundColor={COLORS.backgroundOverlay}
+      backgroundColor={`${COLORS.black90}${COLORS.opacity40HexCode}`}
       cursor="default"
     >
       <Flex {...BASE_STYLE} zIndex={10}>
@@ -202,9 +209,11 @@ export function InterventionModal({
           <Box {...CONTENT_STYLE}>
             {childContent}
             <Box {...FOOTER_STYLE}>
-              {/* 
-              TODO(BC, 08/31/23): reintroduce this link and justify space between when support article is written 
-              <Link css={TYPOGRAPHY.darkLinkH4SemiBold} href="" external>
+              <Link
+                css={TYPOGRAPHY.darkLinkH4SemiBold}
+                href={LEARN_ABOUT_MANUAL_STEPS_URL}
+                external
+              >
                 {t('protocol_info:manual_steps_learn_more')}
                 <Icon
                   name="open-in-new"
@@ -212,7 +221,6 @@ export function InterventionModal({
                   size="0.5rem"
                 />
               </Link>
-              */}
               <PrimaryButton onClick={onResume}>
                 {t('confirm_and_resume')}
               </PrimaryButton>

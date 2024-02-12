@@ -1,5 +1,6 @@
 // fetch wrapper to throw if response is not ok
 import fs from 'fs'
+import fsPromises from 'fs/promises'
 import { Transform, Readable } from 'stream'
 import pump from 'pump'
 import _fetch from 'node-fetch'
@@ -86,31 +87,74 @@ export function postFile(
   input: RequestInput,
   name: string,
   source: string,
-  init?: RequestInit
+  init?: RequestInit,
+  progress?: (progress: number) => void
 ): Promise<Response> {
-  return createReadStream(source).then(readStream => {
-    const body = new FormData()
-    body.append(name, readStream)
-    return fetch(input, { ...init, body, method: 'POST' })
+  return new Promise<Response>((resolve, reject) => {
+    createReadStream(source, progress ?? null, reject).then(readStream => {
+      return new Promise<Response>(resolve => {
+        const body = new FormData()
+        body.append(name, readStream)
+        resolve(fetch(input, { ...init, body, method: 'POST' }))
+      }).then(resolve)
+    })
   })
 }
 
-// create a read stream, handling errors that `fetch` is unable to catch
-function createReadStream(source: string): Promise<Readable> {
+function createReadStreamWithSize(
+  source: string,
+  size: number,
+  progress: ((progress: number) => void) | null,
+  onError: (error: unknown) => unknown
+): Promise<Readable> {
   return new Promise((resolve, reject) => {
     const readStream = fs.createReadStream(source)
     const scheduledResolve = setTimeout(handleSuccess, 0)
+    let seenDataLength = 0
+    let notifiedDataLength = 0
+
+    const onData = (chunk: Buffer): void => {
+      seenDataLength += chunk.length
+      if (
+        size !== Infinity &&
+        seenDataLength / size > notifiedDataLength / size + 0.01
+      ) {
+        progress?.(seenDataLength / size)
+        notifiedDataLength = seenDataLength
+      }
+
+      if (seenDataLength === size) {
+        readStream.removeListener('data', onData)
+        readStream.removeListener('error', handleError)
+      }
+    }
 
     readStream.once('error', handleError)
+    readStream.once('error', onError)
 
     function handleSuccess(): void {
-      readStream.removeListener('error', handleError)
       resolve(readStream)
+      readStream.removeListener('error', handleError)
     }
 
     function handleError(error: Error): void {
       clearTimeout(scheduledResolve)
+      readStream.removeListener('data', onData)
       reject(error)
     }
   })
+}
+
+// create a read stream, handling errors that `fetch` is unable to catch
+function createReadStream(
+  source: string,
+  progress: ((progress: number) => void) | null,
+  onError: (error: unknown) => unknown
+): Promise<Readable> {
+  return fsPromises
+    .stat(source)
+    .then(filestats =>
+      createReadStreamWithSize(source, filestats.size, progress, onError)
+    )
+    .catch(() => createReadStreamWithSize(source, Infinity, progress, onError))
 }

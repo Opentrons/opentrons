@@ -11,6 +11,7 @@ import { useChainRunCommands } from '../../../resources/runs/hooks'
 import type { RegisterPositionAction } from '../types'
 import type { Jog } from '../../../molecules/JogControls'
 import { WizardRequiredEquipmentList } from '../../../molecules/WizardRequiredEquipmentList'
+import { getLatestCurrentOffsets } from '../../Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 import { getIsOnDevice } from '../../../redux/config'
 import { NeedHelpLink } from '../../CalibrationPanels'
 import { useSelector } from 'react-redux'
@@ -33,6 +34,7 @@ import { css } from 'styled-components'
 import { Portal } from '../../../App/portal'
 import { LegacyModalShell } from '../../../molecules/LegacyModal'
 import { SmallButton } from '../../../atoms/buttons'
+import { CALIBRATION_PROBE } from '../../PipetteWizardFlows/constants'
 import { TerseOffsetTable } from '../ResultsSummary'
 import { getLabwareDefinitionsFromCommands } from '../utils/labware'
 
@@ -50,6 +52,8 @@ export const IntroScreen = (props: {
   setFatalError: (errorMessage: string) => void
   isRobotMoving: boolean
   existingOffsets: LabwareOffset[]
+  protocolName: string
+  shouldUseMetalProbe: boolean
 }): JSX.Element | null => {
   const {
     proceed,
@@ -58,6 +62,8 @@ export const IntroScreen = (props: {
     isRobotMoving,
     setFatalError,
     existingOffsets,
+    protocolName,
+    shouldUseMetalProbe,
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
@@ -70,6 +76,19 @@ export const IntroScreen = (props: {
           `IntroScreen failed to issue prep commands with message: ${e.message}`
         )
       })
+  }
+  const requiredEquipmentList = [
+    {
+      loadName: t('all_modules_and_labware_from_protocol', {
+        protocol_name: protocolName,
+      }),
+      displayName: t('all_modules_and_labware_from_protocol', {
+        protocol_name: protocolName,
+      }),
+    },
+  ]
+  if (shouldUseMetalProbe) {
+    requiredEquipmentList.push(CALIBRATION_PROBE)
   }
 
   if (isRobotMoving) {
@@ -88,14 +107,7 @@ export const IntroScreen = (props: {
         />
       }
       rightElement={
-        <WizardRequiredEquipmentList
-          equipmentList={[
-            {
-              loadName: t('all_modules_and_labware_from_protocol'),
-              displayName: t('all_modules_and_labware_from_protocol'),
-            },
-          ]}
-        />
+        <WizardRequiredEquipmentList equipmentList={requiredEquipmentList} />
       }
       footer={
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -127,7 +139,7 @@ export const IntroScreen = (props: {
 
 const VIEW_OFFSETS_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.darkBlackEnabled};
+  color: ${COLORS.black90};
   font-size: ${TYPOGRAPHY.fontSize22};
   &:hover {
     opacity: 100%;
@@ -144,6 +156,7 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
   const { existingOffsets, labwareDefinitions } = props
   const { t, i18n } = useTranslation('labware_position_check')
   const [showOffsetsTable, setShowOffsetsModal] = React.useState(false)
+  const latestCurrentOffsets = getLatestCurrentOffsets(existingOffsets)
   return existingOffsets.length > 0 ? (
     <>
       <Btn
@@ -154,7 +167,7 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
         css={VIEW_OFFSETS_BUTTON_STYLE}
         aria-label="show labware offsets"
       >
-        <Icon name="reticle" size="1.75rem" color={COLORS.darkBlackEnabled} />
+        <Icon name="reticle" size="1.75rem" color={COLORS.black90} />
         <StyledText as="p">
           {i18n.format(t('view_current_offsets'), 'capitalize')}
         </StyledText>
@@ -184,7 +197,7 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
           >
             <Box overflowY="scroll" marginBottom={SPACING.spacing16}>
               <TerseOffsetTable
-                offsets={existingOffsets}
+                offsets={latestCurrentOffsets}
                 labwareDefinitions={labwareDefinitions}
               />
             </Box>

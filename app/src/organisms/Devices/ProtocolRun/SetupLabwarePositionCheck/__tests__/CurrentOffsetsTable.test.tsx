@@ -8,7 +8,7 @@ import { LabwarePositionCheck } from '../../../../LabwarePositionCheck'
 import { useLPCDisabledReason } from '../../../hooks'
 import { CurrentOffsetsTable } from '../CurrentOffsetsTable'
 import { getLatestCurrentOffsets } from '../utils'
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
 
 jest.mock('../../../hooks')
@@ -43,7 +43,7 @@ const render = (props: React.ComponentProps<typeof CurrentOffsetsTable>) => {
     i18nInstance: i18n,
   })[0]
 }
-const protocolWithTC = (_uncastedProtocolWithTC as unknown) as ProtocolAnalysisFile
+const protocolWithTC = (_uncastedProtocolWithTC as unknown) as CompletedProtocolAnalysis
 const mockCurrentOffsets: LabwareOffset[] = [
   {
     createdAt: '2022-12-20T14:06:23.562082+00:00',
@@ -59,13 +59,6 @@ const mockCurrentOffsets: LabwareOffset[] = [
     id: '70ae2e31-716b-4e1f-a90c-9b0dfd4d7feb',
     location: { slotName: '1', moduleModel: 'heaterShakerModuleV1' },
     vector: { x: 0, y: 0, z: 0 },
-  },
-  {
-    createdAt: '2022-12-20T14:09:08.688756+00:00',
-    definitionUri: 'opentrons/opentrons_96_tiprack_10ul/1',
-    id: '494ec3d1-224f-4f9a-a83b-3dd3060ea332',
-    location: { slotName: '2' },
-    vector: { x: 0, y: -0.09999999999999432, z: -0.09999999999999432 },
   },
   {
     createdAt: '2022-12-20T14:09:08.689813+00:00',
@@ -141,7 +134,7 @@ describe('CurrentOffsetsTable', () => {
   })
   it('renders the correct text', () => {
     const { getByText } = render(props)
-    getByText('Applied Labware Offset data')
+    getByText('APPLIED LABWARE OFFSET DATA')
     getByText('location')
     getByText('labware')
     getByText('labware offset data')

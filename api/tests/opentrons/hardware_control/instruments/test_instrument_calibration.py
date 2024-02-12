@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Union, cast
 
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
 
 from opentrons_shared_data.labware.dev_types import (
@@ -32,6 +32,10 @@ def _use_mock_calibration_storage(
     """Mock out the opentrons.calibration_storage module."""
     for name, func in inspect.getmembers(calibration_storage, inspect.isfunction):
         monkeypatch.setattr(calibration_storage, name, decoy.mock(func=func))
+    for name, func in inspect.getmembers(calibration_storage.ot2, inspect.isfunction):
+        monkeypatch.setattr(calibration_storage.ot2, name, decoy.mock(func=func))
+    for name, func in inspect.getmembers(calibration_storage.ot3, inspect.isfunction):
+        monkeypatch.setattr(calibration_storage.ot3, name, decoy.mock(func=func))
 
     for name, func in inspect.getmembers(
         calibration_storage_helpers, inspect.isfunction
@@ -78,16 +82,16 @@ def test_load_tip_length(
         tipLength=1.23,
         lastModified=datetime(year=2023, month=1, day=1),
         uri=LabwareUri("def456"),
-        source=subject.types.SourceType.factory,
+        source=subject.SourceType.factory,
         status=v1_models.CalibrationStatus(
             markedBad=True,
-            source=subject.types.SourceType.user,
+            source=subject.SourceType.user,
             markedAt=datetime(year=2023, month=2, day=2),
         ),
     )
 
     decoy.when(
-        calibration_storage.load_tip_length_calibration(
+        calibration_storage.ot2.load_tip_length_calibration(
             pip_id="abc123", definition=tip_rack_dict
         )
     ).then_return(tip_length_data)
@@ -102,14 +106,14 @@ def test_load_tip_length(
 
     assert result == subject.TipLengthCalibration(
         tip_length=1.23,
-        source=subject.types.SourceType.factory,
+        source=subject.SourceType.factory,
         pipette="abc123",
         tiprack="asdfghjk",
         last_modified=datetime(year=2023, month=1, day=1),
         uri=LabwareUri("def456"),
-        status=subject.types.CalibrationStatus(
+        status=subject.CalibrationStatus(
             markedBad=True,
-            source=subject.types.SourceType.user,
+            source=subject.SourceType.user,
             markedAt=datetime(year=2023, month=2, day=2),
         ),
     )

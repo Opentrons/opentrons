@@ -52,6 +52,8 @@ from .measurement.scale import Scale
 from .tips import MULTI_CHANNEL_TEST_ORDER
 import glob
 
+from opentrons.hardware_control.types import StatusBarState
+
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
 _PREV_TRIAL_GRAMS: Optional[MeasurementData] = None
@@ -544,7 +546,6 @@ def _get_liquid_height(
             ui.alert_user_ready(
                 f"Please replace the {cfg.tip_volume}ul tips in slot 2",
                 resources.ctx._core.get_hardware(),
-                30,
             )
         _tip_counter[0] = 0
     if cfg.jog:
@@ -594,15 +595,12 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
     recorder._recording = GravimetricRecording()
     report.store_config_gm(resources.test_report, cfg)
     calibration_tip_in_use = True
-
+    hw_api = resources.ctx._core.get_hardware()
     if resources.ctx.is_simulating():
         _PREV_TRIAL_GRAMS = None
         _MEASUREMENTS = list()
     try:
         ui.print_title("FIND LIQUID HEIGHT")
-        ui.print_info("homing...")
-        resources.ctx.home()
-        resources.pipette.home_plunger()
         first_tip = _next_tip_for_channel(cfg, resources, 0, total_tips)
         setup_channel_offset = _get_channel_offset(cfg, channel=0)
         first_tip_location = first_tip.top().move(setup_channel_offset)
@@ -615,7 +613,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
         height_below_top = well.depth - _liquid_height
         ui.print_info(f"liquid is {height_below_top} mm below top of vial")
         liquid_tracker.set_start_volume_from_liquid_height(
-            labware_on_scale["A1"], _liquid_height, name="Water"
+            well, _liquid_height, name="Water"
         )
         vial_volume = liquid_tracker.get_volume(well)
         ui.print_info(
@@ -625,6 +623,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
             average_aspirate_evaporation_ul = 0.0
             average_dispense_evaporation_ul = 0.0
         else:
+            hw_api.set_status_bar_state(StatusBarState.SOFTWARE_ERROR)
             (
                 average_aspirate_evaporation_ul,
                 average_dispense_evaporation_ul,
@@ -636,7 +635,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                 resources.test_report,
                 labware_on_scale,
             )
-
+        hw_api.set_status_bar_state(StatusBarState.IDLE)
         ui.print_info("dropping tip")
         if not cfg.same_tip:
             _drop_tip(

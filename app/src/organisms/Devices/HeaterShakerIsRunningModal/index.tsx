@@ -20,7 +20,7 @@ import { HeaterShakerModule } from '../../../redux/modules/types'
 import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
-import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
+import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data'
 
 interface HeaterShakerIsRunningModalProps {
   closeModal: () => void
@@ -50,7 +50,7 @@ export const HeaterShakerIsRunningModal = (
         name="alert-circle"
         marginX={SPACING.spacing8}
         size={SPACING.spacing20}
-        color={COLORS.warningEnabled}
+        color={COLORS.yellow50}
         data-testid="HeaterShakerIsRunning_warning_icon"
       />
       {t('heater_shaker_is_shaking')}

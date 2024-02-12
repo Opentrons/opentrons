@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import '@testing-library/jest-dom'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -14,7 +13,7 @@ import { ProtocolRunDetails } from '../../pages/Devices/ProtocolRunDetails'
 import { RobotSettings } from '../../pages/Devices/RobotSettings'
 import { GeneralSettings } from '../../pages/AppSettings/GeneralSettings'
 import { AlertsModal } from '../../organisms/Alerts/AlertsModal'
-import { useIsOT3 } from '../../organisms/Devices/hooks'
+import { useIsFlex } from '../../organisms/Devices/hooks'
 import { useSoftwareUpdatePoll } from '../hooks'
 import { DesktopApp } from '../DesktopApp'
 
@@ -56,7 +55,7 @@ const mockBreadcrumbs = Breadcrumbs as jest.MockedFunction<typeof Breadcrumbs>
 const mockUseSoftwareUpdatePoll = useSoftwareUpdatePoll as jest.MockedFunction<
   typeof useSoftwareUpdatePoll
 >
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -80,7 +79,7 @@ describe('DesktopApp', () => {
     mockAppSettings.mockReturnValue(<div>Mock AppSettings</div>)
     mockBreadcrumbs.mockReturnValue(<div>Mock Breadcrumbs</div>)
     mockAlertsModal.mockReturnValue(<></>)
-    mockUseIsOT3.mockReturnValue(true)
+    mockUseIsFlex.mockReturnValue(true)
   })
   afterEach(() => {
     jest.resetAllMocks()

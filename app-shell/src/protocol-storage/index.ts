@@ -20,13 +20,15 @@ export const getUnixTimeFromAnalysisPath = (analysisPath: string): number =>
 
 export const getParsedAnalysisFromPath = (
   analysisPath: string
-): ProtocolAnalysisOutput => {
+): ProtocolAnalysisOutput | undefined => {
   try {
     return fse.readJsonSync(analysisPath)
   } catch (error) {
-    return createFailedAnalysis(
-      error?.message ?? 'protocol analysis file cannot be parsed'
-    )
+    const errorMessage =
+      error instanceof Error && error?.message != null
+        ? error.message
+        : 'protocol analysis file cannot be parsed'
+    return createFailedAnalysis(errorMessage)
   }
 }
 
@@ -42,25 +44,35 @@ export const getProtocolSrcFilePaths = (
     })
 }
 
-// TODO(jh, 2023-09-11): remove migrateProtocolsToNewDirectory after
-// OT-2 parity work is completed.
-const migrateProtocols = migrateProtocolsToNewDirectory()
-function migrateProtocolsToNewDirectory(): () => Promise<void> {
+// Revert a v7.0.0 pre-parity stop-gap solution.
+const migrateProtocolsFromTempDirectory = preParityMigrateProtocolsFrom(
+  FileSystem.PRE_V7_PARITY_DIRECTORY_PATH,
+  FileSystem.PROTOCOLS_DIRECTORY_PATH
+)
+export function preParityMigrateProtocolsFrom(
+  src: string,
+  dest: string
+): () => Promise<void> {
   let hasCheckedForMigration = false
+
   return function (): Promise<void> {
     return new Promise((resolve, reject) => {
       if (hasCheckedForMigration) resolve()
       hasCheckedForMigration = true
-      console.log(
-        `Performing protocol migration to ${FileSystem.PROTOCOLS_DIRECTORY_NAME}...`
-      )
-      copyProtocols(
-        FileSystem.OLD_PROTOCOLS_DIRECTORY_PATH,
-        FileSystem.PROTOCOLS_DIRECTORY_PATH
-      )
-        .then(() => {
-          console.log('Protocol migration complete.')
-          resolve()
+
+      fse
+        .stat(src)
+        .then(doesSrcExist => {
+          if (!doesSrcExist.isDirectory()) resolve()
+
+          console.log(
+            `Performing protocol migration to ${FileSystem.PROTOCOLS_DIRECTORY_NAME}...`
+          )
+
+          return migrateProtocols(src, dest).then(() => {
+            console.log('Protocol migration complete.')
+            resolve()
+          })
         })
         .catch(e => {
           console.log(
@@ -71,27 +83,27 @@ function migrateProtocolsToNewDirectory(): () => Promise<void> {
     })
   }
 
-  function copyProtocols(src: string, dest: string): Promise<void> {
+  function migrateProtocols(src: string, dest: string): Promise<void> {
     return fse
-      .stat(src)
-      .then(doesSrcExist => {
-        if (!doesSrcExist.isDirectory()) return Promise.resolve()
+      .readdir(src)
+      .then(items => {
+        const protocols = items.map(item => {
+          const srcItem = path.join(src, item)
+          const destItem = path.join(dest, item)
 
-        return fse.readdir(src).then(items => {
-          const protocols = items.map(item => {
-            const srcItem = path.join(src, item)
-            const destItem = path.join(dest, item)
-
-            return fse.copy(srcItem, destItem, {
-              overwrite: false,
-            })
+          return fse.copy(srcItem, destItem, {
+            overwrite: false,
           })
-          return Promise.all(protocols).then(() => Promise.resolve())
         })
+        // Delete the tmp directory.
+        return Promise.all(protocols).then(() =>
+          fse.rm(src, {
+            recursive: true,
+            force: true,
+          })
+        )
       })
-      .catch(e => {
-        return Promise.reject(e)
-      })
+      .catch(e => Promise.reject(e))
   }
 }
 
@@ -100,7 +112,7 @@ export const fetchProtocols = (
   source: ListSource
 ): Promise<void> => {
   return ensureDir(FileSystem.PROTOCOLS_DIRECTORY_PATH)
-    .then(() => migrateProtocols())
+    .then(() => migrateProtocolsFromTempDirectory())
     .then(() =>
       FileSystem.readDirectoriesWithinDirectory(
         FileSystem.PROTOCOLS_DIRECTORY_PATH
@@ -125,7 +137,7 @@ export const fetchProtocols = (
         }, null)
         const mostRecentAnalysis =
           mostRecentAnalysisFilePath != null
-            ? getParsedAnalysisFromPath(mostRecentAnalysisFilePath)
+            ? getParsedAnalysisFromPath(mostRecentAnalysisFilePath) ?? null
             : null
 
         return {
@@ -201,22 +213,14 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
           })
         break
       }
-      // TODO(jh, 2023-09-15): remove the secondary removeProtocolByKey() after
-      // OT-2 parity work is completed.
+
       case ProtocolStorageActions.REMOVE_PROTOCOL: {
         FileSystem.removeProtocolByKey(
           action.payload.protocolKey,
           FileSystem.PROTOCOLS_DIRECTORY_PATH
+        ).then(() =>
+          fetchProtocols(dispatch, ProtocolStorageActions.PROTOCOL_ADDITION)
         )
-          .then(() =>
-            fetchProtocols(dispatch, ProtocolStorageActions.PROTOCOL_ADDITION)
-          )
-          .then(() =>
-            FileSystem.removeProtocolByKey(
-              action.payload.protocolKey,
-              FileSystem.OLD_PROTOCOLS_DIRECTORY_PATH
-            )
-          )
         break
       }
 

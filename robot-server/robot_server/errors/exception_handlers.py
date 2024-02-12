@@ -8,6 +8,9 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from typing import Any, Callable, Coroutine, Dict, Optional, Sequence, Type, Union
 
 from opentrons_shared_data.errors import ErrorCodes, EnumeratedError, PythonException
+from opentrons_shared_data.errors.exceptions import (
+    FirmwareUpdateRequiredError as HWFirmwareUpdateRequired,
+)
 
 from robot_server.versioning import (
     API_VERSION,
@@ -21,10 +24,6 @@ from .global_errors import (
     BadRequest,
     InvalidRequest,
     FirmwareUpdateRequired,
-)
-
-from opentrons.hardware_control.errors import (
-    FirmwareUpdateRequired as HWFirmwareUpdateRequired,
 )
 
 from .error_responses import (

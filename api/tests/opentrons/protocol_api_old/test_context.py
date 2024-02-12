@@ -6,6 +6,7 @@ from typing import Any, Dict
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.pipette.dev_types import LabwareUri
+from opentrons_shared_data.errors.exceptions import UnexpectedTipRemovalError
 
 import opentrons.protocol_api as papi
 import opentrons.protocols.api_support as papi_support
@@ -17,7 +18,7 @@ from opentrons.protocol_api.module_contexts import (
     HeaterShakerContext,
 )
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
-from opentrons.hardware_control import API, NoTipAttachedError, ThreadManagedHardware
+from opentrons.hardware_control import API, ThreadManagedHardware
 from opentrons.hardware_control.instruments.ot2.pipette import Pipette
 from opentrons.hardware_control.types import Axis
 from opentrons.protocols.advanced_control import transfers as tf
@@ -581,7 +582,7 @@ def test_prevent_liquid_handling_without_tip(ctx):
     plate = ctx.load_labware("corning_384_wellplate_112ul_flat", "2")
     pipR = ctx.load_instrument("p300_single", Mount.RIGHT, tip_racks=[tr])
 
-    with pytest.raises(NoTipAttachedError):
+    with pytest.raises(UnexpectedTipRemovalError):
         pipR.aspirate(100, plate.wells()[0])
 
     pipR.pick_up_tip()
@@ -589,7 +590,7 @@ def test_prevent_liquid_handling_without_tip(ctx):
     pipR.aspirate(100, plate.wells()[0])
     pipR.drop_tip()
 
-    with pytest.raises(NoTipAttachedError):
+    with pytest.raises(UnexpectedTipRemovalError):
         pipR.dispense(100, plate.wells()[1])
 
 
@@ -875,46 +876,47 @@ def test_transfer_options(ctx, monkeypatch):
 
 
 def test_flow_rate(ctx, monkeypatch):
-    old_sfm = ctx._core.get_hardware()
+    instr = ctx.load_instrument("p300_single", Mount.RIGHT)
+    old_sfm = instr._core.set_flow_rate
 
-    def pass_on(mount, aspirate=None, dispense=None, blow_out=None):
-        old_sfm(mount, aspirate=None, dispense=None, blow_out=None)
+    def pass_on(aspirate=None, dispense=None, blow_out=None):
+        old_sfm(aspirate=aspirate, dispense=dispense, blow_out=blow_out)
 
     set_flow_rate = mock.Mock(side_effect=pass_on)
-    monkeypatch.setattr(ctx._core.get_hardware(), "set_flow_rate", set_flow_rate)
-    instr = ctx.load_instrument("p300_single", Mount.RIGHT)
+    monkeypatch.setattr(instr._core, "set_flow_rate", set_flow_rate)
 
     ctx.home()
     instr.flow_rate.aspirate = 1
-    assert set_flow_rate.called_once_with(Mount.RIGHT, aspirate=1)
+    set_flow_rate.assert_called_once_with(aspirate=1)
     set_flow_rate.reset_mock()
     instr.flow_rate.dispense = 10
-    assert set_flow_rate.called_once_with(Mount.RIGHT, dispense=10)
+    set_flow_rate.assert_called_once_with(dispense=10)
     set_flow_rate.reset_mock()
     instr.flow_rate.blow_out = 2
-    assert set_flow_rate.called_once_with(Mount.RIGHT, blow_out=2)
+    set_flow_rate.assert_called_once_with(blow_out=2)
     assert instr.flow_rate.aspirate == 1
     assert instr.flow_rate.dispense == 10
     assert instr.flow_rate.blow_out == 2
 
 
 def test_pipette_speed(ctx, monkeypatch):
-    old_sfm = ctx._core.get_hardware()
+    instr = ctx.load_instrument("p300_single", Mount.RIGHT)
+    old_sfm = instr._core.set_pipette_speed
 
-    def pass_on(mount, aspirate=None, dispense=None, blow_out=None):
-        old_sfm(aspirate=None, dispense=None, blow_out=None)
+    def pass_on(aspirate=None, dispense=None, blow_out=None):
+        old_sfm(aspirate=aspirate, dispense=dispense, blow_out=blow_out)
 
     set_speed = mock.Mock(side_effect=pass_on)
-    monkeypatch.setattr(ctx._core.get_hardware(), "set_pipette_speed", set_speed)
-    instr = ctx.load_instrument("p300_single", Mount.RIGHT)
-
+    monkeypatch.setattr(instr._core, "set_pipette_speed", set_speed)
     ctx.home()
     instr.speed.aspirate = 1
-    assert set_speed.called_once_with(Mount.RIGHT, dispense=1)
+    set_speed.assert_called_once_with(aspirate=1)
+    set_speed.reset_mock()
     instr.speed.dispense = 10
+    set_speed.assert_called_once_with(dispense=10)
+    set_speed.reset_mock()
     instr.speed.blow_out = 2
-    assert set_speed.called_with(Mount.RIGHT, dispense=10)
-    assert set_speed.called_with(Mount.RIGHT, blow_out=2)
+    set_speed.assert_called_once_with(blow_out=2)
     assert instr.speed.aspirate == 1
     assert instr.speed.dispense == 10
     assert instr.speed.blow_out == 2
@@ -1186,11 +1188,11 @@ def test_move_to_with_thermocycler(
     mod = ctx.load_module("thermocycler")
 
     assert isinstance(mod, ThermocyclerContext)
-    mod._core.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[attr-defined, assignment]
+    mod._core.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[attr-defined]
     instr = ctx.load_instrument("p1000_single", "left")
     with pytest.raises(RuntimeError, match="Cannot"):
         instr.move_to(Location(Point(0, 0, 0), None))
-    mod._core.flag_unsafe_move.assert_called_once_with(  # type: ignore[attr-defined]
+    mod._core.flag_unsafe_move.assert_called_once_with(  # type: ignore[attr-defined]  # type: ignore[attr-defined]
         to_loc=Location(Point(0, 0, 0), None), from_loc=Location(Point(0, 0, 0), None)
     )
 

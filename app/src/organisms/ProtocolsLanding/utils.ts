@@ -2,7 +2,7 @@ import first from 'lodash/first'
 import { FLEX_STANDARD_MODEL } from '@opentrons/shared-data'
 import type { ProtocolAnalysisOutput, RobotType } from '@opentrons/shared-data'
 
-type AnalysisStatus = 'missing' | 'loading' | 'error' | 'complete'
+type AnalysisStatus = 'missing' | 'loading' | 'error' | 'complete' | 'stale'
 
 export function getAnalysisStatus(
   isAnalyzing: boolean,
@@ -10,6 +10,8 @@ export function getAnalysisStatus(
 ): AnalysisStatus {
   if (isAnalyzing) {
     return 'loading'
+  } else if (analysis?.liquids == null) {
+    return 'stale'
   } else if (analysis != null) {
     return analysis.errors.length > 0 ? 'error' : 'complete'
   } else {
@@ -36,7 +38,7 @@ export function getRobotTypeDisplayName(
   }
 }
 
-export function getIsOT3Protocol(
+export function getisFlexProtocol(
   protocolAnalysis?: ProtocolAnalysisOutput | null
 ): boolean {
   if (protocolAnalysis?.robotType === FLEX_STANDARD_MODEL) {

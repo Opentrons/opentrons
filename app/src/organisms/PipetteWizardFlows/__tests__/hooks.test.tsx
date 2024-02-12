@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { I18nextProvider } from 'react-i18next'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import {
   NINETY_SIX_CHANNEL,
   RIGHT,
@@ -22,7 +22,7 @@ const BASE_PROPS_FOR_RUN_SETUP = {
 }
 
 describe('usePipetteFlowWizardHeaderText', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     wrapper = ({ children }) => (
       <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
@@ -344,7 +344,7 @@ describe('usePipetteFlowWizardHeaderText', () => {
       }
     )
     expect(result.current).toEqual(
-      'Detach Right Pipette and Attach 96-Channel Pipette'
+      'Detach Left Pipette and Attach 96-Channel Pipette'
     )
   })
   it('should return correct title for detaching pipette and attaching 96 channel from pipette info from right mount', () => {
@@ -371,7 +371,7 @@ describe('usePipetteFlowWizardHeaderText', () => {
       }
     )
     expect(result.current).toEqual(
-      'Detach Left Pipette and Attach 96-Channel Pipette'
+      'Detach Right Pipette and Attach 96-Channel Pipette'
     )
   })
   it('should return correct title for detaching 2 pipettes and attaching 96 channel from pipette info', () => {

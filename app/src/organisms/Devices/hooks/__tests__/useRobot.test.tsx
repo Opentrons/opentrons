@@ -2,7 +2,7 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { Provider } from 'react-redux'
 import { createStore, Store } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { getDiscoverableRobotByName } from '../../../../redux/discovery'
@@ -19,7 +19,7 @@ const mockGetDiscoverableRobotByName = getDiscoverableRobotByName as jest.Mocked
 const store: Store<any> = createStore(jest.fn(), {})
 
 describe('useRobot hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (

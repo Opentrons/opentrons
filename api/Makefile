@@ -79,7 +79,7 @@ setup:
 .PHONY: setup-ot2
 setup-ot2:
 	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip uninstall -y opentrons_hardware
+	$(pipenv) run pip uninstall -y python-can
 	$(pipenv) run pip freeze
 
 .PHONY: clean
@@ -130,14 +130,11 @@ format:
 	$(python) -m black src tests setup.py
 
 docs/build/html/v%: docs/v%
-	$(sphinx_build_allow_warnings) -b html -d docs/build/doctrees -n $< $@
-# sphinx wont automatically do this because it's only in a template
-	$(SHX) cp docs/img/lightbulb.jpg $@/_images/
+	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
 
 docs/build/html/hardware: docs/hardware src/opentrons/hardware_control
 	$(sphinx_build_allow_warnings) -b html -d docs/build/doctrees -n $< $@
 	$(SHX) mkdir $@/_images/
-	$(SHX) cp docs/img/lightbulb.jpg $@/_images/
 
 docs/dist/v%: docs/build/html/v%
 	$(SHX) mkdir -p $@
@@ -184,7 +181,8 @@ push-no-restart-ot3: sdist
 	echo $(sdist_file)
 	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,opentrons,src,,$(version_file))
 	ssh $(ssh_helper) root@$(host) "mount -o remount,rw / && mkdir -p /usr/local/bin"
-	scp $(ssh_helper) ./src/opentrons/hardware_control/scripts/{ot3repl,ot3gripper} root@$(host):/usr/local/bin/
+	scp $(ssh_helper) ./src/opentrons/hardware_control/scripts/ot3repl root@$(host):/usr/local/bin/
+	scp $(ssh_helper) ./src/opentrons/hardware_control/scripts/ot3gripper root@$(host):/usr/local/bin/
 	ssh $(ssh_helper) root@$(host) "mount -o remount,ro /"
 
 .PHONY: push-ot3
@@ -201,8 +199,8 @@ emulator:
 	-$(python) -m opentrons.hardware_control.emulation.app
 
 .PHONY: deploy
-deploy: wheel
-	$(call python_upload_package,$(twine_auth_args),$(twine_repository_url),$(wheel_file))
+deploy: wheel sdist
+	$(call python_upload_package,$(twine_auth_args),$(twine_repository_url),$(wheel_file),$(sdist_file))
 
 # User must currently specify host, e.g.: `make term host=169.254.202.176`
 .PHONY: term

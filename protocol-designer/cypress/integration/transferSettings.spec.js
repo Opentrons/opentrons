@@ -384,19 +384,21 @@ describe('Advanced Settings for Transfer Form', () => {
     cy.get('[data-test="StepItem_2"]').click()
     cy.get('button[id="AspDispSection_settings_button_aspirate"]').click()
 
-    // Verify that fixedTrash is selected
-    cy.get('[id=BlowoutLocationField_dropdown]').should(
-      'have.value',
-      'fixedTrash'
-    )
+    // Verify that trash is selected
+    cy.get('[id=BlowoutLocationField_dropdown]').should($input => {
+      const value = $input.val()
+      const expectedSubstring = 'trashBin'
+      expect(value).to.include(expectedSubstring)
+    })
     // Click on step 3 to verify the batch editing
     cy.get('[data-test="StepItem_3"]').click()
     cy.get('button[id="AspDispSection_settings_button_aspirate"]').click()
 
     // Verify that trash is selected for the blowout option
-    cy.get('[id=BlowoutLocationField_dropdown]').should(
-      'have.value',
-      'fixedTrash'
-    )
+    cy.get('[id=BlowoutLocationField_dropdown]').should($input => {
+      const value = $input.val()
+      const expectedSubstring = 'trashBin'
+      expect(value).to.include(expectedSubstring)
+    })
   })
 })

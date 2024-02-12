@@ -12,12 +12,15 @@ from ..pipette_definition import (
     PipetteGeometryDefinition,
     PipetteLiquidPropertiesDefinition,
     PipettePhysicalPropertiesDefinition,
-    TipHandlingConfigurations,
     PlungerPositions,
     SupportedTipsDefinition,
     MotorConfigurations,
     PartialTipDefinition,
     AvailableSensorDefinition,
+    PickUpTipConfigurations,
+    PressFitPickUpTipConfiguration,
+    DropTipConfigurations,
+    PlungerEjectDropTipConfiguration,
 )
 
 from ..dev_types import PipetteModelSpec
@@ -33,21 +36,20 @@ LIQUID_SCHEMA = "#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json"
 GEOMETRY_SCHEMA = "#/pipette/schemas/2/pipetteGeometryPropertiesSchema.json"
 
 
-def _build_tip_handling_configurations(
-    tip_handling_type: str, model_configurations: Optional[PipetteModelSpec] = None
-) -> TipHandlingConfigurations:
+def _build_pickup_tip_data(
+    model_configurations: Optional[PipetteModelSpec] = None,
+) -> PickUpTipConfigurations:
     presses = 0
     increment = 0
     distance = 0.0
-    if tip_handling_type == "pickup" and model_configurations:
+    if model_configurations:
         current = model_configurations["pickUpCurrent"]["value"]
         speed = model_configurations["pickUpSpeed"]["value"]
         presses = model_configurations["pickUpPresses"]["value"]
         increment = int(model_configurations["pickUpIncrement"]["value"])
         distance = model_configurations["pickUpDistance"]["value"]
-    elif tip_handling_type == "pickup":
+    else:
         print("Handling pick up tip configurations\n")
-        current = float(input("please provide the current\n"))
         speed = float(input("please provide the speed\n"))
         presses = int(input("please provide the number of presses for force pick up\n"))
         increment = int(
@@ -58,19 +60,33 @@ def _build_tip_handling_configurations(
         distance = float(
             input("please provide the starting distance for pick up tip\n")
         )
-    elif tip_handling_type == "drop" and model_configurations:
+    print(f"TODO: Current {current} is not used yet")
+    return PickUpTipConfigurations(
+        pressFit=PressFitPickUpTipConfiguration(
+            speed=speed,
+            presses=presses,
+            increment=increment,
+            distance=distance,
+            currentByTipCount={},
+        )
+    )
+
+
+def _build_drop_tip_data(
+    model_configurations: Optional[PipetteModelSpec] = None,
+) -> DropTipConfigurations:
+    if model_configurations:
         current = model_configurations["dropTipCurrent"]["value"]
         speed = model_configurations["dropTipSpeed"]["value"]
-    elif tip_handling_type == "drop":
+    else:
         print("Handling drop tip configurations\n")
-        current = float(input("please provide the current\n"))
         speed = float(input("please provide the speed\n"))
-    return TipHandlingConfigurations(
-        current=current,
-        speed=speed,
-        presses=presses,
-        increment=increment,
-        distance=distance,
+    return DropTipConfigurations(
+        plungerEject=PlungerEjectDropTipConfiguration(
+            current=current,
+            speed=speed,
+        ),
+        camAction=None,
     )
 
 
@@ -186,8 +202,8 @@ def build_physical_model_v2(
     shaft_ul_per_mm = float(
         input(f"Please provide the uL to mm conversion for {pipette_type}\n")
     )
-    pick_up_tip_configurations = _build_tip_handling_configurations("pickup")
-    drop_tip_configurations = _build_tip_handling_configurations("drop")
+    pick_up_tip_configurations = _build_pickup_tip_data()
+    drop_tip_configurations = _build_drop_tip_data()
     plunger_positions = _build_plunger_positions()
     plunger_motor_configurations = _build_motor_configurations()
     partial_tip_configurations = _build_partial_tip_configurations(int(channels))

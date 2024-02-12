@@ -46,6 +46,8 @@ export function getLocationInfoNames(
     return { slotName: 'Off deck', labwareName }
   } else if ('slotName' in labwareLocation) {
     return { slotName: labwareLocation.slotName, labwareName }
+  } else if ('addressableAreaName' in labwareLocation) {
+    return { slotName: labwareLocation.addressableAreaName, labwareName }
   } else if ('moduleId' in labwareLocation) {
     const loadModuleCommandUnderLabware = loadModuleCommands?.find(
       command => command.result?.moduleId === labwareLocation.moduleId

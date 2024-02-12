@@ -46,7 +46,6 @@ CLASSIFIERS = [
     "Intended Audience :: Science/Research",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -61,15 +60,20 @@ PACKAGES = find_packages(where="src")
 INSTALL_REQUIRES = [
     f"opentrons-shared-data=={VERSION}",
     "aionotify==0.2.0",
-    "anyio==3.3.0",
-    "jsonschema==3.0.2",
-    "numpy>=1.15.1,<2",
-    "pydantic==1.8.2",
-    "pyserial==3.5",
+    "anyio>=3.6.1,<4.0.0",
+    "jsonschema>=3.0.1,<4.18.0",
+    "numpy>=1.20.0,<2",
+    "pydantic>=1.10.9,<2.0.0",
+    "pyserial>=3.5",
     "typing-extensions>=4.0.0,<5",
     "click>=8.0.0,<9",
     'importlib-metadata >= 1.0 ; python_version < "3.8"',
 ]
+
+EXTRAS = {
+    "ot2-hardware": [f"opentrons-hardware=={VERSION}"],
+    "flex-hardware": [f"opentrons-hardware[FLEX]=={VERSION}"],
+}
 
 
 def read(*parts):
@@ -83,7 +87,7 @@ def read(*parts):
 
 if __name__ == "__main__":
     setup(
-        python_requires=">=3.7",
+        python_requires=">=3.8",
         name=DISTNAME,
         description=DESCRIPTION,
         license=LICENSE,
@@ -98,6 +102,7 @@ if __name__ == "__main__":
         zip_safe=False,
         classifiers=CLASSIFIERS,
         install_requires=INSTALL_REQUIRES,
+        extras_require=EXTRAS,
         include_package_data=True,
         package_dir={"": "src"},
         package_data={"opentrons": ["py.typed"]},

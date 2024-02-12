@@ -5,14 +5,15 @@ import { useHistory } from 'react-router-dom'
 import { formatDistance } from 'date-fns'
 
 import {
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
   Flex,
   Icon,
-  COLORS,
+  JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_WRAP_BREAK_WORD,
   SPACING,
   TYPOGRAPHY,
-  DIRECTION_COLUMN,
-  BORDERS,
-  JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 import { useProtocolQuery } from '@opentrons/react-api-client'
 
@@ -23,7 +24,7 @@ import { useTrackEvent } from '../../../redux/analytics'
 import { Skeleton } from '../../../atoms/Skeleton'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
-import { useMissingHardwareText } from './hooks'
+import { useHardwareStatusText } from './hooks'
 import {
   RUN_STATUS_FAILED,
   RUN_STATUS_STOPPED,
@@ -68,10 +69,14 @@ export function ProtocolWithLastRun({
   const {
     missingProtocolHardware,
     isLoading: isLookingForHardware,
+    conflictedSlots,
   } = useMissingProtocolHardware(protocolData.id)
   const history = useHistory()
   const isReadyToBeReRun = missingProtocolHardware.length === 0
-  const chipText = useMissingHardwareText(missingProtocolHardware)
+  const chipText = useHardwareStatusText(
+    missingProtocolHardware,
+    conflictedSlots
+  )
   const trackEvent = useTrackEvent()
   // TODO(BC, 08/29/23): reintroduce this analytics event when we refactor the hook to fetch data lazily (performance concern)
   // const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runData.id)
@@ -86,9 +91,7 @@ export function ProtocolWithLastRun({
   const PROTOCOL_CARD_STYLE = css`
     flex: 1 0 0;
     &:active {
-      background-color: ${isReadyToBeReRun
-        ? COLORS.green3Pressed
-        : COLORS.yellow3Pressed};
+      background-color: ${isReadyToBeReRun ? COLORS.green40 : COLORS.yellow40};
     }
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE};
@@ -97,9 +100,7 @@ export function ProtocolWithLastRun({
 
   const PROTOCOL_CARD_CLICKED_STYLE = css`
     flex: 1 0 0;
-    background-color: ${isReadyToBeReRun
-      ? COLORS.green3Pressed
-      : COLORS.yellow3Pressed};
+    background-color: ${isReadyToBeReRun ? COLORS.green40 : COLORS.yellow40};
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE};
     }
@@ -110,7 +111,7 @@ export function ProtocolWithLastRun({
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 5;
     overflow: hidden;
-    overflow-wrap: break-word;
+    overflow-wrap: ${OVERFLOW_WRAP_BREAK_WORD};
     height: max-content;
   `
 
@@ -153,7 +154,7 @@ export function ProtocolWithLastRun({
       flexDirection={DIRECTION_COLUMN}
       padding={SPACING.spacing24}
       gridGap={SPACING.spacing24}
-      backgroundColor={isReadyToBeReRun ? COLORS.green3 : COLORS.yellow3}
+      backgroundColor={isReadyToBeReRun ? COLORS.green35 : COLORS.yellow35}
       width="25.8125rem"
       height="24.5rem"
       borderRadius={BORDERS.borderRadiusSize4}
@@ -172,7 +173,7 @@ export function ProtocolWithLastRun({
             aria-label="icon_ot-spinner"
             spin={true}
             size="2.5rem"
-            color={COLORS.darkBlack100}
+            color={COLORS.black90}
           />
         )}
       </Flex>
@@ -190,7 +191,7 @@ export function ProtocolWithLastRun({
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         lineHeight={TYPOGRAPHY.lineHeight28}
-        color={COLORS.darkBlack70}
+        color={COLORS.grey60}
       >
         {i18n.format(
           `${terminationTypeMap[runData.status] ?? ''} ${formattedLastRunTime}`,

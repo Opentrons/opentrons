@@ -39,6 +39,11 @@ const mockResetConfigOptions = [
     name: 'Module Calibration FooBar',
     description: 'moduleCalibration fooBar description',
   },
+  {
+    id: 'authorizedKeys',
+    name: 'SSH Keys Foo',
+    description: 'SSH Keys foo description',
+  },
 ]
 
 const mockGetResetConfigOptions = getResetConfigOptions as jest.MockedFunction<
@@ -76,12 +81,17 @@ describe('DeviceReset', () => {
   })
 
   it('should render text and button', () => {
-    const [{ getByText, getByTestId }] = render(props)
+    const [{ getByText, getByTestId, queryByText }] = render(props)
     getByText('Clear pipette calibration')
     getByText('Clear gripper calibration')
     getByText('Clear module calibration')
     getByText('Clear protocol run history')
     getByText('Clears information about past runs of all protocols.')
+    getByText('Clear all stored data')
+    getByText(
+      'Clears calibrations, protocols, and all settings except robot name and network settings.'
+    )
+    expect(queryByText('Clear the ssh authorized keys')).not.toBeInTheDocument()
     expect(getByTestId('DeviceReset_clear_data_button')).toBeDisabled()
   })
 
@@ -101,6 +111,76 @@ describe('DeviceReset', () => {
     fireEvent.click(getByText('Clear pipette calibration'))
     fireEvent.click(getByText('Clear protocol run history'))
     fireEvent.click(getByText('Clear module calibration'))
+    const clearButton = getByText('Clear data and restart robot')
+    fireEvent.click(clearButton)
+    getByText('Are you sure you want to reset your device?')
+    fireEvent.click(getByText('Confirm'))
+    expect(dispatchApiRequest).toBeCalledWith(
+      mockResetConfig('mockRobot', clearMockResetOptions)
+    )
+  })
+
+  it('when tapping clear all stored data, all options are active', () => {
+    const clearMockResetOptions = {
+      pipetteOffsetCalibrations: true,
+      moduleCalibration: true,
+      runsHistory: true,
+      gripperOffsetCalibrations: true,
+      authorizedKeys: true,
+      onDeviceDisplay: true,
+      deckConfiguration: true,
+    }
+
+    const [{ getByText }] = render(props)
+    fireEvent.click(getByText('Clear all stored data'))
+    const clearButton = getByText('Clear data and restart robot')
+    fireEvent.click(clearButton)
+    getByText('Are you sure you want to reset your device?')
+    fireEvent.click(getByText('Confirm'))
+    expect(dispatchApiRequest).toBeCalledWith(
+      mockResetConfig('mockRobot', clearMockResetOptions)
+    )
+  })
+
+  it('when tapping all options except clear all stored data, all options are active', () => {
+    const clearMockResetOptions = {
+      pipetteOffsetCalibrations: true,
+      moduleCalibration: true,
+      runsHistory: true,
+      gripperOffsetCalibrations: true,
+      authorizedKeys: true,
+      onDeviceDisplay: true,
+      deckConfiguration: true,
+    }
+
+    const [{ getByText }] = render(props)
+    fireEvent.click(getByText('Clear pipette calibration'))
+    fireEvent.click(getByText('Clear gripper calibration'))
+    fireEvent.click(getByText('Clear module calibration'))
+    fireEvent.click(getByText('Clear protocol run history'))
+    const clearButton = getByText('Clear data and restart robot')
+    fireEvent.click(clearButton)
+    getByText('Are you sure you want to reset your device?')
+    fireEvent.click(getByText('Confirm'))
+    expect(dispatchApiRequest).toBeCalledWith(
+      mockResetConfig('mockRobot', clearMockResetOptions)
+    )
+  })
+
+  it('when tapping clear all stored data and unselect one options, all options are not active', () => {
+    const clearMockResetOptions = {
+      pipetteOffsetCalibrations: false,
+      moduleCalibration: true,
+      runsHistory: true,
+      gripperOffsetCalibrations: true,
+      authorizedKeys: false,
+      onDeviceDisplay: false,
+      deckConfiguration: false,
+    }
+
+    const [{ getByText }] = render(props)
+    fireEvent.click(getByText('Clear all stored data'))
+    fireEvent.click(getByText('Clear pipette calibration'))
     const clearButton = getByText('Clear data and restart robot')
     fireEvent.click(clearButton)
     getByText('Are you sure you want to reset your device?')

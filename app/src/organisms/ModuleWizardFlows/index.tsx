@@ -1,19 +1,21 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import {
   useDeleteMaintenanceRunMutation,
   useCurrentMaintenanceRun,
+  useDeckConfigurationQuery,
 } from '@opentrons/react-api-client'
 import { COLORS } from '@opentrons/components'
 import {
-  CreateCommand,
-  LEFT,
   getModuleType,
   getModuleDisplayName,
+  FLEX_CUTOUT_BY_SLOT_ID,
+  SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
+import { StyledText } from '../../atoms/text'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { useAttachedPipettesFromInstrumentsQuery } from '../../organisms/Devices/hooks'
@@ -31,9 +33,13 @@ import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
 import { DetachProbe } from './DetachProbe'
-import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
+import type {
+  CreateCommand,
+  CutoutConfig,
+  SingleSlotCutoutFixtureId,
+} from '@opentrons/shared-data'
 
 interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
@@ -60,13 +66,32 @@ export const ModuleWizardFlows = (
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('module_wizard_flows')
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
-  const attachedPipette = attachedPipettes.left ?? attachedPipettes.right
-  const moduleCalibrationSteps = getModuleCalibrationSteps()
+  const attachedPipette =
+    attachedPipettes.left?.data.calibratedOffset?.last_modified != null
+      ? attachedPipettes.left
+      : attachedPipettes.right
 
+  const moduleCalibrationSteps = getModuleCalibrationSteps()
+  const deckConfig = useDeckConfigurationQuery().data ?? []
+  const occupiedCutouts = deckConfig.filter(
+    (fixture: CutoutConfig) =>
+      !SINGLE_SLOT_FIXTURES.includes(
+        fixture.cutoutFixtureId as SingleSlotCutoutFixtureId
+      )
+  )
   const availableSlotNames =
-    FLEX_SLOT_NAMES_BY_MOD_TYPE[getModuleType(attachedModule.moduleModel)] ?? []
+    FLEX_SLOT_NAMES_BY_MOD_TYPE[
+      getModuleType(attachedModule.moduleModel)
+    ]?.filter(
+      slot =>
+        !occupiedCutouts.some(
+          (occCutout: CutoutConfig) =>
+            occCutout.cutoutId === FLEX_CUTOUT_BY_SLOT_ID[slot]
+        )
+    ) ?? []
+
   const [slotName, setSlotName] = React.useState(
-    initialSlotName != null ? initialSlotName : availableSlotNames?.[0] ?? 'D1'
+    initialSlotName != null ? initialSlotName : availableSlotNames?.[0] ?? null
   )
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const totalStepCount = moduleCalibrationSteps.length - 1
@@ -103,7 +128,9 @@ export const ModuleWizardFlows = (
     createTargetedMaintenanceRun,
     isLoading: isCreateLoading,
   } = useCreateTargetedMaintenanceRunMutation({
-    onSuccess: response => {
+    onSuccess: (response: {
+      data: { id: React.SetStateAction<string | null> }
+    }) => {
       setCreatedMaintenanceRunId(response.data.id)
     },
   })
@@ -148,8 +175,12 @@ export const ModuleWizardFlows = (
   }
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
-    onSuccess: () => handleClose(),
-    onError: () => handleClose(),
+    onSuccess: () => {
+      handleClose()
+    },
+    onError: () => {
+      handleClose()
+    },
   })
 
   const handleCleanUpAndClose = (): void => {
@@ -157,7 +188,7 @@ export const ModuleWizardFlows = (
     if (maintenanceRunData?.data.id == null) handleClose()
     else {
       chainRunCommands(
-        maintenanceRunData?.data.id,
+        maintenanceRunData?.data.id as string,
         [{ commandType: 'home' as const, params: {} }],
         false
       )
@@ -189,12 +220,16 @@ export const ModuleWizardFlows = (
       continuePastCommandFailure: boolean
     ): Promise<CommandData[]> =>
       chainRunCommands(
-        maintenanceRunData?.data.id,
+        maintenanceRunData?.data.id as string,
         commands,
         continuePastCommandFailure
       )
   }
-  if (currentStep == null || attachedPipette == null) return null
+  if (
+    currentStep == null ||
+    attachedPipette?.data.calibratedOffset?.last_modified == null
+  )
+    return null
 
   const maintenanceRunId =
     maintenanceRunData?.data.id != null &&
@@ -229,7 +264,7 @@ export const ModuleWizardFlows = (
     modalContent = (
       <SimpleWizardBody
         isSuccess={false}
-        iconColor={COLORS.errorEnabled}
+        iconColor={COLORS.red50}
         header={t(
           prepCommandErrorMessage != null
             ? 'error_prepping_module'
@@ -239,16 +274,20 @@ export const ModuleWizardFlows = (
           prepCommandErrorMessage != null ? (
             prepCommandErrorMessage
           ) : (
-            <>
-              {t('module_calibration_failed')}
-              {errorMessage}
-            </>
+            <Trans
+              t={t}
+              i18nKey={'module_calibration_failed'}
+              values={{ error: errorMessage }}
+              components={{
+                block: <StyledText as="p" />,
+              }}
+            />
           )
         }
       />
     )
   } else if (isExiting) {
-    modalContent = <InProgressModal description={t('stand_back')} />
+    modalContent = <InProgressModal description={t('stand_back_exiting')} />
   } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
     modalContent = (
       <BeforeBeginning
@@ -259,16 +298,6 @@ export const ModuleWizardFlows = (
         createdMaintenanceRunId={createdMaintenanceRunId}
       />
     )
-  } else if (currentStep.section === SECTIONS.FIRMWARE_UPDATE) {
-    modalContent = (
-      <FirmwareUpdateModal
-        proceed={proceed}
-        subsystem={
-          attachedPipette.mount === LEFT ? 'pipette_left' : 'pipette_right'
-        }
-        description={t('firmware_update')}
-      />
-    )
   } else if (currentStep.section === SECTIONS.SELECT_LOCATION) {
     modalContent = (
       <SelectLocation
@@ -276,6 +305,7 @@ export const ModuleWizardFlows = (
         {...calibrateBaseProps}
         availableSlotNames={availableSlotNames}
         setSlotName={setSlotName}
+        occupiedCutouts={occupiedCutouts}
       />
     )
   } else if (currentStep.section === SECTIONS.PLACE_ADAPTER) {

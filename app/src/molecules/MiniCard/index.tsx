@@ -9,50 +9,71 @@ interface MiniCardProps extends StyleProps {
   isSelected: boolean
   children: React.ReactNode
   isError?: boolean
+  isWarning?: boolean
 }
 const unselectedOptionStyles = css`
   background-color: ${COLORS.white};
-  border: 1px solid ${COLORS.medGreyEnabled};
+  border: 1px solid ${COLORS.grey30};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing8};
   width: 100%;
   cursor: pointer;
 
   &:hover {
-    border: 1px solid ${COLORS.medGreyHover};
+    background-color: ${COLORS.grey10};
+    border: 1px solid ${COLORS.grey35};
   }
 `
 const selectedOptionStyles = css`
   ${unselectedOptionStyles}
-  border: 1px solid ${COLORS.blueEnabled};
-  background-color: ${COLORS.lightBlue};
+  border: 1px solid ${COLORS.blue50};
+  background-color: ${COLORS.blue10};
 
   &:hover {
-    border: 1px solid ${COLORS.blueEnabled};
-    background-color: ${COLORS.lightBlue};
+    border: 1px solid ${COLORS.blue50};
+    background-color: ${COLORS.blue10};
   }
 `
 
 const errorOptionStyles = css`
   ${selectedOptionStyles}
-  border: 1px solid ${COLORS.errorEnabled};
-  background-color: ${COLORS.errorBackgroundLight};
+  border: 1px solid ${COLORS.red50};
+  background-color: ${COLORS.red20};
 
   &:hover {
-    border: 1px solid ${COLORS.errorEnabled};
-    background-color: ${COLORS.errorBackgroundLight};
+    border: 1px solid ${COLORS.red50};
+    background-color: ${COLORS.red20};
+  }
+`
+
+const warningOptionStyles = css`
+  ${selectedOptionStyles}
+  border: 1px solid ${COLORS.yellow50};
+  background-color: ${COLORS.yellow20};
+
+  &:hover {
+    border: 1px solid ${COLORS.yellow50};
+    background-color: ${COLORS.yellow20};
   }
 `
 
 export function MiniCard(props: MiniCardProps): JSX.Element {
-  const { children, onClick, isSelected, isError = false } = props
+  const {
+    children,
+    onClick,
+    isSelected,
+    isError = false,
+    isWarning = false,
+  } = props
 
-  const selectedWrapperStyles = isError
-    ? errorOptionStyles
-    : selectedOptionStyles
-  const wrapperStyles = isSelected
-    ? selectedWrapperStyles
-    : unselectedOptionStyles
+  let wrapperStyles = unselectedOptionStyles
+  if (isSelected && isError) {
+    wrapperStyles = errorOptionStyles
+  } else if (isSelected && isWarning) {
+    wrapperStyles = warningOptionStyles
+  } else if (isSelected) {
+    wrapperStyles = selectedOptionStyles
+  }
 
   return (
     <Flex onClick={onClick} css={wrapperStyles}>

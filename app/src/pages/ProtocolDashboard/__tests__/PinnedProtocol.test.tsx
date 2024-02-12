@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { act, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
 import { renderWithProviders } from '@opentrons/components'
@@ -64,10 +64,13 @@ describe('Pinned Protocol', () => {
   })
 
   it('should display modal after long click', async () => {
+    jest.useFakeTimers()
     const [{ getByText }] = render()
     const name = getByText('yay mock protocol')
     fireEvent.mouseDown(name)
-    jest.advanceTimersByTime(1005)
+    act(() => {
+      jest.advanceTimersByTime(1005)
+    })
     expect(props.longPress).toHaveBeenCalled()
     getByText('Run protocol')
     // This should ne "Unpin protocol" but I don't know how to pass state into the render

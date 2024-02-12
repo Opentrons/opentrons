@@ -1,7 +1,11 @@
+import type { PipetteModel } from '@opentrons/shared-data'
+
 export type InstrumentData = PipetteData | GripperData | BadPipette | BadGripper
 
 // pipettes module already exports type `Mount`
 type Mount = 'left' | 'right' | 'extension'
+
+export const INCONSISTENT_PIPETTE_OFFSET = 'inconsistent-pipette-offset'
 
 export interface InconsistentCalibrationFailure {
   kind: 'inconsistent-pipette-offset'
@@ -46,10 +50,13 @@ export interface PipetteData {
   }
   firmwareVersion?: string
   instrumentName: string
-  instrumentModel: string
+  instrumentModel: PipetteModel
   instrumentType: 'pipette'
   mount: 'left' | 'right'
   serialNumber: string
+  state?: {
+    tipDetected: boolean
+  }
   subsystem: 'pipette_left' | 'pipette_right'
   ok: true
 }

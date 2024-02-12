@@ -13,12 +13,12 @@ import {
 import { Divider } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
 import { ToggleButton } from '../../../atoms/buttons'
-import { useIsOT3, useIsRobotBusy, useRobot } from '../hooks'
-import { UsageSettings } from './AdvancedTab/UsageSettings'
+import { useIsFlex, useIsRobotBusy, useRobot } from '../hooks'
 import {
-  GantryHoming,
-  DisplayRobotName,
   DeviceReset,
+  DisplayRobotName,
+  EnableStatusLight,
+  GantryHoming,
   LegacySettings,
   OpenJupyterControl,
   RobotInformation,
@@ -26,6 +26,7 @@ import {
   ShortTrashBin,
   Troubleshooting,
   UpdateRobotSoftware,
+  UsageSettings,
   UseOlderAspirateBehavior,
   UseOlderProtocol,
 } from './AdvancedTab'
@@ -37,9 +38,10 @@ import {
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
 import { DeviceResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetSlideout'
 import { DeviceResetModal } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetModal'
-import { UpdateBuildroot } from './UpdateBuildroot'
+import { handleUpdateBuildroot } from './UpdateBuildroot'
 import { UNREACHABLE } from '../../../redux/discovery'
 import { Portal } from '../../../App/portal'
+import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { State, Dispatch } from '../../../redux/types'
 import type {
@@ -69,15 +71,12 @@ export function RobotSettingsAdvanced({
     showDeviceResetModal,
     setShowDeviceResetModal,
   ] = React.useState<boolean>(false)
-  const [
-    showSoftwareUpdateModal,
-    setShowSoftwareUpdateModal,
-  ] = React.useState<boolean>(false)
 
   const isRobotBusy = useIsRobotBusy({ poll: true })
+  const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
 
   const robot = useRobot(robotName)
-  const isOT3 = useIsOT3(robotName)
+  const isFlex = useIsFlex(robotName)
   const ipAddress = robot?.ip != null ? robot.ip : ''
   const settings = useSelector<State, RobotSettings>((state: State) =>
     getRobotSettings(state, robotName)
@@ -123,14 +122,6 @@ export function RobotSettingsAdvanced({
 
   return (
     <>
-      {showSoftwareUpdateModal &&
-      robot != null &&
-      robot.status !== UNREACHABLE ? (
-        <UpdateBuildroot
-          robot={robot}
-          close={() => setShowSoftwareUpdateModal(false)}
-        />
-      ) : null}
       <Box>
         {showRenameRobotSlideout && (
           <RenameRobotSlideout
@@ -160,19 +151,19 @@ export function RobotSettingsAdvanced({
         <DisplayRobotName
           robotName={robotName}
           updateIsExpanded={updateIsExpanded}
-          isRobotBusy={isRobotBusy}
+          isRobotBusy={isRobotBusy || isEstopNotDisengaged}
         />
         <Divider marginY={SPACING.spacing16} />
         <RobotServerVersion robotName={robotName} />
         <Divider marginY={SPACING.spacing16} />
         <RobotInformation robotName={robotName} />
-        {isOT3 ? null : (
+        {isFlex ? null : (
           <>
             <Divider marginY={SPACING.spacing16} />
             <UsageSettings
               settings={findSettings('enableDoorSafetySwitch')}
               robotName={robotName}
-              isRobotBusy={isRobotBusy}
+              isRobotBusy={isRobotBusy || isEstopNotDisengaged}
             />
           </>
         )}
@@ -180,47 +171,63 @@ export function RobotSettingsAdvanced({
         <GantryHoming
           settings={findSettings('disableHomeOnBoot')}
           robotName={robotName}
-          isRobotBusy={isRobotBusy}
+          isRobotBusy={isRobotBusy || isEstopNotDisengaged}
         />
+
+        {isFlex ? (
+          <>
+            <Divider marginY={SPACING.spacing16} />
+            <EnableStatusLight
+              robotName={robotName}
+              isEstopNotDisengaged={isEstopNotDisengaged}
+            />
+          </>
+        ) : null}
         <Divider marginY={SPACING.spacing16} />
-        <OpenJupyterControl robotIp={ipAddress} />
+        <OpenJupyterControl
+          robotIp={ipAddress}
+          isEstopNotDisengaged={isEstopNotDisengaged}
+        />
         <Divider marginY={SPACING.spacing16} />
         <UpdateRobotSoftware
           robotName={robotName}
-          isRobotBusy={isRobotBusy}
-          onUpdateStart={() => setShowSoftwareUpdateModal(true)}
+          isRobotBusy={isRobotBusy || isEstopNotDisengaged}
+          onUpdateStart={() => handleUpdateBuildroot(robot)}
         />
-        <Troubleshooting robotName={robotName} />
+        <Troubleshooting
+          robotName={robotName}
+          isEstopNotDisengaged={isEstopNotDisengaged}
+        />
         <Divider marginY={SPACING.spacing16} />
         <DeviceReset
           updateIsExpanded={updateIsExpanded}
-          isRobotBusy={isRobotBusy}
+          isRobotBusy={isRobotBusy || isEstopNotDisengaged}
         />
-        {isOT3 ? null : (
+        {isFlex ? null : (
           <>
             <Divider marginY={SPACING.spacing16} />
             <UseOlderProtocol
               settings={findSettings('disableFastProtocolUpload')}
               robotName={robotName}
-              isRobotBusy={isRobotBusy}
+              isRobotBusy={isRobotBusy || isEstopNotDisengaged}
             />
             <Divider marginY={SPACING.spacing16} />
             <LegacySettings
               settings={findSettings('deckCalibrationDots')}
               robotName={robotName}
-              isRobotBusy={isRobotBusy}
+              isRobotBusy={isRobotBusy || isEstopNotDisengaged}
             />
             <Divider marginY={SPACING.spacing16} />
             <ShortTrashBin
               settings={findSettings('shortFixedTrash')}
               robotName={robotName}
-              isRobotBusy={isRobotBusy}
+              isRobotBusy={isRobotBusy || isEstopNotDisengaged}
             />
             <Divider marginY={SPACING.spacing16} />
             <UseOlderAspirateBehavior
               settings={findSettings('useOldAspirationFunctions')}
               robotName={robotName}
-              isRobotBusy={isRobotBusy}
+              isRobotBusy={isRobotBusy || isEstopNotDisengaged}
             />
           </>
         )}

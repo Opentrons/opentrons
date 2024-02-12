@@ -5,7 +5,7 @@ import os
 import time
 
 from dataclasses import dataclass
-from typing import Optional, Callable, List, Any, Tuple, Dict
+from typing import Optional, Callable, List, Any, Tuple, Dict, cast
 from pathlib import Path
 
 from opentrons.config.defaults_ot3 import (
@@ -15,6 +15,7 @@ from opentrons.config.defaults_ot3 import (
     DEFAULT_HOLD_CURRENT,
 )
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.backends.ot3controller import OT3Controller
 
 from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api.types import Axis, OT3Mount, Point, OT3AxisKind
@@ -125,9 +126,10 @@ def _create_csv_and_get_callbacks(sn: str) -> Tuple[CSVProperties, CSVCallbacks]
     """Create CSV and get callback functions."""
     run_id = data.create_run_id()
     test_name = data.create_test_name_from_file(__file__)
-    folder_path = data.create_folder_for_test_data(test_name)
+    test_path = data.create_folder_for_test_data(test_name)
+    run_path = data.create_folder_for_test_data(test_path / run_id)
     file_name = data.create_file_name(test_name=test_name, run_id=run_id, tag=sn)
-    csv_display_name = os.path.join(folder_path, file_name)
+    csv_display_name = os.path.join(run_path, file_name)
     print(f"CSV: {csv_display_name}")
     start_time = time.time()
 
@@ -144,9 +146,11 @@ def _create_csv_and_get_callbacks(sn: str) -> Tuple[CSVProperties, CSVCallbacks]
             data_list = [first_row_value] + data_list
         data_str = ",".join([str(d) for d in data_list])
         if line_number is None:
-            data.append_data_to_file(test_name, file_name, data_str + "\n")
+            data.append_data_to_file(test_name, run_id, file_name, data_str + "\n")
         else:
-            data.insert_data_to_file(test_name, file_name, data_str + "\n", line_number)
+            data.insert_data_to_file(
+                test_name, run_id, file_name, data_str + "\n", line_number
+            )
 
     return (
         CSVProperties(id=run_id, name=test_name, path=csv_display_name),
@@ -596,7 +600,9 @@ async def _run_z_motion(
             run_current=setting[z_ax].run_current,
             hold_current=setting[z_ax].hold_current,  # NOTE: only set this for Z axes
         )
-        LOG.info(f"Motor Current Settings: {api._backend._current_settings}")
+        LOG.info(
+            f"Motor Current Settings: {cast(OT3Controller, api._backend)._current_settings}"
+        )
         fail_count = 0
         pass_count = 0
         for i in range(arguments.cycles):
@@ -675,7 +681,9 @@ async def _run_xy_motion(
                 api.gantry_load,
                 run_current=setting[ax].run_current,
             )
-            LOG.info(f"Motor Current Settings: {api._backend._current_settings}")
+            LOG.info(
+                f"Motor Current Settings: {cast(OT3Controller, api._backend)._current_settings}"
+            )
         fail_count = 0
         pass_count = 0
         for i in range(max(int(arguments.cycles / 2), 1)):
@@ -798,7 +806,7 @@ async def get_test_metadata(
     """Get the operator name and robot serial number."""
     if arguments.no_input:
         _operator = args.operator if isinstance(args.operator, str) else "None"
-        _robot_id = api._backend.eeprom_data.serial_number
+        _robot_id = cast(OT3Controller, api._backend).eeprom_data.serial_number
         if not _robot_id:
             ui.print_error("no serial number saved on this robot")
             _robot_id = "None"
@@ -807,7 +815,7 @@ async def get_test_metadata(
             _robot_id = "ot3-simulated-A01"
             _operator = "simulation"
         else:
-            _robot_id = api._backend.eeprom_data.serial_number
+            _robot_id = cast(OT3Controller, api._backend).eeprom_data.serial_number
             if not _robot_id:
                 ui.print_error("no serial number saved on this robot")
                 _robot_id = input("enter ROBOT SERIAL number: ").strip()
@@ -893,7 +901,9 @@ async def _main(arguments: argparse.Namespace) -> None:
             hold_current=DEFAULT_Z_CURRENT,  # NOTE: only set this for Z axes
         )
         LOG.info(DEFAULT_Z_CURRENT)
-        LOG.info(f"Motor Current Settings: {api._backend._current_settings}")
+        LOG.info(
+            f"Motor Current Settings: {cast(OT3Controller, api._backend)._current_settings}"
+        )
 
         qc_pass = await _run_gantry_cycles(
             arguments,

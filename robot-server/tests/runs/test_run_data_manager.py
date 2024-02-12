@@ -31,6 +31,7 @@ from robot_server.runs.run_store import (
     CommandNotFoundError,
 )
 from robot_server.service.task_runner import TaskRunner
+from robot_server.service.notifications import RunsPublisher
 
 from opentrons.protocol_engine import Liquid
 
@@ -55,6 +56,12 @@ def mock_run_store(decoy: Decoy) -> RunStore:
 def mock_task_runner(decoy: Decoy) -> TaskRunner:
     """Get a mock background TaskRunner."""
     return decoy.mock(cls=TaskRunner)
+
+
+@pytest.fixture()
+def mock_runs_publisher(decoy: Decoy) -> RunsPublisher:
+    """Get a mock RunsPublisher."""
+    return decoy.mock(cls=RunsPublisher)
 
 
 @pytest.fixture
@@ -99,12 +106,14 @@ def subject(
     mock_engine_store: EngineStore,
     mock_run_store: RunStore,
     mock_task_runner: TaskRunner,
+    mock_runs_publisher: RunsPublisher,
 ) -> RunDataManager:
     """Get a RunDataManager test subject."""
     return RunDataManager(
         engine_store=mock_engine_store,
         run_store=mock_run_store,
         task_runner=mock_task_runner,
+        runs_publisher=mock_runs_publisher,
     )
 
 
@@ -121,7 +130,12 @@ async def test_create(
     created_at = datetime(year=2021, month=1, day=1)
 
     decoy.when(
-        await mock_engine_store.create(run_id=run_id, labware_offsets=[], protocol=None)
+        await mock_engine_store.create(
+            run_id=run_id,
+            labware_offsets=[],
+            protocol=None,
+            deck_configuration=[],
+        )
     ).then_return(engine_state_summary)
     decoy.when(
         mock_run_store.insert(
@@ -136,6 +150,7 @@ async def test_create(
         created_at=created_at,
         labware_offsets=[],
         protocol=None,
+        deck_configuration=[],
     )
 
     assert result == Run(
@@ -184,6 +199,7 @@ async def test_create_with_options(
             run_id=run_id,
             labware_offsets=[labware_offset],
             protocol=protocol,
+            deck_configuration=[],
         )
     ).then_return(engine_state_summary)
 
@@ -200,6 +216,7 @@ async def test_create_with_options(
         created_at=created_at,
         labware_offsets=[labware_offset],
         protocol=protocol,
+        deck_configuration=[],
     )
 
     assert result == Run(
@@ -229,7 +246,12 @@ async def test_create_engine_error(
     created_at = datetime(year=2021, month=1, day=1)
 
     decoy.when(
-        await mock_engine_store.create(run_id, labware_offsets=[], protocol=None)
+        await mock_engine_store.create(
+            run_id,
+            labware_offsets=[],
+            protocol=None,
+            deck_configuration=[],
+        )
     ).then_raise(EngineConflictError("oh no"))
 
     with pytest.raises(EngineConflictError):
@@ -238,6 +260,7 @@ async def test_create_engine_error(
             created_at=created_at,
             labware_offsets=[],
             protocol=None,
+            deck_configuration=[],
         )
 
     decoy.verify(
@@ -602,6 +625,7 @@ async def test_create_archives_existing(
             run_id=run_id_new,
             labware_offsets=[],
             protocol=None,
+            deck_configuration=[],
         )
     ).then_return(engine_state_summary)
 
@@ -618,6 +642,7 @@ async def test_create_archives_existing(
         created_at=datetime(year=2021, month=1, day=1),
         labware_offsets=[],
         protocol=None,
+        deck_configuration=[],
     )
 
     decoy.verify(

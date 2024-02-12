@@ -16,12 +16,15 @@ from opentrons.protocol_engine.types import (
     LoadedPipette,
     DeckSlotLocation,
     CurrentWell,
+    CurrentAddressableArea,
     MotorAxis,
+    AddressableOffsetVector,
 )
 from opentrons.protocol_engine.state import PipetteLocationData, move_types
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.pipettes import PipetteView
+from opentrons.protocol_engine.state.addressable_areas import AddressableAreaView
 from opentrons.protocol_engine.state.geometry import GeometryView
 from opentrons.protocol_engine.state.motion import MotionView
 from opentrons.protocol_engine.state.modules import ModuleView
@@ -60,6 +63,7 @@ def subject(
     mock_engine_config: Config,
     labware_view: LabwareView,
     pipette_view: PipetteView,
+    addressable_area_view: AddressableAreaView,
     geometry_view: GeometryView,
     mock_module_view: ModuleView,
 ) -> MotionView:
@@ -68,6 +72,7 @@ def subject(
         config=mock_engine_config,
         labware_view=labware_view,
         pipette_view=pipette_view,
+        addressable_area_view=addressable_area_view,
         geometry_view=geometry_view,
         module_view=mock_module_view,
     )
@@ -79,7 +84,7 @@ def test_get_pipette_location_with_no_current_location(
     subject: MotionView,
 ) -> None:
     """It should return mount and critical_point=None if no location."""
-    decoy.when(pipette_view.get_current_well()).then_return(None)
+    decoy.when(pipette_view.get_current_location()).then_return(None)
 
     decoy.when(pipette_view.get("pipette-id")).then_return(
         LoadedPipette(
@@ -94,14 +99,14 @@ def test_get_pipette_location_with_no_current_location(
     assert result == PipetteLocationData(mount=MountType.LEFT, critical_point=None)
 
 
-def test_get_pipette_location_with_current_location_with_quirks(
+def test_get_pipette_location_with_current_location_with_y_center(
     decoy: Decoy,
     labware_view: LabwareView,
     pipette_view: PipetteView,
     subject: MotionView,
 ) -> None:
-    """It should return cp=XY_CENTER if location labware has center quirk."""
-    decoy.when(pipette_view.get_current_well()).then_return(
+    """It should return cp=Y_CENTER if location labware requests."""
+    decoy.when(pipette_view.get_current_location()).then_return(
         CurrentWell(pipette_id="pipette-id", labware_id="reservoir-id", well_name="A1")
     )
 
@@ -114,9 +119,41 @@ def test_get_pipette_location_with_current_location_with_quirks(
     )
 
     decoy.when(
-        labware_view.get_has_quirk(
+        labware_view.get_should_center_column_on_target_well(
             "reservoir-id",
-            "centerMultichannelOnWells",
+        )
+    ).then_return(True)
+
+    result = subject.get_pipette_location("pipette-id")
+
+    assert result == PipetteLocationData(
+        mount=MountType.RIGHT,
+        critical_point=CriticalPoint.Y_CENTER,
+    )
+
+
+def test_get_pipette_location_with_current_location_with_xy_center(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    pipette_view: PipetteView,
+    subject: MotionView,
+) -> None:
+    """It should return cp=XY_CENTER if location labware requests."""
+    decoy.when(pipette_view.get_current_location()).then_return(
+        CurrentWell(pipette_id="pipette-id", labware_id="reservoir-id", well_name="A1")
+    )
+
+    decoy.when(pipette_view.get("pipette-id")).then_return(
+        LoadedPipette(
+            id="pipette-id",
+            mount=MountType.RIGHT,
+            pipetteName=PipetteNameType.P300_SINGLE,
+        )
+    )
+
+    decoy.when(
+        labware_view.get_should_center_pipette_on_target_well(
+            "reservoir-id",
         )
     ).then_return(True)
 
@@ -135,7 +172,7 @@ def test_get_pipette_location_with_current_location_different_pipette(
     subject: MotionView,
 ) -> None:
     """It should return mount and cp=None if location used other pipette."""
-    decoy.when(pipette_view.get_current_well()).then_return(
+    decoy.when(pipette_view.get_current_location()).then_return(
         CurrentWell(
             pipette_id="other-pipette-id",
             labware_id="reservoir-id",
@@ -152,9 +189,14 @@ def test_get_pipette_location_with_current_location_different_pipette(
     )
 
     decoy.when(
-        labware_view.get_has_quirk(
+        labware_view.get_should_center_column_on_target_well(
             "reservoir-id",
-            "centerMultichannelOnWells",
+        )
+    ).then_return(False)
+
+    decoy.when(
+        labware_view.get_should_center_pipette_on_target_well(
+            "reservoir-id",
         )
     ).then_return(False)
 
@@ -166,13 +208,13 @@ def test_get_pipette_location_with_current_location_different_pipette(
     )
 
 
-def test_get_pipette_location_override_current_location(
+def test_get_pipette_location_override_current_location_xy_center(
     decoy: Decoy,
     labware_view: LabwareView,
     pipette_view: PipetteView,
     subject: MotionView,
 ) -> None:
-    """It should calculate pipette location from a passed in deck location."""
+    """It should calculate pipette location from a passed in deck location with xy override."""
     current_well = CurrentWell(
         pipette_id="pipette-id",
         labware_id="reservoir-id",
@@ -188,15 +230,14 @@ def test_get_pipette_location_override_current_location(
     )
 
     decoy.when(
-        labware_view.get_has_quirk(
+        labware_view.get_should_center_pipette_on_target_well(
             "reservoir-id",
-            "centerMultichannelOnWells",
         )
     ).then_return(True)
 
     result = subject.get_pipette_location(
         pipette_id="pipette-id",
-        current_well=current_well,
+        current_location=current_well,
     )
 
     assert result == PipetteLocationData(
@@ -205,7 +246,45 @@ def test_get_pipette_location_override_current_location(
     )
 
 
-def test_get_movement_waypoints_to_well(
+def test_get_pipette_location_override_current_location_y_center(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    pipette_view: PipetteView,
+    subject: MotionView,
+) -> None:
+    """It should calculate pipette location from a passed in deck location with xy override."""
+    current_well = CurrentWell(
+        pipette_id="pipette-id",
+        labware_id="reservoir-id",
+        well_name="A1",
+    )
+
+    decoy.when(pipette_view.get("pipette-id")).then_return(
+        LoadedPipette(
+            id="pipette-id",
+            mount=MountType.RIGHT,
+            pipetteName=PipetteNameType.P300_SINGLE,
+        )
+    )
+
+    decoy.when(
+        labware_view.get_should_center_column_on_target_well(
+            "reservoir-id",
+        )
+    ).then_return(True)
+
+    result = subject.get_pipette_location(
+        pipette_id="pipette-id",
+        current_location=current_well,
+    )
+
+    assert result == PipetteLocationData(
+        mount=MountType.RIGHT,
+        critical_point=CriticalPoint.Y_CENTER,
+    )
+
+
+def test_get_movement_waypoints_to_well_for_y_center(
     decoy: Decoy,
     labware_view: LabwareView,
     pipette_view: PipetteView,
@@ -216,9 +295,99 @@ def test_get_movement_waypoints_to_well(
     """It should call get_waypoints() with the correct args to move to a well."""
     location = CurrentWell(pipette_id="123", labware_id="456", well_name="abc")
 
-    decoy.when(pipette_view.get_current_well()).then_return(location)
+    decoy.when(pipette_view.get_current_location()).then_return(location)
+
     decoy.when(
-        labware_view.get_has_quirk("labware-id", "centerMultichannelOnWells")
+        labware_view.get_should_center_column_on_target_well(
+            "labware-id",
+        )
+    ).then_return(True)
+    decoy.when(
+        labware_view.get_should_center_pipette_on_target_well(
+            "labware-id",
+        )
+    ).then_return(False)
+
+    decoy.when(
+        geometry_view.get_well_position("labware-id", "well-name", WellLocation())
+    ).then_return(Point(x=4, y=5, z=6))
+
+    decoy.when(
+        move_types.get_move_type_to_well(
+            "pipette-id", "labware-id", "well-name", location, True
+        )
+    ).then_return(motion_planning.MoveType.GENERAL_ARC)
+    decoy.when(
+        geometry_view.get_min_travel_z("pipette-id", "labware-id", location, 123)
+    ).then_return(42.0)
+
+    decoy.when(geometry_view.get_ancestor_slot_name("labware-id")).then_return(
+        DeckSlotName.SLOT_2
+    )
+
+    decoy.when(
+        geometry_view.get_extra_waypoints(location, DeckSlotName.SLOT_2)
+    ).then_return([(456, 789)])
+
+    waypoints = [
+        motion_planning.Waypoint(
+            position=Point(1, 2, 3), critical_point=CriticalPoint.Y_CENTER
+        ),
+        motion_planning.Waypoint(
+            position=Point(4, 5, 6), critical_point=CriticalPoint.MOUNT
+        ),
+    ]
+
+    decoy.when(
+        motion_planning.get_waypoints(
+            move_type=motion_planning.MoveType.GENERAL_ARC,
+            origin=Point(x=1, y=2, z=3),
+            origin_cp=CriticalPoint.MOUNT,
+            max_travel_z=1337,
+            min_travel_z=42,
+            dest=Point(x=4, y=5, z=6),
+            dest_cp=CriticalPoint.Y_CENTER,
+            xy_waypoints=[(456, 789)],
+        )
+    ).then_return(waypoints)
+
+    result = subject.get_movement_waypoints_to_well(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="well-name",
+        well_location=WellLocation(),
+        origin=Point(x=1, y=2, z=3),
+        origin_cp=CriticalPoint.MOUNT,
+        max_travel_z=1337,
+        force_direct=True,
+        minimum_z_height=123,
+    )
+
+    assert result == waypoints
+
+
+def test_get_movement_waypoints_to_well_for_xy_center(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    pipette_view: PipetteView,
+    geometry_view: GeometryView,
+    mock_module_view: ModuleView,
+    subject: MotionView,
+) -> None:
+    """It should call get_waypoints() with the correct args to move to a well."""
+    location = CurrentWell(pipette_id="123", labware_id="456", well_name="abc")
+
+    decoy.when(pipette_view.get_current_location()).then_return(location)
+
+    decoy.when(
+        labware_view.get_should_center_column_on_target_well(
+            "labware-id",
+        )
+    ).then_return(False)
+    decoy.when(
+        labware_view.get_should_center_pipette_on_target_well(
+            "labware-id",
+        )
     ).then_return(True)
 
     decoy.when(
@@ -233,9 +402,14 @@ def test_get_movement_waypoints_to_well(
     decoy.when(
         geometry_view.get_min_travel_z("pipette-id", "labware-id", location, 123)
     ).then_return(42.0)
-    decoy.when(geometry_view.get_extra_waypoints("labware-id", location)).then_return(
-        [(456, 789)]
+
+    decoy.when(geometry_view.get_ancestor_slot_name("labware-id")).then_return(
+        DeckSlotName.SLOT_2
     )
+
+    decoy.when(
+        geometry_view.get_extra_waypoints(location, DeckSlotName.SLOT_2)
+    ).then_return([(456, 789)])
 
     waypoints = [
         motion_planning.Waypoint(
@@ -288,7 +462,7 @@ def test_get_movement_waypoints_to_well_raises(
             well_location=None,
         )
     ).then_return(Point(x=4, y=5, z=6))
-    decoy.when(pipette_view.get_current_well()).then_return(None)
+    decoy.when(pipette_view.get_current_location()).then_return(None)
     decoy.when(
         geometry_view.get_min_travel_z("pipette-id", "labware-id", None, None)
     ).then_return(456)
@@ -326,6 +500,196 @@ def test_get_movement_waypoints_to_well_raises(
         )
 
 
+def test_get_movement_waypoints_to_addressable_area(
+    decoy: Decoy,
+    pipette_view: PipetteView,
+    addressable_area_view: AddressableAreaView,
+    geometry_view: GeometryView,
+    subject: MotionView,
+) -> None:
+    """It should call get_waypoints() with the correct args to move to an addressable area."""
+    location = CurrentAddressableArea(pipette_id="123", addressable_area_name="abc")
+
+    decoy.when(pipette_view.get_current_location()).then_return(location)
+    decoy.when(
+        addressable_area_view.get_addressable_area_move_to_location("area-name")
+    ).then_return(Point(x=3, y=3, z=3))
+    decoy.when(geometry_view.get_all_obstacle_highest_z()).then_return(42)
+
+    decoy.when(
+        addressable_area_view.get_addressable_area_base_slot("area-name")
+    ).then_return(DeckSlotName.SLOT_2)
+
+    decoy.when(
+        geometry_view.get_extra_waypoints(location, DeckSlotName.SLOT_2)
+    ).then_return([])
+
+    waypoints = [
+        motion_planning.Waypoint(
+            position=Point(1, 2, 3), critical_point=CriticalPoint.XY_CENTER
+        ),
+        motion_planning.Waypoint(
+            position=Point(4, 5, 6), critical_point=CriticalPoint.MOUNT
+        ),
+    ]
+
+    decoy.when(
+        motion_planning.get_waypoints(
+            move_type=motion_planning.MoveType.DIRECT,
+            origin=Point(x=1, y=2, z=3),
+            origin_cp=CriticalPoint.MOUNT,
+            max_travel_z=1337,
+            min_travel_z=123,
+            dest=Point(x=4, y=5, z=6),
+            dest_cp=CriticalPoint.XY_CENTER,
+            xy_waypoints=[],
+        )
+    ).then_return(waypoints)
+
+    result = subject.get_movement_waypoints_to_addressable_area(
+        addressable_area_name="area-name",
+        offset=AddressableOffsetVector(x=1, y=2, z=3),
+        origin=Point(x=1, y=2, z=3),
+        origin_cp=CriticalPoint.MOUNT,
+        max_travel_z=1337,
+        force_direct=True,
+        minimum_z_height=123,
+        ignore_tip_configuration=False,
+    )
+
+    assert result == waypoints
+
+
+def test_move_to_moveable_trash_addressable_area(
+    decoy: Decoy,
+    pipette_view: PipetteView,
+    addressable_area_view: AddressableAreaView,
+    geometry_view: GeometryView,
+    subject: MotionView,
+) -> None:
+    """Ensure that a move request to a moveableTrash addressable utilizes the Instrument Center critical point."""
+    location = CurrentAddressableArea(
+        pipette_id="123", addressable_area_name="moveableTrashA1"
+    )
+
+    decoy.when(pipette_view.get_current_location()).then_return(location)
+    decoy.when(
+        addressable_area_view.get_addressable_area_move_to_location("moveableTrashA1")
+    ).then_return(Point(x=3, y=3, z=3))
+    decoy.when(geometry_view.get_all_obstacle_highest_z()).then_return(42)
+
+    decoy.when(
+        addressable_area_view.get_addressable_area_base_slot("moveableTrashA1")
+    ).then_return(DeckSlotName.SLOT_1)
+
+    decoy.when(
+        geometry_view.get_extra_waypoints(location, DeckSlotName.SLOT_1)
+    ).then_return([])
+
+    waypoints = [
+        motion_planning.Waypoint(
+            position=Point(1, 2, 3), critical_point=CriticalPoint.INSTRUMENT_XY_CENTER
+        )
+    ]
+
+    decoy.when(
+        motion_planning.get_waypoints(
+            move_type=motion_planning.MoveType.DIRECT,
+            origin=Point(x=1, y=2, z=3),
+            origin_cp=CriticalPoint.MOUNT,
+            max_travel_z=1337,
+            min_travel_z=123,
+            dest=Point(x=4, y=5, z=6),
+            dest_cp=CriticalPoint.INSTRUMENT_XY_CENTER,
+            xy_waypoints=[],
+        )
+    ).then_return(waypoints)
+
+    result = subject.get_movement_waypoints_to_addressable_area(
+        addressable_area_name="moveableTrashA1",
+        offset=AddressableOffsetVector(x=1, y=2, z=3),
+        origin=Point(x=1, y=2, z=3),
+        origin_cp=CriticalPoint.MOUNT,
+        max_travel_z=1337,
+        force_direct=True,
+        minimum_z_height=123,
+        ignore_tip_configuration=True,
+    )
+
+    assert result == waypoints
+
+
+def test_get_movement_waypoints_to_addressable_area_stay_at_max_travel_z(
+    decoy: Decoy,
+    pipette_view: PipetteView,
+    addressable_area_view: AddressableAreaView,
+    geometry_view: GeometryView,
+    subject: MotionView,
+) -> None:
+    """It should call get_waypoints() with the correct args to move to an addressable area.
+
+    This is the variant where we pass stay_at_max_travel_z=True to the subject.
+    This should affect the dest argument of get_waypoints().
+    """
+    location = CurrentAddressableArea(pipette_id="123", addressable_area_name="abc")
+
+    decoy.when(pipette_view.get_current_location()).then_return(location)
+    decoy.when(
+        addressable_area_view.get_addressable_area_move_to_location("area-name")
+    ).then_return(Point(x=3, y=3, z=3))
+    decoy.when(geometry_view.get_all_obstacle_highest_z()).then_return(42)
+
+    decoy.when(
+        addressable_area_view.get_addressable_area_base_slot("area-name")
+    ).then_return(DeckSlotName.SLOT_2)
+
+    decoy.when(
+        geometry_view.get_extra_waypoints(location, DeckSlotName.SLOT_2)
+    ).then_return([])
+
+    waypoints = [
+        motion_planning.Waypoint(
+            position=Point(1, 2, 3), critical_point=CriticalPoint.XY_CENTER
+        ),
+        motion_planning.Waypoint(
+            position=Point(4, 5, 6), critical_point=CriticalPoint.MOUNT
+        ),
+    ]
+
+    decoy.when(
+        motion_planning.get_waypoints(
+            move_type=motion_planning.MoveType.DIRECT,
+            origin=Point(x=1, y=2, z=3),
+            origin_cp=CriticalPoint.MOUNT,
+            max_travel_z=1337,
+            min_travel_z=123,
+            dest=Point(
+                x=4,
+                y=5,
+                # The max_travel_z arg passed to the subject, plus the offset passed to the subject,
+                # minus a 1 mm margin as a hack--see comments in the subject.
+                z=1337 + 3 - 1,
+            ),
+            dest_cp=CriticalPoint.XY_CENTER,
+            xy_waypoints=[],
+        )
+    ).then_return(waypoints)
+
+    result = subject.get_movement_waypoints_to_addressable_area(
+        addressable_area_name="area-name",
+        offset=AddressableOffsetVector(x=1, y=2, z=3),
+        origin=Point(x=1, y=2, z=3),
+        origin_cp=CriticalPoint.MOUNT,
+        max_travel_z=1337,
+        force_direct=True,
+        minimum_z_height=123,
+        stay_at_max_travel_z=True,
+        ignore_tip_configuration=False,
+    )
+
+    assert result == waypoints
+
+
 @pytest.mark.parametrize(
     ("direct", "expected_move_type"),
     [
@@ -359,7 +723,7 @@ def test_get_movement_waypoints_to_coords(
     dest = Point(4, 5, 6)
     max_travel_z = 789
 
-    decoy.when(geometry_view.get_all_labware_highest_z()).then_return(
+    decoy.when(geometry_view.get_all_obstacle_highest_z()).then_return(
         all_labware_highest_z
     )
 
@@ -401,7 +765,7 @@ def test_get_movement_waypoints_to_coords_raises(
     subject: MotionView,
 ) -> None:
     """It should raise FailedToPlanMoveError if motion_planning.get_waypoints raises."""
-    decoy.when(geometry_view.get_all_labware_highest_z()).then_return(123)
+    decoy.when(geometry_view.get_all_obstacle_highest_z()).then_return(123)
     decoy.when(
         # TODO(mm, 2022-06-22): We should use decoy.matchers.Anything() for all
         # arguments. For some reason, Decoy does not match the call unless we
@@ -455,7 +819,7 @@ def test_check_pipette_blocking_hs_latch(
     expected_result: bool,
 ) -> None:
     """It should return True if pipette is blocking opening the latch."""
-    decoy.when(pipette_view.get_current_well()).then_return(
+    decoy.when(pipette_view.get_current_location()).then_return(
         CurrentWell(pipette_id="pipette-id", labware_id="labware-id", well_name="A1")
     )
 
@@ -495,7 +859,7 @@ def test_check_pipette_blocking_hs_shake(
     expected_result: bool,
 ) -> None:
     """It should return True if pipette is blocking the h/s from shaking."""
-    decoy.when(pipette_view.get_current_well()).then_return(
+    decoy.when(pipette_view.get_current_location()).then_return(
         CurrentWell(pipette_id="pipette-id", labware_id="labware-id", well_name="A1")
     )
 
@@ -526,8 +890,11 @@ def test_get_touch_tip_waypoints(
     center_point = Point(1, 2, 3)
 
     decoy.when(
-        labware_view.get_has_quirk("labware-id", "centerMultichannelOnWells")
+        labware_view.get_should_center_pipette_on_target_well("labware-id")
     ).then_return(True)
+    decoy.when(
+        labware_view.get_should_center_column_on_target_well("labware-id")
+    ).then_return(False)
 
     decoy.when(pipette_view.get_mount("pipette-id")).then_return(MountType.LEFT)
 

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { useAllPipetteOffsetCalibrationsQuery } from '@opentrons/react-api-client'
 import {
@@ -19,7 +19,7 @@ const mockUseAllPipetteOffsetCalibrationsQuery = useAllPipetteOffsetCalibrations
 const CALIBRATION_DATA_POLL_MS = 5000
 
 describe('usePipetteOffsetCalibrations hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (

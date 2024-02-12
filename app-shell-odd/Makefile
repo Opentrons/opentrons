@@ -24,7 +24,7 @@ ssh_opts ?= $(default_ssh_opts)
 builder := yarn electron-builder \
 	--config electron-builder.config.js \
 	--publish never
-  
+
 electron := yarn electron . \
 	--devtools \
 	--log.level.console="debug" \
@@ -48,7 +48,7 @@ setup:
 
 .PHONY: clean
 clean:
-	shx rm -rf lib dist
+	shx rm -rf lib dist opentrons-robot-app.tar.gz
 
 # artifacts
 #####################################################################
@@ -56,7 +56,7 @@ clean:
 .PHONY: lib
 lib: export NODE_ENV := production
 lib:
-	OPENTRONS_PROJECT=$(OPENTRONS_PROJECT) webpack --profile
+	OPENTRONS_PROJECT=$(OPENTRONS_PROJECT) NODE_OPTIONS=--openssl-legacy-provider webpack --profile
 
 .PHONY: deps
 deps:
@@ -75,7 +75,7 @@ push-ot3: dist-ot3
 	scp $(if $(ssh_key),-i $(ssh_key)) $(ssh_opts) -r ./opentrons-robot-app.tar.gz root@$(host):
 	ssh $(if $(ssh_key),-i $(ssh_key)) $(ssh_opts) root@$(host) "mount -o remount,rw / && systemctl stop opentrons-robot-app && rm -rf /opt/opentrons-app && mkdir -p /opt/opentrons-app"
 	ssh $(if $(ssh_key),-i $(ssh_key)) $(ssh_opts) root@$(host) "tar -xvf opentrons-robot-app.tar.gz -C /opt/opentrons-app/ &&  mount -o remount,ro / && systemctl start opentrons-robot-app && rm -rf opentrons-robot-app.tar.gz"
-	rm -rf opentrons-robot-app.tar.gz
+
 
 # development
 #####################################################################
@@ -83,5 +83,9 @@ push-ot3: dist-ot3
 .PHONY: dev
 dev: export NODE_ENV := development
 dev:
-	webpack
+	NODE_OPTIONS=--openssl-legacy-provider webpack
 	$(electron)
+
+.PHONY: test
+test:
+	$(MAKE) -C .. test-js-app-shell-odd

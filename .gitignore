@@ -126,7 +126,6 @@ calibrations/
 api/pyproject.toml
 robot-server/pyproject.toml
 update-server/pyproject.toml
-notify-server/pyproject.toml
 shared-data/python/pyproject.toml
 hardware/pyproject.toml
 
@@ -135,7 +134,6 @@ hardware/pyproject.toml
 # file
 api/LICENSE
 update-server/LICENSE
-notify-server/LICENSE
 shared-data/python/LICENSE
 shared-data/LICENSE
 robot-server/LICENSE
@@ -158,3 +156,6 @@ opentrons-robot-app.tar.gz
 
 # ignore linux swap files
 *.swp
+
+# asdf versions file
+.tool-versions

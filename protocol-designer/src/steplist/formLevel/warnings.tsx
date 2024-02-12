@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { getWellTotalVolume } from '@opentrons/shared-data'
-import { i18n } from '../../localization'
 import { KnowledgeBaseLink } from '../../components/KnowledgeBaseLink'
 import { FormError } from './errors'
 /*******************
@@ -19,49 +18,40 @@ export type FormWarning = FormError & {
 
 const belowMinAirGapVolumeWarning = (min: number): FormWarning => ({
   type: 'BELOW_MIN_AIR_GAP_VOLUME',
-  title: i18n.t(`alert.form.warning.BELOW_MIN_AIR_GAP_VOLUME.title`, {
-    min,
-  }),
-  body: (
-    <React.Fragment>
-      {i18n.t(`alert.form.warning.BELOW_MIN_AIR_GAP_VOLUME.body`)}
-    </React.Fragment>
-  ),
+  title: `Air gap volume is below pipette minimum (${min} uL)`,
+  body: <>{'Pipettes cannot accurately handle volumes below their minimum.'}</>,
   dependentFields: ['disposalVolume_volume', 'pipette'],
 })
 
 const belowPipetteMinVolumeWarning = (min: number): FormWarning => ({
   type: 'BELOW_PIPETTE_MINIMUM_VOLUME',
-  title: i18n.t(`alert.form.warning.BELOW_PIPETTE_MINIMUM_VOLUME.title`, {
-    min,
-  }),
+  title: `Disposal volume is below recommended minimum (${min} uL)`,
   body: (
-    <React.Fragment>
-      {i18n.t(`alert.form.warning.BELOW_PIPETTE_MINIMUM_VOLUME.body`)}
-    </React.Fragment>
+    <>
+      {
+        'For accuracy in multi-dispense Transfers we recommend you use a disposal volume of at least the pipette`s minimum. Read more '
+      }
+    </>
   ),
   dependentFields: ['pipette', 'volume'],
 })
 
 const overMaxWellVolumeWarning = (): FormWarning => ({
   type: 'OVER_MAX_WELL_VOLUME',
-  title: i18n.t(`alert.form.warning.OVER_MAX_WELL_VOLUME.title`),
+  title: 'Dispense volume will overflow a destination well',
   dependentFields: ['dispense_labware', 'dispense_wells', 'volume'],
 })
 
 const belowMinDisposalVolumeWarning = (min: number): FormWarning => ({
   type: 'BELOW_MIN_DISPOSAL_VOLUME',
-  title: i18n.t(`alert.form.warning.BELOW_MIN_DISPOSAL_VOLUME.title`, {
-    min,
-  }),
+  title: `Disposal volume is below recommended minimum (${min} uL)`,
   body: (
-    <React.Fragment>
-      {i18n.t(`alert.form.warning.BELOW_MIN_DISPOSAL_VOLUME.body`)}
-      <KnowledgeBaseLink to="multiDispense">
-        {i18n.t(`alert.form.warning.BELOW_MIN_DISPOSAL_VOLUME.link`)}
-      </KnowledgeBaseLink>
-      .
-    </React.Fragment>
+    <>
+      {
+        'For accuracy in multi-dispense Transfers we recommend you use a disposal volume of at least the pipette`s minimum. Read more '
+      }
+      <KnowledgeBaseLink to="multiDispense">{'here'}</KnowledgeBaseLink>.
+    </>
   ),
   dependentFields: ['disposalVolume_volume', 'pipette'],
 })
@@ -72,7 +62,7 @@ export type WarningChecker = (val: unknown) => FormWarning | null
  ** Warning Checkers **
  ********************/
 // TODO: real HydratedFormData type
-type HydratedFormData = any
+export type HydratedFormData = any
 
 export const belowPipetteMinimumVolume = (
   fields: HydratedFormData
@@ -90,7 +80,12 @@ export const maxDispenseWellVolume = (
   const { dispense_labware, dispense_wells, volume } = fields
   if (!dispense_labware || !dispense_wells) return null
   const hasExceeded = dispense_wells.some((well: string) => {
-    const maximum = getWellTotalVolume(dispense_labware.def, well)
+    const maximum =
+      'name' in dispense_labware &&
+      (dispense_labware.name === 'wasteChute' ||
+        dispense_labware.name === 'trashBin')
+        ? Infinity // some randomly selected high number since waste chute is huge
+        : getWellTotalVolume(dispense_labware.def, well)
     return maximum && volume > maximum
   })
   return hasExceeded ? overMaxWellVolumeWarning() : null

@@ -29,12 +29,7 @@ export function RobotMotionLoader(props: RobotMotionLoaderProps): JSX.Element {
       minHeight="29.5rem"
       gridGap={SPACING.spacing24}
     >
-      <Icon
-        name="ot-spinner"
-        spin
-        size={SIZE_4}
-        color={COLORS.darkGreyEnabled}
-      />
+      <Icon name="ot-spinner" spin size={SIZE_4} color={COLORS.grey50} />
       {header != null ? <LoadingText>{header}</LoadingText> : null}
       {body != null ? <StyledText as="p">{body}</StyledText> : null}
     </Flex>
@@ -43,6 +38,14 @@ export function RobotMotionLoader(props: RobotMotionLoaderProps): JSX.Element {
 
 const LoadingText = styled.h1`
   ${TYPOGRAPHY.h1Default}
+
+  p {
+    text-transform: lowercase;
+  }
+
+  p::first-letter {
+    text-transform: uppercase;
+  }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     ${TYPOGRAPHY.level4HeaderSemiBold}

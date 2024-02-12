@@ -1,5 +1,4 @@
 import Ajv from 'ajv'
-import size from 'lodash/size'
 import labwareV2Schema from '../../labware/schemas/2.json'
 import protocolSchemaV1 from '../../protocol/schemas/1.json'
 import protocolSchemaV2 from '../../protocol/schemas/2.json'
@@ -8,17 +7,12 @@ import protocolSchemaV4 from '../../protocol/schemas/4.json'
 import protocolSchemaV5 from '../../protocol/schemas/5.json'
 
 import type { ErrorObject } from 'ajv'
-import type {
-  JsonProtocolFile,
-  ProtocolAnalysisFile,
-  ProtocolAnalysisOutput,
-  ProtocolFileV1,
-} from '../../protocol'
+import type { JsonProtocolFile } from '../../protocol'
 
 export type ProtocolParseErrorKey = 'INVALID_FILE_TYPE' | 'INVALID_JSON_FILE'
 
 interface ProtocolParseErrorDetails {
-  rawError?: string
+  rawError?: unknown
   schemaErrors?: ErrorObject[] | null
 }
 
@@ -42,9 +36,7 @@ const SCHEMA_BY_VERSION: { [version: string]: ProtocolSchema } = {
   '5': protocolSchemaV5,
 }
 
-export type PythonProtocolMetadata = ProtocolFileV1<{
-  [key: string]: unknown
-}> & {
+export interface PythonProtocolMetadata {
   source?: string
   [key: string]: unknown
 }
@@ -126,12 +118,6 @@ export function validateJsonProtocolFileContents(
     handleError && handleError('INVALID_JSON_FILE', { rawError: error })
     return null
   }
-}
-
-export function protocolHasLiquids(
-  protocol: ProtocolAnalysisFile<{}> | ProtocolAnalysisOutput
-): boolean {
-  return 'liquids' in protocol && size(protocol.liquids) > 0
 }
 
 export function getProtocolDesignerApplicationName(

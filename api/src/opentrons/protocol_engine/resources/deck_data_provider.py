@@ -9,7 +9,7 @@ from opentrons_shared_data.deck import (
     load as load_deck,
     DEFAULT_DECK_DEFINITION_VERSION,
 )
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
 
@@ -39,10 +39,10 @@ class DeckDataProvider:
         self._deck_type = deck_type
         self._labware_data = labware_data or LabwareDataProvider()
 
-    async def get_deck_definition(self) -> DeckDefinitionV3:
+    async def get_deck_definition(self) -> DeckDefinitionV4:
         """Get a labware definition given the labware's identification."""
 
-        def sync() -> DeckDefinitionV3:
+        def sync() -> DeckDefinitionV4:
             return load_deck(
                 name=self._deck_type.value, version=DEFAULT_DECK_DEFINITION_VERSION
             )
@@ -51,12 +51,12 @@ class DeckDataProvider:
 
     async def get_deck_fixed_labware(
         self,
-        deck_definition: DeckDefinitionV3,
+        deck_definition: DeckDefinitionV4,
     ) -> List[DeckFixedLabware]:
         """Get a list of all labware fixtures from a given deck definition."""
         labware: List[DeckFixedLabware] = []
 
-        for fixture in deck_definition["locations"]["fixtures"]:
+        for fixture in deck_definition["locations"]["legacyFixtures"]:
             labware_id = fixture["id"]
             load_name = cast(Optional[str], fixture.get("labware"))
             slot = cast(Optional[str], fixture.get("slot"))

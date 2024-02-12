@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { saveAs } from 'file-saver'
 import { when, resetAllWhenMocks } from 'jest-when'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 import {
@@ -28,18 +29,19 @@ import {
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import {
   useDeckCalibrationData,
-  useIsOT3,
+  useIsFlex,
   usePipetteOffsetCalibrations,
   useRobot,
   useTipLengthCalibrations,
 } from '../../../organisms/Devices/hooks'
-
+import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 import { CalibrationDataDownload } from '../CalibrationDataDownload'
 
 jest.mock('file-saver')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../redux/analytics')
 jest.mock('../../../organisms/Devices/hooks')
+jest.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
 
 const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
   typeof useDeckCalibrationData
@@ -54,21 +56,25 @@ const mockUseTipLengthCalibrations = useTipLengthCalibrations as jest.MockedFunc
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
   typeof useInstrumentsQuery
 >
 const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
   typeof useModulesQuery
 >
+const mockUseIsEstopNotDisengaged = useIsEstopNotDisengaged as jest.MockedFunction<
+  typeof useIsEstopNotDisengaged
+>
 
 let mockTrackEvent: jest.Mock
 const mockSetShowHowCalibrationWorksModal = jest.fn()
+const ROBOT_NAME = 'otie'
 
 const render = () => {
   return renderWithProviders(
     <CalibrationDataDownload
-      robotName="otie"
+      robotName={ROBOT_NAME}
       setShowHowCalibrationWorksModal={mockSetShowHowCalibrationWorksModal}
     />,
     {
@@ -100,7 +106,7 @@ describe('CalibrationDataDownload', () => {
         deckCalibrationData: mockDeckCalData,
         isDeckCalibrated: true,
       })
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(false)
     when(mockUsePipetteOffsetCalibrations)
       .calledWith()
       .mockReturnValue([
@@ -108,7 +114,9 @@ describe('CalibrationDataDownload', () => {
         mockPipetteOffsetCalibration2,
         mockPipetteOffsetCalibration3,
       ])
-    when(mockUseRobot).calledWith('otie').mockReturnValue(mockConnectableRobot)
+    when(mockUseRobot)
+      .calledWith(ROBOT_NAME)
+      .mockReturnValue(mockConnectableRobot)
     when(mockUseTipLengthCalibrations)
       .calledWith()
       .mockReturnValue([
@@ -122,6 +130,9 @@ describe('CalibrationDataDownload', () => {
     mockUseModulesQuery.mockReturnValue({
       data: { data: [] },
     } as any)
+    when(mockUseIsEstopNotDisengaged)
+      .calledWith(ROBOT_NAME)
+      .mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -130,13 +141,13 @@ describe('CalibrationDataDownload', () => {
   })
 
   it('renders a title and description for OT2', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(false)
     const [{ getByText }] = render()
     getByText('Download Calibration Data')
   })
 
   it('renders an OT-3 title and description - About Calibration', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
     const [{ queryByText }] = render()
     queryByText(
       `For the robot to move accurately and precisely, you need to calibrate it. Pipette and gripper calibration is an automated process that uses a calibration probe or pin.`
@@ -149,7 +160,7 @@ describe('CalibrationDataDownload', () => {
   it('renders a download calibration data button', () => {
     const [{ getByText }] = render()
     const downloadButton = getByText('Download calibration logs')
-    downloadButton.click()
+    fireEvent.click(downloadButton)
     expect(saveAs).toHaveBeenCalled()
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
@@ -158,18 +169,18 @@ describe('CalibrationDataDownload', () => {
   })
 
   it('renders a download calibration button for Flex when cal data is present', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
     mockUseInstrumentsQuery.mockReturnValue({
       data: { data: [instrumentsResponseFixture.data[0]] },
     } as any)
     const [{ getByText }] = render()
     const downloadButton = getByText('Download calibration logs')
-    downloadButton.click()
+    fireEvent.click(downloadButton)
     expect(saveAs).toHaveBeenCalled()
   })
 
   it('renders a See how robot calibration works link', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
     const [{ getByRole }] = render()
     const SUPPORT_LINK = 'https://support.opentrons.com'
     expect(
@@ -218,7 +229,7 @@ describe('CalibrationDataDownload', () => {
   })
 
   it('renders disabled button for Flex when no instrument is calibrated', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
     const [{ getByRole, queryByText }] = render()
     queryByText(
       `For the robot to move accurately and precisely, you need to calibrate it. Pipette and gripper calibration is an automated process that uses a calibration probe or pin.`
@@ -238,6 +249,18 @@ describe('CalibrationDataDownload', () => {
     const [{ getByRole, getByText }] = render()
     getByText('No calibration data available.')
 
+    const downloadButton = getByRole('button', {
+      name: 'Download calibration logs',
+    })
+    expect(downloadButton).toBeDisabled()
+  })
+
+  it('renders disabled button when e-stop is pressed', () => {
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
+    when(mockUseIsEstopNotDisengaged)
+      .calledWith(ROBOT_NAME)
+      .mockReturnValue(true)
+    const [{ getByRole }] = render()
     const downloadButton = getByRole('button', {
       name: 'Download calibration logs',
     })

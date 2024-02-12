@@ -44,7 +44,7 @@ jobs:
       - uses: 'actions/checkout@v3'
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '16'
+          node-version: '18.19.0'
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
@@ -62,15 +62,14 @@ jobs:
           yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'run components unit tests'
-        run: |
-          yarn jest --coverage=true --ci=true --collectCoverageFrom="components/src/**/*.(js|ts|tsx)" components/src
+        run: make -C components test-cov
       - name: 'Upload coverage report'
         uses: codecov/codecov-action@v3
         with:
           files: ./coverage/lcov.info
           flags: components
 
-  build-components:
+  build-components-storybook:
     name: 'build components artifact'
     runs-on: 'ubuntu-22.04'
     if: github.event_name != 'pull_request'
@@ -79,7 +78,7 @@ jobs:
       - uses: 'actions/checkout@v3'
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '16'
+          node-version: '18.19.0'
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
@@ -103,11 +102,33 @@ jobs:
         with:
           name: 'components-artifact'
           path: storybook-static
+
+  determine-build-type:
+    runs-on: 'ubuntu-latest'
+    name: 'Determine build type'
+    outputs:
+      type: ${{steps.determine-build-type.outputs.type}}
+    steps:
+      - id: determine-build-type
+        run: |
+          echo "Determining build type for event ${{github.event_type}} and ref ${{github.ref}}"
+          if [ "${{ format('{0}', github.ref == 'refs/heads/edge') }}" = "true" ] ; then
+            echo "storybook s3 builds for edge"
+            echo 'type=storybook' >> $GITHUB_OUTPUT
+          elif [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/components')) }}" = "true" ] ; then
+            echo "publish builds for components tags"
+            echo 'type=publish' >> $GITHUB_OUTPUT
+          else
+            echo "No build for ref ${{github.ref}} and event ${{github.event_type}}"
+            echo 'type=none' >> $GITHUB_OUTPUT
+          fi
+
   deploy-components:
-    name: 'deploy components artifact to S3'
+    name: 'deploy components storybook artifact to S3'
     runs-on: 'ubuntu-22.04'
-    needs: ['js-unit-test', 'build-components']
-    if: github.event_name != 'pull_request'
+    needs:
+      ['js-unit-test', 'build-components-storybook', 'determine-build-type']
+    if: needs.determine-build-type.outputs.type != 'none'
     steps:
       - uses: 'actions/checkout@v3'
       # https://github.com/actions/checkout/issues/290
@@ -118,7 +139,7 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '16'
+          node-version: '18.19.0'
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v6
@@ -138,3 +159,57 @@ jobs:
           AWS_DEFAULT_REGION: us-east-2
         run: |
           aws s3 sync ./dist s3://opentrons-components/${{ env.OT_BRANCH}} --acl public-read
+
+  publish-components:
+    name: 'publish components package to npm'
+    runs-on: 'ubuntu-latest'
+    needs: ['js-unit-test', 'determine-build-type']
+    if: needs.determine-build-type.outputs.type == 'publish'
+    steps:
+      - uses: 'actions/checkout@v3'
+      # https://github.com/actions/checkout/issues/290
+      - name: 'Fix actions/checkout odd handling of tags'
+        if: startsWith(github.ref, 'refs/tags')
+        run: |
+          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
+          git checkout ${{ github.ref }}
+      - uses: 'actions/setup-node@v3'
+        with:
+          node-version: '18.19.0'
+          registry-url: 'https://registry.npmjs.org'
+      - name: 'cache yarn cache'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
+      - name: 'setup-js'
+        run: |
+          npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
+          yarn config set network-timeout 60000
+          yarn
+      - name: 'build typescript'
+        run: make build-ts
+      - name: 'build library'
+        run: |
+          make -C components lib
+      # replace package.json stub version number with version from tag
+      - name: 'set version number'
+        run: |
+          npm install -g json
+          VERSION_STRING=$(echo ${{ github.ref }} | sed 's/refs\/tags\/components@//')
+          json -I -f ./components/package.json -e "this.version=\"$VERSION_STRING\""
+          json -I -f ./components/package.json -e "this.dependencies['@opentrons/shared-data']=\"$VERSION_STRING\""
+      - uses: 'actions/setup-node@v3'
+        with:
+          node-version: '18.19.0'
+          registry-url: 'https://registry.npmjs.org'
+      - name: 'publish to npm registry'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd ./components && echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ./.npmrc && npm publish --access public

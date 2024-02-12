@@ -3,12 +3,13 @@ import { useTranslation } from 'react-i18next'
 
 import { Flex, POSITION_RELATIVE, useHoverTooltip } from '@opentrons/components'
 
+import { MODULE_MODELS_OT2_ONLY } from '@opentrons/shared-data'
 import { MenuList } from '../../atoms/MenuList'
 import { Tooltip } from '../../atoms/Tooltip'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import {
-  useIsOT3,
+  useIsFlex,
   useRunStatuses,
   useIsLegacySessionInProgress,
 } from '../Devices/hooks'
@@ -53,9 +54,9 @@ export const ModuleOverflowMenu = (
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { isRunTerminal, isRunStill } = useRunStatuses()
   const isLegacySessionInProgress = useIsLegacySessionInProgress()
-  const isOT3 = useIsOT3(robotName)
+  const isFlex = useIsFlex(robotName)
   const isIncompatibleWithOT3 =
-    isOT3 && module.moduleModel === 'thermocyclerModuleV1'
+    isFlex && module.moduleModel === 'thermocyclerModuleV1'
 
   let isDisabled: boolean = false
   if (runId != null && isLoadedInRun) {
@@ -81,7 +82,10 @@ export const ModuleOverflowMenu = (
   return (
     <Flex position={POSITION_RELATIVE}>
       <MenuList>
-        {isOT3 ? (
+        {isFlex &&
+        !MODULE_MODELS_OT2_ONLY.some(
+          modModel => modModel === module.moduleModel
+        ) ? (
           <>
             <MenuItem
               onClick={handleCalibrateClick}

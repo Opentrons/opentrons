@@ -34,3 +34,11 @@ class UriDetails:
     namespace: str
     load_name: str
     version: int
+
+
+# TODO(mm, 2023-11-20): Deduplicate this with similar types in robot_server
+# and opentrons.protocol_engine.
+@dataclass
+class CutoutFixturePlacement:
+    cutout_fixture_id: str
+    cutout_id: str

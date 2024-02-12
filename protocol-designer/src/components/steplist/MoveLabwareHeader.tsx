@@ -1,12 +1,12 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import { Tooltip, useHoverTooltip, TOOLTIP_FIXED } from '@opentrons/components'
 import {
   getLabwareDisplayName,
   getModuleDisplayName,
-  WASTE_CHUTE_SLOT,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import {
   getAdditionalEquipmentEntities,
@@ -27,7 +27,7 @@ interface MoveLabwareHeaderProps {
 
 export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
   const { sourceLabwareNickname, destinationSlot, useGripper } = props
-  const { i18n } = useTranslation()
+  const { t } = useTranslation('application')
   const moduleEntities = useSelector(getModuleEntities)
   const labwareEntities = useSelector(getLabwareEntities)
   const additionalEquipmentEntities = useSelector(
@@ -46,7 +46,7 @@ export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
 
   let destSlot: string | null | undefined = null
   if (destinationSlot === 'offDeck') {
-    destSlot = 'off deck'
+    destSlot = 'off-deck'
   } else if (
     destinationSlot != null &&
     moduleEntities[destinationSlot] != null
@@ -59,25 +59,21 @@ export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
     destSlot = getLabwareDisplayName(labwareEntities[destinationSlot].def)
   } else if (
     getHasWasteChute(additionalEquipmentEntities) &&
-    destinationSlot === WASTE_CHUTE_SLOT
+    destinationSlot === WASTE_CHUTE_CUTOUT
   ) {
-    destSlot = i18n.t('application.waste_chute_slot')
+    destSlot = t('waste_chute_slot')
   } else {
     destSlot = destinationSlot
   }
   return (
     <>
       <li className={styles.substep_header}>
-        <span>
-          {useGripper
-            ? i18n.t('application.with_gripper')
-            : i18n.t('application.manually')}
-        </span>
+        <span>{useGripper ? t('with_gripper') : t('manually')}</span>
       </li>
       <li className={styles.substep_header}>
-        <span>{i18n.t('application.labware')}</span>
+        <span>{t('labware')}</span>
         <span className={styles.spacer} />
-        <span>{i18n.t('application.new_location')}</span>
+        <span>{t('new_location')}</span>
       </li>
 
       <Tooltip {...sourceTooltipProps}>

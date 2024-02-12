@@ -5,14 +5,14 @@ from decoy import Decoy, matchers
 from datetime import datetime
 from typing import Callable
 
-from opentrons.broker import Broker
-from opentrons.equipment_broker import EquipmentBroker
 from opentrons.commands.types import CommandMessage as LegacyCommand, PauseMessage
 from opentrons.protocol_engine import (
     StateView,
     actions as pe_actions,
     commands as pe_commands,
 )
+from opentrons.legacy_broker import LegacyBroker
+from opentrons.util.broker import ReadOnlyBroker
 
 from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandMapper
 from opentrons.protocol_runner.legacy_context_plugin import LegacyContextPlugin
@@ -29,15 +29,15 @@ from opentrons_shared_data.labware.dev_types import (
 
 
 @pytest.fixture
-def mock_broker(decoy: Decoy) -> Broker:
-    """Get a mocked out LegacyProtocolContext dependency."""
-    return decoy.mock(cls=Broker)
+def mock_legacy_broker(decoy: Decoy) -> LegacyBroker:
+    """Get a mocked out `broker: LegacyBroker` dependency."""
+    return decoy.mock(cls=LegacyBroker)
 
 
 @pytest.fixture
-def mock_equipment_broker(decoy: Decoy) -> EquipmentBroker[LegacyLoadInfo]:
-    """Get a mocked out LegacyProtocolContext dependency."""
-    return decoy.mock(cls=EquipmentBroker)
+def mock_equipment_broker(decoy: Decoy) -> ReadOnlyBroker[LegacyLoadInfo]:
+    """Get a mocked out `equipment_broker: Broker` dependency."""
+    return decoy.mock(cls=ReadOnlyBroker[LegacyLoadInfo])
 
 
 @pytest.fixture
@@ -60,15 +60,15 @@ def mock_action_dispatcher(decoy: Decoy) -> pe_actions.ActionDispatcher:
 
 @pytest.fixture
 def subject(
-    mock_broker: Broker,
-    mock_equipment_broker: EquipmentBroker[LegacyLoadInfo],
+    mock_legacy_broker: LegacyBroker,
+    mock_equipment_broker: ReadOnlyBroker[LegacyLoadInfo],
     mock_legacy_command_mapper: LegacyCommandMapper,
     mock_state_view: StateView,
     mock_action_dispatcher: pe_actions.ActionDispatcher,
 ) -> LegacyContextPlugin:
     """Get a configured LegacyContextPlugin with its dependencies mocked out."""
     plugin = LegacyContextPlugin(
-        broker=mock_broker,
+        broker=mock_legacy_broker,
         equipment_broker=mock_equipment_broker,
         legacy_command_mapper=mock_legacy_command_mapper,
     )
@@ -76,35 +76,53 @@ def subject(
     return plugin
 
 
+class _ContextManager:
+    """A placeholder in the shape of a context manager, to pass as a template to `decoy.mock()`."""
+
+    def __enter__(self) -> None:
+        raise NotImplementedError()
+
+    def __exit__(self, type: object, value: object, traceback: object) -> None:
+        raise NotImplementedError()
+
+
 async def test_broker_subscribe_unsubscribe(
     decoy: Decoy,
-    mock_broker: Broker,
-    mock_equipment_broker: EquipmentBroker[LegacyLoadInfo],
+    mock_legacy_broker: LegacyBroker,
+    mock_equipment_broker: ReadOnlyBroker[LegacyLoadInfo],
     subject: LegacyContextPlugin,
 ) -> None:
     """It should subscribe to the brokers on setup and unsubscribe on teardown."""
-    command_broker_unsubscribe: Callable[[], None] = decoy.mock()
-    equipment_broker_unsubscribe: Callable[[], None] = decoy.mock()
+    command_broker_unsubscribe: Callable[[], None] = decoy.mock(
+        name="command_broker_unsubscribe"
+    )
+    equipment_broker_subscription_context = decoy.mock(cls=_ContextManager)
 
     decoy.when(
-        mock_broker.subscribe(topic="command", handler=matchers.Anything())
+        mock_legacy_broker.subscribe(topic="command", handler=matchers.Anything())
     ).then_return(command_broker_unsubscribe)
 
     decoy.when(
-        mock_equipment_broker.subscribe(callback=matchers.Anything())
-    ).then_return(equipment_broker_unsubscribe)
+        mock_equipment_broker.subscribed(callback=matchers.Anything())
+    ).then_return(equipment_broker_subscription_context)
 
     subject.setup()
     await subject.teardown()
 
     decoy.verify(command_broker_unsubscribe())
-    decoy.verify(equipment_broker_unsubscribe())
+
+    decoy.verify(
+        [
+            equipment_broker_subscription_context.__enter__(),  # type: ignore[func-returns-value]
+            equipment_broker_subscription_context.__exit__(None, None, None),  # type: ignore[func-returns-value]
+        ]
+    )
 
 
 async def test_command_broker_messages(
     decoy: Decoy,
-    mock_broker: Broker,
-    mock_equipment_broker: EquipmentBroker[LegacyLoadInfo],
+    mock_legacy_broker: LegacyBroker,
+    mock_equipment_broker: ReadOnlyBroker[LegacyLoadInfo],
     mock_legacy_command_mapper: LegacyCommandMapper,
     mock_action_dispatcher: pe_actions.ActionDispatcher,
     subject: LegacyContextPlugin,
@@ -115,11 +133,11 @@ async def test_command_broker_messages(
     # (instead of Decoy's default `None`) so subject.teardown() works.
     command_handler_captor = matchers.Captor()
     decoy.when(
-        mock_broker.subscribe(topic="command", handler=command_handler_captor)
-    ).then_return(decoy.mock())
+        mock_legacy_broker.subscribe(topic="command", handler=command_handler_captor)
+    ).then_return(decoy.mock(name="command_broker_unsubscribe"))
     decoy.when(
-        mock_equipment_broker.subscribe(callback=matchers.Anything())
-    ).then_return(decoy.mock())
+        mock_equipment_broker.subscribed(callback=matchers.Anything())
+    ).then_enter_with(None)
 
     subject.setup()
 
@@ -157,8 +175,8 @@ async def test_command_broker_messages(
 
 async def test_equipment_broker_messages(
     decoy: Decoy,
-    mock_broker: Broker,
-    mock_equipment_broker: EquipmentBroker[LegacyLoadInfo],
+    mock_legacy_broker: LegacyBroker,
+    mock_equipment_broker: ReadOnlyBroker[LegacyLoadInfo],
     mock_legacy_command_mapper: LegacyCommandMapper,
     mock_action_dispatcher: pe_actions.ActionDispatcher,
     subject: LegacyContextPlugin,
@@ -166,15 +184,13 @@ async def test_equipment_broker_messages(
 ) -> None:
     """It should dispatch commands from equipment broker messages."""
     # Capture the function that the plugin sets up as its labware load callback.
-    # Also, ensure that all subscribe calls return an actual unsubscribe callable
-    # (instead of Decoy's default `None`) so subject.teardown() works.
     labware_handler_captor = matchers.Captor()
     decoy.when(
-        mock_broker.subscribe(topic="command", handler=matchers.Anything())
-    ).then_return(decoy.mock())
+        mock_legacy_broker.subscribe(topic="command", handler=matchers.Anything())
+    ).then_return(decoy.mock(name="command_broker_unsubscribe"))
     decoy.when(
-        mock_equipment_broker.subscribe(callback=labware_handler_captor)
-    ).then_return(decoy.mock())
+        mock_equipment_broker.subscribed(callback=labware_handler_captor)
+    ).then_enter_with(None)
 
     subject.setup()
 

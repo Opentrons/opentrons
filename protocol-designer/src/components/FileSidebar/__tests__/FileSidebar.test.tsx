@@ -1,254 +1,179 @@
 import * as React from 'react'
-import { shallow, mount } from 'enzyme'
+import { fireEvent, screen } from '@testing-library/react'
+import { renderWithProviders } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { createFile, getRobotType } from '../../../file-data/selectors'
 import {
-  DeprecatedPrimaryButton,
-  AlertModal,
-  OutlineButton,
-} from '@opentrons/components'
-import { Command } from '@opentrons/shared-data/protocol/types/schemaV5'
+  getCurrentPage,
+  getNewProtocolModal,
+} from '../../../navigation/selectors'
+import { i18n } from '../../../localization'
 import {
-  LabwareDefinition2,
-  MAGNETIC_MODULE_TYPE,
-} from '@opentrons/shared-data'
-import {
-  fixtureP10Single,
-  fixtureP300Single,
-} from '@opentrons/shared-data/pipette/fixtures/name'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+  getAdditionalEquipment,
+  getInitialDeckSetup,
+  getSavedStepForms,
+} from '../../../step-forms/selectors'
+import { toggleNewProtocolModal } from '../../../navigation/actions'
+import { getHasUnsavedChanges } from '../../../load-file/selectors'
 import { useBlockingHint } from '../../Hints/useBlockingHint'
-import { FileSidebar, v7WarningContent } from '../FileSidebar'
+import {
+  getUnusedEntities,
+  getUnusedStagingAreas,
+  getUnusedTrash,
+} from '../utils'
+import { FileSidebar } from '../FileSidebar'
 
-jest.mock('../../Hints/useBlockingHint')
-jest.mock('../../../file-data/selectors')
 jest.mock('../../../step-forms/selectors')
+jest.mock('../../../load-file/selectors')
+jest.mock('../../../navigation/actions')
+jest.mock('../../../navigation/selectors')
+jest.mock('../../../file-data/selectors')
+jest.mock('../../Hints/useBlockingHint')
+jest.mock('../utils')
 
+const mockCreateFile = createFile as jest.MockedFunction<typeof createFile>
+const mockGetCurrentPage = getCurrentPage as jest.MockedFunction<
+  typeof getCurrentPage
+>
+const mockGetInitialDeckSetup = getInitialDeckSetup as jest.MockedFunction<
+  typeof getInitialDeckSetup
+>
+const mockGetRobotType = getRobotType as jest.MockedFunction<
+  typeof getRobotType
+>
+const mockGetAdditionalEquipment = getAdditionalEquipment as jest.MockedFunction<
+  typeof getAdditionalEquipment
+>
+const mockGetSavedStepForms = getSavedStepForms as jest.MockedFunction<
+  typeof getSavedStepForms
+>
+const mockGetNewProtocolModal = getNewProtocolModal as jest.MockedFunction<
+  typeof getNewProtocolModal
+>
+const mockGetHasUnsavedChanges = getHasUnsavedChanges as jest.MockedFunction<
+  typeof getHasUnsavedChanges
+>
+const mockGetUnusedTrash = getUnusedTrash as jest.MockedFunction<
+  typeof getUnusedTrash
+>
+const mockGetUnusedStagingAreas = getUnusedStagingAreas as jest.MockedFunction<
+  typeof getUnusedStagingAreas
+>
+const mockGetUnusedEntities = getUnusedEntities as jest.MockedFunction<
+  typeof getUnusedEntities
+>
 const mockUseBlockingHint = useBlockingHint as jest.MockedFunction<
   typeof useBlockingHint
 >
+const mockToggleNewProtocolModal = toggleNewProtocolModal as jest.MockedFunction<
+  typeof toggleNewProtocolModal
+>
+
+const render = () => {
+  return renderWithProviders(<FileSidebar />, { i18nInstance: i18n })[0]
+}
 
 describe('FileSidebar', () => {
-  const pipetteLeftId = 'pipetteLeftId'
-  const pipetteRightId = 'pipetteRightId'
-  let props: React.ComponentProps<typeof FileSidebar>
-  let commands: Command[]
-  let modulesOnDeck: React.ComponentProps<typeof FileSidebar>['modulesOnDeck']
-  let pipettesOnDeck: React.ComponentProps<typeof FileSidebar>['pipettesOnDeck']
-  let savedStepForms: React.ComponentProps<typeof FileSidebar>['savedStepForms']
   beforeEach(() => {
-    props = {
-      loadFile: jest.fn(),
-      createNewFile: jest.fn(),
-      canDownload: true,
-      onDownload: jest.fn(),
-      fileData: {
-        labware: {},
-        labwareDefinitions: {},
-        metadata: {},
-        pipettes: {},
-        robot: { model: 'OT-2 Standard', deckId: 'ot2_standard' },
-        schemaVersion: 6,
-        commands: [],
-      } as any,
-      pipettesOnDeck: {},
-      modulesOnDeck: {},
-      savedStepForms: {},
-      robotType: 'OT-2 Standard',
-      additionalEquipment: {},
-    }
-
-    commands = [
-      {
-        command: 'pickUpTip',
-        params: { pipette: pipetteLeftId, labware: 'well', well: 'A1' },
-      },
-    ]
-
-    pipettesOnDeck = {
-      pipetteLeftId: {
-        name: 'string' as any,
-        id: pipetteLeftId,
-        tiprackDefURI: 'test',
-        tiprackLabwareDef: fixture_tiprack_10_ul as LabwareDefinition2,
-        spec: fixtureP10Single,
-        mount: 'left',
-      },
-      pipetteRightId: {
-        name: 'string' as any,
-        id: pipetteRightId,
-        tiprackDefURI: 'test',
-        tiprackLabwareDef: fixture_tiprack_10_ul as LabwareDefinition2,
-        spec: fixtureP300Single,
-        mount: 'right',
-      },
-    }
-
-    modulesOnDeck = {
-      magnet123: {
-        type: MAGNETIC_MODULE_TYPE,
-      } as any,
-    }
-
-    savedStepForms = {
-      step123: {
-        id: 'step123',
-        pipette: pipetteLeftId,
-      } as any,
-    }
+    mockGetUnusedEntities.mockReturnValue([])
+    mockGetUnusedStagingAreas.mockReturnValue([])
+    mockGetUnusedTrash.mockReturnValue({
+      trashBinUnused: false,
+      wasteChuteUnused: false,
+    })
+    mockGetInitialDeckSetup.mockReturnValue({
+      modules: {},
+      pipettes: {},
+      additionalEquipmentOnDeck: {},
+      labware: {},
+    })
+    mockGetHasUnsavedChanges.mockReturnValue(false)
+    mockGetNewProtocolModal.mockReturnValue(false)
+    mockGetSavedStepForms.mockReturnValue({})
+    mockGetAdditionalEquipment.mockReturnValue({})
+    mockGetRobotType.mockReturnValue(FLEX_ROBOT_TYPE)
+    mockGetCurrentPage.mockReturnValue('settings-app')
+    mockUseBlockingHint.mockReturnValue(null)
+    mockCreateFile.mockReturnValue({
+      commands: [
+        {
+          commandType: 'moveToAddressableArea',
+          params: {
+            addressableAreaName: 'movableTrashA3',
+            pipetteId: 'mockId',
+            offset: { x: 0, y: 0, z: 0 },
+          },
+        },
+      ],
+    } as any)
   })
   afterEach(() => {
     jest.resetAllMocks()
   })
-  it('create new button creates new protocol', () => {
-    const wrapper = shallow(<FileSidebar {...props} />)
-    const createButton = wrapper.find(OutlineButton).at(0)
-    createButton.simulate('click')
-
-    expect(props.createNewFile).toHaveBeenCalled()
+  it('renders the file sidebar and buttons work as expected with no warning upon export', () => {
+    render()
+    screen.getByText('Protocol File')
+    fireEvent.click(screen.getByRole('button', { name: 'Create New' }))
+    expect(mockToggleNewProtocolModal).toHaveBeenCalled()
+    screen.getByText('Import')
+    fireEvent.click(screen.getByRole('button', { name: 'Export' }))
+    expect(mockUseBlockingHint).toHaveBeenCalled()
   })
-
-  it('import button imports saved protocol', () => {
-    const event = { files: ['test.json'] }
-
-    const wrapper = shallow(<FileSidebar {...props} />)
-    const importButton = wrapper.find('[type="file"]')
-    importButton.simulate('change', event)
-
-    expect(props.loadFile).toHaveBeenCalledWith(event)
+  it('renders the no commands warning', () => {
+    mockCreateFile.mockReturnValue({
+      commands: [],
+    } as any)
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'Export' }))
+    screen.getByText('Your protocol has no steps')
   })
-
-  it('export button is disabled when canDownload is false', () => {
-    props.canDownload = false
-
-    const wrapper = shallow(<FileSidebar {...props} />)
-    const downloadButton = wrapper.find(DeprecatedPrimaryButton).at(0)
-
-    expect(downloadButton.prop('disabled')).toEqual(true)
+  it('renders the unused pipette and module warning', () => {
+    mockGetUnusedEntities.mockReturnValue([
+      {
+        mount: 'left',
+        name: 'p1000_96',
+        id: 'pipetteId',
+        tiprackDefURI: 'mockURI',
+        spec: {
+          name: 'mock pip name',
+          displayName: 'mock display name',
+        },
+      },
+    ])
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'Export' }))
+    screen.getByText('Unused pipette and module')
   })
-
-  it('warning modal is shown when export is clicked with no command', () => {
-    const wrapper = shallow(<FileSidebar {...props} />)
-    const downloadButton = wrapper.find(DeprecatedPrimaryButton).at(0)
-    downloadButton.simulate('click')
-    const alertModal = wrapper.find(AlertModal)
-
-    expect(alertModal).toHaveLength(1)
-    expect(alertModal.prop('heading')).toEqual('Your protocol has no steps')
-  })
-
-  it('warning modal is shown when export is clicked with unused pipette', () => {
-    // @ts-expect-error(sa, 2021-6-22): props.fileData might be null
-    props.fileData.commands = commands
-    props.pipettesOnDeck = pipettesOnDeck
-    props.savedStepForms = savedStepForms
-
-    const wrapper = shallow(<FileSidebar {...props} />)
-    const downloadButton = wrapper.find(DeprecatedPrimaryButton).at(0)
-    downloadButton.simulate('click')
-    const alertModal = wrapper.find(AlertModal)
-
-    expect(alertModal).toHaveLength(1)
-    expect(alertModal.prop('heading')).toEqual('Unused pipette')
-    expect(alertModal.html()).toContain(
-      pipettesOnDeck.pipetteRightId.spec.displayName
-    )
-    expect(alertModal.html()).toContain(pipettesOnDeck.pipetteRightId.mount)
-    expect(alertModal.html()).not.toContain(
-      pipettesOnDeck.pipetteLeftId.spec.displayName
-    )
-  })
-
-  it('warning modal is shown when export is clicked with unused gripper', () => {
-    const gripperId = 'gripperId'
-    props.modulesOnDeck = modulesOnDeck
-    props.savedStepForms = savedStepForms
-    // @ts-expect-error(sa, 2021-6-22): props.fileData might be null
-    props.fileData.commands = commands
-    props.additionalEquipment = {
-      [gripperId]: { name: 'gripper', id: gripperId },
-    }
-
-    const wrapper = shallow(<FileSidebar {...props} />)
-    const downloadButton = wrapper.find(DeprecatedPrimaryButton).at(0)
-    downloadButton.simulate('click')
-    const alertModal = wrapper.find(AlertModal)
-
-    expect(alertModal).toHaveLength(1)
-    expect(alertModal.prop('heading')).toEqual('Unused gripper')
-  })
-
-  it('warning modal is shown when export is clicked with unused module', () => {
-    props.modulesOnDeck = modulesOnDeck
-    props.savedStepForms = savedStepForms
-    // @ts-expect-error(sa, 2021-6-22): props.fileData might be null
-    props.fileData.commands = commands
-
-    const wrapper = shallow(<FileSidebar {...props} />)
-    const downloadButton = wrapper.find(DeprecatedPrimaryButton).at(0)
-    downloadButton.simulate('click')
-    const alertModal = wrapper.find(AlertModal)
-
-    expect(alertModal).toHaveLength(1)
-    expect(alertModal.prop('heading')).toEqual('Unused module')
-    expect(alertModal.html()).toContain('Magnetic module')
-  })
-
-  it('warning modal is shown when export is clicked with unused module and pipette', () => {
-    props.modulesOnDeck = modulesOnDeck
-    props.pipettesOnDeck = pipettesOnDeck
-    props.savedStepForms = savedStepForms
-    // @ts-expect-error(sa, 2021-6-22): props.fileData might be null
-    props.fileData.commands = commands
-
-    const wrapper = shallow(<FileSidebar {...props} />)
-    const downloadButton = wrapper.find(DeprecatedPrimaryButton).at(0)
-    downloadButton.simulate('click')
-    const alertModal = wrapper.find(AlertModal)
-
-    expect(alertModal).toHaveLength(1)
-    expect(alertModal.prop('heading')).toEqual('Unused pipette and module')
-    expect(alertModal.html()).toContain(
-      pipettesOnDeck.pipetteRightId.spec.displayName
-    )
-    expect(alertModal.html()).toContain(pipettesOnDeck.pipetteRightId.mount)
-    expect(alertModal.html()).toContain('Magnetic module')
-    expect(alertModal.html()).not.toContain(
-      pipettesOnDeck.pipetteLeftId.spec.displayName
-    )
-  })
-
-  it('blocking hint is shown', () => {
-    // @ts-expect-error(sa, 2021-6-22): props.fileData might be null
-    props.fileData.commands = commands
-    props.savedStepForms = savedStepForms
-
-    const MockHintComponent = () => {
-      return <div></div>
-    }
-
-    mockUseBlockingHint.mockReturnValue(<MockHintComponent />)
-
-    const wrapper = mount(<FileSidebar {...props} />)
-
-    expect(wrapper.exists(MockHintComponent)).toEqual(true)
-    // Before save button is clicked, enabled should be false
-    expect(mockUseBlockingHint).toHaveBeenNthCalledWith(1, {
-      enabled: false,
-      hintKey: 'export_v7_protocol_7_0',
-      content: v7WarningContent,
-      handleCancel: expect.any(Function),
-      handleContinue: expect.any(Function),
+  it('renders the unused trash warning', () => {
+    mockGetUnusedTrash.mockReturnValue({
+      trashBinUnused: true,
+      wasteChuteUnused: false,
     })
-
-    const downloadButton = wrapper.find(DeprecatedPrimaryButton).at(0)
-    downloadButton.simulate('click')
-
-    // After save button is clicked, enabled should be true
-    expect(mockUseBlockingHint).toHaveBeenLastCalledWith({
-      enabled: true,
-      hintKey: 'export_v7_protocol_7_0',
-      content: v7WarningContent,
-      handleCancel: expect.any(Function),
-      handleContinue: expect.any(Function),
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'Export' }))
+    screen.getByText('Unused trash')
+  })
+  it('renders the unused waste chute warning', () => {
+    mockGetUnusedTrash.mockReturnValue({
+      trashBinUnused: false,
+      wasteChuteUnused: true,
     })
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'Export' }))
+    screen.getByText('Unused trash')
+  })
+  it('renders the unused staging area slot warning', () => {
+    mockGetUnusedStagingAreas.mockReturnValue(['D4'])
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'Export' }))
+    screen.getByText('One or more staging area slots are unused')
+  })
+  it('renders the unused gripper warning', () => {
+    mockGetAdditionalEquipment.mockReturnValue({
+      gripperId: { name: 'gripper', id: 'gripperId' },
+    })
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'Export' }))
+    screen.getByText('Unused gripper')
   })
 })

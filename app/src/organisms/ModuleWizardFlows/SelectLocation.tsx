@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
   FLEX_ROBOT_TYPE,
-  ModuleLocation,
   getDeckDefFromRobotType,
   getModuleDisplayName,
+  THERMOCYCLER_MODULE_TYPE,
+  CutoutConfig,
 } from '@opentrons/shared-data'
 import {
   RESPONSIVENESS,
@@ -30,6 +31,7 @@ export const BODY_STYLE = css`
 interface SelectLocationProps extends ModuleCalibrationWizardStepProps {
   setSlotName: React.Dispatch<React.SetStateAction<string>>
   availableSlotNames: string[]
+  occupiedCutouts: CutoutConfig[]
 }
 export const SelectLocation = (
   props: SelectLocationProps
@@ -40,6 +42,7 @@ export const SelectLocation = (
     slotName,
     setSlotName,
     availableSlotNames,
+    occupiedCutouts,
   } = props
   const { t } = useTranslation('module_wizard_flows')
   const moduleName = getModuleDisplayName(attachedModule.moduleModel)
@@ -49,14 +52,15 @@ export const SelectLocation = (
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const bodyText = (
     <>
-      <Banner type="warning" size={SIZE_1} marginY={SPACING.spacing4}>
-        {t('module_secured')}
-      </Banner>
       <StyledText css={BODY_STYLE}>
         {t('select_the_slot', { module: moduleName })}
       </StyledText>
+      <Banner type="warning" size={SIZE_1} marginY={SPACING.spacing4}>
+        {t('module_secured')}
+      </Banner>
     </>
   )
+
   return (
     <GenericWizardTile
       header={t('select_location')}
@@ -65,18 +69,23 @@ export const SelectLocation = (
           deckDef={deckDef}
           selectedLocation={{ slotName }}
           setSelectedLocation={loc => setSlotName(loc.slotName)}
-          disabledLocations={deckDef.locations.orderedSlots.reduce<
-            ModuleLocation[]
-          >((acc, slot) => {
-            if (availableSlotNames.some(slotName => slotName === slot.id))
-              return acc
-            return [...acc, { slotName: slot.id }]
-          }, [])}
+          availableSlotNames={availableSlotNames}
+          occupiedCutouts={occupiedCutouts}
+          isThermocycler={
+            attachedModule.moduleType === THERMOCYCLER_MODULE_TYPE
+          }
+          showTooltipOnDisabled={true}
         />
       }
       bodyText={bodyText}
       proceedButtonText={t('confirm_location')}
       proceed={handleOnClick}
+      proceedIsDisabled={slotName == null}
+      disableProceedReason={
+        slotName == null
+          ? 'Current deck configuration prevents module placement'
+          : undefined
+      }
     />
   )
 }

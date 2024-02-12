@@ -20,6 +20,16 @@ describe('EquipmentOption', () => {
     const { getByText } = render(props)
     getByText('mockText')
   })
+  it('renders the equipment option that is disabled', () => {
+    props = {
+      ...props,
+      disabled: true,
+    }
+    const { getByLabelText } = render(props)
+    expect(getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
+      `background-color: ${COLORS.white}`
+    )
+  })
   it('renders the equipment option without check not selected and image', () => {
     props = {
       ...props,
@@ -31,7 +41,7 @@ describe('EquipmentOption', () => {
     getByRole('img')
     expect(
       getByLabelText('EquipmentOption_checkbox-blank-outline')
-    ).toHaveStyle(`color: ${COLORS.darkGreyEnabled}`)
+    ).toHaveStyle(`color: ${COLORS.grey50}`)
     expect(getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
       `border: ${BORDERS.lineBorder}`
     )
@@ -45,7 +55,7 @@ describe('EquipmentOption', () => {
     const { getByText, getByLabelText } = render(props)
     getByText('mockText')
     expect(getByLabelText('EquipmentOption_checkbox-marked')).toHaveStyle(
-      `color: ${COLORS.blueEnabled}`
+      `color: ${COLORS.blue50}`
     )
     expect(getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
       `border: ${BORDERS.activeLineBorder}`

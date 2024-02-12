@@ -1,13 +1,14 @@
 import * as React from 'react'
-import i18n from 'i18next'
-import { renderWithProviders, SlotMap } from '@opentrons/components'
-import { WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
+import { fireEvent, screen } from '@testing-library/react'
+import { renderWithProviders } from '@opentrons/components'
 
+import { i18n } from '../../../localization'
 import { AdditionalItemsRow } from '../AdditionalItemsRow'
+import { FlexSlotMap } from '../FlexSlotMap'
 
-jest.mock('@opentrons/components/src/slotmap/SlotMap')
+jest.mock('../FlexSlotMap')
 
-const mockSlotMap = SlotMap as jest.MockedFunction<typeof SlotMap>
+const mockFlexSlotMap = FlexSlotMap as jest.MockedFunction<typeof FlexSlotMap>
 
 const render = (props: React.ComponentProps<typeof AdditionalItemsRow>) => {
   return renderWithProviders(<AdditionalItemsRow {...props} />, {
@@ -23,12 +24,12 @@ describe('AdditionalItemsRow', () => {
       isEquipmentAdded: false,
       name: 'gripper',
     }
-    mockSlotMap.mockReturnValue(<div>mock slot map</div>)
+    mockFlexSlotMap.mockReturnValue(<div>mock slot map</div>)
   })
   it('renders no gripper', () => {
-    const { getByRole, getByText } = render(props)
-    getByText('Flex Gripper')
-    getByRole('button', { name: 'add' }).click()
+    render(props)
+    screen.getByText('Flex Gripper')
+    fireEvent.click(screen.getByRole('button', { name: 'add' }))
     expect(props.handleAttachment).toHaveBeenCalled()
   })
   it('renders a gripper', () => {
@@ -36,12 +37,12 @@ describe('AdditionalItemsRow', () => {
       ...props,
       isEquipmentAdded: true,
     }
-    const { getByRole, getByText, getByAltText } = render(props)
-    getByText('Flex Gripper')
-    getByAltText('Flex Gripper')
-    getByText('Model:')
-    getByText('GEN1')
-    getByRole('button', { name: 'remove' }).click()
+    render(props)
+    screen.getByText('Flex Gripper')
+    screen.getByAltText('Flex Gripper')
+    screen.getByText('Model:')
+    screen.getByText('GEN1')
+    fireEvent.click(screen.getByRole('button', { name: 'remove' }))
     expect(props.handleAttachment).toHaveBeenCalled()
   })
   it('renders no waste chute', () => {
@@ -49,24 +50,68 @@ describe('AdditionalItemsRow', () => {
       ...props,
       name: 'wasteChute',
     }
-    const { getByRole, getByText } = render(props)
-    getByText('Waste Chute')
-    getByRole('button', { name: 'add' }).click()
-    expect(props.handleAttachment).toHaveBeenCalled()
+    render(props)
+    screen.getByText('Waste Chute')
+    fireEvent.click(screen.getByRole('button', { name: 'add' }))
   })
   it('renders a waste chute', () => {
     props = {
       ...props,
       name: 'wasteChute',
       isEquipmentAdded: true,
+      trashBinId: 'mockId',
     }
-    const { getByRole, getByText, getByAltText } = render(props)
-    getByText('Waste Chute')
-    getByAltText('Waste Chute')
-    getByText('mock slot map')
-    getByText('Position:')
-    getByText(`Slot ${WASTE_CHUTE_SLOT}`)
-    getByRole('button', { name: 'remove' }).click()
+    render(props)
+    screen.getByText('Waste Chute')
+    screen.getByAltText('Waste Chute')
+    screen.getByText('mock slot map')
+    screen.getByText('Position:')
+    screen.getByText('D3')
+    fireEvent.click(screen.getByRole('button', { name: 'remove' }))
     expect(props.handleAttachment).toHaveBeenCalled()
+  })
+  it('renders a disabled remove button for waste chute when there is no trash bin', () => {
+    props = {
+      ...props,
+      name: 'wasteChute',
+      isEquipmentAdded: true,
+    }
+    render(props)
+    expect(screen.getByRole('button', { name: 'remove' })).toBeDisabled()
+  })
+  it('renders no trash', () => {
+    props = {
+      ...props,
+      name: 'trashBin',
+    }
+    render(props)
+    screen.getByText('Trash Bin')
+    fireEvent.click(screen.getByRole('button', { name: 'add' }))
+  })
+  it('renders a trash', () => {
+    props = {
+      ...props,
+      name: 'trashBin',
+      isEquipmentAdded: true,
+      hasWasteChute: true,
+      trashBinId: 'mockId',
+      trashBinSlot: 'A3',
+    }
+    render(props)
+    screen.getByText('Trash Bin')
+    fireEvent.click(screen.getByRole('button', { name: 'remove' }))
+    expect(props.handleAttachment).toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'edit' }))
+  })
+  it('renders a disabled remove button for trash when theres no waste chute', () => {
+    props = {
+      ...props,
+      name: 'trashBin',
+      isEquipmentAdded: true,
+      hasWasteChute: false,
+    }
+    render(props)
+    screen.getByText('Trash Bin')
+    expect(screen.getByRole('button', { name: 'remove' })).toBeDisabled()
   })
 })

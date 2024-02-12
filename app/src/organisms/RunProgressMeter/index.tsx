@@ -28,7 +28,6 @@ import {
 import {
   useAllCommandsQuery,
   useCommandQuery,
-  useRunQuery,
 } from '@opentrons/react-api-client'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -39,9 +38,10 @@ import { CommandText } from '../CommandText'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { InterventionModal } from '../InterventionModal'
 import { ProgressBar } from '../../atoms/ProgressBar'
-import { useDownloadRunLog } from '../Devices/hooks'
+import { useDownloadRunLog, useRobotType } from '../Devices/hooks'
 import { InterventionTicks } from './InterventionTicks'
 import { isInterventionCommand } from '../InterventionModal/utils'
+import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
 
 import type { RunStatus } from '@opentrons/api-client'
 
@@ -65,11 +65,12 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     setInterventionModalCommandKey,
   ] = React.useState<string | null>(null)
   const { t } = useTranslation('run_details')
+  const robotType = useRobotType(robotName)
   const runStatus = useRunStatus(runId)
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
   })
-  const { data: runRecord } = useRunQuery(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId)
   const runData = runRecord?.data ?? null
   const analysis = useMostRecentCompletedAnalysis(runId)
   const { data: allCommandsQueryData } = useAllCommandsQuery(runId, {
@@ -138,6 +139,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
       <CommandText
         robotSideAnalysis={analysis}
         command={analysisCommands[lastRunAnalysisCommandIndex]}
+        robotType={robotType}
       />
     )
   } else if (
@@ -149,11 +151,8 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
       <CommandText
         robotSideAnalysis={analysis}
         command={runCommandDetails.data}
+        robotType={robotType}
       />
-    )
-  } else if (runStatus != null && TERMINAL_RUN_STATUSES.includes(runStatus)) {
-    currentStepContents = (
-      <StyledText as="h2">{t('protocol_completed')}</StyledText>
     )
   }
 
@@ -203,10 +202,11 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex gridGap={SPACING.spacing8}>
-            <StyledText
-              as="h2"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            >{`${t('current_step')}${
+            <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>{`${
+              runStatus != null && TERMINAL_RUN_STATUSES.includes(runStatus)
+                ? t('final_step')
+                : t('current_step')
+            }${
               runStatus === RUN_STATUS_IDLE
                 ? ':'
                 : ` ${countOfTotalText}${
@@ -222,11 +222,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             css={css`
             ${TYPOGRAPHY.darkLinkH4SemiBold}
             &:hover {
-              color: ${
-                downloadIsDisabled
-                  ? COLORS.darkGreyEnabled
-                  : COLORS.darkBlackEnabled
-              };
+              color: ${downloadIsDisabled ? COLORS.grey40 : COLORS.black90};
             }
             cursor: ${downloadIsDisabled ? 'default' : 'pointer'};
           }
@@ -256,14 +252,14 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             }
             outerStyles={css`
               height: 0.375rem;
-              background-color: ${COLORS.medGreyEnabled};
+              background-color: ${COLORS.grey30};
               border-radius: ${BORDERS.radiusSoftCorners};
               position: relative;
               overflow: initial;
             `}
             innerStyles={css`
               height: 0.375rem;
-              background-color: ${COLORS.darkGreyEnabled};
+              background-color: ${COLORS.grey50};
               border-radius: ${BORDERS.radiusSoftCorners};
             `}
           >

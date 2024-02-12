@@ -11,7 +11,7 @@ from opentrons.hardware_control.types import (
     CriticalPoint,
     Axis as HardwareAxis,
 )
-from opentrons.hardware_control.errors import MustHomeError as HardwareMustHomeError
+from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
 from opentrons.motion_planning import Waypoint
 
@@ -143,7 +143,7 @@ async def test_get_position_raises(
             critical_point=CriticalPoint.NOZZLE,
             fail_on_not_homed=False,
         )
-    ).then_raise(HardwareMustHomeError("oh no"))
+    ).then_raise(PositionUnknownError("oh no"))
 
     with pytest.raises(MustHomeError, match="oh no"):
         await hardware_subject.get_position("pipette-id")
@@ -266,7 +266,7 @@ async def test_move_relative_must_home(
             fail_on_not_homed=True,
             speed=456.7,
         )
-    ).then_raise(HardwareMustHomeError("oh no"))
+    ).then_raise(PositionUnknownError("oh no"))
 
     with pytest.raises(MustHomeError, match="oh no"):
         await hardware_subject.move_relative(

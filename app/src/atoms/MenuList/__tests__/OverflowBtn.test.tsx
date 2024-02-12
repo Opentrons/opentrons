@@ -1,6 +1,6 @@
+import 'jest-styled-components'
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
-import 'jest-styled-components'
 import { COLORS, renderWithProviders } from '@opentrons/components'
 import { OverflowBtn } from '../OverflowBtn'
 
@@ -27,7 +27,7 @@ describe('OverflowBtn', () => {
 
     expect(getByRole('button')).toHaveStyleRule(
       'background-color',
-      `${String(COLORS.lightGreyHover)}`,
+      `${String(COLORS.grey30)}`,
       {
         modifier: ':hover',
       }
@@ -41,7 +41,7 @@ describe('OverflowBtn', () => {
 
     expect(getByRole('button')).toHaveStyleRule(
       'background-color',
-      `${String(COLORS.lightGreyPressed)}`,
+      `${String(COLORS.grey35)}`,
       {
         modifier: ':active',
       }
@@ -55,7 +55,7 @@ describe('OverflowBtn', () => {
 
     expect(getByRole('button')).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${String(COLORS.fundamentalsFocus)}`,
+      `0 0 0 3px ${String(COLORS.blue50)}`,
       {
         modifier: ':focus-visible',
       }
@@ -69,7 +69,7 @@ describe('OverflowBtn', () => {
 
     expect(getByRole('button')).toHaveStyleRule(
       'fill',
-      `${String(COLORS.successDisabled)}`,
+      `${String(COLORS.grey40)}`,
       {
         modifier: ':disabled circle',
       }

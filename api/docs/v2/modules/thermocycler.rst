@@ -14,9 +14,8 @@ The examples in this section will use a Thermocycler Module GEN2 loaded as follo
 
 .. code-block:: python
 
-    def run(protocol: protocol_api.ProtocolContext):
-        tc_mod = protocol.load_module(module_name='thermocyclerModuleV2')
-        plate = tc_mod.load_labware(name='nest_96_wellplate_100ul_pcr_full_skirt')
+    tc_mod = protocol.load_module(module_name="thermocyclerModuleV2")
+    plate = tc_mod.load_labware(name="nest_96_wellplate_100ul_pcr_full_skirt")
 
 .. versionadded:: 2.13
 
@@ -106,8 +105,8 @@ For example, this profile commands the Thermocycler to reach 10 °C and hold for
 .. code-block:: python
 
         profile = [
-            {'temperature':10, 'hold_time_seconds':30},
-            {'temperature':60, 'hold_time_seconds':45}
+            {"temperature":10, "hold_time_seconds":30},
+            {"temperature":60, "hold_time_seconds":45}
         ]
 
 Once you have written the steps of your profile, execute it with :py:meth:`~.ThermocyclerContext.execute_profile`. This function executes your profile steps multiple times depending on the ``repetitions`` parameter. It also takes a ``block_max_volume`` parameter, which is the same as that of the :py:meth:`~.ThermocyclerContext.set_block_temperature` function.
@@ -117,9 +116,9 @@ For instance, a PCR prep protocol might define and execute a profile like this:
 .. code-block:: python
 
         profile = [
-            {'temperature':95, 'hold_time_seconds':30},
-            {'temperature':57, 'hold_time_seconds':30},
-            {'temperature':72, 'hold_time_seconds':60}
+            {"temperature":95, "hold_time_seconds":30},
+            {"temperature":57, "hold_time_seconds":30},
+            {"temperature":72, "hold_time_seconds":60}
         ]
         tc_mod.execute_profile(steps=profile, repetitions=20, block_max_volume=32)
 

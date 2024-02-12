@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Route } from 'react-router'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
@@ -132,19 +133,15 @@ describe('ProtocolRunDetails', () => {
 
   it('does not render a ProtocolRunHeader when a robot is not found', () => {
     mockUseRobot.mockReturnValue(null)
-    const [{ queryByText }] = render(
-      `/devices/otie/protocol-runs/${RUN_ID}/setup`
-    )
+    render(`/devices/otie/protocol-runs/${RUN_ID}/setup`)
 
-    expect(queryByText('Mock ProtocolRunHeader')).toBeFalsy()
+    expect(screen.queryByText('Mock ProtocolRunHeader')).toBeFalsy()
   })
 
   it('renders a ProtocolRunHeader when a robot is found', () => {
-    const [{ getByText }] = render(
-      `/devices/otie/protocol-runs/${RUN_ID}/setup`
-    )
+    render(`/devices/otie/protocol-runs/${RUN_ID}/setup`)
 
-    getByText('Mock ProtocolRunHeader')
+    screen.getByText('Mock ProtocolRunHeader')
   })
 
   it('syncs robot system clock on mount', () => {
@@ -154,67 +151,55 @@ describe('ProtocolRunDetails', () => {
   })
 
   it('renders navigation tabs', () => {
-    const [{ getByText }] = render(
-      `/devices/otie/protocol-runs/${RUN_ID}/setup`
-    )
+    render(`/devices/otie/protocol-runs/${RUN_ID}/setup`)
 
-    getByText('Setup')
-    getByText('Module Controls')
-    getByText('Run Preview')
+    screen.getByText('Setup')
+    screen.getByText('Module Controls')
+    screen.getByText('Run Preview')
   })
 
   it('defaults to setup content when given an unspecified tab', () => {
-    const [{ getByText }] = render(
-      `/devices/otie/protocol-runs/${RUN_ID}/this-is-not-a-real-tab`
-    )
+    render(`/devices/otie/protocol-runs/${RUN_ID}/this-is-not-a-real-tab`)
 
-    getByText('Mock ProtocolRunSetup')
+    screen.getByText('Mock ProtocolRunSetup')
   })
 
   it('renders a run  when the run  tab is clicked', () => {
-    const [{ getByText, queryByText }] = render(
-      `/devices/otie/protocol-runs/${RUN_ID}`
-    )
+    render(`/devices/otie/protocol-runs/${RUN_ID}`)
 
-    expect(queryByText('Mock RunPreview')).toBeFalsy()
-    const runTab = getByText('Run Preview')
-    runTab.click()
-    getByText('Mock RunPreview')
+    expect(screen.queryByText('Mock RunPreview')).toBeFalsy()
+    const runTab = screen.getByText('Run Preview')
+    fireEvent.click(runTab)
+    screen.getByText('Mock RunPreview')
   })
 
   it('renders protocol run setup when the setup tab is clicked', () => {
-    const [{ getByText, queryByText }] = render(
-      `/devices/otie/protocol-runs/${RUN_ID}`
-    )
+    render(`/devices/otie/protocol-runs/${RUN_ID}`)
 
-    const setupTab = getByText('Setup')
-    const runTab = getByText('Run Preview')
-    runTab.click()
-    getByText('Mock RunPreview')
-    expect(queryByText('Mock ProtocolRunSetup')).toBeFalsy()
-    setupTab.click()
-    getByText('Mock ProtocolRunSetup')
+    const setupTab = screen.getByText('Setup')
+    const runTab = screen.getByText('Run Preview')
+    fireEvent.click(runTab)
+    screen.getByText('Mock RunPreview')
+    expect(screen.queryByText('Mock ProtocolRunSetup')).toBeFalsy()
+    fireEvent.click(setupTab)
+    screen.getByText('Mock ProtocolRunSetup')
   })
 
   it('renders module controls when the module controls tab is clicked', () => {
-    const [{ getByText, queryByText }] = render(
-      `/devices/otie/protocol-runs/${RUN_ID}`
-    )
+    render(`/devices/otie/protocol-runs/${RUN_ID}`)
 
-    const moduleTab = getByText('Module Controls')
-    getByText('Mock ProtocolRunSetup')
-    expect(queryByText('Mock ProtocolRunModuleControls')).toBeFalsy()
-    moduleTab.click()
-    getByText('Mock ProtocolRunModuleControls')
-    expect(queryByText('Mock ProtocolRunSetup')).toBeFalsy()
+    const moduleTab = screen.getByText('Module Controls')
+    screen.getByText('Mock ProtocolRunSetup')
+    expect(screen.queryByText('Mock ProtocolRunModuleControls')).toBeFalsy()
+    fireEvent.click(moduleTab)
+    screen.getByText('Mock ProtocolRunModuleControls')
+    expect(screen.queryByText('Mock ProtocolRunSetup')).toBeFalsy()
   })
 
   it('should NOT render module controls when there are no modules', () => {
     mockUseModuleRenderInfoForProtocolById.mockReturnValue({})
-    const [{ queryByText }] = render(
-      `/devices/otie/protocol-runs/${RUN_ID}/setup`
-    )
-    expect(queryByText('Module Controls')).toBeNull()
+    render(`/devices/otie/protocol-runs/${RUN_ID}/setup`)
+    expect(screen.queryByText('Module Controls')).toBeNull()
   })
 
   it('disables module controls tab when the run current but not idle', () => {
@@ -225,36 +210,30 @@ describe('ProtocolRunDetails', () => {
       isRunTerminal: false,
       isRunIdle: false,
     })
-    const [{ getByText, queryByText }] = render(
-      `/devices/otie/protocol-runs/${RUN_ID}`
-    )
+    render(`/devices/otie/protocol-runs/${RUN_ID}`)
 
-    const moduleTab = getByText('Module Controls')
-    expect(queryByText('Mock ProtocolRunModuleControls')).toBeFalsy()
-    moduleTab.click()
-    expect(queryByText('Mock ProtocolRunModuleControls')).toBeFalsy()
+    const moduleTab = screen.getByText('Module Controls')
+    expect(screen.queryByText('Mock ProtocolRunModuleControls')).toBeFalsy()
+    fireEvent.click(moduleTab)
+    expect(screen.queryByText('Mock ProtocolRunModuleControls')).toBeFalsy()
   })
 
   it('disables run  tab if robot-analyzed protocol data is null', () => {
     mockUseMostRecentCompletedAnalysis.mockReturnValue(null)
-    const [{ getByText, queryByText }] = render(
-      `/devices/otie/protocol-runs/${RUN_ID}`
-    )
+    render(`/devices/otie/protocol-runs/${RUN_ID}`)
 
-    const runTab = getByText('Run Preview')
-    getByText('Mock ProtocolRunSetup')
-    expect(queryByText('Mock RunPreview')).toBeFalsy()
-    runTab.click()
-    expect(queryByText('Mock RunPreview')).toBeFalsy()
+    const runTab = screen.getByText('Run Preview')
+    screen.getByText('Mock ProtocolRunSetup')
+    expect(screen.queryByText('Mock RunPreview')).toBeFalsy()
+    fireEvent.click(runTab)
+    expect(screen.queryByText('Mock RunPreview')).toBeFalsy()
   })
 
   it('redirects to the run  tab when the run is not current', () => {
     mockUseCurrentRunId.mockReturnValue(null)
-    const [{ getByText, queryByText }] = render(
-      `/devices/otie/protocol-runs/${RUN_ID}/setup`
-    )
+    render(`/devices/otie/protocol-runs/${RUN_ID}/setup`)
 
-    getByText('Mock RunPreview')
-    expect(queryByText('Mock ProtocolRunSetup')).toBeFalsy()
+    screen.getByText('Mock RunPreview')
+    expect(screen.queryByText('Mock ProtocolRunSetup')).toBeFalsy()
   })
 })

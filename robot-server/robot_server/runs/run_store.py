@@ -1,22 +1,32 @@
 """Runs' on-db store."""
+import logging
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
 from functools import lru_cache
-from typing import Any, Dict, List, Optional, cast
+from typing import Dict, List, Optional
 
 import sqlalchemy
-from pydantic import parse_obj_as
+from pydantic import ValidationError
 
 from opentrons.util.helpers import utc_now
 from opentrons.protocol_engine import StateSummary, CommandSlice
 from opentrons.protocol_engine.commands import Command
 
-from robot_server.persistence import run_table, action_table, sqlite_rowid
+from robot_server.persistence import (
+    run_table,
+    run_command_table,
+    action_table,
+    sqlite_rowid,
+)
+from robot_server.persistence.pydantic import json_to_pydantic, pydantic_to_json
 from robot_server.protocols import ProtocolNotFoundError
+from robot_server.service.notifications import RunsPublisher
 
 from .action_models import RunAction, RunActionType
 from .run_models import RunNotFoundError
+
+log = logging.getLogger(__name__)
 
 _CACHE_ENTRIES = 32
 
@@ -46,9 +56,14 @@ class CommandNotFoundError(ValueError):
 class RunStore:
     """Methods for storing and retrieving run resources."""
 
-    def __init__(self, sql_engine: sqlalchemy.engine.Engine) -> None:
-        """Initialize a RunStore with sql engine."""
+    def __init__(
+        self,
+        sql_engine: sqlalchemy.engine.Engine,
+        runs_publisher: RunsPublisher,
+    ) -> None:
+        """Initialize a RunStore with sql engine and notification client."""
         self._sql_engine = sql_engine
+        self._runs_publisher = runs_publisher
 
     def update_run_state(
         self,
@@ -75,31 +90,46 @@ class RunStore:
             .values(
                 _convert_state_to_sql_values(
                     run_id=run_id,
-                    commands=commands,
                     state_summary=summary,
                     engine_status=summary.status,
                 )
             )
         )
+
+        delete_existing_commands = sqlalchemy.delete(run_command_table).where(
+            run_command_table.c.run_id == run_id
+        )
+        insert_command = sqlalchemy.insert(run_command_table)
+
         select_run_resource = sqlalchemy.select(_run_columns).where(
             run_table.c.id == run_id
         )
-
         select_actions = sqlalchemy.select(action_table).where(
             action_table.c.run_id == run_id
         )
 
         with self._sql_engine.begin() as transaction:
-            transaction.execute(update_run)
-
-            try:
-                run_row = transaction.execute(select_run_resource).one()
-            except sqlalchemy.exc.NoResultFound:
+            if not self._run_exists(run_id, transaction):
                 raise RunNotFoundError(run_id=run_id)
 
+            transaction.execute(update_run)
+            transaction.execute(delete_existing_commands)
+            for command_index, command in enumerate(commands):
+                transaction.execute(
+                    insert_command,
+                    {
+                        "run_id": run_id,
+                        "index_in_run": command_index,
+                        "command_id": command.id,
+                        "command": pydantic_to_json(command),
+                    },
+                )
+
+            run_row = transaction.execute(select_run_resource).one()
             action_rows = transaction.execute(select_actions).all()
 
         self._clear_caches()
+        self._runs_publisher.publish_runs(run_id=run_id)
         return _convert_row_to_run(row=run_row, action_rows=action_rows)
 
     def insert_action(self, run_id: str, action: RunAction) -> None:
@@ -117,12 +147,12 @@ class RunStore:
         )
 
         with self._sql_engine.begin() as transaction:
-            try:
-                transaction.execute(insert)
-            except sqlalchemy.exc.IntegrityError as e:
-                raise RunNotFoundError(run_id=run_id) from e
+            if not self._run_exists(run_id, transaction):
+                raise RunNotFoundError(run_id=run_id)
+            transaction.execute(insert)
 
         self._clear_caches()
+        self._runs_publisher.publish_runs(run_id=run_id)
 
     def insert(
         self,
@@ -164,14 +194,14 @@ class RunStore:
                 raise ProtocolNotFoundError(protocol_id=run.protocol_id)
 
         self._clear_caches()
+        self._runs_publisher.publish_runs(run_id=run_id)
         return run
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
     def has(self, run_id: str) -> bool:
         """Whether a given run exists in the store."""
-        statement = sqlalchemy.select(run_table.c.id).where(run_table.c.id == run_id)
         with self._sql_engine.begin() as transaction:
-            return transaction.execute(statement).first() is not None
+            return self._run_exists(run_id, transaction)
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
     def get(self, run_id: str) -> RunResource:
@@ -256,27 +286,15 @@ class RunStore:
         with self._sql_engine.begin() as transaction:
             row = transaction.execute(select_run_data).one()
 
-        return (
-            StateSummary.parse_obj(row.state_summary)
-            if row.state_summary is not None
-            else None
-        )
-
-    @lru_cache(maxsize=_CACHE_ENTRIES)
-    def _get_all_unparsed_commands(self, run_id: str) -> List[Dict[str, Any]]:
-        select_run_commands = sqlalchemy.select(run_table.c.commands).where(
-            run_table.c.id == run_id
-        )
-
-        with self._sql_engine.begin() as transaction:
-            try:
-                row = transaction.execute(select_run_commands).one()
-            except sqlalchemy.exc.NoResultFound:
-                raise RunNotFoundError(run_id=run_id)
-
-        return (
-            cast(List[Dict[str, Any]], row.commands) if row.commands is not None else []
-        )
+        try:
+            return (
+                json_to_pydantic(StateSummary, row.state_summary)
+                if row.state_summary is not None
+                else None
+            )
+        except ValidationError as e:
+            log.warning(f"Error retrieving state summary for {run_id}: {e}")
+            return None
 
     def get_commands_slice(
         self,
@@ -290,6 +308,8 @@ class RunStore:
             run_id: Run ID to pull commands from.
             length: Number of commands to return.
             cursor: The starting index of the slice in the whole collection.
+                If `None`, up to `length` elements at the end of the collection will
+                be returned.
 
         Returns:
             A collection of commands as well as the actual cursor used and
@@ -298,22 +318,41 @@ class RunStore:
         Raises:
             RunNotFoundError: The given run ID was not found.
         """
-        command_intent_dicts = self._get_all_unparsed_commands(run_id)
-        commands_length = len(command_intent_dicts)
-        if cursor is None:
-            cursor = commands_length - length
+        with self._sql_engine.begin() as transaction:
+            if not self._run_exists(run_id, transaction):
+                raise RunNotFoundError(run_id=run_id)
 
-        # start is inclusive, stop is exclusive
-        actual_cursor = max(0, min(cursor, commands_length - 1))
-        stop = min(commands_length, actual_cursor + length)
+            select_count = sqlalchemy.select(sqlalchemy.func.count()).where(
+                run_command_table.c.run_id == run_id
+            )
+            count_result: int = transaction.execute(select_count).scalar_one()
+
+            actual_cursor = cursor if cursor is not None else count_result - length
+            # Clamp to [0, count_result).
+            actual_cursor = max(0, min(actual_cursor, count_result - 1))
+
+            select_slice = (
+                sqlalchemy.select(
+                    run_command_table.c.index_in_run, run_command_table.c.command
+                )
+                .where(
+                    run_command_table.c.run_id == run_id,
+                    run_command_table.c.index_in_run >= actual_cursor,
+                    run_command_table.c.index_in_run < actual_cursor + length,
+                )
+                .order_by(run_command_table.c.index_in_run)
+            )
+
+            slice_result = transaction.execute(select_slice).all()
+
         sliced_commands: List[Command] = [
-            parse_obj_as(Command, command)  # type: ignore[arg-type]
-            for command in command_intent_dicts[actual_cursor:stop]
+            json_to_pydantic(Command, row.command)  # type: ignore[arg-type]
+            for row in slice_result
         ]
 
         return CommandSlice(
             cursor=actual_cursor,
-            total_length=commands_length,
+            total_length=count_result,
             commands=sliced_commands,
         )
 
@@ -332,21 +371,20 @@ class RunStore:
             RunNotFoundError: The given run ID was not found in the store.
             CommandNotFoundError: The given command ID was not found in the store.
         """
-        select_run_commands = sqlalchemy.select(run_table.c.commands).where(
-            run_table.c.id == run_id
+        select_command = sqlalchemy.select(run_command_table.c.command).where(
+            run_command_table.c.run_id == run_id,
+            run_command_table.c.command_id == command_id,
         )
+
         with self._sql_engine.begin() as transaction:
-            try:
-                row = transaction.execute(select_run_commands).one()
-            except sqlalchemy.exc.NoResultFound as e:
-                raise RunNotFoundError(run_id=run_id) from e
+            if not self._run_exists(run_id, transaction):
+                raise RunNotFoundError(run_id=run_id)
 
-        try:
-            command = next(c for c in row.commands if c["id"] == command_id)
-        except StopIteration as e:
-            raise CommandNotFoundError(command_id=command_id) from e
+            command = transaction.execute(select_command).scalar_one_or_none()
+            if command is None:
+                raise CommandNotFoundError(command_id=command_id)
 
-        return parse_obj_as(Command, command)  # type: ignore[arg-type]
+        return json_to_pydantic(Command, command)  # type: ignore[arg-type]
 
     def remove(self, run_id: str) -> None:
         """Remove a run by its unique identifier.
@@ -361,8 +399,12 @@ class RunStore:
         delete_actions = sqlalchemy.delete(action_table).where(
             action_table.c.run_id == run_id
         )
+        delete_commands = sqlalchemy.delete(run_command_table).where(
+            run_command_table.c.run_id == run_id
+        )
         with self._sql_engine.begin() as transaction:
             transaction.execute(delete_actions)
+            transaction.execute(delete_commands)
             result = transaction.execute(delete_run)
 
         if result.rowcount < 1:
@@ -370,13 +412,20 @@ class RunStore:
 
         self._clear_caches()
 
+    def _run_exists(
+        self, run_id: str, connection: sqlalchemy.engine.Connection
+    ) -> bool:
+        result: bool = connection.execute(
+            sqlalchemy.select(sqlalchemy.exists().where(run_table.c.id == run_id))
+        ).scalar_one()
+        return result
+
     def _clear_caches(self) -> None:
         self.has.cache_clear()
         self.get.cache_clear()
         self.get_all.cache_clear()
         self.get_state_summary.cache_clear()
         self.get_command.cache_clear()
-        self._get_all_unparsed_commands.cache_clear()
 
 
 # The columns that must be present in a row passed to _convert_row_to_run().
@@ -431,12 +480,10 @@ def _convert_action_to_sql_values(action: RunAction, run_id: str) -> Dict[str, o
 def _convert_state_to_sql_values(
     run_id: str,
     state_summary: StateSummary,
-    commands: List[Command],
     engine_status: str,
 ) -> Dict[str, object]:
     return {
-        "state_summary": state_summary.dict(),
+        "state_summary": pydantic_to_json(state_summary),
         "engine_status": engine_status,
-        "commands": [command.dict() for command in commands],
         "_updated_at": utc_now(),
     }

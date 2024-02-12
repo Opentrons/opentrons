@@ -26,7 +26,13 @@ if TYPE_CHECKING:
 
 log = logging.getLogger(__name__)
 
-MODULE_PORT_REGEX = re.compile("|".join(modules.MODULE_TYPE_BY_NAME.keys()), re.I)
+MODULE_PORT_REGEX = re.compile(
+    # capture all modules by name using alternation
+    "(" + "|".join(modules.MODULE_TYPE_BY_NAME.keys()) + ")"
+    # add a negative lookahead to suppress matches on tempfiles udev creates
+    + r"\d+(?!\.tmp-c\d+:\d+)",
+    re.I,
+)
 
 
 class AttachedModulesControl:
@@ -183,7 +189,7 @@ class AttachedModulesControl:
         """
         match = MODULE_PORT_REGEX.search(port)
         if match:
-            name = match.group().lower()
+            name = match.group(1).lower()
             if name not in modules.MODULE_TYPE_BY_NAME:
                 log.warning(f"Unexpected module connected: {name} on {port}")
                 return None
@@ -205,10 +211,10 @@ class AttachedModulesControl:
         new_modules = None
         removed_modules = None
         if maybe_module_at_port is not None:
-            if hasattr(event.flags, "DELETE"):
+            if hasattr(event.flags, "DELETE") or hasattr(event.flags, "MOVED_FROM"):
                 removed_modules = [maybe_module_at_port]
                 log.info(f"Module Removed: {maybe_module_at_port}")
-            elif hasattr(event.flags, "CREATE"):
+            elif hasattr(event.flags, "CREATE") or hasattr(event.flags, "MOVED_TO"):
                 new_modules = [maybe_module_at_port]
                 log.info(f"Module Added: {maybe_module_at_port}")
             try:
@@ -231,10 +237,10 @@ class AttachedModulesControl:
         return found_module
 
     def load_module_offset(
-        self, module_type: ModuleType, module_id: str, slot: Optional[str] = None
-    ) -> ModuleCalibrationOffset:
+        self, module_type: ModuleType, module_id: str
+    ) -> Optional[ModuleCalibrationOffset]:
         log.info(f"Loading module offset for {module_type} {module_id}")
-        return load_module_calibration_offset(module_type, module_id, slot)
+        return load_module_calibration_offset(module_type, module_id)
 
     def save_module_offset(
         self,
@@ -244,9 +250,9 @@ class AttachedModulesControl:
         slot: str,
         offset: Point,
         instrument_id: Optional[str] = None,
-    ) -> ModuleCalibrationOffset:
+    ) -> Optional[ModuleCalibrationOffset]:
         log.info(f"Saving module {module} {module_id} offset: {offset} for slot {slot}")
         save_module_calibration_offset(
             offset, mount, slot, module, module_id, instrument_id
         )
-        return load_module_calibration_offset(module, module_id, slot)
+        return load_module_calibration_offset(module, module_id)

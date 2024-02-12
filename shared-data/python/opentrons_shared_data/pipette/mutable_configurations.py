@@ -3,6 +3,7 @@ import json
 import re
 from pathlib import Path
 from typing import Optional, List, Dict, Any, cast
+from enum import Enum
 
 from .pipette_definition import PipetteConfigurations, PipetteModelVersionType
 from .model_constants import (
@@ -40,6 +41,34 @@ SERIAL_STUB_REGEX = re.compile(r"P[0-9]{1,3}[KSMHV]{1,2}V[0-9]{2}")
 LIQUID_CLASS = LiquidClasses.default
 
 
+def _edit_non_quirk(
+    mutable_config_key: str, new_mutable_value: MutableConfig, base_dict: Dict[str, Any]
+) -> None:
+    def _do_edit_non_quirk(
+        new_value: MutableConfig, existing: Dict[Any, Any], keypath: List[Any]
+    ) -> None:
+        thiskey: Any = keypath[0]
+        if thiskey in [lc.name for lc in LiquidClasses]:
+            thiskey = LiquidClasses[thiskey]
+        if len(keypath) > 1:
+            restkeys = keypath[1:]
+            if thiskey == "##EACHTIP##":
+                for key in existing.keys():
+                    _do_edit_non_quirk(new_value, existing[key], restkeys)
+            else:
+                _do_edit_non_quirk(new_value, existing[thiskey], restkeys)
+        else:
+            # This was the last key
+            if thiskey == "##EACHTIP##":
+                for key in existing.keys():
+                    existing[key] = new_value.value
+            else:
+                existing[thiskey] = new_value.value
+
+    new_names = _MAP_KEY_TO_V2[mutable_config_key]
+    _do_edit_non_quirk(new_mutable_value, base_dict, new_names)
+
+
 def _migrate_to_v2_configurations(
     base_configurations: PipetteConfigurations,
     v1_mutable_configs: OverrideType,
@@ -59,26 +88,9 @@ def _migrate_to_v2_configurations(
             continue
         if c == "quirks" and isinstance(v, dict):
             quirks_list.extend([b.name for b in v.values() if b.value])
-        else:
-            new_names = _MAP_KEY_TO_V2[c]
-            top_name = new_names["top_level_name"]
-            nested_name = new_names["nested_name"]
-            if c == "tipLength" and isinstance(v, MutableConfig):
-                # This is only a concern for OT-2 configs and I think we can
-                # be less smart about handling multiple tip types by updating
-                # all tips.
-                for k in dict_of_base_model["liquid_properties"][LIQUID_CLASS][
-                    new_names["top_level_name"]
-                ].keys():
-                    dict_of_base_model["liquid_properties"][LIQUID_CLASS][top_name][k][
-                        nested_name
-                    ] = v
-            elif new_names.get("liquid_class") and isinstance(v, MutableConfig):
-                _class = LiquidClasses[new_names["liquid_class"]]
-                dict_of_base_model[top_name][_class][nested_name] = v.value
-            elif isinstance(v, MutableConfig):
-                # isinstances are needed for type checking.
-                dict_of_base_model[top_name][nested_name] = v.value
+        elif isinstance(v, MutableConfig):
+            _edit_non_quirk(c, v, dict_of_base_model)
+
     dict_of_base_model["quirks"] = list(
         set(dict_of_base_model["quirks"]).union(set(quirks_list))
     )
@@ -143,32 +155,50 @@ def _list_all_mutable_configs(
     return default_configurations
 
 
+def _get_default_value_for(config: Dict[str, Any], keypath: List[str]) -> Any:
+    def _do_get_default_value_for(
+        remaining_config: Dict[Any, Any], keypath: List[str]
+    ) -> Any:
+        first: Any = keypath[0]
+        if first in [lc.name for lc in LiquidClasses]:
+            first = LiquidClasses[first]
+        if len(keypath) > 1:
+            rest = keypath[1:]
+            if first == "##EACHTIP##":
+                tip_list = list(remaining_config.keys())
+                tip_list.sort(key=lambda o: o.value if isinstance(o, Enum) else o)
+                return _do_get_default_value_for(remaining_config[tip_list[-1]], rest)
+            else:
+                return _do_get_default_value_for(remaining_config[first], rest)
+        else:
+            if first == "##EACHTIP##":
+                tip_list = list(remaining_config.keys())
+                tip_list.sort(key=lambda o: o.value if isinstance(o, Enum) else o)
+                return remaining_config[tip_list[-1]]
+            elif first == "currentByTipCount":
+                # return the value for the most tips at a time
+                cbt = remaining_config[first]
+                return cbt[next(reversed(sorted(cbt.keys())))]
+            else:
+                return remaining_config[first]
+
+    return _do_get_default_value_for(config, keypath)
+
+
 def _find_default(name: str, configs: Dict[str, Any]) -> MutableConfig:
     """Find the default value from the configs and return it as a mutable config."""
-    lookup_dict = _MAP_KEY_TO_V2[name]
-    nested_name = lookup_dict["nested_name"]
+    keypath = _MAP_KEY_TO_V2[name]
+    nested_name = keypath[-1]
 
-    min_max_dict = _MIN_MAX_LOOKUP[nested_name]
-    type_lookup = _TYPE_LOOKUP[nested_name]
-    units_lookup = _UNITS_LOOKUP[nested_name]
-    if name == "tipLength":
-        # This is only a concern for OT-2 configs and I think we can
-        # be less smart about handling multiple tip types. Instead, just
-        # get the max tip type.
-        tip_list = list(
-            configs["liquid_properties"][LIQUID_CLASS][
-                lookup_dict["top_level_name"]
-            ].keys()
-        )
-        tip_list.sort(key=lambda o: o.value)
-        default_value = configs["liquid_properties"][LIQUID_CLASS][
-            lookup_dict["top_level_name"]
-        ][tip_list[-1]][nested_name]
-    elif lookup_dict.get("liquid_class"):
-        _class = LiquidClasses[lookup_dict["liquid_class"]]
-        default_value = configs[lookup_dict["top_level_name"]][_class][nested_name]
+    if name == "pickUpCurrent":
+        min_max_dict = _MIN_MAX_LOOKUP["current"]
+        type_lookup = _TYPE_LOOKUP["current"]
+        units_lookup = _UNITS_LOOKUP["current"]
     else:
-        default_value = configs[lookup_dict["top_level_name"]][nested_name]
+        min_max_dict = _MIN_MAX_LOOKUP[nested_name]
+        type_lookup = _TYPE_LOOKUP[nested_name]
+        units_lookup = _UNITS_LOOKUP[nested_name]
+    default_value = _get_default_value_for(configs, keypath)
     return MutableConfig(
         value=default_value,
         default=default_value,
@@ -189,6 +219,28 @@ def known_pipettes(pipette_override_path: Path) -> List[str]:
     ]
 
 
+def _load_full_mutable_configs(
+    pipette_model: PipetteModelVersionType, overrides: OverrideType
+) -> OverrideType:
+    base_configs = load_definition(
+        pipette_model.pipette_type,
+        pipette_model.pipette_channels,
+        pipette_model.pipette_version,
+    )
+    base_configs_dict = base_configs.dict(by_alias=True)
+    full_mutable_configs = _list_all_mutable_configs(overrides, base_configs_dict)
+
+    if not full_mutable_configs.get("name"):
+        full_mutable_configs["name"] = str(
+            convert_to_pipette_name_type(cast(PipetteName, str(pipette_model)))
+        )
+
+    if not full_mutable_configs.get("model"):
+        full_mutable_configs["model"] = str(pipette_model)
+
+    return full_mutable_configs
+
+
 def list_mutable_configs(
     pipette_serial_number: str, pipette_override_path: Path
 ) -> OverrideType:
@@ -207,36 +259,36 @@ def list_mutable_configs(
         # This is mimicing behavior from the original file
         # which returned an empty dict if no on disk value was found.
         return mutable_configs
+
+    serial_key_match = SERIAL_STUB_REGEX.match(pipette_serial_number)
+
+    if serial_key_match:
+        serial_key = serial_key_match.group(0)
     else:
-        serial_key_match = SERIAL_STUB_REGEX.match(pipette_serial_number)
+        serial_key = ""
+    pipette_model = convert_pipette_model(
+        cast(PipetteModel, PIPETTE_SERIAL_MODEL_LOOKUP[serial_key])
+    )
+    return _load_full_mutable_configs(pipette_model, mutable_configs)
 
-        if serial_key_match:
-            serial_key = serial_key_match.group(0)
-        else:
-            serial_key = ""
-        pipette_model = convert_pipette_model(
-            cast(PipetteModel, PIPETTE_SERIAL_MODEL_LOOKUP[serial_key])
-        )
 
-        base_configs = load_definition(
-            pipette_model.pipette_type,
-            pipette_model.pipette_channels,
-            pipette_model.pipette_version,
-        )
-        base_configs_dict = base_configs.dict(by_alias=True)
-        full_mutable_configs = _list_all_mutable_configs(
-            mutable_configs, base_configs_dict
-        )
-
-        if not full_mutable_configs.get("name"):
-            full_mutable_configs["name"] = str(
-                convert_to_pipette_name_type(cast(PipetteName, str(pipette_model)))
+def list_mutable_configs_with_defaults(
+    pipette_model: PipetteModelVersionType,
+    pipette_serial_number: Optional[str],
+    pipette_override_path: Path,
+) -> OverrideType:
+    """
+    Returns dict of mutable configs only, with their defaults.
+    """
+    mutable_configs: OverrideType = {}
+    if pipette_serial_number:
+        try:
+            mutable_configs = _load_available_overrides(
+                pipette_serial_number, pipette_override_path
             )
-
-        if not full_mutable_configs.get("model"):
-            full_mutable_configs["model"] = str(pipette_model)
-
-        return full_mutable_configs
+        except FileNotFoundError:
+            pass
+    return _load_full_mutable_configs(pipette_model, mutable_configs)
 
 
 def load_with_mutable_configurations(
@@ -279,9 +331,15 @@ def load_with_mutable_configurations(
         except FileNotFoundError:
             pass
         else:
-            base_configurations = _migrate_to_v2_configurations(
-                base_configurations, override
-            )
+            try:
+                base_configurations = _migrate_to_v2_configurations(
+                    base_configurations, override
+                )
+            except BaseException:
+                log.exception(
+                    "Failed to migrate mutable configurations. Please report this as it is a bug."
+                )
+
     # the ulPerMm functions are structured in pipetteModelSpecs.json as
     # a list sorted from oldest to newest. That means the latest functions
     # are always the last element and, as of right now, the older ones are

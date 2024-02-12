@@ -1,5 +1,5 @@
 import * as React from 'react'
-import i18n from 'i18next'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
@@ -8,6 +8,7 @@ import {
 } from '@opentrons/shared-data'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import { i18n } from '../../../../localization'
 import { getLabwareDefsByURI } from '../../../../labware-defs/selectors'
 import { getAllowAllTipracks } from '../../../../feature-flags/selectors'
 import { getTiprackOptions } from '../../utils'
@@ -39,33 +40,35 @@ const render = (props: React.ComponentProps<typeof PipetteTipsTile>) => {
   })[0]
 }
 
+const values = {
+  fields: {
+    name: 'mockName',
+    description: 'mockDescription',
+    organizationOrAuthor: 'mockOrganizationOrAuthor',
+    robotType: FLEX_ROBOT_TYPE,
+  },
+  pipettesByMount: {
+    left: {
+      pipetteName: 'p50_single_flex',
+      tiprackDefURI: 'opentrons/opentrons_flex_96_tiprack_200ul/1',
+    },
+    right: { pipetteName: null, tiprackDefURI: null },
+  } as FormPipettesByMount,
+  modulesByType: {
+    heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
+    magneticBlockType: { onDeck: false, model: null, slot: '2' },
+    temperatureModuleType: { onDeck: false, model: null, slot: '3' },
+    thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
+  },
+  additionalEquipment: ['gripper'],
+} as FormState
+
 const mockWizardTileProps: Partial<WizardTileProps> = {
   goBack: jest.fn(),
   proceed: jest.fn(),
-
-  values: {
-    fields: {
-      name: 'mockName',
-      description: 'mockDescription',
-      organizationOrAuthor: 'mockOrganizationOrAuthor',
-      robotType: FLEX_ROBOT_TYPE,
-    },
-    pipettesByMount: {
-      left: {
-        pipetteName: 'p50_single_flex',
-        tiprackDefURI: 'opentrons/opentrons_flex_96_tiprack_200ul/1',
-      },
-      right: { pipetteName: null, tiprackDefURI: null },
-    } as FormPipettesByMount,
-    modulesByType: {
-      heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
-      magneticBlockType: { onDeck: false, model: null, slot: '2' },
-      temperatureModuleType: { onDeck: false, model: null, slot: '3' },
-      thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
-    },
-    additionalEquipment: ['gripper'],
-  } as FormState,
+  watch: jest.fn((name: keyof typeof values) => values[name]) as any,
 }
+
 const fixtureTipRack10ul = {
   ...fixture_tiprack_10_ul,
   version: 2,
@@ -105,21 +108,21 @@ describe('PipetteTipsTile', () => {
     ])
   })
   it('renders default tiprack options for 50uL flex pipette and btn ctas work', () => {
-    const { getByText, getByRole } = render(props)
-    getByText('Choose tips for Flex 1-Channel 50 μL')
-    getByText('mock EquipmentOption')
-    getByText('Go back')
-    getByRole('button', { name: 'GoBack_button' }).click()
+    render(props)
+    screen.getByText('Choose tips for Flex 1-Channel 50 μL')
+    screen.getByText('mock EquipmentOption')
+    screen.getByText('Go back')
+    fireEvent.click(screen.getByRole('button', { name: 'GoBack_button' }))
     expect(props.goBack).toHaveBeenCalled()
-    getByRole('button', { name: 'Next' }).click()
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }))
     expect(props.proceed).toHaveBeenCalled()
   })
   it('renders the custom tip btn and section with no custom tips', () => {
-    const { getByLabelText, getByText } = render(props)
-    getByLabelText('PipetteTipsTile_customTipButton').click()
-    getByText('Custom tips')
-    getByText('Upload')
-    getByText('Upload a custom tiprack to select its definition')
+    render(props)
+    fireEvent.click(screen.getByLabelText('PipetteTipsTile_customTipButton'))
+    screen.getByText('Custom tips')
+    screen.getByText('Upload')
+    screen.getByText('Upload a custom tiprack to select its definition')
   })
   it('renders the custom tip btn and section with a custom tip', () => {
     mockGetTiprackOptions.mockReturnValue([
@@ -136,43 +139,45 @@ describe('PipetteTipsTile', () => {
         value: 'custom_beta_blah_blah_blah',
       },
     ])
-    const { getByLabelText, getByText, getAllByText } = render(props)
-    getByText('Choose tips for Flex 1-Channel 50 μL')
-    getByLabelText('PipetteTipsTile_customTipButton').click()
-    getByText('Custom tips')
-    expect(getAllByText('mock EquipmentOption')).toHaveLength(2)
+    render(props)
+    screen.getByText('Choose tips for Flex 1-Channel 50 μL')
+    fireEvent.click(screen.getByLabelText('PipetteTipsTile_customTipButton'))
+    screen.getByText('Custom tips')
+    expect(screen.getAllByText('mock EquipmentOption')).toHaveLength(2)
   })
   it('renders all tiprack options for 50uL flex pipette when all tipracks are true', () => {
     mockGetAllowAllTipracks.mockReturnValue(true)
-    const { getByText, getAllByText } = render(props)
-    getByText('Choose tips for Flex 1-Channel 50 μL')
-    expect(getAllByText('mock EquipmentOption')).toHaveLength(2)
+    render(props)
+    screen.getByText('Choose tips for Flex 1-Channel 50 μL')
+    expect(screen.getAllByText('mock EquipmentOption')).toHaveLength(2)
   })
   it('renders default options for 10uL ot-2 pipette', () => {
+    const values = {
+      fields: {
+        robotType: OT2_ROBOT_TYPE,
+      },
+      pipettesByMount: {
+        left: {
+          pipetteName: 'p10_single',
+          tiprackDefURI: 'opentrons/opentrons_96_tiprack_10ul/1',
+        },
+        right: { pipetteName: null, tiprackDefURI: null },
+      } as FormPipettesByMount,
+      modulesByType: {
+        heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
+        magneticBlockType: { onDeck: false, model: null, slot: '2' },
+        temperatureModuleType: { onDeck: false, model: null, slot: '3' },
+        thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
+      },
+      additionalEquipment: ['gripper'],
+    } as FormState
+
     const mockWizardTileProps: Partial<WizardTileProps> = {
       goBack: jest.fn(),
       proceed: jest.fn(),
-
-      values: {
-        fields: {
-          robotType: OT2_ROBOT_TYPE,
-        },
-        pipettesByMount: {
-          left: {
-            pipetteName: 'p10_single',
-            tiprackDefURI: 'opentrons/opentrons_96_tiprack_10ul/1',
-          },
-          right: { pipetteName: null, tiprackDefURI: null },
-        } as FormPipettesByMount,
-        modulesByType: {
-          heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
-          magneticBlockType: { onDeck: false, model: null, slot: '2' },
-          temperatureModuleType: { onDeck: false, model: null, slot: '3' },
-          thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
-        },
-        additionalEquipment: ['gripper'],
-      } as FormState,
+      watch: jest.fn((name: keyof typeof values) => values[name]) as any,
     }
+
     props = {
       ...props,
       ...mockWizardTileProps,
@@ -188,8 +193,8 @@ describe('PipetteTipsTile', () => {
         value: 'opentrons/opentrons_96_tiprack_300ul/1',
       },
     ])
-    const { getByText } = render(props)
-    getByText('Choose tips for P10 Single-Channel GEN1')
-    getByText('mock EquipmentOption')
+    render(props)
+    screen.getByText('Choose tips for P10 Single-Channel GEN1')
+    screen.getByText('mock EquipmentOption')
   })
 })

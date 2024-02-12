@@ -20,9 +20,9 @@ import { Chip } from '../../../atoms/Chip'
 import { ChildNavigation } from '../../../organisms/ChildNavigation'
 
 import type { IconName } from '@opentrons/components'
-import type { NetworkConnection } from '../../../pages/OnDeviceDisplay/hooks'
+import type { NetworkConnection } from '../../../resources/networking/hooks/useNetworkConnection'
 import type { ChipType } from '../../../atoms/Chip'
-import type { SetSettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SetSettingOption } from '../../../pages/RobotSettingsDashboard'
 
 export type ConnectionType = 'wifi' | 'ethernet' | 'usb'
 
@@ -43,7 +43,7 @@ export function NetworkSettings({
   }
 
   const handleButtonBackgroundColor = (isConnected: boolean): string =>
-    isConnected ? COLORS.green3 : COLORS.light1
+    isConnected ? COLORS.green35 : COLORS.grey35
 
   const handleChipText = (isConnected: boolean): string =>
     isConnected ? t('connected') : t('not_connected')
@@ -102,8 +102,8 @@ function NetworkSettingButton({
   const PUSHED_STATE_STYLE = css`
     &:active {
       background-color: ${chipType === 'success'
-        ? COLORS.green3Pressed
-        : COLORS.darkBlack40};
+        ? COLORS.green40
+        : COLORS.grey50};
     }
   `
 
@@ -135,7 +135,7 @@ function NetworkSettingButton({
                   fontSize={TYPOGRAPHY.fontSize28}
                   lineHeight={TYPOGRAPHY.lineHeight36}
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={COLORS.darkBlack70}
+                  color={COLORS.grey60}
                 >
                   {networkName}
                 </StyledText>

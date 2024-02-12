@@ -20,7 +20,7 @@ import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import {
   useDeckCalibrationData,
-  useIsOT3,
+  useIsFlex,
   usePipetteOffsetCalibrations,
   useRobot,
   useTipLengthCalibrations,
@@ -29,6 +29,7 @@ import {
   useTrackEvent,
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
 } from '../../redux/analytics'
+import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 // TODO(bc, 2022-02-08): replace with support article when available
 const FLEX_CALIBRATION_SUPPORT_URL = 'https://support.opentrons.com'
@@ -52,13 +53,14 @@ export function CalibrationDataDownload({
   const doTrackEvent = useTrackEvent()
 
   const robot = useRobot(robotName)
-  const isOT3 = useIsOT3(robotName)
+  const isFlex = useIsFlex(robotName)
   // wait for robot request to resolve instead of using name directly from params
   const deckCalibrationData = useDeckCalibrationData(robot?.name)
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations()
   const tipLengthCalibrations = useTipLengthCalibrations()
-  const { data: attachedInstruments } = useInstrumentsQuery({ enabled: isOT3 })
-  const { data: attachedModules } = useModulesQuery({ enabled: isOT3 })
+  const { data: attachedInstruments } = useInstrumentsQuery({ enabled: isFlex })
+  const { data: attachedModules } = useModulesQuery({ enabled: isFlex })
+  const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
 
   const ot2DownloadIsPossible =
     deckCalibrationData.isDeckCalibrated &&
@@ -75,7 +77,7 @@ export function CalibrationDataDownload({
     })
     saveAs(
       new Blob([
-        isOT3
+        isFlex
           ? JSON.stringify({
               instrumentData: attachedInstruments,
               moduleData: attachedModules,
@@ -94,15 +96,15 @@ export function CalibrationDataDownload({
     <Flex
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
-      paddingTop={SPACING.spacing24}
+      gridGap={SPACING.spacing40}
     >
       <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
         <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-          {isOT3
+          {isFlex
             ? t('about_calibration_title')
             : t('robot_calibration:download_calibration_title')}
         </StyledText>
-        {isOT3 ? (
+        {isFlex ? (
           <>
             <Trans
               t={t}
@@ -131,7 +133,7 @@ export function CalibrationDataDownload({
       </Flex>
       <TertiaryButton
         onClick={onClickSaveAs}
-        disabled={isOT3 ? false : !ot2DownloadIsPossible} // always enable download on Flex
+        disabled={isFlex ? isEstopNotDisengaged : !ot2DownloadIsPossible} // always enable download on Flex
       >
         <Flex alignItems={ALIGN_CENTER}>
           <Icon name="download" size="0.75rem" marginRight={SPACING.spacing8} />

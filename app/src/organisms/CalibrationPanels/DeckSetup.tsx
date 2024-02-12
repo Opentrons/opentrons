@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import map from 'lodash/map'
+
 import {
   RobotWorkSpace,
   Flex,
@@ -11,14 +12,18 @@ import {
   SPACING,
   PrimaryButton,
 } from '@opentrons/components'
+import {
+  getLabwareDisplayName,
+  getPositionFromSlotId,
+} from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
-import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import * as Sessions from '../../redux/sessions'
 import { StyledText } from '../../atoms/text'
 import { NeedHelpLink } from './NeedHelpLink'
 import { CalibrationLabwareRender } from './CalibrationLabwareRender'
 
+import type { AddressableArea } from '@opentrons/shared-data'
 import type { CalibrationPanelProps } from './types'
 
 const TIPRACK = 'tip rack'
@@ -98,35 +103,32 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
               'fixedTrash',
             ]}
             deckDef={deckDef}
+            showDeckLayers
             viewBox={`-46 -10 ${488} ${390}`} // TODO: put these in variables
           >
             {({ deckSlotsById }) =>
-              map(
-                deckSlotsById,
-                (
-                  slot: typeof deckSlotsById[keyof typeof deckSlotsById],
-                  slotId
-                ) => {
-                  if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
-                  let labwareDef = null
-                  if (String(tipRack?.slot) === slotId) {
-                    labwareDef = tipRack?.definition
-                  } else if (
-                    calBlock != null &&
-                    String(calBlock?.slot) === slotId
-                  ) {
-                    labwareDef = calBlock?.definition
-                  }
-
-                  return labwareDef != null ? (
-                    <CalibrationLabwareRender
-                      key={slotId}
-                      slotDef={slot}
-                      labwareDef={labwareDef}
-                    />
-                  ) : null
+              map(deckSlotsById, (slot: AddressableArea, slotId) => {
+                if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
+                let labwareDef = null
+                if (String(tipRack?.slot) === slotId) {
+                  labwareDef = tipRack?.definition
+                } else if (
+                  calBlock != null &&
+                  String(calBlock?.slot) === slotId
+                ) {
+                  labwareDef = calBlock?.definition
                 }
-              )
+
+                const slotDefPosition = getPositionFromSlotId(slot.id, deckDef)
+
+                return labwareDef != null ? (
+                  <CalibrationLabwareRender
+                    key={slotId}
+                    slotDefPosition={slotDefPosition}
+                    labwareDef={labwareDef}
+                  />
+                ) : null
+              })
             }
           </RobotWorkSpace>
         </Flex>

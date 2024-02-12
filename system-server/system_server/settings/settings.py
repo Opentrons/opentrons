@@ -27,7 +27,8 @@ class Environment(BaseSettings):
     """Environment related settings."""
 
     dot_env_path: typing.Optional[str] = Field(
-        None, description="Path to a .env file to define system server settings."
+        default=None,
+        description="Path to a .env file to define system server settings.",
     )
 
     class Config:
@@ -45,7 +46,7 @@ class SystemServerSettings(BaseSettings):
     """
 
     persistence_directory: typing.Optional[str] = Field(
-        None,
+        default=None,
         description=(
             "A directory for the server to store things persistently across boots."
             " If this directory doesn't already exist, the server will create it."

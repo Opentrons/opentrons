@@ -1,22 +1,31 @@
 import * as React from 'react'
+
 import {
   useCreateMaintenanceRunLabwareDefinitionMutation,
   useDeleteMaintenanceRunMutation,
-  useRunQuery,
 } from '@opentrons/react-api-client'
+
 import { useCreateTargetedMaintenanceRunMutation } from '../../resources/runs/hooks'
 import { LabwarePositionCheck } from '.'
 import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
 import { getLabwareDefinitionsFromCommands } from './utils/labware'
+import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
+
+import type { RobotType } from '@opentrons/shared-data'
 
 export function useLaunchLPC(
-  runId: string
+  runId: string,
+  robotType: RobotType,
+  protocolName?: string
 ): { launchLPC: () => void; LPCWizard: JSX.Element | null } {
-  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
+  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const {
     createTargetedMaintenanceRun,
   } = useCreateTargetedMaintenanceRunMutation()
-  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation()
+  const {
+    deleteMaintenanceRun,
+    isLoading: isDeletingMaintenanceRun,
+  } = useDeleteMaintenanceRunMutation()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const [maintenanceRunId, setMaintenanceRunId] = React.useState<string | null>(
     null
@@ -29,7 +38,7 @@ export function useLaunchLPC(
   const handleCloseLPC = (): void => {
     if (maintenanceRunId != null) {
       deleteMaintenanceRun(maintenanceRunId, {
-        onSuccess: () => {
+        onSettled: () => {
           setMaintenanceRunId(null)
         },
       })
@@ -70,6 +79,10 @@ export function useLaunchLPC(
           mostRecentAnalysis={mostRecentAnalysis}
           existingOffsets={runRecord?.data?.labwareOffsets ?? []}
           maintenanceRunId={maintenanceRunId}
+          setMaintenanceRunId={setMaintenanceRunId}
+          protocolName={protocolName ?? ''}
+          robotType={robotType}
+          isDeletingMaintenanceRun={isDeletingMaintenanceRun}
         />
       ) : null,
   }

@@ -17,7 +17,7 @@ import {
 } from '../../../../../../redux/discovery/__fixtures__'
 
 import { RenameRobotSlideout } from '../RenameRobotSlideout'
-import { useIsOT3 } from '../../../../hooks'
+import { useIsFlex } from '../../../../hooks'
 
 jest.mock('../../../../../../redux/discovery/selectors')
 jest.mock('../../../../../../redux/analytics')
@@ -32,7 +32,7 @@ const mockGetReachableRobots = getReachableRobots as jest.MockedFunction<
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 
 const mockOnCloseClick = jest.fn()
 let mockTrackEvent: jest.Mock
@@ -58,7 +58,7 @@ describe('RobotSettings RenameRobotSlideout', () => {
     mockReachableRobot.name = 'reachableOtie'
     mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
     mockGetReachableRobots.mockReturnValue([mockReachableRobot])
-    mockUseIsOT3.mockReturnValue(false)
+    mockUseIsFlex.mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -84,7 +84,7 @@ describe('RobotSettings RenameRobotSlideout', () => {
   })
 
   it('should render title, description, label, input, and button for flex', () => {
-    mockUseIsOT3.mockReturnValue(true)
+    mockUseIsFlex.mockReturnValue(true)
     const [{ getByText, getByRole, queryByText }] = render()
     getByText('Rename Robot')
     expect(
@@ -110,9 +110,13 @@ describe('RobotSettings RenameRobotSlideout', () => {
 
     await waitFor(() => {
       expect(input).toHaveValue('mockInput')
-      const renameButton = getByRole('button', { name: 'Rename robot' })
+    })
+    const renameButton = getByRole('button', { name: 'Rename robot' })
+    await waitFor(() => {
       expect(renameButton).not.toBeDisabled()
-      fireEvent.click(renameButton)
+    })
+    fireEvent.click(renameButton)
+    await waitFor(() => {
       expect(mockTrackEvent).toHaveBeenCalledWith({
         name: ANALYTICS_RENAME_ROBOT,
         properties: { newRobotName: 'mockInput', previousRobotName: 'otie' },
@@ -127,10 +131,12 @@ describe('RobotSettings RenameRobotSlideout', () => {
     expect(input).toHaveValue('mockInput@@@')
     const renameButton = getByRole('button', { name: 'Rename robot' })
     const error = await findByText(
-      'Oops! Robot name must follow the character count and limitations'
+      'Oops! Robot name must follow the character count and limitations.'
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
+    })
+    await waitFor(() => {
       expect(error).toBeInTheDocument()
     })
   })
@@ -144,10 +150,12 @@ describe('RobotSettings RenameRobotSlideout', () => {
     expect(input).toHaveValue('aaaaaaaaaaaaaaaaaa')
     const renameButton = getByRole('button', { name: 'Rename robot' })
     const error = await findByText(
-      'Oops! Robot name must follow the character count and limitations'
+      'Oops! Robot name must follow the character count and limitations.'
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
+    })
+    await waitFor(() => {
       expect(error).toBeInTheDocument()
     })
   })
@@ -161,10 +169,12 @@ describe('RobotSettings RenameRobotSlideout', () => {
     expect(input).toHaveValue('Hello world123')
     const renameButton = getByRole('button', { name: 'Rename robot' })
     const error = await findByText(
-      'Oops! Robot name must follow the character count and limitations'
+      'Oops! Robot name must follow the character count and limitations.'
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
+    })
+    await waitFor(() => {
       expect(error).toBeInTheDocument()
     })
   })
@@ -178,10 +188,12 @@ describe('RobotSettings RenameRobotSlideout', () => {
     expect(input).toHaveValue(' ')
     const renameButton = getByRole('button', { name: 'Rename robot' })
     const error = await findByText(
-      'Oops! Robot name must follow the character count and limitations'
+      'Oops! Robot name must follow the character count and limitations.'
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
+    })
+    await waitFor(() => {
       expect(error).toBeInTheDocument()
     })
   })
@@ -199,6 +211,8 @@ describe('RobotSettings RenameRobotSlideout', () => {
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
+    })
+    await waitFor(() => {
       expect(error).toBeInTheDocument()
     })
   })
@@ -215,6 +229,8 @@ describe('RobotSettings RenameRobotSlideout', () => {
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
+    })
+    await waitFor(() => {
       expect(error).toBeInTheDocument()
     })
   })

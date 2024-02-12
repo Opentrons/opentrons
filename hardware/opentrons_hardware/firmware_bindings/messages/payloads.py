@@ -229,8 +229,8 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
 class MotorPositionResponse(EmptyPayload):
     """Read Encoder Position."""
 
-    current_position: utils.UInt32Field
-    encoder_position: utils.Int32Field
+    current_position_um: utils.UInt32Field
+    encoder_position_um: utils.Int32Field
     position_flags: MotorPositionFlagsField
 
 
@@ -319,13 +319,13 @@ class FirmwareUpdateData(FirmwareUpdateWithAddress):
             raise InternalMessageFormatError(
                 f"FirmwareUpdateData: Data address needs to be doubleword aligned."
                 f" {address} mod 8 equals {address % 8} and should be 0",
-                detail={"address": address},
+                detail={"address": str(address)},
             )
         if data_length > FirmwareUpdateDataField.NUM_BYTES:
             raise InternalMessageFormatError(
                 f"FirmwareUpdateData: Data cannot be more than"
                 f" {FirmwareUpdateDataField.NUM_BYTES} bytes got {data_length}.",
-                detail={"size": data_length},
+                detail={"size": str(data_length)},
             )
 
     @classmethod
@@ -528,6 +528,13 @@ class GripperJawStatePayload(EmptyPayload):
 
 
 @dataclass(eq=False)
+class GripperJawHoldoffPayload(EmptyPayload):
+    """A respones carrying info about the jaw holdoff value of a gripper."""
+
+    holdoff_ms: utils.UInt32Field
+
+
+@dataclass(eq=False)
 class GripperMoveRequestPayload(AddToMoveGroupRequestPayload):
     """A request to move gripper."""
 
@@ -620,3 +627,44 @@ class GetMotorUsageResponsePayload(_GetMotorUsageResponsePayloadBase):
         return inst
 
     usage_elements: List[MotorUsageTypeField]
+
+
+@dataclass(eq=False)
+class HepaUVInfoResponsePayload(EmptyPayload):
+    """A response carrying data about an attached hepa uv."""
+
+    model: utils.UInt16Field
+    serial: SerialDataCodeField
+
+
+@dataclass(eq=False)
+class SetHepaFanStateRequestPayload(EmptyPayload):
+    """A request to set the state and pwm of a the hepa fan."""
+
+    duty_cycle: utils.UInt32Field
+    fan_on: utils.Int8Field
+
+
+@dataclass(eq=False)
+class GetHepaFanStatePayloadResponse(EmptyPayload):
+    """A response with the state and pwm of the fan."""
+
+    duty_cycle: utils.UInt32Field
+    fan_on: utils.UInt8Field
+
+
+@dataclass(eq=False)
+class SetHepaUVStateRequestPayload(EmptyPayload):
+    """A request to set the state and timeout in seconds of the hepa uv light."""
+
+    timeout_s: utils.UInt32Field
+    uv_light_on: utils.UInt8Field
+
+
+@dataclass(eq=False)
+class GetHepaUVStatePayloadResponse(EmptyPayload):
+    """A response with the state and timeout in seconds of the hepa uv light."""
+
+    timeout_s: utils.UInt32Field
+    uv_light_on: utils.UInt8Field
+    remaining_time_s: utils.UInt32Field

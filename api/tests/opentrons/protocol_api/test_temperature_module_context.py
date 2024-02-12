@@ -2,7 +2,7 @@
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons.broker import Broker
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.modules import TemperatureStatus
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
@@ -30,9 +30,9 @@ def mock_core_map(decoy: Decoy) -> LoadedCoreMap:
 
 
 @pytest.fixture
-def mock_broker(decoy: Decoy) -> Broker:
+def mock_broker(decoy: Decoy) -> LegacyBroker:
     """Get a mock command message broker."""
-    return decoy.mock(cls=Broker)
+    return decoy.mock(cls=LegacyBroker)
 
 
 @pytest.fixture
@@ -47,7 +47,7 @@ def subject(
     mock_core: TemperatureModuleCore,
     mock_protocol_core: ProtocolCore,
     mock_core_map: LoadedCoreMap,
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
 ) -> TemperatureModuleContext:
     """Get a temperature module context with its dependencies mocked out."""
     return TemperatureModuleContext(
@@ -62,7 +62,7 @@ def subject(
 def test_set_temperature(
     decoy: Decoy,
     mock_core: TemperatureModuleCore,
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
     subject: TemperatureModuleContext,
 ) -> None:
     """It should set and wait for the temperature via the core."""
@@ -92,7 +92,7 @@ def test_set_temperature(
 def test_start_set_temperature(
     decoy: Decoy,
     mock_core: TemperatureModuleCore,
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
     subject: TemperatureModuleContext,
 ) -> None:
     """It should set the target temperature via the core."""
@@ -120,7 +120,7 @@ def test_start_set_temperature(
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 2)])
 def test_start_set_temperature_api_version_low(
-    decoy: Decoy, mock_broker: Broker, subject: TemperatureModuleContext
+    decoy: Decoy, mock_broker: LegacyBroker, subject: TemperatureModuleContext
 ) -> None:
     """It should reject if API version is lower than 2.3."""
     with pytest.raises(APIVersionError) as exc_info:
@@ -138,7 +138,7 @@ def test_start_set_temperature_api_version_low(
 def test_await_temperature(
     decoy: Decoy,
     mock_core: TemperatureModuleCore,
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
     subject: TemperatureModuleContext,
 ) -> None:
     """It should wait for a specified target temperature."""
@@ -162,7 +162,7 @@ def test_await_temperature(
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 2)])
 def test_await_temperature_api_version_low(
-    decoy: Decoy, mock_broker: Broker, subject: TemperatureModuleContext
+    decoy: Decoy, mock_broker: LegacyBroker, subject: TemperatureModuleContext
 ) -> None:
     """It should reject if API version is lower than 2.3."""
     with pytest.raises(APIVersionError) as exc_info:
@@ -179,7 +179,7 @@ def test_await_temperature_api_version_low(
 def test_deactivate(
     decoy: Decoy,
     mock_core: TemperatureModuleCore,
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
     subject: TemperatureModuleContext,
 ) -> None:
     """It should deactivate the heater."""

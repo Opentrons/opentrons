@@ -21,6 +21,7 @@ from .helpers import (
     _apply_labware_offsets,
     _pick_up_tip,
     _drop_tip,
+    get_list_of_wells_affected,
 )
 from .trial import (
     PhotometricTrial,
@@ -196,8 +197,9 @@ def _run_trial(trial: PhotometricTrial) -> None:
     for i in range(num_dispenses):
         dest_name = _get_photo_plate_dest(trial.cfg, trial.trial)
         dest_well = trial.dest[dest_name]
-        # FIXME: if 8ch or 96ch, should also set start volumes of other wells
-        trial.liquid_tracker.set_start_volume(dest_well, photoplate_preped_vol)
+        affected_wells = get_list_of_wells_affected(dest_well, trial.pipette.channels)
+        for _w in affected_wells:
+            trial.liquid_tracker.set_start_volume(_w, photoplate_preped_vol)
         trial.pipette.move_to(dest_well.top())
         ui.print_info(f"dispensing to {dest_well}")
         # RUN DISPENSE
@@ -269,7 +271,7 @@ def _display_dye_information(
                     dye_msg = 'A" or "HV' if include_hv and dye == "A" else dye
                     ui.get_user_ready(
                         f"add {_ul_to_ml(reservoir_ul)} mL of DYE type {dye_msg} "
-                        "in well A{cfg.dye_well_column_offset}"
+                        f"in well A{cfg.dye_well_column_offset}"
                     )
 
 
@@ -313,15 +315,11 @@ def execute_trials(
     trials: Dict[float, List[PhotometricTrial]],
 ) -> None:
     """Execute a batch of pre-constructed trials."""
-    ui.print_info("homing...")
-    resources.ctx.home()
-    resources.pipette.home_plunger()
-
     trial_total = len(resources.test_volumes) * cfg.trials
     trial_count = 0
     for volume in trials.keys():
         ui.print_title(f"{volume} uL")
-        if cfg.pipette_channels == 1 and not resources.ctx.is_simulating():
+        if cfg.pipette_channels != 96 and not resources.ctx.is_simulating():
             ui.get_user_ready(
                 f"put PLATE with prepped column {cfg.photoplate_column_offset} and remove SEAL"
             )
@@ -338,7 +336,7 @@ def execute_trials(
                     resources.ctx, resources.pipette, cfg, location=next_tip_location
                 )
             _run_trial(trial)
-        if not trial.ctx.is_simulating() and trial.channel_count == 1:
+        if not trial.ctx.is_simulating() and trial.channel_count != 96:
             ui.get_user_ready("add SEAL to plate and remove from DECK")
 
 
@@ -425,7 +423,6 @@ def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
     """Run."""
     trial_total = len(resources.test_volumes) * cfg.trials
 
-    resources.ctx._core.get_hardware().home()
     ui.print_header("LOAD LABWARE")
     photoplate, reservoir = _load_labware(resources.ctx, cfg)
     liquid_tracker = LiquidTracker(resources.ctx)

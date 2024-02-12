@@ -146,7 +146,7 @@ def build_gravimetric_trials(
                 for trial in range(cfg.trials):
                     d: Optional[float] = None
                     cv: Optional[float] = None
-                    if not cfg.increment:
+                    if not cfg.increment and not cfg.user_volumes:
                         d, cv = config.QC_TEST_MIN_REQUIREMENTS[cfg.pipette_channels][
                             cfg.pipette_volume
                         ][cfg.tip_volume][volume]
@@ -235,18 +235,24 @@ def _finish_test(
     resources: TestResources,
     return_tip: bool,
 ) -> None:
-    if resources.pipette.has_tip:
+    # there are WAY too many tips on a 96ch pipette
+    # so drop them incase something bad happened during the test run
+    if resources.pipette.channels == 96 and resources.pipette.has_tip:
         resources.ctx.home()
         if resources.pipette.current_volume > 0:
             ui.print_info("dispensing liquid to trash")
-            trash = resources.pipette.trash_container.wells()[0]
-            dispense_location = trash.top()
-            if resources.pipette.channels == 96:
-                dispense_location = dispense_location.move(Point(-36.0, -25.5, 0))
+            trash_container = resources.pipette.trash_container
+            dispense_location = (
+                trash_container.wells()[0].top()
+                if isinstance(trash_container, Labware)
+                else trash_container
+            )
             # FIXME: this should be a blow_out() at max volume,
             #        but that is not available through PyAPI yet
             #        so instead just dispensing.
-            resources.pipette.dispense(resources.pipette.current_volume, trash.top())
+            resources.pipette.dispense(
+                resources.pipette.current_volume, dispense_location
+            )
             resources.pipette.aspirate(10)  # to pull any droplets back up
         ui.print_info("dropping tip")
         helpers._drop_tip(resources.pipette, return_tip)

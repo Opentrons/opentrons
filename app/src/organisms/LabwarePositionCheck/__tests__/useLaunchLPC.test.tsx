@@ -2,28 +2,37 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { renderHook } from '@testing-library/react-hooks'
-import { renderWithProviders } from '@opentrons/components'
+import {
+  act,
+  fireEvent,
+  renderHook,
+  screen,
+  waitFor,
+} from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
+
+import { renderWithProviders } from '@opentrons/components'
 import {
   useCreateMaintenanceRunLabwareDefinitionMutation,
   useDeleteMaintenanceRunMutation,
-  useRunQuery,
 } from '@opentrons/react-api-client'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { useCreateTargetedMaintenanceRunMutation } from '../../../resources/runs/hooks'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
-
+import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
 import { useLaunchLPC } from '../useLaunchLPC'
 import { LabwarePositionCheck } from '..'
 
 import type { LabwareOffset } from '@opentrons/api-client'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 jest.mock('../')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../resources/runs/hooks')
 jest.mock('../useMostRecentCompletedAnalysis')
+jest.mock('../../../resources/runs/useNotifyRunQuery')
 
 const mockUseCreateTargetedMaintenanceRunMutation = useCreateTargetedMaintenanceRunMutation as jest.MockedFunction<
   typeof useCreateTargetedMaintenanceRunMutation
@@ -34,7 +43,9 @@ const mockUseCreateMaintenanceRunLabwareDefinitionMutation = useCreateMaintenanc
 const mockUseDeleteMaintenanceRunMutation = useDeleteMaintenanceRunMutation as jest.MockedFunction<
   typeof useDeleteMaintenanceRunMutation
 >
-const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
+const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
+  typeof useNotifyRunQuery
+>
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
 >
@@ -63,7 +74,7 @@ const mockCurrentOffsets: LabwareOffset[] = [
 const mockLabwareDef = fixture_tiprack_300_ul as LabwareDefinition2
 
 describe('useLaunchLPC hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   let mockCreateMaintenanceRun: jest.Mock
   let mockCreateLabwareDefinition: jest.Mock
   let mockDeleteMaintenanceRun: jest.Mock
@@ -80,7 +91,7 @@ describe('useLaunchLPC hook', () => {
       Promise.resolve({ data: { definitionUri: 'fakeDefUri' } })
     )
     mockDeleteMaintenanceRun = jest.fn((_data, opts) => {
-      opts?.onSuccess()
+      opts?.onSettled()
     })
     const store = mockStore({ isOnDevice: false })
     wrapper = ({ children }) => (
@@ -99,7 +110,7 @@ describe('useLaunchLPC hook', () => {
         exit
       </div>
     ))
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(MOCK_RUN_ID, { staleTime: Infinity })
       .mockReturnValue({
         data: {
@@ -156,35 +167,49 @@ describe('useLaunchLPC hook', () => {
   })
 
   it('returns and no wizard by default', () => {
-    const { result } = renderHook(() => useLaunchLPC(MOCK_RUN_ID), { wrapper })
+    const { result } = renderHook(
+      () => useLaunchLPC(MOCK_RUN_ID, FLEX_ROBOT_TYPE),
+      { wrapper }
+    )
     expect(result.current.LPCWizard).toEqual(null)
   })
 
   it('returns creates maintenance run with current offsets and definitions when create callback is called, closes and deletes when exit is clicked', async () => {
-    const { result } = renderHook(() => useLaunchLPC(MOCK_RUN_ID), { wrapper })
-    await result.current.launchLPC()
-    await expect(mockCreateLabwareDefinition).toHaveBeenCalledWith({
-      maintenanceRunId: MOCK_MAINTENANCE_RUN_ID,
-      labwareDef: mockLabwareDef,
+    const { result } = renderHook(
+      () => useLaunchLPC(MOCK_RUN_ID, FLEX_ROBOT_TYPE),
+      { wrapper }
+    )
+    act(() => {
+      result.current.launchLPC()
     })
-    expect(mockCreateMaintenanceRun).toHaveBeenCalledWith({
-      labwareOffsets: mockCurrentOffsets.map(
-        ({ vector, location, definitionUri }) => ({
-          vector,
-          location,
-          definitionUri,
-        })
-      ),
+    await waitFor(() => {
+      expect(mockCreateLabwareDefinition).toHaveBeenCalledWith({
+        maintenanceRunId: MOCK_MAINTENANCE_RUN_ID,
+        labwareDef: mockLabwareDef,
+      })
     })
-    expect(result.current.LPCWizard).not.toBeNull()
-    const { getByText } = renderWithProviders(
-      result.current.LPCWizard ?? <></>
-    )[0]
-    getByText('exit').click()
+
+    await waitFor(() => {
+      expect(mockCreateMaintenanceRun).toHaveBeenCalledWith({
+        labwareOffsets: mockCurrentOffsets.map(
+          ({ vector, location, definitionUri }) => ({
+            vector,
+            location,
+            definitionUri,
+          })
+        ),
+      })
+    })
+
+    await waitFor(() => {
+      expect(result.current.LPCWizard).not.toBeNull()
+    })
+    renderWithProviders(result.current.LPCWizard ?? <></>)
+    fireEvent.click(screen.getByText('exit'))
     expect(mockDeleteMaintenanceRun).toHaveBeenCalledWith(
       MOCK_MAINTENANCE_RUN_ID,
       {
-        onSuccess: expect.any(Function),
+        onSettled: expect.any(Function),
       }
     )
     expect(result.current.LPCWizard).toBeNull()

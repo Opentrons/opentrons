@@ -1,27 +1,18 @@
-import assert from 'assert'
-import reduce from 'lodash/reduce'
 import * as React from 'react'
+import assert from 'assert'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import reduce from 'lodash/reduce'
+import isEmpty from 'lodash/isEmpty'
+import last from 'lodash/last'
+import filter from 'lodash/filter'
+import mapValues from 'lodash/mapValues'
 import cx from 'classnames'
-import { Formik, FormikProps } from 'formik'
+import { useTranslation } from 'react-i18next'
+import { useSelector, useDispatch } from 'react-redux'
 import * as Yup from 'yup'
-import {
-  getIsCrashablePipetteSelected,
-  PipetteOnDeck,
-  FormPipette,
-  FormPipettesByMount,
-  FormModulesByType,
-} from '../../../step-forms'
-import {
-  Modal,
-  FormGroup,
-  InputField,
-  OutlineButton,
-  DropdownField,
-  Flex,
-  SPACING,
-  DIRECTION_COLUMN,
-  ALIGN_STRETCH,
-} from '@opentrons/components'
+
+import { Modal, OutlineButton } from '@opentrons/components'
 import {
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_MODULE_TYPE,
@@ -36,20 +27,35 @@ import {
   MAGNETIC_BLOCK_V1,
   MAGNETIC_BLOCK_TYPE,
   OT2_ROBOT_TYPE,
-  FLEX_ROBOT_TYPE,
-  RobotType,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../localization'
-import { SPAN7_8_10_11_SLOT } from '../../../constants'
-import { StepChangesConfirmModal } from '../EditPipettesModal/StepChangesConfirmModal'
-import { ModuleFields } from './ModuleFields'
-import { PipetteFields } from './PipetteFields'
-import { CrashInfoBox, isModuleWithCollisionIssue } from '../../modules'
-import styles from './FilePipettesModal.css'
-import formStyles from '../../forms/forms.css'
-import modalStyles from '../modal.css'
-import { DeckSlot } from '../../../types'
+import {
+  actions as stepFormActions,
+  selectors as stepFormSelectors,
+  getIsCrashablePipetteSelected,
+  PipetteOnDeck,
+  FormPipettesByMount,
+  FormModulesByType,
+  FormPipette,
+} from '../../../step-forms'
+import {
+  INITIAL_DECK_SETUP_STEP_ID,
+  SPAN7_8_10_11_SLOT,
+} from '../../../constants'
 import { NewProtocolFields } from '../../../load-file'
+import { getRobotType } from '../../../file-data/selectors'
+import { uuid } from '../../../utils'
+import { actions as steplistActions } from '../../../steplist'
+import { selectors as featureFlagSelectors } from '../../../feature-flags'
+import { CrashInfoBox, isModuleWithCollisionIssue } from '../../modules'
+import { StepChangesConfirmModal } from '../EditPipettesModal/StepChangesConfirmModal'
+import { PipetteFields } from './PipetteFields'
+
+import styles from './FilePipettesModal.css'
+import modalStyles from '../modal.css'
+
+import type { DeckSlot, ThunkDispatch } from '../../../types'
+import type { NormalizedPipette } from '@opentrons/step-generation'
+import type { StepIdType } from '../../../form-types'
 
 export type PipetteFieldsData = Omit<
   PipetteOnDeck,
@@ -68,25 +74,10 @@ export interface FormState {
   modulesByType: FormModulesByType
 }
 
-interface State {
-  showEditPipetteConfirmation: boolean
+export interface Props {
+  closeModal: () => void
 }
 
-export interface Props {
-  showProtocolFields?: boolean | null
-  showModulesFields?: boolean | null
-  hideModal?: boolean
-  onCancel: () => unknown
-  initialPipetteValues?: FormState['pipettesByMount']
-  initialModuleValues?: FormState['modulesByType']
-  onSave: (args: {
-    newProtocolFields: NewProtocolFields
-    pipettes: PipetteFieldsData[]
-    modules: ModuleCreationArgs[]
-  }) => unknown
-  moduleRestrictionsDisabled?: boolean | null
-  robotType: RobotType
-}
 const initialFormState: FormState = {
   fields: {
     name: '',
@@ -133,8 +124,8 @@ const pipetteValidationShape = Yup.object().shape({
     .nullable()
     .when('pipetteName', {
       is: (val: string | null): boolean => Boolean(val),
-      then: Yup.string().required('Required'),
-      otherwise: null,
+      then: schema => schema.required('Required'),
+      otherwise: schema => schema.nullable(),
     }),
 })
 // any typing this because TS says there are too many possibilities of what this could be
@@ -144,13 +135,13 @@ const moduleValidationShape: any = Yup.object().shape({
     .nullable()
     .when('onDeck', {
       is: true,
-      then: Yup.string().required('Required'),
-      otherwise: null,
+      then: schema => schema.required('Required'),
+      otherwise: schema => schema.nullable(),
     }),
   slot: Yup.string(),
 })
 
-const validationSchema = Yup.object().shape({
+const validationSchema: any = Yup.object().shape({
   fields: Yup.object().shape({
     name: Yup.string(),
   }),
@@ -170,27 +161,180 @@ const validationSchema = Yup.object().shape({
   }),
 })
 
-const ROBOT_TYPE_OPTIONS = [
-  { value: OT2_ROBOT_TYPE, name: 'OT2' },
-  { value: FLEX_ROBOT_TYPE, name: 'Opentrons Flex' },
-]
-
-// TODO: Ian 2019-03-15 use i18n for labels
-export class FilePipettesModal extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props)
-
-    this.state = {
-      showEditPipetteConfirmation: false,
+const makeUpdatePipettes = (
+  prevPipettes: { [pipetteId: string]: PipetteOnDeck },
+  orderedStepIds: StepIdType[],
+  dispatch: ThunkDispatch<any>,
+  closeModal: () => void
+) => ({ pipettes: newPipetteArray }: { pipettes: PipetteFieldsData[] }) => {
+  const prevPipetteIds = Object.keys(prevPipettes)
+  const usedPrevPipettes: string[] = [] // IDs of pipettes in prevPipettes that were already put into nextPipettes
+  const nextPipettes: {
+    [pipetteId: string]: {
+      mount: string
+      name: PipetteName
+      tiprackDefURI: string
+      id: string
     }
+  } = {}
+  // from array of pipettes from Edit Pipette form (with no IDs),
+  // assign IDs and populate nextPipettes
+  newPipetteArray.forEach((newPipette: PipetteFieldsData) => {
+    if (newPipette && newPipette.name && newPipette.tiprackDefURI) {
+      const candidatePipetteIds = prevPipetteIds.filter(id => {
+        const prevPipette = prevPipettes[id]
+        const alreadyUsed = usedPrevPipettes.some(usedId => usedId === id)
+        return !alreadyUsed && prevPipette.name === newPipette.name
+      })
+      const pipetteId: string | null | undefined = candidatePipetteIds[0]
+      if (pipetteId) {
+        // update used pipette list
+        usedPrevPipettes.push(pipetteId)
+        nextPipettes[pipetteId] = { ...newPipette, id: pipetteId }
+      } else {
+        const newId = uuid()
+        nextPipettes[newId] = { ...newPipette, id: newId }
+      }
+    }
+  })
+
+  dispatch(
+    stepFormActions.createPipettes(
+      mapValues(
+        nextPipettes,
+        (
+          p: typeof nextPipettes[keyof typeof nextPipettes]
+        ): NormalizedPipette => ({
+          id: p.id,
+          name: p.name,
+          tiprackDefURI: p.tiprackDefURI,
+        })
+      )
+    )
+  )
+
+  // set/update pipette locations in initial deck setup step
+  dispatch(
+    steplistActions.changeSavedStepForm({
+      stepId: INITIAL_DECK_SETUP_STEP_ID,
+      update: {
+        pipetteLocationUpdate: mapValues(
+          nextPipettes,
+          (p: PipetteOnDeck) => p.mount
+        ),
+      },
+    })
+  )
+
+  const pipetteIdsToDelete: string[] = Object.keys(prevPipettes).filter(
+    id => !(id in nextPipettes)
+  )
+
+  // SubstitutionMap represents a map of oldPipetteId => newPipetteId
+  // When a pipette's tiprack changes, the ids will be the same
+  interface SubstitutionMap {
+    [pipetteId: string]: string
   }
 
-  componentDidUpdate(prevProps: Props): void {
-    if (!prevProps.hideModal && this.props.hideModal)
-      this.setState({ showEditPipetteConfirmation: false })
+  const pipetteReplacementMap: SubstitutionMap = pipetteIdsToDelete.reduce(
+    (acc: SubstitutionMap, deletedId: string): SubstitutionMap => {
+      const deletedPipette = prevPipettes[deletedId]
+      const replacementId = Object.keys(nextPipettes).find(
+        newId => nextPipettes[newId].mount === deletedPipette.mount
+      )
+      // @ts-expect-error(sa, 2021-6-21): redlacementId will always be a string, so right side of the and will always be true
+      return replacementId && replacementId !== -1
+        ? { ...acc, [deletedId]: replacementId }
+        : acc
+    },
+    {}
+  )
+
+  const pipettesWithNewTipracks: string[] = filter(
+    nextPipettes,
+    (nextPipette: typeof nextPipettes[keyof typeof nextPipettes]) => {
+      const newPipetteId = nextPipette.id
+      const tiprackChanged =
+        newPipetteId in prevPipettes &&
+        nextPipette.tiprackDefURI !== prevPipettes[newPipetteId].tiprackDefURI
+      return tiprackChanged
+    }
+  ).map(pipette => pipette.id)
+
+  // this creates an identity map with all pipette ids that have new tipracks
+  // this will be used so that handleFormChange gets called even though the
+  // pipette id itself has not changed (only it's tiprack)
+
+  const pipettesWithNewTiprackIdentityMap: SubstitutionMap = pipettesWithNewTipracks.reduce(
+    (acc: SubstitutionMap, id: string): SubstitutionMap => {
+      return {
+        ...acc,
+        ...{ [id]: id },
+      }
+    },
+    {}
+  )
+
+  const substitutionMap = {
+    ...pipetteReplacementMap,
+    ...pipettesWithNewTiprackIdentityMap,
   }
 
-  getCrashableModuleSelected: (
+  // substitute deleted pipettes with new pipettes on the same mount, if any
+  if (!isEmpty(substitutionMap) && orderedStepIds.length > 0) {
+    // NOTE: using start/end here is meant to future-proof this action for multi-step editing
+    dispatch(
+      stepFormActions.substituteStepFormPipettes({
+        substitutionMap,
+        startStepId: orderedStepIds[0],
+        // @ts-expect-error(sa, 2021-6-22): last might return undefined
+        endStepId: last(orderedStepIds),
+      })
+    )
+  }
+
+  // delete any pipettes no longer in use
+  if (pipetteIdsToDelete.length > 0) {
+    dispatch(stepFormActions.deletePipettes(pipetteIdsToDelete))
+  }
+  closeModal()
+}
+
+export const FilePipettesModal = (props: Props): JSX.Element => {
+  const [
+    showEditPipetteConfirmation,
+    setShowEditPipetteConfirmation,
+  ] = React.useState<boolean>(false)
+  const { t } = useTranslation(['modal', 'button', 'form'])
+  const robotType = useSelector(getRobotType)
+  const dispatch = useDispatch()
+  const initialPipettes = useSelector(
+    stepFormSelectors.getPipettesForEditPipetteForm
+  )
+  const prevPipettes = useSelector(stepFormSelectors.getInitialDeckSetup)
+    .pipettes
+  const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
+  const moduleRestrictionsDisabled = useSelector(
+    featureFlagSelectors.getDisableModuleRestrictions
+  )
+
+  const onCloseModal = (): void => {
+    setShowEditPipetteConfirmation(false)
+    props.closeModal()
+  }
+
+  const onSave: (args: {
+    newProtocolFields: NewProtocolFields
+    modules: ModuleCreationArgs[]
+    pipettes: PipetteFieldsData[]
+  }) => void = makeUpdatePipettes(
+    prevPipettes,
+    orderedStepIds,
+    dispatch,
+    onCloseModal
+  )
+
+  const getCrashableModuleSelected: (
     modules: FormModulesByType,
     moduleType: ModuleType
   ) => boolean = (modules, moduleType) => {
@@ -203,14 +347,10 @@ export class FilePipettesModal extends React.Component<Props, State> {
     return crashableModuleOnDeck
   }
 
-  handleSubmit: (values: FormState) => void = values => {
-    const { showProtocolFields } = this.props
-    const { showEditPipetteConfirmation } = this.state
-
-    if (!showProtocolFields && !showEditPipetteConfirmation) {
-      return this.showEditPipetteConfirmationModal()
+  const handleFormSubmit: (values: FormState) => void = values => {
+    if (!showEditPipetteConfirmation) {
+      setShowEditPipetteConfirmation(true)
     }
-
     const newProtocolFields = values.fields
     const pipettes = reduce<FormPipettesByMount, PipetteFieldsData[]>(
       values.pipettesByMount,
@@ -263,233 +403,130 @@ export class FilePipettesModal extends React.Component<Props, State> {
       // if both are present, move the Mag mod to slot 9, since both can't be in slot 1
       modules[magModIndex].slot = '9'
     }
-    this.props.onSave({ modules, newProtocolFields, pipettes })
+    onSave({ newProtocolFields, modules, pipettes })
   }
 
-  showEditPipetteConfirmationModal: () => void = () => {
-    this.setState({ showEditPipetteConfirmation: true })
-  }
-
-  handleCancel: () => void = () => {
-    this.setState({ showEditPipetteConfirmation: false })
-  }
-
-  getInitialValues: () => FormState = () => {
+  const getInitialValues: () => FormState = () => {
     return {
       ...initialFormState,
       pipettesByMount: {
         ...initialFormState.pipettesByMount,
-        ...this.props.initialPipetteValues,
+        ...initialPipettes,
       },
       modulesByType: {
         ...initialFormState.modulesByType,
-        ...this.props.initialModuleValues,
       },
     }
   }
 
-  render(): React.ReactNode | null {
-    if (this.props.hideModal) return null
-    const {
-      showProtocolFields,
-      moduleRestrictionsDisabled,
-      robotType,
-    } = this.props
+  const {
+    handleSubmit,
+    formState,
+    control,
+    setValue,
+    trigger,
+    watch,
+    getValues,
+  } = useForm<FormState>({
+    defaultValues: getInitialValues(),
+    resolver: yupResolver(validationSchema),
+  })
+  const pipettesByMount = watch('pipettesByMount')
+  const { modulesByType } = getValues()
 
-    return (
-      <Modal
-        contentsClassName={cx(
-          styles.new_file_modal_contents,
-          modalStyles.scrollable_modal_wrapper,
-          { [styles.edit_pipettes_modal]: !showProtocolFields }
-        )}
-        className={cx(modalStyles.modal, styles.new_file_modal)}
-      >
-        <div className={modalStyles.scrollable_modal_wrapper}>
-          <div className={modalStyles.scrollable_modal_scroll}>
-            <Formik
-              enableReinitialize
-              initialValues={this.getInitialValues()}
-              onSubmit={this.handleSubmit}
-              validationSchema={validationSchema}
-              validateOnChange={false}
-            >
-              {({
-                handleChange,
-                handleSubmit,
-                errors,
-                setFieldValue,
-                touched,
-                values,
-                handleBlur,
-                setFieldTouched,
-              }: FormikProps<FormState>) => {
-                const { left, right } = values.pipettesByMount
+  const { left, right } = pipettesByMount
+  // at least one must not be none (empty string)
+  const pipetteSelectionIsValid = left.pipetteName || right.pipetteName
 
-                const pipetteSelectionIsValid =
-                  // at least one must not be none (empty string)
-                  left.pipetteName || right.pipetteName
+  const hasCrashableMagnetModuleSelected = getCrashableModuleSelected(
+    modulesByType,
+    MAGNETIC_MODULE_TYPE
+  )
+  const hasCrashableTemperatureModuleSelected = getCrashableModuleSelected(
+    modulesByType,
+    TEMPERATURE_MODULE_TYPE
+  )
+  const hasHeaterShakerSelected = Boolean(
+    modulesByType[HEATERSHAKER_MODULE_TYPE].onDeck
+  )
 
-                const hasCrashableMagnetModuleSelected = this.getCrashableModuleSelected(
-                  values.modulesByType,
-                  MAGNETIC_MODULE_TYPE
-                )
-                const hasCrashableTemperatureModuleSelected = this.getCrashableModuleSelected(
-                  values.modulesByType,
-                  TEMPERATURE_MODULE_TYPE
-                )
-                const hasHeaterShakerSelected = Boolean(
-                  values.modulesByType[HEATERSHAKER_MODULE_TYPE].onDeck
-                )
+  const showHeaterShakerPipetteCollisions =
+    hasHeaterShakerSelected &&
+    [
+      getPipetteNameSpecs(left.pipetteName as PipetteName),
+      getPipetteNameSpecs(right.pipetteName as PipetteName),
+    ].some(pipetteSpecs => pipetteSpecs && pipetteSpecs.channels !== 1)
 
-                const showHeaterShakerPipetteCollisions =
-                  hasHeaterShakerSelected &&
-                  [
-                    getPipetteNameSpecs(left.pipetteName as PipetteName),
-                    getPipetteNameSpecs(right.pipetteName as PipetteName),
-                  ].some(
-                    pipetteSpecs => pipetteSpecs && pipetteSpecs.channels !== 1
-                  )
+  const crashablePipetteSelected = getIsCrashablePipetteSelected(
+    pipettesByMount
+  )
 
-                const crashablePipetteSelected = getIsCrashablePipetteSelected(
-                  values.pipettesByMount
-                )
+  const showTempPipetteCollisons =
+    crashablePipetteSelected && hasCrashableTemperatureModuleSelected
+  const showMagPipetteCollisons =
+    crashablePipetteSelected && hasCrashableMagnetModuleSelected
 
-                const showTempPipetteCollisons =
-                  crashablePipetteSelected &&
-                  hasCrashableTemperatureModuleSelected
-                const showMagPipetteCollisons =
-                  crashablePipetteSelected && hasCrashableMagnetModuleSelected
+  return (
+    <Modal
+      contentsClassName={cx(
+        styles.new_file_modal_contents,
+        modalStyles.scrollable_modal_wrapper
+      )}
+      className={cx(modalStyles.modal, styles.new_file_modal)}
+    >
+      <div className={modalStyles.scrollable_modal_wrapper}>
+        <div className={modalStyles.scrollable_modal_scroll}>
+          <form onSubmit={handleSubmit(handleFormSubmit)}>
+            <h2 className={styles.new_file_modal_title}>
+              {t('edit_pipettes.title')}
+            </h2>
+            <PipetteFields
+              values={pipettesByMount}
+              setValue={setValue}
+              formState={formState}
+              trigger={trigger}
+              robotType={robotType}
+              control={control}
+            />
+            {!moduleRestrictionsDisabled && (
+              <CrashInfoBox
+                showDiagram
+                showMagPipetteCollisons={showMagPipetteCollisons}
+                showTempPipetteCollisons={showTempPipetteCollisons}
+                showHeaterShakerLabwareCollisions={hasHeaterShakerSelected}
+                showHeaterShakerModuleCollisions={hasHeaterShakerSelected}
+                showHeaterShakerPipetteCollisions={
+                  showHeaterShakerPipetteCollisions
+                }
+              />
+            )}
+            <div className={modalStyles.button_row}>
+              <OutlineButton
+                onClick={props.closeModal}
+                tabIndex={7}
+                className={styles.button}
+              >
+                {t('button:cancel')}
+              </OutlineButton>
+              <OutlineButton
+                disabled={!pipetteSelectionIsValid}
+                onClick={handleSubmit(handleFormSubmit)}
+                tabIndex={6}
+                className={styles.button}
+              >
+                {t('button:save')}
+              </OutlineButton>
+            </div>
+          </form>
 
-                return (
-                  <>
-                    <form onSubmit={handleSubmit}>
-                      {showProtocolFields && (
-                        <div className={styles.protocol_file_group}>
-                          <Flex gridGap={SPACING.spacing16}>
-                            <h2 className={styles.new_file_modal_title}>
-                              {i18n.t('modal.new_protocol.title.PROTOCOL_FILE')}
-                            </h2>
-                            <Flex
-                              flexDirection={DIRECTION_COLUMN}
-                              width="10rem"
-                              alignItems={ALIGN_STRETCH}
-                            >
-                              <DropdownField
-                                options={ROBOT_TYPE_OPTIONS}
-                                onChange={handleChange}
-                                value={values.fields.robotType}
-                                name="fields.robotType"
-                              />
-                            </Flex>
-                          </Flex>
-                          <FormGroup
-                            className={formStyles.stacked_row}
-                            label="Name"
-                          >
-                            <InputField
-                              autoFocus
-                              tabIndex={1}
-                              placeholder={i18n.t(
-                                'form.generic.default_protocol_name'
-                              )}
-                              name="fields.name"
-                              value={values.fields.name}
-                              onChange={handleChange}
-                              onBlur={handleBlur}
-                            />
-                          </FormGroup>
-                        </div>
-                      )}
-
-                      <h2 className={styles.new_file_modal_title}>
-                        {showProtocolFields
-                          ? i18n.t('modal.new_protocol.title.PROTOCOL_PIPETTES')
-                          : i18n.t('modal.edit_pipettes.title')}
-                      </h2>
-
-                      <PipetteFields
-                        initialTabIndex={1}
-                        values={values.pipettesByMount}
-                        onFieldChange={handleChange}
-                        onSetFieldValue={setFieldValue}
-                        onBlur={handleBlur}
-                        // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module tiprackDefURI inside of pipettesByMount exists, because it could be undefined
-                        errors={errors.pipettesByMount ?? null}
-                        // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module tiprackDefURI inside of pipettesByMount exists, because it could be undefined
-                        touched={touched.pipettesByMount ?? null}
-                        onSetFieldTouched={setFieldTouched}
-                        robotType={robotType}
-                      />
-
-                      {this.props.showModulesFields && (
-                        <div className={styles.protocol_modules_group}>
-                          <h2 className={styles.new_file_modal_title}>
-                            {i18n.t(
-                              'modal.new_protocol.title.PROTOCOL_MODULES'
-                            )}
-                          </h2>
-                          <ModuleFields
-                            // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module model inside of modulesByType exists, because it could be undefined
-                            errors={errors.modulesByType ?? null}
-                            values={values.modulesByType}
-                            onFieldChange={handleChange}
-                            onBlur={handleBlur}
-                            // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module model inside of modulesByType exists, because it could be undefined
-                            touched={touched.modulesByType ?? null}
-                            onSetFieldTouched={setFieldTouched}
-                          />
-                        </div>
-                      )}
-                      {!moduleRestrictionsDisabled && (
-                        <CrashInfoBox
-                          showDiagram
-                          showMagPipetteCollisons={showMagPipetteCollisons}
-                          showTempPipetteCollisons={showTempPipetteCollisons}
-                          showHeaterShakerLabwareCollisions={
-                            hasHeaterShakerSelected
-                          }
-                          showHeaterShakerModuleCollisions={
-                            hasHeaterShakerSelected
-                          }
-                          showHeaterShakerPipetteCollisions={
-                            showHeaterShakerPipetteCollisions
-                          }
-                        />
-                      )}
-                      <div className={modalStyles.button_row}>
-                        <OutlineButton
-                          onClick={this.props.onCancel}
-                          tabIndex={7}
-                          className={styles.button}
-                        >
-                          {i18n.t('button.cancel')}
-                        </OutlineButton>
-                        <OutlineButton
-                          disabled={!pipetteSelectionIsValid}
-                          // @ts-expect-error(sa, 2021-6-21): Formik handleSubmit type not cooporating with OutlineButton onClick type
-                          onClick={handleSubmit}
-                          tabIndex={6}
-                          className={styles.button}
-                        >
-                          {i18n.t('button.save')}
-                        </OutlineButton>
-                      </div>
-                    </form>
-
-                    {this.state.showEditPipetteConfirmation && (
-                      <StepChangesConfirmModal
-                        onCancel={this.handleCancel}
-                        onConfirm={handleSubmit}
-                      />
-                    )}
-                  </>
-                )
-              }}
-            </Formik>
-          </div>
+          {showEditPipetteConfirmation ? (
+            <StepChangesConfirmModal
+              onCancel={() => setShowEditPipetteConfirmation(false)}
+              onConfirm={handleSubmit(handleFormSubmit)}
+            />
+          ) : null}
         </div>
-      </Modal>
-    )
-  }
+      </div>
+    </Modal>
+  )
 }

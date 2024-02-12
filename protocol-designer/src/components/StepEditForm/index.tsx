@@ -1,11 +1,16 @@
-import { useConditionalConfirm } from '@opentrons/components'
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
+import { useConditionalConfirm } from '@opentrons/components'
 import { actions } from '../../steplist'
 import { actions as stepsActions } from '../../ui/steps'
 import { resetScrollElements } from '../../ui/steps/utils'
-import { selectors as stepFormSelectors } from '../../step-forms'
+import {
+  getHydratedForm,
+  selectors as stepFormSelectors,
+} from '../../step-forms'
 import { maskField } from '../../steplist/fieldLevel'
+import { getInvariantContext } from '../../step-forms/selectors'
 import { AutoAddPauseUntilTempStepModal } from '../modals/AutoAddPauseUntilTempStepModal'
 import { AutoAddPauseUntilHeaterShakerTempStepModal } from '../modals/AutoAddPauseUntilHeaterShakerTempStepModal'
 import {
@@ -17,44 +22,39 @@ import {
 import { makeSingleEditFieldProps } from './fields/makeSingleEditFieldProps'
 import { StepEditFormComponent } from './StepEditFormComponent'
 import { getDirtyFields } from './utils'
-import { BaseState, ThunkDispatch } from '../../types'
-import { FormData, StepFieldName, StepIdType } from '../../form-types'
 
-interface SP {
-  canSave: boolean
-  formData?: FormData | null
-  formHasChanges: boolean
-  isNewStep: boolean
-  isPristineSetTempForm: boolean
-  isPristineSetHeaterShakerTempForm: boolean
-}
-interface DP {
-  deleteStep: (stepId: string) => unknown
-  handleClose: () => unknown
-  saveSetTempFormWithAddedPauseUntilTemp: () => unknown
-  saveHeaterShakerFormWithAddedPauseUntilTemp: () => unknown
-  saveStepForm: () => unknown
-  handleChangeFormInput: (name: string, value: unknown) => void
-}
-type StepEditFormManagerProps = SP & DP
+import type { ThunkDispatch } from '../../types'
+import type { StepFieldName, StepIdType } from '../../form-types'
 
-const StepEditFormManager = (
-  props: StepEditFormManagerProps
-): JSX.Element | null => {
-  const {
-    canSave,
-    deleteStep,
-    formData,
-    formHasChanges,
-    handleChangeFormInput,
-    handleClose,
-    isNewStep,
-    isPristineSetTempForm,
-    isPristineSetHeaterShakerTempForm,
-    saveSetTempFormWithAddedPauseUntilTemp,
-    saveHeaterShakerFormWithAddedPauseUntilTemp,
-    saveStepForm,
-  } = props
+export const StepEditForm = (): JSX.Element | null => {
+  const { t } = useTranslation('tooltip')
+  const dispatch = useDispatch<ThunkDispatch<any>>()
+  const canSave = useSelector(stepFormSelectors.getCurrentFormCanBeSaved)
+  const formData = useSelector(stepFormSelectors.getUnsavedForm)
+  const formHasChanges = useSelector(
+    stepFormSelectors.getCurrentFormHasUnsavedChanges
+  )
+  const isNewStep = useSelector(stepFormSelectors.getCurrentFormIsPresaved)
+  const isPristineSetHeaterShakerTempForm = useSelector(
+    stepFormSelectors.getUnsavedFormIsPristineHeaterShakerForm
+  )
+  const isPristineSetTempForm = useSelector(
+    stepFormSelectors.getUnsavedFormIsPristineSetTempForm
+  )
+  const invariantContext = useSelector(getInvariantContext)
+  const deleteStep = (stepId: StepIdType): void =>
+    dispatch(actions.deleteStep(stepId))
+  const handleClose = (): void => dispatch(actions.cancelStepForm())
+  const saveHeaterShakerFormWithAddedPauseUntilTemp = (): void =>
+    dispatch(stepsActions.saveHeaterShakerFormWithAddedPauseUntilTemp())
+  const saveSetTempFormWithAddedPauseUntilTemp = (): void =>
+    dispatch(stepsActions.saveSetTempFormWithAddedPauseUntilTemp())
+  const saveStepForm = (): void => dispatch(stepsActions.saveStepForm())
+
+  const handleChangeFormInput = (name: string, value: unknown): void => {
+    const maskedValue = maskField(name, value)
+    dispatch(actions.changeFormInput({ update: { [name]: maskedValue } }))
+  }
 
   const [
     showMoreOptionsModal,
@@ -125,6 +125,8 @@ const StepEditFormManager = (
     return null
   }
 
+  const hydratedForm = getHydratedForm(formData, invariantContext)
+
   const focusHandlers = {
     focusedField,
     dirtyFields,
@@ -135,7 +137,9 @@ const StepEditFormManager = (
   const propsForFields = makeSingleEditFieldProps(
     focusHandlers,
     formData,
-    handleChangeFormInput
+    handleChangeFormInput,
+    hydratedForm,
+    t
   )
   let handleSave = saveStepForm
   if (isPristineSetTempForm) {
@@ -148,7 +152,7 @@ const StepEditFormManager = (
   }
 
   return (
-    <>
+    <React.Fragment key={formData.id}>
       {showConfirmDeleteModal && (
         <ConfirmDeleteModal
           modalType={DELETE_STEP_FORM}
@@ -194,61 +198,6 @@ const StepEditFormManager = (
           toggleMoreOptionsModal,
         }}
       />
-    </>
+    </React.Fragment>
   )
 }
-
-const mapStateToProps = (state: BaseState): SP => {
-  return {
-    canSave: stepFormSelectors.getCurrentFormCanBeSaved(state),
-    formData: stepFormSelectors.getUnsavedForm(state),
-    formHasChanges: stepFormSelectors.getCurrentFormHasUnsavedChanges(state),
-    isNewStep: stepFormSelectors.getCurrentFormIsPresaved(state),
-    isPristineSetHeaterShakerTempForm: stepFormSelectors.getUnsavedFormIsPristineHeaterShakerForm(
-      state
-    ),
-    isPristineSetTempForm: stepFormSelectors.getUnsavedFormIsPristineSetTempForm(
-      state
-    ),
-  }
-}
-
-const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DP => {
-  const deleteStep = (stepId: StepIdType): void =>
-    dispatch(actions.deleteStep(stepId))
-  const handleClose = (): void => dispatch(actions.cancelStepForm())
-  const saveHeaterShakerFormWithAddedPauseUntilTemp = (): void =>
-    dispatch(stepsActions.saveHeaterShakerFormWithAddedPauseUntilTemp())
-  const saveSetTempFormWithAddedPauseUntilTemp = (): void =>
-    dispatch(stepsActions.saveSetTempFormWithAddedPauseUntilTemp())
-  const saveStepForm = (): void => dispatch(stepsActions.saveStepForm())
-
-  const handleChangeFormInput = (name: string, value: unknown): void => {
-    const maskedValue = maskField(name, value)
-    dispatch(actions.changeFormInput({ update: { [name]: maskedValue } }))
-  }
-
-  return {
-    deleteStep,
-    handleChangeFormInput,
-    handleClose,
-    saveSetTempFormWithAddedPauseUntilTemp,
-    saveStepForm,
-    saveHeaterShakerFormWithAddedPauseUntilTemp,
-  }
-}
-
-// NOTE(IL, 2020-04-22): This is using connect instead of useSelector in order to
-// avoid zombie children in the many connected field components.
-// (Children of a useSelector parent must always be written to use selectors defensively
-// if their parent (StepEditForm) is NOT using connect.
-// It doesn't matter if the children are using connect or useSelector,
-// only the parent matters.)
-// https://react-redux.js.org/api/hooks#stale-props-and-zombie-children
-export const StepEditForm = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)((props: StepEditFormManagerProps) => (
-  // key by ID so manager state doesn't persist across different forms
-  <StepEditFormManager key={props.formData?.id ?? 'empty'} {...props} />
-))

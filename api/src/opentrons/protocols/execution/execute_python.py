@@ -9,7 +9,7 @@ from opentrons.drivers.smoothie_drivers.errors import SmoothieAlarm
 from opentrons.protocol_api import ProtocolContext
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
 from opentrons.protocols.types import PythonProtocol, MalformedPythonProtocolError
-from opentrons.hardware_control import ExecutionCancelledError
+from opentrons_shared_data.errors.exceptions import ExecutionCancelledError
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -47,10 +47,19 @@ def run_python(proto: PythonProtocol, context: ProtocolContext):
     # If the protocol is written correctly, it will have defined a function
     # like run(context: ProtocolContext). If so, that function is now in the
     # current scope.
+
+    # TODO(mm, 2023-10-11): This coupling to opentrons.protocols.parse is fragile.
+    # Can we get the correct filename directly from proto.contents?
     if proto.filename and proto.filename.endswith("zip"):
+        # The ".zip" extension needs to match what opentrons.protocols.parse recognizes as a bundle,
+        # and the "protocol.ot2.py" fallback needs to match what opentrons.protocol.py sets as the
+        # AST filename.
         filename = "protocol.ot2.py"
     else:
+        # "<protocol>" needs to match what opentrons.protocols.parse sets as the fallback
+        # AST filename.
         filename = proto.filename or "<protocol>"
+
     try:
         _runfunc_ok(new_globs.get("run"))
     except SyntaxError as se:
