@@ -149,6 +149,7 @@ class OT3Simulator(FlexBackend):
         self._initialized = False
         self._lights = {"button": False, "rails": False}
         self._gear_motor_position: Dict[Axis, float] = {}
+        self._engaged_axes: Dict[Axis, bool] = {}
         self._feature_flags = feature_flags or HardwareFeatureFlags()
 
         def _sanitize_attached_instrument(
