@@ -274,5 +274,5 @@ test-js-internal:
 	yarn vitest $(tests) $(test_opts) $(cov_opts)
 
 .PHONY: test-js-%
-test-js-%: 
+test-js-%:
 	$(MAKE) test-js-internal tests="$(if $(tests),$(foreach test,$(tests),$*/$(test)),$*)" test_opts="$(test_opts)" cov_opts="$(cov_opts)"
