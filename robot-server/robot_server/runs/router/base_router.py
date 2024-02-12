@@ -27,12 +27,12 @@ from robot_server.service.json_api import (
     PydanticResponse,
 )
 
-from robot_server.protocols import (
+from robot_server.protocols.dependencies import get_protocol_store
+from robot_server.protocols.protocol_store import (
     ProtocolStore,
-    ProtocolNotFound,
     ProtocolNotFoundError,
-    get_protocol_store,
 )
+from robot_server.protocols.router import ProtocolNotFound
 
 from ..run_models import RunNotFoundError
 from ..run_auto_deleter import RunAutoDeleter

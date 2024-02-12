@@ -13,7 +13,7 @@ from opentrons.protocol_engine import (
     Command,
 )
 
-from robot_server.protocols import ProtocolResource
+from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.notifications import RunsPublisher
 
