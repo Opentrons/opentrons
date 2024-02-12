@@ -304,6 +304,7 @@ def load_with_mutable_configurations(
 
     :param str pipette_model: The pipette model name (i.e. "p10_single_v1.3")
                               for which to load configuration
+    :param pipette_override_path: The path to the on-disk file which has the config overrides.
     :param pipette_serial_number: An (optional) unique ID for the pipette to locate
                        config overrides. If the ID is not specified, the system
                        assumes this is a simulated pipette and does not

@@ -271,7 +271,7 @@ def test_load_with_overrides(
         dict_loaded_configs = loaded_base_configurations.dict(by_alias=True)
         dict_loaded_configs["pickUpTipConfigurations"]["pressFit"][
             "speedByTipCount"
-        ] = 5.0
+        ] = {1: 5.0, 2: 5.0, 3: 5.0, 4: 5.0, 5: 5.0, 6: 5.0, 7: 5.0, 8: 5.0}
         updated_configurations_dict = updated_configurations.dict(by_alias=True)
         assert set(dict_loaded_configs.pop("quirks")) == set(
             updated_configurations_dict.pop("quirks")
