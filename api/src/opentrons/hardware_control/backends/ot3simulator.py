@@ -376,6 +376,8 @@ class OT3Simulator(FlexBackend):
         Returns:
             None
         """
+        for ax in origin:
+            self._engaged_axes[ax] = True
         self._position.update(target)
         self._encoder_position.update(target)
 
@@ -398,6 +400,7 @@ class OT3Simulator(FlexBackend):
         for h in homed:
             self._position[h] = self._get_home_position()[h]
             self._motor_status[h] = MotorStatus(True, True)
+            self._engaged_axes[h] = True
         return axis_pad(self._position, 0.0)
 
     @ensure_yield
@@ -652,6 +655,8 @@ class OT3Simulator(FlexBackend):
         return None
 
     async def is_motor_engaged(self, axis: Axis) -> bool:
+        if not axis in self._engaged_axes.keys():
+            return False
         return self._engaged_axes[axis]
 
     @ensure_yield
