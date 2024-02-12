@@ -4,3 +4,6 @@
 // before the release of this code to prevent Funny desktop app behavior when the viewport
 // is precisely 600x1024
 export const touchscreenMediaQuerySpecs = '(height: 600px) and (width: 1024px)'
+
+export const isTouchscreen = window.matchMedia(touchscreenMediaQuerySpecs)
+  .matches
