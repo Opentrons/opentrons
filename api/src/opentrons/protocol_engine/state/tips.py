@@ -237,7 +237,7 @@ class TipView(HasState[TipState]):
 
         elif nozzle_map.starting_nozzle == "A12":
             # Define the critical well by the position of the well relative to Tip Rack entry point H1
-            critical_column = num_nozzle_cols
+            critical_column = num_nozzle_cols - 1
             critical_row = len(columns[critical_column]) - num_nozzle_rows
 
             while critical_column <= 12:
@@ -260,7 +260,7 @@ class TipView(HasState[TipState]):
         elif nozzle_map.starting_nozzle == "H1":
             # Define the critical well by the position of the well relative to Tip Rack entry point A12
             critical_column = len(columns) - num_nozzle_cols
-            critical_row = num_nozzle_rows
+            critical_row = num_nozzle_rows - 1
 
             while critical_column >= 0:
                 tip_cluster = _identify_tip_cluster(critical_column, critical_row)
@@ -281,8 +281,8 @@ class TipView(HasState[TipState]):
 
         elif nozzle_map.starting_nozzle == "H12":
             # Define the critical well by the position of the well relative to Tip Rack entry point A1
-            critical_column = num_nozzle_cols
-            critical_row = num_nozzle_rows
+            critical_column = num_nozzle_cols - 1
+            critical_row = num_nozzle_rows - 1
 
             while critical_column <= 12:
                 tip_cluster = _identify_tip_cluster(critical_column, critical_row)

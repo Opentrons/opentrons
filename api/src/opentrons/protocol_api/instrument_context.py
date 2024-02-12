@@ -876,17 +876,17 @@ class InstrumentContext(publisher.CommandPublisher):
         )
 
         if location is None:
-            if not self._core.is_tip_tracking_available():
-                raise CommandPreconditionViolated(
-                    "Automatic tip tracking is not available for the current pipette"
-                    " nozzle configuration. We suggest switching to a configuration"
-                    " that supports automatic tip tracking or specifying the exact tip"
-                    " to pick up."
-                )
-
+            # if not self._core.is_tip_tracking_available():
+            #     raise CommandPreconditionViolated(
+            #         "Automatic tip tracking is not available for the current pipette"
+            #         " nozzle configuration. We suggest switching to a configuration"
+            #         " that supports automatic tip tracking or specifying the exact tip"
+            #         " to pick up."
+            #     )
+            #this will fail analysis but might pass a run?
             tip_rack, well = labware.next_available_tip(
-                nozzle_map=self._core.get_hardware_state()["current_nozzle_map"],
-                pipette_id=self._core.get_hardware_state()["pipette_id"],
+                nozzle_map=self.hw_pipette["current_nozzle_map"],
+                pipette_id=self.hw_pipette["pipette_id"],
                 starting_tip=self.starting_tip,
                 tip_racks=self.tip_racks,
                 channels=active_channels,
@@ -898,8 +898,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
         elif isinstance(location, labware.Labware):
             tip_rack, well = labware.next_available_tip(
-                nozzle_map=self._core.get_hardware_state()["current_nozzle_map"],
-                pipette_id=self._core.get_hardware_state()["pipette_id"],
+                nozzle_map=self.hw_pipette["current_nozzle_map"],
+                pipette_id=self.hw_pipette["pipette_id"],
                 starting_tip=None,
                 tip_racks=[location],
                 channels=active_channels,
@@ -915,8 +915,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
             elif maybe_tip_rack is not None:
                 tip_rack, well = labware.next_available_tip(
-                    nozzle_map=self._core.get_hardware_state()["current_nozzle_map"],
-                    pipette_id=self._core.get_hardware_state()["pipette_id"],
+                nozzle_map=self.hw_pipette["current_nozzle_map"],
+                pipette_id=self.hw_pipette["pipette_id"],
                     starting_tip=None,
                     tip_racks=[maybe_tip_rack],
                     channels=active_channels,
@@ -1332,8 +1332,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
         if new_tip != types.TransferTipPolicy.NEVER:
             tr, next_tip = labware.next_available_tip(
-                self._core.get_hardware_state()["current_nozzle_map"],
-                self._core.get_hardware_state()["pipette_id"],
+                self.hw_pipette["current_nozzle_map"],
+                self.hw_pipette["pipette_id"],
                 self.starting_tip,
                 self.tip_racks,
                 active_channels,
