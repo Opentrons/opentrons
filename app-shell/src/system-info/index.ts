@@ -26,23 +26,6 @@ const IFACE_POLL_INTERVAL_MS = 30000
 
 const log = createLogger('system-info')
 
-// format USBDevice to UsbDevice type
-const createUsbDevice = (device: USBDevice): UsbDevice => {
-  return {
-    vendorId: device.vendorId,
-    productId: device.productId,
-    productName: device.productName != null ? device.productName : 'no name',
-    manufacturerName:
-      device.manufacturerName != null
-        ? device.manufacturerName
-        : 'no manufacture',
-    serialNumber:
-      device.serialNumber != null ? device.serialNumber : 'no serial',
-  }
-}
-const createUsbDevices = (devices: USBDevice[]): UsbDevice[] =>
-  devices.map((device: USBDevice) => createUsbDevice(device))
-
 const addDriverVersion = (device: UsbDevice): Promise<UsbDevice> => {
   if (
     isWindows() &&
@@ -110,9 +93,7 @@ export function registerSystemInfo(
 
         usbMonitor
           .getAllDevices()
-          .then(devices =>
-            Promise.all(createUsbDevices(devices).map(addDriverVersion))
-          )
+          .then(devices => Promise.all(devices.map(addDriverVersion)))
           .then(devices => {
             dispatch(SystemInfo.initialized(devices, getActiveInterfaces()))
           })
