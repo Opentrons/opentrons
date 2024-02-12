@@ -134,9 +134,14 @@ class ProtocolCore(
     def append_disposal_location(
         self,
         disposal_location: Union[Labware, TrashBin, WasteChute],
-        skip_add_to_engine: bool = False,
     ) -> None:
-        """Append a disposal location object to the core"""
+        """Append a disposal location object to the core."""
+        self._disposal_locations.append(disposal_location)
+
+    def add_disposal_location_to_engine(
+        self, disposal_location: Union[TrashBin, WasteChute]
+    ) -> None:
+        """Verify and add disposal location to engine store and append it to the core."""
         if isinstance(disposal_location, TrashBin):
             self._engine_client.state.addressable_areas.raise_if_area_not_in_deck_configuration(
                 disposal_location.area_name
@@ -152,8 +157,7 @@ class ProtocolCore(
                 existing_labware_ids=list(self._labware_cores_by_id.keys()),
                 existing_module_ids=list(self._module_cores_by_id.keys()),
             )
-            if not skip_add_to_engine:
-                self._engine_client.add_addressable_area(disposal_location.area_name)
+            self._engine_client.add_addressable_area(disposal_location.area_name)
         elif isinstance(disposal_location, WasteChute):
             # TODO(jbl 2024-01-25) hardcoding this specific addressable area should be refactored
             #   when analysis is fixed up
@@ -166,9 +170,8 @@ class ProtocolCore(
             self._engine_client.state.addressable_areas.raise_if_area_not_in_deck_configuration(
                 "1ChannelWasteChute"
             )
-            if not skip_add_to_engine:
-                self._engine_client.add_addressable_area("1ChannelWasteChute")
-        self._disposal_locations.append(disposal_location)
+            self._engine_client.add_addressable_area("1ChannelWasteChute")
+        self.append_disposal_location(disposal_location)
 
     def get_disposal_locations(self) -> List[Union[Labware, TrashBin, WasteChute]]:
         """Get disposal locations."""
