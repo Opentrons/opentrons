@@ -162,10 +162,11 @@ def create_protocol_context(
         deck=deck,
         bundled_data=bundled_data,
     )
-    # If we're loading an engine based core into the context, and we're on api level 2.16 or above, and on an OT-2
-    # we need to insert a fixed trash addressable area into the protocol engine for correctness in anything that relies
-    # on knowing what addressable areas have been loaded (and any checks involving trash geometry). Because the method
-    # that uses this in the core relies on the sync client
+    # If we're loading an engine based core into the context, and we're on api level 2.16 or above, on an OT-2 we need
+    # to insert a fixed trash addressable area into the protocol engine, for correctness in anything that relies on
+    # knowing what addressable areas have been loaded (and any checks involving trash geometry). Because the method
+    # that uses this in the core relies on the sync client and this code will run in the main thread (which if called
+    # will cause a deadlock), we're directly calling the protocol engine method here where we have access to it.
     if (
         protocol_engine is not None
         and should_load_fixed_trash_area_for_python_protocol(
