@@ -12,11 +12,13 @@ class AbstractInstrument(ABC, Generic[InstrumentConfig]):
     """Defines the common methods of an instrument."""
 
     @property
+    @abstractmethod
     def model(self) -> str:
         """Return model of the instrument."""
         ...
 
     @property
+    @abstractmethod
     def config(self) -> InstrumentConfig:
         """Instrument config in dataclass format."""
         ...

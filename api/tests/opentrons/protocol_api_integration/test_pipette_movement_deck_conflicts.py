@@ -138,7 +138,7 @@ def test_deck_conflicts_for_96_ch_a1_column_configuration() -> None:
     with pytest.raises(
         PartialTipMovementNotAllowedError, match="collision with items in deck slot"
     ):
-        instrument.aspirate(25, badly_placed_plate.wells_by_name()["A1"])
+        instrument.aspirate(25, badly_placed_plate.wells_by_name()["A10"])
 
     with pytest.raises(
         PartialTipMovementNotAllowedError, match="outside of robot bounds"

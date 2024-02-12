@@ -1,12 +1,15 @@
 """Geometry state getters."""
 import enum
-from numpy import array, dot
+from numpy import array, dot, double as npdouble
+from numpy.typing import NDArray
 from typing import Optional, List, Tuple, Union, cast, TypeVar, Dict
 
 from opentrons.types import Point, DeckSlotName, StagingSlotName, MountType
-from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
+from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.deck.dev_types import CutoutFixture
+from opentrons_shared_data.pipette import PIPETTE_X_SPAN
+from opentrons_shared_data.pipette.dev_types import ChannelCount
 
 from .. import errors
 from ..errors import (
@@ -39,15 +42,13 @@ from ..types import (
     OnDeckLabwareLocation,
     AddressableAreaLocation,
     AddressableOffsetVector,
+    StagingSlotLocation,
 )
 from .config import Config
 from .labware import LabwareView
 from .modules import ModuleView
 from .pipettes import PipetteView
 from .addressable_areas import AddressableAreaView
-
-from opentrons_shared_data.pipette import PIPETTE_X_SPAN
-from opentrons_shared_data.pipette.dev_types import ChannelCount
 
 
 SLOT_WIDTH = 128
@@ -149,7 +150,9 @@ class GeometryView:
             highest_fixture_z,
         )
 
-    def get_highest_z_in_slot(self, slot: DeckSlotLocation) -> float:
+    def get_highest_z_in_slot(
+        self, slot: Union[DeckSlotLocation, StagingSlotLocation]
+    ) -> float:
         """Get the highest Z-point of all items stacked in the given deck slot."""
         slot_item = self.get_slot_item(slot.slotName)
         if isinstance(slot_item, LoadedModule):
@@ -294,8 +297,10 @@ class GeometryView:
         # Check if the module has moved from one side of the deck to the other
         if calibrated_slot_column != current_slot_column:
             # Since the module was rotated, the calibration offset vector needs to be rotated by 180 degrees along the z axis
-            saved_offset = array([offset.x, offset.y, offset.z])
-            rotation_matrix = array([[-1, 0, 0], [0, -1, 0], [0, 0, 1]])
+            saved_offset: NDArray[npdouble] = array([offset.x, offset.y, offset.z])
+            rotation_matrix: NDArray[npdouble] = array(
+                [[-1, 0, 0], [0, -1, 0], [0, 0, 1]]
+            )
             new_offset = dot(saved_offset, rotation_matrix)
             offset = ModuleOffsetVector(
                 x=new_offset[0], y=new_offset[1], z=new_offset[2]
@@ -601,7 +606,7 @@ class GeometryView:
             self._labware.raise_if_labware_in_location(location)
         if isinstance(location, DeckSlotLocation):
             self._modules.raise_if_module_in_location(location)
-        return cast(_LabwareLocation, location)
+        return location
 
     def get_labware_grip_point(
         self,

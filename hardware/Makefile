@@ -144,5 +144,5 @@ emulator:
 	echo "Nothing here yet"
 
 .PHONY: deploy
-deploy: wheel
-	$(call python_upload_package,$(twine_auth_args),$(twine_repository_url),$(wheel_file))
+deploy: wheel sdist
+	$(call python_upload_package,$(twine_auth_args),$(twine_repository_url),$(wheel_file),$(sdist_file))

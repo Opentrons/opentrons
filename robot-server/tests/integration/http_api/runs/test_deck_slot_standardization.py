@@ -1,7 +1,7 @@
 from typing import AsyncGenerator
 
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
 from ...robot_client import RobotClient
 

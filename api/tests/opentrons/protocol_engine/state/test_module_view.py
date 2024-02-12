@@ -1,7 +1,7 @@
 """Tests for module state accessors in the protocol engine state store."""
 import pytest
 from math import isclose
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
 from contextlib import nullcontext as does_not_raise
 from typing import ContextManager, Dict, NamedTuple, Optional, Type, Union, Any

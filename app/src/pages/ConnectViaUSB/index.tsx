@@ -34,7 +34,7 @@ export function ConnectViaUSB(): JSX.Element {
 
   return (
     <>
-      <StepMeter totalSteps={6} currentStep={2} />
+      <StepMeter totalSteps={5} currentStep={1} />
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}

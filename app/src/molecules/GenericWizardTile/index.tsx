@@ -19,9 +19,11 @@ import {
   DISPLAY_INLINE_BLOCK,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
+  useHoverTooltip,
 } from '@opentrons/components'
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
+import { Tooltip } from '../../atoms/Tooltip'
 import { NeedHelpLink } from '../../organisms/CalibrationPanels'
 import { SmallButton } from '../../atoms/buttons'
 
@@ -90,6 +92,7 @@ export interface GenericWizardTileProps {
   proceedIsDisabled?: boolean
   proceedButton?: JSX.Element
   backIsDisabled?: boolean
+  disableProceedReason?: string
 }
 
 export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
@@ -104,9 +107,11 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
     proceedIsDisabled,
     proceedButton,
     backIsDisabled,
+    disableProceedReason,
   } = props
   const { t } = useTranslation('shared')
   const isOnDevice = useSelector(getIsOnDevice)
+  const [targetProps, tooltipProps] = useHoverTooltip()
 
   let buttonPositioning: string = ''
   if (
@@ -158,19 +163,35 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
         {getHelp != null ? <NeedHelpLink href={getHelp} /> : null}
         {proceed != null && proceedButton == null ? (
           isOnDevice ? (
-            <SmallButton
-              disabled={proceedIsDisabled}
-              buttonText={proceedButtonText}
-              onClick={proceed}
-            />
+            <>
+              <SmallButton
+                disabled={proceedIsDisabled}
+                buttonText={proceedButtonText}
+                onClick={proceed}
+                {...targetProps}
+              />
+              {disableProceedReason != null && (
+                <Tooltip tooltipProps={tooltipProps}>
+                  {disableProceedReason}
+                </Tooltip>
+              )}
+            </>
           ) : (
-            <PrimaryButton
-              disabled={proceedIsDisabled}
-              css={CAPITALIZE_FIRST_LETTER_STYLE}
-              onClick={proceed}
-            >
-              {proceedButtonText}
-            </PrimaryButton>
+            <>
+              <PrimaryButton
+                disabled={proceedIsDisabled}
+                css={CAPITALIZE_FIRST_LETTER_STYLE}
+                onClick={proceed}
+                {...targetProps}
+              >
+                {proceedButtonText}
+              </PrimaryButton>
+              {disableProceedReason != null && (
+                <Tooltip tooltipProps={tooltipProps}>
+                  {disableProceedReason}
+                </Tooltip>
+              )}
+            </>
           )
         ) : null}
         {proceed == null && proceedButton != null ? proceedButton : null}

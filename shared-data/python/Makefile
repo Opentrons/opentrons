@@ -118,8 +118,8 @@ push-ot3: push-no-restart-ot3
 	$(call restart-server,$(host),$(ssh_key),$(ssh_opts),opentrons-robot-server)
 
 .PHONY: deploy
-deploy: wheel
-	$(call python_upload_package,$(twine_auth_args),$(twine_repository_url),$(wheel_file))
+deploy: wheel sdist
+	$(call python_upload_package,$(twine_auth_args),$(twine_repository_url),$(wheel_file),$(sdist_file))
 
 .PHONY: test
 test:

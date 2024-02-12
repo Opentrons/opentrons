@@ -446,7 +446,7 @@ class OT3Simulator(FlexBackend):
     def _attached_to_mount(
         self, mount: OT3Mount, expected_instr: Optional[PipetteName]
     ) -> OT3AttachedInstruments:
-        init_instr = self._attached_instruments.get(mount, {"model": None, "id": None})  # type: ignore
+        init_instr = self._attached_instruments.get(mount, {"model": None, "id": None})
         if mount is OT3Mount.GRIPPER:
             return self._attached_gripper_to_mount(cast(GripperSpec, init_instr))
         return self._attached_pipette_to_mount(

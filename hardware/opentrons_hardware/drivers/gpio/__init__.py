@@ -30,7 +30,7 @@ class OT3GPIO:
         If gpiod is not available, a mock will be used and the problem will be logged.
         """
         try:
-            import gpiod  # type: ignore[import]
+            import gpiod  # type: ignore[import-not-found]
 
             return gpiod
         except ImportError:

@@ -41,7 +41,7 @@ class FileMeta:
 
 def save_upload(directory: Path, upload_file: UploadFile) -> FileMeta:
     """Save an uploaded file."""
-    path = directory / upload_file.filename
+    path = directory / (upload_file.filename or "")
 
     contents = upload_file.file.read()
     content_hash = hashlib.sha256(contents).hexdigest()

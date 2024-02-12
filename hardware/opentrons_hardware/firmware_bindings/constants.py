@@ -250,6 +250,13 @@ class MessageId(int, Enum):
     peripheral_status_response = 0x8D
     baseline_sensor_response = 0x8E
 
+    set_hepa_fan_state_request = 0x90
+    get_hepa_fan_state_request = 0x91
+    get_hepa_fan_state_response = 0x92
+    set_hepa_uv_state_request = 0x93
+    get_hepa_uv_state_request = 0x94
+    get_hepa_uv_state_response = 0x95
+
 
 @unique
 class ErrorSeverity(int, Enum):

@@ -272,7 +272,7 @@ async def test_home_flagged_axes(
     expected: str,
 ) -> None:
     """It should only home un-homed axes."""
-    smoothie.home = AsyncMock()  # type: ignore[assignment]
+    smoothie.home = AsyncMock()  # type: ignore[method-assign]
     await smoothie.update_homed_flags(home_flags)
 
     await smoothie.home_flagged_axes(axes_string=axis_string)
@@ -292,7 +292,7 @@ async def test_home_flagged_axes_no_call(
     smoothie: driver_3_0.SmoothieDriver, home_flags: Dict[str, bool], axis_string: str
 ) -> None:
     """It should not home homed axes."""
-    smoothie.home = AsyncMock()  # type: ignore[assignment]
+    smoothie.home = AsyncMock()  # type: ignore[method-assign]
     await smoothie.update_homed_flags(home_flags)
 
     await smoothie.home_flagged_axes(axes_string=axis_string)
