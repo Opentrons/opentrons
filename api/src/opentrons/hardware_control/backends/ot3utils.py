@@ -351,8 +351,13 @@ def motor_nodes(devices: Set[FirmwareTarget]) -> Set[NodeId]:
         NodeId.head_bootloader,
         NodeId.gripper_bootloader,
     }
+    hepa_nv_nodes = {
+        NodeId.hepa_uv,
+        NodeId.hepa_uv_bootloader,
+    }
     # remove any bootloader nodes
     motor_nodes -= bootloader_nodes
+    motor_nodes -= hepa_nv_nodes
     # filter out usb nodes
     return {NodeId(target) for target in motor_nodes if target in NodeId}
 
