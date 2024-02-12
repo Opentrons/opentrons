@@ -179,7 +179,7 @@ def store_baseline_trial(
             z_travel,
             0,
             0,
-            height,
+            tip_length_error,
         ],
     )
 
