@@ -30,6 +30,7 @@ from opentrons.protocol_engine.types import LabwareOffset
 
 from hardware_testing.liquid_sense import execute
 from .report import build_ls_report, store_config, store_serial_numbers
+from .post_process import process_csv_directory
 
 from hardware_testing.protocols.liquid_sense_lpc import (
     liquid_sense_ot3_p50_single,
@@ -295,6 +296,12 @@ if __name__ == "__main__":
         run_args.test_report.save_to_disk()
         run_args.test_report.print_results()
         ui.print_info("done\n\n")
+        if not run_args.ctx.is_simulating():
+            process_csv_directory(
+                f"{data_dir}/{run_args.name}/{run_args.run_id}",
+                run_args.tip_volumes,
+                run_args.trials,
+            )
         run_args.ctx.cleanup()
         if not args.simulate:
             helpers_ot3.restart_server_ot3()
