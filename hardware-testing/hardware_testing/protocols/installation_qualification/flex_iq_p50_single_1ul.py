@@ -374,7 +374,7 @@ def run(ctx: ProtocolContext) -> None:
     # diluent tips, pipette, and reservoir
     if _get_diluent_volume():
         diluent_tips = ctx.load_labware("opentrons_flex_96_tiprack_200uL", "B3")
-        if "p1000_multi" in TEST_PIPETTE and ALLOW_TEST_PIPETTE_TO_TRANSFER_DILUENT:
+        if "8channel_1000" in TEST_PIPETTE and ALLOW_TEST_PIPETTE_TO_TRANSFER_DILUENT:
             diluent_pipette = dye_pipette  # share the 8ch pipette
         else:
             diluent_pipette = ctx.load_instrument("flex_8channel_1000", "right")

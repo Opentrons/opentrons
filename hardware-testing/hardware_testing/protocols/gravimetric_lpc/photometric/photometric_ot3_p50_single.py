@@ -24,7 +24,7 @@ def run(ctx: ProtocolContext) -> None:
     ]
     reservoir = ctx.load_labware(RESERVOIR_LABWARE, SLOT_RESERVOIR)
     plate = ctx.load_labware(PHOTOPLATE_LABWARE, SLOT_PLATE)
-    pipette = ctx.load_instrument("p50_single_gen3", "left")
+    pipette = ctx.load_instrument("flex_1channel_50", "left")
     for rack in tipracks:
         pipette.pick_up_tip(rack["A1"])
         pipette.aspirate(10, reservoir["A1"].top())
