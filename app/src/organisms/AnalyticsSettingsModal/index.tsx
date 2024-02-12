@@ -35,7 +35,7 @@ export function AnalyticsSettingsModal(): JSX.Element | null {
     dispatch(toggleAnalyticsOptedIn())
   }
 
-  return seen || !hasOptedIn ? (
+  return !seen || !hasOptedIn ? (
     <LegacyModal
       title={
         <StyledText css={TYPOGRAPHY.h3SemiBold}>
