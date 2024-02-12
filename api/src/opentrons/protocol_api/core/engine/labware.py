@@ -123,11 +123,16 @@ class LabwareCore(AbstractLabware[WellCore]):
             raise TypeError(f"{self.get_display_name()} is not a tip rack.")
 
     def get_next_tip(
-        self, nozzle_map: NozzleMap, num_tips: int, starting_tip: Optional[WellCore]
+        self,
+        nozzle_map: NozzleMap,
+        pipette_id: str,
+        num_tips: int,
+        starting_tip: Optional[WellCore],
     ) -> Optional[str]:
         return self._engine_client.state.tips.get_next_tip(
             nozzle_map=nozzle_map,
             labware_id=self._labware_id,
+            pipette_id=pipette_id,
             num_tips=num_tips,
             starting_tip_name=(
                 starting_tip.get_name()

@@ -43,6 +43,7 @@ class TipState:
     channels_by_pipette_id: Dict[str, int]
     length_by_pipette_id: Dict[str, float]
     active_channels_by_pipette_id: Dict[str, int]
+    last_used_nozzle_map: Dict[str, NozzleMap]
 
 
 class TipStore(HasState[TipState], HandlesActions):
@@ -58,6 +59,7 @@ class TipStore(HasState[TipState], HandlesActions):
             channels_by_pipette_id={},
             length_by_pipette_id={},
             active_channels_by_pipette_id={},
+            last_used_nozzle_map={},
         )
 
     def handle_action(self, action: Action) -> None:
@@ -124,20 +126,36 @@ class TipStore(HasState[TipState], HandlesActions):
         pipette_channels = self._state.active_channels_by_pipette_id.get(pipette_id)
         columns = self._state.column_by_labware_id.get(labware_id, [])
         wells = self._state.tips_by_labware_id.get(labware_id, {})
+        nozzle_map = self._state.last_used_nozzle_map.get(pipette_id)
 
-        #TODO: Update the logic here to use a nozzle map casey
+        if nozzle_map is not None:
+            num_nozzle_cols = len(nozzle_map.columns)
+            num_nozzle_rows = len(nozzle_map.rows)
 
-        if pipette_channels == len(wells):
-            for well_name in wells.keys():
-                wells[well_name] = TipRackWellState.USED
-
-        elif columns and pipette_channels == len(columns[0]):
+            critical_column = 0
+            critical_row = 0
             for column in columns:
                 if well_name in column:
-                    for well in column:
-                        wells[well] = TipRackWellState.USED
-                    break
+                    critical_row = column.index(well_name)
+                    critical_column = columns.index(column)
 
+            # we set used from the wellname down and to the right
+            for i in range(num_nozzle_cols):
+                for j in range(num_nozzle_rows):
+                    if nozzle_map.starting_nozzle == "A1":
+                        well = columns[critical_column + i][critical_row + j]
+                        wells[well] = TipRackWellState.USED
+                    elif nozzle_map.starting_nozzle == "A12":
+                        well = columns[critical_column + i][critical_row - j]
+                        wells[well] = TipRackWellState.USED
+                    elif nozzle_map.starting_nozzle == "H1":
+                        well = columns[critical_column - i][critical_row + j]
+                        wells[well] = TipRackWellState.USED
+                    elif nozzle_map.starting_nozzle == "H12":
+                        well = columns[critical_column - i][critical_row - j]
+                        wells[well] = TipRackWellState.USED
+            # clear the last used nozzle map for this pipette
+            self._state.last_used_nozzle_map.clear()
         else:
             wells[well_name] = TipRackWellState.USED
 
@@ -160,15 +178,21 @@ class TipView(HasState[TipState]):
     #  for example when using leftmost column config of 96-channel
     #  or backmost single nozzle configuration of an 8-channel.
     def get_next_tip(  # noqa: C901
-        self, nozzle_map: NozzleMap, labware_id: str, num_tips: int, starting_tip_name: Optional[str]
+        self,
+        nozzle_map: NozzleMap,
+        labware_id: str,
+        pipette_id: str,
+        num_tips: int,
+        starting_tip_name: Optional[str],
     ) -> Optional[str]:
         """Get the next available clean tip."""
+        self._state.last_used_nozzle_map.update({pipette_id: nozzle_map})
         wells = self._state.tips_by_labware_id.get(labware_id, {})
         columns = self._state.column_by_labware_id.get(labware_id, [])
 
         num_nozzle_cols = len(nozzle_map.columns)
         num_nozzle_rows = len(nozzle_map.rows)
-        
+
         def _identify_tip_cluster(critical_column: int, critical_row: int) -> List[str]:
             tip_cluster = []
             for i in range(num_nozzle_cols):
@@ -176,17 +200,19 @@ class TipView(HasState[TipState]):
                 for j in range(num_nozzle_rows):
                     well = column[critical_row + j]
                     tip_cluster.append(well)
-            #Return the list of tips to be analyzed 
+            # Return the list of tips to be analyzed
             return tip_cluster
-        
+
         def _validate_tip_cluster(tip_cluster: List[str]) -> Optional[str]:
             if not any(wells[well] == TipRackWellState.USED for well in tip_cluster):
                 return tip_cluster[0]
             elif all(wells[well] == TipRackWellState.USED for well in tip_cluster):
                 return None
             else:
-                raise KeyError(f"Tiprack {labware_id} has no valid tip selection for current Nozzle Configuration.")
-        
+                raise KeyError(
+                    f"Tiprack {labware_id} has no valid tip selection for current Nozzle Configuration."
+                )
+
         if nozzle_map.starting_nozzle == "A1":
             # Define the critical well by the position of the well relative to Tip Rack entry point H12
             critical_column = len(columns) - num_nozzle_cols
@@ -198,7 +224,7 @@ class TipView(HasState[TipState]):
                 if isinstance(result, str):
                     # The result is the critical tip to target
                     return result
-                elif isinstance(result, None):
+                elif result is None:
                     # Move on to the row above or column to the left
                     if critical_row - num_nozzle_rows >= 0:
                         critical_row = critical_row - num_nozzle_rows
@@ -208,7 +234,7 @@ class TipView(HasState[TipState]):
                     else:
                         critical_column = -1
             return None
-        
+
         elif nozzle_map.starting_nozzle == "A12":
             # Define the critical well by the position of the well relative to Tip Rack entry point H1
             critical_column = num_nozzle_cols
@@ -220,7 +246,7 @@ class TipView(HasState[TipState]):
                 if isinstance(result, str):
                     # The result is the critical tip to target
                     return result
-                elif isinstance(result, None):
+                elif result is None:
                     # Move on to the row above or column to the right
                     if critical_row - num_nozzle_rows >= 0:
                         critical_row = critical_row - num_nozzle_rows
@@ -242,7 +268,7 @@ class TipView(HasState[TipState]):
                 if isinstance(result, str):
                     # The result is the critical tip to target
                     return result
-                elif isinstance(result, None):
+                elif result is None:
                     # Move on to the row above or column to the right
                     if critical_row + num_nozzle_rows <= 8:
                         critical_row = critical_row + num_nozzle_rows
@@ -264,7 +290,7 @@ class TipView(HasState[TipState]):
                 if isinstance(result, str):
                     # The result is the critical tip to target
                     return result
-                elif isinstance(result, None):
+                elif result is None:
                     # Move on to the row above or column to the right
                     if critical_row + num_nozzle_rows <= 8:
                         critical_row = critical_row + num_nozzle_rows
@@ -274,10 +300,12 @@ class TipView(HasState[TipState]):
                     else:
                         critical_column = 13
             return None
-        
+
         else:
-            raise ValueError(f"Nozzle {nozzle_map.starting_nozzle} is an invalid starting tip in configuration for tip pickup.")
-        
+            raise ValueError(
+                f"Nozzle {nozzle_map.starting_nozzle} is an invalid starting tip for automatic tip pickup."
+            )
+
         # if columns and num_tips == len(columns[0]):  # Get next tips for 8-channel
         #     column_head = [column[0] for column in columns]
         #     starting_column_index = 0

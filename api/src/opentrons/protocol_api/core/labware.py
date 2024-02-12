@@ -111,7 +111,11 @@ class AbstractLabware(ABC, Generic[WellCoreType]):
 
     @abstractmethod
     def get_next_tip(
-        self, nozzle_map: NozzleMap, num_tips: int, starting_tip: Optional[WellCoreType]
+        self,
+        nozzle_map: NozzleMap,
+        pipette_id: str,
+        num_tips: int,
+        starting_tip: Optional[WellCoreType],
     ) -> Optional[str]:
         """Get the name of the next available tip(s) in the rack, if available."""
 

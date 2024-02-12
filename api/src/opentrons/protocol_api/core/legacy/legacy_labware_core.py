@@ -11,6 +11,8 @@ from ..labware import AbstractLabware, LabwareLoadParams
 from .legacy_well_core import LegacyWellCore
 from .well_geometry import WellGeometry
 
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+
 
 # URIs of labware whose definitions accidentally specify an engage height
 # in units of half-millimeters instead of millimeters.
@@ -153,7 +155,11 @@ class LegacyLabwareCore(AbstractLabware[LegacyWellCore]):
                 well.set_has_tip(True)
 
     def get_next_tip(
-        self, num_tips: int, starting_tip: Optional[LegacyWellCore]
+        self,
+        nozzle_map: NozzleMap,
+        pipette_id: str,
+        num_tips: int,
+        starting_tip: Optional[LegacyWellCore],
     ) -> Optional[str]:
         next_well = self._tip_tracker.next_tip(num_tips, starting_tip)
         return next_well.get_name() if next_well else None
