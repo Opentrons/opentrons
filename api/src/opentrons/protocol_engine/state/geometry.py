@@ -1071,12 +1071,12 @@ class GeometryView:
         """
         parent_location = self._labware.get_location(labware_id)
         assert isinstance(
-            parent_location, (DeckSlotLocation, ModuleLocation, OnLabwareLocation)
-        ), "No gripper offsets for off-deck labware"
+            parent_location, (DeckSlotLocation, ModuleLocation, AddressableAreaLocation)
+        ), f"No gripper offsets for off-deck labware: {type(parent_location)}"
 
         if isinstance(parent_location, DeckSlotLocation):
             slot_name = parent_location.slotName
-        elif isinstance(parent_location, OnLabwareLocation):
+        elif isinstance(parent_location, AddressableAreaLocation):
             slot_name = self._labware.get_parent_location(labware_id).slotName
         else:
             module_loc = self._modules.get_location(parent_location.moduleId)

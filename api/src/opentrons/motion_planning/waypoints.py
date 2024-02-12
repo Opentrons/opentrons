@@ -144,7 +144,7 @@ def get_gripper_labware_movement_waypoints(
     waypoints_with_jaw_status = [
         GripperMovementWaypointsWithJawStatus(
             position=Point(pick_up_location.x, pick_up_location.y, gripper_home_z),
-            jaw_open=False,
+            jaw_open=True,
             dropping=False,
         ),
         GripperMovementWaypointsWithJawStatus(

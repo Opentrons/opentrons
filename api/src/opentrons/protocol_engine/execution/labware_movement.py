@@ -153,6 +153,7 @@ class LabwareMovementHandler:
             )
             labware_grip_force = self._state_store.labware.get_grip_force(labware_id)
             holding_labware = False
+            await ot3api.ungrip()
             for waypoint_data in movement_waypoints:
                 if waypoint_data.jaw_open:
                     if waypoint_data.dropping:
@@ -191,7 +192,8 @@ class LabwareMovementHandler:
                 )
 
             # this makes sure gripper jaw is closed between two move labware calls
-            await ot3api.idle_gripper()
+            # await ot3api.idle_gripper()
+            await ot3api.ungrip()
 
     async def ensure_movement_not_obstructed_by_module(
         self, labware_id: str, new_location: LabwareLocation
