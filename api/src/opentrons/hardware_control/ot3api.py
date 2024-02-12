@@ -1316,29 +1316,33 @@ class OT3API(
         the 96-channel or gripper mount if it is about to move.
         """
         last_moved = self._last_moved_mount
-        if self.is_idle_mount(mount):
-            # home the left/gripper mount if it is current disengaged
-            await self.home_z(mount)
-
-        if mount != last_moved and last_moved:
-            await self.retract(last_moved, 10)
-
-            # disengage Axis.Z_L motor and engage the brake to lower power
-            # consumption and reduce the chance of the 96-channel pipette dropping
-            if (
-                self.gantry_load == GantryLoad.HIGH_THROUGHPUT
-                and last_moved == OT3Mount.LEFT
-            ):
-                await self.disengage_axes([Axis.Z_L])
-
-            # disegnage Axis.Z_G when we can to reduce the chance of
-            # the gripper dropping
-            if last_moved == OT3Mount.GRIPPER:
-                await self.disengage_axes([Axis.Z_G])
-
-        if mount != OT3Mount.GRIPPER:
+        # if gripper exists and it's not the moving mount, it should retract
+        if (
+            self.has_gripper()
+            and mount != OT3Mount.GRIPPER
+            and not self.is_idle_mount(OT3Mount.GRIPPER)
+        ):
+            await self.retract(OT3Mount.GRIPPER, 10)
+            await self.disengage_axes([Axis.Z_G])
             await self.idle_gripper()
 
+        # if 96-channel pipette is attached and not being moved, it should retract
+        if (
+            mount != OT3Mount.LEFT
+            and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
+            and not self.is_idle_mount(OT3Mount.LEFT)
+        ):
+            await self.retract(OT3Mount.LEFT, 10)
+            await self.disengage_axes([Axis.Z_L])
+
+        # if the last moved mount is not covered in neither of the above scenario,
+        # simply retract the last moved mount
+        if last_moved and not self.is_idle_mount(last_moved) and mount != last_moved:
+            await self.retract(last_moved, 10)
+
+        # finally, home the current left/gripper mount to prepare for movement
+        if self.is_idle_mount(mount):
+            await self.home_z(mount)
         self._last_moved_mount = mount
 
     async def prepare_for_mount_movement(
@@ -1512,7 +1516,7 @@ class OT3API(
             else:
                 await self.engage_axes([axis])
 
-        if encoder_ok:
+        if encoder_ok and motor_engaged:
             await self._update_position_estimation([axis])
             # refresh motor and encoder statuses after position estimation update
             motor_ok = self._backend.check_motor_status([axis])
@@ -1555,22 +1559,21 @@ class OT3API(
 
     async def _home(self, axes: Sequence[Axis]) -> None:
         """Home one axis at a time."""
-        async with self._motion_lock:
-            for axis in axes:
-                try:
-                    if axis == Axis.G:
-                        await self.home_gripper_jaw()
-                    elif axis == Axis.Q:
-                        await self._backend.home([axis], self.gantry_load)
-                    else:
-                        await self._home_axis(axis)
-                except BaseException as e:
-                    self._log.exception(f"Homing failed: {e}")
-                    self._current_position.clear()
-                    raise
+        for axis in axes:
+            try:
+                if axis == Axis.G:
+                    await self.home_gripper_jaw()
+                elif axis == Axis.Q:
+                    await self._backend.home([axis], self.gantry_load)
                 else:
-                    await self._cache_current_position()
-                    await self._cache_encoder_position()
+                    await self._home_axis(axis)
+            except BaseException as e:
+                self._log.exception(f"Homing failed: {e}")
+                self._current_position.clear()
+                raise
+            else:
+                await self._cache_current_position()
+                await self._cache_encoder_position()
 
     @ExecutionManagerProvider.wait_for_running
     async def home(
@@ -1601,7 +1604,8 @@ class OT3API(
             if (ax in checked_axes and self._backend.axis_is_present(ax))
         ]
         self._log.info(f"home was called with {axes} generating sequence {home_seq}")
-        await self._home(home_seq)
+        async with self._motion_lock:
+            await self._home(home_seq)
 
     def get_engaged_axes(self) -> Dict[Axis, bool]:
         """Which axes are engaged and holding."""

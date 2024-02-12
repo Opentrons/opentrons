@@ -1161,16 +1161,15 @@ class OT3Controller(FlexBackend):
     def axis_bounds(self) -> OT3AxisMap[Tuple[float, float]]:
         """Get the axis bounds."""
         # TODO (AL, 2021-11-18): The bounds need to be defined
-        phony_bounds = (0, 300)
         return {
-            Axis.Z_L: phony_bounds,
-            Axis.Z_R: phony_bounds,
-            Axis.P_L: phony_bounds,
-            Axis.P_R: phony_bounds,
-            Axis.X: phony_bounds,
-            Axis.Y: phony_bounds,
-            Axis.Z_G: phony_bounds,
-            Axis.Q: phony_bounds,
+            Axis.Z_L: (0, 300),
+            Axis.Z_R: (0, 300),
+            Axis.P_L: (0, 200),
+            Axis.P_R: (0, 200),
+            Axis.X: (0, 550),
+            Axis.Y: (0, 550),
+            Axis.Z_G: (0, 300),
+            Axis.Q: (0, 200),
         }
 
     def engaged_axes(self) -> OT3AxisMap[bool]:
