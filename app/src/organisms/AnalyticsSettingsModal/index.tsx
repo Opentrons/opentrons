@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import {
   Flex,
   SPACING,
@@ -34,7 +35,7 @@ export function AnalyticsSettingsModal(): JSX.Element | null {
     dispatch(toggleAnalyticsOptedIn())
   }
 
-  return !seen || !hasOptedIn ? (
+  return seen || !hasOptedIn ? (
     <LegacyModal
       title={
         <StyledText css={TYPOGRAPHY.h3SemiBold}>
@@ -58,7 +59,7 @@ export function AnalyticsSettingsModal(): JSX.Element | null {
           <Flex gridGap={SPACING.spacing10} flexDirection={DIRECTION_COLUMN}>
             <Trans
               t={t}
-              i18nKey={t('privacy_body')}
+              i18nKey="privacy_body"
               components={{ block: <StyledText as="p" /> }}
             />
           </Flex>
