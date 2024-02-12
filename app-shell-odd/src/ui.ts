@@ -58,14 +58,9 @@ export function createUi(dispatch: Dispatch): BrowserWindow {
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   mainWindow.loadURL(url, { extraHeaders: 'pragma: no-cache\n' })
 
-  // open new windows (<a target="_blank" ...) in browser windows
-  mainWindow.webContents.setWindowOpenHandler(({ url, disposition }) => {
-    if (disposition === 'new-window' && url === 'about:blank') {
-      shell.openExternal(url)
+  // never allow external links to open
+  mainWindow.webContents.setWindowOpenHandler(() => {
       return { action: 'deny' }
-    } else {
-      return { action: 'allow' }
-    }
   })
 
   return mainWindow
