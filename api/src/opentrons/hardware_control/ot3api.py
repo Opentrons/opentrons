@@ -1482,6 +1482,22 @@ class OT3API(
         target_pos = {axis: self._backend.home_position()[axis]}
         return origin_pos, target_pos
 
+    async def _enable_before_update_estimation(self, axis: Axis) -> None:
+        enabled = await self._backend.is_motor_engaged(axis)
+
+        if not enabled:
+            if axis == Axis.Z_L and self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
+                # we're here if the left mount has been idle and the brake is engaged
+                # we want to temporarily increase its hold current to prevent the z
+                # stage from dropping when switching off the ebrake
+                async with self._backend.increase_z_l_hold_current():
+                    await self.engage_axes([axis])
+            else:
+                await self.engage_axes([axis])
+
+        # now that motor is enabled, we can update position estimation
+        await self._update_position_estimation([axis])
+
     @_adjust_high_throughput_z_current
     async def _home_axis(self, axis: Axis) -> None:
         """
@@ -1503,24 +1519,12 @@ class OT3API(
         assert axis not in [Axis.G, Axis.Q]
 
         encoder_ok = self._backend.check_encoder_status([axis])
+        if encoder_ok:
+            # enable motor (if needed) and update estimation
+            await self._enable_before_update_estimation(axis)
+
+        # refresh motor status after position estimation update
         motor_ok = self._backend.check_motor_status([axis])
-        motor_engaged = await self._backend.is_motor_engaged(axis)
-
-        if encoder_ok and not motor_engaged:
-            if axis == Axis.Z_L and self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
-                # we're here if the left mount has been idle and the brake is engaged
-                # we want to temporarily increase its hold current to prevent the z
-                # stage from dropping when switching off the ebrake
-                async with self._backend.increase_z_l_hold_current():
-                    await self.engage_axes([axis])
-            else:
-                await self.engage_axes([axis])
-
-        if encoder_ok and motor_engaged:
-            await self._update_position_estimation([axis])
-            # refresh motor and encoder statuses after position estimation update
-            motor_ok = self._backend.check_motor_status([axis])
-            encoder_ok = self._backend.check_encoder_status([axis])
 
         if Axis.to_kind(axis) == OT3AxisKind.P:
             await self._set_plunger_current_and_home(axis, motor_ok, encoder_ok)

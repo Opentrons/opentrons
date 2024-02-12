@@ -97,6 +97,7 @@ class OT3Simulator(FlexBackend):
     _position: Dict[Axis, float]
     _encoder_position: Dict[Axis, float]
     _motor_status: Dict[Axis, MotorStatus]
+    _engaged_axes: Dict[Axis, bool]
 
     @classmethod
     async def build(
