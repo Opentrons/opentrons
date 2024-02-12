@@ -184,7 +184,7 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
 // for a component to trigger an unsubscribe event on dismount while a new component mounts and
 // triggers a subscribe event. For the connection store and MQTT to reflect correct topic subscriptions,
 // do not unsubscribe and close connections before newly mounted components have had time to update the connection store.
-const RENDER_TIMEOUT = 250
+const RENDER_TIMEOUT = 10000 // 10 seconds
 
 function unsubscribe(notifyParams: NotifyParams): Promise<void> {
   const { hostname, topic } = notifyParams
