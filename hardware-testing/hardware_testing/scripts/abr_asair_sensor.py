@@ -17,17 +17,17 @@ except ImportError:
     )
 
 
-def _get_user_input(list: List, some_string: str) -> str:
+def _get_user_input(lst: List[str], some_string: str) -> str:
     variable = input(some_string)
-    while variable not in list:
+    while variable not in lst:
         print(
-            f"Your input was {variable}. Expected input is one of the following: {list}"
+            f"Your input was {variable}. Expected input is one of the following: {lst}"
         )
         variable = input(some_string)
     return variable
 
 
-class _abr_asair_sensor:
+class _ABRAsairSensor:
     def __init__(self, robot: str, duration: int, frequency: int) -> None:
         test_name = "ABR-Environment-Monitoring"
         run_id = data.create_run_id()
@@ -123,4 +123,4 @@ if __name__ == "__main__":
     robot = _get_user_input(robot_list, "Robot: ")
     duration = int(input("Duration (min): "))
     frequency = int(input("Frequency (min): "))
-    _abr_asair_sensor(robot, duration, frequency)
+    _ABRAsairSensor(robot, duration, frequency)
