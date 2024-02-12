@@ -3,6 +3,7 @@ import { parseProtocolRunAnalyticsData } from './useProtocolRunAnalyticsData'
 import { parseProtocolAnalysisOutput } from './useStoredProtocolAnalysis'
 
 import type { StoredProtocolData } from '../../../redux/protocol-storage'
+import { useRobot } from './useRobot'
 
 type CreateProtocolRunEventName =
   | 'createProtocolRecordRequest'
@@ -23,6 +24,8 @@ export function useTrackCreateProtocolRunEvent(
 ): { trackCreateProtocolRunEvent: TrackCreateProtocolRunEvent } {
   const trackEvent = useTrackEvent()
 
+  const robot = useRobot(robotName)
+
   const storedProtocolAnalysis = parseProtocolAnalysisOutput(
     protocol?.mostRecentAnalysis ?? null
   )
@@ -31,7 +34,7 @@ export function useTrackCreateProtocolRunEvent(
     storedProtocolAnalysis,
     protocol,
     null,
-    robotName
+    robot
   )
 
   const trackCreateProtocolRunEvent: TrackCreateProtocolRunEvent = ({
