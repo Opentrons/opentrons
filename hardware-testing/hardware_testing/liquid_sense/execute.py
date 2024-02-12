@@ -1,11 +1,10 @@
 """Logic for running a single liquid probe test."""
 from typing import Dict, Any, List, Tuple, Optional
-from .report import store_tip_results, store_trial
+from .report import store_tip_results, store_trial, store_baseline_trial
 from opentrons.config.types import LiquidProbeSettings
 from .__main__ import RunArgs
 from hardware_testing.gravimetric.workarounds import get_sync_hw_api
 from hardware_testing.gravimetric.helpers import (
-    _calculate_stats,
     _jog_to_find_liquid_height,
 )
 from hardware_testing.gravimetric.config import LIQUID_PROBE_SETTINGS
@@ -169,6 +168,12 @@ def run(tip: int, run_args: RunArgs) -> None:
     assert len(tips) >= run_args.trials
     results: List[float] = []
     adjusted_results: List[float] = []
+    lpc_offset = 0.0
+    if run_args.dial_indicator is not None:
+        run_args.pipette.move_to(dial_well.top())
+        lpc_offset = run_args.dial_indicator.read_stable()
+        run_args.pipette._retract()
+
     run_args.pipette.pick_up_tip(tips.pop(0))
     liquid_height = _jog_to_find_liquid_height(
         run_args.ctx, run_args.pipette, test_well
@@ -176,6 +181,7 @@ def run(tip: int, run_args: RunArgs) -> None:
     target_height = test_well.bottom(liquid_height).point.z
 
     run_args.pipette._retract()
+    calibration_tip_length_offset = 0.0
     if run_args.dial_indicator is not None:
         run_args.pipette.move_to(dial_well.top())
         calibration_tip_length_offset = run_args.dial_indicator.read_stable()
@@ -184,6 +190,18 @@ def run(tip: int, run_args: RunArgs) -> None:
         run_args.pipette.return_tip()
     else:
         run_args.pipette.drop_tip()
+
+    env_data = run_args.environment_sensor.get_reading()
+
+    store_baseline_trial(
+        run_args.test_report,
+        tip,
+        target_height,
+        env_data.relative_humidity,
+        env_data.temperature,
+        test_well.top().point.z - target_height,
+        calibration_tip_length_offset - lpc_offset,
+    )
 
     for trial in range(run_args.trials):
         print(f"Picking up {tip}ul tip")
@@ -239,12 +257,8 @@ def run(tip: int, run_args: RunArgs) -> None:
         )
 
     ui.print_info(f"RESULTS: \n{results}")
-    average, cv, d = _calculate_stats(results, target_height)
-    store_tip_results(run_args.test_report, tip, average, cv, d)
-    ui.print_info(f"Raw: Average {average} cv {cv} d {d} target {target_height}")
     ui.print_info(f"Adjusted RESULTS: \n{adjusted_results}")
-    average, cv, d = _calculate_stats(adjusted_results, target_height)
-    ui.print_info(f"adjusted: Average {average} cv {cv} d {d} target {target_height}")
+    store_tip_results(run_args.test_report, tip, results, adjusted_results)
 
 
 def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
