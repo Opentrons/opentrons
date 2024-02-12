@@ -643,16 +643,27 @@ class OT3Simulator(FlexBackend):
 
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""
-        return {}
+        return self._engaged_axes
+
+    async def update_engaged_axes(self) -> None:
+        """Update engaged axes."""
+        return None
+
+    async def is_motor_engaged(self, axis: Axis) -> bool:
+        return self._engaged_axes[axis]
 
     @ensure_yield
     async def disengage_axes(self, axes: List[Axis]) -> None:
         """Disengage axes."""
+        for ax in axes:
+            self._engaged_axes.update({ax: False})
         return None
 
     @ensure_yield
     async def engage_axes(self, axes: List[Axis]) -> None:
         """Engage axes."""
+        for ax in axes:
+            self._engaged_axes.update({ax: True})
         return None
 
     @ensure_yield
