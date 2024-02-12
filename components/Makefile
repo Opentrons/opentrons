@@ -20,26 +20,26 @@ all: clean dist
 
 .PHONY: clean
 clean:
-	yarn --cwd .. shx rm -rf storybook-static
+	pnpm --cwd .. shx rm -rf storybook-static
 
 # artifacts
 #####################################################################
 
 .PHONY: dist
 dist:
-	yarn --cwd .. build-storybook
+	pnpm --cwd .. build-storybook
 
 .PHONY: lib
 lib: export NODE_ENV := production
 lib:
-	yarn webpack
+	pnpm webpack
 
 # development
 #####################################################################
 
 .PHONY: dev
 dev:
-	yarn --cwd .. start-storybook --port $(port)
+	pnpm --cwd .. start-storybook --port $(port)
 
 .PHONY: test
 test:

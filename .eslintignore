@@ -10,7 +10,6 @@
 # prettier
 **/package.json
 **/CHANGELOG.md
-lerna.json
 !api/release-notes.md
 !app-shell/build/release-notes.md
 

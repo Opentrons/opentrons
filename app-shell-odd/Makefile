@@ -6,7 +6,7 @@ include ../scripts/push.mk
 SHELL := bash
 
 # add node_modules/.bin to PATH
-PATH := $(shell cd .. && yarn bin):$(PATH)
+PATH := $(shell cd .. && pnpm bin):$(PATH)
 
 # dev server port
 PORT ?= 8090
@@ -21,11 +21,11 @@ noop := cd .
 # Other SSH args for robots
 ssh_opts ?= $(default_ssh_opts)
 
-builder := yarn electron-builder \
+builder := pnpm electron-builder \
 	--config electron-builder.config.js \
 	--publish never
 
-electron := yarn electron . \
+electron := pnpm electron . \
 	--devtools \
 	--log.level.console="debug" \
 	--disable_ui.webPreferences.webSecurity \
@@ -41,10 +41,10 @@ OPENTRONS_PROJECT ?= robot-stack
 all: package
 
 .PHONY: setup
-# must be wrapped in yarn run otherwise `prebuild-install` will fail silently
+# must be wrapped in pnpm run otherwise `prebuild-install` will fail silently
 # due to how `electron-rebuild` calls `prebuild-install`
 setup:
-	yarn rebuild
+	pnpm rebuild
 
 .PHONY: clean
 clean:

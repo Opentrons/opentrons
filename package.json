@@ -1,32 +1,14 @@
 {
   "name": "opentrons",
   "private": true,
-  "workspaces": {
-    "packages": [
-      "app",
-      "app-shell",
-      "app-shell-odd",
-      "components",
-      "discovery-client",
-      "labware-designer",
-      "labware-library",
-      "protocol-designer",
-      "shared-data",
-      "step-generation",
-      "webpack-config",
-      "api-client",
-      "react-api-client",
-      "usb-bridge/node-client"
-    ]
-  },
   "config": {
     "commitizen": {
       "path": "cz-conventional-changelog"
     }
   },
-  "packageManager": "yarn@1.22.19",
   "engines": {
-    "node": "^18.19.0"
+    "node": "^18.19.0",
+    "pnpm": ">=3"
   },
   "resolutions": {
     "@storybook/react-docgen-typescript-plugin": "1.0.6--canary.9.cd77847.0"

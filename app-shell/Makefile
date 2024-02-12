@@ -6,7 +6,7 @@ include ../scripts/push.mk
 SHELL := bash
 
 # add node_modules/.bin to PATH
-PATH := $(shell cd .. && yarn bin):$(PATH)
+PATH := $(shell cd .. && pnpm bin):$(PATH)
 
 # dev server port
 PORT ?= 8090
@@ -57,13 +57,13 @@ OPENTRONS_PROJECT ?= $(if $(filter ot3@%,$(publish_update)),ot3,robot-stack)
 # make dist no_python_bundle=true or =1 or whatever
 no_python_bundle ?=
 
-builder := yarn electron-builder \
+builder := pnpm electron-builder \
 	--config electron-builder.config.js \
 	--config.electronVersion=23.3.13 \
 	--publish never
 
 
-electron := yarn electron . \
+electron := pnpm electron . \
 	--devtools \
 	--log.level.console="debug" \
 	--disable_ui.webPreferences.webSecurity \
@@ -82,10 +82,10 @@ branch-suffix:
 all: package
 
 .PHONY: setup
-# must be wrapped in yarn run otherwise `prebuild-install` will fail silently
+# must be wrapped in pnpm run otherwise `prebuild-install` will fail silently
 # due to how `electron-rebuild` calls `prebuild-install`
 setup:
-	yarn rebuild
+	pnpm rebuild
 
 .PHONY: clean
 clean:

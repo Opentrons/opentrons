@@ -4,7 +4,7 @@
 SHELL := bash
 
 # add node_modules/.bin to PATH
-PATH := $(shell cd .. && yarn bin):$(PATH)
+PATH := $(shell cd .. && pnpm bin):$(PATH)
 
 # dev server port
 PORT ?= 8090
@@ -35,7 +35,7 @@ all: clean dist
 
 .PHONY: setup
 setup:
-	yarn
+	pnpm i
 
 .PHONY: clean
 clean:

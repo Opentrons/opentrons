@@ -25,18 +25,10 @@ jobs:
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '18.19.0'
-      - name: 'cache yarn cache'
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/.npm-cache/_prebuild
-            ${{ github.workspace }}/.yarn-cache
-          key: js-${{ hashFiles('yarn.lock') }}
       - name: 'setup-js'
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
-          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
-          yarn install
+          pnpm i
       - name: 'create release'
         run: |
           node ./scripts/deploy/create-release.js ${{ github.token }} ${{ github.ref_name }} --deploy

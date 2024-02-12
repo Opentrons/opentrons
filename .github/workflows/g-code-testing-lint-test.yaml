@@ -63,17 +63,9 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'g-code-testing'
-      - name: 'cache yarn cache'
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/.npm-cache/_prebuild
-            ${{ github.workspace }}/.yarn-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
       - name: 'setup-js'
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
-          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           make setup-js
       - name: Lint
         run: make -C g-code-testing lint

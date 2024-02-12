@@ -18,26 +18,12 @@ export default function CowButton(props) {
 
 Usage requirements for dependent projects:
 
-- Node v12 and yarn
+- Node v18 and pnpm
 - The following `dependencies` (peer dependencies of `@opentrons/components`)
   - `react`: `17.0.1`,
   - `react-router-dom`: `^4.2.2`,
   - `classnames`: `^2.2.5`,
   - `lodash`: `^4.17.4`
-
-### new project setup (optional)
-
-If you ever need to set up a new project in the monorepo that depends on the components library:
-
-1.  Add the new project to `workspaces` in the repository's `package.json`
-2.  Ensure the required peer dependencies (listed above) are also in `dependencies`
-    ```shell
-    yarn workspace new-project add react@17.0.1 react-router-dom@^4.2.2 classnames@^2.2.5 lodash@^4.17.4
-    ```
-3.  Add `@opentrons/components` at the current version to `dependencies` in the new project's `package.json`
-4.  Run `yarn`
-
-If you use the base webpack config in `@opentrons/webpack-config`, the project should import and bundle components from the components library correctly.
 
 ## contributing
 

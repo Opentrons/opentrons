@@ -1,7 +1,7 @@
 # opentrons discovery-client makefile
 
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
-# TODO(mc, 2021-02-12): this may be unnecessary by using `yarn run` instead
+# TODO(mc, 2021-02-12): this may be unnecessary by using `pnpm run` instead
 SHELL := bash
 
 # outputs
@@ -16,7 +16,7 @@ all: clean lib
 
 .PHONY: clean
 clean:
-	yarn shx rm -rf $(main_out) $(cli_out)
+	pnpm shx rm -rf $(main_out) $(cli_out)
 
 # artifacts
 #####################################################################
@@ -26,7 +26,7 @@ lib: export NODE_ENV := production
 lib: $(main_out) $(cli_out)
 
 $(main_out) $(cli_out):
-	yarn webpack
+	pnpm webpack
 
 .PHONY: test
 test:

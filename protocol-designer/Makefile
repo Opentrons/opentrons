@@ -4,7 +4,7 @@
 SHELL := bash
 
 # add node_modules/.bin to PATH
-PATH := $(shell cd .. && yarn bin):$(PATH)
+PATH := $(shell cd .. && pnpm bin):$(PATH)
 
 benchmark_output := $(shell node -e 'console.log(new Date());')
 
@@ -22,7 +22,7 @@ all: clean build
 
 .PHONY: setup
 setup:
-	yarn
+	pnpm i
 
 .PHONY: clean
 clean:

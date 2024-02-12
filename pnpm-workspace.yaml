@@ -1,0 +1,16 @@
+packages:
+  - 'app'
+  - 'app-shell'
+  - 'app-shell-odd'
+  - 'components'
+  - 'discovery-client'
+  - 'labware-designer'
+  - 'labware-library'
+  - 'protocol-designer'
+  - 'shared-data'
+  - 'step-generation'
+  - 'webpack-config'
+  - 'api-client'
+  - 'react-api-client'
+  - 'usb-bridge/node-client'
+  

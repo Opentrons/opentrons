@@ -56,19 +56,9 @@ jobs:
           git checkout ${{ github.ref }}
       - name: 'install libudev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'cache yarn cache'
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/.yarn-cache
-            ${{ github.workspace }}/.npm-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: 'setup-js'
         run: |
           npm config set cache ./.npm-cache
-          yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'run labware library unit tests'
         run: make -C labware-library test-cov
@@ -96,19 +86,9 @@ jobs:
           node-version: '18.19.0'
       - name: 'install libudev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'cache yarn cache'
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/.yarn-cache
-            ${{ github.workspace }}/.npm-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: 'setup-js'
         run: |
           npm config set cache ./.npm-cache
-          yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'test-e2e'
         env:
@@ -136,19 +116,9 @@ jobs:
           node-version: '18.19.0'
       - name: 'install libudev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'cache yarn cache'
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/.yarn-cache
-            ${{ github.workspace }}/.npm-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: 'setup-js'
         run: |
           npm config set cache ./.npm-cache
-          yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'build LL'
         env:

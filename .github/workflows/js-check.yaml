@@ -55,20 +55,10 @@ jobs:
             buildComplexEnvVars(core, context)
       - name: 'install libudev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'cache yarn cache'
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/.yarn-cache
-            ${{ github.workspace }}/.npm-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: 'setup-js'
         id: 'setup-js'
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
-          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           make setup-js
         # Use the if to run all the lint checks even of some fail
         shell: bash
@@ -88,4 +78,4 @@ jobs:
         if: always() && steps.setup-js.outcome == 'success'
         run: make lint-css
       - name: 'test scripts'
-        run: yarn jest scripts
+        run: pnpm jest scripts

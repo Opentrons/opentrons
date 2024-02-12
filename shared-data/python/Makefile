@@ -12,7 +12,7 @@ ssh_opts ?= $(default_ssh_opts)
 SHELL := bash
 
 # add node_modules/.bin to PATH
-PATH := $(shell cd ../.. && yarn bin):$(PATH)
+PATH := $(shell cd ../.. && pnpm bin):$(PATH)
 
 # This may be set as an environment variable (and is by CI tasks that upload
 # to test pypi) to add a .dev extension to the python package versions. If

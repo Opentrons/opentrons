@@ -1,11 +1,3 @@
-export {
-  getWasteChuteAddressableAreaNamePip,
-  movableTrashCommandsUtil,
-  curryCommandCreator,
-  reduceCommandCreators,
-  commandCreatorsTimeline,
-  getPipetteIdFromCCArgs
-} from './utils'
 
 export {
   aspirate,
@@ -32,6 +24,7 @@ export {
   heaterShaker,
 } from './commandCreators'
 
+export * from './utils'
 export * from './robotStateSelectors'
 export * from './types'
 export * from './constants'

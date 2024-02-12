@@ -4,7 +4,7 @@ Note: this tooling around benchmark testing is very minimal and subject to chang
 
 To run all PD benchmarks, `make -C protocol-designer benchmarks`. This will output to a file `protocol-designer/benchmarks/output/$(date_time)`. To set the name of the file, specify `benchmark_output`
 
-These benchmarks use [Nanobench](https://github.com/mafintosh/nanobench), so you can pipe the output to a file and compare benchmark runs with `yarn nanobench-compare fileA fileB`
+These benchmarks use [Nanobench](https://github.com/mafintosh/nanobench), so you can pipe the output to a file and compare benchmark runs with `pnpm nanobench-compare fileA fileB`
 
 ## Local benchmarking guidelines
 

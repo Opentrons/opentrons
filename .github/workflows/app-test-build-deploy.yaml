@@ -16,7 +16,7 @@ on:
       - '*.js'
       - 'scripts/**/*'
       - '*.json'
-      - 'yarn.lock'
+      - 'pnpm-lock.yaml'
       - '.github/workflows/app-test-build-deploy.yaml'
       - '.github/workflows/utils.js'
     branches:
@@ -36,7 +36,7 @@ on:
       - 'discovery-client/**/*'
       - '*.js'
       - '*.json'
-      - 'yarn.lock'
+      - 'pnpm-lock.yaml'
       - 'scripts/**/*'
   workflow_dispatch:
 
@@ -71,17 +71,9 @@ jobs:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-      - name: 'cache yarn cache'
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/.npm-cache/_prebuild
-            ${{ github.workspace }}/.yarn-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
       - name: 'setup-js'
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
-          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           make setup-js
       - name: 'test frontend packages'
         run: |
@@ -128,17 +120,9 @@ jobs:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-      - name: 'cache yarn cache'
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/.npm-cache/_prebuild
-            ${{ github.workspace }}/.yarn-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
       - name: setup-js
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
-          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           make setup-js
       - name: 'test native(er) packages'
         run: make test-js-internal tests="app-shell/src app-shell-odd/src discovery-client/src" cov_opts="--coverage=true --ci=true --collectCoverageFrom='(app-shell|app-shell-odd| discovery-client)/src/**/*.(js|ts|tsx)'"
@@ -261,17 +245,9 @@ jobs:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-      - name: 'cache yarn cache'
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/.npm-cache/_prebuild
-            ${{ github.workspace }}/.yarn-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
       - name: setup-js
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
-          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           make setup-js
       # build the desktop app and deploy it
       - name: 'build ${{matrix.variant}} app for ${{ matrix.os }}'
@@ -437,17 +413,9 @@ jobs:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/monorepo/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-      - name: 'cache yarn cache'
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/.npm-cache/_prebuild
-            ${{ github.workspace }}/.yarn-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
       - name: 'setup-js'
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
-          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           cd monorepo
           make setup-js
       - name: 'update internal-releases releases.json'

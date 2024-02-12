@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Splash } from '@opentrons/components'
 import { START_TERMINAL_ITEM_ID } from '../steplist'
-import { Portal as MainPageModalPortal } from '../components/portals/MainPageModalPortal'
+import { getMainPagePortalEl } from '../components/portals/MainPageModalPortal'
 import { DeckSetupManager } from '../components/DeckSetupManager'
 import { SettingsPage } from '../components/SettingsPage'
 import { FilePage } from '../components/FilePage'
@@ -15,6 +15,7 @@ import { Alerts } from '../components/alerts/Alerts'
 import { getSelectedTerminalItemId } from '../ui/steps'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import { selectors } from '../navigation'
+import { createPortal } from 'react-dom'
 
 export function MainPanel(): JSX.Element {
   const page = useSelector(selectors.getCurrentPage)
@@ -38,15 +39,18 @@ export function MainPanel(): JSX.Element {
         selectedTerminalItemId === START_TERMINAL_ITEM_ID
       return (
         <>
-          <MainPageModalPortal>
-            <Alerts componentType="Timeline" />
-            <Hints />
-            {startTerminalItemSelected && <LabwareSelectionModal />}
-            <FormManager />
-            {startTerminalItemSelected && ingredSelectionMode && (
-              <LiquidPlacementModal />
-            )}
-          </MainPageModalPortal>
+          {createPortal(
+            <>
+              <Alerts componentType="Timeline" />
+              <Hints />
+              {startTerminalItemSelected && <LabwareSelectionModal />}
+              <FormManager />
+              {startTerminalItemSelected && ingredSelectionMode && (
+                <LiquidPlacementModal />
+              )}
+            </>,
+            getMainPagePortalEl()
+          )}
           <DeckSetupManager />
         </>
       )

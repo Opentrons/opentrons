@@ -16,7 +16,7 @@
 .pypy_cache
 dist
 build
-yarn.lock
+pnpm-lock.yaml
 Pipfile.lock
 
 __pycache__
