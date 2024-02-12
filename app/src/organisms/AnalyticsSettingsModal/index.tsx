@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 import {
   Flex,
   SPACING,
