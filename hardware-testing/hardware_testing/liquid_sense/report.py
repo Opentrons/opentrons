@@ -1,6 +1,6 @@
 """Format the csv report for a liquid-sense run."""
 
-
+import statistics
 from hardware_testing.data.csv_report import (
     CSVReport,
     CSVSection,
@@ -71,13 +71,22 @@ def build_config_section() -> CSVSection:
 def build_trials_section(trials: int, tips: List[int]) -> CSVSection:
     """Build section."""
     lines: List[Union[CSVLine, CSVLineRepeating]] = [
-        CSVLine("trial_number", [str, str, str, str, str, str, str])
+        CSVLine("trial_number", [str, str, str, str, str, str, str, str])
     ]
     lines.extend(
         [
             CSVLine(
+                f"trial-baseline-{tip}ul",
+                [float, float, float, float, float, float, float, float],
+            )
+            for tip in tips
+        ]
+    )
+    lines.extend(
+        [
+            CSVLine(
                 f"trial-{t + 1}-{tip}ul",
-                [float, float, float, float, float, float, float],
+                [float, float, float, float, float, float, float, float],
             )
             for tip in tips
             for t in range(trials)
@@ -95,8 +104,13 @@ def build_results_section(tips: List[int]) -> CSVSection:
     lines: List[CSVLine] = []
     for tip in tips:
         lines.append(CSVLine(f"{tip}ul-average", [float]))
-        lines.append(CSVLine(f"{tip}ul-cv", [float]))
-        lines.append(CSVLine(f"{tip}ul-d", [float]))
+        lines.append(CSVLine(f"{tip}ul-minumum", [float]))
+        lines.append(CSVLine(f"{tip}ul-maximum", [float]))
+        lines.append(CSVLine(f"{tip}ul-stdev", [float]))
+        lines.append(CSVLine(f"{tip}ul-adjusted-average", [float]))
+        lines.append(CSVLine(f"{tip}ul-adjusted-minumum", [float]))
+        lines.append(CSVLine(f"{tip}ul-adjusted-maximum", [float]))
+        lines.append(CSVLine(f"{tip}ul-adjusted-stdev", [float]))
     return CSVSection(title="RESULTS", lines=lines)  # type: ignore[arg-type]
 
 
@@ -144,6 +158,32 @@ def store_config(
     report("CONFIG", "start_height_offset", [start_height_offset])
 
 
+def store_baseline_trial(
+    report: CSVReport,
+    tip: float,
+    height: float,
+    humidity: float,
+    temp: float,
+    z_travel: float,
+    tip_length_error: float,
+) -> None:
+    """Report Trial."""
+    report(
+        "TRIALS",
+        f"trial-baseline-{tip}ul",
+        [
+            height,
+            0,
+            humidity,
+            temp,
+            z_travel,
+            0,
+            0,
+            height,
+        ],
+    )
+
+
 def store_trial(
     report: CSVReport,
     trial: int,
@@ -168,17 +208,27 @@ def store_trial(
             z_travel,
             plunger_travel,
             tip_length_offset,
+            height + tip_length_offset,
         ],
     )
 
 
 def store_tip_results(
-    report: CSVReport, tip: float, average: float, cv: float, d: float
+    report: CSVReport, tip: float, results: List[float], adjusted_results: List[float]
 ) -> None:
     """Store final results."""
-    report("RESULTS", f"{tip}ul-average", [average])
-    report("RESULTS", f"{tip}ul-cv", [cv])
-    report("RESULTS", f"{tip}ul-d", [d])
+    report("RESULTS", f"{tip}ul-average", [sum(results) / len(results)])
+    report("RESULTS", f"{tip}ul-minumum", [min(results)])
+    report("RESULTS", f"{tip}ul-maximum", [max(results)])
+    report("RESULTS", f"{tip}ul-stdev", [statistics.stdev(results)])
+    report(
+        "RESULTS",
+        f"{tip}ul-adjusted-average",
+        [sum(adjusted_results) / len(adjusted_results)],
+    )
+    report("RESULTS", f"{tip}ul-adjusted-minumum", [min(adjusted_results)])
+    report("RESULTS", f"{tip}ul-adjusted-maximum", [max(adjusted_results)])
+    report("RESULTS", f"{tip}ul-adjusted-stdev", [statistics.stdev(adjusted_results)])
 
 
 def build_ls_report(
@@ -207,27 +257,7 @@ def build_ls_report(
             "z_travel",
             "plunger_travel",
             "tip_length_offset",
+            "adjusted_height",
         ],
     )
     return report
-
-
-"""
-def store_sensor_data(test_name: str, run_id: str, trial: int, tip: int,
- pressure_list: List[Tuple[int, float]]): -> None
-    sensor_report = CSVReport(
-        test_name=f"{test_name}-{trial}-{tip}",
-        sections[
-            CSVSection(
-            title="SensorData",
-            lines=[
-                CSVLine(f"trial-{trial + 1}-{tip}ul-{point}", [int, float])
-                for point in range(pressure_list)
-            ],
-        )
-    for point in range(pressure_list):
-        sensor = pressure_list[point][0]
-        pressure = pressure_list[point][1]
-        sensor_report("SensorData",f"trial-{trial + 1}-{tip}ul-{point}",[sensor, pressure])
-    sensor_report.save_to_disk()
-"""
