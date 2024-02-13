@@ -876,13 +876,13 @@ class InstrumentContext(publisher.CommandPublisher):
         )
 
         if location is None:
-            # if not self._core.is_tip_tracking_available():
-            #     raise CommandPreconditionViolated(
-            #         "Automatic tip tracking is not available for the current pipette"
-            #         " nozzle configuration. We suggest switching to a configuration"
-            #         " that supports automatic tip tracking or specifying the exact tip"
-            #         " to pick up."
-            #     )
+            if not self._core.is_tip_tracking_available():
+                raise CommandPreconditionViolated(
+                    "Automatic tip tracking is not available for the current pipette"
+                    " nozzle configuration. We suggest switching to a configuration"
+                    " that supports automatic tip tracking or specifying the exact tip"
+                    " to pick up."
+                )
             tip_rack, well = labware.next_available_tip(
                 starting_tip=self.starting_tip,
                 tip_racks=self.tip_racks,
