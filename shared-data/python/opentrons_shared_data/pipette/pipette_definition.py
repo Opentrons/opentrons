@@ -161,11 +161,15 @@ class PressFitPickUpTipConfiguration(BaseModel):
         ...,
         description="The increment to move the pipette down on each force tip pickup press",
     )
-    distance: float = Field(
-        ..., description="The starting distance to begin a pick up tip from"
+    distance_by_tip_count: Dict[int, float] = Field(
+        ...,
+        description="The starting distance to begin a pick up tip from, based on number of tips being picked up",
+        alias="distanceByTipCount",
     )
-    speed: float = Field(
-        ..., description="The speed to move the Z axis for each force pickup"
+    speed_by_tip_count: Dict[int, float] = Field(
+        ...,
+        description="The speed to move the Z axis for each force pickup, based on number of tips being picked up",
+        alias="speedByTipCount",
     )
     current_by_tip_count: Dict[int, float] = Field(
         ...,

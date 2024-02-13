@@ -13,6 +13,16 @@
       "type": "number",
       "minimum": 0
     },
+    "distanceRange": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 100
+    },
+    "speedRange": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 100
+    },
     "currentRange": {
       "type": "number",
       "minimum": 0.01,
@@ -34,6 +44,18 @@
     "partialTipCount": {
       "type": "number",
       "enum": [1, 2, 3, 4, 5, 6, 7, 8, 12, 96, 384]
+    },
+    "distanceByTipCount": {
+      "type": "object",
+      "patternProperties": {
+        "\\d+": { "$ref": "#/definitions/distanceRange" }
+      }
+    },
+    "speedByTipCount": {
+      "type": "object",
+      "patternProperties": {
+        "\\d+": { "$ref": "#/definitions/speedRange" }
+      }
     },
     "currentByTipCount": {
       "type": "object",
@@ -168,17 +190,19 @@
               "type": "object",
               "required": [
                 "presses",
-                "speed",
+                "speedByTipCount",
                 "increment",
-                "distance",
+                "distanceByTipCount",
                 "currentByTipCount"
               ],
               "additionalProperties": false,
               "properties": {
                 "presses": { "$ref": "#/definitions/positiveNumber" },
-                "speed": { "$ref": "#/definitions/positiveNumber" },
+                "speedByTipCount": { "$ref": "#/definitions/speedByTipCount" },
                 "increment": { "$ref": "#/definitions/positiveNumber" },
-                "distance": { "$ref": "#/definitions/positiveNumber" },
+                "distanceByTipCount": {
+                  "$ref": "#/definitions/distanceByTipCount"
+                },
                 "currentByTipCount": {
                   "$ref": "#/definitions/currentByTipCount"
                 }
