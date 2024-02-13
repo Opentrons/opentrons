@@ -10,6 +10,7 @@ jest.mock('usb')
 const usbGetDeviceList = usb.getDeviceList as jest.MockedFunction<
   typeof usb.getDeviceList
 >
+
 const usbDeviceGetStringDescriptor = jest.fn() as jest.MockedFunction<
   InstanceType<typeof usb.Device>['getStringDescriptor']
 >
@@ -20,8 +21,7 @@ const usbDeviceOpen = jest.fn() as jest.MockedFunction<
 const usbDeviceClose = jest.fn() as jest.MockedFunction<
   InstanceType<typeof usb.Device>['close']
 >
-
-const usbOn = usb.on as jest.MockedFunciton<typeof usb.on>
+const usbOn = usb.on as jest.MockedFunction<typeof usb.on>
 
 const execaCommand = execa.command as jest.MockedFunction<typeof execa.command>
 
@@ -115,7 +115,7 @@ describe('app-shell::system-info::usb-devices', () => {
   })
 
   it('can notify when devices are added', () =>
-    new Promise((resolve, reject) => {
+    new Promise<void>((resolve, reject) => {
       const onDeviceAdd = jest.fn()
       onDeviceAdd.mockImplementation(device => {
         try {
@@ -141,11 +141,16 @@ describe('app-shell::system-info::usb-devices', () => {
         (descriptorId, callback) =>
           callback(undefined, ['sn1', 'mfr1', 'pn1'][descriptorId])
       )
-      attachListener(mockUSBDevice)
+      if (attachListener) {
+        // @ts-expect-error: this is gross
+        attachListener(mockUSBDevice)
+      } else {
+        reject(new Error('attachListener was not defined'))
+      }
     }))
 
   it('can notify when devices are removed', () =>
-    new Promise((resolve, reject) => {
+    new Promise<void>((resolve, reject) => {
       const onDeviceRemove = jest.fn()
       onDeviceRemove.mockImplementation(device => {
         try {
@@ -160,6 +165,7 @@ describe('app-shell::system-info::usb-devices', () => {
       })
 
       let detachListener
+
       usbOn.mockImplementationOnce((event, listener) => {
         if (event === 'detach') {
           detachListener = listener
@@ -169,7 +175,12 @@ describe('app-shell::system-info::usb-devices', () => {
         throw new Error('Cannot open detached device')
       })
       createUsbDeviceMonitor({ onDeviceRemove })
-      detachListener(mockUSBDevice)
+      if (detachListener) {
+        // @ts-expect-error: this is gross
+        detachListener(mockUSBDevice)
+      } else {
+        reject(new Error('detachListener was not created'))
+      }
     }))
 
   it('can get the Windows driver version of a device', () => {

@@ -109,12 +109,34 @@ function upstreamDeviceFromUsbDevice(device: usb.Device): Promise<UsbDevice> {
         ),
       ])
     )
-
     .then(([manufacturer, serialNumber, productName]) => {
+      try {
+        device.close()
+      } catch (err) {
+        log.warning(
+          `Failed to close pid=${idProduct(device)}, vid=${idVendor(
+            device
+          )}: ${err}`
+        )
+      }
       return descriptorToDevice(device, manufacturer, serialNumber, productName)
     })
-    .finally(() => {
-      device.close()
+    .catch(err => {
+      try {
+        device.close()
+      } catch (err) {
+        log.warning(
+          `Failed to close pid=${idProduct(device)}, vid=${idVendor(
+            device
+          )} in err handler: ${err}`
+        )
+      }
+      log.error(
+        `Could not fetch descriptors for pid=${idProduct(
+          device
+        )}, vid=${idVendor(device)}: ${err}, string descriptors unavailable`
+      )
+      return descriptorToDevice(device)
     })
 }
 
@@ -122,7 +144,15 @@ export function createUsbDeviceMonitor(
   options: UsbDeviceMonitorOptions = {}
 ): UsbDeviceMonitor {
   const { onDeviceAdd, onDeviceRemove } = options
-
+  if (isWindows()) {
+    try {
+      log.info('Initializing USBDk backend on windows')
+      usb.useUsbDkBackend()
+      log.info('USBDk backend initialized')
+    } catch (err) {
+      log.error(`Could not initialize USBDk backend: ${err}`)
+    }
+  }
   if (typeof onDeviceAdd === 'function') {
     usb.on('attach', device => {
       upstreamDeviceFromUsbDevice(device)
