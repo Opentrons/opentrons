@@ -15,6 +15,7 @@ import {
   moveDeckItem,
   openAddLabwareModal,
 } from '../../../labware-ingred/actions'
+import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { selectors as labwareDefSelectors } from '../../../labware-defs'
 import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../../../steplist'
 import { BlockedSlot } from './BlockedSlot'
@@ -54,13 +55,17 @@ export const AdapterControls = (
   const customLabwareDefs = useSelector(
     labwareDefSelectors.getCustomLabwareDefsByURI
   )
-
+  const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
+  const labware = activeDeckSetup.labware
+  const ref = React.useRef(null)
+  const [newSlot, setSlot] = React.useState<string | null>(null)
   const dispatch = useDispatch()
+
   const adapterName =
     allLabware.find(labware => labware.id === labwareId)?.def.metadata
       .displayName ?? ''
 
-  const [{ itemType, draggedItem, isOver }, drop] = useDrop(() => ({
+  const [{ itemType, draggedItem, isOver }, drop] = useDrop({
     accept: DND_TYPES.LABWARE,
     canDrop: (item: DroppedItem) => {
       const draggedDef = item.labwareOnDeck?.def
@@ -82,8 +87,12 @@ export const AdapterControls = (
       return true
     },
     drop: (item: DroppedItem) => {
-      if (item.labwareOnDeck) {
-        dispatch(moveDeckItem(item.labwareOnDeck.slot, labwareId))
+      const droppedLabware = item
+      if (newSlot != null) {
+        dispatch(moveDeckItem(newSlot, labwareId))
+      } else if (droppedLabware.labwareOnDeck != null) {
+        const droppedSlot = droppedLabware.labwareOnDeck.slot
+        dispatch(moveDeckItem(droppedSlot, labwareId))
       }
     },
     hover: () => {
@@ -96,7 +105,17 @@ export const AdapterControls = (
       isOver: !!monitor.isOver(),
       draggedItem: monitor.getItem() as DroppedItem,
     }),
-  }))
+  })
+
+  const draggedLabware = Object.values(labware).find(
+    l => l.id === draggedItem?.labwareOnDeck?.id
+  )
+
+  React.useEffect(() => {
+    if (draggedLabware != null) {
+      setSlot(draggedLabware.slot)
+    }
+  })
 
   if (
     selectedTerminalItemId !== START_TERMINAL_ITEM_ID ||
@@ -124,8 +143,10 @@ export const AdapterControls = (
     slotBlocked = 'Labware incompatible with this adapter'
   }
 
+  drop(ref)
+
   return (
-    <g ref={drop}>
+    <g ref={ref}>
       {slotBlocked ? (
         <BlockedSlot
           x={slotPosition[0]}
