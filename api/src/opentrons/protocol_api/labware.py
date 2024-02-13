@@ -301,8 +301,9 @@ class Labware:
 
     Labware available in the API generally fall under two categories.
 
-      - Standard labware: well plates, tube racks, reservoirs, tip racks, etc.
-      - Adapters: Items that hold other labware, on modules or directly on the deck.
+      - Consumable labware: well plates, tubes in racks, reservoirs, tip racks, etc.
+      - Adapters: durable items that hold other labware, either on modules or directly
+        on the deck.
 
     The ``Labware`` class defines the physical geometry of the labware
     and provides methods for :ref:`accessing wells <new-well-access>` within the labware.
@@ -375,6 +376,7 @@ class Labware:
         """A string fully identifying the labware.
 
         The URI has three parts and follows the pattern ``"namespace/load_name/version"``.
+        For example, ``opentrons/corning_96_wellplate_360ul_flat/2``.
         """
         return self._core.get_uri()
 
@@ -639,12 +641,11 @@ class Labware:
         For example, access well A1 with ``labware.wells()[0]``.
 
         .. note::
-            This method takes args for backward compatibility, but using args is
-            deprecated and will be removed in a future versions of the API.
+            Using args with this method is deprecated. Use indexing instead.
 
-            Args can be either strings or integers, but not a mix of the two. For
-            example, ``.wells(1, 4)`` or ``.wells("1", "4")`` is valid, but
-            ``.wells("1", 4)`` is not.
+            If your code uses args, they can be either strings or integers, but not a
+            mix of the two. For example, ``.wells(1, 4)`` or ``.wells("1", "4")`` is
+            valid, but ``.wells("1", 4)`` is not.
 
         :return: Ordered list of all wells in a labware.
         """
@@ -698,12 +699,11 @@ class Labware:
         objects containing A1 through A12.
 
         .. note::
-            This method takes args for backward compatibility, but using args is
-            deprecated and will be removed in a future versions of the API.
+            Using args with this method is deprecated. Use indexing instead.
 
-            Args can be either strings or integers, but not a mix of the two. For
-            example, ``.rows(1, 4)`` or ``.rows("1", "4")`` is valid, but
-            ``.rows("1", 4)`` is not.
+            If your code uses args, they can be either strings or integers, but not a
+            mix of the two. For example, ``.rows(1, 4)`` or ``.rows("1", "4")`` is
+            valid, but ``.rows("1", 4)`` is not.
 
         :return: A list of row lists.
         """
@@ -764,12 +764,11 @@ class Labware:
         objects containing A1 through H1.
 
         .. note::
-            This method takes args for backward compatibility, but using args is
-            deprecated and will be removed in a future versions of the API.
+            Using args with this method is deprecated. Use indexing instead.
 
-            Args can be either strings or integers, but not a mix of the two. For
-            example, ``.columns(1, 4)`` or ``.columns("1", "4")`` is valid, but
-            ``.columns("1", 4)`` is not.
+            If your code uses args, they can be either strings or integers, but not a
+            mix of the two. For example, ``.columns(1, 4)`` or ``.columns("1", "4")`` is
+            valid, but ``.columns("1", 4)`` is not.
 
         :return: A list of column lists.
         """
@@ -1037,6 +1036,12 @@ class Labware:
     @requires_version(2, 0)
     def reset(self) -> None:
         """Reset tip tracking for a tip rack.
+
+        After resetting, the API treats all wells on the rack as if they contain unused tips.
+        This is useful if you want to reuse tips after calling :py:meth:`.return_tip()`.
+
+        If you need to physically replace an empty tip rack in the middle of your protocol,
+        use :py:meth:`.move_labware()` instead. See :ref:`off-deck-location` for an example.
 
         .. versionchanged:: 2.14
             This method will raise an exception if you call it on a labware that isn't
