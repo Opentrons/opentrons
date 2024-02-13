@@ -70,7 +70,7 @@ export const ConnectedStepItem = (
   props: ConnectedStepItemProps
 ): JSX.Element => {
   const { stepId, stepNumber } = props
-  
+
   const step = useSelector(stepFormSelectors.getSavedStepForms)[stepId]
   const argsAndErrors = useSelector(stepFormSelectors.getArgsAndErrorsByStepId)[
     stepId

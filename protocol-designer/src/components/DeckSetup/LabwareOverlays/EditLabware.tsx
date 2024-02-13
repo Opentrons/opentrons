@@ -25,6 +25,9 @@ interface Props {
   swapBlocked: boolean
 }
 
+interface DroppedItem {
+  labwareOnDeck: LabwareOnDeck
+}
 export const EditLabware = (props: Props): JSX.Element | null => {
   const {
     labwareOnDeck,
@@ -59,30 +62,30 @@ export const EditLabware = (props: Props): JSX.Element | null => {
 
   const [{ draggedLabware, isOver }, drop] = useDrop(() => ({
     accept: DND_TYPES.LABWARE,
-    canDrop: (monitor: DropTargetMonitor) => {
-      const draggedItem: any = monitor.getItem()
+    canDrop: (item: any) => {
+      const draggedItem = item?.labwareOnDeck
       const draggedLabware = draggedItem?.labwareOnDeck
       const isDifferentSlot =
-        draggedLabware && draggedLabware.slot !== props.labwareOnDeck.slot
-      return isDifferentSlot && !props.swapBlocked
+        draggedLabware && draggedLabware.slot !== labwareOnDeck.slot
+      return isDifferentSlot && !swapBlocked
     },
-    drop: (monitor: DropTargetMonitor) => {
-      const draggedItem: any = monitor.getItem()
+    drop: (item: any) => {
+      const draggedItem = item?.labwareOnDeck
       if (draggedItem) {
         dispatch(
-          moveDeckItem(draggedItem.labwareOnDeck.slot, props.labwareOnDeck.slot)
+          moveDeckItem(draggedItem.labwareOnDeck.slot, labwareOnDeck.slot)
         )
       }
     },
 
     hover: (monitor: DropTargetMonitor) => {
       if (monitor.canDrop()) {
-        props.setHoveredLabware(labwareOnDeck)
+        setHoveredLabware(labwareOnDeck)
       }
     },
     collect: (monitor: DropTargetMonitor) => ({
       isOver: monitor.isOver(),
-      draggedLabware: monitor.getItem() as any,
+      draggedLabware: monitor.getItem() as DroppedItem,
     }),
   }))
 
@@ -94,7 +97,8 @@ export const EditLabware = (props: Props): JSX.Element | null => {
       />
     )
   } else {
-    const isBeingDragged = draggedLabware?.slot === labwareOnDeck.slot
+    const isBeingDragged =
+      draggedLabware?.labwareOnDeck.slot === labwareOnDeck.slot
 
     let contents: React.ReactNode | null = null
 
