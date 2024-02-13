@@ -5,24 +5,73 @@ neatly document any changes that may happen during QA, such as bug fixes, and se
 
 ## Releasing Robot Software Stacks
 
-The app and API projects are currently versioned together to ensure interoperability.
+### Overview
 
-1. Ensure you have a release created in GitHub for the robot stack you're releasing - buildroot for ot-2, oe-core for ot-3 - with all the changes you want in this release, if any. If there are no system changes, you don't have to create a new release; the last tag in the system repo is used for release builds.
+The robot release process has 3 main outputs:
+- Electron app
+- OT-2 system package
+- Flex system package
 
-2. Checkout `edge` and make a release branch, without any new changes. The branch name should match `release_*` to make it clear this is a release.
+
+```mermaid
+flowchart LR
+    subgraph Shared ["Shared Repository"]
+    opentrons["Opentrons/opentrons" ]
+    end
+
+    subgraph Flex ["Flex Only"]
+    oe_core["Opentrons/oe-core"]
+    ot3_firmware["Opentrons/ot3-firmware" ]
+    end
+
+    subgraph OT2 ["OT-2 Only"]
+    buildroot["Opentrons/buildroot" ]
+    end
+
+    OT2Build["OT-2 System Package"]
+    opentrons --> OT2Build
+    buildroot --> OT2Build
+
+   App["Opentrons App"]
+    opentrons --> App
+
+    FlexBuild["Flex System Package"]
+    opentrons --> FlexBuild
+    oe_core --> FlexBuild
+    ot3_firmware --> FlexBuild
+
+    click oe_core "https://github.com/Opentrons/oe-core" _blank
+    click ot3_firmware "https://github.com/Opentrons/ot3-firmware" _blank
+    click opentrons "https://github.com/Opentrons/opentrons" _blank
+    click opentrons_modules "https://github.com/Opentrons/opentrons-modules" _blank
+    click buildroot "https://github.com/Opentrons/buildroot" _blank
+```
+
+These are all versioned and released together.  These assets are produced in 2 possible channels:
+- Release (External facing releases - stable, beta, alpha)
+- Internal Release (Internal facing releases - stable, beta, alpha)
+
+
+### Steps to release
+
+1. Checkout `edge` and make a chore release branch, without any new changes. The branch name should match `chore_release-*`.
 
    ```shell
-   git checkout edge
+   git switch edge
    git pull
-   git checkout -b release_${version}
-   git push --set-upstream origin release_${version}
+   git switch -c chore_release-${version}
+   git push --set-upstream origin chore_release-${version}
    ```
 
-3. Open a PR into `release` for your release branch; this should contain all the changes that were in `edge` and not yet `release`. This PR will stick around for the duration of the release process, as QA-discovered bugs will have their fixes merged to this PR.
+2. Open a PR into `release` for your release branch; this should contain all the changes that were in `edge` and not yet in `release`. This PR will stick around for the duration of the release process, as QA-discovered bugs will have their fixes merged to this PR.
 
    Part of what should happen in this branch is soliciting input and changes for the user-facing release notes at `app-shell/build/release-notes.md` for the app and `api/release-notes.md` for the robot software. Any changes should be done in a PR just like a QA bug. You should have final approval before the alpha process concludes.
 
-4. Check out and pull your release branch locally and create a tag for a new alpha version (since this is in QA). The alpha version should end with an `-alpha.N` prerelease tag, where `N` goes from 0 up over the course of the QA process. You don't need a PR or a commit to create a new version; the presence of the tag is all that you need. Let's call the alpha version you're about to create `${alphaVersion}`:
+Evaluate tags on the other repos
+How and if to bump
+only use annotated tags
+
+3. Check out and pull your release branch locally and create a tag for a new alpha version (since this is in QA). The alpha version should end with an `-alpha.N` prerelease tag, where `N` goes from 0 up over the course of the QA process. You don't need a PR or a commit to create a new version; the presence of the tag is all that you need. Let's call the alpha version you're about to create `${alphaVersion}`:
 
    ```shell
    git checkout release_${version}
