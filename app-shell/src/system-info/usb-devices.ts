@@ -3,6 +3,7 @@ import execa from 'execa'
 import { usb } from 'usb'
 import { isWindows } from '../os'
 import { createLogger } from '../log'
+import { createHmac } from 'crypto'
 
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 
@@ -26,6 +27,12 @@ const descriptorToDevice = (
 ): UsbDevice => ({
   vendorId: descriptors.deviceDescriptor.idVendor,
   productId: descriptors.deviceDescriptor.idProduct,
+  // yes this arbitrary string could be something other than an hmac but then
+  // it might be different lengths. it was this or install leftPad, I tell you
+  identifier: createHmac('md5', '')
+    .update(descriptors.busNumber.toString(16))
+    .update(descriptors.deviceAddress.toString(16))
+    .digest('hex'),
   serialNumber,
   manufacturerName,
   productName,
@@ -38,8 +45,10 @@ const getStringDescriptorPromise = (
   new Promise((resolve, reject) => {
     device.getStringDescriptor(index, (error?, value?) => {
       // fyi if you do something in this callback that throws there's a good chance
-      // it will crash node
-      (!!error || !!!value) ? reject(error ?? 'no value') : resolve(value)
+      // it will crash node. fyi things that might raise include calling half the
+      // built-ins since this executes in a weird extension environment. for instance
+      // log.info or in fact console.log will cause a hard crash here
+      !!error || !!!value ? reject(error ?? 'no value') : resolve(value)
     })
   })
 

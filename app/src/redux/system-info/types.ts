@@ -14,6 +14,7 @@ import {
 export interface UsbDevice {
   vendorId: number
   productId: number
+  identifier: string
   productName?: string
   manufacturerName?: string
   serialNumber?: string
