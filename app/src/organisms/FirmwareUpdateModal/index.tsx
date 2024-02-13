@@ -140,16 +140,7 @@ export const FirmwareUpdateModal = (
 
   return (
     <Flex css={MODAL_STYLE}>
-      <StyledText css={DESCRIPTION_STYLE}>
-        {firmwareText.length ? firmwareText : 'Checking for updates...'}
-      </StyledText>
-      {status != null || updateNeeded ? (
-        <ProgressBar
-          percentComplete={percentComplete}
-          outerStyles={OUTER_STYLES}
-        />
-      ) : null}
-      {firmwareText.length ? null : (
+      {status != null || updateNeeded || firmwareText.length == 0 ? (
         <Icon
           name="ot-spinner"
           aria-label="spinner"
@@ -157,7 +148,10 @@ export const FirmwareUpdateModal = (
           css={SPINNER_STYLE}
           spin
         />
-      )}
+      ) : null}
+      <StyledText css={DESCRIPTION_STYLE}>
+        {firmwareText.length ? firmwareText : 'Checking for updates...'}
+      </StyledText>
     </Flex>
   )
 }
