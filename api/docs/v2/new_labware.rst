@@ -32,6 +32,8 @@ After you've created your labware, save it as a ``.json`` file and add it to the
 
 If other people need to use your custom labware definition, they must also add it to their Opentrons App.
 
+.. _loading-labware:
+
 ***************
 Loading Labware
 ***************
