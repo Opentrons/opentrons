@@ -9,7 +9,7 @@ SHELL := bash
 PATH := $(shell cd .. && pnpm bin):$(PATH)
 
 # dev server port
-PORT ?= 8090
+PORT ?= 5173
 
 # dep directories for production build
 # TODO(mc, 2018-08-07): figure out a better way to do this

@@ -15,7 +15,9 @@
   "compilerOptions": {
     "composite": true,
     "rootDir": "src",
-    "outDir": "lib"
+    "outDir": "lib",
+    "target": "esnext",
+    "module": "ESNext"
   },
   "include": ["typings", "src"]
 }

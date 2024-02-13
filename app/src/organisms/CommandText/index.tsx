@@ -23,7 +23,7 @@ import { MoveLabwareCommandText } from './MoveLabwareCommandText'
 import type {
   CompletedProtocolAnalysis,
   RobotType,
-} from '@opentrons/shared-data/js'
+} from '@opentrons/shared-data'
 import type { StyleProps } from '@opentrons/components'
 
 const SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE: {

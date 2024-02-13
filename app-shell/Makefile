@@ -9,7 +9,7 @@ SHELL := bash
 PATH := $(shell cd .. && pnpm bin):$(PATH)
 
 # dev server port
-PORT ?= 8090
+PORT ?= 3000
 
 # dep directories for production build
 # TODO(mc, 2018-08-07): figure out a better way to do this
@@ -97,7 +97,7 @@ clean:
 .PHONY: lib
 lib: export NODE_ENV := production
 lib:
-	NODE_OPTIONS=--openssl-legacy-provider webpack --profile
+	vite build
 
 .PHONY: deps
 deps:
@@ -182,7 +182,9 @@ dev-app-update.yml:
 dev: export NODE_ENV := development
 dev: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
 dev: clean-dev-autoupdate ./dev-app-update.yml
-	NODE_OPTIONS=--openssl-legacy-provider webpack
+	echo STARTING VITE!
+	vite build
+	echo STARTING ELECTRON!
 	$(electron)
 
 .PHONY: test

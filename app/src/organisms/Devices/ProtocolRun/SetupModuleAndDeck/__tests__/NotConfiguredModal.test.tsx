@@ -5,14 +5,14 @@ import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
 import {
   useDeckConfigurationQuery,
   useUpdateDeckConfigurationMutation,
-} from '@opentrons/react-api-client/src/deck_configuration'
+} from '@opentrons/react-api-client'
 import { i18n } from '../../../../../i18n'
 import { NotConfiguredModal } from '../NotConfiguredModal'
 
 import type { UseQueryResult } from 'react-query'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 
-jest.mock('@opentrons/react-api-client/src/deck_configuration')
+jest.mock('@opentrons/react-api-client')
 
 const mockUseUpdateDeckConfigurationMutation = useUpdateDeckConfigurationMutation as jest.MockedFunction<
   typeof useUpdateDeckConfigurationMutation

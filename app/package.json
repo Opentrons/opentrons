@@ -1,5 +1,6 @@
 {
   "name": "@opentrons/app",
+  "type": "module",
   "version": "0.0.0-dev",
   "description": "Opentrons desktop application UI",
   "source": "src/index.tsx",

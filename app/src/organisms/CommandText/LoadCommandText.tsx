@@ -5,7 +5,7 @@ import {
   getOccludedSlotCountForModule,
   LoadLabwareRunTimeCommand,
 } from '@opentrons/shared-data'
-import { getPipetteNameSpecs } from '@opentrons/shared-data/js'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
 import type {
   RunTimeCommand,

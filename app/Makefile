@@ -7,7 +7,7 @@ SHELL := bash
 PATH := $(shell cd .. && pnpm bin):$(PATH)
 
 # dev server port
-PORT ?= 8090
+PORT ?= 5173
 
 # Path of source package
 SRC_PATH = app
@@ -43,11 +43,10 @@ clean:
 
 # artifacts
 #####################################################################
-# override webpack's default hashing algorithm for node 18: https://github.com/webpack/webpack/issues/14532
 .PHONY: dist
 dist: export NODE_ENV := production
 dist:
-	NODE_OPTIONS=--openssl-legacy-provider webpack --profile
+	vite build
 
 # development
 #####################################################################
@@ -71,13 +70,11 @@ dev-odd:
 
 .PHONY: dev-server
 dev-server: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
-dev-server: export NODE_OPTIONS := --openssl-legacy-provider
 dev-server:
-	webpack-dev-server --hot --host=::
+	vite serve
 
 .PHONY: dev-shell
 dev-shell:
-	wait-on http-get://localhost:$(PORT)
 	$(MAKE) -C $(shell_dir) dev OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)
 
 

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   useDeckConfigurationQuery,
   useUpdateDeckConfigurationMutation,
-} from '@opentrons/react-api-client/src/deck_configuration'
+} from '@opentrons/react-api-client'
 import {
   Flex,
   DIRECTION_COLUMN,

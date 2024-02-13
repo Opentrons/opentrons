@@ -5,7 +5,7 @@ import { UseQueryResult } from 'react-query'
 import { STAGING_AREA_RIGHT_SLOT_FIXTURE } from '@opentrons/shared-data'
 import _heaterShakerCommandsWithResultsKey from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommandsWithResultsKey.json'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client/src/deck_configuration'
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 
 import { getProtocolModulesInfo } from '../../ProtocolRun/utils/getProtocolModulesInfo'
 
@@ -28,7 +28,7 @@ import type {
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 
-jest.mock('@opentrons/react-api-client/src/deck_configuration')
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../useAttachedModules')
 jest.mock('../useStoredProtocolAnalysis')

@@ -4,7 +4,7 @@ import { COLORS, TYPOGRAPHY } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
-} from '@opentrons/shared-data/js/constants'
+} from '@opentrons/shared-data'
 import { StatusLabel } from '../../atoms/StatusLabel'
 import { StyledText } from '../../atoms/text'
 import type { MagneticStatus } from '../../redux/modules/api-types'

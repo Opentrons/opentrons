@@ -1,5 +1,5 @@
 // app updater
-import { autoUpdater as updater } from 'electron-updater'
+import updater from 'electron-updater'
 
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import { createLogger } from './log'
@@ -9,10 +9,12 @@ import { UPDATE_VALUE } from '@opentrons/app/src/redux/config'
 import type { UpdateInfo } from '@opentrons/app/src/redux/shell/types'
 import type { Action, Dispatch, PlainError } from './types'
 
-updater.logger = createLogger('update')
-updater.autoDownload = false
+const autoUpdater = updater.autoUpdater
 
-export const CURRENT_VERSION: string = updater.currentVersion.version
+autoUpdater.logger = createLogger('update')
+autoUpdater.autoDownload = false
+
+export const CURRENT_VERSION: string = autoUpdater.currentVersion.version
 
 export function registerUpdate(
   dispatch: Dispatch
@@ -27,7 +29,7 @@ export function registerUpdate(
         return downloadUpdate(dispatch)
 
       case 'shell:APPLY_UPDATE':
-        return updater.quitAndInstall()
+        return autoUpdater.quitAndInstall()
     }
   }
 }
@@ -44,23 +46,23 @@ function checkUpdate(dispatch: Dispatch): void {
     done({ error: PlainObjectError(error), info: null, available: false })
   }
 
-  updater.once('update-available', onAvailable)
-  updater.once('update-not-available', onNotAvailable)
-  updater.once('error', onError)
+  autoUpdater.once('update-available', onAvailable)
+  autoUpdater.once('update-not-available', onNotAvailable)
+  autoUpdater.once('error', onError)
 
   // @ts-expect-error(mc, 2021-02-16): do not use dot-path notation
-  updater.channel = getConfig('update.channel')
+  autoUpdater.channel = getConfig('update.channel')
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  updater.checkForUpdates()
+  autoUpdater.checkForUpdates()
 
   function done(payload: {
     info?: UpdateInfo | null
     available?: boolean
     error?: PlainError
   }): void {
-    updater.removeListener('update-available', onAvailable)
-    updater.removeListener('update-not-available', onNotAvailable)
-    updater.removeListener('error', onError)
+    autoUpdater.removeListener('update-available', onAvailable)
+    autoUpdater.removeListener('update-not-available', onNotAvailable)
+    autoUpdater.removeListener('error', onError)
     dispatch({ type: 'shell:CHECK_UPDATE_RESULT', payload })
   }
 }
@@ -88,16 +90,16 @@ function downloadUpdate(dispatch: Dispatch): void {
     done({ error: PlainObjectError(error) })
   }
 
-  updater.on('download-progress', onDownloading)
-  updater.once('update-downloaded', onDownloaded)
-  updater.once('error', onError)
+  autoUpdater.on('download-progress', onDownloading)
+  autoUpdater.once('update-downloaded', onDownloaded)
+  autoUpdater.once('error', onError)
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  updater.downloadUpdate()
+  autoUpdater.downloadUpdate()
 
   function done(payload: { error?: PlainError }): void {
-    updater.removeListener('download-progress', onDownloading)
-    updater.removeListener('update-downloaded', onDownloaded)
-    updater.removeListener('error', onError)
+    autoUpdater.removeListener('download-progress', onDownloading)
+    autoUpdater.removeListener('update-downloaded', onDownloaded)
+    autoUpdater.removeListener('error', onError)
     if (payload.error == null)
       dispatch({
         type: UPDATE_VALUE,

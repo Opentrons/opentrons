@@ -7,7 +7,7 @@ import {
   SINGLE_SLOT_FIXTURES,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client/src/deck_configuration'
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 
 import { getProtocolModulesInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'

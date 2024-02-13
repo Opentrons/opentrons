@@ -6,7 +6,7 @@ import {
   HEATERSHAKER_MODULE_MODELS,
   TEMPERATURE_MODULE_MODELS,
   THERMOCYCLER_MODULE_MODELS,
-} from '@opentrons/shared-data/js/constants'
+} from '@opentrons/shared-data'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import { StyledText } from '../../atoms/text'

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 
 import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
-import { getModuleDisplayName } from '@opentrons/shared-data/js/modules'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import { StyledText } from '../../../atoms/text'
 import { formatLastCalibrated } from './utils'

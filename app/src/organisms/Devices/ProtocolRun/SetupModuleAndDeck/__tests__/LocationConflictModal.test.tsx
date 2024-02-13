@@ -10,13 +10,13 @@ import {
 import {
   useDeckConfigurationQuery,
   useUpdateDeckConfigurationMutation,
-} from '@opentrons/react-api-client/src/deck_configuration'
+} from '@opentrons/react-api-client'
 import { i18n } from '../../../../../i18n'
 import { LocationConflictModal } from '../LocationConflictModal'
 
 import type { DeckConfiguration } from '@opentrons/shared-data'
 
-jest.mock('@opentrons/react-api-client/src/deck_configuration')
+jest.mock('@opentrons/react-api-client')
 
 const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
   typeof useDeckConfigurationQuery

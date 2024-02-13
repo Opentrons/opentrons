@@ -1,7 +1,12 @@
 // electron main entry point
 import { app, ipcMain } from 'electron'
+import electronDebug from 'electron-debug'
 import dns from 'dns'
 import contextMenu from 'electron-context-menu'
+import devtools, {
+  REACT_DEVELOPER_TOOLS,
+  REDUX_DEVTOOLS,
+} from 'electron-devtools-installer'
 import { webusb } from 'usb'
 
 import { createUi, registerReloadUi } from './ui'
@@ -40,7 +45,7 @@ log.debug('App config', {
 
 if (config.devtools) {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  require('electron-debug')({ isEnabled: true, showDevTools: true })
+  electronDebug({ isEnabled: true, showDevTools: true })
 }
 
 // hold on to references so they don't get garbage collected
@@ -132,11 +137,9 @@ function createRendererLogger(): Logger {
   return logger
 }
 
-function installDevtools(): Promise<void> {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const devtools = require('electron-devtools-installer')
-  const extensions = [devtools.REACT_DEVELOPER_TOOLS, devtools.REDUX_DEVTOOLS]
-  const install = devtools.default
+function installDevtools(): Promise<void | Logger> {
+  const extensions = [REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS]
+  const install = devtools
   const forceReinstall = config.reinstallDevtools
 
   log.debug('Installing devtools')

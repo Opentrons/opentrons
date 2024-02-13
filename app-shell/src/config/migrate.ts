@@ -41,7 +41,7 @@ export const DEFAULTS_V0: ConfigV0 = {
   // app update config
   update: {
     // @ts-expect-error can't get TS to recognize global.d.ts
-    channel: global._PKG_VERSION_.includes('beta') ? 'beta' : 'latest',
+    channel: [].includes('beta') ? 'beta' : 'latest',
   },
 
   buildroot: {

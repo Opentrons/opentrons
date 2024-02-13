@@ -1,6 +1,6 @@
 import Ajv from 'ajv'
 import sortBy from 'lodash/sortBy'
-import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
+import {labwareSchemaV2 as labwareSchema} from '@opentrons/shared-data'
 import { sameIdentity } from './compare'
 
 import {
