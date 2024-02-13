@@ -1,19 +1,18 @@
+import { vi, describe, it, expect } from 'vitest'
 import { labwareDefToFields } from '../labwareDefToFields'
 import { fieldsToLabware } from '../fieldsToLabware'
 import { labwareFormSchema } from '../labwareFormSchema'
 import { DEFAULT_CUSTOM_NAMESPACE } from '@opentrons/shared-data'
-import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import _fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
-import _fixtureTiprack300ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import _fixture24TubeRack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
+import {
+  fixture_96_plate,
+  fixture_12_trough,
+  fixture_tiprack_300_ul,
+  fixture_24_tuberack,
+} from '@opentrons/shared-data/labware/fixtures/2'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ProcessedLabwareFields } from '../fields'
 
-const fixture96Plate = _fixture96Plate as LabwareDefinition2
-const fixture12Trough = _fixture12Trough as LabwareDefinition2
-const fixtureTiprack = _fixtureTiprack300ul as LabwareDefinition2
-const fixture24TubeRack = _fixture24TubeRack as LabwareDefinition2
-jest.mock('../../definitions')
+vi.mock('../../definitions')
 
 describe('load and immediately save integrity test', () => {
   const pipetteName = 'p10_single'
@@ -24,19 +23,19 @@ describe('load and immediately save integrity test', () => {
   // (without these fields, Yup schema cast would fail)
   const testCases = [
     {
-      inputDef: fixture96Plate,
+      inputDef: fixture_96_plate,
       extraFields: { pipetteName },
     },
     {
-      inputDef: fixture12Trough,
+      inputDef: fixture_12_trough,
       extraFields: { pipetteName },
     },
     {
-      inputDef: fixtureTiprack,
+      inputDef: fixture_tiprack_300_ul,
       extraFields: { pipetteName },
     },
     {
-      inputDef: fixture24TubeRack,
+      inputDef: fixture_24_tuberack,
       extraFields: { pipetteName, tubeRackInsertLoadName: 'customTubeRack' },
     },
   ]

@@ -1,38 +1,34 @@
 import React from 'react'
-import '@testing-library/jest-dom'
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { when } from 'vitest-when'
 import { FormikConfig } from 'formik'
-import { when, resetAllWhenMocks } from 'jest-when'
 import { render, screen } from '@testing-library/react'
-import { nestedTextMatcher } from '@opentrons/components'
+import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
 import { getDefaultFormState, LabwareFields } from '../../../fields'
 import { isEveryFieldHidden } from '../../../utils'
 import { Height } from '../../sections/Height'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-jest.mock('../../../utils')
-
-const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
-  typeof isEveryFieldHidden
->
+vi.mock('../../../utils')
 
 const formikConfig: FormikConfig<LabwareFields> = {
   initialValues: getDefaultFormState(),
-  onSubmit: jest.fn(),
+  onSubmit: vi.fn(),
 }
 
 describe('Height Section', () => {
   beforeEach(() => {
-    when(isEveryFieldHiddenMock)
+    when(vi.mocked(isEveryFieldHidden))
       .calledWith(
         ['labwareType', 'labwareZDimension'],
         formikConfig.initialValues
       )
-      .mockReturnValue(false)
+      .thenReturn(false)
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
-    resetAllWhenMocks()
+    vi.restoreAllMocks()
   })
 
   it('should render text fields when fields are visible', () => {
@@ -81,20 +77,19 @@ describe('Height Section', () => {
   it('should render height alert when error is present', () => {
     formikConfig.initialValues.labwareZDimension = '130'
     formikConfig.initialTouched = { labwareZDimension: true }
-    const { container } = render(wrapInFormik(<Height />, formikConfig))
-    const error = container.querySelector('[class="alert info"]')
-    expect(error?.textContent).toBe(
+    render(wrapInFormik(<Height />, formikConfig))
+    screen.getByText(
       'This labware may be too tall to work with some pipette + tip combinations. Please test on robot.'
     )
   })
 
   it('should not render when all fields are hidden', () => {
-    when(isEveryFieldHiddenMock)
+    when(vi.mocked(isEveryFieldHidden))
       .calledWith(
         ['labwareType', 'labwareZDimension'],
         formikConfig.initialValues
       )
-      .mockReturnValue(true)
+      .thenReturn(true)
 
     const { container } = render(wrapInFormik(<Height />, formikConfig))
     expect(container.firstChild).toBe(null)

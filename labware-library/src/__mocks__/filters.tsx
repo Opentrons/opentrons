@@ -1,8 +1,10 @@
 'use strict'
+import { vi } from 'vitest'
+import * as filters from '../filters'
 
-jest.mock('../definitions')
+vi.mock('../definitions')
 
-const filters = jest.genMockFromModule('../filters')
+vi.mock('../filters')
 
 // commonjs export to mock named exports
 module.exports = filters

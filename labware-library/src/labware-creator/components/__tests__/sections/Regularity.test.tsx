@@ -1,8 +1,9 @@
 import React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { when } from 'vitest-when'
 import { FormikConfig } from 'formik'
 import { render, screen } from '@testing-library/react'
-import '@testing-library/jest-dom'
 import {
   getDefaultFormState,
   getInitialStatus,
@@ -12,15 +13,7 @@ import { isEveryFieldHidden, getLabwareName } from '../../../utils'
 import { Regularity } from '../../sections/Regularity'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-jest.mock('../../../utils')
-
-const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
-  typeof isEveryFieldHidden
->
-
-const getLabwareNameMock = getLabwareName as jest.MockedFunction<
-  typeof getLabwareName
->
+vi.mock('../../../utils')
 
 let formikConfig: FormikConfig<LabwareFields>
 
@@ -29,23 +22,22 @@ describe('Regularity', () => {
     formikConfig = {
       initialValues: getDefaultFormState(),
       initialStatus: getInitialStatus(),
-      onSubmit: jest.fn(),
+      onSubmit: vi.fn(),
     }
 
-    when(isEveryFieldHiddenMock)
+    when(vi.mocked(isEveryFieldHidden))
       .calledWith(['homogeneousWells'], formikConfig.initialValues)
-      .mockReturnValue(false)
+      .thenReturn(false)
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
-    resetAllWhenMocks()
+    vi.restoreAllMocks()
   })
 
   it('should render radio fields when fields are visible', () => {
-    when(getLabwareNameMock)
+    when(vi.mocked(getLabwareName))
       .calledWith(formikConfig.initialValues, true)
-      .mockReturnValue('FAKE LABWARE NAME PLURAL')
+      .thenReturn('FAKE LABWARE NAME PLURAL')
 
     render(wrapInFormik(<Regularity />, formikConfig))
     expect(screen.getByRole('heading')).toHaveTextContent(/regularity/i)
@@ -71,9 +63,9 @@ describe('Regularity', () => {
   })
 
   it('should not render when all of the fields are hidden', () => {
-    when(isEveryFieldHiddenMock)
+    when(vi.mocked(isEveryFieldHidden))
       .calledWith(['homogeneousWells'], formikConfig.initialValues)
-      .mockReturnValue(true)
+      .thenReturn(true)
 
     const { container } = render(wrapInFormik(<Regularity />, formikConfig))
     expect(container.firstChild).toBe(null)

@@ -1,21 +1,17 @@
+import { vi, describe, it, expect } from 'vitest'
 import { labwareDefToFields } from '../labwareDefToFields'
-import _fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
-import _fixture24Tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
-import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import _fixtureIrregularExample1 from '@opentrons/shared-data/labware/fixtures/2/fixture_irregular_example_1.json'
+import {
+  fixture_12_trough,
+  fixture_24_tuberack,
+  fixture_96_plate,
+  fixture_irregular_example_1
+} from '@opentrons/shared-data/labware/fixtures/2'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-
-const fixture96Plate = _fixture96Plate as LabwareDefinition2
-const fixture12Trough = _fixture12Trough as LabwareDefinition2
-const fixtureIrregularExample1 = _fixtureIrregularExample1 as LabwareDefinition2
-const fixture24Tuberack = _fixture24Tuberack as LabwareDefinition2
-
-jest.mock('../../definitions')
+vi.mock('../../definitions')
 
 describe('labwareDefToFields', () => {
   it('fixture_96_plate', () => {
-    const def = fixture96Plate
+    const def = fixture_96_plate
     const result = labwareDefToFields(def)
     expect(result).toEqual({
       labwareType: 'wellPlate',
@@ -62,7 +58,7 @@ describe('labwareDefToFields', () => {
 
   it('fixture_12_trough', () => {
     // make sure rectangular wells + single row works as expected
-    const def = fixture12Trough
+    const def = fixture_12_trough
     const result = labwareDefToFields(def)
 
     expect(result?.labwareType).toEqual('reservoir')
@@ -72,13 +68,13 @@ describe('labwareDefToFields', () => {
   })
 
   it('fixture_irregular_example_1 should return null (until multi-grid labware is supported in LC)', () => {
-    const def = fixtureIrregularExample1
+    const def = fixture_irregular_example_1
     const result = labwareDefToFields(def)
     expect(result).toEqual(null)
   })
 
   it('fixture_24_tuberack should match snapshot', () => {
-    const def = fixture24Tuberack
+    const def = fixture_24_tuberack
     const result = labwareDefToFields(def)
 
     expect(result?.labwareType).toEqual('tubeRack')

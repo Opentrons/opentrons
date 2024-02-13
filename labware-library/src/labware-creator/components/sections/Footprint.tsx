@@ -7,6 +7,7 @@ import { FormAlerts } from '../alerts/FormAlerts'
 import { XYDimensionAlerts } from '../alerts/XYDimensionAlerts'
 import { TextField } from '../TextField'
 import { SectionBody } from './SectionBody'
+import footprintImage from '../../images/footprint.svg'
 
 import styles from '../../styles.module.css'
 
@@ -38,7 +39,7 @@ const Content = (props: ContentProps): JSX.Element => {
       </div>
       <div className={styles.diagram_column}>
         <img
-          src={require('../../images/footprint.svg')}
+          src={footprintImage}
           alt="labware footprint"
         />
       </div>

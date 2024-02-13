@@ -1,4 +1,76 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`labwareDefToFields > fixture_12_trough 1`] = `
+{
+  "aluminumBlockChildType": null,
+  "aluminumBlockType": null,
+  "brand": "USA Scientific",
+  "brandId": "1061-8150",
+  "displayName": null,
+  "footprintXDimension": "127.76",
+  "footprintYDimension": "85.8",
+  "gridColumns": "12",
+  "gridOffsetX": "13.94",
+  "gridOffsetY": "42.9",
+  "gridRows": "1",
+  "gridSpacingX": "9.09",
+  "gridSpacingY": null,
+  "groupBrand": undefined,
+  "groupBrandId": undefined,
+  "handPlacedTipFit": null,
+  "homogeneousWells": "true",
+  "labwareType": "reservoir",
+  "labwareZDimension": "44.45",
+  "loadName": null,
+  "pipetteName": null,
+  "regularColumnSpacing": "true",
+  "regularRowSpacing": "true",
+  "tubeRackInsertLoadName": null,
+  "wellBottomShape": "v",
+  "wellDepth": "42.16",
+  "wellDiameter": null,
+  "wellShape": "rectangular",
+  "wellVolume": "22000",
+  "wellXDimension": "8.33",
+  "wellYDimension": "71.88",
+}
+`;
+
+exports[`labwareDefToFields > fixture_24_tuberack should match snapshot 1`] = `
+{
+  "aluminumBlockChildType": null,
+  "aluminumBlockType": null,
+  "brand": "Opentrons",
+  "brandId": "649020",
+  "displayName": null,
+  "footprintXDimension": "127.75",
+  "footprintYDimension": "85.5",
+  "gridColumns": "6",
+  "gridOffsetX": "18.21",
+  "gridOffsetY": "10.07",
+  "gridRows": "4",
+  "gridSpacingX": "19.89",
+  "gridSpacingY": "19.28",
+  "groupBrand": "tube brand here",
+  "groupBrandId": "tube123,other123",
+  "handPlacedTipFit": null,
+  "homogeneousWells": "true",
+  "labwareType": "tubeRack",
+  "labwareZDimension": "84",
+  "loadName": null,
+  "pipetteName": null,
+  "regularColumnSpacing": "true",
+  "regularRowSpacing": "true",
+  "tubeRackInsertLoadName": null,
+  "wellBottomShape": "v",
+  "wellDepth": "42",
+  "wellDiameter": "8.5",
+  "wellShape": "circular",
+  "wellVolume": "2000",
+  "wellXDimension": null,
+  "wellYDimension": null,
+}
+`;
 
 exports[`labwareDefToFields fixture_12_trough 1`] = `
 Object {
