@@ -33,16 +33,12 @@ imports: typing.List[str] = [m.__name__ for m in _imports]
 
 
 def migrate_db_commands_for_run(
-    args: typing.Tuple[
-        pathlib.Path,
-        pathlib.Path,
-        str,
-        # This is a multiprocessing.Lock, which can't be a type annotation for some reason.
-        typing.ContextManager[object],
-    ]
+    source_db_file: pathlib.Path,
+    dest_db_file: pathlib.Path,
+    run_id: str,
+    # This is a multiprocessing.Lock, which can't be a type annotation for some reason.
+    lock: typing.ContextManager[object],
 ) -> None:
-    source_db_file, dest_db_file, run_id, lock = args
-
     with _database.sql_engine_ctx(
         source_db_file
     ) as source_engine, _database.sql_engine_ctx(dest_db_file) as dest_engine:

@@ -205,7 +205,7 @@ def _migrate_db_commands(
         # so that's at most ~200MB total, which should be fine.
         processes=4
     ) as pool:
-        pool.map(
+        pool.starmap(
             _up_to_3_worker.migrate_db_commands_for_run,
             ((source_db_file, dest_db_file, run_id, lock) for run_id in run_ids),
         )
