@@ -21,59 +21,101 @@ const log = createLogger('usb-devices')
 const descriptorToDevice = (
   descriptors: usb.Device,
   manufacturerName?: string,
-  serialNumber?: string
+  serialNumber?: string,
+  productName?: string
 ): UsbDevice => ({
   vendorId: descriptors.deviceDescriptor.idVendor,
   productId: descriptors.deviceDescriptor.idProduct,
   serialNumber,
   manufacturerName,
+  productName,
 })
 
 const getStringDescriptorPromise = (
   device: usb.Device,
   index: number
 ): Promise<string> =>
-  new Promise((resolve, reject) =>
-    device.getStringDescriptor(index, (error?, value?) =>
-      !!error || !!!value ? reject(error) : resolve(value)
-    )
-  )
+  new Promise((resolve, reject) => {
+    device.getStringDescriptor(index, (error?, value?) => {
+      !!error || !!!value ? reject(error ?? 'no value') : resolve(value)
+    })
+  })
+
+const idVendor = (device: usb.Device): string =>
+  device.deviceDescriptor.idVendor.toString(16)
+const idProduct = (device: usb.Device): string =>
+  device.deviceDescriptor.idVendor.toString(16)
 
 const orDefault = <T, U>(
   promise: Promise<T>,
   defaulter: (err: any) => U
 ): Promise<T | U> =>
-  promise.catch((err: any) => {
-    return new Promise(resolve => resolve(defaulter(err)))
-  })
+  promise.then((result: T): T => result).catch((err: any) => defaulter(err))
 
 function upstreamDeviceFromUsbDevice(device: usb.Device): Promise<UsbDevice> {
-  return Promise.all([
-    orDefault(
-      getStringDescriptorPromise(device, device.deviceDescriptor.iManufacturer),
-      (err: any) => {
-        log.error(
-          `Failed to get manufacturer for vid=${device.deviceDescriptor.idVendor.toString(
-            16
-          )} pid=${device.deviceDescriptor.idProduct.toString(16)}: ${err}`
-        )
-        return undefined
-      }
-    ),
-    orDefault(
-      getStringDescriptorPromise(device, device.deviceDescriptor.iSerialNumber),
-      (err: any) => {
-        log.error(
-          `Failed to get serial for vid=${device.deviceDescriptor.idVendor.toString(
-            16
-          )} pid=${device.deviceDescriptor.idProduct.toString(16)}: ${err}`
-        )
-        return undefined
-      }
-    ),
-  ]).then(([manufacturer, serialNumber]) =>
-    descriptorToDevice(device, manufacturer, serialNumber)
-  )
+  return new Promise<usb.Device>((resolve, reject) => {
+    try {
+      device.open(false)
+    } catch (err: any) {
+      log.error(
+        `Failed to open vid=${idVendor(device)} pid=${idProduct(
+          device
+        )}: ${err}`
+      )
+      reject(err)
+    }
+    resolve(device)
+  })
+    .then(() =>
+      Promise.all([
+        orDefault(
+          getStringDescriptorPromise(
+            device,
+            device.deviceDescriptor.iManufacturer
+          ),
+          (err: any): undefined => {
+            log.error(
+              `Failed to get manufacturer for vid=${idVendor(
+                device
+              )} pid=${idProduct(device)}: ${err}`
+            )
+            return undefined
+          }
+        ),
+        orDefault(
+          getStringDescriptorPromise(
+            device,
+            device.deviceDescriptor.iSerialNumber
+          ),
+          (err: any): undefined => {
+            log.error(
+              `Failed to get serial for vid=${idVendor(device)} pid=${idProduct(
+                device
+              )}: ${err}`
+            )
+            return undefined
+          }
+        ),
+        orDefault(
+          getStringDescriptorPromise(device, device.deviceDescriptor.iProduct),
+          (err: any): undefined => {
+            log.error(
+              `Failed to get product name for vid=${idVendor(
+                device
+              )} pid=${idProduct(device)}: ${err}`
+            )
+            return undefined
+          }
+        ),
+      ])
+    )
+
+    .then(([manufacturer, serialNumber, productName]) => {
+      return descriptorToDevice(device, manufacturer, serialNumber, productName)
+    })
+    .finally(() => {
+      device.close()
+    })
 }
 
 export function createUsbDeviceMonitor(
@@ -82,9 +124,17 @@ export function createUsbDeviceMonitor(
   const { onDeviceAdd, onDeviceRemove } = options
 
   if (typeof onDeviceAdd === 'function') {
-    usb.on('attach', device =>
-      upstreamDeviceFromUsbDevice(device).then(onDeviceAdd)
-    )
+    usb.on('attach', device => {
+      upstreamDeviceFromUsbDevice(device)
+        .then(onDeviceAdd)
+        .catch(err => {
+          log.error(
+            `Failed to format added device vid=${idVendor(
+              device
+            )} pid=${idProduct(device)} for upstream: ${err}`
+          )
+        })
+    })
   }
 
   if (typeof onDeviceRemove === 'function') {
