@@ -17,7 +17,6 @@ import {
   useSubsystemUpdateQuery,
   useUpdateSubsystemMutation,
 } from '@opentrons/react-api-client'
-import { ProgressBar } from '../../atoms/ProgressBar'
 import { StyledText } from '../../atoms/text'
 import { BadGripper, BadPipette, Subsystem } from '@opentrons/api-client'
 
