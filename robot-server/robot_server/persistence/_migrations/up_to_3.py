@@ -17,15 +17,14 @@ Summary of changes from schema 2:
 """
 
 import multiprocessing
-from contextlib import ExitStack, contextmanager
+from contextlib import ExitStack
 from pathlib import Path
-from typing import ContextManager, Dict, Generator, Iterable, List, Optional, Tuple
+from typing import List
 
-from opentrons.protocol_engine import Command, StateSummary
+from opentrons.protocol_engine import StateSummary
 import pydantic
 import sqlalchemy
 
-from .. import legacy_pickle
 from ..pydantic import pydantic_to_json
 from .._database import (
     sql_engine_ctx,

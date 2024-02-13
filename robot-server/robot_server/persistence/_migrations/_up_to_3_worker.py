@@ -8,21 +8,21 @@
 from types import ModuleType
 _imports: "list[ModuleType]" = []
 
-import contextlib
-import pathlib
-import typing
+import contextlib  # noqa: E402
+import pathlib  # noqa: E402
+import typing  # noqa: E402
 _imports.extend([contextlib, pathlib, typing])
 
-import pydantic
-import sqlalchemy
+import pydantic  # noqa: E402
+import sqlalchemy  # noqa: E402
 _imports.extend([pydantic, sqlalchemy])
 
-from opentrons.protocol_engine import commands
-from server_utils import sql_utils
+from opentrons.protocol_engine import commands  # noqa: E402
+from server_utils import sql_utils  # noqa: E402
 _imports.extend([commands, sql_utils])
 
-from robot_server.persistence._tables import schema_2, schema_3
-from robot_server.persistence import (
+from robot_server.persistence._tables import schema_2, schema_3  # noqa: E402
+from robot_server.persistence import (  # noqa: E402
     _database,
     legacy_pickle,
     pydantic as pydantic_helpers
