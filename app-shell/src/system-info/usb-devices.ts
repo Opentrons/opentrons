@@ -61,7 +61,14 @@ const orDefault = <T, U>(
   promise: Promise<T>,
   defaulter: (err: any) => U
 ): Promise<T | U> =>
-  promise.then((result: T): T => result).catch((err: any) => defaulter(err))
+  promise
+    .then((result: T): T => result)
+    .catch(
+      (err: any) =>
+        new Promise<U>(resolve => {
+          resolve(defaulter(err))
+        })
+    )
 
 function upstreamDeviceFromUsbDevice(device: usb.Device): Promise<UsbDevice> {
   return new Promise<usb.Device>((resolve, reject) => {
