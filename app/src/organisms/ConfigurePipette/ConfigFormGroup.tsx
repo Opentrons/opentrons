@@ -10,7 +10,7 @@ import {
 } from '@opentrons/components'
 import { InputField } from '../../atoms/InputField'
 import { StyledText } from '../../atoms/text'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 import type { FieldProps } from 'formik'
 import type { DisplayFieldProps, DisplayQuirkFieldProps } from './ConfigForm'

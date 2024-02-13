@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { AlertModal } from '@opentrons/components'
 import { Portal } from '../../App/portal'
 
-import styles from './styles.css'
+import styles from './styles.module.css'
 import type { ButtonProps } from '@opentrons/components'
 
 interface Props {

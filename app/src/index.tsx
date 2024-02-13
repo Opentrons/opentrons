@@ -15,7 +15,7 @@ import { uiInitialized } from './redux/shell'
 import { history } from './redux/reducer'
 import { store } from './redux/store'
 
-import './styles.global.css'
+import './styles.global.module.css'
 
 // component tree
 import { App } from './App'
