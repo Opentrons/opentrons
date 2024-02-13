@@ -101,7 +101,7 @@ class RunStore:
         )
         insert_command = sqlalchemy.insert(run_command_table)
 
-        select_run_resource = sqlalchemy.select(_run_columns).where(
+        select_run_resource = sqlalchemy.select(*_run_columns).where(
             run_table.c.id == run_id
         )
         select_actions = sqlalchemy.select(action_table).where(
@@ -216,7 +216,7 @@ class RunStore:
         Raises:
             RunNotFoundError: The given run ID was not found.
         """
-        select_run_resource = sqlalchemy.select(_run_columns).where(
+        select_run_resource = sqlalchemy.select(*_run_columns).where(
             run_table.c.id == run_id
         )
 
@@ -240,7 +240,7 @@ class RunStore:
         Returns:
             All stored run entries.
         """
-        select_runs = sqlalchemy.select(_run_columns)
+        select_runs = sqlalchemy.select(*_run_columns)
         select_actions = sqlalchemy.select(action_table).order_by(sqlite_rowid.asc())
         actions_by_run_id = defaultdict(list)
 
