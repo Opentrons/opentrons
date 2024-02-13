@@ -2,21 +2,22 @@
 import csv
 import os
 from typing import List, Dict, Tuple
+from math import isclose
 
 COL_TRIAL_CONVERSION = {
-    1: "D",
-    2: "G",
-    3: "J",
-    4: "M",
-    5: "P",
-    6: "S",
-    7: "V",
-    8: "Y",
-    9: "AB",
-    10: "AE",
-    11: "AH",
-    12: "AK",
-    13: "AN",
+    1: "E",
+    2: "H",
+    3: "K",
+    4: "N",
+    5: "Q",
+    6: "T",
+    7: "W",
+    8: "Z",
+    9: "AC",
+    10: "AF",
+    11: "AI",
+    12: "AL",
+    13: "AO",
 }
 
 
@@ -34,6 +35,7 @@ def process_csv_directory(  # noqa: C901
     results_settings: Dict[int, Dict[int, Tuple[float, float, float]]] = {}
     tip_offsets: Dict[int, List[float]] = {}
     p_offsets: Dict[int, List[float]] = {}
+    meniscus_travel: float = 0
     for tip in tips:
         pressure_results_files[tip] = [f for f in pressure_csvs if f"tip{tip}" in f]
         pressure_results[tip] = {}
@@ -74,6 +76,8 @@ def process_csv_directory(  # noqa: C901
             for row in summary_reader:
                 final_report_writer.writerow(row)
                 s += 1
+                if s == 45:
+                    meniscus_travel = float(row[6])
                 if s >= 46 and s < 46 + (trials * len(tips)):
                     # while processing this grab the tip offsets from the summary
                     tip_offsets[tips[int((s - 46) / trials)]].append(float(row[8]))
@@ -95,7 +99,7 @@ def process_csv_directory(  # noqa: C901
             )
 
             # build a header row
-            pressure_header_row = ["time"]
+            pressure_header_row = ["time", ""]
             for i in range(trials):
                 pressure_header_row.extend(
                     [f"pressure T{i+1}", f"z_travel T{i+1}", f"p_travel T{i+1}"]
@@ -104,8 +108,8 @@ def process_csv_directory(  # noqa: C901
             # we want to line up the z height's of each trial at time==0
             # to do this we drop the results at the beginning of each of the trials
             # except for one with the longest tip (lower tip offset are longer tips)
+            min_tip_offset = min(tip_offsets[tip])
             for tip in tips:
-                min_tip_offset = min(tip_offsets[tip])
                 for trial in range(trials):
                     for i in range(max_results_len):
                         if tip_offsets[tip][trial] > min_tip_offset:
@@ -130,6 +134,15 @@ def process_csv_directory(  # noqa: C901
                 final_report_writer.writerow(pressure_header_row)
                 for i in range(max_results_len):
                     pressure_row: List[str] = [f"{time}"]
+                    if isclose(
+                        time,
+                        (meniscus_travel - min_tip_offset)
+                        / results_settings[tip][0][0],
+                        rel_tol=0.001,
+                    ):
+                        pressure_row.append("Meniscus")
+                    else:
+                        pressure_row.append("")
                     for trial in range(trials):
                         if i < len(pressure_results[tip][trial]):
                             pressure_row.append(f"{pressure_results[tip][trial][i]}")
