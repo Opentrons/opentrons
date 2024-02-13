@@ -1,8 +1,8 @@
 import React from 'react'
+import { vi, describe, beforeEach, afterEach, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import '@testing-library/jest-dom'
 import { FormikConfig } from 'formik'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
 import {
   getDefaultFormState,
   getInitialStatus,
@@ -12,15 +12,7 @@ import { displayAsTube, getLabwareName } from '../../../utils'
 import { WellShapeAndSides } from '../../sections/WellShapeAndSides'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-jest.mock('../../../utils')
-
-const displayAsTubeMock = displayAsTube as jest.MockedFunction<
-  typeof displayAsTube
->
-
-const getLabwareNameMock = getLabwareName as jest.MockedFunction<
-  typeof getLabwareName
->
+vi.mock('../../../utils')
 
 let formikConfig: FormikConfig<LabwareFields>
 
@@ -29,25 +21,24 @@ describe('WellShapeAndSides', () => {
     formikConfig = {
       initialValues: getDefaultFormState(),
       initialStatus: getInitialStatus(),
-      onSubmit: jest.fn(),
+      onSubmit: vi.fn(),
     }
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
-    resetAllWhenMocks()
+    vi.restoreAllMocks()
   })
 
   it('should render with the correct information', () => {
-    when(getLabwareNameMock)
+    when(vi.mocked(getLabwareName))
       .calledWith(formikConfig.initialValues, false)
-      .mockReturnValue('FAKE LABWARE NAME SINGULAR')
-    when(getLabwareNameMock)
+      .thenReturn('FAKE LABWARE NAME SINGULAR')
+    when(vi.mocked(getLabwareName))
       .calledWith(formikConfig.initialValues, true)
-      .mockReturnValue('FAKE LABWARE NAME PLURAL')
-    when(displayAsTubeMock)
-      .expectCalledWith(formikConfig.initialValues)
-      .mockReturnValue(false)
+      .thenReturn('FAKE LABWARE NAME PLURAL')
+    when(vi.mocked(displayAsTube))
+      .calledWith(formikConfig.initialValues)
+      .thenReturn(false)
 
     render(wrapInFormik(<WellShapeAndSides />, formikConfig))
 
@@ -69,9 +60,9 @@ describe('WellShapeAndSides', () => {
   })
 
   it('should render tubes when labware that should displayAsTube is selected', () => {
-    when(displayAsTubeMock)
-      .expectCalledWith(formikConfig.initialValues)
-      .mockReturnValue(true)
+    when(vi.mocked(displayAsTube))
+      .calledWith(formikConfig.initialValues)
+      .thenReturn(true)
 
     render(wrapInFormik(<WellShapeAndSides />, formikConfig))
 

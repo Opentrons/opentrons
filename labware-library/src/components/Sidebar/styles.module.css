@@ -85,7 +85,10 @@
   font-size: var(--fs-default); /* from legacy --font-default-dark */
     font-weight: var(--fw-regular); /* from legacy --font-default-dark */
     color: var(--c-font-dark); /* from legacy --font-default-dark */
-  @apply --transition-color;
+
+  /* pulled from legacy --transition-color */
+  transition: color 0.15s ease-in-out;
+
   cursor: pointer;
 
   line-height: var(--lh-title);

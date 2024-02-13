@@ -19,7 +19,8 @@
   /* from legacy --flex-start */
   align-items: center;
   /* from legacy --flex-start */
-  @apply --transition-color;
+  /* pulled from legacy --transition-color */
+  transition: color 0.15s ease-in-out;
 
   margin-top: var(--spacing-3);
   font-size: var(--fs-body-2);

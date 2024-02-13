@@ -1,8 +1,9 @@
 import React from 'react'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom/vitest'
 import { FormikConfig } from 'formik'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
 import {
   getDefaultFormState,
   getInitialStatus,
@@ -14,11 +15,7 @@ import { WellBottomAndDepth } from '../../sections/WellBottomAndDepth'
 
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-jest.mock('../../../utils')
-
-const getLabwareNameMock = getLabwareName as jest.MockedFunction<
-  typeof getLabwareName
->
+vi.mock('../../../utils')
 
 let formikConfig: FormikConfig<LabwareFields>
 
@@ -27,13 +24,12 @@ describe('WellBottomAndDepth', () => {
     formikConfig = {
       initialValues: getDefaultFormState(),
       initialStatus: getInitialStatus(),
-      onSubmit: jest.fn(),
+      onSubmit: vi.fn(),
     }
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
-    resetAllWhenMocks()
+    vi.restoreAllMocks()
   })
 
   const labwareTypes: LabwareType[] = [
@@ -45,12 +41,12 @@ describe('WellBottomAndDepth', () => {
   labwareTypes.forEach(labwareType => {
     it(`should render with the correct information ${labwareType}`, () => {
       formikConfig.initialValues.labwareType = labwareType
-      when(getLabwareNameMock)
+      when(vi.mocked(getLabwareName))
         .calledWith(formikConfig.initialValues, false)
-        .mockReturnValue('FAKE LABWARE NAME SINGULAR')
-      when(getLabwareNameMock)
+        .thenReturn('FAKE LABWARE NAME SINGULAR')
+      when(vi.mocked(getLabwareName))
         .calledWith(formikConfig.initialValues, true)
-        .mockReturnValue('FAKE LABWARE NAME PLURAL')
+        .thenReturn('FAKE LABWARE NAME PLURAL')
 
       render(wrapInFormik(<WellBottomAndDepth />, formikConfig))
 
