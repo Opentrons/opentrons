@@ -92,9 +92,6 @@ def migrate_commands_for_run(
             for index_in_run, parsed_command in enumerate(parsed_commands)
         ]
 
-        # Insert all the commands for this run in one go, to avoid the overhead of
-        # separate statements, and since we had to bring them all into memory at once
-        # in order to parse them anyway.
         with lock, dest_engine.begin() as dest_transaction:
             if len(new_command_rows) > 0:
                 # This needs to be guarded by a len>0 check because if the list is empty,
