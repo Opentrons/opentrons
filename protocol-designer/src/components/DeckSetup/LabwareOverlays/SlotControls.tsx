@@ -70,8 +70,9 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
         )
 
         return getLabwareIsCompatible(draggedDef, moduleType) || isCustomLabware
+      } else {
+        return true
       }
-      return true
     },
     drop: (item: DroppedItem) => {
       if (item.labwareOnDeck) {
@@ -79,7 +80,7 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
       }
     },
     hover: () => {
-      if (handleDragHover) {
+      if (handleDragHover != null) {
         handleDragHover()
       }
     },

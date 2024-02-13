@@ -1,11 +1,7 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import {
-  DragLayerMonitor,
-  DropTargetMonitor,
-  useDrop,
-  useDrag,
-} from 'react-dnd'
+import { DragLayerMonitor, useDrop, useDrag } from 'react-dnd'
 import isEqual from 'lodash/isEqual'
 
 import { DND_TYPES } from '../../constants'
@@ -22,23 +18,22 @@ import styles from './StepItem.css'
 
 interface DragDropStepItemProps extends ConnectedStepItemProps {
   stepId: StepIdType
-  index: number
-  moveStep: (dragIndex: number, hoverIndex: number) => void
+  findStepIndex: (stepIdType: StepIdType) => number
+  clickDrop: () => void
+  moveStep: (stepId: StepIdType, value: number) => void
+}
+
+interface DropType {
+  stepId: StepIdType
 }
 
 const DragDropStepItem = (props: DragDropStepItemProps): JSX.Element => {
-  const { stepId, index, moveStep } = props
+  const { stepId, moveStep, clickDrop, findStepIndex } = props
   const ref = React.useRef<HTMLDivElement>(null)
 
   const [{ isDragging }, drag] = useDrag({
     type: DND_TYPES.STEP_ITEM,
-    item: { stepId, index },
-
-    // beginDrag: () => {
-    //   console.log('you his the onDrag Begin')
-    //   onDragBegin()
-    //   return { stepId: stepId } // Ensure stepId is captured correctly
-    // },
+    item: { stepId },
     collect: (monitor: DragLayerMonitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -47,38 +42,18 @@ const DragDropStepItem = (props: DragDropStepItemProps): JSX.Element => {
   const [, drop] = useDrop(() => ({
     accept: DND_TYPES.STEP_ITEM,
     canDrop: () => {
-      return false
+      return true
     },
-    hover: (item: { index?: number }, monitor: DropTargetMonitor) => {
-      if (!ref.current || !item.index) {
-        return
-      }
-      const dragIndex = item.index
-      const hoverIndex = index
+    drop: () => {
+      clickDrop()
+    },
+    hover: (item: DropType) => {
+      const draggedId = item.stepId
 
-      if (dragIndex === hoverIndex) {
-        return
+      if (draggedId !== stepId) {
+        const overIndex = findStepIndex(stepId)
+        moveStep(draggedId, overIndex)
       }
-
-      const hoverBoundingRect = ref.current.getBoundingClientRect()
-      const hoverMiddleY =
-        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
-      const clientOffset = monitor.getClientOffset()
-      if (!clientOffset) {
-        return
-      }
-      const hoverClientY = clientOffset.y - hoverBoundingRect.top
-
-      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
-        return
-      }
-      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
-        return
-      }
-      console.log('dragIndex', dragIndex)
-      console.log('hoverINdex', hoverIndex)
-      moveStep(dragIndex, hoverIndex)
-      item.index = hoverIndex
     },
   }))
 
@@ -98,55 +73,56 @@ export const DraggableStepItems = (
   props: StepItemsProps
 ): JSX.Element | null => {
   const { orderedStepIds, reorderSteps } = props
+  const { t } = useTranslation('shared')
   const [stepIds, setStepIds] = React.useState<StepIdType[]>(orderedStepIds)
-  const ref = React.useRef<HTMLDivElement>(null)
 
-  const [{ isOver }, drop] = useDrop(() => ({
-    accept: DND_TYPES.STEP_ITEM,
-    drop: () => {
-      console.log('hit the drop')
-      if (!isEqual(orderedStepIds, stepIds)) {
-        if (
-          confirm(
-            'Are you sure you want to reorder these steps, it may cause errors?'
-          )
-        ) {
-          reorderSteps(stepIds)
-        }
+  React.useEffect(() => {
+    setStepIds(orderedStepIds)
+  }, [orderedStepIds])
+
+  const clickDrop = (): void => {
+    if (!isEqual(orderedStepIds, stepIds)) {
+      if (confirm(t('confirm_reorder'))) {
+        reorderSteps(stepIds)
       }
-    },
-    collect: (monitor: DropTargetMonitor) => ({
-      isOver: !!monitor.isOver(),
-    }),
-  }))
-
-  const moveStep = (dragIndex: number, hoverIndex: number): void => {
-    const updatedStepIds = [...stepIds]
-    const draggedStep = updatedStepIds.splice(dragIndex, 1)[0]
-    updatedStepIds.splice(hoverIndex, 0, draggedStep)
-    setStepIds(updatedStepIds)
+    }
   }
-  const currentIds = isOver ? stepIds : orderedStepIds
 
-  drop(ref)
+  const moveStep = (stepId: StepIdType, targetIndex: number): void => {
+    const currentIndex = findStepIndex(stepId)
+    const currentRemoved = [
+      ...stepIds.slice(0, currentIndex),
+      ...stepIds.slice(currentIndex + 1, stepIds.length),
+    ]
+    const currentReinserted = [
+      ...currentRemoved.slice(0, targetIndex),
+      stepId,
+      ...currentRemoved.slice(targetIndex, currentRemoved.length),
+    ]
+    setStepIds(currentReinserted)
+  }
+  const findStepIndex = (stepId: StepIdType): number =>
+    stepIds.findIndex(id => stepId === id)
+
   return (
-    <div ref={ref}>
+    <>
       <ContextMenu>
         {({ makeStepOnContextMenu }) =>
-          currentIds.map((stepId: StepIdType, index: number) => (
+          stepIds.map((stepId: StepIdType, index: number) => (
             <DragDropStepItem
-              key={stepId}
+              key={`${stepId}_${index}`}
               stepNumber={index + 1}
               stepId={stepId}
-              index={index}
               onStepContextMenu={() => makeStepOnContextMenu(stepId)}
               moveStep={moveStep}
+              findStepIndex={findStepIndex}
+              clickDrop={clickDrop}
             />
           ))
         }
       </ContextMenu>
       <StepDragPreview />
-    </div>
+    </>
   )
 }
 
