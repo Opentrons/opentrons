@@ -19,7 +19,6 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition, LabwarePa
 from opentrons.types import Location, Point
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import requires_version, APIVersionError
-from opentrons.hardware_control.nozzle_manager import NozzleMap
 
 # TODO(mc, 2022-09-02): re-exports provided for backwards compatibility
 # remove when their usage is no longer needed
@@ -850,8 +849,6 @@ class Labware:
     # TODO(mc, 2022-11-09): implementation detail; deprecate public method
     def next_tip(
         self,
-        nozzle_map: NozzleMap,
-        pipette_id: str,
         num_tips: int = 1,
         starting_tip: Optional[Well] = None,
     ) -> Optional[Well]:
@@ -879,8 +876,6 @@ class Labware:
         # so what we should do is return the tip thats at the edge of that "tip cluster" that matches the quadrant desired
 
         well_name = self._core.get_next_tip(
-            nozzle_map=nozzle_map,
-            pipette_id=pipette_id,
             num_tips=num_tips,
             starting_tip=starting_tip._core if starting_tip else None,
         )
@@ -1034,8 +1029,6 @@ def split_tipracks(tip_racks: List[Labware]) -> Tuple[Labware, List[Labware]]:
 
 # TODO(mc, 2022-11-09): implementation detail, move to core
 def select_tiprack_from_list(
-    nozzle_map: NozzleMap,
-    pipette_id: str,
     tip_racks: List[Labware],
     num_channels: int,
     starting_point: Optional[Well] = None,
@@ -1054,11 +1047,11 @@ def select_tiprack_from_list(
     else:
         first_well = first.wells()[0]
 
-    next_tip = first.next_tip(nozzle_map, pipette_id, num_channels, first_well)
+    next_tip = first.next_tip(num_channels, first_well)
     if next_tip:
         return first, next_tip
     else:
-        return select_tiprack_from_list(nozzle_map, pipette_id, rest, num_channels)
+        return select_tiprack_from_list(rest, num_channels)
 
 
 # TODO(mc, 2022-11-09): implementation detail, move to core
@@ -1070,19 +1063,15 @@ def filter_tipracks_to_start(
 
 # TODO(mc, 2022-11-09): implementation detail, move to core
 def next_available_tip(
-    nozzle_map: NozzleMap,
-    pipette_id: str,
     starting_tip: Optional[Well],
     tip_racks: List[Labware],
     channels: int,
 ) -> Tuple[Labware, Well]:
     start = starting_tip
     if start is None:
-        return select_tiprack_from_list(nozzle_map, pipette_id, tip_racks, channels)
+        return select_tiprack_from_list(tip_racks, channels)
     else:
         return select_tiprack_from_list(
-            nozzle_map,
-            pipette_id,
             filter_tipracks_to_start(start, tip_racks),
             channels,
             start,
