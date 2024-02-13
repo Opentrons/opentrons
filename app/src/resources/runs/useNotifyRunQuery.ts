@@ -22,7 +22,11 @@ export function useNotifyRunQuery<TError = Error>(
     options: { ...options, enabled: options.enabled && runId != null },
   })
 
-  const isNotifyEnabled = !isNotifyError && !options?.forceHttpPolling
+  const isNotifyEnabled =
+    !isNotifyError &&
+    !options?.forceHttpPolling &&
+    options?.staleTime !== Infinity
+
   if (!isNotifyEnabled && !refetchUsingHTTP) setRefetchUsingHTTP(true)
   const isHTTPEnabled =
     options?.enabled !== false &&
