@@ -9,7 +9,6 @@ import {
   Icon,
   RESPONSIVENESS,
   JUSTIFY_CENTER,
-  BORDERS,
   COLORS,
 } from '@opentrons/components'
 import {
@@ -107,7 +106,6 @@ export const FirmwareUpdateModal = (
   }, [])
   const { data: updateData } = useSubsystemUpdateQuery(updateId)
   const status = updateData?.data.updateStatus
-  const percentComplete = updateData?.data.updateProgress ?? 0
 
   React.useEffect(() => {
     if ((status != null || updateNeeded) && firmwareText !== description) {
@@ -134,7 +132,7 @@ export const FirmwareUpdateModal = (
 
   return (
     <Flex css={MODAL_STYLE}>
-      {status != null || updateNeeded || firmwareText.length == 0 ? (
+      {status != null || updateNeeded || firmwareText.length === 0 ? (
         <Icon
           name="ot-spinner"
           aria-label="spinner"
