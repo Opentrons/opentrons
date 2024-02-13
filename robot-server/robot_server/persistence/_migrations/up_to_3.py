@@ -28,13 +28,13 @@ import sqlalchemy
 from .. import legacy_pickle
 from ..pydantic import pydantic_to_json
 from .._database import (
-    create_schema_2_sql_engine,
-    create_schema_3_sql_engine,
+    sql_engine_ctx,
     sqlite_rowid,
 )
 from .._folder_migrator import Migration
 from .._tables import schema_2, schema_3
 from ._util import copy_rows_unmodified, copy_if_exists, copytree_if_exists
+from . import up_to_2
 
 
 # TODO: Define a single source of truth somewhere for these paths.
@@ -57,39 +57,18 @@ class MigrationUpTo3(Migration):  # noqa: D101
         dest_db_file = dest_dir / _DB_FILE
 
         with ExitStack() as exit_stack:
-            source_engine = exit_stack.enter_context(
-                # If the source is schema 0 or 1, this will migrate it to 2 in-place.
-                _schema_2_sql_engine(source_db_file)
-            )
-            dest_engine = exit_stack.enter_context(_schema_3_sql_engine(dest_db_file))
+            source_engine = exit_stack.enter_context(sql_engine_ctx(source_db_file))
+            schema_2.metadata.create_all(source_engine)
+            up_to_2.migrate(source_engine)
+
+            dest_engine = exit_stack.enter_context(sql_engine_ctx(dest_db_file))
+            schema_3.metadata.create_all(dest_engine)
 
             with source_engine.begin() as source_transaction, dest_engine.begin() as dest_transaction:
                 run_ids = _get_run_ids(schema_2_transaction=source_transaction)
                 _migrate_db_excluding_commands(source_transaction, dest_transaction)
 
         _migrate_db_commands(source_db_file, dest_db_file, run_ids)
-
-
-@contextmanager
-def _schema_2_sql_engine(
-    db_file: Path,
-) -> Generator[sqlalchemy.engine.Engine, None, None]:
-    engine = create_schema_2_sql_engine(db_file)
-    try:
-        yield engine
-    finally:
-        engine.dispose()
-
-
-@contextmanager
-def _schema_3_sql_engine(
-    db_file: Path,
-) -> Generator[sqlalchemy.engine.Engine, None, None]:
-    engine = create_schema_3_sql_engine(db_file)
-    try:
-        yield engine
-    finally:
-        engine.dispose()
 
 
 def _get_run_ids(*, schema_2_transaction: sqlalchemy.engine.Connection) -> List[str]:
@@ -238,7 +217,7 @@ def _migrate_db_commands_for_run(
 ) -> None:
     source_db_file, dest_db_file, run_id, lock = args
 
-    with _schema_2_sql_engine(source_db_file) as source_engine, _schema_3_sql_engine(
+    with sql_engine_ctx(source_db_file) as source_engine, sql_engine_ctx(
         dest_db_file
     ) as dest_engine:
         select_old_commands = sqlalchemy.select(schema_2.run_table.c.commands).where(

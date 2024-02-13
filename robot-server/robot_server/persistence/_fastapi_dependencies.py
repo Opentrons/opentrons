@@ -16,7 +16,7 @@ from server_utils.fastapi_utils.app_state import (
 )
 from robot_server.errors import ErrorDetails
 
-from ._database import create_schema_3_sql_engine
+from ._database import create_sql_engine
 from ._persistence_directory import (
     PersistenceResetter,
     prepare_active_subdirectory,
@@ -102,7 +102,7 @@ def start_initializing_persistence(  # noqa: C901
             prepared_subdirectory = await subdirectory_prep_task
 
             sql_engine = await to_thread.run_sync(
-                create_schema_3_sql_engine, prepared_subdirectory / _DATABASE_FILE
+                create_sql_engine, prepared_subdirectory / _DATABASE_FILE
             )
             return sql_engine
 
