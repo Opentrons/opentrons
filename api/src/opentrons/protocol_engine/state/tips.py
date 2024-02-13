@@ -43,7 +43,7 @@ class TipState:
     channels_by_pipette_id: Dict[str, int]
     length_by_pipette_id: Dict[str, float]
     active_channels_by_pipette_id: Dict[str, int]
-    last_used_nozzle_map: Dict[str, NozzleMap]
+    last_used_nozzle_map: NozzleMap
 
 
 class TipStore(HasState[TipState], HandlesActions):
@@ -59,7 +59,7 @@ class TipStore(HasState[TipState], HandlesActions):
             channels_by_pipette_id={},
             length_by_pipette_id={},
             active_channels_by_pipette_id={},
-            last_used_nozzle_map={},
+            last_used_nozzle_map=None,
         )
 
     def handle_action(self, action: Action) -> None:
@@ -126,7 +126,7 @@ class TipStore(HasState[TipState], HandlesActions):
         pipette_channels = self._state.active_channels_by_pipette_id.get(pipette_id)
         columns = self._state.column_by_labware_id.get(labware_id, [])
         wells = self._state.tips_by_labware_id.get(labware_id, {})
-        nozzle_map = self._state.last_used_nozzle_map.get(pipette_id)
+        nozzle_map = self._state.last_used_nozzle_map
 
         if nozzle_map is not None:
             num_nozzle_cols = len(nozzle_map.columns)
@@ -155,7 +155,7 @@ class TipStore(HasState[TipState], HandlesActions):
                         well = columns[critical_column - i][critical_row - j]
                         wells[well] = TipRackWellState.USED
             # clear the last used nozzle map for this pipette
-            self._state.last_used_nozzle_map.clear()
+            self._state.last_used_nozzle_map = None
         else:
             wells[well_name] = TipRackWellState.USED
 
@@ -186,7 +186,7 @@ class TipView(HasState[TipState]):
         starting_tip_name: Optional[str],
     ) -> Optional[str]:
         """Get the next available clean tip."""
-        self._state.last_used_nozzle_map.update({pipette_id: nozzle_map})
+        self._state.last_used_nozzle_map = nozzle_map
         wells = self._state.tips_by_labware_id.get(labware_id, {})
         columns = self._state.column_by_labware_id.get(labware_id, [])
 
