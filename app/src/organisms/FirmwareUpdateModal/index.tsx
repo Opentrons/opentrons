@@ -54,11 +54,6 @@ const MODAL_STYLE = css`
     height: 31.5625rem;
   }
 `
-const OUTER_STYLES = css`
-  border-radius: ${BORDERS.borderRadiusSize4};
-  background: ${COLORS.grey30};
-  width: 13.374rem;
-`
 
 const SPINNER_STYLE = css`
   color: ${COLORS.grey50};
