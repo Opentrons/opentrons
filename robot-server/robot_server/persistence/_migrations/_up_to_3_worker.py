@@ -1,3 +1,6 @@
+"""Code that runs in a worker subprocess for the `up_to_3` migration."""
+
+
 # fmt: off
 
 # We keep a list of all the modules that this file imports
@@ -30,15 +33,30 @@ _imports.extend([schema_2, schema_3, _database, legacy_pickle, pydantic_helpers]
 
 
 imports: typing.List[str] = [m.__name__ for m in _imports]
+"""The names of all modules imported by this module, e.g. "foo.bar.baz"."""
 
 
-def migrate_db_commands_for_run(
+def migrate_commands_for_run(
     source_db_file: pathlib.Path,
     dest_db_file: pathlib.Path,
     run_id: str,
     # This is a multiprocessing.Lock, which can't be a type annotation for some reason.
     lock: typing.ContextManager[object],
 ) -> None:
+    """Perform the schema 2->3 migration for a single run's commands.
+
+    See the `up_to_3` migration for background.
+
+    Args:
+        source_db_file: The SQLite database file to migrate from.
+        dest_db_file: The SQLite database file to migrate into. Assumed to have all the
+            proper tables set up already.
+        run_id: Which run's commands to migrate.
+        lock: A lock to hold while accessing the database. Concurrent access would be
+            safe in the sense that SQLite would always provide isolation. But, when
+            there are conflicts, we'd have to deal with SQLite retrying transactions or
+            raising SQLITE_BUSY. A Python-level lock is simpler and more reliable.
+    """
     with _database.sql_engine_ctx(
         source_db_file
     ) as source_engine, _database.sql_engine_ctx(dest_db_file) as dest_engine:

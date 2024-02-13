@@ -206,6 +206,6 @@ def _migrate_db_commands(
         processes=4
     ) as pool:
         pool.starmap(
-            _up_to_3_worker.migrate_db_commands_for_run,
+            _up_to_3_worker.migrate_commands_for_run,
             ((source_db_file, dest_db_file, run_id, lock) for run_id in run_ids),
         )
