@@ -106,7 +106,6 @@ run_table = sqlalchemy.Table(
     sqlalchemy.Column(
         "commands",
         sqlalchemy.LargeBinary,
-        # sqlalchemy.PickleType(pickler=legacy_pickle, protocol=PICKLE_PROTOCOL_VERSION),
         nullable=True,
     ),
     # column added in schema v1
