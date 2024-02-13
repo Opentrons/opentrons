@@ -1,7 +1,12 @@
 import * as React from 'react'
 import reduce from 'lodash/reduce'
 
-import { WellMouseEvent, WellGroup, LabwareRender, RobotCoordinateSpace } from '@opentrons/components'
+import {
+  WellMouseEvent,
+  WellGroup,
+  LabwareRender,
+  RobotCoordinateSpace,
+} from '@opentrons/components'
 import { COLUMN } from '@opentrons/shared-data'
 import {
   arrayToWellGroup,
@@ -77,7 +82,7 @@ export class SelectableLabware extends React.Component<Props> {
     return selectedWells
   }
 
-  handleSelectionMove: (e: MouseEvent, rect: GenericRect) => void = (
+  handleSelectionMove: (e: TouchEvent, rect: GenericRect) => void = (
     e,
     rect
   ) => {
@@ -106,7 +111,7 @@ export class SelectableLabware extends React.Component<Props> {
     }
   }
 
-  handleSelectionDone: (e: MouseEvent, rect: GenericRect) => void = (
+  handleSelectionDone: (e: TouchEvent, rect: GenericRect) => void = (
     e,
     rect
   ) => {
@@ -150,19 +155,19 @@ export class SelectableLabware extends React.Component<Props> {
     const allSelectedWells =
       nozzleType != null
         ? reduce<WellGroup, WellGroup>(
-          selectedPrimaryWells,
-          (acc, _, wellName): WellGroup => {
-            const channels = getChannelsFromNozleType(nozzleType)
-            const wellSet = getWellSetForMultichannel(
-              this.props.labwareProps.definition,
-              wellName,
-              channels
-            )
-            if (!wellSet) return acc
-            return { ...acc, ...arrayToWellGroup(wellSet) }
-          },
-          {}
-        )
+            selectedPrimaryWells,
+            (acc, _, wellName): WellGroup => {
+              const channels = getChannelsFromNozleType(nozzleType)
+              const wellSet = getWellSetForMultichannel(
+                this.props.labwareProps.definition,
+                wellName,
+                channels
+              )
+              if (!wellSet) return acc
+              return { ...acc, ...arrayToWellGroup(wellSet) }
+            },
+            {}
+          )
         : selectedPrimaryWells
 
     return (

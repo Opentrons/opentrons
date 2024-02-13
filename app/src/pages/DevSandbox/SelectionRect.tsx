@@ -3,8 +3,8 @@ import * as React from 'react'
 import { DragRect, GenericRect } from './types'
 
 interface Props {
-  onSelectionMove?: (e: MouseEvent, arg: GenericRect) => unknown
-  onSelectionDone?: (e: MouseEvent, arg: GenericRect) => unknown
+  onSelectionMove?: (e: TouchEvent, arg: GenericRect) => unknown
+  onSelectionDone?: (e: TouchEvent, arg: GenericRect) => unknown
   svg?: boolean // set true if this is an embedded SVG
   children?: React.ReactNode
   originXOffset?: number
@@ -98,25 +98,27 @@ export class SelectionRect extends React.Component<Props, State> {
     }
   }
 
-  handleMouseDown: React.MouseEventHandler = e => {
-    document.addEventListener('mousemove', this.handleDrag)
-    document.addEventListener('mouseup', this.handleMouseUp)
+  handleTouchStart: React.TouchEventHandler = e => {
+    document.addEventListener('touchmove', this.handleDrag)
+    document.addEventListener('touchend', this.handleTouchEnd)
+    const touch = e.touches[0]
     this.setState({
       positions: {
-        xStart: e.clientX,
-        xDynamic: e.clientX,
-        yStart: e.clientY,
-        yDynamic: e.clientY,
+        xStart: touch.clientX,
+        xDynamic: touch.clientX,
+        yStart: touch.clientY,
+        yDynamic: touch.clientY,
       },
     })
   }
 
-  handleDrag: (e: MouseEvent) => void = e => {
+  handleDrag: (e: TouchEvent) => void = e => {
+    const touch = e.touches[0]
     if (this.state.positions) {
       const nextRect = {
         ...this.state.positions,
-        xDynamic: e.clientX,
-        yDynamic: e.clientY,
+        xDynamic: touch.clientX,
+        yDynamic: touch.clientY,
       }
       this.setState({ positions: nextRect })
 
@@ -125,12 +127,12 @@ export class SelectionRect extends React.Component<Props, State> {
     }
   }
 
-  handleMouseUp: (e: MouseEvent) => void = e => {
-    if (!(e instanceof MouseEvent)) {
+  handleTouchEnd: (e: TouchEvent) => void = e => {
+    if (!(e instanceof TouchEvent)) {
       return
     }
-    document.removeEventListener('mousemove', this.handleDrag)
-    document.removeEventListener('mouseup', this.handleMouseUp)
+    document.removeEventListener('touchmove', this.handleDrag)
+    document.removeEventListener('touchend', this.handleTouchEnd)
 
     const finalRect = this.state.positions && this.getRect(this.state.positions)
 
@@ -148,7 +150,7 @@ export class SelectionRect extends React.Component<Props, State> {
 
     return svg ? (
       <g
-        onMouseDown={this.handleMouseDown}
+        onTouchStart={this.handleTouchStart}
         ref={ref => {
           this.parentRef = ref
         }}
@@ -158,8 +160,8 @@ export class SelectionRect extends React.Component<Props, State> {
       </g>
     ) : (
       <div
-        style={{height: '100vh', width: '100vw'}}
-        onMouseDown={this.handleMouseDown}
+        style={{ height: '100vh', width: '100vw' }}
+        onTouchStart={this.handleTouchStart}
         ref={ref => {
           this.parentRef = ref
         }}
