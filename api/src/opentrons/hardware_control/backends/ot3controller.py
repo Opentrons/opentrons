@@ -169,6 +169,12 @@ from opentrons_hardware.hardware_control.rear_panel_settings import (
 from opentrons_hardware.hardware_control.gripper_settings import (
     get_gripper_jaw_state,
 )
+from opentrons_hardware.hardware_control.hepa_uv_settings import (
+    set_hepa_fan_state as set_hepa_fan_state_fw,
+    get_hepa_fan_state as get_hepa_fan_state_fw,
+    set_hepa_uv_state as set_hepa_uv_state_fw,
+    get_hepa_uv_state as get_hepa_uv_state_fw,
+)
 
 from opentrons_hardware.drivers.gpio import OT3GPIO, RemoteOT3GPIO
 from opentrons_shared_data.pipette.dev_types import PipetteName
@@ -193,7 +199,7 @@ from ..dev_types import (
     AttachedGripper,
     OT3AttachedInstruments,
 )
-from ..types import StatusBarState
+from ..types import HepaFanState, HepaUVState, StatusBarState
 
 from .types import HWStopCondition
 from .flex_protocol import FlexBackend
@@ -1570,3 +1576,32 @@ class OT3Controller(FlexBackend):
                     "actual-jaw-width": current_gripper_position,
                 },
             )
+
+    async def set_hepa_fan_state(self, fan_on: bool, duty_cycle: int) -> bool:
+        return await set_hepa_fan_state_fw(self._messenger, fan_on, duty_cycle)
+
+    async def get_hepa_fan_state(self) -> Optional[HepaFanState]:
+        res = await get_hepa_fan_state_fw(self._messenger)
+        return (
+            HepaFanState(
+                fan_on=res.fan_on,
+                duty_cycle=res.duty_cycle,
+            )
+            if res
+            else None
+        )
+
+    async def set_hepa_uv_state(self, light_on: bool, timeout_s: int) -> bool:
+        return await set_hepa_uv_state_fw(self._messenger, light_on, timeout_s)
+
+    async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
+        res = await get_hepa_uv_state_fw(self._messenger)
+        return (
+            HepaUVState(
+                light_on=res.uv_light_on,
+                config_timeout=res.timeout_s,
+                remaining_time_s=res.remaining_time_s,
+            )
+            if res
+            else None
+        )

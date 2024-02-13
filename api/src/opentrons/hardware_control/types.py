@@ -392,6 +392,19 @@ class EstopOverallStatus:
     right_physical_state: EstopPhysicalStatus
 
 
+@dataclass
+class HepaFanState:
+    fan_on: bool
+    duty_cycle: int
+
+
+@dataclass
+class HepaUVState:
+    light_on: bool
+    config_timeout: int
+    remaining_time_s: int
+
+
 @dataclass(frozen=True)
 class DoorStateNotification:
     event: Literal[

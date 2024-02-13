@@ -79,6 +79,8 @@ from .types import (
     HardwareEvent,
     HardwareEventHandler,
     HardwareAction,
+    HepaFanState,
+    HepaUVState,
     MotionChecks,
     SubSystem,
     PauseType,
@@ -2685,3 +2687,21 @@ class OT3API(
 
     def get_estop_state(self) -> EstopState:
         return self._backend.get_estop_state()
+
+    async def set_hepa_fan_state(
+        self, turn_on: bool = False, duty_cycle: int = 75
+    ) -> bool:
+        """Sets the state and duty cycle of the Hepa/UV module."""
+        return await self._backend.set_hepa_fan_state(turn_on, duty_cycle)
+
+    async def get_hepa_fan_state(self) -> Optional[HepaFanState]:
+        return await self._backend.get_hepa_fan_state()
+
+    async def set_hepa_uv_state(
+        self, turn_on: bool = False, timeout_s: int = 900
+    ) -> bool:
+        """Sets the state and timeout in seconds of the Hepa/UV module."""
+        return await self._backend.set_hepa_uv_state(turn_on, timeout_s)
+
+    async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
+        return await self._backend.get_hepa_uv_state()

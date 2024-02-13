@@ -642,7 +642,7 @@ class SetHepaFanStateRequestPayload(EmptyPayload):
     """A request to set the state and pwm of a the hepa fan."""
 
     duty_cycle: utils.UInt32Field
-    fan_on: utils.Int8Field
+    fan_on: utils.UInt8Field
 
 
 @dataclass(eq=False)
