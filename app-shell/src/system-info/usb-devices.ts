@@ -37,7 +37,9 @@ const getStringDescriptorPromise = (
 ): Promise<string> =>
   new Promise((resolve, reject) => {
     device.getStringDescriptor(index, (error?, value?) => {
-      !!error || !!!value ? reject(error ?? 'no value') : resolve(value)
+      // fyi if you do something in this callback that throws there's a good chance
+      // it will crash node
+      (!!error || !!!value) ? reject(error ?? 'no value') : resolve(value)
     })
   })
 
@@ -113,7 +115,7 @@ function upstreamDeviceFromUsbDevice(device: usb.Device): Promise<UsbDevice> {
       try {
         device.close()
       } catch (err) {
-        log.warning(
+        log.warn(
           `Failed to close pid=${idProduct(device)}, vid=${idVendor(
             device
           )}: ${err}`
@@ -125,7 +127,7 @@ function upstreamDeviceFromUsbDevice(device: usb.Device): Promise<UsbDevice> {
       try {
         device.close()
       } catch (err) {
-        log.warning(
+        log.warn(
           `Failed to close pid=${idProduct(device)}, vid=${idVendor(
             device
           )} in err handler: ${err}`
