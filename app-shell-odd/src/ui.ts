@@ -1,5 +1,5 @@
 // sets up the main window ui
-import { app, shell, BrowserWindow } from 'electron'
+import { app, BrowserWindow } from 'electron'
 import path from 'path'
 import { sendReadyStatus } from '@opentrons/app/src/redux/shell'
 import { getConfig } from './config'
@@ -60,7 +60,7 @@ export function createUi(dispatch: Dispatch): BrowserWindow {
 
   // never allow external links to open
   mainWindow.webContents.setWindowOpenHandler(() => {
-      return { action: 'deny' }
+    return { action: 'deny' }
   })
 
   return mainWindow
