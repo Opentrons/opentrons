@@ -223,9 +223,9 @@ class TipView(HasState[TipState]):
                         return result
                     elif result is None:
                         # Move on to the row above or column to the left
-                        if critical_row - num_nozzle_rows >= 0:
+                        if critical_row - num_nozzle_rows > 0:
                             critical_row = critical_row - num_nozzle_rows
-                        elif critical_column - num_nozzle_cols >= 0:
+                        elif critical_column - num_nozzle_cols > 0:
                             critical_column = critical_column - num_nozzle_cols
                             critical_row = (
                                 len(columns[critical_column]) - num_nozzle_rows
@@ -247,9 +247,9 @@ class TipView(HasState[TipState]):
                         return result
                     elif result is None:
                         # Move on to the row above or column to the right
-                        if critical_row - num_nozzle_rows >= 0:
+                        if critical_row - num_nozzle_rows > 0:
                             critical_row = critical_row - num_nozzle_rows
-                        elif critical_column + num_nozzle_cols <= 12:
+                        elif critical_column + num_nozzle_cols < 12:
                             critical_column = critical_column + num_nozzle_cols
                             critical_row = (
                                 len(columns[critical_column]) - num_nozzle_rows
@@ -271,11 +271,11 @@ class TipView(HasState[TipState]):
                         return result
                     elif result is None:
                         # Move on to the row above or column to the right
-                        if critical_row + num_nozzle_rows <= 8:
+                        if critical_row + num_nozzle_rows < 8:
                             critical_row = critical_row + num_nozzle_rows
-                        elif critical_column - num_nozzle_cols >= 0:
+                        elif critical_column - num_nozzle_cols > 0:
                             critical_column = critical_column - num_nozzle_cols
-                            critical_row = num_nozzle_rows
+                            critical_row = num_nozzle_rows - 1
                         else:
                             critical_column = -1
                 return None
@@ -293,11 +293,11 @@ class TipView(HasState[TipState]):
                         return result
                     elif result is None:
                         # Move on to the row above or column to the right
-                        if critical_row + num_nozzle_rows <= 8:
+                        if critical_row + num_nozzle_rows < 8:
                             critical_row = critical_row + num_nozzle_rows
-                        elif critical_column + num_nozzle_cols <= 12:
+                        elif critical_column + num_nozzle_cols < 12:
                             critical_column = critical_column + num_nozzle_cols
-                            critical_row = num_nozzle_rows
+                            critical_row = num_nozzle_rows - 1
                         else:
                             critical_column = 13
                 return None
