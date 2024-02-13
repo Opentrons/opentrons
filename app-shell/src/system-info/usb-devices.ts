@@ -55,7 +55,7 @@ const getStringDescriptorPromise = (
 const idVendor = (device: usb.Device): string =>
   device.deviceDescriptor.idVendor.toString(16)
 const idProduct = (device: usb.Device): string =>
-  device.deviceDescriptor.idVendor.toString(16)
+  device.deviceDescriptor.idProduct.toString(16)
 
 const orDefault = <T, U>(
   promise: Promise<T>,
@@ -125,7 +125,7 @@ function upstreamDeviceFromUsbDevice(device: usb.Device): Promise<UsbDevice> {
         device.close()
       } catch (err) {
         log.warn(
-          `Failed to close pid=${idProduct(device)}, vid=${idVendor(
+          `Failed to close vid=${idVendor(device)}, pid=${idProduct(
             device
           )}: ${err}`
         )
@@ -137,15 +137,15 @@ function upstreamDeviceFromUsbDevice(device: usb.Device): Promise<UsbDevice> {
         device.close()
       } catch (err) {
         log.warn(
-          `Failed to close pid=${idProduct(device)}, vid=${idVendor(
+          `Failed to close vid=${idVendor(device)}, pid=${idProduct(
             device
           )} in err handler: ${err}`
         )
       }
       log.error(
-        `Could not fetch descriptors for pid=${idProduct(
+        `Could not fetch descriptors for vid=${idVendor(
           device
-        )}, vid=${idVendor(device)}: ${err}, string descriptors unavailable`
+        )}, pid=${idProduct(device)}: ${err}, string descriptors unavailable`
       )
       return descriptorToDevice(device)
     })
