@@ -2,7 +2,7 @@
 
 Summary of changes from schema 2:
 
-- Run commands were formerly stored as monolithic blobs in the `run` table,
+- Run commands were formerly stored as monolithic blobs in the `run.commands` column,
   with each row storing an entire list. This has been split out into a new
   `run_command` table, where each individual command gets its own row.
 
@@ -65,9 +65,11 @@ class MigrationUpTo3(Migration):  # noqa: D101
             dest_engine = exit_stack.enter_context(sql_engine_ctx(dest_db_file))
             schema_3.metadata.create_all(dest_engine)
 
-            with source_engine.begin() as source_transaction, dest_engine.begin() as dest_transaction:
-                run_ids = _get_run_ids(schema_2_transaction=source_transaction)
-                _migrate_db_excluding_commands(source_transaction, dest_transaction)
+            source_transaction = exit_stack.enter_context(source_engine.begin())
+            dest_transaction = exit_stack.enter_context(dest_engine.begin())
+
+            run_ids = _get_run_ids(schema_2_transaction=source_transaction)
+            _migrate_db_excluding_commands(source_transaction, dest_transaction)
 
         _migrate_db_commands(source_db_file, dest_db_file, run_ids)
 
@@ -126,49 +128,45 @@ def _migrate_run_table_excluding_commands(
     ).order_by(sqlite_rowid)
     insert_new_run = sqlalchemy.insert(schema_3.run_table)
 
-    for old_run_row in source_transaction.execute(select_old_runs).all():
-        old_state_summary = old_run_row.state_summary
+    for old_row in source_transaction.execute(select_old_runs).all():
+        old_state_summary = old_row.state_summary
         new_state_summary = (
             None
-            if old_run_row.state_summary is None
+            if old_row.state_summary is None
             else pydantic_to_json(
                 pydantic.parse_obj_as(StateSummary, old_state_summary)
             )
         )
         dest_transaction.execute(
             insert_new_run,
-            id=old_run_row.id,
-            created_at=old_run_row.created_at,
-            protocol_id=old_run_row.protocol_id,
+            id=old_row.id,
+            created_at=old_row.created_at,
+            protocol_id=old_row.protocol_id,
             state_summary=new_state_summary,
-            engine_status=old_run_row.engine_status,
-            _updated_at=old_run_row._updated_at,
+            engine_status=old_row.engine_status,
+            _updated_at=old_row._updated_at,
         )
 
 
 def _migrate_analysis_table(
-    source_connection: sqlalchemy.engine.Connection,
-    dest_connection: sqlalchemy.engine.Connection,
+    source_transaction: sqlalchemy.engine.Connection,
+    dest_transaction: sqlalchemy.engine.Connection,
 ) -> None:
     select_old_analyses = sqlalchemy.select(schema_2.analysis_table).order_by(
         sqlite_rowid
     )
     insert_new_analysis = sqlalchemy.insert(schema_3.analysis_table)
-    for row in (
-        # The table is missing an explicit sequence number column, so we need
-        # sqlite_rowid to retain order across this copy.
-        source_connection.execute(select_old_analyses).all()
-    ):
-        dest_connection.execute(
+    for old_row in source_transaction.execute(select_old_analyses).all():
+        dest_transaction.execute(
             insert_new_analysis,
             # The new `completed_analysis` column has the data that used to be in
             # `completed_analysis_as_document`. The separate
             # `completed_analysis_as_document` column is dropped.
-            completed_analysis=row.completed_analysis_as_document,
+            completed_analysis=old_row.completed_analysis_as_document,
             # The remaining columns are unchanged:
-            id=row.id,
-            protocol_id=row.protocol_id,
-            analyzer_version=row.analyzer_version,
+            id=old_row.id,
+            protocol_id=old_row.protocol_id,
+            analyzer_version=old_row.analyzer_version,
         )
 
 
