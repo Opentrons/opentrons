@@ -2,7 +2,6 @@ import * as React from 'react'
 import difference from 'lodash/difference'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
-import { useRouteMatch } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 
 import { useInterval, truncateString } from '@opentrons/components'
@@ -145,9 +144,6 @@ export function useCurrentRunRoute(): string | null {
     staleTime: Infinity,
     enabled: currentRunId != null,
   })
-
-  const isRunSetupRoute = useRouteMatch('/runs/:runId/setup')
-  if (isRunSetupRoute != null && runRecord == null) return '/protocols'
 
   const runStatus = runRecord?.data.status
   const runActions = runRecord?.data.actions
