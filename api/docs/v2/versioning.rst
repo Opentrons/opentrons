@@ -126,6 +126,11 @@ This table lists the correspondence between Protocol API versions and robot soft
 Changes in API Versions
 =======================
 
+Version 2.17
+------------
+
+- :py:meth:`.dispense` now raises an error if you try to dispense more than :py:obj:`.InstrumentContext.current_volume`.
+
 Version 2.16
 ------------
 
