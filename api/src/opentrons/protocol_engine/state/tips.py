@@ -152,6 +152,7 @@ class TipStore(HasState[TipState], HandlesActions):
                         well = columns[critical_column - i][critical_row - j]
                         wells[well] = TipRackWellState.USED
         else:
+            # TODO: (cb, 2024-2-14): update/remove this case as soon as we gaurantee a nozzle map upon loading a pipette with (Jira RSS-441.)
             wells[well_name] = TipRackWellState.USED
 
 
