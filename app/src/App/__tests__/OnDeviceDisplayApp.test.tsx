@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
-import { screen, cleanup, logRoles } from '@testing-library/react'
+import { screen, cleanup } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { RUN_STATUS_RUNNING, RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
+import { useProtocolQuery } from '@opentrons/react-api-client'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../__testing-utils__'
 import { i18n } from '../../i18n'
@@ -31,12 +34,14 @@ import { useCurrentRunRoute, useProtocolReceiptToast } from '../hooks'
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 import { useMostRecentRunId } from '../../organisms/ProtocolUpload/hooks/useMostRecentRunId'
 import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
-import * as ReactApiClient from '@opentrons/react-api-client'
-import { useRobotAnalyticsData, useTrackProtocolRunEvent } from '../../organisms/Devices/hooks'
+import { useRobotAnalyticsData, useRobotType, useTrackProtocolRunEvent } from '../../organisms/Devices/hooks'
 import { useTrackEvent } from '../../redux/analytics'
+import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useNotifyLastRunCommandKey } from '../../resources/runs/useNotifyLastRunCommandKey'
+import { useRunControls, useRunStatus, useRunTimestamps } from '../../organisms/RunTimeControl/hooks'
 
+import type * as ReactApiClient from '@opentrons/react-api-client'
 import type { OnDeviceDisplaySettings } from '../../redux/config/types'
-import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 
 // vi.mock('../../pages/Welcome')
 // vi.mock('../../pages/NetworkSetupMenu')
@@ -64,6 +69,9 @@ vi.mock('../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
 vi.mock('../../organisms/ProtocolUpload/hooks/useMostRecentRunId')
 vi.mock('../../resources/runs/useNotifyRunQuery')
 vi.mock('../../organisms/Devices/hooks')
+vi.mock('../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('../../resources/runs/useNotifyLastRunCommandKey')
+vi.mock('../../organisms/RunTimeControl/hooks')
 vi.mock('@opentrons/react-api-client', async (importOriginal) => {
   const actual = await importOriginal<typeof ReactApiClient>()
   return {
@@ -158,18 +166,55 @@ describe('OnDeviceDisplayApp', () => {
   //   render('/runs/my-run-id/setup')
   //   expect(vi.mocked(ProtocolSetup)).toHaveBeenCalled()
   // })
-  // it('when current run route present renders RunningProtocol component from /runs/:runId/run', () => {
-  //   vi.mocked(useCurrentRunRoute).mockReturnValue('/runs/my-run-id/run')
-  //   render('/runs/my-run-id/run')
-  //   expect(vi.mocked(RunningProtocol)).toHaveBeenCalled()
-  // })
+  it('when current run route present renders RunningProtocol component from /runs/:runId/run', () => {
+    const protocolName = 'fake-protocol-name'
+
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({ commands: [] })
+    vi.mocked(useNotifyLastRunCommandKey).mockReturnValue('fake-command-key')
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_RUNNING)
+    vi.mocked(useRunTimestamps).mockReturnValue({
+      startedAt: '2024-02-14T22:37:07+00:00',
+      stoppedAt: '2024-02-14T22:37:07+00:00',
+      completedAt: '2024-02-14T22:37:07+00:00',
+      pausedAt: '2024-02-14T22:37:07+00:00',
+    })
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: {
+        data: {
+          current: true,
+          protocolId: 'protocol-id',
+          status: RUN_STATUS_RUNNING,
+        }
+      }
+    } as any)
+    vi.mocked(useProtocolQuery).mockReturnValue({
+      data: {
+        data: {
+          metadata: { protocolName },
+          files: [{ name: 'file name' }]
+        }
+      }
+    } as any)
+    vi.mocked(useRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
+    vi.mocked(useTrackProtocolRunEvent).mockReturnValue({ trackProtocolRunEvent: vi.fn() })
+    vi.mocked(useCurrentRunRoute).mockReturnValue('/runs/my-run-id/run')
+    render('/runs/my-run-id/run')
+    screen.getByText(protocolName)
+  })
   it.only('when current run route present renders a RunSummary component from /runs/:runId/summary', () => {
     const protocolName = 'fake-protocol-name'
+    vi.mocked(useRunControls).mockReturnValue({ reset: vi.fn() } as any)
     vi.mocked(useCurrentRunRoute).mockReturnValue('/runs/my-run-id/summary')
     vi.mocked(useMostRecentRunId).mockReturnValue('my-run-id')
     vi.mocked(useTrackEvent).mockReturnValue(vi.fn())
-    vi.mocked(useTrackProtocolRunEvent).mockReturnValue({trackProtocolRunEvent: vi.fn()})
+    vi.mocked(useTrackProtocolRunEvent).mockReturnValue({ trackProtocolRunEvent: vi.fn() })
     vi.mocked(useRobotAnalyticsData).mockReturnValue({} as any)
+    vi.mocked(useRunTimestamps).mockReturnValue({
+      startedAt: '2024-02-14T22:37:07+00:00',
+      stoppedAt: '2024-02-14T22:37:07+00:00',
+      completedAt: '2024-02-14T22:37:07+00:00',
+      pausedAt: '2024-02-14T22:37:07+00:00',
+    })
     vi.mocked(useNotifyRunQuery).mockReturnValue({
       data: {
         data: {
@@ -179,11 +224,11 @@ describe('OnDeviceDisplayApp', () => {
         }
       }
     } as any)
-    vi.mocked(ReactApiClient.useProtocolQuery).mockReturnValue({
+    vi.mocked(useProtocolQuery).mockReturnValue({
       data: {
         data: {
-          metadata: {protocolName },
-          files: [{name: 'file name'}]
+          metadata: { protocolName },
+          files: [{ name: 'file name' }]
         }
       }
     } as any)

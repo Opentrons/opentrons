@@ -118,7 +118,6 @@ export function RunSummary(): JSX.Element {
     false
   )
 
-  console.log('RUN RECORD', runRecord)
   const [pipettesWithTip, setPipettesWithTip] = React.useState<
     PipettesWithTip[]
   >([])

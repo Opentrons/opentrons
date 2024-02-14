@@ -26,6 +26,8 @@ export function formatDuration(duration: Duration): string {
  * @returns string in format hh:mm:ss, e.g. 03:15:45
  */
 export function formatInterval(start: string, end: string): string {
+    console.log(start)
+    console.log(new Date(start))
   const duration = intervalToDuration({
     start: new Date(start),
     end: new Date(end),
