@@ -197,9 +197,8 @@ def _migrate_db_commands(
         # We're compute-bound, so more workers would just thrash.
         #
         # Napkin math for the memory footprint:
-        # Suppose a very large protocol has ~10MB of commands (see e.g. RQA-443).
-        # The maximum number of runs at the time of writing is 20,
-        # so that's at most ~200MB total, which should be fine.
+        # Suppose a very large run has ~10 MB of commands (see e.g. RQA-443).
+        # We're limiting this to 4 runs at a time, so 40 MB, which should be fine.
         processes=4
     ) as pool:
         pool.starmap(
