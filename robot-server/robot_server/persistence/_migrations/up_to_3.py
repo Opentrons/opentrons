@@ -19,6 +19,7 @@ Summary of changes from schema 2:
 import multiprocessing
 from contextlib import ExitStack
 from pathlib import Path
+from logging import getLogger
 from typing import List
 
 from opentrons.protocol_engine import StateSummary
@@ -42,6 +43,9 @@ from . import _up_to_3_worker
 _DECK_CONFIGURATION_FILE = "deck_configuration.json"
 _PROTOCOLS_DIRECTORY = "protocols"
 _DB_FILE = "robot_server.db"
+
+
+_log = getLogger(__name__)
 
 
 class MigrationUpTo3(Migration):  # noqa: D101
@@ -68,15 +72,17 @@ class MigrationUpTo3(Migration):  # noqa: D101
             source_transaction = exit_stack.enter_context(source_engine.begin())
             dest_transaction = exit_stack.enter_context(dest_engine.begin())
 
-            run_ids = _get_run_ids(schema_2_transaction=source_transaction)
             _migrate_db_excluding_commands(source_transaction, dest_transaction)
+
+            # Get the run IDs *after* migrating runs, in case any runs got dropped.
+            run_ids = _get_run_ids(schema_3_transaction=dest_transaction)
 
         _migrate_db_commands(source_db_file, dest_db_file, run_ids)
 
 
-def _get_run_ids(*, schema_2_transaction: sqlalchemy.engine.Connection) -> List[str]:
+def _get_run_ids(*, schema_3_transaction: sqlalchemy.engine.Connection) -> List[str]:
     return (
-        schema_2_transaction.execute(sqlalchemy.select(schema_2.run_table.c.id))
+        schema_3_transaction.execute(sqlalchemy.select(schema_3.run_table.c.id))
         .scalars()
         .all()
     )
@@ -129,23 +135,33 @@ def _migrate_run_table_excluding_commands(
     insert_new_run = sqlalchemy.insert(schema_3.run_table)
 
     for old_row in source_transaction.execute(select_old_runs).all():
-        old_state_summary = old_row.state_summary
-        new_state_summary = (
-            None
-            if old_row.state_summary is None
-            else pydantic_to_json(
-                pydantic.parse_obj_as(StateSummary, old_state_summary)
+        try:
+            old_state_summary = old_row.state_summary
+            new_state_summary = (
+                None
+                if old_row.state_summary is None
+                else pydantic_to_json(
+                    pydantic.parse_obj_as(StateSummary, old_state_summary)
+                )
             )
-        )
-        dest_transaction.execute(
-            insert_new_run,
-            id=old_row.id,
-            created_at=old_row.created_at,
-            protocol_id=old_row.protocol_id,
-            state_summary=new_state_summary,
-            engine_status=old_row.engine_status,
-            _updated_at=old_row._updated_at,
-        )
+            dest_transaction.execute(
+                insert_new_run,
+                id=old_row.id,
+                created_at=old_row.created_at,
+                protocol_id=old_row.protocol_id,
+                state_summary=new_state_summary,
+                engine_status=old_row.engine_status,
+                _updated_at=old_row._updated_at,
+            )
+        except Exception:
+            # The format that we're migrating from is prone to bugs where our latest
+            # code can't read records created by older code. (See RSS-98).
+            # If that happens, it's better to silently drop the run than to fail the
+            # whole migration.
+            _log.warning(
+                f"Exception while migrating run {old_row.id}. Dropping it.",
+                exc_info=True,
+            )
 
 
 def _migrate_analysis_table(
