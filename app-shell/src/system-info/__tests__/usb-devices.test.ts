@@ -77,127 +77,128 @@ const mockUSBDevice = {
   close: usbDeviceClose,
 }
 
-const describeIfNotWindows = isWindows() ? describe.skip : describe
+if (!isWindows()) {
+  describe('app-shell::system-info::usb-devices::detection', () => {
+    const { windowsDriverVersion: _, ...mockDevice } = Fixtures.mockUsbDevice
+    afterEach(() => {
+      jest.resetAllMocks()
+    })
 
-describeIfNotWindows('app-shell::system-info::usb-devices::detection', () => {
-  const { windowsDriverVersion: _, ...mockDevice } = Fixtures.mockUsbDevice
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
-  it('can return the list of all devices', async () => {
-    const mockDevices = [mockUSBDevice, mockUSBDevice, mockUSBDevice] as any
-    const serialIterator = getSerialIterator()
-    const mfrIterator = getManufacturerIterator()
-    const productIterator = getProductIterator()
-    usbGetDeviceList.mockReturnValueOnce(mockDevices)
-    usbDeviceGetStringDescriptor.mockImplementation((descriptorId, callback) =>
-      callback(
-        undefined,
-        [serialIterator, mfrIterator, productIterator][descriptorId]()
-      )
-    )
-
-    const monitor = createUsbDeviceMonitor()
-    const result = monitor.getAllDevices()
-    const devices = await result
-
-    expect(devices).toEqual([
-      {
-        ...mockFixtureDevice,
-        manufacturerName: 'mfr1',
-        serialNumber: 'sn1',
-        productName: 'pr1',
-      },
-      {
-        ...mockFixtureDevice,
-        manufacturerName: 'mfr2',
-        serialNumber: 'sn2',
-        productName: 'pr2',
-      },
-      {
-        ...mockFixtureDevice,
-        manufacturerName: 'mfr3',
-        serialNumber: 'sn3',
-        productName: 'pr3',
-      },
-    ])
-  })
-
-  it('can notify when devices are added', () =>
-    new Promise<void>((resolve, reject) => {
-      const onDeviceAdd = jest.fn()
-      onDeviceAdd.mockImplementation(device => {
-        try {
-          expect(device).toEqual({
-            ...mockFixtureDevice,
-            manufacturerName: 'mfr1',
-            serialNumber: 'sn1',
-            productName: 'pn1',
-          })
-          resolve()
-        } catch (error) {
-          reject(error)
-        }
-      })
-      let attachListener
-      usbOn.mockImplementationOnce((event, listener) => {
-        if (event === 'attach') {
-          attachListener = listener
-        }
-      })
-      createUsbDeviceMonitor({ onDeviceAdd })
+    it('can return the list of all devices', async () => {
+      const mockDevices = [mockUSBDevice, mockUSBDevice, mockUSBDevice] as any
+      const serialIterator = getSerialIterator()
+      const mfrIterator = getManufacturerIterator()
+      const productIterator = getProductIterator()
+      usbGetDeviceList.mockReturnValueOnce(mockDevices)
       usbDeviceGetStringDescriptor.mockImplementation(
         (descriptorId, callback) =>
-          callback(undefined, ['sn1', 'mfr1', 'pn1'][descriptorId])
+          callback(
+            undefined,
+            [serialIterator, mfrIterator, productIterator][descriptorId]()
+          )
       )
-      if (attachListener) {
-        // @ts-expect-error: this is gross
-        attachListener(mockUSBDevice)
-      } else {
-        reject(new Error('attachListener was not defined'))
-      }
-    }))
 
-  it('can notify when devices are removed', () =>
-    new Promise<void>((resolve, reject) => {
-      const onDeviceRemove = jest.fn()
-      onDeviceRemove.mockImplementation(device => {
-        try {
-          expect(device).toEqual({
-            vendorId: mockDevice.vendorId,
-            productId: mockDevice.productId,
-            identifier: 'ec2c23ab245e0424059c3ad99e626cdb',
-            manufacturerName: undefined,
-            productName: undefined,
-            serialNumber: undefined,
-            systemIdentifier: undefined,
-          })
-          resolve()
-        } catch (error) {
-          reject(error)
+      const monitor = createUsbDeviceMonitor()
+      const result = monitor.getAllDevices()
+      const devices = await result
+
+      expect(devices).toEqual([
+        {
+          ...mockFixtureDevice,
+          manufacturerName: 'mfr1',
+          serialNumber: 'sn1',
+          productName: 'pr1',
+        },
+        {
+          ...mockFixtureDevice,
+          manufacturerName: 'mfr2',
+          serialNumber: 'sn2',
+          productName: 'pr2',
+        },
+        {
+          ...mockFixtureDevice,
+          manufacturerName: 'mfr3',
+          serialNumber: 'sn3',
+          productName: 'pr3',
+        },
+      ])
+    })
+
+    it('can notify when devices are added', () =>
+      new Promise<void>((resolve, reject) => {
+        const onDeviceAdd = jest.fn()
+        onDeviceAdd.mockImplementation(device => {
+          try {
+            expect(device).toEqual({
+              ...mockFixtureDevice,
+              manufacturerName: 'mfr1',
+              serialNumber: 'sn1',
+              productName: 'pn1',
+            })
+            resolve()
+          } catch (error) {
+            reject(error)
+          }
+        })
+        let attachListener
+        usbOn.mockImplementationOnce((event, listener) => {
+          if (event === 'attach') {
+            attachListener = listener
+          }
+        })
+        createUsbDeviceMonitor({ onDeviceAdd })
+        usbDeviceGetStringDescriptor.mockImplementation(
+          (descriptorId, callback) =>
+            callback(undefined, ['sn1', 'mfr1', 'pn1'][descriptorId])
+        )
+        if (attachListener) {
+          // @ts-expect-error: this is gross
+          attachListener(mockUSBDevice)
+        } else {
+          reject(new Error('attachListener was not defined'))
         }
-      })
+      }))
 
-      let detachListener
+    it('can notify when devices are removed', () =>
+      new Promise<void>((resolve, reject) => {
+        const onDeviceRemove = jest.fn()
+        onDeviceRemove.mockImplementation(device => {
+          try {
+            expect(device).toEqual({
+              vendorId: mockDevice.vendorId,
+              productId: mockDevice.productId,
+              identifier: 'ec2c23ab245e0424059c3ad99e626cdb',
+              manufacturerName: undefined,
+              productName: undefined,
+              serialNumber: undefined,
+              systemIdentifier: undefined,
+            })
+            resolve()
+          } catch (error) {
+            reject(error)
+          }
+        })
 
-      usbOn.mockImplementationOnce((event, listener) => {
-        if (event === 'detach') {
-          detachListener = listener
+        let detachListener
+
+        usbOn.mockImplementationOnce((event, listener) => {
+          if (event === 'detach') {
+            detachListener = listener
+          }
+        })
+        usbDeviceOpen.mockImplementation(() => {
+          throw new Error('Cannot open detached device')
+        })
+        createUsbDeviceMonitor({ onDeviceRemove })
+        if (detachListener) {
+          // @ts-expect-error: this is gross
+          detachListener(mockUSBDevice)
+        } else {
+          reject(new Error('detachListener was not created'))
         }
-      })
-      usbDeviceOpen.mockImplementation(() => {
-        throw new Error('Cannot open detached device')
-      })
-      createUsbDeviceMonitor({ onDeviceRemove })
-      if (detachListener) {
-        // @ts-expect-error: this is gross
-        detachListener(mockUSBDevice)
-      } else {
-        reject(new Error('detachListener was not created'))
-      }
-    }))
-})
+      }))
+  })
+}
 
 describe('app-shell::system-info::usb-devices', () => {
   const { windowsDriverVersion: _, ...mockDevice } = Fixtures.mockUsbDevice
