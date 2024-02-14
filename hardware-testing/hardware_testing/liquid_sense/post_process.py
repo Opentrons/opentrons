@@ -113,7 +113,6 @@ def process_csv_directory(  # noqa: C901
                 for trial in range(trials):
                     for i in range(max_results_len):
                         if tip_offsets[tip][trial] > min_tip_offset:
-                            print(f"tip {tip} trial {trial} tip_offsets {tip_offsets[tip][trial]} min_tip_offset {min_tip_offset}")
                             # drop this pressure result
                             pressure_results[tip][trial].pop(0)
                             # we don't want to change the length of this array so just stretch out
@@ -125,7 +124,6 @@ def process_csv_directory(  # noqa: C901
                             tip_offsets[tip][trial] -=  0.001 * results_settings[tip][0][0]
                             # keep track of how this effects the plunger start position
                             p_offsets[tip][trial] = (i+1) * 0.001 * results_settings[tip][0][1] * -1
-                            print(f"pressure_results {pressure_results[tip][trial][0]} tip_offsets {tip_offsets[tip][trial]} p_offsets {p_offsets[tip][trial]}")
                         else:
                             # we've lined up this trial so move to the next
                             break
