@@ -19,7 +19,7 @@ sphinx_build_allow_warnings := $(pipenv) run sphinx-build
 
 ot_project := $(OPENTRONS_PROJECT)
 project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
-project_ot3_default = $(if $(ot_project),$(ot_project),ot3)
+project_ir_default = $(if $(ot_project),$(ot_project),ot3)
 
 # Find the version of the wheel from git using a helper script. We
 # use python here so we can use the same version normalization that will be
@@ -27,10 +27,10 @@ project_ot3_default = $(if $(ot_project),$(ot_project),ot3)
 wheel_file = dist/$(call python_get_wheelname,api,$(project_rs_default),opentrons,$(BUILD_NUMBER))
 
 # Find the version of the sdist file from git using a helper script.
-sdist_file = dist/$(call python_get_sdistname,api,$(project_ot3_default),opentrons)
+sdist_file = dist/$(call python_get_sdistname,api,$(project_rs_default),opentrons)
 
 # Find the branch, sha, version that will be used to update the VERSION.json file
-version_file = $(call python_get_git_version,api,$(project_ot3_default),opentrons)
+version_file = $(call python_get_git_version,api,$(project_rs_default),opentrons)
 
 # These variables are for simulating python protocols
 sim_log_level ?= info
@@ -100,7 +100,7 @@ wheel:
 
 
 .PHONY: sdist
-sdist: export OPENTRONS_PROJECT=$(project_ot3_default)
+sdist: export OPENTRONS_PROJECT=$(project_rs_default)
 sdist:
 	$(clean_sdist_cmd)
 	$(python) setup.py sdist
