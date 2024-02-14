@@ -61,10 +61,6 @@ export const ContextMenu = (props: Props): JSX.Element => {
   })
 
   const makeHandleContextMenu = (stepId: StepIdType) => (event: MouseEvent) => {
-    console.log(
-      'handle context menu called before isMulti SelectMode',
-      isMultiSelectMode
-    )
     if (isMultiSelectMode) return
     event.preventDefault()
 
@@ -84,7 +80,6 @@ export const ContextMenu = (props: Props): JSX.Element => {
       screenH - clickY > rootH
         ? clickY + MENU_OFFSET_PX
         : clickY - rootH - MENU_OFFSET_PX
-    console.log('handle context menu called')
     setVisible(true)
     setStepId(stepId)
     setPosition({ left, top })

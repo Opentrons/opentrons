@@ -20,8 +20,8 @@ import styles from './LabwareOverlays.css'
 
 interface Props {
   labwareOnDeck: LabwareOnDeck
-  setHoveredLabware: (val?: LabwareOnDeck | null) => unknown
-  setDraggedLabware: (val?: LabwareOnDeck | null) => unknown
+  setHoveredLabware: (val?: LabwareOnDeck | null) => void
+  setDraggedLabware: (val?: LabwareOnDeck | null) => void
   swapBlocked: boolean
 }
 
@@ -38,6 +38,7 @@ export const EditLabware = (props: Props): JSX.Element | null => {
   const savedLabware = useSelector(labwareIngredSelectors.getSavedLabware)
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const { t } = useTranslation('deck')
+  const ref = React.useRef(null)
 
   const { isTiprack } = labwareOnDeck.def.parameters
   const hasName = savedLabware[labwareOnDeck.id]
@@ -62,26 +63,21 @@ export const EditLabware = (props: Props): JSX.Element | null => {
 
   const [{ draggedLabware, isOver }, drop] = useDrop(() => ({
     accept: DND_TYPES.LABWARE,
-    canDrop: (item: any) => {
-      const draggedItem = item?.labwareOnDeck
-      const draggedLabware = draggedItem?.labwareOnDeck
+    canDrop: (item: DroppedItem) => {
+      const draggedLabware = item?.labwareOnDeck
       const isDifferentSlot =
         draggedLabware && draggedLabware.slot !== labwareOnDeck.slot
       return isDifferentSlot && !swapBlocked
     },
-    drop: (item: any) => {
-      const draggedItem = item?.labwareOnDeck
-      if (draggedItem) {
-        dispatch(
-          moveDeckItem(draggedItem.labwareOnDeck.slot, labwareOnDeck.slot)
-        )
+    drop: (item: DroppedItem) => {
+      const draggedLabware = item?.labwareOnDeck
+      if (draggedLabware) {
+        dispatch(moveDeckItem(draggedLabware.slot, labwareOnDeck.slot))
       }
     },
 
-    hover: (monitor: DropTargetMonitor) => {
-      if (monitor.canDrop()) {
-        setHoveredLabware(labwareOnDeck)
-      }
+    hover: () => {
+      setHoveredLabware(labwareOnDeck)
     },
     collect: (monitor: DropTargetMonitor) => ({
       isOver: monitor.isOver(),
@@ -151,17 +147,18 @@ export const EditLabware = (props: Props): JSX.Element | null => {
       )
     }
 
-    const dragResult = drag(
-      <div ref={drop}>
-        <div
-          className={cx(styles.slot_overlay, {
-            [styles.appear_on_mouseover]: !isBeingDragged && !isYetUnnamed,
-            [styles.appear]: isOver,
-            [styles.disabled]: isBeingDragged,
-          })}
-        >
-          {contents}
-        </div>
+    drag(drop(ref))
+
+    const dragResult = (
+      <div
+        ref={ref}
+        className={cx(styles.slot_overlay, {
+          [styles.appear_on_mouseover]: !isBeingDragged && !isYetUnnamed,
+          [styles.appear]: isOver,
+          [styles.disabled]: isBeingDragged,
+        })}
+      >
+        {contents}
       </div>
     )
 

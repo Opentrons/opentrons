@@ -92,8 +92,6 @@ export const DraggableStepItems = (
   React.useEffect(() => {
     setStepIds(orderedStepIds)
   }, [orderedStepIds])
-  console.log('orderedStepIds', orderedStepIds)
-  console.log('stepIds', stepIds)
 
   const clickDrop = (): void => {
     if (!isEqual(orderedStepIds, stepIds)) {
@@ -120,8 +118,7 @@ export const DraggableStepItems = (
     stepIds.findIndex(id => stepId === id)
 
   const currentIds = isOver ? stepIds : orderedStepIds
-  console.log('isover', isOver)
-  console.log('currentIds', currentIds)
+
   return (
     <>
       <ContextMenu>
