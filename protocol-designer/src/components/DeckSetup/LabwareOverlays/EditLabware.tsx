@@ -94,7 +94,7 @@ export const EditLabware = (props: Props): JSX.Element | null => {
     )
   } else {
     const isBeingDragged =
-      draggedLabware?.labwareOnDeck.slot === labwareOnDeck.slot
+      draggedLabware?.labwareOnDeck?.slot === labwareOnDeck.slot
 
     let contents: React.ReactNode | null = null
 
