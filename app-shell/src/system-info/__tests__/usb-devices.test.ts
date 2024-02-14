@@ -25,7 +25,14 @@ const usbOn = usb.on as jest.MockedFunction<typeof usb.on>
 
 const execaCommand = execa.command as jest.MockedFunction<typeof execa.command>
 
+const mockFixtureDevice = {
+  ...Fixtures.mockUsbDevice,
+  identifier: 'ec2c23ab245e0424059c3ad99e626cdb',
+}
+
 const mockDescriptor = {
+  busNumber: 3,
+  deviceAddress: 10,
   deviceDescriptor: {
     idVendor: Fixtures.mockUsbDevice.vendorId,
     idProduct: Fixtures.mockUsbDevice.productId,
@@ -94,19 +101,19 @@ describe('app-shell::system-info::usb-devices', () => {
 
     expect(devices).toEqual([
       {
-        ...Fixtures.mockUsbDevice,
+        ...mockFixtureDevice,
         manufacturerName: 'mfr1',
         serialNumber: 'sn1',
         productName: 'pr1',
       },
       {
-        ...Fixtures.mockUsbDevice,
+        ...mockFixtureDevice,
         manufacturerName: 'mfr2',
         serialNumber: 'sn2',
         productName: 'pr2',
       },
       {
-        ...Fixtures.mockUsbDevice,
+        ...mockFixtureDevice,
         manufacturerName: 'mfr3',
         serialNumber: 'sn3',
         productName: 'pr3',
@@ -120,7 +127,7 @@ describe('app-shell::system-info::usb-devices', () => {
       onDeviceAdd.mockImplementation(device => {
         try {
           expect(device).toEqual({
-            ...Fixtures.mockUsbDevice,
+            ...mockFixtureDevice,
             manufacturerName: 'mfr1',
             serialNumber: 'sn1',
             productName: 'pn1',
@@ -157,6 +164,11 @@ describe('app-shell::system-info::usb-devices', () => {
           expect(device).toEqual({
             vendorId: mockDevice.vendorId,
             productId: mockDevice.productId,
+            identifier: 'ec2c23ab245e0424059c3ad99e626cdb',
+            manufacturerName: undefined,
+            productName: undefined,
+            serialNumber: undefined,
+            systemIdentifier: undefined,
           })
           resolve()
         } catch (error) {

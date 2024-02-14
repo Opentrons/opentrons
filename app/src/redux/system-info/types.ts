@@ -19,6 +19,7 @@ export interface UsbDevice {
   manufacturerName?: string
   serialNumber?: string
   windowsDriverVersion?: string | null
+  systemIdentifier?: string
 }
 
 // based on built-in type os$NetIFAddr
