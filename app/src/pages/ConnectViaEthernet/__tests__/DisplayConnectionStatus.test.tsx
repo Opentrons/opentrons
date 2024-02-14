@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
-
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { i18n } from '../../../i18n'
 import { DisplayConnectionStatus } from '../../../pages/ConnectViaEthernet/DisplayConnectionStatus'

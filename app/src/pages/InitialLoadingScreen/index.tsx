@@ -48,7 +48,7 @@ export function InitialLoadingScreen(): JSX.Element {
         size="160px"
         spin
         color={COLORS.grey60}
-        aria-label="InitialLoadingScreen-spinner"
+        aria-label="loading indicator"
       />
       {targetPath != null && <Redirect exact from="/" to={targetPath} />}
     </Flex>

@@ -42,6 +42,6 @@ describe('InitialLoadingScreen', () => {
   })
   it('should display spinner', () => {
     render()
-    screen.getByLabelText('InitialLoadingScreen-spinner')
+    screen.getByLabelText('loading')
   })
 })

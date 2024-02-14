@@ -1,10 +1,10 @@
 // render using targetted component using @testing-library/react
 // with wrapping providers for i18next and redux
 import * as React from 'react'
-import {vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
+import { vi } from 'vitest'
 import { render } from '@testing-library/react'
 import { createStore } from 'redux'
 

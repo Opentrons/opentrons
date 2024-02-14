@@ -72,7 +72,11 @@ export function Icon(props: IconProps): JSX.Element | null {
       {...svgProps}
       id={id}
     >
-      <path fillRule="evenodd" d={path} />
+      <path
+        aria-roledescription={name}
+        fillRule="evenodd"
+        d={path}
+      />
       {props.children}
     </Svg>
   )

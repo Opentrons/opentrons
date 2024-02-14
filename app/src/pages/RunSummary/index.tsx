@@ -117,6 +117,8 @@ export function RunSummary(): JSX.Element {
   const [showRunFailedModal, setShowRunFailedModal] = React.useState<boolean>(
     false
   )
+
+  console.log('RUN RECORD', runRecord)
   const [pipettesWithTip, setPipettesWithTip] = React.useState<
     PipettesWithTip[]
   >([])

@@ -213,7 +213,6 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/app-settings',
   },
 ]
-
 const onDeviceDisplayEvents: Array<keyof DocumentEventMap> = [
   'mousedown',
   'click',
@@ -289,6 +288,12 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                   <ToasterOven>
                     <ProtocolReceiptToasts />
                     <Switch>
+                      {/* <Route key='/instruments' exact={true} path='/instruments'>
+                              <Box css={TOUCH_SCREEN_STYLE} ref={scrollRef}>
+                                <ModalPortalRoot />
+                                <InstrumentsDashboard />
+                              </Box>
+                            </Route> */}
                       {onDeviceDisplayRoutes.map(
                         ({ Component, exact, path }: RouteProps) => {
                           return (
