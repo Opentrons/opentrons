@@ -57,9 +57,20 @@ def migrate_commands_for_run(
             there are conflicts, we'd have to deal with SQLite retrying transactions or
             raising SQLITE_BUSY. A Python-level lock is simpler and more reliable.
     """
-    with _database.sql_engine_ctx(
+    with contextlib.suppress(
+        # The format that we're migrating from is prone to bugs where our latest
+        # code can't read records created by older code. (See RSS-98).
+        # If that happens, it's better to silently drop the run than to fail the
+        # whole migration.
+        #
+        # TODO(mm, 2024-02-14): Log these somehow. Logging is a little tricky from
+        # subprocesses.
+        Exception
+    ), _database.sql_engine_ctx(
         source_db_file
-    ) as source_engine, _database.sql_engine_ctx(dest_db_file) as dest_engine:
+    ) as source_engine, _database.sql_engine_ctx(
+        dest_db_file
+    ) as dest_engine:
         select_old_commands = sqlalchemy.select(schema_2.run_table.c.commands).where(
             schema_2.run_table.c.id == run_id
         )
