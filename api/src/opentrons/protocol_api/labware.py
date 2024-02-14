@@ -868,13 +868,6 @@ class Labware:
         """
         assert num_tips > 0, f"num_tips must be positive integer, but got {num_tips}"
 
-        # this may be first where our logic needs to change
-        # this function returns the well that the "primary nozzle" of the pipette moves to
-        # so on a column pickup it presumably returns either the first tip on that column of tips
-
-        # from here on out, we're gonna treat all configurations as a form of quadrant
-        # so what we should do is return the tip thats at the edge of that "tip cluster" that matches the quadrant desired
-
         well_name = self._core.get_next_tip(
             num_tips=num_tips,
             starting_tip=starting_tip._core if starting_tip else None,

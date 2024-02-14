@@ -206,9 +206,31 @@ class TipView(HasState[TipState]):
                 elif all(wells[well] == TipRackWellState.USED for well in tip_cluster):
                     return None
                 else:
-                    raise KeyError(
-                        f"Tiprack {labware_id} has no valid tip selection for current Nozzle Configuration."
-                    )
+                    # The tip cluster list is ordered: Each row from a column in order by columns
+                    tip_cluster_final_column = []
+                    for i in range(num_nozzle_rows):
+                        tip_cluster_final_column.append(
+                            tip_cluster[((num_nozzle_cols * num_nozzle_rows) - 1) - i]
+                        )
+                    tip_cluster_final_row = []
+                    for i in range(num_nozzle_cols):
+                        tip_cluster_final_row.append(
+                            tip_cluster[(num_nozzle_rows - 1) + (i * num_nozzle_rows)]
+                        )
+                    if all(
+                        wells[well] == TipRackWellState.USED
+                        for well in tip_cluster_final_column
+                    ):
+                        return None
+                    elif all(
+                        wells[well] == TipRackWellState.USED
+                        for well in tip_cluster_final_row
+                    ):
+                        return None
+                    else:
+                        raise KeyError(
+                            f"Tiprack {labware_id} has no valid tip selection for current Nozzle Configuration."
+                        )
 
             if self._state.nozzle_map.starting_nozzle == "A1":
                 # Define the critical well by the position of the well relative to Tip Rack entry point H12
@@ -226,7 +248,7 @@ class TipView(HasState[TipState]):
                         if critical_row - num_nozzle_rows > 0:
                             critical_row = critical_row - num_nozzle_rows
                         elif critical_column - num_nozzle_cols > 0:
-                            critical_column = critical_column - num_nozzle_cols
+                            critical_column = critical_column - 1
                             critical_row = (
                                 len(columns[critical_column]) - num_nozzle_rows
                             )
@@ -250,7 +272,7 @@ class TipView(HasState[TipState]):
                         if critical_row - num_nozzle_rows > 0:
                             critical_row = critical_row - num_nozzle_rows
                         elif critical_column + num_nozzle_cols < 12:
-                            critical_column = critical_column + num_nozzle_cols
+                            critical_column = critical_column + 1
                             critical_row = (
                                 len(columns[critical_column]) - num_nozzle_rows
                             )
@@ -274,7 +296,7 @@ class TipView(HasState[TipState]):
                         if critical_row + num_nozzle_rows < 8:
                             critical_row = critical_row + num_nozzle_rows
                         elif critical_column - num_nozzle_cols > 0:
-                            critical_column = critical_column - num_nozzle_cols
+                            critical_column = critical_column - 1
                             critical_row = num_nozzle_rows - 1
                         else:
                             critical_column = -1
@@ -296,7 +318,7 @@ class TipView(HasState[TipState]):
                         if critical_row + num_nozzle_rows < 8:
                             critical_row = critical_row + num_nozzle_rows
                         elif critical_column + num_nozzle_cols < 12:
-                            critical_column = critical_column + num_nozzle_cols
+                            critical_column = critical_column + 1
                             critical_row = num_nozzle_rows - 1
                         else:
                             critical_column = 13
