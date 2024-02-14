@@ -153,7 +153,11 @@ class GeometryView:
     def get_highest_z_in_slot(
         self, slot: Union[DeckSlotLocation, StagingSlotLocation]
     ) -> float:
-        """Get the highest Z-point of all items stacked in the given deck slot."""
+        """Get the highest Z-point of all items stacked in the given deck slot.
+
+        This height includes the height of any module that occupies the given slot
+        even if it wasn't loaded in that slot (e.g., thermocycler).
+        """
         slot_item = self.get_slot_item(slot.slotName)
         if isinstance(slot_item, LoadedModule):
             # get height of module + all labware on it
@@ -161,9 +165,8 @@ class GeometryView:
             try:
                 labware_id = self._labware.get_id_by_module(module_id=module_id)
             except LabwareNotLoadedOnModuleError:
-                deck_type = DeckType(self._labware.get_deck_definition()["otId"])
                 return self._modules.get_module_highest_z(
-                    module_id=module_id, deck_type=deck_type
+                    module_id=module_id,
                 )
             else:
                 return self.get_highest_z_of_labware_stack(labware_id)
@@ -244,10 +247,7 @@ class GeometryView:
             return LabwareOffsetVector(x=0, y=0, z=0)
         elif isinstance(labware_location, ModuleLocation):
             module_id = labware_location.moduleId
-            deck_type = DeckType(self._labware.get_deck_definition()["otId"])
-            module_offset = self._modules.get_nominal_module_offset(
-                module_id=module_id, deck_type=deck_type
-            )
+            module_offset = self._modules.get_nominal_module_offset(module_id=module_id)
             module_model = self._modules.get_connected_model(module_id)
             stacking_overlap = self._labware.get_module_overlap_offsets(
                 labware_id, module_model
@@ -698,7 +698,11 @@ class GeometryView:
     def get_slot_item(
         self, slot_name: Union[DeckSlotName, StagingSlotName]
     ) -> Union[LoadedLabware, LoadedModule, CutoutFixture, None]:
-        """Get the item present in a deck slot, if any."""
+        """Get the top-most item present in a deck slot, if any.
+
+        This includes any module that occupies the given slot even if it wasn't loaded
+        in that slot (e.g., thermocycler).
+        """
         maybe_labware = self._labware.get_by_slot(
             slot_name=slot_name,
         )
@@ -717,7 +721,7 @@ class GeometryView:
 
             maybe_module = self._modules.get_by_slot(
                 slot_name=slot_name,
-            )
+            ) or self._modules.get_overflowed_module_in_slot(slot_name=slot_name)
         else:
             # Modules and fixtures can't be loaded on staging slots
             maybe_fixture = None

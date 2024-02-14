@@ -1,5 +1,8 @@
 """Module state store tests."""
+from typing import List
+
 import pytest
+from opentrons_shared_data.robot.dev_types import RobotType
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
 from opentrons.types import DeckSlotName
@@ -14,6 +17,7 @@ from opentrons.protocol_engine.types import (
     ModuleDefinition,
     ModuleModel,
     HeaterShakerLatchStatus,
+    DeckType,
 )
 
 from opentrons.protocol_engine.state.modules import (
@@ -33,20 +37,29 @@ from opentrons.protocol_engine.state.module_substates import (
     ThermocyclerModuleSubState,
     ModuleSubStateType,
 )
-
+from opentrons.protocol_engine.state.config import Config
 from opentrons.hardware_control.modules.types import LiveData
+
+
+_OT2_STANDARD_CONFIG = Config(
+    use_simulated_deck_config=False,
+    robot_type="OT-2 Standard",
+    deck_type=DeckType.OT2_STANDARD,
+)
 
 
 def test_initial_state() -> None:
     """It should initialize the module state."""
-    subject = ModuleStore()
+    subject = ModuleStore(config=_OT2_STANDARD_CONFIG)
 
     assert subject.state == ModuleState(
+        deck_type=DeckType.OT2_STANDARD,
         requested_model_by_id={},
         slot_by_module_id={},
         hardware_by_module_id={},
         substate_by_module_id={},
         module_offset_by_serial={},
+        additional_slots_occupied_by_module_id={},
     )
 
 
@@ -145,10 +158,11 @@ def test_load_module(
         ),
     )
 
-    subject = ModuleStore()
+    subject = ModuleStore(config=_OT2_STANDARD_CONFIG)
     subject.handle_action(action)
 
     assert subject.state == ModuleState(
+        deck_type=DeckType.OT2_STANDARD,
         slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
         requested_model_by_id={"module-id": params_model},
         hardware_by_module_id={
@@ -159,7 +173,64 @@ def test_load_module(
         },
         substate_by_module_id={"module-id": expected_substate},
         module_offset_by_serial={},
+        additional_slots_occupied_by_module_id={},
     )
+
+
+@pytest.mark.parametrize(
+    argnames=["tc_slot", "deck_type", "robot_type", "expected_additional_slots"],
+    argvalues=[
+        (
+            DeckSlotName.SLOT_7,
+            DeckType.OT2_STANDARD,
+            "OT-2 Standard",
+            [DeckSlotName.SLOT_8, DeckSlotName.SLOT_10, DeckSlotName.SLOT_11],
+        ),
+        (
+            DeckSlotName.SLOT_B1,
+            DeckType.OT3_STANDARD,
+            "OT-3 Standard",
+            [DeckSlotName.SLOT_A1],
+        ),
+    ],
+)
+def test_load_thermocycler_in_thermocycler_slot(
+    tc_slot: DeckSlotName,
+    deck_type: DeckType,
+    robot_type: RobotType,
+    expected_additional_slots: List[DeckSlotName],
+    thermocycler_v2_def: ModuleDefinition,
+) -> None:
+    """It should update additional slots for thermocycler module."""
+    action = actions.UpdateCommandAction(
+        private_result=None,
+        command=commands.LoadModule.construct(  # type: ignore[call-arg]
+            params=commands.LoadModuleParams(
+                model=ModuleModel.THERMOCYCLER_MODULE_V2,
+                location=DeckSlotLocation(slotName=tc_slot),
+            ),
+            result=commands.LoadModuleResult(
+                moduleId="module-id",
+                model=ModuleModel.THERMOCYCLER_MODULE_V2,
+                serialNumber="serial-number",
+                definition=thermocycler_v2_def,
+            ),
+        ),
+    )
+
+    subject = ModuleStore(
+        Config(
+            use_simulated_deck_config=False,
+            robot_type=robot_type,
+            deck_type=deck_type,
+        )
+    )
+    subject.handle_action(action)
+
+    assert subject.state.slot_by_module_id == {"module-id": tc_slot}
+    assert subject.state.additional_slots_occupied_by_module_id == {
+        "module-id": expected_additional_slots
+    }
 
 
 @pytest.mark.parametrize(
@@ -231,10 +302,11 @@ def test_add_module_action(
         module_live_data=live_data,
     )
 
-    subject = ModuleStore()
+    subject = ModuleStore(_OT2_STANDARD_CONFIG)
     subject.handle_action(action)
 
     assert subject.state == ModuleState(
+        deck_type=DeckType.OT2_STANDARD,
         slot_by_module_id={"module-id": None},
         requested_model_by_id={"module-id": None},
         hardware_by_module_id={
@@ -245,6 +317,7 @@ def test_add_module_action(
         },
         substate_by_module_id={"module-id": expected_substate},
         module_offset_by_serial={},
+        additional_slots_occupied_by_module_id={},
     )
 
 
@@ -270,7 +343,7 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
         params=hs_commands.DeactivateHeaterParams(moduleId="module-id"),
         result=hs_commands.DeactivateHeaterResult(),
     )
-    subject = ModuleStore()
+    subject = ModuleStore(_OT2_STANDARD_CONFIG)
 
     subject.handle_action(
         actions.UpdateCommandAction(private_result=None, command=load_module_cmd)
@@ -321,7 +394,7 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
         params=hs_commands.DeactivateShakerParams(moduleId="module-id"),
         result=hs_commands.DeactivateShakerResult(),
     )
-    subject = ModuleStore()
+    subject = ModuleStore(_OT2_STANDARD_CONFIG)
 
     subject.handle_action(
         actions.UpdateCommandAction(private_result=None, command=load_module_cmd)
@@ -374,7 +447,7 @@ def test_handle_hs_labware_latch_commands(
         params=hs_commands.OpenLabwareLatchParams(moduleId="module-id"),
         result=hs_commands.OpenLabwareLatchResult(pipetteRetracted=False),
     )
-    subject = ModuleStore()
+    subject = ModuleStore(_OT2_STANDARD_CONFIG)
 
     subject.handle_action(
         actions.UpdateCommandAction(private_result=None, command=load_module_cmd)
@@ -438,7 +511,7 @@ def test_handle_tempdeck_temperature_commands(
         params=temp_commands.DeactivateTemperatureParams(moduleId="module-id"),
         result=temp_commands.DeactivateTemperatureResult(),
     )
-    subject = ModuleStore()
+    subject = ModuleStore(_OT2_STANDARD_CONFIG)
 
     subject.handle_action(
         actions.UpdateCommandAction(private_result=None, command=load_module_cmd)
@@ -497,7 +570,7 @@ def test_handle_thermocycler_temperature_commands(
         params=tc_commands.DeactivateLidParams(moduleId="module-id"),
         result=tc_commands.DeactivateLidResult(),
     )
-    subject = ModuleStore()
+    subject = ModuleStore(_OT2_STANDARD_CONFIG)
 
     subject.handle_action(
         actions.UpdateCommandAction(private_result=None, command=load_module_cmd)
@@ -574,7 +647,13 @@ def test_handle_thermocycler_lid_commands(
         result=tc_commands.CloseLidResult(),
     )
 
-    subject = ModuleStore()
+    subject = ModuleStore(
+        Config(
+            use_simulated_deck_config=False,
+            robot_type="OT-3 Standard",
+            deck_type=DeckType.OT3_STANDARD,
+        )
+    )
 
     subject.handle_action(
         actions.UpdateCommandAction(private_result=None, command=load_module_cmd)
