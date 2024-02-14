@@ -1,4 +1,5 @@
 """Test the Protocol Landing of the page."""
+
 import os
 
 import pytest

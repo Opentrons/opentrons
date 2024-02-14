@@ -1,4 +1,5 @@
 """Pytest setup."""
+
 import os
 from typing import Generator, List, Optional
 

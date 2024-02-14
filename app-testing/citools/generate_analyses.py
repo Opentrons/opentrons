@@ -7,11 +7,13 @@
 
 import json
 import os
+import signal
 import time
+from contextlib import contextmanager
 from dataclasses import dataclass
 from enum import Enum, auto
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import docker  # type: ignore
 from automation.data.protocol import Protocol
@@ -33,6 +35,21 @@ ANALYSIS_SUFFIX = "analysis.json"
 console = Console()
 
 
+@contextmanager
+def timeout(time):
+    # Signal handler function
+    def raise_timeout(signum, frame):
+        raise TimeoutError
+
+    # Set the signal handler for the alarm signal
+    signal.signal(signal.SIGALRM, raise_timeout)
+    signal.alarm(time)  # Set the alarm
+    try:
+        yield
+    finally:
+        signal.alarm(0)  # Disable the alarm
+
+
 class ProtocolType(Enum):
     PROTOCOL_DESIGNER = auto()
     PYTHON = auto()
@@ -45,10 +62,10 @@ class AnalyzeProtocol:
     host_analysis_file: Path
     container_analysis_file: Path
     tag: str
-    analysis_execution_time: float | None = None
-    exit_code: int | None = None
-    output: str | None = None
-    analysis: Dict[str, Any] | None = None
+    analysis_execution_time: Optional[float] = None
+    exit_code: Optional[int] = None
+    output: Optional[str] = None
+    analysis: Optional[Dict[str, Any]] = None
 
     @property
     def analysis_file_exists(self) -> bool:
@@ -71,7 +88,7 @@ class AnalyzeProtocol:
         self.analysis_execution_time = analysis_execution_time
 
 
-def run_container(image_name: str, timeout: int = 60) -> docker.models.containers.Container:
+def stop_and_restart_container(image_name: str, timeout: int = 60) -> docker.models.containers.Container:
     client = docker.from_env()
     volumes = {
         str(HOST_LABWARE): {"bind": CONTAINER_LABWARE, "mode": "rw"},
@@ -79,17 +96,17 @@ def run_container(image_name: str, timeout: int = 60) -> docker.models.container
         str(HOST_PROTOCOLS_ROOT): {"bind": CONTAINER_PROTOCOLS_ROOT, "mode": "rw"},
     }
 
-    # Check for running containers using the specified image
+    # Find the running container using the specified image
     containers = client.containers.list(filters={"ancestor": image_name, "status": "running"})
 
     if containers:
-        print("Container already running.")
-        print("Exiting, stop this container so that you may be sure to have the right volumes attached.")
-        exit(1)
-    else:
-        # If no running container is found, start a new one with the specified volume
-        print("Starting a new container.")
-        container = client.containers.run(image_name, detach=True, volumes=volumes)
+        console.print("Stopping the running container(s)...")
+        for container in containers:
+            container.stop(timeout=10)
+
+    # Start a new container with the specified volume
+    console.print("Starting a new container.")
+    container = client.containers.run(image_name, detach=True, volumes=volumes)
 
     # Wait for the container to be ready if a readiness command is provided
     start_time = time.time()
@@ -117,7 +134,7 @@ def stop_and_remove_containers(image_name: str) -> None:
             # Stop the container if it's running
             if container.status == "running":
                 print(f"Stopping container {container.short_id}...")
-                container.stop()
+                container.stop(timeout=10)
 
             # Remove the container
             print(f"Removing container {container.short_id}...")
@@ -207,7 +224,6 @@ def report(protocol: AnalyzeProtocol) -> None:
             console.print(protocol.output)
     else:
         console.print(f"[bold red]Analysis not created for {protocol.protocol_file_name}[/bold red]")
-        console.print(protocol.output)
 
 
 def container_custom_labware_paths() -> List[str]:
@@ -216,15 +232,38 @@ def container_custom_labware_paths() -> List[str]:
     return []
 
 
-def analyze(protocol: AnalyzeProtocol, container: docker.models.containers.Container) -> None:
+def analyze(protocol: AnalyzeProtocol, container: docker.models.containers.Container) -> bool:
     # Run the analyze command
     command = f"python -I -m opentrons.cli analyze --json-output {protocol.container_analysis_file} {protocol.container_protocol_file} {' '.join(map(str, container_custom_labware_paths()))}"  # noqa: E501
     start_time = time.time()
-    exit_code, result = container.exec_run(command)  # Assuming container is a defined object
-    protocol.output = result.decode("utf-8")
-    protocol.exit_code = exit_code
-    protocol.set_analysis()
+    timeout_duration = 15  # seconds
+    try:
+        with timeout(timeout_duration):
+            command_result = container.exec_run(cmd=command)
+            exit_code = command_result.exit_code
+            result = command_result.output
+            protocol.output = result.decode("utf-8")
+            protocol.exit_code = exit_code
+            protocol.set_analysis()
+            protocol.set_analysis_execution_time(time.time() - start_time)
+            return True
+    except TimeoutError:
+        console.print(f"Command execution exceeded {timeout_duration} seconds and was aborted.")
+        logs = container.logs()
+        # Decode and print the logs
+        console.print(f"container logs{logs.decode('utf-8')}")
+    except KeyboardInterrupt:
+        console.print("Execution was interrupted by the user.")
+        raise
+    except Exception as e:
+        console.error(f"An unexpected error occurred: {e}")
+    console.print("Out of the try block...")
+    protocol.output = None
+    protocol.exit_code = None
+    protocol.analysis = None
     protocol.set_analysis_execution_time(time.time() - start_time)
+    report(protocol)
+    return False
 
 
 def analyze_many(protocol_files: List[AnalyzeProtocol], container: docker.models.containers.Container) -> None:
@@ -241,7 +280,7 @@ def analyze_against_image(tag: str) -> List[AnalyzeProtocol]:
     # protocols_to_process = protocols[:1]  # For testing
     try:
         console.print(f"Analyzing {len(protocols_to_process)} protocol(s) against {image_name}...")
-        container = run_container(image_name)
+        container = stop_and_restart_container(image_name)
         analyze_many(protocols_to_process, container)
     finally:
         stop_and_remove_containers(image_name)
@@ -262,7 +301,16 @@ def generate_analyses_from_test(tag: str, protocols: List[Protocol]) -> None:
         )
     try:
         console.print(f"Analyzing {len(protocols_to_process)} protocol(s) against {tag}...")
-        container = run_container(image_name)
-        analyze_many(protocols_to_process, container)
+        container = stop_and_restart_container(image_name)
+        for protocol in protocols_to_process:
+            console.print(f"Analyzing {protocol.protocol_file_name}...")
+            analyzed = analyze(protocol, container)
+        if not analyzed:
+            console.print("Analysis failed. Exiting.")
+            stop_and_remove_containers(image_name)
+        accumulated_time = sum(
+            protocol.analysis_execution_time for protocol in protocols_to_process if protocol.analysis_execution_time is not None
+        )
+        console.print(f"{len(protocols_to_process)} protocols with total analysis time of {accumulated_time:.2f} seconds.\n")
     finally:
         stop_and_remove_containers(image_name)

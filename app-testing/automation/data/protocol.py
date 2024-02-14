@@ -1,4 +1,5 @@
 """Model of a protocol for testing."""
+
 import hashlib
 import os
 from pathlib import Path

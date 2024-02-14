@@ -1,4 +1,5 @@
 """Map for protocol files available for testing."""
+
 from automation.data.protocol import Protocol
 
 
