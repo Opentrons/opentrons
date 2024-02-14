@@ -190,7 +190,6 @@ class MessageId(int, Enum):
     read_motor_current_response = 0x35
     read_motor_driver_error_status_request = 0x36
     read_motor_driver_error_status_response = 0x37
-    motor_driver_in_error_state = 0x38
 
     set_brushed_motor_vref_request = 0x40
     set_brushed_motor_pwm_request = 0x41
