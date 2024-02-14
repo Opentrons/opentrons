@@ -36,7 +36,7 @@ from opentrons.calibration_storage.ot2 import (
 from opentrons.protocol_api import labware
 from opentrons.types import Point, Mount
 
-from robot_server import app
+from robot_server.app import app
 from robot_server.hardware import get_hardware, get_ot2_hardware
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
 from robot_server.service.session.manager import SessionManager

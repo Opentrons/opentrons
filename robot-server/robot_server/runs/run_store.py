@@ -20,7 +20,7 @@ from robot_server.persistence import (
     sqlite_rowid,
 )
 from robot_server.persistence.pydantic import json_to_pydantic, pydantic_to_json
-from robot_server.protocols import ProtocolNotFoundError
+from robot_server.protocols.protocol_store import ProtocolNotFoundError
 from robot_server.service.notifications import RunsPublisher
 
 from .action_models import RunAction, RunActionType

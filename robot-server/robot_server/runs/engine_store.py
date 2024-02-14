@@ -31,7 +31,7 @@ from opentrons.protocol_engine import (
     create_protocol_engine,
 )
 
-from robot_server.protocols import ProtocolResource
+from robot_server.protocols.protocol_store import ProtocolResource
 from opentrons.protocol_engine.types import DeckConfigurationType
 
 
