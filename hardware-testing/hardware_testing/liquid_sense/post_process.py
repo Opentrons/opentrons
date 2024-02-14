@@ -41,7 +41,7 @@ def process_csv_directory(  # noqa: C901
         pressure_results[tip] = {}
         results_settings[tip] = {}
         tip_offsets[tip] = []
-        p_offsets[tip] = []
+        p_offsets[tip] = [i*0 for i in range(trials)]
         for trial in range(trials):
             pressure_results[tip][trial] = []
             results_settings[tip][trial] = (0.0, 0.0, 0.0)
@@ -113,6 +113,7 @@ def process_csv_directory(  # noqa: C901
                 for trial in range(trials):
                     for i in range(max_results_len):
                         if tip_offsets[tip][trial] > min_tip_offset:
+                            print(f"tip {tip} trial {trial} tip_offsets {tip_offsets[tip][trial]} min_tip_offset {min_tip_offset}")
                             # drop this pressure result
                             pressure_results[tip][trial].pop(0)
                             # we don't want to change the length of this array so just stretch out
@@ -121,23 +122,22 @@ def process_csv_directory(  # noqa: C901
                                 pressure_results[tip][trial][-1]
                             )
                             # decrement the offset while this is true so we can account for it later
-                            tip_offsets[tip][trial] -= i * 0.001
+                            tip_offsets[tip][trial] -=  0.001 * results_settings[tip][0][0]
                             # keep track of how this effects the plunger start position
-                            p_offsets[tip][trial] = i * 0.001
+                            p_offsets[tip][trial] = (i+1) * 0.001 * results_settings[tip][0][1] * -1
+                            print(f"pressure_results {pressure_results[tip][trial][0]} tip_offsets {tip_offsets[tip][trial]} p_offsets {p_offsets[tip][trial]}")
                         else:
                             # we've lined up this trial so move to the next
                             break
-
             # write the processed test data
             for tip in tips:
                 time = 0.0
                 final_report_writer.writerow(pressure_header_row)
+                menisucs_time = (meniscus_travel + min_tip_offset)/ results_settings[tip][0][0]
                 for i in range(max_results_len):
                     pressure_row: List[str] = [f"{time}"]
                     if isclose(
-                        time,
-                        (meniscus_travel - min_tip_offset)
-                        / results_settings[tip][0][0],
+                        time, menisucs_time,
                         rel_tol=0.001,
                     ):
                         pressure_row.append("Meniscus")
@@ -159,4 +159,4 @@ def process_csv_directory(  # noqa: C901
 
 
 if __name__ == "__main__":
-    process_csv_directory("/home/ryan/testdata", [50], 3)
+    process_csv_directory("/home/ryan/testdata", [50], 10)
