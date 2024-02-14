@@ -667,8 +667,18 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         ):
             if not config:
                 continue
-            if count in config.current_by_tip_count:
+
+            if isinstance(config, PressFitPickUpTipConfiguration) and all(
+                [
+                    config.speed_by_tip_count.get(count),
+                    config.distance_by_tip_count.get(count),
+                    config.current_by_tip_count.get(count),
+                ]
+            ):
                 return config
+            elif config.current_by_tip_count.get(count) is not None:
+                return config
+
         raise CommandPreconditionViolated(
             message=f"No pick up tip configuration for {count} tips",
         )

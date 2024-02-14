@@ -100,6 +100,12 @@ MessageDefinition = Union[
     defs.SetGripperJawHoldoffRequest,
     defs.GripperJawHoldoffRequest,
     defs.GripperJawHoldoffResponse,
+    defs.SetHepaFanStateRequest,
+    defs.GetHepaFanStateRequest,
+    defs.GetHepaFanStateResponse,
+    defs.SetHepaUVStateRequest,
+    defs.GetHepaUVStateRequest,
+    defs.GetHepaUVStateResponse,
 ]
 
 

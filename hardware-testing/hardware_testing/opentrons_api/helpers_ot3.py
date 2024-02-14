@@ -567,10 +567,12 @@ async def update_pick_up_current(
 async def update_pick_up_distance(
     api: OT3API, mount: OT3Mount, distance: float = 17.0
 ) -> None:
-    """Update pick-up-tip current."""
+    """Update pick-up-tip distance."""
     pipette = _get_pipette_from_mount(api, mount)
     config_model = pipette.pick_up_configurations.press_fit
-    config_model.distance = distance
+    config_model.distance_by_tip_count = {
+        k: distance for k in config_model.distance_by_tip_count.keys()
+    }
     pipette.pick_up_configurations.press_fit = config_model
 
 
