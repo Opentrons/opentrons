@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
@@ -15,9 +16,9 @@ describe('useSoftwareUpdatePoll', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   let store: Store<State>
   beforeEach(() => {
-    jest.useFakeTimers()
-    store = createStore(jest.fn(), {})
-    store.dispatch = jest.fn()
+    vi.useFakeTimers()
+    store = createStore(vi.fn(), {})
+    store.dispatch = vi.fn()
     wrapper = ({ children }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
@@ -25,15 +26,15 @@ describe('useSoftwareUpdatePoll', () => {
     )
   })
   afterEach(() => {
-    jest.clearAllTimers()
-    jest.useRealTimers()
-    jest.resetAllMocks()
+    vi.clearAllTimers()
+    vi.useRealTimers()
+    vi.resetAllMocks()
   })
   it('checks for update availability on an interval', () => {
     renderHook(useSoftwareUpdatePoll, { wrapper })
 
     expect(store.dispatch).not.toHaveBeenCalledWith(checkShellUpdate())
-    jest.advanceTimersByTime(60001)
+    vi.advanceTimersByTime(60001)
     expect(store.dispatch).toHaveBeenCalledTimes(1)
     expect(store.dispatch).toHaveBeenCalledWith(checkShellUpdate())
   })

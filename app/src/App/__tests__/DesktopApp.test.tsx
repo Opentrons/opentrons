@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../__testing-utils__'
 import { i18n } from '../../i18n'
 import { Breadcrumbs } from '../../organisms/Breadcrumbs'
 import { CalibrationDashboard } from '../../pages/Devices/CalibrationDashboard'
@@ -17,45 +17,17 @@ import { useIsFlex } from '../../organisms/Devices/hooks'
 import { useSoftwareUpdatePoll } from '../hooks'
 import { DesktopApp } from '../DesktopApp'
 
-jest.mock('../../organisms/Breadcrumbs')
-jest.mock('../../organisms/Devices/hooks')
-jest.mock('../../pages/AppSettings/GeneralSettings')
-jest.mock('../../pages/Devices/CalibrationDashboard')
-jest.mock('../../pages/Devices/DeviceDetails')
-jest.mock('../../pages/Devices/DevicesLanding')
-jest.mock('../../pages/Protocols/ProtocolsLanding')
-jest.mock('../../pages/Devices/ProtocolRunDetails')
-jest.mock('../../pages/Devices/RobotSettings')
-jest.mock('../hooks')
-jest.mock('../../organisms/Alerts/AlertsModal')
-
-const mockCalibrationDashboard = CalibrationDashboard as jest.MockedFunction<
-  typeof CalibrationDashboard
->
-const mockDeviceDetails = DeviceDetails as jest.MockedFunction<
-  typeof DeviceDetails
->
-const mockDevicesLanding = DevicesLanding as jest.MockedFunction<
-  typeof DevicesLanding
->
-const mockProtocolsLanding = ProtocolsLanding as jest.MockedFunction<
-  typeof ProtocolsLanding
->
-const mockProtocolRunDetails = ProtocolRunDetails as jest.MockedFunction<
-  typeof ProtocolRunDetails
->
-const mockRobotSettings = RobotSettings as jest.MockedFunction<
-  typeof RobotSettings
->
-const mockAppSettings = GeneralSettings as jest.MockedFunction<
-  typeof GeneralSettings
->
-const mockAlertsModal = AlertsModal as jest.MockedFunction<typeof AlertsModal>
-const mockBreadcrumbs = Breadcrumbs as jest.MockedFunction<typeof Breadcrumbs>
-const mockUseSoftwareUpdatePoll = useSoftwareUpdatePoll as jest.MockedFunction<
-  typeof useSoftwareUpdatePoll
->
-const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
+vi.mock('../../organisms/Breadcrumbs')
+vi.mock('../../organisms/Devices/hooks')
+vi.mock('../../pages/AppSettings/GeneralSettings')
+vi.mock('../../pages/Devices/CalibrationDashboard')
+vi.mock('../../pages/Devices/DeviceDetails')
+vi.mock('../../pages/Devices/DevicesLanding')
+vi.mock('../../pages/Protocols/ProtocolsLanding')
+vi.mock('../../pages/Devices/ProtocolRunDetails')
+vi.mock('../../pages/Devices/RobotSettings')
+vi.mock('../hooks')
+vi.mock('../../organisms/Alerts/AlertsModal')
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -68,21 +40,21 @@ const render = (path = '/') => {
 
 describe('DesktopApp', () => {
   beforeEach(() => {
-    mockCalibrationDashboard.mockReturnValue(
+    vi.mocked(CalibrationDashboard).mockReturnValue(
       <div>Mock CalibrationDashboard</div>
     )
-    mockDeviceDetails.mockReturnValue(<div>Mock DeviceDetails</div>)
-    mockDevicesLanding.mockReturnValue(<div>Mock DevicesLanding</div>)
-    mockProtocolsLanding.mockReturnValue(<div>Mock ProtocolsLanding</div>)
-    mockProtocolRunDetails.mockReturnValue(<div>Mock ProtocolRunDetails</div>)
-    mockRobotSettings.mockReturnValue(<div>Mock RobotSettings</div>)
-    mockAppSettings.mockReturnValue(<div>Mock AppSettings</div>)
-    mockBreadcrumbs.mockReturnValue(<div>Mock Breadcrumbs</div>)
-    mockAlertsModal.mockReturnValue(<></>)
-    mockUseIsFlex.mockReturnValue(true)
+    vi.mocked(DeviceDetails).mockReturnValue(<div>Mock DeviceDetails</div>)
+    vi.mocked(DevicesLanding).mockReturnValue(<div>Mock DevicesLanding</div>)
+    vi.mocked(ProtocolsLanding).mockReturnValue(<div>Mock ProtocolsLanding</div>)
+    vi.mocked(ProtocolRunDetails).mockReturnValue(<div>Mock ProtocolRunDetails</div>)
+    vi.mocked(RobotSettings).mockReturnValue(<div>Mock RobotSettings</div>)
+    vi.mocked(GeneralSettings).mockReturnValue(<div>Mock AppSettings</div>)
+    vi.mocked(Breadcrumbs).mockReturnValue(<div>Mock Breadcrumbs</div>)
+    vi.mocked(AlertsModal).mockReturnValue(<></>)
+    vi.mocked(useIsFlex).mockReturnValue(true)
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
   it('renders a Breadcrumbs component', () => {
     const [{ getByText }] = render('/devices')
@@ -130,6 +102,6 @@ describe('DesktopApp', () => {
 
   it('should poll for software updates', () => {
     render()
-    expect(mockUseSoftwareUpdatePoll).toBeCalled()
+    expect(vi.mocked(useSoftwareUpdatePoll)).toBeCalled()
   })
 })

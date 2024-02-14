@@ -23,6 +23,8 @@ export default mergeConfig(viteConfig, defineConfig({
       '@opentrons/shared-data/labware/fixtures/2': path.resolve('./shared-data/labware/fixtures/2/index.ts'),
       '@opentrons/shared-data': path.resolve('./shared-data/js/index.ts'),
       '@opentrons/step-generation': path.resolve('./step-generation/src/index.ts'),
+      '@opentrons/api-client': path.resolve('./api-client/src/index.ts'),
+      '@opentrons/react-api-client': path.resolve( './react-api-client/src/index.ts'),
     },
   },
 }))
