@@ -29,16 +29,10 @@ export const systemInfoReducer: Reducer<SystemInfoState, Action> = (
     }
 
     case Constants.USB_DEVICE_REMOVED: {
-      const { vendorId, productId, serialNumber } = action.payload.usbDevice
+      const { identifier } = action.payload.usbDevice
       return {
         ...state,
-        usbDevices: state.usbDevices.filter(d => {
-          return (
-            d.vendorId !== vendorId ||
-            d.productId !== productId ||
-            d.serialNumber !== serialNumber
-          )
-        }),
+        usbDevices: state.usbDevices.filter(d => d.identifier !== identifier),
       }
     }
 
