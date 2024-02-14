@@ -1,7 +1,12 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { DragLayerMonitor, useDrop, useDrag } from 'react-dnd'
+import {
+  DragLayerMonitor,
+  useDrop,
+  useDrag,
+  DropTargetOptions,
+} from 'react-dnd'
 import isEqual from 'lodash/isEqual'
 
 import { DND_TYPES } from '../../constants'
@@ -21,6 +26,7 @@ interface DragDropStepItemProps extends ConnectedStepItemProps {
   findStepIndex: (stepIdType: StepIdType) => number
   clickDrop: () => void
   moveStep: (stepId: StepIdType, value: number) => void
+  setIsOver: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 interface DropType {
@@ -28,7 +34,7 @@ interface DropType {
 }
 
 const DragDropStepItem = (props: DragDropStepItemProps): JSX.Element => {
-  const { stepId, moveStep, clickDrop, findStepIndex } = props
+  const { stepId, moveStep, clickDrop, findStepIndex, setIsOver } = props
   const ref = React.useRef<HTMLDivElement>(null)
 
   const [{ isDragging }, drag] = useDrag({
@@ -39,7 +45,7 @@ const DragDropStepItem = (props: DragDropStepItemProps): JSX.Element => {
     }),
   })
 
-  const [, drop] = useDrop(() => ({
+  const [{ isOver }, drop] = useDrop(() => ({
     accept: DND_TYPES.STEP_ITEM,
     canDrop: () => {
       return true
@@ -55,7 +61,14 @@ const DragDropStepItem = (props: DragDropStepItemProps): JSX.Element => {
         moveStep(draggedId, overIndex)
       }
     },
+    collect: (monitor: DropTargetOptions) => ({
+      isOver: monitor.isOver(),
+    }),
   }))
+
+  React.useEffect(() => {
+    setIsOver(isOver)
+  }, [isOver])
 
   drag(drop(ref))
   return (
@@ -74,11 +87,13 @@ export const DraggableStepItems = (
 ): JSX.Element | null => {
   const { orderedStepIds, reorderSteps } = props
   const { t } = useTranslation('shared')
+  const [isOver, setIsOver] = React.useState<boolean>(false)
   const [stepIds, setStepIds] = React.useState<StepIdType[]>(orderedStepIds)
-
   React.useEffect(() => {
     setStepIds(orderedStepIds)
   }, [orderedStepIds])
+  console.log('orderedStepIds', orderedStepIds)
+  console.log('stepIds', stepIds)
 
   const clickDrop = (): void => {
     if (!isEqual(orderedStepIds, stepIds)) {
@@ -104,19 +119,24 @@ export const DraggableStepItems = (
   const findStepIndex = (stepId: StepIdType): number =>
     stepIds.findIndex(id => stepId === id)
 
+  const currentIds = isOver ? stepIds : orderedStepIds
+  console.log('isover', isOver)
+  console.log('currentIds', currentIds)
   return (
     <>
       <ContextMenu>
         {({ makeStepOnContextMenu }) =>
-          stepIds.map((stepId: StepIdType, index: number) => (
+          currentIds.map((stepId: StepIdType, index: number) => (
             <DragDropStepItem
               key={`${stepId}_${index}`}
               stepNumber={index + 1}
               stepId={stepId}
-              onStepContextMenu={() => makeStepOnContextMenu(stepId)}
+              //  @ts-expect-error
+              onStepContextMenu={makeStepOnContextMenu(stepId)}
               moveStep={moveStep}
               findStepIndex={findStepIndex}
               clickDrop={clickDrop}
+              setIsOver={setIsOver}
             />
           ))
         }

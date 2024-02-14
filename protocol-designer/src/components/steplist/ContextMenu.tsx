@@ -8,12 +8,13 @@ import {
 } from '../modals/ConfirmDeleteModal'
 import { actions as stepsActions, getIsMultiSelectMode } from '../../ui/steps'
 import { actions as steplistActions } from '../../steplist'
+import { getSavedStepForms } from '../../step-forms/selectors'
 import { Portal } from '../portals/TopPortal'
 import styles from './StepItem.css'
-import { StepIdType } from '../../form-types'
-import { getSavedStepForms } from '../../step-forms/selectors'
-import { ThunkDispatch } from 'redux-thunk'
-import { BaseState } from '../../types'
+
+import type { StepIdType } from '../../form-types'
+import type { ThunkDispatch } from 'redux-thunk'
+import type { BaseState } from '../../types'
 
 const MENU_OFFSET_PX = 5
 
@@ -21,7 +22,7 @@ interface Props {
   children: (args: {
     makeStepOnContextMenu: (
       stepIdType: StepIdType
-    ) => (event: MouseEvent) => unknown
+    ) => (event: MouseEvent) => void
   }) => React.ReactNode
 }
 
@@ -33,10 +34,9 @@ interface Position {
 export const ContextMenu = (props: Props): JSX.Element => {
   const { t } = useTranslation('context_menu')
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
-  const deleteStep = (
-    stepId: StepIdType
-  ): ReturnType<typeof steplistActions.deleteStep> =>
+  const deleteStep = (stepId: StepIdType): void => {
     dispatch(steplistActions.deleteStep(stepId))
+  }
   const duplicateStep = (
     stepId: StepIdType
   ): ReturnType<typeof stepsActions.duplicateStep> =>
@@ -61,6 +61,10 @@ export const ContextMenu = (props: Props): JSX.Element => {
   })
 
   const makeHandleContextMenu = (stepId: StepIdType) => (event: MouseEvent) => {
+    console.log(
+      'handle context menu called before isMulti SelectMode',
+      isMultiSelectMode
+    )
     if (isMultiSelectMode) return
     event.preventDefault()
 
@@ -80,7 +84,7 @@ export const ContextMenu = (props: Props): JSX.Element => {
       screenH - clickY > rootH
         ? clickY + MENU_OFFSET_PX
         : clickY - rootH - MENU_OFFSET_PX
-
+    console.log('handle context menu called')
     setVisible(true)
     setStepId(stepId)
     setPosition({ left, top })
