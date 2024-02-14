@@ -51,7 +51,7 @@ export function ChooseProtocolSlideoutComponent(
 ): JSX.Element | null {
   const { t } = useTranslation(['device_details', 'shared'])
   const history = useHistory()
-  const logger = useLogger(__filename)
+  const logger = useLogger(new URL('', import.meta.url).pathname)
   const { robot, showSlideout, onCloseClick } = props
   const { name } = robot
 

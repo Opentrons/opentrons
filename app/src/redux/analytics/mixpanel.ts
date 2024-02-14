@@ -6,7 +6,7 @@ import { CURRENT_VERSION } from '../shell'
 
 import type { AnalyticsEvent, AnalyticsConfig } from './types'
 
-const log = createLogger(__filename)
+const log = createLogger(new URL('', import.meta.url).pathname)
 
 // pulled in from environment at build time
 const MIXPANEL_ID = process.env.OT_APP_MIXPANEL_ID

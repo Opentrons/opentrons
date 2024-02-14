@@ -1,5 +1,4 @@
 // custom labware selectors
-import { basename } from 'path'
 import { createSelector } from 'reselect'
 import sortBy from 'lodash/sortBy'
 
@@ -24,6 +23,10 @@ export const OPENTRONS_LABWARE_FILE: 'OPENTRONS_LABWARE_FILE' =
   'OPENTRONS_LABWARE_FILE'
 
 export const VALID_LABWARE_FILE: 'VALID_LABWARE_FILE' = 'VALID_LABWARE_FILE'
+
+const _getFileBaseName = (filePath: string): string => {
+  return filePath.split('/').reverse()[0]
+}
 
 export const getCustomLabwareDirectory: (
   state: State
@@ -56,7 +59,7 @@ export const getValidCustomLabwareFiles: (
 ) => File[] = createSelector(getValidCustomLabware, labware => {
   const labwareFiles = labware.map(lw => {
     const jsonDefinition = JSON.stringify(lw.definition)
-    return new File([jsonDefinition], basename(lw.filename))
+    return new File([jsonDefinition], _getFileBaseName(lw.filename))
   })
   return labwareFiles
 })

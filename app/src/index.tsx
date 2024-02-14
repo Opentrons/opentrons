@@ -20,7 +20,7 @@ import './styles.global.module.css'
 // component tree
 import { App } from './App'
 
-const log = createLogger(__filename)
+const log = createLogger(new URL('', import.meta.url).pathname)
 
 // kickoff app-shell initializations
 store.dispatch(uiInitialized())
