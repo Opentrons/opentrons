@@ -199,12 +199,6 @@ def _migrate_db_commands(
     mp = multiprocessing.get_context("forkserver")
     mp.set_forkserver_preload(_up_to_3_worker.imports)
 
-    # We'll use a lock to make sure only one process is accessing the database at once.
-    #
-    # Concurrent access would be safe in the sense that SQLite would always provide
-    # isolation. But, when there are conflicts, we'd have to deal with SQLite retrying
-    # transactions or raising SQLITE_BUSY. A Python-level lock is simpler and more
-    # reliable.
     manager = mp.Manager()
     lock = manager.Lock()
 
