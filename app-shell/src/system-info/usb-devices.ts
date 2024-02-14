@@ -117,7 +117,7 @@ function upstreamDeviceFromUsbDeviceWinAPI(
   // pid
   return execa
     .command(
-      `Get-WmiObject Win32_PnpEntity -Filter "DeviceId like '%\\VID_${idVendor(
+      `Get-WmiObject Win32_PnpEntity -Filter "DeviceId like '%\\\\VID_${idVendor(
         device
       )}&PID_${idProduct(
         device
@@ -228,15 +228,20 @@ function upstreamDeviceFromUsbDeviceLibUSB(
       ]
     })
     .finally(() => {
-      try {
-        device.close()
-      } catch (err) {
-        log.warn(
-          `Failed to close vid=${idVendor(device)}, pid=${idProduct(
-            device
-          )} in err handler: ${err}`
-        )
-      }
+      setImmediate(() => {
+        try {
+          device.close()
+          log.info(
+            `closed vid=${idVendor(device)}, pid=${idProduct(device)} ok`
+          )
+        } catch (err) {
+          log.info(
+            `failed to close vid=${idVendor(device)}, pid=${idProduct(
+              device
+            )}: ${err}`
+          )
+        }
+      })
     })
 }
 

@@ -3,6 +3,7 @@ import { usb } from 'usb'
 
 import * as Fixtures from '@opentrons/app/src/redux/system-info/__fixtures__'
 import { createUsbDeviceMonitor, getWindowsDriverVersion } from '../usb-devices'
+import { isWindows } from '../../os'
 
 jest.mock('execa')
 jest.mock('usb')
@@ -76,7 +77,9 @@ const mockUSBDevice = {
   close: usbDeviceClose,
 }
 
-describe('app-shell::system-info::usb-devices', () => {
+const describeIfNotWindows = isWindows() ? describe.skip : describe
+
+describeIfNotWindows('app-shell::system-info::usb-devices::detection', () => {
   const { windowsDriverVersion: _, ...mockDevice } = Fixtures.mockUsbDevice
   afterEach(() => {
     jest.resetAllMocks()
@@ -194,6 +197,13 @@ describe('app-shell::system-info::usb-devices', () => {
         reject(new Error('detachListener was not created'))
       }
     }))
+})
+
+describe('app-shell::system-info::usb-devices', () => {
+  const { windowsDriverVersion: _, ...mockDevice } = Fixtures.mockUsbDevice
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
 
   it('can get the Windows driver version of a device', () => {
     execaCommand.mockResolvedValue({ stdout: '1.2.3' } as any)
