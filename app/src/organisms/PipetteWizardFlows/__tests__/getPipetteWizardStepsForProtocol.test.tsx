@@ -30,7 +30,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
       getPipetteWizardStepsForProtocol({ left: null, right: null }, [], LEFT)
     ).toStrictEqual(mockFlowSteps)
   })
-  it('returns the calibration flow only when correct pipette is attached even if htere is pip cal data', () => {
+  it('returns the calibration flow only when correct pipette is attached even if there is pip cal data', () => {
     const mockFlowSteps = [
       {
         section: SECTIONS.BEFORE_BEGINNING,
