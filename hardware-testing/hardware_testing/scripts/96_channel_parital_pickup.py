@@ -334,7 +334,7 @@ async def _main() -> None:
     try:
         await hw_api.home()
         await asyncio.sleep(1)
-        await hw_api.home_plunger(mount)
+        # await hw_api.home_plunger(mount)
         await hw_api.set_lights(rails=True)
         plunger_pos = get_plunger_positions_ot3(hw_api, mount)
         print(plunger_pos)
@@ -358,21 +358,26 @@ async def _main() -> None:
             print("Move Nozzle to Dial Indicator")
             await move_to_point(hw_api, mount, initial_dial_loc, cp)
             current_position = await hw_api.current_position_ot3(mount, cp)
-            nozzle_loc = await jog(hw_api, current_position_ot3(mount, cp))
+            nozzle_loc = await jog(hw_api, current_position, cp)
             number_of_channels = 96
+            nozzle_count = 0
+            x_offset = 0
+            y_offset = 0
+            measurements = []
+            num_of_columns = 12
             for tip in range(1, number_of_channels + 1):
                 cp = CriticalPoint.NOZZLE
                 nozzle_count += 1
-                nozzle_position = Point(nozzle_loc[0] + x_offset,
-                                        nozzle_loc[1] + y_offset,
-                                        nozzle_loc[2])
+                nozzle_position = Point(nozzle_loc[Axis.X] + x_offset,
+                                        nozzle_loc[Axis.Y] + y_offset,
+                                        nozzle_loc[Axis.by_mount(mount)])
                 await move_to_point(hw_api, mount, nozzle_position, cp)
                 await asyncio.sleep(1)
                 nozzle_measurement = gauge.read()
                 print("nozzle-",nozzle_count, "(mm): " , nozzle_measurement, end="")
                 print("\r", end="")
                 measurements.append(nozzle_measurement)
-                if tip_count % num_of_columns == 0:
+                if nozzle_count % num_of_columns == 0:
                     d_str = ''
                     for m in measurements:
                         d_str += str(m) + ','
@@ -383,9 +388,9 @@ async def _main() -> None:
                     measurements = []
                     print("\r\n")
                 x_offset -= 9
-                if tip_count % num_of_columns == 0:
+                if nozzle_count % num_of_columns == 0:
                     y_offset += 9
-                if tip_count % num_of_columns == 0:
+                if nozzle_count % num_of_columns == 0:
                     x_offset = 0
         # Calibrate to tiprack
         if (args.calibrate):
