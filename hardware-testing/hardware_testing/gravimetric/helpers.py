@@ -40,6 +40,8 @@ from opentrons.protocol_engine import (
     WellLocation,
     DropTipWellLocation,
 )
+
+
 def _add_fake_simulate(
     ctx: protocol_api.ProtocolContext, is_simulating: bool
 ) -> protocol_api.ProtocolContext:
@@ -233,11 +235,14 @@ def _override_add_current_volume(self, volume_incr: float) -> None:  # noqa: ANN
 def _override_ok_to_add_volume(self, volume_incr: float) -> bool:  # noqa: ANN001
     return True
 
-def _override_validate_aspirate_volume(state_view: StateView, pipette_id: str, aspirate_volume: float
+
+def _override_validate_aspirate_volume(
+    state_view: StateView, pipette_id: str, aspirate_volume: float
 ) -> float:
     return aspirate_volume
 
-def _override_check_deck_conflict_for_8_channel(
+
+def _check_safe_for_pipette_movement(
     engine_state: StateView,
     pipette_id: str,
     labware_id: str,
@@ -245,6 +250,7 @@ def _override_check_deck_conflict_for_8_channel(
     well_location: Union[WellLocation, DropTipWellLocation],
 ) -> None:
     return None
+
 
 def _override_software_supports_high_volumes() -> None:
     # yea so ok this is pretty ugly but this is super helpful for us
@@ -254,8 +260,13 @@ def _override_software_supports_high_volumes() -> None:
     Pipette.set_current_volume = _override_set_current_volume  # type: ignore[assignment]
     Pipette.ok_to_add_volume = _override_ok_to_add_volume  # type: ignore[assignment]
     Pipette.add_current_volume = _override_add_current_volume  # type: ignore[assignment]
-    PE_pipetting._validate_aspirate_volume = _override_validate_aspirate_volume  # type: ignore[assignment]
-    PE_deck_conflict._check_deck_conflict_for_8_channel = _override_check_deck_conflict_for_8_channel # type: ignore[assignment]
+    PE_pipetting._validate_aspirate_volume = (
+        _override_validate_aspirate_volume
+    )  # type: ignore[assignment]
+    PE_deck_conflict.check_safe_for_pipette_movement = (
+        _check_safe_for_pipette_movement
+    )  # type: ignore[assignment]
+
 
 def _get_channel_offset(cfg: config.VolumetricConfig, channel: int) -> Point:
     assert (
@@ -328,24 +339,12 @@ def _pick_up_tip(
 
 
 def _drop_tip(
-    pipette: InstrumentContext,
-    return_tip: bool,
-    minimum_z_height: int = 0,
-    offset: Optional[Point] = None,
+    pipette: InstrumentContext, return_tip: bool, minimum_z_height: int = 0
 ) -> None:
     if return_tip:
         pipette.return_tip(home_after=False)
     else:
-        if offset is not None:
-            #we don't actually need the offset, if this is an 8 channel we always center channel a1 over the back of the trash
-            trash_well = pipette.trash_container.well(0)
-            trash_container = trash_well.center().move(Point(0,trash_well.width/2,0))
-            pipette.drop_tip(
-                trash_container,
-                home_after=False,
-            )
-        else:
-            pipette.drop_tip(home_after=False)
+        pipette.drop_tip(home_after=False)
     if minimum_z_height > 0:
         cur_location = pipette._get_last_location_by_api_version()
         if cur_location is not None:
