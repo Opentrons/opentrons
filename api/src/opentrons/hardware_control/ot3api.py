@@ -524,7 +524,8 @@ class OT3API(
                     message="Update failed because of uncaught error",
                     wrapping=[PythonException(e)],
                 ) from e
-            self._configured_since_update = False
+            finally:
+                self._configured_since_update = False
 
     # Incidentals (i.e. not motion) API
 
