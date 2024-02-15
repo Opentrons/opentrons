@@ -100,7 +100,7 @@ class PipetteData(BaseModel):
 class PipetteState(BaseModel):
     """State from an attached pipette."""
 
-    tipDetected: bool = Field(
+    tipDetected: Optional[bool] = Field(
         None,
         description="Physical state of the tip photointerrupter on the Flex. Null for OT-2",
         alias="tip_detected",

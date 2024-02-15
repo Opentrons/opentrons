@@ -627,3 +627,44 @@ class GetMotorUsageResponsePayload(_GetMotorUsageResponsePayloadBase):
         return inst
 
     usage_elements: List[MotorUsageTypeField]
+
+
+@dataclass(eq=False)
+class HepaUVInfoResponsePayload(EmptyPayload):
+    """A response carrying data about an attached hepa uv."""
+
+    model: utils.UInt16Field
+    serial: SerialDataCodeField
+
+
+@dataclass(eq=False)
+class SetHepaFanStateRequestPayload(EmptyPayload):
+    """A request to set the state and pwm of a the hepa fan."""
+
+    duty_cycle: utils.UInt32Field
+    fan_on: utils.Int8Field
+
+
+@dataclass(eq=False)
+class GetHepaFanStatePayloadResponse(EmptyPayload):
+    """A response with the state and pwm of the fan."""
+
+    duty_cycle: utils.UInt32Field
+    fan_on: utils.UInt8Field
+
+
+@dataclass(eq=False)
+class SetHepaUVStateRequestPayload(EmptyPayload):
+    """A request to set the state and timeout in seconds of the hepa uv light."""
+
+    timeout_s: utils.UInt32Field
+    uv_light_on: utils.UInt8Field
+
+
+@dataclass(eq=False)
+class GetHepaUVStatePayloadResponse(EmptyPayload):
+    """A response with the state and timeout in seconds of the hepa uv light."""
+
+    timeout_s: utils.UInt32Field
+    uv_light_on: utils.UInt8Field
+    remaining_time_s: utils.UInt32Field

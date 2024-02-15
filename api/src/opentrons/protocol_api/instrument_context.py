@@ -404,17 +404,25 @@ class InstrumentContext(publisher.CommandPublisher):
         flow_rate = self._core.get_dispense_flow_rate(rate)
 
         if isinstance(target, (TrashBin, WasteChute)):
-            # HANDLE THE MOVETOADDDRESSABLEAREA
-            self._core.dispense(
-                volume=c_vol,
-                rate=rate,
-                location=target,
-                well_core=None,
-                flow_rate=flow_rate,
-                in_place=False,
-                push_out=push_out,
-            )
-            # TODO publish this info
+            with publisher.publish_context(
+                broker=self.broker,
+                command=cmds.dispense_in_disposal_location(
+                    instrument=self,
+                    volume=c_vol,
+                    location=target,
+                    rate=rate,
+                    flow_rate=flow_rate,
+                ),
+            ):
+                self._core.dispense(
+                    volume=c_vol,
+                    rate=rate,
+                    location=target,
+                    well_core=None,
+                    flow_rate=flow_rate,
+                    in_place=False,
+                    push_out=push_out,
+                )
             return self
 
         with publisher.publish_context(
@@ -568,12 +576,17 @@ class InstrumentContext(publisher.CommandPublisher):
         elif isinstance(target, validation.PointTarget):
             move_to_location = target.location
         elif isinstance(target, (TrashBin, WasteChute)):
-            # TODO handle publish info
-            self._core.blow_out(
-                location=target,
-                well_core=None,
-                in_place=False,
-            )
+            with publisher.publish_context(
+                broker=self.broker,
+                command=cmds.blow_out_in_disposal_location(
+                    instrument=self, location=target
+                ),
+            ):
+                self._core.blow_out(
+                    location=target,
+                    well_core=None,
+                    in_place=False,
+                )
             return self
 
         with publisher.publish_context(
@@ -1033,8 +1046,15 @@ class InstrumentContext(publisher.CommandPublisher):
             well = maybe_well
 
         elif isinstance(location, (TrashBin, WasteChute)):
-            # TODO: Publish to run log.
-            self._core.drop_tip_in_disposal_location(location, home_after=home_after)
+            with publisher.publish_context(
+                broker=self.broker,
+                command=cmds.drop_tip_in_disposal_location(
+                    instrument=self, location=location
+                ),
+            ):
+                self._core.drop_tip_in_disposal_location(
+                    location, home_after=home_after
+                )
             self._last_tip_picked_up_from = None
             return self
 
@@ -1419,36 +1439,43 @@ class InstrumentContext(publisher.CommandPublisher):
         :param publish: Whether to list this function call in the run preview.
                         Default is ``True``.
         """
-
-        if isinstance(location, (TrashBin, WasteChute)):
-            self._core.move_to(
-                location=location,
-                well_core=None,
-                force_direct=force_direct,
-                minimum_z_height=minimum_z_height,
-                speed=speed,
-            )
-            # TODO handle publish
-            return self
-
         with ExitStack() as contexts:
-            if publish:
-                contexts.enter_context(
-                    publisher.publish_context(
-                        broker=self.broker,
-                        command=cmds.move_to(instrument=self, location=location),
+            if isinstance(location, (TrashBin, WasteChute)):
+                if publish:
+                    contexts.enter_context(
+                        publisher.publish_context(
+                            broker=self.broker,
+                            command=cmds.move_to_disposal_location(
+                                instrument=self, location=location
+                            ),
+                        )
                     )
+
+                self._core.move_to(
+                    location=location,
+                    well_core=None,
+                    force_direct=force_direct,
+                    minimum_z_height=minimum_z_height,
+                    speed=speed,
                 )
+            else:
+                if publish:
+                    contexts.enter_context(
+                        publisher.publish_context(
+                            broker=self.broker,
+                            command=cmds.move_to(instrument=self, location=location),
+                        )
+                    )
 
-            _, well = location.labware.get_parent_labware_and_well()
+                _, well = location.labware.get_parent_labware_and_well()
 
-            self._core.move_to(
-                location=location,
-                well_core=well._core if well is not None else None,
-                force_direct=force_direct,
-                minimum_z_height=minimum_z_height,
-                speed=speed,
-            )
+                self._core.move_to(
+                    location=location,
+                    well_core=well._core if well is not None else None,
+                    force_direct=force_direct,
+                    minimum_z_height=minimum_z_height,
+                    speed=speed,
+                )
 
         return self
 

@@ -37,8 +37,9 @@ async def _get_estop_status_response(
     return await PydanticResponse.create(content=SimpleBody.construct(data=data))
 
 
-@control_router.get(
-    "/robot/control/estopStatus",
+@PydanticResponse.wrap_route(
+    control_router.get,
+    path="/robot/control/estopStatus",
     summary="Get connected estop status.",
     description="Get the current estop status of the robot, as well as a list of connected estops.",
     responses={
@@ -53,8 +54,9 @@ async def get_estop_status(
     return await _get_estop_status_response(estop_handler)
 
 
-@control_router.put(
-    "/robot/control/acknowledgeEstopDisengage",
+@PydanticResponse.wrap_route(
+    control_router.put,
+    path="/robot/control/acknowledgeEstopDisengage",
     summary="Acknowledge and clear an Estop event.",
     description="If the estop is currently logically engaged (the estop was previously pressed but is "
     + "now released), this endpoint will reset the state to reflect the current physical status.",
@@ -75,8 +77,9 @@ def get_door_switch_required(robot_type: RobotType = Depends(get_robot_type)) ->
     return ff.enable_door_safety_switch(RobotTypeEnum.robot_literal_to_enum(robot_type))
 
 
-@control_router.get(
-    "/robot/door/status",
+@PydanticResponse.wrap_route(
+    control_router.get,
+    path="/robot/door/status",
     summary="Get the status of the robot door.",
     description="Get whether the robot door is open or closed.",
     responses={status.HTTP_200_OK: {"model": SimpleBody[DoorStatusModel]}},

@@ -71,7 +71,7 @@ clean_all_cmd = $(clean_cmd) dist
 #     probably POSIX-only.
 dev_port ?= "31950"
 dev_host ?= "localhost"
-run_dev ?= uvicorn "robot_server:app" --host $(dev_host) --port $(dev_port) --ws wsproto --lifespan on --reload
+run_dev ?= uvicorn "robot_server.app:app" --host $(dev_host) --port $(dev_port) --ws wsproto --lifespan on --reload
 
 .PHONY: all
 all: clean sdist wheel

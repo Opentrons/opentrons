@@ -4,7 +4,7 @@ import { formatDistance } from 'date-fns'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { MemoryRouter } from 'react-router-dom'
 
-import { useAllRunsQuery, useProtocolQuery } from '@opentrons/react-api-client'
+import { useProtocolQuery } from '@opentrons/react-api-client'
 import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import { COLORS, renderWithProviders } from '@opentrons/components'
 
@@ -16,6 +16,11 @@ import { useTrackEvent } from '../../../../redux/analytics'
 import { useCloneRun } from '../../../ProtocolUpload/hooks'
 import { useHardwareStatusText } from '../hooks'
 import { RecentRunProtocolCard } from '../'
+import { useNotifyAllRunsQuery } from '../../../../resources/runs/useNotifyAllRunsQuery'
+import {
+  useRobotInitializationStatus,
+  INIT_STATUS,
+} from '../../../../resources/health/hooks'
 
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
 
@@ -27,8 +32,11 @@ jest.mock('../../../../organisms/RunTimeControl/hooks')
 jest.mock('../../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../../redux/analytics')
 jest.mock('../hooks')
+jest.mock('../../../../resources/runs/useNotifyAllRunsQuery')
+jest.mock('../../../../resources/health/hooks')
 
 const RUN_ID = 'mockRunId'
+const ROBOT_NAME = 'otie'
 
 const mockMissingPipette = [
   {
@@ -77,8 +85,8 @@ let mockCloneRun: jest.Mock
 const mockUseMissingProtocolHardware = useMissingProtocolHardware as jest.MockedFunction<
   typeof useMissingProtocolHardware
 >
-const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
-  typeof useAllRunsQuery
+const mockUseNotifyAllRunsQuery = useNotifyAllRunsQuery as jest.MockedFunction<
+  typeof useNotifyAllRunsQuery
 >
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
@@ -94,6 +102,9 @@ const mockUseHardwareStatusText = useHardwareStatusText as jest.MockedFunction<
   typeof useHardwareStatusText
 >
 const mockSkeleton = Skeleton as jest.MockedFunction<typeof Skeleton>
+const mockUseRobotInitializationStatus = useRobotInitializationStatus as jest.MockedFunction<
+  typeof useRobotInitializationStatus
+>
 
 const render = (props: React.ComponentProps<typeof RecentRunProtocolCard>) => {
   return renderWithProviders(
@@ -128,19 +139,22 @@ describe('RecentRunProtocolCard', () => {
       isLoading: false,
       conflictedSlots: [],
     })
-    mockUseAllRunsQuery.mockReturnValue({
+    mockUseNotifyAllRunsQuery.mockReturnValue({
       data: { data: [mockRunData] },
     } as any)
     mockUseProtocolQuery.mockReturnValue({
       data: { data: { metadata: { protocolName: 'mockProtocol' } } },
     } as any)
-    when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
-      trackProtocolRunEvent: mockTrackProtocolRunEvent,
-    })
+    when(mockUseTrackProtocolRunEvent)
+      .calledWith(RUN_ID, ROBOT_NAME)
+      .mockReturnValue({
+        trackProtocolRunEvent: mockTrackProtocolRunEvent,
+      })
     mockCloneRun = jest.fn()
     when(mockUseCloneRun)
       .calledWith(RUN_ID, expect.anything())
       .mockReturnValue({ cloneRun: mockCloneRun, isLoading: false })
+    mockUseRobotInitializationStatus.mockReturnValue(INIT_STATUS.SUCCEEDED)
   })
 
   afterEach(() => {
@@ -226,6 +240,18 @@ describe('RecentRunProtocolCard', () => {
       isLoading: true,
       data: { data: { metadata: { protocolName: 'mockProtocol' } } },
     } as any)
+    const [{ getByText }] = render(props)
+    getByText('mock Skeleton')
+  })
+
+  it('should render the skeleton when the robot server is initializing', () => {
+    mockUseRobotInitializationStatus.mockReturnValue(INIT_STATUS.INITIALIZING)
+    const [{ getByText }] = render(props)
+    getByText('mock Skeleton')
+  })
+
+  it('should render the skeleton when the robot server is unresponsive', () => {
+    mockUseRobotInitializationStatus.mockReturnValue(null)
     const [{ getByText }] = render(props)
     getByText('mock Skeleton')
   })

@@ -1,4 +1,4 @@
-import { FormikProps } from 'formik'
+import { UseFormReturn } from 'react-hook-form'
 import type {
   FormPipettesByMount,
   FormModulesByType,
@@ -21,7 +21,7 @@ export interface FormState {
   additionalEquipment: AdditionalEquipment[]
 }
 
-export interface WizardTileProps extends FormikProps<FormState> {
+export interface WizardTileProps extends UseFormReturn<FormState> {
   proceed: (stepsForward?: number) => void
   goBack: (stepsBack?: number) => void
 }

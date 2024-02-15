@@ -3,7 +3,7 @@ import pytest
 import mock
 
 from typing import ContextManager, Any, Optional
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from contextlib import nullcontext as does_not_raise
 from opentrons.types import Location, Point
 

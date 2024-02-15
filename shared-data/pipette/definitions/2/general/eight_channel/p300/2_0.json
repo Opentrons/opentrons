@@ -5,10 +5,28 @@
   "displayCategory": "GEN2",
   "pickUpTipConfigurations": {
     "pressFit": {
-      "speed": 10.0,
+      "speedByTipCount": {
+        "1": 10.0,
+        "2": 10.0,
+        "3": 10.0,
+        "4": 10.0,
+        "5": 10.0,
+        "6": 10.0,
+        "7": 10.0,
+        "8": 10.0
+      },
       "presses": 1,
       "increment": 0.0,
-      "distance": 11.0,
+      "distanceByTipCount": {
+        "1": 11.0,
+        "2": 11.0,
+        "3": 11.0,
+        "4": 11.0,
+        "5": 11.0,
+        "6": 11.0,
+        "7": 11.0,
+        "8": 11.0
+      },
       "currentByTipCount": {
         "1": 0.13,
         "2": 0.2,

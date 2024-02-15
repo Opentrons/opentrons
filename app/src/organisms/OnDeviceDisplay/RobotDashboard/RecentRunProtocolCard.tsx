@@ -5,16 +5,25 @@ import { useHistory } from 'react-router-dom'
 import { formatDistance } from 'date-fns'
 
 import {
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
   Flex,
   Icon,
-  COLORS,
+  JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_WRAP_BREAK_WORD,
   SPACING,
   TYPOGRAPHY,
-  DIRECTION_COLUMN,
-  BORDERS,
-  JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 import { useProtocolQuery } from '@opentrons/react-api-client'
+import {
+  RUN_STATUS_FAILED,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
+  Run,
+  RunData,
+  RunStatus,
+} from '@opentrons/api-client'
 
 import { StyledText } from '../../../atoms/text'
 import { Chip } from '../../../atoms/Chip'
@@ -25,13 +34,10 @@ import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
 import { useHardwareStatusText } from './hooks'
 import {
-  RUN_STATUS_FAILED,
-  RUN_STATUS_STOPPED,
-  RUN_STATUS_SUCCEEDED,
-  Run,
-  RunData,
-  RunStatus,
-} from '@opentrons/api-client'
+  useRobotInitializationStatus,
+  INIT_STATUS,
+} from '../../../resources/health/hooks'
+
 import type { ProtocolResource } from '@opentrons/shared-data'
 
 interface RecentRunProtocolCardProps {
@@ -82,6 +88,9 @@ export function ProtocolWithLastRun({
   const onResetSuccess = (createRunResponse: Run): void =>
     history.push(`runs/${createRunResponse.data.id}/setup`)
   const { cloneRun } = useCloneRun(runData.id, onResetSuccess)
+  const robotInitStatus = useRobotInitializationStatus()
+  const isRobotInitializing =
+    robotInitStatus === INIT_STATUS.INITIALIZING || robotInitStatus == null
   const [showSpinner, setShowSpinner] = React.useState<boolean>(false)
 
   const protocolName =
@@ -110,7 +119,7 @@ export function ProtocolWithLastRun({
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 5;
     overflow: hidden;
-    overflow-wrap: break-word;
+    overflow-wrap: ${OVERFLOW_WRAP_BREAK_WORD};
     height: max-content;
   `
 
@@ -139,7 +148,7 @@ export function ProtocolWithLastRun({
     }
   ).replace('about ', '')
 
-  return isProtocolFetching || isLookingForHardware ? (
+  return isProtocolFetching || isLookingForHardware || isRobotInitializing ? (
     <Skeleton
       height="24.5rem"
       width="25.8125rem"

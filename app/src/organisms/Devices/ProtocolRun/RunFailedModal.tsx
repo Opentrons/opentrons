@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -7,13 +9,14 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
   Link,
   OVERFLOW_AUTO,
+  OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
   SPACING,
   TYPOGRAPHY,
-  Icon,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -80,17 +83,7 @@ export function RunFailedModal({
             errorCode: highestPriorityError.errorCode,
           })}
         </StyledText>
-        <Flex
-          maxHeight="9.5rem"
-          overflowY={OVERFLOW_AUTO}
-          marginTop={SPACING.spacing8}
-          marginBottom={SPACING.spacing16}
-          padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
-          backgroundColor={COLORS.grey10}
-          borderRadius={BORDERS.borderRadiusSize1}
-          overflowWrap="anywhere"
-          border={BORDERS.lineBorder}
-        >
+        <Flex css={ERROR_MESSAGE_STYLE}>
           <StyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
             {highestPriorityError.detail}
           </StyledText>
@@ -118,3 +111,18 @@ export function RunFailedModal({
     </LegacyModal>
   )
 }
+
+const ERROR_MESSAGE_STYLE = css`
+  max-height: 9.5rem;
+  overflow-y: ${OVERFLOW_AUTO};
+  margin-top: ${SPACING.spacing8};
+  margin-bottom: ${SPACING.spacing16};
+  padding: ${`${SPACING.spacing8} ${SPACING.spacing12}`};
+  background-color: ${COLORS.grey30};
+  border-radius: ${BORDERS.borderRadiusSize1};
+  overflow-wrap: ${OVERFLOW_WRAP_ANYWHERE};
+
+  ::-webkit-scrollbar-thumb {
+    background: ${COLORS.grey40};
+  }
+`

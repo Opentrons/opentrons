@@ -37,6 +37,7 @@ from .command_unions import (
     CommandResult,
     CommandType,
     CommandPrivateResult,
+    CommandT,
 )
 
 from .aspirate import (
@@ -323,6 +324,7 @@ __all__ = [
     "CommandResult",
     "CommandType",
     "CommandPrivateResult",
+    "CommandT",
     # base interfaces
     "AbstractCommandImpl",
     "AbstractCommandWithPrivateResultImpl",

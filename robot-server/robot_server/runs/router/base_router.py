@@ -27,12 +27,12 @@ from robot_server.service.json_api import (
     PydanticResponse,
 )
 
-from robot_server.protocols import (
+from robot_server.protocols.dependencies import get_protocol_store
+from robot_server.protocols.protocol_store import (
     ProtocolStore,
-    ProtocolNotFound,
     ProtocolNotFoundError,
-    get_protocol_store,
 )
+from robot_server.protocols.router import ProtocolNotFound
 
 from ..run_models import RunNotFoundError
 from ..run_auto_deleter import RunAutoDeleter
@@ -114,7 +114,8 @@ async def get_run_data_from_url(
     return run_data
 
 
-@base_router.post(
+@PydanticResponse.wrap_route(
+    base_router.post,
     path="/runs",
     summary="Create a run",
     description=dedent(
@@ -197,7 +198,8 @@ async def create_run(
     )
 
 
-@base_router.get(
+@PydanticResponse.wrap_route(
+    base_router.get,
     path="/runs",
     summary="Get all runs",
     description="Get a list of all active and inactive runs.",
@@ -238,7 +240,8 @@ async def get_runs(
     )
 
 
-@base_router.get(
+@PydanticResponse.wrap_route(
+    base_router.get,
     path="/runs/{runId}",
     summary="Get a run",
     description="Get a specific run by its unique identifier.",
@@ -261,7 +264,8 @@ async def get_run(
     )
 
 
-@base_router.delete(
+@PydanticResponse.wrap_route(
+    base_router.delete,
     path="/runs/{runId}",
     summary="Delete a run",
     description="Delete a specific run by its unique identifier.",
@@ -295,7 +299,8 @@ async def remove_run(
     )
 
 
-@base_router.patch(
+@PydanticResponse.wrap_route(
+    base_router.patch,
     path="/runs/{runId}",
     summary="Update a run",
     description="Update a specific run, returning the updated resource.",

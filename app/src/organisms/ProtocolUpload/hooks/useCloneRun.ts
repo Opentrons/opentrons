@@ -1,9 +1,8 @@
 import { useQueryClient } from 'react-query'
-import {
-  useHost,
-  useRunQuery,
-  useCreateRunMutation,
-} from '@opentrons/react-api-client'
+
+import { useHost, useCreateRunMutation } from '@opentrons/react-api-client'
+
+import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
 
 import type { Run } from '@opentrons/api-client'
 
@@ -18,7 +17,7 @@ export function useCloneRun(
 ): UseCloneRunResult {
   const host = useHost()
   const queryClient = useQueryClient()
-  const { data: runRecord } = useRunQuery(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId)
   const { createRun, isLoading } = useCreateRunMutation({
     onSuccess: response => {
       queryClient

@@ -61,7 +61,7 @@ async def test_with_magdeck(setup_klass: Type[simulator_setup.SimulatorSetup]) -
     )
     simulator = await simulator_setup.create_simulator(setup)
 
-    assert type(simulator.attached_modules[0]) == MagDeck
+    assert isinstance(simulator.attached_modules[0], MagDeck)
     assert simulator.attached_modules[0].live_data == {
         "data": {"engaged": True, "height": 3},
         "status": "engaged",
@@ -89,7 +89,7 @@ async def test_with_thermocycler(
     )
     simulator = await simulator_setup.create_simulator(setup)
 
-    assert type(simulator.attached_modules[0]) == Thermocycler
+    assert isinstance(simulator.attached_modules[0], Thermocycler)
     assert simulator.attached_modules[0].live_data == {
         "data": {
             "currentCycleIndex": None,
@@ -125,7 +125,7 @@ async def test_with_tempdeck(setup_klass: Type[simulator_setup.SimulatorSetup]) 
     )
     simulator = await simulator_setup.create_simulator(setup)
 
-    assert type(simulator.attached_modules[0]) == TempDeck
+    assert isinstance(simulator.attached_modules[0], TempDeck)
     assert simulator.attached_modules[0].live_data == {
         "data": {"currentTemp": 23, "targetTemp": 23},
         "status": "holding at target",

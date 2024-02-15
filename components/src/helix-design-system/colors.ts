@@ -1,10 +1,14 @@
+// some colors are slightly adjusted for on-device display screen differences
+// isTouchscreen hex values are dev concerns only - designs will reflect the standard hex values
+import { isTouchscreen } from '../ui-style-constants/responsiveness'
+
 /**
  * green
  */
 export const green60 = '#03683E'
-export const green50 = '#04AA65'
-export const green40 = '#91E2C0'
-export const green35 = '#AFEDD3'
+export const green50 = isTouchscreen ? '#1CA850' : '#04AA65'
+export const green40 = isTouchscreen ? '#8EF3A8' : '#91E2C0'
+export const green35 = isTouchscreen ? '#8AFBAB' : '#AFEDD3'
 export const green30 = '#C4F6E0'
 export const green20 = '#E8F7ED'
 
@@ -32,13 +36,13 @@ export const yellow20 = '#FDF3E2'
 /**
  * purple
  */
-export const purple60 = '#562566'
-export const purple55 = '#713187'
-export const purple50 = '#893BA4'
-export const purple40 = '#CEA4DF'
-export const purple35 = '#DBBCE7'
-export const purple30 = '#E6D5EC'
-export const purple20 = '#F1E8F5'
+export const purple60 = isTouchscreen ? '#612367' : '#562566'
+export const purple55 = isTouchscreen ? '#822E89' : '#713187'
+export const purple50 = isTouchscreen ? '#9E39A8' : '#893BA4'
+export const purple40 = isTouchscreen ? '#E2A9EA' : '#CEA4DF'
+export const purple35 = isTouchscreen ? '#ECC2F2' : '#DBBCE7'
+export const purple30 = isTouchscreen ? '#F4DEF7' : '#E6D5EC'
+export const purple20 = isTouchscreen ? '#FFF3FE' : '#F1E8F5'
 
 /**
  * blue

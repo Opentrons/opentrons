@@ -1,6 +1,6 @@
 from dataclasses import asdict
 import logging
-from typing import Dict, cast, Union, Any
+from typing import cast, Any, Dict, List, Optional, Union
 
 from starlette import status
 from fastapi import APIRouter, Depends
@@ -9,6 +9,7 @@ from opentrons_shared_data.errors import ErrorCodes
 from opentrons.hardware_control import (
     HardwareControlAPI,
     dev_types as hardware_dev_types,
+    API,
 )
 from opentrons.hardware_control.types import HardwareFeatureFlags
 from opentrons_shared_data.pipette import (
@@ -24,12 +25,17 @@ from opentrons.config import (
     get_opentrons_path,
 )
 from robot_server.deck_configuration.fastapi_dependencies import (
-    get_deck_configuration_store,
+    get_deck_configuration_store_failsafe,
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
 
 from robot_server.errors import LegacyErrorResponse
-from robot_server.hardware import get_hardware, get_robot_type, get_robot_type_enum
+from robot_server.hardware import (
+    get_hardware,
+    get_robot_type,
+    get_robot_type_enum,
+    get_ot2_hardware,
+)
 from robot_server.service.legacy import reset_odd
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models.settings import (
@@ -200,13 +206,14 @@ async def get_settings_reset_options(
     description="Perform a factory reset of some robot data",
     responses={
         status.HTTP_403_FORBIDDEN: {"model": LegacyErrorResponse},
+        status.HTTP_503_SERVICE_UNAVAILABLE: {"model": LegacyErrorResponse},
     },
 )
 async def post_settings_reset_options(
     factory_reset_commands: Dict[reset_util.ResetOptionId, bool],
     persistence_resetter: PersistenceResetter = Depends(get_persistence_resetter),
-    deck_configuration_store: DeckConfigurationStore = Depends(
-        get_deck_configuration_store
+    deck_configuration_store: Optional[DeckConfigurationStore] = Depends(
+        get_deck_configuration_store_failsafe
     ),
     robot_type: RobotTypeEnum = Depends(get_robot_type_enum),
 ) -> V1BasicResponse:
@@ -224,6 +231,9 @@ async def post_settings_reset_options(
         ).as_error(status.HTTP_403_FORBIDDEN)
 
     options = set(k for k, v in factory_reset_commands.items() if v)
+
+    failed_commands: List[reset_util.ResetOptionId] = []
+
     reset_util.reset(options, robot_type)
 
     if factory_reset_commands.get(reset_util.ResetOptionId.runs_history, False):
@@ -233,16 +243,30 @@ async def post_settings_reset_options(
         await reset_odd.mark_odd_for_reset_next_boot()
 
     if factory_reset_commands.get(reset_util.ResetOptionId.deck_configuration, False):
-        await deck_configuration_store.delete()
+        if deck_configuration_store:
+            await deck_configuration_store.delete()
+        else:
+            failed_commands.append(reset_util.ResetOptionId.deck_configuration)
 
-    # TODO (tz, 5-24-22): The order of a set is undefined because set's aren't ordered.
-    # The message returned to the client will be printed in the wrong order.
-    message = (
-        "Options '{}' were reset".format(", ".join(o.name for o in options))
-        if options
-        else "Nothing to do"
-    )
-    return V1BasicResponse(message=message)
+    if failed_commands:
+        raise LegacyErrorResponse(
+            message=f"Some options could not be reset: {failed_commands}",
+            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+        ).as_error(
+            # 503 because this condition can happen if someone tries to reset something
+            # before our persistence layer has fully initialized. It will start working
+            # after initialization finishes.
+            status.HTTP_503_SERVICE_UNAVAILABLE
+        )
+    else:
+        # TODO (tz, 5-24-22): The order of a set is undefined because set's aren't ordered.
+        # The message returned to the client will be printed in the wrong order.
+        message = (
+            "Options '{}' were reset".format(", ".join(o.name for o in options))
+            if options
+            else "Nothing to do"
+        )
+        return V1BasicResponse(message=message)
 
 
 @router.get(
@@ -258,13 +282,13 @@ async def get_robot_settings(
 
 @router.get(
     "/settings/pipettes",
-    description="List all settings for all known pipettes by id",
+    description="List all settings for all known pipettes by id. Only available on OT-2.",
     response_model=MultiPipetteSettings,
     response_model_by_alias=True,
     response_model_exclude_unset=True,
 )
 async def get_pipette_settings(
-    hardware: HardwareControlAPI = Depends(get_hardware),
+    hardware: API = Depends(get_ot2_hardware),
 ) -> MultiPipetteSettings:
     res = {}
     attached_pipettes = hardware.attached_pipettes
@@ -286,7 +310,7 @@ async def get_pipette_settings(
 
 @router.get(
     path="/settings/pipettes/{pipette_id}",
-    description="Get the settings of a specific pipette by ID",
+    description="Get the settings of a specific pipette by ID. Only available on OT-2.",
     response_model=PipetteSettings,
     response_model_by_alias=True,
     response_model_exclude_unset=True,
@@ -295,7 +319,7 @@ async def get_pipette_settings(
     },
 )
 async def get_pipette_setting(
-    pipette_id: str, hardware: HardwareControlAPI = Depends(get_hardware)
+    pipette_id: str, hardware: API = Depends(get_ot2_hardware)
 ) -> PipetteSettings:
     attached_pipettes = hardware.attached_pipettes
     known_ids = mutable_configurations.known_pipettes(
@@ -314,7 +338,7 @@ async def get_pipette_setting(
 
 @router.patch(
     path="/settings/pipettes/{pipette_id}",
-    description="Change the settings of a specific pipette",
+    description="Change the settings of a specific pipette. Only available on OT-2.",
     response_model=PipetteSettings,
     response_model_by_alias=True,
     response_model_exclude_unset=True,
@@ -323,7 +347,9 @@ async def get_pipette_setting(
     },
 )
 async def patch_pipette_setting(
-    pipette_id: str, settings_update: PipetteSettingsUpdate
+    pipette_id: str,
+    settings_update: PipetteSettingsUpdate,
+    hardware: None = Depends(get_ot2_hardware),
 ) -> PipetteSettings:
     # Convert fields to dict of field name to value
     fields = settings_update.setting_fields or {}

@@ -4,7 +4,7 @@ from decoy import Decoy
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons.types import MountType
+from opentrons.types import MountType, Point
 
 from opentrons.protocol_engine.errors import InvalidSpecificationForRobotTypeError
 from opentrons.protocol_engine.types import FlowRates
@@ -41,6 +41,8 @@ async def test_load_pipette_implementation(
         ),
         tip_configuration_lookup_table={},
         nominal_tip_overlap={},
+        back_left_nozzle_offset=Point(x=1, y=2, z=3),
+        front_right_nozzle_offset=Point(x=4, y=5, z=6),
     )
     data = LoadPipetteParams(
         pipetteName=PipetteNameType.P300_SINGLE,
@@ -96,6 +98,8 @@ async def test_load_pipette_implementation_96_channel(
         ),
         tip_configuration_lookup_table={},
         nominal_tip_overlap={},
+        back_left_nozzle_offset=Point(x=1, y=2, z=3),
+        front_right_nozzle_offset=Point(x=4, y=5, z=6),
     )
 
     decoy.when(

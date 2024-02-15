@@ -91,24 +91,9 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
         log.info(`Successfully connected to ${hostname}`)
         connectionStore[hostname].client = client
         establishListeners({ ...notifyParams, client })
-        return new Promise<void>(() => {
-          client.subscribe(topic, subscribeOptions, (error, result) => {
-            if (error != null) {
-              log.warn(`Failed to subscribe on ${hostname} to topic: ${topic}`)
-              sendToBrowserDeserialized({
-                browserWindow,
-                hostname,
-                topic,
-                message: 'ECONNFAILED',
-              })
-              handleDecrementSubscriptionCount(hostname, topic)
-            } else {
-              log.info(
-                `Successfully subscribed on ${hostname} to topic: ${topic}`
-              )
-            }
-          })
-        })
+        return new Promise<void>(() =>
+          client.subscribe(topic, subscribeOptions, subscribeCb)
+        )
       })
       .catch((error: Error) => {
         log.warn(
@@ -127,31 +112,110 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
         if (hostname in connectionStore) delete connectionStore[hostname]
       })
   }
-  // true if a connection AND subscription to host already exists.
+  // true if the connection store has an entry for the hostname.
   else {
-    connectionStore[hostname].subscriptions[topic] += 1
-    const { client } = connectionStore[hostname]
-    return new Promise<void>(() => {
-      client?.subscribe(topic, subscribeOptions)
-    })
+    const subscriptions = connectionStore[hostname]?.subscriptions
+    if (subscriptions && subscriptions[topic] > 0) {
+      subscriptions[topic] += 1
+      return Promise.resolve()
+    } else {
+      if (subscriptions) {
+        subscriptions[topic] = 1
+      }
+      return new Promise<void>(() => checkIfClientConnected()).catch(() => {
+        log.warn(`Failed to subscribe on ${hostname} to topic: ${topic}`)
+        sendToBrowserDeserialized({
+          browserWindow,
+          hostname,
+          topic,
+          message: 'ECONNFAILED',
+        })
+        handleDecrementSubscriptionCount(hostname, topic)
+      })
+    }
+  }
+
+  function subscribeCb(error: Error, result: mqtt.ISubscriptionGrant[]): void {
+    if (error != null) {
+      log.warn(`Failed to subscribe on ${hostname} to topic: ${topic}`)
+      sendToBrowserDeserialized({
+        browserWindow,
+        hostname,
+        topic,
+        message: 'ECONNFAILED',
+      })
+      handleDecrementSubscriptionCount(hostname, topic)
+    } else {
+      log.info(`Successfully subscribed on ${hostname} to topic: ${topic}`)
+    }
+  }
+
+  // Check every 500ms for 2 seconds before failing.
+  function checkIfClientConnected(): void {
+    const MAX_RETRIES = 4
+    let counter = 0
+    const intervalId = setInterval(() => {
+      const client = connectionStore[hostname]?.client
+      if (client != null) {
+        clearInterval(intervalId)
+        new Promise<void>(() =>
+          client.subscribe(topic, subscribeOptions, subscribeCb)
+        )
+          .then(() => Promise.resolve())
+          .catch(() =>
+            Promise.reject(
+              new Error(
+                `Maximum number of subscription retries reached for hostname: ${hostname}`
+              )
+            )
+          )
+      }
+
+      counter++
+      if (counter === MAX_RETRIES) {
+        clearInterval(intervalId)
+        Promise.reject(
+          new Error(
+            `Maximum number of subscription retries reached for hostname: ${hostname}`
+          )
+        )
+      }
+    }, 500)
   }
 }
+
+// Because subscription logic is directly tied to the component lifecycle, it is possible
+// for a component to trigger an unsubscribe event on dismount while a new component mounts and
+// triggers a subscribe event. For the connection store and MQTT to reflect correct topic subscriptions,
+// do not unsubscribe and close connections before newly mounted components have had time to update the connection store.
+const RENDER_TIMEOUT = 10000 // 10 seconds
 
 function unsubscribe(notifyParams: NotifyParams): Promise<void> {
   const { hostname, topic } = notifyParams
   return new Promise<void>(() => {
     if (hostname in connectionStore) {
-      const { client } = connectionStore[hostname]
-      client?.unsubscribe(topic, {}, (error, result) => {
-        if (error != null) {
-          log.warn(`Failed to unsubscribe on ${hostname} from topic: ${topic}`)
+      setTimeout(() => {
+        const { client } = connectionStore[hostname]
+        const subscriptions = connectionStore[hostname]?.subscriptions
+        const isLastSubscription = subscriptions[topic] <= 1
+
+        if (isLastSubscription) {
+          client?.unsubscribe(topic, {}, (error, result) => {
+            if (error != null) {
+              log.warn(
+                `Failed to unsubscribe on ${hostname} from topic: ${topic}`
+              )
+            } else {
+              log.info(
+                `Successfully unsubscribed on ${hostname} from topic: ${topic}`
+              )
+              handleDecrementSubscriptionCount(hostname, topic)
+            }
+          })
         } else {
-          log.info(
-            `Successfully unsubscribed on ${hostname} from topic: ${topic}`
-          )
-          handleDecrementSubscriptionCount(hostname, topic)
+          subscriptions[topic] -= 1
         }
-      })
+      }, RENDER_TIMEOUT)
     } else {
       log.info(
         `Attempted to unsubscribe from unconnected hostname: ${hostname}`
@@ -228,7 +292,6 @@ function establishListeners({
   client.on(
     'message',
     (topic: NotifyTopic, message: Buffer, packet: mqtt.IPublishPacket) => {
-      log.debug(`Received message for ${hostname} on ${topic}}`)
       sendToBrowserDeserialized({
         browserWindow,
         hostname,
@@ -305,6 +368,11 @@ function sendToBrowserDeserialized({
   } catch {
     deserializedMessage = message
   }
+
+  log.info('Received notification data from main via IPC', {
+    hostname,
+    topic,
+  })
 
   browserWindow.webContents.send('notify', hostname, topic, deserializedMessage)
 }

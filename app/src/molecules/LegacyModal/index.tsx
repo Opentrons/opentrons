@@ -68,7 +68,7 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
       onOutsideClick={closeOnOutsideClick ?? false ? onClose : undefined}
       // center within viewport aside from nav
       marginLeft={styleProps.marginLeft ?? '7.125rem'}
-      {...props}
+      {...styleProps}
       footer={footer}
     >
       <Box padding={childrenPadding}>{children}</Box>

@@ -1,11 +1,12 @@
 import {
   useAllSessionsQuery,
-  useAllRunsQuery,
   useEstopQuery,
   useHost,
+  useCurrentAllSubsystemUpdatesQuery,
 } from '@opentrons/react-api-client'
 
 import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
+import { useNotifyAllRunsQuery } from '../../../resources/runs/useNotifyAllRunsQuery'
 import { DISENGAGED } from '../../EmergencyStop'
 import { useIsFlex } from './useIsFlex'
 
@@ -20,7 +21,7 @@ export function useIsRobotBusy(
   const { poll } = options
   const queryOptions = poll ? { refetchInterval: ROBOT_STATUS_POLL_MS } : {}
   const robotHasCurrentRun =
-    useAllRunsQuery({}, queryOptions)?.data?.links?.current != null
+    useNotifyAllRunsQuery({}, queryOptions)?.data?.links?.current != null
   const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: poll ? ROBOT_STATUS_POLL_MS : false,
   })
@@ -33,12 +34,23 @@ export function useIsRobotBusy(
     ...queryOptions,
     enabled: isFlex,
   })
+  const {
+    data: currentSubsystemsUpdatesData,
+  } = useCurrentAllSubsystemUpdatesQuery({
+    refetchInterval: ROBOT_STATUS_POLL_MS,
+  })
+  const isSubsystemUpdating =
+    currentSubsystemsUpdatesData?.data.some(
+      update =>
+        update.updateStatus === 'queued' || update.updateStatus === 'updating'
+    ) ?? false
 
   return (
     robotHasCurrentRun ||
     isMaintenanceRunExisting ||
     (allSessionsQueryResponse?.data?.data != null &&
       allSessionsQueryResponse?.data?.data?.length !== 0) ||
-    (isFlex && estopStatus?.data.status !== DISENGAGED && estopError == null)
+    (isFlex && estopStatus?.data.status !== DISENGAGED && estopError == null) ||
+    isSubsystemUpdating
   )
 }

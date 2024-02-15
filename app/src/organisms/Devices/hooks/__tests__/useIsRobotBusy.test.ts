@@ -2,8 +2,8 @@ import { UseQueryResult } from 'react-query'
 
 import {
   useAllSessionsQuery,
-  useAllRunsQuery,
   useEstopQuery,
+  useCurrentAllSubsystemUpdatesQuery,
 } from '@opentrons/react-api-client'
 
 import {
@@ -14,6 +14,7 @@ import {
 import { useIsRobotBusy } from '../useIsRobotBusy'
 import { useIsFlex } from '../useIsFlex'
 import { useNotifyCurrentMaintenanceRun } from '../../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
+import { useNotifyAllRunsQuery } from '../../../../resources/runs/useNotifyAllRunsQuery'
 
 import type { Sessions, Runs } from '@opentrons/api-client'
 import type { AxiosError } from 'axios'
@@ -21,6 +22,7 @@ import type { AxiosError } from 'axios'
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../ProtocolUpload/hooks')
 jest.mock('../useIsFlex')
+jest.mock('../../../../resources/runs/useNotifyAllRunsQuery')
 jest.mock(
   '../../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 )
@@ -36,14 +38,17 @@ const mockEstopStatus = {
 const mockUseAllSessionsQuery = useAllSessionsQuery as jest.MockedFunction<
   typeof useAllSessionsQuery
 >
-const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
-  typeof useAllRunsQuery
+const mockUseNotifyAllRunsQuery = useNotifyAllRunsQuery as jest.MockedFunction<
+  typeof useNotifyAllRunsQuery
 >
 const mockUseNotifyCurrentMaintenanceRun = useNotifyCurrentMaintenanceRun as jest.MockedFunction<
   typeof useNotifyCurrentMaintenanceRun
 >
 const mockUseEstopQuery = useEstopQuery as jest.MockedFunction<
   typeof useEstopQuery
+>
+const mockUseCurrentAllSubsystemUpdatesQuery = useCurrentAllSubsystemUpdatesQuery as jest.MockedFunction<
+  typeof useCurrentAllSubsystemUpdatesQuery
 >
 const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 
@@ -52,7 +57,7 @@ describe('useIsRobotBusy', () => {
     mockUseAllSessionsQuery.mockReturnValue({
       data: {},
     } as UseQueryResult<Sessions, Error>)
-    mockUseAllRunsQuery.mockReturnValue({
+    mockUseNotifyAllRunsQuery.mockReturnValue({
       data: {
         links: {
           current: {},
@@ -63,6 +68,18 @@ describe('useIsRobotBusy', () => {
       data: {},
     } as any)
     mockUseEstopQuery.mockReturnValue({ data: mockEstopStatus } as any)
+    mockUseCurrentAllSubsystemUpdatesQuery.mockReturnValue({
+      data: {
+        data: [
+          {
+            id: '123',
+            createdAt: 'today',
+            subsystem: 'pipette_right',
+            updateStatus: 'done',
+          },
+        ],
+      },
+    } as any)
     mockUseIsFlex.mockReturnValue(false)
   })
 
@@ -81,7 +98,7 @@ describe('useIsRobotBusy', () => {
   })
 
   it('returns false when current runId is null and sessions are empty', () => {
-    mockUseAllRunsQuery.mockReturnValue({
+    mockUseNotifyAllRunsQuery.mockReturnValue({
       data: {
         links: {
           current: null,
@@ -105,7 +122,7 @@ describe('useIsRobotBusy', () => {
   })
 
   it('returns false when Estop status is disengaged', () => {
-    mockUseAllRunsQuery.mockReturnValue({
+    mockUseNotifyAllRunsQuery.mockReturnValue({
       data: {
         links: {
           current: null,
@@ -130,7 +147,7 @@ describe('useIsRobotBusy', () => {
 
   it('returns true when robot is a Flex and Estop status is engaged', () => {
     mockUseIsFlex.mockReturnValue(true)
-    mockUseAllRunsQuery.mockReturnValue({
+    mockUseNotifyAllRunsQuery.mockReturnValue({
       data: {
         links: {
           current: null,
@@ -161,7 +178,7 @@ describe('useIsRobotBusy', () => {
   })
   it('returns false when robot is NOT a Flex and Estop status is engaged', () => {
     mockUseIsFlex.mockReturnValue(false)
-    mockUseAllRunsQuery.mockReturnValue({
+    mockUseNotifyAllRunsQuery.mockReturnValue({
       data: {
         links: {
           current: null,
@@ -197,6 +214,22 @@ describe('useIsRobotBusy', () => {
         data: {
           id: '123',
         },
+      },
+    } as any)
+    const result = useIsRobotBusy()
+    expect(result).toBe(true)
+  })
+  it('returns true when a subsystem update is in progress', () => {
+    mockUseCurrentAllSubsystemUpdatesQuery.mockReturnValue({
+      data: {
+        data: [
+          {
+            id: '123',
+            createdAt: 'today',
+            subsystem: 'pipette_right',
+            updateStatus: 'updating',
+          },
+        ],
       },
     } as any)
     const result = useIsRobotBusy()

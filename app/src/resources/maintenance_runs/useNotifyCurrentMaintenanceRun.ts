@@ -12,14 +12,10 @@ export function useNotifyCurrentMaintenanceRun(
   options?: QueryOptionsWithPolling<MaintenanceRun, Error>
 ): UseQueryResult<MaintenanceRun> | UseQueryResult<MaintenanceRun, Error> {
   const host = useHost()
-  const [refetchUsingHTTP, setRefetchUsingHTTP] = React.useState(true)
+  const [refetchUsingHTTP, setRefetchUsingHTTP] = React.useState(false)
 
-  const {
-    notifyQueryResponse,
-    isNotifyError,
-  } = useNotifyService<MaintenanceRun>({
-    topic: 'robot-server/maintenance_runs',
-    queryKey: [host, 'maintenance_runs', 'current_run'],
+  const { isNotifyError } = useNotifyService<MaintenanceRun, Error>({
+    topic: 'robot-server/maintenance_runs/current_run',
     refetchUsingHTTP: () => setRefetchUsingHTTP(true),
     options: {
       ...options,
@@ -27,7 +23,11 @@ export function useNotifyCurrentMaintenanceRun(
     },
   })
 
-  const isNotifyEnabled = !isNotifyError && !options?.forceHttpPolling
+  const isNotifyEnabled =
+    !isNotifyError &&
+    !options?.forceHttpPolling &&
+    options?.staleTime !== Infinity
+
   if (!isNotifyEnabled && !refetchUsingHTTP) setRefetchUsingHTTP(true)
   const isHTTPEnabled =
     host !== null && options?.enabled !== false && refetchUsingHTTP
@@ -38,5 +38,5 @@ export function useNotifyCurrentMaintenanceRun(
     onSettled: isNotifyEnabled ? () => setRefetchUsingHTTP(false) : undefined,
   })
 
-  return isHTTPEnabled ? httpQueryResult : notifyQueryResponse
+  return httpQueryResult
 }

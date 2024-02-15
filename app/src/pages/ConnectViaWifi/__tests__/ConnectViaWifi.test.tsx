@@ -66,7 +66,7 @@ describe('ConnectViaWifi', () => {
     render()
     screen.getByTestId('StepMeter_StepMeterContainer')
     const bar = screen.getByTestId('StepMeter_StepMeterBar')
-    expect(bar).toHaveStyle('width: 33.33333333333333%')
+    expect(bar).toHaveStyle('width: 20%')
   })
 
   it('should render Searching for networks', () => {

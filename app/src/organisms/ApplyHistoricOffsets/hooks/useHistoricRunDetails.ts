@@ -1,11 +1,11 @@
-import { useAllRunsQuery } from '@opentrons/react-api-client'
+import { useNotifyAllRunsQuery } from '../../../resources/runs/useNotifyAllRunsQuery'
 
 import type { HostConfig, RunData } from '@opentrons/api-client'
 
 export function useHistoricRunDetails(
   hostOverride?: HostConfig | null
 ): RunData[] {
-  const { data: allHistoricRuns } = useAllRunsQuery({}, {}, hostOverride)
+  const { data: allHistoricRuns } = useNotifyAllRunsQuery({}, {}, hostOverride)
 
   return allHistoricRuns == null
     ? []

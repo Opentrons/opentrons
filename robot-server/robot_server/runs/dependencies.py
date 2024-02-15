@@ -21,7 +21,10 @@ from robot_server.persistence import get_sql_engine
 from robot_server.service.task_runner import get_task_runner, TaskRunner
 from robot_server.settings import get_settings
 from robot_server.deletion_planner import RunDeletionPlanner
-from robot_server.notification_client import get_notification_client, NotificationClient
+from robot_server.service.notifications import (
+    get_runs_publisher,
+    RunsPublisher,
+)
 
 from .run_auto_deleter import RunAutoDeleter
 from .engine_store import EngineStore, NoRunnerEnginePairError
@@ -40,12 +43,13 @@ _light_control_accessor = AppStateAccessor[LightController]("light_controller")
 async def get_run_store(
     app_state: AppState = Depends(get_app_state),
     sql_engine: SQLEngine = Depends(get_sql_engine),
+    runs_publisher: RunsPublisher = Depends(get_runs_publisher),
 ) -> RunStore:
     """Get a singleton RunStore to keep track of created runs."""
     run_store = _run_store_accessor.get_from(app_state)
 
     if run_store is None:
-        run_store = RunStore(sql_engine=sql_engine)
+        run_store = RunStore(sql_engine=sql_engine, runs_publisher=runs_publisher)
         _run_store_accessor.set_on(app_state, run_store)
 
     return run_store
@@ -140,14 +144,14 @@ async def get_run_data_manager(
     task_runner: TaskRunner = Depends(get_task_runner),
     engine_store: EngineStore = Depends(get_engine_store),
     run_store: RunStore = Depends(get_run_store),
-    notification_client: NotificationClient = Depends(get_notification_client),
+    runs_publisher: RunsPublisher = Depends(get_runs_publisher),
 ) -> RunDataManager:
     """Get a run data manager to keep track of current/historical run data."""
     return RunDataManager(
         task_runner=task_runner,
         engine_store=engine_store,
         run_store=run_store,
-        notification_client=notification_client,
+        runs_publisher=runs_publisher,
     )
 
 

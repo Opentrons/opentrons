@@ -1,12 +1,10 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { resetAllWhenMocks } from 'jest-when'
 import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import * as Config from '../../../redux/config'
 import {
   AdditionalCustomLabwareSourceFolder,
   ClearUnavailableRobots,
@@ -17,6 +15,7 @@ import {
   ShowHeaterShakerAttachmentModal,
   ShowLabwareOffsetSnippets,
   U2EInformation,
+  UpdatedChannel,
 } from '../../../organisms/AdvancedSettings'
 
 import { AdvancedSettings } from '../AdvancedSettings'
@@ -42,8 +41,8 @@ const render = (): ReturnType<typeof renderWithProviders> => {
   )
 }
 
-const mockGetChannelOptions = Config.getUpdateChannelOptions as jest.MockedFunction<
-  typeof Config.getUpdateChannelOptions
+const mockAdditionalCustomLabwareSourceFolder = AdditionalCustomLabwareSourceFolder as jest.MockedFunction<
+  typeof AdditionalCustomLabwareSourceFolder
 >
 const mockPreventRobotCaching = PreventRobotCaching as jest.MockedFunction<
   typeof PreventRobotCaching
@@ -70,20 +69,12 @@ const mockOverridePathToPython = OverridePathToPython as jest.MockedFunction<
 const mockShowHeaterShakerAttachmentModal = ShowHeaterShakerAttachmentModal as jest.MockedFunction<
   typeof ShowHeaterShakerAttachmentModal
 >
-const mockAdditionalCustomLabwareSourceFolder = AdditionalCustomLabwareSourceFolder as jest.MockedFunction<
-  typeof AdditionalCustomLabwareSourceFolder
+const mockUpdatedChannel = UpdatedChannel as jest.MockedFunction<
+  typeof UpdatedChannel
 >
 
 describe('AdvancedSettings', () => {
   beforeEach(() => {
-    mockGetChannelOptions.mockReturnValue([
-      {
-        label: 'Stable',
-        value: 'latest',
-      },
-      { label: 'Beta', value: 'beta' },
-      { label: 'Alpha', value: 'alpha' },
-    ])
     mockPreventRobotCaching.mockReturnValue(<div>mock PreventRobotCaching</div>)
     mockOT2AdvancedSettings.mockReturnValue(<div>mock OT2AdvancedSettings</div>)
     mockEnableDevTools.mockReturnValue(<div>mock EnableDevTools</div>)
@@ -100,6 +91,7 @@ describe('AdvancedSettings', () => {
     mockShowHeaterShakerAttachmentModal.mockReturnValue(
       <div>mock ShowHeaterShakerAttachmentModal</div>
     )
+    mockUpdatedChannel.mockReturnValue(<div>mock UpdatedChannel</div>)
     mockAdditionalCustomLabwareSourceFolder.mockReturnValue(
       <div>mock AdditionalCustomLabwareSourceFolder</div>
     )
@@ -107,20 +99,11 @@ describe('AdvancedSettings', () => {
 
   afterEach(() => {
     jest.resetAllMocks()
-    resetAllWhenMocks()
   })
 
-  it('renders correct titles', () => {
-    const [{ getByText }] = render()
-    getByText('Update Channel')
-  })
-
-  it('renders the update channel combobox and section', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText(
-      'Stable receives the latest stable releases. Beta allows you to try out new in-progress features before they launch in Stable channel, but they have not completed testing yet.'
-    )
-    getByRole('combobox', { name: '' })
+  it('should render mock UpdatedChannel section', () => {
+    render()
+    screen.getByText('mock UpdatedChannel')
   })
 
   it('should render mock OT-2 Advanced Settings Tip Length Calibration Method section', () => {

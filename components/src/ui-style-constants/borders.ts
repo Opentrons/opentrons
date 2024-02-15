@@ -16,7 +16,7 @@ export const borderRadiusSize6 = '60px'
 export const tabBorder = css`
   border-bottom-style: ${styleSolid};
   border-bottom-width: 2px;
-  border-bottom-color: ${COLORS.blue50};
+  border-bottom-color: ${COLORS.purple50};
 `
 
 export const activeLineBorder = `1px ${styleSolid} ${COLORS.blue50}`

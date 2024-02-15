@@ -7,6 +7,7 @@ import { getRobotSettings, fetchSettings } from '../../../redux/robot-settings'
 import {
   getRobotApiVersion,
   getRobotFirmwareVersion,
+  getRobotSerialNumber,
 } from '../../../redux/discovery'
 
 import type { State, Dispatch } from '../../../redux/types'
@@ -30,6 +31,8 @@ export function useRobotAnalyticsData(
   const settings = useSelector((state: State) =>
     getRobotSettings(state, robotName)
   )
+  const serialNumber =
+    robot?.status != null ? getRobotSerialNumber(robot) : null
   const dispatch = useDispatch<Dispatch>()
 
   React.useEffect(() => {
@@ -50,6 +53,7 @@ export function useRobotAnalyticsData(
           robotSmoothieVersion: getRobotFirmwareVersion(robot) ?? '',
           robotLeftPipette: pipettes.left?.model ?? '',
           robotRightPipette: pipettes.right?.model ?? '',
+          robotSerialNumber: serialNumber ?? '',
         }
       )
     }

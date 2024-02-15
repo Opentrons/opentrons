@@ -45,3 +45,10 @@ def resume() -> command_types.ResumeCommand:
         "name": command_types.RESUME,
         "payload": {"text": "Resuming robot operation"},
     }
+
+
+def move_labware(text: str) -> command_types.MoveLabwareCommand:
+    return {
+        "name": command_types.MOVE_LABWARE,
+        "payload": {"text": text},
+    }

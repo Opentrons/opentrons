@@ -1,7 +1,6 @@
 """Manage current and historical run data."""
-import asyncio
 from datetime import datetime
-from typing import List, Optional, Union
+from typing import List, Optional
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
@@ -14,9 +13,9 @@ from opentrons.protocol_engine import (
     Command,
 )
 
-from robot_server.protocols import ProtocolResource
+from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
-from robot_server.notification_client import NotificationClient
+from robot_server.service.notifications import RunsPublisher
 
 from .engine_store import EngineStore
 from .run_store import RunResource, RunStore
@@ -79,13 +78,12 @@ class RunDataManager:
         engine_store: EngineStore,
         run_store: RunStore,
         task_runner: TaskRunner,
-        notification_client: NotificationClient,
+        runs_publisher: RunsPublisher,
     ) -> None:
         self._engine_store = engine_store
         self._run_store = run_store
         self._task_runner = task_runner
-        self._notification_client = notification_client
-        self._stop_polling_event = asyncio.Event()
+        self._runs_publisher = runs_publisher
 
     @property
     def current_run_id(self) -> Optional[str]:
@@ -114,6 +112,11 @@ class RunDataManager:
             EngineConflictError: There is a currently active run that cannot
                 be superceded by this new run.
         """
+        await self._runs_publisher.begin_polling_engine_store(
+            get_current_command=self.get_current_command,
+            get_state_summary=self._get_state_summary,
+            run_id=run_id,
+        )
         prev_run_id = self._engine_store.current_run_id
         if prev_run_id is not None:
             prev_run_result = await self._engine_store.clear()
@@ -122,7 +125,6 @@ class RunDataManager:
                 summary=prev_run_result.state_summary,
                 commands=prev_run_result.commands,
             )
-
         state_summary = await self._engine_store.create(
             run_id=run_id,
             labware_offsets=labware_offsets,
@@ -134,8 +136,6 @@ class RunDataManager:
             created_at=created_at,
             protocol_id=protocol.protocol_id if protocol is not None else None,
         )
-
-        asyncio.create_task(self._poll_current_command(run_id))
 
         return _build_run(
             run_resource=run_resource,
@@ -220,10 +220,7 @@ class RunDataManager:
         """
         if run_id == self._engine_store.current_run_id:
             await self._engine_store.clear()
-            self._stop_polling_event.set()
-            await self._notification_client.publish(
-                topic="robot-server/runs/current_command"
-            )
+            await self._runs_publisher.stop_polling_engine_store()
 
         self._run_store.remove(run_id=run_id)
 
@@ -329,22 +326,3 @@ class RunDataManager:
             result = self._run_store.get_state_summary(run_id=run_id)
 
         return result
-
-    async def _poll_current_command(self, run_id: str) -> None:
-        """Continuously poll for the current command.
-
-        Args:
-            run_id: ID of the run.
-        """
-        previous_current_command: Union[CurrentCommand, None] = None
-        while True:
-            current_command = self.get_current_command(run_id)
-            if (
-                current_command is not None
-                and previous_current_command != current_command
-            ):
-                await self._notification_client.publish(
-                    topic="robot-server/runs/current_command"
-                )
-                previous_current_command = current_command
-            await asyncio.sleep(3)

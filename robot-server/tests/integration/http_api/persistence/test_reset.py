@@ -1,5 +1,4 @@
 import asyncio
-import os
 import secrets
 from pathlib import Path
 from shutil import copytree
@@ -41,7 +40,9 @@ async def _assert_reset_was_successful(
     all_files_and_directories = set(persistence_directory.glob("**/*"))
     expected_files_and_directories = {
         persistence_directory / "robot_server.db",
-        persistence_directory / "protocols",
+        persistence_directory / "3",
+        persistence_directory / "3" / "protocols",
+        persistence_directory / "3" / "robot_server.db",
     }
     assert all_files_and_directories == expected_files_and_directories
 
@@ -106,11 +107,6 @@ async def test_upload_protocols_and_reset_persistence_dir() -> None:
             result = await robot_client.get_protocols()
 
             assert len(result.json()["data"]) == 2
-
-            # TODO(mm, 2022-09-08): This can erroneously pass if something other than
-            # our software creates a file in this directory, like if macOS creates
-            # .DS_Store.
-            assert os.listdir(f"{server.persistence_directory}/protocols/")
 
             # Restart to enact the reset.
             server.stop()

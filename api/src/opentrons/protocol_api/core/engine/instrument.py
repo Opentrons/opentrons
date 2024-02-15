@@ -510,6 +510,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 speed=speed,
                 minimum_z_height=None,
                 alternate_drop_location=alternate_tip_drop,
+                ignore_tip_configuration=True,
             )
 
         if isinstance(disposal_location, WasteChute):

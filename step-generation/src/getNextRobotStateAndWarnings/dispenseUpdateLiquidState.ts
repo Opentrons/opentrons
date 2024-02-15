@@ -166,7 +166,7 @@ export function dispenseUpdateLiquidState(
     labwareLiquidState != null
   ) {
     prevLiquidState.labware[sourceId] = Object.assign(
-      liquidLabware,
+      liquidLabware ?? {},
       labwareLiquidState
     )
   }

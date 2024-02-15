@@ -27,3 +27,19 @@ jest.mock('../protocol-designer/src/components/portals/MainPageModalPortal')
 jest.mock('typeface-open-sans', () => {})
 jest.mock('@fontsource/dejavu-sans', () => {})
 jest.mock('@fontsource/public-sans', () => {})
+
+// jest requires methods not implemented by JSDOM to be mocked, e.g. window.matchMedia
+// https://jestjs.io/docs/manual-mocks#mocking-methods-which-are-not-implemented-in-jsdom
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(), // deprecated
+    removeListener: jest.fn(), // deprecated
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+})
