@@ -82,7 +82,9 @@ export function U2EInformation(): JSX.Element {
               <StyledText css={TYPOGRAPHY.pSemiBold}>
                 {t('usb_to_ethernet_adapter_description')}
               </StyledText>
-              <StyledText as="p">{device?.productName}</StyledText>
+              <StyledText as="p">
+                {device?.productName ?? t('usb_to_ethernet_unknown_product')}
+              </StyledText>
             </Flex>
             <Flex
               flexDirection={DIRECTION_COLUMN}
@@ -91,7 +93,10 @@ export function U2EInformation(): JSX.Element {
               <StyledText css={TYPOGRAPHY.pSemiBold}>
                 {t('usb_to_ethernet_adapter_manufacturer')}
               </StyledText>
-              <StyledText as="p">{device?.manufacturerName}</StyledText>
+              <StyledText as="p">
+                {device?.manufacturerName ??
+                  t('usb_to_ethernet_unknown_manufacturer')}
+              </StyledText>
             </Flex>
             <Flex
               flexDirection={DIRECTION_COLUMN}

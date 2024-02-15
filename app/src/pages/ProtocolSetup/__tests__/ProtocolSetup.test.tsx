@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
+import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   useAllPipetteOffsetCalibrationsQuery,
   useInstrumentsQuery,
@@ -72,6 +72,8 @@ Object.defineProperty(window, 'IntersectionObserver', {
   value: IntersectionObserver,
 })
 
+let mockHistoryPush: jest.Mock
+
 jest.mock('@opentrons/shared-data/js/helpers')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../organisms/LabwarePositionCheck/useLaunchLPC')
@@ -91,6 +93,12 @@ jest.mock('../ConfirmAttachedModal')
 jest.mock('../../../organisms/ToasterOven')
 jest.mock('../../../resources/deck_configuration/hooks')
 jest.mock('../../../resources/runs/useNotifyRunQuery')
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useHistory: () => ({
+    push: mockHistoryPush,
+  }),
+}))
 
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
@@ -252,6 +260,7 @@ describe('ProtocolSetup', () => {
   let mockLaunchLPC: jest.Mock
   beforeEach(() => {
     mockLaunchLPC = jest.fn()
+    mockHistoryPush = jest.fn()
     mockUseLPCDisabledReason.mockReturnValue(null)
     mockUseAttachedModules.mockReturnValue([])
     mockProtocolSetupModulesAndDeck.mockReturnValue(
@@ -461,5 +470,11 @@ describe('ProtocolSetup', () => {
       name: ANALYTICS_PROTOCOL_RUN_START,
       properties: {},
     })
+  })
+
+  it('should redirect to the protocols page when a run is stopped', () => {
+    mockUseRunStatus.mockReturnValue(RUN_STATUS_STOPPED)
+    render(`/runs/${RUN_ID}/setup/`)
+    expect(mockHistoryPush).toHaveBeenCalledWith('/protocols')
   })
 })

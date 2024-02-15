@@ -7,7 +7,7 @@ SHX := npx shx
 
 ot_project := $(OPENTRONS_PROJECT)
 project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
-project_ot3_default = $(if $(ot_project),$(ot_project),ot3)
+project_ir_default = $(if $(ot_project),$(ot_project),ot3)
 
 # Find the version of the wheel from git using a helper script. We
 # use python here so we can use the same version normalization that will be
@@ -18,10 +18,10 @@ wheel_file = dist/$(call python_get_wheelname,hardware,$(project_rs_default),ope
 # Find the version of the sdist from git using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the sdist.
-sdist_file = dist/$(call python_get_sdistname,hardware,$(project_ot3_default),opentrons_hardware)
+sdist_file = dist/$(call python_get_sdistname,hardware,$(project_rs_default),opentrons_hardware)
 
 # Find the branch, sha, version that will be used to update the VERSION.json file
-version_file = $(call python_get_git_version,hardware,$(project_ot3_default),opentrons_hardware)
+version_file = $(call python_get_git_version,hardware,$(project_rs_default),opentrons_hardware)
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
@@ -79,7 +79,7 @@ dist/opentrons_hardware-%-py2.py3-none-any.whl: setup.py $(ot_sources)
 
 wheel: $(wheel_file)
 
-$(sdist_file): export OPENTRONS_PROJECT=$(project_ot3_default)
+$(sdist_file): export OPENTRONS_PROJECT=$(project_rs_default)
 $(sdist_file): setup.py $(ot_sources)
 	$(python) setup.py sdist
 	$(SHX) rm -rf build

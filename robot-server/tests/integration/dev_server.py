@@ -79,7 +79,7 @@ class DevServer:
                 "robot_server",
                 "-m",
                 "uvicorn",
-                "robot_server:app",
+                "robot_server.app:app",
                 "--host",
                 "localhost",
                 "--port",

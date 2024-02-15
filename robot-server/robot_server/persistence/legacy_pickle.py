@@ -15,7 +15,7 @@ from pickle import (  # noqa: F401
     # unknown types.
     dumps as dumps,
 )
-from typing import Dict, List
+from typing import Any, Dict, List
 
 
 _log = getLogger(__name__)
@@ -69,7 +69,7 @@ class LegacyUnpickler(Unpickler):
             return super().find_class(module, name)
 
 
-def loads(data: bytes) -> object:
+def loads(data: bytes) -> Any:
     """Drop-in replacement for `pickle.loads` that uses our custom unpickler."""
     return LegacyUnpickler(BytesIO(data)).load()
 
