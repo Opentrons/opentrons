@@ -138,13 +138,13 @@ class ModuleState:
 
     additional_slots_occupied_by_module_id: Dict[str, List[DeckSlotName]]
     """List of additional slots occupied by each module.
-    
+
     The thermocycler (both GENs), occupies multiple slots on both OT-2 and the Flex
-    but only one slot is associated with the location of the thermocycler. 
-    In order to check for deck conflicts with other items, we will keep track of any 
+    but only one slot is associated with the location of the thermocycler.
+    In order to check for deck conflicts with other items, we will keep track of any
     additional slots occupied by a module here.
-      
-    This will be None when a module occupies only one slot. 
+
+    This will be None when a module occupies only one slot.
     """
 
     requested_model_by_id: Dict[str, Optional[ModuleModel]]

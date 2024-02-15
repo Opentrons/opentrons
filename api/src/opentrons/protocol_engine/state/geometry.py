@@ -34,7 +34,6 @@ from ..types import (
     LabwareOffsetVector,
     ModuleOffsetVector,
     ModuleOffsetData,
-    DeckType,
     CurrentWell,
     CurrentPipetteLocation,
     TipGeometry,
