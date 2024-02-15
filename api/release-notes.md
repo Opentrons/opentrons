@@ -25,7 +25,7 @@ If you don't care about preserving your labware offsets and run history, you can
 
 ### Removals
 
-- Removed the `notify_server` Python package and `/notifications/subscribe` WebSocket endpoint, as they were never fully used.
+- Removed the `notify_server` Python package and `/notifications/subscribe` WebSocket endpoint, as they were never fully used. (See pull request [#14280](https://github.com/Opentrons/opentrons/pull/14280) for details.)
 
 ---
 
