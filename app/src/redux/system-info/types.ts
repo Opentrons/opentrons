@@ -14,10 +14,12 @@ import {
 export interface UsbDevice {
   vendorId: number
   productId: number
+  identifier: string
   productName?: string
   manufacturerName?: string
   serialNumber?: string
   windowsDriverVersion?: string | null
+  systemIdentifier?: string
 }
 
 // based on built-in type os$NetIFAddr

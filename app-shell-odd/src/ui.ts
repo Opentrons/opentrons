@@ -1,5 +1,5 @@
 // sets up the main window ui
-import { app, shell, BrowserWindow } from 'electron'
+import { app, BrowserWindow } from 'electron'
 import path from 'path'
 import { sendReadyStatus } from '@opentrons/app/src/redux/shell'
 import { getConfig } from './config'
@@ -58,14 +58,9 @@ export function createUi(dispatch: Dispatch): BrowserWindow {
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   mainWindow.loadURL(url, { extraHeaders: 'pragma: no-cache\n' })
 
-  // open new windows (<a target="_blank" ...) in browser windows
-  mainWindow.webContents.setWindowOpenHandler(({ url, disposition }) => {
-    if (disposition === 'new-window' && url === 'about:blank') {
-      shell.openExternal(url)
-      return { action: 'deny' }
-    } else {
-      return { action: 'allow' }
-    }
+  // never allow external links to open
+  mainWindow.webContents.setWindowOpenHandler(() => {
+    return { action: 'deny' }
   })
 
   return mainWindow

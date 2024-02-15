@@ -13,7 +13,7 @@ from opentrons.protocol_engine import (
     Command,
 )
 
-from robot_server.protocols import ProtocolResource
+from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.notifications import RunsPublisher
 
@@ -120,7 +120,6 @@ class RunDataManager:
                 summary=prev_run_result.state_summary,
                 commands=prev_run_result.commands,
             )
-
         state_summary = await self._engine_store.create(
             run_id=run_id,
             labware_offsets=labware_offsets,

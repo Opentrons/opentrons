@@ -165,11 +165,11 @@ jobs:
         with:
           project: 'api'
           repository_url: 'https://test.pypi.org/legacy/'
-          password: '${{ secrets.OT_TEST_PYPI_PASSWORD }}'
+          password: '${{ secrets.TEST_PYPI_DEPLOY_TOKEN_OPENTRONS }}'
       - if: startsWith(env.OT_TAG, 'v')
         name: 'upload to real pypi'
         uses: './.github/actions/python/pypi-deploy'
         with:
           project: 'api'
           repository_url: 'https://upload.pypi.org/legacy/'
-          password: '${{ secrets.OT_PYPI_PASSWORD }}'
+          password: '${{ secrets.PYPI_DEPLOY_TOKEN_OPENTRONS }}'

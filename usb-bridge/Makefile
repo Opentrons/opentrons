@@ -13,7 +13,8 @@ SHX := npx shx
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
 ot_project := $(OPENTRONS_PROJECT)
-project_ot3_default = $(if $(ot_project),$(ot_project),ot3)
+project_ir_default = $(if $(ot_project),$(ot_project),ot3)
+project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
@@ -21,10 +22,10 @@ project_ot3_default = $(if $(ot_project),$(ot_project),ot3)
 # specified test
 tests ?= tests
 test_opts ?=
-sdist_file = $(call python_get_sdistname,usb-bridge,$(project_ot3_default),ot3usb)
+sdist_file = $(call python_get_sdistname,usb-bridge,$(project_rs_default),ot3usb)
 
 # Find the branch, sha, version that will be used to update the VERSION.json file
-version_file = $(call python_get_git_version,usb-bridge,$(project_ot3_default),ot3usb)
+version_file = $(call python_get_git_version,usb-bridge,$(project_rs_default),ot3usb)
 
 # Host key location for robot
 ssh_key ?= $(default_ssh_key)
@@ -66,7 +67,7 @@ format:
 	$(python) -m black ot3usb tests
 
 .PHONY: sdist
-sdist: export OPENTRONS_PROJECT=$(project_ot3_default)
+sdist: export OPENTRONS_PROJECT=$(project_rs_default)
 sdist: clean
 	$(python) setup.py sdist
 	$(SHX) rm -rf build

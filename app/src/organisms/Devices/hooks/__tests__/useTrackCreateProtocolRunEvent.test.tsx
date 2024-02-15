@@ -72,7 +72,7 @@ describe('useTrackCreateProtocolRunEvent hook', () => {
 
   it('returns trackCreateProtocolRunEvent function', () => {
     const { result } = renderHook(
-      () => useTrackCreateProtocolRunEvent(storedProtocolData),
+      () => useTrackCreateProtocolRunEvent(storedProtocolData, 'otie'),
       {
         wrapper,
       }
@@ -82,7 +82,7 @@ describe('useTrackCreateProtocolRunEvent hook', () => {
 
   it('trackCreateProtocolRunEvent invokes trackEvent with correct props', async () => {
     const { result } = renderHook(
-      () => useTrackCreateProtocolRunEvent(storedProtocolData),
+      () => useTrackCreateProtocolRunEvent(storedProtocolData, 'otie'),
       {
         wrapper,
       }
@@ -107,7 +107,7 @@ describe('useTrackCreateProtocolRunEvent hook', () => {
         })
     )
     const { result } = renderHook(
-      () => useTrackCreateProtocolRunEvent(storedProtocolData),
+      () => useTrackCreateProtocolRunEvent(storedProtocolData, 'otie'),
       {
         wrapper,
       }

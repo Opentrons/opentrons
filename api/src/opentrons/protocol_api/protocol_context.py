@@ -26,7 +26,8 @@ from opentrons.commands.publisher import CommandPublisher, publish, publish_cont
 from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.deck_type import (
     NoTrashDefinedError,
-    should_load_fixed_trash_for_python_protocol,
+    should_load_fixed_trash_labware_for_python_protocol,
+    should_load_fixed_trash_area_for_python_protocol,
 )
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
@@ -159,22 +160,19 @@ class ProtocolContext(CommandPublisher):
         # protocols after 2.16 expect trash to exist as either a TrashBin or WasteChute object.
 
         self._load_fixed_trash()
-        if should_load_fixed_trash_for_python_protocol(self._api_version):
+        if should_load_fixed_trash_labware_for_python_protocol(self._api_version):
             self._core.append_disposal_location(self.fixed_trash)
-        elif (
-            self._api_version >= APIVersion(2, 16)
-            and self._core.robot_type == "OT-2 Standard"
+        elif should_load_fixed_trash_area_for_python_protocol(
+            self._api_version, self._core.robot_type
         ):
             _fixed_trash_trashbin = TrashBin(
                 location=DeckSlotName.FIXED_TRASH, addressable_area_name="fixedTrash"
             )
-            # We have to skip adding this fixed trash bin to engine because this __init__ is called in the main thread
-            # and any calls to sync client will cause a deadlock. This means that OT-2 fixed trashes are not added to
-            # the engine store until one is first referenced. This should have minimal consequences for OT-2 given that
-            # we do not need to worry about the 96 channel pipette and partial tip configuration with that pipette.
-            self._core.append_disposal_location(
-                _fixed_trash_trashbin, skip_add_to_engine=True
-            )
+            # We are just appending the fixed trash to the core's internal list here, not adding it to the engine via
+            # the core, since that method works through the SyncClient and if called from here, will cause protocols
+            # to deadlock. Instead, that method is called in protocol engine directly in create_protocol_context after
+            # ProtocolContext is initialized.
+            self._core.append_disposal_location(_fixed_trash_trashbin)
 
         self._commands: List[str] = []
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
@@ -517,7 +515,7 @@ class ProtocolContext(CommandPublisher):
         trash_bin = TrashBin(
             location=slot_name, addressable_area_name=addressable_area_name
         )
-        self._core.append_disposal_location(trash_bin)
+        self._core.add_disposal_location_to_engine(trash_bin)
         return trash_bin
 
     @requires_version(2, 16)
@@ -534,7 +532,7 @@ class ProtocolContext(CommandPublisher):
         API will raise an error.
         """
         waste_chute = WasteChute()
-        self._core.append_disposal_location(waste_chute)
+        self._core.add_disposal_location_to_engine(waste_chute)
         return waste_chute
 
     @requires_version(2, 15)

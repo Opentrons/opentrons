@@ -18,7 +18,7 @@ Type=notify
 # /run/aiohttp.sock matches where our reverse proxy expects to find us.
 # It refers to aiohttp even though this server doesn't use that framework
 # for historical reasons.
-ExecStart=uvicorn robot_server:app --uds /run/aiohttp.sock --ws wsproto --lifespan on
+ExecStart=uvicorn robot_server.app:app --uds /run/aiohttp.sock --ws wsproto --lifespan on
 
 Environment=OT_SMOOTHIE_ID=AMA
 Environment=RUNNING_ON_PI=true
