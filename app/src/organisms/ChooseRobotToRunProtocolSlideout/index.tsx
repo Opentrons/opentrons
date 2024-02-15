@@ -1,5 +1,4 @@
 import * as React from 'react'
-import path from 'path'
 import first from 'lodash/first'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
@@ -27,6 +26,9 @@ import type { State } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 
+const _getFileBaseName = (filePath: string): string => {
+  return filePath.split('/').reverse()[0]
+}
 interface ChooseRobotToRunProtocolSlideoutProps extends StyleProps {
   storedProtocolData: StoredProtocolData
   onCloseClick: () => void
@@ -124,7 +126,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   }
   const srcFileObjects = srcFiles.map((srcFileBuffer, index) => {
     const srcFilePath = srcFileNames[index]
-    return new File([srcFileBuffer], path.basename(srcFilePath))
+    return new File([srcFileBuffer], _getFileBaseName(srcFilePath))
   })
   const protocolDisplayName =
     mostRecentAnalysis?.metadata?.protocolName ??

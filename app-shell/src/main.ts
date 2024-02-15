@@ -3,10 +3,7 @@ import { app, ipcMain } from 'electron'
 import electronDebug from 'electron-debug'
 import dns from 'dns'
 import contextMenu from 'electron-context-menu'
-import devtools, {
-  REACT_DEVELOPER_TOOLS,
-  REDUX_DEVTOOLS,
-} from 'electron-devtools-installer'
+import * as electronDevtoolsInstaller from 'electron-devtools-installer'
 import { webusb } from 'usb'
 
 import { createUi, registerReloadUi } from './ui'
@@ -138,18 +135,29 @@ function createRendererLogger(): Logger {
 }
 
 function installDevtools(): Promise<void | Logger> {
-  const extensions = [REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS]
-  const install = devtools
+  const extensions = [
+    electronDevtoolsInstaller.REACT_DEVELOPER_TOOLS,
+    electronDevtoolsInstaller.REDUX_DEVTOOLS,
+  ]
+  // @ts-expect-error the types for electron-devtools-installer are not correct
+  // when importing the default export via commmon JS. the installer is actually nested in
+  // another default object
+  const install = electronDevtoolsInstaller.default?.default
   const forceReinstall = config.reinstallDevtools
 
   log.debug('Installing devtools')
 
-  return install(extensions, forceReinstall)
-    .then(() => log.debug('Devtools extensions installed'))
-    .catch((error: unknown) => {
-      log.warn('Failed to install devtools extensions', {
-        forceReinstall,
-        error,
+  if (typeof install === 'function') {
+    return install(extensions, forceReinstall)
+      .then(() => log.debug('Devtools extensions installed'))
+      .catch((error: unknown) => {
+        log.warn('Failed to install devtools extensions', {
+          forceReinstall,
+          error,
+        })
       })
-    })
+  } else {
+    log.warn('could not resolve electron dev tools installer')
+    return Promise.reject('could not resolve electron dev tools installer')
+  }
 }

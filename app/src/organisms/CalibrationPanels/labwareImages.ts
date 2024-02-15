@@ -5,46 +5,97 @@
 
 export const labwareImages = {
   opentrons_96_tiprack_1000ul: [
-    require('../../assets/images/labware/opentrons_96_tiprack_1000ul_side_view.jpg'),
+    new URL(
+      '../../assets/images/labware/opentrons_96_tiprack_1000ul_side_view.jpg',
+      import.meta.url
+    ).href,
   ],
   opentrons_96_filtertiprack_1000ul: [
-    require('../../assets/images/labware/opentrons_96_tiprack_1000ul_side_view.jpg'),
+    new URL(
+      '../../assets/images/labware/opentrons_96_tiprack_1000ul_side_view.jpg',
+      import.meta.url
+    ).href,
   ],
   opentrons_96_tiprack_10ul: [
-    require('../../assets/images/labware/opentrons_96_tiprack_10ul_side_view.jpg'),
+    new URL(
+      '../../assets/images/labware/opentrons_96_tiprack_10ul_side_view.jpg',
+      import.meta.url
+    ).href,
   ],
   opentrons_96_filtertiprack_10ul: [
-    require('../../assets/images/labware/opentrons_96_tiprack_10ul_side_view.jpg'),
+    new URL(
+      '../../assets/images/labware/opentrons_96_tiprack_10ul_side_view.jpg',
+      import.meta.url
+    ).href,
   ],
   opentrons_96_tiprack_20ul: [
-    require('../../assets/images/labware/opentrons_96_tiprack_10ul_side_view.jpg'),
+    new URL(
+      '../../assets/images/labware/opentrons_96_tiprack_10ul_side_view.jpg',
+      import.meta.url
+    ).href,
   ],
   opentrons_96_filtertiprack_20ul: [
-    require('../../assets/images/labware/opentrons_96_tiprack_10ul_side_view.jpg'),
+    new URL(
+      '../../assets/images/labware/opentrons_96_tiprack_10ul_side_view.jpg',
+      import.meta.url
+    ).href,
   ],
   opentrons_96_tiprack_300ul: [
-    require('../../assets/images/labware/opentrons_96_tiprack_300ul_side_view.jpg'),
+    new URL(
+      '../../assets/images/labware/opentrons_96_tiprack_300ul_side_view.jpg',
+      import.meta.url
+    ).href,
   ],
   opentrons_96_filtertiprack_200ul: [
-    require('../../assets/images/labware/opentrons_96_tiprack_300ul_side_view.jpg'),
+    new URL(
+      '../../assets/images/labware/opentrons_96_tiprack_300ul_side_view.jpg',
+      import.meta.url
+    ).href,
   ],
   geb_96_tiprack_1000ul: [
-    require('../../assets/images/labware/geb_96_tiprack_1000ul_side_view.jpg'),
+    new URL(
+      '../../assets/images/labware/geb_96_tiprack_1000ul_side_view.jpg',
+      import.meta.url
+    ).href,
   ],
   geb_96_tiprack_10ul: [
-    require('../../assets/images/labware/geb_96_tiprack_10ul_side_view.jpg'),
+    new URL(
+      '../../assets/images/labware/geb_96_tiprack_10ul_side_view.jpg',
+      import.meta.url
+    ).href,
   ],
   tipone_96_tiprack_200ul: [
-    require('../../assets/images/labware/tipone_96_tiprack_200ul_side_view.jpg'),
+    new URL(
+      '../../assets/images/labware/tipone_96_tiprack_200ul_side_view.jpg',
+      import.meta.url
+    ).href,
   ],
   eppendorf_96_tiprack_1000ul_eptips: [
-    require('../../assets/images/labware/eppendorf_1000ul_tip_eptips_side_view.jpg'),
+    new URL(
+      '../../assets/images/labware/eppendorf_1000ul_tip_eptips_side_view.jpg',
+      import.meta.url
+    ).href,
   ],
   eppendorf_96_tiprack_10ul_eptips: [
-    require('../../assets/images/labware/eppendorf_10ul_tips_eptips_side_view.jpg'),
+    new URL(
+      '../../assets/images/labware/eppendorf_10ul_tips_eptips_side_view.jpg',
+      import.meta.url
+    ).href,
   ],
-  opentrons_calibrationblock_short_side_right: require('../../assets/images/labware/opentrons_calibration_block.png'),
-  opentrons_calibrationblock_short_side_left: require('../../assets/images/labware/opentrons_calibration_block.png'),
-  generic_custom_tiprack: require('../../assets/images/labware/generic_tiprack_side_view.png'),
-  removable_black_plastic_trash_bin: require('../../assets/images/labware/removable_black_plastic_trash_bin.png'),
+  opentrons_calibrationblock_short_side_right: new URL(
+    '../../assets/images/labware/opentrons_calibration_block.png',
+    import.meta.url
+  ).href,
+  opentrons_calibrationblock_short_side_left: new URL(
+    '../../assets/images/labware/opentrons_calibration_block.png',
+    import.meta.url
+  ).href,
+  generic_custom_tiprack: new URL(
+    '../../assets/images/labware/generic_tiprack_side_view.png',
+    import.meta.url
+  ).href,
+  removable_black_plastic_trash_bin: new URL(
+    '../../assets/images/labware/removable_black_plastic_trash_bin.png',
+    import.meta.url
+  ).href,
 }

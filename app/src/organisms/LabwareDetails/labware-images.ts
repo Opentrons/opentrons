@@ -3,243 +3,388 @@
 
 export const labwareImages: Record<string, string[]> = {
   agilent_1_reservoir_290ml: [
-    require('./images/agilent_1_reservoir_290ml_side_view.jpg'),
+    new URL('./images/agilent_1_reservoir_290ml_side_view.jpg', import.meta.url)
+      .href,
   ],
   axygen_1_reservoir_90ml: [
-    require('./images/axygen_1_reservoir_90ml_side_view.jpg'),
+    new URL('./images/axygen_1_reservoir_90ml_side_view.jpg', import.meta.url)
+      .href,
   ],
   biorad_96_wellplate_200ul_pcr: [
-    require('./images/biorad_96_wellplate_200ul_pcr_photo_three_quarters.jpg'),
+    new URL(
+      './images/biorad_96_wellplate_200ul_pcr_photo_three_quarters.jpg',
+      import.meta.url
+    ).href,
   ],
   'corning_12_wellplate_6.9ml_flat': [
-    require('./images/corning_12_wellplate_6.9ml_flat_photo_three_quarters.jpg'),
+    new URL(
+      './images/corning_12_wellplate_6.9ml_flat_photo_three_quarters.jpg',
+      import.meta.url
+    ).href,
   ],
   'corning_24_wellplate_3.4ml_flat': [
-    require('./images/corning_24_wellplate_3.4ml_flat_photo_three_quarters.jpg'),
+    new URL(
+      './images/corning_24_wellplate_3.4ml_flat_photo_three_quarters.jpg',
+      import.meta.url
+    ).href,
   ],
   corning_384_wellplate_112ul_flat: [
-    require('./images/corning_384_wellplate_112ul_flat_photo_three_quarters.jpg'),
+    new URL(
+      './images/corning_384_wellplate_112ul_flat_photo_three_quarters.jpg',
+      import.meta.url
+    ).href,
   ],
   corning_96_wellplate_360ul_flat: [
-    require('./images/corning_96_wellplate_360ul_flat_three_quarters.jpg'),
+    new URL(
+      './images/corning_96_wellplate_360ul_flat_three_quarters.jpg',
+      import.meta.url
+    ).href,
   ],
   'corning_48_wellplate_1.6ml_flat': [
-    require('./images/corning_48_wellplate_1.6ml_flat_photo_three_quarters.jpg'),
+    new URL(
+      './images/corning_48_wellplate_1.6ml_flat_photo_three_quarters.jpg',
+      import.meta.url
+    ).href,
   ],
   'corning_6_wellplate_16.8ml_flat': [
-    require('./images/corning_6_wellplate_16.8ml_flat_photo_three_quarters.jpg'),
+    new URL(
+      './images/corning_6_wellplate_16.8ml_flat_photo_three_quarters.jpg',
+      import.meta.url
+    ).href,
   ],
   eppendorf_96_tiprack_1000ul_eptips: [
-    require('./images/eppendorf_1000ul_tip_eptips_side_view.jpg'),
+    new URL(
+      './images/eppendorf_1000ul_tip_eptips_side_view.jpg',
+      import.meta.url
+    ).href,
   ],
   eppendorf_96_tiprack_10ul_eptips: [
-    require('./images/eppendorf_10ul_tips_eptips_side_view.jpg'),
+    new URL(
+      './images/eppendorf_10ul_tips_eptips_side_view.jpg',
+      import.meta.url
+    ).href,
   ],
   geb_96_tiprack_1000ul: [
-    require('./images/geb_96_tiprack_1000ul_side_view.jpg'),
-    require('./images/geb_1000ul_tip_side_view.jpg'),
+    new URL('./images/geb_96_tiprack_1000ul_side_view.jpg', import.meta.url)
+      .href,
+    new URL('./images/geb_1000ul_tip_side_view.jpg', import.meta.url).href,
   ],
   geb_96_tiprack_10ul: [
-    require('./images/geb_96_tiprack_10ul_side_view.jpg'),
-    require('./images/geb_10ul_tip_side_view.jpg'),
+    new URL('./images/geb_96_tiprack_10ul_side_view.jpg', import.meta.url).href,
+    new URL('./images/geb_10ul_tip_side_view.jpg', import.meta.url).href,
   ],
   nest_1_reservoir_195ml: [
-    require('./images/nest_1_reservoir_195ml_three_quarters.jpg'),
+    new URL(
+      './images/nest_1_reservoir_195ml_three_quarters.jpg',
+      import.meta.url
+    ).href,
   ],
-  nest_1_reservoir_290ml: [require('./images/nest_1_reservoir_290ml.jpg')],
+  nest_1_reservoir_290ml: [
+    new URL('./images/nest_1_reservoir_290ml.jpg', import.meta.url).href,
+  ],
   nest_12_reservoir_15ml: [
-    require('./images/nest_12_reservoir_15ml_three_quarters.jpg'),
+    new URL(
+      './images/nest_12_reservoir_15ml_three_quarters.jpg',
+      import.meta.url
+    ).href,
   ],
   nest_96_wellplate_100ul_pcr_full_skirt: [
-    require('./images/nest_96_wellplate_100ul_pcr_full_skirt_three_quarters.jpg'),
+    new URL(
+      './images/nest_96_wellplate_100ul_pcr_full_skirt_three_quarters.jpg',
+      import.meta.url
+    ).href,
   ],
   nest_96_wellplate_200ul_flat: [
-    require('./images/nest_96_wellplate_200ul_flat_three_quarters.jpg'),
+    new URL(
+      './images/nest_96_wellplate_200ul_flat_three_quarters.jpg',
+      import.meta.url
+    ).href,
   ],
   nest_96_wellplate_2ml_deep: [
-    require('./images/nest_96_wellplate_2ml_deep.jpg'),
+    new URL('./images/nest_96_wellplate_2ml_deep.jpg', import.meta.url).href,
   ],
   opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical: [
-    require('./images/opentrons_10_tuberack_4_6_side_view.jpg'),
-    require('./images/falcon_50ml_15ml_conical_tubes.jpg'),
+    new URL('./images/opentrons_10_tuberack_4_6_side_view.jpg', import.meta.url)
+      .href,
+    new URL('./images/falcon_50ml_15ml_conical_tubes.jpg', import.meta.url)
+      .href,
   ],
   opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical_acrylic: [
-    require('./images/falcon_50ml_15ml_conical_tubes.jpg'),
+    new URL('./images/falcon_50ml_15ml_conical_tubes.jpg', import.meta.url)
+      .href,
   ],
   opentrons_15_tuberack_falcon_15ml_conical: [
-    require('./images/opentrons_15_tuberack_side_view.jpg'),
-    require('./images/falcon_15ml_conical_tube.jpg'),
+    new URL('./images/opentrons_15_tuberack_side_view.jpg', import.meta.url)
+      .href,
+    new URL('./images/falcon_15ml_conical_tube.jpg', import.meta.url).href,
   ],
   opentrons_10_tuberack_nest_4x50ml_6x15ml_conical: [
-    require('./images/opentrons_10_tuberack_4_6_side_view.jpg'),
-    require('./images/nest_50ml_15ml_conical_tubes.jpg'),
+    new URL('./images/opentrons_10_tuberack_4_6_side_view.jpg', import.meta.url)
+      .href,
+    new URL('./images/nest_50ml_15ml_conical_tubes.jpg', import.meta.url).href,
   ],
   opentrons_15_tuberack_nest_15ml_conical: [
-    require('./images/opentrons_15_tuberack_side_view.jpg'),
-    require('./images/nest_15ml_conical_tube.jpg'),
+    new URL('./images/opentrons_15_tuberack_side_view.jpg', import.meta.url)
+      .href,
+    new URL('./images/nest_15ml_conical_tube.jpg', import.meta.url).href,
   ],
   opentrons_6_tuberack_nest_50ml_conical: [
-    require('./images/opentrons_6_tuberack_side_view.jpg'),
-    require('./images/nest_50ml_conical_tube.jpg'),
+    new URL('./images/opentrons_6_tuberack_side_view.jpg', import.meta.url)
+      .href,
+    new URL('./images/nest_50ml_conical_tube.jpg', import.meta.url).href,
   ],
   opentrons_1_trash_1100ml_fixed: [],
   opentrons_1_trash_850ml_fixed: [],
   opentrons_24_aluminumblock_generic_2ml_screwcap: [
-    require('./images/opentrons_24_aluminumblock_side_view.jpg'),
-    require('./images/generic_2ml_screwcap_tube.jpg'),
+    new URL(
+      './images/opentrons_24_aluminumblock_side_view.jpg',
+      import.meta.url
+    ).href,
+    new URL('./images/generic_2ml_screwcap_tube.jpg', import.meta.url).href,
   ],
   'opentrons_24_aluminumblock_nest_0.5ml_screwcap': [
-    require('./images/opentrons_24_aluminumblock_side_view.jpg'),
-    require('./images/nest_0.5ml_screwcap_tube.jpg'),
+    new URL(
+      './images/opentrons_24_aluminumblock_side_view.jpg',
+      import.meta.url
+    ).href,
+    new URL('./images/nest_0.5ml_screwcap_tube.jpg', import.meta.url).href,
   ],
   'opentrons_24_aluminumblock_nest_1.5ml_screwcap': [
-    require('./images/opentrons_24_aluminumblock_side_view.jpg'),
-    require('./images/nest_1.5ml_screwcap_tube.jpg'),
+    new URL(
+      './images/opentrons_24_aluminumblock_side_view.jpg',
+      import.meta.url
+    ).href,
+    new URL('./images/nest_1.5ml_screwcap_tube.jpg', import.meta.url).href,
   ],
   'opentrons_24_aluminumblock_nest_1.5ml_snapcap': [
-    require('./images/opentrons_24_aluminumblock_side_view.jpg'),
-    require('./images/nest_1.5ml_snapcap_tube.jpg'),
+    new URL(
+      './images/opentrons_24_aluminumblock_side_view.jpg',
+      import.meta.url
+    ).href,
+    new URL('./images/nest_1.5ml_snapcap_tube.jpg', import.meta.url).href,
   ],
   opentrons_24_aluminumblock_nest_2ml_screwcap: [
-    require('./images/opentrons_24_aluminumblock_side_view.jpg'),
-    require('./images/nest_2ml_screwcap_tube.jpg'),
+    new URL(
+      './images/opentrons_24_aluminumblock_side_view.jpg',
+      import.meta.url
+    ).href,
+    new URL('./images/nest_2ml_screwcap_tube.jpg', import.meta.url).href,
   ],
   opentrons_24_aluminumblock_nest_2ml_snapcap: [
-    require('./images/opentrons_24_aluminumblock_side_view.jpg'),
-    require('./images/nest_2ml_snapcap_tube.jpg'),
+    new URL(
+      './images/opentrons_24_aluminumblock_side_view.jpg',
+      import.meta.url
+    ).href,
+    new URL('./images/nest_2ml_snapcap_tube.jpg', import.meta.url).href,
   ],
   'opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap': [
-    require('./images/opentrons_24_tuberack_side_view.jpg'),
-    require('./images/eppendorf_1.5ml_safelock_snapcap_tube.jpg'),
+    new URL('./images/opentrons_24_tuberack_side_view.jpg', import.meta.url)
+      .href,
+    new URL(
+      './images/eppendorf_1.5ml_safelock_snapcap_tube.jpg',
+      import.meta.url
+    ).href,
   ],
   opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap: [
-    require('./images/opentrons_24_tuberack_side_view.jpg'),
-    require('./images/eppendorf_2ml_safelock_snapcap_tube.jpg'),
+    new URL('./images/opentrons_24_tuberack_side_view.jpg', import.meta.url)
+      .href,
+    new URL('./images/eppendorf_2ml_safelock_snapcap_tube.jpg', import.meta.url)
+      .href,
   ],
   'opentrons_24_tuberack_nest_0.5ml_screwcap': [
-    require('./images/opentrons_24_tuberack_side_view.jpg'),
-    require('./images/nest_0.5ml_screwcap_tube.jpg'),
+    new URL('./images/opentrons_24_tuberack_side_view.jpg', import.meta.url)
+      .href,
+    new URL('./images/nest_0.5ml_screwcap_tube.jpg', import.meta.url).href,
   ],
   'opentrons_24_tuberack_nest_1.5ml_screwcap': [
-    require('./images/opentrons_24_tuberack_side_view.jpg'),
-    require('./images/nest_1.5ml_screwcap_tube.jpg'),
+    new URL('./images/opentrons_24_tuberack_side_view.jpg', import.meta.url)
+      .href,
+    new URL('./images/nest_1.5ml_screwcap_tube.jpg', import.meta.url).href,
   ],
   'opentrons_24_tuberack_nest_1.5ml_snapcap': [
-    require('./images/opentrons_24_tuberack_side_view.jpg'),
-    require('./images/nest_1.5ml_snapcap_tube.jpg'),
+    new URL('./images/opentrons_24_tuberack_side_view.jpg', import.meta.url)
+      .href,
+    new URL('./images/nest_1.5ml_snapcap_tube.jpg', import.meta.url).href,
   ],
   opentrons_24_tuberack_nest_2ml_screwcap: [
-    require('./images/opentrons_24_tuberack_side_view.jpg'),
-    require('./images/nest_2ml_screwcap_tube.jpg'),
+    new URL('./images/opentrons_24_tuberack_side_view.jpg', import.meta.url)
+      .href,
+    new URL('./images/nest_2ml_screwcap_tube.jpg', import.meta.url).href,
   ],
   opentrons_24_tuberack_nest_2ml_snapcap: [
-    require('./images/opentrons_24_tuberack_side_view.jpg'),
-    require('./images/nest_2ml_snapcap_tube.jpg'),
+    new URL('./images/opentrons_24_tuberack_side_view.jpg', import.meta.url)
+      .href,
+    new URL('./images/nest_2ml_snapcap_tube.jpg', import.meta.url).href,
   ],
   opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap_acrylic: [
-    require('./images/eppendorf_2ml_safelock_snapcap_tube.jpg'),
+    new URL('./images/eppendorf_2ml_safelock_snapcap_tube.jpg', import.meta.url)
+      .href,
   ],
   'opentrons_24_tuberack_generic_0.75ml_snapcap_acrylic': [],
   opentrons_24_tuberack_generic_2ml_screwcap: [
-    require('./images/opentrons_24_tuberack_side_view.jpg'),
-    require('./images/generic_2ml_screwcap_tube.jpg'),
+    new URL('./images/opentrons_24_tuberack_side_view.jpg', import.meta.url)
+      .href,
+    new URL('./images/generic_2ml_screwcap_tube.jpg', import.meta.url).href,
   ],
   'opentrons_40_aluminumblock_eppendorf_24x2ml_safelock_snapcap_generic_16x0.2ml_pcr_strip': [
-    require('./images/eppendorf_2ml_safelock_snapcap_tube.jpg'),
-    require('./images/generic_pcr_strip_200ul_tubes.jpg'),
+    new URL('./images/eppendorf_2ml_safelock_snapcap_tube.jpg', import.meta.url)
+      .href,
+    new URL('./images/generic_pcr_strip_200ul_tubes.jpg', import.meta.url).href,
   ],
   opentrons_6_tuberack_falcon_50ml_conical: [
-    require('./images/opentrons_6_tuberack_side_view.jpg'),
-    require('./images/falcon_50ml_conical_tube.jpg'),
+    new URL('./images/opentrons_6_tuberack_side_view.jpg', import.meta.url)
+      .href,
+    new URL('./images/falcon_50ml_conical_tube.jpg', import.meta.url).href,
   ],
   opentrons_96_aluminumblock_biorad_wellplate_200ul: [
-    require('./images/opentrons_96_aluminumblock_side_view.jpg'),
-    require('./images/biorad_96_wellplate_200ul_pcr_photo_three_quarters.jpg'),
+    new URL(
+      './images/opentrons_96_aluminumblock_side_view.jpg',
+      import.meta.url
+    ).href,
+    new URL(
+      './images/biorad_96_wellplate_200ul_pcr_photo_three_quarters.jpg',
+      import.meta.url
+    ).href,
   ],
   opentrons_96_aluminumblock_generic_pcr_strip_200ul: [
-    require('./images/opentrons_96_aluminumblock_side_view.jpg'),
-    require('./images/generic_pcr_strip_200ul_tubes.jpg'),
+    new URL(
+      './images/opentrons_96_aluminumblock_side_view.jpg',
+      import.meta.url
+    ).href,
+    new URL('./images/generic_pcr_strip_200ul_tubes.jpg', import.meta.url).href,
   ],
   opentrons_96_aluminumblock_nest_wellplate_100ul: [
-    require('./images/opentrons_96_aluminumblock_side_view.jpg'),
-    require('./images/nest_96_wellplate_100ul_pcr_full_skirt_three_quarters.jpg'),
+    new URL(
+      './images/opentrons_96_aluminumblock_side_view.jpg',
+      import.meta.url
+    ).href,
+    new URL(
+      './images/nest_96_wellplate_100ul_pcr_full_skirt_three_quarters.jpg',
+      import.meta.url
+    ).href,
   ],
   opentrons_96_tiprack_1000ul: [
-    require('./images/opentrons_96_tiprack_1000ul_side_view.jpg'),
+    new URL(
+      './images/opentrons_96_tiprack_1000ul_side_view.jpg',
+      import.meta.url
+    ).href,
   ],
   opentrons_96_tiprack_10ul: [
-    require('./images/opentrons_96_tiprack_10ul_side_view.jpg'),
+    new URL('./images/opentrons_96_tiprack_10ul_side_view.jpg', import.meta.url)
+      .href,
   ],
   opentrons_96_tiprack_20ul: [
-    require('./images/opentrons_96_tiprack_10ul_side_view.jpg'),
+    new URL('./images/opentrons_96_tiprack_10ul_side_view.jpg', import.meta.url)
+      .href,
   ],
   opentrons_96_tiprack_300ul: [
-    require('./images/opentrons_96_tiprack_300ul_side_view.jpg'),
+    new URL(
+      './images/opentrons_96_tiprack_300ul_side_view.jpg',
+      import.meta.url
+    ).href,
   ],
   opentrons_96_filtertiprack_1000ul: [
-    require('./images/opentrons_96_tiprack_1000ul_side_view.jpg'),
+    new URL(
+      './images/opentrons_96_tiprack_1000ul_side_view.jpg',
+      import.meta.url
+    ).href,
   ],
   opentrons_96_filtertiprack_10ul: [
-    require('./images/opentrons_96_tiprack_10ul_side_view.jpg'),
+    new URL('./images/opentrons_96_tiprack_10ul_side_view.jpg', import.meta.url)
+      .href,
   ],
   opentrons_96_filtertiprack_20ul: [
-    require('./images/opentrons_96_tiprack_10ul_side_view.jpg'),
+    new URL('./images/opentrons_96_tiprack_10ul_side_view.jpg', import.meta.url)
+      .href,
   ],
   opentrons_96_filtertiprack_200ul: [
-    require('./images/opentrons_96_tiprack_300ul_side_view.jpg'),
+    new URL(
+      './images/opentrons_96_tiprack_300ul_side_view.jpg',
+      import.meta.url
+    ).href,
   ],
   tipone_96_tiprack_200ul: [
-    require('./images/tipone_96_tiprack_200ul_side_view.jpg'),
-    require('./images/tipone_200ul_tip_side_view.jpg'),
+    new URL('./images/tipone_96_tiprack_200ul_side_view.jpg', import.meta.url)
+      .href,
+    new URL('./images/tipone_200ul_tip_side_view.jpg', import.meta.url).href,
   ],
   usascientific_12_reservoir_22ml: [
-    require('./images/usascientific_12_reservoir_22ml_side_view.jpg'),
+    new URL(
+      './images/usascientific_12_reservoir_22ml_side_view.jpg',
+      import.meta.url
+    ).href,
   ],
   'usascientific_96_wellplate_2.4ml_deep': [
-    require('./images/usascientific_96_wellplate_2.4ml_deep_side_view.jpg'),
+    new URL(
+      './images/usascientific_96_wellplate_2.4ml_deep_side_view.jpg',
+      import.meta.url
+    ).href,
   ],
   thermoscientificnunc_96_wellplate_1300ul: [
-    require('./images/thermoscientificnunc_96_wellplate_1300ul.jpg'),
+    new URL(
+      './images/thermoscientificnunc_96_wellplate_1300ul.jpg',
+      import.meta.url
+    ).href,
   ],
   thermoscientificnunc_96_wellplate_2000ul: [
-    require('./images/thermoscientificnunc_96_wellplate_2000ul.jpg'),
+    new URL(
+      './images/thermoscientificnunc_96_wellplate_2000ul.jpg',
+      import.meta.url
+    ).href,
   ],
   appliedbiosystemsmicroamp_384_wellplate_40ul: [
-    require('./images/appliedbiosystemsmicroamp_384_wellplate_40ul.jpg'),
+    new URL(
+      './images/appliedbiosystemsmicroamp_384_wellplate_40ul.jpg',
+      import.meta.url
+    ).href,
   ],
   biorad_384_wellplate_50ul: [
-    require('./images/biorad_384_wellplate_50ul.jpg'),
+    new URL('./images/biorad_384_wellplate_50ul.jpg', import.meta.url).href,
   ],
   opentrons_96_deep_well_adapter: [
-    require('./images/deep_well_plate_adapter.jpg'),
+    new URL('./images/deep_well_plate_adapter.jpg', import.meta.url).href,
   ],
   opentrons_96_flat_bottom_adapter: [
-    require('./images/flat_bottom_plate_adapter.jpg'),
+    new URL('./images/flat_bottom_plate_adapter.jpg', import.meta.url).href,
   ],
-  opentrons_96_pcr_adapter: [require('./images/pcr_plate_adapter.jpg')],
+  opentrons_96_pcr_adapter: [
+    new URL('./images/pcr_plate_adapter.jpg', import.meta.url).href,
+  ],
   opentrons_universal_flat_adapter: [
-    require('./images/universal_flat_adapter.jpg'),
+    new URL('./images/universal_flat_adapter.jpg', import.meta.url).href,
   ],
   opentrons_aluminum_flat_bottom_plate: [
-    require('./images/flat_bottom_aluminum.png'),
+    new URL('./images/flat_bottom_aluminum.png', import.meta.url).href,
   ],
   opentrons_96_well_aluminum_block: [
-    require('./images/opentrons_96_aluminumblock_side_view.jpg'),
+    new URL(
+      './images/opentrons_96_aluminumblock_side_view.jpg',
+      import.meta.url
+    ).href,
   ],
   opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep: [
-    require('./images/deep_well_plate_adapter.jpg'),
-    require('./images/nest_96_wellplate_2ml_deep.jpg'),
+    new URL('./images/deep_well_plate_adapter.jpg', import.meta.url).href,
+    new URL('./images/nest_96_wellplate_2ml_deep.jpg', import.meta.url).href,
   ],
   opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat: [
-    require('./images/flat_bottom_plate_adapter.jpg'),
-    require('./images/nest_96_wellplate_200ul_flat_three_quarters.jpg'),
+    new URL('./images/flat_bottom_plate_adapter.jpg', import.meta.url).href,
+    new URL(
+      './images/nest_96_wellplate_200ul_flat_three_quarters.jpg',
+      import.meta.url
+    ).href,
   ],
   opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt: [
-    require('./images/pcr_plate_adapter.jpg'),
-    require('./images/nest_96_wellplate_100ul_pcr_full_skirt_three_quarters.jpg'),
+    new URL('./images/pcr_plate_adapter.jpg', import.meta.url).href,
+    new URL(
+      './images/nest_96_wellplate_100ul_pcr_full_skirt_three_quarters.jpg',
+      import.meta.url
+    ).href,
   ],
   opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat: [
-    require('./images/universal_flat_adapter.jpg'),
-    require('./images/corning_384_wellplate_112ul_flat_photo_three_quarters.jpg'),
+    new URL('./images/universal_flat_adapter.jpg', import.meta.url).href,
+    new URL(
+      './images/corning_384_wellplate_112ul_flat_photo_three_quarters.jpg',
+      import.meta.url
+    ).href,
   ],
 }

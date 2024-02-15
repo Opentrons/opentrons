@@ -22,9 +22,9 @@ export default defineConfig({
         main: 'src/main.ts',
         preload: 'src/preload.ts',
       },
-      
+
       formats: ['cjs'],
-    }
+    },
   },
   plugins: [
     react({
