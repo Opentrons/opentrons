@@ -12,7 +12,7 @@ export const getPipetteWizardSteps = (
   mount: PipetteMount,
   selectedPipette: SelectablePipettes,
   isGantryEmpty: boolean
-): PipetteWizardStep[] => {
+): PipetteWizardStep[] | null => {
   switch (flowType) {
     case FLOWS.CALIBRATE: {
       return [
@@ -205,5 +205,5 @@ export const getPipetteWizardSteps = (
       }
     }
   }
-  return []
+  return null
 }
