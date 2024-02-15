@@ -979,9 +979,9 @@ class ProtocolContext(CommandPublisher):
 
         A human can resume the protocol in the Opentrons App or on the touchscreen.
 
-        This function returns immediately, but the next function call that
-        is blocked by a paused robot (anything that involves moving) will
-        not return until the protocol is resumed.
+        .. note::
+            In Python Protocol API version 2.13 and earlier, the pause will only
+            take effect on the next function call that involves moving the robot.
 
         :param str msg: An optional message to show in the run log entry for the pause step.
         """
