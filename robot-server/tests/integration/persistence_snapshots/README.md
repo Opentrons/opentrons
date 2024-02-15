@@ -80,3 +80,7 @@ Contains an invalid SQLite database file, to simulate a database that's been cor
 ### ot3_v0.14.0_python_validation
 
 This has a single Python protocol and a single run of that protocol. The protocol file is valid on the Flex's internal release v0.14.0, but invalid for the first public release, because of additional validation of the `metadata` and `requirements` dicts that was added late during Flex development. See https://opentrons.atlassian.net/browse/RSS-306.
+
+### v7.1.1
+
+An amalgamation of the office's ABR (Application Based Reliability) robots, which were running the v7.1.1 stable release. A few runs were extracted from each robot and manually combined to form a single Frankenstein persistence directory.
