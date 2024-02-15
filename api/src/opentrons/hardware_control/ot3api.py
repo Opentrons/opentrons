@@ -244,6 +244,7 @@ class OT3API(
         self._pipette_handler = OT3PipetteHandler({m: None for m in OT3Mount})
         self._gripper_handler = GripperHandler(gripper=None)
         self._gantry_load = GantryLoad.LOW_THROUGHPUT
+        self._configured_since_update = True
         OT3RobotCalibrationProvider.__init__(self, self._config)
         ExecutionManagerProvider.__init__(self, isinstance(backend, OT3Simulator))
 
@@ -523,6 +524,7 @@ class OT3API(
                     message="Update failed because of uncaught error",
                     wrapping=[PythonException(e)],
                 ) from e
+            self._configured_since_update = False
 
     # Incidentals (i.e. not motion) API
 
@@ -651,8 +653,8 @@ class OT3API(
         and set up hardware controller internal state if necessary.
         """
         skip_configure = await self._cache_instruments(require)
-        if not skip_configure:
-            self._log.info("Instrument model cache updated, reconfiguring")
+        if not skip_configure or not self._configured_since_update:
+            self._log.info("Reconfiguring instrument cache")
             await self._configure_instruments()
 
     async def _cache_instruments(  # noqa: C901
@@ -725,6 +727,7 @@ class OT3API(
         await self.set_gantry_load(self._gantry_load_from_instruments())
         await self.refresh_positions()
         await self.reset_tip_detectors(False)
+        self._configured_since_update = False
 
     async def reset_tip_detectors(
         self,
