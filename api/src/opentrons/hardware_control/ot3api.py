@@ -727,7 +727,7 @@ class OT3API(
         await self.set_gantry_load(self._gantry_load_from_instruments())
         await self.refresh_positions()
         await self.reset_tip_detectors(False)
-        self._configured_since_update = False
+        self._configured_since_update = True
 
     async def reset_tip_detectors(
         self,
