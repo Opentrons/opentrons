@@ -24,29 +24,13 @@ const mockSingleMountPipetteAttached = {
 }
 
 describe('getPipetteWizardStepsForProtocol', () => {
-  it('returns an empty array of info when the attached pipette matches required pipette', () => {
-    const mockFlowSteps = [] as PipetteWizardStep[]
-    expect(
-      getPipetteWizardStepsForProtocol(
-        mockSingleMountPipetteAttached,
-        [
-          {
-            id: '123',
-            pipetteName: 'p1000_single_flex',
-            mount: 'left',
-          },
-        ],
-        LEFT
-      )
-    ).toStrictEqual(mockFlowSteps)
-  })
   it('returns an empty array when there is no pipette attached and no pipette is needed', () => {
-    const mockFlowSteps = [] as PipetteWizardStep[]
+    const mockFlowSteps = null as PipetteWizardStep[] | null
     expect(
       getPipetteWizardStepsForProtocol({ left: null, right: null }, [], LEFT)
     ).toStrictEqual(mockFlowSteps)
   })
-  it('returns the calibration flow only when correct pipette is attached but there is no pip cal data', () => {
+  it('returns the calibration flow only when correct pipette is attached even if htere is pip cal data', () => {
     const mockFlowSteps = [
       {
         section: SECTIONS.BEFORE_BEGINNING,
@@ -71,7 +55,6 @@ describe('getPipetteWizardStepsForProtocol', () => {
           left: null,
           right: {
             ...mockAttachedPipetteInformation,
-            data: { calibratedOffset: undefined as any },
           } as any,
         },
         [{ id: '123', pipetteName: 'p1000_single_flex', mount: 'right' }],
