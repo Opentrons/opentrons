@@ -30,7 +30,7 @@ export const StepList = (): JSX.Element => {
   const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
   const dispatch = useDispatch<ThunkDispatch<any>>()
-  console.log('orderedStepIds from stepList', orderedStepIds)
+
   const handleKeyDown: (e: KeyboardEvent) => void = e => {
     const key = e.key
     const altIsPressed = e.altKey

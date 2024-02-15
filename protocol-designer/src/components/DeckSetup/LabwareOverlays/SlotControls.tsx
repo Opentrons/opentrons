@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import noop from 'lodash/noop'
-import { useDrop, DropTargetMonitor } from 'react-dnd'
+import { useDrop, DropTargetMonitor, useDrag } from 'react-dnd'
 import cx from 'classnames'
 import { Icon, RobotCoordsForeignDiv } from '@opentrons/components'
 import { DND_TYPES } from '../../../constants'
@@ -61,6 +61,11 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
   const dispatch = useDispatch()
 
   const { t } = useTranslation('deck')
+
+  const [, drag] = useDrag({
+    type: DND_TYPES.LABWARE,
+    item: { labwareOnDeck: null },
+  })
 
   const [{ draggedItem, itemType, isOver }, drop] = useDrop({
     accept: DND_TYPES.LABWARE,
@@ -150,7 +155,7 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
     dispatch(openAddLabwareModal({ slot: slotId }))
   }
 
-  drop(ref)
+  drag(drop(ref))
 
   return (
     <g ref={ref}>

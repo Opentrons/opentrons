@@ -7,6 +7,7 @@ import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { DropTargetMonitor, useDrag, useDrop } from 'react-dnd'
 import { NameThisLabware } from './NameThisLabware'
 import { DND_TYPES } from '../../../constants'
+import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import {
   deleteContainer,
   duplicateLabware,
@@ -38,7 +39,10 @@ export const EditLabware = (props: Props): JSX.Element | null => {
   const savedLabware = useSelector(labwareIngredSelectors.getSavedLabware)
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const { t } = useTranslation('deck')
+  const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
+  const labware = activeDeckSetup.labware
   const ref = React.useRef(null)
+  const [newSlot, setSlot] = React.useState<string | null>(null)
 
   const { isTiprack } = labwareOnDeck.def.parameters
   const hasName = savedLabware[labwareOnDeck.id]
@@ -71,7 +75,9 @@ export const EditLabware = (props: Props): JSX.Element | null => {
     },
     drop: (item: DroppedItem) => {
       const draggedLabware = item?.labwareOnDeck
-      if (draggedLabware) {
+      if (newSlot != null) {
+        dispatch(moveDeckItem(newSlot, labwareOnDeck.slot))
+      } else if (draggedLabware != null) {
         dispatch(moveDeckItem(draggedLabware.slot, labwareOnDeck.slot))
       }
     },
@@ -85,6 +91,16 @@ export const EditLabware = (props: Props): JSX.Element | null => {
     }),
   }))
 
+  const draggedItem = Object.values(labware).find(
+    l => l.id === draggedLabware?.labwareOnDeck?.id
+  )
+
+  React.useEffect(() => {
+    if (draggedItem != null) {
+      setSlot(draggedItem.slot)
+    }
+  })
+
   if (isYetUnnamed && !isTiprack) {
     return (
       <NameThisLabware
@@ -93,8 +109,7 @@ export const EditLabware = (props: Props): JSX.Element | null => {
       />
     )
   } else {
-    const isBeingDragged =
-      draggedLabware?.labwareOnDeck?.slot === labwareOnDeck.slot
+    const isBeingDragged = draggedItem?.slot === labwareOnDeck.slot
 
     let contents: React.ReactNode | null = null
 
@@ -111,6 +126,11 @@ export const EditLabware = (props: Props): JSX.Element | null => {
             `overlay.slot.${isBeingDragged ? 'drag_to_new_slot' : 'place_here'}`
           )}
         </div>
+        // <LabwareOnDeckFromComp
+        //   x={cursor.x}
+        //   y={cursor.y}
+        //   labwareOnDeck={draggedLabware.labwareOnDeck}
+        // />
       )
     } else {
       contents = (

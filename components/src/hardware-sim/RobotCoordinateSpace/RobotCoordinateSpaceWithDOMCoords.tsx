@@ -34,9 +34,16 @@ export function RobotCoordinateSpaceWithDOMCoords(
     cursorPoint.x = x
     cursorPoint.y = y
 
-    return cursorPoint.matrixTransform(
-      wrapperRef.current.getScreenCTM()?.inverse()
-    )
+    const screenCTM = wrapperRef.current.getScreenCTM()
+
+    if (!screenCTM) return { x, y }
+
+    const transformedY = wrapperRef.current.clientHeight - y
+
+    cursorPoint.y = transformedY
+    const transformedPoint = cursorPoint.matrixTransform(screenCTM.inverse())
+
+    return transformedPoint
   }
   if (deckDef == null && viewBox == null) return null
 

@@ -39,7 +39,7 @@
     "react": "18.2.0",
     "react-color": "2.19.3",
     "react-dnd": "16.0.1",
-    "react-dnd-mouse-backend": "1.0.0-rc.2",
+    "react-dnd-html5-backend": "16.0.1",
     "react-dom": "18.2.0",
     "react-hook-form": "7.49.3",
     "react-i18next": "14.0.0",

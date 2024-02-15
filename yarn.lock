@@ -17516,10 +17516,12 @@ react-color@2.19.3:
     reactcss "^1.2.0"
     tinycolor2 "^1.4.1"
 
-react-dnd-mouse-backend@1.0.0-rc.2:
-  version "1.0.0-rc.2"
-  resolved "https://registry.yarnpkg.com/react-dnd-mouse-backend/-/react-dnd-mouse-backend-1.0.0-rc.2.tgz#bc114d2e91ee6d079adc6920c22167a9780185af"
-  integrity sha512-mmbyXvg6YGKxdi7gx+ICFD0pFEMMiG1x7FBSu8ZYXBCqxVPkm8pkhrHfzd8AY89YmcWoUeqL3/DSU0u9lkwbsQ==
+react-dnd-html5-backend@16.0.1:
+  version "16.0.1"
+  resolved "https://registry.yarnpkg.com/react-dnd-html5-backend/-/react-dnd-html5-backend-16.0.1.tgz#87faef15845d512a23b3c08d29ecfd34871688b6"
+  integrity sha512-Wu3dw5aDJmOGw8WjH1I1/yTH+vlXEL4vmjk5p+MHxP8HuHJS1lAGeIdG/hze1AvNeXWo/JgULV87LyQOr+r5jw==
+  dependencies:
+    dnd-core "^16.0.1"
 
 react-dnd@16.0.1:
   version "16.0.1"

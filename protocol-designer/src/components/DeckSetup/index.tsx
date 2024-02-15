@@ -556,6 +556,7 @@ export const DeckSetup = (): JSX.Element => {
   return (
     <div className={styles.deck_row}>
       {drilledDown && <BrowseLabwareModal />}
+
       <div ref={wrapperRef} className={styles.deck_wrapper}>
         <RobotCoordinateSpaceWithDOMCoords
           height="100%"

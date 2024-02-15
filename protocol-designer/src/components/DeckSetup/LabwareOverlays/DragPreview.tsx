@@ -25,13 +25,13 @@ export const DragPreview = (props: DragPreviewProps): JSX.Element | null => {
   }
 
   const { x, y } = currentOffset
-  const cursor: XYCoord = getRobotCoordsFromDOMCoords(x, y)
+  const cursor: XYCoord = getRobotCoordsFromDOMCoords(x, -y)
 
   return (
     <LabwareOnDeck
       className={styles.labware_drag_preview}
       x={cursor.x}
-      y={cursor.y - item.labwareOnDeck.def.dimensions.yDimension}
+      y={cursor.y + 475}
       labwareOnDeck={item.labwareOnDeck}
     />
   )
