@@ -6,6 +6,7 @@ import {
   useDrop,
   useDrag,
   DropTargetOptions,
+  XYCoord,
 } from 'react-dnd'
 import isEqual from 'lodash/isEqual'
 
@@ -25,27 +26,29 @@ interface DragDropStepItemProps extends ConnectedStepItemProps {
   stepId: StepIdType
   findStepIndex: (stepIdType: StepIdType) => number
   clickDrop: () => void
-  moveStep: (stepId: StepIdType, value: number) => void
+  moveStep: (dragIndex: number, value: number) => void
   setIsOver: React.Dispatch<React.SetStateAction<boolean>>
+  index: number
 }
 
 interface DropType {
   stepId: StepIdType
+  index: number
 }
 
 const DragDropStepItem = (props: DragDropStepItemProps): JSX.Element => {
-  const { stepId, moveStep, clickDrop, findStepIndex, setIsOver } = props
+  const { stepId, moveStep, clickDrop, setIsOver, index } = props
   const ref = React.useRef<HTMLDivElement>(null)
 
   const [{ isDragging }, drag] = useDrag({
     type: DND_TYPES.STEP_ITEM,
-    item: { stepId },
+    item: { stepId, index },
     collect: (monitor: DragLayerMonitor) => ({
       isDragging: monitor.isDragging(),
     }),
   })
 
-  const [{ isOver }, drop] = useDrop(() => ({
+  const [{ isOver, handlerId }, drop] = useDrop(() => ({
     accept: DND_TYPES.STEP_ITEM,
     canDrop: () => {
       return true
@@ -53,16 +56,36 @@ const DragDropStepItem = (props: DragDropStepItemProps): JSX.Element => {
     drop: () => {
       clickDrop()
     },
-    hover: (item: DropType) => {
-      const draggedId = item.stepId
-
-      if (draggedId !== stepId) {
-        const overIndex = findStepIndex(stepId)
-        moveStep(draggedId, overIndex)
+    hover(item: DropType, monitor: DropTargetOptions) {
+      if (!ref.current) {
+        return
       }
+      const dragIndex = item.index
+      const hoverIndex = index
+
+      if (dragIndex === hoverIndex) {
+        return
+      }
+
+      const hoverBoundingRect = ref.current?.getBoundingClientRect()
+      const hoverMiddleY =
+        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
+      const clientOffset = monitor.getClientOffset()
+      const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top
+
+      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+        return
+      }
+      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+        return
+      }
+      moveStep(dragIndex, hoverIndex)
+
+      item.index = hoverIndex
     },
     collect: (monitor: DropTargetOptions) => ({
       isOver: monitor.isOver(),
+      handlerId: monitor.getHandlerId(),
     }),
   }))
 
@@ -72,7 +95,11 @@ const DragDropStepItem = (props: DragDropStepItemProps): JSX.Element => {
 
   drag(drop(ref))
   return (
-    <div ref={ref} style={{ opacity: isDragging ? 0.3 : 1 }}>
+    <div
+      ref={ref}
+      style={{ opacity: isDragging ? 0.3 : 1 }}
+      data-handler-id={handlerId}
+    >
       <ConnectedStepItem {...props} stepId={stepId} />
     </div>
   )
@@ -101,19 +128,19 @@ export const DraggableStepItems = (
     }
   }
 
-  const moveStep = (stepId: StepIdType, targetIndex: number): void => {
-    const currentIndex = findStepIndex(stepId)
-    const currentRemoved = [
-      ...stepIds.slice(0, currentIndex),
-      ...stepIds.slice(currentIndex + 1, stepIds.length),
-    ]
-    const currentReinserted = [
-      ...currentRemoved.slice(0, targetIndex),
-      stepId,
-      ...currentRemoved.slice(targetIndex, currentRemoved.length),
-    ]
-    setStepIds(currentReinserted)
-  }
+  const moveStep = React.useCallback(
+    (dragIndex: number, hoverIndex: number) => {
+      setStepIds((prevCards: StepIdType[]) => {
+        const updatedCards = [...prevCards]
+        const draggedCard = updatedCards[dragIndex]
+        updatedCards.splice(dragIndex, 1)
+        updatedCards.splice(hoverIndex, 0, draggedCard)
+        return updatedCards
+      })
+    },
+    []
+  )
+
   const findStepIndex = (stepId: StepIdType): number =>
     stepIds.findIndex(id => stepId === id)
 
@@ -134,6 +161,7 @@ export const DraggableStepItems = (
               findStepIndex={findStepIndex}
               clickDrop={clickDrop}
               setIsOver={setIsOver}
+              index={index}
             />
           ))
         }
