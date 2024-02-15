@@ -4,7 +4,7 @@ from enum import Enum
 _TOPIC_BASE = "robot-server"
 
 
-class Topics(Enum):
+class Topics(str, Enum):
     """Notification Topics
 
     MQTT functional equivalent of endpoints.
