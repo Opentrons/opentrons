@@ -10,7 +10,7 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 Welcome to the v7.2.0 release of the Opentrons robot software!
 
-This update may take longer than usual if your robot has a lot of long protocols and runs stored on it. Allow *approximately 25 minutes* for your robot to restart. This delay will only happen once.
+This update may take longer than usual if your robot has a lot of long protocols and runs stored on it. Allow *approximately 20 minutes* for your robot to restart. This delay will only happen once.
 
 If you don't care about preserving your labware offsets and run history, you can avoid the delay by clearing your runs and protocols before starting this update. Go to **Robot Settings** > **Device Reset** and select **Clear protocol run history**.
 
