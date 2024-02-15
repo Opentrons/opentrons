@@ -45,7 +45,6 @@ describe('GripperCard', () => {
         },
       } as GripperData,
       isCalibrated: true,
-      setSubsystemToUpdate: jest.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -88,7 +87,6 @@ describe('GripperCard', () => {
         },
       } as GripperData,
       isCalibrated: false,
-      setSubsystemToUpdate: jest.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -112,7 +110,6 @@ describe('GripperCard', () => {
         },
       } as GripperData,
       isCalibrated: false,
-      setSubsystemToUpdate: jest.fn(),
       isRunActive: false,
       isEstopNotDisengaged: true,
     }
@@ -156,7 +153,6 @@ describe('GripperCard', () => {
     props = {
       attachedGripper: null,
       isCalibrated: false,
-      setSubsystemToUpdate: jest.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -175,16 +171,15 @@ describe('GripperCard', () => {
         ok: false,
       } as any,
       isCalibrated: false,
-      setSubsystemToUpdate: jest.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
     render(props)
     screen.getByText('Extension mount')
     screen.getByText('Instrument attached')
-    screen.getByText('Firmware update available.')
-    fireEvent.click(screen.getByText('Update now'))
-    expect(props.setSubsystemToUpdate).toHaveBeenCalledWith('gripper')
+    screen.getByText(
+      `Instrument firmware update needed. Start the update on the robot's touchscreen.`
+    )
   })
   it('renders firmware update in progress state if gripper is bad and update in progress', () => {
     mockUseCurrentSubsystemUpdateQuery.mockReturnValue({
@@ -195,7 +190,6 @@ describe('GripperCard', () => {
         ok: false,
       } as any,
       isCalibrated: true,
-      setSubsystemToUpdate: jest.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
