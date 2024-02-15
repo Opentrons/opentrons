@@ -33,7 +33,7 @@
 }
 
 .slot_overlay.disabled {
-  background-color: color-mod(var(--c-light-gray) alpha(0.9));
+  background-color: color-mod(var(--c-light-gray) alpha(0.7));
   color: var(--c-font-dark);
 }
 

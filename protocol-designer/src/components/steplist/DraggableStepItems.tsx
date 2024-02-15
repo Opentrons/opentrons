@@ -24,7 +24,6 @@ import styles from './StepItem.css'
 
 interface DragDropStepItemProps extends ConnectedStepItemProps {
   stepId: StepIdType
-  findStepIndex: (stepIdType: StepIdType) => number
   clickDrop: () => void
   moveStep: (dragIndex: number, value: number) => void
   setIsOver: React.Dispatch<React.SetStateAction<boolean>>
@@ -141,9 +140,6 @@ export const DraggableStepItems = (
     []
   )
 
-  const findStepIndex = (stepId: StepIdType): number =>
-    stepIds.findIndex(id => stepId === id)
-
   const currentIds = isOver ? stepIds : orderedStepIds
 
   return (
@@ -158,7 +154,6 @@ export const DraggableStepItems = (
               //  @ts-expect-error
               onStepContextMenu={makeStepOnContextMenu(stepId)}
               moveStep={moveStep}
-              findStepIndex={findStepIndex}
               clickDrop={clickDrop}
               setIsOver={setIsOver}
               index={index}

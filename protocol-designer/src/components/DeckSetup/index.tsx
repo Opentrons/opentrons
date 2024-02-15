@@ -8,7 +8,6 @@ import {
   FlexTrash,
   Module,
   RobotCoordinateSpaceWithDOMCoords,
-  RobotWorkSpaceRenderProps,
   SingleSlotFixture,
   StagingAreaFixture,
   StagingAreaLocation,
@@ -64,7 +63,6 @@ import {
   AdapterControls,
   SlotControls,
   LabwareControls,
-  DragPreview,
 } from './LabwareOverlays'
 import { FlexModuleTag } from './FlexModuleTag'
 import { Ot2ModuleTag } from './Ot2ModuleTag'
@@ -102,7 +100,6 @@ const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
 ]
 
 interface ContentsProps {
-  getRobotCoordsFromDOMCoords: RobotWorkSpaceRenderProps['getRobotCoordsFromDOMCoords']
   activeDeckSetup: InitialDeckSetup
   selectedTerminalItemId?: TerminalItemId | null
   showGen1MultichannelCollisionWarnings: boolean
@@ -118,7 +115,6 @@ const darkFill = COLORS.grey60
 export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   const {
     activeDeckSetup,
-    getRobotCoordsFromDOMCoords,
     showGen1MultichannelCollisionWarnings,
     deckDef,
     robotType,
@@ -482,7 +478,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
           </React.Fragment>
         )
       })}
-      <DragPreview getRobotCoordsFromDOMCoords={getRobotCoordsFromDOMCoords} />
     </>
   )
 }
@@ -567,7 +562,7 @@ export const DeckSetup = (): JSX.Element => {
               : deckDef.cornerOffsetFromOrigin[1]
           } ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
         >
-          {({ getRobotCoordsFromDOMCoords }) => (
+          {() => (
             <>
               {robotType === OT2_ROBOT_TYPE ? (
                 <DeckFromLayers
@@ -652,7 +647,7 @@ export const DeckSetup = (): JSX.Element => {
                 )}
                 {...{
                   deckDef,
-                  getRobotCoordsFromDOMCoords,
+
                   showGen1MultichannelCollisionWarnings,
                 }}
               />

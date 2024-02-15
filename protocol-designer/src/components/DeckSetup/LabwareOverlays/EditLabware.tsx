@@ -115,23 +115,8 @@ export const EditLabware = (props: Props): JSX.Element | null => {
 
     if (swapBlocked) {
       contents = null
-    } else if (draggedLabware) {
-      contents = (
-        <div
-          className={cx(styles.overlay_button, {
-            [styles.drag_text]: isBeingDragged,
-          })}
-        >
-          {t(
-            `overlay.slot.${isBeingDragged ? 'drag_to_new_slot' : 'place_here'}`
-          )}
-        </div>
-        // <LabwareOnDeckFromComp
-        //   x={cursor.x}
-        //   y={cursor.y}
-        //   labwareOnDeck={draggedLabware.labwareOnDeck}
-        // />
-      )
+    } else if (draggedLabware != null) {
+      contents = null
     } else {
       contents = (
         <>

@@ -4,10 +4,6 @@ import type { DeckDefinition, DeckSlot } from '@opentrons/shared-data'
 
 export interface RobotCoordinateSpaceWithDOMCoordsRenderProps {
   deckSlotsById: { [slotId: string]: DeckSlot }
-  getRobotCoordsFromDOMCoords: (
-    domX: number,
-    domY: number
-  ) => { x: number; y: number }
 }
 
 interface RobotCoordinateSpaceWithDOMCoordsProps
@@ -19,32 +15,12 @@ interface RobotCoordinateSpaceWithDOMCoordsProps
   ) => React.ReactNode
 }
 
-type GetRobotCoordsFromDOMCoords = RobotCoordinateSpaceWithDOMCoordsRenderProps['getRobotCoordsFromDOMCoords']
-
 export function RobotCoordinateSpaceWithDOMCoords(
   props: RobotCoordinateSpaceWithDOMCoordsProps
 ): JSX.Element | null {
   const { children, deckDef, viewBox, ...restProps } = props
   const wrapperRef = React.useRef<SVGSVGElement>(null)
-  const getRobotCoordsFromDOMCoords: GetRobotCoordsFromDOMCoords = (x, y) => {
-    if (wrapperRef.current == null) return { x: 0, y: 0 }
 
-    const cursorPoint = wrapperRef.current.createSVGPoint()
-
-    cursorPoint.x = x
-    cursorPoint.y = y
-
-    const screenCTM = wrapperRef.current.getScreenCTM()
-
-    if (!screenCTM) return { x, y }
-
-    const transformedY = wrapperRef.current.clientHeight - y
-
-    cursorPoint.y = transformedY
-    const transformedPoint = cursorPoint.matrixTransform(screenCTM.inverse())
-
-    return transformedPoint
-  }
   if (deckDef == null && viewBox == null) return null
 
   let wholeDeckViewBox
@@ -66,7 +42,7 @@ export function RobotCoordinateSpaceWithDOMCoords(
       transform="scale(1, -1)"
       {...restProps}
     >
-      {children?.({ deckSlotsById, getRobotCoordsFromDOMCoords })}
+      {children?.({ deckSlotsById })}
     </Svg>
   )
 }
