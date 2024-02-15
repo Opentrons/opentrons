@@ -182,9 +182,7 @@ dev-app-update.yml:
 dev: export NODE_ENV := development
 dev: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
 dev: clean-dev-autoupdate ./dev-app-update.yml
-	echo STARTING VITE!
 	vite build
-	echo STARTING ELECTRON!
 	$(electron)
 
 .PHONY: test
