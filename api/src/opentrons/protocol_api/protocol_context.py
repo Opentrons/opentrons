@@ -940,11 +940,11 @@ class ProtocolContext(CommandPublisher):
     def pause(self, msg: Optional[str] = None) -> None:
         """Pause execution of the protocol until it's resumed.
 
-        A human can resume the protocol through the Opentrons App.
+        A human can resume the protocol through the Opentrons App or Flex touchscreen.
 
-        This function returns immediately, but the next function call that
-        is blocked by a paused robot (anything that involves moving) will
-        not return until the protocol is resumed.
+        .. note::
+            In Python Protocol API versions 2.13 and earlier, the pause will only
+            take effect on the next function call that involves moving the robot.
 
         :param str msg: An optional message to show to connected clients. The
             Opentrons App will show this in the run log.
