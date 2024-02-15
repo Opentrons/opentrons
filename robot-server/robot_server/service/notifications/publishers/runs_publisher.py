@@ -45,14 +45,26 @@ class RunsPublisher:
                     get_state_summary=get_state_summary,
                 )
             )
+        else:
+            await self.stop_polling_engine_store()
+            self._poller = asyncio.create_task(
+                self._poll_engine_store(
+                    get_current_command=get_current_command,
+                    run_id=run_id,
+                    get_state_summary=get_state_summary,
+                )
+            )
 
     async def stop_polling_engine_store(self) -> None:
         """Stops polling the engine store."""
         if self._poller is not None:
             self._run_data_manager_polling.set()
-            await self._client.publish_async(topic=Topics.RUNS_CURRENT_COMMAND.value)
             self._poller.cancel()
             self._poller = None
+            self._run_data_manager_polling.clear()
+            self._previous_current_command = None
+            self._previous_state_summary_status = None
+            await self._client.publish_async(topic=Topics.RUNS_CURRENT_COMMAND)
 
     def publish_runs(self, run_id: str) -> None:
         """Publishes the equivalent of GET /runs and GET /runs/:runId.
@@ -60,8 +72,8 @@ class RunsPublisher:
         Args:
             run_id: ID of the current run.
         """
-        self._client.publish(topic=Topics.RUNS.value)
-        self._client.publish(topic=f"{Topics.RUNS.value}/{run_id}")
+        self._client.publish(topic=Topics.RUNS)
+        self._client.publish(topic=f"{Topics.RUNS}/{run_id}")
 
     async def _poll_engine_store(
         self,
@@ -81,17 +93,12 @@ class RunsPublisher:
             current_state_summary_status = (
                 current_state_summary.status if current_state_summary else None
             )
-            if (
-                current_command is not None
-                and self._previous_current_command != current_command
-            ):
+
+            if self._previous_current_command != current_command:
                 await self._publish_current_command()
                 self._previous_current_command = current_command
 
-            if (
-                current_state_summary_status is not None
-                and self._previous_state_summary_status != current_state_summary_status
-            ):
+            if self._previous_state_summary_status != current_state_summary_status:
                 await self._publish_runs_async(run_id=run_id)
                 self._previous_state_summary_status = current_state_summary_status
             await asyncio.sleep(1)
@@ -100,7 +107,7 @@ class RunsPublisher:
         self,
     ) -> None:
         """Publishes the equivalent of GET /runs/:runId/commands?cursor=null&pageLength=1."""
-        await self._client.publish_async(topic=Topics.RUNS_CURRENT_COMMAND.value)
+        await self._client.publish_async(topic=Topics.RUNS_CURRENT_COMMAND)
 
     async def _publish_runs_async(self, run_id: str) -> None:
         """Asynchronously publishes the equivalent of GET /runs and GET /runs/:runId.
@@ -108,8 +115,8 @@ class RunsPublisher:
         Args:
             run_id: ID of the current run.
         """
-        await self._client.publish_async(topic=Topics.RUNS.value)
-        await self._client.publish_async(topic=f"{Topics.RUNS.value}/{run_id}")
+        await self._client.publish_async(topic=Topics.RUNS)
+        await self._client.publish_async(topic=f"{Topics.RUNS}/{run_id}")
 
 
 _runs_publisher_accessor: AppStateAccessor[RunsPublisher] = AppStateAccessor[
