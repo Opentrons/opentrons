@@ -12,6 +12,15 @@ Welcome to the v7.2.0 release of the Opentrons App!
 
 The Linux version of the Opentrons App now requires Ubuntu 20.04 or newer.
 
+### New Features
+
+- Added a warning in case you need to manually remove tips from a pipette after power cycling the robot.
+
+### Improved Features
+
+- Commands involving the trash bin or waste chute now appear in the run preview.
+- The app will prompt you to reanalyze protocols that haven't been analyzed in such a long time that intervening changes to the app could affect their behavior.
+
 ### Bug Fixes
 
 - The OT-2 now accurately calculates the position of the Thermocycler. If you previously compensated for the incorrect position with labware offsets, re-run Labware Position Check to avoid pipette crashes.
