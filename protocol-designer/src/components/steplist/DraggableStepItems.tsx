@@ -6,7 +6,6 @@ import {
   useDrop,
   useDrag,
   DropTargetOptions,
-  XYCoord,
 } from 'react-dnd'
 import isEqual from 'lodash/isEqual'
 
@@ -25,23 +24,22 @@ import styles from './StepItem.css'
 interface DragDropStepItemProps extends ConnectedStepItemProps {
   stepId: StepIdType
   clickDrop: () => void
-  moveStep: (dragIndex: number, value: number) => void
+  moveStep: (stepId: StepIdType, value: number) => void
   setIsOver: React.Dispatch<React.SetStateAction<boolean>>
-  index: number
+  findStepIndex: (stepId: StepIdType) => number
 }
 
 interface DropType {
   stepId: StepIdType
-  index: number
 }
 
 const DragDropStepItem = (props: DragDropStepItemProps): JSX.Element => {
-  const { stepId, moveStep, clickDrop, setIsOver, index } = props
+  const { stepId, moveStep, clickDrop, setIsOver, findStepIndex } = props
   const ref = React.useRef<HTMLDivElement>(null)
 
   const [{ isDragging }, drag] = useDrag({
     type: DND_TYPES.STEP_ITEM,
-    item: { stepId, index },
+    item: { stepId },
     collect: (monitor: DragLayerMonitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -55,32 +53,12 @@ const DragDropStepItem = (props: DragDropStepItemProps): JSX.Element => {
     drop: () => {
       clickDrop()
     },
-    hover(item: DropType, monitor: DropTargetOptions) {
-      if (!ref.current) {
-        return
+    hover: (item: DropType) => {
+      const draggedId = item.stepId
+      if (draggedId !== stepId) {
+        const overIndex = findStepIndex(stepId)
+        moveStep(draggedId, overIndex)
       }
-      const dragIndex = item.index
-      const hoverIndex = index
-
-      if (dragIndex === hoverIndex) {
-        return
-      }
-
-      const hoverBoundingRect = ref.current?.getBoundingClientRect()
-      const hoverMiddleY =
-        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
-      const clientOffset = monitor.getClientOffset()
-      const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top
-
-      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
-        return
-      }
-      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
-        return
-      }
-      moveStep(dragIndex, hoverIndex)
-
-      item.index = hoverIndex
     },
     collect: (monitor: DropTargetOptions) => ({
       isOver: monitor.isOver(),
@@ -127,17 +105,24 @@ export const DraggableStepItems = (
     }
   }
 
+  const findStepIndex = (stepId: StepIdType): number =>
+    stepIds.findIndex(id => stepId === id)
+
   const moveStep = React.useCallback(
-    (dragIndex: number, hoverIndex: number) => {
-      setStepIds((prevCards: StepIdType[]) => {
-        const updatedCards = [...prevCards]
-        const draggedCard = updatedCards[dragIndex]
-        updatedCards.splice(dragIndex, 1)
-        updatedCards.splice(hoverIndex, 0, draggedCard)
-        return updatedCards
-      })
+    (stepId: StepIdType, targetIndex: number): void => {
+      const currentIndex = findStepIndex(stepId)
+      const currentRemoved = [
+        ...stepIds.slice(0, currentIndex),
+        ...stepIds.slice(currentIndex + 1, stepIds.length),
+      ]
+      const currentReinserted = [
+        ...currentRemoved.slice(0, targetIndex),
+        stepId,
+        ...currentRemoved.slice(targetIndex, currentRemoved.length),
+      ]
+      setStepIds(currentReinserted)
     },
-    []
+    [stepIds, findStepIndex]
   )
 
   const currentIds = isOver ? stepIds : orderedStepIds
@@ -156,7 +141,7 @@ export const DraggableStepItems = (
               moveStep={moveStep}
               clickDrop={clickDrop}
               setIsOver={setIsOver}
-              index={index}
+              findStepIndex={findStepIndex}
             />
           ))
         }
