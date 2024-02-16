@@ -9,9 +9,6 @@ tests ?=
 cov_opts ?= --coverage=true --ci=true --collectCoverageFrom='components/src/**/*.(js|ts|tsx)'
 test_opts ?=
 
-# override webpack's default hashing algorithm for node 18: https://github.com/webpack/webpack/issues/14532
-export NODE_OPTIONS := --openssl-legacy-provider
-
 # standard targets
 #####################################################################
 
@@ -32,7 +29,7 @@ dist:
 .PHONY: lib
 lib: export NODE_ENV := production
 lib:
-	pnpm webpack
+	pnpm vite build
 
 # development
 #####################################################################
