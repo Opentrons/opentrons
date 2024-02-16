@@ -40,13 +40,13 @@ export function appShellRequestor<Data>(
 export function appShellListener(
   hostname: string | null,
   topic: NotifyTopic,
-  listenerCb: (data: NotifyResponseData) => void
+  callback: (data: NotifyResponseData) => void
 ): void {
   remote.ipcRenderer.on(
     'notify',
     (_, shellHostname, shellTopic, shellMessage) => {
       if (hostname === shellHostname && topic === shellTopic) {
-        listenerCb(shellMessage)
+        callback(shellMessage)
       }
     }
   )

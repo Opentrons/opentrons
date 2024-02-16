@@ -46,8 +46,7 @@ export function useNotifyService<TData, TError = Error>({
       hostname != null &&
       staleTime !== Infinity
     ) {
-      const listenerCb = (data: NotifyResponseData): void => onDataEvent(data)
-      appShellListener(hostname, topic, listenerCb)
+      appShellListener(hostname, topic, onDataEvent)
       dispatch(notifySubscribeAction(hostname, topic))
 
       return () => {
