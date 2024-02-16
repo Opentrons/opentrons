@@ -1,25 +1,23 @@
 import * as React from 'react'
-import { when } from 'jest-when'
+import { expect, vi, it, describe, beforeEach } from 'vitest'
+import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
 
+import { renderWithProviders } from '../../__testing-utils__'
 import { i18n } from '../../i18n'
 import { appRestart } from '../../redux/shell'
 import { useTrackEvent, ANALYTICS_ODD_APP_ERROR } from '../../redux/analytics'
 import { OnDeviceDisplayAppFallback } from '../OnDeviceDisplayAppFallback'
 
+import type { Mock } from 'vitest'
 import type { FallbackProps } from 'react-error-boundary'
 
-jest.mock('../../redux/shell')
-jest.mock('../../redux/analytics')
+vi.mock('../../redux/shell')
+vi.mock('../../redux/analytics')
 
 const mockError = {
   message: 'mock error',
 } as Error
-const mockAppRestart = appRestart as jest.MockedFunction<typeof appRestart>
-const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
-  typeof useTrackEvent
->
 
 const render = (props: FallbackProps) => {
   return renderWithProviders(<OnDeviceDisplayAppFallback {...props} />, {
@@ -27,18 +25,18 @@ const render = (props: FallbackProps) => {
   })
 }
 
-let mockTrackEvent: jest.Mock
 
 describe('OnDeviceDisplayAppFallback', () => {
   let props: FallbackProps
+  let mockTrackEvent: Mock
 
   beforeEach(() => {
     props = {
       error: mockError,
       resetErrorBoundary: {} as any,
     } as FallbackProps
-    mockTrackEvent = jest.fn()
-    when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
+    mockTrackEvent = vi.fn()
+    when(vi.mocked(useTrackEvent)).calledWith().thenReturn(mockTrackEvent)
   })
 
   it('should render text and button', () => {
@@ -57,6 +55,6 @@ describe('OnDeviceDisplayAppFallback', () => {
       name: ANALYTICS_ODD_APP_ERROR,
       properties: { errorMessage: 'mock error' },
     })
-    expect(mockAppRestart).toHaveBeenCalled()
+    expect(vi.mocked(appRestart)).toHaveBeenCalled()
   })
 })
