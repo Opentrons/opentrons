@@ -1,5 +1,5 @@
 import pytest
-from typing import cast, Any, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 
 from opentrons.calibration_storage import (
     types as cs_types,
@@ -18,7 +18,6 @@ from opentrons.calibration_storage.ot2 import (
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
-    from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 
 @pytest.fixture
@@ -48,13 +47,13 @@ def test_save_tip_length_calibration(
     """
     assert tip_lengths_for_pipette("pip1") == {}
     assert tip_lengths_for_pipette("pip2") == {}
-    tip_rack_hash = helpers.hash_labware_def(minimal_labware_def)
+    tip_rack_uri = helpers.uri_from_definition(minimal_labware_def)
     tip_length1 = create_tip_length_data(minimal_labware_def, 22.0)
     tip_length2 = create_tip_length_data(minimal_labware_def, 31.0)
     save_tip_length_calibration("pip1", tip_length1)
     save_tip_length_calibration("pip2", tip_length2)
-    assert tip_lengths_for_pipette("pip1")[tip_rack_hash].tipLength == 22.0
-    assert tip_lengths_for_pipette("pip2")[tip_rack_hash].tipLength == 31.0
+    assert tip_lengths_for_pipette("pip1")[tip_rack_uri].tipLength == 22.0
+    assert tip_lengths_for_pipette("pip2")[tip_rack_uri].tipLength == 31.0
 
 
 def test_get_tip_length_calibration(
@@ -64,11 +63,12 @@ def test_get_tip_length_calibration(
     Test ability to get a tip length calibration model.
     """
     tip_length_data = load_tip_length_calibration("pip1", minimal_labware_def)
+    tip_rack_hash = helpers.hash_labware_def(minimal_labware_def)
     assert tip_length_data == models.v1.TipLengthModel(
         tipLength=22.0,
         source=cs_types.SourceType.user,
         lastModified=tip_length_data.lastModified,
-        uri=cast("LabwareUri", "opentronstest/minimal_labware_def/1"),
+        definitionHash=tip_rack_hash,
     )
 
     with pytest.raises(cs_types.TipLengthCalNotFound):
@@ -83,8 +83,8 @@ def test_delete_specific_tip_calibration(
     """
     assert len(tip_lengths_for_pipette("pip1").keys()) == 2
     assert tip_lengths_for_pipette("pip2") != {}
-    tip_rack_hash = helpers.hash_labware_def(minimal_labware_def)
-    delete_tip_length_calibration(tip_rack_hash, "pip1")
+    tip_rack_uri = helpers.uri_from_definition(minimal_labware_def)
+    delete_tip_length_calibration(tip_rack_uri, "pip1")
     assert len(tip_lengths_for_pipette("pip1").keys()) == 1
     assert tip_lengths_for_pipette("pip2") != {}
 
