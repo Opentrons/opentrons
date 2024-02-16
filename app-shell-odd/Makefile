@@ -56,7 +56,7 @@ clean:
 .PHONY: lib
 lib: export NODE_ENV := production
 lib:
-	OPENTRONS_PROJECT=$(OPENTRONS_PROJECT) NODE_OPTIONS=--openssl-legacy-provider webpack --profile
+	OPENTRONS_PROJECT=$(OPENTRONS_PROJECT) vite build
 
 .PHONY: deps
 deps:
@@ -83,7 +83,7 @@ push-ot3: dist-ot3
 .PHONY: dev
 dev: export NODE_ENV := development
 dev:
-	NODE_OPTIONS=--openssl-legacy-provider webpack
+	vite build
 	$(electron)
 
 .PHONY: test

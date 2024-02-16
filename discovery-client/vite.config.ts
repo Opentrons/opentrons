@@ -17,19 +17,11 @@ export default defineConfig(
       publicDir: false,
       build: {
         // Relative to the root
-        ssr: 'src/main.ts',
+        ssr: 'src/index.ts',
         outDir: 'lib',
         commonjsOptions: {
           transformMixedEsModules: true,
           esmExternals: true,
-        },
-        lib: {
-          entry: {
-            main: 'src/main.ts',
-            preload: 'src/preload.ts',
-          },
-
-          formats: ['cjs'],
         },
       },
       plugins: [
@@ -61,7 +53,6 @@ export default defineConfig(
         'process.env': process.env,
         global: 'globalThis',
         _PKG_VERSION_: JSON.stringify(version),
-        _PKG_PRODUCT_NAME_: JSON.stringify(pkg.productName),
         _PKG_BUGS_URL_: JSON.stringify(pkg.bugs.url),
         _OPENTRONS_PROJECT_: JSON.stringify(project),
       },

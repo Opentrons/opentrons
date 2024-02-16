@@ -26,7 +26,7 @@ lib: export NODE_ENV := production
 lib: $(main_out) $(cli_out)
 
 $(main_out) $(cli_out):
-	pnpm webpack
+	pnpm vite build
 
 .PHONY: test
 test:

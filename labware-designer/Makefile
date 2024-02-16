@@ -6,9 +6,6 @@ SHELL := bash
 # add node_modules/.bin to PATH
 PATH := $(shell cd .. && pnpm bin):$(PATH)
 
-# override webpack's default hashing algorithm for node 18: https://github.com/webpack/webpack/issues/14532
-export NODE_OPTIONS := --openssl-legacy-provider
-
 # standard targets
 #####################################################################
 
@@ -29,7 +26,7 @@ clean:
 .PHONY: dist
 dist: export NODE_ENV := production
 dist:
-	webpack --profile
+	vite build
 
 # development
 #####################################################################
@@ -37,7 +34,7 @@ dist:
 .PHONY: dev
 dev: export NODE_ENV := development
 dev:
-	webpack-dev-server --hot --host=::
+	vite serve --host=::
 
 .PHONY: test
 test:

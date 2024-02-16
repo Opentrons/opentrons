@@ -29,7 +29,7 @@ interface LabwarePositionCheckModalProps {
 export const LabwarePositionCheck = (
   props: LabwarePositionCheckModalProps
 ): JSX.Element => {
-  const logger = useLogger(__filename)
+  const logger = useLogger(new URL('', import.meta.url).pathname)
   return (
     <ErrorBoundary
       logger={logger}
