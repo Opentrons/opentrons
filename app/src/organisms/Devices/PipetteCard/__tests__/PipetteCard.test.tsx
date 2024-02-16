@@ -87,7 +87,6 @@ describe('PipetteCard', () => {
       pipetteIs96Channel: false,
       isPipetteCalibrated: false,
       pipetteIsBad: false,
-      updatePipette: jest.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -132,7 +131,6 @@ describe('PipetteCard', () => {
       pipetteIs96Channel: false,
       isPipetteCalibrated: false,
       pipetteIsBad: false,
-      updatePipette: jest.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -149,7 +147,6 @@ describe('PipetteCard', () => {
       pipetteIs96Channel: true,
       isPipetteCalibrated: false,
       pipetteIsBad: false,
-      updatePipette: jest.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -172,7 +169,6 @@ describe('PipetteCard', () => {
       pipetteIs96Channel: true,
       isPipetteCalibrated: false,
       pipetteIsBad: false,
-      updatePipette: jest.fn(),
       isRunActive: false,
       isEstopNotDisengaged: true,
     }
@@ -194,7 +190,6 @@ describe('PipetteCard', () => {
       pipetteIs96Channel: false,
       isPipetteCalibrated: false,
       pipetteIsBad: false,
-      updatePipette: jest.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -210,7 +205,6 @@ describe('PipetteCard', () => {
       pipetteIs96Channel: false,
       isPipetteCalibrated: false,
       pipetteIsBad: false,
-      updatePipette: jest.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -226,7 +220,6 @@ describe('PipetteCard', () => {
       pipetteIs96Channel: false,
       isPipetteCalibrated: false,
       pipetteIsBad: false,
-      updatePipette: jest.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -243,7 +236,6 @@ describe('PipetteCard', () => {
       pipetteIs96Channel: false,
       isPipetteCalibrated: false,
       pipetteIsBad: false,
-      updatePipette: jest.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -259,7 +251,6 @@ describe('PipetteCard', () => {
       pipetteIs96Channel: false,
       isPipetteCalibrated: false,
       pipetteIsBad: false,
-      updatePipette: jest.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -274,7 +265,6 @@ describe('PipetteCard', () => {
       pipetteIs96Channel: false,
       isPipetteCalibrated: false,
       pipetteIsBad: false,
-      updatePipette: jest.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -298,16 +288,15 @@ describe('PipetteCard', () => {
       pipetteIs96Channel: false,
       isPipetteCalibrated: false,
       pipetteIsBad: true,
-      updatePipette: jest.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
     render(props)
     screen.getByText('Right mount')
     screen.getByText('Instrument attached')
-    screen.getByText('Firmware update available.')
-    fireEvent.click(screen.getByText('Update now'))
-    expect(props.updatePipette).toHaveBeenCalled()
+    screen.getByText(
+      `Instrument firmware update needed. Start the update on the robot's touchscreen.`
+    )
   })
   it('renders firmware update in progress state if pipette is bad and update in progress', () => {
     when(mockUseCurrentSubsystemUpdateQuery).mockReturnValue({
@@ -320,7 +309,6 @@ describe('PipetteCard', () => {
       pipetteIs96Channel: false,
       isPipetteCalibrated: false,
       pipetteIsBad: true,
-      updatePipette: jest.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
