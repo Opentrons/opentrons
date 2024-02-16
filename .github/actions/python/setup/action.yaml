@@ -28,6 +28,6 @@ runs:
       run: |
         npm install --global shx@0.3.3
         $OT_PYTHON -m pip install --upgrade pip
-        $OT_PYTHON -m pip install pipenv==2023.12.1
+        $OT_PYTHON -m pip install --user pipenv==2023.12.1
     - shell: bash
       run: 'make -C ${{ inputs.project }} setup'
