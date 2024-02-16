@@ -78,13 +78,10 @@ const Overlay = styled.div`
   top: 0;
   bottom: 0;
   z-index: 1;
-  background-color: ${COLORS.black90}${COLORS.opacity40HexCode};
+  background-color: ${COLORS.black90}${COLORS.opacity60HexCode};
   cursor: default;
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    background-color: ${COLORS.black90}${COLORS.opacity60HexCode};
-  }
 `
+
 const ContentArea = styled.div<{ zIndex: string | number }>`
   display: flex;
   position: ${POSITION_ABSOLUTE};

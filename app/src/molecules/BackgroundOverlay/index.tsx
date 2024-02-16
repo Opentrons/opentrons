@@ -12,11 +12,7 @@ const BACKGROUND_OVERLAY_STYLE = css`
   position: ${POSITION_FIXED};
   inset: 0;
   z-index: 3;
-  background-color: ${COLORS.black90}${COLORS.opacity40HexCode};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    background-color: ${COLORS.black90}${COLORS.opacity60HexCode};
-  }
+  background-color: ${COLORS.black90}${COLORS.opacity60HexCode};
 `
 
 export interface BackgroundOverlayProps
