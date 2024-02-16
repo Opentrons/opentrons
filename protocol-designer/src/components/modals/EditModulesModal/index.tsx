@@ -68,7 +68,6 @@ import { PDAlert } from '../../alerts/PDAlert'
 import { isModuleWithCollisionIssue } from '../../modules'
 import { ModelDropdown } from './ModelDropdown'
 import { SlotDropdown } from './SlotDropdown'
-import { ConnectedSlotMap } from './ConnectedSlotMap'
 import styles from './EditModules.css'
 
 import type { ModuleOnDeck } from '../../../step-forms/types'
@@ -407,24 +406,23 @@ const EditModulesModalComponent = (
           <Controller
             name="selectedSlot"
             control={control}
-            render={({ field, fieldState }) =>
-              moduleType === THERMOCYCLER_MODULE_TYPE ? (
-                <Flex
-                  height="16rem"
-                  justifyContent={JUSTIFY_CENTER}
-                  paddingY={SPACING.spacing16}
-                >
+            render={({ field, fieldState }) => (
+              <Flex
+                height="16rem"
+                justifyContent={JUSTIFY_CENTER}
+                paddingY={SPACING.spacing16}
+              >
+                {moduleType === THERMOCYCLER_MODULE_TYPE ? (
                   <SlotMap occupiedSlots={['7', '8', '10', '11']} />
-                </Flex>
-              ) : (
-                <ConnectedSlotMap
-                  robotType={OT2_ROBOT_TYPE}
-                  field={field}
-                  hasFieldError={!fieldState.error}
-                />
-              )
-            }
-          ></Controller>
+                ) : (
+                  <SlotMap
+                    occupiedSlots={[`${field.value}`]}
+                    isError={!fieldState.error}
+                  />
+                )}
+              </Flex>
+            )}
+          />
         ) : (
           <Flex height="20rem" justifyContent={JUSTIFY_CENTER}>
             <DeckLocationSelect

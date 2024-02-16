@@ -163,7 +163,6 @@ export function ModuleRow(props: Props): JSX.Element {
                 <SlotMap
                   occupiedSlots={occupiedSlotsForMap}
                   collisionSlots={collisionSlots}
-                  robotType={robotType}
                 />
               </div>
             ))}

@@ -11,11 +11,9 @@ import { getRobotType } from '../../../../file-data/selectors'
 import { getInitialDeckSetup } from '../../../../step-forms/selectors'
 import { getLabwareIsCompatible } from '../../../../utils/labwareModuleCompatibility'
 import { getDisableModuleRestrictions } from '../../../../feature-flags/selectors'
-import { ConnectedSlotMap } from '../ConnectedSlotMap'
 import { EditModulesModal } from '../index'
 import type { ModuleOnDeck } from '../../../../step-forms'
 
-jest.mock('../ConnectedSlotMap')
 jest.mock('../../../../file-data/selectors')
 jest.mock('../../../../step-forms/selectors')
 jest.mock('../../../../utils/labwareModuleCompatibility')
@@ -38,9 +36,6 @@ const mockGetLabwareIsCompatible = getLabwareIsCompatible as jest.MockedFunction
 >
 const mockGetDisableModuleRestrictions = getDisableModuleRestrictions as jest.MockedFunction<
   typeof getDisableModuleRestrictions
->
-const mockConnectedSlotMap = ConnectedSlotMap as jest.MockedFunction<
-  typeof ConnectedSlotMap
 >
 const mockSlotMap = SlotMap as jest.MockedFunction<typeof SlotMap>
 const render = (props: React.ComponentProps<typeof EditModulesModal>) => {
@@ -97,7 +92,6 @@ describe('Edit Modules Modal', () => {
     mockGetLabwareIsCompatible.mockReturnValue(true)
     mockGetDisableModuleRestrictions.mockReturnValue(false)
     mockDeckLocationSelect.mockReturnValue(<div>mock DeckLocationSelect</div>)
-    mockConnectedSlotMap.mockReturnValue(<div>mock ConnectedSlotMap</div>)
     mockSlotMap.mockReturnValue(<div>mock SlotMap</div>)
   })
   it('renders the edit modules modal for a temp on a flex', () => {
@@ -112,7 +106,7 @@ describe('Edit Modules Modal', () => {
     mockGetRobotType.mockReturnValue(OT2_ROBOT_TYPE)
     render(props)
     screen.getByText('Temperature module')
-    screen.getByText('mock ConnectedSlotMap')
+    screen.getByText('mock SlotMap')
     fireEvent.click(screen.getByRole('button', { name: 'cancel' }))
     expect(props.onCloseClick).toHaveBeenCalled()
     screen.getByRole('button', { name: 'save' })
