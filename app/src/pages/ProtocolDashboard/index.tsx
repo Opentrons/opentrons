@@ -148,7 +148,6 @@ export function ProtocolDashboard(): JSX.Element {
         paddingBottom={SPACING.spacing40}
       >
         <Navigation
-          routes={onDeviceDisplayRoutes}
           setNavMenuIsOpened={setNavMenuIsOpened}
           longPressModalIsOpened={longPressModalIsOpened}
         />

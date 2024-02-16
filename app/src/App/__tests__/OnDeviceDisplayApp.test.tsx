@@ -1,10 +1,6 @@
 import * as React from 'react'
 import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
-import { screen, cleanup } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { RUN_STATUS_RUNNING, RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
-import { useProtocolQuery } from '@opentrons/react-api-client'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../__testing-utils__'
 import { i18n } from '../../i18n'
@@ -32,53 +28,31 @@ import { getLocalRobot } from '../../redux/discovery'
 import { mockConnectedRobot } from '../../redux/discovery/__fixtures__'
 import { useCurrentRunRoute, useProtocolReceiptToast } from '../hooks'
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
-import { useMostRecentRunId } from '../../organisms/ProtocolUpload/hooks/useMostRecentRunId'
-import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
-import { useRobotAnalyticsData, useRobotType, useTrackProtocolRunEvent } from '../../organisms/Devices/hooks'
-import { useTrackEvent } from '../../redux/analytics'
-import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useNotifyLastRunCommandKey } from '../../resources/runs/useNotifyLastRunCommandKey'
-import { useRunControls, useRunStatus, useRunTimestamps } from '../../organisms/RunTimeControl/hooks'
 
-import type * as ReactApiClient from '@opentrons/react-api-client'
-import type { OnDeviceDisplaySettings } from '../../redux/config/types'
+import type { OnDeviceDisplaySettings } from '../../redux/config/schema-types'
 
-// vi.mock('../../pages/Welcome')
-// vi.mock('../../pages/NetworkSetupMenu')
-// vi.mock('../../pages/ConnectViaEthernet')
-// vi.mock('../../pages/ConnectViaUSB')
-// vi.mock('../../pages/ConnectViaWifi')
-// vi.mock('../../pages/RobotDashboard')
-// vi.mock('../../pages/RobotSettingsDashboard')
-// vi.mock('../../pages/ProtocolDashboard')
-// vi.mock('../../pages/ProtocolSetup')
-// vi.mock('../../pages/ProtocolDetails')
-// vi.mock('../../pages/InstrumentsDashboard')
-// vi.mock('../../pages/RunningProtocol')
-// vi.mock('../../pages/RunSummary')
-// vi.mock('../../pages/NameRobot')
-// vi.mock('../../pages/InitialLoadingScreen')
-// vi.mock('../../pages/EmergencyStop')
-// vi.mock('../../pages/DeckConfiguration')
-vi.mock('../../redux/analytics')
+vi.mock('../../pages/Welcome')
+vi.mock('../../pages/NetworkSetupMenu')
+vi.mock('../../pages/ConnectViaEthernet')
+vi.mock('../../pages/ConnectViaUSB')
+vi.mock('../../pages/ConnectViaWifi')
+vi.mock('../../pages/RobotDashboard')
+vi.mock('../../pages/RobotSettingsDashboard')
+vi.mock('../../pages/ProtocolDashboard')
+vi.mock('../../pages/ProtocolSetup')
+vi.mock('../../pages/ProtocolDetails')
+vi.mock('../../pages/InstrumentsDashboard')
+vi.mock('../../pages/RunningProtocol')
+vi.mock('../../pages/RunSummary')
+vi.mock('../../pages/NameRobot')
+vi.mock('../../pages/InitialLoadingScreen')
+vi.mock('../../pages/EmergencyStop')
+vi.mock('../../pages/DeckConfiguration')
 vi.mock('../../redux/config')
 vi.mock('../../redux/shell')
 vi.mock('../../redux/discovery')
-vi.mock('../hooks')
 vi.mock('../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
-vi.mock('../../organisms/ProtocolUpload/hooks/useMostRecentRunId')
-vi.mock('../../resources/runs/useNotifyRunQuery')
-vi.mock('../../organisms/Devices/hooks')
-vi.mock('../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('../../resources/runs/useNotifyLastRunCommandKey')
-vi.mock('../../organisms/RunTimeControl/hooks')
-vi.mock('@opentrons/react-api-client', async (importOriginal) => {
-  const actual = await importOriginal<typeof ReactApiClient>()
-  return {
-    ...actual,
-    useProtocolQuery: vi.fn()
-  }
-})
+vi.mock('../hooks')
 
 const mockSettings = {
   sleepMs: 60 * 1000 * 60 * 24 * 7,
@@ -112,144 +86,75 @@ describe('OnDeviceDisplayApp', () => {
   })
   afterEach(() => {
     vi.resetAllMocks()
-    cleanup()
   })
 
-  // it('renders Welcome component from /welcome', () => {
-  //   render('/welcome')
-  //   expect(vi.mocked(Welcome)).toHaveBeenCalled()
-  // })
-
-  // it('renders NetworkSetupMenu component from /network-setup', () => {
-  //   render('/network-setup')
-  //   expect(vi.mocked(NetworkSetupMenu)).toHaveBeenCalled()
-  // })
-
-  // it('renders ConnectViaEthernet component from /network-setup/ethernet', () => {
-  //   render('/network-setup/ethernet')
-  //   expect(vi.mocked(ConnectViaEthernet)).toHaveBeenCalled()
-  // })
-
-  // it('renders ConnectViaUSB component from /network-setup/usb', () => {
-  //   render('/network-setup/usb')
-  //   expect(vi.mocked(ConnectViaUSB)).toHaveBeenCalled()
-  // })
-
-  // it('renders ConnectViaWifi component from /network-setup/wifi', () => {
-  //   render('/network-setup/wifi')
-  //   expect(vi.mocked(ConnectViaWifi)).toHaveBeenCalled()
-  // })
-
-  // it('renders RobotDashboard component from /dashboard', () => {
-  //   render('/dashboard')
-  //   expect(vi.mocked(RobotDashboard)).toHaveBeenCalled()
-  // })
-  // it('renders ProtocolDashboard component from /protocols', () => {
-  //   render('/protocols')
-  //   expect(vi.mocked(ProtocolDashboard)).toHaveBeenCalled()
-  // })
-  // it('renders ProtocolDetails component from /protocols/:protocolId/setup', () => {
-  //   render('/protocols/my-protocol-id')
-  //   expect(vi.mocked(ProtocolDetails)).toHaveBeenCalled()
-  // })
-
-  // it('renders RobotSettingsDashboard component from /robot-settings', () => {
-  //   render('/robot-settings')
-  //   expect(vi.mocked(RobotSettingsDashboard)).toHaveBeenCalled()
-  // })
-  // it('renders InstrumentsDashboard component from /instruments', () => {
-  //   render('/instruments')
-  //   expect(vi.mocked(InstrumentsDashboard)).toHaveBeenCalled()
-  // })
-  // it('when current run route present renders ProtocolSetup component from /runs/:runId/setup', () => {
-  //   vi.mocked(useCurrentRunRoute).mockReturnValue('/runs/my-run-id/setup')
-  //   render('/runs/my-run-id/setup')
-  //   expect(vi.mocked(ProtocolSetup)).toHaveBeenCalled()
-  // })
+  it('renders Welcome component from /welcome', () => {
+    render('/welcome')
+    expect(vi.mocked(Welcome)).toHaveBeenCalled()
+  })
+  it('renders NetworkSetupMenu component from /network-setup', () => {
+    render('/network-setup')
+    expect(vi.mocked(NetworkSetupMenu)).toHaveBeenCalled()
+  })
+  it('renders ConnectViaEthernet component from /network-setup/ethernet', () => {
+    render('/network-setup/ethernet')
+    expect(vi.mocked(ConnectViaEthernet)).toHaveBeenCalled()
+  })
+  it('renders ConnectViaUSB component from /network-setup/usb', () => {
+    render('/network-setup/usb')
+    expect(vi.mocked(ConnectViaUSB)).toHaveBeenCalled()
+  })
+  it('renders ConnectViaWifi component from /network-setup/wifi', () => {
+    render('/network-setup/wifi')
+    expect(vi.mocked(ConnectViaWifi)).toHaveBeenCalled()
+  })
+  it('renders RobotDashboard component from /dashboard', () => {
+    render('/dashboard')
+    expect(vi.mocked(RobotDashboard)).toHaveBeenCalled()
+  })
+  it('renders ProtocolDashboard component from /protocols', () => {
+    render('/protocols')
+    expect(vi.mocked(ProtocolDashboard)).toHaveBeenCalled()
+  })
+  it('renders ProtocolDetails component from /protocols/:protocolId/setup', () => {
+    render('/protocols/my-protocol-id')
+    expect(vi.mocked(ProtocolDetails)).toHaveBeenCalled()
+  })
+  it('renders RobotSettingsDashboard component from /robot-settings', () => {
+    render('/robot-settings')
+    expect(vi.mocked(RobotSettingsDashboard)).toHaveBeenCalled()
+  })
+  it('renders InstrumentsDashboard component from /instruments', () => {
+    render('/instruments')
+    expect(vi.mocked(InstrumentsDashboard)).toHaveBeenCalled()
+  })
+  it('when current run route present renders ProtocolSetup component from /runs/:runId/setup', () => {
+    render('/runs/my-run-id/setup')
+    expect(vi.mocked(ProtocolSetup)).toHaveBeenCalled()
+  })
   it('when current run route present renders RunningProtocol component from /runs/:runId/run', () => {
-    const protocolName = 'fake-protocol-name'
-
-    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({ commands: [] })
-    vi.mocked(useNotifyLastRunCommandKey).mockReturnValue('fake-command-key')
-    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_RUNNING)
-    vi.mocked(useRunTimestamps).mockReturnValue({
-      startedAt: '2024-02-14T22:37:07+00:00',
-      stoppedAt: '2024-02-14T22:37:07+00:00',
-      completedAt: '2024-02-14T22:37:07+00:00',
-      pausedAt: '2024-02-14T22:37:07+00:00',
-    })
-    vi.mocked(useNotifyRunQuery).mockReturnValue({
-      data: {
-        data: {
-          current: true,
-          protocolId: 'protocol-id',
-          status: RUN_STATUS_RUNNING,
-        }
-      }
-    } as any)
-    vi.mocked(useProtocolQuery).mockReturnValue({
-      data: {
-        data: {
-          metadata: { protocolName },
-          files: [{ name: 'file name' }]
-        }
-      }
-    } as any)
-    vi.mocked(useRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
-    vi.mocked(useTrackProtocolRunEvent).mockReturnValue({ trackProtocolRunEvent: vi.fn() })
-    vi.mocked(useCurrentRunRoute).mockReturnValue('/runs/my-run-id/run')
     render('/runs/my-run-id/run')
-    screen.getByText(protocolName)
+    expect(vi.mocked(RunningProtocol)).toHaveBeenCalled()
   })
-  it.only('when current run route present renders a RunSummary component from /runs/:runId/summary', () => {
-    const protocolName = 'fake-protocol-name'
-    vi.mocked(useRunControls).mockReturnValue({ reset: vi.fn() } as any)
-    vi.mocked(useCurrentRunRoute).mockReturnValue('/runs/my-run-id/summary')
-    vi.mocked(useMostRecentRunId).mockReturnValue('my-run-id')
-    vi.mocked(useTrackEvent).mockReturnValue(vi.fn())
-    vi.mocked(useTrackProtocolRunEvent).mockReturnValue({ trackProtocolRunEvent: vi.fn() })
-    vi.mocked(useRobotAnalyticsData).mockReturnValue({} as any)
-    vi.mocked(useRunTimestamps).mockReturnValue({
-      startedAt: '2024-02-14T22:37:07+00:00',
-      stoppedAt: '2024-02-14T22:37:07+00:00',
-      completedAt: '2024-02-14T22:37:07+00:00',
-      pausedAt: '2024-02-14T22:37:07+00:00',
-    })
-    vi.mocked(useNotifyRunQuery).mockReturnValue({
-      data: {
-        data: {
-          current: true,
-          protocolId: 'protocol-id',
-          status: RUN_STATUS_SUCCEEDED
-        }
-      }
-    } as any)
-    vi.mocked(useProtocolQuery).mockReturnValue({
-      data: {
-        data: {
-          metadata: { protocolName },
-          files: [{ name: 'file name' }]
-        }
-      }
-    } as any)
+  it('when current run route present renders a RunSummary component from /runs/:runId/summary', () => {
     render('/runs/my-run-id/summary')
-    screen.getByText(protocolName)
+    expect(vi.mocked(RunSummary)).toHaveBeenCalled()
   })
   it('renders the loading screen on mount', () => {
-    vi.mocked(useCurrentRunRoute).mockReturnValue('/loading')
-    vi.mocked(getIsShellReady).mockReturnValue(true)
     render('/loading')
-    screen.getByLabelText('loading indicator')
+    expect(vi.mocked(InitialLoadingScreen)).toHaveBeenCalled()
   })
   it('renders EmergencyStop component from /emergency-stop', () => {
-    vi.mocked(useCurrentRunRoute).mockReturnValue('/emergency-stop')
     render('/emergency-stop')
-    screen.getByText('Install the E-stop')
+    expect(vi.mocked(EmergencyStop)).toHaveBeenCalled()
   })
   it('renders DeckConfiguration component from /deck-configuration', () => {
-    vi.mocked(useCurrentRunRoute).mockReturnValue('/deck-configuration')
     render('/deck-configuration')
-    screen.getByText('Deck configuration')
+    expect(vi.mocked(DeckConfigurationEditor)).toHaveBeenCalled()
+  })
+  it('renders DeckConfiguration component from /deck-configuration', () => {
+    render('/robot-settings/rename-robot')
+    expect(vi.mocked(NameRobot)).toHaveBeenCalled()
   })
   it('renders protocol receipt toasts', () => {
     render('/')

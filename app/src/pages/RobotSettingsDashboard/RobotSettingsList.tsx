@@ -79,7 +79,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const { lightsEnabled, toggleLights } = useLEDLights(robotName)
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <Navigation routes={onDeviceDisplayRoutes} />
+      <Navigation />
       <Flex paddingX={SPACING.spacing40} flexDirection={DIRECTION_COLUMN}>
         <RobotSettingButton
           settingName={t('network_settings')}

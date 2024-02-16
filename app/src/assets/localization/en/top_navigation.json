@@ -3,6 +3,7 @@
   "calibrate_deck_to_proceed": "Calibrate your deck to proceed",
   "deck_setup": "Deck Setup",
   "devices": "Devices",
+  "instruments": "instruments",
   "labware": "Labware",
   "modules": "modules",
   "pipettes_not_calibrated": "Please calibrate all pipettes specified in loaded protocol to proceed",
@@ -12,5 +13,6 @@
   "protocol_runs": "Protocol Runs",
   "protocols": "Protocols",
   "robot_settings": "Robot Settings",
-  "run": "run"
+  "run": "run",
+  "settings": "settings"
 }

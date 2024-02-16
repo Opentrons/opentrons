@@ -82,7 +82,7 @@ export function RobotDashboard(): JSX.Element {
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <Navigation routes={onDeviceDisplayRoutes} />
+      <Navigation />
       <Flex
         paddingX={SPACING.spacing40}
         flexDirection={DIRECTION_COLUMN}
