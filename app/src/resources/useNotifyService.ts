@@ -12,21 +12,12 @@ import {
 } from '../redux/analytics'
 
 import type { UseQueryOptions } from 'react-query'
-import type { NotifyTopic } from '../redux/shell/types'
+import type { NotifyTopic, NotifyResponseData } from '../redux/shell/types'
 
 export interface QueryOptionsWithPolling<TData, TError = Error>
   extends UseQueryOptions<TData, TError> {
   forceHttpPolling?: boolean
 }
-
-interface NotifyRefetchData {
-  refetchUsingHTTP: boolean
-  statusCode: never
-}
-
-export type NotifyNetworkError = 'ECONNFAILED' | 'ECONNREFUSED'
-
-type NotifyResponseData = NotifyRefetchData | NotifyNetworkError
 
 interface UseNotifyServiceProps<TData, TError = Error> {
   topic: NotifyTopic
@@ -55,12 +46,10 @@ export function useNotifyService<TData, TError = Error>({
       hostname != null &&
       staleTime !== Infinity
     ) {
-      const eventEmitter = appShellListener(hostname, topic)
-      eventEmitter.on('data', onDataListener)
+      appShellListener(hostname, topic, onDataEvent)
       dispatch(notifySubscribeAction(hostname, topic))
 
       return () => {
-        eventEmitter.off('data', onDataListener)
         if (hostname != null) {
           dispatch(notifyUnsubscribeAction(hostname, topic))
         }
@@ -77,7 +66,7 @@ export function useNotifyService<TData, TError = Error>({
 
   return { isNotifyError: isNotifyError.current }
 
-  function onDataListener(data: NotifyResponseData): void {
+  function onDataEvent(data: NotifyResponseData): void {
     if (!isNotifyError.current) {
       if (data === 'ECONNFAILED' || data === 'ECONNREFUSED') {
         isNotifyError.current = true
