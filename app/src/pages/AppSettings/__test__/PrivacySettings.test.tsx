@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-
-import { renderWithProviders } from '@opentrons/components'
-
+import { screen } from '@testing-library/react'
+import { vi, describe, it } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { PrivacySettings } from '../PrivacySettings'
 
-jest.mock('../../../redux/analytics')
-jest.mock('../../../redux/config')
+vi.mock('../../../redux/analytics')
+vi.mock('../../../redux/config')
 
 const render = (): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(
@@ -22,11 +22,11 @@ const render = (): ReturnType<typeof renderWithProviders> => {
 
 describe('PrivacySettings', () => {
   it('renders correct title, body text, and toggle', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText('Share App Analytics with Opentrons')
-    getByText(
+    render()
+    screen.getByText('Share App Analytics with Opentrons')
+    screen.getByText(
       'Help Opentrons improve its products and services by automatically sending anonymous diagnostics and usage data.'
     )
-    getByRole('switch', { name: 'analytics_opt_in' })
+    screen.getByRole('switch', { name: 'analytics_opt_in' })
   })
 })

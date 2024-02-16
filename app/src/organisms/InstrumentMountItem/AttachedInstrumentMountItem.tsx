@@ -33,6 +33,7 @@ export function AttachedInstrumentMountItem(
   props: AttachedInstrumentMountItemProps
 ): JSX.Element {
   const history = useHistory()
+  console.log(history)
   const { mount, attachedInstrument, setWizardProps } = props
 
   const [showChoosePipetteModal, setShowChoosePipetteModal] = React.useState(
