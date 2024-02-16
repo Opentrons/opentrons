@@ -4,7 +4,7 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   build: {
     // Relative to the root
-    ssr: 'src/js/index.ts',
+    ssr: 'js/index.ts',
     outDir: 'lib',
     commonjsOptions: {
       transformMixedEsModules: true,

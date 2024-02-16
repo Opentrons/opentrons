@@ -10,7 +10,12 @@ import lostCss from 'lost'
 export default defineConfig({
   build: {
     // Relative to the root
-    outDir: 'dist',
+    ssr: 'src/index.ts',
+    outDir: 'lib',
+    commonjsOptions: {
+      transformMixedEsModules: true,
+      esmExternals: true,
+    },
   },
   plugins: [
     react({
@@ -44,6 +49,9 @@ export default defineConfig({
   resolve: {
     alias: {
       '@opentrons/shared-data': path.resolve('../shared-data/js/index.ts'),
+      '@opentrons/components/styles': path.resolve(
+        '../components/src/index.module.css'
+      ),
     },
   },
 })
