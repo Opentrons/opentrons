@@ -427,8 +427,8 @@ class FlexBackend(Protocol):
     async def get_hepa_fan_state(self) -> Optional[HepaFanState]:
         ...
 
-    async def set_hepa_uv_state(self, light_on: bool, timeout_s: int) -> bool:
-        """Sets the state and timeout in seconds of the Hepa/UV module."""
+    async def set_hepa_uv_state(self, light_on: bool, uv_duration_s: int) -> bool:
+        """Sets the state and duration (seconds) of the UV light for the Hepa/UV module."""
         ...
 
     async def get_hepa_uv_state(self) -> Optional[HepaUVState]:

@@ -401,7 +401,7 @@ class HepaFanState:
 @dataclass
 class HepaUVState:
     light_on: bool
-    config_timeout: int
+    uv_duration_s: int
     remaining_time_s: int
 
 

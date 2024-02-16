@@ -42,7 +42,7 @@ class HepaUVState:
     """Hepa UV Light Config."""
 
     uv_light_on: bool
-    timeout_s: int
+    uv_duration_s: int
     remaining_time_s: int
 
 
@@ -100,14 +100,15 @@ async def get_hepa_fan_state(can_messenger: CanMessenger) -> Optional[HepaFanSta
 async def set_hepa_uv_state(
     can_messenger: CanMessenger,
     uv_light_on: bool,
-    timeout_s: int,
+    uv_duration_s: int,
 ) -> bool:
-    """Set the Hepa UV state and timeout in seconds."""
+    """Sets the Hepa UV light state and duration in seconds."""
     error = await can_messenger.ensure_send(
         node_id=NodeId.hepa_uv,
         message=SetHepaUVStateRequest(
             payload=payloads.SetHepaUVStateRequestPayload(
-                timeout_s=UInt32Field(timeout_s), uv_light_on=UInt8Field(uv_light_on)
+                uv_duration_s=UInt32Field(uv_duration_s),
+                uv_light_on=UInt8Field(uv_light_on),
             ),
         ),
         expected_nodes=[NodeId.hepa_uv],
@@ -129,7 +130,7 @@ async def get_hepa_uv_state(can_messenger: CanMessenger) -> Optional[HepaUVState
             event.set()
             uv_state = HepaUVState(
                 uv_light_on=bool(message.payload.uv_light_on.value),
-                timeout_s=int(message.payload.timeout_s.value),
+                uv_duration_s=int(message.payload.uv_duration_s.value),
                 remaining_time_s=int(message.payload.remaining_time_s.value),
             )
 

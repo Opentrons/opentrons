@@ -1591,15 +1591,15 @@ class OT3Controller(FlexBackend):
             else None
         )
 
-    async def set_hepa_uv_state(self, light_on: bool, timeout_s: int) -> bool:
-        return await set_hepa_uv_state_fw(self._messenger, light_on, timeout_s)
+    async def set_hepa_uv_state(self, light_on: bool, uv_duration_s: int) -> bool:
+        return await set_hepa_uv_state_fw(self._messenger, light_on, uv_duration_s)
 
     async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
         res = await get_hepa_uv_state_fw(self._messenger)
         return (
             HepaUVState(
                 light_on=res.uv_light_on,
-                config_timeout=res.timeout_s,
+                uv_duration_s=res.uv_duration_s,
                 remaining_time_s=res.remaining_time_s,
             )
             if res

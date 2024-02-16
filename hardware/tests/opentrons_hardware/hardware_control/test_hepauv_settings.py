@@ -46,13 +46,13 @@ def create_hepa_fan_state_response(fan_on: bool, duty_cycle: int) -> MessageDefi
 
 
 def create_hepa_uv_state_response(
-    light_on: bool, config_timeout: int, remaining_time: int
+    light_on: bool, duration: int, remaining_time: int
 ) -> MessageDefinition:
     """Create a GetHepaUVStateResponse."""
     return md.GetHepaUVStateResponse(
         payload=GetHepaUVStatePayloadResponse(
             uv_light_on=UInt8Field(light_on),
-            timeout_s=UInt32Field(config_timeout),
+            uv_duration_s=UInt32Field(duration),
             remaining_time_s=UInt32Field(remaining_time),
         )
     )
@@ -81,21 +81,21 @@ async def test_set_hepa_fan_state(
 
 
 @pytest.mark.parametrize(
-    ("light_on", "timeout"), [[True, 0], [True, 900], [False, 3600], [False, 7200]]
+    ("light_on", "duration"), [[True, 0], [True, 900], [False, 3600], [False, 7200]]
 )
 async def test_set_hepa_uv_state(
     mock_can_messenger: AsyncMock,
     light_on: bool,
-    timeout: int,
+    duration: int,
 ) -> None:
-    """We should set the uv light state and timeout for the hepa/uv node."""
-    await set_hepa_uv_state(mock_can_messenger, light_on, timeout)
+    """We should set the uv light state and duration for the hepa/uv node."""
+    await set_hepa_uv_state(mock_can_messenger, light_on, duration)
     mock_can_messenger.ensure_send.assert_any_call(
         node_id=NodeId.hepa_uv,
         message=md.SetHepaUVStateRequest(
             payload=SetHepaUVStateRequestPayload(
                 uv_light_on=UInt8Field(light_on),
-                timeout_s=UInt32Field(timeout),
+                uv_duration_s=UInt32Field(duration),
             )
         ),
         expected_nodes=[NodeId.hepa_uv],
@@ -160,7 +160,7 @@ async def test_get_hepa_uv_state(
     message_send_loopback: CanLoopback,
     response: Tuple[NodeId, MessageDefinition, NodeId],
 ) -> None:
-    """We should get the uv light state and timeout for the hepa/uv node."""
+    """We should get the uv light state and duration for the hepa/uv node."""
 
     def responder(
         node_id: NodeId, message: MessageDefinition
@@ -184,7 +184,7 @@ async def test_get_hepa_uv_state(
     assert (
         HepaUVState(
             bool(payload.uv_light_on.value),
-            int(payload.timeout_s.value),
+            int(payload.uv_duration_s.value),
             int(payload.remaining_time_s.value),
         )
         == res

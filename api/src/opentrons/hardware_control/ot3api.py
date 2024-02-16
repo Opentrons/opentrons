@@ -2698,10 +2698,10 @@ class OT3API(
         return await self._backend.get_hepa_fan_state()
 
     async def set_hepa_uv_state(
-        self, turn_on: bool = False, timeout_s: int = 900
+        self, turn_on: bool = False, uv_duration_s: int = 900
     ) -> bool:
-        """Sets the state and timeout in seconds of the Hepa/UV module."""
-        return await self._backend.set_hepa_uv_state(turn_on, timeout_s)
+        """Sets the state and duration (seconds) of the UV light for the Hepa/UV module."""
+        return await self._backend.set_hepa_uv_state(turn_on, uv_duration_s)
 
     async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
         return await self._backend.get_hepa_uv_state()
