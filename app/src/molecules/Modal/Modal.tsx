@@ -24,6 +24,9 @@ interface ModalProps extends StyleProps {
   /** see ModalHeader component for more details */
   header?: ModalHeaderBaseProps
 }
+/**
+ * For ODD use only.
+ */
 export function Modal(props: ModalProps): JSX.Element {
   const {
     modalSize = 'medium',

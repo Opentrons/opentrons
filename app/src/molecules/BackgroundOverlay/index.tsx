@@ -1,5 +1,14 @@
 import * as React from 'react'
+import { css } from 'styled-components'
+
 import { COLORS, Flex, POSITION_FIXED } from '@opentrons/components'
+
+const BACKGROUND_OVERLAY_STYLE = css`
+  position: ${POSITION_FIXED};
+  inset: 0;
+  z-index: 3;
+  background-color: ${COLORS.black90}${COLORS.opacity60HexCode};
+`
 
 export interface BackgroundOverlayProps
   extends React.ComponentProps<typeof Flex> {
@@ -13,13 +22,7 @@ export function BackgroundOverlay(props: BackgroundOverlayProps): JSX.Element {
   return (
     <Flex
       aria-label="BackgroundOverlay"
-      position={POSITION_FIXED}
-      left="0"
-      right="0"
-      top="0"
-      bottom="0"
-      zIndex="3"
-      backgroundColor={COLORS.grey50}
+      css={BACKGROUND_OVERLAY_STYLE}
       onClick={onClick}
       {...flexProps}
     />
