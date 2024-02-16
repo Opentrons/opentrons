@@ -642,7 +642,7 @@ class SetHepaFanStateRequestPayload(EmptyPayload):
     """A request to set the state and pwm of a the hepa fan."""
 
     duty_cycle: utils.UInt32Field
-    fan_on: utils.Int8Field
+    fan_on: utils.UInt8Field
 
 
 @dataclass(eq=False)
@@ -655,16 +655,16 @@ class GetHepaFanStatePayloadResponse(EmptyPayload):
 
 @dataclass(eq=False)
 class SetHepaUVStateRequestPayload(EmptyPayload):
-    """A request to set the state and timeout in seconds of the hepa uv light."""
+    """A request to set the state and duration in seconds of the hepa uv light."""
 
-    timeout_s: utils.UInt32Field
+    uv_duration_s: utils.UInt32Field
     uv_light_on: utils.UInt8Field
 
 
 @dataclass(eq=False)
 class GetHepaUVStatePayloadResponse(EmptyPayload):
-    """A response with the state and timeout in seconds of the hepa uv light."""
+    """A response with the state and duration in seconds of the hepa uv light."""
 
-    timeout_s: utils.UInt32Field
+    uv_duration_s: utils.UInt32Field
     uv_light_on: utils.UInt8Field
     remaining_time_s: utils.UInt32Field
