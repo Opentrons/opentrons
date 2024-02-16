@@ -108,22 +108,19 @@ export const DraggableStepItems = (
   const findStepIndex = (stepId: StepIdType): number =>
     stepIds.findIndex(id => stepId === id)
 
-  const moveStep = React.useCallback(
-    (stepId: StepIdType, targetIndex: number): void => {
-      const currentIndex = findStepIndex(stepId)
-      const currentRemoved = [
-        ...stepIds.slice(0, currentIndex),
-        ...stepIds.slice(currentIndex + 1, stepIds.length),
-      ]
-      const currentReinserted = [
-        ...currentRemoved.slice(0, targetIndex),
-        stepId,
-        ...currentRemoved.slice(targetIndex, currentRemoved.length),
-      ]
-      setStepIds(currentReinserted)
-    },
-    [stepIds, findStepIndex]
-  )
+  const moveStep = (stepId: StepIdType, targetIndex: number): void => {
+    const currentIndex = findStepIndex(stepId)
+    const currentRemoved = [
+      ...stepIds.slice(0, currentIndex),
+      ...stepIds.slice(currentIndex + 1, stepIds.length),
+    ]
+    const currentReinserted = [
+      ...currentRemoved.slice(0, targetIndex),
+      stepId,
+      ...currentRemoved.slice(targetIndex, currentRemoved.length),
+    ]
+    setStepIds(currentReinserted)
+  }
 
   const currentIds = isOver ? stepIds : orderedStepIds
 
