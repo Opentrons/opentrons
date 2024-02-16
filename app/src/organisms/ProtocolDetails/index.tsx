@@ -591,7 +591,7 @@ export function ProtocolDetails(
                   onClick={() => setCurrentTab('robot_config')}
                 >
                   <StyledText>
-                    {i18n.format(t('robot_configuration'), 'capitalize')}
+                    {i18n.format(t('hardware'), 'capitalize')}
                   </StyledText>
                 </RoundTab>
                 <RoundTab
