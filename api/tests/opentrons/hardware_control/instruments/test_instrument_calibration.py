@@ -99,9 +99,9 @@ def test_load_tip_length(
     decoy.when(calibration_storage.helpers.hash_labware_def(tip_rack_dict)).then_return(
         "asdfghjk"
     )
-    decoy.when(calibration_storage.helpers.uri_from_definition(tip_rack_dict)).then_return(
-        "def456"
-    )
+    decoy.when(
+        calibration_storage.helpers.uri_from_definition(tip_rack_dict)
+    ).then_return(LabwareUri("def456"))
 
     result = subject.load_tip_length_for_pipette(
         pipette_id="abc123", tiprack=tip_rack_definition
