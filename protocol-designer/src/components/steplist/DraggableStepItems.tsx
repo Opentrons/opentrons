@@ -93,6 +93,8 @@ export const DraggableStepItems = (
   const { t } = useTranslation('shared')
   const [isOver, setIsOver] = React.useState<boolean>(false)
   const [stepIds, setStepIds] = React.useState<StepIdType[]>(orderedStepIds)
+
+  //  needed to initalize stepIds
   React.useEffect(() => {
     setStepIds(orderedStepIds)
   }, [orderedStepIds])
@@ -109,17 +111,13 @@ export const DraggableStepItems = (
     stepIds.findIndex(id => stepId === id)
 
   const moveStep = (stepId: StepIdType, targetIndex: number): void => {
-    const currentIndex = findStepIndex(stepId)
-    const currentRemoved = [
-      ...stepIds.slice(0, currentIndex),
-      ...stepIds.slice(currentIndex + 1, stepIds.length),
-    ]
-    const currentReinserted = [
-      ...currentRemoved.slice(0, targetIndex),
-      stepId,
-      ...currentRemoved.slice(targetIndex, currentRemoved.length),
-    ]
-    setStepIds(currentReinserted)
+    const currentIndex = orderedStepIds.findIndex(id => id === stepId)
+
+    const newStepIds = [...orderedStepIds]
+    newStepIds.splice(currentIndex, 1)
+    newStepIds.splice(targetIndex, 0, stepId)
+
+    setStepIds(newStepIds)
   }
 
   const currentIds = isOver ? stepIds : orderedStepIds
