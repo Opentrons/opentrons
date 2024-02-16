@@ -16,12 +16,14 @@ If you don't care about preserving your labware offsets and run history, you can
 
 ### Improved Features
 
-- In the `/runs/commands`, `/maintenance_runs/commands`, and `/protocols` endpoints, the `dispense` command will now return an error if you try to dispense more than you've aspirated, instead of silently clamping.
-- The `/runs/commands` endpoints are significantly faster when you request a small number of commands from a stored run.
+- The robot software now runs Python 3.10. Many built-in Python packages were updated to match. If you have installed your own Python packages on the robot, re-install them to ensure compatibility.
+- Added error handling when dispensing. The `/runs/commands`, `/maintenance_runs/commands`, and `/protocols` HTTP API endpoints now return an error if you try to dispense more than you've aspirated.
+- Improved performance of the `/runs/commands` endpoints. They are now significantly faster when requesting a small number of commands from a stored run.
 
 ### Bug Fixes
 
 - The Flex Gripper will no longer pick up large labware that could collide with tips held by an adjoining pipette.
+- Flex now properly configures itself when connected by Ethernet directly to a computer.
 
 ### Removals
 
