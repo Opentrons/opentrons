@@ -2,21 +2,19 @@ import * as React from 'react'
 import { Svg } from '../../primitives'
 import type { DeckDefinition, DeckSlot } from '@opentrons/shared-data'
 
-export interface RobotCoordinateSpaceWithDOMCoordsRenderProps {
+export interface RobotCoordinateSpaceWithRefRenderProps {
   deckSlotsById: { [slotId: string]: DeckSlot }
 }
 
-interface RobotCoordinateSpaceWithDOMCoordsProps
+interface RobotCoordinateSpaceWithRefProps
   extends React.ComponentProps<typeof Svg> {
   viewBox?: string | null
   deckDef?: DeckDefinition
-  children?: (
-    props: RobotCoordinateSpaceWithDOMCoordsRenderProps
-  ) => React.ReactNode
+  children?: (props: RobotCoordinateSpaceWithRefRenderProps) => React.ReactNode
 }
 
-export function RobotCoordinateSpaceWithDOMCoords(
-  props: RobotCoordinateSpaceWithDOMCoordsProps
+export function RobotCoordinateSpaceWithRef(
+  props: RobotCoordinateSpaceWithRefProps
 ): JSX.Element | null {
   const { children, deckDef, viewBox, ...restProps } = props
   const wrapperRef = React.useRef<SVGSVGElement>(null)

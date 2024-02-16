@@ -7,7 +7,7 @@ import {
   DeckFromLayers,
   FlexTrash,
   Module,
-  RobotCoordinateSpaceWithDOMCoords,
+  RobotCoordinateSpaceWithRef,
   SingleSlotFixture,
   StagingAreaFixture,
   StagingAreaLocation,
@@ -553,7 +553,7 @@ export const DeckSetup = (): JSX.Element => {
       {drilledDown && <BrowseLabwareModal />}
 
       <div ref={wrapperRef} className={styles.deck_wrapper}>
-        <RobotCoordinateSpaceWithDOMCoords
+        <RobotCoordinateSpaceWithRef
           height="100%"
           deckDef={deckDef}
           viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${
@@ -658,7 +658,7 @@ export const DeckSetup = (): JSX.Element => {
               />
             </>
           )}
-        </RobotCoordinateSpaceWithDOMCoords>
+        </RobotCoordinateSpaceWithRef>
       </div>
     </div>
   )
