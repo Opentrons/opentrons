@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { BORDERS, RESPONSIVENESS, SPACING } from '../ui-style-constants'
+import { BORDERS, SPACING } from '../ui-style-constants'
 import { COLORS } from '../helix-design-system'
 import { StyleProps, styleProps } from '../primitives'
 import {

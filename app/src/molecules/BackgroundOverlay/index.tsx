@@ -1,12 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 
-import {
-  COLORS,
-  Flex,
-  POSITION_FIXED,
-  RESPONSIVENESS,
-} from '@opentrons/components'
+import { COLORS, Flex, POSITION_FIXED } from '@opentrons/components'
 
 const BACKGROUND_OVERLAY_STYLE = css`
   position: ${POSITION_FIXED};
