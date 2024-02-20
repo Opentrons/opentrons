@@ -26,6 +26,7 @@ const BUTTON_GROUP_STYLES = css`
     &:focus {
       box-shadow: none;
       color: ${COLORS.white};
+      background-color: ${COLORS.blue50};
     }
 
     &:hover {
