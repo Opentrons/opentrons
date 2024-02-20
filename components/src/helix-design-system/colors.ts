@@ -60,12 +60,12 @@ export const blue10 = '#F1F8FF'
  */
 export const grey60 = '#4A4C4E'
 export const grey55 = '#737578'
-export const grey50 = '#9C9C9C'
+export const grey50 = '#737578'
 export const grey40 = '#B7B8B9'
 export const grey35 = '#CBCCCC'
 export const grey30 = '#DEDEDE'
 export const grey20 = '#E9E9E9'
-export const grey10 = '#F8F8F8'
+export const grey10 = '#F3F3F3'
 
 /**
  * core
