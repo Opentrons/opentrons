@@ -1,6 +1,4 @@
 """Test pipette data provider."""
-from collections import OrderedDict
-
 import pytest
 from opentrons_shared_data.pipette.dev_types import PipetteNameType, PipetteModel
 from opentrons_shared_data.pipette import pipette_definition, types as pip_types
@@ -13,7 +11,6 @@ from opentrons.protocol_engine.resources.pipette_data_provider import (
 )
 
 from opentrons.protocol_engine.resources import pipette_data_provider as subject
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from ..pipette_fixtures import get_default_nozzle_map
 
 
@@ -175,7 +172,7 @@ def test_get_pipette_static_config(
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
 ) -> None:
     """It should return config data given a PipetteDict."""
-    dummy_nozzle_map = get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
+    dummy_nozzle_map = get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2)
     pipette_dict: PipetteDict = {
         "name": "p300_single_gen2",
         "min_volume": 20,

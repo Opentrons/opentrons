@@ -246,7 +246,7 @@ class EquipmentHandler:
         return LoadedPipetteData(
             pipette_id=pipette_id,
             serial_number=serial,
-            static_config=static_pipette_config
+            static_config=static_pipette_config,
         )
 
     async def load_magnetic_block(

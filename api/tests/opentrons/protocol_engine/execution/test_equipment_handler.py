@@ -10,7 +10,7 @@ from opentrons_shared_data.pipette import pipette_definition
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
 from opentrons.calibration_storage.helpers import uri_from_details
-from opentrons.types import Mount as HwMount, MountType, DeckSlotName, Point
+from opentrons.types import Mount as HwMount, MountType, DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import (
     TempDeck,
@@ -56,7 +56,6 @@ from opentrons.protocol_engine.execution.equipment import (
     LoadedPipetteData,
     LoadedModuleData,
 )
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from ..pipette_fixtures import get_default_nozzle_map
 
 
@@ -149,7 +148,7 @@ def loaded_static_pipette_data(
         nominal_tip_overlap={"default": 9.87},
         home_position=10.11,
         nozzle_offset_z=12.13,
-        nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE)
+        nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
     )
 
 

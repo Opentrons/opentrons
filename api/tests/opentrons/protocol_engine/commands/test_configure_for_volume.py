@@ -19,6 +19,7 @@ from opentrons.protocol_engine.commands.configure_for_volume import (
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from ..pipette_fixtures import get_default_nozzle_map
 
+
 async def test_configure_for_volume_implementation(
     decoy: Decoy,
     equipment: EquipmentHandler,

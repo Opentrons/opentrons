@@ -18,7 +18,6 @@ from opentrons.hardware_control.nozzle_manager import (
 )
 
 from ..types import FlowRates
-from ...types import Point
 
 
 @dataclass(frozen=True)
@@ -172,7 +171,7 @@ class VirtualPipetteDataProvider:
             nominal_tip_overlap=config.liquid_properties[
                 liquid_class
             ].tip_overlap_dictionary,
-            nozzle_map=nozzle_manager.current_configuration
+            nozzle_map=nozzle_manager.current_configuration,
         )
 
     def get_virtual_pipette_static_config(
@@ -206,5 +205,5 @@ def get_pipette_static_config(pipette_dict: PipetteDict) -> LoadedStaticPipetteD
         # https://opentrons.atlassian.net/browse/RCORE-655
         home_position=0,
         nozzle_offset_z=0,
-        nozzle_map=pipette_dict["current_nozzle_map"]
+        nozzle_map=pipette_dict["current_nozzle_map"],
     )
