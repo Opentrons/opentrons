@@ -167,11 +167,14 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 home_position=config.home_position,
                 nozzle_offset_z=config.nozzle_offset_z,
                 bounding_nozzle_offsets=BoundingNozzlesOffsets(
-                    back_left_offset=config.back_left_nozzle_offset,
-                    front_right_offset=config.front_right_nozzle_offset,
+                    back_left_offset=config.nozzle_map.back_left_nozzle_offset,
+                    front_right_offset=config.nozzle_map.front_right_nozzle_offset,
                 ),
             )
             self._state.flow_rates_by_id[private_result.pipette_id] = config.flow_rates
+            self._state.nozzle_configuration_by_id[
+                private_result.pipette_id
+            ] = config.nozzle_map
         elif isinstance(private_result, PipetteNozzleLayoutResultMixin):
             self._state.nozzle_configuration_by_id[
                 private_result.pipette_id

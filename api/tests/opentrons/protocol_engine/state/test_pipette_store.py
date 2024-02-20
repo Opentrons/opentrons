@@ -51,7 +51,8 @@ from .command_fixtures import (
     create_move_relative_command,
     create_prepare_to_aspirate_command,
 )
-
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from ..pipette_fixtures import get_default_nozzle_map
 
 @pytest.fixture
 def subject() -> PipetteStore:
@@ -682,8 +683,7 @@ def test_add_pipette_config(
             nominal_tip_overlap={"default": 5},
             home_position=8.9,
             nozzle_offset_z=10.11,
-            back_left_nozzle_offset=Point(x=1, y=2, z=3),
-            front_right_nozzle_offset=Point(x=4, y=5, z=6),
+            nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE)
         ),
     )
     subject.handle_action(
@@ -702,8 +702,8 @@ def test_add_pipette_config(
         home_position=8.9,
         nozzle_offset_z=10.11,
         bounding_nozzle_offsets=BoundingNozzlesOffsets(
-            back_left_offset=Point(x=1, y=2, z=3),
-            front_right_offset=Point(x=4, y=5, z=6),
+            back_left_offset=Point(x=0, y=0, z=0),
+            front_right_offset=Point(x=0, y=0, z=0)
         ),
     )
     assert subject.state.flow_rates_by_id["pipette-id"].default_aspirate == {"a": 1.0}

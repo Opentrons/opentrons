@@ -3,6 +3,9 @@
 from collections import OrderedDict
 
 from opentrons.types import Point
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
+
 
 NINETY_SIX_ROWS = OrderedDict(
     (
@@ -317,3 +320,34 @@ EIGHT_CHANNEL_MAP = OrderedDict(
         ("H1", Point(0.0, -31.5, 35.52)),
     )
 )
+
+
+def get_default_nozzle_map(pipette_type: PipetteNameType) -> NozzleMap:
+    """Get default nozzle map for a given pipette type."""
+    if "multi" in pipette_type.value:
+        return NozzleMap.build(
+            physical_nozzles=EIGHT_CHANNEL_MAP,
+            physical_rows=EIGHT_CHANNEL_ROWS,
+            physical_columns=EIGHT_CHANNEL_COLS,
+            starting_nozzle="A1",
+            back_left_nozzle="A1",
+            front_right_nozzle="A1",
+        )
+    elif "96" in pipette_type.value:
+        return NozzleMap.build(
+            physical_nozzles=NINETY_SIX_MAP,
+            physical_rows=NINETY_SIX_ROWS,
+            physical_columns=NINETY_SIX_COLS,
+            starting_nozzle="A1",
+            back_left_nozzle="A1",
+            front_right_nozzle="A1",
+        )
+    else:
+        return NozzleMap.build(
+            physical_nozzles=OrderedDict({"A1": Point(0, 0, 0)}),
+            physical_rows=OrderedDict({"A": ["A1"]}),
+            physical_columns=OrderedDict({"1": ["A1"]}),
+            starting_nozzle="A1",
+            back_left_nozzle="A1",
+            front_right_nozzle="A1",
+        )

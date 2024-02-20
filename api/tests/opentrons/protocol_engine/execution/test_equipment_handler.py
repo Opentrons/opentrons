@@ -56,6 +56,8 @@ from opentrons.protocol_engine.execution.equipment import (
     LoadedPipetteData,
     LoadedModuleData,
 )
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from ..pipette_fixtures import get_default_nozzle_map
 
 
 def _make_config(use_virtual_modules: bool) -> Config:
@@ -147,8 +149,7 @@ def loaded_static_pipette_data(
         nominal_tip_overlap={"default": 9.87},
         home_position=10.11,
         nozzle_offset_z=12.13,
-        back_left_nozzle_offset=Point(x=1, y=2, z=3),
-        front_right_nozzle_offset=Point(x=4, y=5, z=6),
+        nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE)
     )
 
 

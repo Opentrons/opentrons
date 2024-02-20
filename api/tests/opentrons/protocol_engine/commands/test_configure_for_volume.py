@@ -16,8 +16,8 @@ from opentrons.protocol_engine.commands.configure_for_volume import (
     ConfigureForVolumePrivateResult,
     ConfigureForVolumeImplementation,
 )
-from opentrons.types import Point
-
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from ..pipette_fixtures import get_default_nozzle_map
 
 async def test_configure_for_volume_implementation(
     decoy: Decoy,
@@ -44,8 +44,7 @@ async def test_configure_for_volume_implementation(
         ),
         tip_configuration_lookup_table={},
         nominal_tip_overlap={},
-        back_left_nozzle_offset=Point(x=1, y=2, z=3),
-        front_right_nozzle_offset=Point(x=4, y=5, z=6),
+        nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI),
     )
 
     decoy.when(

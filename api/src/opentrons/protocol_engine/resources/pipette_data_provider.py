@@ -37,8 +37,7 @@ class LoadedStaticPipetteData:
         float, pipette_definition.SupportedTipsDefinition
     ]
     nominal_tip_overlap: Dict[str, float]
-    back_left_nozzle_offset: Point
-    front_right_nozzle_offset: Point
+    nozzle_map: NozzleMap
 
 
 class VirtualPipetteDataProvider:
@@ -173,8 +172,7 @@ class VirtualPipetteDataProvider:
             nominal_tip_overlap=config.liquid_properties[
                 liquid_class
             ].tip_overlap_dictionary,
-            back_left_nozzle_offset=nozzle_manager.current_configuration.back_left_nozzle_offset,
-            front_right_nozzle_offset=nozzle_manager.current_configuration.front_right_nozzle_offset,
+            nozzle_map=nozzle_manager.current_configuration
         )
 
     def get_virtual_pipette_static_config(
@@ -208,11 +206,5 @@ def get_pipette_static_config(pipette_dict: PipetteDict) -> LoadedStaticPipetteD
         # https://opentrons.atlassian.net/browse/RCORE-655
         home_position=0,
         nozzle_offset_z=0,
-        # TODO (spp): Confirm that the nozzle map is populated by the hardware api by default
-        back_left_nozzle_offset=pipette_dict[
-            "current_nozzle_map"
-        ].back_left_nozzle_offset,
-        front_right_nozzle_offset=pipette_dict[
-            "current_nozzle_map"
-        ].front_right_nozzle_offset,
+        nozzle_map=pipette_dict["current_nozzle_map"]
     )
