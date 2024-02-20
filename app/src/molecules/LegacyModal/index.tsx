@@ -19,6 +19,9 @@ export interface LegacyModalProps extends StyleProps {
   footer?: React.ReactNode
 }
 
+/**
+ * For Desktop app use only.
+ */
 export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
   const {
     type = 'info',

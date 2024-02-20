@@ -22,7 +22,7 @@ BUILD_NUMBER ?=
 
 ot_project := $(OPENTRONS_PROJECT)
 project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
-project_ot3_default = $(if $(ot_project),$(ot_project),ot3)
+project_ir_default = $(if $(ot_project),$(ot_project),ot3)
 
 # this may be set as an environment variable to select the version of
 # python to run if pyenv is not available. it should always be set to
@@ -33,7 +33,7 @@ BUILD_DIR := dist
 
 
 wheel_file = $(BUILD_DIR)/$(call python_get_wheelname,shared-data,$(project_rs_default),opentrons_shared_data,$(BUILD_NUMBER),../../scripts/python_build_utils.py)
-sdist_file = $(BUILD_DIR)/$(call python_get_sdistname,shared-data,$(project_ot3_default),opentrons_shared_data,,../../scripts/python_build_utils.py)
+sdist_file = $(BUILD_DIR)/$(call python_get_sdistname,shared-data,$(project_rs_default),opentrons_shared_data,,../../scripts/python_build_utils.py)
 
 py_sources = $(filter %.py,$(shell $(SHX) find opentrons_shared_data)) opentrons_shared_data/py.typed
 deck_sources = $(wildcard ../deck/definitions/*/*.json) $(wildcard ../deck/schemas/*.json)
@@ -84,7 +84,7 @@ wheel: setup.py $(py_sources) $(json_sources)
 
 
 .PHONY: sdist
-sdist: export OPENTRONS_PROJECT=$(project_ot3_default)
+sdist: export OPENTRONS_PROJECT=$(project_rs_default)
 sdist: setup.py $(py_sources) $(json_sources)
 	$(SHX) mkdir -p build
 	$(python) setup.py sdist

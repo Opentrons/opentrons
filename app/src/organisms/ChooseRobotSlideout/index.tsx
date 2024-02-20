@@ -190,7 +190,7 @@ export function ChooseRobotSlideout(
             <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
               <StyledText
                 as="p"
-                color={COLORS.grey50}
+                color={COLORS.grey60}
                 marginRight={SPACING.spacing12}
               >
                 {t('app_settings:searching')}
@@ -199,7 +199,7 @@ export function ChooseRobotSlideout(
                 name="ot-spinner"
                 spin
                 size="1.25rem"
-                color={COLORS.grey50}
+                color={COLORS.grey60}
               />
             </Flex>
           ) : (

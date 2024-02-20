@@ -11,13 +11,12 @@ import { GripperWizardFlows } from '../GripperWizardFlows'
 import { AboutGripperSlideout } from './AboutGripperSlideout'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
 
-import type { BadGripper, GripperData, Subsystem } from '@opentrons/api-client'
+import type { BadGripper, GripperData } from '@opentrons/api-client'
 import type { GripperWizardFlowType } from '../GripperWizardFlows/types'
 
 interface GripperCardProps {
   attachedGripper: GripperData | BadGripper | null
   isCalibrated: boolean
-  setSubsystemToUpdate: (subsystem: Subsystem | null) => void
   isRunActive: boolean
   isEstopNotDisengaged: boolean
 }
@@ -42,7 +41,6 @@ const POLL_DURATION_MS = 5000
 export function GripperCard({
   attachedGripper,
   isCalibrated,
-  setSubsystemToUpdate,
   isRunActive,
   isEstopNotDisengaged,
 }: GripperCardProps): JSX.Element {
@@ -177,29 +175,14 @@ export function GripperCard({
               type={subsystemUpdateData != null ? 'warning' : 'error'}
               marginBottom={SPACING.spacing4}
             >
-              {isEstopNotDisengaged ? (
-                <StyledText as="p">
-                  {t('firmware_update_available_now_without_link')}
-                </StyledText>
-              ) : (
-                <Trans
-                  t={t}
-                  i18nKey={
-                    subsystemUpdateData != null
-                      ? 'firmware_update_occurring'
-                      : 'firmware_update_available_now'
-                  }
-                  components={{
-                    updateLink: (
-                      <StyledText
-                        as="p"
-                        css={BANNER_LINK_CSS}
-                        onClick={() => setSubsystemToUpdate('gripper')}
-                      />
-                    ),
-                  }}
-                />
-              )}
+              <Trans
+                t={t}
+                i18nKey={
+                  subsystemUpdateData != null
+                    ? 'firmware_update_occurring'
+                    : 'firmware_update_needed'
+                }
+              />
             </Banner>
           }
           isEstopNotDisengaged={isEstopNotDisengaged}

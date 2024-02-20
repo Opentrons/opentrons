@@ -59,15 +59,9 @@ interface PipetteCardProps {
   robotName: string
   pipetteIs96Channel: boolean
   pipetteIsBad: boolean
-  updatePipette: () => void
   isRunActive: boolean
   isEstopNotDisengaged: boolean
 }
-const BANNER_LINK_STYLE = css`
-  text-decoration: underline;
-  cursor: pointer;
-  margin-left: ${SPACING.spacing8};
-`
 
 const INSTRUMENT_CARD_STYLE = css`
   p {
@@ -91,7 +85,6 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     pipetteId,
     pipetteIs96Channel,
     pipetteIsBad,
-    updatePipette,
     isRunActive,
     isEstopNotDisengaged,
   } = props
@@ -356,17 +349,8 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                 i18nKey={
                   subsystemUpdateData != null
                     ? 'firmware_update_occurring'
-                    : 'firmware_update_available_now'
+                    : 'firmware_update_needed'
                 }
-                components={{
-                  updateLink: (
-                    <StyledText
-                      as="p"
-                      css={BANNER_LINK_STYLE}
-                      onClick={updatePipette}
-                    />
-                  ),
-                }}
               />
             </Banner>
           }
