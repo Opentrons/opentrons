@@ -153,7 +153,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
                 >
                   {t(stepSizeTranslationKeyByStep[stepSize])}
                   <StyledText
-                    color={COLORS.grey50}
+                    color={COLORS.grey60}
                     css={TYPOGRAPHY.labelRegular}
                   >{`${stepSize} mm`}</StyledText>
                 </PrimaryButton>
