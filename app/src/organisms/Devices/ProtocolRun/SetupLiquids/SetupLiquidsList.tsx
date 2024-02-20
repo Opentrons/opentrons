@@ -113,7 +113,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
 
     &:hover {
       cursor: pointer;
-      border: 1px solid ${COLORS.grey60};
+      border: 1px solid ${COLORS.grey35};
     }
   `
   const LIQUID_CARD_ITEM_STYLE = css`
@@ -311,7 +311,7 @@ export const LiquidsListItemDetails = (
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={COLORS.grey50}
+          color={COLORS.grey60}
           marginX={SPACING.spacing16}
         >
           {description != null ? description : null}
