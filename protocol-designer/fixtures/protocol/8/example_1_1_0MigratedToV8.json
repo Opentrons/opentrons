@@ -3351,7 +3351,7 @@
       "key": "823bb056-dd22-40aa-9c97-89a2e67fcb82",
       "commandType": "loadLabware",
       "params": {
-        "displayName": "Opentrons OT-2 96 Tip Rack 10 µL",
+        "displayName": "tiprack 10ul (1)",
         "labwareId": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul",
         "loadName": "opentrons_96_tiprack_10ul",
         "namespace": "opentrons",
@@ -3363,7 +3363,7 @@
       "key": "8a771523-8f41-4228-9f62-852de34df87e",
       "commandType": "loadLabware",
       "params": {
-        "displayName": "(Retired) TipOne 96 Tip Rack 200 µL",
+        "displayName": "tiprack 200ul (1)",
         "labwareId": "c6f51380-92a5-11e9-ac62-1b173f839d9e:tiprack-200ul",
         "loadName": "tipone_96_tiprack_200ul",
         "namespace": "opentrons",
@@ -3375,7 +3375,7 @@
       "key": "a545c357-1414-4500-b01b-16bc8dc87fbb",
       "commandType": "loadLabware",
       "params": {
-        "displayName": "USA Scientific 96 Deep Well Plate 2.4 mL",
+        "displayName": "96 deep well (1)",
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "loadName": "usascientific_96_wellplate_2.4ml_deep",
         "namespace": "opentrons",
