@@ -16,7 +16,9 @@ from .dev_types import (
 
 OLD_TC_GEN2_LABWARE_OFFSET = {"x": 0, "y": 68.06, "z": 98.26}
 
-# TODO (spp, 2023-02-14): make these a part of thermocycler/ deck definitions
+# TODO (spp, 2023-02-14): these values are measured experimentally, and aren't from
+#  machine drawings. We should replace them with values from CAD files and
+#  possibly make them a part of thermocycler/ deck definitions
 FLEX_TC_LID_CLIP_POSITIONS_IN_DECK_COORDINATES = {
     "left_clip": {"x": -3.25, "y": 402, "z": 205},
     "right_clip": {"x": 97.75, "y": 402, "z": 205},

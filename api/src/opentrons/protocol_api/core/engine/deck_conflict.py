@@ -329,7 +329,18 @@ def _will_collide_with_thermocycler_lid(
     pipette_bounds: Tuple[Point, Point, Point, Point],
     surrounding_regular_slots: List[DeckSlotName],
 ) -> bool:
-    """Return whether the pipette might collide with thermocycler's lid on a Flex."""
+    """Return whether the pipette might collide with thermocycler's lid/clips on a Flex.
+
+    If any of the pipette's bounding vertices lie inside the no-go zone of the thermocycler-
+    which is the area that's to the left, back and below the thermocycler's lid's
+    protruding clips, then we will mark the movement for possible collision.
+
+    This could cause false raises for the case where an 8-channel is accessing the
+    thermocycler labware in a location such that the pipette is in the area between
+    the clips but not touching either clips. But that's a tradeoff we'll need to make
+    between a complicated check involving accurate positions of all entities involved
+    and a crude check that disallows all partial tip movements around the thermocycler.
+    """
     if (
         DeckSlotName.SLOT_A1 in surrounding_regular_slots
         and engine_state.modules.is_flex_deck_with_thermocycler()
