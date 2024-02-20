@@ -10,6 +10,7 @@ import {
   notifySubscribeAction,
   notifyUnsubscribeAction,
 } from '../../redux/shell'
+import { useRobotType } from '../../organisms/Devices/hooks'
 
 import type { HostConfig } from '@opentrons/api-client'
 import type { QueryOptionsWithPolling } from '../useNotifyService'
@@ -20,8 +21,12 @@ jest.mock('../../redux/analytics')
 jest.mock('../../redux/shell/remote', () => ({
   appShellListener: jest.fn(),
 }))
+jest.mock('../../organisms/Devices/hooks')
 
-const MOCK_HOST_CONFIG: HostConfig = { hostname: 'MOCK_HOST' }
+const MOCK_HOST_CONFIG: HostConfig = {
+  hostname: 'MOCK_HOST',
+  robotName: 'MOCK_NAME',
+}
 const MOCK_TOPIC = '/test/topic' as any
 const MOCK_OPTIONS: QueryOptionsWithPolling<any, any> = {
   forceHttpPolling: false,
@@ -34,6 +39,9 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
 >
 const mockAppShellListener = appShellListener as jest.MockedFunction<
   typeof appShellListener
+>
+const mockUseRobotType = useRobotType as jest.MockedFunction<
+  typeof useRobotType
 >
 
 describe('useNotifyService', () => {
@@ -48,6 +56,7 @@ describe('useNotifyService', () => {
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
     mockUseDispatch.mockReturnValue(mockDispatch)
     mockUseHost.mockReturnValue(MOCK_HOST_CONFIG)
+    mockUseRobotType.mockReturnValue('OT-3 Standard')
   })
 
   afterEach(() => {

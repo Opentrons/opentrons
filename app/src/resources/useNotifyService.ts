@@ -33,7 +33,6 @@ export function useNotifyService<TData, TError = Error>({
 }: UseNotifyServiceProps<TData, TError>): { isNotifyError: boolean } {
   const dispatch = useDispatch()
   const host = useHost()
-  const robotType = useRobotType(host?.robotName ?? '')
   const isNotifyError = React.useRef(false)
   const doTrackEvent = useTrackEvent()
   const { enabled, staleTime, forceHttpPolling } = options
@@ -72,7 +71,8 @@ export function useNotifyService<TData, TError = Error>({
     if (!isNotifyError.current) {
       if (data === 'ECONNFAILED' || data === 'ECONNREFUSED') {
         isNotifyError.current = true
-        if (data === 'ECONNREFUSED') {
+        if (data === 'ECONNREFUSED' && host?.robotName != null) {
+          const robotType = useRobotType(host.robotName)
           doTrackEvent({
             name: ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
             properties: { robotType },
