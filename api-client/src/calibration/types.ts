@@ -8,7 +8,7 @@ export interface PipOffsetDeletionParams {
 
 export interface TipLengthDeletionParams {
   calType: 'tipLength'
-  tiprack_hash: string
+  tiprack_uri: string
   pipette_id: string
 }
 export type DeleteCalRequestParams =
