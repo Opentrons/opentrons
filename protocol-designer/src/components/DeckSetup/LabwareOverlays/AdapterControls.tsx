@@ -96,7 +96,7 @@ export const AdapterControls = (
       }
     },
     hover: () => {
-      if (handleDragHover) {
+      if (handleDragHover != null) {
         handleDragHover()
       }
     },

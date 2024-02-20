@@ -52,18 +52,10 @@ export const EditLabware = (props: Props): JSX.Element | null => {
     dispatch(openIngredientSelector(labwareOnDeck.id))
   }
 
-  const [, drag] = useDrag(() => ({
+  const [, drag] = useDrag({
     type: DND_TYPES.LABWARE,
     item: { labwareOnDeck },
-    beginDrag: () => {
-      setDraggedLabware(labwareOnDeck)
-      return { labwareOnDeck }
-    },
-    endDrag: () => {
-      setHoveredLabware(null)
-      setDraggedLabware(null)
-    },
-  }))
+  })
 
   const [{ draggedLabware, isOver }, drop] = useDrop(() => ({
     accept: DND_TYPES.LABWARE,
@@ -82,8 +74,10 @@ export const EditLabware = (props: Props): JSX.Element | null => {
       }
     },
 
-    hover: () => {
-      setHoveredLabware(labwareOnDeck)
+    hover: (item: DroppedItem, monitor: DropTargetMonitor) => {
+      if (monitor.canDrop()) {
+        setHoveredLabware(labwareOnDeck)
+      }
     },
     collect: (monitor: DropTargetMonitor) => ({
       isOver: monitor.isOver(),
@@ -98,6 +92,10 @@ export const EditLabware = (props: Props): JSX.Element | null => {
   React.useEffect(() => {
     if (draggedItem != null) {
       setSlot(draggedItem.slot)
+      setDraggedLabware(draggedItem)
+    } else {
+      setHoveredLabware(null)
+      setDraggedLabware(null)
     }
   })
 
