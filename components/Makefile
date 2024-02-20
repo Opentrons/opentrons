@@ -17,7 +17,7 @@ all: clean dist
 
 .PHONY: clean
 clean:
-	pnpm --cwd .. shx rm -rf storybook-static
+	cd .. && pnpm shx rm -rf storybook-static
 
 # artifacts
 #####################################################################
