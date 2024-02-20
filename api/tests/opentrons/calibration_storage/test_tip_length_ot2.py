@@ -84,7 +84,7 @@ def test_delete_specific_tip_calibration(
     assert len(tip_lengths_for_pipette("pip1").keys()) == 2
     assert tip_lengths_for_pipette("pip2") != {}
     tip_rack_uri = helpers.uri_from_definition(minimal_labware_def)
-    delete_tip_length_calibration(tip_rack_uri, "pip1")
+    delete_tip_length_calibration("pip1", tiprack_uri=tip_rack_uri)
     assert len(tip_lengths_for_pipette("pip1").keys()) == 1
     assert tip_lengths_for_pipette("pip2") != {}
 

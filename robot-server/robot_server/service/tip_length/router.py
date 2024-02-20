@@ -92,7 +92,9 @@ async def delete_specific_tip_length_calibration(
 ):
     try:
         tip_length.delete_tip_length_calibration(
-            cast(LabwareUri, tiprack_uri), pipette_id
+            pipette_id,
+            tiprack_uri=cast(LabwareUri, tiprack_uri),
+            tiprack_hash=tiprack_hash,
         )
     except cal_types.TipLengthCalNotFound:
         raise RobotServerError(

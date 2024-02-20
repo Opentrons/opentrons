@@ -41,16 +41,16 @@ def tip_lengths_for_pipette(
     try:
         tip_length_filepath = config.get_tip_length_cal_path() / f"{pipette_id}.json"
         all_tip_lengths_for_pipette = io.read_cal_file(tip_length_filepath)
-        for tiprack_uri, data in all_tip_lengths_for_pipette.items():
+        for tiprack_identifier, data in all_tip_lengths_for_pipette.items():
             # check if tiprack hash
-            if len(tiprack_uri.split("/")) == 1:
-                data["definitionHash"] = tiprack_uri
-                tiprack_uri = data.pop("uri")
+            if len(tiprack_identifier.split("/")) == 1:
+                data["definitionHash"] = tiprack_identifier
+                tiprack_identifier = data.pop("uri")
             try:
-                tip_lengths[LabwareUri(tiprack_uri)] = v1.TipLengthModel(**data)
+                tip_lengths[LabwareUri(tiprack_identifier)] = v1.TipLengthModel(**data)
             except (json.JSONDecodeError, ValidationError):
                 log.warning(
-                    f"Tip length calibration is malformed for {tiprack_uri} on {pipette_id}"
+                    f"Tip length calibration is malformed for {tiprack_identifier} on {pipette_id}"
                 )
                 pass
         return tip_lengths
@@ -134,7 +134,11 @@ def get_custom_tiprack_definition_for_tlc(labware_uri: str) -> "LabwareDefinitio
 # Delete Tip Length Calibration
 
 
-def delete_tip_length_calibration(tiprack: LabwareUri, pipette_id: str) -> None:
+def delete_tip_length_calibration(
+    pipette_id: str,
+    tiprack_uri: typing.Optional[LabwareUri] = None,
+    tiprack_hash: typing.Optional[str] = None,
+) -> None:
     """
     Delete tip length calibration based on tiprack hash and
     pipette serial number
@@ -143,11 +147,23 @@ def delete_tip_length_calibration(tiprack: LabwareUri, pipette_id: str) -> None:
     :param pipette: pipette serial number
     """
     tip_lengths = tip_lengths_for_pipette(pipette_id)
-
-    if tiprack in tip_lengths:
+    tip_length_dir = config.get_tip_length_cal_path()
+    if tiprack_uri in tip_lengths:
         # maybe make modify and delete same file?
-        del tip_lengths[tiprack]
-        tip_length_dir = config.get_tip_length_cal_path()
+        del tip_lengths[tiprack_uri]
+
+        if tip_lengths:
+            dict_of_tip_lengths = _convert_tip_length_model_to_dict(tip_lengths)
+            io.save_to_file(tip_length_dir, pipette_id, dict_of_tip_lengths)
+        else:
+            io.delete_file(tip_length_dir / f"{pipette_id}.json")
+    elif tiprack_hash and any(tiprack_hash in v.dict() for v in tip_lengths.values()):
+        # NOTE this is for backwards compatibilty only
+        # TODO delete this check once the tip_length DELETE router
+        # no longer depends on a tiprack hash
+        for k, v in tip_lengths.items():
+            if tiprack_hash in v.dict():
+                tip_lengths.pop(k)
         if tip_lengths:
             dict_of_tip_lengths = _convert_tip_length_model_to_dict(tip_lengths)
             io.save_to_file(tip_length_dir, pipette_id, dict_of_tip_lengths)
@@ -155,7 +171,7 @@ def delete_tip_length_calibration(tiprack: LabwareUri, pipette_id: str) -> None:
             io.delete_file(tip_length_dir / f"{pipette_id}.json")
     else:
         raise local_types.TipLengthCalNotFound(
-            f"Tip length for hash {tiprack} has not been "
+            f"Tip length for uri {tiprack_uri} and hash {tiprack_hash} has not been "
             f"calibrated for this pipette: {pipette_id} and cannot"
             "be loaded"
         )
