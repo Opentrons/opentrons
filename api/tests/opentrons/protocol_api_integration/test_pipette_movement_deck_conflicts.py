@@ -29,6 +29,9 @@ def test_deck_conflicts_for_96_ch_a12_column_configuration() -> None:
     )
 
     thermocycler = protocol_context.load_module("thermocyclerModuleV2")
+    tc_adjacent_plate = protocol_context.load_labware(
+        "opentrons_96_wellplate_200ul_pcr_full_skirt", "A2"
+    )
     accessible_plate = thermocycler.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt"
     )
@@ -67,8 +70,13 @@ def test_deck_conflicts_for_96_ch_a12_column_configuration() -> None:
     ):
         instrument.dispense(50, badly_placed_labware.wells()[0])
 
+    # Currently does not raise a 'collision with thermocycler lid' error`
+    # because it's the pipette outer cover that hits the lid, but we don't include
+    # the cover in pipette dimensions yet.
+    instrument.dispense(10, tc_adjacent_plate.wells_by_name()["A1"])
+
     # No error cuz dispensing from high above plate, so it clears tuberack in west slot
-    instrument.dispense(25, badly_placed_labware.wells_by_name()["A1"].top(150))
+    instrument.dispense(15, badly_placed_labware.wells_by_name()["A1"].top(150))
 
     thermocycler.open_lid()  # type: ignore[union-attr]
 

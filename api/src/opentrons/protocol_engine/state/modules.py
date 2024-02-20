@@ -1049,3 +1049,17 @@ class ModuleView(HasState[ModuleState]):
                 return self.get(module_id)
 
         return None
+
+    def is_flex_deck_with_thermocycler(self) -> bool:
+        """Return if this is a Flex deck with a thermocycler loaded in B1-A1 slots."""
+        maybe_module = self.get_by_slot(
+            DeckSlotName.SLOT_A1
+        ) or self.get_overflowed_module_in_slot(DeckSlotName.SLOT_A1)
+        if (
+            self._state.deck_type == DeckType.OT3_STANDARD
+            and maybe_module
+            and maybe_module.model == ModuleModel.THERMOCYCLER_MODULE_V2
+        ):
+            return True
+        else:
+            return False

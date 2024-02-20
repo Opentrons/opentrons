@@ -1819,3 +1819,55 @@ def test_get_overflowed_module_in_slot(tempdeck_v1_def: ModuleDefinition) -> Non
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         serialNumber="serial-number",
     )
+
+
+@pytest.mark.parametrize(
+    argnames=["deck_type", "module_def", "module_slot", "expected_result"],
+    argvalues=[
+        (
+            DeckType.OT3_STANDARD,
+            lazy_fixture("thermocycler_v2_def"),
+            DeckSlotName.SLOT_A1,
+            True,
+        ),
+        (
+            DeckType.OT3_STANDARD,
+            lazy_fixture("tempdeck_v1_def"),
+            DeckSlotName.SLOT_A1,
+            False,
+        ),
+        (
+            DeckType.OT3_STANDARD,
+            lazy_fixture("thermocycler_v2_def"),
+            DeckSlotName.SLOT_1,
+            False,
+        ),
+        (
+            DeckType.OT2_STANDARD,
+            lazy_fixture("thermocycler_v2_def"),
+            DeckSlotName.SLOT_A1,
+            False,
+        ),
+    ],
+)
+def test_is_flex_deck_with_thermocycler(
+    deck_type: DeckType,
+    module_def: ModuleDefinition,
+    module_slot: DeckSlotName,
+    expected_result: bool,
+) -> None:
+    """It should return True if there is a thermocycler on Flex."""
+    subject = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_B1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=module_def,
+            )
+        },
+        additional_slots_occupied_by_module_id={
+            "module-id": [module_slot, DeckSlotName.SLOT_C1],
+        },
+        deck_type=deck_type,
+    )
+    assert subject.is_flex_deck_with_thermocycler() == expected_result

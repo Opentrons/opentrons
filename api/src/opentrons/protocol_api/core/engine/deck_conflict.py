@@ -10,9 +10,11 @@ from typing import (
     overload,
     Union,
     TYPE_CHECKING,
+    List,
 )
 
 from opentrons_shared_data.errors.exceptions import MotionPlanningFailureError
+from opentrons_shared_data.module import FLEX_TC_LID_CLIP_POSITIONS_IN_DECK_COORDINATES
 
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons.hardware_control.modules.types import ModuleType
@@ -30,7 +32,10 @@ from opentrons.protocol_engine import (
     DropTipWellLocation,
 )
 from opentrons.protocol_engine.errors.exceptions import LabwareNotLoadedOnModuleError
-from opentrons.protocol_engine.types import StagingSlotLocation, Dimensions
+from opentrons.protocol_engine.types import (
+    StagingSlotLocation,
+    Dimensions,
+)
 from opentrons.types import DeckSlotName, StagingSlotName, Point
 from ..._trash_bin import TrashBin
 from ..._waste_chute import WasteChute
@@ -195,7 +200,8 @@ def check(
     )
 
 
-def check_safe_for_pipette_movement(  # noqa: C901
+# TODO (spp, 2023-02-16): move pipette movement safety checks to its own separate file.
+def check_safe_for_pipette_movement(
     engine_state: StateView,
     pipette_id: str,
     labware_id: str,
@@ -249,44 +255,105 @@ def check_safe_for_pipette_movement(  # noqa: C901
         slot=labware_slot.as_int(), robot_type=engine_state.config.robot_type
     )
 
-    def _check_conflict_with_slot_item(
-        surrounding_slot: Union[DeckSlotName, StagingSlotName],
-    ) -> None:
-        """Raises error if the pipette is expected to collide with surrounding slot items."""
-        # Check if slot overlaps with pipette position
-        slot_pos = engine_state.addressable_areas.get_addressable_area_position(
-            addressable_area_name=surrounding_slot.id,
-            do_compatibility_check=False,
+    if _will_collide_with_thermocycler_lid(
+        engine_state=engine_state,
+        pipette_bounds=pipette_bounds_at_well_location,
+        surrounding_regular_slots=surrounding_slots.regular_slots,
+    ):
+        raise PartialTipMovementNotAllowedError(
+            f"Moving to {engine_state.labware.get_display_name(labware_id)} in slot"
+            f" {labware_slot} with {primary_nozzle} nozzle partial configuration"
+            f" will result in collision with thermocycler lid in deck slot A1."
         )
-        slot_bounds = engine_state.addressable_areas.get_addressable_area_bounding_box(
-            addressable_area_name=surrounding_slot.id,
-            do_compatibility_check=False,
-        )
-        for bound_vertex in pipette_bounds_at_well_location:
-            if not _point_overlaps_with_slot(
-                slot_pos, slot_bounds, nozzle_point=bound_vertex
-            ):
-                continue
-            # Check z-height of items in overlapping slot
-            if isinstance(surrounding_slot, DeckSlotName):
-                slot_highest_z = engine_state.geometry.get_highest_z_in_slot(
-                    DeckSlotLocation(slotName=surrounding_slot)
-                )
-            else:
-                slot_highest_z = engine_state.geometry.get_highest_z_in_slot(
-                    StagingSlotLocation(slotName=surrounding_slot)
-                )
-            if slot_highest_z + Z_SAFETY_MARGIN > pipette_bounds_at_well_location[0].z:
-                raise PartialTipMovementNotAllowedError(
-                    f"Moving to {engine_state.labware.get_display_name(labware_id)} in slot"
-                    f" {labware_slot} with {primary_nozzle} nozzle partial configuration"
-                    f" will result in collision with items in deck slot {surrounding_slot}."
-                )
 
     for regular_slot in surrounding_slots.regular_slots:
-        _check_conflict_with_slot_item(regular_slot)
+        if _slot_has_potential_colliding_object(
+            engine_state=engine_state,
+            pipette_bounds=pipette_bounds_at_well_location,
+            surrounding_slot=regular_slot,
+        ):
+            raise PartialTipMovementNotAllowedError(
+                f"Moving to {engine_state.labware.get_display_name(labware_id)} in slot"
+                f" {labware_slot} with {primary_nozzle} nozzle partial configuration"
+                f" will result in collision with items in deck slot {regular_slot}."
+            )
     for staging_slot in surrounding_slots.staging_slots:
-        _check_conflict_with_slot_item(staging_slot)
+        if _slot_has_potential_colliding_object(
+            engine_state=engine_state,
+            pipette_bounds=pipette_bounds_at_well_location,
+            surrounding_slot=staging_slot,
+        ):
+            raise PartialTipMovementNotAllowedError(
+                f"Moving to {engine_state.labware.get_display_name(labware_id)} in slot"
+                f" {labware_slot} with {primary_nozzle} nozzle partial configuration"
+                f" will result in collision with items in staging slot {staging_slot}."
+            )
+
+
+def _slot_has_potential_colliding_object(
+    engine_state: StateView,
+    pipette_bounds: Tuple[Point, Point, Point, Point],
+    surrounding_slot: Union[DeckSlotName, StagingSlotName],
+) -> bool:
+    """Return the slot, if any, that has an item that the pipette might collide into."""
+    # Check if slot overlaps with pipette position
+    slot_pos = engine_state.addressable_areas.get_addressable_area_position(
+        addressable_area_name=surrounding_slot.id,
+        do_compatibility_check=False,
+    )
+    slot_bounds = engine_state.addressable_areas.get_addressable_area_bounding_box(
+        addressable_area_name=surrounding_slot.id,
+        do_compatibility_check=False,
+    )
+    for bound_vertex in pipette_bounds:
+        if not _point_overlaps_with_slot(
+            slot_pos, slot_bounds, nozzle_point=bound_vertex
+        ):
+            continue
+        # Check z-height of items in overlapping slot
+        if isinstance(surrounding_slot, DeckSlotName):
+            slot_highest_z = engine_state.geometry.get_highest_z_in_slot(
+                DeckSlotLocation(slotName=surrounding_slot)
+            )
+        else:
+            slot_highest_z = engine_state.geometry.get_highest_z_in_slot(
+                StagingSlotLocation(slotName=surrounding_slot)
+            )
+        if slot_highest_z + Z_SAFETY_MARGIN > pipette_bounds[0].z:
+            return True
+    return False
+
+
+def _will_collide_with_thermocycler_lid(
+    engine_state: StateView,
+    pipette_bounds: Tuple[Point, Point, Point, Point],
+    surrounding_regular_slots: List[DeckSlotName],
+) -> bool:
+    """Return whether the pipette might collide with thermocycler's lid/clips on a Flex.
+
+    If any of the pipette's bounding vertices lie inside the no-go zone of the thermocycler-
+    which is the area that's to the left, back and below the thermocycler's lid's
+    protruding clips, then we will mark the movement for possible collision.
+
+    This could cause false raises for the case where an 8-channel is accessing the
+    thermocycler labware in a location such that the pipette is in the area between
+    the clips but not touching either clips. But that's a tradeoff we'll need to make
+    between a complicated check involving accurate positions of all entities involved
+    and a crude check that disallows all partial tip movements around the thermocycler.
+    """
+    if (
+        DeckSlotName.SLOT_A1 in surrounding_regular_slots
+        and engine_state.modules.is_flex_deck_with_thermocycler()
+    ):
+        tc_right_clip_pos = FLEX_TC_LID_CLIP_POSITIONS_IN_DECK_COORDINATES["right_clip"]
+        for bound_vertex in pipette_bounds:
+            if (
+                bound_vertex.x <= tc_right_clip_pos["x"]
+                and bound_vertex.y >= tc_right_clip_pos["y"]
+                and bound_vertex.z <= tc_right_clip_pos["z"]
+            ):
+                return True
+    return False
 
 
 def _point_overlaps_with_slot(

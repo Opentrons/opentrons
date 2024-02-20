@@ -424,7 +424,7 @@ module = LoadedModule(
             ),
             pytest.raises(
                 deck_conflict.PartialTipMovementNotAllowedError,
-                match="collision with items in deck slot C4",
+                match="collision with items in staging slot C4",
             ),
         ),
     ],
@@ -527,6 +527,73 @@ def test_deck_conflict_raises_for_bad_pipette_move(
         ).then_return(Dimensions(90, 90, 0))
 
     with expected_raise:
+        deck_conflict.check_safe_for_pipette_movement(
+            engine_state=mock_state_view,
+            pipette_id="pipette-id",
+            labware_id="destination-labware-id",
+            well_name="A2",
+            well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
+        )
+
+
+@pytest.mark.parametrize(
+    ("robot_type", "deck_type"),
+    [("OT-3 Standard", DeckType.OT3_STANDARD)],
+)
+def test_deck_conflict_raises_for_collision_with_tc_lid(
+    decoy: Decoy,
+    mock_state_view: StateView,
+) -> None:
+    """It should raise an error if pipette might collide with thermocycler lid on the Flex."""
+    destination_well_point = Point(x=123, y=123, z=123)
+    nozzle_bounds_at_destination = (
+        Point(x=50, y=150, z=60),
+        Point(x=150, y=50, z=60),
+        Point(x=97, y=403, z=204.5),
+        Point(x=50, y=50, z=60),
+    )
+
+    decoy.when(
+        mock_state_view.pipettes.get_is_partially_configured("pipette-id")
+    ).then_return(True)
+    decoy.when(mock_state_view.pipettes.get_primary_nozzle("pipette-id")).then_return(
+        "A12"
+    )
+    decoy.when(
+        mock_state_view.geometry.get_ancestor_slot_name("destination-labware-id")
+    ).then_return(DeckSlotName.SLOT_C2)
+
+    decoy.when(
+        mock_state_view.geometry.get_well_position(
+            labware_id="destination-labware-id",
+            well_name="A2",
+            well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
+        )
+    ).then_return(destination_well_point)
+    decoy.when(
+        mock_state_view.pipettes.get_nozzle_bounds_at_specified_move_to_position(
+            pipette_id="pipette-id", destination_position=destination_well_point
+        )
+    ).then_return(nozzle_bounds_at_destination)
+
+    decoy.when(
+        adjacent_slots_getters.get_surrounding_slots(5, robot_type="OT-3 Standard")
+    ).then_return(
+        _MixedTypeSlots(
+            regular_slots=[
+                DeckSlotName.SLOT_A1,
+                DeckSlotName.SLOT_B1,
+            ],
+            staging_slots=[StagingSlotName.SLOT_C4],
+        )
+    )
+    decoy.when(mock_state_view.modules.is_flex_deck_with_thermocycler()).then_return(
+        True
+    )
+    with pytest.raises(
+        deck_conflict.PartialTipMovementNotAllowedError,
+        match="collision with thermocycler lid in deck slot A1.",
+    ):
         deck_conflict.check_safe_for_pipette_movement(
             engine_state=mock_state_view,
             pipette_id="pipette-id",
