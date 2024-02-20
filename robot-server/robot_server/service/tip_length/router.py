@@ -85,7 +85,10 @@ async def get_all_tip_length_calibrations(
     responses={status.HTTP_404_NOT_FOUND: {"model": ErrorBody}},
 )
 async def delete_specific_tip_length_calibration(
-    tiprack_uri: str, pipette_id: str, _: API = Depends(get_ot2_hardware)
+    pipette_id: str,
+    tiprack_hash: Optional[str] = None,
+    tiprack_uri: Optional[str] = None,
+    _: API = Depends(get_ot2_hardware),
 ):
     try:
         tip_length.delete_tip_length_calibration(
