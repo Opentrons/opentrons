@@ -10,6 +10,7 @@ import {
   useTrackEvent,
   ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
 } from '../redux/analytics'
+import { useRobotType } from '../organisms/Devices/hooks'
 
 import type { UseQueryOptions } from 'react-query'
 import type { NotifyTopic, NotifyResponseData } from '../redux/shell/types'
@@ -32,6 +33,7 @@ export function useNotifyService<TData, TError = Error>({
 }: UseNotifyServiceProps<TData, TError>): { isNotifyError: boolean } {
   const dispatch = useDispatch()
   const host = useHost()
+  const robotType = useRobotType(host?.robotName ?? '')
   const isNotifyError = React.useRef(false)
   const doTrackEvent = useTrackEvent()
   const { enabled, staleTime, forceHttpPolling } = options
@@ -73,7 +75,7 @@ export function useNotifyService<TData, TError = Error>({
         if (data === 'ECONNREFUSED') {
           doTrackEvent({
             name: ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
-            properties: {},
+            properties: { robotType },
           })
         }
       } else if ('refetchUsingHTTP' in data) {
