@@ -75,7 +75,7 @@ const disabledRoundTabStyling = css`
 
 const RoundNavLink = styled(NavLink)`
   ${baseRoundTabStyling}
-  color: ${COLORS.grey60};
+  color: ${COLORS.black90};
 
   &:hover {
     background-color: ${COLORS.purple35};
