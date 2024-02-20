@@ -1092,12 +1092,11 @@ class ProtocolContext(CommandPublisher):
             reflect the new deck state, add a :py:meth:`.pause` or use
             :py:meth:`.move_labware` instead.
 
-        .. versionchanged:: 2.15
-           ``del`` sets the corresponding labware's location to ``OFF_DECK``.
-
         .. versionchanged:: 2.14
            Includes the Thermocycler in all of the slots it occupies.
 
+        .. versionchanged:: 2.15
+           ``del`` sets the corresponding labware's location to ``OFF_DECK``.
         """
         return self._deck
 
