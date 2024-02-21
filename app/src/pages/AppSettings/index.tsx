@@ -16,6 +16,7 @@ import {
 
 import * as Config from '../../redux/config'
 import { GeneralSettings } from './GeneralSettings'
+import { PrivacySettings } from './PrivacySettings'
 import { AdvancedSettings } from './AdvancedSettings'
 import { FeatureFlags } from '../../organisms/AppSettings/FeatureFlags'
 import { NavTab } from '../../molecules/NavTab'
@@ -33,6 +34,7 @@ export function AppSettings(): JSX.Element {
     [K in AppSettingsTab]: JSX.Element
   } = {
     general: <GeneralSettings />,
+    privacy: <PrivacySettings />,
     advanced: <AdvancedSettings />,
     'feature-flags': <FeatureFlags />,
   }
@@ -64,6 +66,7 @@ export function AppSettings(): JSX.Element {
             gridGap={SPACING.spacing20}
           >
             <NavTab to="/app-settings/general" tabName={t('general')} />
+            <NavTab to="/app-settings/privacy" tabName={t('privacy')} />
             <NavTab to="/app-settings/advanced" tabName={t('advanced')} />
             {devToolsOn && (
               <NavTab
