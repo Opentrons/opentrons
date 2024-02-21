@@ -59,7 +59,7 @@ export const blue10 = '#F1F8FF'
  * grey
  */
 export const grey60 = '#4A4C4E'
-export const grey55 = '#737578'
+export const grey55 = '#626467'
 export const grey50 = '#737578'
 export const grey40 = '#B7B8B9'
 export const grey35 = '#CBCCCC'
