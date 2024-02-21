@@ -120,7 +120,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
     border: 1px solid ${COLORS.white};
     &:hover {
       cursor: pointer;
-      ${BORDERS.cardOutlineBorder}
+      border: 1px solid ${COLORS.grey30};
     }
   `
   const handleSetOpenItem = (): void => {

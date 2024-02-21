@@ -6,7 +6,7 @@ import { Btn, Icon, COLORS, SIZE_1, SIZE_2 } from '@opentrons/components'
 import type { StyleProps } from '@opentrons/components'
 
 const TOGGLE_DISABLED_STYLES = css`
-  color: ${COLORS.grey60};
+  color: ${COLORS.grey50};
 
   &:hover {
     color: ${COLORS.grey55};
@@ -17,7 +17,7 @@ const TOGGLE_DISABLED_STYLES = css`
   }
 
   &:disabled {
-    color: ${COLORS.grey40};
+    color: ${COLORS.grey30};
   }
 `
 
@@ -33,7 +33,7 @@ const TOGGLE_ENABLED_STYLES = css`
   }
 
   &:disabled {
-    color: ${COLORS.grey40};
+    color: ${COLORS.grey30};
   }
 `
 

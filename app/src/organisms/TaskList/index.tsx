@@ -218,7 +218,11 @@ function SubTask({
       backgroundColor={isActiveSubTask ? COLORS.blue10 : COLORS.white}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       padding={SPACING.spacing16}
-      border={isActiveSubTask ? BORDERS.activeLineBorder : TASK_CONNECTOR_STYLE}
+      border={
+        isActiveSubTask
+          ? BORDERS.activeLineBorder
+          : `1px solid ${COLORS.grey30}`
+      }
       borderRadius={BORDERS.radiusSoftCorners}
       gridGap={SPACING.spacing24}
       width="100%"
