@@ -1075,7 +1075,8 @@ class ProtocolContext(CommandPublisher):
         relevant slots. Currently, the only multiple-slot module is the Thermocycler.
         When loaded, the :py:class:`ThermocyclerContext` object is the value for
         ``deck`` keys ``"A1"`` and ``"B1"`` on Flex, and ``7``, ``8``, ``10``, and
-        ``11`` on OT-2.
+        ``11`` on OT-2. In API version 2.13 and earlier, only slot 7 keyed to the
+        Thermocycler object, and slots 8, 10, and 11 keyed to ``None``.
 
         Rather than filtering the objects in the deck map yourself,
         you can also use :py:attr:`loaded_labwares` to get a dict of labwares
