@@ -241,8 +241,10 @@ class RunStore:
     def get_all(self, length: Optional[int] = None) -> List[RunResource]:
         """Get all known run resources.
 
-        Returns:
-            All stored run entries.
+        Results are ordered from oldest to newest.
+
+        Params:
+            length: If `None`, return all runs. Otherwise, return the newest n runs.
         """
         select_runs = sqlalchemy.select(*_run_columns)
         select_actions = sqlalchemy.select(action_table).order_by(sqlite_rowid.asc())

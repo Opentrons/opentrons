@@ -195,8 +195,10 @@ class RunDataManager:
     def get_all(self, length: Optional[int]) -> List[Run]:
         """Get current and stored run resources.
 
-        Returns:
-            All run resources.
+        Results are ordered from oldest to newest.
+
+        Params:
+            length: If `None`, return all runs. Otherwise, return the newest n runs.
         """
         return [
             _build_run(
