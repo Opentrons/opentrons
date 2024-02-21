@@ -19,7 +19,7 @@ jest.mock('../../../../step-forms/selectors')
 jest.mock('../../../../utils/labwareModuleCompatibility')
 jest.mock('../../../../feature-flags/selectors')
 jest.mock('@opentrons/components/src/hooks/useSelectDeckLocation/index')
-jest.mock('@opentrons/components/src/slotmap/SlotMap')
+jest.mock('@opentrons/components/src/slotmap/OT2SlotMap')
 
 const mockGetRobotType = getRobotType as jest.MockedFunction<
   typeof getRobotType
