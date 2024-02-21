@@ -42,8 +42,10 @@ def tip_lengths_for_pipette(
         tip_length_filepath = config.get_tip_length_cal_path() / f"{pipette_id}.json"
         all_tip_lengths_for_pipette = io.read_cal_file(tip_length_filepath)
         for tiprack_identifier, data in all_tip_lengths_for_pipette.items():
-            # check if tiprack hash
-            if len(tiprack_identifier.split("/")) == 1:
+            # We normally key these calibrations by their tip rack URI,
+            # but older software had them keyed by their tip rack hash.
+            # Migrate from the old format, if necessary.
+            if "/" not in tiprack_identifier:
                 data["definitionHash"] = tiprack_identifier
                 tiprack_identifier = data.pop("uri")
             try:
@@ -140,10 +142,11 @@ def delete_tip_length_calibration(
     tiprack_hash: typing.Optional[str] = None,
 ) -> None:
     """
-    Delete tip length calibration based on tiprack hash and
-    pipette serial number
+    Delete tip length calibration based on an optional tiprack uri or
+    tiprack hash and pipette serial number.
 
-    :param tiprack: tiprack hash
+    :param tiprack_uri: tiprack uri
+    :param tiprack_hash: tiprack uri
     :param pipette: pipette serial number
     """
     tip_lengths = tip_lengths_for_pipette(pipette_id)
