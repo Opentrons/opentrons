@@ -13,6 +13,7 @@
   "dependencies": {
     "@opentrons/api-client": "link:../api-client",
     "@opentrons/shared-data": "link:../shared-data",
+    "axios": "^0.21.1",
     "react-query": "3.35.0"
   }
 }

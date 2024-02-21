@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { InstrumentContainer } from '..'
 
 const render = (props: React.ComponentProps<typeof InstrumentContainer>) => {

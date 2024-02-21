@@ -38,6 +38,7 @@
     "react-popper": "1.0.0",
     "react-remove-scroll": "2.4.3",
     "react-select": "5.4.0",
+    "redux": "4.0.5",
     "styled-components": "5.3.6"
   },
   "browser": {

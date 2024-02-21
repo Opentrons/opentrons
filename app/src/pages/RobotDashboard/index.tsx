@@ -12,7 +12,6 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { Navigation } from '../../organisms/Navigation'
-import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import {
   EmptyRecentRun,
   RecentRunProtocolCarousel,

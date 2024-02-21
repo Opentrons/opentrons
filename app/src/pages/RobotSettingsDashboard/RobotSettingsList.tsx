@@ -37,7 +37,6 @@ import { getRobotSettings, updateSetting } from '../../redux/robot-settings'
 import { UNREACHABLE } from '../../redux/discovery/constants'
 import { Navigation } from '../../organisms/Navigation'
 import { useLEDLights } from '../../organisms/Devices/hooks'
-import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import { useNetworkConnection } from '../../resources/networking/hooks/useNetworkConnection'
 import { RobotSettingButton } from '../../pages/RobotSettingsDashboard/RobotSettingButton'
 

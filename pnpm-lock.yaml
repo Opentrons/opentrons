@@ -65,6 +65,9 @@ importers:
       '@types/express':
         specifier: ^4.17.11
         version: 4.17.21
+      '@types/glob':
+        specifier: 7.1.3
+        version: 7.1.3
       '@types/jest':
         specifier: ^26.0.20
         version: 26.0.24
@@ -536,6 +539,28 @@ importers:
       uuid:
         specifier: 8.3.2
         version: 8.3.2
+    devDependencies:
+      '@opentrons/discovery-client':
+        specifier: link:../discovery-client
+        version: link:../discovery-client
+      '@types/classnames':
+        specifier: 2.2.5
+        version: 2.2.5
+      '@types/file-saver':
+        specifier: 2.0.1
+        version: 2.0.1
+      '@types/jszip':
+        specifier: 3.1.7
+        version: 3.1.7
+      '@types/mixpanel-browser':
+        specifier: ^2.35.6
+        version: 2.49.0
+      '@types/styled-components':
+        specifier: ^5.1.26
+        version: 5.1.34
+      axios:
+        specifier: ^0.21.1
+        version: 0.21.4
 
   app-shell:
     dependencies:
@@ -796,6 +821,9 @@ importers:
       react-select:
         specifier: 5.4.0
         version: 5.4.0(@types/react@18.2.51)(react-dom@18.2.0)(react@18.2.0)
+      redux:
+        specifier: 4.0.5
+        version: 4.0.5
       styled-components:
         specifier: 5.3.6
         version: 5.3.6(react-dom@18.2.0)(react-is@18.2.0)(react@18.2.0)
@@ -808,6 +836,9 @@ importers:
       '@types/node-fetch':
         specifier: ^2.5.8
         version: 2.6.11
+      '@types/yargs':
+        specifier: 17.0.32
+        version: 17.0.32
       escape-string-regexp:
         specifier: 1.0.5
         version: 1.0.5
@@ -826,6 +857,9 @@ importers:
       redux:
         specifier: 4.0.5
         version: 4.0.5
+      reselect:
+        specifier: 4.0.0
+        version: 4.0.0
       stable:
         specifier: 0.1.8
         version: 0.1.8
@@ -1070,6 +1104,9 @@ importers:
       '@opentrons/shared-data':
         specifier: link:../shared-data
         version: link:../shared-data
+      axios:
+        specifier: ^0.21.1
+        version: 0.21.4
       react:
         specifier: 18.2.0
         version: 18.2.0
@@ -6230,8 +6267,8 @@ packages:
     dependencies:
       '@types/node': 20.11.17
 
-  /@types/glob@7.2.0:
-    resolution: {integrity: sha512-ZUxbzKl0IfJILTS6t7ip5fQQM/J3TJYubDm3nMbgubNNYS62eXeUpoLUC8/7fJNiFYHTrGPQn7hspDUzIHX3UA==}
+  /@types/glob@7.1.3:
+    resolution: {integrity: sha512-SEYeGAIQIQX8NN6LDKprLjbrd5dARM5EXsd8GI/A5l0apYI1fGMWgPHSe4ZKL4eozlAyI+doUE9XbYS4xCkQ1w==}
     dependencies:
       '@types/minimatch': 5.1.2
       '@types/node': 20.11.17
@@ -6550,7 +6587,6 @@ packages:
       '@types/hoist-non-react-statics': 3.3.5
       '@types/react': 18.2.51
       csstype: 3.1.3
-    dev: false
 
   /@types/triple-beam@1.3.5:
     resolution: {integrity: sha512-6WaYesThRMCl19iryMYP7/x2OVgCtbIVflDGFpWnb9irXI3UjYE4AzmYuiUKY1AJstGijoY+MgUszMgRxIYTYw==}
@@ -6613,7 +6649,6 @@ packages:
 
   /@types/yargs-parser@21.0.3:
     resolution: {integrity: sha512-I4q9QU9MQv4oEOz4tAHJtNz1cwuLxn2F3xcc2iV5WdqLPpUnj30aUuxt1mAxYTG+oe8CZMV/+6rU4S4gRDzqtQ==}
-    dev: true
 
   /@types/yargs@15.0.19:
     resolution: {integrity: sha512-2XUaGVmyQjgyAZldf0D0c14vvo/yv0MhQBSTJcejMMaitsn3nxCB6TmH4G0ZQf+uxROOa9mpanoSm8h6SG/1ZA==}
@@ -6625,13 +6660,12 @@ packages:
     resolution: {integrity: sha512-xQ67Yc/laOG5uMfX/093MRlGGCIBzZMarVa+gfNKJxWAIgykYpVGkBdbqEzGDDfCrVUj6Hiff4mTZ5BA6TmAog==}
     dependencies:
       '@types/yargs-parser': 21.0.3
-    dev: true
 
   /@types/yauzl@2.10.3:
     resolution: {integrity: sha512-oJoftv0LSuaDZE3Le4DbKX+KS9G36NzOeSap90UIK0yMA/NhKJhqlSGtNDORNRaIbQfzjXDrQa0ytJ6mNRGz/Q==}
     requiresBuild: true
     dependencies:
-      '@types/node': 18.19.15
+      '@types/node': 20.11.17
     dev: true
     optional: true
 
@@ -7800,7 +7834,6 @@ packages:
       follow-redirects: 1.15.5(debug@4.3.4)
     transitivePeerDependencies:
       - debug
-    dev: false
 
   /babel-core@7.0.0-bridge.0(@babel/core@7.23.9):
     resolution: {integrity: sha512-poPX9mZH/5CSanm50Q+1toVci6pv5KSRv/5TWCwtzQS5XEwn40BcCrgIeMFWP9CKKIniKXNxoIOnOq4VVlGXhg==}
@@ -10326,7 +10359,7 @@ packages:
     resolution: {integrity: sha512-QwGuEUouP2kVwQenAsOof5Fv8K9t3D8Ca8NxcXKrIpEHjTXK5J2nXLdP+ALI1cgv8wj7KuwBhTwBkOZSJKM5XQ==}
     engines: {node: '>=6'}
     dependencies:
-      '@types/glob': 7.2.0
+      '@types/glob': 7.1.3
       globby: 6.1.0
       is-path-cwd: 2.2.0
       is-path-in-cwd: 2.1.0
@@ -13028,7 +13061,7 @@ packages:
     peerDependencies:
       glob: ^7.1.6
     dependencies:
-      '@types/glob': 7.2.0
+      '@types/glob': 7.1.3
       glob: 7.2.3
     dev: true
 
@@ -13154,7 +13187,7 @@ packages:
     resolution: {integrity: sha512-7dUi7RvCoT/xast/o/dLN53oqND4yk0nsHkhRgn9w65C4PofCLOoJ39iSOg+qVDdWQPIEj+eszMHQ+aLVwwQSg==}
     engines: {node: '>=8'}
     dependencies:
-      '@types/glob': 7.2.0
+      '@types/glob': 7.1.3
       array-union: 2.1.0
       dir-glob: 3.0.1
       fast-glob: 3.3.2
@@ -13190,7 +13223,7 @@ packages:
     resolution: {integrity: sha512-ollPHROa5mcxDEkwg6bPt3QbEf4pDQSNtd6JPL1YvOvAo/7/0VAm9TccUeoTmarjPw4pfUthSCqcyfNB1I3ZSg==}
     engines: {node: '>=6'}
     dependencies:
-      '@types/glob': 7.2.0
+      '@types/glob': 7.1.3
       array-union: 1.0.2
       dir-glob: 2.2.2
       fast-glob: 2.2.7

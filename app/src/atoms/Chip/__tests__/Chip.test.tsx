@@ -1,7 +1,7 @@
 import * as React from 'react'
 
-import { BORDERS, COLORS, renderWithProviders } from '@opentrons/components'
-
+import { BORDERS, COLORS } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { Chip } from '..'
 
 const render = (props: React.ComponentProps<typeof Chip>) => {
