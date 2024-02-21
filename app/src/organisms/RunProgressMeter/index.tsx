@@ -230,7 +230,11 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             onClick={onDownloadClick}
           >
-            <Flex gridGap={SPACING.spacing2} alignItems={ALIGN_CENTER}>
+            <Flex
+              gridGap={SPACING.spacing2}
+              alignItems={ALIGN_CENTER}
+              color={COLORS.grey60}
+            >
               <Icon name="download" size={SIZE_1} />
               {t('download_run_log')}
             </Flex>

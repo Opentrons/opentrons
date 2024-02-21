@@ -95,7 +95,7 @@ export const RunPreviewComponent = (
       >
         {(command, index) => {
           const isCurrent = index === currentRunCommandIndex
-          const backgroundColor = isCurrent ? COLORS.blue30 : COLORS.grey10
+          const backgroundColor = isCurrent ? COLORS.blue30 : COLORS.grey20
           const iconColor = isCurrent ? COLORS.blue60 : COLORS.grey50
           return (
             <Flex
