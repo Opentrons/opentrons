@@ -614,7 +614,6 @@ def test_drop_tip(
             ),
             5,
         ),
-        (None, 9),
     ],
 )
 def test_active_channels(
@@ -646,7 +645,7 @@ def test_active_channels(
             nominal_tip_overlap={},
             nozzle_offset_z=1.23,
             home_position=4.56,
-            nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
+            nozzle_map=nozzle_map,
         ),
     )
     subject.handle_action(

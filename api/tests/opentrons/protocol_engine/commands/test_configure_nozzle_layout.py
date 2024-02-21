@@ -73,11 +73,6 @@ from ..pipette_fixtures import (
             ),
             {"primary_nozzle": "A1", "front_right_nozzle": "E1"},
         ],
-        [
-            AllNozzleLayoutConfiguration(),
-            None,
-            {},
-        ],
     ],
 )
 async def test_configure_nozzle_layout_implementation(

@@ -705,6 +705,7 @@ def test_add_pipette_config(
             back_left_offset=Point(x=0, y=0, z=0),
             front_right_offset=Point(x=0, y=0, z=0),
         ),
+        default_nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
     )
     assert subject.state.flow_rates_by_id["pipette-id"].default_aspirate == {"a": 1.0}
     assert subject.state.flow_rates_by_id["pipette-id"].default_dispense == {"b": 2.0}
