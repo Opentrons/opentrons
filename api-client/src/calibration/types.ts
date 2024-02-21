@@ -93,7 +93,7 @@ export interface TipLengthCalibration {
   source: CalibrationSourceType
   status: IndividualCalibrationHealthStatus
   id: string
-  uri?: string | null
+  uri: string
 }
 
 export interface AllTipLengthCalibrations {
