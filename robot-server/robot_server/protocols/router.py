@@ -108,7 +108,10 @@ class ProtocolLinks(BaseModel):
 
     referencingRuns: List[RunLink] = Field(
         ...,
-        description="Links to runs that reference the protocol.",
+        description=(
+            "Links to runs that reference the protocol,"
+            " in order from the oldest run to the newest run."
+        ),
     )
 
 
