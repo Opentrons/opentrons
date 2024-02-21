@@ -150,4 +150,11 @@ describe('NameRobot', () => {
     screen.getByText('Enter up to 17 characters (letters and numbers only)')
     screen.getByText('Confirm')
   })
+
+  it('should call a mock function when tapping back button', () => {
+    mockuseIsUnboxingFlowOngoing.mockReturnValue(false)
+    render()
+    fireEvent.click(screen.getByTestId('name_back_button'))
+    expect(mockPush).toHaveBeenCalledWith('/robot-settings')
+  })
 })
