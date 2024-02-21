@@ -12,7 +12,6 @@ import { useStoredProtocolAnalysis, useProtocolDetailsForRun } from '../'
 import { useProtocolMetadata } from '../useProtocolMetadata'
 import { useRunTimestamps } from '../../../RunTimeControl/hooks'
 import { formatInterval } from '../../../RunTimeControl/utils'
-import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 
 jest.mock('../../../../redux/analytics/hash')
 jest.mock('../../../../redux/protocol-storage')
@@ -46,6 +45,7 @@ let store: Store<any> = createStore(jest.fn(), {})
 
 const RUN_ID = '1'
 const RUN_ID_2 = '2'
+const ROBOT_NAME = 'otie'
 
 const PIPETTES = [
   { id: '1', pipetteName: 'testModelLeft' },
@@ -113,7 +113,7 @@ describe('useProtocolAnalysisErrors hook', () => {
 
   it('returns getProtocolRunAnalyticsData function', () => {
     const { result } = renderHook(
-      () => useProtocolRunAnalyticsData(RUN_ID, mockConnectableRobot),
+      () => useProtocolRunAnalyticsData(RUN_ID, ROBOT_NAME),
       {
         wrapper,
       }
@@ -128,7 +128,7 @@ describe('useProtocolAnalysisErrors hook', () => {
       .calledWith(RUN_ID_2)
       .mockReturnValue({ protocolData: ROBOT_PROTOCOL_ANALYSIS } as any)
     const { result } = renderHook(
-      () => useProtocolRunAnalyticsData(RUN_ID_2, mockConnectableRobot),
+      () => useProtocolRunAnalyticsData(RUN_ID_2, ROBOT_NAME),
       {
         wrapper,
       }
@@ -157,7 +157,7 @@ describe('useProtocolAnalysisErrors hook', () => {
 
   it('getProtocolRunAnalyticsData returns fallback stored data when robot data unavailable', async () => {
     const { result } = renderHook(
-      () => useProtocolRunAnalyticsData(RUN_ID, mockConnectableRobot),
+      () => useProtocolRunAnalyticsData(RUN_ID, ROBOT_NAME),
       {
         wrapper,
       }

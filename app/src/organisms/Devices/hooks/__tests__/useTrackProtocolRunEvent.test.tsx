@@ -11,8 +11,6 @@ import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_RUN_START,
 } from '../../../../redux/analytics'
-import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
-import { useRobot } from '../useRobot'
 
 jest.mock('../../hooks')
 jest.mock('../useProtocolRunAnalyticsData')
@@ -20,12 +18,10 @@ jest.mock('../../../../redux/discovery')
 jest.mock('../../../../redux/pipettes')
 jest.mock('../../../../redux/analytics')
 jest.mock('../../../../redux/robot-settings')
-jest.mock('../useRobot')
 
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
-const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockUseProtocolRunAnalyticsData = useProtocolRunAnalyticsData as jest.MockedFunction<
   typeof useProtocolRunAnalyticsData
 >
@@ -59,9 +55,8 @@ describe('useTrackProtocolRunEvent hook', () => {
         )
     )
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
-    mockUseRobot.mockReturnValue(mockConnectableRobot)
     when(mockUseProtocolRunAnalyticsData)
-      .calledWith(RUN_ID, mockConnectableRobot)
+      .calledWith(RUN_ID, ROBOT_NAME)
       .mockReturnValue({
         getProtocolRunAnalyticsData: mockGetProtocolRunAnalyticsData,
       })
@@ -103,7 +98,7 @@ describe('useTrackProtocolRunEvent hook', () => {
 
   it('trackProtocolRunEvent calls trackEvent without props when error is thrown in getProtocolRunAnalyticsData', async () => {
     when(mockUseProtocolRunAnalyticsData)
-      .calledWith('errorId', mockConnectableRobot)
+      .calledWith('errorId', ROBOT_NAME)
       .mockReturnValue({
         getProtocolRunAnalyticsData: () =>
           new Promise(() => {

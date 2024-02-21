@@ -3,7 +3,11 @@ import { useSelector } from 'react-redux'
 import { hash } from '../../../redux/analytics/hash'
 import { getStoredProtocol } from '../../../redux/protocol-storage'
 import { getRobotSerialNumber } from '../../../redux/discovery'
-import { useStoredProtocolAnalysis, useProtocolDetailsForRun } from './'
+import {
+  useRobot,
+  useStoredProtocolAnalysis,
+  useProtocolDetailsForRun,
+} from './'
 import { useProtocolMetadata } from './useProtocolMetadata'
 import { useRunTimestamps } from '../../RunTimeControl/hooks'
 import { formatInterval } from '../../RunTimeControl/utils'
@@ -13,19 +17,19 @@ import type { ProtocolAnalyticsData } from '../../../redux/analytics/types'
 import type { StoredProtocolData } from '../../../redux/protocol-storage/types'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'
-import { DiscoveredRobot } from '../../../redux/discovery/types'
 
 export const parseProtocolRunAnalyticsData = (
   protocolAnalysis: ProtocolAnalysisOutput | null,
   storedProtocol: StoredProtocolData | null,
   startedAt: string | null,
-  robot: DiscoveredRobot | null
+  robotName: string
 ) => () => {
   const hashTasks = [
     hash(protocolAnalysis?.metadata?.author) ?? '',
     hash(storedProtocol?.srcFiles?.toString() ?? '') ?? '',
   ]
 
+  const robot = useRobot(robotName)
   const serialNumber =
     robot?.status != null ? getRobotSerialNumber(robot) : null
 
@@ -76,7 +80,7 @@ type GetProtocolRunAnalyticsData = () => Promise<{
  */
 export function useProtocolRunAnalyticsData(
   runId: string | null,
-  robot: DiscoveredRobot | null
+  robotName: string
 ): {
   getProtocolRunAnalyticsData: GetProtocolRunAnalyticsData
 } {
@@ -105,7 +109,7 @@ export function useProtocolRunAnalyticsData(
     protocolAnalysis as ProtocolAnalysisOutput | null,
     storedProtocol,
     startedAt,
-    robot
+    robotName
   )
 
   return { getProtocolRunAnalyticsData }
