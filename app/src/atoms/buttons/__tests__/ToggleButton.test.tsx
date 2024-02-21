@@ -57,7 +57,7 @@ describe('ToggleButton', () => {
     props.disabled = true
     const { getByLabelText } = render(props)
     const button = getByLabelText('toggle button')
-    expect(button).toHaveStyleRule('color', `${String(COLORS.grey40)}`, {
+    expect(button).toHaveStyleRule('color', `${String(COLORS.grey30)}`, {
       modifier: ':disabled',
     })
   })
@@ -73,7 +73,7 @@ describe('ToggleButton', () => {
     props.toggledOn = false
     const { getByLabelText } = render(props)
     const button = getByLabelText('toggle button')
-    expect(button).toHaveStyle(`color: ${String(COLORS.grey60)}`)
+    expect(button).toHaveStyle(`color: ${String(COLORS.grey50)}`)
     expect(button).toHaveStyle(`height: ${String(SIZE_2)}`)
     expect(button).toHaveStyle(`width: ${String(SIZE_2)}`)
     expect(button).toHaveAttribute('aria-checked', 'false')
@@ -106,7 +106,7 @@ describe('ToggleButton', () => {
     props.disabled = true
     const { getByLabelText } = render(props)
     const button = getByLabelText('toggle button')
-    expect(button).toHaveStyleRule('color', `${String(COLORS.grey40)}`, {
+    expect(button).toHaveStyleRule('color', `${String(COLORS.grey30)}`, {
       modifier: ':disabled',
     })
   })
