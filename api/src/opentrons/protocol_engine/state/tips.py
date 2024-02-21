@@ -248,13 +248,11 @@ class TipView(HasState[TipState]):
                         # Move on to the row above or column to the left
                         if critical_row - num_nozzle_rows > 0:
                             critical_row = critical_row - num_nozzle_rows
-                        elif critical_column - num_nozzle_cols > 0:
+                        else:
                             critical_column = critical_column - 1
                             critical_row = (
                                 len(columns[critical_column]) - num_nozzle_rows
                             )
-                        else:
-                            critical_column = -1
                 return None
 
             elif self._state.nozzle_map.starting_nozzle == "A12":
@@ -262,7 +260,7 @@ class TipView(HasState[TipState]):
                 critical_column = num_nozzle_cols - 1
                 critical_row = len(columns[critical_column]) - num_nozzle_rows
 
-                while critical_column <= 12:
+                while critical_column <= len(columns): # change to max size of labware
                     tip_cluster = _identify_tip_cluster(critical_column, critical_row)
                     result = _validate_tip_cluster(tip_cluster)
                     if isinstance(result, str):
@@ -272,13 +270,11 @@ class TipView(HasState[TipState]):
                         # Move on to the row above or column to the right
                         if critical_row - num_nozzle_rows > 0:
                             critical_row = critical_row - num_nozzle_rows
-                        elif critical_column + num_nozzle_cols < 12:
+                        else:
                             critical_column = critical_column + 1
                             critical_row = (
                                 len(columns[critical_column]) - num_nozzle_rows
                             )
-                        else:
-                            critical_column = 13
                 return None
 
             elif self._state.nozzle_map.starting_nozzle == "H1":
@@ -294,13 +290,11 @@ class TipView(HasState[TipState]):
                         return result
                     elif result is None:
                         # Move on to the row above or column to the right
-                        if critical_row + num_nozzle_rows < 8:
+                        if critical_row + num_nozzle_rows < len(columns[0]):
                             critical_row = critical_row + num_nozzle_rows
-                        elif critical_column - num_nozzle_cols > 0:
+                        else:
                             critical_column = critical_column - 1
                             critical_row = num_nozzle_rows - 1
-                        else:
-                            critical_column = -1
                 return None
 
             elif self._state.nozzle_map.starting_nozzle == "H12":
@@ -308,7 +302,7 @@ class TipView(HasState[TipState]):
                 critical_column = num_nozzle_cols - 1
                 critical_row = num_nozzle_rows - 1
 
-                while critical_column <= 12:
+                while critical_column <= len(columns):
                     tip_cluster = _identify_tip_cluster(critical_column, critical_row)
                     result = _validate_tip_cluster(tip_cluster)
                     if isinstance(result, str):
@@ -316,13 +310,11 @@ class TipView(HasState[TipState]):
                         return result
                     elif result is None:
                         # Move on to the row above or column to the right
-                        if critical_row + num_nozzle_rows < 8:
+                        if critical_row + num_nozzle_rows < len(columns[0]):
                             critical_row = critical_row + num_nozzle_rows
-                        elif critical_column + num_nozzle_cols < 12:
+                        else:
                             critical_column = critical_column + 1
                             critical_row = num_nozzle_rows - 1
-                        else:
-                            critical_column = 13
                 return None
 
             else:
