@@ -202,7 +202,9 @@ async def create_run(
     base_router.get,
     path="/runs",
     summary="Get all runs",
-    description="Get a list of all active and inactive runs.",
+    description=(
+        "Get a list of all active and inactive runs, in order from oldest to newest."
+    ),
     responses={
         status.HTTP_200_OK: {"model": MultiBody[Run, AllRunsLinks]},
     },
