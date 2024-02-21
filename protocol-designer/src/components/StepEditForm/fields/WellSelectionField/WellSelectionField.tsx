@@ -40,9 +40,10 @@ export const WellSelectionField = (props: Props): JSX.Element => {
   const stepId = useSelector(getSelectedStepId)
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
   const wellSelectionLabwareKey = useSelector(getWellSelectionLabwareKey)
-  const primaryWellCount = Array.isArray(selectedWells)
-    ? selectedWells.length.toString()
-    : undefined
+  const primaryWellCount =
+    Array.isArray(selectedWells) && selectedWells.length > 0
+      ? selectedWells.length.toString()
+      : undefined
   const pipette = pipetteId != null ? pipetteEntities[pipetteId] : null
   const is8Channel = pipette != null ? pipette.spec.channels === 8 : false
 
