@@ -42,7 +42,7 @@ const SORT_BY_BUTTON_STYLE = css`
   background-color: ${COLORS.transparent};
   cursor: pointer;
   &:hover {
-    background-color: ${COLORS.grey60};
+    background-color: ${COLORS.grey30};
   }
   &:active,
   &:focus {
