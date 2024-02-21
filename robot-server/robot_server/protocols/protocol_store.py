@@ -188,7 +188,10 @@ class ProtocolStore:
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
     def get_all(self) -> List[ProtocolResource]:
-        """Get all protocols currently saved in this store."""
+        """Get all protocols currently saved in this store.
+
+        Results are ordered from first-added to last-added.
+        """
         all_sql_resources = self._sql_get_all()
         return [
             ProtocolResource(
@@ -333,7 +336,7 @@ class ProtocolStore:
     def _sql_get_all_from_engine(
         sql_engine: sqlalchemy.engine.Engine,
     ) -> List[_DBProtocolResource]:
-        statement = sqlalchemy.select(protocol_table)
+        statement = sqlalchemy.select(protocol_table).order_by(sqlite_rowid)
         with sql_engine.begin() as transaction:
             all_rows = transaction.execute(statement).all()
         return [_convert_sql_row_to_dataclass(sql_row=row) for row in all_rows]

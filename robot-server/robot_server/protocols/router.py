@@ -283,6 +283,7 @@ async def create_protocol(
     protocols_router.get,
     path="/protocols",
     summary="Get uploaded protocols",
+    description="Return all stored protocols, in order from first-uploaded to last-uploaded.",
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[Protocol]}},
 )
 async def get_protocols(
