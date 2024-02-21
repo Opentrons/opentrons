@@ -8,10 +8,17 @@ neatly document any changes that may happen during QA, such as bug fixes, and se
 ### Overview
 
 The robot release process has 3 main outputs:
-- Electron app
+
+- Opentrons App
 - OT-2 system package
 - Flex system package
 
+The robot software stack is composed of the following repositories:
+- [oe_core]("https://github.com/Opentrons/oe-core")
+- [ot3_firmware]("https://github.com/Opentrons/ot3-firmware")
+- [opentrons]("https://github.com/Opentrons/opentrons")
+- [opentrons_modules]("https://github.com/Opentrons/opentrons-modules")
+- [buildroot]("https://github.com/Opentrons/buildroot")
 
 ```mermaid
 flowchart LR
@@ -39,18 +46,12 @@ flowchart LR
     opentrons --> FlexBuild
     oe_core --> FlexBuild
     ot3_firmware --> FlexBuild
-
-    click oe_core "https://github.com/Opentrons/oe-core" _blank
-    click ot3_firmware "https://github.com/Opentrons/ot3-firmware" _blank
-    click opentrons "https://github.com/Opentrons/opentrons" _blank
-    click opentrons_modules "https://github.com/Opentrons/opentrons-modules" _blank
-    click buildroot "https://github.com/Opentrons/buildroot" _blank
 ```
 
-These are all versioned and released together.  These assets are produced in 2 possible channels:
+These are all versioned and released together. These assets are produced in 2 possible channels:
+
 - Release (External facing releases - stable, beta, alpha)
 - Internal Release (Internal facing releases - stable, beta, alpha)
-
 
 ### Steps to release
 
@@ -79,7 +80,7 @@ only use annotated tags
    git tag -a v${alphaVersion} -m 'chore(release): ${alphaVersion}'
    ```
 
-5. Review the tag with `git show v${alphaVersion}`. Double check that the commit displayed is the one you want - it should probably be the latest commit in your release branch, and you should double check that with the Github web UI. If the tag looks good, push it - this starts the build process. This is a release candidate that will undergo QA.
+4. Review the tag with `git show v${alphaVersion}`. Double check that the commit displayed is the one you want - it should probably be the latest commit in your release branch, and you should double check that with the Github web UI. If the tag looks good, push it - this starts the build process. This is a release candidate that will undergo QA.
 
    ```shell
    git push origin v${alphaVersion}
@@ -87,9 +88,9 @@ only use annotated tags
 
    Changelogs for the release are automatically generated when the tag is pushed and sent to the release page in github.
 
-6. Run QA on this release. If issues are found, create PRs targeted on the release branch. To create new alpha releases, repeat steps 4-6.
+5. Run QA on this release. If issues are found, create PRs targeted on the release branch. To create new alpha releases, repeat steps 4-6.
 
-7. Once QA is a pass, do a final check that the release notes are good and wordsmithed, and then do a NORMAL MERGE into `release`. Do NOT squash or rebase; do NOT yet push a tag. This should be done from your local command line (and will succeed as long as the release PR is reviewed and status checks have passed):
+6. Once QA is a pass, do a final check that the release notes are good and wordsmithed, and then do a NORMAL MERGE into `release`. Do NOT squash or rebase; do NOT yet push a tag. This should be done from your local command line (and will succeed as long as the release PR is reviewed and status checks have passed):
 
    ```shell
    # note: make sure you have pulled the latest changes for branch
@@ -103,7 +104,7 @@ only use annotated tags
    git push origin release
    ```
 
-8. Make a tag for the release. This tag will have the actual target release version, no alpha prerelease tags involved. It should be the same as the `${version}` part of your release branch:
+7. Make a tag for the release. This tag will have the actual target release version, no alpha prerelease tags involved. It should be the same as the `${version}` part of your release branch:
 
    ```shell
    git tag -a v${version} -m 'chore(release): ${version}'
@@ -120,16 +121,16 @@ only use annotated tags
 
    The tag push will kick off release builds and deploy the results to customers. It will also create a release page where those builds and automatically generated in-depth changelogs will be posted.
 
-9. Ensure all deploy jobs succeeded:
+8. Ensure all deploy jobs succeeded:
 
    - The Opentrons App should be prompting people to update to the new version.
    - https://pypi.org/project/opentrons/ should be showing the new version.
 
-10. Release the Python Protocol API docs for this version (see below under Releasing Web Projects).
+9. Release the Python Protocol API docs for this version (see below under Releasing Web Projects).
 
-11. Update the download links on https://opentrons.com/ot-app/. That page is defined in an Opentrons private repository.
+10. Update the download links on https://opentrons.com/ot-app/. That page is defined in an Opentrons private repository.
 
-12. Open a PR of `release` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`:
+11. Open a PR of `release` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`:
 
     ```shell
     git checkout edge
@@ -137,7 +138,7 @@ only use annotated tags
     git merge --no-ff release
     ```
 
-13. Use the PR title for the merge commit title. You can then `git push origin edge`, which will succeed as long as the PR is approved and status checks pass.
+12. Use the PR title for the merge commit title. You can then `git push origin edge`, which will succeed as long as the PR is approved and status checks pass.
 
 ## Releasing Robot Software Stack Hotfixes
 
