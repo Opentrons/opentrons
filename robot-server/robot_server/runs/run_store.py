@@ -104,8 +104,10 @@ class RunStore:
         select_run_resource = sqlalchemy.select(*_run_columns).where(
             run_table.c.id == run_id
         )
-        select_actions = sqlalchemy.select(action_table).where(
-            action_table.c.run_id == run_id
+        select_actions = (
+            sqlalchemy.select(action_table)
+            .where(action_table.c.run_id == run_id)
+            .order_by(sqlite_rowid)
         )
 
         with self._sql_engine.begin() as transaction:
@@ -220,8 +222,10 @@ class RunStore:
             run_table.c.id == run_id
         )
 
-        select_actions = sqlalchemy.select(action_table).where(
-            action_table.c.run_id == run_id
+        select_actions = (
+            sqlalchemy.select(action_table)
+            .where(action_table.c.run_id == run_id)
+            .order_by(sqlite_rowid)
         )
 
         with self._sql_engine.begin() as transaction:
