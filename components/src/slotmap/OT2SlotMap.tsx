@@ -28,7 +28,7 @@ const iconSize = 20
 const numRows = 4
 const numCols = 3
 
-export function SlotMap(props: SlotMapProps): JSX.Element {
+export function OT2SlotMap(props: SlotMapProps): JSX.Element {
   const { collisionSlots, occupiedSlots, isError } = props
   const slots = OT2_SLOT_MAP_SLOTS
   return (

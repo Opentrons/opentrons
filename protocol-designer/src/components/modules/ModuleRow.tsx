@@ -5,7 +5,7 @@ import upperFirst from 'lodash/upperFirst'
 import {
   LabeledValue,
   OutlineButton,
-  SlotMap,
+  OT2SlotMap,
   Tooltip,
   useHoverTooltip,
   ModuleIcon,
@@ -51,7 +51,7 @@ export function ModuleRow(props: Props): JSX.Element {
   const slot = moduleOnDeck?.slot
   /*
   TODO (ka 2020-2-3): This logic is very specific to this individual implementation
-  of SlotMap. Kept it here (for now?) because it spells out the different cases.
+  of OT2SlotMap. Kept it here (for now?) because it spells out the different cases.
   */
   let slotDisplayName = null
   let occupiedSlotsForMap: string[] = []
@@ -160,7 +160,7 @@ export function ModuleRow(props: Props): JSX.Element {
               />
             ) : (
               <div {...targetProps}>
-                <SlotMap
+                <OT2SlotMap
                   occupiedSlots={occupiedSlotsForMap}
                   collisionSlots={collisionSlots}
                 />

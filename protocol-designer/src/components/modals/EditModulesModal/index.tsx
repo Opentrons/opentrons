@@ -27,7 +27,7 @@ import {
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_FLEX_END,
-  SlotMap,
+  OT2SlotMap,
   usePrevious,
 } from '@opentrons/components'
 import {
@@ -413,9 +413,9 @@ const EditModulesModalComponent = (
                 paddingY={SPACING.spacing16}
               >
                 {moduleType === THERMOCYCLER_MODULE_TYPE ? (
-                  <SlotMap occupiedSlots={['7', '8', '10', '11']} />
+                  <OT2SlotMap occupiedSlots={['7', '8', '10', '11']} />
                 ) : (
-                  <SlotMap
+                  <OT2SlotMap
                     occupiedSlots={[`${field.value}`]}
                     isError={!fieldState.error}
                   />

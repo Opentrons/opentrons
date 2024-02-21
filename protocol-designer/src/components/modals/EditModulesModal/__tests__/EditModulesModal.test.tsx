@@ -4,7 +4,7 @@ import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   DeckLocationSelect,
   renderWithProviders,
-  SlotMap,
+  OT2SlotMap,
 } from '@opentrons/components'
 import { i18n } from '../../../../localization'
 import { getRobotType } from '../../../../file-data/selectors'
@@ -37,7 +37,7 @@ const mockGetLabwareIsCompatible = getLabwareIsCompatible as jest.MockedFunction
 const mockGetDisableModuleRestrictions = getDisableModuleRestrictions as jest.MockedFunction<
   typeof getDisableModuleRestrictions
 >
-const mockSlotMap = SlotMap as jest.MockedFunction<typeof SlotMap>
+const mockOT2SlotMap = OT2SlotMap as jest.MockedFunction<typeof OT2SlotMap>
 const render = (props: React.ComponentProps<typeof EditModulesModal>) => {
   return renderWithProviders(<EditModulesModal {...props} />, {
     i18nInstance: i18n,
@@ -92,7 +92,7 @@ describe('Edit Modules Modal', () => {
     mockGetLabwareIsCompatible.mockReturnValue(true)
     mockGetDisableModuleRestrictions.mockReturnValue(false)
     mockDeckLocationSelect.mockReturnValue(<div>mock DeckLocationSelect</div>)
-    mockSlotMap.mockReturnValue(<div>mock SlotMap</div>)
+    mockOT2SlotMap.mockReturnValue(<div>mock SlotMap</div>)
   })
   it('renders the edit modules modal for a temp on a flex', () => {
     render(props)
