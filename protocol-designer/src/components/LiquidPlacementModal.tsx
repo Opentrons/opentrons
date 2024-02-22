@@ -1,5 +1,5 @@
 import * as React from 'react'
-import assert from 'assert'
+
 import { useDispatch, useSelector } from 'react-redux'
 import cx from 'classnames'
 import isEmpty from 'lodash/isEmpty'
@@ -33,7 +33,7 @@ export function LiquidPlacementModal(): JSX.Element {
   const liquidNamesById = useSelector(selectors.getLiquidNamesById)
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
   if (labwareId == null) {
-    assert(
+    console.assert(
       false,
       'LiquidPlacementModal: No labware is selected, and no labwareId was given to LiquidPlacementModal'
     )

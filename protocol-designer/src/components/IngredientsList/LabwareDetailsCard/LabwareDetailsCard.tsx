@@ -1,5 +1,5 @@
 import * as React from 'react'
-import assert from 'assert'
+
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
@@ -26,13 +26,13 @@ export function LabwareDetailsCard(): JSX.Element {
       ? getLabwareDisplayName(labwareEntities[labwareId].def)
       : null
 
-  assert(
+  console.assert(
     labwareId,
     'Expected labware id to exist in connected labware details card'
   )
 
   const renameLabware = (name: string): void => {
-    assert(
+    console.assert(
       labwareId,
       'renameLabware in LabwareDetailsCard expected a labwareId'
     )

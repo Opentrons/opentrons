@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import assert from 'assert'
+
 import styles from './modalContents.module.css'
 import { FileUploadMessage } from '../../../load-file'
 import type { ModalContents } from './types'
@@ -191,7 +191,7 @@ export function useModalContents(
         t,
       })
     default: {
-      assert(
+      console.assert(
         false,
         `invalid messageKey ${uploadResponse.messageKey} specified for modal`
       )

@@ -1,4 +1,4 @@
-import assert from 'assert'
+
 import { getWellsDepth, LabwareDefinition2 } from '@opentrons/shared-data'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
 import {
@@ -62,7 +62,7 @@ type MoveLiquidStepArgs = ConsolidateArgs | DistributeArgs | TransferArgs | null
 export const moveLiquidFormToArgs = (
   hydratedFormData: HydratedMoveLiquidFormData
 ): MoveLiquidStepArgs => {
-  assert(
+  console.assert(
     hydratedFormData.stepType === 'moveLiquid',
     `moveLiquidFormToArgs called with stepType ${hydratedFormData.stepType}, expected "moveLiquid"`
   )
@@ -203,11 +203,11 @@ export const moveLiquidFormToArgs = (
     dropTipLocation,
     nozzles,
   }
-  assert(
+  console.assert(
     sourceWellsUnordered.length > 0,
     'expected sourceWells to have length > 0'
   )
-  assert(
+  console.assert(
     !(
       path === 'multiDispense' &&
       blowoutLocation === DEST_WELL_BLOWOUT_DESTINATION
@@ -219,7 +219,7 @@ export const moveLiquidFormToArgs = (
     console.error('expected to have destWells.length > 0 but got none')
   }
 
-  assert(
+  console.assert(
     !(path === 'multiDispense' && destWells == null),
     'cannot distribute when destWells is null'
   )
@@ -268,7 +268,7 @@ export const moveLiquidFormToArgs = (
     }
 
     default: {
-      assert(
+      console.assert(
         false,
         `moveLiquidFormToArgs got unexpected "path" field value: ${path}`
       )

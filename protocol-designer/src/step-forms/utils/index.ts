@@ -1,4 +1,4 @@
-import assert from 'assert'
+
 import reduce from 'lodash/reduce'
 import values from 'lodash/values'
 import find from 'lodash/find'
@@ -54,15 +54,15 @@ export function getIdsInRange<T extends string | number>(
 ): T[] {
   const startIdx = orderedIds.findIndex(id => id === startId)
   const endIdx = orderedIds.findIndex(id => id === endId)
-  assert(
+  console.assert(
     startIdx !== -1,
     `start step "${String(startId)}" does not exist in orderedStepIds`
   )
-  assert(
+  console.assert(
     endIdx !== -1,
     `end step "${String(endId)}" does not exist in orderedStepIds`
   )
-  assert(
+  console.assert(
     endIdx >= startIdx,
     `expected end index to be greater than or equal to start index, got "${startIdx}", "${endIdx}"`
   )
@@ -76,7 +76,7 @@ export function getDeckItemIdInSlot(
   const idsForSourceSlot = Object.entries(itemIdToSlot)
     .filter(([id, labwareSlot]) => labwareSlot === slot)
     .map(([id, labwareSlot]) => id)
-  assert(
+  console.assert(
     idsForSourceSlot.length < 2,
     `multiple deck items in slot ${slot}, expected none or one`
   )

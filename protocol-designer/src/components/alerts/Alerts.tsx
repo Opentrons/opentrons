@@ -1,5 +1,5 @@
 import * as React from 'react'
-import assert from 'assert'
+
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import * as timelineWarningSelectors from '../../top-selectors/timelineWarnings'
@@ -116,7 +116,7 @@ const AlertsComponent = (props: Props): JSX.Element => {
     }
   }
   const makeHandleCloseWarning = (dismissId?: string | null) => () => {
-    assert(dismissId, 'expected dismissId, Alert cannot dismiss warning')
+    console.assert(dismissId, 'expected dismissId, Alert cannot dismiss warning')
     if (dismissId) {
       dismissWarning(dismissId)
     }

@@ -1,5 +1,5 @@
 // replace webpack-specific require.context with Node-based glob in tests
-import assert from 'assert'
+
 import { vi } from 'vitest'
 import path from 'path'
 import glob from 'glob'
@@ -16,7 +16,7 @@ const allLabware: LabwareDefByDefURI = glob
   .map(require)
   .filter(d => d.metadata.displayCategory !== 'trash')
   .reduce((acc, d) => ({ ...acc, [getLabwareDefURI(d)]: d }), {})
-assert(
+console.assert(
   Object.keys(allLabware).length > 0,
   `no labware fixtures found, is the path correct? ${LABWARE_FIXTURE_PATTERN}`
 )

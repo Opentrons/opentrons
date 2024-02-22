@@ -1,4 +1,4 @@
-import assert from 'assert'
+
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
@@ -174,7 +174,7 @@ const slotTarget = {
     const draggedItem = monitor.getItem()
     const draggedDef = draggedItem?.labwareOnDeck?.def
     const moduleType = props.moduleType
-    assert(draggedDef, 'no labware def of dragged item, expected it on drop')
+    console.assert(draggedDef, 'no labware def of dragged item, expected it on drop')
 
     if (moduleType != null && draggedDef != null) {
       // this is a module slot, prevent drop if the dragged labware is not compatible

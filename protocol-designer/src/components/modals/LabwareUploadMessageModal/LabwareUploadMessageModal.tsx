@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import assert from 'assert'
+
 import cx from 'classnames'
 import { AlertModal, OutlineButton, ButtonProps } from '@opentrons/components'
 import modalStyles from '../modal.module.css'
@@ -80,7 +80,7 @@ const MessageBody = (props: {
       </>
     )
   }
-  assert(false, `MessageBody got unhandled messageType: ${message.messageType}`)
+  console.assert(false, `MessageBody got unhandled messageType: ${message.messageType}`)
   return null
 }
 
@@ -107,7 +107,7 @@ export const LabwareUploadMessageModal = (): JSX.Element | null => {
         })
       )
     } else {
-      assert(
+      console.assert(
         false,
         `labware def should only be overwritten when messageType is ASK_FOR_LABWARE_OVERWRITE. Got ${String(
           message?.messageType

@@ -1,4 +1,4 @@
-import assert from 'assert'
+
 import { getWellsDepth } from '@opentrons/shared-data'
 import {
   DEFAULT_CHANGE_TIP_OPTION,
@@ -46,7 +46,7 @@ export const mixFormToArgs = (
     hydratedFormData.mix_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_DISPENSE
   // It's radiobutton, so one should always be selected.
   // One changeTip option should always be selected.
-  assert(
+  console.assert(
     hydratedFormData.changeTip,
     'mixFormToArgs expected non-falsey changeTip option'
   )

@@ -1,4 +1,4 @@
-import assert from 'assert'
+
 import Ajv from 'ajv'
 import isEqual from 'lodash/isEqual'
 import flatten from 'lodash/flatten'
@@ -186,7 +186,7 @@ const _createCustomLabwareDef: (
         ...defsMatchingCustomLoadName,
         ...defsMatchingCustomDisplayName,
       ]
-      assert(
+      console.assert(
         uniqBy(matchingDefs, getLabwareDefURI).length === 1,
         'expected exactly 1 matching labware def to ask to overwrite'
       )

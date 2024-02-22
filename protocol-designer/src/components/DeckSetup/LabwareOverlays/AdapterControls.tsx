@@ -1,4 +1,4 @@
-import assert from 'assert'
+
 import * as React from 'react'
 import { DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd'
 import cx from 'classnames'
@@ -175,7 +175,7 @@ const slotTarget = {
   canDrop: (props: SlotControlsProps, monitor: DropTargetMonitor) => {
     const draggedItem = monitor.getItem()
     const draggedDef = draggedItem?.labwareOnDeck?.def
-    assert(draggedDef, 'no labware def of dragged item, expected it on drop')
+    console.assert(draggedDef, 'no labware def of dragged item, expected it on drop')
 
     if (draggedDef != null) {
       const isCustomLabware = getLabwareIsCustom(

@@ -1,5 +1,5 @@
 import get from 'lodash/get'
-import assert from 'assert'
+
 import { Store } from 'redux'
 import { dismissedHintsPersist } from './tutorial/reducers'
 export interface RehydratePersistedAction {
@@ -22,7 +22,7 @@ export const getLocalStorageItem = (path: string): unknown => {
 }
 // The `path` should match where the reducer lives in the Redux state tree
 export const _rehydrate = (path: string): any => {
-  assert(
+  console.assert(
     PERSISTED_PATHS.includes(path),
     `Path "${path}" is missing from PERSISTED_PATHS! The changes to this reducer will not be persisted.`
   )

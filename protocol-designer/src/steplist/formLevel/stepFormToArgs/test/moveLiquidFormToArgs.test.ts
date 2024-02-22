@@ -1,4 +1,4 @@
-import assert from 'assert'
+
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'

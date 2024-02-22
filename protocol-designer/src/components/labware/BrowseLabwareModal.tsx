@@ -1,4 +1,4 @@
-import assert from 'assert'
+
 import * as React from 'react'
 import cx from 'classnames'
 import { useDispatch, useSelector } from 'react-redux'
@@ -30,7 +30,7 @@ export const BrowseLabwareModal = (): JSX.Element | null => {
       : null
 
   if (!definition) {
-    assert(definition, 'BrowseLabwareModal expected definition')
+    console.assert(definition, 'BrowseLabwareModal expected definition')
     return null
   }
 
