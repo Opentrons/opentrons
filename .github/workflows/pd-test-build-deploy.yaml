@@ -54,6 +54,9 @@ jobs:
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '18.19.0'
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'setup-js'
@@ -89,6 +92,9 @@ jobs:
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '18.19.0'
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
       - name: 'install udev for usb-detection'
         if: startsWith(matrix.os, 'ubuntu')
         run: sudo apt-get update && sudo apt-get install libudev-dev
@@ -119,6 +125,9 @@ jobs:
           node-version: '18.19.0'
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
       - name: 'setup-js'
         run: |
           npm config set cache ./.npm-cache
