@@ -18,7 +18,6 @@ from opentrons.hardware_control.nozzle_manager import (
 )
 
 from ..types import FlowRates
-from ...types import Point
 
 
 @dataclass(frozen=True)

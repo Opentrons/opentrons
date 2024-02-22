@@ -10,7 +10,7 @@ from opentrons_shared_data.pipette import pipette_definition
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
 from opentrons.calibration_storage.helpers import uri_from_details
-from opentrons.types import Mount as HwMount, MountType, DeckSlotName, Point
+from opentrons.types import Mount as HwMount, MountType, DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import (
     TempDeck,

@@ -4,7 +4,7 @@ from decoy import Decoy
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons.types import MountType, Point
+from opentrons.types import MountType
 
 from opentrons.protocol_engine.errors import InvalidSpecificationForRobotTypeError
 from opentrons.protocol_engine.types import FlowRates
