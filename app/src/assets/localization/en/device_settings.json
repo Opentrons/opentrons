@@ -301,7 +301,7 @@
   "update_robot_software_description": "Bypass the Opentrons App auto-update process and update the robot software manually.",
   "update_robot_software_link": "Launch Opentrons software update page",
   "updating": "Updating",
-  "updating_robot_system": "Updating the robot software requires restarting the robot",
+  "update_requires_restarting": "Updating the robot software requires restarting the robot",
   "usage_settings": "Usage Settings",
   "usb": "USB",
   "usb_to_ethernet_description": "Looking for USB-to-Ethernet Adapter info?",
