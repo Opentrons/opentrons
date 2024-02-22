@@ -4,7 +4,7 @@ import asyncio
 import argparse
 import datetime
 
-from typing import Optional
+from typing import Optional, cast
 
 from hardware_testing.opentrons_api import helpers_ot3
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
