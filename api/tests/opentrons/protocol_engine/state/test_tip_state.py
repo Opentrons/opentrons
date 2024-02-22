@@ -19,11 +19,12 @@ from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
 )
 from opentrons.types import Point
-
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from ..pipette_fixtures import (
     NINETY_SIX_MAP,
     NINETY_SIX_COLS,
     NINETY_SIX_ROWS,
+    get_default_nozzle_map,
 )
 
 _tip_rack_parameters = LabwareParameters.construct(isTiprack=True)  # type: ignore[call-arg]
@@ -218,8 +219,7 @@ def test_get_next_tip_skips_picked_up_tip(
             nominal_tip_overlap={},
             nozzle_offset_z=1.23,
             home_position=4.56,
-            back_left_nozzle_offset=Point(x=1, y=2, z=3),
-            front_right_nozzle_offset=Point(x=4, y=5, z=6),
+            nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
         ),
     )
     subject.handle_action(
@@ -412,8 +412,7 @@ def test_reset_tips(
             nominal_tip_overlap={},
             nozzle_offset_z=1.23,
             home_position=4.56,
-            back_left_nozzle_offset=Point(x=1, y=2, z=3),
-            front_right_nozzle_offset=Point(x=4, y=5, z=6),
+            nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
         ),
     )
 
@@ -462,8 +461,7 @@ def test_handle_pipette_config_action(
             nominal_tip_overlap={},
             nozzle_offset_z=1.23,
             home_position=4.56,
-            back_left_nozzle_offset=Point(x=1, y=2, z=3),
-            front_right_nozzle_offset=Point(x=4, y=5, z=6),
+            nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
         ),
     )
     subject.handle_action(
@@ -544,8 +542,7 @@ def test_drop_tip(
             nominal_tip_overlap={},
             nozzle_offset_z=1.23,
             home_position=4.56,
-            back_left_nozzle_offset=Point(x=1, y=2, z=3),
-            front_right_nozzle_offset=Point(x=4, y=5, z=6),
+            nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
         ),
     )
     subject.handle_action(
@@ -617,7 +614,6 @@ def test_drop_tip(
             ),
             5,
         ),
-        (None, 9),
     ],
 )
 def test_active_channels(
@@ -649,8 +645,7 @@ def test_active_channels(
             nominal_tip_overlap={},
             nozzle_offset_z=1.23,
             home_position=4.56,
-            back_left_nozzle_offset=Point(x=1, y=2, z=3),
-            front_right_nozzle_offset=Point(x=4, y=5, z=6),
+            nozzle_map=nozzle_map,
         ),
     )
     subject.handle_action(
@@ -713,8 +708,7 @@ def test_next_tip_uses_active_channels(
             nominal_tip_overlap={},
             nozzle_offset_z=1.23,
             home_position=4.56,
-            back_left_nozzle_offset=Point(x=1, y=2, z=3),
-            front_right_nozzle_offset=Point(x=4, y=5, z=6),
+            nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
         ),
     )
     subject.handle_action(
