@@ -8,9 +8,10 @@ from opentrons_shared_data.labware.dev_types import (
 
 from opentrons_shared_data.labware.labware_definition import LabwareRole
 
+from opentrons.protocol_engine import LoadedPipette
 from opentrons.protocol_engine.errors import LabwareNotOnDeckError, ModuleNotOnDeckError
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
-from opentrons.types import DeckSlotName, Point
+from opentrons.types import DeckSlotName, Point, Mount, MountType
 
 from ..labware import AbstractLabware, LabwareLoadParams
 from .well import WellCore
@@ -123,18 +124,27 @@ class LabwareCore(AbstractLabware[WellCore]):
 
     def get_next_tip(
         self,
+        mount: Mount,
         num_tips: int,
         starting_tip: Optional[WellCore],
     ) -> Optional[str]:
-        return self._engine_client.state.tips.get_next_tip(
-            labware_id=self._labware_id,
-            num_tips=num_tips,
-            starting_tip_name=(
-                starting_tip.get_name()
-                if starting_tip and starting_tip.labware_id == self._labware_id
-                else None
-            ),
+        pipette = self._engine_client.state.pipettes.get_by_mount(
+            MountType.from_hw_mount(mount)
         )
+        if isinstance(pipette, LoadedPipette):
+            pipette_id = pipette.id
+            return self._engine_client.state.tips.get_next_tip(
+                pipette_id=pipette_id,
+                labware_id=self._labware_id,
+                num_tips=num_tips,
+                starting_tip_name=(
+                    starting_tip.get_name()
+                    if starting_tip and starting_tip.labware_id == self._labware_id
+                    else None
+                ),
+            )
+        else:
+            raise ValueError(f"No valid Pipette found for Mount {mount.name}")
 
     def get_well_columns(self) -> List[List[str]]:
         """Get the all well names, organized by column, from the labware's definition."""

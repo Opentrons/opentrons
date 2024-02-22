@@ -880,6 +880,7 @@ class InstrumentContext(publisher.CommandPublisher):
                     " to pick up."
                 )
             tip_rack, well = labware.next_available_tip(
+                mount=self._core.get_mount(),
                 starting_tip=self.starting_tip,
                 tip_racks=self.tip_racks,
                 channels=active_channels,
@@ -891,6 +892,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         elif isinstance(location, labware.Labware):
             tip_rack, well = labware.next_available_tip(
+                mount=self._core.get_mount(),
                 starting_tip=None,
                 tip_racks=[location],
                 channels=active_channels,
@@ -906,6 +908,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
             elif maybe_tip_rack is not None:
                 tip_rack, well = labware.next_available_tip(
+                    mount=self._core.get_mount(),
                     starting_tip=None,
                     tip_racks=[maybe_tip_rack],
                     channels=active_channels,
@@ -1321,6 +1324,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         if new_tip != types.TransferTipPolicy.NEVER:
             tr, next_tip = labware.next_available_tip(
+                self._core.get_mount(),
                 self.starting_tip,
                 self.tip_racks,
                 active_channels,

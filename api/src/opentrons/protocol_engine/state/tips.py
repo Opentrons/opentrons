@@ -43,7 +43,7 @@ class TipState:
     channels_by_pipette_id: Dict[str, int]
     length_by_pipette_id: Dict[str, float]
     active_channels_by_pipette_id: Dict[str, int]
-    nozzle_map: Optional[NozzleMap]
+    nozzle_map_by_pipette_id: Dict[str, NozzleMap]
 
 
 class TipStore(HasState[TipState], HandlesActions):
@@ -59,7 +59,7 @@ class TipStore(HasState[TipState], HandlesActions):
             channels_by_pipette_id={},
             length_by_pipette_id={},
             active_channels_by_pipette_id={},
-            nozzle_map=None,
+            nozzle_map_by_pipette_id={},
         )
 
     def handle_action(self, action: Action) -> None:
@@ -70,6 +70,7 @@ class TipStore(HasState[TipState], HandlesActions):
                 config = action.private_result.config
                 self._state.channels_by_pipette_id[pipette_id] = config.channels
                 self._state.active_channels_by_pipette_id[pipette_id] = config.channels
+                self._state.nozzle_map_by_pipette_id[pipette_id] = config.nozzle_map
             self._handle_command(action.command)
 
             if isinstance(action.private_result, PipetteNozzleLayoutResultMixin):
@@ -79,7 +80,7 @@ class TipStore(HasState[TipState], HandlesActions):
                     self._state.active_channels_by_pipette_id[
                         pipette_id
                     ] = nozzle_map.tip_count
-                    self._state.nozzle_map = nozzle_map
+                    self._state.nozzle_map_by_pipette_id[pipette_id] = nozzle_map
                 else:
                     self._state.active_channels_by_pipette_id[
                         pipette_id
@@ -114,18 +115,24 @@ class TipStore(HasState[TipState], HandlesActions):
             well_name = command.params.wellName
             pipette_id = command.params.pipetteId
             length = command.result.tipLength
-            self._set_used_tips(well_name=well_name, labware_id=labware_id)
+            self._set_used_tips(
+                pipette_id=pipette_id, well_name=well_name, labware_id=labware_id
+            )
             self._state.length_by_pipette_id[pipette_id] = length
 
         elif isinstance(command.result, (DropTipResult, DropTipInPlaceResult)):
             pipette_id = command.params.pipetteId
             self._state.length_by_pipette_id.pop(pipette_id, None)
 
-    def _set_used_tips(self, well_name: str, labware_id: str) -> None:  # noqa: C901
+    def _set_used_tips(
+        self, pipette_id: str, well_name: str, labware_id: str
+    ) -> None:  # noqa: C901
         columns = self._state.column_by_labware_id.get(labware_id, [])
         wells = self._state.tips_by_labware_id.get(labware_id, {})
-        nozzle_map = self._state.nozzle_map
+        nozzle_map = self._state.nozzle_map_by_pipette_id[pipette_id]
 
+        # fix this None logic?
+        # replace this with the whole nozzle map mask instead of the active nozzles?
         if nozzle_map is not None:
             num_nozzle_cols = len(nozzle_map.columns)
             num_nozzle_rows = len(nozzle_map.rows)
@@ -152,8 +159,7 @@ class TipStore(HasState[TipState], HandlesActions):
                         well = columns[critical_column - i][critical_row - j]
                         wells[well] = TipRackWellState.USED
         else:
-            # TODO: (cb, 2024-2-14): update/remove this case as soon as we gaurantee a nozzle map upon loading a pipette with (Jira RSS-441.)
-            wells[well_name] = TipRackWellState.USED
+            raise RuntimeError(f"No Nozzle Map found for Pipette-ID: {pipette_id}.")
 
 
 class TipView(HasState[TipState]):
@@ -175,6 +181,7 @@ class TipView(HasState[TipState]):
     #  or backmost single nozzle configuration of an 8-channel.
     def get_next_tip(  # noqa: C901
         self,
+        pipette_id: str,
         labware_id: str,
         num_tips: int,
         starting_tip_name: Optional[str],
@@ -182,10 +189,11 @@ class TipView(HasState[TipState]):
         """Get the next available clean tip."""
         wells = self._state.tips_by_labware_id.get(labware_id, {})
         columns = self._state.column_by_labware_id.get(labware_id, [])
+        nozzle_map = self._state.nozzle_map_by_pipette_id[pipette_id]
 
-        if self._state.nozzle_map is not None:
-            num_nozzle_cols = len(self._state.nozzle_map.columns)
-            num_nozzle_rows = len(self._state.nozzle_map.rows)
+        if nozzle_map is not None:
+            num_nozzle_cols = len(nozzle_map.columns)
+            num_nozzle_rows = len(nozzle_map.rows)
 
             def _identify_tip_cluster(
                 critical_column: int, critical_row: int
@@ -233,7 +241,7 @@ class TipView(HasState[TipState]):
                             f"Tiprack {labware_id} has no valid tip selection for current Nozzle Configuration."
                         )
 
-            if self._state.nozzle_map.starting_nozzle == "A1":
+            if nozzle_map.starting_nozzle == "A1":
                 # Define the critical well by the position of the well relative to Tip Rack entry point H12
                 critical_column = len(columns) - num_nozzle_cols
                 critical_row = len(columns[critical_column]) - num_nozzle_rows
@@ -255,12 +263,12 @@ class TipView(HasState[TipState]):
                             )
                 return None
 
-            elif self._state.nozzle_map.starting_nozzle == "A12":
+            elif nozzle_map.starting_nozzle == "A12":
                 # Define the critical well by the position of the well relative to Tip Rack entry point H1
                 critical_column = num_nozzle_cols - 1
                 critical_row = len(columns[critical_column]) - num_nozzle_rows
 
-                while critical_column <= len(columns): # change to max size of labware
+                while critical_column <= len(columns):  # change to max size of labware
                     tip_cluster = _identify_tip_cluster(critical_column, critical_row)
                     result = _validate_tip_cluster(tip_cluster)
                     if isinstance(result, str):
@@ -277,7 +285,7 @@ class TipView(HasState[TipState]):
                             )
                 return None
 
-            elif self._state.nozzle_map.starting_nozzle == "H1":
+            elif nozzle_map.starting_nozzle == "H1":
                 # Define the critical well by the position of the well relative to Tip Rack entry point A12
                 critical_column = len(columns) - num_nozzle_cols
                 critical_row = num_nozzle_rows - 1
@@ -297,7 +305,7 @@ class TipView(HasState[TipState]):
                             critical_row = num_nozzle_rows - 1
                 return None
 
-            elif self._state.nozzle_map.starting_nozzle == "H12":
+            elif nozzle_map.starting_nozzle == "H12":
                 # Define the critical well by the position of the well relative to Tip Rack entry point A1
                 critical_column = num_nozzle_cols - 1
                 critical_row = num_nozzle_rows - 1
@@ -319,10 +327,10 @@ class TipView(HasState[TipState]):
 
             else:
                 raise ValueError(
-                    f"Nozzle {self._state.nozzle_map.starting_nozzle} is an invalid starting tip for automatic tip pickup."
+                    f"Nozzle {nozzle_map.starting_nozzle} is an invalid starting tip for automatic tip pickup."
                 )
         else:
-            return None
+            raise RuntimeError(f"No Nozzle Map found for Pipette-ID: {pipette_id}.")
 
     def get_pipette_channels(self, pipette_id: str) -> int:
         """Return the given pipette's number of channels."""

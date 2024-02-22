@@ -10,7 +10,7 @@ from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LabwareDefinitionDict,
 )
 
-from opentrons.types import DeckSlotName, Point
+from opentrons.types import DeckSlotName, Point, Mount
 
 from .well import WellCoreType
 
@@ -111,6 +111,7 @@ class AbstractLabware(ABC, Generic[WellCoreType]):
     @abstractmethod
     def get_next_tip(
         self,
+        mount: Mount,
         num_tips: int,
         starting_tip: Optional[WellCoreType],
     ) -> Optional[str]:
