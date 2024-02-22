@@ -2,7 +2,7 @@
  * This is for loading software keyboard lib's css without changing webpack
 */
 
-@import '../../node_modules/react-simple-keyboard/build/css/index.css';
+@import '../node_modules/react-simple-keyboard/build/css/index.css';
 @import './atoms/SoftwareKeyboard/CustomKeyboard/index.module.css';
 @import './atoms/SoftwareKeyboard/NormalKeyboard/index.module.css';
 @import './atoms/SoftwareKeyboard/Numpad/index.module.css';

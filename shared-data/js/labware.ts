@@ -1,6 +1,7 @@
 import labwareSchemaV2 from '../labware/schemas/2.json'
 import fixture96Plate from '../labware/fixtures/2/fixture_96_plate.json'
 import fixture12Trough from '../labware/fixtures/2/fixture_12_trough.json'
+import fixture24Tuberack from '../labware/fixtures/2/fixture_24_tuberack.json'
 import fixtureTiprack10ul from '../labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixtureTiprack300ul from '../labware/fixtures/2/fixture_tiprack_300_ul.json'
 import fixtureTiprack1000ul from '../labware/fixtures/2/fixture_flex_96_tiprack_1000ul.json'
@@ -344,8 +345,7 @@ const tubeRack5Ml96 = tubeRack5Ml96Uncasted as LabwareDefinition1
 const tubeRack80Well = tubeRack80WellUncasted as LabwareDefinition1
 const wheatonVialRack = wheatonVialRackUncasted as LabwareDefinition1
 
-// labware definitions
-const getAllLabwareDefs = (): Record<string, LabwareDefinition2> => ({
+const latestDefs = {
   agilent1Reservoir290MlV1,
   appliedbiosystemsmicroamp384Wellplate40UlV1,
   armadillo96Wellplate200UlPcrFullSkirtV1,
@@ -451,7 +451,12 @@ const getAllLabwareDefs = (): Record<string, LabwareDefinition2> => ({
   tipone96Tiprack200UlV1,
   usascientific12Reservoir22MlV1,
   usascientific96Wellplate24MlDeepV1,
-})
+}
+// labware definitions
+const getAllLabwareDefs = (): Record<
+  keyof typeof latestDefs,
+  LabwareDefinition2
+> => latestDefs
 
 const getAllLegacyDefs = (): Record<string, LabwareDefinition1> => ({
   wellPlate12,
@@ -545,6 +550,7 @@ export {
   labwareSchemaV2,
   fixture96Plate,
   fixture12Trough,
+  fixture24Tuberack,
   fixtureTiprack10ul,
   fixtureTiprack300ul,
   fixtureTiprack1000ul,

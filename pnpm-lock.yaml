@@ -398,9 +398,15 @@ importers:
       '@opentrons/shared-data':
         specifier: link:../shared-data
         version: link:../shared-data
+      '@types/lodash':
+        specifier: ^4.14.191
+        version: 4.14.202
       axios:
         specifier: ^0.21.1
         version: 0.21.4
+      lodash:
+        specifier: 4.17.21
+        version: 4.17.21
 
   app:
     dependencies:

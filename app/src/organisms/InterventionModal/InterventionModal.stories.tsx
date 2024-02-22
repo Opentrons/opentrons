@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import { fixture96Plate } from '@opentrons/shared-data'
 import { configReducer } from '../../redux/config/reducer'
 import { mockRunData } from './__fixtures__'
 import { InterventionModal as InterventionModalComponent } from './'
@@ -65,7 +65,7 @@ MoveLabwareIntervention.args = {
     labware: [
       {
         id: 'fake_labware_id',
-        loadName: fixture_96_plate.parameters.loadName,
+        loadName: fixture96Plate.parameters.loadName,
         definitionUri: 'fixture/fixture_96_plate/1',
         location: {
           slotName: '9',
@@ -80,13 +80,13 @@ MoveLabwareIntervention.args = {
         params: {
           displayName: 'fake display name',
           labwareId: 'fake_labware_id',
-          loadName: fixture_96_plate.parameters.loadName,
+          loadName: fixture96Plate.parameters.loadName,
           namespace: 'fixture',
           version: 1,
           location: { slotName: '9' },
         },
         result: {
-          definition: fixture_96_plate,
+          definition: fixture96Plate,
         },
       },
     ],
