@@ -1,7 +1,9 @@
 import * as React from 'react'
 import '@testing-library/jest-dom/vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders, COLORS, BORDERS } from '@opentrons/components'
+import { COLORS, BORDERS } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { MediumButton } from '../MediumButton'
 
@@ -13,7 +15,7 @@ describe('MediumButton', () => {
   let props: React.ComponentProps<typeof MediumButton>
   beforeEach(() => {
     props = {
-      onClick: jest.fn(),
+      onClick: vi.fn(),
       buttonType: 'primary',
       buttonText: 'Medium button',
     }
@@ -22,9 +24,7 @@ describe('MediumButton', () => {
     render(props)
     fireEvent.click(screen.getByText('Medium button'))
     expect(props.onClick).toHaveBeenCalled()
-    expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.blue50}`
-    )
+    expect(screen.getByRole('button')).toHaveStyle('background-color: #045dd0')
   })
   it('renders the alert button', () => {
     props = {
@@ -32,9 +32,7 @@ describe('MediumButton', () => {
       buttonType: 'alert',
     }
     render(props)
-    expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.red50}`
-    )
+    expect(screen.getByRole('button')).toHaveStyle('background-color: #b91f20')
   })
   it('renders the secondary button', () => {
     props = {
@@ -42,9 +40,7 @@ describe('MediumButton', () => {
       buttonType: 'secondary',
     }
     render(props)
-    expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.blue35}`
-    )
+    expect(screen.getByRole('button')).toHaveStyle('background-color: #94afd4')
   })
   it('renders the secondary alert button', () => {
     props = {
@@ -52,9 +48,7 @@ describe('MediumButton', () => {
       buttonType: 'alertSecondary',
     }
     render(props)
-    expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.red35}`
-    )
+    expect(screen.getByRole('button')).toHaveStyle('background-color: #ccabac')
   })
   it('renders the tertiary high button', () => {
     props = {
@@ -63,7 +57,7 @@ describe('MediumButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.white}`
+      `background-color: ${COLORS.grey35}`
     )
   })
   it('renders the tertiary low light button', () => {
@@ -73,7 +67,7 @@ describe('MediumButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.white}`
+      `background-color: ${COLORS.grey35}`
     )
   })
   it('renders the button as disabled', () => {
@@ -89,8 +83,8 @@ describe('MediumButton', () => {
       ...props,
       iconName: 'restart',
     }
-    const { getByLabelText } = render(props)
-    getByLabelText('restart icon')
+    render(props)
+    screen.getByLabelText('restart icon')
   })
   it('renders the rounded button category', () => {
     props = {

@@ -1,5 +1,9 @@
 import * as React from 'react'
-import { renderWithProviders, SPACING, TYPOGRAPHY } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import '@testing-library/jest-dom/vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
+import { SPACING, TYPOGRAPHY } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { OffsetVector } from '../'
 
@@ -19,28 +23,34 @@ describe('OffsetVector', () => {
   })
 
   it('renders text with correct styles', () => {
-    const { getByText, getAllByRole } = render(props)
-    expect(getAllByRole('heading', { level: 6 })).toHaveLength(6)
+    render(props)
+    expect(screen.getAllByRole('heading', { level: 6 })).toHaveLength(6)
 
-    expect(getByText('X')).toHaveStyle(`margin-right: ${SPACING.spacing4}`)
-    expect(getByText('X')).toHaveStyle(
-      `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
+    expect(screen.getByText('X')).toHaveStyle(
+      `margin-right: ${SPACING.spacing4}`
     )
-    const x = getByText('10.00')
+    expect(screen.getByText('X')).toHaveStyle(
+      `font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`
+    )
+    const x = screen.getByText('10.00')
     expect(x).toHaveStyle(`margin-right: ${SPACING.spacing8}`)
 
-    expect(getByText('Y')).toHaveStyle(`margin-right: ${SPACING.spacing4}`)
-    expect(getByText('Y')).toHaveStyle(
-      `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
+    expect(screen.getByText('Y')).toHaveStyle(
+      `margin-right: ${SPACING.spacing4}`
     )
-    const y = getByText('20.00')
+    expect(screen.getByText('Y')).toHaveStyle(
+      `font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`
+    )
+    const y = screen.getByText('20.00')
     expect(y).toHaveStyle(`margin-right: ${SPACING.spacing8}`)
 
-    expect(getByText('Z')).toHaveStyle(`margin-right: ${SPACING.spacing4}`)
-    expect(getByText('Z')).toHaveStyle(
-      `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
+    expect(screen.getByText('Z')).toHaveStyle(
+      `margin-right: ${SPACING.spacing4}`
     )
-    const z = getByText('30.00')
+    expect(screen.getByText('Z')).toHaveStyle(
+      `font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`
+    )
+    const z = screen.getByText('30.00')
     expect(z).toHaveStyle(`margin-right: ${SPACING.spacing8}`)
   })
 
@@ -48,15 +58,15 @@ describe('OffsetVector', () => {
     props.x = 1.0000001
     props.y = 111.11111111
     props.z = 99999.99888
-    const { getByText } = render(props)
-    getByText('1.00')
-    getByText('111.11')
-    getByText('100000.00')
+    render(props)
+    screen.getByText('1.00')
+    screen.getByText('111.11')
+    screen.getByText('100000.00')
   })
 
   it('renders text with a specific heading level', () => {
     props.as = 'h1'
-    const { getAllByRole } = render(props)
-    expect(getAllByRole('heading', { level: 1 })).toHaveLength(6)
+    render(props)
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(6)
   })
 })

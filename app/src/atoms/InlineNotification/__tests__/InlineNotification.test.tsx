@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { screen, fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { InlineNotification } from '..'
-
 
 const render = (props: React.ComponentProps<typeof InlineNotification>) => {
   return renderWithProviders(<InlineNotification {...props} />, {
@@ -21,19 +21,19 @@ describe('InlineNotification', () => {
     }
   })
   it('renders success inline notification', () => {
-    const { getByText, getByLabelText } = render(props)
-    getByLabelText('icon_success')
-    getByText('TITLE')
+    render(props)
+    screen.getByLabelText('icon_success')
+    screen.getByText('TITLE')
   })
   it('renders success inline notification with exit button and when click dismisses inline notification', () => {
     props = {
       type: 'success',
       heading: 'TITLE',
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
     }
-    const { getByText, getByLabelText } = render(props)
-    getByText('TITLE')
-    const btn = getByLabelText('close_icon')
+    render(props)
+    screen.getByText('TITLE')
+    const btn = screen.getByLabelText('close_icon')
     fireEvent.click(btn)
     expect(props.onCloseClick).toHaveBeenCalled()
   })
@@ -42,26 +42,26 @@ describe('InlineNotification', () => {
       type: 'alert',
       heading: 'TITLE',
     }
-    const { getByText, getByLabelText } = render(props)
-    getByLabelText('icon_alert')
-    getByText('TITLE')
+    render(props)
+    screen.getByLabelText('icon_alert')
+    screen.getByText('TITLE')
   })
   it('renders error inline notification', () => {
     props = {
       type: 'error',
       heading: 'TITLE',
     }
-    const { getByText, getByLabelText } = render(props)
-    getByLabelText('icon_error')
-    getByText('TITLE')
+    render(props)
+    screen.getByLabelText('icon_error')
+    screen.getByText('TITLE')
   })
   it('renders neutral inline notification', () => {
     props = {
       type: 'neutral',
       heading: 'TITLE',
     }
-    const { getByText, getByLabelText } = render(props)
-    getByLabelText('icon_neutral')
-    getByText('TITLE')
+    render(props)
+    screen.getByLabelText('icon_neutral')
+    screen.getByText('TITLE')
   })
 })

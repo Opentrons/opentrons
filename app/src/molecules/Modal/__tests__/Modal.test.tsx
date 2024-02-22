@@ -1,10 +1,12 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import '@testing-library/jest-dom/vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { ModalHeader } from '../ModalHeader'
 import { Modal } from '../Modal'
+import { renderWithProviders } from '../../../__testing-utils__'
 
-jest.mock('../ModalHeader')
+vi.mock('../ModalHeader')
 
 const mockModalHeader = ModalHeader as jest.MockedFunction<typeof ModalHeader>
 const render = (props: React.ComponentProps<typeof Modal>) => {
@@ -15,7 +17,7 @@ describe('Modal', () => {
   let props: React.ComponentProps<typeof Modal>
   beforeEach(() => {
     props = {
-      onOutsideClick: jest.fn(),
+      onOutsideClick: vi.fn(),
       children: <div>children</div>,
     }
     mockModalHeader.mockReturnValue(<div>mock Modal Header</div>)

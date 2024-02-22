@@ -1,10 +1,12 @@
 import * as React from 'react'
 import { fireEvent, render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom/vitest'
+import { describe, it, expect, vi } from 'vitest'
 
 import { InstrumentCard } from '..'
 
-const mockOnClick = jest.fn()
-const mockDisabledOnClick = jest.fn()
+const mockOnClick = vi.fn()
+const mockDisabledOnClick = vi.fn()
 
 const renderInstrumentCard = () =>
   render(
@@ -28,10 +30,6 @@ const renderInstrumentCard = () =>
   )
 
 describe('InstrumentCard', () => {
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('renders instrument card label and description', () => {
     renderInstrumentCard()
     screen.getByText('new instrument GEN4')

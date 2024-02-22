@@ -1,11 +1,14 @@
 import * as React from 'react'
-import { COLORS, renderWithProviders } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { COLORS } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { Skeleton } from '../../../atoms/Skeleton'
 import { getIsOnDevice } from '../../../redux/config'
 import { SimpleWizardBody } from '..'
 
-jest.mock('../../../atoms/Skeleton')
-jest.mock('../../../redux/config')
+vi.mock('../../../atoms/Skeleton')
+vi.mock('../../../redux/config')
 
 const mockSkeleton = Skeleton as jest.MockedFunction<typeof Skeleton>
 const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
@@ -28,28 +31,30 @@ describe('SimpleWizardBody', () => {
     mockGetIsOnDevice.mockReturnValue(false)
   })
   it('renders the correct information when it is not success', () => {
-    const { getByText, getByLabelText } = render(props)
-    getByText('header')
-    getByText('subheader')
-    getByLabelText('ot-alert')
+    render(props)
+    screen.getByText('header')
+    screen.getByText('subheader')
+    screen.getByLabelText('ot-alert')
   })
   it('renders the correct information for on device display', () => {
     mockGetIsOnDevice.mockReturnValue(true)
-    const { getByText, getByLabelText } = render(props)
-    getByText('header')
-    getByText('subheader')
-    getByLabelText('ot-alert')
+    render(props)
+    screen.getByText('header')
+    screen.getByText('subheader')
+    screen.getByLabelText('ot-alert')
   })
   it('renders the correct information when it is success', () => {
     props = {
       ...props,
       isSuccess: true,
     }
-    const { getByText, getByRole } = render(props)
-    getByText('header')
-    getByText('subheader')
-    const image = getByRole('img', { name: 'Success Icon' })
-    expect(image.getAttribute('src')).toEqual('icon_success.png')
+    render(props)
+    screen.getByText('header')
+    screen.getByText('subheader')
+    const image = screen.getByRole('img', { name: 'Success Icon' })
+    expect(image.getAttribute('src')).toEqual(
+      '/app/src/assets/images/icon_success.png'
+    )
   })
   it('renders a few skeletons  when it is pending', () => {
     props = {
@@ -57,7 +62,7 @@ describe('SimpleWizardBody', () => {
       isPending: true,
     }
     mockSkeleton.mockReturnValue(<div>mock skeleton</div>)
-    const { getAllByText } = render(props)
-    getAllByText('mock skeleton')
+    render(props)
+    screen.getAllByText('mock skeleton')
   })
 })
