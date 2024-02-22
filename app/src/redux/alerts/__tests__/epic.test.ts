@@ -1,3 +1,4 @@
+import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { TestScheduler } from 'rxjs/testing'
 
 import * as Cfg from '../../config'
@@ -7,9 +8,7 @@ import { alertsEpic } from '../epic'
 import type { Action, State } from '../../types'
 import type { AlertId } from '../types'
 
-jest.mock('../../config/selectors')
-
-const getConfig = Cfg.getConfig as jest.MockedFunction<typeof Cfg.getConfig>
+vi.mock('../../config/selectors')
 
 const MOCK_STATE: State = { mockState: true } as any
 const MOCK_ALERT_1: AlertId = 'mockAlert1' as any
@@ -24,15 +23,13 @@ describe('alerts epic', () => {
     })
   })
 
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('should trigger a config:ADD_UNIQUE_VALUE to save persistent alert ignores', () => {
-    getConfig.mockImplementation((state: State) => {
-      expect(state).toEqual(MOCK_STATE)
-      return { alerts: { ignored: [MOCK_ALERT_1] } } as any
-    })
+    vi.mocked(
+      (Cfg as any).getConfig((state: State) => {
+        expect(state).toEqual(MOCK_STATE)
+        return { alerts: { ignored: [MOCK_ALERT_1] } }
+      })
+    )
 
     testScheduler.run(({ hot, expectObservable }) => {
       const action$ = hot<Action>('-a', {

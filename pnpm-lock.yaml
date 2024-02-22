@@ -479,6 +479,9 @@ importers:
       netmask:
         specifier: 2.0.2
         version: 2.0.2
+      node-fetch:
+        specifier: 2.6.7
+        version: 2.6.7
       path-to-regexp:
         specifier: 3.0.0
         version: 3.0.0
@@ -561,6 +564,9 @@ importers:
       '@types/mixpanel-browser':
         specifier: ^2.35.6
         version: 2.49.0
+      '@types/node-fetch':
+        specifier: 2.6.11
+        version: 2.6.11
       '@types/styled-components':
         specifier: ^5.1.26
         version: 5.1.34

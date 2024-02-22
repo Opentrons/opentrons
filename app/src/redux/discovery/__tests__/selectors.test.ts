@@ -1,4 +1,5 @@
-// discovery selectors tests
+import { describe, it, expect } from 'vitest'
+
 import {
   mockLegacyHealthResponse,
   mockLegacyServerHealthResponse,

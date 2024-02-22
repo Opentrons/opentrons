@@ -1,10 +1,12 @@
+import { vi, describe, it, expect } from 'vitest'
+
 import * as Selectors from '../selectors'
 import * as SessionsSelectors from '../../sessions/selectors'
 
 import type { State } from '../../types'
 import type { DeckCalibrationSessionDetails } from '../../sessions/deck-calibration/types'
 
-jest.mock('../../sessions/selectors')
+vi.mock('../../sessions/selectors')
 
 describe('analytics selectors', () => {
   describe('analytics config selectors', () => {

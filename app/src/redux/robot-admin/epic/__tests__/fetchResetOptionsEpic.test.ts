@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
@@ -6,10 +8,6 @@ import { fetchResetOptionsEpic } from '../fetchResetOptionsEpic'
 import type { Action } from '../../../types'
 
 describe('robotAdminEpic handles fetching "factory reset" options', () => {
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('calls GET /settings/reset/options on FETCH_RESET_CONFIG_OPTIONS', () => {
     const mocks = setupEpicTestMocks(
       robotName => Actions.fetchResetConfigOptions(robotName),
