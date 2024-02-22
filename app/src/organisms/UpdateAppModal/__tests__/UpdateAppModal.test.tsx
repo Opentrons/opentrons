@@ -133,4 +133,13 @@ describe('UpdateAppModal', () => {
       screen.getByRole('heading', { name: 'Update Error' })
     ).toBeInTheDocument()
   })
+  it('uses a custom width and left margin to properly center the modal', () => {
+    render(props)
+    expect(screen.getByLabelText('ModalShell_ModalArea')).toHaveStyle(
+      'width: 40rem'
+    )
+    expect(screen.getByLabelText('ModalShell_ModalArea')).toHaveStyle(
+      'margin-left: 5.336rem'
+    )
+  })
 })
