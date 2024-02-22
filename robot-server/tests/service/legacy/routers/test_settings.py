@@ -18,7 +18,7 @@ from opentrons.types import Mount
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 
-from robot_server import app
+from robot_server.app import app
 from robot_server.deck_configuration.fastapi_dependencies import (
     get_deck_configuration_store_failsafe,
 )

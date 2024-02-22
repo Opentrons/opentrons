@@ -184,30 +184,38 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
   }
 }
 
+// Because subscription logic is directly tied to the component lifecycle, it is possible
+// for a component to trigger an unsubscribe event on dismount while a new component mounts and
+// triggers a subscribe event. For the connection store and MQTT to reflect correct topic subscriptions,
+// do not unsubscribe and close connections before newly mounted components have had time to update the connection store.
+const RENDER_TIMEOUT = 10000 // 10 seconds
+
 function unsubscribe(notifyParams: NotifyParams): Promise<void> {
   const { hostname, topic } = notifyParams
   return new Promise<void>(() => {
     if (hostname in connectionStore) {
-      const { client } = connectionStore[hostname]
-      const subscriptions = connectionStore[hostname]?.subscriptions
-      const isLastSubscription = subscriptions[topic] <= 1
+      setTimeout(() => {
+        const { client } = connectionStore[hostname]
+        const subscriptions = connectionStore[hostname]?.subscriptions
+        const isLastSubscription = subscriptions[topic] <= 1
 
-      if (isLastSubscription) {
-        client?.unsubscribe(topic, {}, (error, result) => {
-          if (error != null) {
-            log.warn(
-              `Failed to unsubscribe on ${hostname} from topic: ${topic}`
-            )
-          } else {
-            log.info(
-              `Successfully unsubscribed on ${hostname} from topic: ${topic}`
-            )
-            handleDecrementSubscriptionCount(hostname, topic)
-          }
-        })
-      } else {
-        subscriptions[topic] -= 1
-      }
+        if (isLastSubscription) {
+          client?.unsubscribe(topic, {}, (error, result) => {
+            if (error != null) {
+              log.warn(
+                `Failed to unsubscribe on ${hostname} from topic: ${topic}`
+              )
+            } else {
+              log.info(
+                `Successfully unsubscribed on ${hostname} from topic: ${topic}`
+              )
+              handleDecrementSubscriptionCount(hostname, topic)
+            }
+          })
+        } else {
+          subscriptions[topic] -= 1
+        }
+      }, RENDER_TIMEOUT)
     } else {
       log.info(
         `Attempted to unsubscribe from unconnected hostname: ${hostname}`

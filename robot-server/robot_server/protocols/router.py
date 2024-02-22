@@ -108,7 +108,10 @@ class ProtocolLinks(BaseModel):
 
     referencingRuns: List[RunLink] = Field(
         ...,
-        description="Links to runs that reference the protocol.",
+        description=(
+            "Links to runs that reference the protocol,"
+            " in order from the oldest run to the newest run."
+        ),
     )
 
 
@@ -129,11 +132,18 @@ protocols_router = APIRouter()
         When too many protocols already exist, old ones will be automatically deleted
         to make room for the new one.
         A protocol will never be automatically deleted if there's a run
-        referring to it, though.
+        referring to it, though. (See the `/runs/` endpoints.)
+
+        If you upload the exact same set of files multiple times, the first protocol
+        resource will be returned instead of creating duplicate ones.
+
+        When a new protocol resource is created, an analysis is started for it.
+        See the `/protocols/{id}/analyses/` endpoints.
         """
     ),
     status_code=status.HTTP_201_CREATED,
     responses={
+        status.HTTP_200_OK: {"model": SimpleBody[Protocol]},
         status.HTTP_201_CREATED: {"model": SimpleBody[Protocol]},
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
             "model": ErrorBody[Union[ProtocolFilesInvalid, ProtocolRobotTypeMismatch]]
@@ -280,6 +290,7 @@ async def create_protocol(
     protocols_router.get,
     path="/protocols",
     summary="Get uploaded protocols",
+    description="Return all stored protocols, in order from first-uploaded to last-uploaded.",
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[Protocol]}},
 )
 async def get_protocols(

@@ -15,10 +15,14 @@ from opentrons.util.broker import Broker
 from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_engine.clients import SyncClient, ChildThreadTransport
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.deck_type import (
+    should_load_fixed_trash_area_for_python_protocol,
+)
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 from .protocol_context import ProtocolContext
 from .deck import Deck
+from ._trash_bin import TrashBin
 
 from .core.common import ProtocolCore as AbstractProtocolCore
 from .core.legacy.deck import Deck as LegacyDeck
@@ -148,7 +152,7 @@ def create_protocol_context(
     # this swap may happen once `ctx.move_labware` off-deck is implemented
     deck = None if isinstance(core, ProtocolCore) else cast(Deck, core.get_deck())
 
-    return ProtocolContext(
+    context = ProtocolContext(
         api_version=api_version,
         # TODO(mm, 2023-05-11): This cast shouldn't be necessary.
         # Fix this by making the appropriate TypeVars covariant?
@@ -158,3 +162,18 @@ def create_protocol_context(
         deck=deck,
         bundled_data=bundled_data,
     )
+    # If we're loading an engine based core into the context, and we're on api level 2.16 or above, on an OT-2 we need
+    # to insert a fixed trash addressable area into the protocol engine, for correctness in anything that relies on
+    # knowing what addressable areas have been loaded (and any checks involving trash geometry). Because the method
+    # that uses this in the core relies on the sync client and this code will run in the main thread (which if called
+    # will cause a deadlock), we're directly calling the protocol engine method here where we have access to it.
+    if (
+        protocol_engine is not None
+        and should_load_fixed_trash_area_for_python_protocol(
+            api_version=api_version,
+            robot_type=protocol_engine.state_view.config.robot_type,
+        )
+    ):
+        assert isinstance(context.fixed_trash, TrashBin)
+        protocol_engine.add_addressable_area(context.fixed_trash.area_name)
+    return context

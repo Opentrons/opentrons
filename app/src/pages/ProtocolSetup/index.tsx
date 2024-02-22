@@ -269,6 +269,11 @@ function PrepareToRun({
     }
   )
 
+  const runStatus = useRunStatus(runId)
+  if (runStatus === RUN_STATUS_STOPPED) {
+    history.push('/protocols')
+  }
+
   React.useEffect(() => {
     if (mostRecentAnalysis?.status === 'completed') {
       setIsPollingForCompletedAnalysis(false)
@@ -305,7 +310,6 @@ function PrepareToRun({
 
   const protocolHasFixtures = requiredFixtures.length > 0
 
-  const runStatus = useRunStatus(runId)
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
 
   const deckDef = getDeckDefFromRobotType(robotType)
@@ -343,7 +347,7 @@ function PrepareToRun({
     mostRecentAnalysis
   )
 
-  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
 
   const requiredDeckConfigCompatibility = getRequiredDeckConfig(
@@ -450,7 +454,7 @@ function PrepareToRun({
       if (
         isHeaterShakerInProtocol &&
         isReadyToRun &&
-        (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
+        runStatus === RUN_STATUS_IDLE
       ) {
         confirmAttachment()
       } else {

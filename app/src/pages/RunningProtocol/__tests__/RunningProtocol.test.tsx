@@ -17,6 +17,7 @@ import {
   useRunActionMutations,
 } from '@opentrons/react-api-client'
 
+import { getLocalRobot } from '../../../redux/discovery'
 import { mockRobotSideAnalysis } from '../../../organisms/CommandText/__fixtures__'
 import {
   CurrentRunningProtocolCommand,
@@ -24,6 +25,7 @@ import {
   RunningProtocolSkeleton,
 } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
 import { mockUseAllCommandsResponseNonDeterministic } from '../../../organisms/RunProgressMeter/__fixtures__'
+import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import {
   useRunStatus,
   useRunTimestamps,
@@ -100,8 +102,12 @@ const mockOpenDoorAlertModal = OpenDoorAlertModal as jest.MockedFunction<
 const mockUseNotifyLastRunCommandKey = useNotifyLastRunCommandKey as jest.MockedFunction<
   typeof useNotifyLastRunCommandKey
 >
+const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
+  typeof getLocalRobot
+>
 
 const RUN_ID = 'run_id'
+const ROBOT_NAME = 'otie'
 const PROTOCOL_ID = 'protocol_id'
 const PROTOCOL_KEY = 'protocol_key'
 const PROTOCOL_ANALYSIS = {
@@ -160,6 +166,10 @@ describe('RunningProtocol', () => {
       stoppedAt: '',
       completedAt: '2022-05-04T18:24:41.833862+00:00',
     })
+    mockGetLocalRobot.mockReturnValue({
+      ...mockConnectedRobot,
+      name: ROBOT_NAME,
+    })
     when(mockUseRunActionMutations).calledWith(RUN_ID).mockReturnValue({
       playRun: mockPlayRun,
       pauseRun: mockPauseRun,
@@ -168,9 +178,11 @@ describe('RunningProtocol', () => {
       isPauseRunActionLoading: false,
       isStopRunActionLoading: false,
     })
-    when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
-      trackProtocolRunEvent: mockTrackProtocolRunEvent,
-    })
+    when(mockUseTrackProtocolRunEvent)
+      .calledWith(RUN_ID, ROBOT_NAME)
+      .mockReturnValue({
+        trackProtocolRunEvent: mockTrackProtocolRunEvent,
+      })
     when(mockUseMostRecentCompletedAnalysis)
       .calledWith(RUN_ID)
       .mockReturnValue(mockRobotSideAnalysis)

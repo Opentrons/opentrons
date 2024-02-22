@@ -13,7 +13,7 @@ from opentrons.protocol_engine import (
     Command,
 )
 
-from robot_server.protocols import ProtocolResource
+from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.notifications import RunsPublisher
 
@@ -120,7 +120,6 @@ class RunDataManager:
                 summary=prev_run_result.state_summary,
                 commands=prev_run_result.commands,
             )
-
         state_summary = await self._engine_store.create(
             run_id=run_id,
             labware_offsets=labware_offsets,
@@ -196,8 +195,10 @@ class RunDataManager:
     def get_all(self, length: Optional[int]) -> List[Run]:
         """Get current and stored run resources.
 
-        Returns:
-            All run resources.
+        Results are ordered from oldest to newest.
+
+        Params:
+            length: If `None`, return all runs. Otherwise, return the newest n runs.
         """
         return [
             _build_run(

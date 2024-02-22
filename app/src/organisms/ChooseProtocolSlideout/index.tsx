@@ -82,7 +82,8 @@ export function ChooseProtocolSlideoutComponent(
       : []
 
   const { trackCreateProtocolRunEvent } = useTrackCreateProtocolRunEvent(
-    selectedProtocol
+    selectedProtocol,
+    name
   )
 
   const {

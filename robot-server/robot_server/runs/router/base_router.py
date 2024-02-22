@@ -27,12 +27,12 @@ from robot_server.service.json_api import (
     PydanticResponse,
 )
 
-from robot_server.protocols import (
+from robot_server.protocols.dependencies import get_protocol_store
+from robot_server.protocols.protocol_store import (
     ProtocolStore,
-    ProtocolNotFound,
     ProtocolNotFoundError,
-    get_protocol_store,
 )
+from robot_server.protocols.router import ProtocolNotFound
 
 from ..run_models import RunNotFoundError
 from ..run_auto_deleter import RunAutoDeleter
@@ -202,7 +202,9 @@ async def create_run(
     base_router.get,
     path="/runs",
     summary="Get all runs",
-    description="Get a list of all active and inactive runs.",
+    description=(
+        "Get a list of all active and inactive runs, in order from oldest to newest."
+    ),
     responses={
         status.HTTP_200_OK: {"model": MultiBody[Run, AllRunsLinks]},
     },

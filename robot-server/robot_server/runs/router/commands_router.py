@@ -235,6 +235,9 @@ async def create_run_command(
     summary="Get a list of all protocol commands in the run",
     description=(
         "Get a list of all commands in the run and their statuses. "
+        "\n\n"
+        "The commands are returned in order from oldest to newest."
+        "\n\n"
         "This endpoint returns command summaries. Use "
         "`GET /runs/{runId}/commands/{commandId}` to get all "
         "information available for a given command."

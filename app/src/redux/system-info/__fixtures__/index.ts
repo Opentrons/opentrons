@@ -8,6 +8,7 @@ export const mockUsbDevice: UsbDevice = {
   productName: 'USB Device',
   manufacturerName: 'Manufacturer Name',
   serialNumber: 'Serial Number',
+  identifier: 'aasdhasdasd',
 }
 
 export const mockRealtekDevice: UsbDevice = {
@@ -18,6 +19,7 @@ export const mockRealtekDevice: UsbDevice = {
   productName: 'USB 10/100 LAN',
   manufacturerName: 'Realtek',
   serialNumber: 'Serial Number',
+  identifier: 'kjhgkjhdf',
 }
 
 export const mockWindowsRealtekDevice: UsbDevice = {
@@ -28,6 +30,7 @@ export const mockWindowsRealtekDevice: UsbDevice = {
   productName: 'Realtek USB FE Family Controller',
   manufacturerName: 'Realtek',
   serialNumber: 'Serial Number',
+  identifier: '0tgewu0dfasd',
   windowsDriverVersion: '1.2.3',
 }
 

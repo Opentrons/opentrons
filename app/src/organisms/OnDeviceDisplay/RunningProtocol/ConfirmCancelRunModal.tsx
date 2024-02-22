@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
@@ -21,6 +22,7 @@ import { Modal } from '../../../molecules/Modal'
 import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { useRunStatus } from '../../../organisms/RunTimeControl/hooks'
 import { ANALYTICS_PROTOCOL_RUN_CANCEL } from '../../../redux/analytics'
+import { getLocalRobot } from '../../../redux/discovery'
 import { CancelingRunModal } from './CancelingRunModal'
 
 import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
@@ -45,7 +47,9 @@ export function ConfirmCancelRunModal({
     isLoading: isDismissing,
   } = useDismissCurrentRunMutation()
   const runStatus = useRunStatus(runId)
-  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
+  const localRobot = useSelector(getLocalRobot)
+  const robotName = localRobot?.name ?? ''
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const history = useHistory()
   const [isCanceling, setIsCanceling] = React.useState(false)
 

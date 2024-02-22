@@ -257,11 +257,12 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     overflow-y: ${OVERFLOW_AUTO};
 
     &::-webkit-scrollbar {
-      display: ${isScrolling ? 'block' : 'none'};
+      display: block;
       width: 0.75rem;
     }
 
     &::-webkit-scrollbar-thumb {
+      display: ${isScrolling ? 'block' : 'none'};
       background: ${COLORS.grey50};
       border-radius: 11px;
     }
