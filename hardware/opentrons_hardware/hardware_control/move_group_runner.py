@@ -571,7 +571,7 @@ class MoveScheduler:
 
         log.debug(f"Executing move group {group_id}.")
         self._current_group = group_id - self._start_at_index
-        error = await can_messenger.ensure_send(
+        error = await can_messenger.ensure_send( # catches Error response as opposed to ack response??
             node_id=NodeId.broadcast,
             message=ExecuteMoveGroupRequest(
                 payload=ExecuteMoveGroupRequestPayload(
@@ -587,6 +587,8 @@ class MoveScheduler:
         if error != ErrorCode.ok:
             log.error(f"received error trying to execute move group: {str(error)}")
 
+        # just report errors when move requested
+        # we want to report follow-up message! Just let logs gather it if error doesn't occur during a move? Do we collect non-response (error) messages??
         expected_time = max(3.0, self._durations[group_id - self._start_at_index] * 1.1)
         full_timeout = max(5.0, self._durations[group_id - self._start_at_index] * 2)
         start_time = time.time()
