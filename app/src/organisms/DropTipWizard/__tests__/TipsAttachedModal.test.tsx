@@ -12,6 +12,7 @@ import { ROBOT_MODEL_OT3 } from '../../../redux/discovery'
 import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import type { HostConfig } from '@opentrons/api-client'
 
 jest.mock('../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
 
@@ -27,6 +28,7 @@ const mockOnClose = jest.fn()
 const mockUseNotifyCurrentMaintenanceRun = useNotifyCurrentMaintenanceRun as jest.MockedFunction<
   typeof useNotifyCurrentMaintenanceRun
 >
+const MOCK_HOST: HostConfig = { hostname: 'MOCK_HOST' }
 
 const render = (pipetteSpecs: PipetteModelSpecs) => {
   return renderWithProviders(
@@ -37,6 +39,7 @@ const render = (pipetteSpecs: PipetteModelSpecs) => {
             LEFT,
             pipetteSpecs,
             ROBOT_MODEL_OT3,
+            MOCK_HOST,
             mockOnClose
           )
         }
