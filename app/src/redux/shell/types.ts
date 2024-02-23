@@ -12,12 +12,20 @@ export interface Remote {
         event: IpcMainEvent,
         hostname: string,
         topic: NotifyTopic,
-        message: string | Object,
+        message: NotifyResponseData | NotifyNetworkError,
         ...args: unknown[]
       ) => void
     ) => void
   }
 }
+
+interface NotifyRefetchData {
+  refetchUsingHTTP: boolean
+  statusCode: never
+}
+
+export type NotifyNetworkError = 'ECONNFAILED' | 'ECONNREFUSED'
+export type NotifyResponseData = NotifyRefetchData | NotifyNetworkError
 
 interface File {
   sha512: string

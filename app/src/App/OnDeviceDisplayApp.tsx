@@ -27,6 +27,7 @@ import { ConnectViaWifi } from '../pages/ConnectViaWifi'
 import { EmergencyStop } from '../pages/EmergencyStop'
 import { NameRobot } from '../pages/NameRobot'
 import { NetworkSetupMenu } from '../pages/NetworkSetupMenu'
+import { PrivacyPolicy } from '../pages/PrivacyPolicy'
 import { ProtocolSetup } from '../pages/ProtocolSetup'
 import { RobotDashboard } from '../pages/RobotDashboard'
 import { RobotSettingsDashboard } from '../pages/RobotSettingsDashboard'
@@ -196,6 +197,12 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/emergency-stop',
   },
   {
+    Component: PrivacyPolicy,
+    exact: true,
+    name: 'Privacy Policy',
+    path: '/privacy-policy',
+  },
+  {
     Component: DeckConfigurationEditor,
     exact: true,
     name: 'Deck Configuration',
@@ -250,11 +257,12 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     overflow-y: ${OVERFLOW_AUTO};
 
     &::-webkit-scrollbar {
-      display: ${isScrolling ? 'block' : 'none'};
+      display: block;
       width: 0.75rem;
     }
 
     &::-webkit-scrollbar-thumb {
+      display: ${isScrolling ? 'block' : 'none'};
       background: ${COLORS.grey50};
       border-radius: 11px;
     }

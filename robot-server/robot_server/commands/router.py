@@ -54,6 +54,7 @@ class CommandNotFound(ErrorDetails):
         " simple, stateless control of the robot. For complex control,"
         " create a run with ``POST /runs`` and issue commands on that run."
     ),
+    response_model=SimpleBody[StatelessCommand],
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[StatelessCommand]},
@@ -126,6 +127,7 @@ async def create_command(
         "Get a list of commands that have been run on the device since boot."
         " Only returns command run via the `/commands` endpoint."
     ),
+    response_model=SimpleMultiBody[StatelessCommand],
     responses={
         status.HTTP_200_OK: {"model": SimpleMultiBody[StatelessCommand]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunActive]},
@@ -170,6 +172,7 @@ async def get_commands_list(
         "Get a single stateless command that has been queued or executed."
         " Only returns command run via the `/commands` endpoint."
     ),
+    response_model=SimpleBody[StatelessCommand],
     responses={
         status.HTTP_200_OK: {"model": SimpleBody[StatelessCommand]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[CommandNotFound]},

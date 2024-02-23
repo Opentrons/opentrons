@@ -74,7 +74,9 @@ class ExecutionManager:
         async with self._condition:
             if self._state == ExecutionState.PAUSED:
                 await self._condition.wait()
-                if self._state == ExecutionState.CANCELLED:
+                # type-ignore needed because this is a reentrant function and narrowing cannot
+                # apply
+                if self._state == ExecutionState.CANCELLED:  # type: ignore[comparison-overlap]
                     raise ExecutionCancelledError
             elif self._state == ExecutionState.CANCELLED:
                 raise ExecutionCancelledError

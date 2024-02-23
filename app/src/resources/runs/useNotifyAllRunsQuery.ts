@@ -26,7 +26,11 @@ export function useNotifyAllRunsQuery(
     options,
   })
 
-  const isNotifyEnabled = !isNotifyError && !options?.forceHttpPolling
+  const isNotifyEnabled =
+    !isNotifyError &&
+    !options?.forceHttpPolling &&
+    options?.staleTime !== Infinity
+
   if (!isNotifyEnabled && !refetchUsingHTTP) setRefetchUsingHTTP(true)
   const isHTTPEnabled = options?.enabled !== false && refetchUsingHTTP
 

@@ -16,7 +16,7 @@ from server_utils.fastapi_utils.app_state import (
 )
 from robot_server.errors import ErrorDetails
 
-from ._database import create_schema_3_sql_engine
+from ._database import create_sql_engine
 from ._persistence_directory import (
     PersistenceResetter,
     prepare_active_subdirectory,
@@ -102,7 +102,7 @@ def start_initializing_persistence(  # noqa: C901
             prepared_subdirectory = await subdirectory_prep_task
 
             sql_engine = await to_thread.run_sync(
-                create_schema_3_sql_engine, prepared_subdirectory / _DATABASE_FILE
+                create_sql_engine, prepared_subdirectory / _DATABASE_FILE
             )
             return sql_engine
 
@@ -220,7 +220,9 @@ async def get_active_persistence_directory(
     If this is called before that initialization completes, this will raise an
     appropriate HTTP-facing error to indicate that the server is busy.
     """
-    initialize_task = _root_persistence_directory_init_task_accessor.get_from(app_state)
+    initialize_task = _active_persistence_directory_init_task_accessor.get_from(
+        app_state
+    )
     assert (
         initialize_task is not None
     ), "Forgot to start persistence directory initialization as part of server startup?"
@@ -242,6 +244,28 @@ async def get_active_persistence_directory(
         raise DatabaseFailedToInitialize(detail=str(exception)).as_error(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
         ) from exception
+
+
+async def get_active_persistence_directory_failsafe(
+    app_state: AppState = Depends(get_app_state),
+) -> Optional[Path]:
+    """Return the path to the server's persistence directory.
+
+    This is the same as `get_active_persistence_directory()`, except this will return
+    `None` if the active persistence directory has failed to initialize or is not yet
+    ready, instead of raising an exception or blocking.
+    """
+    initialize_task = _active_persistence_directory_init_task_accessor.get_from(
+        app_state
+    )
+    assert (
+        initialize_task is not None
+    ), "Forgot to start persistence directory initialization as part of server startup?"
+
+    try:
+        return initialize_task.result()
+    except Exception:
+        return None
 
 
 async def _get_persistence_directory_root(

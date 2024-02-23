@@ -107,12 +107,12 @@ export function RunSummary(): JSX.Element {
   const [showSplash, setShowSplash] = React.useState(
     runStatus === RUN_STATUS_FAILED || runStatus === RUN_STATUS_SUCCEEDED
   )
-  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
+  const localRobot = useSelector(getLocalRobot)
+  const robotName = localRobot?.name ?? 'no name'
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const { reset } = useRunControls(runId)
   const trackEvent = useTrackEvent()
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
-  const localRobot = useSelector(getLocalRobot)
-  const robotName = localRobot?.name ?? 'no name'
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const [showRunFailedModal, setShowRunFailedModal] = React.useState<boolean>(
     false

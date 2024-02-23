@@ -11,6 +11,8 @@ import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_RUN_START,
 } from '../../../../redux/analytics'
+import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
+import { useRobot } from '../useRobot'
 
 jest.mock('../../hooks')
 jest.mock('../useProtocolRunAnalyticsData')
@@ -18,15 +20,18 @@ jest.mock('../../../../redux/discovery')
 jest.mock('../../../../redux/pipettes')
 jest.mock('../../../../redux/analytics')
 jest.mock('../../../../redux/robot-settings')
+jest.mock('../useRobot')
 
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
+const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockUseProtocolRunAnalyticsData = useProtocolRunAnalyticsData as jest.MockedFunction<
   typeof useProtocolRunAnalyticsData
 >
 
 const RUN_ID = 'runId'
+const ROBOT_NAME = 'otie'
 const PROTOCOL_PROPERTIES = { protocolType: 'python' }
 
 let mockTrackEvent: jest.Mock
@@ -54,9 +59,12 @@ describe('useTrackProtocolRunEvent hook', () => {
         )
     )
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
-    when(mockUseProtocolRunAnalyticsData).calledWith(RUN_ID).mockReturnValue({
-      getProtocolRunAnalyticsData: mockGetProtocolRunAnalyticsData,
-    })
+    mockUseRobot.mockReturnValue(mockConnectableRobot)
+    when(mockUseProtocolRunAnalyticsData)
+      .calledWith(RUN_ID, mockConnectableRobot)
+      .mockReturnValue({
+        getProtocolRunAnalyticsData: mockGetProtocolRunAnalyticsData,
+      })
   })
 
   afterEach(() => {
@@ -65,16 +73,22 @@ describe('useTrackProtocolRunEvent hook', () => {
   })
 
   it('returns trackProtocolRunEvent function', () => {
-    const { result } = renderHook(() => useTrackProtocolRunEvent(RUN_ID), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useTrackProtocolRunEvent(RUN_ID, ROBOT_NAME),
+      {
+        wrapper,
+      }
+    )
     expect(typeof result.current.trackProtocolRunEvent).toBe('function')
   })
 
   it('trackProtocolRunEvent invokes trackEvent with correct props', async () => {
-    const { result } = renderHook(() => useTrackProtocolRunEvent(RUN_ID), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useTrackProtocolRunEvent(RUN_ID, ROBOT_NAME),
+      {
+        wrapper,
+      }
+    )
     await waitFor(() =>
       result.current.trackProtocolRunEvent({
         name: ANALYTICS_PROTOCOL_RUN_START,
@@ -89,16 +103,19 @@ describe('useTrackProtocolRunEvent hook', () => {
 
   it('trackProtocolRunEvent calls trackEvent without props when error is thrown in getProtocolRunAnalyticsData', async () => {
     when(mockUseProtocolRunAnalyticsData)
-      .calledWith('errorId')
+      .calledWith('errorId', mockConnectableRobot)
       .mockReturnValue({
         getProtocolRunAnalyticsData: () =>
           new Promise(() => {
             throw new Error('error')
           }),
       })
-    const { result } = renderHook(() => useTrackProtocolRunEvent('errorId'), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useTrackProtocolRunEvent('errorId', ROBOT_NAME),
+      {
+        wrapper,
+      }
+    )
     await waitFor(() =>
       result.current.trackProtocolRunEvent({
         name: ANALYTICS_PROTOCOL_RUN_START,

@@ -86,7 +86,7 @@ async def test_wait_for_state(
     subject: StateStore,
 ) -> None:
     """It should return an awaitable that signals state changes."""
-    check_condition: Callable[..., Optional[str]] = decoy.mock()
+    check_condition: Callable[..., Optional[str]] = decoy.mock(name="check_condition")
 
     decoy.when(check_condition("foo", bar="baz")).then_return(
         None,
@@ -106,7 +106,7 @@ async def test_wait_for_state_short_circuit(
     change_notifier: ChangeNotifier,
 ) -> None:
     """It should short-circuit the change notifier if condition is satisfied."""
-    check_condition: Callable[..., Optional[str]] = decoy.mock()
+    check_condition: Callable[..., Optional[str]] = decoy.mock(name="check_condition")
 
     decoy.when(check_condition("foo", bar="baz")).then_return("hello world")
 
@@ -118,14 +118,14 @@ async def test_wait_for_state_short_circuit(
 
 async def test_wait_for_already_true(decoy: Decoy, subject: StateStore) -> None:
     """It should signal immediately if condition is already met."""
-    check_condition = decoy.mock()
+    check_condition = decoy.mock(name="check_condition")
     decoy.when(check_condition()).then_return(True)
     await subject.wait_for(check_condition)
 
 
 async def test_wait_for_raises(decoy: Decoy, subject: StateStore) -> None:
     """It should raise if the condition function raises."""
-    check_condition = decoy.mock()
+    check_condition = decoy.mock(name="check_condition")
 
     decoy.when(check_condition()).then_raise(ValueError("oh no"))
 

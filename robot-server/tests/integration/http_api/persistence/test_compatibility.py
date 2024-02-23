@@ -25,14 +25,19 @@ _PORT = "15555"
 
 
 @dataclass
+class Run:
+    id: str
+    expected_command_count: int
+
+
+@dataclass
 class Snapshot:
     """Model to describe a snapshot of a persistence directory."""
 
     version: str
     expected_protocol_count: int
-    expected_run_count: int
+    expected_runs: List[Run]
     protocols_with_no_analyses: List[str] = field(default_factory=list)
-    runs_with_no_commands: List[str] = field(default_factory=list)
 
     def get_copy(self) -> Path:
         """Return a path to an isolated copy of this snapshot.
@@ -49,29 +54,62 @@ class Snapshot:
 flex_dev_compat_snapshot = Snapshot(
     version="ot3_v0.14.0_python_validation",
     expected_protocol_count=1,
-    expected_run_count=1,
+    expected_runs=[Run("305b0cca-fc78-4853-b113-40ac4c30cd8f", 1)],
 )
 
 
 snapshots: List[(Snapshot)] = [
-    Snapshot(version="v6.0.1", expected_protocol_count=4, expected_run_count=5),
-    Snapshot(version="v6.1.0", expected_protocol_count=2, expected_run_count=2),
-    Snapshot(version="v6.2.0", expected_protocol_count=2, expected_run_count=2),
+    Snapshot(
+        version="v6.0.1",
+        expected_protocol_count=4,
+        expected_runs=[
+            Run("7bc1f20d-3925-4aa2-b200-82906112816f", 23),
+            Run("1b00190c-013f-463d-b371-5bf49b6ad61f", 16),
+            Run("8165be3f-382f-4b1f-97d7-f3c4ae613868", 65),
+            Run("467761f3-7339-4b8d-9007-4482500657da", 65),
+            Run("f7817fa9-bc80-45c0-afea-f7c4af30a663", 333),
+        ],
+    ),
+    Snapshot(
+        version="v6.1.0",
+        expected_protocol_count=2,
+        expected_runs=[
+            Run("a4338d46-96af-4e23-877d-1d79227a0946", 147),
+            Run("efc7374f-2e64-45ea-83fe-bd7a55f2699e", 205),
+        ],
+    ),
+    Snapshot(
+        version="v6.2.0",
+        expected_protocol_count=2,
+        expected_runs=[
+            Run("199b991d-db3c-49ff-9b4f-905118c10685", 125),
+            Run("25a66ec6-2137-4680-8a94-d53c0e2a7488", 87),
+        ],
+    ),
     Snapshot(
         version="v6.2.0_large",
         expected_protocol_count=17,
-        expected_run_count=16,
+        expected_runs=[
+            Run("eeb17dc0-1878-432a-bf3f-33e7d3023b8d", 218),
+            Run("917cf0f8-8b79-47ab-a407-918c182eb6df", 125),
+            Run("7b87bac2-680a-4757-a10f-8341a6dce540", 185),
+            Run("0b97477c-844d-406a-87e8-0852421d7212", 0),
+            Run("f31659a6-33c9-406d-beb5-da2ec19ef063", 120),
+            Run("965b45f4-f296-44bf-ae20-df297d3a35af", 8),
+            Run("b97b0ee8-2ba4-43cd-99aa-601b60f5b75d", 13),
+            Run("7dd90a28-14b6-4e6f-86a8-41ca6e6e42ae", 11),
+            Run("dc9162c2-f9f6-48aa-a923-7ba252d3eb1d", 15),
+            Run("2d9b6f1b-e2fd-40a9-9219-504df2c89305", 0),
+            Run("9ba966c6-bc2f-4c65-b898-59a4f2530f35", 0),
+            Run("5f30a0dd-e4da-4f24-abce-7468067d883a", 0),
+            Run("83f0bad0-6bb2-4ecd-bccf-f14667298168", 0),
+            Run("0b97363d-0910-43a0-b5a2-b6a62ad2fa6b", 96),
+            Run("35c014ec-b6ea-4665-8149-5c6340cbc5ca", 0),
+            Run("d2b68ac6-5c4f-4914-bc2e-f306a976d582", 220),
+        ],
         protocols_with_no_analyses=[
             "429e72e1-6ff1-4328-8a1d-c13fe3ac0c80",
             "e3515d46-3c3b-425b-8734-bd6e38d6a729",
-        ],
-        runs_with_no_commands=[
-            "0b97477c-844d-406a-87e8-0852421d7212",
-            "2d9b6f1b-e2fd-40a9-9219-504df2c89305",
-            "9ba966c6-bc2f-4c65-b898-59a4f2530f35",
-            "5f30a0dd-e4da-4f24-abce-7468067d883a",
-            "83f0bad0-6bb2-4ecd-bccf-f14667298168",
-            "35c014ec-b6ea-4665-8149-5c6340cbc5ca",
         ],
     ),
     flex_dev_compat_snapshot,
@@ -133,27 +171,24 @@ async def test_protocols_analyses_and_runs_available_from_older_persistence_dir(
                 else:
                     assert number_of_analyses > 0
 
-                all_runs = (await robot_client.get_runs()).json()
-                all_run_ids = [r["id"] for r in all_runs["data"]]
-                assert len(all_run_ids) == snapshot.expected_run_count
+            all_runs = (await robot_client.get_runs()).json()
+            all_run_ids = [r["id"] for r in all_runs["data"]]
+            assert all_run_ids == [r.id for r in snapshot.expected_runs]
 
-                for run_id in all_run_ids:
-                    await robot_client.get_run(run_id=run_id)
+            for expected_run in snapshot.expected_runs:
+                await robot_client.get_run(run_id=expected_run.id)
 
-                    all_command_summaries = (
-                        await robot_client.get_run_commands(
-                            run_id=run_id,
-                            page_length=999999,  # Big enough to include all commands.
-                        )
-                    ).json()
+                all_command_summaries = (
+                    await robot_client.get_run_commands(
+                        run_id=expected_run.id,
+                        page_length=999999,  # Big enough to include all commands.
+                    )
+                ).json()["data"]
 
-                    if run_id in snapshot.runs_with_no_commands:
-                        assert len(all_command_summaries["data"]) == 0
-                    else:
-                        assert len(all_command_summaries["data"]) > 0
-                # Ideally, we would also fetch full commands via
-                # `GET /runs/{run_id}/commands/{command_id}`.
-                # We skip it for performance. Adds ~10+ seconds
+                assert len(all_command_summaries) == expected_run.expected_command_count
+            # Ideally, we would also fetch full commands via
+            # `GET /runs/{run_id}/commands/{command_id}`.
+            # We skip it for performance. Adds ~10+ seconds
 
 
 # TODO(mm, 2023-08-12): We can remove this test when we remove special handling for these

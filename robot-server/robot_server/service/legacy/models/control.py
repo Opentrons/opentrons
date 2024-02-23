@@ -110,37 +110,19 @@ class RobotMoveTarget(BaseModel):
 
     class Config:
         schema_extra = {
-            "examples": {
-                "moveLeftMount": {
-                    "description": "Move the left mount, regardless of what is "
-                    "attached to that mount, to a specific "
-                    "position. Since you move the mount, the end of"
-                    " the pipette will be in different places "
-                    "depending on what pipette is attached - but "
-                    "you don't have to know what's attached.",
-                    "summary": "Move left mount",
-                    "value": {
-                        "target": "mount",
-                        "point": [100, 100, 80],
-                        "mount": "left",
-                    },
+            "examples": [
+                {
+                    "target": "mount",
+                    "point": [100, 100, 80],
+                    "mount": "left",
                 },
-                "moveRightP300Single": {
-                    "summary": "Move P300 Single on right mount",
-                    "description": "Move a P300 Single attached to the right mount"
-                    " to a specific position. You have to specify "
-                    "that it's a P300 Single that you're moving, "
-                    "but as long as you specify the correct model "
-                    "the end of the pipette will always be at the "
-                    "specified position.",
-                    "value": {
-                        "target": "pipette",
-                        "mount": "right",
-                        "model": "p300_single",
-                        "point": [25, 25, 50],
-                    },
+                {
+                    "target": "pipette",
+                    "mount": "right",
+                    "model": "p300_single",
+                    "point": [25, 25, 50],
                 },
-            }
+            ]
         }
 
 
@@ -168,18 +150,7 @@ class RobotHomeTarget(BaseModel):
 
     class Config:
         schema_extra = {
-            "examples": {
-                "homeGantry": {
-                    "summary": "Home Gantry",
-                    "description": "Home the robot's gantry",
-                    "value": {"target": "robot"},
-                },
-                "homeRight": {
-                    "summary": "Home right pipette",
-                    "description": "Home only the right pipette",
-                    "value": {"target": "pipette", "mount": "right"},
-                },
-            }
+            "examples": [{"target": "robot"}, {"target": "pipette", "mount": "right"}]
         }
 
 

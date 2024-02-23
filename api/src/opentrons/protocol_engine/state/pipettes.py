@@ -10,7 +10,7 @@ from opentrons.hardware_control.nozzle_manager import (
     NozzleConfigurationType,
     NozzleMap,
 )
-from opentrons.types import MountType, Mount as HwMount
+from opentrons.types import MountType, Mount as HwMount, Point
 
 from .. import errors
 from ..types import (
@@ -78,6 +78,14 @@ class CurrentDeckPoint:
 
 
 @dataclass(frozen=True)
+class BoundingNozzlesOffsets:
+    """Offsets of the bounding nozzles of the pipette."""
+
+    back_left_offset: Point
+    front_right_offset: Point
+
+
+@dataclass(frozen=True)
 class StaticPipetteConfig:
     """Static config for a pipette."""
 
@@ -93,6 +101,8 @@ class StaticPipetteConfig:
     nominal_tip_overlap: Dict[str, float]
     home_position: float
     nozzle_offset_z: float
+    bounding_nozzle_offsets: BoundingNozzlesOffsets
+    default_nozzle_map: NozzleMap
 
 
 @dataclass
@@ -157,8 +167,16 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 nominal_tip_overlap=config.nominal_tip_overlap,
                 home_position=config.home_position,
                 nozzle_offset_z=config.nozzle_offset_z,
+                bounding_nozzle_offsets=BoundingNozzlesOffsets(
+                    back_left_offset=config.nozzle_map.back_left_nozzle_offset,
+                    front_right_offset=config.nozzle_map.front_right_nozzle_offset,
+                ),
+                default_nozzle_map=config.nozzle_map,
             )
             self._state.flow_rates_by_id[private_result.pipette_id] = config.flow_rates
+            self._state.nozzle_configuration_by_id[
+                private_result.pipette_id
+            ] = config.nozzle_map
         elif isinstance(private_result, PipetteNozzleLayoutResultMixin):
             self._state.nozzle_configuration_by_id[
                 private_result.pipette_id
@@ -175,7 +193,11 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.aspirated_volume_by_id[pipette_id] = None
             self._state.movement_speed_by_id[pipette_id] = None
             self._state.attached_tip_by_id[pipette_id] = None
-            self._state.nozzle_configuration_by_id[pipette_id] = None
+            static_config = self._state.static_config_by_id.get(pipette_id)
+            if static_config:
+                self._state.nozzle_configuration_by_id[
+                    pipette_id
+                ] = static_config.default_nozzle_map
 
         elif isinstance(command.result, (AspirateResult, AspirateInPlaceResult)):
             pipette_id = command.params.pipetteId
@@ -653,3 +675,61 @@ class PipetteView(HasState[PipetteState]):
         """Get the primary nozzle, if any, related to the given pipette's nozzle configuration."""
         nozzle_map = self._state.nozzle_configuration_by_id.get(pipette_id)
         return nozzle_map.starting_nozzle if nozzle_map else None
+
+    def get_primary_nozzle_offset(self, pipette_id: str) -> Point:
+        """Get the pipette's current primary nozzle's offset."""
+        nozzle_map = self._state.nozzle_configuration_by_id.get(pipette_id)
+        if nozzle_map:
+            primary_nozzle_offset = nozzle_map.starting_nozzle_offset
+        else:
+            # When not in partial configuration, back-left nozzle is the primary
+            primary_nozzle_offset = self.get_config(
+                pipette_id
+            ).bounding_nozzle_offsets.back_left_offset
+        return primary_nozzle_offset
+
+    def get_pipette_bounding_nozzle_offsets(
+        self, pipette_id: str
+    ) -> BoundingNozzlesOffsets:
+        """Get the nozzle offsets of the pipette's bounding nozzles."""
+        return self.get_config(pipette_id).bounding_nozzle_offsets
+
+    def get_nozzle_bounds_at_specified_move_to_position(
+        self,
+        pipette_id: str,
+        destination_position: Point,
+    ) -> Tuple[Point, Point, Point, Point]:
+        """Get the given pipette's bounding nozzles' positions when primary nozzle is at the given destination position."""
+        primary_nozzle_offset = self.get_primary_nozzle_offset(pipette_id)
+        tip = self.get_attached_tip(pipette_id)
+        # Primary nozzle position at destination, in deck coordinates
+        primary_nozzle_position = destination_position + Point(
+            x=0, y=0, z=tip.length if tip else 0
+        )
+
+        # Get the pipette bounding box based on total nozzles
+        bounding_nozzles_offsets = self.get_pipette_bounding_nozzle_offsets(pipette_id)
+
+        # TODO (spp): add a margin to these bounds
+        pip_back_left_bound = (
+            primary_nozzle_position
+            - primary_nozzle_offset
+            + bounding_nozzles_offsets.back_left_offset
+        )
+        pip_front_right_bound = (
+            primary_nozzle_position
+            - primary_nozzle_offset
+            + bounding_nozzles_offsets.front_right_offset
+        )
+        pip_back_right_bound = Point(
+            pip_front_right_bound.x, pip_back_left_bound.y, pip_front_right_bound.z
+        )
+        pip_front_left_bound = Point(
+            pip_back_left_bound.x, pip_front_right_bound.y, pip_back_left_bound.z
+        )
+        return (
+            pip_back_left_bound,
+            pip_front_right_bound,
+            pip_back_right_bound,
+            pip_front_left_bound,
+        )

@@ -92,7 +92,7 @@ This code only loads the instruments and labware listed above, and performs no o
                     load_name="usascientific_12_reservoir_22ml", location="D1"
                 )
                 # load trash bin in deck slot A3
-                trash = protocol.load_trash_bin("A3")
+                trash = protocol.load_trash_bin(location="A3")
                 # Put protocol commands here
     
     .. tab:: OT-2 

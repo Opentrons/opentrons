@@ -12,21 +12,12 @@ import {
 } from '../redux/analytics'
 
 import type { UseQueryOptions } from 'react-query'
-import type { NotifyTopic } from '../redux/shell/types'
+import type { NotifyTopic, NotifyResponseData } from '../redux/shell/types'
 
 export interface QueryOptionsWithPolling<TData, TError = Error>
   extends UseQueryOptions<TData, TError> {
   forceHttpPolling?: boolean
 }
-
-interface NotifyRefetchData {
-  refetchUsingHTTP: boolean
-  statusCode: never
-}
-
-export type NotifyNetworkError = 'ECONNFAILED' | 'ECONNREFUSED'
-
-type NotifyResponseData = NotifyRefetchData | NotifyNetworkError
 
 interface UseNotifyServiceProps<TData, TError = Error> {
   topic: NotifyTopic
@@ -43,37 +34,39 @@ export function useNotifyService<TData, TError = Error>({
   const host = useHost()
   const isNotifyError = React.useRef(false)
   const doTrackEvent = useTrackEvent()
-  const { enabled, refetchInterval, forceHttpPolling } = options
-  const isRefetchEnabled =
-    refetchInterval !== undefined && refetchInterval !== false
+  const { enabled, staleTime, forceHttpPolling } = options
+  const hostname = host?.hostname ?? null
 
   React.useEffect(() => {
     // Always fetch on initial mount.
     refetchUsingHTTP()
-    if (!forceHttpPolling && isRefetchEnabled && enabled !== false) {
-      const hostname = host?.hostname ?? null
-      const eventEmitter = appShellListener(hostname, topic)
-
-      eventEmitter.on('data', onDataListener)
-
-      if (hostname != null) {
-        dispatch(notifySubscribeAction(hostname, topic))
-      } else {
-        console.error('NotifyService expected hostname, received null.')
-      }
+    if (
+      !forceHttpPolling &&
+      enabled !== false &&
+      hostname != null &&
+      staleTime !== Infinity
+    ) {
+      appShellListener(hostname, topic, onDataEvent)
+      dispatch(notifySubscribeAction(hostname, topic))
 
       return () => {
-        eventEmitter.off('data', onDataListener)
         if (hostname != null) {
           dispatch(notifyUnsubscribeAction(hostname, topic))
         }
       }
+    } else {
+      if (hostname == null) {
+        console.error(
+          'NotifyService expected hostname, received null for topic:',
+          topic
+        )
+      }
     }
-  }, [topic])
+  }, [topic, host])
 
   return { isNotifyError: isNotifyError.current }
 
-  function onDataListener(data: NotifyResponseData): void {
+  function onDataEvent(data: NotifyResponseData): void {
     if (!isNotifyError.current) {
       if (data === 'ECONNFAILED' || data === 'ECONNREFUSED') {
         isNotifyError.current = true

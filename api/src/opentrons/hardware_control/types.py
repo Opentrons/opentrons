@@ -392,6 +392,19 @@ class EstopOverallStatus:
     right_physical_state: EstopPhysicalStatus
 
 
+@dataclass
+class HepaFanState:
+    fan_on: bool
+    duty_cycle: int
+
+
+@dataclass
+class HepaUVState:
+    light_on: bool
+    uv_duration_s: int
+    remaining_time_s: int
+
+
 @dataclass(frozen=True)
 class DoorStateNotification:
     event: Literal[
@@ -487,6 +500,13 @@ class CriticalPoint(enum.Enum):
     This changes nothing for single pipettes, but makes multipipettes
     move their centers - so between channels 4 and 5 - to the specified
     point. This is the same as the GRIPPER_JAW_CENTER for grippers.
+    """
+
+    INSTRUMENT_XY_CENTER = enum.auto()
+    """
+    The INSTRUMENT_XY_CENTER means the critical point under consideration is
+    the XY center of the entire pipette, regardless of configuration.
+    No pipettes, single or multi, will change their instrument center point.
     """
 
     FRONT_NOZZLE = enum.auto()

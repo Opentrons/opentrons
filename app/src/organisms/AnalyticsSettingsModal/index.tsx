@@ -58,7 +58,7 @@ export function AnalyticsSettingsModal(): JSX.Element | null {
           <Flex gridGap={SPACING.spacing10} flexDirection={DIRECTION_COLUMN}>
             <Trans
               t={t}
-              i18nKey={t('privacy_body')}
+              i18nKey="privacy_body"
               components={{ block: <StyledText as="p" /> }}
             />
           </Flex>

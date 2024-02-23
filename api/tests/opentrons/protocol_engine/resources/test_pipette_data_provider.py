@@ -11,6 +11,7 @@ from opentrons.protocol_engine.resources.pipette_data_provider import (
 )
 
 from opentrons.protocol_engine.resources import pipette_data_provider as subject
+from ..pipette_fixtures import get_default_nozzle_map
 
 
 @pytest.fixture
@@ -50,6 +51,7 @@ def test_get_virtual_pipette_static_config(
             "opentrons/opentrons_96_tiprack_10ul/1": 8.25,
             "opentrons/opentrons_96_tiprack_20ul/1": 8.25,
         },
+        nozzle_map=result.nozzle_map,
     )
 
 
@@ -75,6 +77,7 @@ def test_configure_virtual_pipette_for_volume(
         ),
         tip_configuration_lookup_table=result1.tip_configuration_lookup_table,
         nominal_tip_overlap=result1.nominal_tip_overlap,
+        nozzle_map=result1.nozzle_map,
     )
     subject_instance.configure_virtual_pipette_for_volume(
         "my-pipette", 1, result1.model
@@ -97,6 +100,7 @@ def test_configure_virtual_pipette_for_volume(
         ),
         tip_configuration_lookup_table=result2.tip_configuration_lookup_table,
         nominal_tip_overlap=result2.nominal_tip_overlap,
+        nozzle_map=result2.nozzle_map,
     )
 
 
@@ -122,6 +126,7 @@ def test_load_virtual_pipette_by_model_string(
         ),
         tip_configuration_lookup_table=result.tip_configuration_lookup_table,
         nominal_tip_overlap=result.nominal_tip_overlap,
+        nozzle_map=result.nozzle_map,
     )
 
 
@@ -167,6 +172,7 @@ def test_get_pipette_static_config(
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
 ) -> None:
     """It should return config data given a PipetteDict."""
+    dummy_nozzle_map = get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2)
     pipette_dict: PipetteDict = {
         "name": "p300_single_gen2",
         "min_volume": 20,
@@ -202,7 +208,7 @@ def test_get_pipette_static_config(
         "default_aspirate_speeds": {"2.0": 5.021202, "2.6": 10.042404},
         "default_push_out_volume": 3,
         "supported_tips": {pip_types.PipetteTipType.t300: supported_tip_fixture},
-        "current_nozzle_map": None,
+        "current_nozzle_map": dummy_nozzle_map,
     }
 
     result = subject.get_pipette_static_config(pipette_dict)
@@ -228,4 +234,5 @@ def test_get_pipette_static_config(
         # https://opentrons.atlassian.net/browse/RCORE-655
         nozzle_offset_z=0,
         home_position=0,
+        nozzle_map=dummy_nozzle_map,
     )

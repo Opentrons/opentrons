@@ -6,6 +6,7 @@ import { useHistory } from 'react-router-dom'
 
 import {
   ALIGN_START,
+  BORDERS,
   Box,
   COLORS,
   DIRECTION_COLUMN,
@@ -248,7 +249,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   return (
     <Flex
       backgroundColor={COLORS.grey10}
-      borderRadius={SPACING.spacing4}
+      borderRadius={BORDERS.borderRadiusSize2}
       width="100%"
       data-testid={`ModuleCard_${module.serialNumber}`}
     >

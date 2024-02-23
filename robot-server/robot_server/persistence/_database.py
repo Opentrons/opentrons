@@ -1,12 +1,11 @@
 """SQLite database initialization and utilities."""
+from contextlib import contextmanager
 from pathlib import Path
+from typing import Generator
 
 import sqlalchemy
 
 from server_utils import sql_utils
-
-from ._tables import schema_2, schema_3
-from ._migrations.up_to_2 import migrate
 
 
 # A reference to SQLite's built-in ROWID column.
@@ -24,23 +23,17 @@ from ._migrations.up_to_2 import migrate
 sqlite_rowid = sqlalchemy.column("_ROWID_")
 
 
-def create_schema_2_sql_engine(path: Path) -> sqlalchemy.engine.Engine:
-    """Create a SQL engine for a schema 2 database.
+def create_sql_engine(path: Path) -> sqlalchemy.engine.Engine:
+    """Return an engine for accessing the given SQLite database file.
 
-    If provided a schema 0 or 1 database, this will migrate it in-place to schema 2.
-
-    Warning:
-        Migrations can take several minutes. If calling this from an async function,
-        offload this to a thread to avoid blocking the event loop.
+    If the file does not already exist, it will be created, empty.
+    You must separately set up any tables you're expecting.
     """
     sql_engine = sqlalchemy.create_engine(sql_utils.get_connection_url(path))
 
     try:
         sql_utils.enable_foreign_key_constraints(sql_engine)
         sql_utils.fix_transactions(sql_engine)
-        schema_2.metadata.create_all(sql_engine)
-
-        migrate(sql_engine)
 
     except Exception:
         sql_engine.dispose()
@@ -49,21 +42,11 @@ def create_schema_2_sql_engine(path: Path) -> sqlalchemy.engine.Engine:
     return sql_engine
 
 
-def create_schema_3_sql_engine(path: Path) -> sqlalchemy.engine.Engine:
-    """Create a SQL engine for a schema 3 database.
-
-    Unlike `create_schema_2_sql_engine()`, this assumes the database is already
-    at schema 3. Migration is done through other mechanisms.
-    """
-    sql_engine = sqlalchemy.create_engine(sql_utils.get_connection_url(path))
-
+@contextmanager
+def sql_engine_ctx(path: Path) -> Generator[sqlalchemy.engine.Engine, None, None]:
+    """Like `create_sql_engine()`, but clean up when done."""
+    engine = create_sql_engine(path)
     try:
-        sql_utils.enable_foreign_key_constraints(sql_engine)
-        sql_utils.fix_transactions(sql_engine)
-        schema_3.metadata.create_all(sql_engine)
-
-    except Exception:
-        sql_engine.dispose()
-        raise
-
-    return sql_engine
+        yield engine
+    finally:
+        engine.dispose()

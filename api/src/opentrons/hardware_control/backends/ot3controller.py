@@ -54,7 +54,7 @@ from .ot3utils import (
 from .tip_presence_manager import TipPresenceManager
 
 try:
-    import aionotify  # type: ignore[import]
+    import aionotify  # type: ignore[import-untyped]
 except (OSError, ModuleNotFoundError):
     aionotify = None
 
@@ -169,6 +169,12 @@ from opentrons_hardware.hardware_control.rear_panel_settings import (
 from opentrons_hardware.hardware_control.gripper_settings import (
     get_gripper_jaw_state,
 )
+from opentrons_hardware.hardware_control.hepa_uv_settings import (
+    set_hepa_fan_state as set_hepa_fan_state_fw,
+    get_hepa_fan_state as get_hepa_fan_state_fw,
+    set_hepa_uv_state as set_hepa_uv_state_fw,
+    get_hepa_uv_state as get_hepa_uv_state_fw,
+)
 
 from opentrons_hardware.drivers.gpio import OT3GPIO, RemoteOT3GPIO
 from opentrons_shared_data.pipette.dev_types import PipetteName
@@ -193,7 +199,7 @@ from ..dev_types import (
     AttachedGripper,
     OT3AttachedInstruments,
 )
-from ..types import StatusBarState
+from ..types import HepaFanState, HepaUVState, StatusBarState
 
 from .types import HWStopCondition
 from .flex_protocol import FlexBackend
@@ -653,6 +659,7 @@ class OT3Controller(FlexBackend):
             if not self._feature_flags.stall_detection_enabled
             else False,
         )
+
         mounts_moving = [
             k
             for k in moving_axes_in_move_group(move_group)
@@ -1218,7 +1225,6 @@ class OT3Controller(FlexBackend):
 
     async def clean_up(self) -> None:
         """Clean up."""
-
         try:
             loop = asyncio.get_event_loop()
         except RuntimeError:
@@ -1227,6 +1233,15 @@ class OT3Controller(FlexBackend):
         if hasattr(self, "_event_watcher"):
             if loop.is_running() and self._event_watcher:
                 self._event_watcher.close()
+
+        messenger = getattr(self, "_messenger", None)
+        if messenger:
+            await messenger.stop()
+
+        usb_messenger = getattr(self, "_usb_messenger", None)
+        if usb_messenger:
+            await usb_messenger.stop()
+
         return None
 
     @staticmethod
@@ -1561,3 +1576,32 @@ class OT3Controller(FlexBackend):
                     "actual-jaw-width": current_gripper_position,
                 },
             )
+
+    async def set_hepa_fan_state(self, fan_on: bool, duty_cycle: int) -> bool:
+        return await set_hepa_fan_state_fw(self._messenger, fan_on, duty_cycle)
+
+    async def get_hepa_fan_state(self) -> Optional[HepaFanState]:
+        res = await get_hepa_fan_state_fw(self._messenger)
+        return (
+            HepaFanState(
+                fan_on=res.fan_on,
+                duty_cycle=res.duty_cycle,
+            )
+            if res
+            else None
+        )
+
+    async def set_hepa_uv_state(self, light_on: bool, uv_duration_s: int) -> bool:
+        return await set_hepa_uv_state_fw(self._messenger, light_on, uv_duration_s)
+
+    async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
+        res = await get_hepa_uv_state_fw(self._messenger)
+        return (
+            HepaUVState(
+                light_on=res.uv_light_on,
+                uv_duration_s=res.uv_duration_s,
+                remaining_time_s=res.remaining_time_s,
+            )
+            if res
+            else None
+        )

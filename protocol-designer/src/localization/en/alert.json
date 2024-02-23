@@ -270,7 +270,7 @@
       "heading": "One or more staging area slots are unused",
       "body1_plural": "The {{count}} staging area slots in [{{slot}}] in your protocol are not currently in use. They will not appear as a needed item on the deck when uploaded to the app.",
       "body1": "The staging area slot in {{slot}} in your protocol is not currently in use. It will not appear as a needed item on the deck when uploaded to the app.",
-      "body2_plural": "If you don't intend to use these staging area slots, please consider removing it from your protocol.",
+      "body2_plural": "If you don't intend to use these staging area slots, please consider removing them from your protocol.",
       "body2": "If you don't intend to use this staging area slot, please consider removing it from your protocol."
     }
   },

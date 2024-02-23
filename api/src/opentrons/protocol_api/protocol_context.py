@@ -26,7 +26,8 @@ from opentrons.commands.publisher import CommandPublisher, publish, publish_cont
 from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.deck_type import (
     NoTrashDefinedError,
-    should_load_fixed_trash_for_python_protocol,
+    should_load_fixed_trash_labware_for_python_protocol,
+    should_load_fixed_trash_area_for_python_protocol,
 )
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
@@ -150,24 +151,27 @@ class ProtocolContext(CommandPublisher):
         }
         self._bundled_data: Dict[str, bytes] = bundled_data or {}
 
-        # With the addition of Moveable Trashes and Waste Chute support, it is not necessary
+        # With the addition of Movable Trashes and Waste Chute support, it is not necessary
         # to ensure that the list of "disposal locations", essentially the list of trashes,
         # is initialized correctly on protocols utilizing former API versions prior to 2.16
-        # and also to ensure that any protocols after 2.16 intialize a Fixed Trash for OT-2
+        # and also to ensure that any protocols after 2.16 initialize a Fixed Trash for OT-2
         # protocols so that no load trash bin behavior is required within the protocol itself.
         # Protocols prior to 2.16 expect the Fixed Trash to exist as a Labware object, while
         # protocols after 2.16 expect trash to exist as either a TrashBin or WasteChute object.
 
         self._load_fixed_trash()
-        if should_load_fixed_trash_for_python_protocol(self._api_version):
+        if should_load_fixed_trash_labware_for_python_protocol(self._api_version):
             self._core.append_disposal_location(self.fixed_trash)
-        elif (
-            self._api_version >= APIVersion(2, 16)
-            and self._core.robot_type == "OT-2 Standard"
+        elif should_load_fixed_trash_area_for_python_protocol(
+            self._api_version, self._core.robot_type
         ):
             _fixed_trash_trashbin = TrashBin(
                 location=DeckSlotName.FIXED_TRASH, addressable_area_name="fixedTrash"
             )
+            # We are just appending the fixed trash to the core's internal list here, not adding it to the engine via
+            # the core, since that method works through the SyncClient and if called from here, will cause protocols
+            # to deadlock. Instead, that method is called in protocol engine directly in create_protocol_context after
+            # ProtocolContext is initialized.
             self._core.append_disposal_location(_fixed_trash_trashbin)
 
         self._commands: List[str] = []
@@ -511,7 +515,7 @@ class ProtocolContext(CommandPublisher):
         trash_bin = TrashBin(
             location=slot_name, addressable_area_name=addressable_area_name
         )
-        self._core.append_disposal_location(trash_bin)
+        self._core.add_disposal_location_to_engine(trash_bin)
         return trash_bin
 
     @requires_version(2, 16)
@@ -528,7 +532,7 @@ class ProtocolContext(CommandPublisher):
         API will raise an error.
         """
         waste_chute = WasteChute()
-        self._core.append_disposal_location(waste_chute)
+        self._core.add_disposal_location_to_engine(waste_chute)
         return waste_chute
 
     @requires_version(2, 15)
@@ -975,9 +979,9 @@ class ProtocolContext(CommandPublisher):
 
         A human can resume the protocol in the Opentrons App or on the touchscreen.
 
-        This function returns immediately, but the next function call that
-        is blocked by a paused robot (anything that involves moving) will
-        not return until the protocol is resumed.
+        .. note::
+            In Python Protocol API version 2.13 and earlier, the pause will only
+            take effect on the next function call that involves moving the robot.
 
         :param str msg: An optional message to show in the run log entry for the pause step.
         """

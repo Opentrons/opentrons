@@ -106,9 +106,11 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
         deleteRun: jest.fn(),
       } as any)
     )
-    when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
-      trackProtocolRunEvent: mockTrackProtocolRunEvent,
-    })
+    when(mockUseTrackProtocolRunEvent)
+      .calledWith(RUN_ID, ROBOT_NAME)
+      .mockReturnValue({
+        trackProtocolRunEvent: mockTrackProtocolRunEvent,
+      })
     when(mockUseRunControls)
       .calledWith(RUN_ID, expect.anything())
       .mockReturnValue({

@@ -7,7 +7,7 @@ from functools import partial
 from typing import Optional, AsyncGenerator, Union
 from typing_extensions import Literal
 
-from serial import Serial, serial_for_url  # type: ignore[import]
+from serial import Serial, serial_for_url  # type: ignore[import-untyped]
 
 TimeoutProperties = Union[Literal["write_timeout"], Literal["timeout"]]
 

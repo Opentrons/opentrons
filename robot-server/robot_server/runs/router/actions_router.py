@@ -71,7 +71,8 @@ async def get_run_controller(
     )
 
 
-@actions_router.post(
+@PydanticResponse.wrap_route(
+    actions_router.post,
     path="/runs/{runId}/actions",
     summary="Issue a control action to the run",
     description="Provide an action in order to control execution of the run.",

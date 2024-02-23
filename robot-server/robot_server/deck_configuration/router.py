@@ -24,7 +24,8 @@ from .store import DeckConfigurationStore
 router = fastapi.APIRouter()
 
 
-@router.put(
+@PydanticResponse.wrap_route(
+    router.put,
     path="/deck_configuration",
     summary="Set the deck configuration",
     description=(
@@ -82,8 +83,9 @@ async def put_deck_configuration(  # noqa: D103
         )
 
 
-@router.get(
-    "/deck_configuration",
+@PydanticResponse.wrap_route(
+    router.get,
+    path="/deck_configuration",
     summary="Get the deck configuration",
     description=(
         "Get the robot's current deck configuration."

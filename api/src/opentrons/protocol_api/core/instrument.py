@@ -239,6 +239,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
     def get_blow_out_flow_rate(self, rate: float = 1.0) -> float:
         ...
 
+    @abstractmethod
     def set_flow_rate(
         self,
         aspirate: Optional[float] = None,
@@ -247,6 +248,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
     ) -> None:
         ...
 
+    @abstractmethod
     def configure_for_volume(self, volume: float) -> None:
         """Configure the pipette for a specific volume.
 
@@ -255,10 +257,12 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         """
         ...
 
+    @abstractmethod
     def prepare_to_aspirate(self) -> None:
         """Prepare the pipette to aspirate."""
         ...
 
+    @abstractmethod
     def configure_nozzle_layout(
         self,
         style: NozzleLayout,
@@ -274,6 +278,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         """
         ...
 
+    @abstractmethod
     def is_tip_tracking_available(self) -> bool:
         """Return whether auto tip tracking is available for the pipette's current nozzle configuration."""
         ...
