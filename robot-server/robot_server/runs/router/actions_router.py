@@ -24,11 +24,10 @@ from ..run_controller import RunController, RunActionNotAllowedError
 from ..action_models import RunAction, RunActionCreate, RunActionType
 from ..dependencies import get_engine_store, get_run_store
 from .base_router import RunNotFound, RunStopped
-from robot_server.maintenance_runs import (
+from robot_server.maintenance_runs.maintenance_engine_store import (
     MaintenanceEngineStore,
-    get_maintenance_engine_store,
 )
-
+from robot_server.maintenance_runs.dependencies import get_maintenance_engine_store
 
 log = logging.getLogger(__name__)
 actions_router = APIRouter()

@@ -14,7 +14,9 @@ from robot_server.runs.action_models import (
 )
 from robot_server.runs.router.actions_router import create_run_action
 
-from robot_server.maintenance_runs import MaintenanceEngineStore
+from robot_server.maintenance_runs.maintenance_engine_store import (
+    MaintenanceEngineStore,
+)
 from robot_server.deck_configuration.store import DeckConfigurationStore
 
 
