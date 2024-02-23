@@ -4,6 +4,9 @@ from collections import OrderedDict
 import pytest
 from opentrons_shared_data.pipette.dev_types import PipetteNameType, PipetteModel
 from opentrons_shared_data.pipette import pipette_definition, types as pip_types
+from opentrons_shared_data.pipette.pipette_definition import (
+    PipetteBoundingBoxOffsetDefinition,
+)
 
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.nozzle_manager import NozzleMap
@@ -214,6 +217,10 @@ def test_get_pipette_static_config(
         "default_aspirate_speeds": {"2.0": 5.021202, "2.6": 10.042404},
         "default_push_out_volume": 3,
         "supported_tips": {pip_types.PipetteTipType.t300: supported_tip_fixture},
+        "pipette_bounding_box_offsets": PipetteBoundingBoxOffsetDefinition(
+            backLeftCorner=[10, 20, 30],
+            frontRightCorner=[40, 50, 60],
+        ),
         "current_nozzle_map": NozzleMap.build(
             physical_nozzles=OrderedDict({"A1": Point(1, 2, 3), "B1": Point(4, 5, 6)}),
             physical_rows=OrderedDict({"A": ["A1"], "B": ["B1"]}),

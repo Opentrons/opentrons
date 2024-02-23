@@ -387,8 +387,8 @@ class PipetteColumnDefinition(BaseModel):
 
 
 class PipetteBoundingBoxOffsetDefinition(BaseModel):
-    back_left_corner: List[float]
-    front_right_corner: List[float]
+    back_left_corner: List[float] = Field(..., alias="backLeftCorner")
+    front_right_corner: List[float] = Field(..., alias="frontRightCorner")
 
 
 class PipetteGeometryDefinition(BaseModel):
