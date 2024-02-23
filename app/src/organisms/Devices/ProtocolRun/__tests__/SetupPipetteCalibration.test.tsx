@@ -8,16 +8,22 @@ import { mockTipRackDefinition } from '../../../../redux/custom-labware/__fixtur
 import { useRunPipetteInfoByMount } from '../../hooks'
 import { SetupPipetteCalibrationItem } from '../SetupPipetteCalibrationItem'
 import { SetupInstrumentCalibration } from '../SetupInstrumentCalibration'
+import { useNotifyRunQuery } from '../../../../resources/runs/useNotifyRunQuery'
+
 import type { PipetteInfo } from '../../hooks'
 
 jest.mock('../../hooks')
 jest.mock('../SetupPipetteCalibrationItem')
+jest.mock('../../../../resources/runs/useNotifyRunQuery')
 
 const mockUseRunPipetteInfoByMount = useRunPipetteInfoByMount as jest.MockedFunction<
   typeof useRunPipetteInfoByMount
 >
 const mockSetupPipetteCalibrationItem = SetupPipetteCalibrationItem as jest.MockedFunction<
   typeof SetupPipetteCalibrationItem
+>
+const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
+  typeof useNotifyRunQuery
 >
 
 const ROBOT_NAME = 'otie'
@@ -56,6 +62,7 @@ describe('SetupPipetteCalibration', () => {
     when(mockSetupPipetteCalibrationItem).mockReturnValue(
       <div>Mock SetupPipetteCalibrationItem</div>
     )
+    mockUseNotifyRunQuery.mockReturnValue({} as any)
   })
   afterEach(() => {
     resetAllWhenMocks()

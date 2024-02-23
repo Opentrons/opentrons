@@ -10,6 +10,7 @@ import {
   useTrackEvent,
   ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
 } from '../redux/analytics'
+import { useIsFlex } from '../organisms/Devices/hooks/useIsFlex'
 
 import type { UseQueryOptions } from 'react-query'
 import type { HostConfig } from '@opentrons/api-client'
@@ -38,6 +39,7 @@ export function useNotifyService<TData, TError = Error>({
   const host = hostOverride ?? hostFromProvider
   const hostname = host?.hostname ?? null
   const doTrackEvent = useTrackEvent()
+  const isFlex = useIsFlex(host?.robotName ?? '')
   const isNotifyError = React.useRef(false)
   const { enabled, staleTime, forceHttpPolling } = options
 
@@ -74,7 +76,8 @@ export function useNotifyService<TData, TError = Error>({
     if (!isNotifyError.current) {
       if (data === 'ECONNFAILED' || data === 'ECONNREFUSED') {
         isNotifyError.current = true
-        if (data === 'ECONNREFUSED') {
+        // TODO(jh 2023-02-23): remove the robot type check once OT-2s support MQTT.
+        if (data === 'ECONNREFUSED' && isFlex) {
           doTrackEvent({
             name: ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
             properties: {},
