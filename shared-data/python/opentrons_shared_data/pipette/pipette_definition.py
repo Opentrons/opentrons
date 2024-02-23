@@ -386,6 +386,11 @@ class PipetteColumnDefinition(BaseModel):
         return v
 
 
+class PipetteBoundingBoxOffsetDefinition(BaseModel):
+    back_left_corner: List[float]
+    front_right_corner: List[float]
+
+
 class PipetteGeometryDefinition(BaseModel):
     """The geometry properties definition of a pipette."""
 
@@ -396,6 +401,9 @@ class PipetteGeometryDefinition(BaseModel):
         alias="pathTo3D",
     )
     nozzle_map: Dict[str, List[float]] = Field(..., alias="nozzleMap")
+    pipette_bounding_box_offsets: PipetteBoundingBoxOffsetDefinition = Field(
+        ..., alias="pipetteBoundingBoxOffsets"
+    )
     ordered_columns: List[PipetteColumnDefinition] = Field(..., alias="orderedColumns")
     ordered_rows: List[PipetteRowDefinition] = Field(..., alias="orderedRows")
 
