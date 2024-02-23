@@ -10,6 +10,49 @@ from hardware_testing.opentrons_api.types import GantryLoad, OT3Mount, OT3Axis, 
 
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 
+import json
+import requests
+
+SlackToken = "xoxb-3897728585-6504490807157-gO93ItOvDaUVYtjOxLOZPPOp"
+SlackChannel = 'C06L33U3XBM'
+
+def sendMessage2Slack(token,channel,message):
+    """
+    send message to slack
+    """
+    try:
+        payload = {"text": message,"channel": channel}
+        data = json.dumps(payload).encode("utf8")
+        url = 'https://slack.com/api/chat.postMessage'
+        header = {"Content-Type": "application/json; charset=utf-8", "Authorization": "Bearer " + token}
+        response = requests.post(url, data=data, headers=header)
+    except:
+        print("Can't reach slack when send 2 slack!")
+
+def write_local_json(file_path, data):
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=4, ensure_ascii=False)
+
+def read_local_json(file_path, key_name):
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            content = json.load(f)
+            return content[key_name]
+    except:
+        return 0
+    
+def append_to_log(file_path, content):
+    from datetime import datetime
+    now = datetime.now()
+    formatted_date = now.strftime("%Y-%m-%d %H:%M:%S")
+    print(formatted_date)
+    with open(file_path, mode='a', encoding='utf-8') as file:
+        file.write(f"{formatted_date}: {content} \n")
+    
+def update_local_cycle(file_path, cycles):
+    ret = read_local_json(file_path, 'cycles')
+    cycles = cycles + ret
+    write_local_json(file_path, {"cycles": cycles})
 
 def convert(seconds):
     weeks, seconds = divmod(seconds, 7*24*60*60)
@@ -198,8 +241,25 @@ if __name__ == "__main__":
     parser.add_argument("--current", type=float, default=0.75)
     parser.add_argument("--calibrate_height", action="store_true")
     parser.add_argument("--slot", type=str, default="C2")
+    parser.add_argument("--update", type=str, default="update")
+    parser.add_argument("--target", type=str, default="z_stage_0")
     parser.add_argument("--speed", type=float, default=10.0)
     args = parser.parse_args()
     mount = mount_options[args.mount]
-
+    this_test_name = "# Z-Stage force pick up lifetime test"
+    sendMessage2Slack(SlackToken, SlackChannel, f"{this_test_name}\n {args.target}: \nStarting Z-Stage with {args.current}A&{args.speed}mm/s, Append cycles: {args.cycles}\n")
     asyncio.run(_main(args.simulate, args.cycles, mount, args.current, args.calibrate_height, args.slot, args.speed))
+    # update local
+    append_to_log("/data/testing_data/force_z_stage_lifetime_log.txt", f"+ {args.cycles}")
+    if args.update == "update":
+        update_local_cycle("/data/testing_data/force_z_stage_lifetime_log.json", args.cycles)
+    elif args.update == "init":
+        write_local_json("/data/testing_data/force_z_stage_lifetime_log.json", {"cycles": args.cycles})
+    else:
+        update_cycles = int(args.update) + args.cycles
+        write_local_json("/data/testing_data/force_z_stage_lifetime_log.json", {"cycles": update_cycles})
+    completed_cycles = read_local_json("/data/testing_data/force_z_stage_lifetime_log.json", "cycles")
+    sendMessage2Slack(SlackToken, SlackChannel, f"{this_test_name}\n{args.target}: \n"
+                      f"Ending Z-Stage with {args.current}A&{args.speed}mm/s \nCompleted {completed_cycles} times \n"
+                      f"Update data tracker here: https://docs.google.com/spreadsheets/d/1d2i_oKZ-dqU3zp9k99Z-iJW_NcS2mbw0mLBWLSA2B6E/edit#gid=0")
+    
