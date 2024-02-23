@@ -8,7 +8,7 @@ from opentrons.protocol_engine import ProtocolEngine
 
 from robot_server.errors.error_responses import ApiError
 from robot_server.runs import EngineStore, EngineConflictError
-from robot_server.modules import ModuleIdentifier, ModuleIdentity
+from robot_server.modules.module_identifier import ModuleIdentifier, ModuleIdentity
 from robot_server.commands.get_default_engine import get_default_engine
 
 

@@ -10,7 +10,7 @@ from .deck_configuration.router import router as deck_configuration_router
 from .health.router import health_router
 from .instruments.router import instruments_router
 from .maintenance_runs.router import maintenance_runs_router
-from .modules import modules_router
+from .modules.router import modules_router
 from .protocols.router import protocols_router
 from .robot.router import robot_router
 from .runs import runs_router

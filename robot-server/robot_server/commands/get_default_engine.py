@@ -11,7 +11,7 @@ from opentrons_shared_data.errors import ErrorCodes
 from robot_server.errors.error_responses import ErrorDetails
 from robot_server.hardware import get_hardware
 from robot_server.runs import EngineStore, EngineConflictError, get_engine_store
-from robot_server.modules import ModuleIdentifier
+from robot_server.modules.module_identifier import ModuleIdentifier
 
 
 class RunActive(ErrorDetails):
