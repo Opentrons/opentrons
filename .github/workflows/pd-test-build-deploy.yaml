@@ -188,4 +188,5 @@ jobs:
           aws configure set role_arn ${{ secrets.OT_PD_DEPLOY_ROLE }} --profile deploy
           aws configure set source_profile identity --profile deploy
           aws s3 sync ./dist s3://sandbox.designer.opentrons.com/${{ env.OT_BRANCH }} --acl=public-read --profile=deploy
+          aws cloudfront create-invalidation --distribution-id ENGOO2NRYGWKN --paths "/${{ env.OT_BRANCH }}/*""
         shell: bash
