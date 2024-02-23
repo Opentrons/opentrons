@@ -17,7 +17,7 @@ from robot_server.hardware import (
     get_deck_type,
     get_robot_type,
 )
-from robot_server.persistence import get_sql_engine
+from robot_server.persistence.fastapi_dependencies import get_sql_engine
 from robot_server.service.task_runner import get_task_runner, TaskRunner
 from robot_server.settings import get_settings
 from robot_server.deletion_planner import RunDeletionPlanner

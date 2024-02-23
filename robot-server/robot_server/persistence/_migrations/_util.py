@@ -5,7 +5,7 @@ import sqlalchemy
 import shutil
 from pathlib import Path
 
-from .._database import sqlite_rowid
+from ..database import sqlite_rowid
 
 
 def copy_rows_unmodified(

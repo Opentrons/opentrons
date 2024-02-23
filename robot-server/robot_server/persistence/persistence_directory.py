@@ -1,3 +1,6 @@
+"""Create or reset the server's persistence directory."""
+
+
 from pathlib import Path
 from logging import getLogger
 from shutil import rmtree

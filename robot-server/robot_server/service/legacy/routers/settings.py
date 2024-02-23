@@ -53,7 +53,10 @@ from robot_server.service.legacy.models.settings import (
     Links,
     AdvancedSetting,
 )
-from robot_server.persistence import PersistenceResetter, get_persistence_resetter
+from robot_server.persistence.fastapi_dependencies import (
+    get_persistence_resetter,
+)
+from robot_server.persistence.persistence_directory import PersistenceResetter
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 log = logging.getLogger(__name__)

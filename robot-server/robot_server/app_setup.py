@@ -19,7 +19,10 @@ from .hardware import (
     fbl_start_blinking,
     fbl_clean_up,
 )
-from .persistence import start_initializing_persistence, clean_up_persistence
+from .persistence.fastapi_dependencies import (
+    start_initializing_persistence,
+    clean_up_persistence,
+)
 from .router import router
 from .service import initialize_logging
 from .service.task_runner import (
