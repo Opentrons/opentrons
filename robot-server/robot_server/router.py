@@ -8,7 +8,7 @@ from .versioning import check_version_header
 from .commands.router import commands_router
 from .deck_configuration.router import router as deck_configuration_router
 from .health.router import health_router
-from .instruments import instruments_router
+from .instruments.router import instruments_router
 from .maintenance_runs.router import maintenance_runs_router
 from .modules import modules_router
 from .protocols.router import protocols_router
