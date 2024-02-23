@@ -1,5 +1,6 @@
-import { WellGroup } from '@opentrons/components'
+import { COLORS } from '@opentrons/components'
 
+import type { WellGroup } from '@opentrons/components'
 import type { LabwareByLiquidId } from '@opentrons/components/src/hardware-sim/ProtocolDeck/types'
 import type { Liquid } from '@opentrons/shared-data'
 
@@ -22,6 +23,40 @@ export function getWellFillFromLabwareId(
         } = {}
         Object.keys(labware.volumeByWell).forEach(key => {
           wellFill[key] = liquid?.displayColor ?? ''
+        })
+        labwareWellFill = { ...labwareWellFill, ...wellFill }
+      }
+    })
+  })
+  return labwareWellFill
+}
+
+export function getDisabledWellFillFromLabwareId(
+  labwareId: string,
+  liquidsInLoadOrder: Liquid[],
+  labwareByLiquidId: LabwareByLiquidId,
+  selectedLabwareId?: string
+): { [well: string]: string } {
+  let labwareWellFill: { [well: string]: string } = {}
+  const liquidIds = Object.keys(labwareByLiquidId)
+  const labwareInfo = Object.values(labwareByLiquidId)
+
+  labwareInfo.forEach((labwareArray, index) => {
+    labwareArray.forEach(labware => {
+      if (labware.labwareId === labwareId) {
+        const liquidId = liquidIds[index]
+        const liquid = liquidsInLoadOrder.find(liquid => liquid.id === liquidId)
+        const wellFill: {
+          [well: string]: string
+        } = {}
+        Object.keys(labware.volumeByWell).forEach(key => {
+          if (liquidId === selectedLabwareId) {
+            wellFill[key] = liquid?.displayColor ?? ''
+          } else {
+            wellFill[key] =
+              // apply 40% opacity to disabled wells
+              `${liquid?.displayColor}${COLORS.opacity40HexCode}` ?? ''
+          }
         })
         labwareWellFill = { ...labwareWellFill, ...wellFill }
       }
