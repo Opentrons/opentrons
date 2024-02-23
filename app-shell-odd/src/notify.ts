@@ -115,24 +115,21 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
   // true if the connection store has an entry for the hostname.
   else {
     const subscriptions = connectionStore[hostname]?.subscriptions
-    if (subscriptions && subscriptions[topic] > 0) {
-      subscriptions[topic] += 1
-      return Promise.resolve()
-    } else {
-      if (subscriptions) {
-        subscriptions[topic] = 1
-      }
-      return new Promise<void>(() => checkIfClientConnected()).catch(() => {
-        log.warn(`Failed to subscribe on ${hostname} to topic: ${topic}`)
-        sendToBrowserDeserialized({
-          browserWindow,
-          hostname,
-          topic,
-          message: 'ECONNFAILED',
-        })
-        handleDecrementSubscriptionCount(hostname, topic)
-      })
+    if (subscriptions) {
+      if (subscriptions[topic] > 0) subscriptions[topic] += 1
+      else subscriptions[topic] = 1
     }
+
+    return checkIfClientConnected().catch(() => {
+      log.warn(`Failed to subscribe on ${hostname} to topic: ${topic}`)
+      sendToBrowserDeserialized({
+        browserWindow,
+        hostname,
+        topic,
+        message: 'ECONNFAILED',
+      })
+      handleDecrementSubscriptionCount(hostname, topic)
+    })
   }
 
   function subscribeCb(error: Error, result: mqtt.ISubscriptionGrant[]): void {
@@ -151,36 +148,38 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
   }
 
   // Check every 500ms for 2 seconds before failing.
-  function checkIfClientConnected(): void {
-    const MAX_RETRIES = 4
-    let counter = 0
-    const intervalId = setInterval(() => {
-      const client = connectionStore[hostname]?.client
-      if (client != null) {
-        clearInterval(intervalId)
-        new Promise<void>(() =>
-          client.subscribe(topic, subscribeOptions, subscribeCb)
-        )
-          .then(() => Promise.resolve())
-          .catch(() =>
-            Promise.reject(
-              new Error(
-                `Maximum number of subscription retries reached for hostname: ${hostname}`
+  function checkIfClientConnected(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      const MAX_RETRIES = 4
+      let counter = 0
+      const intervalId = setInterval(() => {
+        const client = connectionStore[hostname]?.client
+        if (client != null) {
+          clearInterval(intervalId)
+          new Promise<void>(() =>
+            client.subscribe(topic, subscribeOptions, subscribeCb)
+          )
+            .then(() => resolve())
+            .catch(() =>
+              reject(
+                new Error(
+                  `Maximum number of subscription retries reached for hostname: ${hostname}`
+                )
               )
             )
-          )
-      }
+        }
 
-      counter++
-      if (counter === MAX_RETRIES) {
-        clearInterval(intervalId)
-        Promise.reject(
-          new Error(
-            `Maximum number of subscription retries reached for hostname: ${hostname}`
+        counter++
+        if (counter === MAX_RETRIES) {
+          clearInterval(intervalId)
+          reject(
+            new Error(
+              `Maximum number of subscription retries reached for hostname: ${hostname}`
+            )
           )
-        )
-      }
-    }, 500)
+        }
+      }, 500)
+    })
   }
 }
 
