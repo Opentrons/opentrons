@@ -1,23 +1,15 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-
-import { renderWithProviders } from '@opentrons/components'
-
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { i18n } from '../../../i18n'
 import {
   getIsHeaterShakerAttached,
   updateConfigValue,
 } from '../../../redux/config'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { ShowHeaterShakerAttachmentModal } from '../ShowHeaterShakerAttachmentModal'
 
-jest.mock('../../../redux/config')
-
-const mockGetIsHeaterShakerAttached = getIsHeaterShakerAttached as jest.MockedFunction<
-  typeof getIsHeaterShakerAttached
->
-const mockUpdateConfigValue = updateConfigValue as jest.MockedFunction<
-  typeof updateConfigValue
->
+vi.mock('../../../redux/config')
 
 const render = () => {
   return renderWithProviders(<ShowHeaterShakerAttachmentModal />, {
@@ -27,7 +19,7 @@ const render = () => {
 
 describe('ShowHeaterShakerAttachmentModal', () => {
   beforeEach(() => {
-    mockGetIsHeaterShakerAttached.mockReturnValue(true)
+    vi.mocked(getIsHeaterShakerAttached).mockReturnValue(true)
   })
 
   it('renders the toggle button on when showing heater shaker modal as false', () => {
@@ -43,7 +35,7 @@ describe('ShowHeaterShakerAttachmentModal', () => {
   })
 
   it('renders the toggle button on when showing heater shaker modal as true', () => {
-    mockGetIsHeaterShakerAttached.mockReturnValue(false)
+    vi.mocked(getIsHeaterShakerAttached).mockReturnValue(false)
     render()
     const toggleButton = screen.getByRole('switch', {
       name: 'show_heater_shaker_modal',
@@ -57,7 +49,7 @@ describe('ShowHeaterShakerAttachmentModal', () => {
       name: 'show_heater_shaker_modal',
     })
     fireEvent.click(toggleButton)
-    expect(mockUpdateConfigValue).toHaveBeenCalledWith(
+    expect(vi.mocked(updateConfigValue)).toHaveBeenCalledWith(
       'modules.heaterShaker.isAttached',
       false
     )

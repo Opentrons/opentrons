@@ -74,15 +74,18 @@ const mock96ChannelData = {
     },
   },
 }
-vi.mock('@opentrons/react-api-client', async (importOriginal) => {
+vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = await importOriginal<typeof ReactApiClient>()
   return {
     ...actual,
-    useInstrumentsQuery: vi.fn(() => ({
-      data: {
-        data: [mockLeftPipetteData, mockRightPipetteData, mockGripperData],
-      },
-    } as any))
+    useInstrumentsQuery: vi.fn(
+      () =>
+        ({
+          data: {
+            data: [mockLeftPipetteData, mockRightPipetteData, mockGripperData],
+          },
+        } as any)
+    ),
   }
 })
 vi.mock('../../../organisms/GripperWizardFlows')
@@ -153,19 +156,25 @@ describe('InstrumentsDashboard', () => {
     screen.getByText(mockGripperData.serialNumber)
   })
   it('should open choose pipette to attach to left mount when empty and clicked', () => {
-    vi.mocked(useInstrumentsQuery).mockReturnValue({ data: { data: [] } } as any)
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
+      data: { data: [] },
+    } as any)
     render()
     fireEvent.click(screen.getByText('left Mount'))
     expect(vi.mocked(ChoosePipette)).toHaveBeenCalled()
   })
   it('should open choose pipette to attach to right mount when empty and clicked', () => {
-    vi.mocked(useInstrumentsQuery).mockReturnValue({ data: { data: [] } } as any)
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
+      data: { data: [] },
+    } as any)
     render()
     fireEvent.click(screen.getByText('right Mount'))
     expect(vi.mocked(ChoosePipette)).toHaveBeenCalled()
   })
   it('should open attach gripper wizard when extension mount item empty and clicked', () => {
-    vi.mocked(useInstrumentsQuery).mockReturnValue({ data: { data: [] } } as any)
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
+      data: { data: [] },
+    } as any)
     render()
     fireEvent.click(screen.getByText('extension Mount'))
     expect(vi.mocked(GripperWizardFlows)).toHaveBeenCalled()

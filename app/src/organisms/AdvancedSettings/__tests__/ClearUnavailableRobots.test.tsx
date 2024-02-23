@@ -1,10 +1,7 @@
 import * as React from 'react'
-import { screen, fireEvent } from '@testing-library/react'
-
-import {
-  renderWithProviders,
-  useConditionalConfirm,
-} from '@opentrons/components'
+import { screen, fireEvent, waitFor } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { useConditionalConfirm } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import {
   getReachableRobots,
@@ -14,20 +11,26 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { ClearUnavailableRobots } from '../ClearUnavailableRobots'
+import type * as OpentronsComponents from '@opentrons/components'
 
-jest.mock('@opentrons/components/src/hooks')
-jest.mock('../../../redux/discovery')
+const mockConfirm = vi.fn()
+const mockCancel = vi.fn()
 
-const mockGetUnreachableRobots = getUnreachableRobots as jest.MockedFunction<
-  typeof getUnreachableRobots
->
-const mockGetReachableRobots = getReachableRobots as jest.MockedFunction<
-  typeof getReachableRobots
->
-const mockUseConditionalConfirm = useConditionalConfirm as jest.MockedFunction<
-  typeof useConditionalConfirm
->
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof OpentronsComponents>()
+  return {
+    ...actual,
+    useConditionalConfirm: vi.fn(() => ({
+      confirm: mockConfirm,
+      showConfirmation: true,
+      cancel: mockCancel,
+    })),
+  }
+})
+
+vi.mock('../../../redux/discovery')
 
 const render = () => {
   return renderWithProviders(<ClearUnavailableRobots />, {
@@ -35,21 +38,16 @@ const render = () => {
   })
 }
 
-const mockConfirm = jest.fn()
-const mockCancel = jest.fn()
-
 describe('ClearUnavailableRobots', () => {
   beforeEach(() => {
-    mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
-    mockGetReachableRobots.mockReturnValue([mockReachableRobot])
-    mockUseConditionalConfirm.mockReturnValue({
+    vi.mocked(getUnreachableRobots).mockReturnValue([mockUnreachableRobot])
+    vi.mocked(getReachableRobots).mockReturnValue([mockReachableRobot])
+    vi.mocked(useConditionalConfirm).mockReturnValue({
       confirm: mockConfirm,
       showConfirmation: true,
       cancel: mockCancel,
     })
   })
-
-  afterEach(() => {})
 
   it('should render text and button', () => {
     render()
@@ -69,7 +67,8 @@ describe('ClearUnavailableRobots', () => {
         name: 'Clear unavailable robots list',
       })
     )
-    screen.getByText('Clear unavailable robots?')
+
+    screen.getByText('Clear unavailable robots')
     screen.getByText(
       'Clearing the list of unavailable robots on the Devices page cannot be undone.'
     )

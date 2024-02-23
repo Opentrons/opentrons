@@ -1,22 +1,15 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { i18n } from '../../../i18n'
-import { renderWithProviders } from '@opentrons/components'
 import {
   getIsLabwareOffsetCodeSnippetsOn,
   updateConfigValue,
 } from '../../../redux/config'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { ShowLabwareOffsetSnippets } from '../ShowLabwareOffsetSnippets'
 
-jest.mock('../../../redux/config')
-
-const mockGetIsLabwareOffsetCodeSnippetsOn = getIsLabwareOffsetCodeSnippetsOn as jest.MockedFunction<
-  typeof getIsLabwareOffsetCodeSnippetsOn
->
-const mockUpdateConfigValue = updateConfigValue as jest.MockedFunction<
-  typeof updateConfigValue
->
+vi.mock('../../../redux/config')
 
 const render = () => {
   return (
@@ -29,7 +22,7 @@ const render = () => {
 
 describe('ShowLabwareOffsetSnippets', () => {
   beforeEach(() => {
-    mockGetIsLabwareOffsetCodeSnippetsOn.mockReturnValue(true)
+    vi.mocked(getIsLabwareOffsetCodeSnippetsOn).mockReturnValue(true)
   })
   it('renders the display show link to get labware offset data section', () => {
     render()
@@ -46,7 +39,7 @@ describe('ShowLabwareOffsetSnippets', () => {
       name: 'show_link_to_get_labware_offset_data',
     })
     fireEvent.click(toggleButton)
-    expect(mockUpdateConfigValue).toHaveBeenCalledWith(
+    expect(vi.mocked(updateConfigValue)).toHaveBeenCalledWith(
       'labware.showLabwareOffsetCodeSnippets',
       false
     )

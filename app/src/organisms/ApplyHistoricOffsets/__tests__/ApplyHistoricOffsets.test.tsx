@@ -1,24 +1,18 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
 import fixture_adapter from '@opentrons/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json'
 import fixture_96_wellplate from '@opentrons/shared-data/labware/definitions/2/opentrons_96_wellplate_200ul_pcr_full_skirt/1.json'
 import { i18n } from '../../../i18n'
-import { ApplyHistoricOffsets } from '..'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../redux/config'
 import { getLabwareDefinitionsFromCommands } from '../../LabwarePositionCheck/utils/labware'
+import { ApplyHistoricOffsets } from '..'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { OffsetCandidate } from '../hooks/useOffsetCandidatesForAnalysis'
-import { fireEvent, screen } from '@testing-library/react'
 
-jest.mock('../../../redux/config')
-jest.mock('../../LabwarePositionCheck/utils/labware')
-
-const mockGetIsLabwareOffsetCodeSnippetsOn = getIsLabwareOffsetCodeSnippetsOn as jest.MockedFunction<
-  typeof getIsLabwareOffsetCodeSnippetsOn
->
-const mockGetLabwareDefinitionsFromCommands = getLabwareDefinitionsFromCommands as jest.MockedFunction<
-  typeof getLabwareDefinitionsFromCommands
->
+vi.mock('../../../redux/config')
+vi.mock('../../LabwarePositionCheck/utils/labware')
 
 const mockLabwareDef = fixture_96_wellplate as LabwareDefinition2
 const mockAdapterDef = fixture_adapter as LabwareDefinition2
@@ -87,10 +81,6 @@ describe('ApplyHistoricOffsets', () => {
       { i18nInstance: i18n }
     )
 
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('renders correct copy when shouldApplyOffsets is true', () => {
     render()
     screen.getByText('Apply labware offset data')
@@ -104,7 +94,7 @@ describe('ApplyHistoricOffsets', () => {
   })
 
   it('renders view data modal when link clicked, with correct copy and table row for each candidate', () => {
-    mockGetLabwareDefinitionsFromCommands.mockReturnValue([
+    vi.mocked(getLabwareDefinitionsFromCommands).mockReturnValue([
       mockLabwareDef,
       mockAdapterDef,
     ])
@@ -167,11 +157,11 @@ describe('ApplyHistoricOffsets', () => {
   })
 
   it('renders tabbed offset data with snippets when config option is selected', () => {
-    mockGetLabwareDefinitionsFromCommands.mockReturnValue([
+    vi.mocked(getLabwareDefinitionsFromCommands).mockReturnValue([
       mockLabwareDef,
       mockAdapterDef,
     ])
-    mockGetIsLabwareOffsetCodeSnippetsOn.mockReturnValue(true)
+    vi.mocked(getIsLabwareOffsetCodeSnippetsOn).mockReturnValue(true)
     render()
     const viewDataButton = screen.getByText('View data')
     fireEvent.click(viewDataButton)

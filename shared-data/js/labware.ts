@@ -555,6 +555,7 @@ export {
   fixtureTiprack300ul,
   fixtureTiprack1000ul,
   fixtureTiprackAdapter,
+  opentrons96PcrAdapterV1,
   opentrons1Trash3200MlFixedV1,
 }
 

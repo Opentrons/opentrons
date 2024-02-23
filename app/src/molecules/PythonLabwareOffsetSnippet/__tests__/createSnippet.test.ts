@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { transfer_settings } from '@opentrons/shared-data/protocol/fixtures/6'
+import { transfer_settings } from '@opentrons/shared-data'
 import { ModuleModel, CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import { createSnippet } from '../createSnippet'
 
