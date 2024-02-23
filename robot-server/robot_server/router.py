@@ -20,7 +20,7 @@ from .service.pipette_offset.router import router as pip_os_router
 from .service.session.router import router as deprecated_session_router
 from .service.tip_length.router import router as tl_router
 from .subsystems.router import subsystems_router
-from .system import system_router
+from .system.router import system_router
 
 router = APIRouter()
 
