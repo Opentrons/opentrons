@@ -3,9 +3,11 @@ from typing import Dict
 
 import graphviz as gv
 import robot_server.service.session.session_types
-from robot_server.robot.calibration.check.session import (
+from robot_server.robot.calibration.check.constants import (
     CalibrationCheckState,
-    CHECK_TRANSITIONS,
+)
+from robot_server.robot.calibration.check.state_machine import (
+    CALIBRATION_CHECK_TRANSITIONS as CHECK_TRANSITIONS,
 )
 from robot_server.robot.calibration.tip_length.constants import TipCalibrationState
 from robot_server.robot.calibration.tip_length.state_machine import (
@@ -174,7 +176,8 @@ def build_argparser(parent: argparse.ArgumentParser = None) -> argparse.Argument
         metavar="SESSION",
         choices=[
             "calibration_check",
-            "tip_length_calibration" "deck_calibration",
+            "tip_length_calibration",
+            "deck_calibration",
             "pipette_offset_calibration",
         ],
         help="The session to check",
