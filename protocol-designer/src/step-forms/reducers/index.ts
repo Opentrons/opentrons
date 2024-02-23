@@ -57,6 +57,7 @@ import {
   _getPipetteEntitiesRootState,
   _getLabwareEntitiesRootState,
   _getInitialDeckSetupRootState,
+  _getAdditionalEquipmentEntitiesRootState,
 } from '../selectors'
 import {
   CreateDeckFixtureAction,
@@ -190,6 +191,9 @@ export const unsavedForm = (
         orderedStepIds: rootState.orderedStepIds,
         initialDeckSetup: _getInitialDeckSetupRootState(rootState),
         robotStateTimeline: action.meta.robotStateTimeline,
+        additionalEquipmentEntities: _getAdditionalEquipmentEntitiesRootState(
+          rootState
+        ),
       })
     }
 
@@ -1420,6 +1424,14 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
                   stepForm.blowout_location?.includes('trashBin'))
             )
           : null
+      const mixStepTrashBin =
+        savedStepForms != null
+          ? Object.values(savedStepForms).find(
+              stepForm =>
+                stepForm.stepType === 'mix' &&
+                stepForm.dropTip_location.includes('trashBin')
+            )
+          : null
 
       let trashBinId: string | null = null
       if (moveLiquidStepTrashBin != null) {
@@ -1438,6 +1450,8 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
         ) {
           trashBinId = moveLiquidStepTrashBin.blowOut_location
         }
+      } else if (mixStepTrashBin != null) {
+        trashBinId = mixStepTrashBin.dropTip_location
       }
 
       const trashCutoutId =
@@ -1518,6 +1532,19 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
           }
         : {}
 
+      const hardcodedTrashBinId = `${uuid()}:fixedTrash`
+      const hardcodedTrashBin = {
+        [hardcodedTrashBinId]: {
+          name: 'trashBin' as const,
+          id: hardcodedTrashBinId,
+          location: getCutoutIdByAddressableArea(
+            'fixedTrash' as AddressableAreaName,
+            'fixedTrashSlot',
+            OT2_ROBOT_TYPE
+          ),
+        },
+      }
+
       if (isFlex) {
         return {
           ...state,
@@ -1527,7 +1554,14 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
           ...stagingAreas,
         }
       } else {
-        return { ...state, ...trashBin }
+        if (trashBin != null) {
+          return { ...state, ...trashBin }
+        } else {
+          //  when importing an OT-2 protocol, ensure that there is always a trashBin
+          //  entity created even when the protocol does not have a command that involves
+          //  the trash. Since no trash for OT-2 is not supported
+          return { ...state, ...hardcodedTrashBin }
+        }
       }
     },
 

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
-
+import { screen, fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 
@@ -81,34 +81,34 @@ describe('SetupTipLengthCalibrationButton', () => {
   })
 
   it('renders the calibrate now button if tip length not calibrated', () => {
-    const { getByRole } = render()
-    expect(getByRole('button', { name: 'Calibrate now' })).toBeTruthy()
+    render()
+    expect(screen.getByRole('button', { name: 'Calibrate now' })).toBeTruthy()
   })
 
   it('renders the recalibrate link if tip length calibrated and run unstarted', () => {
-    const { getByText } = render({ hasCalibrated: true })
-    expect(getByText('Recalibrate')).toBeTruthy()
+    render({ hasCalibrated: true })
+    expect(screen.getByText('Recalibrate')).toBeTruthy()
   })
 
   it('button launches the tip length calibration wizard when clicked - no calibration', () => {
-    const { getByText } = render()
-    const calibrateBtn = getByText('Calibrate now')
-    calibrateBtn.click()
+    render()
+    const calibrateBtn = screen.getByText('Calibrate now')
+    fireEvent.click(calibrateBtn)
     expect(mockTipLengthCalLauncher).toHaveBeenCalled()
   })
 
   it('button launches the tip length calibration wizard when clicked - recalibration', () => {
     const { getByText } = render({ hasCalibrated: true })
     const recalibrateBtn = getByText('Recalibrate')
-    recalibrateBtn.click()
+    fireEvent.click(recalibrateBtn)
     expect(mockTipLengthCalLauncher).toHaveBeenCalled()
   })
 
   it('disables the recalibrate link if tip length calibrated and run started', () => {
     when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
-    const { getByText } = render({ hasCalibrated: true })
-    const recalibrate = getByText('Recalibrate')
-    recalibrate.click()
+    render({ hasCalibrated: true })
+    const recalibrate = screen.getByText('Recalibrate')
+    fireEvent.click(recalibrate)
     expect(mockTipLengthCalLauncher).not.toBeCalled()
   })
 })

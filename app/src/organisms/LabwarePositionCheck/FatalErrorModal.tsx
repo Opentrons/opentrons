@@ -52,7 +52,7 @@ export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
           <Icon
             name="ot-alert"
             size="2.5rem"
-            color={COLORS.errorEnabled}
+            color={COLORS.red50}
             aria-label="alert"
           />
           <ErrorHeader>

@@ -7,7 +7,7 @@ import { Provider } from 'react-redux'
 import { render, RenderResult } from '@testing-library/react'
 import { createStore } from 'redux'
 
-import type { Store } from 'redux'
+import type { PreloadedState, Store } from 'redux'
 import type { RenderOptions } from '@testing-library/react'
 
 export interface RenderWithProvidersOptions<State> extends RenderOptions {
@@ -20,11 +20,14 @@ export function renderWithProviders<State>(
   options?: RenderWithProvidersOptions<State>
 ): [RenderResult, Store<State>] {
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  const { initialState = {} as State, i18nInstance = null } = options || {}
+  const { initialState = {}, i18nInstance = null } = options || {}
 
-  const store: Store<State> = createStore(jest.fn(), initialState)
+  const store: Store<State> = createStore(
+    jest.fn(),
+    initialState as PreloadedState<State>
+  )
   store.dispatch = jest.fn()
-  store.getState = jest.fn(() => initialState)
+  store.getState = jest.fn(() => initialState) as () => State
 
   const queryClient = new QueryClient()
 

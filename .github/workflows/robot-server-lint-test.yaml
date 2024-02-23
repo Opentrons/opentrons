@@ -14,7 +14,6 @@ on:
       - 'server-utils/**/*'
       - '!shared-data/js/**/*'
       - 'robot-server/**/*'
-      - 'notify-server/**/*'
       - 'scripts/**/*.mk'
       - 'scripts/**/*.py'
       - '.github/workflows/robot-server-lint-test.yaml'
@@ -34,7 +33,6 @@ on:
       - 'server-utils/**/*'
       - '!shared-data/js/**/*'
       - 'robot-server/**/*'
-      - 'notify-server/**/*'
       - 'scripts/**/*.mk'
       - 'scripts/**/*.py'
       - '.github/workflows/robot-server-lint-test.yaml'
@@ -63,7 +61,7 @@ jobs:
           fetch-depth: 0
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '16'
+          node-version: '18.19.0'
       - uses: 'actions/setup-python@v4'
         with:
           python-version: '3.10'

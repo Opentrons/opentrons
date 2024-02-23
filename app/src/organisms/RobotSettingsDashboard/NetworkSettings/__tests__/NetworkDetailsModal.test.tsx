@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -67,13 +68,13 @@ describe('NetworkDetailsModal', () => {
 
   it('should call the mock function when tapping the close icon', () => {
     const [{ getByLabelText }] = render(props)
-    getByLabelText('closeIcon').click()
+    fireEvent.click(getByLabelText('closeIcon'))
     expect(mockFn).toHaveBeenCalled()
   })
 
   it('should call the mock function when tapping outside of the modal', () => {
     const [{ getByLabelText }] = render(props)
-    getByLabelText('BackgroundOverlay').click()
+    fireEvent.click(getByLabelText('BackgroundOverlay'))
     expect(mockFn).toHaveBeenCalled()
   })
 })

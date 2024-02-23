@@ -32,6 +32,8 @@ After you've created your labware, save it as a ``.json`` file and add it to the
 
 If other people need to use your custom labware definition, they must also add it to their Opentrons App.
 
+.. _loading-labware:
+
 ***************
 Loading Labware
 ***************
@@ -187,10 +189,12 @@ The API provides many different ways to access wells inside labware. Different m
 Accessing Individual Wells
 ==========================
 
+.. _well-dictionary-access:
+
 Dictionary Access
 -----------------
 
-The simplest way to refer to a single well is by its name, like A1 or D6. :py:meth:`.Labware.wells_by_name` accomplishes this. This is such a common task that the API also has an equivalent shortcut: dictionary indexing.
+The simplest way to refer to a single well is by its :py:obj:`.well_name`, like A1 or D6. Referencing a particular key in the result of :py:meth:`.Labware.wells_by_name` accomplishes this. This is such a common task that the API also has an equivalent shortcut: dictionary indexing.
 
 .. code-block:: python
 

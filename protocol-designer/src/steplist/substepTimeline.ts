@@ -244,10 +244,6 @@ export const substepTimelineMultiChannel = (
           numChannels = 96
         } else if (nozzles === COLUMN) {
           numChannels = 8
-        } else {
-          console.error(
-            'we currently do not support other 96-channel configurations'
-          )
         }
         const wellsForTips =
           numChannels &&

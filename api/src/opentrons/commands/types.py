@@ -7,6 +7,8 @@ from opentrons.hardware_control.modules import ThermocyclerStep
 if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext
     from opentrons.protocol_api.labware import Well
+    from opentrons.protocol_api._trash_bin import TrashBin
+    from opentrons.protocol_api._waste_chute import WasteChute
 
 from opentrons.types import Location
 
@@ -21,22 +23,27 @@ HOME: Final = "command.HOME"
 PAUSE: Final = "command.PAUSE"
 RESUME: Final = "command.RESUME"
 COMMENT: Final = "command.COMMENT"
+MOVE_LABWARE: Final = "command.MOVE_LABWARE"
 
 # Pipette #
 
 ASPIRATE: Final = "command.ASPIRATE"
 DISPENSE: Final = "command.DISPENSE"
+DISPENSE_IN_DISPOSAL_LOCATION: Final = "command.DISPENSE_IN_DISPOSAL_LOCATION"
 MIX: Final = "command.MIX"
 CONSOLIDATE: Final = "command.CONSOLIDATE"
 DISTRIBUTE: Final = "command.DISTRIBUTE"
 TRANSFER: Final = "command.TRANSFER"
 PICK_UP_TIP: Final = "command.PICK_UP_TIP"
 DROP_TIP: Final = "command.DROP_TIP"
+DROP_TIP_IN_DISPOSAL_LOCATION: Final = "command.DROP_TIP_IN_DISPOSAL_LOCATION"
 BLOW_OUT: Final = "command.BLOW_OUT"
+BLOW_OUT_IN_DISPOSAL_LOCATION: Final = "command.BLOW_OUT_IN_DISPOSAL_LOCATION"
 AIR_GAP: Final = "command.AIR_GAP"
 TOUCH_TIP: Final = "command.TOUCH_TIP"
 RETURN_TIP: Final = "command.RETURN_TIP"
 MOVE_TO: Final = "command.MOVE_TO"
+MOVE_TO_DISPOSAL_LOCATION: Final = "command.MOVE_TO_DISPOSAL_LOCATION"
 
 # Modules #
 
@@ -372,6 +379,19 @@ class DispenseCommand(TypedDict):
     payload: AspirateDispenseCommandPayload
 
 
+class DispenseInDisposalLocationCommandPayload(
+    TextOnlyPayload, SingleInstrumentPayload
+):
+    location: Union[TrashBin, WasteChute]
+    volume: float
+    rate: float
+
+
+class DispenseInDisposalLocationCommand(TypedDict):
+    name: Literal["command.DISPENSE_IN_DISPOSAL_LOCATION"]
+    payload: DispenseInDisposalLocationCommandPayload
+
+
 class ConsolidateCommandPayload(
     TextOnlyPayload, MultiLocationPayload, SingleInstrumentPayload
 ):
@@ -431,6 +451,15 @@ class BlowOutCommand(TypedDict):
     payload: BlowOutCommandPayload
 
 
+class BlowOutInDisposalLocationCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
+    location: Union[TrashBin, WasteChute]
+
+
+class BlowOutInDisposalLocationCommand(TypedDict):
+    name: Literal["command.BLOW_OUT_IN_DISPOSAL_LOCATION"]
+    payload: BlowOutInDisposalLocationCommandPayload
+
+
 class TouchTipCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
     pass
 
@@ -476,27 +505,57 @@ class DropTipCommand(TypedDict):
     payload: DropTipCommandPayload
 
 
-class MoveToCommand(TypedDict):
-    name: Literal["command.MOVE_TO"]
-    payload: MoveToCommandPayload
+class DropTipInDisposalLocationCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
+    location: Union[TrashBin, WasteChute]
+
+
+class DropTipInDisposalLocationCommand(TypedDict):
+    name: Literal["command.DROP_TIP_IN_DISPOSAL_LOCATION"]
+    payload: DropTipInDisposalLocationCommandPayload
 
 
 class MoveToCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
     location: Location
 
 
+class MoveToCommand(TypedDict):
+    name: Literal["command.MOVE_TO"]
+    payload: MoveToCommandPayload
+
+
+class MoveToDisposalLocationCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
+    location: Union[TrashBin, WasteChute]
+
+
+class MoveToDisposalLocationCommand(TypedDict):
+    name: Literal["command.MOVE_TO_DISPOSAL_LOCATION"]
+    payload: MoveToDisposalLocationCommandPayload
+
+
+class MoveLabwareCommandPayload(TextOnlyPayload):
+    pass
+
+
+class MoveLabwareCommand(TypedDict):
+    name: Literal["command.MOVE_LABWARE"]
+    payload: MoveLabwareCommandPayload
+
+
 Command = Union[
     DropTipCommand,
+    DropTipInDisposalLocationCommand,
     PickUpTipCommand,
     ReturnTipCommand,
     AirGapCommand,
     TouchTipCommand,
     BlowOutCommand,
+    BlowOutInDisposalLocationCommand,
     MixCommand,
     TransferCommand,
     DistributeCommand,
     ConsolidateCommand,
     DispenseCommand,
+    DispenseInDisposalLocationCommand,
     AspirateCommand,
     HomeCommand,
     HeaterShakerSetTargetTemperatureCommand,
@@ -528,6 +587,8 @@ Command = Union[
     DelayCommand,
     CommentCommand,
     MoveToCommand,
+    MoveToDisposalLocationCommand,
+    MoveLabwareCommand,
 ]
 
 
@@ -556,14 +617,17 @@ CommandPayload = Union[
     AirGapCommandPayload,
     ReturnTipCommandPayload,
     DropTipCommandPayload,
+    DropTipInDisposalLocationCommandPayload,
     PickUpTipCommandPayload,
     TouchTipCommandPayload,
     BlowOutCommandPayload,
+    BlowOutInDisposalLocationCommandPayload,
     MixCommandPayload,
     TransferCommandPayload,
     DistributeCommandPayload,
     ConsolidateCommandPayload,
     AspirateDispenseCommandPayload,
+    DispenseInDisposalLocationCommandPayload,
     HomeCommandPayload,
     ThermocyclerExecuteProfileCommandPayload,
     ThermocyclerSetBlockTempCommandPayload,
@@ -572,6 +636,8 @@ CommandPayload = Union[
     PauseCommandPayload,
     DelayCommandPayload,
     MoveToCommandPayload,
+    MoveToDisposalLocationCommandPayload,
+    MoveLabwareCommandPayload,
 ]
 
 
@@ -588,7 +654,19 @@ class MoveToMessage(CommandMessageFields, MoveToCommand):
     pass
 
 
+class MoveToDisposalLocationMessage(
+    CommandMessageFields, MoveToDisposalLocationCommand
+):
+    pass
+
+
 class DropTipMessage(CommandMessageFields, DropTipCommand):
+    pass
+
+
+class DropTipInDisposalLocationMessage(
+    CommandMessageFields, DropTipInDisposalLocationCommand
+):
     pass
 
 
@@ -612,6 +690,12 @@ class BlowOutMessage(CommandMessageFields, BlowOutCommand):
     pass
 
 
+class BlowOutInDisposalLocationMessage(
+    CommandMessageFields, BlowOutInDisposalLocationCommand
+):
+    pass
+
+
 class MixMessage(CommandMessageFields, MixCommand):
     pass
 
@@ -629,6 +713,12 @@ class ConsolidateMessage(CommandMessageFields, ConsolidateCommand):
 
 
 class DispenseMessage(CommandMessageFields, DispenseCommand):
+    pass
+
+
+class DispenseInDisposalLocationMessage(
+    CommandMessageFields, DispenseInDisposalLocationCommand
+):
     pass
 
 
@@ -784,18 +874,25 @@ class CommentMessage(CommandMessageFields, CommentCommand):
     pass
 
 
+class MoveLabwareMessage(CommandMessageFields, MoveLabwareCommand):
+    pass
+
+
 CommandMessage = Union[
     DropTipMessage,
+    DropTipInDisposalLocationMessage,
     PickUpTipMessage,
     ReturnTipMessage,
     AirGapMessage,
     TouchTipMessage,
     BlowOutMessage,
+    BlowOutInDisposalLocationMessage,
     MixMessage,
     TransferMessage,
     DistributeMessage,
     ConsolidateMessage,
     DispenseMessage,
+    DispenseInDisposalLocationMessage,
     AspirateMessage,
     HomeMessage,
     HeaterShakerSetTargetTemperatureMessage,
@@ -826,4 +923,6 @@ CommandMessage = Union[
     PauseMessage,
     ResumeMessage,
     MoveToMessage,
+    MoveToDisposalLocationMessage,
+    MoveLabwareMessage,
 ]

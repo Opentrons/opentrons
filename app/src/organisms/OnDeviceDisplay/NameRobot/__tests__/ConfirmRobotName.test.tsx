@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -45,7 +46,7 @@ describe('ConfirmRobotName', () => {
   it('when tapping a button, call a mock function', () => {
     const [{ getByText }] = render(props)
     const button = getByText('Finish setup')
-    button.click()
+    fireEvent.click(button)
     expect(mockPush).toBeCalledWith('/dashboard')
   })
 })

@@ -24,7 +24,8 @@ export const makeSingleEditFieldProps = (
   focusHandlers: FocusHandlers,
   formData: FormData,
   handleChangeFormInput: (name: string, value: unknown) => void,
-  hydratedForm: { [key: string]: any } //  TODO: create real HydratedFormData type
+  hydratedForm: { [key: string]: any }, //  TODO: create real HydratedFormData type
+  t: any
 ): FieldPropsByName => {
   const { dirtyFields, blur, focusedField, focus } = focusHandlers
   const fieldNames: string[] = Object.keys(
@@ -56,10 +57,11 @@ export const makeSingleEditFieldProps = (
       focus(name)
     }
 
-    const defaultTooltip = getFieldDefaultTooltip(name)
+    const defaultTooltip = getFieldDefaultTooltip(name, t)
     const disabledTooltip = getSingleSelectDisabledTooltip(
       name,
-      formData.stepType
+      formData.stepType,
+      t
     )
     const fieldProps: FieldProps = {
       disabled,

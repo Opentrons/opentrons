@@ -1,13 +1,14 @@
-from typing import Any, Dict
+from typing import Any, Dict, cast
 
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from _pytest.fixtures import SubRequest
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from opentrons.config.advanced_settings import _migrate, _ensure
 
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 29
+    return 30
 
 
 # make sure to set a boolean value in default_file_settings only if
@@ -27,7 +28,6 @@ def default_file_settings() -> Dict[str, Any]:
         "disableStallDetection": None,
         "disableStatusBar": None,
         "disableOverpressureDetection": None,
-        "disableTipPresenceDetection": None,
         "estopNotRequired": None,
     }
 
@@ -359,6 +359,13 @@ def v29_config(v28_config: Dict[str, Any]) -> Dict[str, Any]:
     return r
 
 
+@pytest.fixture
+def v30_config(v29_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = {k: v for k, v in v29_config.items() if k != "disableTipPresenceDetection"}
+    r["_version"] = 30
+    return r
+
+
 @pytest.fixture(
     scope="session",
     params=[
@@ -393,10 +400,11 @@ def v29_config(v28_config: Dict[str, Any]) -> Dict[str, Any]:
         lazy_fixture("v27_config"),
         lazy_fixture("v28_config"),
         lazy_fixture("v29_config"),
+        lazy_fixture("v30_config"),
     ],
 )
-def old_settings(request: pytest.FixtureRequest) -> Dict[str, Any]:
-    return request.param  # type: ignore[attr-defined, no-any-return]
+def old_settings(request: SubRequest) -> Dict[str, Any]:
+    return cast(Dict[str, Any], request.param)
 
 
 def test_migrations(
@@ -483,6 +491,5 @@ def test_ensures_config() -> None:
         "disableStallDetection": None,
         "disableStatusBar": None,
         "estopNotRequired": None,
-        "disableTipPresenceDetection": None,
         "disableOverpressureDetection": None,
     }

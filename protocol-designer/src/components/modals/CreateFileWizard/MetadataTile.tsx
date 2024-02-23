@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { i18n } from '../../../localization'
+import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -19,21 +19,14 @@ import { HandleEnter } from './HandleEnter'
 import type { WizardTileProps } from './types'
 
 export function MetadataTile(props: WizardTileProps): JSX.Element {
-  const {
-    handleChange,
-    handleBlur,
-    values,
-    goBack,
-    proceed,
-    errors,
-    touched,
-  } = props
+  const { t } = useTranslation(['modal', 'application'])
+  const { formState, goBack, proceed, register, watch } = props
+  const fields = watch('fields')
+  const name = fields.name
 
-  const disableProceed =
-    values.fields.name == null ||
-    values.fields.name === '' ||
-    !Boolean(touched?.fields?.name) ||
-    errors?.fields?.name != null
+  const { errors, touchedFields } = formState
+
+  const disableProceed = name == null || name === ''
 
   return (
     <HandleEnter onEnter={proceed} disabled={disableProceed}>
@@ -43,14 +36,10 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
           height="26rem"
           gridGap={SPACING.spacing24}
         >
-          <Text as="h2">
-            {i18n.t('modal.create_file_wizard.protocol_name_and_description')}
-          </Text>
+          <Text as="h2">{t('protocol_name_and_description')}</Text>
 
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-            <Text as="h4">
-              {i18n.t('modal.create_file_wizard.name_your_protocol')}
-            </Text>
+            <Text as="h4">{t('name_your_protocol')}</Text>
             <Flex
               flexDirection={DIRECTION_COLUMN}
               width="20rem"
@@ -58,20 +47,18 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
               gridGap={SPACING.spacing4}
             >
               <Text as="p" fontSize={TYPOGRAPHY.fontSizeP}>
-                {`${i18n.t('modal.create_file_wizard.protocol_name')} *`}
+                {`${t('protocol_name')} *`}
               </Text>
               <InputField
-                aria-label="MetadataTile_protocolName"
+                id="MetadataTile_protocolName"
                 autoFocus
-                name="fields.name"
-                value={values.fields.name}
-                onChange={handleChange}
-                onBlur={handleBlur}
+                register={register}
+                fieldName="fields.name"
                 error={
-                  touched?.fields?.name &&
-                  values.fields.name &&
-                  values.fields.name.length > 1
-                    ? errors?.fields?.name ?? null
+                  //  TODO(jr, 2/1/24): wire up errors for this field
+                  //  need to wire it up in the parent component
+                  touchedFields?.fields?.name && name && name.length > 1
+                    ? errors?.fields?.name?.message ?? null
                     : null
                 }
               />
@@ -79,23 +66,18 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
           </Flex>
 
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-            <Text as="h4">
-              {i18n.t('modal.create_file_wizard.add_optional_info')}
-            </Text>
+            <Text as="h4">{t('add_optional_info')}</Text>
             <Flex
               flexDirection={DIRECTION_COLUMN}
               width="30rem"
               gridGap={SPACING.spacing4}
             >
               <Text as="p" fontSize={TYPOGRAPHY.fontSizeP}>
-                {i18n.t('modal.create_file_wizard.description')}
+                {t('description')}
               </Text>
               <DescriptionField
                 aira-label="MetadataTile_descriptionField"
-                name="fields.description"
-                value={values.fields.description ?? ''}
-                onChange={handleChange}
-                onBlur={handleBlur}
+                {...register('fields.description')}
               />
             </Flex>
             <Flex
@@ -104,14 +86,12 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
               gridGap={SPACING.spacing4}
             >
               <Text as="p" fontSize={TYPOGRAPHY.fontSizeP}>
-                {i18n.t('modal.create_file_wizard.organization_or_author')}
+                {t('organization_or_author')}
               </Text>
               <InputField
                 aria-label="MetadataTile_orgOrAuth"
-                name="fields.organizationOrAuthor"
-                value={values.fields.organizationOrAuthor}
-                onChange={handleChange}
-                onBlur={handleBlur}
+                fieldName="fields.organizationOrAuthor"
+                register={register}
               />
             </Flex>
           </Flex>
@@ -123,7 +103,7 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
         >
           <GoBack onClick={() => goBack()} />
           <PrimaryButton onClick={() => proceed()} disabled={disableProceed}>
-            {i18n.t('application.next')}
+            {t('application:next')}
           </PrimaryButton>
         </Flex>
       </Flex>

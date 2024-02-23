@@ -20,6 +20,8 @@ const render = (
   })
 }
 
+const ROBOT_NAME = 'mockRobot'
+
 describe('RobotSettingsModuleCalibration', () => {
   let props: React.ComponentProps<typeof RobotSettingsModuleCalibration>
 
@@ -28,6 +30,7 @@ describe('RobotSettingsModuleCalibration', () => {
       attachedModules: mockFetchModulesSuccessActionPayloadModules,
       updateRobotStatus: jest.fn(),
       formattedPipetteOffsetCalibrations: [],
+      robotName: ROBOT_NAME,
     }
     mockModuleCalibrationItems.mockReturnValue(
       <div>mock ModuleCalibrationItems</div>

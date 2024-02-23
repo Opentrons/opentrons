@@ -112,18 +112,18 @@ export function FixtureListItem({
             ? t('location_conflict')
             : t('not_configured')
         }
-        backgroundColor={COLORS.warningBackgroundLight}
-        iconColor={COLORS.warningEnabled}
-        textColor={COLORS.warningText}
+        backgroundColor={COLORS.yellow30}
+        iconColor={COLORS.yellow60}
+        textColor={COLORS.yellow60}
       />
     )
   } else {
     statusLabel = (
       <StatusLabel
         status={t('configured')}
-        backgroundColor={COLORS.successBackgroundLight}
-        iconColor={COLORS.successEnabled}
-        textColor={COLORS.successText}
+        backgroundColor={COLORS.green30}
+        iconColor={COLORS.green60}
+        textColor={COLORS.green60}
       />
     )
   }
@@ -166,7 +166,7 @@ export function FixtureListItem({
       ) : null}
       <Box
         border={BORDERS.styleSolid}
-        borderColor={COLORS.medGreyEnabled}
+        borderColor={COLORS.grey30}
         borderWidth="1px"
         borderRadius={BORDERS.radiusSoftCorners}
         padding={SPACING.spacing16}
@@ -202,10 +202,10 @@ export function FixtureListItem({
               <Btn
                 marginLeft={SPACING.spacing16}
                 css={css`
-                  color: ${COLORS.blueEnabled};
+                  color: ${COLORS.blue50};
 
                   &:hover {
-                    color: ${COLORS.blueHover};
+                    color: ${COLORS.blue55};
                   }
                 `}
                 marginTop={SPACING.spacing4}

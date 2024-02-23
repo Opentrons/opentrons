@@ -80,6 +80,9 @@ class MoveToMaintenancePositionImplementation(
         ot3_api = ensure_ot3_hardware(
             self._hardware_api,
         )
+        # the 96-channel mount is disengaged during gripper calibration and
+        #  must be homed before the gantry position can be called
+        await ot3_api.prepare_for_mount_movement(Mount.LEFT)
         current_position_mount = await ot3_api.gantry_position(
             Mount.LEFT, critical_point=CriticalPoint.MOUNT
         )
@@ -99,6 +102,7 @@ class MoveToMaintenancePositionImplementation(
             Point(x=_ATTACH_POINT.x, y=_ATTACH_POINT.y, z=max_height_z_mount),
         ]
 
+        await ot3_api.prepare_for_mount_movement(Mount.LEFT)
         for movement in movement_points:
             await ot3_api.move_to(
                 mount=Mount.LEFT,

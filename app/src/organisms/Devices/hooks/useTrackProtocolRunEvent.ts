@@ -1,5 +1,6 @@
 import { useTrackEvent } from '../../../redux/analytics'
 import { useProtocolRunAnalyticsData } from './useProtocolRunAnalyticsData'
+import { useRobot } from './useRobot'
 
 interface ProtocolRunAnalyticsEvent {
   name: string
@@ -11,10 +12,15 @@ export type TrackProtocolRunEvent = (
 ) => void
 
 export function useTrackProtocolRunEvent(
-  runId: string | null
+  runId: string | null,
+  robotName: string
 ): { trackProtocolRunEvent: TrackProtocolRunEvent } {
   const trackEvent = useTrackEvent()
-  const { getProtocolRunAnalyticsData } = useProtocolRunAnalyticsData(runId)
+  const robot = useRobot(robotName)
+  const { getProtocolRunAnalyticsData } = useProtocolRunAnalyticsData(
+    runId,
+    robot
+  )
 
   const trackProtocolRunEvent: TrackProtocolRunEvent = ({
     name,

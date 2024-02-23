@@ -31,7 +31,7 @@ describe('QuaternaryButton', () => {
       `border-radius: ${String(BORDERS.radiusRoundEdge)}`
     )
     expect(button).toHaveStyle('box-shadow: none')
-    expect(button).toHaveStyle(`color: ${String(COLORS.blueEnabled)}`)
+    expect(button).toHaveStyle(`color: ${String(COLORS.blue50)}`)
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16}`
     )
@@ -72,7 +72,7 @@ describe('QuaternaryButton', () => {
     const button = getByText('secondary tertiary button')
     expect(button).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${String(COLORS.warningEnabled)}`,
+      `0 0 0 3px ${String(COLORS.yellow50)}`,
       {
         modifier: ':focus-visible',
       }
@@ -80,10 +80,10 @@ describe('QuaternaryButton', () => {
   })
 
   it('renders secondary tertiary button with text and different background color', () => {
-    props.color = COLORS.errorEnabled
+    props.color = COLORS.red50
     const { getByText } = render(props)
     const button = getByText('secondary tertiary button')
     expect(button).toHaveStyle(`background-color: ${String(COLORS.white)}`)
-    expect(button).toHaveStyle(`color: ${String(COLORS.errorEnabled)}`)
+    expect(button).toHaveStyle(`color: ${String(COLORS.red50)}`)
   })
 })

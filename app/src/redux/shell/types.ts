@@ -1,3 +1,4 @@
+import type { IpcMainEvent } from 'electron'
 import type { Error } from '../types'
 import type { RobotSystemAction } from './is-ready/types'
 
@@ -5,8 +6,26 @@ export interface Remote {
   ipcRenderer: {
     invoke: (channel: string, ...args: unknown[]) => Promise<any>
     send: (channel: string, ...args: unknown[]) => void
+    on: (
+      channel: string,
+      listener: (
+        event: IpcMainEvent,
+        hostname: string,
+        topic: NotifyTopic,
+        message: NotifyResponseData | NotifyNetworkError,
+        ...args: unknown[]
+      ) => void
+    ) => void
   }
 }
+
+interface NotifyRefetchData {
+  refetchUsingHTTP: boolean
+  statusCode: never
+}
+
+export type NotifyNetworkError = 'ECONNFAILED' | 'ECONNREFUSED'
+export type NotifyResponseData = NotifyRefetchData | NotifyNetworkError
 
 interface File {
   sha512: string
@@ -63,6 +82,14 @@ export interface AppRestartAction {
   meta: { shell: true }
 }
 
+export interface ReloadUiAction {
+  type: 'shell:RELOAD_UI'
+  payload: {
+    message: string
+  }
+  meta: { shell: true }
+}
+
 export interface SendLogAction {
   type: 'shell:SEND_LOG'
   payload: {
@@ -104,14 +131,43 @@ export interface RobotMassStorageDeviceRemoved {
   meta: { shell: true }
 }
 
+export type NotifyTopic =
+  | 'robot-server/maintenance_runs/current_run'
+  | 'robot-server/runs/current_command'
+  | 'robot-server/runs'
+  | `robot-server/runs/${string}`
+
+export type NotifyAction = 'subscribe' | 'unsubscribe'
+
+export interface NotifySubscribeAction {
+  type: 'shell:NOTIFY_SUBSCRIBE'
+  payload: {
+    hostname: string
+    topic: NotifyTopic
+  }
+  meta: { shell: true }
+}
+
+export interface NotifyUnsubscribeAction {
+  type: 'shell:NOTIFY_UNSUBSCRIBE'
+  payload: {
+    hostname: string
+    topic: NotifyTopic
+  }
+  meta: { shell: true }
+}
+
 export type ShellAction =
   | UiInitializedAction
   | ShellUpdateAction
   | RobotSystemAction
   | UsbRequestsAction
   | AppRestartAction
+  | ReloadUiAction
   | SendLogAction
   | UpdateBrightnessAction
   | RobotMassStorageDeviceAdded
   | RobotMassStorageDeviceEnumerated
   | RobotMassStorageDeviceRemoved
+  | NotifySubscribeAction
+  | NotifyUnsubscribeAction

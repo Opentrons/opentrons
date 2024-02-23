@@ -14,6 +14,7 @@ import {
 import { Banner } from '../../atoms/Banner'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useIsFlex } from '../../organisms/Devices/hooks'
+import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 interface UpdateBannerProps {
   robotName: string
@@ -44,6 +45,7 @@ export const UpdateBanner = ({
   let bannerMessage: string
   let hyperlinkText: string
   let closeButtonRendered: false | undefined
+  const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
 
   if (updateType === 'calibration') {
     bannerType = isTooHot ? 'informing' : 'error'
@@ -59,7 +61,8 @@ export const UpdateBanner = ({
       !attachPipetteRequired &&
       !updatePipetteFWRequired &&
       !isTooHot &&
-      !calibratePipetteRequired
+      !calibratePipetteRequired &&
+      !isEstopNotDisengaged
         ? t('calibrate_now')
         : ''
   } else {

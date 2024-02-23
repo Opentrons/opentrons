@@ -71,7 +71,7 @@ export function AddFixtureModal({
     title: t('add_to_slot', {
       slotName: getCutoutDisplayName(cutoutId),
     }),
-    hasExitIcon: true,
+    hasExitIcon: providedFixtureOptions == null,
     onClick: () => setShowAddFixtureModal(false),
   }
 
@@ -109,15 +109,18 @@ export function AddFixtureModal({
     [CutoutFixtureId | 'WASTE_CHUTE', string]
   > = fixtureOptions.map(fixture => [fixture, getFixtureDisplayName(fixture)])
 
-  const showSelectWasteChuteOptions = cutoutId === WASTE_CHUTE_CUTOUT
-  if (showSelectWasteChuteOptions) {
-    fixtureOptionsWithDisplayNames.push([
-      GENERIC_WASTE_CHUTE_OPTION,
-      t('waste_chute'),
-    ])
-  }
+  const showSelectWasteChuteOptions =
+    cutoutId === WASTE_CHUTE_CUTOUT && providedFixtureOptions == null
 
-  fixtureOptionsWithDisplayNames.sort((a, b) => a[1].localeCompare(b[1]))
+  const fixtureOptionsWithDisplayNamesAndGenericWasteChute = fixtureOptionsWithDisplayNames.concat(
+    showSelectWasteChuteOptions
+      ? [[GENERIC_WASTE_CHUTE_OPTION, t('waste_chute')]]
+      : []
+  )
+
+  fixtureOptionsWithDisplayNamesAndGenericWasteChute.sort((a, b) =>
+    a[1].localeCompare(b[1])
+  )
 
   const wasteChuteOptionsWithDisplayNames = WASTE_CHUTE_FIXTURES.map(
     fixture => [fixture, getFixtureDisplayName(fixture)]
@@ -125,7 +128,7 @@ export function AddFixtureModal({
 
   const displayedFixtureOptions = showWasteChuteOptions
     ? wasteChuteOptionsWithDisplayNames
-    : fixtureOptionsWithDisplayNames
+    : fixtureOptionsWithDisplayNamesAndGenericWasteChute
 
   const handleAddDesktop = (requiredFixtureId: CutoutFixtureId): void => {
     const newDeckConfig = deckConfig.map(fixture =>
@@ -143,7 +146,11 @@ export function AddFixtureModal({
       {isOnDevice ? (
         <Modal
           header={modalHeader}
-          onOutsideClick={() => setShowAddFixtureModal(false)}
+          onOutsideClick={() =>
+            providedFixtureOptions != null
+              ? null
+              : setShowAddFixtureModal(false)
+          }
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <StyledText as="p">{t('add_to_slot_description')}</StyledText>
@@ -208,7 +215,7 @@ export function AddFixtureModal({
                         alignItems={ALIGN_CENTER}
                         justifyContent={JUSTIFY_SPACE_BETWEEN}
                         padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
-                        backgroundColor={COLORS.medGreyEnabled}
+                        backgroundColor={COLORS.grey20}
                         borderRadius={BORDERS.borderRadiusSize1}
                       >
                         <StyledText css={TYPOGRAPHY.pSemiBold}>
@@ -244,39 +251,39 @@ export function AddFixtureModal({
 }
 
 const FIXTURE_BUTTON_STYLE = css`
-  background-color: ${COLORS.light1};
+  background-color: ${COLORS.grey35};
   cursor: default;
   border-radius: ${BORDERS.borderRadiusSize3};
   box-shadow: none;
 
   &:focus {
-    background-color: ${COLORS.light1Pressed};
+    background-color: ${COLORS.grey40};
     box-shadow: none;
   }
 
   &:hover {
     border: none;
     box-shadow: none;
-    background-color: ${COLORS.light1};
+    background-color: ${COLORS.grey35};
   }
 
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.light1};
+    background-color: ${COLORS.grey35};
   }
 
   &:active {
-    background-color: ${COLORS.light1Pressed};
+    background-color: ${COLORS.grey40};
   }
 
   &:disabled {
-    background-color: ${COLORS.light1};
-    color: ${COLORS.darkBlack60};
+    background-color: ${COLORS.grey35};
+    color: ${COLORS.grey50};
   }
 `
 const GO_BACK_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50};
 
   &:hover {
     opacity: 70%;

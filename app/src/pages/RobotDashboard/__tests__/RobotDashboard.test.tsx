@@ -2,10 +2,7 @@ import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 
 import { renderWithProviders } from '@opentrons/components'
-import {
-  useAllProtocolsQuery,
-  useAllRunsQuery,
-} from '@opentrons/react-api-client'
+import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
 import { EmptyRecentRun } from '../../../organisms/OnDeviceDisplay/RobotDashboard/EmptyRecentRun'
@@ -15,6 +12,7 @@ import { useMissingProtocolHardware } from '../../Protocols/hooks'
 import { getOnDeviceDisplaySettings } from '../../../redux/config'
 import { WelcomeModal } from '../WelcomeModal'
 import { RobotDashboard } from '..'
+import { useNotifyAllRunsQuery } from '../../../resources/runs/useNotifyAllRunsQuery'
 
 import type { ProtocolResource } from '@opentrons/shared-data'
 
@@ -36,13 +34,14 @@ jest.mock('../../../organisms/Navigation')
 jest.mock('../../Protocols/hooks')
 jest.mock('../../../redux/config')
 jest.mock('../WelcomeModal')
+jest.mock('../../../resources/runs/useNotifyAllRunsQuery')
 
 const mockNavigation = Navigation as jest.MockedFunction<typeof Navigation>
 const mockUseAllProtocolsQuery = useAllProtocolsQuery as jest.MockedFunction<
   typeof useAllProtocolsQuery
 >
-const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
-  typeof useAllRunsQuery
+const mockUseNotifyAllRunsQuery = useNotifyAllRunsQuery as jest.MockedFunction<
+  typeof useNotifyAllRunsQuery
 >
 const mockEmptyRecentRun = EmptyRecentRun as jest.MockedFunction<
   typeof EmptyRecentRun
@@ -99,7 +98,7 @@ describe('RobotDashboard', () => {
     mockEmptyRecentRun.mockReturnValue(<div> mock EmptyRecentRun</div>)
     mockNavigation.mockReturnValue(<div>mock Navigation</div>)
     mockUseAllProtocolsQuery.mockReturnValue({} as any)
-    mockUseAllRunsQuery.mockReturnValue({} as any)
+    mockUseNotifyAllRunsQuery.mockReturnValue({} as any)
     mockUseMissingProtocolHardware.mockReturnValue({
       missingProtocolHardware: [],
       isLoading: false,
@@ -130,7 +129,7 @@ describe('RobotDashboard', () => {
         data: [mockProtocol],
       },
     } as any)
-    mockUseAllRunsQuery.mockReturnValue({
+    mockUseNotifyAllRunsQuery.mockReturnValue({
       data: { data: [mockRunData] },
     } as any)
     const [{ getByText }] = render()

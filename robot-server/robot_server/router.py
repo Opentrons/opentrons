@@ -11,12 +11,11 @@ from .health import health_router
 from .instruments import instruments_router
 from .maintenance_runs.router import maintenance_runs_router
 from .modules import modules_router
-from .protocols import protocols_router
+from .protocols.router import protocols_router
 from .robot.router import robot_router
 from .runs import runs_router
 from .service.labware.router import router as labware_router
 from .service.legacy.routers import legacy_routes
-from .service.notifications.router import router as notifications_router
 from .service.pipette_offset.router import router as pip_os_router
 from .service.session.router import router as deprecated_session_router
 from .service.tip_length.router import router as tl_router
@@ -110,12 +109,6 @@ router.include_router(
 router.include_router(
     router=tl_router,
     tags=["Tip Length Calibration Management"],
-    dependencies=[Depends(check_version_header)],
-)
-
-router.include_router(
-    router=notifications_router,
-    tags=["Notification Server Management"],
     dependencies=[Depends(check_version_header)],
 )
 

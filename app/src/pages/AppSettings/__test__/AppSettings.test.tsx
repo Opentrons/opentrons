@@ -7,14 +7,12 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import * as Config from '../../../redux/config'
 import { GeneralSettings } from '../GeneralSettings'
-import { PrivacySettings } from '../PrivacySettings'
 import { AdvancedSettings } from '../AdvancedSettings'
 import { FeatureFlags } from '../../../organisms/AppSettings/FeatureFlags'
 import { AppSettings } from '..'
 
 jest.mock('../../../redux/config')
 jest.mock('../GeneralSettings')
-jest.mock('../PrivacySettings')
 jest.mock('../AdvancedSettings')
 jest.mock('../../../organisms/AppSettings/FeatureFlags')
 
@@ -23,9 +21,6 @@ const getDevtoolsEnabled = Config.getDevtoolsEnabled as jest.MockedFunction<
 >
 const mockGeneralSettings = GeneralSettings as jest.MockedFunction<
   typeof GeneralSettings
->
-const mockPrivacySettings = PrivacySettings as jest.MockedFunction<
-  typeof PrivacySettings
 >
 const mockAdvancedSettings = AdvancedSettings as jest.MockedFunction<
   typeof AdvancedSettings
@@ -50,7 +45,6 @@ describe('AppSettingsHeader', () => {
   beforeEach(() => {
     getDevtoolsEnabled.mockReturnValue(false)
     mockGeneralSettings.mockReturnValue(<div>Mock General Settings</div>)
-    mockPrivacySettings.mockReturnValue(<div>Mock Privacy Settings</div>)
     mockAdvancedSettings.mockReturnValue(<div>Mock Advanced Settings</div>)
     mockFeatureFlags.mockReturnValue(<div>Mock Feature Flags</div>)
   })
@@ -62,7 +56,6 @@ describe('AppSettingsHeader', () => {
     const [{ getByText }] = render('/app-settings/general')
     getByText('App Settings')
     getByText('General')
-    getByText('Privacy')
     getByText('Advanced')
   })
   it('does not render feature flags link if dev tools disabled', () => {

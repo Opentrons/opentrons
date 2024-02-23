@@ -61,8 +61,10 @@ class DeckCalibrationData(BaseModel):
     tiprack: typing.Optional[str] = Field(
         None, description="The sha256 hash of the tiprack used in this calibration"
     )
-    source: SourceType = Field(None, description="The calibration source")
-    status: cal_model.CalibrationStatus = Field(
+    source: typing.Optional[SourceType] = Field(
+        None, description="The calibration source"
+    )
+    status: typing.Optional[cal_model.CalibrationStatus] = Field(
         None,
         description="The status of this calibration as determined"
         "by a user performing calibration check.",

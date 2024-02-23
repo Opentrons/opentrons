@@ -3,10 +3,9 @@ import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import { getIsTiprack, getLabwareDisplayName } from '@opentrons/shared-data'
 import { AdditionalEquipmentEntity } from '@opentrons/step-generation'
-import { i18n } from '../../localization'
 import * as stepFormSelectors from '../../step-forms/selectors'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import { getModuleUnderLabware } from '../modules/utils'
+import { getModuleShortNames, getModuleUnderLabware } from '../modules/utils'
 import { getLabwareOffDeck, getLabwareInColumn4 } from './utils'
 
 import type { LabwareEntity } from '@opentrons/step-generation'
@@ -86,11 +85,7 @@ export const getLabwareOptions: Selector<Options> = createSelector(
           labwareId
         )
         const module =
-          moduleOnDeck != null
-            ? i18n.t(
-                `form.step_edit_form.field.moduleLabwarePrefix.${moduleOnDeck.type}`
-              )
-            : null
+          moduleOnDeck != null ? getModuleShortNames(moduleOnDeck.type) : null
 
         const isLabwareInColumn4 = getLabwareInColumn4(
           initialDeckSetup,

@@ -15,6 +15,8 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
+  OVERFLOW_WRAP_ANYWHERE,
+  OVERFLOW_WRAP_BREAK_WORD,
   SIZE_2,
   SPACING,
   TYPOGRAPHY,
@@ -146,15 +148,15 @@ export function ProtocolCard(props: {
       background-color: ${longpress.isLongPressed
         ? ''
         : isFailedAnalysis
-        ? COLORS.red3Pressed
-        : COLORS.darkBlack40};
+        ? COLORS.red40
+        : COLORS.grey50};
     }
   `
 
   return (
     <Flex
       alignItems={isFailedAnalysis ? ALIGN_END : ALIGN_CENTER}
-      backgroundColor={isFailedAnalysis ? COLORS.red3 : COLORS.light1}
+      backgroundColor={isFailedAnalysis ? COLORS.red35 : COLORS.grey35}
       borderRadius={BORDERS.borderRadiusSize4}
       marginBottom={SPACING.spacing8}
       gridGap={SPACING.spacing48}
@@ -175,13 +177,13 @@ export function ProtocolCard(props: {
       ) : null}
       <Flex
         width="28.9375rem"
-        overflowWrap="anywhere"
+        overflowWrap={OVERFLOW_WRAP_ANYWHERE}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
       >
         {isFailedAnalysis ? (
           <Flex
-            color={COLORS.red1}
+            color={COLORS.red60}
             flexDirection={DIRECTION_ROW}
             gridGap={SPACING.spacing8}
           >
@@ -204,7 +206,7 @@ export function ProtocolCard(props: {
         </StyledText>
       </Flex>
       <Flex width="9.25rem">
-        <StyledText as="p" color={COLORS.darkBlack70}>
+        <StyledText as="p" color={COLORS.grey60}>
           {lastRun != null
             ? formatDistance(new Date(lastRun), new Date(), {
                 addSuffix: true,
@@ -213,7 +215,7 @@ export function ProtocolCard(props: {
         </StyledText>
       </Flex>
       <Flex width="12.5rem" whiteSpace="nowrap">
-        <StyledText as="p" color={COLORS.darkBlack70}>
+        <StyledText as="p" color={COLORS.grey60}>
           {formatTimeWithUtcLabel(protocol.createdAt)}
         </StyledText>
         {longpress.isLongPressed && !isFailedAnalysis && (
@@ -253,7 +255,7 @@ export function ProtocolCard(props: {
                           -webkit-box-orient: vertical;
                           -webkit-line-clamp: 3;
                           overflow: hidden;
-                          overflow-wrap: break-word;
+                          overflow-wrap: ${OVERFLOW_WRAP_BREAK_WORD};
                           height: max-content;
                         `}
                       />

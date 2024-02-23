@@ -134,13 +134,19 @@ class LegacyProtocolCore(
         return self._sync_hardware.is_simulator  # type: ignore[no-any-return]
 
     def append_disposal_location(
-        self, disposal_location: Union[Labware, TrashBin, WasteChute]
+        self,
+        disposal_location: Union[Labware, TrashBin, WasteChute],
     ) -> None:
         if isinstance(disposal_location, (TrashBin, WasteChute)):
             raise APIVersionError(
                 "Trash Bin and Waste Chute Disposal locations are not supported in this API Version."
             )
         self._disposal_locations.append(disposal_location)
+
+    def add_disposal_location_to_engine(
+        self, disposal_location: Union[TrashBin, WasteChute]
+    ) -> None:
+        assert False, "add_disposal_location_to_engine only supported on engine core"
 
     def add_labware_definition(
         self,

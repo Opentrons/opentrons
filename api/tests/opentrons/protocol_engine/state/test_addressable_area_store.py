@@ -7,7 +7,10 @@ from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
 
 from opentrons.protocol_engine.commands import Command
-from opentrons.protocol_engine.actions import UpdateCommandAction
+from opentrons.protocol_engine.actions import (
+    UpdateCommandAction,
+    AddAddressableAreaAction,
+)
 from opentrons.protocol_engine.state import Config
 from opentrons.protocol_engine.state.addressable_areas import (
     AddressableAreaStore,
@@ -243,3 +246,17 @@ def test_addressable_area_referencing_commands_load(
     """It should check that the addressable area is in the deck config."""
     subject.handle_action(UpdateCommandAction(private_result=None, command=command))
     assert expected_area in subject.state.loaded_addressable_areas_by_name
+
+
+def test_add_addressable_area_action(
+    simulated_subject: AddressableAreaStore,
+) -> None:
+    """It should add the addressable area to the store."""
+    simulated_subject.handle_action(
+        AddAddressableAreaAction(
+            addressable_area=AddressableAreaLocation(
+                addressableAreaName="movableTrashA1"
+            )
+        )
+    )
+    assert "movableTrashA1" in simulated_subject.state.loaded_addressable_areas_by_name

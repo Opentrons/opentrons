@@ -1,9 +1,10 @@
 import styled from 'styled-components'
-import { COLORS, BORDERS, TYPOGRAPHY, SPACING } from '../../ui-style-constants'
+import { BORDERS, TYPOGRAPHY, SPACING } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 import { NewPrimaryBtn, styleProps } from '../../primitives'
 
 export const PrimaryButton = styled(NewPrimaryBtn)`
-  background-color: ${COLORS.blueEnabled};
+  background-color: ${COLORS.blue50};
   border-radius: ${BORDERS.radiusSoftCorners};
   box-shadow: none;
   padding-left: ${SPACING.spacing16};
@@ -16,20 +17,20 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
 
   &:hover,
   &:focus {
-    background-color: ${COLORS.blueHover};
+    background-color: ${COLORS.blue55};
     box-shadow: none;
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
+    box-shadow: 0 0 0 3px ${COLORS.yellow50};
   }
 
   &:active {
-    background-color: ${COLORS.bluePressed};
+    background-color: ${COLORS.blue60};
   }
 
   &:disabled {
-    background-color: ${COLORS.darkGreyDisabled};
-    color: ${COLORS.errorDisabled};
+    background-color: ${COLORS.grey30};
+    color: ${COLORS.grey50};
   }
 `

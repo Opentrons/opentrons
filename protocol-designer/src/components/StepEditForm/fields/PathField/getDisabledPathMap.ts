@@ -1,4 +1,3 @@
-import { i18n } from '../../../../localization'
 import { getWellRatio } from '../../../../steplist/utils'
 import { getPipetteCapacity } from '../../../../pipettes/pipetteData'
 import {
@@ -19,7 +18,8 @@ export interface ValuesForPath {
 }
 export function getDisabledPathMap(
   values: ValuesForPath,
-  pipetteEntities: PipetteEntities
+  pipetteEntities: PipetteEntities,
+  t: any
 ): DisabledPathMap {
   const {
     aspirate_airGap_checkbox,
@@ -36,15 +36,15 @@ export function getDisabledPathMap(
   if (changeTip === 'perDest') {
     disabledPathMap = {
       ...disabledPathMap,
-      multiDispense: i18n.t(
-        'form.step_edit_form.field.path.subtitle.incompatible_with_per_dest'
+      multiDispense: t(
+        'step_edit_form.field.path.subtitle.incompatible_with_per_dest'
       ),
     }
   } else if (changeTip === 'perSource') {
     disabledPathMap = {
       ...disabledPathMap,
-      multiAspirate: i18n.t(
-        'form.step_edit_form.field.path.subtitle.incompatible_with_per_source'
+      multiAspirate: t(
+        'step_edit_form.field.path.subtitle.incompatible_with_per_source'
       ),
     }
   }
@@ -70,18 +70,14 @@ export function getDisabledPathMap(
   if (!withinCapacityForMultiDispense) {
     disabledPathMap = {
       ...disabledPathMap,
-      multiDispense: i18n.t(
-        'form.step_edit_form.field.path.subtitle.volume_too_high'
-      ),
+      multiDispense: t('step_edit_form.field.path.subtitle.volume_too_high'),
     }
   }
 
   if (!withinCapacityForMultiAspirate) {
     disabledPathMap = {
       ...disabledPathMap,
-      multiAspirate: i18n.t(
-        'form.step_edit_form.field.path.subtitle.volume_too_high'
-      ),
+      multiAspirate: t('step_edit_form.field.path.subtitle.volume_too_high'),
     }
   }
 
@@ -89,26 +85,18 @@ export function getDisabledPathMap(
   if (wellRatio === '1:many') {
     disabledPathMap = {
       ...disabledPathMap,
-      multiAspirate: i18n.t(
-        'form.step_edit_form.field.path.subtitle.only_many_to_1'
-      ),
+      multiAspirate: t('step_edit_form.field.path.subtitle.only_many_to_1'),
     }
   } else if (wellRatio === 'many:1') {
     disabledPathMap = {
       ...disabledPathMap,
-      multiDispense: i18n.t(
-        'form.step_edit_form.field.path.subtitle.only_1_to_many'
-      ),
+      multiDispense: t('step_edit_form.field.path.subtitle.only_1_to_many'),
     }
   } else {
     disabledPathMap = {
       ...disabledPathMap,
-      multiAspirate: i18n.t(
-        'form.step_edit_form.field.path.subtitle.only_many_to_1'
-      ),
-      multiDispense: i18n.t(
-        'form.step_edit_form.field.path.subtitle.only_1_to_many'
-      ),
+      multiAspirate: t('step_edit_form.field.path.subtitle.only_many_to_1'),
+      multiDispense: t('step_edit_form.field.path.subtitle.only_1_to_many'),
     }
   }
   return disabledPathMap

@@ -44,7 +44,7 @@ export function NetworkSetupMenu(): JSX.Element {
 
   return (
     <>
-      <StepMeter totalSteps={6} currentStep={1} />
+      <StepMeter totalSteps={5} currentStep={1} />
       <Flex
         padding={`${SPACING.spacing32} ${SPACING.spacing60} ${SPACING.spacing60}`}
         flexDirection={DIRECTION_COLUMN}
@@ -57,7 +57,7 @@ export function NetworkSetupMenu(): JSX.Element {
           <StyledText
             as="h2"
             fontWeight={TYPOGRAPHY.fontWeightBold}
-            color={COLORS.black}
+            color={COLORS.black90}
           >
             {t('choose_network_type')}
           </StyledText>
@@ -70,7 +70,7 @@ export function NetworkSetupMenu(): JSX.Element {
           <StyledText
             as="h4"
             fontWeight={TYPOGRAPHY.fontWeightRegular}
-            color={COLORS.darkBlack70}
+            color={COLORS.grey60}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
             {t('network_setup_menu_description')}

@@ -110,7 +110,7 @@ describe('PipetteOffsetCalibrationItems', () => {
     getByText('Last Calibrated')
   })
 
-  it('should omit tip rack table header for OT-3', () => {
+  it('should omit tip rack table header for Flex', () => {
     when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     const [{ getByText, queryByText }] = render(props)
     getByText('Pipette Model and Serial')
@@ -119,7 +119,7 @@ describe('PipetteOffsetCalibrationItems', () => {
     getByText('Last Calibrated')
   })
 
-  it('should include the correct information for OT-3 when 1 pipette is attached', () => {
+  it('should include the correct information for Flex when 1 pipette is attached', () => {
     props = {
       ...props,
       formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrationsForOt3,

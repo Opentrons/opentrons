@@ -9,7 +9,7 @@ from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.motion_planning import deck_conflict
 
-from opentrons.types import DeckSlotName
+from opentrons.types import DeckSlotName, StagingSlotName
 
 
 @pytest.mark.parametrize(
@@ -34,15 +34,25 @@ def test_empty_no_conflict(robot_type: RobotType, slot_name: DeckSlotName) -> No
 
 @pytest.mark.parametrize(
     "robot_type, slot_name",
-    [("OT-2 Standard", DeckSlotName.SLOT_1), ("OT-3 Standard", DeckSlotName.SLOT_A1)],
+    [
+        ("OT-2 Standard", DeckSlotName.SLOT_1),
+        ("OT-3 Standard", DeckSlotName.SLOT_A1),
+        ("OT-3 Standard", StagingSlotName.SLOT_A4),
+    ],
 )
 def test_no_multiple_locations(robot_type: RobotType, slot_name: DeckSlotName) -> None:
     """It should not allow two items in the same slot."""
-    item_1 = deck_conflict.OtherModule(
-        highest_z_including_labware=123, name_for_errors="some_item_1"
+    item_1 = deck_conflict.Labware(
+        uri=LabwareUri("some_labware_uri"),
+        highest_z=123,
+        is_fixed_trash=False,
+        name_for_errors="some_item_1",
     )
-    item_2 = deck_conflict.OtherModule(
-        highest_z_including_labware=123, name_for_errors="some_item_2"
+    item_2 = deck_conflict.Labware(
+        uri=LabwareUri("some_labware_uri"),
+        highest_z=123,
+        is_fixed_trash=False,
+        name_for_errors="some_item_2",
     )
 
     with pytest.raises(
@@ -193,6 +203,41 @@ def test_flex_labware_when_thermocycler(
             existing_items={labware_location: labware},
             new_location=DeckSlotName.SLOT_B1,
             new_item=thermocycler,
+            robot_type="OT-3 Standard",
+        )
+
+
+def test_flex_trash_bin_blocks_thermocycler() -> None:
+    """It should prevent loading a thermocycler when there is a trash in A1 and vice-versa."""
+    thermocycler = deck_conflict.ThermocyclerModule(
+        name_for_errors="some_thermocycler",
+        highest_z_including_labware=123,
+        is_semi_configuration=False,
+    )
+    trash = deck_conflict.TrashBin(name_for_errors="some_trash_bin")
+
+    with pytest.raises(
+        deck_conflict.DeckConflictError,
+        match=(
+            "some_trash_bin in slot A1 prevents some_thermocycler from using slot B1"
+        ),
+    ):
+        deck_conflict.check(
+            existing_items={DeckSlotName.SLOT_A1: trash},
+            new_item=thermocycler,
+            new_location=DeckSlotName.SLOT_B1,
+            robot_type="OT-3 Standard",
+        )
+    with pytest.raises(
+        deck_conflict.DeckConflictError,
+        match=(
+            "some_thermocycler in slot B1 prevents some_trash_bin from using slot A1"
+        ),
+    ):
+        deck_conflict.check(
+            existing_items={DeckSlotName.SLOT_B1: thermocycler},
+            new_item=trash,
+            new_location=DeckSlotName.SLOT_A1,
             robot_type="OT-3 Standard",
         )
 
@@ -484,3 +529,118 @@ def test_no_heater_shaker_south_of_trash() -> None:
             new_location=DeckSlotName.SLOT_9,
             robot_type="OT-2 Standard",
         )
+
+
+def test_heater_shaker_restrictions_trash_bin_addressable_area() -> None:
+    """It should prevent loading a Heater-Shaker adjacent of a non-labware trash bin.
+
+    This is for the OT-2 only and for slot 11 and slot 9
+    """
+    heater_shaker = deck_conflict.HeaterShakerModule(
+        highest_z_including_labware=123, name_for_errors="some_heater_shaker"
+    )
+    trash = deck_conflict.TrashBin(name_for_errors="some_trash_bin")
+
+    with pytest.raises(
+        deck_conflict.DeckConflictError,
+        match=(
+            "some_trash_bin in slot 12" " prevents some_heater_shaker from using slot 9"
+        ),
+    ):
+        deck_conflict.check(
+            existing_items={DeckSlotName.FIXED_TRASH: trash},
+            new_item=heater_shaker,
+            new_location=DeckSlotName.SLOT_9,
+            robot_type="OT-2 Standard",
+        )
+    with pytest.raises(
+        deck_conflict.DeckConflictError,
+        match=(
+            "some_trash_bin in slot 12"
+            " prevents some_heater_shaker from using slot 11"
+        ),
+    ):
+        deck_conflict.check(
+            existing_items={DeckSlotName.FIXED_TRASH: trash},
+            new_item=heater_shaker,
+            new_location=DeckSlotName.SLOT_11,
+            robot_type="OT-2 Standard",
+        )
+
+
+@pytest.mark.parametrize(
+    ("deck_slot_name", "adjacent_staging_slot", "non_adjacent_staging_slot"),
+    [
+        (DeckSlotName.SLOT_A3, StagingSlotName.SLOT_A4, StagingSlotName.SLOT_B4),
+        (DeckSlotName.SLOT_B3, StagingSlotName.SLOT_B4, StagingSlotName.SLOT_C4),
+        (DeckSlotName.SLOT_C3, StagingSlotName.SLOT_C4, StagingSlotName.SLOT_D4),
+        (DeckSlotName.SLOT_D3, StagingSlotName.SLOT_D4, StagingSlotName.SLOT_A4),
+    ],
+)
+def test_no_staging_slot_adjacent_to_module(
+    deck_slot_name: DeckSlotName,
+    adjacent_staging_slot: StagingSlotName,
+    non_adjacent_staging_slot: StagingSlotName,
+) -> None:
+    """It should raise if certain modules are placed adjacent to labware on a staging slot."""
+    staging_slot_labware = deck_conflict.Labware(
+        uri=LabwareUri("some_labware_uri"),
+        highest_z=123,
+        is_fixed_trash=False,
+        name_for_errors="some_labware",
+    )
+    heater_shaker = deck_conflict.HeaterShakerModule(
+        name_for_errors="some_heater_shaker",
+        highest_z_including_labware=123,
+    )
+    with pytest.raises(
+        deck_conflict.DeckConflictError,
+        match=(
+            f"some_labware in slot {adjacent_staging_slot}"
+            f" prevents some_heater_shaker from using slot {deck_slot_name}"
+        ),
+    ):
+        deck_conflict.check(
+            existing_items={adjacent_staging_slot: staging_slot_labware},
+            new_item=heater_shaker,
+            new_location=deck_slot_name,
+            robot_type="OT-3 Standard",
+        )
+
+    # Non-adjacent staging slot passes
+    deck_conflict.check(
+        existing_items={non_adjacent_staging_slot: staging_slot_labware},
+        new_item=heater_shaker,
+        new_location=deck_slot_name,
+        robot_type="OT-3 Standard",
+    )
+
+    other_module = deck_conflict.OtherModule(
+        name_for_errors="some_other_module",
+        highest_z_including_labware=123,
+    )
+    with pytest.raises(
+        deck_conflict.DeckConflictError,
+        match=(
+            f"some_other_module in slot {deck_slot_name}"
+            f" prevents some_labware from using slot {adjacent_staging_slot}"
+        ),
+    ):
+        deck_conflict.check(
+            existing_items={deck_slot_name: other_module},
+            new_item=staging_slot_labware,
+            new_location=adjacent_staging_slot,
+            robot_type="OT-3 Standard",
+        )
+
+    # Magnetic block is allowed
+    magnetic_block = deck_conflict.MagneticBlockModule(
+        name_for_errors="some_mag_block",
+        highest_z_including_labware=123,
+    )
+    deck_conflict.check(
+        existing_items={adjacent_staging_slot: staging_slot_labware},
+        new_item=magnetic_block,
+        new_location=deck_slot_name,
+        robot_type="OT-3 Standard",
+    )

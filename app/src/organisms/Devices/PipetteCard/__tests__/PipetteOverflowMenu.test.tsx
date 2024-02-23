@@ -79,7 +79,7 @@ describe('PipetteOverflowMenu', () => {
     fireEvent.click(btn)
     expect(props.handleChangePipette).toHaveBeenCalled()
   })
-  it('renders recalibrate pipette text for OT-3 pipette', () => {
+  it('renders recalibrate pipette text for Flex pipette', () => {
     mockisFlexPipette.mockReturnValue(true)
     props = {
       ...props,
@@ -93,7 +93,7 @@ describe('PipetteOverflowMenu', () => {
     expect(props.handleCalibrate).toHaveBeenCalled()
   })
 
-  it('should render recalibrate pipette text for OT-3 pipette', () => {
+  it('should render recalibrate pipette text for Flex pipette', () => {
     mockisFlexPipette.mockReturnValue(true)
     props = {
       ...props,

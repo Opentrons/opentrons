@@ -110,7 +110,7 @@ export function ConnectViaWifi(): JSX.Element {
 
   return (
     <>
-      <StepMeter totalSteps={6} currentStep={2} />
+      <StepMeter totalSteps={5} currentStep={1} />
       <Flex
         flexDirection={DIRECTION_COLUMN}
         // subtract height of StepMeter

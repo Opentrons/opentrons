@@ -11,6 +11,7 @@ import {
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC,
   getDeckDefFromRobotType,
   getSimplestDeckConfigForProtocol,
   OT2_ROBOT_TYPE,
@@ -164,8 +165,7 @@ describe('SetupLiquidsMap', () => {
       .mockReturnValue({})
     when(mockGetSimplestDeckConfigForProtocol)
       .calledWith(mockProtocolAnalysis)
-      // TODO(bh, 2023-11-13): mock the cutout config protocol spec
-      .mockReturnValue([])
+      .mockReturnValue(FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC)
     when(mockParseLiquidsInLoadOrder)
       .calledWith(
         mockProtocolAnalysis.liquids as any,

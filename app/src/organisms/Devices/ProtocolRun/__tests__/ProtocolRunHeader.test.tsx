@@ -18,7 +18,6 @@ import {
 import { renderWithProviders } from '@opentrons/components'
 import {
   useHost,
-  useRunQuery,
   useModulesQuery,
   usePipettesQuery,
   useDismissCurrentRunMutation,
@@ -92,6 +91,7 @@ import { getIsFixtureMismatch } from '../../../../resources/deck_configuration/u
 import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useMostRecentRunId } from '../../../ProtocolUpload/hooks/useMostRecentRunId'
+import { useNotifyRunQuery } from '../../../../resources/runs/useNotifyRunQuery'
 
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
@@ -141,6 +141,7 @@ jest.mock('../../../../resources/deck_configuration/utils')
 jest.mock('../../../../resources/deck_configuration/hooks')
 jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 jest.mock('../../../ProtocolUpload/hooks/useMostRecentRunId')
+jest.mock('../../../../resources/runs/useNotifyRunQuery')
 
 const mockGetIsHeaterShakerAttached = getIsHeaterShakerAttached as jest.MockedFunction<
   typeof getIsHeaterShakerAttached
@@ -169,7 +170,9 @@ const mockUseTrackProtocolRunEvent = useTrackProtocolRunEvent as jest.MockedFunc
 const mockUseProtocolAnalysisErrors = useProtocolAnalysisErrors as jest.MockedFunction<
   typeof useProtocolAnalysisErrors
 >
-const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
+const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
+  typeof useNotifyRunQuery
+>
 const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
   typeof useUnmatchedModulesForProtocol
 >
@@ -395,7 +398,7 @@ describe('ProtocolRunHeader', () => {
     when(mockUseRunCreatedAtTimestamp)
       .calledWith(RUN_ID)
       .mockReturnValue(CREATED_AT)
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID, { staleTime: Infinity })
       .mockReturnValue({
         data: { data: mockIdleUnstartedRun },
@@ -403,9 +406,11 @@ describe('ProtocolRunHeader', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith(RUN_ID)
       .mockReturnValue(PROTOCOL_DETAILS)
-    when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
-      trackProtocolRunEvent: mockTrackProtocolRunEvent,
-    })
+    when(mockUseTrackProtocolRunEvent)
+      .calledWith(RUN_ID, ROBOT_NAME)
+      .mockReturnValue({
+        trackProtocolRunEvent: mockTrackProtocolRunEvent,
+      })
     when(mockUseDismissCurrentRunMutation)
       .calledWith()
       .mockReturnValue({
@@ -526,7 +531,7 @@ describe('ProtocolRunHeader', () => {
     when(mockUseRunStatus)
       .calledWith(RUN_ID)
       .mockReturnValue(RUN_STATUS_STOPPED)
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
         data: { data: { ...mockIdleUnstartedRun, current: true } },
@@ -600,7 +605,7 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('renders a pause run button, start time, and end time when run is running, and calls trackProtocolRunEvent when button clicked', () => {
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
         data: { data: mockRunningRun },
@@ -621,7 +626,7 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('renders a cancel run button when running and shows a confirm cancel modal when clicked', () => {
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
         data: { data: mockRunningRun },
@@ -638,7 +643,7 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('renders a Resume Run button and Cancel Run button when paused and call trackProtocolRunEvent when resume button clicked', () => {
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
         data: { data: mockPausedRun },
@@ -658,7 +663,7 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('renders a disabled Resume Run button and when pause requested', () => {
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
         data: { data: mockPauseRequestedRun },
@@ -676,7 +681,7 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('renders a disabled Canceling Run button and when stop requested', () => {
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
         data: { data: mockStopRequestedRun },
@@ -693,7 +698,7 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('renders a disabled button and when the robot door is open', () => {
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
         data: { data: mockRunningRun },
@@ -715,7 +720,7 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('renders a Run Again button and end time when run has stopped and calls trackProtocolRunEvent when run again button clicked', () => {
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
         data: { data: mockStoppedRun },
@@ -742,7 +747,7 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('renders a Run Again button and end time when run has failed and calls trackProtocolRunEvent when run again button clicked', () => {
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
         data: { data: mockFailedRun },
@@ -767,7 +772,7 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('renders a Run Again button and end time when run has succeeded and calls trackProtocolRunEvent when run again button clicked', () => {
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
         data: { data: mockSucceededRun },
@@ -798,7 +803,7 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('disables the Run Again button with tooltip for a completed run if the robot is busy', () => {
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
         data: { data: mockSucceededRun },
@@ -831,7 +836,7 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('renders a error detail link banner when run has failed', () => {
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
         data: { data: mockFailedRun },
@@ -842,6 +847,30 @@ describe('ProtocolRunHeader', () => {
     fireEvent.click(screen.getByText('View error'))
     expect(mockCloseCurrentRun).toBeCalled()
     screen.getByText('mock RunFailedModal')
+  })
+
+  it('does not render banners when a run is resetting', () => {
+    when(mockUseNotifyRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: { data: mockFailedRun },
+      } as UseQueryResult<Run>)
+    when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_FAILED)
+    when(mockUseRunControls)
+      .calledWith(RUN_ID, expect.anything())
+      .mockReturnValue({
+        play: () => {},
+        pause: () => {},
+        stop: () => {},
+        reset: () => {},
+        isPlayRunActionLoading: false,
+        isPauseRunActionLoading: false,
+        isStopRunActionLoading: false,
+        isResetRunLoading: true,
+      })
+    render()
+
+    expect(screen.queryByText('mock RunFailedModal')).not.toBeInTheDocument()
   })
 
   it('renders a clear protocol banner when run has been canceled', () => {
@@ -855,7 +884,7 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('renders a clear protocol banner when run has succeeded', () => {
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
         data: { data: mockSucceededRun },
@@ -967,7 +996,7 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('renders banner with spinner if currently closing current run', async () => {
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
         data: { data: mockSucceededRun },
@@ -1018,7 +1047,7 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('renders the drop tip banner when the run is over and a pipette has a tip attached and is a flex', async () => {
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
         data: {
@@ -1040,7 +1069,7 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('does not render the drop tip banner when the run is not over', async () => {
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
         data: {

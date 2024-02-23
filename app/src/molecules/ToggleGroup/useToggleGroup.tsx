@@ -29,19 +29,19 @@ const BUTTON_GROUP_STYLES = css`
     }
 
     &:hover {
-      background-color: ${COLORS.fundamentalsBackground};
-      color: ${COLORS.black};
+      background-color: ${COLORS.grey10};
+      color: ${COLORS.black90};
       box-shadow: 0 0 0;
     }
 
     &.active {
-      background-color: ${COLORS.blueEnabled};
+      background-color: ${COLORS.blue50};
       color: ${COLORS.white};
     }
 
     &:disabled {
       background-color: inherit;
-      color: ${COLORS.errorDisabled};
+      color: ${COLORS.grey40};
     }
   }
 
@@ -59,7 +59,7 @@ const BUTTON_GROUP_STYLES = css`
 const ACTIVE_STYLE = css`
   padding-left: ${SPACING.spacing8};
   padding-right: ${SPACING.spacing8};
-  background-color: ${COLORS.blueEnabled};
+  background-color: ${COLORS.blue50};
   color: ${COLORS.white};
   pointer-events: none;
 `
@@ -68,8 +68,8 @@ const DEFAULT_STYLE = css`
   padding-left: ${SPACING.spacing8};
   padding-right: ${SPACING.spacing8};
   background-color: ${COLORS.white};
-  color: ${COLORS.black};
-  border: 1px ${COLORS.medGreyEnabled} solid;
+  color: ${COLORS.black90};
+  border: 1px ${COLORS.grey30} solid;
 `
 
 export const useToggleGroup = (

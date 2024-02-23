@@ -17,7 +17,6 @@ from typing import (
 )
 
 from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
-from opentrons.system import log_control
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 if TYPE_CHECKING:
@@ -108,22 +107,6 @@ class DisableLogIntegrationSettingDefinition(SettingDefinition):
             " troubleshoot robot issues and spot error trends.",
             robot_type=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
         )
-
-    async def on_change(self, value: Optional[bool]) -> None:
-        """Special side effect for this setting"""
-        if ARCHITECTURE == SystemArchitecture.BUILDROOT:
-            code, stdout, stderr = await log_control.set_syslog_level(
-                "emerg" if value else "info"
-            )
-            if code != 0:
-                log.error(
-                    f"Could not set log control: {code}: stdout={stdout}"
-                    f" stderr={stderr}"
-                )
-                raise SettingException(
-                    f"Failed to set log upstreaming: {code}", "log-config-failure"
-                )
-        await super().on_change(value)
 
 
 class Setting(NamedTuple):
@@ -234,12 +217,6 @@ settings = [
         _id="disableOverpressureDetection",
         title="Disable Flex pipette pressure sensing.",
         description="When this setting is on, Flex will continue its activities regardless of pressure changes inside the pipette. Do not turn this setting on unless you are intentionally causing pressures over 8 kPa inside the pipette air channel.",
-        robot_type=[RobotTypeEnum.FLEX],
-    ),
-    SettingDefinition(
-        _id="disableTipPresenceDetection",
-        title="Disable tip presence detection on pipettes.",
-        description="This setting disables tip presence detection on pipettes, do not turn this feature off unless recommended.",
         robot_type=[RobotTypeEnum.FLEX],
     ),
 ]
@@ -683,6 +660,14 @@ def _migrate28to29(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate29to30(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 30 of the feature flags file.
+
+    - Removes the disableTipPresenceDetection flag.
+    """
+    return {k: v for k, v in previous.items() if "disableTipPresenceDetection" != k}
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -713,6 +698,7 @@ _MIGRATIONS = [
     _migrate26to27,
     _migrate27to28,
     _migrate28to29,
+    _migrate29to30,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

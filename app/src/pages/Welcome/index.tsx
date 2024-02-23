@@ -36,7 +36,7 @@ export function Welcome(): JSX.Element {
       <Flex justifyContent={JUSTIFY_CENTER}>
         <StyledText
           as="h4"
-          color={COLORS.darkBlack70}
+          color={COLORS.grey60}
           textAlign={TYPOGRAPHY.textAlignCenter}
           width="39.875rem"
         >

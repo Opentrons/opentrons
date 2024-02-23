@@ -110,7 +110,7 @@ Which fixtures you need to configure depend on both load methods and the effects
 Staging Area Slots
 ------------------
 
-Slots A4 through D4 are the staging area slots. Pipettes can't reach the staging area, but these slots are always available in the API for loading and moving labware. Using a slot in column 4 as the ``location`` argument of :py:meth:`.load_labware` or the ``new_location`` argument of :py:meth:`.move_labware` will require the corresponding staging area slot in the robot's deck configuration::
+Slots A4 through D4 are the staging area slots. Pipettes can't reach the staging area, but these slots are always available in the API for loading and moving labware. Using a slot in column 4 as the ``location`` argument of :py:meth:`~.ProtocolContext.load_labware` or the ``new_location`` argument of :py:meth:`.move_labware` will require the corresponding staging area slot in the robot's deck configuration::
 
     plate_1 = protocol.load_labware(
         load_name="corning_96_wellplate_360ul_flat", location="C3"
@@ -150,7 +150,7 @@ Starting in API version 2.16, you must load trash bin fixtures in your protocol 
 .. versionadded:: 2.16
 
 .. note::
-    The :py:class:`TrashBin` class doesn't have any callable methods, so you don't have to save the result of ``load_trash_bin()`` to a variable, especially if your protocol only loads a single trash container. Being able to reference the trash bin by name is useful when dealing with multiple trash containers.
+    The :py:class:`.TrashBin` class doesn't have any callable methods, so you don't have to save the result of ``load_trash_bin()`` to a variable, especially if your protocol only loads a single trash container. Being able to reference the trash bin by name is useful when dealing with multiple trash containers.
 
 Call ``load_trash_bin()`` multiple times to add more than one bin. See :ref:`pipette-trash-containers` for more information on using pipettes with multiple trash bins.
 
@@ -169,7 +169,7 @@ To use the waste chute, first use :py:meth:`.load_waste_chute` to load it in slo
 
 The ``load_waste_chute()`` method takes no arguments, since D3 is the only valid location for the chute. However, there are multiple variant configurations of the waste chute, depending on how other methods in your protocol use it.
 
-The waste chute is installed either on a standard deck plate adapter or on a deck plate adapter with a staging area. If any :py:meth:`.load_labware` or :py:meth:`.move_labware` calls in your protocol reference slot D4, you have to use the deck plate adapter with staging area.
+The waste chute is installed either on a standard deck plate adapter or on a deck plate adapter with a staging area. If any :py:meth:`~.ProtocolContext.load_labware` or :py:meth:`.move_labware` calls in your protocol reference slot D4, you have to use the deck plate adapter with staging area.
 
 The waste chute has a removable cover with a narrow opening which helps prevent aerosols and droplets from contaminating the working area. 1- and 8-channel pipettes can dispense liquid, blow out, or drop tips through the opening in the cover. Any of the following require you to remove the cover. 
 

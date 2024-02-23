@@ -6,6 +6,9 @@ SHELL := bash
 # add node_modules/.bin to PATH
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
+# override webpack's default hashing algorithm for node 18: https://github.com/webpack/webpack/issues/14532
+export NODE_OPTIONS := --openssl-legacy-provider
+
 # standard targets
 #####################################################################
 
@@ -34,7 +37,7 @@ dist:
 .PHONY: dev
 dev: export NODE_ENV := development
 dev:
-	webpack-dev-server --hot
+	webpack-dev-server --hot --host=::
 
 .PHONY: test
 test:

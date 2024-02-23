@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
   FormGroup,
@@ -10,7 +11,6 @@ import {
   C_LIGHT_GRAY,
 } from '@opentrons/components'
 import cx from 'classnames'
-import { i18n } from '../../../../localization'
 import ZIG_ZAG_IMAGE from '../../../../images/zig_zag_icon.svg'
 import { WellOrderModal } from './WellOrderModal'
 import stepEditStyles from '../../StepEditForm.css'
@@ -39,6 +39,7 @@ export const WellOrderField = (props: WellOrderFieldProps): JSX.Element => {
     updateFirstWellOrder,
     updateSecondWellOrder,
   } = props
+  const { t } = useTranslation(['form', 'modal'])
   const [isModalOpen, setModalOpen] = React.useState(false)
 
   const handleOpen = (): void => {
@@ -85,7 +86,7 @@ export const WellOrderField = (props: WellOrderFieldProps): JSX.Element => {
   return (
     <>
       <Tooltip {...tooltipProps}>
-        {i18n.t('form.step_edit_form.field.well_order.label')}
+        {t('step_edit_form.field.well_order.label')}
       </Tooltip>
       <div {...targetProps}>
         <FormGroup label={props.label} className={className}>
@@ -113,7 +114,7 @@ export const WellOrderField = (props: WellOrderFieldProps): JSX.Element => {
                 secondValue
               )}`}
             >
-              {i18n.t('form.step_edit_form.field.well_order.mixed')}
+              {t('step_edit_form.field.well_order.mixed')}
             </Text>
           )}
         </FormGroup>

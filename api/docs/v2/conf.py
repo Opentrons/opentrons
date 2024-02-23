@@ -424,3 +424,25 @@ ogp_enable_meta_description = False
 # -- Options for tabs -----------------------------------------------------
 
 sphinx_tabs_disable_tab_closing = True
+
+# -- Suppress autodoc warnings --------------------------------------------
+
+# Ignore warnings for deliberately missing/undocumented things that appear
+# in automatically generated type signatures.
+#
+# The goal here is to pass through any warnings for bad targets of MANUALLY
+# created links.
+nitpick_ignore_regex = [
+    ("py:class", r".*Optional\[.*"),  # any Optional with bad members
+    ("py:class", r".*commands\.types.*"),
+    ("py:class", r".*hardware_control.*"),
+    ("py:class", r".*legacy_broker.*"),
+    ("py:class", r".*protocol_api\.core.*"),
+    ("py:class", r".*api_support.*"),
+    ("py:class", r".*duration\.estimator.*"),
+    ("py:class", r".*protocols\.types.*"),
+    ("py:class", r".*protocol_api\.deck.*"),
+    ("py:class", r".*protocol_api\.config.*"),
+    ("py:class", r".*opentrons_shared_data.*"),
+    ("py:class", r'.*AbstractLabware|APIVersion|LabwareLike|LoadedCoreMap|ModuleTypes|NoneType|OffDeckType|ProtocolCore|WellCore'),  # laundry list of not fully qualified things
+]

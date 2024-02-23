@@ -34,7 +34,7 @@ export function UpdateResultsModal(
   const updateFailedHeader: ModalHeaderBaseProps = {
     title: t('update_failed'),
     iconName: 'ot-alert',
-    iconColor: COLORS.red2,
+    iconColor: COLORS.red50,
   }
   let instrumentName = 'instrument'
   if (instrument?.ok) {
@@ -75,16 +75,16 @@ export function UpdateResultsModal(
             <Flex
               height="11.5rem"
               width="100%"
-              backgroundColor={COLORS.green3}
+              backgroundColor={COLORS.green35}
               borderRadius={BORDERS.borderRadiusSize3}
               flexDirection={DIRECTION_COLUMN}
-              color={COLORS.darkBlack90}
+              color={COLORS.grey60}
               padding={SPACING.spacing24}
               alignItems={ALIGN_CENTER}
             >
               <Icon
                 name="ot-check"
-                color={COLORS.green2}
+                color={COLORS.green50}
                 size="2.5rem"
                 marginBottom={SPACING.spacing16}
               />

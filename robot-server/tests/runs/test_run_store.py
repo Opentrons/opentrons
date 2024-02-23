@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from typing import List, Optional, Type
 
 import pytest
+from decoy import Decoy
 from sqlalchemy.engine import Engine
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -15,6 +16,7 @@ from robot_server.runs.run_store import (
 )
 from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.action_models import RunAction, RunActionType
+from robot_server.service.notifications import RunsPublisher
 
 from opentrons.protocol_engine import (
     commands as pe_commands,
@@ -28,10 +30,22 @@ from opentrons.protocol_engine import (
 from opentrons.types import MountType, DeckSlotName
 
 
+@pytest.fixture()
+def mock_runs_publisher(decoy: Decoy) -> RunsPublisher:
+    """Get a mock RunsPublisher."""
+    return decoy.mock(cls=RunsPublisher)
+
+
 @pytest.fixture
-def subject(sql_engine: Engine) -> RunStore:
+def subject(
+    sql_engine: Engine,
+    mock_runs_publisher: RunsPublisher,
+) -> RunStore:
     """Get a ProtocolStore test subject."""
-    return RunStore(sql_engine=sql_engine)
+    return RunStore(
+        sql_engine=sql_engine,
+        runs_publisher=mock_runs_publisher,
+    )
 
 
 @pytest.fixture

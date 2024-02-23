@@ -71,6 +71,12 @@ class SyncClient:
             definition=definition,
         )
 
+    def add_addressable_area(self, addressable_area_name: str) -> None:
+        """Add an addressable area to the engine's state."""
+        self._transport.call_method(
+            "add_addressable_area", addressable_area_name=addressable_area_name
+        )
+
     def add_liquid(
         self, name: str, color: Optional[str], description: Optional[str]
     ) -> Liquid:
@@ -214,6 +220,7 @@ class SyncClient:
         force_direct: bool,
         speed: Optional[float],
         alternate_drop_location: Optional[bool],
+        ignore_tip_configuration: Optional[bool] = True,
     ) -> commands.MoveToAddressableAreaForDropTipResult:
         """Execute a MoveToAddressableArea command and return the result."""
         request = commands.MoveToAddressableAreaForDropTipCreate(
@@ -225,6 +232,7 @@ class SyncClient:
                 minimumZHeight=minimum_z_height,
                 speed=speed,
                 alternateDropLocation=alternate_drop_location,
+                ignoreTipConfiguration=ignore_tip_configuration,
             )
         )
         result = self._transport.execute_command(request=request)

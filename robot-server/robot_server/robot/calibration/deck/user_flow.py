@@ -82,7 +82,7 @@ and gantry system.
 """
 
 # TODO: BC 2020-07-08: type all command logic here with actual Model type
-COMMAND_HANDLER = Callable[..., Awaitable]
+COMMAND_HANDLER = Callable[..., Awaitable[None]]
 
 COMMAND_MAP = Dict[str, COMMAND_HANDLER]
 
@@ -187,7 +187,7 @@ class DeckCalibrationUserFlow:
             name=self._hw_pipette.name,
             tipLength=self._hw_pipette.active_tip_settings.default_tip_length,
             mount=str(self._mount),
-            serial=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
+            serial=self._hw_pipette.pipette_id,
             defaultTipracks=self._default_tipracks,
         )
 

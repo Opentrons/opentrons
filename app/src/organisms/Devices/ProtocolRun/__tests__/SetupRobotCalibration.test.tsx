@@ -105,7 +105,7 @@ describe('SetupRobotCalibration', () => {
     getByText('Mock SetupTipLengthCalibration')
   })
 
-  it('renders only pipette calibration component for OT-3', () => {
+  it('renders only pipette calibration component for Flex', () => {
     when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
     const { getByText, queryByText } = render()[0]
 

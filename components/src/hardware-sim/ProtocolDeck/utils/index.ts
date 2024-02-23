@@ -1,2 +1,2 @@
-export * from './getLabwareOnDeck'
+export * from './getLabwareInSlots'
 export * from './getStandardDeckViewLayerBlockList'

@@ -1,9 +1,14 @@
 import mock
 import pytest
 from decoy import Decoy
+import asyncio
 
-from contextlib import nullcontext as does_not_raise
+from contextlib import (
+    nullcontext as does_not_raise,
+    AbstractContextManager,
+)
 from typing import (
+    cast,
     Dict,
     List,
     Optional,
@@ -77,12 +82,13 @@ from opentrons_hardware.hardware_control.tools.types import (
     GripperInformation,
 )
 
-from opentrons.hardware_control.estop_state import EstopStateMachine
+from opentrons.hardware_control.backends.estop_state import EstopStateMachine
 
 from opentrons_shared_data.errors.exceptions import (
     EStopActivatedError,
     EStopNotPresentError,
     FirmwareUpdateRequiredError,
+    FailedGripperPickupError,
 )
 
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
@@ -153,9 +159,9 @@ def controller(
     mock_config: OT3Config,
     mock_can_driver: AbstractCanDriver,
     mock_eeprom_driver: EEPROMDriver,
-) -> Iterator[OT3Controller]:
+) -> OT3Controller:
     with (mock.patch("opentrons.hardware_control.backends.ot3controller.OT3GPIO")):
-        yield OT3Controller(
+        return OT3Controller(
             mock_config, mock_can_driver, eeprom_driver=mock_eeprom_driver
         )
 
@@ -195,6 +201,25 @@ def mock_move_group_run() -> Iterator[mock.AsyncMock]:
     ) as mock_mgr_run:
         mock_mgr_run.return_value = {}
         yield mock_mgr_run
+
+
+@pytest.fixture
+def mock_check_overpressure() -> Iterator[mock.AsyncMock]:
+    with mock.patch(
+        "opentrons.hardware_control.backends.ot3controller.check_overpressure",
+        autospec=True,
+    ) as mock_check_overpressure:
+        queue: asyncio.Queue[Any] = asyncio.Queue()
+
+        class FakeOverpressure:
+            async def __aenter__(self) -> asyncio.Queue[Any]:
+                return queue
+
+            async def __aexit__(self, *args: Any, **kwargs: Any) -> None:
+                pass
+
+        mock_check_overpressure.return_value = lambda: FakeOverpressure()
+        yield mock_check_overpressure
 
 
 def _device_info_entry(subsystem: SubSystem) -> Tuple[SubSystem, DeviceInfoCache]:
@@ -337,11 +362,12 @@ async def test_home_execute(
     controller: OT3Controller,
     axes: List[Axis],
     mock_present_devices: None,
+    mock_check_overpressure: None,
 ) -> None:
     config = {"run.side_effect": move_group_run_side_effect(controller, axes)}
     with mock.patch(  # type: ignore [call-overload]
         "opentrons.hardware_control.backends.ot3controller.MoveGroupRunner",
-        spec=mock.Mock(MoveGroupRunner),
+        spec=MoveGroupRunner,
         **config
     ) as mock_runner:
         present_axes = set(ax for ax in axes if controller.axis_is_present(ax))
@@ -349,7 +375,6 @@ async def test_home_execute(
         # nothing has been homed
         assert not controller._motor_status
         await controller.home(axes, GantryLoad.LOW_THROUGHPUT)
-
         all_groups = [
             group
             for arg in mock_runner.call_args_list
@@ -392,7 +417,7 @@ async def test_home_gantry_order(
 ) -> None:
     with mock.patch(
         "opentrons.hardware_control.backends.ot3controller.MoveGroupRunner",
-        spec=mock.Mock(MoveGroupRunner),
+        spec=MoveGroupRunner,
     ) as mock_runner:
         controller._build_home_gantry_z_runner(axes, GantryLoad.LOW_THROUGHPUT)
         has_mount = len(set(Axis.ot3_mount_axes()) & set(axes)) > 0
@@ -444,6 +469,7 @@ async def test_home_only_present_devices(
     mock_move_group_run: mock.AsyncMock,
     axes: List[Axis],
     mock_present_devices: None,
+    mock_check_overpressure: None,
 ) -> None:
     starting_position = {
         NodeId.head_l: 20.0,
@@ -574,7 +600,7 @@ async def test_gripper_home_jaw(
 async def test_gripper_grip(
     controller: OT3Controller, mock_move_group_run: mock.AsyncMock
 ) -> None:
-    await controller.gripper_grip_jaw(duty_cycle=50)
+    await controller.gripper_grip_jaw(duty_cycle=50, expected_displacement=0)
     for call in mock_move_group_run.call_args_list:
         move_group_runner = call[0][0]
         for move_group in move_group_runner._move_groups:
@@ -1059,19 +1085,6 @@ async def test_update_required_flag_disabled(
         await controller.set_active_current({Axis.X: 2})
 
 
-async def test_monitor_pressure(
-    controller: OT3Controller,
-    mock_move_group_run: mock.AsyncMock,
-    mock_present_devices: None,
-) -> None:
-    mount = NodeId.pipette_left
-    mock_move_group_run.side_effect = move_group_run_side_effect(controller, [Axis.P_L])
-    async with controller._monitor_overpressure([mount]):
-        await controller.home([Axis.P_L], GantryLoad.LOW_THROUGHPUT)
-
-    mock_move_group_run.assert_called_once()
-
-
 @pytest.mark.parametrize(
     "estop_state, expectation",
     [
@@ -1087,6 +1100,7 @@ async def test_requires_estop(
     decoy: Decoy,
     estop_state: EstopState,
     expectation: ContextManager[None],
+    mock_check_overpressure: None,
 ) -> None:
     """Test that the estop state machine raises properly."""
     decoy.when(mock_estop_state_machine.state).then_return(estop_state)
@@ -1209,3 +1223,44 @@ async def test_engage_motors(
                 )
             else:
                 set_tip_axes.assert_not_awaited()
+
+
+@pytest.mark.parametrize(
+    "expected_grip_width,actual_grip_width,wider,narrower,allowed_error,hard_max,hard_min,raise_error",
+    [
+        (80, 80, 0, 0, 0, 92, 60, False),
+        (80, 81, 0, 0, 0, 92, 60, True),
+        (80, 79, 0, 0, 0, 92, 60, True),
+        (80, 81, 1, 0, 0, 92, 60, False),
+        (80, 79, 0, 1, 0, 92, 60, False),
+        (80, 81, 0, 0, 1, 92, 60, False),
+        (80, 79, 0, 0, 1, 92, 60, False),
+        (80, 45, 40, 0, 1, 92, 60, True),
+        (80, 100, 0, 40, 0, 92, 60, True),
+    ],
+)
+def test_grip_error_detection(
+    controller: OT3Controller,
+    expected_grip_width: float,
+    actual_grip_width: float,
+    wider: float,
+    narrower: float,
+    allowed_error: float,
+    hard_max: float,
+    hard_min: float,
+    raise_error: bool,
+) -> None:
+    context = cast(
+        AbstractContextManager[None],
+        pytest.raises(FailedGripperPickupError) if raise_error else does_not_raise(),
+    )
+    with context:
+        controller.check_gripper_position_within_bounds(
+            expected_grip_width,
+            wider,
+            narrower,
+            actual_grip_width,
+            allowed_error,
+            hard_max,
+            hard_min,
+        )

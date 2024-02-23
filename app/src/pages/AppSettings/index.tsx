@@ -4,23 +4,22 @@ import { useSelector } from 'react-redux'
 import { Redirect, useParams } from 'react-router-dom'
 
 import {
-  Text,
-  Box,
-  Flex,
   ALIGN_START,
-  DIRECTION_ROW,
-  SPACING,
-  COLORS,
   BORDERS,
+  Box,
+  COLORS,
+  DIRECTION_ROW,
+  Flex,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import * as Config from '../../redux/config'
 import { GeneralSettings } from './GeneralSettings'
-import { PrivacySettings } from './PrivacySettings'
 import { AdvancedSettings } from './AdvancedSettings'
 import { FeatureFlags } from '../../organisms/AppSettings/FeatureFlags'
 import { NavTab } from '../../molecules/NavTab'
+import { StyledText } from '../../atoms/text'
 import { Line } from '../../atoms/structure'
 
 import type { DesktopRouteParams, AppSettingsTab } from '../../App/types'
@@ -34,7 +33,6 @@ export function AppSettings(): JSX.Element {
     [K in AppSettingsTab]: JSX.Element
   } = {
     general: <GeneralSettings />,
-    privacy: <PrivacySettings />,
     advanced: <AdvancedSettings />,
     'feature-flags': <FeatureFlags />,
   }
@@ -50,21 +48,22 @@ export function AppSettings(): JSX.Element {
         backgroundColor={COLORS.white}
         height="100%"
         width="100%"
-        border={`1px ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius={BORDERS.borderRadiusSize2}
         minHeight="95%"
       >
         <Box padding={SPACING.spacing16} paddingBottom="0">
-          <Text css={TYPOGRAPHY.h1Default} paddingBottom={SPACING.spacing24}>
+          <StyledText
+            css={TYPOGRAPHY.h1Default}
+            paddingBottom={SPACING.spacing24}
+          >
             {t('app_settings')}
-          </Text>
+          </StyledText>
           <Flex
             alignItems={ALIGN_START}
             flexDirection={DIRECTION_ROW}
             gridGap={SPACING.spacing20}
           >
             <NavTab to="/app-settings/general" tabName={t('general')} />
-            <NavTab to="/app-settings/privacy" tabName={t('privacy')} />
             <NavTab to="/app-settings/advanced" tabName={t('advanced')} />
             {devToolsOn && (
               <NavTab

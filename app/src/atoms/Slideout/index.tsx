@@ -1,18 +1,19 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import {
-  Box,
-  Flex,
-  DIRECTION_ROW,
-  DIRECTION_COLUMN,
-  Btn,
-  Icon,
-  SPACING,
-  JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
+  Box,
+  Btn,
   COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_WRAP_ANYWHERE,
   Overlay,
   POSITION_FIXED,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -99,10 +100,10 @@ const CLOSE_ICON_STYLE = css`
   border-radius: 50%;
 
   &:hover {
-    background: ${COLORS.lightGreyHover};
+    background: ${COLORS.grey30};
   }
   &:active {
-    background: ${COLORS.lightGreyPressed};
+    background: ${COLORS.grey35};
   }
 `
 
@@ -145,7 +146,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
         css={`
           ${isExpanded ?? false ? OVERLAY_IN_STYLE : overlayOutStyle}
         `}
-        backgroundColor={COLORS.darkBlackEnabled}
+        backgroundColor={COLORS.black90}
       />
       <Box
         css={isExpanded ?? false ? EXPANDED_STYLE : collapsedStyle}
@@ -175,7 +176,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
             >
               <StyledText
                 as="h2"
-                overflowWrap="anywhere"
+                overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 data-testid={`Slideout_title_${title}`}
               >
@@ -195,7 +196,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
           ) : (
             <>{title}</>
           )}
-          <Divider marginY={0} color={COLORS.medGreyEnabled} />
+          <Divider marginY={0} color={COLORS.grey30} />
           <Box
             padding={SPACING.spacing16}
             flex="1 1 auto"

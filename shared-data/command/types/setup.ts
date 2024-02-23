@@ -1,11 +1,11 @@
 import type {
+  AddressableAreaName,
   CommonCommandRunTimeInfo,
   CommonCommandCreateInfo,
   LabwareDefinition2,
   LabwareOffset,
   PipetteName,
   ModuleModel,
-  Cutout,
 } from '../../js'
 
 export interface LoadPipetteCreateCommand extends CommonCommandCreateInfo {
@@ -59,16 +59,6 @@ export interface LoadLiquidRunTimeCommand
     LoadLiquidCreateCommand {
   result?: LoadLiquidResult
 }
-//  TODO(jr, 10/31/23): update `loadFixture` to `loadAddressableArea`
-export interface LoadFixtureCreateCommand extends CommonCommandCreateInfo {
-  commandType: 'loadFixture'
-  params: LoadFixtureParams
-}
-export interface LoadFixtureRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    LoadFixtureCreateCommand {
-  result?: LoadLabwareResult
-}
 
 export interface ConfigureNozzleLayoutCreateCommand
   extends CommonCommandCreateInfo {
@@ -86,7 +76,6 @@ export type SetupRunTimeCommand =
   | ConfigureNozzleLayoutRunTimeCommand
   | LoadPipetteRunTimeCommand
   | LoadLabwareRunTimeCommand
-  | LoadFixtureRunTimeCommand
   | LoadModuleRunTimeCommand
   | LoadLiquidRunTimeCommand
   | MoveLabwareRunTimeCommand
@@ -95,7 +84,6 @@ export type SetupCreateCommand =
   | ConfigureNozzleLayoutCreateCommand
   | LoadPipetteCreateCommand
   | LoadLabwareCreateCommand
-  | LoadFixtureCreateCommand
   | LoadModuleCreateCommand
   | LoadLiquidCreateCommand
   | MoveLabwareCreateCommand
@@ -105,13 +93,13 @@ export type LabwareLocation =
   | { slotName: string }
   | { moduleId: string }
   | { labwareId: string }
-  | { addressableAreaName: string }
+  | { addressableAreaName: AddressableAreaName }
 
 export type NonStackedLocation =
   | 'offDeck'
   | { slotName: string }
   | { moduleId: string }
-  | { addressableAreaName: string }
+  | { addressableAreaName: AddressableAreaName }
 
 export interface ModuleLocation {
   slotName: string
@@ -167,12 +155,6 @@ interface LoadLiquidParams {
 }
 interface LoadLiquidResult {
   liquidId: string
-}
-
-interface LoadFixtureParams {
-  location: { cutout: Cutout }
-  loadName: string
-  fixtureId?: string
 }
 
 export const COLUMN = 'COLUMN'

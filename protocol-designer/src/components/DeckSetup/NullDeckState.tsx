@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   FONT_SIZE_BODY_1,
   FONT_WEIGHT_BOLD,
@@ -7,7 +8,6 @@ import {
   RobotWorkSpace,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
 import {
   VIEWBOX_HEIGHT,
   VIEWBOX_MIN_X,
@@ -20,7 +20,7 @@ import styles from './DeckSetup.css'
 
 export const NullDeckState = (): JSX.Element => {
   const deckDef = React.useMemo(() => getDeckDefinitions().ot2_standard, [])
-
+  const { t } = useTranslation('deck')
   return (
     <div className={styles.deck_row}>
       <div className={styles.deck_wrapper}>
@@ -40,7 +40,7 @@ export const NullDeckState = (): JSX.Element => {
               fontWeight={FONT_WEIGHT_BOLD}
               fontSize={FONT_SIZE_BODY_1}
             >
-              {i18n.t('deck.inactive_deck')}
+              {t('inactive_deck')}
             </RobotCoordsText>
           )}
         </RobotWorkSpace>

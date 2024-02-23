@@ -74,7 +74,7 @@ async def jaw_precheck(api: OT3API, ax: Axis, speed: float) -> Tuple[bool, bool]
     """Check the LEDs work and jaws are aligned."""
     # HOME
     print("homing...")
-    await api.home([ax])
+    await helpers_ot3.home_tip_motors(api, False)  # Home with no backoff
     # Check LEDs can turn on when homed
     if not api.is_simulator:
         led_check = ui.get_user_answer("are both endstop Lights ON?")

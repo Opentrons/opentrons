@@ -154,7 +154,7 @@ describe('RobotCard', () => {
     expect(image.getAttribute('src')).toEqual(OT2_PNG_FILE_NAME)
   })
 
-  it('renders an OT-3 image when robot model is OT-3', () => {
+  it('renders a Flex image when robot model is OT-3', () => {
     props = { robot: { ...mockConnectableRobot, name: 'buzz' } }
     when(mockGetRobotModelByName)
       .calledWith(MOCK_STATE, 'buzz')

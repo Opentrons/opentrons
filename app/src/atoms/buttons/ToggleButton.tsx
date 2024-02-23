@@ -6,34 +6,34 @@ import { Btn, Icon, COLORS, SIZE_1, SIZE_2 } from '@opentrons/components'
 import type { StyleProps } from '@opentrons/components'
 
 const TOGGLE_DISABLED_STYLES = css`
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50};
 
   &:hover {
-    color: ${COLORS.darkGreyHover};
+    color: ${COLORS.grey60};
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
+    box-shadow: 0 0 0 3px ${COLORS.yellow50};
   }
 
   &:disabled {
-    color: ${COLORS.darkGreyDisabled};
+    color: ${COLORS.grey40};
   }
 `
 
 const TOGGLE_ENABLED_STYLES = css`
-  color: ${COLORS.blueEnabled};
+  color: ${COLORS.blue50};
 
   &:hover {
-    color: ${COLORS.blueHover};
+    color: ${COLORS.blue55};
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
+    box-shadow: 0 0 0 3px ${COLORS.yellow50};
   }
 
   &:disabled {
-    color: ${COLORS.darkGreyDisabled};
+    color: ${COLORS.grey40};
   }
 `
 

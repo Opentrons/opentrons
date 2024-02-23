@@ -12,13 +12,14 @@ import { StepFieldName } from '../../form-types'
 export const makeBatchEditFieldProps = (
   fieldValues: MultiselectFieldValues,
   disabledFields: DisabledFields,
-  handleChangeFormInput: (name: string, value: unknown) => void
+  handleChangeFormInput: (name: string, value: unknown) => void,
+  t: any
 ): FieldPropsByName => {
   const fieldNames: StepFieldName[] = Object.keys(fieldValues)
   return fieldNames.reduce<FieldPropsByName>((acc, name) => {
-    const defaultTooltip = getFieldDefaultTooltip(name)
+    const defaultTooltip = getFieldDefaultTooltip(name, t)
     const isIndeterminate = fieldValues[name].isIndeterminate
-    const indeterminateTooltip = getFieldIndeterminateTooltip(name)
+    const indeterminateTooltip = getFieldIndeterminateTooltip(name, t)
     let tooltipContent = defaultTooltip // Default to the default content (or blank)
 
     if (isIndeterminate && indeterminateTooltip) {

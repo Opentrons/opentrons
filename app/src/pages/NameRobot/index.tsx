@@ -19,7 +19,6 @@ import {
   COLORS,
   TYPOGRAPHY,
   Icon,
-  Btn,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 
@@ -153,7 +152,7 @@ export function NameRobot(): JSX.Element {
       ) : (
         <>
           {isUnboxingFlowOngoing ? (
-            <StepMeter totalSteps={6} currentStep={5} />
+            <StepMeter totalSteps={5} currentStep={4} />
           ) : null}
           <Flex
             flexDirection={DIRECTION_COLUMN}
@@ -168,20 +167,7 @@ export function NameRobot(): JSX.Element {
               }
               position={POSITION_RELATIVE}
             >
-              <Flex position={POSITION_ABSOLUTE} left="0">
-                <Btn
-                  data-testid="name_back_button"
-                  onClick={() => {
-                    if (isUnboxingFlowOngoing) {
-                      history.push('/emergency-stop')
-                    } else {
-                      history.push('/robot-settings')
-                    }
-                  }}
-                >
-                  <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
-                </Btn>
-              </Flex>
+              <Flex position={POSITION_ABSOLUTE} left="0"></Flex>
               <Flex marginLeft={isUnboxingFlowOngoing ? '0' : '4rem'}>
                 <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
                   {isUnboxingFlowOngoing
@@ -224,7 +210,7 @@ export function NameRobot(): JSX.Element {
                 <StyledText
                   as="h4"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={COLORS.darkBlack70}
+                  color={COLORS.grey60}
                   marginBottom={SPACING.spacing24}
                 >
                   {t('name_your_robot_description')}
@@ -243,7 +229,7 @@ export function NameRobot(): JSX.Element {
             </Flex>
             <StyledText
               as="p"
-              color={COLORS.darkBlack70}
+              color={COLORS.grey60}
               fontWeight={TYPOGRAPHY.fontWeightRegular}
             >
               {t('name_rule_description')}
@@ -252,7 +238,7 @@ export function NameRobot(): JSX.Element {
               <StyledText
                 as="p"
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
-                color={COLORS.red2}
+                color={COLORS.red50}
               >
                 {formik.errors.newRobotName}
               </StyledText>

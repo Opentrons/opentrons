@@ -8,10 +8,21 @@ from opentrons.hardware_control import HardwareControlAPI
 from ..state import StateView, HardwarePipette
 from ..errors.exceptions import (
     TipNotAttachedError,
-    InvalidPipettingVolumeError,
+    InvalidAspirateVolumeError,
     InvalidPushOutVolumeError,
     InvalidDispenseVolumeError,
 )
+
+
+# 1e-9 µL (1 femtoliter!) is a good value because:
+# * It's large relative to rounding errors that occur in practice in protocols. For
+#   example, https://opentrons.atlassian.net/browse/RESC-182 shows a rounding error
+#   on the order of 1e-15 µL.
+# * It's small relative to volumes that our users might actually care about and
+#   expect the robot to execute faithfully.
+# * It's the default absolute tolerance for math.isclose(), where it apparently works
+#   well in general.
+_VOLUME_ROUNDING_ERROR_TOLERANCE = 1e-9
 
 
 class PipettingHandler(TypingProtocol):
@@ -80,14 +91,19 @@ class HardwarePipettingHandler(PipettingHandler):
     ) -> float:
         """Set flow-rate and aspirate."""
         # get mount and config data from state and hardware controller
+        adjusted_volume = _validate_aspirate_volume(
+            state_view=self._state_view, pipette_id=pipette_id, aspirate_volume=volume
+        )
         hw_pipette = self._state_view.pipettes.get_hardware_pipette(
             pipette_id=pipette_id,
             attached_pipettes=self._hardware_api.attached_instruments,
         )
         with self._set_flow_rate(pipette=hw_pipette, aspirate_flow_rate=flow_rate):
-            await self._hardware_api.aspirate(mount=hw_pipette.mount, volume=volume)
+            await self._hardware_api.aspirate(
+                mount=hw_pipette.mount, volume=adjusted_volume
+            )
 
-        return volume
+        return adjusted_volume
 
     async def dispense_in_place(
         self,
@@ -97,6 +113,9 @@ class HardwarePipettingHandler(PipettingHandler):
         push_out: Optional[float],
     ) -> float:
         """Dispense liquid without moving the pipette."""
+        adjusted_volume = _validate_dispense_volume(
+            state_view=self._state_view, pipette_id=pipette_id, dispense_volume=volume
+        )
         hw_pipette = self._state_view.pipettes.get_hardware_pipette(
             pipette_id=pipette_id,
             attached_pipettes=self._hardware_api.attached_instruments,
@@ -108,10 +127,10 @@ class HardwarePipettingHandler(PipettingHandler):
             )
         with self._set_flow_rate(pipette=hw_pipette, dispense_flow_rate=flow_rate):
             await self._hardware_api.dispense(
-                mount=hw_pipette.mount, volume=volume, push_out=push_out
+                mount=hw_pipette.mount, volume=adjusted_volume, push_out=push_out
             )
 
-        return volume
+        return adjusted_volume
 
     async def blow_out_in_place(
         self,
@@ -172,23 +191,6 @@ class VirtualPipettingHandler(PipettingHandler):
         """Get whether a pipette is ready to aspirate."""
         return self._state_view.pipettes.get_aspirated_volume(pipette_id) is not None
 
-    def _validate_aspirated_volume(self, pipette_id: str, volume: float) -> None:
-        """Get whether the aspirated volume is valid to aspirate."""
-        working_volume = self._state_view.pipettes.get_working_volume(
-            pipette_id=pipette_id
-        )
-
-        current_volume = (
-            self._state_view.pipettes.get_aspirated_volume(pipette_id=pipette_id) or 0
-        )
-
-        new_volume = current_volume + volume
-
-        if new_volume > working_volume:
-            raise InvalidPipettingVolumeError(
-                "Cannot aspirate more than pipette max volume"
-            )
-
     async def prepare_for_aspirate(self, pipette_id: str) -> None:
         """Virtually prepare to aspirate (no-op)."""
 
@@ -200,8 +202,9 @@ class VirtualPipettingHandler(PipettingHandler):
     ) -> float:
         """Virtually aspirate (no-op)."""
         self._validate_tip_attached(pipette_id=pipette_id, command_name="aspirate")
-        self._validate_aspirated_volume(pipette_id=pipette_id, volume=volume)
-        return volume
+        return _validate_aspirate_volume(
+            state_view=self._state_view, pipette_id=pipette_id, aspirate_volume=volume
+        )
 
     async def dispense_in_place(
         self,
@@ -217,8 +220,9 @@ class VirtualPipettingHandler(PipettingHandler):
                 "push out value cannot have a negative value."
             )
         self._validate_tip_attached(pipette_id=pipette_id, command_name="dispense")
-        self._validate_dispense_volume(pipette_id=pipette_id, dispense_volume=volume)
-        return volume
+        return _validate_dispense_volume(
+            state_view=self._state_view, pipette_id=pipette_id, dispense_volume=volume
+        )
 
     async def blow_out_in_place(
         self,
@@ -235,20 +239,6 @@ class VirtualPipettingHandler(PipettingHandler):
                 f"Cannot perform {command_name} without a tip attached"
             )
 
-    def _validate_dispense_volume(
-        self, pipette_id: str, dispense_volume: float
-    ) -> None:
-        """Validate dispense volume."""
-        aspirate_volume = self._state_view.pipettes.get_aspirated_volume(pipette_id)
-        if aspirate_volume is None:
-            raise InvalidDispenseVolumeError(
-                "Cannot perform a dispense if there is no volume in attached tip."
-            )
-        elif dispense_volume > aspirate_volume:
-            raise InvalidDispenseVolumeError(
-                f"Cannot dispense {dispense_volume} µL when only {aspirate_volume} µL has been aspirated."
-            )
-
 
 def create_pipetting_handler(
     state_view: StateView, hardware_api: HardwareControlAPI
@@ -259,3 +249,68 @@ def create_pipetting_handler(
         if state_view.config.use_virtual_pipettes is False
         else VirtualPipettingHandler(state_view=state_view)
     )
+
+
+def _validate_aspirate_volume(
+    state_view: StateView, pipette_id: str, aspirate_volume: float
+) -> float:
+    """Get whether the given volume is valid to aspirate right now.
+
+    Return the volume to aspirate, possibly clamped, or raise an
+    InvalidAspirateVolumeError.
+    """
+    working_volume = state_view.pipettes.get_working_volume(pipette_id=pipette_id)
+
+    current_volume = (
+        state_view.pipettes.get_aspirated_volume(pipette_id=pipette_id) or 0
+    )
+
+    # TODO(mm, 2024-01-11): We should probably just use
+    # state_view.pipettes.get_available_volume()? Its whole `None` return vs. exception
+    # raising thing is confusing me.
+    available_volume = working_volume - current_volume
+    available_volume_with_tolerance = (
+        available_volume + _VOLUME_ROUNDING_ERROR_TOLERANCE
+    )
+
+    if aspirate_volume > available_volume_with_tolerance:
+        raise InvalidAspirateVolumeError(
+            attempted_aspirate_volume=aspirate_volume,
+            available_volume=available_volume,
+            max_pipette_volume=state_view.pipettes.get_maximum_volume(
+                pipette_id=pipette_id
+            ),
+            max_tip_volume=_get_max_tip_volume(
+                state_view=state_view, pipette_id=pipette_id
+            ),
+        )
+    else:
+        return min(aspirate_volume, available_volume)
+
+
+def _validate_dispense_volume(
+    state_view: StateView, pipette_id: str, dispense_volume: float
+) -> float:
+    """Get whether the given volume is valid to dispense right now.
+
+    Return the volume to dispense, possibly clamped, or raise an
+    InvalidDispenseVolumeError.
+    """
+    aspirated_volume = state_view.pipettes.get_aspirated_volume(pipette_id)
+    if aspirated_volume is None:
+        raise InvalidDispenseVolumeError(
+            "Cannot perform a dispense if there is no volume in attached tip."
+        )
+    else:
+        remaining = aspirated_volume - dispense_volume
+        if remaining < -_VOLUME_ROUNDING_ERROR_TOLERANCE:
+            raise InvalidDispenseVolumeError(
+                f"Cannot dispense {dispense_volume} µL when only {aspirated_volume} µL has been aspirated."
+            )
+        else:
+            return min(dispense_volume, aspirated_volume)
+
+
+def _get_max_tip_volume(state_view: StateView, pipette_id: str) -> Optional[float]:
+    attached_tip = state_view.pipettes.get_attached_tip(pipette_id=pipette_id)
+    return None if attached_tip is None else attached_tip.volume

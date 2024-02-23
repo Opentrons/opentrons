@@ -9,7 +9,6 @@ import {
 } from '@opentrons/components'
 import { parseLiquidsInLoadOrder } from '@opentrons/api-client'
 import { getIsOnDevice } from '../../../../../redux/config'
-import { useLabwareRenderInfoForRunById } from '../../../../Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { mockDefinition } from '../../../../../redux/custom-labware/__fixtures__'
 import { getLocationInfoNames } from '../../utils/getLocationInfoNames'
@@ -56,9 +55,6 @@ const mockLabwareRender = LabwareRender as jest.MockedFunction<
 >
 const mockGetWellFillFromLabwareId = getWellFillFromLabwareId as jest.MockedFunction<
   typeof getWellFillFromLabwareId
->
-const mockUseLabwareRenderInfoForRunById = useLabwareRenderInfoForRunById as jest.MockedFunction<
-  typeof useLabwareRenderInfoForRunById
 >
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
@@ -116,11 +112,6 @@ describe('LiquidsLabwareDetailsModal', () => {
     ])
     mockLiquidDetailCard.mockReturnValue(<div></div>)
     mockGetWellFillFromLabwareId.mockReturnValue({})
-    mockUseLabwareRenderInfoForRunById.mockReturnValue({
-      '123': {
-        labwareDef: {},
-      },
-    } as any)
     mockUseMostRecentCompletedAnalysis.mockReturnValue(
       {} as CompletedProtocolAnalysis
     )

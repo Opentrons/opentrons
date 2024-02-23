@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Box,
   DeprecatedPrimaryButton,
@@ -8,7 +9,6 @@ import {
   TOOLTIP_TOP,
   TOOLTIP_FIXED,
 } from '@opentrons/components'
-import { i18n } from '../../localization'
 import {
   BlowoutLocationField,
   CheckboxRowField,
@@ -37,6 +37,7 @@ interface BatchEditMixProps {
 }
 export const BatchEditMix = (props: BatchEditMixProps): JSX.Element => {
   const { propsForFields, handleCancel, handleSave } = props
+  const { t } = useTranslation(['form', 'button', 'tooltip'])
   const [cancelButtonTargetProps, cancelButtonTooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP,
     strategy: TOOLTIP_FIXED,
@@ -74,7 +75,7 @@ export const BatchEditMix = (props: BatchEditMixProps): JSX.Element => {
       <Box className={styles.form_wrapper}>
         <Box className={styles.section_wrapper}>
           <FormColumn
-            sectionHeader={i18n.t('form.batch_edit_form.settings_for', {
+            sectionHeader={t('batch_edit_form.settings_for', {
               prefix: 'aspirate',
             })}
           >
@@ -90,7 +91,7 @@ export const BatchEditMix = (props: BatchEditMixProps): JSX.Element => {
               />
               <WellOrderField
                 prefix="mix"
-                label={i18n.t('form.step_edit_form.field.well_order.label')}
+                label={t('step_edit_form.field.well_order.label')}
                 firstValue={getWellOrderFieldValue('mix_wellOrder_first')}
                 secondValue={getWellOrderFieldValue('mix_wellOrder_second')}
                 firstName="mix_wellOrder_first"
@@ -115,7 +116,7 @@ export const BatchEditMix = (props: BatchEditMixProps): JSX.Element => {
           </FormColumn>
 
           <FormColumn
-            sectionHeader={i18n.t('form.batch_edit_form.settings_for', {
+            sectionHeader={t('batch_edit_form.settings_for', {
               prefix: 'dispense',
             })}
           >
@@ -136,7 +137,7 @@ export const BatchEditMix = (props: BatchEditMixProps): JSX.Element => {
             />
             <CheckboxRowField
               {...propsForFields.mix_touchTip_checkbox}
-              label={i18n.t('form.step_edit_form.field.touchTip.label')}
+              label={t('step_edit_form.field.touchTip.label')}
               className={styles.small_field}
             >
               <TipPositionField
@@ -148,7 +149,7 @@ export const BatchEditMix = (props: BatchEditMixProps): JSX.Element => {
             </CheckboxRowField>
             <CheckboxRowField
               {...propsForFields.blowout_checkbox}
-              label={i18n.t('form.step_edit_form.field.blowout.label')}
+              label={t('step_edit_form.field.blowout.label')}
               className={styles.small_field}
             >
               <BlowoutLocationField
@@ -172,10 +173,10 @@ export const BatchEditMix = (props: BatchEditMixProps): JSX.Element => {
               onClick={handleCancel}
               className={buttonStyles.button_auto}
             >
-              {i18n.t('button.discard_changes')}
+              {t('button:discard_changes')}
             </OutlineButton>
             <Tooltip {...cancelButtonTooltipProps}>
-              {i18n.t('tooltip.cancel_batch_edit')}
+              {t('tooltip:cancel_batch_edit')}
             </Tooltip>
           </Box>
 
@@ -188,11 +189,11 @@ export const BatchEditMix = (props: BatchEditMixProps): JSX.Element => {
               disabled={disableSave}
               onClick={handleSave}
             >
-              {i18n.t('button.save')}
+              {t('button:save')}
             </DeprecatedPrimaryButton>
             <Tooltip {...saveButtonTooltipProps}>
-              {i18n.t(
-                `tooltip.save_batch_edit.${
+              {t(
+                `tooltip:save_batch_edit.${
                   disableSave ? 'disabled' : 'enabled'
                 }`
               )}

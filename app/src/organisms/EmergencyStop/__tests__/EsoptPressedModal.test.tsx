@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { when } from 'jest-when'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 import { useAcknowledgeEstopDisengageMutation } from '@opentrons/react-api-client'
@@ -60,7 +61,7 @@ describe('EstopPressedModal - Touchscreen', () => {
 
   it('should call a mock function when clicking resume robot operations', () => {
     const [{ getByText }] = render(props)
-    getByText('Resume robot operations').click()
+    fireEvent.click(getByText('Resume robot operations'))
     expect(mockUseAcknowledgeEstopDisengageMutation).toHaveBeenCalled()
   })
 })
@@ -102,14 +103,14 @@ describe('EstopPressedModal - Desktop', () => {
 
   it('should call a mock function when clicking close icon', () => {
     const [{ getByTestId }] = render(props)
-    getByTestId('ModalHeader_icon_close_E-stop pressed').click()
+    fireEvent.click(getByTestId('ModalHeader_icon_close_E-stop pressed'))
     expect(props.setIsDismissedModal).toHaveBeenCalled()
     expect(props.closeModal).toHaveBeenCalled()
   })
 
   it('should call a mock function when clicking resume robot operations', () => {
     const [{ getByRole }] = render(props)
-    getByRole('button', { name: 'Resume robot operations' }).click()
+    fireEvent.click(getByRole('button', { name: 'Resume robot operations' }))
     expect(mockUseAcknowledgeEstopDisengageMutation).toHaveBeenCalled()
   })
 })

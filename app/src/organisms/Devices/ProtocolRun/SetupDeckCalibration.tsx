@@ -47,7 +47,7 @@ export function SetupDeckCalibration({
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <StyledText
-          color={COLORS.black}
+          color={COLORS.black90}
           css={TYPOGRAPHY.pSemiBold}
           id="DeckCalibration_deckCalibrationTitle"
         >

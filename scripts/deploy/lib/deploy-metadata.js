@@ -50,7 +50,6 @@ function setDeployMetadata(s3, bucket, path, metadata, dryrun) {
     .putObject({
       Bucket: bucket,
       Key: getDeployMetadataKey(path),
-      ACL: 'public-read',
       Body: JSON.stringify(metadata),
       CacheControl: 'no-store',
       ContentType: 'application/json',

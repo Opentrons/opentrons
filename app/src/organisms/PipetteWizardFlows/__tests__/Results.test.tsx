@@ -150,7 +150,7 @@ describe('Results', () => {
     render(props)
     screen.getByText('Unable to detect pipette')
     expect(screen.getByLabelText('ot-alert')).toHaveStyle(
-      `color: ${String(COLORS.errorEnabled)}`
+      `color: ${String(COLORS.red50)}`
     )
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
     await act(() => pipettePromise)
@@ -180,7 +180,7 @@ describe('Results', () => {
     render(props)
     screen.getByText('Flex 1-Channel 1000 μL still attached')
     expect(screen.getByLabelText('ot-alert')).toHaveStyle(
-      `color: ${String(COLORS.errorEnabled)}`
+      `color: ${String(COLORS.red50)}`
     )
     screen.getByRole('button', { name: 'Try again' })
   })
@@ -215,7 +215,7 @@ describe('Results', () => {
     render(props)
     screen.getByText('Flex 1-Channel 1000 μL still attached')
     expect(screen.getByLabelText('ot-alert')).toHaveStyle(
-      `color: ${String(COLORS.errorEnabled)}`
+      `color: ${String(COLORS.red50)}`
     )
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
     await act(() => pipettePromise)
@@ -304,7 +304,7 @@ describe('Results', () => {
     render(props)
     screen.getByText('Unable to detect pipette')
     expect(screen.getByLabelText('ot-alert')).toHaveStyle(
-      `color: ${String(COLORS.errorEnabled)}`
+      `color: ${String(COLORS.red50)}`
     )
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
     await act(() => pipettePromise)

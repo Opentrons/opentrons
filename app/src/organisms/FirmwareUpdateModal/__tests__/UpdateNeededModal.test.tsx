@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
+
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import {
   useInstrumentsQuery,
@@ -9,6 +11,7 @@ import { i18n } from '../../../i18n'
 import { UpdateNeededModal } from '../UpdateNeededModal'
 import { UpdateInProgressModal } from '../UpdateInProgressModal'
 import { UpdateResultsModal } from '../UpdateResultsModal'
+
 import type {
   BadPipette,
   SubsystemUpdateProgressData,
@@ -97,7 +100,7 @@ describe('UpdateNeededModal', () => {
         'The firmware for Left Pipette is out of date. You need to update it before running protocols that use this instrument'
       )
     )
-    getByText('Update firmware').click()
+    fireEvent.click(getByText('Update firmware'))
     expect(updateSubsystem).toHaveBeenCalled()
   })
   it('renders the update in progress modal when update is pending', () => {

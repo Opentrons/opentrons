@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { UseQueryResult } from 'react-query'
 import { renderWithProviders } from '@opentrons/components'
-import { useAllRunsQuery } from '@opentrons/react-api-client'
+
+import { useNotifyAllRunsQuery } from '../../../resources/runs/useNotifyAllRunsQuery'
 import { i18n } from '../../../i18n'
 import { useIsRobotViewable, useRunStatuses } from '../hooks'
 import { RecentProtocolRuns } from '../RecentProtocolRuns'
@@ -10,7 +11,7 @@ import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
 import type { Runs } from '@opentrons/api-client'
 import type { AxiosError } from 'axios'
 
-jest.mock('@opentrons/react-api-client')
+jest.mock('../../../resources/runs/useNotifyAllRunsQuery')
 jest.mock('../hooks')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../HistoricalProtocolRun')
@@ -18,8 +19,8 @@ jest.mock('../HistoricalProtocolRun')
 const mockUseIsRobotViewable = useIsRobotViewable as jest.MockedFunction<
   typeof useIsRobotViewable
 >
-const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
-  typeof useAllRunsQuery
+const mockUseNotifyAllRunsQuery = useNotifyAllRunsQuery as jest.MockedFunction<
+  typeof useNotifyAllRunsQuery
 >
 const mockHistoricalProtocolRun = HistoricalProtocolRun as jest.MockedFunction<
   typeof HistoricalProtocolRun
@@ -56,7 +57,7 @@ describe('RecentProtocolRuns', () => {
   })
   it('renders an empty state message when there are no runs', () => {
     mockUseIsRobotViewable.mockReturnValue(true)
-    mockUseAllRunsQuery.mockReturnValue({
+    mockUseNotifyAllRunsQuery.mockReturnValue({
       data: {},
     } as UseQueryResult<Runs, AxiosError>)
     const [{ getByText }] = render()
@@ -65,7 +66,7 @@ describe('RecentProtocolRuns', () => {
   })
   it('renders table headers if there are runs', () => {
     mockUseIsRobotViewable.mockReturnValue(true)
-    mockUseAllRunsQuery.mockReturnValue({
+    mockUseNotifyAllRunsQuery.mockReturnValue({
       data: {
         data: [
           {

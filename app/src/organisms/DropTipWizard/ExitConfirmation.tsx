@@ -33,7 +33,7 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
 
   return (
     <SimpleWizardBody
-      iconColor={COLORS.warningEnabled}
+      iconColor={COLORS.yellow50}
       header={t('exit_screen_title', { flow: flowTitle })}
       isSuccess={false}
     >

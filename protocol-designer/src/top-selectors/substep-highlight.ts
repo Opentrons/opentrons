@@ -30,7 +30,7 @@ function _wellsForPipette(
     let channels: 8 | 96 = pipChannels
     if (nozzles === ALL) {
       channels = 96
-    } else if (nozzles === COLUMN) {
+    } else if (nozzles === COLUMN || pipChannels === 8) {
       channels = 8
     } else {
       console.error(`we don't support other 96-channel configurations yet`)

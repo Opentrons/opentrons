@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { useCurrentMaintenanceRun } from '@opentrons/react-api-client'
+
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 
 interface MaintenanceRunIds {
   currentRunId: string | null
@@ -28,7 +29,7 @@ export function MaintenanceRunStatusProvider(
     oddRunId: null,
   })
 
-  const currentRunIdQueryResult = useCurrentMaintenanceRun({
+  const currentRunIdQueryResult = useNotifyCurrentMaintenanceRun({
     refetchInterval: 5000,
   }).data?.data.id
 

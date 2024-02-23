@@ -1,4 +1,5 @@
 """Tests for the /protocols router."""
+import io
 import pytest
 from datetime import datetime
 from decoy import Decoy, matchers
@@ -322,11 +323,11 @@ async def test_create_protocol(
 ) -> None:
     """It should store an uploaded protocol file."""
     protocol_directory = Path("/dev/null")
+    content = bytes("some_content", encoding="utf-8")
+    uploaded_file = io.BytesIO(content)
 
-    protocol_file = UploadFile(filename="foo.json")
-    buffered_file = BufferedFile(
-        name="blah", contents=bytes("some_content", encoding="utf-8"), path=None
-    )
+    protocol_file = UploadFile(filename="foo.json", file=uploaded_file)
+    buffered_file = BufferedFile(name="blah", contents=content, path=None)
 
     protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
@@ -355,9 +356,14 @@ async def test_create_protocol(
         status=AnalysisStatus.PENDING,
     )
 
-    decoy.when(await file_reader_writer.read(files=[protocol_file])).then_return(
-        [buffered_file]
-    )
+    decoy.when(
+        await file_reader_writer.read(
+            # TODO(mm, 2024-02-07): Recent FastAPI upgrades mean protocol_file.filename
+            # is typed as possibly None. Investigate whether that can actually happen in
+            # practice and whether we need to account for it.
+            files=[protocol_file]  # type: ignore[list-item]
+        )
+    ).then_return([buffered_file])
 
     decoy.when(await file_hasher.hash(files=[buffered_file])).then_return("abc123")
 

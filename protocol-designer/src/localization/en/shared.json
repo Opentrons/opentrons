@@ -1,5 +1,6 @@
 {
   "add": "add",
+  "confirm_reorder": "Are you sure you want to reorder these steps, it may cause errors?",
   "edit": "edit",
   "exit": "exit",
   "go_back": "go back",

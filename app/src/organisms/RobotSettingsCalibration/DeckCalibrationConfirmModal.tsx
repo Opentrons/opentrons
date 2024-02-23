@@ -48,14 +48,14 @@ export function DeckCalibrationConfirmModal({
             onClick={cancel}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             marginRight={SPACING.spacing24}
-            color={COLORS.blueEnabled}
+            color={COLORS.blue50}
             css={TYPOGRAPHY.fontSizeP}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {t('shared:cancel')}
           </Link>
           <PrimaryButton
-            backgroundColor={COLORS.errorEnabled}
+            backgroundColor={COLORS.red50}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             css={TYPOGRAPHY.fontSizeP}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}

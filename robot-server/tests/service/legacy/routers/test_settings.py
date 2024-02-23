@@ -1,7 +1,7 @@
 import logging
 from mock import patch, call, MagicMock
 from dataclasses import make_dataclass
-from typing import Generator
+from typing import Generator, Optional
 from pathlib import Path
 
 import pytest
@@ -18,58 +18,12 @@ from opentrons.types import Mount
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 
-from robot_server import app
+from robot_server.app import app
 from robot_server.deck_configuration.fastapi_dependencies import (
-    get_deck_configuration_store,
+    get_deck_configuration_store_failsafe,
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.persistence import PersistenceResetter, get_persistence_resetter
-
-
-# TODO(isk: 3/20/20): test validation errors after refactor
-# return {message: string}
-@pytest.mark.parametrize(
-    "log_level, syslog_level, expected_message",
-    [
-        ("error", "err", {"message": "Upstreaming log level changed to error"}),
-        ("ERROR", "err", {"message": "Upstreaming log level changed to error"}),
-        ("warning", "warning", {"message": "Upstreaming log level changed to warning"}),
-        ("WARNING", "warning", {"message": "Upstreaming log level changed to warning"}),
-        ("info", "info", {"message": "Upstreaming log level changed to info"}),
-        ("INFO", "info", {"message": "Upstreaming log level changed to info"}),
-        ("debug", "debug", {"message": "Upstreaming log level changed to debug"}),
-        ("DEBUG", "debug", {"message": "Upstreaming log level changed to debug"}),
-        (None, "emerg", {"message": "Upstreaming logs disabled"}),
-        (None, "emerg", {"message": "Upstreaming logs disabled"}),
-    ],
-)
-def test_post_log_level_upstream(api_client, log_level, syslog_level, expected_message):
-    with patch("opentrons.system.log_control.set_syslog_level") as m:
-        m.return_value = 0, "stdout", "stderr"
-        response = api_client.post(
-            "/settings/log_level/upstream", json={"log_level": log_level}
-        )
-        body = response.json()
-        assert response.status_code == 200
-        assert body == expected_message
-        m.assert_called_once_with(syslog_level)
-
-
-def test_post_log_level_upstream_fails_reload(api_client):
-    log_level = "debug"
-
-    with patch("opentrons.system.log_control.set_syslog_level") as m:
-        m.return_value = 1, "stdout", "stderr"
-        response = api_client.post(
-            "/settings/log_level/upstream", json={"log_level": log_level}
-        )
-        body = response.json()
-        assert response.status_code == 500
-        assert body == {
-            "message": "Could not reload config: stdout stderr",
-            "errorCode": "4000",
-        }
-        m.assert_called_once_with(log_level)
 
 
 def test_get_robot_settings(api_client, hardware):
@@ -556,19 +510,19 @@ def mock_persistence_resetter(
 
 
 @pytest.fixture
-def mock_deck_configuration_store(
+def mock_deck_configuration_store_failsafe(
     decoy: Decoy,
-) -> Generator[DeckConfigurationStore, None, None]:
+) -> Generator[Optional[DeckConfigurationStore], None, None]:
     mock_deck_configuration_store = decoy.mock(cls=DeckConfigurationStore)
 
-    async def mock_get_deck_configuration_store() -> DeckConfigurationStore:
+    async def mock_get_deck_configuration_store_failsafe() -> DeckConfigurationStore:
         return mock_deck_configuration_store
 
     app.dependency_overrides[
-        get_deck_configuration_store
-    ] = mock_get_deck_configuration_store
+        get_deck_configuration_store_failsafe
+    ] = mock_get_deck_configuration_store_failsafe
     yield mock_deck_configuration_store
-    del app.dependency_overrides[get_deck_configuration_store]
+    del app.dependency_overrides[get_deck_configuration_store_failsafe]
 
 
 @pytest.mark.parametrize(
@@ -624,7 +578,7 @@ def test_reset_success(
     api_client,
     mock_reset,
     mock_persistence_resetter: PersistenceResetter,
-    mock_deck_configuration_store: DeckConfigurationStore,
+    mock_deck_configuration_store_failsafe: Optional[DeckConfigurationStore],
     body,
     called_with,
 ):
@@ -634,7 +588,10 @@ def test_reset_success(
 
 
 def test_reset_invalid_option(
-    api_client, mock_reset, mock_persistence_resetter, mock_deck_configuration_store
+    api_client,
+    mock_reset,
+    mock_persistence_resetter,
+    mock_deck_configuration_store_failsafe,
 ):
     resp = api_client.post("/settings/reset", json={"aksgjajhadjasl": False})
     assert resp.status_code == 422
@@ -741,7 +698,7 @@ def mock_set_adv_setting():
 
 def validate_response_body(body, restart):
     settings_list = body.get("settings")
-    assert type(settings_list) == list
+    assert isinstance(settings_list, list)
     for obj in settings_list:
         assert "id" in obj, '"id" field not found in settings object'
         assert "title" in obj, '"title" not found for {}'.format(obj["id"])

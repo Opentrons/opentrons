@@ -145,6 +145,7 @@ Command Line
 ------------
 
 .. TODO update with separate links to OT-2 and Flex setup, when new Flex process is in manual or on help site
+
 The robot's command line is accessible either by going to **New > Terminal** in Jupyter or `via SSH <https://support.opentrons.com/s/article/Connecting-to-your-OT-2-with-SSH>`_.
 
 To execute a protocol from the robot's command line, copy the protocol file to the robot with ``scp`` and then run the protocol with ``opentrons_execute``:

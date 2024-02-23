@@ -43,7 +43,7 @@ export function UpdateSoftware({
 
   return (
     <Flex
-      backgroundColor={COLORS.darkBlack20}
+      backgroundColor={COLORS.grey35}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing40}
       alignItems={ALIGN_CENTER}
@@ -63,7 +63,7 @@ export function UpdateSoftware({
         <StyledText
           as="h3"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={COLORS.darkBlack70}
+          color={COLORS.grey60}
         >
           {renderText()}
         </StyledText>

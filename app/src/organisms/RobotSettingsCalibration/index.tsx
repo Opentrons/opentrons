@@ -324,7 +324,10 @@ export function RobotSettingsCalibration({
             updateRobotStatus={updateRobotStatus}
           />
           <Line />
-          <RobotSettingsGripperCalibration gripper={attachedGripper} />
+          <RobotSettingsGripperCalibration
+            gripper={attachedGripper}
+            robotName={robotName}
+          />
           <Line />
           <RobotSettingsModuleCalibration
             attachedModules={attachedModules}
@@ -332,6 +335,7 @@ export function RobotSettingsCalibration({
             formattedPipetteOffsetCalibrations={
               formattedPipetteOffsetCalibrations
             }
+            robotName={robotName}
           />
         </>
       ) : (

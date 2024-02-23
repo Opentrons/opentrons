@@ -24,11 +24,11 @@ const INTERVENTION_COMMAND_STYLE = css`
 
 const INTERVENTION_COMMAND_NOTES_STYLE = css`
   ${TYPOGRAPHY.h6Default}
-  color: ${COLORS.errorDisabled};
+  color: ${COLORS.grey60};
   text-transform: ${TEXT_TRANSFORM_UPPERCASE};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     ${TYPOGRAPHY.smallBodyTextBold}
-    color: ${COLORS.darkBlack100};
+    color: ${COLORS.black90};
     text-transform: ${TEXT_TRANSFORM_CAPITALIZE};
   }
 `

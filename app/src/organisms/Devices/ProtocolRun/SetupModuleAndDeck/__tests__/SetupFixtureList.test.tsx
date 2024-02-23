@@ -1,7 +1,11 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE } from '@opentrons/shared-data'
+import {
+  SINGLE_RIGHT_SLOT_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  TRASH_BIN_ADAPTER_FIXTURE,
+} from '@opentrons/shared-data'
 import { i18n } from '../../../../../i18n'
 import { SetupFixtureList } from '../SetupFixtureList'
 import { NotConfiguredModal } from '../NotConfiguredModal'
@@ -31,6 +35,30 @@ const mockDeckConfigCompatibility: CutoutConfigAndCompatibility[] = [
   {
     cutoutId: 'cutoutD3',
     cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+    requiredAddressableAreas: ['D4'],
+    compatibleCutoutFixtureIds: [
+      STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+    ],
+    missingLabwareDisplayName: null,
+  },
+]
+
+const mockNotConfiguredDeckConfigCompatibility: CutoutConfigAndCompatibility[] = [
+  {
+    cutoutId: 'cutoutD3',
+    cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
+    requiredAddressableAreas: ['D4'],
+    compatibleCutoutFixtureIds: [
+      STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+    ],
+    missingLabwareDisplayName: null,
+  },
+]
+
+const mockConflictDeckConfigCompatibility: CutoutConfigAndCompatibility[] = [
+  {
+    cutoutId: 'cutoutD3',
+    cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
     requiredAddressableAreas: ['D4'],
     compatibleCutoutFixtureIds: [
       STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
@@ -79,17 +107,23 @@ describe('SetupFixtureList', () => {
     screen.getByText('mock DeckFixtureSetupInstructionsModal')
   })
 
-  // TODO(bh, 2023-11-14): implement test cases when example JSON protocol fixtures exist
-  // it('should render the headers and a fixture with conflicted status', () => {
-  //   render(props)
-  //   screen.getByText('Location conflict')
-  //   screen.getByRole('button', { name: 'Update deck' }).click()
-  //   screen.getByText('mock location conflict modal')
-  // })
-  // it('should render the headers and a fixture with not configured status and button', () => {
-  //   render(props)
-  //   screen.getByText('Not configured')
-  //   screen.getByRole('button', { name: 'Update deck' }).click()
-  //   screen.getByText('mock not configured modal')
-  // })
+  it('should render the headers and a fixture with conflicted status', () => {
+    props = {
+      deckConfigCompatibility: mockConflictDeckConfigCompatibility,
+    }
+    render(props)
+    screen.getByText('Location conflict')
+    fireEvent.click(screen.getByRole('button', { name: 'Resolve' }))
+    screen.getByText('mock location conflict modal')
+  })
+
+  it('should render the headers and a fixture with not configured status and button', () => {
+    props = {
+      deckConfigCompatibility: mockNotConfiguredDeckConfigCompatibility,
+    }
+    render(props)
+    screen.getByText('Not configured')
+    fireEvent.click(screen.getByRole('button', { name: 'Resolve' }))
+    screen.getByText('mock not configured modal')
+  })
 })

@@ -174,7 +174,7 @@ const DEFAULT_BUTTON_STYLE = css`
   justify-content: ${JUSTIFY_FLEX_START};
   align-items: ${ALIGN_CENTER};
   background-color: ${COLORS.white};
-  color: ${COLORS.black};
+  color: ${COLORS.black90};
   grid-gap: ${SPACING.spacing8};
   padding: ${SPACING.spacing8};
 
@@ -184,31 +184,31 @@ const DEFAULT_BUTTON_STYLE = css`
 
   &:hover {
     background-color: ${COLORS.white};
-    color: ${COLORS.black};
+    color: ${COLORS.black90};
     box-shadow: 0 0 0;
-    border: 1px ${COLORS.lightGreyHover} solid;
+    border: 1px ${COLORS.grey30} solid;
   }
 
   &:active {
     background-color: ${COLORS.white};
-    color: ${COLORS.blueEnabled};
-    border: 1px ${COLORS.blueEnabled} solid;
+    color: ${COLORS.blue50};
+    border: 1px ${COLORS.blue50} solid;
   }
 
   &:disabled {
     background-color: ${COLORS.white};
-    color: ${COLORS.errorDisabled};
+    color: ${COLORS.grey40};
   }
 `
 
 const ACTIVE_BUTTON_STYLE = css`
   ${DEFAULT_BUTTON_STYLE}
-  color: ${COLORS.blueEnabled};
-  border: 1px ${COLORS.blueEnabled} solid;
+  color: ${COLORS.blue50};
+  border: 1px ${COLORS.blue50} solid;
 
   &:hover {
-    color: ${COLORS.bluePressed};
-    border: 1px ${COLORS.bluePressed} solid;
+    color: ${COLORS.blue60};
+    border: 1px ${COLORS.blue60} solid;
   }
 `
 
@@ -266,7 +266,7 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
                   <StyledText
                     textAlign={TEXT_ALIGN_LEFT}
                     alignSelf={ALIGN_STRETCH}
-                    color={COLORS.darkGreyEnabled}
+                    color={COLORS.grey50}
                     css={TYPOGRAPHY.labelRegular}
                   >
                     {subtitle}
@@ -330,7 +330,7 @@ const ARROW_GRID_STYLES = css`
   }
 `
 const ARROW_BUTTON_STYLES = css`
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50};
   background-color: ${COLORS.white};
 
   border: ${BORDERS.lineBorder};
@@ -342,15 +342,15 @@ const ARROW_BUTTON_STYLES = css`
   justify-content: ${JUSTIFY_CENTER};
   &:hover {
     background-color: ${COLORS.white};
-    color: ${COLORS.darkGreyHover};
+    color: ${COLORS.grey60};
     box-shadow: 0 0 0;
-    border: 1px ${COLORS.lightGreyHover} solid;
+    border: 1px ${COLORS.grey30} solid;
   }
 
   &:active {
     background-color: ${COLORS.white};
-    color: ${COLORS.darkGreyPressed};
-    border: 1px ${COLORS.lightGreyHover} solid;
+    color: ${COLORS.grey60};
+    border: 1px ${COLORS.grey30} solid;
   }
 
   &:focus {
@@ -359,7 +359,7 @@ const ARROW_BUTTON_STYLES = css`
 
   &:disabled {
     background-color: ${COLORS.white};
-    color: ${COLORS.darkGreyDisabled};
+    color: ${COLORS.grey30};
   }
 
   @media (max-width: 750px) {
@@ -369,28 +369,28 @@ const ARROW_BUTTON_STYLES = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     width: 125px;
     height: 125px;
-    background-color: ${COLORS.light1};
-    color: ${COLORS.darkBlackEnabled};
+    background-color: ${COLORS.grey35};
+    color: ${COLORS.black90};
     border-radius: ${BORDERS.borderRadiusSize4};
 
     &:hover {
-      background-color: ${COLORS.light1Pressed};
-      color: ${COLORS.darkBlackHover};
+      background-color: ${COLORS.grey40};
+      color: ${COLORS.black80};
       border: 1px ${COLORS.transparent} solid;
     }
 
     &:active {
-      background-color: ${COLORS.light1Pressed};
-      color: ${COLORS.darkGreyPressed};
+      background-color: ${COLORS.grey40};
+      color: ${COLORS.grey60};
     }
 
     &:focus {
-      background-color: ${COLORS.light1Pressed};
+      background-color: ${COLORS.grey40};
     }
 
     &:disabled {
-      background-color: ${COLORS.darkBlack20};
-      color: ${COLORS.darkBlack40};
+      background-color: ${COLORS.grey35};
+      color: ${COLORS.grey50};
       border: 1px ${COLORS.transparent} solid;
     }
   }
@@ -457,7 +457,7 @@ export function TouchDirectionControl(
     <Flex
       flex="1"
       flexDirection={DIRECTION_COLUMN}
-      border={`1px solid ${COLORS.darkBlack40}`}
+      border={`1px solid ${COLORS.grey50}`}
       borderRadius={BORDERS.borderRadiusSize4}
       padding={SPACING.spacing16}
       gridGap={SPACING.spacing16}
@@ -486,7 +486,7 @@ export function TouchDirectionControl(
                   <StyledText
                     as="p"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    color={selected ? COLORS.white : COLORS.darkBlackEnabled}
+                    color={selected ? COLORS.white : COLORS.black90}
                   >
                     {CONTROLS_CONTENTS_BY_PLANE[plane].title}
                   </StyledText>

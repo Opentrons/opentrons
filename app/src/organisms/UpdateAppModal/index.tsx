@@ -80,12 +80,11 @@ const UpdateAppBanner = styled(Banner)`
 const UPDATE_PROGRESS_BAR_STYLE = css`
   margin-top: ${SPACING.spacing24};
   border-radius: ${BORDERS.borderRadiusSize3};
-  background: ${COLORS.medGreyEnabled};
+  background: ${COLORS.grey30};
   width: 17.12rem;
 `
 const LEGACY_MODAL_STYLE = css`
   width: 40rem;
-  textalign: center;
 `
 
 const RESTART_APP_AFTER_TIME = 5000
@@ -174,7 +173,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
               {downloading ? t('download_update') : t('restarting_app')}
             </StyledText>
             <ProgressBar
-              percentComplete={downloadPercentage}
+              percentComplete={downloaded ? 100 : downloadPercentage}
               outerStyles={UPDATE_PROGRESS_BAR_STYLE}
             />
           </Flex>

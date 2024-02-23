@@ -66,7 +66,7 @@ describe('Long Press Modal', () => {
     result.current.isLongPressed = true
     const [{ getByText }] = render(result.current)
     const button = getByText('Delete protocol')
-    button.click()
+    fireEvent.click(button)
     expect(mockSetTargetProtocolId).toHaveBeenCalledWith('mockProtocol1')
     expect(mockFunc).toHaveBeenCalled()
   })

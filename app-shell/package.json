@@ -45,7 +45,7 @@
     "@types/uuid": "^3.4.7",
     "ajv": "6.12.3",
     "dateformat": "3.0.3",
-    "electron-context-menu": "^3.5.0",
+    "electron-context-menu": "3.6.1",
     "electron-debug": "3.0.1",
     "electron-devtools-installer": "3.2.0",
     "electron-store": "5.1.1",
@@ -55,17 +55,16 @@
     "fs-extra": "10.0.0",
     "get-stream": "5.1.0",
     "merge-options": "1.0.1",
+    "mqtt": "4.3.8",
     "node-fetch": "2.6.7",
     "node-stream-zip": "1.8.2",
     "pump": "3.0.0",
     "semver": "5.5.0",
     "serialport": "10.5.0",
     "tempy": "1.0.1",
+    "usb": "^2.11.0",
     "uuid": "3.2.1",
     "winston": "3.1.0",
     "yargs-parser": "13.1.2"
-  },
-  "optionalDependencies": {
-    "usb-detection": "4.14.1"
   }
 }

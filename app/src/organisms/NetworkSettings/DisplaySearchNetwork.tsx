@@ -32,7 +32,7 @@ export function DisplaySearchNetwork(): JSX.Element {
       >
         <StyledText
           as="h3"
-          color={COLORS.darkBlack70}
+          color={COLORS.grey60}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing40}
         >

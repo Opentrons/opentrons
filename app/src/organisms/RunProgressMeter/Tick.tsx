@@ -71,7 +71,7 @@ export function Tick(props: TickProps): JSX.Element {
       backgroundColor={COLORS.white}
       fontSize="9px"
       borderRadius="4px"
-      border={`${COLORS.blueEnabled} 1px solid`}
+      border={`${COLORS.blue50} 1px solid`}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
       height="0.75rem"

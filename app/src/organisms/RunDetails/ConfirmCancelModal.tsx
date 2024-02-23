@@ -28,16 +28,17 @@ import { ANALYTICS_PROTOCOL_RUN_CANCEL } from '../../redux/analytics'
 export interface ConfirmCancelModalProps {
   onClose: () => unknown
   runId: string
+  robotName: string
 }
 
 export function ConfirmCancelModal(
   props: ConfirmCancelModalProps
 ): JSX.Element {
-  const { onClose, runId } = props
+  const { onClose, runId, robotName } = props
   const { stopRun } = useStopRunMutation()
   const [isCanceling, setIsCanceling] = React.useState(false)
   const runStatus = useRunStatus(runId)
-  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const { t } = useTranslation('run_details')
 
   const cancelRun: React.MouseEventHandler<HTMLButtonElement> = (e): void => {
@@ -88,7 +89,7 @@ export function ConfirmCancelModal(
               </Link>
             )}
             <AlertPrimaryButton
-              backgroundColor={COLORS.errorEnabled}
+              backgroundColor={COLORS.red50}
               onClick={cancelRun}
               disabled={isCanceling}
               minWidth="8rem"

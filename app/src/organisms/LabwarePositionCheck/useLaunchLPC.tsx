@@ -1,21 +1,24 @@
 import * as React from 'react'
+
 import {
   useCreateMaintenanceRunLabwareDefinitionMutation,
   useDeleteMaintenanceRunMutation,
-  useRunQuery,
 } from '@opentrons/react-api-client'
+
 import { useCreateTargetedMaintenanceRunMutation } from '../../resources/runs/hooks'
 import { LabwarePositionCheck } from '.'
 import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
 import { getLabwareDefinitionsFromCommands } from './utils/labware'
-import { RobotType } from '@opentrons/shared-data'
+import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
+
+import type { RobotType } from '@opentrons/shared-data'
 
 export function useLaunchLPC(
   runId: string,
   robotType: RobotType,
   protocolName?: string
 ): { launchLPC: () => void; LPCWizard: JSX.Element | null } {
-  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
+  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const {
     createTargetedMaintenanceRun,
   } = useCreateTargetedMaintenanceRunMutation()

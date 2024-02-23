@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -34,7 +35,7 @@ describe('TitleHeader', () => {
 
   it('should call a mock function when tapping back button', () => {
     const [{ getByTestId }] = render(props)
-    getByTestId('Ethernet_header_back_button').click()
+    fireEvent.click(getByTestId('Ethernet_header_back_button'))
     expect(mockPush).toHaveBeenCalledWith('/network-setup')
   })
 })

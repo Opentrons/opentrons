@@ -17,7 +17,7 @@ export function Numpad({ onChange, keyboardRef }: NumpadProps): JSX.Element {
   }
   return (
     /*
-     *  autoUseTouchEvents: for OT-3 on-device app
+     *  autoUseTouchEvents: for Flex on-device app
      *  useButtonTag: this is for testing purpose that each key renders as a button
      */
     <Keyboard

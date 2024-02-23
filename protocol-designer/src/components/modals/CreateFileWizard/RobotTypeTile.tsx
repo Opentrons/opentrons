@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -16,9 +18,7 @@ import {
   PrimaryButton,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
-import { i18n } from '../../../localization'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-import { css } from 'styled-components'
 import opentronsFlexImage from '../../../images/OpentronsFlex.png'
 import OT2Image from '../../../images/OT2.png'
 import { HandleEnter } from './HandleEnter'
@@ -29,7 +29,11 @@ import type { WizardTileProps } from './types'
 const ROBOT_TYPES: RobotType[] = [OT2_ROBOT_TYPE, FLEX_ROBOT_TYPE]
 
 export function RobotTypeTile(props: WizardTileProps): JSX.Element {
-  const { values, setFieldValue, proceed } = props
+  const { setValue, proceed, watch } = props
+  const { t } = useTranslation(['modal', 'application'])
+  const fields = watch('fields')
+  const liveRobotType = fields?.robotType ?? OT2_ROBOT_TYPE
+
   return (
     <HandleEnter onEnter={proceed}>
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
@@ -38,9 +42,7 @@ export function RobotTypeTile(props: WizardTileProps): JSX.Element {
           height="26rem"
           gridGap={SPACING.spacing32}
         >
-          <Text as="h2">
-            {i18n.t('modal.create_file_wizard.choose_robot_type')}
-          </Text>
+          <Text as="h2">{t('modal:choose_robot_type')}</Text>
 
           <Flex
             justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -49,9 +51,9 @@ export function RobotTypeTile(props: WizardTileProps): JSX.Element {
             {ROBOT_TYPES.map(robotType => (
               <RobotTypeOption
                 key={robotType}
-                isSelected={values.fields.robotType === robotType}
+                isSelected={liveRobotType === robotType}
                 onClick={() => {
-                  setFieldValue('fields.robotType', robotType)
+                  setValue('fields.robotType', robotType)
                 }}
                 robotType={robotType}
               />
@@ -64,7 +66,7 @@ export function RobotTypeTile(props: WizardTileProps): JSX.Element {
           width="100%"
         >
           <PrimaryButton onClick={() => proceed()}>
-            {i18n.t('application.next')}
+            {t('application:next')}
           </PrimaryButton>
         </Flex>
       </Flex>
@@ -120,7 +122,7 @@ function RobotTypeOption(props: RobotTypeOptionProps): JSX.Element {
 
 const UNSELECTED_OPTIONS_STYLE = css`
   background-color: ${COLORS.white};
-  border: 1px solid ${COLORS.medGreyEnabled};
+  border: 1px solid ${COLORS.grey30};
   border-radius: ${BORDERS.radiusSoftCorners};
   height: 14.5625rem;
   width: 14.5625rem;
@@ -131,14 +133,14 @@ const UNSELECTED_OPTIONS_STYLE = css`
   grid-gap: ${SPACING.spacing8}
 
   &:hover {
-    border: 1px solid ${COLORS.medGreyHover};
+    border: 1px solid ${COLORS.grey60};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     flex-direction: ${DIRECTION_ROW};
     justify-content: ${JUSTIFY_FLEX_START};
-    background-color: ${COLORS.mediumBlueEnabled};
-    border-width: 0; 
+    background-color: ${COLORS.blue35};
+    border-width: 0;
     border-radius: ${BORDERS.borderRadiusSize4};
     padding: ${SPACING.spacing24};
     height: 5.25rem;
@@ -151,22 +153,22 @@ const UNSELECTED_OPTIONS_STYLE = css`
 `
 const SELECTED_OPTIONS_STYLE = css`
   ${UNSELECTED_OPTIONS_STYLE}
-  border: 1px solid ${COLORS.blueEnabled};
-  background-color: ${COLORS.lightBlue};
+  border: 1px solid ${COLORS.blue50};
+  background-color: ${COLORS.blue10};
 
   &:hover {
-    border: 1px solid ${COLORS.blueEnabled};
-    background-color: ${COLORS.lightBlue};
+    border: 1px solid ${COLORS.blue50};
+    background-color: ${COLORS.blue10};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     border-width: 0px;
-    background-color: ${COLORS.blueEnabled};
+    background-color: ${COLORS.blue50};
     color: ${COLORS.white};
 
     &:hover {
       border-width: 0px;
-      background-color: ${COLORS.blueEnabled};
+      background-color: ${COLORS.blue50};
     }
   }
 `

@@ -105,7 +105,7 @@ export function SelectAuthenticationType({
             <StyledText
               as="h4"
               fontWeight={TYPOGRAPHY.fontWeightRegular}
-              color={COLORS.darkBlack70}
+              color={COLORS.grey60}
             >
               {t('your_mac_address_is', { macAddress: wifi?.macAddress })}
             </StyledText>
@@ -121,7 +121,7 @@ export function SelectAuthenticationType({
             <StyledText
               as="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={COLORS.darkBlack70}
+              color={COLORS.grey60}
             >
               {t('need_another_security_type')}
             </StyledText>

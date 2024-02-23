@@ -366,6 +366,7 @@ describe('SetupModulesList', () => {
             model: mockMagneticModule.model,
           } as any,
           slotName: '1',
+          conflictedFixture: null,
         },
         [dupModId]: {
           moduleId: dupModId,
@@ -386,6 +387,7 @@ describe('SetupModulesList', () => {
             },
           } as any,
           slotName: '3',
+          conflictedFixture: null,
         },
       })
     render(props)

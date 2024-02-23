@@ -18,7 +18,7 @@ from server_utils.fastapi_utils.app_state import (
     get_app_state,
 )
 from robot_server.deletion_planner import ProtocolDeletionPlanner
-from robot_server.persistence import get_sql_engine, get_persistence_directory
+from robot_server.persistence import get_sql_engine, get_active_persistence_directory
 from robot_server.settings import get_settings
 
 from .protocol_auto_deleter import ProtocolAutoDeleter
@@ -59,7 +59,7 @@ def get_file_hasher() -> FileHasher:
 
 async def get_protocol_directory(
     app_state: AppState = Depends(get_app_state),
-    persistence_directory: Path = Depends(get_persistence_directory),
+    persistence_directory: Path = Depends(get_active_persistence_directory),
 ) -> Path:
     """Get the directory to save protocol files, creating it if needed."""
     async with _protocol_directory_init_lock:

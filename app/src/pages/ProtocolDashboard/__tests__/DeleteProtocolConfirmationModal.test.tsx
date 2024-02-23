@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { act } from '@testing-library/react'
+import { act, fireEvent, screen } from '@testing-library/react'
 
 import {
   getProtocol,
@@ -80,16 +80,16 @@ describe('DeleteProtocolConfirmationModal', () => {
   })
 
   it('should render text and buttons', () => {
-    const { getByText } = render(props)
-    getByText('Delete this protocol?')
-    getByText('and its run history will be permanently deleted.')
-    getByText('Cancel')
-    getByText('Delete')
+    render(props)
+    screen.getByText('Delete this protocol?')
+    screen.getByText('and its run history will be permanently deleted.')
+    screen.getByText('Cancel')
+    screen.getByText('Delete')
   })
 
   it('should close the modal when tapping cancel button', () => {
-    const { getByText } = render(props)
-    getByText('Cancel').click()
+    render(props)
+    fireEvent.click(screen.getByText('Cancel'))
     expect(mockFunc).toHaveBeenCalled()
   })
 
@@ -100,9 +100,9 @@ describe('DeleteProtocolConfirmationModal', () => {
         data: { links: { referencingRuns: [{ id: '1' }, { id: '2' }] } },
       } as any)
 
-    const { getByText } = render(props)
+    render(props)
     act(() => {
-      getByText('Delete').click()
+      screen.getByText('Delete').click()
     })
     await new Promise(setImmediate)
     expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '1')

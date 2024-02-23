@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
+
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
@@ -36,13 +38,13 @@ describe('ConfirmAttachedModal', () => {
 
   it('should call a mock function when tapping cancel button', () => {
     const [{ getByText }] = render(props)
-    getByText('Cancel').click()
+    fireEvent.click(getByText('Cancel'))
     expect(mockOnCloseClick).toHaveBeenCalled()
   })
 
   it('should call a mock function when tapping proceed to run button', () => {
     const [{ getByText }] = render(props)
-    getByText('Proceed to run').click()
+    fireEvent.click(getByText('Proceed to run'))
     expect(mockOnConfirmClick).toHaveBeenCalled()
   })
 })

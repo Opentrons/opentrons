@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders, BaseDeck } from '@opentrons/components'
 import {
@@ -87,13 +88,13 @@ describe('ProtocolSetupDeckConfiguration', () => {
 
   it('should call a mock function when tapping the back button', () => {
     const [{ getByTestId }] = render(props)
-    getByTestId('ChildNavigation_Back_Button').click()
+    fireEvent.click(getByTestId('ChildNavigation_Back_Button'))
     expect(mockSetSetupScreen).toHaveBeenCalledWith('modules')
   })
 
   it('should call a mock function when tapping confirm button', () => {
     const [{ getByText }] = render(props)
-    getByText('Confirm').click()
+    fireEvent.click(getByText('Confirm'))
     expect(mockUpdateDeckConfiguration).toHaveBeenCalled()
   })
 })

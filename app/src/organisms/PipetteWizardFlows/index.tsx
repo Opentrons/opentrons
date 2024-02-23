@@ -12,13 +12,13 @@ import {
 import {
   useHost,
   useDeleteMaintenanceRunMutation,
-  useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
 import {
   useCreateTargetedMaintenanceRunMutation,
   useChainMaintenanceCommands,
 } from '../../resources/runs/hooks'
 
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
@@ -86,8 +86,8 @@ export const PipetteWizardFlows = (
   )
   const host = useHost()
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
-  const totalStepCount = pipetteWizardSteps.length - 1
-  const currentStep = pipetteWizardSteps?.[currentStepIndex]
+  const totalStepCount = pipetteWizardSteps ? pipetteWizardSteps.length - 1 : 0
+  const currentStep = pipetteWizardSteps?.[currentStepIndex] ?? null
   const [isFetchingPipettes, setIsFetchingPipettes] = React.useState<boolean>(
     false
   )
@@ -120,7 +120,7 @@ export const PipetteWizardFlows = (
       currentStepIndex !== totalStepCount ? 0 : currentStepIndex
     )
   }
-  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
     enabled: createdMaintenanceRunId != null,
   })
@@ -253,10 +253,10 @@ export const PipetteWizardFlows = (
     isOnDevice,
   }
   const is96ChannelUnskippableStep =
-    currentStep.section === SECTIONS.CARRIAGE ||
-    currentStep.section === SECTIONS.MOUNTING_PLATE ||
+    currentStep?.section === SECTIONS.CARRIAGE ||
+    currentStep?.section === SECTIONS.MOUNTING_PLATE ||
     (selectedPipette === NINETY_SIX_CHANNEL &&
-      currentStep.section === SECTIONS.DETACH_PIPETTE)
+      currentStep?.section === SECTIONS.DETACH_PIPETTE)
 
   const exitModal = is96ChannelUnskippableStep ? (
     <UnskippableModal

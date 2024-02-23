@@ -1,7 +1,7 @@
 import * as React from 'react'
-import i18n from 'i18next'
 import { fireEvent, screen } from '@testing-library/react'
 import { DeckConfigurator, renderWithProviders } from '@opentrons/components'
+import { i18n } from '../../../localization'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { getSlotIsEmpty } from '../../../step-forms'
 import { StagingAreasModal } from '../StagingAreasModal'

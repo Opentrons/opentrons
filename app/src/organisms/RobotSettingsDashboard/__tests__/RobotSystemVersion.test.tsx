@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent } from '@testing-library/react'
+
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
@@ -76,13 +78,13 @@ describe('RobotSystemVersion', () => {
       isUpdateAvailable: true,
     }
     const [{ getByText }] = render(props)
-    getByText('View update').click()
+    fireEvent.click(getByText('View update'))
     getByText('mock RobotSystemVersionModal')
   })
 
   it('should call a mock function when tapping Back button', () => {
     const [{ getByRole }] = render(props)
-    getByRole('button').click()
+    fireEvent.click(getByRole('button'))
     expect(mockBack).toHaveBeenCalled()
   })
 })

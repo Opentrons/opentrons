@@ -1,16 +1,21 @@
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import assert from 'assert'
 import cx from 'classnames'
-import * as React from 'react'
 import { AlertModal, OutlineButton, ButtonProps } from '@opentrons/components'
-import { i18n } from '../../../localization'
+import {
+  selectors as labwareDefSelectors,
+  actions as labwareDefActions,
+  LabwareUploadMessage,
+} from '../../../labware-defs'
 import modalStyles from '../modal.css'
-import { LabwareUploadMessage } from '../../../labware-defs'
 
 const MessageBody = (props: {
   message: LabwareUploadMessage
 }): JSX.Element | null => {
   const { message } = props
-
+  const { t } = useTranslation('modal')
   if (
     message.messageType === 'EXACT_LABWARE_MATCH' ||
     message.messageType === 'INVALID_JSON_FILE' ||
@@ -20,11 +25,7 @@ const MessageBody = (props: {
   ) {
     return (
       <>
-        <p>
-          {i18n.t(
-            `modal.labware_upload_message.message.${message.messageType}`
-          )}
-        </p>
+        <p>{t(`labware_upload_message.message.${message.messageType}`)}</p>
         {/* @ts-expect-error (ce, 2021-06-23) errorText does not exist on all type posibilities at this point */}
         {message.errorText ? <p>{message.errorText}</p> : null}
       </>
@@ -38,16 +39,14 @@ const MessageBody = (props: {
     return (
       <>
         <p>
-          {i18n.t('modal.labware_upload_message.name_conflict.shares_name', {
+          {t('labware_upload_message.name_conflict.shares_name', {
             customOrStandard: canOverwrite ? 'custom' : 'Opentrons standard',
           })}
         </p>
         {canOverwrite && defsMatchingLoadName.length > 0 ? (
           <p>
             <strong>
-              {i18n.t(
-                'modal.labware_upload_message.name_conflict.shared_load_name'
-              )}
+              {t('labware_upload_message.name_conflict.shared_load_name')}
               {defsMatchingLoadName
                 .map(def => def?.parameters.loadName || '?')
                 .join(', ')}
@@ -57,30 +56,27 @@ const MessageBody = (props: {
         {canOverwrite && defsMatchingDisplayName.length > 0 ? (
           <p>
             <strong>
-              {i18n.t(
-                'modal.labware_upload_message.name_conflict.shared_display_name'
-              )}
+              {t('labware_upload_message.name_conflict.shared_display_name')}
               {defsMatchingDisplayName
                 .map(def => def?.metadata.displayName || '?')
                 .join(', ')}
             </strong>
           </p>
         ) : null}
-        <p>{i18n.t('modal.labware_upload_message.name_conflict.re_export')}</p>
+        <p>{t('labware_upload_message.name_conflict.re_export')}</p>
         {canOverwrite && (
-          <p>
-            {i18n.t('modal.labware_upload_message.name_conflict.overwrite')}
-          </p>
+          <p>{t('labware_upload_message.name_conflict.overwrite')}</p>
         )}
-        {/* @ts-expect-error (ce, 2021-06-23) Property 'isOverwriteMismatched' does not exist on type '(NameConflictFields & { messageType: "LABWARE_NAME_CONFLICT"; }) | (NameConflictFields & { messageType: "ASK_FOR_LABWARE_OVERWRITE"; defURIToOverwrite: string; isOverwriteMismatched: boolean; })' */}
-        {canOverwrite && message.isOverwriteMismatched && (
-          <p>
-            <strong>
-              {i18n.t('modal.labware_upload_message.name_conflict.warning')}
-            </strong>{' '}
-            {i18n.t('modal.labware_upload_message.name_conflict.mismatched')}
-          </p>
-        )}
+        {canOverwrite &&
+          'isOverwriteMismatched' in message &&
+          message.isOverwriteMismatched && (
+            <p>
+              <strong>
+                {t('labware_upload_message.name_conflict.warning')}
+              </strong>{' '}
+              {t('labware_upload_message.name_conflict.mismatched')}
+            </p>
+          )}
       </>
     )
   }
@@ -94,10 +90,32 @@ export interface LabwareUploadMessageModalProps {
   overwriteLabwareDef?: () => unknown
 }
 
-export const LabwareUploadMessageModal = (
-  props: LabwareUploadMessageModalProps
-): JSX.Element | null => {
-  const { message, dismissModal, overwriteLabwareDef } = props
+export const LabwareUploadMessageModal = (): JSX.Element | null => {
+  const message = useSelector(labwareDefSelectors.getLabwareUploadMessage)
+  const dispatch = useDispatch()
+  const { t } = useTranslation('modal')
+  const dismissModal = (): void => {
+    dispatch(labwareDefActions.dismissLabwareUploadMessage())
+  }
+  const overwriteLabwareDef = (): void => {
+    if (message && message.messageType === 'ASK_FOR_LABWARE_OVERWRITE') {
+      dispatch(
+        labwareDefActions.replaceCustomLabwareDef({
+          defURIToOverwrite: message.defURIToOverwrite,
+          newDef: message.newDef,
+          isOverwriteMismatched: message.isOverwriteMismatched,
+        })
+      )
+    } else {
+      assert(
+        false,
+        `labware def should only be overwritten when messageType is ASK_FOR_LABWARE_OVERWRITE. Got ${String(
+          message?.messageType
+        )}`
+      )
+    }
+  }
+
   if (!message) return null
 
   let buttons: ButtonProps[] = [{ children: 'OK', onClick: dismissModal }]
@@ -114,9 +132,7 @@ export const LabwareUploadMessageModal = (
 
   return (
     <AlertModal
-      heading={i18n.t(
-        `modal.labware_upload_message.title.${message.messageType}`
-      )}
+      heading={t(`labware_upload_message.title.${message.messageType}`)}
       className={modalStyles.modal}
       alertOverlay
     >

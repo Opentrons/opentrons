@@ -12,8 +12,9 @@ import {
 } from '../../../../../redux/robot-update'
 import { getDiscoverableRobotByName } from '../../../../../redux/discovery'
 import { UpdateRobotModal, RELEASE_NOTES_URL_BASE } from '../UpdateRobotModal'
-import type { Store } from 'redux'
+import { useIsRobotBusy } from '../../../hooks'
 
+import type { Store } from 'redux'
 import type { State } from '../../../../../redux/types'
 
 jest.mock('../../../../../redux/robot-update')
@@ -21,6 +22,7 @@ jest.mock('../../../../../redux/discovery')
 jest.mock('../../../../UpdateAppModal', () => ({
   UpdateAppModal: () => null,
 }))
+jest.mock('../../../hooks')
 
 const mockGetRobotUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
   typeof getRobotUpdateDisplayInfo
@@ -30,6 +32,9 @@ const mockGetDiscoverableRobotByName = getDiscoverableRobotByName as jest.Mocked
 >
 const mockGetRobotUpdateVersion = getRobotUpdateVersion as jest.MockedFunction<
   typeof getRobotUpdateVersion
+>
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
 >
 
 const render = (props: React.ComponentProps<typeof UpdateRobotModal>) => {
@@ -58,6 +63,7 @@ describe('UpdateRobotModal', () => {
     })
     when(mockGetDiscoverableRobotByName).mockReturnValue(null)
     when(mockGetRobotUpdateVersion).mockReturnValue('7.0.0')
+    when(mockUseIsRobotBusy).mockReturnValue(false)
   })
 
   afterEach(() => {

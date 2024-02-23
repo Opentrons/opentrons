@@ -5,10 +5,10 @@ import { renderHook } from '@testing-library/react'
 import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
-  useRunQuery,
 } from '@opentrons/react-api-client'
 
 import { useProtocolDetailsForRun } from '..'
+import { useNotifyRunQuery } from '../../../../resources/runs/useNotifyRunQuery'
 
 import { RUN_ID_2 } from '../../../../organisms/RunTimeControl/__fixtures__'
 
@@ -19,6 +19,7 @@ import {
 } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client')
+jest.mock('../../../../resources/runs/useNotifyRunQuery')
 
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
@@ -26,7 +27,9 @@ const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
 const mockUseProtocolAnalysisAsDocumentQuery = useProtocolAnalysisAsDocumentQuery as jest.MockedFunction<
   typeof useProtocolAnalysisAsDocumentQuery
 >
-const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
+const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
+  typeof useNotifyRunQuery
+>
 
 const PROTOCOL_ID = 'fake_protocol_id'
 const PROTOCOL_ANALYSIS = {
@@ -48,7 +51,7 @@ const PROTOCOL_RESPONSE = {
 
 describe('useProtocolDetailsForRun hook', () => {
   beforeEach(() => {
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(null, { staleTime: Infinity })
       .mockReturnValue({} as UseQueryResult<Run>)
     when(mockUseProtocolQuery)
@@ -77,7 +80,7 @@ describe('useProtocolDetailsForRun hook', () => {
   })
 
   it('returns the protocol file when given a run id', async () => {
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID_2, { staleTime: Infinity })
       .mockReturnValue({
         data: { data: { protocolId: PROTOCOL_ID } } as any,

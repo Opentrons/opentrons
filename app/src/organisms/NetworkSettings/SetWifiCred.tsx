@@ -30,14 +30,14 @@ const SSID_INPUT_FIELD_STYLE = css`
   font-size: ${TYPOGRAPHY.fontSize28};
   line-height: ${TYPOGRAPHY.lineHeight36};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  color: ${COLORS.darkBlack100};
+  color: ${COLORS.black90};
   padding-left: ${SPACING.spacing24};
   box-sizing: border-box;
   width: 42.625rem;
 
   &:focus {
-    border: 3px solid ${COLORS.blueEnabled};
-    filter: drop-shadow(0px 0px 10px ${COLORS.blueEnabled});
+    border: 3px solid ${COLORS.blue50};
+    filter: drop-shadow(0px 0px 10px ${COLORS.blue50});
     border-radius: ${BORDERS.borderRadiusSize1};
   }
 `

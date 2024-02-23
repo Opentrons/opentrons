@@ -22,7 +22,7 @@ describe('SmallButton', () => {
     fireEvent.click(screen.getByText('small button'))
     expect(props.onClick).toHaveBeenCalled()
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.blueEnabled}`
+      `background-color: ${COLORS.blue50}`
     )
     expect(screen.getByRole('button')).toHaveStyle(
       `border-radius: ${BORDERS.borderRadiusSize4}`
@@ -35,7 +35,7 @@ describe('SmallButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.red2}`
+      `background-color: ${COLORS.red50}`
     )
   })
   it('renders the secondary button', () => {
@@ -45,7 +45,7 @@ describe('SmallButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.mediumBlueEnabled}`
+      `background-color: ${COLORS.blue35}`
     )
   })
   it('renders the tertiary high light button', () => {
@@ -54,9 +54,7 @@ describe('SmallButton', () => {
       buttonType: 'tertiaryHighLight',
     }
     render(props)
-    expect(screen.getByRole('button')).toHaveStyle(
-      `color: ${COLORS.darkBlackEnabled}`
-    )
+    expect(screen.getByRole('button')).toHaveStyle(`color: ${COLORS.black90}`)
   })
   it('renders the tertiary low light', () => {
     props = {
@@ -64,9 +62,7 @@ describe('SmallButton', () => {
       buttonType: 'tertiaryLowLight',
     }
     render(props)
-    expect(screen.getByRole('button')).toHaveStyle(
-      `color: ${COLORS.darkBlackEnabled}${COLORS.opacity70HexCode}`
-    )
+    expect(screen.getByRole('button')).toHaveStyle(`color: ${COLORS.grey60}`)
   })
   it('renders the button as disabled', () => {
     props = {

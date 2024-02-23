@@ -29,9 +29,7 @@ describe('MiniCard', () => {
     const { getByText } = render(props)
     const miniCard = getByText('mock mini card')
     expect(miniCard).toHaveStyle(`background-color: ${String(COLORS.white)}`)
-    expect(miniCard).toHaveStyle(
-      `border: 1px solid ${String(COLORS.medGreyEnabled)}`
-    )
+    expect(miniCard).toHaveStyle(`border: 1px solid ${String(COLORS.grey30)}`)
     expect(miniCard).toHaveStyle(
       `border-radius: ${String(BORDERS.radiusSoftCorners)}`
     )
@@ -44,12 +42,8 @@ describe('MiniCard', () => {
     props.isSelected = true
     const { getByText } = render(props)
     const miniCard = getByText('mock mini card')
-    expect(miniCard).toHaveStyle(
-      `background-color: ${String(COLORS.lightBlue)}`
-    )
-    expect(miniCard).toHaveStyle(
-      `border: 1px solid ${String(COLORS.blueEnabled)}`
-    )
+    expect(miniCard).toHaveStyle(`background-color: ${String(COLORS.blue10)}`)
+    expect(miniCard).toHaveStyle(`border: 1px solid ${String(COLORS.blue50)}`)
     expect(miniCard).toHaveStyle(
       `border-radius: ${String(BORDERS.radiusSoftCorners)}`
     )
@@ -58,14 +52,14 @@ describe('MiniCard', () => {
     expect(miniCard).toHaveStyle(`cursor: pointer`)
     expect(miniCard).toHaveStyleRule(
       'border',
-      `1px solid ${String(COLORS.blueEnabled)}`,
+      `1px solid ${String(COLORS.blue50)}`,
       {
         modifier: ':hover',
       }
     )
     expect(miniCard).toHaveStyleRule(
       'background-color',
-      `${String(COLORS.lightBlue)}`,
+      `${String(COLORS.blue10)}`,
       {
         modifier: ':hover',
       }
@@ -77,12 +71,8 @@ describe('MiniCard', () => {
     props.isSelected = true
     const { getByText } = render(props)
     const miniCard = getByText('mock mini card')
-    expect(miniCard).toHaveStyle(
-      `background-color: ${String(COLORS.errorBackgroundLight)}`
-    )
-    expect(miniCard).toHaveStyle(
-      `border: 1px solid ${String(COLORS.errorEnabled)}`
-    )
+    expect(miniCard).toHaveStyle(`background-color: ${String(COLORS.red20)}`)
+    expect(miniCard).toHaveStyle(`border: 1px solid ${String(COLORS.red50)}`)
     expect(miniCard).toHaveStyle(
       `border-radius: ${String(BORDERS.radiusSoftCorners)}`
     )
@@ -91,14 +81,14 @@ describe('MiniCard', () => {
     expect(miniCard).toHaveStyle(`cursor: pointer`)
     expect(miniCard).toHaveStyleRule(
       'border',
-      `1px solid ${String(COLORS.errorEnabled)}`,
+      `1px solid ${String(COLORS.red50)}`,
       {
         modifier: ':hover',
       }
     )
     expect(miniCard).toHaveStyleRule(
       'background-color',
-      `${String(COLORS.errorBackgroundLight)}`,
+      `${String(COLORS.red20)}`,
       {
         modifier: ':hover',
       }

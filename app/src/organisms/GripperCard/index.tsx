@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { SPACING } from '@opentrons/components'
+import { SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { getGripperDisplayName, GripperModel } from '@opentrons/shared-data'
 import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
 import { Banner } from '../../atoms/Banner'
@@ -10,17 +10,18 @@ import { InstrumentCard } from '../../molecules/InstrumentCard'
 import { GripperWizardFlows } from '../GripperWizardFlows'
 import { AboutGripperSlideout } from './AboutGripperSlideout'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
-import type { BadGripper, GripperData, Subsystem } from '@opentrons/api-client'
+
+import type { BadGripper, GripperData } from '@opentrons/api-client'
 import type { GripperWizardFlowType } from '../GripperWizardFlows/types'
 
 interface GripperCardProps {
   attachedGripper: GripperData | BadGripper | null
   isCalibrated: boolean
-  setSubsystemToUpdate: (subsystem: Subsystem | null) => void
   isRunActive: boolean
+  isEstopNotDisengaged: boolean
 }
 const BANNER_LINK_CSS = css`
-  text-decoration: underline;
+  text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
   cursor: pointer;
   margin-left: ${SPACING.spacing8};
 `
@@ -40,8 +41,8 @@ const POLL_DURATION_MS = 5000
 export function GripperCard({
   attachedGripper,
   isCalibrated,
-  setSubsystemToUpdate,
   isRunActive,
+  isEstopNotDisengaged,
 }: GripperCardProps): JSX.Element {
   const { t, i18n } = useTranslation(['device_details', 'shared'])
   const [
@@ -134,26 +135,33 @@ export function GripperCard({
           }
           banner={
             attachedGripper?.ok && !isCalibrated ? (
-              <Banner type="error" marginBottom={SPACING.spacing4}>
-                <Trans
-                  t={t}
-                  i18nKey="calibration_needed"
-                  components={{
-                    calLink: (
-                      <StyledText
-                        as="p"
-                        css={BANNER_LINK_CSS}
-                        onClick={handleCalibrate}
-                      />
-                    ),
-                  }}
-                />
+              <Banner type="error" marginBottom={SPACING.spacing4} width="100%">
+                {isEstopNotDisengaged ? (
+                  <StyledText as="p">
+                    {t('calibration_needed_without_link')}
+                  </StyledText>
+                ) : (
+                  <Trans
+                    t={t}
+                    i18nKey={'calibration_needed'}
+                    components={{
+                      calLink: (
+                        <StyledText
+                          as="p"
+                          css={BANNER_LINK_CSS}
+                          onClick={handleCalibrate}
+                        />
+                      ),
+                    }}
+                  />
+                )}
               </Banner>
             ) : null
           }
           isGripperAttached={attachedGripper != null}
           label={t('shared:extension_mount')}
           menuOverlayItems={menuOverlayItems}
+          isEstopNotDisengaged={isEstopNotDisengaged}
         />
       ) : null}
       {attachedGripper?.ok === false ||
@@ -172,20 +180,12 @@ export function GripperCard({
                 i18nKey={
                   subsystemUpdateData != null
                     ? 'firmware_update_occurring'
-                    : 'firmware_update_available_now'
+                    : 'firmware_update_needed'
                 }
-                components={{
-                  updateLink: (
-                    <StyledText
-                      as="p"
-                      css={BANNER_LINK_CSS}
-                      onClick={() => setSubsystemToUpdate('gripper')}
-                    />
-                  ),
-                }}
               />
             </Banner>
           }
+          isEstopNotDisengaged={isEstopNotDisengaged}
         />
       ) : null}
       {openWizardFlowType != null ? (

@@ -4,21 +4,22 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
+import { useProtocolQuery } from '@opentrons/react-api-client'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
-  Btn,
-  Flex,
-  Icon,
-  useHoverTooltip,
-  useInterval,
   ALIGN_CENTER,
+  Btn,
   COLORS,
   DIRECTION_COLUMN,
+  Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_WRAP_ANYWHERE,
   SPACING,
-  TYPOGRAPHY,
   truncateString,
+  TYPOGRAPHY,
+  useHoverTooltip,
+  useInterval,
 } from '@opentrons/components'
 
 import { QuaternaryButton } from '../../atoms/buttons'
@@ -33,6 +34,7 @@ import {
   OPENTRONS_USB,
 } from '../../redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
+import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
 
 import type { IconName, StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
@@ -63,7 +65,9 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   const isFlex = useIsFlex(name)
   const currentRunId = useCurrentRunId()
   const currentRunStatus = useCurrentRunStatus()
-  const { data: runRecord } = useRunQuery(currentRunId, { staleTime: Infinity })
+  const { data: runRecord } = useNotifyRunQuery(currentRunId, {
+    staleTime: Infinity,
+  })
   const protocolId = runRecord?.data?.protocolId ?? null
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,
@@ -78,7 +82,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
         <StyledText
           as="label"
           paddingRight={SPACING.spacing8}
-          overflowWrap="anywhere"
+          overflowWrap={OVERFLOW_WRAP_ANYWHERE}
         >
           {`${truncateString(displayName, 68)}; ${i18n.format(
             t(`run_details:status_${currentRunStatus}`),
@@ -153,7 +157,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
       <Flex flexDirection={DIRECTION_COLUMN}>
         <StyledText
           as="h6"
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey50}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing2}
           textTransform={TYPOGRAPHY.textTransformUppercase}
@@ -185,7 +189,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
                   aria-label={iconName}
                   paddingTop={SPACING.spacing4}
                   name={iconName}
-                  color={COLORS.darkGreyEnabled}
+                  color={COLORS.grey50}
                   size="1.25rem"
                 />
               </Btn>

@@ -452,13 +452,14 @@ class FailedGripperPickupError(RoboticsControlError):
 
     def __init__(
         self,
+        message: Optional[str] = None,
         details: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a FailedGripperPickupError."""
         super().__init__(
             ErrorCodes.FAILED_GRIPPER_PICKUP_ERROR,
-            "Expected to grip labware, but none found.",
+            message or "Expected to grip labware, but none found.",
             details,
             wrapping,
         )

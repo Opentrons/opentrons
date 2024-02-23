@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { LEFT, renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '@opentrons/components'
+import { LEFT } from '@opentrons/shared-data'
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'

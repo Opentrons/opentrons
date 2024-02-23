@@ -12,6 +12,7 @@ from robot_server.service.json_api.response import (
     SimpleMultiBody,
     MultiBody,
     MultiBodyMeta,
+    NotifyRefetchBody,
     DeprecatedResponseModel,
     DeprecatedMultiResponseModel,
 )
@@ -23,7 +24,6 @@ class _Resource(ResourceModel):
 
 
 class _Links(BaseModel):
-
     sibling: ResourceLink
 
 
@@ -115,6 +115,7 @@ RESPONSE_SPECS = [
             "links": {"sibling": {"href": "/bar", "meta": None}},
         },
     ),
+    ResponseSpec(subject=NotifyRefetchBody(), expected={"refetchUsingHTTP": True}),
 ]
 
 

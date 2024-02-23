@@ -16,6 +16,8 @@ from opentrons.protocol_engine.commands.configure_for_volume import (
     ConfigureForVolumePrivateResult,
     ConfigureForVolumeImplementation,
 )
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from ..pipette_fixtures import get_default_nozzle_map
 
 
 async def test_configure_for_volume_implementation(
@@ -43,6 +45,7 @@ async def test_configure_for_volume_implementation(
         ),
         tip_configuration_lookup_table={},
         nominal_tip_overlap={},
+        nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI),
     )
 
     decoy.when(

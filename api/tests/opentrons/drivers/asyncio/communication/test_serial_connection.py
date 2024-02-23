@@ -1,6 +1,7 @@
 from typing import Type, Union
 
 import pytest
+from _pytest.fixtures import SubRequest
 from mock import AsyncMock, call
 import mock
 
@@ -35,10 +36,10 @@ SerialKind = Union[AsyncResponseSerialConnection, SerialConnection]
     params=[AsyncResponseSerialConnection, SerialConnection],  # type: ignore[return]
 )
 async def subject(
-    request: pytest.FixtureRequest, mock_serial_port: AsyncMock, ack: str
+    request: SubRequest, mock_serial_port: AsyncMock, ack: str
 ) -> SerialKind:
     """Create the test subject."""
-    serial_class = request.param  # type: ignore[attr-defined]
+    serial_class = request.param
     serial_class.RETRY_WAIT_TIME = 0
     if serial_class == AsyncResponseSerialConnection:
         return serial_class(  # type: ignore[no-any-return]

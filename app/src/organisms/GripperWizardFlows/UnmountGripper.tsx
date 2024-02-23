@@ -28,7 +28,7 @@ import type { GripperData } from '@opentrons/api-client'
 
 const GO_BACK_BUTTON_TEXT_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50};
 
   &:hover {
     opacity: 70%;
@@ -99,7 +99,7 @@ export const UnmountGripper = (
     )
   return showGripperStillDetected ? (
     <SimpleWizardBody
-      iconColor={COLORS.errorEnabled}
+      iconColor={COLORS.red50}
       header={t('gripper_still_attached')}
       isSuccess={false}
     >

@@ -146,6 +146,6 @@ describe('ProtocolCard', () => {
     })
     expect(props.longPress).toHaveBeenCalled()
     screen.getByLabelText('Protocol is loading')
-    screen.getByText('yay mock protocol').click()
+    fireEvent.click(screen.getByText('yay mock protocol'))
   })
 })

@@ -123,7 +123,6 @@ export function SetupLiquidsMap(
           >
             <LabwareInfoOverlay
               definition={topLabwareDefinition}
-              // TODO(bh, 2023-11-09): pass hover to labware render in BaseDeck
               hover={topLabwareId === hoverLabwareId && labwareHasLiquid}
               labwareHasLiquid={labwareHasLiquid}
               labwareId={topLabwareId}

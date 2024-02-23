@@ -1,4 +1,4 @@
-import { getLabwareOnDeck } from '@opentrons/components'
+import { getTopMostLabwareInSlots } from '@opentrons/components'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
@@ -6,8 +6,13 @@ import {
   getCutoutFixturesForCutoutId,
   getCutoutIdForAddressableArea,
   getDeckDefFromRobotType,
+  getLabwareDisplayName,
+  SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_SLOT_FIXTURES,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+
+import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
 import type {
   CompletedProtocolAnalysis,
@@ -35,10 +40,21 @@ export function useDeckConfigurationCompatibility(
   const deckDef = getDeckDefFromRobotType(robotType)
   const allAddressableAreas =
     protocolAnalysis != null
-      ? getAddressableAreasInProtocol(protocolAnalysis)
+      ? getAddressableAreasInProtocol(protocolAnalysis, deckDef)
       : []
-  const labwareOnDeck =
-    protocolAnalysis != null ? getLabwareOnDeck(protocolAnalysis) : []
+  const labwareInSlots =
+    protocolAnalysis != null ? getTopMostLabwareInSlots(protocolAnalysis) : []
+
+  const protocolModulesInfo =
+    protocolAnalysis != null
+      ? getProtocolModulesInfo(protocolAnalysis, deckDef)
+      : []
+
+  const hasThermocycler =
+    protocolModulesInfo.find(
+      protocolMod =>
+        protocolMod.moduleDef.moduleType === THERMOCYCLER_MODULE_TYPE
+    ) != null
 
   return deckConfig.reduce<CutoutConfigAndCompatibility[]>(
     (acc, { cutoutId, cutoutFixtureId }) => {
@@ -68,29 +84,31 @@ export function useDeckConfigurationCompatibility(
         compatibleCutoutFixtureIds[0] != null &&
         // compatible fixture is single-slot
         SINGLE_SLOT_FIXTURES.includes(compatibleCutoutFixtureIds[0])
-          ? labwareOnDeck.find(
-              ({ labwareLocation }) =>
-                labwareLocation !== 'offDeck' &&
+          ? labwareInSlots.find(
+              ({ location }) =>
                 // match the addressable area to an on-deck labware
-                (('slotName' in labwareLocation &&
-                  requiredAddressableAreasForCutoutId[0] ===
-                    labwareLocation.slotName) ||
-                  ('addressableAreaName' in labwareLocation &&
-                    requiredAddressableAreasForCutoutId[0] ===
-                      labwareLocation.addressableAreaName))
+                requiredAddressableAreasForCutoutId[0] === location.slotName
             )
           : null
 
       const missingLabwareDisplayName =
-        missingSingleSlotLabware?.displayName ?? null
+        missingSingleSlotLabware != null
+          ? missingSingleSlotLabware.labwareNickName ??
+            getLabwareDisplayName(missingSingleSlotLabware.labwareDef) ??
+            null
+          : null
 
       return [
         ...acc,
         {
           cutoutId,
-          cutoutFixtureId: cutoutFixtureId,
+          cutoutFixtureId,
           requiredAddressableAreas: requiredAddressableAreasForCutoutId,
-          compatibleCutoutFixtureIds,
+          // Thermocycler requires an "empty" (single slot) fixture in A1 that is not referenced directly in protocol
+          compatibleCutoutFixtureIds:
+            hasThermocycler && cutoutId === 'cutoutA1'
+              ? [SINGLE_LEFT_SLOT_FIXTURE]
+              : compatibleCutoutFixtureIds,
           missingLabwareDisplayName,
         },
       ]

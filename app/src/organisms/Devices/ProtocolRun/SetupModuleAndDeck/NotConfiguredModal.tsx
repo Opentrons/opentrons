@@ -50,13 +50,9 @@ export const NotConfiguredModal = (
   return (
     <Portal level="top">
       <LegacyModal
-        title={
-          <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {t('add_fixture', {
-              fixtureName: getFixtureDisplayName(requiredFixtureId),
-            })}
-          </StyledText>
-        }
+        title={t('add_fixture', {
+          fixtureName: getFixtureDisplayName(requiredFixtureId),
+        })}
         onClose={onCloseClick}
         width="27.75rem"
       >
@@ -65,7 +61,7 @@ export const NotConfiguredModal = (
           <Flex paddingTop={SPACING.spacing16} flexDirection={DIRECTION_COLUMN}>
             <Flex
               padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
-              backgroundColor={COLORS.medGreyEnabled}
+              backgroundColor={COLORS.grey30}
               borderRadius={BORDERS.radiusSoftCorners}
               alignItems={ALIGN_CENTER}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -74,7 +70,7 @@ export const NotConfiguredModal = (
                 {getFixtureDisplayName(requiredFixtureId)}
               </StyledText>
               <TertiaryButton onClick={handleUpdateDeck}>
-                {i18n.format(t('add'), 'capitalize')}
+                {i18n.format(t('shared:add'), 'capitalize')}
               </TertiaryButton>
             </Flex>
           </Flex>

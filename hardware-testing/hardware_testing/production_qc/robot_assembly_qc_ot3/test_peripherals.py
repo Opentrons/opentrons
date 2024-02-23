@@ -210,7 +210,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
                     state[2],  # blue
                     state[1],  # green
                     state[3],  # white
-                    api._backend._usb_messenger,  # type: ignore[union-attr]
+                    api._backend._usb_messenger,  # type: ignore[attr-defined]
                 )
             result = _get_user_confirmation(f"is the STATUS-LIGHT {color}")
             report(section, f"status-light-{color}", [CSVResult.from_bool(result)])

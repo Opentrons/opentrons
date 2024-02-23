@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import {
   useAllPipetteOffsetCalibrationsQuery,
@@ -6,6 +7,8 @@ import {
   useInstrumentsQuery,
   usePipettesQuery,
 } from '@opentrons/react-api-client'
+import { instrumentsResponseFixture } from '@opentrons/api-client'
+
 import { i18n } from '../../../i18n'
 import { Banner } from '../../../atoms/Banner'
 import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
@@ -24,7 +27,7 @@ import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
 } from '../../../redux/calibration/pipette-offset/__fixtures__'
-import { instrumentsResponseFixture } from '@opentrons/api-client'
+import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
@@ -50,6 +53,7 @@ jest.mock('../utils', () => {
   }
 })
 jest.mock('../../RunTimeControl/hooks')
+jest.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
 
 const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
   typeof useModulesQuery
@@ -86,9 +90,14 @@ const mockGetShowPipetteCalibrationWarning = getShowPipetteCalibrationWarning as
   typeof getShowPipetteCalibrationWarning
 >
 const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
+const mockUseIsEstopNotDisengaged = useIsEstopNotDisengaged as jest.MockedFunction<
+  typeof useIsEstopNotDisengaged
+>
+
+const ROBOT_NAME = 'otie'
 
 const render = () => {
-  return renderWithProviders(<InstrumentsAndModules robotName="otie" />, {
+  return renderWithProviders(<InstrumentsAndModules robotName={ROBOT_NAME} />, {
     i18nInstance: i18n,
   })
 }
@@ -110,13 +119,17 @@ describe('InstrumentsAndModules', () => {
     mockPipetteCard.mockReturnValue(<div>Mock PipetteCard</div>)
     mockGripperCard.mockReturnValue(<div>Mock GripperCard</div>)
     mockModuleCard.mockReturnValue(<div>Mock ModuleCard</div>)
-    mockUseIsFlex.mockReturnValue(false)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(false)
+    when(mockUseIsEstopNotDisengaged)
+      .calledWith(ROBOT_NAME)
+      .mockReturnValue(false)
     mockPipetteRecalibrationWarning.mockReturnValue(
       <div>Mock PipetteRecalibrationWarning</div>
     )
   })
   afterEach(() => {
     jest.resetAllMocks()
+    resetAllWhenMocks()
   })
 
   it('renders an empty state message when robot is not on the network', () => {
@@ -158,7 +171,7 @@ describe('InstrumentsAndModules', () => {
     getAllByText('Mock PipetteCard')
   })
   it('renders gripper cards when a robot is Flex', () => {
-    mockUseIsFlex.mockReturnValue(true)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
     mockUseIsRobotViewable.mockReturnValue(true)
     mockUseModulesQuery.mockReturnValue({ data: { data: [] } } as any)
     mockUsePipettesQuery.mockReturnValue({

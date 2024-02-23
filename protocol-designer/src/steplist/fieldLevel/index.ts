@@ -152,7 +152,8 @@ const getLabwareLocation = (
     return {
       addressableAreaName: isWasteChuteLocation
         ? 'gripperWasteChute'
-        : newLocationString,
+        : // TODO(bh, 2024-01-02): check new location against addressable areas via the deck definition
+          (newLocationString as AddressableAreaName),
     }
   } else {
     return { slotName: newLocationString }

@@ -94,8 +94,8 @@ describe('robot controls selectors', () => {
         'U2E Vendor ID': Fixtures.mockRealtekDevice.vendorId,
         'U2E Product ID': Fixtures.mockRealtekDevice.productId,
         'U2E Serial Number': Fixtures.mockRealtekDevice.serialNumber,
-        'U2E Device Name': Fixtures.mockRealtekDevice.deviceName,
-        'U2E Manufacturer': Fixtures.mockRealtekDevice.manufacturer,
+        'U2E Device Name': Fixtures.mockRealtekDevice.productName,
+        'U2E Manufacturer': Fixtures.mockRealtekDevice.manufacturerName,
       })
     })
 

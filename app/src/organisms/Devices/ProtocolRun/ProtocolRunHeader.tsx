@@ -17,7 +17,6 @@ import {
   RunStatus,
 } from '@opentrons/api-client'
 import {
-  useRunQuery,
   useModulesQuery,
   useDoorQuery,
   useHost,
@@ -29,26 +28,26 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import {
+  ALIGN_CENTER,
+  BORDERS,
   Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  DISPLAY_FLEX,
   Flex,
   Icon,
   IconName,
-  useHoverTooltip,
-  ALIGN_CENTER,
-  DIRECTION_COLUMN,
-  DISPLAY_FLEX,
   JUSTIFY_CENTER,
+  JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
-  SIZE_1,
-  BORDERS,
-  COLORS,
-  SPACING,
-  TYPOGRAPHY,
+  Link as LinkButton,
   PrimaryButton,
   SecondaryButton,
+  SIZE_1,
+  SPACING,
+  TYPOGRAPHY,
   useConditionalConfirm,
-  JUSTIFY_FLEX_END,
-  Link as LinkButton,
+  useHoverTooltip,
 } from '@opentrons/components'
 
 import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
@@ -106,6 +105,7 @@ import { getIsFixtureMismatch } from '../../../resources/deck_configuration/util
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useMostRecentRunId } from '../../ProtocolUpload/hooks/useMostRecentRunId'
+import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
 
 import type { Run, RunError } from '@opentrons/api-client'
 import type { State } from '../../../redux/types'
@@ -154,13 +154,14 @@ export function ProtocolRunHeader({
     protocolKey,
     isProtocolAnalyzing,
   } = useProtocolDetailsForRun(runId)
-  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
+
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = useRunStatus(runId)
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const { data: attachedInstruments } = useInstrumentsQuery()
-  const isRunCurrent = Boolean(useRunQuery(runId)?.data?.data?.current)
+  const isRunCurrent = Boolean(useNotifyRunQuery(runId)?.data?.data?.current)
   const mostRecentRunId = useMostRecentRunId()
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
@@ -170,7 +171,8 @@ export function ProtocolRunHeader({
   const [pipettesWithTip, setPipettesWithTip] = React.useState<
     PipettesWithTip[]
   >([])
-  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
+  const isResetRunLoadingRef = React.useRef(false)
+  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const highestPriorityError =
     runRecord?.data.errors?.[0] != null
       ? getHighestPriorityError(runRecord?.data?.errors)
@@ -313,8 +315,7 @@ export function ProtocolRunHeader({
       <Flex
         ref={protocolRunHeaderRef}
         backgroundColor={COLORS.white}
-        border={BORDERS.lineBorder}
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius={BORDERS.borderRadiusSize2}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing16}
         marginBottom={SPACING.spacing16}
@@ -336,7 +337,7 @@ export function ProtocolRunHeader({
               <StyledText
                 as="h2"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                color={COLORS.blueEnabled}
+                color={COLORS.blue50}
               >
                 {displayName}
               </StyledText>
@@ -372,6 +373,7 @@ export function ProtocolRunHeader({
               setShowRunFailedModal,
               highestPriorityError,
             }}
+            isResetRunLoading={isResetRunLoadingRef.current}
           />
         ) : null}
         {mostRecentRunId === runId &&
@@ -407,12 +409,13 @@ export function ProtocolRunHeader({
               }
               isDoorOpen={isDoorOpen}
               isFixtureMismatch={isFixtureMismatch}
+              isResetRunLoadingRef={isResetRunLoadingRef}
             />
           </Flex>
         </Box>
         {runStatus != null ? (
           <Box
-            backgroundColor={COLORS.fundamentalsBackground}
+            backgroundColor={COLORS.grey10}
             display="grid"
             gridTemplateColumns="4fr 6fr 4fr"
             padding={SPACING.spacing8}
@@ -450,6 +453,7 @@ export function ProtocolRunHeader({
           <ConfirmCancelModal
             onClose={() => setShowConfirmCancelModal(false)}
             runId={runId}
+            robotName={robotName}
           />
         ) : null}
         {showDropTipWizard &&
@@ -482,7 +486,9 @@ interface LabeledValueProps {
 function LabeledValue(props: LabeledValueProps): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-      <StyledText as="h6">{props.label}</StyledText>
+      <StyledText as="h6" color={COLORS.grey60}>
+        {props.label}
+      </StyledText>
       {typeof props.value === 'string' ? (
         <StyledText as="p">{props.value}</StyledText>
       ) : (
@@ -503,14 +509,14 @@ function DisplayRunStatus(props: DisplayRunStatusProps): JSX.Element {
       {props.runStatus === RUN_STATUS_RUNNING ? (
         <Icon
           name="circle"
-          color={COLORS.blueEnabled}
+          color={COLORS.blue50}
           size={SPACING.spacing4}
           marginRight={SPACING.spacing4}
           data-testid="running_circle"
         >
           <animate
             attributeName="fill"
-            values={`${COLORS.blueEnabled}; transparent`}
+            values={`${COLORS.blue50}; transparent`}
             dur="1s"
             calcMode="discrete"
             repeatCount="indefinite"
@@ -549,7 +555,9 @@ interface ActionButtonProps {
   isProtocolAnalyzing: boolean
   isDoorOpen: boolean
   isFixtureMismatch: boolean
+  isResetRunLoadingRef: React.MutableRefObject<boolean>
 }
+
 function ActionButton(props: ActionButtonProps): JSX.Element {
   const {
     runId,
@@ -558,6 +566,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     isProtocolAnalyzing,
     isDoorOpen,
     isFixtureMismatch,
+    isResetRunLoadingRef,
   } = props
   const history = useHistory()
   const { t } = useTranslation(['run_details', 'shared'])
@@ -567,7 +576,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       enabled: runStatus != null && START_RUN_STATUSES.includes(runStatus),
     })?.data?.data ?? []
   const trackEvent = useTrackEvent()
-  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const {
     play,
@@ -582,6 +591,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
     )
   )
+  isResetRunLoadingRef.current = isResetRunLoading
   const { missingModuleIds } = useUnmatchedModulesForProtocol(robotName, runId)
   const { complete: isCalibrationComplete } = useRunCalibrationStatus(
     robotName,
@@ -749,7 +759,9 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         <StyledText css={TYPOGRAPHY.pSemiBold}>{buttonText}</StyledText>
       </PrimaryButton>
       {disableReason != null && (
-        <Tooltip tooltipProps={tooltipProps}>{disableReason}</Tooltip>
+        <Tooltip tooltipProps={tooltipProps} width="auto" maxWidth="8rem">
+          {disableReason}
+        </Tooltip>
       )}
       {showIsShakingModal &&
         activeHeaterShaker != null &&
@@ -777,6 +789,7 @@ interface TerminalRunProps {
   handleClearClick: () => void
   isClosingCurrentRun: boolean
   setShowRunFailedModal: (showRunFailedModal: boolean) => void
+  isResetRunLoading: boolean
   highestPriorityError?: RunError | null
 }
 function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
@@ -786,6 +799,7 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
     isClosingCurrentRun,
     setShowRunFailedModal,
     highestPriorityError,
+    isResetRunLoading,
   } = props
   const { t } = useTranslation('run_details')
 
@@ -794,7 +808,10 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
     setShowRunFailedModal(true)
   }
 
-  if (runStatus === RUN_STATUS_FAILED || runStatus === RUN_STATUS_SUCCEEDED) {
+  if (
+    isResetRunLoading === false &&
+    (runStatus === RUN_STATUS_FAILED || runStatus === RUN_STATUS_SUCCEEDED)
+  ) {
     return (
       <>
         {runStatus === RUN_STATUS_SUCCEEDED ? (

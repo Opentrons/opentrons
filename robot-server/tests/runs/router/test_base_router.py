@@ -17,10 +17,10 @@ from robot_server.service.json_api import (
     ResourceLink,
 )
 
-from robot_server.protocols import (
-    ProtocolStore,
-    ProtocolResource,
+from robot_server.protocols.protocol_store import (
     ProtocolNotFoundError,
+    ProtocolResource,
+    ProtocolStore,
 )
 
 from robot_server.runs.run_auto_deleter import RunAutoDeleter

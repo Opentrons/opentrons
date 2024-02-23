@@ -232,6 +232,13 @@ class Axis(enum.Enum):
         """
         return cls.of_main_tool_actuator(mount)
 
+    @classmethod
+    def node_axes(cls) -> List["Axis"]:
+        """
+        Get a list of axes that are backed by flex canbus nodes.
+        """
+        return [cls.X, cls.Y, cls.Z_L, cls.Z_R, cls.P_L, cls.P_R, cls.Z_G, cls.G]
+
 
 class SubSystem(enum.Enum):
     """An enumeration of ot3 components.
@@ -247,6 +254,7 @@ class SubSystem(enum.Enum):
     gripper = 5
     rear_panel = 6
     motor_controller_board = 7
+    hepa_uv = 8
 
     def __str__(self) -> str:
         return self.name
@@ -384,6 +392,19 @@ class EstopOverallStatus:
     right_physical_state: EstopPhysicalStatus
 
 
+@dataclass
+class HepaFanState:
+    fan_on: bool
+    duty_cycle: int
+
+
+@dataclass
+class HepaUVState:
+    light_on: bool
+    uv_duration_s: int
+    remaining_time_s: int
+
+
 @dataclass(frozen=True)
 class DoorStateNotification:
     event: Literal[
@@ -412,6 +433,7 @@ HardwareEvent = Union[
 ]
 
 HardwareEventHandler = Callable[[HardwareEvent], None]
+HardwareEventUnsubscriber = Callable[[], None]
 
 
 RevisionLiteral = Literal["2.1", "A", "B", "C", "UNKNOWN"]
@@ -478,6 +500,13 @@ class CriticalPoint(enum.Enum):
     This changes nothing for single pipettes, but makes multipipettes
     move their centers - so between channels 4 and 5 - to the specified
     point. This is the same as the GRIPPER_JAW_CENTER for grippers.
+    """
+
+    INSTRUMENT_XY_CENTER = enum.auto()
+    """
+    The INSTRUMENT_XY_CENTER means the critical point under consideration is
+    the XY center of the entire pipette, regardless of configuration.
+    No pipettes, single or multi, will change their instrument center point.
     """
 
     FRONT_NOZZLE = enum.auto()
@@ -630,7 +659,6 @@ class HardwareFeatureFlags:
     use_old_aspiration_functions: bool = (
         False  # To support pipette backwards compatability
     )
-    tip_presence_detection_enabled: bool = True
     require_estop: bool = True
     stall_detection_enabled: bool = True
     overpressure_detection_enabled: bool = True
@@ -646,7 +674,6 @@ class HardwareFeatureFlags:
         """
         return HardwareFeatureFlags(
             use_old_aspiration_functions=feature_flags.use_old_aspiration_functions(),
-            tip_presence_detection_enabled=feature_flags.tip_presence_detection_enabled(),
             require_estop=feature_flags.require_estop(),
             stall_detection_enabled=feature_flags.stall_detection_enabled(),
             overpressure_detection_enabled=feature_flags.overpressure_detection_enabled(),

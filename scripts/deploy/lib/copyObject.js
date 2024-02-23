@@ -4,7 +4,6 @@ const mime = require('mime')
 
 // TODO(mc, 2019-07-16): optimize cache values
 const getCopyParams = obj => ({
-  ACL: 'public-read',
   CacheControl: 'public, max-age=86400, no-cache',
   ContentType: mime.getType(obj.Key),
   MetadataDirective: 'REPLACE',

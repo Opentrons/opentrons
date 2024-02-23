@@ -1,24 +1,27 @@
 import * as React from 'react'
-import { css } from 'styled-components'
 
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
-import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
-import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { TYPOGRAPHY } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
-  WASTE_CHUTE_DISPLAY_NAME,
+  COLUMN_3_X_ADJUSTMENT,
+  CONFIG_STYLE_EDITABLE,
+  CONFIG_STYLE_READ_ONLY,
   FIXTURE_HEIGHT,
   STAGING_AREA_FIXTURE_WIDTH,
   SINGLE_SLOT_FIXTURE_WIDTH,
+  WASTE_CHUTE_DISPLAY_NAME,
+  Y_ADJUSTMENT,
 } from './constants'
 
-import type { Cutout, DeckDefinition } from '@opentrons/shared-data'
+import type { CutoutId, DeckDefinition } from '@opentrons/shared-data'
 
 interface WasteChuteConfigFixtureProps {
   deckDefinition: DeckDefinition
-  fixtureLocation: Cutout
-  handleClickRemove?: (fixtureLocation: Cutout) => void
+  fixtureLocation: CutoutId
+  handleClickRemove?: (fixtureLocation: CutoutId) => void
   hasStagingAreas?: boolean
 }
 
@@ -32,15 +35,19 @@ export function WasteChuteConfigFixture(
     hasStagingAreas = false,
   } = props
 
-  const wasteChuteSlot = deckDefinition.locations.cutouts.find(
-    slot => slot.id === fixtureLocation
+  const wasteChuteCutout = deckDefinition.locations.cutouts.find(
+    cutout => cutout.id === fixtureLocation
   )
-  const [xSlotPosition = 0, ySlotPosition = 0] = wasteChuteSlot?.position ?? []
-  // TODO: remove adjustment when reading from fixture position
-  const xAdjustment = -17
-  const x = xSlotPosition + xAdjustment
-  const yAdjustment = -10
-  const y = ySlotPosition + yAdjustment
+
+  /**
+   * deck definition cutout position is the position of the single slot located within that cutout
+   * so, to get the position of the cutout itself we must add an adjustment to the slot position
+   */
+  const [xSlotPosition = 0, ySlotPosition = 0] =
+    wasteChuteCutout?.position ?? []
+
+  const x = xSlotPosition + COLUMN_3_X_ADJUSTMENT
+  const y = ySlotPosition + Y_ADJUSTMENT
 
   return (
     <RobotCoordsForeignObject
@@ -56,8 +63,8 @@ export function WasteChuteConfigFixture(
       <Btn
         css={
           handleClickRemove != null
-            ? WASTE_CHUTE_CONFIG_STYLE_EDITABLE
-            : WASTE_CHUTE_CONFIG_STYLE_READ_ONLY
+            ? CONFIG_STYLE_EDITABLE
+            : CONFIG_STYLE_READ_ONLY
         }
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
         onClick={
@@ -76,30 +83,3 @@ export function WasteChuteConfigFixture(
     </RobotCoordsForeignObject>
   )
 }
-
-const WASTE_CHUTE_CONFIG_STYLE_READ_ONLY = css`
-  display: ${DISPLAY_FLEX};
-  align-items: ${ALIGN_CENTER};
-  background-color: ${COLORS.grey2};
-  border-radius: ${BORDERS.borderRadiusSize1};
-  color: ${COLORS.white};
-  justify-content: ${JUSTIFY_CENTER};
-  grid-gap: ${SPACING.spacing8};
-  width: 100%;
-`
-
-const WASTE_CHUTE_CONFIG_STYLE_EDITABLE = css`
-  ${WASTE_CHUTE_CONFIG_STYLE_READ_ONLY}
-
-  &:active {
-    background-color: ${COLORS.darkBlack90};
-  }
-
-  &:hover {
-    background-color: ${COLORS.grey1};
-  }
-
-  &:focus-visible {
-    border: 3px solid ${COLORS.fundamentalsFocus};
-  }
-`

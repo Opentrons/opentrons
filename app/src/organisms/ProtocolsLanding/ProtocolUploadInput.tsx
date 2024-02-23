@@ -59,7 +59,7 @@ export function ProtocolUploadInput(
               t={t}
               i18nKey="shared:drag_and_drop"
               components={{
-                a: <Link color={COLORS.blueHover} role="button" />,
+                a: <Link color={COLORS.blue55} role="button" />,
               }}
             />
           </StyledText>

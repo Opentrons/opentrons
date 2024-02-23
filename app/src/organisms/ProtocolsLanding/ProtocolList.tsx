@@ -42,11 +42,11 @@ const SORT_BY_BUTTON_STYLE = css`
   background-color: ${COLORS.transparent};
   cursor: pointer;
   &:hover {
-    background-color: ${COLORS.medGreyHover};
+    background-color: ${COLORS.grey60};
   }
   &:active,
   &:focus {
-    background-color: ${COLORS.medGreyEnabled};
+    background-color: ${COLORS.grey40};
   }
 `
 const FLEX = 'Flex'
@@ -161,7 +161,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
             <StyledText
               as="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.grey50}
             >
               {t('shared:sort_by')}
             </StyledText>
@@ -186,6 +186,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               </StyledText>
               <Icon
                 paddingRight={SPACING.spacing8}
+                color={COLORS.black90}
                 height={TYPOGRAPHY.lineHeight16}
                 name={showSortByMenu ? 'chevron-up' : 'chevron-down'}
               />

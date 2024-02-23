@@ -17,7 +17,8 @@ log = logging.getLogger(__name__)
 labware_router = APIRouter()
 
 
-@labware_router.post(
+@PydanticResponse.wrap_route(
+    labware_router.post,
     path="/maintenance_runs/{runId}/labware_offsets",
     summary="Add a labware offset to a maintenance run",
     description=(
@@ -57,7 +58,8 @@ async def add_labware_offset(
 
 # TODO(mc, 2022-02-28): add complementary GET endpoint
 # https://github.com/Opentrons/opentrons/issues/9427
-@labware_router.post(
+@PydanticResponse.wrap_route(
+    labware_router.post,
     path="/maintenance_runs/{runId}/labware_definitions",
     summary="Add a labware definition to a maintenance run",
     description=(

@@ -83,7 +83,7 @@ describe('RobotConfigurationDetails', () => {
     getByText('OT-2')
   })
 
-  it('renders a robot section showing the intended robot model for an OT-3 protocol', () => {
+  it('renders a robot section showing the intended robot model for a Flex protocol', () => {
     props = {
       leftMountPipetteName: 'p10_single',
       rightMountPipetteName: null,

@@ -25,7 +25,6 @@ import {
   EXTENSION,
   MAGNETIC_BLOCK_V1,
 } from './constants'
-import type { INode } from 'svgson'
 import type { RunTimeCommand, LabwareLocation } from '../command/types'
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 import type { PipetteName } from './pipettes'
@@ -129,16 +128,19 @@ export interface LabwareBrand {
   links?: string[]
 }
 
+export interface CircularWellShapeProperties {
+  shape: 'circular'
+  diameter: number
+}
+export interface RectangularWellShapeProperties {
+  shape: 'rectangular'
+  xDimension: number
+  yDimension: number
+}
+
 export type LabwareWellShapeProperties =
-  | {
-      shape: 'circular'
-      diameter: number
-    }
-  | {
-      shape: 'rectangular'
-      xDimension: number
-      yDimension: number
-    }
+  | CircularWellShapeProperties
+  | RectangularWellShapeProperties
 
 // well without x,y,z
 export type LabwareWellProperties = LabwareWellShapeProperties & {
@@ -294,7 +296,7 @@ export interface DeckMetadata {
 }
 
 export interface DeckCutout {
-  id: string
+  id: CutoutId
   position: CoordinateTuple
   displayName: string
 }
@@ -358,7 +360,7 @@ export interface ModuleDefinition {
   quirks: string[]
   slotTransforms: SlotTransforms
   compatibleWith: ModuleModel[]
-  twoDimensionalRendering: INode
+  twoDimensionalRendering: any // deprecated SVGson INode use Module SVG Components instead
 }
 
 export type AffineTransformMatrix = number[][]
@@ -550,52 +552,6 @@ export type StatusBarAnimation =
   | 'off'
 
 export type StatusBarAnimations = StatusBarAnimation[]
-
-export type Cutout =
-  | 'cutoutA1'
-  | 'cutoutB1'
-  | 'cutoutC1'
-  | 'cutoutD1'
-  | 'cutoutA2'
-  | 'cutoutB2'
-  | 'cutoutC2'
-  | 'cutoutD2'
-  | 'cutoutA3'
-  | 'cutoutB3'
-  | 'cutoutC3'
-  | 'cutoutD3'
-
-export type OT2Cutout =
-  | 'cutout1'
-  | 'cutout2'
-  | 'cutout3'
-  | 'cutout4'
-  | 'cutout5'
-  | 'cutout6'
-  | 'cutout7'
-  | 'cutout8'
-  | 'cutout9'
-  | 'cutout10'
-  | 'cutout11'
-  | 'cutout12'
-
-export type FlexSlot =
-  | 'A1'
-  | 'B1'
-  | 'C1'
-  | 'D1'
-  | 'A2'
-  | 'B2'
-  | 'C2'
-  | 'D2'
-  | 'A3'
-  | 'B3'
-  | 'C3'
-  | 'D3'
-  | 'A4'
-  | 'B4'
-  | 'C4'
-  | 'D4'
 
 export interface CutoutConfig {
   cutoutId: CutoutId

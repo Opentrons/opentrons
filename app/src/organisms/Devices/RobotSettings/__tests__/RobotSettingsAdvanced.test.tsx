@@ -6,7 +6,7 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 import { getShellUpdateState } from '../../../../redux/shell'
-import { useIsFlex } from '../../hooks'
+import { useIsFlex, useIsRobotBusy } from '../../hooks'
 import {
   DeviceReset,
   DisplayRobotName,
@@ -33,7 +33,7 @@ jest.mock('../../../../redux/shell/update', () => ({
   ...jest.requireActual<{}>('../../../../redux/shell/update'),
   getShellUpdateState: jest.fn(),
 }))
-jest.mock('../../hooks/useIsFlex')
+jest.mock('../../hooks')
 jest.mock('../AdvancedTab/DeviceReset')
 jest.mock('../AdvancedTab/DisplayRobotName')
 jest.mock('../AdvancedTab/EnableStatusLight')
@@ -94,6 +94,9 @@ const mockEnableStatusLight = EnableStatusLight as jest.MockedFunction<
   typeof EnableStatusLight
 >
 const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
+>
 
 const mockUpdateRobotStatus = jest.fn()
 
@@ -143,6 +146,7 @@ describe('RobotSettings Advanced tab', () => {
     )
     when(mockUseIsFlex).calledWith('otie').mockReturnValue(false)
     mockEnableStatusLight.mockReturnValue(<div>mock EnableStatusLight</div>)
+    when(mockUseIsRobotBusy).mockReturnValue(false)
   })
 
   afterAll(() => {

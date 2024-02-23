@@ -32,7 +32,7 @@ export function RestartRobotConfirmationModal({
   const modalHeader: ModalHeaderBaseProps = {
     title: t('restart_now'),
     iconName: 'ot-alert',
-    iconColor: COLORS.yellow2,
+    iconColor: COLORS.yellow50,
   }
   const dispatch = useDispatch<Dispatch>()
 

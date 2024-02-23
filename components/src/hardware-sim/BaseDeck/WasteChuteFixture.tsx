@@ -10,7 +10,8 @@ import {
   JUSTIFY_CENTER,
   TEXT_ALIGN_CENTER,
 } from '../../styles'
-import { COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import { SlotBase } from './SlotBase'
 
@@ -31,8 +32,8 @@ export function WasteChuteFixture(
   const {
     cutoutId,
     deckDefinition,
-    fixtureBaseColor = COLORS.light1,
-    wasteChuteColor = COLORS.grey2,
+    fixtureBaseColor = COLORS.grey35,
+    wasteChuteColor = COLORS.grey50,
     ...restProps
   } = props
 

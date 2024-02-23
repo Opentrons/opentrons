@@ -4,8 +4,9 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   JUSTIFY_FLEX_END,
-  SPACING,
+  OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -38,7 +39,7 @@ export function ProtocolAnalysisErrorModal({
         title="Protocol analysis failure"
         onClose={onClose}
       >
-        <StyledText as="p" overflowWrap="anywhere">
+        <StyledText as="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
           {t('analysis_failure_on_robot', {
             protocolName: displayName,
             robotName,

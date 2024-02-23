@@ -1,19 +1,20 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
 import {
   ConfirmDeleteModal,
   DELETE_STEP_FORM,
 } from '../modals/ConfirmDeleteModal'
-import { i18n } from '../../localization'
 import { actions as stepsActions, getIsMultiSelectMode } from '../../ui/steps'
 import { actions as steplistActions } from '../../steplist'
+import { getSavedStepForms } from '../../step-forms/selectors'
 import { Portal } from '../portals/TopPortal'
 import styles from './StepItem.css'
-import { StepIdType } from '../../form-types'
-import { getSavedStepForms } from '../../step-forms/selectors'
-import { ThunkDispatch } from 'redux-thunk'
-import { BaseState } from '../../types'
+
+import type { StepIdType } from '../../form-types'
+import type { ThunkDispatch } from 'redux-thunk'
+import type { BaseState } from '../../types'
 
 const MENU_OFFSET_PX = 5
 
@@ -21,7 +22,7 @@ interface Props {
   children: (args: {
     makeStepOnContextMenu: (
       stepIdType: StepIdType
-    ) => (event: MouseEvent) => unknown
+    ) => (event: MouseEvent) => void
   }) => React.ReactNode
 }
 
@@ -31,11 +32,11 @@ interface Position {
 }
 
 export const ContextMenu = (props: Props): JSX.Element => {
+  const { t } = useTranslation('context_menu')
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
-  const deleteStep = (
-    stepId: StepIdType
-  ): ReturnType<typeof steplistActions.deleteStep> =>
+  const deleteStep = (stepId: StepIdType): void => {
     dispatch(steplistActions.deleteStep(stepId))
+  }
   const duplicateStep = (
     stepId: StepIdType
   ): ReturnType<typeof stepsActions.duplicateStep> =>
@@ -79,7 +80,6 @@ export const ContextMenu = (props: Props): JSX.Element => {
       screenH - clickY > rootH
         ? clickY + MENU_OFFSET_PX
         : clickY - rootH - MENU_OFFSET_PX
-
     setVisible(true)
     setStepId(stepId)
     setPosition({ left, top })
@@ -144,11 +144,11 @@ export const ContextMenu = (props: Props): JSX.Element => {
                 onClick={handleDuplicate}
                 className={styles.context_menu_item}
               >
-                {i18n.t('context_menu.step.duplicate')}
+                {t('duplicate')}
               </div>
             )}
             <div onClick={confirmDelete} className={styles.context_menu_item}>
-              {i18n.t('context_menu.step.delete')}
+              {t('delete')}
             </div>
           </div>
         </Portal>

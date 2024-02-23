@@ -32,45 +32,35 @@ export function PlayButton({
   const playButtonStyle = css`
     -webkit-tap-highlight-color: transparent;
     &:focus {
-      background-color: ${ready && !isDoorOpen
-        ? COLORS.bluePressed
-        : COLORS.darkBlack40};
+      background-color: ${ready && !isDoorOpen ? COLORS.blue60 : COLORS.grey50};
       color: ${COLORS.white};
     }
 
     &:hover {
-      background-color: ${ready && !isDoorOpen
-        ? COLORS.blueEnabled
-        : COLORS.darkBlack20};
+      background-color: ${ready && !isDoorOpen ? COLORS.blue50 : COLORS.grey35};
       color: ${COLORS.white};
     }
 
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE};
-      background-color: ${ready && !isDoorOpen
-        ? COLORS.blueEnabled
-        : COLORS.darkBlack20};
+      background-color: ${ready && !isDoorOpen ? COLORS.blue50 : COLORS.grey35};
     }
 
     &:active {
-      background-color: ${ready && !isDoorOpen
-        ? COLORS.bluePressed
-        : COLORS.darkBlack40};
+      background-color: ${ready && !isDoorOpen ? COLORS.blue60 : COLORS.grey50};
       color: ${COLORS.white};
     }
 
     &:disabled {
-      background-color: ${COLORS.darkBlack20};
-      color: ${COLORS.darkBlack60};
+      background-color: ${COLORS.grey35};
+      color: ${COLORS.grey50};
     }
   `
   return (
     <Btn
       alignItems={ALIGN_CENTER}
       backgroundColor={
-        disabled || !ready || isDoorOpen
-          ? COLORS.darkBlack20
-          : COLORS.blueEnabled
+        disabled || !ready || isDoorOpen ? COLORS.grey35 : COLORS.blue50
       }
       borderRadius="6.25rem"
       display={DISPLAY_FLEX}
@@ -83,9 +73,7 @@ export function PlayButton({
       css={playButtonStyle}
     >
       <Icon
-        color={
-          disabled || !ready || isDoorOpen ? COLORS.darkBlack60 : COLORS.white
-        }
+        color={disabled || !ready || isDoorOpen ? COLORS.grey50 : COLORS.white}
         name="play-icon"
         size="2.5rem"
       />
@@ -101,7 +89,7 @@ export function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
   return (
     <Btn
       alignItems={ALIGN_CENTER}
-      backgroundColor={COLORS.red2}
+      backgroundColor={COLORS.red50}
       borderRadius="6.25rem"
       display={DISPLAY_FLEX}
       height="6.25rem"
@@ -119,27 +107,27 @@ export function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
 const CLOSE_BUTTON_STYLE = css`
   -webkit-tap-highlight-color: transparent;
   &:focus {
-    background-color: ${COLORS.red2Pressed};
+    background-color: ${COLORS.red55};
     color: ${COLORS.white};
   }
 
   &:hover {
-    background-color: ${COLORS.red2};
+    background-color: ${COLORS.red50};
     color: ${COLORS.white};
   }
 
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.red2};
+    background-color: ${COLORS.red50};
   }
 
   &:active {
-    background-color: ${COLORS.red2Pressed};
+    background-color: ${COLORS.red55};
     color: ${COLORS.white};
   }
 
   &:disabled {
-    background-color: ${COLORS.darkBlack20};
-    color: ${COLORS.darkBlack60};
+    background-color: ${COLORS.grey35};
+    color: ${COLORS.grey50};
   }
 `

@@ -189,7 +189,7 @@ describe('AttachProbe', () => {
       'Take the calibration probe from its storage location. Ensure its collar is unlocked. Push the pipette ejector up and press the probe firmly onto the pipette nozzle. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
     )
     getByTestId('Pipette_Attach_Probe_1.webm')
-    getByRole('button', { name: 'Begin calibration' }).click()
+    fireEvent.click(getByRole('button', { name: 'Begin calibration' }))
     await waitFor(() => {
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
@@ -227,7 +227,7 @@ describe('AttachProbe', () => {
     await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()
     })
-    getByLabelText('back').click()
+    fireEvent.click(getByLabelText('back'))
     expect(props.goBack).toHaveBeenCalled()
   })
 

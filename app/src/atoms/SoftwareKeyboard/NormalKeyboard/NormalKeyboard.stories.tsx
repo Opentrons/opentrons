@@ -8,6 +8,8 @@ import {
 import { touchScreenViewport } from '../../../DesignTokens/constants'
 import { InputField } from '../../InputField'
 import { NormalKeyboard } from '.'
+import '../../../styles.global.css'
+
 import type { Story, Meta } from '@storybook/react'
 
 export default {

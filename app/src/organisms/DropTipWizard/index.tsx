@@ -13,11 +13,11 @@ import {
 import {
   useCreateMaintenanceCommandMutation,
   useDeleteMaintenanceRunMutation,
-  useCurrentMaintenanceRun,
-  useDeckConfigurationQuery,
   CreateMaintenanceRunType,
+  useDeckConfigurationQuery,
 } from '@opentrons/react-api-client'
 
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
@@ -112,7 +112,7 @@ export function DropTipWizard(props: MaintenanceRunManagerProps): JSX.Element {
     onError: error => setErrorMessage(error.message),
   })
 
-  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL_MS,
     enabled: createdMaintenanceRunId != null,
   })
@@ -351,7 +351,7 @@ export const DropTipWizardComponent = (
     modalContent = (
       <SimpleWizardBody
         isSuccess={false}
-        iconColor={COLORS.errorEnabled}
+        iconColor={COLORS.red50}
         header={t('error_dropping_tips')}
         subHeader={
           <>

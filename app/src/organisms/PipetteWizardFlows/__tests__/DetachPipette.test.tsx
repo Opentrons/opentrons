@@ -114,7 +114,7 @@ describe('DetachPipette', () => {
     )
     getByTestId('Pipette_Detach_1_L.webm')
     getByText('Continue')
-    getByLabelText('back').click()
+    fireEvent.click(getByLabelText('back'))
     expect(props.goBack).toHaveBeenCalled()
   })
 })

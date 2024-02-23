@@ -121,6 +121,7 @@ describe('useModuleCalibrationStatus hook', () => {
             ...mockMagneticModuleGen2,
             moduleOffset: mockOffsetData,
           },
+          conflictedFixture: null,
           ...MAGNETIC_MODULE_INFO,
         },
       })
@@ -142,6 +143,7 @@ describe('useModuleCalibrationStatus hook', () => {
           attachedModuleMatch: {
             ...mockMagneticModuleGen2,
           },
+          conflictedFixture: null,
           ...MAGNETIC_MODULE_INFO,
         },
       })

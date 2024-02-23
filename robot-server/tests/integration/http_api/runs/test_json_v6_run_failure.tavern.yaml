@@ -83,44 +83,9 @@ stages:
         links:
           current: !anydict
         meta:
-          cursor: 0
+          cursor: 3
           totalLength: 5
         data:
-          # Initial home
-          - id: !anystr
-            key: !anystr
-            commandType: home
-            createdAt: !anystr
-            startedAt: !anystr
-            completedAt: !anystr
-            status: succeeded
-            params: {}
-          - id: !anystr
-            key: !anystr
-            commandType: loadLabware
-            createdAt: !anystr
-            startedAt: !anystr
-            completedAt: !anystr
-            status: succeeded
-            params:
-              location:
-                slotName: '8'
-              loadName: fixture_1_tiprack_10ul
-              namespace: fixture
-              version: 1
-              labwareId: tipRackId
-              displayName: Tip Rack
-          - id: !anystr
-            key: !anystr
-            commandType: loadPipette
-            createdAt: !anystr
-            startedAt: !anystr
-            completedAt: !anystr
-            status: succeeded
-            params:
-              pipetteName: p10_single
-              mount: left
-              pipetteId: pipetteId
           - id: !anystr
             key: !anystr
             commandType: aspirate

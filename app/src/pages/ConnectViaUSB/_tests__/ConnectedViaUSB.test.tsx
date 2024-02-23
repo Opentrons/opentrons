@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent } from '@testing-library/react'
+
 import { renderWithProviders } from '@opentrons/components'
 import { useConnectionsQuery } from '@opentrons/react-api-client'
 
@@ -61,7 +63,7 @@ describe('ConnectViaUSB', () => {
 
   it('should call a mock function when tapping back button', () => {
     const [{ getByRole }] = render()
-    getByRole('button').click()
+    fireEvent.click(getByRole('button'))
     expect(mockPush).toHaveBeenCalledWith('/network-setup')
   })
 
@@ -88,7 +90,7 @@ describe('ConnectViaUSB', () => {
       } as unknown) as UseQueryResult<ActiveConnections>)
     const [{ getByText }] = render()
     const button = getByText('Continue')
-    button.click()
+    fireEvent.click(button)
     expect(mockPush).toHaveBeenCalledWith('/emergency-stop')
   })
 })

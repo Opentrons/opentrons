@@ -4,7 +4,7 @@ import { when, resetAllWhenMocks } from 'jest-when'
 
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
-import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
+import { useProtocolQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
@@ -15,9 +15,9 @@ import {
   OPENTRONS_USB,
 } from '../../../redux/discovery'
 import { getNetworkInterfaces } from '../../../redux/networking'
-
 import { useIsFlex } from '../hooks'
 import { RobotStatusHeader } from '../RobotStatusHeader'
+import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
 
 import type { DiscoveryClientRobotAddress } from '../../../redux/discovery/types'
 import type { SimpleInterfaceStatus } from '../../../redux/networking/types'
@@ -29,6 +29,7 @@ jest.mock('../../../organisms/RunTimeControl/hooks')
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/networking')
 jest.mock('../hooks')
+jest.mock('../../../resources/runs/useNotifyRunQuery')
 
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
@@ -39,7 +40,9 @@ const mockUseCurrentRunStatus = useCurrentRunStatus as jest.MockedFunction<
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
 >
-const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
+const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
+  typeof useNotifyRunQuery
+>
 const mockGetNetworkInterfaces = getNetworkInterfaces as jest.MockedFunction<
   typeof getNetworkInterfaces
 >
@@ -79,10 +82,10 @@ describe('RobotStatusHeader', () => {
     props = MOCK_OTIE
     when(mockUseCurrentRunId).calledWith().mockReturnValue(null)
     when(mockUseCurrentRunStatus).calledWith().mockReturnValue(null)
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith(null, { staleTime: Infinity })
       .mockReturnValue({} as any)
-    when(mockUseRunQuery)
+    when(mockUseNotifyRunQuery)
       .calledWith('fakeRunId', { staleTime: Infinity })
       .mockReturnValue({
         data: {

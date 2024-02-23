@@ -43,11 +43,11 @@ clean:
 
 # artifacts
 #####################################################################
-
+# override webpack's default hashing algorithm for node 18: https://github.com/webpack/webpack/issues/14532
 .PHONY: dist
 dist: export NODE_ENV := production
 dist:
-	webpack --profile
+	NODE_OPTIONS=--openssl-legacy-provider webpack --profile
 
 # development
 #####################################################################
@@ -71,8 +71,9 @@ dev-odd:
 
 .PHONY: dev-server
 dev-server: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
+dev-server: export NODE_OPTIONS := --openssl-legacy-provider
 dev-server:
-	webpack-dev-server --hot
+	webpack-dev-server --hot --host=::
 
 .PHONY: dev-shell
 dev-shell:
@@ -82,7 +83,7 @@ dev-shell:
 
 .PHONY: dev-shell-odd
 dev-shell-odd: export OT_APP_IS_ON_DEVICE := 1
-dev-shell-odd: export OT_APP_ON_DEVICE_DISPLAY_SETTINGS__UNFINISHED_UNBOXING_FLOW_ROUTE := /dashboard
+dev-shell-odd: export OT_APP_ON_DEVICE_DISPLAY_SETTINGS__UNFINISHED_UNBOXING_FLOW_ROUTE := 0
 dev-shell-odd: export OT_APP_UI__WIDTH := 1024
 dev-shell-odd: export OT_APP_UI__HEIGHT := 600
 dev-shell-odd:

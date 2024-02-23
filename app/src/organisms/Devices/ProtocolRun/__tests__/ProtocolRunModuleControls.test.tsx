@@ -2,25 +2,17 @@ import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
 import { i18n } from '../../../../i18n'
 import { renderWithProviders } from '@opentrons/components'
-import {
-  CompletedProtocolAnalysis,
-  ModuleModel,
-  ModuleType,
-} from '@opentrons/shared-data'
+import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { ProtocolRunModuleControls } from '../ProtocolRunModuleControls'
 import { ModuleCard } from '../../../ModuleCard'
-import {
-  useModuleRenderInfoForProtocolById,
-  useProtocolDetailsForRun,
-} from '../../hooks'
+import { useModuleRenderInfoForProtocolById } from '../../hooks'
 import {
   mockMagneticModuleGen2,
   mockTemperatureModuleGen2,
   mockThermocycler,
   mockHeaterShaker,
 } from '../../../../redux/modules/__fixtures__'
-import fixtureAnalysis from '../../../../organisms/RunDetails/__fixtures__/analysis.json'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../ModuleCard')
@@ -30,14 +22,9 @@ const mockModuleCard = ModuleCard as jest.MockedFunction<typeof ModuleCard>
 const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
   typeof useModuleRenderInfoForProtocolById
 >
-const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
-  typeof useProtocolDetailsForRun
->
 const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
   typeof useInstrumentsQuery
 >
-
-const _fixtureAnalysis = (fixtureAnalysis as unknown) as CompletedProtocolAnalysis
 
 const RUN_ID = 'test123'
 
@@ -78,12 +65,6 @@ const render = (
 
 describe('ProtocolRunModuleControls', () => {
   beforeEach(() => {
-    when(mockUseProtocolDetailsForRun).calledWith(RUN_ID).mockReturnValue({
-      protocolData: _fixtureAnalysis,
-      displayName: 'mock display name',
-      protocolKey: 'fakeProtocolKey',
-      robotType: 'OT-2 Standard',
-    })
     when(mockUseInstrumentsQuery).mockReturnValue({
       data: { data: [] },
     } as any)

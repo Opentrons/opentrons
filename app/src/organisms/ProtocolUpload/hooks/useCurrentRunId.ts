@@ -1,10 +1,13 @@
-import { useAllRunsQuery } from '@opentrons/react-api-client'
+import { useNotifyAllRunsQuery } from '../../../resources/runs/useNotifyAllRunsQuery'
+
+import type { AxiosError } from 'axios'
 import type { UseAllRunsQueryOptions } from '@opentrons/react-api-client/src/runs/useAllRunsQuery'
+import type { QueryOptionsWithPolling } from '../../../resources/useNotifyService'
 
 export function useCurrentRunId(
-  options: UseAllRunsQueryOptions = {}
+  options: QueryOptionsWithPolling<UseAllRunsQueryOptions, AxiosError> = {}
 ): string | null {
-  const { data: allRuns } = useAllRunsQuery({ pageLength: 0 }, options)
+  const { data: allRuns } = useNotifyAllRunsQuery({ pageLength: 0 }, options)
   const currentRunLink = allRuns?.links?.current ?? null
   return currentRunLink != null &&
     typeof currentRunLink !== 'string' &&

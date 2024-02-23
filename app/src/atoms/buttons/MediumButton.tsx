@@ -58,48 +58,48 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
     alert: {
       //  TODO(ew, 3/22/23): replaces these hex codes with the color constants
       activeBackgroundColor: '#b91f20',
-      defaultBackgroundColor: COLORS.red2,
+      defaultBackgroundColor: COLORS.red50,
       defaultColor: COLORS.white,
-      disabledBackgroundColor: COLORS.darkBlack20,
+      disabledBackgroundColor: COLORS.grey35,
       iconColor: COLORS.white,
     },
     alertSecondary: {
       //  TODO(ew, 3/22/23): replaces these hex codes with the color constants
       activeBackgroundColor: '#ccabac',
-      defaultBackgroundColor: COLORS.red3,
-      defaultColor: COLORS.red1,
-      disabledBackgroundColor: COLORS.darkBlack20,
-      iconColor: COLORS.red1,
+      defaultBackgroundColor: COLORS.red35,
+      defaultColor: COLORS.red60,
+      disabledBackgroundColor: COLORS.grey35,
+      iconColor: COLORS.red60,
     },
     primary: {
       //  TODO(ew, 3/22/23): replaces these hex codes with the color constants
       activeBackgroundColor: '#045dd0',
-      defaultBackgroundColor: COLORS.blueEnabled,
+      defaultBackgroundColor: COLORS.blue50,
       defaultColor: COLORS.white,
-      disabledBackgroundColor: COLORS.darkBlack20,
+      disabledBackgroundColor: COLORS.grey35,
       iconColor: COLORS.white,
     },
     secondary: {
       //  TODO(ew, 3/22/23): replaces these hex codes with the color constants
       activeBackgroundColor: '#94afd4',
-      defaultBackgroundColor: COLORS.mediumBlueEnabled,
-      defaultColor: COLORS.darkBlackEnabled,
-      disabledBackgroundColor: COLORS.darkBlack20,
-      iconColor: COLORS.blueEnabled,
+      defaultBackgroundColor: COLORS.blue35,
+      defaultColor: COLORS.black90,
+      disabledBackgroundColor: COLORS.grey35,
+      iconColor: COLORS.blue50,
     },
     tertiaryHigh: {
-      activeBackgroundColor: COLORS.darkBlack20,
+      activeBackgroundColor: COLORS.grey35,
       defaultBackgroundColor: COLORS.white,
-      defaultColor: COLORS.darkBlack100,
+      defaultColor: COLORS.black90,
       disabledBackgroundColor: COLORS.transparent,
-      iconColor: COLORS.darkBlack100,
+      iconColor: COLORS.black90,
     },
     tertiaryLowLight: {
-      activeBackgroundColor: COLORS.darkBlack20,
+      activeBackgroundColor: COLORS.grey35,
       defaultBackgroundColor: COLORS.white,
-      defaultColor: COLORS.darkBlack70,
+      defaultColor: COLORS.grey60,
       disabledBackgroundColor: COLORS.transparent,
-      iconColor: COLORS.darkBlack70,
+      iconColor: COLORS.grey60,
     },
   }
 
@@ -137,7 +137,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
     &:disabled {
       background-color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType]
         .disabledBackgroundColor};
-      color: ${COLORS.darkBlack60};
+      color: ${COLORS.grey50};
     }
   `
   return (
@@ -162,7 +162,7 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
           aria-label={`${iconName ?? 'play'} icon`}
           color={
             disabled
-              ? COLORS.darkBlack60
+              ? COLORS.grey50
               : MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
           }
           size={SPACING.spacing40}

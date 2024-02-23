@@ -132,7 +132,7 @@ describe('DeviceReset', () => {
     }
 
     const [{ getByText }] = render(props)
-    getByText('Clear all stored data').click()
+    fireEvent.click(getByText('Clear all stored data'))
     const clearButton = getByText('Clear data and restart robot')
     fireEvent.click(clearButton)
     getByText('Are you sure you want to reset your device?')
@@ -154,10 +154,10 @@ describe('DeviceReset', () => {
     }
 
     const [{ getByText }] = render(props)
-    getByText('Clear pipette calibration').click()
-    getByText('Clear gripper calibration').click()
-    getByText('Clear module calibration').click()
-    getByText('Clear protocol run history').click()
+    fireEvent.click(getByText('Clear pipette calibration'))
+    fireEvent.click(getByText('Clear gripper calibration'))
+    fireEvent.click(getByText('Clear module calibration'))
+    fireEvent.click(getByText('Clear protocol run history'))
     const clearButton = getByText('Clear data and restart robot')
     fireEvent.click(clearButton)
     getByText('Are you sure you want to reset your device?')
@@ -179,8 +179,8 @@ describe('DeviceReset', () => {
     }
 
     const [{ getByText }] = render(props)
-    getByText('Clear all stored data').click()
-    getByText('Clear pipette calibration').click()
+    fireEvent.click(getByText('Clear all stored data'))
+    fireEvent.click(getByText('Clear pipette calibration'))
     const clearButton = getByText('Clear data and restart robot')
     fireEvent.click(clearButton)
     getByText('Are you sure you want to reset your device?')

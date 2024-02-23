@@ -85,7 +85,7 @@ describe('RobotSettingsPipetteOffsetCalibration', () => {
     getByText('PipetteOffsetCalibrationItems')
   })
 
-  it('renders an OT-3 title and description - Pipette Calibrations', () => {
+  it('renders a Flex title and description - Pipette Calibrations', () => {
     when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
       left: mockAttachedPipetteInformation,

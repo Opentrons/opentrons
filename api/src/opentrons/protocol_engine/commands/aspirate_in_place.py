@@ -8,7 +8,7 @@ from opentrons.hardware_control import HardwareControlAPI
 
 from .pipetting_common import (
     PipetteIdMixin,
-    VolumeMixin,
+    AspirateVolumeMixin,
     FlowRateMixin,
     BaseLiquidHandlingResult,
 )
@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 AspirateInPlaceCommandType = Literal["aspirateInPlace"]
 
 
-class AspirateInPlaceParams(PipetteIdMixin, VolumeMixin, FlowRateMixin):
+class AspirateInPlaceParams(PipetteIdMixin, AspirateVolumeMixin, FlowRateMixin):
     """Payload required to aspirate in place."""
 
     pass

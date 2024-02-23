@@ -47,10 +47,7 @@ def get_error_text(protocol_landing: ProtocolLanding, error_link: WebElement) ->
     return error_details
 
 
-@pytest.mark.parametrize(
-    "protocol",
-    _what_protocols(),
-)
+@pytest.mark.parametrize("protocol", _what_protocols())
 def test_analyses(
     driver: WebDriver,
     console: Console,
@@ -74,9 +71,9 @@ def test_analyses(
                 style="white on blue",
             )
             drag_and_drop_file(labware_landing.get_drag_drop_file_button(), labware)
-            if labware_landing.get_success_toast_message(
+            if labware_landing.get_success_toast_message(filename=labware.name) or labware_landing.get_duplicate_error_toast_message(
                 filename=labware.name
-            ) or labware_landing.get_duplicate_error_toast_message(filename=labware.name):
+            ):
                 console.print(
                     f"{labware.name} uploaded to app.",
                     style="white on blue",
@@ -109,10 +106,7 @@ def test_analyses(
     # Verifying elements on Protocol Landing Page
     # todo fix next line needs to be safe and print name not found
     assert protocol_landing.get_deckMap_protocol_landing(protocol_name=protocol.protocol_name).is_displayed()
-    assert (
-        protocol_landing.get_protocol_name_text_protocol_landing(protocol_name=protocol.protocol_name)
-        == protocol.protocol_name
-    )
+    assert protocol_landing.get_protocol_name_text_protocol_landing(protocol_name=protocol.protocol_name) == protocol.protocol_name
 
     # TODO validate robot
 

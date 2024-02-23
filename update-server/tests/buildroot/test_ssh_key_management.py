@@ -10,7 +10,7 @@ from otupdate.common import ssh_key_management
 @pytest.fixture
 def dummy_authorized_keys(tmpdir, monkeypatch):
     path = os.path.join(tmpdir, "authorized_keys")
-    ak = open(path, "w").write("")
+    open(path, "w").write("")
 
     @contextlib.contextmanager
     def ak(mode="r"):

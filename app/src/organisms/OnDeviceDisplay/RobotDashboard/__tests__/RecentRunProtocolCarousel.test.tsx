@@ -1,14 +1,15 @@
 import * as React from 'react'
 
 import { renderWithProviders } from '@opentrons/components'
-import { useAllRunsQuery } from '@opentrons/react-api-client'
 
+import { useNotifyAllRunsQuery } from '../../../../resources/runs/useNotifyAllRunsQuery'
 import { RecentRunProtocolCard, RecentRunProtocolCarousel } from '..'
 
 import type { RunData } from '@opentrons/api-client'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../RecentRunProtocolCard')
+jest.mock('../../../../resources/runs/useNotifyAllRunsQuery')
 
 const mockRun = {
   actions: [],
@@ -29,8 +30,8 @@ const mockRun = {
 const mockRecentRunProtocolCard = RecentRunProtocolCard as jest.MockedFunction<
   typeof RecentRunProtocolCard
 >
-const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
-  typeof useAllRunsQuery
+const mockUseNotifyAllRunsQuery = useNotifyAllRunsQuery as jest.MockedFunction<
+  typeof useNotifyAllRunsQuery
 >
 
 const render = (
@@ -49,7 +50,9 @@ describe('RecentRunProtocolCarousel', () => {
     mockRecentRunProtocolCard.mockReturnValue(
       <div>mock RecentRunProtocolCard</div>
     )
-    mockUseAllRunsQuery.mockReturnValue({ data: { data: [mockRun] } } as any)
+    mockUseNotifyAllRunsQuery.mockReturnValue({
+      data: { data: [mockRun] },
+    } as any)
   })
 
   it('should render RecentRunProtocolCard', () => {

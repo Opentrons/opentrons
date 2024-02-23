@@ -4,9 +4,9 @@ import { css } from 'styled-components'
 import { radiusSoftCorners } from '../ui-style-constants/borders'
 import { fontSizeH4 } from '../ui-style-constants/typography'
 import { spacing8 } from '../ui-style-constants/spacing'
-import { white, darkGreyEnabled } from '../ui-style-constants/colors'
 import { ARROW_SIZE_PX } from './styles'
 import { Box } from '../primitives'
+import { COLORS } from '../helix-design-system'
 
 import type { CSSProperties } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
@@ -51,7 +51,7 @@ export const Tooltip = React.forwardRef(function TooltipComponent(
     children,
     width,
     fontSize = fontSizeH4,
-    backgroundColor = darkGreyEnabled,
+    backgroundColor = COLORS.grey50,
     ...boxProps
   } = props
 
@@ -59,7 +59,7 @@ export const Tooltip = React.forwardRef(function TooltipComponent(
     position: absolute;
     z-index: 9001;
     padding: ${spacing8};
-    color: ${white};
+    color: ${COLORS.white};
     filter: drop-shadow(0px 1px 3px rgba(0, 0, 0, 0.2));
     cursor: pointer;
     font-size: ${fontSize};

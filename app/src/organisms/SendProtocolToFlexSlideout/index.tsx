@@ -75,8 +75,6 @@ export function SendProtocolToFlexSlideout(
 
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
 
-  const isAnalysisError = analysisStatus === 'error'
-
   if (protocolKey == null || srcFileNames == null || srcFiles == null) {
     // TODO: do more robust corrupt file catching and handling here
     return null
@@ -167,7 +165,8 @@ export function SendProtocolToFlexSlideout(
       selectedRobot={selectedRobot}
       setSelectedRobot={setSelectedRobot}
       robotType={FLEX_ROBOT_TYPE}
-      isAnalysisError={isAnalysisError}
+      isAnalysisError={analysisStatus === 'error'}
+      isAnalysisStale={analysisStatus === 'stale'}
     />
   )
 }

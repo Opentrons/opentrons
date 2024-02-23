@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 import { renderWithProviders, nestedTextMatcher } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { UpdateResultsModal } from '../UpdateResultsModal'
@@ -31,7 +32,7 @@ describe('UpdateResultsModal', () => {
   })
   it('calls close modal when the close button is pressed', () => {
     const { getByText } = render(props)
-    getByText('Close').click()
+    fireEvent.click(getByText('Close'))
     expect(props.onClose).toHaveBeenCalled()
   })
   it('renders correct text for a failed instrument update', () => {

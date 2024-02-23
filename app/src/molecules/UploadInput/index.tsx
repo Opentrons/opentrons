@@ -23,20 +23,18 @@ const StyledLabel = styled.label`
   align-items: ${ALIGN_CENTER};
   width: 100%;
   padding: ${SPACING.spacing32};
-  border: 2px dashed ${COLORS.medGreyEnabled};
+  border: 2px dashed ${COLORS.grey30};
   border-radius: ${BORDERS.radiusSoftCorners};
   text-align: center;
   background-color: ${COLORS.white};
 
   &:hover,
   &:focus-within {
-    background-color: ${COLORS.lightBlue};
-    border: 2px dashed ${COLORS.blueEnabled};
+    border: 2px dashed ${COLORS.blue50};
   }
 `
 const DRAG_OVER_STYLES = css`
-  background-color: ${COLORS.lightBlue};
-  border: 2px dashed ${COLORS.blueEnabled};
+  border: 2px dashed ${COLORS.blue50};
 `
 
 const StyledInput = styled.input`
@@ -58,6 +56,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
   const [isFileOverDropZone, setIsFileOverDropZone] = React.useState<boolean>(
     false
   )
+  const [isHover, setIsHover] = React.useState<boolean>(false)
   const handleDrop: React.DragEventHandler<HTMLLabelElement> = e => {
     e.preventDefault()
     e.stopPropagation()
@@ -72,11 +71,13 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
     e.preventDefault()
     e.stopPropagation()
     setIsFileOverDropZone(false)
+    setIsHover(false)
   }
   const handleDragOver: React.DragEventHandler<HTMLLabelElement> = e => {
     e.preventDefault()
     e.stopPropagation()
     setIsFileOverDropZone(true)
+    setIsHover(true)
   }
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = _event => {
@@ -116,11 +117,13 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
         onDragOver={handleDragOver}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
+        onMouseEnter={() => setIsHover(true)}
+        onMouseLeave={() => setIsHover(false)}
         css={isFileOverDropZone ? DRAG_OVER_STYLES : undefined}
       >
         <Icon
           width={SIZE_3}
-          color={COLORS.darkGreyEnabled}
+          color={isHover ? COLORS.blue50 : COLORS.grey60}
           name="upload"
           marginBottom={SPACING.spacing24}
         />

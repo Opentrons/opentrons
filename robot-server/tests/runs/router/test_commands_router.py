@@ -13,10 +13,7 @@ from opentrons.protocol_engine import (
 )
 
 from robot_server.errors import ApiError
-from robot_server.service.json_api import (
-    RequestModel,
-    MultiBodyMeta,
-)
+from robot_server.service.json_api import MultiBodyMeta
 
 from robot_server.runs.run_store import RunStore, CommandNotFoundError
 from robot_server.runs.engine_store import EngineStore
@@ -26,6 +23,7 @@ from robot_server.runs.router.commands_router import (
     CommandCollectionLinks,
     CommandLink,
     CommandLinkMeta,
+    RequestModelWithCommandCreate,
     create_run_command,
     get_run_command,
     get_run_commands,
@@ -123,7 +121,7 @@ async def test_create_run_command(
     ).then_do(_stub_queued_command_state)
 
     result = await create_run_command(
-        request_body=RequestModel(data=command_request),
+        request_body=RequestModelWithCommandCreate(data=command_request),
         waitUntilComplete=False,
         protocol_engine=mock_protocol_engine,
     )
@@ -181,7 +179,7 @@ async def test_create_run_command_blocking_completion(
     )
 
     result = await create_run_command(
-        request_body=RequestModel(data=command_request),
+        request_body=RequestModelWithCommandCreate(data=command_request),
         waitUntilComplete=True,
         timeout=999,
         protocol_engine=mock_protocol_engine,
@@ -207,7 +205,7 @@ async def test_add_conflicting_setup_command(
 
     with pytest.raises(ApiError) as exc_info:
         await create_run_command(
-            request_body=RequestModel(data=command_request),
+            request_body=RequestModelWithCommandCreate(data=command_request),
             waitUntilComplete=False,
             protocol_engine=mock_protocol_engine,
         )
@@ -235,7 +233,7 @@ async def test_add_command_to_stopped_engine(
 
     with pytest.raises(ApiError) as exc_info:
         await create_run_command(
-            request_body=RequestModel(data=command_request),
+            request_body=RequestModelWithCommandCreate(data=command_request),
             waitUntilComplete=False,
             protocol_engine=mock_protocol_engine,
         )

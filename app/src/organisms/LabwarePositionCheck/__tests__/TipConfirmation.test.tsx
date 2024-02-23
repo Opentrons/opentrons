@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { resetAllWhenMocks } from 'jest-when'
+import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { TipConfirmation } from '../TipConfirmation'
 import { i18n } from '../../../i18n'
@@ -31,9 +32,9 @@ describe('TipConfirmation', () => {
   })
   it('should invoke callback props when ctas are clicked', () => {
     const { getByRole } = render(props)
-    getByRole('button', { name: 'Try again' }).click()
+    fireEvent.click(getByRole('button', { name: 'Try again' }))
     expect(props.invalidateTip).toHaveBeenCalled()
-    getByRole('button', { name: 'Yes' }).click()
+    fireEvent.click(getByRole('button', { name: 'Yes' }))
     expect(props.confirmTip).toHaveBeenCalled()
   })
 })

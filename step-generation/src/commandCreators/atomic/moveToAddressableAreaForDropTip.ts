@@ -1,9 +1,11 @@
+import type { AddressableAreaName } from '@opentrons/shared-data'
+
 import { uuid } from '../../utils'
 import type { CommandCreator } from '../../types'
 
 export interface MoveToAddressableAreaForDropTipArgs {
   pipetteId: string
-  addressableAreaName: string
+  addressableAreaName: AddressableAreaName
 }
 export const moveToAddressableAreaForDropTip: CommandCreator<MoveToAddressableAreaForDropTipArgs> = (
   args,

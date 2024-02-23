@@ -25,7 +25,7 @@ export function ConnectingNetwork({
   return (
     <Flex flexDirection={DIRECTION_COLUMN} flex="1" height="100%">
       <Flex
-        backgroundColor={COLORS.darkBlack20}
+        backgroundColor={COLORS.grey35}
         flex="1"
         justifyContent={JUSTIFY_CENTER}
         borderRadius={BORDERS.borderRadiusSize3}
@@ -39,7 +39,7 @@ export function ConnectingNetwork({
           <Icon
             name="ot-spinner"
             size="5rem"
-            color={COLORS.darkBlack70}
+            color={COLORS.grey60}
             aria-label="spinner"
             spin
           />

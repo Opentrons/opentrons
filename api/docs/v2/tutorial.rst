@@ -119,6 +119,8 @@ Whether you need a ``requirements`` block depends on your robot model and API ve
 
 With the metadata and requirements defined, you can move on to creating the ``run()`` function for your protocol.
 
+.. _run-function:
+
 The ``run()`` function
 ----------------------
 

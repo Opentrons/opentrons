@@ -1,4 +1,5 @@
 """Model of a protocol for testing."""
+import hashlib
 import os
 from pathlib import Path
 from typing import Literal, Optional
@@ -15,7 +16,7 @@ class Protocol(BaseModel):
     file_name: names = Field(description="file name not including extension")
     file_extension: Literal["json", "py"] = Field(description="file extension of the protocol")
     protocol_name: str = Field(description="the protocol name which will appear in the protocol name field in the app")
-    robot: Literal["OT-2", "OT-3"] = Field(description="the robot type which will appear in the robot field in the app")
+    robot: Literal["OT-2", "Flex"] = Field(description="the robot type which will appear in the robot field in the app")
     app_error: bool = Field(description="will analysis with the app raise an error")
     robot_error: bool = Field(description="will analysis with the robot raise an error")
     app_analysis_error: Optional[str] = Field(description="the exact error shown in the app popout", default=None)
@@ -52,3 +53,11 @@ class Protocol(BaseModel):
             )
             for p in self.custom_labware
         ]
+
+    @property
+    def short_sha(self) -> str:
+        """Short sha of the file."""
+        # Hash the string using SHA-1
+        hash_object = hashlib.sha1(self.file_name.encode())
+        # Convert to hexadecimal and truncate
+        return hash_object.hexdigest()[:10]

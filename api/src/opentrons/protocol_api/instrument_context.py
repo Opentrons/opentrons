@@ -345,7 +345,6 @@ class InstrumentContext(publisher.CommandPublisher):
 
         .. versionchanged:: 2.15
             Added the ``push_out`` parameter.
-
         """
         if self.api_version < APIVersion(2, 15) and push_out:
             raise APIVersionError(
@@ -401,17 +400,25 @@ class InstrumentContext(publisher.CommandPublisher):
         flow_rate = self._core.get_dispense_flow_rate(rate)
 
         if isinstance(target, (TrashBin, WasteChute)):
-            # HANDLE THE MOVETOADDDRESSABLEAREA
-            self._core.dispense(
-                volume=c_vol,
-                rate=rate,
-                location=target,
-                well_core=None,
-                flow_rate=flow_rate,
-                in_place=False,
-                push_out=push_out,
-            )
-            # TODO publish this info
+            with publisher.publish_context(
+                broker=self.broker,
+                command=cmds.dispense_in_disposal_location(
+                    instrument=self,
+                    volume=c_vol,
+                    location=target,
+                    rate=rate,
+                    flow_rate=flow_rate,
+                ),
+            ):
+                self._core.dispense(
+                    volume=c_vol,
+                    rate=rate,
+                    location=target,
+                    well_core=None,
+                    flow_rate=flow_rate,
+                    in_place=False,
+                    push_out=push_out,
+                )
             return self
 
         with publisher.publish_context(
@@ -565,12 +572,17 @@ class InstrumentContext(publisher.CommandPublisher):
         elif isinstance(target, validation.PointTarget):
             move_to_location = target.location
         elif isinstance(target, (TrashBin, WasteChute)):
-            # TODO handle publish info
-            self._core.blow_out(
-                location=target,
-                well_core=None,
-                in_place=False,
-            )
+            with publisher.publish_context(
+                broker=self.broker,
+                command=cmds.blow_out_in_disposal_location(
+                    instrument=self, location=target
+                ),
+            ):
+                self._core.blow_out(
+                    location=target,
+                    well_core=None,
+                    in_place=False,
+                )
             return self
 
         with publisher.publish_context(
@@ -977,10 +989,10 @@ class InstrumentContext(publisher.CommandPublisher):
               unusually large height above the tip rack, you could call
               ``pipette.drop_tip(tip_rack["A1"].top(z=10))``.
             - As a :py:class:`.TrashBin`. This uses a default location relative to the
-              TrashBin object. For example,
+              ``TrashBin`` object. For example,
               ``pipette.drop_tip(location=trash_bin)``.
             - As a :py:class:`.WasteChute`. This uses a default location relative to
-              the WasteChute object. For example,
+              the ``WasteChute`` object. For example,
               ``pipette.drop_tip(location=waste_chute)``.
 
         :param location:
@@ -1030,8 +1042,15 @@ class InstrumentContext(publisher.CommandPublisher):
             well = maybe_well
 
         elif isinstance(location, (TrashBin, WasteChute)):
-            # TODO: Publish to run log.
-            self._core.drop_tip_in_disposal_location(location, home_after=home_after)
+            with publisher.publish_context(
+                broker=self.broker,
+                command=cmds.drop_tip_in_disposal_location(
+                    instrument=self, location=location
+                ),
+            ):
+                self._core.drop_tip_in_disposal_location(
+                    location, home_after=home_after
+                )
             self._last_tip_picked_up_from = None
             return self
 
@@ -1416,36 +1435,43 @@ class InstrumentContext(publisher.CommandPublisher):
         :param publish: Whether to list this function call in the run preview.
                         Default is ``True``.
         """
-
-        if isinstance(location, (TrashBin, WasteChute)):
-            self._core.move_to(
-                location=location,
-                well_core=None,
-                force_direct=force_direct,
-                minimum_z_height=minimum_z_height,
-                speed=speed,
-            )
-            # TODO handle publish
-            return self
-
         with ExitStack() as contexts:
-            if publish:
-                contexts.enter_context(
-                    publisher.publish_context(
-                        broker=self.broker,
-                        command=cmds.move_to(instrument=self, location=location),
+            if isinstance(location, (TrashBin, WasteChute)):
+                if publish:
+                    contexts.enter_context(
+                        publisher.publish_context(
+                            broker=self.broker,
+                            command=cmds.move_to_disposal_location(
+                                instrument=self, location=location
+                            ),
+                        )
                     )
+
+                self._core.move_to(
+                    location=location,
+                    well_core=None,
+                    force_direct=force_direct,
+                    minimum_z_height=minimum_z_height,
+                    speed=speed,
                 )
+            else:
+                if publish:
+                    contexts.enter_context(
+                        publisher.publish_context(
+                            broker=self.broker,
+                            command=cmds.move_to(instrument=self, location=location),
+                        )
+                    )
 
-            _, well = location.labware.get_parent_labware_and_well()
+                _, well = location.labware.get_parent_labware_and_well()
 
-            self._core.move_to(
-                location=location,
-                well_core=well._core if well is not None else None,
-                force_direct=force_direct,
-                minimum_z_height=minimum_z_height,
-                speed=speed,
-            )
+                self._core.move_to(
+                    location=location,
+                    well_core=well._core if well is not None else None,
+                    force_direct=force_direct,
+                    minimum_z_height=minimum_z_height,
+                    speed=speed,
+                )
 
         return self
 
@@ -1540,7 +1566,7 @@ class InstrumentContext(publisher.CommandPublisher):
         This is the property used to determine where to drop tips and blow out liquids
         when calling :py:meth:`drop_tip` or :py:meth:`blow_out` without arguments.
 
-        You can set this to a :py:obj:`Labware`, :py:obj:`TrashBin`, or :py:obj:`WasteChute`.
+        You can set this to a :py:obj:`Labware`, :py:class:`.TrashBin`, or :py:class:`.WasteChute`.
 
         The default value depends on the robot type and API version:
 
@@ -1865,7 +1891,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 )
             if start not in types.ALLOWED_PRIMARY_NOZZLES:
                 raise ValueError(
-                    f"Starting nozzle specified is not of {types.ALLOWED_PRIMARY_NOZZLES}"
+                    f"Starting nozzle specified is not one of {types.ALLOWED_PRIMARY_NOZZLES}"
                 )
         if style == NozzleLayout.QUADRANT:
             if front_right is None:

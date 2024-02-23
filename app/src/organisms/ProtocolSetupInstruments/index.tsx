@@ -12,7 +12,7 @@ import {
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
-import { PipetteRecalibrationODDWarning } from '../../pages/InstrumentsDashboard/PipetteRealibrationODDWarning'
+import { PipetteRecalibrationODDWarning } from '../../pages/InstrumentsDashboard/PipetteRecalibrationODDWarning'
 import { getShowPipetteCalibrationWarning } from '../Devices/utils'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolInstrumentMountItem } from '../InstrumentMountItem'
@@ -86,6 +86,7 @@ export function ProtocolSetupInstruments({
             speccedName={loadedPipette.pipetteName}
             attachedInstrument={attachedPipetteMatch}
             instrumentsRefetch={refetch}
+            pipetteInfo={mostRecentAnalysis?.pipettes}
           />
         )
       })}
@@ -106,5 +107,5 @@ const ColumnLabel = styled.p`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
-  color: ${COLORS.darkBlack70};
+  color: ${COLORS.grey60};
 `

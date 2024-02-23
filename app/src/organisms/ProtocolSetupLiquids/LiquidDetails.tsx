@@ -25,7 +25,7 @@ const Table = styled('table')`
   width: 100%;
   border-spacing: 0 ${BORDERS.borderRadiusSize2};
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  color: ${COLORS.darkBlack90};
+  color: ${COLORS.grey60};
 `
 const TableHeader = styled('th')`
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
@@ -41,7 +41,7 @@ const TableRow = styled('tr')`
 const TableDatum = styled('td')`
   z-index: 2;
   padding: ${SPACING.spacing8} ${SPACING.spacing20};
-  background-color: ${COLORS.light2};
+  background-color: ${COLORS.grey30};
   font-size: ${TYPOGRAPHY.fontSize22};
   white-space: break-spaces;
   text-overflow: ${WRAP};

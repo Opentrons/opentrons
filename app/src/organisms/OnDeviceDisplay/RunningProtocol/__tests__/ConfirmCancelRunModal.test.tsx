@@ -14,6 +14,8 @@ import { i18n } from '../../../../i18n'
 import { useTrackProtocolRunEvent } from '../../../../organisms/Devices/hooks'
 import { useRunStatus } from '../../../../organisms/RunTimeControl/hooks'
 import { useTrackEvent } from '../../../../redux/analytics'
+import { getLocalRobot } from '../../../../redux/discovery'
+import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
 import { ConfirmCancelRunModal } from '../ConfirmCancelRunModal'
 import { CancelingRunModal } from '../CancelingRunModal'
 
@@ -23,6 +25,7 @@ jest.mock('../../../../organisms/RunTimeControl/hooks')
 jest.mock('../../../../redux/analytics')
 jest.mock('../../../ProtocolUpload/hooks')
 jest.mock('../CancelingRunModal')
+jest.mock('../../../../redux/discovery')
 
 const mockPush = jest.fn()
 let mockStopRun: jest.Mock
@@ -56,6 +59,9 @@ const mockCancelingRunModal = CancelingRunModal as jest.MockedFunction<
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
 >
+const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
+  typeof getLocalRobot
+>
 
 const render = (props: React.ComponentProps<typeof ConfirmCancelRunModal>) => {
   return renderWithProviders(
@@ -69,6 +75,7 @@ const render = (props: React.ComponentProps<typeof ConfirmCancelRunModal>) => {
 }
 
 const RUN_ID = 'mock_runID'
+const ROBOT_NAME = 'otie'
 const mockFn = jest.fn()
 
 describe('ConfirmCancelRunModal', () => {
@@ -86,15 +93,21 @@ describe('ConfirmCancelRunModal', () => {
     mockTrackProtocolRunEvent = jest.fn(
       () => new Promise(resolve => resolve({}))
     )
+    mockGetLocalRobot.mockReturnValue({
+      ...mockConnectedRobot,
+      name: ROBOT_NAME,
+    })
     mockUseStopRunMutation.mockReturnValue({ stopRun: mockStopRun } as any)
     mockUseDismissCurrentRunMutation.mockReturnValue({
       dismissCurrentRun: mockDismissCurrentRun,
       isLoading: false,
     } as any)
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
-    when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
-      trackProtocolRunEvent: mockTrackProtocolRunEvent,
-    })
+    when(mockUseTrackProtocolRunEvent)
+      .calledWith(RUN_ID, ROBOT_NAME)
+      .mockReturnValue({
+        trackProtocolRunEvent: mockTrackProtocolRunEvent,
+      })
     mockCancelingRunModal.mockReturnValue(<div>mock CancelingRunModal</div>)
     when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_IDLE)
   })

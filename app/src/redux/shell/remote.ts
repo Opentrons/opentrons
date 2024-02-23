@@ -3,7 +3,7 @@ import assert from 'assert'
 
 import type { AxiosRequestConfig } from 'axios'
 import type { ResponsePromise } from '@opentrons/api-client'
-import type { Remote } from './types'
+import type { Remote, NotifyTopic, NotifyResponseData } from './types'
 
 const emptyRemote: Remote = {} as any
 
@@ -35,4 +35,19 @@ export function appShellRequestor<Data>(
   const configProxy = { ...config, data: formDataProxy }
 
   return remote.ipcRenderer.invoke('usb:request', configProxy)
+}
+
+export function appShellListener(
+  hostname: string | null,
+  topic: NotifyTopic,
+  callback: (data: NotifyResponseData) => void
+): void {
+  remote.ipcRenderer.on(
+    'notify',
+    (_, shellHostname, shellTopic, shellMessage) => {
+      if (hostname === shellHostname && topic === shellTopic) {
+        callback(shellMessage)
+      }
+    }
+  )
 }

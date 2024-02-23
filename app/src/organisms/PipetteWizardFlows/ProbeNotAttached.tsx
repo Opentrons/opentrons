@@ -34,7 +34,7 @@ export const ProbeNotAttached = (
     <SimpleWizardBody
       header={t('unable_to_detect_probe')}
       subHeader={numberOfTryAgains > 2 ? t('something_seems_wrong') : undefined}
-      iconColor={COLORS.errorEnabled}
+      iconColor={COLORS.red50}
       isSuccess={false}
     >
       <Flex
@@ -80,7 +80,7 @@ const ALIGN_BUTTONS = css`
 `
 const GO_BACK_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50};
   padding-left: ${SPACING.spacing32};
 
   &:hover {

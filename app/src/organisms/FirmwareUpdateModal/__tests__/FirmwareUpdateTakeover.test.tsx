@@ -1,28 +1,32 @@
 import * as React from 'react'
+
 import { renderWithProviders } from '@opentrons/components'
 import {
   useInstrumentsQuery,
-  useCurrentMaintenanceRun,
   useCurrentAllSubsystemUpdatesQuery,
   useSubsystemUpdateQuery,
 } from '@opentrons/react-api-client'
+
 import { i18n } from '../../../i18n'
 import { UpdateNeededModal } from '../UpdateNeededModal'
 import { UpdateInProgressModal } from '../UpdateInProgressModal'
 import { useIsUnboxingFlowOngoing } from '../../RobotSettingsDashboard/NetworkSettings/hooks'
 import { FirmwareUpdateTakeover } from '../FirmwareUpdateTakeover'
+import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
+
 import type { BadPipette, PipetteData } from '@opentrons/api-client'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../UpdateNeededModal')
 jest.mock('../UpdateInProgressModal')
 jest.mock('../../RobotSettingsDashboard/NetworkSettings/hooks')
+jest.mock('../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
 
 const mockUseInstrumentQuery = useInstrumentsQuery as jest.MockedFunction<
   typeof useInstrumentsQuery
 >
-const mockUseCurrentMaintenanceRun = useCurrentMaintenanceRun as jest.MockedFunction<
-  typeof useCurrentMaintenanceRun
+const mockUseNotifyCurrentMaintenanceRun = useNotifyCurrentMaintenanceRun as jest.MockedFunction<
+  typeof useNotifyCurrentMaintenanceRun
 >
 const mockUpdateNeededModal = UpdateNeededModal as jest.MockedFunction<
   typeof UpdateNeededModal
@@ -59,7 +63,9 @@ describe('FirmwareUpdateTakeover', () => {
       },
     } as any)
     mockUpdateNeededModal.mockReturnValue(<>Mock Update Needed Modal</>)
-    mockUseCurrentMaintenanceRun.mockReturnValue({ data: undefined } as any)
+    mockUseNotifyCurrentMaintenanceRun.mockReturnValue({
+      data: undefined,
+    } as any)
     mockUseIsUnboxingFlowOngoing.mockReturnValue(false)
     mockUseCurrentAllSubsystemUpdateQuery.mockReturnValue({
       data: undefined,
@@ -93,7 +99,7 @@ describe('FirmwareUpdateTakeover', () => {
   })
 
   it('does not render modal when a maintenance run is active', () => {
-    mockUseCurrentMaintenanceRun.mockReturnValue({
+    mockUseNotifyCurrentMaintenanceRun.mockReturnValue({
       data: {
         runId: 'mock run id',
       },

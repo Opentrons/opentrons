@@ -103,7 +103,7 @@ Aspirating and Dispensing
 See :ref:`complex-tip-refilling` below for cases where the total amount to be dispensed is greater than the capacity of the tip.
     
 .. figure:: ../../img/complex_commands/robot_distribute.png
-    :name: Transfer
+    :name: Distribute
     :scale: 35%
     :align: center
     
@@ -120,7 +120,7 @@ See :ref:`complex-tip-refilling` below for cases where the total amount to be di
 See :ref:`complex-tip-refilling` below for cases where the total amount to be aspirated is greater than the capacity of the tip.
 
 .. figure:: ../../img/complex_commands/robot_consolidate.png
-    :name: Transfer
+    :name: Consolidate
     :scale: 35%
     :align: center
     

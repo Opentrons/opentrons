@@ -116,12 +116,12 @@ const DisplayConnectionStatus = ({
       flex="1"
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing32}
-      backgroundColor={COLORS.green3}
+      backgroundColor={COLORS.green35}
       borderRadius={BORDERS.borderRadiusSize3}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
     >
-      <Icon size="3rem" name="ot-check" color={COLORS.green2} />
+      <Icon size="3rem" name="ot-check" color={COLORS.green50} />
       <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('successfully_connected_to_network', { ssid })}
       </StyledText>

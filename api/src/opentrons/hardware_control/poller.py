@@ -3,6 +3,7 @@ import contextlib
 import logging
 from abc import ABC, abstractmethod
 from typing import AsyncGenerator, List, Optional
+from opentrons_shared_data.errors.exceptions import ModuleCommunicationError
 
 
 log = logging.getLogger(__name__)
@@ -48,6 +49,8 @@ class Poller:
         async with self._use_read_lock():
             task.cancel()
             await asyncio.gather(task, return_exceptions=True)
+        for waiter in self._poll_waiters:
+            waiter.cancel(msg="Module was removed")
 
     async def wait_next_poll(self) -> None:
         """Wait for the next poll to complete.
@@ -56,6 +59,9 @@ class Poller:
         the next complete read. If a read raises an exception,
         it will be passed through to `wait_next_poll`.
         """
+        if not self._poll_forever_task or self._poll_forever_task.done():
+            raise ModuleCommunicationError(message="Module was removed")
+
         poll_future = asyncio.get_running_loop().create_future()
         self._poll_waiters.append(poll_future)
         await poll_future
