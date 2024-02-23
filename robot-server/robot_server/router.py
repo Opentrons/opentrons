@@ -13,7 +13,7 @@ from .maintenance_runs.router import maintenance_runs_router
 from .modules.router import modules_router
 from .protocols.router import protocols_router
 from .robot.router import robot_router
-from .runs import runs_router
+from .runs.router import runs_router
 from .service.labware.router import router as labware_router
 from .service.legacy.routers import legacy_routes
 from .service.pipette_offset.router import router as pip_os_router
