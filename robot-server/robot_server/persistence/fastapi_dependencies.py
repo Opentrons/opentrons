@@ -1,3 +1,6 @@
+"""Functions to use as dependencies in FastAPI routers."""
+
+
 import asyncio
 import logging
 from pathlib import Path
@@ -14,10 +17,10 @@ from server_utils.fastapi_utils.app_state import (
     AppStateAccessor,
     get_app_state,
 )
-from robot_server.errors import ErrorDetails
+from robot_server.errors.error_responses import ErrorDetails
 
-from ._database import create_sql_engine
-from ._persistence_directory import (
+from .database import create_sql_engine
+from .persistence_directory import (
     PersistenceResetter,
     prepare_active_subdirectory,
     prepare_root,

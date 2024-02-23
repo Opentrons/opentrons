@@ -9,7 +9,8 @@ from dataclasses import dataclass
 import sqlalchemy
 import anyio
 
-from robot_server.persistence import analysis_table, sqlite_rowid
+from robot_server.persistence.database import sqlite_rowid
+from robot_server.persistence.tables import analysis_table
 from robot_server.persistence.pydantic import json_to_pydantic, pydantic_to_json
 
 from .analysis_models import CompletedAnalysis

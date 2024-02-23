@@ -9,7 +9,7 @@ from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
 
-from robot_server.errors import ErrorBody
+from robot_server.errors.error_responses import ErrorBody
 from robot_server.hardware import get_deck_definition
 from robot_server.service.dependencies import get_current_time
 from robot_server.service.json_api import PydanticResponse, RequestModel, SimpleBody

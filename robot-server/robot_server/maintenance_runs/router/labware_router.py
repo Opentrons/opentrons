@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, status
 from opentrons.protocol_engine import LabwareOffsetCreate, LabwareOffset
 from opentrons.protocols.models import LabwareDefinition
 
-from robot_server.errors import ErrorBody
+from robot_server.errors.error_responses import ErrorBody
 from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResponse
 
 from ..maintenance_run_models import MaintenanceRun, LabwareDefinitionSummary
