@@ -498,7 +498,12 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     ) -> None:
         # TODO (nd, 2023-11-30): give appropriate offset when finalized
         # https://opentrons.atlassian.net/browse/RSS-391
-        offset = AddressableOffsetVector(x=0, y=0, z=0)
+
+        disposal_offset = disposal_location.offset
+
+        offset = AddressableOffsetVector(
+            x=disposal_offset.x, y=disposal_offset.y, z=disposal_offset.z
+        )
 
         if isinstance(disposal_location, TrashBin):
             addressable_area_name = disposal_location._addressable_area_name

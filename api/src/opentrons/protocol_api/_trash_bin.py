@@ -1,4 +1,6 @@
-from opentrons.types import DeckSlotName
+from __future__ import annotations
+
+from opentrons.types import DeckSlotName, Point
 
 
 class TrashBin:
@@ -7,9 +9,25 @@ class TrashBin:
     See :py:meth:`.ProtocolContext.load_trash_bin`.
     """
 
-    def __init__(self, location: DeckSlotName, addressable_area_name: str) -> None:
+    def __init__(
+        self,
+        location: DeckSlotName,
+        addressable_area_name: str,
+        offset: Point = Point(x=0, y=0, z=0),
+    ) -> None:
         self._location = location
         self._addressable_area_name = addressable_area_name
+        # TODO maybe make this some sort of offset vector
+        self._offset = offset
+
+    def top(self, x: float = 0, y: float = 0, z: float = 0) -> TrashBin:
+        return TrashBin(
+            self._location, self._addressable_area_name, Point(x=x, y=y, z=z)
+        )
+
+    @property
+    def offset(self) -> Point:
+        return self._offset
 
     @property
     def location(self) -> DeckSlotName:
