@@ -8,6 +8,8 @@ import postCssPresetEnv from 'postcss-preset-env'
 import lostCss from 'lost'
 
 export default defineConfig({
+  // this makes imports relative rather than absolute
+  base: '',
   build: {
     // Relative to the root
     outDir: 'dist',
@@ -43,10 +45,14 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@opentrons/components/styles': path.resolve('../components/src/index.module.css'),
+      '@opentrons/components/styles': path.resolve(
+        '../components/src/index.module.css'
+      ),
       '@opentrons/components': path.resolve('../components/src/index.ts'),
       '@opentrons/shared-data': path.resolve('../shared-data/js/index.ts'),
-      '@opentrons/step-generation': path.resolve('../step-generation/src/index.ts'),
+      '@opentrons/step-generation': path.resolve(
+        '../step-generation/src/index.ts'
+      ),
     },
   },
 })
