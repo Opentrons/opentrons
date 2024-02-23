@@ -177,8 +177,8 @@
         "body": "The gripper cannot move aluminum blocks. Edit the step and deselect the 'Use Gripper' checkbox."
       },
       "PIPETTE_HAS_TIP": {
-        "title": "Collision warning due to pipette tip",
-        "body": "The gripper cannot be moved when any pipettes have tips on them, please drop tip in order to continue."
+        "title": "Possible collision with tip",
+        "body": "The gripper cannot pick up labware while pipettes have tips attached. Drop all tips before this move labware step."
       }
     },
     "warning": {
