@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from opentrons import __version__
 
-from .errors import exception_handlers
+from .errors.exception_handlers import exception_handlers
 from .hardware import (
     fbl_init,
     fbl_mark_hardware_init_complete,

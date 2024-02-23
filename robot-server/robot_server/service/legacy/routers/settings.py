@@ -29,7 +29,7 @@ from robot_server.deck_configuration.fastapi_dependencies import (
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
 
-from robot_server.errors import LegacyErrorResponse
+from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.hardware import (
     get_hardware,
     get_robot_type,

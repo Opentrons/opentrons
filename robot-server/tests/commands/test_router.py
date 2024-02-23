@@ -12,7 +12,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
 
 from robot_server.service.json_api import MultiBodyMeta
-from robot_server.errors import ApiError
+from robot_server.errors.error_responses import ApiError
 from robot_server.commands.router import (
     RequestModelWithStatelessCommandCreate,
     create_command,

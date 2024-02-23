@@ -14,7 +14,7 @@ from server_utils.fastapi_utils.app_state import (
     AppStateAccessor,
     get_app_state,
 )
-from robot_server.errors import ErrorDetails
+from robot_server.errors.error_responses import ErrorDetails
 
 from ._database import create_sql_engine
 from ._persistence_directory import (

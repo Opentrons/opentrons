@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 
 from opentrons_shared_data.errors import ErrorCodes
 
-from robot_server.errors import ErrorDetails, ErrorBody
+from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.robot.control.dependencies import require_estop_in_good_state
 
