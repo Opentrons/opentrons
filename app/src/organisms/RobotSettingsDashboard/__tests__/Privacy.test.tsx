@@ -1,25 +1,17 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 
 import { i18n } from '../../../i18n'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { toggleAnalyticsOptedIn } from '../../../redux/analytics'
 import { getRobotSettings, updateSetting } from '../../../redux/robot-settings'
 
 import { Privacy } from '../Privacy'
 
-jest.mock('../../../redux/analytics')
-jest.mock('../../../redux/robot-settings')
-
-const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
-  typeof getRobotSettings
->
-const mockUpdateSetting = updateSetting as jest.MockedFunction<
-  typeof updateSetting
->
-const mockToggleAnalyticsOptedIn = toggleAnalyticsOptedIn as jest.MockedFunction<
-  typeof toggleAnalyticsOptedIn
->
+vi.mock('../../../redux/analytics')
+vi.mock('../../../redux/robot-settings')
 
 const render = (props: React.ComponentProps<typeof Privacy>) => {
   return renderWithProviders(<Privacy {...props} />, {
@@ -32,13 +24,9 @@ describe('Privacy', () => {
   beforeEach(() => {
     props = {
       robotName: 'Otie',
-      setCurrentOption: jest.fn(),
+      setCurrentOption: vi.fn(),
     }
-    mockGetRobotSettings.mockReturnValue([])
-  })
-
-  afterEach(() => {
-    jest.clearAllMocks()
+    vi.mocked(getRobotSettings).mockReturnValue([])
   })
 
   it('should render text and buttons', () => {
@@ -56,16 +44,12 @@ describe('Privacy', () => {
   it('should toggle display usage sharing on click', () => {
     render(props)
     fireEvent.click(screen.getByText('Share display usage'))
-    expect(mockToggleAnalyticsOptedIn).toBeCalled()
+    expect(toggleAnalyticsOptedIn).toBeCalled()
   })
 
   it('should toggle robot logs sharing on click', () => {
     render(props)
     fireEvent.click(screen.getByText('Share robot logs'))
-    expect(mockUpdateSetting).toBeCalledWith(
-      'Otie',
-      'disableLogAggregation',
-      true
-    )
+    expect(updateSetting).toBeCalledWith('Otie', 'disableLogAggregation', true)
   })
 })

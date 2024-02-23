@@ -1,7 +1,8 @@
 import * as React from 'react'
-import { resetAllWhenMocks } from 'jest-when'
-
-import { renderWithProviders } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 
 import * as RobotUpdate from '../../../redux/robot-update'
@@ -13,24 +14,16 @@ import {
 
 import type { State } from '../../../redux/types'
 
-jest.mock('../../../redux/discovery')
-jest.mock('../../../redux/robot-update')
-jest.mock('../../../organisms/UpdateRobotSoftware/CheckUpdates')
-jest.mock('../../../organisms/UpdateRobotSoftware/CompleteUpdateSoftware')
-jest.mock('../../../organisms/UpdateRobotSoftware/ErrorUpdateSoftware')
-jest.mock('../../../organisms/UpdateRobotSoftware/NoUpdateFound')
-jest.mock('../../../organisms/UpdateRobotSoftware/UpdateSoftware')
+vi.mock('../../../redux/discovery')
+vi.mock('../../../redux/robot-update')
+vi.mock('../../../organisms/UpdateRobotSoftware/CheckUpdates')
+vi.mock('../../../organisms/UpdateRobotSoftware/CompleteUpdateSoftware')
+vi.mock('../../../organisms/UpdateRobotSoftware/ErrorUpdateSoftware')
+vi.mock('../../../organisms/UpdateRobotSoftware/NoUpdateFound')
+vi.mock('../../../organisms/UpdateRobotSoftware/UpdateSoftware')
 
-const mockCompleteUpdateSoftware = CompleteUpdateSoftware as jest.MockedFunction<
-  typeof CompleteUpdateSoftware
->
-const mockUpdateSoftware = UpdateSoftware as jest.MockedFunction<
-  typeof UpdateSoftware
->
+const getRobotUpdateSession = RobotUpdate.getRobotUpdateSession
 
-const mockGetRobotUpdateSession = RobotUpdate.getRobotUpdateSession as jest.MockedFunction<
-  typeof RobotUpdate.getRobotUpdateSession
->
 const MOCK_STATE: State = {
   discovery: {
     robot: { connection: { connectedTo: null } },
@@ -77,8 +70,8 @@ const mockSession = {
   error: null,
 }
 
-const mockAfterError = jest.fn()
-const mockBeforeCommitting = jest.fn()
+const mockAfterError = vi.fn()
+const mockBeforeCommitting = vi.fn()
 
 const render = () => {
   return renderWithProviders(
@@ -96,23 +89,18 @@ const render = () => {
 
 describe('UpdateRobotSoftware', () => {
   beforeEach(() => {
-    jest.useFakeTimers()
-    mockCompleteUpdateSoftware.mockReturnValue(
+    vi.useFakeTimers()
+    vi.mocked(CompleteUpdateSoftware).mockReturnValue(
       <div>mock CompleteUpdateSoftware</div>
     )
-    mockUpdateSoftware.mockReturnValue(<div>mock UpdateSoftware</div>)
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
+    vi.mocked(UpdateSoftware).mockReturnValue(<div>mock UpdateSoftware</div>)
   })
 
   it('should render complete screen when finished', () => {
     const mockCompleteSession = { ...mockSession, step: RobotUpdate.FINISHED }
-    mockGetRobotUpdateSession.mockReturnValue(mockCompleteSession)
-    const [{ getByText }] = render()
-    getByText('mock CompleteUpdateSoftware')
+    vi.mocked(getRobotUpdateSession).mockReturnValue(mockCompleteSession)
+    render()
+    screen.getByText('mock CompleteUpdateSoftware')
   })
 
   it('should call beforeCommittingSuccessFulUpdate before installing', () => {
@@ -121,21 +109,21 @@ describe('UpdateRobotSoftware', () => {
       step: RobotUpdate.COMMIT_UPDATE,
       stage: RobotUpdate.READY_FOR_RESTART,
     }
-    mockGetRobotUpdateSession.mockReturnValue(mockAboutToCommitSession)
-    const [{ getByText }] = render()
+    vi.mocked(getRobotUpdateSession).mockReturnValue(mockAboutToCommitSession)
+    render()
     expect(mockBeforeCommitting).toBeCalled()
-    expect(mockUpdateSoftware).toBeCalledWith(
+    expect(UpdateSoftware).toBeCalledWith(
       { updateType: 'installing', processProgress: 0 },
       expect.anything()
     )
-    getByText('mock UpdateSoftware')
+    screen.getByText('mock UpdateSoftware')
   })
   it('should call afterError if there is an error', () => {
     const mockErrorSession = { ...mockSession, error: 'oh no!' }
-    mockGetRobotUpdateSession.mockReturnValue(mockErrorSession)
-    const [{ getByText }] = render()
+    vi.mocked(getRobotUpdateSession).mockReturnValue(mockErrorSession)
+    render()
     expect(mockAfterError).toBeCalled()
-    getByText('mock UpdateSoftware')
+    screen.getByText('mock UpdateSoftware')
   })
 
   it('should render mock Update Robot Software for downloading', () => {
@@ -143,10 +131,10 @@ describe('UpdateRobotSoftware', () => {
       ...mockSession,
       step: RobotUpdate.RESTART,
     }
-    mockGetRobotUpdateSession.mockReturnValue(mockDownloadSession)
-    const [{ getByText }] = render()
-    jest.advanceTimersByTime(11000)
-    getByText('mock UpdateSoftware')
+    vi.mocked(getRobotUpdateSession).mockReturnValue(mockDownloadSession)
+    render()
+    vi.advanceTimersByTime(11000)
+    screen.getByText('mock UpdateSoftware')
   })
 
   it('should render mock Update Software for sending file', () => {
@@ -155,10 +143,10 @@ describe('UpdateRobotSoftware', () => {
       step: RobotUpdate.GET_TOKEN,
       stage: RobotUpdate.VALIDATING,
     }
-    mockGetRobotUpdateSession.mockReturnValue(mockSendingFileSession)
-    const [{ getByText }] = render()
-    jest.advanceTimersByTime(11000)
-    getByText('mock UpdateSoftware')
+    vi.mocked(getRobotUpdateSession).mockReturnValue(mockSendingFileSession)
+    render()
+    vi.advanceTimersByTime(11000)
+    screen.getByText('mock UpdateSoftware')
   })
 
   it('should render mock Update Software for validating', () => {
@@ -166,10 +154,10 @@ describe('UpdateRobotSoftware', () => {
       ...mockSession,
       step: RobotUpdate.PROCESS_FILE,
     }
-    mockGetRobotUpdateSession.mockReturnValue(mockValidatingSession)
-    const [{ getByText }] = render()
-    jest.advanceTimersByTime(11000)
-    getByText('mock UpdateSoftware')
+    vi.mocked(getRobotUpdateSession).mockReturnValue(mockValidatingSession)
+    render()
+    vi.advanceTimersByTime(11000)
+    screen.getByText('mock UpdateSoftware')
   })
 
   it('should render mock Update Software for installing', () => {
@@ -177,9 +165,9 @@ describe('UpdateRobotSoftware', () => {
       ...mockSession,
       step: RobotUpdate.COMMIT_UPDATE,
     }
-    mockGetRobotUpdateSession.mockReturnValue(mockInstallingSession)
-    const [{ getByText }] = render()
-    jest.advanceTimersByTime(11000)
-    getByText('mock UpdateSoftware')
+    vi.mocked(getRobotUpdateSession).mockReturnValue(mockInstallingSession)
+    render()
+    vi.advanceTimersByTime(11000)
+    screen.getByText('mock UpdateSoftware')
   })
 })
