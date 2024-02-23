@@ -12,6 +12,7 @@ import {
 } from '../redux/analytics'
 
 import type { UseQueryOptions } from 'react-query'
+import type { HostConfig } from '@opentrons/api-client'
 import type { NotifyTopic, NotifyResponseData } from '../redux/shell/types'
 
 export interface QueryOptionsWithPolling<TData, TError = Error>
@@ -23,19 +24,22 @@ interface UseNotifyServiceProps<TData, TError = Error> {
   topic: NotifyTopic
   refetchUsingHTTP: () => void
   options: QueryOptionsWithPolling<TData, TError>
+  hostOverride?: HostConfig | null
 }
 
 export function useNotifyService<TData, TError = Error>({
   topic,
   refetchUsingHTTP,
   options,
+  hostOverride,
 }: UseNotifyServiceProps<TData, TError>): { isNotifyError: boolean } {
   const dispatch = useDispatch()
-  const host = useHost()
-  const isNotifyError = React.useRef(false)
-  const doTrackEvent = useTrackEvent()
-  const { enabled, staleTime, forceHttpPolling } = options
+  const hostFromProvider = useHost()
+  const host = hostOverride ?? hostFromProvider
   const hostname = host?.hostname ?? null
+  const doTrackEvent = useTrackEvent()
+  const isNotifyError = React.useRef(false)
+  const { enabled, staleTime, forceHttpPolling } = options
 
   React.useEffect(() => {
     // Always fetch on initial mount.

@@ -24,6 +24,7 @@ export function useNotifyAllRunsQuery(
     topic: 'robot-server/runs',
     refetchUsingHTTP: () => setRefetchUsingHTTP(true),
     options,
+    hostOverride,
   })
 
   const isNotifyEnabled =
