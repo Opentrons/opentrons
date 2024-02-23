@@ -43,7 +43,7 @@ from typing_extensions import Final
 import sqlalchemy
 
 from ..tables.schema_2 import analysis_table, migration_table, run_table
-from .. import legacy_pickle
+from .. import _legacy_pickle
 
 
 _LATEST_SCHEMA_VERSION: Final = 2
@@ -216,7 +216,7 @@ def _migrate_data_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
         )
 
         v1_completed_analysis = CompletedAnalysis.parse_obj(
-            legacy_pickle.loads(row.completed_analysis)
+            _legacy_pickle.loads(row.completed_analysis)
         )
 
         v2_completed_analysis_as_document = v1_completed_analysis.json(

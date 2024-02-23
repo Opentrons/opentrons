@@ -24,10 +24,10 @@ _imports.extend([commands, sql_utils])
 from robot_server.persistence.tables import schema_2, schema_3  # noqa: E402
 from robot_server.persistence import (  # noqa: E402
     database,
-    legacy_pickle,
-    pydantic as pydantic_helpers
+    pydantic as pydantic_helpers,
+    _legacy_pickle,
 )
-_imports.extend([schema_2, schema_3, database, legacy_pickle, pydantic_helpers])
+_imports.extend([schema_2, schema_3, database, pydantic_helpers, _legacy_pickle])
 
 # fmt: on
 
@@ -82,7 +82,7 @@ def migrate_commands_for_run(
             ).scalar_one()
 
         old_commands: typing.List[typing.Dict[str, object]] = (
-            legacy_pickle.loads(old_commands_bytes) if old_commands_bytes else []
+            _legacy_pickle.loads(old_commands_bytes) if old_commands_bytes else []
         )
 
         parsed_commands: typing.Iterable[commands.Command] = (

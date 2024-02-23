@@ -6,7 +6,7 @@ See our migration code for details.
 
 import sqlalchemy
 
-from robot_server.persistence import legacy_pickle
+from robot_server.persistence import _legacy_pickle
 from robot_server.persistence.pickle_protocol_version import PICKLE_PROTOCOL_VERSION
 from robot_server.persistence._utc_datetime import UTCDateTime
 
@@ -99,7 +99,7 @@ run_table = sqlalchemy.Table(
     # column added in schema v1
     sqlalchemy.Column(
         "state_summary",
-        sqlalchemy.PickleType(pickler=legacy_pickle, protocol=PICKLE_PROTOCOL_VERSION),
+        sqlalchemy.PickleType(pickler=_legacy_pickle, protocol=PICKLE_PROTOCOL_VERSION),
         nullable=True,
     ),
     # column added in schema v1
