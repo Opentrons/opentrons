@@ -90,7 +90,7 @@ router.include_router(
 
 router.include_router(
     router=deprecated_session_router,
-    tags=["Session Management"],
+    tags=["OT-2 Calibration Sessions"],
     dependencies=[Depends(check_version_header)],
 )
 
