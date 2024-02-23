@@ -54,6 +54,7 @@ from opentrons.protocol_engine.state.pipettes import (
     PipetteView,
     StaticPipetteConfig,
     BoundingNozzlesOffsets,
+    PipetteBoundingBoxOffsets,
 )
 from opentrons.protocol_engine.state.addressable_areas import AddressableAreaView
 from opentrons.protocol_engine.state.geometry import GeometryView, _GripperMoveType
@@ -1856,6 +1857,10 @@ def test_get_next_drop_tip_location(
             bounding_nozzle_offsets=BoundingNozzlesOffsets(
                 back_left_offset=Point(x=10, y=20, z=30),
                 front_right_offset=Point(x=40, y=50, z=60),
+            ),
+            pipette_bounding_box_offsets=PipetteBoundingBoxOffsets(
+                back_left_corner=Point(x=10, y=20, z=30),
+                front_right_corner=Point(x=40, y=50, z=60),
             ),
         )
     )

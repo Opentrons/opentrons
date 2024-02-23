@@ -463,7 +463,7 @@ def test_deck_conflict_raises_for_bad_pipette_move(
         )
     ).then_return(destination_well_point)
     decoy.when(
-        mock_state_view.pipettes.get_nozzle_bounds_at_specified_move_to_position(
+        mock_state_view.pipettes.get_pipette_bounds_at_specified_move_to_position(
             pipette_id="pipette-id", destination_position=destination_well_point
         )
     ).then_return(nozzle_bounds)
@@ -571,7 +571,7 @@ def test_deck_conflict_raises_for_collision_with_tc_lid(
         )
     ).then_return(destination_well_point)
     decoy.when(
-        mock_state_view.pipettes.get_nozzle_bounds_at_specified_move_to_position(
+        mock_state_view.pipettes.get_pipette_bounds_at_specified_move_to_position(
             pipette_id="pipette-id", destination_position=destination_well_point
         )
     ).then_return(nozzle_bounds_at_destination)

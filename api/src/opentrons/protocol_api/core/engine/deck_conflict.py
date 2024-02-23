@@ -246,9 +246,8 @@ def check_safe_for_pipette_movement(
 
     labware_slot = engine_state.geometry.get_ancestor_slot_name(labware_id)
     pipette_bounds_at_well_location = (
-        engine_state.pipettes.get_nozzle_bounds_at_specified_move_to_position(
-            pipette_id=pipette_id,
-            destination_position=well_location_point,
+        engine_state.pipettes.get_pipette_bounds_at_specified_move_to_position(
+            pipette_id=pipette_id, destination_position=well_location_point
         )
     )
     surrounding_slots = adjacent_slots_getters.get_surrounding_slots(

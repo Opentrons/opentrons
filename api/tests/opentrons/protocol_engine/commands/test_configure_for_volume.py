@@ -46,6 +46,8 @@ async def test_configure_for_volume_implementation(
         nominal_tip_overlap={},
         back_left_nozzle_offset=Point(x=1, y=2, z=3),
         front_right_nozzle_offset=Point(x=4, y=5, z=6),
+        back_left_corner_offset=Point(10, 20, 30),
+        front_right_corner_offset=Point(40, 50, 60),
     )
 
     decoy.when(

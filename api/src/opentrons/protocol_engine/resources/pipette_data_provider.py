@@ -37,6 +37,8 @@ class LoadedStaticPipetteData:
         float, pipette_definition.SupportedTipsDefinition
     ]
     nominal_tip_overlap: Dict[str, float]
+    back_left_corner_offset: Point
+    front_right_corner_offset: Point
     back_left_nozzle_offset: Point
     front_right_nozzle_offset: Point
 
@@ -151,6 +153,8 @@ class VirtualPipetteDataProvider:
         ]
 
         nozzle_manager = NozzleConfigurationManager.build_from_config(config)
+        pip_back_left = config.pipette_bounding_box_offsets.back_left_corner
+        pip_front_right = config.pipette_bounding_box_offsets.front_right_corner
         return LoadedStaticPipetteData(
             model=str(pipette_model),
             display_name=config.display_name,
@@ -173,6 +177,12 @@ class VirtualPipetteDataProvider:
             nominal_tip_overlap=config.liquid_properties[
                 liquid_class
             ].tip_overlap_dictionary,
+            back_left_corner_offset=Point(
+                pip_back_left[0], pip_back_left[1], pip_back_left[2]
+            ),
+            front_right_corner_offset=Point(
+                pip_front_right[0], pip_front_right[1], pip_front_right[2]
+            ),
             back_left_nozzle_offset=nozzle_manager.current_configuration.back_left_nozzle_offset,
             front_right_nozzle_offset=nozzle_manager.current_configuration.front_right_nozzle_offset,
         )
@@ -189,6 +199,8 @@ class VirtualPipetteDataProvider:
 
 def get_pipette_static_config(pipette_dict: PipetteDict) -> LoadedStaticPipetteData:
     """Get the config for a pipette, given the state/config object from the HW API."""
+    back_left_offset = pipette_dict["pipette_bounding_box_offsets"].back_left_corner
+    front_right_offset = pipette_dict["pipette_bounding_box_offsets"].front_right_corner
     return LoadedStaticPipetteData(
         model=pipette_dict["model"],
         display_name=pipette_dict["display_name"],
@@ -215,4 +227,10 @@ def get_pipette_static_config(pipette_dict: PipetteDict) -> LoadedStaticPipetteD
         front_right_nozzle_offset=pipette_dict[
             "current_nozzle_map"
         ].front_right_nozzle_offset,
+        back_left_corner_offset=Point(
+            back_left_offset[0], back_left_offset[1], back_left_offset[2]
+        ),
+        front_right_corner_offset=Point(
+            front_right_offset[0], front_right_offset[1], front_right_offset[2]
+        ),
     )

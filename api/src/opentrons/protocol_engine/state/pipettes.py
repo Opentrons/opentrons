@@ -86,6 +86,14 @@ class BoundingNozzlesOffsets:
 
 
 @dataclass(frozen=True)
+class PipetteBoundingBoxOffsets:
+    """Offsets of the bounding nozzles of the pipette."""
+
+    back_left_corner: Point
+    front_right_corner: Point
+
+
+@dataclass(frozen=True)
 class StaticPipetteConfig:
     """Static config for a pipette."""
 
@@ -101,6 +109,7 @@ class StaticPipetteConfig:
     nominal_tip_overlap: Dict[str, float]
     home_position: float
     nozzle_offset_z: float
+    pipette_bounding_box_offsets: PipetteBoundingBoxOffsets
     bounding_nozzle_offsets: BoundingNozzlesOffsets
 
 
@@ -166,6 +175,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 nominal_tip_overlap=config.nominal_tip_overlap,
                 home_position=config.home_position,
                 nozzle_offset_z=config.nozzle_offset_z,
+                pipette_bounding_box_offsets=PipetteBoundingBoxOffsets(
+                    back_left_corner=config.back_left_corner_offset,
+                    front_right_corner=config.front_right_corner_offset,
+                ),
                 bounding_nozzle_offsets=BoundingNozzlesOffsets(
                     back_left_offset=config.back_left_nozzle_offset,
                     front_right_offset=config.front_right_nozzle_offset,
@@ -685,7 +698,7 @@ class PipetteView(HasState[PipetteState]):
         """Get the nozzle offsets of the pipette's bounding nozzles."""
         return self.get_config(pipette_id).bounding_nozzle_offsets
 
-    def get_nozzle_bounds_at_specified_move_to_position(
+    def get_pipette_bounds_at_specified_move_to_position(
         self,
         pipette_id: str,
         destination_position: Point,
@@ -699,18 +712,19 @@ class PipetteView(HasState[PipetteState]):
         )
 
         # Get the pipette bounding box based on total nozzles
-        bounding_nozzles_offsets = self.get_pipette_bounding_nozzle_offsets(pipette_id)
-
+        pipette_bounds_offsets = self.get_config(
+            pipette_id
+        ).pipette_bounding_box_offsets
         # TODO (spp): add a margin to these bounds
         pip_back_left_bound = (
             primary_nozzle_position
             - primary_nozzle_offset
-            + bounding_nozzles_offsets.back_left_offset
+            + pipette_bounds_offsets.back_left_corner
         )
         pip_front_right_bound = (
             primary_nozzle_position
             - primary_nozzle_offset
-            + bounding_nozzles_offsets.front_right_offset
+            + pipette_bounds_offsets.front_right_corner
         )
         pip_back_right_bound = Point(
             pip_front_right_bound.x, pip_back_left_bound.y, pip_front_right_bound.z

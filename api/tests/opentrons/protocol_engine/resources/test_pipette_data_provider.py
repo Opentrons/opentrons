@@ -59,6 +59,8 @@ def test_get_virtual_pipette_static_config(
         },
         back_left_nozzle_offset=Point(x=0.0, y=0.0, z=10.45),
         front_right_nozzle_offset=Point(x=0.0, y=0.0, z=10.45),
+        back_left_corner_offset=Point(0, 0, 10.45),
+        front_right_corner_offset=Point(0, 0, 10.45),
     )
 
 
@@ -86,6 +88,8 @@ def test_configure_virtual_pipette_for_volume(
         nominal_tip_overlap=result1.nominal_tip_overlap,
         back_left_nozzle_offset=Point(x=-8.0, y=-22.0, z=-259.15),
         front_right_nozzle_offset=Point(x=-8.0, y=-22.0, z=-259.15),
+        back_left_corner_offset=Point(-8.0, -22.0, -259.15),
+        front_right_corner_offset=Point(-8.0, -22.0, -259.15),
     )
     subject_instance.configure_virtual_pipette_for_volume(
         "my-pipette", 1, result1.model
@@ -110,6 +114,8 @@ def test_configure_virtual_pipette_for_volume(
         nominal_tip_overlap=result2.nominal_tip_overlap,
         back_left_nozzle_offset=Point(x=-8.0, y=-22.0, z=-259.15),
         front_right_nozzle_offset=Point(x=-8.0, y=-22.0, z=-259.15),
+        back_left_corner_offset=Point(-8.0, -22.0, -259.15),
+        front_right_corner_offset=Point(-8.0, -22.0, -259.15),
     )
 
 
@@ -137,6 +143,8 @@ def test_load_virtual_pipette_by_model_string(
         nominal_tip_overlap=result.nominal_tip_overlap,
         back_left_nozzle_offset=Point(x=0.0, y=31.5, z=35.52),
         front_right_nozzle_offset=Point(x=0.0, y=-31.5, z=35.52),
+        back_left_corner_offset=Point(-16.0, 43.15, 35.52),
+        front_right_corner_offset=Point(16.0, -43.15, 35.52),
     )
 
 
@@ -256,4 +264,6 @@ def test_get_pipette_static_config(
         home_position=0,
         back_left_nozzle_offset=Point(x=1, y=2, z=3),
         front_right_nozzle_offset=Point(x=4, y=5, z=6),
+        back_left_corner_offset=Point(10, 20, 30),
+        front_right_corner_offset=Point(40, 50, 60),
     )
