@@ -5,7 +5,7 @@ from .constants import V1_TAG
 from .errors import LegacyErrorResponse
 from .versioning import check_version_header
 
-from .commands import commands_router
+from .commands.router import commands_router
 from .deck_configuration.router import router as deck_configuration_router
 from .health import health_router
 from .instruments import instruments_router
