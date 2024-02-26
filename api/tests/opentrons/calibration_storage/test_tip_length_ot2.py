@@ -1,9 +1,11 @@
 import pytest
 from typing import Any, TYPE_CHECKING
 
+from opentrons import config
 from opentrons.calibration_storage import (
     types as cs_types,
     helpers,
+    file_operators as io,
 )
 
 from opentrons.calibration_storage.ot2 import (
@@ -37,6 +39,18 @@ def starting_calibration_data(
     save_tip_length_calibration("pip1", tip_length1)
     save_tip_length_calibration("pip2", tip_length2)
     save_tip_length_calibration("pip1", tip_length3)
+    inside_data = tip_length3["dummy_namespace/minimal_labware_def/1"]
+    data = {
+        inside_data.definitionHash: {
+            "tipLength": 27,
+            "lastModified": inside_data.lastModified.isoformat(),
+            "source": inside_data.source,
+            "status": inside_data.status.dict(),
+            "uri": "dummy_namespace/minimal_labware_def/1",
+        }
+    }
+    tip_length_dir_path = config.get_tip_length_cal_path()
+    io.save_to_file(tip_length_dir_path, "pip2", data)
 
 
 def test_save_tip_length_calibration(
