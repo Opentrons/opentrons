@@ -303,8 +303,9 @@ jobs:
   deploy-release-app:
     name: 'Deploy built app artifacts to S3'
     runs-on: 'ubuntu-22.04'
+    # TODO: readd unit test dependency after tests are converted to vitest
     needs:
-      ['js-unit-test', 'backend-unit-test', 'build-app', 'determine-build-type']
+      ['build-app', 'determine-build-type']
     if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release') || contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
     steps:
       - name: 'download run app builds'
