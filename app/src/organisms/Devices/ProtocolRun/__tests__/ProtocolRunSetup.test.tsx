@@ -42,6 +42,7 @@ import { SetupLiquids } from '../SetupLiquids'
 import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
 import { EmptySetupStep } from '../EmptySetupStep'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
+import { useNotifyRunQuery } from '../../../../resources/runs/useNotifyRunQuery'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../hooks')
@@ -56,6 +57,7 @@ jest.mock('@opentrons/shared-data/js/helpers/getSimplestFlexDeckConfig')
 jest.mock('../../../../redux/config')
 jest.mock('../../../../resources/deck_configuration/utils')
 jest.mock('../../../../resources/deck_configuration/hooks')
+jest.mock('../../../../resources/runs/useNotifyRunQuery')
 
 const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
@@ -112,6 +114,9 @@ const mockUseDeckConfigurationCompatibility = useDeckConfigurationCompatibility 
 >
 const mockGetIsFixtureMismatch = getIsFixtureMismatch as jest.MockedFunction<
   typeof getIsFixtureMismatch
+>
+const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
+  typeof useNotifyRunQuery
 >
 
 const ROBOT_NAME = 'otie'
@@ -184,6 +189,7 @@ describe('ProtocolRunSetup', () => {
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
     when(mockGetIsFixtureMismatch).mockReturnValue(false)
+    mockUseNotifyRunQuery.mockReturnValue({} as any)
   })
   afterEach(() => {
     resetAllWhenMocks()

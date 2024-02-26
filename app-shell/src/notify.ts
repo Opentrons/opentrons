@@ -189,8 +189,8 @@ const RENDER_TIMEOUT = 10000 // 10 seconds
 function unsubscribe(notifyParams: NotifyParams): Promise<void> {
   const { hostname, topic } = notifyParams
   return new Promise<void>(() => {
-    if (hostname in connectionStore) {
-      setTimeout(() => {
+    setTimeout(() => {
+      if (hostname in connectionStore) {
         const { client } = connectionStore[hostname]
         const subscriptions = connectionStore[hostname]?.subscriptions
         const isLastSubscription = subscriptions[topic] <= 1
@@ -211,12 +211,12 @@ function unsubscribe(notifyParams: NotifyParams): Promise<void> {
         } else {
           subscriptions[topic] -= 1
         }
-      }, RENDER_TIMEOUT)
-    } else {
-      log.info(
-        `Attempted to unsubscribe from unconnected hostname: ${hostname}`
-      )
-    }
+      } else {
+        log.info(
+          `Attempted to unsubscribe from unconnected hostname: ${hostname}`
+        )
+      }
+    }, RENDER_TIMEOUT)
   })
 }
 

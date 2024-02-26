@@ -8,7 +8,7 @@ import {
   GripperModel,
   PipetteModel,
 } from '@opentrons/shared-data'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import { useInstrumentsQuery, useHost } from '@opentrons/react-api-client'
 import {
   Icon,
   DIRECTION_COLUMN,
@@ -28,6 +28,7 @@ import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 
 export const InstrumentDetail = (): JSX.Element => {
+  const host = useHost()
   const { mount } = useParams<{ mount: PipetteData['mount'] }>()
   const { data: attachedInstruments } = useInstrumentsQuery()
   const instrument =
@@ -57,7 +58,9 @@ export const InstrumentDetail = (): JSX.Element => {
             <Flex marginTop={`-${SPACING.spacing16}`}>
               <IconButton
                 aria-label="overflow menu button"
-                onClick={() => handleInstrumentDetailOverflowMenu(instrument)}
+                onClick={() =>
+                  handleInstrumentDetailOverflowMenu(instrument, host)
+                }
               >
                 <Icon
                   name="overflow-btn-touchscreen"

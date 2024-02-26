@@ -18,10 +18,12 @@ import {
 } from '../../../redux/discovery/__fixtures__'
 import { getNetworkInterfaces } from '../../../redux/networking'
 import { ChooseRobotSlideout } from '..'
+import { useNotifyService } from '../../../resources/useNotifyService'
 
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/robot-update')
 jest.mock('../../../redux/networking')
+jest.mock('../../../resources/useNotifyService')
 
 const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
   typeof getConnectableRobots
@@ -38,6 +40,9 @@ const mockStartDiscovery = startDiscovery as jest.MockedFunction<
 >
 const mockGetNetworkInterfaces = getNetworkInterfaces as jest.MockedFunction<
   typeof getNetworkInterfaces
+>
+const mockUseNotifyService = useNotifyService as jest.MockedFunction<
+  typeof useNotifyService
 >
 
 const render = (props: React.ComponentProps<typeof ChooseRobotSlideout>) => {
@@ -61,6 +66,7 @@ describe('ChooseRobotSlideout', () => {
     mockGetScanning.mockReturnValue(false)
     mockStartDiscovery.mockReturnValue({ type: 'mockStartDiscovery' } as any)
     mockGetNetworkInterfaces.mockReturnValue({ wifi: null, ethernet: null })
+    mockUseNotifyService.mockReturnValue({} as any)
   })
   afterEach(() => {
     jest.resetAllMocks()

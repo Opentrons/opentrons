@@ -9,7 +9,11 @@ import { i18n } from '../../../i18n'
 import { handleInstrumentDetailOverflowMenu } from '../InstrumentDetailOverflowMenu'
 import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 
-import type { PipetteData, GripperData } from '@opentrons/api-client'
+import type {
+  PipetteData,
+  GripperData,
+  HostConfig,
+} from '@opentrons/api-client'
 
 jest.mock('@opentrons/shared-data', () => ({
   getAllPipetteNames: jest.fn(
@@ -98,11 +102,15 @@ const MOCK_GRIPPER = {
   instrumentName: 'p1000_single_flex',
 } as GripperData
 
+const MOCK_HOST: HostConfig = { hostname: 'TEST_HOST' }
+
 const render = (pipetteOrGripper: PipetteData | GripperData) => {
   return renderWithProviders(
     <NiceModal.Provider>
       <button
-        onClick={() => handleInstrumentDetailOverflowMenu(pipetteOrGripper)}
+        onClick={() =>
+          handleInstrumentDetailOverflowMenu(pipetteOrGripper, MOCK_HOST)
+        }
         data-testid="testButton"
       />
     </NiceModal.Provider>,

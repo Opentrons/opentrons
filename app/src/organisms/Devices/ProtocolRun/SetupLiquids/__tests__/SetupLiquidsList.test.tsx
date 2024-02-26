@@ -23,6 +23,7 @@ import {
   getTotalVolumePerLiquidLabwarePair,
 } from '../utils'
 import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
+import { useNotifyRunQuery } from '../../../../../resources/runs/useNotifyRunQuery'
 
 const MOCK_LIQUIDS_IN_LOAD_ORDER = [
   {
@@ -56,6 +57,7 @@ jest.mock('../../utils/getLocationInfoNames')
 jest.mock('../LiquidsLabwareDetailsModal')
 jest.mock('@opentrons/api-client')
 jest.mock('../../../../../redux/analytics')
+jest.mock('../../../../../resources/runs/useNotifyRunQuery')
 
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
@@ -77,6 +79,9 @@ const mockParseLabwareInfoByLiquidId = parseLabwareInfoByLiquidId as jest.Mocked
 >
 const mockLiquidsLabwareDetailsModal = LiquidsLabwareDetailsModal as jest.MockedFunction<
   typeof LiquidsLabwareDetailsModal
+>
+const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
+  typeof useNotifyRunQuery
 >
 
 const render = (props: React.ComponentProps<typeof SetupLiquidsList>) => {
@@ -107,6 +112,7 @@ describe('SetupLiquidsList', () => {
         partialComponentPropsMatcher({ labwareId: '123', liquidId: '0' })
       )
       .mockReturnValue(<div>Mock liquids labwaqre details modal</div>)
+    mockUseNotifyRunQuery.mockReturnValue({} as any)
   })
 
   it('renders the total volume of the liquid, sample display name, and description', () => {

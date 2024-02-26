@@ -10,8 +10,10 @@ import {
   useTrackEvent,
   ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
 } from '../redux/analytics'
+import { useIsFlex } from '../organisms/Devices/hooks/useIsFlex'
 
 import type { UseQueryOptions } from 'react-query'
+import type { HostConfig } from '@opentrons/api-client'
 import type { NotifyTopic, NotifyResponseData } from '../redux/shell/types'
 
 export interface QueryOptionsWithPolling<TData, TError = Error>
@@ -23,19 +25,23 @@ interface UseNotifyServiceProps<TData, TError = Error> {
   topic: NotifyTopic
   refetchUsingHTTP: () => void
   options: QueryOptionsWithPolling<TData, TError>
+  hostOverride?: HostConfig | null
 }
 
 export function useNotifyService<TData, TError = Error>({
   topic,
   refetchUsingHTTP,
   options,
+  hostOverride,
 }: UseNotifyServiceProps<TData, TError>): { isNotifyError: boolean } {
   const dispatch = useDispatch()
-  const host = useHost()
-  const isNotifyError = React.useRef(false)
-  const doTrackEvent = useTrackEvent()
-  const { enabled, staleTime, forceHttpPolling } = options
+  const hostFromProvider = useHost()
+  const host = hostOverride ?? hostFromProvider
   const hostname = host?.hostname ?? null
+  const doTrackEvent = useTrackEvent()
+  const isFlex = useIsFlex(host?.robotName ?? '')
+  const isNotifyError = React.useRef(false)
+  const { enabled, staleTime, forceHttpPolling } = options
 
   React.useEffect(() => {
     // Always fetch on initial mount.
@@ -70,7 +76,8 @@ export function useNotifyService<TData, TError = Error>({
     if (!isNotifyError.current) {
       if (data === 'ECONNFAILED' || data === 'ECONNREFUSED') {
         isNotifyError.current = true
-        if (data === 'ECONNREFUSED') {
+        // TODO(jh 2023-02-23): remove the robot type check once OT-2s support MQTT.
+        if (data === 'ECONNREFUSED' && isFlex) {
           doTrackEvent({
             name: ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
             properties: {},

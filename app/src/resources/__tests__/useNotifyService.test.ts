@@ -10,6 +10,7 @@ import {
   notifySubscribeAction,
   notifyUnsubscribeAction,
 } from '../../redux/shell'
+import { useIsFlex } from '../../organisms/Devices/hooks/useIsFlex'
 
 import type { HostConfig } from '@opentrons/api-client'
 import type { QueryOptionsWithPolling } from '../useNotifyService'
@@ -20,6 +21,7 @@ jest.mock('../../redux/analytics')
 jest.mock('../../redux/shell/remote', () => ({
   appShellListener: jest.fn(),
 }))
+jest.mock('../../organisms/Devices/hooks/useIsFlex')
 
 const MOCK_HOST_CONFIG: HostConfig = { hostname: 'MOCK_HOST' }
 const MOCK_TOPIC = '/test/topic' as any
@@ -35,6 +37,7 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
 const mockAppShellListener = appShellListener as jest.MockedFunction<
   typeof appShellListener
 >
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 
 describe('useNotifyService', () => {
   let mockDispatch: jest.Mock
@@ -48,6 +51,7 @@ describe('useNotifyService', () => {
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
     mockUseDispatch.mockReturnValue(mockDispatch)
     mockUseHost.mockReturnValue(MOCK_HOST_CONFIG)
+    mockUseIsFlex.mockReturnValue(true)
   })
 
   afterEach(() => {

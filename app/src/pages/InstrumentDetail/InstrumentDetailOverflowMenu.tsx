@@ -15,6 +15,7 @@ import {
   FLEX_ROBOT_TYPE,
   getPipetteModelSpecs,
 } from '@opentrons/shared-data'
+import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../atoms/text'
 import { MenuList } from '../../atoms/MenuList'
@@ -25,21 +26,27 @@ import { DropTipWizard } from '../../organisms/DropTipWizard'
 import { FLOWS } from '../../organisms/PipetteWizardFlows/constants'
 import { GRIPPER_FLOW_TYPES } from '../../organisms/GripperWizardFlows/constants'
 
-import type { PipetteData, GripperData } from '@opentrons/api-client'
+import type {
+  PipetteData,
+  GripperData,
+  HostConfig,
+} from '@opentrons/api-client'
 
 interface InstrumentDetailsOverflowMenuProps {
   instrument: PipetteData | GripperData
+  host: HostConfig | null
 }
 
 export const handleInstrumentDetailOverflowMenu = (
-  instrument: InstrumentDetailsOverflowMenuProps['instrument']
+  instrument: InstrumentDetailsOverflowMenuProps['instrument'],
+  host: InstrumentDetailsOverflowMenuProps['host']
 ): void => {
   NiceModal.show(InstrumentDetailsOverflowMenu, { instrument })
 }
 
 const InstrumentDetailsOverflowMenu = NiceModal.create(
   (props: InstrumentDetailsOverflowMenuProps): JSX.Element => {
-    const { instrument } = props
+    const { instrument, host } = props
     const { t } = useTranslation('robot_controls')
     const modal = useModal()
     const [showDropTipWizard, setShowDropTipWizard] = React.useState(false)
@@ -88,7 +95,7 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
     }
 
     return (
-      <>
+      <ApiHostProvider {...host} hostname={host?.hostname ?? null}>
         <MenuList onClick={modal.remove} isOnDevice={true}>
           {instrument.data.calibratedOffset?.last_modified != null ? (
             <MenuItem key="recalibrate" onClick={handleRecalibrate}>
@@ -147,7 +154,7 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
             closeFlow={modal.remove}
           />
         ) : null}
-      </>
+      </ApiHostProvider>
     )
   }
 )
