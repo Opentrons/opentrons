@@ -6,6 +6,7 @@ import fixtureTiprack10ul from '../labware/fixtures/2/fixture_tiprack_10_ul.json
 import fixtureTiprack300ul from '../labware/fixtures/2/fixture_tiprack_300_ul.json'
 import fixtureTiprack1000ul from '../labware/fixtures/2/fixture_flex_96_tiprack_1000ul.json'
 import fixtureTiprackAdapter from '../labware/fixtures/2/fixture_flex_96_tiprack_adapter.json'
+import fixtureCalibrationBlock from '../labware/fixtures/2/fixture_calibration_block.json'
 import { getLabwareDefURI } from './helpers/index'
 
 // v2 labware definitions
@@ -557,6 +558,7 @@ export {
   fixtureTiprackAdapter,
   opentrons96PcrAdapterV1,
   opentrons1Trash3200MlFixedV1,
+  fixtureCalibrationBlock,
 }
 
 export { getAllLabwareDefs }
