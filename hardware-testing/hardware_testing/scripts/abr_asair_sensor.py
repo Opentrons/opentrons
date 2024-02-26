@@ -6,15 +6,10 @@ import datetime
 import sys
 import time as t
 from typing import List
+import os
 
 
-try:
-    sys.path.insert(0, "/var/lib/jupyter/notebooks")
-    import google_sheets_tool  # type: ignore[import]
-except ImportError:
-    raise ImportError(
-        "Run on robot. Make sure google_sheets_tool.py is in jupyter notebook."
-    )
+
 
 
 def _get_user_input(lst: List[str], some_string: str) -> str:
@@ -29,10 +24,28 @@ def _get_user_input(lst: List[str], some_string: str) -> str:
 
 class _ABRAsairSensor:
     def __init__(self, robot: str, duration: int, frequency: int) -> None:
+        var = _get_user_input(["C", "R"], "Running on computer (C) or robot (R)? ")
+        if var == "R":
+            try:
+                sys.path.insert(0, "/var/lib/jupyter/notebooks")
+                import google_sheets_tool  # type: ignore[import]
+                credentials_path = "/var/lib/jupyter/notebooks/abr.json"
+            except ImportError:
+                from hardware_testing import google_sheets_tool
+                raise ImportError(
+                    "Run on robot. Make sure google_sheets_tool.py is in jupyter notebook."
+                )
+        else:
+            from hardware_testing import google_sheets_tool
+            #credentials_path = "/hardware-testing/hardware_testing/abr.json"
+            credentials_path = "C:/Users/Rhyann Clarke/opentrons/hardware-testing/hardware_testing/abr.json"
+            
+        print(os.path.exists(credentials_path))
         test_name = "ABR-Environment-Monitoring"
         run_id = data.create_run_id()
         file_name = data.create_file_name(test_name, run_id, robot)
-        sensor = asair_sensor.BuildAsairSensor(False, True)
+        sensor = asair_sensor.BuildAsairSensor(False, False)
+        print(sensor)
         env_data = sensor.get_reading()
         header = [
             "Robot",
@@ -45,7 +58,7 @@ class _ABRAsairSensor:
         header_str = ",".join(header) + "\n"
         data.append_data_to_file(test_name, run_id, file_name, header_str)
         # Upload to google has passed
-        credentials_path = "/var/lib/jupyter/notebooks/abr.json"
+        
         try:
             google_sheet = google_sheets_tool.google_sheet(
                 credentials_path, "ABR Ambient Conditions", tab_number=0
@@ -119,8 +132,10 @@ if __name__ == "__main__":
         "PVT1ABR10",
         "PVT1ABR11",
         "PVT1ABR12",
+        "ROOM_339", 
+        "Room_340",
     ]  # type: List
-    robot = _get_user_input(robot_list, "Robot: ")
+    robot = _get_user_input(robot_list, "Robot/Room: ")
     duration = int(input("Duration (min): "))
     frequency = int(input("Frequency (min): "))
     _ABRAsairSensor(robot, duration, frequency)
