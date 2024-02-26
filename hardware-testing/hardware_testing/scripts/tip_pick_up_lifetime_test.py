@@ -231,9 +231,9 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     else:
         multi_pip = True
         ROWS = 1
-        CYCLES = 2
-        if args.pick_up_num == 60:
-            PICKUPS_PER_TIP = 60
+        CYCLES = 1
+        if args.pick_up_num == 120:
+            PICKUPS_PER_TIP = 120
         else:
             PICKUPS_PER_TIP = args.pick_up_num
         check_tip_presence = True
