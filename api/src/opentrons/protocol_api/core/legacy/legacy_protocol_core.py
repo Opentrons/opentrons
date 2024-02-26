@@ -384,6 +384,16 @@ class LegacyProtocolCore(
 
         return new_instr
 
+    def load_trash_bin(self, slot_name: DeckSlotName, area_name: str) -> TrashBin:
+        raise APIVersionError(
+            "Loading deck configured trash bin is not supported in this API version."
+        )
+
+    def load_waste_chute(self) -> WasteChute:
+        raise APIVersionError(
+            "Loading waste chute is not supported in this API version."
+        )
+
     def get_loaded_instruments(
         self,
     ) -> Dict[Mount, Optional[LegacyInstrumentCore]]:

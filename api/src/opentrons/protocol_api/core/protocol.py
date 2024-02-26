@@ -137,6 +137,14 @@ class AbstractProtocol(
         ...
 
     @abstractmethod
+    def load_trash_bin(self, slot_name: DeckSlotName, area_name: str) -> TrashBin:
+        ...
+
+    @abstractmethod
+    def load_waste_chute(self) -> WasteChute:
+        ...
+
+    @abstractmethod
     def pause(self, msg: Optional[str]) -> None:
         ...
 

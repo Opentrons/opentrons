@@ -524,6 +524,30 @@ class ProtocolCore(
             default_movement_speed=400,
         )
 
+    def load_trash_bin(self, slot_name: DeckSlotName, area_name: str) -> TrashBin:
+        """Load a deck configuration based trash bin.
+
+        Args:
+            slot_name: the slot the trash is being loaded into.
+            area_name: the addressable area name of the trash.
+
+        Returns:
+            A trash bin object.
+        """
+        trash_bin = TrashBin(location=slot_name, addressable_area_name=area_name)
+        self.add_disposal_location_to_engine(trash_bin)
+        return trash_bin
+
+    def load_waste_chute(self) -> WasteChute:
+        """Load a deck configured waste chute into Slot D3.
+
+        Returns:
+            A waste chute object.
+        """
+        waste_chute = WasteChute()
+        self.add_disposal_location_to_engine(waste_chute)
+        return waste_chute
+
     def pause(self, msg: Optional[str]) -> None:
         """Pause the protocol."""
         self._engine_client.wait_for_resume(message=msg)
