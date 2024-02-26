@@ -624,6 +624,9 @@ importers:
       electron-devtools-installer:
         specifier: 3.2.0
         version: 3.2.0
+      electron-localshortcut:
+        specifier: 3.2.1
+        version: 3.2.1
       electron-store:
         specifier: 5.1.1
         version: 5.1.1
@@ -727,9 +730,6 @@ importers:
       dateformat:
         specifier: 3.0.3
         version: 3.0.3
-      electron-debug:
-        specifier: 3.0.1
-        version: 3.0.1
       electron-devtools-installer:
         specifier: 3.2.0
         version: 3.2.0
