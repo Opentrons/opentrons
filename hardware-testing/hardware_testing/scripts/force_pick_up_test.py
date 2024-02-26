@@ -13,13 +13,14 @@ from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedErro
 import json
 import requests
 
-SlackToken = "xoxb-3897728585-6504490807157-gO93ItOvDaUVYtjOxLOZPPOp"
 SlackChannel = 'C06L33U3XBM'
 
 def sendMessage2Slack(token,channel,message):
     """
     send message to slack
     """
+    if token == "none":
+        print("ignore send 2 slack !")
     try:
         payload = {"text": message,"channel": channel}
         data = json.dumps(payload).encode("utf8")
@@ -243,11 +244,13 @@ if __name__ == "__main__":
     parser.add_argument("--slot", type=str, default="C2")
     parser.add_argument("--update", type=str, default="update")
     parser.add_argument("--target", type=str, default="z_stage_0")
+    parser.add_argument("--slack_token", type=str, default="none")
     parser.add_argument("--speed", type=float, default=10.0)
     args = parser.parse_args()
     mount = mount_options[args.mount]
     this_test_name = "# Z-Stage force pick up lifetime test"
-    sendMessage2Slack(SlackToken, SlackChannel, f"{this_test_name}\n {args.target}: \nStarting Z-Stage with {args.current}A&{args.speed}mm/s, Append cycles: {args.cycles}\n")
+    slack_token = args.slack_token
+    sendMessage2Slack(slack_token, SlackChannel, f"{this_test_name}\n {args.target}: \nStarting Z-Stage with {args.current}A&{args.speed}mm/s, Append cycles: {args.cycles}\n")
     asyncio.run(_main(args.simulate, args.cycles, mount, args.current, args.calibrate_height, args.slot, args.speed))
     # update local
     append_to_log("/data/testing_data/force_z_stage_lifetime_log.txt", f"+ {args.cycles}")
@@ -259,7 +262,7 @@ if __name__ == "__main__":
         update_cycles = int(args.update) + args.cycles
         write_local_json("/data/testing_data/force_z_stage_lifetime_log.json", {"cycles": update_cycles})
     completed_cycles = read_local_json("/data/testing_data/force_z_stage_lifetime_log.json", "cycles")
-    sendMessage2Slack(SlackToken, SlackChannel, f"{this_test_name}\n{args.target}: \n"
+    sendMessage2Slack(slack_token, SlackChannel, f"{this_test_name}\n{args.target}: \n"
                       f"Ending Z-Stage with {args.current}A&{args.speed}mm/s \nCompleted {completed_cycles} times \n"
                       f"Update data tracker here: https://docs.google.com/spreadsheets/d/1d2i_oKZ-dqU3zp9k99Z-iJW_NcS2mbw0mLBWLSA2B6E/edit#gid=0")
     
