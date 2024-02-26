@@ -187,11 +187,12 @@ async def _main(args: argparse.Namespace) -> None:
         is_simulating=args.is_simulating
     )
 
-    # scan for subsystems
-    await cast(OT3Controller, api._backend).probe_network()
-
-    # Make sure we have a hepa/uv module
-    assert SubSystem.hepa_uv in api.attached_subsystems, "No Hepa/UV module detected!"
+    # Scan for subsystems and make sure we have a hepa/uv module if not simulating
+    if not args.is_simulating:
+        await cast(OT3Controller, api._backend).probe_network()
+        assert (
+            SubSystem.hepa_uv in api.attached_subsystems
+        ), "No Hepa/UV module detected!"
 
     # Make sure everything is off before we start testing
     await _turn_off_hepa_uv(api)
@@ -219,7 +220,7 @@ def log_config(log_level: int) -> Dict:
     """Configure logging."""
     return {
         "version": 1,
-        "disable_existing_loggers": True,
+        "disable_existing_loggers": False,
         "formatters": {
             "basic": {"format": "%(asctime)s %(name)s %(levelname)s %(message)s"},
             "production_trace": {"format": "%(asctime)s %(message)s"},
@@ -228,7 +229,7 @@ def log_config(log_level: int) -> Dict:
             "main_log_handler": {
                 "class": "logging.handlers.RotatingFileHandler",
                 "formatter": "basic",
-                "filename": "/var/log/hepauv_lifetime_debug.log",
+                "filename": "/var/log/hepauv_lifetime.log",
                 "maxBytes": 5000000,
                 "level": log_level,
                 "backupCount": 3,
@@ -244,7 +245,7 @@ def log_config(log_level: int) -> Dict:
                 "handlers": (
                     ["main_log_handler"]
                     if log_level > logging.INFO
-                    else ["stream_handler"]
+                    else ["main_log_handler", "stream_handler"]
                 ),
                 "level": log_level,
             },
@@ -262,11 +263,11 @@ if __name__ == "__main__":
         help=(
             "Developer logging level. At DEBUG or below, logs are written "
             "to console; at INFO or above, logs are only written to "
-            "/var/log/hepauv_lifetime_debug.log"
+            "/var/log/hepauv_lifetime.log"
         ),
         type=str,
         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
-        default="WARNING",
+        default="INFO",
     )
     parser.add_argument(
         "--is_simulating",
