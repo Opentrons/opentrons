@@ -71,6 +71,8 @@ export function registerNotify(
   }
 }
 
+const CHECK_CONNECTION_INTERVAL = 500
+
 interface NotifyParams {
   browserWindow: BrowserWindow
   hostname: string
@@ -178,7 +180,7 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
             )
           )
         }
-      }, 500)
+      }, CHECK_CONNECTION_INTERVAL)
     })
   }
 }
