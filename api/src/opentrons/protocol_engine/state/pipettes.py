@@ -715,7 +715,6 @@ class PipetteView(HasState[PipetteState]):
         pipette_bounds_offsets = self.get_config(
             pipette_id
         ).pipette_bounding_box_offsets
-        # TODO (spp): add a margin to these bounds
         pip_back_left_bound = (
             primary_nozzle_position
             - primary_nozzle_offset

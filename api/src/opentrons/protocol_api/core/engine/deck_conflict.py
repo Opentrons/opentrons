@@ -34,9 +34,9 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.errors.exceptions import LabwareNotLoadedOnModuleError
 from opentrons.protocol_engine.types import (
     StagingSlotLocation,
-    Dimensions,
 )
 from opentrons.types import DeckSlotName, StagingSlotName, Point
+from . import point_calculations
 from ..._trash_bin import TrashBin
 from ..._waste_chute import WasteChute
 
@@ -304,11 +304,14 @@ def _slot_has_potential_colliding_object(
         addressable_area_name=surrounding_slot.id,
         do_compatibility_check=False,
     )
-    for bound_vertex in pipette_bounds:
-        if not _point_overlaps_with_slot(
-            slot_pos, slot_bounds, nozzle_point=bound_vertex
-        ):
-            continue
+    slot_back_left_coords = Point(slot_pos.x, slot_pos.y + slot_bounds.y, slot_pos.z)
+    slot_front_right_coords = Point(slot_pos.x + slot_bounds.x, slot_pos.y, slot_pos.z)
+
+    # If slot overlaps with pipette bounds
+    if point_calculations.are_overlapping_rectangles(
+        rectangle1=(pipette_bounds[0], pipette_bounds[1]),
+        rectangle2=(slot_back_left_coords, slot_front_right_coords),
+    ):
         # Check z-height of items in overlapping slot
         if isinstance(surrounding_slot, DeckSlotName):
             slot_highest_z = engine_state.geometry.get_highest_z_in_slot(
@@ -318,8 +321,7 @@ def _slot_has_potential_colliding_object(
             slot_highest_z = engine_state.geometry.get_highest_z_in_slot(
                 StagingSlotLocation(slotName=surrounding_slot)
             )
-        if slot_highest_z + Z_SAFETY_MARGIN > pipette_bounds[0].z:
-            return True
+        return slot_highest_z + Z_SAFETY_MARGIN > pipette_bounds[0].z
     return False
 
 
@@ -353,18 +355,6 @@ def _will_collide_with_thermocycler_lid(
             ):
                 return True
     return False
-
-
-def _point_overlaps_with_slot(
-    slot_position: Point,
-    slot_dimensions: Dimensions,
-    nozzle_point: Point,
-) -> bool:
-    """Check if the given nozzle point overlaps with any slot area in x & y"""
-    return (
-        slot_position.x <= nozzle_point.x <= slot_position.x + slot_dimensions.x
-        and slot_position.y <= nozzle_point.y <= slot_position.y + slot_dimensions.y
-    )
 
 
 def check_safe_for_tip_pickup_and_return(

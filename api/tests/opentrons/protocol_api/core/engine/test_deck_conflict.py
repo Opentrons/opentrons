@@ -379,7 +379,7 @@ module = LoadedModule(
     [("OT-3 Standard", DeckType.OT3_STANDARD)],
 )
 @pytest.mark.parametrize(
-    ["nozzle_bounds", "expected_raise"],
+    ["pipette_bounds", "expected_raise"],
     [
         (  # nozzles above highest Z
             (
@@ -432,7 +432,7 @@ module = LoadedModule(
 def test_deck_conflict_raises_for_bad_pipette_move(
     decoy: Decoy,
     mock_state_view: StateView,
-    nozzle_bounds: Tuple[Point, Point, Point, Point],
+    pipette_bounds: Tuple[Point, Point, Point, Point],
     expected_raise: ContextManager[Any],
 ) -> None:
     """It should raise errors when moving to locations with restrictions for partial pipette movement.
@@ -443,6 +443,10 @@ def test_deck_conflict_raises_for_bad_pipette_move(
     - we are checking for conflicts when moving to a labware in C2.
       For each test case, we are moving to a different point in the destination labware,
       with the same pipette and tip
+
+    Note: this test does not stub out the slot overlap checker function
+          in order to preserve readability of the test. That means the test does
+          actual slot overlap checks.
     """
     destination_well_point = Point(x=123, y=123, z=123)
     decoy.when(
@@ -466,7 +470,7 @@ def test_deck_conflict_raises_for_bad_pipette_move(
         mock_state_view.pipettes.get_pipette_bounds_at_specified_move_to_position(
             pipette_id="pipette-id", destination_position=destination_well_point
         )
-    ).then_return(nozzle_bounds)
+    ).then_return(pipette_bounds)
 
     decoy.when(
         adjacent_slots_getters.get_surrounding_slots(5, robot_type="OT-3 Standard")
@@ -546,7 +550,7 @@ def test_deck_conflict_raises_for_collision_with_tc_lid(
 ) -> None:
     """It should raise an error if pipette might collide with thermocycler lid on the Flex."""
     destination_well_point = Point(x=123, y=123, z=123)
-    nozzle_bounds_at_destination = (
+    pipette_bounds_at_destination = (
         Point(x=50, y=150, z=60),
         Point(x=150, y=50, z=60),
         Point(x=97, y=403, z=204.5),
@@ -574,7 +578,7 @@ def test_deck_conflict_raises_for_collision_with_tc_lid(
         mock_state_view.pipettes.get_pipette_bounds_at_specified_move_to_position(
             pipette_id="pipette-id", destination_position=destination_well_point
         )
-    ).then_return(nozzle_bounds_at_destination)
+    ).then_return(pipette_bounds_at_destination)
 
     decoy.when(
         adjacent_slots_getters.get_surrounding_slots(5, robot_type="OT-3 Standard")

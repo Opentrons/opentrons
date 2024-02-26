@@ -70,10 +70,10 @@ def test_deck_conflicts_for_96_ch_a12_column_configuration() -> None:
     ):
         instrument.dispense(50, badly_placed_labware.wells()[0])
 
-    # Currently does not raise a 'collision with thermocycler lid' error`
-    # because it's the pipette outer cover that hits the lid, but we don't include
-    # the cover in pipette dimensions yet.
-    instrument.dispense(10, tc_adjacent_plate.wells_by_name()["A1"])
+    with pytest.raises(
+        PartialTipMovementNotAllowedError, match="collision with thermocycler lid"
+    ):
+        instrument.dispense(10, tc_adjacent_plate.wells_by_name()["A1"])
 
     # No error cuz dispensing from high above plate, so it clears tuberack in west slot
     instrument.dispense(15, badly_placed_labware.wells_by_name()["A1"].top(150))
