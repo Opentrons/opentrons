@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing_extensions import Protocol as TypingProtocol
 
 from opentrons.types import DeckSlotName, Point
+from opentrons.protocol_engine.clients import SyncClient
 
 
 class DisposalLocation(TypingProtocol):
@@ -46,15 +47,20 @@ class TrashBin(DisposalLocation):
         self,
         location: DeckSlotName,
         addressable_area_name: str,
+        engine_client: SyncClient,
         offset: Point = Point(x=0, y=0, z=0),
     ) -> None:
         self._location = location
         self._addressable_area_name = addressable_area_name
         self._offset = offset
+        self._engine_client = engine_client
 
     def top(self, x: float = 0, y: float = 0, z: float = 0) -> TrashBin:
         return TrashBin(
-            self._location, self._addressable_area_name, Point(x=x, y=y, z=z)
+            self._location,
+            self._addressable_area_name,
+            self._engine_client,
+            Point(x=x, y=y, z=z),
         )
 
     @property
@@ -88,12 +94,13 @@ class WasteChute(DisposalLocation):
     See :py:meth:`.ProtocolContext.load_waste_chute`.
     """
 
-    def __init__(self, offset: Point = Point()) -> None:
+    def __init__(self, engine_client: SyncClient, offset: Point = Point()) -> None:
+        self._engine_client = engine_client
         # TODO maybe make this some sort of offset vector
         self._offset = offset
 
     def top(self, x: float = 0, y: float = 0, z: float = 0) -> WasteChute:
-        return WasteChute(Point(x=x, y=y, z=z))
+        return WasteChute(self._engine_client, Point(x=x, y=y, z=z))
 
     @property
     def offset(self) -> Point:

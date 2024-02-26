@@ -533,9 +533,26 @@ class ProtocolCore(
         Returns:
             A trash bin object.
         """
-        trash_bin = TrashBin(location=slot_name, addressable_area_name=area_name)
+        trash_bin = TrashBin(
+            location=slot_name,
+            addressable_area_name=area_name,
+            engine_client=self._engine_client,
+        )
         self._add_disposal_location_to_engine(trash_bin)
         return trash_bin
+
+    def load_ot2_fixed_trash_bin(self) -> None:
+        """Load a deck configured OT-2 fixed trash in Slot 12."""
+        _fixed_trash_trash_bin = TrashBin(
+            location=DeckSlotName.FIXED_TRASH,
+            addressable_area_name="fixedTrash",
+            engine_client=self._engine_client,
+        )
+        # We are just appending the fixed trash to the core's internal list here, not adding it to the engine via
+        # the core, since that method works through the SyncClient and if called from here, will cause protocols
+        # to deadlock. Instead, that method is called in protocol engine directly in create_protocol_context after
+        # ProtocolContext is initialized.
+        self.append_disposal_location(_fixed_trash_trash_bin)
 
     def load_waste_chute(self) -> WasteChute:
         """Load a deck configured waste chute into Slot D3.
@@ -543,7 +560,7 @@ class ProtocolCore(
         Returns:
             A waste chute object.
         """
-        waste_chute = WasteChute()
+        waste_chute = WasteChute(engine_client=self._engine_client)
         self._add_disposal_location_to_engine(waste_chute)
         return waste_chute
 

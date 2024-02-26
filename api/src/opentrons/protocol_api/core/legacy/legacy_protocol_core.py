@@ -383,6 +383,11 @@ class LegacyProtocolCore(
             "Loading deck configured trash bin is not supported in this API version."
         )
 
+    def load_ot2_fixed_trash_bin(self) -> None:
+        raise APIVersionError(
+            "Loading deck configured OT-2 fixed trash bin is not supported in this API version."
+        )
+
     def load_waste_chute(self) -> WasteChute:
         raise APIVersionError(
             "Loading waste chute is not supported in this API version."

@@ -19,6 +19,7 @@ from opentrons.protocol_engine import (
     ModuleModel,
     StateView,
 )
+from opentrons.protocol_engine.clients import SyncClient
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 from opentrons.types import DeckSlotName, Point, StagingSlotName
 
@@ -62,6 +63,12 @@ def use_mock_wrapped_deck_conflict(
     """Replace the check() function that our subject should wrap with a mock."""
     mock_check = decoy.mock(func=wrapped_deck_conflict.check)
     monkeypatch.setattr(wrapped_deck_conflict, "check", mock_check)
+
+
+@pytest.fixture
+def mock_sync_client(decoy: Decoy) -> SyncClient:
+    """Return a mock in the shape of a SyncClient."""
+    return decoy.mock(cls=SyncClient)
 
 
 @pytest.fixture
@@ -323,7 +330,9 @@ def test_maps_different_module_models(
         ("OT-3 Standard", DeckType.OT3_STANDARD),
     ],
 )
-def test_maps_trash_bins(decoy: Decoy, mock_state_view: StateView) -> None:
+def test_maps_trash_bins(
+    decoy: Decoy, mock_state_view: StateView, mock_sync_client: SyncClient
+) -> None:
     """It should correctly map disposal locations."""
     mock_trash_lw = decoy.mock(cls=Labware)
 
@@ -332,12 +341,18 @@ def test_maps_trash_bins(decoy: Decoy, mock_state_view: StateView) -> None:
         existing_labware_ids=[],
         existing_module_ids=[],
         existing_disposal_locations=[
-            TrashBin(location=DeckSlotName.SLOT_B1, addressable_area_name="blah"),
-            WasteChute(),
+            TrashBin(
+                location=DeckSlotName.SLOT_B1,
+                addressable_area_name="blah",
+                engine_client=mock_sync_client,
+            ),
+            WasteChute(engine_client=mock_sync_client),
             mock_trash_lw,
         ],
         new_trash_bin=TrashBin(
-            location=DeckSlotName.SLOT_A1, addressable_area_name="blah"
+            location=DeckSlotName.SLOT_A1,
+            addressable_area_name="blah",
+            engine_client=mock_sync_client,
         ),
     )
     decoy.verify(

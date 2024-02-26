@@ -133,6 +133,10 @@ class AbstractProtocol(
         ...
 
     @abstractmethod
+    def load_ot2_fixed_trash_bin(self) -> None:
+        ...
+
+    @abstractmethod
     def load_waste_chute(self) -> WasteChute:
         ...
 

@@ -164,14 +164,7 @@ class ProtocolContext(CommandPublisher):
         elif should_load_fixed_trash_area_for_python_protocol(
             self._api_version, self._core.robot_type
         ):
-            _fixed_trash_trash_bin = TrashBin(
-                location=DeckSlotName.FIXED_TRASH, addressable_area_name="fixedTrash"
-            )
-            # We are just appending the fixed trash to the core's internal list here, not adding it to the engine via
-            # the core, since that method works through the SyncClient and if called from here, will cause protocols
-            # to deadlock. Instead, that method is called in protocol engine directly in create_protocol_context after
-            # ProtocolContext is initialized.
-            self._core.append_disposal_location(_fixed_trash_trash_bin)
+            self._core.load_ot2_fixed_trash_bin()
 
         self._commands: List[str] = []
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
