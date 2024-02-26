@@ -172,6 +172,10 @@ jobs:
             echo "both develop builds for edge"
             echo 'variants=["release", "internal-release"]' >> $GITHUB_OUTPUT
             echo 'type=develop' >> $GITHUB_OUTPUT
+          elif [ "${{github.event_name}}" = "workflow_dispatch" ] ; then
+            echo "both develop builds on manual triggers"
+            echo 'variants=["release", "internal-release"]' >> $GITHUB_OUTPUT
+            echo 'type=develop' >> $GITHUB_OUTPUT
           elif [ "${{ format('{0}', endsWith(github.ref, 'app-build-internal')) }}" = "true" ] ; then
             echo "internal-release builds for app-build-internal suffixes"
             echo 'variants=["internal-release"]' >> $GITHUB_OUTPUT
