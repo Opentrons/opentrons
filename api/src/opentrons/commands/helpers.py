@@ -2,8 +2,7 @@ from typing import List, Union
 
 from opentrons.protocol_api.labware import Well, Labware
 from opentrons.protocol_api.module_contexts import ModuleContext
-from opentrons.protocol_api._trash_bin import TrashBin
-from opentrons.protocol_api._waste_chute import WasteChute
+from opentrons.protocol_api._disposal_locations import TrashBin, WasteChute
 from opentrons.protocol_api._types import OffDeckType
 from opentrons.types import Location, DeckLocation
 

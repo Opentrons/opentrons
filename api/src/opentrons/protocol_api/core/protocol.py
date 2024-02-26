@@ -19,8 +19,7 @@ from .instrument import InstrumentCoreType
 from .labware import LabwareCoreType, LabwareLoadParams
 from .module import ModuleCoreType
 from .._liquid import Liquid
-from .._trash_bin import TrashBin
-from .._waste_chute import WasteChute
+from .._disposal_locations import TrashBin, WasteChute
 from .._types import OffDeckType
 
 if TYPE_CHECKING:

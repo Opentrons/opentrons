@@ -18,8 +18,7 @@ from opentrons.protocols import labware as labware_definition
 from ...labware import Labware
 from ..._liquid import Liquid
 from ..._types import OffDeckType
-from ..._trash_bin import TrashBin
-from ..._waste_chute import WasteChute
+from ..._disposal_locations import TrashBin, WasteChute
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 
