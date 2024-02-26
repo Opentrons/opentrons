@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { resetAllWhenMocks } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
 import {
@@ -11,19 +12,16 @@ import {
 import { isFlexPipette } from '@opentrons/shared-data'
 
 import type { Mount } from '../../../../redux/pipettes/types'
+import type * as SharedData from '@opentrons/shared-data'
 
-jest.mock('../../../../redux/config')
-jest.mock('@opentrons/shared-data', () => {
-  const actualSharedData = jest.requireActual('@opentrons/shared-data')
+vi.mock('../../../../redux/config')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actualSharedData = await importOriginal<typeof SharedData>()
   return {
     ...actualSharedData,
-    isFlexPipette: jest.fn(),
+    isFlexPipette: vi.fn(),
   }
 })
-
-const mockisFlexPipette = isFlexPipette as jest.MockedFunction<
-  typeof isFlexPipette
->
 
 const render = (props: React.ComponentProps<typeof PipetteOverflowMenu>) => {
   return renderWithProviders(<PipetteOverflowMenu {...props} />, {
@@ -40,18 +38,14 @@ describe('PipetteOverflowMenu', () => {
       pipetteSpecs: mockLeftProtoPipette.modelSpecs,
       pipetteSettings: mockPipetteSettingsFieldsMap,
       mount: LEFT,
-      handleDropTip: jest.fn(),
-      handleChangePipette: jest.fn(),
-      handleCalibrate: jest.fn(),
-      handleAboutSlideout: jest.fn(),
-      handleSettingsSlideout: jest.fn(),
+      handleDropTip: vi.fn(),
+      handleChangePipette: vi.fn(),
+      handleCalibrate: vi.fn(),
+      handleAboutSlideout: vi.fn(),
+      handleSettingsSlideout: vi.fn(),
       isPipetteCalibrated: false,
       isRunActive: false,
     }
-  })
-  afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
   })
 
   it('renders information with a pipette attached', () => {
@@ -80,7 +74,7 @@ describe('PipetteOverflowMenu', () => {
     expect(props.handleChangePipette).toHaveBeenCalled()
   })
   it('renders recalibrate pipette text for Flex pipette', () => {
-    mockisFlexPipette.mockReturnValue(true)
+    vi.mocked(isFlexPipette).mockReturnValue(true)
     props = {
       ...props,
       isPipetteCalibrated: true,
@@ -94,7 +88,7 @@ describe('PipetteOverflowMenu', () => {
   })
 
   it('should render recalibrate pipette text for Flex pipette', () => {
-    mockisFlexPipette.mockReturnValue(true)
+    vi.mocked(isFlexPipette).mockReturnValue(true)
     props = {
       ...props,
       isPipetteCalibrated: true,
@@ -106,7 +100,7 @@ describe('PipetteOverflowMenu', () => {
   })
 
   it('renders only the about pipette button if FLEX pipette is attached', () => {
-    mockisFlexPipette.mockReturnValue(true)
+    vi.mocked(isFlexPipette).mockReturnValue(true)
 
     render(props)
 
@@ -127,7 +121,7 @@ describe('PipetteOverflowMenu', () => {
   })
 
   it('does not render the pipette settings button if the pipette has no settings', () => {
-    mockisFlexPipette.mockReturnValue(false)
+    vi.mocked(isFlexPipette).mockReturnValue(false)
     props = {
       ...props,
       pipetteSettings: null,
@@ -139,7 +133,7 @@ describe('PipetteOverflowMenu', () => {
   })
 
   it('should disable certain menu items if a run is active', () => {
-    mockisFlexPipette.mockReturnValue(true)
+    vi.mocked(isFlexPipette).mockReturnValue(true)
     props = {
       ...props,
       isRunActive: true,
