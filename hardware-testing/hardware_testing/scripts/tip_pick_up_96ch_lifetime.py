@@ -14,7 +14,6 @@ from hardware_testing.opentrons_api.types import OT3Mount, Mount, Axis, Point, G
 import json
 import requests
 
-SlackToken = "xoxb-3897728585-6504490807157-gO93ItOvDaUVYtjOxLOZPPOp"
 SlackChannel = 'C06L33U3XBM'
 
 
@@ -22,12 +21,15 @@ def sendMessage2Slack(token, channel, message):
     """
     send message to slack
     """
+    if token == "none":
+        print("ignore send 2 slack !")
     try:
         payload = {"text": message, "channel": channel}
         data = json.dumps(payload).encode("utf8")
         url = 'https://slack.com/api/chat.postMessage'
         header = {"Content-Type": "application/json; charset=utf-8", "Authorization": "Bearer " + token}
         response = requests.post(url, data=data, headers=header)
+        print("send2Slack: ", response.text)
     except:
         print("Can't reach slack when send 2 slack!")
 
@@ -345,6 +347,7 @@ if __name__ == "__main__":
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--target", type=str, default="Test2-Pipette-0")
     parser.add_argument("--update", type=str, default="update")
+    parser.add_argument("--slack_token", type=str, default="none")
     parser.add_argument("--pick_up_num", type=int, default=240)
     parser.add_argument("--load_cal", action="store_true")
     parser.add_argument("--test_tag", action="store_true")
@@ -353,7 +356,8 @@ if __name__ == "__main__":
     parser.add_argument("--start_slot_row_col_totalTips_totalFailure", type=str, default="1:1:1:1:0")
     args = parser.parse_args()
     this_test_name = "# Tip pick up 96ch lifetime test"
-    sendMessage2Slack(SlackToken, SlackChannel, f"{this_test_name}\n {args.target}: \nStarting 96ch lifetime test, Append cycles: {args.pick_up_num * 12}\n")
+    slack_token = args.slack_token
+    sendMessage2Slack(slack_token, SlackChannel, f"{this_test_name}\n {args.target}: \nStarting 96ch lifetime test, Append cycles: {args.pick_up_num * 12}\n")
     asyncio.run(_main(args.simulate))
      # update local
     log_file_path = "/data/testing_data/tip_pick_up_lifetime_log.txt"
@@ -367,7 +371,7 @@ if __name__ == "__main__":
         update_cycles = int(args.update) + (args.pick_up_num * 12)
         write_local_json(json_file_path, {"cycles": update_cycles})
     completed_cycles = read_local_json(json_file_path, "cycles")
-    sendMessage2Slack(SlackToken, SlackChannel, f"{this_test_name}\n{args.target}: \n"
+    sendMessage2Slack(slack_token, SlackChannel, f"{this_test_name}\n{args.target}: \n"
                       f"Ending 96ch lifetime test \nCompleted {completed_cycles} times \n"
                       f"Update data tracker here: https://docs.google.com/spreadsheets/d/1uRyGvalCr1LnfU2TQo5yvUuKUZW1AUyexb1-LWDDTLc/edit#gid=139182862")
     
