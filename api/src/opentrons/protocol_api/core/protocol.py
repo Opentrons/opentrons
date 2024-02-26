@@ -70,13 +70,6 @@ class AbstractProtocol(
         ...
 
     @abstractmethod
-    def add_disposal_location_to_engine(
-        self, disposal_location: Union[TrashBin, WasteChute]
-    ) -> None:
-        """Verify and add disposal location to engine store and append it to the core."""
-        ...
-
-    @abstractmethod
     def load_labware(
         self,
         load_name: str,

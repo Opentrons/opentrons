@@ -143,11 +143,6 @@ class LegacyProtocolCore(
             )
         self._disposal_locations.append(disposal_location)
 
-    def add_disposal_location_to_engine(
-        self, disposal_location: Union[TrashBin, WasteChute]
-    ) -> None:
-        assert False, "add_disposal_location_to_engine only supported on engine core"
-
     def add_labware_definition(
         self,
         definition: LabwareDefinition,

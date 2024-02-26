@@ -138,7 +138,7 @@ class ProtocolCore(
         """Append a disposal location object to the core."""
         self._disposal_locations.append(disposal_location)
 
-    def add_disposal_location_to_engine(
+    def _add_disposal_location_to_engine(
         self, disposal_location: Union[TrashBin, WasteChute]
     ) -> None:
         """Verify and add disposal location to engine store and append it to the core."""
@@ -535,7 +535,7 @@ class ProtocolCore(
             A trash bin object.
         """
         trash_bin = TrashBin(location=slot_name, addressable_area_name=area_name)
-        self.add_disposal_location_to_engine(trash_bin)
+        self._add_disposal_location_to_engine(trash_bin)
         return trash_bin
 
     def load_waste_chute(self) -> WasteChute:
@@ -545,7 +545,7 @@ class ProtocolCore(
             A waste chute object.
         """
         waste_chute = WasteChute()
-        self.add_disposal_location_to_engine(waste_chute)
+        self._add_disposal_location_to_engine(waste_chute)
         return waste_chute
 
     def pause(self, msg: Optional[str]) -> None:
