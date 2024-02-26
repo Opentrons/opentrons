@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import map from 'lodash/map'
 import omit from 'lodash/omit'
 import isEmpty from 'lodash/isEmpty'
@@ -45,7 +46,7 @@ import {
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
@@ -187,7 +188,7 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
   )
 }
 
-interface ProtocolDetailsProps extends StoredProtocolData {}
+interface ProtocolDetailsProps extends StoredProtocolData { }
 
 export function ProtocolDetails(
   props: ProtocolDetailsProps
@@ -243,24 +244,24 @@ export function ProtocolDetails(
   const requiredLabwareDetails =
     mostRecentAnalysis != null
       ? map({
-          ...parseInitialLoadedLabwareByModuleId(
-            mostRecentAnalysis.commands != null
-              ? mostRecentAnalysis.commands
-              : []
-          ),
-          ...parseInitialLoadedLabwareBySlot(
-            mostRecentAnalysis.commands != null
-              ? mostRecentAnalysis.commands
-              : []
-          ),
-          ...parseInitialLoadedLabwareByAdapter(
-            mostRecentAnalysis.commands != null
-              ? mostRecentAnalysis.commands
-              : []
-          ),
-        }).filter(
-          labware => labware.result?.definition?.parameters?.format !== 'trash'
-        )
+        ...parseInitialLoadedLabwareByModuleId(
+          mostRecentAnalysis.commands != null
+            ? mostRecentAnalysis.commands
+            : []
+        ),
+        ...parseInitialLoadedLabwareBySlot(
+          mostRecentAnalysis.commands != null
+            ? mostRecentAnalysis.commands
+            : []
+        ),
+        ...parseInitialLoadedLabwareByAdapter(
+          mostRecentAnalysis.commands != null
+            ? mostRecentAnalysis.commands
+            : []
+        ),
+      }).filter(
+        labware => labware.result?.definition?.parameters?.format !== 'trash'
+      )
       : []
 
   const protocolDisplayName = getProtocolDisplayName(
@@ -363,16 +364,15 @@ export function ProtocolDetails(
 
   return (
     <>
-      <Portal level="top">
-        {showDeckViewModal ? (
-          <LegacyModal
-            title={t('deck_view')}
-            onClose={() => setShowDeckViewModal(false)}
-          >
-            {deckMap}
-          </LegacyModal>
-        ) : null}
-      </Portal>
+      {showDeckViewModal ? createPortal(
+        <LegacyModal
+          title={t('deck_view')}
+          onClose={() => setShowDeckViewModal(false)}
+        >
+          {deckMap}
+        </LegacyModal>,
+        getTopPortalEl()
+      ) : null}
       <Flex
         flexDirection={DIRECTION_COLUMN}
         padding={SPACING.spacing16}
@@ -405,8 +405,8 @@ export function ProtocolDetails(
               width="100%"
             >
               {analysisStatus !== 'loading' &&
-              mostRecentAnalysis != null &&
-              mostRecentAnalysis.errors.length > 0 ? (
+                mostRecentAnalysis != null &&
+                mostRecentAnalysis.errors.length > 0 ? (
                 <ProtocolAnalysisFailure
                   protocolKey={protocolKey}
                   errors={mostRecentAnalysis.errors.map(e => e.detail)}
@@ -629,13 +629,11 @@ export function ProtocolDetails(
               <Box
                 backgroundColor={COLORS.white}
                 // remove left upper corner border radius when first tab is active
-                borderRadius={`${
-                  currentTab === 'robot_config'
+                borderRadius={`${currentTab === 'robot_config'
                     ? '0'
                     : BORDERS.radiusSoftCorners
-                } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
-                  BORDERS.radiusSoftCorners
-                }`}
+                  } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners
+                  }`}
                 padding={`${SPACING.spacing16} ${SPACING.spacing16} 0 ${SPACING.spacing16}`}
               >
                 {contentsByTabName[currentTab]}

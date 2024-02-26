@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useSelector, useDispatch } from 'react-redux'
 
 import { SpinnerModalPage } from '@opentrons/components'
@@ -15,7 +16,7 @@ import type {
 } from '../../redux/sessions/types'
 import type { RequestState } from '../../redux/robot-api/types'
 
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { CalibratePipetteOffset } from '.'
 import { pipetteOffsetCalibrationStarted } from '../../redux/analytics'
 import { useTranslation } from 'react-i18next'
@@ -54,7 +55,7 @@ export function useCalibratePipetteOffset(
       if (
         dispatchedAction.type === Sessions.ENSURE_SESSION &&
         dispatchedAction.payload.sessionType ===
-          Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
+        Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
       ) {
         // @ts-expect-error(sa, 2021-05-26): avoiding src code change, use in operator to type narrow
         createRequestId.current = dispatchedAction.meta.requestId
@@ -67,7 +68,7 @@ export function useCalibratePipetteOffset(
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
         dispatchedAction.payload.command.command ===
-          Sessions.sharedCalCommands.JOG
+        Sessions.sharedCalCommands.JOG
       ) {
         // @ts-expect-error(sa, 2021-05-26): avoiding src code change, use in operator to type narrow
         jogRequestId.current = dispatchedAction.meta.requestId
@@ -155,29 +156,28 @@ export function useCalibratePipetteOffset(
     mount === pipOffsetCalSession.createParams.mount &&
     tipRackDefinition === pipOffsetCalSession.createParams.tipRackDefinition
 
-  let Wizard: JSX.Element | null = (
-    <Portal level="top">
-      {startingSession ? (
-        <SpinnerModalPage
-          titleBar={{
-            title: t('pipette_offset_calibration'),
-            back: {
-              disabled: true,
-              title: t('shared:exit'),
-              children: t('shared:exit'),
-            },
-          }}
-        />
-      ) : (
-        <CalibratePipetteOffset
-          session={pipOffsetCalSession}
-          robotName={robotName}
-          showSpinner={startingSession || showSpinner}
-          dispatchRequests={dispatchRequests}
-          isJogging={isJogging}
-        />
-      )}
-    </Portal>
+  let Wizard: JSX.Element | null = createPortal(
+    startingSession ? (
+      <SpinnerModalPage
+        titleBar={{
+          title: t('pipette_offset_calibration'),
+          back: {
+            disabled: true,
+            title: t('shared:exit'),
+            children: t('shared:exit'),
+          },
+        }}
+      />
+    ) : (
+      <CalibratePipetteOffset
+        session={pipOffsetCalSession}
+        robotName={robotName}
+        showSpinner={startingSession || showSpinner}
+        dispatchRequests={dispatchRequests}
+        isJogging={isJogging}
+      />
+    ),
+    getTopPortalEl()
   )
   if (!(startingSession || isCorrectSession)) Wizard = null
 

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import {
   Flex,
@@ -19,7 +20,7 @@ import styles from './styles.module.css'
 import { labwareImages } from '../../organisms/CalibrationPanels/labwareImages'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { setUseTrashSurfaceForTipCal } from '../../redux/calibration'
 import { StyledText } from '../../atoms/text'
 
@@ -52,8 +53,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
     props.onResponse(hasBlock)
   }
 
-  return (
-    <Portal level="top">
+  return createPortal(
       <LegacyModalShell
         width="47rem"
         header={
@@ -125,7 +125,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
             </Flex>
           </Flex>
         </Flex>
-      </LegacyModalShell>
-    </Portal>
+      </LegacyModalShell>,
+      getTopPortalEl()
   )
 }

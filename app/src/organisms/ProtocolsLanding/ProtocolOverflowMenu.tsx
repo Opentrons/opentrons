@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
@@ -13,7 +14,7 @@ import {
 } from '@opentrons/components'
 import { FLEX_DISPLAY_NAME } from '@opentrons/shared-data'
 
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
@@ -165,8 +166,7 @@ export function ProtocolOverflowMenu(
         </Flex>
       ) : null}
 
-      {showDeleteConfirmation ? (
-        <Portal level="top">
+      {showDeleteConfirmation ? createPortal(
           <ConfirmDeleteProtocolModal
             cancelDeleteProtocol={(e: React.MouseEvent) => {
               e.preventDefault()
@@ -174,8 +174,8 @@ export function ProtocolOverflowMenu(
               cancelDeleteProtocol()
             }}
             handleClickDelete={handleClickDelete}
-          />
-        </Portal>
+          />,
+          getTopPortalEl()
       ) : null}
       {menuOverlay}
     </Flex>

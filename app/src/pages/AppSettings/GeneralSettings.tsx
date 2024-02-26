@@ -1,5 +1,6 @@
 // app info card with version and updated
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 
@@ -42,7 +43,7 @@ import {
 import { UpdateAppModal } from '../../organisms/UpdateAppModal'
 import { PreviousVersionModal } from '../../organisms/AppSettings/PreviousVersionModal'
 import { ConnectRobotSlideout } from '../../organisms/AppSettings/ConnectRobotSlideout'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 
 import type { Dispatch, State } from '../../redux/types'
 
@@ -247,10 +248,9 @@ export function GeneralSettings(): JSX.Element {
           </TertiaryButton>
         </Flex>
       </Box>
-      {showUpdateModal ? (
-        <Portal level="top">
-          <UpdateAppModal closeModal={() => setShowUpdateModal(false)} />
-        </Portal>
+      {showUpdateModal ? createPortal(
+        <UpdateAppModal closeModal={() => setShowUpdateModal(false)} />,
+        getTopPortalEl()
       ) : null}
       {showPreviousVersionModal ? (
         <PreviousVersionModal

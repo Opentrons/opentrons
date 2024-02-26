@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useConditionalConfirm } from '@opentrons/components'
@@ -20,7 +21,7 @@ import {
 
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
@@ -75,10 +76,10 @@ export const PipetteWizardFlows = (
       memoizedPipetteInfo == null
         ? getPipetteWizardSteps(flowType, mount, selectedPipette, isGantryEmpty)
         : getPipetteWizardStepsForProtocol(
-            attachedPipettes,
-            memoizedPipetteInfo,
-            mount
-          ),
+          attachedPipettes,
+          memoizedPipetteInfo,
+          mount
+        ),
     []
   )
   const requiredPipette = memoizedPipetteInfo?.find(
@@ -237,7 +238,7 @@ export const PipetteWizardFlows = (
 
   const maintenanceRunId =
     maintenanceRunData?.data.id != null &&
-    maintenanceRunData?.data.id === createdMaintenanceRunId
+      maintenanceRunData?.data.id === createdMaintenanceRunId
       ? createdMaintenanceRunId
       : undefined
   const calibrateBaseProps = {
@@ -406,30 +407,29 @@ export const PipetteWizardFlows = (
     />
   )
 
-  return (
-    <Portal level="top">
-      {isOnDevice ? (
-        <LegacyModalShell>
-          {wizardHeader}
-          {modalContent}
-        </LegacyModalShell>
-      ) : (
-        <LegacyModalShell
-          width="47rem"
-          height={
-            //  changing modal height for now on BeforeBeginning 96 channel attach flow
-            //  until we do design qa to normalize the modal sizes
-            currentStep.section === SECTIONS.BEFORE_BEGINNING &&
+  return createPortal(
+    isOnDevice ? (
+      <LegacyModalShell>
+        {wizardHeader}
+        {modalContent}
+      </LegacyModalShell>
+    ) : (
+      <LegacyModalShell
+        width="47rem"
+        height={
+          //  changing modal height for now on BeforeBeginning 96 channel attach flow
+          //  until we do design qa to normalize the modal sizes
+          currentStep.section === SECTIONS.BEFORE_BEGINNING &&
             selectedPipette === NINETY_SIX_CHANNEL &&
             flowType === FLOWS.ATTACH
-              ? '70%'
-              : 'auto'
-          }
-          header={wizardHeader}
-        >
-          {modalContent}
-        </LegacyModalShell>
-      )}
-    </Portal>
+            ? '70%'
+            : 'auto'
+        }
+        header={wizardHeader}
+      >
+        {modalContent}
+      </LegacyModalShell>
+    ),
+    getTopPortalEl()
   )
 }

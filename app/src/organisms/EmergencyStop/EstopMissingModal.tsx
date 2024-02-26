@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
@@ -10,7 +11,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { Modal } from '../../molecules/Modal'
@@ -37,22 +38,21 @@ export function EstopMissingModal({
 }: EstopMissingModalProps): JSX.Element {
   const isOnDevice = useSelector(getIsOnDevice)
 
-  return (
-    <Portal level="top">
-      {isOnDevice ? (
-        <TouchscreenModal robotName={robotName} closeModal={closeModal} />
-      ) : (
-        <>
-          {isDismissedModal === false ? (
-            <DesktopModal
-              robotName={robotName}
-              closeModal={closeModal}
-              setIsDismissedModal={setIsDismissedModal}
-            />
-          ) : null}
-        </>
-      )}
-    </Portal>
+  return createPortal(
+    isOnDevice ? (
+      <TouchscreenModal robotName={robotName} closeModal={closeModal} />
+    ) : (
+      <>
+        {isDismissedModal === false ? (
+          <DesktopModal
+            robotName={robotName}
+            closeModal={closeModal}
+            setIsDismissedModal={setIsDismissedModal}
+          />
+        ) : null}
+      </>
+    ),
+    getTopPortalEl()
   )
 }
 
@@ -60,7 +60,7 @@ interface EstopMissingTouchscreenModalProps
   extends Omit<
     EstopMissingModalProps,
     'isDismissedModal' | 'setIsDismissedModal'
-  > {}
+  > { }
 
 function TouchscreenModal({
   robotName,
@@ -90,7 +90,7 @@ function TouchscreenModal({
 }
 
 interface EstopMissingDesktopModalProps
-  extends Omit<EstopMissingModalProps, 'isDismissedModal'> {}
+  extends Omit<EstopMissingModalProps, 'isDismissedModal'> { }
 
 function DesktopModal({
   robotName,

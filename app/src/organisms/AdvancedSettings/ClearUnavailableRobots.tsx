@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -23,7 +24,7 @@ import { TertiaryButton } from '../../atoms/buttons'
 import { ERROR_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
 import { useToaster } from '../../organisms/ToasterOven'
 import { LegacyModal } from '../../molecules/LegacyModal'
-import { Portal } from '../../App/portal'
+import { Portal, getTopPortalEl } from '../../App/portal'
 import {
   clearDiscoveryCache,
   getReachableRobots,
@@ -62,8 +63,7 @@ export function ClearUnavailableRobots(): JSX.Element {
   } = useConditionalConfirm(handleDeleteUnavailRobots, true)
   return (
     <>
-      {showConfirmDeleteUnavailRobots ? (
-        <Portal level="top">
+      {showConfirmDeleteUnavailRobots ? createPortal(
           <LegacyModal
             type="warning"
             title={t('clear_unavailable_robots')}
@@ -95,8 +95,8 @@ export function ClearUnavailableRobots(): JSX.Element {
                 </AlertPrimaryButton>
               </Flex>
             </Flex>
-          </LegacyModal>
-        </Portal>
+          </LegacyModal>,
+          getTopPortalEl()
       ) : null}
       <Flex
         alignItems={ALIGN_CENTER}
