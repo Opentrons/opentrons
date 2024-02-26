@@ -13,7 +13,10 @@ import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck
 import { mockDefinition } from '../../../../../redux/custom-labware/__fixtures__'
 import { getLocationInfoNames } from '../../utils/getLocationInfoNames'
 import { getSlotLabwareDefinition } from '../../utils/getSlotLabwareDefinition'
-import { getLiquidsByIdForLabware, getWellFillFromLabwareId } from '../utils'
+import {
+  getLiquidsByIdForLabware,
+  getDisabledWellFillFromLabwareId,
+} from '../utils'
 import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
 import { LiquidDetailCard } from '../LiquidDetailCard'
 
@@ -53,8 +56,8 @@ const mockParseLiquidsInLoadOrder = parseLiquidsInLoadOrder as jest.MockedFuncti
 const mockLabwareRender = LabwareRender as jest.MockedFunction<
   typeof LabwareRender
 >
-const mockGetWellFillFromLabwareId = getWellFillFromLabwareId as jest.MockedFunction<
-  typeof getWellFillFromLabwareId
+const mockGetDisabledWellFillFromLabwareId = getDisabledWellFillFromLabwareId as jest.MockedFunction<
+  typeof getDisabledWellFillFromLabwareId
 >
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
@@ -111,7 +114,7 @@ describe('LiquidsLabwareDetailsModal', () => {
       },
     ])
     mockLiquidDetailCard.mockReturnValue(<div></div>)
-    mockGetWellFillFromLabwareId.mockReturnValue({})
+    mockGetDisabledWellFillFromLabwareId.mockReturnValue({})
     mockUseMostRecentCompletedAnalysis.mockReturnValue(
       {} as CompletedProtocolAnalysis
     )
@@ -144,7 +147,7 @@ describe('LiquidsLabwareDetailsModal', () => {
     getByText(nestedTextMatcher('mock LiquidDetailCard'))
   })
   it('should render labware render with well fill', () => {
-    mockGetWellFillFromLabwareId.mockReturnValue({
+    mockGetDisabledWellFillFromLabwareId.mockReturnValue({
       C1: '#ff4888',
       C2: '#ff4888',
     })
@@ -153,7 +156,7 @@ describe('LiquidsLabwareDetailsModal', () => {
   })
   it('should render labware render with well fill on odd', () => {
     mockGetIsOnDevice.mockReturnValue(true)
-    mockGetWellFillFromLabwareId.mockReturnValue({
+    mockGetDisabledWellFillFromLabwareId.mockReturnValue({
       C1: '#ff4888',
       C2: '#ff4888',
     })
