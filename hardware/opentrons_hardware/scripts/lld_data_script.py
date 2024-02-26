@@ -136,7 +136,7 @@ def running_avg(
 def main() -> None:
     """Main function."""
 
-    # data starts at row 63
+    # data starts at row 59 + number of trials
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -168,7 +168,7 @@ def main() -> None:
             pressure = []
             z_travel = []
             p_travel = []
-            for row in range(69, len(reader_list)):
+            for row in range((59+number_of_trials), len(reader_list)):
                 current_time = reader_list[row][0]
                 current_pressure = reader_list[row][3 * trial + 2]
                 current_z_pos = reader_list[row][3 * trial + 3]
