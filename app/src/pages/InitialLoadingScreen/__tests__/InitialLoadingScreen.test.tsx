@@ -1,7 +1,8 @@
 import * as React from 'react'
+import { vi, it, describe, beforeEach, afterEach } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { getOnDeviceDisplaySettings } from '../../../redux/config'
 import { getIsShellReady } from '../../../redux/shell'
@@ -10,15 +11,8 @@ import { InitialLoadingScreen } from '..'
 
 import type { OnDeviceDisplaySettings } from '../../../redux/config/schema-types'
 
-jest.mock('../../../redux/config')
-jest.mock('../../../redux/shell')
-
-const mockGetOnDeviceDisplaySettings = getOnDeviceDisplaySettings as jest.MockedFunction<
-  typeof getOnDeviceDisplaySettings
->
-const mockGetIsShellReady = getIsShellReady as jest.MockedFunction<
-  typeof getIsShellReady
->
+vi.mock('../../../redux/config')
+vi.mock('../../../redux/shell')
 
 const mockSettings = {
   sleepMs: 60 * 1000 * 60 * 24 * 7,
@@ -33,15 +27,15 @@ const render = () => {
 
 describe('InitialLoadingScreen', () => {
   beforeEach(() => {
-    mockGetOnDeviceDisplaySettings.mockReturnValue(mockSettings)
-    mockGetIsShellReady.mockReturnValue(false)
+    vi.mocked(getOnDeviceDisplaySettings).mockReturnValue(mockSettings)
+    vi.mocked(getIsShellReady).mockReturnValue(false)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
   it('should display spinner', () => {
     render()
-    screen.getByLabelText('loading')
+    screen.getByLabelText('loading indicator')
   })
 })

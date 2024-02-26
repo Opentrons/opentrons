@@ -1,7 +1,8 @@
 import * as React from 'react'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import {
   useTrackEvent,
@@ -14,34 +15,16 @@ import { useAllLabware, useLabwareFailure, useNewLabwareName } from '../hooks'
 import { Labware } from '..'
 import { mockDefinition } from '../../../redux/custom-labware/__fixtures__'
 
-jest.mock('../../../organisms/LabwareCard')
-jest.mock('../../../organisms/AddCustomLabwareSlideout')
-jest.mock('../../../organisms/ToasterOven')
-jest.mock('../hooks')
-jest.mock('../../../redux/analytics')
+vi.mock('../../../organisms/LabwareCard')
+vi.mock('../../../organisms/AddCustomLabwareSlideout')
+vi.mock('../../../organisms/ToasterOven')
+vi.mock('../hooks')
+vi.mock('../../../redux/analytics')
 
-const mockLabwareCard = LabwareCard as jest.MockedFunction<typeof LabwareCard>
-const mockAddCustomLabwareSlideout = AddCustomLabwareSlideout as jest.MockedFunction<
-  typeof AddCustomLabwareSlideout
->
-const mockUseAllLabware = useAllLabware as jest.MockedFunction<
-  typeof useAllLabware
->
-const mockUseLabwareFailure = useLabwareFailure as jest.MockedFunction<
-  typeof useLabwareFailure
->
-const mockUseNewLabwareName = useNewLabwareName as jest.MockedFunction<
-  typeof useNewLabwareName
->
-const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
-  typeof useTrackEvent
->
-const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
-
-let mockTrackEvent: jest.Mock
-const mockMakeSnackbar = jest.fn()
-const mockMakeToast = jest.fn()
-const mockEatToast = jest.fn()
+const mockTrackEvent = vi.fn()
+const mockMakeSnackbar = vi.fn()
+const mockMakeToast = vi.fn()
+const mockEatToast = vi.fn()
 
 const render = () => {
   return renderWithProviders(
@@ -56,29 +39,25 @@ const render = () => {
 
 describe('Labware', () => {
   beforeEach(() => {
-    mockTrackEvent = jest.fn()
-    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
-    mockLabwareCard.mockReturnValue(<div>Mock Labware Card</div>)
-    mockAddCustomLabwareSlideout.mockReturnValue(
-      <div>Mock Add Custom Labware</div>
-    )
-    mockUseAllLabware.mockReturnValue([{ definition: mockDefinition }])
-    mockUseLabwareFailure.mockReturnValue({
+    vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
+    vi.mocked(LabwareCard).mockReturnValue(<div>Mock Labware Card</div>)
+    vi.mocked(useAllLabware).mockReturnValue([{ definition: mockDefinition }])
+    vi.mocked(useLabwareFailure).mockReturnValue({
       labwareFailureMessage: null,
-      clearLabwareFailure: jest.fn(),
+      clearLabwareFailure: vi.fn(),
     })
-    mockUseNewLabwareName.mockReturnValue({
+    vi.mocked(useNewLabwareName).mockReturnValue({
       newLabwareName: null,
-      clearLabwareName: jest.fn(),
+      clearLabwareName: vi.fn(),
     })
-    mockUseToaster.mockReturnValue({
+    vi.mocked(useToaster).mockReturnValue({
       makeSnackbar: mockMakeSnackbar,
       makeToast: mockMakeToast,
       eatToast: mockEatToast,
     })
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders correct title, import button and labware cards', () => {
@@ -92,11 +71,10 @@ describe('Labware', () => {
     expect(getByTestId('sortBy-label')).toHaveTextContent('Alphabetical')
   })
   it('renders AddCustomLabware slideout when import button is clicked', () => {
-    const [{ getByText, getByRole, queryByText }] = render()
-    expect(queryByText('Mock Add Custom Labware')).not.toBeInTheDocument()
+    const [{ getByRole }] = render()
     const importButton = getByRole('button', { name: 'Import' })
     fireEvent.click(importButton)
-    getByText('Mock Add Custom Labware')
+    expect(vi.mocked(AddCustomLabwareSlideout)).toHaveBeenCalled()
   })
   it('renders footer with labware creator link', () => {
     const [{ getByText, getByRole }] = render()
@@ -109,9 +87,9 @@ describe('Labware', () => {
     })
   })
   it('renders error toast if there is a failure', () => {
-    mockUseLabwareFailure.mockReturnValue({
+    vi.mocked(useLabwareFailure).mockReturnValue({
       labwareFailureMessage: 'mock failure message',
-      clearLabwareFailure: jest.fn(),
+      clearLabwareFailure: vi.fn(),
     })
     render()
     expect(mockMakeToast).toBeCalledWith(
@@ -121,9 +99,9 @@ describe('Labware', () => {
     )
   })
   it('renders success toast if there is a new labware name', () => {
-    mockUseNewLabwareName.mockReturnValue({
+    vi.mocked(useNewLabwareName).mockReturnValue({
       newLabwareName: 'mock filename',
-      clearLabwareName: jest.fn(),
+      clearLabwareName: vi.fn(),
     })
     render()
     expect(mockMakeToast).toBeCalledWith(

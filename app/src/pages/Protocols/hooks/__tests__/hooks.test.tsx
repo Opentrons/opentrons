@@ -1,6 +1,7 @@
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { UseQueryResult } from 'react-query'
 import { renderHook } from '@testing-library/react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
 import omitBy from 'lodash/omitBy'
 
 import {
@@ -16,35 +17,20 @@ import {
   FLEX_SIMPLEST_DECK_CONFIG,
   LabwareDefinition2,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  fixtureTiprack300ul,
 } from '@opentrons/shared-data'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { useMissingProtocolHardware, useRequiredProtocolLabware } from '..'
 
 import type { Protocol } from '@opentrons/api-client'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../../organisms/Devices/hooks')
-jest.mock('../../../../redux/config')
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../../organisms/Devices/hooks')
+vi.mock('../../../../redux/config')
 
 const PROTOCOL_ID = 'fake_protocol_id'
 
-const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
-  typeof useProtocolQuery
->
-const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
-  typeof useInstrumentsQuery
->
-const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
-  typeof useModulesQuery
->
-const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
-  typeof useDeckConfigurationQuery
->
-const mockUseProtocolAnalysisAsDocumentQuery = useProtocolAnalysisAsDocumentQuery as jest.MockedFunction<
-  typeof useProtocolAnalysisAsDocumentQuery
->
-const mockLabwareDef = fixture_tiprack_300_ul as LabwareDefinition2
+const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition2
 const PROTOCOL_ANALYSIS = {
   id: 'fake analysis',
   status: 'completed',
@@ -124,27 +110,27 @@ const NULL_PROTOCOL_ANALYSIS = {
 
 describe('useRequiredProtocolLabware', () => {
   beforeEach(() => {
-    when(mockUseProtocolQuery)
+    when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID)
-      .mockReturnValue({
+      .thenReturn({
         data: {
           data: { analysisSummaries: [{ id: PROTOCOL_ANALYSIS.id } as any] },
         },
       } as UseQueryResult<Protocol>)
-    when(mockUseProtocolAnalysisAsDocumentQuery)
+    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(PROTOCOL_ID, PROTOCOL_ANALYSIS.id, { enabled: true })
-      .mockReturnValue({
+      .thenReturn({
         data: PROTOCOL_ANALYSIS,
       } as UseQueryResult<CompletedProtocolAnalysis>)
-    when(mockUseProtocolAnalysisAsDocumentQuery)
+    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(PROTOCOL_ID, NULL_PROTOCOL_ANALYSIS.id, { enabled: true })
-      .mockReturnValue({
+      .thenReturn({
         data: NULL_PROTOCOL_ANALYSIS,
       } as UseQueryResult<CompletedProtocolAnalysis>)
   })
 
   afterEach(() => {
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('should return LabwareSetupItem array', () => {
@@ -158,9 +144,9 @@ describe('useRequiredProtocolLabware', () => {
   })
 
   it('should return empty array when there is no match with protocol id', () => {
-    when(mockUseProtocolQuery)
+    when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID)
-      .mockReturnValue({
+      .thenReturn({
         data: {
           data: {
             analysisSummaries: [{ id: NULL_PROTOCOL_ANALYSIS.id } as any],
@@ -175,29 +161,29 @@ describe('useRequiredProtocolLabware', () => {
 describe('useMissingProtocolHardware', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
-    mockUseInstrumentsQuery.mockReturnValue({
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: { data: [] },
       isLoading: false,
     } as any)
-    mockUseModulesQuery.mockReturnValue({
+    vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [] },
       isLoading: false,
     } as any)
-    mockUseProtocolQuery.mockReturnValue({
+    vi.mocked(useProtocolQuery).mockReturnValue({
       data: {
         data: { analysisSummaries: [{ id: PROTOCOL_ANALYSIS.id } as any] },
       },
     } as UseQueryResult<Protocol>)
-    mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: PROTOCOL_ANALYSIS,
     } as UseQueryResult<CompletedProtocolAnalysis>)
-    mockUseDeckConfigurationQuery.mockReturnValue({
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
       data: [{}],
     } as UseQueryResult<DeckConfiguration>)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
   it('should return 1 pipette and 1 module', () => {
     const { result } = renderHook(
@@ -225,7 +211,7 @@ describe('useMissingProtocolHardware', () => {
     })
   })
   it('should return 1 conflicted slot', () => {
-    mockUseDeckConfigurationQuery.mockReturnValue(({
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue(({
       data: [
         {
           cutoutId: 'cutoutD3',
@@ -267,7 +253,7 @@ describe('useMissingProtocolHardware', () => {
     })
   })
   it('should return empty array when the correct modules and pipettes are attached', () => {
-    mockUseInstrumentsQuery.mockReturnValue({
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: {
         data: [
           {
@@ -281,7 +267,7 @@ describe('useMissingProtocolHardware', () => {
       isLoading: false,
     } as any)
 
-    mockUseModulesQuery.mockReturnValue({
+    vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [mockHeaterShaker] },
       isLoading: false,
     } as any)
@@ -296,7 +282,7 @@ describe('useMissingProtocolHardware', () => {
     })
   })
   it('should return conflicting slot when module location is configured with something other than single slot fixture', () => {
-    mockUseInstrumentsQuery.mockReturnValue({
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: {
         data: [
           {
@@ -310,12 +296,12 @@ describe('useMissingProtocolHardware', () => {
       isLoading: false,
     } as any)
 
-    mockUseModulesQuery.mockReturnValue({
+    vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [mockHeaterShaker] },
       isLoading: false,
     } as any)
 
-    mockUseDeckConfigurationQuery.mockReturnValue({
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
       data: [
         omitBy(
           FLEX_SIMPLEST_DECK_CONFIG,

@@ -38,9 +38,13 @@ const render = (path = '/') => {
 describe('CalibrationDashboard', () => {
   beforeEach(() => {
     vi.mocked(useCalibrationTaskList).mockReturnValue(expectedTaskList)
-    vi.mocked(useDashboardCalibratePipOffset).mockReturnValue([() => { }, null])
-    vi.mocked(useDashboardCalibrateTipLength).mockReturnValue([() => { }, null])
-    vi.mocked(useDashboardCalibrateDeck).mockReturnValue([() => { }, null, false])
+    vi.mocked(useDashboardCalibratePipOffset).mockReturnValue([() => {}, null])
+    vi.mocked(useDashboardCalibrateTipLength).mockReturnValue([() => {}, null])
+    vi.mocked(useDashboardCalibrateDeck).mockReturnValue([
+      () => {},
+      null,
+      false,
+    ])
     vi.mocked(useAttachedPipettes).mockReturnValue({
       left: mockLeftProtoPipette,
       right: null,

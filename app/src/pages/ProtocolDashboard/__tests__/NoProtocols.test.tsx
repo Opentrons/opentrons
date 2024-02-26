@@ -10,7 +10,8 @@ const render = () => {
   return renderWithProviders(<NoProtocols />, { i18nInstance: i18n })
 }
 
-const NO_PROTOCOLS_PNG_FINE_NAME = '/app/src/assets/images/on-device-display/empty_protocol_dashboard.png'
+const NO_PROTOCOLS_PNG_FINE_NAME =
+  '/app/src/assets/images/on-device-display/empty_protocol_dashboard.png'
 
 describe('NoProtocols', () => {
   it('should render text and image', () => {

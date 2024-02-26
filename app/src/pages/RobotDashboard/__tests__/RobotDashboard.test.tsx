@@ -1,7 +1,8 @@
 import * as React from 'react'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
@@ -15,49 +16,27 @@ import { RobotDashboard } from '..'
 import { useNotifyAllRunsQuery } from '../../../resources/runs/useNotifyAllRunsQuery'
 
 import type { ProtocolResource } from '@opentrons/shared-data'
+import type * as ReactRouterDom from 'react-router-dom'
 
-const mockPush = jest.fn()
+const mockPush = vi.fn()
 
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<typeof ReactRouterDom>()
   return {
-    ...reactRouterDom,
+    ...actual,
     useHistory: () => ({ push: mockPush } as any),
   }
 })
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../organisms/OnDeviceDisplay/RobotDashboard/EmptyRecentRun')
-jest.mock(
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../organisms/OnDeviceDisplay/RobotDashboard/EmptyRecentRun')
+vi.mock(
   '../../../organisms/OnDeviceDisplay/RobotDashboard/RecentRunProtocolCarousel'
 )
-jest.mock('../../../organisms/Navigation')
-jest.mock('../../Protocols/hooks')
-jest.mock('../../../redux/config')
-jest.mock('../WelcomeModal')
-jest.mock('../../../resources/runs/useNotifyAllRunsQuery')
-
-const mockNavigation = Navigation as jest.MockedFunction<typeof Navigation>
-const mockUseAllProtocolsQuery = useAllProtocolsQuery as jest.MockedFunction<
-  typeof useAllProtocolsQuery
->
-const mockUseNotifyAllRunsQuery = useNotifyAllRunsQuery as jest.MockedFunction<
-  typeof useNotifyAllRunsQuery
->
-const mockEmptyRecentRun = EmptyRecentRun as jest.MockedFunction<
-  typeof EmptyRecentRun
->
-const mockUseMissingProtocolHardware = useMissingProtocolHardware as jest.MockedFunction<
-  typeof useMissingProtocolHardware
->
-const mockRecentRunProtocolCarousel = RecentRunProtocolCarousel as jest.MockedFunction<
-  typeof RecentRunProtocolCarousel
->
-const mockGetOnDeviceDisplaySettings = getOnDeviceDisplaySettings as jest.MockedFunction<
-  typeof getOnDeviceDisplaySettings
->
-const mockWelcomeModal = WelcomeModal as jest.MockedFunction<
-  typeof WelcomeModal
->
+vi.mock('../../../organisms/Navigation')
+vi.mock('../../Protocols/hooks')
+vi.mock('../../../redux/config')
+vi.mock('../WelcomeModal')
+vi.mock('../../../resources/runs/useNotifyAllRunsQuery')
 
 const render = () => {
   return renderWithProviders(
@@ -95,54 +74,48 @@ const mockRunData = {
 
 describe('RobotDashboard', () => {
   beforeEach(() => {
-    mockEmptyRecentRun.mockReturnValue(<div> mock EmptyRecentRun</div>)
-    mockNavigation.mockReturnValue(<div>mock Navigation</div>)
-    mockUseAllProtocolsQuery.mockReturnValue({} as any)
-    mockUseNotifyAllRunsQuery.mockReturnValue({} as any)
-    mockUseMissingProtocolHardware.mockReturnValue({
+    vi.mocked(useAllProtocolsQuery).mockReturnValue({} as any)
+    vi.mocked(useNotifyAllRunsQuery).mockReturnValue({} as any)
+    vi.mocked(useMissingProtocolHardware).mockReturnValue({
       missingProtocolHardware: [],
       isLoading: false,
       conflictedSlots: [],
     })
-    mockRecentRunProtocolCarousel.mockReturnValue(
-      <div>mock RecentRunProtocolCarousel</div>
-    )
-    mockGetOnDeviceDisplaySettings.mockReturnValue({
+    vi.mocked(getOnDeviceDisplaySettings).mockReturnValue({
       unfinishedUnboxingFlowRoute: null,
     } as any)
-    mockWelcomeModal.mockReturnValue(<div>mock WelcomeModal</div>)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('should render empty recent run image and buttons', () => {
-    const [{ getByText }] = render()
-    getByText('mock Navigation')
-    getByText('mock EmptyRecentRun')
+    render()
+    expect(vi.mocked(Navigation)).toHaveBeenCalled()
+    expect(vi.mocked(EmptyRecentRun)).toHaveBeenCalled()
   })
 
   it('should render a recent run protocol carousel', () => {
-    mockUseAllProtocolsQuery.mockReturnValue({
+    vi.mocked(useAllProtocolsQuery).mockReturnValue({
       data: {
         data: [mockProtocol],
       },
     } as any)
-    mockUseNotifyAllRunsQuery.mockReturnValue({
+    vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
       data: { data: [mockRunData] },
     } as any)
     const [{ getByText }] = render()
-    getByText('mock Navigation')
+    expect(vi.mocked(Navigation)).toHaveBeenCalled()
     getByText('Run again')
-    getByText('mock RecentRunProtocolCarousel')
+    expect(vi.mocked(RecentRunProtocolCarousel)).toHaveBeenCalled()
   })
 
   it('should render WelcomeModal component when finish unboxing flow', () => {
-    mockGetOnDeviceDisplaySettings.mockReturnValue({
+    vi.mocked(getOnDeviceDisplaySettings).mockReturnValue({
       unfinishedUnboxingFlowRoute: '/robot-settings/rename-robot',
     } as any)
-    const [{ getByText }] = render()
-    getByText('mock WelcomeModal')
+    render()
+    expect(vi.mocked(WelcomeModal)).toHaveBeenCalled()
   })
 })

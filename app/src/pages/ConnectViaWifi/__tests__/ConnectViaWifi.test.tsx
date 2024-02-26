@@ -1,8 +1,9 @@
 import * as React from 'react'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import * as RobotApi from '../../../redux/robot-api'
 import * as Fixtures from '../../../redux/networking/__fixtures__'
@@ -10,10 +11,10 @@ import { useWifiList } from '../../../resources/networking/hooks'
 import * as Networking from '../../../redux/networking'
 import { ConnectViaWifi } from '../../../pages/ConnectViaWifi'
 
-jest.mock('../../../redux/discovery')
-jest.mock('../../../resources/networking/hooks')
-jest.mock('../../../redux/networking/selectors')
-jest.mock('../../../redux/robot-api/selectors')
+vi.mock('../../../redux/discovery')
+vi.mock('../../../resources/networking/hooks')
+vi.mock('../../../redux/networking/selectors')
+vi.mock('../../../redux/robot-api/selectors')
 
 const mockWifiList = [
   { ...Fixtures.mockWifiNetwork, ssid: 'foo', active: true },
@@ -31,13 +32,13 @@ const initialMockWifi = {
   type: Networking.INTERFACE_WIFI,
 }
 
-const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
-  typeof RobotApi.getRequestById
->
-const mockUseWifiList = useWifiList as jest.MockedFunction<typeof useWifiList>
-const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedFunction<
-  typeof Networking.getNetworkInterfaces
->
+// const mockGetRequestById = RobotApi.getRequestById as vi.MockedFunction<
+//   typeof RobotApi.getRequestById
+// >
+// const vi.mocked(useWifiList) = useWifiList as vi.MockedFunction<typeof useWifiList>
+// const vi.mocked(Networking.etNetworkInterfaces) = Networking.Networking.etNetworkInterfaces as vi.MockedFunction<
+//   typeof Networking.Networking.etNetworkInterfaces
+// >
 
 // ToDo (kj:05/16/2023) this test will be updated later
 // since this test requires to update the entire wifi setup flow
@@ -55,11 +56,11 @@ const render = () => {
 
 describe('ConnectViaWifi', () => {
   beforeEach(() => {
-    mockGetRequestById.mockReturnValue(null)
+    vi.mocked(RobotApi.getRequestById).mockReturnValue(null)
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should render step meter 2/5 (width:40%)', () => {
@@ -75,7 +76,7 @@ describe('ConnectViaWifi', () => {
   })
 
   it('should render DisplayWifiList', () => {
-    mockUseWifiList.mockReturnValue(mockWifiList)
+    vi.mocked(useWifiList).mockReturnValue(mockWifiList)
     render()
     screen.getByText('foo')
     screen.getByText('bar')
@@ -83,8 +84,8 @@ describe('ConnectViaWifi', () => {
   })
 
   it('should render SelectAuthenticationType', () => {
-    mockUseWifiList.mockReturnValue(mockWifiList)
-    mockGetNetworkInterfaces.mockReturnValue({
+    vi.mocked(useWifiList).mockReturnValue(mockWifiList)
+    vi.mocked(Networking.getNetworkInterfaces).mockReturnValue({
       wifi: initialMockWifi,
       ethernet: null,
     })
@@ -94,8 +95,8 @@ describe('ConnectViaWifi', () => {
   })
 
   it('should render SetWifiCred', () => {
-    mockUseWifiList.mockReturnValue(mockWifiList)
-    mockGetNetworkInterfaces.mockReturnValue({
+    vi.mocked(useWifiList).mockReturnValue(mockWifiList)
+    vi.mocked(Networking.getNetworkInterfaces).mockReturnValue({
       wifi: initialMockWifi,
       ethernet: null,
     })
@@ -106,12 +107,12 @@ describe('ConnectViaWifi', () => {
   })
 
   it('should render ConnectingNetwork', () => {
-    mockUseWifiList.mockReturnValue(mockWifiList)
-    mockGetNetworkInterfaces.mockReturnValue({
+    vi.mocked(useWifiList).mockReturnValue(mockWifiList)
+    vi.mocked(Networking.getNetworkInterfaces).mockReturnValue({
       wifi: initialMockWifi,
       ethernet: null,
     })
-    mockGetRequestById.mockReturnValue({
+    vi.mocked(RobotApi.getRequestById).mockReturnValue({
       status: RobotApi.PENDING,
     })
     render()
@@ -123,8 +124,8 @@ describe('ConnectViaWifi', () => {
   /* 
   ToDO (kj:05/25/2023) fix these later
   it('should render WifiConnectionDetails', () => {
-    mockUseWifiList.mockReturnValue(mockWifiList)
-    mockGetNetworkInterfaces.mockReturnValue({
+    vi.mocked(useWifiList).mockReturnValue(mockWifiList)
+    vi.mocked(Networking.etNetworkInterfaces).mockReturnValue({
       wifi: initialMockWifi,
       ethernet: null,
     })
@@ -140,8 +141,8 @@ describe('ConnectViaWifi', () => {
   })
 
   it('should render FailedToConnect', () => {
-    mockUseWifiList.mockReturnValue(mockWifiList)
-    mockGetNetworkInterfaces.mockReturnValue({
+    vi.mocked(useWifiList).mockReturnValue(mockWifiList)
+    vi.mocked(Networking.etNetworkInterfaces).mockReturnValue({
       wifi: initialMockWifi,
       ethernet: null,
     })
