@@ -15,6 +15,11 @@ import type { Action, Dispatch } from './types'
 // However, redundant subscriptions are permitted and result in the broker sending the retained message for that topic.
 // To mitigate redundant connections, the connection manager eagerly adds the host, removing the host if the connection fails.
 
+const FAILURE_STATUSES = {
+  ECONNREFUSED: 'ECONNREFUSED',
+  ECONNFAILED: 'ECONNFAILED',
+} as const
+
 interface ConnectionStore {
   [hostname: string]: {
     client: mqtt.MqttClient | null
@@ -72,6 +77,7 @@ export function registerNotify(
 }
 
 const CHECK_CONNECTION_INTERVAL = 500
+let hasReportedAPortBlockEvent = false
 
 interface NotifyParams {
   browserWindow: BrowserWindow
@@ -101,9 +107,15 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
         log.warn(
           `Failed to connect to ${hostname} - ${error.name}: ${error.message} `
         )
-        const failureMessage = error.message.includes('ECONNREFUSED')
-          ? 'ECONNREFUSED'
-          : 'ECONNFAILED'
+
+        let failureMessage: string = FAILURE_STATUSES.ECONNFAILED
+        if (
+          error.message.includes(FAILURE_STATUSES.ECONNREFUSED) &&
+          !hasReportedAPortBlockEvent
+        ) {
+          failureMessage = FAILURE_STATUSES.ECONNREFUSED
+          hasReportedAPortBlockEvent = true
+        }
 
         sendToBrowserDeserialized({
           browserWindow,
@@ -128,7 +140,7 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
         browserWindow,
         hostname,
         topic,
-        message: 'ECONNFAILED',
+        message: FAILURE_STATUSES.ECONNFAILED,
       })
       handleDecrementSubscriptionCount(hostname, topic)
     })
@@ -141,7 +153,7 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
         browserWindow,
         hostname,
         topic,
-        message: 'ECONNFAILED',
+        message: FAILURE_STATUSES.ECONNFAILED,
       })
       handleDecrementSubscriptionCount(hostname, topic)
     } else {
@@ -312,7 +324,7 @@ function establishListeners({
       browserWindow,
       hostname,
       topic,
-      message: 'ECONNFAILED',
+      message: FAILURE_STATUSES.ECONNFAILED,
     })
     client.end()
   })
