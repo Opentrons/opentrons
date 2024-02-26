@@ -22,7 +22,7 @@ export function getWellFillFromLabwareId(
           [well: string]: string
         } = {}
         Object.keys(labware.volumeByWell).forEach(key => {
-          wellFill[key] = liquid?.displayColor ?? ''
+          wellFill[key] = liquid?.displayColor ?? COLORS.transparent
         })
         labwareWellFill = { ...labwareWellFill, ...wellFill }
       }
@@ -51,11 +51,12 @@ export function getDisabledWellFillFromLabwareId(
         } = {}
         Object.keys(labware.volumeByWell).forEach(key => {
           if (liquidId === selectedLabwareId) {
-            wellFill[key] = liquid?.displayColor ?? ''
-          } else {
+            wellFill[key] = liquid?.displayColor ?? COLORS.transparent
+            // apply 40% opacity to disabled wells if well not already filled
+          } else if (wellFill[key] == null && labwareWellFill[key] == null) {
             wellFill[key] =
-              // apply 40% opacity to disabled wells
-              `${liquid?.displayColor}${COLORS.opacity40HexCode}` ?? ''
+              `${liquid?.displayColor}${COLORS.opacity40HexCode}` ??
+              COLORS.transparent
           }
         })
         labwareWellFill = { ...labwareWellFill, ...wellFill }
