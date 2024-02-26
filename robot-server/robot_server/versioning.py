@@ -3,7 +3,7 @@ from fastapi import Header, Request, Response, status
 from typing import Union
 from typing_extensions import Literal, Final
 
-from robot_server.errors import ErrorDetails
+from robot_server.errors.error_responses import ErrorDetails
 
 API_VERSION: Final[int] = 4
 """The current version of the HTTP API used by the server.

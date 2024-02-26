@@ -15,7 +15,7 @@ from opentrons.protocol_engine import (
 )
 
 from robot_server.docs_helpers.xrefs import OperationId
-from robot_server.errors import ErrorDetails, ErrorBody
+from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,

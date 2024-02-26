@@ -27,12 +27,12 @@ import pydantic
 import sqlalchemy
 
 from ..pydantic import pydantic_to_json
-from .._database import (
+from ..database import (
     sql_engine_ctx,
     sqlite_rowid,
 )
+from ..tables import schema_2, schema_3
 from .._folder_migrator import Migration
-from .._tables import schema_2, schema_3
 from ._util import copy_rows_unmodified, copy_if_exists, copytree_if_exists
 from . import up_to_2
 

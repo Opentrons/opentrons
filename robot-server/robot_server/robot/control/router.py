@@ -6,7 +6,7 @@ from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 from robot_server.hardware import get_robot_type
 
-from robot_server.errors import ErrorBody
+from robot_server.errors.error_responses import ErrorBody
 from robot_server.errors.robot_errors import NotSupportedOnOT2
 from robot_server.service.json_api import (
     PydanticResponse,

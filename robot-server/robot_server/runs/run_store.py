@@ -13,11 +13,11 @@ from opentrons.util.helpers import utc_now
 from opentrons.protocol_engine import StateSummary, CommandSlice
 from opentrons.protocol_engine.commands import Command
 
-from robot_server.persistence import (
+from robot_server.persistence.database import sqlite_rowid
+from robot_server.persistence.tables import (
     run_table,
     run_command_table,
     action_table,
-    sqlite_rowid,
 )
 from robot_server.persistence.pydantic import json_to_pydantic, pydantic_to_json
 from robot_server.protocols.protocol_store import ProtocolNotFoundError

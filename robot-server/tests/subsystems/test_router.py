@@ -36,7 +36,7 @@ from robot_server.subsystems.router import (
     get_attached_subsystems,
 )
 
-from robot_server.errors import ApiError
+from robot_server.errors.error_responses import ApiError
 
 from opentrons.hardware_control.types import (
     SubSystem as HWSubSystem,

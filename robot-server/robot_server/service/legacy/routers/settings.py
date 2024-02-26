@@ -29,7 +29,7 @@ from robot_server.deck_configuration.fastapi_dependencies import (
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
 
-from robot_server.errors import LegacyErrorResponse
+from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.hardware import (
     get_hardware,
     get_robot_type,
@@ -53,7 +53,10 @@ from robot_server.service.legacy.models.settings import (
     Links,
     AdvancedSetting,
 )
-from robot_server.persistence import PersistenceResetter, get_persistence_resetter
+from robot_server.persistence.fastapi_dependencies import (
+    get_persistence_resetter,
+)
+from robot_server.persistence.persistence_directory import PersistenceResetter
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 log = logging.getLogger(__name__)
