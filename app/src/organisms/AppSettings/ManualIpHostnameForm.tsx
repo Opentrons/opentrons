@@ -72,6 +72,18 @@ export function ManualIpHostnameForm({
     dispatch(startDiscovery())
   }
 
+  const resolver: Resolver<FormValues> = values => {
+    let errors = {}
+    errors = validateForm(values, errors)
+    return { values, errors }
+  }
+  const { formState, handleSubmit, register, reset } = useForm<FormValues>({
+    defaultValues: {
+      ip: '',
+    },
+    resolver: resolver,
+  })
+
   const validateForm = (
     data: FormValues,
     errors: Record<string, FieldError>
@@ -94,19 +106,6 @@ export function ManualIpHostnameForm({
         : errors
     return updatedErrors
   }
-
-  const resolver: Resolver<FormValues> = values => {
-    let errors = {}
-    errors = validateForm(values, errors)
-    return { values, errors }
-  }
-
-  const { formState, handleSubmit, register, reset } = useForm<FormValues>({
-    defaultValues: {
-      ip: '',
-    },
-    resolver: resolver,
-  })
 
   const onSubmit = (data: FormValues): void => {
     const trimmedIp = data.ip.trim()
