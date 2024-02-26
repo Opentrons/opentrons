@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook } from '@testing-library/react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { vi, it, expect, describe, beforeEach } from 'vitest'
+import { when } from 'vitest-when'
 import { mockTipRackDefinition } from '../../../../redux/custom-labware/__fixtures__'
 
 import {
@@ -16,37 +17,29 @@ import type { PipetteInfo } from '..'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 
-jest.mock('../useDeckCalibrationStatus')
-jest.mock('../useIsFlex')
-jest.mock('../useRunPipetteInfoByMount')
-jest.mock('../../../../resources/runs/useNotifyRunQuery')
+vi.mock('../useDeckCalibrationStatus')
+vi.mock('../useIsFlex')
+vi.mock('../useRunPipetteInfoByMount')
+vi.mock('../../../../resources/runs/useNotifyRunQuery')
 
-const mockUseDeckCalibrationStatus = useDeckCalibrationStatus as jest.MockedFunction<
-  typeof useDeckCalibrationStatus
->
-const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
-const mockUseRunPipetteInfoByMount = useRunPipetteInfoByMount as jest.MockedFunction<
-  typeof useRunPipetteInfoByMount
->
-const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
-  typeof useNotifyRunQuery
->
 let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
 describe('useRunCalibrationStatus hook', () => {
   beforeEach(() => {
-    when(mockUseDeckCalibrationStatus).calledWith('otie').mockReturnValue('OK')
+    when(vi.mocked(useDeckCalibrationStatus))
+      .calledWith('otie')
+      .thenReturn('OK')
 
-    when(mockUseRunPipetteInfoByMount).calledWith('1').mockReturnValue({
+    when(vi.mocked(useRunPipetteInfoByMount)).calledWith('1').thenReturn({
       left: null,
       right: null,
     })
-    when(mockUseIsFlex).calledWith('otie').mockReturnValue(false)
-    mockUseNotifyRunQuery.mockReturnValue({} as any)
+    when(vi.mocked(useIsFlex)).calledWith('otie').thenReturn(false)
+    vi.mocked(useNotifyRunQuery).mockReturnValue({} as any)
 
-    const store = createStore(jest.fn(), {})
-    store.dispatch = jest.fn()
-    store.getState = jest.fn(() => {})
+    const store = createStore(vi.fn(), {})
+    store.dispatch = vi.fn()
+    store.getState = vi.fn(() => {})
 
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (
@@ -56,13 +49,10 @@ describe('useRunCalibrationStatus hook', () => {
     )
   })
 
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
   it('should return deck cal failure if not calibrated', () => {
-    when(mockUseDeckCalibrationStatus)
+    when(vi.mocked(useDeckCalibrationStatus))
       .calledWith('otie')
-      .mockReturnValue('BAD_CALIBRATION')
+      .thenReturn('BAD_CALIBRATION')
     const { result } = renderHook(() => useRunCalibrationStatus('otie', '1'), {
       wrapper,
     })
@@ -72,10 +62,10 @@ describe('useRunCalibrationStatus hook', () => {
     })
   })
   it('should ignore deck calibration status of a Flex', () => {
-    when(mockUseDeckCalibrationStatus)
+    when(vi.mocked(useDeckCalibrationStatus))
       .calledWith('otie')
-      .mockReturnValue('BAD_CALIBRATION')
-    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
+      .thenReturn('BAD_CALIBRATION')
+    when(vi.mocked(useIsFlex)).calledWith('otie').thenReturn(true)
     const { result } = renderHook(() => useRunCalibrationStatus('otie', '1'), {
       wrapper,
     })
@@ -84,9 +74,9 @@ describe('useRunCalibrationStatus hook', () => {
     })
   })
   it('should return attach pipette if missing', () => {
-    when(mockUseRunPipetteInfoByMount)
+    when(vi.mocked(useRunPipetteInfoByMount))
       .calledWith('1')
-      .mockReturnValue({
+      .thenReturn({
         left: {
           requestedPipetteMatch: 'incompatible',
           pipetteCalDate: null,
@@ -112,9 +102,9 @@ describe('useRunCalibrationStatus hook', () => {
     })
   })
   it('should return calibrate pipette if cal date null', () => {
-    when(mockUseRunPipetteInfoByMount)
+    when(vi.mocked(useRunPipetteInfoByMount))
       .calledWith('1')
-      .mockReturnValue({
+      .thenReturn({
         left: {
           requestedPipetteMatch: 'match',
           pipetteCalDate: null,
@@ -140,9 +130,9 @@ describe('useRunCalibrationStatus hook', () => {
     })
   })
   it('should return calibrate tip rack if cal date null', () => {
-    when(mockUseRunPipetteInfoByMount)
+    when(vi.mocked(useRunPipetteInfoByMount))
       .calledWith('1')
-      .mockReturnValue({
+      .thenReturn({
         left: {
           requestedPipetteMatch: 'match',
           pipetteCalDate: '2020-08-30T10:02',
@@ -168,9 +158,9 @@ describe('useRunCalibrationStatus hook', () => {
     })
   })
   it('should ignore tip rack calibration for the Flex', () => {
-    when(mockUseRunPipetteInfoByMount)
+    when(vi.mocked(useRunPipetteInfoByMount))
       .calledWith('1')
-      .mockReturnValue({
+      .thenReturn({
         left: {
           requestedPipetteMatch: 'match',
           pipetteCalDate: '2020-08-30T10:02',
@@ -187,7 +177,7 @@ describe('useRunCalibrationStatus hook', () => {
         } as PipetteInfo,
         right: null,
       })
-    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
+    when(vi.mocked(useIsFlex)).calledWith('otie').thenReturn(true)
     const { result } = renderHook(() => useRunCalibrationStatus('otie', '1'), {
       wrapper,
     })
@@ -196,9 +186,9 @@ describe('useRunCalibrationStatus hook', () => {
     })
   })
   it('should return complete if everything is calibrated', () => {
-    when(mockUseRunPipetteInfoByMount)
+    when(vi.mocked(useRunPipetteInfoByMount))
       .calledWith('1')
-      .mockReturnValue({
+      .thenReturn({
         left: {
           requestedPipetteMatch: 'match',
           pipetteCalDate: '2020-08-30T10:02',

@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
+import { when } from 'vitest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook } from '@testing-library/react'
 import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
@@ -10,9 +11,9 @@ import {
 } from '../../../../redux/calibration/tip-length/__fixtures__'
 import { useTipLengthCalibrations } from '..'
 
-jest.mock('@opentrons/react-api-client')
+vi.mock('@opentrons/react-api-client')
 
-const mockUseAllTipLengthCalibrationsQuery = useAllTipLengthCalibrationsQuery as jest.MockedFunction<
+const mockUseAllTipLengthCalibrationsQuery = useAllTipLengthCalibrationsQuery as vi.mockedFunction<
   typeof useAllTipLengthCalibrationsQuery
 >
 
@@ -26,8 +27,7 @@ describe('useTipLengthCalibrations hook', () => {
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
     afterEach(() => {
-      resetAllWhenMocks()
-      jest.resetAllMocks()
+      vi.resetAllMocks()
     })
   })
 
@@ -36,7 +36,7 @@ describe('useTipLengthCalibrations hook', () => {
       .calledWith({
         refetchInterval: CALIBRATIONS_FETCH_MS,
       })
-      .mockReturnValue(null as any)
+      .thenReturn(null as any)
 
     const { result } = renderHook(() => useTipLengthCalibrations(), {
       wrapper,
@@ -50,7 +50,7 @@ describe('useTipLengthCalibrations hook', () => {
       .calledWith({
         refetchInterval: CALIBRATIONS_FETCH_MS,
       })
-      .mockReturnValue({
+      .thenReturn({
         data: {
           data: [
             mockTipLengthCalibration1,

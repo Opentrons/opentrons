@@ -559,6 +559,7 @@ export {
   opentrons96PcrAdapterV1,
   opentrons1Trash3200MlFixedV1,
   fixtureCalibrationBlock,
+  opentrons96Tiprack10UlV1Uncasted,
 }
 
 export { getAllLabwareDefs }

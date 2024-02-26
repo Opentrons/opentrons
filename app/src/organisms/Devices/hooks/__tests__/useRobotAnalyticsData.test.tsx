@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { resetAllWhenMocks, when } from 'jest-when'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
+import { when } from 'vitest-when'
 import { renderHook } from '@testing-library/react'
 import { createStore, Store } from 'redux'
 import { Provider } from 'react-redux'
@@ -17,25 +18,11 @@ import {
 import type { DiscoveredRobot } from '../../../../redux/discovery/types'
 import type { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../hooks')
-jest.mock('../../../../redux/discovery')
-jest.mock('../../../../redux/pipettes')
-jest.mock('../../../../redux/robot-settings')
-
-const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
-const mockGetRobotApiVersion = getRobotApiVersion as jest.MockedFunction<
-  typeof getRobotApiVersion
->
-const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
-  typeof getRobotSettings
->
-const mockGetRobotFirmwareVersion = getRobotFirmwareVersion as jest.MockedFunction<
-  typeof getRobotFirmwareVersion
->
-const mockGetAttachedPipettes = getAttachedPipettes as jest.MockedFunction<
-  typeof getAttachedPipettes
->
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../hooks')
+vi.mock('../../../../redux/discovery')
+vi.mock('../../../../redux/pipettes')
+vi.mock('../../../../redux/robot-settings')
 
 const ROBOT_SETTINGS = [
   { id: `setting1`, value: true, title: '', description: '' },
@@ -49,12 +36,12 @@ const ATTACHED_PIPETTES = {
 }
 
 let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
-let store: Store<any> = createStore(jest.fn(), {})
+let store: Store<any> = createStore(vi.fn(), {})
 
 describe('useProtocolAnalysisErrors hook', () => {
   beforeEach(() => {
-    store = createStore(jest.fn(), {})
-    store.dispatch = jest.fn()
+    store = createStore(vi.fn(), {})
+    store.dispatch = vi.fn()
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (
       <Provider store={store}>
@@ -63,18 +50,17 @@ describe('useProtocolAnalysisErrors hook', () => {
         </QueryClientProvider>
       </Provider>
     )
-    when(mockUseRobot).calledWith('noRobot').mockReturnValue(null)
-    mockGetRobotApiVersion.mockReturnValue(ROBOT_VERSION)
-    mockGetRobotSettings.mockReturnValue(ROBOT_SETTINGS)
-    mockGetRobotFirmwareVersion.mockReturnValue(ROBOT_FIRMWARE_VERSION)
-    mockGetAttachedPipettes.mockReturnValue(
+    when(vi.mocked(useRobot)).calledWith('noRobot').thenReturn(null)
+    vi.mocked(getRobotApiVersion).mockReturnValue(ROBOT_VERSION)
+    vi.mocked(getRobotSettings).mockReturnValue(ROBOT_SETTINGS)
+    vi.mocked(getRobotFirmwareVersion).mockReturnValue(ROBOT_FIRMWARE_VERSION)
+    vi.mocked(getAttachedPipettes).mockReturnValue(
       ATTACHED_PIPETTES as AttachedPipettesByMount
     )
   })
 
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('returns null when robot is null or undefined', () => {
@@ -85,9 +71,9 @@ describe('useProtocolAnalysisErrors hook', () => {
   })
 
   it('returns robot analytics data when robot exists', () => {
-    when(mockUseRobot)
+    when(vi.mocked(useRobot))
       .calledWith('otie')
-      .mockReturnValue({} as DiscoveredRobot)
+      .thenReturn({} as DiscoveredRobot)
 
     const { result } = renderHook(() => useRobotAnalyticsData('otie'), {
       wrapper,
