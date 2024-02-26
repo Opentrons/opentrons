@@ -88,7 +88,6 @@ export function ProtocolSetupModulesAndDeck({
 
   const isModuleMismatch =
     remainingAttachedModules.length > 0 && missingModuleIds.length > 0
-
   return (
     <>
       <Portal level="top">
