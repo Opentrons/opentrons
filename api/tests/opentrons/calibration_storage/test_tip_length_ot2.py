@@ -17,6 +17,7 @@ from opentrons.calibration_storage.ot2 import (
     clear_tip_length_calibration,
     models,
 )
+from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
@@ -39,7 +40,7 @@ def starting_calibration_data(
     save_tip_length_calibration("pip1", tip_length1)
     save_tip_length_calibration("pip2", tip_length2)
     save_tip_length_calibration("pip1", tip_length3)
-    inside_data = tip_length3["dummy_namespace/minimal_labware_def/1"]
+    inside_data = tip_length3[LabwareUri("dummy_namespace/minimal_labware_def/1")]
     data = {
         inside_data.definitionHash: {
             "tipLength": 27,
