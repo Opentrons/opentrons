@@ -177,8 +177,13 @@ class WasteChute(DisposalLocation):
 
         This is intended for Opentrons internal use only and is not a guaranteed API.
         """
-        # TODO(jbl 2024-02-06) this is hardcoded here because every possible waste chute combination contains
-        #    a 1ChannelWasteChute.
+        # TODO(jbl 2024-02-06) this is hardcoded here and should be removed when a multiple pass analysis exists
+        #
+        # We want to tell Protocol Engine that there's a waste chute in the waste chute location when it's loaded,
+        # so analysis can prevent the user from doing anything that would collide with it. At the same time, we
+        # do not want to create a false negative when it comes to addressable area conflict. We therefore use the
+        # addressable area `1ChannelWasteChute` because every waste chute cutout fixture provides it and it will
+        # provide the engine with the information it needs.
         return "1ChannelWasteChute"
 
     @property
