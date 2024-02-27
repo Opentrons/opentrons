@@ -725,6 +725,8 @@ class PipetteView(HasState[PipetteState]):
             - primary_nozzle_offset
             + pipette_bounds_offsets.front_right_corner
         )
+        # TODO (spp, 2024-02-27): remove back right & front left;
+        #  return only back left and front right points.
         pip_back_right_bound = Point(
             pip_front_right_bound.x, pip_back_left_bound.y, pip_front_right_bound.z
         )

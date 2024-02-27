@@ -14,7 +14,7 @@ from typing import (
 )
 
 from opentrons_shared_data.errors.exceptions import MotionPlanningFailureError
-from opentrons_shared_data.module import FLEX_TC_LID_CLIP_POSITIONS_IN_DECK_COORDINATES
+from opentrons_shared_data.module import FLEX_TC_LID_COLLISION_ZONE
 
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons.hardware_control.modules.types import ModuleType
@@ -81,6 +81,18 @@ A1_column_back_right_bound = Point(
 
 # Arbitrary safety margin in z-direction
 Z_SAFETY_MARGIN = 10
+
+_FLEX_TC_LID_BACK_LEFT_PT = Point(
+    x=FLEX_TC_LID_COLLISION_ZONE["back_left"]["x"],
+    y=FLEX_TC_LID_COLLISION_ZONE["back_left"]["y"],
+    z=FLEX_TC_LID_COLLISION_ZONE["back_left"]["z"],
+)
+
+_FLEX_TC_LID_FRONT_RIGHT_PT = Point(
+    x=FLEX_TC_LID_COLLISION_ZONE["front_right"]["x"],
+    y=FLEX_TC_LID_COLLISION_ZONE["front_right"]["y"],
+    z=FLEX_TC_LID_COLLISION_ZONE["front_right"]["z"],
+)
 
 
 @overload
@@ -343,7 +355,6 @@ def _will_collide_with_thermocycler_lid(
     and a crude check that disallows all partial tip movements around the thermocycler.
     """
     # TODO (spp, 2024-02-27): Improvements:
-    #  - create a complete no-go zone that includes the lid itself
     #  - make the check dynamic according to lid state:
     #     - if lid is open, check if pipette is in no-go zone
     #     - if lid is closed, use the closed lid height to check for conflict
@@ -351,14 +362,14 @@ def _will_collide_with_thermocycler_lid(
         DeckSlotName.SLOT_A1 in surrounding_regular_slots
         and engine_state.modules.is_flex_deck_with_thermocycler()
     ):
-        tc_right_clip_pos = FLEX_TC_LID_CLIP_POSITIONS_IN_DECK_COORDINATES["right_clip"]
-        for bound_vertex in pipette_bounds:
-            if (
-                bound_vertex.x <= tc_right_clip_pos["x"]
-                and bound_vertex.y >= tc_right_clip_pos["y"]
-                and bound_vertex.z <= tc_right_clip_pos["z"]
-            ):
-                return True
+        return (
+            point_calculations.are_overlapping_rectangles(
+                rectangle1=(_FLEX_TC_LID_BACK_LEFT_PT, _FLEX_TC_LID_FRONT_RIGHT_PT),
+                rectangle2=(pipette_bounds[0], pipette_bounds[1]),
+            )
+            and pipette_bounds[0].z <= _FLEX_TC_LID_BACK_LEFT_PT.z
+        )
+
     return False
 
 

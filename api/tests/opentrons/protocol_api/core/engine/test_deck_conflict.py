@@ -551,10 +551,10 @@ def test_deck_conflict_raises_for_collision_with_tc_lid(
     """It should raise an error if pipette might collide with thermocycler lid on the Flex."""
     destination_well_point = Point(x=123, y=123, z=123)
     pipette_bounds_at_destination = (
-        Point(x=50, y=150, z=60),
-        Point(x=150, y=50, z=60),
-        Point(x=97, y=403, z=204.5),
-        Point(x=50, y=50, z=60),
+        Point(x=50, y=350, z=204.5),
+        Point(x=150, y=450, z=204.5),
+        Point(x=150, y=400, z=204.5),
+        Point(x=50, y=300, z=204.5),
     )
 
     decoy.when(

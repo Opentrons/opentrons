@@ -23,6 +23,15 @@ FLEX_TC_LID_CLIP_POSITIONS_IN_DECK_COORDINATES = {
     "left_clip": {"x": -3.25, "y": 402, "z": 205},
     "right_clip": {"x": 97.75, "y": 402, "z": 205},
 }
+FLEX_TC_LID_COLLISION_ZONE = {
+    "back_left": {"x": -43.25, "y": 454.9, "z": 211.91},
+    "front_right": {"x": 128.75, "y": 402, "z": 211.91},
+}
+"""
+Deck co-ordinates of the top plane of TC lid + lid clips
+of a thermocycler on a Flex.
+"""
+
 
 # TODO (spp, 2022-05-12): Python has a built-in error called `ModuleNotFoundError` so,
 #                         maybe rename this one?
