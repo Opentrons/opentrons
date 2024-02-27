@@ -342,6 +342,11 @@ def _will_collide_with_thermocycler_lid(
     between a complicated check involving accurate positions of all entities involved
     and a crude check that disallows all partial tip movements around the thermocycler.
     """
+    # TODO (spp, 2024-02-27): Improvements:
+    #  - create a complete no-go zone that includes the lid itself
+    #  - make the check dynamic according to lid state:
+    #     - if lid is open, check if pipette is in no-go zone
+    #     - if lid is closed, use the closed lid height to check for conflict
     if (
         DeckSlotName.SLOT_A1 in surrounding_regular_slots
         and engine_state.modules.is_flex_deck_with_thermocycler()

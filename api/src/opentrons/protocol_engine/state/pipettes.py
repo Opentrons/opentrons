@@ -703,7 +703,7 @@ class PipetteView(HasState[PipetteState]):
         pipette_id: str,
         destination_position: Point,
     ) -> Tuple[Point, Point, Point, Point]:
-        """Get the given pipette's bounding nozzles' positions when primary nozzle is at the given destination position."""
+        """Get the pipette's bounding offsets when primary nozzle is at the given position."""
         primary_nozzle_offset = self.get_primary_nozzle_offset(pipette_id)
         tip = self.get_attached_tip(pipette_id)
         # Primary nozzle position at destination, in deck coordinates
