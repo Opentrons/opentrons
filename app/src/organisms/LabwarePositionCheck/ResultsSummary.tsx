@@ -226,7 +226,7 @@ const TableHeader = styled('th')`
   padding: ${SPACING.spacing4};
 `
 const TableRow = styled('tr')`
-  background-color: ${COLORS.grey10};
+  background-color: ${COLORS.grey20};
 `
 
 const TableDatum = styled('td')`
