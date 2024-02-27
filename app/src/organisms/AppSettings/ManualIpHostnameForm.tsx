@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useFormik } from 'formik'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import {
   Flex,
@@ -113,6 +113,9 @@ export function ManualIpHostnameForm({
           onBlur={formik.handleBlur}
           value={formik.values.ip}
           data-testid="manual-ip-hostname-input"
+          css={css`
+            padding-left: ${SPACING.spacing8};
+          `}
         />
         <TertiaryButton
           fontSize={TYPOGRAPHY.fontSizeH6}
