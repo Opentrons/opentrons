@@ -33,7 +33,7 @@
     },
     "nozzleOffset": { "$ref": "#/definitions/xyzArray" },
     "pipetteBoundingBoxOffsets": {
-      "description": "Offsets from the pipette mount position to the back-left & front-right corners of the pipette's casing around the nozzles.",
+      "description": "Offsets from the pipette mount position to the back-left & front-right corners of the pipette's bounding box which includes the outer casing and all nozzles.",
       "type": "object",
       "properties": {
         "backLeftCorner": { "$ref": "#/definitions/xyzArray" },
