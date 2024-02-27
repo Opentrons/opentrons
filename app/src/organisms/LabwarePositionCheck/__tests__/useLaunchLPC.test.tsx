@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
 import {
   act,
   fireEvent,
@@ -9,17 +9,18 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react'
+import { describe, it, beforeEach, afterEach, vi, expect } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
-import { renderWithProviders } from '@opentrons/components'
 import {
   useCreateMaintenanceRunLabwareDefinitionMutation,
   useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { renderWithProviders } from '../../../__testing-utils__'
 import { useCreateTargetedMaintenanceRunMutation } from '../../../resources/runs/hooks'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import { fixtureTiprack300ul } from '@opentrons/shared-data'
 import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
 import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
 import { useLaunchLPC } from '../useLaunchLPC'
@@ -28,30 +29,12 @@ import { LabwarePositionCheck } from '..'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-jest.mock('../')
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../resources/runs/hooks')
-jest.mock('../useMostRecentCompletedAnalysis')
-jest.mock('../../../resources/runs/useNotifyRunQuery')
+vi.mock('../')
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../resources/runs/hooks')
+vi.mock('../useMostRecentCompletedAnalysis')
+vi.mock('../../../resources/runs/useNotifyRunQuery')
 
-const mockUseCreateTargetedMaintenanceRunMutation = useCreateTargetedMaintenanceRunMutation as jest.MockedFunction<
-  typeof useCreateTargetedMaintenanceRunMutation
->
-const mockUseCreateMaintenanceRunLabwareDefinitionMutation = useCreateMaintenanceRunLabwareDefinitionMutation as jest.MockedFunction<
-  typeof useCreateMaintenanceRunLabwareDefinitionMutation
->
-const mockUseDeleteMaintenanceRunMutation = useDeleteMaintenanceRunMutation as jest.MockedFunction<
-  typeof useDeleteMaintenanceRunMutation
->
-const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
-  typeof useNotifyRunQuery
->
-const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
-  typeof useMostRecentCompletedAnalysis
->
-const mockLabwarePositionCheck = LabwarePositionCheck as jest.MockedFunction<
-  typeof LabwarePositionCheck
->
 const MOCK_RUN_ID = 'mockRunId'
 const MOCK_MAINTENANCE_RUN_ID = 'mockMaintenanceRunId'
 const mockCurrentOffsets: LabwareOffset[] = [
@@ -71,26 +54,26 @@ const mockCurrentOffsets: LabwareOffset[] = [
     vector: { x: 0, y: 0, z: 0 },
   },
 ]
-const mockLabwareDef = fixture_tiprack_300_ul as LabwareDefinition2
+const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition2
 
 describe('useLaunchLPC hook', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
-  let mockCreateMaintenanceRun: jest.Mock
-  let mockCreateLabwareDefinition: jest.Mock
-  let mockDeleteMaintenanceRun: jest.Mock
+  let mockCreateMaintenanceRun: vi.Mock
+  let mockCreateLabwareDefinition: vi.Mock
+  let mockDeleteMaintenanceRun: vi.Mock
   const mockStore = configureStore()
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    mockCreateMaintenanceRun = jest.fn((_data, opts) => {
+    mockCreateMaintenanceRun = vi.fn((_data, opts) => {
       const results = { data: { id: MOCK_MAINTENANCE_RUN_ID } }
       opts?.onSuccess(results)
       return Promise.resolve(results)
     })
-    mockCreateLabwareDefinition = jest.fn(_data =>
+    mockCreateLabwareDefinition = vi.fn(_data =>
       Promise.resolve({ data: { definitionUri: 'fakeDefUri' } })
     )
-    mockDeleteMaintenanceRun = jest.fn((_data, opts) => {
+    mockDeleteMaintenanceRun = vi.fn((_data, opts) => {
       opts?.onSettled()
     })
     const store = mockStore({ isOnDevice: false })
@@ -101,7 +84,7 @@ describe('useLaunchLPC hook', () => {
         </QueryClientProvider>
       </Provider>
     )
-    mockLabwarePositionCheck.mockImplementation(({ onCloseClick }) => (
+    vi.mocked(LabwarePositionCheck).mockImplementation(({ onCloseClick }) => (
       <div
         onClick={() => {
           onCloseClick()
@@ -110,33 +93,33 @@ describe('useLaunchLPC hook', () => {
         exit
       </div>
     ))
-    when(mockUseNotifyRunQuery)
+    when(vi.mocked(useNotifyRunQuery))
       .calledWith(MOCK_RUN_ID, { staleTime: Infinity })
-      .mockReturnValue({
+      .thenReturn({
         data: {
           data: {
             labwareOffsets: mockCurrentOffsets,
           },
         },
       } as any)
-    when(mockUseCreateTargetedMaintenanceRunMutation)
+    when(vi.mocked(useCreateTargetedMaintenanceRunMutation))
       .calledWith()
-      .mockReturnValue({
+      .thenReturn({
         createTargetedMaintenanceRun: mockCreateMaintenanceRun,
       } as any)
-    when(mockUseCreateMaintenanceRunLabwareDefinitionMutation)
+    when(vi.mocked(useCreateMaintenanceRunLabwareDefinitionMutation))
       .calledWith()
-      .mockReturnValue({
+      .thenReturn({
         createLabwareDefinition: mockCreateLabwareDefinition,
       } as any)
-    when(mockUseDeleteMaintenanceRunMutation)
+    when(vi.mocked(useDeleteMaintenanceRunMutation))
       .calledWith()
-      .mockReturnValue({
+      .thenReturn({
         deleteMaintenanceRun: mockDeleteMaintenanceRun,
       } as any)
-    when(mockUseMostRecentCompletedAnalysis)
+    when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(MOCK_RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         commands: [
           {
             key: 'CommandKey0',
@@ -162,8 +145,7 @@ describe('useLaunchLPC hook', () => {
       } as any)
   })
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('returns and no wizard by default', () => {

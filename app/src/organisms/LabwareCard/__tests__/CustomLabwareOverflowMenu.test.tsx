@@ -67,33 +67,33 @@ describe('CustomLabwareOverflowMenu', () => {
     screen.getByRole('button', { name: 'Delete' })
   })
 
-  it('should call a mock function when canceling delete a labware definition', () => {
+  it('should call a mock function when canceling delete a labware definition', async () => {
     render(props)
     fireEvent.click(screen.getByLabelText('CustomLabwareOverflowMenu_button'))
     fireEvent.click(screen.getByRole('button', { name: 'Delete' }))
-    screen.getByText('Delete this labware definition?')
-    screen.getByText(
+    await screen.getByText('Delete this labware definition?')
+    await screen.getByText(
       'This labware definition will be moved to this computer’s trash and may be unrecoverable.'
     )
-    screen.getByText(
+    await screen.getByText(
       'Robots cannot run Python protocols with missing labware definitions.'
     )
     fireEvent.click(screen.getByText('cancel'))
     expect(mockCancel).toHaveBeenCalled()
   })
 
-  it('should call a mock function when deleting a labware definition', () => {
+  it('should call a mock function when deleting a labware definition', async () => {
     render(props)
     fireEvent.click(screen.getByLabelText('CustomLabwareOverflowMenu_button'))
     fireEvent.click(screen.getByRole('button', { name: 'Delete' }))
-    // screen.getByText('Delete this labware definition?')
-    // screen.getByText(
-    //   'This labware definition will be moved to this computer’s trash and may be unrecoverable.'
-    // )
-    // screen.getByText(
-    //   'Robots cannot run Python protocols with missing labware definitions.'
-    // )
-    // fireEvent.click(screen.getByText('Yes, delete definition'))
-    // expect(mockConfirm).toHaveBeenCalled()
+    await screen.getByText('Delete this labware definition?')
+    await screen.getByText(
+      'This labware definition will be moved to this computer’s trash and may be unrecoverable.'
+    )
+    await screen.getByText(
+      'Robots cannot run Python protocols with missing labware definitions.'
+    )
+    fireEvent.click(screen.getByText('Yes, delete definition'))
+    expect(mockConfirm).toHaveBeenCalled()
   })
 })
