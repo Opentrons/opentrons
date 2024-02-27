@@ -43,6 +43,8 @@ async def test_load_pipette_implementation(
         nominal_tip_overlap={},
         back_left_nozzle_offset=Point(x=1, y=2, z=3),
         front_right_nozzle_offset=Point(x=4, y=5, z=6),
+        back_left_corner_offset=Point(x=1, y=2, z=3),
+        front_right_corner_offset=Point(x=4, y=5, z=6),
     )
     data = LoadPipetteParams(
         pipetteName=PipetteNameType.P300_SINGLE,
@@ -100,6 +102,8 @@ async def test_load_pipette_implementation_96_channel(
         nominal_tip_overlap={},
         back_left_nozzle_offset=Point(x=1, y=2, z=3),
         front_right_nozzle_offset=Point(x=4, y=5, z=6),
+        back_left_corner_offset=Point(x=1, y=2, z=3),
+        front_right_corner_offset=Point(x=4, y=5, z=6),
     )
 
     decoy.when(

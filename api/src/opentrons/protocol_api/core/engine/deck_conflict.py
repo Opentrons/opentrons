@@ -14,7 +14,7 @@ from typing import (
 )
 
 from opentrons_shared_data.errors.exceptions import MotionPlanningFailureError
-from opentrons_shared_data.module import FLEX_TC_LID_CLIP_POSITIONS_IN_DECK_COORDINATES
+from opentrons_shared_data.module import FLEX_TC_LID_COLLISION_ZONE
 
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons.hardware_control.modules.types import ModuleType
@@ -34,9 +34,9 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.errors.exceptions import LabwareNotLoadedOnModuleError
 from opentrons.protocol_engine.types import (
     StagingSlotLocation,
-    Dimensions,
 )
 from opentrons.types import DeckSlotName, StagingSlotName, Point
+from . import point_calculations
 from ..._trash_bin import TrashBin
 from ..._waste_chute import WasteChute
 
@@ -81,6 +81,18 @@ A1_column_back_right_bound = Point(
 
 # Arbitrary safety margin in z-direction
 Z_SAFETY_MARGIN = 10
+
+_FLEX_TC_LID_BACK_LEFT_PT = Point(
+    x=FLEX_TC_LID_COLLISION_ZONE["back_left"]["x"],
+    y=FLEX_TC_LID_COLLISION_ZONE["back_left"]["y"],
+    z=FLEX_TC_LID_COLLISION_ZONE["back_left"]["z"],
+)
+
+_FLEX_TC_LID_FRONT_RIGHT_PT = Point(
+    x=FLEX_TC_LID_COLLISION_ZONE["front_right"]["x"],
+    y=FLEX_TC_LID_COLLISION_ZONE["front_right"]["y"],
+    z=FLEX_TC_LID_COLLISION_ZONE["front_right"]["z"],
+)
 
 
 @overload
@@ -246,9 +258,8 @@ def check_safe_for_pipette_movement(
 
     labware_slot = engine_state.geometry.get_ancestor_slot_name(labware_id)
     pipette_bounds_at_well_location = (
-        engine_state.pipettes.get_nozzle_bounds_at_specified_move_to_position(
-            pipette_id=pipette_id,
-            destination_position=well_location_point,
+        engine_state.pipettes.get_pipette_bounds_at_specified_move_to_position(
+            pipette_id=pipette_id, destination_position=well_location_point
         )
     )
     surrounding_slots = adjacent_slots_getters.get_surrounding_slots(
@@ -305,11 +316,14 @@ def _slot_has_potential_colliding_object(
         addressable_area_name=surrounding_slot.id,
         do_compatibility_check=False,
     )
-    for bound_vertex in pipette_bounds:
-        if not _point_overlaps_with_slot(
-            slot_pos, slot_bounds, nozzle_point=bound_vertex
-        ):
-            continue
+    slot_back_left_coords = Point(slot_pos.x, slot_pos.y + slot_bounds.y, slot_pos.z)
+    slot_front_right_coords = Point(slot_pos.x + slot_bounds.x, slot_pos.y, slot_pos.z)
+
+    # If slot overlaps with pipette bounds
+    if point_calculations.are_overlapping_rectangles(
+        rectangle1=(pipette_bounds[0], pipette_bounds[1]),
+        rectangle2=(slot_back_left_coords, slot_front_right_coords),
+    ):
         # Check z-height of items in overlapping slot
         if isinstance(surrounding_slot, DeckSlotName):
             slot_highest_z = engine_state.geometry.get_highest_z_in_slot(
@@ -319,8 +333,7 @@ def _slot_has_potential_colliding_object(
             slot_highest_z = engine_state.geometry.get_highest_z_in_slot(
                 StagingSlotLocation(slotName=surrounding_slot)
             )
-        if slot_highest_z + Z_SAFETY_MARGIN > pipette_bounds[0].z:
-            return True
+        return slot_highest_z + Z_SAFETY_MARGIN > pipette_bounds[0].z
     return False
 
 
@@ -341,31 +354,23 @@ def _will_collide_with_thermocycler_lid(
     between a complicated check involving accurate positions of all entities involved
     and a crude check that disallows all partial tip movements around the thermocycler.
     """
+    # TODO (spp, 2024-02-27): Improvements:
+    #  - make the check dynamic according to lid state:
+    #     - if lid is open, check if pipette is in no-go zone
+    #     - if lid is closed, use the closed lid height to check for conflict
     if (
         DeckSlotName.SLOT_A1 in surrounding_regular_slots
         and engine_state.modules.is_flex_deck_with_thermocycler()
     ):
-        tc_right_clip_pos = FLEX_TC_LID_CLIP_POSITIONS_IN_DECK_COORDINATES["right_clip"]
-        for bound_vertex in pipette_bounds:
-            if (
-                bound_vertex.x <= tc_right_clip_pos["x"]
-                and bound_vertex.y >= tc_right_clip_pos["y"]
-                and bound_vertex.z <= tc_right_clip_pos["z"]
-            ):
-                return True
+        return (
+            point_calculations.are_overlapping_rectangles(
+                rectangle1=(_FLEX_TC_LID_BACK_LEFT_PT, _FLEX_TC_LID_FRONT_RIGHT_PT),
+                rectangle2=(pipette_bounds[0], pipette_bounds[1]),
+            )
+            and pipette_bounds[0].z <= _FLEX_TC_LID_BACK_LEFT_PT.z
+        )
+
     return False
-
-
-def _point_overlaps_with_slot(
-    slot_position: Point,
-    slot_dimensions: Dimensions,
-    nozzle_point: Point,
-) -> bool:
-    """Check if the given nozzle point overlaps with any slot area in x & y"""
-    return (
-        slot_position.x <= nozzle_point.x <= slot_position.x + slot_dimensions.x
-        and slot_position.y <= nozzle_point.y <= slot_position.y + slot_dimensions.y
-    )
 
 
 def check_safe_for_tip_pickup_and_return(

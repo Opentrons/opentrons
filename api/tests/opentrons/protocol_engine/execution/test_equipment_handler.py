@@ -149,6 +149,8 @@ def loaded_static_pipette_data(
         nozzle_offset_z=12.13,
         back_left_nozzle_offset=Point(x=1, y=2, z=3),
         front_right_nozzle_offset=Point(x=4, y=5, z=6),
+        back_left_corner_offset=Point(x=1, y=2, z=3),
+        front_right_corner_offset=Point(x=4, y=5, z=6),
     )
 
 
