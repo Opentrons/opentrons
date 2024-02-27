@@ -1,3 +1,4 @@
+import { beforeEach, describe, it, expect, vi } from 'vitest'
 import {
   getNextRobotStateAndWarningsSingleCommand,
   getNextRobotStateAndWarnings,
@@ -9,7 +10,7 @@ import {
 } from '../utils'
 import { DEFAULT_CONFIG } from '../fixtures'
 import type { InvariantContext } from '../types'
-jest.mock('../getNextRobotStateAndWarnings')
+vi.mock('../getNextRobotStateAndWarnings')
 
 let invariantContext: InvariantContext
 

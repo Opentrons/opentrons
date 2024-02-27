@@ -7,6 +7,8 @@ import fixtureTiprack300ul from '../labware/fixtures/2/fixture_tiprack_300_ul.js
 import fixtureTiprack1000ul from '../labware/fixtures/2/fixture_flex_96_tiprack_1000ul.json'
 import fixtureTiprackAdapter from '../labware/fixtures/2/fixture_flex_96_tiprack_adapter.json'
 import fixtureCalibrationBlock from '../labware/fixtures/2/fixture_calibration_block.json'
+import fixture384Plate from '../labware/fixtures/2/fixture_384_plate.json'
+import fixtureTrash from '../labware/fixtures/2/fixture_trash.json'
 import { getLabwareDefURI } from './helpers/index'
 
 // v2 labware definitions
@@ -558,6 +560,8 @@ export {
   fixtureTiprackAdapter,
   opentrons96PcrAdapterV1,
   opentrons1Trash3200MlFixedV1,
+  fixtureTrash,
+  fixture384Plate,
   fixtureCalibrationBlock,
   opentrons96Tiprack10UlV1Uncasted,
 }

@@ -1,7 +1,9 @@
-import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import _fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
-import _fixture384Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_384_plate.json'
-
+import { beforeEach, describe, it, expect } from 'vitest'
+import {
+  fixture12Trough as _fixture12Trough,
+  fixture96Plate as _fixture96Plate,
+  fixture384Plate as _fixture384Plate,
+} from '@opentrons/shared-data'
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import produce from 'immer'
