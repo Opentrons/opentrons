@@ -28,7 +28,7 @@ import { InputField } from '../../../../../atoms/InputField'
 import { Banner } from '../../../../../atoms/Banner'
 import { useIsFlex } from '../../../hooks'
 
-import { Resolver, FieldError } from 'react-hook-form'
+import type { Resolver, FieldError } from 'react-hook-form'
 import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { State, Dispatch } from '../../../../../redux/types'
 interface RenameRobotSlideoutProps {

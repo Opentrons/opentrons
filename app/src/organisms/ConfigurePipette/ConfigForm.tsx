@@ -56,44 +56,6 @@ export function ConfigForm(props: ConfigFormProps): JSX.Element {
     groupLabels,
   } = props
 
-  const getInitialValues: () => FormValues = () => {
-    const fields = getVisibleFields()
-    const initialFieldValues = mapValues<
-      PipetteSettingsFieldsMap,
-      string | boolean
-    >(fields, f => {
-      if (f.value === true || f.value === false) return f.value
-      // @ts-expect-error(sa, 2021-05-27): avoiding src code change, use optional chain to access f.value
-      return f.value !== f.default ? f.value.toString() : ''
-    })
-    const initialQuirkValues = settings[QUIRK_KEY]
-    const initialValues = Object.assign(
-      {},
-      initialFieldValues,
-      initialQuirkValues
-    )
-
-    return initialValues
-  }
-  const initialValues = getInitialValues()
-
-  const resolver: Resolver<FormValues> = values => {
-    let errors = {}
-    errors = validate(values, errors)
-    return { values, errors }
-  }
-
-  const {
-    handleSubmit,
-    reset,
-    getValues,
-    control,
-    formState: { errors },
-  } = useForm<FormValues>({
-    defaultValues: initialValues,
-    resolver: resolver,
-  })
-
   const getFieldsByKey = (
     keys: string[],
     fields: PipetteSettingsFieldsMap
@@ -205,6 +167,26 @@ export function ConfigForm(props: ConfigFormProps): JSX.Element {
     return errors
   }
 
+  const getInitialValues: () => FormValues = () => {
+    const fields = getVisibleFields()
+    const initialFieldValues = mapValues<
+      PipetteSettingsFieldsMap,
+      string | boolean
+    >(fields, f => {
+      if (f.value === true || f.value === false) return f.value
+      // @ts-expect-error(sa, 2021-05-27): avoiding src code change, use optional chain to access f.value
+      return f.value !== f.default ? f.value.toString() : ''
+    })
+    const initialQuirkValues = settings[QUIRK_KEY]
+    const initialValues = Object.assign(
+      {},
+      initialFieldValues,
+      initialQuirkValues
+    )
+
+    return initialValues
+  }
+
   const fields = getVisibleFields()
   const UNKNOWN_KEYS = getUnknownKeys()
   const plungerFields = getFieldsByKey(PLUNGER_KEYS, fields)
@@ -213,6 +195,24 @@ export function ConfigForm(props: ConfigFormProps): JSX.Element {
   const quirkFields = getKnownQuirks()
   const quirksPresent = quirkFields.length > 0
   const unknownFields = getFieldsByKey(UNKNOWN_KEYS, fields)
+  const initialValues = getInitialValues()
+
+  const resolver: Resolver<FormValues> = values => {
+    let errors = {}
+    errors = validate(values, errors)
+    return { values, errors }
+  }
+
+  const {
+    handleSubmit,
+    reset,
+    getValues,
+    control,
+    formState: { errors },
+  } = useForm<FormValues>({
+    defaultValues: initialValues,
+    resolver: resolver,
+  })
 
   const handleReset = (): void => {
     const newValues = mapValues(getValues(), v => {
