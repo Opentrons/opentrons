@@ -10,9 +10,7 @@ import requests
 
 
 def get_run_ids_from_storage(storage_directory: str) -> Set[str]:
-    """Read all files in long term storage directory and read run id.
-    Add run id to a set. Return run id set.
-    """
+    """Read all files in storage directory, extracts run id, adds to set."""
     os.makedirs(storage_directory, exist_ok=True)
     list_of_files = os.listdir(storage_directory)
     run_ids = set()
@@ -109,7 +107,9 @@ def save_runs(runs_to_save: Set[str], ip: str, storage_directory: str) -> None:
 
 
 def get_all_run_logs(storage_directory: str) -> None:
-    """Connect to each ABR robot to read run log data.
+    """GET ALL RUN LOGS.
+
+    Connect to each ABR robot to read run log data.
     Read each robot's list of unique run log IDs and compare them to all IDs in storage.
     Any ID that is not in storage, download the run log and put it in storage.
     """
@@ -125,6 +125,7 @@ def get_all_run_logs(storage_directory: str) -> None:
 
 
 if __name__ == "__main__":
+    """Get run logs."""
     parser = argparse.ArgumentParser(description="Pulls run logs from ABR robots.")
     parser.add_argument(
         "storage_directory",
