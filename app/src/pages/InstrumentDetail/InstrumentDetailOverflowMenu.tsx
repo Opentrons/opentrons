@@ -41,7 +41,7 @@ export const handleInstrumentDetailOverflowMenu = (
   instrument: InstrumentDetailsOverflowMenuProps['instrument'],
   host: InstrumentDetailsOverflowMenuProps['host']
 ): void => {
-  NiceModal.show(InstrumentDetailsOverflowMenu, { instrument })
+  NiceModal.show(InstrumentDetailsOverflowMenu, { instrument, host })
 }
 
 const InstrumentDetailsOverflowMenu = NiceModal.create(
