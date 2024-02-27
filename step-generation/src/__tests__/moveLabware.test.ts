@@ -1,3 +1,4 @@
+import { beforeEach, describe, it, expect, afterEach, vi } from 'vitest'
 import {
   HEATERSHAKER_MODULE_TYPE,
   LabwareDefinition2,
@@ -38,7 +39,7 @@ describe('moveLabware', () => {
     }
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
   it('should return a moveLabware command for manualMoveWithPause given only the required params', () => {
     const params = {

@@ -1,3 +1,4 @@
+import { expect } from 'vitest'
 import { tiprackWellNamesFlat } from './data'
 import {
   AddressableAreaName,

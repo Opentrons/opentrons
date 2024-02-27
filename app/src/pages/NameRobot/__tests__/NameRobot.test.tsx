@@ -1,9 +1,10 @@
 import * as React from 'react'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 
 import { i18n } from '../../../i18n'
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { useTrackEvent } from '../../../redux/analytics'
 import {
   getConnectableRobots,
@@ -16,35 +17,24 @@ import {
 } from '../../../redux/discovery/__fixtures__'
 
 import { NameRobot } from '..'
+import type * as ReactRouterDom from 'react-router-dom'
 
-jest.mock('../../../redux/discovery/selectors')
-jest.mock('../../../redux/config')
-jest.mock('../../../redux/analytics')
-jest.mock('../../../organisms/RobotSettingsDashboard/NetworkSettings/hooks')
+vi.mock('../../../redux/discovery/selectors')
+vi.mock('../../../redux/config')
+vi.mock('../../../redux/analytics')
+vi.mock('../../../organisms/RobotSettingsDashboard/NetworkSettings/hooks')
 
-const mockPush = jest.fn()
+const mockPush = vi.fn()
 
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<typeof ReactRouterDom>()
   return {
-    ...reactRouterDom,
+    ...actual,
     useHistory: () => ({ push: mockPush } as any),
   }
 })
 
-const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
-  typeof getConnectableRobots
->
-const mockGetReachableRobots = getReachableRobots as jest.MockedFunction<
-  typeof getReachableRobots
->
-const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
-  typeof useTrackEvent
->
-const mockuseIsUnboxingFlowOngoing = useIsUnboxingFlowOngoing as jest.MockedFunction<
-  typeof useIsUnboxingFlowOngoing
->
-let mockTrackEvent: jest.Mock
+const mockTrackEvent = vi.fn()
 
 const render = () => {
   return renderWithProviders(
@@ -57,13 +47,12 @@ const render = () => {
 
 describe('NameRobot', () => {
   beforeEach(() => {
-    mockTrackEvent = jest.fn()
-    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
+    vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
     mockConnectableRobot.name = 'connectableOtie'
     mockReachableRobot.name = 'reachableOtie'
-    mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
-    mockGetReachableRobots.mockReturnValue([mockReachableRobot])
-    mockuseIsUnboxingFlowOngoing.mockReturnValue(true)
+    vi.mocked(getConnectableRobots).mockReturnValue([mockConnectableRobot])
+    vi.mocked(getReachableRobots).mockReturnValue([mockReachableRobot])
+    vi.mocked(useIsUnboxingFlowOngoing).mockReturnValue(true)
   })
 
   it('should render text, button and keyboard', () => {
@@ -139,7 +128,7 @@ describe('NameRobot', () => {
   })
 
   it('should render text and button when coming from robot settings', () => {
-    mockuseIsUnboxingFlowOngoing.mockReturnValue(false)
+    vi.mocked(useIsUnboxingFlowOngoing).mockReturnValue(false)
     render()
     screen.getByText('Rename robot')
     expect(
@@ -152,7 +141,7 @@ describe('NameRobot', () => {
   })
 
   it('should call a mock function when tapping back button', () => {
-    mockuseIsUnboxingFlowOngoing.mockReturnValue(false)
+    vi.mocked(useIsUnboxingFlowOngoing).mockReturnValue(false)
     render()
     fireEvent.click(screen.getByTestId('name_back_button'))
     expect(mockPush).toHaveBeenCalledWith('/robot-settings')

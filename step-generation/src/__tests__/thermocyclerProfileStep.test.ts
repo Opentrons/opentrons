@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 import { thermocyclerProfileStep } from '../commandCreators/compound/thermocyclerProfileStep'
 import {
