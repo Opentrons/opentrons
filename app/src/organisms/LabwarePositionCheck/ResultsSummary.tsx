@@ -156,6 +156,10 @@ export const ResultsSummary = (
         flexDirection={DIRECTION_COLUMN}
         maxHeight="20rem"
         overflowY="scroll"
+        css={css`
+          overflow: hidden;
+          scrollbar-gutter: stable;
+        `}
       >
         <Header>{t('new_labware_offset_data')}</Header>
         {isLabwareOffsetCodeSnippetsOn ? (
@@ -226,7 +230,7 @@ const TableHeader = styled('th')`
   padding: ${SPACING.spacing4};
 `
 const TableRow = styled('tr')`
-  background-color: ${COLORS.grey10};
+  background-color: ${COLORS.grey20};
 `
 
 const TableDatum = styled('td')`

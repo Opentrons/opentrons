@@ -40,6 +40,7 @@ const EQUIPMENT_OPTION_SELECTED_STYLE = css`
   &:hover {
     background-color: ${COLORS.blue10};
     border: 1px ${BORDERS.styleSolid} ${COLORS.blue50};
+    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2);
   }
 `
 
