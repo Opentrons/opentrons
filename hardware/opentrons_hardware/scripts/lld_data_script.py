@@ -112,7 +112,6 @@ def running_avg(
         # there are kinda drastic changes in avg derivative in the very beginning
         if tick_func(float(pressure[i])):
         # if average < running_avg_threshold:
-            # breakpoint()
             #print(f"found z height = {z_travel[i]}")
             #print(f"at time = {time[i]}")
             return_val = time[i], z_travel[i], p_travel[i]
@@ -131,8 +130,9 @@ def running_avg(
 def run(args: argparse.Namespace, reset_func, tick_func):
 
     path = args.filepath + "/"
-    for run_file in os.listdir(args.filepath):
-        with open(path + run_file, "r") as file:
+    report_files = [file for file in os.listdir(args.filepath) if file == "final_report.csv"]
+    for report_file in report_files:
+        with open(path + report_file, "r") as file:
             reader = csv.reader(file)
             reader_list = list(reader)
 
@@ -142,12 +142,7 @@ def run(args: argparse.Namespace, reset_func, tick_func):
         # have a time list for each trial so the list lengths can all be equal
         results: List[float] = []
         for trial in range(number_of_trials):
-            #print(f"Trial {trial}:")
-            #print(f"Expected z height: {expected_height}")
 
-            # pressure = reader_list[63:][3 * trial + 1]
-            # z_travel = reader_list[63:][3 * trial + 2]
-            # p_travel = reader_list[63:][3 * trial + 3]
             time = []
             pressure = []
             z_travel = []
@@ -208,7 +203,7 @@ def main() -> None:
 
     function_pairs = [("threshold", reset_th, tick_th), ("simple moving avg der", reset_smad, tick_smad), ("weighted moving avg der", reset_wmad,tick_wmad), ("exponential moving avg der", reset_emad, tick_emad)]
     for name, reset_func, tick_func in function_pairs:
-        print(f"Algorythm {name}")
+        print(f"Algorithm {name}")
         run(args, reset_func, tick_func)
 
 
