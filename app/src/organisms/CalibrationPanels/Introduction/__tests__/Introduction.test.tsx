@@ -1,23 +1,21 @@
 import * as React from 'react'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
 
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { mockCalibrationCheckLabware } from '../../../../redux/sessions/__fixtures__'
 import * as Sessions from '../../../../redux/sessions'
 import { i18n } from '../../../../i18n'
 import { Introduction } from '../'
 import { ChooseTipRack } from '../../ChooseTipRack'
 
-jest.mock('../../ChooseTipRack')
+vi.mock('../../ChooseTipRack')
 
-const mockChooseTipRack = ChooseTipRack as jest.MockedFunction<
-  typeof ChooseTipRack
->
-const mockCalInvalidationHandler = jest.fn()
+const mockCalInvalidationHandler = vi.fn()
 
 describe('Introduction', () => {
-  const mockSendCommands = jest.fn()
-  const mockCleanUpAndExit = jest.fn()
+  const mockSendCommands = vi.fn()
+  const mockCleanUpAndExit = vi.fn()
 
   const render = (
     props: Partial<React.ComponentProps<typeof Introduction>> = {}
@@ -39,11 +37,11 @@ describe('Introduction', () => {
     )
   }
   beforeEach(() => {
-    mockChooseTipRack.mockReturnValue(<div>mock choose tip rack</div>)
+    vi.mocked(ChooseTipRack).mockReturnValue(<div>mock choose tip rack</div>)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders correct text', () => {

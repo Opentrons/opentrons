@@ -19,7 +19,9 @@ vi.mock('../remote')
 // TODO(mc, 2020-10-08): this is a partial mock because shell/update
 // needs some reorg to split actions and selectors
 vi.mock('../update', async importOriginal => {
-  const actual = (await importOriginal()) as any
+  const actual = await importOriginal<
+    typeof ShellUpdate.getAvailableShellUpdate
+  >()
   return {
     ...actual,
     getAvailableShellUpdate: vi.fn(),

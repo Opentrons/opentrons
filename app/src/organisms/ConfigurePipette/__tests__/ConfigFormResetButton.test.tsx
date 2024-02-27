@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { vi, it, expect, describe, beforeEach } from 'vitest'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ConfigFormResetButton } from '../ConfigFormResetButton'
 
@@ -14,12 +16,9 @@ describe('ConfigFormResetButton', () => {
   let props: React.ComponentProps<typeof ConfigFormResetButton>
   beforeEach(() => {
     props = {
-      onClick: jest.fn(),
+      onClick: vi.fn(),
       disabled: false,
     }
-  })
-  afterEach(() => {
-    jest.resetAllMocks()
   })
 
   it('renders text and not disabled', () => {
@@ -36,7 +35,7 @@ describe('ConfigFormResetButton', () => {
   })
   it('renders button text and is disabled', () => {
     props = {
-      onClick: jest.fn(),
+      onClick: vi.fn(),
       disabled: true,
     }
     const { getByRole } = render(props)

@@ -1,7 +1,7 @@
 import * as React from 'react'
+import { it, describe } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { InvalidationWarning } from '../InvalidationWarning'
 
