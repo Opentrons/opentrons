@@ -9,7 +9,8 @@ from typing import Set, Dict, Any
 
 
 def get_run_ids_from_storage(storage_directory: str) -> Set[str]:
-    """Read all files in long term storage directory and read run id. Add run id to a set. Return run id set."""
+    """Read all files in long term storage directory and read run id.
+    Add run id to a set. Return run id set."""
     os.makedirs(storage_directory, exist_ok=True)
     list_of_files = os.listdir(storage_directory)
     run_ids = set()
@@ -47,6 +48,7 @@ def get_run_ids_from_robot(ip: str) -> Set[str]:
 
 
 def get_run_data(one_run: Any, ip: str) -> Dict[str, Any]:
+    """Use http requests to get command, health, and protocol data from robot."""
     response = requests.get(
         f"http://{ip}:31950/runs/{one_run}/commands",
         headers={"opentrons-version": "3"},
@@ -84,7 +86,7 @@ def get_run_data(one_run: Any, ip: str) -> Dict[str, Any]:
     robot_name = health_data["name"]
     try:
         robot_serial = health_data["robot_serial"]
-    except:
+    except UnboundLocalError:
         robot_serial = "unknown"
     run["robot_name"] = robot_name
     run["run_id"] = one_run
@@ -93,6 +95,7 @@ def get_run_data(one_run: Any, ip: str) -> Dict[str, Any]:
 
 
 def save_runs(runs_to_save: Set[str], ip: str, storage_directory: str) -> None:
+    """Saves runs to user given storage directory."""
     for a_run in runs_to_save:
         data = get_run_data(a_run, ip)
         robot_name = data["robot_name"]
@@ -101,14 +104,12 @@ def save_runs(runs_to_save: Set[str], ip: str, storage_directory: str) -> None:
     print(
         f"Saved {len(runs_to_save)} run(s) from robot {robot_name} with IP address {ip}."
     )
-    pass
 
 
-def get_all_run_logs(storage_directory: str):
+def get_all_run_logs(storage_directory: str) -> None:
     """Connect to each ABR robot to read run log data.
-    Read each robot's list of unique run log IDs and compare them to all IDs for all of the runs in storage.
+    Read each robot's list of unique run log IDs and compare them to all IDs in storage.
     Any ID that is not in storage, download the run log and put it in storage."""
-
     runs_from_storage = get_run_ids_from_storage(storage_directory)
     for ip in ABR_IPS:
         try:
@@ -118,7 +119,6 @@ def get_all_run_logs(storage_directory: str):
         except Exception:
             print(f"Failed to read IP address: {ip}.")
             traceback.print_exc()
-    pass
 
 
 if __name__ == "__main__":
