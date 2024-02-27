@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useFormik } from 'formik'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 
 import {
   Flex,
