@@ -37,6 +37,7 @@ const StyledInput = styled.input`
   border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
   height: ${SIZE_2};
   font-size: ${TYPOGRAPHY.fontSizeP};
+  padding-left: ${SPACING.spacing8};
 
   &:active {
     border: 1px ${BORDERS.styleSolid} ${COLORS.grey50};
@@ -113,9 +114,6 @@ export function ManualIpHostnameForm({
           onBlur={formik.handleBlur}
           value={formik.values.ip}
           data-testid="manual-ip-hostname-input"
-          css={css`
-            padding-left: ${SPACING.spacing8};
-          `}
         />
         <TertiaryButton
           fontSize={TYPOGRAPHY.fontSizeH6}
