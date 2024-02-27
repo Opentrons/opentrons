@@ -24,6 +24,8 @@ robot_list = [
     "PVT1ABR10",
     "PVT1ABR11",
     "PVT1ABR12",
+    "ROOM_339",
+    "ROOM_340",
 ]
 # Labware per Robot
 labware_DVT1ABR4 = [
