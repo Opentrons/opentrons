@@ -32,6 +32,7 @@ interface ConnectModalComponentProps extends ConnectModalProps {
   isValid: boolean
   values: ConnectFormValues
   control: Control<ConnectFormValues, any>
+  id: string
 }
 
 export const ConnectModal = (props: ConnectModalProps): JSX.Element => {
@@ -60,14 +61,16 @@ export const ConnectModal = (props: ConnectModalProps): JSX.Element => {
   })
 
   const values = getValues()
+  const id = `ConnectForm__${props.robotName}`
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)} id={id}>
       <ConnectModalComponent
         {...props}
         control={control}
         values={values}
         isValid={isValid}
+        id={id}
       />
     </form>
   )
@@ -84,10 +87,10 @@ export const ConnectModalComponent = (
     onCancel,
     values,
     isValid,
+    id,
     control,
   } = props
 
-  const id = `ConnectForm__${robotName}`
   const fields = getConnectFormFields(
     network,
     robotName,
