@@ -1,8 +1,9 @@
 import React from 'react'
 import NiceModal from '@ebay/nice-modal-react'
-import { fireEvent } from '@testing-library/react'
+import { describe, it, beforeEach, expect, vi } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 
 import { handleTipsAttachedModal } from '../TipsAttachedModal'
@@ -13,7 +14,7 @@ import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_r
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
-jest.mock('../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
+vi.mock('../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
 
 const MOCK_ACTUAL_PIPETTE = {
   ...mockPipetteInfo.pipetteSpecs,
@@ -23,10 +24,7 @@ const MOCK_ACTUAL_PIPETTE = {
   },
 } as PipetteModelSpecs
 
-const mockOnClose = jest.fn()
-const mockUseNotifyCurrentMaintenanceRun = useNotifyCurrentMaintenanceRun as jest.MockedFunction<
-  typeof useNotifyCurrentMaintenanceRun
->
+const mockOnClose = vi.fn()
 
 const render = (pipetteSpecs: PipetteModelSpecs) => {
   return renderWithProviders(
@@ -51,7 +49,7 @@ const render = (pipetteSpecs: PipetteModelSpecs) => {
 
 describe('TipsAttachedModal', () => {
   beforeEach(() => {
-    mockUseNotifyCurrentMaintenanceRun.mockReturnValue({
+    vi.mocked(useNotifyCurrentMaintenanceRun).mockReturnValue({
       data: {
         data: {
           id: 'test',
@@ -60,37 +58,31 @@ describe('TipsAttachedModal', () => {
     } as any)
   })
 
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('renders appropriate warning given the pipette mount', () => {
-    const [{ getByTestId, getByText, queryByText }] = render(
-      MOCK_ACTUAL_PIPETTE
-    )
-    const btn = getByTestId('testButton')
+    render(MOCK_ACTUAL_PIPETTE)
+    const btn = screen.getByTestId('testButton')
     fireEvent.click(btn)
 
-    getByText('Tips are attached')
-    queryByText(`${LEFT} Pipette`)
+    screen.getByText('Tips are attached')
+    screen.queryByText(`${LEFT} Pipette`)
   })
   it('clicking the close button properly closes the modal', () => {
-    const [{ getByTestId, getByText }] = render(MOCK_ACTUAL_PIPETTE)
-    const btn = getByTestId('testButton')
+    render(MOCK_ACTUAL_PIPETTE)
+    const btn = screen.getByTestId('testButton')
     fireEvent.click(btn)
 
-    const skipBtn = getByText('Skip')
+    const skipBtn = screen.getByText('Skip')
     fireEvent.click(skipBtn)
     expect(mockOnClose).toHaveBeenCalled()
   })
   it('clicking the launch wizard button properly launches the wizard', () => {
-    const [{ getByTestId, getByText }] = render(MOCK_ACTUAL_PIPETTE)
-    const btn = getByTestId('testButton')
+    render(MOCK_ACTUAL_PIPETTE)
+    const btn = screen.getByTestId('testButton')
     fireEvent.click(btn)
 
-    const skipBtn = getByText('Begin removal')
+    const skipBtn = screen.getByText('Begin removal')
     fireEvent.click(skipBtn)
-    getByText('Drop tips')
+    screen.queryByText('Drop tips')
   })
   it('renders special text when the pipette is a 96-Channel', () => {
     const ninetySixSpecs = {
@@ -98,12 +90,12 @@ describe('TipsAttachedModal', () => {
       channels: 96,
     } as PipetteModelSpecs
 
-    const [{ getByTestId, queryByText, getByText }] = render(ninetySixSpecs)
-    const btn = getByTestId('testButton')
+    render(ninetySixSpecs)
+    const btn = screen.getByTestId('testButton')
     fireEvent.click(btn)
 
-    const skipBtn = getByText('Begin removal')
+    const skipBtn = screen.getByText('Begin removal')
     fireEvent.click(skipBtn)
-    queryByText('96-Channel')
+    screen.queryByText('96-Channel')
   })
 })

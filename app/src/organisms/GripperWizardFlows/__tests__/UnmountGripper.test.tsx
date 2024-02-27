@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { instrumentsResponseFixture } from '@opentrons/api-client'
 import { i18n } from '../../../i18n'
 
@@ -8,7 +9,7 @@ import { UnmountGripper } from '../UnmountGripper'
 import { GRIPPER_FLOW_TYPES } from '../constants'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 
-jest.mock('@opentrons/react-api-client')
+vi.mock('@opentrons/react-api-client')
 
 const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
   typeof useInstrumentsQuery
@@ -16,11 +17,11 @@ const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
 
 const mockRunId = 'fakeRunId'
 describe('UnmountGripper', () => {
-  let mockRefetch: jest.Mock
-  let mockGoBack: jest.Mock
-  let mockProceed: jest.Mock
-  let mockChainRunCommands: jest.Mock
-  let mockSetErrorMessage: jest.Mock
+  let mockRefetch: any
+  let mockGoBack: any
+  let mockProceed: any
+  let mockChainRunCommands: any
+  let mockSetErrorMessage: any
   const render = (
     props: Partial<React.ComponentProps<typeof UnmountGripper>> = {}
   ) => {
@@ -42,14 +43,10 @@ describe('UnmountGripper', () => {
   }
 
   beforeEach(() => {
-    mockGoBack = jest.fn()
-    mockProceed = jest.fn()
-    mockChainRunCommands = jest.fn(() => Promise.resolve())
-    mockRefetch = jest.fn(() => Promise.resolve())
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
+    mockGoBack = vi.fn()
+    mockProceed = vi.fn()
+    mockChainRunCommands = vi.fn(() => Promise.resolve())
+    mockRefetch = vi.fn(() => Promise.resolve())
   })
 
   it('clicking confirm proceed calls home and proceed if gripper detached', async () => {

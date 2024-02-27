@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 
 import {
   AlertModal,
@@ -11,7 +12,7 @@ import {
   Text,
 } from '@opentrons/components'
 
-import { Portal } from '../../App/portal'
+import { getModalPortalEl } from '../../App/portal'
 
 import styles from './styles.module.css'
 
@@ -41,8 +42,7 @@ interface Props {
 export function ConfirmRecalibrationModal(props: Props): JSX.Element {
   const { confirm, cancel, tiprackDisplayName } = props
 
-  return (
-    <Portal>
+  return createPortal(
       <AlertModal
         className={styles.alert_modal_padding}
         iconName={null}
@@ -78,7 +78,7 @@ export function ConfirmRecalibrationModal(props: Props): JSX.Element {
           </SecondaryBtn>
           <SecondaryBtn onClick={cancel}>{CANCEL}</SecondaryBtn>
         </Flex>
-      </AlertModal>
-    </Portal>
+      </AlertModal>,
+      getModalPortalEl()
   )
 }

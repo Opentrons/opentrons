@@ -1,5 +1,6 @@
 // Pipette Offset Calibration Orchestration Component
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 
@@ -21,7 +22,7 @@ import {
 } from '../../organisms/CalibrationPanels'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 
 import type { Mount } from '@opentrons/components'
 import type {
@@ -121,8 +122,7 @@ export function CalibratePipetteOffset(
     currentStep != null && currentStep in PANEL_BY_STEP
       ? PANEL_BY_STEP[currentStep]
       : null
-  return (
-    <Portal level="top">
+  return createPortal(
       <LegacyModalShell
         width="47rem"
         header={
@@ -164,8 +164,8 @@ export function CalibratePipetteOffset(
             defaultTipracks={instrument?.defaultTipracks}
           />
         )}
-      </LegacyModalShell>
-    </Portal>
+      </LegacyModalShell>,
+      getTopPortalEl()
   )
 }
 

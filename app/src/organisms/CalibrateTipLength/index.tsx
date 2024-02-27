@@ -1,5 +1,6 @@
 // Tip Length Calibration Orchestration Component
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { css } from 'styled-components'
@@ -22,7 +23,7 @@ import {
 } from '../../organisms/CalibrationPanels'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 
 import slotOneRemoveBlockAsset from '../../assets/videos/tip-length-cal/Slot_1_Remove_CalBlock_(330x260)REV1.webm'
 import slotThreeRemoveBlockAsset from '../../assets/videos/tip-length-cal/Slot_3_Remove_CalBlock_(330x260)REV1.webm'
@@ -135,8 +136,7 @@ export function CalibrateTipLength(
     currentStep != null && currentStep in PANEL_BY_STEP
       ? PANEL_BY_STEP[currentStep]
       : null
-  return (
-    <Portal level="top">
+  return createPortal(
       <LegacyModalShell
         width="47rem"
         header={
@@ -178,8 +178,8 @@ export function CalibrateTipLength(
             allowChangeTipRack={allowChangeTipRack}
           />
         )}
-      </LegacyModalShell>
-    </Portal>
+      </LegacyModalShell>,
+      getTopPortalEl()
   )
 }
 

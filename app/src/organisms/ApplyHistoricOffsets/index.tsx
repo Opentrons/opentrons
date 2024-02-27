@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 import pick from 'lodash/pick'
 import { Trans, useTranslation } from 'react-i18next'
@@ -14,7 +15,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   CheckboxField,
 } from '@opentrons/components'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import {
   LegacyModalHeader,
   LegacyModalShell,
@@ -107,8 +108,7 @@ export function ApplyHistoricOffsets(
       >
         {t(noOffsetData ? 'learn_more' : 'view_data')}
       </Link>
-      {showOffsetDataModal ? (
-        <Portal level="top">
+      {showOffsetDataModal ? createPortal(
           <LegacyModalShell
             maxWidth="40rem"
             header={
@@ -175,8 +175,8 @@ export function ApplyHistoricOffsets(
                 )
               ) : null}
             </Flex>
-          </LegacyModalShell>
-        </Portal>
+          </LegacyModalShell>,
+          getTopPortalEl()
       ) : null}
     </Flex>
   )

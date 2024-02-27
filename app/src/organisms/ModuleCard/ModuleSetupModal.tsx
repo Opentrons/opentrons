@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { createPortal } from 'react-dom'
 import { StyledText } from '../../atoms/text'
 import code from '../../assets/images/module_instruction_code.png'
 import {
@@ -14,7 +15,7 @@ import {
   Link,
 } from '@opentrons/components'
 import { LegacyModal } from '../../molecules/LegacyModal'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 
 const MODULE_SETUP_URL = 'https://support.opentrons.com/s/modules'
 
@@ -27,8 +28,7 @@ export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
   const { moduleDisplayName } = props
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
 
-  return (
-    <Portal level="top">
+  return createPortal(
       <LegacyModal
         title={t('modal_instructions_title', { moduleName: moduleDisplayName })}
         onClose={props.close}
@@ -68,7 +68,7 @@ export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
             {i18n.format(t('shared:close'), 'capitalize')}
           </PrimaryButton>
         </Flex>
-      </LegacyModal>
-    </Portal>
+      </LegacyModal>,
+      getTopPortalEl()
   )
 }

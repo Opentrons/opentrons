@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
@@ -28,7 +29,7 @@ import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import { LegacyModal } from '../../molecules/LegacyModal'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import {
   deleteCustomLabwareFile,
   openCustomLabwareDirectory,
@@ -134,38 +135,37 @@ export function CustomLabwareOverflowMenu(
           </MenuItem>
         </Flex>
       )}
-      {showDeleteConfirmation && (
-        <Portal level="top">
-          <LegacyModal
-            type="warning"
-            title={t('delete_this_labware')}
-            onClose={handleCancelModal}
-          >
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText as="p">{t('def_moved_to_trash')}</StyledText>
-              <StyledText as="p" paddingTop={SPACING.spacing8}>
-                {t('cannot-run-python-missing-labware')}
-              </StyledText>
-              <Flex
-                justifyContent={JUSTIFY_FLEX_END}
-                alignItems={ALIGN_CENTER}
-                marginTop={SPACING.spacing24}
+      {showDeleteConfirmation && createPortal(
+        <LegacyModal
+          type="warning"
+          title={t('delete_this_labware')}
+          onClose={handleCancelModal}
+        >
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            <StyledText as="p">{t('def_moved_to_trash')}</StyledText>
+            <StyledText as="p" paddingTop={SPACING.spacing8}>
+              {t('cannot-run-python-missing-labware')}
+            </StyledText>
+            <Flex
+              justifyContent={JUSTIFY_FLEX_END}
+              alignItems={ALIGN_CENTER}
+              marginTop={SPACING.spacing24}
+            >
+              <Btn
+                onClick={handleCancelModal}
+                textTransform={TYPOGRAPHY.textTransformCapitalize}
+                marginRight={SPACING.spacing24}
+                css={TYPOGRAPHY.linkPSemiBold}
               >
-                <Btn
-                  onClick={handleCancelModal}
-                  textTransform={TYPOGRAPHY.textTransformCapitalize}
-                  marginRight={SPACING.spacing24}
-                  css={TYPOGRAPHY.linkPSemiBold}
-                >
-                  {t('shared:cancel')}
-                </Btn>
-                <AlertPrimaryButton onClick={handleClickDelete}>
-                  {t('yes_delete_def')}
-                </AlertPrimaryButton>
-              </Flex>
+                {t('shared:cancel')}
+              </Btn>
+              <AlertPrimaryButton onClick={handleClickDelete}>
+                {t('yes_delete_def')}
+              </AlertPrimaryButton>
             </Flex>
-          </LegacyModal>
-        </Portal>
+          </Flex>
+        </LegacyModal>,
+        getTopPortalEl()
       )}
     </Flex>
   )

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
@@ -11,14 +12,13 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
 
 export function OpenDoorAlertModal(): JSX.Element {
   const { t } = useTranslation('run_details')
-  return (
-    <Portal level="top">
+  return createPortal(
       <Modal>
         <Flex
           backgroundColor={COLORS.grey35}
@@ -49,7 +49,7 @@ export function OpenDoorAlertModal(): JSX.Element {
             </StyledText>
           </Flex>
         </Flex>
-      </Modal>
-    </Portal>
+      </Modal>,
+      getTopPortalEl()
   )
 }

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
   useDeckConfigurationQuery,
@@ -16,7 +17,7 @@ import {
 } from '@opentrons/components'
 import { getFixtureDisplayName } from '@opentrons/shared-data'
 import { TertiaryButton } from '../../../../atoms/buttons/TertiaryButton'
-import { Portal } from '../../../../App/portal'
+import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { StyledText } from '../../../../atoms/text'
 
@@ -47,8 +48,7 @@ export const NotConfiguredModal = (
     onCloseClick()
   }
 
-  return (
-    <Portal level="top">
+  return createPortal(
       <LegacyModal
         title={t('add_fixture', {
           fixtureName: getFixtureDisplayName(requiredFixtureId),
@@ -75,7 +75,7 @@ export const NotConfiguredModal = (
             </Flex>
           </Flex>
         </Flex>
-      </LegacyModal>
-    </Portal>
+      </LegacyModal>,
+      getTopPortalEl()
   )
 }

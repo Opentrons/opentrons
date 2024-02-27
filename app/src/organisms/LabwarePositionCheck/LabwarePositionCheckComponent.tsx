@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import isEqual from 'lodash/isEqual'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -23,7 +24,7 @@ import {
   RobotType,
 } from '@opentrons/shared-data'
 
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 // import { useTrackEvent } from '../../redux/analytics'
 import { IntroScreen } from './IntroScreen'
 import { ExitConfirmation } from './ExitConfirmation'
@@ -204,14 +205,14 @@ export const LabwarePositionCheckComponent = (
     const dropTipToBeSafeCommands: DropTipCreateCommand[] = shouldUseMetalProbe
       ? []
       : (protocolData?.pipettes ?? []).map(pip => ({
-          commandType: 'dropTip' as const,
-          params: {
-            pipetteId: pip.id,
-            labwareId: FIXED_TRASH_ID,
-            wellName: 'A1',
-            wellLocation: { origin: 'default' as const },
-          },
-        }))
+        commandType: 'dropTip' as const,
+        params: {
+          pipetteId: pip.id,
+          labwareId: FIXED_TRASH_ID,
+          wellName: 'A1',
+          wellLocation: { origin: 'default' as const },
+        },
+      }))
     chainRunCommands(
       maintenanceRunId,
       [
@@ -417,27 +418,26 @@ export const LabwarePositionCheckComponent = (
         showConfirmation || isExiting
           ? undefined
           : () => {
-              if (fatalError != null) {
-                handleCleanUpAndClose()
-              } else {
-                confirmExitLPC()
-              }
+            if (fatalError != null) {
+              handleCleanUpAndClose()
+            } else {
+              confirmExitLPC()
             }
+          }
       }
     />
   )
-  return (
-    <Portal level="top">
-      {isOnDevice ? (
-        <LegacyModalShell fullPage>
-          {wizardHeader}
-          {modalContent}
-        </LegacyModalShell>
-      ) : (
-        <LegacyModalShell width="47rem" header={wizardHeader}>
-          {modalContent}
-        </LegacyModalShell>
-      )}
-    </Portal>
+  return createPortal(
+    isOnDevice ? (
+      <LegacyModalShell fullPage>
+        {wizardHeader}
+        {modalContent}
+      </LegacyModalShell>
+    ) : (
+      <LegacyModalShell width="47rem" header={wizardHeader}>
+        {modalContent}
+      </LegacyModalShell>
+    ),
+    getTopPortalEl()
   )
 }

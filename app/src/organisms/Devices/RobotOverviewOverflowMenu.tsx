@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
@@ -14,7 +15,7 @@ import {
   useMountEffect,
 } from '@opentrons/components'
 
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
@@ -98,14 +99,15 @@ export const RobotOverviewOverflowMenu = (
 
   return (
     <Flex data-testid="RobotOverview_overflowMenu" position={POSITION_RELATIVE}>
-      <Portal level="top">
-        {showDisconnectModal ? (
+      {showDisconnectModal
+        ? createPortal(
           <DisconnectModal
             onCancel={() => setShowDisconnectModal(false)}
             robotName={robot.name}
-          />
-        ) : null}
-      </Portal>
+          />,
+          getTopPortalEl()
+        )
+        : null}
       <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
       {showOverflowMenu ? (
         <Flex
@@ -125,8 +127,8 @@ export const RobotOverviewOverflowMenu = (
           }}
         >
           {isRobotOnWrongVersionOfSoftware &&
-          !isRobotUnavailable &&
-          !isEstopNotDisengaged ? (
+            !isRobotUnavailable &&
+            !isEstopNotDisengaged ? (
             <MenuItem
               onClick={() => handleUpdateBuildroot(robot)}
               data-testid={`RobotOverviewOverflowMenu_updateSoftware_${String(

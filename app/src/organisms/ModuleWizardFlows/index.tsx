@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
@@ -10,7 +11,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { LegacyModalShell } from '../../molecules/LegacyModal'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { StyledText } from '../../atoms/text'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
@@ -203,7 +204,7 @@ export const ModuleWizardFlows = (
 
   const maintenanceRunId =
     maintenanceRunData?.data.id != null &&
-    maintenanceRunData?.data.id === createdMaintenanceRunId
+      maintenanceRunData?.data.id === createdMaintenanceRunId
       ? createdMaintenanceRunId
       : undefined
   const calibrateBaseProps = {
@@ -301,7 +302,7 @@ export const ModuleWizardFlows = (
         {...currentStep}
         {...calibrateBaseProps}
         isRobotMoving={isRobotMoving}
-        proceed={isRobotMoving ? () => {} : handleCleanUpAndClose}
+        proceed={isRobotMoving ? () => { } : handleCleanUpAndClose}
       />
     )
   }
@@ -316,18 +317,17 @@ export const ModuleWizardFlows = (
     />
   )
 
-  return (
-    <Portal level="top">
-      {isOnDevice ? (
-        <LegacyModalShell>
-          {wizardHeader}
-          {modalContent}
-        </LegacyModalShell>
-      ) : (
-        <LegacyModalShell width="47rem" height="auto" header={wizardHeader}>
-          {modalContent}
-        </LegacyModalShell>
-      )}
-    </Portal>
+  return createPortal(
+    isOnDevice ? (
+      <LegacyModalShell>
+        {wizardHeader}
+        {modalContent}
+      </LegacyModalShell>
+    ) : (
+      <LegacyModalShell width="47rem" height="auto" header={wizardHeader}>
+        {modalContent}
+      </LegacyModalShell>
+    ),
+    getTopPortalEl()
   )
 }
