@@ -477,13 +477,16 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def drop_tip_in_disposal_location(
-        self, disposal_location: Union[TrashBin, WasteChute], home_after: Optional[bool]
+        self,
+        disposal_location: Union[TrashBin, WasteChute],
+        home_after: Optional[bool],
+        alternate_tip_drop: bool = False,
     ) -> None:
         self._move_to_disposal_location(
             disposal_location,
             force_direct=False,
             speed=None,
-            alternate_tip_drop=True,
+            alternate_tip_drop=alternate_tip_drop,
         )
         self._drop_tip_in_place(home_after=home_after)
         self._protocol_core.set_last_location(location=None, mount=self.get_mount())
@@ -499,7 +502,6 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         # https://opentrons.atlassian.net/browse/RSS-391
 
         disposal_offset = disposal_location.offset
-
         offset = AddressableOffsetVector(
             x=disposal_offset.x, y=disposal_offset.y, z=disposal_offset.z
         )

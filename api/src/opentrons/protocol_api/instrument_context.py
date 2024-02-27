@@ -1017,7 +1017,9 @@ class InstrumentContext(publisher.CommandPublisher):
                 well = trash_container.wells()[0]
             else:  # implicit drop tip in disposal location, not well
                 self._core.drop_tip_in_disposal_location(
-                    trash_container, home_after=home_after
+                    trash_container,
+                    home_after=home_after,
+                    alternate_tip_drop=True,
                 )
                 self._last_tip_picked_up_from = None
                 return self

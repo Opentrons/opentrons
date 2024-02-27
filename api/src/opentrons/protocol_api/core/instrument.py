@@ -136,13 +136,17 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
 
     @abstractmethod
     def drop_tip_in_disposal_location(
-        self, disposal_location: Union[TrashBin, WasteChute], home_after: Optional[bool]
+        self,
+        disposal_location: Union[TrashBin, WasteChute],
+        home_after: Optional[bool],
+        alternate_tip_drop: bool = False,
     ) -> None:
         """Move to and drop tip into a TrashBin or WasteChute.
 
         Args:
             disposal_location: The disposal location object we're dropping to.
             home_after: Whether to home the pipette after the tip is dropped.
+            alternate_tip_drop: Whether to alternate tip drop location in a trash bin.
         """
         ...
 

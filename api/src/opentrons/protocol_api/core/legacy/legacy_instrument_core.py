@@ -294,7 +294,10 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
                 )
 
     def drop_tip_in_disposal_location(
-        self, disposal_location: Union[TrashBin, WasteChute], home_after: Optional[bool]
+        self,
+        disposal_location: Union[TrashBin, WasteChute],
+        home_after: Optional[bool],
+        alternate_tip_drop: bool = False,
     ) -> None:
         raise APIVersionError(
             "Dropping tips in a trash bin or waste chute is not supported in this API Version."
