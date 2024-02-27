@@ -87,7 +87,7 @@ class BoundingNozzlesOffsets:
 
 @dataclass(frozen=True)
 class PipetteBoundingBoxOffsets:
-    """Offsets of the bounding nozzles of the pipette."""
+    """Offsets of the corners of the pipette's bounding box."""
 
     back_left_corner: Point
     front_right_corner: Point
