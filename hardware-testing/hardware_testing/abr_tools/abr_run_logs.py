@@ -1,16 +1,18 @@
 """ABR Run Log Pull."""
 from .abr_robots import ABR_IPS
+from typing import Set, Dict, Any
+
 import argparse
 import os
 import json
 import traceback
 import requests
-from typing import Set, Dict, Any
 
 
 def get_run_ids_from_storage(storage_directory: str) -> Set[str]:
     """Read all files in long term storage directory and read run id.
-    Add run id to a set. Return run id set."""
+    Add run id to a set. Return run id set.
+    """
     os.makedirs(storage_directory, exist_ok=True)
     list_of_files = os.listdir(storage_directory)
     run_ids = set()
@@ -109,7 +111,8 @@ def save_runs(runs_to_save: Set[str], ip: str, storage_directory: str) -> None:
 def get_all_run_logs(storage_directory: str) -> None:
     """Connect to each ABR robot to read run log data.
     Read each robot's list of unique run log IDs and compare them to all IDs in storage.
-    Any ID that is not in storage, download the run log and put it in storage."""
+    Any ID that is not in storage, download the run log and put it in storage.
+    """
     runs_from_storage = get_run_ids_from_storage(storage_directory)
     for ip in ABR_IPS:
         try:
