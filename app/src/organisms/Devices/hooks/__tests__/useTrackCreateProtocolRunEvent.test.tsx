@@ -2,7 +2,7 @@ import * as React from 'react'
 import { createStore, Store } from 'redux'
 import { Provider } from 'react-redux'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { resetAllWhenMocks, when } from 'jest-when'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { waitFor, renderHook } from '@testing-library/react'
 
 import { STORED_PROTOCOL_ANALYSIS } from '../__fixtures__/storedProtocolAnalysis'
@@ -14,35 +14,25 @@ import { storedProtocolData } from '../../../../redux/protocol-storage/__fixture
 
 import type { ProtocolAnalyticsData } from '../../../../redux/analytics/types'
 
-jest.mock('../../hooks')
-jest.mock('../useProtocolRunAnalyticsData')
-jest.mock('../useStoredProtocolAnalysis')
-jest.mock('../../../../redux/discovery')
-jest.mock('../../../../redux/pipettes')
-jest.mock('../../../../redux/analytics')
-jest.mock('../../../../redux/robot-settings')
-
-const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
-  typeof useTrackEvent
->
-const mockParseProtocolRunAnalyticsData = parseProtocolRunAnalyticsData as jest.MockedFunction<
-  typeof parseProtocolRunAnalyticsData
->
-const mockParseProtocolAnalysisOutput = parseProtocolAnalysisOutput as jest.MockedFunction<
-  typeof parseProtocolAnalysisOutput
->
+vi.mock('../../hooks')
+vi.mock('../useProtocolRunAnalyticsData')
+vi.mock('../useStoredProtocolAnalysis')
+vi.mock('../../../../redux/discovery')
+vi.mock('../../../../redux/pipettes')
+vi.mock('../../../../redux/analytics')
+vi.mock('../../../../redux/robot-settings')
 
 const PROTOCOL_PROPERTIES = { protocolType: 'python' } as ProtocolAnalyticsData
 
-let mockTrackEvent: jest.Mock
-let mockGetProtocolRunAnalyticsData: jest.Mock
+let mockTrackEvent: vi.mock
+let mockGetProtocolRunAnalyticsData: vi.mock
 let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
-let store: Store<any> = createStore(jest.fn(), {})
+let store: Store<any> = createStore(vi.fn(), {})
 
 describe('useTrackCreateProtocolRunEvent hook', () => {
   beforeEach(() => {
-    store = createStore(jest.fn(), {})
-    store.dispatch = jest.fn()
+    store = createStore(vi.fn(), {})
+    store.dispatch = vi.fn()
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (
       <Provider store={store}>
@@ -51,23 +41,24 @@ describe('useTrackCreateProtocolRunEvent hook', () => {
         </QueryClientProvider>
       </Provider>
     )
-    mockTrackEvent = jest.fn()
-    mockGetProtocolRunAnalyticsData = jest.fn(
+    mockTrackEvent = vi.fn()
+    mockGetProtocolRunAnalyticsData = vi.fn(
       () =>
         new Promise(resolve =>
           resolve({ protocolRunAnalyticsData: PROTOCOL_PROPERTIES })
         )
     )
-    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
-    mockParseProtocolAnalysisOutput.mockReturnValue(STORED_PROTOCOL_ANALYSIS)
-    mockParseProtocolRunAnalyticsData.mockReturnValue(
+    vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
+    vi.mocked(parseProtocolAnalysisOutput).mockReturnValue(
+      STORED_PROTOCOL_ANALYSIS
+    )
+    vi.mocked(parseProtocolRunAnalyticsData).mockReturnValue(
       mockGetProtocolRunAnalyticsData
     )
   })
 
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('returns trackCreateProtocolRunEvent function', () => {
@@ -100,7 +91,7 @@ describe('useTrackCreateProtocolRunEvent hook', () => {
   })
 
   it('trackCreateProtocolRunEvent calls trackEvent with error props when error is thrown in getProtocolRunAnalyticsData', async () => {
-    when(mockParseProtocolRunAnalyticsData).mockReturnValue(
+    vi.mocked(parseProtocolRunAnalyticsData).mockReturnValue(
       () =>
         new Promise(() => {
           throw new Error('error')

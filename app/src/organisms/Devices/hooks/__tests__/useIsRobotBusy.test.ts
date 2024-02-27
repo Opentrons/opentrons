@@ -1,6 +1,7 @@
 import { UseQueryResult } from 'react-query'
 
 import { useAllSessionsQuery, useEstopQuery } from '@opentrons/react-api-client'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 
 import {
   DISENGAGED,
@@ -15,13 +16,11 @@ import { useNotifyAllRunsQuery } from '../../../../resources/runs/useNotifyAllRu
 import type { Sessions, Runs } from '@opentrons/api-client'
 import type { AxiosError } from 'axios'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../ProtocolUpload/hooks')
-jest.mock('../useIsFlex')
-jest.mock('../../../../resources/runs/useNotifyAllRunsQuery')
-jest.mock(
-  '../../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
-)
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../ProtocolUpload/hooks')
+vi.mock('../useIsFlex')
+vi.mock('../../../../resources/runs/useNotifyAllRunsQuery')
+vi.mock('../../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
 
 const mockEstopStatus = {
   data: {
@@ -31,41 +30,27 @@ const mockEstopStatus = {
   },
 }
 
-const mockUseAllSessionsQuery = useAllSessionsQuery as jest.MockedFunction<
-  typeof useAllSessionsQuery
->
-const mockUseNotifyAllRunsQuery = useNotifyAllRunsQuery as jest.MockedFunction<
-  typeof useNotifyAllRunsQuery
->
-const mockUseNotifyCurrentMaintenanceRun = useNotifyCurrentMaintenanceRun as jest.MockedFunction<
-  typeof useNotifyCurrentMaintenanceRun
->
-const mockUseEstopQuery = useEstopQuery as jest.MockedFunction<
-  typeof useEstopQuery
->
-const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
-
 describe('useIsRobotBusy', () => {
   beforeEach(() => {
-    mockUseAllSessionsQuery.mockReturnValue({
+    vi.mocked(useAllSessionsQuery).mockReturnValue({
       data: {},
     } as UseQueryResult<Sessions, Error>)
-    mockUseNotifyAllRunsQuery.mockReturnValue({
+    vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
       data: {
         links: {
           current: {},
         },
       },
     } as UseQueryResult<Runs, AxiosError>)
-    mockUseNotifyCurrentMaintenanceRun.mockReturnValue({
+    vi.mocked(useNotifyCurrentMaintenanceRun).mockReturnValue({
       data: {},
     } as any)
-    mockUseEstopQuery.mockReturnValue({ data: mockEstopStatus } as any)
-    mockUseIsFlex.mockReturnValue(false)
+    vi.mocked(useEstopQuery).mockReturnValue({ data: mockEstopStatus } as any)
+    vi.mocked(useIsFlex).mockReturnValue(false)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('returns true when current runId is not null', () => {
@@ -79,14 +64,14 @@ describe('useIsRobotBusy', () => {
   })
 
   it('returns false when current runId is null and sessions are empty', () => {
-    mockUseNotifyAllRunsQuery.mockReturnValue({
+    vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
       data: {
         links: {
           current: null,
         },
       },
     } as any)
-    mockUseAllSessionsQuery.mockReturnValue(({
+    vi.mocked(useAllSessionsQuery).mockReturnValue(({
       data: [
         {
           id: 'test',
@@ -103,14 +88,14 @@ describe('useIsRobotBusy', () => {
   })
 
   it('returns false when Estop status is disengaged', () => {
-    mockUseNotifyAllRunsQuery.mockReturnValue({
+    vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
       data: {
         links: {
           current: null,
         },
       },
     } as any)
-    mockUseAllSessionsQuery.mockReturnValue(({
+    vi.mocked(useAllSessionsQuery).mockReturnValue(({
       data: [
         {
           id: 'test',
@@ -127,15 +112,15 @@ describe('useIsRobotBusy', () => {
   })
 
   it('returns true when robot is a Flex and Estop status is engaged', () => {
-    mockUseIsFlex.mockReturnValue(true)
-    mockUseNotifyAllRunsQuery.mockReturnValue({
+    vi.mocked(useIsFlex).mockReturnValue(true)
+    vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
       data: {
         links: {
           current: null,
         },
       },
     } as any)
-    mockUseAllSessionsQuery.mockReturnValue(({
+    vi.mocked(useAllSessionsQuery).mockReturnValue(({
       data: [
         {
           id: 'test',
@@ -153,20 +138,20 @@ describe('useIsRobotBusy', () => {
         status: PHYSICALLY_ENGAGED,
       },
     }
-    mockUseEstopQuery.mockReturnValue({ data: mockEngagedStatus } as any)
+    vi.mocked(useEstopQuery).mockReturnValue({ data: mockEngagedStatus } as any)
     const result = useIsRobotBusy()
     expect(result).toBe(true)
   })
   it('returns false when robot is NOT a Flex and Estop status is engaged', () => {
-    mockUseIsFlex.mockReturnValue(false)
-    mockUseNotifyAllRunsQuery.mockReturnValue({
+    vi.mocked(useIsFlex).mockReturnValue(false)
+    vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
       data: {
         links: {
           current: null,
         },
       },
     } as any)
-    mockUseAllSessionsQuery.mockReturnValue(({
+    vi.mocked(useAllSessionsQuery).mockReturnValue(({
       data: [
         {
           id: 'test',
@@ -184,13 +169,13 @@ describe('useIsRobotBusy', () => {
         status: PHYSICALLY_ENGAGED,
       },
     }
-    mockUseEstopQuery.mockReturnValue({ data: mockEngagedStatus } as any)
+    vi.mocked(useEstopQuery).mockReturnValue({ data: mockEngagedStatus } as any)
     const result = useIsRobotBusy()
     expect(result).toBe(false)
   })
 
   it('returns true when a maintenance run exists', () => {
-    mockUseNotifyCurrentMaintenanceRun.mockReturnValue({
+    vi.mocked(useNotifyCurrentMaintenanceRun).mockReturnValue({
       data: {
         data: {
           id: '123',

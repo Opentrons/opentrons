@@ -13,6 +13,7 @@ import fixture_tiprack_10_ul from './fixture_tiprack_10_ul.json'
 import fixture_tiprack_300_ul from './fixture_tiprack_300_ul.json'
 import fixture_tiprack_1000_ul from './fixture_tiprack_1000_ul.json'
 import fixture_trash from './fixture_trash.json'
+import fixture_calibration_block from './fixture_calibration_block.json'
 
 export {
   fixture_12_trough_v2,
@@ -30,4 +31,5 @@ export {
   fixture_tiprack_300_ul,
   fixture_tiprack_1000_ul,
   fixture_trash,
+  fixture_calibration_block,
 }

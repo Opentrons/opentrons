@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
+import { when } from 'vitest-when'
 import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { useAllPipetteOffsetCalibrationsQuery } from '@opentrons/react-api-client'
@@ -10,11 +11,7 @@ import {
 } from '../../../../redux/calibration/pipette-offset/__fixtures__'
 import { usePipetteOffsetCalibrations } from '..'
 
-jest.mock('@opentrons/react-api-client')
-
-const mockUseAllPipetteOffsetCalibrationsQuery = useAllPipetteOffsetCalibrationsQuery as jest.MockedFunction<
-  typeof useAllPipetteOffsetCalibrationsQuery
->
+vi.mock('@opentrons/react-api-client')
 
 const CALIBRATION_DATA_POLL_MS = 5000
 
@@ -27,14 +24,13 @@ describe('usePipetteOffsetCalibrations hook', () => {
     )
   })
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('returns empty array when no calibrations found', () => {
-    when(mockUseAllPipetteOffsetCalibrationsQuery)
+    when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
       .calledWith({ refetchInterval: CALIBRATION_DATA_POLL_MS })
-      .mockReturnValue(null as any)
+      .thenReturn(null as any)
 
     const { result } = renderHook(() => usePipetteOffsetCalibrations(), {
       wrapper,
@@ -44,9 +40,9 @@ describe('usePipetteOffsetCalibrations hook', () => {
   })
 
   it('returns pipette offset calibrations when calibrations found', () => {
-    when(mockUseAllPipetteOffsetCalibrationsQuery)
+    when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
       .calledWith({ refetchInterval: CALIBRATION_DATA_POLL_MS })
-      .mockReturnValue({
+      .thenReturn({
         data: {
           data: [
             mockPipetteOffsetCalibration1,

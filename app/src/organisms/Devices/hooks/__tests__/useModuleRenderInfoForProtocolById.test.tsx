@@ -1,9 +1,10 @@
 import { renderHook } from '@testing-library/react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { vi, it, expect, describe, beforeEach } from 'vitest'
+import { when } from 'vitest-when'
 import { UseQueryResult } from 'react-query'
 
 import { STAGING_AREA_RIGHT_SLOT_FIXTURE } from '@opentrons/shared-data'
-import _heaterShakerCommandsWithResultsKey from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommandsWithResultsKey.json'
+import { heater_shaker_commands_with_result as _heaterShakerCommandsWithResultsKey } from '@opentrons/shared-data'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 
@@ -28,27 +29,12 @@ import type {
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../ProtocolRun/utils/getProtocolModulesInfo')
-jest.mock('../useAttachedModules')
-jest.mock('../useStoredProtocolAnalysis')
-jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../ProtocolRun/utils/getProtocolModulesInfo')
+vi.mock('../useAttachedModules')
+vi.mock('../useStoredProtocolAnalysis')
+vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 
-const mockGetProtocolModulesInfo = getProtocolModulesInfo as jest.MockedFunction<
-  typeof getProtocolModulesInfo
->
-const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
-  typeof useAttachedModules
->
-const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFunction<
-  typeof useStoredProtocolAnalysis
->
-const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
-  typeof useMostRecentCompletedAnalysis
->
-const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
-  typeof useDeckConfigurationQuery
->
 const heaterShakerCommandsWithResultsKey = (_heaterShakerCommandsWithResultsKey as unknown) as ProtocolAnalysisOutput
 
 const PROTOCOL_DETAILS = {
@@ -132,36 +118,33 @@ const mockCutoutConfig: CutoutConfig = {
 
 describe('useModuleRenderInfoForProtocolById hook', () => {
   beforeEach(() => {
-    when(mockUseDeckConfigurationQuery).mockReturnValue({
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
       data: [mockCutoutConfig],
     } as UseQueryResult<DeckConfiguration>)
-    when(mockUseAttachedModules)
+    when(vi.mocked(useAttachedModules))
       .calledWith()
-      .mockReturnValue([
+      .thenReturn([
         mockMagneticModuleGen2,
         mockTemperatureModuleGen2,
         mockThermocycler,
       ])
-    when(mockUseStoredProtocolAnalysis)
+    when(vi.mocked(useStoredProtocolAnalysis))
       .calledWith('1')
-      .mockReturnValue((PROTOCOL_DETAILS as unknown) as ProtocolAnalysisOutput)
-    when(mockUseMostRecentCompletedAnalysis)
+      .thenReturn((PROTOCOL_DETAILS as unknown) as ProtocolAnalysisOutput)
+    when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith('1')
-      .mockReturnValue(PROTOCOL_DETAILS.protocolData as any)
-    mockGetProtocolModulesInfo.mockReturnValue([
+      .thenReturn(PROTOCOL_DETAILS.protocolData as any)
+    vi.mocked(getProtocolModulesInfo).mockReturnValue([
       TEMPERATURE_MODULE_INFO,
       MAGNETIC_MODULE_INFO,
     ])
   })
 
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
   it('should return no module render info when protocol details not found', () => {
-    when(mockUseMostRecentCompletedAnalysis)
+    when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith('1')
-      .mockReturnValue(null)
-    when(mockUseStoredProtocolAnalysis).calledWith('1').mockReturnValue(null)
+      .thenReturn(null)
+    when(vi.mocked(useStoredProtocolAnalysis)).calledWith('1').thenReturn(null)
     const { result } = renderHook(() => useModuleRenderInfoForProtocolById('1'))
     expect(result.current).toStrictEqual({})
   })

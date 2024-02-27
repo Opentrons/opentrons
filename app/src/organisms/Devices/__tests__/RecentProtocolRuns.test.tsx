@@ -1,7 +1,9 @@
 import * as React from 'react'
 import { UseQueryResult } from 'react-query'
-import { renderWithProviders } from '@opentrons/components'
-
+import { screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach} from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { useNotifyAllRunsQuery } from '../../../resources/runs/useNotifyAllRunsQuery'
 import { i18n } from '../../../i18n'
 import { useIsRobotViewable, useRunStatuses } from '../hooks'
@@ -11,23 +13,11 @@ import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
 import type { Runs } from '@opentrons/api-client'
 import type { AxiosError } from 'axios'
 
-jest.mock('../../../resources/runs/useNotifyAllRunsQuery')
-jest.mock('../hooks')
-jest.mock('../../ProtocolUpload/hooks')
-jest.mock('../HistoricalProtocolRun')
+vi.mock('../../../resources/runs/useNotifyAllRunsQuery')
+vi.mock('../hooks')
+vi.mock('../../ProtocolUpload/hooks')
+vi.mock('../HistoricalProtocolRun')
 
-const mockUseIsRobotViewable = useIsRobotViewable as jest.MockedFunction<
-  typeof useIsRobotViewable
->
-const mockUseNotifyAllRunsQuery = useNotifyAllRunsQuery as jest.MockedFunction<
-  typeof useNotifyAllRunsQuery
->
-const mockHistoricalProtocolRun = HistoricalProtocolRun as jest.MockedFunction<
-  typeof HistoricalProtocolRun
->
-const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
-  typeof useRunStatuses
->
 const render = () => {
   return renderWithProviders(<RecentProtocolRuns robotName="otie" />, {
     i18nInstance: i18n,
@@ -36,37 +26,35 @@ const render = () => {
 
 describe('RecentProtocolRuns', () => {
   beforeEach(() => {
-    mockUseRunStatuses.mockReturnValue({
+    vi.mocked(useRunStatuses).mockReturnValue({
       isRunRunning: false,
       isRunStill: false,
       isRunTerminal: true,
       isRunIdle: false,
     })
-    mockHistoricalProtocolRun.mockReturnValue(
+    vi.mocked(HistoricalProtocolRun).mockReturnValue(
       <div>mock HistoricalProtocolRun</div>
     )
   })
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-  it('renders an empty state message when robot is not on the network', () => {
-    mockUseIsRobotViewable.mockReturnValue(false)
-    const [{ getByText }] = render()
 
-    getByText('Robot must be on the network to see protocol runs')
+  it('renders an empty state message when robot is not on the network', () => {
+    vi.mocked(useIsRobotViewable).mockReturnValue(false)
+    render()
+
+    screen.getByText('Robot must be on the network to see protocol runs')
   })
   it('renders an empty state message when there are no runs', () => {
-    mockUseIsRobotViewable.mockReturnValue(true)
-    mockUseNotifyAllRunsQuery.mockReturnValue({
+    vi.mocked(useIsRobotViewable).mockReturnValue(true)
+    vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
       data: {},
     } as UseQueryResult<Runs, AxiosError>)
-    const [{ getByText }] = render()
+    render()
 
-    getByText('No protocol runs yet!')
+    screen.getByText('No protocol runs yet!')
   })
   it('renders table headers if there are runs', () => {
-    mockUseIsRobotViewable.mockReturnValue(true)
-    mockUseNotifyAllRunsQuery.mockReturnValue({
+    vi.mocked(useIsRobotViewable).mockReturnValue(true)
+    vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
       data: {
         data: [
           {
@@ -79,12 +67,12 @@ describe('RecentProtocolRuns', () => {
         ],
       },
     } as UseQueryResult<Runs, AxiosError>)
-    const [{ getByText }] = render()
-    getByText('Recent Protocol Runs')
-    getByText('Run')
-    getByText('Protocol')
-    getByText('Status')
-    getByText('Run duration')
-    getByText('mock HistoricalProtocolRun')
+    render()
+    screen.getByText('Recent Protocol Runs')
+    screen.getByText('Run')
+    screen.getByText('Protocol')
+    screen.getByText('Status')
+    screen.getByText('Run duration')
+    screen.getByText('mock HistoricalProtocolRun')
   })
 })

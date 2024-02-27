@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { resetAllWhenMocks, when } from 'jest-when'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
+import { when } from 'vitest-when'
 import { renderHook, waitFor } from '@testing-library/react'
 import { createStore, Store } from 'redux'
 import { Provider } from 'react-redux'
@@ -13,35 +14,15 @@ import { useProtocolMetadata } from '../useProtocolMetadata'
 import { useRunTimestamps } from '../../../RunTimeControl/hooks'
 import { formatInterval } from '../../../RunTimeControl/utils'
 
-jest.mock('../../../../redux/analytics/hash')
-jest.mock('../../../../redux/protocol-storage')
-jest.mock('../../hooks')
-jest.mock('../useProtocolMetadata')
-jest.mock('../../../RunTimeControl/hooks')
-jest.mock('../../../RunTimeControl/utils')
-
-const mockHash = hash as jest.MockedFunction<typeof hash>
-const mockGetStoredProtocol = getStoredProtocol as jest.MockedFunction<
-  typeof getStoredProtocol
->
-const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFunction<
-  typeof useStoredProtocolAnalysis
->
-const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
-  typeof useProtocolDetailsForRun
->
-const mockUseProtocolMetadata = useProtocolMetadata as jest.MockedFunction<
-  typeof useProtocolMetadata
->
-const mockUseRunTimestamps = useRunTimestamps as jest.MockedFunction<
-  typeof useRunTimestamps
->
-const mockFormatInterval = formatInterval as jest.MockedFunction<
-  typeof formatInterval
->
+vi.mock('../../../../redux/analytics/hash')
+vi.mock('../../../../redux/protocol-storage')
+vi.mock('../../hooks')
+vi.mock('../useProtocolMetadata')
+vi.mock('../../../RunTimeControl/hooks')
+vi.mock('../../../RunTimeControl/utils')
 
 let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
-let store: Store<any> = createStore(jest.fn(), {})
+let store: Store<any> = createStore(vi.fn(), {})
 
 const RUN_ID = '1'
 const RUN_ID_2 = '2'
@@ -76,7 +57,7 @@ const ROBOT_PROTOCOL_ANALYSIS = {
 
 describe('useProtocolAnalysisErrors hook', () => {
   beforeEach(() => {
-    store = createStore(jest.fn(), {})
+    store = createStore(vi.fn(), {})
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (
       <Provider store={store}>
@@ -85,29 +66,30 @@ describe('useProtocolAnalysisErrors hook', () => {
         </QueryClientProvider>
       </Provider>
     )
-    mockHash.mockReturnValue(new Promise(resolve => resolve('hashedString')))
-    mockGetStoredProtocol.mockReturnValue({
+    vi.mocked(hash).mockReturnValue(
+      new Promise(resolve => resolve('hashedString'))
+    )
+    vi.mocked(getStoredProtocol).mockReturnValue({
       srcFiles: Buffer.from('protocol content'),
     } as any)
-    when(mockUseStoredProtocolAnalysis)
+    when(vi.mocked(useStoredProtocolAnalysis))
       .calledWith(RUN_ID)
-      .mockReturnValue(STORED_PROTOCOL_ANALYSIS as any)
-    when(mockUseProtocolDetailsForRun)
+      .thenReturn(STORED_PROTOCOL_ANALYSIS as any)
+    when(vi.mocked(useProtocolDetailsForRun))
       .calledWith(RUN_ID)
-      .mockReturnValue({ protocolData: null } as any)
-    mockUseProtocolMetadata.mockReturnValue({
+      .thenReturn({ protocolData: null } as any)
+    vi.mocked(useProtocolMetadata).mockReturnValue({
       author: 'testAuthor',
       apiLevel: 2.3,
       protocolName: 'robot protocol',
       source: 'robot protocol source',
     })
-    mockUseRunTimestamps.mockReturnValue({ startedAt: '100000' } as any)
-    mockFormatInterval.mockReturnValue('1:00:00')
+    vi.mocked(useRunTimestamps).mockReturnValue({ startedAt: '100000' } as any)
+    vi.mocked(formatInterval).mockReturnValue('1:00:00' as any)
   })
 
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('returns getProtocolRunAnalyticsData function', () => {
@@ -120,9 +102,9 @@ describe('useProtocolAnalysisErrors hook', () => {
   })
 
   it('getProtocolRunAnalyticsData returns robot data when available', async () => {
-    when(mockUseProtocolDetailsForRun)
+    when(vi.mocked(useProtocolDetailsForRun))
       .calledWith(RUN_ID_2)
-      .mockReturnValue({ protocolData: ROBOT_PROTOCOL_ANALYSIS } as any)
+      .thenReturn({ protocolData: ROBOT_PROTOCOL_ANALYSIS } as any)
     const { result } = renderHook(() => useProtocolRunAnalyticsData(RUN_ID_2), {
       wrapper,
     })

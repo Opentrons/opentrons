@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { resetAllWhenMocks } from 'jest-when'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { Provider } from 'react-redux'
 import { createStore, Store } from 'redux'
 import { renderHook } from '@testing-library/react'
@@ -11,20 +11,13 @@ import {
 
 import { useLights } from '..'
 
-jest.mock('@opentrons/react-api-client')
+vi.mock('@opentrons/react-api-client')
 
-const mockUseLightsQuery = useLightsQuery as jest.MockedFunction<
-  typeof useLightsQuery
->
-const mockUseSetLightsMutation = useSetLightsMutation as jest.MockedFunction<
-  typeof useSetLightsMutation
->
-
-const store: Store<any> = createStore(jest.fn(), {})
+const store: Store<any> = createStore(vi.fn(), {})
 
 describe('useLights hook', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
-  let setLights: jest.Mock
+  let setLights: vi.mock
 
   beforeEach(() => {
     const queryClient = new QueryClient()
@@ -35,17 +28,16 @@ describe('useLights hook', () => {
         </QueryClientProvider>
       </Provider>
     )
-    mockUseLightsQuery.mockReturnValue({ data: { on: false } } as any)
-    setLights = jest.fn()
-    mockUseSetLightsMutation.mockReturnValue({ setLights } as any)
+    vi.mocked(useLightsQuery).mockReturnValue({ data: { on: false } } as any)
+    setLights = vi.fn()
+    vi.mocked(useSetLightsMutation).mockReturnValue({ setLights } as any)
   })
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('toggles lights off when on', () => {
-    mockUseLightsQuery.mockReturnValue({ data: { on: true } } as any)
+    vi.mocked(useLightsQuery).mockReturnValue({ data: { on: true } } as any)
 
     const { result } = renderHook(() => useLights(), { wrapper })
 
@@ -55,7 +47,7 @@ describe('useLights hook', () => {
   })
 
   it('toggles lights on when off', () => {
-    mockUseLightsQuery.mockReturnValue({ data: { on: false } } as any)
+    vi.mocked(useLightsQuery).mockReturnValue({ data: { on: false } } as any)
 
     const { result } = renderHook(() => useLights(), {
       wrapper,
