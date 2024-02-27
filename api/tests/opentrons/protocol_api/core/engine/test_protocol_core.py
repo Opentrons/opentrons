@@ -65,6 +65,7 @@ from opentrons.protocol_api.core.engine import (
     ModuleCore,
     load_labware_params,
 )
+from opentrons.protocol_api._disposal_locations import TrashBin, WasteChute
 from opentrons.protocol_api._liquid import Liquid
 from opentrons.protocol_api.core.engine.exceptions import InvalidModuleLocationError
 from opentrons.protocol_api.core.engine.module_core import (
@@ -677,6 +678,80 @@ def test_load_adapter_on_staging_slot(
     )
 
     assert subject.get_slot_item(StagingSlotName.SLOT_B4) is result
+
+
+def test_load_trash_bin(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+) -> None:
+    """It should load a trash bin."""
+    prior_disposal_locations = subject.get_disposal_locations()
+    trash = subject.load_trash_bin(
+        slot_name=DeckSlotName.SLOT_D2, area_name="my trendy area"
+    )
+    assert isinstance(trash, TrashBin)
+    decoy.verify(
+        mock_engine_client.state.addressable_areas.raise_if_area_not_in_deck_configuration(
+            "my trendy area"
+        ),
+        deck_conflict.check(
+            engine_state=mock_engine_client.state,
+            new_trash_bin=trash,
+            existing_disposal_locations=prior_disposal_locations,
+            existing_labware_ids=[],
+            existing_module_ids=[],
+        ),
+        mock_engine_client.add_addressable_area("my trendy area"),
+    )
+
+    assert trash in subject.get_disposal_locations()
+
+
+def test_load_ot2_fixed_trash_bin(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: ProtocolCore
+) -> None:
+    """It should load a fixed trash bin for the OT-2."""
+    prior_disposal_locations = subject.get_disposal_locations()
+    subject.load_ot2_fixed_trash_bin()
+    fixed_trash = subject.get_disposal_locations()[-1]
+    assert isinstance(fixed_trash, TrashBin)
+    assert fixed_trash.area_name == "fixedTrash"
+    decoy.verify(
+        mock_engine_client.state.addressable_areas.raise_if_area_not_in_deck_configuration(
+            "fixedTrash"
+        ),
+        times=0,
+    )
+    decoy.verify(
+        deck_conflict.check(
+            engine_state=mock_engine_client.state,
+            new_trash_bin=fixed_trash,
+            existing_disposal_locations=prior_disposal_locations,
+            existing_labware_ids=[],
+            existing_module_ids=[],
+        ),
+        times=0,
+    )
+    decoy.verify(mock_engine_client.add_addressable_area("fixedTrash"), times=0)
+
+
+def test_load_waste_chute(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+) -> None:
+    """It should load a waste chute."""
+    waste_chute = subject.load_waste_chute()
+    assert isinstance(waste_chute, WasteChute)
+    decoy.verify(
+        mock_engine_client.state.addressable_areas.raise_if_area_not_in_deck_configuration(
+            "1ChannelWasteChute"
+        ),
+        mock_engine_client.add_addressable_area("1ChannelWasteChute"),
+    )
+
+    assert waste_chute in subject.get_disposal_locations()
 
 
 @pytest.mark.parametrize(
