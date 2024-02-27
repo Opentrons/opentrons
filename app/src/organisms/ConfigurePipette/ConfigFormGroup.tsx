@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Control, Controller } from 'react-hook-form'
+import { Controller } from 'react-hook-form'
 import {
   FormGroup,
   Flex,
@@ -12,6 +12,7 @@ import { InputField } from '../../atoms/InputField'
 import { StyledText } from '../../atoms/text'
 import styles from './styles.css'
 
+import type { Control } from 'react-hook-form'
 import type { DisplayFieldProps, DisplayQuirkFieldProps } from './ConfigForm'
 
 export interface FormColumnProps {

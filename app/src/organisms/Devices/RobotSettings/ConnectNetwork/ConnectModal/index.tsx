@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Control, useForm, Resolver } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 
 import { useResetFormOnSecurityChange } from './form-state'
 import {
@@ -10,6 +10,7 @@ import {
 
 import { FormModal } from './FormModal'
 
+import type { Control, Resolver } from 'react-hook-form'
 import type {
   ConnectFormValues,
   WifiConfigureRequest,

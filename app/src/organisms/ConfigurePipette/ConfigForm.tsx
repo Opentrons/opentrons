@@ -6,6 +6,7 @@ import forOwn from 'lodash/forOwn'
 import keys from 'lodash/keys'
 import omit from 'lodash/omit'
 import set from 'lodash/set'
+import { useForm } from 'react-hook-form'
 import { Box, OVERFLOW_AUTO } from '@opentrons/components'
 import { ConfigFormResetButton } from './ConfigFormResetButton'
 import {
@@ -14,13 +15,13 @@ import {
   ConfigQuirkGroup,
 } from './ConfigFormGroup'
 
+import type { FieldError, Resolver } from 'react-hook-form'
 import type { FormValues } from './ConfigFormGroup'
 import type {
   PipetteSettingsField,
   PipetteSettingsFieldsMap,
   UpdatePipetteSettingsData,
 } from '@opentrons/api-client'
-import { FieldError, Resolver, useForm } from 'react-hook-form'
 
 export interface DisplayFieldProps extends PipetteSettingsField {
   name: string
@@ -46,7 +47,7 @@ const POWER_KEYS = ['plungerCurrent', 'pickUpCurrent', 'dropTipCurrent']
 const TIP_KEYS = ['dropTipSpeed', 'pickUpDistance']
 const QUIRK_KEY = 'quirks'
 
-export const ConfigForm = (props: ConfigFormProps): JSX.Element => {
+export function ConfigForm(props: ConfigFormProps): JSX.Element {
   const {
     updateInProgress,
     formId,
@@ -54,6 +55,44 @@ export const ConfigForm = (props: ConfigFormProps): JSX.Element => {
     updateSettings,
     groupLabels,
   } = props
+
+  const getInitialValues: () => FormValues = () => {
+    const fields = getVisibleFields()
+    const initialFieldValues = mapValues<
+      PipetteSettingsFieldsMap,
+      string | boolean
+    >(fields, f => {
+      if (f.value === true || f.value === false) return f.value
+      // @ts-expect-error(sa, 2021-05-27): avoiding src code change, use optional chain to access f.value
+      return f.value !== f.default ? f.value.toString() : ''
+    })
+    const initialQuirkValues = settings[QUIRK_KEY]
+    const initialValues = Object.assign(
+      {},
+      initialFieldValues,
+      initialQuirkValues
+    )
+
+    return initialValues
+  }
+  const initialValues = getInitialValues()
+
+  const resolver: Resolver<FormValues> = values => {
+    let errors = {}
+    errors = validate(values, errors)
+    return { values, errors }
+  }
+
+  const {
+    handleSubmit,
+    reset,
+    getValues,
+    control,
+    formState: { errors },
+  } = useForm<FormValues>({
+    defaultValues: initialValues,
+    resolver: resolver,
+  })
 
   const getFieldsByKey = (
     keys: string[],
@@ -166,32 +205,6 @@ export const ConfigForm = (props: ConfigFormProps): JSX.Element => {
     return errors
   }
 
-  const resolver: Resolver<FormValues> = values => {
-    let errors = {}
-    errors = validate(values, errors)
-    return { values, errors }
-  }
-
-  const getInitialValues: () => FormValues = () => {
-    const fields = getVisibleFields()
-    const initialFieldValues = mapValues<
-      PipetteSettingsFieldsMap,
-      string | boolean
-    >(fields, f => {
-      if (f.value === true || f.value === false) return f.value
-      // @ts-expect-error(sa, 2021-05-27): avoiding src code change, use optional chain to access f.value
-      return f.value !== f.default ? f.value.toString() : ''
-    })
-    const initialQuirkValues = settings[QUIRK_KEY]
-    const initialValues = Object.assign(
-      {},
-      initialFieldValues,
-      initialQuirkValues
-    )
-
-    return initialValues
-  }
-
   const fields = getVisibleFields()
   const UNKNOWN_KEYS = getUnknownKeys()
   const plungerFields = getFieldsByKey(PLUNGER_KEYS, fields)
@@ -200,18 +213,6 @@ export const ConfigForm = (props: ConfigFormProps): JSX.Element => {
   const quirkFields = getKnownQuirks()
   const quirksPresent = quirkFields.length > 0
   const unknownFields = getFieldsByKey(UNKNOWN_KEYS, fields)
-  const initialValues = getInitialValues()
-
-  const {
-    handleSubmit,
-    reset,
-    getValues,
-    control,
-    formState: { errors },
-  } = useForm<FormValues>({
-    defaultValues: initialValues,
-    resolver: resolver,
-  })
 
   const handleReset = (): void => {
     const newValues = mapValues(getValues(), v => {

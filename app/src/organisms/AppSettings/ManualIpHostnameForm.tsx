@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { FieldError, Resolver, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import styled from 'styled-components'
 
 import {
@@ -19,6 +19,7 @@ import { StyledText } from '../../atoms/text'
 import { addManualIp } from '../../redux/config'
 import { startDiscovery } from '../../redux/discovery'
 
+import type { FieldError, Resolver } from 'react-hook-form'
 import type { Dispatch } from '../../redux/types'
 
 const FlexForm = styled.form`
@@ -90,7 +91,6 @@ export function ManualIpHostnameForm({
   ): Record<string, FieldError> => {
     const ip = data.ip.trim()
     let message: string | undefined
-    // ToDo: kj 12/19/2022 for this, the best way is to use the regex because invisible unicode characters
     if (!ip) {
       message = t('add_ip_error')
     }

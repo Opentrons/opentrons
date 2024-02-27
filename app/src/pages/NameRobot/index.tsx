@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Controller, FieldError, Resolver, useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { css } from 'styled-components'
@@ -37,7 +37,7 @@ import { SmallButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
 import { useIsUnboxingFlowOngoing } from '../../organisms/RobotSettingsDashboard/NetworkSettings/hooks'
 import { ConfirmRobotName } from '../../organisms/OnDeviceDisplay/NameRobot/ConfirmRobotName'
-
+import type { FieldError, Resolver } from 'react-hook-form'
 import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { State, Dispatch } from '../../redux/types'
 
@@ -84,11 +84,11 @@ export function NameRobot(): JSX.Element {
     errors: Record<string, FieldError>
   ): Record<string, FieldError> => {
     const newName = data.newRobotName
-    let message: string | undefined
+    let errorMessage: string | undefined
     // In ODD users cannot input letters and numbers from software keyboard
     // so the app only checks the length of input string
     if (newName.length < 1) {
-      message = t('name_rule_error_name_length')
+      errorMessage = t('name_rule_error_name_length')
     }
 
     if (
@@ -96,16 +96,16 @@ export function NameRobot(): JSX.Element {
         robot => newName === robot.name && robot.ip !== ipAddress
       )
     ) {
-      message = t('name_rule_error_exist')
+      errorMessage = t('name_rule_error_exist')
     }
 
     const updatedErrors =
-      message != null
+      errorMessage != null
         ? {
             ...errors,
             newRobotName: {
               type: 'error',
-              message: message,
+              message: errorMessage,
             },
           }
         : errors

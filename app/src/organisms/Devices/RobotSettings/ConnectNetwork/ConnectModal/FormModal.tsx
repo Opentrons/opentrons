@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Control, Controller } from 'react-hook-form'
+import { Controller } from 'react-hook-form'
 import styled, { css } from 'styled-components'
 
 import {
@@ -14,6 +14,7 @@ import { SecurityField } from './SecurityField'
 import { FIELD_TYPE_KEY_FILE, FIELD_TYPE_SECURITY } from '../constants'
 import * as Copy from '../i18n'
 
+import type { Control } from 'react-hook-form'
 import type { ConnectFormField, ConnectFormValues, WifiNetwork } from '../types'
 
 const fieldStyle = css`

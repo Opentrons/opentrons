@@ -1,9 +1,9 @@
 import get from 'lodash/get'
-import { FieldError } from 'react-hook-form'
 
 import * as Constants from '../constants'
 import * as Copy from '../i18n'
 
+import type { FieldError } from 'react-hook-form'
 import type {
   WifiNetwork,
   WifiKey,
@@ -149,16 +149,16 @@ export function validateConnectFormFields(
     securityType: formSecurityType,
     psk: formPsk,
   } = values
-  let message: string | undefined
+  let errorMessage: string | undefined
 
-  if (network === null && !formSsid) {
-    message = Copy.FIELD_IS_REQUIRED(Copy.LABEL_SSID)
-    return message != null
+  if (network === null && (formSsid == null || formSsid.length === 0)) {
+    errorMessage = Copy.FIELD_IS_REQUIRED(Copy.LABEL_SSID)
+    return errorMessage != null
       ? {
           ...errors,
           ssid: {
             type: 'ssidError',
-            message: message,
+            message: errorMessage,
           },
         }
       : errors
@@ -168,13 +168,13 @@ export function validateConnectFormFields(
     (network === null || network.securityType === Constants.SECURITY_WPA_EAP) &&
     !formSecurityType
   ) {
-    message = Copy.FIELD_IS_REQUIRED(Copy.LABEL_SECURITY)
-    return message != null
+    errorMessage = Copy.FIELD_IS_REQUIRED(Copy.LABEL_SECURITY)
+    return errorMessage != null
       ? {
           ...errors,
           securityType: {
             type: 'securityTypeError',
-            message: message,
+            message: errorMessage,
           },
         }
       : errors
@@ -185,16 +185,16 @@ export function validateConnectFormFields(
       formSecurityType === Constants.SECURITY_WPA_PSK) &&
     (!formPsk || formPsk.length < Constants.CONFIGURE_PSK_MIN_LENGTH)
   ) {
-    message = Copy.FIELD_NOT_LONG_ENOUGH(
+    errorMessage = Copy.FIELD_NOT_LONG_ENOUGH(
       Copy.LABEL_PSK,
       Constants.CONFIGURE_PSK_MIN_LENGTH
     )
-    return message != null
+    return errorMessage != null
       ? {
           ...errors,
           psk: {
             type: 'pskError',
-            message: message,
+            message: errorMessage,
           },
         }
       : errors

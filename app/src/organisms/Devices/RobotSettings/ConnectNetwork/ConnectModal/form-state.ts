@@ -1,12 +1,11 @@
-import * as React from 'react'
-import {
-  useForm,
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { usePrevious } from '@opentrons/components'
+import type {
   ControllerFieldState,
   ControllerRenderProps,
   FieldValues,
 } from 'react-hook-form'
-import { usePrevious } from '@opentrons/components'
-
 import type { ConnectFormValues, ConnectFormFieldProps } from '../types'
 
 export const useResetFormOnSecurityChange = (): void => {
@@ -25,7 +24,7 @@ export const useResetFormOnSecurityChange = (): void => {
   const securityType = getValues('securityType')
   const prevSecurityType = usePrevious(securityType)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (prevSecurityType && securityType !== prevSecurityType) {
       clearErrors('ssid')
       clearErrors('securityType')
