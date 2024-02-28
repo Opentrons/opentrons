@@ -59,15 +59,15 @@ describe('useNotifyService', () => {
     jest.clearAllMocks()
   })
 
-  it('should trigger an HTTP refetch and subscribe action on initial mount', () => {
+  it('should trigger an HTTP refetch and subscribe action on a successful initial mount', () => {
     renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        refetchUsingHTTP: mockHTTPRefetch,
+        setRefetchUsingHTTP: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       } as any)
     )
-    expect(mockHTTPRefetch).toHaveBeenCalled()
+    expect(mockHTTPRefetch).toHaveBeenCalledWith('once')
     expect(mockDispatch).toHaveBeenCalledWith(
       notifySubscribeAction(MOCK_HOST_CONFIG.hostname, MOCK_TOPIC)
     )
@@ -81,7 +81,7 @@ describe('useNotifyService', () => {
     const { unmount } = renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        refetchUsingHTTP: mockHTTPRefetch,
+        setRefetchUsingHTTP: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       } as any)
     )
@@ -91,22 +91,11 @@ describe('useNotifyService', () => {
     )
   })
 
-  it('should return no notify error if there was a successful topic subscription', () => {
-    const { result } = renderHook(() =>
-      useNotifyService({
-        topic: MOCK_TOPIC,
-        refetchUsingHTTP: mockHTTPRefetch,
-        options: MOCK_OPTIONS,
-      } as any)
-    )
-    expect(result.current.isNotifyError).toBe(false)
-  })
-
   it('should not subscribe to notifications if forceHttpPolling is true', () => {
     renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        refetchUsingHTTP: mockHTTPRefetch,
+        setRefetchUsingHTTP: mockHTTPRefetch,
         options: { ...MOCK_OPTIONS, forceHttpPolling: true },
       } as any)
     )
@@ -119,7 +108,7 @@ describe('useNotifyService', () => {
     renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        refetchUsingHTTP: mockHTTPRefetch,
+        setRefetchUsingHTTP: mockHTTPRefetch,
         options: { ...MOCK_OPTIONS, enabled: false },
       } as any)
     )
@@ -132,7 +121,7 @@ describe('useNotifyService', () => {
     renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        refetchUsingHTTP: mockHTTPRefetch,
+        setRefetchUsingHTTP: mockHTTPRefetch,
         options: { ...MOCK_OPTIONS, staleTime: Infinity },
       } as any)
     )
@@ -149,7 +138,7 @@ describe('useNotifyService', () => {
     renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        refetchUsingHTTP: mockHTTPRefetch,
+        setRefetchUsingHTTP: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       } as any)
     )
@@ -160,49 +149,47 @@ describe('useNotifyService', () => {
     errorSpy.mockRestore()
   })
 
-  it('should return a notify error and fire an analytics reporting event if the connection was refused', () => {
+  it('should set HTTP refetch to always if there is an error', () => {
+    mockUseHost.mockReturnValue({ hostname: null } as any)
+
+    renderHook(() =>
+      useNotifyService({
+        topic: MOCK_TOPIC,
+        setRefetchUsingHTTP: mockHTTPRefetch,
+        options: MOCK_OPTIONS,
+      } as any)
+    )
+    expect(mockHTTPRefetch).toHaveBeenCalledWith('always')
+  })
+
+  it('should return set HTTP refetch to always and fire an analytics reporting event if the connection was refused', () => {
     mockAppShellListener.mockImplementation((_: any, __: any, mockCb: any) => {
       mockCb('ECONNREFUSED')
     })
-    const { result, rerender } = renderHook(() =>
+    const { rerender } = renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        refetchUsingHTTP: mockHTTPRefetch,
+        setRefetchUsingHTTP: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       } as any)
     )
     expect(mockTrackEvent).toHaveBeenCalled()
     rerender()
-    expect(result.current.isNotifyError).toBe(true)
+    expect(mockHTTPRefetch).toHaveBeenCalledWith('always')
   })
 
-  it('should return a notify error if the connection failed', () => {
-    mockAppShellListener.mockImplementation((_: any, __: any, mockCb: any) => {
-      mockCb('ECONNFAILED')
-    })
-    const { result, rerender } = renderHook(() =>
-      useNotifyService({
-        topic: MOCK_TOPIC,
-        refetchUsingHTTP: mockHTTPRefetch,
-        options: MOCK_OPTIONS,
-      } as any)
-    )
-    rerender()
-    expect(result.current.isNotifyError).toBe(true)
-  })
-
-  it('should trigger an HTTP refetch if the refetch flag was returned', () => {
+  it('should trigger a single HTTP refetch if the refetch flag was returned', () => {
     mockAppShellListener.mockImplementation((_: any, __: any, mockCb: any) => {
       mockCb({ refetchUsingHTTP: true })
     })
     const { rerender } = renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        refetchUsingHTTP: mockHTTPRefetch,
+        setRefetchUsingHTTP: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       } as any)
     )
     rerender()
-    expect(mockHTTPRefetch).toHaveBeenCalled()
+    expect(mockHTTPRefetch).toHaveBeenCalledWith('once')
   })
 })
