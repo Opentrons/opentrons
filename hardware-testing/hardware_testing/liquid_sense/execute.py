@@ -174,36 +174,43 @@ def run(tip: int, run_args: RunArgs) -> None:
         lpc_offset = run_args.dial_indicator.read_stable()
         run_args.pipette._retract()
 
-    run_args.pipette.pick_up_tip(tips.pop(0))
-    liquid_height = _jog_to_find_liquid_height(
-        run_args.ctx, run_args.pipette, test_well
-    )
-    target_height = test_well.bottom(liquid_height).point.z
+    def _get_baseline() -> float:
+        run_args.pipette.pick_up_tip(tips.pop(0))
+        liquid_height = _jog_to_find_liquid_height(
+            run_args.ctx, run_args.pipette, test_well
+        )
+        target_height = test_well.bottom(liquid_height).point.z
 
-    run_args.pipette._retract()
-    calibration_tip_length_offset = 0.0
-    if run_args.dial_indicator is not None:
-        run_args.pipette.move_to(dial_well.top())
-        calibration_tip_length_offset = run_args.dial_indicator.read_stable()
         run_args.pipette._retract()
-    if run_args.return_tip:
-        run_args.pipette.return_tip()
-    else:
-        run_args.pipette.drop_tip()
+        tip_offset = 0.0
+        if run_args.dial_indicator is not None:
+            run_args.pipette.move_to(dial_well.top())
+            tip_offset = run_args.dial_indicator.read_stable()
+            run_args.pipette._retract()
+        if run_args.return_tip:
+            run_args.pipette.return_tip()
+        else:
+            run_args.pipette.drop_tip()
 
-    env_data = run_args.environment_sensor.get_reading()
+        env_data = run_args.environment_sensor.get_reading()
 
-    store_baseline_trial(
-        run_args.test_report,
-        tip,
-        target_height,
-        env_data.relative_humidity,
-        env_data.temperature,
-        test_well.top().point.z - target_height,
-        calibration_tip_length_offset - lpc_offset,
-    )
+        store_baseline_trial(
+            run_args.test_report,
+            tip,
+            target_height,
+            env_data.relative_humidity,
+            env_data.temperature,
+            test_well.top().point.z - target_height,
+            tip_offset - lpc_offset,
+        )
 
+    trials_before_jog = run_args.trials_before_jog
+    tip_offset = 0.0
     for trial in range(run_args.trials):
+        if (trials_before_jog > 0) and (trial % trials_before_jog == 0):
+            tip_offset = _get_baseline()
+
+
         print(f"Picking up {tip}ul tip")
         run_args.pipette.pick_up_tip(tips.pop(0))
         run_args.pipette.move_to(test_well.top())
@@ -218,7 +225,7 @@ def run(tip: int, run_args: RunArgs) -> None:
             run_args.pipette._retract()
             run_args.pipette.move_to(dial_well.top())
             tip_length_offset = (
-                calibration_tip_length_offset - run_args.dial_indicator.read_stable()
+                tip_offset - run_args.dial_indicator.read_stable()
             )
             run_args.pipette._retract()
             print(f"Tip Offset  {tip_length_offset}")
@@ -259,6 +266,8 @@ def run(tip: int, run_args: RunArgs) -> None:
     ui.print_info(f"RESULTS: \n{results}")
     ui.print_info(f"Adjusted RESULTS: \n{adjusted_results}")
     store_tip_results(run_args.test_report, tip, results, adjusted_results)
+
+def _adjust_water_loss_height()
 
 
 def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
