@@ -4,7 +4,10 @@ import { StaticRouter } from 'react-router-dom'
 import { when } from 'vitest-when'
 import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
+import {
+  partialComponentPropsMatcher,
+  renderWithProviders,
+} from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ChooseRobotToRunProtocolSlideout } from '../../../organisms/ChooseRobotToRunProtocolSlideout'
 import {
