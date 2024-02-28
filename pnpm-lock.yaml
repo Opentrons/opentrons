@@ -591,6 +591,15 @@ importers:
       '@opentrons/app':
         specifier: link:../app
         version: link:../app
+      '@opentrons/discovery-client':
+        specifier: link:../discovery-client
+        version: link:../discovery-client
+      '@opentrons/shared-data':
+        specifier: link:../shared-data
+        version: link:../shared-data
+      '@opentrons/usb-bridge/node-client':
+        specifier: link:../usb-bridge/node-client
+        version: link:../usb-bridge/node-client
       '@thi.ng/paths':
         specifier: 1.6.5
         version: 1.6.5
@@ -691,15 +700,6 @@ importers:
         specifier: 13.1.2
         version: 13.1.2
     devDependencies:
-      '@opentrons/discovery-client':
-        specifier: link:../discovery-client
-        version: link:../discovery-client
-      '@opentrons/shared-data':
-        specifier: link:../shared-data
-        version: link:../shared-data
-      '@opentrons/usb-bridge/node-client':
-        specifier: link:../usb-bridge/node-client
-        version: link:../usb-bridge/node-client
       electron-notarize:
         specifier: ^1.2.1
         version: 1.2.2
@@ -7155,6 +7155,7 @@ packages:
   /@xmldom/xmldom@0.8.10:
     resolution: {integrity: sha512-2WALfTl4xo2SkGCYRt6rDTFfk9R1czmBvUQy12gK2KuRKIpWEhcbbzy8EZXtz/jkRqHX8bFEc6FC1HjX4TUWYw==}
     engines: {node: '>=10.0.0'}
+    requiresBuild: true
     dev: true
 
   /@xtuc/ieee754@1.2.0:
@@ -23787,6 +23788,7 @@ packages:
   /xmlbuilder@15.1.1:
     resolution: {integrity: sha512-yMqGBqtXyeN1e3TGYvgNgDVZ3j84W4cwkOXQswghol6APgZWaff9lnbvN7MHYJOiXsvGPXtjTYJEiC9J2wv9Eg==}
     engines: {node: '>=8.0'}
+    requiresBuild: true
     dev: true
 
   /xmlchars@2.2.0:

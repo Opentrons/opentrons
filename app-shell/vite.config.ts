@@ -8,6 +8,8 @@ export default defineConfig(
     const project = process.env.OPENTRONS_PROJECT ?? 'robot-stack'
     const version = await versionForProject(project)
     return {
+      // this makes imports relative rather than absolute
+      base: '',
       publicDir: false,
       build: {
         // Relative to the root

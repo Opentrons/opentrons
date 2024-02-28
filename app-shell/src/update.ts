@@ -1,13 +1,12 @@
 // app updater
 import updater from 'electron-updater'
 
-import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import { createLogger } from './log'
 import { getConfig } from './config'
-import { UPDATE_VALUE } from '@opentrons/app/src/redux/config'
-
+import { UI_INITIALIZED, UPDATE_VALUE } from './constants'
 import type { UpdateInfo } from '@opentrons/app/src/redux/shell/types'
 import type { Action, Dispatch, PlainError } from './types'
+
 
 const autoUpdater = updater.autoUpdater
 

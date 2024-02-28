@@ -9,7 +9,7 @@ import {
   RESET_VALUE,
   ADD_UNIQUE_VALUE,
   SUBTRACT_VALUE,
-} from '@opentrons/app/src/redux/config'
+} from '../constants'
 
 import { DEFAULTS } from './migrate'
 
