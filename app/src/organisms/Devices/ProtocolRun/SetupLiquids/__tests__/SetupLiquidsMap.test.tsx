@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
-import { describe, it, beforeEach, vi, afterEach } from 'vitest'
+import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 
 import { BaseDeck, LabwareRender } from '@opentrons/components'
 import {
@@ -21,10 +21,7 @@ import {
   simpleAnalysisFileFixture,
 } from '@opentrons/api-client'
 
-import {
-  partialComponentPropsMatcher,
-  renderWithProviders,
-} from '../../../../../__testing-utils__'
+import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import { useAttachedModules } from '../../../hooks'
 import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
@@ -42,9 +39,11 @@ import type {
   ModuleType,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
+import type * as Components from '@opentrons/components'
+import { LabwareInfo } from '@opentrons/components/src/hardware-sim/ProtocolDeck/LabwareInfo'
 
-vi.mock('@opentrons/components', () => {
-  const actualComponents = vi.requireActual('@opentrons/components')
+vi.mock('@opentrons/components', async importOriginal => {
+  const actualComponents = await importOriginal<typeof Components>()
   return {
     ...actualComponents,
     LabwareRender: vi.fn(() => <div>mock LabwareRender</div>),
@@ -108,26 +107,28 @@ describe('SetupLiquidsMap', () => {
       protocolAnalysis: mockProtocolAnalysis,
     }
     when(vi.mocked(LabwareRender))
-      .thenReturn(<div></div>) // this (default) empty div will be returned when LabwareRender isn't called with expected labware definition
       .calledWith(
-        partialComponentPropsMatcher({
+        expect.objectContaining({
           definition: fixtureTiprack300ul,
           wellFill: undefined,
-        })
+        }),
+        expect.anything()
       )
       .thenReturn(
         <div>
           mock labware render of {fixtureTiprack300ul.metadata.displayName}
         </div>
       )
+    when(vi.mocked(LabwareRender))
       .calledWith(
-        partialComponentPropsMatcher({
+        expect.objectContaining({
           wellFill: { C1: '#ff4888', C2: '#ff4888' },
-        })
+        }),
+        expect.anything()
       )
       .thenReturn(<div>mock labware render with well fill</div>)
     when(vi.mocked(useAttachedModules)).calledWith().thenReturn([])
-    when(vi.mocked(getAttachedProtocolModuleMatches)).thenReturn([])
+    vi.mocked(getAttachedProtocolModuleMatches).mockReturnValue([])
     when(vi.mocked(getLabwareRenderInfo))
       .calledWith(mockProtocolAnalysis, ot2StandardDeckDef as any)
       .thenReturn({})
@@ -144,9 +145,9 @@ describe('SetupLiquidsMap', () => {
       .calledWith(mockProtocolAnalysis.commands as any)
       .thenReturn({})
     when(vi.mocked(LabwareInfoOverlay))
-      .thenReturn(<div></div>) // this (default) empty div will be returned when LabwareInfoOverlay isn't called with expected props
       .calledWith(
-        partialComponentPropsMatcher({ definition: fixtureTiprack300ul })
+        expect.objectContaining({ definition: fixtureTiprack300ul }),
+        expect.anything()
       )
       .thenReturn(
         <div>
@@ -154,6 +155,12 @@ describe('SetupLiquidsMap', () => {
           {fixtureTiprack300ul.metadata.displayName}
         </div>
       )
+    when(vi.mocked(LabwareInfoOverlay))
+      .calledWith(
+        expect.not.objectContaining({ definition: fixtureTiprack300ul }),
+        expect.anything()
+      )
+      .thenReturn(<div></div>)
   })
 
   afterEach(() => {
@@ -173,23 +180,23 @@ describe('SetupLiquidsMap', () => {
   it('should render base deck - robot type is OT-2', () => {
     when(vi.mocked(getDeckDefFromRobotType))
       .calledWith(OT2_ROBOT_TYPE)
-      .mockReturnValue(ot2StandardDeckDef as any)
+      .thenReturn(ot2StandardDeckDef as any)
     when(vi.mocked(parseLabwareInfoByLiquidId))
       .calledWith(mockProtocolAnalysis.commands as any)
-      .mockReturnValue({})
+      .thenReturn({})
     vi.mocked(useAttachedModules).mockReturnValue(
       mockFetchModulesSuccessActionPayloadModules
     )
-    when(vi.mocked(getLabwareRenderInfo)).mockReturnValue({})
+    vi.mocked(getLabwareRenderInfo).mockReturnValue({})
     when(vi.mocked(getProtocolModulesInfo))
       .calledWith(mockProtocolAnalysis, ot2StandardDeckDef as any)
-      .mockReturnValue(mockProtocolModuleInfo)
+      .thenReturn(mockProtocolModuleInfo)
     when(vi.mocked(getAttachedProtocolModuleMatches))
       .calledWith(
         mockFetchModulesSuccessActionPayloadModules,
         mockProtocolModuleInfo
       )
-      .mockReturnValue([
+      .thenReturn([
         {
           moduleId: mockMagneticModule.moduleId,
           x: MOCK_MAGNETIC_MODULE_COORDS[0],
@@ -220,12 +227,13 @@ describe('SetupLiquidsMap', () => {
 
     when(mockBaseDeck)
       .calledWith(
-        partialComponentPropsMatcher({
+        expect.objectContaining({
           robotType: OT2_ROBOT_TYPE,
           deckLayerBlocklist: getStandardDeckViewLayerBlockList(OT2_ROBOT_TYPE),
-        })
+        }),
+        expect.anything()
       )
-      .mockReturnValue(<div>mock BaseDeck</div>)
+      .thenReturn(<div>mock BaseDeck</div>)
     render(props)
     screen.getByText('mock BaseDeck')
   })
@@ -244,11 +252,11 @@ describe('SetupLiquidsMap', () => {
     }
     when(vi.mocked(getDeckDefFromRobotType))
       .calledWith(FLEX_ROBOT_TYPE)
-      .mockReturnValue(ot3StandardDeckDef as any)
+      .thenReturn(ot3StandardDeckDef as any)
 
     when(vi.mocked(getLabwareRenderInfo))
       .calledWith(mockFlexAnalysis, ot3StandardDeckDef as any)
-      .mockReturnValue({
+      .thenReturn({
         [MOCK_300_UL_TIPRACK_ID]: {
           labwareDef: fixtureTiprack300ul as LabwareDefinition2,
           displayName: 'fresh tips',
@@ -261,20 +269,20 @@ describe('SetupLiquidsMap', () => {
 
     when(vi.mocked(parseLabwareInfoByLiquidId))
       .calledWith(mockFlexAnalysis.commands as any)
-      .mockReturnValue({})
+      .thenReturn({})
     vi.mocked(useAttachedModules).mockReturnValue(
       mockFetchModulesSuccessActionPayloadModules
     )
 
     when(vi.mocked(getProtocolModulesInfo))
       .calledWith(mockFlexAnalysis, ot3StandardDeckDef as any)
-      .mockReturnValue(mockProtocolModuleInfo)
+      .thenReturn(mockProtocolModuleInfo)
     when(vi.mocked(getAttachedProtocolModuleMatches))
       .calledWith(
         mockFetchModulesSuccessActionPayloadModules,
         mockProtocolModuleInfo
       )
-      .mockReturnValue([
+      .thenReturn([
         {
           moduleId: mockMagneticModule.moduleId,
           x: MOCK_MAGNETIC_MODULE_COORDS[0],
@@ -304,7 +312,7 @@ describe('SetupLiquidsMap', () => {
       ])
     when(mockBaseDeck)
       .calledWith(
-        partialComponentPropsMatcher({
+        expect.objectContaining({
           deckLayerBlocklist: getStandardDeckViewLayerBlockList(
             FLEX_ROBOT_TYPE
           ),
@@ -312,9 +320,10 @@ describe('SetupLiquidsMap', () => {
           // // ToDo (kk:11/03/2023) Update the following part later
           labwareOnDeck: expect.anything(),
           modulesOnDeck: expect.anything(),
-        })
+        }),
+        expect.anything()
       )
-      .mockReturnValue(<div>mock BaseDeck</div>)
+      .thenReturn(<div>mock BaseDeck</div>)
     render(props)
     screen.getByText('mock BaseDeck')
   })

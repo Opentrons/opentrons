@@ -4,17 +4,11 @@ import { StaticRouter } from 'react-router-dom'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { LabwareRender, Module } from '@opentrons/components'
-import {
-  OT2_ROBOT_TYPE,
-  getModuleDef2,
-  fixtureTiprack300ul,
-} from '@opentrons/shared-data'
+import { BaseDeck } from '@opentrons/components'
+import { OT2_ROBOT_TYPE, getModuleDef2 } from '@opentrons/shared-data'
+import { fixtureTiprack300ul as fixture_tiprack_300_ul } from '@opentrons/shared-data'
 
-import {
-  partialComponentPropsMatcher,
-  renderWithProviders,
-} from '../../../../../__testing-utils__'
+import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import { getAttachedProtocolModuleMatches } from '../../../../ProtocolSetupModulesAndDeck/utils'
 import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
@@ -27,12 +21,19 @@ import type {
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
+import type Components from '@opentrons/components'
+import type SharedData from '@opentrons/shared-data'
+import { fixtureTiprack300ul } from '@opentrons/shared-data'
 
-vi.mock('@opentrons/components/src/hardware-sim/Labware/LabwareRender')
-vi.mock('@opentrons/components/src/hardware-sim/Module')
-
+vi.mock('@opentrons/components', async importOriginal => {
+  const actualComponents = await importOriginal<typeof Components>()
+  return {
+    ...actualComponents,
+    BaseDeck: vi.fn(),
+  }
+})
 vi.mock('@opentrons/shared-data', async importOriginal => {
-  const actualSharedData = await importOriginal<typeof getModuleDef2>()
+  const actualSharedData = await importOriginal<typeof SharedData>()
   return {
     ...actualSharedData,
     getModuleDef2: vi.fn(),
@@ -92,32 +93,33 @@ const render = (props: React.ComponentProps<typeof SetupLabwareMap>) => {
 
 describe('SetupLabwareMap', () => {
   beforeEach(() => {
-    when(vi.mocked(getAttachedProtocolModuleMatches)).thenReturn([])
-    when(vi.mocked(getLabwareRenderInfo)).thenReturn({})
-    when(vi.mocked(LabwareRender))
-      .thenReturn(<div></div>) // this (default) empty div will be returned when LabwareRender isn't called with expected labware definition
-      .calledWith(
-        partialComponentPropsMatcher({
-          definition: fixtureTiprack300ul,
-        })
-      )
-      .thenReturn(
-        <div>
-          mock labware render of {fixtureTiprack300ul.metadata.displayName}
-        </div>
-      )
+    vi.mocked(getAttachedProtocolModuleMatches).mockReturnValue([])
+    vi.mocked(getLabwareRenderInfo).mockReturnValue({})
+    vi.mocked(BaseDeck).mockReturnValue(<div>mock baseDeck</div>)
+    // when(vi.mocked(LabwareRender))
+    //   .called.thenReturn(<div></div>) // this (default) empty div will be returned when LabwareRender isn't called with expected labware definition
+    //   .calledWith(
+    //     partialComponentPropsMatcher({
+    //       definition: fixture_tiprack_300_ul,
+    //     })
+    //   )
+    //   .thenReturn(
+    //     <div>
+    //       mock labware render of {fixture_tiprack_300_ul.metadata.displayName}
+    //     </div>
+    //   )
 
-    when(vi.mocked(LabwareInfoOverlay))
-      .thenReturn(<div></div>) // this (default) empty div will be returned when LabwareInfoOverlay isn't called with expected props
-      .calledWith(
-        partialComponentPropsMatcher({ definition: fixtureTiprack300ul })
-      )
-      .thenReturn(
-        <div>
-          mock labware info overlay of{' '}
-          {fixtureTiprack300ul.metadata.displayName}
-        </div>
-      )
+    // when(vi.mocked(LabwareInfoOverlay))
+    //   .thenReturn(<div></div>) // this (default) empty div will be returned when LabwareInfoOverlay isn't called with expected props
+    //   .calledWith(
+    //     partialComponentPropsMatcher({ definition: fixture_tiprack_300_ul })
+    //   )
+    //   .thenReturn(
+    //     <div>
+    //       mock labware info overlay of{' '}
+    //       {fixture_tiprack_300_ul.metadata.displayName}
+    //     </div>
+    //   )
   })
 
   afterEach(() => {
@@ -125,12 +127,22 @@ describe('SetupLabwareMap', () => {
   })
 
   it('should render a deck WITHOUT labware and WITHOUT modules', () => {
-    expect(vi.mocked(Module)).not.toHaveBeenCalled()
-    expect(vi.mocked(LabwareRender)).not.toHaveBeenCalled()
+    render({
+      runId: RUN_ID,
+      protocolAnalysis: ({
+        commands: [],
+        labware: [],
+        robotType: OT2_ROBOT_TYPE,
+      } as unknown) as CompletedProtocolAnalysis,
+    })
     expect(vi.mocked(LabwareInfoOverlay)).not.toHaveBeenCalled()
+    expect(vi.mocked(BaseDeck)).toHaveBeenCalledWith(
+      expect.objectContaining({ labwareOnDeck: [], modulesOnDeck: [] }),
+      expect.anything()
+    )
   })
   it('should render a deck WITH labware and WITHOUT modules', () => {
-    when(vi.mocked(getLabwareRenderInfo)).thenReturn({
+    vi.mocked(getLabwareRenderInfo).mockReturnValue({
       '300_ul_tiprack_id': {
         labwareDef: fixtureTiprack300ul as LabwareDefinition2,
         displayName: 'fresh tips',
@@ -140,7 +152,6 @@ describe('SetupLabwareMap', () => {
         slotName: '1',
       },
     })
-
     render({
       runId: RUN_ID,
       protocolAnalysis: ({
@@ -150,15 +161,23 @@ describe('SetupLabwareMap', () => {
       } as unknown) as CompletedProtocolAnalysis,
     })
 
-    expect(vi.mocked(Module)).not.toHaveBeenCalled()
-    expect(vi.mocked(LabwareRender)).toHaveBeenCalled()
-    expect(vi.mocked(LabwareInfoOverlay)).toHaveBeenCalled()
-    screen.getByText('mock labware render of 300ul Tiprack FIXTURE')
-    screen.getByText('mock labware info overlay of 300ul Tiprack FIXTURE')
+    expect(vi.mocked(BaseDeck)).toHaveBeenCalledWith(
+      expect.objectContaining(
+        {
+          labwareOnDeck: [
+            expect.objectContaining(
+              { definition: fixtureTiprack300ul },
+              expect.anything()
+            ),
+          ],
+        },
+        expect.anything()
+      )
+    )
   })
 
   it('should render a deck WITH labware and WITH modules', () => {
-    when(vi.mocked(getLabwareRenderInfo)).thenReturn({
+    vi.mocked(getLabwareRenderInfo).mockReturnValue({
       [MOCK_300_UL_TIPRACK_ID]: {
         labwareDef: fixtureTiprack300ul as LabwareDefinition2,
         displayName: 'fresh tips',
@@ -169,7 +188,7 @@ describe('SetupLabwareMap', () => {
       },
     })
 
-    when(vi.mocked(getAttachedProtocolModuleMatches)).thenReturn([
+    vi.mocked(getAttachedProtocolModuleMatches).mockReturnValue([
       {
         moduleId: mockMagneticModule.moduleId,
         x: MOCK_MAGNETIC_MODULE_COORDS[0],
@@ -203,21 +222,21 @@ describe('SetupLabwareMap', () => {
       .calledWith(mockTCModule.model)
       .thenReturn(mockTCModule as any)
 
-    when(vi.mocked(Module))
-      .calledWith(
-        partialComponentPropsMatcher({
-          def: mockMagneticModule,
-        })
-      )
-      .thenReturn(<div>mock module viz {mockMagneticModule.type} </div>)
+    // when(vi.mocked(Module))
+    //   .calledWith(
+    //     partialComponentPropsMatcher({
+    //       def: mockMagneticModule,
+    //     })
+    //   )
+    //   .thenReturn(<div>mock module viz {mockMagneticModule.type} </div>)
 
-    when(vi.mocked(Module))
-      .calledWith(
-        partialComponentPropsMatcher({
-          def: mockTCModule,
-        })
-      )
-      .thenReturn(<div>mock module viz {mockTCModule.type} </div>)
+    // when(vi.mocked(Module))
+    //   .calledWith(
+    //     partialComponentPropsMatcher({
+    //       def: mockTCModule,
+    //     })
+    //   )
+    //   .thenReturn(<div>mock module viz {mockTCModule.type} </div>)
 
     render({
       runId: RUN_ID,
@@ -227,6 +246,25 @@ describe('SetupLabwareMap', () => {
         robotType: OT2_ROBOT_TYPE,
       } as unknown) as CompletedProtocolAnalysis,
     })
+
+    expect(vi.mocked(Module)).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        def: mockMagneticModule,
+      })
+    )
+    expect(vi.mocked(Module)).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        def: mockTCModule,
+      })
+    )
+    expect(vi.mocked(LabwareRender)).toHaveBeenCalledWith(
+      expect.objectContaining({ definition: fixture_tiprack_300_ul })
+    )
+    expect(vi.mocked(LabwareInfoOverlay)).toHaveBeenCalledWith(
+      expect.objectContaining({ definition: fixture_tiprack_300_ul })
+    )
 
     screen.getByText('mock module viz magneticModuleType')
     screen.getByText('mock module viz thermocyclerModuleType')

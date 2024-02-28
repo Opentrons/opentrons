@@ -27,14 +27,6 @@ vi.mock('../../hooks')
 vi.mock('../utils/getLabwareDefinitionUri')
 vi.mock('../useLabwareOffsetForLabware')
 
-// jest.mock('@opentrons/shared-data', () => {
-//   const actualSharedData = jest.requireActual('@opentrons/shared-data')
-//   return {
-//     ...actualSharedData,
-//     getLabwareDisplayName: jest.fn(),
-//   }
-// })
-
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getLabwareDisplayName>()
   return {

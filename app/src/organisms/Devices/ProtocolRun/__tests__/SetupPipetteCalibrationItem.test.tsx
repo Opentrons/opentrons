@@ -13,9 +13,6 @@ import { MemoryRouter } from 'react-router-dom'
 
 vi.mock('../../hooks')
 
-const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
-  typeof useDeckCalibrationData
->
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
 
@@ -44,7 +41,7 @@ describe('SetupPipetteCalibrationItem', () => {
   }
 
   beforeEach(() => {
-    when(mockUseDeckCalibrationData).calledWith(ROBOT_NAME).thenReturn({
+    when(vi.mocked(useDeckCalibrationData)).calledWith(ROBOT_NAME).thenReturn({
       deckCalibrationData: mockDeckCalData,
       isDeckCalibrated: true,
     })

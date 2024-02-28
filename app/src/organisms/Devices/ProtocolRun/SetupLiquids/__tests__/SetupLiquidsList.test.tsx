@@ -10,7 +10,6 @@ import {
 
 import {
   nestedTextMatcher,
-  partialComponentPropsMatcher,
   renderWithProviders,
 } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
@@ -89,9 +88,10 @@ describe('SetupLiquidsList', () => {
     )
     when(vi.mocked(LiquidsLabwareDetailsModal))
       .calledWith(
-        partialComponentPropsMatcher({ labwareId: '123', liquidId: '0' })
+        expect.objectContaining({ labwareId: '123', liquidId: '0' }),
+        expect.anything()
       )
-      .thenReturn(<div>Mock liquids labwaqre details modal</div>)
+      .thenReturn(<div>Mock liquids labware details modal</div>)
   })
 
   it('renders the total volume of the liquid, sample display name, and description', () => {
@@ -129,6 +129,6 @@ describe('SetupLiquidsList', () => {
       name: ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
       properties: {},
     })
-    screen.getByText('Mock liquids labwaqre details modal')
+    screen.getByText('Mock liquids labware details modal')
   })
 })

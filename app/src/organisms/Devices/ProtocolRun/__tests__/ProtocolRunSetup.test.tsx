@@ -12,13 +12,12 @@ import {
   ProtocolAnalysisOutput,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
-import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
-import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
-
 import {
-  partialComponentPropsMatcher,
-  renderWithProviders,
-} from '../../../../__testing-utils__'
+  simple_v4 as noModulesProtocol,
+  test_modules_protocol as withModulesProtocol,
+} from '@opentrons/shared-data'
+
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
 import {
@@ -43,6 +42,7 @@ import { SetupLiquids } from '../SetupLiquids'
 import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
 import { EmptySetupStep } from '../EmptySetupStep'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
+import type * as SharedData from '@opentrons/shared-data'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../hooks')
@@ -52,11 +52,17 @@ vi.mock('../SetupModuleAndDeck')
 vi.mock('../SetupLiquids')
 vi.mock('../EmptySetupStep')
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-vi.mock('@opentrons/shared-data/js/helpers/parseProtocolData')
-vi.mock('@opentrons/shared-data/js/helpers/getSimplestFlexDeckConfig')
 vi.mock('../../../../redux/config')
 vi.mock('../../../../resources/deck_configuration/utils')
 vi.mock('../../../../resources/deck_configuration/hooks')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actualSharedData = await importOriginal<typeof SharedData>()
+  return {
+    ...actualSharedData,
+    parseProtocolData: vi.fn(),
+    getSimplestDeckConfigForProtocol: vi.fn(),
+  }
+})
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -92,8 +98,8 @@ describe('ProtocolRunSetup', () => {
         ...noModulesProtocol,
         ...MOCK_ROTOCOL_LIQUID_KEY,
       } as unknown) as ProtocolAnalysisOutput)
-    when(vi.mocked(parseAllRequiredModuleModels)).thenReturn([])
-    when(vi.mocked(parseLiquidsInLoadOrder)).thenReturn([])
+    vi.mocked(parseAllRequiredModuleModels).mockReturnValue([])
+    vi.mocked(parseLiquidsInLoadOrder).mockReturnValue([])
     when(vi.mocked(useRobot))
       .calledWith(ROBOT_NAME)
       .thenReturn(mockConnectedRobot)
@@ -103,31 +109,36 @@ describe('ProtocolRunSetup', () => {
     when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
     when(vi.mocked(SetupRobotCalibration))
       .calledWith(
-        partialComponentPropsMatcher({
+        expect.objectContaining({
           robotName: ROBOT_NAME,
           runId: RUN_ID,
-        })
+        }),
+        expect.anything()
       )
       .thenReturn(<span>Mock SetupRobotCalibration</span>)
     when(vi.mocked(SetupLabware))
       .calledWith(
-        partialComponentPropsMatcher({
+        expect.objectContaining({
           protocolRunHeaderRef: null,
           robotName: ROBOT_NAME,
           runId: RUN_ID,
-        })
+        }),
+        expect.anything()
       )
       .thenReturn(<span>Mock SetupLabware</span>)
-    when(vi.mocked(SetupModuleAndDeck)).thenReturn(<div>Mock SetupModules</div>)
-    when(vi.mocked(SetupLiquids)).thenReturn(<div>Mock SetupLiquids</div>)
-    when(vi.mocked(EmptySetupStep)).thenReturn(<div>Mock EmptySetupStep</div>)
-    when(vi.mocked(getSimplestDeckConfigForProtocol)).thenReturn([])
-    when(vi.mocked(useDeckConfigurationCompatibility)).thenReturn([])
-    when(vi.mocked(getRequiredDeckConfig)).thenReturn([])
+    vi.mocked(SetupRobotCalibration).mockReturnValue(
+      <div>Mock SetupRobotCalibration</div>
+    )
+    vi.mocked(SetupModuleAndDeck).mockReturnValue(<div>Mock SetupModules</div>)
+    vi.mocked(SetupLiquids).mockReturnValue(<div>Mock SetupLiquids</div>)
+    vi.mocked(EmptySetupStep).mockReturnValue(<div>Mock EmptySetupStep</div>)
+    vi.mocked(getSimplestDeckConfigForProtocol).mockReturnValue([])
+    vi.mocked(useDeckConfigurationCompatibility).mockReturnValue([])
+    vi.mocked(getRequiredDeckConfig).mockReturnValue([])
     when(vi.mocked(useUnmatchedModulesForProtocol))
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
-    when(vi.mocked(getIsFixtureMismatch)).thenReturn(false)
+    vi.mocked(getIsFixtureMismatch).mockReturnValue(false)
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -225,7 +236,7 @@ describe('ProtocolRunSetup', () => {
 
   describe('when modules are in the protocol', () => {
     beforeEach(() => {
-      when(vi.mocked(parseAllRequiredModuleModels)).thenReturn([
+      vi.mocked(parseAllRequiredModuleModels).mockReturnValue([
         'magneticModuleV1',
         'temperatureModuleV1',
       ])
@@ -303,7 +314,7 @@ describe('ProtocolRunSetup', () => {
           missingLabwareDisplayName: null,
         },
       ])
-      when(vi.mocked(getRequiredDeckConfig)).thenReturn([
+      vi.mocked(getRequiredDeckConfig).mockReturnValue([
         {
           cutoutId: 'cutoutA1',
           cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
@@ -313,7 +324,7 @@ describe('ProtocolRunSetup', () => {
           ],
         },
       ] as any)
-      when(vi.mocked(getIsFixtureMismatch)).thenReturn(true)
+      vi.mocked(getIsFixtureMismatch).mockReturnValue(true)
       when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
       when(vi.mocked(useModuleCalibrationStatus))
         .calledWith(ROBOT_NAME, RUN_ID)
@@ -366,7 +377,7 @@ describe('ProtocolRunSetup', () => {
             },
           ],
         } as any)
-      when(vi.mocked(parseAllRequiredModuleModels)).thenReturn([
+      vi.mocked(parseAllRequiredModuleModels).mockReturnValue([
         'magneticModuleV1',
       ])
       render()
@@ -402,7 +413,7 @@ describe('ProtocolRunSetup', () => {
             },
           ],
         } as any)
-      when(vi.mocked(parseAllRequiredModuleModels)).thenReturn([
+      vi.mocked(parseAllRequiredModuleModels).mockReturnValue([
         'magneticModuleV1',
       ])
       render()
