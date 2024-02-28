@@ -46,7 +46,14 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 import { CalibrationDataDownload } from '../CalibrationDataDownload'
 
-vi.mock('file-saver')
+// file-saver has circular dep, need to mock with factory to prevent error
+vi.mock('file-saver', async importOriginal => {
+  const actual = await importOriginal<typeof saveAs>()
+  return {
+    ...actual,
+    saveAs: vi.fn(),
+  }
+})
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../redux/analytics')
 vi.mock('../../../organisms/Devices/hooks')
