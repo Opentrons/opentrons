@@ -261,7 +261,7 @@ if __name__ == "__main__":
     parser.add_argument("--ignore-scale", action="store_true")
     parser.add_argument("--ignore-env", action="store_true")
     parser.add_argument("--ignore-dial", action="store_true")
-    parser.add_argument("--trials-before-job", type=float, default=0.0)
+    parser.add_argument("--trials-before-jog", type=float, default=0.0)
 
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
