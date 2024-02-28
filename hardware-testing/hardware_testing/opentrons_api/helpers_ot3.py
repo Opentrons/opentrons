@@ -557,11 +557,12 @@ async def update_pick_up_current(
 ) -> None:
     """Update pick-up-tip current."""
     pipette = _get_pipette_from_mount(api, mount)
-    config_model = pipette.pick_up_configurations.press_fit
-    config_model.current_by_tip_count = {
-        k: current for k in config_model.current_by_tip_count.keys()
+    config_model = pipette.pick_up_configurations
+    print(f'config: {config_model}')
+    config_model.press_fit.current_by_tip_count = {
+        k: current for k in config_model.press_fit.current_by_tip_count.keys()
     }
-    pipette.pick_up_configurations.press_fit = config_model
+    pipette.pick_up_configurations = config_model
 
 async def update_drop_tip_current(
     api: OT3API, mount: OT3Mount, current: float = 1.0
