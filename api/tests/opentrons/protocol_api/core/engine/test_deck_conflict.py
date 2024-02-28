@@ -10,6 +10,8 @@ from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons.motion_planning import deck_conflict as wrapped_deck_conflict
 from opentrons.motion_planning import adjacent_slots_getters
 from opentrons.motion_planning.adjacent_slots_getters import _MixedTypeSlots
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api._disposal_locations import TrashBin, WasteChute
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocol_api.core.engine import deck_conflict
@@ -63,6 +65,12 @@ def use_mock_wrapped_deck_conflict(
     """Replace the check() function that our subject should wrap with a mock."""
     mock_check = decoy.mock(func=wrapped_deck_conflict.check)
     monkeypatch.setattr(wrapped_deck_conflict, "check", mock_check)
+
+
+@pytest.fixture
+def api_version() -> APIVersion:
+    """Get mocked api_version."""
+    return MAX_SUPPORTED_VERSION
 
 
 @pytest.fixture
@@ -331,7 +339,10 @@ def test_maps_different_module_models(
     ],
 )
 def test_maps_trash_bins(
-    decoy: Decoy, mock_state_view: StateView, mock_sync_client: SyncClient
+    decoy: Decoy,
+    mock_state_view: StateView,
+    api_version: APIVersion,
+    mock_sync_client: SyncClient,
 ) -> None:
     """It should correctly map disposal locations."""
     mock_trash_lw = decoy.mock(cls=Labware)
@@ -345,14 +356,16 @@ def test_maps_trash_bins(
                 location=DeckSlotName.SLOT_B1,
                 addressable_area_name="blah",
                 engine_client=mock_sync_client,
+                api_version=api_version,
             ),
-            WasteChute(engine_client=mock_sync_client),
+            WasteChute(engine_client=mock_sync_client, api_version=api_version),
             mock_trash_lw,
         ],
         new_trash_bin=TrashBin(
             location=DeckSlotName.SLOT_A1,
             addressable_area_name="blah",
             engine_client=mock_sync_client,
+            api_version=api_version,
         ),
     )
     decoy.verify(

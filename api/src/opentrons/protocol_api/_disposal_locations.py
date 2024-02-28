@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing_extensions import Protocol as TypingProtocol
 
-from opentrons.types import DeckSlotName, Point
+from opentrons.types import DeckSlotName
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_engine.clients import SyncClient
 
 
@@ -16,6 +18,13 @@ _TRASH_BIN_CUTOUT_FIXTURE = "trashBinAdapter"
 _WASTE_CHUTE_CUTOUT_FIXTURE = "wasteChuteRightAdapterCovered"
 
 
+@dataclass(frozen=True)
+class DisposalOffset:
+    x: float
+    y: float
+    z: float
+
+
 class DisposalLocation(TypingProtocol):
     """Abstract class for disposal location."""
 
@@ -24,7 +33,7 @@ class DisposalLocation(TypingProtocol):
         ...
 
     @property
-    def offset(self) -> Point:
+    def offset(self) -> DisposalOffset:
         """Offset of the disposal location.
 
         :meta private:
@@ -75,24 +84,27 @@ class TrashBin(DisposalLocation):
         location: DeckSlotName,
         addressable_area_name: str,
         engine_client: SyncClient,
-        offset: Point = Point(x=0, y=0, z=0),
+        api_version: APIVersion,
+        offset: DisposalOffset = DisposalOffset(x=0, y=0, z=0),
     ) -> None:
         self._location = location
         self._addressable_area_name = addressable_area_name
         self._offset = offset
+        self._api_version = api_version
         self._engine_client = engine_client
 
     def top(self, x: float = 0, y: float = 0, z: float = 0) -> TrashBin:
         """Returns a trash bin with a user set offset."""
         return TrashBin(
-            self._location,
-            self._addressable_area_name,
-            self._engine_client,
-            Point(x=x, y=y, z=z),
+            location=self._location,
+            addressable_area_name=self._addressable_area_name,
+            engine_client=self._engine_client,
+            api_version=self._api_version,
+            offset=DisposalOffset(x=x, y=y, z=z),
         )
 
     @property
-    def offset(self) -> Point:
+    def offset(self) -> DisposalOffset:
         """Current offset of the trash bin..
 
         :meta private:
@@ -140,17 +152,26 @@ class WasteChute(DisposalLocation):
     See :py:meth:`.ProtocolContext.load_waste_chute`.
     """
 
-    def __init__(self, engine_client: SyncClient, offset: Point = Point()) -> None:
+    def __init__(
+        self,
+        engine_client: SyncClient,
+        api_version: APIVersion,
+        offset: DisposalOffset = DisposalOffset(x=0, y=0, z=0),
+    ) -> None:
         self._engine_client = engine_client
-        # TODO maybe make this some sort of offset vector
+        self._api_version = api_version
         self._offset = offset
 
     def top(self, x: float = 0, y: float = 0, z: float = 0) -> WasteChute:
         """Returns a waste chute with a user set offset."""
-        return WasteChute(self._engine_client, Point(x=x, y=y, z=z))
+        return WasteChute(
+            engine_client=self._engine_client,
+            api_version=self._api_version,
+            offset=DisposalOffset(x=x, y=y, z=z),
+        )
 
     @property
-    def offset(self) -> Point:
+    def offset(self) -> DisposalOffset:
         """Current offset of the waste chute.
 
         :meta private:

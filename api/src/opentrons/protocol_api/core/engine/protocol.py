@@ -523,6 +523,7 @@ class ProtocolCore(
         trash_bin = TrashBin(
             location=slot_name,
             addressable_area_name=area_name,
+            api_version=self._api_version,
             engine_client=self._engine_client,
         )
         self._add_disposal_location_to_engine(trash_bin)
@@ -533,6 +534,7 @@ class ProtocolCore(
         _fixed_trash_trash_bin = TrashBin(
             location=DeckSlotName.FIXED_TRASH,
             addressable_area_name="fixedTrash",
+            api_version=self._api_version,
             engine_client=self._engine_client,
         )
         # We are just appending the fixed trash to the core's internal list here, not adding it to the engine via
@@ -547,7 +549,9 @@ class ProtocolCore(
         Returns:
             A waste chute object.
         """
-        waste_chute = WasteChute(engine_client=self._engine_client)
+        waste_chute = WasteChute(
+            engine_client=self._engine_client, api_version=self._api_version
+        )
         self._add_disposal_location_to_engine(waste_chute)
         return waste_chute
 
