@@ -267,8 +267,6 @@ def run(tip: int, run_args: RunArgs) -> None:
     ui.print_info(f"Adjusted RESULTS: \n{adjusted_results}")
     store_tip_results(run_args.test_report, tip, results, adjusted_results)
 
-def _adjust_water_loss_height()
-
 
 def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
     hw_api = get_sync_hw_api(run_args.ctx)
