@@ -26,6 +26,7 @@ robot_list = [
     "PVT1ABR12",
 ]
 # Labware per Robot
+labware_DVT1ABR2 = ["Reagents", "Sample Plate"]
 labware_DVT1ABR4 = [
     "Sample Plate",
     "Reservoir",
@@ -48,6 +49,7 @@ labware_PVT1ABR11 = [
 labware_DVT1ABR3 = ["Plate1", "Seal1", "Plate2", "Seal2"]
 labware_PVT1ABR7 = ["Waste", "R1", "R2", "PCR Plate", "Deep Well Plate"]
 labware = [
+    labware_DVT1ABR2,
     labware_DVT1ABR4,
     labware_PVT1ABR9,
     labware_PVT1ABR10,
@@ -55,7 +57,7 @@ labware = [
     labware_DVT1ABR3,
     labware_PVT1ABR7,
 ]
-abr = ["DVT1ABR4", "PVT1ABR9", "PVT1ABR10", "PVT1ABR11", "DVT1ABR3", "PVT1ABR7"]
+abr = ["DVT1ABR2", "DVT1ABR4", "PVT1ABR9", "PVT1ABR10", "PVT1ABR11", "DVT1ABR3", "PVT1ABR7"]
 robot_labware: Dict[str, List[str]] = {"Robot": [], "Labware": []}
 for i in range(len(labware)):
     robot_labware["Robot"].extend([abr[i]] * len(labware[i]))
