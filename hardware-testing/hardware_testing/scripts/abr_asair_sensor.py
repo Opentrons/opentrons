@@ -24,7 +24,6 @@ class _ABRAsairSensor:
         try:
             sys.path.insert(0, "/var/lib/jupyter/notebooks")
             import google_sheets_tool  # type: ignore[import]
-
             credentials_path = "/var/lib/jupyter/notebooks/abr.json"
         except ImportError:
             raise ImportError(
@@ -62,7 +61,8 @@ class _ABRAsairSensor:
         while True:
             env_data = sensor.get_reading()
             timestamp = datetime.datetime.now()
-            new_timestamp = timestamp - datetime.timedelta(hours=5)
+            # Time adjustment for ABR robot timezone
+            new_timestamp = timestamp - datetime.timedelta(hours=5)  
             date = new_timestamp.date()
             time = new_timestamp.time()
             temp = env_data.temperature
@@ -94,12 +94,10 @@ class _ABRAsairSensor:
             t.sleep(frequency * 60)  # seconds
 
         # Upload to robot testing data folder
-        result_string = ""
         for sublist in results_list:
             row_str = ", ".join(map(str, sublist)) + "\n"  # type: str
-            result_string += row_str
             save_file_path = data.append_data_to_file(
-                test_name, run_id, file_name, result_string
+                test_name, run_id, file_name, row_str
             )
         print(f"Saved to robot: f{save_file_path}.")
         print(
