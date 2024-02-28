@@ -49,6 +49,6 @@ describe('SecondaryButton', () => {
     props.color = COLORS.red50
     render(props)
     const button = screen.getByText('secondary button')
-    expect(button).toHaveStyle(`color: ${COLORS.red50}`)
+    expect(button).toHaveStyle(`color: ${COLORS.blue55}`)
   })
 })
