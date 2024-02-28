@@ -55,7 +55,9 @@ describe('MountPipette', () => {
     screen.getByText(
       'Attach the pipette to the robot by aligning the connector and pressing to ensure a secure connection. Hold the pipette in place and use the hex screwdriver to tighten the pipette screws. Then test that the pipette is securely attached by gently pulling it side to side.'
     )
-    screen.getByTestId('Pipette_Attach_1_8_L.webm')
+    screen.getByTestId(
+      '/app/src/assets/videos/pipette-wizard-flows/Pipette_Attach_1_8_L.webm'
+    )
     const backBtn = screen.getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
@@ -75,7 +77,9 @@ describe('MountPipette', () => {
     screen.getByText(
       'Hold onto the pipette so it does not fall. Connect the pipette by aligning the two protruding rods on the mounting plate. Ensure a secure attachment by screwing in the four front screws with the provided screwdriver.'
     )
-    screen.getByTestId('Pipette_Attach_96.webm')
+    screen.getByTestId(
+      '/app/src/assets/videos/pipette-wizard-flows/Pipette_Attach_96.webm'
+    )
     const backBtn = screen.getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()

@@ -40,7 +40,9 @@ describe('MountingPlate', () => {
     screen.getByText(
       'Attach the mounting plate by aligning the pins on the plate to the slots on the gantry carriage. You may need to adjust the position of the right pipette mount to achieve proper alignment.'
     )
-    screen.getByTestId('Pipette_Detach_Plate_96.webm')
+    screen.getByTestId(
+      '/app/src/assets/videos/pipette-wizard-flows/Pipette_Attach_Plate_96.webm'
+    )
     const proceedBtn = screen.getByRole('button', { name: 'Continue' })
     fireEvent.click(proceedBtn)
     await waitFor(() => {
@@ -74,7 +76,9 @@ describe('MountingPlate', () => {
     screen.getByText(
       'Hold onto the plate so it does not fall. Then remove the pins on the plate from the slots on the gantry carriage.'
     )
-    screen.getByTestId('Pipette_Detach_Plate_96.webm')
+    screen.getByTestId(
+      '/app/src/assets/videos/pipette-wizard-flows/Pipette_Detach_Plate_96.webm'
+    )
     const proceedBtn = screen.getByRole('button', { name: 'Continue' })
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()

@@ -89,9 +89,9 @@ export function ProtocolSetupLabware({
   ] = React.useState<boolean>(false)
   const [selectedLabware, setSelectedLabware] = React.useState<
     | (LabwareDefinition2 & {
-      location: LabwareLocation
-      nickName: string | null
-    })
+        location: LabwareLocation
+        nickName: string | null
+      })
     | null
   >(null)
 
@@ -199,7 +199,7 @@ export function ProtocolSetupLabware({
               <LocationIcon
                 iconName={
                   MODULE_ICON_NAME_BY_TYPE[
-                  moduleUnderAdapter.moduleDef.moduleType
+                    moduleUnderAdapter.moduleDef.moduleType
                   ]
                 }
               />
@@ -252,13 +252,13 @@ export function ProtocolSetupLabware({
                   <StyledText as="p" color={COLORS.grey60}>
                     {selectedLabware.nickName}
                     {selectedLabwareLocation != null &&
-                      selectedLabwareLocation !== 'offDeck' &&
-                      'labwareId' in selectedLabwareLocation
+                    selectedLabwareLocation !== 'offDeck' &&
+                    'labwareId' in selectedLabwareLocation
                       ? t('on_adapter', {
-                        adapterName: mostRecentAnalysis?.labware.find(
-                          l => l.id === selectedLabwareLocation.labwareId
-                        )?.displayName,
-                      })
+                          adapterName: mostRecentAnalysis?.labware.find(
+                            l => l.id === selectedLabwareLocation.labwareId
+                          )?.displayName,
+                        })
                       : null}
                   </StyledText>
                 </Flex>
@@ -477,15 +477,15 @@ function RowLabware({
 
   const matchedModule =
     initialLocation !== 'offDeck' &&
-      'moduleId' in initialLocation &&
-      attachedProtocolModules.length > 0
+    'moduleId' in initialLocation &&
+    attachedProtocolModules.length > 0
       ? attachedProtocolModules.find(
-        mod => mod.moduleId === initialLocation.moduleId
-      )
+          mod => mod.moduleId === initialLocation.moduleId
+        )
       : null
   const matchingHeaterShaker =
     matchedModule?.attachedModuleMatch != null &&
-      matchedModule.attachedModuleMatch.moduleType === HEATERSHAKER_MODULE_TYPE
+    matchedModule.attachedModuleMatch.moduleType === HEATERSHAKER_MODULE_TYPE
       ? matchedModule.attachedModuleMatch
       : null
 
@@ -533,7 +533,7 @@ function RowLabware({
               <LocationIcon
                 iconName={
                   MODULE_ICON_NAME_BY_TYPE[
-                  moduleUnderAdapter.moduleDef.moduleType
+                    moduleUnderAdapter.moduleDef.moduleType
                   ]
                 }
               />
@@ -581,7 +581,7 @@ function RowLabware({
             />
           ) : null}
           {nestedLabwareInfo != null &&
-            nestedLabwareInfo?.sharedSlotId === slotName ? (
+          nestedLabwareInfo?.sharedSlotId === slotName ? (
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
               <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {nestedLabwareInfo.nestedLabwareDisplayName}

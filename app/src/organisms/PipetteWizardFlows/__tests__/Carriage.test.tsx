@@ -39,7 +39,9 @@ describe('Carriage', () => {
   it('returns the correct information, buttons work as expected when flow is attach', () => {
     render(props)
     screen.getByText('Unscrew z-axis carriage')
-    screen.getByTestId('Pipette_Zaxis_Attach_96.webm')
+    screen.getByTestId(
+      '/app/src/assets/videos/pipette-wizard-flows/Pipette_Zaxis_Attach_96.webm'
+    )
     screen.getByRole('button', { name: 'Continue' })
     expect(screen.queryByLabelText('back')).not.toBeInTheDocument()
   })
@@ -57,7 +59,9 @@ describe('Carriage', () => {
     screen.getByText(
       'When reattached, the right mount should no longer freely move up and down.'
     )
-    screen.getByTestId('Pipette_Zaxis_Detach_96.webm')
+    screen.getByTestId(
+      '/app/src/assets/videos/pipette-wizard-flows/Pipette_Zaxis_Detach_96.webm'
+    )
     screen.getByRole('button', { name: 'Continue' })
     fireEvent.click(screen.getByLabelText('back'))
     expect(props.goBack).toHaveBeenCalled()

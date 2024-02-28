@@ -37,6 +37,22 @@ vi.mock('../../../redux/config')
 
 const MOCK_300_UL_TIPRACK_COORDS = [30, 40, 0]
 
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<typeof getSimplestDeckConfigForProtocol>()
+  return {
+    ...actual,
+    getSimplestDeckConfigForProtocol: vi.fn(),
+  }
+})
+
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof BaseDeck>()
+  return {
+    ...actual,
+    BaseDeck: vi.fn(),
+  }
+})
+
 const render = (props: React.ComponentProps<typeof LabwareMapViewModal>) => {
   return renderWithProviders(
     <StaticRouter>
@@ -51,7 +67,7 @@ const render = (props: React.ComponentProps<typeof LabwareMapViewModal>) => {
 describe('LabwareMapViewModal', () => {
   beforeEach(() => {
     vi.mocked(getLabwareRenderInfo).mockReturnValue({})
-    vi.mocked(getSimplestDeckConfigForProtocol).mockReturnValue([])
+    // vi.mocked(getSimplestDeckConfigForProtocol).mockReturnValue([])
   })
 
   afterEach(() => {
@@ -121,8 +137,8 @@ describe('LabwareMapViewModal', () => {
       },
     })
     render({
-      handleLabwareClick: jest.fn(),
-      onCloseClick: jest.fn(),
+      handleLabwareClick: vi.fn(),
+      onCloseClick: vi.fn(),
       deckDef: (deckDefFixture as unknown) as DeckDefinition,
       mostRecentAnalysis: ({} as unknown) as CompletedProtocolAnalysis,
       initialLoadedLabwareByAdapter: {},

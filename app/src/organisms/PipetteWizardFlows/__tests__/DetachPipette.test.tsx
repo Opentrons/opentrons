@@ -55,7 +55,9 @@ describe('DetachPipette', () => {
     getByText(
       'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )
-    getByTestId('Pipette_Detach_1_L.webm')
+    getByTestId(
+      '/app/src/assets/videos/pipette-wizard-flows/Pipette_Detach_1_L.webm'
+    )
     getByText('Continue')
     const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
@@ -84,7 +86,9 @@ describe('DetachPipette', () => {
     screen.getByText(
       'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )
-    screen.getByTestId('Pipette_Detach_96.webm')
+    screen.getByTestId(
+      '/app/src/assets/videos/pipette-wizard-flows/Pipette_Detach_96.webm'
+    )
     screen.getByText('Continue')
     const backBtn = screen.getByLabelText('back')
     fireEvent.click(backBtn)
@@ -112,7 +116,9 @@ describe('DetachPipette', () => {
     screen.getByText(
       'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )
-    screen.getByTestId('Pipette_Detach_1_L.webm')
+    screen.getByTestId(
+      '/app/src/assets/videos/pipette-wizard-flows/Pipette_Detach_1_L.webm'
+    )
     screen.getByText('Continue')
     fireEvent.click(screen.getByLabelText('back'))
     expect(props.goBack).toHaveBeenCalled()

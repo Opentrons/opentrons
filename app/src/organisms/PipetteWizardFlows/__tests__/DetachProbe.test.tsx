@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, beforeEach, vi } from 'vitest'
+import { describe, it, beforeEach, vi, expect } from 'vitest'
 
 import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 
@@ -48,7 +48,9 @@ describe('DetachProbe', () => {
     getByText(
       'Unlock the calibration probe, remove it from the nozzle, and return it to its storage location.'
     )
-    getByTestId('Pipette_Detach_Probe_1.webm')
+    getByTestId(
+      '/app/src/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
+    )
     const proceedBtn = getByRole('button', { name: 'Complete calibration' })
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
@@ -74,7 +76,9 @@ describe('DetachProbe', () => {
     getByText(
       'Unlock the calibration probe, remove it from the nozzle, and return it to its storage location.'
     )
-    getByTestId('Pipette_Detach_Probe_1.webm')
+    getByTestId(
+      '/app/src/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
+    )
     const proceedBtn = getByRole('button', { name: 'Exit calibration' })
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()

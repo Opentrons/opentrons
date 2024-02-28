@@ -1,13 +1,10 @@
 import * as React from 'react'
 import { act, screen, waitFor } from '@testing-library/react'
 import { StaticRouter } from 'react-router-dom'
-import { resetAllWhenMocks, when } from 'jest-when'
+import { when } from 'vitest-when'
+import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
 
-import {
-  partialComponentPropsMatcher,
-  renderWithProviders,
-} from '@opentrons/components'
-
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ChooseRobotToRunProtocolSlideout } from '../../../organisms/ChooseRobotToRunProtocolSlideout'
 import {
@@ -30,37 +27,15 @@ import {
 import { storedProtocolData } from '../../../redux/protocol-storage/__fixtures__'
 import { ProtocolDetails } from '..'
 
+import type { Mock } from 'vitest'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
-jest.mock('../../../redux/analytics')
-jest.mock('../../../redux/custom-labware/selectors')
-jest.mock('../../../redux/discovery/selectors')
-jest.mock('../../../redux/protocol-storage/selectors')
-jest.mock('../../../organisms/ChooseRobotToRunProtocolSlideout')
-jest.mock('../../../organisms/SendProtocolToFlexSlideout')
-
-const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
-  typeof getConnectableRobots
->
-const mockGetReachableRobots = getReachableRobots as jest.MockedFunction<
-  typeof getReachableRobots
->
-const mockGetUnreachableRobots = getUnreachableRobots as jest.MockedFunction<
-  typeof getUnreachableRobots
->
-const mockGetScanning = getScanning as jest.MockedFunction<typeof getScanning>
-const mockGetIsProtocolAnalysisInProgress = getIsProtocolAnalysisInProgress as jest.MockedFunction<
-  typeof getIsProtocolAnalysisInProgress
->
-const mockGetValidCustomLabwareFiles = getValidCustomLabwareFiles as jest.MockedFunction<
-  typeof getValidCustomLabwareFiles
->
-const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
-  typeof useTrackEvent
->
-const mockChooseRobotToRunProtocolSlideout = ChooseRobotToRunProtocolSlideout as jest.MockedFunction<
-  typeof ChooseRobotToRunProtocolSlideout
->
+vi.mock('../../../redux/analytics')
+vi.mock('../../../redux/custom-labware/selectors')
+vi.mock('../../../redux/discovery/selectors')
+vi.mock('../../../redux/protocol-storage/selectors')
+vi.mock('../../../organisms/ChooseRobotToRunProtocolSlideout')
+vi.mock('../../../organisms/SendProtocolToFlexSlideout')
 
 const render = (
   props: Partial<React.ComponentProps<typeof ProtocolDetails>> = {}
@@ -83,29 +58,28 @@ const description = 'fake protocol description'
 
 const mockMostRecentAnalysis: ProtocolAnalysisOutput = storedProtocolData.mostRecentAnalysis as ProtocolAnalysisOutput
 
-let mockTrackEvent: jest.Mock
+let mockTrackEvent: Mock
 
 describe('ProtocolDetails', () => {
   beforeEach(() => {
-    mockTrackEvent = jest.fn()
-    mockGetValidCustomLabwareFiles.mockReturnValue([])
-    mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
-    mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
-    mockGetReachableRobots.mockReturnValue([mockReachableRobot])
-    mockGetScanning.mockReturnValue(false)
+    mockTrackEvent = vi.fn()
+    vi.mocked(getValidCustomLabwareFiles).mockReturnValue([])
+    vi.mocked(getConnectableRobots).mockReturnValue([mockConnectableRobot])
+    vi.mocked(getUnreachableRobots).mockReturnValue([mockUnreachableRobot])
+    vi.mocked(getReachableRobots).mockReturnValue([mockReachableRobot])
+    vi.mocked(getScanning).mockReturnValue(false)
 
-    when(mockChooseRobotToRunProtocolSlideout)
+    when(vi.mocked(ChooseRobotToRunProtocolSlideout))
       .calledWith(partialComponentPropsMatcher({ showSlideout: true }))
-      .mockReturnValue(<div>open ChooseRobotToRunProtocolSlideout</div>)
-    when(mockChooseRobotToRunProtocolSlideout)
+      .thenReturn(<div>open ChooseRobotToRunProtocolSlideout</div>)
+    when(vi.mocked(ChooseRobotToRunProtocolSlideout))
       .calledWith(partialComponentPropsMatcher({ showSlideout: false }))
-      .mockReturnValue(<div>close ChooseRobotToRunProtocolSlideout</div>)
-    mockGetIsProtocolAnalysisInProgress.mockReturnValue(false)
-    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
+      .thenReturn(<div>close ChooseRobotToRunProtocolSlideout</div>)
+    vi.mocked(getIsProtocolAnalysisInProgress).mockReturnValue(false)
+    vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
   })
   afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('renders protocol title as display name if present in metadata', () => {
