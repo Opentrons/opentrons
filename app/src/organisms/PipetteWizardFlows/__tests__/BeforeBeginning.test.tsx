@@ -1,12 +1,15 @@
 import * as React from 'react'
-import { fireEvent, waitFor } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, waitFor, screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect, afterEach } from 'vitest'
+
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
@@ -19,15 +22,9 @@ import { getIsGantryEmpty } from '../utils'
 //  TODO(jr, 11/3/22): uncomment out the get help link when we have
 //  the correct URL to link it to
 // jest.mock('../../CalibrationPanels')
-jest.mock('../../../molecules/InProgressModal/InProgressModal')
-jest.mock('../utils')
+vi.mock('../../../molecules/InProgressModal/InProgressModal')
+vi.mock('../utils')
 
-const mockGetIsGantryEmpty = getIsGantryEmpty as jest.MockedFunction<
-  typeof getIsGantryEmpty
->
-const mockInProgressModal = InProgressModal as jest.MockedFunction<
-  typeof InProgressModal
->
 // const mockNeedHelpLink = NeedHelpLink as jest.MockedFunction<
 //   typeof NeedHelpLink
 // >
@@ -44,17 +41,15 @@ describe('BeforeBeginning', () => {
     props = {
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       mount: LEFT,
-      goBack: jest.fn(),
-      proceed: jest.fn(),
-      chainRunCommands: jest
-        .fn()
-        .mockImplementationOnce(() => Promise.resolve()),
+      goBack: vi.fn(),
+      proceed: vi.fn(),
+      chainRunCommands: vi.fn().mockImplementationOnce(() => Promise.resolve()),
       maintenanceRunId: RUN_ID_1,
       attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
       flowType: FLOWS.CALIBRATE,
-      createMaintenanceRun: jest.fn(),
+      createMaintenanceRun: vi.fn(),
       errorMessage: null,
-      setShowErrorMessage: jest.fn(),
+      setShowErrorMessage: vi.fn(),
       isCreateLoading: false,
       isRobotMoving: false,
       isOnDevice: false,
@@ -62,26 +57,28 @@ describe('BeforeBeginning', () => {
       createdMaintenanceRunId: null,
     }
     // mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
-    mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
-    mockGetIsGantryEmpty.mockReturnValue(false)
+    vi.mocked(InProgressModal).mockReturnValue(<div>mock in progress</div>)
+    vi.mocked(getIsGantryEmpty).mockReturnValue(false)
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
   describe('calibrate flow single mount', () => {
     it('returns the correct information for calibrate flow', async () => {
-      const { getByText, getByAltText, getByRole } = render(props)
-      getByText('Before you begin')
-      getByText(
+      render(props)
+      screen.getByText('Before you begin')
+      screen.getByText(
         'To get started, remove labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
       )
-      getByText(
+      screen.getByText(
         'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
-      getByText('You will need:')
+      screen.getByText('You will need:')
       // getByText('mock need help link')
-      getByAltText('Calibration Probe')
-      const proceedBtn = getByRole('button', { name: 'Move gantry to front' })
+      screen.getByAltText('Calibration Probe')
+      const proceedBtn = screen.getByRole('button', {
+        name: 'Move gantry to front',
+      })
       fireEvent.click(proceedBtn)
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
@@ -105,13 +102,14 @@ describe('BeforeBeginning', () => {
         expect(props.proceed).toHaveBeenCalled()
       })
     })
+
     it('returns the correct information for in progress modal when robot is moving', () => {
       props = {
         ...props,
         isRobotMoving: true,
       }
-      const { getByText } = render(props)
-      getByText('mock in progress')
+      render(props)
+      screen.getByText('mock in progress')
     })
 
     it('continue button is disabled when isCreateLoading is true', () => {
@@ -119,8 +117,10 @@ describe('BeforeBeginning', () => {
         ...props,
         isCreateLoading: true,
       }
-      const { getByRole } = render(props)
-      const proceedBtn = getByRole('button', { name: 'Move gantry to front' })
+      render(props)
+      const proceedBtn = screen.getByRole('button', {
+        name: 'Move gantry to front',
+      })
       expect(proceedBtn).toBeDisabled()
     })
 
@@ -129,11 +129,12 @@ describe('BeforeBeginning', () => {
         ...props,
         errorMessage: 'error shmerror',
       }
-      const { getByText } = render(props)
-      getByText('Error encountered')
-      getByText('error shmerror')
+      render(props)
+      screen.getByText('Error encountered')
+      screen.getByText('error shmerror')
     })
   })
+
   describe('attach flow single mount', () => {
     it('renders the modal with all correct text. clicking on proceed button sends commands', async () => {
       props = {
@@ -141,22 +142,24 @@ describe('BeforeBeginning', () => {
         attachedPipettes: { left: null, right: null },
         flowType: FLOWS.ATTACH,
       }
-      const { getByText, getByAltText, getByRole } = render(props)
-      getByText('Before you begin')
-      getByText(
+      render(props)
+      screen.getByText('Before you begin')
+      screen.getByText(
         'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
       )
-      getByText(
+      screen.getByText(
         'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
-      getByAltText('1- or 8-Channel Pipette')
-      getByText('You will need:')
-      getByAltText('Calibration Probe')
-      getByAltText('2.5 mm Hex Screwdriver')
-      getByText(
+      screen.getByAltText('1- or 8-Channel Pipette')
+      screen.getByText('You will need:')
+      screen.getByAltText('Calibration Probe')
+      screen.getByAltText('2.5 mm Hex Screwdriver')
+      screen.getByText(
         'Provided with the robot. Using another size can strip the instruments’s screws.'
       )
-      const proceedBtn = getByRole('button', { name: 'Move gantry to front' })
+      const proceedBtn = screen.getByRole('button', {
+        name: 'Move gantry to front',
+      })
       fireEvent.click(proceedBtn)
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
@@ -172,6 +175,7 @@ describe('BeforeBeginning', () => {
         expect(props.proceed).toHaveBeenCalled()
       })
     })
+
     it('renders the attach flow when swapping pipettes is needed', async () => {
       props = {
         ...props,
@@ -183,22 +187,24 @@ describe('BeforeBeginning', () => {
           pipetteName: 'p1000_single_flex',
         },
       }
-      const { getByText, getByAltText, getByRole } = render(props)
-      getByText('Before you begin')
-      getByText(
+      render(props)
+      screen.getByText('Before you begin')
+      screen.getByText(
         'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
       )
-      getByText(
+      screen.getByText(
         'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
-      getByAltText('Flex 1-Channel 1000 μL')
-      getByText('You will need:')
-      getByAltText('Calibration Probe')
-      getByAltText('2.5 mm Hex Screwdriver')
-      getByText(
+      screen.getByAltText('Flex 1-Channel 1000 μL')
+      screen.getByText('You will need:')
+      screen.getByAltText('Calibration Probe')
+      screen.getByAltText('2.5 mm Hex Screwdriver')
+      screen.getByText(
         'Provided with the robot. Using another size can strip the instruments’s screws.'
       )
-      const proceedBtn = getByRole('button', { name: 'Move gantry to front' })
+      const proceedBtn = screen.getByRole('button', {
+        name: 'Move gantry to front',
+      })
       fireEvent.click(proceedBtn)
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
@@ -223,6 +229,7 @@ describe('BeforeBeginning', () => {
       })
     })
   })
+
   describe('detach flow single mount', () => {
     it('renders the modal with all correct text. clicking on proceed button sends commands for detach flow', async () => {
       props = {
@@ -264,34 +271,35 @@ describe('BeforeBeginning', () => {
       })
     })
   })
+
   describe('attach flow 96 channel', () => {
     it('renders the modal with all the correct text, clicking on proceed button sends commands for attach flow with an empty gantry', async () => {
-      mockGetIsGantryEmpty.mockReturnValue(true)
+      vi.mocked(getIsGantryEmpty).mockReturnValue(true)
       props = {
         ...props,
         attachedPipettes: { left: null, right: null },
         flowType: FLOWS.ATTACH,
         selectedPipette: NINETY_SIX_CHANNEL,
       }
-      const { getByText, getByAltText, getByRole } = render(props)
-      getByText('Before you begin')
-      getByText(
+      render(props)
+      screen.getByText('Before you begin')
+      screen.getByText(
         'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
       )
-      getByText(
+      screen.getByText(
         'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
-      getByText(
+      screen.getByText(
         'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
       )
-      getByAltText('2.5 mm Hex Screwdriver')
-      getByAltText('Calibration Probe')
-      getByAltText('96-Channel Pipette')
-      getByAltText('96-Channel Mounting Plate')
-      getByText(
+      screen.getByAltText('2.5 mm Hex Screwdriver')
+      screen.getByAltText('Calibration Probe')
+      screen.getByAltText('96-Channel Pipette')
+      screen.getByAltText('96-Channel Mounting Plate')
+      screen.getByText(
         'Provided with the robot. Using another size can strip the instruments’s screws.'
       )
-      const proceedBtn = getByRole('button', {
+      const proceedBtn = screen.getByRole('button', {
         name: 'Move gantry to front',
       })
       fireEvent.click(proceedBtn)
@@ -309,8 +317,9 @@ describe('BeforeBeginning', () => {
         expect(props.proceed).toHaveBeenCalled()
       })
     })
+
     it('renders the 96 channel flow when there is a pipette on the gantry on the right mount', async () => {
-      mockGetIsGantryEmpty.mockReturnValue(false)
+      vi.mocked(getIsGantryEmpty).mockReturnValue(false)
       props = {
         ...props,
         mount: RIGHT,
@@ -318,25 +327,25 @@ describe('BeforeBeginning', () => {
         flowType: FLOWS.ATTACH,
         selectedPipette: NINETY_SIX_CHANNEL,
       }
-      const { getByText, getByAltText, getByRole } = render(props)
-      getByText('Before you begin')
-      getByText(
+      render(props)
+      screen.getByText('Before you begin')
+      screen.getByText(
         'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
       )
-      getByText(
+      screen.getByText(
         'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
-      getByText(
+      screen.getByText(
         'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
       )
-      getByAltText('2.5 mm Hex Screwdriver')
-      getByAltText('Calibration Probe')
-      getByAltText('96-Channel Pipette')
-      getByAltText('96-Channel Mounting Plate')
-      getByText(
+      screen.getByAltText('2.5 mm Hex Screwdriver')
+      screen.getByAltText('Calibration Probe')
+      screen.getByAltText('96-Channel Pipette')
+      screen.getByAltText('96-Channel Mounting Plate')
+      screen.getByText(
         'Provided with the robot. Using another size can strip the instruments’s screws.'
       )
-      const proceedBtn = getByRole('button', {
+      const proceedBtn = screen.getByRole('button', {
         name: 'Move gantry to front',
       })
       fireEvent.click(proceedBtn)
@@ -362,33 +371,34 @@ describe('BeforeBeginning', () => {
         expect(props.proceed).toHaveBeenCalled()
       })
     })
+
     it('renders the 96 channel flow when there is a pipette on the gantry on the left mount', async () => {
-      mockGetIsGantryEmpty.mockReturnValue(false)
+      vi.mocked(getIsGantryEmpty).mockReturnValue(false)
       props = {
         ...props,
         attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
         flowType: FLOWS.ATTACH,
         selectedPipette: NINETY_SIX_CHANNEL,
       }
-      const { getByText, getByAltText, getByRole } = render(props)
-      getByText('Before you begin')
-      getByText(
+      render(props)
+      screen.getByText('Before you begin')
+      screen.getByText(
         'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
       )
-      getByText(
+      screen.getByText(
         'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
-      getByText(
+      screen.getByText(
         'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
       )
-      getByAltText('2.5 mm Hex Screwdriver')
-      getByAltText('Calibration Probe')
-      getByAltText('96-Channel Pipette')
-      getByAltText('96-Channel Mounting Plate')
-      getByText(
+      screen.getByAltText('2.5 mm Hex Screwdriver')
+      screen.getByAltText('Calibration Probe')
+      screen.getByAltText('96-Channel Pipette')
+      screen.getByAltText('96-Channel Mounting Plate')
+      screen.getByText(
         'Provided with the robot. Using another size can strip the instruments’s screws.'
       )
-      const proceedBtn = getByRole('button', {
+      const proceedBtn = screen.getByRole('button', {
         name: 'Move gantry to front',
       })
       fireEvent.click(proceedBtn)
@@ -414,8 +424,9 @@ describe('BeforeBeginning', () => {
         expect(props.proceed).toHaveBeenCalled()
       })
     })
+
     it('renders the detach and attach 96 channel flow when there is a required 96-channel', async () => {
-      mockGetIsGantryEmpty.mockReturnValue(false)
+      vi.mocked(getIsGantryEmpty).mockReturnValue(false)
       props = {
         ...props,
         attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
@@ -427,25 +438,25 @@ describe('BeforeBeginning', () => {
           mount: 'left',
         },
       }
-      const { getByText, getByAltText, getByRole } = render(props)
-      getByText('Before you begin')
-      getByText(
+      render(props)
+      screen.getByText('Before you begin')
+      screen.getByText(
         'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
       )
-      getByText(
+      screen.getByText(
         'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
-      getByText(
+      screen.getByText(
         'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
       )
-      getByAltText('2.5 mm Hex Screwdriver')
-      getByAltText('Calibration Probe')
-      getByAltText('Flex 96-Channel 1000 μL')
-      getByAltText('96-Channel Mounting Plate')
-      getByText(
+      screen.getByAltText('2.5 mm Hex Screwdriver')
+      screen.getByAltText('Calibration Probe')
+      screen.getByAltText('Flex 96-Channel 1000 μL')
+      screen.getByAltText('96-Channel Mounting Plate')
+      screen.getByText(
         'Provided with the robot. Using another size can strip the instruments’s screws.'
       )
-      const proceedBtn = getByRole('button', {
+      const proceedBtn = screen.getByRole('button', {
         name: 'Move gantry to front',
       })
       fireEvent.click(proceedBtn)
@@ -472,6 +483,7 @@ describe('BeforeBeginning', () => {
       })
     })
   })
+
   describe('detach flow 96 channel', () => {
     it('renders the banner for 96 channel with correct info for on device display', () => {
       props = {
@@ -481,16 +493,17 @@ describe('BeforeBeginning', () => {
         selectedPipette: NINETY_SIX_CHANNEL,
         isOnDevice: true,
       }
-      const { getByLabelText, getByText } = render(props)
-      getByLabelText('icon_warning')
-      getByText('Before you begin')
-      getByText(
+      render(props)
+      screen.getByLabelText('icon_warning')
+      screen.getByText('Before you begin')
+      screen.getByText(
         'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
       )
-      getByText(
+      screen.getByText(
         'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
       )
     })
+
     it('renders the modal with all correct text. clicking on proceed button sends commands for detach flow', async () => {
       props = {
         ...props,
@@ -498,16 +511,18 @@ describe('BeforeBeginning', () => {
         flowType: FLOWS.DETACH,
         selectedPipette: NINETY_SIX_CHANNEL,
       }
-      const { getByText, getByAltText, getByRole } = render(props)
-      getByText('Before you begin')
-      getByText(
+      render(props)
+      screen.getByText('Before you begin')
+      screen.getByText(
         'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
       )
-      getByText(
+      screen.getByText(
         'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
       )
-      getByAltText('2.5 mm Hex Screwdriver')
-      const proceedBtn = getByRole('button', { name: 'Move gantry to front' })
+      screen.getByAltText('2.5 mm Hex Screwdriver')
+      const proceedBtn = screen.getByRole('button', {
+        name: 'Move gantry to front',
+      })
       fireEvent.click(proceedBtn)
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [

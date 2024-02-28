@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
 import { fixtureTiprack300ul as _fixtureTiprack300ul } from '@opentrons/shared-data'
-import { anyProps, renderWithProviders } from '../../../testing/utils'
+import { renderWithProviders } from '../../../testing/utils'
 import { RobotCoordsForeignDiv } from '../../Deck/RobotCoordsForeignDiv'
 import { PipetteRender } from '../PipetteRender'
 import { EmanatingNozzle } from '../EmanatingNozzle'
@@ -46,9 +46,8 @@ describe('PipetteRender', () => {
         </div>
       ))
 
-      when(EmanatingNozzle)
-        .calledWith(anyProps())
-        .thenReturn(<div>mock emanating nozzle</div>)
+      vi.mocked(EmanatingNozzle)
+      .mockReturnValue(<div>mock emanating nozzle</div>)
     })
 
     it('should render a rectangle with the correct dimensions', () => {

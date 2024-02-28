@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, beforeEach, vi } from 'vitest'
+
 import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
@@ -9,7 +12,7 @@ import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { FLOWS } from '../constants'
 import { DetachProbe } from '../DetachProbe'
 
-jest.mock('../../../molecules/InProgressModal/InProgressModal')
+vi.mock('../../../molecules/InProgressModal/InProgressModal')
 
 const mockInProgressModal = InProgressModal as jest.MockedFunction<
   typeof InProgressModal
@@ -26,14 +29,14 @@ describe('DetachProbe', () => {
     props = {
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       mount: LEFT,
-      goBack: jest.fn(),
-      proceed: jest.fn(),
-      chainRunCommands: jest.fn(),
+      goBack: vi.fn(),
+      proceed: vi.fn(),
+      chainRunCommands: vi.fn(),
       maintenanceRunId: RUN_ID_1,
       attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
       flowType: FLOWS.CALIBRATE,
       errorMessage: null,
-      setShowErrorMessage: jest.fn(),
+      setShowErrorMessage: vi.fn(),
       isRobotMoving: false,
       isOnDevice: false,
     }

@@ -1,6 +1,7 @@
 import * as React from 'react'
-
+import { describe, it, beforeEach, expect } from 'vitest'
 import { renderWithProviders } from '../../../testing/utils'
+import { screen } from '@testing-library/react'
 import { BORDERS, SPACING } from '../../../ui-style-constants'
 import { COLORS } from '../../../helix-design-system'
 
@@ -20,8 +21,8 @@ describe('LocationIcon', () => {
   })
 
   it('should render the proper styles', () => {
-    const [{ getByTestId }] = render(props)
-    const locationIcon = getByTestId('LocationIcon_A1')
+    render(props)
+    const locationIcon = screen.getByTestId('LocationIcon_A1')
     expect(locationIcon).toHaveStyle(`padding: ${SPACING.spacing4} 0.375rem`)
     expect(locationIcon).toHaveStyle('height: 2rem')
     expect(locationIcon).toHaveStyle('width: max-content')
@@ -32,15 +33,15 @@ describe('LocationIcon', () => {
   })
 
   it('should render slot name', () => {
-    const [{ getByText }] = render(props)
-    getByText('A1')
+    render(props)
+    screen.getByText('A1')
   })
 
   it('should render an icon', () => {
     props = {
       iconName: 'ot-temperature-v2',
     }
-    const [{ getByLabelText }] = render(props)
-    getByLabelText(props.iconName as string)
+    render(props)
+    screen.getByLabelText(props.iconName as string)
   })
 })

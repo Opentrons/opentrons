@@ -1,8 +1,14 @@
 import * as React from 'react'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
+import { describe, it, beforeEach, vi, expect } from 'vitest'
+
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
+
+import {
+  nestedTextMatcher,
+  renderWithProviders,
+} from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import {
   mock8ChannelAttachedPipetteInformation,
@@ -18,20 +24,16 @@ const render = (props: React.ComponentProps<typeof AttachProbe>) => {
     i18nInstance: i18n,
   })[0]
 }
-jest.mock('@opentrons/react-api-client')
-
-const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
-  typeof useDeckConfigurationQuery
->
+vi.mock('@opentrons/react-api-client')
 
 describe('AttachProbe', () => {
   let props: React.ComponentProps<typeof AttachProbe>
   beforeEach(() => {
     props = {
       mount: LEFT,
-      goBack: jest.fn(),
-      proceed: jest.fn(),
-      chainRunCommands: jest
+      goBack: vi.fn(),
+      proceed: vi.fn(),
+      chainRunCommands: vi
         .fn()
         .mockImplementationOnce(() => Promise.resolve())
         .mockImplementationOnce(() => Promise.resolve()),
@@ -39,13 +41,13 @@ describe('AttachProbe', () => {
       attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
       flowType: FLOWS.CALIBRATE,
       errorMessage: null,
-      setShowErrorMessage: jest.fn(),
+      setShowErrorMessage: vi.fn(),
       isRobotMoving: false,
       isExiting: false,
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       isOnDevice: false,
     }
-    mockUseDeckConfigurationQuery.mockReturnValue({
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
       data: [
         {
           cutoutId: 'cutoutD3',
