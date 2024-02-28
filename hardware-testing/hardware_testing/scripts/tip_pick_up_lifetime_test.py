@@ -231,9 +231,9 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     else:
         multi_pip = True
         ROWS = 1
-        CYCLES = 1
-        if args.pick_up_num == 120:
-            PICKUPS_PER_TIP = 120
+        CYCLES = 2
+        if args.pick_up_num == 60:
+            PICKUPS_PER_TIP = 60
         else:
             PICKUPS_PER_TIP = args.pick_up_num
         check_tip_presence = True
@@ -314,13 +314,13 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
 
     for i in range(CYCLES):
         print(f"\n=========== Cycle {i + 1}/{CYCLES} ===========\n")
-        if i > 0:
-            stop_time = time.perf_counter()
-            print("Replace tips before continuing test.")
-            input("\n\t>> Press \"Enter\" to continue.")
-            resume_time = time.perf_counter()
-            elapsed_time += resume_time - stop_time
-            print(f"Elapsed time: {convert(resume_time-stop_time)}\n")
+        # if i > 0:
+        #     stop_time = time.perf_counter()
+        #     print("Replace tips before continuing test.")
+        #     input("\n\t>> Press \"Enter\" to continue.")
+        #     resume_time = time.perf_counter()
+        #     elapsed_time += resume_time - stop_time
+        #     print(f"Elapsed time: {convert(resume_time-stop_time)}\n")
         for key_index, key in enumerate(calibrated_slot_loc.keys()):
             if (key_index >= 12):
                 break
