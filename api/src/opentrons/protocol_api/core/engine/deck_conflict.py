@@ -520,7 +520,9 @@ def _map_disposal_location(
     if isinstance(disposal_location, TrashBin):
         return (
             disposal_location.location,
-            wrapped_deck_conflict.TrashBin(name_for_errors="trash bin"),
+            wrapped_deck_conflict.TrashBin(
+                name_for_errors="trash bin", highest_z=disposal_location.height
+            ),
         )
     else:
         return None

@@ -12,7 +12,11 @@ from opentrons.motion_planning import adjacent_slots_getters
 from opentrons.motion_planning.adjacent_slots_getters import _MixedTypeSlots
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
-from opentrons.protocol_api._disposal_locations import TrashBin, WasteChute
+from opentrons.protocol_api._disposal_locations import (
+    TrashBin,
+    WasteChute,
+    _TRASH_BIN_CUTOUT_FIXTURE,
+)
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocol_api.core.engine import deck_conflict
 from opentrons.protocol_engine import (
@@ -347,6 +351,12 @@ def test_maps_trash_bins(
     """It should correctly map disposal locations."""
     mock_trash_lw = decoy.mock(cls=Labware)
 
+    decoy.when(
+        mock_sync_client.state.addressable_areas.get_fixture_height(
+            _TRASH_BIN_CUTOUT_FIXTURE
+        )
+    ).then_return(1.23)
+
     deck_conflict.check(
         engine_state=mock_state_view,
         existing_labware_ids=[],
@@ -372,11 +382,11 @@ def test_maps_trash_bins(
         wrapped_deck_conflict.check(
             existing_items={
                 DeckSlotName.SLOT_B1: wrapped_deck_conflict.TrashBin(
-                    name_for_errors="trash bin",
+                    name_for_errors="trash bin", highest_z=1.23
                 )
             },
             new_item=wrapped_deck_conflict.TrashBin(
-                name_for_errors="trash bin",
+                name_for_errors="trash bin", highest_z=1.23
             ),
             new_location=DeckSlotName.SLOT_A1,
             robot_type=mock_state_view.config.robot_type,

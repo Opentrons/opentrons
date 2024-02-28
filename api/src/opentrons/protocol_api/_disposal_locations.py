@@ -15,6 +15,7 @@ from opentrons.protocol_engine.clients import SyncClient
 #   writing cumbersome guessing logic for area name -> fixture name while still providing a direct link to
 #   the numbers in shared data.
 _TRASH_BIN_CUTOUT_FIXTURE = "trashBinAdapter"
+_TRASH_BIN_OT2_CUTOUT_FIXTURE = "fixedTrashSlot"
 _WASTE_CHUTE_CUTOUT_FIXTURE = "wasteChuteRightAdapterCovered"
 
 
@@ -92,6 +93,10 @@ class TrashBin(DisposalLocation):
         self._offset = offset
         self._api_version = api_version
         self._engine_client = engine_client
+        if self._engine_client.state.config.robot_type == "OT-2 Standard":
+            self._cutout_fixture_name = _TRASH_BIN_OT2_CUTOUT_FIXTURE
+        else:
+            self._cutout_fixture_name = _TRASH_BIN_CUTOUT_FIXTURE
 
     def top(self, x: float = 0, y: float = 0, z: float = 0) -> TrashBin:
         """Returns a trash bin with a user set offset."""
@@ -142,7 +147,7 @@ class TrashBin(DisposalLocation):
         This is intended for Opentrons internal use only and is not a guaranteed API.
         """
         return self._engine_client.state.addressable_areas.get_fixture_height(
-            _TRASH_BIN_CUTOUT_FIXTURE
+            self._cutout_fixture_name
         )
 
 
