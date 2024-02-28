@@ -27,6 +27,7 @@ const SUPPORT_EMAIL = 'support@opentrons.com'
 
 interface FatalErrorModalProps {
   errorMessage: string
+  shouldUseMetalProbe: boolean
   onClose: () => void
 }
 export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
@@ -58,6 +59,15 @@ export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
           <ErrorHeader>
             {i18n.format(t('shared:something_went_wrong'), 'sentenceCase')}
           </ErrorHeader>
+          {props.shouldUseMetalProbe && (
+            <StyledText
+              as="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              textAlign={TEXT_ALIGN_CENTER}
+            >
+              {t('remove_probe_before_exit')}
+            </StyledText>
+          )}
           <StyledText as="p" textAlign={TEXT_ALIGN_CENTER}>
             {t('shared:help_us_improve_send_error_report', {
               support_email: SUPPORT_EMAIL,
