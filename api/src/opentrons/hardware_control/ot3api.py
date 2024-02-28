@@ -1196,6 +1196,7 @@ class OT3API(
             await self.refresh_positions()
 
         for axis in position.keys():
+            print(axis)
             if not self._backend.axis_is_present(axis):
                 raise InvalidActuator(
                     message=f"{axis} is not present", detail={"axis": str(axis)}
@@ -2068,17 +2069,19 @@ class OT3API(
 
     async def _force_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: TipActionSpec
-    ) -> None:
+    ) -> Dict[Axis, float]:
         for press in pipette_spec.tip_action_moves:
             async with self._backend.motor_current(run_currents=press.currents):
                 target_down = target_position_from_relative(
                     mount, top_types.Point(z=press.distance), self._current_position
                 )
                 await self._move(target_down, speed=press.speed, expect_stalls=True)
+                press_dist = await self.encoder_current_position_ot3(mount)
             if press.distance < 0:
                 # we expect a stall has happened during a downward movement into the tiprack, so
                 # we want to update the motor estimation
                 await self._update_position_estimation([Axis.by_mount(mount)])
+        return press_dist
 
     async def _tip_motor_action(
         self, mount: OT3Mount, pipette_spec: List[TipActionMoveSpec]
@@ -2102,6 +2105,25 @@ class OT3API(
             )
             await self.home_gear_motors()
 
+    async def _motor_pickup_move(
+        self, mount: OT3Mount, motor_current: Mapping[Axis, float],
+            move_distance: float, speed: float) -> None:
+        async with self._backend.restore_current():
+            await self._backend.set_active_current(
+                {axis: current for axis, current in motor_current.items()}
+            )
+            # perform pick up tip
+            await self._backend.tip_action(
+                [Axis.of_main_tool_actuator(mount)],
+                move_distance,
+                speed,
+                "clamp",
+            )
+
+    async def get_tip_presence(self, mount: Union[top_types.Mount, OT3Mount]):
+        state = await self._backend.get_tip_present_state(mount)
+        return state
+
     async def pick_up_tip(
         self,
         mount: Union[top_types.Mount, OT3Mount],
@@ -2109,7 +2131,7 @@ class OT3API(
         presses: Optional[int] = None,
         increment: Optional[float] = None,
         prep_after: bool = True,
-    ) -> None:
+    ) -> Dict[Axis, float]:
         """Pick up tip from current location."""
         realmount = OT3Mount.from_mount(mount)
         instrument = self._pipette_handler.get_pipette(realmount)
@@ -2139,7 +2161,7 @@ class OT3API(
                 presses,
                 increment,
             )
-            await self._force_pick_up_tip(realmount, spec)
+            press_dist = await self._force_pick_up_tip(realmount, spec)
 
         # neighboring tips tend to get stuck in the space between
         # the volume chamber and the drop-tip sleeve on p1000.
@@ -2158,6 +2180,7 @@ class OT3API(
 
         if prep_after:
             await self.prepare_for_aspirate(realmount)
+        return press_dist
 
     def set_current_tiprack_diameter(
         self, mount: Union[top_types.Mount, OT3Mount], tiprack_diameter: float
