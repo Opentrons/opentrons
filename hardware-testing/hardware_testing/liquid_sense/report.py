@@ -165,7 +165,7 @@ def store_baseline_trial(
     humidity: float,
     temp: float,
     z_travel: float,
-    tip_length_error: float,
+    measured_error: float,
 ) -> None:
     """Report Trial."""
     report(
@@ -179,7 +179,7 @@ def store_baseline_trial(
             z_travel,
             0,
             0,
-            tip_length_error,
+            measured_error,
         ],
     )
 
