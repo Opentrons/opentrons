@@ -23,6 +23,7 @@ The Linux version of the Opentrons App now requires Ubuntu 20.04 or newer.
 
 ### Bug Fixes
 
+- The OT-2 now consistently applies tip length calibration. There used to be a height discrepancy between Labware Position Check and protocol runs. If you previously compensated for the inconsistent pipette height with labware offsets, re-run Labware Position Check to avoid pipette crashes.
 - The OT-2 now accurately calculates the position of the Thermocycler. If you previously compensated for the incorrect position with labware offsets, re-run Labware Position Check to avoid pipette crashes.
 
 ---
