@@ -10,10 +10,12 @@ import {
 import {
   getConnectableRobots,
   getReachableRobots,
+  getUnreachableRobots,
 } from '../../../../../../redux/discovery'
 import {
   mockConnectableRobot,
   mockReachableRobot,
+  mockUnreachableRobot,
 } from '../../../../../../redux/discovery/__fixtures__'
 
 import { RenameRobotSlideout } from '../RenameRobotSlideout'
@@ -28,6 +30,9 @@ const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
 >
 const mockGetReachableRobots = getReachableRobots as jest.MockedFunction<
   typeof getReachableRobots
+>
+const mockGetUnreachableRobots = getUnreachableRobots as jest.MockedFunction<
+  typeof getUnreachableRobots
 >
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
@@ -56,8 +61,10 @@ describe('RobotSettings RenameRobotSlideout', () => {
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
     mockConnectableRobot.name = 'connectableOtie'
     mockReachableRobot.name = 'reachableOtie'
+    mockUnreachableRobot.name = 'unreachableOtie'
     mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
     mockGetReachableRobots.mockReturnValue([mockReachableRobot])
+    mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
     mockUseIsFlex.mockReturnValue(false)
   })
 
