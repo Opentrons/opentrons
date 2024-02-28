@@ -3,10 +3,9 @@
 
 import path from 'path'
 
-import { OPENTRONS_USB } from '@opentrons/app/src/redux/discovery/constants'
-
 import { fetch, postFile } from '../http'
 import { getSerialPortHttpAgent } from '../usb'
+import { OPENTRONS_USB } from '../constants'
 
 import type { RobotHost } from '@opentrons/app/src/redux/robot-api/types'
 import type {

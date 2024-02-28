@@ -43,7 +43,14 @@ const PIPETTE_NAME = 'pipetteName'
 const OT3_PIPETTE_NAME = OT3_PIPETTES[0]
 
 const startCalibration = vi.fn()
-vi.mock('file-saver')
+// file-saver has circular dep, need to mock with factory to prevent error
+vi.mock('file-saver', async importOriginal => {
+  const actual = await importOriginal<typeof saveAs>()
+  return {
+    ...actual,
+    saveAs: vi.fn(),
+  }
+})
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../redux/sessions/selectors')
 vi.mock('../../../../redux/discovery')

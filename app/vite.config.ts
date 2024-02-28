@@ -8,6 +8,8 @@ import postCssPresetEnv from 'postcss-preset-env'
 import lostCss from 'lost'
 
 export default defineConfig({
+  // this makes imports relative rather than absolute
+  base: '',
   build: {
     // Relative to the root
     outDir: 'dist',

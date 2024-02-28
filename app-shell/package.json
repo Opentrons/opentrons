@@ -29,14 +29,14 @@
     ]
   },
   "devDependencies": {
-    "@opentrons/app": "link:../app",
-    "@opentrons/discovery-client": "link:../discovery-client",
-    "@opentrons/shared-data": "link:../shared-data",
-    "@opentrons/usb-bridge/node-client": "link:../usb-bridge/node-client",
     "electron-notarize": "^1.2.1",
     "electron-publisher-s3": "^20.17.2"
   },
   "dependencies": {
+    "@opentrons/app": "link:../app",
+    "@opentrons/discovery-client": "link:../discovery-client",
+    "@opentrons/shared-data": "link:../shared-data",
+    "@opentrons/usb-bridge/node-client": "link:../usb-bridge/node-client",
     "@thi.ng/paths": "1.6.5",
     "@types/dateformat": "^3.0.1",
     "@types/fs-extra": "9.0.13",
@@ -48,6 +48,7 @@
     "dateformat": "3.0.3",
     "electron-context-menu": "3.6.1",
     "electron-debug": "3.0.1",
+    "electron-is-dev": "1.2.0",
     "electron-localshortcut": "3.2.1",
     "electron-devtools-installer": "3.2.0",
     "electron-store": "5.1.1",

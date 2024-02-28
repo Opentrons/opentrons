@@ -2,12 +2,13 @@
 import { app, shell, BrowserWindow } from 'electron'
 import path from 'path'
 
-import { RELOAD_UI } from '@opentrons/app/src/redux/shell/actions'
 
 import { getConfig } from './config'
+import { RELOAD_UI } from './constants'
 import { createLogger } from './log'
 
 import type { Action } from './types'
+
 
 const config = getConfig('ui')
 const log = createLogger('ui')
