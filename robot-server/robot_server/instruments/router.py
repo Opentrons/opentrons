@@ -254,9 +254,14 @@ async def _get_attached_instruments_ot2(
 @PydanticResponse.wrap_route(
     instruments_router.get,
     path="/instruments",
-    summary="Get attached instruments.",
-    description="Get a list of all instruments (pipettes & gripper) currently attached"
-    " to the robot.",
+    summary="Get attached instruments",
+    description=(
+        "Get a list of all instruments (pipettes & gripper) currently attached"
+        " to the robot."
+        "\n\n"
+        "**Warning:** The behavior of this endpoint is currently only defined for Flex"
+        " robots. For OT-2 robots, use `/pipettes` instead."
+    ),
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[AttachedItem]}},
 )
 async def get_attached_instruments(
