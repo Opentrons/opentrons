@@ -29,8 +29,22 @@ AttitudeMatrix = typing.Sequence[
 
 
 class InstrumentOffset(BaseModel):
-    single: Offset
-    multi: Offset
+    single: Offset = Field(
+        ...,
+        deprecated=True,
+        description=(
+            "This will always be `[0, 0, 0]`."
+            " Use the `GET /calibration/pipette_offset` endpoint instead."
+        ),
+    )
+    multi: Offset = Field(
+        ...,
+        deprecated=True,
+        description=(
+            "This will always be `[0, 0, 0]`."
+            " Use the `GET /calibration/pipette_offset` endpoint instead."
+        ),
+    )
 
 
 class InstrumentCalibrationStatus(BaseModel):
