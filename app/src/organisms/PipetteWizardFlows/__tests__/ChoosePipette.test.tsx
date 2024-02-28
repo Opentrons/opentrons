@@ -5,7 +5,11 @@ import {
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import { fireEvent, screen } from '@testing-library/react'
-import { COLORS, renderWithProviders } from '@opentrons/components'
+import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
+
+import { COLORS } from '@opentrons/components'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 import { getIsOnDevice } from '../../../redux/config'
@@ -13,19 +17,10 @@ import { useAttachedPipettesFromInstrumentsQuery } from '../../Devices/hooks'
 import { ChoosePipette } from '../ChoosePipette'
 import { getIsGantryEmpty } from '../utils'
 
-jest.mock('../utils')
-jest.mock('../../Devices/hooks')
-jest.mock('../../../redux/config')
+vi.mock('../utils')
+vi.mock('../../Devices/hooks')
+vi.mock('../../../redux/config')
 
-const mockUseAttachedPipettesFromInstrumentsQuery = useAttachedPipettesFromInstrumentsQuery as jest.MockedFunction<
-  typeof useAttachedPipettesFromInstrumentsQuery
->
-const mockGetIsGantryEmpty = getIsGantryEmpty as jest.MockedFunction<
-  typeof getIsGantryEmpty
->
-const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
-  typeof getIsOnDevice
->
 const render = (props: React.ComponentProps<typeof ChoosePipette>) => {
   return renderWithProviders(<ChoosePipette {...props} />, {
     i18nInstance: i18n,
@@ -35,23 +30,24 @@ const render = (props: React.ComponentProps<typeof ChoosePipette>) => {
 describe('ChoosePipette', () => {
   let props: React.ComponentProps<typeof ChoosePipette>
   beforeEach(() => {
-    mockGetIsOnDevice.mockReturnValue(false)
-    mockGetIsGantryEmpty.mockReturnValue(true)
-    mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
+    vi.mocked(getIsOnDevice).mockReturnValue(false)
+    vi.mocked(getIsGantryEmpty).mockReturnValue(true)
+    vi.mocked(useAttachedPipettesFromInstrumentsQuery).mockReturnValue({
       left: null,
       right: null,
     })
     props = {
-      proceed: jest.fn(),
-      exit: jest.fn(),
-      setSelectedPipette: jest.fn(),
+      proceed: vi.fn(),
+      exit: vi.fn(),
+      setSelectedPipette: vi.fn(),
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       mount: LEFT,
     }
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
+
   it('returns the correct information, buttons work as expected', () => {
     render(props)
     screen.getByText('Attach Left Pipette')
@@ -69,7 +65,7 @@ describe('ChoosePipette', () => {
 
     //  Single and 8-Channel pipettes are selected first by default
     expect(singleMountPipettes).toHaveStyle(
-      `background-color: ${COLORS.blue10}`
+      `background-color: ${COLORS.blue30}`
     )
     expect(ninetySixPipette).toHaveStyle(`background-color: ${COLORS.white}`)
 
@@ -85,8 +81,9 @@ describe('ChoosePipette', () => {
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
   })
+
   it('returns the correct information, buttons work as expected for on device display', () => {
-    mockGetIsOnDevice.mockReturnValue(true)
+    vi.mocked(getIsOnDevice).mockReturnValue(true)
     render(props)
     screen.getByText('Attach Left Pipette')
     screen.getByText('Choose a pipette to attach')
@@ -105,6 +102,7 @@ describe('ChoosePipette', () => {
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
   })
+
   it('renders exit button and clicking on it renders the exit modal, clicking on back button works', () => {
     render(props)
     const exit = screen.getByLabelText('Exit')
@@ -117,6 +115,7 @@ describe('ChoosePipette', () => {
     fireEvent.click(goBack)
     screen.getByText('Choose a pipette to attach')
   })
+
   it('renders exit button and clicking on it renders the exit modal, clicking on exit button works', () => {
     render(props)
     const exit = screen.getByLabelText('Exit')
@@ -129,6 +128,7 @@ describe('ChoosePipette', () => {
     fireEvent.click(exitButton)
     expect(props.exit).toHaveBeenCalled()
   })
+
   it('renders the 96 channel pipette option selected', () => {
     props = { ...props, selectedPipette: NINETY_SIX_CHANNEL }
     render(props)
@@ -139,11 +139,11 @@ describe('ChoosePipette', () => {
       name: '96-Channel pipette 96-Channel pipette',
     })
     expect(singleMountPipettes).toHaveStyle(`background-color: ${COLORS.white}`)
-    expect(ninetySixPipette).toHaveStyle(`background-color: ${COLORS.blue10}`)
+    expect(ninetySixPipette).toHaveStyle(`background-color: ${COLORS.blue30}`)
   })
   it('renders the correct text for the 96 channel button when there is a left pipette attached', () => {
-    mockGetIsGantryEmpty.mockReturnValue(false)
-    mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
+    vi.mocked(getIsGantryEmpty).mockReturnValue(false)
+    vi.mocked(useAttachedPipettesFromInstrumentsQuery).mockReturnValue({
       left: mockAttachedPipetteInformation,
       right: null,
     })
@@ -153,9 +153,10 @@ describe('ChoosePipette', () => {
       'Detach Flex 1-Channel 1000 μL and attach 96-Channel pipette'
     )
   })
+
   it('renders the correct text for the 96 channel button when there is a right pipette attached', () => {
-    mockGetIsGantryEmpty.mockReturnValue(false)
-    mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
+    vi.mocked(getIsGantryEmpty).mockReturnValue(false)
+    vi.mocked(useAttachedPipettesFromInstrumentsQuery).mockReturnValue({
       left: null,
       right: mockAttachedPipetteInformation,
     })

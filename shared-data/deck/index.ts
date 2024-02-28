@@ -8,6 +8,8 @@ import ot2StandardDeckV4 from './definitions/4/ot2_standard.json'
 import ot2ShortFixedTrashDeckV4 from './definitions/4/ot2_short_trash.json'
 import ot3StandardDeckV4 from './definitions/4/ot3_standard.json'
 
+import deckExample from './fixtures/3/deckExample.json'
+
 import type { DeckDefinition } from '../js/types'
 
 export * from './types/schemaV4'
@@ -19,6 +21,7 @@ export {
   ot2StandardDeckV4,
   ot2ShortFixedTrashDeckV4,
   ot3StandardDeckV4,
+  deckExample,
 }
 
 const latestDeckDefinitions = {

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, beforeEach, afterEach, vi, expect } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   MOVABLE_TRASH_D3_ADDRESSABLE_AREA,
@@ -10,26 +10,20 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
 
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { LocationConflictModal } from '../../../organisms/Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
 import { FixtureTable } from '../FixtureTable'
 
-jest.mock('../../../resources/deck_configuration/hooks')
-jest.mock(
+vi.mock('../../../resources/deck_configuration/hooks')
+vi.mock(
   '../../../organisms/Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 )
 
-const mockLocationConflictModal = LocationConflictModal as jest.MockedFunction<
-  typeof LocationConflictModal
->
-const mockUseDeckConfigurationCompatibility = useDeckConfigurationCompatibility as jest.MockedFunction<
-  typeof useDeckConfigurationCompatibility
->
-
-const mockSetSetupScreen = jest.fn()
-const mockSetCutoutId = jest.fn()
-const mockSetProvidedFixtureOptions = jest.fn()
+const mockSetSetupScreen = vi.fn()
+const mockSetCutoutId = vi.fn()
+const mockSetProvidedFixtureOptions = vi.fn()
 
 const render = (props: React.ComponentProps<typeof FixtureTable>) => {
   return renderWithProviders(<FixtureTable {...props} />, {
@@ -47,10 +41,10 @@ describe('FixtureTable', () => {
       setCutoutId: mockSetCutoutId,
       setProvidedFixtureOptions: mockSetProvidedFixtureOptions,
     }
-    mockLocationConflictModal.mockReturnValue(
+    vi.mocked(LocationConflictModal).mockReturnValue(
       <div>mock location conflict modal</div>
     )
-    mockUseDeckConfigurationCompatibility.mockReturnValue([
+    vi.mocked(useDeckConfigurationCompatibility).mockReturnValue([
       {
         cutoutId: 'cutoutD3',
         cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
@@ -63,7 +57,7 @@ describe('FixtureTable', () => {
     ])
   })
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should render table header and contents', () => {
@@ -79,7 +73,7 @@ describe('FixtureTable', () => {
   })
 
   it('should render the current status - not configured', () => {
-    mockUseDeckConfigurationCompatibility.mockReturnValue([
+    vi.mocked(useDeckConfigurationCompatibility).mockReturnValue([
       {
         cutoutId: 'cutoutD3',
         cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
@@ -101,7 +95,7 @@ describe('FixtureTable', () => {
   })
 
   it('should render the current status - conflicting', () => {
-    mockUseDeckConfigurationCompatibility.mockReturnValue([
+    vi.mocked(useDeckConfigurationCompatibility).mockReturnValue([
       {
         cutoutId: 'cutoutD3',
         cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
