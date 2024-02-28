@@ -22,7 +22,7 @@ interface LevelPipetteProps {
   confirm: () => void
 }
 
-function LevelingVideo(props: {
+export function LevelingVideo(props: {
   pipetteName: string
   mount: Mount
 }): JSX.Element {
@@ -40,7 +40,12 @@ function LevelingVideo(props: {
       controls={true}
     >
       <source
-        src={require(`../../assets/videos/pip-leveling/${pipetteName}-${mount}.webm`)}
+        src={
+          new URL(
+            `../../assets/videos/pip-leveling/${pipetteName}-${mount}.webm`,
+            import.meta.url
+          ).href
+        }
       />
     </video>
   )

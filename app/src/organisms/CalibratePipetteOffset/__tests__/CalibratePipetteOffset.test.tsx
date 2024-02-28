@@ -1,7 +1,8 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { vi, it, describe, expect, beforeEach } from 'vitest'
+import { when } from 'vitest-when'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { getDeckDefinitions } from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
@@ -13,19 +14,21 @@ import type { PipetteOffsetCalibrationStep } from '../../../redux/sessions/types
 import { DispatchRequestsType } from '../../../redux/robot-api'
 import { fireEvent, screen } from '@testing-library/react'
 
-jest.mock('@opentrons/shared-data')
-jest.mock('../../../redux/sessions/selectors')
-jest.mock('../../../redux/robot-api/selectors')
-jest.mock('../../../redux/config')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<typeof getDeckDefinitions>()
+  return {
+    ...actual,
+    getDeckDefinitions: vi.fn(),
+  }
+})
+vi.mock('../../../redux/sessions/selectors')
+vi.mock('../../../redux/robot-api/selectors')
+vi.mock('../../../redux/config')
 
 interface CalibratePipetteOffsetSpec {
   heading: string
   currentStep: PipetteOffsetCalibrationStep
 }
-
-const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
-  typeof getDeckDefinitions
->
 
 describe('CalibratePipetteOffset', () => {
   let dispatchRequests: DispatchRequestsType
@@ -71,17 +74,13 @@ describe('CalibratePipetteOffset', () => {
   ]
 
   beforeEach(() => {
-    dispatchRequests = jest.fn()
-    when(mockGetDeckDefinitions).calledWith().mockReturnValue({})
+    dispatchRequests = vi.fn()
+    when(vi.mocked(getDeckDefinitions)).calledWith().thenReturn({})
 
     mockPipOffsetCalSession = {
       id: 'fake_session_id',
       ...mockPipetteOffsetCalibrationSessionAttributes,
     }
-  })
-
-  afterEach(() => {
-    resetAllWhenMocks()
   })
 
   SPECS.forEach(spec => {

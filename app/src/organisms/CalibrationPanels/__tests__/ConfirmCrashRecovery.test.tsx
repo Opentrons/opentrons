@@ -1,13 +1,14 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { vi, it, describe, expect } from 'vitest'
 
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ConfirmCrashRecovery } from '../ConfirmCrashRecovery'
 
 describe('ConfirmCrashRecovery', () => {
-  const mockBack = jest.fn()
-  const mockConfirm = jest.fn()
+  const mockBack = vi.fn()
+  const mockConfirm = vi.fn()
   const render = (
     props: Partial<React.ComponentProps<typeof ConfirmCrashRecovery>> = {}
   ) => {
@@ -17,10 +18,6 @@ describe('ConfirmCrashRecovery', () => {
       { i18nInstance: i18n }
     )
   }
-
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
 
   it('clicking resume goes back', () => {
     render()

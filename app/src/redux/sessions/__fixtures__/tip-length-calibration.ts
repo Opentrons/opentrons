@@ -1,15 +1,12 @@
-import { fixtureTiprack300ul } from '@opentrons/shared-data'
-// import calBlockFixture from '@opentrons/shared-data/labware/definitions/2/opentrons_calibrationblock_short_side_left/1.json'
-import { getLatestLabwareDef } from '../../../assets/labware/getLabware'
+import {
+  fixtureTiprack300ul,
+  fixtureCalibrationBlock,
+} from '@opentrons/shared-data'
 import type {
   TipLengthCalibrationSessionDetails,
   CalibrationLabware,
 } from '../types'
 import type { TipLengthCalibrationSessionParams } from '../tip-length-calibration/types'
-
-const calBlockFixture = getLatestLabwareDef(
-  'opentrons_calibrationblock_short_side_left'
-)
 
 export const mockTipLengthTipRack: CalibrationLabware = {
   slot: '8',
@@ -26,7 +23,7 @@ export const mockTipLengthCalBlock: CalibrationLabware = {
   namespace: 'opentrons',
   version: 1,
   isTiprack: false,
-  definition: calBlockFixture as CalibrationLabware['definition'],
+  definition: fixtureCalibrationBlock as CalibrationLabware['definition'],
 }
 
 export const mockTipLengthCalibrationSessionDetails: TipLengthCalibrationSessionDetails = {

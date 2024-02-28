@@ -1,8 +1,10 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { vi, it, describe, expect, beforeEach } from 'vitest'
+
 import { StaticRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import {
   getConnectableRobots,
@@ -19,26 +21,9 @@ import {
 import { getNetworkInterfaces } from '../../../redux/networking'
 import { ChooseRobotSlideout } from '..'
 
-jest.mock('../../../redux/discovery')
-jest.mock('../../../redux/robot-update')
-jest.mock('../../../redux/networking')
-
-const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
-  typeof getConnectableRobots
->
-const mockGetReachableRobots = getReachableRobots as jest.MockedFunction<
-  typeof getReachableRobots
->
-const mockGetUnreachableRobots = getUnreachableRobots as jest.MockedFunction<
-  typeof getUnreachableRobots
->
-const mockGetScanning = getScanning as jest.MockedFunction<typeof getScanning>
-const mockStartDiscovery = startDiscovery as jest.MockedFunction<
-  typeof startDiscovery
->
-const mockGetNetworkInterfaces = getNetworkInterfaces as jest.MockedFunction<
-  typeof getNetworkInterfaces
->
+vi.mock('../../../redux/discovery')
+vi.mock('../../../redux/robot-update')
+vi.mock('../../../redux/networking')
 
 const render = (props: React.ComponentProps<typeof ChooseRobotSlideout>) => {
   return renderWithProviders(
@@ -51,28 +36,30 @@ const render = (props: React.ComponentProps<typeof ChooseRobotSlideout>) => {
   )
 }
 
-const mockSetSelectedRobot = jest.fn()
+const mockSetSelectedRobot = vi.fn()
 
 describe('ChooseRobotSlideout', () => {
   beforeEach(() => {
-    mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
-    mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
-    mockGetReachableRobots.mockReturnValue([mockReachableRobot])
-    mockGetScanning.mockReturnValue(false)
-    mockStartDiscovery.mockReturnValue({ type: 'mockStartDiscovery' } as any)
-    mockGetNetworkInterfaces.mockReturnValue({ wifi: null, ethernet: null })
-  })
-  afterEach(() => {
-    jest.resetAllMocks()
+    vi.mocked(getConnectableRobots).mockReturnValue([mockConnectableRobot])
+    vi.mocked(getUnreachableRobots).mockReturnValue([mockUnreachableRobot])
+    vi.mocked(getReachableRobots).mockReturnValue([mockReachableRobot])
+    vi.mocked(getScanning).mockReturnValue(false)
+    vi.mocked(startDiscovery).mockReturnValue({
+      type: 'mockStartDiscovery',
+    } as any)
+    vi.mocked(getNetworkInterfaces).mockReturnValue({
+      wifi: null,
+      ethernet: null,
+    })
   })
 
   it('renders slideout if isExpanded true', () => {
     render({
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       isExpanded: true,
       isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
-      setSelectedRobot: jest.fn(),
+      setSelectedRobot: vi.fn(),
       title: 'choose robot slideout title',
       robotType: 'OT-2 Standard',
     })
@@ -80,11 +67,11 @@ describe('ChooseRobotSlideout', () => {
   })
   it('shows a warning if the protocol has failed analysis', () => {
     render({
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       isExpanded: true,
       isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
-      setSelectedRobot: jest.fn(),
+      setSelectedRobot: vi.fn(),
       title: 'choose robot slideout title',
       isAnalysisError: true,
       robotType: 'OT-2 Standard',
@@ -95,11 +82,11 @@ describe('ChooseRobotSlideout', () => {
   })
   it('renders an available robot option for every connectable robot, and link for other robots', () => {
     render({
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       isExpanded: true,
       isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
-      setSelectedRobot: jest.fn(),
+      setSelectedRobot: vi.fn(),
       title: 'choose robot slideout title',
       robotType: 'OT-2 Standard',
     })
@@ -107,13 +94,13 @@ describe('ChooseRobotSlideout', () => {
     screen.getByText('2 unavailable robots are not listed.')
   })
   it('if scanning, show robots, but do not show link to other devices', () => {
-    mockGetScanning.mockReturnValue(true)
+    vi.mocked(getScanning).mockReturnValue(true)
     render({
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       isExpanded: true,
       isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
-      setSelectedRobot: jest.fn(),
+      setSelectedRobot: vi.fn(),
       title: 'choose robot slideout title',
       robotType: 'OT-2 Standard',
     })
@@ -124,7 +111,7 @@ describe('ChooseRobotSlideout', () => {
   })
   it('if not scanning, show refresh button, start discovery if clicked', () => {
     const { dispatch } = render({
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       isExpanded: true,
       isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
@@ -134,16 +121,16 @@ describe('ChooseRobotSlideout', () => {
     })[1]
     const refreshButton = screen.getByRole('button', { name: 'refresh' })
     fireEvent.click(refreshButton)
-    expect(mockStartDiscovery).toHaveBeenCalled()
+    expect(vi.mocked(startDiscovery)).toHaveBeenCalled()
     expect(dispatch).toHaveBeenCalledWith({ type: 'mockStartDiscovery' })
   })
   it('defaults to first available robot and allows an available robot to be selected', () => {
-    mockGetConnectableRobots.mockReturnValue([
+    vi.mocked(getConnectableRobots).mockReturnValue([
       { ...mockConnectableRobot, name: 'otherRobot', ip: 'otherIp' },
       mockConnectableRobot,
     ])
     render({
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       isExpanded: true,
       isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,

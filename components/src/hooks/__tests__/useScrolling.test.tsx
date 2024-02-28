@@ -1,15 +1,16 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { useScrolling } from '../'
 
 describe('useScrolling', () => {
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
-    jest.clearAllTimers()
-    jest.useRealTimers()
+    vi.resetAllMocks()
+    vi.clearAllTimers()
+    vi.useRealTimers()
   })
 
   it('returns false when there is no scrolling', () => {
@@ -29,6 +30,7 @@ describe('useScrolling', () => {
   })
 
   it('returns false after scrolling stops', () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
     const ref = document.createElement('div')
     const { result } = renderHook(() => useScrolling(ref))
     ref.scrollTop = 10
@@ -37,9 +39,8 @@ describe('useScrolling', () => {
     })
     expect(result.current).toBe(true)
     act(() => {
-      jest.runTimersToTime(300)
+      vi.advanceTimersByTime(300)
     })
-    jest.runTimersToTime(300)
     expect(result.current).toBe(false)
   })
 })

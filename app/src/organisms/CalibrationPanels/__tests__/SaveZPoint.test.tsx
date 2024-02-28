@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { vi, it, describe, expect } from 'vitest'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 
 import {
@@ -11,8 +13,8 @@ import * as Sessions from '../../../redux/sessions'
 import { SaveZPoint } from '../SaveZPoint'
 
 describe('SaveZPoint', () => {
-  const mockSendCommands = jest.fn()
-  const mockDeleteSession = jest.fn()
+  const mockSendCommands = vi.fn()
+  const mockDeleteSession = vi.fn()
 
   const render = (
     props: Partial<React.ComponentProps<typeof SaveZPoint>> = {}
@@ -41,10 +43,6 @@ describe('SaveZPoint', () => {
       { i18nInstance: i18n }
     )
   }
-
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
 
   it('displays proper asset for left multi', () => {
     render({ mount: 'left', isMulti: true })

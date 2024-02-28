@@ -41,6 +41,9 @@
     "redux": "4.0.5",
     "styled-components": "5.3.6"
   },
+  "devDependencies": {
+    "react-redux": "8.1.2"
+  },
   "browser": {
     "jest-when": false
   }

@@ -1,7 +1,9 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/shared-data'
+import { vi, it, describe, expect, beforeEach } from 'vitest'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import {
   mockDeckCalTipRack,
@@ -12,19 +14,22 @@ import * as Sessions from '../../../redux/sessions'
 
 import { DeckSetup } from '../DeckSetup'
 
-jest.mock('../../../assets/labware/getLabware')
-jest.mock('@opentrons/shared-data')
-jest.mock('@opentrons/components/src/hardware-sim/Deck/RobotWorkSpace', () => ({
-  RobotWorkSpace: () => <></>,
-}))
-
-const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
-  typeof getDeckDefinitions
->
+vi.mock('../../../assets/labware/getLabware')
+vi.mock('@opentrons/shared-data')
+vi.mock(
+  '@opentrons/components/src/hardware-sim/Deck/RobotWorkSpace',
+  async importOriginal => {
+    const actual = (await importOriginal()) as any
+    return {
+      ...actual,
+      RobotWorkSpace: () => <></>,
+    }
+  }
+)
 
 describe('DeckSetup', () => {
-  const mockSendCommands = jest.fn()
-  const mockDeleteSession = jest.fn()
+  const mockSendCommands = vi.fn()
+  const mockDeleteSession = vi.fn()
 
   const render = (
     props: Partial<React.ComponentProps<typeof DeckSetup>> = {}
@@ -57,11 +62,7 @@ describe('DeckSetup', () => {
   }
 
   beforeEach(() => {
-    mockGetDeckDefinitions.mockReturnValue({})
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
+    vi.mocked(getDeckDefinitions).mockReturnValue({})
   })
 
   it('clicking continue proceeds to next step', () => {

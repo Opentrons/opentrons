@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { vi, it, describe, expect } from 'vitest'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { i18n } from '../../../i18n'
 import { setUseTrashSurfaceForTipCal } from '../../../redux/calibration'
@@ -7,7 +9,7 @@ import { AskForCalibrationBlockModal } from '../AskForCalibrationBlockModal'
 import { fireEvent, screen } from '@testing-library/react'
 
 describe('AskForCalibrationBlockModal', () => {
-  const onResponse = jest.fn()
+  const onResponse = vi.fn()
   const render = () => {
     return renderWithProviders<
       React.ComponentProps<typeof AskForCalibrationBlockModal>
@@ -15,15 +17,11 @@ describe('AskForCalibrationBlockModal', () => {
       <AskForCalibrationBlockModal
         onResponse={onResponse}
         titleBarTitle="Test Cal Flow"
-        closePrompt={jest.fn()}
+        closePrompt={vi.fn()}
       />,
       { i18nInstance: i18n }
     )
   }
-
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
 
   it('saves preference when not checked and use trash is clicked', () => {
     const { dispatch } = render()[1]
