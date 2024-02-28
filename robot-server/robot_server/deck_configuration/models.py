@@ -7,7 +7,7 @@ from typing_extensions import Literal
 
 import pydantic
 
-from robot_server.errors import ErrorDetails
+from robot_server.errors.error_responses import ErrorDetails
 
 
 class CutoutFixture(pydantic.BaseModel):

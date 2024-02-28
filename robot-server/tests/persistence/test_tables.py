@@ -6,7 +6,7 @@ from typing import List, cast
 import pytest
 import sqlalchemy
 
-from robot_server.persistence._tables import (
+from robot_server.persistence.tables import (
     metadata as latest_metadata,
     schema_3,
     schema_2,

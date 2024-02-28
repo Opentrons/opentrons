@@ -18,7 +18,10 @@ from server_utils.fastapi_utils.app_state import (
     get_app_state,
 )
 from robot_server.deletion_planner import ProtocolDeletionPlanner
-from robot_server.persistence import get_sql_engine, get_active_persistence_directory
+from robot_server.persistence.fastapi_dependencies import (
+    get_sql_engine,
+    get_active_persistence_directory,
+)
 from robot_server.settings import get_settings
 
 from .protocol_auto_deleter import ProtocolAutoDeleter

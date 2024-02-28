@@ -6,7 +6,7 @@ from opentrons import types as ot_types
 from opentrons.calibration_storage.ot2 import pipette_offset, models
 
 from robot_server.hardware import get_ot2_hardware
-from robot_server.errors import ErrorBody
+from robot_server.errors.error_responses import ErrorBody
 from robot_server.service.pipette_offset import models as pip_models
 from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.shared_models import calibration as cal_model

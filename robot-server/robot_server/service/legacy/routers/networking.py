@@ -9,7 +9,7 @@ from fastapi import APIRouter, HTTPException, File, Path, UploadFile, Query
 
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons.system import nmcli, wifi
-from robot_server.errors import LegacyErrorResponse
+from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models.networking import (
     NetworkingStatus,

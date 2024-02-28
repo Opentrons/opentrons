@@ -40,7 +40,9 @@ from robot_server.app import app
 from robot_server.hardware import get_hardware, get_ot2_hardware
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
 from robot_server.service.session.manager import SessionManager
-from robot_server.persistence import get_sql_engine, metadata, sql_engine_ctx
+from robot_server.persistence.database import sql_engine_ctx
+from robot_server.persistence.tables import metadata
+from robot_server.persistence.fastapi_dependencies import get_sql_engine
 from robot_server.health.router import ComponentVersions, get_versions
 
 test_router = routing.APIRouter()

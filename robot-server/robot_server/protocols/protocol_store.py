@@ -13,11 +13,11 @@ import sqlalchemy
 
 from opentrons.protocols.parse import PythonParseMode
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
-from robot_server.persistence import (
+from robot_server.persistence.database import sqlite_rowid
+from robot_server.persistence.tables import (
     analysis_table,
     protocol_table,
     run_table,
-    sqlite_rowid,
 )
 
 
