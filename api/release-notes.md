@@ -22,6 +22,8 @@ If you don't care about preserving your labware offsets and run history, you can
 
 ### Bug Fixes
 
+- The OT-2 now consistently applies tip length calibration. There used to be a height discrepancy between Labware Position Check and protocol runs. If you previously compensated for the inconsistent pipette height with labware offsets, re-run Labware Position Check to avoid pipette crashes.
+- The OT-2 now accurately calculates the position of the Thermocycler. If you previously compensated for the incorrect position with labware offsets, re-run Labware Position Check to avoid pipette crashes.
 - The Flex Gripper will no longer pick up large labware that could collide with tips held by an adjoining pipette.
 - Flex now properly configures itself when connected by Ethernet directly to a computer.
 
