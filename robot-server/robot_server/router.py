@@ -72,7 +72,7 @@ router.include_router(
 
 router.include_router(
     router=deck_configuration_router,
-    tags=["Deck Configuration"],
+    tags=["Flex Deck Configuration"],
     dependencies=[Depends(check_version_header)],
 )
 

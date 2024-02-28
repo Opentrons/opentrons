@@ -27,7 +27,7 @@ router = fastapi.APIRouter()
 @PydanticResponse.wrap_route(
     router.put,
     path="/deck_configuration",
-    summary="Set the deck configuration",
+    summary="Set the Flex deck configuration",
     description=(
         "Inform the robot how its deck is physically set up."
         "\n\n"
@@ -38,6 +38,9 @@ router = fastapi.APIRouter()
         " configuration, such as loading a labware into a staging area slot that this deck"
         " configuration doesn't provide, the run command will fail with an error."
         "\n\n"
+        "After you set the deck configuration, it will persist, even across reboots,"
+        " until you set it to something else."
+        "\n\n"
         "**Warning:**"
         " Currently, you can call this endpoint at any time, even while there is an active run."
         " However, the robot can't adapt to deck configuration changes in the middle of a run."
@@ -45,8 +48,8 @@ router = fastapi.APIRouter()
         " first played. In the future, this endpoint may error if you try to call it in the middle"
         " of an active run, so don't rely on being able to do that."
         "\n\n"
-        "After you set the deck configuration, it will persist, even across reboots,"
-        " until you set it to something else."
+        "**Warning:** The behavior of this endpoint is currently only defined for Flex"
+        " robots, not OT-2 robots."
     ),
     responses={
         fastapi.status.HTTP_200_OK: {
@@ -86,10 +89,13 @@ async def put_deck_configuration(  # noqa: D103
 @PydanticResponse.wrap_route(
     router.get,
     path="/deck_configuration",
-    summary="Get the deck configuration",
+    summary="Get the Flex deck configuration",
     description=(
         "Get the robot's current deck configuration."
         " See `PUT /deck_configuration` for background information."
+        "\n\n"
+        "**Warning:** The behavior of this endpoint is currently only defined for Flex"
+        " robots, not OT-2 robots."
     ),
     responses={
         fastapi.status.HTTP_200_OK: {
