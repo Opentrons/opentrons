@@ -3,7 +3,6 @@ from typing import Dict
 
 from opentrons.system import log_control
 
-from robot_server.docs_helpers.xrefs import OperationId as OpId, xref
 from robot_server.service.legacy.models.logs import LogIdentifier, LogFormat
 
 router = APIRouter()
@@ -21,12 +20,12 @@ IDENTIFIER_TO_SYSLOG_ID: Dict[LogIdentifier, str] = {
     path="/logs/{log_identifier}",
     summary="Get troubleshooting logs",
     description=(
-        f"Get the robot's troubleshooting logs."
-        f"\n\n"
-        f'If you want the list of steps executed in a protocol,'
-        f' like "aspirated 5 µL from well A1...", you probably want the'
-        f' {xref(OpId.GET_PROTOCOL_ANALYSIS, "*protocol analysis commands*")} or'
-        f' {xref(OpId.GET_RUN_COMMANDS, "*run commands*")} instead.'
+        "Get the robot's troubleshooting logs."
+        "\n\n"
+        "If you want the list of steps executed in a protocol,"
+        ' like "aspirated 5 µL from well A1...", you probably want the'
+        " *protocol analysis commands* (`GET /protocols/{id}/analyses/{id}`)"
+        " or *run commands* (`GET /runs/{id}/commands`) instead."
     ),
 )
 async def get_logs(

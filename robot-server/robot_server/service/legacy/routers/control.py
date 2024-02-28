@@ -12,7 +12,6 @@ from opentrons.hardware_control.types import Axis, CriticalPoint
 from opentrons.hardware_control import HardwareControlAPI
 
 from opentrons.types import Mount, Point
-from robot_server.docs_helpers.xrefs import OperationId as OpID, xref
 
 from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.service.dependencies import get_motion_lock
@@ -75,8 +74,8 @@ async def get_robot_positions() -> control.RobotPositionsResponse:
         "position retrieved from `GET /robot/positions`)."
         "\n\n"
         "**Deprecated:**"
-        f" {xref(OpID.POST_MAINTENANCE_RUN_COMMAND, 'Run a `moveToCoordinates` command in a maintenance run')}"
-        " instead."
+        " Run a `moveToCoordinates` command in a maintenance run instead."
+        " See the `/maintenance_runs` endpoints."
     ),
     response_model=V1BasicResponse,
     responses={
