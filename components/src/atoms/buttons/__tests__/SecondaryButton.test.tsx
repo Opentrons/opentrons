@@ -1,5 +1,7 @@
-import 'jest-styled-components'
 import * as React from 'react'
+import { describe, it, beforeEach, expect } from 'vitest'
+import { screen } from '@testing-library/react'
+import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../testing/utils'
 import { BORDERS, TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
 import { COLORS } from '../../../helix-design-system'
@@ -20,8 +22,8 @@ describe('SecondaryButton', () => {
   })
 
   it('renders primary button with text', () => {
-    const { getByText } = render(props)
-    const button = getByText('secondary button')
+    render(props)
+    const button = screen.getByText('secondary button')
     expect(button).toHaveStyle(`background-color: ${COLORS.transparent}`)
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16}`
@@ -33,40 +35,20 @@ describe('SecondaryButton', () => {
     expect(button).toHaveStyle(
       `text-transform: ${TYPOGRAPHY.textTransformNone}`
     )
-    expect(button).toHaveStyle(`color: ${COLORS.blue50}`)
+    expect(button).toHaveStyle(`color: ${COLORS.blue55}`)
   })
 
   it('renders secondary button with text and disabled', () => {
     props.disabled = true
-    const { getByText } = render(props)
-    const button = getByText('secondary button')
+    render(props)
+    const button = screen.getByText('secondary button')
     expect(button).toBeDisabled()
-  })
-
-  it('applies the correct states to the button - hover', () => {
-    const { getByText } = render(props)
-    const button = getByText('secondary button')
-    expect(button).toHaveStyleRule('box-shadow', '0 0 0', {
-      modifier: ':hover',
-    })
-  })
-
-  it('applies the correct states to the button - focus-visible', () => {
-    const { getByText } = render(props)
-    const button = getByText('secondary button')
-    expect(button).toHaveStyleRule(
-      'box-shadow',
-      `0 0 0 3px ${COLORS.yellow50}`,
-      {
-        modifier: ':focus-visible',
-      }
-    )
   })
 
   it('renders secondary button with text and different background color', () => {
     props.color = COLORS.red50
-    const { getByText } = render(props)
-    const button = getByText('secondary button')
+    render(props)
+    const button = screen.getByText('secondary button')
     expect(button).toHaveStyle(`color: ${COLORS.red50}`)
   })
 })

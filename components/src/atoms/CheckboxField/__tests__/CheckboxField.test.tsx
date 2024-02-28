@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { describe, beforeEach, afterEach } from 'vitest'
+import { describe, beforeEach, afterEach, vi, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import '@testing-library/jest-dom/vitest'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../../styles'
 import { renderWithProviders } from '../../../testing/utils'
 import { COLORS } from '../../../helix-design-system'
@@ -16,7 +17,7 @@ describe('CheckboxField', () => {
 
   beforeEach(() => {
     props = {
-      onChange: jest.fn(),
+      onChange: vi.fn(),
       value: false,
       name: 'mockCheckboxField',
       label: 'checkMockCheckboxField',
@@ -26,7 +27,7 @@ describe('CheckboxField', () => {
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders label with correct style', () => {
