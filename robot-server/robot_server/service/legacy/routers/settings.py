@@ -193,8 +193,8 @@ async def post_log_level_upstream(log_level: LogLevel) -> V1BasicResponse:
 
 @router.get(
     "/settings/reset/options",
-    summary="Get the things that can be factory-reset",
-    description="Get the things that can be reset through `POST /settings/reset`.",
+    summary="Get the things that can be reset",
+    description="Get the robot settings and data that can be reset through `POST /settings/reset`.",
     response_model=FactoryResetOptions,
 )
 async def get_settings_reset_options(
@@ -211,20 +211,14 @@ async def get_settings_reset_options(
 
 @router.post(
     "/settings/reset",
-    summary="Perform a factory reset",
+    summary="Reset specific settings or data",
     description=(
-        "Perform a factory reset of some robot data."
+        "Perform a reset of the requested robot settings or data."
         "\n\n"
         "The valid properties are given by `GET /settings/reset/options`."
         "\n\n"
         "You should always restart the robot after using this endpoint to"
         " reset something."
-        "\n\n"
-        '**Warning:** Despite being called "factory reset" in Opentrons code,'
-        " this is not a true factory reset. Even if you reset everything you can"
-        " through this endpoint, it can still leave other data behind. There is"
-        " currently no way to totally restore the robot to its true factory state"
-        " except by manually reimaging it."
     ),
     responses={
         status.HTTP_403_FORBIDDEN: {"model": LegacyErrorResponse},
