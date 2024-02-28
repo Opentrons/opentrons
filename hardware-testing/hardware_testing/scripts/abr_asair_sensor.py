@@ -24,6 +24,7 @@ class _ABRAsairSensor:
         try:
             sys.path.insert(0, "/var/lib/jupyter/notebooks")
             import google_sheets_tool  # type: ignore[import]
+
             credentials_path = "/var/lib/jupyter/notebooks/abr.json"
         except ImportError:
             raise ImportError(
@@ -62,7 +63,7 @@ class _ABRAsairSensor:
             env_data = sensor.get_reading()
             timestamp = datetime.datetime.now()
             # Time adjustment for ABR robot timezone
-            new_timestamp = timestamp - datetime.timedelta(hours=5)  
+            new_timestamp = timestamp - datetime.timedelta(hours=5)
             date = new_timestamp.date()
             time = new_timestamp.time()
             temp = env_data.temperature
