@@ -515,6 +515,7 @@ def test_pick_up_tip_from_labware(
     decoy.when(mock_instrument_core.get_active_channels()).then_return(123)
     decoy.when(
         labware.next_available_tip(
+            mount=Mount.LEFT,
             starting_tip=None,
             tip_racks=[mock_tip_rack],
             channels=123,
@@ -569,6 +570,7 @@ def test_pick_up_tip_from_labware_location(
     decoy.when(mock_instrument_core.get_active_channels()).then_return(123)
     decoy.when(
         labware.next_available_tip(
+            mount=Mount.LEFT,
             starting_tip=None,
             tip_racks=[mock_tip_rack],
             channels=123,
@@ -604,6 +606,7 @@ def test_pick_up_from_associated_tip_racks(
     decoy.when(mock_instrument_core.get_active_channels()).then_return(123)
     decoy.when(
         labware.next_available_tip(
+            mount=Mount.LEFT,
             starting_tip=mock_starting_tip,
             tip_racks=[mock_tip_rack_1, mock_tip_rack_2],
             channels=123,

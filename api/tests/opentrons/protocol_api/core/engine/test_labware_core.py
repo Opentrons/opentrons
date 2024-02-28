@@ -16,7 +16,7 @@ from opentrons_shared_data.labware.labware_definition import (
     Metadata as LabwareDefinitionMetadata,
 )
 
-from opentrons.types import DeckSlotName, Point
+from opentrons.types import DeckSlotName, Point, Mount
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.errors import LabwareNotOnDeckError
 
@@ -246,6 +246,7 @@ def test_get_next_tip(
     """It should get the next available tip from the core."""
     decoy.when(
         mock_engine_client.state.tips.get_next_tip(
+            pipette_id="pipette-id",
             labware_id="cool-labware",
             num_tips=8,
             starting_tip_name="B1",
@@ -255,7 +256,9 @@ def test_get_next_tip(
     starting_tip = WellCore(
         name="B1", labware_id="cool-labware", engine_client=mock_engine_client
     )
-    result = subject.get_next_tip(num_tips=8, starting_tip=starting_tip)
+    result = subject.get_next_tip(
+        mount=Mount.LEFT, num_tips=8, starting_tip=starting_tip
+    )
 
     assert result == "A2"
 

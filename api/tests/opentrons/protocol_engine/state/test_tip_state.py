@@ -123,6 +123,7 @@ def test_get_next_tip_returns_none(
     )
 
     result = TipView(subject.state).get_next_tip(
+        pipette_id="pipette-id",
         labware_id="cool-labware",
         num_tips=1,
         starting_tip_name=None,
@@ -141,6 +142,7 @@ def test_get_next_tip_returns_first_tip(
     )
 
     result = TipView(subject.state).get_next_tip(
+        pipette_id="pipette-id",
         labware_id="cool-labware",
         num_tips=input_tip_amount,
         starting_tip_name=None,
@@ -162,6 +164,7 @@ def test_get_next_tip_used_starting_tip(
     )
 
     result = TipView(subject.state).get_next_tip(
+        pipette_id="pipette-id",
         labware_id="cool-labware",
         num_tips=input_tip_amount,
         starting_tip_name="B1",
@@ -232,6 +235,7 @@ def test_get_next_tip_skips_picked_up_tip(
     )
 
     result = TipView(subject.state).get_next_tip(
+        pipette_id="pipette-id",
         labware_id="cool-labware",
         num_tips=get_next_tip_tips,
         starting_tip_name=input_starting_tip,
@@ -250,6 +254,7 @@ def test_get_next_tip_with_starting_tip(
     )
 
     result = TipView(subject.state).get_next_tip(
+        pipette_id="pipette-id",
         labware_id="cool-labware",
         num_tips=1,
         starting_tip_name="B2",
@@ -273,6 +278,7 @@ def test_get_next_tip_with_starting_tip(
     )
 
     result = TipView(subject.state).get_next_tip(
+        pipette_id="pipette-id",
         labware_id="cool-labware",
         num_tips=1,
         starting_tip_name="B2",
@@ -291,6 +297,7 @@ def test_get_next_tip_with_starting_tip_8_channel(
     )
 
     result = TipView(subject.state).get_next_tip(
+        pipette_id="pipette-id",
         labware_id="cool-labware",
         num_tips=8,
         starting_tip_name="A2",
@@ -314,6 +321,7 @@ def test_get_next_tip_with_starting_tip_8_channel(
     )
 
     result = TipView(subject.state).get_next_tip(
+        pipette_id="pipette-id",
         labware_id="cool-labware",
         num_tips=8,
         starting_tip_name="A2",
@@ -332,6 +340,7 @@ def test_get_next_tip_with_starting_tip_out_of_tips(
     )
 
     result = TipView(subject.state).get_next_tip(
+        pipette_id="pipette-id",
         labware_id="cool-labware",
         num_tips=1,
         starting_tip_name="H12",
@@ -355,6 +364,7 @@ def test_get_next_tip_with_starting_tip_out_of_tips(
     )
 
     result = TipView(subject.state).get_next_tip(
+        pipette_id="pipette-id",
         labware_id="cool-labware",
         num_tips=1,
         starting_tip_name="H12",
@@ -373,6 +383,7 @@ def test_get_next_tip_with_column_and_starting_tip(
     )
 
     result = TipView(subject.state).get_next_tip(
+        pipette_id="pipette-id",
         labware_id="cool-labware",
         num_tips=8,
         starting_tip_name="D1",
@@ -428,6 +439,7 @@ def test_reset_tips(
     subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
 
     result = TipView(subject.state).get_next_tip(
+        pipette_id="pipette-id",
         labware_id="cool-labware",
         num_tips=1,
         starting_tip_name=None,
@@ -744,6 +756,7 @@ def test_next_tip_uses_active_channels(
     )
 
     result = TipView(subject.state).get_next_tip(
+        pipette_id="pipette-id",
         labware_id="cool-labware",
         num_tips=5,
         starting_tip_name=None,

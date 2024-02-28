@@ -22,7 +22,7 @@ from opentrons.protocol_api.core.legacy.legacy_well_core import LegacyWellCore
 from opentrons.protocol_api.core.legacy.well_geometry import WellGeometry
 
 from opentrons.calibration_storage import helpers
-from opentrons.types import Point, Location
+from opentrons.types import Point, Location, Mount
 
 test_data: Dict[str, WellDefinition] = {
     "circular_well_json": {
@@ -544,15 +544,22 @@ def test_tiprack_list():
         core_map=None,  # type: ignore[arg-type]
     )
 
-    assert labware.select_tiprack_from_list([tiprack], 1) == (tiprack, tiprack["A1"])
+    assert labware.select_tiprack_from_list(Mount.LEFT, [tiprack], 1) == (
+        tiprack,
+        tiprack["A1"],
+    )
 
-    assert labware.select_tiprack_from_list([tiprack], 1, tiprack.wells()[1]) == (
+    assert labware.select_tiprack_from_list(
+        Mount.LEFT, [tiprack], 1, tiprack.wells()[1]
+    ) == (
         tiprack,
         tiprack["B1"],
     )
 
     tiprack["C1"].has_tip = False
-    assert labware.select_tiprack_from_list([tiprack], 1, tiprack.wells()[2]) == (
+    assert labware.select_tiprack_from_list(
+        Mount.LEFT, [tiprack], 1, tiprack.wells()[2]
+    ) == (
         tiprack,
         tiprack["D1"],
     )
@@ -560,11 +567,11 @@ def test_tiprack_list():
     tiprack["H12"].has_tip = False
     tiprack_2["A1"].has_tip = False
     assert labware.select_tiprack_from_list(
-        [tiprack, tiprack_2], 1, tiprack.wells()[95]
+        Mount.LEFT, [tiprack, tiprack_2], 1, tiprack.wells()[95]
     ) == (tiprack_2, tiprack_2["B1"])
 
     with pytest.raises(labware.OutOfTipsError):
-        labware.select_tiprack_from_list([tiprack], 1, tiprack.wells()[95])
+        labware.select_tiprack_from_list(Mount.LEFT, [tiprack], 1, tiprack.wells()[95])
 
 
 def test_uris():

@@ -124,42 +124,38 @@ class TipStore(HasState[TipState], HandlesActions):
             pipette_id = command.params.pipetteId
             self._state.length_by_pipette_id.pop(pipette_id, None)
 
-    def _set_used_tips(
+    def _set_used_tips(  # noqa: C901
         self, pipette_id: str, well_name: str, labware_id: str
-    ) -> None:  # noqa: C901
+    ) -> None:
         columns = self._state.column_by_labware_id.get(labware_id, [])
         wells = self._state.tips_by_labware_id.get(labware_id, {})
         nozzle_map = self._state.nozzle_map_by_pipette_id[pipette_id]
 
-        # fix this None logic?
-        # replace this with the whole nozzle map mask instead of the active nozzles?
-        if nozzle_map is not None:
-            num_nozzle_cols = len(nozzle_map.columns)
-            num_nozzle_rows = len(nozzle_map.rows)
+        # TODO (cb, 02-28-2024): Transition from using partial nozzle map to full instrument map for the set used logic
+        num_nozzle_cols = len(nozzle_map.columns)
+        num_nozzle_rows = len(nozzle_map.rows)
 
-            critical_column = 0
-            critical_row = 0
-            for column in columns:
-                if well_name in column:
-                    critical_row = column.index(well_name)
-                    critical_column = columns.index(column)
+        critical_column = 0
+        critical_row = 0
+        for column in columns:
+            if well_name in column:
+                critical_row = column.index(well_name)
+                critical_column = columns.index(column)
 
-            for i in range(num_nozzle_cols):
-                for j in range(num_nozzle_rows):
-                    if nozzle_map.starting_nozzle == "A1":
-                        well = columns[critical_column + i][critical_row + j]
-                        wells[well] = TipRackWellState.USED
-                    elif nozzle_map.starting_nozzle == "A12":
-                        well = columns[critical_column + i][critical_row - j]
-                        wells[well] = TipRackWellState.USED
-                    elif nozzle_map.starting_nozzle == "H1":
-                        well = columns[critical_column - i][critical_row + j]
-                        wells[well] = TipRackWellState.USED
-                    elif nozzle_map.starting_nozzle == "H12":
-                        well = columns[critical_column - i][critical_row - j]
-                        wells[well] = TipRackWellState.USED
-        else:
-            raise RuntimeError(f"No Nozzle Map found for Pipette-ID: {pipette_id}.")
+        for i in range(num_nozzle_cols):
+            for j in range(num_nozzle_rows):
+                if nozzle_map.starting_nozzle == "A1":
+                    well = columns[critical_column + i][critical_row + j]
+                    wells[well] = TipRackWellState.USED
+                elif nozzle_map.starting_nozzle == "A12":
+                    well = columns[critical_column + i][critical_row - j]
+                    wells[well] = TipRackWellState.USED
+                elif nozzle_map.starting_nozzle == "H1":
+                    well = columns[critical_column - i][critical_row + j]
+                    wells[well] = TipRackWellState.USED
+                elif nozzle_map.starting_nozzle == "H12":
+                    well = columns[critical_column - i][critical_row - j]
+                    wells[well] = TipRackWellState.USED
 
 
 class TipView(HasState[TipState]):
@@ -236,14 +232,6 @@ class TipView(HasState[TipState]):
                         f"Tiprack {labware_id} has no valid tip selection for current Nozzle Configuration."
                     )
 
-        # three things need to happen here:
-        # firstly we need to remove this nozzle map none stuff
-        # second, if there is a starting tip do the old logic that I've removed (somehow)
-        # next inside the "new logic section" we need to split the logic with three new cases:
-        #  --if single channel, start from A1 corner
-        #  -- if 8 channel and primary nozzle A1, start from H1
-        #  -- if 8 channel and primary nozzle H1, start from A1
-        #  -- else if 96ch: do current new logic
         if starting_tip_name is None:
             if self.get_pipette_channels(pipette_id) == 1:
                 # for a single channel pipette, always begin at A1 on the tiprack
@@ -444,8 +432,7 @@ class TipView(HasState[TipState]):
                 for well_name, tip_state in wells.items():
                     if tip_state == TipRackWellState.CLEAN:
                         return well_name
-
-            return None
+        return None
 
     def get_pipette_channels(self, pipette_id: str) -> int:
         """Return the given pipette's number of channels."""
