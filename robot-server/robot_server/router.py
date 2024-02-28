@@ -120,7 +120,7 @@ router.include_router(
 
 router.include_router(
     router=subsystems_router,
-    tags=["Subsystem Management"],
+    tags=["Flex Subsystem Management"],
     dependencies=[Depends(check_version_header)],
 )
 
