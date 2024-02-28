@@ -6,11 +6,7 @@ import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Atta
 import { Trans, useTranslation } from 'react-i18next'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import { WASTE_CHUTE_CUTOUT, CreateCommand } from '@opentrons/shared-data'
-import {
-  LEFT,
-  THERMOCYCLER_MODULE_MODELS,
-} from '@opentrons/shared-data/js/constants'
-import { getModuleDisplayName } from '@opentrons/shared-data/js/modules'
+import { LEFT } from '@opentrons/shared-data/js/constants'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import {
   Flex,
@@ -25,20 +21,9 @@ import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 
 import type { ModuleCalibrationWizardStepProps } from './types'
 interface AttachProbeProps extends ModuleCalibrationWizardStepProps {
-  isExiting: boolean
   adapterId: string | null
 }
 
-const IN_PROGRESS_STYLE = css`
-  ${TYPOGRAPHY.pRegular};
-  text-align: ${TYPOGRAPHY.textAlignCenter};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: ${TYPOGRAPHY.fontSize28};
-    line-height: 1.625rem;
-    margin-top: ${SPACING.spacing4};
-  }
-`
 const BODY_STYLE = css`
   ${TYPOGRAPHY.pRegular};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
@@ -57,7 +42,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     isRobotMoving,
     attachedModule,
     attachedPipette,
-    isExiting,
     isOnDevice,
     slotName,
   } = props
@@ -65,8 +49,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     'module_wizard_flows',
     'pipette_wizard_flows',
   ])
-
-  const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
 
   const attachedPipetteChannels = attachedPipette.data.channels
   let pipetteAttachProbeVideoSource, probeLocation
@@ -106,22 +88,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       </video>
     </Flex>
   )
-
-  let moduleCalibratingDisplay
-  if (
-    THERMOCYCLER_MODULE_MODELS.some(
-      model => model === attachedModule.moduleModel
-    )
-  ) {
-    moduleCalibratingDisplay = t('calibration_probe_touching', {
-      module: moduleDisplayName,
-      slotName: slotName,
-    })
-  } else {
-    moduleCalibratingDisplay = t('calibration_probe_touching', {
-      module: moduleDisplayName,
-    })
-  }
 
   const bodyText = (
     <>
@@ -192,22 +158,8 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       <InProgressModal
         // TODO ND: 9/6/23 use spinner until animations are made
         alternativeSpinner={null}
-        description={
-          isExiting
-            ? t('stand_back')
-            : t('module_calibrating', {
-                moduleName: moduleDisplayName,
-              })
-        }
-      >
-        {isExiting ? undefined : (
-          <Flex marginX={isOnDevice ? '4.5rem' : '8.5625rem'}>
-            <StyledText css={IN_PROGRESS_STYLE}>
-              {moduleCalibratingDisplay}
-            </StyledText>
-          </Flex>
-        )}
-      </InProgressModal>
+        description={t('stand_back')}
+      />
     )
   // TODO: add calibration loading screen and error screen
   else
