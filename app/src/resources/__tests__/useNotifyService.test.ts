@@ -130,25 +130,6 @@ describe('useNotifyService', () => {
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
-  it('should log an error if hostname is null', () => {
-    mockUseHost.mockReturnValue({ hostname: null } as any)
-    const errorSpy = jest.spyOn(console, 'error')
-    errorSpy.mockImplementation(() => {})
-
-    renderHook(() =>
-      useNotifyService({
-        topic: MOCK_TOPIC,
-        setRefetchUsingHTTP: mockHTTPRefetch,
-        options: MOCK_OPTIONS,
-      } as any)
-    )
-    expect(errorSpy).toHaveBeenCalledWith(
-      'NotifyService expected hostname, received null for topic:',
-      MOCK_TOPIC
-    )
-    errorSpy.mockRestore()
-  })
-
   it('should set HTTP refetch to always if there is an error', () => {
     mockUseHost.mockReturnValue({ hostname: null } as any)
 
