@@ -634,7 +634,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                 5: AspirateSettings(  # 5uL
                     z_submerge_depth=_default_submerge_aspirate_mm,
                     plunger_acceleration=_default_accel_96ch_ul_sec_sec,
-                    plunger_flow_rate=6.5,  # ul/sec
+                    plunger_flow_rate=3.5,  # ul/sec
                     delay=_default_aspirate_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
