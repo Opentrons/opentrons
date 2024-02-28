@@ -146,7 +146,7 @@ class WifiConfiguration(BaseModel):
     psk: typing.Optional[SecretStr] = Field(
         None,
         description="If this is a PSK-secured network (`securityType` is "
-        "`\"wpa-psk\"`), the PSK",
+        '`"wpa-psk"`), the PSK',
     )
     eapConfig: typing.Optional[typing.Dict[str, str]] = Field(
         None,

@@ -221,10 +221,10 @@ async def get_settings_reset_options(
         " reset something."
         "\n\n"
         '**Warning:** Despite being called "factory reset" in Opentrons code,'
-        ' this is not a true factory reset. Even if you reset everything you can'
-        ' through this endpoint, it can still leave other data behind. There is'
-        ' currently no way to totally restore the robot to its true factory state'
-        ' except by manually reimaging it.'
+        " this is not a true factory reset. Even if you reset everything you can"
+        " through this endpoint, it can still leave other data behind. There is"
+        " currently no way to totally restore the robot to its true factory state"
+        " except by manually reimaging it."
     ),
     responses={
         status.HTTP_403_FORBIDDEN: {"model": LegacyErrorResponse},
