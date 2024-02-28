@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import {
   useTrackEvent,
@@ -9,13 +10,13 @@ import {
 } from '../../../redux/analytics'
 import { ProtocolUploadInput } from '../ProtocolUploadInput'
 
-jest.mock('../../../redux/analytics')
+vi.mock('../../../redux/analytics')
 
-const mockUseTrackEvent = useTrackEvent as jest.Mock<typeof useTrackEvent>
+const mockUseTrackEvent = useTrackEvent as vi.Mock<typeof useTrackEvent>
 
 describe('ProtocolUploadInput', () => {
-  let onUpload: jest.MockedFunction<() => {}>
-  let trackEvent: jest.MockedFunction<any>
+  let onUpload: vi.MockedFunction<() => {}>
+  let trackEvent: vi.MockedFunction<any>
   const render = () => {
     return renderWithProviders(
       <BrowserRouter>
@@ -28,12 +29,12 @@ describe('ProtocolUploadInput', () => {
   }
 
   beforeEach(() => {
-    onUpload = jest.fn()
-    trackEvent = jest.fn()
+    onUpload = vi.fn()
+    trackEvent = vi.fn()
     mockUseTrackEvent.mockReturnValue(trackEvent)
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders correct contents for empty state', () => {
@@ -52,7 +53,7 @@ describe('ProtocolUploadInput', () => {
     render()
     const button = screen.getByRole('button', { name: 'Upload' })
     const input = screen.getByTestId('file_input')
-    input.click = jest.fn()
+    input.click = vi.fn()
     fireEvent.click(button)
     expect(input.click).toHaveBeenCalled()
   })
