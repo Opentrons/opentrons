@@ -276,16 +276,19 @@ function handleDecrementSubscriptionCount(
   hostname: string,
   topic: NotifyTopic
 ): void {
-  const { client, subscriptions } = connectionStore[hostname]
-  if (topic in subscriptions) {
-    subscriptions[topic] -= 1
-    if (subscriptions[topic] <= 0) {
-      delete subscriptions[topic]
+  const host = connectionStore[hostname]
+  if (host) {
+    const { client, subscriptions } = host
+    if (topic in subscriptions) {
+      subscriptions[topic] -= 1
+      if (subscriptions[topic] <= 0) {
+        delete subscriptions[topic]
+      }
     }
-  }
 
-  if (Object.keys(subscriptions).length <= 0) {
-    client?.end()
+    if (Object.keys(subscriptions).length <= 0) {
+      client?.end()
+    }
   }
 }
 
