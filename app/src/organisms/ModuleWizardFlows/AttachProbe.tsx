@@ -5,8 +5,7 @@ import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attac
 import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
-import { WASTE_CHUTE_CUTOUT, CreateCommand } from '@opentrons/shared-data'
-import { LEFT } from '@opentrons/shared-data/js/constants'
+import { WASTE_CHUTE_CUTOUT, CreateCommand, LEFT } from '@opentrons/shared-data'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import {
   Flex,
