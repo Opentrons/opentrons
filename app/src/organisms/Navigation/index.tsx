@@ -29,8 +29,8 @@ import { NavigationMenu } from './NavigationMenu'
 import type { ON_DEVICE_DISPLAY_PATHS } from '../../App/OnDeviceDisplayApp'
 
 const NAV_LINKS: Array<typeof ON_DEVICE_DISPLAY_PATHS[number]> = [
-  '/instruments',
   '/protocols',
+  '/instruments',
   '/robot-settings',
 ]
 
@@ -81,7 +81,7 @@ export function Navigation(props: NavigationProps): JSX.Element {
       case '/instruments':
         return t('instruments')
       case '/protocols':
-        return t('protocols')
+        return t('all_protocols')
       case '/robot-settings':
         return t('settings')
       default:
@@ -116,7 +116,10 @@ export function Navigation(props: NavigationProps): JSX.Element {
           <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
             <NavigationLink
               to="/dashboard"
-              name={truncateString(robotName, iconName != null ? CHAR_LIMIT_WITH_ICON : CHAR_LIMIT_NO_ICON)}
+              name={truncateString(
+                robotName,
+                iconName != null ? CHAR_LIMIT_WITH_ICON : CHAR_LIMIT_NO_ICON
+              )}
             />
             {iconName != null ? (
               <Icon
@@ -128,13 +131,19 @@ export function Navigation(props: NavigationProps): JSX.Element {
             ) : null}
           </Flex>
           {NAV_LINKS.map(path => (
-            <NavigationLink key={path} to={path} name={getPathDisplayName(path)} />
+            <NavigationLink
+              key={path}
+              to={path}
+              name={getPathDisplayName(path)}
+            />
           ))}
         </Flex>
         <Flex marginTop={`-${SPACING.spacing12}`}>
           <IconButton
             aria-label="overflow menu button"
-            onClick={() => { handleMenu(true) }}
+            onClick={() => {
+              handleMenu(true)
+            }}
           >
             <Icon
               name="overflow-btn-touchscreen"
@@ -147,7 +156,9 @@ export function Navigation(props: NavigationProps): JSX.Element {
       </Flex>
       {showNavMenu && (
         <NavigationMenu
-          onClick={() => { handleMenu(false) }}
+          onClick={() => {
+            handleMenu(false)
+          }}
           robotName={robotName}
           setShowNavMenu={setShowNavMenu}
         />

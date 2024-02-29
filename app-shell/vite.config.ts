@@ -18,6 +18,7 @@ export default defineConfig(
         commonjsOptions: {
           transformMixedEsModules: true,
           esmExternals: true,
+          exclude: [/node_modules/],
         },
         lib: {
           entry: {
@@ -32,6 +33,7 @@ export default defineConfig(
         esbuildOptions: {
           target: 'CommonJs',
         },
+        exclude: ['node_modules']
       },
       define: {
         'process.env': process.env,

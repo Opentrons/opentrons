@@ -1,67 +1,26 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { useNetworkConnection } from '../../../resources/networking/hooks/useNetworkConnection'
 import { getLocalRobot } from '../../../redux/discovery'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
+import { useNetworkConnection } from '../../../resources/networking/hooks/useNetworkConnection'
 import { NavigationMenu } from '../NavigationMenu'
 import { Navigation } from '..'
-import { fireEvent, screen } from '@testing-library/react'
 
-jest.mock('../../../resources/networking/hooks/useNetworkConnection')
-jest.mock('../../../redux/discovery')
-jest.mock('../NavigationMenu')
-
-const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
-  typeof getLocalRobot
->
-const mockNavigationMenu = NavigationMenu as jest.MockedFunction<
-  typeof NavigationMenu
->
-const mockUseNetworkConnection = useNetworkConnection as jest.MockedFunction<
-  typeof useNetworkConnection
->
-const mockComponent = () => null
-
-const mockRoutes = [
-  {
-    Component: mockComponent,
-    exact: true,
-    name: 'Get started',
-    path: '/get-started',
-  },
-  {
-    Component: mockComponent,
-    exact: true,
-    name: 'All Protocols',
-    navLinkTo: '/protocols',
-    path: '/protocols',
-  },
-  {
-    Component: mockComponent,
-    exact: true,
-    name: 'Instruments',
-    navLinkTo: '/instruments',
-    path: '/instruments',
-  },
-  {
-    Component: mockComponent,
-    exact: true,
-    name: 'Settings',
-    navLinkTo: '/robot-settings',
-    path: '/robot-settings',
-  },
-]
+vi.mock('../../../resources/networking/hooks/useNetworkConnection')
+vi.mock('../../../redux/discovery')
+vi.mock('../NavigationMenu')
 
 mockConnectedRobot.name = '12345678901234567'
 
 class MockIntersectionObserver {
-  observe = jest.fn()
-  disconnect = jest.fn()
-  unobserve = jest.fn()
+  observe = vi.fn()
+  disconnect = vi.fn()
+  unobserve = vi.fn()
 }
 
 Object.defineProperty(window, 'IntersectionObserver', {
@@ -88,12 +47,10 @@ const render = (props: React.ComponentProps<typeof Navigation>) => {
 describe('Navigation', () => {
   let props: React.ComponentProps<typeof Navigation>
   beforeEach(() => {
-    props = {
-      routes: mockRoutes,
-    }
-    mockGetLocalRobot.mockReturnValue(mockConnectedRobot)
-    mockNavigationMenu.mockReturnValue(<div>mock NavigationMenu</div>)
-    mockUseNetworkConnection.mockReturnValue({
+    props = {}
+    vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
+    vi.mocked(NavigationMenu).mockReturnValue(<div>mock NavigationMenu</div>)
+    vi.mocked(useNetworkConnection).mockReturnValue({
       isEthernetConnected: false,
       isWifiConnected: false,
       isUsbConnected: false,
@@ -116,7 +73,7 @@ describe('Navigation', () => {
     expect(screen.queryByLabelText('network icon')).not.toBeInTheDocument()
   })
   it('should render a network icon', () => {
-    mockUseNetworkConnection.mockReturnValue({
+    vi.mocked(useNetworkConnection).mockReturnValue({
       isEthernetConnected: false,
       isWifiConnected: true,
       isUsbConnected: false,
@@ -136,7 +93,7 @@ describe('Navigation', () => {
   it('should call the setNavMenuIsOpened prop when you click on the overflow menu button', () => {
     props = {
       ...props,
-      setNavMenuIsOpened: jest.fn(),
+      setNavMenuIsOpened: vi.fn(),
     }
     render(props)
     fireEvent.click(
