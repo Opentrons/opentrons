@@ -158,7 +158,6 @@ async def post_serial_update(
                 modules.update_firmware(
                     matching_module,
                     matching_module.bundled_fw.path,
-                    asyncio.get_event_loop(),
                 ),
                 100,
             )
