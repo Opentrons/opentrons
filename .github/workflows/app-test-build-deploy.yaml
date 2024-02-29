@@ -283,7 +283,7 @@ jobs:
           OT_APP_DEPLOY_FOLDER: ${{ steps.project.outputs.folder }}
 
         run: |
-          make -C app-shell dist-${{ matrix.os }}
+          make -C app-shell dist-${{ matrix.os }} USE_HARD_LINKS=false
 
       - name: 'upload github artifact'
         if: matrix.target == 'desktop'
