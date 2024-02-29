@@ -18,6 +18,7 @@ export default defineConfig(
         commonjsOptions: {
           transformMixedEsModules: true,
           esmExternals: true,
+          exclude: [/node_modules/],
         },
         lib: {
           entry: {
