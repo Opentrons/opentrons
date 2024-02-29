@@ -81,7 +81,7 @@ export function Navigation(props: NavigationProps): JSX.Element {
       case '/instruments':
         return t('instruments')
       case '/protocols':
-        return t('protocols')
+        return t('all_protocols')
       case '/robot-settings':
         return t('settings')
       default:

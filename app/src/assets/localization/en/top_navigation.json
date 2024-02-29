@@ -1,4 +1,5 @@
 {
+  "all_protocols": "All Protocols",
   "attached_pipettes_do_not_match": "Attached pipettes do not match pipettes specified in loaded protocol",
   "calibrate_deck_to_proceed": "Calibrate your deck to proceed",
   "deck_setup": "Deck Setup",
@@ -11,7 +12,7 @@
   "please_connect_to_a_robot": "Please connect to a robot to proceed",
   "please_load_a_protocol": "Please load a protocol to proceed",
   "protocol_runs": "Protocol Runs",
-  "protocols": "All Protocols",
+  "protocols": "Protocols",
   "robot_settings": "Robot Settings",
   "run": "run",
   "settings": "Settings"
