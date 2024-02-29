@@ -99,7 +99,14 @@ class TrashBin(DisposalLocation):
             self._cutout_fixture_name = _TRASH_BIN_CUTOUT_FIXTURE
 
     def top(self, x: float = 0, y: float = 0, z: float = 0) -> TrashBin:
-        """Returns a trash bin with a user set offset."""
+        """Add a location offset to a trash bin.
+
+        The default location (``x``, ``y``, and ``z`` all set to ``0``) is the center of
+        the bin on the x- and y-axes, and slightly below its physical top on the z-axis.
+
+        Offsets can be positive or negative and are measured in mm.
+        See :ref:`protocol-api-deck-coords`.
+        """
         return TrashBin(
             location=self._location,
             addressable_area_name=self._addressable_area_name,
@@ -110,7 +117,7 @@ class TrashBin(DisposalLocation):
 
     @property
     def offset(self) -> DisposalOffset:
-        """Current offset of the trash bin..
+        """Current offset of the trash bin.
 
         :meta private:
 
@@ -168,7 +175,16 @@ class WasteChute(DisposalLocation):
         self._offset = offset
 
     def top(self, x: float = 0, y: float = 0, z: float = 0) -> WasteChute:
-        """Returns a waste chute with a user set offset."""
+        """Add a location offset to a waste chute.
+
+        The default location (``x``, ``y``, and ``z`` all set to ``0``) is the center of
+        the chute's opening on the x- and y-axes, and slightly below its physical top
+        on the z-axis. See :ref:`configure-waste-chute` for more information on possible
+        configurations of the chute.
+
+        Offsets can be positive or negative and are measured in mm.
+        See :ref:`protocol-api-deck-coords`.
+        """
         return WasteChute(
             engine_client=self._engine_client,
             api_version=self._api_version,
