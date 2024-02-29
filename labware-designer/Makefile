@@ -4,7 +4,7 @@
 SHELL := bash
 
 # add node_modules/.bin to PATH
-PATH := $(shell cd .. && pnpm bin):$(PATH)
+PATH := $(shell cd .. && yarn bin):$(PATH)
 
 # standard targets
 #####################################################################
@@ -14,7 +14,7 @@ all: clean dist
 
 .PHONY: setup
 setup:
-	pnpm
+	yarn
 
 .PHONY: clean
 clean:
