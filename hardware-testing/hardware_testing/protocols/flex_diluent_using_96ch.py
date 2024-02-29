@@ -13,6 +13,7 @@ from opentrons.protocol_api import ProtocolContext, InstrumentContext, Labware
 metadata = {"protocolName": "Flex: Diluent using 96ch"}
 requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
+NUM_PLATES = 5
 CHANGE_TIP = False
 RETURN_TIP = False
 FILL_MULTIPLE_PLATES = True
@@ -242,7 +243,7 @@ def run(ctx: ProtocolContext) -> None:
     pipette = ctx.load_instrument(PIPETTE_NAME, "left", tip_racks=[tips])
     pipette.configure_for_volume(TARGET_VOLUME)
     _assign_starting_volumes(ctx, pipette, reservoir)
-    for i in range(100):
+    for i in range(NUM_PLATES):
         if not pipette.has_tip:
             pipette.pick_up_tip()
         for test in TARGET_SOURCES:
