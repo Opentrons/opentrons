@@ -48,7 +48,7 @@ teardown:
 
 .PHONY: format-readme
 format-readme:
-	pnpm prettier --ignore-path .eslintignore --write app-testing/**/*.md
+	yarn prettier --ignore-path .eslintignore --write app-testing/**/*.md
 
 .PHONY: print-protocols
 print-protocols:

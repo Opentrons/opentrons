@@ -4,11 +4,11 @@ include ../scripts/python.mk
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
 SHELL := bash
 
-PATH := $(shell cd .. && pnpm bin):$(PATH)
+PATH := $(shell cd .. && yarn bin):$(PATH)
 SHX := npx shx
 
-# add pnpm CLI dev deps to PATH (for cross platform POSIX commands via shx)
-PATH := $(shell cd .. && pnpm bin):$(PATH)
+# add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
+PATH := $(shell cd .. && yarn bin):$(PATH)
 
 ot_project := $(OPENTRONS_PROJECT)
 project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)

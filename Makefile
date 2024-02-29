@@ -47,16 +47,16 @@ endif
 
 # run at usage (=), not on makefile parse (:=)
 # todo(mm, 2021-03-17): Deduplicate with scripts/python.mk.
-usb_host=$(shell pnpm -s discovery find -i 169.254)
+usb_host=$(shell yarn -s discovery find -i 169.254)
 
 # install all project dependencies
 .PHONY: setup
 setup: setup-js setup-py
 
-# front-end dependecies handled by pnpm
+# front-end dependecies handled by yarn
 .PHONY: setup-js
 setup-js:
-	pnpm i
+	yarn
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 	$(MAKE) -C $(APP_SHELL_ODD_DIR) setup
 
@@ -80,7 +80,7 @@ teardown:
 
 .PHONY: teardown-js
 teardown-js: clean-js
-	pnpm shx rm -rf "**/node_modules"
+	yarn shx rm -rf "**/node_modules"
 
 PYTHON_TEARDOWN_TARGETS := $(addsuffix -py-teardown, $(PYTHON_DIRS))
 
@@ -208,16 +208,16 @@ lint-py: $(PYTHON_LINT_TARGETS)
 
 .PHONY: lint-js
 lint-js:
-	pnpm eslint --quiet=$(quiet) ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
-	pnpm prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
+	yarn eslint --quiet=$(quiet) ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
+	yarn prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
 
 .PHONY: lint-json
 lint-json:
-	pnpm eslint --max-warnings 0 --ext .json .
+	yarn eslint --max-warnings 0 --ext .json .
 
 .PHONY: lint-css
 lint-css:
-	pnpm stylelint "**/*.css" "**/*.js"
+	yarn stylelint "**/*.css" "**/*.js"
 
 .PHONY: format
 format: format-js format-py
@@ -232,31 +232,31 @@ format-py: $(PYTHON_FORMAT_TARGETS)
 
 .PHONY: format-js
 format-js:
-	pnpm prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
+	yarn prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
 
 .PHONY: check-js
 check-js: build-ts
 
 .PHONY: build-ts
 build-ts:
-	pnpm tsc --build
+	yarn tsc --build
 
 .PHONY: clean-ts
 clean-ts:
-	pnpm tsc --build --clean
+	yarn tsc --build --clean
 
 # TODO: Ian 2019-12-17 gradually add components and shared-data
 .PHONY: circular-dependencies-js
 circular-dependencies-js:
-	pnpm madge $(and $(CI),--no-spinner --no-color) --circular protocol-designer/src/index.tsx
-	pnpm madge $(and $(CI),--no-spinner --no-color) --circular step-generation/src/index.ts
-	pnpm madge $(and $(CI),--no-spinner --no-color) --circular labware-library/src/index.tsx
-	pnpm madge $(and $(CI),--no-spinner --no-color) --circular app/src/index.tsx
-	pnpm madge $(and $(CI),--no-spinner --no-color) --circular components/src/index.ts
+	yarn madge $(and $(CI),--no-spinner --no-color) --circular protocol-designer/src/index.tsx
+	yarn madge $(and $(CI),--no-spinner --no-color) --circular step-generation/src/index.ts
+	yarn madge $(and $(CI),--no-spinner --no-color) --circular labware-library/src/index.tsx
+	yarn madge $(and $(CI),--no-spinner --no-color) --circular app/src/index.tsx
+	yarn madge $(and $(CI),--no-spinner --no-color) --circular components/src/index.ts
 
 .PHONY: test-js-internal
 test-js-internal:
-	pnpm jest $(tests) $(test_opts) $(cov_opts)
+	yarn jest $(tests) $(test_opts) $(cov_opts)
 
 .PHONY: test-js-%
 test-js-%: 
