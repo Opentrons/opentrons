@@ -229,7 +229,7 @@ def _transfer(
         if touch_tip:
             pipette.touch_tip(speed=TOUCH_TIP_SPEED, v_offset=TOUCH_TIP_DEPTH)
         pipette.aspirate(1, blow_out_pos)  # trailing air-gap to avoid droplets
-
+    pipette.move_to(reservoir[source].top(100))
 
 def run(ctx: ProtocolContext) -> None:
     """Run."""
