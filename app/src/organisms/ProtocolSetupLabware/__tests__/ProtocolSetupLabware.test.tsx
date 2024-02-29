@@ -25,7 +25,17 @@ import {
   mockUseModulesQueryUnknown,
 } from '../__fixtures__'
 
-vi.mock('@opentrons/react-api-client')
+import type * as ReactApiClient from '@opentrons/react-api-client'
+
+vi.mock('@opentrons/react-api-client', async importOriginal => {
+  const actual = await importOriginal<typeof ReactApiClient>()
+  return {
+    ...actual,
+    useCreateLiveCommandMutation: vi.fn(),
+    useModulesQuery: vi.fn(),
+  }
+})
+
 vi.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
