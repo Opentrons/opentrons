@@ -9,17 +9,14 @@ export const getIsTallLabwareWestOf96Channel = (
   robotState: RobotState,
   invariantContext: InvariantContext,
   sourceLabwareId: string,
-  pipetteId: string
+  pipetteId: string,
+  tipRackId: string
 ): boolean => {
-  const {
-    labwareEntities,
-    additionalEquipmentEntities,
-    pipetteEntities,
-  } = invariantContext
+  const { labwareEntities, additionalEquipmentEntities } = invariantContext
   const { labware: labwareState, tipState } = robotState
   const pipetteHasTip = tipState.pipettes[pipetteId]
   const tipLength = pipetteHasTip
-    ? pipetteEntities[pipetteId].tiprackLabwareDef.parameters.tipLength ?? 0
+    ? labwareEntities[tipRackId].def.parameters.tipLength ?? 0
     : 0
   // early exit if source labware is the waste chute or trash bin
   if (additionalEquipmentEntities[sourceLabwareId] != null) {

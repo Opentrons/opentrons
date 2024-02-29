@@ -76,6 +76,7 @@ export const moveLiquidFormToArgs = (
     dispense_wells: destWellsUnordered,
     dropTip_location: dropTipLocation,
     path,
+    tipRack,
     nozzles,
   } = fields
   let sourceWells = getOrderedWells(
@@ -180,6 +181,7 @@ export const moveLiquidFormToArgs = (
     volume,
     sourceLabware: sourceLabware.id,
     destLabware: destLabware.id,
+    tipRack: tipRack,
     aspirateFlowRateUlSec:
       fields.aspirate_flowRate ||
       matchingTipLiquidSpecs.defaultAspirateFlowRate.default,

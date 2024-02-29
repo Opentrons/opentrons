@@ -57,7 +57,7 @@ export const pipetteEntities: PipetteEntities = {
     id: 'pipetteId',
     name: 'p10_single',
     spec: fixtureP10SingleV2Specs,
-    tiprackDefURI: 'opentrons/opentrons_96_tiprack_10ul/1',
+    tiprackDefURI: ['opentrons/opentrons_96_tiprack_10ul/1'],
     tiprackLabwareDef: fixtureTiprack10ul,
   },
 }
