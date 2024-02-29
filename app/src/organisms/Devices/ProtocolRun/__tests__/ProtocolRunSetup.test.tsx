@@ -33,6 +33,7 @@ import {
   useRobot,
   useRunCalibrationStatus,
   useRunHasStarted,
+  useRunPipetteInfoByMount,
   useStoredProtocolAnalysis,
   useUnmatchedModulesForProtocol,
 } from '../../hooks'
@@ -118,6 +119,9 @@ const mockGetIsFixtureMismatch = getIsFixtureMismatch as jest.MockedFunction<
 const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
   typeof useNotifyRunQuery
 >
+const mockUseRunPipetteInfoByMount = useRunPipetteInfoByMount as jest.MockedFunction<
+  typeof useRunPipetteInfoByMount
+>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -190,6 +194,9 @@ describe('ProtocolRunSetup', () => {
       .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
     when(mockGetIsFixtureMismatch).mockReturnValue(false)
     mockUseNotifyRunQuery.mockReturnValue({} as any)
+    when(mockUseRunPipetteInfoByMount)
+      .calledWith(RUN_ID)
+      .mockReturnValue({ left: null, right: null })
   })
   afterEach(() => {
     resetAllWhenMocks()
