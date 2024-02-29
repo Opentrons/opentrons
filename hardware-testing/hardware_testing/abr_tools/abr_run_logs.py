@@ -84,6 +84,7 @@ def get_run_data(one_run: Any, ip: str) -> Dict[str, Any]:
     )
     health_data = response.json()
     robot_name = health_data["name"]
+    run["API_Version"] = health_data["api_version"]
     try:
         robot_serial = health_data["robot_serial"]
     except KeyError:
@@ -94,7 +95,14 @@ def get_run_data(one_run: Any, ip: str) -> Dict[str, Any]:
         robot_name = "unknown"
     run["run_id"] = one_run
     run["robot_serial"] = robot_serial
+    # Instruments Attached
+    response = requests.get(f"http://{ip}:31950/instruments", headers = {"opentrons-version": "3"})
+    instrument_data = response.json()
+    for instrument in instrument_data["data"]:
+        run[instrument["mount"]] = instrument["serialNumber"] + "_" + instrument["instrumentModel"]
     return run
+    
+
 
 
 def save_runs(runs_to_save: Set[str], ip: str, storage_directory: str) -> None:
