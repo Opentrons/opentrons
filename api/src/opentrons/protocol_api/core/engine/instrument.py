@@ -507,7 +507,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         )
 
         if isinstance(disposal_location, TrashBin):
-            addressable_area_name = disposal_location._addressable_area_name
+            addressable_area_name = disposal_location.area_name
             self._engine_client.move_to_addressable_area_for_drop_tip(
                 pipette_id=self._pipette_id,
                 addressable_area_name=addressable_area_name,

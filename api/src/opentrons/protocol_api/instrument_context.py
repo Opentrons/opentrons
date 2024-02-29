@@ -1049,6 +1049,8 @@ class InstrumentContext(publisher.CommandPublisher):
                     instrument=self, location=location
                 ),
             ):
+                # TODO(jbl 2024-02-28) when adding 2.18 api version checks, set alternate_tip_drop
+                #   if below that version for compatability
                 self._core.drop_tip_in_disposal_location(
                     location, home_after=home_after
                 )

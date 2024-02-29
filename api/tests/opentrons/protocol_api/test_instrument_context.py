@@ -29,6 +29,7 @@ from opentrons.protocol_api.core.common import InstrumentCore, ProtocolCore
 from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
     LegacyInstrumentCore,
 )
+from opentrons.protocol_api._disposal_locations import TrashBin, WasteChute
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.types import Location, Mount, Point
 
@@ -707,6 +708,65 @@ def test_drop_tip_to_randomized_trash_location(
             well_core=mock_well._core,
             home_after=None,
             alternate_drop_location=True,
+        ),
+        times=1,
+    )
+
+
+def test_drop_tip_in_trash_bin(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+) -> None:
+    """It should drop a tip in a deck configured trash bin."""
+    trash_bin = decoy.mock(cls=TrashBin)
+
+    subject.drop_tip(trash_bin)
+
+    decoy.verify(
+        mock_instrument_core.drop_tip_in_disposal_location(
+            trash_bin,
+            home_after=None,
+        ),
+        times=1,
+    )
+
+
+def test_drop_tip_in_waste_chute(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+) -> None:
+    """It should drop a tip in a deck configured trash bin or waste chute."""
+    waste_chute = decoy.mock(cls=WasteChute)
+
+    subject.drop_tip(waste_chute)
+
+    decoy.verify(
+        mock_instrument_core.drop_tip_in_disposal_location(
+            waste_chute,
+            home_after=None,
+        ),
+        times=1,
+    )
+
+
+def test_drop_tip_in_disposal_location_implicitly(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+) -> None:
+    """It should drop a tip in a deck configured trash bin when no arguments have been provided."""
+    trash_bin = decoy.mock(cls=TrashBin)
+    subject.trash_container = trash_bin
+
+    subject.drop_tip()
+
+    decoy.verify(
+        mock_instrument_core.drop_tip_in_disposal_location(
+            trash_bin,
+            home_after=None,
+            alternate_tip_drop=True,
         ),
         times=1,
     )
