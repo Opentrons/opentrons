@@ -1,14 +1,12 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
 import { StaticRouter } from 'react-router-dom'
+import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
+import { screen } from '@testing-library/react'
+
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import {
-  renderWithProviders,
-  partialComponentPropsMatcher,
-  componentPropsMatcher,
-} from '@opentrons/components'
-
+import { componentPropsMatcher, partialComponentPropsMatcher, renderWithProviders } from '../../../../../__testing-utils__'}
 import { i18n } from '../../../../../i18n'
 import {
   mockThermocycler as mockThermocyclerFixture,
@@ -25,24 +23,24 @@ import type {
   ModuleType,
 } from '@opentrons/shared-data'
 
-jest.mock('@opentrons/components', () => {
-  const actualComponents = jest.requireActual('@opentrons/components')
+vi.mock('@opentrons/components', () => {
+  const actualComponents = vi.requireActual('@opentrons/components')
   return {
     ...actualComponents,
-    RobotWorkSpace: jest.fn(() => <div>mock RobotWorkSpace</div>),
+    RobotWorkSpace: vi.fn(() => <div>mock RobotWorkSpace</div>),
   }
 })
-jest.mock('@opentrons/shared-data', () => {
-  const actualSharedData = jest.requireActual('@opentrons/shared-data')
+vi.mock('@opentrons/shared-data', () => {
+  const actualSharedData = vi.requireActual('@opentrons/shared-data')
   return {
     ...actualSharedData,
-    inferModuleOrientationFromXCoordinate: jest.fn(),
+    inferModuleOrientationFromXCoordinate: vi.fn(),
   }
 })
-jest.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-jest.mock('../../../../ProtocolSetupModulesAndDeck/utils')
-jest.mock('../../../ModuleInfo')
-jest.mock('../../../hooks')
+vi.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('../../../../ProtocolSetupModulesAndDeck/utils')
+vi.mock('../../../ModuleInfo')
+vi.mock('../../../hooks')
 
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
@@ -110,16 +108,16 @@ describe('SetupModulesMap', () => {
     }
     when(mockUseMostRecentCompletedAnalysis)
       .calledWith(MOCK_RUN_ID)
-      .mockReturnValue(({
+      .thenReturn(({
         commands: [],
         labware: [],
         robotType: OT2_ROBOT_TYPE,
       } as unknown) as CompletedProtocolAnalysis)
-    when(mockGetAttachedProtocolModuleMatches).mockReturnValue([])
+    when(mockGetAttachedProtocolModuleMatches).thenReturn([])
   })
 
   afterEach(() => {
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('should render a deck WITHOUT modules if none passed (component will never be rendered in this circumstance)', () => {
@@ -127,7 +125,7 @@ describe('SetupModulesMap', () => {
     expect(mockModuleInfo).not.toHaveBeenCalled()
   })
   it('should render a deck WITH MoaM', () => {
-    when(mockGetAttachedProtocolModuleMatches).mockReturnValue([
+    when(mockGetAttachedProtocolModuleMatches).thenReturn([
       {
         moduleId: mockMagneticModule.moduleId,
         x: MOCK_MAGNETIC_MODULE_COORDS[0],
@@ -165,14 +163,14 @@ describe('SetupModulesMap', () => {
           runId: MOCK_RUN_ID,
         })
       )
-      .mockReturnValue(<div>mock module info {mockMagneticModule.model}</div>)
+      .thenReturn(<div>mock module info {mockMagneticModule.model}</div>)
 
-    const { getAllByText } = render(props)
-    expect(getAllByText('mock module info magneticModuleV2')).toHaveLength(2)
+    render(props)
+    expect(screen.getAllByText('mock module info magneticModuleV2')).toHaveLength(2)
   })
 
   it('should render a deck WITH modules', () => {
-    when(mockGetAttachedProtocolModuleMatches).mockReturnValue([
+    when(mockGetAttachedProtocolModuleMatches).thenReturn([
       {
         moduleId: mockMagneticModule.moduleId,
         x: MOCK_MAGNETIC_MODULE_COORDS[0],
@@ -216,7 +214,7 @@ describe('SetupModulesMap', () => {
           runId: MOCK_RUN_ID,
         })
       )
-      .mockReturnValue(<div>mock module info {mockMagneticModule.model} </div>)
+      .thenReturn(<div>mock module info {mockMagneticModule.model} </div>)
 
     when(mockModuleInfo)
       .calledWith(
@@ -227,7 +225,7 @@ describe('SetupModulesMap', () => {
           runId: MOCK_RUN_ID,
         })
       )
-      .mockReturnValue(<div>mock module info {mockTCModule.model} </div>)
+      .thenReturn(<div>mock module info {mockTCModule.model} </div>)
 
     const { getByText } = render(props)
     getByText('mock module info magneticModuleV2')
@@ -238,7 +236,7 @@ describe('SetupModulesMap', () => {
     const dupModId = `${mockMagneticModule.moduleId}duplicate`
     const dupModPort = 10
 
-    when(mockGetAttachedProtocolModuleMatches).mockReturnValue([
+    when(mockGetAttachedProtocolModuleMatches).thenReturn([
       {
         moduleId: mockMagneticModule.moduleId,
         x: MOCK_MAGNETIC_MODULE_COORDS[0],
@@ -288,7 +286,7 @@ describe('SetupModulesMap', () => {
           runId: MOCK_RUN_ID,
         })
       )
-      .mockReturnValue(<div>mock module info {mockMagneticModule.model} </div>)
+      .thenReturn(<div>mock module info {mockMagneticModule.model} </div>)
 
     when(mockModuleInfo)
       .calledWith(
@@ -304,9 +302,9 @@ describe('SetupModulesMap', () => {
           runId: MOCK_RUN_ID,
         })
       )
-      .mockReturnValue(<div>mock module info {mockTCModule.model} </div>)
+      .thenReturn(<div>mock module info {mockTCModule.model} </div>)
 
-    const { getByText } = render(props)
-    getByText('mock module info magneticModuleV2')
+    render(props)
+    screen.getByText('mock module info magneticModuleV2')
   })
 })

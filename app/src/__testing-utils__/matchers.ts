@@ -21,8 +21,5 @@ export const nestedTextMatcher = (textMatch: string | RegExp): Matcher => (
   return nodeHasText && childrenDontHaveText
 }
 
-export const partialComponentPropsMatcher = (argsToMatch: unknown): any =>
-  // @ts-expect-error(sa, 2021-08-03): when.allArgs not part of type definition yet for jest-when
-  when.allArgs((args, equals) =>
-    equals(args[0], expect.objectContaining(argsToMatch))
-  )
+// need componentPropsMatcher
+// need partialComponentPropsMatcher

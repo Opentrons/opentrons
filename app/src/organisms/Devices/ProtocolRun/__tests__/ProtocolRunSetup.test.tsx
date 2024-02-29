@@ -1,15 +1,12 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 
 import {
   parseAllRequiredModuleModels,
   parseLiquidsInLoadOrder,
 } from '@opentrons/api-client'
-import {
-  partialComponentPropsMatcher,
-  renderWithProviders,
-} from '@opentrons/components'
 import {
   getSimplestDeckConfigForProtocol,
   ProtocolAnalysisOutput,
@@ -18,6 +15,10 @@ import {
 import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 
+import {
+  partialComponentPropsMatcher,
+  renderWithProviders,
+} from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
 import {
@@ -43,76 +44,19 @@ import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
 import { EmptySetupStep } from '../EmptySetupStep'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
 
-jest.mock('@opentrons/api-client')
-jest.mock('../../hooks')
-jest.mock('../SetupLabware')
-jest.mock('../SetupRobotCalibration')
-jest.mock('../SetupModuleAndDeck')
-jest.mock('../SetupLiquids')
-jest.mock('../EmptySetupStep')
-jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-jest.mock('@opentrons/shared-data/js/helpers/parseProtocolData')
-jest.mock('@opentrons/shared-data/js/helpers/getSimplestFlexDeckConfig')
-jest.mock('../../../../redux/config')
-jest.mock('../../../../resources/deck_configuration/utils')
-jest.mock('../../../../resources/deck_configuration/hooks')
-
-const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
-const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
-  typeof useMostRecentCompletedAnalysis
->
-const mockUseProtocolAnalysisErrors = useProtocolAnalysisErrors as jest.MockedFunction<
-  typeof useProtocolAnalysisErrors
->
-const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
-const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
-  typeof useRunCalibrationStatus
->
-const mockUseModuleCalibrationStatus = useModuleCalibrationStatus as jest.MockedFunction<
-  typeof useModuleCalibrationStatus
->
-const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
-  typeof useRunHasStarted
->
-const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFunction<
-  typeof useStoredProtocolAnalysis
->
-const mockParseAllRequiredModuleModels = parseAllRequiredModuleModels as jest.MockedFunction<
-  typeof parseAllRequiredModuleModels
->
-const mockParseLiquidsInLoadOrder = parseLiquidsInLoadOrder as jest.MockedFunction<
-  typeof parseLiquidsInLoadOrder
->
-const mockSetupLabware = SetupLabware as jest.MockedFunction<
-  typeof SetupLabware
->
-const mockSetupRobotCalibration = SetupRobotCalibration as jest.MockedFunction<
-  typeof SetupRobotCalibration
->
-const mockSetupModuleAndDeck = SetupModuleAndDeck as jest.MockedFunction<
-  typeof SetupModuleAndDeck
->
-const mockSetupLiquids = SetupLiquids as jest.MockedFunction<
-  typeof SetupLiquids
->
-const mockEmptySetupStep = EmptySetupStep as jest.MockedFunction<
-  typeof EmptySetupStep
->
-const mockGetSimplestDeckConfigForProtocol = getSimplestDeckConfigForProtocol as jest.MockedFunction<
-  typeof getSimplestDeckConfigForProtocol
->
-const mockGetRequiredDeckConfig = getRequiredDeckConfig as jest.MockedFunction<
-  typeof getRequiredDeckConfig
->
-const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
-  typeof useUnmatchedModulesForProtocol
->
-const mockUseDeckConfigurationCompatibility = useDeckConfigurationCompatibility as jest.MockedFunction<
-  typeof useDeckConfigurationCompatibility
->
-const mockGetIsFixtureMismatch = getIsFixtureMismatch as jest.MockedFunction<
-  typeof getIsFixtureMismatch
->
+vi.mock('@opentrons/api-client')
+vi.mock('../../hooks')
+vi.mock('../SetupLabware')
+vi.mock('../SetupRobotCalibration')
+vi.mock('../SetupModuleAndDeck')
+vi.mock('../SetupLiquids')
+vi.mock('../EmptySetupStep')
+vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('@opentrons/shared-data/js/helpers/parseProtocolData')
+vi.mock('@opentrons/shared-data/js/helpers/getSimplestFlexDeckConfig')
+vi.mock('../../../../redux/config')
+vi.mock('../../../../resources/deck_configuration/utils')
+vi.mock('../../../../resources/deck_configuration/hooks')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -132,40 +76,40 @@ const render = () => {
 
 describe('ProtocolRunSetup', () => {
   beforeEach(() => {
-    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(false)
-    when(mockUseMostRecentCompletedAnalysis)
+    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(false)
+    when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         ...noModulesProtocol,
         ...MOCK_ROTOCOL_LIQUID_KEY,
       } as any)
-    when(mockUseProtocolAnalysisErrors).calledWith(RUN_ID).mockReturnValue({
+    when(vi.mocked(useProtocolAnalysisErrors)).calledWith(RUN_ID).thenReturn({
       analysisErrors: null,
     })
-    when(mockUseStoredProtocolAnalysis)
+    when(vi.mocked(useStoredProtocolAnalysis))
       .calledWith(RUN_ID)
-      .mockReturnValue(({
+      .thenReturn(({
         ...noModulesProtocol,
         ...MOCK_ROTOCOL_LIQUID_KEY,
       } as unknown) as ProtocolAnalysisOutput)
-    when(mockParseAllRequiredModuleModels).mockReturnValue([])
-    when(mockParseLiquidsInLoadOrder).mockReturnValue([])
-    when(mockUseRobot)
+    when(vi.mocked(parseAllRequiredModuleModels)).thenReturn([])
+    when(vi.mocked(parseLiquidsInLoadOrder)).thenReturn([])
+    when(vi.mocked(useRobot))
       .calledWith(ROBOT_NAME)
-      .mockReturnValue(mockConnectedRobot)
-    when(mockUseRunCalibrationStatus)
+      .thenReturn(mockConnectedRobot)
+    when(vi.mocked(useRunCalibrationStatus))
       .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({ complete: true })
-    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
-    when(mockSetupRobotCalibration)
+      .thenReturn({ complete: true })
+    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
+    when(vi.mocked(SetupRobotCalibration))
       .calledWith(
         partialComponentPropsMatcher({
           robotName: ROBOT_NAME,
           runId: RUN_ID,
         })
       )
-      .mockReturnValue(<span>Mock SetupRobotCalibration</span>)
-    when(mockSetupLabware)
+      .thenReturn(<span>Mock SetupRobotCalibration</span>)
+    when(vi.mocked(SetupLabware))
       .calledWith(
         partialComponentPropsMatcher({
           protocolRunHeaderRef: null,
@@ -173,33 +117,35 @@ describe('ProtocolRunSetup', () => {
           runId: RUN_ID,
         })
       )
-      .mockReturnValue(<span>Mock SetupLabware</span>)
-    when(mockSetupModuleAndDeck).mockReturnValue(<div>Mock SetupModules</div>)
-    when(mockSetupLiquids).mockReturnValue(<div>Mock SetupLiquids</div>)
-    when(mockEmptySetupStep).mockReturnValue(<div>Mock EmptySetupStep</div>)
-    when(mockGetSimplestDeckConfigForProtocol).mockReturnValue([])
-    when(mockUseDeckConfigurationCompatibility).mockReturnValue([])
-    when(mockGetRequiredDeckConfig).mockReturnValue([])
-    when(mockUseUnmatchedModulesForProtocol)
+      .thenReturn(<span>Mock SetupLabware</span>)
+    when(vi.mocked(SetupModuleAndDeck)).thenReturn(<div>Mock SetupModules</div>)
+    when(vi.mocked(SetupLiquids)).thenReturn(<div>Mock SetupLiquids</div>)
+    when(vi.mocked(EmptySetupStep)).thenReturn(<div>Mock EmptySetupStep</div>)
+    when(vi.mocked(getSimplestDeckConfigForProtocol)).thenReturn([])
+    when(vi.mocked(useDeckConfigurationCompatibility)).thenReturn([])
+    when(vi.mocked(getRequiredDeckConfig)).thenReturn([])
+    when(vi.mocked(useUnmatchedModulesForProtocol))
       .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
-    when(mockGetIsFixtureMismatch).mockReturnValue(false)
+      .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
+    when(vi.mocked(getIsFixtureMismatch)).thenReturn(false)
   })
   afterEach(() => {
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('renders null if robot is null', () => {
-    when(mockUseRobot).calledWith(ROBOT_NAME).mockReturnValue(null)
+    when(vi.mocked(useRobot)).calledWith(ROBOT_NAME).thenReturn(null)
     const { container } = render()
     expect(container).toBeEmptyDOMElement()
   })
 
   it('renders loading data message if robot-analyzed and app-analyzed protocol data is null', () => {
-    when(mockUseMostRecentCompletedAnalysis)
+    when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
-      .mockReturnValue(null)
-    when(mockUseStoredProtocolAnalysis).calledWith(RUN_ID).mockReturnValue(null)
+      .thenReturn(null)
+    when(vi.mocked(useStoredProtocolAnalysis))
+      .calledWith(RUN_ID)
+      .thenReturn(null)
     render()
     screen.getByText('Loading data...')
   })
@@ -210,15 +156,15 @@ describe('ProtocolRunSetup', () => {
   })
 
   it('renders calibration needed when robot calibration not complete', () => {
-    when(mockUseRunCalibrationStatus)
+    when(vi.mocked(useRunCalibrationStatus))
       .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({ complete: false })
+      .thenReturn({ complete: false })
     render()
     screen.getByText('Calibration needed')
   })
 
   it('does not render calibration status when run has started', () => {
-    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
+    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
     render()
     expect(screen.queryByText('Calibration needed')).toBeNull()
     expect(screen.queryByText('Calibration ready')).toBeNull()
@@ -236,7 +182,7 @@ describe('ProtocolRunSetup', () => {
       expect(screen.getByText('Mock SetupRobotCalibration')).toBeVisible()
     })
     it('renders robot calibration setup for Flex', () => {
-      when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
+      when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
       render()
 
       screen.getByText(
@@ -267,7 +213,7 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('renders view-only info message if run has started', async () => {
-      when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
+      when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
 
       render()
       await new Promise(resolve => setTimeout(resolve, 1000))
@@ -279,40 +225,40 @@ describe('ProtocolRunSetup', () => {
 
   describe('when modules are in the protocol', () => {
     beforeEach(() => {
-      when(mockParseAllRequiredModuleModels).mockReturnValue([
+      when(vi.mocked(parseAllRequiredModuleModels)).thenReturn([
         'magneticModuleV1',
         'temperatureModuleV1',
       ])
-      when(mockUseMostRecentCompletedAnalysis)
+      when(vi.mocked(useMostRecentCompletedAnalysis))
         .calledWith(RUN_ID)
-        .mockReturnValue({
+        .thenReturn({
           ...withModulesProtocol,
           ...MOCK_ROTOCOL_LIQUID_KEY,
         } as any)
-      when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
-      when(mockUseModuleCalibrationStatus)
+      when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
+      when(vi.mocked(useModuleCalibrationStatus))
         .calledWith(ROBOT_NAME, RUN_ID)
-        .mockReturnValue({ complete: true })
+        .thenReturn({ complete: true })
     })
     afterEach(() => {
-      resetAllWhenMocks()
+      vi.resetAllWhenMocks()
     })
 
     it('renders calibration ready if robot is Flex and modules are calibrated', () => {
-      when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
-      when(mockUseModuleCalibrationStatus)
+      when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+      when(vi.mocked(useModuleCalibrationStatus))
         .calledWith(ROBOT_NAME, RUN_ID)
-        .mockReturnValue({ complete: true })
+        .thenReturn({ complete: true })
 
       render()
       expect(screen.getAllByText('Calibration ready').length).toEqual(2)
     })
 
     it('renders calibration needed if robot is Flex and modules are not calibrated', () => {
-      when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
-      when(mockUseModuleCalibrationStatus)
+      when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+      when(vi.mocked(useModuleCalibrationStatus))
         .calledWith(ROBOT_NAME, RUN_ID)
-        .mockReturnValue({ complete: false })
+        .thenReturn({ complete: false })
 
       render()
       screen.getByText('STEP 2')
@@ -321,23 +267,23 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('does not render calibration element if robot is OT-2', () => {
-      when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(false)
+      when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(false)
 
       render()
       expect(screen.getAllByText('Calibration ready').length).toEqual(1)
     })
 
     it('renders action needed if robot is Flex and modules are not connected', () => {
-      when(mockUseUnmatchedModulesForProtocol)
+      when(vi.mocked(useUnmatchedModulesForProtocol))
         .calledWith(ROBOT_NAME, RUN_ID)
-        .mockReturnValue({
+        .thenReturn({
           missingModuleIds: ['temperatureModuleV1'],
           remainingAttachedModules: [],
         })
-      when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
-      when(mockUseModuleCalibrationStatus)
+      when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+      when(vi.mocked(useModuleCalibrationStatus))
         .calledWith(ROBOT_NAME, RUN_ID)
-        .mockReturnValue({ complete: false })
+        .thenReturn({ complete: false })
 
       render()
       screen.getByText('STEP 2')
@@ -346,7 +292,7 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('renders action needed if robot is Flex and deck config is not configured', () => {
-      mockUseDeckConfigurationCompatibility.mockReturnValue([
+      vi.mocked(useDeckConfigurationCompatibility).mockReturnValue([
         {
           cutoutId: 'cutoutA1',
           cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
@@ -357,7 +303,7 @@ describe('ProtocolRunSetup', () => {
           missingLabwareDisplayName: null,
         },
       ])
-      when(mockGetRequiredDeckConfig).mockReturnValue([
+      when(vi.mocked(getRequiredDeckConfig)).thenReturn([
         {
           cutoutId: 'cutoutA1',
           cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
@@ -367,11 +313,11 @@ describe('ProtocolRunSetup', () => {
           ],
         },
       ] as any)
-      when(mockGetIsFixtureMismatch).mockReturnValue(true)
-      when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
-      when(mockUseModuleCalibrationStatus)
+      when(vi.mocked(getIsFixtureMismatch)).thenReturn(true)
+      when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+      when(vi.mocked(useModuleCalibrationStatus))
         .calledWith(ROBOT_NAME, RUN_ID)
-        .mockReturnValue({ complete: false })
+        .thenReturn({ complete: false })
 
       render()
       screen.getByText('STEP 2')
@@ -407,9 +353,9 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('renders correct text contents for single module', () => {
-      when(mockUseMostRecentCompletedAnalysis)
+      when(vi.mocked(useMostRecentCompletedAnalysis))
         .calledWith(RUN_ID)
-        .mockReturnValue({
+        .thenReturn({
           ...withModulesProtocol,
           ...MOCK_ROTOCOL_LIQUID_KEY,
           modules: [
@@ -420,7 +366,7 @@ describe('ProtocolRunSetup', () => {
             },
           ],
         } as any)
-      when(mockParseAllRequiredModuleModels).mockReturnValue([
+      when(vi.mocked(parseAllRequiredModuleModels)).thenReturn([
         'magneticModuleV1',
       ])
       render()
@@ -442,10 +388,10 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('renders correct text contents for modules and fixtures', () => {
-      when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
-      when(mockUseMostRecentCompletedAnalysis)
+      when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+      when(vi.mocked(useMostRecentCompletedAnalysis))
         .calledWith(RUN_ID)
-        .mockReturnValue({
+        .thenReturn({
           ...withModulesProtocol,
           ...MOCK_ROTOCOL_LIQUID_KEY,
           modules: [
@@ -456,7 +402,7 @@ describe('ProtocolRunSetup', () => {
             },
           ],
         } as any)
-      when(mockParseAllRequiredModuleModels).mockReturnValue([
+      when(vi.mocked(parseAllRequiredModuleModels)).thenReturn([
         'magneticModuleV1',
       ])
       render()
@@ -469,7 +415,7 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('renders view-only info message if run has started', async () => {
-      when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
+      when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
 
       render()
       await new Promise(resolve => setTimeout(resolve, 1000))
@@ -480,9 +426,9 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('renders analysis error message if there is an analysis error', async () => {
-      when(mockUseProtocolAnalysisErrors)
+      when(vi.mocked(useProtocolAnalysisErrors))
         .calledWith(RUN_ID)
-        .mockReturnValue({
+        .thenReturn({
           analysisErrors: [
             {
               id: 'error_id',

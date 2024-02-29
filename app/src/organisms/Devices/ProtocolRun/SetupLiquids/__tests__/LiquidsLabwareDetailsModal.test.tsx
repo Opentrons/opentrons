@@ -1,13 +1,15 @@
 import * as React from 'react'
-import { when } from 'jest-when'
-import { i18n } from '../../../../../i18n'
+import { when } from 'vitest-when'
+import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
+import { screen } from '@testing-library/react'
+
 import {
-  nestedTextMatcher,
-  renderWithProviders,
-  partialComponentPropsMatcher,
   LabwareRender,
 } from '@opentrons/components'
 import { parseLiquidsInLoadOrder } from '@opentrons/api-client'
+
+import { nestedTextMatcher, partialComponentPropsMatcher, renderWithProviders } from '../../../../../__testing-utils__'}
+import { i18n } from '../../../../../i18n'
 import { getIsOnDevice } from '../../../../../redux/config'
 import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { mockDefinition } from '../../../../../redux/custom-labware/__fixtures__'
@@ -19,49 +21,22 @@ import { LiquidDetailCard } from '../LiquidDetailCard'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
-jest.mock('@opentrons/components', () => {
-  const actualComponents = jest.requireActual('@opentrons/components')
+vi.mock('@opentrons/components', () => {
+  const actualComponents = vi.requireActual('@opentrons/components')
   return {
     ...actualComponents,
-    LabwareRender: jest.fn(() => <div>mock LabwareRender</div>),
+    LabwareRender: vi.fn(() => <div>mock LabwareRender</div>),
   }
 })
-jest.mock('@opentrons/api-client')
-jest.mock('../../../../../redux/config')
-jest.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-jest.mock('../../../../Devices/hooks')
-jest.mock('../../utils/getLocationInfoNames')
-jest.mock('../../utils/getSlotLabwareDefinition')
-jest.mock('../utils')
-jest.mock('../LiquidDetailCard')
+vi.mock('@opentrons/api-client')
+vi.mock('../../../../../redux/config')
+vi.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('../../../../Devices/hooks')
+vi.mock('../../utils/getLocationInfoNames')
+vi.mock('../../utils/getSlotLabwareDefinition')
+vi.mock('../utils')
+vi.mock('../LiquidDetailCard')
 
-const mockLiquidDetailCard = LiquidDetailCard as jest.MockedFunction<
-  typeof LiquidDetailCard
->
-const mockGetLocationInfoNames = getLocationInfoNames as jest.MockedFunction<
-  typeof getLocationInfoNames
->
-const mockGetSlotLabwareDefinition = getSlotLabwareDefinition as jest.MockedFunction<
-  typeof getSlotLabwareDefinition
->
-const mockGetLiquidsByIdForLabware = getLiquidsByIdForLabware as jest.MockedFunction<
-  typeof getLiquidsByIdForLabware
->
-const mockParseLiquidsInLoadOrder = parseLiquidsInLoadOrder as jest.MockedFunction<
-  typeof parseLiquidsInLoadOrder
->
-const mockLabwareRender = LabwareRender as jest.MockedFunction<
-  typeof LabwareRender
->
-const mockGetWellFillFromLabwareId = getWellFillFromLabwareId as jest.MockedFunction<
-  typeof getWellFillFromLabwareId
->
-const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
-  typeof useMostRecentCompletedAnalysis
->
-const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
-  typeof getIsOnDevice
->
 const render = (
   props: React.ComponentProps<typeof LiquidsLabwareDetailsModal>
 ) => {
@@ -80,12 +55,12 @@ describe('LiquidsLabwareDetailsModal', () => {
       runId: '456',
       closeModal: jest.fn(),
     }
-    mockGetLocationInfoNames.mockReturnValue({
+    vi.mocked(getLocationInfoNames).mockReturnValue({
       labwareName: 'mock labware name',
       slotName: '5',
     })
-    mockGetSlotLabwareDefinition.mockReturnValue(mockDefinition)
-    mockGetLiquidsByIdForLabware.mockReturnValue({
+    vi.mocked(getSlotLabwareDefinition).mockReturnValue(mockDefinition)
+    vi.mocked(getLiquidsByIdForLabware).mockReturnValue({
       '4': [
         {
           labwareId: '123',
@@ -102,7 +77,7 @@ describe('LiquidsLabwareDetailsModal', () => {
         },
       ],
     })
-    mockParseLiquidsInLoadOrder.mockReturnValue([
+    vi.mocked(parseLiquidsInLoadOrder).mockReturnValue([
       {
         id: '4',
         displayName: 'liquid 4',
@@ -110,24 +85,24 @@ describe('LiquidsLabwareDetailsModal', () => {
         displayColor: '#B925FF',
       },
     ])
-    mockLiquidDetailCard.mockReturnValue(<div></div>)
-    mockGetWellFillFromLabwareId.mockReturnValue({})
-    mockUseMostRecentCompletedAnalysis.mockReturnValue(
+    vi.mocked(LiquidDetailCard).mockReturnValue(<div></div>)
+    vi.mocked(getWellFillFromLabwareId).mockReturnValue({})
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue(
       {} as CompletedProtocolAnalysis
     )
-    mockGetIsOnDevice.mockReturnValue(false)
-    when(mockLabwareRender)
-      .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareRender isn't called with expected props
+    vi.mocked(getIsOnDevice).mockReturnValue(false)
+    when(vi.mocked(LabwareRender))
+      .thenReturn(<div></div>) // this (default) empty div will be returned when LabwareRender isn't called with expected props
       .calledWith(
         partialComponentPropsMatcher({
           wellFill: { C1: '#ff4888', C2: '#ff4888' },
         })
       )
-      .mockReturnValue(<div>mock labware render with well fill</div>)
+      .thenReturn(<div>mock labware render with well fill</div>)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
   it('should render slot name and labware name', () => {
     const [{ getByText, getAllByText, getByRole }] = render(props)
@@ -137,27 +112,27 @@ describe('LiquidsLabwareDetailsModal', () => {
     getAllByText('mock labware name')
   })
   it('should render LiquidDetailCard when correct props are passed', () => {
-    when(mockLiquidDetailCard)
+    when(vi.mocked(LiquidDetailCard))
       .calledWith(partialComponentPropsMatcher({ liquidId: '4' }))
-      .mockReturnValue(<>mock LiquidDetailCard</>)
-    const [{ getByText }] = render(props)
-    getByText(nestedTextMatcher('mock LiquidDetailCard'))
+      .thenReturn(<>mock LiquidDetailCard</>)
+    render(props)
+    screen.getByText(nestedTextMatcher('mock LiquidDetailCard'))
   })
   it('should render labware render with well fill', () => {
-    mockGetWellFillFromLabwareId.mockReturnValue({
+    vi.mocked(getWellFillFromLabwareId).mockReturnValue({
       C1: '#ff4888',
       C2: '#ff4888',
     })
-    const [{ getByText }] = render(props)
-    getByText('mock labware render with well fill')
+    render(props)
+    screen.getByText('mock labware render with well fill')
   })
   it('should render labware render with well fill on odd', () => {
-    mockGetIsOnDevice.mockReturnValue(true)
-    mockGetWellFillFromLabwareId.mockReturnValue({
+    vi.mocked(getIsOnDevice).mockReturnValue(true)
+    vi.mocked(getWellFillFromLabwareId).mockReturnValue({
       C1: '#ff4888',
       C2: '#ff4888',
     })
-    const [{ getByText }] = render(props)
-    getByText('mock labware render with well fill')
+    render(props)
+    screen.getByText('mock labware render with well fill')
   })
 })

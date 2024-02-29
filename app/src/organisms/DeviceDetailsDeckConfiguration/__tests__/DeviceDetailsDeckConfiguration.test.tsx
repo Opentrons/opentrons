@@ -1,17 +1,18 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
+import { describe, it, beforeEach, vi, afterEach } from 'vitest'
 
-import {
-  DeckConfigurator,
-  partialComponentPropsMatcher,
-  renderWithProviders,
-} from '@opentrons/components'
+import { DeckConfigurator } from '@opentrons/components'
 import {
   useDeckConfigurationQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 
+import {
+  partialComponentPropsMatcher,
+  renderWithProviders,
+} from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { useIsRobotViewable, useRunStatuses } from '../../Devices/hooks'
 import { DeckFixtureSetupInstructionsModal } from '../DeckFixtureSetupInstructionsModal'
@@ -21,15 +22,15 @@ import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_r
 
 import type { MaintenanceRun } from '@opentrons/api-client'
 
-jest.mock('@opentrons/components/src/hardware-sim/DeckConfigurator/index')
-jest.mock('@opentrons/react-api-client')
-jest.mock('../DeckFixtureSetupInstructionsModal')
-jest.mock('../../Devices/hooks')
-jest.mock('../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
-jest.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('@opentrons/components/src/hardware-sim/DeckConfigurator/index')
+vi.mock('@opentrons/react-api-client')
+vi.mock('../DeckFixtureSetupInstructionsModal')
+vi.mock('../../Devices/hooks')
+vi.mock('../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
+vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
 
 const ROBOT_NAME = 'otie'
-const mockUpdateDeckConfiguration = jest.fn()
+const mockUpdateDeckConfiguration = vi.fn()
 const RUN_STATUSES = {
   isRunRunning: false,
   isRunStill: false,
@@ -39,31 +40,6 @@ const RUN_STATUSES = {
 const mockCurrnetMaintenanceRun = {
   data: { id: 'mockMaintenanceRunId' },
 } as MaintenanceRun
-
-const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
-  typeof useDeckConfigurationQuery
->
-const mockUseUpdateDeckConfigurationMutation = useUpdateDeckConfigurationMutation as jest.MockedFunction<
-  typeof useUpdateDeckConfigurationMutation
->
-const mockDeckFixtureSetupInstructionsModal = DeckFixtureSetupInstructionsModal as jest.MockedFunction<
-  typeof DeckFixtureSetupInstructionsModal
->
-const mockDeckConfigurator = DeckConfigurator as jest.MockedFunction<
-  typeof DeckConfigurator
->
-const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
-  typeof useRunStatuses
->
-const mockUseNotifyCurrentMaintenanceRun = useNotifyCurrentMaintenanceRun as jest.MockedFunction<
-  typeof useNotifyCurrentMaintenanceRun
->
-const mockUseIsEstopNotDisengaged = useIsEstopNotDisengaged as jest.MockedFunction<
-  typeof useIsEstopNotDisengaged
->
-const mockUseIsRobotViewable = useIsRobotViewable as jest.MockedFunction<
-  typeof useIsRobotViewable
->
 
 const render = (
   props: React.ComponentProps<typeof DeviceDetailsDeckConfiguration>
@@ -80,26 +56,28 @@ describe('DeviceDetailsDeckConfiguration', () => {
     props = {
       robotName: ROBOT_NAME,
     }
-    mockUseDeckConfigurationQuery.mockReturnValue({ data: [] } as any)
-    mockUseUpdateDeckConfigurationMutation.mockReturnValue({
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue({ data: [] } as any)
+    vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
-    mockDeckFixtureSetupInstructionsModal.mockReturnValue(
+    vi.mocked(DeckFixtureSetupInstructionsModal).mockReturnValue(
       <div>mock DeckFixtureSetupInstructionsModal</div>
     )
-    when(mockDeckConfigurator).mockReturnValue(<div>mock DeckConfigurator</div>)
-    mockUseRunStatuses.mockReturnValue(RUN_STATUSES)
-    mockUseNotifyCurrentMaintenanceRun.mockReturnValue({
+    when(vi.mocked(DeckConfigurator)).thenReturn(
+      <div>mock DeckConfigurator</div>
+    )
+    vi.mocked(useRunStatuses).mockReturnValue(RUN_STATUSES)
+    vi.mocked(useNotifyCurrentMaintenanceRun).mockReturnValue({
       data: {},
     } as any)
-    when(mockUseIsEstopNotDisengaged)
+    when(vi.mocked(useIsEstopNotDisengaged))
       .calledWith(ROBOT_NAME)
-      .mockReturnValue(false)
-    when(mockUseIsRobotViewable).calledWith(ROBOT_NAME).mockReturnValue(true)
+      .thenReturn(false)
+    when(vi.mocked(useIsRobotViewable)).calledWith(ROBOT_NAME).thenReturn(true)
   })
 
   afterEach(() => {
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('should render text and button', () => {
@@ -119,10 +97,10 @@ describe('DeviceDetailsDeckConfiguration', () => {
 
   it('should render banner and make deck configurator disabled when running', () => {
     RUN_STATUSES.isRunRunning = true
-    mockUseRunStatuses.mockReturnValue(RUN_STATUSES)
-    when(mockDeckConfigurator)
+    vi.mocked(useRunStatuses).mockReturnValue(RUN_STATUSES)
+    when(vi.mocked(DeckConfigurator))
       .calledWith(partialComponentPropsMatcher({ readOnly: true }))
-      .mockReturnValue(<div>disabled mock DeckConfigurator</div>)
+      .thenReturn(<div>disabled mock DeckConfigurator</div>)
     render(props)
     screen.getByText(
       'Deck configuration is not available when run is in progress'
@@ -131,12 +109,12 @@ describe('DeviceDetailsDeckConfiguration', () => {
   })
 
   it('should render banner and make deck configurator disabled when a maintenance run exists', () => {
-    mockUseNotifyCurrentMaintenanceRun.mockReturnValue({
+    vi.mocked(useNotifyCurrentMaintenanceRun).mockReturnValue({
       data: mockCurrnetMaintenanceRun,
     } as any)
-    when(mockDeckConfigurator)
+    when(vi.mocked(DeckConfigurator))
       .calledWith(partialComponentPropsMatcher({ readOnly: true }))
-      .mockReturnValue(<div>disabled mock DeckConfigurator</div>)
+      .thenReturn(<div>disabled mock DeckConfigurator</div>)
     render(props)
     screen.getByText(
       'Deck configuration is not available when the robot is busy'
@@ -145,26 +123,26 @@ describe('DeviceDetailsDeckConfiguration', () => {
   })
 
   it('should render no deck fixtures, if deck configs are not set', () => {
-    when(mockUseDeckConfigurationQuery)
+    when(vi.mocked(useDeckConfigurationQuery))
       .calledWith()
-      .mockReturnValue([] as any)
+      .thenReturn([] as any)
     render(props)
     screen.getByText('No deck fixtures')
   })
 
   it('should render disabled deck configurator when e-stop is pressed', () => {
-    when(mockUseIsEstopNotDisengaged)
+    when(vi.mocked(useIsEstopNotDisengaged))
       .calledWith(ROBOT_NAME)
-      .mockReturnValue(true)
-    when(mockDeckConfigurator)
+      .thenReturn(true)
+    when(vi.mocked(DeckConfigurator))
       .calledWith(partialComponentPropsMatcher({ readOnly: true }))
-      .mockReturnValue(<div>disabled mock DeckConfigurator</div>)
+      .thenReturn(<div>disabled mock DeckConfigurator</div>)
     render(props)
     screen.getByText('disabled mock DeckConfigurator')
   })
 
   it('should render not viewable text when robot is not viewable', () => {
-    when(mockUseIsRobotViewable).calledWith(ROBOT_NAME).mockReturnValue(false)
+    when(vi.mocked(useIsRobotViewable)).calledWith(ROBOT_NAME).thenReturn(false)
     render(props)
     screen.getByText('Robot must be on the network to see deck configuration')
   })
