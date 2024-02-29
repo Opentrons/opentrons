@@ -64,10 +64,9 @@
     "semver": "5.5.0",
     "styled-components": "5.3.6",
     "typeface-open-sans": "0.0.75",
-    "uuid": "8.3.2"
+    "uuid": "3.2.1"
   },
   "devDependencies": {
-    "@opentrons/discovery-client": "link:../discovery-client",
     "@types/classnames": "2.2.5",
     "@types/file-saver": "2.0.1",
     "@types/jszip": "3.1.7",
