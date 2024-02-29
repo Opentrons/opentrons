@@ -53,7 +53,6 @@ module.exports = async () => ({
   artifactName: '${productName}-v${version}-${os}-${env.BUILD_ID}.${ext}',
   /* eslint-enable no-template-curly-in-string */
   asar: true,
-  asarUnpack: ['node_modules/usb', 'node_modules/serialport'],
   mac: {
     target: process.platform === 'darwin' ? ['dmg', 'zip'] : ['zip'],
     category: 'public.app-category.productivity',
