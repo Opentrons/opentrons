@@ -28,7 +28,7 @@ def sendMessage2Slack(token, channel, message):
         data = json.dumps(payload).encode("utf8")
         url = 'https://slack.com/api/chat.postMessage'
         header = {"Content-Type": "application/json; charset=utf-8", "Authorization": "Bearer " + token}
-        response = requests.post(url, data=data, headers=header)
+        response = requests.post(url, data=data, headers=header, verify=False)
         print("send2Slack: ", response.text)
     except:
         print("Can't reach slack when send 2 slack!")
