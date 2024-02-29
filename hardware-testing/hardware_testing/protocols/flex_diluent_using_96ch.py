@@ -242,7 +242,7 @@ def run(ctx: ProtocolContext) -> None:
     pipette = ctx.load_instrument(PIPETTE_NAME, "left", tip_racks=[tips])
     pipette.configure_for_volume(TARGET_VOLUME)
     _assign_starting_volumes(ctx, pipette, reservoir)
-    for i in range(12):
+    for i in range(100):
         if not pipette.has_tip:
             pipette.pick_up_tip()
         for test in TARGET_SOURCES:
