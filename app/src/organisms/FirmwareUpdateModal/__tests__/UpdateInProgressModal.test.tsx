@@ -1,12 +1,7 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { ProgressBar } from '../../../atoms/ProgressBar'
 import { UpdateInProgressModal } from '../UpdateInProgressModal'
-
-jest.mock('../../../atoms/ProgressBar')
-
-const mockProgressBar = ProgressBar as jest.MockedFunction<typeof ProgressBar>
 
 const render = (props: React.ComponentProps<typeof UpdateInProgressModal>) => {
   return renderWithProviders(<UpdateInProgressModal {...props} />, {
@@ -18,14 +13,11 @@ describe('UpdateInProgressModal', () => {
   let props: React.ComponentProps<typeof UpdateInProgressModal>
   beforeEach(() => {
     props = {
-      percentComplete: 12,
       subsystem: 'pipette_right',
     }
-    mockProgressBar.mockReturnValue('12' as any)
   })
-  it('renders test and progress bar', () => {
+  it('renders text', () => {
     const { getByText } = render(props)
     getByText('Updating pipette firmware...')
-    getByText('12')
   })
 })
