@@ -266,5 +266,8 @@ def run(ctx: ProtocolContext) -> None:
                 pipette.drop_tip()
         if not FILL_MULTIPLE_PLATES:
             break
-        if i < 11:
-            ctx.pause("refresh liquid to start volumes, and add new Plate")
+        if i < NUM_PLATES - 1:
+            min_vol = int(MIN_VOL_SRC[RESERVOIR_NAME] / 1000)
+            ctx.pause(f"liquid is {min_vol}mL per well, "
+                      f"refresh to start volumes, "
+                      f"and add new Plate")
