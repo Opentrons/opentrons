@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, beforeEach, vi } from 'vitest'
+import { renderWithProviders } from '../../../../../__testing-utils__'
 import {
   SINGLE_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
@@ -14,22 +15,12 @@ import { DeckFixtureSetupInstructionsModal } from '../../../../DeviceDetailsDeck
 
 import type { CutoutConfigAndCompatibility } from '../../../../../resources/deck_configuration/hooks'
 
-jest.mock('../../../../../resources/deck_configuration/hooks')
-jest.mock('../LocationConflictModal')
-jest.mock('../NotConfiguredModal')
-jest.mock(
+vi.mock('../../../../../resources/deck_configuration/hooks')
+vi.mock('../LocationConflictModal')
+vi.mock('../NotConfiguredModal')
+vi.mock(
   '../../../../DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 )
-
-const mockLocationConflictModal = LocationConflictModal as jest.MockedFunction<
-  typeof LocationConflictModal
->
-const mockNotConfiguredModal = NotConfiguredModal as jest.MockedFunction<
-  typeof NotConfiguredModal
->
-const mockDeckFixtureSetupInstructionsModal = DeckFixtureSetupInstructionsModal as jest.MockedFunction<
-  typeof DeckFixtureSetupInstructionsModal
->
 
 const mockDeckConfigCompatibility: CutoutConfigAndCompatibility[] = [
   {
@@ -79,11 +70,13 @@ describe('SetupFixtureList', () => {
     props = {
       deckConfigCompatibility: mockDeckConfigCompatibility,
     }
-    mockLocationConflictModal.mockReturnValue(
+    vi.mocked(LocationConflictModal).mockReturnValue(
       <div>mock location conflict modal</div>
     )
-    mockNotConfiguredModal.mockReturnValue(<div>mock not configured modal</div>)
-    mockDeckFixtureSetupInstructionsModal.mockReturnValue(
+    vi.mocked(NotConfiguredModal).mockReturnValue(
+      <div>mock not configured modal</div>
+    )
+    vi.mocked(DeckFixtureSetupInstructionsModal).mockReturnValue(
       <div>mock DeckFixtureSetupInstructionsModal</div>
     )
   })
