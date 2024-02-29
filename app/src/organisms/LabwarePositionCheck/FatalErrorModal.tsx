@@ -31,6 +31,7 @@ interface FatalErrorModalProps {
   onClose: () => void
 }
 export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
+  const { errorMessage, shouldUseMetalProbe, onClose } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   return (
     <Portal level="top">
@@ -39,7 +40,7 @@ export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
         header={
           <WizardHeader
             title={t('labware_position_check_title')}
-            onExit={props.onClose}
+            onExit={onClose}
           />
         }
       >
@@ -59,7 +60,7 @@ export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
           <ErrorHeader>
             {i18n.format(t('shared:something_went_wrong'), 'sentenceCase')}
           </ErrorHeader>
-          {props.shouldUseMetalProbe && (
+          {shouldUseMetalProbe ? (
             <StyledText
               as="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -67,7 +68,7 @@ export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
             >
               {t('remove_probe_before_exit')}
             </StyledText>
-          )}
+          ) : null}
           <StyledText as="p" textAlign={TEXT_ALIGN_CENTER}>
             {t('shared:help_us_improve_send_error_report', {
               support_email: SUPPORT_EMAIL,
@@ -75,13 +76,13 @@ export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
           </StyledText>
           <ErrorTextArea
             readOnly
-            value={props.errorMessage ?? ''}
+            value={errorMessage ?? ''}
             spellCheck={false}
           />
           <PrimaryButton
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
             alignSelf={ALIGN_FLEX_END}
-            onClick={props.onClose}
+            onClick={onClose}
           >
             {t('shared:exit')}
           </PrimaryButton>
