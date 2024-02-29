@@ -26,6 +26,7 @@ import {
 import {
   useCurrentSubsystemUpdateQuery,
   usePipetteSettingsQuery,
+  useHost,
 } from '@opentrons/react-api-client'
 
 import { LEFT } from '../../../redux/pipettes'
@@ -36,7 +37,7 @@ import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
 import { InstrumentCard } from '../../../molecules/InstrumentCard'
 import { ChangePipette } from '../../ChangePipette'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
-import { PipetteWizardFlows } from '../../PipetteWizardFlows'
+import { handlePipetteWizardFlows } from '../../PipetteWizardFlows'
 import { ChoosePipette } from '../../PipetteWizardFlows/ChoosePipette'
 import { useIsFlex } from '../hooks'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
@@ -50,6 +51,7 @@ import type {
   SelectablePipettes,
 } from '../../PipetteWizardFlows/types'
 import { DropTipWizard } from '../../DropTipWizard'
+import { HostConfig } from '@opentrons/api-client'
 
 interface PipetteCardProps {
   pipetteModelSpecs: PipetteModelSpecs | null
@@ -95,6 +97,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
   const isFlex = useIsFlex(robotName)
+  const host = useHost() as HostConfig
   const pipetteName = pipetteModelSpecs?.name
   const isFlexPipetteAttached = isFlexPipette(pipetteName as PipetteName)
   const pipetteDisplayName = pipetteModelSpecs?.displayName
@@ -104,10 +107,6 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const [showChangePipette, setChangePipette] = React.useState(false)
   const [showDropTipWizard, setShowDropTipWizard] = React.useState(false)
   const [showSlideout, setShowSlideout] = React.useState(false)
-  const [
-    pipetteWizardFlow,
-    setPipetteWizardFlow,
-  ] = React.useState<PipetteWizardFlow | null>(null)
   const [showAttachPipette, setShowAttachPipette] = React.useState(false)
   const [showAboutSlideout, setShowAboutSlideout] = React.useState(false)
   const subsystem = mount === LEFT ? 'pipette_left' : 'pipette_right'
@@ -148,10 +147,12 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     selectedPipette,
     setSelectedPipette,
   ] = React.useState<SelectablePipettes>(SINGLE_MOUNT_PIPETTES)
+  const selectedPipetteForWizard =
+    pipetteName === 'p1000_96' ? NINETY_SIX_CHANNEL : selectedPipette
 
   const handleChangePipette = (): void => {
     if (isFlexPipetteAttached && isFlex) {
-      setPipetteWizardFlow(FLOWS.DETACH)
+      handleLaunchPipetteWizardFlows(FLOWS.DETACH)
     } else if (!isFlexPipetteAttached && isFlex) {
       setShowAttachPipette(true)
     } else {
@@ -162,7 +163,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     setShowDropTipWizard(true)
   }
   const handleCalibrate = (): void => {
-    if (isFlexPipetteAttached) setPipetteWizardFlow(FLOWS.CALIBRATE)
+    if (isFlexPipetteAttached) {
+      handleLaunchPipetteWizardFlows(FLOWS.CALIBRATE)
+    }
   }
   const handleAboutSlideout = (): void => {
     setShowAboutSlideout(true)
@@ -170,11 +173,22 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const handleSettingsSlideout = (): void => {
     setShowSlideout(true)
   }
-
   const handleAttachPipette = (): void => {
     setShowAttachPipette(false)
-    setPipetteWizardFlow(FLOWS.ATTACH)
+    handleLaunchPipetteWizardFlows(FLOWS.ATTACH)
   }
+  const setCloseFlow = (): void => {
+    setSelectedPipette(SINGLE_MOUNT_PIPETTES)
+  }
+  const handleLaunchPipetteWizardFlows = (flowType: PipetteWizardFlow): void =>
+    handlePipetteWizardFlows({
+      flowType,
+      mount,
+      closeFlow: setCloseFlow,
+      selectedPipette: selectedPipetteForWizard,
+      host,
+    })
+
   return (
     <Flex
       backgroundColor={COLORS.grey10}
@@ -189,19 +203,6 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           selectedPipette={selectedPipette}
           exit={() => setShowAttachPipette(false)}
           mount={mount}
-        />
-      ) : null}
-      {pipetteWizardFlow != null ? (
-        <PipetteWizardFlows
-          flowType={pipetteWizardFlow}
-          mount={mount}
-          closeFlow={() => {
-            setSelectedPipette(SINGLE_MOUNT_PIPETTES)
-            setPipetteWizardFlow(null)
-          }}
-          selectedPipette={
-            pipetteName === 'p1000_96' ? NINETY_SIX_CHANNEL : selectedPipette
-          }
         />
       ) : null}
       {showChangePipette && (

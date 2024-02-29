@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import NiceModal, { useModal } from '@ebay/nice-modal-react'
+
 import { useConditionalConfirm } from '@opentrons/components'
 import {
   LEFT,
@@ -12,12 +14,13 @@ import {
 import {
   useHost,
   useDeleteMaintenanceRunMutation,
+  ApiHostProvider,
 } from '@opentrons/react-api-client'
+
 import {
   useCreateTargetedMaintenanceRunMutation,
   useChainMaintenanceCommands,
 } from '../../resources/runs/hooks'
-
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
@@ -42,7 +45,7 @@ import { MountingPlate } from './MountingPlate'
 import { UnskippableModal } from './UnskippableModal'
 
 import type { PipetteMount } from '@opentrons/shared-data'
-import type { CommandData } from '@opentrons/api-client'
+import type { CommandData, HostConfig } from '@opentrons/api-client'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
 
 const RUN_REFETCH_INTERVAL = 5000
@@ -433,3 +436,29 @@ export const PipetteWizardFlows = (
     </Portal>
   )
 }
+
+type PipetteWizardFlowsPropsWithHost = PipetteWizardFlowsProps & {
+  host: HostConfig
+}
+
+export const handlePipetteWizardFlows = (
+  props: PipetteWizardFlowsPropsWithHost
+): void => {
+  NiceModal.show(NiceModalPipetteWizardFlows, props)
+}
+
+const NiceModalPipetteWizardFlows = NiceModal.create(
+  (props: PipetteWizardFlowsPropsWithHost): JSX.Element => {
+    const modal = useModal()
+    const closeFlowAndModal = (): void => {
+      props.closeFlow()
+      modal.remove()
+    }
+
+    return (
+      <ApiHostProvider {...props.host}>
+        <PipetteWizardFlows {...props} closeFlow={closeFlowAndModal} />
+      </ApiHostProvider>
+    )
+  }
+)

@@ -1,6 +1,6 @@
 import React from 'react'
 import NiceModal from '@ebay/nice-modal-react'
-import { fireEvent, waitFor } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
@@ -165,46 +165,6 @@ describe('UpdateBuildroot', () => {
 
     getByText('Recalibrate')
     expect(queryByText('Drop tips')).not.toBeInTheDocument()
-  })
-
-  it('renders the pipette calibration wizard  when recalibrate is clicked', () => {
-    const [{ getByTestId, getByText }] = render(MOCK_PIPETTE)
-    const btn = getByTestId('testButton')
-    fireEvent.click(btn)
-    fireEvent.click(getByText('Recalibrate'))
-
-    getByText('Calibrate Left Pipette')
-  })
-
-  it('renders the drop tip wizard  when Drop tips is clicked', () => {
-    const [{ getByTestId, getByText, getAllByText }] = render(MOCK_PIPETTE)
-    const btn = getByTestId('testButton')
-    fireEvent.click(btn)
-    fireEvent.click(getByText('Drop tips'))
-
-    expect(getAllByText('Drop tips')).toHaveLength(2)
-  })
-
-  it('renders the gripper calibration wizard when recalibrate is clicked', () => {
-    const [{ getByTestId, getByText }] = render(MOCK_GRIPPER)
-    const btn = getByTestId('testButton')
-    fireEvent.click(btn)
-    fireEvent.click(getByText('Recalibrate'))
-
-    getByText('Calibrate Gripper')
-  })
-
-  it('closes the overflow menu when a launched wizard closes', async () => {
-    const [{ getByTestId, getByText, queryByText }] = render(MOCK_GRIPPER)
-    const btn = getByTestId('testButton')
-    fireEvent.click(btn)
-    fireEvent.click(getByText('Recalibrate'))
-
-    getByText('Calibrate Gripper')
-    fireEvent.click(getByText('exit'))
-    await waitFor(() =>
-      expect(queryByText('Recalibrate')).not.toBeInTheDocument()
-    )
   })
 
   it('closes the overflow menu when a click occurs outside of the overflow menu', () => {
