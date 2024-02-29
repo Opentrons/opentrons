@@ -219,8 +219,8 @@ client.on('error', (error) => console.error(error)
 # prereq: build project before first run or after changes
 make -C discovery-client
 
-# run via pnpm run
-pnpm run discovery [command] [options]
+# run via yarm run
+yarm run discovery [command] [options]
 
 # run via npx
 npx discovery [command] [options]
@@ -234,7 +234,7 @@ node_modules/.bin/discovery [command] [options]
 The CLI's global options are almost completely the same as the API's options, with the addition of `logLevel`. You may print the options with:
 
 ```shell
-pnpm discovery --help
+yarm discovery --help
 ```
 
 | flag                 | description                                       | default  | example        |
