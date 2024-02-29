@@ -162,10 +162,35 @@ def test_persistence_ot3(tmpdir: str) -> None:
             OT3Mount.GRIPPER: {"id": "some-other-id"},
         },
         attached_modules={
-            "magdeck": [simulator_setup.ModuleCall("engage", kwargs={"height": 3})],
+            "magdeck": [
+                simulator_setup.ModuleItem(
+                    id="mag-123",
+                    items=[simulator_setup.ModuleCall("engage", kwargs={"height": 3})],
+                )
+            ],
             "tempdeck": [
-                simulator_setup.ModuleCall("set_temperature", kwargs={"celsius": 23}),
-                simulator_setup.ModuleCall("set_temperature", kwargs={"celsius": 24}),
+                simulator_setup.ModuleItem(
+                    id="temp-123",
+                    items=[
+                        simulator_setup.ModuleCall(
+                            "set_temperature", kwargs={"celsius": 23}
+                        ),
+                        simulator_setup.ModuleCall(
+                            "set_temperature", kwargs={"celsius": 24}
+                        ),
+                    ],
+                ),
+                simulator_setup.ModuleItem(
+                    id="temp-1234",
+                    items=[
+                        simulator_setup.ModuleCall(
+                            "set_temperature", kwargs={"celsius": 23}
+                        ),
+                        simulator_setup.ModuleCall(
+                            "set_temperature", kwargs={"celsius": 24}
+                        ),
+                    ],
+                ),
             ],
         },
         config=robot_configs.build_config_ot3({}),

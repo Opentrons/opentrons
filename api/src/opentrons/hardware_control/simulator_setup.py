@@ -21,6 +21,13 @@ class ModuleCall:
     kwargs: Dict[str, Any] = field(default_factory=dict)
 
 
+# Name and kwargs for a module function
+@dataclass(frozen=True)
+class ModuleItem:
+    id: str
+    items: List[ModuleCall] = field(default_factory=list)
+
+
 @dataclass(frozen=True)
 class OT2SimulatorSetup:
     machine: Literal["OT-2 Standard"] = "OT-2 Standard"
@@ -198,5 +205,14 @@ def _prepare_for_ot3_simulator_setup(key: str, value: Dict[str, Any]) -> Any:
     if key == "config" and value:
         return robot_configs.build_config_ot3(value)
     if key == "attached_modules" and value:
+        # list of items with id, item - loop and set to ModuleCall
+        for key, item in value.items():
+            # print(list(item['items']))
+            for obj in item:
+                for data in obj["items"]:
+                    print(ModuleCall(**data))
+
+        # items = {k: [ModuleCall(**data) for data in v] for (k, v) in value.items()}
+        # print(items)
         return {k: [ModuleCall(**data) for data in v] for (k, v) in value.items()}
     return value
