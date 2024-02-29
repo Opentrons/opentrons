@@ -558,11 +558,9 @@ class UnmatchedTipPresenceStates(RoboticsControlError):
         """Build an UnmatchedTipPresenceStatesError."""
         format_tip_state = {0: "not detected", 1: "detected"}
         msg = (
-            "Received two differing tip presence statuses:"
-            "\nRear Sensor tips"
-            + format_tip_state[states[0]]
-            + "\nFront Sensor tips"
-            + format_tip_state[states[1]]
+            f"Received two differing tip presence statuses."
+            f" Rear Sensor tips: {format_tip_state[states[0]]}."
+            f" Front Sensor tips: {format_tip_state[states[1]]}."
         )
         if detail:
             msg += str(detail)
