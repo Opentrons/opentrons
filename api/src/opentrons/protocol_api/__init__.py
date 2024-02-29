@@ -22,9 +22,9 @@ from .module_contexts import (
     HeaterShakerContext,
     MagneticBlockContext,
 )
+from .disposal_locations import TrashBin, WasteChute
 from ._liquid import Liquid
 from ._types import OFF_DECK
-from ._disposal_locations import TrashBin, WasteChute
 from ._nozzle_layout import (
     COLUMN,
     ALL,

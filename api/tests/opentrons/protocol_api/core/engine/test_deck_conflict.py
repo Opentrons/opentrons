@@ -12,7 +12,7 @@ from opentrons.motion_planning import adjacent_slots_getters
 from opentrons.motion_planning.adjacent_slots_getters import _MixedTypeSlots
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
-from opentrons.protocol_api._disposal_locations import (
+from opentrons.protocol_api.disposal_locations import (
     TrashBin,
     WasteChute,
     _TRASH_BIN_CUTOUT_FIXTURE,

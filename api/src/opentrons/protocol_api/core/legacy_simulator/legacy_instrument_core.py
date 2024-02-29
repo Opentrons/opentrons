@@ -21,7 +21,7 @@ from opentrons_shared_data.errors.exceptions import (
     UnexpectedTipAttachError,
 )
 
-from ..._disposal_locations import TrashBin, WasteChute
+from ...disposal_locations import TrashBin, WasteChute
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 
 from ..instrument import AbstractInstrument

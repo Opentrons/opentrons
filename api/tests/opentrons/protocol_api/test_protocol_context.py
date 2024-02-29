@@ -38,7 +38,7 @@ from opentrons.protocol_api.core.common import (
     MagneticModuleCore,
     MagneticBlockCore,
 )
-from opentrons.protocol_api._disposal_locations import TrashBin, WasteChute
+from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
 from opentrons.protocols.api_support.deck_type import (
     NoTrashDefinedError,
 )

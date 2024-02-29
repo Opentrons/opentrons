@@ -6,7 +6,7 @@ from .helpers import stringify_location, stringify_disposal_location, listify
 from . import types as command_types
 
 from opentrons.types import Location
-from opentrons.protocol_api._disposal_locations import TrashBin, WasteChute
+from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
 
 if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext

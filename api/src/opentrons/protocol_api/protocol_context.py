@@ -52,7 +52,7 @@ from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 
 from . import validation
 from ._liquid import Liquid
-from ._disposal_locations import TrashBin, WasteChute
+from .disposal_locations import TrashBin, WasteChute
 from .deck import Deck
 from .instrument_context import InstrumentContext
 from .labware import Labware

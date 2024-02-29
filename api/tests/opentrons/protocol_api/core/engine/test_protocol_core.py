@@ -65,8 +65,8 @@ from opentrons.protocol_api.core.engine import (
     ModuleCore,
     load_labware_params,
 )
-from opentrons.protocol_api._disposal_locations import TrashBin, WasteChute
 from opentrons.protocol_api._liquid import Liquid
+from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
 from opentrons.protocol_api.core.engine.exceptions import InvalidModuleLocationError
 from opentrons.protocol_api.core.engine.module_core import (
     TemperatureModuleCore,

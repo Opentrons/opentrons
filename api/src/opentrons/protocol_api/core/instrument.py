@@ -10,7 +10,7 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import FlowRates
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 
-from .._disposal_locations import TrashBin, WasteChute
+from ..disposal_locations import TrashBin, WasteChute
 from .well import WellCoreType
 
 

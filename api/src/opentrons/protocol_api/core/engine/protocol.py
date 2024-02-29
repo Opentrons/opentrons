@@ -51,7 +51,7 @@ from opentrons.protocol_engine.errors import (
 from ... import validation
 from ..._types import OffDeckType
 from ..._liquid import Liquid
-from ..._disposal_locations import TrashBin, WasteChute
+from ...disposal_locations import TrashBin, WasteChute
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore

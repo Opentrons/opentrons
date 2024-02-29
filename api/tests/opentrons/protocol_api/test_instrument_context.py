@@ -29,7 +29,7 @@ from opentrons.protocol_api.core.common import InstrumentCore, ProtocolCore
 from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
     LegacyInstrumentCore,
 )
-from opentrons.protocol_api._disposal_locations import TrashBin, WasteChute
+from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.types import Location, Mount, Point
 

@@ -38,7 +38,7 @@ from . import deck_conflict
 from ..instrument import AbstractInstrument
 from .well import WellCore
 
-from ..._disposal_locations import TrashBin, WasteChute
+from ...disposal_locations import TrashBin, WasteChute
 
 if TYPE_CHECKING:
     from .protocol import ProtocolCore

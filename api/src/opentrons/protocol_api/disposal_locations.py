@@ -26,10 +26,10 @@ class DisposalOffset:
     z: float
 
 
-class DisposalLocation(TypingProtocol):
+class _DisposalLocation(TypingProtocol):
     """Abstract class for disposal location."""
 
-    def top(self, x: float = 0, y: float = 0, z: float = 0) -> DisposalLocation:
+    def top(self, x: float = 0, y: float = 0, z: float = 0) -> _DisposalLocation:
         """Returns a disposal location with a user set offset."""
         ...
 
@@ -74,7 +74,7 @@ class DisposalLocation(TypingProtocol):
         ...
 
 
-class TrashBin(DisposalLocation):
+class TrashBin(_DisposalLocation):
     """Represents a Flex or OT-2 trash bin.
 
     See :py:meth:`.ProtocolContext.load_trash_bin`.
@@ -158,7 +158,7 @@ class TrashBin(DisposalLocation):
         )
 
 
-class WasteChute(DisposalLocation):
+class WasteChute(_DisposalLocation):
     """Represents a Flex waste chute.
 
     See :py:meth:`.ProtocolContext.load_waste_chute`.

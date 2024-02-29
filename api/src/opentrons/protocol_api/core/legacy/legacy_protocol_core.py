@@ -16,9 +16,9 @@ from opentrons.protocols.api_support.util import AxisMaxSpeeds, APIVersionError
 from opentrons.protocols import labware as labware_definition
 
 from ...labware import Labware
+from ...disposal_locations import TrashBin, WasteChute
 from ..._liquid import Liquid
 from ..._types import OffDeckType
-from ..._disposal_locations import TrashBin, WasteChute
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 

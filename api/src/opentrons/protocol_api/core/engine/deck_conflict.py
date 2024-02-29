@@ -32,7 +32,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.errors.exceptions import LabwareNotLoadedOnModuleError
 from opentrons.protocol_engine.types import StagingSlotLocation, Dimensions
 from opentrons.types import DeckSlotName, StagingSlotName, Point
-from ..._disposal_locations import TrashBin, WasteChute
+from ...disposal_locations import TrashBin, WasteChute
 
 if TYPE_CHECKING:
     from ...labware import Labware

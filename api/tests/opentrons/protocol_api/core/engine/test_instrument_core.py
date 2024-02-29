@@ -31,7 +31,7 @@ from opentrons.protocol_engine.types import (
     ColumnNozzleLayoutConfiguration,
     AddressableOffsetVector,
 )
-from opentrons.protocol_api._disposal_locations import (
+from opentrons.protocol_api.disposal_locations import (
     TrashBin,
     WasteChute,
     DisposalOffset,
