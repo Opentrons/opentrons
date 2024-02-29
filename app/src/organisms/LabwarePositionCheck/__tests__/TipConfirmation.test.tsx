@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { resetAllWhenMocks } from 'jest-when'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
 import { TipConfirmation } from '../TipConfirmation'
 import { i18n } from '../../../i18n'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 const render = (props: React.ComponentProps<typeof TipConfirmation>) => {
   return renderWithProviders(<TipConfirmation {...props} />, {
@@ -16,25 +16,24 @@ describe('TipConfirmation', () => {
 
   beforeEach(() => {
     props = {
-      invalidateTip: jest.fn(),
-      confirmTip: jest.fn(),
+      invalidateTip: vi.fn(),
+      confirmTip: vi.fn(),
     }
   })
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
   it('should render correct copy', () => {
-    const { getByText, getByRole } = render(props)
-    getByText('Did pipette pick up tip successfully?')
-    getByRole('button', { name: 'Yes' })
-    getByRole('button', { name: 'Try again' })
+    render(props)
+    screen.getByText('Did pipette pick up tip successfully?')
+    screen.getByRole('button', { name: 'Yes' })
+    screen.getByRole('button', { name: 'Try again' })
   })
   it('should invoke callback props when ctas are clicked', () => {
-    const { getByRole } = render(props)
-    fireEvent.click(getByRole('button', { name: 'Try again' }))
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
     expect(props.invalidateTip).toHaveBeenCalled()
-    fireEvent.click(getByRole('button', { name: 'Yes' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Yes' }))
     expect(props.confirmTip).toHaveBeenCalled()
   })
 })
