@@ -1,7 +1,10 @@
 import * as React from 'react'
-import { resetAllWhenMocks, when } from 'jest-when'
+import { when } from 'vitest-when'
+import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
+import { screen } from '@testing-library/react'
+
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
-import { renderWithProviders } from '@opentrons/components'
 import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { ProtocolRunModuleControls } from '../ProtocolRunModuleControls'
@@ -14,20 +17,11 @@ import {
   mockHeaterShaker,
 } from '../../../../redux/modules/__fixtures__'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../ModuleCard')
-jest.mock('../../hooks')
-
-const mockModuleCard = ModuleCard as jest.MockedFunction<typeof ModuleCard>
-const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
-  typeof useModuleRenderInfoForProtocolById
->
-const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
-  typeof useInstrumentsQuery
->
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../ModuleCard')
+vi.mock('../../hooks')
 
 const RUN_ID = 'test123'
-
 const mockTempMod = {
   labwareOffset: { x: 3, y: 3, z: 3 },
   moduleId: 'temperature_id',
@@ -65,20 +59,21 @@ const render = (
 
 describe('ProtocolRunModuleControls', () => {
   beforeEach(() => {
-    when(mockUseInstrumentsQuery).mockReturnValue({
-      data: { data: [] },
-    } as any)
+    when(vi.mocked(useInstrumentsQuery))
+      .calledWith()
+      .thenReturn({
+        data: { data: [] },
+      } as any)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('renders a magnetic module card', () => {
-    when(mockUseModuleRenderInfoForProtocolById)
+    when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         [mockMagMod.moduleId]: {
           moduleId: 'magModModuleId',
           x: '0',
@@ -91,19 +86,19 @@ describe('ProtocolRunModuleControls', () => {
           attachedModuleMatch: mockMagneticModuleGen2,
         },
       } as any)
-    when(mockModuleCard).mockReturnValue(<div>mock Magnetic Module Card</div>)
-    const { getByText } = render({
+    when(vi.mocked(ModuleCard)).thenReturn(<div>mock Magnetic Module Card</div>)
+    render({
       robotName: 'otie',
       runId: 'test123',
     })
 
-    getByText('mock Magnetic Module Card')
+    screen.getByText('mock Magnetic Module Card')
   })
 
   it('renders a temperature module card', () => {
-    when(mockUseModuleRenderInfoForProtocolById)
+    when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         [mockTempMod.moduleId]: {
           moduleId: 'temperatureModuleId',
           x: '0',
@@ -116,21 +111,21 @@ describe('ProtocolRunModuleControls', () => {
           attachedModuleMatch: mockTemperatureModuleGen2,
         },
       } as any)
-    when(mockModuleCard).mockReturnValue(
+    when(vi.mocked(ModuleCard)).thenReturn(
       <div>mock Temperature Module Card</div>
     )
-    const { getByText } = render({
+    render({
       robotName: 'otie',
       runId: 'test123',
     })
 
-    getByText('mock Temperature Module Card')
+    screen.getByText('mock Temperature Module Card')
   })
 
   it('renders a thermocycler module card', () => {
-    when(mockUseModuleRenderInfoForProtocolById)
+    when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         [mockTCModule.moduleId]: {
           moduleId: mockTCModule.moduleId,
           x: MOCK_TC_COORDS[0],
@@ -144,22 +139,22 @@ describe('ProtocolRunModuleControls', () => {
         },
       } as any)
 
-    when(mockModuleCard).mockReturnValue(
+    when(vi.mocked(ModuleCard)).thenReturn(
       <div>mock Thermocycler Module Card</div>
     )
 
-    const { getByText } = render({
+    render({
       robotName: 'otie',
       runId: 'test123',
     })
 
-    getByText('mock Thermocycler Module Card')
+    screen.getByText('mock Thermocycler Module Card')
   })
 
   it('renders a heater-shaker module card', () => {
-    when(mockUseModuleRenderInfoForProtocolById)
+    when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         [mockHeaterShakerDef.moduleId]: {
           moduleId: 'heaterShakerModuleId',
           x: '0',
@@ -172,22 +167,22 @@ describe('ProtocolRunModuleControls', () => {
           attachedModuleMatch: mockHeaterShaker,
         },
       } as any)
-    when(mockModuleCard).mockReturnValue(
+    when(vi.mocked(ModuleCard)).thenReturn(
       <div>mock Heater-Shaker Module Card</div>
     )
 
-    const { getByText } = render({
+    render({
       robotName: 'otie',
       runId: 'test123',
     })
 
-    getByText('mock Heater-Shaker Module Card')
+    screen.getByText('mock Heater-Shaker Module Card')
   })
 
   it('renders correct text when module is not attached but required for protocol', () => {
-    when(mockUseModuleRenderInfoForProtocolById)
+    when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         [mockHeaterShakerDef.moduleId]: {
           moduleId: 'heaterShakerModuleId',
           x: '0',
@@ -201,11 +196,11 @@ describe('ProtocolRunModuleControls', () => {
         },
       } as any)
 
-    const { getByText } = render({
+    render({
       robotName: 'otie',
       runId: 'test123',
     })
 
-    getByText('Connect modules to see controls')
+    screen.getByText('Connect modules to see controls')
   })
 })

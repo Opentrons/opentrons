@@ -1,22 +1,16 @@
 import * as React from 'react'
 import { screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { when } from 'vitest-when'
+import { describe, it, beforeEach, vi, afterEach } from 'vitest'
 
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { useRunHasStarted } from '../../hooks'
 import { formatTimestamp } from '../../utils'
 import { SetupCalibrationItem } from '../SetupCalibrationItem'
-import { when, resetAllWhenMocks } from 'jest-when'
 
-jest.mock('../../hooks')
-jest.mock('../../utils')
-
-const mockFormatTimestamp = formatTimestamp as jest.MockedFunction<
-  typeof formatTimestamp
->
-const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
-  typeof useRunHasStarted
->
+vi.mock('../../hooks')
+vi.mock('../../utils')
 
 const RUN_ID = '1'
 
@@ -37,11 +31,11 @@ describe('SetupCalibrationItem', () => {
   }
 
   beforeEach(() => {
-    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
+    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
   })
 
   afterEach(() => {
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('renders all nodes with prop contents', () => {
@@ -51,9 +45,9 @@ describe('SetupCalibrationItem', () => {
     screen.getByRole('button', { name: 'stub button' })
   })
   it('renders calibrated date if there is no subtext', () => {
-    when(mockFormatTimestamp)
+    when(vi.mocked(formatTimestamp))
       .calledWith('Thursday, September 9, 2021')
-      .mockReturnValue('09/09/2021 00:00:00')
+      .thenReturn('09/09/2021 00:00:00')
     render({
       calibratedDate: 'Thursday, September 9, 2021',
     })
@@ -64,7 +58,7 @@ describe('SetupCalibrationItem', () => {
     screen.getByText('Not calibrated yet')
   })
   it('renders calibration data not available if run has started', () => {
-    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
+    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
     render()
     screen.getByText('Calibration data not available once run has started')
   })
