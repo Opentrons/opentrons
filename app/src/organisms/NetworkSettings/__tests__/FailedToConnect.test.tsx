@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { FailedToConnect } from '../FailedToConnect'
 
@@ -39,41 +39,41 @@ describe('ConnectedResult', () => {
     props = {
       requestState: failureState,
       selectedSsid: 'mockSsid',
-      handleChangeNetwork: jest.fn(),
-      handleTryAgain: jest.fn(),
+      handleChangeNetwork: vi.fn(),
+      handleTryAgain: vi.fn(),
       isInvalidPassword: true,
     }
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('should render a failure screen - incorrect password', () => {
-    const [{ getByText }] = render(props)
-    getByText('Oops! Incorrect password for mockSsid')
-    getByText('Try again')
-    getByText('Change network')
+    render(props)
+    screen.getByText('Oops! Incorrect password for mockSsid')
+    screen.getByText('Try again')
+    screen.getByText('Change network')
   })
 
   it('should render a failure screen - other error cases', () => {
     props.isInvalidPassword = false
-    const [{ getByText }] = render(props)
-    getByText('Failed to connect to mockSsid')
-    getByText('Try again')
-    getByText('Change network')
+    render(props)
+    screen.getByText('Failed to connect to mockSsid')
+    screen.getByText('Try again')
+    screen.getByText('Change network')
   })
 
   it('should call handleChangeNetwork when pressing Change network', () => {
-    const [{ getByText }] = render(props)
-    const button = getByText('Change network')
+    render(props)
+    const button = screen.getByText('Change network')
     fireEvent.click(button)
     expect(props.handleChangeNetwork).toHaveBeenCalled()
   })
 
   it('should call handleTryAgain when pressing Try again', () => {
-    const [{ getByText }] = render(props)
-    const button = getByText('Try again')
+    render(props)
+    const button = screen.getByText('Try again')
     fireEvent.click(button)
     expect(props.handleTryAgain).toHaveBeenCalled()
   })

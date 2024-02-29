@@ -1,15 +1,14 @@
 import * as React from 'react'
+import { screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { StatusLabel } from '../../../atoms/StatusLabel'
 import { MagneticModuleData } from '../MagneticModuleData'
 import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
 
-jest.mock('../../../atoms/StatusLabel')
-
-const mockStatusLabel = StatusLabel as jest.MockedFunction<typeof StatusLabel>
+vi.mock('../../../atoms/StatusLabel')
 
 const render = (props: React.ComponentProps<typeof MagneticModuleData>) => {
   return renderWithProviders(<MagneticModuleData {...props} />, {
@@ -25,21 +24,21 @@ describe('MagneticModuleData', () => {
       moduleModel: mockMagneticModule.moduleModel,
       moduleStatus: mockMagneticModule.data.status,
     }
-    mockStatusLabel.mockReturnValue(<div>Mock StatusLabel</div>)
+    vi.mocked(StatusLabel).mockReturnValue(<div>Mock StatusLabel</div>)
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders a status', () => {
-    const { getByText } = render(props)
+    render(props)
 
-    getByText('Mock StatusLabel')
+    screen.getByText('Mock StatusLabel')
   })
 
   it('renders magnet height data', () => {
-    const { getByText } = render(props)
+    render(props)
 
-    getByText(`Height: ${props.moduleHeight}`)
+    screen.getByText(`Height: ${props.moduleHeight}`)
   })
 })

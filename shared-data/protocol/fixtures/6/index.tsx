@@ -1,5 +1,5 @@
 import heater_shaker_commands from './heaterShakerCommands.json'
-import heater_shaker_commands_with_result from './heaterShakerCommandsWithResultsKey.json'
+import heater_shaker_commands_with_results_key from './heaterShakerCommandsWithResultsKey.json'
 import multiple_temp_modules from './multipleTempModules.json'
 import multiple_tipracks from './multipleTipracks.json'
 import multiple_tipacks_with_tc from './multipleTipracksWithTC.json'
@@ -10,7 +10,7 @@ import transfer_settings from './transferSettings.json'
 
 export {
   heater_shaker_commands,
-  heater_shaker_commands_with_result,
+  heater_shaker_commands_with_results_key,
   multiple_temp_modules,
   multiple_tipracks,
   multiple_tipacks_with_tc,

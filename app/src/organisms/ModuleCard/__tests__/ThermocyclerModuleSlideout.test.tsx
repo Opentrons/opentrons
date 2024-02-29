@@ -1,17 +1,15 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
+import { mockThermocycler } from '../../../redux/modules/__fixtures__'
 import { ThermocyclerModuleSlideout } from '../ThermocyclerModuleSlideout'
 
-import { mockThermocycler } from '../../../redux/modules/__fixtures__'
-
-jest.mock('@opentrons/react-api-client')
-
-const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
-  typeof useCreateLiveCommandMutation
->
+vi.mock('@opentrons/react-api-client')
 
 const render = (
   props: React.ComponentProps<typeof ThermocyclerModuleSlideout>
@@ -23,16 +21,16 @@ const render = (
 
 describe('ThermocyclerModuleSlideout', () => {
   let props: React.ComponentProps<typeof ThermocyclerModuleSlideout>
-  let mockCreateLiveCommand = jest.fn()
+  let mockCreateLiveCommand = vi.fn()
   beforeEach(() => {
-    mockCreateLiveCommand = jest.fn()
+    mockCreateLiveCommand = vi.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
-    mockUseLiveCommandMutation.mockReturnValue({
+    vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders correct title and body for Thermocycler Lid temperature', () => {
@@ -40,16 +38,16 @@ describe('ThermocyclerModuleSlideout', () => {
       module: mockThermocycler,
       isSecondaryTemp: true,
       isExpanded: true,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
     }
-    const { getByText } = render(props)
+    render(props)
 
-    getByText('Set Lid Temperature for Thermocycler Module GEN1')
-    getByText(
+    screen.getByText('Set Lid Temperature for Thermocycler Module GEN1')
+    screen.getByText(
       'Pre heat or cool your Thermocycler Lid. Enter a whole number between 37 °C and 110 °C.'
     )
-    getByText('Set lid temperature')
-    getByText('Confirm')
+    screen.getByText('Set lid temperature')
+    screen.getByText('Confirm')
   })
 
   it('renders correct title and body for Thermocycler Block Temperature', () => {
@@ -57,16 +55,16 @@ describe('ThermocyclerModuleSlideout', () => {
       module: mockThermocycler,
       isSecondaryTemp: false,
       isExpanded: true,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
     }
-    const { getByText } = render(props)
+    render(props)
 
-    getByText('Set Block Temperature for Thermocycler Module GEN1')
-    getByText(
+    screen.getByText('Set Block Temperature for Thermocycler Module GEN1')
+    screen.getByText(
       'Pre heat or cool your Thermocycler Block. Enter a whole number between 4 °C and 99 °C.'
     )
-    getByText('Set block temperature')
-    getByText('Confirm')
+    screen.getByText('Set block temperature')
+    screen.getByText('Confirm')
   })
 
   it('renders the button and it is not clickable until there is something in form field for the TC Block', () => {
@@ -74,11 +72,11 @@ describe('ThermocyclerModuleSlideout', () => {
       module: mockThermocycler,
       isSecondaryTemp: false,
       isExpanded: true,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
     }
-    const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Confirm' })
-    const input = getByTestId('thermocyclerModuleV1_false')
+    render(props)
+    const button = screen.getByRole('button', { name: 'Confirm' })
+    const input = screen.getByTestId('thermocyclerModuleV1_false')
     fireEvent.change(input, { target: { value: '45' } })
     expect(button).toBeEnabled()
     fireEvent.click(button)
@@ -100,11 +98,11 @@ describe('ThermocyclerModuleSlideout', () => {
       module: mockThermocycler,
       isSecondaryTemp: true,
       isExpanded: true,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
     }
-    const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Confirm' })
-    const input = getByTestId('thermocyclerModuleV1_true')
+    render(props)
+    const button = screen.getByRole('button', { name: 'Confirm' })
+    const input = screen.getByTestId('thermocyclerModuleV1_true')
     fireEvent.change(input, { target: { value: '45' } })
     expect(button).toBeEnabled()
     fireEvent.click(button)
@@ -126,11 +124,11 @@ describe('ThermocyclerModuleSlideout', () => {
       module: mockThermocycler,
       isSecondaryTemp: true,
       isExpanded: true,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
     }
-    const { getByLabelText, getByTestId } = render(props)
-    const button = getByLabelText('exit')
-    const input = getByTestId('thermocyclerModuleV1_true')
+    render(props)
+    const button = screen.getByLabelText('exit')
+    const input = screen.getByTestId('thermocyclerModuleV1_true')
     fireEvent.change(input, { target: { value: '45' } })
     fireEvent.click(button)
 
