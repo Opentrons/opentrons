@@ -28,7 +28,8 @@ jobs:
       - name: 'setup-js'
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
-          pnpm i
+          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
+
       - name: 'create release'
         run: |
           node ./scripts/deploy/create-release.js ${{ github.token }} ${{ github.ref_name }} --deploy

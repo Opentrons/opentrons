@@ -16,7 +16,7 @@ on:
       - '*.js'
       - 'scripts/**/*'
       - '*.json'
-      - 'pnpm-lock.yaml'
+      - 'yarn.lock'
       - '.github/workflows/app-test-build-deploy.yaml'
       - '.github/workflows/utils.js'
     branches:
@@ -36,7 +36,7 @@ on:
       - 'discovery-client/**/*'
       - '*.js'
       - '*.json'
-      - 'pnpm-lock.yaml'
+      - 'yarn.lock'
       - 'scripts/**/*'
   workflow_dispatch:
 
