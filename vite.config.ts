@@ -27,6 +27,7 @@ export default defineConfig({
     esbuildOptions: {
       target: 'es2020',
     },
+    exclude: ['node_modules']
   },
   css: {
     postcss: {
