@@ -21,6 +21,7 @@ FINAL_TEST_RESULTS = []
 GRIP_HEIGHT_MM = 48
 GAUGE_HEIGHT_MM = 75
 SLOT_WIDTH_GAUGE: List[Optional[int]] = [[], [], []]
+from datetime import datetime
 
 async def _main(simulating: bool) -> None:
 
@@ -39,22 +40,23 @@ async def _main(simulating: bool) -> None:
     uvinstrument = BuildAsairUV()
     INTSN = instrument.serial_number().strip("SS").replace(' ', '')
     csv_props, csv_cb = _create_csv_and_get_callbacks(HEPASN)
+    operator = input("Enter Operator Name:: ").strip()
+    csv_cb.write(["operator:", operator])
+    csv_cb.write(["test_time:", datetime.utcnow().strftime("%Y/%m/%d-%H:%M:%S")])
     csv_cb.write(["INSTRUMENT SN:", INTSN])
     csv_cb.write(["HEPA SN:" , HEPASN])
-    csv_cb.write('')
-    csv_cb.write(
-            {'{}'.format(time.now().strftime("%a-%b-%d-%y %I:%M %p"))})
+
     test_data={
-                'Time(Date Time)': None,
-                'Size1(um)': None,
-                'Count1(M3)': None,
-                'Size2(um)': None,
-                'Count2(M3)': None,
-                'Location': None,
-                'Sample Time(sec)': None,
-                'PASS/FAIL': None,
-                    }
-    csv_cb.write(test_data) 
+                    'Time(Date Time)': None,
+                    'Size1(um)': None,
+                    'Count1(M3)': None,
+                    'Size2(um)': None,
+                    'Count2(M3)': None,
+                    'Location': None,
+                    'Sample Time(sec)': None,
+                    'PASS/FAIL': None,
+                        }
+                        
     try:
         print("TURN ON FAN")
         input("PRESS ENTER TO CONTINUE")
@@ -355,5 +357,5 @@ if __name__ == "__main__":
         operator = input("OPERATOR name:").strip()
     else:
         operator = "simulation"
-    warm_up_time = 300 #300 seconds == 5mins
+    warm_up_time = 190 #300 seconds == 5mins
     asyncio.run(_main(args.simulate))
