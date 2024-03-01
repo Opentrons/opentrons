@@ -14,12 +14,16 @@ import * as Sessions from '../../../redux/sessions'
 
 import { DeckSetup } from '../DeckSetup'
 
+import type * as OpentronsComponent from '@opentrons/components'
+
 vi.mock('../../../assets/labware/getLabware')
 vi.mock('@opentrons/shared-data')
 vi.mock(
   '@opentrons/components/src/hardware-sim/Deck/RobotWorkSpace',
   async importOriginal => {
-    const actual = (await importOriginal()) as any
+    const actual = await importOriginal<
+      typeof OpentronsComponent.RobotWorkSpace
+    >()
     return {
       ...actual,
       RobotWorkSpace: () => <></>,
