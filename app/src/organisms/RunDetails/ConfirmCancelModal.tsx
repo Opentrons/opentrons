@@ -2,16 +2,16 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
-  Icon,
-  SPACING,
-  Flex,
-  Link,
   AlertPrimaryButton,
-  DIRECTION_COLUMN,
-  JUSTIFY_FLEX_END,
-  TYPOGRAPHY,
-  COLORS,
   ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_FLEX_END,
+  Link,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   RUN_STATUS_STOPPED,
