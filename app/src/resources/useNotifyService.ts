@@ -49,8 +49,7 @@ export function useNotifyService<TData, TError = Error>({
     !forceHttpPolling &&
     enabled !== false &&
     hostname != null &&
-    staleTime !== Infinity &&
-    isFlex
+    staleTime !== Infinity
 
   React.useEffect(() => {
     if (shouldUseNotifications) {
