@@ -3,12 +3,14 @@ import { when } from 'vitest-when'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import {
-  LabwareRender,
-} from '@opentrons/components'
+import { LabwareRender } from '@opentrons/components'
 import { parseLiquidsInLoadOrder } from '@opentrons/api-client'
 
-import { nestedTextMatcher, partialComponentPropsMatcher, renderWithProviders } from '../../../../../__testing-utils__'}
+import {
+  nestedTextMatcher,
+  partialComponentPropsMatcher,
+  renderWithProviders,
+} from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import { getIsOnDevice } from '../../../../../redux/config'
 import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'

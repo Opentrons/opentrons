@@ -1,20 +1,28 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { resetAllWhenMocks, when } from 'jest-when'
-import { renderWithProviders, nestedTextMatcher } from '@opentrons/components'
+import { when } from 'vitest-when'
+import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
+
 import {
   FLEX_ROBOT_TYPE,
   HEATERSHAKER_MODULE_V1,
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
+
+import {
+  nestedTextMatcher,
+  renderWithProviders,
+} from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { CheckItem } from '../CheckItem'
 import { SECTIONS } from '../constants'
 import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
 
-jest.mock('../../../redux/config')
-jest.mock('../../Devices/hooks')
+import type { Mock } from 'vitest'
+
+vi.mock('../../../redux/config')
+vi.mock('../../Devices/hooks')
 
 const mockStartPosition = { x: 10, y: 20, z: 30 }
 const mockEndPosition = { x: 9, y: 19, z: 29 }
@@ -27,12 +35,10 @@ const render = (props: React.ComponentProps<typeof CheckItem>) => {
 
 describe('CheckItem', () => {
   let props: React.ComponentProps<typeof CheckItem>
-  let mockChainRunCommands: jest.Mock
+  let mockChainRunCommands: Mock
 
   beforeEach(() => {
-    mockChainRunCommands = jest
-      .fn()
-      .mockImplementation(() => Promise.resolve([]))
+    mockChainRunCommands = vi.fn().mockImplementation(() => Promise.resolve([]))
     props = {
       section: SECTIONS.CHECK_LABWARE,
       pipetteId: mockCompletedAnalysis.pipettes[0].id,
@@ -40,11 +46,11 @@ describe('CheckItem', () => {
       definitionUri: mockCompletedAnalysis.labware[0].definitionUri,
       location: { slotName: 'D1' },
       protocolData: mockCompletedAnalysis,
-      proceed: jest.fn(),
+      proceed: vi.fn(),
       chainRunCommands: mockChainRunCommands,
-      handleJog: jest.fn(),
-      registerPosition: jest.fn(),
-      setFatalError: jest.fn(),
+      handleJog: vi.fn(),
+      registerPosition: vi.fn(),
+      setFatalError: vi.fn(),
       workingOffsets: [],
       existingOffsets: mockExistingOffsets,
       isRobotMoving: false,
@@ -53,8 +59,7 @@ describe('CheckItem', () => {
     }
   })
   afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
   it('renders correct copy when preparing space with tip rack', () => {
     render(props)
