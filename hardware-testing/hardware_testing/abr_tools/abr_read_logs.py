@@ -1,7 +1,7 @@
 """Read ABR run logs and save data to ABR testing csv."""
 from .abr_run_logs import get_run_ids_from_storage, get_unseen_run_ids
 from .error_levels import ERROR_LEVELS_PATH
-from typing import Set, Dict, Tuple
+from typing import Set, Dict, Tuple, Any, List
 import argparse
 import os
 import csv
@@ -9,25 +9,7 @@ import json
 from datetime import datetime
 
 
-def get_command_info(file_results: Dict[str, str]) -> Dict[str, int]:
-    """Summarize actions that occurred in run log."""
-    all_commands = dict()
-    for command in file_results["commands"]:
-        try:
-            pipette = command["params"]["pipetteId"]
-        except (KeyError, TypeError):
-            pipette = command["params"].get(
-                "model", command["params"].get("moduleId", "")
-            )
-        command_and_tool = command["commandType"] + "_" + pipette
-        if command_and_tool in all_commands:
-            all_commands[command_and_tool] += 1
-        else:
-            all_commands[command_and_tool] = 1
-    return all_commands
-
-
-def get_modules(file_results: Dict[str, str]) -> Dict[str, str]:
+def get_modules(file_results: Dict[str, str]) -> Dict[str, Any]:
     """Get module IPs and models from run log."""
     modList = (
         "heaterShakerModuleV1",
@@ -36,8 +18,8 @@ def get_modules(file_results: Dict[str, str]) -> Dict[str, str]:
         "thermocyclerModuleV2",
     )
     all_modules = {key: None for key in modList}
-    for module in file_results["modules"]:
-        if module["model"] in modList:
+    for module in file_results.get("modules", []):
+        if isinstance(module, dict) and module.get("model") in modList:
             try:
                 all_modules[module["model"]] = module["serialNumber"]
             except KeyError:
@@ -45,36 +27,34 @@ def get_modules(file_results: Dict[str, str]) -> Dict[str, str]:
     return all_modules
 
 
-def get_error_info(file_results: Dict[str, str]) -> Tuple[int, str, str, str, str]:
+def get_error_info(file_results: Dict[str, Any]) -> Tuple[int, str, str, str, str]:
     """Determines if errors exist in run log and documents them."""
     error_levels = []
     # Read error levels file
     with open(ERROR_LEVELS_PATH, "r") as error_file:
         error_levels = list(csv.reader(error_file))
-    num_of_errors = len(file_results["errors"])
+    num_of_errors: int = len(file_results["errors"])
     if num_of_errors > 0:
-        commands = file_results.get("commands", {})
-        for n in commands:
+        commands_of_run = file_results.get("commands", [])  # type: List[Dict[str, Any]]
+        run_command_error = commands_of_run[-1]  # type: Dict[str, Any]
+        error_str = len(run_command_error.get("error", ""))  # type: int
+        if error_str > 1:
+            error_type = run_command_error["error"].get("errorType", None)
+            error_code = run_command_error["error"].get("errorCode", None)
             try:
-                error = len(n["error"])
-                if error > 1:
-                    error_type = n["error"]["errorType"]
-                    error_code = n["error"]["errorCode"]
-                    try:
-                        # Instrument Error
-                        error_instrument = n["error"]["errorInfo"]["node"]
-                    except KeyError:
-                        # Module Error
-                        error_instrument = n["error"]["errorInfo"]["port"]
-                    for error in error_levels:
-                        code_error = error[1]
-                        if code_error == error_code:
-                            error_level = error[4]
+                # Instrument Error
+                error_instrument = run_command_error["error"]["errorInfo"].get(
+                    "node", None
+                )
             except KeyError:
-                error_type = ""
-                error_code = ""
-                error_instrument = ""
-                error_level = ""
+                # Module Error
+                error_instrument = run_command_error["error"]["errorInfo"].get(
+                    "port", None
+                )
+            for error in error_levels:
+                code_error = error[1]
+                if code_error == error_code:
+                    error_level = error[4]
     else:
         error_type = ""
         error_code = ""
@@ -118,7 +98,7 @@ def create_abr_data_sheet(storage_directory: str) -> None:
 
 def create_data_dictionary(
     runs_to_save: Set[str], storage_directory: str
-) -> Dict[str, str]:
+) -> Dict[Any, Dict[str, Any]]:
     """Pull data from run files and format into a dictionary."""
     runs_and_robots = {}
     for filename in os.listdir(storage_directory):
@@ -147,12 +127,17 @@ def create_data_dictionary(
             ) = get_error_info(file_results)
             all_modules = get_modules(file_results)
 
-            start_time_str, complete_time_str, start_date, run_time_min = "", "", "", 0
+            start_time_str, complete_time_str, start_date, run_time_min = (
+                "",
+                "",
+                "",
+                0.0,
+            )
             try:
                 start_time = datetime.strptime(
                     file_results.get("startedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
                 )
-                start_date = start_time.date()
+                start_date = str(start_time.date())
                 start_time_str = str(start_time).split("+")[0]
                 complete_time = datetime.strptime(
                     file_results.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
@@ -199,14 +184,17 @@ def read_abr_data_sheet(storage_directory: str) -> Set[str]:
     with open(sheet_location, "r") as csv_start:
         data = csv.DictReader(csv_start)
         headers = data.fieldnames
-        for row in data:
-            run_id = row[headers[1]]
-            runs_in_sheet.add(run_id)
+        if headers is not None:
+            for row in data:
+                run_id = row[headers[1]]
+                runs_in_sheet.add(run_id)
         print(f"There are {str(len(runs_in_sheet))} runs documented in the ABR sheet.")
     return runs_in_sheet
 
 
-def write_to_abr_sheet(runs_and_robots: Dict[str, str], storage_directory: str) -> None:
+def write_to_abr_sheet(
+    runs_and_robots: Dict[Any, Dict[str, Any]], storage_directory: str
+) -> None:
     """Write dict of data to abr csv."""
     sheet_location = os.path.join(storage_directory, "ABR-run-data.csv")
     list_of_runs = list(runs_and_robots.keys())
