@@ -93,6 +93,7 @@ import {
   useRobotAnalyticsData,
   useIsFlex,
   useModuleCalibrationStatus,
+  useRobot,
 } from '../hooks'
 import { getPipettesWithTipAttached } from '../../DropTipWizard/getPipettesWithTipAttached'
 import { formatTimestamp } from '../utils'
@@ -111,6 +112,7 @@ import type { Run, RunError } from '@opentrons/api-client'
 import type { State } from '../../../redux/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import { getRobotSerialNumber } from '../../../redux/discovery'
 
 interface PipettesWithTip {
   mount: 'left' | 'right'
@@ -638,8 +640,14 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
       runStatus != null &&
       CANCELLABLE_STATUSES.includes(runStatus))
+  const robot = useRobot(robotName)
+  const serialNumber =
+    robot?.status != null ? getRobotSerialNumber(robot) : null ?? ''
   const handleProceedToRunClick = (): void => {
-    trackEvent({ name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN, properties: {} })
+    trackEvent({
+      name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+      properties: { serialNumber },
+    })
     play()
   }
   const configBypassHeaterShakerAttachmentConfirmation = useSelector(
@@ -735,9 +743,11 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       reset()
       trackEvent({
         name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-        properties: { sourceLocation: 'RunRecordDetail' },
+        properties: { sourceLocation: 'RunRecordDetail', serialNumber },
       })
-      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_AGAIN })
+      trackProtocolRunEvent({
+        name: ANALYTICS_PROTOCOL_RUN_AGAIN,
+      })
     }
   }
 
