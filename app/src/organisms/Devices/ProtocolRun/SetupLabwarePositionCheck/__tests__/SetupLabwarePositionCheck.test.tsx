@@ -1,14 +1,17 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
 import { StaticRouter } from 'react-router-dom'
 import { screen, fireEvent } from '@testing-library/react'
+import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../../../i18n'
 import {
   useProtocolQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import { renderWithProviders } from '../../../../../__testing-utils__'
+import { i18n } from '../../../../../i18n'
 import { useLPCSuccessToast } from '../../../hooks/useLPCSuccessToast'
 import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTypesThatRequireExtraAttention'
 import { useLaunchLPC } from '../../../../LabwarePositionCheck/useLaunchLPC'
@@ -21,54 +24,19 @@ import {
   useRobotType,
 } from '../../../hooks'
 import { SetupLabwarePositionCheck } from '..'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { useNotifyRunQuery } from '../../../../../resources/runs/useNotifyRunQuery'
 
-jest.mock('../../../../LabwarePositionCheck/useLaunchLPC')
-jest.mock('../../utils/getModuleTypesThatRequireExtraAttention')
-jest.mock('../../../../RunTimeControl/hooks')
-jest.mock('../../../../../redux/config')
-jest.mock('../../../hooks')
-jest.mock('../../../hooks/useLPCSuccessToast')
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../../../resources/runs/useNotifyRunQuery')
+import type { Mock } from 'vitest'
 
-const mockGetModuleTypesThatRequireExtraAttention = getModuleTypesThatRequireExtraAttention as jest.MockedFunction<
-  typeof getModuleTypesThatRequireExtraAttention
->
-const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
-  typeof useRunHasStarted
->
-const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
-  typeof useUnmatchedModulesForProtocol
->
-const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
-  typeof useRunCalibrationStatus
->
-const mockGetIsLabwareOffsetCodeSnippetsOn = getIsLabwareOffsetCodeSnippetsOn as jest.MockedFunction<
-  typeof getIsLabwareOffsetCodeSnippetsOn
->
-const mockUseLPCSuccessToast = useLPCSuccessToast as jest.MockedFunction<
-  typeof useLPCSuccessToast
->
-const mockUseLPCDisabledReason = useLPCDisabledReason as jest.MockedFunction<
-  typeof useLPCDisabledReason
->
-const mockUseLaunchLPC = useLaunchLPC as jest.MockedFunction<
-  typeof useLaunchLPC
->
-const mockUseRobotType = useRobotType as jest.MockedFunction<
-  typeof useRobotType
->
-const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
-  typeof useNotifyRunQuery
->
-const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
-  typeof useProtocolQuery
->
-const mockUseProtocolAnalysisAsDocumentQuery = useProtocolAnalysisAsDocumentQuery as jest.MockedFunction<
-  typeof useProtocolAnalysisAsDocumentQuery
->
+vi.mock('../../../../LabwarePositionCheck/useLaunchLPC')
+vi.mock('../../utils/getModuleTypesThatRequireExtraAttention')
+vi.mock('../../../../RunTimeControl/hooks')
+vi.mock('../../../../../redux/config')
+vi.mock('../../../hooks')
+vi.mock('../../../hooks/useLPCSuccessToast')
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../../../resources/runs/useNotifyRunQuery')
+
 const DISABLED_REASON = 'MOCK_DISABLED_REASON'
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -77,7 +45,7 @@ const render = () => {
   return renderWithProviders(
     <StaticRouter>
       <SetupLabwarePositionCheck
-        expandLabwareStep={jest.fn()}
+        expandLabwareStep={vi.fn()}
         robotName={ROBOT_NAME}
         runId={RUN_ID}
       />
@@ -89,57 +57,57 @@ const render = () => {
 }
 
 describe('SetupLabwarePositionCheck', () => {
-  let mockLaunchLPC: jest.Mock
+  let mockLaunchLPC: Mock
 
   beforeEach(() => {
-    mockLaunchLPC = jest.fn()
-    when(mockGetModuleTypesThatRequireExtraAttention)
+    mockLaunchLPC = vi.fn()
+    when(vi.mocked(getModuleTypesThatRequireExtraAttention))
       .calledWith(expect.anything())
-      .mockReturnValue([])
+      .thenReturn([])
 
-    when(mockUseUnmatchedModulesForProtocol)
+    when(vi.mocked(useUnmatchedModulesForProtocol))
       .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         missingModuleIds: [],
         remainingAttachedModules: [],
       })
 
-    when(mockUseLPCSuccessToast)
+    when(vi.mocked(useLPCSuccessToast))
       .calledWith()
-      .mockReturnValue({ setIsShowingLPCSuccessToast: jest.fn() })
+      .thenReturn({ setIsShowingLPCSuccessToast: vi.fn() })
 
-    when(mockUseRunCalibrationStatus)
+    when(vi.mocked(useRunCalibrationStatus))
       .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         complete: true,
       })
-    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
-    when(mockGetIsLabwareOffsetCodeSnippetsOn).mockReturnValue(false)
-    when(mockUseLPCDisabledReason).mockReturnValue(null)
-    when(mockUseRobotType)
+    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
+    vi.mocked(getIsLabwareOffsetCodeSnippetsOn).mockReturnValue(false)
+    vi.mocked(useLPCDisabledReason).mockReturnValue(null)
+    when(vi.mocked(useRobotType))
       .calledWith(ROBOT_NAME)
-      .mockReturnValue(FLEX_ROBOT_TYPE)
-    when(mockUseLaunchLPC)
+      .thenReturn(FLEX_ROBOT_TYPE)
+    when(vi.mocked(useLaunchLPC))
       .calledWith(RUN_ID, FLEX_ROBOT_TYPE, 'test protocol')
-      .mockReturnValue({
+      .thenReturn({
         launchLPC: mockLaunchLPC,
         LPCWizard: <div>mock LPC Wizard</div>,
       })
-    when(mockUseNotifyRunQuery).mockReturnValue({
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
       data: {
         data: { protocolId: 'fakeProtocolId' },
       },
     } as any)
-    when(mockUseProtocolQuery).mockReturnValue({
+    vi.mocked(useProtocolQuery).mockReturnValue({
       data: { data: { metadata: { protocolName: 'test protocol' } } },
     } as any)
-    when(mockUseProtocolAnalysisAsDocumentQuery).mockReturnValue({
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: null,
     } as any)
   })
 
   afterEach(() => {
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('should render LPC button and clicking should launch modal', () => {
@@ -152,8 +120,10 @@ describe('SetupLabwarePositionCheck', () => {
     expect(mockLaunchLPC).toHaveBeenCalled()
   })
   it('should render a disabled LPC button when disabled LPC reason exists', () => {
-    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
-    when(mockUseLPCDisabledReason).mockReturnValue(DISABLED_REASON)
+    when(vi.mocked(useUnmatchedModulesForProtocol))
+      .calledWith(RUN_ID)
+      .thenReturn(true)
+    vi.mocked(useLPCDisabledReason).mockReturnValue(DISABLED_REASON)
     render()
     const button = screen.getByRole('button', {
       name: 'run labware position check',
@@ -164,8 +134,8 @@ describe('SetupLabwarePositionCheck', () => {
   })
 
   it('should close Labware Offset Success toast when LPC is launched', () => {
-    const mockSetIsShowingLPCSuccessToast = jest.fn()
-    when(mockUseLPCSuccessToast).calledWith().mockReturnValue({
+    const mockSetIsShowingLPCSuccessToast = vi.fn()
+    when(vi.mocked(useLPCSuccessToast)).calledWith().thenReturn({
       setIsShowingLPCSuccessToast: mockSetIsShowingLPCSuccessToast,
     })
     render()
