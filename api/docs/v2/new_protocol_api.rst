@@ -35,6 +35,7 @@ Labware
    signatures, since users should never construct these directly.
 
 .. autoclass:: opentrons.protocol_api.TrashBin()
+   :members:
 
 .. autoclass:: opentrons.protocol_api.WasteChute()
 
@@ -75,7 +76,7 @@ Modules
    :members:
    :exclude-members: total_step_count, current_cycle_index, total_cycle_count, hold_time, ramp_rate, current_step_index, broker, geometry, load_labware_object
    :inherited-members:
-   
+
 
 .. _protocol-api-types:
 
@@ -100,5 +101,3 @@ Executing and Simulating Protocols
 
 .. automodule:: opentrons.simulate
    :members:
-
-
