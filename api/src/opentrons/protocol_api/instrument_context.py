@@ -32,8 +32,7 @@ from .core.common import InstrumentCore, ProtocolCore
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_instrument_core import LegacyInstrumentCore
 from .config import Clearances
-from ._trash_bin import TrashBin
-from ._waste_chute import WasteChute
+from .disposal_locations import TrashBin, WasteChute
 from ._nozzle_layout import NozzleLayout
 from . import labware, validation
 
@@ -1018,7 +1017,9 @@ class InstrumentContext(publisher.CommandPublisher):
                 well = trash_container.wells()[0]
             else:  # implicit drop tip in disposal location, not well
                 self._core.drop_tip_in_disposal_location(
-                    trash_container, home_after=home_after
+                    trash_container,
+                    home_after=home_after,
+                    alternate_tip_drop=True,
                 )
                 self._last_tip_picked_up_from = None
                 return self
@@ -1048,6 +1049,8 @@ class InstrumentContext(publisher.CommandPublisher):
                     instrument=self, location=location
                 ),
             ):
+                # TODO(jbl 2024-02-28) when adding 2.18 api version checks, set alternate_tip_drop
+                #   if below that version for compatability
                 self._core.drop_tip_in_disposal_location(
                     location, home_after=home_after
                 )

@@ -10,8 +10,13 @@ from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons.motion_planning import deck_conflict as wrapped_deck_conflict
 from opentrons.motion_planning import adjacent_slots_getters
 from opentrons.motion_planning.adjacent_slots_getters import _MixedTypeSlots
-from opentrons.protocol_api._trash_bin import TrashBin
-from opentrons.protocol_api._waste_chute import WasteChute
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api.disposal_locations import (
+    TrashBin,
+    WasteChute,
+    _TRASH_BIN_CUTOUT_FIXTURE,
+)
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocol_api.core.engine import deck_conflict
 from opentrons.protocol_engine import (
@@ -20,6 +25,7 @@ from opentrons.protocol_engine import (
     ModuleModel,
     StateView,
 )
+from opentrons.protocol_engine.clients import SyncClient
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 from opentrons.types import DeckSlotName, Point, StagingSlotName
 
@@ -63,6 +69,18 @@ def use_mock_wrapped_deck_conflict(
     """Replace the check() function that our subject should wrap with a mock."""
     mock_check = decoy.mock(func=wrapped_deck_conflict.check)
     monkeypatch.setattr(wrapped_deck_conflict, "check", mock_check)
+
+
+@pytest.fixture
+def api_version() -> APIVersion:
+    """Get mocked api_version."""
+    return MAX_SUPPORTED_VERSION
+
+
+@pytest.fixture
+def mock_sync_client(decoy: Decoy) -> SyncClient:
+    """Return a mock in the shape of a SyncClient."""
+    return decoy.mock(cls=SyncClient)
 
 
 @pytest.fixture
@@ -324,32 +342,51 @@ def test_maps_different_module_models(
         ("OT-3 Standard", DeckType.OT3_STANDARD),
     ],
 )
-def test_maps_trash_bins(decoy: Decoy, mock_state_view: StateView) -> None:
+def test_maps_trash_bins(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    api_version: APIVersion,
+    mock_sync_client: SyncClient,
+) -> None:
     """It should correctly map disposal locations."""
     mock_trash_lw = decoy.mock(cls=Labware)
+
+    decoy.when(
+        mock_sync_client.state.addressable_areas.get_fixture_height(
+            _TRASH_BIN_CUTOUT_FIXTURE
+        )
+    ).then_return(1.23)
 
     deck_conflict.check(
         engine_state=mock_state_view,
         existing_labware_ids=[],
         existing_module_ids=[],
         existing_disposal_locations=[
-            TrashBin(location=DeckSlotName.SLOT_B1, addressable_area_name="blah"),
-            WasteChute(),
+            TrashBin(
+                location=DeckSlotName.SLOT_B1,
+                addressable_area_name="blah",
+                engine_client=mock_sync_client,
+                api_version=api_version,
+            ),
+            WasteChute(engine_client=mock_sync_client, api_version=api_version),
             mock_trash_lw,
         ],
         new_trash_bin=TrashBin(
-            location=DeckSlotName.SLOT_A1, addressable_area_name="blah"
+            location=DeckSlotName.SLOT_A1,
+            addressable_area_name="blah",
+            engine_client=mock_sync_client,
+            api_version=api_version,
         ),
     )
     decoy.verify(
         wrapped_deck_conflict.check(
             existing_items={
                 DeckSlotName.SLOT_B1: wrapped_deck_conflict.TrashBin(
-                    name_for_errors="trash bin",
+                    name_for_errors="trash bin", highest_z=1.23
                 )
             },
             new_item=wrapped_deck_conflict.TrashBin(
-                name_for_errors="trash bin",
+                name_for_errors="trash bin", highest_z=1.23
             ),
             new_location=DeckSlotName.SLOT_A1,
             robot_type=mock_state_view.config.robot_type,

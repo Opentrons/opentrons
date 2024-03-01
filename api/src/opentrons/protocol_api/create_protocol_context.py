@@ -22,7 +22,7 @@ from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 from .protocol_context import ProtocolContext
 from .deck import Deck
-from ._trash_bin import TrashBin
+from .disposal_locations import TrashBin
 
 from .core.common import ProtocolCore as AbstractProtocolCore
 from .core.legacy.deck import Deck as LegacyDeck
