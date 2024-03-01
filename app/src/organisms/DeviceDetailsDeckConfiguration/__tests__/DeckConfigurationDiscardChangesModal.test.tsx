@@ -6,14 +6,17 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { DeckConfigurationDiscardChangesModal } from '../DeckConfigurationDiscardChangesModal'
 
+import type * as ReactRouterDom from 'react-router-dom'
+
 const mockFunc = vi.fn()
 const mockGoBack = vi.fn()
+const mockPush = vi.fn()
 
-vi.mock('react-router-dom', () => {
-  const reactRouterDom = vi.requireActual('react-router-dom')
+vi.mock('react-router-dom', async importOriginal => {
+  const reactRouterDom = await importOriginal<typeof ReactRouterDom>()
   return {
     ...reactRouterDom,
-    useHistory: () => ({ goBack: mockGoBack } as any),
+    useHistory: () => ({ push: mockPush } as any),
   }
 })
 

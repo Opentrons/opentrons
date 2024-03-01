@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { when } from 'vitest-when'
-import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
+import { describe, it, beforeEach, vi, afterEach } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
@@ -59,11 +59,9 @@ const render = (
 
 describe('ProtocolRunModuleControls', () => {
   beforeEach(() => {
-    when(vi.mocked(useInstrumentsQuery))
-      .calledWith()
-      .thenReturn({
-        data: { data: [] },
-      } as any)
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
+      data: { data: [] },
+    } as any)
   })
 
   afterEach(() => {
@@ -86,7 +84,7 @@ describe('ProtocolRunModuleControls', () => {
           attachedModuleMatch: mockMagneticModuleGen2,
         },
       } as any)
-    when(vi.mocked(ModuleCard)).thenReturn(<div>mock Magnetic Module Card</div>)
+    vi.mocked(ModuleCard).mockReturnValue(<div>mock Magnetic Module Card</div>)
     render({
       robotName: 'otie',
       runId: 'test123',
@@ -111,7 +109,7 @@ describe('ProtocolRunModuleControls', () => {
           attachedModuleMatch: mockTemperatureModuleGen2,
         },
       } as any)
-    when(vi.mocked(ModuleCard)).thenReturn(
+    vi.mocked(ModuleCard).mockReturnValue(
       <div>mock Temperature Module Card</div>
     )
     render({
@@ -139,7 +137,7 @@ describe('ProtocolRunModuleControls', () => {
         },
       } as any)
 
-    when(vi.mocked(ModuleCard)).thenReturn(
+    vi.mocked(ModuleCard).mockReturnValue(
       <div>mock Thermocycler Module Card</div>
     )
 
@@ -167,7 +165,7 @@ describe('ProtocolRunModuleControls', () => {
           attachedModuleMatch: mockHeaterShaker,
         },
       } as any)
-    when(vi.mocked(ModuleCard)).thenReturn(
+    vi.mocked(ModuleCard).mockReturnValue(
       <div>mock Heater-Shaker Module Card</div>
     )
 

@@ -57,10 +57,10 @@
       "format": "irregular",
       "isTiprack": false,
       "isMagneticModuleCompatible": false,
-      "loadName": "opentrons_calibrationblock_short_side_left"
+      "loadName": "fixture_calibration_block"
     },
     "ordering": [["A1"], ["A2"]],
-    "namespace": "opentrons",
+    "namespace": "fixture",
     "version": 1,
     "schemaVersion": 2,
     "cornerOffsetFromSlot": {

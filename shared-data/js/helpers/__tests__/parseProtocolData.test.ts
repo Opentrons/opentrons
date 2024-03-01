@@ -49,7 +49,7 @@ describe('validateJsonProtocolFileContents', () => {
   it('should call handleError with INVALID_FILE_TYPE if empty json', () => {
     validateJsonProtocolFileContents('[]', handleError)
     expect(handleError).toBeCalledWith('INVALID_JSON_FILE', {
-      rawError: expect.any(Error),
+      rawError: 'Error: schema should be object or boolean',
     })
   })
 
@@ -70,7 +70,7 @@ describe('validateJsonProtocolFileContents', () => {
     })
     validateJsonProtocolFileContents('[]', handleError)
     expect(handleError).toBeCalledWith('INVALID_JSON_FILE', {
-      rawError: expect.any(Error),
+      rawError: 'Error: not parseable as JSON',
     })
     parseSpy.mockRestore()
   })

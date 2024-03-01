@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { describe, it, beforeEach, vi, afterEach } from 'vitest'
+import { when } from 'vitest-when'
+import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 
 import {
   RUN_STATUS_IDLE,
@@ -29,9 +29,9 @@ import {
 import {
   getPipetteModelSpecs,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  simple_v6 as _uncastedSimpleV6Protocol,
+  simple_v4 as noModulesProtocol,
 } from '@opentrons/shared-data'
-import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
-import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
@@ -96,35 +96,38 @@ import { useMostRecentRunId } from '../../../ProtocolUpload/hooks/useMostRecentR
 import { useNotifyRunQuery } from '../../../../resources/runs/useNotifyRunQuery'
 
 import type { UseQueryResult } from 'react-query'
-import type { Run } from '@opentrons/api-client'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type * as ReactRouterDom from 'react-router-dom'
+import type * as OpentronsSharedData from '@opentrons/shared-data'
+import type * as OpentronsComponents from '@opentrons/components'
+import type * as OpentronsApiClient from '@opentrons/api-client'
 
 const mockPush = vi.fn()
 
-vi.mock('react-router-dom', () => {
-  const reactRouterDom = vi.requireActual('react-router-dom')
+vi.mock('react-router-dom', async importOriginal => {
+  const reactRouterDom = await importOriginal<typeof ReactRouterDom>()
   return {
     ...reactRouterDom,
     useHistory: () => ({ push: mockPush } as any),
   }
 })
-vi.mock('@opentrons/components', () => {
-  const actualComponents = vi.requireActual('@opentrons/components')
+
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof OpentronsComponents>()
   return {
-    ...actualComponents,
+    ...actual,
     Tooltip: vi.fn(({ children }) => <div>{children}</div>),
   }
 })
+
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<typeof OpentronsSharedData>()
+  return {
+    ...actual,
+    getPipetteModelSpecs: vi.fn(),
+  }
+})
+
 vi.mock('@opentrons/react-api-client')
-vi.mock('@opentrons/shared-data', () => ({
-  getAllPipetteNames: vi.fn(
-    vi.requireActual('@opentrons/shared-data').getAllPipetteNames
-  ),
-  getPipetteNameSpecs: vi.fn(
-    vi.requireActual('@opentrons/shared-data').getPipetteNameSpecs
-  ),
-  getPipetteModelSpecs: vi.fn(),
-}))
 vi.mock('../../../../organisms/ProtocolUpload/hooks')
 vi.mock('../../../../organisms/RunDetails/ConfirmCancelModal')
 vi.mock('../../../../organisms/RunTimeControl/hooks')
@@ -145,82 +148,6 @@ vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('../../../ProtocolUpload/hooks/useMostRecentRunId')
 vi.mock('../../../../resources/runs/useNotifyRunQuery')
 
-const mockUseRunCalibrationStatus = useRunCalibrationStatus as vi.MockedFunction<
-  typeof useRunCalibrationStatus
->
-const mockUseModuleCalibrationStatus = useModuleCalibrationStatus as vi.MockedFunction<
-  typeof useModuleCalibrationStatus
->
-const mockUseRunCreatedAtTimestamp = useRunCreatedAtTimestamp as vi.MockedFunction<
-  typeof useRunCreatedAtTimestamp
->
-const mockUseModulesQuery = useModulesQuery as vi.MockedFunction<
-  typeof useModulesQuery
->
-const mockUsePipettesQuery = usePipettesQuery as vi.MockedFunction<
-  typeof usePipettesQuery
->
-const mockConfirmCancelModal = ConfirmCancelModal as vi.MockedFunction<
-  typeof ConfirmCancelModal
->
-const mockUseDismissCurrentRunMutation = useDismissCurrentRunMutation as vi.MockedFunction<
-  typeof useDismissCurrentRunMutation
->
-const mockHeaterShakerIsRunningModal = HeaterShakerIsRunningModal as vi.MockedFunction<
-  typeof HeaterShakerIsRunningModal
->
-const mockUseIsHeaterShakerInProtocol = useIsHeaterShakerInProtocol as vi.MockedFunction<
-  typeof useIsHeaterShakerInProtocol
->
-const mockConfirmAttachmentModal = ConfirmAttachmentModal as vi.MockedFunction<
-  typeof ConfirmAttachmentModal
->
-const mockRunProgressMeter = RunProgressMeter as vi.MockedFunction<
-  typeof RunProgressMeter
->
-const mockUseTrackEvent = useTrackEvent as vi.MockedFunction<
-  typeof useTrackEvent
->
-const mockUseIsRobotViewable = useIsRobotViewable as vi.MockedFunction<
-  typeof useIsRobotViewable
->
-const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as vi.MockedFunction<
-  typeof getRobotUpdateDisplayInfo
->
-const mockRunFailedModal = RunFailedModal as vi.MockedFunction<
-  typeof RunFailedModal
->
-const mockUseEstopQuery = useEstopQuery as vi.MockedFunction<
-  typeof useEstopQuery
->
-const mockUseIsFlex = useIsFlex as vi.MockedFunction<typeof useIsFlex>
-const mockUseDoorQuery = useDoorQuery as vi.MockedFunction<typeof useDoorQuery>
-const mockGetRobotSettings = getRobotSettings as vi.MockedFunction<
-  typeof getRobotSettings
->
-const mockUseInstrumentsQuery = useInstrumentsQuery as vi.MockedFunction<
-  typeof useInstrumentsQuery
->
-const mockUseHost = useHost as vi.MockedFunction<typeof useHost>
-const mockGetPipettesWithTipAttached = getPipettesWithTipAttached as vi.MockedFunction<
-  typeof getPipettesWithTipAttached
->
-const mockGetPipetteModelSpecs = getPipetteModelSpecs as vi.MockedFunction<
-  typeof getPipetteModelSpecs
->
-const mockGetIsFixtureMismatch = getIsFixtureMismatch as vi.MockedFunction<
-  typeof getIsFixtureMismatch
->
-const mockUseDeckConfigurationCompatibility = useDeckConfigurationCompatibility as vi.MockedFunction<
-  typeof useDeckConfigurationCompatibility
->
-const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as vi.MockedFunction<
-  typeof useMostRecentCompletedAnalysis
->
-const mockUseMostRecentRunId = useMostRecentRunId as vi.MockedFunction<
-  typeof useMostRecentRunId
->
-
 const ROBOT_NAME = 'otie'
 const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
 const CREATED_AT = '03/03/2022 19:08:49'
@@ -236,7 +163,7 @@ const mockSettings = {
 }
 const MOCK_ROTOCOL_LIQUID_KEY = { liquids: [] }
 
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as CompletedProtocolAnalysis
+const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as OpentronsSharedData.CompletedProtocolAnalysis
 
 const PROTOCOL_DETAILS = {
   displayName: PROTOCOL_NAME,
@@ -305,16 +232,20 @@ describe('ProtocolRunHeader', () => {
     mockTrackProtocolRunEvent = vi.fn(() => new Promise(resolve => resolve({})))
     mockCloseCurrentRun = vi.fn()
 
-    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
-    mockConfirmCancelModal.mockReturnValue(<div>Mock ConfirmCancelModal</div>)
-    mockRunProgressMeter.mockReturnValue(<div>Mock RunProgressMeter</div>)
-    mockHeaterShakerIsRunningModal.mockReturnValue(
+    vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
+    vi.mocked(ConfirmCancelModal).mockReturnValue(
+      <div>Mock ConfirmCancelModal</div>
+    )
+    vi.mocked(RunProgressMeter).mockReturnValue(
+      <div>Mock RunProgressMeter</div>
+    )
+    vi.mocked(HeaterShakerIsRunningModal).mockReturnValue(
       <div>Mock HeaterShakerIsRunningModal</div>
     )
-    mockUseModulesQuery.mockReturnValue({
+    vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [] },
     } as any)
-    mockUsePipettesQuery.mockReturnValue({
+    vi.mocked(usePipettesQuery).mockReturnValue({
       data: {
         data: {
           left: null,
@@ -323,29 +254,27 @@ describe('ProtocolRunHeader', () => {
       },
     } as any)
     vi.mocked(getIsHeaterShakerAttached).mockReturnValue(false)
-    mockUseIsRobotViewable.mockReturnValue(true)
-    mockConfirmAttachmentModal.mockReturnValue(
+    vi.mocked(useIsRobotViewable).mockReturnValue(true)
+    vi.mocked(ConfirmAttachmentModal).mockReturnValue(
       <div>mock confirm attachment modal</div>
     )
-    when(vi.mocked(useProtocolAnalysisErrors))
-      .calledWith(RUN_ID)
-      .mockReturnValue({
-        analysisErrors: null,
-      })
-    mockUseIsHeaterShakerInProtocol.mockReturnValue(false)
-    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+    when(vi.mocked(useProtocolAnalysisErrors)).calledWith(RUN_ID).thenReturn({
+      analysisErrors: null,
+    })
+    vi.mocked(useIsHeaterShakerInProtocol).mockReturnValue(false)
+    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: 'reinstall',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
-    when(vi.mocked(useCurrentRunId)).calledWith().mockReturnValue(RUN_ID)
-    when(vi.mocked(useCloseCurrentRun)).calledWith().mockReturnValue({
+    when(vi.mocked(useCurrentRunId)).calledWith().thenReturn(RUN_ID)
+    when(vi.mocked(useCloseCurrentRun)).calledWith().thenReturn({
       isClosingCurrentRun: false,
       closeCurrentRun: mockCloseCurrentRun,
     })
     when(vi.mocked(useRunControls))
       .calledWith(RUN_ID, expect.anything())
-      .mockReturnValue({
+      .thenReturn({
         play: () => {},
         pause: () => {},
         stop: () => {},
@@ -355,72 +284,67 @@ describe('ProtocolRunHeader', () => {
         isStopRunActionLoading: false,
         isResetRunLoading: false,
       })
-    when(vi.mocked(useRunStatus))
-      .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_IDLE)
-    when(vi.mocked(useRunTimestamps)).calledWith(RUN_ID).mockReturnValue({
+    when(vi.mocked(useRunStatus)).calledWith(RUN_ID).thenReturn(RUN_STATUS_IDLE)
+    when(vi.mocked(useRunTimestamps)).calledWith(RUN_ID).thenReturn({
       startedAt: STARTED_AT,
       pausedAt: null,
       stoppedAt: null,
       completedAt: null,
     })
-    when(mockUseRunCreatedAtTimestamp)
+    when(vi.mocked(useRunCreatedAtTimestamp))
       .calledWith(RUN_ID)
-      .mockReturnValue(CREATED_AT)
+      .thenReturn(CREATED_AT)
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, { staleTime: Infinity })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockIdleUnstartedRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useProtocolDetailsForRun))
       .calledWith(RUN_ID)
-      .mockReturnValue(PROTOCOL_DETAILS)
-    when(vi.mocked(useTrackProtocolRunEvent))
-      .calledWith(RUN_ID)
-      .mockReturnValue({
-        trackProtocolRunEvent: mockTrackProtocolRunEvent,
-      })
-    when(mockUseDismissCurrentRunMutation)
+      .thenReturn(PROTOCOL_DETAILS)
+    when(vi.mocked(useTrackProtocolRunEvent)).calledWith(RUN_ID).thenReturn({
+      trackProtocolRunEvent: mockTrackProtocolRunEvent,
+    })
+    when(vi.mocked(useDismissCurrentRunMutation))
       .calledWith()
-      .mockReturnValue({
+      .thenReturn({
         dismissCurrentRun: vi.fn(),
       } as any)
-    when(mockUseUnmatchedModulesForProtocol)
+    when(vi.mocked(useUnmatchedModulesForProtocol))
       .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
-    when(mockUseRunCalibrationStatus)
+      .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
+    when(vi.mocked(useRunCalibrationStatus))
       .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({ complete: true })
-    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
-    when(mockUseModuleCalibrationStatus)
+      .thenReturn({ complete: true })
+    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
+    when(vi.mocked(useModuleCalibrationStatus))
       .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({ complete: true })
-    mockRunFailedModal.mockReturnValue(<div>mock RunFailedModal</div>)
-    mockUseEstopQuery.mockReturnValue({ data: mockEstopStatus } as any)
-    mockUseDoorQuery.mockReturnValue({ data: mockDoorStatus } as any)
-    mockGetRobotSettings.mockReturnValue([mockSettings])
-    mockUseInstrumentsQuery.mockReturnValue({ data: {} } as any)
-    mockUseHost.mockReturnValue({} as any)
-    mockGetPipettesWithTipAttached.mockReturnValue(
+      .thenReturn({ complete: true })
+    vi.mocked(RunFailedModal).mockReturnValue(<div>mock RunFailedModal</div>)
+    vi.mocked(useEstopQuery).mockReturnValue({ data: mockEstopStatus } as any)
+    vi.mocked(useDoorQuery).mockReturnValue({ data: mockDoorStatus } as any)
+    vi.mocked(getRobotSettings).mockReturnValue([mockSettings])
+    vi.mocked(useInstrumentsQuery).mockReturnValue({ data: {} } as any)
+    vi.mocked(useHost).mockReturnValue({} as any)
+    vi.mocked(getPipettesWithTipAttached).mockReturnValue(
       Promise.resolve([
         instrumentsResponseLeftPipetteFixture,
         instrumentsResponseRightPipetteFixture,
       ]) as any
     )
-    mockGetPipetteModelSpecs.mockReturnValue('p10_single_v1' as any)
-    when(mockUseMostRecentCompletedAnalysis)
+    vi.mocked(getPipetteModelSpecs).mockReturnValue('p10_single_v1' as any)
+    when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         ...noModulesProtocol,
         ...MOCK_ROTOCOL_LIQUID_KEY,
       } as any)
-    mockUseDeckConfigurationCompatibility.mockReturnValue([])
-    when(mockGetIsFixtureMismatch).mockReturnValue(false)
-    when(mockUseMostRecentRunId).mockReturnValue(RUN_ID)
+    vi.mocked(useDeckConfigurationCompatibility).mockReturnValue([])
+    vi.mocked(getIsFixtureMismatch).mockReturnValue(false)
+    vi.mocked(useMostRecentRunId).mockReturnValue(RUN_ID)
   })
 
   afterEach(() => {
-    resetAllWhenMocks()
     vi.restoreAllMocks()
   })
 
@@ -449,7 +373,7 @@ describe('ProtocolRunHeader', () => {
   it('does not render link to protocol detail page if protocol key is absent', () => {
     when(vi.mocked(useProtocolDetailsForRun))
       .calledWith(RUN_ID)
-      .mockReturnValue({ ...PROTOCOL_DETAILS, protocolKey: null })
+      .thenReturn({ ...PROTOCOL_DETAILS, protocolKey: null })
     render()
 
     expect(
@@ -458,15 +382,13 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('renders a disabled "Analyzing on robot" button if robot-side analysis is not complete', () => {
-    when(vi.mocked(useProtocolDetailsForRun))
-      .calledWith(RUN_ID)
-      .mockReturnValue({
-        displayName: null,
-        protocolData: null,
-        protocolKey: null,
-        isProtocolAnalyzing: true,
-        robotType: 'OT-2 Standard',
-      })
+    when(vi.mocked(useProtocolDetailsForRun)).calledWith(RUN_ID).thenReturn({
+      displayName: null,
+      protocolData: null,
+      protocolKey: null,
+      isProtocolAnalyzing: true,
+      robotType: 'OT-2 Standard',
+    })
 
     render()
 
@@ -501,12 +423,12 @@ describe('ProtocolRunHeader', () => {
   it('dismisses a current but canceled run and calls trackProtocolRunEvent', () => {
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_STOPPED)
+      .thenReturn(RUN_STATUS_STOPPED)
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         data: { data: { ...mockIdleUnstartedRun, current: true } },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     render()
     expect(mockCloseCurrentRun).toBeCalled()
     expect(mockTrackProtocolRunEvent).toBeCalled()
@@ -517,9 +439,9 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('disables the Start Run button with tooltip if calibration is incomplete', () => {
-    when(mockUseRunCalibrationStatus)
+    when(vi.mocked(useRunCalibrationStatus))
       .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({ complete: false })
+      .thenReturn({ complete: false })
 
     render()
 
@@ -529,9 +451,9 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('disables the Start Run button with tooltip if a module is missing', () => {
-    when(mockUseUnmatchedModulesForProtocol)
+    when(vi.mocked(useUnmatchedModulesForProtocol))
       .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         missingModuleIds: ['temperatureModuleV1'],
         remainingAttachedModules: [],
       })
@@ -543,7 +465,7 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('disables the Start Run button with tooltip if robot software update is available', () => {
-    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: 'upgrade',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
@@ -558,7 +480,7 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('disables the Start Run button when a fixture is not configured or conflicted', () => {
-    mockUseDeckConfigurationCompatibility.mockReturnValue([
+    vi.mocked(useDeckConfigurationCompatibility).mockReturnValue([
       {
         cutoutId: 'cutoutA1',
         cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
@@ -569,7 +491,7 @@ describe('ProtocolRunHeader', () => {
         missingLabwareDisplayName: null,
       },
     ])
-    when(mockGetIsFixtureMismatch).mockReturnValue(true)
+    vi.mocked(getIsFixtureMismatch).mockReturnValue(true)
     render()
     const button = screen.getByRole('button', { name: 'Start run' })
     expect(button).toBeDisabled()
@@ -578,12 +500,12 @@ describe('ProtocolRunHeader', () => {
   it('renders a pause run button, start time, and end time when run is running, and calls trackProtocolRunEvent when button clicked', () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockRunningRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_RUNNING)
+      .thenReturn(RUN_STATUS_RUNNING)
     render()
 
     const button = screen.getByRole('button', { name: 'Pause run' })
@@ -599,12 +521,12 @@ describe('ProtocolRunHeader', () => {
   it('renders a cancel run button when running and shows a confirm cancel modal when clicked', () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockRunningRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_RUNNING)
+      .thenReturn(RUN_STATUS_RUNNING)
     render()
 
     expect(screen.queryByText('Mock ConfirmCancelModal')).toBeFalsy()
@@ -616,12 +538,12 @@ describe('ProtocolRunHeader', () => {
   it('renders a Resume Run button and Cancel Run button when paused and call trackProtocolRunEvent when resume button clicked', () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockPausedRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_PAUSED)
+      .thenReturn(RUN_STATUS_PAUSED)
 
     render()
 
@@ -638,12 +560,12 @@ describe('ProtocolRunHeader', () => {
   it('renders a disabled Resume Run button and when pause requested', () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockPauseRequestedRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_PAUSE_REQUESTED)
+      .thenReturn(RUN_STATUS_PAUSE_REQUESTED)
 
     render()
 
@@ -656,12 +578,12 @@ describe('ProtocolRunHeader', () => {
   it('renders a disabled Canceling Run button and when stop requested', () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockStopRequestedRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_STOP_REQUESTED)
+      .thenReturn(RUN_STATUS_STOP_REQUESTED)
 
     render()
 
@@ -673,17 +595,17 @@ describe('ProtocolRunHeader', () => {
   it('renders a disabled button and when the robot door is open', () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockRunningRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
+      .thenReturn(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
 
     const mockOpenDoorStatus = {
       data: { status: 'open', doorRequiredClosedForProtocol: true },
     }
-    mockUseDoorQuery.mockReturnValue({ data: mockOpenDoorStatus } as any)
+    vi.mocked(useDoorQuery).mockReturnValue({ data: mockOpenDoorStatus } as any)
 
     render()
 
@@ -695,13 +617,13 @@ describe('ProtocolRunHeader', () => {
   it('renders a Run Again button and end time when run has stopped and calls trackProtocolRunEvent when run again button clicked', () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockStoppedRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_STOPPED)
-    when(vi.mocked(useRunTimestamps)).calledWith(RUN_ID).mockReturnValue({
+      .thenReturn(RUN_STATUS_STOPPED)
+    when(vi.mocked(useRunTimestamps)).calledWith(RUN_ID).thenReturn({
       startedAt: STARTED_AT,
       pausedAt: null,
       stoppedAt: null,
@@ -722,13 +644,13 @@ describe('ProtocolRunHeader', () => {
   it('renders a Run Again button and end time when run has failed and calls trackProtocolRunEvent when run again button clicked', () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockFailedRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_FAILED)
-    when(vi.mocked(useRunTimestamps)).calledWith(RUN_ID).mockReturnValue({
+      .thenReturn(RUN_STATUS_FAILED)
+    when(vi.mocked(useRunTimestamps)).calledWith(RUN_ID).thenReturn({
       startedAt: STARTED_AT,
       pausedAt: null,
       stoppedAt: null,
@@ -749,13 +671,13 @@ describe('ProtocolRunHeader', () => {
   it('renders a Run Again button and end time when run has succeeded and calls trackProtocolRunEvent when run again button clicked', () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockSucceededRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_SUCCEEDED)
-    when(vi.mocked(useRunTimestamps)).calledWith(RUN_ID).mockReturnValue({
+      .thenReturn(RUN_STATUS_SUCCEEDED)
+    when(vi.mocked(useRunTimestamps)).calledWith(RUN_ID).thenReturn({
       startedAt: STARTED_AT,
       pausedAt: null,
       stoppedAt: null,
@@ -780,13 +702,13 @@ describe('ProtocolRunHeader', () => {
   it('disables the Run Again button with tooltip for a completed run if the robot is busy', () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockSucceededRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_SUCCEEDED)
-    when(vi.mocked(useRunTimestamps)).calledWith(RUN_ID).mockReturnValue({
+      .thenReturn(RUN_STATUS_SUCCEEDED)
+    when(vi.mocked(useRunTimestamps)).calledWith(RUN_ID).thenReturn({
       startedAt: STARTED_AT,
       pausedAt: null,
       stoppedAt: null,
@@ -794,7 +716,7 @@ describe('ProtocolRunHeader', () => {
     })
     when(vi.mocked(useCurrentRunId))
       .calledWith()
-      .mockReturnValue('some other run id')
+      .thenReturn('some other run id')
 
     render()
 
@@ -806,7 +728,7 @@ describe('ProtocolRunHeader', () => {
   it('renders an alert when the robot door is open', () => {
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
+      .thenReturn(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
     render()
 
     screen.getByText('Close robot door to resume run')
@@ -815,12 +737,12 @@ describe('ProtocolRunHeader', () => {
   it('renders a error detail link banner when run has failed', () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockFailedRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_FAILED)
+      .thenReturn(RUN_STATUS_FAILED)
     render()
 
     fireEvent.click(screen.getByText('View error'))
@@ -831,15 +753,15 @@ describe('ProtocolRunHeader', () => {
   it('does not render banners when a run is resetting', () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockFailedRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_FAILED)
+      .thenReturn(RUN_STATUS_FAILED)
     when(vi.mocked(useRunControls))
       .calledWith(RUN_ID, expect.anything())
-      .mockReturnValue({
+      .thenReturn({
         play: () => {},
         pause: () => {},
         stop: () => {},
@@ -857,7 +779,7 @@ describe('ProtocolRunHeader', () => {
   it('renders a clear protocol banner when run has been canceled', () => {
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_STOPPED)
+      .thenReturn(RUN_STATUS_STOPPED)
     render()
 
     screen.getByText('Run canceled.')
@@ -867,12 +789,12 @@ describe('ProtocolRunHeader', () => {
   it('renders a clear protocol banner when run has succeeded', () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockSucceededRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_SUCCEEDED)
+      .thenReturn(RUN_STATUS_SUCCEEDED)
     render()
 
     screen.getByText('Run completed.')
@@ -881,11 +803,9 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('if a heater shaker is shaking, clicking on start run should render HeaterShakerIsRunningModal', async () => {
-    when(vi.mocked(useRunStatus))
-      .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_IDLE)
-    mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
-    mockUseModulesQuery.mockReturnValue({
+    when(vi.mocked(useRunStatus)).calledWith(RUN_ID).thenReturn(RUN_STATUS_IDLE)
+    vi.mocked(useIsHeaterShakerInProtocol).mockReturnValue(true)
+    vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [mockMovingHeaterShaker] },
     } as any)
     render()
@@ -897,10 +817,10 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('does not render the confirm attachment modal when there is a heater shaker in the protocol and run is idle', () => {
-    mockUseModulesQuery.mockReturnValue({
+    vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [mockHeaterShaker] },
     } as any)
-    mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
+    vi.mocked(useIsHeaterShakerInProtocol).mockReturnValue(true)
     render()
 
     const button = screen.getByRole('button', { name: 'Start run' })
@@ -912,12 +832,12 @@ describe('ProtocolRunHeader', () => {
   it('renders the confirm attachment modal when there is a heater shaker in the protocol and the heater shaker is idle status and run is paused', () => {
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_PAUSED)
+      .thenReturn(RUN_STATUS_PAUSED)
 
-    mockUseModulesQuery.mockReturnValue({
+    vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [mockHeaterShaker] },
     } as any)
-    mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
+    vi.mocked(useIsHeaterShakerInProtocol).mockReturnValue(true)
     render()
 
     const button = screen.getByRole('button', { name: 'Resume run' })
@@ -928,10 +848,10 @@ describe('ProtocolRunHeader', () => {
 
   it('does NOT render confirm attachment modal when the user already confirmed the heater shaker is attached', () => {
     vi.mocked(useCurrentRunId).mockReturnValue(true)
-    mockUseModulesQuery.mockReturnValue({
+    vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [mockHeaterShaker] },
     } as any)
-    mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
+    vi.mocked(useIsHeaterShakerInProtocol).mockReturnValue(true)
     render()
     const button = screen.getByRole('button', { name: 'Start run' })
     fireEvent.click(button)
@@ -941,7 +861,7 @@ describe('ProtocolRunHeader', () => {
   it('renders analysis error modal if there is an analysis error', () => {
     when(vi.mocked(useProtocolAnalysisErrors))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         analysisErrors: [
           {
             id: 'error_id',
@@ -958,7 +878,7 @@ describe('ProtocolRunHeader', () => {
   it('renders analysis error banner if there is an analysis error', () => {
     when(vi.mocked(useProtocolAnalysisErrors))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         analysisErrors: [
           {
             id: 'error_id',
@@ -973,7 +893,7 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('renders the devices page when robot is not viewable but protocol is loaded', async () => {
-    mockUseIsRobotViewable.mockReturnValue(false)
+    vi.mocked(useIsRobotViewable).mockReturnValue(false)
     render()
     await waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith('/devices')
@@ -983,13 +903,13 @@ describe('ProtocolRunHeader', () => {
   it('renders banner with spinner if currently closing current run', async () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockSucceededRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_SUCCEEDED)
-    when(vi.mocked(useCloseCurrentRun)).calledWith().mockReturnValue({
+      .thenReturn(RUN_STATUS_SUCCEEDED)
+    when(vi.mocked(useCloseCurrentRun)).calledWith().thenReturn({
       isClosingCurrentRun: true,
       closeCurrentRun: mockCloseCurrentRun,
     })
@@ -1002,29 +922,29 @@ describe('ProtocolRunHeader', () => {
     const mockOpenDoorStatus = {
       data: { status: 'open', doorRequiredClosedForProtocol: true },
     }
-    mockUseDoorQuery.mockReturnValue({ data: mockOpenDoorStatus } as any)
+    vi.mocked(useDoorQuery).mockReturnValue({ data: mockOpenDoorStatus } as any)
     render()
     screen.getByText('Close the robot door before starting the run.')
   })
 
   it('should render door close banner when door is open and enabled safety door switch is on - OT-2', () => {
-    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(false)
+    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(false)
     const mockOpenDoorStatus = {
       data: { status: 'open', doorRequiredClosedForProtocol: true },
     }
-    mockUseDoorQuery.mockReturnValue({ data: mockOpenDoorStatus } as any)
+    vi.mocked(useDoorQuery).mockReturnValue({ data: mockOpenDoorStatus } as any)
     render()
     screen.getByText('Close the robot door before starting the run.')
   })
 
   it('should not render door close banner when door is open and enabled safety door switch is off - OT-2', () => {
-    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(false)
+    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(false)
     const mockOffSettings = { ...mockSettings, value: false }
-    mockGetRobotSettings.mockReturnValue([mockOffSettings])
+    vi.mocked(getRobotSettings).mockReturnValue([mockOffSettings])
     const mockOpenDoorStatus = {
       data: { status: 'open', doorRequiredClosedForProtocol: true },
     }
-    mockUseDoorQuery.mockReturnValue({ data: mockOpenDoorStatus } as any)
+    vi.mocked(useDoorQuery).mockReturnValue({ data: mockOpenDoorStatus } as any)
     render()
     expect(
       screen.queryByText('Close the robot door before starting the run.')
@@ -1034,7 +954,7 @@ describe('ProtocolRunHeader', () => {
   it('renders the drop tip banner when the run is over and a pipette has a tip attached and is a flex', async () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         data: {
           data: {
             ...mockIdleUnstartedRun,
@@ -1042,10 +962,10 @@ describe('ProtocolRunHeader', () => {
             status: RUN_STATUS_SUCCEEDED,
           },
         },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_SUCCEEDED)
+      .thenReturn(RUN_STATUS_SUCCEEDED)
 
     render()
     await waitFor(() => {
@@ -1056,7 +976,7 @@ describe('ProtocolRunHeader', () => {
   it('does not render the drop tip banner when the run is not over', async () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         data: {
           data: {
             ...mockIdleUnstartedRun,
@@ -1064,10 +984,8 @@ describe('ProtocolRunHeader', () => {
             status: RUN_STATUS_IDLE,
           },
         },
-      } as UseQueryResult<Run>)
-    when(vi.mocked(useRunStatus))
-      .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_IDLE)
+      } as UseQueryResult<OpentronsApiClient.Run>)
+    when(vi.mocked(useRunStatus)).calledWith(RUN_ID).thenReturn(RUN_STATUS_IDLE)
 
     render()
     await waitFor(() => {
