@@ -883,7 +883,7 @@ describe('ProtocolRunHeader', () => {
     expect(screen.queryByTestId('Banner_close-button')).not.toBeInTheDocument()
   })
 
-  it('renders a clear protocol banner when run has succeeded', () => {
+  it('renders a clear protocol banner when run has succeeded', async () => {
     when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -895,8 +895,24 @@ describe('ProtocolRunHeader', () => {
     render()
 
     screen.getByText('Run completed.')
+  })
+
+  it('clicking close on a terminal run banner closes the run context and dismisses the banner', async () => {
+    when(mockUseNotifyRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: { data: mockSucceededRun },
+      } as UseQueryResult<Run>)
+    when(mockUseRunStatus)
+      .calledWith(RUN_ID)
+      .mockReturnValue(RUN_STATUS_SUCCEEDED)
+    render()
+
     fireEvent.click(screen.getByTestId('Banner_close-button'))
     expect(mockCloseCurrentRun).toBeCalled()
+    await waitFor(() => {
+      expect(screen.queryByText('Run completed.')).not.toBeInTheDocument()
+    })
   })
 
   it('if a heater shaker is shaking, clicking on start run should render HeaterShakerIsRunningModal', async () => {
