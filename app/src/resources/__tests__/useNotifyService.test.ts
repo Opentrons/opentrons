@@ -173,4 +173,19 @@ describe('useNotifyService', () => {
     rerender()
     expect(mockHTTPRefetch).toHaveBeenCalledWith('once')
   })
+  it('does not use notifications if the device is an OT-2', () => {
+    mockAppShellListener.mockImplementation((_: any, __: any, mockCb: any) => {
+      mockCb({ refetchUsingHTTP: true })
+    })
+    mockUseIsFlex.mockReturnValue(false)
+    const { rerender } = renderHook(() =>
+      useNotifyService({
+        topic: MOCK_TOPIC,
+        setRefetchUsingHTTP: mockHTTPRefetch,
+        options: MOCK_OPTIONS,
+      } as any)
+    )
+    rerender()
+    expect(mockDispatch).not.toHaveBeenCalled()
+  })
 })
