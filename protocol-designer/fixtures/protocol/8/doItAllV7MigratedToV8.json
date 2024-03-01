@@ -13,9 +13,9 @@
   },
   "designerApplication": {
     "name": "opentrons/protocol-designer",
-    "version": "8.0.2",
+    "version": "8.1.0",
     "data": {
-      "_internalAppBuildDate": "Thu, 21 Mar 2024 18:51:59 GMT",
+      "_internalAppBuildDate": "Fri, 01 Mar 2024 14:22:27 GMT",
       "defaultValues": {
         "aspirate_mmFromBottom": 1,
         "dispense_mmFromBottom": 0.5,
@@ -23,8 +23,12 @@
         "blowout_mmFromTop": 0
       },
       "pipetteTiprackAssignments": {
-        "2e7c6344-58ab-465c-b542-489883cb63fe": "opentrons/opentrons_flex_96_filtertiprack_50ul/1",
-        "6d1e53c3-2db3-451b-ad60-3fe13781a193": "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
+        "2e7c6344-58ab-465c-b542-489883cb63fe": [
+          "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
+        ],
+        "6d1e53c3-2db3-451b-ad60-3fe13781a193": [
+          "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
+        ]
       },
       "dismissedWarnings": { "form": {}, "timeline": {} },
       "ingredients": {
@@ -147,6 +151,7 @@
         "f9a294f1-f42b-4cae-893a-592405349d56": {
           "pipette": "2e7c6344-58ab-465c-b542-489883cb63fe",
           "volume": "100",
+          "tipRack": "23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1",
           "changeTip": "always",
           "path": "single",
           "aspirate_wells_grouped": false,
@@ -216,6 +221,7 @@
           "mix_touchTip_mmFromBottom": null,
           "dropTip_location": "4824b094-5999-4549-9e6b-7098a9b30a8b:trashBin",
           "nozzles": null,
+          "tipRack": "23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1",
           "id": "5fdb9a12-fab4-42fd-886f-40af107b15d6",
           "stepType": "mix",
           "stepName": "mix",
