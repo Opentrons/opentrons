@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest'
 import fixture_trash from '../../labware/fixtures/2/fixture_trash.json'
 import fixture_96_plate from '../../labware/fixtures/2/fixture_96_plate.json'
 import fixture_384_plate from '../../labware/fixtures/2/fixture_384_plate.json'
