@@ -23,6 +23,7 @@ import {
   TEMPERATURE_DEACTIVATED,
   FIXED_TRASH_ID,
 } from '../constants'
+import { makeInitialRobotState } from '../utils'
 import {
   DEFAULT_PIPETTE,
   MULTI_PIPETTE,
@@ -30,9 +31,8 @@ import {
   SOURCE_LABWARE,
   DEST_LABWARE,
   TROUGH_LABWARE,
-} from './commandFixtures'
-import { makeInitialRobotState } from '../utils'
-import { tiprackWellNamesFlat } from './data'
+  tiprackWellNamesFlat,
+} from './data'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntities } from '../types'
 import type {
