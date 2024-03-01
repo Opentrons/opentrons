@@ -24,7 +24,7 @@ class ModuleCall:
 # Name and kwargs for a module function
 @dataclass(frozen=True)
 class ModuleItem:
-    id: str
+    serial_number: str
     items: List[ModuleCall] = field(default_factory=list)
 
 
