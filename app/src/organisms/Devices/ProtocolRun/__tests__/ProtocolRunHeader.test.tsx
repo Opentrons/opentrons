@@ -97,10 +97,9 @@ import { useNotifyRunQuery } from '../../../../resources/runs/useNotifyRunQuery'
 
 import type { UseQueryResult } from 'react-query'
 import type * as ReactRouterDom from 'react-router-dom'
-import type { Run } from '@opentrons/api-client'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type * as OpentronsSharedData from '@opentrons/shared-data'
 import type * as OpentronsComponents from '@opentrons/components'
+import type * as OpentronsApiClient from '@opentrons/api-client'
 
 const mockPush = vi.fn()
 
@@ -124,8 +123,6 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsSharedData>()
   return {
     ...actual,
-    getAllPipetteNames: vi.fn(),
-    getPipetteNameSpecs: vi.fn(),
     getPipetteModelSpecs: vi.fn(),
   }
 })
@@ -166,7 +163,7 @@ const mockSettings = {
 }
 const MOCK_ROTOCOL_LIQUID_KEY = { liquids: [] }
 
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as CompletedProtocolAnalysis
+const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as OpentronsSharedData.CompletedProtocolAnalysis
 
 const PROTOCOL_DETAILS = {
   displayName: PROTOCOL_NAME,
@@ -301,7 +298,7 @@ describe('ProtocolRunHeader', () => {
       .calledWith(RUN_ID, { staleTime: Infinity })
       .thenReturn({
         data: { data: mockIdleUnstartedRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useProtocolDetailsForRun))
       .calledWith(RUN_ID)
       .thenReturn(PROTOCOL_DETAILS)
@@ -343,8 +340,8 @@ describe('ProtocolRunHeader', () => {
         ...MOCK_ROTOCOL_LIQUID_KEY,
       } as any)
     vi.mocked(useDeckConfigurationCompatibility).mockReturnValue([])
-    when(vi.mocked(getIsFixtureMismatch)).thenReturn(false)
-    when(vi.mocked(useMostRecentRunId)).thenReturn(RUN_ID)
+    vi.mocked(getIsFixtureMismatch).mockReturnValue(false)
+    vi.mocked(useMostRecentRunId).mockReturnValue(RUN_ID)
   })
 
   afterEach(() => {
@@ -431,7 +428,7 @@ describe('ProtocolRunHeader', () => {
       .calledWith(RUN_ID)
       .thenReturn({
         data: { data: { ...mockIdleUnstartedRun, current: true } },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     render()
     expect(mockCloseCurrentRun).toBeCalled()
     expect(mockTrackProtocolRunEvent).toBeCalled()
@@ -505,7 +502,7 @@ describe('ProtocolRunHeader', () => {
       .calledWith(RUN_ID)
       .thenReturn({
         data: { data: mockRunningRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
       .thenReturn(RUN_STATUS_RUNNING)
@@ -526,7 +523,7 @@ describe('ProtocolRunHeader', () => {
       .calledWith(RUN_ID)
       .thenReturn({
         data: { data: mockRunningRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
       .thenReturn(RUN_STATUS_RUNNING)
@@ -543,7 +540,7 @@ describe('ProtocolRunHeader', () => {
       .calledWith(RUN_ID)
       .thenReturn({
         data: { data: mockPausedRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
       .thenReturn(RUN_STATUS_PAUSED)
@@ -565,7 +562,7 @@ describe('ProtocolRunHeader', () => {
       .calledWith(RUN_ID)
       .thenReturn({
         data: { data: mockPauseRequestedRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
       .thenReturn(RUN_STATUS_PAUSE_REQUESTED)
@@ -583,7 +580,7 @@ describe('ProtocolRunHeader', () => {
       .calledWith(RUN_ID)
       .thenReturn({
         data: { data: mockStopRequestedRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
       .thenReturn(RUN_STATUS_STOP_REQUESTED)
@@ -600,7 +597,7 @@ describe('ProtocolRunHeader', () => {
       .calledWith(RUN_ID)
       .thenReturn({
         data: { data: mockRunningRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
       .thenReturn(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
@@ -622,7 +619,7 @@ describe('ProtocolRunHeader', () => {
       .calledWith(RUN_ID)
       .thenReturn({
         data: { data: mockStoppedRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
       .thenReturn(RUN_STATUS_STOPPED)
@@ -649,7 +646,7 @@ describe('ProtocolRunHeader', () => {
       .calledWith(RUN_ID)
       .thenReturn({
         data: { data: mockFailedRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
       .thenReturn(RUN_STATUS_FAILED)
@@ -676,7 +673,7 @@ describe('ProtocolRunHeader', () => {
       .calledWith(RUN_ID)
       .thenReturn({
         data: { data: mockSucceededRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
       .thenReturn(RUN_STATUS_SUCCEEDED)
@@ -707,7 +704,7 @@ describe('ProtocolRunHeader', () => {
       .calledWith(RUN_ID)
       .thenReturn({
         data: { data: mockSucceededRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
       .thenReturn(RUN_STATUS_SUCCEEDED)
@@ -742,7 +739,7 @@ describe('ProtocolRunHeader', () => {
       .calledWith(RUN_ID)
       .thenReturn({
         data: { data: mockFailedRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
       .thenReturn(RUN_STATUS_FAILED)
@@ -758,7 +755,7 @@ describe('ProtocolRunHeader', () => {
       .calledWith(RUN_ID)
       .thenReturn({
         data: { data: mockFailedRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
       .thenReturn(RUN_STATUS_FAILED)
@@ -794,7 +791,7 @@ describe('ProtocolRunHeader', () => {
       .calledWith(RUN_ID)
       .thenReturn({
         data: { data: mockSucceededRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
       .thenReturn(RUN_STATUS_SUCCEEDED)
@@ -908,7 +905,7 @@ describe('ProtocolRunHeader', () => {
       .calledWith(RUN_ID)
       .thenReturn({
         data: { data: mockSucceededRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
       .thenReturn(RUN_STATUS_SUCCEEDED)
@@ -965,7 +962,7 @@ describe('ProtocolRunHeader', () => {
             status: RUN_STATUS_SUCCEEDED,
           },
         },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
       .thenReturn(RUN_STATUS_SUCCEEDED)
@@ -987,7 +984,7 @@ describe('ProtocolRunHeader', () => {
             status: RUN_STATUS_IDLE,
           },
         },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus)).calledWith(RUN_ID).thenReturn(RUN_STATUS_IDLE)
 
     render()
