@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { createRunAction, RUN_ACTION_TYPE_PLAY } from '@opentrons/api-client'
@@ -14,13 +14,8 @@ import {
 import type { HostConfig, Response, RunAction } from '@opentrons/api-client'
 import type { UsePlayMaintenanceRunMutationOptions } from '../usePlayMaintenanceRunMutation'
 
-jest.mock('@opentrons/api-client')
-jest.mock('../../api/useHost')
-
-const mockCreateRunAction = createRunAction as jest.MockedFunction<
-  typeof createRunAction
->
-const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
+vi.mock('@opentrons/api-client')
+vi.mock('../../api/useHost')
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
@@ -39,15 +34,10 @@ describe('usePlayMaintenanceRunMutation hook', () => {
     )
     wrapper = clientProvider
   })
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
 
   it('should return no data when calling playRun if the request fails', async () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockCreateRunAction)
-      .calledWith(HOST_CONFIG, MAINTENANCE_RUN_ID, createPlayRunActionData)
-      .mockRejectedValue('oh no')
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(createRunAction).mockRejectedValue('oh no')
 
     const { result } = renderHook(usePlayMaintenanceRunMutation, {
       wrapper,
@@ -61,12 +51,10 @@ describe('usePlayMaintenanceRunMutation hook', () => {
   })
 
   it('should create a play run action when calling the playRun callback', async () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockCreateRunAction)
-      .calledWith(HOST_CONFIG, MAINTENANCE_RUN_ID, createPlayRunActionData)
-      .mockResolvedValue({
-        data: mockPlayMaintenanceRunAction,
-      } as Response<RunAction>)
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(createRunAction).mockResolvedValue({
+      data: mockPlayMaintenanceRunAction,
+    } as Response<RunAction>)
 
     const { result } = renderHook(usePlayMaintenanceRunMutation, {
       wrapper,

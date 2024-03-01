@@ -1,21 +1,19 @@
 // tests for the useLights hooks
 import * as React from 'react'
-import { when } from 'jest-when'
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
+
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook, waitFor } from '@testing-library/react'
 
-import { getLights as mockGetLights } from '@opentrons/api-client'
-import { useHost as mockUseHost } from '../../api'
+import { getLights } from '@opentrons/api-client'
+import { useHost } from '../../api'
 import { useLightsQuery } from '..'
 
 import type { HostConfig, Response, Lights } from '@opentrons/api-client'
 import type { UseLightsQueryOptions } from '../useLightsQuery'
 
-jest.mock('@opentrons/api-client')
-jest.mock('../../api/useHost')
-
-const getLights = mockGetLights as jest.MockedFunction<typeof mockGetLights>
-const useHost = mockUseHost as jest.MockedFunction<typeof mockUseHost>
+vi.mock('@opentrons/api-client')
+vi.mock('../../api/useHost')
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const LIGHTS_RESPONSE: Lights = { on: true } as Lights
@@ -37,11 +35,11 @@ describe('useLights hook', () => {
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('should return no data if no host', () => {
-    when(useHost).calledWith().mockReturnValue(null)
+    vi.mocked(useHost).mockReturnValue(null)
 
     const { result } = renderHook(() => useLightsQuery(), { wrapper })
 
@@ -49,8 +47,8 @@ describe('useLights hook', () => {
   })
 
   it('should return no data if lights request fails', () => {
-    when(useHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(getLights).calledWith(HOST_CONFIG).mockRejectedValue('oh no')
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(getLights).mockRejectedValue('oh no')
 
     const { result } = renderHook(() => useLightsQuery(), { wrapper })
 
@@ -58,10 +56,10 @@ describe('useLights hook', () => {
   })
 
   it('should return lights response data', async () => {
-    when(useHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(getLights)
-      .calledWith(HOST_CONFIG)
-      .mockResolvedValue({ data: LIGHTS_RESPONSE } as Response<Lights>)
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(getLights).mockResolvedValue({
+      data: LIGHTS_RESPONSE,
+    } as Response<Lights>)
 
     const { result } = renderHook(() => useLightsQuery(), { wrapper })
 

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { when } from 'jest-when'
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook, waitFor } from '@testing-library/react'
 
@@ -10,13 +10,8 @@ import { useEstopQuery } from '..'
 import type { HostConfig, Response, EstopStatus } from '@opentrons/api-client'
 import type { UseEstopQueryOptions } from '../useEstopQuery'
 
-jest.mock('@opentrons/api-client')
-jest.mock('../../api/useHost')
-
-const mockGetEstopStatus = getEstopStatus as jest.MockedFunction<
-  typeof getEstopStatus
->
-const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
+vi.mock('@opentrons/api-client')
+vi.mock('../../api/useHost')
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const ESTOP_STATE_RESPONSE: EstopStatus = {
@@ -44,11 +39,11 @@ describe('useEstopQuery hook', () => {
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('should return no data if no host', () => {
-    when(mockUseHost).calledWith().mockReturnValue(null)
+    vi.mocked(useHost).mockReturnValue(null)
 
     const { result } = renderHook(() => useEstopQuery(), { wrapper })
 
@@ -56,8 +51,8 @@ describe('useEstopQuery hook', () => {
   })
 
   it('should return no data if estop request fails', () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetEstopStatus).calledWith(HOST_CONFIG).mockRejectedValue('oh no')
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(getEstopStatus).mockRejectedValue('oh no')
 
     const { result } = renderHook(() => useEstopQuery(), { wrapper })
 
@@ -65,12 +60,10 @@ describe('useEstopQuery hook', () => {
   })
 
   it('should return estop state response data', async () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetEstopStatus)
-      .calledWith(HOST_CONFIG)
-      .mockResolvedValue({
-        data: ESTOP_STATE_RESPONSE,
-      } as Response<EstopStatus>)
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(getEstopStatus).mockResolvedValue({
+      data: ESTOP_STATE_RESPONSE,
+    } as Response<EstopStatus>)
 
     const { result } = renderHook(() => useEstopQuery(), { wrapper })
 

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider, UseQueryOptions } from 'react-query'
 import { renderHook, waitFor } from '@testing-library/react'
 import { getSessions } from '@opentrons/api-client'
@@ -8,11 +8,8 @@ import { useAllSessionsQuery } from '..'
 
 import type { HostConfig, Response, Sessions } from '@opentrons/api-client'
 
-jest.mock('@opentrons/api-client')
-jest.mock('../../api/useHost')
-
-const mockGetSessions = getSessions as jest.MockedFunction<typeof getSessions>
-const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
+vi.mock('@opentrons/api-client')
+vi.mock('../../api/useHost')
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const SESSIONS_RESPONSE = {
@@ -37,12 +34,9 @@ describe('useAllSessionsQuery hook', () => {
 
     wrapper = clientProvider
   })
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
 
   it('should return no data if no host', () => {
-    when(mockUseHost).calledWith().mockReturnValue(null)
+    vi.mocked(useHost).mockReturnValue(null)
 
     const { result } = renderHook(useAllSessionsQuery, { wrapper })
 
@@ -50,18 +44,17 @@ describe('useAllSessionsQuery hook', () => {
   })
 
   it('should return no data if the get sessions request fails', () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetSessions).calledWith(HOST_CONFIG).mockRejectedValue('oh no')
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(getSessions).mockRejectedValue('oh no')
 
     const { result } = renderHook(useAllSessionsQuery, { wrapper })
     expect(result.current.data).toBeUndefined()
   })
 
   it('should return all current robot sessions', async () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetSessions)
-      .calledWith(HOST_CONFIG)
-      .mockResolvedValue({ data: SESSIONS_RESPONSE } as Response<Sessions>)
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(getSessions)
+    .mockResolvedValue({ data: SESSIONS_RESPONSE } as Response<Sessions>)
 
     const { result } = renderHook(useAllSessionsQuery, { wrapper })
 
