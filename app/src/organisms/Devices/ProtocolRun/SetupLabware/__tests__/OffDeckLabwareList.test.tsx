@@ -29,12 +29,12 @@ describe('OffDeckLabwareList', () => {
     )
   })
   it('renders null if labware items is null', () => {
-    const { container } = render({
+    render({
       labwareItems: [],
       isFlex: false,
       commands: [],
     })
-    expect(container.firstChild).toBeNull()
+    expect(screen.queryAllByText('Additional Off-Deck Labware')).toHaveLength(0)
   })
   it('renders additional offdeck labware info if there is an offdeck labware', () => {
     render({

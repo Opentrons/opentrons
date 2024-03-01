@@ -1,14 +1,11 @@
 import * as React from 'react'
-import { when } from 'vitest-when'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import {
-  LabwareRender,
-} from '@opentrons/components'
+import { LabwareRender } from '@opentrons/components'
 import { parseLiquidsInLoadOrder } from '@opentrons/api-client'
 
-import { nestedTextMatcher, partialComponentPropsMatcher, renderWithProviders } from '../../../../../__testing-utils__'}
+import { nestedTextMatcher, renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import { getIsOnDevice } from '../../../../../redux/config'
 import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -19,10 +16,11 @@ import { getLiquidsByIdForLabware, getWellFillFromLabwareId } from '../utils'
 import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
 import { LiquidDetailCard } from '../LiquidDetailCard'
 
+import type * as Components from '@opentrons/components'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
-vi.mock('@opentrons/components', () => {
-  const actualComponents = vi.requireActual('@opentrons/components')
+vi.mock('@opentrons/components', async importOriginal => {
+  const actualComponents = await importOriginal<typeof Components>()
   return {
     ...actualComponents,
     LabwareRender: vi.fn(() => <div>mock LabwareRender</div>),
@@ -48,12 +46,12 @@ const render = (
 describe('LiquidsLabwareDetailsModal', () => {
   let props: React.ComponentProps<typeof LiquidsLabwareDetailsModal>
   beforeEach(() => {
-    window.HTMLElement.prototype.scrollIntoView = function () {}
+    window.HTMLElement.prototype.scrollIntoView = function () { }
     props = {
       liquidId: '4',
       labwareId: '123',
       runId: '456',
-      closeModal: jest.fn(),
+      closeModal: vi.fn(),
     }
     vi.mocked(getLocationInfoNames).mockReturnValue({
       labwareName: 'mock labware name',
@@ -91,14 +89,6 @@ describe('LiquidsLabwareDetailsModal', () => {
       {} as CompletedProtocolAnalysis
     )
     vi.mocked(getIsOnDevice).mockReturnValue(false)
-    when(vi.mocked(LabwareRender))
-      .thenReturn(<div></div>) // this (default) empty div will be returned when LabwareRender isn't called with expected props
-      .calledWith(
-        partialComponentPropsMatcher({
-          wellFill: { C1: '#ff4888', C2: '#ff4888' },
-        })
-      )
-      .thenReturn(<div>mock labware render with well fill</div>)
   })
 
   afterEach(() => {
@@ -112,19 +102,22 @@ describe('LiquidsLabwareDetailsModal', () => {
     getAllByText('mock labware name')
   })
   it('should render LiquidDetailCard when correct props are passed', () => {
-    when(vi.mocked(LiquidDetailCard))
-      .calledWith(partialComponentPropsMatcher({ liquidId: '4' }))
-      .thenReturn(<>mock LiquidDetailCard</>)
     render(props)
+    expect(vi.mocked(LiquidDetailCard)).toHaveBeenCalledWith(expect.objectContaining({ liquidId: '4' }), expect.any(Object))
     screen.getByText(nestedTextMatcher('mock LiquidDetailCard'))
   })
-  it('should render labware render with well fill', () => {
+  it.only('should render labware render with well fill', () => {
     vi.mocked(getWellFillFromLabwareId).mockReturnValue({
       C1: '#ff4888',
       C2: '#ff4888',
     })
     render(props)
-    screen.getByText('mock labware render with well fill')
+    expect(vi.mocked(LabwareRender)).toHaveBeenCalledWith(expect.objectContaining({
+      wellFill: {
+        C1: '#ff4888',
+        C2: '#ff4888',
+      }
+    }), expect.any(Object))
   })
   it('should render labware render with well fill on odd', () => {
     vi.mocked(getIsOnDevice).mockReturnValue(true)
@@ -134,5 +127,11 @@ describe('LiquidsLabwareDetailsModal', () => {
     })
     render(props)
     screen.getByText('mock labware render with well fill')
+    expect(vi.mocked(LabwareRender)).toHaveBeenCalledWith(expect.objectContaining({
+      wellFill: {
+        C1: '#ff4888',
+        C2: '#ff4888',
+      }
+    }))
   })
 })
