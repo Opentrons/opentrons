@@ -33,7 +33,7 @@ If you don't care about preserving your labware offsets and run history, you can
 
 ### Known Issues
 
-- Downgrading an OT-2 to an earlier software version will delete tip length calibrations created with version 7.2.0. If you need to downgrade, re-run all calibrations afterward.
+- Downgrading an OT-2 to an earlier software version will delete tip length calibrations created with version 7.2.0. If you need to downgrade, re-run all pipette calibrations afterward.
 
 ---
 
