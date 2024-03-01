@@ -101,7 +101,6 @@ if __name__=="__main__":
         try:
             print("TURN ON FAN")
             input("PRESS ENTER TO CONTINUE")
-            pause()
             instrument.initialize_connection()
             instrument.clear_data()
             instrument.set_number_of_samples(options.samples)

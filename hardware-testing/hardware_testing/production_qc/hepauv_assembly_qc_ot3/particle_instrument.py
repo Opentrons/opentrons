@@ -246,7 +246,18 @@ if __name__ == '__main__':
     PARTICLE_COUNTER.clear_data()
     PARTICLE_COUNTER.set_number_of_samples(6)
     PARTICLE_COUNTER.start_sampling()
-    time.sleep(185)
+    operation = True
+    while operation:
+        stats = PARTICLE_COUNTER.operation_status()
+        time.sleep(1) #Refresh Stats every 1 Second
+        if stats == "Stop":
+            operation = False
+        elif stats == "Running":
+            print(stats, end='')
+            print('\r', end='')
+        elif stats == "Hold":
+            print(stats, end='')
+            print('\r', end='')
     header, data = PARTICLE_COUNTER.available_records()
     print(header)
     print(data)
