@@ -124,9 +124,7 @@ class TipStore(HasState[TipState], HandlesActions):
             pipette_id = command.params.pipetteId
             self._state.length_by_pipette_id.pop(pipette_id, None)
 
-    def _set_used_tips(  # noqa: C901
-        self, pipette_id: str, well_name: str, labware_id: str
-    ) -> None:
+    def _set_used_tips(self, pipette_id: str, well_name: str, labware_id: str) -> None:
         columns = self._state.column_by_labware_id.get(labware_id, [])
         wells = self._state.tips_by_labware_id.get(labware_id, {})
         nozzle_map = self._state.nozzle_map_by_pipette_id[pipette_id]
@@ -232,163 +230,108 @@ class TipView(HasState[TipState]):
                         f"Tiprack {labware_id} has no valid tip selection for current Nozzle Configuration."
                     )
 
+        # Search through the tiprack beginning at A1
+        def _cluster_search_A1() -> Optional[str]:
+            critical_column = num_nozzle_cols - 1
+            critical_row = num_nozzle_rows - 1
+
+            while critical_column <= len(columns):
+                tip_cluster = _identify_tip_cluster(critical_column, critical_row)
+                result = _validate_tip_cluster(tip_cluster)
+                if isinstance(result, str):
+                    # The result is the critical tip to target
+                    return result
+                elif result is None:
+                    if critical_row + num_nozzle_rows < len(columns[0]):
+                        critical_row = critical_row + num_nozzle_rows
+                    else:
+                        critical_column = critical_column + 1
+                        critical_row = num_nozzle_rows - 1
+            return None
+
+        # Search through the tiprack beginning at A12
+        def _cluster_search_A12() -> Optional[str]:
+            critical_column = len(columns) - num_nozzle_cols
+            critical_row = num_nozzle_rows - 1
+
+            while critical_column >= 0:
+                tip_cluster = _identify_tip_cluster(critical_column, critical_row)
+                result = _validate_tip_cluster(tip_cluster)
+                if isinstance(result, str):
+                    # The result is the critical tip to target
+                    return result
+                elif result is None:
+                    if critical_row + num_nozzle_rows < len(columns[0]):
+                        critical_row = critical_row + num_nozzle_rows
+                    else:
+                        critical_column = critical_column - 1
+                        critical_row = num_nozzle_rows - 1
+            return None
+
+        # Search through the tiprack beginning at H1
+        def _cluster_search_H1() -> Optional[str]:
+            critical_column = num_nozzle_cols - 1
+            critical_row = len(columns[critical_column]) - num_nozzle_rows
+
+            while critical_column <= len(columns):  # change to max size of labware
+                tip_cluster = _identify_tip_cluster(critical_column, critical_row)
+                result = _validate_tip_cluster(tip_cluster)
+                if isinstance(result, str):
+                    # The result is the critical tip to target
+                    return result
+                elif result is None:
+                    if critical_row - num_nozzle_rows > 0:
+                        critical_row = critical_row - num_nozzle_rows
+                    else:
+                        critical_column = critical_column + 1
+                        critical_row = len(columns[critical_column]) - num_nozzle_rows
+            return None
+
+        # Search through the tiprack beginning at H12
+        def _cluster_search_H12() -> Optional[str]:
+            critical_column = len(columns) - num_nozzle_cols
+            critical_row = len(columns[critical_column]) - num_nozzle_rows
+
+            while critical_column >= 0:
+                tip_cluster = _identify_tip_cluster(critical_column, critical_row)
+                result = _validate_tip_cluster(tip_cluster)
+                if isinstance(result, str):
+                    # The result is the critical tip to target
+                    return result
+                elif result is None:
+                    # Move on to the row above or column to the left
+                    if critical_row - num_nozzle_rows > 0:
+                        critical_row = critical_row - num_nozzle_rows
+                    else:
+                        critical_column = critical_column - 1
+                        critical_row = len(columns[critical_column]) - num_nozzle_rows
+            return None
+
         if starting_tip_name is None:
             if self.get_pipette_channels(pipette_id) == 1:
                 # for a single channel pipette, always begin at A1 on the tiprack
-                critical_column = num_nozzle_cols - 1
-                critical_row = num_nozzle_rows - 1
-
-                while critical_column <= len(columns):
-                    tip_cluster = _identify_tip_cluster(critical_column, critical_row)
-                    result = _validate_tip_cluster(tip_cluster)
-                    if isinstance(result, str):
-                        # The result is the critical tip to target
-                        return result
-                    elif result is None:
-                        if critical_row + num_nozzle_rows < len(columns[0]):
-                            critical_row = critical_row + num_nozzle_rows
-                        else:
-                            critical_column = critical_column + 1
-                            critical_row = num_nozzle_rows - 1
-                return None
+                return _cluster_search_A1()
             elif self.get_pipette_channels(pipette_id) == 8:
                 # perform 8 channel logic beginning from either H1 or A1 of the tiprack
                 if nozzle_map.starting_nozzle == "A1":
                     # Define the critical well by the position of the well relative to Tip Rack entry point H1
-                    critical_column = num_nozzle_cols - 1
-                    critical_row = len(columns[critical_column]) - num_nozzle_rows
-
-                    while critical_column <= len(
-                        columns
-                    ):  # change to max size of labware
-                        tip_cluster = _identify_tip_cluster(
-                            critical_column, critical_row
-                        )
-                        result = _validate_tip_cluster(tip_cluster)
-                        if isinstance(result, str):
-                            # The result is the critical tip to target
-                            return result
-                        elif result is None:
-                            if critical_row - num_nozzle_rows > 0:
-                                critical_row = critical_row - num_nozzle_rows
-                            else:
-                                critical_column = critical_column + 1
-                                critical_row = (
-                                    len(columns[critical_column]) - num_nozzle_rows
-                                )
-                    return None
+                    return _cluster_search_H1()
                 elif nozzle_map.starting_nozzle == "H1":
                     # Define the critical well by the position of the well relative to Tip Rack entry point A1
-                    critical_column = num_nozzle_cols - 1
-                    critical_row = num_nozzle_rows - 1
-
-                    while critical_column <= len(columns):
-                        tip_cluster = _identify_tip_cluster(
-                            critical_column, critical_row
-                        )
-                        result = _validate_tip_cluster(tip_cluster)
-                        if isinstance(result, str):
-                            # The result is the critical tip to target
-                            return result
-                        elif result is None:
-                            if critical_row + num_nozzle_rows < len(columns[0]):
-                                critical_row = critical_row + num_nozzle_rows
-                            else:
-                                critical_column = critical_column + 1
-                                critical_row = num_nozzle_rows - 1
-                    return None
+                    return _cluster_search_A1()
             elif self.get_pipette_channels(pipette_id) == 96:
                 if nozzle_map.starting_nozzle == "A1":
                     # Define the critical well by the position of the well relative to Tip Rack entry point H12
-                    critical_column = len(columns) - num_nozzle_cols
-                    critical_row = len(columns[critical_column]) - num_nozzle_rows
-
-                    while critical_column >= 0:
-                        tip_cluster = _identify_tip_cluster(
-                            critical_column, critical_row
-                        )
-                        result = _validate_tip_cluster(tip_cluster)
-                        if isinstance(result, str):
-                            # The result is the critical tip to target
-                            return result
-                        elif result is None:
-                            # Move on to the row above or column to the left
-                            if critical_row - num_nozzle_rows > 0:
-                                critical_row = critical_row - num_nozzle_rows
-                            else:
-                                critical_column = critical_column - 1
-                                critical_row = (
-                                    len(columns[critical_column]) - num_nozzle_rows
-                                )
-                    return None
-
+                    return _cluster_search_H12()
                 elif nozzle_map.starting_nozzle == "A12":
                     # Define the critical well by the position of the well relative to Tip Rack entry point H1
-                    critical_column = num_nozzle_cols - 1
-                    critical_row = len(columns[critical_column]) - num_nozzle_rows
-
-                    while critical_column <= len(
-                        columns
-                    ):  # change to max size of labware
-                        tip_cluster = _identify_tip_cluster(
-                            critical_column, critical_row
-                        )
-                        result = _validate_tip_cluster(tip_cluster)
-                        if isinstance(result, str):
-                            # The result is the critical tip to target
-                            return result
-                        elif result is None:
-                            if critical_row - num_nozzle_rows > 0:
-                                critical_row = critical_row - num_nozzle_rows
-                            else:
-                                critical_column = critical_column + 1
-                                critical_row = (
-                                    len(columns[critical_column]) - num_nozzle_rows
-                                )
-                    return None
-
+                    return _cluster_search_H1()
                 elif nozzle_map.starting_nozzle == "H1":
                     # Define the critical well by the position of the well relative to Tip Rack entry point A12
-                    critical_column = len(columns) - num_nozzle_cols
-                    critical_row = num_nozzle_rows - 1
-
-                    while critical_column >= 0:
-                        tip_cluster = _identify_tip_cluster(
-                            critical_column, critical_row
-                        )
-                        result = _validate_tip_cluster(tip_cluster)
-                        if isinstance(result, str):
-                            # The result is the critical tip to target
-                            return result
-                        elif result is None:
-                            if critical_row + num_nozzle_rows < len(columns[0]):
-                                critical_row = critical_row + num_nozzle_rows
-                            else:
-                                critical_column = critical_column - 1
-                                critical_row = num_nozzle_rows - 1
-                    return None
-
+                    return _cluster_search_A12()
                 elif nozzle_map.starting_nozzle == "H12":
                     # Define the critical well by the position of the well relative to Tip Rack entry point A1
-                    critical_column = num_nozzle_cols - 1
-                    critical_row = num_nozzle_rows - 1
-
-                    while critical_column <= len(columns):
-                        tip_cluster = _identify_tip_cluster(
-                            critical_column, critical_row
-                        )
-                        result = _validate_tip_cluster(tip_cluster)
-                        if isinstance(result, str):
-                            # The result is the critical tip to target
-                            return result
-                        elif result is None:
-                            if critical_row + num_nozzle_rows < len(columns[0]):
-                                critical_row = critical_row + num_nozzle_rows
-                            else:
-                                critical_column = critical_column + 1
-                                critical_row = num_nozzle_rows - 1
-                    return None
-
+                    return _cluster_search_A1()
                 else:
                     raise ValueError(
                         f"Nozzle {nozzle_map.starting_nozzle} is an invalid starting tip for automatic tip pickup."
@@ -398,7 +341,6 @@ class TipView(HasState[TipState]):
                     f"Ivnalid Pipette-ID: {pipette_id} during automatic tip tracking."
                 )
         else:
-            # If we have a starting tip, perform the old logic for now
             # TODO (cb, 2-28-2024): The starting tip handler logic should instead be consolidated into the new automatic tip tracking code above
             if columns and num_tips == len(columns[0]):  # Get next tips for 8-channel
                 column_head = [column[0] for column in columns]

@@ -872,7 +872,12 @@ class InstrumentContext(publisher.CommandPublisher):
         )
 
         if location is None:
-            if not self._core.is_tip_tracking_available():
+            # TODO (cb, 02-29-2024): Remove the 96 channel specific gating here once starting tip is supported in tip-cluster based automatic tip tracking
+            if not self._core.is_tip_tracking_available() or (
+                self.starting_tip is not None
+                and self._core.get_channels() == 96
+                and (self._core.get_active_channels() not in [96, 8])
+            ):
                 raise CommandPreconditionViolated(
                     "Automatic tip tracking is not available for the current pipette"
                     " nozzle configuration. We suggest switching to a configuration"
