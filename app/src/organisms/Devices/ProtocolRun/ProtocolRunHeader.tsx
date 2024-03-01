@@ -641,12 +641,12 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       runStatus != null &&
       CANCELLABLE_STATUSES.includes(runStatus))
   const robot = useRobot(robotName)
-  const serialNumber =
+  const robotSerialNumber =
     robot?.status != null ? getRobotSerialNumber(robot) : null ?? ''
   const handleProceedToRunClick = (): void => {
     trackEvent({
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-      properties: { serialNumber },
+      properties: { robotSerialNumber },
     })
     play()
   }
@@ -743,7 +743,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       reset()
       trackEvent({
         name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-        properties: { sourceLocation: 'RunRecordDetail', serialNumber },
+        properties: { sourceLocation: 'RunRecordDetail', robotSerialNumber },
       })
       trackProtocolRunEvent({
         name: ANALYTICS_PROTOCOL_RUN_AGAIN,

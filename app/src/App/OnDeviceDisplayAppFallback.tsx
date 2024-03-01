@@ -31,12 +31,12 @@ export function OnDeviceDisplayAppFallback({
   const trackEvent = useTrackEvent()
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
-  const serialNumber =
+  const robotSerialNumber =
     localRobot?.status != null ? getRobotSerialNumber(localRobot) : null
   const handleRestartClick = (): void => {
     trackEvent({
       name: ANALYTICS_ODD_APP_ERROR,
-      properties: { errorMessage: error.message, serialNumber },
+      properties: { errorMessage: error.message, robotSerialNumber },
     })
     dispatch(appRestart(error.message))
   }

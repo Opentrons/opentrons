@@ -745,7 +745,7 @@ export type SetupScreens =
 export function ProtocolSetup(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
   const localRobot = useSelector(getLocalRobot)
-  const serialNumber =
+  const robotSerialNumber =
     localRobot?.status != null ? getRobotSerialNumber(localRobot) : null
   const trackEvent = useTrackEvent()
   const { play } = useRunControls(runId)
@@ -753,7 +753,7 @@ export function ProtocolSetup(): JSX.Element {
   const handleProceedToRunClick = (): void => {
     trackEvent({
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-      properties: { serialNumber },
+      properties: { robotSerialNumber },
     })
     play()
   }

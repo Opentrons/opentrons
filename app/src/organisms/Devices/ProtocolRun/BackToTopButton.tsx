@@ -26,7 +26,7 @@ export function BackToTopButton({
   const { t } = useTranslation('protocol_setup')
   const trackEvent = useTrackEvent()
   const robot = useRobot(robotName)
-  const serialNumber =
+  const robotSerialNumber =
     robot?.status != null ? getRobotSerialNumber(robot) : null ?? ''
   return (
     <Link
@@ -34,7 +34,7 @@ export function BackToTopButton({
       onClick={() => {
         trackEvent({
           name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-          properties: { sourceLocation, serialNumber },
+          properties: { sourceLocation, robotSerialNumber },
         })
         protocolRunHeaderRef?.current?.scrollIntoView({
           behavior: 'smooth',
