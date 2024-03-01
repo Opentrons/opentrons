@@ -256,7 +256,7 @@ circular-dependencies-js:
 
 .PHONY: test-js-internal
 test-js-internal:
-	yarn jest $(tests) $(test_opts) $(cov_opts)
+	yarn vitest $(tests) $(test_opts) $(cov_opts)
 
 .PHONY: test-js-%
 test-js-%: 
