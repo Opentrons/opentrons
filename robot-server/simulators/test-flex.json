@@ -14,6 +14,8 @@
   "attached_modules": {
     "thermocycler": [
       {
+        "serial_number": "123",
+        "items": [{
         "function_name": "set_temperature",
         "kwargs": {
           "temperature": 3,
@@ -28,10 +30,14 @@
         "kwargs": {
           "temperature": 4
         }
+      }]
       }
     ],
     "heatershaker": [],
     "tempdeck": [
+      {
+        "serial_number": "temp-123",
+        "items": [
       {
         "function_name": "start_set_temperature",
         "kwargs": {
@@ -44,14 +50,35 @@
           "awaiting_temperature": null
         }
       }
+          ]},
+            {
+        "serial_number": "temp-1234",
+        "items": [
+      {
+        "function_name": "start_set_temperature",
+        "kwargs": {
+          "celsius": 3
+        }
+      },
+      {
+        "function_name": "await_temperature",
+        "kwargs": {
+          "awaiting_temperature": null
+        }
+      }
+          ]}
     ],
     "magdeck": [
+      {
+        "serial_number": "temp-123",
+        "items": [
       {
         "function_name": "engage",
         "kwargs": {
           "height": 4
         }
       }
+          ]}
     ]
   }
 }
