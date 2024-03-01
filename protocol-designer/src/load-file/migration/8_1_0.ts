@@ -51,7 +51,7 @@ export const migrateFile = (
   const savedStepForms = designerApplication.data
     ?.savedStepForms as DesignerApplicationData['savedStepForms']
   const pipettingSavedSteps = Object.values(savedStepForms).filter(
-    form => form.stepName === 'transfer' || form.stepName === 'mix'
+    form => form.stepType === 'moveLiquid' || form.stepType === 'mix'
   )
 
   const pipettingSavedStepsWithTipRack = pipettingSavedSteps.reduce(
@@ -68,8 +68,6 @@ export const migrateFile = (
         .filter(command => command.params.loadName === tiprackLoadname)
         .map(command => command.params.labwareId as string)
 
-      //  TODO, figure out how to assign tipracks to each step when multiple tipracks
-      //  of the same URI are involved
       acc[item.id] = { ...item, tipRack: tiprackIds[0] }
       return acc
     },
