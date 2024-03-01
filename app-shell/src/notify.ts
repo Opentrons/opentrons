@@ -7,6 +7,8 @@ import type { BrowserWindow } from 'electron'
 import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
 import type { Action, Dispatch } from './types'
 
+// TODO(jh, 2024-03-01): after refactoring notify connectivity and subscription logic, uncomment logs.
+
 // Manages MQTT broker connections via a connection store, establishing a connection to the broker only if a connection does not
 // already exist, and disconnects from the broker when the app is not subscribed to any topics for the given broker.
 // A redundant connection to the same broker results in the older connection forcibly closing, which we want to avoid.
@@ -131,7 +133,7 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
     }
 
     return checkIfClientConnected().catch(() => {
-      log.warn(`Failed to subscribe on ${hostname} to topic: ${topic}`)
+      // log.warn(`Failed to subscribe on ${hostname} to topic: ${topic}`)
       sendToBrowserDeserialized({
         browserWindow,
         hostname,
@@ -144,7 +146,7 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
 
   function subscribeCb(error: Error, result: mqtt.ISubscriptionGrant[]): void {
     if (error != null) {
-      log.warn(`Failed to subscribe on ${hostname} to topic: ${topic}`)
+      // log.warn(`Failed to subscribe on ${hostname} to topic: ${topic}`)
       sendToBrowserDeserialized({
         browserWindow,
         hostname,
@@ -215,9 +217,9 @@ function unsubscribe(notifyParams: NotifyParams): Promise<void> {
                 `Failed to unsubscribe on ${hostname} from topic: ${topic}`
               )
             } else {
-              log.info(
-                `Successfully unsubscribed on ${hostname} from topic: ${topic}`
-              )
+              // log.info(
+              //   `Successfully unsubscribed on ${hostname} from topic: ${topic}`
+              // )
               handleDecrementSubscriptionCount(hostname, topic)
             }
           })
@@ -225,9 +227,9 @@ function unsubscribe(notifyParams: NotifyParams): Promise<void> {
           subscriptions[topic] -= 1
         }
       } else {
-        log.info(
-          `Attempted to unsubscribe from unconnected hostname: ${hostname}`
-        )
+        // log.info(
+        //   `Attempted to unsubscribe from unconnected hostname: ${hostname}`
+        // )
       }
     }, RENDER_TIMEOUT)
   })
