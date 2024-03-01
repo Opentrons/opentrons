@@ -75,6 +75,12 @@ import {
   USB_HTTP_REQUESTS_STOP,
   VALUE_UPDATED,
   VIEW_PROTOCOL_SOURCE_FOLDER,
+  NOTIFY_SUBSCRIBE,
+  NOTIFY_UNSUBSCRIBE,
+  ROBOT_MASS_STORAGE_DEVICE_ADDED,
+  ROBOT_MASS_STORAGE_DEVICE_ENUMERATED,
+  ROBOT_MASS_STORAGE_DEVICE_REMOVED,
+  UPDATE_BRIGHTNESS,
 } from '../constants'
 import type {
   InitializedAction,
@@ -102,14 +108,6 @@ import type {
   UpdateBrightnessAction,
   UsbRequestsAction,
 } from '@opentrons/app/src/redux/shell/types'
-import type {
-  NOTIFY_SUBSCRIBE,
-  NOTIFY_UNSUBSCRIBE,
-  ROBOT_MASS_STORAGE_DEVICE_ADDED,
-  ROBOT_MASS_STORAGE_DEVICE_ENUMERATED,
-  ROBOT_MASS_STORAGE_DEVICE_REMOVED,
-  UPDATE_BRIGHTNESS,
-} from '@opentrons/app/src/redux/shell/actions'
 
 // config file has been initialized
 export const configInitialized = (config: Config): ConfigInitializedAction => ({

@@ -12,8 +12,7 @@
     },
     {
       "path": "../step-generation"
-    },
-    { "path": "./tsconfig.node.json" }
+    }
   ],
   "compilerOptions": {
     "rootDir": "src",
