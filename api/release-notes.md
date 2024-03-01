@@ -31,6 +31,10 @@ If you don't care about preserving your labware offsets and run history, you can
 
 - Removed the `notify_server` Python package and `/notifications/subscribe` WebSocket endpoint, as they were never fully used. (See pull request [#14280](https://github.com/Opentrons/opentrons/pull/14280) for details.)
 
+### Known Issues
+
+- Downgrading an OT-2 to an earlier software version will delete tip length calibrations created with version 7.2.0. If you need to downgrade, re-run all pipette calibrations afterward.
+
 ---
 
 ## Opentrons Robot Software Changes in 7.1.1
