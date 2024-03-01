@@ -386,10 +386,10 @@ function sendToBrowserDeserialized({
     deserializedMessage = message
   }
 
-  log.info('Received notification data from main via IPC', {
-    hostname,
-    topic,
-  })
+  // log.info('Received notification data from main via IPC', {
+  //   hostname,
+  //   topic,
+  // })
 
   browserWindow.webContents.send('notify', hostname, topic, deserializedMessage)
 }
