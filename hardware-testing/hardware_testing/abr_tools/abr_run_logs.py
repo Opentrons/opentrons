@@ -1,7 +1,6 @@
 """ABR Run Log Pull."""
 from .abr_robots import ABR_IPS
 from typing import Set, Dict, Any
-
 import argparse
 import os
 import json
@@ -29,6 +28,7 @@ def get_run_ids_from_storage(storage_directory: str) -> Set[str]:
 def get_unseen_run_ids(runs: Set[str], runs_from_storage: Set[str]) -> Set[str]:
     """Subtracts runs from storage from current runs being read."""
     runs_to_save = runs - runs_from_storage
+    print(f"There are {str(len(runs_to_save))} new run(s) to save.")
     return runs_to_save
 
 
@@ -96,25 +96,25 @@ def get_run_data(one_run: Any, ip: str) -> Dict[str, Any]:
     run["run_id"] = one_run
     run["robot_serial"] = robot_serial
     # Instruments Attached
-    response = requests.get(f"http://{ip}:31950/instruments", headers = {"opentrons-version": "3"})
+    response = requests.get(
+        f"http://{ip}:31950/instruments", headers={"opentrons-version": "3"}
+    )
     instrument_data = response.json()
     for instrument in instrument_data["data"]:
-        run[instrument["mount"]] = instrument["serialNumber"] + "_" + instrument["instrumentModel"]
+        run[instrument["mount"]] = (
+            instrument["serialNumber"] + "_" + instrument["instrumentModel"]
+        )
     return run
-    
-
 
 
 def save_runs(runs_to_save: Set[str], ip: str, storage_directory: str) -> None:
     """Saves runs to user given storage directory."""
     for a_run in runs_to_save:
         data = get_run_data(a_run, ip)
-        #robot_name = data["robot_name"]
+        # robot_name = data["robot_name"]
         data_file_name = ip + "_" + data["run_id"] + ".json"
         json.dump(data, open(os.path.join(storage_directory, data_file_name), mode="w"))
-    print(
-        f"Saved {len(runs_to_save)} run(s) from robot with IP address {ip}."
-    )
+    print(f"Saved {len(runs_to_save)} run(s) from robot with IP address {ip}.")
 
 
 def get_all_run_logs(storage_directory: str) -> None:

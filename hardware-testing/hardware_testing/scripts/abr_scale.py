@@ -57,7 +57,15 @@ labware = [
     labware_DVT1ABR3,
     labware_PVT1ABR7,
 ]
-abr = ["DVT1ABR2", "DVT1ABR4", "PVT1ABR9", "PVT1ABR10", "PVT1ABR11", "DVT1ABR3", "PVT1ABR7"]
+abr = [
+    "DVT1ABR2",
+    "DVT1ABR4",
+    "PVT1ABR9",
+    "PVT1ABR10",
+    "PVT1ABR11",
+    "DVT1ABR3",
+    "PVT1ABR7",
+]
 robot_labware: Dict[str, List[str]] = {"Robot": [], "Labware": []}
 for i in range(len(labware)):
     robot_labware["Robot"].extend([abr[i]] * len(labware[i]))
