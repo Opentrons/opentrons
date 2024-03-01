@@ -27,7 +27,7 @@ const mockWizardTileProps: Partial<WizardTileProps> = {
   goBack: vi.fn(),
   proceed: vi.fn(),
   watch: vi.fn((name: keyof typeof values) => values[name]) as any,
-  register: vi.fn(),
+  register: vi.fn() as any,
   formState: {
     errors: { fields: { name: null } },
     touchedFields: { fields: { name: true } },

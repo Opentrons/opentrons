@@ -130,8 +130,8 @@ describe('generateRobotStateTimeline', () => {
     )
     // NOTE: if you update this snapshot, make sure this it exhibits eager tip dropping
     expect(commandOverview).toMatchInlineSnapshot(`
-      Array [
-        Array [
+      [
+        [
           "pickUpTip",
           "aspirate",
           "dispense",
@@ -140,14 +140,14 @@ describe('generateRobotStateTimeline', () => {
           "moveToAddressableAreaForDropTip",
           "dropTipInPlace",
         ],
-        Array [
+        [
           "pickUpTip",
           "aspirate",
           "dispense",
           "moveToAddressableAreaForDropTip",
           "dropTipInPlace",
         ],
-        Array [
+        [
           "pickUpTip",
           "aspirate",
           "dispense",

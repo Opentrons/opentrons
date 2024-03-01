@@ -19,7 +19,7 @@ import { WellSelectionInstructions } from './WellSelectionInstructions'
 
 import styles from './LiquidPlacementModal.module.css'
 
-export function LiquidPlacementModal(): JSX.Element {
+export function LiquidPlacementModal(): JSX.Element | null {
   const [highlightedWells, setHighlightedWells] = React.useState<
     WellGroup | {}
   >({})
@@ -37,6 +37,7 @@ export function LiquidPlacementModal(): JSX.Element {
       false,
       'LiquidPlacementModal: No labware is selected, and no labwareId was given to LiquidPlacementModal'
     )
+    return null
   }
 
   const labwareDef = labwareEntities[labwareId]?.def

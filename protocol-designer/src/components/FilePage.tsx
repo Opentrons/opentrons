@@ -15,7 +15,6 @@ import {
   InputField,
 } from '@opentrons/components'
 import { resetScrollElements } from '../ui/steps/utils'
-import { Portal } from './portals/MainPageModalPortal'
 import { EditModulesCard } from './modules'
 import { EditModules } from './EditModules'
 
