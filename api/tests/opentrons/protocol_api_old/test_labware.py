@@ -375,46 +375,47 @@ def test_select_next_tip(
 ) -> None:
     tiprack = opentrons_96_tiprack_300ul
     well_list = tiprack.wells()
+    mount = Mount.LEFT
 
-    next_one = tiprack.next_tip()
+    next_one = tiprack.next_tip(mount)
     assert next_one == well_list[0]
-    next_five = tiprack.next_tip(5)
+    next_five = tiprack.next_tip(mount, 5)
     assert next_five == well_list[0]
-    next_eight = tiprack.next_tip(8)
+    next_eight = tiprack.next_tip(mount, 8)
     assert next_eight == well_list[0]
-    next_nine = tiprack.next_tip(9)
+    next_nine = tiprack.next_tip(mount, 9)
     assert next_nine is None
 
     # A1 tip only has been used
     tiprack.use_tips(well_list[0])
 
-    next_one = tiprack.next_tip()
+    next_one = tiprack.next_tip(mount)
     assert next_one == well_list[1]
-    next_five = tiprack.next_tip(5)
+    next_five = tiprack.next_tip(mount, 5)
     assert next_five == well_list[1]
-    next_eight = tiprack.next_tip(8)
+    next_eight = tiprack.next_tip(mount, 8)
     assert next_eight == well_list[8]
 
     # 2nd column has also been used
     tiprack.use_tips(well_list[8], num_channels=8)
 
-    next_one = tiprack.next_tip()
+    next_one = tiprack.next_tip(mount)
     assert next_one == well_list[1]
-    next_five = tiprack.next_tip(5)
+    next_five = tiprack.next_tip(mount, 5)
     assert next_five == well_list[1]
-    next_eight = tiprack.next_tip(8)
+    next_eight = tiprack.next_tip(mount, 8)
     assert next_eight == well_list[16]
 
     # Bottom 4 tips of 1rd column are also used
     tiprack.use_tips(well_list[4], num_channels=4)
 
-    next_one = tiprack.next_tip()
+    next_one = tiprack.next_tip(mount)
     assert next_one == well_list[1]
-    next_three = tiprack.next_tip(3)
+    next_three = tiprack.next_tip(mount, 3)
     assert next_three == well_list[1]
-    next_five = tiprack.next_tip(5)
+    next_five = tiprack.next_tip(mount, 5)
     assert next_five == well_list[16]
-    next_eight = tiprack.next_tip(8)
+    next_eight = tiprack.next_tip(mount, 8)
     assert next_eight == well_list[16]
 
     # you can reuse tips infinitely on api level 2.2

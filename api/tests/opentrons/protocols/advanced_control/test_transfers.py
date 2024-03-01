@@ -380,7 +380,7 @@ def test_new_tip_always(_instr_labware, monkeypatch):
     assert xfer_plan_list == exp1
     for cmd in xfer_plan_list:
         getattr(i_ctx, cmd["method"])(*cmd["args"], **cmd["kwargs"])
-    assert tiprack.next_tip() == tiprack.columns()[0][4]
+    assert tiprack.next_tip(Mount.LEFT) == tiprack.columns()[0][4]
 
 
 def test_transfer_w_touchtip_blowout(_instr_labware):

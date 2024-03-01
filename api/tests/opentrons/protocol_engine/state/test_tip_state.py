@@ -266,9 +266,6 @@ def test_get_next_tip_used_starting_tip(
             private_result=load_pipette_private_result, command=load_pipette_command
         )
     )
-    # subject.handle_action(
-    #     actions.UpdateCommandAction(command=pick_up_tip_command, private_result=None)
-    # )
 
     result = TipView(subject.state).get_next_tip(
         pipette_id="pipette-id",
@@ -410,10 +407,40 @@ def test_get_next_tip_skips_picked_up_tip(
 def test_get_next_tip_with_starting_tip(
     subject: TipStore,
     load_labware_command: commands.LoadLabware,
+    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
 ) -> None:
     """It should return the starting tip, and then the following tip after that."""
     subject.handle_action(
         actions.UpdateCommandAction(private_result=None, command=load_labware_command)
+    )
+    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+        result=commands.LoadPipetteResult(pipetteId="pipette-id")
+    )
+    load_pipette_private_result = commands.LoadPipettePrivateResult(
+        pipette_id="pipette-id",
+        serial_number="pipette-serial",
+        config=LoadedStaticPipetteData(
+            channels=1,
+            max_volume=15,
+            min_volume=3,
+            model="gen a",
+            display_name="display name",
+            flow_rates=FlowRates(
+                default_aspirate={},
+                default_dispense={},
+                default_blow_out={},
+            ),
+            tip_configuration_lookup_table={15: supported_tip_fixture},
+            nominal_tip_overlap={},
+            nozzle_offset_z=1.23,
+            home_position=4.56,
+            nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
+        ),
+    )
+    subject.handle_action(
+        actions.UpdateCommandAction(
+            private_result=load_pipette_private_result, command=load_pipette_command
+        )
     )
 
     result = TipView(subject.state).get_next_tip(
@@ -453,10 +480,40 @@ def test_get_next_tip_with_starting_tip(
 def test_get_next_tip_with_starting_tip_8_channel(
     subject: TipStore,
     load_labware_command: commands.LoadLabware,
+    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
 ) -> None:
     """It should return the starting tip, and then the following tip after that."""
     subject.handle_action(
         actions.UpdateCommandAction(private_result=None, command=load_labware_command)
+    )
+    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+        result=commands.LoadPipetteResult(pipetteId="pipette-id")
+    )
+    load_pipette_private_result = commands.LoadPipettePrivateResult(
+        pipette_id="pipette-id",
+        serial_number="pipette-serial",
+        config=LoadedStaticPipetteData(
+            channels=8,
+            max_volume=15,
+            min_volume=3,
+            model="gen a",
+            display_name="display name",
+            flow_rates=FlowRates(
+                default_aspirate={},
+                default_dispense={},
+                default_blow_out={},
+            ),
+            tip_configuration_lookup_table={15: supported_tip_fixture},
+            nominal_tip_overlap={},
+            nozzle_offset_z=1.23,
+            home_position=4.56,
+            nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI_GEN2),
+        ),
+    )
+    subject.handle_action(
+        actions.UpdateCommandAction(
+            private_result=load_pipette_private_result, command=load_pipette_command
+        )
     )
 
     result = TipView(subject.state).get_next_tip(
@@ -496,10 +553,40 @@ def test_get_next_tip_with_starting_tip_8_channel(
 def test_get_next_tip_with_starting_tip_out_of_tips(
     subject: TipStore,
     load_labware_command: commands.LoadLabware,
+    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
 ) -> None:
     """It should return the starting tip of H12 and then None after that."""
     subject.handle_action(
         actions.UpdateCommandAction(private_result=None, command=load_labware_command)
+    )
+    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+        result=commands.LoadPipetteResult(pipetteId="pipette-id")
+    )
+    load_pipette_private_result = commands.LoadPipettePrivateResult(
+        pipette_id="pipette-id",
+        serial_number="pipette-serial",
+        config=LoadedStaticPipetteData(
+            channels=1,
+            max_volume=15,
+            min_volume=3,
+            model="gen a",
+            display_name="display name",
+            flow_rates=FlowRates(
+                default_aspirate={},
+                default_dispense={},
+                default_blow_out={},
+            ),
+            tip_configuration_lookup_table={15: supported_tip_fixture},
+            nominal_tip_overlap={},
+            nozzle_offset_z=1.23,
+            home_position=4.56,
+            nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
+        ),
+    )
+    subject.handle_action(
+        actions.UpdateCommandAction(
+            private_result=load_pipette_private_result, command=load_pipette_command
+        )
     )
 
     result = TipView(subject.state).get_next_tip(
@@ -539,10 +626,40 @@ def test_get_next_tip_with_starting_tip_out_of_tips(
 def test_get_next_tip_with_column_and_starting_tip(
     subject: TipStore,
     load_labware_command: commands.LoadLabware,
+    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
 ) -> None:
     """It should return the first tip in a column, taking starting tip into account."""
     subject.handle_action(
         actions.UpdateCommandAction(private_result=None, command=load_labware_command)
+    )
+    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+        result=commands.LoadPipetteResult(pipetteId="pipette-id")
+    )
+    load_pipette_private_result = commands.LoadPipettePrivateResult(
+        pipette_id="pipette-id",
+        serial_number="pipette-serial",
+        config=LoadedStaticPipetteData(
+            channels=8,
+            max_volume=15,
+            min_volume=3,
+            model="gen a",
+            display_name="display name",
+            flow_rates=FlowRates(
+                default_aspirate={},
+                default_dispense={},
+                default_blow_out={},
+            ),
+            tip_configuration_lookup_table={15: supported_tip_fixture},
+            nominal_tip_overlap={},
+            nozzle_offset_z=1.23,
+            home_position=4.56,
+            nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI_GEN2),
+        ),
+    )
+    subject.handle_action(
+        actions.UpdateCommandAction(
+            private_result=load_pipette_private_result, command=load_pipette_command
+        )
     )
 
     result = TipView(subject.state).get_next_tip(
@@ -572,7 +689,7 @@ def test_reset_tips(
         pipette_id="pipette-id",
         serial_number="pipette-serial",
         config=LoadedStaticPipetteData(
-            channels=8,
+            channels=1,
             max_volume=15,
             min_volume=3,
             model="gen a",

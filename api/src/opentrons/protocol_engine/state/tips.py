@@ -307,7 +307,7 @@ class TipView(HasState[TipState]):
                         critical_row = len(columns[critical_column]) - num_nozzle_rows
             return None
 
-        if starting_tip_name is None:
+        if starting_tip_name is None and columns:
             if self.get_pipette_channels(pipette_id) == 1:
                 # for a single channel pipette, always begin at A1 on the tiprack
                 return _cluster_search_A1()
