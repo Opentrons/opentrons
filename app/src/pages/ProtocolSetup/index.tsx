@@ -784,6 +784,7 @@ export function ProtocolSetup(): JSX.Element {
         setSetupScreen={setSetupScreen}
         confirmAttachment={confirmAttachment}
         play={play}
+        robotName={localRobot?.displayName ?? ''}
       />
     ),
     instruments: (
