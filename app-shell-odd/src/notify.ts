@@ -216,9 +216,9 @@ function unsubscribe(notifyParams: NotifyParams): Promise<void> {
         if (isLastSubscription) {
           client?.unsubscribe(topic, {}, (error, result) => {
             if (error != null) {
-              log.warn(
-                `Failed to unsubscribe on ${hostname} from topic: ${topic}`
-              )
+              // log.warn(
+              //   `Failed to unsubscribe on ${hostname} from topic: ${topic}`
+              // )
             } else {
               // log.info(
               //   `Successfully unsubscribed on ${hostname} from topic: ${topic}`
