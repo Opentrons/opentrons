@@ -171,6 +171,7 @@ export function ProtocolRunHeader({
   const [pipettesWithTip, setPipettesWithTip] = React.useState<
     PipettesWithTip[]
   >([])
+  const [closeTerminalBanner, setCloseTerminalBanner] = React.useState(false)
   const isResetRunLoadingRef = React.useRef(false)
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const highestPriorityError =
@@ -256,6 +257,12 @@ export function ProtocolRunHeader({
     }
   }, [runStatus, isRunCurrent, runId, closeCurrentRun])
 
+  React.useEffect(() => {
+    if (runStatus === RUN_STATUS_IDLE) {
+      setCloseTerminalBanner(false)
+    }
+  }, [runStatus])
+
   const startedAtTimestamp =
     startedAt != null ? formatTimestamp(startedAt) : EMPTY_TIMESTAMP
 
@@ -300,6 +307,7 @@ export function ProtocolRunHeader({
       properties: robotAnalyticsData ?? undefined,
     })
     closeCurrentRun()
+    setCloseTerminalBanner(true)
   }
 
   return (
@@ -364,7 +372,7 @@ export function ProtocolRunHeader({
         CANCELLABLE_STATUSES.includes(runStatus) ? (
           <Banner type="warning">{t('shared:close_robot_door')}</Banner>
         ) : null}
-        {mostRecentRunId === runId ? (
+        {mostRecentRunId === runId && !closeTerminalBanner ? (
           <TerminalRunBanner
             {...{
               runStatus,
