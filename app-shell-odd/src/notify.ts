@@ -158,7 +158,7 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
       })
       handleDecrementSubscriptionCount(hostname, topic)
     } else {
-      log.info(`Successfully subscribed on ${hostname} to topic: ${topic}`)
+      // log.info(`Successfully subscribed on ${hostname} to topic: ${topic}`)
     }
   }
 
