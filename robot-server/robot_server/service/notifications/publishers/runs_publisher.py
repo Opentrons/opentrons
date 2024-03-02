@@ -56,7 +56,7 @@ class RunsPublisher:
             )
 
     async def stop_polling_engine_store(self) -> None:
-        """Stops polling the engine store."""
+        """Stops polling the engine store. Run-related topics will publish as the poller is cancelled."""
         if self._poller is not None:
             self._run_data_manager_polling.set()
             self._poller.cancel()
@@ -64,7 +64,6 @@ class RunsPublisher:
             self._run_data_manager_polling.clear()
             self._previous_current_command = None
             self._previous_state_summary_status = None
-            await self._client.publish_async(topic=Topics.RUNS_CURRENT_COMMAND)
 
     def publish_runs(self, run_id: str, should_unsubscribe: bool = False) -> None:
         """Publishes the equivalent of GET /runs and GET /runs/:runId.
@@ -90,21 +89,25 @@ class RunsPublisher:
             get_current_command: Retrieves the engine store's current command.
             run_id: ID of the current run.
         """
-        while not self._run_data_manager_polling.is_set():
-            current_command = get_current_command(run_id)
-            current_state_summary = get_state_summary(run_id)
-            current_state_summary_status = (
-                current_state_summary.status if current_state_summary else None
-            )
+        try:
+            while not self._run_data_manager_polling.is_set():
+                current_command = get_current_command(run_id)
+                current_state_summary = get_state_summary(run_id)
+                current_state_summary_status = (
+                    current_state_summary.status if current_state_summary else None
+                )
 
-            if self._previous_current_command != current_command:
-                await self._publish_current_command()
-                self._previous_current_command = current_command
+                if self._previous_current_command != current_command:
+                    await self._publish_current_command()
+                    self._previous_current_command = current_command
 
-            if self._previous_state_summary_status != current_state_summary_status:
-                await self._publish_runs_async(run_id=run_id)
-                self._previous_state_summary_status = current_state_summary_status
-            await asyncio.sleep(1)
+                if self._previous_state_summary_status != current_state_summary_status:
+                    await self._publish_runs_async(run_id=run_id)
+                    self._previous_state_summary_status = current_state_summary_status
+                await asyncio.sleep(1)
+        except asyncio.CancelledError:
+            await self._publish_runs_async(run_id=run_id, should_unsubscribe=True)
+            await self._client.publish_async(topic=Topics.RUNS_CURRENT_COMMAND)
 
     async def _publish_current_command(
         self,
@@ -112,14 +115,21 @@ class RunsPublisher:
         """Publishes the equivalent of GET /runs/:runId/commands?cursor=null&pageLength=1."""
         await self._client.publish_async(topic=Topics.RUNS_CURRENT_COMMAND)
 
-    async def _publish_runs_async(self, run_id: str) -> None:
+    async def _publish_runs_async(
+        self, run_id: str, should_unsubscribe: bool = False
+    ) -> None:
         """Asynchronously publishes the equivalent of GET /runs and GET /runs/:runId.
 
         Args:
             run_id: ID of the current run.
+            should_unsubscribe: Whether the client should unsubscribe from the run_id topic.
         """
-        await self._client.publish_async(topic=Topics.RUNS)
-        await self._client.publish_async(topic=f"{Topics.RUNS}/{run_id}")
+        await self._client.publish_async(
+            topic=Topics.RUNS, should_unsubscribe=should_unsubscribe
+        )
+        await self._client.publish_async(
+            topic=f"{Topics.RUNS}/{run_id}", should_unsubscribe=should_unsubscribe
+        )
 
 
 _runs_publisher_accessor: AppStateAccessor[RunsPublisher] = AppStateAccessor[

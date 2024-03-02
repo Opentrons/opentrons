@@ -411,7 +411,7 @@ class RunStore:
             raise RunNotFoundError(run_id)
 
         self._clear_caches()
-        self._runs_publisher.publish_runs(run_id=run_id)
+        self._runs_publisher.publish_runs(run_id=run_id, should_unsubscribe=True)
 
     def _run_exists(
         self, run_id: str, connection: sqlalchemy.engine.Connection
