@@ -115,7 +115,9 @@ RESPONSE_SPECS = [
             "links": {"sibling": {"href": "/bar", "meta": None}},
         },
     ),
-    ResponseSpec(subject=NotifyRefetchBody(), expected={"refetchUsingHTTP": True}),
+    ResponseSpec(
+        subject=NotifyRefetchBody.construct(), expected={"refetchUsingHTTP": True}
+    ),
 ]
 
 

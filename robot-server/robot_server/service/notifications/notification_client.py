@@ -78,7 +78,7 @@ class NotificationClient:
         await to_thread.run_sync(self.client.disconnect)
 
     async def publish_async(
-        self, topic: str, message: NotifyRefetchBody = NotifyRefetchBody()
+        self, topic: str, message: NotifyRefetchBody = NotifyRefetchBody.construct()
     ) -> None:
         """Asynchronously Publish a message on a specific topic to the MQTT broker.
 
@@ -89,7 +89,7 @@ class NotificationClient:
         await to_thread.run_sync(self.publish, topic, message)
 
     def publish(
-        self, topic: str, message: NotifyRefetchBody = NotifyRefetchBody()
+        self, topic: str, message: NotifyRefetchBody = NotifyRefetchBody.construct()
     ) -> None:
         """Publish a message on a specific topic to the MQTT broker.
 

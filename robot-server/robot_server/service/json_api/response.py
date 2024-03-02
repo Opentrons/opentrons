@@ -285,5 +285,6 @@ class ResponseList(BaseModel, Generic[ResponseDataT]):
 
 
 class NotifyRefetchBody(BaseResponseBody):
-    "A notification response that returns a flag for refetching via HTTP."
+    """A notification response that returns a flag for refetching via HTTP."""
+
     refetchUsingHTTP: bool = True
