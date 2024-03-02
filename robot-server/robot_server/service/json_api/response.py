@@ -288,3 +288,13 @@ class NotifyRefetchBody(BaseResponseBody):
     """A notification response that returns a flag for refetching via HTTP."""
 
     refetchUsingHTTP: bool = True
+
+
+class NotifyUnsubscribeBody(BaseResponseBody):
+    """A notification response.
+
+    Returns flags for refetching via HTTP and unsubscribing from a topic.
+    """
+
+    refetchUsingHTTP: bool = True
+    unsubscribe: bool = True

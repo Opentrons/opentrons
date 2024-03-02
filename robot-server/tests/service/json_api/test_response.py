@@ -13,6 +13,7 @@ from robot_server.service.json_api.response import (
     MultiBody,
     MultiBodyMeta,
     NotifyRefetchBody,
+    NotifyUnsubscribeBody,
     DeprecatedResponseModel,
     DeprecatedMultiResponseModel,
 )
@@ -115,8 +116,10 @@ RESPONSE_SPECS = [
             "links": {"sibling": {"href": "/bar", "meta": None}},
         },
     ),
+    ResponseSpec(subject=NotifyRefetchBody(), expected={"refetchUsingHTTP": True}),
     ResponseSpec(
-        subject=NotifyRefetchBody.construct(), expected={"refetchUsingHTTP": True}
+        subject=NotifyUnsubscribeBody(),
+        expected={"refetchUsingHTTP": True, "unsubscribe": True},
     ),
 ]
 

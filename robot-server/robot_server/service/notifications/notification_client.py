@@ -3,10 +3,10 @@ import logging
 import paho.mqtt.client as mqtt
 from anyio import to_thread
 from fastapi import Depends
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 from enum import Enum
 
-from ..json_api import NotifyRefetchBody
+from ..json_api import NotifyRefetchBody, NotifyUnsubscribeBody
 from server_utils.fastapi_utils.app_state import (
     AppState,
     AppStateAccessor,
@@ -77,26 +77,28 @@ class NotificationClient:
         self.client.loop_stop()
         await to_thread.run_sync(self.client.disconnect)
 
-    async def publish_async(
-        self, topic: str, message: NotifyRefetchBody = NotifyRefetchBody.construct()
-    ) -> None:
+    async def publish_async(self, topic: str, should_unsubscribe: bool = False) -> None:
         """Asynchronously Publish a message on a specific topic to the MQTT broker.
 
         Args:
             topic: The topic to publish the message on.
-            message: The message to be published, in the format of NotifyRefetchBody.
+            should_unsubscribe: Whether the client should unsubscribe from the topic.
+
         """
-        await to_thread.run_sync(self.publish, topic, message)
+        await to_thread.run_sync(self.publish, topic, should_unsubscribe)
 
     def publish(
-        self, topic: str, message: NotifyRefetchBody = NotifyRefetchBody.construct()
+        self,
+        topic: str,
+        should_unsubscribe: bool = False,
     ) -> None:
         """Publish a message on a specific topic to the MQTT broker.
 
         Args:
             topic: The topic to publish the message on.
-            message: The message to be published.
+            should_unsubscribe: Whether the client should unsubscribe from the topic.
         """
+        message = self._create_message(should_unsubscribe)
         payload = message.json()
         self.client.publish(
             topic=topic,
@@ -104,6 +106,17 @@ class NotificationClient:
             qos=self._default_qos,
             retain=self._retain_message,
         )
+
+    def _create_message(
+        self, should_unsubscribe: bool
+    ) -> Union[NotifyRefetchBody, NotifyUnsubscribeBody]:
+        message: Union[NotifyRefetchBody, NotifyUnsubscribeBody]
+        message = (
+            NotifyUnsubscribeBody.construct()
+            if should_unsubscribe
+            else NotifyRefetchBody.construct()
+        )
+        return message
 
     def _on_connect(
         self,

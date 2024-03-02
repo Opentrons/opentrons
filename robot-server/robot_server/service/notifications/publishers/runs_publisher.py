@@ -66,14 +66,17 @@ class RunsPublisher:
             self._previous_state_summary_status = None
             await self._client.publish_async(topic=Topics.RUNS_CURRENT_COMMAND)
 
-    def publish_runs(self, run_id: str) -> None:
+    def publish_runs(self, run_id: str, should_unsubscribe: bool = False) -> None:
         """Publishes the equivalent of GET /runs and GET /runs/:runId.
 
         Args:
             run_id: ID of the current run.
+            should_unsubscribe: Whether the client should unsubscribe from the run_id topic.
         """
         self._client.publish(topic=Topics.RUNS)
-        self._client.publish(topic=f"{Topics.RUNS}/{run_id}")
+        self._client.publish(
+            topic=f"{Topics.RUNS}/{run_id}", should_unsubscribe=should_unsubscribe
+        )
 
     async def _poll_engine_store(
         self,
