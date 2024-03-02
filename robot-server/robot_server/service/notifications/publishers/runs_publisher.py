@@ -34,7 +34,8 @@ class RunsPublisher:
         """Continuously poll the engine store for the current_command.
 
         Args:
-            current_command: The currently executing command, if any.
+            get_current_command: Callback to get the currently executing command, if any.
+            get_state_summary: Callback to get the current run's state summary, if any.
             run_id: ID of the current run.
         """
         if self._poller is None:
