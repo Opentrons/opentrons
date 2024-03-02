@@ -126,7 +126,9 @@ class AttachedModulesControl:
 
     async def register_modules(
         self,
-        new_mods_at_ports: Optional[List[modules.ModuleAtPort]] = None,
+        new_mods_at_ports: Optional[
+            Union[List[modules.ModuleAtPort], List[modules.SimulatingModuleAtPort]]
+        ] = None,
         removed_mods_at_ports: Optional[List[modules.ModuleAtPort]] = None,
     ) -> None:
         """

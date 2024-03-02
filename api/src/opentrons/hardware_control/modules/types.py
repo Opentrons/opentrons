@@ -110,6 +110,14 @@ class ModuleAtPort:
     usb_port: USBPort = USBPort(name="", port_number=0)
 
 
+@dataclass
+class SimulatingModuleAtPort:
+    serial_numer: str
+    port: str
+    name: str
+    usb_port: USBPort = USBPort(name="", port_number=0)
+
+
 class BundledFirmware(NamedTuple):
     """Represents a versioned firmware file, generally bundled into the fs"""
 
