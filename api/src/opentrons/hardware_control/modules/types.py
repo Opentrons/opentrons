@@ -110,12 +110,8 @@ class ModuleAtPort:
     usb_port: USBPort = USBPort(name="", port_number=0)
 
 
-@dataclass
-class SimulatingModuleAtPort:
+class SimulatingModuleAtPort(ModuleAtPort):
     serial_numer: str
-    port: str
-    name: str
-    usb_port: USBPort = USBPort(name="", port_number=0)
 
 
 class BundledFirmware(NamedTuple):
