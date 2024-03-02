@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent, screen } from '@testing-library/react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 
@@ -11,7 +12,6 @@ import { mockTipLengthCalibrationSessionAttributes } from '../../../redux/sessio
 
 import { CalibrateTipLength } from '../index'
 import type { TipLengthCalibrationStep } from '../../../redux/sessions/types'
-import { fireEvent, screen } from '@testing-library/react'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof getDeckDefinitions>()
