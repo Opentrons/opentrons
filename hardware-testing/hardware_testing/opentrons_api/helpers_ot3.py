@@ -224,6 +224,7 @@ async def build_async_ot3_hardware_api(
     gripper: Optional[str] = None,
     loop: Optional[asyncio.AbstractEventLoop] = None,
     stall_detection_enable: Optional[bool] = None,
+    reset_ot3_api: Optional[bool] = True,
 ) -> OT3API:
     """Built an OT3 Hardware API instance."""
     if stall_detection_enable is not None:
@@ -258,7 +259,8 @@ async def build_async_ot3_hardware_api(
         print(e)
         kwargs["use_usb_bus"] = False  # type: ignore[assignment]
         api = await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
-    await reset_api(api)
+    if reset_ot3_api:
+        await reset_api(api)
     return api
 
 

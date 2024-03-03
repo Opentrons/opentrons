@@ -488,9 +488,9 @@ class OT3Controller(FlexBackend):
     async def update_motor_status(self) -> None:
         """Retreieve motor and encoder status and position from all present nodes"""
         motor_nodes = self._motor_nodes()
-        assert len(motor_nodes)
-        response = await get_motor_position(self._messenger, motor_nodes)
-        self._handle_motor_status_response(response)
+        if motor_nodes:
+            response = await get_motor_position(self._messenger, motor_nodes)
+            self._handle_motor_status_response(response)
 
     async def update_motor_estimation(self, axes: Sequence[Axis]) -> None:
         """Update motor position estimation for commanded nodes, and update cache of data."""
