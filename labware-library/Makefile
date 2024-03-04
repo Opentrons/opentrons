@@ -9,10 +9,9 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 # These variables can be overriden when make is invoked to customize the
 # behavior of jest
 tests ?=
-cov_opts ?= --coverage=true  --collectCoverageFrom='labware-library/src/**/*.(js|ts|tsx)'
+cov_opts ?= --coverage=true
 test_opts ?=
 
-# --coverage=true  --collectCoverageFrom="labware-library/src/**/*.(js|ts|tsx)" labware-library/src
 
 .PHONY: all
 all: clean dist
