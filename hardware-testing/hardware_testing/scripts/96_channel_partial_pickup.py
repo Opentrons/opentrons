@@ -174,13 +174,15 @@ async def jog(api, position, cp) -> Dict[Axis, float]:
 
         elif input == "\r":
             sys.stdout.flush()
-            position = await api.current_position_ot3(
-                mount, refresh=True, critical_point=cp
+            await api._update_position_estimation([Axis.by_mount(mount)])
+            position = await api.encoder_current_position_ot3(
+                mount, critical_point=cp, refresh=True
             )
             print("\r\n")
             return position
-        position = await api.current_position_ot3(
-            mount, refresh=True, critical_point=cp
+        await api._update_position_estimation([Axis.by_mount(mount)])
+        position = await api.encoder_current_position_ot3(
+            mount, critical_point=cp, refresh = True
         )
 
         print(
@@ -276,8 +278,10 @@ async def calibrate_tiprack(api, home_position, mount):
     tiprack_loc = Point(tiprack_loc[Axis.X],
                         tiprack_loc[Axis.Y],
                         tiprack_loc[Axis.by_mount(mount)])
-    await api.pick_up_tip(
-        mount, tip_length=tip_length[args.tip_size])
+    print(f'Befor Press Distance: {tiprack_loc[2]}')
+    press_dist = await api.pick_up_tip(
+        mount, tip_length=(tip_length[args.tip_size]-tip_overlap))
+    print(f'Press Distance:{press_dist}')
     await api.home([Axis.Z_L])
     cp = CriticalPoint.TIP
     await asyncio.sleep(1)
@@ -373,21 +377,25 @@ async def _main() -> None:
             await move_to_point(hw_api, mount, initial_dial_loc, cp)
             current_position = await hw_api.current_position_ot3(mount, cp)
             nozzle_loc = await jog(hw_api, current_position, cp)
-            number_of_channels = 96
+            number_of_channels = args.nozzles
             nozzle_count = 0
             x_offset = 0
             y_offset = 0
             measurements = []
-            num_of_columns = 12
+            measurement_map = {}
+            # num_of_columns = 12
+            num_of_columns = 1
             for tip in range(1, number_of_channels + 1):
                 cp = CriticalPoint.NOZZLE
                 nozzle_count += 1
-                nozzle_position = Point(nozzle_loc[Axis.X] + x_offset,
+                # nozzle_position = Point(nozzle_loc[Axis.X] + x_offset,
+                nozzle_position = Point(nozzle_loc[Axis.X],
                                         nozzle_loc[Axis.Y] + y_offset,
                                         nozzle_loc[Axis.by_mount(mount)])
                 await move_to_point(hw_api, mount, nozzle_position, cp)
                 await asyncio.sleep(1)
                 nozzle_measurement = gauge.read()
+                measurement_map.update({nozzle_count: nozzle_measurement})
                 print("nozzle-",nozzle_count, "(mm): " , nozzle_measurement, end="")
                 print("\r", end="")
                 measurements.append(nozzle_measurement)
@@ -406,10 +414,10 @@ async def _main() -> None:
                     y_offset += 9
                 if nozzle_count % num_of_columns == 0:
                     x_offset = 0
+            print(f'Nozzle Measurements: {measurement_map}')
         # Calibrate to tiprack
         if (args.calibrate):
             pickup_loc, droptip_loc = await calibrate_tiprack(hw_api, home_position, mount)
-            print(pickup_loc)
             deck_slot['deck_slot'][args.tiprack_slot][Axis.X.name] = pickup_loc.x
             deck_slot['deck_slot'][args.tiprack_slot][Axis.Y.name] = pickup_loc.y
             deck_slot['deck_slot'][args.tiprack_slot]['Z'] = pickup_loc.z
@@ -420,11 +428,15 @@ async def _main() -> None:
         home_w_tip = await hw_api.current_position_ot3(mount, cp)
         # Calibrate Dial Indicator with single tip
         if (args.calibrate):
+            nozzle_position
             # cp = CriticalPoint.TIP
-            initial_dial_loc = Point(
-                            deck_slot['deck_slot'][args.dial_slot]['X'],
-                            deck_slot['deck_slot'][args.dial_slot]['Y'],
-                            home_w_tip[Axis.by_mount(mount)])
+            # initial_dial_loc = Point(
+            #                 deck_slot['deck_slot'][args.dial_slot]['X'],
+            #                 deck_slot['deck_slot'][args.dial_slot]['Y'],
+            #                 home_w_tip[Axis.by_mount(mount)])
+            initial_dial_loc = Point(nozzle_loc[Axis.X],
+                                    nozzle_loc[Axis.Y],
+                                    nozzle_loc[Axis.by_mount(mount)])
             print("Move to Dial Indicator")
             await move_to_point(hw_api, mount, initial_dial_loc, cp)
             current_position = await hw_api.current_position_ot3(mount, cp)
@@ -432,6 +444,7 @@ async def _main() -> None:
             dial_loc = Point(dial_loc[Axis.X],
                                 dial_loc[Axis.Y],
                                 dial_loc[Axis.by_mount(mount)])
+            await move_to_point()
             deck_slot['deck_slot'][args.dial_slot][Axis.X.name] = dial_loc.x
             deck_slot['deck_slot'][args.dial_slot][Axis.Y.name] = dial_loc.y
             deck_slot['deck_slot'][args.dial_slot]['Z'] = dial_loc.z
@@ -538,10 +551,12 @@ async def _main() -> None:
                                     pickup_loc[1] + row,
                                     pickup_loc[2])
             await move_to_point(hw_api, mount, pickup_loc, cp)
-            await hw_api.pick_up_tip(mount,
-                                    tip_length=tip_length[args.tip_size],
+            print(f'start_position{pickup_loc[2]}')
+            press_dist = await hw_api.pick_up_tip(mount,
+                                    tip_length=(tip_length[args.tip_size]-tip_overlap),
                                     presses = 1,
                                     increment = 0)
+            print(f'Press Distance: {press_dist}')
             await hw_api.home_z(mount.LEFT)
             cp = CriticalPoint.TIP
             current_position = await hw_api.current_position_ot3(mount, cp)
@@ -577,7 +592,7 @@ if __name__ == "__main__":
     parser.add_argument("--mount", type=str, choices=["left", "right"], default="left")
     parser.add_argument("--tiprack_slot", type=str, choices=slot_locs, default="B2")
     parser.add_argument("--dial_slot", type=str, choices=slot_locs, default="C2")
-    parser.add_argument("--trough_slot", type=str, choices=slot_locs, default="B3")
+    parser.add_argument("--trough_slot", type=str, choices=slot_locs, default="D1")
     parser.add_argument("--dial_indicator", action="store_true")
     parser.add_argument("--calibrate", action="store_true")
     parser.add_argument("--measure_nozzles", action="store_true")
@@ -607,6 +622,7 @@ if __name__ == "__main__":
         with open(path + cal_fn, 'r') as openfile:
             deck_slot = json.load(openfile)
     tip_length = {"T1K": 95.7, "T200": 58.35, "T50": 57.9}
+    tip_overlap = 10.5
     if args.mount == "left":
         mount = OT3Mount.LEFT
     else:

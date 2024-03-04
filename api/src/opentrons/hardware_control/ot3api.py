@@ -1091,6 +1091,7 @@ class OT3API(
             self._encoder_position,
             critical_point,
         )
+        # print(f'api encoder_position: {self._encoder_position}')
         return ot3pos
 
     def _effector_pos_from_carriage_pos(
@@ -1208,7 +1209,6 @@ class OT3API(
             await self.refresh_positions()
 
         for axis in position.keys():
-            print(axis)
             if not self._backend.axis_is_present(axis):
                 raise InvalidActuator(
                     message=f"{axis} is not present", detail={"axis": str(axis)}
