@@ -378,7 +378,7 @@ function sendToBrowserDeserialized({
   topic,
   message,
 }: SendToBrowserParams): void {
-  let deserializedMessage: string | Object
+  let deserializedMessage: string | Record<string, unknown>
 
   try {
     deserializedMessage = JSON.parse(message)
