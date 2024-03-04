@@ -1538,7 +1538,7 @@ class InstrumentContext(publisher.CommandPublisher):
     ) -> None:
         self._core.retract()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def mount(self) -> str:
         """
