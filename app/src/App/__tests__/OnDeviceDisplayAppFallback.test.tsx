@@ -4,13 +4,13 @@ import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { getLocalRobot } from '../../redux/discovery'
+import { mockConnectableRobot } from '../../redux/discovery/__fixtures__'
 import { i18n } from '../../i18n'
 import { appRestart } from '../../redux/shell'
 import { useTrackEvent, ANALYTICS_ODD_APP_ERROR } from '../../redux/analytics'
 import { OnDeviceDisplayAppFallback } from '../OnDeviceDisplayAppFallback'
 
 import type { FallbackProps } from 'react-error-boundary'
-import { mockConnectableRobot } from '../../redux/discovery/__fixtures__'
 
 jest.mock('../../redux/shell')
 jest.mock('../../redux/analytics')

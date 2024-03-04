@@ -52,6 +52,7 @@ import {
 
 import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import { getRobotSettings } from '../../../redux/robot-settings'
+import { getRobotSerialNumber } from '../../../redux/discovery'
 import { ProtocolAnalysisErrorBanner } from './ProtocolAnalysisErrorBanner'
 import { ProtocolDropTipBanner } from './ProtocolDropTipBanner'
 import { DropTipWizard } from '../../DropTipWizard'
@@ -112,7 +113,6 @@ import type { Run, RunError } from '@opentrons/api-client'
 import type { State } from '../../../redux/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
-import { getRobotSerialNumber } from '../../../redux/discovery'
 
 interface PipettesWithTip {
   mount: 'left' | 'right'
