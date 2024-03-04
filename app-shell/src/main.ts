@@ -134,7 +134,7 @@ function createRendererLogger(): Logger {
   return logger
 }
 
-function installDevtools(): Promise<void | Logger> {
+function installDevtools(): Promise<Logger> {
   const extensions = [
     electronDevtoolsInstaller.REACT_DEVELOPER_TOOLS,
     electronDevtoolsInstaller.REDUX_DEVTOOLS,
@@ -158,6 +158,8 @@ function installDevtools(): Promise<void | Logger> {
       })
   } else {
     log.warn('could not resolve electron dev tools installer')
-    return Promise.reject('could not resolve electron dev tools installer')
+    return Promise.reject(
+      new Error('could not resolve electron dev tools installer')
+    )
   }
 }

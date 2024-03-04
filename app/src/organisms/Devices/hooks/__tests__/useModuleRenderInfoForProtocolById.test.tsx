@@ -3,8 +3,10 @@ import { vi, it, expect, describe, beforeEach } from 'vitest'
 import { when } from 'vitest-when'
 import { UseQueryResult } from 'react-query'
 
-import { STAGING_AREA_RIGHT_SLOT_FIXTURE } from '@opentrons/shared-data'
-import { heater_shaker_commands_with_result as _heaterShakerCommandsWithResultsKey } from '@opentrons/shared-data'
+import {
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  heater_shaker_commands_with_results_key,
+} from '@opentrons/shared-data'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 
@@ -35,7 +37,7 @@ vi.mock('../useAttachedModules')
 vi.mock('../useStoredProtocolAnalysis')
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 
-const heaterShakerCommandsWithResultsKey = (_heaterShakerCommandsWithResultsKey as unknown) as ProtocolAnalysisOutput
+const heaterShakerCommandsWithResultsKey = (heater_shaker_commands_with_results_key as unknown) as ProtocolAnalysisOutput
 
 const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',

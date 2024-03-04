@@ -2,7 +2,7 @@ import * as React from 'react'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
-import { createRunAction, RUN_ACTION_TYPE_PLAY } from '@opentrons/api-client'
+import { createRunAction } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { usePlayMaintenanceRunMutation } from '..'
 
@@ -23,7 +23,6 @@ describe('usePlayMaintenanceRunMutation hook', () => {
   let wrapper: React.FunctionComponent<
     { children: React.ReactNode } & UsePlayMaintenanceRunMutationOptions
   >
-  const createPlayRunActionData = { actionType: RUN_ACTION_TYPE_PLAY }
 
   beforeEach(() => {
     const queryClient = new QueryClient()

@@ -71,11 +71,11 @@ describe('CustomLabwareOverflowMenu', () => {
     render(props)
     fireEvent.click(screen.getByLabelText('CustomLabwareOverflowMenu_button'))
     fireEvent.click(screen.getByRole('button', { name: 'Delete' }))
-    await screen.getByText('Delete this labware definition?')
-    await screen.getByText(
+    screen.getByText('Delete this labware definition?')
+    screen.getByText(
       'This labware definition will be moved to this computer’s trash and may be unrecoverable.'
     )
-    await screen.getByText(
+    screen.getByText(
       'Robots cannot run Python protocols with missing labware definitions.'
     )
     fireEvent.click(screen.getByText('cancel'))
@@ -86,11 +86,11 @@ describe('CustomLabwareOverflowMenu', () => {
     render(props)
     fireEvent.click(screen.getByLabelText('CustomLabwareOverflowMenu_button'))
     fireEvent.click(screen.getByRole('button', { name: 'Delete' }))
-    await screen.getByText('Delete this labware definition?')
-    await screen.getByText(
+    screen.getByText('Delete this labware definition?')
+    screen.getByText(
       'This labware definition will be moved to this computer’s trash and may be unrecoverable.'
     )
-    await screen.getByText(
+    screen.getByText(
       'Robots cannot run Python protocols with missing labware definitions.'
     )
     fireEvent.click(screen.getByText('Yes, delete definition'))

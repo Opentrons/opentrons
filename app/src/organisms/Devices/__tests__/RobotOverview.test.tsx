@@ -55,7 +55,7 @@ import type * as ReactApiClient from '@opentrons/react-api-client'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = importOriginal<typeof ReactApiClient>()
-  return {
+  return await {
     ...actual,
     useAuthorization: vi.fn(),
   }

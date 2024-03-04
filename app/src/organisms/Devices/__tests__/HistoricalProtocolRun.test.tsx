@@ -19,7 +19,7 @@ vi.mock('../../RunTimeControl/hooks')
 vi.mock('../HistoricalProtocolRunOverflowMenu')
 vi.mock('react-router-dom', async importOriginal => {
   const reactRouterDom = importOriginal<typeof Dom>()
-  return {
+  return await {
     ...reactRouterDom,
     useHistory: () => ({ push: mockPush } as any),
   }

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { screen, fireEvent, waitFor } from '@testing-library/react'
+import { screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useConditionalConfirm } from '@opentrons/components'
 import { i18n } from '../../../i18n'

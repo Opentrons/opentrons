@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { COLORS, SPACING } from '@opentrons/components'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { ModuleIcon } from '../'

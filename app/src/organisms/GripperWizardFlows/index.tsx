@@ -17,7 +17,7 @@ import {
 } from '@opentrons/react-api-client'
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
-import { Portal, getTopPortalEl } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 import { getIsOnDevice } from '../../redux/config'

@@ -24,12 +24,6 @@ vi.mock('@opentrons/components', async importOriginal => {
   }
 })
 
-const mockCustomLabwareOverflowMenu = CustomLabwareOverflowMenu as jest.MockedFunction<
-  typeof CustomLabwareOverflowMenu
->
-const mockUseAllLabware = useAllLabware as jest.MockedFunction<
-  typeof useAllLabware
->
 const render = (props: React.ComponentProps<typeof LabwareCard>) => {
   return renderWithProviders(<LabwareCard {...props} />, {
     i18nInstance: i18n,

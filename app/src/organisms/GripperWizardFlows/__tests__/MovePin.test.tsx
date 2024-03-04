@@ -64,7 +64,7 @@ describe('MovePin', () => {
     render()
     const begin = screen.getByRole('button', { name: 'Begin calibration' })
     fireEvent.click(begin)
-    await new Promise(r => setTimeout(r))
+    await new Promise((resolve, reject) => setTimeout(resolve))
     expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
       maintenanceRunId: 'fakeRunId',
       command: {
@@ -138,7 +138,7 @@ describe('MovePin', () => {
       name: 'Continue calibration',
     })
     fireEvent.click(continueButton)
-    await new Promise(r => setTimeout(r))
+    await new Promise((resolve, reject) => setTimeout(resolve))
     expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
       maintenanceRunId: 'fakeRunId',
       command: {

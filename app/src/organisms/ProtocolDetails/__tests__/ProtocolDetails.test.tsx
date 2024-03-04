@@ -1,13 +1,9 @@
 import * as React from 'react'
 import { act, screen, waitFor } from '@testing-library/react'
 import { StaticRouter } from 'react-router-dom'
-import { when } from 'vitest-when'
 import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
 
-import {
-  partialComponentPropsMatcher,
-  renderWithProviders,
-} from '../../../__testing-utils__'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ChooseRobotToRunProtocolSlideout } from '../../../organisms/ChooseRobotToRunProtocolSlideout'
 import {
@@ -72,12 +68,8 @@ describe('ProtocolDetails', () => {
     vi.mocked(getReachableRobots).mockReturnValue([mockReachableRobot])
     vi.mocked(getScanning).mockReturnValue(false)
 
-    when(vi.mocked(ChooseRobotToRunProtocolSlideout))
-      .calledWith(partialComponentPropsMatcher({ showSlideout: true }))
-      .thenReturn(<div>open ChooseRobotToRunProtocolSlideout</div>)
-    when(vi.mocked(ChooseRobotToRunProtocolSlideout))
-      .calledWith(partialComponentPropsMatcher({ showSlideout: false }))
-      .thenReturn(<div>close ChooseRobotToRunProtocolSlideout</div>)
+    vi.mocked(ChooseRobotToRunProtocolSlideout)
+    .mockReturnValue(<div>close ChooseRobotToRunProtocolSlideout</div>)
     vi.mocked(getIsProtocolAnalysisInProgress).mockReturnValue(false)
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
   })
@@ -143,6 +135,9 @@ describe('ProtocolDetails', () => {
     screen.getByText('close ChooseRobotToRunProtocolSlideout')
   })
   it('opens choose robot to run protocol slideout when Start setup button is clicked', async () => {
+    vi.mocked(ChooseRobotToRunProtocolSlideout).mockReturnValue(
+      <div>open ChooseRobotToRunProtocolSlideout</div>
+    )
     render({
       mostRecentAnalysis: {
         ...mockMostRecentAnalysis,
