@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { when } from 'vitest-when'
 import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 
 import {
