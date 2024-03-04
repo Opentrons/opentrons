@@ -6,7 +6,7 @@ port ?= 6060
 # These variables can be overriden when make is invoked to customize the
 # behavior of jest
 tests ?=
-cov_opts ?= --coverage=true --ci=true --collectCoverageFrom='components/src/**/*.(js|ts|tsx)'
+cov_opts ?= --coverage=true  --collectCoverageFrom='components/src/**/*.(js|ts|tsx)'
 test_opts ?=
 
 # standard targets
