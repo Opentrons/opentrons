@@ -74,7 +74,7 @@ describe('RobotSettingsDashboard', () => {
   })
 
   it('should render Navigation', () => {
-    const [{ getByText }] = render()
+    render()
     expect(vi.mocked(Navigation)).toHaveBeenCalled()
   })
 

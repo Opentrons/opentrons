@@ -54,10 +54,6 @@ import { ProtocolSetup } from '../../../pages/ProtocolSetup'
 import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
 
 import type { UseQueryResult } from 'react-query'
-import type {
-  DeckConfiguration,
-  CompletedProtocolAnalysis,
-} from '@opentrons/shared-data'
 import type * as SharedData from '@opentrons/shared-data'
 import type * as ReactRouterDom from 'react-router-dom'
 // Mock IntersectionObserver
@@ -153,7 +149,7 @@ const mockEmptyAnalysis = ({
   labware: [],
   pipettes: [],
   commands: [],
-} as unknown) as CompletedProtocolAnalysis
+} as unknown) as SharedData.CompletedProtocolAnalysis
 const mockLiquids = [
   {
     id: 'm',
@@ -186,7 +182,7 @@ const MOCK_MAKE_SNACKBAR = vi.fn()
 const mockTrackProtocolRunEvent = vi.fn()
 
 describe('ProtocolSetup', () => {
-  let mockLaunchLPC: vi.Mock
+  let mockLaunchLPC = vi.fn()
   beforeEach(() => {
     mockLaunchLPC = vi.fn()
     mockHistoryPush = vi.fn()
@@ -263,7 +259,7 @@ describe('ProtocolSetup', () => {
     } as any)
     vi.mocked(useDeckConfigurationQuery).mockReturnValue({
       data: [mockFixture],
-    } as UseQueryResult<DeckConfiguration>)
+    } as UseQueryResult<SharedData.DeckConfiguration>)
     when(vi.mocked(useToaster))
       .calledWith()
       .thenReturn(({

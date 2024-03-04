@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { fixture96Plate } from '@opentrons/shared-data'
 import {
+  fixture96Plate,
   FLEX_ROBOT_TYPE,
   SINGLE_CENTER_SLOT_FIXTURE,
   SINGLE_LEFT_SLOT_FIXTURE,
