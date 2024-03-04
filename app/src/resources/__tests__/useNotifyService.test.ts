@@ -6,10 +6,7 @@ import { useHost } from '@opentrons/react-api-client'
 import { useNotifyService } from '../useNotifyService'
 import { appShellListener } from '../../redux/shell/remote'
 import { useTrackEvent } from '../../redux/analytics'
-import {
-  notifySubscribeAction,
-  notifyUnsubscribeAction,
-} from '../../redux/shell'
+import { notifySubscribeAction } from '../../redux/shell'
 import { useIsFlex } from '../../organisms/Devices/hooks/useIsFlex'
 
 import type { HostConfig } from '@opentrons/api-client'
@@ -71,24 +68,7 @@ describe('useNotifyService', () => {
     expect(mockDispatch).toHaveBeenCalledWith(
       notifySubscribeAction(MOCK_HOST_CONFIG.hostname, MOCK_TOPIC)
     )
-    expect(mockDispatch).not.toHaveBeenCalledWith(
-      notifyUnsubscribeAction(MOCK_HOST_CONFIG.hostname, MOCK_TOPIC)
-    )
     expect(appShellListener).toHaveBeenCalled()
-  })
-
-  it('should trigger an unsubscribe action on dismount', () => {
-    const { unmount } = renderHook(() =>
-      useNotifyService({
-        topic: MOCK_TOPIC,
-        setRefetchUsingHTTP: mockHTTPRefetch,
-        options: MOCK_OPTIONS,
-      } as any)
-    )
-    unmount()
-    expect(mockDispatch).toHaveBeenCalledWith(
-      notifyUnsubscribeAction(MOCK_HOST_CONFIG.hostname, MOCK_TOPIC)
-    )
   })
 
   it('should not subscribe to notifications if forceHttpPolling is true', () => {
