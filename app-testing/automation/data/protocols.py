@@ -736,6 +736,3 @@ class Protocols:
         robot_error=False,
         app_analysis_error="IncompatibleAddressableAreaError [line 15]: Cannot use Slot C3, not compatible with one or more of the following fixtures: Thermocycler in C3",  # noqa: E501
     )
-
-
-
