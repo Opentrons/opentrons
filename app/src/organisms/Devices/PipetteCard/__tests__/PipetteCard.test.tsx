@@ -274,9 +274,9 @@ describe('PipetteCard', () => {
     render(props)
     screen.getByText('Right mount')
     screen.getByText('Instrument attached')
-    screen.getByText('Firmware update available.')
-    fireEvent.click(screen.getByText('Update now'))
-    expect(props.updatePipette).toHaveBeenCalled()
+    screen.getByText(
+      `Instrument firmware update needed. Start the update on the robot's touchscreen.`
+    )
   })
   it('renders firmware update in progress state if pipette is bad and update in progress', () => {
     vi.mocked(useCurrentSubsystemUpdateQuery).mockReturnValue({

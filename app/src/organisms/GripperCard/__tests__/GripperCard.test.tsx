@@ -170,9 +170,9 @@ describe('GripperCard', () => {
     render(props)
     screen.getByText('Extension mount')
     screen.getByText('Instrument attached')
-    screen.getByText('Firmware update available.')
-    fireEvent.click(screen.getByText('Update now'))
-    expect(props.setSubsystemToUpdate).toHaveBeenCalledWith('gripper')
+    screen.getByText(
+      `Instrument firmware update needed. Start the update on the robot's touchscreen.`
+    )
   })
   it('renders firmware update in progress state if gripper is bad and update in progress', () => {
     vi.mocked(useCurrentSubsystemUpdateQuery).mockReturnValue({

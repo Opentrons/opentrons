@@ -4,7 +4,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
+import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   useAllPipetteOffsetCalibrationsQuery,
   useInstrumentsQuery,
@@ -59,7 +59,7 @@ import type {
   CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
 import type * as SharedData from '@opentrons/shared-data'
-
+import type * as ReactRouterDom from 'react-router-dom'
 // Mock IntersectionObserver
 class IntersectionObserver {
   observe = vi.fn()
@@ -73,11 +73,23 @@ Object.defineProperty(window, 'IntersectionObserver', {
   value: IntersectionObserver,
 })
 
+let mockHistoryPush = vi.fn()
+
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const sharedData = await importOriginal<typeof SharedData>()
   return {
     ...sharedData,
     getDeckDefFromRobotType: vi.fn(),
+  }
+})
+
+vi.mock('react-router-dom', async importOriginal => {
+  const reactRouterDom = await importOriginal<typeof ReactRouterDom>()
+  return {
+    ...reactRouterDom,
+    useHistory: () => ({
+      push: mockHistoryPush,
+    }),
   }
 })
 
@@ -177,6 +189,7 @@ describe('ProtocolSetup', () => {
   let mockLaunchLPC: vi.Mock
   beforeEach(() => {
     mockLaunchLPC = vi.fn()
+    mockHistoryPush = vi.fn()
     vi.mocked(useLPCDisabledReason).mockReturnValue(null)
     vi.mocked(useAttachedModules).mockReturnValue([])
     vi.mocked(useModuleCalibrationStatus).mockReturnValue({ complete: true })
@@ -258,7 +271,7 @@ describe('ProtocolSetup', () => {
       } as unknown) as any)
     vi.mocked(useDeckConfigurationCompatibility).mockReturnValue([])
     when(vi.mocked(useTrackProtocolRunEvent))
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, ROBOT_NAME)
       .thenReturn({ trackProtocolRunEvent: mockTrackProtocolRunEvent })
   })
 
@@ -370,5 +383,11 @@ describe('ProtocolSetup', () => {
       name: ANALYTICS_PROTOCOL_RUN_START,
       properties: {},
     })
+  })
+
+  it('should redirect to the protocols page when a run is stopped', () => {
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_STOPPED)
+    render(`/runs/${RUN_ID}/setup/`)
+    expect(mockHistoryPush).toHaveBeenCalledWith('/protocols')
   })
 })

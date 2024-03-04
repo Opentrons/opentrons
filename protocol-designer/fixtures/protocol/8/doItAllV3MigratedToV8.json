@@ -2526,7 +2526,7 @@
       "key": "d497b90e-2eaa-40ae-92ed-aa688f2b0eb5",
       "commandType": "loadLabware",
       "params": {
-        "displayName": "Opentrons OT-2 96 Tip Rack 300 µL",
+        "displayName": "Opentrons 96 Tip Rack 300 µL",
         "labwareId": "0b44c760-75c7-11ea-b42f-4b64e50f43e5:opentrons/opentrons_96_tiprack_300ul/1",
         "loadName": "opentrons_96_tiprack_300ul",
         "namespace": "opentrons",

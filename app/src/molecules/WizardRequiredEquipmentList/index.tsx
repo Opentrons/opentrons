@@ -99,7 +99,7 @@ export function WizardRequiredEquipmentList(
             <StyledText
               marginTop={SPACING.spacing8}
               as="label"
-              color={COLORS.grey50}
+              color={COLORS.grey60}
             >
               {footer}
             </StyledText>

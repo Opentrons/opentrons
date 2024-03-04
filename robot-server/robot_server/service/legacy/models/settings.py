@@ -94,8 +94,8 @@ class LogLevels(str, Enum):
 
 
 class LogLevel(BaseModel):
-    log_level: LogLevels = Field(
-        None, description="The value to set (conforming to Python " "log levels)"
+    log_level: Optional[LogLevels] = Field(
+        None, description="The value to set (conforming to Python log levels)"
     )
 
     @validator("log_level", pre=True)
@@ -132,7 +132,7 @@ class PipetteSettingsFieldType(str, Enum):
 class PipetteSettingsField(BaseModel):
     """A pipette config element identified by the property's name"""
 
-    units: str = Field(
+    units: Optional[str] = Field(
         None, description="The physical units this value is in (e.g. mm, uL)"
     )
     type: Optional[PipetteSettingsFieldType]
@@ -152,7 +152,7 @@ class PipetteSettingsInfo(BaseModel):
 
 
 class BasePipetteSettingFields(BaseModel):
-    quirks: Dict[str, bool] = Field(
+    quirks: Optional[Dict[str, bool]] = Field(
         None,
         description="Quirks are behavioral changes associated with "
         "pipettes. For instance, some models of pipette "

@@ -155,7 +155,7 @@ export function ProtocolRunHeader({
     isProtocolAnalyzing,
   } = useProtocolDetailsForRun(runId)
 
-  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = useRunStatus(runId)
@@ -453,6 +453,7 @@ export function ProtocolRunHeader({
           <ConfirmCancelModal
             onClose={() => setShowConfirmCancelModal(false)}
             runId={runId}
+            robotName={robotName}
           />
         ) : null}
         {showDropTipWizard &&
@@ -575,7 +576,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       enabled: runStatus != null && START_RUN_STATUSES.includes(runStatus),
     })?.data?.data ?? []
   const trackEvent = useTrackEvent()
-  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const {
     play,
@@ -758,7 +759,9 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         <StyledText css={TYPOGRAPHY.pSemiBold}>{buttonText}</StyledText>
       </PrimaryButton>
       {disableReason != null && (
-        <Tooltip tooltipProps={tooltipProps}>{disableReason}</Tooltip>
+        <Tooltip tooltipProps={tooltipProps} width="auto" maxWidth="8rem">
+          {disableReason}
+        </Tooltip>
       )}
       {showIsShakingModal &&
         activeHeaterShaker != null &&

@@ -18,6 +18,7 @@ from typing import (
     AsyncGenerator,
     Union,
     Type,
+    ParamSpec,
 )
 from .adapters import SynchronousAdapter
 from .modules.mod_abc import AbstractModule
@@ -34,17 +35,14 @@ class ThreadManagerException(Exception):
 
 WrappedReturn = TypeVar("WrappedReturn", contravariant=True)
 WrappedYield = TypeVar("WrappedYield", contravariant=True)
-WrappedCoro = TypeVar("WrappedCoro", bound=Callable[..., Awaitable[WrappedReturn]])
-WrappedAGenFunc = TypeVar(
-    "WrappedAGenFunc", bound=Callable[..., AsyncGenerator[WrappedYield, None]]
-)
+P = ParamSpec("P")
 
 
 async def call_coroutine_threadsafe(
     loop: asyncio.AbstractEventLoop,
-    coro: WrappedCoro,
-    *args: Sequence[Any],
-    **kwargs: Mapping[str, Any],
+    coro: Callable[P, Awaitable[WrappedReturn]],
+    *args: P.args,
+    **kwargs: P.kwargs,
 ) -> WrappedReturn:
     fut = cast(
         "asyncio.Future[WrappedReturn]",
@@ -56,9 +54,9 @@ async def call_coroutine_threadsafe(
 
 async def execute_asyncgen_threadsafe(
     loop: asyncio.AbstractEventLoop,
-    agenfunc: WrappedAGenFunc,
-    *args: Sequence[Any],
-    **kwargs: Mapping[str, Any],
+    agenfunc: Callable[P, AsyncGenerator[WrappedYield, None]],
+    *args: P.args,
+    **kwargs: P.kwargs,
 ) -> AsyncGenerator[WrappedYield, None]:
 
     # This function should bridge an async generator function between two asyncio

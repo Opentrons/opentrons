@@ -150,6 +150,7 @@ class MotionView:
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
         stay_at_max_travel_z: bool = False,
+        ignore_tip_configuration: Optional[bool] = True,
     ) -> List[motion_planning.Waypoint]:
         """Calculate waypoints to a destination that's specified as an addressable area."""
         location = self._pipettes.get_current_location()
@@ -177,7 +178,10 @@ class MotionView:
             destination = base_destination + Point(offset.x, offset.y, offset.z)
 
         # TODO(jbl 11-28-2023) This may need to change for partial tip configurations on a 96
-        destination_cp = CriticalPoint.XY_CENTER
+        if ignore_tip_configuration:
+            destination_cp = CriticalPoint.INSTRUMENT_XY_CENTER
+        else:
+            destination_cp = CriticalPoint.XY_CENTER
 
         all_labware_highest_z = self._geometry.get_all_obstacle_highest_z()
         if minimum_z_height is None:

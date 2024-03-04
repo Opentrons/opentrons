@@ -38,8 +38,7 @@ from . import deck_conflict
 from ..instrument import AbstractInstrument
 from .well import WellCore
 
-from ..._trash_bin import TrashBin
-from ..._waste_chute import WasteChute
+from ...disposal_locations import TrashBin, WasteChute
 
 if TYPE_CHECKING:
     from .protocol import ProtocolCore
@@ -478,13 +477,16 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def drop_tip_in_disposal_location(
-        self, disposal_location: Union[TrashBin, WasteChute], home_after: Optional[bool]
+        self,
+        disposal_location: Union[TrashBin, WasteChute],
+        home_after: Optional[bool],
+        alternate_tip_drop: bool = False,
     ) -> None:
         self._move_to_disposal_location(
             disposal_location,
             force_direct=False,
             speed=None,
-            alternate_tip_drop=True,
+            alternate_tip_drop=alternate_tip_drop,
         )
         self._drop_tip_in_place(home_after=home_after)
         self._protocol_core.set_last_location(location=None, mount=self.get_mount())
@@ -498,10 +500,14 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     ) -> None:
         # TODO (nd, 2023-11-30): give appropriate offset when finalized
         # https://opentrons.atlassian.net/browse/RSS-391
-        offset = AddressableOffsetVector(x=0, y=0, z=0)
+
+        disposal_offset = disposal_location.offset
+        offset = AddressableOffsetVector(
+            x=disposal_offset.x, y=disposal_offset.y, z=disposal_offset.z
+        )
 
         if isinstance(disposal_location, TrashBin):
-            addressable_area_name = disposal_location._addressable_area_name
+            addressable_area_name = disposal_location.area_name
             self._engine_client.move_to_addressable_area_for_drop_tip(
                 pipette_id=self._pipette_id,
                 addressable_area_name=addressable_area_name,
@@ -510,6 +516,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 speed=speed,
                 minimum_z_height=None,
                 alternate_drop_location=alternate_tip_drop,
+                ignore_tip_configuration=True,
             )
 
         if isinstance(disposal_location, WasteChute):

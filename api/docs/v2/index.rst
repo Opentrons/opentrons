@@ -81,6 +81,7 @@ For example, if we wanted to transfer liquid from well A1 to well B1 on a plate,
                 tiprack = protocol.load_labware(
                     "opentrons_flex_96_tiprack_200ul", location="D2"
                 )
+                trash = protocol.load_trash_bin(location="A3")
             
                 # pipettes
                 left_pipette = protocol.load_instrument(

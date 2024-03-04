@@ -34,7 +34,10 @@ def build_module(decoy: Decoy) -> Callable[..., Awaitable[AbstractModule]]:
         `AttachedModulesControl` is doing too much work _and_ these tests
         are too brittle and of questionable value.
     """
-    return cast(Callable[..., Awaitable[AbstractModule]], decoy.mock(is_async=True))
+    return cast(
+        Callable[..., Awaitable[AbstractModule]],
+        decoy.mock(name="build_module", is_async=True),
+    )
 
 
 @pytest.fixture()

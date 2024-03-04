@@ -9,7 +9,7 @@ from fastapi import APIRouter, HTTPException, File, Path, UploadFile, Query
 
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons.system import nmcli, wifi
-from robot_server.errors import LegacyErrorResponse
+from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models.networking import (
     NetworkingStatus,
@@ -147,13 +147,22 @@ async def get_wifi_keys():
 @router.post(
     "/wifi/keys",
     description="Send a new key file to the robot",
-    responses={status.HTTP_200_OK: {"model": AddWifiKeyFileResponse}},
+    responses={
+        status.HTTP_200_OK: {"model": AddWifiKeyFileResponse},
+        status.HTTP_400_BAD_REQUEST: {"model": LegacyErrorResponse},
+    },
     response_model=AddWifiKeyFileResponse,
     status_code=status.HTTP_201_CREATED,
     response_model_exclude_unset=True,
 )
 async def post_wifi_key(key: UploadFile = File(...)):
-    add_key_result = wifi.add_key(key.filename, key.file.read())
+    key_name = key.filename
+    if not key_name:
+        raise LegacyErrorResponse(
+            message="No name for key", errorCode=ErrorCodes.GENERAL_ERROR.value.code
+        ).as_error(status.HTTP_400_BAD_REQUEST)
+
+    add_key_result = wifi.add_key(key_name, key.file.read())
 
     response = AddWifiKeyFileResponse(
         uri=f"/wifi/keys/{add_key_result.key.directory}",

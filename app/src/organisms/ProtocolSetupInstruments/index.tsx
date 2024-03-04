@@ -86,6 +86,7 @@ export function ProtocolSetupInstruments({
             speccedName={loadedPipette.pipetteName}
             attachedInstrument={attachedPipetteMatch}
             instrumentsRefetch={refetch}
+            pipetteInfo={mostRecentAnalysis?.pipettes}
           />
         )
       })}

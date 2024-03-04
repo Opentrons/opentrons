@@ -23,7 +23,11 @@ export function useNotifyCurrentMaintenanceRun(
     },
   })
 
-  const isNotifyEnabled = !isNotifyError && !options?.forceHttpPolling
+  const isNotifyEnabled =
+    !isNotifyError &&
+    !options?.forceHttpPolling &&
+    options?.staleTime !== Infinity
+
   if (!isNotifyEnabled && !refetchUsingHTTP) setRefetchUsingHTTP(true)
   const isHTTPEnabled =
     host !== null && options?.enabled !== false && refetchUsingHTTP

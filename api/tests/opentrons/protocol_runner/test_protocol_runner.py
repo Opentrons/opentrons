@@ -1,6 +1,6 @@
 """Tests for the PythonAndLegacyRunner, JsonRunner & LiveRunner classes."""
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy, matchers
 from pathlib import Path
 from typing import List, cast, Optional, Union, Type

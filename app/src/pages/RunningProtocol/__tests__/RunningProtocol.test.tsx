@@ -20,7 +20,6 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { mockRobotSideAnalysis } from '../../../organisms/CommandText/__fixtures__'
 import {
   CurrentRunningProtocolCommand,
-  RunningProtocolCommandList,
   RunningProtocolSkeleton,
 } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
 import { mockUseAllCommandsResponseNonDeterministic } from '../../../organisms/RunProgressMeter/__fixtures__'
@@ -54,6 +53,7 @@ vi.mock('../../../resources/runs/useNotifyLastRunCommandKey')
 vi.mock('../../../resources/runs/useNotifyRunQuery')
 
 const RUN_ID = 'run_id'
+const ROBOT_NAME = 'otie'
 const PROTOCOL_ID = 'protocol_id'
 const PROTOCOL_KEY = 'protocol_key'
 const PROTOCOL_ANALYSIS = {
@@ -120,9 +120,11 @@ describe('RunningProtocol', () => {
       isPauseRunActionLoading: false,
       isStopRunActionLoading: false,
     })
-    when(vi.mocked(useTrackProtocolRunEvent)).calledWith(RUN_ID).thenReturn({
-      trackProtocolRunEvent: mockTrackProtocolRunEvent,
-    })
+    when(vi.mocked(useTrackProtocolRunEvent))
+      .calledWith(RUN_ID, ROBOT_NAME)
+      .thenReturn({
+        trackProtocolRunEvent: mockTrackProtocolRunEvent,
+      })
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(mockRobotSideAnalysis)

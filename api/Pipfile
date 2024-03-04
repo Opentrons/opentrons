@@ -3,42 +3,48 @@ url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[packages]
+jsonschema = "==4.17.3"
+pydantic = "==1.10.12"
+anyio = "==3.7.1"
+opentrons-shared-data = { editable = true, path = "../shared-data/python" }
+opentrons = { editable = true, path = "." }
+opentrons-hardware = { editable = true, path = "./../hardware", extras=["FLEX"] }
+numpy = "==1.22.3"
+
 [dev-packages]
 # atomicwrites and colorama are pytest dependencies on windows,
 # spec'd here to force lockfile inclusion
 # https://github.com/pypa/pipenv/issues/4408#issuecomment-668324177
 atomicwrites = { version = "==1.4.0", markers="sys_platform=='win32'" }
 colorama = { version = "==0.4.4", markers="sys_platform=='win32'" }
-coverage = "==5.1"
-mypy = "==0.981"
+coverage = "==7.4.1"
+mypy = "==1.8.0"
 numpydoc = "==0.9.1"
-pytest = "==7.0.1"
-pytest-asyncio = "~=0.16"
-pytest-cov = "==2.10.1"
+pytest = "==7.4.4"
+pytest-asyncio = "~=0.23.0"
+pytest-cov = "==4.1.0"
 pytest-lazy-fixture = "==0.6.3"
 pytest-xdist = "~=2.5.0"
 sphinx = "==5.0.1"
 twine = "==4.0.0"
 wheel = "==0.37.0"
-typeguard = "==2.13.1"
+typeguard = "==4.1.5"
 sphinx-substitution-extensions = "==2020.9.30.0"
 sphinxext-opengraph = "==0.8.1"
 sphinx-tabs = ">=3.4.1,<4"
-mock = "~=4.0.3"
-flake8 = "~=3.9.0"
-flake8-annotations = "~=2.6.2"
-flake8-docstrings = "~=1.6.0"
-flake8-noqa = "~=1.2.1"
-decoy = "~=1.11"
+mock = "==5.1.0"
+flake8 = "==7.0.0"
+flake8-annotations = "~=3.0.1"
+flake8-docstrings = "~=1.7.0"
+flake8-noqa = "~=1.4.0"
+decoy = "==2.1.1"
 black = "==22.3.0"
-types-mock = "==4.0.1"
+types-mock = "~=5.1.0"
 types-setuptools = "==57.0.2"
-opentrons-shared-data = { editable = true, path = "../shared-data/python" }
-opentrons = { editable = true, path = "." }
-opentrons-hardware = { editable = true, path = "./../hardware", extras=["FLEX"] }
 # specify typing-extensions explicitly to force lockfile inclusion on Python >= 3.8
 typing-extensions = ">=4.0.0,<5"
 pytest-profiling = "~=1.7.0"
 # TODO(mc, 2022-03-31): upgrade sphinx, remove this subdep pin
 jinja2 = ">=2.3,<3.1"
-hypothesis = ">=6.36,<7"
+hypothesis = "==6.96.1"

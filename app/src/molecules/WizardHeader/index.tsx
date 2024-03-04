@@ -28,7 +28,7 @@ interface WizardHeaderProps {
 const EXIT_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
-  color: ${COLORS.grey50};
+  color: ${COLORS.grey60};
 
   &:hover {
     opacity: 70%;

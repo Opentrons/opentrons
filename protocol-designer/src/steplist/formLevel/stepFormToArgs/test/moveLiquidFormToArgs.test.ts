@@ -374,23 +374,6 @@ describe('move liquid step form -> command creator args', () => {
       })
     })
 
-    it('should not allow blowing out into the destination well', () => {
-      moveLiquidFormToArgs({
-        ...hydratedForm,
-        fields: {
-          ...hydratedForm.fields,
-          ...disposalVolumeFields,
-          blowout_checkbox: true,
-          blowout_location: DEST_WELL_BLOWOUT_DESTINATION,
-        },
-      })
-
-      expect(assert).toHaveBeenCalledWith(
-        false,
-        'blowout location for multiDispense cannot be destination well'
-      )
-    })
-
     it('should blow out into the destination when checkbox is true and blowout location is destination', () => {
       const result = moveLiquidFormToArgs({
         ...hydratedForm,

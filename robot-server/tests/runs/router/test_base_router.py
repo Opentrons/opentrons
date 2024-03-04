@@ -8,7 +8,7 @@ from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import LabwareOffsetCreate, types as pe_types
 from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 
-from robot_server.errors import ApiError
+from robot_server.errors.error_responses import ApiError
 from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,
@@ -17,10 +17,10 @@ from robot_server.service.json_api import (
     ResourceLink,
 )
 
-from robot_server.protocols import (
-    ProtocolStore,
-    ProtocolResource,
+from robot_server.protocols.protocol_store import (
     ProtocolNotFoundError,
+    ProtocolResource,
+    ProtocolStore,
 )
 
 from robot_server.runs.run_auto_deleter import RunAutoDeleter

@@ -123,6 +123,24 @@ describe('ConnectRobotSlideout', () => {
     screen.queryByText('Available')
   })
 
+  it.todo(
+    'Clicking Add button with an IP address/hostname should display the IP address/hostname and Not Found label'
+  )
+  // NOTE: consider mocking react-hook-form here?
+  // , async () => {
+  //   mockGetConfig.mockReturnValue({ discovery: { candidates: ['1.1.1.2'] } } as any)
+  //   mockGetViewableRobots.mockReturnValue([] as any[])
+  //   render(props)
+  //   const user = userEvent.setup()
+  //   const notFoundIpAddress = '1.1.1.2'
+  //   await user.type(screen.getByRole('textbox'), notFoundIpAddress)
+  //   await user.click(screen.getByRole('button', { name: 'Add' }))
+  //   await waitFor(() =>
+  //     expect(screen.getByText(notFoundIpAddress))
+  //   )
+  //   screen.getByText('Not Found')
+  // })
+
   it('Clicking Close button in a row should remove an IP address/hostname', async () => {
     render(props)
     const targetIpAddress = 'test'

@@ -13,6 +13,7 @@ import { useStoredProtocolAnalysis, useProtocolDetailsForRun } from '../'
 import { useProtocolMetadata } from '../useProtocolMetadata'
 import { useRunTimestamps } from '../../../RunTimeControl/hooks'
 import { formatInterval } from '../../../RunTimeControl/utils'
+import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 
 vi.mock('../../../../redux/analytics/hash')
 vi.mock('../../../../redux/protocol-storage')
@@ -93,9 +94,12 @@ describe('useProtocolAnalysisErrors hook', () => {
   })
 
   it('returns getProtocolRunAnalyticsData function', () => {
-    const { result } = renderHook(() => useProtocolRunAnalyticsData(RUN_ID), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useProtocolRunAnalyticsData(RUN_ID, mockConnectableRobot),
+      {
+        wrapper,
+      }
+    )
     expect(typeof result.current.getProtocolRunAnalyticsData).toEqual(
       'function'
     )
@@ -105,7 +109,7 @@ describe('useProtocolAnalysisErrors hook', () => {
     when(vi.mocked(useProtocolDetailsForRun))
       .calledWith(RUN_ID_2)
       .thenReturn({ protocolData: ROBOT_PROTOCOL_ANALYSIS } as any)
-    const { result } = renderHook(() => useProtocolRunAnalyticsData(RUN_ID_2), {
+    const { result } = renderHook(() => useProtocolRunAnalyticsData(RUN_ID_2, mockConnectableRobot), {
       wrapper,
     })
     const protocolRunAnalyticsData = await waitFor(() =>
@@ -124,15 +128,19 @@ describe('useProtocolAnalysisErrors hook', () => {
         protocolText: 'hashedString',
         protocolType: '',
         robotType: 'OT-2 Standard',
+        robotSerialNumber: '',
       },
       runTime: '1:00:00',
     })
   })
 
   it('getProtocolRunAnalyticsData returns fallback stored data when robot data unavailable', async () => {
-    const { result } = renderHook(() => useProtocolRunAnalyticsData(RUN_ID), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useProtocolRunAnalyticsData(RUN_ID, mockConnectableRobot),
+      {
+        wrapper,
+      }
+    )
     const protocolRunAnalyticsData = await waitFor(() =>
       result.current.getProtocolRunAnalyticsData()
     )
@@ -149,6 +157,7 @@ describe('useProtocolAnalysisErrors hook', () => {
         protocolText: 'hashedString',
         protocolType: 'json',
         robotType: 'OT-2 Standard',
+        robotSerialNumber: '',
       },
       runTime: '1:00:00',
     })

@@ -517,6 +517,10 @@ def build_move(
     """Build a move."""
     log = logging.getLogger("build_move")
 
+    # TODO: We need to limit the initial speed and the final speed based on the directions
+    # of this and the bounding moves - if the directions are not the same, and I mean exact
+    # unit vector equivalence, we need to limit the junction speed to the max speed discontinuity
+    # because we can only instantly change speed below that value.
     initial_speed = find_initial_speed(constraints, move, prev_move)
     final_speed = find_final_speed(constraints, move, next_move)
     final_speed = achievable_final(constraints, move, initial_speed, final_speed)

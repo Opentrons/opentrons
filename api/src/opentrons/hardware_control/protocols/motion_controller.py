@@ -226,3 +226,7 @@ class MotionController(Protocol[MountArgType]):
     async def cancel_execution_and_running_tasks(self) -> None:
         """Cancel all tasks and set execution manager state to Cancelled."""
         ...
+
+    async def prepare_for_mount_movement(self, mount: MountArgType) -> None:
+        """Retract the other mount if necessary."""
+        ...

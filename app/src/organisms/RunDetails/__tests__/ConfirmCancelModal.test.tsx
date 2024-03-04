@@ -40,6 +40,7 @@ const RUN_ID = 'mockRunId'
 let mockStopRun: any
 let mockTrackEvent: any
 let mockTrackProtocolRunEvent: any
+const ROBOT_NAME = 'otie'
 
 describe('ConfirmCancelModal', () => {
   let props: React.ComponentProps<typeof ConfirmCancelModal>
@@ -52,11 +53,15 @@ describe('ConfirmCancelModal', () => {
     } as any)
     vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_RUNNING)
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
-    when(useTrackProtocolRunEvent).calledWith(RUN_ID).thenReturn({
+    when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
     })
 
-    props = { onClose: vi.fn(), runId: RUN_ID }
+    props = { onClose: jest.fn(), runId: RUN_ID, robotName: ROBOT_NAME }
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
   })
 
   it('should render the correct title', () => {

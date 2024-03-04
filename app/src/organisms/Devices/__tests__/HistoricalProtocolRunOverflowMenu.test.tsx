@@ -71,7 +71,7 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
       deleteRun: vi.fn(),
     } as any)
 
-    when(useTrackProtocolRunEvent).calledWith(RUN_ID).thenReturn({
+    when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
     })
     when(useRunControls)

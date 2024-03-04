@@ -8,8 +8,9 @@ import { getRobotType } from '../../../../file-data/selectors'
 import { getInitialDeckSetup } from '../../../../step-forms/selectors'
 import { getLabwareIsCompatible } from '../../../../utils/labwareModuleCompatibility'
 import { getDisableModuleRestrictions } from '../../../../feature-flags/selectors'
-import { ConnectedSlotMap } from '../ConnectedSlotMap'
 import { EditModulesModal } from '../index'
+import { ConnectedSlotMap } from '../ConnectedSlotMap'
+
 import type * as Components from '@opentrons/components'
 import type { ModuleOnDeck } from '../../../../step-forms'
 
@@ -23,7 +24,7 @@ vi.mock('@opentrons/components', async (importOriginal) => {
   return {
     ...actual,
     DeckLocationSelect: vi.fn(() => (<div>mock DeckLocationSelect</div>)),
-    SlotMap: vi.fn(() => (<div>mock SlotMap</div>))
+    OT2SlotMap: vi.fn(() => (<div>mock SlotMap</div>))
   }
 })
 
@@ -97,7 +98,7 @@ describe('Edit Modules Modal', () => {
     vi.mocked(getRobotType).mockReturnValue(OT2_ROBOT_TYPE)
     render(props)
     screen.getByText('Temperature module')
-    screen.getByText('mock ConnectedSlotMap')
+    screen.getByText('mock SlotMap')
     fireEvent.click(screen.getByRole('button', { name: 'cancel' }))
     expect(props.onCloseClick).toHaveBeenCalled()
     screen.getByRole('button', { name: 'save' })

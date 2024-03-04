@@ -10,9 +10,12 @@ import { useRobot } from '../'
 import { useRobotAnalyticsData } from '../useRobotAnalyticsData'
 import { getAttachedPipettes } from '../../../../redux/pipettes'
 import { getRobotSettings } from '../../../../redux/robot-settings'
+import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
+
 import {
   getRobotApiVersion,
   getRobotFirmwareVersion,
+  getRobotSerialNumber,
 } from '../../../../redux/discovery'
 
 import type { DiscoveredRobot } from '../../../../redux/discovery/types'
@@ -34,6 +37,7 @@ const ATTACHED_PIPETTES = {
   left: { id: '1', model: 'testModelLeft' },
   right: { id: '2', model: 'testModelRight' },
 }
+const ROBOT_SERIAL_NUMBER = 'OT123'
 
 let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 let store: Store<any> = createStore(vi.fn(), {})
@@ -57,6 +61,7 @@ describe('useProtocolAnalysisErrors hook', () => {
     vi.mocked(getAttachedPipettes).mockReturnValue(
       ATTACHED_PIPETTES as AttachedPipettesByMount
     )
+    vi.mocked(getRobotSerialNumber).mockReturnValue(ROBOT_SERIAL_NUMBER)
   })
 
   afterEach(() => {
@@ -73,7 +78,13 @@ describe('useProtocolAnalysisErrors hook', () => {
   it('returns robot analytics data when robot exists', () => {
     when(vi.mocked(useRobot))
       .calledWith('otie')
-      .thenReturn({} as DiscoveredRobot)
+      .thenReturn({
+        ...mockConnectableRobot,
+        health: {
+          ...mockConnectableRobot.health,
+          robot_serial: ROBOT_SERIAL_NUMBER,
+        },
+      } as DiscoveredRobot)
 
     const { result } = renderHook(() => useRobotAnalyticsData('otie'), {
       wrapper,
@@ -85,6 +96,7 @@ describe('useProtocolAnalysisErrors hook', () => {
       robotLeftPipette: 'testModelLeft',
       robotRightPipette: 'testModelRight',
       robotSmoothieVersion: ROBOT_FIRMWARE_VERSION,
+      robotSerialNumber: ROBOT_SERIAL_NUMBER,
     })
   })
 })

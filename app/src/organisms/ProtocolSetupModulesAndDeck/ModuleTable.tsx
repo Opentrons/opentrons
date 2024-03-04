@@ -113,10 +113,15 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
         const isMagneticBlockModule =
           module.moduleDef.moduleType === MAGNETIC_BLOCK_TYPE
 
+        const isThermocycler =
+          module.moduleDef.moduleType === THERMOCYCLER_MODULE_TYPE
+
         const conflictedFixture =
           deckConfig?.find(
             fixture =>
-              fixture.cutoutId === cutoutIdForSlotName &&
+              (fixture.cutoutId === cutoutIdForSlotName ||
+                // special-case A1 for the thermocycler to require a single slot fixture
+                (fixture.cutoutId === 'cutoutA1' && isThermocycler)) &&
               fixture.cutoutFixtureId != null &&
               // do not generate a conflict for single slot fixtures, because modules are not yet fixtures
               !SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId) &&

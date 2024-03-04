@@ -7,7 +7,6 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import * as Config from '../../../redux/config'
 import { GeneralSettings } from '../GeneralSettings'
-import { PrivacySettings } from '../PrivacySettings'
 import { AdvancedSettings } from '../AdvancedSettings'
 import { FeatureFlags } from '../../../organisms/AppSettings/FeatureFlags'
 import { AppSettings } from '..'
@@ -34,7 +33,6 @@ describe('AppSettingsHeader', () => {
   beforeEach(() => {
     vi.mocked(Config.getDevtoolsEnabled).mockReturnValue(false)
     vi.mocked(GeneralSettings).mockReturnValue(<div>Mock General Settings</div>)
-    vi.mocked(PrivacySettings).mockReturnValue(<div>Mock Privacy Settings</div>)
     vi.mocked(AdvancedSettings).mockReturnValue(
       <div>Mock Advanced Settings</div>
     )
@@ -48,7 +46,6 @@ describe('AppSettingsHeader', () => {
     const [{ getByText }] = render('/app-settings/general')
     getByText('App Settings')
     getByText('General')
-    getByText('Privacy')
     getByText('Advanced')
   })
   it('does not render feature flags link if dev tools disabled', () => {

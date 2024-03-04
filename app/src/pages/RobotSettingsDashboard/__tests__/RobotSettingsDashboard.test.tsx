@@ -16,7 +16,6 @@ import {
   TouchScreenSleep,
   TouchscreenBrightness,
   NetworkSettings,
-  Privacy,
   RobotSystemVersion,
   UpdateChannel,
 } from '../../../organisms/RobotSettingsDashboard'
@@ -89,8 +88,6 @@ describe('RobotSettingsDashboard', () => {
     getByText('Control the strip of color lights on the front of the robot.')
     getByText('Touchscreen Sleep')
     getByText('Touchscreen Brightness')
-    getByText('Privacy')
-    getByText('Choose what data to share with Opentrons.')
     getByText('Device Reset')
     getByText('Update Channel')
     getByText('Apply Labware Offsets')

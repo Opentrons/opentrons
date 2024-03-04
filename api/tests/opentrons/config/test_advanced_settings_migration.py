@@ -1,7 +1,8 @@
-from typing import Any, Dict
+from typing import Any, Dict, cast
 
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from _pytest.fixtures import SubRequest
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from opentrons.config.advanced_settings import _migrate, _ensure
 
 
@@ -402,8 +403,8 @@ def v30_config(v29_config: Dict[str, Any]) -> Dict[str, Any]:
         lazy_fixture("v30_config"),
     ],
 )
-def old_settings(request: pytest.FixtureRequest) -> Dict[str, Any]:
-    return request.param  # type: ignore[attr-defined, no-any-return]
+def old_settings(request: SubRequest) -> Dict[str, Any]:
+    return cast(Dict[str, Any], request.param)
 
 
 def test_migrations(

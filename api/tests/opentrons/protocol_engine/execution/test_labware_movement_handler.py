@@ -195,7 +195,7 @@ async def test_raise_error_if_gripper_pickup_failed(
     starting_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
     to_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_2)
 
-    mock_tc_context_manager = decoy.mock()
+    mock_tc_context_manager = decoy.mock(name="mock_tc_context_manager")
     decoy.when(
         thermocycler_plate_lifter.lift_plate_for_labware_movement(
             labware_location=starting_location
@@ -343,7 +343,7 @@ async def test_move_labware_with_gripper(
             labware_id="my-teleporting-labware", location=to_location
         )
     ).then_return(Point(201, 202, 219.5))
-    mock_tc_context_manager = decoy.mock()
+    mock_tc_context_manager = decoy.mock(name="mock_tc_context_manager")
     decoy.when(
         thermocycler_plate_lifter.lift_plate_for_labware_movement(
             labware_location=from_location

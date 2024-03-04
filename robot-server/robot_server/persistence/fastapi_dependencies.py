@@ -1,7 +1,10 @@
+"""Functions to use as dependencies in FastAPI routers."""
+
+
 import asyncio
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Awaitable, Callable, Iterable, Optional
 from typing_extensions import Literal
 
 from sqlalchemy.engine import Engine as SQLEngine
@@ -14,10 +17,10 @@ from server_utils.fastapi_utils.app_state import (
     AppStateAccessor,
     get_app_state,
 )
-from robot_server.errors import ErrorDetails
+from robot_server.errors.error_responses import ErrorDetails
 
-from ._database import create_schema_3_sql_engine
-from ._persistence_directory import (
+from .database import create_sql_engine
+from .persistence_directory import (
     PersistenceResetter,
     prepare_active_subdirectory,
     prepare_root,
@@ -57,7 +60,9 @@ class DatabaseFailedToInitialize(ErrorDetails):
 
 
 def start_initializing_persistence(  # noqa: C901
-    app_state: AppState, persistence_directory_root: Optional[Path]
+    app_state: AppState,
+    persistence_directory_root: Optional[Path],
+    done_callbacks: Iterable[Callable[[AppState], Awaitable[None]]],
 ) -> None:
     """Initialize the persistence layer to get it ready for use by endpoint functions.
 
@@ -100,7 +105,7 @@ def start_initializing_persistence(  # noqa: C901
             prepared_subdirectory = await subdirectory_prep_task
 
             sql_engine = await to_thread.run_sync(
-                create_schema_3_sql_engine, prepared_subdirectory / _DATABASE_FILE
+                create_sql_engine, prepared_subdirectory / _DATABASE_FILE
             )
             return sql_engine
 
@@ -135,6 +140,15 @@ def start_initializing_persistence(  # noqa: C901
     _sql_engine_init_task_accessor.set_on(
         app_state=app_state, value=sql_engine_init_task
     )
+
+    async def wait_until_done_then_trigger_callbacks() -> None:
+        try:
+            await sql_engine_init_task
+        finally:
+            for callback in done_callbacks:
+                await callback(app_state)
+
+    asyncio.create_task(wait_until_done_then_trigger_callbacks())
 
 
 async def clean_up_persistence(app_state: AppState) -> None:
@@ -209,7 +223,9 @@ async def get_active_persistence_directory(
     If this is called before that initialization completes, this will raise an
     appropriate HTTP-facing error to indicate that the server is busy.
     """
-    initialize_task = _root_persistence_directory_init_task_accessor.get_from(app_state)
+    initialize_task = _active_persistence_directory_init_task_accessor.get_from(
+        app_state
+    )
     assert (
         initialize_task is not None
     ), "Forgot to start persistence directory initialization as part of server startup?"
@@ -231,6 +247,28 @@ async def get_active_persistence_directory(
         raise DatabaseFailedToInitialize(detail=str(exception)).as_error(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
         ) from exception
+
+
+async def get_active_persistence_directory_failsafe(
+    app_state: AppState = Depends(get_app_state),
+) -> Optional[Path]:
+    """Return the path to the server's persistence directory.
+
+    This is the same as `get_active_persistence_directory()`, except this will return
+    `None` if the active persistence directory has failed to initialize or is not yet
+    ready, instead of raising an exception or blocking.
+    """
+    initialize_task = _active_persistence_directory_init_task_accessor.get_from(
+        app_state
+    )
+    assert (
+        initialize_task is not None
+    ), "Forgot to start persistence directory initialization as part of server startup?"
+
+    try:
+        return initialize_task.result()
+    except Exception:
+        return None
 
 
 async def _get_persistence_directory_root(

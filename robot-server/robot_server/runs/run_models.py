@@ -73,7 +73,7 @@ class Run(ResourceModel):
     )
     actions: List[RunAction] = Field(
         ...,
-        description="Client-initiated run control actions.",
+        description="Client-initiated run control actions, ordered oldest to newest.",
     )
     errors: List[ErrorOccurrence] = Field(
         ...,

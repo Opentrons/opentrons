@@ -7,7 +7,8 @@ import { renderWithProviders } from '../../../../../__testing-utils__'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   RobotUpdateProgressModal,
-  TIME_BEFORE_ALLOWING_EXIT_MS,
+  TIME_BEFORE_ALLOWING_EXIT,
+  TIME_BEFORE_ALLOWING_EXIT_INIT,
 } from '../RobotUpdateProgressModal'
 import { useRobotUpdateInfo } from '../useRobotUpdateInfo'
 import {
@@ -15,6 +16,10 @@ import {
   getRobotUpdateDownloadError,
 } from '../../../../../redux/robot-update'
 import { useDispatchStartRobotUpdate } from '../../../../../redux/robot-update/hooks'
+import {
+  useRobotInitializationStatus,
+  INIT_STATUS,
+} from '../../../../../resources/health/hooks'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { RobotUpdateSession } from '../../../../../redux/robot-update/types'
@@ -177,5 +182,37 @@ describe('DownloadUpdateModal', () => {
 
     screen.getByText(/Try restarting the update./i)
     screen.getByText(/This update is taking longer than usual/i)
+  })
+
+  it('renders alternative text if the robot is initializing', () => {
+    mockUseRobotInitializationStatus.mockReturnValue(INIT_STATUS.INITIALIZING)
+    mockUseRobotUpdateInfo.mockReturnValue({
+      updateStep: 'restart',
+      progressPercent: 100,
+    })
+    render(props)
+
+    screen.getByText(/Initializing robot.../i)
+    screen.getByText(
+      "This could take up to 40 minutes. Don't turn off the robot."
+    )
+  })
+
+  it('renders alternative text if update takes too long while robot is initializing', () => {
+    jest.useFakeTimers()
+    mockUseRobotInitializationStatus.mockReturnValue(INIT_STATUS.INITIALIZING)
+    mockUseRobotUpdateInfo.mockReturnValue({
+      updateStep: 'restart',
+      progressPercent: 100,
+    })
+    render(props)
+
+    act(() => {
+      jest.advanceTimersByTime(TIME_BEFORE_ALLOWING_EXIT_INIT)
+    })
+
+    screen.getByText(
+      /Check the Advanced tab of its settings page to see whether it updated successfully./i
+    )
   })
 })

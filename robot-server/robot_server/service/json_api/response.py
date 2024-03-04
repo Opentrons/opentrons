@@ -1,9 +1,21 @@
 from __future__ import annotations
 from anyio import to_thread
-from typing import Any, Dict, Generic, List, Optional, TypeVar, Sequence
+from typing import (
+    Any,
+    Dict,
+    Generic,
+    List,
+    Optional,
+    TypeVar,
+    Sequence,
+    ParamSpec,
+    Callable,
+)
 from pydantic import Field, BaseModel
 from pydantic.generics import GenericModel
+from pydantic.typing import get_args
 from fastapi.responses import JSONResponse
+from fastapi.dependencies.utils import get_typed_return_annotation
 from .resource_links import ResourceLinks as DeprecatedResourceLinks
 
 
@@ -119,6 +131,12 @@ class MultiBody(
 
 ResponseBodyT = TypeVar("ResponseBodyT", bound=BaseResponseBody)
 
+RouteMethodSig = ParamSpec("RouteMethodSig")
+DecoratedEndpoint = TypeVar("DecoratedEndpoint", bound=Callable[..., Any])
+RouteMethodReturn = TypeVar(
+    "RouteMethodReturn", bound=Callable[[DecoratedEndpoint], DecoratedEndpoint]
+)
+
 
 class PydanticResponse(JSONResponse, Generic[ResponseBodyT]):
     """A custom JSON response that uses Pydantic for JSON serialization.
@@ -126,6 +144,61 @@ class PydanticResponse(JSONResponse, Generic[ResponseBodyT]):
     Returning this class from an endpoint function is much more performant
     than returning a plain Pydantic model and letting FastAPI serialize it.
     """
+
+    @classmethod
+    def wrap_route(
+        cls,
+        route_method: Callable[RouteMethodSig, RouteMethodReturn],
+        *route_args: RouteMethodSig.args,
+        **route_kwargs: RouteMethodSig.kwargs,
+    ) -> Callable[[DecoratedEndpoint], DecoratedEndpoint]:
+        """Use this classmethod as a decorator to wrap routes that return PydanticResponses.
+
+        The route method (i.e. the .post() method of the router) is the first argument and the rest of the
+        arguments are keyword args that are forwarded to the route handler.
+
+        For instance:
+        @PydanticResponse.wrap_route(
+            some_router.post,
+            path='/some/path',
+            ...
+        )
+        def my_some_path_handler(...) -> PydanticResponse[SimpleBody[whatever]]:
+            ...
+
+        The reason this exists is that if you do not specify a response_model, pydantic will parse the return
+        value annotation and try to stuff it in a pydantic field. Pydantic fields can't handle arbitrary classes,
+        like fastapi.JSONResponse; therefore, you get an exception while parsing the file (since this all happens
+        in a decorator). The fix for this is to always specify a response_model, even if you're also doing a return
+        value annotation and/or responses={} arguments.
+
+        This decorator does that for you! Just take any route handler that returns a PydanticResponse (you still have to
+        annotate it as such, and return PydanticResponse.create(...) yourself, this only handles the decorating part) and
+        replace its route decoration with this one, passing the erstwhile route decorator in.
+        """
+        # our outermost function exists to capture the arguments that you want to forward to the route decorator
+        assert (
+            "response_model" not in route_kwargs
+        ), "Do not use PydanticResponse.wrap_route if you are already specifying a response model"
+
+        def decorator(
+            endpoint_method: DecoratedEndpoint,
+        ) -> DecoratedEndpoint:
+            # the return annotation is e.g. PydanticResponse[SimpleBody[Whatever]]
+            return_annotation = get_typed_return_annotation(endpoint_method)
+            # the first arg of the outermost type is the argument to the generic,
+            # in this case SimpleBody[Whatever]
+            response_model = get_args(return_annotation)[0]
+            # and that's what we want to pass to the route method as response_model, so we do it and get the actual
+            # function transformer
+            route_decorator = route_method(
+                **route_kwargs, response_model=response_model
+            )
+            # which we then call on the endpoint method to get it registered with the router, and return the results
+            return route_decorator(endpoint_method)
+
+        # and finally we return our own function transformer with the route method args closed over
+        return decorator
 
     def __init__(
         self,
@@ -163,7 +236,7 @@ class DeprecatedResponseDataModel(BaseModel):
         Prefer ResourceModel, which requires ID to be specified
     """
 
-    id: str = Field(None, description="Unique identifier for the resource object.")
+    id: str = Field(..., description="Unique identifier for the resource object.")
 
 
 # TODO(mc, 2021-12-09): remove this model

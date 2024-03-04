@@ -4,7 +4,7 @@ from typing import Generator
 
 import pytest
 import sqlalchemy
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
 from system_server.persistence.database import create_sql_engine
 from system_server.persistence import (

@@ -25,6 +25,8 @@ from opentrons.hardware_control import modules
 from opentrons.hardware_control.types import (
     BoardRevision,
     Axis,
+    HepaFanState,
+    HepaUVState,
     OT3Mount,
     OT3AxisMap,
     CurrentConfig,
@@ -446,7 +448,7 @@ class OT3Simulator(FlexBackend):
     def _attached_to_mount(
         self, mount: OT3Mount, expected_instr: Optional[PipetteName]
     ) -> OT3AttachedInstruments:
-        init_instr = self._attached_instruments.get(mount, {"model": None, "id": None})  # type: ignore
+        init_instr = self._attached_instruments.get(mount, {"model": None, "id": None})
         if mount is OT3Mount.GRIPPER:
             return self._attached_gripper_to_mount(cast(GripperSpec, init_instr))
         return self._attached_pipette_to_mount(
@@ -803,3 +805,15 @@ class OT3Simulator(FlexBackend):
         # This is a (pretty bad) simulation of the gripper actually gripping something,
         # but it should work.
         self._encoder_position[Axis.G] = (hard_limit_upper - jaw_width) / 2
+
+    async def set_hepa_fan_state(self, fan_on: bool, duty_cycle: int) -> bool:
+        return False
+
+    async def get_hepa_fan_state(self) -> Optional[HepaFanState]:
+        return None
+
+    async def set_hepa_uv_state(self, light_on: bool, timeout_s: int) -> bool:
+        return False
+
+    async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
+        return None

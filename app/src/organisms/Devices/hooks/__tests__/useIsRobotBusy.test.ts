@@ -1,6 +1,10 @@
 import { UseQueryResult } from 'react-query'
 
-import { useAllSessionsQuery, useEstopQuery } from '@opentrons/react-api-client'
+import {
+  useAllSessionsQuery,
+  useCurrentAllSubsystemUpdatesQuery,
+  useEstopQuery,
+} from '@opentrons/react-api-client'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 
 import {
@@ -180,6 +184,22 @@ describe('useIsRobotBusy', () => {
         data: {
           id: '123',
         },
+      },
+    } as any)
+    const result = useIsRobotBusy()
+    expect(result).toBe(true)
+  })
+  it('returns true when a subsystem update is in progress', () => {
+    vi.mocked(useCurrentAllSubsystemUpdatesQuery).mockReturnValue({
+      data: {
+        data: [
+          {
+            id: '123',
+            createdAt: 'today',
+            subsystem: 'pipette_right',
+            updateStatus: 'updating',
+          },
+        ],
       },
     } as any)
     const result = useIsRobotBusy()

@@ -50,6 +50,22 @@ export const FLEX_CUTOUT_BY_SLOT_ID: { [slotId: string]: CutoutId } = {
   D4: 'cutoutD3',
 }
 
+// mapping of Flex single slot cutouts to deck slots
+export const FLEX_SINGLE_SLOT_BY_CUTOUT_ID: { [CutoutId: string]: string } = {
+  cutoutA1: 'A1',
+  cutoutA2: 'A2',
+  cutoutA3: 'A3',
+  cutoutB1: 'B1',
+  cutoutB2: 'B2',
+  cutoutB3: 'B3',
+  cutoutC1: 'C1',
+  cutoutC2: 'C2',
+  cutoutC3: 'C3',
+  cutoutD1: 'D1',
+  cutoutD2: 'D2',
+  cutoutD3: 'D3',
+}
+
 // returns the position associated with a slot id
 export function getPositionFromSlotId(
   slotId: string,

@@ -1532,6 +1532,19 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
           }
         : {}
 
+      const hardcodedTrashBinId = `${uuid()}:fixedTrash`
+      const hardcodedTrashBin = {
+        [hardcodedTrashBinId]: {
+          name: 'trashBin' as const,
+          id: hardcodedTrashBinId,
+          location: getCutoutIdByAddressableArea(
+            'fixedTrash' as AddressableAreaName,
+            'fixedTrashSlot',
+            OT2_ROBOT_TYPE
+          ),
+        },
+      }
+
       if (isFlex) {
         return {
           ...state,
@@ -1541,7 +1554,14 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
           ...stagingAreas,
         }
       } else {
-        return { ...state, ...trashBin }
+        if (trashBin != null) {
+          return { ...state, ...trashBin }
+        } else {
+          //  when importing an OT-2 protocol, ensure that there is always a trashBin
+          //  entity created even when the protocol does not have a command that involves
+          //  the trash. Since no trash for OT-2 is not supported
+          return { ...state, ...hardcodedTrashBin }
+        }
       }
     },
 

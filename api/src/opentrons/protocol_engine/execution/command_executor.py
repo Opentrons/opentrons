@@ -13,7 +13,12 @@ from opentrons_shared_data.errors.exceptions import (
 
 from ..state import StateStore
 from ..resources import ModelUtils
-from ..commands import CommandStatus, AbstractCommandImpl
+from ..commands import (
+    CommandStatus,
+    AbstractCommandImpl,
+    CommandResult,
+    CommandPrivateResult,
+)
 from ..actions import ActionDispatcher, UpdateCommandAction, FailCommandAction
 from ..errors import RunStoppedError
 from ..errors.exceptions import EStopActivatedError as PE_EStopActivatedError
@@ -108,8 +113,8 @@ class CommandExecutor:
                 f"Executing {command.id}, {command.commandType}, {command.params}"
             )
             if isinstance(command_impl, AbstractCommandImpl):
-                result = await command_impl.execute(command.params)  # type: ignore[arg-type]
-                private_result = None
+                result: CommandResult = await command_impl.execute(command.params)  # type: ignore[arg-type]
+                private_result: Optional[CommandPrivateResult] = None
             else:
                 result, private_result = await command_impl.execute(command.params)  # type: ignore[arg-type]
 

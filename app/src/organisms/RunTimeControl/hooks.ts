@@ -78,9 +78,9 @@ export function useRunStatus(
     enabled:
       lastRunStatus.current == null ||
       !([
-        RUN_STATUS_STOP_REQUESTED,
         RUN_STATUS_FAILED,
         RUN_STATUS_SUCCEEDED,
+        RUN_STATUS_STOP_REQUESTED,
       ] as RunStatus[]).includes(lastRunStatus.current),
     onSuccess: data => (lastRunStatus.current = data?.data?.status ?? null),
     ...options,

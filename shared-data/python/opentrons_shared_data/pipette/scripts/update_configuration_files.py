@@ -76,7 +76,7 @@ def list_configuration_keys() -> Tuple[List[str], Dict[int, str]]:
 
 def list_available_enum(enum_type: Type[Enum]) -> List[str]:
     """List available pipette models"""
-    return [f"{i}: {v}" for (i, v) in enumerate(enum_type)]  # type: ignore[var-annotated]
+    return [f"{i}: {v}" for (i, v) in enumerate(enum_type)]
 
 
 def handle_subclass_model(

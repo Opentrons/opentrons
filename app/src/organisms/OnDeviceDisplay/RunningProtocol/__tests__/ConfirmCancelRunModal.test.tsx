@@ -15,6 +15,8 @@ import { i18n } from '../../../../i18n'
 import { useTrackProtocolRunEvent } from '../../../../organisms/Devices/hooks'
 import { useRunStatus } from '../../../../organisms/RunTimeControl/hooks'
 import { useTrackEvent } from '../../../../redux/analytics'
+import { getLocalRobot } from '../../../../redux/discovery'
+import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
 import { ConfirmCancelRunModal } from '../ConfirmCancelRunModal'
 import { CancelingRunModal } from '../CancelingRunModal'
 
@@ -55,6 +57,8 @@ const render = (props: React.ComponentProps<typeof ConfirmCancelRunModal>) => {
 }
 
 const RUN_ID = 'mock_runID'
+const ROBOT_NAME = 'otie'
+
 const mockFn = vi.fn()
 
 describe('ConfirmCancelRunModal', () => {
@@ -75,12 +79,17 @@ describe('ConfirmCancelRunModal', () => {
       isLoading: false,
     } as any)
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
-    when(useTrackProtocolRunEvent).calledWith(RUN_ID).thenReturn({
+    when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
     })
     vi.mocked(CancelingRunModal).mockReturnValue(
       <div>mock CancelingRunModal</div>
     )
+
+    vi.mocked(getLocalRobot).mockReturnValue({
+      ...mockConnectedRobot,
+      name: ROBOT_NAME,
+    })
     when(useRunStatus).calledWith(RUN_ID).thenReturn(RUN_STATUS_IDLE)
   })
 

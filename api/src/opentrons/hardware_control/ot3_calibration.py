@@ -9,7 +9,7 @@ import numpy as np
 from enum import Enum
 from math import floor, copysign
 from logging import getLogger
-from opentrons.util.linal import solve_attitude, SolvePoints
+from opentrons.util.linal import solve_attitude, SolvePoints, DoubleMatrix
 
 from .types import OT3Mount, Axis, GripperProbe
 from opentrons.types import Point
@@ -952,8 +952,10 @@ def apply_machine_transform(
     -------
     Attitude matrix with regards to machine coordinate system.
     """
-    belt_attitude_arr = np.array(belt_attitude)
-    machine_transform_arr = np.array(defaults_ot3.DEFAULT_MACHINE_TRANSFORM)
+    belt_attitude_arr: DoubleMatrix = np.array(belt_attitude)
+    machine_transform_arr: DoubleMatrix = np.array(
+        defaults_ot3.DEFAULT_MACHINE_TRANSFORM
+    )
     deck_attitude_arr = np.dot(belt_attitude_arr, machine_transform_arr)
     deck_attitude = deck_attitude_arr.round(4).tolist()
     return deck_attitude  # type: ignore[no-any-return]
@@ -991,7 +993,7 @@ def validate_attitude_deck_calibration(
     TODO(pm, 5/9/2023): As with the OT2, expand on this method,
     or create another method to diagnose bad instrument offset data
     """
-    curr_cal = np.array(deck_cal.attitude)
+    curr_cal: DoubleMatrix = np.array(deck_cal.attitude)
     row, _ = curr_cal.shape
     rank: int = np.linalg.matrix_rank(curr_cal)
     if row != rank:

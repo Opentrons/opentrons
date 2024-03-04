@@ -19,6 +19,10 @@ import { useCloneRun } from '../../../ProtocolUpload/hooks'
 import { useHardwareStatusText } from '../hooks'
 import { RecentRunProtocolCard } from '../'
 import { useNotifyAllRunsQuery } from '../../../../resources/runs/useNotifyAllRunsQuery'
+import {
+  useRobotInitializationStatus,
+  INIT_STATUS,
+} from '../../../../resources/health/hooks'
 
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
 
@@ -33,6 +37,7 @@ vi.mock('../hooks')
 vi.mock('../../../../resources/runs/useNotifyAllRunsQuery')
 
 const RUN_ID = 'mockRunId'
+const ROBOT_NAME = 'otie'
 
 const mockMissingPipette = [
   {
@@ -208,5 +213,17 @@ describe('RecentRunProtocolCard', () => {
     } as any)
     render(props)
     screen.getByText('mock Skeleton')
+  })
+
+  it('should render the skeleton when the robot server is initializing', () => {
+    vi.mocked(useRobotInitializationStatus).mockReturnValue(INIT_STATUS.INITIALIZING)
+    const [{ getByText }] = render(props)
+    getByText('mock Skeleton')
+  })
+
+  it('should render the skeleton when the robot server is unresponsive', () => {
+    vi.mocked(useRobotInitializationStatus).mockReturnValue(null)
+    const [{ getByText }] = render(props)
+    getByText('mock Skeleton')
   })
 })

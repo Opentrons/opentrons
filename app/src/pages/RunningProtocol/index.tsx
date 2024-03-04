@@ -110,9 +110,9 @@ export function RunningProtocol(): JSX.Element {
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
   const { playRun, pauseRun } = useRunActionMutations(runId)
-  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot != null ? localRobot.name : 'no name'
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const robotType = useRobotType(robotName)
   React.useEffect(() => {

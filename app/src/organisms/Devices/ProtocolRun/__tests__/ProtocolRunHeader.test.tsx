@@ -302,9 +302,11 @@ describe('ProtocolRunHeader', () => {
     when(vi.mocked(useProtocolDetailsForRun))
       .calledWith(RUN_ID)
       .thenReturn(PROTOCOL_DETAILS)
-    when(vi.mocked(useTrackProtocolRunEvent)).calledWith(RUN_ID).thenReturn({
-      trackProtocolRunEvent: mockTrackProtocolRunEvent,
-    })
+    when(vi.mocked(useTrackProtocolRunEvent))
+      .calledWith(RUN_ID, ROBOT_NAME)
+      .thenReturn({
+        trackProtocolRunEvent: mockTrackProtocolRunEvent,
+      })
     when(vi.mocked(useDismissCurrentRunMutation))
       .calledWith()
       .thenReturn({
