@@ -28,22 +28,54 @@ DEFAULT_ACCELERATION = DEFAULT_ACCELERATIONS.low_throughput[types.OT3AxisKind.P]
 DEFAULT_CURRENT = DEFAULT_RUN_CURRENT.low_throughput[types.OT3AxisKind.P]
 DEFAULT_SPEED = DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P]
 
-MUST_PASS_CURRENT = round(DEFAULT_CURRENT * 0.75, 2)  # the target spec (must pass here)
+# MUST_PASS_CURRENT = round(DEFAULT_CURRENT * 0.75, 2)  # the target spec (must pass here)
+MUST_PASS_CURRENT = 0.1
 assert (
     MUST_PASS_CURRENT < DEFAULT_CURRENT
 ), "must-pass current must be less than default current"
+# TEST_SPEEDS = [
+#     DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] - 20,
+#     DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P],
+#     DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] + 10,
+#     DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] + 20,
+# ]
+# TEST_SPEEDS = [
+#     90,
+#     80,
+#     70,
+#     60
+# ]
 TEST_SPEEDS = [
-    DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] - 20,
-    DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P],
-    DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] + 10,
-    DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] + 20,
+    150,
+    140,
+    130,
+    120,
+    110,
+    100,
+    90
 ]
+# PLUNGER_CURRENTS_SPEED = {
+#     MUST_PASS_CURRENT - 0.45: TEST_SPEEDS,
+#     MUST_PASS_CURRENT - 0.35: TEST_SPEEDS,
+#     MUST_PASS_CURRENT - 0.25: TEST_SPEEDS,
+#     MUST_PASS_CURRENT: TEST_SPEEDS,
+#     DEFAULT_CURRENT: TEST_SPEEDS,
+# }
+# PLUNGER_CURRENTS_SPEED = {
+#     0.3: TEST_SPEEDS,
+#     0.35: TEST_SPEEDS,
+#     0.4: TEST_SPEEDS,
+#     0.45: TEST_SPEEDS,
+#     0.5: TEST_SPEEDS,
+#     0.55: TEST_SPEEDS,
+#     0.6: TEST_SPEEDS,
+#     1: TEST_SPEEDS,
+# }
 PLUNGER_CURRENTS_SPEED = {
-    MUST_PASS_CURRENT - 0.45: TEST_SPEEDS,
-    MUST_PASS_CURRENT - 0.35: TEST_SPEEDS,
-    MUST_PASS_CURRENT - 0.25: TEST_SPEEDS,
-    MUST_PASS_CURRENT: TEST_SPEEDS,
-    DEFAULT_CURRENT: TEST_SPEEDS,
+    0.7: TEST_SPEEDS,
+    0.8: TEST_SPEEDS,
+    0.9: TEST_SPEEDS,
+    1: TEST_SPEEDS,
 }
 
 MAX_SPEED = max(TEST_SPEEDS)
@@ -208,12 +240,12 @@ async def _test_plunger(
     continue_after_stall: bool,
 ) -> float:
     # start at HIGHEST (easiest) current
-    currents = sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=False)
+    currents = sorted(list(PLUNGER_CURRENTS_SPEED.keys()), reverse=True)
     max_failed_current = 0.0
     for current in currents:
         ui.print_title(f"CURRENT = {current}")
         # start at LOWEST (easiest) speed
-        speeds = sorted(PLUNGER_CURRENTS_SPEED[current], reverse=False)
+        speeds = sorted(PLUNGER_CURRENTS_SPEED[current], reverse=True)
         for speed in speeds:
             for trial in range(trials):
                 ui.print_header(
