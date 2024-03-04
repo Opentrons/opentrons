@@ -111,7 +111,7 @@ class ModuleAtPort:
 
 
 class SimulatingModuleAtPort(ModuleAtPort):
-    serial_numer: str
+    serial_number: str
 
 
 class BundledFirmware(NamedTuple):
