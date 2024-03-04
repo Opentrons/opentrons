@@ -28,6 +28,7 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('../useRobotUpdateInfo')
 vi.mock('../../../../../redux/robot-update')
 vi.mock('../../../../../redux/robot-update/hooks')
+vi.mock('../../../../../resources/health/hooks')
 
 const render = (
   props: React.ComponentProps<typeof RobotUpdateProgressModal>
@@ -177,7 +178,7 @@ describe('DownloadUpdateModal', () => {
     render(props)
 
     act(() => {
-      vi.advanceTimersByTime(TIME_BEFORE_ALLOWING_EXIT_MS)
+      vi.advanceTimersByTime(TIME_BEFORE_ALLOWING_EXIT)
     })
 
     screen.getByText(/Try restarting the update./i)
@@ -185,8 +186,10 @@ describe('DownloadUpdateModal', () => {
   })
 
   it('renders alternative text if the robot is initializing', () => {
-    mockUseRobotInitializationStatus.mockReturnValue(INIT_STATUS.INITIALIZING)
-    mockUseRobotUpdateInfo.mockReturnValue({
+    vi.mocked(useRobotInitializationStatus).mockReturnValue(
+      INIT_STATUS.INITIALIZING
+    )
+    vi.mocked(useRobotUpdateInfo).mockReturnValue({
       updateStep: 'restart',
       progressPercent: 100,
     })
@@ -199,16 +202,18 @@ describe('DownloadUpdateModal', () => {
   })
 
   it('renders alternative text if update takes too long while robot is initializing', () => {
-    jest.useFakeTimers()
-    mockUseRobotInitializationStatus.mockReturnValue(INIT_STATUS.INITIALIZING)
-    mockUseRobotUpdateInfo.mockReturnValue({
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    vi.mocked(useRobotInitializationStatus).mockReturnValue(
+      INIT_STATUS.INITIALIZING
+    )
+    vi.mocked(useRobotUpdateInfo).mockReturnValue({
       updateStep: 'restart',
       progressPercent: 100,
     })
     render(props)
 
     act(() => {
-      jest.advanceTimersByTime(TIME_BEFORE_ALLOWING_EXIT_INIT)
+      vi.advanceTimersByTime(TIME_BEFORE_ALLOWING_EXIT_INIT)
     })
 
     screen.getByText(

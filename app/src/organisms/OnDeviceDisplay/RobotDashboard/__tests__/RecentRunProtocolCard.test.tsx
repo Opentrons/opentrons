@@ -121,7 +121,7 @@ describe('RecentRunProtocolCard', () => {
     vi.mocked(useProtocolQuery).mockReturnValue({
       data: { data: { metadata: { protocolName: 'mockProtocol' } } },
     } as any)
-    when(useTrackProtocolRunEvent).calledWith(RUN_ID).thenReturn({
+    when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
     })
     when(useCloneRun)
@@ -216,7 +216,9 @@ describe('RecentRunProtocolCard', () => {
   })
 
   it('should render the skeleton when the robot server is initializing', () => {
-    vi.mocked(useRobotInitializationStatus).mockReturnValue(INIT_STATUS.INITIALIZING)
+    vi.mocked(useRobotInitializationStatus).mockReturnValue(
+      INIT_STATUS.INITIALIZING
+    )
     const [{ getByText }] = render(props)
     getByText('mock Skeleton')
   })
