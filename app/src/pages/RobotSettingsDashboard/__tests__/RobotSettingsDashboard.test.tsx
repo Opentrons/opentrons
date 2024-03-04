@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { vi, it, describe, expect, beforeEach } from 'vitest'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 
@@ -34,7 +34,6 @@ vi.mock('../../../organisms/Navigation')
 vi.mock('../../../organisms/RobotSettingsDashboard/TouchScreenSleep')
 vi.mock('../../../organisms/RobotSettingsDashboard/NetworkSettings')
 vi.mock('../../../organisms/RobotSettingsDashboard/DeviceReset')
-vi.mock('../../../organisms/RobotSettingsDashboard/Privacy')
 vi.mock('../../../organisms/RobotSettingsDashboard/RobotSystemVersion')
 vi.mock('../../../organisms/RobotSettingsDashboard/TouchscreenBrightness')
 vi.mock('../../../organisms/RobotSettingsDashboard/UpdateChannel')
@@ -71,6 +70,10 @@ describe('RobotSettingsDashboard', () => {
       toggleLights: mockToggleLights,
     })
     vi.mocked(useNetworkConnection).mockReturnValue({} as any)
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
   })
 
   it('should render Navigation', () => {
@@ -147,13 +150,6 @@ describe('RobotSettingsDashboard', () => {
     const button = getByText('Touchscreen Brightness')
     fireEvent.click(button)
     expect(vi.mocked(TouchscreenBrightness)).toHaveBeenCalled()
-  })
-
-  it('should render component when tapping privacy', () => {
-    const [{ getByText }] = render()
-    const button = getByText('Privacy')
-    fireEvent.click(button)
-    expect(vi.mocked(Privacy)).toHaveBeenCalled()
   })
 
   it('should render component when tapping device rest', () => {
