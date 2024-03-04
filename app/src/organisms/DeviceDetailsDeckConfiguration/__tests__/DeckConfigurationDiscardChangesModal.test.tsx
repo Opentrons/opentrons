@@ -1,22 +1,20 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi, expect } from 'vitest'
+import { useHistory } from 'react-router-dom'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { DeckConfigurationDiscardChangesModal } from '../DeckConfigurationDiscardChangesModal'
 
-import type * as ReactRouterDom from 'react-router-dom'
-
 const mockFunc = vi.fn()
 const mockGoBack = vi.fn()
-const mockPush = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
-  const reactRouterDom = await importOriginal<typeof ReactRouterDom>()
+  const actual = await importOriginal<typeof useHistory>()
   return {
-    ...reactRouterDom,
-    useHistory: () => ({ push: mockPush } as any),
+    ...actual,
+    useHistory: () => ({ goBack: mockGoBack }),
   }
 })
 

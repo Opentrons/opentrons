@@ -13,8 +13,5 @@
     "skipLibCheck": true,
     "moduleResolution": "node",
     "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom"],
-    "paths": {
-      "@opentrons/shared-data": ["./shared-data"]
-    }
   }
 }

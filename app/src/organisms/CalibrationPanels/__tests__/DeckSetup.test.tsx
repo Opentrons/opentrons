@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
+import { vi, it, describe, expect } from 'vitest'
+
 import { getDeckDefinitions } from '@opentrons/shared-data'
-import { vi, it, describe, expect, beforeEach } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
@@ -15,17 +16,14 @@ import * as Sessions from '../../../redux/sessions'
 import { DeckSetup } from '../DeckSetup'
 
 vi.mock('../../../assets/labware/getLabware')
-vi.mock('@opentrons/shared-data')
-vi.mock(
-  '@opentrons/components/src/hardware-sim/Deck/RobotWorkSpace',
-  async importOriginal => {
-    const actual = (await importOriginal()) as any
-    return {
-      ...actual,
-      RobotWorkSpace: () => <></>,
-    }
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<typeof getDeckDefinitions>()
+  return {
+    ...actual,
+    getDeckDefinitions: () => vi.fn(),
   }
-)
+})
+vi.mock('@opentrons/components/src/hardware-sim/Deck/RobotWorkSpace')
 
 describe('DeckSetup', () => {
   const mockSendCommands = vi.fn()
@@ -60,10 +58,6 @@ describe('DeckSetup', () => {
       { i18nInstance: i18n }
     )
   }
-
-  beforeEach(() => {
-    vi.mocked(getDeckDefinitions).mockReturnValue({})
-  })
 
   it('clicking continue proceeds to next step', () => {
     render()

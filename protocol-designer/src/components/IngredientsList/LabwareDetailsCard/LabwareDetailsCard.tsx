@@ -63,7 +63,11 @@ export function LabwareDetailsCard(): JSX.Element {
             {t('generic.nickname')}
           </span>
           <EditableTextField
-            value={labwareNicknamesById[labwareId] ?? 'Unnamed Labware'}
+            value={
+              labwareId != null && labwareNicknamesById[labwareId] != null
+                ? labwareNicknamesById[labwareId]
+                : 'Unnamed Labware'
+            }
             saveEdit={renameLabware}
           />
         </div>

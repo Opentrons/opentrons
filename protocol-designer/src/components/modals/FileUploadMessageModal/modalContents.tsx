@@ -195,7 +195,6 @@ export function useModalContents(
         false,
         `invalid messageKey ${uploadResponse.messageKey} specified for modal`
       )
-      // @ts-expect-error (ce, 2021-06-23) the case below will never happened, as we've already narrowed all posibilities
       return { title: '', body: uploadResponse.messageKey }
     }
   }

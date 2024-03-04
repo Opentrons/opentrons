@@ -1,21 +1,23 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
-import fixture_adapter from '@opentrons/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json'
-import fixture_96_wellplate from '@opentrons/shared-data/labware/definitions/2/opentrons_96_wellplate_200ul_pcr_full_skirt/1.json'
+
+import { opentrons96PcrAdapterV1, fixture96Plate } from '@opentrons/shared-data'
+
 import { i18n } from '../../../i18n'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../redux/config'
 import { getLabwareDefinitionsFromCommands } from '../../LabwarePositionCheck/utils/labware'
 import { ApplyHistoricOffsets } from '..'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { OffsetCandidate } from '../hooks/useOffsetCandidatesForAnalysis'
 
 vi.mock('../../../redux/config')
 vi.mock('../../LabwarePositionCheck/utils/labware')
 
-const mockLabwareDef = fixture_96_wellplate as LabwareDefinition2
-const mockAdapterDef = fixture_adapter as LabwareDefinition2
+const mockLabwareDef = fixture96Plate as LabwareDefinition2
+const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition2
 
 const mockFirstCandidate: OffsetCandidate = {
   id: 'first_offset_id',
@@ -59,7 +61,7 @@ const mockFourthCandidate: OffsetCandidate = {
 }
 
 describe('ApplyHistoricOffsets', () => {
-  const mockSetShouldApplyOffsets = jest.fn()
+  const mockSetShouldApplyOffsets = vi.fn()
   const render = (
     props?: Partial<React.ComponentProps<typeof ApplyHistoricOffsets>>
   ) =>

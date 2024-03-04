@@ -22,7 +22,6 @@ export interface GenerateRobotStateTimelineArgs {
 export const generateRobotStateTimeline = (
   args: GenerateRobotStateTimelineArgs
 ): StepGeneration.Timeline => {
-  console.log('got to generateRobotStateTimeline')
   const {
     allStepArgsAndErrors,
     orderedStepIds,

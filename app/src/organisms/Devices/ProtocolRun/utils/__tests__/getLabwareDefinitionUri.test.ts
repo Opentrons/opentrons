@@ -1,8 +1,9 @@
+import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { getLabwareDefURI, LabwareDefinition2 } from '@opentrons/shared-data'
 import { getLabwareDefinitionUri } from '../getLabwareDefinitionUri'
 import type { LoadedLabware } from '@opentrons/shared-data'
 
-jest.mock('@opentrons/shared-data')
+vi.mock('@opentrons/shared-data')
 
 const mockGetLabareDefURI = getLabwareDefURI as jest.MockedFunction<
   typeof getLabwareDefURI

@@ -18,7 +18,7 @@ import { selectors as stepFormSelectors } from '../../step-forms'
 import { getRobotType } from '../../file-data/selectors'
 import { getAdditionalEquipment } from '../../step-forms/selectors'
 import { resetScrollElements } from '../../ui/steps/utils'
-import { Portal, getMainPagePortalEl } from '../portals/MainPageModalPortal'
+import { getMainPagePortalEl } from '../portals/MainPageModalPortal'
 import { useBlockingHint } from '../Hints/useBlockingHint'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import {
