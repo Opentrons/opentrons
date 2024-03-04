@@ -1,5 +1,3 @@
-"""Smoke Test v3.0 """
-# https://opentrons.atlassian.net/projects/RQA?selectedItem=com.atlassian.plugins.atlassian-connect-plugin:com.kanoah.test-manager__main-project-page#!/testCase/QB-T497
 from opentrons import protocol_api
 
 metadata = {
