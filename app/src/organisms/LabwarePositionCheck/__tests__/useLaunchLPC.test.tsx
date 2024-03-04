@@ -16,11 +16,10 @@ import {
   useCreateMaintenanceRunLabwareDefinitionMutation,
   useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, fixtureTiprack300ul } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { useCreateTargetedMaintenanceRunMutation } from '../../../resources/runs/hooks'
-import { fixtureTiprack300ul } from '@opentrons/shared-data'
 import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
 import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
 import { useLaunchLPC } from '../useLaunchLPC'

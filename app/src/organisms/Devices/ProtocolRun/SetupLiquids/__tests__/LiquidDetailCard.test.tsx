@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, beforeEach, vi, expect } from 'vitest'
+import { describe, it, beforeEach, vi, expect, Mock } from 'vitest'
 
 import { SPACING, COLORS } from '@opentrons/components'
 
@@ -15,8 +15,6 @@ import {
 } from '../../../../../redux/analytics'
 import { getIsOnDevice } from '../../../../../redux/config'
 import { LiquidDetailCard } from '../LiquidDetailCard'
-
-import { Mock } from 'vitest'
 
 vi.mock('../../../../../redux/analytics')
 vi.mock('../../../../../redux/config')

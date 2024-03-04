@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { describe, it, beforeEach, vi } from 'vitest'
-import { screen } from '@testing-library/react'
+import { screen, fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
@@ -8,7 +8,6 @@ import { SetupLiquids } from '../index'
 import { SetupLiquidsList } from '../SetupLiquidsList'
 import { SetupLiquidsMap } from '../SetupLiquidsMap'
 import { BackToTopButton } from '../../BackToTopButton'
-import { fireEvent } from '@testing-library/react'
 
 vi.mock('../SetupLiquidsList')
 vi.mock('../SetupLiquidsMap')

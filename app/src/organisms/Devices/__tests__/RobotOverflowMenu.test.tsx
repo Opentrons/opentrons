@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
-import { screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
@@ -68,7 +67,7 @@ describe('RobotOverflowMenu', () => {
     render(props)
     const btn = screen.getByLabelText('RobotOverflowMenu_button')
     fireEvent.click(btn)
-    const why = screen.getByText('Why is this robot unavailable?')
+    screen.getByText('Why is this robot unavailable?')
     screen.getByText('Forget unavailable robot')
   })
 

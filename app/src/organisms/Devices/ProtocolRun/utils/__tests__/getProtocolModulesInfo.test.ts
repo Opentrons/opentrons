@@ -3,14 +3,12 @@ import {
   transfer_settings,
   multiple_temp_modules,
   ot2DeckDefV4,
-} from '@opentrons/shared-data'
-import { getProtocolModulesInfo } from '../getProtocolModulesInfo'
-import {
   getModuleDef2,
   ProtocolAnalysisOutput,
   LoadedLabware,
   LoadedModule,
 } from '@opentrons/shared-data'
+import { getProtocolModulesInfo } from '../getProtocolModulesInfo'
 
 const protocolWithMagTempTC = ({
   ...transfer_settings,

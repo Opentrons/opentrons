@@ -77,7 +77,7 @@ describe('SetupRobotCalibration', () => {
   })
 
   it('renders deck, pipette, and tip length calibration components', () => {
-    render()[0]
+    render()
     screen.getByText('Mock SetupDeckCalibration')
     screen.getByText('Mock SetupInstrumentCalibration')
     screen.getByText('Mock SetupTipLengthCalibration')
@@ -85,19 +85,19 @@ describe('SetupRobotCalibration', () => {
 
   it('renders only pipette calibration component for Flex', () => {
     when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
-    render()[0]
+    render()
     expect(screen.queryByText('Mock SetupDeckCalibration')).toBeNull()
     screen.getByText('Mock SetupInstrumentCalibration')
     expect(screen.queryByText('Mock SetupTipLengthCalibration')).toBeNull()
   })
 
   it('changes Proceed CTA copy based on next step', () => {
-    render({ nextStep: 'labware_setup_step' })[0]
+    render({ nextStep: 'labware_setup_step' })
     screen.getByRole('button', { name: 'Proceed to labware' })
   })
 
   it('calls the expandStep function and tracks the analytics event on click', () => {
-    render()[0]
+    render()
     fireEvent.click(screen.getByRole('button', { name: 'Proceed to modules' }))
     expect(mockExpandStep).toHaveBeenCalled()
     expect(mockTrackEvent).toHaveBeenCalledWith({
@@ -107,7 +107,7 @@ describe('SetupRobotCalibration', () => {
   })
 
   it('does not call the expandStep function on click if calibration is not complete', () => {
-    render({ calibrationStatus: { complete: false } })[0]
+    render({ calibrationStatus: { complete: false } })
     const button = screen.getByRole('button', { name: 'Proceed to modules' })
     expect(button).toBeDisabled()
     fireEvent.click(button)
@@ -116,7 +116,7 @@ describe('SetupRobotCalibration', () => {
 
   it('does not call the expandStep function on click if run has started', () => {
     when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
-    render()[0]
+    render()
     const button = screen.getByRole('button', { name: 'Proceed to modules' })
     expect(button).toBeDisabled()
     fireEvent.click(button)

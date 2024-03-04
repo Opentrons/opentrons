@@ -1,6 +1,5 @@
 import {
   LabwareDefinition2,
-  ModuleDefinition,
   SPAN7_8_10_11_SLOT,
   THERMOCYCLER_MODULE_V1,
   getModuleDef2,

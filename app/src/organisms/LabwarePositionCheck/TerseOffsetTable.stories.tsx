@@ -6,8 +6,12 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
 } from '@opentrons/components'
-import { fixture12Trough, fixtureTiprack10ul } from '@opentrons/shared-data'
-import { LabwareDefinition2, getLabwareDefURI } from '@opentrons/shared-data'
+import {
+  fixture12Trough,
+  fixtureTiprack10ul,
+  LabwareDefinition2,
+  getLabwareDefURI,
+} from '@opentrons/shared-data'
 
 import { touchScreenViewport } from '../../DesignTokens/constants'
 import { SmallButton } from '../../atoms/buttons'

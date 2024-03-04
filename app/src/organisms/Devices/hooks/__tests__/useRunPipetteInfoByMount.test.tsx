@@ -6,9 +6,9 @@ import {
   getPipetteNameSpecs,
   getLoadedLabwareDefinitionsByUri,
   RunTimeCommand,
+  opentrons96Tiprack10UlV1Uncasted as _tiprack10ul,
 } from '@opentrons/shared-data'
 import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
-import { opentrons96Tiprack10UlV1Uncasted as _tiprack10ul } from '@opentrons/shared-data'
 
 import {
   mockPipetteOffsetCalibration1,
@@ -31,11 +31,6 @@ import {
 } from '..'
 import _uncastedModifiedSimpleV6Protocol from '../__fixtures__/modifiedSimpleV6.json'
 
-import type {
-  LabwareDefinition2,
-  PipetteNameSpecs,
-  ProtocolAnalysisOutput,
-} from '@opentrons/shared-data'
 import type * as SharedData from '@opentrons/shared-data'
 import type { PipetteInfo } from '..'
 
@@ -75,7 +70,7 @@ const TIP_LENGTH_CALIBRATIONS = [
   mockTipLengthCalibration2,
 ]
 
-const tiprack10ul = _tiprack10ul as LabwareDefinition2
+const tiprack10ul = _tiprack10ul as SharedData.LabwareDefinition2
 const modifiedSimpleV6Protocol = ({
   ..._uncastedModifiedSimpleV6Protocol,
   labware: [
@@ -110,7 +105,7 @@ const modifiedSimpleV6Protocol = ({
       pipetteName: 'p10_single',
     },
   ],
-} as any) as ProtocolAnalysisOutput
+} as any) as SharedData.ProtocolAnalysisOutput
 
 const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',
@@ -135,12 +130,14 @@ describe('useRunPipetteInfoByMount hook', () => {
       .thenReturn(PROTOCOL_DETAILS.protocolData as any)
     when(vi.mocked(useStoredProtocolAnalysis))
       .calledWith('1')
-      .thenReturn((PROTOCOL_DETAILS as unknown) as ProtocolAnalysisOutput)
+      .thenReturn(
+        (PROTOCOL_DETAILS as unknown) as SharedData.ProtocolAnalysisOutput
+      )
     when(vi.mocked(getPipetteNameSpecs))
       .calledWith('p10_single')
       .thenReturn({
         displayName: 'P10 Single-Channel GEN1',
-      } as PipetteNameSpecs)
+      } as SharedData.PipetteNameSpecs)
     when(vi.mocked(getLoadedLabwareDefinitionsByUri))
       .calledWith(
         _uncastedModifiedSimpleV6Protocol.commands as RunTimeCommand[]

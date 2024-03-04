@@ -4,8 +4,10 @@ import { Provider } from 'react-redux'
 import { I18nextProvider } from 'react-i18next'
 import { createStore } from 'redux'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
-import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
-import { simple_v6 as _uncastedSimpleV6Protocol } from '@opentrons/shared-data'
+import {
+  getLoadedLabwareDefinitionsByUri,
+  simple_v6 as _uncastedSimpleV6Protocol,
+} from '@opentrons/shared-data'
 import { i18n } from '../../../../i18n'
 import { RUN_ID_1 } from '../../../RunTimeControl/__fixtures__'
 import { useLPCDisabledReason } from '../useLPCDisabledReason'
@@ -17,7 +19,6 @@ import {
 } from '..'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import type { Store } from 'redux'
-import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type * as SharedData from '@opentrons/shared-data'
 import type { State } from '../../../../redux/types'
 
@@ -31,7 +32,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
   }
 })
 
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisOutput
+const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as SharedData.ProtocolAnalysisOutput
 
 describe('useLPCDisabledReason', () => {
   const store: Store<State> = createStore(vi.fn(), {})
@@ -48,7 +49,7 @@ describe('useLPCDisabledReason', () => {
       simpleV6Protocol as any
     )
     vi.mocked(useStoredProtocolAnalysis).mockReturnValue(
-      (simpleV6Protocol as unknown) as ProtocolAnalysisOutput
+      (simpleV6Protocol as unknown) as SharedData.ProtocolAnalysisOutput
     )
     vi.mocked(useRunHasStarted).mockReturnValue(false)
     vi.mocked(useRunCalibrationStatus).mockReturnValue({ complete: true })
