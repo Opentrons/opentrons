@@ -1,13 +1,17 @@
 """Tests for opentrons.hardware_control.module_control."""
 import pytest
 from decoy import Decoy, matchers
-from typing import Awaitable, Callable, cast
+from typing import Awaitable, Callable, cast, Union
 
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.rpi_drivers.interfaces import USBDriverInterface
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.modules import AbstractModule
-from opentrons.hardware_control.modules.types import ModuleAtPort, ModuleType
+from opentrons.hardware_control.modules.types import (
+    ModuleAtPort,
+    ModuleType,
+    SimulatingModuleAtPort,
+)
 from opentrons.hardware_control.module_control import AttachedModulesControl
 
 
@@ -55,15 +59,23 @@ def subject(
     return modules_control
 
 
+@pytest.mark.parametrize(
+    "module_at_port_input",
+    [
+        (ModuleAtPort(port="/dev/foo", name="bar")),
+        SimulatingModuleAtPort(port="/dev/foo", name="bar", serial_number="test-123"),
+    ],
+)
 async def test_register_modules(
     decoy: Decoy,
     usb_bus: USBDriverInterface,
     build_module: Callable[..., Awaitable[AbstractModule]],
     hardware_api: HardwareAPI,
     subject: AttachedModulesControl,
+    module_at_port_input: Union[ModuleAtPort, SimulatingModuleAtPort],
 ) -> None:
     """It should register attached modules."""
-    new_mods_at_ports = [ModuleAtPort(port="/dev/foo", name="bar")]
+    new_mods_at_ports = [module_at_port_input]
     actual_ports = [
         ModuleAtPort(
             port="/dev/foo",
