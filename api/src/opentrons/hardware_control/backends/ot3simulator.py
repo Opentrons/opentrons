@@ -825,7 +825,6 @@ class OT3Simulator(FlexBackend):
     def add_estop_callback(self, cb: HardwareEventHandler) -> HardwareEventUnsubscriber:
         return lambda: None
 
-<<<<<<< HEAD
     def check_gripper_position_within_bounds(
         self,
         expected_grip_width: float,
@@ -851,9 +850,8 @@ class OT3Simulator(FlexBackend):
 
     async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
         return None
-=======
+
     def _update_tip_state(self, mount: OT3Mount, status: bool) -> None:
         """This is something we only use in the simulator.
         It is required so that PE simulations using ot3api don't break."""
         self._sim_tip_state[mount] = status
->>>>>>> a26303f8b5 (add in a fix for tip pressence when using the ot3simulator backend)
