@@ -88,7 +88,7 @@ interface NotifyParams {
   topic: NotifyTopic
 }
 
-function subscribe(notifyParams: NotifyParams): Promise<void> | void {
+function subscribe(notifyParams: NotifyParams): Promise<void> {
   const { hostname, topic, browserWindow } = notifyParams
   if (unreachableHosts.has(hostname)) {
     sendToBrowserDeserialized({
@@ -97,6 +97,7 @@ function subscribe(notifyParams: NotifyParams): Promise<void> | void {
       topic,
       message: FAILURE_STATUSES.ECONNFAILED,
     })
+    return Promise.resolve()
   }
   // true if no subscription (and therefore connection) to host exists
   else if (connectionStore[hostname] == null) {
@@ -145,22 +146,40 @@ function subscribe(notifyParams: NotifyParams): Promise<void> | void {
   }
   // true if the connection store has an entry for the hostname.
   else {
-    return waitUntilActiveOrErrored('client').then(() => {
-      const { client, subscriptions, pendingSubs } = connectionStore[hostname]
-      const activeClient = client as mqtt.Client
-      const isNotActiveSubscription = (subscriptions[topic] ?? 0) <= 0
-      if (!pendingSubs.has(topic) && isNotActiveSubscription) {
-        pendingSubs.add(topic)
-        return new Promise<void>(() => {
-          activeClient.subscribe(topic, subscribeOptions, subscribeCb)
-          pendingSubs.delete(topic)
+    return waitUntilActiveOrErrored('client')
+      .then(() => {
+        const { client, subscriptions, pendingSubs } = connectionStore[hostname]
+        const activeClient = client as mqtt.Client
+        const isNotActiveSubscription = (subscriptions[topic] ?? 0) <= 0
+        if (!pendingSubs.has(topic) && isNotActiveSubscription) {
+          pendingSubs.add(topic)
+          return new Promise<void>(() => {
+            activeClient.subscribe(topic, subscribeOptions, subscribeCb)
+            pendingSubs.delete(topic)
+          })
+        } else {
+          void waitUntilActiveOrErrored('subscription')
+            .then(() => {
+              subscriptions[topic] += 1
+            })
+            .catch(() => {
+              sendToBrowserDeserialized({
+                browserWindow,
+                hostname,
+                topic,
+                message: FAILURE_STATUSES.ECONNFAILED,
+              })
+            })
+        }
+      })
+      .catch(() => {
+        sendToBrowserDeserialized({
+          browserWindow,
+          hostname,
+          topic,
+          message: FAILURE_STATUSES.ECONNFAILED,
         })
-      } else {
-        void waitUntilActiveOrErrored('subscription').then(() => {
-          subscriptions[topic] += 1
-        })
-      }
-    })
+      })
   }
   function subscribeCb(error: Error, result: mqtt.ISubscriptionGrant[]): void {
     const { subscriptions } = connectionStore[hostname]
@@ -179,8 +198,11 @@ function subscribe(notifyParams: NotifyParams): Promise<void> | void {
       }, RENDER_TIMEOUT)
     } else {
       // log.info(`Successfully subscribed on ${hostname} to topic: ${topic}`)
-      if (subscriptions[topic] > 0) subscriptions[topic] += 1
-      else subscriptions[topic] = 1
+      if (subscriptions[topic] > 0) {
+        subscriptions[topic] += 1
+      } else {
+        subscriptions[topic] = 1
+      }
     }
   }
 
@@ -206,12 +228,6 @@ function subscribe(notifyParams: NotifyParams): Promise<void> | void {
         if (counter === MAX_RETRIES) {
           clearInterval(intervalId)
           // log.warn(`Failed to subscribe on ${hostname} to topic: ${topic}`)
-          sendToBrowserDeserialized({
-            browserWindow,
-            hostname,
-            topic,
-            message: FAILURE_STATUSES.ECONNFAILED,
-          })
           reject(new Error('Maximum subscription retries exceeded.'))
         }
       }, CHECK_CONNECTION_INTERVAL)
