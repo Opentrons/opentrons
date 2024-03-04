@@ -293,7 +293,6 @@ function handleDecrementSubscriptionCount(
 interface ListenerParams {
   client: mqtt.MqttClient
   browserWindow: BrowserWindow
-  topic: NotifyTopic
   hostname: string
 }
 
@@ -301,7 +300,6 @@ function establishListeners({
   client,
   browserWindow,
   hostname,
-  topic,
 }: ListenerParams): void {
   client.on(
     'message',
@@ -324,7 +322,7 @@ function establishListeners({
     sendToBrowserDeserialized({
       browserWindow,
       hostname,
-      topic,
+      topic: 'ALL_TOPICS',
       message: FAILURE_STATUSES.ECONNFAILED,
     })
     client.end()
@@ -335,13 +333,19 @@ function establishListeners({
     if (hostname in connectionStore) delete connectionStore[hostname]
   })
 
-  client.on('disconnect', packet =>
+  client.on('disconnect', packet => {
     log.warn(
       `Disconnected from ${hostname} with code ${
         packet.reasonCode ?? 'undefined'
       }`
     )
-  )
+    sendToBrowserDeserialized({
+      browserWindow,
+      hostname,
+      topic: 'ALL_TOPICS',
+      message: FAILURE_STATUSES.ECONNFAILED,
+    })
+  })
 }
 
 export function closeAllNotifyConnections(): Promise<unknown[]> {
