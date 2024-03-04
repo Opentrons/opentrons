@@ -10,10 +10,8 @@ import type { Action, Dispatch } from './types'
 // TODO(jh, 2024-03-01): after refactoring notify connectivity and subscription logic, uncomment logs.
 
 // Manages MQTT broker connections via a connection store, establishing a connection to the broker only if a connection does not
-// already exist, and disconnects from the broker when the app is not subscribed to any topics for the given broker.
-// A redundant connection to the same broker results in the older connection forcibly closing, which we want to avoid.
+// already exist. A redundant connection to the same broker results in the older connection forcibly closing, which we want to avoid.
 // However, redundant subscriptions are permitted and result in the broker sending the retained message for that topic.
-// To mitigate redundant connections, the connection manager eagerly adds the host, removing the host if the connection fails.
 
 const FAILURE_STATUSES = {
   ECONNREFUSED: 'ECONNREFUSED',
@@ -80,7 +78,7 @@ interface NotifyParams {
   topic: NotifyTopic
 }
 
-function subscribe(notifyParams: NotifyParams): Promise<void> | void {
+function subscribe(notifyParams: NotifyParams): Promise<void> {
   const { hostname, topic, browserWindow } = notifyParams
   if (unreachableHosts.has(hostname)) {
     sendToBrowserDeserialized({
@@ -89,6 +87,7 @@ function subscribe(notifyParams: NotifyParams): Promise<void> | void {
       topic,
       message: FAILURE_STATUSES.ECONNFAILED,
     })
+    return Promise.resolve()
   }
   // true if no subscription (and therefore connection) to host exists
   else if (connectionStore[hostname] == null) {
@@ -136,21 +135,37 @@ function subscribe(notifyParams: NotifyParams): Promise<void> | void {
   }
   // true if the connection store has an entry for the hostname.
   else {
-    return waitUntilActiveOrErrored('client').then(() => {
-      const { client, subscriptions, pendingSubs } = connectionStore[hostname]
-      const activeClient = client as mqtt.MqttClient
-      if (!subscriptions.has(topic)) {
-        if (!pendingSubs.has(topic)) {
-          pendingSubs.add(topic)
-          return new Promise<void>(() => {
-            activeClient.subscribe(topic, subscribeOptions, subscribeCb)
-            pendingSubs.delete(topic)
-          })
-        } else {
-          void waitUntilActiveOrErrored('subscription')
+    return waitUntilActiveOrErrored('client')
+      .then(() => {
+        const { client, subscriptions, pendingSubs } = connectionStore[hostname]
+        const activeClient = client as mqtt.MqttClient
+        if (!subscriptions.has(topic)) {
+          if (!pendingSubs.has(topic)) {
+            pendingSubs.add(topic)
+            return new Promise<void>(() => {
+              activeClient.subscribe(topic, subscribeOptions, subscribeCb)
+              pendingSubs.delete(topic)
+            })
+          } else {
+            void waitUntilActiveOrErrored('subscription').catch(() => {
+              sendToBrowserDeserialized({
+                browserWindow,
+                hostname,
+                topic,
+                message: FAILURE_STATUSES.ECONNFAILED,
+              })
+            })
+          }
         }
-      }
-    })
+      })
+      .catch(() => {
+        sendToBrowserDeserialized({
+          browserWindow,
+          hostname,
+          topic,
+          message: FAILURE_STATUSES.ECONNFAILED,
+        })
+      })
   }
   function subscribeCb(error: Error, result: mqtt.ISubscriptionGrant[]): void {
     const { subscriptions } = connectionStore[hostname]
@@ -201,6 +216,19 @@ function subscribe(notifyParams: NotifyParams): Promise<void> | void {
     })
   }
 }
+
+function checkForUnsubscribeFlag(
+  deserializedMessage: string | Record<string, unknown>,
+  hostname: string,
+  topic: NotifyTopic
+): void {
+  const messageContainsUnsubFlag =
+    typeof deserializedMessage !== 'string' &&
+    'unsubscribe' in deserializedMessage
+
+  if (messageContainsUnsubFlag) void unsubscribe(hostname, topic)
+}
+
 function unsubscribe(hostname: string, topic: NotifyTopic): Promise<void> {
   return new Promise<void>(() => {
     if (hostname in connectionStore && !pendingUnsubs.has(topic)) {
@@ -266,7 +294,6 @@ function connectAsync(brokerURL: string): Promise<mqtt.Client> {
 interface ListenerParams {
   client: mqtt.MqttClient
   browserWindow: BrowserWindow
-  topic: NotifyTopic
   hostname: string
 }
 
@@ -274,17 +301,12 @@ function establishListeners({
   client,
   browserWindow,
   hostname,
-  topic,
 }: ListenerParams): void {
   client.on(
     'message',
     (topic: NotifyTopic, message: Buffer, packet: mqtt.IPublishPacket) => {
       const deserializedMessage = deserialize(message.toString())
-      const messageContainsUnsubFlag =
-        typeof deserializedMessage !== 'string' &&
-        'unsubscribe' in deserializedMessage
-
-      if (messageContainsUnsubFlag) void unsubscribe(hostname, topic)
+      checkForUnsubscribeFlag(deserializedMessage, hostname, topic)
 
       browserWindow.webContents.send(
         'notify',
@@ -304,7 +326,7 @@ function establishListeners({
     sendToBrowserDeserialized({
       browserWindow,
       hostname,
-      topic,
+      topic: 'ALL_TOPICS',
       message: FAILURE_STATUSES.ECONNFAILED,
     })
     client.end()
@@ -315,13 +337,19 @@ function establishListeners({
     if (hostname in connectionStore) delete connectionStore[hostname]
   })
 
-  client.on('disconnect', packet =>
+  client.on('disconnect', packet => {
     log.warn(
       `Disconnected from ${hostname} with code ${
         packet.reasonCode ?? 'undefined'
       }`
     )
-  )
+    sendToBrowserDeserialized({
+      browserWindow,
+      hostname,
+      topic: 'ALL_TOPICS',
+      message: FAILURE_STATUSES.ECONNFAILED,
+    })
+  })
 }
 
 export function closeAllNotifyConnections(): Promise<unknown[]> {
