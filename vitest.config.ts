@@ -7,6 +7,7 @@ import viteConfig from './vite.config'
 export default mergeConfig(viteConfig, defineConfig({
   test: {
     environment: 'jsdom',
+    allowOnly: true,
     exclude: [
       ...configDefaults.exclude,
       '**/node_modules/**',
