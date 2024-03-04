@@ -64,12 +64,6 @@ export function registerNotify(
           ...action.payload,
           browserWindow: mainWindow,
         })
-
-      case 'shell:NOTIFY_UNSUBSCRIBE':
-        return unsubscribe({
-          ...action.payload,
-          browserWindow: mainWindow,
-        })
     }
   }
 }

@@ -66,13 +66,6 @@ export function registerNotify(
           browserWindow: mainWindow,
           hostname: '127.0.0.1',
         })
-
-      case 'shell:NOTIFY_UNSUBSCRIBE':
-        return unsubscribe({
-          ...action.payload,
-          browserWindow: mainWindow,
-          hostname: '127.0.0.1',
-        })
     }
   }
 }
