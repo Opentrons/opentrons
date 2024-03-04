@@ -351,6 +351,8 @@ def _find_liquid_height(
         and not cfg.same_tip
         and cfg.pipette_channels == 96
     ):
+
+        resources.pipette._retract()
         ui.get_user_ready("REPLACE first tip with NEW TIP")
     required_ul_per_src = (volume_for_setup * channel_count * cfg.trials) / len(
         cfg.dye_well_column_offset
