@@ -347,7 +347,7 @@ describe('ProtocolRunHeader', () => {
   })
 
   afterEach(() => {
-    vi.restoreAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders a protocol name, run record id, status, and run time', () => {
