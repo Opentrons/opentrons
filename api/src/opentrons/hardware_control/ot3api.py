@@ -507,6 +507,10 @@ class OT3API(
     ) -> AsyncIterator[UpdateStatus]:
         """Start the firmware update for one or more subsystems and return update progress iterator."""
         subsystems = subsystems or set()
+        if SubSystem.head in subsystems:
+            await self.disengage_axes([Axis.Z_L, Axis.Z_R])
+        if SubSystem.gripper in subsystems:
+            await self.disengage_axes([Axis.Z_G])
         # start the updates and yield the progress
         async with self._motion_lock:
             try:
