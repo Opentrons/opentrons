@@ -29,8 +29,7 @@ if __name__ == "__main__":
         device = list_ports_and_select()
         scale = RadwagScale.create(device)
     scale.connect()
-    grams, is_stable = scale.read_mass()
-    print(f"Scale reading: grams={grams}, is_stable={is_stable}")
+    is_stable = False
     save_file_variables = _create_scale_reading_file()
     results_list = []
     break_all = False
