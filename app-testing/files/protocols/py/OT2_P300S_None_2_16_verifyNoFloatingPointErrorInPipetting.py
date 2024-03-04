@@ -3,6 +3,7 @@
 
 requirements = {"robotType": "OT-2", "apiLevel": "2.16"}
 
+
 def run(protocol):
     tip_rack = protocol.load_labware("opentrons_96_tiprack_300ul", location="9")
     well_plate = protocol.load_labware("opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap", location="10")

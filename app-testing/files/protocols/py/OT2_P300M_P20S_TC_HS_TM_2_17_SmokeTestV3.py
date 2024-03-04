@@ -21,5 +21,5 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     # Instead it should be added to a separate test protocol - OT2_P300M_P20S_TC_HS_TM_2_17_dispense_changes.py
 
     # Therefore the 2.17 smoke test protocol is the same as the 2.16 smoke test protocol. Instead of copying and pasting the 2.16 smoke test protocol, we will noop this protocol and add a comment to explain the situation.
-    
+
     pass

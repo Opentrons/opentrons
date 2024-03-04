@@ -25,7 +25,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     res_1_position = "3"
     res_2_position = "2"
 
-
     # Thermocycler has a default position that covers Slots 7, 8, 10, and 11.
     # This is the only valid location for the Thermocycler on the OT-2 deck.
     # This position is a default parameter when declaring the TC so you do not need to specify.

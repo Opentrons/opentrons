@@ -2,15 +2,16 @@
 
 
 requirements = {
-	"robotType": "OT-2",
-	"apiLevel": "2.17",
+    "robotType": "OT-2",
+    "apiLevel": "2.17",
 }
 
+
 def run(protocol):
-	thermocycler = protocol.load_module('thermocycler module gen2')
-	
-	assert protocol.loaded_modules == {7: thermocycler}
-	assert protocol.deck["7"] ==  thermocycler
-	assert protocol.deck["8"] == thermocycler
-	assert protocol.deck["10"] == thermocycler
-	assert protocol.deck["11"] == thermocycler
+    thermocycler = protocol.load_module("thermocycler module gen2")
+
+    assert protocol.loaded_modules == {7: thermocycler}
+    assert protocol.deck["7"] == thermocycler
+    assert protocol.deck["8"] == thermocycler
+    assert protocol.deck["10"] == thermocycler
+    assert protocol.deck["11"] == thermocycler
