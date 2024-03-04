@@ -78,7 +78,7 @@ describe('ProtocolSetupLabware', () => {
     } as any)
   })
   afterEach(() => {
-    vi.resetAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the Labware Setup page', () => {

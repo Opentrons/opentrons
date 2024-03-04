@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import {
   RUN_STATUS_RUNNING,
@@ -57,7 +57,7 @@ describe('ConfirmCancelModal', () => {
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
     })
 
-    props = { onClose: jest.fn(), runId: RUN_ID, robotName: ROBOT_NAME }
+    props = { onClose: vi.fn(), runId: RUN_ID, robotName: ROBOT_NAME }
   })
 
   afterEach(() => {
