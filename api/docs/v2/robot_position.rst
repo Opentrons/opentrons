@@ -21,6 +21,8 @@ Top, Bottom, and Center
 
 Every well on every piece of labware has three addressable positions: top, bottom, and center. The position is determined by the labware definition and what the labware is loaded on top of. You can use these positions as-is or calculate other positions relative to them.
 
+.. _well-top:
+
 Top
 ^^^^
 
@@ -115,6 +117,39 @@ Using Labware Position Check
 All positions relative to labware are adjusted automatically based on labware offset data. Calculate labware offsets by running Labware Position Check during protocol setup, either in the Opentrons App or on the Flex touchscreen. Version 6.0.0 and later of the robot software can apply previously calculated offsets on the same robot for the same labware type and deck slot, even across different protocols.
 
 You should only adjust labware offsets in your Python code if you plan to run your protocol in Jupyter Notebook or from the command line. See :ref:`using_lpc` in the Advanced Control article for information.
+
+.. _position-relative-trash:
+
+Position Relative to Trash Containers
+=====================================
+
+In API version 2.15 and earlier, trash containers are :py:class:`.Labware` objects that have a single well. Use the above techniques for labware to adjust position relative to trash containers in protocols specifying these API versions.
+
+Starting in API version 2.16, trash containers are :py:class:`.TrashBin` or :py:class:`.WasteChute` objects. The API calculates movement to these objects based on the horizontal *center* of the pipette, rather than its primary channel (the back channel on 8-channel pipettes, and the back-left channel on 96-channel pipettes in default configuration). This ensures that all tips attached to the pipette are placed over the trash container for blowing out, dropping tips, or other operations.
+
+You can adjust the position of the pipette center with the :py:meth:`.TrashBin.top` and :py:meth:`.WasteChute.top` methods. These methods allow adjustments along the x-, y-, and z-axes. In contrast, ``Well.top()``, :ref:`covered above <well-top>`, only allows z-axis adjustment. With no adjustments, the "top" position is centered on the x- and y-axes and is just below the opening of the trash container.
+
+.. code-block:: python
+
+    trash = protocol.load_trash_bin("A3")
+
+    trash  # pipette center just below trash top center
+    trash.top()  # same position
+    trash.top(z=10)  # 10 mm higher
+    trash.top(y=10)  # 10 mm towards back, default height
+
+.. versionadded:: 2.16
+
+Another difference between the trash container ``top()`` methods and ``Well.top()`` is that they return an object of the same type, not a :py:class:`.Location`. This means that you can use their output anywhere that accepts objects of those types.
+
+One example is the :py:obj:`.InstrumentContext.trash_container` property. Because this property is settable, if you always want to drop tips at an offset from the default location, you can overwrite the default for a given pipette::
+
+    chute = protocol.load_waste_chute()
+
+    pipette.trash_container = chute.top(z=-5)
+    pipette.pick_up_tip()
+    pipette.drop_tip()  # drop in waste chute, 5 mm lower than default
+
 
 .. _protocol-api-deck-coords:
 
