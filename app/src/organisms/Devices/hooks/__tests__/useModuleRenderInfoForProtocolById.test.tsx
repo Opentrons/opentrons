@@ -135,13 +135,11 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
     when(mockUseDeckConfigurationQuery).mockReturnValue({
       data: [mockCutoutConfig],
     } as UseQueryResult<DeckConfiguration>)
-    when(mockUseAttachedModules)
-      .calledWith()
-      .mockReturnValue([
-        mockMagneticModuleGen2,
-        mockTemperatureModuleGen2,
-        mockThermocycler,
-      ])
+    mockUseAttachedModules.mockReturnValue([
+      mockMagneticModuleGen2,
+      mockTemperatureModuleGen2,
+      mockThermocycler,
+    ])
     when(mockUseStoredProtocolAnalysis)
       .calledWith('1')
       .mockReturnValue((PROTOCOL_DETAILS as unknown) as ProtocolAnalysisOutput)
@@ -162,11 +160,15 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
       .calledWith('1')
       .mockReturnValue(null)
     when(mockUseStoredProtocolAnalysis).calledWith('1').mockReturnValue(null)
-    const { result } = renderHook(() => useModuleRenderInfoForProtocolById('1'))
+    const { result } = renderHook(() =>
+      useModuleRenderInfoForProtocolById('1', true)
+    )
     expect(result.current).toStrictEqual({})
   })
   it('should return module render info', () => {
-    const { result } = renderHook(() => useModuleRenderInfoForProtocolById('1'))
+    const { result } = renderHook(() =>
+      useModuleRenderInfoForProtocolById('1', true)
+    )
     expect(result.current).toStrictEqual({
       magneticModuleId: {
         conflictedFixture: mockCutoutConfig,

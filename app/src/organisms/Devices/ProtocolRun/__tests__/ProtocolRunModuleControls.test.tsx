@@ -77,7 +77,7 @@ describe('ProtocolRunModuleControls', () => {
 
   it('renders a magnetic module card', () => {
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, true)
       .mockReturnValue({
         [mockMagMod.moduleId]: {
           moduleId: 'magModModuleId',
@@ -102,7 +102,7 @@ describe('ProtocolRunModuleControls', () => {
 
   it('renders a temperature module card', () => {
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, true)
       .mockReturnValue({
         [mockTempMod.moduleId]: {
           moduleId: 'temperatureModuleId',
@@ -129,7 +129,7 @@ describe('ProtocolRunModuleControls', () => {
 
   it('renders a thermocycler module card', () => {
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, true)
       .mockReturnValue({
         [mockTCModule.moduleId]: {
           moduleId: mockTCModule.moduleId,
@@ -158,7 +158,7 @@ describe('ProtocolRunModuleControls', () => {
 
   it('renders a heater-shaker module card', () => {
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, true)
       .mockReturnValue({
         [mockHeaterShakerDef.moduleId]: {
           moduleId: 'heaterShakerModuleId',
@@ -186,7 +186,7 @@ describe('ProtocolRunModuleControls', () => {
 
   it('renders correct text when module is not attached but required for protocol', () => {
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, true)
       .mockReturnValue({
         [mockHeaterShakerDef.moduleId]: {
           moduleId: 'heaterShakerModuleId',
