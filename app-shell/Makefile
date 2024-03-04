@@ -31,7 +31,7 @@ publish_dir := dist/publish
 # make test tests=src/__tests__/http.test.ts would run only the
 # specified test
 tests ?= $(SRC_PATH)/src
-cov_opts ?= --coverage=true  --collectCoverageFrom='app-shell/src/**/*.(js|ts|tsx)'
+cov_opts ?= --coverage=true
 test_opts ?=
 
 # Other SSH args for robot
