@@ -2,7 +2,7 @@
 import asyncio
 from random import random, randint
 from types import MethodType
-from typing import Any, List, Dict, Optional, Tuple, Union
+from typing import Any, List, Dict, Optional, Tuple
 from statistics import stdev
 from . import config
 from .liquid_class.defaults import get_liquid_class
@@ -33,13 +33,8 @@ from opentrons.protocol_api import ProtocolContext, InstrumentContext
 from .workarounds import get_sync_hw_api
 from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
 
-import opentrons.protocol_api.core.engine.deck_conflict as PE_deck_conflict
 import opentrons.protocol_engine.execution.pipetting as PE_pipetting
 from opentrons.protocol_engine.state import StateView
-from opentrons.protocol_engine import (
-    WellLocation,
-    DropTipWellLocation,
-)
 
 
 def _add_fake_simulate(
@@ -242,16 +237,6 @@ def _override_validate_asp_vol(
     return aspirate_volume
 
 
-def _override_check_deck_conflict_for_8_channel(
-    engine_state: StateView,
-    pipette_id: str,
-    labware_id: str,
-    well_name: str,
-    well_location: Union[WellLocation, DropTipWellLocation],
-) -> None:
-    return None
-
-
 def _override_software_supports_high_volumes() -> None:
     # yea so ok this is pretty ugly but this is super helpful for us
     # with this we don't need to apply patches, and can run the testing scripts
@@ -261,9 +246,6 @@ def _override_software_supports_high_volumes() -> None:
     Pipette.ok_to_add_volume = _override_ok_to_add_volume  # type: ignore[assignment]
     Pipette.add_current_volume = _override_add_current_volume  # type: ignore[assignment]
     PE_pipetting._validate_aspirate_volume = _override_validate_asp_vol  # type: ignore[assignment]
-    PE_deck_conflict._check_deck_conflict_for_8_channel = (
-        _override_check_deck_conflict_for_8_channel
-    )  # type: ignore[assignment]
 
 
 def _get_channel_offset(cfg: config.VolumetricConfig, channel: int) -> Point:
