@@ -27,7 +27,7 @@ export function BackToTopButton({
   const trackEvent = useTrackEvent()
   const robot = useRobot(robotName)
   const robotSerialNumber =
-    robot?.status != null ? getRobotSerialNumber(robot) : null ?? ''
+    robot?.status != null ? getRobotSerialNumber(robot) : null
   return (
     <Link
       to={`/devices/${robotName}/protocol-runs/${runId}/setup`}

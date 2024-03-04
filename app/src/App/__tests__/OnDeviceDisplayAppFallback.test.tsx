@@ -14,7 +14,13 @@ import { mockConnectableRobot } from '../../redux/discovery/__fixtures__'
 
 jest.mock('../../redux/shell')
 jest.mock('../../redux/analytics')
-jest.mock('../../redux/discovery')
+jest.mock('../../redux/discovery', () => {
+  const actual = jest.requireActual('../../redux/discovery')
+  return {
+    ...actual,
+    getLocalRobot: jest.fn(),
+  }
+})
 
 const mockError = {
   message: 'mock error',
@@ -70,7 +76,10 @@ describe('OnDeviceDisplayAppFallback', () => {
     fireEvent.click(screen.getByText('Restart touchscreen'))
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_ODD_APP_ERROR,
-      properties: { errorMessage: 'mock error' },
+      properties: {
+        errorMessage: 'mock error',
+        robotSerialNumber: MOCK_ROBOT_SERIAL_NUMBER,
+      },
     })
     expect(mockAppRestart).toHaveBeenCalled()
   })
