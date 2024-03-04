@@ -24,8 +24,15 @@ interface NotifyRefetchData {
   statusCode: never
 }
 
+interface NotifyUnsubscribeData extends NotifyRefetchData {
+  unsubscribe: boolean
+}
+
 export type NotifyNetworkError = 'ECONNFAILED' | 'ECONNREFUSED'
-export type NotifyResponseData = NotifyRefetchData | NotifyNetworkError
+export type NotifyResponseData =
+  | NotifyRefetchData
+  | NotifyUnsubscribeData
+  | NotifyNetworkError
 
 interface File {
   sha512: string
