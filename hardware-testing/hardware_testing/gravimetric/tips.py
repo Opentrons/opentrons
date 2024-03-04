@@ -1,7 +1,7 @@
 """Multi-Channel Tips."""
 from typing import List, Dict
 
-from opentrons.protocol_api import ProtocolContext, Well, Labware, InstrumentContext
+from opentrons.protocol_api import ProtocolContext, Well, Labware, InstrumentContext, Mount
 
 # Rows by Channel:
 #  - Rear Racks (slot-row=C)
@@ -107,7 +107,7 @@ def _unused_tips_for_racks(racks: List[Labware]) -> List[Well]:
         for col in range(1, 13):
             for row in rows:
                 wellname = f"{row}{col}"
-                next_well = rack.next_tip(1, rack[wellname])
+                next_well = rack.next_tip(Mount.LEFT, 1, rack[wellname])
                 if next_well is not None and wellname == next_well.well_name:
                     wells.append(rack[wellname])
     return wells
