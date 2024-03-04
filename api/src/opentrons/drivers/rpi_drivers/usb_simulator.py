@@ -17,8 +17,6 @@ from .interfaces import USBDriverInterface
 class USBBusSimulator(USBDriverInterface):
     def match_virtual_ports(
         self,
-        virtual_port: Union[
-            List[ModuleAtPort], List[SimulatingModuleAtPort]
-        ],  # should probably one use simulating
+        virtual_port: Union[List[ModuleAtPort], List[SimulatingModuleAtPort]],
     ) -> Union[List[ModuleAtPort], List[SimulatingModuleAtPort]]:
         return virtual_port

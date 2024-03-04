@@ -8,9 +8,12 @@ more readable format.
 import subprocess
 import re
 import os
-from typing import List
+from typing import List, Union
 
-from opentrons.hardware_control.modules.types import ModuleAtPort
+from opentrons.hardware_control.modules.types import (
+    ModuleAtPort,
+    SimulatingModuleAtPort,
+)
 from opentrons.hardware_control.types import BoardRevision
 
 from .interfaces import USBDriverInterface
@@ -79,8 +82,8 @@ class USBBus(USBDriverInterface):
 
     def match_virtual_ports(
         self,
-        virtual_ports: List[ModuleAtPort],
-    ) -> List[ModuleAtPort]:
+        virtual_ports: Union[List[ModuleAtPort], List[SimulatingModuleAtPort]],
+    ) -> Union[List[ModuleAtPort], List[SimulatingModuleAtPort]]:
         """
         Match Virtual Ports
 
