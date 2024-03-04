@@ -29,6 +29,7 @@ interface ConnectionStore {
 }
 
 const connectionStore: ConnectionStore = {}
+const unreachableHosts = new Set<string>()
 const log = createLogger('notify')
 // MQTT is somewhat particular about the clientId format and will connect erratically if an unexpected string is supplied.
 // This clientId is derived from the mqttjs library.
@@ -84,10 +85,18 @@ interface NotifyParams {
   topic: NotifyTopic
 }
 
-function subscribe(notifyParams: NotifyParams): Promise<void> {
+function subscribe(notifyParams: NotifyParams): Promise<void> | void {
   const { hostname, topic, browserWindow } = notifyParams
+  if (unreachableHosts.has(hostname)) {
+    sendToBrowserDeserialized({
+      browserWindow,
+      hostname,
+      topic,
+      message: FAILURE_STATUSES.ECONNFAILED,
+    })
+  }
   // true if no subscription (and therefore connection) to host exists
-  if (connectionStore[hostname] == null) {
+  else if (connectionStore[hostname] == null) {
     connectionStore[hostname] = {
       client: null,
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -110,14 +119,16 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
         log.warn(
           `Failed to connect to ${hostname} - ${error.name}: ${error.message} `
         )
-
         let failureMessage: string = FAILURE_STATUSES.ECONNFAILED
-        if (
-          error.message.includes(FAILURE_STATUSES.ECONNREFUSED) &&
-          !hasReportedAPortBlockEvent
-        ) {
-          failureMessage = FAILURE_STATUSES.ECONNREFUSED
-          hasReportedAPortBlockEvent = true
+        if (connectionStore[hostname]?.client == null) {
+          unreachableHosts.add(hostname)
+          if (
+            error.message.includes(FAILURE_STATUSES.ECONNREFUSED) &&
+            !hasReportedAPortBlockEvent
+          ) {
+            failureMessage = FAILURE_STATUSES.ECONNREFUSED
+            hasReportedAPortBlockEvent = true
+          }
         }
 
         sendToBrowserDeserialized({
@@ -133,17 +144,19 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
   else {
     return waitUntilActiveOrErrored('client').then(() => {
       const { client, subscriptions, pendingSubs } = connectionStore[hostname]
+      const activeClient = client as mqtt.Client
       const isNotActiveSubscription = (subscriptions[topic] ?? 0) <= 0
       if (!pendingSubs.has(topic) && isNotActiveSubscription) {
         pendingSubs.add(topic)
         return new Promise<void>(() => {
-          client?.subscribe(topic, subscribeOptions, subscribeCb)
+          activeClient.subscribe(topic, subscribeOptions, subscribeCb)
           pendingSubs.delete(topic)
         })
-      } else
+      } else {
         void waitUntilActiveOrErrored('subscription').then(() => {
           subscriptions[topic] += 1
         })
+      }
     })
   }
   function subscribeCb(error: Error, result: mqtt.ISubscriptionGrant[]): void {
