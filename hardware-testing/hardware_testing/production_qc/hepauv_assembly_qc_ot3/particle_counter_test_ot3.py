@@ -33,7 +33,7 @@ async def _main(simulating: bool) -> None:
     # home and move to attach position
     await api.home([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R])
     attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
-    current_pos = await api.gantry_position(OT3Mount.RIGHT)
+    current_pos = await api.gantry_position(OT3Mount.LEFT)
     await api.move_to(OT3Mount.LEFT, attach_pos._replace(z=current_pos.z),)
     HEPASN = input("Enter HEPA/UV Barcode Number:: ").strip()
     instrument = BuildAsairGT521S()
@@ -102,39 +102,42 @@ async def _main(simulating: bool) -> None:
             test_data['PASS/FAIL'] = test_result
             csv_cb.write(test_data)
             
-        print(f"CSV: {csv_props.name}")
+        
+        GRIP_SLOT = [[8,5,"home"],[5,9,"home"],[9,"A4",1]["A4",1,"home"],[1,"D4","home"]]
 
         #test uv
-        for width, slot in  SLOT_WIDTH_GAUGE:
+        await api.home([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R,Axis.Z_G,Axis.G])
+        for slot in  GRIP_SLOT:
+
             await api.ungrip()
-            if slot is not None:
-                z_ax = Axis.Z_G
-                g_ax = Axis.G
-                mount = OT3Mount.GRIPPER
-                print("homing Z and G...")
-                await api.home([z_ax, g_ax])
-                hover_pos, target_pos = _get_width_hover_and_grip_positions(api, slot)
-                # MOVE TO SLOT
-                await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos)
-                # OPERATOR SETS UP GAUGE
-                
-                # GRIPPER MOVES TO GAUGE
-                await api.move_to(mount, target_pos)
-                
-                # grip once to center the thing
-                await api.grip(20)
-                await api.ungrip()
+            for sl in slot:
+
+                if sl is not None:
+                    mount = OT3Mount.GRIPPER
+                    print("homing......")
+                    
+                    hover_pos, target_pos = _get_width_hover_and_grip_positions(api, slot)
+                    # MOVE TO SLOT
+                    await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos)
+                    # OPERATOR SETS UP GAUGE
+                    
+                    # GRIPPER MOVES TO GAUGE
+                    await api.move_to(mount, target_pos)
+                    
+                    # grip once to center the thing
+                    await api.grip(20)
+                    await api.ungrip()
 
 
-                #等待10s
-                await asyncio.sleep(11)
+                    #等待10s
+                    await asyncio.sleep(11)
 
-                #获取数据
-                alldata = uvinstrument.get_uv_()
-                intdatadict = uvinstrument.parse_modbus_data(alldata)
-                test_data['Tempval']=intdatadict['Tempval']
-                test_data['uvdata']=intdatadict['uvdata']
-                csv_cb.write(test_data)
+                    #获取数据
+                    alldata = uvinstrument.get_uv_()
+                    intdatadict = uvinstrument.parse_modbus_data(alldata)
+                    test_data['Tempval']=intdatadict['Tempval']
+                    test_data['uvdata']=intdatadict['uvdata']
+                    csv_cb.write(test_data)
 
 
 
@@ -143,6 +146,8 @@ async def _main(simulating: bool) -> None:
             # LOOP THROUGH FORCES
     except:
         pass
+    finally:
+        print(f"CSV: {csv_props.name}")
 
 async def UV_test(simulating: bool):
     api = await helpers_ot3.build_async_ot3_hardware_api(
