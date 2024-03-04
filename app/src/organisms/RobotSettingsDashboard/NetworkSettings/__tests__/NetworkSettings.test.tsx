@@ -1,3 +1,4 @@
+/* eslint-disable testing-library/no-node-access */
 import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'

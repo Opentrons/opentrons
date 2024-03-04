@@ -107,7 +107,7 @@ describe('CheckItem', () => {
     )
     const { getByRole } = render(props)
     fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
-    await new Promise(r => setTimeout(r))
+    await new Promise((resolve, reject) => setTimeout(resolve))
     expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
@@ -162,7 +162,8 @@ describe('CheckItem', () => {
     )
     const { getByRole } = render(props)
     fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
-    await new Promise(r => setTimeout(r))
+    await new Promise((resolve, reject) => setTimeout(resolve))
+
     expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
@@ -214,7 +215,8 @@ describe('CheckItem', () => {
     )
     const { getByRole } = render(props)
     fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
-    await new Promise(r => setTimeout(r))
+    await new Promise((resolve, reject) => setTimeout(resolve))
+
     expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
@@ -283,7 +285,8 @@ describe('CheckItem', () => {
     )
     const { getByRole } = render(props)
     fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
-    await new Promise(r => setTimeout(r))
+    await new Promise((resolve, reject) => setTimeout(resolve))
+
     expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
@@ -340,7 +343,8 @@ describe('CheckItem', () => {
     }
     const { getByRole } = render(props)
     fireEvent.click(getByRole('button', { name: 'Go back' }))
-    await new Promise(r => setTimeout(r))
+    await new Promise((resolve, reject) => setTimeout(resolve))
+
     expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
@@ -389,7 +393,8 @@ describe('CheckItem', () => {
     }
     const { getByRole } = render(props)
     fireEvent.click(getByRole('button', { name: 'Confirm position' }))
-    await new Promise(r => setTimeout(r))
+    await new Promise((resolve, reject) => setTimeout(resolve))
+
     expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
@@ -455,7 +460,8 @@ describe('CheckItem', () => {
       },
     }
     const { getByRole } = render(props)
-    await new Promise(r => setTimeout(r))
+    await new Promise((resolve, reject) => setTimeout(resolve))
+
     expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
@@ -558,7 +564,8 @@ describe('CheckItem', () => {
 
     const { getByRole } = render(props)
     fireEvent.click(getByRole('button', { name: 'Confirm position' }))
-    await new Promise(r => setTimeout(r))
+    await new Promise((resolve, reject) => setTimeout(resolve))
+
     expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
@@ -659,7 +666,8 @@ describe('CheckItem', () => {
     )
     const { getByRole } = render(props)
     fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
-    await new Promise(r => setTimeout(r))
+    await new Promise((resolve, reject) => setTimeout(resolve))
+
     expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [

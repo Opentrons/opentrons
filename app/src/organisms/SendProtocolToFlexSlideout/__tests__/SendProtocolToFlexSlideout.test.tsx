@@ -3,7 +3,6 @@ import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { StaticRouter } from 'react-router-dom'
-import { when } from 'vitest-when'
 
 import {
   mockOT3HealthResponse,

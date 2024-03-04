@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react'
-import assert from 'assert'
 
 import type { RefObject } from 'react'
 

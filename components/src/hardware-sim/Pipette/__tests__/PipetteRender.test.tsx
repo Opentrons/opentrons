@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { when } from 'vitest-when'
 import { screen } from '@testing-library/react'
 import { fixtureTiprack300ul as _fixtureTiprack300ul } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../testing/utils'
@@ -46,8 +45,9 @@ describe('PipetteRender', () => {
         </div>
       ))
 
-      vi.mocked(EmanatingNozzle)
-      .mockReturnValue(<div>mock emanating nozzle</div>)
+      vi.mocked(EmanatingNozzle).mockReturnValue(
+        <div>mock emanating nozzle</div>
+      )
     })
 
     it('should render a rectangle with the correct dimensions', () => {

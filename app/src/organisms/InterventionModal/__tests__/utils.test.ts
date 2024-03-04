@@ -1,7 +1,9 @@
 import deepClone from 'lodash/cloneDeep'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { getSlotHasMatingSurfaceUnitVector } from '@opentrons/shared-data'
-import { ot2DeckDefV4 } from '@opentrons/shared-data'
+import {
+  getSlotHasMatingSurfaceUnitVector,
+  ot2DeckDefV4,
+} from '@opentrons/shared-data'
 
 import {
   mockLabwareDefinition,
