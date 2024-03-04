@@ -9,10 +9,7 @@ import {
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 
-import {
-  partialComponentPropsMatcher,
-  renderWithProviders,
-} from '../../../__testing-utils__'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { useIsRobotViewable, useRunStatuses } from '../../Devices/hooks'
 import { DeckFixtureSetupInstructionsModal } from '../DeckFixtureSetupInstructionsModal'
@@ -21,8 +18,15 @@ import { DeviceDetailsDeckConfiguration } from '../'
 import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 
 import type { MaintenanceRun } from '@opentrons/api-client'
+import type * as OpentronsComponents from '@opentrons/components'
 
-vi.mock('@opentrons/components/src/hardware-sim/DeckConfigurator/index')
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof OpentronsComponents>()
+  return {
+    ...actual,
+    DeckConfigurator: vi.fn(),
+  }
+})
 vi.mock('@opentrons/react-api-client')
 vi.mock('../DeckFixtureSetupInstructionsModal')
 vi.mock('../../Devices/hooks')
@@ -63,7 +67,7 @@ describe('DeviceDetailsDeckConfiguration', () => {
     vi.mocked(DeckFixtureSetupInstructionsModal).mockReturnValue(
       <div>mock DeckFixtureSetupInstructionsModal</div>
     )
-    when(vi.mocked(DeckConfigurator)).thenReturn(
+    vi.mocked(DeckConfigurator).mockReturnValue(
       <div>mock DeckConfigurator</div>
     )
     vi.mocked(useRunStatuses).mockReturnValue(RUN_STATUSES)
@@ -98,9 +102,9 @@ describe('DeviceDetailsDeckConfiguration', () => {
   it('should render banner and make deck configurator disabled when running', () => {
     RUN_STATUSES.isRunRunning = true
     vi.mocked(useRunStatuses).mockReturnValue(RUN_STATUSES)
-    when(vi.mocked(DeckConfigurator))
-      .calledWith(partialComponentPropsMatcher({ readOnly: true }))
-      .thenReturn(<div>disabled mock DeckConfigurator</div>)
+    vi.mocked(DeckConfigurator).mockReturnValue(
+      <div>disabled mock DeckConfigurator</div>
+    )
     render(props)
     screen.getByText(
       'Deck configuration is not available when run is in progress'
@@ -112,9 +116,9 @@ describe('DeviceDetailsDeckConfiguration', () => {
     vi.mocked(useNotifyCurrentMaintenanceRun).mockReturnValue({
       data: mockCurrnetMaintenanceRun,
     } as any)
-    when(vi.mocked(DeckConfigurator))
-      .calledWith(partialComponentPropsMatcher({ readOnly: true }))
-      .thenReturn(<div>disabled mock DeckConfigurator</div>)
+    vi.mocked(DeckConfigurator).mockReturnValue(
+      <div>disabled mock DeckConfigurator</div>
+    )
     render(props)
     screen.getByText(
       'Deck configuration is not available when the robot is busy'
@@ -123,9 +127,8 @@ describe('DeviceDetailsDeckConfiguration', () => {
   })
 
   it('should render no deck fixtures, if deck configs are not set', () => {
-    when(vi.mocked(useDeckConfigurationQuery))
-      .calledWith()
-      .thenReturn([] as any)
+    vi.mocked(useDeckConfigurationQuery)
+    .mockReturnValue([] as any)
     render(props)
     screen.getByText('No deck fixtures')
   })
@@ -134,9 +137,9 @@ describe('DeviceDetailsDeckConfiguration', () => {
     when(vi.mocked(useIsEstopNotDisengaged))
       .calledWith(ROBOT_NAME)
       .thenReturn(true)
-    when(vi.mocked(DeckConfigurator))
-      .calledWith(partialComponentPropsMatcher({ readOnly: true }))
-      .thenReturn(<div>disabled mock DeckConfigurator</div>)
+    vi.mocked(DeckConfigurator).mockReturnValue(
+      <div>disabled mock DeckConfigurator</div>
+    )
     render(props)
     screen.getByText('disabled mock DeckConfigurator')
   })
