@@ -24,7 +24,7 @@ discovery_client_dir := ../discovery-client
 # make test tests=src/pages/Labware/__tests__/hooks.test.tsx would run only the
 # specified test
 tests ?=
-cov_opts ?= --coverage=true --ci=true --collectCoverageFrom='app/src/**/*.(js|ts|tsx)'
+cov_opts ?= --coverage=true  --collectCoverageFrom='app/src/**/*.(js|ts|tsx)'
 test_opts ?=
 
 # standard targets
