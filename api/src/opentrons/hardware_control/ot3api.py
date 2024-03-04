@@ -1079,6 +1079,7 @@ class OT3API(
             self._encoder_position,
             critical_point,
         )
+        # print(f'api encoder_position: {self._encoder_position}')
         return ot3pos
 
     def _effector_pos_from_carriage_pos(
@@ -1196,7 +1197,6 @@ class OT3API(
             await self.refresh_positions()
 
         for axis in position.keys():
-            print(axis)
             if not self._backend.axis_is_present(axis):
                 raise InvalidActuator(
                     message=f"{axis} is not present", detail={"axis": str(axis)}
@@ -2070,17 +2070,35 @@ class OT3API(
     async def _force_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: TipActionSpec
     ) -> Dict[Axis, float]:
-        for press in pipette_spec.tip_action_moves:
-            async with self._backend.motor_current(run_currents=press.currents):
+        press_moves = pipette_spec.tip_action_moves
+        press_dist = 0
+        for i in range(len(press_moves)):
+            async with self._backend.motor_current(run_currents=press_moves[i].currents):
                 target_down = target_position_from_relative(
-                    mount, top_types.Point(z=press.distance), self._current_position
+                    mount, top_types.Point(z=press_moves[i].distance), self._current_position
                 )
-                await self._move(target_down, speed=press.speed, expect_stalls=True)
-                press_dist = await self.encoder_current_position_ot3(mount)
-            if press.distance < 0:
+                await self._move(target_down, speed=press_moves[i].speed, expect_stalls=True)
+            await self._update_position_estimation([Axis.by_mount(mount)])
+            if i == 0:
+                await self._update_position_estimation([Axis.by_mount(mount)])
+                press_dist = await self.encoder_current_position_ot3(OT3Mount.LEFT)
+            if press_moves[i].distance < 0:
                 # we expect a stall has happened during a downward movement into the tiprack, so
                 # we want to update the motor estimation
                 await self._update_position_estimation([Axis.by_mount(mount)])
+        # for press in pipette_spec.tip_action_moves:
+        #     async with self._backend.motor_current(run_currents=press.currents):
+        #         target_down = target_position_from_relative(
+        #             mount, top_types.Point(z=press.distance), self._current_position
+        #         )
+        #         await self._move(target_down, speed=press.speed, expect_stalls=True)
+        #     if press.distance < 0:
+        #         # we expect a stall has happened during a downward movement into the tiprack, so
+        #         # we want to update the motor estimation
+        #         await self._update_position_estimation([Axis.by_mount(mount)])
+        #     press_dist = await self.encoder_current_position_ot3(mount, CriticalPoint.NOZZLE, True)
+        #     print(f'Encoder Press Dist: {press_dist}')
+        #     breakpoint()
         return press_dist
 
     async def _tip_motor_action(
