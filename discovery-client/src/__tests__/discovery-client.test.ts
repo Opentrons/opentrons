@@ -12,6 +12,9 @@ import * as HealthPollerModule from '../health-poller'
 import * as MdnsBrowserModule from '../mdns-browser'
 import { createDiscoveryClient } from '..'
 
+import type { HealthPollerResult, Logger } from '../types'
+import type { MdnsBrowserService } from '../mdns-browser'
+
 vi.mock('../health-poller')
 vi.mock('../mdns-browser')
 

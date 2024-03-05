@@ -1,14 +1,18 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
-import { describe, it, beforeEach, vi, expect} from 'vitest'
+import { describe, it, beforeEach, vi, expect } from 'vitest'
 
 import {
   parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
 
-import { nestedTextMatcher, partialComponentPropsMatcher, renderWithProviders } from '../../../../../__testing-utils__'}
+import {
+  nestedTextMatcher,
+  partialComponentPropsMatcher,
+  renderWithProviders,
+} from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import {
   useTrackEvent,
@@ -77,7 +81,9 @@ describe('SetupLiquidsList', () => {
     })
     mockTrackEvent = vi.fn()
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
-    vi.mocked(parseLiquidsInLoadOrder).mockReturnValue(MOCK_LIQUIDS_IN_LOAD_ORDER)
+    vi.mocked(parseLiquidsInLoadOrder).mockReturnValue(
+      MOCK_LIQUIDS_IN_LOAD_ORDER
+    )
     vi.mocked(parseLabwareInfoByLiquidId).mockReturnValue(
       MOCK_LABWARE_INFO_BY_LIQUID_ID as any
     )
