@@ -35,6 +35,7 @@ vi.mock('../../../../organisms/ProtocolUpload/hooks')
 vi.mock('../../../../redux/analytics')
 vi.mock('../hooks')
 vi.mock('../../../../resources/runs/useNotifyAllRunsQuery')
+vi.mock('../../../../resources/health/hooks')
 
 const RUN_ID = 'mockRunId'
 const ROBOT_NAME = 'otie'
@@ -105,6 +106,7 @@ describe('RecentRunProtocolCard', () => {
   beforeEach(() => {
     props = {
       runData: mockRunData,
+      isProtocolFetching: false,
     }
 
     vi.mocked(Skeleton).mockReturnValue(<div>mock Skeleton</div>)
@@ -121,6 +123,9 @@ describe('RecentRunProtocolCard', () => {
     vi.mocked(useProtocolQuery).mockReturnValue({
       data: { data: { metadata: { protocolName: 'mockProtocol' } } },
     } as any)
+    vi.mocked(useRobotInitializationStatus).mockReturnValue(
+      INIT_STATUS.SUCCEEDED
+    )
     when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
     })

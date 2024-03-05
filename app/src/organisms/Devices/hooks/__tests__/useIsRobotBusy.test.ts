@@ -51,6 +51,18 @@ describe('useIsRobotBusy', () => {
     } as any)
     vi.mocked(useEstopQuery).mockReturnValue({ data: mockEstopStatus } as any)
     vi.mocked(useIsFlex).mockReturnValue(false)
+    vi.mocked(useCurrentAllSubsystemUpdatesQuery).mockReturnValue({
+      data: {
+        data: [
+          {
+            id: '123',
+            createdAt: 'today',
+            subsystem: 'pipette_right',
+            updateStatus: 'done',
+          },
+        ],
+      },
+    } as any)
   })
 
   afterEach(() => {

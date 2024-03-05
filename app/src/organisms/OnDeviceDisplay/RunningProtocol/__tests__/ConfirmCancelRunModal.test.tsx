@@ -28,7 +28,7 @@ vi.mock('../../../../organisms/RunTimeControl/hooks')
 vi.mock('../../../../redux/analytics')
 vi.mock('../../../ProtocolUpload/hooks')
 vi.mock('../CancelingRunModal')
-
+vi.mock('../../../../redux/discovery')
 const mockPush = vi.fn()
 const mockStopRun = vi.fn()
 const mockDismissCurrentRun = vi.fn()

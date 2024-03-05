@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { vi, it, describe, expect, beforeEach } from 'vitest'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 
@@ -52,13 +52,15 @@ describe('NameRobot', () => {
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
     mockConnectableRobot.name = 'connectableOtie'
     mockReachableRobot.name = 'reachableOtie'
+    mockUnreachableRobot.name = 'unreachableOtie'
     vi.mocked(getConnectableRobots).mockReturnValue([mockConnectableRobot])
     vi.mocked(getReachableRobots).mockReturnValue([mockReachableRobot])
+    vi.mocked(getUnreachableRobots).mockReturnValue([mockUnreachableRobot])
     vi.mocked(useIsUnboxingFlowOngoing).mockReturnValue(true)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('should render text, button and keyboard', () => {

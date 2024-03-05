@@ -1,6 +1,6 @@
 // mock electron-store
 'use strict'
-
-module.exports = jest.createMockFromModule(
+import { vi } from 'vitest'
+module.exports = vi.mock(
   '../app-shell/node_modules/electron-store'
 )
