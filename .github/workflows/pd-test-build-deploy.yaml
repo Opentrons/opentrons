@@ -9,7 +9,6 @@ on:
       - 'step-generation/**'
       - 'shared-data/**'
       - 'components/**'
-      - 'webpack-config/**'
       - 'package.json'
       - '.github/workflows/pd-test-build-deploy.yaml'
   push:
@@ -18,7 +17,6 @@ on:
       - 'step-generation/**'
       - 'shared-data/**'
       - 'components/**'
-      - 'webpack-config/**'
       - 'package.json'
       - '.github/workflows/pd-test-build-deploy.yaml'
     branches:
