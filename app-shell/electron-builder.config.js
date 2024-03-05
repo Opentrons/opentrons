@@ -1,6 +1,7 @@
 'use strict'
 const path = require('path')
 const { versionForProject } = require('../scripts/git-version')
+const { app } = require('electron')
 
 const {
   OT_APP_DEPLOY_BUCKET,
@@ -25,7 +26,7 @@ const publishConfig =
 module.exports = async () => ({
   appId:
     project === 'robot-stack' ? 'com.opentrons.app' : 'com.opentrons.appot3',
-  electronVersion: '23.3.13',
+  electronVersion: app.getVersion(),
   npmRebuild: false,
   releaseInfo: {
     releaseNotesFile:
