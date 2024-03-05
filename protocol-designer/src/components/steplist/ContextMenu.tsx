@@ -9,22 +9,13 @@ import {
 } from '../modals/ConfirmDeleteModal'
 import { actions as stepsActions, getIsMultiSelectMode } from '../../ui/steps'
 import { actions as steplistActions } from '../../steplist'
-<<<<<<< HEAD
 import { getTopPortalEl } from '../portals/TopPortal'
 import styles from './StepItem.module.css'
 import { getSavedStepForms } from '../../step-forms/selectors'
-import type { ThunkDispatch } from 'redux-thunk'
-import type { BaseState } from '../../types'
-import type { StepIdType } from '../../form-types'
-=======
-import { getSavedStepForms } from '../../step-forms/selectors'
-import { Portal } from '../portals/TopPortal'
-import styles from './StepItem.css'
 
 import type { StepIdType } from '../../form-types'
 import type { ThunkDispatch } from 'redux-thunk'
 import type { BaseState } from '../../types'
->>>>>>> edge
 
 const MENU_OFFSET_PX = 5
 
@@ -141,7 +132,8 @@ export const ContextMenu = (props: Props): JSX.Element => {
       {props.children({
         makeStepOnContextMenu: makeHandleContextMenu,
       })}
-      {!showDeleteConfirmation && visible && (
+      {!showDeleteConfirmation &&
+        visible &&
         createPortal(
           <div
             ref={menuRoot}
@@ -162,8 +154,7 @@ export const ContextMenu = (props: Props): JSX.Element => {
             </div>
           </div>,
           getTopPortalEl()
-        )
-      )}
+        )}
     </div>
   )
 }
