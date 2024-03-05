@@ -5,8 +5,11 @@ import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { LabwareRender, Module } from '@opentrons/components'
-import { OT2_ROBOT_TYPE, getModuleDef2 } from '@opentrons/shared-data'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import {
+  OT2_ROBOT_TYPE,
+  getModuleDef2,
+  fixtureTiprack300ul,
+} from '@opentrons/shared-data'
 
 import {
   partialComponentPropsMatcher,
@@ -27,13 +30,15 @@ import type {
 
 vi.mock('@opentrons/components/src/hardware-sim/Labware/LabwareRender')
 vi.mock('@opentrons/components/src/hardware-sim/Module')
-vi.mock('@opentrons/shared-data', () => {
-  const actualSharedData = vi.requireActual('@opentrons/shared-data')
+
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actualSharedData = await importOriginal<typeof getModuleDef2>()
   return {
     ...actualSharedData,
     getModuleDef2: vi.fn(),
   }
 })
+
 vi.mock('../../../../ProtocolSetupModulesAndDeck/utils')
 vi.mock('../../LabwareInfoOverlay')
 vi.mock('../../utils/getLabwareRenderInfo')
@@ -93,24 +98,24 @@ describe('SetupLabwareMap', () => {
       .thenReturn(<div></div>) // this (default) empty div will be returned when LabwareRender isn't called with expected labware definition
       .calledWith(
         partialComponentPropsMatcher({
-          definition: fixture_tiprack_300_ul,
+          definition: fixtureTiprack300ul,
         })
       )
       .thenReturn(
         <div>
-          mock labware render of {fixture_tiprack_300_ul.metadata.displayName}
+          mock labware render of {fixtureTiprack300ul.metadata.displayName}
         </div>
       )
 
     when(vi.mocked(LabwareInfoOverlay))
       .thenReturn(<div></div>) // this (default) empty div will be returned when LabwareInfoOverlay isn't called with expected props
       .calledWith(
-        partialComponentPropsMatcher({ definition: fixture_tiprack_300_ul })
+        partialComponentPropsMatcher({ definition: fixtureTiprack300ul })
       )
       .thenReturn(
         <div>
           mock labware info overlay of{' '}
-          {fixture_tiprack_300_ul.metadata.displayName}
+          {fixtureTiprack300ul.metadata.displayName}
         </div>
       )
   })
@@ -127,7 +132,7 @@ describe('SetupLabwareMap', () => {
   it('should render a deck WITH labware and WITHOUT modules', () => {
     when(vi.mocked(getLabwareRenderInfo)).thenReturn({
       '300_ul_tiprack_id': {
-        labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
+        labwareDef: fixtureTiprack300ul as LabwareDefinition2,
         displayName: 'fresh tips',
         x: MOCK_300_UL_TIPRACK_COORDS[0],
         y: MOCK_300_UL_TIPRACK_COORDS[1],
@@ -155,7 +160,7 @@ describe('SetupLabwareMap', () => {
   it('should render a deck WITH labware and WITH modules', () => {
     when(vi.mocked(getLabwareRenderInfo)).thenReturn({
       [MOCK_300_UL_TIPRACK_ID]: {
-        labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
+        labwareDef: fixtureTiprack300ul as LabwareDefinition2,
         displayName: 'fresh tips',
         x: MOCK_300_UL_TIPRACK_COORDS[0],
         y: MOCK_300_UL_TIPRACK_COORDS[1],
