@@ -11,7 +11,7 @@ export default mergeConfig(
       environment: 'jsdom',
       allowOnly: true,
       exclude: [...configDefaults.exclude, '**/node_modules/**', '**/dist/**'],
-      setupFiles: ['./setup-vitest.js'],
+      setupFiles: ['./setup-vitest.ts'],
       poolOptions: { threads: { singleThread: true } },
     },
     resolve: {
