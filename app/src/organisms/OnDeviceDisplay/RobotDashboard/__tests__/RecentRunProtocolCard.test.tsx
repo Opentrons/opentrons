@@ -106,7 +106,6 @@ describe('RecentRunProtocolCard', () => {
   beforeEach(() => {
     props = {
       runData: mockRunData,
-      isProtocolFetching: false,
     }
 
     vi.mocked(Skeleton).mockReturnValue(<div>mock Skeleton</div>)

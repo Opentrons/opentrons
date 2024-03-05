@@ -9,15 +9,11 @@ import type { Modules } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 
-const mockUseModulesQuery = useModulesQuery as vi.MockedFunction<
-  typeof useModulesQuery
->
-
 describe('useAttachedModules hook', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   it('returns attached modules', () => {
-    mockUseModulesQuery.mockReturnValue({
+    vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: mockModulesResponse },
     } as UseQueryResult<Modules, unknown>)
 

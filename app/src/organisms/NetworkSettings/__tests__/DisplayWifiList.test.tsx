@@ -31,10 +31,6 @@ vi.mock('react-router-dom', async importOriginal => {
   }
 })
 
-const mockDisplaySearchNetwork = DisplaySearchNetwork as vi.MockedFunction<
-  typeof DisplaySearchNetwork
->
-
 const render = (props: React.ComponentProps<typeof DisplayWifiList>) => {
   return renderWithProviders(<DisplayWifiList {...props} />, {
     i18nInstance: i18n,
@@ -50,7 +46,7 @@ describe('DisplayWifiList', () => {
       handleNetworkPress: vi.fn(),
       isHeader: true,
     }
-    mockDisplaySearchNetwork.mockReturnValue(
+    vi.mocked(DisplaySearchNetwork).mockReturnValue(
       <div>mock DisplaySearchNetwork</div>
     )
   })

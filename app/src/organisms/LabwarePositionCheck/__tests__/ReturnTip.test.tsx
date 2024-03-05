@@ -26,7 +26,7 @@ describe('ReturnTip', () => {
   let mockChainRunCommands
 
   beforeEach(() => {
-    mockChainRunCommands = vi.fn(() => Promise.resolve())
+    mockChainRunCommands = vi.fn().mockImplementation(() => Promise.resolve())
     vi.mocked(getIsOnDevice).mockReturnValue(false)
     props = {
       section: SECTIONS.RETURN_TIP,

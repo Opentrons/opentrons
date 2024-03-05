@@ -12,6 +12,7 @@ import { parseProtocolAnalysisOutput } from '../useStoredProtocolAnalysis'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { storedProtocolData } from '../../../../redux/protocol-storage/__fixtures__'
 
+import type { Mock } from 'vitest'
 import type { ProtocolAnalyticsData } from '../../../../redux/analytics/types'
 
 vi.mock('../../hooks')
@@ -24,8 +25,8 @@ vi.mock('../../../../redux/robot-settings')
 
 const PROTOCOL_PROPERTIES = { protocolType: 'python' } as ProtocolAnalyticsData
 
-let mockTrackEvent: vi.mock
-let mockGetProtocolRunAnalyticsData: vi.mock
+let mockTrackEvent: Mock
+let mockGetProtocolRunAnalyticsData: Mock
 let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 let store: Store<any> = createStore(vi.fn(), {})
 
