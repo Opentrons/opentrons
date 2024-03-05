@@ -104,6 +104,16 @@ To run analysis snapshot tests locally, you run
    ```
 This will run the analyses snapshot test using the `TARGET` branch or tag, and compare the results against your local analysis snapshots located inside `app-testing/tests/__snapshots__/analyses_snapshot_test`.
 
+#### Updating Analysis Snapshots
+
+If you want to update the analysis snapshots, you can run the following command:
+
+   ```bash
+   TARGET="<target-branch-or-tag>" make snapshot-test-update
+   ```
+
+This will take the results of the analysis snapshot test using the `TARGET` branch or tag, and update the local analysis snapshots located inside `app-testing/tests/__snapshots__/analyses_snapshot_test`.
+
 #### Running Analysis Snapshot Tests on CI
 
 To run analysis snapshot tests on CI, you need to run the `Analyses Snapshot Test` workflow dispatch job. This job requires two inputs, `TARGET` and `TEST_SOURCE`.
