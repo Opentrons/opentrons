@@ -4,7 +4,7 @@ import path from 'path'
 import fs from 'fs-extra'
 import tempy from 'tempy'
 import Electron from 'electron'
-import { vi, describe, beforeEach, it, afterAll } from 'vitest'
+import { vi, describe, beforeEach, it, afterAll, expect } from 'vitest'
 import uuid from 'uuid/v4'
 
 import {
@@ -16,14 +16,12 @@ import {
   PROTOCOLS_DIRECTORY_NAME,
   PROTOCOLS_DIRECTORY_PATH,
 } from '../file-system'
-import { getConfig } from '../../config'
 import { analyzeProtocolSource } from '../../protocol-analysis'
-
 
 vi.mock('uuid/v4')
 vi.mock('electron')
-vi.mock('../../config')
 vi.mock('../../protocol-analysis')
+vi.mock('electron-store')
 
 const trashItem = Electron.shell.trashItem
 
@@ -37,9 +35,6 @@ describe('protocol storage directory utilities', () => {
   }
   beforeEach(() => {
     protocolsDir = makeEmptyDir()
-    vi.mocked(getConfig).mockReturnValue({
-      python: { pathToPythonOverride: null },
-    } as any)
     vi.mocked(analyzeProtocolSource).mockReturnValue(Promise.resolve())
   })
 

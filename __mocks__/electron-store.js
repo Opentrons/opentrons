@@ -1,6 +1,5 @@
 // mock electron-store
 'use strict'
-import { vi } from 'vitest'
 import { DEFAULTS_V12 } from '../app-shell-odd/src/config/migrate'
 
 const Store = function () {
