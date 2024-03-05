@@ -120,9 +120,7 @@ describe('SetupLabwarePositionCheck', () => {
     expect(mockLaunchLPC).toHaveBeenCalled()
   })
   it('should render a disabled LPC button when disabled LPC reason exists', () => {
-    when(vi.mocked(useUnmatchedModulesForProtocol))
-      .calledWith(RUN_ID)
-      .thenReturn(true)
+    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
     vi.mocked(useLPCDisabledReason).mockReturnValue(DISABLED_REASON)
     render()
     const button = screen.getByRole('button', {
