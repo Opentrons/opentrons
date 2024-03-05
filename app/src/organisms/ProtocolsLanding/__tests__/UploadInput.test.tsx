@@ -10,13 +10,13 @@ import {
 } from '../../../redux/analytics'
 import { ProtocolUploadInput } from '../ProtocolUploadInput'
 
+import type { Mock } from 'vitest'
+
 vi.mock('../../../redux/analytics')
 
-const mockUseTrackEvent = useTrackEvent as vi.Mock<typeof useTrackEvent>
-
 describe('ProtocolUploadInput', () => {
-  let onUpload: vi.MockedFunction<() => {}>
-  let trackEvent: vi.MockedFunction<any>
+  let onUpload: Mock
+  let trackEvent: Mock
   const render = () => {
     return renderWithProviders(
       <BrowserRouter>
@@ -31,7 +31,7 @@ describe('ProtocolUploadInput', () => {
   beforeEach(() => {
     onUpload = vi.fn()
     trackEvent = vi.fn()
-    mockUseTrackEvent.mockReturnValue(trackEvent)
+    vi.mocked(useTrackEvent).mockReturnValue(trackEvent)
   })
   afterEach(() => {
     vi.resetAllMocks()

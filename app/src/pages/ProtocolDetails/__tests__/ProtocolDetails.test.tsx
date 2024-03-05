@@ -112,7 +112,11 @@ describe('ODDProtocolDetails', () => {
     } as any)
     when(vi.mocked(useHost)).calledWith().thenReturn(MOCK_HOST_CONFIG)
     vi.mocked(getProtocol).mockResolvedValue({
-      data: { links: { referencingRuns: [{ id: '1' }, { id: '2' }] } },
+      data: {
+        links: {
+          referencingRuns: [{ id: '1', href: 'dummy' }],
+        },
+      },
     })
   })
   afterEach(() => {

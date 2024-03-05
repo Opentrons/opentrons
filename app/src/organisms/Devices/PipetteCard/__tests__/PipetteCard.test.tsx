@@ -60,7 +60,6 @@ describe('PipetteCard', () => {
       pipetteIs96Channel: false,
       isPipetteCalibrated: false,
       pipetteIsBad: false,
-      updatePipette: vi.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -101,7 +100,6 @@ describe('PipetteCard', () => {
       pipetteIs96Channel: false,
       isPipetteCalibrated: false,
       pipetteIsBad: false,
-      updatePipette: vi.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -118,7 +116,6 @@ describe('PipetteCard', () => {
       pipetteIs96Channel: true,
       isPipetteCalibrated: false,
       pipetteIsBad: false,
-      updatePipette: vi.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -141,7 +138,6 @@ describe('PipetteCard', () => {
       pipetteIs96Channel: true,
       isPipetteCalibrated: false,
       pipetteIsBad: false,
-      updatePipette: vi.fn(),
       isRunActive: false,
       isEstopNotDisengaged: true,
     }
@@ -163,7 +159,6 @@ describe('PipetteCard', () => {
       pipetteIs96Channel: false,
       isPipetteCalibrated: false,
       pipetteIsBad: false,
-      updatePipette: vi.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -179,7 +174,6 @@ describe('PipetteCard', () => {
       pipetteIs96Channel: false,
       isPipetteCalibrated: false,
       pipetteIsBad: false,
-      updatePipette: vi.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -195,7 +189,6 @@ describe('PipetteCard', () => {
       pipetteIs96Channel: false,
       isPipetteCalibrated: false,
       pipetteIsBad: false,
-      updatePipette: vi.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -212,7 +205,6 @@ describe('PipetteCard', () => {
       pipetteIs96Channel: false,
       isPipetteCalibrated: false,
       pipetteIsBad: false,
-      updatePipette: vi.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -228,7 +220,6 @@ describe('PipetteCard', () => {
       pipetteIs96Channel: false,
       isPipetteCalibrated: false,
       pipetteIsBad: false,
-      updatePipette: vi.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -243,7 +234,6 @@ describe('PipetteCard', () => {
       pipetteIs96Channel: false,
       isPipetteCalibrated: false,
       pipetteIsBad: false,
-      updatePipette: vi.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -267,7 +257,6 @@ describe('PipetteCard', () => {
       pipetteIs96Channel: false,
       isPipetteCalibrated: false,
       pipetteIsBad: true,
-      updatePipette: vi.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -289,7 +278,6 @@ describe('PipetteCard', () => {
       pipetteIs96Channel: false,
       isPipetteCalibrated: false,
       pipetteIsBad: true,
-      updatePipette: vi.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }

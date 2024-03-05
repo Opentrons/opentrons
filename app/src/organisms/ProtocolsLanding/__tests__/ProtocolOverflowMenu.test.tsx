@@ -18,6 +18,8 @@ import {
 
 import { ProtocolOverflowMenu } from '../ProtocolOverflowMenu'
 
+import type { Mock } from 'vitest'
+
 vi.mock('../../../redux/analytics')
 vi.mock('../../../redux/protocol-storage')
 
@@ -37,7 +39,7 @@ const render = () => {
   )
 }
 
-let mockTrackEvent: vi.Mock
+let mockTrackEvent: Mock
 
 describe('ProtocolOverflowMenu', () => {
   beforeEach(() => {

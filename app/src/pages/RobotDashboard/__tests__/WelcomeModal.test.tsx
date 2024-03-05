@@ -2,11 +2,11 @@ import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { fireEvent } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../__testing-utils__'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { WelcomeModal } from '../WelcomeModal'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 
@@ -30,7 +30,6 @@ describe('WelcomeModal', () => {
     mockCreateLiveCommand = vi.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
     props = {
-      setShowAnalyticsOptInModal: vi.fn(),
       setShowWelcomeModal: mockFunc,
     }
     vi.mocked(useCreateLiveCommandMutation).mockReturnValue({

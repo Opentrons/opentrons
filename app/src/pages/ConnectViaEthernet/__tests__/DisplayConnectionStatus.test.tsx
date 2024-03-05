@@ -1,15 +1,17 @@
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '../../../__testing-utils__'
 
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { DisplayConnectionStatus } from '../../../pages/ConnectViaEthernet/DisplayConnectionStatus'
+
+import type * as ReactRouterDom from 'react-router-dom'
 
 const mockFunc = vi.fn()
 const mockPush = vi.fn()
 vi.mock('react-router-dom', async importOriginal => {
-  const actual = await importOriginal()
+  const actual = await importOriginal<typeof ReactRouterDom>()
   return {
     ...actual,
     useHistory: () => ({ push: mockPush } as any),
