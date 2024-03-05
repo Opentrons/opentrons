@@ -1,5 +1,5 @@
 // mock electron module
-'use strict'
+// 'use strict'
 import { vi } from 'vitest'
 
 module.exports = {
@@ -23,3 +23,4 @@ module.exports = {
     openPath: vi.fn(),
   },
 }
+
