@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
-import { vi, it, describe, expect, beforeEach } from 'vitest'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 
 import { getDeckDefinitions } from '@opentrons/shared-data'
 
@@ -13,9 +13,15 @@ import { mockCalibrationCheckSessionAttributes } from '../../../redux/sessions/_
 import { CheckCalibration } from '../index'
 import type { RobotCalibrationCheckStep } from '../../../redux/sessions/types'
 
-vi.mock('@opentrons/shared-data')
 vi.mock('../../../redux/calibration/selectors')
 vi.mock('../../../redux/config')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<typeof getDeckDefinitions>()
+  return {
+    ...actual,
+    getDeckDefinitions: vi.fn(),
+  }
+})
 
 interface CheckCalibrationSpec {
   heading: string
@@ -23,7 +29,7 @@ interface CheckCalibrationSpec {
 }
 
 describe('CheckCalibration', () => {
-  const dispatchRequests = jest.fn()
+  const dispatchRequests = vi.fn()
   const mockCalibrationCheckSession: Sessions.CalibrationCheckSession = {
     id: 'fake_check_session_id',
     ...mockCalibrationCheckSessionAttributes,
@@ -83,6 +89,10 @@ describe('CheckCalibration', () => {
 
   beforeEach(() => {
     when(vi.mocked(getDeckDefinitions)).calledWith().thenReturn({})
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
   })
 
   SPECS.forEach(spec => {
