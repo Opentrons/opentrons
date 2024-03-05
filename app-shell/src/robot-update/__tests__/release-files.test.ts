@@ -3,9 +3,12 @@ import path from 'path'
 import { promises as fs } from 'fs'
 import fse from 'fs-extra'
 import tempy from 'tempy'
-import { describe, it, afterAll } from 'vitest'
+import { vi, describe, it, afterAll, expect } from 'vitest'
 
 import { cleanupReleaseFiles } from '../release-files'
+
+vi.mock('electron-updater')
+vi.mock('electron-store')
 
 describe('robot update release files utilities', () => {
   const tempDirs: string[] = []
@@ -16,7 +19,7 @@ describe('robot update release files utilities', () => {
   }
 
   afterAll(() => {
-    return Promise.all(tempDirs.map(d => fse.remove(d)))
+    return Promise.all(tempDirs.map(d => fse.remove(d))) as any
   })
 
   describe('cleanupReleaseFiles', () => {

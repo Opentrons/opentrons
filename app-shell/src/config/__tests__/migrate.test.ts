@@ -23,7 +23,7 @@ import {
   MOCK_CONFIG_V19,
   MOCK_CONFIG_V20,
   MOCK_CONFIG_V21,
-} from '../__fixtures__'
+} from '../../__fixtures__'
 import { migrate } from '../migrate'
 
 const NEWEST_VERSION = 21

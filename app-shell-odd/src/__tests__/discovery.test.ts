@@ -1,7 +1,8 @@
 // tests for the app-shell's discovery module
 import { app } from 'electron'
+import { vi, it, expect, describe, beforeEach } from 'vitest'
 import Store from 'electron-store'
-import { when } from 'jest-when'
+import { when } from 'vitest-when'
 
 import * as DiscoveryClient from '@opentrons/discovery-client'
 import {
@@ -11,71 +12,49 @@ import {
 import { registerDiscovery } from '../discovery'
 import * as Cfg from '../config'
 
-jest.mock('electron')
-jest.mock('electron-store')
-jest.mock('@opentrons/discovery-client')
-jest.mock('../config')
-
-const createDiscoveryClient = DiscoveryClient.createDiscoveryClient as jest.MockedFunction<
-  typeof DiscoveryClient.createDiscoveryClient
->
-
-const getFullConfig = Cfg.getFullConfig as jest.MockedFunction<
-  typeof Cfg.getFullConfig
->
-
-const getOverrides = Cfg.getOverrides as jest.MockedFunction<
-  typeof Cfg.getOverrides
->
-
-const handleConfigChange = Cfg.handleConfigChange as jest.MockedFunction<
-  typeof Cfg.handleConfigChange
->
-
-const appOnce = app.once as jest.MockedFunction<typeof app.once>
-
-const MockStore = Store as jest.MockedClass<typeof Store>
+vi.mock('electron')
+vi.mock('electron-store')
+vi.mock('@opentrons/discovery-client')
+vi.mock('../config')
 
 describe('app-shell/discovery', () => {
-  const dispatch = jest.fn()
+  const dispatch = vi.fn()
   const mockClient = {
-    start: jest.fn(),
-    stop: jest.fn(),
-    getRobots: jest.fn(),
-    removeRobot: jest.fn(),
+    start: vi.fn(),
+    stop: vi.fn(),
+    getRobots: vi.fn(),
+    removeRobot: vi.fn(),
   }
 
   const emitListChange = (): void => {
-    const lastCall =
-      createDiscoveryClient.mock.calls[
-        createDiscoveryClient.mock.calls.length - 1
-      ]
+    const lastCall = vi.mocked(DiscoveryClient.createDiscoveryClient).mock
+      .calls[
+      vi.mocked(DiscoveryClient.createDiscoveryClient).mock.calls.length - 1
+    ]
     const { onListChange } = lastCall[0]
     onListChange([])
   }
 
   beforeEach(() => {
-    getFullConfig.mockReturnValue(({
+    vi.mocked(Cfg.getFullConfig).mockReturnValue(({
       discovery: { disableCache: false, candidates: [] },
     } as unknown) as Cfg.Config)
 
-    getOverrides.mockReturnValue({})
-    createDiscoveryClient.mockReturnValue(mockClient)
+    vi.mocked(Cfg.getOverrides).mockReturnValue({})
+    vi.mocked(DiscoveryClient.createDiscoveryClient).mockReturnValue(mockClient)
 
-    when(MockStore.prototype.get).calledWith('robots', []).mockReturnValue([])
-    when(MockStore.prototype.get)
+    when(vi.mocked(Store).prototype.get).calledWith('robots', []).thenReturn([])
+    when(vi.mocked(Store).prototype.get)
       .calledWith('services', null)
-      .mockReturnValue(null)
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
+      .thenReturn(null)
   })
 
   it('registerDiscovery creates a DiscoveryClient', () => {
     registerDiscovery(dispatch)
 
-    expect(createDiscoveryClient).toHaveBeenCalledWith(
+    expect(
+      vi.mocked(DiscoveryClient.createDiscoveryClient)
+    ).toHaveBeenCalledWith(
       expect.objectContaining({
         onListChange: expect.any(Function),
       })
@@ -95,14 +74,14 @@ describe('app-shell/discovery', () => {
   })
 
   it('calls client.stop when electron app emits "will-quit"', () => {
-    expect(appOnce).toHaveBeenCalledTimes(0)
+    expect(vi.mocked(app.once)).toHaveBeenCalledTimes(0)
 
     registerDiscovery(dispatch)
 
     expect(mockClient.stop).toHaveBeenCalledTimes(0)
-    expect(appOnce).toHaveBeenCalledTimes(1)
+    expect(vi.mocked(app.once)).toHaveBeenCalledTimes(1)
 
-    const [event, handler] = appOnce.mock.calls[0]
+    const [event, handler] = vi.mocked(app.once).mock.calls[0]
     expect(event).toEqual('will-quit')
 
     // trigger event handler
@@ -168,16 +147,16 @@ describe('app-shell/discovery', () => {
       mockClient.getRobots.mockReturnValue([{ name: 'foo' }, { name: 'bar' }])
       emitListChange()
 
-      expect(MockStore.prototype.set).toHaveBeenLastCalledWith('robots', [
-        { name: 'foo' },
-        { name: 'bar' },
-      ])
+      expect(vi.mocked(Store).prototype.set).toHaveBeenLastCalledWith(
+        'robots',
+        [{ name: 'foo' }, { name: 'bar' }]
+      )
     })
 
     it('loads robots from cache on client initialization', () => {
       const mockRobot = { name: 'foo' }
 
-      MockStore.prototype.get.mockImplementation(key => {
+      vi.mocked(Store).prototype.get.mockImplementation((key: string) => {
         if (key === 'robots') return [mockRobot]
         return null
       })
@@ -263,13 +242,13 @@ describe('app-shell/discovery', () => {
         },
       ]
 
-      MockStore.prototype.get.mockImplementation(key => {
+      vi.mocked(Store).prototype.get.mockImplementation((key: string) => {
         if (key === 'services') return services
         return null
       })
 
       registerDiscovery(dispatch)
-      expect(MockStore.prototype.delete).toHaveBeenCalledWith('services')
+      expect(vi.mocked(Store).prototype.delete).toHaveBeenCalledWith('services')
       expect(mockClient.start).toHaveBeenCalledWith(
         expect.objectContaining({
           initialRobots: [
@@ -339,7 +318,7 @@ describe('app-shell/discovery', () => {
 
     it('does not update services from store when caching disabled', () => {
       // cache has been disabled
-      getFullConfig.mockReturnValue(({
+      vi.mocked(Cfg.getFullConfig).mockReturnValue(({
         discovery: {
           candidates: [],
           disableCache: true,
@@ -347,7 +326,7 @@ describe('app-shell/discovery', () => {
       } as unknown) as Cfg.Config)
 
       // discovery.json contains 1 entry
-      MockStore.prototype.get.mockImplementation(key => {
+      vi.mocked(Store).prototype.get.mockImplementation((key: string) => {
         if (key === 'robots') return [{ name: 'foo' }]
         return null
       })
@@ -364,7 +343,7 @@ describe('app-shell/discovery', () => {
 
     it('should clear cache and suspend caching when caching becomes disabled', () => {
       // Cache enabled initially
-      getFullConfig.mockReturnValue(({
+      vi.mocked(Cfg.getFullConfig).mockReturnValue(({
         discovery: {
           candidates: [],
           disableCache: false,
@@ -372,7 +351,7 @@ describe('app-shell/discovery', () => {
       } as unknown) as Cfg.Config)
 
       // discovery.json contains 1 entry
-      MockStore.prototype.get.mockImplementation(key => {
+      vi.mocked(Store).prototype.get.mockImplementation((key: string) => {
         if (key === 'robots') return [{ name: 'foo' }]
         return null
       })
@@ -380,25 +359,25 @@ describe('app-shell/discovery', () => {
       registerDiscovery(dispatch)
 
       // the 'discovery.disableCache' change handler
-      const changeHandler = handleConfigChange.mock.calls[1][1]
+      const changeHandler = vi.mocked(Cfg.handleConfigChange).mock.calls[1][1]
       const disableCache = true
       changeHandler(disableCache, false)
 
-      expect(MockStore.prototype.set).toHaveBeenCalledWith('robots', [])
+      expect(vi.mocked(Store).prototype.set).toHaveBeenCalledWith('robots', [])
 
       // new services discovered
-      MockStore.prototype.set.mockClear()
+      vi.mocked(Store).prototype.set.mockClear()
       mockClient.getRobots.mockReturnValue([{ name: 'foo' }, { name: 'bar' }])
       emitListChange()
 
       // but discovery.json should not update
-      expect(MockStore.prototype.set).toHaveBeenCalledTimes(0)
+      expect(vi.mocked(Store).prototype.set).toHaveBeenCalledTimes(0)
     })
   })
 
   describe('manual addresses', () => {
     it('loads candidates from config on client initialization', () => {
-      getFullConfig.mockReturnValue(({
+      vi.mocked(Cfg.getFullConfig).mockReturnValue(({
         discovery: { cacheDisabled: false, candidates: ['1.2.3.4'] },
       } as unknown) as Cfg.Config)
 
@@ -415,7 +394,7 @@ describe('app-shell/discovery', () => {
 
     // ensures config override works with only one candidate specified
     it('candidates in config can be single string value', () => {
-      getFullConfig.mockReturnValue(({
+      vi.mocked(Cfg.getFullConfig).mockReturnValue(({
         discovery: { cacheDisabled: false, candidates: '1.2.3.4' },
       } as unknown) as Cfg.Config)
 

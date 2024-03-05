@@ -21,7 +21,7 @@ import type {
   ConfigV19,
   ConfigV20,
   ConfigV21,
-} from '@opentrons/app/src/redux/config/types'
+} from '@opentrons/app/lib/redux/config/types'
 
 export const MOCK_CONFIG_V0: ConfigV0 = {
   version: 0, // Default key added on boot if missing in configs
