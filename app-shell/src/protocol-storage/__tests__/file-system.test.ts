@@ -38,7 +38,7 @@ describe('protocol storage directory utilities', () => {
     vi.mocked(analyzeProtocolSource).mockReturnValue(Promise.resolve())
   })
 
-  afterAll(() => {
+  afterAll((): any => {
     vi.resetAllMocks()
     return Promise.all(tempDirs.map(d => fs.remove(d)))
   })

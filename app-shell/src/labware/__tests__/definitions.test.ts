@@ -23,7 +23,7 @@ describe('labware directory utilities', () => {
     return dir
   }
 
-  afterAll(() => {
+  afterAll((): any => {
     return Promise.all(tempDirs.map(d => fs.remove(d)))
   })
 
