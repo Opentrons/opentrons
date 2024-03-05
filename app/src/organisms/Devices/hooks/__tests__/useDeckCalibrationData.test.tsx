@@ -105,7 +105,7 @@ describe('useDeckCalibrationData hook', () => {
     when(vi.mocked(getDiscoverableRobotByName))
       .calledWith(undefined as any, 'otie')
       .thenReturn(mockConnectableRobot)
-    when(mockUseCalibrationStatusQuery)
+    when(vi.mocked(useCalibrationStatusQuery))
       .calledWith({}, { hostname: mockConnectableRobot.ip })
       .thenReturn({
         data: {
