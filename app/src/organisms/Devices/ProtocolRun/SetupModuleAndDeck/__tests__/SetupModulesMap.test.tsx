@@ -6,7 +6,11 @@ import { screen } from '@testing-library/react'
 
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { componentPropsMatcher, partialComponentPropsMatcher, renderWithProviders } from '../../../../../__testing-utils__'}
+import {
+  componentPropsMatcher,
+  partialComponentPropsMatcher,
+  renderWithProviders,
+} from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import {
   mockThermocycler as mockThermocyclerFixture,
@@ -166,7 +170,9 @@ describe('SetupModulesMap', () => {
       .thenReturn(<div>mock module info {mockMagneticModule.model}</div>)
 
     render(props)
-    expect(screen.getAllByText('mock module info magneticModuleV2')).toHaveLength(2)
+    expect(
+      screen.getAllByText('mock module info magneticModuleV2')
+    ).toHaveLength(2)
   })
 
   it('should render a deck WITH modules', () => {
