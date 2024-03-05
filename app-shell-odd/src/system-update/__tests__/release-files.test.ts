@@ -1,4 +1,5 @@
 // TODO(mc, 2020-06-11): test all release-files functions
+import { vi, describe, it, expect, afterAll } from 'vitest'
 import path from 'path'
 import { describe, afterAll, it } from 'vitest'
 import { promises as fs } from 'fs'
@@ -6,6 +7,7 @@ import fse from 'fs-extra'
 import tempy from 'tempy'
 
 import { cleanupReleaseFiles } from '../release-files'
+vi.mock('electron-store')
 
 describe('system release files utilities', () => {
   const tempDirs: string[] = []
@@ -15,8 +17,8 @@ describe('system release files utilities', () => {
     return dir
   }
 
-  afterAll(() => {
-    return Promise.all(tempDirs.map(d => fse.remove(d)))
+  afterAll(async () => {
+    await Promise.all(tempDirs.map(d => fse.remove(d)))
   })
 
   describe('cleanupReleaseFiles', () => {
