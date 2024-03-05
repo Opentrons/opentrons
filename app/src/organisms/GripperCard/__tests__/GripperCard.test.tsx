@@ -35,7 +35,6 @@ describe('GripperCard', () => {
         },
       } as GripperData,
       isCalibrated: true,
-      setSubsystemToUpdate: vi.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -76,7 +75,6 @@ describe('GripperCard', () => {
         },
       } as GripperData,
       isCalibrated: false,
-      setSubsystemToUpdate: vi.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -100,7 +98,6 @@ describe('GripperCard', () => {
         },
       } as GripperData,
       isCalibrated: false,
-      setSubsystemToUpdate: vi.fn(),
       isRunActive: false,
       isEstopNotDisengaged: true,
     }
@@ -144,7 +141,6 @@ describe('GripperCard', () => {
     props = {
       attachedGripper: null,
       isCalibrated: false,
-      setSubsystemToUpdate: vi.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -163,7 +159,6 @@ describe('GripperCard', () => {
         ok: false,
       } as any,
       isCalibrated: false,
-      setSubsystemToUpdate: vi.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -183,7 +178,6 @@ describe('GripperCard', () => {
         ok: false,
       } as any,
       isCalibrated: true,
-      setSubsystemToUpdate: vi.fn(),
       isRunActive: false,
       isEstopNotDisengaged: false,
     }

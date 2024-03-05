@@ -13,10 +13,6 @@ import { useTipLengthCalibrations } from '..'
 
 vi.mock('@opentrons/react-api-client')
 
-const mockUseAllTipLengthCalibrationsQuery = useAllTipLengthCalibrationsQuery as vi.mockedFunction<
-  typeof useAllTipLengthCalibrationsQuery
->
-
 const CALIBRATIONS_FETCH_MS = 5000
 
 describe('useTipLengthCalibrations hook', () => {
@@ -32,7 +28,7 @@ describe('useTipLengthCalibrations hook', () => {
   })
 
   it('returns an empty array when no tip length calibrations found', () => {
-    when(mockUseAllTipLengthCalibrationsQuery)
+    when(vi.mocked(useAllTipLengthCalibrationsQuery))
       .calledWith({
         refetchInterval: CALIBRATIONS_FETCH_MS,
       })
@@ -46,7 +42,7 @@ describe('useTipLengthCalibrations hook', () => {
   })
 
   it('returns tip length calibrations when found', () => {
-    when(mockUseAllTipLengthCalibrationsQuery)
+    when(vi.mocked(useAllTipLengthCalibrationsQuery))
       .calledWith({
         refetchInterval: CALIBRATIONS_FETCH_MS,
       })

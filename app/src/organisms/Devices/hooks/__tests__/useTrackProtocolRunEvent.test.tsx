@@ -15,6 +15,8 @@ import {
 import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 import { useRobot } from '../useRobot'
 
+import type { Mock } from 'vitest'
+
 vi.mock('../useRobot')
 vi.mock('../useProtocolRunAnalyticsData')
 vi.mock('../../../../redux/discovery')
@@ -26,8 +28,8 @@ const RUN_ID = 'runId'
 const ROBOT_NAME = 'otie'
 const PROTOCOL_PROPERTIES = { protocolType: 'python' }
 
-let mockTrackEvent: vi.mock
-let mockGetProtocolRunAnalyticsData: vi.mock
+let mockTrackEvent: Mock
+let mockGetProtocolRunAnalyticsData: Mock
 let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 let store: Store<any> = createStore(vi.fn(), {})
 

@@ -25,6 +25,7 @@ import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
 import { useLaunchLPC } from '../useLaunchLPC'
 import { LabwarePositionCheck } from '..'
 
+import type { Mock } from 'vitest'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
@@ -57,9 +58,9 @@ const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition2
 
 describe('useLaunchLPC hook', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
-  let mockCreateMaintenanceRun: vi.Mock
-  let mockCreateLabwareDefinition: vi.Mock
-  let mockDeleteMaintenanceRun: vi.Mock
+  let mockCreateMaintenanceRun: Mock
+  let mockCreateLabwareDefinition: Mock
+  let mockDeleteMaintenanceRun: Mock
   const mockStore = configureStore()
 
   beforeEach(() => {
