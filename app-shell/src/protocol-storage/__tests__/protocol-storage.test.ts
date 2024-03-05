@@ -3,6 +3,7 @@
 import path from 'path'
 import fs from 'fs-extra'
 import tempy from 'tempy'
+import { describe, it, vi, beforeEach, afterEach } from 'vitest'
 
 import { PROTOCOLS_DIRECTORY_NAME } from '../file-system'
 import {
@@ -20,7 +21,7 @@ describe('protocol storage directory utilities', () => {
   beforeEach(() => {
     mockAnalysisFilePath = tempy.file({ extension: 'json' })
     protocolsDir = path.join('__mock-app-path__', PROTOCOLS_DIRECTORY_NAME)
-    mockDispatch = jest.fn()
+    mockDispatch = vi.fn()
     requiredRmdir = true
   })
 

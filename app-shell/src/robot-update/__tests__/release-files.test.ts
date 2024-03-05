@@ -3,6 +3,7 @@ import path from 'path'
 import { promises as fs } from 'fs'
 import fse from 'fs-extra'
 import tempy from 'tempy'
+import { describe, it, afterAll } from 'vitest'
 
 import { cleanupReleaseFiles } from '../release-files'
 
