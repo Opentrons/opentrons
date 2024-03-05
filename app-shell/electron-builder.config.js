@@ -1,6 +1,7 @@
 'use strict'
 const path = require('path')
 const { versionForProject } = require('../scripts/git-version')
+const { app } = require('electron')
 
 const {
   OT_APP_DEPLOY_BUCKET,

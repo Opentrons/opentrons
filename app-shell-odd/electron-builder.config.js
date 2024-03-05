@@ -1,8 +1,9 @@
 'use strict'
+const { app } = require('electron')
 
 module.exports = {
   appId: 'com.opentrons.odd',
-  electronVersion: '27.0.0',
+  electronVersion: app.getVersion(),
   npmRebuild: false,
   files: [
     '**/*',
