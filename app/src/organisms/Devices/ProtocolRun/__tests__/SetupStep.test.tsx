@@ -6,6 +6,8 @@ import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { SetupStep } from '../SetupStep'
 
+import type { Mock } from 'vitest'
+
 describe('SetupStep', () => {
   const render = ({
     expanded = true,
@@ -31,7 +33,7 @@ describe('SetupStep', () => {
       { i18nInstance: i18n }
     )[0]
   }
-  let toggleExpandedMock: vi.MockedFunction<() => void>
+  let toggleExpandedMock: Mock
 
   beforeEach(() => {
     toggleExpandedMock = vi.fn()
