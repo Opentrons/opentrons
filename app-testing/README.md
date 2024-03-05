@@ -82,5 +82,40 @@ This allows us to run one or many.
 
 ### Analyses Snapshot Test
 
-- run the Workflow Dispatch job
-  - `gh workflow run 'Analyses Snapshot Test' --ref 7.1-analyses-battery -f TARGET=v7.1.0-alpha.10 -f TEST_SOURCE=7.1-analyses-battery`
+The analyses snapshot test runs protocol analysis using `TARGET` branch or tag then compares them against snapshots found on `TEST_SOURCE` branch or tag.
+
+#### Protocol Files Location
+
+The set of protocols to analyze is defined inside of `app-testing/.env` file, under the `APP_ANALYSIS_TEST_PROTOCOLS` variable. These protocols must exist inside of `app-testing/files/protocols` folder. 
+
+- Protocol Designer protocols go in the `json` folder
+- Python protocols go in the `python` folder.
+
+#### Analysis Snapshots Location
+
+Analysis snapshots are located inside of `app-testing/tests/__snapshots__/analyses_snapshot_test` folder. 
+
+#### Running Analysis Snapshot Tests Locally
+
+To run analysis snapshot tests locally, you run 
+   
+   ```bash
+   TARGET="<target-branch-or-tag>" make snapshot-test
+   ```
+This will run the analyses snapshot test using the `TARGET` branch or tag, and compare the results against your local analysis snapshots located inside `app-testing/tests/__snapshots__/analyses_snapshot_test`.
+
+#### Running Analysis Snapshot Tests on CI
+
+To run analysis snapshot tests on CI, you need to run the `Analyses Snapshot Test` workflow dispatch job. This job requires two inputs, `TARGET` and `TEST_SOURCE`.
+
+Given the scenario that you want to see if the latest version of `chore_release-v7.2.0` release branch has any differences compared to the current analysis snapshots.
+
+`TARGET` - is chore_release-v7.2.0. "I want to run analysis against `chore_release-v7.2.0`"
+
+`TEST_SOURCE` - This one varies a bit on what it can be. The question to ask is, "Where are the snapshots that you want to compare against?"
+- If you want to compare against the current analysis snapshots for this release, then TEST_SOURCE is chore_release-v7.2.0.
+- If you want to compare against the previous release branch, then TEST_SOURCE is chore_release-v7.1.0.
+- If you want to compare your in-progress release branch against the previous release branch, then TEST_SOURCE is `<your-branch-name>`.
+
+ run the Workflow Dispatch job
+  - `gh workflow run 'Analyses Snapshot Test' --ref chore_release-v7.2.0 -f TARGET=chore_release-v7.2.0 -f TEST_SOURCE=chore_release-v7.1.0`
