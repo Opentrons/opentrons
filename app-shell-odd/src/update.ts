@@ -17,9 +17,13 @@ import type { ReleaseSetUrls } from './system-update/types'
 
 const log = createLogger('update')
 
-export const FLEX_MANIFEST_URL = _OPENTRONS_PROJECT_.includes('robot-stack')
-  ? 'https://builds.opentrons.com/ot3-oe/releases.json'
-  : 'https://ot3-development.builds.opentrons.com/ot3-oe/releases.json'
+export const FLEX_MANIFEST_URL =
+  // @ts-expect-error can't get TS to recognize global.d.ts
+  global._OPENTRONS_PROJECT_ &&
+  // @ts-expect-error can't get TS to recognize global.d.ts
+  global._OPENTRONS_PROJECT_.includes('robot-stack')
+    ? 'https://builds.opentrons.com/ot3-oe/releases.json'
+    : 'https://ot3-development.builds.opentrons.com/ot3-oe/releases.json'
 
 let LATEST_OT_SYSTEM_VERSION = _PKG_VERSION_
 

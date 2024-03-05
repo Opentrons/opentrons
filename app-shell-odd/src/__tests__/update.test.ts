@@ -19,7 +19,7 @@ describe('update', () => {
   let handleAction: Dispatch
 
   beforeEach(() => {
-    dispatch = jest.fn()
+    dispatch = vi.fn()
     handleAction = registerUpdate(dispatch)
   })
 
