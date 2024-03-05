@@ -209,7 +209,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume || 0
   const effectiveTransferVol =
-  getPipetteWithTipMaxVol(args.pipette, invariantContext, tipRack) -
+    getPipetteWithTipMaxVol(args.pipette, invariantContext, tipRack) -
     aspirateAirGapVolume
   const liquidMinVolumes = Object.values(pipetteSpec.liquids).map(
     liquid => liquid.minVolume
@@ -411,7 +411,6 @@ export const transfer: CommandCreator<TransferArgs> = (
                   dispenseDelaySeconds: dispenseDelay?.seconds,
                   tipRack,
                 })
-
               : []
 
           const airGapAfterAspirateCommands =
