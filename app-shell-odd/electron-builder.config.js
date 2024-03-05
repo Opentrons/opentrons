@@ -1,9 +1,9 @@
 'use strict'
-const { app } = require('electron')
+import pkg from '../package.json'
 
 module.exports = {
   appId: 'com.opentrons.odd',
-  electronVersion: app.getVersion(),
+  electronVersion: JSON.stringify(pkg.devDependencies.electron),
   npmRebuild: false,
   files: [
     '**/*',
