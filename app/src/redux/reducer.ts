@@ -1,5 +1,3 @@
-// @ts-expect-error pnpm and ts do not like importing sub dependency like this
-// fix this after the vite + pnpm migration
 import createHistory from 'history/createHashHistory'
 import { combineReducers } from 'redux'
 import { connectRouter } from 'connected-react-router'
