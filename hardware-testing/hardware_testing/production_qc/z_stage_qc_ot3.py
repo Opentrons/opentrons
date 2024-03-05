@@ -32,28 +32,50 @@ LOG.setLevel(logging.CRITICAL)
 
 # Test Parameters
 FORCE_SPEED = 10
-FORCE_MARGIN = 15  # Percentage
-FORCE_TEST_SETTINGS = [
-    {"CURRENT": 0.15, "F_MAX": 50},
-    {"CURRENT": 0.2, "F_MAX": 73},
-    {"CURRENT": 0.3, "F_MAX": 120},
-    {"CURRENT": 0.4, "F_MAX": 160},
-    {"CURRENT": 0.5, "F_MAX": 200},
-    {"CURRENT": 0.6, "F_MAX": 230},
-    {"CURRENT": 0.7, "F_MAX": 260},
-    {"CURRENT": 1.4, "F_MAX": 480},
-    {"CURRENT": 1.5, "F_MAX": 520},
+FORCE_MARGIN = 30  # Percentage
+FORCE_TEST_LEFT_SETTINGS = [
+    {"CURRENT": 0.15, "F_MAX": 41},
+    {"CURRENT": 0.2, "F_MAX": 62},
+    {"CURRENT": 0.3, "F_MAX": 104},
+    {"CURRENT": 0.4, "F_MAX": 146},
+    {"CURRENT": 0.5, "F_MAX": 186},
+    {"CURRENT": 0.6, "F_MAX": 222},
+    {"CURRENT": 0.7, "F_MAX": 262},
+    {"CURRENT": 1.4, "F_MAX": 494},
+    {"CURRENT": 1.5, "F_MAX": 524},
 ]
+FORCE_TEST_RIGHT_SETTINGS = [
+    {"CURRENT": 0.15, "F_MAX": 35},
+    {"CURRENT": 0.2, "F_MAX": 58},
+    {"CURRENT": 0.3, "F_MAX": 96},
+    {"CURRENT": 0.4, "F_MAX": 132},
+    {"CURRENT": 0.5, "F_MAX": 164},
+    {"CURRENT": 0.6, "F_MAX": 197},
+    {"CURRENT": 0.7, "F_MAX": 231},
+    {"CURRENT": 1.4, "F_MAX": 397},
+    {"CURRENT": 1.5, "F_MAX": 428},
+]
+
+
 CYCLES_CURRENT = 5
 
-TEST_PARAMETERS: Dict[str, float] = {
+TEST_LEFT_PARAMETERS: Dict[str, float] = {
     "SPEED": FORCE_SPEED,
     "FORCE_MARGIN": FORCE_MARGIN,
     "CYCLES": CYCLES_CURRENT,
 }
-for i in FORCE_TEST_SETTINGS:
-    TEST_PARAMETERS[str(i["CURRENT"])] = i["F_MAX"]
 
+TEST_RIGHT_PARAMETERS: Dict[str, float] = {
+    "SPEED": FORCE_SPEED,
+    "FORCE_MARGIN": FORCE_MARGIN,
+    "CYCLES": CYCLES_CURRENT,
+}
+
+for i in FORCE_TEST_LEFT_SETTINGS:
+    TEST_LEFT_PARAMETERS[str(i["CURRENT"])] = i["F_MAX"]
+
+for i in FORCE_TEST_RIGHT_SETTINGS:
+    TEST_RIGHT_PARAMETERS[str(i["CURRENT"])] = i["F_MAX"]
 
 # Global variables
 thread_sensor = False
@@ -81,7 +103,7 @@ def build_test_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     mount_data_line: List[Union[CSVLine, CSVLineRepeating]] = [
         CSVLine("TEST_CURRENTS", [str, str, str, str, str])
     ]
-    for setting in FORCE_TEST_SETTINGS:
+    for setting in FORCE_TEST_LEFT_SETTINGS:
         mount_data_line.append(
             CSVLine(
                 _get_test_tag(setting["CURRENT"]),
@@ -98,8 +120,12 @@ def _build_csv_report() -> CSVReport:
         test_name="z-stage-test-qc-ot3",
         sections=[
             CSVSection(
-                title="TEST_PARAMETERS",
-                lines=[CSVLine(parameter, [int]) for parameter in TEST_PARAMETERS],
+                title="TEST_LEFT_PARAMETERS",
+                lines=[CSVLine(parameter, [int]) for parameter in TEST_LEFT_PARAMETERS],
+            ),
+             CSVSection(
+                title="TEST_RIGHT_PARAMETERS",
+                lines=[CSVLine(parameter, [int]) for parameter in TEST_RIGHT_PARAMETERS],
             ),
             CSVSection(
                 title=OT3Mount.LEFT.name,
@@ -190,7 +216,9 @@ def check_force(
         qc_pass = True
     else:
         qc_pass = False
-
+    # validate None
+    if max_force is None or max_force_range is None or average_force is None or average_force_range is None:
+        raise EnvironmentError("Found None data, please adjust Z-Stage, Test Failed ( 请调整Z轴位置, 测试失败)!")
     _tag = _get_test_tag(current)
     report(
         mount.name,
@@ -203,7 +231,6 @@ def check_force(
             CSVResult.from_bool(qc_pass),
         ],
     )
-
     return qc_pass
 
 
@@ -235,7 +262,11 @@ async def _force_gauge(
         ["MAX", "MAX_RANGE", "AVERAGE", "AVERAGE_RANGE", "RESULT"],
     )
     # Test each current setting
-    for test in FORCE_TEST_SETTINGS:
+    if mount == OT3Mount.LEFT:
+        force_test_setting = FORCE_TEST_LEFT_SETTINGS
+    else:
+        force_test_setting = FORCE_TEST_RIGHT_SETTINGS
+    for test in force_test_setting:
         # Test each current setting several times and average the results
         max_results = []
         avg_results = []
@@ -326,8 +357,10 @@ async def _main(arguments: argparse.Namespace) -> None:
     dut = helpers_ot3.DeviceUnderTest.OTHER
     helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut=dut)
 
-    for k, v in TEST_PARAMETERS.items():
-        report("TEST_PARAMETERS", k, [v])
+    for k, v in TEST_LEFT_PARAMETERS.items():
+        report("TEST_LEFT_PARAMETERS", k, [v])
+    for k, v in TEST_RIGHT_PARAMETERS.items():
+        report("TEST_RIGHT_PARAMETERS", k, [v])
 
     # Attempt to home if first homing fails because of OT-3 in box Y axis issue
     try:
@@ -353,6 +386,14 @@ async def _main(arguments: argparse.Namespace) -> None:
 
     try:
         qc_pass = await _run(api, arguments, report)
+        await api.home(
+            [
+                Axis.X,
+                Axis.Y,
+                Axis.by_mount(OT3Mount.LEFT),
+                Axis.by_mount(OT3Mount.RIGHT),
+            ]
+        )
     except KeyboardInterrupt:
         print("Cancelled")
     except Exception as e:
