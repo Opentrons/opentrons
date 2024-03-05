@@ -45,8 +45,12 @@ describe('DesktopApp', () => {
     )
     vi.mocked(DeviceDetails).mockReturnValue(<div>Mock DeviceDetails</div>)
     vi.mocked(DevicesLanding).mockReturnValue(<div>Mock DevicesLanding</div>)
-    vi.mocked(ProtocolsLanding).mockReturnValue(<div>Mock ProtocolsLanding</div>)
-    vi.mocked(ProtocolRunDetails).mockReturnValue(<div>Mock ProtocolRunDetails</div>)
+    vi.mocked(ProtocolsLanding).mockReturnValue(
+      <div>Mock ProtocolsLanding</div>
+    )
+    vi.mocked(ProtocolRunDetails).mockReturnValue(
+      <div>Mock ProtocolRunDetails</div>
+    )
     vi.mocked(RobotSettings).mockReturnValue(<div>Mock RobotSettings</div>)
     vi.mocked(GeneralSettings).mockReturnValue(<div>Mock AppSettings</div>)
     vi.mocked(Breadcrumbs).mockReturnValue(<div>Mock Breadcrumbs</div>)

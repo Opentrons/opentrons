@@ -33,7 +33,9 @@ const render = () => {
 describe('App', () => {
   beforeEach(() => {
     vi.mocked(DesktopApp).mockReturnValue(<div>mock DesktopApp</div>)
-    vi.mocked(OnDeviceDisplayApp).mockReturnValue(<div>mock OnDeviceDisplayApp</div>)
+    vi.mocked(OnDeviceDisplayApp).mockReturnValue(
+      <div>mock OnDeviceDisplayApp</div>
+    )
     when(vi.mocked(getConfig))
       .calledWith(MOCK_STATE)
       .thenReturn(MOCK_STATE.config)

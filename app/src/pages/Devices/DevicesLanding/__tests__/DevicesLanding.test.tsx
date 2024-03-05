@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
-import { renderWithProviders } from '../../../../__testing-utils__'
 
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { DevicesEmptyState } from '../../../../organisms/Devices/DevicesEmptyState'
 import { RobotCard } from '../../../../organisms/Devices/RobotCard'
