@@ -9,22 +9,20 @@ import { getInitialDeckSetup } from '../../../../step-forms/selectors'
 import { getLabwareIsCompatible } from '../../../../utils/labwareModuleCompatibility'
 import { getDisableModuleRestrictions } from '../../../../feature-flags/selectors'
 import { EditModulesModal } from '../index'
-import { ConnectedSlotMap } from '../ConnectedSlotMap'
 
 import type * as Components from '@opentrons/components'
 import type { ModuleOnDeck } from '../../../../step-forms'
 
-vi.mock('../ConnectedSlotMap')
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../step-forms/selectors')
 vi.mock('../../../../utils/labwareModuleCompatibility')
 vi.mock('../../../../feature-flags/selectors')
-vi.mock('@opentrons/components', async (importOriginal) => {
+vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof Components>()
   return {
     ...actual,
-    DeckLocationSelect: vi.fn(() => (<div>mock DeckLocationSelect</div>)),
-    OT2SlotMap: vi.fn(() => (<div>mock SlotMap</div>))
+    DeckLocationSelect: vi.fn(() => <div>mock DeckLocationSelect</div>),
+    OT2SlotMap: vi.fn(() => <div>mock SlotMap</div>),
   }
 })
 
@@ -81,7 +79,6 @@ describe('Edit Modules Modal', () => {
     })
     vi.mocked(getLabwareIsCompatible).mockReturnValue(true)
     vi.mocked(getDisableModuleRestrictions).mockReturnValue(false)
-    vi.mocked(ConnectedSlotMap).mockReturnValue(<div>mock ConnectedSlotMap</div>)
   })
   afterEach(() => {
     cleanup()
