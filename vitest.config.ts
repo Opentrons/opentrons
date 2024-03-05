@@ -12,7 +12,6 @@ export default mergeConfig(
       allowOnly: true,
       exclude: [...configDefaults.exclude, '**/node_modules/**', '**/dist/**'],
       setupFiles: ['./setup-vitest.ts'],
-      poolOptions: { threads: { singleThread: true } },
     },
     resolve: {
       alias: {
