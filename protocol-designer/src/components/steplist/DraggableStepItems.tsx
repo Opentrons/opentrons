@@ -18,12 +18,7 @@ import {
 } from '../../containers/ConnectedStepItem'
 import { PDTitledList } from '../lists'
 import { ContextMenu } from './ContextMenu'
-<<<<<<< HEAD
 import styles from './StepItem.module.css'
-=======
-
-import styles from './StepItem.css'
->>>>>>> edge
 
 interface DragDropStepItemProps extends ConnectedStepItemProps {
   stepId: StepIdType
