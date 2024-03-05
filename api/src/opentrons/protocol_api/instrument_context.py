@@ -306,8 +306,8 @@ class InstrumentContext(publisher.CommandPublisher):
         :type volume: int or float
 
         :param location: Tells the robot where to dispense liquid held in the pipette.
-                         The location can be a :py:class:`.Well` or a
-                         :py:class:`.Location`.
+                         The location can be a :py:class:`.Well`, :py:class:`.Location`,
+                         :py:class:`.TrashBin`, or :py:class:`.WasteChute`.
 
                             - If the location is a ``Well``, the pipette will dispense
                               at or above the bottom center of the well. The distance (in
