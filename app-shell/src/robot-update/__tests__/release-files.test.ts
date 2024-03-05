@@ -9,6 +9,7 @@ import { cleanupReleaseFiles } from '../release-files'
 
 vi.mock('electron-updater')
 vi.mock('electron-store')
+vi.mock('../../log')
 
 describe('robot update release files utilities', () => {
   const tempDirs: string[] = []

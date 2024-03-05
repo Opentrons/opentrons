@@ -5,6 +5,7 @@ import { downloadAndCacheReleaseManifest } from '../release-manifest'
 
 vi.mock('../../http')
 vi.mock('../directories')
+vi.mock('../../log')
 vi.mock('electron-store')
 const fetchJson = Http.fetchJson
 const getManifestCacheDir = Dirs.getManifestCacheDir

@@ -20,8 +20,9 @@ import { analyzeProtocolSource } from '../../protocol-analysis'
 
 vi.mock('uuid/v4')
 vi.mock('electron')
-vi.mock('../../protocol-analysis')
 vi.mock('electron-store')
+vi.mock('../../protocol-analysis')
+vi.mock('../../log')
 
 const trashItem = Electron.shell.trashItem
 

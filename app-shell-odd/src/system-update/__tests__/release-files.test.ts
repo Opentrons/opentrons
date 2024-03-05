@@ -7,6 +7,7 @@ import tempy from 'tempy'
 
 import { cleanupReleaseFiles } from '../release-files'
 vi.mock('electron-store')
+vi.mock('../../log')
 
 describe('system release files utilities', () => {
   const tempDirs: string[] = []

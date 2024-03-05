@@ -3,12 +3,25 @@ import { usb } from 'usb'
 import { vi, it, expect, describe, afterEach } from 'vitest'
 
 import * as Fixtures from '@opentrons/app/src/redux/system-info/__fixtures__'
+import { createLogger } from '../../log'
 import { createUsbDeviceMonitor, getWindowsDriverVersion } from '../usb-devices'
 import { isWindows } from '../../os'
+
 
 vi.mock('execa')
 vi.mock('usb')
 vi.mock('electron-store')
+vi.mock('../../log', async importOriginal => {
+  const actual = await importOriginal<typeof createLogger>()
+  return {
+    ...actual,
+    createLogger: () => ({
+      debug: vi.fn(),
+      error: vi.fn(),
+      warn: vi.fn(),
+    }),
+  }
+})
 
 const mockFixtureDevice = {
   ...Fixtures.mockUsbDevice,

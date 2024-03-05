@@ -5,6 +5,7 @@ import * as Fixtures from '@opentrons/app/src/redux/system-info/__fixtures__'
 import * as SystemInfo from '@opentrons/app/src/redux/system-info'
 import { uiInitialized } from '@opentrons/app/src/redux/shell/actions'
 import * as OS from '../../os'
+import { createLogger } from '../../log'
 import { createUsbDeviceMonitor, getWindowsDriverVersion } from '../usb-devices'
 import {
   getActiveInterfaces,
@@ -16,11 +17,21 @@ import type { Dispatch } from '../../types'
 import type { UsbDeviceMonitor } from '../usb-devices'
 import type { NetworkInterfaceMonitor } from '../network-interfaces'
 
+
 vi.mock('../../os')
 vi.mock('../usb-devices')
 vi.mock('../network-interfaces')
 vi.mock('electron-store')
-
+vi.mock('../../log', async importOriginal => {
+  const actual = await importOriginal<typeof createLogger>()
+  return {
+    ...actual,
+    createLogger: () => ({
+      debug: vi.fn(),
+      error: vi.fn(),
+    }),
+  }
+})
 const flush = (): Promise<void> =>
   new Promise(resolve => setTimeout(resolve, 0))
 

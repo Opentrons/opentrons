@@ -13,6 +13,7 @@ import {
 } from '../'
 
 vi.mock('electron-store')
+vi.mock('../../log')
 
 describe('protocol storage directory utilities', () => {
   let protocolsDir: string
