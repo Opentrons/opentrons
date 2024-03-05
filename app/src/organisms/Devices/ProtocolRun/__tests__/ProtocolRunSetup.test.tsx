@@ -241,7 +241,7 @@ describe('ProtocolRunSetup', () => {
         .thenReturn({ complete: true })
     })
     afterEach(() => {
-      vi.resetAllWhenMocks()
+      vi.clearAllMocks()
     })
 
     it('renders calibration ready if robot is Flex and modules are calibrated', () => {
