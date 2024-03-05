@@ -23,7 +23,6 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
     home_ot3,
     move_plunger_absolute_ot3,
     get_plunger_positions_ot3,
-    # update_pick_up_current,
     update_pick_up_speed,
     update_pick_up_distance,
     # update_drop_tip_speed,
@@ -36,8 +35,7 @@ from hardware_testing import data
 from hardware_testing.drivers.mark10 import Mark10
 from hardware_testing.drivers import mitutoyo_digimatic_indicator
 
-aspirate_depth = 10
-dispense_depth = 3
+z_depth = 4
 liquid_retract_dist = 12
 liquid_retract_speed = 5
 retract_dist = 100
@@ -48,7 +46,6 @@ test_volume = 1000
 
 def dict_keys_to_line(dict):
     return str.join(",", list(dict.keys())) + "\n"
-
 
 def file_setup(test_data, details):
     today = datetime.date.today()
@@ -66,12 +63,10 @@ def file_setup(test_data, details):
     print("FILE NAME = ", test_file)
     return test_name, test_file
 
-
 def dial_indicator_setup(port):
     gauge = mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator(port=port)
     gauge.connect()
     return gauge
-
 
 def getch():
     """
@@ -90,7 +85,6 @@ def getch():
         return ch
 
     return _getch()
-
 
 async def jog(api, position, cp) -> Dict[Axis, float]:
     step_size = [0.01, 0.05, 0.1, 0.5, 1, 10, 20, 50]
@@ -198,7 +192,6 @@ async def jog(api, position, cp) -> Dict[Axis, float]:
         )
         print("\r", end="")
 
-
 async def countdown(count_time: float):
     """
     This function loops through a countdown before checking the leak visually
@@ -210,7 +203,6 @@ async def countdown(count_time: float):
         print(f"Remaining: {count_time-time_suspend} (s)", end="")
         print("\r", end="")
     print("")
-
 
 async def update_pickup_tip_speed(api, mount, speed) -> None:
     """Update drop-tip current."""
@@ -278,10 +270,11 @@ async def calibrate_tiprack(api, home_position, mount):
     tiprack_loc = Point(tiprack_loc[Axis.X],
                         tiprack_loc[Axis.Y],
                         tiprack_loc[Axis.by_mount(mount)])
-    print(f'Befor Press Distance: {tiprack_loc[2]}')
+    initial_press_dist = await api.encoder_current_position_ot3(mount, cp)
+    print(f'Initial Press Position: {initial_press_dist[Axis.by_mount(mount)]}')
     press_dist = await api.pick_up_tip(
         mount, tip_length=(tip_length[args.tip_size]-tip_overlap))
-    print(f'Press Distance:{press_dist}')
+    print(f'Press Position:{press_dist[Axis.by_mount(mount)]}')
     await api.home([Axis.Z_L])
     cp = CriticalPoint.TIP
     await asyncio.sleep(1)
@@ -309,6 +302,7 @@ async def update_pick_up_current(api, mount, tip_count, current) -> None:
     """Update pick-up-tip current."""
     pipette = _get_pipette_from_mount(api, mount)
     pipette.get_pick_up_configuration_for_tip_count(tip_count).current_by_tip_count.update({tip_count: current})
+    print(f'Settings: {pipette.get_pick_up_configuration_for_tip_count(tip_count)}')
 
 async def _main() -> None:
     today = datetime.date.today()
@@ -327,32 +321,9 @@ async def _main() -> None:
     await update_nozzle_manager(hw_api, OT3Mount.LEFT, args.nozzles)
     details = [pipette_model, m_current]
     test_n, test_f = file_setup(dial_data, details)
-    file_name = "/home/root/.opentrons/testing_data/pickup_tip_test/pu_96_pipette_%s-%s.csv" % (
-        m_current,
-        datetime.datetime.now().strftime("%m-%d-%y_%H-%M"),
-    )
-    lp_file_name = '/var/{}-P-{}_Z-{}-{}.csv'.format( pipette_model,
-                                                args.plunger_speed,
-                                                args.mount_speed,
-                                                today.strftime("%b-%d-%Y"))
-    liquid_probe_settings = LiquidProbeSettings(
-                                                # starting_mount_height = 100,
-                                                max_z_distance = args.max_z_distance,
-                                                min_z_distance = args.min_z_distance,
-                                                mount_speed = args.mount_speed,
-                                                plunger_speed = args.plunger_speed,
-                                                sensor_threshold_pascals = args.sensor_threshold,
-                                                expected_liquid_height = args.expected_liquid_height,
-                                                log_pressure = args.log_pressure,
-                                                aspirate_while_sensing = False,
-                                                auto_zero_sensor = False,
-                                                num_baseline_reads = 10,
-                                                data_file = lp_file_name,
-                                                )
     try:
         await hw_api.home()
         await asyncio.sleep(1)
-        # await hw_api.home_plunger(mount)
         await hw_api.set_lights(rails=True)
         plunger_pos = get_plunger_positions_ot3(hw_api, mount)
         print(plunger_pos)
@@ -428,12 +399,6 @@ async def _main() -> None:
         home_w_tip = await hw_api.current_position_ot3(mount, cp)
         # Calibrate Dial Indicator with single tip
         if (args.calibrate):
-            nozzle_position
-            # cp = CriticalPoint.TIP
-            # initial_dial_loc = Point(
-            #                 deck_slot['deck_slot'][args.dial_slot]['X'],
-            #                 deck_slot['deck_slot'][args.dial_slot]['Y'],
-            #                 home_w_tip[Axis.by_mount(mount)])
             initial_dial_loc = Point(nozzle_loc[Axis.X],
                                     nozzle_loc[Axis.Y],
                                     nozzle_loc[Axis.by_mount(mount)])
@@ -444,7 +409,6 @@ async def _main() -> None:
             dial_loc = Point(dial_loc[Axis.X],
                                 dial_loc[Axis.Y],
                                 dial_loc[Axis.by_mount(mount)])
-            await move_to_point()
             deck_slot['deck_slot'][args.dial_slot][Axis.X.name] = dial_loc.x
             deck_slot['deck_slot'][args.dial_slot][Axis.Y.name] = dial_loc.y
             deck_slot['deck_slot'][args.dial_slot]['Z'] = dial_loc.z
@@ -460,7 +424,7 @@ async def _main() -> None:
             trough_loc = await jog(hw_api, current_position, cp)
             trough_loc = Point(trough_loc[Axis.X],
                                 trough_loc[Axis.Y],
-                                trough_loc[Axis.by_mount(mount)])
+                                trough_loc[Axis.by_mount(mount)] - z_depth)
             deck_slot['deck_slot'][args.trough_slot][Axis.X.name] = dial_loc.x
             deck_slot['deck_slot'][args.trough_slot][Axis.Y.name] = dial_loc.y
             deck_slot['deck_slot'][args.trough_slot]['Z'] = dial_loc.z
@@ -519,6 +483,8 @@ async def _main() -> None:
             # hw_api.clamp_drop_tip_speed = float(input("Drop tip speed: "))
             # await update_drop_tip_speed(hw_api, mount, hw_api.clamp_drop_tip_speed )
             cp = CriticalPoint.TIP
+            drop_tip_location =  Point(299.66 , 389.04 , 104.5)
+             # 299.66 , 389.04 , 104.5
             await move_to_point(hw_api, mount, droptip_loc, cp)
             input("Feel the Tip!")
             await hw_api.drop_tip(mount)
@@ -541,7 +507,7 @@ async def _main() -> None:
             if args.columns:
                 column = float(input("How many Columns to Move: "))
                 column = column*9
-                pickup_loc = Point(pickup_loc[0] - column,
+                pickup_loc = Point(pickup_loc[0] + column,
                                     pickup_loc[1],
                                     pickup_loc[2])
             else:
@@ -551,12 +517,13 @@ async def _main() -> None:
                                     pickup_loc[1] + row,
                                     pickup_loc[2])
             await move_to_point(hw_api, mount, pickup_loc, cp)
-            print(f'start_position{pickup_loc[2]}')
+            initial_press_dist = await hw_api.encoder_current_position_ot3(mount, cp)
+            print(f'inital press position: {initial_press_dist[Axis.by_mount(mount)]}')
             press_dist = await hw_api.pick_up_tip(mount,
                                     tip_length=(tip_length[args.tip_size]-tip_overlap),
                                     presses = 1,
                                     increment = 0)
-            print(f'Press Distance: {press_dist}')
+            print(f'Press Position: {press_dist[Axis.by_mount(mount)]}')
             await hw_api.home_z(mount.LEFT)
             cp = CriticalPoint.TIP
             current_position = await hw_api.current_position_ot3(mount, cp)
@@ -568,7 +535,6 @@ async def _main() -> None:
     finally:
         await hw_api.disengage_axes([Axis.X, Axis.Y])
         await hw_api.clean_up()
-
 
 if __name__ == "__main__":
     slot_locs = [
