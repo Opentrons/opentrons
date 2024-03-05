@@ -2,7 +2,7 @@ import * as React from 'react'
 import { when } from 'vitest-when'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { Provider } from 'react-redux'
-import { createStore, Store } from 'redux'
+import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
@@ -11,11 +11,9 @@ import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 
 import { useRobot } from '..'
 
-vi.mock('../../../../redux/discovery')
+import type { Store } from 'redux'
 
-const mockGetDiscoverableRobotByName = getDiscoverableRobotByName as vi.MockedFunction<
-  typeof getDiscoverableRobotByName
->
+vi.mock('../../../../redux/discovery')
 
 const store: Store<any> = createStore(vi.fn(), {})
 
@@ -36,7 +34,7 @@ describe('useRobot hook', () => {
   })
 
   it('returns null when given a robot name that is not discoverable', () => {
-    when(vi.mocked(mockGetDiscoverableRobotByName))
+    when(vi.mocked(getDiscoverableRobotByName))
       .calledWith(undefined as any, 'otie')
       .thenReturn(null)
 
@@ -46,7 +44,7 @@ describe('useRobot hook', () => {
   })
 
   it('returns robot when given a discoverable robot name', () => {
-    when(vi.mocked(mockGetDiscoverableRobotByName))
+    when(vi.mocked(getDiscoverableRobotByName))
       .calledWith(undefined as any, 'otie')
       .thenReturn(mockConnectableRobot)
 

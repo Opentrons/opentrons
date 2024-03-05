@@ -13,14 +13,10 @@ import type { State } from '../../../../redux/types'
 
 vi.mock('../../../ProtocolUpload/hooks')
 
-const mockUseCurrentProtocol = useCurrentProtocol as vi.mockedFunction<
-  typeof useCurrentProtocol
->
-
 describe('useProtocolMetadata', () => {
   const store: Store<State> = createStore(vi.fn(), {})
 
-  when(mockUseCurrentProtocol)
+  when(vi.mocked(useCurrentProtocol))
     .calledWith()
     .thenReturn({
       data: {

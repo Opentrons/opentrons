@@ -11,13 +11,15 @@ import {
 
 import { useLights } from '..'
 
+import type { Mock } from 'vitest'
+
 vi.mock('@opentrons/react-api-client')
 
 const store: Store<any> = createStore(vi.fn(), {})
 
 describe('useLights hook', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
-  let setLights: vi.mock
+  let setLights: Mock
 
   beforeEach(() => {
     const queryClient = new QueryClient()

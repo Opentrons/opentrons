@@ -2,7 +2,7 @@ import * as React from 'react'
 import { when } from 'vitest-when'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { Provider } from 'react-redux'
-import { createStore, Store } from 'redux'
+import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { useCalibrationStatusQuery } from '@opentrons/react-api-client'
@@ -16,6 +16,7 @@ import { getDiscoverableRobotByName } from '../../../../redux/discovery'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 import { useDispatchApiRequest } from '../../../../redux/robot-api'
 
+import type { Store } from 'redux'
 import type { DispatchApiRequestType } from '../../../../redux/robot-api'
 
 import { useDeckCalibrationData } from '..'
@@ -25,17 +26,6 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../redux/calibration')
 vi.mock('../../../../redux/robot-api')
 vi.mock('../../../../redux/discovery')
-
-const mockGetDiscoverableRobotByName = getDiscoverableRobotByName as vi.mockedFunction<
-  typeof getDiscoverableRobotByName
->
-
-const mockUseDispatchApiRequest = useDispatchApiRequest as vi.mockedFunction<
-  typeof useDispatchApiRequest
->
-const mockUseCalibrationStatusQuery = useCalibrationStatusQuery as vi.mockedFunction<
-  typeof useCalibrationStatusQuery
->
 
 const store: Store<any> = createStore(vi.fn(), {})
 
@@ -52,14 +42,14 @@ describe('useDeckCalibrationData hook', () => {
         </QueryClientProvider>
       </Provider>
     )
-    mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
+    vi.mocked(useDispatchApiRequest).mockReturnValue([dispatchApiRequest, []])
   })
   afterEach(() => {
     vi.resetAllMocks()
   })
 
   it('returns no deck calibration data when given a null robot name', () => {
-    when(mockUseCalibrationStatusQuery)
+    when(vi.mocked(useCalibrationStatusQuery))
       .calledWith({}, null)
       .thenReturn({
         data: {
@@ -85,11 +75,11 @@ describe('useDeckCalibrationData hook', () => {
   })
 
   it('returns deck calibration data when given a robot name', () => {
-    when(mockGetDiscoverableRobotByName)
+    when(vi.mocked(getDiscoverableRobotByName))
       .calledWith(undefined as any, 'otie')
       .thenReturn(mockConnectableRobot)
 
-    when(mockUseCalibrationStatusQuery)
+    when(vi.mocked(useCalibrationStatusQuery))
       .calledWith({}, { hostname: mockConnectableRobot.ip })
       .thenReturn({
         data: {
@@ -112,7 +102,7 @@ describe('useDeckCalibrationData hook', () => {
   })
 
   it('returns markedBad deck calibration data when given a failed status', () => {
-    when(mockGetDiscoverableRobotByName)
+    when(vi.mocked(getDiscoverableRobotByName))
       .calledWith(undefined as any, 'otie')
       .thenReturn(mockConnectableRobot)
     when(mockUseCalibrationStatusQuery)
