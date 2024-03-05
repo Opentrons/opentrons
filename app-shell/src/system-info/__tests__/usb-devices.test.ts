@@ -67,14 +67,13 @@ if (!isWindows()) {
     afterEach(() => {
       vi.resetAllMocks()
     })
-    // TODO jh(03-05-2023): Implement these tests with vitest.
+
     it.skip('can return the list of all devices', async () => {
       const mockDevices = [mockUSBDevice, mockUSBDevice, mockUSBDevice] as any
       const serialIterator = getSerialIterator()
       const mfrIterator = getManufacturerIterator()
       const productIterator = getProductIterator()
       vi.mocked(usb.getDeviceList).mockReturnValueOnce(mockDevices)
-      // @ts-expect-error
       vi.mocked(usb.Device).mockImplementation((descriptorId, callback) =>
         callback(
           undefined,
