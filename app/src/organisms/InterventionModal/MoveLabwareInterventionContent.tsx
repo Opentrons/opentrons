@@ -78,6 +78,7 @@ const LABWARE_NAME_STYLE = css`
 `
 
 const DIVIDER_STYLE = css`
+  color: ${COLORS.grey35};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     display: ${DISPLAY_NONE};
   }
