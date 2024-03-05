@@ -10,6 +10,7 @@ import { getValidLabwareFilePaths } from '../../labware'
 import { selectPythonPath, getPythonPath } from '../getPythonPath'
 import { executeAnalyzeCli } from '../executeAnalyzeCli'
 import { writeFailedAnalysis } from '../writeFailedAnalysis'
+import { createLogger } from '../../log'
 
 import {
   registerProtocolAnalysis,
@@ -25,6 +26,16 @@ vi.mock('../executeAnalyzeCli')
 vi.mock('../writeFailedAnalysis')
 vi.mock('electron-store')
 vi.mock('../../config')
+vi.mock('../../log', async importOriginal => {
+  const actual = await importOriginal<typeof createLogger>()
+  return {
+    ...actual,
+    createLogger: () => ({
+      debug: vi.fn(),
+      error: vi.fn(),
+    }),
+  }
+})
 
 // wait a few ticks to let the mock Promises clear
 const flush = (): Promise<void> =>
