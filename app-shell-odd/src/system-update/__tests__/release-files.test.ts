@@ -1,5 +1,6 @@
 // TODO(mc, 2020-06-11): test all release-files functions
 import path from 'path'
+import { describe, afterAll, it } from 'vitest'
 import { promises as fs } from 'fs'
 import fse from 'fs-extra'
 import tempy from 'tempy'

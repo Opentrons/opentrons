@@ -4,8 +4,8 @@ import path from 'path'
 import fs from 'fs-extra'
 import tempy from 'tempy'
 import Electron from 'electron'
+import { vi, describe, beforeEach, it, afterAll } from 'vitest'
 import uuid from 'uuid/v4'
-import { when } from 'jest-when'
 
 import {
   readDirectoriesWithinDirectory,
@@ -19,19 +19,13 @@ import {
 import { getConfig } from '../../config'
 import { analyzeProtocolSource } from '../../protocol-analysis'
 
-jest.mock('uuid/v4')
-jest.mock('electron')
-jest.mock('../../config')
-jest.mock('../../protocol-analysis')
 
-const trashItem = Electron.shell.trashItem as jest.MockedFunction<
-  typeof Electron.shell.trashItem
->
-const mockUuid = uuid as jest.MockedFunction<typeof uuid>
-const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
-const mockRunFileWithPython = analyzeProtocolSource as jest.MockedFunction<
-  typeof analyzeProtocolSource
->
+vi.mock('uuid/v4')
+vi.mock('electron')
+vi.mock('../../config')
+vi.mock('../../protocol-analysis')
+
+const trashItem = Electron.shell.trashItem
 
 describe('protocol storage directory utilities', () => {
   let protocolsDir: string
@@ -43,14 +37,14 @@ describe('protocol storage directory utilities', () => {
   }
   beforeEach(() => {
     protocolsDir = makeEmptyDir()
-    mockGetConfig.mockReturnValue({
+    vi.mocked(getConfig).mockReturnValue({
       python: { pathToPythonOverride: null },
     } as any)
-    mockRunFileWithPython.mockReturnValue(Promise.resolve())
+    vi.mocked(analyzeProtocolSource).mockReturnValue(Promise.resolve())
   })
 
   afterAll(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
     return Promise.all(tempDirs.map(d => fs.remove(d)))
   })
 
@@ -185,13 +179,11 @@ describe('protocol storage directory utilities', () => {
   describe('addProtocolFile', () => {
     it('writes a protocol file to a new directory', () => {
       let count = 0
-      when(mockUuid)
-        .calledWith()
-        .mockImplementation(() => {
-          const nextId = `${count}abc123`
-          count = count + 1
-          return nextId
-        })
+      vi.mocked(uuid).mockImplementation(() => {
+        const nextId = `${count}abc123`
+        count = count + 1
+        return nextId
+      })
       const sourceDir = makeEmptyDir()
       const destDir = makeEmptyDir()
       const sourceName = path.join(sourceDir, 'source.py')
@@ -223,7 +215,7 @@ describe('protocol storage directory utilities', () => {
       const protocolId = 'def456'
       const setup = fs.mkdir(path.join(protocolsDir, protocolId))
 
-      trashItem.mockResolvedValue()
+      vi.mocked(trashItem).mockResolvedValue()
 
       return setup
         .then(() => removeProtocolByKey('def456', protocolsDir))
@@ -239,7 +231,7 @@ describe('protocol storage directory utilities', () => {
       const protocolId = 'def456'
       const setup = fs.mkdir(path.join(protocolsDir, protocolId))
 
-      trashItem.mockRejectedValue(Error('something went wrong'))
+      vi.mocked(trashItem).mockRejectedValue(Error('something went wrong'))
 
       return setup
         .then(() => removeProtocolByKey('def456', protocolsDir))

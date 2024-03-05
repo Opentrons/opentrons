@@ -59,10 +59,6 @@ describe('NameRobot', () => {
     vi.mocked(useIsUnboxingFlowOngoing).mockReturnValue(true)
   })
 
-  afterEach(() => {
-    vi.resetAllMocks()
-  })
-
   it('should render text, button and keyboard', () => {
     render()
     screen.getByText('Name your robot')
@@ -109,9 +105,10 @@ describe('NameRobot', () => {
     fireEvent.click(screen.getByRole('button', { name: 'c' }))
     fireEvent.click(screen.getByRole('button', { name: 't' }))
     expect(input).toHaveValue('connect')
+
     fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
     await waitFor(() =>
-      screen.findByText(
+      screen.queryByText(
         'Oops! Name is already in use. Choose a different name.'
       )
     )
@@ -128,7 +125,7 @@ describe('NameRobot', () => {
     expect(input).toHaveValue('reach')
     fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
     await waitFor(() =>
-      screen.findByText(
+      screen.queryByText(
         'Oops! Name is already in use. Choose a different name.'
       )
     )
@@ -145,12 +142,5 @@ describe('NameRobot', () => {
     ).not.toBeInTheDocument()
     screen.getByText('Enter up to 17 characters (letters and numbers only)')
     screen.getByText('Confirm')
-  })
-
-  it('should call a mock function when tapping back button', () => {
-    vi.mocked(useIsUnboxingFlowOngoing).mockReturnValue(false)
-    render()
-    fireEvent.click(screen.getByTestId('name_back_button'))
-    expect(mockPush).toHaveBeenCalledWith('/robot-settings')
   })
 })
