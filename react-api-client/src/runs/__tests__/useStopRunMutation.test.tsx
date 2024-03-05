@@ -2,7 +2,7 @@ import * as React from 'react'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
-import { createRunAction, RUN_ACTION_TYPE_STOP } from '@opentrons/api-client'
+import { createRunAction } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useStopRunMutation } from '..'
 
