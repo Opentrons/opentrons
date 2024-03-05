@@ -140,16 +140,8 @@ You can adjust the position of the pipette center with the :py:meth:`.TrashBin.t
 
 .. versionadded:: 2.16
 
-Another difference between the trash container ``top()`` methods and ``Well.top()`` is that they return an object of the same type, not a :py:class:`.Location`. This means that you can use their output anywhere that accepts objects of those types.
-
-One example is the :py:obj:`.InstrumentContext.trash_container` property. Because this property is settable, if you always want to drop tips at an offset from the default location, you can overwrite the default for a given pipette::
-
-    chute = protocol.load_waste_chute()
-
-    pipette.trash_container = chute.top(z=-5)
-    pipette.pick_up_tip()
-    pipette.drop_tip()  # drop in waste chute, 5 mm lower than default
-
+.. note::
+    Another difference between the trash container ``top()`` methods and ``Well.top()`` is that they return an object of the same type, not a :py:class:`.Location`. This helps prevent performing undesired actions in trash containers. For example, you can :py:meth:`.aspirate` at a location or from a well, but not from a trash container. On the other hand, you can :py:meth:`.blow_out` at a location, well, trash bin, or waste chute.
 
 .. _protocol-api-deck-coords:
 
