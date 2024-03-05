@@ -97,6 +97,7 @@ import { useNotifyRunQuery } from '../../../../resources/runs/useNotifyRunQuery'
 
 import type { UseQueryResult } from 'react-query'
 import type * as ReactRouterDom from 'react-router-dom'
+import type { Mock } from 'vitest'
 import type * as OpentronsSharedData from '@opentrons/shared-data'
 import type * as OpentronsComponents from '@opentrons/components'
 import type * as OpentronsApiClient from '@opentrons/api-client'
@@ -222,9 +223,9 @@ const render = () => {
     { i18nInstance: i18n }
   )
 }
-let mockTrackEvent: vi.Mock
-let mockTrackProtocolRunEvent: vi.Mock
-let mockCloseCurrentRun: vi.Mock
+let mockTrackEvent: Mock
+let mockTrackProtocolRunEvent: Mock
+let mockCloseCurrentRun: Mock
 
 describe('ProtocolRunHeader', () => {
   beforeEach(() => {
