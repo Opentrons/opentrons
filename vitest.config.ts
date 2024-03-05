@@ -39,6 +39,9 @@ export default mergeConfig(
         '@opentrons/discovery-client': path.resolve(
           './discovery-client/src/index.ts'
         ),
+        '@opentrons/usb-bridge/node-client': path.resolve(
+          './usb-bridge/node-client/src/index.ts'
+        ),
       },
     },
   })

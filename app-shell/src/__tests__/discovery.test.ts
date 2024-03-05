@@ -16,12 +16,25 @@ import * as SysInfo from '../system-info'
 import { getSerialPortHttpAgent } from '../usb'
 
 vi.mock('electron')
-// vi.mock('electron-store')
+vi.mock('electron-store')
 vi.mock('../usb')
 vi.mock('@opentrons/discovery-client')
 vi.mock('../config')
 vi.mock('../system-info')
+vi.mock('../log', () => {
+  return {
+    createLogger: () => {
+      return { debug: () => null }
+    },
+  }
+})
 
+let mockGet = vi.fn(property => {
+  return []
+})
+let mockOnDidChange = vi.fn()
+let mockDelete = vi.fn()
+let mockSet = vi.fn()
 describe('app-shell/discovery', () => {
   const dispatch = vi.fn()
   const mockClient = {
@@ -41,6 +54,20 @@ describe('app-shell/discovery', () => {
   }
 
   beforeEach(() => {
+    mockGet = vi.fn(property => {
+      return []
+    })
+    mockDelete = vi.fn()
+    mockOnDidChange = vi.fn()
+    mockSet = vi.fn()
+    vi.mocked(Store).mockImplementation(() => {
+      return {
+        get: mockGet,
+        set: mockSet,
+        delete: mockDelete,
+        onDidAnyChange: mockOnDidChange,
+      } as any
+    })
     vi.mocked(Cfg.getFullConfig).mockReturnValue(({
       discovery: { disableCache: false, candidates: [] },
     } as unknown) as Cfg.Config)
@@ -51,11 +78,6 @@ describe('app-shell/discovery', () => {
     })
     vi.mocked(DiscoveryClient.createDiscoveryClient).mockReturnValue(mockClient)
     vi.mocked(getSerialPortHttpAgent).mockReturnValue({} as any)
-
-    when(vi.mocked(Store).prototype.get).calledWith('robots', []).thenReturn([])
-    when(vi.mocked(Store).prototype.get)
-      .calledWith('services', null)
-      .thenReturn(null)
   })
 
   afterEach(() => {
@@ -160,18 +182,18 @@ describe('app-shell/discovery', () => {
       mockClient.getRobots.mockReturnValue([{ name: 'foo' }, { name: 'bar' }])
       emitListChange()
 
-      expect(vi.mocked(Store).prototype.set).toHaveBeenLastCalledWith(
-        'robots',
-        [{ name: 'foo' }, { name: 'bar' }]
-      )
+      expect(vi.mocked(mockSet)).toHaveBeenLastCalledWith('robots', [
+        { name: 'foo' },
+        { name: 'bar' },
+      ])
     })
 
     it('loads robots from cache on client initialization', () => {
       const mockRobot = { name: 'foo' }
 
-      vi.mocked(Store).prototype.get.mockImplementation((key: string) => {
+      vi.mocked(mockGet).mockImplementation((key: string) => {
         if (key === 'robots') return [mockRobot]
-        return null
+        return null as any
       })
 
       registerDiscovery(dispatch)
@@ -255,13 +277,13 @@ describe('app-shell/discovery', () => {
         },
       ]
 
-      vi.mocked(Store).prototype.get.mockImplementation((key: string) => {
+      vi.mocked(mockGet).mockImplementation((key: string) => {
         if (key === 'services') return services
-        return null
+        return null as any
       })
 
       registerDiscovery(dispatch)
-      expect(vi.mocked(Store).prototype.delete).toHaveBeenCalledWith('services')
+      expect(mockDelete).toHaveBeenCalledWith('services')
       expect(mockClient.start).toHaveBeenCalledWith(
         expect.objectContaining({
           initialRobots: [
@@ -339,9 +361,9 @@ describe('app-shell/discovery', () => {
       } as unknown) as Cfg.Config)
 
       // discovery.json contains 1 entry
-      vi.mocked(Store).prototype.get.mockImplementation((key: string) => {
+      mockGet.mockImplementation((key: string) => {
         if (key === 'robots') return [{ name: 'foo' }]
-        return null
+        return null as any
       })
 
       registerDiscovery(dispatch)
@@ -364,9 +386,9 @@ describe('app-shell/discovery', () => {
       } as unknown) as Cfg.Config)
 
       // discovery.json contains 1 entry
-      vi.mocked(Store).prototype.get.mockImplementation((key: string) => {
+      mockGet.mockImplementation((key: string) => {
         if (key === 'robots') return [{ name: 'foo' }]
-        return null
+        return null as any
       })
 
       registerDiscovery(dispatch)
@@ -376,15 +398,15 @@ describe('app-shell/discovery', () => {
       const disableCache = true
       changeHandler(disableCache, false)
 
-      expect(vi.mocked(Store).prototype.set).toHaveBeenCalledWith('robots', [])
+      expect(mockSet).toHaveBeenCalledWith('robots', [])
 
       // new services discovered
-      vi.mocked(Store).prototype.set.mockClear()
+      mockSet.mockClear()
       mockClient.getRobots.mockReturnValue([{ name: 'foo' }, { name: 'bar' }])
       emitListChange()
 
       // but discovery.json should not update
-      expect(vi.mocked(Store).prototype.set).toHaveBeenCalledTimes(0)
+      expect(mockSet).toHaveBeenCalledTimes(0)
     })
   })
 
