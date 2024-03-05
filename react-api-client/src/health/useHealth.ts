@@ -1,5 +1,5 @@
-import { getHealth } from '@opentrons/api-client'
 import { useQuery } from 'react-query'
+import { getHealth } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
