@@ -736,3 +736,50 @@ class Protocols:
         robot_error=False,
         app_analysis_error="IncompatibleAddressableAreaError [line 15]: Cannot use Slot C3, not compatible with one or more of the following fixtures: Thermocycler in C3",  # noqa: E501
     )
+
+    Flex_P1000_96_TC_2_16_PartialTipPickupSingle: Protocol = Protocol(
+        file_name="Flex_P1000_96_TC_2_16_PartialTipPickupSingle",
+        file_extension="py",
+        protocol_name="Partial Tip Pickup Single",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
+
+    Flex_P1000_96_TC_2_16_PartialTipPickupColumn: Protocol = Protocol(
+        file_name="Flex_P1000_96_TC_2_16_PartialTipPickupColumn",
+        file_extension="py",
+        protocol_name="Partial Tip Pickup Column",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
+
+    Flex_P1000_96_TC_2_16_AnalysisError_PartialTipPickupTryToReturnTip: Protocol = Protocol(
+        file_name="Flex_P1000_96_TC_2_16_AnalysisError_PartialTipPickupTryToReturnTip",
+        file_extension="py",
+        protocol_name="Partial Tip Pickup Try to Return Tip",
+        robot="Flex",
+        app_error=True,
+        robot_error=False,
+        app_analysis_error="ValueError [line 15]: Cannot return tip in partial tip pickup mode.",  # noqa: E501
+    )
+
+    Flex_P1000_96_TC_2_16_AnalysisError_PartialTipPickupThermocyclerLidConflict: Protocol = Protocol(
+        file_name="Flex_P1000_96_TC_2_16_AnalysisError_PartialTipPickupThermocyclerLidConflict",
+        file_extension="py",
+        protocol_name="Partial Tip Pickup Thermocycler Lid Conflict",
+        robot="Flex",
+        app_error=True,
+        robot_error=False,
+        app_analysis_error="IncompatibleAddressableAreaError [line 15]: Cannot use Slot C3, not compatible with one or more of the following fixtures: Thermocycler in C3",  # noqa: E501
+    )
+
+    Flex_P1000_96_Gripper_2_16_TriggerPrepareForMountMovement: Protocol = Protocol(
+        file_name="Flex_P1000_96_Gripper_2_16_TriggerPrepareForMountMovement",
+        file_extension="py",
+        protocol_name="96ch protocol with modules gripper moves and pipette aspirations",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
