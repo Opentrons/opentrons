@@ -2,10 +2,10 @@ import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { when } from 'vitest-when'
-import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { describe, it, vi, beforeEach, expect, afterEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { renderWithProviders } from '../../../../__testing-utils__'
 
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { getShellUpdateState } from '../../../../redux/shell'
 import { useIsFlex, useIsRobotBusy } from '../../hooks'
@@ -118,6 +118,10 @@ describe('RobotSettings Advanced tab', () => {
       <div>mock EnableStatusLight</div>
     )
     vi.mocked(useIsRobotBusy).mockReturnValue(false)
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
   })
 
   it('should render AboutRobotName section', () => {

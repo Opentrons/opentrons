@@ -8,7 +8,6 @@ import {
 } from '../../redux/analytics'
 
 import { Modal, OutlineButton, SPACING } from '@opentrons/components'
-import { AnalyticsToggle } from './AnalyticsToggle'
 import { getModalPortalEl } from '../../App/portal'
 import type { Dispatch } from '../../redux/types'
 
@@ -22,17 +21,18 @@ export function AnalyticsSettingsModal(): JSX.Element | null {
   const seen = useSelector(getAnalyticsOptInSeen)
   const setSeen = (): unknown => dispatch(setAnalyticsOptInSeen())
 
-  return !seen ? createPortal(
-    <Modal onCloseClick={setSeen} heading={TITLE} alertOverlay>
-      <AnalyticsToggle />
-      <OutlineButton
-        onClick={setSeen}
-        float="right"
-        margin={SPACING.spacing12}
-      >
-        {CONTINUE}
-      </OutlineButton>
-    </Modal>,
-    getModalPortalEl()
-  ) : null
+  return !seen
+    ? createPortal(
+        <Modal onCloseClick={setSeen} heading={TITLE} alertOverlay>
+          <OutlineButton
+            onClick={setSeen}
+            float="right"
+            margin={SPACING.spacing12}
+          >
+            {CONTINUE}
+          </OutlineButton>
+        </Modal>,
+        getModalPortalEl()
+      )
+    : null
 }
