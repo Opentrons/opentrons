@@ -353,7 +353,8 @@ const initialFormState: FormState = {
 
 const pipetteValidationShape = Yup.object().shape({
   pipetteName: Yup.string().nullable(),
-  tiprackDefURI: Yup.string()
+  tiprackDefURI: Yup.array()
+    .of(Yup.string())
     .nullable()
     .when('pipetteName', {
       is: (val: string | null): boolean => Boolean(val),
