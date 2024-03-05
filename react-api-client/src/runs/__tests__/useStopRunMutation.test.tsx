@@ -17,7 +17,6 @@ const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
 describe('useStopRunMutation hook', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
-  const createStopRunActionData = { actionType: RUN_ACTION_TYPE_STOP }
 
   beforeEach(() => {
     const queryClient = new QueryClient()
