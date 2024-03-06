@@ -7,7 +7,6 @@ import { createLogger } from '../../log'
 import { createUsbDeviceMonitor, getWindowsDriverVersion } from '../usb-devices'
 import { isWindows } from '../../os'
 
-
 vi.mock('execa')
 vi.mock('usb')
 vi.mock('electron-store')
@@ -87,6 +86,7 @@ if (!isWindows()) {
       const mfrIterator = getManufacturerIterator()
       const productIterator = getProductIterator()
       vi.mocked(usb.getDeviceList).mockReturnValueOnce(mockDevices)
+      // @ts-expect-error Revisit after Vite migration.
       vi.mocked(usb.Device).mockImplementation((descriptorId, callback) =>
         callback(
           undefined,
@@ -143,7 +143,7 @@ if (!isWindows()) {
           }
         })
         createUsbDeviceMonitor({ onDeviceAdd })
-        // @ts-expect-error
+        // @ts-expect-error Revisit after Vite migration.
         vi.mocked(usb.Device).mockImplementation((descriptorId, callback) =>
           callback(undefined, ['sn1', 'mfr1', 'pn1'][descriptorId])
         )

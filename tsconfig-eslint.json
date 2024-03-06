@@ -34,6 +34,7 @@
     "react-api-client/src",
     "usb-bridge/node-client/src",
     "**/*.js",
+    "**/*.ts",
     "*.js",
     ".*.js",
     "**/*.json"

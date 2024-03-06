@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/triple-slash-reference */
 /// <reference types="vitest" />
 /// <reference types="vite/client" />
 import path from 'path'
 import { configDefaults, defineConfig, mergeConfig } from 'vitest/config'
 import viteConfig from './vite.config'
 
+// eslint-disable-next-line import/no-default-export
 export default mergeConfig(
   viteConfig,
   defineConfig({

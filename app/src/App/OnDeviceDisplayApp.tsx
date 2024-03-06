@@ -26,7 +26,6 @@ import { ConnectViaWifi } from '../pages/ConnectViaWifi'
 import { EmergencyStop } from '../pages/EmergencyStop'
 import { NameRobot } from '../pages/NameRobot'
 import { NetworkSetupMenu } from '../pages/NetworkSetupMenu'
-import { PrivacyPolicy } from '../pages/PrivacyPolicy'
 import { ProtocolSetup } from '../pages/ProtocolSetup'
 import { RobotDashboard } from '../pages/RobotDashboard'
 import { RobotSettingsDashboard } from '../pages/RobotSettingsDashboard'
@@ -61,7 +60,6 @@ import type { Dispatch } from '../redux/types'
 // network calls to localhost. see ./hacks.ts for more.
 hackWindowNavigatorOnLine()
 
-
 export const ON_DEVICE_DISPLAY_PATHS = [
   '/dashboard',
   '/deck-configuration',
@@ -85,7 +83,9 @@ export const ON_DEVICE_DISPLAY_PATHS = [
   '/welcome',
 ] as const
 
-function getPathComponent(path: typeof ON_DEVICE_DISPLAY_PATHS[number]): JSX.Element {
+function getPathComponent(
+  path: typeof ON_DEVICE_DISPLAY_PATHS[number]
+): JSX.Element {
   switch (path) {
     case '/dashboard':
       return <RobotDashboard />
@@ -152,10 +152,9 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   const dispatch = useDispatch<Dispatch>()
   const isIdle = useIdle(sleepTime, options)
   const [currentNode, setCurrentNode] = React.useState<null | HTMLElement>(null)
-  const scrollRef = React.useCallback(
-    (node: HTMLElement | null) => { setCurrentNode(node) },
-    []
-  )
+  const scrollRef = React.useCallback((node: HTMLElement | null) => {
+    setCurrentNode(node)
+  }, [])
   const isScrolling = useScrolling(currentNode)
 
   const TOUCH_SCREEN_STYLE = css`
@@ -206,16 +205,14 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                   <ToasterOven>
                     <ProtocolReceiptToasts />
                     <Switch>
-                      {ON_DEVICE_DISPLAY_PATHS.map(
-                        path => (
-                          <Route key={path} exact path={path}>
-                            <Box css={TOUCH_SCREEN_STYLE} ref={scrollRef}>
-                              <ModalPortalRoot />
-                              {getPathComponent(path)}
-                            </Box>
-                          </Route>
-                        )
-                      )}
+                      {ON_DEVICE_DISPLAY_PATHS.map(path => (
+                        <Route key={path} exact path={path}>
+                          <Box css={TOUCH_SCREEN_STYLE} ref={scrollRef}>
+                            <ModalPortalRoot />
+                            {getPathComponent(path)}
+                          </Box>
+                        </Route>
+                      ))}
                       <Redirect exact from="/" to={'/loading'} />
                     </Switch>
                   </ToasterOven>
