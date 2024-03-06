@@ -48,8 +48,8 @@ router = fastapi.APIRouter()
         " first played. In the future, this endpoint may error if you try to call it in the middle"
         " of an active run, so don't rely on being able to do that."
         "\n\n"
-        "**Warning:** The behavior of this endpoint is currently only defined for Flex"
-        " robots, not OT-2 robots."
+        "**Warning:** Only use this on Flex robots, never OT-2 robots. The behavior on"
+        " OT-2 robots is currently undefined and it may interfere with protocol execution."
     ),
     responses={
         fastapi.status.HTTP_200_OK: {
