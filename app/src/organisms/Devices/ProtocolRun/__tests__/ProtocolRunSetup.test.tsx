@@ -9,10 +9,7 @@ import {
 } from '@opentrons/api-client'
 import {
   getSimplestDeckConfigForProtocol,
-  ProtocolAnalysisOutput,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-} from '@opentrons/shared-data'
-import {
   simple_v4 as noModulesProtocol,
   test_modules_protocol as withModulesProtocol,
 } from '@opentrons/shared-data'
@@ -42,6 +39,7 @@ import { SetupLiquids } from '../SetupLiquids'
 import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
 import { EmptySetupStep } from '../EmptySetupStep'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
+
 import type * as SharedData from '@opentrons/shared-data'
 
 vi.mock('@opentrons/api-client')
@@ -97,7 +95,7 @@ describe('ProtocolRunSetup', () => {
       .thenReturn(({
         ...noModulesProtocol,
         ...MOCK_ROTOCOL_LIQUID_KEY,
-      } as unknown) as ProtocolAnalysisOutput)
+      } as unknown) as SharedData.ProtocolAnalysisOutput)
     vi.mocked(parseAllRequiredModuleModels).mockReturnValue([])
     vi.mocked(parseLiquidsInLoadOrder).mockReturnValue([])
     when(vi.mocked(useRobot))
