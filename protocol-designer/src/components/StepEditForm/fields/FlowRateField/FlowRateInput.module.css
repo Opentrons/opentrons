@@ -8,8 +8,8 @@
    (AlertModal gets us 90% there) */
 .header {
   font-size: var(--fs-header); /* from legacy --font-header-dark */
-    font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
-    color: var(--c-font-dark); /* from legacy --font-header-dark */
+  font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
+  color: var(--c-font-dark); /* from legacy --font-header-dark */
 }
 
 .flow_rate_type_label {

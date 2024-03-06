@@ -2,9 +2,8 @@
 
 .title {
   font-size: var(--fs-header); /* from legacy --font-header-dark */
-    font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
-    color: var(--c-font-dark); /* from legacy --font-header-dark */
-
+  font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
+  color: var(--c-font-dark); /* from legacy --font-header-dark */
   padding-bottom: 1rem;
 }
 
@@ -83,15 +82,14 @@
 
 .labware_preview_header {
   font-size: var(--fs-header); /* from legacy --font-header-dark */
-    font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
-    color: var(--c-font-dark); /* from legacy --font-header-dark */
+  font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
+  color: var(--c-font-dark); /* from legacy --font-header-dark */
 }
 
 .labware_preview_module_compat {
   font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
-
+  font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
   display: flex;
   align-items: center;
 }
@@ -132,8 +130,8 @@
 
 .upload_helper_copy {
   font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-1-dark */
+  font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
 }
 
 /* TODO: Ian 2019-09-03 similar styles for links exist in multiple projects */
@@ -156,9 +154,7 @@
 
 .filters_heading {
   font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
-
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
   font-weight: var(--fw-semibold);
 }
 
@@ -175,9 +171,8 @@
 
 .filters_section_copy {
   font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-1-dark */
-
+  font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
   padding-left: 0.15rem;
 }
 

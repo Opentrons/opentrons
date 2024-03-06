@@ -1,25 +1,27 @@
 @import '@opentrons/components/styles';
 
 .modal {
-
   position: absolute;
+
   /* from legacy --modal */
   top: 0;
+
   /* from legacy --modal */
   right: 0;
+
   /* from legacy --modal */
   bottom: 0;
+
   /* from legacy --modal */
   left: 0;
+
   /* from legacy --modal */
   display: flex;
-  /* from legacy --modal */
-  justify-content: center;
+
   /* from legacy --modal */
   align-items: center;
+
   /* from legacy --modal */
-
-
   flex-direction: column;
   justify-content: flex-start;
   padding: 4rem 2rem 2rem;

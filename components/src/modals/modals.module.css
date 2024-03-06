@@ -2,21 +2,27 @@
 @import '../index.module.css';
 
 .modal {
-  position: absolute;
   /* from legacy --absolute-fill */
   top: 0;
+
   /* from legacy --absolute-fill */
   right: 0;
+
   /* from legacy --absolute-fill */
   bottom: 0;
+
   /* from legacy --absolute-fill */
   left: 0;
+
   /* from legacy --absolute-fill */
   display: flex;
+
   /* from legacy --center-children */
   justify-content: center;
+
   /* from legacy --center-children */
   align-items: center;
+
   /* from legacy --center-children */
 
   align-items: flex-start;
@@ -27,21 +33,29 @@
 
 .modal_page {
   position: absolute;
+
   /* from legacy --absolute-fill */
   top: 0;
+
   /* from legacy --absolute-fill */
   right: 0;
+
   /* from legacy --absolute-fill */
   bottom: 0;
+
   /* from legacy --absolute-fill */
   left: 0;
+
   /* from legacy --absolute-fill */
 
   display: flex;
+
   /* from legacy --flex-start */
   justify-content: flex-start;
+
   /* from legacy --flex-start */
   align-items: center;
+
   /* from legacy --flex-start */
 
   flex-direction: column;
@@ -50,14 +64,19 @@
 
 .overlay {
   position: absolute;
+
   /* from legacy --absolute-fill */
   top: 0;
+
   /* from legacy --absolute-fill */
   right: 0;
+
   /* from legacy --absolute-fill */
   bottom: 0;
+
   /* from legacy --absolute-fill */
   left: 0;
+
   /* from legacy --absolute-fill */
 
   background-color: rgba(0, 0, 0, 0.9);
@@ -74,16 +93,22 @@
 
 .modal_contents {
   z-index: 1;
+
   /* from legacy --modal-contents */
   width: 100%;
+
   /* from legacy --modal-contents */
   max-width: 38rem;
+
   /* from legacy --modal-contents */
   margin: 0 auto;
+
   /* from legacy --modal-contents */
   padding: 1rem;
+
   /* from legacy --modal-contents */
   border-radius: 0.5rem;
+
   /* from legacy --modal-contents */
 
   background-color: white;
@@ -91,16 +116,22 @@
 
 .modal_page_contents {
   z-index: 1;
+
   /* from legacy --modal-contents */
   width: 100%;
+
   /* from legacy --modal-contents */
   max-width: 38rem;
+
   /* from legacy --modal-contents */
   margin: 0 auto;
+
   /* from legacy --modal-contents */
   padding: 1rem;
+
   /* from legacy --modal-contents */
   border-radius: 0.5rem;
+
   /* from legacy --modal-contents */
 
   background-color: white;
@@ -111,10 +142,13 @@
 
 .modal_heading {
   font-size: var(--fs-header);
+
   /* from legacy --font-header-dark */
   font-weight: var(--fw-semibold);
+
   /* from legacy --font-header-dark */
   color: var(--c-font-dark);
+
   /* from legacy --font-header-dark */
 
   margin-top: 0;
@@ -138,23 +172,27 @@
 }
 
 .spinner_modal_contents {
-  z-index: 1;
   /* from legacy --modal-contents */
   width: 100%;
-  /* from legacy --modal-contents */
-  max-width: 38rem;
+
   /* from legacy --modal-contents */
   margin: 0 auto;
+
   /* from legacy --modal-contents */
   padding: 1rem;
+
   /* from legacy --modal-contents */
   border-radius: 0.5rem;
+
   /* from legacy --modal-contents */
   font-size: var(--fs-body-2);
+
   /* from legacy --font-body-2-light */
   font-weight: var(--fw-regular);
+
   /* from legacy --font-body-2-light */
   color: var(--c-font-light);
+
   /* from legacy --font-body-2-light */
 
   max-width: 30rem;
@@ -185,27 +223,30 @@
 
 .alert_modal_contents {
   font-size: var(--fs-body-2);
+
   /* from legacy --font-body-2-dark */
   font-weight: var(--fw-regular);
+
   /* from legacy --font-body-2-dark */
   color: var(--c-font-dark);
+
   /* from legacy --font-body-2-dark */
 
   width: 100%;
   max-height: 100%;
   padding: 1rem;
 
-  &>p {
+  & > p {
     padding-bottom: 1rem;
   }
 }
 
 .alert_modal_heading {
   font-size: var(--fs-header);
-  /* from legacy --font-header-dark */
-  font-weight: var(--fw-semibold);
+
   /* from legacy --font-header-dark */
   color: var(--c-font-dark);
+
   /* from legacy --font-header-dark */
 
   font-weight: normal;

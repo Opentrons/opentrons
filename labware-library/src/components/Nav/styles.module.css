@@ -58,7 +58,6 @@ are project specific  */
 .breadcrumbs_link {
   /* pulled from legacy --transition-color */
   transition: color 0.15s ease-in-out;
-
   color: var(--c-blue);
   white-space: nowrap;
   overflow: hidden;

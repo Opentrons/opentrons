@@ -2,9 +2,8 @@
 
 .info_wrapper {
   font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
-
+  font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
   text-align: center;
   max-width: 38rem;
   margin: 2rem auto;
@@ -12,8 +11,8 @@
 
 .header {
   font-size: var(--fs-header); /* from legacy --font-header-dark */
-    font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
-    color: var(--c-font-dark); /* from legacy --font-header-dark */
+  font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
+  color: var(--c-font-dark); /* from legacy --font-header-dark */
 }
 
 .instruction {

@@ -13,9 +13,8 @@
 
 .form_field {
   font-size: var(--fs-body-1); /* from legacy --font-form-default */
-    font-weight: var(--fw-regular); /* from legacy --font-form-default */
-    color: var(--c-font-dark); /* from legacy --font-form-default */
-
+  font-weight: var(--fw-regular); /* from legacy --font-form-default */
+  color: var(--c-font-dark); /* from legacy --font-form-default */
   display: flex;
   align-items: center;
   line-height: 1;
@@ -32,9 +31,7 @@
 
 .form_group_label {
   font-size: var(--fs-body-1); /* from legacy --font-form-default */
-    font-weight: var(--fw-regular); /* from legacy --font-form-default */
-    color: var(--c-font-dark); /* from legacy --font-form-default */
-
+  color: var(--c-font-dark); /* from legacy --font-form-default */
   font-weight: var(--fw-semibold);
   margin-bottom: 0.15rem;
   text-transform: capitalize;
@@ -45,10 +42,6 @@
 }
 
 .form_group_label_pipette_settings_slideout {
-  font-size: var(--fs-body-1); /* from legacy --font-form-default */
-    font-weight: var(--fw-regular); /* from legacy --font-form-default */
-    color: var(--c-font-dark); /* from legacy --font-form-default */
-
   font-weight: var(--fw-semibold);
   margin-bottom: 0.5rem;
   text-transform: capitalize;
@@ -111,7 +104,6 @@
     font-size: var(--fs-body-1); /* from legacy --font-form-default */
     font-weight: var(--fw-regular); /* from legacy --font-form-default */
     color: var(--c-font-dark); /* from legacy --font-form-default */
-
     background-color: inherit;
     border-radius: inherit;
     border: none;
@@ -142,9 +134,7 @@
 
   & .suffix {
     font-size: var(--fs-body-1); /* from legacy --font-form-default */
-    font-weight: var(--fw-regular); /* from legacy --font-form-default */
     color: var(--c-font-dark); /* from legacy --font-form-default */
-
     font-weight: var(--fw-semibold);
     display: inline-block;
     flex: 1 0;
@@ -157,7 +147,6 @@
   font-size: var(--fs-caption); /* from legacy --font-form-caption */
   font-weight: var(--fw-semibold); /* from legacy --font-form-caption */
   color: var(--c-med-gray); /* from legacy --font-form-caption */
-
   line-height: 1.2;
 
   & .right {
@@ -198,7 +187,6 @@
     font-size: var(--fs-body-1); /* from legacy --font-form-default */
     font-weight: var(--fw-regular); /* from legacy --font-form-default */
     color: var(--c-font-dark); /* from legacy --font-form-default */
-
     border: 0;
     padding: 0.25rem 0.5rem;
     outline: none;

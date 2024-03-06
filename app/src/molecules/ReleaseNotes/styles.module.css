@@ -9,15 +9,12 @@
     font-size: var(--fs-header); /* from legacy --font-header-dark */
     font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
     color: var(--c-font-dark); /* from legacy --font-header-dark */
-
     margin-bottom: 1rem;
   }
 
   & > h2 {
     font-size: var(--fs-header); /* from legacy --font-header-dark */
-    font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
     color: var(--c-font-dark); /* from legacy --font-header-dark */
-
     font-weight: var(--fw-regular);
     margin-top: 1rem;
     margin-bottom: 0.75rem;
@@ -25,9 +22,7 @@
 
   & > h3 {
     font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
     color: var(--c-font-dark); /* from legacy --font-body-2-dark */
-
     font-weight: var(--fw-semibold);
     margin-top: 0.75rem;
     margin-bottom: 0.5rem;
@@ -62,7 +57,6 @@
     font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
     font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
     color: var(--c-font-dark); /* from legacy --font-body-2-dark */
-
     margin-bottom: 1rem;
   }
 }

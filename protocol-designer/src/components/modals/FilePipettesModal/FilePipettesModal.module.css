@@ -47,17 +47,15 @@
 
 .new_file_modal_title {
   font-size: var(--fs-header); /* from legacy --font-header-dark */
-    font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
-    color: var(--c-font-dark); /* from legacy --font-header-dark */
-
+  font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
+  color: var(--c-font-dark); /* from legacy --font-header-dark */
   margin-bottom: 1rem;
 }
 
 .beta_restrictions {
   font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
-
+  font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
   margin: 1rem 0;
 }
 

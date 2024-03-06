@@ -99,9 +99,8 @@
 
 .sub_label_no_checkbox {
   font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-1-dark */
-
+  font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
   width: 5rem;
   display: flex;
   align-items: center;
@@ -344,9 +343,7 @@ and when that is implemented.
 
 .profile_step_labels {
   font-size: var(--fs-body-1); /* from legacy --font-form-default */
-    font-weight: var(--fw-regular); /* from legacy --font-form-default */
-    color: var(--c-font-dark); /* from legacy --font-form-default */
-
+  color: var(--c-font-dark); /* from legacy --font-form-default */
   display: grid;
   grid-template-columns: 12.5rem 7.25rem 7.25rem;
   font-weight: var(--fw-semibold);
@@ -355,9 +352,8 @@ and when that is implemented.
 
 .profile_step_number {
   font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-1-dark */
-
+  font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
   width: 1.5rem;
   text-align: right;
   padding: 0.5rem 0.5rem 0 0;

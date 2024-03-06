@@ -67,10 +67,13 @@
 /* Subdomain Nav (wrapper and container responsive styles in Nav/) */
 .subdomain_nav_contents {
   display: flex;
+
   /* from legacy --flex-end */
   justify-content: flex-end;
+
   /* from legacy --flex-end */
   align-items: center;
+
   /* from legacy --flex-end */
 
   width: 100%;
@@ -97,10 +100,13 @@ a.subdomain_link {
 /* Main Nav (wrapper and container responsive styles in Nav/) */
 .main_nav_contents {
   display: flex;
+
   /* from legacy --flex-between */
   justify-content: space-between;
+
   /* from legacy --flex-between */
   align-items: center;
+
   /* from legacy --flex-between */
 
   height: 100%;
@@ -135,8 +141,9 @@ a.subdomain_link {
 /* Dropdown Containers */
 .dropdown_small {
   font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+  font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+
   @apply --dropdown-base;
 
   left: 0;
@@ -157,8 +164,9 @@ a.subdomain_link {
 
 .dropdown_medium {
   font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+  font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+
   @apply --dropdown-base;
 
   left: -11rem;
@@ -179,8 +187,9 @@ a.subdomain_link {
 
 .dropdown_large {
   font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+  font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+
   @apply --dropdown-base;
 
   right: -0.125rem;
@@ -292,10 +301,13 @@ a.subdomain_link {
 
 .link_button {
   display: flex;
+
   /* from legacy --center-children */
   justify-content: center;
+
   /* from legacy --center-children */
   align-items: center;
+
   /* from legacy --center-children */
 
   @apply --link-text;
@@ -312,10 +324,13 @@ a.subdomain_link {
 
 .bottom_link {
   display: flex;
+
   /* from legacy --flex-start */
   justify-content: flex-start;
+
   /* from legacy --flex-start */
   align-items: center;
+
   /* from legacy --flex-start */
   @apply --bottom-link;
 
@@ -324,11 +339,15 @@ a.subdomain_link {
 
 .bottom_link_center {
   @apply --bottom-link;
+
   display: flex;
+
   /* from legacy --center-children */
   justify-content: center;
+
   /* from legacy --center-children */
   align-items: center;
+
   /* from legacy --center-children */
 }
 
@@ -354,10 +373,13 @@ a.subdomain_link {
 
 .mobile_nav_item {
   display: flex;
+
   /* from legacy --flex-start */
   justify-content: flex-start;
+
   /* from legacy --flex-start */
   align-items: center;
+
   /* from legacy --flex-start */
 
   padding: var(--spacing-7);
@@ -392,10 +414,13 @@ a.subdomain_link {
 /* Top Mobile Menu bar */
 .mobile_menu_heading {
   display: flex;
+
   /* from legacy --flex-start */
   justify-content: flex-start;
+
   /* from legacy --flex-start */
   align-items: center;
+
   /* from legacy --flex-start */
 
   height: var(--spacing-mobile-heading);
@@ -550,10 +575,13 @@ a.subdomain_link {
 
   .nav_list {
     display: flex;
+
     /* from legacy --flex-end */
     justify-content: flex-end;
+
     /* from legacy --flex-end */
     align-items: center;
+
     /* from legacy --flex-end */
   }
 

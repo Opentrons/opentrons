@@ -103,16 +103,18 @@
 
 .inner_carat {
   cursor: pointer;
-
   text-align: right;
 }
 
 .highlighted {
   border-color: transparent;
+
   /* from legacy --outline-highlight */
   outline: 2px solid var(--c-highlight);
+
   /* from legacy --outline-highlight */
   outline-width: 2px 0;
+
   /* from legacy --outline-highlight */
 }
 
@@ -283,9 +285,8 @@
 
 .cycle_group {
   font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-1-dark */
-
+  font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
   display: flex;
   flex-direction: column;
   position: relative;

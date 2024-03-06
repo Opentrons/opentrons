@@ -15,14 +15,19 @@
 
 .slot_overlay {
   position: absolute;
+
   /* from legacy --absolute-fill */
   top: 0;
+
   /* from legacy --absolute-fill */
   right: 0;
+
   /* from legacy --absolute-fill */
   bottom: 0;
+
   /* from legacy --absolute-fill */
   left: 0;
+
   /* from legacy --absolute-fill */
 
   z-index: 1;
@@ -101,14 +106,19 @@
 
 .highlighted_border_div {
   position: absolute;
+
   /* from legacy --absolute-fill */
   top: 0;
+
   /* from legacy --absolute-fill */
   right: 0;
+
   /* from legacy --absolute-fill */
   bottom: 0;
+
   /* from legacy --absolute-fill */
   left: 0;
+
   /* from legacy --absolute-fill */
 
   border-color: var(--c-highlight);

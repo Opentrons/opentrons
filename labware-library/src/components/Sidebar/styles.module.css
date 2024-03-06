@@ -21,9 +21,7 @@
 
 .labware_guide_title {
   font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
-
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
   display: flex;
   align-items: center;
   margin-bottom: var(--spacing-5);
@@ -59,9 +57,8 @@
 
 .filter_manufacturer_select {
   font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-1-dark */
-
+  font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
   line-height: var(--lh-title);
 
   /* react-select adds background: white on its <input> for some reason */
@@ -83,14 +80,11 @@
 
 .filter_category_link {
   font-size: var(--fs-default); /* from legacy --font-default-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-default-dark */
-    color: var(--c-font-dark); /* from legacy --font-default-dark */
+  color: var(--c-font-dark); /* from legacy --font-default-dark */
 
   /* pulled from legacy --transition-color */
   transition: color 0.15s ease-in-out;
-
   cursor: pointer;
-
   line-height: var(--lh-title);
   font-weight: var(--fw-semibold);
 

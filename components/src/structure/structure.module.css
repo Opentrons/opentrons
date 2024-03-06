@@ -31,7 +31,6 @@
   overflow: hidden; /* from legacy --truncate */
   text-overflow: ellipsis; /* from legacy --truncate */
   min-width: 0; /* from legacy --truncate */
-
   padding: 0 1.5rem;
 }
 
@@ -89,9 +88,8 @@
 
 .labeled_value {
   font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-1-dark */
-
+  font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
   line-height: 1.5;
 
   & svg {

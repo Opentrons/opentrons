@@ -21,11 +21,9 @@
 
 .card_content {
   padding: 1rem;
-
   font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
-
+  font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
   line-height: 1.5;
 
   & p {
@@ -55,9 +53,7 @@
 
 .toggle_label {
   font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
-  font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
   color: var(--c-font-dark); /* from legacy --font-body-2-dark */
-
   max-width: var(--mw-labeled-toggle);
   display: inline-block;
   font-weight: var(--fw-semibold);

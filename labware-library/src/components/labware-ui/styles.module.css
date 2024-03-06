@@ -7,11 +7,15 @@
 
 .gallery_image_container {
   @apply --aspect-item;
+
   display: flex;
+
   /* from legacy --center-children */
   justify-content: center;
+
   /* from legacy --center-children */
   align-items: center;
+
   /* from legacy --center-children */
 }
 
@@ -24,7 +28,6 @@
 
 .gallery_thumbnail_container {
   cursor: pointer;
-
   width: calc(var(--size-third) - var(--spacing-5) * 2 / 3);
   margin-right: var(--spacing-5);
 
@@ -101,10 +104,13 @@ button.load_name_button {
 
 .well_count_data {
   display: flex;
+
   /* from legacy --flex-between */
   justify-content: space-between;
+
   /* from legacy --flex-between */
   align-items: center;
+
   /* from legacy --flex-between */
 
   width: 100%;
@@ -113,10 +119,13 @@ button.load_name_button {
 
 .well_properties {
   display: flex;
+
   /* from legacy --flex-between */
   justify-content: space-between;
+
   /* from legacy --flex-between */
   align-items: center;
+
   /* from legacy --flex-between */
 
   flex-wrap: wrap;
@@ -127,9 +136,7 @@ button.load_name_button {
 
 .well_properties_title {
   font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
-
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
   width: 100%;
   margin-bottom: var(--spacing-5);
   font-weight: var(--fw-semibold);

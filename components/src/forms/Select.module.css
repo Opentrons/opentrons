@@ -15,7 +15,6 @@
     font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
     font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
     color: var(--c-font-dark); /* from legacy --font-body-1-dark */
-
     display: flex;
     position: relative;
     background-color: var(--c-light-gray);
@@ -56,7 +55,6 @@
     font-size: var(--fs-caption); /* from legacy --font-form-caption */
     font-weight: var(--fw-semibold); /* from legacy --font-form-caption */
     color: var(--c-med-gray); /* from legacy --font-form-caption */
-
     text-transform: uppercase;
     margin-left: 0.5rem;
   }
@@ -94,9 +92,8 @@
 
 .menu {
   font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-1-dark */
-
+  font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
   position: absolute;
   top: 100%;
   left: 0;

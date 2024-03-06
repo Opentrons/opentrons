@@ -5,7 +5,6 @@
   --button-pad: 0.5rem;
 
   --button-inverted: {
-
     /* VVV from legacy --button-inverted VVV */
     color: var(--c-font-light);
     border-color: var(--c-font-light);
@@ -18,18 +17,25 @@
     &:disabled,
     &.disabled {
       background-color: transparent;
+
       /* from legacy --button-disabled */
       font-weight: normal;
+
       /* from legacy --button-disabled */
       border-color: var(--c-font-disabled);
+
       /* from legacy --button-disabled */
       color: var(--c-font-disabled);
+
       /* from legacy --button-disabled */
       fill: var(--c-font-disabled);
+
       /* from legacy --button-disabled */
       cursor: default;
+
       /* from legacy --button-disabled */
       pointer-events: none;
+
       /* from legacy --button-disabled */
     }
 
@@ -76,18 +82,25 @@
   &:disabled,
   &.disabled {
     background-color: transparent;
+
     /* from legacy --button-disabled */
     font-weight: normal;
+
     /* from legacy --button-disabled */
     border-color: var(--c-font-disabled);
+
     /* from legacy --button-disabled */
     color: var(--c-font-disabled);
+
     /* from legacy --button-disabled */
     fill: var(--c-font-disabled);
+
     /* from legacy --button-disabled */
     cursor: default;
+
     /* from legacy --button-disabled */
     pointer-events: none;
+
     /* from legacy --button-disabled */
   }
 
@@ -153,18 +166,25 @@
   &:disabled,
   &.disabled {
     background-color: transparent;
+
     /* from legacy --button-disabled */
     font-weight: normal;
+
     /* from legacy --button-disabled */
     border-color: var(--c-font-disabled);
+
     /* from legacy --button-disabled */
     color: var(--c-font-disabled);
+
     /* from legacy --button-disabled */
     fill: var(--c-font-disabled);
+
     /* from legacy --button-disabled */
     cursor: default;
+
     /* from legacy --button-disabled */
     pointer-events: none;
+
     /* from legacy --button-disabled */
 
     background-color: color-mod(var(--c-bg-dark) tint(70%));
@@ -174,7 +194,6 @@
 }
 
 .button_flat {
-
   /* VVV from legacy --button-default VVV */
   display: inline-block;
   text-decoration: none;
@@ -199,18 +218,25 @@
   &:disabled,
   &.disabled {
     background-color: transparent;
+
     /* from legacy --button-disabled */
     font-weight: normal;
+
     /* from legacy --button-disabled */
     border-color: var(--c-font-disabled);
+
     /* from legacy --button-disabled */
     color: var(--c-font-disabled);
+
     /* from legacy --button-disabled */
     fill: var(--c-font-disabled);
+
     /* from legacy --button-disabled */
     cursor: default;
+
     /* from legacy --button-disabled */
     pointer-events: none;
+
     /* from legacy --button-disabled */
   }
 
@@ -228,8 +254,6 @@
 
   /* ^^^ from legacy --button-default ^^^ */
 
-
-
   width: 9rem;
 
   &.inverted {
@@ -245,18 +269,25 @@
     &:disabled,
     &.disabled {
       background-color: transparent;
+
       /* from legacy --button-disabled */
       font-weight: normal;
+
       /* from legacy --button-disabled */
       border-color: var(--c-font-disabled);
+
       /* from legacy --button-disabled */
       color: var(--c-font-disabled);
+
       /* from legacy --button-disabled */
       fill: var(--c-font-disabled);
+
       /* from legacy --button-disabled */
       cursor: default;
+
       /* from legacy --button-disabled */
       pointer-events: none;
+
       /* from legacy --button-disabled */
     }
 
@@ -301,18 +332,25 @@
   &:disabled,
   &.disabled {
     background-color: transparent;
+
     /* from legacy --button-disabled */
     font-weight: normal;
+
     /* from legacy --button-disabled */
     border-color: var(--c-font-disabled);
+
     /* from legacy --button-disabled */
     color: var(--c-font-disabled);
+
     /* from legacy --button-disabled */
     fill: var(--c-font-disabled);
+
     /* from legacy --button-disabled */
     cursor: default;
+
     /* from legacy --button-disabled */
     pointer-events: none;
+
     /* from legacy --button-disabled */
   }
 
@@ -346,18 +384,25 @@
     &:disabled,
     &.disabled {
       background-color: transparent;
+
       /* from legacy --button-disabled */
       font-weight: normal;
+
       /* from legacy --button-disabled */
       border-color: var(--c-font-disabled);
+
       /* from legacy --button-disabled */
       color: var(--c-font-disabled);
+
       /* from legacy --button-disabled */
       fill: var(--c-font-disabled);
+
       /* from legacy --button-disabled */
       cursor: default;
+
       /* from legacy --button-disabled */
       pointer-events: none;
+
       /* from legacy --button-disabled */
     }
 
@@ -398,18 +443,25 @@
     &:disabled,
     &.disabled {
       background-color: transparent;
+
       /* from legacy --button-disabled */
       font-weight: normal;
+
       /* from legacy --button-disabled */
       border-color: var(--c-font-disabled);
+
       /* from legacy --button-disabled */
       color: var(--c-font-disabled);
+
       /* from legacy --button-disabled */
       fill: var(--c-font-disabled);
+
       /* from legacy --button-disabled */
       cursor: default;
+
       /* from legacy --button-disabled */
       pointer-events: none;
+
       /* from legacy --button-disabled */
     }
   }

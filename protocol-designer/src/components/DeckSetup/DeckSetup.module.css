@@ -7,9 +7,8 @@
 
 .deck_header {
   font-size: var(--fs-header); /* from legacy --font-header-dark */
-    font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
-    color: var(--c-font-dark); /* from legacy --font-header-dark */
-
+  font-weight: var(--fw-semibold); /* from legacy --font-header-dark */
+  color: var(--c-font-dark); /* from legacy --font-header-dark */
   text-align: center;
   padding: 1rem 0;
 }

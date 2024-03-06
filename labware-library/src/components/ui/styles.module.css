@@ -14,14 +14,17 @@
 
 .external_link {
   display: flex;
+
   /* from legacy --flex-start */
   justify-content: flex-start;
+
   /* from legacy --flex-start */
   align-items: center;
+
   /* from legacy --flex-start */
+
   /* pulled from legacy --transition-color */
   transition: color 0.15s ease-in-out;
-
   margin-top: var(--spacing-3);
   font-size: var(--fs-body-2);
   font-weight: var(--fw-semibold);
@@ -54,14 +57,12 @@
 .table_title {
   padding-bottom: var(--spacing-1);
   border-bottom: var(--bd-light);
-
   display: flex;
+
   /* from legacy --flex-between */
   justify-content: space-between;
-  /* from legacy --flex-between */
-  align-items: center;
-  /* from legacy --flex-between */
 
+  /* from legacy --flex-between */
   align-items: center;
 }
 
@@ -119,9 +120,7 @@
 
 .value {
   font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
-    font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
-    color: var(--c-font-dark); /* from legacy --font-body-2-dark */
-
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
   font-weight: var(--fw-semibold);
   line-height: var(--lh-title);
 }
