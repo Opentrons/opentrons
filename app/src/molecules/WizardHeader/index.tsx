@@ -31,7 +31,7 @@ const EXIT_BUTTON_STYLE = css`
   color: ${COLORS.grey60};
 
   &:hover {
-    opacity: 70%;
+    color: ${COLORS.grey50};
   }
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     margin-right: 1.75rem;
@@ -41,7 +41,7 @@ const EXIT_BUTTON_STYLE = css`
       opacity: 100%;
     }
     &:active {
-      opacity: 70%;
+      color: ${COLORS.grey50};
     }
   }
 `
@@ -70,6 +70,7 @@ const HEADER_TEXT_STYLE = css`
 `
 const STEP_TEXT_STYLE = css`
   ${TYPOGRAPHY.pSemiBold}
+  color: ${COLORS.grey60};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: 1.375rem;
     margin-left: ${SPACING.spacing16};
@@ -89,7 +90,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
           </StyledText>
 
           {currentStep != null && totalSteps != null && currentStep > 0 ? (
-            <StyledText css={STEP_TEXT_STYLE} color={COLORS.grey50}>
+            <StyledText css={STEP_TEXT_STYLE}>
               {t('step', { current: currentStep, max: totalSteps })}
             </StyledText>
           ) : null}

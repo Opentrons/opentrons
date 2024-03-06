@@ -18,6 +18,7 @@ import {
 import { SetupLabwareList } from '../SetupLabwareList'
 import { SetupLabwareMap } from '../SetupLabwareMap'
 import { SetupLabware } from '..'
+import { useNotifyRunQuery } from '../../../../../resources/runs/useNotifyRunQuery'
 
 jest.mock('../SetupLabwareList')
 jest.mock('../SetupLabwareMap')
@@ -27,6 +28,7 @@ jest.mock('../../../../RunTimeControl/hooks')
 jest.mock('../../../../../redux/config')
 jest.mock('../../../hooks')
 jest.mock('../../../hooks/useLPCSuccessToast')
+jest.mock('../../../../../resources/runs/useNotifyRunQuery')
 
 const mockGetModuleTypesThatRequireExtraAttention = getModuleTypesThatRequireExtraAttention as jest.MockedFunction<
   typeof getModuleTypesThatRequireExtraAttention
@@ -57,6 +59,9 @@ const mockSetupLabwareMap = SetupLabwareMap as jest.MockedFunction<
 >
 const mockUseLPCDisabledReason = useLPCDisabledReason as jest.MockedFunction<
   typeof useLPCDisabledReason
+>
+const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
+  typeof useNotifyRunQuery
 >
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -110,6 +115,7 @@ describe('SetupLabware', () => {
       <div> mock setup labware list</div>
     )
     when(mockUseLPCDisabledReason).mockReturnValue(null)
+    mockUseNotifyRunQuery.mockReturnValue({} as any)
   })
 
   afterEach(() => {

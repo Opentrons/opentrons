@@ -2,6 +2,10 @@
   "$otSharedSchema": "#/pipette/schemas/2/pipetteGeometrySchema.json",
   "pathTo3D": "pipette/definitions/2/geometry/ninety_six_channel/p1000/placeholder.gltf",
   "nozzleOffset": [-36.0, -25.5, -259.15],
+  "pipetteBoundingBoxOffsets": {
+    "backLeftCorner": [-67.0, -3.5, -259.15],
+    "frontRightCorner": [94.0, -113.0, -259.15]
+  },
   "orderedRows": [
     {
       "key": "A",

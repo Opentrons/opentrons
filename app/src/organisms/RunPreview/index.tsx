@@ -95,9 +95,8 @@ export const RunPreviewComponent = (
       >
         {(command, index) => {
           const isCurrent = index === currentRunCommandIndex
-          const borderColor = isCurrent ? COLORS.blue50 : COLORS.transparent
-          const backgroundColor = isCurrent ? COLORS.blue30 : COLORS.grey10
-          const contentColor = isCurrent ? COLORS.blue60 : COLORS.grey50
+          const backgroundColor = isCurrent ? COLORS.blue30 : COLORS.grey20
+          const iconColor = isCurrent ? COLORS.blue60 : COLORS.grey50
           return (
             <Flex
               key={command.id}
@@ -114,9 +113,6 @@ export const RunPreviewComponent = (
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing4}
                 width="100%"
-                border={`solid 1px ${
-                  index === jumpedIndex ? COLORS.purple40 : borderColor
-                }`}
                 backgroundColor={
                   index === jumpedIndex ? '#F5E3FF' : backgroundColor
                 }
@@ -129,12 +125,12 @@ export const RunPreviewComponent = (
                 `}
               >
                 <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-                  <CommandIcon command={command} color={contentColor} />
+                  <CommandIcon command={command} color={iconColor} />
                   <CommandText
                     command={command}
                     robotSideAnalysis={robotSideAnalysis}
                     robotType={robotType}
-                    color={contentColor}
+                    color={COLORS.black90}
                   />
                 </Flex>
               </Flex>

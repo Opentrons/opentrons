@@ -91,6 +91,7 @@ export const mockBadTipLengthCalibrations: TipLengthCalibration[] = [
     source: 'user',
     status: { markedBad: true, source: null, markedAt: null },
     id: 'test-tip-length-id-1',
+    uri: 'test-uri',
   },
   {
     tipLength: 0,
@@ -100,6 +101,7 @@ export const mockBadTipLengthCalibrations: TipLengthCalibration[] = [
     source: 'user',
     status: { markedBad: true, source: null, markedAt: null },
     id: 'test-tip-length-id-2',
+    uri: 'test-uri-2',
   },
 ]
 
@@ -112,6 +114,7 @@ export const mockCompleteTipLengthCalibrations: TipLengthCalibration[] = [
     source: 'user',
     status: { markedBad: false, source: null, markedAt: null },
     id: 'test-tip-length-id-1',
+    uri: 'test-uri',
   },
   {
     tipLength: 0,
@@ -121,6 +124,7 @@ export const mockCompleteTipLengthCalibrations: TipLengthCalibration[] = [
     source: 'user',
     status: { markedBad: false, source: null, markedAt: null },
     id: 'test-tip-length-id-2',
+    uri: 'test-uri-2',
   },
 ]
 
@@ -133,6 +137,7 @@ export const mockIncompleteTipLengthCalibrations: TipLengthCalibration[] = [
     source: 'user',
     status: { markedBad: false, source: null, markedAt: null },
     id: 'test-tip-length-id-2',
+    uri: 'test-uri-2',
   },
 ]
 
