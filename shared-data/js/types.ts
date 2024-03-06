@@ -394,6 +394,69 @@ export interface FlowRateSpec {
   max: number
 }
 
+export interface PipetteV2Specs {
+  displayName: string
+  model: string
+  displayCategory: PipetteDisplayCategory
+  pickUpTipConfigurations: {
+    pressFit: {
+      speedByTipCount: any
+      presses: number
+      increment: number
+      distanceByTipcount: any
+      currentByTipCount: any
+    }
+  }
+  dropTipConfigurations: {
+    plungerEject: {
+      current: number
+      speed: number
+    }
+  }
+  plungerMotorConfigurations: {
+    idle: number
+    run: number
+  }
+  plungerPositionConfigurations: {
+    default: {
+      top: number
+      bottom: number
+      blowout: number
+      drop: number
+    }
+  }
+  availableSensors: {
+    sensors: string[]
+  }
+  partialTipConfigurations: {
+    partialTipSupported: boolean
+    availableConfigurations: number[]
+  }
+  channels: number
+  shaftDiameter: number
+  shaftULperMM: number
+  backCompatNames: string[]
+  backlashDistance: number
+  quirks: string[]
+  plungerHomingConfigurations: {
+    current: number
+    speed: number
+  }
+  nozzleOffset: number[]
+  pipetteBoundingBoxOffsets: {
+    backLeftCorner: number[]
+    frontRightCorner: []
+  }
+  pathTo3D: string
+  orderedRows: any
+  orderedColumns: any
+  nozzleMap: any
+  supportedTips: any
+  defaultTipOverlapDictonary: any
+  maxVolume: number
+  minVolume: number
+  defaultTipracks: string[]
+}
 export interface PipetteNameSpecs {
   name: string
   displayName: string

@@ -2,7 +2,11 @@ import pipetteNameSpecs from '../pipette/definitions/1/pipetteNameSpecs.json'
 import pipetteModelSpecs from '../pipette/definitions/1/pipetteModelSpecs.json'
 import { OT3_PIPETTES } from './constants'
 
-import type { PipetteNameSpecs, PipetteModelSpecs } from './types'
+import type {
+  PipetteV2Specs,
+  PipetteNameSpecs,
+  PipetteModelSpecs,
+} from './types'
 
 type SortableProps = 'maxVolume' | 'channels'
 
@@ -10,6 +14,9 @@ type SortableProps = 'maxVolume' | 'channels'
 // to simplify return types in this module and possibly remove some `null`s
 export type PipetteName = keyof typeof pipetteNameSpecs
 export type PipetteModel = keyof typeof pipetteModelSpecs.config
+type PipChannelString = 'single' | 'multi' | '96'
+type Channels = 'eight_channel' | 'single_channel' | 'ninety_six_channel'
+type Gen = 'gen1' | 'gen2' | 'gen3' | 'flex'
 
 // models sorted by channels and then volume by default
 const ALL_PIPETTE_NAMES: PipetteName[] = (Object.keys(
@@ -89,3 +96,71 @@ export const getIncompatiblePipetteNames = (
 }
 
 export * from '../pipette/fixtures/name'
+const getChannelsFromString = (
+  pipChannelString: PipChannelString
+): Channels | null => {
+  switch (pipChannelString) {
+    case 'single': {
+      return 'single_channel'
+    }
+    case 'multi': {
+      return 'eight_channel'
+    }
+    case '96': {
+      return 'ninety_six_channel'
+    }
+    default: {
+      console.error(`invalid number of channels from ${pipChannelString}`)
+      return null
+    }
+  }
+}
+const getVersionFromGen = (gen: Gen): string | null => {
+  switch (gen) {
+    case 'gen1': {
+      return '1_0'
+    }
+    case 'gen2': {
+      return '2_0'
+    }
+    case 'gen3':
+    case 'flex': {
+      return '3_0'
+    }
+    default: {
+      console.error(`invalid generation from ${gen}`)
+      return null
+    }
+  }
+}
+
+const V2_DEFINITION_TYPES = ['general', 'geometry', 'liquid']
+
+/* takes in pipetteName such as 'p300_single' or 'p300_single_gen1' 
+or PipetteModel such as 'p300_single_v1.3' and converts it to channels,
+model, and version from generation in order to return the correct pipette schema v2 json files. 
+**/
+export const getPipetteSpecsV2 = (
+  name: PipetteName | PipetteModel
+): PipetteV2Specs | null => {
+  const nameSplit = name.split('_')
+  const pipetteModel = nameSplit[0] // ex: p300
+  const channels = getChannelsFromString(nameSplit[1] as PipChannelString) //  ex: single -> single_channel
+  const gen = getVersionFromGen(nameSplit[2] as Gen)
+
+  let version: string
+  if (nameSplit.length === 2) {
+    version = '1_0'
+  } else if (gen != null) {
+    version = gen //  ex: gen1 -> 1_0
+  } else {
+    const versionWithDot = nameSplit[2].split('v')[1]
+    version = versionWithDot.replace('.', '_') // ex: v1.1 -> 1_1
+  }
+
+  const jsonFilePath = `/${channels}/${pipetteModel}/${version}.json`
+
+  //  import all json files? and parse through them until we find 3 that match
+  //  the file paths. Then combine them and return
+  return null
+}
