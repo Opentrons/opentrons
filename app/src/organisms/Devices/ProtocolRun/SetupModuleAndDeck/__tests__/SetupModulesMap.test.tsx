@@ -25,17 +25,21 @@ import type {
   CompletedProtocolAnalysis,
   ModuleModel,
   ModuleType,
+  inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
+import type * as OpentronsComponents from '@opentrons/components'
 
-vi.mock('@opentrons/components', () => {
-  const actualComponents = vi.requireActual('@opentrons/components')
+vi.mock('@opentrons/components', async importOriginal => {
+  const actualComponents = await importOriginal<typeof OpentronsComponents>()
   return {
     ...actualComponents,
     RobotWorkSpace: vi.fn(() => <div>mock RobotWorkSpace</div>),
   }
 })
-vi.mock('@opentrons/shared-data', () => {
-  const actualSharedData = vi.requireActual('@opentrons/shared-data')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actualSharedData = await importOriginal<
+    typeof inferModuleOrientationFromXCoordinate
+  >()
   return {
     ...actualSharedData,
     inferModuleOrientationFromXCoordinate: vi.fn(),
@@ -117,7 +121,7 @@ describe('SetupModulesMap', () => {
         labware: [],
         robotType: OT2_ROBOT_TYPE,
       } as unknown) as CompletedProtocolAnalysis)
-    when(mockGetAttachedProtocolModuleMatches).thenReturn([])
+    when(mockGetAttachedProtocolModuleMatches).calledWith().thenReturn([])
   })
 
   afterEach(() => {

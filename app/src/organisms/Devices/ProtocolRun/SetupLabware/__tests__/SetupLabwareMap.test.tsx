@@ -4,9 +4,12 @@ import { StaticRouter } from 'react-router-dom'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { BaseDeck } from '@opentrons/components'
-import { OT2_ROBOT_TYPE, getModuleDef2 } from '@opentrons/shared-data'
-import { fixtureTiprack300ul as fixture_tiprack_300_ul } from '@opentrons/shared-data'
+import { BaseDeck, LabwareRender, Module } from '@opentrons/components'
+import {
+  OT2_ROBOT_TYPE,
+  getModuleDef2,
+  fixtureTiprack300ul,
+} from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
@@ -21,19 +24,16 @@ import type {
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
-import type Components from '@opentrons/components'
-import type SharedData from '@opentrons/shared-data'
-import { fixtureTiprack300ul } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/components', async importOriginal => {
-  const actualComponents = await importOriginal<typeof Components>()
+  const actualComponents = await importOriginal<typeof BaseDeck>()
   return {
     ...actualComponents,
     BaseDeck: vi.fn(),
   }
 })
 vi.mock('@opentrons/shared-data', async importOriginal => {
-  const actualSharedData = await importOriginal<typeof SharedData>()
+  const actualSharedData = await importOriginal<typeof getModuleDef2>()
   return {
     ...actualSharedData,
     getModuleDef2: vi.fn(),
@@ -260,10 +260,10 @@ describe('SetupLabwareMap', () => {
       })
     )
     expect(vi.mocked(LabwareRender)).toHaveBeenCalledWith(
-      expect.objectContaining({ definition: fixture_tiprack_300_ul })
+      expect.objectContaining({ definition: fixtureTiprack300ul })
     )
     expect(vi.mocked(LabwareInfoOverlay)).toHaveBeenCalledWith(
-      expect.objectContaining({ definition: fixture_tiprack_300_ul })
+      expect.objectContaining({ definition: fixtureTiprack300ul })
     )
 
     screen.getByText('mock module viz magneticModuleType')
