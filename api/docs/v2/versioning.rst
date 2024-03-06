@@ -84,6 +84,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+------------------------------+
 | API Version | Introduced in Robot Software |
 +=============+==============================+
+|     2.17    |          7.2.0               |
++-------------+------------------------------+
 |     2.16    |          7.1.0               |
 +-------------+------------------------------+
 |     2.15    |          7.0.0               |

@@ -297,6 +297,12 @@ class InstrumentContext(publisher.CommandPublisher):
                            of the protocol. In API version 2.16 and earlier, dispense all
                            liquid in the pipette (same as unspecified or ``None``). In API
                            version 2.17 and later, dispense no liquid.
+
+                         - If greater than :py:obj:`.current_volume`, the behavior of
+                           ``dispense()`` depends on the API level of the protocol. In API
+                           version 2.16 and earlier, dispense all liquid in the pipette.
+                           In API version 2.17 and later, raise an error.
+
         :type volume: int or float
 
         :param location: Tells the robot where to dispense liquid held in the pipette.
@@ -343,6 +349,9 @@ class InstrumentContext(publisher.CommandPublisher):
 
         .. versionchanged:: 2.15
             Added the ``push_out`` parameter.
+
+        .. versionchanged:: 2.17
+            Behavior of the ``volume`` parameter.
         """
         if self.api_version < APIVersion(2, 15) and push_out:
             raise APIVersionError(
