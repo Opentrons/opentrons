@@ -1,4 +1,5 @@
 'use strict'
+import { vi } from 'vitest'
 
 global._PKG_VERSION_ = '0.0.0-test'
 global._OPENTRONS_PROJECT_ = 'robot-stack'
