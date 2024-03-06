@@ -416,6 +416,8 @@ def test_get_next_tip_with_starting_tip(
             nozzle_offset_z=1.23,
             home_position=4.56,
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
+            back_left_corner_offset=Point(x=1, y=2, z=3),
+            front_right_corner_offset=Point(x=4, y=5, z=6),
         ),
     )
     subject.handle_action(
@@ -684,6 +686,8 @@ def test_reset_tips(
             nozzle_offset_z=1.23,
             home_position=4.56,
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
+            back_left_corner_offset=Point(x=1, y=2, z=3),
+            front_right_corner_offset=Point(x=4, y=5, z=6),
         ),
     )
 
@@ -734,6 +738,8 @@ def test_handle_pipette_config_action(
             nozzle_offset_z=1.23,
             home_position=4.56,
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
+            back_left_corner_offset=Point(x=1, y=2, z=3),
+            front_right_corner_offset=Point(x=4, y=5, z=6),
         ),
     )
     subject.handle_action(
@@ -815,6 +821,8 @@ def test_drop_tip(
             nozzle_offset_z=1.23,
             home_position=4.56,
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
+            back_left_corner_offset=Point(x=1, y=2, z=3),
+            front_right_corner_offset=Point(x=4, y=5, z=6),
         ),
     )
     subject.handle_action(
@@ -918,6 +926,8 @@ def test_active_channels(
             nozzle_offset_z=1.23,
             home_position=4.56,
             nozzle_map=nozzle_map,
+            back_left_corner_offset=Point(x=1, y=2, z=3),
+            front_right_corner_offset=Point(x=4, y=5, z=6),
         ),
     )
     subject.handle_action(
@@ -981,6 +991,8 @@ def test_next_tip_uses_active_channels(
             nozzle_offset_z=1.23,
             home_position=4.56,
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
+            back_left_corner_offset=Point(x=1, y=2, z=3),
+            front_right_corner_offset=Point(x=4, y=5, z=6),
         ),
     )
     subject.handle_action(

@@ -130,18 +130,15 @@ def load_tip_length_for_pipette(
         pipette_id, tiprack
     )
 
-    # TODO (lc 09-26-2022) We shouldn't have to do a hash twice. We should figure out what
-    # information we actually need from the labware definition and pass it into
-    # the `load_tip_length_calibration` function.
-    tiprack_hash = helpers.hash_labware_def(tiprack)
+    tiprack_uri = helpers.uri_from_definition(tiprack)
 
     return TipLengthCalibration(
         tip_length=tip_length_data.tipLength,
         source=tip_length_data.source,
         pipette=pipette_id,
-        tiprack=tiprack_hash,
+        tiprack=tip_length_data.definitionHash,
         last_modified=tip_length_data.lastModified,
-        uri=tip_length_data.uri,
+        uri=tiprack_uri,
         status=types.CalibrationStatus(
             markedAt=tip_length_data.status.markedAt,
             markedBad=tip_length_data.status.markedBad,

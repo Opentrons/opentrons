@@ -96,6 +96,7 @@ export function HistoricalProtocolRun(
           css={css`
             cursor: pointer;
           `}
+          color={COLORS.grey60}
         >
           {runDisplayName}
         </StyledText>
@@ -107,6 +108,7 @@ export function HistoricalProtocolRun(
             onClick={() => history.push(`/protocols/${protocolKey}`)}
             css={CLICK_STYLE}
             marginRight={SPACING.spacing16}
+            color={COLORS.grey60}
           >
             {protocolName}
           </StyledText>
@@ -117,6 +119,7 @@ export function HistoricalProtocolRun(
             data-testid={`RecentProtocolRuns_Protocol_${String(protocolKey)}`}
             overflowWrap={OVERFLOW_WRAP_ANYWHERE}
             marginRight={SPACING.spacing16}
+            color={COLORS.grey60}
           >
             {protocolName}
           </StyledText>
@@ -126,6 +129,7 @@ export function HistoricalProtocolRun(
           width="20%"
           textTransform="capitalize"
           data-testid={`RecentProtocolRuns_Status_${String(protocolKey)}`}
+          color={COLORS.grey60}
         >
           {runStatus === 'running' && (
             <Icon

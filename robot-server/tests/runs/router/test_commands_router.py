@@ -12,7 +12,7 @@ from opentrons.protocol_engine import (
     errors as pe_errors,
 )
 
-from robot_server.errors import ApiError
+from robot_server.errors.error_responses import ApiError
 from robot_server.service.json_api import MultiBodyMeta
 
 from robot_server.runs.run_store import RunStore, CommandNotFoundError

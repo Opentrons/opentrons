@@ -113,6 +113,32 @@ snapshots: List[(Snapshot)] = [
         ],
     ),
     flex_dev_compat_snapshot,
+    Snapshot(
+        version="v7.1.1",
+        expected_protocol_count=10,
+        expected_runs=[
+            Run("69fe2d6f-3bda-4dfb-800b-cd93017d1cbd", 4634),
+            Run("04ec9eda-19b2-4850-9148-d28112565b37", 0),
+            Run("7edf736e-2b5c-41c0-be37-7ab7ac215445", 787),
+            Run("4f623a64-20ce-464b-a118-e8a785911613", 0),
+            Run("237fd93f-e4a5-4c37-9675-58a8a3c32bbb", 953),
+            Run("59706cac-74d5-4542-8b38-499d11ad352e", 54),
+            Run("ef7794a5-3afd-438d-a69e-34138d9ae520", 0),
+            Run("b0c6a8fa-f117-4f5f-b5f0-22c487d83526", 359),
+            Run("62011896-29f5-40b4-83ee-29d7b7817583", 0),
+            Run("790d551d-68f0-4513-8896-bc175f629546", 1541),
+            Run("92dafa40-3425-4a74-9d20-a3fc08365a92", 0),
+            Run("7622aed6-08bf-4339-accc-952dcad310ce", 205),
+            Run("b710a6c2-d373-4bc1-ad14-18f1094d7104", 0),
+            Run("0b593bb0-d2d8-4c21-afc5-44e4868aeeef", 1609),
+            Run("22d99b67-3062-48ed-80bd-4505def1bb7d", 0),
+            Run("519a45e1-f68a-454f-bac9-0910eaddbbac", 18),
+            Run("7367493c-40b1-4516-abf5-9c5b0228d27f", 679),
+            Run("4af7e324-2f2b-40bc-803c-e9100016d2b3", 1183),
+            Run("e164059b-57dc-4a68-a23b-b026a7addf2a", 1467),
+            Run("ae2e23fc-74fb-4b3f-9b8b-d632e31b222a", 0),
+        ],
+    ),
 ]
 
 

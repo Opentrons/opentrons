@@ -9,11 +9,13 @@ import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/
 import { useTrackCreateProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { useCreateRunFromProtocol } from '../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { ChooseProtocolSlideout } from '../'
+import { useNotifyService } from '../../../resources/useNotifyService'
 
 jest.mock('../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol')
 jest.mock('../../../redux/protocol-storage')
 jest.mock('../../../organisms/Devices/hooks')
 jest.mock('../../../redux/config')
+jest.mock('../../../resources/useNotifyService')
 
 const mockGetStoredProtocols = getStoredProtocols as jest.MockedFunction<
   typeof getStoredProtocols
@@ -23,6 +25,9 @@ const mockUseCreateRunFromProtocol = useCreateRunFromProtocol as jest.MockedFunc
 >
 const mockUseTrackCreateProtocolRunEvent = useTrackCreateProtocolRunEvent as jest.MockedFunction<
   typeof useTrackCreateProtocolRunEvent
+>
+const mockUseNotifyService = useNotifyService as jest.MockedFunction<
+  typeof useNotifyService
 >
 
 const render = (props: React.ComponentProps<typeof ChooseProtocolSlideout>) => {
@@ -52,6 +57,7 @@ describe('ChooseProtocolSlideout', () => {
     mockUseTrackCreateProtocolRunEvent.mockReturnValue({
       trackCreateProtocolRunEvent: mockTrackCreateProtocolRunEvent,
     })
+    mockUseNotifyService.mockReturnValue({} as any)
   })
   afterEach(() => {
     jest.resetAllMocks()

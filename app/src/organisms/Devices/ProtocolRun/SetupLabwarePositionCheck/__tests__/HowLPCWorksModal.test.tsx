@@ -30,16 +30,6 @@ describe('HowLPCWorksModal', () => {
     )
   })
 
-  it('should render a link to robot cal', () => {
-    const { getByRole } = render(props)
-    expect(
-      getByRole('link', {
-        name: 'Learn more about Robot Calibration',
-      }).getAttribute('href')
-    ).toBe(
-      'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'
-    )
-  })
   it('should render a link to the learn more page', () => {
     const { getByRole } = render(props)
     expect(

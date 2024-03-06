@@ -81,7 +81,7 @@ def test_load_tip_length(
     tip_length_data = v1_models.TipLengthModel(
         tipLength=1.23,
         lastModified=datetime(year=2023, month=1, day=1),
-        uri=LabwareUri("def456"),
+        definitionHash="asdfghjk",
         source=subject.SourceType.factory,
         status=v1_models.CalibrationStatus(
             markedBad=True,
@@ -99,6 +99,9 @@ def test_load_tip_length(
     decoy.when(calibration_storage.helpers.hash_labware_def(tip_rack_dict)).then_return(
         "asdfghjk"
     )
+    decoy.when(
+        calibration_storage.helpers.uri_from_definition(tip_rack_dict)
+    ).then_return(LabwareUri("def456"))
 
     result = subject.load_tip_length_for_pipette(
         pipette_id="abc123", tiprack=tip_rack_definition

@@ -75,7 +75,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     control API. Its only purpose is to gather state.
     """
 
-    DictType = Dict[str, Union[str, float, bool]]
+    DictType = Dict[
+        str, Union[str, float, bool]
+    ]  # spp: as_dict() has value items that aren't Union[str, float, bool]..
     #: The type of this data class as a dict
 
     def __init__(

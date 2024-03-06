@@ -16,10 +16,9 @@ from opentrons.protocols.api_support.util import AxisMaxSpeeds, APIVersionError
 from opentrons.protocols import labware as labware_definition
 
 from ...labware import Labware
+from ...disposal_locations import TrashBin, WasteChute
 from ..._liquid import Liquid
 from ..._types import OffDeckType
-from ..._trash_bin import TrashBin
-from ..._waste_chute import WasteChute
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 
@@ -142,11 +141,6 @@ class LegacyProtocolCore(
                 "Trash Bin and Waste Chute Disposal locations are not supported in this API Version."
             )
         self._disposal_locations.append(disposal_location)
-
-    def add_disposal_location_to_engine(
-        self, disposal_location: Union[TrashBin, WasteChute]
-    ) -> None:
-        assert False, "add_disposal_location_to_engine only supported on engine core"
 
     def add_labware_definition(
         self,
@@ -383,6 +377,21 @@ class LegacyProtocolCore(
         )
 
         return new_instr
+
+    def load_trash_bin(self, slot_name: DeckSlotName, area_name: str) -> TrashBin:
+        raise APIVersionError(
+            "Loading deck configured trash bin is not supported in this API version."
+        )
+
+    def load_ot2_fixed_trash_bin(self) -> None:
+        raise APIVersionError(
+            "Loading deck configured OT-2 fixed trash bin is not supported in this API version."
+        )
+
+    def load_waste_chute(self) -> WasteChute:
+        raise APIVersionError(
+            "Loading waste chute is not supported in this API version."
+        )
 
     def get_loaded_instruments(
         self,

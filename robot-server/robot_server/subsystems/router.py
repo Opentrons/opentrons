@@ -22,7 +22,7 @@ from .firmware_update_manager import (
     SubsystemNotFound as _SubsystemNotFound,
 )
 
-from robot_server.errors import ErrorDetails, ErrorBody
+from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.errors.robot_errors import NotSupportedOnOT2
 from robot_server.errors.global_errors import IDNotFound
 from robot_server.hardware import (

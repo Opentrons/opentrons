@@ -19,9 +19,8 @@ from .instrument import InstrumentCoreType
 from .labware import LabwareCoreType, LabwareLoadParams
 from .module import ModuleCoreType
 from .._liquid import Liquid
-from .._trash_bin import TrashBin
-from .._waste_chute import WasteChute
 from .._types import OffDeckType
+from ..disposal_locations import TrashBin, WasteChute
 
 if TYPE_CHECKING:
     from ..labware import Labware
@@ -67,13 +66,6 @@ class AbstractProtocol(
         disposal_location: Union[Labware, TrashBin, WasteChute],
     ) -> None:
         """Append a disposal location object to the core"""
-        ...
-
-    @abstractmethod
-    def add_disposal_location_to_engine(
-        self, disposal_location: Union[TrashBin, WasteChute]
-    ) -> None:
-        """Verify and add disposal location to engine store and append it to the core."""
         ...
 
     @abstractmethod
@@ -134,6 +126,18 @@ class AbstractProtocol(
     def load_instrument(
         self, instrument_name: PipetteNameType, mount: Mount
     ) -> InstrumentCoreType:
+        ...
+
+    @abstractmethod
+    def load_trash_bin(self, slot_name: DeckSlotName, area_name: str) -> TrashBin:
+        ...
+
+    @abstractmethod
+    def load_ot2_fixed_trash_bin(self) -> None:
+        ...
+
+    @abstractmethod
+    def load_waste_chute(self) -> WasteChute:
         ...
 
     @abstractmethod

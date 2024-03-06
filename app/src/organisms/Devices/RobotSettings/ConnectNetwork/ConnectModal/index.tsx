@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Formik, useFormikContext } from 'formik'
+import { useForm } from 'react-hook-form'
 
 import { useResetFormOnSecurityChange } from './form-state'
 import {
@@ -10,6 +10,7 @@ import {
 
 import { FormModal } from './FormModal'
 
+import type { Control, Resolver } from 'react-hook-form'
 import type {
   ConnectFormValues,
   WifiConfigureRequest,
@@ -23,43 +24,73 @@ export interface ConnectModalProps {
   network: WifiNetwork | null
   wifiKeys: WifiKey[]
   eapOptions: EapOption[]
-  onConnect: (r: WifiConfigureRequest) => unknown
-  onCancel: () => unknown
+  onConnect: (r: WifiConfigureRequest) => void
+  onCancel: () => void
+}
+
+interface ConnectModalComponentProps extends ConnectModalProps {
+  isValid: boolean
+  values: ConnectFormValues
+  control: Control<ConnectFormValues, any>
+  id: string
 }
 
 export const ConnectModal = (props: ConnectModalProps): JSX.Element => {
   const { network, eapOptions, onConnect } = props
 
-  const handleSubmit = (values: ConnectFormValues): void => {
+  const onSubmit = (values: ConnectFormValues): void => {
     const request = connectFormToConfigureRequest(network, values)
     if (request) onConnect(request)
   }
 
-  const handleValidate = (
-    values: ConnectFormValues
-  ): ReturnType<typeof validateConnectFormFields> => {
-    return validateConnectFormFields(network, eapOptions, values)
+  const handleValidate: Resolver<ConnectFormValues> = values => {
+    let errors = {}
+
+    errors = validateConnectFormFields(network, eapOptions, values, errors)
+    return { values, errors }
   }
 
+  const {
+    handleSubmit,
+    formState: { isValid },
+    getValues,
+    control,
+  } = useForm<ConnectFormValues>({
+    defaultValues: {},
+    resolver: handleValidate,
+  })
+
+  const values = getValues()
+  const id = `ConnectForm__${props.robotName}`
+
   return (
-    <Formik
-      initialValues={{}}
-      onSubmit={handleSubmit}
-      validate={handleValidate}
-      validateOnMount
-    >
-      <ConnectModalComponent {...props} />
-    </Formik>
+    <form onSubmit={handleSubmit(onSubmit)} id={id}>
+      <ConnectModalComponent
+        {...props}
+        control={control}
+        values={values}
+        isValid={isValid}
+        id={id}
+      />
+    </form>
   )
 }
 
 export const ConnectModalComponent = (
-  props: ConnectModalProps
+  props: ConnectModalComponentProps
 ): JSX.Element => {
-  const { robotName, network, wifiKeys, eapOptions, onCancel } = props
-  const { values, isValid } = useFormikContext<ConnectFormValues>()
+  const {
+    robotName,
+    network,
+    wifiKeys,
+    eapOptions,
+    onCancel,
+    values,
+    isValid,
+    id,
+    control,
+  } = props
 
-  const id = `ConnectForm__${robotName}`
   const fields = getConnectFormFields(
     network,
     robotName,
@@ -78,6 +109,7 @@ export const ConnectModalComponent = (
         fields,
         isValid,
         onCancel,
+        control,
       }}
     />
   )

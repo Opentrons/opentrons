@@ -115,7 +115,7 @@ export const HeaterShakerModuleData = (
         >
           <StyledText
             textTransform={TYPOGRAPHY.textTransformUppercase}
-            color={COLORS.grey50}
+            color={COLORS.grey60}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH6}
             marginTop={SPACING.spacing8}
@@ -149,7 +149,7 @@ export const HeaterShakerModuleData = (
       >
         <StyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={COLORS.grey50}
+          color={COLORS.grey60}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           fontSize={TYPOGRAPHY.fontSizeH6}
           marginTop={SPACING.spacing8}
@@ -185,7 +185,7 @@ export const HeaterShakerModuleData = (
         <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText
             textTransform={TYPOGRAPHY.textTransformUppercase}
-            color={COLORS.grey50}
+            color={COLORS.grey60}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH6}
             marginTop={SPACING.spacing8}

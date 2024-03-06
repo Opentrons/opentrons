@@ -21,13 +21,13 @@ from opentrons.protocol_engine import commands  # noqa: E402
 from server_utils import sql_utils  # noqa: E402
 _imports.extend([commands, sql_utils])
 
-from robot_server.persistence._tables import schema_2, schema_3  # noqa: E402
+from robot_server.persistence.tables import schema_2, schema_3  # noqa: E402
 from robot_server.persistence import (  # noqa: E402
-    _database,
-    legacy_pickle,
-    pydantic as pydantic_helpers
+    database,
+    pydantic as pydantic_helpers,
+    _legacy_pickle,
 )
-_imports.extend([schema_2, schema_3, _database, legacy_pickle, pydantic_helpers])
+_imports.extend([schema_2, schema_3, database, pydantic_helpers, _legacy_pickle])
 
 # fmt: on
 
@@ -66,9 +66,9 @@ def migrate_commands_for_run(
         # TODO(mm, 2024-02-14): Log these somehow. Logging is a little tricky from
         # subprocesses.
         Exception
-    ), _database.sql_engine_ctx(
+    ), database.sql_engine_ctx(
         source_db_file
-    ) as source_engine, _database.sql_engine_ctx(
+    ) as source_engine, database.sql_engine_ctx(
         dest_db_file
     ) as dest_engine:
         select_old_commands = sqlalchemy.select(schema_2.run_table.c.commands).where(
@@ -82,7 +82,7 @@ def migrate_commands_for_run(
             ).scalar_one()
 
         old_commands: typing.List[typing.Dict[str, object]] = (
-            legacy_pickle.loads(old_commands_bytes) if old_commands_bytes else []
+            _legacy_pickle.loads(old_commands_bytes) if old_commands_bytes else []
         )
 
         parsed_commands: typing.Iterable[commands.Command] = (

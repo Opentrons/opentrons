@@ -14,7 +14,7 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 
-const PROTOCOL_LIBRARY_URL = 'https://protocols.opentrons.com'
+const PROTOCOL_LIBRARY_URL = 'https://library.opentrons.com'
 const PROTOCOL_DESIGNER_URL = 'https://designer.opentrons.com'
 const API_DOCS_URL = 'https://docs.opentrons.com/v2/'
 

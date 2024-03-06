@@ -171,7 +171,6 @@ export function DeviceResetSlideout({
           backgroundColor={COLORS.yellow30}
           borderRadius={BORDERS.borderRadiusSize1}
           padding={SPACING.spacing8}
-          border={`1px solid ${COLORS.yellow60}`}
           marginBottom={SPACING.spacing24}
         >
           <Icon

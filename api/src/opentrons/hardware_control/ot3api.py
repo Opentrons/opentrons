@@ -246,6 +246,7 @@ class OT3API(
         self._pipette_handler = OT3PipetteHandler({m: None for m in OT3Mount})
         self._gripper_handler = GripperHandler(gripper=None)
         self._gantry_load = GantryLoad.LOW_THROUGHPUT
+        self._configured_since_update = True
         OT3RobotCalibrationProvider.__init__(self, self._config)
         ExecutionManagerProvider.__init__(self, isinstance(backend, OT3Simulator))
 
@@ -508,6 +509,10 @@ class OT3API(
     ) -> AsyncIterator[UpdateStatus]:
         """Start the firmware update for one or more subsystems and return update progress iterator."""
         subsystems = subsystems or set()
+        if SubSystem.head in subsystems:
+            await self.disengage_axes([Axis.Z_L, Axis.Z_R])
+        if SubSystem.gripper in subsystems:
+            await self.disengage_axes([Axis.Z_G])
         # start the updates and yield the progress
         async with self._motion_lock:
             try:
@@ -525,6 +530,8 @@ class OT3API(
                     message="Update failed because of uncaught error",
                     wrapping=[PythonException(e)],
                 ) from e
+            finally:
+                self._configured_since_update = False
 
     # Incidentals (i.e. not motion) API
 
@@ -652,10 +659,11 @@ class OT3API(
         Scan the attached instruments, take necessary configuration actions,
         and set up hardware controller internal state if necessary.
         """
-        skip_configure = await self._cache_instruments(require)
-        if not skip_configure:
-            self._log.info("Instrument model cache updated, reconfiguring")
-            await self._configure_instruments()
+        async with self._motion_lock:
+            skip_configure = await self._cache_instruments(require)
+            if not skip_configure or not self._configured_since_update:
+                self._log.info("Reconfiguring instrument cache")
+                await self._configure_instruments()
 
     async def _cache_instruments(  # noqa: C901
         self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
@@ -675,11 +683,11 @@ class OT3API(
             # We should also check version here once we're comfortable.
             if not pipette_load_name.supported_pipette(name):
                 raise RuntimeError(f"{name} is not a valid pipette name")
-        async with self._motion_lock:
-            # we're not actually checking the required instrument except in the context
-            # of simulation and it feels like a lot of work for this function
-            # actually be doing.
-            found = await self._backend.get_attached_instruments(checked_require)
+
+        # we're not actually checking the required instrument except in the context
+        # of simulation and it feels like a lot of work for this function
+        # actually be doing.
+        found = await self._backend.get_attached_instruments(checked_require)
 
         if OT3Mount.GRIPPER in found.keys():
             # Is now a gripper, ask if it's ok to skip
@@ -725,8 +733,9 @@ class OT3API(
     async def _configure_instruments(self) -> None:
         """Configure instruments"""
         await self.set_gantry_load(self._gantry_load_from_instruments())
-        await self.refresh_positions()
+        await self.refresh_positions(acquire_lock=False)
         await self.reset_tip_detectors(False)
+        self._configured_since_update = True
 
     async def reset_tip_detectors(
         self,
@@ -981,9 +990,11 @@ class OT3API(
             OT3Mount.from_mount(mount), self._current_position, critical_point
         )
 
-    async def refresh_positions(self) -> None:
+    async def refresh_positions(self, acquire_lock: bool = True) -> None:
         """Request and update both the motor and encoder positions from backend."""
-        async with self._motion_lock:
+        async with contextlib.AsyncExitStack() as stack:
+            if acquire_lock:
+                await stack.enter_async_context(self._motion_lock)
             await self._backend.update_motor_status()
             await self._cache_current_position()
             await self._cache_encoder_position()
@@ -1304,24 +1315,25 @@ class OT3API(
         Disengage the 96-channel and gripper mount if retracted. Re-engage
         the 96-channel or gripper mount if it is about to move.
         """
+        last_moved = self._last_moved_mount
         if self.is_idle_mount(mount):
             # home the left/gripper mount if it is current disengaged
             await self.home_z(mount)
 
-        if mount != self._last_moved_mount and self._last_moved_mount:
-            await self.retract(self._last_moved_mount, 10)
+        if mount != last_moved and last_moved:
+            await self.retract(last_moved, 10)
 
             # disengage Axis.Z_L motor and engage the brake to lower power
             # consumption and reduce the chance of the 96-channel pipette dropping
             if (
                 self.gantry_load == GantryLoad.HIGH_THROUGHPUT
-                and self._last_moved_mount == OT3Mount.LEFT
+                and last_moved == OT3Mount.LEFT
             ):
                 await self.disengage_axes([Axis.Z_L])
 
             # disegnage Axis.Z_G when we can to reduce the chance of
             # the gripper dropping
-            if self._last_moved_mount == OT3Mount.GRIPPER:
+            if last_moved == OT3Mount.GRIPPER:
                 await self.disengage_axes([Axis.Z_G])
 
         if mount != OT3Mount.GRIPPER:
@@ -1532,7 +1544,7 @@ class OT3API(
                     self._log.warning(
                         f"Stall on {axis} during fast home, encoder may have missed an overflow"
                     )
-                    await self.refresh_positions()
+                    await self.refresh_positions(acquire_lock=False)
 
             await self._backend.home([axis], self.gantry_load)
         else:

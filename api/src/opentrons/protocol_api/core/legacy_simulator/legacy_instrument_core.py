@@ -21,8 +21,7 @@ from opentrons_shared_data.errors.exceptions import (
     UnexpectedTipAttachError,
 )
 
-from ..._trash_bin import TrashBin
-from ..._waste_chute import WasteChute
+from ...disposal_locations import TrashBin, WasteChute
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 
@@ -264,7 +263,10 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
                 )
 
     def drop_tip_in_disposal_location(
-        self, disposal_location: Union[TrashBin, WasteChute], home_after: Optional[bool]
+        self,
+        disposal_location: Union[TrashBin, WasteChute],
+        home_after: Optional[bool],
+        alternate_tip_drop: bool = False,
     ) -> None:
         raise APIVersionError(
             "Dropping tips in a trash bin or waste chute is not supported in this API Version."

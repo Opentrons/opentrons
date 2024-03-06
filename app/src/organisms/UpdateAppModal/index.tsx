@@ -85,6 +85,7 @@ const UPDATE_PROGRESS_BAR_STYLE = css`
 `
 const LEGACY_MODAL_STYLE = css`
   width: 40rem;
+  margin-left: 5.336rem;
 `
 
 const RESTART_APP_AFTER_TIME = 5000

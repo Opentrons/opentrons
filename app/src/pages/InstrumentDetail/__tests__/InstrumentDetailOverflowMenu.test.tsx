@@ -1,6 +1,6 @@
 import React from 'react'
 import NiceModal from '@ebay/nice-modal-react'
-import { fireEvent, waitFor } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
@@ -9,7 +9,11 @@ import { i18n } from '../../../i18n'
 import { handleInstrumentDetailOverflowMenu } from '../InstrumentDetailOverflowMenu'
 import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 
-import type { PipetteData, GripperData } from '@opentrons/api-client'
+import type {
+  PipetteData,
+  GripperData,
+  HostConfig,
+} from '@opentrons/api-client'
 
 jest.mock('@opentrons/shared-data', () => ({
   getAllPipetteNames: jest.fn(
@@ -98,11 +102,15 @@ const MOCK_GRIPPER = {
   instrumentName: 'p1000_single_flex',
 } as GripperData
 
+const MOCK_HOST: HostConfig = { hostname: 'TEST_HOST' }
+
 const render = (pipetteOrGripper: PipetteData | GripperData) => {
   return renderWithProviders(
     <NiceModal.Provider>
       <button
-        onClick={() => handleInstrumentDetailOverflowMenu(pipetteOrGripper)}
+        onClick={() =>
+          handleInstrumentDetailOverflowMenu(pipetteOrGripper, MOCK_HOST)
+        }
         data-testid="testButton"
       />
     </NiceModal.Provider>,
@@ -157,46 +165,6 @@ describe('UpdateBuildroot', () => {
 
     getByText('Recalibrate')
     expect(queryByText('Drop tips')).not.toBeInTheDocument()
-  })
-
-  it('renders the pipette calibration wizard  when recalibrate is clicked', () => {
-    const [{ getByTestId, getByText }] = render(MOCK_PIPETTE)
-    const btn = getByTestId('testButton')
-    fireEvent.click(btn)
-    fireEvent.click(getByText('Recalibrate'))
-
-    getByText('Calibrate Left Pipette')
-  })
-
-  it('renders the drop tip wizard  when Drop tips is clicked', () => {
-    const [{ getByTestId, getByText, getAllByText }] = render(MOCK_PIPETTE)
-    const btn = getByTestId('testButton')
-    fireEvent.click(btn)
-    fireEvent.click(getByText('Drop tips'))
-
-    expect(getAllByText('Drop tips')).toHaveLength(2)
-  })
-
-  it('renders the gripper calibration wizard when recalibrate is clicked', () => {
-    const [{ getByTestId, getByText }] = render(MOCK_GRIPPER)
-    const btn = getByTestId('testButton')
-    fireEvent.click(btn)
-    fireEvent.click(getByText('Recalibrate'))
-
-    getByText('Calibrate Gripper')
-  })
-
-  it('closes the overflow menu when a launched wizard closes', async () => {
-    const [{ getByTestId, getByText, queryByText }] = render(MOCK_GRIPPER)
-    const btn = getByTestId('testButton')
-    fireEvent.click(btn)
-    fireEvent.click(getByText('Recalibrate'))
-
-    getByText('Calibrate Gripper')
-    fireEvent.click(getByText('exit'))
-    await waitFor(() =>
-      expect(queryByText('Recalibrate')).not.toBeInTheDocument()
-    )
   })
 
   it('closes the overflow menu when a click occurs outside of the overflow menu', () => {
