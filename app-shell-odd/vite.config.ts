@@ -70,16 +70,16 @@ export default defineConfig(
           '@opentrons/components/styles': path.resolve(
             '../components/src/index.module.css'
           ),
-          '@opentrons/components': path.resolve('../components/src/config.ts'),
-          '@opentrons/shared-data': path.resolve('../shared-data/js/config.ts'),
+          '@opentrons/components': path.resolve('../components/src/index.ts'),
+          '@opentrons/shared-data': path.resolve('../shared-data/js/index.ts'),
           '@opentrons/step-generation': path.resolve(
-            '../step-generation/src/config.ts'
+            '../step-generation/src/index.ts'
           ),
           '@opentrons/discovery-client': path.resolve(
-            '../discovery-client/src/config.ts'
+            '../discovery-client/src/index.ts'
           ),
           '@opentrons/usb-bridge/node-client': path.resolve(
-            '../usb-bridge/node-client/src/config.ts'
+            '../usb-bridge/node-client/src/inxex.ts'
           ),
         },
       },
