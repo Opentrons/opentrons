@@ -22,17 +22,21 @@ router = APIRouter()
     "currently attached to the robot like name, model, "
     "and mount."
     "\n\n"
-    "**Warning:** The behavior of this endpoint is currently only defined for OT-2"
-    " robots. For Flex robots, use `/instruments` instead.",
+    "If you're controlling a Flex, and not an OT-2, you might prefer the"
+    " `GET /instruments` endpoint instead.",
     response_model=pipettes.PipettesByMount,
 )
 async def get_pipettes(
     refresh: typing.Optional[bool] = Query(
         False,
         description="If `false`, query a cached value. If `true`, actively scan for"
-        " attached pipettes. **Warning:** This scan requires disabling the pipette"
-        " motors and should only be done when no protocol is running and you know it"
-        " won't cause a problem.",
+        " attached pipettes."
+        "\n\n"
+        "**Warning:** This scan disables the pipette motors and should only be done"
+        " when no protocol is running and you know it won't cause a problem."
+        "\n\n"
+        "**Warning:** Scanning is only valid on OT-2s. On Flex robots, it's"
+        " unnecessary, and the behavior is currently undefined.",
     ),
     hardware: HardwareControlAPI = Depends(get_hardware),
 ) -> pipettes.PipettesByMount:
