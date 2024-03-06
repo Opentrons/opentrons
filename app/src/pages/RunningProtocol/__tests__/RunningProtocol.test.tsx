@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { UseQueryResult } from 'react-query'
 import { Route, MemoryRouter } from 'react-router-dom'
-import { vi, it, describe, expect, beforeEach, afterEach, Mock } from 'vitest'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 
 import {
