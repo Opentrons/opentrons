@@ -3,6 +3,8 @@ import { when } from 'jest-when'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
+import { getLocalRobot } from '../../redux/discovery'
+import { mockConnectableRobot } from '../../redux/discovery/__fixtures__'
 import { i18n } from '../../i18n'
 import { appRestart } from '../../redux/shell'
 import { useTrackEvent, ANALYTICS_ODD_APP_ERROR } from '../../redux/analytics'
@@ -12,6 +14,13 @@ import type { FallbackProps } from 'react-error-boundary'
 
 jest.mock('../../redux/shell')
 jest.mock('../../redux/analytics')
+jest.mock('../../redux/discovery', () => {
+  const actual = jest.requireActual('../../redux/discovery')
+  return {
+    ...actual,
+    getLocalRobot: jest.fn(),
+  }
+})
 
 const mockError = {
   message: 'mock error',
@@ -19,6 +28,9 @@ const mockError = {
 const mockAppRestart = appRestart as jest.MockedFunction<typeof appRestart>
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
+>
+const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
+  typeof getLocalRobot
 >
 
 const render = (props: FallbackProps) => {
@@ -28,6 +40,8 @@ const render = (props: FallbackProps) => {
 }
 
 let mockTrackEvent: jest.Mock
+
+const MOCK_ROBOT_SERIAL_NUMBER = 'OT123'
 
 describe('OnDeviceDisplayAppFallback', () => {
   let props: FallbackProps
@@ -39,6 +53,13 @@ describe('OnDeviceDisplayAppFallback', () => {
     } as FallbackProps
     mockTrackEvent = jest.fn()
     when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
+    when(mockGetLocalRobot).mockReturnValue({
+      ...mockConnectableRobot,
+      health: {
+        ...mockConnectableRobot.health,
+        robot_serial: MOCK_ROBOT_SERIAL_NUMBER,
+      },
+    })
   })
 
   it('should render text and button', () => {
@@ -55,7 +76,10 @@ describe('OnDeviceDisplayAppFallback', () => {
     fireEvent.click(screen.getByText('Restart touchscreen'))
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_ODD_APP_ERROR,
-      properties: { errorMessage: 'mock error' },
+      properties: {
+        errorMessage: 'mock error',
+        robotSerialNumber: MOCK_ROBOT_SERIAL_NUMBER,
+      },
     })
     expect(mockAppRestart).toHaveBeenCalled()
   })

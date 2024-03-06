@@ -63,6 +63,7 @@ import {
   ANALYTICS_PROTOCOL_RUN_START,
   ANALYTICS_PROTOCOL_RUN_RESUME,
 } from '../../../../redux/analytics'
+import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 import { getRobotUpdateDisplayInfo } from '../../../../redux/robot-update'
 import { getIsHeaterShakerAttached } from '../../../../redux/config'
 import { getRobotSettings } from '../../../../redux/robot-settings'
@@ -77,6 +78,7 @@ import {
   useUnmatchedModulesForProtocol,
   useIsRobotViewable,
   useIsFlex,
+  useRobot,
 } from '../../hooks'
 import { useIsHeaterShakerInProtocol } from '../../../ModuleCard/hooks'
 import { ConfirmAttachmentModal } from '../../../ModuleCard/ConfirmAttachmentModal'
@@ -92,7 +94,6 @@ import { useDeckConfigurationCompatibility } from '../../../../resources/deck_co
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useMostRecentRunId } from '../../../ProtocolUpload/hooks/useMostRecentRunId'
 import { useNotifyRunQuery } from '../../../../resources/runs/useNotifyRunQuery'
-
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
@@ -253,6 +254,7 @@ const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jes
 const mockUseMostRecentRunId = useMostRecentRunId as jest.MockedFunction<
   typeof useMostRecentRunId
 >
+const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
@@ -268,6 +270,7 @@ const mockSettings = {
   restart_required: false,
 }
 const MOCK_ROTOCOL_LIQUID_KEY = { liquids: [] }
+const MOCK_ROBOT_SERIAL_NUMBER = 'OT123'
 
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as CompletedProtocolAnalysis
 
@@ -448,6 +451,13 @@ describe('ProtocolRunHeader', () => {
     mockUseDeckConfigurationCompatibility.mockReturnValue([])
     when(mockGetIsFixtureMismatch).mockReturnValue(false)
     when(mockUseMostRecentRunId).mockReturnValue(RUN_ID)
+    when(mockUseRobot).mockReturnValue({
+      ...mockConnectableRobot,
+      health: {
+        ...mockConnectableRobot.health,
+        robot_serial: MOCK_ROBOT_SERIAL_NUMBER,
+      },
+    })
   })
 
   afterEach(() => {
@@ -795,7 +805,10 @@ describe('ProtocolRunHeader', () => {
     fireEvent.click(button)
     expect(mockTrackEvent).toBeCalledWith({
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-      properties: { sourceLocation: 'RunRecordDetail' },
+      properties: {
+        sourceLocation: 'RunRecordDetail',
+        robotSerialNumber: MOCK_ROBOT_SERIAL_NUMBER,
+      },
     })
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
       name: ANALYTICS_PROTOCOL_RUN_AGAIN,
@@ -883,7 +896,7 @@ describe('ProtocolRunHeader', () => {
     expect(screen.queryByTestId('Banner_close-button')).not.toBeInTheDocument()
   })
 
-  it('renders a clear protocol banner when run has succeeded', () => {
+  it('renders a clear protocol banner when run has succeeded', async () => {
     when(mockUseNotifyRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -895,8 +908,24 @@ describe('ProtocolRunHeader', () => {
     render()
 
     screen.getByText('Run completed.')
+  })
+
+  it('clicking close on a terminal run banner closes the run context and dismisses the banner', async () => {
+    when(mockUseNotifyRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: { data: mockSucceededRun },
+      } as UseQueryResult<Run>)
+    when(mockUseRunStatus)
+      .calledWith(RUN_ID)
+      .mockReturnValue(RUN_STATUS_SUCCEEDED)
+    render()
+
     fireEvent.click(screen.getByTestId('Banner_close-button'))
     expect(mockCloseCurrentRun).toBeCalled()
+    await waitFor(() => {
+      expect(screen.queryByText('Run completed.')).not.toBeInTheDocument()
+    })
   })
 
   it('if a heater shaker is shaking, clicking on start run should render HeaterShakerIsRunningModal', async () => {

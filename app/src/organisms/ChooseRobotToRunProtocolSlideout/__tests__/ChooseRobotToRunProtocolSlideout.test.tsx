@@ -29,6 +29,7 @@ import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/
 import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
 import { useOffsetCandidatesForAnalysis } from '../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { ChooseRobotToRunProtocolSlideout } from '../'
+import { useNotifyService } from '../../../resources/useNotifyService'
 
 import type { State } from '../../../redux/types'
 
@@ -41,6 +42,7 @@ jest.mock('../../../redux/networking')
 jest.mock('../../../redux/config')
 jest.mock('../useCreateRunFromProtocol')
 jest.mock('../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis')
+jest.mock('../../../resources/useNotifyService')
 
 const mockUseOffsetCandidatesForAnalysis = useOffsetCandidatesForAnalysis as jest.MockedFunction<
   typeof useOffsetCandidatesForAnalysis
@@ -81,6 +83,9 @@ const mockUseTrackCreateProtocolRunEvent = useTrackCreateProtocolRunEvent as jes
 >
 const mockGetNetworkInterfaces = getNetworkInterfaces as jest.MockedFunction<
   typeof getNetworkInterfaces
+>
+const mockUseNotifyService = useNotifyService as jest.MockedFunction<
+  typeof useNotifyService
 >
 
 const render = (
@@ -125,6 +130,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     })
     mockUseCurrentRunId.mockReturnValue(null)
     mockUseCurrentRunStatus.mockReturnValue(null)
+    mockUseNotifyService.mockReturnValue({} as any)
     when(mockUseCreateRunFromProtocol)
       .calledWith(
         expect.any(Object),

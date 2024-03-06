@@ -15,11 +15,13 @@ import { useDashboardCalibrateTipLength } from '../hooks/useDashboardCalibrateTi
 import { useDashboardCalibrateDeck } from '../hooks/useDashboardCalibrateDeck'
 import { expectedTaskList } from '../../../../organisms/Devices/hooks/__fixtures__/taskListFixtures'
 import { mockLeftProtoPipette } from '../../../../redux/pipettes/__fixtures__'
+import { useNotifyAllRunsQuery } from '../../../../resources/runs/useNotifyAllRunsQuery'
 
 jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../hooks/useDashboardCalibratePipOffset')
 jest.mock('../hooks/useDashboardCalibrateTipLength')
 jest.mock('../hooks/useDashboardCalibrateDeck')
+jest.mock('../../../../resources/runs/useNotifyAllRunsQuery')
 
 const mockUseCalibrationTaskList = useCalibrationTaskList as jest.MockedFunction<
   typeof useCalibrationTaskList
@@ -35,6 +37,9 @@ const mockUseDashboardCalibrateDeck = useDashboardCalibrateDeck as jest.MockedFu
 >
 const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
   typeof useAttachedPipettes
+>
+const mockUseNotifyAllRunsQuery = useNotifyAllRunsQuery as jest.MockedFunction<
+  typeof useNotifyAllRunsQuery
 >
 
 const render = (path = '/') => {
@@ -60,6 +65,7 @@ describe('CalibrationDashboard', () => {
       left: mockLeftProtoPipette,
       right: null,
     })
+    mockUseNotifyAllRunsQuery.mockReturnValue({} as any)
   })
 
   it('renders a robot calibration dashboard title', () => {

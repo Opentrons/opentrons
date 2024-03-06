@@ -138,7 +138,7 @@ describe('PipetteOverflowMenu', () => {
     expect(settings).not.toBeInTheDocument()
   })
 
-  it('should disable certain menu items if a run is active', () => {
+  it('should disable certain menu items if a run is active for Flex pipette', () => {
     mockisFlexPipette.mockReturnValue(true)
     props = {
       ...props,
@@ -158,6 +158,30 @@ describe('PipetteOverflowMenu', () => {
     expect(
       screen.getByRole('button', {
         name: 'Drop tips',
+      })
+    ).toBeDisabled()
+  })
+
+  it('should disable certain menu items if a run is active for OT-2 pipette', () => {
+    mockisFlexPipette.mockReturnValue(false)
+    props = {
+      ...props,
+      isRunActive: true,
+    }
+    render(props)
+    expect(
+      screen.getByRole('button', {
+        name: 'Detach pipette',
+      })
+    ).toBeDisabled()
+    expect(
+      screen.getByRole('button', {
+        name: 'Drop tips',
+      })
+    ).toBeDisabled()
+    expect(
+      screen.getByRole('button', {
+        name: 'Pipette Settings',
       })
     ).toBeDisabled()
   })

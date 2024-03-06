@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
-import { useSelector } from 'react-redux'
 
 import {
   Icon,
@@ -15,10 +14,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useEstopQuery } from '@opentrons/react-api-client'
-import {
-  getAnalyticsOptInSeen,
-  getAnalyticsOptedIn,
-} from '../../redux/analytics'
 
 import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
@@ -31,8 +26,6 @@ const ESTOP_STATUS_REFETCH_INTERVAL_MS = 10000
 export function EmergencyStop(): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
-  const seenOptIn = useSelector(getAnalyticsOptInSeen)
-  const optedIn = useSelector(getAnalyticsOptedIn)
 
   // Note here the touchscreen app is using status since status is linked to EstopPhysicalStatuses
   // left notPresent + right disengaged => disengaged
@@ -45,7 +38,7 @@ export function EmergencyStop(): JSX.Element {
 
   return (
     <>
-      <StepMeter totalSteps={5} currentStep={2} />
+      <StepMeter totalSteps={6} currentStep={4} />
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}
@@ -105,11 +98,7 @@ export function EmergencyStop(): JSX.Element {
           flex="1"
           buttonText={i18n.format(t('shared:continue'), 'capitalize')}
           disabled={!isEstopConnected}
-          onClick={() => {
-            seenOptIn && optedIn
-              ? history.push('/robot-settings/rename-robot')
-              : history.push('/privacy-policy')
-          }}
+          onClick={() => history.push('/robot-settings/rename-robot')}
         />
       </Flex>
     </>

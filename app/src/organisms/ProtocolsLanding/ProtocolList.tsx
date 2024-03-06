@@ -42,7 +42,7 @@ const SORT_BY_BUTTON_STYLE = css`
   background-color: ${COLORS.transparent};
   cursor: pointer;
   &:hover {
-    background-color: ${COLORS.grey60};
+    background-color: ${COLORS.grey30};
   }
   &:active,
   &:focus {
@@ -161,7 +161,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
             <StyledText
               as="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={COLORS.grey50}
+              color={COLORS.grey60}
             >
               {t('shared:sort_by')}
             </StyledText>

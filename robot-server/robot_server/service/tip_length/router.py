@@ -1,6 +1,6 @@
 from starlette import status
 from fastapi import APIRouter, Depends
-from typing import Optional
+from typing import Optional, cast
 
 from opentrons.calibration_storage import types as cal_types
 from opentrons.calibration_storage.ot2 import tip_length, models
@@ -12,6 +12,7 @@ from robot_server.service.errors import RobotServerError, CommonErrorDef
 from robot_server.service.shared_models import calibration as cal_model
 
 from opentrons.hardware_control import API
+from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 
 router = APIRouter()
@@ -80,17 +81,24 @@ async def get_all_tip_length_calibrations(
 @router.delete(
     "/calibration/tip_length",
     description="Delete one specific tip length calibration by pipette "
-    "serial and tiprack hash",
+    "serial and tiprack uri",
     responses={status.HTTP_404_NOT_FOUND: {"model": ErrorBody}},
 )
 async def delete_specific_tip_length_calibration(
-    tiprack_hash: str, pipette_id: str, _: API = Depends(get_ot2_hardware)
+    pipette_id: str,
+    tiprack_hash: Optional[str] = None,
+    tiprack_uri: Optional[str] = None,
+    _: API = Depends(get_ot2_hardware),
 ):
     try:
-        tip_length.delete_tip_length_calibration(tiprack_hash, pipette_id)
+        tip_length.delete_tip_length_calibration(
+            pipette_id,
+            tiprack_uri=cast(LabwareUri, tiprack_uri),
+            tiprack_hash=tiprack_hash,
+        )
     except cal_types.TipLengthCalNotFound:
         raise RobotServerError(
             definition=CommonErrorDef.RESOURCE_NOT_FOUND,
             resource="TipLengthCalibration",
-            id=f"{tiprack_hash}&{pipette_id}",
+            id=f"{tiprack_uri}&{pipette_id}",
         )

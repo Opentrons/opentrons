@@ -4,28 +4,33 @@ import { useNotifyService } from '../useNotifyService'
 import { useLastRunCommandKey } from '../../organisms/Devices/hooks/useLastRunCommandKey'
 
 import type { CommandsData } from '@opentrons/api-client'
-import type { QueryOptionsWithPolling } from '../useNotifyService'
+import type {
+  QueryOptionsWithPolling,
+  HTTPRefetchFrequency,
+} from '../useNotifyService'
 
 export function useNotifyLastRunCommandKey(
   runId: string,
-  options?: QueryOptionsWithPolling<CommandsData, Error>
+  options: QueryOptionsWithPolling<CommandsData, Error> = {}
 ): string | null {
-  const [refetchUsingHTTP, setRefetchUsingHTTP] = React.useState(false)
+  const [
+    refetchUsingHTTP,
+    setRefetchUsingHTTP,
+  ] = React.useState<HTTPRefetchFrequency>(null)
 
-  const { isNotifyError } = useNotifyService({
+  useNotifyService({
     topic: 'robot-server/runs/current_command',
-    refetchUsingHTTP: () => setRefetchUsingHTTP(true),
-    options: options != null ? options : {},
+    setRefetchUsingHTTP,
+    options,
   })
-
-  const isNotifyEnabled = !isNotifyError && !options?.forceHttpPolling
-  if (!isNotifyEnabled && !refetchUsingHTTP) setRefetchUsingHTTP(true)
-  const isHTTPEnabled = options?.enabled !== false && refetchUsingHTTP
 
   const httpResponse = useLastRunCommandKey(runId, {
     ...options,
-    enabled: isHTTPEnabled,
-    onSettled: isNotifyEnabled ? () => setRefetchUsingHTTP(false) : undefined,
+    enabled: options?.enabled !== false && refetchUsingHTTP != null,
+    onSettled:
+      refetchUsingHTTP === 'once'
+        ? () => setRefetchUsingHTTP(null)
+        : () => null,
   })
 
   return httpResponse

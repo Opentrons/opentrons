@@ -10,8 +10,13 @@ from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons.motion_planning import deck_conflict as wrapped_deck_conflict
 from opentrons.motion_planning import adjacent_slots_getters
 from opentrons.motion_planning.adjacent_slots_getters import _MixedTypeSlots
-from opentrons.protocol_api._trash_bin import TrashBin
-from opentrons.protocol_api._waste_chute import WasteChute
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api.disposal_locations import (
+    TrashBin,
+    WasteChute,
+    _TRASH_BIN_CUTOUT_FIXTURE,
+)
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocol_api.core.engine import deck_conflict
 from opentrons.protocol_engine import (
@@ -20,6 +25,7 @@ from opentrons.protocol_engine import (
     ModuleModel,
     StateView,
 )
+from opentrons.protocol_engine.clients import SyncClient
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
 from opentrons.types import DeckSlotName, Point, StagingSlotName
 
@@ -63,6 +69,18 @@ def use_mock_wrapped_deck_conflict(
     """Replace the check() function that our subject should wrap with a mock."""
     mock_check = decoy.mock(func=wrapped_deck_conflict.check)
     monkeypatch.setattr(wrapped_deck_conflict, "check", mock_check)
+
+
+@pytest.fixture
+def api_version() -> APIVersion:
+    """Get mocked api_version."""
+    return MAX_SUPPORTED_VERSION
+
+
+@pytest.fixture
+def mock_sync_client(decoy: Decoy) -> SyncClient:
+    """Return a mock in the shape of a SyncClient."""
+    return decoy.mock(cls=SyncClient)
 
 
 @pytest.fixture
@@ -324,32 +342,51 @@ def test_maps_different_module_models(
         ("OT-3 Standard", DeckType.OT3_STANDARD),
     ],
 )
-def test_maps_trash_bins(decoy: Decoy, mock_state_view: StateView) -> None:
+def test_maps_trash_bins(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    api_version: APIVersion,
+    mock_sync_client: SyncClient,
+) -> None:
     """It should correctly map disposal locations."""
     mock_trash_lw = decoy.mock(cls=Labware)
+
+    decoy.when(
+        mock_sync_client.state.addressable_areas.get_fixture_height(
+            _TRASH_BIN_CUTOUT_FIXTURE
+        )
+    ).then_return(1.23)
 
     deck_conflict.check(
         engine_state=mock_state_view,
         existing_labware_ids=[],
         existing_module_ids=[],
         existing_disposal_locations=[
-            TrashBin(location=DeckSlotName.SLOT_B1, addressable_area_name="blah"),
-            WasteChute(),
+            TrashBin(
+                location=DeckSlotName.SLOT_B1,
+                addressable_area_name="blah",
+                engine_client=mock_sync_client,
+                api_version=api_version,
+            ),
+            WasteChute(engine_client=mock_sync_client, api_version=api_version),
             mock_trash_lw,
         ],
         new_trash_bin=TrashBin(
-            location=DeckSlotName.SLOT_A1, addressable_area_name="blah"
+            location=DeckSlotName.SLOT_A1,
+            addressable_area_name="blah",
+            engine_client=mock_sync_client,
+            api_version=api_version,
         ),
     )
     decoy.verify(
         wrapped_deck_conflict.check(
             existing_items={
                 DeckSlotName.SLOT_B1: wrapped_deck_conflict.TrashBin(
-                    name_for_errors="trash bin",
+                    name_for_errors="trash bin", highest_z=1.23
                 )
             },
             new_item=wrapped_deck_conflict.TrashBin(
-                name_for_errors="trash bin",
+                name_for_errors="trash bin", highest_z=1.23
             ),
             new_location=DeckSlotName.SLOT_A1,
             robot_type=mock_state_view.config.robot_type,
@@ -379,7 +416,7 @@ module = LoadedModule(
     [("OT-3 Standard", DeckType.OT3_STANDARD)],
 )
 @pytest.mark.parametrize(
-    ["nozzle_bounds", "expected_raise"],
+    ["pipette_bounds", "expected_raise"],
     [
         (  # nozzles above highest Z
             (
@@ -424,7 +461,7 @@ module = LoadedModule(
             ),
             pytest.raises(
                 deck_conflict.PartialTipMovementNotAllowedError,
-                match="collision with items in deck slot C4",
+                match="collision with items in staging slot C4",
             ),
         ),
     ],
@@ -432,7 +469,7 @@ module = LoadedModule(
 def test_deck_conflict_raises_for_bad_pipette_move(
     decoy: Decoy,
     mock_state_view: StateView,
-    nozzle_bounds: Tuple[Point, Point, Point, Point],
+    pipette_bounds: Tuple[Point, Point, Point, Point],
     expected_raise: ContextManager[Any],
 ) -> None:
     """It should raise errors when moving to locations with restrictions for partial pipette movement.
@@ -443,6 +480,10 @@ def test_deck_conflict_raises_for_bad_pipette_move(
     - we are checking for conflicts when moving to a labware in C2.
       For each test case, we are moving to a different point in the destination labware,
       with the same pipette and tip
+
+    Note: this test does not stub out the slot overlap checker function
+          in order to preserve readability of the test. That means the test does
+          actual slot overlap checks.
     """
     destination_well_point = Point(x=123, y=123, z=123)
     decoy.when(
@@ -463,10 +504,10 @@ def test_deck_conflict_raises_for_bad_pipette_move(
         )
     ).then_return(destination_well_point)
     decoy.when(
-        mock_state_view.pipettes.get_nozzle_bounds_at_specified_move_to_position(
+        mock_state_view.pipettes.get_pipette_bounds_at_specified_move_to_position(
             pipette_id="pipette-id", destination_position=destination_well_point
         )
-    ).then_return(nozzle_bounds)
+    ).then_return(pipette_bounds)
 
     decoy.when(
         adjacent_slots_getters.get_surrounding_slots(5, robot_type="OT-3 Standard")
@@ -527,6 +568,73 @@ def test_deck_conflict_raises_for_bad_pipette_move(
         ).then_return(Dimensions(90, 90, 0))
 
     with expected_raise:
+        deck_conflict.check_safe_for_pipette_movement(
+            engine_state=mock_state_view,
+            pipette_id="pipette-id",
+            labware_id="destination-labware-id",
+            well_name="A2",
+            well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
+        )
+
+
+@pytest.mark.parametrize(
+    ("robot_type", "deck_type"),
+    [("OT-3 Standard", DeckType.OT3_STANDARD)],
+)
+def test_deck_conflict_raises_for_collision_with_tc_lid(
+    decoy: Decoy,
+    mock_state_view: StateView,
+) -> None:
+    """It should raise an error if pipette might collide with thermocycler lid on the Flex."""
+    destination_well_point = Point(x=123, y=123, z=123)
+    pipette_bounds_at_destination = (
+        Point(x=50, y=350, z=204.5),
+        Point(x=150, y=450, z=204.5),
+        Point(x=150, y=400, z=204.5),
+        Point(x=50, y=300, z=204.5),
+    )
+
+    decoy.when(
+        mock_state_view.pipettes.get_is_partially_configured("pipette-id")
+    ).then_return(True)
+    decoy.when(mock_state_view.pipettes.get_primary_nozzle("pipette-id")).then_return(
+        "A12"
+    )
+    decoy.when(
+        mock_state_view.geometry.get_ancestor_slot_name("destination-labware-id")
+    ).then_return(DeckSlotName.SLOT_C2)
+
+    decoy.when(
+        mock_state_view.geometry.get_well_position(
+            labware_id="destination-labware-id",
+            well_name="A2",
+            well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
+        )
+    ).then_return(destination_well_point)
+    decoy.when(
+        mock_state_view.pipettes.get_pipette_bounds_at_specified_move_to_position(
+            pipette_id="pipette-id", destination_position=destination_well_point
+        )
+    ).then_return(pipette_bounds_at_destination)
+
+    decoy.when(
+        adjacent_slots_getters.get_surrounding_slots(5, robot_type="OT-3 Standard")
+    ).then_return(
+        _MixedTypeSlots(
+            regular_slots=[
+                DeckSlotName.SLOT_A1,
+                DeckSlotName.SLOT_B1,
+            ],
+            staging_slots=[StagingSlotName.SLOT_C4],
+        )
+    )
+    decoy.when(mock_state_view.modules.is_flex_deck_with_thermocycler()).then_return(
+        True
+    )
+    with pytest.raises(
+        deck_conflict.PartialTipMovementNotAllowedError,
+        match="collision with thermocycler lid in deck slot A1.",
+    ):
         deck_conflict.check_safe_for_pipette_movement(
             engine_state=mock_state_view,
             pipette_id="pipette-id",

@@ -10,7 +10,7 @@ from opentrons_shared_data.pipette import pipette_definition
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
 from opentrons.calibration_storage.helpers import uri_from_details
-from opentrons.types import Mount as HwMount, MountType, DeckSlotName
+from opentrons.types import Mount as HwMount, MountType, DeckSlotName, Point
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import (
     TempDeck,
@@ -149,6 +149,8 @@ def loaded_static_pipette_data(
         home_position=10.11,
         nozzle_offset_z=12.13,
         nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
+        back_left_corner_offset=Point(x=1, y=2, z=3),
+        front_right_corner_offset=Point(x=4, y=5, z=6),
     )
 
 

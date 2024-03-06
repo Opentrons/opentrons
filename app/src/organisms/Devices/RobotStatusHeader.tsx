@@ -157,7 +157,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
       <Flex flexDirection={DIRECTION_COLUMN}>
         <StyledText
           as="h6"
-          color={COLORS.grey50}
+          color={COLORS.grey60}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing2}
           textTransform={TYPOGRAPHY.textTransformUppercase}
@@ -189,7 +189,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
                   aria-label={iconName}
                   paddingTop={SPACING.spacing4}
                   name={iconName}
-                  color={COLORS.grey50}
+                  color={COLORS.grey60}
                   size="1.25rem"
                 />
               </Btn>

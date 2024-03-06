@@ -2,6 +2,8 @@ import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { StaticRouter } from 'react-router-dom'
+import { useRobot } from '../../hooks'
+import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -20,13 +22,16 @@ jest.mock('@opentrons/components', () => {
   }
 })
 jest.mock('../../../../redux/analytics')
+jest.mock('../../hooks')
 
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
+const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
+const ROBOT_SERIAL_NUMBER = 'OT123'
 
 const render = () => {
   return renderWithProviders(
@@ -50,6 +55,13 @@ describe('BackToTopButton', () => {
   beforeEach(() => {
     mockTrackEvent = jest.fn()
     when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
+    when(mockUseRobot).mockReturnValue({
+      ...mockConnectableRobot,
+      health: {
+        ...mockConnectableRobot.health,
+        robot_serial: ROBOT_SERIAL_NUMBER,
+      },
+    })
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -70,7 +82,10 @@ describe('BackToTopButton', () => {
     fireEvent.click(button)
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-      properties: { sourceLocation: 'test run button' },
+      properties: {
+        sourceLocation: 'test run button',
+        robotSerialNumber: ROBOT_SERIAL_NUMBER,
+      },
     })
   })
 

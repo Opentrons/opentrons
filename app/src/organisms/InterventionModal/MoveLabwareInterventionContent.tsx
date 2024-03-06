@@ -70,7 +70,7 @@ const LABWARE_NAME_TITLE_STYLE = css`
 `
 
 const LABWARE_NAME_STYLE = css`
-  color: ${COLORS.grey40};
+  color: ${COLORS.grey60};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     ${TYPOGRAPHY.bodyTextBold}
     color: ${COLORS.black90};

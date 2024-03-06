@@ -1,4 +1,4 @@
-import { getTopMostLabwareInSlots } from '@opentrons/components'
+import { getInitialAndMovedLabwareInSlots } from '@opentrons/components'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
@@ -43,7 +43,9 @@ export function useDeckConfigurationCompatibility(
       ? getAddressableAreasInProtocol(protocolAnalysis, deckDef)
       : []
   const labwareInSlots =
-    protocolAnalysis != null ? getTopMostLabwareInSlots(protocolAnalysis) : []
+    protocolAnalysis != null
+      ? getInitialAndMovedLabwareInSlots(protocolAnalysis)
+      : []
 
   const protocolModulesInfo =
     protocolAnalysis != null
