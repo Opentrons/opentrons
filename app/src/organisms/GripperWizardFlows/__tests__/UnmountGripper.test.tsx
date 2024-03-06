@@ -63,7 +63,7 @@ describe('UnmountGripper', () => {
   })
 
   it('clicking go back calls back', () => {
-    mockUseInstrumentsQuery.mockReturnValue({
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
       refetch: mockRefetch,
       data: instrumentsResponseFixture,
     } as any)
@@ -74,7 +74,7 @@ describe('UnmountGripper', () => {
   })
 
   it('renders correct text', () => {
-    mockUseInstrumentsQuery.mockReturnValue({
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
       refetch: mockRefetch,
       data: instrumentsResponseFixture,
     } as any)
