@@ -10,7 +10,7 @@ import {
   mockOT2ServerHealthResponse,
   mockOT3HealthResponse,
   mockOT3ServerHealthResponse,
-} from '@opentrons/discovery-client/src/__fixtures__'
+} from '../../../../../discovery-client/src/fixtures'
 
 import { i18n } from '../../../i18n'
 import { mockFetchModulesSuccessActionPayloadModules } from '../../../redux/modules/__fixtures__'

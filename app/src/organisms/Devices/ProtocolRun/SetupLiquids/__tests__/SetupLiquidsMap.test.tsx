@@ -40,7 +40,6 @@ import type {
   LabwareDefinition2,
 } from '@opentrons/shared-data'
 import type * as Components from '@opentrons/components'
-import { LabwareInfo } from '@opentrons/components/src/hardware-sim/ProtocolDeck/LabwareInfo'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actualComponents = await importOriginal<typeof Components>()
@@ -60,8 +59,22 @@ vi.mock('../../utils/getLabwareRenderInfo')
 vi.mock('../../../../ProtocolSetupModulesAndDeck/utils')
 vi.mock('../../utils/getProtocolModulesInfo')
 vi.mock('../../../../../resources/deck_configuration/utils')
-
-const mockBaseDeck = BaseDeck as jest.MockedFunction<typeof BaseDeck>
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<typeof getSimplestDeckConfigForProtocol>()
+  return {
+    ...actual,
+    getSimplestDeckConfigForProtocol: vi.fn(),
+    getDeckDefFromRobotType: vi.fn(),
+  }
+})
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof BaseDeck>()
+  return {
+    ...actual,
+    BaseDeck: vi.fn(),
+    LabwareRender: vi.fn(),
+  }
+})
 
 const RUN_ID = '1'
 const MOCK_300_UL_TIPRACK_ID = '300_ul_tiprack_id'
@@ -106,12 +119,14 @@ describe('SetupLiquidsMap', () => {
       runId: RUN_ID,
       protocolAnalysis: mockProtocolAnalysis,
     }
+
     when(vi.mocked(LabwareRender))
       .calledWith(
         expect.objectContaining({
           definition: fixtureTiprack300ul,
           wellFill: undefined,
         }),
+        // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
         expect.anything()
       )
       .thenReturn(
@@ -124,6 +139,7 @@ describe('SetupLiquidsMap', () => {
         expect.objectContaining({
           wellFill: { C1: '#ff4888', C2: '#ff4888' },
         }),
+        // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
         expect.anything()
       )
       .thenReturn(<div>mock labware render with well fill</div>)
@@ -147,6 +163,7 @@ describe('SetupLiquidsMap', () => {
     when(vi.mocked(LabwareInfoOverlay))
       .calledWith(
         expect.objectContaining({ definition: fixtureTiprack300ul }),
+        // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
         expect.anything()
       )
       .thenReturn(
@@ -158,6 +175,7 @@ describe('SetupLiquidsMap', () => {
     when(vi.mocked(LabwareInfoOverlay))
       .calledWith(
         expect.not.objectContaining({ definition: fixtureTiprack300ul }),
+        // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
         expect.anything()
       )
       .thenReturn(<div></div>)
@@ -225,12 +243,13 @@ describe('SetupLiquidsMap', () => {
         },
       ])
 
-    when(mockBaseDeck)
+    when(vi.mocked(BaseDeck))
       .calledWith(
         expect.objectContaining({
           robotType: OT2_ROBOT_TYPE,
           deckLayerBlocklist: getStandardDeckViewLayerBlockList(OT2_ROBOT_TYPE),
         }),
+        // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
         expect.anything()
       )
       .thenReturn(<div>mock BaseDeck</div>)
@@ -310,7 +329,7 @@ describe('SetupLiquidsMap', () => {
           attachedModuleMatch: null,
         },
       ])
-    when(mockBaseDeck)
+    when(vi.mocked(BaseDeck))
       .calledWith(
         expect.objectContaining({
           deckLayerBlocklist: getStandardDeckViewLayerBlockList(
@@ -321,6 +340,7 @@ describe('SetupLiquidsMap', () => {
           labwareOnDeck: expect.anything(),
           modulesOnDeck: expect.anything(),
         }),
+        // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
         expect.anything()
       )
       .thenReturn(<div>mock BaseDeck</div>)

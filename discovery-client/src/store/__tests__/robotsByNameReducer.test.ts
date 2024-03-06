@@ -4,7 +4,7 @@ import {
   mockLegacyHealthResponse,
   mockLegacyServerHealthResponse,
   mockHealthErrorJsonResponse,
-} from '../../__fixtures__/health'
+} from '../../fixtures/health'
 
 import * as Actions from '../actions'
 import { reducer, robotsByNameReducer } from '../reducer'

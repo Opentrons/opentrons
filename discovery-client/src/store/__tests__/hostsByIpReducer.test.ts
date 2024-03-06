@@ -9,7 +9,7 @@ import {
   mockOT3HealthResponse,
   mockHealthErrorJsonResponse,
   mockHealthFetchErrorResponse,
-} from '../../__fixtures__/health'
+} from '../../fixtures/health'
 
 import * as Constants from '../../constants'
 import * as Actions from '../actions'

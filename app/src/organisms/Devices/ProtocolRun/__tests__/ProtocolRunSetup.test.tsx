@@ -111,6 +111,7 @@ describe('ProtocolRunSetup', () => {
           robotName: ROBOT_NAME,
           runId: RUN_ID,
         }),
+        // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
         expect.anything()
       )
       .thenReturn(<span>Mock SetupRobotCalibration</span>)
@@ -121,6 +122,7 @@ describe('ProtocolRunSetup', () => {
           robotName: ROBOT_NAME,
           runId: RUN_ID,
         }),
+        // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
         expect.anything()
       )
       .thenReturn(<span>Mock SetupLabware</span>)

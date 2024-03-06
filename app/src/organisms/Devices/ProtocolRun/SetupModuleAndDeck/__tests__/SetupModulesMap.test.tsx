@@ -165,7 +165,7 @@ describe('SetupModulesMap', () => {
           physicalPort: null,
           runId: MOCK_RUN_ID,
         }),
-        // @ts-expect-error This actually takes two args.
+        // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
         expect.anything()
       )
       .thenReturn(<div>mock module info {mockMagneticModule.model}</div>)
@@ -220,7 +220,7 @@ describe('SetupModulesMap', () => {
           physicalPort: mockMagneticModuleFixture.usbPort,
           runId: MOCK_RUN_ID,
         }),
-        // @ts-expect-error This actually takes two args.
+        // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
         expect.anything()
       )
       .thenReturn(<div>mock module info {mockMagneticModule.model} </div>)
@@ -233,7 +233,7 @@ describe('SetupModulesMap', () => {
           physicalPort: mockThermocyclerFixture.usbPort,
           runId: MOCK_RUN_ID,
         }),
-        // @ts-expect-error This actually takes two args.
+        // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
         expect.anything()
       )
       .thenReturn(<div>mock module info {mockTCModule.model} </div>)
@@ -296,7 +296,7 @@ describe('SetupModulesMap', () => {
           physicalPort: mockMagneticModuleFixture.usbPort,
           runId: MOCK_RUN_ID,
         }),
-        // @ts-expect-error This actually takes two args.
+        // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
         expect.anything()
       )
       .thenReturn(<div>mock module info {mockMagneticModule.model} </div>)
@@ -314,7 +314,7 @@ describe('SetupModulesMap', () => {
           },
           runId: MOCK_RUN_ID,
         }),
-        // @ts-expect-error This actually takes two args.
+        // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
         expect.anything()
       )
       .thenReturn(<div>mock module info {mockTCModule.model} </div>)

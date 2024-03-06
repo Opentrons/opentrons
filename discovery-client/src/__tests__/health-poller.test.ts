@@ -2,7 +2,7 @@ import nodeFetch from 'node-fetch'
 import isError from 'lodash/isError'
 import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
 
-import * as Fixtures from '../__fixtures__'
+import * as Fixtures from '../fixtures'
 import { createHealthPoller } from '../health-poller'
 
 import type { RequestInit, Response } from 'node-fetch'

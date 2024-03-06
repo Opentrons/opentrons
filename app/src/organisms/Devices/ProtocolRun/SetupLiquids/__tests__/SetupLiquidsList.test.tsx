@@ -89,6 +89,7 @@ describe('SetupLiquidsList', () => {
     when(vi.mocked(LiquidsLabwareDetailsModal))
       .calledWith(
         expect.objectContaining({ labwareId: '123', liquidId: '0' }),
+        // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
         expect.anything()
       )
       .thenReturn(<div>Mock liquids labware details modal</div>)

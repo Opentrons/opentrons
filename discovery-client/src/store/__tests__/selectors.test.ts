@@ -7,7 +7,7 @@ import {
   mockLegacyServerHealthResponse,
   mockHealthErrorJsonResponse,
   mockHealthFetchErrorResponse,
-} from '../../__fixtures__/health'
+} from '../../fixtures/health'
 
 import {
   HEALTH_STATUS_OK,

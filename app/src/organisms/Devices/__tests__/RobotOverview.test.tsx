@@ -5,10 +5,7 @@ import { screen, fireEvent } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
-import {
-  mockOT3HealthResponse,
-  mockOT3ServerHealthResponse,
-} from '@opentrons/discovery-client/src/__fixtures__'
+import * as DiscoveryClientFixtures from '../../../../../discovery-client/src/fixtures'
 import { useAuthorization } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
@@ -80,8 +77,8 @@ const MOCK_STATE: State = {
       [mockConnectableRobot.name]: mockConnectableRobot,
       buzz: {
         name: 'buzz',
-        health: mockOT3HealthResponse,
-        serverHealth: mockOT3ServerHealthResponse,
+        health: DiscoveryClientFixtures.mockOT3HealthResponse,
+        serverHealth: DiscoveryClientFixtures.mockOT3ServerHealthResponse,
         addresses: [
           {
             ip: '10.0.0.4',

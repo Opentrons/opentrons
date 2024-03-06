@@ -6,7 +6,7 @@ import {
   mockOT2ServerHealthResponse,
   mockOT3HealthResponse,
   mockOT3ServerHealthResponse,
-} from '../__fixtures__'
+} from '../fixtures'
 import { HEALTH_STATUS_OK } from '../constants'
 import * as HealthPollerModule from '../health-poller'
 import * as MdnsBrowserModule from '../mdns-browser'

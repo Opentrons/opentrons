@@ -104,6 +104,7 @@ module.exports = {
         '**/__mocks__/**.@(js|ts|tsx)',
         '**/__utils__/**.@(js|ts|tsx)',
         '**/__fixtures__/**.@(js|ts|tsx)',
+        '**/fixtures/**.@(js|ts|tsx)',
         'scripts/*.@(js|ts|tsx)',
       ],
       env: {

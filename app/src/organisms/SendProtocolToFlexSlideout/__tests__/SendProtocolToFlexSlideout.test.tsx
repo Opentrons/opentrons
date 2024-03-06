@@ -7,7 +7,7 @@ import { StaticRouter } from 'react-router-dom'
 import {
   mockOT3HealthResponse,
   mockOT3ServerHealthResponse,
-} from '@opentrons/discovery-client/src/__fixtures__'
+} from '../../../../../discovery-client/src/fixtures'
 import { useCreateProtocolMutation } from '@opentrons/react-api-client'
 
 import { mockSuccessQueryResults } from '../../../__fixtures__'
