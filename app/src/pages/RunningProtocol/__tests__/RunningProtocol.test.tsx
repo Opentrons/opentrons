@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { UseQueryResult } from 'react-query'
 import { Route, MemoryRouter } from 'react-router-dom'
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
+import { vi, it, describe, expect, beforeEach, afterEach, Mock } from 'vitest'
 import { when } from 'vitest-when'
 
 import {
@@ -27,6 +27,7 @@ import {
   useRunStatus,
   useRunTimestamps,
 } from '../../../organisms/RunTimeControl/hooks'
+import { getLocalRobot } from '../../../redux/discovery'
 import { CancelingRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
 import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -64,9 +65,6 @@ const PROTOCOL_ANALYSIS = {
 const mockPlayRun = vi.fn()
 const mockPauseRun = vi.fn()
 const mockStopRun = vi.fn()
-const mockTrackProtocolRunEvent = vi.fn(
-  () => new Promise(resolve => resolve({}))
-)
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -90,6 +88,12 @@ describe('RunningProtocol', () => {
           },
         },
       } as any)
+    vi.mocked(getLocalRobot).mockReturnValue({ name: ROBOT_NAME } as any)
+    when(vi.mocked(useTrackProtocolRunEvent))
+      .calledWith(RUN_ID, ROBOT_NAME)
+      .thenReturn({
+        trackProtocolRunEvent: vi.fn(),
+      })
     when(vi.mocked(useRunStatus)).calledWith(RUN_ID).thenReturn(RUN_STATUS_IDLE)
     when(vi.mocked(useProtocolAnalysesQuery))
       .calledWith(PROTOCOL_ID, { staleTime: Infinity }, expect.any(Boolean))
@@ -120,11 +124,6 @@ describe('RunningProtocol', () => {
       isPauseRunActionLoading: false,
       isStopRunActionLoading: false,
     })
-    when(vi.mocked(useTrackProtocolRunEvent))
-      .calledWith(RUN_ID, ROBOT_NAME)
-      .thenReturn({
-        trackProtocolRunEvent: mockTrackProtocolRunEvent,
-      })
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(mockRobotSideAnalysis)
