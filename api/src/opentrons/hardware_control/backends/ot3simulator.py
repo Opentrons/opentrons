@@ -655,7 +655,7 @@ class OT3Simulator(FlexBackend):
         return None
 
     async def is_motor_engaged(self, axis: Axis) -> bool:
-        if not axis in self._engaged_axes.keys():
+        if axis not in self._engaged_axes.keys():
             return False
         return self._engaged_axes[axis]
 

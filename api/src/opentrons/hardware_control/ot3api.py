@@ -263,7 +263,9 @@ class OT3API(
             realmount == OT3Mount.LEFT
             and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
         ):
-            return not self.engaged_axes[Axis.by_mount(realmount)]
+            ax = Axis.by_mount(realmount)
+            if ax in self.engage_axes.keys():
+                return not self.engaged_axes[ax]
 
         return False
 
