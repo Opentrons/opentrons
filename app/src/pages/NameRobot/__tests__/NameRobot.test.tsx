@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
+import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 
@@ -94,7 +94,7 @@ describe('NameRobot', () => {
     })
   })
 
-  it('should show an error message when typing an existing name - connectable robot', async () => {
+  it('should show an error message when typing an existing name - connectable robot', () => {
     render()
     const input = screen.getByRole('textbox')
     fireEvent.click(screen.getByRole('button', { name: 'c' }))
@@ -107,14 +107,11 @@ describe('NameRobot', () => {
     expect(input).toHaveValue('connect')
 
     fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
-    await waitFor(() =>
-      screen.queryByText(
-        'Oops! Name is already in use. Choose a different name.'
-      )
-    )
+
+    screen.queryByText('Oops! Name is already in use. Choose a different name.')
   })
 
-  it('should show an error message when typing an existing name - reachable robot', async () => {
+  it('should show an error message when typing an existing name - reachable robot', () => {
     render()
     const input = screen.getByRole('textbox')
     fireEvent.click(screen.getByRole('button', { name: 'r' }))
@@ -124,11 +121,8 @@ describe('NameRobot', () => {
     fireEvent.click(screen.getByRole('button', { name: 'h' }))
     expect(input).toHaveValue('reach')
     fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
-    await waitFor(() =>
-      screen.queryByText(
-        'Oops! Name is already in use. Choose a different name.'
-      )
-    )
+
+    screen.queryByText('Oops! Name is already in use. Choose a different name.')
   })
 
   it('should render text and button when coming from robot settings', () => {

@@ -2,7 +2,6 @@
 import { app } from 'electron'
 import Store from 'electron-store'
 import noop from 'lodash/noop'
-import { when } from 'vitest-when'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 
 import * as DiscoveryClient from '@opentrons/discovery-client'

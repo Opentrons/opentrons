@@ -210,7 +210,7 @@ describe('PickUpTip', () => {
     fireEvent.click(confirm)
     await new Promise((resolve, reject) => setTimeout(resolve))
 
-    waitFor(() => {
+    await waitFor(() => {
       expect(props.chainRunCommands).toHaveBeenNthCalledWith(
         1,
         [
@@ -222,7 +222,7 @@ describe('PickUpTip', () => {
         false
       )
     })
-    waitFor(() => {
+    await waitFor(() => {
       expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
         type: 'finalPosition',
         labwareId: 'labwareId1',
@@ -230,13 +230,13 @@ describe('PickUpTip', () => {
         position: { x: 10, y: 20, z: 30 },
       })
     })
-    waitFor(() => {
+    await waitFor(() => {
       expect(props.registerPosition).toHaveBeenNthCalledWith(2, {
         type: 'tipPickUpOffset',
         offset: { x: 9, y: 18, z: 27 },
       })
     })
-    waitFor(() => {
+    await waitFor(() => {
       expect(props.chainRunCommands).toHaveBeenNthCalledWith(
         2,
         [
@@ -260,7 +260,7 @@ describe('PickUpTip', () => {
     fireEvent.click(tryAgain)
     await new Promise((resolve, reject) => setTimeout(resolve))
 
-    waitFor(() => {
+    await waitFor(() => {
       expect(props.chainRunCommands).toHaveBeenNthCalledWith(
         3,
         [
@@ -285,7 +285,7 @@ describe('PickUpTip', () => {
         false
       )
     })
-    waitFor(() => {
+    await waitFor(() => {
       expect(props.registerPosition).toHaveBeenNthCalledWith(3, {
         type: 'tipPickUpOffset',
         offset: null,
@@ -321,7 +321,7 @@ describe('PickUpTip', () => {
     fireEvent.click(confirm)
     await new Promise((resolve, reject) => setTimeout(resolve))
 
-    waitFor(() => {
+    await waitFor(() => {
       expect(props.chainRunCommands).toHaveBeenNthCalledWith(
         1,
         [
@@ -333,7 +333,7 @@ describe('PickUpTip', () => {
         false
       )
     })
-    waitFor(() => {
+    await waitFor(() => {
       expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
         type: 'finalPosition',
         labwareId: 'labwareId1',
@@ -341,13 +341,13 @@ describe('PickUpTip', () => {
         position: { x: 10, y: 20, z: 30 },
       })
     })
-    waitFor(() => {
+    await waitFor(() => {
       expect(props.registerPosition).toHaveBeenNthCalledWith(2, {
         type: 'tipPickUpOffset',
         offset: { x: 9, y: 18, z: 27 },
       })
     })
-    waitFor(() => {
+    await waitFor(() => {
       expect(props.chainRunCommands).toHaveBeenNthCalledWith(
         2,
         [
@@ -371,7 +371,7 @@ describe('PickUpTip', () => {
     fireEvent.click(yesButton)
     await new Promise((resolve, reject) => setTimeout(resolve))
 
-    waitFor(() => {
+    await waitFor(() => {
       expect(props.chainRunCommands).toHaveBeenNthCalledWith(
         3,
         [

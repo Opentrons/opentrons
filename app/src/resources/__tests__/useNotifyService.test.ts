@@ -12,7 +12,7 @@ import {
   notifyUnsubscribeAction,
 } from '../../redux/shell'
 
-import { Mock } from 'vitest'
+import type { Mock } from 'vitest'
 import type { HostConfig } from '@opentrons/api-client'
 import type { QueryOptionsWithPolling } from '../useNotifyService'
 
