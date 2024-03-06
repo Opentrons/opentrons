@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { UseQueryResult } from 'react-query'
 import { Route, MemoryRouter } from 'react-router-dom'
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
@@ -36,6 +35,7 @@ import { RunningProtocol } from '..'
 import { useNotifyLastRunCommandKey } from '../../../resources/runs/useNotifyLastRunCommandKey'
 import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
 
+import type { UseQueryResult } from 'react-query'
 import type { ProtocolAnalyses } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')

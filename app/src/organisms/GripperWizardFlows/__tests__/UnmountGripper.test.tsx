@@ -1,13 +1,15 @@
 import * as React from 'react'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
+
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { instrumentsResponseFixture } from '@opentrons/api-client'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 
 import { UnmountGripper } from '../UnmountGripper'
 import { GRIPPER_FLOW_TYPES } from '../constants'
-import { fireEvent, screen, waitFor } from '@testing-library/react'
 
 vi.mock('@opentrons/react-api-client')
 

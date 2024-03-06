@@ -2,9 +2,10 @@ import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { ModalHeader } from '../ModalHeader'
 import { Modal } from '../Modal'
-import { renderWithProviders } from '../../../__testing-utils__'
 
 vi.mock('../ModalHeader')
 
