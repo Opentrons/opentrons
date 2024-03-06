@@ -23,8 +23,13 @@ export type RobotSettingsTab =
   | 'networking'
   | 'advanced'
   | 'feature-flags'
+  | 'privacy'
 
-export type AppSettingsTab = 'general' | 'advanced' | 'feature-flags'
+export type AppSettingsTab =
+  | 'general'
+  | 'privacy'
+  | 'advanced'
+  | 'feature-flags'
 
 export type ProtocolRunDetailsTab = 'setup' | 'module-controls' | 'run-preview'
 

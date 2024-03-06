@@ -123,9 +123,8 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
     vi.mocked(useDeckConfigurationQuery).mockReturnValue({
       data: [mockCutoutConfig],
     } as UseQueryResult<DeckConfiguration>)
-    when(vi.mocked(useAttachedModules))
-      .calledWith()
-      .thenReturn([
+   vi.mocked(useAttachedModules)
+      .mockReturnValue([
         mockMagneticModuleGen2,
         mockTemperatureModuleGen2,
         mockThermocycler,
@@ -147,11 +146,13 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
       .calledWith('1')
       .thenReturn(null)
     when(vi.mocked(useStoredProtocolAnalysis)).calledWith('1').thenReturn(null)
-    const { result } = renderHook(() => useModuleRenderInfoForProtocolById('1'))
+    const { result } = renderHook(() => useModuleRenderInfoForProtocolById('1', true))
     expect(result.current).toStrictEqual({})
   })
   it('should return module render info', () => {
-    const { result } = renderHook(() => useModuleRenderInfoForProtocolById('1'))
+    const { result } = renderHook(() =>
+      useModuleRenderInfoForProtocolById('1', true)
+    )
     expect(result.current).toStrictEqual({
       magneticModuleId: {
         conflictedFixture: mockCutoutConfig,

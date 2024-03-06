@@ -2,6 +2,9 @@
 import pytest
 from opentrons_shared_data.pipette.dev_types import PipetteNameType, PipetteModel
 from opentrons_shared_data.pipette import pipette_definition, types as pip_types
+from opentrons_shared_data.pipette.pipette_definition import (
+    PipetteBoundingBoxOffsetDefinition,
+)
 
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocol_engine.types import FlowRates
@@ -12,6 +15,7 @@ from opentrons.protocol_engine.resources.pipette_data_provider import (
 
 from opentrons.protocol_engine.resources import pipette_data_provider as subject
 from ..pipette_fixtures import get_default_nozzle_map
+from opentrons.types import Point
 
 
 @pytest.fixture
@@ -52,6 +56,8 @@ def test_get_virtual_pipette_static_config(
             "opentrons/opentrons_96_tiprack_20ul/1": 8.25,
         },
         nozzle_map=result.nozzle_map,
+        back_left_corner_offset=Point(0, 0, 10.45),
+        front_right_corner_offset=Point(0, 0, 10.45),
     )
 
 
@@ -78,6 +84,8 @@ def test_configure_virtual_pipette_for_volume(
         tip_configuration_lookup_table=result1.tip_configuration_lookup_table,
         nominal_tip_overlap=result1.nominal_tip_overlap,
         nozzle_map=result1.nozzle_map,
+        back_left_corner_offset=Point(-8.0, -22.0, -259.15),
+        front_right_corner_offset=Point(-8.0, -22.0, -259.15),
     )
     subject_instance.configure_virtual_pipette_for_volume(
         "my-pipette", 1, result1.model
@@ -101,6 +109,8 @@ def test_configure_virtual_pipette_for_volume(
         tip_configuration_lookup_table=result2.tip_configuration_lookup_table,
         nominal_tip_overlap=result2.nominal_tip_overlap,
         nozzle_map=result2.nozzle_map,
+        back_left_corner_offset=Point(-8.0, -22.0, -259.15),
+        front_right_corner_offset=Point(-8.0, -22.0, -259.15),
     )
 
 
@@ -127,6 +137,8 @@ def test_load_virtual_pipette_by_model_string(
         tip_configuration_lookup_table=result.tip_configuration_lookup_table,
         nominal_tip_overlap=result.nominal_tip_overlap,
         nozzle_map=result.nozzle_map,
+        back_left_corner_offset=Point(-16.0, 43.15, 35.52),
+        front_right_corner_offset=Point(16.0, -43.15, 35.52),
     )
 
 
@@ -209,6 +221,10 @@ def test_get_pipette_static_config(
         "default_push_out_volume": 3,
         "supported_tips": {pip_types.PipetteTipType.t300: supported_tip_fixture},
         "current_nozzle_map": dummy_nozzle_map,
+        "pipette_bounding_box_offsets": PipetteBoundingBoxOffsetDefinition(
+            backLeftCorner=[10, 20, 30],
+            frontRightCorner=[40, 50, 60],
+        ),
     }
 
     result = subject.get_pipette_static_config(pipette_dict)
@@ -235,4 +251,6 @@ def test_get_pipette_static_config(
         nozzle_offset_z=0,
         home_position=0,
         nozzle_map=dummy_nozzle_map,
+        back_left_corner_offset=Point(10, 20, 30),
+        front_right_corner_offset=Point(40, 50, 60),
     )

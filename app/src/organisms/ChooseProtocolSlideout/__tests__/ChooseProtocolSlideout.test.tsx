@@ -11,11 +11,13 @@ import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/
 import { useTrackCreateProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { useCreateRunFromProtocol } from '../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { ChooseProtocolSlideout } from '../'
+import { useNotifyService } from '../../../resources/useNotifyService'
 
 vi.mock('../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol')
 vi.mock('../../../redux/protocol-storage')
 vi.mock('../../../organisms/Devices/hooks')
 vi.mock('../../../redux/config')
+vi.mock('../../../resources/useNotifyService')
 
 const render = (props: React.ComponentProps<typeof ChooseProtocolSlideout>) => {
   return renderWithProviders(
@@ -44,6 +46,7 @@ describe('ChooseProtocolSlideout', () => {
     vi.mocked(useTrackCreateProtocolRunEvent).mockReturnValue({
       trackCreateProtocolRunEvent: mockTrackCreateProtocolRunEvent,
     })
+      vi.mocked(useNotifyService).mockReturnValue({} as any)
   })
 
   it('renders slideout if showSlideout true', () => {

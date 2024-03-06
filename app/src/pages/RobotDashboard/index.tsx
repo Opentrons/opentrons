@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { useHistory } from 'react-router-dom'
 
 import {
   COLORS,
@@ -18,10 +17,7 @@ import {
   RecentRunProtocolCarousel,
 } from '../../organisms/OnDeviceDisplay/RobotDashboard'
 import { getOnDeviceDisplaySettings } from '../../redux/config'
-import {
-  getAnalyticsOptInSeen,
-  getAnalyticsOptedIn,
-} from '../../redux/analytics'
+import { AnalyticsOptInModal } from './AnalyticsOptInModal'
 import { WelcomeModal } from './WelcomeModal'
 import { RunData } from '@opentrons/api-client'
 import { ServerInitializing } from '../../organisms/OnDeviceDisplay/RobotDashboard/ServerInitializing'
@@ -42,14 +38,10 @@ export function RobotDashboard(): JSX.Element {
   const [showWelcomeModal, setShowWelcomeModal] = React.useState<boolean>(
     unfinishedUnboxingFlowRoute !== null
   )
-
-  const seen = useSelector(getAnalyticsOptInSeen)
-  const hasOptedIn = useSelector(getAnalyticsOptedIn)
-  const history = useHistory()
-
-  if (!seen || !hasOptedIn) {
-    history.push('/privacy-policy')
-  }
+  const [
+    showAnalyticsOptInModal,
+    setShowAnalyticsOptInModal,
+  ] = React.useState<boolean>(false)
 
   const recentRunsOfUniqueProtocols = (allRunsQueryData?.data ?? [])
     .reverse() // newest runs first
@@ -96,7 +88,15 @@ export function RobotDashboard(): JSX.Element {
         gridGap={SPACING.spacing16}
       >
         {showWelcomeModal ? (
-          <WelcomeModal setShowWelcomeModal={setShowWelcomeModal} />
+          <WelcomeModal
+            setShowAnalyticsOptInModal={setShowAnalyticsOptInModal}
+            setShowWelcomeModal={setShowWelcomeModal}
+          />
+        ) : null}
+        {showAnalyticsOptInModal ? (
+          <AnalyticsOptInModal
+            setShowAnalyticsOptInModal={setShowAnalyticsOptInModal}
+          />
         ) : null}
         {contents}
       </Flex>

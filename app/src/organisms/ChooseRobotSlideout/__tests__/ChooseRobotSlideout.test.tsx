@@ -20,6 +20,7 @@ import {
 } from '../../../redux/discovery/__fixtures__'
 import { getNetworkInterfaces } from '../../../redux/networking'
 import { ChooseRobotSlideout } from '..'
+import { useNotifyService } from '../../../resources/useNotifyService'
 
 vi.mock('../../../redux/discovery')
 vi.mock('../../../redux/robot-update')
@@ -51,6 +52,7 @@ describe('ChooseRobotSlideout', () => {
       wifi: null,
       ethernet: null,
     })
+      vi.mocked(useNotifyService).mockReturnValue({} as any)
   })
 
   it('renders slideout if isExpanded true', () => {

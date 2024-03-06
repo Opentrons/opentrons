@@ -1,19 +1,27 @@
 import * as React from 'react'
-import { expect, vi, it, describe, beforeEach } from 'vitest'
-import { when } from 'vitest-when'
+import { when } from 'jest-when'
 import { fireEvent, screen } from '@testing-library/react'
+import { renderWithProviders } from '@opentrons/components'
 
-import { renderWithProviders } from '../../__testing-utils__'
+import { getLocalRobot } from '../../redux/discovery'
+import { mockConnectableRobot } from '../../redux/discovery/__fixtures__'
 import { i18n } from '../../i18n'
 import { appRestart } from '../../redux/shell'
 import { useTrackEvent, ANALYTICS_ODD_APP_ERROR } from '../../redux/analytics'
 import { OnDeviceDisplayAppFallback } from '../OnDeviceDisplayAppFallback'
 
-import type { Mock } from 'vitest'
 import type { FallbackProps } from 'react-error-boundary'
+import type {Mock} from 'vitest'
 
 vi.mock('../../redux/shell')
 vi.mock('../../redux/analytics')
+vi.mock('../../redux/discovery', async (importOriginal) => {
+  const actual = await importOriginal<typeof getLocalRobot>()
+  return {
+    ...actual,
+    getLocalRobot: vi.fn()
+  }
+})
 
 const mockError = {
   message: 'mock error',
@@ -25,9 +33,12 @@ const render = (props: FallbackProps) => {
   })
 }
 
+let mockTrackEvent: Mock
+
+const MOCK_ROBOT_SERIAL_NUMBER = 'OT123'
+
 describe('OnDeviceDisplayAppFallback', () => {
   let props: FallbackProps
-  let mockTrackEvent: Mock
 
   beforeEach(() => {
     props = {
@@ -35,7 +46,14 @@ describe('OnDeviceDisplayAppFallback', () => {
       resetErrorBoundary: {} as any,
     } as FallbackProps
     mockTrackEvent = vi.fn()
-    when(vi.mocked(useTrackEvent)).calledWith().thenReturn(mockTrackEvent)
+    when(vi.mocked(useTrackEvent)).calledWith().mockReturnValue(mockTrackEvent)
+    when(vi.mocked(getLocalRobot)).mockReturnValue({
+      ...mockConnectableRobot,
+      health: {
+        ...mockConnectableRobot.health,
+        robot_serial: MOCK_ROBOT_SERIAL_NUMBER,
+      },
+    })
   })
 
   it('should render text and button', () => {
@@ -52,7 +70,10 @@ describe('OnDeviceDisplayAppFallback', () => {
     fireEvent.click(screen.getByText('Restart touchscreen'))
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_ODD_APP_ERROR,
-      properties: { errorMessage: 'mock error' },
+      properties: {
+        errorMessage: 'mock error',
+        robotSerialNumber: MOCK_ROBOT_SERIAL_NUMBER,
+      },
     })
     expect(vi.mocked(appRestart)).toHaveBeenCalled()
   })

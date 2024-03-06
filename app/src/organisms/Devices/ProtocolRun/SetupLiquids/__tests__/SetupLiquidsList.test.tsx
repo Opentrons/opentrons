@@ -25,6 +25,7 @@ import {
   getTotalVolumePerLiquidLabwarePair,
 } from '../utils'
 import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
+import { useNotifyRunQuery } from '../../../../../resources/runs/useNotifyRunQuery'
 
 import type { Mock } from 'vitest'
 
@@ -93,6 +94,7 @@ describe('SetupLiquidsList', () => {
         expect.anything()
       )
       .thenReturn(<div>Mock liquids labware details modal</div>)
+      vi.mocked(useNotifyRunQuery).mockReturnValue({} as any)
   })
 
   it('renders the total volume of the liquid, sample display name, and description', () => {

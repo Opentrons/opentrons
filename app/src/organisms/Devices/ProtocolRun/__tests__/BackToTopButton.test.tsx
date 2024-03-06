@@ -2,7 +2,9 @@ import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 import { StaticRouter } from 'react-router-dom'
-import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
+import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
+
+import {Tooltip} from '@opentrons/components'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
@@ -11,13 +13,26 @@ import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '../../../../redux/analytics'
 import { BackToTopButton } from '../BackToTopButton'
+import { useRobot } from '../../hooks'
+import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 
 import type { Mock } from 'vitest'
 
+vi.mock('@opentrons/components', async (importOriginal) => {
+  const actual = await importOriginal<typeof Tooltip>()
+  return {
+    ...actual,
+    Tooltip: vi.fn(({ children }) => <div>{children}</div>)
+  }
+})
 vi.mock('../../../../redux/analytics')
+vi.mock('../../hooks')
+
+
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
+const ROBOT_SERIAL_NUMBER = 'OT123'
 
 const render = () => {
   return renderWithProviders(
@@ -41,8 +56,15 @@ describe('BackToTopButton', () => {
   beforeEach(() => {
     mockTrackEvent = vi.fn()
     when(vi.mocked(useTrackEvent)).calledWith().thenReturn(mockTrackEvent)
+      vi.mocked(useRobot).mockReturnValue({
+      ...mockConnectableRobot,
+      health: {
+        ...mockConnectableRobot.health,
+        robot_serial: ROBOT_SERIAL_NUMBER,
+      },
+    })
   })
-  afterEach(() => {
+    afterEach(() => {
     vi.clearAllMocks()
   })
 
@@ -61,7 +83,10 @@ describe('BackToTopButton', () => {
     fireEvent.click(button)
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-      properties: { sourceLocation: 'test run button' },
+      properties: {
+        sourceLocation: 'test run button',
+        robotSerialNumber: ROBOT_SERIAL_NUMBER,
+      },
     })
   })
 

@@ -13,7 +13,7 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
 })<SecondaryButtonProps>`
   appearance: none;
   cursor: pointer;
-  color: ${props => (props.isDangerous ? COLORS.red60 : COLORS.blue50)};
+  color: ${props => (props.isDangerous ? COLORS.red50 : COLORS.blue50)};
   border: ${BORDERS.lineBorder};
   border-color: ${props => (props.isDangerous ? COLORS.red50 : 'initial')};
   border-radius: ${BORDERS.radiusSoftCorners};
@@ -28,7 +28,7 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   }
 
   &:hover {
-    color: ${props => (props.isDangerous ? COLORS.red60 : COLORS.blue60)};
+    color: ${props => (props.isDangerous ? COLORS.red50 : COLORS.blue60)};
     border-color: ${props =>
       props.isDangerous ? COLORS.red50 : COLORS.blue55};
     box-shadow: 0 0 0;
@@ -45,7 +45,7 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
     box-shadow: none;
     color: ${props => (props.isDangerous ? COLORS.red60 : COLORS.blue55)};
     border-color: ${props =>
-      props.isDangerous ? COLORS.red50 : COLORS.blue55};
+      props.isDangerous ? COLORS.red60 : COLORS.blue55};
   }
 
   &:disabled,

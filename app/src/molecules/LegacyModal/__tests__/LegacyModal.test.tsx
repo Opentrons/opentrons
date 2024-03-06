@@ -51,4 +51,14 @@ describe('LegacyModal', () => {
       `background-color: ${COLORS.white}`
     )
   })
+
+  it('should supply a default margin to account for the sidebar, aligning the modal in the center of the app', () => {
+    render(props)
+    expect(screen.getByLabelText('ModalShell_ModalArea')).toHaveStyle(
+      'width: 31.25rem'
+    )
+    expect(screen.getByLabelText('ModalShell_ModalArea')).toHaveStyle(
+      'margin-left: 5.656rem'
+    )
+  })
 })

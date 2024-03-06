@@ -1053,9 +1053,17 @@ class ProtocolContext(CommandPublisher):
         For instance, ``deck[1]``, ``deck["1"]``, and ``deck["D1"]``
         will all return the object loaded in the front-left slot.
 
-        The value will be a :py:obj:`~opentrons.protocol_api.Labware` if the slot contains a
-        labware, a module context if the slot contains a hardware
-        module, or ``None`` if the slot doesn't contain anything.
+        The value for each key depends on what is loaded in the slot:
+          - A :py:obj:`~opentrons.protocol_api.Labware` if the slot contains a labware.
+          - A module context if the slot contains a hardware module.
+          - ``None`` if the slot doesn't contain anything.
+
+        A module that occupies multiple slots is set as the value for all of the
+        relevant slots. Currently, the only multiple-slot module is the Thermocycler.
+        When loaded, the :py:class:`ThermocyclerContext` object is the value for
+        ``deck`` keys ``"A1"`` and ``"B1"`` on Flex, and ``7``, ``8``, ``10``, and
+        ``11`` on OT-2. In API version 2.13 and earlier, only slot 7 keyed to the
+        Thermocycler object, and slots 8, 10, and 11 keyed to ``None``.
 
         Rather than filtering the objects in the deck map yourself,
         you can also use :py:attr:`loaded_labwares` to get a dict of labwares
@@ -1071,6 +1079,9 @@ class ProtocolContext(CommandPublisher):
             commands continue immediately. If you need to physically move the labware to
             reflect the new deck state, add a :py:meth:`.pause` or use
             :py:meth:`.move_labware` instead.
+
+        .. versionchanged:: 2.14
+           Includes the Thermocycler in all of the slots it occupies.
 
         .. versionchanged:: 2.15
            ``del`` sets the corresponding labware's location to ``OFF_DECK``.

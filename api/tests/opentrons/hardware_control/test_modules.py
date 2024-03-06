@@ -240,7 +240,6 @@ async def test_module_update_integration(
     bootloader_kwargs = {
         "stdout": asyncio.subprocess.PIPE,
         "stderr": asyncio.subprocess.PIPE,
-        "loop": loop,
     }
 
     upload_via_avrdude_mock = mock.Mock(

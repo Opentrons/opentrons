@@ -9,6 +9,8 @@ import { mockTipRackDefinition } from '../../../../redux/custom-labware/__fixtur
 import { useRunPipetteInfoByMount } from '../../hooks'
 import { SetupPipetteCalibrationItem } from '../SetupPipetteCalibrationItem'
 import { SetupInstrumentCalibration } from '../SetupInstrumentCalibration'
+import { useNotifyRunQuery } from '../../../../resources/runs/useNotifyRunQuery'
+
 import type { PipetteInfo } from '../../hooks'
 
 vi.mock('../../hooks')
@@ -50,6 +52,7 @@ describe('SetupPipetteCalibration', () => {
     vi.mocked(SetupPipetteCalibrationItem).mockReturnValue(
       <div>Mock SetupPipetteCalibrationItem</div>
     )
+    vi.mocked(useNotifyRunQuery).mockReturnValue({} as any)
   })
   afterEach(() => {
     vi.clearAllMocks()

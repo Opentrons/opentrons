@@ -30,6 +30,7 @@ import {
   useRobot,
   useRunCalibrationStatus,
   useRunHasStarted,
+  useRunPipetteInfoByMount,
   useStoredProtocolAnalysis,
   useUnmatchedModulesForProtocol,
 } from '../../hooks'
@@ -39,6 +40,7 @@ import { SetupLiquids } from '../SetupLiquids'
 import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
 import { EmptySetupStep } from '../EmptySetupStep'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
+import { useNotifyRunQuery } from '../../../../resources/runs/useNotifyRunQuery'
 
 import type * as SharedData from '@opentrons/shared-data'
 
@@ -139,6 +141,10 @@ describe('ProtocolRunSetup', () => {
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     vi.mocked(getIsFixtureMismatch).mockReturnValue(false)
+      vi.mocked(useNotifyRunQuery).mockReturnValue({} as any)
+    when(vi.mocked(useRunPipetteInfoByMount))
+      .calledWith(RUN_ID)
+      .thenReturn({ left: null, right: null })
   })
   afterEach(() => {
     vi.resetAllMocks()

@@ -52,6 +52,7 @@ import { useDeckConfigurationCompatibility } from '../../../resources/deck_confi
 import { ConfirmAttachedModal } from '../../../pages/ProtocolSetup/ConfirmAttachedModal'
 import { ProtocolSetup } from '../../../pages/ProtocolSetup'
 import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
+import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 
 import type { UseQueryResult } from 'react-query'
 import type * as SharedData from '@opentrons/shared-data'
@@ -123,6 +124,7 @@ const render = (path = '/') => {
 
 const ROBOT_NAME = 'fake-robot-name'
 const RUN_ID = 'my-run-id'
+const ROBOT_SERIAL_NUMBER = 'OT123'
 const PROTOCOL_ID = 'my-protocol-id'
 const PROTOCOL_NAME = 'Mock Protocol Name'
 const CREATED_AT = 'top of the hour'
@@ -189,7 +191,14 @@ describe('ProtocolSetup', () => {
     vi.mocked(useLPCDisabledReason).mockReturnValue(null)
     vi.mocked(useAttachedModules).mockReturnValue([])
     vi.mocked(useModuleCalibrationStatus).mockReturnValue({ complete: true })
-    vi.mocked(getLocalRobot).mockReturnValue({ name: ROBOT_NAME } as any)
+    vi.mocked(getLocalRobot).mockReturnValue({
+      ...mockConnectableRobot,
+      name: ROBOT_NAME,
+      health: {
+        ...mockConnectableRobot.health,
+        robot_serial: ROBOT_SERIAL_NUMBER,
+      },
+    } as any)
     when(vi.mocked(useRobotType))
       .calledWith(ROBOT_NAME)
       .thenReturn(FLEX_ROBOT_TYPE)

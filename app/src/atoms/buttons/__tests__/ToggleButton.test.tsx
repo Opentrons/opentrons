@@ -38,7 +38,7 @@ describe('ToggleButton', () => {
     props.disabled = true
     render(props)
     const button = screen.getByLabelText('toggle button')
-    expect(button).toHaveStyle(`color: ${COLORS.grey40}`)
+    expect(button).toHaveStyle(`color: ${COLORS.grey30}`)
   })
 
   it('calls mock function when clicking the toggle button - on', () => {
@@ -63,7 +63,7 @@ describe('ToggleButton', () => {
     props.disabled = true
     render(props)
     const button = screen.getByLabelText('toggle button')
-    expect(button).toHaveStyle(`color: ${COLORS.grey40}`)
+    expect(button).toHaveStyle(`color: ${COLORS.grey30}`)
   })
 
   it('calls mock function when clicking the toggle button - off', () => {

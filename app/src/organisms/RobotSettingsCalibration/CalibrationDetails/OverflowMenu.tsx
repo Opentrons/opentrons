@@ -160,7 +160,7 @@ export function OverflowMenu({
       if (applicableTipLengthCal == null) return
       params = {
         calType,
-        tiprack_hash: applicableTipLengthCal.tiprack,
+        tiprack_uri: applicableTipLengthCal.uri,
         pipette_id: applicableTipLengthCal.pipette,
       }
     }

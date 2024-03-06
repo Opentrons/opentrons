@@ -1,12 +1,13 @@
 import * as React from 'react'
-import { Route, MemoryRouter } from 'react-router-dom'
-import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
+import { Route } from 'react-router'
+import { MemoryRouter } from 'react-router-dom'
 
-import { renderWithProviders } from '../../../__testing-utils__'
+import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
 import * as Config from '../../../redux/config'
 import { GeneralSettings } from '../GeneralSettings'
+import { PrivacySettings } from '../PrivacySettings'
 import { AdvancedSettings } from '../AdvancedSettings'
 import { FeatureFlags } from '../../../organisms/AppSettings/FeatureFlags'
 import { AppSettings } from '..'
@@ -37,6 +38,7 @@ describe('AppSettingsHeader', () => {
       <div>Mock Advanced Settings</div>
     )
     vi.mocked(FeatureFlags).mockReturnValue(<div>Mock Feature Flags</div>)
+      vi.mocked(PrivacySettings).mockReturnValue(<div>Mock Privacy Settings</div>)
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -46,6 +48,7 @@ describe('AppSettingsHeader', () => {
     const [{ getByText }] = render('/app-settings/general')
     getByText('App Settings')
     getByText('General')
+    getByText('Privacy')
     getByText('Advanced')
   })
   it('does not render feature flags link if dev tools disabled', () => {

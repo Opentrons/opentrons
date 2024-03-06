@@ -16,11 +16,13 @@ import { useDashboardCalibrateTipLength } from '../hooks/useDashboardCalibrateTi
 import { useDashboardCalibrateDeck } from '../hooks/useDashboardCalibrateDeck'
 import { expectedTaskList } from '../../../../organisms/Devices/hooks/__fixtures__/taskListFixtures'
 import { mockLeftProtoPipette } from '../../../../redux/pipettes/__fixtures__'
+import { useNotifyAllRunsQuery } from '../../../../resources/runs/useNotifyAllRunsQuery'
 
 vi.mock('../../../../organisms/Devices/hooks')
 vi.mock('../hooks/useDashboardCalibratePipOffset')
 vi.mock('../hooks/useDashboardCalibrateTipLength')
 vi.mock('../hooks/useDashboardCalibrateDeck')
+vi.mock('../../../../resources/runs/useNotifyAllRunsQuery')
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -49,6 +51,7 @@ describe('CalibrationDashboard', () => {
       left: mockLeftProtoPipette,
       right: null,
     })
+      vi.mocked(useNotifyAllRunsQuery).mockReturnValue({} as any)
   })
 
   it('renders a robot calibration dashboard title', () => {
