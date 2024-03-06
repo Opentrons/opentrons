@@ -1652,8 +1652,8 @@ describe('unsavedForm reducer', () => {
       // @ts-expect-error(sa, 2021-6-14): not a valid FormData Type
       'createPresavedStepFormMockResult'
     )
-    // @ts-expect-error(sa, 2021-6-14): not valid InitialDeckSetup state
     vi.mocked(_getInitialDeckSetupRootState).mockReturnValue(
+      // @ts-expect-error(sa, 2021-6-14): not valid InitialDeckSetup state
       'initalDeckSetupValue'
     )
     const stateMock: RootState = {
