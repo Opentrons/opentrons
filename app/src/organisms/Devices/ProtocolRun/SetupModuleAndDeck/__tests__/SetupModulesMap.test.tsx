@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
 import * as React from 'react'
 import { when } from 'vitest-when'
 import { StaticRouter } from 'react-router-dom'
@@ -6,11 +8,7 @@ import { screen } from '@testing-library/react'
 
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import {
-  componentPropsMatcher,
-  partialComponentPropsMatcher,
-  renderWithProviders,
-} from '../../../../../__testing-utils__'
+import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import {
   mockThermocycler as mockThermocyclerFixture,
@@ -50,13 +48,10 @@ vi.mock('../../../../ProtocolSetupModulesAndDeck/utils')
 vi.mock('../../../ModuleInfo')
 vi.mock('../../../hooks')
 
-const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
-  typeof useMostRecentCompletedAnalysis
->
-const mockGetAttachedProtocolModuleMatches = getAttachedProtocolModuleMatches as jest.MockedFunction<
-  typeof getAttachedProtocolModuleMatches
->
-const mockModuleInfo = ModuleInfo as jest.MockedFunction<typeof ModuleInfo>
+// const vi.mocked(useMostRecentCompletedAnalysis) = useMostRecentCompletedAnalysis as jest.MockedFunction<
+//   typeof useMostRecentCompletedAnalysis
+// >
+// const vi.mocked(ModuleInfo) = ModuleInfo as jest.MockedFunction<typeof ModuleInfo>
 
 const render = (props: React.ComponentProps<typeof SetupModulesMap>) => {
   return renderWithProviders(
@@ -114,14 +109,14 @@ describe('SetupModulesMap', () => {
     props = {
       runId: MOCK_RUN_ID,
     }
-    when(mockUseMostRecentCompletedAnalysis)
+    when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(MOCK_RUN_ID)
       .thenReturn(({
         commands: [],
         labware: [],
         robotType: OT2_ROBOT_TYPE,
       } as unknown) as CompletedProtocolAnalysis)
-    when(mockGetAttachedProtocolModuleMatches).calledWith().thenReturn([])
+    vi.mocked(getAttachedProtocolModuleMatches).mockReturnValue([])
   })
 
   afterEach(() => {
@@ -130,10 +125,10 @@ describe('SetupModulesMap', () => {
 
   it('should render a deck WITHOUT modules if none passed (component will never be rendered in this circumstance)', () => {
     render(props)
-    expect(mockModuleInfo).not.toHaveBeenCalled()
+    expect(vi.mocked(ModuleInfo)).not.toHaveBeenCalled()
   })
   it('should render a deck WITH MoaM', () => {
-    when(mockGetAttachedProtocolModuleMatches).thenReturn([
+    vi.mocked(getAttachedProtocolModuleMatches).mockReturnValue([
       {
         moduleId: mockMagneticModule.moduleId,
         x: MOCK_MAGNETIC_MODULE_COORDS[0],
@@ -162,14 +157,16 @@ describe('SetupModulesMap', () => {
       },
     ])
 
-    when(mockModuleInfo)
+    when(vi.mocked(ModuleInfo))
       .calledWith(
-        partialComponentPropsMatcher({
+        expect.objectContaining({
           moduleModel: mockMagneticModule.model,
           isAttached: false,
           physicalPort: null,
           runId: MOCK_RUN_ID,
-        })
+        }),
+        // @ts-expect-error This actually takes two args.
+        expect.anything()
       )
       .thenReturn(<div>mock module info {mockMagneticModule.model}</div>)
 
@@ -180,7 +177,7 @@ describe('SetupModulesMap', () => {
   })
 
   it('should render a deck WITH modules', () => {
-    when(mockGetAttachedProtocolModuleMatches).thenReturn([
+    vi.mocked(getAttachedProtocolModuleMatches).mockReturnValue([
       {
         moduleId: mockMagneticModule.moduleId,
         x: MOCK_MAGNETIC_MODULE_COORDS[0],
@@ -215,25 +212,29 @@ describe('SetupModulesMap', () => {
       },
     ])
 
-    when(mockModuleInfo)
+    when(vi.mocked(ModuleInfo))
       .calledWith(
-        componentPropsMatcher({
+        expect.objectContaining({
           moduleModel: mockMagneticModule.model,
           isAttached: true,
           physicalPort: mockMagneticModuleFixture.usbPort,
           runId: MOCK_RUN_ID,
-        })
+        }),
+        // @ts-expect-error This actually takes two args.
+        expect.anything()
       )
       .thenReturn(<div>mock module info {mockMagneticModule.model} </div>)
 
-    when(mockModuleInfo)
+    when(vi.mocked(ModuleInfo))
       .calledWith(
-        componentPropsMatcher({
+        expect.objectContaining({
           moduleModel: mockTCModule.model,
           isAttached: true,
           physicalPort: mockThermocyclerFixture.usbPort,
           runId: MOCK_RUN_ID,
-        })
+        }),
+        // @ts-expect-error This actually takes two args.
+        expect.anything()
       )
       .thenReturn(<div>mock module info {mockTCModule.model} </div>)
 
@@ -246,7 +247,7 @@ describe('SetupModulesMap', () => {
     const dupModId = `${mockMagneticModule.moduleId}duplicate`
     const dupModPort = 10
 
-    when(mockGetAttachedProtocolModuleMatches).thenReturn([
+    vi.mocked(getAttachedProtocolModuleMatches).mockReturnValue([
       {
         moduleId: mockMagneticModule.moduleId,
         x: MOCK_MAGNETIC_MODULE_COORDS[0],
@@ -287,20 +288,22 @@ describe('SetupModulesMap', () => {
       },
     ])
 
-    when(mockModuleInfo)
+    when(vi.mocked(ModuleInfo))
       .calledWith(
-        componentPropsMatcher({
+        expect.objectContaining({
           moduleModel: mockMagneticModule.model,
           isAttached: true,
           physicalPort: mockMagneticModuleFixture.usbPort,
           runId: MOCK_RUN_ID,
-        })
+        }),
+        // @ts-expect-error This actually takes two args.
+        expect.anything()
       )
       .thenReturn(<div>mock module info {mockMagneticModule.model} </div>)
 
-    when(mockModuleInfo)
+    when(vi.mocked(ModuleInfo))
       .calledWith(
-        componentPropsMatcher({
+        expect.objectContaining({
           moduleModel: mockMagneticModule.model,
           isAttached: true,
           physicalPort: {
@@ -310,7 +313,9 @@ describe('SetupModulesMap', () => {
             path: '',
           },
           runId: MOCK_RUN_ID,
-        })
+        }),
+        // @ts-expect-error This actually takes two args.
+        expect.anything()
       )
       .thenReturn(<div>mock module info {mockTCModule.model} </div>)
 
