@@ -22,13 +22,13 @@ COL_TRIAL_CONVERSION = {
 
 
 def process_csv_directory(  # noqa: C901
-    data_directory: str, tips: List[int], trials: int
+    data_directory: str, tips: List[int], trials: int, make_graph: bool = False
 ) -> None:
     """Post process script csvs."""
     csv_files: List[str] = os.listdir(data_directory)
     summary: str = [f for f in csv_files if "CSVReport" in f][0]
     final_report_file: str = f"{data_directory}/final_report.csv"
-    # initalize our data structs
+    # initialize our data structs
     pressure_csvs = [f for f in csv_files if "pressure_sensor_data" in f]
     pressure_results_files: Dict[int, List[str]] = {}
     pressure_results: Dict[int, Dict[int, List[float]]] = {}
@@ -108,34 +108,36 @@ def process_csv_directory(  # noqa: C901
             # we want to line up the z height's of each trial at time==0
             # to do this we drop the results at the beginning of each of the trials
             # except for one with the longest tip (lower tip offset are longer tips)
-            min_tip_offset = min(tip_offsets[tip])
-            for tip in tips:
-                for trial in range(trials):
-                    for i in range(max_results_len):
-                        if tip_offsets[tip][trial] > min_tip_offset:
-                            # drop this pressure result
-                            pressure_results[tip][trial].pop(0)
-                            # we don't want to change the length of this array so just stretch out
-                            # the last value
-                            pressure_results[tip][trial].append(
-                                pressure_results[tip][trial][-1]
-                            )
-                            # decrement the offset while this is true so we can account for it later
-                            tip_offsets[tip][trial] -=  0.001 * results_settings[tip][0][0]
-                            # keep track of how this effects the plunger start position
-                            p_offsets[tip][trial] = (i+1) * 0.001 * results_settings[tip][0][1] * -1
-                        else:
-                            # we've lined up this trial so move to the next
-                            break
+            min_tip_offset = 0
+            if make_graph:
+                for tip in tips:
+                    min_tip_offset = min(tip_offsets[tip])
+                    for trial in range(trials):
+                        for i in range(max_results_len):
+                            if tip_offsets[tip][trial] > min_tip_offset:
+                                # drop this pressure result
+                                pressure_results[tip][trial].pop(0)
+                                # we don't want to change the length of this array so just stretch out
+                                # the last value
+                                pressure_results[tip][trial].append(
+                                    pressure_results[tip][trial][-1]
+                                )
+                                # decrement the offset while this is true so we can account for it later
+                                tip_offsets[tip][trial] -= 0.001 * results_settings[tip][0][0]
+                                # keep track of how this effects the plunger start position
+                                p_offsets[tip][trial] = (i+1) * 0.001 * results_settings[tip][0][1] * -1
+                            else:
+                                # we've lined up this trial so move to the next
+                                break
             # write the processed test data
             for tip in tips:
                 time = 0.0
                 final_report_writer.writerow(pressure_header_row)
-                menisucs_time = (meniscus_travel + min_tip_offset)/ results_settings[tip][0][0]
+                meniscus_time = (meniscus_travel + min_tip_offset) / results_settings[tip][0][0]
                 for i in range(max_results_len):
                     pressure_row: List[str] = [f"{time}"]
                     if isclose(
-                        time, menisucs_time,
+                        time, meniscus_time,
                         rel_tol=0.001,
                     ):
                         pressure_row.append("Meniscus")
