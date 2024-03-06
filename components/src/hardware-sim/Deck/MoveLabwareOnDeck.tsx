@@ -271,7 +271,7 @@ export function MoveLabwareOnDeck(
 /**
  * These animated components needs to be split out because react-spring and styled-components don't play nice
  * @see https://github.com/pmndrs/react-spring/issues/1515 */
-// @ts-expect-error see the above
+// @ts-expect-error(kk 2024-03-06): see the above
 const AnimatedG = styled(animated.g)<any>``
 
 interface WellProps {
