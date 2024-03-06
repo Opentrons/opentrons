@@ -31,7 +31,9 @@ export const Hints = (): JSX.Element | null => {
   }
 
   const makeHandleCloseClick = (hintKey: HintKey): (() => void) => {
-    return () => { removeHint(hintKey) }
+    return () => {
+      removeHint(hintKey)
+    }
   }
 
   const renderHintContents = (hintKey: HintKey): JSX.Element | null => {
@@ -145,31 +147,29 @@ export const Hints = (): JSX.Element | null => {
 
   const headingText = t(`hint.${hintKey}.title`)
   const hintIsAlert = HINT_IS_ALERT.includes(hintKey)
-  return (
-    createPortal(
-      <AlertModal alertOverlay heading={hintIsAlert ? headingText : null}>
-        {!hintIsAlert ? (
-          <div className={styles.heading}>{headingText}</div>
-        ) : null}
-        <div className={styles.hint_contents}>
-          {renderHintContents(hintKey)}
-        </div>
-        <div>
-          <DeprecatedCheckboxField
-            className={styles.dont_show_again}
-            label={t('hint.dont_show_again')}
-            onChange={() => { toggleRememberDismissal(rememberDismissal) }}
-            value={rememberDismissal}
-          />
-          <OutlineButton
-            className={styles.ok_button}
-            onClick={makeHandleCloseClick(hintKey)}
-          >
-            {t('button:ok')}
-          </OutlineButton>
-        </div>
-      </AlertModal>,
-      getMainPagePortalEl()
-    )
+  return createPortal(
+    <AlertModal alertOverlay heading={hintIsAlert ? headingText : null}>
+      {!hintIsAlert ? (
+        <div className={styles.heading}>{headingText}</div>
+      ) : null}
+      <div className={styles.hint_contents}>{renderHintContents(hintKey)}</div>
+      <div>
+        <DeprecatedCheckboxField
+          className={styles.dont_show_again}
+          label={t('hint.dont_show_again')}
+          onChange={() => {
+            toggleRememberDismissal(rememberDismissal)
+          }}
+          value={rememberDismissal}
+        />
+        <OutlineButton
+          className={styles.ok_button}
+          onClick={makeHandleCloseClick(hintKey)}
+        >
+          {t('button:ok')}
+        </OutlineButton>
+      </div>
+    </AlertModal>,
+    getMainPagePortalEl()
   )
 }

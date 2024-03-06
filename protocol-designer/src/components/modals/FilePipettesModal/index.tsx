@@ -354,7 +354,10 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
     const pipettes = reduce<FormPipettesByMount, PipetteFieldsData[]>(
       values.pipettesByMount,
       (acc, formPipette: FormPipette, mount): PipetteFieldsData[] => {
-        console.assert(mount === 'left' || mount === 'right', `invalid mount: ${mount}`) // this is mostly for flow
+        console.assert(
+          mount === 'left' || mount === 'right',
+          `invalid mount: ${mount}`
+        ) // this is mostly for flow
         // @ts-expect-error(sa, 2021-6-21): TODO validate that pipette names coming from the modal are actually valid pipette names on PipetteName type
         return formPipette &&
           formPipette.pipetteName &&

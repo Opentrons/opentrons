@@ -30,8 +30,7 @@ describe('useCreateLiveCommandMutation hook', () => {
 
   it('should issue the given live command when callback is called', async () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(createLiveCommand)
-    .mockResolvedValue({ data: 'something' } as any)
+    vi.mocked(createLiveCommand).mockResolvedValue({ data: 'something' } as any)
 
     const { result } = renderHook(() => useCreateLiveCommandMutation(), {
       wrapper,
@@ -51,8 +50,7 @@ describe('useCreateLiveCommandMutation hook', () => {
     const waitUntilComplete = true
     const timeout = 2000
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(createLiveCommand)
-    .mockResolvedValue({ data: 'something' } as any)
+    vi.mocked(createLiveCommand).mockResolvedValue({ data: 'something' } as any)
 
     const { result } = renderHook(() => useCreateLiveCommandMutation(), {
       wrapper,

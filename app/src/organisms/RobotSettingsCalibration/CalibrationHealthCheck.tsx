@@ -161,14 +161,16 @@ export function CalibrationHealthCheck({
           {t('fully_calibrate_before_checking_health')}
         </Tooltip>
       )}
-        {showCalBlockModal ? createPortal(
-          <AskForCalibrationBlockModal
-            onResponse={handleHealthCheck}
-            titleBarTitle={t('robot_calibration:health_check_title')}
-            closePrompt={() => setShowCalBlockModal(false)}
-          />,
-          getTopPortalEl()
-        ) : null}
+      {showCalBlockModal
+        ? createPortal(
+            <AskForCalibrationBlockModal
+              onResponse={handleHealthCheck}
+              titleBarTitle={t('robot_calibration:health_check_title')}
+              closePrompt={() => setShowCalBlockModal(false)}
+            />,
+            getTopPortalEl()
+          )
+        : null}
     </Flex>
   )
 }

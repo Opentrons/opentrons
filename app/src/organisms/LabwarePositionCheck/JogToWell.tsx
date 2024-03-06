@@ -192,46 +192,48 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
               onClick={handleConfirmPosition}
             />
           </Flex>
-          {showFullJogControls ? createPortal(
-            <LegacyModalShell
-              width="60rem"
-              height="33.5rem"
-              padding={SPACING.spacing32}
-              display="flex"
-              flexDirection={DIRECTION_COLUMN}
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-              header={
-                <StyledText
-                  as="h4"
-                  css={css`
-                      font-weight: ${TYPOGRAPHY.fontWeightBold};
-                      font-size: ${TYPOGRAPHY.fontSize28};
-                      line-height: ${TYPOGRAPHY.lineHeight36};
-                    `}
+          {showFullJogControls
+            ? createPortal(
+                <LegacyModalShell
+                  width="60rem"
+                  height="33.5rem"
+                  padding={SPACING.spacing32}
+                  display="flex"
+                  flexDirection={DIRECTION_COLUMN}
+                  justifyContent={JUSTIFY_SPACE_BETWEEN}
+                  header={
+                    <StyledText
+                      as="h4"
+                      css={css`
+                        font-weight: ${TYPOGRAPHY.fontWeightBold};
+                        font-size: ${TYPOGRAPHY.fontSize28};
+                        line-height: ${TYPOGRAPHY.lineHeight36};
+                      `}
+                    >
+                      {t('move_to_a1_position')}
+                    </StyledText>
+                  }
+                  footer={
+                    <SmallButton
+                      width="100%"
+                      textTransform={TYPOGRAPHY.textTransformCapitalize}
+                      buttonText={t('shared:close')}
+                      onClick={() => {
+                        setShowFullJogControls(false)
+                      }}
+                    />
+                  }
                 >
-                  {t('move_to_a1_position')}
-                </StyledText>
-              }
-              footer={
-                <SmallButton
-                  width="100%"
-                  textTransform={TYPOGRAPHY.textTransformCapitalize}
-                  buttonText={t('shared:close')}
-                  onClick={() => {
-                    setShowFullJogControls(false)
-                  }}
-                />
-              }
-            >
-              <JogControls
-                jog={(axis, direction, step, _onSuccess) =>
-                  handleJog(axis, direction, step, setJoggedPosition)
-                }
-                isOnDevice={true}
-              />
-            </LegacyModalShell>,
-            getTopPortalEl()
-          ) : null}
+                  <JogControls
+                    jog={(axis, direction, step, _onSuccess) =>
+                      handleJog(axis, direction, step, setJoggedPosition)
+                    }
+                    isOnDevice={true}
+                  />
+                </LegacyModalShell>,
+                getTopPortalEl()
+              )
+            : null}
         </Flex>
       ) : (
         <>

@@ -1,4 +1,3 @@
-
 import {
   SetTemperatureArgs,
   DeactivateTemperatureArgs,

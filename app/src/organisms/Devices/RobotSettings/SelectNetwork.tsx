@@ -99,38 +99,39 @@ export const SelectNetwork = ({
         onJoinOther={handleSelectJoinOther}
         isRobotBusy={isRobotBusy}
       />
-      {changeState.type != null && createPortal(
-        requestState != null ? (
-          <ResultModal
-            type={changeState.type}
-            ssid={changeState.ssid}
-            requestStatus={requestState.status}
-            error={
-              'error' in requestState &&
+      {changeState.type != null &&
+        createPortal(
+          requestState != null ? (
+            <ResultModal
+              type={changeState.type}
+              ssid={changeState.ssid}
+              requestStatus={requestState.status}
+              error={
+                'error' in requestState &&
                 requestState.error != null &&
                 'message' in requestState.error &&
                 requestState.error.message != null
-                ? requestState.error
-                : null
-            }
-            onClose={handleDone}
-          />
-        ) : (
-          <ConnectModal
-            robotName={robotName}
-            network={
-              // if we're connecting to a known network, pass it to the ConnectModal
-              // otherwise we're joining a hidden network, so set network to null
-              changeState.type === CONNECT ? changeState.network : null
-            }
-            wifiKeys={keys}
-            eapOptions={eapOptions}
-            onConnect={handleConnect}
-            onCancel={handleDone}
-          />
-        ),
-        getModalPortalEl()
-      )}
+                  ? requestState.error
+                  : null
+              }
+              onClose={handleDone}
+            />
+          ) : (
+            <ConnectModal
+              robotName={robotName}
+              network={
+                // if we're connecting to a known network, pass it to the ConnectModal
+                // otherwise we're joining a hidden network, so set network to null
+                changeState.type === CONNECT ? changeState.network : null
+              }
+              wifiKeys={keys}
+              eapOptions={eapOptions}
+              onConnect={handleConnect}
+              onCancel={handleDone}
+            />
+          ),
+          getModalPortalEl()
+        )}
     </>
   )
 }

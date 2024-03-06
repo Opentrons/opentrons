@@ -55,7 +55,7 @@ export function useCalibratePipetteOffset(
       if (
         dispatchedAction.type === Sessions.ENSURE_SESSION &&
         dispatchedAction.payload.sessionType ===
-        Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
+          Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
       ) {
         // @ts-expect-error(sa, 2021-05-26): avoiding src code change, use in operator to type narrow
         createRequestId.current = dispatchedAction.meta.requestId
@@ -68,7 +68,7 @@ export function useCalibratePipetteOffset(
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
         dispatchedAction.payload.command.command ===
-        Sessions.sharedCalCommands.JOG
+          Sessions.sharedCalCommands.JOG
       ) {
         // @ts-expect-error(sa, 2021-05-26): avoiding src code change, use in operator to type narrow
         jogRequestId.current = dispatchedAction.meta.requestId

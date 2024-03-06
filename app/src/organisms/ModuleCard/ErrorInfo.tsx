@@ -43,7 +43,7 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
   }
   const errorDetails =
     attachedModule.moduleType === HEATERSHAKER_MODULE_TYPE &&
-      attachedModule.data.errorDetails != null
+    attachedModule.data.errorDetails != null
       ? attachedModule.data.errorDetails
       : null
 
@@ -78,34 +78,36 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
           </Btn>
         </Flex>
       </Flex>
-      {showErrorDetails ? createPortal(
-        <LegacyModal
-          type="error"
-          title={t('module_name_error', {
-            moduleName: getModuleDisplayName(attachedModule.moduleModel),
-          })}
-          onClose={() => setShowErrorDetails(false)}
-        >
-          <Flex flexDirection={DIRECTION_COLUMN}>
-            {errorDetails != null ? (
-              <StyledText as="p">{errorDetails}</StyledText>
-            ) : null}
-            <StyledText as="p" marginBottom={SPACING.spacing16}>
-              {t('module_error_contact_support')}
-            </StyledText>
-          </Flex>
-          <Flex justifyContent={JUSTIFY_FLEX_END}>
-            <PrimaryButton
-              onClick={() => setShowErrorDetails(false)}
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
-              marginTop={SPACING.spacing16}
+      {showErrorDetails
+        ? createPortal(
+            <LegacyModal
+              type="error"
+              title={t('module_name_error', {
+                moduleName: getModuleDisplayName(attachedModule.moduleModel),
+              })}
+              onClose={() => setShowErrorDetails(false)}
             >
-              {t('shared:close')}
-            </PrimaryButton>
-          </Flex>
-        </LegacyModal>,
-        getTopPortalEl()
-      ) : null}
+              <Flex flexDirection={DIRECTION_COLUMN}>
+                {errorDetails != null ? (
+                  <StyledText as="p">{errorDetails}</StyledText>
+                ) : null}
+                <StyledText as="p" marginBottom={SPACING.spacing16}>
+                  {t('module_error_contact_support')}
+                </StyledText>
+              </Flex>
+              <Flex justifyContent={JUSTIFY_FLEX_END}>
+                <PrimaryButton
+                  onClick={() => setShowErrorDetails(false)}
+                  textTransform={TYPOGRAPHY.textTransformCapitalize}
+                  marginTop={SPACING.spacing16}
+                >
+                  {t('shared:close')}
+                </PrimaryButton>
+              </Flex>
+            </LegacyModal>,
+            getTopPortalEl()
+          )
+        : null}
     </Banner>
   )
 }

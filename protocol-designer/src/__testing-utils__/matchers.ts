@@ -1,6 +1,4 @@
-
 import type { Matcher } from '@testing-library/react'
-
 
 // Match things like <p>Some <strong>nested</strong> text</p>
 // Use with either string match: getByText(nestedTextMatcher("Some nested text"))

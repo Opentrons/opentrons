@@ -38,10 +38,7 @@ const Content = (props: ContentProps): JSX.Element => {
         </p>
       </div>
       <div className={styles.diagram_column}>
-        <img
-          src={footprintImage}
-          alt="labware footprint"
-        />
+        <img src={footprintImage} alt="labware footprint" />
       </div>
       <div className={styles.form_fields_column}>
         <TextField

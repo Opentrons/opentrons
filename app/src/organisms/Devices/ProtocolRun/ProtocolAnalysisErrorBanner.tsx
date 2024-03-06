@@ -63,31 +63,33 @@ export function ProtocolAnalysisErrorBanner(
           />
         </StyledText>
       </Flex>
-      {showErrorDetails ? createPortal(
-        <LegacyModal
-          type="error"
-          title={t('protocol_analysis_failure')}
-          onClose={handleToggleDetails}
-        >
-          {errors.map((error, index) => (
-            <StyledText as="p" key={index}>
-              {error?.detail}
-            </StyledText>
-          ))}
-          <Flex justifyContent={JUSTIFY_FLEX_END}>
-            <PrimaryButton
-              role="button"
-              aria-label="close_modal_button"
-              onClick={handleToggleDetails}
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
-              marginTop={SPACING.spacing16}
+      {showErrorDetails
+        ? createPortal(
+            <LegacyModal
+              type="error"
+              title={t('protocol_analysis_failure')}
+              onClose={handleToggleDetails}
             >
-              {t('shared:close')}
-            </PrimaryButton>
-          </Flex>
-        </LegacyModal>,
-        getTopPortalEl()
-      ) : null}
+              {errors.map((error, index) => (
+                <StyledText as="p" key={index}>
+                  {error?.detail}
+                </StyledText>
+              ))}
+              <Flex justifyContent={JUSTIFY_FLEX_END}>
+                <PrimaryButton
+                  role="button"
+                  aria-label="close_modal_button"
+                  onClick={handleToggleDetails}
+                  textTransform={TYPOGRAPHY.textTransformCapitalize}
+                  marginTop={SPACING.spacing16}
+                >
+                  {t('shared:close')}
+                </PrimaryButton>
+              </Flex>
+            </LegacyModal>,
+            getTopPortalEl()
+          )
+        : null}
     </Banner>
   )
 }

@@ -1,4 +1,3 @@
-
 import cloneDeep from 'lodash/cloneDeep'
 import range from 'lodash/range'
 import mapValues from 'lodash/mapValues'
@@ -271,7 +270,10 @@ function transferLikeSubsteps(args: {
   )
 
   if (!substepCommandCreator) {
-    console.assert(false, `transferLikeSubsteps could not make a command creator`)
+    console.assert(
+      false,
+      `transferLikeSubsteps could not make a command creator`
+    )
     return null
   }
 

@@ -19,11 +19,21 @@ beforeEach(() => {
   vi.mocked(addHint).mockReturnValue('addHintReturnValue' as any)
   vi.mocked(labwareIngredSelectors.getDeckHasLiquid).mockReturnValue(true)
   vi.mocked(uiModuleSelectors.getMagnetModuleHasLabware).mockReturnValue(false)
-  vi.mocked(uiModuleSelectors.getTemperatureModuleHasLabware).mockReturnValue(false)
-  vi.mocked(uiModuleSelectors.getThermocyclerModuleHasLabware).mockReturnValue(false)
-  vi.mocked(uiModuleSelectors.getSingleTemperatureModuleId).mockReturnValue(null)
-  vi.mocked(uiModuleSelectors.getSingleThermocyclerModuleId).mockReturnValue(null)
-  vi.mocked(fileDataSelectors.getRobotStateTimeline).mockReturnValue('mockGetRobotStateTimelineValue' as any)
+  vi.mocked(uiModuleSelectors.getTemperatureModuleHasLabware).mockReturnValue(
+    false
+  )
+  vi.mocked(uiModuleSelectors.getThermocyclerModuleHasLabware).mockReturnValue(
+    false
+  )
+  vi.mocked(uiModuleSelectors.getSingleTemperatureModuleId).mockReturnValue(
+    null
+  )
+  vi.mocked(uiModuleSelectors.getSingleThermocyclerModuleId).mockReturnValue(
+    null
+  )
+  vi.mocked(fileDataSelectors.getRobotStateTimeline).mockReturnValue(
+    'mockGetRobotStateTimelineValue' as any
+  )
 })
 describe('addAndSelectStepWithHints', () => {
   it('should dispatch addStep thunk, and no hints when no hints are applicable (eg pause step)', () => {
@@ -112,23 +122,25 @@ describe('addAndSelectStepWithHints', () => {
         vi.mocked(uiModuleSelectors.getMagnetModuleHasLabware).mockReturnValue(
           selectorValues.getMagnetModuleHasLabware
         )
-        vi.mocked(uiModuleSelectors.getTemperatureModuleHasLabware).mockReturnValue(
-          selectorValues.getTemperatureModuleHasLabware
-        )
-        vi.mocked(uiModuleSelectors.getThermocyclerModuleHasLabware).mockReturnValue(
-          selectorValues.getThermocyclerModuleHasLabware
-        )
-        vi.mocked(uiModuleSelectors.getSingleTemperatureModuleId).mockReturnValue(
-          selectorValues.getSingleTemperatureModuleId
-        )
-        vi.mocked(uiModuleSelectors.getSingleThermocyclerModuleId).mockReturnValue(
-          selectorValues.getSingleThermocyclerModuleId
-        )
+        vi.mocked(
+          uiModuleSelectors.getTemperatureModuleHasLabware
+        ).mockReturnValue(selectorValues.getTemperatureModuleHasLabware)
+        vi.mocked(
+          uiModuleSelectors.getThermocyclerModuleHasLabware
+        ).mockReturnValue(selectorValues.getThermocyclerModuleHasLabware)
+        vi.mocked(
+          uiModuleSelectors.getSingleTemperatureModuleId
+        ).mockReturnValue(selectorValues.getSingleTemperatureModuleId)
+        vi.mocked(
+          uiModuleSelectors.getSingleThermocyclerModuleId
+        ).mockReturnValue(selectorValues.getSingleThermocyclerModuleId)
         const payload = {
           stepType,
         }
         addAndSelectStepWithHints(payload)(dispatch, getState)
-        expect(vi.mocked(addHint).mock.calls).toEqual([['module_without_labware']])
+        expect(vi.mocked(addHint).mock.calls).toEqual([
+          ['module_without_labware'],
+        ])
         expect(dispatch.mock.calls).toEqual([
           [
             {

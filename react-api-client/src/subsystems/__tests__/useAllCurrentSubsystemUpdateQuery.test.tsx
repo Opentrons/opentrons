@@ -60,8 +60,7 @@ describe('useAllCurrentSubsystemUpdateQuery', () => {
 
   it('should return no data if the get current system updates request fails', () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(getCurrentAllSubsystemUpdates)
-    .mockRejectedValue('oh no')
+    vi.mocked(getCurrentAllSubsystemUpdates).mockRejectedValue('oh no')
 
     const { result } = renderHook(() => useCurrentAllSubsystemUpdatesQuery(), {
       wrapper,
@@ -71,8 +70,7 @@ describe('useAllCurrentSubsystemUpdateQuery', () => {
 
   it('should return current subsystem updates', async () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(getCurrentAllSubsystemUpdates)
-    .mockResolvedValue({
+    vi.mocked(getCurrentAllSubsystemUpdates).mockResolvedValue({
       data: CURRENT_SUBSYSTEM_UPDATES_RESPONSE,
     } as Response<CurrentSubsystemUpdates>)
 

@@ -1,4 +1,3 @@
-
 import { getIsTiprack } from '@opentrons/shared-data'
 import { uuid } from '../../utils'
 import { selectors as labwareDefSelectors } from '../../labware-defs'

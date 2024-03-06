@@ -47,19 +47,17 @@ export function ConfirmDeleteModal(props: Props): JSX.Element {
       onClick: onContinueClick,
     },
   ]
-  return (
-    createPortal(
-      <AlertModal
-        alertOverlay
-        restrictOuterScroll={false}
-        buttons={buttons}
-        onCloseClick={onCancelClick}
-        className={modalStyles.modal}
-        heading={t(`confirm_delete_modal.${modalType}.title`)}
-      >
-        <p>{t(`confirm_delete_modal.${modalType}.body`)}</p>
-      </AlertModal>,
-      getMainPagePortalEl()
-    )
+  return createPortal(
+    <AlertModal
+      alertOverlay
+      restrictOuterScroll={false}
+      buttons={buttons}
+      onCloseClick={onCancelClick}
+      className={modalStyles.modal}
+      heading={t(`confirm_delete_modal.${modalType}.title`)}
+    >
+      <p>{t(`confirm_delete_modal.${modalType}.body`)}</p>
+    </AlertModal>,
+    getMainPagePortalEl()
   )
 }

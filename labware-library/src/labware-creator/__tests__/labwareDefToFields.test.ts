@@ -4,7 +4,7 @@ import {
   fixture_12_trough,
   fixture_24_tuberack,
   fixture_96_plate,
-  fixture_irregular_example_1
+  fixture_irregular_example_1,
 } from '@opentrons/shared-data/labware/fixtures/2'
 
 vi.mock('../../definitions')

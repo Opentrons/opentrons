@@ -34,13 +34,14 @@ describe('getNextDefaultMagnetAction', () => {
     ]
     testCases.forEach(({ testMsg, orderedStepIds, expected }) => {
       it(testMsg, () => {
-        const savedForms:
-          Record<string, {
+        const savedForms: Record<
+          string,
+          {
             id: string
             stepType: StepType
             magnetAction: string
-          }>
-          = {
+          }
+        > = {
           e: {
             id: 'moduleId',
             stepType: 'magnet',

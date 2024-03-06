@@ -60,7 +60,7 @@ interface EstopMissingTouchscreenModalProps
   extends Omit<
     EstopMissingModalProps,
     'isDismissedModal' | 'setIsDismissedModal'
-  > { }
+  > {}
 
 function TouchscreenModal({
   robotName,
@@ -90,7 +90,7 @@ function TouchscreenModal({
 }
 
 interface EstopMissingDesktopModalProps
-  extends Omit<EstopMissingModalProps, 'isDismissedModal'> { }
+  extends Omit<EstopMissingModalProps, 'isDismissedModal'> {}
 
 function DesktopModal({
   robotName,

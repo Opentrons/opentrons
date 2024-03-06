@@ -234,7 +234,7 @@ export const ModuleWizardFlows = (
 
   const maintenanceRunId =
     maintenanceRunData?.data.id != null &&
-      maintenanceRunData?.data.id === createdMaintenanceRunId
+    maintenanceRunData?.data.id === createdMaintenanceRunId
       ? createdMaintenanceRunId
       : undefined
   const calibrateBaseProps = {
@@ -333,7 +333,7 @@ export const ModuleWizardFlows = (
         {...currentStep}
         {...calibrateBaseProps}
         isRobotMoving={isRobotMoving}
-        proceed={isRobotMoving ? () => { } : handleCleanUpAndClose}
+        proceed={isRobotMoving ? () => {} : handleCleanUpAndClose}
       />
     )
   }

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   fixture_tiprack_10_ul,
-  fixture_tiprack_300_ul
+  fixture_tiprack_300_ul,
 } from '@opentrons/shared-data/labware/fixtures/2'
 import { getTiprackOptions } from '../utils'
 

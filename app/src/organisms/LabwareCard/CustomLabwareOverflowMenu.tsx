@@ -135,38 +135,39 @@ export function CustomLabwareOverflowMenu(
           </MenuItem>
         </Flex>
       )}
-      {showDeleteConfirmation && createPortal(
-        <LegacyModal
-          type="warning"
-          title={t('delete_this_labware')}
-          onClose={handleCancelModal}
-        >
-          <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="p">{t('def_moved_to_trash')}</StyledText>
-            <StyledText as="p" paddingTop={SPACING.spacing8}>
-              {t('cannot-run-python-missing-labware')}
-            </StyledText>
-            <Flex
-              justifyContent={JUSTIFY_FLEX_END}
-              alignItems={ALIGN_CENTER}
-              marginTop={SPACING.spacing24}
-            >
-              <Btn
-                onClick={handleCancelModal}
-                textTransform={TYPOGRAPHY.textTransformCapitalize}
-                marginRight={SPACING.spacing24}
-                css={TYPOGRAPHY.linkPSemiBold}
+      {showDeleteConfirmation &&
+        createPortal(
+          <LegacyModal
+            type="warning"
+            title={t('delete_this_labware')}
+            onClose={handleCancelModal}
+          >
+            <Flex flexDirection={DIRECTION_COLUMN}>
+              <StyledText as="p">{t('def_moved_to_trash')}</StyledText>
+              <StyledText as="p" paddingTop={SPACING.spacing8}>
+                {t('cannot-run-python-missing-labware')}
+              </StyledText>
+              <Flex
+                justifyContent={JUSTIFY_FLEX_END}
+                alignItems={ALIGN_CENTER}
+                marginTop={SPACING.spacing24}
               >
-                {t('shared:cancel')}
-              </Btn>
-              <AlertPrimaryButton onClick={handleClickDelete}>
-                {t('yes_delete_def')}
-              </AlertPrimaryButton>
+                <Btn
+                  onClick={handleCancelModal}
+                  textTransform={TYPOGRAPHY.textTransformCapitalize}
+                  marginRight={SPACING.spacing24}
+                  css={TYPOGRAPHY.linkPSemiBold}
+                >
+                  {t('shared:cancel')}
+                </Btn>
+                <AlertPrimaryButton onClick={handleClickDelete}>
+                  {t('yes_delete_def')}
+                </AlertPrimaryButton>
+              </Flex>
             </Flex>
-          </Flex>
-        </LegacyModal>,
-        getTopPortalEl()
-      )}
+          </LegacyModal>,
+          getTopPortalEl()
+        )}
     </Flex>
   )
 }

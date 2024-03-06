@@ -48,7 +48,9 @@ describe('EditModules', () => {
       labware: {},
       additionalEquipmentOnDeck: {},
     })
-    vi.mocked(EditModulesModal).mockReturnValue(<div>mock EditModulesModal</div>)
+    vi.mocked(EditModulesModal).mockReturnValue(
+      <div>mock EditModulesModal</div>
+    )
     vi.mocked(getDismissedHints).mockReturnValue([hintKey])
   })
 

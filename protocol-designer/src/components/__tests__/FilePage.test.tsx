@@ -20,11 +20,11 @@ import type * as Components from '@opentrons/components'
 vi.mock('../../file-data/selectors')
 vi.mock('../../step-forms/selectors')
 vi.mock('../modules')
-vi.mock('@opentrons/components', async (importOriginal) => {
+vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof Components>()
   return {
     ...actual,
-    InstrumentGroup: () => (<div>mock InstrumentGroup</div>)
+    InstrumentGroup: () => <div>mock InstrumentGroup</div>,
   }
 })
 vi.mock('../modals/FilePipettesModal')
@@ -47,7 +47,9 @@ describe('File Page', () => {
       labware: {},
     })
     vi.mocked(EditModulesCard).mockReturnValue(<div>mock EditModulesCard</div>)
-    vi.mocked(FilePipettesModal).mockReturnValue(<div>mock FilePipettesModal</div>)
+    vi.mocked(FilePipettesModal).mockReturnValue(
+      <div>mock FilePipettesModal</div>
+    )
   })
   afterEach(() => {
     cleanup()

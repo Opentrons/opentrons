@@ -7,17 +7,16 @@ import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../localization'
 import { StagingAreaTile } from '../StagingAreaTile'
 
-import type * as Components  from '@opentrons/components'
+import type * as Components from '@opentrons/components'
 import type { FormState, WizardTileProps } from '../types'
 
-vi.mock('@opentrons/components', async (importOriginal) => {
+vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof Components>()
   return {
     ...actual,
-    DeckConfigurator: () => (<div>mock deck configurator</div>)
+    DeckConfigurator: () => <div>mock deck configurator</div>,
   }
 })
-
 
 const render = (props: React.ComponentProps<typeof StagingAreaTile>) => {
   return renderWithProviders(<StagingAreaTile {...props} />, {

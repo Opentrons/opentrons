@@ -53,8 +53,9 @@ describe('useDoorQuery hook', () => {
 
   it('should return lights response data', async () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(getDoorStatus)
-    .mockResolvedValue({ data: DOOR_RESPONSE } as Response<DoorStatus>)
+    vi.mocked(getDoorStatus).mockResolvedValue({
+      data: DOOR_RESPONSE,
+    } as Response<DoorStatus>)
 
     const { result } = renderHook(() => useDoorQuery(), { wrapper })
 

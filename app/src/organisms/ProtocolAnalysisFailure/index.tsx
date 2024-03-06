@@ -86,29 +86,31 @@ export function ProtocolAnalysisFailure(
           />
         </StyledText>
       </Flex>
-      {showErrorDetails ? createPortal(
-        <LegacyModal
-          type="error"
-          title={t('protocol_analysis_failure')}
-          onClose={handleClickHideDetails}
-        >
-          {errors.map((error, index) => (
-            <StyledText key={index} as="p">
-              {error}
-            </StyledText>
-          ))}
-          <Flex justifyContent={JUSTIFY_FLEX_END}>
-            <PrimaryButton
-              onClick={handleClickHideDetails}
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
-              marginTop={SPACING.spacing16}
+      {showErrorDetails
+        ? createPortal(
+            <LegacyModal
+              type="error"
+              title={t('protocol_analysis_failure')}
+              onClose={handleClickHideDetails}
             >
-              {t('shared:close')}
-            </PrimaryButton>
-          </Flex>
-        </LegacyModal>,
-        getTopPortalEl()
-      ) : null}
+              {errors.map((error, index) => (
+                <StyledText key={index} as="p">
+                  {error}
+                </StyledText>
+              ))}
+              <Flex justifyContent={JUSTIFY_FLEX_END}>
+                <PrimaryButton
+                  onClick={handleClickHideDetails}
+                  textTransform={TYPOGRAPHY.textTransformCapitalize}
+                  marginTop={SPACING.spacing16}
+                >
+                  {t('shared:close')}
+                </PrimaryButton>
+              </Flex>
+            </LegacyModal>,
+            getTopPortalEl()
+          )
+        : null}
     </Banner>
   )
 }

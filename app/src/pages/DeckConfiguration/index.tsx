@@ -71,11 +71,11 @@ export function DeckConfigurationEditor(): JSX.Element {
       prevDeckConfig.map(fixture =>
         fixture.cutoutId === cutoutId
           ? {
-            ...fixture,
-            cutoutFixtureId: SINGLE_RIGHT_CUTOUTS.includes(cutoutId)
-              ? SINGLE_RIGHT_SLOT_FIXTURE
-              : SINGLE_LEFT_SLOT_FIXTURE,
-          }
+              ...fixture,
+              cutoutFixtureId: SINGLE_RIGHT_CUTOUTS.includes(cutoutId)
+                ? SINGLE_RIGHT_SLOT_FIXTURE
+                : SINGLE_LEFT_SLOT_FIXTURE,
+            }
           : fixture
       )
     )

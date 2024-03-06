@@ -109,8 +109,9 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     lastRunAnalysisCommandIndex >= 0 &&
     lastRunAnalysisCommandIndex <= analysisCommands.length - 1
   ) {
-    countOfTotalText = ` ${lastRunAnalysisCommandIndex + 1}/${analysisCommands.length
-      }`
+    countOfTotalText = ` ${lastRunAnalysisCommandIndex + 1}/${
+      analysisCommands.length
+    }`
   } else if (
     lastRunAnalysisCommandIndex === -1 &&
     lastRunCommand?.key != null &&
@@ -183,32 +184,37 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   return (
     <>
       {interventionModalCommandKey != null &&
-        lastRunCommand != null &&
-        isInterventionCommand(lastRunCommand) &&
-        analysisCommands != null &&
-        runStatus != null &&
-        runData != null &&
-        !TERMINAL_RUN_STATUSES.includes(runStatus) ? createPortal(
-          <InterventionModal
-            robotName={robotName}
-            command={lastRunCommand}
-            onResume={resumeRunHandler}
-            run={runData}
-            analysis={analysis}
-          />,
-          getTopPortalEl()
-        ) : null}
+      lastRunCommand != null &&
+      isInterventionCommand(lastRunCommand) &&
+      analysisCommands != null &&
+      runStatus != null &&
+      runData != null &&
+      !TERMINAL_RUN_STATUSES.includes(runStatus)
+        ? createPortal(
+            <InterventionModal
+              robotName={robotName}
+              command={lastRunCommand}
+              onResume={resumeRunHandler}
+              run={runData}
+              analysis={analysis}
+            />,
+            getTopPortalEl()
+          )
+        : null}
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex gridGap={SPACING.spacing8}>
-            <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>{`${runStatus != null && TERMINAL_RUN_STATUSES.includes(runStatus)
+            <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>{`${
+              runStatus != null && TERMINAL_RUN_STATUSES.includes(runStatus)
                 ? t('final_step')
                 : t('current_step')
-              }${runStatus === RUN_STATUS_IDLE
+            }${
+              runStatus === RUN_STATUS_IDLE
                 ? ':'
-                : ` ${countOfTotalText}${currentStepContents != null ? ': ' : ''
-                }`
-              }`}</StyledText>
+                : ` ${countOfTotalText}${
+                    currentStepContents != null ? ': ' : ''
+                  }`
+            }`}</StyledText>
 
             {currentStepContents}
           </Flex>
@@ -243,8 +249,8 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
               runHasNotBeenStarted
                 ? 0
                 : ((lastRunAnalysisCommandIndex + 1) /
-                  analysisCommands.length) *
-                100
+                    analysisCommands.length) *
+                  100
             }
             outerStyles={css`
               height: 0.375rem;

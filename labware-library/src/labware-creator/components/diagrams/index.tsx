@@ -28,8 +28,6 @@ import offsetHelpTextTipsImage from '../../images/offset_helpText_tips.svg'
 import type { WellBottomShape } from '@opentrons/shared-data'
 import type { LabwareType, WellShape } from '../../fields'
 
-
-
 interface HeightImgProps {
   labwareType: LabwareType | null | undefined
   aluminumBlockChildType: string | null | undefined
@@ -142,7 +140,7 @@ export const DepthImg = (props: DepthImgProps): JSX.Element | null => {
       const imgMap = {
         v: depthPlateVImage,
         flat: depthPlateFlatImage,
-        u: depthPlateRoundImage, 
+        u: depthPlateRoundImage,
       }
       const altMap = {
         v: 'v shaped well depth',

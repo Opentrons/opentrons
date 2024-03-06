@@ -55,8 +55,7 @@ describe('useDeleteCalibrationMutation hook', () => {
 
   it('should delete calibration data when calling the deleteCalibration callback', async () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(deleteCalibration)
-    .mockResolvedValue({
+    vi.mocked(deleteCalibration).mockResolvedValue({
       data: DELETE_CAL_DATA_RESPONSE,
     } as Response<EmptyResponse>)
 

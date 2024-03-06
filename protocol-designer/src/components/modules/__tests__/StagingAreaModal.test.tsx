@@ -11,11 +11,11 @@ import type * as Components from '@opentrons/components'
 vi.mock('../../../step-forms')
 vi.mock('../../../step-forms/selectors')
 vi.mock('../../../step-forms/actions/additionalItems')
-vi.mock('@opentrons/components', async (importOriginal) => {
+vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof Components>()
   return {
     ...actual,
-    DeckConfigurator: vi.fn(() => (<div>mock deck config</div>))
+    DeckConfigurator: vi.fn(() => <div>mock deck config</div>),
   }
 })
 

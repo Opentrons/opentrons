@@ -6,7 +6,11 @@ import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
 
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
-import { FLEX_ROBOT_TYPE, WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE, getDeckDefFromRobotType } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  getDeckDefFromRobotType,
+} from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
@@ -39,7 +43,9 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('../../../resources/runs/hooks')
 vi.mock('../../../redux/discovery')
 vi.mock('../../../organisms/Devices/hooks')
-vi.mock('../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock(
+  '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+)
 vi.mock('../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo')
 vi.mock('../utils')
 vi.mock('../SetupInstructionsModal')
@@ -121,7 +127,9 @@ describe('ProtocolSetupModulesAndDeck', () => {
       .thenReturn({
         complete: true,
       })
-    vi.mocked(ModuleWizardFlows).mockReturnValue(<div>mock ModuleWizardFlows</div>)
+    vi.mocked(ModuleWizardFlows).mockReturnValue(
+      <div>mock ModuleWizardFlows</div>
+    )
     vi.mocked(useChainLiveCommands).mockReturnValue({
       chainLiveCommands: mockChainLiveCommands,
     } as any)

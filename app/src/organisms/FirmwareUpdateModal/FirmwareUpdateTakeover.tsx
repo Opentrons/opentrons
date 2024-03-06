@@ -104,8 +104,8 @@ export function FirmwareUpdateTakeover(): JSX.Element {
   return (
     <>
       {instrumentsToUpdate.length > indexToUpdate &&
-        instrumentsToUpdate[indexToUpdate]?.subsystem != null &&
-        showUpdateNeededModal ? (
+      instrumentsToUpdate[indexToUpdate]?.subsystem != null &&
+      showUpdateNeededModal ? (
         <UpdateNeededModal
           subsystem={instrumentsToUpdate[indexToUpdate]?.subsystem}
           onClose={() => {
@@ -123,13 +123,15 @@ export function FirmwareUpdateTakeover(): JSX.Element {
           setInitiatedSubsystemUpdate={setInitiatedSubsystemUpdate}
         />
       ) : null}
-      {externalsubsystemUpdateData != null && maintenanceRunData == null ? createPortal(
-        <UpdateInProgressModal
-          percentComplete={externalsubsystemUpdateData.data.updateProgress}
-          subsystem={externalsubsystemUpdateData.data.subsystem}
-        />,
-        getTopPortalEl()
-      ) : null}
+      {externalsubsystemUpdateData != null && maintenanceRunData == null
+        ? createPortal(
+            <UpdateInProgressModal
+              percentComplete={externalsubsystemUpdateData.data.updateProgress}
+              subsystem={externalsubsystemUpdateData.data.subsystem}
+            />,
+            getTopPortalEl()
+          )
+        : null}
     </>
   )
 }

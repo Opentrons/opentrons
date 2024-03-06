@@ -205,14 +205,14 @@ export const LabwarePositionCheckComponent = (
     const dropTipToBeSafeCommands: DropTipCreateCommand[] = shouldUseMetalProbe
       ? []
       : (protocolData?.pipettes ?? []).map(pip => ({
-        commandType: 'dropTip' as const,
-        params: {
-          pipetteId: pip.id,
-          labwareId: FIXED_TRASH_ID,
-          wellName: 'A1',
-          wellLocation: { origin: 'default' as const },
-        },
-      }))
+          commandType: 'dropTip' as const,
+          params: {
+            pipetteId: pip.id,
+            labwareId: FIXED_TRASH_ID,
+            wellName: 'A1',
+            wellLocation: { origin: 'default' as const },
+          },
+        }))
     chainRunCommands(
       maintenanceRunId,
       [
@@ -418,12 +418,12 @@ export const LabwarePositionCheckComponent = (
         showConfirmation || isExiting
           ? undefined
           : () => {
-            if (fatalError != null) {
-              handleCleanUpAndClose()
-            } else {
-              confirmExitLPC()
+              if (fatalError != null) {
+                handleCleanUpAndClose()
+              } else {
+                confirmExitLPC()
+              }
             }
-          }
       }
     />
   )

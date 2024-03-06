@@ -1,4 +1,3 @@
-
 import last from 'lodash/last'
 import {
   getUnsavedForm,
@@ -268,7 +267,10 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
   if (unsavedPauseForm != null) {
     dispatch(_saveStepForm(unsavedPauseForm))
   } else {
-    console.assert(false, 'could not auto-save pause form, getUnsavedForm returned')
+    console.assert(
+      false,
+      'could not auto-save pause form, getUnsavedForm returned'
+    )
   }
 }
 
@@ -341,6 +343,9 @@ export const saveHeaterShakerFormWithAddedPauseUntilTemp: () => ThunkAction<any>
   if (unsavedPauseForm != null) {
     dispatch(_saveStepForm(unsavedPauseForm))
   } else {
-    console.assert(false, 'could not auto-save pause form, getUnsavedForm returned')
+    console.assert(
+      false,
+      'could not auto-save pause form, getUnsavedForm returned'
+    )
   }
 }

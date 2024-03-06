@@ -53,8 +53,9 @@ describe('useAllSessionsQuery hook', () => {
 
   it('should return all current robot sessions', async () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(getSessions)
-    .mockResolvedValue({ data: SESSIONS_RESPONSE } as Response<Sessions>)
+    vi.mocked(getSessions).mockResolvedValue({
+      data: SESSIONS_RESPONSE,
+    } as Response<Sessions>)
 
     const { result } = renderHook(useAllSessionsQuery, { wrapper })
 

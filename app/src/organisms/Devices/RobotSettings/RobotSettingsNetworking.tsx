@@ -99,13 +99,15 @@ export function RobotSettingsNetworking({
 
   return (
     <>
-      {showDisconnectModal ? createPortal(
-        <DisconnectModal
-          onCancel={() => setShowDisconnectModal(false)}
-          robotName={robotName}
-        />,
-        getModalPortalEl()
-      ) : null}
+      {showDisconnectModal
+        ? createPortal(
+            <DisconnectModal
+              onCancel={() => setShowDisconnectModal(false)}
+              robotName={robotName}
+            />,
+            getModalPortalEl()
+          )
+        : null}
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
         <Flex alignItems={ALIGN_CENTER}>
           {isFlexConnectedViaWifi ? (

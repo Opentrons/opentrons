@@ -208,8 +208,7 @@ describe('steps actions', () => {
       vi.restoreAllMocks()
     })
     it('should duplicate multiple steps with a new step ids, and select the new duplicated steps', () => {
-      vi 
-        .spyOn(utils, 'uuid')
+      vi.spyOn(utils, 'uuid')
         .mockReturnValueOnce('dup_1')
         .mockReturnValueOnce('dup_2')
         .mockReturnValueOnce('dup_3')
@@ -248,8 +247,7 @@ describe('steps actions', () => {
       ])
     })
     it('should duplicate multiple steps with a new step ids, and select the new duplicated steps even when provided in a non linear order', () => {
-      vi 
-        .spyOn(utils, 'uuid')
+      vi.spyOn(utils, 'uuid')
         .mockReturnValueOnce('dup_1')
         .mockReturnValueOnce('dup_2')
         .mockReturnValueOnce('dup_3')
@@ -316,7 +314,9 @@ describe('steps actions', () => {
           stepType: 'heaterShaker',
           targetHeaterShakerTemperature: '10',
         } as any)
-      vi.mocked(stepFormSelectors.getUnsavedFormIsPristineHeaterShakerForm).mockReturnValue(true)
+      vi.mocked(
+        stepFormSelectors.getUnsavedFormIsPristineHeaterShakerForm
+      ).mockReturnValue(true)
       vi.mocked(getRobotStateTimeline).mockReturnValue(mockRobotStateTimeline)
     })
 
@@ -457,7 +457,9 @@ describe('steps actions', () => {
           targetTemperature: 10,
           moduleId: 'mockTemp',
         } as any)
-      vi.mocked(stepFormSelectors.getUnsavedFormIsPristineSetTempForm).mockReturnValue(true)
+      vi.mocked(
+        stepFormSelectors.getUnsavedFormIsPristineSetTempForm
+      ).mockReturnValue(true)
       vi.mocked(getRobotStateTimeline).mockReturnValue(mockRobotStateTimeline)
     })
 

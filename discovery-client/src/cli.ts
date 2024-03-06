@@ -171,7 +171,7 @@ Yargs.options({
   .env('OT_DC')
   // @ts-expect-error
   .middleware([debugLogArgvMiddleware])
-    // @ts-expect-error
+  // @ts-expect-error
   .command(['$0', 'browse'], 'Browse for robots on the network', noop, browse)
   .command(
     'find [name]',

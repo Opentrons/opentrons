@@ -101,12 +101,12 @@ export const RobotOverviewOverflowMenu = (
     <Flex data-testid="RobotOverview_overflowMenu" position={POSITION_RELATIVE}>
       {showDisconnectModal
         ? createPortal(
-          <DisconnectModal
-            onCancel={() => setShowDisconnectModal(false)}
-            robotName={robot.name}
-          />,
-          getTopPortalEl()
-        )
+            <DisconnectModal
+              onCancel={() => setShowDisconnectModal(false)}
+              robotName={robot.name}
+            />,
+            getTopPortalEl()
+          )
         : null}
       <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
       {showOverflowMenu ? (
@@ -127,8 +127,8 @@ export const RobotOverviewOverflowMenu = (
           }}
         >
           {isRobotOnWrongVersionOfSoftware &&
-            !isRobotUnavailable &&
-            !isEstopNotDisengaged ? (
+          !isRobotUnavailable &&
+          !isEstopNotDisengaged ? (
             <MenuItem
               onClick={() => handleUpdateBuildroot(robot)}
               data-testid={`RobotOverviewOverflowMenu_updateSoftware_${String(

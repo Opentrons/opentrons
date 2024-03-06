@@ -101,7 +101,7 @@ export function FeatureFlagCard(): JSX.Element {
   }
   return (
     <>
-      {modalFlagName && (
+      {modalFlagName &&
         createPortal(
           <ContinueModal
             alertOverlay
@@ -125,8 +125,7 @@ export function FeatureFlagCard(): JSX.Element {
             </p>
           </ContinueModal>,
           getMainPagePortalEl()
-        )
-      )}
+        )}
       <Card title={t('card:title.feature_flags')}>
         <div className={styles.card_content}>
           {userFacingFlagRows.length > 0 ? userFacingFlagRows : noFlagsFallback}

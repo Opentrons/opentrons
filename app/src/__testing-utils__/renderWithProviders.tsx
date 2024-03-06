@@ -9,7 +9,7 @@ import { render } from '@testing-library/react'
 import { createStore } from 'redux'
 
 import type { PreloadedState, Store } from 'redux'
-import type { RenderOptions, RenderResult  } from '@testing-library/react'
+import type { RenderOptions, RenderResult } from '@testing-library/react'
 
 export interface RenderWithProvidersOptions<State> extends RenderOptions {
   initialState?: State

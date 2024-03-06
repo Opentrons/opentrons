@@ -99,8 +99,8 @@ function getStepIndexCheckingBothPipettes(
   return rank === CHECK_PIPETTE_RANK_FIRST
     ? STEPS_IN_ORDER_BOTH_PIPETTES.findIndex(step => step === currentStep)
     : STEPS_IN_ORDER_BOTH_PIPETTES.slice(9).findIndex(
-      step => step === currentStep
-    ) + 9
+        step => step === currentStep
+      ) + 9
 }
 
 export function CheckCalibration(
@@ -161,9 +161,9 @@ export function CheckCalibration(
   const checkBothPipettes = instruments?.length === 2
   const stepIndex = checkBothPipettes
     ? getStepIndexCheckingBothPipettes(
-      currentStep ?? null,
-      activePipette?.rank ?? null
-    )
+        currentStep ?? null,
+        activePipette?.rank ?? null
+      )
     : STEPS_IN_ORDER_ONE_PIPETTE.findIndex(step => step === currentStep) ?? 0
 
   if (!session || !activeTipRack) {
@@ -175,7 +175,6 @@ export function CheckCalibration(
       ? PANEL_BY_STEP[currentStep]
       : null
   return createPortal(
-
     <LegacyModalShell
       width="47rem"
       header={

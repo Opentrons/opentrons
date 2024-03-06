@@ -25,7 +25,6 @@ const render = (props: FallbackProps) => {
   })
 }
 
-
 describe('OnDeviceDisplayAppFallback', () => {
   let props: FallbackProps
   let mockTrackEvent: Mock

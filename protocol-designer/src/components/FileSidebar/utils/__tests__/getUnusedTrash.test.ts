@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { getUnusedTrash } from '../getUnusedTrash'
-import { EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA, ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA } from '@opentrons/shared-data'
+import {
+  EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+} from '@opentrons/shared-data'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { AdditionalEquipment } from '../../FileSidebar'
 

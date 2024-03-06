@@ -82,7 +82,7 @@ export const WellTooltip = (props: WellTooltipProps): JSX.Element => {
     <>
       <Manager>
         <Reference>
-          {({ ref }) => (
+          {({ ref }) =>
             createPortal(
               <div
                 ref={ref}
@@ -92,7 +92,7 @@ export const WellTooltip = (props: WellTooltipProps): JSX.Element => {
               />,
               getTopPortalEl()
             )
-          )}
+          }
         </Reference>
         {children({
           makeHandleMouseEnterWell: makeHandleMouseEnterWell,
@@ -109,27 +109,25 @@ export const WellTooltip = (props: WellTooltipProps): JSX.Element => {
             }}
           >
             {({ ref, style, placement, arrowProps }) => {
-              return (
-                createPortal(
+              return createPortal(
+                <div
+                  style={style}
+                  ref={ref}
+                  data-placement={placement}
+                  className={styles.tooltip_box}
+                >
+                  <PillTooltipContents
+                    well={tooltipWellName || ''}
+                    ingredNames={ingredNames}
+                    ingreds={tooltipWellIngreds || {}}
+                  />
                   <div
-                    style={style}
-                    ref={ref}
-                    data-placement={placement}
-                    className={styles.tooltip_box}
-                  >
-                    <PillTooltipContents
-                      well={tooltipWellName || ''}
-                      ingredNames={ingredNames}
-                      ingreds={tooltipWellIngreds || {}}
-                    />
-                    <div
-                      className={cx(styles.arrow, styles[placement])}
-                      ref={arrowProps.ref}
-                      style={arrowProps.style}
-                    />
-                  </div>,
-                  getTopPortalEl()
-                )
+                    className={cx(styles.arrow, styles[placement])}
+                    ref={arrowProps.ref}
+                    style={arrowProps.style}
+                  />
+                </div>,
+                getTopPortalEl()
               )
             }}
           </Popper>

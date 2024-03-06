@@ -30,8 +30,7 @@ describe('useDeleteMaintenanceRunMutation hook', () => {
 
   it('should return no data when calling DeleteMaintenanceRun if the request fails', async () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(deleteMaintenanceRun)
-    .mockRejectedValue('oh no')
+    vi.mocked(deleteMaintenanceRun).mockRejectedValue('oh no')
 
     const { result } = renderHook(() => useDeleteMaintenanceRunMutation(), {
       wrapper,
@@ -46,8 +45,9 @@ describe('useDeleteMaintenanceRunMutation hook', () => {
 
   it('should delete a maintenance run when calling the deleteMaintenanceRun callback with basic run args', async () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(deleteMaintenanceRun)
-    .mockResolvedValue({ data: { data: null } } as Response<EmptyResponse>)
+    vi.mocked(deleteMaintenanceRun).mockResolvedValue({
+      data: { data: null },
+    } as Response<EmptyResponse>)
 
     const { result } = renderHook(() => useDeleteMaintenanceRunMutation(), {
       wrapper,

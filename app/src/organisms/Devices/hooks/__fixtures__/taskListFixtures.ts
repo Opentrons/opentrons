@@ -324,7 +324,7 @@ export const expectedBadDeckTaskList: TaskListProps = {
       description: '',
       title: 'Deck Calibration',
       footer: 'Calibration recommended',
-      cta: { label: 'Calibrate', onClick: () => { } },
+      cta: { label: 'Calibrate', onClick: () => {} },
       markedBad: true,
       taskIndex: 0,
     },
@@ -417,7 +417,7 @@ export const expectedBadDeckAndPipetteOffsetTaskList: TaskListProps = {
       description: '',
       title: 'Deck Calibration',
       footer: 'Calibration recommended',
-      cta: { label: 'Calibrate', onClick: () => { } },
+      cta: { label: 'Calibrate', onClick: () => {} },
       markedBad: true,
       taskIndex: 0,
     },
@@ -506,7 +506,7 @@ export const expectedBadEverythingTaskList: TaskListProps = {
       description: '',
       title: 'Deck Calibration',
       footer: 'Calibration recommended',
-      cta: { label: 'Calibrate', onClick: () => { } },
+      cta: { label: 'Calibrate', onClick: () => {} },
       markedBad: true,
       taskIndex: 0,
     },
@@ -591,7 +591,7 @@ export const expectedBadPipetteOffsetTaskList: TaskListProps = {
       description: '',
       title: 'Deck Calibration',
       footer: 'Calibration recommended',
-      cta: { label: 'Calibrate', onClick: () => { } },
+      cta: { label: 'Calibrate', onClick: () => {} },
       isComplete: true,
       taskIndex: 0,
     },
@@ -683,7 +683,7 @@ export const expectedBadTipLengthTaskList: TaskListProps = {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         mockCompleteDeckCalibration.deckCalibration.data.lastModified!
       )}`,
-      cta: { label: 'Recalibrate', onClick: () => { } },
+      cta: { label: 'Recalibrate', onClick: () => {} },
       isComplete: true,
       taskIndex: 0,
     },
@@ -775,7 +775,7 @@ export const expectedBadTipLengthAndOffsetTaskList: TaskListProps = {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         mockCompleteDeckCalibration.deckCalibration.data.lastModified!
       )}`,
-      cta: { label: 'Recalibrate', onClick: () => { } },
+      cta: { label: 'Recalibrate', onClick: () => {} },
       isComplete: true,
       taskIndex: 0,
     },

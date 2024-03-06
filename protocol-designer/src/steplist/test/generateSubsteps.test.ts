@@ -1,5 +1,9 @@
 import { it, describe, expect, beforeEach } from 'vitest'
-import { makeInitialRobotState, makeContext, FIXED_TRASH_ID } from '@opentrons/step-generation'
+import {
+  makeInitialRobotState,
+  makeContext,
+  FIXED_TRASH_ID,
+} from '@opentrons/step-generation'
 import { THERMOCYCLER_STATE } from '../../constants'
 import { generateSubstepItem } from '../generateSubstepItem'
 
@@ -10,7 +14,7 @@ import type {
   EngageMagnetArgs,
   DisengageMagnetArgs,
   DeactivateTemperatureArgs,
-  ThermocyclerStateStepArgs
+  ThermocyclerStateStepArgs,
 } from '../../../../step-generation/src/types'
 import type { StepArgsAndErrors, LabwareNamesByModuleId } from '../types'
 
@@ -73,43 +77,43 @@ describe('generateSubstepItem', () => {
 
     expect(result).toBeNull()
   })
-    ;[
-      {
-        testName: 'null is returned when no stepArgsAndErrors',
-        args: null,
+  ;[
+    {
+      testName: 'null is returned when no stepArgsAndErrors',
+      args: null,
+    },
+    {
+      testName: 'null is returned when no stepArgs',
+      args: {
+        stepArgs: null,
+        errors: { field: {} },
       },
-      {
-        testName: 'null is returned when no stepArgs',
-        args: {
-          stepArgs: null,
-          errors: { field: {} },
+    },
+    {
+      testName: 'null is returned when no errors',
+      args: {
+        stepArgs: {
+          module: 'aaaa',
+          commandCreatorFnName: 'deactivateTemperature',
+          message: 'message',
         },
+        errors: { field: {} },
       },
-      {
-        testName: 'null is returned when no errors',
-        args: {
-          stepArgs: {
-            module: 'aaaa',
-            commandCreatorFnName: 'deactivateTemperature',
-            message: 'message',
-          },
-          errors: { field: {} },
-        },
-      },
-    ].forEach(({ testName, args }) => {
-      it(testName, () => {
-        const result = generateSubstepItem(
-          // @ts-expect-error(sa, 2021-6-15): errors should be a boolean, not {}
-          args,
-          invariantContext,
-          robotState,
-          stepId,
-          labwareNamesByModuleId
-        )
+    },
+  ].forEach(({ testName, args }) => {
+    it(testName, () => {
+      const result = generateSubstepItem(
+        // @ts-expect-error(sa, 2021-6-15): errors should be a boolean, not {}
+        args,
+        invariantContext,
+        robotState,
+        stepId,
+        labwareNamesByModuleId
+      )
 
-        expect(result).toBeNull()
-      })
+      expect(result).toBeNull()
     })
+  })
 
   it('delay command returns pause substep data', () => {
     const stepArgsAndErrors: StepArgsAndErrors = {
@@ -178,198 +182,198 @@ describe('generateSubstepItem', () => {
         dropTipLocation: FIXED_TRASH_ID,
       }
     })
-      ;[
-        {
-          testName: 'consolidate command returns substep data',
-          stepArgs: {
-            commandCreatorFnName: 'consolidate',
-            sourceWells: ['A1', 'A2'],
-            destWell: 'C1',
-            blowoutLocation: null,
-            blowoutFlowRateUlSec: 10,
-            blowoutOffsetFromTopMm: 5,
-            mixFirstAspirate: null,
-            mixInDestination: null,
-            dropTipLocation: FIXED_TRASH_ID,
-          },
-          expected: {
-            substepType: 'sourceDest',
-            multichannel: false,
-            commandCreatorFnName: 'consolidate',
-            parentStepId: stepId,
-            rows: [
-              {
-                activeTips: {
-                  pipetteId: pipetteId,
-                  labwareId: tiprackId,
-                  wellName: 'A1',
-                },
-                source: { well: 'A1', preIngreds: {}, postIngreds: {} },
-                dest: undefined,
-                volume: 50,
-              },
-              {
-                volume: 50,
-                source: { well: 'A2', preIngreds: {}, postIngreds: {} },
-                activeTips: {
-                  pipetteId: pipetteId,
-                  labwareId: tiprackId,
-                  wellName: 'A1',
-                },
-                dest: {
-                  postIngreds: {
-                    __air__: {
-                      volume: 100,
-                    },
-                  },
-                  preIngreds: {},
-                  well: 'C1',
-                },
-              },
-            ],
-          },
+    ;[
+      {
+        testName: 'consolidate command returns substep data',
+        stepArgs: {
+          commandCreatorFnName: 'consolidate',
+          sourceWells: ['A1', 'A2'],
+          destWell: 'C1',
+          blowoutLocation: null,
+          blowoutFlowRateUlSec: 10,
+          blowoutOffsetFromTopMm: 5,
+          mixFirstAspirate: null,
+          mixInDestination: null,
+          dropTipLocation: FIXED_TRASH_ID,
         },
-        {
-          testName: 'distribute command returns substep data',
-          stepArgs: {
-            commandCreatorFnName: 'distribute',
-            sourceWell: 'A1',
-            destWells: ['A1', 'A2'],
-            disposalVolume: null,
-            disposalLabware: null,
-            disposalWell: null,
-            blowoutFlowRateUlSec: 10,
-            blowoutOffsetFromTopMm: 5,
-            mixBeforeAspirate: null,
-            dropTipLocation: FIXED_TRASH_ID,
-          },
-          expected: {
-            commandCreatorFnName: 'distribute',
-            multichannel: false,
-            parentStepId: stepId,
-            rows: [
-              {
-                activeTips: {
-                  labwareId: tiprackId,
-                  pipetteId: pipetteId,
-                  wellName: 'A1',
-                },
-                dest: {
-                  postIngreds: {
-                    __air__: {
-                      volume: 50,
-                    },
-                  },
-                  preIngreds: {},
-                  well: 'A1',
-                },
-                source: {
-                  postIngreds: {},
-                  preIngreds: {},
-                  well: 'A1',
-                },
-                volume: 50,
+        expected: {
+          substepType: 'sourceDest',
+          multichannel: false,
+          commandCreatorFnName: 'consolidate',
+          parentStepId: stepId,
+          rows: [
+            {
+              activeTips: {
+                pipetteId: pipetteId,
+                labwareId: tiprackId,
+                wellName: 'A1',
               },
-              {
-                activeTips: {
-                  labwareId: tiprackId,
-                  pipetteId: pipetteId,
-                  wellName: 'A1',
-                },
-                dest: {
-                  postIngreds: {
-                    __air__: {
-                      volume: 50,
-                    },
-                  },
-                  preIngreds: {},
-                  well: 'A2',
-                },
-                source: undefined,
-                volume: 50,
+              source: { well: 'A1', preIngreds: {}, postIngreds: {} },
+              dest: undefined,
+              volume: 50,
+            },
+            {
+              volume: 50,
+              source: { well: 'A2', preIngreds: {}, postIngreds: {} },
+              activeTips: {
+                pipetteId: pipetteId,
+                labwareId: tiprackId,
+                wellName: 'A1',
               },
-            ],
-            substepType: 'sourceDest',
-          },
+              dest: {
+                postIngreds: {
+                  __air__: {
+                    volume: 100,
+                  },
+                },
+                preIngreds: {},
+                well: 'C1',
+              },
+            },
+          ],
         },
-        {
-          testName: 'transfer command returns substep data',
-          stepArgs: {
-            commandCreatorFnName: 'transfer',
-            sourceWells: ['A1', 'A2'],
-            destWells: ['A1', 'A2'],
-            blowoutLocation: null,
-            blowoutFlowRateUlSec: 10,
-            blowoutOffsetFromTopMm: 5,
-            mixBeforeAspirate: null,
-            mixInDestination: null,
-            dropTipLocation: FIXED_TRASH_ID,
-          },
-          expected: {
-            substepType: 'sourceDest',
-            multichannel: false,
-            commandCreatorFnName: 'transfer',
-            parentStepId: stepId,
-            rows: [
-              {
-                activeTips: {
-                  pipetteId: pipetteId,
-                  labwareId: tiprackId,
-                  wellName: 'A1',
-                },
-                source: { well: 'A1', preIngreds: {}, postIngreds: {} },
-                dest: {
-                  well: 'A1',
-                  preIngreds: {},
-                  postIngreds: {
-                    __air__: {
-                      volume: 50,
-                    },
-                  },
-                },
-                volume: 50,
-              },
-              {
-                volume: 50,
-                source: { well: 'A2', preIngreds: {}, postIngreds: {} },
-                activeTips: {
-                  pipetteId: pipetteId,
-                  labwareId: tiprackId,
-                  wellName: 'A1',
-                },
-                dest: {
-                  postIngreds: {
-                    __air__: {
-                      volume: 50,
-                    },
-                  },
-                  preIngreds: {},
-                  well: 'A2',
-                },
-              },
-            ],
-          },
+      },
+      {
+        testName: 'distribute command returns substep data',
+        stepArgs: {
+          commandCreatorFnName: 'distribute',
+          sourceWell: 'A1',
+          destWells: ['A1', 'A2'],
+          disposalVolume: null,
+          disposalLabware: null,
+          disposalWell: null,
+          blowoutFlowRateUlSec: 10,
+          blowoutOffsetFromTopMm: 5,
+          mixBeforeAspirate: null,
+          dropTipLocation: FIXED_TRASH_ID,
         },
-      ].forEach(({ testName, stepArgs, expected }) => {
-        it(testName, () => {
-          const stepArgsAndErrors: StepArgsAndErrors = {
-            // @ts-expect-error(sa, 2021-6-15): errors should be boolean typed
-            errors: {},
-            // @ts-expect-error(sa, 2021-6-15): stepArgs missing name and description
-            stepArgs: { ...sharedArgs, ...stepArgs },
-          }
+        expected: {
+          commandCreatorFnName: 'distribute',
+          multichannel: false,
+          parentStepId: stepId,
+          rows: [
+            {
+              activeTips: {
+                labwareId: tiprackId,
+                pipetteId: pipetteId,
+                wellName: 'A1',
+              },
+              dest: {
+                postIngreds: {
+                  __air__: {
+                    volume: 50,
+                  },
+                },
+                preIngreds: {},
+                well: 'A1',
+              },
+              source: {
+                postIngreds: {},
+                preIngreds: {},
+                well: 'A1',
+              },
+              volume: 50,
+            },
+            {
+              activeTips: {
+                labwareId: tiprackId,
+                pipetteId: pipetteId,
+                wellName: 'A1',
+              },
+              dest: {
+                postIngreds: {
+                  __air__: {
+                    volume: 50,
+                  },
+                },
+                preIngreds: {},
+                well: 'A2',
+              },
+              source: undefined,
+              volume: 50,
+            },
+          ],
+          substepType: 'sourceDest',
+        },
+      },
+      {
+        testName: 'transfer command returns substep data',
+        stepArgs: {
+          commandCreatorFnName: 'transfer',
+          sourceWells: ['A1', 'A2'],
+          destWells: ['A1', 'A2'],
+          blowoutLocation: null,
+          blowoutFlowRateUlSec: 10,
+          blowoutOffsetFromTopMm: 5,
+          mixBeforeAspirate: null,
+          mixInDestination: null,
+          dropTipLocation: FIXED_TRASH_ID,
+        },
+        expected: {
+          substepType: 'sourceDest',
+          multichannel: false,
+          commandCreatorFnName: 'transfer',
+          parentStepId: stepId,
+          rows: [
+            {
+              activeTips: {
+                pipetteId: pipetteId,
+                labwareId: tiprackId,
+                wellName: 'A1',
+              },
+              source: { well: 'A1', preIngreds: {}, postIngreds: {} },
+              dest: {
+                well: 'A1',
+                preIngreds: {},
+                postIngreds: {
+                  __air__: {
+                    volume: 50,
+                  },
+                },
+              },
+              volume: 50,
+            },
+            {
+              volume: 50,
+              source: { well: 'A2', preIngreds: {}, postIngreds: {} },
+              activeTips: {
+                pipetteId: pipetteId,
+                labwareId: tiprackId,
+                wellName: 'A1',
+              },
+              dest: {
+                postIngreds: {
+                  __air__: {
+                    volume: 50,
+                  },
+                },
+                preIngreds: {},
+                well: 'A2',
+              },
+            },
+          ],
+        },
+      },
+    ].forEach(({ testName, stepArgs, expected }) => {
+      it(testName, () => {
+        const stepArgsAndErrors: StepArgsAndErrors = {
+          // @ts-expect-error(sa, 2021-6-15): errors should be boolean typed
+          errors: {},
+          // @ts-expect-error(sa, 2021-6-15): stepArgs missing name and description
+          stepArgs: { ...sharedArgs, ...stepArgs },
+        }
 
-          const result = generateSubstepItem(
-            stepArgsAndErrors,
-            invariantContext,
-            robotState,
-            stepId,
-            labwareNamesByModuleId
-          )
+        const result = generateSubstepItem(
+          stepArgsAndErrors,
+          invariantContext,
+          robotState,
+          stepId,
+          labwareNamesByModuleId
+        )
 
-          expect(result).toEqual(expected)
-        })
+        expect(result).toEqual(expected)
       })
+    })
   })
 
   it('mix command returns substep data', () => {

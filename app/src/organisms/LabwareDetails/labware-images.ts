@@ -1,7 +1,6 @@
 // images by labware load name
 // TODO(mc, 2019-05-29): shared-data? components-library?
 
-
 import agilent_1_reservoir_290ml_side_view from './images/agilent_1_reservoir_290ml_side_view.jpg'
 import axygen_1_reservoir_90ml_side_view from './images/axygen_1_reservoir_90ml_side_view.jpg'
 import biorad_96_wellplate_200ul_pcr_photo_three_quarters from './images/biorad_96_wellplate_200ul_pcr_photo_three_quarters.jpg'
@@ -61,84 +60,45 @@ import universal_flat_adapter from './images/universal_flat_adapter.jpg'
 import flat_bottom_aluminum from './images/flat_bottom_aluminum.png'
 import opentrons_96_aluminumblock_side_view from './images/opentrons_96_aluminumblock_side_view.jpg'
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export const labwareImages: Record<string, string[]> = {
-  agilent_1_reservoir_290ml: [
-    agilent_1_reservoir_290ml_side_view
-  ],
-  axygen_1_reservoir_90ml: [
-    axygen_1_reservoir_90ml_side_view
-  ],
+  agilent_1_reservoir_290ml: [agilent_1_reservoir_290ml_side_view],
+  axygen_1_reservoir_90ml: [axygen_1_reservoir_90ml_side_view],
   biorad_96_wellplate_200ul_pcr: [
-    biorad_96_wellplate_200ul_pcr_photo_three_quarters
+    biorad_96_wellplate_200ul_pcr_photo_three_quarters,
   ],
   'corning_12_wellplate_6.9ml_flat': [
-    corning_12_wellplate_6_9ml_flat_photo_three_quarters
+    corning_12_wellplate_6_9ml_flat_photo_three_quarters,
   ],
   'corning_24_wellplate_3.4ml_flat': [
-    corning_24_wellplate_3_4ml_flat_photo_three_quarters
+    corning_24_wellplate_3_4ml_flat_photo_three_quarters,
   ],
   corning_384_wellplate_112ul_flat: [
-    corning_384_wellplate_112ul_flat_photo_three_quarters
+    corning_384_wellplate_112ul_flat_photo_three_quarters,
   ],
   corning_96_wellplate_360ul_flat: [
-    corning_96_wellplate_360ul_flat_three_quarters
+    corning_96_wellplate_360ul_flat_three_quarters,
   ],
   'corning_48_wellplate_1.6ml_flat': [
-    corning_48_wellplate_1_6ml_flat_photo_three_quarters
+    corning_48_wellplate_1_6ml_flat_photo_three_quarters,
   ],
   'corning_6_wellplate_16.8ml_flat': [
-    corning_6_wellplate_16_8ml_flat_photo_three_quarters
+    corning_6_wellplate_16_8ml_flat_photo_three_quarters,
   ],
-  eppendorf_96_tiprack_1000ul_eptips: [
-    eppendorf_1000ul_tip_eptips_side_view
-  ],
-  eppendorf_96_tiprack_10ul_eptips: [
-    eppendorf_10ul_tips_eptips_side_view
-  ],
+  eppendorf_96_tiprack_1000ul_eptips: [eppendorf_1000ul_tip_eptips_side_view],
+  eppendorf_96_tiprack_10ul_eptips: [eppendorf_10ul_tips_eptips_side_view],
   geb_96_tiprack_1000ul: [
     geb_96_tiprack_1000ul_side_view,
     geb_1000ul_tip_side_view,
   ],
-  geb_96_tiprack_10ul: [
-    geb_96_tiprack_10ul_side_view,
-    geb_10ul_tip_side_view,
-  ],
-  nest_1_reservoir_195ml: [
-    nest_1_reservoir_195ml_three_quarters,
-  ],
-  nest_1_reservoir_290ml: [
-    nest_1_reservoir_290ml
-  ],
-  nest_12_reservoir_15ml: [
-    nest_12_reservoir_15ml_three_quarters,
-  ],
+  geb_96_tiprack_10ul: [geb_96_tiprack_10ul_side_view, geb_10ul_tip_side_view],
+  nest_1_reservoir_195ml: [nest_1_reservoir_195ml_three_quarters],
+  nest_1_reservoir_290ml: [nest_1_reservoir_290ml],
+  nest_12_reservoir_15ml: [nest_12_reservoir_15ml_three_quarters],
   nest_96_wellplate_100ul_pcr_full_skirt: [
     nest_96_wellplate_100ul_pcr_full_skirt_three_quarters,
   ],
-  nest_96_wellplate_200ul_flat: [
-    nest_96_wellplate_200ul_flat_three_quarters,
-  ],
-  nest_96_wellplate_2ml_deep: [
-    nest_96_wellplate_2ml_deep,
-  ],
+  nest_96_wellplate_200ul_flat: [nest_96_wellplate_200ul_flat_three_quarters],
+  nest_96_wellplate_2ml_deep: [nest_96_wellplate_2ml_deep],
   opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical: [
     opentrons_10_tuberack_4_6_side_view,
     falcon_50ml_15ml_conical_tubes,
@@ -244,37 +204,19 @@ export const labwareImages: Record<string, string[]> = {
     opentrons_96_aluminumblock_side_view,
     nest_96_wellplate_100ul_pcr_full_skirt_three_quarters,
   ],
-  opentrons_96_tiprack_1000ul: [
-    opentrons_96_tiprack_1000ul_side_view,
-  ],
-  opentrons_96_tiprack_10ul: [
-    opentrons_96_tiprack_10ul_side_view,
-  ],
-  opentrons_96_tiprack_20ul: [
-    opentrons_96_tiprack_10ul_side_view,
-  ],
-  opentrons_96_tiprack_300ul: [
-    opentrons_96_tiprack_300ul_side_view,
-  ],
-  opentrons_96_filtertiprack_1000ul: [
-    opentrons_96_tiprack_1000ul_side_view,
-  ],
-  opentrons_96_filtertiprack_10ul: [
-    opentrons_96_tiprack_10ul_side_view,
-  ],
-  opentrons_96_filtertiprack_20ul: [
-    opentrons_96_tiprack_10ul_side_view,
-  ],
-  opentrons_96_filtertiprack_200ul: [
-    opentrons_96_tiprack_300ul_side_view,
-  ],
+  opentrons_96_tiprack_1000ul: [opentrons_96_tiprack_1000ul_side_view],
+  opentrons_96_tiprack_10ul: [opentrons_96_tiprack_10ul_side_view],
+  opentrons_96_tiprack_20ul: [opentrons_96_tiprack_10ul_side_view],
+  opentrons_96_tiprack_300ul: [opentrons_96_tiprack_300ul_side_view],
+  opentrons_96_filtertiprack_1000ul: [opentrons_96_tiprack_1000ul_side_view],
+  opentrons_96_filtertiprack_10ul: [opentrons_96_tiprack_10ul_side_view],
+  opentrons_96_filtertiprack_20ul: [opentrons_96_tiprack_10ul_side_view],
+  opentrons_96_filtertiprack_200ul: [opentrons_96_tiprack_300ul_side_view],
   tipone_96_tiprack_200ul: [
     tipone_96_tiprack_200ul_side_view,
     tipone_200ul_tip_side_view,
   ],
-  usascientific_12_reservoir_22ml: [
-    usascientific_12_reservoir_22ml_side_view,
-  ],
+  usascientific_12_reservoir_22ml: [usascientific_12_reservoir_22ml_side_view],
   'usascientific_96_wellplate_2.4ml_deep': [
     usascientific_96_wellplate_2_4ml_deep_side_view,
   ],
@@ -287,25 +229,13 @@ export const labwareImages: Record<string, string[]> = {
   appliedbiosystemsmicroamp_384_wellplate_40ul: [
     appliedbiosystemsmicroamp_384_wellplate_40ul,
   ],
-  biorad_384_wellplate_50ul: [
-    biorad_384_wellplate_50ul,
-  ],
-  opentrons_96_deep_well_adapter: [
-    deep_well_plate_adapter,
-  ],
-  opentrons_96_flat_bottom_adapter: [
-    flat_bottom_plate_adapter,
-  ],
+  biorad_384_wellplate_50ul: [biorad_384_wellplate_50ul],
+  opentrons_96_deep_well_adapter: [deep_well_plate_adapter],
+  opentrons_96_flat_bottom_adapter: [flat_bottom_plate_adapter],
   opentrons_96_pcr_adapter: [pcr_plate_adapter],
-  opentrons_universal_flat_adapter: [
-    universal_flat_adapter,
-  ],
-  opentrons_aluminum_flat_bottom_plate: [
-    flat_bottom_aluminum,
-  ],
-  opentrons_96_well_aluminum_block: [
-    opentrons_96_aluminumblock_side_view,
-  ],
+  opentrons_universal_flat_adapter: [universal_flat_adapter],
+  opentrons_aluminum_flat_bottom_plate: [flat_bottom_aluminum],
+  opentrons_96_well_aluminum_block: [opentrons_96_aluminumblock_side_view],
   opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep: [
     deep_well_plate_adapter,
     nest_96_wellplate_2ml_deep,

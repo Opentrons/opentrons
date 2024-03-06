@@ -51,8 +51,7 @@ describe('useCreateCommandMutation hook', () => {
     const waitUntilComplete = true
     const timeout = 2000
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(createCommand)
-    .mockResolvedValue({ data: 'something' } as any)
+    vi.mocked(createCommand).mockResolvedValue({ data: 'something' } as any)
 
     const { result } = renderHook(() => useCreateCommandMutation(), {
       wrapper,

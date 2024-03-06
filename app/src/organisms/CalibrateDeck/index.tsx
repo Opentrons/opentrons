@@ -137,49 +137,49 @@ export function CalibrateDeck(
       ? PANEL_BY_STEP[currentStep]
       : null
   return createPortal(
-      <LegacyModalShell
-        width="47rem"
-        header={
-          <WizardHeader
-            title={t('deck_calibration')}
-            currentStep={
-              STEPS_IN_ORDER.findIndex(step => step === currentStep) ?? 0
-            }
-            totalSteps={STEPS_IN_ORDER.length - 1}
-            onExit={confirmExit}
-          />
-        }
-      >
-        {showSpinner || currentStep == null || Panel == null ? (
-          <LoadingState />
-        ) : showConfirmExit ? (
-          <ConfirmExit
-            exit={confirmExit}
-            back={cancelExit}
-            heading={t('progress_will_be_lost', {
-              sessionType: t('deck_calibration'),
-            })}
-            body={t('confirm_exit_before_completion', {
-              sessionType: t('deck_calibration'),
-            })}
-          />
-        ) : (
-          <Panel
-            sendCommands={sendCommands}
-            cleanUpAndExit={cleanUpAndExit}
-            tipRack={tipRack}
-            isMulti={isMulti}
-            mount={instrument?.mount.toLowerCase() as Mount}
-            currentStep={currentStep}
-            sessionType={session.sessionType}
-            supportedCommands={supportedCommands}
-            defaultTipracks={instrument?.defaultTipracks}
-            calInvalidationHandler={offsetInvalidationHandler}
-            allowChangeTipRack
-          />
-        )}
-      </LegacyModalShell>,
-      getTopPortalEl()
+    <LegacyModalShell
+      width="47rem"
+      header={
+        <WizardHeader
+          title={t('deck_calibration')}
+          currentStep={
+            STEPS_IN_ORDER.findIndex(step => step === currentStep) ?? 0
+          }
+          totalSteps={STEPS_IN_ORDER.length - 1}
+          onExit={confirmExit}
+        />
+      }
+    >
+      {showSpinner || currentStep == null || Panel == null ? (
+        <LoadingState />
+      ) : showConfirmExit ? (
+        <ConfirmExit
+          exit={confirmExit}
+          back={cancelExit}
+          heading={t('progress_will_be_lost', {
+            sessionType: t('deck_calibration'),
+          })}
+          body={t('confirm_exit_before_completion', {
+            sessionType: t('deck_calibration'),
+          })}
+        />
+      ) : (
+        <Panel
+          sendCommands={sendCommands}
+          cleanUpAndExit={cleanUpAndExit}
+          tipRack={tipRack}
+          isMulti={isMulti}
+          mount={instrument?.mount.toLowerCase() as Mount}
+          currentStep={currentStep}
+          sessionType={session.sessionType}
+          supportedCommands={supportedCommands}
+          defaultTipracks={instrument?.defaultTipracks}
+          calInvalidationHandler={offsetInvalidationHandler}
+          allowChangeTipRack
+        />
+      )}
+    </LegacyModalShell>,
+    getTopPortalEl()
   )
 }
 

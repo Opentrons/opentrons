@@ -116,7 +116,10 @@ const AlertsComponent = (props: Props): JSX.Element => {
     }
   }
   const makeHandleCloseWarning = (dismissId?: string | null) => () => {
-    console.assert(dismissId, 'expected dismissId, Alert cannot dismiss warning')
+    console.assert(
+      dismissId,
+      'expected dismissId, Alert cannot dismiss warning'
+    )
     if (dismissId) {
       dismissWarning(dismissId)
     }

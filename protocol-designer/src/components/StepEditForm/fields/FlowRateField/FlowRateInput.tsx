@@ -126,8 +126,9 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
   // and pristinity only masks the outOfBounds error, not the correctDecimals error
   if (!modalUseDefault) {
     if (!Number.isNaN(modalFlowRateNum) && !correctDecimals) {
-      errorMessage = `a max of ${DECIMALS_ALLOWED} decimal place${DECIMALS_ALLOWED > 1 ? 's' : ''
-        } is allowed`
+      errorMessage = `a max of ${DECIMALS_ALLOWED} decimal place${
+        DECIMALS_ALLOWED > 1 ? 's' : ''
+      } is allowed`
     } else if (!isPristine && outOfBounds) {
       errorMessage = `accepted range is ${displayMinFlowRate} to ${maxFlowRate}`
     }
@@ -146,7 +147,8 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
     />
   )
 
-  const FlowRateModal = pipetteDisplayName && (
+  const FlowRateModal =
+    pipetteDisplayName &&
     createPortal(
       <AlertModal
         alertOverlay
@@ -195,7 +197,6 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
       </AlertModal>,
       getMainPagePortalEl()
     )
-  )
 
   return (
     <React.Fragment>

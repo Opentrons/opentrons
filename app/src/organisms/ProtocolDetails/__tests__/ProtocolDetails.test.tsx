@@ -68,8 +68,9 @@ describe('ProtocolDetails', () => {
     vi.mocked(getReachableRobots).mockReturnValue([mockReachableRobot])
     vi.mocked(getScanning).mockReturnValue(false)
 
-    vi.mocked(ChooseRobotToRunProtocolSlideout)
-    .mockReturnValue(<div>close ChooseRobotToRunProtocolSlideout</div>)
+    vi.mocked(ChooseRobotToRunProtocolSlideout).mockReturnValue(
+      <div>close ChooseRobotToRunProtocolSlideout</div>
+    )
     vi.mocked(getIsProtocolAnalysisInProgress).mockReturnValue(false)
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
   })

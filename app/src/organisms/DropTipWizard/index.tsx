@@ -427,17 +427,17 @@ export const DropTipWizardComponent = (
               [
                 currentStep === POSITION_AND_BLOWOUT
                   ? {
-                    commandType: 'blowOutInPlace',
-                    params: {
-                      pipetteId: MANAGED_PIPETTE_ID,
-                      flowRate:
-                        instrumentModelSpecs.defaultBlowOutFlowRate.value,
-                    },
-                  }
+                      commandType: 'blowOutInPlace',
+                      params: {
+                        pipetteId: MANAGED_PIPETTE_ID,
+                        flowRate:
+                          instrumentModelSpecs.defaultBlowOutFlowRate.value,
+                      },
+                    }
                   : {
-                    commandType: 'dropTipInPlace',
-                    params: { pipetteId: MANAGED_PIPETTE_ID },
-                  },
+                      commandType: 'dropTipInPlace',
+                      params: { pipetteId: MANAGED_PIPETTE_ID },
+                    },
               ],
               true
             )
@@ -449,9 +449,10 @@ export const DropTipWizardComponent = (
               })
               .catch(e =>
                 setErrorMessage(
-                  `Error issuing ${currentStep === POSITION_AND_BLOWOUT
-                    ? 'blowout'
-                    : 'drop tip'
+                  `Error issuing ${
+                    currentStep === POSITION_AND_BLOWOUT
+                      ? 'blowout'
+                      : 'drop tip'
                   } command: ${e.message}`
                 )
               )

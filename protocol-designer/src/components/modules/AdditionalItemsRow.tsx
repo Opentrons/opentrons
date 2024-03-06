@@ -67,16 +67,18 @@ export function AdditionalItemsRow(
 
   return (
     <>
-      {trashModal && name !== 'gripper' ? (
-        createPortal(
-          <TrashModal
-            onCloseClick={() => { openTrashModal(false) }}
-            trashName={name}
-            trashBinId={trashBinId}
-          />,
-          getTopPortalEl()
-        )
-      ) : null}
+      {trashModal && name !== 'gripper'
+        ? createPortal(
+            <TrashModal
+              onCloseClick={() => {
+                openTrashModal(false)
+              }}
+              trashName={name}
+              trashBinId={trashBinId}
+            />,
+            getTopPortalEl()
+          )
+        : null}
       <Flex flexDirection={DIRECTION_COLUMN}>
         <h4 className={styles.row_title}>
           {t(`additional_equipment_display_names.${name}`)}

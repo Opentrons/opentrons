@@ -21,9 +21,7 @@ describe('BeforeBeginning', () => {
     props = {
       goBack: vi.fn(),
       proceed: vi.fn(),
-      chainRunCommands: vi
-        .fn()
-        .mockImplementationOnce(() => Promise.resolve()),
+      chainRunCommands: vi.fn().mockImplementationOnce(() => Promise.resolve()),
       maintenanceRunId: RUN_ID_1,
       attachedGripper: {},
       flowType: GRIPPER_FLOW_TYPES.ATTACH,

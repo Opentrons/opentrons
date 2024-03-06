@@ -47,8 +47,7 @@ describe('useDeleteProtocolMutation hook', () => {
 
   it('should delete a protocol when calling the deleteProtocol callback', async () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(deleteProtocol)
-    .mockResolvedValue({
+    vi.mocked(deleteProtocol).mockResolvedValue({
       data: DELETE_PROTOCOL_RESPONSE,
     } as Response<EmptyResponse>)
 

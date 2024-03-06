@@ -14,10 +14,9 @@ import opentrons_calibrationblock from '../../assets/images/labware/opentrons_ca
 import generic_custom_tiprack from '../../assets/images/labware/generic_tiprack_side_view.png'
 import removable_black_plastic_trash_bin from '../../assets/images/labware/removable_black_plastic_trash_bin.png'
 
-
 export const labwareImages = {
-  opentrons_96_tiprack_1000ul: opentrons_96_tiprack_1000ul_side_view ,
-  opentrons_96_filtertiprack_1000ul: opentrons_96_tiprack_1000ul_side_view ,
+  opentrons_96_tiprack_1000ul: opentrons_96_tiprack_1000ul_side_view,
+  opentrons_96_filtertiprack_1000ul: opentrons_96_tiprack_1000ul_side_view,
   opentrons_96_tiprack_10ul: opentrons_96_tiprack_10ul_side_view,
   opentrons_96_filtertiprack_10ul: opentrons_96_tiprack_10ul_side_view,
   opentrons_96_tiprack_20ul: opentrons_96_tiprack_10ul_side_view,

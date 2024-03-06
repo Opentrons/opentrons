@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen, cleanup } from '@testing-library/react'
 import { fixture_tiprack_10_ul } from '@opentrons/shared-data/labware/fixtures/2'
-import { renderWithProviders } from '../../../../__testing-utils__' 
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../localization'
 import { getNewProtocolModal } from '../../../../navigation/selectors'
 import {

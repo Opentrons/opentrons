@@ -55,8 +55,7 @@ describe('usePipetteSettingsQuery hook', () => {
 
   it('should return all current attached pipettes', async () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(getPipetteSettings)
-    .mockResolvedValue({
+    vi.mocked(getPipetteSettings).mockResolvedValue({
       data: pipetteSettingsResponseFixture as any,
     } as Response<PipetteSettings>)
 

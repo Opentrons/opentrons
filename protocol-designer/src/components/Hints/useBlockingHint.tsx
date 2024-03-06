@@ -42,26 +42,24 @@ export const BlockingHint = (props: HintProps): JSX.Element => {
     handleContinue()
   }
 
-  return (
-    createPortal(
-      <ContinueModal
-        alertOverlay
-        heading={t(`hint.${hintKey}.title`)}
-        onCancelClick={onCancelClick}
-        onContinueClick={onContinueClick}
-      >
-        <div className={styles.hint_contents}>{props.content}</div>
-        <div>
-          <DeprecatedCheckboxField
-            className={styles.dont_show_again}
-            label={t('hint.dont_show_again')}
-            onChange={toggleRememberDismissal}
-            value={rememberDismissal}
-          />
-        </div>
-      </ContinueModal>,
-      getMainPagePortalEl()
-    )
+  return createPortal(
+    <ContinueModal
+      alertOverlay
+      heading={t(`hint.${hintKey}.title`)}
+      onCancelClick={onCancelClick}
+      onContinueClick={onContinueClick}
+    >
+      <div className={styles.hint_contents}>{props.content}</div>
+      <div>
+        <DeprecatedCheckboxField
+          className={styles.dont_show_again}
+          label={t('hint.dont_show_again')}
+          onChange={toggleRememberDismissal}
+          value={rememberDismissal}
+        />
+      </div>
+    </ContinueModal>,
+    getMainPagePortalEl()
   )
 }
 

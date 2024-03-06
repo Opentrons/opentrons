@@ -40,15 +40,15 @@ export function StagingAreasRow(props: StagingAreasRowProps): JSX.Element {
 
   return (
     <>
-      {stagingAreaModal ? (
-        createPortal(
-          <StagingAreasModal
-            onCloseClick={() => openStagingAreaModal(false)}
-            stagingAreas={stagingAreas}
-          />,
-          getTopPortalEl()
-        )
-      ) : null}
+      {stagingAreaModal
+        ? createPortal(
+            <StagingAreasModal
+              onCloseClick={() => openStagingAreaModal(false)}
+              stagingAreas={stagingAreas}
+            />,
+            getTopPortalEl()
+          )
+        : null}
       <Flex flexDirection={DIRECTION_COLUMN}>
         <h4 className={styles.row_title}>
           {t(`additional_equipment_display_names.stagingAreas`)}

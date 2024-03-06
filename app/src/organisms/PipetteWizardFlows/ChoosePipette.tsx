@@ -121,13 +121,13 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
 
   const bothMounts = getIsGantryEmpty(attachedPipettesByMount)
     ? t('ninety_six_channel', {
-      ninetySix: NINETY_SIX_CHANNEL,
-    })
+        ninetySix: NINETY_SIX_CHANNEL,
+      })
     : t('detach_pipette_to_attach_96', {
-      pipetteName:
-        attachedPipettesByMount[LEFT]?.displayName ??
-        attachedPipettesByMount[RIGHT]?.displayName,
-    })
+        pipetteName:
+          attachedPipettesByMount[LEFT]?.displayName ??
+          attachedPipettesByMount[RIGHT]?.displayName,
+      })
 
   const singleMount = t('single_or_8_channel', {
     single: '1-',
@@ -164,10 +164,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               height="29.5rem"
             >
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing8}
-              >
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
                 <StyledText
                   as="h4"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}

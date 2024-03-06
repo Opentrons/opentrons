@@ -79,8 +79,12 @@ describe('Footprint', () => {
     formikConfig.initialValues.footprintXDimension = '130'
     formikConfig.initialTouched = { footprintXDimension: true }
     render(wrapInFormik(<Footprint />, formikConfig))
-    const warning = screen.getByText('Our recommended footprint for labware', {exact: false})
-    expect(warning.textContent).toEqual('Our recommended footprint for labware is 127.76 by 85.47 +/- 1mm. If you can fit your labware snugly into a single slot on the deck continue through the form. If not please request custom labware via this form.')
+    const warning = screen.getByText('Our recommended footprint for labware', {
+      exact: false,
+    })
+    expect(warning.textContent).toEqual(
+      'Our recommended footprint for labware is 127.76 by 85.47 +/- 1mm. If you can fit your labware snugly into a single slot on the deck continue through the form. If not please request custom labware via this form.'
+    )
   })
 
   it('should not render when all fields are hidden', () => {

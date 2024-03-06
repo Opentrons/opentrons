@@ -49,11 +49,5 @@ export function renderWithProviders<State>(
     }
   }
 
-  return [
-    render(
-      Component,
-      { wrapper: ProviderWrapper }
-    ),
-    store
-  ]
+  return [render(Component, { wrapper: ProviderWrapper }), store]
 }

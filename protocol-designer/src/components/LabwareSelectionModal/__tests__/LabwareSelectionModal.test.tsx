@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen, cleanup } from '@testing-library/react'
-import { renderWithProviders, nestedTextMatcher } from '../../../__testing-utils__'
+import {
+  renderWithProviders,
+  nestedTextMatcher,
+} from '../../../__testing-utils__'
 import {
   getIsLabwareAboveHeight,
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
@@ -28,7 +31,7 @@ vi.mock('../../../labware-defs/selectors')
 vi.mock('../../Hints/useBlockingHint')
 vi.mock('../../../utils')
 vi.mock('../../../labware-ingred/selectors')
-vi.mock('@opentrons/shared-data', async (importOriginal) => {
+vi.mock('@opentrons/shared-data', async importOriginal => {
   const actual = await importOriginal<typeof SharedData>()
   return {
     ...actual,
@@ -54,7 +57,9 @@ describe('LabwareSelectionModal', () => {
       pipettes: {},
       additionalEquipmentOnDeck: {},
     })
-    vi.mocked(labwareIngredSelectors.selectedAddLabwareSlot).mockReturnValue('2')
+    vi.mocked(labwareIngredSelectors.selectedAddLabwareSlot).mockReturnValue(
+      '2'
+    )
     vi.mocked(getHas96Channel).mockReturnValue(false)
     vi.mocked(getPermittedTipracks).mockReturnValue(mockPermittedTipracks)
     vi.mocked(getPipetteEntities).mockReturnValue({
@@ -98,7 +103,9 @@ describe('LabwareSelectionModal', () => {
   })
   it.only('should display only permitted tipracks if the 96-channel is attached', () => {
     vi.mocked(getHas96Channel).mockReturnValue(true)
-    vi.mocked(labwareIngredSelectors.selectedAddLabwareSlot).mockReturnValue('adapter')
+    vi.mocked(labwareIngredSelectors.selectedAddLabwareSlot).mockReturnValue(
+      'adapter'
+    )
     vi.mocked(getInitialDeckSetup).mockReturnValue({
       labware: {
         adapter: {

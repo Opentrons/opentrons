@@ -8,7 +8,7 @@ import {
 } from '../reducers'
 
 import type { SelectMultipleStepsAction } from '../actions/types'
-import type {SelectableItem, } from '../reducers'
+import type { SelectableItem } from '../reducers'
 
 vi.mock('../../../labware-defs/utils')
 

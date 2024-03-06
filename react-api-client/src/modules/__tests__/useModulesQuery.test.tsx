@@ -9,9 +9,9 @@ import {
 } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useModulesQuery } from '..'
-import { UseModulesQueryOptions } from '../useModulesQuery'
 
 import type { HostConfig, Response, Modules } from '@opentrons/api-client'
+import type { UseModulesQueryOptions } from '../useModulesQuery'
 
 vi.mock('@opentrons/api-client')
 vi.mock('../../api/useHost')
@@ -69,8 +69,7 @@ describe('useModulesQuery hook', () => {
   })
   it('should return an empty array if an old version of modules returns', async () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(getModules)
-    .mockResolvedValue({
+    vi.mocked(getModules).mockResolvedValue({
       data: V2_MODULES_RESPONSE,
     } as Response<any>)
 

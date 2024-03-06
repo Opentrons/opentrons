@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen, cleanup } from '@testing-library/react'
-import { renderWithProviders } from '../../../__testing-utils__' 
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../localization'
 import { FlexSlotMap } from '../FlexSlotMap'
 import { StagingAreasRow } from '../StagingAreasRow'

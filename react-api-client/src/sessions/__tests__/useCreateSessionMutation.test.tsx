@@ -57,8 +57,9 @@ describe('useCreateSessionMutation hook', () => {
 
   it('should create a session when calling the createSession callback', async () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(createSession)
-    .mockResolvedValue({ data: SESSION_RESPONSE } as Response<Session>)
+    vi.mocked(createSession).mockResolvedValue({
+      data: SESSION_RESPONSE,
+    } as Response<Session>)
 
     const { result } = renderHook(
       () => useCreateSessionMutation(createSessionData),

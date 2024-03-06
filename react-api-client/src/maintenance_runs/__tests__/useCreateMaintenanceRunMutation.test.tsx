@@ -34,8 +34,7 @@ describe('useCreateMaintenanceRunMutation hook', () => {
 
   it('should return no data when calling createMaintenanceRun if the request fails', async () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(createMaintenanceRun)
-    .mockRejectedValue('oh no')
+    vi.mocked(createMaintenanceRun).mockRejectedValue('oh no')
 
     const { result } = renderHook(() => useCreateMaintenanceRunMutation(), {
       wrapper,

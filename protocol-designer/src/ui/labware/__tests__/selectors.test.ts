@@ -19,7 +19,7 @@ import {
   fixture_tiprack_1000_ul,
   fixture_tiprack_10_ul,
   fixture_96_plate,
-  fixture_trash
+  fixture_trash,
 } from '@opentrons/shared-data/labware/fixtures/2'
 
 import type { LabwareEntities } from '@opentrons/step-generation'
@@ -70,9 +70,7 @@ describe('labware selectors', () => {
 
   describe('getDisposalOptions', () => {
     it('returns an empty list when additionalEquipment is NOT provided', () => {
-      expect(
-        getDisposalOptions.resultFunc({}, null)
-      ).toEqual([])
+      expect(getDisposalOptions.resultFunc({}, null)).toEqual([])
     })
     it('returns empty list when trash bin is NOT present', () => {
       const additionalEquipmentEntities = {

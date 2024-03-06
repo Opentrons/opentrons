@@ -6,7 +6,10 @@ import {
 } from '@opentrons/shared-data/labware/fixtures/2'
 
 import { getWellContentsAllLabware } from '../getWellContentsAllLabware'
-import type { LabwareEntities, LabwareLiquidState } from '@opentrons/step-generation'
+import type {
+  LabwareEntities,
+  LabwareLiquidState,
+} from '@opentrons/step-generation'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../../../labware-defs/utils')

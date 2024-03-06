@@ -104,15 +104,15 @@ export const StepCreationButton = (): JSX.Element => {
   const getSupportedSteps = (): Array<
     Exclude<StepType, 'manualIntervention'>
   > => [
-      'moveLabware',
-      'moveLiquid',
-      'mix',
-      'pause',
-      'heaterShaker',
-      'magnet',
-      'temperature',
-      'thermocycler',
-    ]
+    'moveLabware',
+    'moveLiquid',
+    'mix',
+    'pause',
+    'heaterShaker',
+    'magnet',
+    'temperature',
+    'thermocycler',
+  ]
 
   const currentFormIsPresaved = useSelector(
     stepFormSelectors.getCurrentFormIsPresaved
@@ -167,7 +167,7 @@ export const StepCreationButton = (): JSX.Element => {
 
   return (
     <>
-      {enqueuedStepType !== null && (
+      {enqueuedStepType !== null &&
         createPortal(
           <ConfirmDeleteModal
             modalType={CLOSE_UNSAVED_STEP_FORM}
@@ -180,8 +180,7 @@ export const StepCreationButton = (): JSX.Element => {
             }}
           />,
           getMainPagePortalEl()
-        )
-      )}
+        )}
       <StepCreationButtonComponent
         expanded={expanded}
         setExpanded={setExpanded}

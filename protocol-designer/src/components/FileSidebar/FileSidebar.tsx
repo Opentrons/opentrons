@@ -188,7 +188,7 @@ function getWarningContent({
     return {
       content:
         (fixtureWithoutStep.trashBin && !fixtureWithoutStep.wasteChute) ||
-          (!fixtureWithoutStep.trashBin && fixtureWithoutStep.wasteChute) ? (
+        (!fixtureWithoutStep.trashBin && fixtureWithoutStep.wasteChute) ? (
           <p>
             {t('export_warnings.unused_trash.body', {
               name: fixtureWithoutStep.trashBin ? 'trash bin' : 'waste chute',
@@ -366,7 +366,7 @@ export function FileSidebar(): JSX.Element {
   return (
     <>
       {blockingExportHint}
-      {showExportWarningModal && (
+      {showExportWarningModal &&
         createPortal(
           <AlertModal
             alertOverlay
@@ -391,8 +391,7 @@ export function FileSidebar(): JSX.Element {
             {warning && warning.content}
           </AlertModal>,
           getMainPagePortalEl()
-        )
-      )}
+        )}
       <SidePanel title="Protocol File">
         <div className={styles.file_sidebar}>
           <OutlineButton onClick={createNewFile} className={styles.button}>

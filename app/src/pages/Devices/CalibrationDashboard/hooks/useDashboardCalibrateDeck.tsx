@@ -54,7 +54,7 @@ export function useDashboardCalibrateDeck(
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
         dispatchedAction.payload.command.command ===
-        Sessions.sharedCalCommands.JOG
+          Sessions.sharedCalCommands.JOG
       ) {
         jogRequestId.current =
           'requestId' in dispatchedAction.meta

@@ -63,8 +63,7 @@ describe('useUpdateSubsystemMutation hook', () => {
 
   it('should update subsystem a play run action when calling the playRun callback', async () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(updateSubsystem)
-    .mockResolvedValue({
+    vi.mocked(updateSubsystem).mockResolvedValue({
       data: SUBSYSTEM_UPDATE_RESPONSE,
     } as Response<SubsystemUpdateProgressData>)
 

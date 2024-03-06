@@ -169,7 +169,10 @@ describe('makeSingleEditFieldProps', () => {
       updateValue('foo')
       expect(handleChangeFormInput).toHaveBeenCalledWith(name, 'foo')
 
-      expect(vi.mocked(getFieldErrors)).toHaveBeenCalledWith(name, formData[name])
+      expect(vi.mocked(getFieldErrors)).toHaveBeenCalledWith(
+        name,
+        formData[name]
+      )
     })
   })
 })

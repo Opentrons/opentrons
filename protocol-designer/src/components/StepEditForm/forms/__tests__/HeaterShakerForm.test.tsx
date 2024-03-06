@@ -7,23 +7,25 @@ import { i18n } from '../../../../localization'
 import { HeaterShakerForm } from '../HeaterShakerForm'
 import type { DropdownOption } from '@opentrons/components'
 
-vi.mock('../../../../ui/modules/selectors', async (importOriginal) => {
-  const actualFields = await importOriginal<typeof import('../../../../ui/modules/selectors')>()
+vi.mock('../../../../ui/modules/selectors', async importOriginal => {
+  const actualFields = await importOriginal<
+    typeof import('../../../../ui/modules/selectors')
+  >()
   return {
     ...actualFields,
-    getHeaterShakerLabwareOptions: vi.fn()
+    getHeaterShakerLabwareOptions: vi.fn(),
   }
 })
-vi.mock('../../fields', async (importOriginal) => {
+vi.mock('../../fields', async importOriginal => {
   const actualFields = await importOriginal<typeof import('../../fields')>()
 
   return {
     ...actualFields,
     StepFormDropdown: vi.fn(() => <div>mock step form dropdown field!</div>),
-    TextField: vi.fn((p) => {
-      return (<div>{`mock ${p.name} input!`}</div>)
+    TextField: vi.fn(p => {
+      return <div>{`mock ${p.name} input!`}</div>
     }),
-    ToggleRowField: vi.fn(({ name }) => (<div>{`mock ${name} toggle!`}</div>)),
+    ToggleRowField: vi.fn(({ name }) => <div>{`mock ${name} toggle!`}</div>),
   }
 })
 

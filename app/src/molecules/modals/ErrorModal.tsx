@@ -12,7 +12,7 @@ interface Props {
   description: string
   close?: () => unknown
   closeUrl?: string
-  error: { message?: string;[key: string]: unknown } | null
+  error: { message?: string; [key: string]: unknown } | null
 }
 
 const DEFAULT_HEADING = 'Unexpected Error'
@@ -41,9 +41,8 @@ export function ErrorModal(props: Props): JSX.Element {
       </p>
       <p>{description}</p>
       <p>
-        If you keep getting this message, try restarting your app and/or
-        robot. If this does not resolve the issue please contact Opentrons
-        Support.
+        If you keep getting this message, try restarting your app and/or robot.
+        If this does not resolve the issue please contact Opentrons Support.
       </p>
     </AlertModal>,
     getModalPortalEl()

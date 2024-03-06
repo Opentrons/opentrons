@@ -54,8 +54,7 @@ describe('useCurrentSubsystemUpdateQuery', () => {
 
   it('should return no data if the get current system updates request fails', () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(getCurrentSubsystemUpdate)
-    .mockRejectedValue('oh no')
+    vi.mocked(getCurrentSubsystemUpdate).mockRejectedValue('oh no')
 
     const { result } = renderHook(
       () => useCurrentSubsystemUpdateQuery(SUBSYSTEM_TYPE),

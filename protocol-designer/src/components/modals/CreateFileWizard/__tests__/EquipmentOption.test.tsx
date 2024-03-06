@@ -8,7 +8,9 @@ import { renderWithProviders } from '../../../../__testing-utils__'
 import { EquipmentOption } from '../EquipmentOption'
 
 const render = (props: React.ComponentProps<typeof EquipmentOption>) => {
-  return renderWithProviders(<EquipmentOption {...props} />, { i18nInstance: i18n })[0]
+  return renderWithProviders(<EquipmentOption {...props} />, {
+    i18nInstance: i18n,
+  })[0]
 }
 
 describe('EquipmentOption', () => {
@@ -62,9 +64,9 @@ describe('EquipmentOption', () => {
     }
     render(props)
     screen.getByText('mockText')
-    expect(screen.getByLabelText('EquipmentOption_checkbox-marked')).toHaveStyle(
-      `color: ${COLORS.blue50}`
-    )
+    expect(
+      screen.getByLabelText('EquipmentOption_checkbox-marked')
+    ).toHaveStyle(`color: ${COLORS.blue50}`)
     expect(screen.getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
       `border: ${BORDERS.activeLineBorder}`
     )

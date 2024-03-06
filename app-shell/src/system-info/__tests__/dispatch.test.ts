@@ -17,7 +17,6 @@ import type { Dispatch } from '../../types'
 import type { UsbDeviceMonitor } from '../usb-devices'
 import type { NetworkInterfaceMonitor } from '../network-interfaces'
 
-
 vi.mock('../../os')
 vi.mock('../usb-devices')
 vi.mock('../network-interfaces')

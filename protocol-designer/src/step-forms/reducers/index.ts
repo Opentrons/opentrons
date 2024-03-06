@@ -1,4 +1,3 @@
-
 import { handleActions } from 'redux-actions'
 import { Reducer } from 'redux'
 import mapValues from 'lodash/mapValues'

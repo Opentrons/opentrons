@@ -80,7 +80,10 @@ const MessageBody = (props: {
       </>
     )
   }
-  console.assert(false, `MessageBody got unhandled messageType: ${message.messageType}`)
+  console.assert(
+    false,
+    `MessageBody got unhandled messageType: ${message.messageType}`
+  )
   return null
 }
 

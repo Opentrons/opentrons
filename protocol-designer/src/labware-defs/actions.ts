@@ -1,4 +1,3 @@
-
 import Ajv from 'ajv'
 import isEqual from 'lodash/isEqual'
 import flatten from 'lodash/flatten'

@@ -248,10 +248,12 @@ export function GeneralSettings(): JSX.Element {
           </TertiaryButton>
         </Flex>
       </Box>
-      {showUpdateModal ? createPortal(
-        <UpdateAppModal closeModal={() => setShowUpdateModal(false)} />,
-        getTopPortalEl()
-      ) : null}
+      {showUpdateModal
+        ? createPortal(
+            <UpdateAppModal closeModal={() => setShowUpdateModal(false)} />,
+            getTopPortalEl()
+          )
+        : null}
       {showPreviousVersionModal ? (
         <PreviousVersionModal
           closeModal={() => setShowPreviousVersionModal(false)}

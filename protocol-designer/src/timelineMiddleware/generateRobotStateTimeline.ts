@@ -7,7 +7,7 @@ import {
   dropTip,
   reduceCommandCreators,
   commandCreatorsTimeline,
-  getPipetteIdFromCCArgs
+  getPipetteIdFromCCArgs,
 } from '@opentrons/step-generation'
 import { commandCreatorFromStepArgs } from '../file-data/helpers'
 import type { StepArgsAndErrorsById } from '../steplist/types'

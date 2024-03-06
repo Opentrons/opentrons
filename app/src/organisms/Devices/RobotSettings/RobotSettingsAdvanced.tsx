@@ -139,7 +139,8 @@ export function RobotSettingsAdvanced({
             updateResetStatus={updateResetStatus}
           />
         )}
-        {showDeviceResetModal && createPortal(
+        {showDeviceResetModal &&
+          createPortal(
             <DeviceResetModal
               closeModal={() => setShowDeviceResetModal(false)}
               isRobotReachable={isRobotReachable}
@@ -147,7 +148,7 @@ export function RobotSettingsAdvanced({
               resetOptions={resetOptions}
             />,
             getTopPortalEl()
-        )}
+          )}
         <DisplayRobotName
           robotName={robotName}
           updateIsExpanded={updateIsExpanded}

@@ -5,7 +5,10 @@ import { screen } from '@testing-library/react'
 import { LabwareRender } from '@opentrons/components'
 import { parseLiquidsInLoadOrder } from '@opentrons/api-client'
 
-import { nestedTextMatcher, renderWithProviders } from '../../../../../__testing-utils__'
+import {
+  nestedTextMatcher,
+  renderWithProviders,
+} from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import { getIsOnDevice } from '../../../../../redux/config'
 import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -46,7 +49,7 @@ const render = (
 describe('LiquidsLabwareDetailsModal', () => {
   let props: React.ComponentProps<typeof LiquidsLabwareDetailsModal>
   beforeEach(() => {
-    window.HTMLElement.prototype.scrollIntoView = function () { }
+    window.HTMLElement.prototype.scrollIntoView = function () {}
     props = {
       liquidId: '4',
       labwareId: '123',
@@ -103,7 +106,10 @@ describe('LiquidsLabwareDetailsModal', () => {
   })
   it('should render LiquidDetailCard when correct props are passed', () => {
     render(props)
-    expect(vi.mocked(LiquidDetailCard)).toHaveBeenCalledWith(expect.objectContaining({ liquidId: '4' }), expect.any(Object))
+    expect(vi.mocked(LiquidDetailCard)).toHaveBeenCalledWith(
+      expect.objectContaining({ liquidId: '4' }),
+      expect.any(Object)
+    )
     screen.getByText(nestedTextMatcher('mock LiquidDetailCard'))
   })
   it.only('should render labware render with well fill', () => {
@@ -112,12 +118,15 @@ describe('LiquidsLabwareDetailsModal', () => {
       C2: '#ff4888',
     })
     render(props)
-    expect(vi.mocked(LabwareRender)).toHaveBeenCalledWith(expect.objectContaining({
-      wellFill: {
-        C1: '#ff4888',
-        C2: '#ff4888',
-      }
-    }), expect.any(Object))
+    expect(vi.mocked(LabwareRender)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        wellFill: {
+          C1: '#ff4888',
+          C2: '#ff4888',
+        },
+      }),
+      expect.any(Object)
+    )
   })
   it('should render labware render with well fill on odd', () => {
     vi.mocked(getIsOnDevice).mockReturnValue(true)
@@ -127,11 +136,13 @@ describe('LiquidsLabwareDetailsModal', () => {
     })
     render(props)
     screen.getByText('mock labware render with well fill')
-    expect(vi.mocked(LabwareRender)).toHaveBeenCalledWith(expect.objectContaining({
-      wellFill: {
-        C1: '#ff4888',
-        C2: '#ff4888',
-      }
-    }))
+    expect(vi.mocked(LabwareRender)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        wellFill: {
+          C1: '#ff4888',
+          C2: '#ff4888',
+        },
+      })
+    )
   })
 })

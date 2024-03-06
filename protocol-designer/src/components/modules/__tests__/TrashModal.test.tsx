@@ -2,7 +2,7 @@ import * as React from 'react'
 import { vi, describe, expect, it, beforeEach } from 'vitest'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
-import { renderWithProviders } from '../../../__testing-utils__' 
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../localization'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { getSlotIsEmpty } from '../../../step-forms'
@@ -53,7 +53,10 @@ describe('TrashModal ', () => {
     expect(props.onCloseClick).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'save' }))
     await waitFor(() => {
-      expect(vi.mocked(createDeckFixture)).toHaveBeenCalledWith('trashBin', 'cutoutA3')
+      expect(vi.mocked(createDeckFixture)).toHaveBeenCalledWith(
+        'trashBin',
+        'cutoutA3'
+      )
     })
   })
   it('call delete then create container when trash is already on the slot', async () => {
@@ -69,7 +72,10 @@ describe('TrashModal ', () => {
       expect(vi.mocked(deleteDeckFixture)).toHaveBeenCalledWith(mockId)
     })
     await waitFor(() => {
-      expect(vi.mocked(createDeckFixture)).toHaveBeenCalledWith('trashBin', 'cutoutA3')
+      expect(vi.mocked(createDeckFixture)).toHaveBeenCalledWith(
+        'trashBin',
+        'cutoutA3'
+      )
     })
   })
   it('renders the button as disabled when the slot is full for trash bin', () => {

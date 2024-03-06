@@ -34,29 +34,31 @@ export function NewRobotSetupHelp(): JSX.Element {
       >
         {t('see_how_to_setup_new_robot')}
       </Link>
-      {showNewRobotHelpModal ? createPortal(
-        <LegacyModal
-          title={t('how_to_setup_a_robot')}
-          onClose={() => setShowNewRobotHelpModal(false)}
-        >
-          <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="p" marginBottom={SPACING.spacing16}>
-              {t('use_usb_cable_for_new_robot')}
-            </StyledText>
-            <ExternalLink href={NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF}>
-              {t('learn_more_about_new_robot_setup')}
-            </ExternalLink>
-            <PrimaryButton
-              onClick={() => setShowNewRobotHelpModal(false)}
-              alignSelf={ALIGN_FLEX_END}
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
+      {showNewRobotHelpModal
+        ? createPortal(
+            <LegacyModal
+              title={t('how_to_setup_a_robot')}
+              onClose={() => setShowNewRobotHelpModal(false)}
             >
-              {t('shared:close')}
-            </PrimaryButton>
-          </Flex>
-        </LegacyModal>,
-        getTopPortalEl()
-      ) : null}
+              <Flex flexDirection={DIRECTION_COLUMN}>
+                <StyledText as="p" marginBottom={SPACING.spacing16}>
+                  {t('use_usb_cable_for_new_robot')}
+                </StyledText>
+                <ExternalLink href={NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF}>
+                  {t('learn_more_about_new_robot_setup')}
+                </ExternalLink>
+                <PrimaryButton
+                  onClick={() => setShowNewRobotHelpModal(false)}
+                  alignSelf={ALIGN_FLEX_END}
+                  textTransform={TYPOGRAPHY.textTransformCapitalize}
+                >
+                  {t('shared:close')}
+                </PrimaryButton>
+              </Flex>
+            </LegacyModal>,
+            getTopPortalEl()
+          )
+        : null}
     </>
   )
 }

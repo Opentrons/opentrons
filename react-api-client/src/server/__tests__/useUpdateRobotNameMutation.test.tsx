@@ -37,8 +37,7 @@ describe('useUpdatedRobotNameMutation, hook', () => {
 
   it('should return no data when calling updateRobotName if the request fails', async () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(updateRobotName)
-    .mockRejectedValue('error')
+    vi.mocked(updateRobotName).mockRejectedValue('error')
 
     const { result } = renderHook(() => useUpdateRobotNameMutation(), {
       wrapper,

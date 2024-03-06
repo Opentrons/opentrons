@@ -38,20 +38,20 @@ export const ProtocolLabwareDetails = (
   const labwareDetails =
     requiredLabwareDetails != null
       ? [
-        ...requiredLabwareDetails
-          .reduce((acc, labware) => {
-            if (labware.result?.definition == null) return acc
-            else if (!acc.has(getLabwareDefURI(labware.result.definition))) {
-              acc.set(getLabwareDefURI(labware.result.definition), {
-                ...labware,
-                quantity: 0,
-              })
-            }
-            acc.get(getLabwareDefURI(labware.result?.definition)).quantity++
-            return acc
-          }, new Map())
-          .values(),
-      ]
+          ...requiredLabwareDetails
+            .reduce((acc, labware) => {
+              if (labware.result?.definition == null) return acc
+              else if (!acc.has(getLabwareDefURI(labware.result.definition))) {
+                acc.set(getLabwareDefURI(labware.result.definition), {
+                  ...labware,
+                  quantity: 0,
+                })
+              }
+              acc.get(getLabwareDefURI(labware.result?.definition)).quantity++
+              return acc
+            }, new Map())
+            .values(),
+        ]
       : []
 
   return (

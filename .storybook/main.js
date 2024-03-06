@@ -12,10 +12,10 @@ module.exports = {
 
   framework: {
     name: '@storybook/react-vite',
-    options: {}
+    options: {},
   },
 
   docs: {
-    autodocs: true
-  }
+    autodocs: true,
+  },
 }

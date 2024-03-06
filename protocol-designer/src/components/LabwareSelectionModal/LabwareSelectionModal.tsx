@@ -51,7 +51,11 @@ import { LabwareItem } from './LabwareItem'
 import { LabwarePreview } from './LabwarePreview'
 import styles from './styles.module.css'
 
-import type { LabwareDefinition2, ModuleType, ModuleModel } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  ModuleType,
+  ModuleModel,
+} from '@opentrons/shared-data'
 import type { DeckSlot, ThunkDispatch } from '../../types'
 import type { LabwareDefByDefURI } from '../../labware-defs'
 import type { ModuleOnDeck } from '../../step-forms'
@@ -136,8 +140,8 @@ export const getLabwareIsRecommended = (
   } else {
     return moduleType != null
       ? RECOMMENDED_LABWARE_BY_MODULE[moduleType].includes(
-        def.parameters.loadName
-      )
+          def.parameters.loadName
+        )
       : false
   }
 }
@@ -367,11 +371,11 @@ export function LabwareSelectionModal(): JSX.Element | null {
         (acc, category) =>
           labwareByCategory[category]
             ? {
-              ...acc,
-              [category]: labwareByCategory[category].some(
-                def => !getIsLabwareFiltered(def)
-              ),
-            }
+                ...acc,
+                [category]: labwareByCategory[category].some(
+                  def => !getIsLabwareFiltered(def)
+                ),
+              }
             : acc,
         {}
       ),
@@ -534,19 +538,19 @@ export function LabwareSelectionModal(): JSX.Element | null {
             >
               {has96Channel && adapterLoadName === ADAPTER_96_CHANNEL
                 ? permittedTipracks.map((tiprackDefUri, index) => {
-                  const labwareDefUri = URIs.find(
-                    defUri => defUri === tiprackDefUri
-                  )
-                  return getLabwareAdapterItem(index, labwareDefUri)
-                })
-                : getLabwareCompatibleWithAdapter(adapterLoadName).map(
-                  (adapterDefUri, index) => {
                     const labwareDefUri = URIs.find(
-                      defUri => defUri === adapterDefUri
+                      defUri => defUri === tiprackDefUri
                     )
                     return getLabwareAdapterItem(index, labwareDefUri)
-                  }
-                )}
+                  })
+                : getLabwareCompatibleWithAdapter(adapterLoadName).map(
+                    (adapterDefUri, index) => {
+                      const labwareDefUri = URIs.find(
+                        defUri => defUri === adapterDefUri
+                      )
+                      return getLabwareAdapterItem(index, labwareDefUri)
+                    }
+                  )}
             </PDTitledList>
           )}
         </ul>

@@ -1,9 +1,7 @@
 import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, it, vi } from 'vitest'
-import {
-  renderWithProviders,
-} from '../../../__testing-utils__'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { FlexModuleTag } from '../FlexModuleTag'
 import type { ModuleDimensions } from '@opentrons/shared-data'
 
@@ -11,7 +9,9 @@ vi.mock('@opentrons/components', async () => {
   const actual = await vi.importActual('@opentrons/components')
   return {
     ...actual,
-    RobotCoordsForeignDiv: ({children}: {children: React.ReactNode}) => <div>{children}</div>
+    RobotCoordsForeignDiv: ({ children }: { children: React.ReactNode }) => (
+      <div>{children}</div>
+    ),
   }
 })
 

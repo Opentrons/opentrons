@@ -173,37 +173,39 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
           {i18n.format(t('view_current_offsets'), 'capitalize')}
         </StyledText>
       </Btn>
-      {showOffsetsTable ? createPortal(
-        <LegacyModalShell
-          width="60rem"
-          height="33.5rem"
-          padding={SPACING.spacing32}
-          display="flex"
-          flexDirection={DIRECTION_COLUMN}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          header={
-            <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
-              {i18n.format(t('labware_offset_data'), 'capitalize')}
-            </StyledText>
-          }
-          footer={
-            <SmallButton
-              width="100%"
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
-              buttonText={t('shared:close')}
-              onClick={() => setShowOffsetsModal(false)}
-            />
-          }
-        >
-          <Box overflowY="scroll" marginBottom={SPACING.spacing16}>
-            <TerseOffsetTable
-              offsets={latestCurrentOffsets}
-              labwareDefinitions={labwareDefinitions}
-            />
-          </Box>
-        </LegacyModalShell>,
-        getTopPortalEl()
-      ) : null}
+      {showOffsetsTable
+        ? createPortal(
+            <LegacyModalShell
+              width="60rem"
+              height="33.5rem"
+              padding={SPACING.spacing32}
+              display="flex"
+              flexDirection={DIRECTION_COLUMN}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+              header={
+                <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
+                  {i18n.format(t('labware_offset_data'), 'capitalize')}
+                </StyledText>
+              }
+              footer={
+                <SmallButton
+                  width="100%"
+                  textTransform={TYPOGRAPHY.textTransformCapitalize}
+                  buttonText={t('shared:close')}
+                  onClick={() => setShowOffsetsModal(false)}
+                />
+              }
+            >
+              <Box overflowY="scroll" marginBottom={SPACING.spacing16}>
+                <TerseOffsetTable
+                  offsets={latestCurrentOffsets}
+                  labwareDefinitions={labwareDefinitions}
+                />
+              </Box>
+            </LegacyModalShell>,
+            getTopPortalEl()
+          )
+        : null}
     </>
   ) : (
     <Flex />

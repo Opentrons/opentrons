@@ -157,14 +157,16 @@ export const TestShakeSlideout = (
         </PrimaryButton>
       }
     >
-      {showConfirmationModal ? createPortal(
-        <ConfirmAttachmentModal
-          onCloseClick={cancelExit}
-          isProceedToRunModal={false}
-          onConfirmClick={sendCommands}
-        />,
-        getTopPortalEl()
-      ) : null}
+      {showConfirmationModal
+        ? createPortal(
+            <ConfirmAttachmentModal
+              onCloseClick={cancelExit}
+              isProceedToRunModal={false}
+              onConfirmClick={sendCommands}
+            />,
+            getTopPortalEl()
+          )
+        : null}
       <Flex
         borderRadius={BORDERS.radiusSoftCorners}
         marginBottom={SPACING.spacing8}

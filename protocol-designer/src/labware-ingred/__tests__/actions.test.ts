@@ -37,12 +37,14 @@ describe('renameLabware thunk', () => {
       return { someLabwareId: 'Some Labware', otherLabwareId: 'Other Labware' }
     })
 
-    vi.mocked(getNextNickname).mockImplementation((allNicknames, proposedNickname) => {
-      expect(allNicknames).not.toContain('Some Labware')
-      expect(allNicknames).toContain('Other Labware')
-      expect(proposedNickname).toEqual('Some Labware')
-      return 'Mock Next Nickname'
-    })
+    vi.mocked(getNextNickname).mockImplementation(
+      (allNicknames, proposedNickname) => {
+        expect(allNicknames).not.toContain('Some Labware')
+        expect(allNicknames).toContain('Other Labware')
+        expect(proposedNickname).toEqual('Some Labware')
+        return 'Mock Next Nickname'
+      }
+    )
 
     const expectedActions = [
       {
@@ -62,15 +64,17 @@ describe('renameLabware thunk', () => {
       return { someLabwareId: 'Some Labware', otherLabwareId: 'Other Labware' }
     })
 
-    vi.mocked(getNextNickname).mockImplementation((allNicknames, proposedNickname) => {
-      expect(allNicknames).not.toContain('Some Labware')
-      expect(allNicknames).toContain('Other Labware')
+    vi.mocked(getNextNickname).mockImplementation(
+      (allNicknames, proposedNickname) => {
+        expect(allNicknames).not.toContain('Some Labware')
+        expect(allNicknames).toContain('Other Labware')
 
-      expect(proposedNickname).toEqual('Specified Name')
-      // In real life, 'Mock Next Nickname' might be "Some Labware (2)" -- but that
-      // is up to the implementation of getNextNickname.
-      return 'Mock Next Nickname'
-    })
+        expect(proposedNickname).toEqual('Specified Name')
+        // In real life, 'Mock Next Nickname' might be "Some Labware (2)" -- but that
+        // is up to the implementation of getNextNickname.
+        return 'Mock Next Nickname'
+      }
+    )
 
     const expectedActions = [
       {
@@ -145,10 +149,12 @@ describe('createContainer', () => {
 
     vi.mocked(uuid).mockImplementation(() => 'fakeUuid')
 
-    vi.mocked(getNextAvailableDeckSlot).mockImplementation(_initialDeckSetup => {
-      expect(_initialDeckSetup).toBe(initialDeckSetup)
-      return '3'
-    })
+    vi.mocked(getNextAvailableDeckSlot).mockImplementation(
+      _initialDeckSetup => {
+        expect(_initialDeckSetup).toBe(initialDeckSetup)
+        return '3'
+      }
+    )
 
     const expectedActions = [
       {
@@ -184,11 +190,13 @@ describe('createContainer', () => {
       return { someLabwareDefURI: fixture_96_plate as LabwareDefinition2 }
     })
 
-    vi.mocked(getNextAvailableDeckSlot).mockImplementation(_initialDeckSetup => {
-      expect(_initialDeckSetup).toBe(initialDeckSetup)
-      // IRL this would mean that the deck is full, no slots available
-      return null
-    })
+    vi.mocked(getNextAvailableDeckSlot).mockImplementation(
+      _initialDeckSetup => {
+        expect(_initialDeckSetup).toBe(initialDeckSetup)
+        // IRL this would mean that the deck is full, no slots available
+        return null
+      }
+    )
 
     const expectedActions: any[] = []
 
@@ -210,15 +218,17 @@ describe('createContainer', () => {
       }
     })
 
-    vi.mocked(getNextNickname).mockImplementation((allNicknames, proposedNickname) => {
-      expect(allNicknames).not.toContain('Some Labware')
-      expect(allNicknames).toContain('Other Labware')
+    vi.mocked(getNextNickname).mockImplementation(
+      (allNicknames, proposedNickname) => {
+        expect(allNicknames).not.toContain('Some Labware')
+        expect(allNicknames).toContain('Other Labware')
 
-      expect(proposedNickname).toEqual('Some Labware')
-      // In real life, 'Mock Next Nickname' might be "Some Labware (2)" -- but that
-      // is up to the implementation of getNextNickname.
-      return 'Mock Next Nickname'
-    })
+        expect(proposedNickname).toEqual('Some Labware')
+        // In real life, 'Mock Next Nickname' might be "Some Labware (2)" -- but that
+        // is up to the implementation of getNextNickname.
+        return 'Mock Next Nickname'
+      }
+    )
 
     vi.mocked(getInitialDeckSetup).mockImplementation(state => {
       expect(state).toBe(store.getState())

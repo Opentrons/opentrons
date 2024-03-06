@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
-import { getTopPortalEl} from '../../../../App/portal'
+import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModalShell } from '../../../../molecules/LegacyModal'
 import { WizardHeader } from '../../../../molecules/WizardHeader'
 import { CalibratePipetteOffset } from '../../../../organisms/CalibratePipetteOffset'
@@ -28,7 +28,7 @@ const spinnerCommandBlockList: SessionCommandString[] = [
 
 export interface DashboardOffsetCalInvokerProps {
   params: Pick<PipetteOffsetCalibrationSessionParams, 'mount'> &
-  Partial<Omit<PipetteOffsetCalibrationSessionParams, 'mount'>>
+    Partial<Omit<PipetteOffsetCalibrationSessionParams, 'mount'>>
 }
 
 export type DashboardCalOffsetInvoker = (
@@ -57,7 +57,7 @@ export function useDashboardCalibratePipOffset(
       if (
         dispatchedAction.type === Sessions.ENSURE_SESSION &&
         dispatchedAction.payload.sessionType ===
-        Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
+          Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
       ) {
         createRequestId.current =
           'requestId' in dispatchedAction.meta
@@ -74,7 +74,7 @@ export function useDashboardCalibratePipOffset(
       } else if (
         dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
         dispatchedAction.payload.command.command ===
-        Sessions.sharedCalCommands.JOG
+          Sessions.sharedCalCommands.JOG
       ) {
         jogRequestId.current =
           'requestId' in dispatchedAction.meta

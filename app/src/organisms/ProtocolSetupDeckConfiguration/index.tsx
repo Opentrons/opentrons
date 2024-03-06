@@ -85,25 +85,25 @@ export function ProtocolSetupDeckConfiguration({
 
   return (
     <>
-    {createPortal(
-      <>
-        {showDiscardChangeModal ? (
-          <DeckConfigurationDiscardChangesModal
-            setShowConfirmationModal={setShowDiscardChangeModal}
-          />
-        ) : null}
-        {showConfigurationModal && cutoutId != null ? (
-          <AddFixtureModal
-            cutoutId={cutoutId}
-            setShowAddFixtureModal={setShowConfigurationModal}
-            providedFixtureOptions={providedFixtureOptions}
-            setCurrentDeckConfig={setCurrentDeckConfig}
-            isOnDevice
-          />
-        ) : null}
-      </>,
-      getTopPortalEl()
-    )}
+      {createPortal(
+        <>
+          {showDiscardChangeModal ? (
+            <DeckConfigurationDiscardChangesModal
+              setShowConfirmationModal={setShowDiscardChangeModal}
+            />
+          ) : null}
+          {showConfigurationModal && cutoutId != null ? (
+            <AddFixtureModal
+              cutoutId={cutoutId}
+              setShowAddFixtureModal={setShowConfigurationModal}
+              providedFixtureOptions={providedFixtureOptions}
+              setCurrentDeckConfig={setCurrentDeckConfig}
+              isOnDevice
+            />
+          ) : null}
+        </>,
+        getTopPortalEl()
+      )}
       <Flex flexDirection={DIRECTION_COLUMN}>
         <ChildNavigation
           header={t('devices_landing:deck_configuration')}

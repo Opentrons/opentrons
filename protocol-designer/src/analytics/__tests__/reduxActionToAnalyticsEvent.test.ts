@@ -12,7 +12,6 @@ import type { SaveStepFormsMultiAction } from '../../step-forms/actions'
 vi.mock('../../file-data/selectors')
 vi.mock('../../step-forms/selectors')
 
-
 describe('reduxActionToAnalyticsEvent', () => {
   let fooState: any
   beforeEach(() => {

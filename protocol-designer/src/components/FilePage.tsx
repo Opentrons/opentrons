@@ -237,22 +237,20 @@ export const FilePage = (): JSX.Element => {
           {t('continue_to_liquids')}
         </DeprecatedPrimaryButton>
       </div>
-      {
-        createPortal(
-          <>
-            {isEditPipetteModalOpen && (
-              <FilePipettesModal closeModal={closeEditPipetteModal} />
-            )}
-            {moduleToEdit != null && (
-              <EditModules
-                moduleToEdit={moduleToEdit}
-                onCloseClick={closeEditModulesModal}
-              />
-            )}
-          </>,
-          getTopPortalEl() 
-        )
-      }
+      {createPortal(
+        <>
+          {isEditPipetteModalOpen && (
+            <FilePipettesModal closeModal={closeEditPipetteModal} />
+          )}
+          {moduleToEdit != null && (
+            <EditModules
+              moduleToEdit={moduleToEdit}
+              onCloseClick={closeEditModulesModal}
+            />
+          )}
+        </>,
+        getTopPortalEl()
+      )}
     </div>
   )
 }

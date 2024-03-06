@@ -7,12 +7,15 @@ import {
 } from '@opentrons/shared-data/labware/fixtures/2'
 import { OT2_ROBOT_TYPE, OT2_STANDARD_DECKID } from '@opentrons/shared-data'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { LabwareLiquidState, LabwareEntities, PipetteEntities } from '@opentrons/step-generation'
+import type {
+  LabwareLiquidState,
+  LabwareEntities,
+  PipetteEntities,
+} from '@opentrons/step-generation'
 import type { DismissedWarningState } from '../../../dismiss/reducers'
 import type { IngredientsState } from '../../../labware-ingred/reducers'
 import type { LabwareDefByDefURI } from '../../../labware-defs'
 import type { FileMetadataFields } from '../../types'
-
 
 const fixture96Plate = fixture_96_plate as LabwareDefinition2
 const fixtureTiprack10ul = fixture_tiprack_10_ul as LabwareDefinition2

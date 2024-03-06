@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { UseQueryResult } from 'react-query'
 import { screen } from '@testing-library/react'
-import { describe, it, vi, beforeEach} from 'vitest'
+import { describe, it, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { useNotifyAllRunsQuery } from '../../../resources/runs/useNotifyAllRunsQuery'

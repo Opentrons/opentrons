@@ -2,7 +2,7 @@ import * as React from 'react'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen, cleanup } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { renderWithProviders } from '../../../__testing-utils__' 
+import { renderWithProviders } from '../../../__testing-utils__'
 import { createFile, getRobotType } from '../../../file-data/selectors'
 import {
   getCurrentPage,

@@ -3,7 +3,7 @@ import Ajv from 'ajv'
 import glob from 'glob'
 import last from 'lodash/last'
 import path from 'path'
-import { 
+import {
   protocolSchemaV1,
   protocolSchemaV3,
   protocolSchemaV4,
@@ -13,7 +13,7 @@ import {
   protocolSchemaV8,
   labwareSchemaV2,
   commandSchemaV7,
- } from '@opentrons/shared-data'
+} from '@opentrons/shared-data'
 
 // TODO: copied from createFile.test.js
 const getAjvValidator = (_protocolSchema: object) => {

@@ -49,33 +49,33 @@ export const NotConfiguredModal = (
   }
 
   return createPortal(
-      <LegacyModal
-        title={t('add_fixture', {
-          fixtureName: getFixtureDisplayName(requiredFixtureId),
-        })}
-        onClose={onCloseClick}
-        width="27.75rem"
-      >
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText as="p">{t('add_fixture_to_deck')}</StyledText>
-          <Flex paddingTop={SPACING.spacing16} flexDirection={DIRECTION_COLUMN}>
-            <Flex
-              padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
-              backgroundColor={COLORS.grey30}
-              borderRadius={BORDERS.radiusSoftCorners}
-              alignItems={ALIGN_CENTER}
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-            >
-              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-                {getFixtureDisplayName(requiredFixtureId)}
-              </StyledText>
-              <TertiaryButton onClick={handleUpdateDeck}>
-                {i18n.format(t('shared:add'), 'capitalize')}
-              </TertiaryButton>
-            </Flex>
+    <LegacyModal
+      title={t('add_fixture', {
+        fixtureName: getFixtureDisplayName(requiredFixtureId),
+      })}
+      onClose={onCloseClick}
+      width="27.75rem"
+    >
+      <Flex flexDirection={DIRECTION_COLUMN}>
+        <StyledText as="p">{t('add_fixture_to_deck')}</StyledText>
+        <Flex paddingTop={SPACING.spacing16} flexDirection={DIRECTION_COLUMN}>
+          <Flex
+            padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
+            backgroundColor={COLORS.grey30}
+            borderRadius={BORDERS.radiusSoftCorners}
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+          >
+            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              {getFixtureDisplayName(requiredFixtureId)}
+            </StyledText>
+            <TertiaryButton onClick={handleUpdateDeck}>
+              {i18n.format(t('shared:add'), 'capitalize')}
+            </TertiaryButton>
           </Flex>
         </Flex>
-      </LegacyModal>,
-      getTopPortalEl()
+      </Flex>
+    </LegacyModal>,
+    getTopPortalEl()
   )
 }

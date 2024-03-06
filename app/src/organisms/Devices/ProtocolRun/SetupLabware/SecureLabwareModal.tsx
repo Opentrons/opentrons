@@ -48,9 +48,7 @@ export const SecureLabwareModal = (
             <Flex flexDirection={DIRECTION_COLUMN}>
               <Trans
                 t={t}
-                i18nKey={`secure_labware_explanation_${snakeCase(
-                  moduleName
-                )}`}
+                i18nKey={`secure_labware_explanation_${snakeCase(moduleName)}`}
                 components={{
                   block: (
                     <StyledText

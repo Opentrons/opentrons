@@ -109,9 +109,12 @@ describe('useProtocolAnalysisErrors hook', () => {
     when(vi.mocked(useProtocolDetailsForRun))
       .calledWith(RUN_ID_2)
       .thenReturn({ protocolData: ROBOT_PROTOCOL_ANALYSIS } as any)
-    const { result } = renderHook(() => useProtocolRunAnalyticsData(RUN_ID_2, mockConnectableRobot), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useProtocolRunAnalyticsData(RUN_ID_2, mockConnectableRobot),
+      {
+        wrapper,
+      }
+    )
     const protocolRunAnalyticsData = await waitFor(() =>
       result.current.getProtocolRunAnalyticsData()
     )

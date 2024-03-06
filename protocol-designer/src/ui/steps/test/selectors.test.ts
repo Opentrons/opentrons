@@ -38,7 +38,7 @@ function createArgsForStepId(
   return {
     [stepId]: {
       stepArgs,
-      errors: false
+      errors: false,
     },
   }
 }
@@ -100,24 +100,24 @@ describe('getHoveredStepLabware', () => {
 
     expect(result).toEqual([])
   })
-    ;['consolidate', 'distribute', 'transfer'].forEach(command => {
-      it(`source and destination labware is returned when ${command}`, () => {
-        const sourceLabware = 'test tube'
-        const stepArgs = {
-          commandCreatorFnName: command,
-          destLabware: labware,
-          sourceLabware,
-        }
-        const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
-        const result = getHoveredStepLabware.resultFunc(
-          argsByStepId,
-          hoveredStepId,
-          initialDeckState
-        )
+  ;['consolidate', 'distribute', 'transfer'].forEach(command => {
+    it(`source and destination labware is returned when ${command}`, () => {
+      const sourceLabware = 'test tube'
+      const stepArgs = {
+        commandCreatorFnName: command,
+        destLabware: labware,
+        sourceLabware,
+      }
+      const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
+      const result = getHoveredStepLabware.resultFunc(
+        argsByStepId,
+        hoveredStepId,
+        initialDeckState
+      )
 
-        expect(result).toEqual([sourceLabware, labware])
-      })
+      expect(result).toEqual([sourceLabware, labware])
     })
+  })
 
   it('labware is returned when command is mix', () => {
     const stepArgs = {
@@ -177,7 +177,9 @@ describe('getHoveredStepLabware', () => {
     })
 
     it('labware on module is returned when module id exists', () => {
-      vi.mocked(utils.getLabwareOnModule).mockReturnValue({ id: labware } as any)
+      vi.mocked(utils.getLabwareOnModule).mockReturnValue({
+        id: labware,
+      } as any)
       const stepArgs = {
         commandCreatorFnName: setTempCommand,
         module: type,
@@ -369,7 +371,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
       'another_move_liquid_step_id',
     ]
   })
-  afterEach(() => { })
+  afterEach(() => {})
 
   it('should return null if any of the forms are an unhandled type', () => {
     const savedStepForms = {
