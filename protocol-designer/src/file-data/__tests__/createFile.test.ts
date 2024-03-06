@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import Ajv from 'ajv'
-import { commandSchemaV8, labwareSchemaV2, protocolSchemaV8 } from '@opentrons/shared-data'
+import {
+  commandSchemaV8,
+  labwareSchemaV2,
+  protocolSchemaV8,
+} from '@opentrons/shared-data'
 import {
   fixture_12_trough,
   fixture_96_plate,
@@ -25,7 +29,7 @@ import {
   ot2Robot,
 } from '../__fixtures__/createFile/commonFields'
 import * as v7Fixture from '../__fixtures__/createFile/v7Fixture'
-import { type LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   LabwareEntities,
   PipetteEntities,
