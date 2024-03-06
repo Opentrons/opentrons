@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 const { versionPrevious } = require('../create-release')
 
 const HISTORICAL_VERSIONS = [
