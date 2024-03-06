@@ -1,5 +1,4 @@
 'use strict'
-const { vi } = require('vitest')
 
 global._PKG_VERSION_ = '0.0.0-test'
 global._OPENTRONS_PROJECT_ = 'robot-stack'
