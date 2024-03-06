@@ -850,7 +850,7 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('does NOT render confirm attachment modal when the user already confirmed the heater shaker is attached', () => {
-    vi.mocked(useCurrentRunId).mockReturnValue(true)
+    vi.mocked(getIsHeaterShakerAttached).mockReturnValue(true)
     vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [mockHeaterShaker] },
     } as any)
