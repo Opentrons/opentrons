@@ -1,4 +1,3 @@
-import type { Mount } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -15,6 +14,7 @@ import type {
   PipetteName,
   NozzleConfigurationStyle,
   LabwareLocation,
+  PipetteMount as Mount,
 } from '@opentrons/shared-data'
 import type {
   AtomicProfileStep,
