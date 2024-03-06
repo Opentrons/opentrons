@@ -83,18 +83,11 @@ def get_run_data(one_run: Any, ip: str) -> Dict[str, Any]:
         f"http://{ip}:31950/health", headers={"opentrons-version": "3"}
     )
     health_data = response.json()
-    robot_name = health_data["name"]
-    run["API_Version"] = health_data["api_version"]
-    try:
-        robot_serial = health_data["robot_serial"]
-    except KeyError:
-        robot_serial = "unknown"
-    try:
-        run["robot_name"] = robot_name
-    except UnboundLocalError:
-        robot_name = "unknown"
+    run["robot_name"] = health_data.get("name", "")
+    run["API_Version"] = health_data.get("api_version", "")
+    run["robot_serial"] = health_data.get("robot_serial", "")
     run["run_id"] = one_run
-    run["robot_serial"] = robot_serial
+
     # Instruments Attached
     response = requests.get(
         f"http://{ip}:31950/instruments", headers={"opentrons-version": "3"}
@@ -111,7 +104,6 @@ def save_runs(runs_to_save: Set[str], ip: str, storage_directory: str) -> None:
     """Saves runs to user given storage directory."""
     for a_run in runs_to_save:
         data = get_run_data(a_run, ip)
-        # robot_name = data["robot_name"]
         data_file_name = ip + "_" + data["run_id"] + ".json"
         json.dump(data, open(os.path.join(storage_directory, data_file_name), mode="w"))
     print(f"Saved {len(runs_to_save)} run(s) from robot with IP address {ip}.")

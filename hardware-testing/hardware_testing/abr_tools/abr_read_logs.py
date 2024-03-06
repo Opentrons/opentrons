@@ -20,10 +20,7 @@ def get_modules(file_results: Dict[str, str]) -> Dict[str, Any]:
     all_modules = {key: None for key in modList}
     for module in file_results.get("modules", []):
         if isinstance(module, dict) and module.get("model") in modList:
-            try:
-                all_modules[module["model"]] = module["serialNumber"]
-            except KeyError:
-                all_modules[module["model"]] = ""
+            all_modules[module["model"]] = module.get("serialNumber", "")
     return all_modules
 
 
@@ -33,9 +30,15 @@ def get_error_info(file_results: Dict[str, Any]) -> Tuple[int, str, str, str, st
     # Read error levels file
     with open(ERROR_LEVELS_PATH, "r") as error_file:
         error_levels = list(csv.reader(error_file))
-    num_of_errors: int = len(file_results["errors"])
+    num_of_errors = len(file_results["errors"])
+    if num_of_errors == 0:
+        error_type = ""
+        error_code = ""
+        error_instrument = ""
+        error_level = ""
+        return 0, error_type, error_code, error_instrument, error_level
     if num_of_errors > 0:
-        commands_of_run = file_results.get("commands", [])  # type: List[Dict[str, Any]]
+        commands_of_run: List[Dict[str, Any]] = file_results.get("commands", [])
         run_command_error = commands_of_run[-1]  # type: Dict[str, Any]
         error_str = len(run_command_error.get("error", ""))  # type: int
         if error_str > 1:
@@ -43,9 +46,7 @@ def get_error_info(file_results: Dict[str, Any]) -> Tuple[int, str, str, str, st
             error_code = run_command_error["error"].get("errorCode", None)
             try:
                 # Instrument Error
-                error_instrument = run_command_error["error"]["errorInfo"].get(
-                    "node", None
-                )
+                error_instrument = run_command_error["error"]["errorInfo"]["node"]
             except KeyError:
                 # Module Error
                 error_instrument = run_command_error["error"]["errorInfo"].get(
@@ -55,11 +56,6 @@ def get_error_info(file_results: Dict[str, Any]) -> Tuple[int, str, str, str, st
                 code_error = error[1]
                 if code_error == error_code:
                     error_level = error[4]
-    else:
-        error_type = ""
-        error_code = ""
-        error_instrument = ""
-        error_level = ""
     return num_of_errors, error_type, error_code, error_instrument, error_level
 
 
@@ -67,7 +63,7 @@ def create_abr_data_sheet(storage_directory: str) -> None:
     """Creates csv file to log ABR data."""
     sheet_location = os.path.join(storage_directory, "ABR-run-data.csv")
     if os.path.exists(sheet_location):
-        print(f"File {sheet_location} located.")
+        print(f"File {sheet_location} located. Not overwriting.")
     else:
         with open(sheet_location, "w") as csvfile:
             headers = [
@@ -94,6 +90,7 @@ def create_abr_data_sheet(storage_directory: str) -> None:
             ]
             writer = csv.DictWriter(csvfile, fieldnames=headers)
             writer.writeheader()
+            print(f"Created file. Located: {sheet_location}.")
 
 
 def create_data_dictionary(
@@ -114,10 +111,10 @@ def create_data_dictionary(
         if run_id in runs_to_save:
             robot = file_results.get("robot_name")
             protocol_name = file_results["protocol"]["metadata"].get("protocolName", "")
-            software_version = file_results.get("API_Version", None)
-            left_pipette = file_results.get("left", None)
-            right_pipette = file_results.get("right", None)
-            extension = file_results.get("extension", None)
+            software_version = file_results.get("API_Version", "")
+            left_pipette = file_results.get("left", "")
+            right_pipette = file_results.get("right", "")
+            extension = file_results.get("extension", "")
             (
                 num_of_errors,
                 error_type,
