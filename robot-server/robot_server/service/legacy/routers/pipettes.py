@@ -32,10 +32,10 @@ async def get_pipettes(
         description="If `false`, query a cached value. If `true`, actively scan for"
         " attached pipettes."
         "\n\n"
-        "**Warning:** This scan disables the pipette motors and should only be done"
+        "**Warning:** Actively scanning disables the pipette motors and should only be done"
         " when no protocol is running and you know it won't cause a problem."
         "\n\n"
-        "**Warning:** Scanning is only valid on OT-2s. On Flex robots, it's"
+        "**Warning:** Actively scanning is only valid on OT-2s. On Flex robots, it's"
         " unnecessary, and the behavior is currently undefined.",
     ),
     hardware: HardwareControlAPI = Depends(get_hardware),
