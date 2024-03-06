@@ -266,7 +266,6 @@
   text-decoration: none;
   position: relative;
   line-height: 1.4;
-  border: none;
   padding: var(--button-pad);
   font-size: var(--fs-body-2);
   font-weight: var(--fw-semibold);
