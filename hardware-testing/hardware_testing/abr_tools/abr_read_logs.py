@@ -37,25 +37,22 @@ def get_error_info(file_results: Dict[str, Any]) -> Tuple[int, str, str, str, st
         error_instrument = ""
         error_level = ""
         return 0, error_type, error_code, error_instrument, error_level
-    if num_of_errors > 0:
-        commands_of_run: List[Dict[str, Any]] = file_results.get("commands", [])
-        run_command_error = commands_of_run[-1]  # type: Dict[str, Any]
-        error_str = len(run_command_error.get("error", ""))  # type: int
-        if error_str > 1:
-            error_type = run_command_error["error"].get("errorType", None)
-            error_code = run_command_error["error"].get("errorCode", None)
-            try:
-                # Instrument Error
-                error_instrument = run_command_error["error"]["errorInfo"]["node"]
-            except KeyError:
-                # Module Error
-                error_instrument = run_command_error["error"]["errorInfo"].get(
-                    "port", None
-                )
-            for error in error_levels:
-                code_error = error[1]
-                if code_error == error_code:
-                    error_level = error[4]
+    commands_of_run: List[Dict[str, Any]] = file_results.get("commands", [])
+    run_command_error: Dict[str, Any] = commands_of_run[-1]
+    error_str: int = len(run_command_error.get("error", ""))
+    if error_str > 1:
+        error_type = run_command_error["error"].get("errorType", None)
+        error_code = run_command_error["error"].get("errorCode", None)
+        try:
+            # Instrument Error
+            error_instrument = run_command_error["error"]["errorInfo"]["node"]
+        except KeyError:
+            # Module Error
+            error_instrument = run_command_error["error"]["errorInfo"].get("port", None)
+        for error in error_levels:
+            code_error = error[1]
+            if code_error == error_code:
+                error_level = error[4]
     return num_of_errors, error_type, error_code, error_instrument, error_level
 
 
