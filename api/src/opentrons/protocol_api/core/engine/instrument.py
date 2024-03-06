@@ -33,6 +33,7 @@ from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 from . import deck_conflict
 
 from ..instrument import AbstractInstrument
@@ -669,6 +670,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             self._pipette_id
         )
 
+    def get_nozzle_map(self) -> NozzleMap:
+        return self._engine_client.state.tips.get_pipette_nozzle_map(self._pipette_id)
+
     def has_tip(self) -> bool:
         return (
             self._engine_client.state.pipettes.get_attached_tip(self._pipette_id)
@@ -705,6 +709,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             if self.get_channels() == 96:
                 return True
             if self.get_channels() == 8:
+                # TODO: (cb, 03/06/24): Enable automatic tip tracking on the 8 channel pipettes once PAPI support exists
                 return (
                     self.get_nozzle_configuration() == NozzleConfigurationType.SINGLE
                     and primary_nozzle == "H1"

@@ -1,4 +1,5 @@
 """Tests for the InstrumentContext public interface."""
+from collections import OrderedDict
 import inspect
 
 import pytest
@@ -29,6 +30,8 @@ from opentrons.protocol_api.core.common import InstrumentCore, ProtocolCore
 from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
     LegacyInstrumentCore,
 )
+
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.types import Location, Mount, Point
 
@@ -511,14 +514,23 @@ def test_pick_up_tip_from_labware(
     mock_tip_rack = decoy.mock(cls=Labware)
     mock_well = decoy.mock(cls=Well)
     top_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    mock_map = NozzleMap.build(
+        physical_nozzles=OrderedDict({"A1": Point(0, 0, 0)}),
+        physical_rows=OrderedDict({"A": ["A1"]}),
+        physical_columns=OrderedDict({"1": ["A1"]}),
+        starting_nozzle="A1",
+        back_left_nozzle="A1",
+        front_right_nozzle="A1",
+    )
 
     decoy.when(mock_instrument_core.get_active_channels()).then_return(123)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_map)
     decoy.when(
         labware.next_available_tip(
-            mount=Mount.LEFT,
             starting_tip=None,
             tip_racks=[mock_tip_rack],
             channels=123,
+            nozzle_map=None,
         )
     ).then_return((mock_tip_rack, mock_well))
     decoy.when(mock_well.top()).then_return(top_location)
@@ -566,14 +578,23 @@ def test_pick_up_tip_from_labware_location(
     mock_well = decoy.mock(cls=Well)
     location = Location(point=Point(1, 2, 3), labware=mock_tip_rack)
     top_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    mock_map = NozzleMap.build(
+        physical_nozzles=OrderedDict({"A1": Point(0, 0, 0)}),
+        physical_rows=OrderedDict({"A": ["A1"]}),
+        physical_columns=OrderedDict({"1": ["A1"]}),
+        starting_nozzle="A1",
+        back_left_nozzle="A1",
+        front_right_nozzle="A1",
+    )
 
     decoy.when(mock_instrument_core.get_active_channels()).then_return(123)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_map)
     decoy.when(
         labware.next_available_tip(
-            mount=Mount.LEFT,
             starting_tip=None,
             tip_racks=[mock_tip_rack],
             channels=123,
+            nozzle_map=None,
         )
     ).then_return((mock_tip_rack, mock_well))
     decoy.when(mock_well.top()).then_return(top_location)
@@ -601,15 +622,24 @@ def test_pick_up_from_associated_tip_racks(
     mock_starting_tip = decoy.mock(cls=Well)
     mock_well = decoy.mock(cls=Well)
     top_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    mock_map = NozzleMap.build(
+        physical_nozzles=OrderedDict({"A1": Point(0, 0, 0)}),
+        physical_rows=OrderedDict({"A": ["A1"]}),
+        physical_columns=OrderedDict({"1": ["A1"]}),
+        starting_nozzle="A1",
+        back_left_nozzle="A1",
+        front_right_nozzle="A1",
+    )
 
     decoy.when(mock_instrument_core.is_tip_tracking_available()).then_return(True)
     decoy.when(mock_instrument_core.get_active_channels()).then_return(123)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_map)
     decoy.when(
         labware.next_available_tip(
-            mount=Mount.LEFT,
             starting_tip=mock_starting_tip,
             tip_racks=[mock_tip_rack_1, mock_tip_rack_2],
             channels=123,
+            nozzle_map=None,
         )
     ).then_return((mock_tip_rack_2, mock_well))
     decoy.when(mock_well.top()).then_return(top_location)

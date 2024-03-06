@@ -22,7 +22,7 @@ from opentrons.protocol_api.core.legacy.legacy_well_core import LegacyWellCore
 from opentrons.protocol_api.core.legacy.well_geometry import WellGeometry
 
 from opentrons.calibration_storage import helpers
-from opentrons.types import Point, Location, Mount
+from opentrons.types import Point, Location
 
 test_data: Dict[str, WellDefinition] = {
     "circular_well_json": {
@@ -375,47 +375,46 @@ def test_select_next_tip(
 ) -> None:
     tiprack = opentrons_96_tiprack_300ul
     well_list = tiprack.wells()
-    mount = Mount.LEFT
 
-    next_one = tiprack.next_tip(mount)
+    next_one = tiprack.next_tip()
     assert next_one == well_list[0]
-    next_five = tiprack.next_tip(mount, 5)
+    next_five = tiprack.next_tip(5)
     assert next_five == well_list[0]
-    next_eight = tiprack.next_tip(mount, 8)
+    next_eight = tiprack.next_tip(8)
     assert next_eight == well_list[0]
-    next_nine = tiprack.next_tip(mount, 9)
+    next_nine = tiprack.next_tip(9)
     assert next_nine is None
 
     # A1 tip only has been used
     tiprack.use_tips(well_list[0])
 
-    next_one = tiprack.next_tip(mount)
+    next_one = tiprack.next_tip()
     assert next_one == well_list[1]
-    next_five = tiprack.next_tip(mount, 5)
+    next_five = tiprack.next_tip(5)
     assert next_five == well_list[1]
-    next_eight = tiprack.next_tip(mount, 8)
+    next_eight = tiprack.next_tip(8)
     assert next_eight == well_list[8]
 
     # 2nd column has also been used
     tiprack.use_tips(well_list[8], num_channels=8)
 
-    next_one = tiprack.next_tip(mount)
+    next_one = tiprack.next_tip()
     assert next_one == well_list[1]
-    next_five = tiprack.next_tip(mount, 5)
+    next_five = tiprack.next_tip(5)
     assert next_five == well_list[1]
-    next_eight = tiprack.next_tip(mount, 8)
+    next_eight = tiprack.next_tip(8)
     assert next_eight == well_list[16]
 
     # Bottom 4 tips of 1rd column are also used
     tiprack.use_tips(well_list[4], num_channels=4)
 
-    next_one = tiprack.next_tip(mount)
+    next_one = tiprack.next_tip()
     assert next_one == well_list[1]
-    next_three = tiprack.next_tip(mount, 3)
+    next_three = tiprack.next_tip(3)
     assert next_three == well_list[1]
-    next_five = tiprack.next_tip(mount, 5)
+    next_five = tiprack.next_tip(5)
     assert next_five == well_list[16]
-    next_eight = tiprack.next_tip(mount, 8)
+    next_eight = tiprack.next_tip(8)
     assert next_eight == well_list[16]
 
     # you can reuse tips infinitely on api level 2.2
@@ -545,22 +544,18 @@ def test_tiprack_list():
         core_map=None,  # type: ignore[arg-type]
     )
 
-    assert labware.select_tiprack_from_list(Mount.LEFT, [tiprack], 1) == (
+    assert labware.select_tiprack_from_list([tiprack], 1) == (
         tiprack,
         tiprack["A1"],
     )
 
-    assert labware.select_tiprack_from_list(
-        Mount.LEFT, [tiprack], 1, tiprack.wells()[1]
-    ) == (
+    assert labware.select_tiprack_from_list([tiprack], 1, tiprack.wells()[1]) == (
         tiprack,
         tiprack["B1"],
     )
 
     tiprack["C1"].has_tip = False
-    assert labware.select_tiprack_from_list(
-        Mount.LEFT, [tiprack], 1, tiprack.wells()[2]
-    ) == (
+    assert labware.select_tiprack_from_list([tiprack], 1, tiprack.wells()[2]) == (
         tiprack,
         tiprack["D1"],
     )
@@ -568,11 +563,11 @@ def test_tiprack_list():
     tiprack["H12"].has_tip = False
     tiprack_2["A1"].has_tip = False
     assert labware.select_tiprack_from_list(
-        Mount.LEFT, [tiprack, tiprack_2], 1, tiprack.wells()[95]
+        [tiprack, tiprack_2], 1, tiprack.wells()[95]
     ) == (tiprack_2, tiprack_2["B1"])
 
     with pytest.raises(labware.OutOfTipsError):
-        labware.select_tiprack_from_list(Mount.LEFT, [tiprack], 1, tiprack.wells()[95])
+        labware.select_tiprack_from_list([tiprack], 1, tiprack.wells()[95])
 
 
 def test_uris():

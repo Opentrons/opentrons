@@ -4,7 +4,6 @@ from typing import cast
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LabwareDefDict,
     LabwareParameters as LabwareParamsDict,
@@ -17,8 +16,7 @@ from opentrons_shared_data.labware.labware_definition import (
     Metadata as LabwareDefinitionMetadata,
 )
 
-from opentrons.types import DeckSlotName, Point, Mount, MountType
-from opentrons.protocol_engine.types import LoadedPipette
+from opentrons.types import DeckSlotName, Point
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.errors import LabwareNotOnDeckError
 
@@ -246,30 +244,21 @@ def test_get_next_tip(
     decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
 ) -> None:
     """It should get the next available tip from the core."""
-    mount = Mount.LEFT
-    decoy.when(
-        mock_engine_client.state.pipettes.get_by_mount(MountType.from_hw_mount(mount))
-    ).then_return(
-        LoadedPipette.construct(
-            pipetteName=PipetteNameType.P300_MULTI,
-            id="pipette-id",
-            mount=MountType.from_hw_mount(mount),
-        )
-    )
-
     decoy.when(
         mock_engine_client.state.tips.get_next_tip(
-            pipette_id="pipette-id",
             labware_id="cool-labware",
             num_tips=8,
             starting_tip_name="B1",
+            nozzle_map=None,
         )
     ).then_return("A2")
 
     starting_tip = WellCore(
         name="B1", labware_id="cool-labware", engine_client=mock_engine_client
     )
-    result = subject.get_next_tip(mount=mount, num_tips=8, starting_tip=starting_tip)
+    result = subject.get_next_tip(
+        num_tips=8, starting_tip=starting_tip, nozzle_map=None
+    )
 
     assert result == "A2"
 

@@ -27,6 +27,8 @@ from opentrons.protocols.api_support.util import (
     requires_version,
     APIVersionError,
 )
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 
 from .core.common import InstrumentCore, ProtocolCore
 from .core.engine import ENGINE_CORE_API_VERSION
@@ -57,6 +59,9 @@ _PRESSES_INCREMENT_REMOVED_IN = APIVersion(2, 14)
 _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN = APIVersion(2, 15)
 """The version after which a drop-tip-into-trash procedure drops tips in different alternating locations within the trash well."""
 _PARTIAL_NOZZLE_CONFIGURATION_ADDED_IN = APIVersion(2, 16)
+"""The version after which a partial nozzle configuration became available for the 96 Channel Pipette."""
+_PARTIAL_NOZZLE_CONFIGURATION_AUTOMATIC_TIP_TRACKING_IN = APIVersion(2, 18)
+"""The version after which automatic tip tracking supported partially configured nozzle layouts."""
 
 
 class InstrumentContext(publisher.CommandPublisher):
@@ -870,14 +875,26 @@ class InstrumentContext(publisher.CommandPublisher):
             if self._api_version >= _PARTIAL_NOZZLE_CONFIGURATION_ADDED_IN
             else self.channels
         )
+        nozzle_map = (
+            self.nozzle_map
+            if self._api_version
+            >= _PARTIAL_NOZZLE_CONFIGURATION_AUTOMATIC_TIP_TRACKING_IN
+            else None
+        )
 
         if location is None:
-            # TODO (cb, 02-29-2024): Remove the 96 channel specific gating here once starting tip is supported in tip-cluster based automatic tip tracking
-            if not self._core.is_tip_tracking_available() or (
-                self.starting_tip is not None
-                and self._core.get_channels() == 96
-                and (self._core.get_active_channels() not in [96, 8])
+            if (
+                nozzle_map is not None
+                and nozzle_map.configuration != NozzleConfigurationType.FULL
+                and self.starting_tip is not None
             ):
+                raise CommandPreconditionViolated(
+                    "Automatic tip tracking is not available for the partial pipette"
+                    " nozzle configuration when using a starting tip. We suggest"
+                    " switching to full configuration or removing the starting tip"
+                    " specificaiton."
+                )
+            if not self._core.is_tip_tracking_available():
                 raise CommandPreconditionViolated(
                     "Automatic tip tracking is not available for the current pipette"
                     " nozzle configuration. We suggest switching to a configuration"
@@ -885,10 +902,10 @@ class InstrumentContext(publisher.CommandPublisher):
                     " to pick up."
                 )
             tip_rack, well = labware.next_available_tip(
-                mount=self._core.get_mount(),
                 starting_tip=self.starting_tip,
                 tip_racks=self.tip_racks,
                 channels=active_channels,
+                nozzle_map=nozzle_map,
             )
 
         elif isinstance(location, labware.Well):
@@ -897,10 +914,10 @@ class InstrumentContext(publisher.CommandPublisher):
 
         elif isinstance(location, labware.Labware):
             tip_rack, well = labware.next_available_tip(
-                mount=self._core.get_mount(),
                 starting_tip=None,
                 tip_racks=[location],
                 channels=active_channels,
+                nozzle_map=nozzle_map,
             )
 
         elif isinstance(location, types.Location):
@@ -913,10 +930,10 @@ class InstrumentContext(publisher.CommandPublisher):
 
             elif maybe_tip_rack is not None:
                 tip_rack, well = labware.next_available_tip(
-                    mount=self._core.get_mount(),
                     starting_tip=None,
                     tip_racks=[maybe_tip_rack],
                     channels=active_channels,
+                    nozzle_map=nozzle_map,
                 )
             else:
                 raise TypeError(
@@ -1313,6 +1330,12 @@ class InstrumentContext(publisher.CommandPublisher):
             if self._api_version >= _PARTIAL_NOZZLE_CONFIGURATION_ADDED_IN
             else self.channels
         )
+        nozzle_map = (
+            self.nozzle_map
+            if self._api_version
+            >= _PARTIAL_NOZZLE_CONFIGURATION_AUTOMATIC_TIP_TRACKING_IN
+            else None
+        )
 
         if blow_out and not blowout_location:
             if self.current_volume:
@@ -1329,10 +1352,10 @@ class InstrumentContext(publisher.CommandPublisher):
 
         if new_tip != types.TransferTipPolicy.NEVER:
             tr, next_tip = labware.next_available_tip(
-                self._core.get_mount(),
                 self.starting_tip,
                 self.tip_racks,
                 active_channels,
+                nozzle_map,
             )
             max_volume = min(next_tip.max_volume, self.max_volume)
         else:
@@ -1699,6 +1722,16 @@ class InstrumentContext(publisher.CommandPublisher):
         to set the pipette to use fewer channels.
         """
         return self._core.get_active_channels()
+
+    @property
+    @requires_version(2, 18)
+    def nozzle_map(self) -> NozzleMap:
+        """The Nozzle Map the pipette is actively configured to use.
+
+        By default, the Nozzle Map consists of all channels on the pipette. Use
+        :py:meth:`.configure_nozzle_layout` to set the pipette to use fewer channels.
+        """
+        return self._core.get_nozzle_map()
 
     @property
     @requires_version(2, 2)

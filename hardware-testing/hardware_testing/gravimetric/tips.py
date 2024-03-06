@@ -115,7 +115,6 @@ def _unused_tips_for_racks(
             for row in rows:
                 wellname = f"{row}{col}"
                 next_well = rack.next_tip(
-                    ctx.loaded_instruments[pipette_mount]._core.get_mount(),
                     1,
                     rack[wellname],
                 )

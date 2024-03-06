@@ -154,10 +154,10 @@ def test_get_next_tip_returns_none(
     )
 
     result = TipView(subject.state).get_next_tip(
-        pipette_id="pipette-id",
         labware_id="cool-labware",
         num_tips=1,
         starting_tip_name=None,
+        nozzle_map=None,
     )
 
     assert result is None
@@ -216,10 +216,10 @@ def test_get_next_tip_returns_first_tip(
     # )
 
     result = TipView(subject.state).get_next_tip(
-        pipette_id="pipette-id",
         labware_id="cool-labware",
         num_tips=input_tip_amount,
         starting_tip_name=None,
+        nozzle_map=None,
     )
 
     assert result == "A1"
@@ -268,10 +268,10 @@ def test_get_next_tip_used_starting_tip(
     )
 
     result = TipView(subject.state).get_next_tip(
-        pipette_id="pipette-id",
         labware_id="cool-labware",
         num_tips=input_tip_amount,
         starting_tip_name="B1",
+        nozzle_map=None,
     )
 
     assert result == result_well_name
@@ -337,23 +337,6 @@ def test_get_next_tip_skips_picked_up_tip(
                 nozzle_map=get_default_nozzle_map(pipette_name_type),
             ),
         )
-        subject.handle_action(
-            actions.UpdateCommandAction(
-                private_result=load_pipette_private_result, command=load_pipette_command
-            )
-        )
-        subject.handle_action(
-            actions.UpdateCommandAction(
-                command=pick_up_tip_command, private_result=None
-            )
-        )
-
-        result = TipView(subject.state).get_next_tip(
-            pipette_id="pipette-id",
-            labware_id="cool-labware",
-            num_tips=get_next_tip_tips,
-            starting_tip_name=input_starting_tip,
-        )
     else:
         pipette_name_type = PipetteNameType.P1000_96
         if get_next_tip_tips == 1:
@@ -383,23 +366,21 @@ def test_get_next_tip_skips_picked_up_tip(
                 nozzle_map=get_default_nozzle_map(pipette_name_type),
             ),
         )
-        subject.handle_action(
-            actions.UpdateCommandAction(
-                private_result=load_pipette_private_result, command=load_pipette_command
-            )
+    subject.handle_action(
+        actions.UpdateCommandAction(
+            private_result=load_pipette_private_result, command=load_pipette_command
         )
-        subject.handle_action(
-            actions.UpdateCommandAction(
-                command=pick_up_tip_command, private_result=None
-            )
-        )
+    )
+    subject.handle_action(
+        actions.UpdateCommandAction(command=pick_up_tip_command, private_result=None)
+    )
 
-        result = TipView(subject.state).get_next_tip(
-            pipette_id="pipette-id",
-            labware_id="cool-labware",
-            num_tips=get_next_tip_tips,
-            starting_tip_name=input_starting_tip,
-        )
+    result = TipView(subject.state).get_next_tip(
+        labware_id="cool-labware",
+        num_tips=get_next_tip_tips,
+        starting_tip_name=input_starting_tip,
+        nozzle_map=load_pipette_private_result.config.nozzle_map,
+    )
 
     assert result == result_well_name
 
@@ -442,12 +423,11 @@ def test_get_next_tip_with_starting_tip(
             private_result=load_pipette_private_result, command=load_pipette_command
         )
     )
-
     result = TipView(subject.state).get_next_tip(
-        pipette_id="pipette-id",
         labware_id="cool-labware",
         num_tips=1,
         starting_tip_name="B2",
+        nozzle_map=load_pipette_private_result.config.nozzle_map,
     )
 
     assert result == "B2"
@@ -468,10 +448,10 @@ def test_get_next_tip_with_starting_tip(
     )
 
     result = TipView(subject.state).get_next_tip(
-        pipette_id="pipette-id",
         labware_id="cool-labware",
         num_tips=1,
         starting_tip_name="B2",
+        nozzle_map=load_pipette_private_result.config.nozzle_map,
     )
 
     assert result == "C2"
@@ -517,10 +497,10 @@ def test_get_next_tip_with_starting_tip_8_channel(
     )
 
     result = TipView(subject.state).get_next_tip(
-        pipette_id="pipette-id",
         labware_id="cool-labware",
         num_tips=8,
         starting_tip_name="A2",
+        nozzle_map=None,
     )
 
     assert result == "A2"
@@ -541,10 +521,10 @@ def test_get_next_tip_with_starting_tip_8_channel(
     )
 
     result = TipView(subject.state).get_next_tip(
-        pipette_id="pipette-id",
         labware_id="cool-labware",
         num_tips=8,
         starting_tip_name="A2",
+        nozzle_map=None,
     )
 
     assert result == "A3"
@@ -590,10 +570,10 @@ def test_get_next_tip_with_starting_tip_out_of_tips(
     )
 
     result = TipView(subject.state).get_next_tip(
-        pipette_id="pipette-id",
         labware_id="cool-labware",
         num_tips=1,
         starting_tip_name="H12",
+        nozzle_map=None,
     )
 
     assert result == "H12"
@@ -614,10 +594,10 @@ def test_get_next_tip_with_starting_tip_out_of_tips(
     )
 
     result = TipView(subject.state).get_next_tip(
-        pipette_id="pipette-id",
         labware_id="cool-labware",
         num_tips=1,
         starting_tip_name="H12",
+        nozzle_map=None,
     )
 
     assert result is None
@@ -663,10 +643,10 @@ def test_get_next_tip_with_column_and_starting_tip(
     )
 
     result = TipView(subject.state).get_next_tip(
-        pipette_id="pipette-id",
         labware_id="cool-labware",
         num_tips=8,
         starting_tip_name="D1",
+        nozzle_map=None,
     )
 
     assert result == "A2"
@@ -719,10 +699,10 @@ def test_reset_tips(
     subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
 
     result = TipView(subject.state).get_next_tip(
-        pipette_id="pipette-id",
         labware_id="cool-labware",
         num_tips=1,
         starting_tip_name=None,
+        nozzle_map=None,
     )
 
     assert result == "A1"
@@ -1036,9 +1016,9 @@ def test_next_tip_uses_active_channels(
     )
 
     result = TipView(subject.state).get_next_tip(
-        pipette_id="pipette-id",
         labware_id="cool-labware",
         num_tips=5,
         starting_tip_name=None,
+        nozzle_map=None,
     )
     assert result == "A2"

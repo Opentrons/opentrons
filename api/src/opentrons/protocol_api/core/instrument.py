@@ -9,6 +9,7 @@ from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import FlowRates
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 
 from .._trash_bin import TrashBin
 from .._waste_chute import WasteChute
@@ -213,6 +214,10 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
 
     @abstractmethod
     def get_active_channels(self) -> int:
+        ...
+
+    @abstractmethod
+    def get_nozzle_map(self) -> NozzleMap:
         ...
 
     @abstractmethod

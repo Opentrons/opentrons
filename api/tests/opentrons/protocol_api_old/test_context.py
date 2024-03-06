@@ -422,7 +422,7 @@ def test_pick_up_tip_no_location(ctx, get_labware_def, pipette_model, tiprack_ki
         if well.has_tip:
             tiprack1.use_tips(well)
 
-    assert tiprack1.next_tip(mount) is None
+    assert tiprack1.next_tip() is None
 
     assert tiprack2.wells()[0].has_tip
     instr.pick_up_tip()

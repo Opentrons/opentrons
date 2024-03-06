@@ -285,7 +285,6 @@ def _transfer(
             pipette.configure_for_volume(volume)
             pipette.pick_up_tip(
                 tips.next_tip(
-                    ctx.loaded_instruments[pipette.mount]._core.get_mount(),
                     pipette.channels,
                 )
             )
@@ -318,11 +317,7 @@ def _transfer_diluent(
         return
     diluent_vol, dest_per_src = diluent_info
     pipette.configure_for_volume(diluent_vol)
-    pipette.pick_up_tip(
-        tips.next_tip(
-            ctx.loaded_instruments[pipette.mount]._core.get_mount(), pipette.channels
-        )
-    )
+    pipette.pick_up_tip(tips.next_tip(pipette.channels))
     for src, destinations in dest_per_src.items():
         _transfer(
             ctx,
