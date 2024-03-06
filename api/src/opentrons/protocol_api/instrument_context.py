@@ -120,6 +120,10 @@ class InstrumentContext(publisher.CommandPublisher):
 
         See :py:meth:`.pick_up_tip()`.
 
+        The well must be from one of the tip racks in :py:obj:`.tip_racks`.
+        See :ref:`new-well-access`.
+        The default is ``None``, meaning the pipette will start at the first tip.
+
         .. note::
 
             In robot software versions 6.3.0 and 6.3.1, protocols specifying API level
