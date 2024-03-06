@@ -12,6 +12,7 @@ import {
 import {
   getConnectableRobots,
   getReachableRobots,
+  getUnreachableRobots,
 } from '../../../../../../redux/discovery'
 import {
   mockConnectableRobot,
@@ -24,6 +25,13 @@ import { useIsFlex } from '../../../../hooks'
 vi.mock('../../../../../../redux/discovery/selectors')
 vi.mock('../../../../../../redux/analytics')
 vi.mock('../../../../hooks')
+vi.mock('../../../../../../redux/discovery', async importOriginal => {
+  const actual = await importOriginal<typeof getUnreachableRobots>()
+  return {
+    ...actual,
+    getUnreachableRobots: vi.fn(),
+  }
+})
 
 const mockOnCloseClick = vi.fn()
 let mockTrackEvent: any
@@ -50,6 +58,7 @@ describe('RobotSettings RenameRobotSlideout', () => {
     vi.mocked(getConnectableRobots).mockReturnValue([mockConnectableRobot])
     vi.mocked(getReachableRobots).mockReturnValue([mockReachableRobot])
     vi.mocked(useIsFlex).mockReturnValue(false)
+    vi.mocked(getUnreachableRobots).mockReturnValue([])
   })
 
   it('should render title, description, label, input, and button', () => {
