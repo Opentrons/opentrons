@@ -13,13 +13,6 @@ vi.mock('../SetupLiquidsList')
 vi.mock('../SetupLiquidsMap')
 vi.mock('../../BackToTopButton')
 
-const mockSetupLiquidsMap = SetupLiquidsMap as jest.MockedFunction<
-  typeof SetupLiquidsMap
->
-const mockBackToTopButton = BackToTopButton as jest.MockedFunction<
-  typeof BackToTopButton
->
-
 const render = (props: React.ComponentProps<typeof SetupLiquids>) => {
   return renderWithProviders(
     <SetupLiquids
@@ -40,8 +33,12 @@ describe('SetupLiquids', () => {
     vi.mocked(SetupLiquidsList).mockReturnValue(
       <div>Mock setup liquids list</div>
     )
-    mockSetupLiquidsMap.mockReturnValue(<div>Mock setup liquids map</div>)
-    mockBackToTopButton.mockReturnValue(<button>Mock BackToTopButton</button>)
+    vi.mocked(SetupLiquidsMap).mockReturnValue(
+      <div>Mock setup liquids map</div>
+    )
+    vi.mocked(BackToTopButton).mockReturnValue(
+      <button>Mock BackToTopButton</button>
+    )
   })
 
   it('renders the list and map view buttons and proceed button', () => {

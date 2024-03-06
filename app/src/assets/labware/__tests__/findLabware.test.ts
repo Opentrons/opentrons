@@ -15,10 +15,6 @@ vi.mock('../getLabware', async importOriginal => {
   }
 })
 
-const mockGetLabware = getLatestLabwareDef as jest.MockedFunction<
-  typeof getLatestLabwareDef
->
-
 const fixtureTipRack10ul = fixtureTiprack10ul as LabwareDefinition2
 
 const fixtureTipRack10ulCustomBeta = {
@@ -42,7 +38,7 @@ describe('findLabwareDefWithCustom', () => {
   })
 
   it('finds standard labware with namesearch', () => {
-    mockGetLabware.mockReturnValue(fixtureTipRack300ulOpentrons)
+    vi.mocked(getLatestLabwareDef).mockReturnValue(fixtureTipRack300ulOpentrons)
 
     expect(
       findLabwareDefWithCustom(
@@ -53,7 +49,9 @@ describe('findLabwareDefWithCustom', () => {
       )
     ).toEqual(fixtureTipRack300ulOpentrons)
 
-    expect(mockGetLabware).toHaveBeenCalledWith('opentrons_96_tiprack_300ul')
+    expect(vi.mocked(getLatestLabwareDef)).toHaveBeenCalledWith(
+      'opentrons_96_tiprack_300ul'
+    )
   })
 
   it('handles no-custom-labware', () => {

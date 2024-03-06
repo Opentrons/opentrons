@@ -36,8 +36,6 @@ const PROTOCOL_DETAILS = {
   robotType: 'OT-3 Standard' as const,
 }
 
-// const mockBaseDeck = BaseDeck as jest.MockedFunction<typeof BaseDeck>
-
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof BaseDeck>()
   return {

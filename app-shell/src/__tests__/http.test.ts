@@ -10,8 +10,6 @@ import type { Request, Response } from 'node-fetch'
 vi.mock('../config')
 vi.mock('node-fetch')
 
-// const mockFetch = fetch as jest.MockedFunction<typeof fetch>
-
 describe('app-shell main http module', () => {
   beforeEach(() => {
     vi.clearAllMocks()

@@ -11,6 +11,7 @@ import { uiInitialized } from '@opentrons/app/src/redux/shell/actions'
 import * as CustomLabware from '@opentrons/app/src/redux/custom-labware'
 import * as CustomLabwareFixtures from '@opentrons/app/src/redux/custom-labware/__fixtures__'
 
+import type { Mock } from 'vitest'
 import type { Config } from '@opentrons/app/src/redux/config/types'
 import type { Dispatch } from '../../types'
 
@@ -30,7 +31,7 @@ describe('labware module dispatches', () => {
   const mockMainWindow = ({
     browserWindow: true,
   } as unknown) as electron.BrowserWindow
-  let dispatch: jest.MockedFunction<Dispatch>
+  let dispatch: Mock
   let handleAction: Dispatch
 
   beforeEach(() => {

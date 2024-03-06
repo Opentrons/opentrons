@@ -16,6 +16,8 @@ import {
   mockPipetteSettingsFieldsMap,
 } from '../../../../redux/pipettes/__fixtures__'
 
+import type { Mock } from 'vitest'
+
 vi.mock('@opentrons/react-api-client')
 
 const render = (
@@ -30,7 +32,7 @@ const mockRobotName = 'mockRobotName'
 
 describe('PipetteSettingsSlideout', () => {
   let props: React.ComponentProps<typeof PipetteSettingsSlideout>
-  let mockUpdatePipetteSettings: jest.Mock
+  let mockUpdatePipetteSettings: Mock
 
   beforeEach(() => {
     props = {

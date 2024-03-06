@@ -14,14 +14,6 @@ import type { HostConfig } from '@opentrons/api-client'
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../resources/runs/useNotifyRunQuery')
 
-const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
-const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
-  typeof useNotifyRunQuery
->
-const mockUseCreateRunMutation = useCreateRunMutation as jest.MockedFunction<
-  typeof useCreateRunMutation
->
-
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const RUN_ID: string = 'run_id'
 
@@ -29,8 +21,8 @@ describe('useCloneRun hook', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   beforeEach(() => {
-    when(mockUseHost).calledWith().thenReturn(HOST_CONFIG)
-    when(mockUseNotifyRunQuery)
+    when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
+    when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID)
       .thenReturn({
         data: {
@@ -41,7 +33,7 @@ describe('useCloneRun hook', () => {
           },
         },
       } as any)
-    when(mockUseCreateRunMutation)
+    when(vi.mocked(useCreateRunMutation))
       .calledWith(expect.anything())
       .thenReturn({ createRun: vi.fn() } as any)
 
@@ -59,7 +51,7 @@ describe('useCloneRun hook', () => {
 
   it('should return a function that when called, calls stop run with the run id', async () => {
     const mockCreateRun = vi.fn()
-    mockUseCreateRunMutation.mockReturnValue({
+    vi.mocked(useCreateRunMutation).mockReturnValue({
       createRun: mockCreateRun,
     } as any)
 

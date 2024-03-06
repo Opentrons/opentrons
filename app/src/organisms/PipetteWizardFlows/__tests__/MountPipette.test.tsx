@@ -18,10 +18,6 @@ import { MountPipette } from '../MountPipette'
 
 vi.mock('../CheckPipetteButton')
 
-const mockCheckPipetteButton = CheckPipetteButton as jest.MockedFunction<
-  typeof CheckPipetteButton
->
-
 const render = (props: React.ComponentProps<typeof MountPipette>) => {
   return renderWithProviders(<MountPipette {...props} />, {
     i18nInstance: i18n,
@@ -47,7 +43,9 @@ describe('MountPipette', () => {
       setFetching: vi.fn(),
       isOnDevice: false,
     }
-    mockCheckPipetteButton.mockReturnValue(<div>mock check pipette button</div>)
+    vi.mocked(CheckPipetteButton).mockReturnValue(
+      <div>mock check pipette button</div>
+    )
   })
   it('returns the correct information, buttons work as expected for single mount pipettes', () => {
     render(props)

@@ -11,10 +11,6 @@ import { fireEvent, screen, waitFor } from '@testing-library/react'
 
 vi.mock('@opentrons/react-api-client')
 
-const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
-  typeof useInstrumentsQuery
->
-
 const mockRunId = 'fakeRunId'
 describe('UnmountGripper', () => {
   let mockRefetch: any
@@ -50,7 +46,7 @@ describe('UnmountGripper', () => {
   })
 
   it('clicking confirm proceed calls home and proceed if gripper detached', async () => {
-    mockUseInstrumentsQuery.mockReturnValue({
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
       refetch: mockRefetch,
       data: null,
     } as any)

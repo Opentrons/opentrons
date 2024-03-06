@@ -21,13 +21,8 @@ import { getIsGantryEmpty } from '../utils'
 
 //  TODO(jr, 11/3/22): uncomment out the get help link when we have
 //  the correct URL to link it to
-// jest.mock('../../CalibrationPanels')
 vi.mock('../../../molecules/InProgressModal/InProgressModal')
 vi.mock('../utils')
-
-// const mockNeedHelpLink = NeedHelpLink as jest.MockedFunction<
-//   typeof NeedHelpLink
-// >
 
 const render = (props: React.ComponentProps<typeof BeforeBeginning>) => {
   return renderWithProviders(<BeforeBeginning {...props} />, {

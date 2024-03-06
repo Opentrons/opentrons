@@ -14,9 +14,6 @@ import { DetachProbe } from '../DetachProbe'
 
 vi.mock('../../../molecules/InProgressModal/InProgressModal')
 
-const mockInProgressModal = InProgressModal as jest.MockedFunction<
-  typeof InProgressModal
->
 const render = (props: React.ComponentProps<typeof DetachProbe>) => {
   return renderWithProviders(<DetachProbe {...props} />, {
     i18nInstance: i18n,
@@ -40,7 +37,7 @@ describe('DetachProbe', () => {
       isRobotMoving: false,
       isOnDevice: false,
     }
-    mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
+    vi.mocked(InProgressModal).mockReturnValue(<div>mock in progress</div>)
   })
   it('returns the correct information, buttons work as expected', () => {
     const { getByText, getByTestId, getByRole, getByLabelText } = render(props)

@@ -30,10 +30,6 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
   }
 })
 
-const mockGetSlotHasMatingSurfaceUnitVector = getSlotHasMatingSurfaceUnitVector as jest.MockedFunction<
-  typeof getSlotHasMatingSurfaceUnitVector
->
-
 describe('getLabwareNameFromRunData', () => {
   it('returns an empty string if it cannot find matching loaded labware', () => {
     const res = getLabwareNameFromRunData(mockRunData, 'a bad ID', [])
@@ -127,7 +123,7 @@ describe('getModuleModelFromRunData', () => {
 
 describe('getRunLabwareRenderInfo', () => {
   beforeEach(() => {
-    mockGetSlotHasMatingSurfaceUnitVector.mockReturnValue(true)
+    vi.mocked(getSlotHasMatingSurfaceUnitVector).mockReturnValue(true)
   })
 
   it('returns an empty array if there is no loaded labware for the run', () => {
@@ -154,7 +150,7 @@ describe('getRunLabwareRenderInfo', () => {
   })
 
   it('does not add labware to results array if the labware is on deck and the slot does not have a mating surface vector', () => {
-    mockGetSlotHasMatingSurfaceUnitVector.mockReturnValue(false)
+    vi.mocked(getSlotHasMatingSurfaceUnitVector).mockReturnValue(false)
     const res = getRunLabwareRenderInfo(
       mockRunData,
       mockLabwareDefinitionsByUri,

@@ -8,7 +8,6 @@ import { renderWithProviders } from '../../../__testing-utils__'
 
 vi.mock('../ModalHeader')
 
-const mockModalHeader = ModalHeader as jest.MockedFunction<typeof ModalHeader>
 const render = (props: React.ComponentProps<typeof Modal>) => {
   return renderWithProviders(<Modal {...props} />)[0]
 }
@@ -20,7 +19,7 @@ describe('Modal', () => {
       onOutsideClick: vi.fn(),
       children: <div>children</div>,
     }
-    mockModalHeader.mockReturnValue(<div>mock Modal Header</div>)
+    vi.mocked(ModalHeader).mockReturnValue(<div>mock Modal Header</div>)
   })
   it('should render the modal with no header', () => {
     render(props)

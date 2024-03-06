@@ -48,11 +48,6 @@ vi.mock('../../../../ProtocolSetupModulesAndDeck/utils')
 vi.mock('../../../ModuleInfo')
 vi.mock('../../../hooks')
 
-// const vi.mocked(useMostRecentCompletedAnalysis) = useMostRecentCompletedAnalysis as jest.MockedFunction<
-//   typeof useMostRecentCompletedAnalysis
-// >
-// const vi.mocked(ModuleInfo) = ModuleInfo as jest.MockedFunction<typeof ModuleInfo>
-
 const render = (props: React.ComponentProps<typeof SetupModulesMap>) => {
   return renderWithProviders(
     <StaticRouter>

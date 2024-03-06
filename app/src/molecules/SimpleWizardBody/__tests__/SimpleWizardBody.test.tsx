@@ -10,11 +10,6 @@ import { SimpleWizardBody } from '..'
 vi.mock('../../../atoms/Skeleton')
 vi.mock('../../../redux/config')
 
-const mockSkeleton = Skeleton as jest.MockedFunction<typeof Skeleton>
-const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
-  typeof getIsOnDevice
->
-
 const render = (props: React.ComponentProps<typeof SimpleWizardBody>) => {
   return renderWithProviders(<SimpleWizardBody {...props} />)[0]
 }
@@ -28,7 +23,7 @@ describe('SimpleWizardBody', () => {
       subHeader: 'subheader',
       isSuccess: false,
     }
-    mockGetIsOnDevice.mockReturnValue(false)
+    vi.mocked(getIsOnDevice).mockReturnValue(false)
   })
   it('renders the correct information when it is not success', () => {
     render(props)
@@ -37,7 +32,7 @@ describe('SimpleWizardBody', () => {
     screen.getByLabelText('ot-alert')
   })
   it('renders the correct information for on device display', () => {
-    mockGetIsOnDevice.mockReturnValue(true)
+    vi.mocked(getIsOnDevice).mockReturnValue(true)
     render(props)
     screen.getByText('header')
     screen.getByText('subheader')
@@ -61,7 +56,7 @@ describe('SimpleWizardBody', () => {
       ...props,
       isPending: true,
     }
-    mockSkeleton.mockReturnValue(<div>mock skeleton</div>)
+    vi.mocked(Skeleton).mockReturnValue(<div>mock skeleton</div>)
     render(props)
     screen.getAllByText('mock skeleton')
   })
