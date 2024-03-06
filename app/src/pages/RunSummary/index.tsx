@@ -143,6 +143,7 @@ export function RunSummary(): JSX.Element {
         mount,
         specs,
         FLEX_ROBOT_TYPE,
+        host,
         setPipettesWithTip
       ).catch(e => console.log(`Error launching Tip Attachment Modal: ${e}`))
     } else {
@@ -158,6 +159,7 @@ export function RunSummary(): JSX.Element {
         mount,
         specs,
         FLEX_ROBOT_TYPE,
+        host,
         setPipettesWithTip
       ).catch(e => console.log(`Error launching Tip Attachment Modal: ${e}`))
     } else {

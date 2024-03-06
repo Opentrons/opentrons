@@ -31,7 +31,7 @@ export const STYLE_BY_WELL_CONTENTS: {
   },
   disabledWell: {
     stroke: '#C6C6C6', // LEGACY --light-grey-hover
-    fill: '#EDEDEDCC', // LEGACY --lightest-gray + 80% opacity
+    fill: COLORS.transparent,
     strokeWidth: 0.6,
   },
   selectedWell: {

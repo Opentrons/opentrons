@@ -108,6 +108,7 @@ export const PipetteOverflowMenu = (
               <MenuItem
                 key={`${pipetteDisplayName}_${mount}_view_settings`}
                 onClick={() => handleSettingsSlideout()}
+                disabled={isRunActive}
               >
                 {t('view_pipette_setting')}
               </MenuItem>

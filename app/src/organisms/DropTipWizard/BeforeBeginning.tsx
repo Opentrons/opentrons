@@ -194,10 +194,10 @@ const UNSELECTED_OPTIONS_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
-  grid-gap: ${SPACING.spacing8}
+  grid-gap: ${SPACING.spacing8};
 
   &:hover {
-    border: 1px solid ${COLORS.grey60};
+    border: 1px solid ${COLORS.grey35};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
@@ -218,10 +218,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
 const SELECTED_OPTIONS_STYLE = css`
   ${UNSELECTED_OPTIONS_STYLE}
   border: 1px solid ${COLORS.blue50};
-
-  &:hover {
-    border: 1px solid ${COLORS.blue50};
-  }
+  background-color: ${COLORS.blue30};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     border-width: 0px;

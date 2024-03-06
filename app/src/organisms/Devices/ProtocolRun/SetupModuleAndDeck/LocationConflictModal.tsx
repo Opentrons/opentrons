@@ -291,27 +291,27 @@ export const LocationConflictModal = (
                 alignItems={ALIGN_CENTER}
               >
                 <Box width="107px">
-                  <StyledText as="label" color={COLORS.grey60}>
+                  <StyledText as="label" width={SPACING.spacing120}>
                     {t('protocol_specifies')}
                   </StyledText>
                 </Box>
-                <StyledText as="label">
+                <StyledText as="label" flex="1">
                   {protocolSpecifiesDisplayName}
                 </StyledText>
               </Flex>
               <Flex
                 padding={SPACING.spacing8}
-                backgroundColor={COLORS.grey10}
+                backgroundColor={COLORS.grey20}
                 flexDirection={DIRECTION_ROW}
                 gridGap={SPACING.spacing20}
                 alignItems={ALIGN_CENTER}
               >
                 <Box width="max-content">
-                  <StyledText as="label">
+                  <StyledText as="label" width={SPACING.spacing120}>
                     {t('currently_configured')}
                   </StyledText>
                 </Box>
-                <StyledText as="label">
+                <StyledText as="label" flex="1">
                   {' '}
                   {isThermocycler
                     ? currentThermocyclerFixtureDisplayName

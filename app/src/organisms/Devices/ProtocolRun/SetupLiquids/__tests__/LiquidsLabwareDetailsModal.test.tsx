@@ -15,7 +15,10 @@ import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck
 import { mockDefinition } from '../../../../../redux/custom-labware/__fixtures__'
 import { getLocationInfoNames } from '../../utils/getLocationInfoNames'
 import { getSlotLabwareDefinition } from '../../utils/getSlotLabwareDefinition'
-import { getLiquidsByIdForLabware, getWellFillFromLabwareId } from '../utils'
+import {
+  getLiquidsByIdForLabware,
+  getDisabledWellFillFromLabwareId,
+} from '../utils'
 import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
 import { LiquidDetailCard } from '../LiquidDetailCard'
 
@@ -87,7 +90,7 @@ describe('LiquidsLabwareDetailsModal', () => {
       },
     ])
     vi.mocked(LiquidDetailCard).mockReturnValue(<div></div>)
-    vi.mocked(getWellFillFromLabwareId).mockReturnValue({})
+    vi.mocked(getDisabledWellFillFromLabwareId).mockReturnValue({})
     vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue(
       {} as CompletedProtocolAnalysis
     )
@@ -113,7 +116,7 @@ describe('LiquidsLabwareDetailsModal', () => {
     screen.getByText(nestedTextMatcher('mock LiquidDetailCard'))
   })
   it.only('should render labware render with well fill', () => {
-    vi.mocked(getWellFillFromLabwareId).mockReturnValue({
+    vi.mocked(getDisabledWellFillFromLabwareId()).mockReturnValue({
       C1: '#ff4888',
       C2: '#ff4888',
     })
@@ -130,7 +133,7 @@ describe('LiquidsLabwareDetailsModal', () => {
   })
   it('should render labware render with well fill on odd', () => {
     vi.mocked(getIsOnDevice).mockReturnValue(true)
-    vi.mocked(getWellFillFromLabwareId).mockReturnValue({
+    vi.mocked(getDisabledWellFillFromLabwareId).mockReturnValue({
       C1: '#ff4888',
       C2: '#ff4888',
     })

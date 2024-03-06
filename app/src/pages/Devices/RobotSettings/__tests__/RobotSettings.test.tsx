@@ -8,6 +8,7 @@ import { i18n } from '../../../../i18n'
 import { RobotSettingsCalibration } from '../../../../organisms/RobotSettingsCalibration'
 import { RobotSettingsNetworking } from '../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsAdvanced } from '../../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'
+import { RobotSettingsPrivacy } from '../../../../organisms/Devices/RobotSettings/RobotSettingsPrivacy'
 import { useRobot } from '../../../../organisms/Devices/hooks'
 import { RobotSettings } from '..'
 import { when } from 'vitest-when'
@@ -55,6 +56,9 @@ describe('RobotSettings', () => {
     )
     vi.mocked(RobotSettingsAdvanced).mockReturnValue(
       <div>Mock RobotSettingsAdvanced</div>
+    )
+    mockRobotSettingsPrivacy.mockReturnValue(
+      <div>Mock RobotSettingsPrivacy</div>
     )
   })
   afterEach(() => {
@@ -151,5 +155,14 @@ describe('RobotSettings', () => {
     expect(screen.queryByText('Mock RobotSettingsAdvanced')).toBeFalsy()
     fireEvent.click(AdvancedTab)
     screen.getByText('Mock RobotSettingsAdvanced')
+  })
+
+  it('renders privacy content when the privacy tab is clicked', () => {
+    render('/devices/otie/robot-settings/calibration')
+
+    const PrivacyTab = screen.getByText('Privacy')
+    expect(screen.queryByText('Mock RobotSettingsPrivacy')).toBeFalsy()
+    fireEvent.click(PrivacyTab)
+    screen.getByText('Mock RobotSettingsPrivacy')
   })
 })

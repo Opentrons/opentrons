@@ -65,6 +65,7 @@ import {
   ANALYTICS_PROTOCOL_RUN_START,
   ANALYTICS_PROTOCOL_RUN_RESUME,
 } from '../../../../redux/analytics'
+import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 import { getRobotUpdateDisplayInfo } from '../../../../redux/robot-update'
 import { getIsHeaterShakerAttached } from '../../../../redux/config'
 import { getRobotSettings } from '../../../../redux/robot-settings'
@@ -79,6 +80,7 @@ import {
   useUnmatchedModulesForProtocol,
   useIsRobotViewable,
   useIsFlex,
+  useRobot,
 } from '../../hooks'
 import { useIsHeaterShakerInProtocol } from '../../../ModuleCard/hooks'
 import { ConfirmAttachmentModal } from '../../../ModuleCard/ConfirmAttachmentModal'
@@ -94,13 +96,13 @@ import { useDeckConfigurationCompatibility } from '../../../../resources/deck_co
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useMostRecentRunId } from '../../../ProtocolUpload/hooks/useMostRecentRunId'
 import { useNotifyRunQuery } from '../../../../resources/runs/useNotifyRunQuery'
-
 import type { UseQueryResult } from 'react-query'
 import type * as ReactRouterDom from 'react-router-dom'
 import type { Mock } from 'vitest'
 import type * as OpentronsSharedData from '@opentrons/shared-data'
 import type * as OpentronsComponents from '@opentrons/components'
 import type * as OpentronsApiClient from '@opentrons/api-client'
+import type { Run } from '@opentrons/api-client'
 
 const mockPush = vi.fn()
 
@@ -163,6 +165,7 @@ const mockSettings = {
   restart_required: false,
 }
 const MOCK_ROTOCOL_LIQUID_KEY = { liquids: [] }
+const MOCK_ROBOT_SERIAL_NUMBER = 'OT123'
 
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as OpentronsSharedData.CompletedProtocolAnalysis
 
@@ -345,6 +348,13 @@ describe('ProtocolRunHeader', () => {
     vi.mocked(useDeckConfigurationCompatibility).mockReturnValue([])
     vi.mocked(getIsFixtureMismatch).mockReturnValue(false)
     vi.mocked(useMostRecentRunId).mockReturnValue(RUN_ID)
+      vi.mocked(useRobot).mockReturnValue({
+      ...mockConnectableRobot,
+      health: {
+        ...mockConnectableRobot.health,
+        robot_serial: MOCK_ROBOT_SERIAL_NUMBER,
+      },
+    })
   })
 
   afterEach(() => {
@@ -695,7 +705,10 @@ describe('ProtocolRunHeader', () => {
     fireEvent.click(button)
     expect(mockTrackEvent).toBeCalledWith({
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-      properties: { sourceLocation: 'RunRecordDetail' },
+      properties: {
+        sourceLocation: 'RunRecordDetail',
+        robotSerialNumber: MOCK_ROBOT_SERIAL_NUMBER,
+      },
     })
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
       name: ANALYTICS_PROTOCOL_RUN_AGAIN,
@@ -789,7 +802,7 @@ describe('ProtocolRunHeader', () => {
     expect(screen.queryByTestId('Banner_close-button')).not.toBeInTheDocument()
   })
 
-  it('renders a clear protocol banner when run has succeeded', () => {
+  it('renders a clear protocol banner when run has succeeded', async () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID)
       .thenReturn({
@@ -801,8 +814,23 @@ describe('ProtocolRunHeader', () => {
     render()
 
     screen.getByText('Run completed.')
+  })
+  it('clicking close on a terminal run banner closes the run context and dismisses the banner', async () => {
+    when(vi.mocked(useNotifyRunQuery))
+      .calledWith(RUN_ID)
+      .thenReturn({
+        data: { data: mockSucceededRun },
+      } as UseQueryResult<Run>)
+    when(vi.mocked(useRunStatus))
+      .calledWith(RUN_ID)
+      .thenReturn(RUN_STATUS_SUCCEEDED)
+    render()
+
     fireEvent.click(screen.getByTestId('Banner_close-button'))
     expect(mockCloseCurrentRun).toBeCalled()
+    await waitFor(() => {
+      expect(screen.queryByText('Run completed.')).not.toBeInTheDocument()
+    })
   })
 
   it('if a heater shaker is shaking, clicking on start run should render HeaterShakerIsRunningModal', async () => {

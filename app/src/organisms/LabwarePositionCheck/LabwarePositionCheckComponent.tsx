@@ -335,6 +335,7 @@ export const LabwarePositionCheckComponent = (
     modalContent = (
       <FatalErrorModal
         errorMessage={fatalError}
+        shouldUseMetalProbe={shouldUseMetalProbe}
         onClose={handleCleanUpAndClose}
       />
     )

@@ -126,7 +126,6 @@ export function FirmwareUpdateTakeover(): JSX.Element {
       {externalsubsystemUpdateData != null && maintenanceRunData == null
         ? createPortal(
             <UpdateInProgressModal
-              percentComplete={externalsubsystemUpdateData.data.updateProgress}
               subsystem={externalsubsystemUpdateData.data.subsystem}
             />,
             getTopPortalEl()

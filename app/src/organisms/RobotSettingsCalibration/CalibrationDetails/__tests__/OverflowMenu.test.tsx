@@ -246,7 +246,7 @@ describe('OverflowMenu', () => {
     }
     const expectedCallParams = {
       calType: 'tipLength',
-      tiprack_hash: mockTipLengthCalibrationResponse.tiprack,
+      tiprack_uri: mockTipLengthCalibrationResponse.uri,
       pipette_id: mockTipLengthCalibrationResponse.pipette,
     }
     render(props)

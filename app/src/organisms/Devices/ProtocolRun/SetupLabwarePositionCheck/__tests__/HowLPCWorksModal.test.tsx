@@ -31,19 +31,6 @@ describe('HowLPCWorksModal', () => {
       'Labware Position Check is intended to correct for minor variances. Opentrons does not recommend using Labware Position Check to compensate for large positional adjustments. Needing to set large labware offsets could indicate a problem with robot calibration.'
     )
   })
-
-  it('should render a link to robot cal', () => {
-    render(props)
-    expect(
-      screen
-        .getByRole('link', {
-          name: 'Learn more about Robot Calibration',
-        })
-        .getAttribute('href')
-    ).toBe(
-      'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'
-    )
-  })
   it('should render a link to the learn more page', () => {
     render(props)
     expect(

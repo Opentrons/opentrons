@@ -42,7 +42,10 @@ export function appShellListener(
   remote.ipcRenderer.on(
     'notify',
     (_, shellHostname, shellTopic, shellMessage) => {
-      if (hostname === shellHostname && topic === shellTopic) {
+      if (
+        hostname === shellHostname &&
+        (topic === shellTopic || shellTopic === 'ALL_TOPICS')
+      ) {
         callback(shellMessage)
       }
     }

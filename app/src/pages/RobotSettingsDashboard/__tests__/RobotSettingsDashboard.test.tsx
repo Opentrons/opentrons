@@ -16,6 +16,7 @@ import {
   TouchScreenSleep,
   TouchscreenBrightness,
   NetworkSettings,
+  Privacy,
   RobotSystemVersion,
   UpdateChannel,
 } from '../../../organisms/RobotSettingsDashboard'
@@ -38,6 +39,7 @@ vi.mock('../../../organisms/RobotSettingsDashboard/RobotSystemVersion')
 vi.mock('../../../organisms/RobotSettingsDashboard/TouchscreenBrightness')
 vi.mock('../../../organisms/RobotSettingsDashboard/UpdateChannel')
 vi.mock('../../../organisms/Devices/hooks')
+vi.mock('../../../organisms/RobotSettingsDashboard/Privacy')
 
 const mockToggleLights = vi.fn()
 
@@ -91,6 +93,8 @@ describe('RobotSettingsDashboard', () => {
     getByText('Control the strip of color lights on the front of the robot.')
     getByText('Touchscreen Sleep')
     getByText('Touchscreen Brightness')
+    getByText('Privacy')
+    getByText('Choose what data to share with Opentrons.')
     getByText('Device Reset')
     getByText('Update Channel')
     getByText('Apply Labware Offsets')
@@ -150,6 +154,13 @@ describe('RobotSettingsDashboard', () => {
     const button = getByText('Touchscreen Brightness')
     fireEvent.click(button)
     expect(vi.mocked(TouchscreenBrightness)).toHaveBeenCalled()
+  })
+
+  it('should render component when tapping privacy', () => {
+    const [{ getByText }] = render()
+    const button = getByText('Privacy')
+    fireEvent.click(button)
+    getByText('Mock Privacy')
   })
 
   it('should render component when tapping device rest', () => {

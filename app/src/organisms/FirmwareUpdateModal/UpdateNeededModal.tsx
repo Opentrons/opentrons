@@ -59,7 +59,6 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
     }
   }, [status, setInitiatedSubsystemUpdate])
 
-  const percentComplete = updateData?.data.updateProgress ?? 0
   const updateError = updateData?.data.updateError
   const instrumentType = subsystem === 'gripper' ? 'gripper' : 'pipette'
   let mount = ''
@@ -103,12 +102,7 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
     (status === 'updating' || status === 'queued') &&
     ongoingUpdateId != null
   ) {
-    modalContent = (
-      <UpdateInProgressModal
-        percentComplete={percentComplete}
-        subsystem={subsystem}
-      />
-    )
+    modalContent = <UpdateInProgressModal subsystem={subsystem} />
   } else if (status === 'done' && ongoingUpdateId != null) {
     modalContent = (
       <UpdateResultsModal

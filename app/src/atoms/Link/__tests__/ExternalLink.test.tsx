@@ -29,7 +29,7 @@ describe('ExternalLink', () => {
     const link = screen.getByText('Test Link')
     expect(link).toHaveAttribute('href', 'https://opentrons.com')
     expect(link).toHaveAttribute('target', '_blank')
-    expect(link).toHaveStyle(`color: ${COLORS.grey50}`)
+    expect(link).toHaveStyle(`color: ${COLORS.blue50}`)
   })
 
   it('renders open-in-new icon', () => {

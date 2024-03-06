@@ -70,7 +70,7 @@ describe('ProtocolRunModuleControls', () => {
 
   it('renders a magnetic module card', () => {
     when(vi.mocked(useModuleRenderInfoForProtocolById))
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, true)
       .thenReturn({
         [mockMagMod.moduleId]: {
           moduleId: 'magModModuleId',
@@ -95,7 +95,7 @@ describe('ProtocolRunModuleControls', () => {
 
   it('renders a temperature module card', () => {
     when(vi.mocked(useModuleRenderInfoForProtocolById))
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, true)
       .thenReturn({
         [mockTempMod.moduleId]: {
           moduleId: 'temperatureModuleId',
@@ -122,7 +122,7 @@ describe('ProtocolRunModuleControls', () => {
 
   it('renders a thermocycler module card', () => {
     when(vi.mocked(useModuleRenderInfoForProtocolById))
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, true)
       .thenReturn({
         [mockTCModule.moduleId]: {
           moduleId: mockTCModule.moduleId,
@@ -151,7 +151,7 @@ describe('ProtocolRunModuleControls', () => {
 
   it('renders a heater-shaker module card', () => {
     when(vi.mocked(useModuleRenderInfoForProtocolById))
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, true
       .thenReturn({
         [mockHeaterShakerDef.moduleId]: {
           moduleId: 'heaterShakerModuleId',
@@ -179,7 +179,7 @@ describe('ProtocolRunModuleControls', () => {
 
   it('renders correct text when module is not attached but required for protocol', () => {
     when(vi.mocked(useModuleRenderInfoForProtocolById))
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, true)
       .thenReturn({
         [mockHeaterShakerDef.moduleId]: {
           moduleId: 'heaterShakerModuleId',

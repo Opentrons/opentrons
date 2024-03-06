@@ -36,6 +36,8 @@ tests ?= tests
 cov_opts ?= --cov=$(SRC_PATH) --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
 test_opts ?=
 
+black_opts := --extend-exclude tests/integration/persistence_snapshots/
+
 # Host key location for robot
 ssh_key ?= $(default_ssh_key)
 # Pubkey location for robot to install with install-key
@@ -122,12 +124,12 @@ test-cov:
 .PHONY: lint
 lint:
 	$(python) -m mypy $(SRC_PATH) $(tests)
-	$(python) -m black --check .
+	$(python) -m black $(black_opts) --check .
 	$(python) -m flake8 $(SRC_PATH) $(tests) setup.py
 
 .PHONY: format
 format:
-	$(python) -m black .
+	$(python) -m black $(black_opts) .
 
 .PHONY: _dev
 _dev:
