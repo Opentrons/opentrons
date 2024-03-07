@@ -12,16 +12,6 @@ import { Privacy } from '../Privacy'
 vi.mock('../../../redux/analytics')
 vi.mock('../../../redux/robot-settings')
 
-const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
-  typeof getRobotSettings
->
-const mockUpdateSetting = updateSetting as jest.MockedFunction<
-  typeof updateSetting
->
-const mockToggleAnalyticsOptedIn = toggleAnalyticsOptedIn as jest.MockedFunction<
-  typeof toggleAnalyticsOptedIn
->
-
 const render = (props: React.ComponentProps<typeof Privacy>) => {
   return renderWithProviders(<Privacy {...props} />, {
     i18nInstance: i18n,
@@ -33,13 +23,13 @@ describe('Privacy', () => {
   beforeEach(() => {
     props = {
       robotName: 'Otie',
-      setCurrentOption: jest.fn(),
+      setCurrentOption: vi.fn(),
     }
-    mockGetRobotSettings.mockReturnValue([])
+    vi.mocked(getRobotSettings).mockReturnValue([])
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should render text and buttons', () => {
@@ -57,13 +47,13 @@ describe('Privacy', () => {
   it('should toggle display usage sharing on click', () => {
     render(props)
     fireEvent.click(screen.getByText('Share display usage'))
-    expect(mockToggleAnalyticsOptedIn).toBeCalled()
+    expect(vi.mocked(toggleAnalyticsOptedIn)).toBeCalled()
   })
 
   it('should toggle robot logs sharing on click', () => {
     render(props)
     fireEvent.click(screen.getByText('Share robot logs'))
-    expect(mockUpdateSetting).toBeCalledWith(
+    expect(vi.mocked(updateSetting)).toBeCalledWith(
       'Otie',
       'disableLogAggregation',
       true
