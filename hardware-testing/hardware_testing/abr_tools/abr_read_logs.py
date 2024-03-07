@@ -112,6 +112,8 @@ def create_data_dictionary(
         if file_path.endswith(".json"):
             with open(file_path) as file:
                 file_results = json.load(file)
+        else:
+            continue
         run_id = file_results.get("run_id")
         if run_id in runs_to_save:
             robot = file_results.get("robot_name")
