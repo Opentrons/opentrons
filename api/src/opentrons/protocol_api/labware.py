@@ -1082,8 +1082,10 @@ def select_tiprack_from_list(
         )
     elif starting_point:
         first_well = starting_point
-    else:
+    elif nozzle_map:
         first_well = None
+    else:
+        first_well = first.wells()[0]
 
     next_tip = first.next_tip(num_channels, first_well, nozzle_map)
     if next_tip:
