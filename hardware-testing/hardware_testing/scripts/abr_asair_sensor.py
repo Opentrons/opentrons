@@ -55,7 +55,7 @@ class _ABRAsairSensor:
             print("Connected to the google sheet.")
         except FileNotFoundError:
             print(
-                "There is no google sheets credentials. Make sure credentials in jupyter notebook."
+                "There are no google sheets credentials. Make sure credentials in jupyter notebook."
             )
         results_list = []  # type: List
         start_time = datetime.datetime.now()

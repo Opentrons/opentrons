@@ -44,26 +44,26 @@ if __name__ == "__main__":
         results_list = []
         try:
             with open(raw_data_file_csv_path, "r") as f:
-                for line in f:
-                    # Process the file here
-                    columns = line.split(",")
-                    if len(columns) >= 2:
-                        stable_value = columns[4]
-                        date_of_measurement = columns[0]
-                        date = str(date_of_measurement).split(" ")[0]
-                        row_data = (
-                            date,
-                            raw_data_file_csv,
-                            plate_state,
-                            robot,
-                            stable_value,
-                            sample,
-                        )
-                        results_list.append(row_data)
-
-                pass
+                csvreader = csv.reader(f)
+                rows = list(csvreader)
         except Exception as e:
             print(f"Error opening file: {e}")
+        last_row = rows[-1]
+        # Process the file here
+        stable_value = last_row[-2]
+        print(stable_value)
+        date_of_measurement = last_row[0]
+        date = str(date_of_measurement).split(" ")[0]
+        row_data = (
+            date,
+            raw_data_file_csv,
+            plate_state,
+            robot,
+            stable_value,
+            sample,
+        )
+        results_list.append(row_data)
+
         with open(new_csv_file_path, "a", newline="") as csv_file:
             csv_writer = csv.writer(csv_file)
             # Write data
