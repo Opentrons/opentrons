@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
+import { QueryClient, QueryClientProvider } from 'react-query'
+
 import { fixture96Plate } from '@opentrons/shared-data'
+
 import { configReducer } from '../../redux/config/reducer'
 import { mockRunData } from './__fixtures__'
 import { mockConnectableRobot } from '../../redux/discovery/__fixtures__'
@@ -42,7 +45,7 @@ const dummyConfig = {
 } as any
 
 const store: Store<any> = createStore(configReducer, dummyConfig)
-
+const queryClient = new QueryClient()
 const now = new Date()
 
 const pauseCommand = {
@@ -62,9 +65,11 @@ export default {
 const Template: Story<
   React.ComponentProps<typeof InterventionModalComponent>
 > = args => (
-  <Provider store={store}>
-    <InterventionModalComponent {...args} />
-  </Provider>
+  <QueryClientProvider client={queryClient}>
+    <Provider store={store}>
+      <InterventionModalComponent {...args} />
+    </Provider>
+  </QueryClientProvider>
 )
 
 export const PauseIntervention = Template.bind({})
