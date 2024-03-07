@@ -1,4 +1,3 @@
-//
 import * as React from 'react'
 import { when } from 'vitest-when'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'

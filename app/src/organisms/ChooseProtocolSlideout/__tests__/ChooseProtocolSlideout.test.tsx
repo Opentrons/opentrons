@@ -1,4 +1,3 @@
-//
 import * as React from 'react'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { StaticRouter } from 'react-router-dom'
@@ -47,7 +46,7 @@ describe('ChooseProtocolSlideout', () => {
     vi.mocked(useTrackCreateProtocolRunEvent).mockReturnValue({
       trackCreateProtocolRunEvent: mockTrackCreateProtocolRunEvent,
     })
-      vi.mocked(useNotifyService).mockReturnValue({} as any)
+    vi.mocked(useNotifyService).mockReturnValue({} as any)
   })
 
   it('renders slideout if showSlideout true', () => {

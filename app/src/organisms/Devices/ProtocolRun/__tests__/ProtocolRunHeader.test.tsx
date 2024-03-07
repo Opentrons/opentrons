@@ -1,4 +1,3 @@
-//
 import * as React from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'

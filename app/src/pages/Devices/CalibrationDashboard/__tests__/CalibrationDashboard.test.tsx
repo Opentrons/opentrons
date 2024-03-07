@@ -1,4 +1,3 @@
-//
 import * as React from 'react'
 import { vi, describe, it, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
@@ -52,7 +51,7 @@ describe('CalibrationDashboard', () => {
       left: mockLeftProtoPipette,
       right: null,
     })
-      vi.mocked(useNotifyAllRunsQuery).mockReturnValue({} as any)
+    vi.mocked(useNotifyAllRunsQuery).mockReturnValue({} as any)
   })
 
   it('renders a robot calibration dashboard title', () => {

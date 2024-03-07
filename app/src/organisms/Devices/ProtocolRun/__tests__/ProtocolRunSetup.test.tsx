@@ -1,4 +1,3 @@
-//
 import * as React from 'react'
 import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'

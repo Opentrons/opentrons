@@ -1,4 +1,3 @@
-//
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
@@ -134,7 +133,7 @@ describe('PipetteOverflowMenu', () => {
   })
 
   it('should disable certain menu items if a run is active for Flex pipette', () => {
-     vi.mocked(isFlexPipette).mockReturnValue(true)
+    vi.mocked(isFlexPipette).mockReturnValue(true)
     props = {
       ...props,
       isRunActive: true,

@@ -1,4 +1,3 @@
-//
 import * as React from 'react'
 import { StaticRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
@@ -86,7 +85,7 @@ describe('SetupLabware', () => {
       <div> mock setup labware list</div>
     )
     vi.mocked(useLPCDisabledReason).mockReturnValue(null)
-      vi.mocked(useNotifyRunQuery).mockReturnValue({} as any)
+    vi.mocked(useNotifyRunQuery).mockReturnValue({} as any)
   })
 
   afterEach(() => {

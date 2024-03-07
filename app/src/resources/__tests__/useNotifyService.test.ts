@@ -1,4 +1,3 @@
-//
 import { useDispatch } from 'react-redux'
 import { renderHook } from '@testing-library/react'
 import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
@@ -44,7 +43,7 @@ describe('useNotifyService', () => {
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
     vi.mocked(useHost).mockReturnValue(MOCK_HOST_CONFIG)
-      vi.mocked(useIsFlex).mockReturnValue(true)
+    vi.mocked(useIsFlex).mockReturnValue(true)
   })
 
   afterEach(() => {
@@ -157,9 +156,11 @@ describe('useNotifyService', () => {
   })
 
   it('should trigger a single HTTP refetch if the refetch flag was returned', () => {
-    vi.mocked(appShellListener).mockImplementation((_: any, __: any, mockCb: any) => {
-      mockCb({ refetchUsingHTTP: true })
-    })
+    vi.mocked(appShellListener).mockImplementation(
+      (_: any, __: any, mockCb: any) => {
+        mockCb({ refetchUsingHTTP: true })
+      }
+    )
     const { rerender } = renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,

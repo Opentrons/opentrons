@@ -1,4 +1,3 @@
-//
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useSelector, useDispatch } from 'react-redux'
@@ -25,16 +24,17 @@ export function AnalyticsSettingsModal(): JSX.Element | null {
 
   return !seen
     ? createPortal(
-      <Modal onCloseClick={setSeen} heading={TITLE} alertOverlay>
-        <AnalyticsToggle />
-        <OutlineButton
-          onClick={setSeen}
-          float="right"
-          margin={SPACING.spacing12}
-        >
-          {CONTINUE}
-        </OutlineButton>
-     </Modal>,
+        <Modal onCloseClick={setSeen} heading={TITLE} alertOverlay>
+          <AnalyticsToggle />
+          <OutlineButton
+            onClick={setSeen}
+            float="right"
+            margin={SPACING.spacing12}
+          >
+            {CONTINUE}
+          </OutlineButton>
+        </Modal>,
         getModalPortalEl()
-  ) : null
+      )
+    : null
 }

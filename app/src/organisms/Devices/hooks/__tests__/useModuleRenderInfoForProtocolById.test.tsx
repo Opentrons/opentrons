@@ -1,4 +1,3 @@
-//
 import { renderHook } from '@testing-library/react'
 import { vi, it, expect, describe, beforeEach } from 'vitest'
 import { when } from 'vitest-when'
@@ -124,12 +123,11 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
     vi.mocked(useDeckConfigurationQuery).mockReturnValue({
       data: [mockCutoutConfig],
     } as UseQueryResult<DeckConfiguration>)
-   vi.mocked(useAttachedModules)
-      .mockReturnValue([
-        mockMagneticModuleGen2,
-        mockTemperatureModuleGen2,
-        mockThermocycler,
-      ])
+    vi.mocked(useAttachedModules).mockReturnValue([
+      mockMagneticModuleGen2,
+      mockTemperatureModuleGen2,
+      mockThermocycler,
+    ])
     when(vi.mocked(useStoredProtocolAnalysis))
       .calledWith('1')
       .thenReturn((PROTOCOL_DETAILS as unknown) as ProtocolAnalysisOutput)
@@ -147,7 +145,9 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
       .calledWith('1')
       .thenReturn(null)
     when(vi.mocked(useStoredProtocolAnalysis)).calledWith('1').thenReturn(null)
-    const { result } = renderHook(() => useModuleRenderInfoForProtocolById('1', true))
+    const { result } = renderHook(() =>
+      useModuleRenderInfoForProtocolById('1', true)
+    )
     expect(result.current).toStrictEqual({})
   })
   it('should return module render info', () => {

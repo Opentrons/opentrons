@@ -1,4 +1,3 @@
-//
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import styled from 'styled-components'
@@ -61,25 +60,21 @@ export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
         <ErrorHeader>
           {i18n.format(t('shared:something_went_wrong'), 'sentenceCase')}
         </ErrorHeader>
-{shouldUseMetalProbe ? (
-            <StyledText
-              as="p"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              textAlign={TEXT_ALIGN_CENTER}
-            >
-              {t('remove_probe_before_exit')}
-            </StyledText>
-          ) : null}
+        {shouldUseMetalProbe ? (
+          <StyledText
+            as="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            textAlign={TEXT_ALIGN_CENTER}
+          >
+            {t('remove_probe_before_exit')}
+          </StyledText>
+        ) : null}
         <StyledText as="p" textAlign={TEXT_ALIGN_CENTER}>
           {t('shared:help_us_improve_send_error_report', {
             support_email: SUPPORT_EMAIL,
           })}
         </StyledText>
-        <ErrorTextArea
-          readOnly
-          value={errorMessage ?? ''}
-          spellCheck={false}
-        />
+        <ErrorTextArea readOnly value={errorMessage ?? ''} spellCheck={false} />
         <PrimaryButton
           textTransform={TEXT_TRANSFORM_CAPITALIZE}
           alignSelf={ALIGN_FLEX_END}
