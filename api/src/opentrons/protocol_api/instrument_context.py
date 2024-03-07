@@ -1024,11 +1024,17 @@ class InstrumentContext(publisher.CommandPublisher):
             if isinstance(trash_container, labware.Labware):
                 well = trash_container.wells()[0]
             else:  # implicit drop tip in disposal location, not well
-                self._core.drop_tip_in_disposal_location(
-                    trash_container,
-                    home_after=home_after,
-                    alternate_tip_drop=True,
-                )
+                with publisher.publish_context(
+                    broker=self.broker,
+                    command=cmds.drop_tip_in_disposal_location(
+                        instrument=self, location=trash_container
+                    ),
+                ):
+                    self._core.drop_tip_in_disposal_location(
+                        trash_container,
+                        home_after=home_after,
+                        alternate_tip_drop=True,
+                    )
                 self._last_tip_picked_up_from = None
                 return self
 
