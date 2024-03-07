@@ -13,7 +13,11 @@ import { PipetteWizardFlows } from '../../../organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '../../../organisms/GripperWizardFlows'
 import { DropTipWizard } from '../../../organisms/DropTipWizard'
 
-import type { PipetteData, GripperData, HostConfig } from '@opentrons/api-client'
+import type {
+  PipetteData,
+  GripperData,
+  HostConfig,
+} from '@opentrons/api-client'
 import type * as SharedData from '@opentrons/shared-data'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
@@ -103,7 +107,9 @@ const render = (pipetteOrGripper: PipetteData | GripperData) => {
   return renderWithProviders(
     <NiceModal.Provider>
       <button
-        onClick={() => handleInstrumentDetailOverflowMenu(pipetteOrGripper, MOCK_HOST)}
+        onClick={() =>
+          handleInstrumentDetailOverflowMenu(pipetteOrGripper, MOCK_HOST)
+        }
         data-testid="testButton"
       />
     </NiceModal.Provider>,
