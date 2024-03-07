@@ -37,8 +37,6 @@
 }
 
 .title {
-  @apply --transition-background-color;
-
   display: flex;
   align-items: center;
   margin-bottom: var(--spacing-3);
@@ -118,7 +116,17 @@
 }
 
 .btn_blue {
-  @apply --link-btn;
+  /* from legacy --linkb-tn */
+  display: block;
+  width: 100%;
+  margin: 1.5rem 0 0.5rem;
+  padding: 1rem;
+  border-radius: 3px;
+  font-size: var(--fs-body-2);
+  text-align: center;
+  font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
+  text-transform: uppercase;
+  cursor: pointer;
 
   background-color: var(--c-blue);
   color: white;
@@ -134,7 +142,17 @@
 }
 
 .btn_white {
-  @apply --link-btn;
+  /* from legacy --linkb-tn */
+  display: block;
+  width: 100%;
+  margin: 1.5rem 0 0.5rem;
+  padding: 1rem;
+  border-radius: 3px;
+  font-size: var(--fs-body-2);
+  text-align: center;
+  font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
+  text-transform: uppercase;
+  cursor: pointer;
 
   border: 1px solid var(--c-blue);
   color: var(--c-blue);

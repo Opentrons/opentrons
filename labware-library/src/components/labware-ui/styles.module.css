@@ -2,11 +2,19 @@
 @import '../../styles/spacing.module.css';
 
 .gallery_main {
-  @apply --aspect-4-3;
+  position: relative;
+  height: 0;
+  padding-bottom: 75%;
 }
 
 .gallery_image_container {
-  @apply --aspect-item;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 
   display: flex;
 
@@ -37,7 +45,9 @@
 }
 
 .gallery_thumbnail {
-  @apply --aspect-1-1;
+  position: relative;
+  height: 0;
+  padding-bottom: 100%;
 }
 
 .load_name {
