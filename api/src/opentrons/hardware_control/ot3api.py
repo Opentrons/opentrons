@@ -653,12 +653,16 @@ class OT3API(
 
     # TODO (spp, 2023-01-31): add unit tests
     async def cache_instruments(
-        self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
+        self,
+        require: Optional[Dict[top_types.Mount, PipetteName]] = None,
+        skip_if_would_block: bool = False,
     ) -> None:
         """
         Scan the attached instruments, take necessary configuration actions,
         and set up hardware controller internal state if necessary.
         """
+        if skip_if_would_block and self._motion_lock.locked():
+            return
         async with self._motion_lock:
             skip_configure = await self._cache_instruments(require)
             if not skip_configure or not self._configured_since_update:

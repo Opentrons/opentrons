@@ -216,7 +216,7 @@ async def _get_attached_instruments_ot3(
     hardware: OT3HardwareControlAPI,
 ) -> PydanticResponse[SimpleMultiBody[AttachedItem]]:
     # OT3
-    await hardware.cache_instruments()
+    await hardware.cache_instruments(skip_if_would_block=True)
     response_data = await _get_instrument_data(hardware)
     return await PydanticResponse.create(
         content=SimpleMultiBody.construct(
