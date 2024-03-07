@@ -80,7 +80,7 @@ for i in FORCE_TEST_RIGHT_SETTINGS:
 # Global variables
 thread_sensor = False
 force_output = []
-
+valid_fail = []
 
 def _connect_to_mark10_fixture(simulate: bool) -> Union[Mark10, SimMark10]:
     """Connect to the force Gauge."""
@@ -216,9 +216,6 @@ def check_force(
         qc_pass = True
     else:
         qc_pass = False
-    # validate None
-    if max_force is None or max_force_range is None or average_force is None or average_force_range is None:
-        raise EnvironmentError("Found None data, please adjust Z-Stage, Test Failed ( 请调整Z轴位置, 测试失败)!")
     _tag = _get_test_tag(current)
     report(
         mount.name,
@@ -302,10 +299,12 @@ async def _force_gauge(
                 avg_results.append(round(analyzed_avg, 1))
             else:
                 ui.print_error(
-                    "DATA INVALID - z-stage did not contact or guage not zeroed"
+                    "DATA INVALID - z-stage did not contact or guage not zeroed \n"
+                    f"Mount {mount.name} fail !"
                 )
+                valid_fail.append(mount.name)
                 qc_pass = False
-                break
+                return
 
             # we expect a stall has happened during pick up, so we want to
             # update the motor estimation
@@ -404,6 +403,12 @@ async def _main(arguments: argparse.Namespace) -> None:
             ui.print_title("Test Done - PASSED")
         else:
             ui.print_title("Test Done - FAILED")
+        if len(valid_fail) == 0:
+            pass
+        else:
+            print("Data Invalid, Please Re-Test This Unit (数据验证失败, 请复测当前Z轴) !")
+            for item in valid_fail:
+                print(f"Mount {item} Fail")
         report.save_to_disk()
         report.print_results()
 
