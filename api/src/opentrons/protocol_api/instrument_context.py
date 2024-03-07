@@ -327,6 +327,9 @@ class InstrumentContext(publisher.CommandPublisher):
                             liquid aspirated into the pipette will be dispensed (the
                             amount is accessible through :py:attr:`current_volume`).
 
+            .. versionchanged:: 2.18
+                Accepts ``TrashBin`` and ``WasteChute`` values.
+
         :param rate: How quickly a pipette dispenses liquid. The speed in µL/s is
                      calculated as ``rate`` multiplied by :py:attr:`flow_rate.dispense
                      <flow_rate>`. If not specified, defaults to 1.0. See
@@ -551,6 +554,9 @@ class InstrumentContext(publisher.CommandPublisher):
                               without first calling a method that takes a location, like
                               :py:meth:`.aspirate` or :py:meth:`dispense`.
         :returns: This instance.
+
+        .. versionchanged:: 2.18
+            The ``location`` parameter accepts ``TrashBin`` and ``WasteChute`` values.
         """
         well: Optional[labware.Well] = None
         move_to_location: types.Location
@@ -1015,6 +1021,9 @@ class InstrumentContext(publisher.CommandPublisher):
             position.
 
         :returns: This instance.
+
+        .. versionchanged:: 2.18
+            The ``location`` parameter accepts ``TrashBin`` and ``WasteChute`` values.
         """
         alternate_drop_location: bool = False
         if location is None:
@@ -1445,6 +1454,9 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :param publish: Whether to list this function call in the run preview.
                         Default is ``True``.
+
+        .. versionchanged:: 2.18
+            The ``location`` parameter accepts ``TrashBin`` and ``WasteChute`` values.
         """
         with ExitStack() as contexts:
             if isinstance(location, (TrashBin, WasteChute)):
