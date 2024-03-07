@@ -1091,7 +1091,7 @@ def select_tiprack_from_list(
     if next_tip:
         return first, next_tip
     else:
-        return select_tiprack_from_list(rest, num_channels, starting_point, nozzle_map)
+        return select_tiprack_from_list(rest, num_channels, None, nozzle_map)
 
 
 # TODO(mc, 2022-11-09): implementation detail, move to core
