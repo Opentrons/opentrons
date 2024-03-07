@@ -22,6 +22,7 @@ const liquid = import.meta.glob(
 type PipChannelString = 'single' | 'multi' | '96'
 type Channels = 'eight_channel' | 'single_channel' | 'ninety_six_channel'
 type Gen = 'gen1' | 'gen2' | 'gen3' | 'flex'
+
 type CombinedModules =
   | PipetteV2GeneralSpecs
   | PipetteV2GeometrySpecs
@@ -160,7 +161,6 @@ model, and version from generation in order to return the correct pipette schema
 **/
 export const getPipetteSpecsV2 = (
   name: PipetteName | PipetteModel
-  //  TODO: make type, do not type as any
 ): PipetteV2Specs | null => {
   const nameSplit = name.split('_')
   const pipetteModel = nameSplit[0] // ex: p300
@@ -183,7 +183,7 @@ export const getPipetteSpecsV2 = (
   const allJsons = Object.keys(combinedGlobs).map(path => combinedGlobs[path])
 
   const matchingJsons = allJsons.reduce(
-    //  combinedModules = array of 3 jsons, module = 1 json
+    //  NOTE: combinedModules = array of 3 jsons, module = 1 json
     (combinedModules: CombinedModules[], module: ModuleSpecs, index) => {
       const path = Object.keys(combinedGlobs)[index]
       V2_DEFINITION_TYPES.forEach(type => {
