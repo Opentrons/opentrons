@@ -463,9 +463,11 @@ export interface PipetteV2LiquidSpecs {
   defaultTipracks: string[]
 }
 
-export type PipetteV2Specs = PipetteV2GeneralSpecs &
-  PipetteV2GeometrySpecs &
-  PipetteV2LiquidSpecs
+type GenericAndGeometry = PipetteV2GeneralSpecs & PipetteV2GeometrySpecs
+
+export interface PipetteV2Specs extends GenericAndGeometry {
+  liquids: Record<string, PipetteV2LiquidSpecs>
+}
 
 export interface PipetteNameSpecs {
   name: string
