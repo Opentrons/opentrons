@@ -145,6 +145,8 @@ def test_get_next_tip_returns_none(
             nozzle_offset_z=1.23,
             home_position=4.56,
             nozzle_map=get_default_nozzle_map(PipetteNameType.P1000_96),
+            back_left_corner_offset=Point(0, 0, 0),
+            front_right_corner_offset=Point(0, 0, 0),
         ),
     )
     subject.handle_action(
@@ -204,6 +206,8 @@ def test_get_next_tip_returns_first_tip(
             nozzle_offset_z=1.23,
             home_position=4.56,
             nozzle_map=get_default_nozzle_map(pipette_name_type),
+            back_left_corner_offset=Point(0, 0, 0),
+            front_right_corner_offset=Point(0, 0, 0),
         ),
     )
     subject.handle_action(
@@ -259,6 +263,8 @@ def test_get_next_tip_used_starting_tip(
             nozzle_offset_z=1.23,
             home_position=4.56,
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
+            back_left_corner_offset=Point(0, 0, 0),
+            front_right_corner_offset=Point(0, 0, 0),
         ),
     )
     subject.handle_action(
@@ -308,6 +314,7 @@ def test_get_next_tip_skips_picked_up_tip(
     load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
         result=commands.LoadPipetteResult(pipetteId="pipette-id")
     )
+    channels_num = input_tip_amount
     if input_starting_tip is not None:
         pipette_name_type = PipetteNameType.P1000_96
         if input_tip_amount == 1:
@@ -316,28 +323,8 @@ def test_get_next_tip_skips_picked_up_tip(
             pipette_name_type = PipetteNameType.P300_MULTI_GEN2
         else:
             pipette_name_type = PipetteNameType.P1000_96
-        load_pipette_private_result = commands.LoadPipettePrivateResult(
-            pipette_id="pipette-id",
-            serial_number="pipette-serial",
-            config=LoadedStaticPipetteData(
-                channels=input_tip_amount,
-                max_volume=15,
-                min_volume=3,
-                model="gen a",
-                display_name="display name",
-                flow_rates=FlowRates(
-                    default_aspirate={},
-                    default_dispense={},
-                    default_blow_out={},
-                ),
-                tip_configuration_lookup_table={15: supported_tip_fixture},
-                nominal_tip_overlap={},
-                nozzle_offset_z=1.23,
-                home_position=4.56,
-                nozzle_map=get_default_nozzle_map(pipette_name_type),
-            ),
-        )
     else:
+        channels_num = get_next_tip_tips
         pipette_name_type = PipetteNameType.P1000_96
         if get_next_tip_tips == 1:
             pipette_name_type = PipetteNameType.P300_SINGLE_GEN2
@@ -345,27 +332,29 @@ def test_get_next_tip_skips_picked_up_tip(
             pipette_name_type = PipetteNameType.P300_MULTI_GEN2
         else:
             pipette_name_type = PipetteNameType.P1000_96
-        load_pipette_private_result = commands.LoadPipettePrivateResult(
-            pipette_id="pipette-id",
-            serial_number="pipette-serial",
-            config=LoadedStaticPipetteData(
-                channels=get_next_tip_tips,
-                max_volume=15,
-                min_volume=3,
-                model="gen a",
-                display_name="display name",
-                flow_rates=FlowRates(
-                    default_aspirate={},
-                    default_dispense={},
-                    default_blow_out={},
-                ),
-                tip_configuration_lookup_table={15: supported_tip_fixture},
-                nominal_tip_overlap={},
-                nozzle_offset_z=1.23,
-                home_position=4.56,
-                nozzle_map=get_default_nozzle_map(pipette_name_type),
+    load_pipette_private_result = commands.LoadPipettePrivateResult(
+        pipette_id="pipette-id",
+        serial_number="pipette-serial",
+        config=LoadedStaticPipetteData(
+            channels=channels_num,
+            max_volume=15,
+            min_volume=3,
+            model="gen a",
+            display_name="display name",
+            flow_rates=FlowRates(
+                default_aspirate={},
+                default_dispense={},
+                default_blow_out={},
             ),
-        )
+            tip_configuration_lookup_table={15: supported_tip_fixture},
+            nominal_tip_overlap={},
+            nozzle_offset_z=1.23,
+            home_position=4.56,
+            nozzle_map=get_default_nozzle_map(pipette_name_type),
+            back_left_corner_offset=Point(0, 0, 0),
+            front_right_corner_offset=Point(0, 0, 0),
+        ),
+    )
     subject.handle_action(
         actions.UpdateCommandAction(
             private_result=load_pipette_private_result, command=load_pipette_command
@@ -490,6 +479,8 @@ def test_get_next_tip_with_starting_tip_8_channel(
             nozzle_offset_z=1.23,
             home_position=4.56,
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI_GEN2),
+            back_left_corner_offset=Point(0, 0, 0),
+            front_right_corner_offset=Point(0, 0, 0),
         ),
     )
     subject.handle_action(
@@ -563,6 +554,8 @@ def test_get_next_tip_with_starting_tip_out_of_tips(
             nozzle_offset_z=1.23,
             home_position=4.56,
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
+            back_left_corner_offset=Point(0, 0, 0),
+            front_right_corner_offset=Point(0, 0, 0),
         ),
     )
     subject.handle_action(
@@ -636,6 +629,8 @@ def test_get_next_tip_with_column_and_starting_tip(
             nozzle_offset_z=1.23,
             home_position=4.56,
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI_GEN2),
+            back_left_corner_offset=Point(0, 0, 0),
+            front_right_corner_offset=Point(0, 0, 0),
         ),
     )
     subject.handle_action(

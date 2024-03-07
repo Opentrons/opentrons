@@ -176,7 +176,7 @@ class TipView(HasState[TipState]):
         starting_tip_name: Optional[str],
         nozzle_map: Optional[NozzleMap],
     ) -> Optional[str]:
-        """Get the next available clean tip."""
+        """Get the next available clean tip. Does not support use of a starting tip if the pipette used is in a partial configuration."""
         wells = self._state.tips_by_labware_id.get(labware_id, {})
         columns = self._state.column_by_labware_id.get(labware_id, [])
 
@@ -215,10 +215,10 @@ class TipView(HasState[TipState]):
                         else:
                             return None
                     tip_cluster.append(well)
+
             if any(well not in [*wells] for well in tip_cluster):
-                # If wells from this cluster have been dropped, return None to search for the next cluster
                 return None
-            # Return the list of tips to be analyzed
+
             return tip_cluster
 
         def _validate_tip_cluster(
@@ -269,7 +269,6 @@ class TipView(HasState[TipState]):
                         active_columns, active_rows, tip_cluster
                     )
                     if isinstance(result, str):
-                        # The result is the critical tip to target
                         return result
                 if critical_row + active_rows < len(columns[0]):
                     critical_row = critical_row + active_rows
@@ -292,7 +291,6 @@ class TipView(HasState[TipState]):
                         active_columns, active_rows, tip_cluster
                     )
                     if isinstance(result, str):
-                        # The result is the critical tip to target
                         return result
                 if critical_row + active_rows < len(columns[0]):
                     critical_row = critical_row + active_rows
@@ -315,7 +313,6 @@ class TipView(HasState[TipState]):
                         active_columns, active_rows, tip_cluster
                     )
                     if isinstance(result, str):
-                        # The result is the critical tip to target
                         return result
                 if critical_row - active_rows > 0:
                     critical_row = critical_row - active_rows
@@ -338,7 +335,6 @@ class TipView(HasState[TipState]):
                         active_columns, active_rows, tip_cluster
                     )
                     if isinstance(result, str):
-                        # The result is the critical tip to target
                         return result
                 if critical_row - active_rows > 0:
                     critical_row = critical_row - active_rows
@@ -351,29 +347,28 @@ class TipView(HasState[TipState]):
             num_channels = len(nozzle_map.full_instrument_map_store)
             num_nozzle_cols = len(nozzle_map.columns)
             num_nozzle_rows = len(nozzle_map.rows)
+            # Each pipette's cluster search is determined by the point of entry for a given pipette/configuration:
+            # - Single channel pipettes always search a tiprack top to bottom, left to right
+            # - Eight channel pipettes will begin at the top if the primary nozzle is H1 and at the bottom if
+            #   it is A1. The eight channel will always progress across the columns left to right.
+            # - 96 Channel pipettes will begin in the corner opposite their primary/starting nozzle (if starting nozzle = A1, enter tiprack at H12)
+            #   The 96 channel will then progress towards the opposite corner, either going up or down, left or right depending on configuration.
+
             if num_channels == 1:
-                # for a single channel pipette, always begin at A1 on the tiprack
                 return _cluster_search_A1(num_nozzle_cols, num_nozzle_rows)
             elif num_channels == 8:
-                # perform 8 channel logic beginning from either H1 or A1 of the tiprack
                 if nozzle_map.starting_nozzle == "A1":
-                    # Define the critical well by the position of the well relative to Tip Rack entry point H1
                     return _cluster_search_H1(num_nozzle_cols, num_nozzle_rows)
                 elif nozzle_map.starting_nozzle == "H1":
-                    # Define the critical well by the position of the well relative to Tip Rack entry point A1
                     return _cluster_search_A1(num_nozzle_cols, num_nozzle_rows)
             elif num_channels == 96:
                 if nozzle_map.starting_nozzle == "A1":
-                    # Define the critical well by the position of the well relative to Tip Rack entry point H12
                     return _cluster_search_H12(num_nozzle_cols, num_nozzle_rows)
                 elif nozzle_map.starting_nozzle == "A12":
-                    # Define the critical well by the position of the well relative to Tip Rack entry point H1
                     return _cluster_search_H1(num_nozzle_cols, num_nozzle_rows)
                 elif nozzle_map.starting_nozzle == "H1":
-                    # Define the critical well by the position of the well relative to Tip Rack entry point A12
                     return _cluster_search_A12(num_nozzle_cols, num_nozzle_rows)
                 elif nozzle_map.starting_nozzle == "H12":
-                    # Define the critical well by the position of the well relative to Tip Rack entry point A1
                     return _cluster_search_A1(num_nozzle_cols, num_nozzle_rows)
                 else:
                     raise ValueError(
