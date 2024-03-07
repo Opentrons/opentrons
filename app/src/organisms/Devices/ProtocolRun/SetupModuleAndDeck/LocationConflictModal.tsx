@@ -17,7 +17,6 @@ import {
   COLORS,
   JUSTIFY_END,
   ALIGN_CENTER,
-  Box,
   JUSTIFY_SPACE_BETWEEN,
   BORDERS,
 } from '@opentrons/components'
@@ -290,11 +289,9 @@ export const LocationConflictModal = (
                 gridGap={SPACING.spacing20}
                 alignItems={ALIGN_CENTER}
               >
-                <Box width="107px">
-                  <StyledText as="label" width={SPACING.spacing120}>
-                    {t('protocol_specifies')}
-                  </StyledText>
-                </Box>
+                <StyledText as="label" width={SPACING.spacing120}>
+                  {t('protocol_specifies')}
+                </StyledText>
                 <StyledText as="label" flex="1">
                   {protocolSpecifiesDisplayName}
                 </StyledText>
@@ -306,13 +303,10 @@ export const LocationConflictModal = (
                 gridGap={SPACING.spacing20}
                 alignItems={ALIGN_CENTER}
               >
-                <Box width="max-content">
-                  <StyledText as="label" width={SPACING.spacing120}>
-                    {t('currently_configured')}
-                  </StyledText>
-                </Box>
+                <StyledText as="label" width={SPACING.spacing120}>
+                  {t('currently_configured')}
+                </StyledText>
                 <StyledText as="label" flex="1">
-                  {' '}
                   {isThermocycler
                     ? currentThermocyclerFixtureDisplayName
                     : currentFixtureDisplayName}
