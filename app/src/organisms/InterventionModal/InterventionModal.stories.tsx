@@ -4,14 +4,40 @@ import { createStore } from 'redux'
 import { fixture96Plate } from '@opentrons/shared-data'
 import { configReducer } from '../../redux/config/reducer'
 import { mockRunData } from './__fixtures__'
+import { mockConnectableRobot } from '../../redux/discovery/__fixtures__'
+import * as DiscoveryClientFixtures from '../../../../discovery-client/src/fixtures'
+import {
+  HEALTH_STATUS_OK,
+  ROBOT_MODEL_OT3,
+} from '../../redux/discovery/constants'
 import { InterventionModal as InterventionModalComponent } from './'
 
 import type { Store } from 'redux'
 import type { Story, Meta } from '@storybook/react'
 
 const dummyConfig = {
-  config: {
-    isOnDevice: false,
+  discovery: {
+    robot: { connection: { connectedTo: null } },
+    robotsByName: {
+      [mockConnectableRobot.name]: mockConnectableRobot,
+      buzz: {
+        name: 'buzz',
+        health: DiscoveryClientFixtures.mockOT3HealthResponse,
+        serverHealth: DiscoveryClientFixtures.mockOT3ServerHealthResponse,
+        addresses: [
+          {
+            ip: '1.1.1.1',
+            port: 31950,
+            seen: true,
+            healthStatus: HEALTH_STATUS_OK,
+            serverHealthStatus: HEALTH_STATUS_OK,
+            healthError: null,
+            serverHealthError: null,
+            advertisedModel: ROBOT_MODEL_OT3,
+          },
+        ],
+      },
+    },
   },
 } as any
 
