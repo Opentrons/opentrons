@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { vi, describe, beforeEach, it, expect } from 'vitest'
+import { vi, describe, beforeEach, it, expect, afterEach } from 'vitest'
 import { Route } from 'react-router'
 import { MemoryRouter } from 'react-router-dom'
 
@@ -39,7 +39,7 @@ describe('AppSettingsHeader', () => {
       <div>Mock Advanced Settings</div>
     )
     vi.mocked(FeatureFlags).mockReturnValue(<div>Mock Feature Flags</div>)
-      vi.mocked(PrivacySettings).mockReturnValue(<div>Mock Privacy Settings</div>)
+    vi.mocked(PrivacySettings).mockReturnValue(<div>Mock Privacy Settings</div>)
   })
   afterEach(() => {
     vi.resetAllMocks()

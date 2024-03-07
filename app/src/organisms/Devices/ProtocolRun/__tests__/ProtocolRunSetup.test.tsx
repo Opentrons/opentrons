@@ -56,6 +56,7 @@ vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('../../../../redux/config')
 vi.mock('../../../../resources/deck_configuration/utils')
 vi.mock('../../../../resources/deck_configuration/hooks')
+vi.mock('../../../../resources/runs/useNotifyRunQuery')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
   return {
@@ -142,7 +143,7 @@ describe('ProtocolRunSetup', () => {
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     vi.mocked(getIsFixtureMismatch).mockReturnValue(false)
-      vi.mocked(useNotifyRunQuery).mockReturnValue({} as any)
+    vi.mocked(useNotifyRunQuery).mockReturnValue({} as any)
     when(vi.mocked(useRunPipetteInfoByMount))
       .calledWith(RUN_ID)
       .thenReturn({ left: null, right: null })

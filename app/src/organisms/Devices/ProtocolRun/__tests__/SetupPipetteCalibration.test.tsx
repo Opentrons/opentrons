@@ -16,6 +16,7 @@ import type { PipetteInfo } from '../../hooks'
 
 vi.mock('../../hooks')
 vi.mock('../SetupPipetteCalibrationItem')
+vi.mock('../../../../resources/runs/useNotifyRunQuery')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'

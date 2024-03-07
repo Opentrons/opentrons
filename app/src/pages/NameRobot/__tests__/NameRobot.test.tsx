@@ -139,7 +139,7 @@ describe('NameRobot', () => {
   })
 
   it('should call a mock function when tapping back button', () => {
-    mockuseIsUnboxingFlowOngoing.mockReturnValue(false)
+    vi.mocked(useIsUnboxingFlowOngoing).mockReturnValue(false)
     render()
     fireEvent.click(screen.getByTestId('name_back_button'))
     expect(mockPush).toHaveBeenCalledWith('/robot-settings')

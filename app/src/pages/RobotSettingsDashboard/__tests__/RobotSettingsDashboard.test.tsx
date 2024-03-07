@@ -161,7 +161,7 @@ describe('RobotSettingsDashboard', () => {
     const [{ getByText }] = render()
     const button = getByText('Privacy')
     fireEvent.click(button)
-    getByText('Mock Privacy')
+    expect(vi.mocked(Privacy)).toHaveBeenCalled()
   })
 
   it('should render component when tapping device rest', () => {

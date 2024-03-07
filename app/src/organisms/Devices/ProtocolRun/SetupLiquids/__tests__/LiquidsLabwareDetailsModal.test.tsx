@@ -117,7 +117,7 @@ describe('LiquidsLabwareDetailsModal', () => {
     screen.getByText(nestedTextMatcher('mock LiquidDetailCard'))
   })
   it.only('should render labware render with well fill', () => {
-    vi.mocked(getDisabledWellFillFromLabwareId()).mockReturnValue({
+    vi.mocked(getDisabledWellFillFromLabwareId).mockReturnValue({
       C1: '#ff4888',
       C2: '#ff4888',
     })

@@ -1,13 +1,12 @@
 # shared-data makefile
-#
 
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
 SHELL := bash
 
-# These variables can be overriden when make is invoked to customize the
+# These variables can be overridden when make is invoked to customize the
 # behavior of jest
 tests ?=
-cov_opts ?= --coverage=true
+cov_opts ?= --coverage=true --ci=true --collectCoverageFrom='shared-data/js/**/*.(js|ts|tsx)'
 test_opts ?=
 
 # Top level targets

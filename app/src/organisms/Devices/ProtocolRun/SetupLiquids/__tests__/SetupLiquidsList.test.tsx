@@ -62,6 +62,7 @@ vi.mock('../../utils/getLocationInfoNames')
 vi.mock('../LiquidsLabwareDetailsModal')
 vi.mock('@opentrons/api-client')
 vi.mock('../../../../../redux/analytics')
+vi.mock('../../../../../resources/runs/useNotifyRunQuery')
 
 const render = (props: React.ComponentProps<typeof SetupLiquidsList>) => {
   return renderWithProviders(<SetupLiquidsList {...props} />, {
@@ -95,7 +96,7 @@ describe('SetupLiquidsList', () => {
         expect.anything()
       )
       .thenReturn(<div>Mock liquids labware details modal</div>)
-      vi.mocked(useNotifyRunQuery).mockReturnValue({} as any)
+    vi.mocked(useNotifyRunQuery).mockReturnValue({} as any)
   })
 
   it('renders the total volume of the liquid, sample display name, and description', () => {

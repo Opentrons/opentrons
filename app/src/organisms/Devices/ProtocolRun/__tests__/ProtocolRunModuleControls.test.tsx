@@ -152,7 +152,7 @@ describe('ProtocolRunModuleControls', () => {
 
   it('renders a heater-shaker module card', () => {
     when(vi.mocked(useModuleRenderInfoForProtocolById))
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, true)
       .thenReturn({
         [mockHeaterShakerDef.moduleId]: {
           moduleId: 'heaterShakerModuleId',

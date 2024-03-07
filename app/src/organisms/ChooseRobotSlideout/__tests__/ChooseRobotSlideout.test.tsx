@@ -26,6 +26,7 @@ import { useNotifyService } from '../../../resources/useNotifyService'
 vi.mock('../../../redux/discovery')
 vi.mock('../../../redux/robot-update')
 vi.mock('../../../redux/networking')
+vi.mock('../../../resources/useNotifyService')
 
 const render = (props: React.ComponentProps<typeof ChooseRobotSlideout>) => {
   return renderWithProviders(
@@ -53,7 +54,7 @@ describe('ChooseRobotSlideout', () => {
       wifi: null,
       ethernet: null,
     })
-      vi.mocked(useNotifyService).mockReturnValue({} as any)
+    vi.mocked(useNotifyService).mockReturnValue({} as any)
   })
 
   it('renders slideout if isExpanded true', () => {

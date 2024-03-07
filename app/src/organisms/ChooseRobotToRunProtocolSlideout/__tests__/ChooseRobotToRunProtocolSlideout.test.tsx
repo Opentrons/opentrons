@@ -44,6 +44,7 @@ vi.mock('../../../redux/networking')
 vi.mock('../../../redux/config')
 vi.mock('../useCreateRunFromProtocol')
 vi.mock('../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis')
+vi.mock('../../../resources/useNotifyService')
 
 const render = (
   props: React.ComponentProps<typeof ChooseRobotToRunProtocolSlideout>
@@ -119,7 +120,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     when(vi.mocked(getNetworkInterfaces))
       .calledWith({} as State, expect.any(String))
       .thenReturn({ wifi: null, ethernet: null })
-      vi.mocked(useNotifyService).mockReturnValue({} as any)
+    vi.mocked(useNotifyService).mockReturnValue({} as any)
   })
   afterEach(() => {
     vi.resetAllMocks()

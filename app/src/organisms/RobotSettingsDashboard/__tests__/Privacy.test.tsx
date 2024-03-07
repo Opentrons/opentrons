@@ -1,15 +1,16 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
 
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { toggleAnalyticsOptedIn } from '../../../redux/analytics'
 import { getRobotSettings, updateSetting } from '../../../redux/robot-settings'
 
 import { Privacy } from '../Privacy'
 
-jest.mock('../../../redux/analytics')
-jest.mock('../../../redux/robot-settings')
+vi.mock('../../../redux/analytics')
+vi.mock('../../../redux/robot-settings')
 
 const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
   typeof getRobotSettings

@@ -30,7 +30,7 @@ describe('WelcomeModal', () => {
     mockCreateLiveCommand = vi.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
     props = {
-      setShowAnalyticsOptInModal: jest.fn(),
+      setShowAnalyticsOptInModal: vi.fn(),
       setShowWelcomeModal: mockFunc,
     }
     vi.mocked(useCreateLiveCommandMutation).mockReturnValue({

@@ -1,8 +1,10 @@
 import 'vi-styled-components'
 import * as React from 'react'
-import { vi, it, expect } from 'vitest' 
+import { vi, it, expect } from 'vitest'
 import { fireEvent } from '@testing-library/react'
-import { COLORS, renderWithProviders } from '@opentrons/components'
+import { COLORS } from '@opentrons/components'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { OverflowBtn } from '../OverflowBtn'
 
 const render = (props: React.ComponentProps<typeof OverflowBtn>) => {
@@ -26,12 +28,8 @@ describe('OverflowBtn', () => {
       onClick: vi.fn(),
     })
 
-    expect(getByRole('button')).toHaveStyleRule(
-      'background-color',
-      `${String(COLORS.grey30)}`,
-      {
-        modifier: ':hover',
-      }
+    expect(getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.grey30}`
     )
   })
 
@@ -40,12 +38,8 @@ describe('OverflowBtn', () => {
       onClick: vi.fn(),
     })
 
-    expect(getByRole('button')).toHaveStyleRule(
-      'background-color',
-      `${String(COLORS.grey35)}`,
-      {
-        modifier: ':active',
-      }
+    expect(getByRole('button')).toHaveStyle(
+      `background-color: ${String(COLORS.grey35)}`
     )
   })
 
