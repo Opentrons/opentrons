@@ -15,7 +15,7 @@ const generalGeometric = import.meta.glob(
   { eager: true }
 )
 const liquid = import.meta.glob(
-  '../pipette/definitions/2/liquid/*/*/default/*.json',
+  '../pipette/definitions/2/liquid/*/*/*/*.json',
   { eager: true }
 )
 
@@ -160,7 +160,8 @@ or PipetteModel such as 'p300_single_v1.3' and converts it to channels,
 model, and version from generation in order to return the correct pipette schema v2 json files. 
 **/
 export const getPipetteSpecsV2 = (
-  name: PipetteName | PipetteModel
+  name: PipetteName | PipetteModel,
+  lowVolume: boolean
 ): PipetteV2Specs | null => {
   const nameSplit = name.split('_')
   const pipetteModel = nameSplit[0] // ex: p300
@@ -181,6 +182,7 @@ export const getPipetteSpecsV2 = (
     ...liquid,
   }
   const allJsons = Object.keys(combinedGlobs).map(path => combinedGlobs[path])
+  const liquidPath = lowVolume ? 'lowVolumeDefault' : 'default'
 
   const matchingJsons = allJsons.reduce(
     //  NOTE: combinedModules = array of 3 jsons, module = 1 json
@@ -192,7 +194,7 @@ export const getPipetteSpecsV2 = (
             `../pipette/definitions/2/${type}/${channels}/${pipetteModel}/${version}.json` ===
               path) ||
           (type === 'liquid' &&
-            `../pipette/definitions/2/liquid/${channels}/${pipetteModel}/default/${version}.json` ===
+            `../pipette/definitions/2/liquid/${channels}/${pipetteModel}/${liquidPath}/${version}.json` ===
               path)
         ) {
           combinedModules.push(module.default)
