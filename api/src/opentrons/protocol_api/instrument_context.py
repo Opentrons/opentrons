@@ -546,7 +546,11 @@ class InstrumentContext(publisher.CommandPublisher):
         :ref:`blow-out`.
 
         :param location: The blowout location. If no location is specified, the pipette
-                         will blow out from its current position.
+            will blow out from its current position.
+
+            .. versionchanged:: 2.18
+                Accepts ``TrashBin`` and ``WasteChute`` values.
+
         :type location: :py:class:`.Well` or :py:class:`.Location` or ``None``
 
         :raises RuntimeError: If no location is specified and the location cache is
@@ -554,9 +558,6 @@ class InstrumentContext(publisher.CommandPublisher):
                               without first calling a method that takes a location, like
                               :py:meth:`.aspirate` or :py:meth:`dispense`.
         :returns: This instance.
-
-        .. versionchanged:: 2.18
-            The ``location`` parameter accepts ``TrashBin`` and ``WasteChute`` values.
         """
         well: Optional[labware.Well] = None
         move_to_location: types.Location
@@ -1009,7 +1010,11 @@ class InstrumentContext(publisher.CommandPublisher):
               ``pipette.drop_tip(location=waste_chute)``.
 
         :param location:
-            The location to drop the tip.
+            Where to drop the tip.
+
+            .. versionchanged:: 2.16
+                Accepts ``TrashBin`` and ``WasteChute`` values.
+
         :type location:
             :py:class:`~.types.Location` or :py:class:`.Well` or ``None``
         :param home_after:
@@ -1021,9 +1026,6 @@ class InstrumentContext(publisher.CommandPublisher):
             position.
 
         :returns: This instance.
-
-        .. versionchanged:: 2.18
-            The ``location`` parameter accepts ``TrashBin`` and ``WasteChute`` values.
         """
         alternate_drop_location: bool = False
         if location is None:
@@ -1436,7 +1438,11 @@ class InstrumentContext(publisher.CommandPublisher):
 
         See :ref:`move-to` for examples.
 
-        :param location: The location to move to.
+        :param location: Where to move to.
+
+          .. versionchanged:: 2.18
+               Accepts ``TrashBin`` and ``WasteChute`` values.
+
         :type location: :py:class:`~.types.Location`
         :param force_direct: If ``True``, move directly to the destination without arc
                              motion.
@@ -1454,9 +1460,6 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :param publish: Whether to list this function call in the run preview.
                         Default is ``True``.
-
-        .. versionchanged:: 2.18
-            The ``location`` parameter accepts ``TrashBin`` and ``WasteChute`` values.
         """
         with ExitStack() as contexts:
             if isinstance(location, (TrashBin, WasteChute)):
