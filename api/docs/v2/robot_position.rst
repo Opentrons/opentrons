@@ -138,7 +138,7 @@ You can adjust the position of the pipette center with the :py:meth:`.TrashBin.t
     trash.top(z=10)  # 10 mm higher
     trash.top(y=10)  # 10 mm towards back, default height
 
-.. versionadded:: 2.16
+.. versionadded:: 2.18
 
 .. note::
     Another difference between the trash container ``top()`` methods and ``Well.top()`` is that they return an object of the same type, not a :py:class:`.Location`. This helps prevent performing undesired actions in trash containers. For example, you can :py:meth:`.aspirate` at a location or from a well, but not from a trash container. On the other hand, you can :py:meth:`.blow_out` at a location, well, trash bin, or waste chute.
