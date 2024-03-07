@@ -15,7 +15,10 @@ import { uiInitialized } from './redux/shell'
 import { history } from './redux/reducer'
 import { store } from './redux/store'
 
-import './styles.global.module.css'
+import '../src/atoms/SoftwareKeyboard/index.css'
+import '../src/atoms/SoftwareKeyboard/CustomKeyboard/index.css'
+import '../src/atoms/SoftwareKeyboard/NormalKeyboard/index.css'
+import '../src/atoms/SoftwareKeyboard/Numpad/index.css'
 
 // component tree
 import { App } from './App'
