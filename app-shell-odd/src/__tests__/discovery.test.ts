@@ -4,10 +4,7 @@ import Store from 'electron-store'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 
 import * as DiscoveryClient from '@opentrons/discovery-client'
-import {
-  startDiscovery,
-  finishDiscovery,
-} from '@opentrons/app/src/redux/discovery'
+import { startDiscovery, finishDiscovery } from '../actions'
 import { registerDiscovery } from '../discovery'
 import * as Cfg from '../config'
 

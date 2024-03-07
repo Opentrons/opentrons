@@ -4,7 +4,7 @@ import { ensureDir } from 'fs-extra'
 import { readFile } from 'fs/promises'
 import StreamZip from 'node-stream-zip'
 import Semver from 'semver'
-import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
+import { UI_INITIALIZED } from '../constants'
 import { createLogger } from '../log'
 import {
   getLatestSystemUpdateUrls,

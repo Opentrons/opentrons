@@ -1,8 +1,5 @@
 import semver from 'semver'
-import {
-  UI_INITIALIZED,
-  UPDATE_BRIGHTNESS,
-} from '@opentrons/app/src/redux/shell/actions'
+import { UI_INITIALIZED, UPDATE_BRIGHTNESS } from './constants'
 import { createLogger } from './log'
 import { getConfig } from './config'
 import {
