@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { when } from 'jest-when'
+import { vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../__testing-utils__'
 
 import { getLocalRobot } from '../../redux/discovery'
 import { mockConnectableRobot } from '../../redux/discovery/__fixtures__'
@@ -11,15 +11,15 @@ import { useTrackEvent, ANALYTICS_ODD_APP_ERROR } from '../../redux/analytics'
 import { OnDeviceDisplayAppFallback } from '../OnDeviceDisplayAppFallback'
 
 import type { FallbackProps } from 'react-error-boundary'
-import type {Mock} from 'vitest'
+import type { Mock } from 'vitest'
 
 vi.mock('../../redux/shell')
 vi.mock('../../redux/analytics')
-vi.mock('../../redux/discovery', async (importOriginal) => {
+vi.mock('../../redux/discovery', async importOriginal => {
   const actual = await importOriginal<typeof getLocalRobot>()
   return {
     ...actual,
-    getLocalRobot: vi.fn()
+    getLocalRobot: vi.fn(),
   }
 })
 
@@ -46,8 +46,8 @@ describe('OnDeviceDisplayAppFallback', () => {
       resetErrorBoundary: {} as any,
     } as FallbackProps
     mockTrackEvent = vi.fn()
-    when(vi.mocked(useTrackEvent)).calledWith().mockReturnValue(mockTrackEvent)
-    when(vi.mocked(getLocalRobot)).mockReturnValue({
+    vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
+    vi.mocked(getLocalRobot).mockReturnValue({
       ...mockConnectableRobot,
       health: {
         ...mockConnectableRobot.health,

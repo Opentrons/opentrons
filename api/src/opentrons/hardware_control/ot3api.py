@@ -1544,7 +1544,7 @@ class OT3API(
                     self._log.warning(
                         f"Stall on {axis} during fast home, encoder may have missed an overflow"
                     )
-                    await self.refresh_positions()
+                    await self.refresh_positions(acquire_lock=False)
 
             await self._backend.home([axis], self.gantry_load)
         else:

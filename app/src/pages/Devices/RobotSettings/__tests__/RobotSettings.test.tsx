@@ -57,7 +57,7 @@ describe('RobotSettings', () => {
     vi.mocked(RobotSettingsAdvanced).mockReturnValue(
       <div>Mock RobotSettingsAdvanced</div>
     )
-    mockRobotSettingsPrivacy.mockReturnValue(
+    vi.mocked(RobotSettingsPrivacy).mockReturnValue(
       <div>Mock RobotSettingsPrivacy</div>
     )
   })

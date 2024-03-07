@@ -1,8 +1,9 @@
 import * as React from 'react'
+import { vi, describe, beforeEach, it, expect } from 'vitest'
 import { Route } from 'react-router'
 import { MemoryRouter } from 'react-router-dom'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { i18n } from '../../../i18n'
 import * as Config from '../../../redux/config'
