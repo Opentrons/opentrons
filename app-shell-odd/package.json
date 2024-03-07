@@ -29,11 +29,11 @@
     ]
   },
   "devDependencies": {
-    "@opentrons/app": "link:../app",
-    "@opentrons/discovery-client": "link:../discovery-client",
-    "@opentrons/shared-data": "link:../shared-data"
+    "@opentrons/app": "link:../app"
   },
   "dependencies": {
+    "@opentrons/discovery-client": "link:../discovery-client",
+    "@opentrons/shared-data": "link:../shared-data",
     "@thi.ng/paths": "1.6.5",
     "@types/dateformat": "^3.0.1",
     "@types/fs-extra": "9.0.13",
