@@ -7,6 +7,14 @@ import postColorModFunction from 'postcss-color-mod-function'
 import postCssPresetEnv from 'postcss-preset-env'
 import lostCss from 'lost'
 
+const testAliases: {} | { 'file-saver': string } =
+  process.env.CYPRESS === '1'
+    ? {
+        'file-saver':
+          path.resolve(__dirname, 'cypress/mocks/file-saver.js') ?? '',
+      }
+    : {}
+
 export default defineConfig({
   build: {
     // Relative to the root
@@ -43,10 +51,15 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@opentrons/components/styles': path.resolve('../components/src/index.module.css'),
+      '@opentrons/components/styles': path.resolve(
+        '../components/src/index.module.css'
+      ),
       '@opentrons/components': path.resolve('../components/src/index.ts'),
       '@opentrons/shared-data': path.resolve('../shared-data/js/index.ts'),
-      '@opentrons/step-generation': path.resolve('../step-generation/src/index.ts'),
+      '@opentrons/step-generation': path.resolve(
+        '../step-generation/src/index.ts'
+      ),
+      ...testAliases,
     },
   },
 })
