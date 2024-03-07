@@ -331,7 +331,7 @@ class InstrumentContext(publisher.CommandPublisher):
                             liquid aspirated into the pipette will be dispensed (the
                             amount is accessible through :py:attr:`current_volume`).
 
-            .. versionchanged:: 2.18
+            .. versionchanged:: 2.16
                 Accepts ``TrashBin`` and ``WasteChute`` values.
 
         :param rate: How quickly a pipette dispenses liquid. The speed in µL/s is
@@ -552,7 +552,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :param location: The blowout location. If no location is specified, the pipette
             will blow out from its current position.
 
-            .. versionchanged:: 2.18
+            .. versionchanged:: 2.16
                 Accepts ``TrashBin`` and ``WasteChute`` values.
 
         :type location: :py:class:`.Well` or :py:class:`.Location` or ``None``
@@ -1444,7 +1444,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :param location: Where to move to.
 
-          .. versionchanged:: 2.18
+          .. versionchanged:: 2.16
                Accepts ``TrashBin`` and ``WasteChute`` values.
 
         :type location: :py:class:`~.types.Location`
