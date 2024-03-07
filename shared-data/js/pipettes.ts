@@ -1,12 +1,34 @@
 import pipetteNameSpecs from '../pipette/definitions/1/pipetteNameSpecs.json'
 import pipetteModelSpecs from '../pipette/definitions/1/pipetteModelSpecs.json'
 import { OT3_PIPETTES } from './constants'
-
 import type {
   PipetteV2Specs,
+  PipetteV2GeneralSpecs,
+  PipetteV2GeometrySpecs,
+  PipetteV2LiquidSpecs,
   PipetteNameSpecs,
   PipetteModelSpecs,
 } from './types'
+
+const generalGeometric = import.meta.glob(
+  '../pipette/definitions/2/*/*/*/*.json',
+  { eager: true }
+)
+const liquid = import.meta.glob(
+  '../pipette/definitions/2/liquid/*/*/default/*.json',
+  { eager: true }
+)
+
+type PipChannelString = 'single' | 'multi' | '96'
+type Channels = 'eight_channel' | 'single_channel' | 'ninety_six_channel'
+type Gen = 'gen1' | 'gen2' | 'gen3' | 'flex'
+type CombinedModules =
+  | PipetteV2GeneralSpecs
+  | PipetteV2GeometrySpecs
+  | PipetteV2LiquidSpecs
+interface ModuleSpecs {
+  default: CombinedModules
+}
 
 type SortableProps = 'maxVolume' | 'channels'
 
@@ -14,9 +36,6 @@ type SortableProps = 'maxVolume' | 'channels'
 // to simplify return types in this module and possibly remove some `null`s
 export type PipetteName = keyof typeof pipetteNameSpecs
 export type PipetteModel = keyof typeof pipetteModelSpecs.config
-type PipChannelString = 'single' | 'multi' | '96'
-type Channels = 'eight_channel' | 'single_channel' | 'ninety_six_channel'
-type Gen = 'gen1' | 'gen2' | 'gen3' | 'flex'
 
 // models sorted by channels and then volume by default
 const ALL_PIPETTE_NAMES: PipetteName[] = (Object.keys(
@@ -128,7 +147,6 @@ const getVersionFromGen = (gen: Gen): string | null => {
       return '3_0'
     }
     default: {
-      console.error(`invalid generation from ${gen}`)
       return null
     }
   }
@@ -142,6 +160,7 @@ model, and version from generation in order to return the correct pipette schema
 **/
 export const getPipetteSpecsV2 = (
   name: PipetteName | PipetteModel
+  //  TODO: make type, do not type as any
 ): PipetteV2Specs | null => {
   const nameSplit = name.split('_')
   const pipetteModel = nameSplit[0] // ex: p300
@@ -154,13 +173,35 @@ export const getPipetteSpecsV2 = (
   } else if (gen != null) {
     version = gen //  ex: gen1 -> 1_0
   } else {
-    const versionWithDot = nameSplit[2].split('v')[1]
-    version = versionWithDot.replace('.', '_') // ex: v1.1 -> 1_1
+    const versionDot = nameSplit[2].split('v')[1]
+    version = versionDot.replace('.', '_') // ex: v1.1 -> 1_1
   }
+  const combinedGlobs = {
+    ...generalGeometric,
+    ...liquid,
+  }
+  const allJsons = Object.keys(combinedGlobs).map(path => combinedGlobs[path])
 
-  const jsonFilePath = `/${channels}/${pipetteModel}/${version}.json`
+  const matchingJsons = allJsons.reduce(
+    //  combinedModules = array of 3 jsons, module = 1 json
+    (combinedModules: CombinedModules[], module: ModuleSpecs, index) => {
+      const path = Object.keys(combinedGlobs)[index]
+      V2_DEFINITION_TYPES.forEach(type => {
+        if (
+          (type !== 'liquid' &&
+            `../pipette/definitions/2/${type}/${channels}/${pipetteModel}/${version}.json` ===
+              path) ||
+          (type === 'liquid' &&
+            `../pipette/definitions/2/liquid/${channels}/${pipetteModel}/default/${version}.json` ===
+              path)
+        ) {
+          combinedModules.push(module.default)
+        }
+      })
+      return combinedModules
+    },
+    []
+  )
 
-  //  import all json files? and parse through them until we find 3 that match
-  //  the file paths. Then combine them and return
-  return null
+  return Object.assign({}, ...matchingJsons) as PipetteV2Specs
 }

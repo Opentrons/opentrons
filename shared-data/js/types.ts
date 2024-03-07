@@ -394,7 +394,7 @@ export interface FlowRateSpec {
   max: number
 }
 
-export interface PipetteV2Specs {
+export interface PipetteV2GeneralSpecs {
   displayName: string
   model: string
   displayCategory: PipetteDisplayCategory
@@ -442,6 +442,9 @@ export interface PipetteV2Specs {
     current: number
     speed: number
   }
+}
+
+export interface PipetteV2GeometrySpecs {
   nozzleOffset: number[]
   pipetteBoundingBoxOffsets: {
     backLeftCorner: number[]
@@ -451,12 +454,19 @@ export interface PipetteV2Specs {
   orderedRows: any
   orderedColumns: any
   nozzleMap: any
+}
+export interface PipetteV2LiquidSpecs {
   supportedTips: any
   defaultTipOverlapDictonary: any
   maxVolume: number
   minVolume: number
   defaultTipracks: string[]
 }
+
+export type PipetteV2Specs = PipetteV2GeneralSpecs &
+  PipetteV2GeometrySpecs &
+  PipetteV2LiquidSpecs
+
 export interface PipetteNameSpecs {
   name: string
   displayName: string
