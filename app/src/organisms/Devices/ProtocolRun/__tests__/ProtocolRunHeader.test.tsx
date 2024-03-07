@@ -103,7 +103,6 @@ import type { Mock } from 'vitest'
 import type * as OpentronsSharedData from '@opentrons/shared-data'
 import type * as OpentronsComponents from '@opentrons/components'
 import type * as OpentronsApiClient from '@opentrons/api-client'
-import type { Run } from '@opentrons/api-client'
 
 const mockPush = vi.fn()
 
@@ -349,7 +348,7 @@ describe('ProtocolRunHeader', () => {
     vi.mocked(useDeckConfigurationCompatibility).mockReturnValue([])
     vi.mocked(getIsFixtureMismatch).mockReturnValue(false)
     vi.mocked(useMostRecentRunId).mockReturnValue(RUN_ID)
-      vi.mocked(useRobot).mockReturnValue({
+    vi.mocked(useRobot).mockReturnValue({
       ...mockConnectableRobot,
       health: {
         ...mockConnectableRobot.health,
@@ -821,7 +820,7 @@ describe('ProtocolRunHeader', () => {
       .calledWith(RUN_ID)
       .thenReturn({
         data: { data: mockSucceededRun },
-      } as UseQueryResult<Run>)
+      } as UseQueryResult<OpentronsApiClient.Run>)
     when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID)
       .thenReturn(RUN_STATUS_SUCCEEDED)

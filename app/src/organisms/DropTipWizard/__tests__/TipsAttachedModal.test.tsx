@@ -11,7 +11,6 @@ import { handleTipsAttachedModal } from '../TipsAttachedModal'
 import { LEFT } from '@opentrons/shared-data'
 import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
 import { ROBOT_MODEL_OT3 } from '../../../redux/discovery'
-import { useNotifyService } from '../../../resources/useNotifyService'
 import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'

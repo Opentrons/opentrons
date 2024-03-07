@@ -48,6 +48,7 @@ describe('OverflowBtn', () => {
       onClick: vi.fn(),
     })
 
+    // @ts-expect-error Refactor to test modifier states.
     expect(getByRole('button')).toHaveStyleRule(
       'box-shadow',
       `0 0 0 3px ${String(COLORS.yellow50)}`,
@@ -62,6 +63,7 @@ describe('OverflowBtn', () => {
       onClick: vi.fn(),
     })
 
+    // @ts-expect-error Refactor to test modifier states.
     expect(getByRole('button')).toHaveStyleRule(
       'fill',
       `${String(COLORS.grey40)}`,
