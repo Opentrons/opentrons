@@ -271,14 +271,12 @@
   display: block;
   width: 100%;
   margin: 1.5rem 0 0.5rem;
-  padding: 1rem;
   border-radius: 3px;
   font-size: var(--fs-body-2);
   text-align: center;
   font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
   text-transform: uppercase;
   cursor: pointer;
-
   margin-top: 0;
   padding: 1rem 4rem;
 }

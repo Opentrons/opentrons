@@ -126,7 +126,6 @@ a.subdomain_link {
   font-weight: var(--fw-semibold);
   font-size: var(--fs-body-2);
   cursor: pointer;
-
   position: relative;
   padding: 2rem var(--spacing-nav);
   color: var(--c-nav-gray);
@@ -145,13 +144,11 @@ a.subdomain_link {
   font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
   font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
   color: var(--c-font-dark); /* from legacy --font-body-2-dark */
-
   position: absolute;
   top: 4.25rem;
   background-color: var(--c-white);
   border-radius: var(--bd-radius-default);
   border: var(--bd-light);
-
   left: 0;
   width: 16rem;
 
@@ -163,7 +160,6 @@ a.subdomain_link {
     border-style: solid;
     border-color: transparent transparent var(--c-lightest-gray) transparent;
     z-index: 10;
-
     left: 10%;
   }
 
@@ -175,7 +171,6 @@ a.subdomain_link {
     border-style: solid;
     border-color: transparent transparent var(--c-white) transparent;
     z-index: 20;
-
     left: 10.7%;
   }
 }
@@ -184,13 +179,11 @@ a.subdomain_link {
   font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
   font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
   color: var(--c-font-dark); /* from legacy --font-body-2-dark */
-
   position: absolute;
   top: 4.25rem;
   background-color: var(--c-white);
   border-radius: var(--bd-radius-default);
   border: var(--bd-light);
-
   left: -11rem;
   width: 27rem;
 
@@ -202,7 +195,6 @@ a.subdomain_link {
     border-style: solid;
     border-color: transparent transparent var(--c-lightest-gray) transparent;
     z-index: 10;
-
     left: 47%;
   }
 
@@ -214,7 +206,6 @@ a.subdomain_link {
     border-style: solid;
     border-color: transparent transparent var(--c-white) transparent;
     z-index: 20;
-
     left: 47.5%;
   }
 }
@@ -223,13 +214,11 @@ a.subdomain_link {
   font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
   font-weight: var(--fw-regular); /* from legacy --font-body-2-dark */
   color: var(--c-font-dark); /* from legacy --font-body-2-dark */
-
   position: absolute;
   top: 4.25rem;
   background-color: var(--c-white);
   border-radius: var(--bd-radius-default);
   border: var(--bd-light);
-
   right: -0.125rem;
   width: 46rem;
   display: flex;
@@ -242,7 +231,6 @@ a.subdomain_link {
     border-style: solid;
     border-color: transparent transparent var(--c-lightest-gray) transparent;
     z-index: 10;
-
     left: 86.75%;
   }
 
@@ -254,7 +242,6 @@ a.subdomain_link {
     border-style: solid;
     border-color: transparent transparent var(--c-white) transparent;
     z-index: 20;
-
     left: 87%;
   }
 }
@@ -276,7 +263,6 @@ a.subdomain_link {
   font-weight: var(--fw-light);
   letter-spacing: 0.7px;
   color: var(--c-nav-gray);
-
   line-height: 1.25rem;
   flex: none;
   width: 7rem;
@@ -327,7 +313,6 @@ a.subdomain_link {
   font-weight: var(--fw-semibold);
   font-size: var(--fs-body-2);
   cursor: pointer;
-
   display: block;
   width: 100%;
   text-align: left;
@@ -369,7 +354,6 @@ a.subdomain_link {
   font-weight: var(--fw-semibold);
   font-size: var(--fs-body-2);
   cursor: pointer;
-
   height: 3rem;
   border-radius: var(--bd-radius-default);
   border: var(--bd-button);
@@ -394,7 +378,6 @@ a.subdomain_link {
   border-top: var(--bd-light);
   color: var(--c-blue);
   font-weight: var(--fw-semibold);
-
   padding-left: var(--spacing-submenu);
 }
 
@@ -403,7 +386,6 @@ a.subdomain_link {
   border-top: var(--bd-light);
   color: var(--c-blue);
   font-weight: var(--fw-semibold);
-
   display: flex;
 
   /* from legacy --center-children */
@@ -513,9 +495,10 @@ a.subdomain_link {
 }
 
 .scrollable_contents {
-  max-height: calc(
-    100vh - var(--size-mobile-nav) - var(--spacing-mobile-heading)
-  );
+  max-height:
+    calc(
+      100vh - var(--size-mobile-nav) - var(--spacing-mobile-heading)
+    );
   overflow-y: auto;
 }
 

@@ -127,7 +127,6 @@
   font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
   text-transform: uppercase;
   cursor: pointer;
-
   background-color: var(--c-blue);
   color: white;
 
@@ -153,7 +152,6 @@
   font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
   text-transform: uppercase;
   cursor: pointer;
-
   border: 1px solid var(--c-blue);
   color: var(--c-blue);
 
