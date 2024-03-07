@@ -123,9 +123,10 @@ You should only adjust labware offsets in your Python code if you plan to run yo
 Position Relative to Trash Containers
 =====================================
 
-In API version 2.15 and earlier, trash containers are :py:class:`.Labware` objects that have a single well. Use the above techniques for labware to adjust position relative to trash containers in protocols specifying these API versions.
+Movement to :py:class:`.TrashBin` or :py:class:`.WasteChute` objects is based on the horizontal *center* of the pipette. This is different than movement to labware, which is based on the primary channel (the back channel on 8-channel pipettes, and the back-left channel on 96-channel pipettes in default configuration). Using the center of the pipette ensures that all attached tips are over the trash container for blowing out, dropping tips, or other disposal operations.
 
-Starting in API version 2.16, trash containers are :py:class:`.TrashBin` or :py:class:`.WasteChute` objects. The API calculates movement to these objects based on the horizontal *center* of the pipette, rather than its primary channel (the back channel on 8-channel pipettes, and the back-left channel on 96-channel pipettes in default configuration). This ensures that all tips attached to the pipette are placed over the trash container for blowing out, dropping tips, or other operations.
+.. note::
+    In API version 2.15 and earlier, trash containers are :py:class:`.Labware` objects that have a single well. See :py:obj:`.fixed_trash` and :ref:`position-relative-labware` above.
 
 You can adjust the position of the pipette center with the :py:meth:`.TrashBin.top` and :py:meth:`.WasteChute.top` methods. These methods allow adjustments along the x-, y-, and z-axes. In contrast, ``Well.top()``, :ref:`covered above <well-top>`, only allows z-axis adjustment. With no adjustments, the "top" position is centered on the x- and y-axes and is just below the opening of the trash container.
 
@@ -140,8 +141,7 @@ You can adjust the position of the pipette center with the :py:meth:`.TrashBin.t
 
 .. versionadded:: 2.18
 
-.. note::
-    Another difference between the trash container ``top()`` methods and ``Well.top()`` is that they return an object of the same type, not a :py:class:`.Location`. This helps prevent performing undesired actions in trash containers. For example, you can :py:meth:`.aspirate` at a location or from a well, but not from a trash container. On the other hand, you can :py:meth:`.blow_out` at a location, well, trash bin, or waste chute.
+Another difference between the trash container ``top()`` methods and ``Well.top()`` is that they return an object of the same type, not a :py:class:`.Location`. This helps prevent performing undesired actions in trash containers. For example, you can :py:meth:`.aspirate` at a location or from a well, but not from a trash container. On the other hand, you can :py:meth:`.blow_out` at a location, well, trash bin, or waste chute.
 
 .. _protocol-api-deck-coords:
 
