@@ -306,21 +306,25 @@ class InstrumentContext(publisher.CommandPublisher):
         :type volume: int or float
 
         :param location: Tells the robot where to dispense liquid held in the pipette.
-                         The location can be a :py:class:`.Well`, :py:class:`.Location`,
-                         :py:class:`.TrashBin`, or :py:class:`.WasteChute`.
+            The location can be a :py:class:`.Well`, :py:class:`.Location`,
+            :py:class:`.TrashBin`, or :py:class:`.WasteChute`.
 
-                            - If the location is a ``Well``, the pipette will dispense
+                            - If a ``Well``, the pipette will dispense
                               at or above the bottom center of the well. The distance (in
                               mm) from the well bottom is specified by
                               :py:obj:`well_bottom_clearance.dispense
                               <well_bottom_clearance>`.
 
-                            - If the location is a ``Location`` (e.g., the result of
-                              :py:meth:`.Well.top` or :py:meth:`.Well.bottom`), the robot
-                              will dispense into that specified position.
+                            - If a ``Location`` (e.g., the result of
+                              :py:meth:`.Well.top` or :py:meth:`.Well.bottom`), the pipette
+                              will dispense at that specified position.
 
-                            - If the ``location`` is unspecified, the robot will
-                              dispense into its current position.
+                            - If a trash container, the pipette will dispense at a location
+                              relative to its center and the trash container's top center.
+                              See :ref:`position-relative-trash` for details.
+
+                            - If unspecified, the pipette will
+                              dispense at its current position.
 
                             If only a ``location`` is passed (e.g.,
                             ``pipette.dispense(location=plate['A1'])``), all of the
