@@ -87,7 +87,6 @@ from opentrons_hardware.hardware_control.motor_enable_disable import (
     set_enable_tip_motor,
     set_disable_tip_motor,
     get_motor_enabled,
-    get_tip_motor_enabled,
 )
 from opentrons_hardware.hardware_control.motor_position_status import (
     get_motor_position,
@@ -1179,17 +1178,16 @@ class OT3Controller(FlexBackend):
     async def update_engaged_axes(self) -> None:
         """Update engaged axes."""
         motor_nodes = self._motor_nodes()
-        for node in motor_nodes:
-            await self.is_motor_engaged(node_to_axis(node))
+        results = await get_motor_enabled(self._messenger, motor_nodes)
+        for node, status in results.items():
+            self._engaged_axes[node_to_axis(node)] = status
 
     async def is_motor_engaged(self, axis: Axis) -> bool:
         node = axis_to_node(axis)
-        if axis == Axis.Q:
-            result = await get_tip_motor_enabled(self._messenger, node)
-        else:
-            result = await get_motor_enabled(self._messenger, node)
-        self._engaged_axes.update({axis: result})
-        return result
+        result = await get_motor_enabled(self._messenger, {node})
+        engaged = result[node]
+        self._engaged_axes.update({axis: engaged})
+        return engaged
 
     async def disengage_axes(self, axes: List[Axis]) -> None:
         """Disengage axes."""
