@@ -60,9 +60,6 @@ jobs:
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '18.19.0'
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 8
       - name: 'install udev'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
@@ -72,9 +69,17 @@ jobs:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
+      - name: 'cache yarn cache'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.npm-cache/_prebuild
+            ${{ github.workspace }}/.yarn-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
       - name: 'setup-js'
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
+          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           make setup-js
       - name: 'test frontend packages'
         run: |
@@ -104,9 +109,6 @@ jobs:
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '18.19.0'
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 8
       - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
@@ -124,9 +126,17 @@ jobs:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
+      - name: 'cache yarn cache'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.npm-cache/_prebuild
+            ${{ github.workspace }}/.yarn-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
       - name: setup-js
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
+          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           make setup-js
       - name: 'test native(er) packages'
         run: make test-js-internal tests="app-shell/src app-shell-odd/src discovery-client/src" cov_opts="--coverage=true"
@@ -168,11 +178,6 @@ jobs:
             echo 'type=develop' >> $GITHUB_OUTPUT
           elif [ "${{ format('{0}', github.ref == 'refs/heads/edge') }}" = "true" ] ; then
             echo "both develop builds for edge"
-            echo 'variants=["release", "internal-release"]' >> $GITHUB_OUTPUT
-            echo 'type=develop' >> $GITHUB_OUTPUT
-          elif [ "${{ format('{0}', endsWith(github.ref, 'protocol_designer-migrate-webpack-to-vite')) }}" = "true" ] ; then
-            echo "REMOVE THIS AFTER APP TESTS ARE MIGRATED"
-            echo "HACK: run release builds for the vite migration branch"
             echo 'variants=["release", "internal-release"]' >> $GITHUB_OUTPUT
             echo 'type=develop' >> $GITHUB_OUTPUT
           elif [ "${{ format('{0}', endsWith(github.ref, 'app-build-internal')) }}" = "true" ] ; then
@@ -237,9 +242,6 @@ jobs:
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '18.19.0'
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 8
       - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
@@ -257,9 +259,17 @@ jobs:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
+      - name: 'cache yarn cache'
+          uses: actions/cache@v3
+          with:
+            path: |
+              ${{ github.workspace }}/.npm-cache/_prebuild
+              ${{ github.workspace }}/.yarn-cache
+            key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
       - name: setup-js
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
+          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           make setup-js
       # build the desktop app and deploy it
       - name: 'build ${{matrix.variant}} app for ${{ matrix.os }}'
@@ -302,9 +312,8 @@ jobs:
   deploy-release-app:
     name: 'Deploy built app artifacts to S3'
     runs-on: 'ubuntu-22.04'
-    # TODO: readd unit test dependency after tests are converted to vitest
     needs:
-      ['build-app', 'determine-build-type']
+      ['js-unit-test', 'backend-unit-test', 'build-app', 'determine-build-type']
     if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release') || contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
     steps:
       - name: 'download run app builds'
@@ -414,9 +423,6 @@ jobs:
           cd ./monorepo
           git fetch -f origin ${{ github.ref }}:${{ github.ref }}
           git checkout ${{ github.ref }}
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 8
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '18.19.0'
@@ -429,9 +435,16 @@ jobs:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/monorepo/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
+      - name: 'cache yarn cache'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.npm-cache/_prebuild
+            ${{ github.workspace }}/.yarn-cache
       - name: 'setup-js'
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
+          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           cd monorepo
           make setup-js
       - name: 'update internal-releases releases.json'

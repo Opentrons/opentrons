@@ -43,9 +43,6 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: 'actions/checkout@v3'
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 8
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '18.19.0'
@@ -58,10 +55,20 @@ jobs:
             buildComplexEnvVars(core, context)
       - name: 'install libudev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
+      - name: 'cache yarn cache'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: 'setup-js'
         id: 'setup-js'
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
+          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           make setup-js
         # Use the if to run all the lint checks even of some fail
         shell: bash

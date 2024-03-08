@@ -40,14 +40,20 @@ jobs:
     runs-on: 'ubuntu-22.04'
     steps:
       - uses: 'actions/checkout@v3'
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 8
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '18.19.0'
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
+      - name: 'cache yarn cache'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: 'setup-js'
         run: |
           npm config set cache ./.npm-cache
@@ -64,21 +70,27 @@ jobs:
     name: 'build components artifact'
     runs-on: 'ubuntu-22.04'
     if: github.event_name != 'pull_request'
-    # TODO IMMEDIATELY: revert change below. doing this so i can test component builds without tests passing
-    #needs: ['js-unit-test']
+    needs: ['js-unit-test']
     steps:
       - uses: 'actions/checkout@v3'
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 8
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '18.19.0'
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
+      - name: 'cache yarn cache'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: 'setup-js'
         run: |
           npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'build components'
         run: make -C components
@@ -112,8 +124,8 @@ jobs:
     name: 'deploy components storybook artifact to S3'
     runs-on: 'ubuntu-22.04'
     needs:
-        # TODO IMMEDIATELY: revert change below. doing this so i can test component builds without tests passing
-      ['build-components-storybook', 'determine-build-type']
+      # TODO IMMEDIATELY: revert change below. doing this so i can test component builds without tests passing
+      ['js-unit-test', build-components-storybook', 'determine-build-type']
     if: needs.determine-build-type.outputs.type != 'none'
     steps:
       - uses: 'actions/checkout@v3'
@@ -123,9 +135,6 @@ jobs:
         run: |
           git fetch -f origin ${{ github.ref }}:${{ github.ref }}
           git checkout ${{ github.ref }}
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 8
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '18.19.0'
@@ -152,8 +161,7 @@ jobs:
   publish-components:
     name: 'publish components package to npm'
     runs-on: 'ubuntu-latest'
-    # TODO IMMEDIATELY: revert change below. doing this so i can test component builds without tests passing
-    needs: ['determine-build-type']
+    needs: ['js-unit-test', 'determine-build-type']
     if: needs.determine-build-type.outputs.type == 'publish'
     steps:
       - uses: 'actions/checkout@v3'
@@ -163,9 +171,6 @@ jobs:
         run: |
           git fetch -f origin ${{ github.ref }}:${{ github.ref }}
           git checkout ${{ github.ref }}
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 8
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '18.19.0'
@@ -173,7 +178,7 @@ jobs:
       - name: 'setup-js'
         run: |
           npm config set cache ./.npm-cache
-          yarn config set cache-folder ./.yarn-cache 
+          yarn config set cache-folder ./.yarn-cache
       - name: 'build typescript'
         run: make build-ts
       - name: 'build library'

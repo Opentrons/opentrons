@@ -52,14 +52,21 @@ jobs:
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '18.19.0'
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 8
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
+      - name: 'cache yarn cache'
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: 'setup-js'
         run: |
           npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'run PD unit tests'
         run: make -C protocol-designer test-cov
@@ -90,22 +97,28 @@ jobs:
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '18.19.0'
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 8
       - name: 'install udev for usb-detection'
         if: startsWith(matrix.os, 'ubuntu')
         run: sudo apt-get update && sudo apt-get install libudev-dev
+      - name: 'cache yarn cache'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: 'setup-js'
         run: |
           npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'test-e2e'
         run: make -C protocol-designer test-e2e
   build-pd:
     name: 'build protocol designer artifact'
-    # TODO: uncomment code below. doing this to test that PD artifacts build and deploy correctly
-    # needs: ['js-unit-test']
+    needs: ['js-unit-test']
     runs-on: 'ubuntu-22.04'
     if: github.event_name != 'pull_request'
     steps:
@@ -123,12 +136,17 @@ jobs:
           node-version: '18.19.0'
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
-      - uses: pnpm/action-setup@v3
+      - name: 'cache yarn cache'
+        uses: actions/cache@v3
         with:
-          version: 8
+          path: |
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
       - name: 'setup-js'
         run: |
           npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'build PD'
         env:
@@ -144,8 +162,7 @@ jobs:
   deploy-pd:
     name: 'deploy PD artifact to S3'
     runs-on: 'ubuntu-22.04'
-    # TODO: uncomment code below. doing this to test that PD artifacts build and deploy correctly
-    needs: ['build-pd']
+    needs: ['js-unit-test', 'build-pd']
     if: github.event_name != 'pull_request'
     steps:
       - uses: 'actions/checkout@v3'

@@ -118,9 +118,19 @@ jobs:
           node-version: '18.19.0'
       - name: 'install udev'
         run: sudo apt-get update && sudo apt-get install libudev-dev
+      - name: 'cache yarn cache'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: 'js deps'
         run: |
           npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'run shared-data JS unit tests'
         run: make -C shared-data test-cov
@@ -215,6 +225,15 @@ jobs:
         with:
           node-version: '18.19.0'
           registry-url: 'https://registry.npmjs.org'
+      - name: 'cache yarn cache'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: 'js deps'
         run: |
           npm config set cache ./.npm-cache
