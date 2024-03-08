@@ -42,7 +42,7 @@ retract_dist = 100
 retract_speed = 60
 
 leak_test_time = 30
-test_volume = 1000
+test_volume = 50
 
 def dict_keys_to_line(dict):
     return str.join(",", list(dict.keys())) + "\n"
@@ -330,11 +330,11 @@ async def _main() -> None:
         home_position = await hw_api.current_position_ot3(mount)
         start_time = time.perf_counter()
         m_current = float(input("motor_current in amps: "))
-        # pick_up_speed = float(input("pick up tip speed in mm/s: "))
+        pick_up_speed = float(input("pick up tip speed in mm/s: "))
         # hw_api.clamp_tip_speed = float(input("clamp pick up Speed: "))
         # pick_up_distance = float(input("pick up distance in mm: "))
         await update_pick_up_current(hw_api, mount, args.nozzles, m_current)
-        # await update_pick_up_speed(hw_api, mount, pick_up_speed)
+        await update_pick_up_speed(hw_api, mount, pick_up_speed)
         # await update_pick_up_distance(hw_api, mount, pick_up_distance)
         if (args.measure_nozzles):
             cp = CriticalPoint.NOZZLE
@@ -355,12 +355,12 @@ async def _main() -> None:
             measurements = []
             measurement_map = {}
             # num_of_columns = 12
-            num_of_columns = 1
+            num_of_columns = int(args.nozzles/8)
             for tip in range(1, number_of_channels + 1):
                 cp = CriticalPoint.NOZZLE
                 nozzle_count += 1
-                # nozzle_position = Point(nozzle_loc[Axis.X] + x_offset,
-                nozzle_position = Point(nozzle_loc[Axis.X],
+                nozzle_position = Point(nozzle_loc[Axis.X] + x_offset,
+                # nozzle_position = Point(nozzle_loc[Axis.X],
                                         nozzle_loc[Axis.Y] + y_offset,
                                         nozzle_loc[Axis.by_mount(mount)])
                 await move_to_point(hw_api, mount, nozzle_position, cp)
@@ -485,7 +485,7 @@ async def _main() -> None:
             cp = CriticalPoint.TIP
             drop_tip_location =  Point(299.66 , 389.04 , 104.5)
              # 299.66 , 389.04 , 104.5
-            await move_to_point(hw_api, mount, droptip_loc, cp)
+            await move_to_point(hw_api, mount, drop_tip_location, cp)
             input("Feel the Tip!")
             await hw_api.drop_tip(mount)
             await hw_api.home_z(mount)
@@ -523,12 +523,12 @@ async def _main() -> None:
                                     tip_length=(tip_length[args.tip_size]-tip_overlap),
                                     presses = 1,
                                     increment = 0)
-            print(f'Press Position: {press_dist[Axis.by_mount(mount)]}')
+            # print(f'Press Position: {press_dist[Axis.by_mount(mount)]}')
             await hw_api.home_z(mount.LEFT)
             cp = CriticalPoint.TIP
             current_position = await hw_api.current_position_ot3(mount, cp)
-            this_position = await jog(hw_api, current_position, cp)
-            input("Press Enter to continue")
+            # this_position = await jog(hw_api, current_position, cp)
+            # input("Press Enter to continue")
 
     except KeyboardInterrupt:
         await hw_api.disengage_axes([Axis.X, Axis.Y])
