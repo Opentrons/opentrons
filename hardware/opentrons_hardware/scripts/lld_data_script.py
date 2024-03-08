@@ -6,8 +6,8 @@ import matplotlib.pyplot as plot
 import numpy
 
 # ----present day threshold based----
-def tick_th(pressure: float) -> bool:
-    return pressure < -150
+def tick_th(pressure: float) -> Tuple[bool, float]:
+    return (pressure < -150, pressure)
 
 
 def reset_th() -> None:
@@ -16,7 +16,7 @@ def reset_th() -> None:
 
 # -----Simple moving average derivative---
 impossible_pressure_smad = 9001.0
-samples_n_smad = 4
+samples_n_smad = 10
 running_samples_smad: List[float] = [impossible_pressure_smad] * samples_n_smad
 derivative_threshold_smad = -2.5
 
@@ -26,13 +26,13 @@ def reset_smad() -> None:
     running_samples_smad = [impossible_pressure_smad] * samples_n_smad
 
 
-def tick_smad(pressure: float) -> bool:
+def tick_smad(pressure: float) -> Tuple[bool, float]:
     global running_samples_smad
     try:
         next_ind = running_samples_smad.index(impossible_pressure_smad)
         # if no exception we're still filling the minimum samples
         running_samples_smad[next_ind] = pressure
-        return False
+        return (False, 0)
     except ValueError:  # the array has been filled
         pass
     # store old running average
@@ -42,13 +42,13 @@ def tick_smad(pressure: float) -> bool:
         running_samples_smad[i] = running_samples_smad[i + 1]
     running_samples_smad[samples_n_smad - 1] = pressure
     new_running_avg = sum(running_samples_smad) / samples_n_smad
-    return (new_running_avg - prev_running_avg) < derivative_threshold_smad
+    return ((new_running_avg - prev_running_avg) < derivative_threshold_smad, new_running_avg)
 
 
 # -----weighted moving average derivative---
 impossible_pressure_wmad = 9001.0
-samples_n_wmad = 4
-weights_wmad = numpy.array([0.5, 0.25, 0.15, 0.1])
+samples_n_wmad = 10
+weights_wmad = numpy.array([0.19,0.17,0.15,0.13,0.11,0.09,0.07, 0.05, 0.03, 0.01])
 running_samples_wmad = numpy.full(samples_n_wmad, impossible_pressure_wmad)
 derivative_threshold_wmad = -2
 
@@ -59,13 +59,13 @@ def reset_wmad() -> None:
     running_samples_wmad = numpy.full(samples_n_wmad, impossible_pressure_wmad)
 
 
-def tick_wmad(pressure: float) -> bool:
+def tick_wmad(pressure: float) -> Tuple[bool, float]:
     global running_samples_wmad
     if numpy.isin(impossible_pressure_wmad, running_samples_wmad):
         next_ind = numpy.where(running_samples_wmad == impossible_pressure_wmad)[0][0]
         # if no exception we're still filling the minimum samples
         running_samples_wmad[next_ind] = pressure
-        return False
+        return (False, 0)
     # store old running average
     prev_running_avg = numpy.sum(numpy.multiply(running_samples_wmad, weights_wmad))
     # left shift old samples
@@ -73,31 +73,29 @@ def tick_wmad(pressure: float) -> bool:
         running_samples_wmad[i] = running_samples_wmad[i + 1]
     running_samples_wmad[samples_n_wmad - 1] = pressure
     new_running_avg = numpy.sum(numpy.multiply(running_samples_wmad, weights_wmad))
-    return (new_running_avg - prev_running_avg) < derivative_threshold_wmad
+    return ((new_running_avg - prev_running_avg) < derivative_threshold_wmad, new_running_avg)
 
 
-# -----exponential moving average derivative---
+#-----exponential moving average derivative---
 impossible_pressure_emad: float = 9001.0
-current_average_emad: float = impossible_pressure_emad
-derivative_threshold_emad = -1.5
-
+current_average_emad : float = impossible_pressure_emad
+smoothing_factor = 0.1
+derivative_threshold_emad = -2.5
 
 def reset_emad() -> None:
     global current_average_emad
     current_average_emad = impossible_pressure_emad
 
-
-def tick_emad(pressure: float) -> bool:
+def tick_emad(pressure: float) -> Tuple[bool, float]:
     global current_average_emad
     if current_average_emad == impossible_pressure_emad:
         current_average_emad = pressure
-        return False
+        return (False, 0)
     else:
-        new_average = (pressure + current_average_emad) / 2
+        new_average = (pressure * smoothing_factor) + (current_average_emad * (1-smoothing_factor))
         derivative = new_average - current_average_emad
         current_average_emad = new_average
-        return derivative < derivative_threshold_emad
-
+        return (derivative < derivative_threshold_emad, current_average_emad)
 
 def running_avg(
     time: List[float],
@@ -107,16 +105,25 @@ def running_avg(
     no_plot: bool,
     reset_func,
     tick_func,
+    plot_name: str,
 ) -> Optional[Tuple[str, str, str]]:
     reset_func()
-    average = float(pressure[0])
+    average = float(0)
     running_time = []
     running_derivative = []
     running_avg = []
     return_val = None
     for i in range(1, len(time)):
         prev_avg = average
-        average = (average + float(pressure[i])) / 2
+        found, average = tick_func(float(pressure[i]))
+        if found:
+            # if average < running_avg_threshold:
+            # print(f"found z height = {z_travel[i]}")
+            # print(f"at time = {time[i]}")
+            return_val = time[i], z_travel[i], p_travel[i]
+            if no_plot:
+                # once we find it we don't need to keep going
+                break
         running_avg_derivative = average - prev_avg
 
         running_time.append(time[i])
@@ -125,27 +132,27 @@ def running_avg(
 
         # print(running_avg_derivative)
 
-        # there are kinda drastic changes in avg derivative in the very beginning
-        if tick_func(float(pressure[i])):
-            # if average < running_avg_threshold:
-            # print(f"found z height = {z_travel[i]}")
-            # print(f"at time = {time[i]}")
-            return_val = time[i], z_travel[i], p_travel[i]
-            # once we find it we don't need to keep going
-            break
+
     time_array = numpy.array(running_time)
     derivative_array = numpy.array(running_derivative)
     avg_array = numpy.array(running_avg)
 
     if not no_plot:
+        plot.figure(plot_name)
+        avg_ax = plot.subplot(211)
+        avg_ax.set_title("Running Average")
         plot.plot(time_array, avg_array)
+        der_ax = plot.subplot(212)
+        der_ax.set_title("Derivative")
         plot.plot(time_array, derivative_array)
+        mng = plot.get_current_fig_manager()
+        mng.resize(*mng.window.maxsize())
         plot.show()
 
     return return_val
 
 
-def run(args: argparse.Namespace, reset_func, tick_func) -> None:
+def run(args: argparse.Namespace, reset_func, tick_func, name) -> None:
 
     path = args.filepath + "/"
     report_files = [
@@ -187,7 +194,7 @@ def run(args: argparse.Namespace, reset_func, tick_func) -> None:
                 p_travel.append(current_p_pos)
 
             threshold_data = running_avg(
-                time, pressure, z_travel, p_travel, args.no_plot, reset_func, tick_func
+                time, pressure, z_travel, p_travel, args.no_plot, reset_func, tick_func, f"{name} trial: {trial+1}"
             )
             if threshold_data:
                 threshold_time = threshold_data[0]
@@ -230,7 +237,7 @@ def main() -> None:
     ]
     for name, reset_func, tick_func in function_pairs:
         print(f"Algorithm {name}")
-        run(args, reset_func, tick_func)
+        run(args, reset_func, tick_func, name)
 
 
 if __name__ == "__main__":
