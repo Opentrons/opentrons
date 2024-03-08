@@ -79,9 +79,6 @@ A1_column_back_right_bound = Point(
     x=A12_column_back_right_bound.x - _NOZZLE_PITCH * 11, y=506.2
 )
 
-# Arbitrary safety margin in z-direction
-Z_SAFETY_MARGIN = 10
-
 _FLEX_TC_LID_BACK_LEFT_PT = Point(
     x=FLEX_TC_LID_COLLISION_ZONE["back_left"]["x"],
     y=FLEX_TC_LID_COLLISION_ZONE["back_left"]["y"],
@@ -333,7 +330,7 @@ def _slot_has_potential_colliding_object(
             slot_highest_z = engine_state.geometry.get_highest_z_in_slot(
                 StagingSlotLocation(slotName=surrounding_slot)
             )
-        return slot_highest_z + Z_SAFETY_MARGIN > pipette_bounds[0].z
+        return slot_highest_z >= pipette_bounds[0].z
     return False
 
 
