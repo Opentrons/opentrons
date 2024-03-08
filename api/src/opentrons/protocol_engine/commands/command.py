@@ -175,6 +175,13 @@ class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
             " a command that is part of a calibration procedure."
         ),
     )
+    notes: Optional[List[CommandNote]] = Field(
+        None,
+        description=(
+            "Information not critical to the execution of the command derived from either"
+            " the command's execution or the command's generation."
+        ),
+    )
 
 
 class AbstractCommandImpl(
