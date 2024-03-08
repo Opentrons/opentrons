@@ -155,7 +155,6 @@ const getVersionFromGen = (gen: Gen): string | null => {
 }
 
 const V2_DEFINITION_TYPES = ['general', 'geometry']
-const LIQUID_TYPES = ['default', 'lowVolumeDefault']
 
 /* takes in pipetteName such as 'p300_single' or 'p300_single_gen1' 
 or PipetteModel such as 'p300_single_v1.3' and converts it to channels,
@@ -199,6 +198,7 @@ export const getPipetteSpecsV2 = (
     []
   )
   const generalGeometricCombined = Object.assign({}, ...matchingJsons)
+  const liquidTypes: string[] = []
 
   const liquidJsons = Object.keys(liquid).map(
     path => liquid[path]
@@ -207,7 +207,15 @@ export const getPipetteSpecsV2 = (
     //  NOTE: combinedModules = array of 2+ jsons, module = 1 json
     (combinedModules: PipetteV2LiquidSpecs[], module: LiquidSpecs, index) => {
       const path = Object.keys(liquid)[index]
-      LIQUID_TYPES.forEach(type => {
+
+      //  dynamically check the different liquid types and store unique types
+      //  into an array to parse through
+      const type = path.split('/')[7]
+      if (!liquidTypes.includes(type)) {
+        liquidTypes.push(type)
+      }
+
+      liquidTypes.forEach(type => {
         if (
           `../pipette/definitions/2/liquid/${channels}/${pipetteModel}/${type}/${version}.json` ===
           path
@@ -226,7 +234,7 @@ export const getPipetteSpecsV2 = (
 
   for (const [key, value] of Object.entries(liquidMatchingJsons)) {
     const index = Number(key)
-    const newKeyName = LIQUID_TYPES[index] || key
+    const newKeyName = liquidTypes[index] || key
     liquidMatchingJsonsGrouped.liquids[newKeyName] = value
   }
 
