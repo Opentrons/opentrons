@@ -1,7 +1,6 @@
 'use strict'
 const path = require('path')
 const { versionForProject } = require('../scripts/git-version')
-const pkg = require('../package.json')
 
 const {
   OT_APP_DEPLOY_BUCKET,

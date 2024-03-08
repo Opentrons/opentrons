@@ -1,9 +1,8 @@
 'use strict'
-import pkg from '../package.json'
 
 module.exports = {
   appId: 'com.opentrons.odd',
-  electronVersion: JSON.stringify(pkg.devDependencies.electron),
+  electronVersion: '27.0.0',
   npmRebuild: false,
   files: [
     '**/*',
