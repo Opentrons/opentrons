@@ -5,6 +5,7 @@ from typing_extensions import Protocol as TypingProtocol
 
 from opentrons.types import DeckSlotName
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import requires_version
 from opentrons.protocol_engine.clients import SyncClient
 
 
@@ -98,6 +99,7 @@ class TrashBin(_DisposalLocation):
         else:
             self._cutout_fixture_name = _TRASH_BIN_CUTOUT_FIXTURE
 
+    @requires_version(2, 18)
     def top(self, x: float = 0, y: float = 0, z: float = 0) -> TrashBin:
         """Add a location offset to a trash bin.
 
@@ -174,6 +176,7 @@ class WasteChute(_DisposalLocation):
         self._api_version = api_version
         self._offset = offset
 
+    @requires_version(2, 18)
     def top(self, x: float = 0, y: float = 0, z: float = 0) -> WasteChute:
         """Add a location offset to a waste chute.
 
