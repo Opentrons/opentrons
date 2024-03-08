@@ -16,7 +16,7 @@ describe('Create a Tip Rack', () => {
       .children()
       .first()
       .trigger('mousedown')
-    cy.get('*[class^="Dropdown__option_label"]').contains('Tip Rack').click()
+    cy.get('*[class^="_option_label"]').contains('Tip Rack').click()
     cy.get('button').contains('start creating labware').click({ force: true })
   })
 

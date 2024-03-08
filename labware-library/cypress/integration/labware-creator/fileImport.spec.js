@@ -110,7 +110,7 @@ context('File Import', () => {
       .children()
       .first()
       .trigger('mousedown')
-    cy.get('*[class^="Dropdown__option_label"]')
+    cy.get('*[class^="_option_label"]')
       .contains(/P10.*Single-Channel.*GEN1/)
       .click()
 
