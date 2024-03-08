@@ -43,8 +43,5 @@
   },
   "devDependencies": {
     "react-redux": "8.1.2"
-  },
-  "browser": {
-    "jest-when": false
   }
 }
