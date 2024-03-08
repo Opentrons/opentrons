@@ -260,12 +260,12 @@ jobs:
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
       - name: 'cache yarn cache'
-          uses: actions/cache@v3
-          with:
-            path: |
-              ${{ github.workspace }}/.npm-cache/_prebuild
-              ${{ github.workspace }}/.yarn-cache
-            key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.npm-cache/_prebuild
+            ${{ github.workspace }}/.yarn-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
       - name: setup-js
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache

@@ -123,9 +123,7 @@ jobs:
   deploy-components:
     name: 'deploy components storybook artifact to S3'
     runs-on: 'ubuntu-22.04'
-    needs:
-      # TODO IMMEDIATELY: revert change below. doing this so i can test component builds without tests passing
-      ['js-unit-test', build-components-storybook', 'determine-build-type']
+    needs: ['js-unit-test', build-components-storybook', 'determine-build-type']
     if: needs.determine-build-type.outputs.type != 'none'
     steps:
       - uses: 'actions/checkout@v3'
