@@ -1,14 +1,11 @@
 import * as React from 'react'
+import { vi, describe, beforeEach, it, expect } from 'vitest'
 import { screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { TiprackSelect } from '../TiprackSelect'
 import { TiprackOption } from '../TiprackOption'
 
-jest.mock('../TiprackOption')
-
-const mockTiprackOption = TiprackOption as jest.MockedFunction<
-  typeof TiprackOption
->
+vi.mock('../TiprackOption')
 
 const render = (props: React.ComponentProps<typeof TiprackSelect>) => {
   return renderWithProviders(<TiprackSelect {...props} />)[0]
@@ -17,7 +14,7 @@ const render = (props: React.ComponentProps<typeof TiprackSelect>) => {
 describe('TiprackSelect', () => {
   let props: React.ComponentProps<typeof TiprackSelect>
   beforeEach(() => {
-    mockTiprackOption.mockReturnValue(<div>mock TiprackOption</div>)
+    vi.mocked(TiprackOption).mockReturnValue(<div>mock TiprackOption</div>)
     props = {
       mount: 'left',
       tiprackOptions: [
@@ -25,7 +22,7 @@ describe('TiprackSelect', () => {
         { name: 'mockTip2', value: 'mockUri2' },
         { name: 'mockTip3', value: 'mockUri3' },
       ],
-      onSetFieldValue: jest.fn(),
+      onSetFieldValue: vi.fn(),
       values: {
         left: {
           pipetteName: 'mockPipetteName',

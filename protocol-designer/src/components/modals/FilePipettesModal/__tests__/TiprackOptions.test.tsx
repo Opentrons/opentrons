@@ -1,6 +1,8 @@
 import * as React from 'react'
+import { vi, describe, beforeEach, it, expect } from 'vitest'
 import { screen } from '@testing-library/react'
-import { COLORS, renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { COLORS } from '@opentrons/components'
 import { TiprackOption } from '../TiprackOption'
 
 const render = (props: React.ComponentProps<typeof TiprackOption>) => {
@@ -11,7 +13,7 @@ describe('TiprackOption', () => {
   let props: React.ComponentProps<typeof TiprackOption>
   beforeEach(() => {
     props = {
-      onClick: jest.fn(),
+      onClick: vi.fn(),
       isSelected: true,
       text: 'mockText',
     }
