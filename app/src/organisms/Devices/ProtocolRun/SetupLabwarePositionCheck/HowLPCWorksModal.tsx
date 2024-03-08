@@ -22,7 +22,11 @@ interface HowLPCWorksModalProps {
 }
 
 export const HowLPCWorksModal = (props: HowLPCWorksModalProps): JSX.Element => {
+<<<<<<< HEAD
   const { t } = useTranslation(['protocol_setup', 'shared', 'branded'])
+=======
+  const { t } = useTranslation(['protocol_setup', 'shared'])
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   return createPortal(
     <LegacyModal
       title={t('how_offset_data_works')}
@@ -48,7 +52,11 @@ export const HowLPCWorksModal = (props: HowLPCWorksModalProps): JSX.Element => {
           />
         </Link>
         <StyledText as="p" marginBottom={SPACING.spacing16}>
+<<<<<<< HEAD
           {t('branded:why_use_lpc')}
+=======
+          {t('why_use_lpc')}
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
         </StyledText>
         <PrimaryButton
           onClick={props.onCloseClick}

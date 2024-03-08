@@ -1,8 +1,12 @@
 import { describe, it, expect } from 'vitest'
+<<<<<<< HEAD
 import {
   TEMPERATURE_MODULE_V2_FIXTURE,
   getModuleDef2,
 } from '@opentrons/shared-data'
+=======
+import { getModuleDef2 } from '@opentrons/shared-data'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 import { mockTemperatureModuleGen2 } from '../../../redux/modules/__fixtures__'
 import {

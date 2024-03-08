@@ -46,7 +46,11 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
       <Modal header={terminateHeader}>
         <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText as="p" marginBottom={SPACING.spacing32}>
+<<<<<<< HEAD
             {t('branded:confirm_terminate')}
+=======
+            {t('confirm_terminate')}
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
           </StyledText>
           <Flex flex="1" gridGap={SPACING.spacing8}>
             <SmallButton
@@ -77,7 +81,11 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
           <Flex
             height="12.5rem"
             backgroundColor={COLORS.grey35}
+<<<<<<< HEAD
             borderRadius={BORDERS.borderRadius12}
+=======
+            borderRadius={BORDERS.borderRadiusSize3}
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
             flexDirection={DIRECTION_COLUMN}
             color={COLORS.grey60}
             padding={SPACING.spacing24}
@@ -96,7 +104,11 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
               {i18n.format(t('robot_is_busy'), 'capitalize')}
             </StyledText>
             <StyledText as="p" textAlign={TYPOGRAPHY.textAlignCenter}>
+<<<<<<< HEAD
               {t('branded:computer_in_app_is_controlling_robot')}
+=======
+              {t('computer_in_app_is_controlling_robot')}
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
             </StyledText>
           </Flex>
           <StyledText

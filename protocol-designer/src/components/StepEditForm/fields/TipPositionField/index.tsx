@@ -19,6 +19,7 @@ import {
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { TipPositionModal } from './TipPositionModal'
 import { getDefaultMmFromBottom } from './utils'
+<<<<<<< HEAD
 import { ZTipPositionModal } from './ZTipPositionModal'
 import type {
   TipXOffsetFields,
@@ -30,6 +31,11 @@ import type { PositionSpecs } from './TipPositionModal'
 
 import stepFormStyles from '../../StepEditForm.module.css'
 import styles from './TipPositionInput.module.css'
+=======
+import stepFormStyles from '../../StepEditForm.module.css'
+import styles from './TipPositionInput.module.css'
+import type { FieldProps } from '../../types'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 interface TipPositionFieldProps {
   propsForFields: FieldPropsByName

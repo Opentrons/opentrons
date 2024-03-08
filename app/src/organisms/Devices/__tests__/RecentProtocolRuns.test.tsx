@@ -4,7 +4,11 @@ import { screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
+<<<<<<< HEAD
 import { useNotifyAllRunsQuery } from '../../../resources/runs'
+=======
+import { useNotifyAllRunsQuery } from '../../../resources/runs/useNotifyAllRunsQuery'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { i18n } from '../../../i18n'
 import { useIsRobotViewable, useRunStatuses } from '../hooks'
 import { RecentProtocolRuns } from '../RecentProtocolRuns'
@@ -13,7 +17,11 @@ import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
 import type { Runs } from '@opentrons/api-client'
 import type { AxiosError } from 'axios'
 
+<<<<<<< HEAD
 vi.mock('../../../resources/runs')
+=======
+vi.mock('../../../resources/runs/useNotifyAllRunsQuery')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 vi.mock('../hooks')
 vi.mock('../../ProtocolUpload/hooks')
 vi.mock('../HistoricalProtocolRun')

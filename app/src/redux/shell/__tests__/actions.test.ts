@@ -1,6 +1,14 @@
 import { describe, it, expect } from 'vitest'
 
+<<<<<<< HEAD
 import { uiInitialized, notifySubscribeAction } from '../actions'
+=======
+import {
+  uiInitialized,
+  notifySubscribeAction,
+  notifyUnsubscribeAction,
+} from '../actions'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 import type { NotifyTopic } from '../types'
 

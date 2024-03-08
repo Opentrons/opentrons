@@ -18,12 +18,16 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   fixtureTiprack300ul,
 } from '@opentrons/shared-data'
+<<<<<<< HEAD
 import {
   useMissingProtocolHardware,
   useRequiredProtocolLabware,
   useRunTimeParameters,
 } from '../index'
 import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration/useNotifyDeckConfigurationQuery'
+=======
+import { useMissingProtocolHardware, useRequiredProtocolLabware } from '..'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 import type { Protocol } from '@opentrons/api-client'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
@@ -31,6 +35,7 @@ import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../organisms/Devices/hooks')
 vi.mock('../../../../redux/config')
+<<<<<<< HEAD
 vi.mock(
   '../../../../resources/deck_configuration/useNotifyDeckConfigurationQuery'
 )
@@ -115,6 +120,11 @@ const mockRTPData = [
     default: 'none',
   },
 ]
+=======
+
+const PROTOCOL_ID = 'fake_protocol_id'
+
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition2
 const PROTOCOL_ANALYSIS = {
   id: 'fake analysis',
@@ -208,6 +218,7 @@ describe('useRunTimeParameters', () => {
       .thenReturn({
         data: PROTOCOL_ANALYSIS,
       } as UseQueryResult<CompletedProtocolAnalysis>)
+<<<<<<< HEAD
   })
   it('return RTP', () => {
     const { result } = renderHook(() => useRunTimeParameters(PROTOCOL_ID))
@@ -228,6 +239,8 @@ describe('useRequiredProtocolLabware', () => {
       .thenReturn({
         data: PROTOCOL_ANALYSIS,
       } as UseQueryResult<CompletedProtocolAnalysis>)
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(PROTOCOL_ID, NULL_PROTOCOL_ANALYSIS.id, { enabled: true })
       .thenReturn({
@@ -283,7 +296,11 @@ describe.only('useMissingProtocolHardware', () => {
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: PROTOCOL_ANALYSIS,
     } as UseQueryResult<CompletedProtocolAnalysis>)
+<<<<<<< HEAD
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
+=======
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       data: [{}],
     } as UseQueryResult<DeckConfiguration>)
   })
@@ -317,7 +334,11 @@ describe.only('useMissingProtocolHardware', () => {
     })
   })
   it('should return 1 conflicted slot', () => {
+<<<<<<< HEAD
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+=======
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue(({
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       data: [
         {
           cutoutId: 'cutoutD3',
@@ -394,7 +415,11 @@ describe.only('useMissingProtocolHardware', () => {
       conflictedSlots: [],
     })
   })
+<<<<<<< HEAD
   it('should return conflicting slot when module location is configured with something other than module fixture', () => {
+=======
+  it('should return conflicting slot when module location is configured with something other than single slot fixture', () => {
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: {
         data: [
@@ -414,7 +439,11 @@ describe.only('useMissingProtocolHardware', () => {
       isLoading: false,
     } as any)
 
+<<<<<<< HEAD
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
+=======
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       data: [
         omitBy(
           FLEX_SIMPLEST_DECK_CONFIG,

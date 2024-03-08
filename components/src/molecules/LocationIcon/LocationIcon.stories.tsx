@@ -1,11 +1,23 @@
 import * as React from 'react'
+<<<<<<< HEAD
 import { Flex } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
+=======
+
+import { Flex, SPACING } from '@opentrons/components'
+
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { GlobalStyle } from '../../../../app/src/atoms/GlobalStyle'
 import { customViewports } from '../../../../.storybook/preview'
 import { ICON_DATA_BY_NAME } from '../../icons'
 import { LocationIcon } from '.'
+<<<<<<< HEAD
 import type { Meta, StoryObj } from '@storybook/react'
+=======
+
+import type { Story, Meta } from '@storybook/react'
+import { ICON_DATA_BY_NAME } from '../../icons'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const slots = [
   'A1',

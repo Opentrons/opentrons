@@ -11,7 +11,11 @@ import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_r
 import type { MaintenanceRunStatus } from '../MaintenanceRunStatusProvider'
 
 vi.mock('../useMaintenanceRunTakeover')
+<<<<<<< HEAD
 vi.mock('../../../resources/maintenance_runs')
+=======
+vi.mock('../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const MOCK_MAINTENANCE_RUN: MaintenanceRunStatus = {
   getRunIds: () => ({

@@ -1,4 +1,10 @@
+<<<<<<< HEAD
 import { ICON_DATA_BY_NAME, VIEWPORT } from '@opentrons/components'
+=======
+import * as React from 'react'
+import { ICON_DATA_BY_NAME } from '@opentrons/components'
+import { touchScreenViewport } from '../../DesignTokens/constants'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { MediumButton } from './'
 import type { Meta, StoryObj } from '@storybook/react'
 

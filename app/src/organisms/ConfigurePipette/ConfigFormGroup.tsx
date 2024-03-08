@@ -10,6 +10,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { InputField } from '../../atoms/InputField'
+<<<<<<< HEAD
+=======
+import { StyledText } from '../../atoms/text'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import styles from './styles.module.css'
 
 import type { Control } from 'react-hook-form'

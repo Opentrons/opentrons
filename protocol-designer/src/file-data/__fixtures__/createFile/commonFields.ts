@@ -1,14 +1,22 @@
 // Named arguments to createFile selector. This data would be the result of several selectors.
+<<<<<<< HEAD
+=======
+import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import {
   fixture_96_plate,
   fixture_tiprack_10_ul,
   fixture_trash,
 } from '@opentrons/shared-data/labware/fixtures/2'
+<<<<<<< HEAD
 import {
   OT2_ROBOT_TYPE,
   OT2_STANDARD_DECKID,
   fixtureP10SingleV2Specs,
 } from '@opentrons/shared-data'
+=======
+import { OT2_ROBOT_TYPE, OT2_STANDARD_DECKID } from '@opentrons/shared-data'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   LabwareLiquidState,

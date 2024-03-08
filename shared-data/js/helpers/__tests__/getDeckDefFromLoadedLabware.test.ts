@@ -1,6 +1,11 @@
 import { describe, it, expect } from 'vitest'
+<<<<<<< HEAD
 import ot2DeckDef from '../../../deck/definitions/5/ot2_standard.json'
 import ot3DeckDef from '../../../deck/definitions/5/ot3_standard.json'
+=======
+import ot2DeckDef from '../../../deck/definitions/4/ot2_standard.json'
+import ot3DeckDef from '../../../deck/definitions/4/ot3_standard.json'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { getDeckDefFromRobotType } from '..'
 
 describe('getDeckDefFromRobotType', () => {

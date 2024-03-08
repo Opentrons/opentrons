@@ -3,7 +3,13 @@
 */
 
 @import '../../node_modules/react-simple-keyboard/build/css/index.css';
+<<<<<<< HEAD
 @import './atoms/SoftwareKeyboard/AlphanumericKeyboard/index.css';
 @import './atoms/SoftwareKeyboard/FullKeyboard/index.css';
 @import './atoms/SoftwareKeyboard/NumericalKeyboard/index.css';
 @import './atoms/SoftwareKeyboard/IndividualKey/index.css';
+=======
+@import './atoms/SoftwareKeyboard/CustomKeyboard/index.css';
+@import './atoms/SoftwareKeyboard/NormalKeyboard/index.css';
+@import './atoms/SoftwareKeyboard/Numpad/index.css';
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))

@@ -52,6 +52,10 @@ vi.mock('../AdvancedTab/Troubleshooting')
 vi.mock('../AdvancedTab/UpdateRobotSoftware')
 vi.mock('../AdvancedTab/UsageSettings')
 vi.mock('../AdvancedTab/UseOlderAspirateBehavior')
+<<<<<<< HEAD
+=======
+vi.mock('../AdvancedTab/UseOlderProtocol')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const mockUpdateRobotStatus = vi.fn()
 
@@ -108,10 +112,20 @@ describe('RobotSettings Advanced tab', () => {
     vi.mocked(UseOlderAspirateBehavior).mockReturnValue(
       <div>Mock UseOlderAspirateBehavior Section</div>
     )
+<<<<<<< HEAD
     when(useIsFlex).calledWith('otie').thenReturn(false)
     vi.mocked(EnableStatusLight).mockReturnValue(
       <div>mock EnableStatusLight</div>
     )
+=======
+    vi.mocked(UseOlderProtocol).mockReturnValue(
+      <div>Mock UseOlderProtocol Section</div>
+    )
+    when(useIsFlex).calledWith('otie').thenReturn(false)
+    vi.mocked(EnableStatusLight).mockReturnValue(
+      <div>mock EnableStatusLight</div>
+    )
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     vi.mocked(useIsRobotBusy).mockReturnValue(false)
   })
 
@@ -203,6 +217,20 @@ describe('RobotSettings Advanced tab', () => {
     expect(
       screen.queryByText('Mock UseOlderAspirateBehavior Section')
     ).toBeNull()
+<<<<<<< HEAD
+=======
+  })
+
+  it('should render UseOlderProtocol section for OT-2', () => {
+    render()
+    screen.getByText('Mock UseOlderProtocol Section')
+  })
+
+  it('should not render UseOlderProtocol section for Flex', () => {
+    when(useIsFlex).calledWith('otie').thenReturn(true)
+    render()
+    expect(screen.queryByText('Mock UseOlderProtocol Section')).toBeNull()
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   })
 
   it('should not render EnableStatusLight section for OT-2', () => {

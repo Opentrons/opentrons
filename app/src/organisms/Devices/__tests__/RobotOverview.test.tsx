@@ -51,8 +51,13 @@ import type { State } from '../../../redux/types'
 import type * as ReactApiClient from '@opentrons/react-api-client'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
+<<<<<<< HEAD
   const actual = await importOriginal<typeof ReactApiClient>()
   return {
+=======
+  const actual = importOriginal<typeof ReactApiClient>()
+  return await {
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     ...actual,
     useAuthorization: vi.fn(),
   }

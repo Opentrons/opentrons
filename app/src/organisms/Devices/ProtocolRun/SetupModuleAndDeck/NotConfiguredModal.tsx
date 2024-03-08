@@ -3,6 +3,20 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
+<<<<<<< HEAD
+=======
+  useDeckConfigurationQuery,
+  useUpdateDeckConfigurationMutation,
+} from '@opentrons/react-api-client'
+import {
+  Flex,
+  DIRECTION_COLUMN,
+  TYPOGRAPHY,
+  SPACING,
+  JUSTIFY_SPACE_BETWEEN,
+  COLORS,
+  BORDERS,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   ALIGN_CENTER,
   BORDERS,
   COLORS,
@@ -48,23 +62,38 @@ export const NotConfiguredModal = (
     updateDeckConfiguration(newDeckConfig)
     onCloseClick()
   }
+<<<<<<< HEAD
   const cutoutDisplayName = getCutoutDisplayName(cutoutId)
+=======
+
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   return createPortal(
     <LegacyModal
       title={t('add_fixture', {
         fixtureName: getFixtureDisplayName(requiredFixtureId),
+<<<<<<< HEAD
         locationName: cutoutDisplayName,
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       })}
       onClose={onCloseClick}
       width="27.75rem"
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
+<<<<<<< HEAD
         <StyledText as="p">{t('add_this_deck_hardware')}</StyledText>
+=======
+        <StyledText as="p">{t('add_fixture_to_deck')}</StyledText>
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
         <Flex paddingTop={SPACING.spacing16} flexDirection={DIRECTION_COLUMN}>
           <Flex
             padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
             backgroundColor={COLORS.grey30}
+<<<<<<< HEAD
             borderRadius={BORDERS.borderRadius8}
+=======
+            borderRadius={BORDERS.radiusSoftCorners}
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >

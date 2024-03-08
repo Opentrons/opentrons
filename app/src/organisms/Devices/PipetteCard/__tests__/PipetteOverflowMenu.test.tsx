@@ -40,8 +40,15 @@ describe('PipetteOverflowMenu', () => {
       mount: LEFT,
       handleDropTip: vi.fn(),
       handleChangePipette: vi.fn(),
+<<<<<<< HEAD
       handleAboutSlideout: vi.fn(),
       handleSettingsSlideout: vi.fn(),
+=======
+      handleCalibrate: vi.fn(),
+      handleAboutSlideout: vi.fn(),
+      handleSettingsSlideout: vi.fn(),
+      isPipetteCalibrated: false,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       isRunActive: false,
     }
   })
@@ -71,6 +78,55 @@ describe('PipetteOverflowMenu', () => {
     fireEvent.click(btn)
     expect(props.handleChangePipette).toHaveBeenCalled()
   })
+<<<<<<< HEAD
+=======
+  it('renders recalibrate pipette text for Flex pipette', () => {
+    vi.mocked(isFlexPipette).mockReturnValue(true)
+    props = {
+      ...props,
+      isPipetteCalibrated: true,
+    }
+    render(props)
+    const recalibrate = screen.getByRole('button', {
+      name: 'Recalibrate pipette',
+    })
+    fireEvent.click(recalibrate)
+    expect(props.handleCalibrate).toHaveBeenCalled()
+  })
+
+  it('should render recalibrate pipette text for Flex pipette', () => {
+    vi.mocked(isFlexPipette).mockReturnValue(true)
+    props = {
+      ...props,
+      isPipetteCalibrated: true,
+    }
+    render(props)
+    screen.getByRole('button', {
+      name: 'Recalibrate pipette',
+    })
+  })
+
+  it('renders only the about pipette button if FLEX pipette is attached', () => {
+    vi.mocked(isFlexPipette).mockReturnValue(true)
+
+    render(props)
+
+    const calibrate = screen.getByRole('button', {
+      name: 'Calibrate pipette',
+    })
+    const detach = screen.getByRole('button', { name: 'Detach pipette' })
+    const settings = screen.queryByRole('button', { name: 'Pipette Settings' })
+    const about = screen.getByRole('button', { name: 'About pipette' })
+
+    fireEvent.click(calibrate)
+    expect(props.handleCalibrate).toHaveBeenCalled()
+    fireEvent.click(detach)
+    expect(props.handleChangePipette).toHaveBeenCalled()
+    expect(settings).toBeNull()
+    fireEvent.click(about)
+    expect(props.handleAboutSlideout).toHaveBeenCalled()
+  })
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
   it('does not render the pipette settings button if the pipette has no settings', () => {
     vi.mocked(isFlexPipette).mockReturnValue(false)
@@ -84,6 +140,33 @@ describe('PipetteOverflowMenu', () => {
     expect(settings).not.toBeInTheDocument()
   })
 
+<<<<<<< HEAD
+=======
+  it('should disable certain menu items if a run is active for Flex pipette', () => {
+    vi.mocked(isFlexPipette).mockReturnValue(true)
+    props = {
+      ...props,
+      isRunActive: true,
+    }
+    render(props)
+    expect(
+      screen.getByRole('button', {
+        name: 'Calibrate pipette',
+      })
+    ).toBeDisabled()
+    expect(
+      screen.getByRole('button', {
+        name: 'Detach pipette',
+      })
+    ).toBeDisabled()
+    expect(
+      screen.getByRole('button', {
+        name: 'Drop tips',
+      })
+    ).toBeDisabled()
+  })
+
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   it('should disable certain menu items if a run is active for OT-2 pipette', () => {
     vi.mocked(isFlexPipette).mockReturnValue(false)
     props = {

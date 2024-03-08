@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import * as React from 'react'
 import { describe, it, afterEach, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
@@ -17,6 +18,9 @@ const render = (props: React.ComponentProps<typeof MagnetForm>) => {
     i18nInstance: i18n,
   })[0]
 }
+=======
+import { describe, it } from 'vitest'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 describe('MagnetForm', () => {
   let props: React.ComponentProps<typeof MagnetForm>

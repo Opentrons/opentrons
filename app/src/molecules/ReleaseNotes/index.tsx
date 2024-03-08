@@ -1,4 +1,5 @@
 import * as React from 'react'
+<<<<<<< HEAD
 import Markdown from 'react-markdown'
 
 import { Box, COLORS, SPACING, StyledText } from '@opentrons/components'
@@ -7,6 +8,12 @@ import { useIsOEMMode } from '../../resources/robot-settings/hooks'
 
 import styles from './styles.module.css'
 
+=======
+import remark from 'remark'
+import reactRenderer from 'remark-react'
+import styles from './styles.module.css'
+import { StyledText } from '../../atoms/text'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 export interface ReleaseNotesProps {
   source?: string | null
 }

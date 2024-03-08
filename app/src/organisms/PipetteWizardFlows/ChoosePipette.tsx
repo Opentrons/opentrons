@@ -33,6 +33,10 @@ import {
 } from '@opentrons/shared-data'
 import { i18n } from '../../i18n'
 import { getIsOnDevice } from '../../redux/config'
+<<<<<<< HEAD
+=======
+import { StyledText } from '../../atoms/text'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { getTopPortalEl } from '../../App/portal'
 import { SmallButton } from '../../atoms/buttons'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
@@ -207,11 +211,15 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
         </Flex>
       </LegacyModalShell>
     ) : (
+<<<<<<< HEAD
       <LegacyModalShell
         width="47rem"
         height="min-content"
         header={wizardHeader}
       >
+=======
+      <LegacyModalShell width="47rem" height="30rem" header={wizardHeader}>
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
         {showExitConfirmation ? (
           <ExitModal
             goBack={() => setShowExitConfirmation(false)}
@@ -222,7 +230,11 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
         ) : (
           <Flex
             flexDirection={DIRECTION_COLUMN}
+<<<<<<< HEAD
             padding={SPACING.spacing32}
+=======
+            padding={SPACING.spacing40}
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>

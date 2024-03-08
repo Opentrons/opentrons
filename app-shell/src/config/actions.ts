@@ -76,6 +76,10 @@ import {
   VALUE_UPDATED,
   VIEW_PROTOCOL_SOURCE_FOLDER,
   NOTIFY_SUBSCRIBE,
+<<<<<<< HEAD
+=======
+  NOTIFY_UNSUBSCRIBE,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   ROBOT_MASS_STORAGE_DEVICE_ADDED,
   ROBOT_MASS_STORAGE_DEVICE_ENUMERATED,
   ROBOT_MASS_STORAGE_DEVICE_REMOVED,
@@ -98,6 +102,10 @@ import type {
   AppRestartAction,
   NotifySubscribeAction,
   NotifyTopic,
+<<<<<<< HEAD
+=======
+  NotifyUnsubscribeAction,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   ReloadUiAction,
   RobotMassStorageDeviceAdded,
   RobotMassStorageDeviceEnumerated,
@@ -419,3 +427,18 @@ export const notifySubscribeAction = (
   },
   meta: { shell: true },
 })
+<<<<<<< HEAD
+=======
+
+export const notifyUnsubscribeAction = (
+  hostname: string,
+  topic: NotifyTopic
+): NotifyUnsubscribeAction => ({
+  type: NOTIFY_UNSUBSCRIBE,
+  payload: {
+    hostname,
+    topic,
+  },
+  meta: { shell: true },
+})
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))

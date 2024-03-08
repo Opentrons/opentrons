@@ -17,7 +17,11 @@ import type { Mount } from '@opentrons/components'
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../ModuleWizardFlows')
 vi.mock('../../../Devices/hooks')
+<<<<<<< HEAD
 vi.mock('../../../../resources/runs')
+=======
+vi.mock('../../../../resources/runs/hooks')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 vi.mock('../../../../resources/devices/hooks/useIsEstopNotDisengaged')
 
 const mockPipetteOffsetCalibrations = [

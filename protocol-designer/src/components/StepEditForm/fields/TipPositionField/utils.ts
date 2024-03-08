@@ -1,6 +1,9 @@
+<<<<<<< HEAD
 import floor from 'lodash/floor'
 import round from 'lodash/round'
 import { getIsTouchTipField } from '../../../../form-types'
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,

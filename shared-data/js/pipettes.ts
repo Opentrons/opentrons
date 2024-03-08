@@ -118,6 +118,7 @@ export const getIncompatiblePipetteNames = (
 }
 
 export * from '../pipette/fixtures/name'
+<<<<<<< HEAD
 export * from '../pipette/fixtures/index'
 
 const getChannelsFromString = (
@@ -278,3 +279,5 @@ export const getPipetteSpecsV2 = (
 
   return pipetteV2Specs
 }
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))

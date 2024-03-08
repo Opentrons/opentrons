@@ -20,7 +20,11 @@ import { createStore } from 'redux'
 vi.mock('../useDeckCalibrationStatus')
 vi.mock('../useIsFlex')
 vi.mock('../useRunPipetteInfoByMount')
+<<<<<<< HEAD
 vi.mock('../../../../resources/runs')
+=======
+vi.mock('../../../../resources/runs/useNotifyRunQuery')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 

@@ -4,11 +4,16 @@ import { useTranslation } from 'react-i18next'
 import { FormGroup } from '@opentrons/components'
 import { selectors as uiModuleSelectors } from '../../../ui/modules'
 import { StepFormDropdown, RadioGroupField, TextField } from '../fields'
+import styles from '../StepEditForm.module.css'
 import type { StepFormProps } from '../types'
 
+<<<<<<< HEAD
 import styles from '../StepEditForm.module.css'
 
 export function TemperatureForm(props: StepFormProps): JSX.Element {
+=======
+export const TemperatureForm = (props: StepFormProps): JSX.Element => {
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   const { t } = useTranslation(['application', 'form'])
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getTemperatureLabwareOptions

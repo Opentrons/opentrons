@@ -14,6 +14,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../../App/portal'
+<<<<<<< HEAD
+=======
+import { StyledText } from '../../../../atoms/text'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import secureMagModBracketImage from '../../../../assets/images/secure_mag_mod_bracket.png'
 import secureTCLatchImage from '../../../../assets/images/secure_tc_latch.png'
@@ -48,9 +52,13 @@ export const SecureLabwareModal = (
             <Flex flexDirection={DIRECTION_COLUMN}>
               <Trans
                 t={t}
+<<<<<<< HEAD
                 i18nKey={`branded:secure_labware_explanation_${snakeCase(
                   moduleName
                 )}`}
+=======
+                i18nKey={`secure_labware_explanation_${snakeCase(moduleName)}`}
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
                 components={{
                   block: (
                     <StyledText
@@ -76,7 +84,11 @@ export const SecureLabwareModal = (
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
             <StyledText as="p" marginRight="3.625rem">
+<<<<<<< HEAD
               {t(`branded:secure_labware_explanation_${snakeCase(moduleName)}`)}
+=======
+              {t(`secure_labware_explanation_${snakeCase(moduleName)}`)}
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
             </StyledText>
             <img
               src={secureTCLatchImage}

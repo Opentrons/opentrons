@@ -8,10 +8,14 @@ import {
   useCreateLiveCommandMutation,
   useModulesQuery,
 } from '@opentrons/react-api-client'
+<<<<<<< HEAD
 import {
   HEATERSHAKER_MODULE_V1_FIXTURE,
   ot3StandardDeckV5 as ot3StandardDeckDef,
 } from '@opentrons/shared-data'
+=======
+import { ot3StandardDeckV4 as ot3StandardDeckDef } from '@opentrons/shared-data'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
@@ -44,7 +48,10 @@ vi.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
 vi.mock('../../Devices/ProtocolRun/utils/getProtocolModulesInfo')
+<<<<<<< HEAD
 vi.mock('../../../resources/deck_configuration')
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const RUN_ID = "otie's run"
 const mockSetSetupScreen = vi.fn()

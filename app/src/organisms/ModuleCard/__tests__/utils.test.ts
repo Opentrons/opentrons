@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
+=======
+import { describe, expect, it } from 'vitest'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 import {
   mockHeaterShaker,
@@ -85,6 +89,7 @@ describe('getModuleCardImage', () => {
     expect(result).toEqual(
       '/app/src/assets/images/thermocycler_gen_2_closed.png'
     )
+<<<<<<< HEAD
   })
 })
 
@@ -111,5 +116,7 @@ describe('useModuleApiRequests', () => {
       updateModuleAction.meta.requestId
     )
     expect(result.current[0]('NON_EXISTENT_SERIAL')).toBeNull()
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   })
 })

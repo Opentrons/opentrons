@@ -2,7 +2,11 @@ import { describe, it, expect } from 'vitest'
 import {
   transfer_settings,
   multiple_temp_modules,
+<<<<<<< HEAD
   ot2DeckDefV5,
+=======
+  ot2DeckDefV4,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   getModuleDef2,
   ProtocolAnalysisOutput,
   LoadedLabware,
@@ -174,7 +178,11 @@ const protocolWithMultipleTemps = ({
     },
   ] as LoadedModule[],
 } as unknown) as ProtocolAnalysisOutput
+<<<<<<< HEAD
 const standardDeckDef = ot2DeckDefV5 as any
+=======
+const standardDeckDef = ot2DeckDefV4 as any
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 describe('getProtocolModulesInfo', () => {
   it('should gather protocol module info for temp, mag, and tc', () => {

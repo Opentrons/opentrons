@@ -16,7 +16,11 @@ import { useNotifyRunQuery } from '../../../../resources/runs'
 import type { HostConfig } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
+<<<<<<< HEAD
 vi.mock('../../../../resources/runs')
+=======
+vi.mock('../../../../resources/runs/useNotifyRunQuery')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const RUN_ID: string = 'run_id'
@@ -41,9 +45,12 @@ describe('useCloneRun hook', () => {
     when(vi.mocked(useCreateRunMutation))
       .calledWith(expect.anything())
       .thenReturn({ createRun: vi.fn() } as any)
+<<<<<<< HEAD
     vi.mocked(useCreateProtocolAnalysisMutation).mockReturnValue({
       createProtocolAnalysis: vi.fn(),
     } as any)
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
     const queryClient = new QueryClient()
     const clientProvider: React.FunctionComponent<{

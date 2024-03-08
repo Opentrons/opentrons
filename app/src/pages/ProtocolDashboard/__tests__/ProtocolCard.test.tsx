@@ -70,9 +70,12 @@ describe('ProtocolCard', () => {
 
   beforeEach(() => {
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
+<<<<<<< HEAD
       data: { result: 'ok' } as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
     vi.mocked(useMostRecentSuccessfulAnalysisAsDocumentQuery).mockReturnValue({
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       data: { result: 'ok' } as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
   })
@@ -146,9 +149,12 @@ describe('ProtocolCard', () => {
 
   it('should display a loading spinner when analysis is pending', async () => {
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
+<<<<<<< HEAD
       data: null as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
     vi.mocked(useMostRecentSuccessfulAnalysisAsDocumentQuery).mockReturnValue({
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       data: null as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
     render()

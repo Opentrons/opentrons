@@ -19,8 +19,11 @@ import type { OffsetCandidate } from '../useOffsetCandidatesForAnalysis'
 vi.mock('../useAllHistoricOffsets')
 vi.mock('../getLabwareLocationCombos')
 vi.mock('@opentrons/shared-data')
+<<<<<<< HEAD
 vi.mock('../../../../resources/runs')
 vi.mock('../../../../resources/useNotifyService')
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition2
 

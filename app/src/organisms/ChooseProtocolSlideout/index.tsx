@@ -53,6 +53,7 @@ import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
 
+<<<<<<< HEAD
 export const CARD_OUTLINE_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
   border-width: 1px;
@@ -65,6 +66,8 @@ export const CARD_OUTLINE_BORDER_STYLE = css`
 
 const TOOLTIP_DELAY_MS = 2000
 
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 const _getFileBaseName = (filePath: string): string => {
   return filePath.split('/').reverse()[0]
 }
@@ -80,12 +83,15 @@ export function ChooseProtocolSlideoutComponent(
   const { t } = useTranslation(['device_details', 'shared'])
   const history = useHistory()
   const logger = useLogger(new URL('', import.meta.url).pathname)
+<<<<<<< HEAD
   const [targetProps, tooltipProps] = useTooltip()
   const [
     showRestoreValuesTooltip,
     setShowRestoreValuesTooltip,
   ] = React.useState<boolean>(false)
 
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   const { robot, showSlideout, onCloseClick } = props
   const { name } = robot
 

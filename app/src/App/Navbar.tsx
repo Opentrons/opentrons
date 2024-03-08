@@ -129,7 +129,11 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
         alignSelf={ALIGN_STRETCH}
       >
         <LogoImg
+<<<<<<< HEAD
           src={PROJECT === 'ot3' ? logoSvgThree : logoSvg}
+=======
+          src={global._OPENTRONS_PROJECT_ === 'ot3' ? logoSvgThree : logoSvg}
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
           alt="opentrons logo"
         />
         {navRoutes.map(({ name, navLinkTo }: RouteProps) => (

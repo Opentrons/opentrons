@@ -33,7 +33,11 @@ interface FatalErrorModalProps {
 }
 export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
   const { errorMessage, shouldUseMetalProbe, onClose } = props
+<<<<<<< HEAD
   const { t } = useTranslation(['labware_position_check', 'shared', 'branded'])
+=======
+  const { t } = useTranslation(['labware_position_check', 'shared'])
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   return createPortal(
     <LegacyModalShell
       width="47rem"
@@ -70,7 +74,11 @@ export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
           </StyledText>
         ) : null}
         <StyledText as="p" textAlign={TEXT_ALIGN_CENTER}>
+<<<<<<< HEAD
           {t('branded:help_us_improve_send_error_report', {
+=======
+          {t('shared:help_us_improve_send_error_report', {
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
             support_email: SUPPORT_EMAIL,
           })}
         </StyledText>

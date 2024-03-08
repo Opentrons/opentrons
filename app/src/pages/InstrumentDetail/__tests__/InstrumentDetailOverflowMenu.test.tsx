@@ -8,7 +8,11 @@ import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
 import { handleInstrumentDetailOverflowMenu } from '../InstrumentDetailOverflowMenu'
+<<<<<<< HEAD
 import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs'
+=======
+import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { PipetteWizardFlows } from '../../../organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '../../../organisms/GripperWizardFlows'
 import { DropTipWizard } from '../../../organisms/DropTipWizard'
@@ -27,7 +31,11 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     getPipetteModelSpecs: vi.fn(),
   }
 })
+<<<<<<< HEAD
 vi.mock('../../../resources/maintenance_runs')
+=======
+vi.mock('../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 vi.mock('../../../organisms/PipetteWizardFlows')
 vi.mock('../../../organisms/GripperWizardFlows')
 vi.mock('../../../organisms/DropTipWizard')

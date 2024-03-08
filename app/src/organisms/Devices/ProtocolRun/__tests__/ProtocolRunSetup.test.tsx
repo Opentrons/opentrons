@@ -97,7 +97,11 @@ describe('ProtocolRunSetup', () => {
       .calledWith(RUN_ID)
       .thenReturn(({
         ...noModulesProtocol,
+<<<<<<< HEAD
         ...MOCK_PROTOCOL_LIQUID_KEY,
+=======
+        ...MOCK_ROTOCOL_LIQUID_KEY,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       } as unknown) as SharedData.ProtocolAnalysisOutput)
     vi.mocked(parseAllRequiredModuleModels).mockReturnValue([])
     vi.mocked(parseLiquidsInLoadOrder).mockReturnValue([])

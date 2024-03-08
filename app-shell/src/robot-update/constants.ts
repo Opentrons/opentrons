@@ -17,7 +17,12 @@ const UPDATE_MANIFEST_URLS_INTERNAL_RELEASE = {
 }
 
 export const getUpdateManifestUrls = (): UpdateManifestUrls =>
+<<<<<<< HEAD
   OPENTRONS_PROJECT.includes('robot-stack')
+=======
+  // @ts-expect-error can't get TS to recognize global.d.ts
+  global._OPENTRONS_PROJECT_.includes('robot-stack')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     ? UPDATE_MANIFEST_URLS_RELEASE
     : UPDATE_MANIFEST_URLS_INTERNAL_RELEASE
 

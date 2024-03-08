@@ -5,7 +5,11 @@ import { describe, it, afterEach, expect, vi } from 'vitest'
 import { useCurrentRunId } from '../useCurrentRunId'
 import { useNotifyAllRunsQuery } from '../../../../resources/runs'
 
+<<<<<<< HEAD
 vi.mock('../../../../resources/runs')
+=======
+vi.mock('../../../../resources/runs/useNotifyAllRunsQuery')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 describe('useCurrentRunId hook', () => {
   afterEach(() => {

@@ -1,11 +1,15 @@
 // tests for pipette info accessors in `shared-data/js/pipettes.js`
 import { describe, expect, it } from 'vitest'
+<<<<<<< HEAD
 import {
   getPipetteSpecsV2,
   getPipetteNameSpecs,
   getPipetteModelSpecs,
 } from '../pipettes'
 import type { PipetteV2LiquidSpecs, PipetteV2Specs } from '../types'
+=======
+import { getPipetteNameSpecs, getPipetteModelSpecs } from '../pipettes'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const PIPETTE_NAMES = [
   'p10_single',

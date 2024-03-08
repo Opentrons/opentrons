@@ -53,7 +53,11 @@ describe('LiquidDetailCard', () => {
     render(props)
     screen.getByText('Mock Liquid')
     screen.getByText('Mock Description')
+<<<<<<< HEAD
     screen.getAllByText(nestedTextMatcher('100.0 µL'))
+=======
+    screen.getAllByText(nestedTextMatcher('100 µL'))
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   })
 
   it('renders clickable box, clicking on it calls track event', () => {
@@ -72,7 +76,11 @@ describe('LiquidDetailCard', () => {
     })
     screen.getByText('A1')
     screen.getByText('B1')
+<<<<<<< HEAD
     screen.getAllByText(nestedTextMatcher('50.0 µL'))
+=======
+    screen.getAllByText(nestedTextMatcher('50 µL'))
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   })
   it('renders well range for volume info if selected', () => {
     render({
@@ -81,14 +89,23 @@ describe('LiquidDetailCard', () => {
       volumeByWell: { A1: 50, B1: 50, C1: 50, D1: 50 },
     })
     screen.getByText('A1: D1')
+<<<<<<< HEAD
     screen.getByText(nestedTextMatcher('50.0 µL'))
+=======
+    screen.getByText(nestedTextMatcher('50 µL'))
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   })
   it('renders liquid name, description, total volume for odd, and clicking item selects the box', () => {
     vi.mocked(getIsOnDevice).mockReturnValue(true)
     render(props)
     screen.getByText('Mock Liquid')
     screen.getByText('Mock Description')
+<<<<<<< HEAD
     screen.getAllByText(nestedTextMatcher('100.0 µL'))
+=======
+    screen.getAllByText(nestedTextMatcher('100 µL'))
+    screen.getAllByText(nestedTextMatcher('total volume'))
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     expect(screen.getByLabelText('liquidBox_odd')).toHaveStyle(
       `border: ${SPACING.spacing4} solid ${COLORS.grey30}`
     )

@@ -21,8 +21,15 @@ import {
 } from '@opentrons/shared-data'
 import { uuid } from '../../../utils'
 import { ModuleDiagram } from '../../modules'
+<<<<<<< HEAD
 import { EquipmentOption } from '../CreateFileWizard/EquipmentOption'
 import type { WizardTileProps } from '../CreateFileWizard/types'
+=======
+import styles from './FilePipettesModal.module.css'
+import { MAGNETIC_BLOCK_TYPE, ModuleType } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
+import type { FormState } from '../CreateFileWizard/types'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 export const DEFAULT_SLOT_MAP: { [moduleType in ModuleType]?: string } = {
   [THERMOCYCLER_MODULE_TYPE]: SPAN7_8_10_11_SLOT,

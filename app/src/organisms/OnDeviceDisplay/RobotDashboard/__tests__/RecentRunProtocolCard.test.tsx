@@ -5,6 +5,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
+<<<<<<< HEAD
 import {
   useProtocolQuery,
   useProtocolAnalysisAsDocumentQuery,
@@ -13,6 +14,10 @@ import {
   RUN_STATUS_FAILED,
   simpleAnalysisFileFixture,
 } from '@opentrons/api-client'
+=======
+import { useProtocolQuery } from '@opentrons/react-api-client'
+import { RUN_STATUS_FAILED } from '@opentrons/api-client'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { COLORS } from '@opentrons/components'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
@@ -36,6 +41,7 @@ import {
 import type { useHistory } from 'react-router-dom'
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
 
+<<<<<<< HEAD
 const mockPush = vi.fn()
 
 vi.mock('react-router-dom', async importOriginal => {
@@ -50,12 +56,21 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../atoms/Skeleton')
 vi.mock('../../../../pages/Protocols/hooks')
 vi.mock('../../../../pages/ProtocolDetails')
+=======
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../../atoms/Skeleton')
+vi.mock('../../../../pages/Protocols/hooks')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 vi.mock('../../../../organisms/Devices/hooks')
 vi.mock('../../../../organisms/RunTimeControl/hooks')
 vi.mock('../../../../organisms/ProtocolUpload/hooks')
 vi.mock('../../../../redux/analytics')
 vi.mock('../hooks')
+<<<<<<< HEAD
 vi.mock('../../../../resources/runs')
+=======
+vi.mock('../../../../resources/runs/useNotifyAllRunsQuery')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 vi.mock('../../../../resources/health/hooks')
 
 const RUN_ID = 'mockRunId'
@@ -103,6 +118,7 @@ const mockRunData = {
   status: RUN_STATUS_FAILED,
 } as any
 
+<<<<<<< HEAD
 const mockBadRunData = {
   ...mockRunData,
   ok: false,
@@ -111,6 +127,8 @@ const mockBadRunData = {
   },
 } as any
 
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 const mockCloneRun = vi.fn()
 
 const render = (props: React.ComponentProps<typeof RecentRunProtocolCard>) => {
@@ -138,7 +156,11 @@ describe('RecentRunProtocolCard', () => {
     }
 
     vi.mocked(Skeleton).mockReturnValue(<div>mock Skeleton</div>)
+<<<<<<< HEAD
     vi.mocked(useRerunnableStatusText).mockReturnValue('Ready to run')
+=======
+    vi.mocked(useHardwareStatusText).mockReturnValue('Ready to run')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
     vi.mocked(useMissingProtocolHardware).mockReturnValue({
       missingProtocolHardware: [],
@@ -149,6 +171,7 @@ describe('RecentRunProtocolCard', () => {
       data: { data: [mockRunData] },
     } as any)
     vi.mocked(useProtocolQuery).mockReturnValue({
+<<<<<<< HEAD
       data: {
         data: {
           metadata: { protocolName: 'mockProtocol' },
@@ -162,6 +185,10 @@ describe('RecentRunProtocolCard', () => {
         runTimeParameters: [],
       },
     } as any)
+=======
+      data: { data: { metadata: { protocolName: 'mockProtocol' } } },
+    } as any)
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     vi.mocked(useRobotInitializationStatus).mockReturnValue(
       INIT_STATUS.SUCCEEDED
     )
@@ -197,7 +224,11 @@ describe('RecentRunProtocolCard', () => {
       isLoading: false,
       conflictedSlots: [],
     })
+<<<<<<< HEAD
     vi.mocked(useRerunnableStatusText).mockReturnValue('Missing 1 pipette')
+=======
+    vi.mocked(useHardwareStatusText).mockReturnValue('Missing 1 pipette')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     render(props)
     screen.getByText('Missing 1 pipette')
   })
@@ -208,7 +239,11 @@ describe('RecentRunProtocolCard', () => {
       isLoading: false,
       conflictedSlots: ['cutoutD3'],
     })
+<<<<<<< HEAD
     vi.mocked(useRerunnableStatusText).mockReturnValue('Location conflicts')
+=======
+    vi.mocked(useHardwareStatusText).mockReturnValue('Location conflicts')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     render(props)
     screen.getByText('Location conflicts')
   })
@@ -219,7 +254,11 @@ describe('RecentRunProtocolCard', () => {
       isLoading: false,
       conflictedSlots: [],
     })
+<<<<<<< HEAD
     vi.mocked(useRerunnableStatusText).mockReturnValue('Missing 1 module')
+=======
+    vi.mocked(useHardwareStatusText).mockReturnValue('Missing 1 module')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     render(props)
     screen.getByText('Missing 1 module')
   })
@@ -230,6 +269,7 @@ describe('RecentRunProtocolCard', () => {
       isLoading: false,
       conflictedSlots: [],
     })
+<<<<<<< HEAD
     vi.mocked(useRerunnableStatusText).mockReturnValue('Missing hardware')
     render(props)
     screen.getByText('Missing hardware')
@@ -245,6 +285,11 @@ describe('RecentRunProtocolCard', () => {
     )
     render(propsWithBadRun)
     screen.getByText('Run could not be loaded')
+=======
+    vi.mocked(useHardwareStatusText).mockReturnValue('Missing hardware')
+    render(props)
+    screen.getByText('Missing hardware')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   })
 
   it('when tapping a card, mock functions is called and loading state is activated', () => {

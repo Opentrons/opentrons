@@ -125,7 +125,11 @@ describe('FirmwareUpdateModal', () => {
     })
     await waitFor(() => expect(props.proceed).toHaveBeenCalled())
   })
+<<<<<<< HEAD
   it('does not render text until instrument update status is known', () => {
+=======
+  it('does not render text or a progress bar until instrument update status is known', () => {
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     vi.mocked(useSubsystemUpdateQuery).mockReturnValue({
       data: {
         data: {

@@ -24,7 +24,11 @@ describe('QuaternaryButton', () => {
     render(props)
     const button = screen.getByText('secondary tertiary button')
     expect(button).toHaveStyle(`background-color: ${COLORS.white}`)
+<<<<<<< HEAD
     expect(button).toHaveStyle(`border-radius: ${BORDERS.borderRadiusFull}`)
+=======
+    expect(button).toHaveStyle(`border-radius: ${BORDERS.radiusRoundEdge}`)
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     expect(button).toHaveStyle('box-shadow: 0 0 0')
     expect(button).toHaveStyle(`color: ${COLORS.blue50}`)
     expect(button).toHaveStyle(

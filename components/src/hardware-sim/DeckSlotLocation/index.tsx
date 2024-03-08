@@ -2,7 +2,11 @@ import * as React from 'react'
 import {
   getPositionFromSlotId,
   OT2_ROBOT_TYPE,
+<<<<<<< HEAD
   ot2DeckDefV5,
+=======
+  ot2DeckDefV4,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 } from '@opentrons/shared-data'
 
 import { SlotBase } from '../BaseDeck/SlotBase'

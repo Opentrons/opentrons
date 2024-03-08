@@ -43,5 +43,11 @@
   },
   "devDependencies": {
     "react-redux": "8.1.2"
+<<<<<<< HEAD
+=======
+  },
+  "browser": {
+    "jest-when": false
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   }
 }

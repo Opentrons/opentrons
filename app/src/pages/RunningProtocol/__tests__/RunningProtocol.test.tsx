@@ -41,7 +41,11 @@ import {
 import { useFeatureFlag } from '../../../redux/config'
 
 import type { UseQueryResult } from 'react-query'
+<<<<<<< HEAD
 import type { ProtocolAnalyses, RunCommandSummary } from '@opentrons/api-client'
+=======
+import type { ProtocolAnalyses } from '@opentrons/api-client'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../organisms/Devices/hooks')
@@ -50,14 +54,22 @@ vi.mock('../../../organisms/RunTimeControl/hooks')
 vi.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
+<<<<<<< HEAD
 vi.mock('../../../organisms/OnDeviceDisplay/RunningProtocol/RunPausedSplash')
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 vi.mock('../../../organisms/RunTimeControl/hooks')
 vi.mock('../../../organisms/OnDeviceDisplay/RunningProtocol')
 vi.mock('../../../redux/discovery')
 vi.mock('../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal')
 vi.mock('../../../organisms/OpenDoorAlertModal')
+<<<<<<< HEAD
 vi.mock('../../../resources/runs')
 vi.mock('../../../redux/config')
+=======
+vi.mock('../../../resources/runs/useNotifyLastRunCommandKey')
+vi.mock('../../../resources/runs/useNotifyRunQuery')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const RUN_ID = 'run_id'
 const ROBOT_NAME = 'otie'
@@ -137,12 +149,18 @@ describe('RunningProtocol', () => {
     when(vi.mocked(useAllCommandsQuery))
       .calledWith(RUN_ID, { cursor: null, pageLength: 1 })
       .thenReturn(mockUseAllCommandsResponseNonDeterministic)
+<<<<<<< HEAD
     vi.mocked(useNotifyLastRunCommand).mockReturnValue({
       key: 'FAKE_COMMAND_KEY',
     } as RunCommandSummary)
     when(vi.mocked(useFeatureFlag))
       .calledWith('enableRunNotes')
       .thenReturn(true)
+=======
+    vi.mocked(useNotifyLastRunCommandKey).mockReturnValue({
+      data: {},
+    } as any)
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   })
 
   afterEach(() => {
@@ -174,6 +192,7 @@ describe('RunningProtocol', () => {
       .thenReturn(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
     render(`/runs/${RUN_ID}/run`)
     expect(vi.mocked(OpenDoorAlertModal)).toHaveBeenCalled()
+<<<<<<< HEAD
   })
 
   it(`should display a Run Paused splash screen if the run status is "${RUN_STATUS_AWAITING_RECOVERY}"`, () => {
@@ -182,6 +201,8 @@ describe('RunningProtocol', () => {
       .thenReturn(RUN_STATUS_AWAITING_RECOVERY)
     render(`/runs/${RUN_ID}/run`)
     expect(vi.mocked(RunPausedSplash)).toHaveBeenCalled()
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   })
 
   // ToDo (kj:04/04/2023) need to figure out the way to simulate swipe

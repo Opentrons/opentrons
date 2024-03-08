@@ -23,11 +23,17 @@ import {
   HEATERSHAKER_MODULE_MODELS,
   TEMPERATURE_MODULE_MODELS,
   THERMOCYCLER_MODULE_MODELS,
+<<<<<<< HEAD
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   THERMOCYCLER_V2_FRONT_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+=======
+} from '@opentrons/shared-data'
+
+import { StyledText } from '../../atoms/text'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { LEFT_SLOTS } from './constants'
 

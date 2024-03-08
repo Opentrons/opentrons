@@ -17,6 +17,10 @@ import {
 } from '@opentrons/components'
 
 import { analyzeProtocol } from '../../redux/protocol-storage'
+<<<<<<< HEAD
+=======
+import { StyledText } from '../../atoms/text'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { Banner } from '../../atoms/Banner'
 import { getTopPortalEl } from '../../App/portal'
 import { LegacyModal } from '../../molecules/LegacyModal'

@@ -11,7 +11,10 @@ import {
   JUSTIFY_FLEX_END,
   Link,
   SPACING,
+<<<<<<< HEAD
   StyledText,
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -21,6 +24,10 @@ import {
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { getModalPortalEl } from '../../App/portal'
+<<<<<<< HEAD
+=======
+import { StyledText } from '../../atoms/text'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { useTrackProtocolRunEvent, useIsFlex } from '../Devices/hooks'
 import { useRunStatus } from '../RunTimeControl/hooks'
@@ -77,7 +84,11 @@ export function ConfirmCancelModal(
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         <StyledText as="p" marginBottom={SPACING.spacing24}>
+<<<<<<< HEAD
           {cancelRunAlertInfo}
+=======
+          {t('cancel_run_alert_info')}
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
         </StyledText>
         <StyledText as="p" marginBottom={SPACING.spacing24}>
           {t('cancel_run_module_info')}

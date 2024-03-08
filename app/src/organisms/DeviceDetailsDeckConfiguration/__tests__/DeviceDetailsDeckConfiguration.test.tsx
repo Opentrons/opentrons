@@ -3,10 +3,13 @@ import { fireEvent, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 import { describe, it, beforeEach, vi, afterEach } from 'vitest'
 
+<<<<<<< HEAD
 import {
   DeckConfiguration,
   TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { DeckConfigurator } from '@opentrons/components'
 import {
   useModulesQuery,
@@ -39,9 +42,14 @@ vi.mock('@opentrons/components', async importOriginal => {
 vi.mock('@opentrons/react-api-client')
 vi.mock('../DeckFixtureSetupInstructionsModal')
 vi.mock('../../Devices/hooks')
+<<<<<<< HEAD
 vi.mock('../../../resources/maintenance_runs')
 vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
 vi.mock('../../../resources/deck_configuration')
+=======
+vi.mock('../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
+vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const mockDeckConfig = [
   {
@@ -76,7 +84,11 @@ describe('DeviceDetailsDeckConfiguration', () => {
     props = {
       robotName: ROBOT_NAME,
     }
+<<<<<<< HEAD
     vi.mocked(useModulesQuery).mockReturnValue({ data: { data: [] } } as any)
+=======
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue({ data: [] } as any)
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
@@ -94,6 +106,7 @@ describe('DeviceDetailsDeckConfiguration', () => {
       .calledWith(ROBOT_NAME)
       .thenReturn(false)
     when(vi.mocked(useIsRobotViewable)).calledWith(ROBOT_NAME).thenReturn(true)
+<<<<<<< HEAD
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: mockDeckConfig,
     } as UseQueryResult<DeckConfiguration>)
@@ -102,6 +115,8 @@ describe('DeviceDetailsDeckConfiguration', () => {
       removeFixtureFromCutout: vi.fn(),
       addFixtureModal: null,
     })
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   })
 
   afterEach(() => {
@@ -151,9 +166,13 @@ describe('DeviceDetailsDeckConfiguration', () => {
   })
 
   it('should render no deck fixtures, if deck configs are not set', () => {
+<<<<<<< HEAD
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [],
     } as any)
+=======
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue([] as any)
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     render(props)
     screen.getByText('No deck fixtures')
   })

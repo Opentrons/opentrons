@@ -97,10 +97,19 @@ describe('ConfirmCancelRunModal', () => {
     vi.restoreAllMocks()
   })
 
+<<<<<<< HEAD
   it('should render correct text and buttons', () => {
     render(props)
     screen.getByText('Are you sure you want to cancel?')
     screen.getByText('Doing so will terminate this run and home your robot.')
+=======
+  it('should render text and buttons', () => {
+    render(props)
+    screen.getByText('Are you sure you want to cancel this run?')
+    screen.getByText(
+      'Doing so will terminate this run, drop any attached tips in the trash container and home your robot.'
+    )
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     screen.getByText(
       'Additionally, any hardware modules used within the protocol will remain active and maintain their current states until deactivated.'
     )
@@ -109,7 +118,11 @@ describe('ConfirmCancelRunModal', () => {
     screen.getByText('Cancel run')
   })
 
+<<<<<<< HEAD
   it('should render the canceling run modal when run is dismissing', () => {
+=======
+  it('shoudler render the canceling run modal when run is dismissing', () => {
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     vi.mocked(useDismissCurrentRunMutation).mockReturnValue({
       dismissCurrentRun: mockDismissCurrentRun,
       isLoading: true,

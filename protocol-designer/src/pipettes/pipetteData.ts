@@ -85,10 +85,13 @@ export function getMinPipetteVolume(pipetteEntity: PipetteEntity): number {
     recommendedMinimumDisposalVol = lowestVolume
   }
 
+<<<<<<< HEAD
   if (spec != null) {
     return recommendedMinimumDisposalVol
   }
 
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   console.assert(
     false,
     `Expected spec for pipette ${pipetteEntity ? pipetteEntity.id : '???'}`

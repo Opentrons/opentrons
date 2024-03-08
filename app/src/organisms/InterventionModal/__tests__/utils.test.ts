@@ -2,7 +2,11 @@ import deepClone from 'lodash/cloneDeep'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import {
   getSlotHasMatingSurfaceUnitVector,
+<<<<<<< HEAD
   ot2DeckDefV5,
+=======
+  ot2DeckDefV4,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 } from '@opentrons/shared-data'
 
 import {
@@ -137,7 +141,11 @@ describe('getRunLabwareRenderInfo', () => {
     const res = getRunLabwareRenderInfo(
       mockRunData,
       mockLabwareDefinitionsByUri,
+<<<<<<< HEAD
       ot2DeckDefV5 as any
+=======
+      ot2DeckDefV4 as any
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     )
     const labwareInfo = res[0]
     expect(labwareInfo).toBeTruthy()
@@ -154,7 +162,11 @@ describe('getRunLabwareRenderInfo', () => {
     const res = getRunLabwareRenderInfo(
       mockRunData,
       mockLabwareDefinitionsByUri,
+<<<<<<< HEAD
       ot2DeckDefV5 as any
+=======
+      ot2DeckDefV4 as any
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     )
     expect(res).toHaveLength(1) // the offdeck labware still gets added because the mating surface doesn't exist for offdeck labware
   })
@@ -163,7 +175,11 @@ describe('getRunLabwareRenderInfo', () => {
     const res = getRunLabwareRenderInfo(
       mockRunData,
       mockLabwareDefinitionsByUri,
+<<<<<<< HEAD
       ot2DeckDefV5 as any
+=======
+      ot2DeckDefV4 as any
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     )
     expect(res).toHaveLength(2)
     const labwareInfo = res.find(
@@ -172,7 +188,11 @@ describe('getRunLabwareRenderInfo', () => {
     expect(labwareInfo).toBeTruthy()
     expect(labwareInfo?.x).toEqual(0)
     expect(labwareInfo?.y).toEqual(
+<<<<<<< HEAD
       ot2DeckDefV5.cornerOffsetFromOrigin[1] -
+=======
+      ot2DeckDefV4.cornerOffsetFromOrigin[1] -
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
         mockLabwareDefinition.dimensions.yDimension
     )
   })
@@ -189,7 +209,11 @@ describe('getRunLabwareRenderInfo', () => {
     const res = getRunLabwareRenderInfo(
       { labware: [mockBadSlotLabware] } as any,
       mockLabwareDefinitionsByUri,
+<<<<<<< HEAD
       ot2DeckDefV5 as any
+=======
+      ot2DeckDefV4 as any
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     )
 
     expect(res[0].x).toEqual(0)
@@ -207,7 +231,11 @@ describe('getCurrentRunModuleRenderInfo', () => {
   it('returns run module render info with nested labware', () => {
     const res = getRunModuleRenderInfo(
       mockRunData,
+<<<<<<< HEAD
       ot2DeckDefV5 as any,
+=======
+      ot2DeckDefV4 as any,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       mockLabwareDefinitionsByUri
     )
     const moduleInfo = res[0]
@@ -228,7 +256,11 @@ describe('getCurrentRunModuleRenderInfo', () => {
 
     const res = getRunModuleRenderInfo(
       mockRunDataNoNesting,
+<<<<<<< HEAD
       ot2DeckDefV5 as any,
+=======
+      ot2DeckDefV4 as any,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       mockLabwareDefinitionsByUri
     )
 
@@ -245,7 +277,11 @@ describe('getCurrentRunModuleRenderInfo', () => {
 
     const res = getRunModuleRenderInfo(
       mockRunDataWithTC,
+<<<<<<< HEAD
       ot2DeckDefV5 as any,
+=======
+      ot2DeckDefV4 as any,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       mockLabwareDefinitionsByUri
     )
 
@@ -270,7 +306,11 @@ describe('getCurrentRunModuleRenderInfo', () => {
 
     const res = getRunModuleRenderInfo(
       mockRunDataWithBadModuleSlot,
+<<<<<<< HEAD
       ot2DeckDefV5 as any,
+=======
+      ot2DeckDefV4 as any,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       mockLabwareDefinitionsByUri
     )
 

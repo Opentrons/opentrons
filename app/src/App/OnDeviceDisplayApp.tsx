@@ -68,13 +68,20 @@ export const ON_DEVICE_DISPLAY_PATHS = [
   '/emergency-stop',
   '/instruments',
   '/instruments/:mount',
+<<<<<<< HEAD
+=======
+  '/loading',
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   '/network-setup',
   '/network-setup/ethernet',
   '/network-setup/usb',
   '/network-setup/wifi',
   '/protocols',
   '/protocols/:protocolId',
+<<<<<<< HEAD
   '/quick-transfer',
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   '/robot-settings',
   '/robot-settings/rename-robot',
   '/robot-settings/update-robot',
@@ -99,6 +106,11 @@ function getPathComponent(
       return <InstrumentsDashboard />
     case '/instruments/:mount':
       return <InstrumentDetail />
+<<<<<<< HEAD
+=======
+    case '/loading':
+      return <InitialLoadingScreen />
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     case '/network-setup':
       return <NetworkSetupMenu />
     case '/network-setup/ethernet':
@@ -111,8 +123,11 @@ function getPathComponent(
       return <ProtocolDashboard />
     case '/protocols/:protocolId':
       return <ProtocolDetails />
+<<<<<<< HEAD
     case `/quick-transfer`:
       return <QuickTransferFlow />
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     case '/robot-settings':
       return <RobotSettingsDashboard />
     case '/robot-settings/rename-robot':
@@ -153,6 +168,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   }
   const dispatch = useDispatch<Dispatch>()
   const isIdle = useIdle(sleepTime, options)
+<<<<<<< HEAD
 
   React.useEffect(() => {
     if (isIdle) {
@@ -210,6 +226,8 @@ const getTargetPath = (unfinishedUnboxingFlowRoute: string | null): string => {
 // split to a separate function because scrollRef rerenders on every route change
 // this avoids rerendering parent providers as well
 export function OnDeviceDisplayAppRoutes(): JSX.Element {
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   const [currentNode, setCurrentNode] = React.useState<null | HTMLElement>(null)
   const scrollRef = React.useCallback((node: HTMLElement | null) => {
     setCurrentNode(node)
@@ -242,6 +260,7 @@ export function OnDeviceDisplayAppRoutes(): JSX.Element {
   `
 
   return (
+<<<<<<< HEAD
     <Switch>
       {ON_DEVICE_DISPLAY_PATHS.map(path => (
         <Route key={path} exact path={path}>
@@ -253,6 +272,41 @@ export function OnDeviceDisplayAppRoutes(): JSX.Element {
       ))}
       {targetPath != null && <Redirect exact from="/" to={targetPath} />}
     </Switch>
+=======
+    <ApiHostProvider hostname="127.0.0.1">
+      <ErrorBoundary FallbackComponent={OnDeviceDisplayAppFallback}>
+        <Box width="100%" css="user-select: none;">
+          {isIdle ? (
+            <SleepScreen />
+          ) : (
+            <>
+              <EstopTakeover />
+              <MaintenanceRunTakeover>
+                <FirmwareUpdateTakeover />
+                <NiceModal.Provider>
+                  <ToasterOven>
+                    <ProtocolReceiptToasts />
+                    <Switch>
+                      {ON_DEVICE_DISPLAY_PATHS.map(path => (
+                        <Route key={path} exact path={path}>
+                          <Box css={TOUCH_SCREEN_STYLE} ref={scrollRef}>
+                            <ModalPortalRoot />
+                            {getPathComponent(path)}
+                          </Box>
+                        </Route>
+                      ))}
+                      <Redirect exact from="/" to={'/loading'} />
+                    </Switch>
+                  </ToasterOven>
+                </NiceModal.Provider>
+              </MaintenanceRunTakeover>
+            </>
+          )}
+        </Box>
+      </ErrorBoundary>
+      <TopLevelRedirects />
+    </ApiHostProvider>
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   )
 }
 

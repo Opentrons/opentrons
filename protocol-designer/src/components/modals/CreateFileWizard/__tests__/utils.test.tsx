@@ -3,6 +3,7 @@ import {
   FLEX_ROBOT_TYPE,
   SINGLE_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
+import { it, describe, expect } from 'vitest'
 import {
   FLEX_TRASH_DEFAULT_SLOT,
   getUnoccupiedStagingAreaSlots,

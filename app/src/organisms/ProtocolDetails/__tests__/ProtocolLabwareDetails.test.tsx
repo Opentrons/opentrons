@@ -1,7 +1,11 @@
 import * as React from 'react'
 import { screen } from '@testing-library/react'
+<<<<<<< HEAD
 import { describe, it, beforeEach, vi } from 'vitest'
 import { InfoScreen } from '@opentrons/components'
+=======
+import { describe, it, beforeEach } from 'vitest'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ProtocolLabwareDetails } from '../ProtocolLabwareDetails'
@@ -145,6 +149,7 @@ describe('ProtocolLabwareDetails', () => {
     screen.getByText('NEST 96 Well Plate 100 µL PCR Full Skirt')
     screen.getByText('Quantity')
     screen.getByText('2')
+<<<<<<< HEAD
   })
 
   it('should render mock infoscreen when no labware', () => {
@@ -153,5 +158,7 @@ describe('ProtocolLabwareDetails', () => {
     }
     render(props)
     screen.getByText('mock InfoScreen')
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   })
 })

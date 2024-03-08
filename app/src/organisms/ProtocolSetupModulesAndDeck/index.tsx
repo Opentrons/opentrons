@@ -109,6 +109,14 @@ export function ProtocolSetupModulesAndDeck({
     <>
       {createPortal(
         <>
+<<<<<<< HEAD
+=======
+          {showMultipleModulesModal ? (
+            <MultipleModulesModal
+              onCloseClick={() => setShowMultipleModulesModal(false)}
+            />
+          ) : null}
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
           {showSetupInstructionsModal ? (
             <SetupInstructionsModal
               setShowSetupInstructionsModal={setShowSetupInstructionsModal}

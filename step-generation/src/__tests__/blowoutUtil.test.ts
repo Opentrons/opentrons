@@ -63,9 +63,15 @@ describe('blowoutUtil', () => {
       blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
     })
     expect(curryCommandCreator).toHaveBeenCalledWith(blowout, {
+<<<<<<< HEAD
       pipetteId: blowoutArgs.pipette,
       labwareId: blowoutArgs.sourceLabwareId,
       wellName: blowoutArgs.sourceWell,
+=======
+      pipette: blowoutArgs.pipette,
+      labware: blowoutArgs.sourceLabwareId,
+      well: blowoutArgs.sourceWell,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       flowRate: blowoutArgs.flowRate,
       wellLocation: {
         offset: {
@@ -108,9 +114,15 @@ describe('blowoutUtil', () => {
       blowoutLocation: DEST_WELL_BLOWOUT_DESTINATION,
     })
     expect(curryCommandCreator).toHaveBeenCalledWith(blowout, {
+<<<<<<< HEAD
       pipetteId: blowoutArgs.pipette,
       labwareId: blowoutArgs.destLabwareId,
       wellName: blowoutArgs.destWell,
+=======
+      pipette: blowoutArgs.pipette,
+      labware: blowoutArgs.destLabwareId,
+      well: blowoutArgs.destWell,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       flowRate: blowoutArgs.flowRate,
       wellLocation: {
         offset: {
@@ -125,9 +137,15 @@ describe('blowoutUtil', () => {
       blowoutLocation: TROUGH_LABWARE,
     })
     expect(curryCommandCreator).toHaveBeenCalledWith(blowout, {
+<<<<<<< HEAD
       pipetteId: blowoutArgs.pipette,
       labwareId: TROUGH_LABWARE,
       wellName: 'A1',
+=======
+      pipette: blowoutArgs.pipette,
+      labware: TROUGH_LABWARE,
+      well: 'A1',
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       flowRate: blowoutArgs.flowRate,
       wellLocation: {
         offset: {

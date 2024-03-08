@@ -17,7 +17,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../App/portal'
+<<<<<<< HEAD
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import {
   LegacyModalHeader,
   LegacyModalShell,

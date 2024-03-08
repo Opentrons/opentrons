@@ -23,8 +23,11 @@ import { mockRobotSideAnalysis } from '../../../../organisms/CommandText/__fixtu
 import { useFeatureFlag } from '../../../../redux/config'
 import { ProtocolRunDetails } from '..'
 
+<<<<<<< HEAD
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 vi.mock(
   '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
@@ -34,10 +37,13 @@ vi.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup')
 vi.mock('../../../../organisms/RunPreview')
 vi.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls')
 vi.mock('../../../../organisms/ProtocolUpload/hooks')
+<<<<<<< HEAD
 vi.mock(
   '../../../../organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 )
 vi.mock('../../../../redux/config')
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
 
@@ -75,7 +81,10 @@ const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
 
 describe('ProtocolRunDetails', () => {
   beforeEach(() => {
+<<<<<<< HEAD
     vi.mocked(useFeatureFlag).mockReturnValue(false)
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     vi.mocked(useRobot).mockReturnValue(mockConnectableRobot)
     vi.mocked(useRunStatuses).mockReturnValue({
       isRunRunning: false,
@@ -93,9 +102,12 @@ describe('ProtocolRunDetails', () => {
     vi.mocked(ProtocolRunModuleControls).mockReturnValue(
       <div>Mock ProtocolRunModuleControls</div>
     )
+<<<<<<< HEAD
     vi.mocked(ProtocolRunRuntimeParameters).mockReturnValue(
       <div>Mock ProtocolRunRuntimeParameters</div>
     )
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     vi.mocked(useModuleRenderInfoForProtocolById).mockReturnValue({
       [mockMagneticModule.moduleId]: {
         moduleId: mockMagneticModule.moduleId,

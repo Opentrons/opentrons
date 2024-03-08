@@ -19,10 +19,14 @@ import {
 import { FLEX_ROBOT_TYPE, fixtureTiprack300ul } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../__testing-utils__'
+<<<<<<< HEAD
 import {
   useCreateTargetedMaintenanceRunMutation,
   useNotifyRunQuery,
 } from '../../../resources/runs'
+=======
+import { useCreateTargetedMaintenanceRunMutation } from '../../../resources/runs/hooks'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
 import { useLaunchLPC } from '../useLaunchLPC'
 import { LabwarePositionCheck } from '..'
@@ -33,8 +37,14 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../')
 vi.mock('@opentrons/react-api-client')
+<<<<<<< HEAD
 vi.mock('../useMostRecentCompletedAnalysis')
 vi.mock('../../../resources/runs')
+=======
+vi.mock('../../../resources/runs/hooks')
+vi.mock('../useMostRecentCompletedAnalysis')
+vi.mock('../../../resources/runs/useNotifyRunQuery')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const MOCK_RUN_ID = 'mockRunId'
 const MOCK_MAINTENANCE_RUN_ID = 'mockMaintenanceRunId'

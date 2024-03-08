@@ -7,7 +7,11 @@ import {
   getLabwareDefURI,
   getIsTiprack,
   OPENTRONS_LABWARE_NAMESPACE,
+<<<<<<< HEAD
   labwareSchemaV2,
+=======
+  protocolSchemaV2,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 } from '@opentrons/shared-data'
 import { getAllWellSetsForLabware } from '../utils'
 import * as labwareDefSelectors from './selectors'
@@ -55,7 +59,12 @@ const ajv = new Ajv({
   allErrors: true,
   jsonPointers: true,
 })
+<<<<<<< HEAD
 const validate = ajv.compile(labwareSchemaV2)
+=======
+const validate = ajv.compile(protocolSchemaV2)
+
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 const _labwareDefsMatchingLoadName = (
   labwareDefs: LabwareDefinition2[],
   loadName: string

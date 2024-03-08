@@ -19,13 +19,24 @@ beforeEach(() => {
   vi.mocked(addHint).mockReturnValue('addHintReturnValue' as any)
   vi.mocked(labwareIngredSelectors.getDeckHasLiquid).mockReturnValue(true)
   vi.mocked(uiModuleSelectors.getMagnetModuleHasLabware).mockReturnValue(false)
+<<<<<<< HEAD
   vi.mocked(uiModuleSelectors.getTemperatureModulesHaveLabware).mockReturnValue(
     []
+=======
+  vi.mocked(uiModuleSelectors.getTemperatureModuleHasLabware).mockReturnValue(
+    false
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   )
   vi.mocked(uiModuleSelectors.getThermocyclerModuleHasLabware).mockReturnValue(
     false
   )
+<<<<<<< HEAD
   vi.mocked(uiModuleSelectors.getTemperatureModuleIds).mockReturnValue(null)
+=======
+  vi.mocked(uiModuleSelectors.getSingleTemperatureModuleId).mockReturnValue(
+    null
+  )
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   vi.mocked(uiModuleSelectors.getSingleThermocyclerModuleId).mockReturnValue(
     null
   )
@@ -126,6 +137,7 @@ describe('addAndSelectStepWithHints', () => {
           selectorValues.getMagnetModuleHasLabware
         )
         vi.mocked(
+<<<<<<< HEAD
           uiModuleSelectors.getTemperatureModulesHaveLabware
         ).mockReturnValue(selectorValues.getTemperatureModulesHaveLabware)
         vi.mocked(
@@ -134,6 +146,16 @@ describe('addAndSelectStepWithHints', () => {
         vi.mocked(uiModuleSelectors.getTemperatureModuleIds).mockReturnValue(
           selectorValues.getTemperatureModuleIds
         )
+=======
+          uiModuleSelectors.getTemperatureModuleHasLabware
+        ).mockReturnValue(selectorValues.getTemperatureModuleHasLabware)
+        vi.mocked(
+          uiModuleSelectors.getThermocyclerModuleHasLabware
+        ).mockReturnValue(selectorValues.getThermocyclerModuleHasLabware)
+        vi.mocked(
+          uiModuleSelectors.getSingleTemperatureModuleId
+        ).mockReturnValue(selectorValues.getSingleTemperatureModuleId)
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
         vi.mocked(
           uiModuleSelectors.getSingleThermocyclerModuleId
         ).mockReturnValue(selectorValues.getSingleThermocyclerModuleId)
@@ -144,6 +166,7 @@ describe('addAndSelectStepWithHints', () => {
         expect(vi.mocked(addHint).mock.calls).toEqual([
           ['module_without_labware'],
         ])
+<<<<<<< HEAD
         expect(dispatch.mock.calls).toEqual([
           [
             {
@@ -196,6 +219,8 @@ describe('addAndSelectStepWithHints', () => {
         expect(vi.mocked(addHint).mock.calls).toEqual([
           ['multiple_modules_without_labware'],
         ])
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
         expect(dispatch.mock.calls).toEqual([
           [
             {

@@ -1,8 +1,15 @@
+<<<<<<< HEAD
 import { versionForProject } from '../scripts/git-version.mjs'
 import pkg from './package.json'
 import path from 'path'
 import { defineConfig } from 'vite'
 import type { UserConfig } from 'vite'
+=======
+import { versionForProject } from '../scripts/git-version'
+import pkg from './package.json'
+import path from 'path'
+import { UserConfig, defineConfig } from 'vite'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 export default defineConfig(
   async (): Promise<UserConfig> => {

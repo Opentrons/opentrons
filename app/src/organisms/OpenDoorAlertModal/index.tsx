@@ -14,6 +14,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../App/portal'
+<<<<<<< HEAD
+=======
+import { StyledText } from '../../atoms/text'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { Modal } from '../../molecules/Modal'
 
 export function OpenDoorAlertModal(): JSX.Element {
@@ -22,7 +26,11 @@ export function OpenDoorAlertModal(): JSX.Element {
     <Modal>
       <Flex
         backgroundColor={COLORS.grey35}
+<<<<<<< HEAD
         borderRadius={BORDERS.borderRadius12}
+=======
+        borderRadius={BORDERS.borderRadiusSize3}
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
         flexDirection={DIRECTION_COLUMN}
         padding={SPACING.spacing24}
         alignItems={ALIGN_CENTER}

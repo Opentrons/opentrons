@@ -158,10 +158,17 @@ describe('DisconnectModal', () => {
     screen.getByText('it errored')
     screen.getByText(
       'Your robot was unable to disconnect from Wi-Fi network foo.'
+<<<<<<< HEAD
     )
     screen.getByText(
       'If you keep getting this message, try restarting your app and robot. If this does not resolve the issue, contact Opentrons Support.'
     )
+=======
+    )
+    screen.getByText(
+      'If you keep getting this message, try restarting your app and/or robot. If this does not resolve the issue please contact Opentrons Support.'
+    )
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     screen.getByRole('button', { name: 'cancel' })
     screen.getByRole('button', { name: 'Disconnect' })
   })

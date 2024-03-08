@@ -18,8 +18,13 @@ vi.mock('../../../redux/protocol-storage')
 vi.mock('../../RunTimeControl/hooks')
 vi.mock('../HistoricalProtocolRunOverflowMenu')
 vi.mock('react-router-dom', async importOriginal => {
+<<<<<<< HEAD
   const reactRouterDom = await importOriginal<typeof Dom>()
   return {
+=======
+  const reactRouterDom = importOriginal<typeof Dom>()
+  return await {
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     ...reactRouterDom,
     useHistory: () => ({ push: mockPush } as any),
   }

@@ -225,6 +225,11 @@ export const ROBOT_MASS_STORAGE_DEVICE_ENUMERATED: 'shell:ROBOT_MASS_STORAGE_DEV
   'shell:ROBOT_MASS_STORAGE_DEVICE_ENUMERATED'
 export const NOTIFY_SUBSCRIBE: 'shell:NOTIFY_SUBSCRIBE' =
   'shell:NOTIFY_SUBSCRIBE'
+<<<<<<< HEAD
+=======
+export const NOTIFY_UNSUBSCRIBE: 'shell:NOTIFY_UNSUBSCRIBE' =
+  'shell:NOTIFY_UNSUBSCRIBE'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 // copy
 // TODO(mc, 2020-05-11): i18n
@@ -245,9 +250,12 @@ export const DISCOVERY_UPDATE_LIST: DISCOVERY_UPDATE_LIST_TYPE =
 export const DISCOVERY_REMOVE: DISCOVERY_REMOVE_TYPE = 'discovery:REMOVE'
 
 export const CLEAR_CACHE: CLEAR_CACHE_TYPE = 'discovery:CLEAR_CACHE'
+<<<<<<< HEAD
 export const HEALTH_STATUS_OK: 'ok' = 'ok'
 export const HEALTH_STATUS_NOT_OK: 'notOk' = 'notOk'
 export const FAILURE_STATUSES = {
   ECONNREFUSED: 'ECONNREFUSED',
   ECONNFAILED: 'ECONNFAILED',
 } as const
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))

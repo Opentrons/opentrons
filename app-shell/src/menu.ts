@@ -30,7 +30,12 @@ const helpMenu: MenuItemConstructorOptions = {
       },
     },
     {
+<<<<<<< HEAD
       label: `View ${PRODUCT_NAME} App Logs`,
+=======
+      // @ts-expect-error can't get TS to recognize global.d.ts
+      label: `View ${global._PKG_PRODUCT_NAME_} App Logs`,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       click: () => {
         shell.openPath(LOG_DIR)
       },
@@ -39,7 +44,12 @@ const helpMenu: MenuItemConstructorOptions = {
       label: 'Report an Issue',
       click: () => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
+<<<<<<< HEAD
         shell.openExternal(BUGS_URL)
+=======
+        // @ts-expect-error can't get TS to recognize global.d.ts
+        shell.openExternal(global._PKG_BUGS_URL_)
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       },
     },
   ],

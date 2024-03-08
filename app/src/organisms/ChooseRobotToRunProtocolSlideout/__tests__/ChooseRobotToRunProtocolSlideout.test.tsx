@@ -45,7 +45,10 @@ vi.mock('../../../redux/config')
 vi.mock('../useCreateRunFromProtocol')
 vi.mock('../../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis')
 vi.mock('../../../resources/useNotifyService')
+<<<<<<< HEAD
 vi.mock('../../../redux/config')
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const render = (
   props: React.ComponentProps<typeof ChooseRobotToRunProtocolSlideout>
@@ -72,7 +75,10 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     mockTrackCreateProtocolRunEvent = vi.fn(
       () => new Promise(resolve => resolve({}))
     )
+<<<<<<< HEAD
     vi.mocked(useFeatureFlag).mockReturnValue(true)
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: '',
       autoUpdateDisabledReason: null,
@@ -103,12 +109,16 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
         reset: mockResetCreateRun,
       } as any)
     when(vi.mocked(useCreateRunFromProtocol))
+<<<<<<< HEAD
       .calledWith(
         expect.any(Object),
         null,
         expect.any(Array),
         expect.any(Object)
       )
+=======
+      .calledWith(expect.any(Object), null, expect.any(Array))
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       .thenReturn({
         createRunFromProtocolSource: mockCreateRunFromProtocolSource,
         reset: mockResetCreateRun,
@@ -369,7 +379,10 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       name: 'Continue to parameters',
     })
     fireEvent.click(proceedButton)
+<<<<<<< HEAD
     fireEvent.click(screen.getByRole('button', { name: 'Confirm values' }))
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     expect(vi.mocked(useCreateRunFromProtocol)).nthCalledWith(
       2,
       expect.any(Object),
@@ -383,7 +396,12 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       ],
       {}
     )
+<<<<<<< HEAD
     expect(vi.mocked(useCreateRunFromProtocol)).toHaveBeenLastCalledWith(
+=======
+    expect(vi.mocked(useCreateRunFromProtocol)).nthCalledWith(
+      3,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       expect.any(Object),
       { hostname: 'otherIp' },
       [],

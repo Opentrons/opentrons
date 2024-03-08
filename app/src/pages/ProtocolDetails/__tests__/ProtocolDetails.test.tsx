@@ -46,7 +46,11 @@ Object.defineProperty(window, 'IntersectionObserver', {
   configurable: true,
   value: IntersectionObserver,
 })
+<<<<<<< HEAD
 vi.mock('../../../organisms/ProtocolSetupParameters')
+=======
+
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../organisms/OnDeviceDisplay/RobotDashboard/hooks')
@@ -57,11 +61,18 @@ vi.mock('../../Protocols/hooks')
 vi.mock('../Deck')
 vi.mock('../Hardware')
 vi.mock('../Labware')
+<<<<<<< HEAD
 vi.mock('../Parameters')
 vi.mock('../../../redux/config')
 
 const MOCK_HOST_CONFIG = {} as HostConfig
 const mockCreateRun = vi.fn((id: string) => {})
+=======
+
+const MOCK_HOST_CONFIG = {} as HostConfig
+const mockCreateRun = vi.fn((id: string) => {})
+
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 const MOCK_DATA = {
   data: {
     id: 'mockProtocol1',
@@ -96,8 +107,11 @@ const render = (path = '/protocols/fakeProtocolId') => {
 
 describe('ODDProtocolDetails', () => {
   beforeEach(() => {
+<<<<<<< HEAD
     when(useRunTimeParameters).calledWith('fakeProtocolId').thenReturn([])
     vi.mocked(useFeatureFlag).mockReturnValue(true)
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     vi.mocked(useCreateRunMutation).mockReturnValue({
       createRun: mockCreateRun,
     } as any)
@@ -191,8 +205,11 @@ describe('ODDProtocolDetails', () => {
     vi.mocked(Hardware).mockReturnValue(<div>Mock Hardware</div>)
     vi.mocked(Labware).mockReturnValue(<div>Mock Labware</div>)
     vi.mocked(Deck).mockReturnValue(<div>Mock Initial Deck Layout</div>)
+<<<<<<< HEAD
     vi.mocked(Parameters).mockReturnValue(<div>Mock Parameters</div>)
 
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     render()
     const parametersButton = screen.getByRole('button', { name: 'Parameters' })
     fireEvent.click(parametersButton)

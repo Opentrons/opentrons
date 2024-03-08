@@ -14,7 +14,17 @@ import type { ReleaseSetUrls } from './system-update/types'
 
 const log = createLogger('update')
 
+<<<<<<< HEAD
 const OPENTRONS_PROJECT: string = _OPENTRONS_PROJECT_
+=======
+export const FLEX_MANIFEST_URL =
+  // @ts-expect-error can't get TS to recognize global.d.ts
+  global._OPENTRONS_PROJECT_ &&
+  // @ts-expect-error can't get TS to recognize global.d.ts
+  global._OPENTRONS_PROJECT_.includes('robot-stack')
+    ? 'https://builds.opentrons.com/ot3-oe/releases.json'
+    : 'https://ot3-development.builds.opentrons.com/ot3-oe/releases.json'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 export const FLEX_MANIFEST_URL =
   OPENTRONS_PROJECT && OPENTRONS_PROJECT.includes('robot-stack')

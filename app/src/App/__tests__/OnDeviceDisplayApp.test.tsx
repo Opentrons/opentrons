@@ -1,5 +1,8 @@
 import * as React from 'react'
+<<<<<<< HEAD
 import { screen } from '@testing-library/react'
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 
@@ -30,6 +33,7 @@ import { mockConnectedRobot } from '../../redux/discovery/__fixtures__'
 import { useCurrentRunRoute, useProtocolReceiptToast } from '../hooks'
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
 
+<<<<<<< HEAD
 import type { UseQueryResult } from 'react-query'
 import type { RobotSettingsResponse } from '@opentrons/api-client'
 import type { OnDeviceLocalizationProviderProps } from '../../LocalizationProvider'
@@ -46,6 +50,10 @@ vi.mock('@opentrons/react-api-client', async () => {
   }
 })
 vi.mock('../../LocalizationProvider')
+=======
+import type { OnDeviceDisplaySettings } from '../../redux/config/schema-types'
+
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 vi.mock('../../pages/Welcome')
 vi.mock('../../pages/NetworkSetupMenu')
 vi.mock('../../pages/ConnectViaEthernet')
@@ -60,12 +68,20 @@ vi.mock('../../pages/InstrumentsDashboard')
 vi.mock('../../pages/RunningProtocol')
 vi.mock('../../pages/RunSummary')
 vi.mock('../../pages/NameRobot')
+<<<<<<< HEAD
+=======
+vi.mock('../../pages/InitialLoadingScreen')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 vi.mock('../../pages/EmergencyStop')
 vi.mock('../../pages/DeckConfiguration')
 vi.mock('../../redux/config')
 vi.mock('../../redux/shell')
 vi.mock('../../redux/discovery')
+<<<<<<< HEAD
 vi.mock('../../resources/maintenance_runs')
+=======
+vi.mock('../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 vi.mock('../hooks')
 
 const mockSettings = {
@@ -87,7 +103,11 @@ const render = (path = '/') => {
 describe('OnDeviceDisplayApp', () => {
   beforeEach(() => {
     vi.mocked(getOnDeviceDisplaySettings).mockReturnValue(mockSettings as any)
+<<<<<<< HEAD
     vi.mocked(getIsShellReady).mockReturnValue(true)
+=======
+    vi.mocked(getIsShellReady).mockReturnValue(false)
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     vi.mocked(useCurrentRunRoute).mockReturnValue(null)
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
     vi.mocked(useNotifyCurrentMaintenanceRun).mockReturnValue({
@@ -160,6 +180,7 @@ describe('OnDeviceDisplayApp', () => {
     render('/runs/my-run-id/summary')
     expect(vi.mocked(RunSummary)).toHaveBeenCalled()
   })
+<<<<<<< HEAD
   it('renders the localization provider and not the loading screen when app-shell is ready', () => {
     render('/')
     expect(vi.mocked(OnDeviceLocalizationProvider)).toHaveBeenCalled()
@@ -170,6 +191,11 @@ describe('OnDeviceDisplayApp', () => {
     render('/')
     screen.getByLabelText('loading indicator')
     expect(vi.mocked(OnDeviceLocalizationProvider)).not.toHaveBeenCalled()
+=======
+  it('renders the loading screen on mount', () => {
+    render('/loading')
+    expect(vi.mocked(InitialLoadingScreen)).toHaveBeenCalled()
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   })
   it('renders EmergencyStop component from /emergency-stop', () => {
     render('/emergency-stop')

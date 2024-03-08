@@ -92,7 +92,11 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
                   <StyledText as="p">{errorDetails}</StyledText>
                 ) : null}
                 <StyledText as="p" marginBottom={SPACING.spacing16}>
+<<<<<<< HEAD
                   {t('branded:module_error_contact_support')}
+=======
+                  {t('module_error_contact_support')}
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
                 </StyledText>
               </Flex>
               <Flex justifyContent={JUSTIFY_FLEX_END}>

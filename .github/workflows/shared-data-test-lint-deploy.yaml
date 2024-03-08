@@ -212,7 +212,7 @@ jobs:
           elif [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/components')) }}" = "true" ] ; then
             echo "Publishing builds for components@ tags"
             echo 'should_publish=true' >> $GITHUB_OUTPUT
-          else 
+          else
             echo "No publish for ref ${{github.ref}} and event ${{github.event_type}}"
             echo 'should_publish=false' >> $GITHUB_OUTPUT
           fi
@@ -252,7 +252,7 @@ jobs:
         run: |
           npm config set cache ./.npm-cache
           yarn config set cache-folder ./.yarn-cache
-          make setup-js 
+          make setup-js
       - name: 'build typescript'
         run: make build-ts
       - name: 'build library'

@@ -1,3 +1,4 @@
+import { describe, it, before } from 'vitest'
 describe('The Settings Page', () => {
   const exptlSettingText = 'Disable module placement restrictions'
 

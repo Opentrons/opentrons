@@ -26,7 +26,11 @@ import {
 } from '@opentrons/shared-data'
 import { StepChangesConfirmModal } from '../EditPipettesModal/StepChangesConfirmModal'
 import { PipetteFields } from './PipetteFields'
+<<<<<<< HEAD
 import { CrashInfoBox } from '../../modules'
+=======
+import { CrashInfoBox, isModuleWithCollisionIssue } from '../../modules'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import styles from './FilePipettesModal.module.css'
 import modalStyles from '../modal.module.css'
 import {
@@ -44,7 +48,10 @@ import { getRobotType } from '../../../file-data/selectors'
 import { uuid } from '../../../utils'
 import { actions as steplistActions } from '../../../steplist'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
+<<<<<<< HEAD
 import { getCrashableModuleSelected } from '../CreateFileWizard/utils'
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 import type { DeckSlot, ThunkDispatch } from '../../../types'
 import type { NormalizedPipette } from '@opentrons/step-generation'

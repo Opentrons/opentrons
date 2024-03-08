@@ -426,7 +426,11 @@ export const PipetteWizardFlows = (
           currentStep.section === SECTIONS.BEFORE_BEGINNING &&
           selectedPipette === NINETY_SIX_CHANNEL &&
           flowType === FLOWS.ATTACH
+<<<<<<< HEAD
             ? '30rem'
+=======
+            ? '70%'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
             : 'auto'
         }
         header={wizardHeader}

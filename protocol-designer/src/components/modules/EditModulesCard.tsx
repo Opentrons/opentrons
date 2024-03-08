@@ -27,6 +27,11 @@ import { CrashInfoBox } from './CrashInfoBox'
 import { ModuleRow } from './ModuleRow'
 import { AdditionalItemsRow } from './AdditionalItemsRow'
 import { isModuleWithCollisionIssue } from './utils'
+<<<<<<< HEAD
+=======
+import styles from './styles.module.css'
+import { AdditionalEquipmentEntity } from '@opentrons/step-generation'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { StagingAreasRow } from './StagingAreasRow'
 import { MultipleModulesRow } from './MultipleModulesRow'
 

@@ -7,7 +7,13 @@ import {
   VIEWPORT,
 } from '@opentrons/components'
 import { InputField } from '../../InputField'
+<<<<<<< HEAD:app/src/atoms/SoftwareKeyboard/IndividualKey/IndividualKey.stories.tsx
 import { IndividualKey } from '.'
+=======
+import { Numpad } from './'
+import '../index.css'
+import './index.css'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405)):app/src/atoms/SoftwareKeyboard/Numpad/Numpad.stories.tsx
 
 import type { Meta, StoryObj } from '@storybook/react'
 

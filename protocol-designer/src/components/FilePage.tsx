@@ -28,10 +28,15 @@ import { actions as steplistActions } from '../steplist'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../constants'
 import { FilePipettesModal } from './modals/FilePipettesModal'
+<<<<<<< HEAD
 import { getTopPortalEl } from './portals/TopPortal'
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 import type { ModuleType } from '@opentrons/shared-data'
 import type { FileMetadataFields } from '../file-data'
+import { createPortal } from 'react-dom'
+import { getTopPortalEl } from './portals/TopPortal'
 
 // TODO(mc, 2020-02-28): explore l10n for these dates
 const DATE_ONLY_FORMAT = 'MMM dd, yyyy'

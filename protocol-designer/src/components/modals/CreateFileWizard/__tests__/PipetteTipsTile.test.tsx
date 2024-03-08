@@ -50,7 +50,10 @@ const mockWizardTileProps: Partial<WizardTileProps> = {
   goBack: vi.fn(),
   proceed: vi.fn(),
   watch: vi.fn((name: keyof typeof values) => values[name]) as any,
+<<<<<<< HEAD
   getValues: vi.fn(() => values) as any,
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 }
 
 const fixtureTipRack10ul = {
@@ -94,7 +97,11 @@ describe('PipetteTipsTile', () => {
   afterEach(() => {
     cleanup()
   })
+<<<<<<< HEAD
   it('renders default tiprack options for 1000uL flex pipette and btn ctas work', () => {
+=======
+  it('renders default tiprack options for 50uL flex pipette and btn ctas work', () => {
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     render(props)
     screen.getByText('Choose tips for Flex 1-Channel 1000 μL')
     screen.getAllByText('mock EquipmentOption')
@@ -132,7 +139,11 @@ describe('PipetteTipsTile', () => {
     screen.getByText('Custom tips')
     expect(screen.getAllByText('mock EquipmentOption')).toHaveLength(3)
   })
+<<<<<<< HEAD
   it('renders all tiprack options for 1000uL flex pipette when all tipracks are true', () => {
+=======
+  it('renders all tiprack options for 50uL flex pipette when all tipracks are true', () => {
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     vi.mocked(getAllowAllTipracks).mockReturnValue(true)
     render(props)
     screen.getByText('Choose tips for Flex 1-Channel 1000 μL')

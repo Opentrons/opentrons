@@ -1,6 +1,10 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+<<<<<<< HEAD
 import { COLORS, TYPOGRAPHY, StyledText } from '@opentrons/components'
+=======
+import { COLORS, TYPOGRAPHY } from '@opentrons/components'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
 import { StatusLabel } from '../../atoms/StatusLabel'
 import type { MagneticStatus } from '../../redux/modules/api-types'

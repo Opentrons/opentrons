@@ -31,7 +31,11 @@ vi.mock('../../../organisms/RunTimeControl/hooks')
 vi.mock('../../../redux/discovery')
 vi.mock('../../../redux/networking')
 vi.mock('../hooks')
+<<<<<<< HEAD
 vi.mock('../../../resources/runs')
+=======
+vi.mock('../../../resources/runs/useNotifyRunQuery')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const MOCK_OTIE = {
   name: 'otie',

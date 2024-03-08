@@ -29,6 +29,8 @@ import { useNotifyRunQuery } from '../../../../../resources/runs'
 
 import type { Mock } from 'vitest'
 
+import type { Mock } from 'vitest'
+
 const MOCK_LIQUIDS_IN_LOAD_ORDER = [
   {
     id: '0',
@@ -61,7 +63,11 @@ vi.mock('../../utils/getLocationInfoNames')
 vi.mock('../LiquidsLabwareDetailsModal')
 vi.mock('@opentrons/api-client')
 vi.mock('../../../../../redux/analytics')
+<<<<<<< HEAD
 vi.mock('../../../../../resources/runs')
+=======
+vi.mock('../../../../../resources/runs/useNotifyRunQuery')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const render = (props: React.ComponentProps<typeof SetupLiquidsList>) => {
   return renderWithProviders(<SetupLiquidsList {...props} />, {
@@ -100,7 +106,11 @@ describe('SetupLiquidsList', () => {
 
   it('renders the total volume of the liquid, sample display name, and description', () => {
     render(props)
+<<<<<<< HEAD
     screen.getAllByText(nestedTextMatcher('400.0 µL'))
+=======
+    screen.getAllByText(nestedTextMatcher('400 µL'))
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     screen.getByText('mock liquid 1')
     screen.getByText('mock sample')
     screen.getByText('mock liquid 2')
@@ -118,7 +128,11 @@ describe('SetupLiquidsList', () => {
     screen.getByText('Location')
     screen.getByText('Labware name')
     screen.getByText('Volume')
+<<<<<<< HEAD
     screen.getAllByText(nestedTextMatcher('200.0 µL'))
+=======
+    screen.getAllByText(nestedTextMatcher('200 µL'))
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     screen.getByText('4')
     screen.getByText('mock labware name')
   })

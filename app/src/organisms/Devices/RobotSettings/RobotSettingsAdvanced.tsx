@@ -41,7 +41,11 @@ import { DeviceResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/DeviceRe
 import { DeviceResetModal } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetModal'
 import { FactoryModeSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryModeSlideout'
 import { handleUpdateBuildroot } from './UpdateBuildroot'
+<<<<<<< HEAD
 import { getRobotSerialNumber, UNREACHABLE } from '../../../redux/discovery'
+=======
+import { UNREACHABLE } from '../../../redux/discovery'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { getTopPortalEl } from '../../../App/portal'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 

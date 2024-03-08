@@ -1,16 +1,26 @@
 import { describe, it, beforeEach, expect } from 'vitest'
+<<<<<<< HEAD
 import { fixtureP300SingleV2Specs } from '@opentrons/shared-data'
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import {
   volumeInCapacityForMulti,
   volumeInCapacityForMultiAspirate,
   volumeInCapacityForMultiDispense,
 } from '../utils'
+<<<<<<< HEAD
 import { fixture_tiprack_300_ul } from '@opentrons/shared-data/labware/fixtures/2'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   PipetteEntities,
   LabwareEntities,
 } from '@opentrons/step-generation'
+=======
+import { fixtureP300Single } from '@opentrons/shared-data/pipette/fixtures/name'
+import { fixture_tiprack_300_ul } from '@opentrons/shared-data/labware/fixtures/2'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { PipetteEntities } from '@opentrons/step-generation'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import type { FormData } from '../../../../form-types'
 
 const fixtureTiprack300ul = fixture_tiprack_300_ul as LabwareDefinition2

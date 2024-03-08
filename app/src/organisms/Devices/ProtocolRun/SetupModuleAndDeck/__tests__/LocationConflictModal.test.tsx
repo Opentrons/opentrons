@@ -15,7 +15,10 @@ import {
   useModulesQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { i18n } from '../../../../../i18n'
 import { mockHeaterShaker } from '../../../../../redux/modules/__fixtures__'
 import { useCloseCurrentRun } from '../../../../ProtocolUpload/hooks'
@@ -25,8 +28,11 @@ import { useNotifyDeckConfigurationQuery } from '../../../../../resources/deck_c
 import type { DeckConfiguration } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
+<<<<<<< HEAD
 vi.mock('../../../../../resources/deck_configuration')
 vi.mock('../../../../ProtocolUpload/hooks')
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const mockFixture = {
   cutoutId: 'cutoutB3',
@@ -55,11 +61,15 @@ describe('LocationConflictModal', () => {
       deckDef: ot3StandardDeckV5 as any,
       robotName: 'otie',
     }
+<<<<<<< HEAD
     vi.mocked(useCloseCurrentRun).mockReturnValue({
       closeCurrentRun: vi.fn(),
     } as any)
     vi.mocked(useModulesQuery).mockReturnValue({ data: { data: [] } } as any)
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
+=======
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       data: [mockFixture],
     } as UseQueryResult<DeckConfiguration>)
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
@@ -104,7 +114,11 @@ describe('LocationConflictModal', () => {
     expect(mockUpdate).toHaveBeenCalled()
   })
   it('should render the modal information for a single slot fixture conflict', () => {
+<<<<<<< HEAD
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
+=======
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       data: [
         {
           cutoutId: 'cutoutB1',

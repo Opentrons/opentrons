@@ -7,7 +7,14 @@ import {
   VIEWPORT,
 } from '@opentrons/components'
 import { InputField } from '../../InputField'
+<<<<<<< HEAD:app/src/atoms/SoftwareKeyboard/FullKeyboard/FullKeyboard.stories.tsx
 import { FullKeyboard } from '.'
+=======
+import { NormalKeyboard } from '.'
+
+import '../index.css'
+import './index.css'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405)):app/src/atoms/SoftwareKeyboard/NormalKeyboard/NormalKeyboard.stories.tsx
 
 import type { Meta, StoryObj } from '@storybook/react'
 

@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest'
 
+<<<<<<< HEAD
 import { transfer_settings, ot2DeckDefV5 } from '@opentrons/shared-data'
+=======
+import { transfer_settings, ot2DeckDefV4 } from '@opentrons/shared-data'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { getLabwareRenderInfo } from '../getLabwareRenderInfo'
 import type {
   CompletedProtocolAnalysis,
@@ -8,7 +12,11 @@ import type {
 } from '@opentrons/shared-data'
 
 const protocolWithMagTempTC = (transfer_settings as unknown) as CompletedProtocolAnalysis
+<<<<<<< HEAD
 const standardDeckDef = ot2DeckDefV5 as any
+=======
+const standardDeckDef = ot2DeckDefV4 as any
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 describe('getLabwareRenderInfo', () => {
   it('should gather labware coordinates', () => {

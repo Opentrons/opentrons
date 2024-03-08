@@ -29,6 +29,10 @@ describe('HeaterShakerSlideout', () => {
   it('renders correct information when type is number', () => {
     render(props)
     screen.getByText('caption')
+<<<<<<< HEAD
+=======
+    screen.getByText('secondary caption')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     screen.getByText('rpm')
   })
   it('renders correct information when type is text', () => {

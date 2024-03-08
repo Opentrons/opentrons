@@ -1,10 +1,14 @@
 import type { DevInternalFlag } from './types'
 
+<<<<<<< HEAD
 export const DEV_INTERNAL_FLAGS: DevInternalFlag[] = [
   'protocolStats',
   'enableRunNotes',
   'enableQuickTransfer',
 ]
+=======
+export const DEV_INTERNAL_FLAGS: DevInternalFlag[] = ['protocolStats']
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 // action type constants
 export const INITIALIZED: 'config:INITIALIZED' = 'config:INITIALIZED'

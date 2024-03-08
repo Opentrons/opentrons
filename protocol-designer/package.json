@@ -8,7 +8,12 @@
     "email": "engineering@opentrons.com"
   },
   "name": "protocol-designer",
+<<<<<<< HEAD
   "productName": "Opentrons Protocol Designer",
+=======
+  "type": "module",
+  "productName": "Opentrons Protocol Designer BETA",
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   "private": true,
   "version": "0.0.0-dev",
   "description": "Protocol designer app",

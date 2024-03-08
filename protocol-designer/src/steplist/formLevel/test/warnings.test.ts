@@ -1,5 +1,9 @@
 import { describe, it, beforeEach, expect } from 'vitest'
+<<<<<<< HEAD
 import { fixture24Tuberack, fixture96Plate } from '@opentrons/shared-data'
+=======
+import { fixture_24_tuberack } from '@opentrons/shared-data/labware/fixtures/2'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import {
   _minAirGapVolume,
   belowPipetteMinimumVolume,

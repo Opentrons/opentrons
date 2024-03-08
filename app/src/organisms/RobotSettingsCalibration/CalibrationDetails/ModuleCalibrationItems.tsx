@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 
+<<<<<<< HEAD
 import {
   BORDERS,
   COLORS,
@@ -9,6 +10,9 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+=======
+import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import { formatLastCalibrated } from './utils'

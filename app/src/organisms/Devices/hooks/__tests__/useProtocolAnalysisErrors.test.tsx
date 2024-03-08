@@ -20,7 +20,11 @@ import type {
 } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
+<<<<<<< HEAD
 vi.mock('../../../../resources/runs')
+=======
+vi.mock('../../../../resources/runs/useNotifyRunQuery')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 describe('useProtocolAnalysisErrors hook', () => {
   beforeEach(() => {

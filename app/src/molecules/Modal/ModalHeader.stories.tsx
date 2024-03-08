@@ -1,5 +1,10 @@
 import * as React from 'react'
+<<<<<<< HEAD
 import { COLORS, VIEWPORT } from '@opentrons/components'
+=======
+import { COLORS } from '@opentrons/components'
+import { touchScreenViewport } from '../../DesignTokens/constants'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { ModalHeader } from './ModalHeader'
 import type { Story, Meta } from '@storybook/react'
 

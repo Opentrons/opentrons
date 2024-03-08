@@ -1,5 +1,9 @@
 import * as React from 'react'
+<<<<<<< HEAD
 import { vi, it, expect, describe, beforeEach } from 'vitest'
+=======
+import { vi, it, expect, describe } from 'vitest'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { renderHook } from '@testing-library/react'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
@@ -10,7 +14,10 @@ import { useIsOEMMode } from '../../../../resources/robot-settings/hooks'
 import { useAttachedPipettesFromInstrumentsQuery } from '..'
 
 vi.mock('@opentrons/react-api-client')
+<<<<<<< HEAD
 vi.mock('../../../../resources/robot-settings/hooks')
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 describe('useAttachedPipettesFromInstrumentsQuery hook', () => {
   beforeEach(() => {

@@ -591,7 +591,11 @@ export const DropTipWizardComponent = (
         top="16px"
         border={BORDERS.lineBorder}
         boxShadow={BORDERS.shadowSmall}
+<<<<<<< HEAD
         borderRadius={BORDERS.borderRadius16}
+=======
+        borderRadius={BORDERS.borderRadiusSize4}
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
         position={POSITION_ABSOLUTE}
         backgroundColor={COLORS.white}
       >

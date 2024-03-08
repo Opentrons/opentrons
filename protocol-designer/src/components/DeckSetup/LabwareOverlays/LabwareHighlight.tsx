@@ -10,7 +10,11 @@ import {
 import { THERMOCYCLER_PROFILE } from '../../../constants'
 
 import styles from './LabwareOverlays.module.css'
+<<<<<<< HEAD
 import type { LabwareOnDeck } from '../../../step-forms'
+=======
+import { LabwareOnDeck } from '../../../step-forms'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 interface LabwareHighlightProps {
   labwareOnDeck: LabwareOnDeck

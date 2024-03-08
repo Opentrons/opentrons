@@ -144,7 +144,11 @@ vi.mock('../../../../resources/deck_configuration/utils')
 vi.mock('../../../../resources/deck_configuration/hooks')
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('../../../ProtocolUpload/hooks/useMostRecentRunId')
+<<<<<<< HEAD
 vi.mock('../../../../resources/runs')
+=======
+vi.mock('../../../../resources/runs/useNotifyRunQuery')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
@@ -810,7 +814,11 @@ describe('ProtocolRunHeader', () => {
 
     screen.getByText('Run completed.')
   })
+<<<<<<< HEAD
   it('clicking close on a terminal run banner closes the run context', async () => {
+=======
+  it('clicking close on a terminal run banner closes the run context and dismisses the banner', async () => {
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID)
       .thenReturn({

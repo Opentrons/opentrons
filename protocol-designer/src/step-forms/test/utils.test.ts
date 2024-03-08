@@ -1,7 +1,11 @@
 import { describe, it, expect } from 'vitest'
+<<<<<<< HEAD
 import { getIdsInRange, getUnoccupiedSlotForMoveableTrash } from '../utils'
 import type { AddressableAreaName, CreateCommand } from '@opentrons/shared-data'
 
+=======
+import { getIdsInRange } from '../utils'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 describe('getIdsInRange', () => {
   it('gets id in array of length 1', () => {
     expect(getIdsInRange(['X'], 'X', 'X')).toEqual(['X'])

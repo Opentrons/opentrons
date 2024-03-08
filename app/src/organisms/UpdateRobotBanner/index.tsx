@@ -38,7 +38,11 @@ export function UpdateRobotBanner(
       onClick={(e: React.MouseEvent) => e.stopPropagation()}
       flexDirection={DIRECTION_COLUMN}
     >
+<<<<<<< HEAD
       <Banner type="error" {...styleProps} iconMarginLeft={SPACING.spacing4}>
+=======
+      <Banner type="error" {...styleProps}>
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
         <StyledText as="p" marginRight={SPACING.spacing4}>
           {t('branded:robot_software_update_required')}
         </StyledText>

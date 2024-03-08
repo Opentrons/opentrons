@@ -1,11 +1,15 @@
 import * as React from 'react'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen, cleanup } from '@testing-library/react'
+<<<<<<< HEAD
 import {
   FLEX_ROBOT_TYPE,
   LabwareDefinition2,
   fixtureTiprack300ul,
 } from '@opentrons/shared-data'
+=======
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { renderWithProviders } from '../../../__testing-utils__'
 import { createFile, getRobotType } from '../../../file-data/selectors'
 import {
@@ -31,14 +35,23 @@ vi.mock('../../../navigation/actions')
 vi.mock('../../../navigation/selectors')
 vi.mock('../../../file-data/selectors')
 vi.mock('../../Hints/useBlockingHint')
+<<<<<<< HEAD
 vi.mock('../utils/getUnusedStagingAreas')
 vi.mock('../utils/getUnusedTrash')
+=======
+vi.mock('../utils')
+
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 const render = () => {
   return renderWithProviders(<FileSidebar />, { i18nInstance: i18n })[0]
 }
 
 describe('FileSidebar', () => {
   beforeEach(() => {
+<<<<<<< HEAD
+=======
+    vi.mocked(getUnusedEntities).mockReturnValue([])
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     vi.mocked(getUnusedStagingAreas).mockReturnValue([])
     vi.mocked(getUnusedTrash).mockReturnValue({
       trashBinUnused: false,
@@ -73,6 +86,7 @@ describe('FileSidebar', () => {
   afterEach(() => {
     vi.resetAllMocks()
     cleanup()
+<<<<<<< HEAD
   })
   it('renders the file sidebar and exports with blocking hint for exporting', () => {
     vi.mocked(useBlockingHint).mockReturnValue(<div>mock blocking hint</div>)
@@ -80,6 +94,8 @@ describe('FileSidebar', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Export' }))
     expect(vi.mocked(useBlockingHint)).toHaveBeenCalled()
     screen.getByText('mock blocking hint')
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   })
   it('renders the file sidebar and buttons work as expected with no warning upon export', () => {
     render()
@@ -98,6 +114,7 @@ describe('FileSidebar', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Export' }))
     screen.getByText('Your protocol has no steps')
   })
+<<<<<<< HEAD
   it('renders the unused pipette warning', () => {
     vi.mocked(getInitialDeckSetup).mockReturnValue({
       modules: {},
@@ -111,6 +128,18 @@ describe('FileSidebar', () => {
           spec: {
             displayName: 'mock display name',
           } as any,
+=======
+  it('renders the unused pipette and module warning', () => {
+    vi.mocked(getUnusedEntities).mockReturnValue([
+      {
+        mount: 'left',
+        name: 'p1000_96',
+        id: 'pipetteId',
+        tiprackDefURI: 'mockURI',
+        spec: {
+          name: 'mock pip name',
+          displayName: 'mock display name',
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
         },
       },
       additionalEquipmentOnDeck: {},

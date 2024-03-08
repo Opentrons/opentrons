@@ -22,7 +22,10 @@ import type {
 
 const CONFIG_VERSION_LATEST = 21 // update this after each config version bump
 
+<<<<<<< HEAD
 const PKG_VERSION: string = _PKG_VERSION_
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 export const DEFAULTS_V12: ConfigV12 = {
   version: 12,
   devtools: false,

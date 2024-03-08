@@ -2,7 +2,11 @@ import { when } from 'vitest-when'
 import { beforeEach, describe, it, expect, afterEach, vi } from 'vitest'
 import {
   getLabwareDefURI,
+<<<<<<< HEAD
   getPipetteSpecsV2,
+=======
+  getPipetteNameSpecs,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   fixtureTiprack1000ul as _fixtureTiprack1000ul,
 } from '@opentrons/shared-data'
 import { heaterShakerOpenLatch } from '../commandCreators/atomic/heaterShakerOpenLatch'

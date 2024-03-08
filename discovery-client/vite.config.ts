@@ -1,14 +1,24 @@
+<<<<<<< HEAD
 import { versionForProject } from '../scripts/git-version.mjs'
 import pkg from './package.json'
 import path from 'path'
 import { defineConfig } from 'vite'
+=======
+import { versionForProject } from '../scripts/git-version'
+import pkg from './package.json'
+import path from 'path'
+import { UserConfig, defineConfig } from 'vite'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import react from '@vitejs/plugin-react'
 import postCssImport from 'postcss-import'
 import postCssApply from 'postcss-apply'
 import postColorModFunction from 'postcss-color-mod-function'
 import postCssPresetEnv from 'postcss-preset-env'
 import lostCss from 'lost'
+<<<<<<< HEAD
 import type { UserConfig } from 'vite'
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 export default defineConfig(
   async (): Promise<UserConfig> => {

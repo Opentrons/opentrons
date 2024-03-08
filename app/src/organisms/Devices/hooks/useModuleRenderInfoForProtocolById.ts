@@ -6,6 +6,10 @@ import {
   getDeckDefFromRobotType,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
+<<<<<<< HEAD
+=======
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 import { getProtocolModulesInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'

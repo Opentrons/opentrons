@@ -8,7 +8,11 @@ import {
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
 } from '@opentrons/shared-data'
 
+<<<<<<< HEAD
 import type { PipetteV2Specs } from '@opentrons/shared-data'
+=======
+import type { PipetteNameSpecs } from '@opentrons/shared-data'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 import type {
   LabwareEntities,

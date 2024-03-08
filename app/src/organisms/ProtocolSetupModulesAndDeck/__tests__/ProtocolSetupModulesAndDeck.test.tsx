@@ -5,6 +5,10 @@ import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
 
+<<<<<<< HEAD
+=======
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import {
   FLEX_ROBOT_TYPE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
@@ -41,10 +45,17 @@ import { useRunStatus } from '../../RunTimeControl/hooks'
 import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 
+<<<<<<< HEAD
 vi.mock('../../../resources/runs')
 vi.mock('../../../redux/discovery')
 vi.mock('../../../organisms/Devices/hooks')
 vi.mock('../../../resources/deck_configuration')
+=======
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../resources/runs/hooks')
+vi.mock('../../../redux/discovery')
+vi.mock('../../../organisms/Devices/hooks')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 vi.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
@@ -55,7 +66,10 @@ vi.mock('../../ModuleWizardFlows')
 vi.mock('../FixtureTable')
 vi.mock('../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal')
 vi.mock('../ModulesAndDeckMapViewModal')
+<<<<<<< HEAD
 vi.mock('../../RunTimeControl/hooks')
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -110,10 +124,17 @@ describe('ProtocolSetupModulesAndDeck', () => {
       .calledWith(mockRobotSideAnalysis, flexDeckDef)
       .thenReturn([])
     when(vi.mocked(getAttachedProtocolModuleMatches))
+<<<<<<< HEAD
       .calledWith([], [], [])
       .thenReturn([])
     when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith([], [])
+=======
+      .calledWith([], [])
+      .thenReturn([])
+    when(vi.mocked(getUnmatchedModulesForProtocol))
+      .calledWith([], [])
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     vi.mocked(getLocalRobot).mockReturnValue({
       ...mockConnectedRobot,
@@ -122,7 +143,11 @@ describe('ProtocolSetupModulesAndDeck', () => {
     vi.mocked(LocationConflictModal).mockReturnValue(
       <div>mock location conflict modal</div>
     )
+<<<<<<< HEAD
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+=======
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue(({
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       data: [],
     } as unknown) as UseQueryResult<DeckConfiguration>)
     when(vi.mocked(useRunCalibrationStatus))
@@ -137,7 +162,10 @@ describe('ProtocolSetupModulesAndDeck', () => {
       chainLiveCommands: mockChainLiveCommands,
     } as any)
     vi.mocked(FixtureTable).mockReturnValue(<div>mock FixtureTable</div>)
+<<<<<<< HEAD
     vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_IDLE)
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   })
 
   afterEach(() => {
@@ -311,7 +339,11 @@ describe('ProtocolSetupModulesAndDeck', () => {
   })
 
   it('should render mock Fixture table and module location conflict', () => {
+<<<<<<< HEAD
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
+=======
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       data: [mockFixture],
     } as UseQueryResult<DeckConfiguration>)
     vi.mocked(getAttachedProtocolModuleMatches).mockReturnValue([

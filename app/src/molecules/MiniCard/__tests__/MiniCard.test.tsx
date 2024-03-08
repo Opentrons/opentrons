@@ -27,7 +27,11 @@ describe('MiniCard', () => {
     const miniCard = screen.getByText('mock mini card')
     expect(miniCard).toHaveStyle(`background-color: ${COLORS.grey10}`)
     expect(miniCard).toHaveStyle(`border: 1px solid ${COLORS.grey35}`)
+<<<<<<< HEAD
     expect(miniCard).toHaveStyle(`border-radius: ${BORDERS.borderRadius8}`)
+=======
+    expect(miniCard).toHaveStyle(`border-radius: ${BORDERS.radiusSoftCorners}`)
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     expect(miniCard).toHaveStyle(`padding: ${SPACING.spacing8}`)
     expect(miniCard).toHaveStyle(`width: 100%`)
     expect(miniCard).toHaveStyle(`cursor: pointer`)
@@ -39,7 +43,11 @@ describe('MiniCard', () => {
     const miniCard = screen.getByText('mock mini card')
     expect(miniCard).toHaveStyle(`background-color: ${COLORS.blue10}`)
     expect(miniCard).toHaveStyle(`border: 1px solid ${COLORS.blue50}`)
+<<<<<<< HEAD
     expect(miniCard).toHaveStyle(`border-radius: ${BORDERS.borderRadius8}`)
+=======
+    expect(miniCard).toHaveStyle(`border-radius: ${BORDERS.radiusSoftCorners}`)
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     expect(miniCard).toHaveStyle(`padding: ${SPACING.spacing8}`)
     expect(miniCard).toHaveStyle(`width: 100%`)
     expect(miniCard).toHaveStyle(`cursor: pointer`)
@@ -52,7 +60,11 @@ describe('MiniCard', () => {
     const miniCard = screen.getByText('mock mini card')
     expect(miniCard).toHaveStyle(`background-color: ${COLORS.red20}`)
     expect(miniCard).toHaveStyle(`border: 1px solid ${COLORS.red50}`)
+<<<<<<< HEAD
     expect(miniCard).toHaveStyle(`border-radius: ${BORDERS.borderRadius8}`)
+=======
+    expect(miniCard).toHaveStyle(`border-radius: ${BORDERS.radiusSoftCorners}`)
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     expect(miniCard).toHaveStyle(`padding: ${SPACING.spacing8}`)
     expect(miniCard).toHaveStyle(`width: 100%`)
     expect(miniCard).toHaveStyle(`cursor: pointer`)

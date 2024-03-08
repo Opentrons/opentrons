@@ -3,14 +3,22 @@ import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
+<<<<<<< HEAD
 import { useNotifyAllRunsQuery } from '../../../../resources/runs'
+=======
+import { useNotifyAllRunsQuery } from '../../../../resources/runs/useNotifyAllRunsQuery'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { RecentRunProtocolCard, RecentRunProtocolCarousel } from '..'
 
 import type { RunData } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../RecentRunProtocolCard')
+<<<<<<< HEAD
 vi.mock('../../../../resources/runs')
+=======
+vi.mock('../../../../resources/runs/useNotifyAllRunsQuery')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const mockRun = {
   actions: [],

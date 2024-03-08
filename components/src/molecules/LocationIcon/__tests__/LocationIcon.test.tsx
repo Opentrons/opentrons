@@ -2,8 +2,13 @@ import * as React from 'react'
 import { describe, it, beforeEach, expect } from 'vitest'
 import { renderWithProviders } from '../../../testing/utils'
 import { screen } from '@testing-library/react'
+<<<<<<< HEAD
 import { SPACING } from '../../../ui-style-constants'
 import { BORDERS, COLORS } from '../../../helix-design-system'
+=======
+import { BORDERS, SPACING } from '../../../ui-style-constants'
+import { COLORS } from '../../../helix-design-system'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 import { LocationIcon } from '..'
 

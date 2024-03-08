@@ -23,8 +23,13 @@ import type { AxiosError } from 'axios'
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../ProtocolUpload/hooks')
 vi.mock('../useIsFlex')
+<<<<<<< HEAD
 vi.mock('../../../../resources/runs')
 vi.mock('../../../../resources/maintenance_runs')
+=======
+vi.mock('../../../../resources/runs/useNotifyAllRunsQuery')
+vi.mock('../../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const mockEstopStatus = {
   data: {

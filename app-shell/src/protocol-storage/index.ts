@@ -1,6 +1,10 @@
 import fse from 'fs-extra'
 import path from 'path'
 import { shell } from 'electron'
+<<<<<<< HEAD
+=======
+import first from 'lodash/first'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 import {
   ADD_PROTOCOL,

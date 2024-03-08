@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+/* eslint-disable jest/consistent-test-it */
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { beforeEach, describe, it, expect, test } from 'vitest'
 import {
   ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,

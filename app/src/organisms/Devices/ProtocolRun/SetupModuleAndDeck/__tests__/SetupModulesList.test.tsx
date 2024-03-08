@@ -3,7 +3,11 @@ import { when } from 'vitest-when'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { renderWithProviders } from '../../../../../__testing-utils__'
+<<<<<<< HEAD
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+=======
+import { STAGING_AREA_RIGHT_SLOT_FIXTURE } from '@opentrons/shared-data'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { i18n } from '../../../../../i18n'
 import {
   mockMagneticModule as mockMagneticModuleFixture,
@@ -37,8 +41,13 @@ vi.mock('../LocationConflictModal')
 vi.mock('../UnMatchedModuleWarning')
 vi.mock('../../../../ModuleCard/ModuleSetupModal')
 vi.mock('../../../../ModuleWizardFlows')
+<<<<<<< HEAD
 vi.mock('../OT2MultipleModulesHelp')
 vi.mock('../../../../../resources/runs')
+=======
+vi.mock('../MultipleModulesModal')
+vi.mock('../../../../../resources/runs/hooks')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 vi.mock('../../../../../redux/config')
 
 const ROBOT_NAME = 'otie'
@@ -92,9 +101,12 @@ describe('SetupModulesList', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
     }
+<<<<<<< HEAD
     when(vi.mocked(useRobot))
       .calledWith(ROBOT_NAME)
       .thenReturn({ robotModel: FLEX_ROBOT_TYPE } as DiscoveredRobot)
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     mockChainLiveCommands = vi.fn()
     mockChainLiveCommands.mockResolvedValue(null)
     vi.mocked(ModuleSetupModal).mockReturnValue(<div>mockModuleSetupModal</div>)
@@ -120,6 +132,18 @@ describe('SetupModulesList', () => {
       <div>mock location conflict modal</div>
     )
   })
+<<<<<<< HEAD
+=======
+
+  it('should render the list view headers', () => {
+    when(useRunHasStarted).calledWith(RUN_ID).thenReturn(false)
+    when(useModuleRenderInfoForProtocolById).calledWith(RUN_ID).thenReturn({})
+    render(props)
+    screen.getByText('Module')
+    screen.getByText('Location')
+    screen.getByText('Status')
+  })
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
   it('should render a magnetic module that is connected', () => {
     vi.mocked(useModuleRenderInfoForProtocolById).mockReturnValue({
@@ -295,6 +319,7 @@ describe('SetupModulesList', () => {
     screen.getByText('Connected')
   })
 
+<<<<<<< HEAD
   it('should render the MoaM component when Moam is attached and robot is OT2', () => {
     when(vi.mocked(useRobot))
       .calledWith(ROBOT_NAME)
@@ -302,6 +327,10 @@ describe('SetupModulesList', () => {
     vi.mocked(OT2MultipleModulesHelp).mockReturnValue(
       <div>mock Moam modal</div>
     )
+=======
+  it('should render the MoaM component when Moam is attached', () => {
+    vi.mocked(MultipleModulesModal).mockReturnValue(<div>mock Moam modal</div>)
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     when(useUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({
@@ -406,4 +435,39 @@ describe('SetupModulesList', () => {
     fireEvent.click(moduleSetup)
     screen.getByText('mockModuleSetupModal')
   })
+<<<<<<< HEAD
+=======
+  it('should render a magnetic block with a conflicted fixture', () => {
+    when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.mocked(useModuleRenderInfoForProtocolById).mockReturnValue({
+      [mockMagneticBlock.id]: {
+        moduleId: mockMagneticBlock.id,
+        x: MOCK_MAGNETIC_MODULE_COORDS[0],
+        y: MOCK_MAGNETIC_MODULE_COORDS[1],
+        z: MOCK_MAGNETIC_MODULE_COORDS[2],
+        moduleDef: {
+          id: 'magneticBlock_id',
+          model: mockMagneticBlock.moduleModel,
+          moduleType: mockMagneticBlock.moduleType,
+          displayName: mockMagneticBlock.displayName,
+        },
+        nestedLabwareDef: null,
+        nestedLabwareId: null,
+        protocolLoadOrder: 0,
+        slotName: 'B3',
+        attachedModuleMatch: null,
+        conflictedFixture: {
+          cutoutId: 'cutoutB3',
+          cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+        },
+      },
+    } as any)
+    render(props)
+    screen.getByText('No USB connection required')
+    screen.getByText('Location conflict')
+    screen.getByText('Magnetic Block GEN1')
+    fireEvent.click(screen.getByRole('button', { name: 'Resolve' }))
+    screen.getByText('mock location conflict modal')
+  })
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 })

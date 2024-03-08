@@ -12,11 +12,21 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
+<<<<<<< HEAD
 import { getIsTouchTipField } from '../../../../form-types'
 import { PDAlert } from '../../../alerts/PDAlert'
 import { TOO_MANY_DECIMALS, PERCENT_RANGE_TO_SHOW_WARNING } from './constants'
 import { TipPositionAllViz } from './TipPositionAllViz'
 import * as utils from './utils'
+=======
+import modalStyles from '../../../modals/modal.module.css'
+import { getIsTouchTipField } from '../../../../form-types'
+import { TipPositionZAxisViz } from './TipPositionZAxisViz'
+
+import styles from './TipPositionInput.module.css'
+import * as utils from './utils'
+import type { StepFieldName } from '../../../../form-types'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 import styles from './TipPositionInput.module.css'
 import modalStyles from '../../../modals/modal.module.css'
@@ -297,6 +307,7 @@ export const TipPositionModal = (
   const isMixAspDispField = zSpec?.name === 'mix_mmFromBottom'
 
   return createPortal(
+<<<<<<< HEAD
     <AlertModal
       alertOverlay
       buttons={[
@@ -367,6 +378,106 @@ export const TipPositionModal = (
         </Flex>
       </div>
     </AlertModal>,
+=======
+    <HandleKeypress
+      preventDefault
+      handlers={[
+        {
+          key: 'ArrowUp',
+          shiftKey: false,
+          onPress: makeHandleIncrement(SMALL_STEP_MM),
+        },
+        {
+          key: 'ArrowUp',
+          shiftKey: true,
+          onPress: makeHandleIncrement(LARGE_STEP_MM),
+        },
+        {
+          key: 'ArrowDown',
+          shiftKey: false,
+          onPress: makeHandleDecrement(SMALL_STEP_MM),
+        },
+        {
+          key: 'ArrowDown',
+          shiftKey: true,
+          onPress: makeHandleDecrement(LARGE_STEP_MM),
+        },
+      ]}
+    >
+      <AlertModal
+        alertOverlay
+        buttons={[
+          { onClick: handleCancel, children: t('button:cancel') },
+          {
+            onClick: handleDone,
+            children: t('button:done'),
+            disabled: hasVisibleErrors,
+          },
+        ]}
+        className={modalStyles.modal}
+        contentsClassName={cx(modalStyles.modal_contents)}
+        onCloseClick={handleCancel}
+      >
+        <div className={styles.modal_header}>
+          <h4>{t('tip_position.title')}</h4>
+          <p>{t(`tip_position.body.${name}`)}</p>
+        </div>
+        <div className={styles.main_row}>
+          <Flex alignItems="flex-start">
+            <div>
+              <RadioGroup
+                value={isDefault ? 'default' : 'custom'}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setIsDefault(e.currentTarget.value === 'default')
+                }}
+                options={[
+                  {
+                    name: isMixAspDispField
+                      ? `Aspirate 1mm, Dispense 0.5mm from the bottom (default)`
+                      : `${defaultMmFromBottom} mm from the bottom (default)`,
+                    value: 'default',
+                  },
+                  {
+                    name: 'Custom',
+                    value: 'custom',
+                  },
+                ]}
+                name="TipPositionOptions"
+              />
+              {TipPositionInputField}
+            </div>
+
+            <div className={styles.viz_group}>
+              {!isDefault && (
+                <div className={styles.adjustment_buttons}>
+                  <OutlineButton
+                    id="Increment_tipPosition"
+                    className={styles.adjustment_button}
+                    onClick={makeHandleIncrement(SMALL_STEP_MM)}
+                  >
+                    <Icon name="plus" />
+                  </OutlineButton>
+                  <OutlineButton
+                    id="Decrement_tipPosition"
+                    className={styles.adjustment_button}
+                    onClick={makeHandleDecrement(SMALL_STEP_MM)}
+                  >
+                    <Icon name="minus" />
+                  </OutlineButton>
+                </div>
+              )}
+              <TipPositionZAxisViz
+                mmFromBottom={
+                  value !== null ? Number(value) : defaultMmFromBottom
+                }
+                wellDepthMm={wellDepthMm}
+              />
+            </div>
+          </Flex>
+        </div>
+      </AlertModal>
+    </HandleKeypress>,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     getMainPagePortalEl()
   )
 }

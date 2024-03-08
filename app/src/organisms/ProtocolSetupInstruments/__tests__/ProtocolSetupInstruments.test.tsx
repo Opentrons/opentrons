@@ -20,7 +20,10 @@ vi.mock('@opentrons/react-api-client')
 vi.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
+<<<<<<< HEAD
 vi.mock('../../../resources/robot-settings/hooks')
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const mockGripperData = {
   instrumentModel: 'gripper_v1',

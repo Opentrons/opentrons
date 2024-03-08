@@ -59,7 +59,10 @@ describe('ConfirmCancelModal', () => {
     when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
     })
+<<<<<<< HEAD
     vi.mocked(useIsFlex).mockReturnValue(true)
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
     props = { onClose: vi.fn(), runId: RUN_ID, robotName: ROBOT_NAME }
   })
@@ -70,11 +73,21 @@ describe('ConfirmCancelModal', () => {
 
   it('should render the correct title', () => {
     render(props)
+<<<<<<< HEAD
     screen.getByText('Are you sure you want to cancel?')
   })
   it('should render the correct body text for a Flex', () => {
     render(props)
     screen.getByText('Doing so will terminate this run and home your robot.')
+=======
+    screen.getByText('Are you sure you want to cancel this run?')
+  })
+  it('should render the correct body', () => {
+    render(props)
+    screen.getByText(
+      'Doing so will terminate this run, drop any attached tips in the trash container and home your robot.'
+    )
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     screen.getByText(
       'Additionally, any hardware modules used within the protocol will remain active and maintain their current states until deactivated.'
     )

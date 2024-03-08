@@ -1,7 +1,11 @@
 import * as React from 'react'
 import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
+<<<<<<< HEAD
 import { QueryClient, QueryClientProvider } from 'react-query'
+=======
+import { QueryClient, QueryClientProvider, UseQueryResult } from 'react-query'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react'
@@ -33,7 +37,11 @@ import type { StoredProtocolData } from '../../../../redux/protocol-storage'
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../redux/protocol-storage/selectors')
+<<<<<<< HEAD
 vi.mock('../../../../resources/runs')
+=======
+vi.mock('../../../../resources/runs/useNotifyRunQuery')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const store: Store<any> = createStore(vi.fn(), {})
 

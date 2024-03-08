@@ -9,9 +9,14 @@ import {
 } from '@opentrons/components'
 import { PDListItem } from '../lists'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
+<<<<<<< HEAD
 import type { ModuleType } from '@opentrons/shared-data'
 
 import styles from './StepItem.module.css'
+=======
+import styles from './StepItem.module.css'
+import { ModuleType } from '@opentrons/shared-data'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 export interface ModuleStepItemRowProps {
   label?: string | null

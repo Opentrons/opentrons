@@ -13,10 +13,17 @@ import { uiInitialized } from './redux/shell'
 import { history } from './redux/reducer'
 import { store } from './redux/store'
 
+<<<<<<< HEAD
 import '../src/atoms/SoftwareKeyboard/AlphanumericKeyboard'
 import '../src/atoms/SoftwareKeyboard/FullKeyboard/index.css'
 import '../src/atoms/SoftwareKeyboard/IndividualKey/index.css'
 import '../src/atoms/SoftwareKeyboard/NumericalKeyboard/index.css'
+=======
+import '../src/atoms/SoftwareKeyboard/index.css'
+import '../src/atoms/SoftwareKeyboard/CustomKeyboard/index.css'
+import '../src/atoms/SoftwareKeyboard/NormalKeyboard/index.css'
+import '../src/atoms/SoftwareKeyboard/Numpad/index.css'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 // component tree
 import { App } from './App'

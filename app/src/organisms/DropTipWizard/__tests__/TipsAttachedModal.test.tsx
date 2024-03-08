@@ -10,12 +10,20 @@ import { handleTipsAttachedModal } from '../TipsAttachedModal'
 import { LEFT } from '@opentrons/shared-data'
 import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
 import { ROBOT_MODEL_OT3 } from '../../../redux/discovery'
+<<<<<<< HEAD
 import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs'
+=======
+import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { HostConfig } from '@opentrons/api-client'
 
+<<<<<<< HEAD
 vi.mock('../../../resources/maintenance_runs')
+=======
+vi.mock('../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 vi.mock('../../../resources/useNotifyService')
 
 const MOCK_ACTUAL_PIPETTE = {

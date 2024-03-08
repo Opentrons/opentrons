@@ -16,8 +16,11 @@ const testAliases: {} | { 'file-saver': string } =
     : {}
 
 export default defineConfig({
+<<<<<<< HEAD
   // this makes imports relative rather than absolute
   base: '',
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   build: {
     // Relative to the root
     outDir: 'dist',

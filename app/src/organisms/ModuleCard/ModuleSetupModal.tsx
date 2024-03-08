@@ -1,6 +1,10 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
+<<<<<<< HEAD
+=======
+import { StyledText } from '../../atoms/text'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import code from '../../assets/images/module_instruction_code.png'
 import {
   ALIGN_FLEX_END,
@@ -42,7 +46,11 @@ export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
             width="50%"
           >
             <StyledText as="p" marginBottom={SPACING.spacing16}>
+<<<<<<< HEAD
               {t('branded:modal_instructions')}
+=======
+              {t('modal_instructions')}
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
             </StyledText>
             <Link
               external

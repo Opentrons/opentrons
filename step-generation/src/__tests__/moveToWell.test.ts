@@ -1,6 +1,10 @@
 import { when } from 'vitest-when'
 import { beforeEach, describe, it, expect, afterEach, vi } from 'vitest'
+<<<<<<< HEAD
 import { getPipetteSpecsV2 } from '@opentrons/shared-data'
+=======
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { moveToWell } from '../commandCreators/atomic/moveToWell'
 import {

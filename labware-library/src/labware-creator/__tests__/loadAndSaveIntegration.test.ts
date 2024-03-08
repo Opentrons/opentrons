@@ -23,6 +23,7 @@ describe('load and immediately save integrity test', () => {
   const testCases = [
     {
       inputDef: fixture_96_plate as LabwareDefinition2,
+<<<<<<< HEAD
       extraFields: {},
     },
     {
@@ -36,6 +37,21 @@ describe('load and immediately save integrity test', () => {
     {
       inputDef: fixture_24_tuberack as LabwareDefinition2,
       extraFields: { tubeRackInsertLoadName: 'customTubeRack' },
+=======
+      extraFields: { pipetteName },
+    },
+    {
+      inputDef: fixture_12_trough as LabwareDefinition2,
+      extraFields: { pipetteName },
+    },
+    {
+      inputDef: fixture_tiprack_300_ul as LabwareDefinition2,
+      extraFields: { pipetteName },
+    },
+    {
+      inputDef: fixture_24_tuberack as LabwareDefinition2,
+      extraFields: { pipetteName, tubeRackInsertLoadName: 'customTubeRack' },
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     },
   ]
   testCases.forEach(({ inputDef, extraFields }) => {

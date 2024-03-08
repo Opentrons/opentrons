@@ -14,7 +14,10 @@ import type {
   NozzleConfigurationStyle,
   LabwareLocation,
   PipetteMount as Mount,
+<<<<<<< HEAD
   PipetteV2Specs,
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 } from '@opentrons/shared-data'
 import type {
   AtomicProfileStep,

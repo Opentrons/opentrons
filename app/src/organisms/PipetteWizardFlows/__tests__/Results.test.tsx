@@ -21,7 +21,10 @@ import { FLOWS } from '../constants'
 import type { Mock } from 'vitest'
 
 vi.mock('@opentrons/react-api-client')
+<<<<<<< HEAD
 vi.mock('../../../resources/robot-settings/hooks')
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const render = (props: React.ComponentProps<typeof Results>) => {
   return renderWithProviders(<Results {...props} />, {

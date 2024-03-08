@@ -5,7 +5,11 @@ import { describe, it, afterEach, vi, expect } from 'vitest'
 import { useNotifyAllRunsQuery } from '../../../../resources/runs'
 import { useMostRecentRunId } from '../useMostRecentRunId'
 
+<<<<<<< HEAD
 vi.mock('../../../../resources/runs')
+=======
+vi.mock('../../../../resources/runs/useNotifyAllRunsQuery')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 describe('useMostRecentRunId hook', () => {
   afterEach(() => {

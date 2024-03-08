@@ -1,6 +1,7 @@
 import { renderHook } from '@testing-library/react'
 import { vi, it, expect, describe, beforeEach } from 'vitest'
 import { when } from 'vitest-when'
+<<<<<<< HEAD
 
 import {
   TEMPERATURE_MODULE_TYPE,
@@ -9,6 +10,16 @@ import {
   heater_shaker_commands_with_results_key,
 } from '@opentrons/shared-data'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+=======
+import { UseQueryResult } from 'react-query'
+
+import {
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  heater_shaker_commands_with_results_key,
+} from '@opentrons/shared-data'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 import { getProtocolModulesInfo } from '../../ProtocolRun/utils/getProtocolModulesInfo'
 
@@ -33,11 +44,18 @@ import type {
 import type { UseQueryResult } from 'react-query'
 import type { AttachedModule } from '../../../../redux/modules/types'
 
+<<<<<<< HEAD
+=======
+vi.mock('@opentrons/react-api-client')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 vi.mock('../../ProtocolRun/utils/getProtocolModulesInfo')
 vi.mock('../useAttachedModules')
 vi.mock('../useStoredProtocolAnalysis')
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+<<<<<<< HEAD
 vi.mock('../../../../resources/deck_configuration')
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const heaterShakerCommandsWithResultsKey = (heater_shaker_commands_with_results_key as unknown) as ProtocolAnalysisOutput
 
@@ -113,11 +131,19 @@ const mockCutoutConfig: CutoutConfig = {
 
 describe('useModuleRenderInfoForProtocolById hook', () => {
   beforeEach(() => {
+<<<<<<< HEAD
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [mockCutoutConfig],
     } as UseQueryResult<DeckConfiguration>)
     vi.mocked(useAttachedModules).mockReturnValue([mockAttachedTempMod])
     vi.mocked(useAttachedModules).mockReturnValue([
+=======
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+      data: [mockCutoutConfig],
+    } as UseQueryResult<DeckConfiguration>)
+    vi.mocked(useAttachedModules).mockReturnValue([
+      mockMagneticModuleGen2,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       mockTemperatureModuleGen2,
       mockThermocycler,
     ])
@@ -127,7 +153,14 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith('1')
       .thenReturn(PROTOCOL_DETAILS.protocolData as any)
+<<<<<<< HEAD
     vi.mocked(getProtocolModulesInfo).mockReturnValue([TEMPERATURE_MODULE_INFO])
+=======
+    vi.mocked(getProtocolModulesInfo).mockReturnValue([
+      TEMPERATURE_MODULE_INFO,
+      MAGNETIC_MODULE_INFO,
+    ])
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   })
 
   it('should return no module render info when protocol details not found', () => {

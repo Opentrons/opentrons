@@ -10,6 +10,10 @@ import {
 } from '@opentrons/usb-bridge/node-client'
 
 import { createLogger } from './log'
+<<<<<<< HEAD
+=======
+import { getProtocolSrcFilePaths } from './protocol-storage'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { usbRequestsStart, usbRequestsStop } from './config/actions'
 import {
   SYSTEM_INFO_INITIALIZED,

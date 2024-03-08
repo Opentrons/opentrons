@@ -4,17 +4,28 @@ import {
   getLabwareDefURI,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+<<<<<<< HEAD
+=======
+  fixtureP10Single as _fixtureP10Single,
+  fixtureP10Multi as _fixtureP10Multi,
+  fixtureP300Single as _fixtureP300Single,
+  fixtureP300Multi as _fixtureP300Multi,
+  fixtureP100096 as _fixtureP100096,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   fixture96Plate as _fixture96Plate,
   fixture12Trough as _fixture12Trough,
   fixtureTiprack10ul as _fixtureTiprack10ul,
   fixtureTiprack300ul as _fixtureTiprack300ul,
   fixtureTiprack1000ul as _fixtureTiprack1000ul,
   fixtureTiprackAdapter as _fixtureTiprackAdapter,
+<<<<<<< HEAD
   fixtureP10SingleV2Specs,
   fixtureP10MultiV2Specs,
   fixtureP300SingleV2Specs,
   fixtureP300MultiV2Specs,
   fixtureP100096V2Specs,
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 } from '@opentrons/shared-data'
 
 import {

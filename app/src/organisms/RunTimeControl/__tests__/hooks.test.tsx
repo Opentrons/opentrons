@@ -43,7 +43,11 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
 })
 
 vi.mock('../../ProtocolUpload/hooks')
+<<<<<<< HEAD
 vi.mock('../../../resources/runs')
+=======
+vi.mock('../../../resources/runs/useNotifyRunQuery')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 describe('useRunControls hook', () => {
   it('returns run controls hooks', () => {
@@ -61,7 +65,11 @@ describe('useRunControls hook', () => {
       isStopRunActionLoading: false,
     })
     when(useCloneRun)
+<<<<<<< HEAD
       .calledWith(mockPausedRun.id, undefined, true)
+=======
+      .calledWith(mockPausedRun.id, undefined)
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       .thenReturn({ cloneRun: mockCloneRun, isLoading: false })
 
     const { result } = renderHook(() => useRunControls(mockPausedRun.id))

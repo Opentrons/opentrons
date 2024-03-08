@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import Ajv from 'ajv'
+<<<<<<< HEAD
 import {
   commandSchemaV8,
   fixtureP10SingleV2Specs,
@@ -13,6 +14,23 @@ import {
   fixture_tiprack_10_ul,
   fixture_tiprack_300_ul,
 } from '@opentrons/shared-data/labware/fixtures/2'
+=======
+import {
+  commandSchemaV8,
+  labwareSchemaV2,
+  protocolSchemaV8,
+} from '@opentrons/shared-data'
+import {
+  fixture_12_trough,
+  fixture_96_plate,
+  fixture_tiprack_10_ul,
+  fixture_tiprack_300_ul,
+} from '@opentrons/shared-data/labware/fixtures/2'
+import {
+  fixtureP10Single,
+  fixtureP300Single,
+} from '@opentrons/shared-data/pipette/fixtures/name'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
 import { createFile, getLabwareDefinitionsInUse } from '../selectors'
 import {

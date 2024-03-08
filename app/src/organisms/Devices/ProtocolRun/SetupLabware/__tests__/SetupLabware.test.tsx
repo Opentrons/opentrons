@@ -29,7 +29,11 @@ vi.mock('../../../../RunTimeControl/hooks')
 vi.mock('../../../../../redux/config')
 vi.mock('../../../hooks')
 vi.mock('../../../hooks/useLPCSuccessToast')
+<<<<<<< HEAD
 vi.mock('../../../../../resources/runs')
+=======
+vi.mock('../../../../../resources/runs/useNotifyRunQuery')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'

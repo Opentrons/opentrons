@@ -13,13 +13,20 @@ import type { Mock } from 'vitest'
 import type { HostConfig } from '@opentrons/api-client'
 import type { QueryOptionsWithPolling } from '../useNotifyService'
 
+<<<<<<< HEAD
 vi.unmock('../useNotifyService')
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 vi.mock('react-redux')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../redux/analytics')
 vi.mock('../../redux/shell/remote', () => ({
   appShellListener: vi.fn(),
 }))
+<<<<<<< HEAD
+=======
+vi.mock('../../organisms/Devices/hooks/useIsFlex')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const MOCK_HOST_CONFIG: HostConfig = { hostname: 'MOCK_HOST' }
 const MOCK_TOPIC = '/test/topic' as any
@@ -39,7 +46,11 @@ describe('useNotifyService', () => {
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
     vi.mocked(useHost).mockReturnValue(MOCK_HOST_CONFIG)
+<<<<<<< HEAD
     vi.mocked(appShellListener).mockClear()
+=======
+    vi.mocked(useIsFlex).mockReturnValue(true)
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   })
 
   afterEach(() => {

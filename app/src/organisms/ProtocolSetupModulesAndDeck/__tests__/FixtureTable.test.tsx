@@ -18,7 +18,10 @@ import { FixtureTable } from '../FixtureTable'
 import { getLocalRobot } from '../../../redux/discovery'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 
+<<<<<<< HEAD
 vi.mock('../../../redux/discovery')
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 vi.mock('../../../resources/deck_configuration/hooks')
 vi.mock(
   '../../../organisms/Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
@@ -44,7 +47,10 @@ describe('FixtureTable', () => {
       setCutoutId: mockSetCutoutId,
       setProvidedFixtureOptions: mockSetProvidedFixtureOptions,
     }
+<<<<<<< HEAD
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     vi.mocked(LocationConflictModal).mockReturnValue(
       <div>mock location conflict modal</div>
     )
@@ -62,6 +68,16 @@ describe('FixtureTable', () => {
   })
   afterEach(() => {
     vi.clearAllMocks()
+<<<<<<< HEAD
+=======
+  })
+
+  it('should render table header and contents', () => {
+    render(props)
+    screen.getByText('Fixture')
+    screen.getByText('Location')
+    screen.getByText('Status')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   })
 
   it('should render the current status - configured', () => {

@@ -3,8 +3,11 @@ import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { StaticRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 
+<<<<<<< HEAD
 import { simpleAnalysisFileFixture } from '@opentrons/api-client'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { getStoredProtocols } from '../../../redux/protocol-storage'
@@ -58,7 +61,11 @@ describe('ChooseProtocolSlideout', () => {
     mockTrackCreateProtocolRunEvent = vi.fn(
       () => new Promise(resolve => resolve({}))
     )
+<<<<<<< HEAD
     vi.mocked(getStoredProtocols).mockReturnValue(mockStoredProtocolDataFixture)
+=======
+    vi.mocked(getStoredProtocols).mockReturnValue([storedProtocolDataFixture])
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     vi.mocked(useCreateRunFromProtocol).mockReturnValue({
       createRunFromProtocolSource: mockCreateRunFromProtocol,
       reset: vi.fn(),

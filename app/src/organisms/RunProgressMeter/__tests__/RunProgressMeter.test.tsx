@@ -35,6 +35,10 @@ import {
   mockRunData,
 } from '../../InterventionModal/__fixtures__'
 import { RunProgressMeter } from '..'
+<<<<<<< HEAD
+=======
+import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { renderWithProviders } from '../../../__testing-utils__'
 import type * as ApiClient from '@opentrons/react-api-client'
 
@@ -48,10 +52,18 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
 })
 vi.mock('../../RunTimeControl/hooks')
 vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+<<<<<<< HEAD
 vi.mock('../../../resources/runs')
 vi.mock('../../Devices/hooks')
 vi.mock('../../../atoms/ProgressBar')
 vi.mock('../../InterventionModal')
+=======
+vi.mock('../../../resources/runs/useNotifyLastRunCommandKey')
+vi.mock('../../Devices/hooks')
+vi.mock('../../../atoms/ProgressBar')
+vi.mock('../../InterventionModal')
+vi.mock('../../../resources/runs/useNotifyRunQuery')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const render = (props: React.ComponentProps<typeof RunProgressMeter>) => {
   return renderWithProviders(<RunProgressMeter {...props} />, {
@@ -83,9 +95,15 @@ describe('RunProgressMeter', () => {
       downloadRunLog: vi.fn(),
       isRunLogLoading: false,
     })
+<<<<<<< HEAD
     when(useNotifyLastRunCommand)
       .calledWith(NON_DETERMINISTIC_RUN_ID, { refetchInterval: 1000 })
       .thenReturn({ key: NON_DETERMINISTIC_COMMAND_KEY } as RunCommandSummary)
+=======
+    when(useNotifyLastRunCommandKey)
+      .calledWith(NON_DETERMINISTIC_RUN_ID, { refetchInterval: 1000 })
+      .thenReturn(NON_DETERMINISTIC_COMMAND_KEY)
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
     vi.mocked(useNotifyRunQuery).mockReturnValue({ data: null } as any)
 

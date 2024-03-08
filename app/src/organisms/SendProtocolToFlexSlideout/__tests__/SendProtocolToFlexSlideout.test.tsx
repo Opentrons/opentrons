@@ -51,7 +51,11 @@ vi.mock('../../../redux/discovery')
 vi.mock('../../../redux/networking')
 vi.mock('../../../redux/custom-labware')
 vi.mock('../../../redux/protocol-storage/selectors')
+<<<<<<< HEAD
 vi.mock('../../../resources/runs')
+=======
+vi.mock('../../../resources/runs/useNotifyAllRunsQuery')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const render = (
   props: React.ComponentProps<typeof SendProtocolToFlexSlideout>

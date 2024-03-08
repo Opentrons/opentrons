@@ -5,6 +5,10 @@ import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
+<<<<<<< HEAD
+=======
+import { UseQueryResult } from 'react-query'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import {
   useAllCommandsQuery,
   useDeleteRunMutation,
@@ -105,9 +109,12 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
       robotName: ROBOT_NAME,
       robotIsBusy: false,
     }
+<<<<<<< HEAD
     when(vi.mocked(useRobot))
       .calledWith(ROBOT_NAME)
       .thenReturn(mockConnectableRobot)
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   })
 
   it('renders the correct menu when a runId is present', () => {

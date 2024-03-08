@@ -24,7 +24,10 @@ import { AddFixtureModal } from '../DeviceDetailsDeckConfiguration/AddFixtureMod
 import { DeckConfigurationDiscardChangesModal } from '../DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getTopPortalEl } from '../../App/portal'
+<<<<<<< HEAD
 import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 import type {
   CutoutFixtureId,
@@ -136,8 +139,14 @@ export function ProtocolSetupDeckConfiguration({
           {showConfigurationModal && cutoutId != null ? (
             <AddFixtureModal
               cutoutId={cutoutId}
+<<<<<<< HEAD
               closeModal={() => setShowConfigurationModal(false)}
               providedFixtureOptions={providedFixtureOptions}
+=======
+              setShowAddFixtureModal={setShowConfigurationModal}
+              providedFixtureOptions={providedFixtureOptions}
+              setCurrentDeckConfig={setCurrentDeckConfig}
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
               isOnDevice
             />
           ) : null}

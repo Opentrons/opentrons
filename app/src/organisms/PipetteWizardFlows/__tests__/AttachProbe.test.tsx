@@ -2,6 +2,10 @@ import * as React from 'react'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, it, beforeEach, vi, expect } from 'vitest'
 
+<<<<<<< HEAD
+=======
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 
 import {
@@ -24,7 +28,11 @@ const render = (props: React.ComponentProps<typeof AttachProbe>) => {
     i18nInstance: i18n,
   })[0]
 }
+<<<<<<< HEAD
 vi.mock('../../../resources/deck_configuration')
+=======
+vi.mock('@opentrons/react-api-client')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 describe('AttachProbe', () => {
   let props: React.ComponentProps<typeof AttachProbe>
@@ -47,7 +55,11 @@ describe('AttachProbe', () => {
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       isOnDevice: false,
     }
+<<<<<<< HEAD
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
+=======
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       data: [
         {
           cutoutId: 'cutoutD3',

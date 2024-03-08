@@ -10,6 +10,10 @@ import {
 import {
   fixture12Trough,
   fixtureTiprack10ul,
+<<<<<<< HEAD
+=======
+  LabwareDefinition2,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   getLabwareDefURI,
 } from '@opentrons/shared-data'
 

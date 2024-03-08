@@ -4,6 +4,10 @@ import electronDebug from 'electron-debug'
 import dns from 'dns'
 import contextMenu from 'electron-context-menu'
 import * as electronDevtoolsInstaller from 'electron-devtools-installer'
+<<<<<<< HEAD
+=======
+import { webusb } from 'usb'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 import { createUi, registerReloadUi } from './ui'
 import { initializeMenu } from './menu'

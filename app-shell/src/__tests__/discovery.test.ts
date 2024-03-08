@@ -27,7 +27,10 @@ vi.mock('../log', () => {
     },
   }
 })
+<<<<<<< HEAD
 vi.mock('../notifications')
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 let mockGet = vi.fn(property => {
   return []

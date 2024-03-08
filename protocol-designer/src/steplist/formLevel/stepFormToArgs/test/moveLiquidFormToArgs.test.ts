@@ -1,8 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+<<<<<<< HEAD
 import {
   fixtureP10SingleV2Specs,
   getLabwareDefURI,
 } from '@opentrons/shared-data'
+=======
+import { getLabwareDefURI } from '@opentrons/shared-data'
+import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import {
   fixture_12_trough,
   fixture_96_plate,

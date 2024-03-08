@@ -21,6 +21,13 @@ import type { DispatchApiRequestType } from '../../../../redux/robot-api'
 
 vi.mock('../PipetteOverflowMenu')
 vi.mock('../../../../redux/config')
+<<<<<<< HEAD
+=======
+vi.mock('../../../CalibratePipetteOffset/useCalibratePipetteOffset')
+vi.mock('../../../CalibrateTipLength')
+vi.mock('../../hooks')
+vi.mock('../AboutPipetteSlideout')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 vi.mock('../../../../redux/robot-api')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../redux/pipettes')
@@ -37,6 +44,10 @@ describe('PipetteCard', () => {
   let props: React.ComponentProps<typeof PipetteCard>
 
   beforeEach(() => {
+<<<<<<< HEAD
+=======
+    startWizard = vi.fn()
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     dispatchApiRequest = vi.fn()
     props = {
       pipetteModelSpecs: mockLeftSpecs,
@@ -46,14 +57,38 @@ describe('PipetteCard', () => {
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
+<<<<<<< HEAD
+=======
+    when(useIsFlex).calledWith(mockRobotName).thenReturn(false)
+    vi.mocked(AboutPipetteSlideout).mockReturnValue(
+      <div>mock about slideout</div>
+    )
+    when(useDeckCalibrationData).calledWith(mockRobotName).thenReturn({
+      isDeckCalibrated: true,
+      deckCalibrationData: mockDeckCalData,
+    })
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     vi.mocked(PipetteOverflowMenu).mockReturnValue(
       <div>mock pipette overflow menu</div>
     )
     vi.mocked(getHasCalibrationBlock).mockReturnValue(null)
+<<<<<<< HEAD
+=======
+    vi.mocked(useCalibratePipetteOffset).mockReturnValue([startWizard, null])
+    vi.mocked(AskForCalibrationBlockModal).mockReturnValue(
+      <div>Mock AskForCalibrationBlockModal</div>
+    )
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     vi.mocked(useDispatchApiRequest).mockReturnValue([
       dispatchApiRequest,
       ['id'],
     ])
+<<<<<<< HEAD
+=======
+    vi.mocked(useCurrentSubsystemUpdateQuery).mockReturnValue({
+      data: undefined,
+    } as any)
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     when(usePipetteSettingsQuery)
       .calledWith({ refetchInterval: 5000, enabled: true })
       .thenReturn({} as any)
@@ -111,6 +146,10 @@ describe('PipetteCard', () => {
     screen.getByText('Empty')
   })
   it('does not render banner to calibrate for ot2 pipette if not calibrated', () => {
+<<<<<<< HEAD
+=======
+    when(useIsFlex).calledWith(mockRobotName).thenReturn(false)
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     props = {
       pipetteModelSpecs: mockLeftSpecs,
       mount: LEFT,
@@ -121,6 +160,24 @@ describe('PipetteCard', () => {
     render(props)
     expect(screen.queryByText('Calibrate now')).toBeNull()
   })
+<<<<<<< HEAD
+=======
+  it('renders banner to calibrate for ot3 pipette if not calibrated', () => {
+    when(useIsFlex).calledWith(mockRobotName).thenReturn(true)
+    props = {
+      pipetteModelSpecs: { ...mockLeftSpecs, name: 'p300_single_flex' },
+      mount: LEFT,
+      robotName: mockRobotName,
+      pipetteIs96Channel: false,
+      isPipetteCalibrated: false,
+      pipetteIsBad: false,
+      isRunActive: false,
+      isEstopNotDisengaged: false,
+    }
+    render(props)
+    screen.getByText('Calibrate now')
+  })
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   it('renders kebab icon, opens and closes overflow menu on click', () => {
     props = {
       pipetteModelSpecs: mockRightSpecs,
@@ -141,6 +198,46 @@ describe('PipetteCard', () => {
     fireEvent.click(overflowMenu)
     expect(screen.queryByText('mock pipette overflow menu')).toBeNull()
   })
+<<<<<<< HEAD
+=======
+  it('renders firmware update needed state if pipette is bad', () => {
+    props = {
+      pipetteModelSpecs: mockRightSpecs,
+      mount: RIGHT,
+      robotName: mockRobotName,
+      pipetteIs96Channel: false,
+      isPipetteCalibrated: false,
+      pipetteIsBad: true,
+      isRunActive: false,
+      isEstopNotDisengaged: false,
+    }
+    render(props)
+    screen.getByText('Right mount')
+    screen.getByText('Instrument attached')
+    screen.getByText(
+      `Instrument firmware update needed. Start the update on the robot's touchscreen.`
+    )
+  })
+  it('renders firmware update in progress state if pipette is bad and update in progress', () => {
+    vi.mocked(useCurrentSubsystemUpdateQuery).mockReturnValue({
+      data: { data: { updateProgress: 50 } as any },
+    } as any)
+    props = {
+      pipetteModelSpecs: mockRightSpecs,
+      mount: RIGHT,
+      robotName: mockRobotName,
+      pipetteIs96Channel: false,
+      isPipetteCalibrated: false,
+      pipetteIsBad: true,
+      isRunActive: false,
+      isEstopNotDisengaged: false,
+    }
+    render(props)
+    screen.getByText('Right mount')
+    screen.getByText('Instrument attached')
+    screen.getByText('Firmware update in progress...')
+  })
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   it('does not render a pipette settings slideout card if the pipette has no settings', () => {
     render(props)
     expect(

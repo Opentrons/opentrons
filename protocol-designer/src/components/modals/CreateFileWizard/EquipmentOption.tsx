@@ -20,7 +20,10 @@ import {
   StyledText,
 } from '@opentrons/components'
 import type { StyleProps } from '@opentrons/components'
+<<<<<<< HEAD
 import type { RobotType } from '@opentrons/shared-data'
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const ARROW_STYLE = css`
   color: ${COLORS.grey50};

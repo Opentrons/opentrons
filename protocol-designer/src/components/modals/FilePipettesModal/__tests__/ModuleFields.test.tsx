@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import * as React from 'react'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
@@ -42,6 +43,9 @@ const mockWizardTileProps: Partial<WizardTileProps> = {
   getValues: vi.fn(() => values) as any,
   formState: {} as any,
 }
+=======
+import { describe, it } from 'vitest'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 describe('ModuleFields', () => {
   let props: React.ComponentProps<typeof ModuleFields>

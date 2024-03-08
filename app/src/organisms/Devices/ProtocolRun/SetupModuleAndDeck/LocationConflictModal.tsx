@@ -3,9 +3,17 @@ import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
+<<<<<<< HEAD
   ALIGN_CENTER,
   BORDERS,
   COLORS,
+=======
+  useDeckConfigurationQuery,
+  useUpdateDeckConfigurationMutation,
+} from '@opentrons/react-api-client'
+import {
+  Flex,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -27,7 +35,10 @@ import {
   getCutoutFixturesForModuleModel,
   getFixtureIdByCutoutIdFromModuleSlotName,
 } from '@opentrons/shared-data'
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { Modal } from '../../../../molecules/Modal'
@@ -154,6 +165,7 @@ export const LocationConflictModal = (
     protocolSpecifiesDisplayName = getModuleDisplayName(requiredModule)
   }
 
+<<<<<<< HEAD
   const displaySlotName = isThermocycler
     ? 'A1 + B1'
     : getCutoutDisplayName(cutoutId)
@@ -173,6 +185,8 @@ export const LocationConflictModal = (
     )
   }
 
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   return createPortal(
     isOnDevice ? (
       <Modal
@@ -208,7 +222,15 @@ export const LocationConflictModal = (
               fontWeight={TYPOGRAPHY.fontWeightBold}
               paddingBottom={SPACING.spacing8}
             >
+<<<<<<< HEAD
               {t('slot_location', { slotName: displaySlotName })}
+=======
+              {t('slot_location', {
+                slotName: isThermocycler
+                  ? 'A1 + B1'
+                  : getCutoutDisplayName(cutoutId),
+              })}
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
             </StyledText>
             <Flex
               flexDirection={DIRECTION_COLUMN}
@@ -221,7 +243,11 @@ export const LocationConflictModal = (
                 flexDirection={DIRECTION_ROW}
                 alignItems={ALIGN_CENTER}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
+<<<<<<< HEAD
                 borderRadius={BORDERS.borderRadius4}
+=======
+                borderRadius={BORDERS.borderRadiusSize3}
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
               >
                 <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                   {t('protocol_specifies')}
@@ -237,7 +263,11 @@ export const LocationConflictModal = (
                 flexDirection={DIRECTION_ROW}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
                 alignItems={ALIGN_CENTER}
+<<<<<<< HEAD
                 borderRadius={BORDERS.borderRadius4}
+=======
+                borderRadius={BORDERS.borderRadiusSize3}
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
               >
                 <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                   {t('currently_configured')}
@@ -307,7 +337,15 @@ export const LocationConflictModal = (
               fontSize={TYPOGRAPHY.fontSizeH4}
               fontWeight={TYPOGRAPHY.fontWeightBold}
             >
+<<<<<<< HEAD
               {t('slot_location', { slotName: displaySlotName })}
+=======
+              {t('slot_location', {
+                slotName: isThermocycler
+                  ? 'A1 + B1'
+                  : getCutoutDisplayName(cutoutId),
+              })}
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
             </StyledText>
             <Flex
               flexDirection={DIRECTION_COLUMN}
@@ -320,7 +358,10 @@ export const LocationConflictModal = (
                 flexDirection={DIRECTION_ROW}
                 gridGap={SPACING.spacing20}
                 alignItems={ALIGN_CENTER}
+<<<<<<< HEAD
                 borderRadius={BORDERS.borderRadius4}
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
               >
                 <StyledText as="label" width={SPACING.spacing120}>
                   {t('protocol_specifies')}
@@ -335,7 +376,10 @@ export const LocationConflictModal = (
                 flexDirection={DIRECTION_ROW}
                 gridGap={SPACING.spacing20}
                 alignItems={ALIGN_CENTER}
+<<<<<<< HEAD
                 borderRadius={BORDERS.borderRadius4}
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
               >
                 <StyledText as="label" width={SPACING.spacing120}>
                   {t('currently_configured')}

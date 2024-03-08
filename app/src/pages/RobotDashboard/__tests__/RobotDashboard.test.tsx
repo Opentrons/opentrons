@@ -38,7 +38,11 @@ vi.mock('../../../organisms/Navigation')
 vi.mock('../../Protocols/hooks')
 vi.mock('../../../redux/config')
 vi.mock('../WelcomeModal')
+<<<<<<< HEAD
 vi.mock('../../../resources/runs')
+=======
+vi.mock('../../../resources/runs/useNotifyAllRunsQuery')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const render = () => {
   return renderWithProviders(

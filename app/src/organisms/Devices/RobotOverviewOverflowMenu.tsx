@@ -1,5 +1,8 @@
 import * as React from 'react'
+<<<<<<< HEAD
 import { css } from 'styled-components'
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'

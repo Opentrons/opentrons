@@ -16,10 +16,15 @@ import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { DeckFixtureSetupInstructionsModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { DeckConfigurationDiscardChangesModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 import { getTopPortalEl } from '../../App/portal'
+<<<<<<< HEAD
 import {
   useDeckConfigurationEditingTools,
   useNotifyDeckConfigurationQuery,
 } from '../../resources/deck_configuration'
+=======
+
+import type { CutoutId, DeckConfiguration } from '@opentrons/shared-data'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 export function DeckConfigurationEditor(): JSX.Element {
   const { t, i18n } = useTranslation([
@@ -71,10 +76,24 @@ export function DeckConfigurationEditor(): JSX.Element {
           {showSetupInstructionsModal ? (
             <DeckFixtureSetupInstructionsModal
               setShowSetupInstructionsModal={setShowSetupInstructionsModal}
+<<<<<<< HEAD
               isOnDevice={isOnDevice}
             />
           ) : null}
           {addFixtureModal}
+=======
+              isOnDevice
+            />
+          ) : null}
+          {showConfigurationModal && targetCutoutId != null ? (
+            <AddFixtureModal
+              cutoutId={targetCutoutId}
+              setShowAddFixtureModal={setShowConfigurationModal}
+              setCurrentDeckConfig={setCurrentDeckConfig}
+              isOnDevice
+            />
+          ) : null}
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
         </>,
         getTopPortalEl()
       )}

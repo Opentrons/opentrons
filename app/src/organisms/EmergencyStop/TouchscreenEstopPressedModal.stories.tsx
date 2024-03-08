@@ -2,8 +2,11 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import { QueryClient, QueryClientProvider } from 'react-query'
+<<<<<<< HEAD
 
 import { VIEWPORT } from '@opentrons/components'
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 import { configReducer } from '../../redux/config/reducer'
 import { EstopPressedModal } from '.'

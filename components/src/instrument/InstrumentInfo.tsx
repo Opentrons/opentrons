@@ -1,6 +1,12 @@
 import * as React from 'react'
 
 import { LEFT, RIGHT } from '@opentrons/shared-data'
+<<<<<<< HEAD
+=======
+import { InfoItem } from './InfoItem'
+import { InstrumentDiagram } from './InstrumentDiagram'
+import styles from './instrument.module.css'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { Flex } from '../primitives'
 import { SPACING, TYPOGRAPHY } from '../ui-style-constants'
 import { StyledText } from '../atoms'

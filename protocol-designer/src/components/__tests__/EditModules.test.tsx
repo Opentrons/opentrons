@@ -1,22 +1,34 @@
 import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { vi, beforeEach, describe, it } from 'vitest'
+<<<<<<< HEAD
 import {
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
   TEMPERATURE_MODULE_TYPE,
 } from '@opentrons/shared-data'
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { i18n } from '../../localization'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { getDismissedHints } from '../../tutorial/selectors'
 import { EditModules } from '../EditModules'
 import { EditModulesModal } from '../modals/EditModulesModal'
 import { renderWithProviders } from '../../__testing-utils__'
+<<<<<<< HEAD
 import { getEnableMoam } from '../../feature-flags/selectors'
 import { getRobotType } from '../../file-data/selectors'
 import { EditMultipleModulesModal } from '../modals/EditModulesModal/EditMultipleModulesModal'
 
 import type { HintKey } from '../../tutorial'
+=======
+
+import type { HintKey } from '../../tutorial'
+
+vi.mock('../../step-forms/selectors')
+vi.mock('../modals/EditModulesModal')
+vi.mock('../../tutorial/selectors')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 vi.mock('../../step-forms/selectors')
 vi.mock('../modals/EditModulesModal/EditMultipleModulesModal')
@@ -61,12 +73,16 @@ describe('EditModules', () => {
     vi.mocked(EditModulesModal).mockReturnValue(
       <div>mock EditModulesModal</div>
     )
+<<<<<<< HEAD
     vi.mocked(EditMultipleModulesModal).mockReturnValue(
       <div>mock EditMultipleModulesModal</div>
     )
     vi.mocked(getDismissedHints).mockReturnValue([hintKey])
     vi.mocked(getRobotType).mockReturnValue(OT2_ROBOT_TYPE)
     vi.mocked(getEnableMoam).mockReturnValue(true)
+=======
+    vi.mocked(getDismissedHints).mockReturnValue([hintKey])
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   })
 
   it('renders the edit modules modal for single modules', () => {

@@ -21,10 +21,16 @@ import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { Modules } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
+<<<<<<< HEAD
 vi.mock('../../../resources/deck_configuration')
 
 const mockCloseModal = vi.fn()
 const mockUpdateDeckConfiguration = vi.fn()
+=======
+const mockSetShowAddFixtureModal = vi.fn()
+const mockUpdateDeckConfiguration = vi.fn()
+const mockSetCurrentDeckConfig = vi.fn()
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const render = (props: React.ComponentProps<typeof AddFixtureModal>) => {
   return renderWithProviders(<AddFixtureModal {...props} />, {
@@ -44,7 +50,11 @@ describe('Touchscreen AddFixtureModal', () => {
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
+<<<<<<< HEAD
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+=======
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue(({
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       data: [],
     } as unknown) as UseQueryResult<DeckConfiguration>)
     vi.mocked(useModulesQuery).mockReturnValue(({

@@ -11,8 +11,11 @@ import {
   CutoutFixtureId,
   RobotType,
   INTERACTIVE_WELL_DATA_ATTRIBUTE,
+<<<<<<< HEAD
   SupportedTip,
   LOW_VOLUME_PIPETTES,
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 } from '@opentrons/shared-data'
 import { BoundingRect, GenericRect } from '../collision-types'
 import type {

@@ -19,7 +19,11 @@ import {
   getDeckDefFromRobotType,
   FLEX_ROBOT_TYPE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
+<<<<<<< HEAD
   flexDeckDefV5,
+=======
+  flexDeckDefV4,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 } from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
@@ -98,8 +102,11 @@ vi.mock('react-router-dom', async importOriginal => {
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../organisms/LabwarePositionCheck/useLaunchLPC')
 vi.mock('../../../organisms/Devices/hooks')
+<<<<<<< HEAD
 vi.mock('../../../redux/config')
 vi.mock('../../../organisms/ProtocolSetupParameters/ViewOnlyParameters')
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 vi.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
@@ -114,8 +121,12 @@ vi.mock('../../../redux/discovery/selectors')
 vi.mock('../ConfirmAttachedModal')
 vi.mock('../../../organisms/ToasterOven')
 vi.mock('../../../resources/deck_configuration/hooks')
+<<<<<<< HEAD
 vi.mock('../../../resources/runs')
 vi.mock('../../../resources/deck_configuration')
+=======
+vi.mock('../../../resources/runs/useNotifyRunQuery')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -196,7 +207,10 @@ describe('ProtocolSetup', () => {
   beforeEach(() => {
     mockLaunchLPC = vi.fn()
     mockHistoryPush = vi.fn()
+<<<<<<< HEAD
     vi.mocked(useFeatureFlag).mockReturnValue(false)
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     vi.mocked(useLPCDisabledReason).mockReturnValue(null)
     vi.mocked(useAttachedModules).mockReturnValue([])
     vi.mocked(useModuleCalibrationStatus).mockReturnValue({ complete: true })
@@ -231,14 +245,22 @@ describe('ProtocolSetup', () => {
       .calledWith(RUN_ID)
       .thenReturn(CREATED_AT)
     when(vi.mocked(getProtocolModulesInfo))
+<<<<<<< HEAD
       .calledWith(mockEmptyAnalysis, flexDeckDefV5 as any)
+=======
+      .calledWith(mockEmptyAnalysis, flexDeckDefV4 as any)
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       .thenReturn([])
     when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith([], [])
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     when(vi.mocked(getDeckDefFromRobotType))
       .calledWith('OT-3 Standard')
+<<<<<<< HEAD
       .thenReturn(flexDeckDefV5 as any)
+=======
+      .thenReturn(flexDeckDefV4 as any)
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, { staleTime: Infinity })
       .thenReturn({
@@ -249,9 +271,12 @@ describe('ProtocolSetup', () => {
           },
         },
       } as any)
+<<<<<<< HEAD
     when(vi.mocked(useProtocolAnalysisErrors))
       .calledWith(RUN_ID)
       .thenReturn({ analysisErrors: null })
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID, { staleTime: Infinity })
       .thenReturn({
@@ -278,7 +303,11 @@ describe('ProtocolSetup', () => {
     vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [mockHeaterShaker] },
     } as any)
+<<<<<<< HEAD
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
+=======
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       data: [mockFixture],
     } as UseQueryResult<SharedData.DeckConfiguration>)
     when(vi.mocked(useToaster))
@@ -287,7 +316,10 @@ describe('ProtocolSetup', () => {
         makeSnackbar: MOCK_MAKE_SNACKBAR,
       } as unknown) as any)
     vi.mocked(useDeckConfigurationCompatibility).mockReturnValue([])
+<<<<<<< HEAD
     vi.mocked(useProtocolHasRunTimeParameters).mockReturnValue(false)
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     when(vi.mocked(useTrackProtocolRunEvent))
       .calledWith(RUN_ID, ROBOT_NAME)
       .thenReturn({ trackProtocolRunEvent: mockTrackProtocolRunEvent })
@@ -325,13 +357,21 @@ describe('ProtocolSetup', () => {
       data: mockRobotSideAnalysis,
     } as any)
     when(vi.mocked(getProtocolModulesInfo))
+<<<<<<< HEAD
       .calledWith(mockRobotSideAnalysis, flexDeckDefV5 as any)
+=======
+      .calledWith(mockRobotSideAnalysis, flexDeckDefV4 as any)
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       .thenReturn(mockProtocolModuleInfo)
     when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith([], mockProtocolModuleInfo)
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     render(`/runs/${RUN_ID}/setup/`)
+<<<<<<< HEAD
     fireEvent.click(screen.getByText('Deck hardware'))
+=======
+    fireEvent.click(screen.getByText('Modules & deck'))
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     expect(vi.mocked(ProtocolSetupModulesAndDeck)).toHaveBeenCalled()
   })
 
@@ -342,7 +382,11 @@ describe('ProtocolSetup', () => {
     when(vi.mocked(getProtocolModulesInfo))
       .calledWith(
         { ...mockRobotSideAnalysis, liquids: mockLiquids },
+<<<<<<< HEAD
         flexDeckDefV5 as any
+=======
+        flexDeckDefV4 as any
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       )
       .thenReturn(mockProtocolModuleInfo)
     when(vi.mocked(getUnmatchedModulesForProtocol))
@@ -352,6 +396,7 @@ describe('ProtocolSetup', () => {
     screen.getByText('1 initial liquid')
     fireEvent.click(screen.getByText('Liquids'))
     expect(vi.mocked(ProtocolSetupLiquids)).toHaveBeenCalled()
+<<<<<<< HEAD
   })
 
   it('should launch view only parameters screen when click parameters', () => {
@@ -378,6 +423,8 @@ describe('ProtocolSetup', () => {
     render(`/runs/${RUN_ID}/setup/`)
     fireEvent.click(screen.getByText('Parameters'))
     expect(vi.mocked(ViewOnlyParameters)).toHaveBeenCalled()
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   })
 
   it('should launch LPC when clicked', () => {

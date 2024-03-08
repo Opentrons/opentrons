@@ -3,7 +3,11 @@ import { describe, it, expect, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, renderHook, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../../__testing-utils__'
+<<<<<<< HEAD:app/src/atoms/SoftwareKeyboard/FullKeyboard/__tests__/FullKeyboard.test.tsx
 import { FullKeyboard } from '..'
+=======
+import { NormalKeyboard } from '..'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405)):app/src/atoms/SoftwareKeyboard/NormalKeyboard/__tests__/NormalKeyboard.test.tsx
 
 const render = (props: React.ComponentProps<typeof FullKeyboard>) => {
   return renderWithProviders(<FullKeyboard {...props} />)[0]
@@ -65,7 +69,11 @@ describe('FullKeyboard', () => {
       keyboardRef: result.current,
     }
     render(props)
+<<<<<<< HEAD:app/src/atoms/SoftwareKeyboard/FullKeyboard/__tests__/FullKeyboard.test.tsx
     const shiftKey = screen.getByRole('button', { name: 'ABC' })
+=======
+    const shiftKey = screen.getByRole('button', { name: 'SHIFT' })
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405)):app/src/atoms/SoftwareKeyboard/NormalKeyboard/__tests__/NormalKeyboard.test.tsx
     fireEvent.click(shiftKey)
     const buttons = screen.getAllByRole('button')
     const expectedButtonNames = [

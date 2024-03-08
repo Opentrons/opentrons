@@ -12,6 +12,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+<<<<<<< HEAD
+=======
+import { StyledText } from '../../../atoms/text'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { getTopPortalEl } from '../../../App/portal'
 import { LegacyModal } from '../../../molecules/LegacyModal'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'

@@ -4,7 +4,11 @@ import { expectTimelineError } from '../__utils__/testMatchers'
 import { aspirate } from '../commandCreators/atomic/aspirate'
 import {
   getLabwareDefURI,
+<<<<<<< HEAD
   getPipetteSpecsV2,
+=======
+  getPipetteNameSpecs,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   fixtureTiprack10ul as tip10,
   fixtureTiprack1000ul as tip1000,
 } from '@opentrons/shared-data'

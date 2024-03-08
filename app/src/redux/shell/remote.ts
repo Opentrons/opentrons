@@ -1,4 +1,5 @@
 // access main process remote modules via attachments to `global`
+<<<<<<< HEAD
 import type { AxiosRequestConfig, AxiosResponse } from 'axios'
 import type {
   Remote,
@@ -6,6 +7,11 @@ import type {
   NotifyResponseData,
   IPCSafeFormData,
 } from './types'
+=======
+import type { AxiosRequestConfig } from 'axios'
+import type { ResponsePromise } from '@opentrons/api-client'
+import type { Remote, NotifyTopic, NotifyResponseData } from './types'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const emptyRemote: Remote = {} as any
 

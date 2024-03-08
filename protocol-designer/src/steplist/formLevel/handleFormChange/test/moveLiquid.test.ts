@@ -1,5 +1,12 @@
 import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest'
 import {
+<<<<<<< HEAD
+=======
+  fixtureP10Single,
+  fixtureP300Single,
+} from '@opentrons/shared-data/pipette/fixtures/name'
+import {
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   fixture_tiprack_10_ul,
   fixture_tiprack_300_ul,
 } from '@opentrons/shared-data/labware/fixtures/2'
@@ -11,11 +18,15 @@ import {
   dependentFieldsUpdateMoveLiquid,
   updatePatchBlowoutFields,
 } from '../dependentFieldsUpdateMoveLiquid'
+<<<<<<< HEAD
 import {
   fixtureP10SingleV2Specs,
   fixtureP300SingleV2Specs,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
+=======
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import type {
   PipetteEntities,
   LabwareEntities,

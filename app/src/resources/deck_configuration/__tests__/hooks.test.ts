@@ -14,7 +14,11 @@ import { useNotifyDeckConfigurationQuery } from '../useNotifyDeckConfigurationQu
 import type { UseQueryResult } from 'react-query'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 
+<<<<<<< HEAD
 vi.mock('../useNotifyDeckConfigurationQuery')
+=======
+vi.mock('@opentrons/react-api-client')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const MOCK_DECK_CONFIG: DeckConfiguration = [
   {
@@ -53,7 +57,11 @@ const MOCK_DECK_CONFIG: DeckConfiguration = [
 
 describe('useDeckConfigurationCompatibility', () => {
   beforeEach(() => {
+<<<<<<< HEAD
     when(useNotifyDeckConfigurationQuery)
+=======
+    when(useDeckConfigurationQuery)
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       .calledWith()
       .thenReturn({
         data: MOCK_DECK_CONFIG,

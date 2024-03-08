@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import * as React from 'react'
 import { describe, it, beforeEach, vi } from 'vitest'
 import { screen } from '@testing-library/react'
@@ -52,6 +53,9 @@ const temperatureStepId = 'tempStepId'
 const moveLabwareStepId = 'moveLabwareId'
 const mixStepId = 'mixStepId'
 const moveLiquidStepId = 'moveLiquidStepId'
+=======
+import { describe, it } from 'vitest'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 describe('ConnectedStepItem', () => {
   let props: React.ComponentProps<typeof ConnectedStepItem>

@@ -19,8 +19,11 @@ import {
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 
+<<<<<<< HEAD
 import type { TemperatureStatus } from '@opentrons/api-client'
 
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 vi.mock('../../Devices/hooks')
 vi.mock('../../RunTimeControl/hooks')
 vi.mock('../../ProtocolUpload/hooks')
@@ -534,6 +537,7 @@ describe('ModuleOverflowMenu', () => {
     render(props)
 
     const calibrate = screen.getByRole('button', { name: 'Calibrate' })
+<<<<<<< HEAD
     expect(calibrate).toBeDisabled()
   })
 
@@ -572,6 +576,8 @@ describe('ModuleOverflowMenu', () => {
     render(props)
 
     const calibrate = screen.getByRole('button', { name: 'Calibrate' })
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     expect(calibrate).toBeDisabled()
   })
 

@@ -1,9 +1,13 @@
 import { describe, it, expect } from 'vitest'
+<<<<<<< HEAD
 import {
   getAnalysisStatus,
   getisFlexProtocol,
   getRobotTypeDisplayName,
 } from '../utils'
+=======
+import { getisFlexProtocol, getRobotTypeDisplayName } from '../utils'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 const mockOT3ProtocolAnalysisOutput = {

@@ -61,7 +61,10 @@ describe('ModulesAndOtherTile', () => {
       ...props,
       ...mockWizardTileProps,
     } as WizardTileProps
+<<<<<<< HEAD
     vi.mocked(getEnableMoam).mockReturnValue(true)
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     vi.mocked(CrashInfoBox).mockReturnValue(<div> mock CrashInfoBox</div>)
     vi.mocked(EquipmentOption).mockReturnValue(<div>mock EquipmentOption</div>)
     vi.mocked(getDisableModuleRestrictions).mockReturnValue(false)

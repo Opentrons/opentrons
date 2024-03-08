@@ -22,7 +22,11 @@ vi.mock('../../../../organisms/Devices/hooks')
 vi.mock('../hooks/useDashboardCalibratePipOffset')
 vi.mock('../hooks/useDashboardCalibrateTipLength')
 vi.mock('../hooks/useDashboardCalibrateDeck')
+<<<<<<< HEAD
 vi.mock('../../../../resources/runs')
+=======
+vi.mock('../../../../resources/runs/useNotifyAllRunsQuery')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const render = (path = '/') => {
   return renderWithProviders(

@@ -1,9 +1,14 @@
 import * as React from 'react'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
+<<<<<<< HEAD
 import { screen, cleanup, fireEvent } from '@testing-library/react'
 import { BORDERS, COLORS } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+=======
+import { screen, cleanup } from '@testing-library/react'
+import { BORDERS, COLORS } from '@opentrons/components'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { i18n } from '../../../../localization'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { EquipmentOption } from '../EquipmentOption'
@@ -39,7 +44,11 @@ describe('EquipmentOption', () => {
     }
     render(props)
     expect(screen.getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
+<<<<<<< HEAD
       `background-color: ${COLORS.grey10}`
+=======
+      `background-color: ${COLORS.white}`
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     )
   })
   it('renders the equipment option without check not selected and image', () => {

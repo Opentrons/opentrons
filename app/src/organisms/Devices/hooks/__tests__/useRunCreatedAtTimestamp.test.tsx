@@ -10,7 +10,11 @@ import { useNotifyRunQuery } from '../../../../resources/runs'
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
 
+<<<<<<< HEAD
 vi.mock('../../../../resources/runs')
+=======
+vi.mock('../../../../resources/runs/useNotifyRunQuery')
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 vi.mock('../../utils')
 
 const MOCK_RUN_ID = '1'

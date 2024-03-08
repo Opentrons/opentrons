@@ -1,6 +1,11 @@
 import * as React from 'react'
+<<<<<<< HEAD
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
+=======
+import { createPortal } from 'react-dom'
+import { RunTimeCommand } from '@opentrons/shared-data'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import {
   ALIGN_CENTER,
   COLORS,
@@ -15,7 +20,12 @@ import {
 
 import { Tooltip } from '../../atoms/Tooltip'
 import { getModalPortalEl } from '../../App/portal'
+<<<<<<< HEAD
 
+=======
+import { StyledText } from '../../atoms/text'
+import { useTranslation } from 'react-i18next'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import type { IconName } from '@opentrons/components'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 

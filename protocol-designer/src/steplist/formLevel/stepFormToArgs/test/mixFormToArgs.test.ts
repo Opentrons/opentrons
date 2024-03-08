@@ -1,8 +1,13 @@
 import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
+<<<<<<< HEAD
 import {
   fixtureP10SingleV2Specs,
   getLabwareDefURI,
 } from '@opentrons/shared-data'
+=======
+import { getLabwareDefURI } from '@opentrons/shared-data'
+import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { fixture_96_plate } from '@opentrons/shared-data/labware/fixtures/2'
 import { mixFormToArgs } from '../mixFormToArgs'
 import { DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP } from '../../../../constants'

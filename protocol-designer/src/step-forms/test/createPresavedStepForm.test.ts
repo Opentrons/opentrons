@@ -8,6 +8,10 @@ import {
   THERMOCYCLER_MODULE_V1,
   fixtureP10SingleV2Specs,
 } from '@opentrons/shared-data'
+<<<<<<< HEAD
+=======
+import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { fixture_tiprack_10_ul } from '@opentrons/shared-data/labware/fixtures/2'
 import { getStateAndContextTempTCModules } from '@opentrons/step-generation'
 import {

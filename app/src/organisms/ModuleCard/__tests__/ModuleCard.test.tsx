@@ -24,6 +24,10 @@ import {
   getRequestById,
   PENDING,
   SUCCESS,
+<<<<<<< HEAD
+=======
+  useDispatchApiRequest,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 } from '../../../redux/robot-api'
 import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 import { useToaster } from '../../ToasterOven'
@@ -42,7 +46,11 @@ import type {
   MagneticModule,
   ThermocyclerModule,
 } from '../../../redux/modules/types'
+<<<<<<< HEAD
 import type { Mock } from 'vitest'
+=======
+import type { DispatchApiRequestType } from '../../../redux/robot-api'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 vi.mock('../ErrorInfo')
 vi.mock('../MagneticModuleData')
@@ -180,8 +188,11 @@ const mockHotThermo = {
 const mockMakeSnackbar = vi.fn()
 const mockMakeToast = vi.fn()
 const mockEatToast = vi.fn()
+<<<<<<< HEAD
 
 const MOCK_LATEST_REQUEST_ID = '1234'
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 
 const render = (props: React.ComponentProps<typeof ModuleCard>) => {
   return renderWithProviders(<ModuleCard {...props} />, {
@@ -207,7 +218,16 @@ describe('ModuleCard', () => {
       latestRequestId: MOCK_LATEST_REQUEST_ID,
     }
 
+<<<<<<< HEAD
     vi.mocked(ErrorInfo).mockReturnValue(null)
+=======
+    dispatchApiRequest = vi.fn()
+    vi.mocked(ErrorInfo).mockReturnValue(null)
+    vi.mocked(useDispatchApiRequest).mockReturnValue([
+      dispatchApiRequest,
+      ['id'],
+    ])
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     vi.mocked(MagneticModuleData).mockReturnValue(
       <div>Mock Magnetic Module Data</div>
     )

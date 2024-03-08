@@ -9,12 +9,22 @@ import {
   getIsLabwareAboveHeight,
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
   HEATERSHAKER_MODULE_TYPE,
+<<<<<<< HEAD
+=======
+  PipetteNameSpecs,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   fixtureTrash as _fixtureTrash,
   fixture96Plate as _fixture96Plate,
   fixtureTiprack10ul as _fixtureTiprack10ul,
   fixtureTiprack300ul as _fixtureTiprack300ul,
+<<<<<<< HEAD
   fixtureP10SingleV2Specs,
   fixtureP300MultiV2Specs,
+=======
+  fixtureP10Single,
+  fixtureP300Multi,
+  pipetteNameSpecFixtures,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 } from '@opentrons/shared-data'
 import { FIXED_TRASH_ID, TEMPERATURE_DEACTIVATED } from '../constants'
 import {
@@ -273,16 +283,28 @@ describe('makeInitialRobotState', () => {
             p10SingleId: {
               id: 'p10SingleId',
               name: 'p10_single',
+<<<<<<< HEAD
               spec: fixtureP10SingleV2Specs,
               tiprackDefURI: [getLabwareDefURI(fixtureTiprack10ul)],
               tiprackLabwareDef: [fixtureTiprack10ul],
+=======
+              spec: fixtureP10Single,
+              tiprackDefURI: getLabwareDefURI(fixtureTiprack10ul),
+              tiprackLabwareDef: fixtureTiprack10ul,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
             },
             p300MultiId: {
               id: 'p300MultiId',
               name: 'p300_multi',
+<<<<<<< HEAD
               spec: fixtureP300MultiV2Specs,
               tiprackDefURI: [getLabwareDefURI(fixtureTiprack300ul)],
               tiprackLabwareDef: [fixtureTiprack300ul],
+=======
+              spec: fixtureP300Multi,
+              tiprackDefURI: getLabwareDefURI(fixtureTiprack300ul),
+              tiprackLabwareDef: fixtureTiprack300ul,
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
             },
           },
           moduleEntities: {
@@ -890,7 +912,11 @@ describe('getIsHeaterShakerEastWestMultiChannelPipette', () => {
         },
       },
     }
+<<<<<<< HEAD
     pipetteSpecs = SharedData.fixtureP10MultiV2Specs
+=======
+    pipetteSpecs = pipetteNameSpecFixtures.p10_multi as PipetteNameSpecs
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
   })
   it('should return true when there is a heater shaker east west and the pipette is a multi channel', () => {
     expect(
@@ -898,13 +924,21 @@ describe('getIsHeaterShakerEastWestMultiChannelPipette', () => {
     ).toBe(true)
   })
   it('should return false when there the pipette is not a multi channel', () => {
+<<<<<<< HEAD
     pipetteSpecs = SharedData.fixtureP1000SingleV2Specs
+=======
+    pipetteSpecs = pipetteNameSpecFixtures.p1000_single as PipetteNameSpecs
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     expect(
       getIsHeaterShakerEastWestMultiChannelPipette(modules, slot, pipetteSpecs)
     ).toBe(false)
   })
   it('should return false when the HS is not next to the slot', () => {
+<<<<<<< HEAD
     pipetteSpecs = SharedData.fixtureP1000SingleV2Specs
+=======
+    pipetteSpecs = pipetteNameSpecFixtures.p1000_single as PipetteNameSpecs
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     slot = '11'
     expect(
       getIsHeaterShakerEastWestMultiChannelPipette(modules, slot, pipetteSpecs)
@@ -929,7 +963,11 @@ describe('getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette', () =>
         },
       },
     }
+<<<<<<< HEAD
     pipetteSpecs = SharedData.fixtureP10MultiV2Specs
+=======
+    pipetteSpecs = pipetteNameSpecFixtures.p10_multi as PipetteNameSpecs
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     labwareEntity = {
       id: 'fixture96PlateId',
       labwareDefURI: getLabwareDefURI(fixture96Plate),

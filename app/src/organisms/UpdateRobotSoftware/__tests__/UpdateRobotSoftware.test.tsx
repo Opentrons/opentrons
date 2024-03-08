@@ -113,7 +113,11 @@ describe('UpdateRobotSoftware', () => {
     render()
     expect(mockBeforeCommitting).toBeCalled()
     expect(UpdateSoftware).toBeCalledWith(
+<<<<<<< HEAD
       { updateType: 'installing' },
+=======
+      { updateType: 'installing', processProgress: 0 },
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
       expect.anything()
     )
     screen.getByText('mock UpdateSoftware')

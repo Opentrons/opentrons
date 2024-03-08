@@ -23,7 +23,10 @@ import { MoveLabwareCommandText } from './MoveLabwareCommandText'
 import type {
   CompletedProtocolAnalysis,
   RobotType,
+<<<<<<< HEAD
   RunTimeCommand,
+=======
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 } from '@opentrons/shared-data'
 import type { StyleProps } from '@opentrons/components'
 

@@ -7,7 +7,12 @@ import {
   THERMOCYCLER_MODULE_MODELS,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
+<<<<<<< HEAD
 import { StyledText } from '@opentrons/components'
+=======
+
+import { StyledText } from '../../atoms/text'
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
 

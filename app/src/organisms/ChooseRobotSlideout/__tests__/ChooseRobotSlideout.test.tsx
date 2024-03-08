@@ -29,7 +29,11 @@ vi.mock('../../../redux/discovery')
 vi.mock('../../../redux/robot-update')
 vi.mock('../../../redux/networking')
 vi.mock('../../../resources/useNotifyService')
+<<<<<<< HEAD
 vi.mock('../../../redux/config')
+=======
+
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
 const render = (props: React.ComponentProps<typeof ChooseRobotSlideout>) => {
   return renderWithProviders(
     <StaticRouter>
@@ -42,6 +46,7 @@ const render = (props: React.ComponentProps<typeof ChooseRobotSlideout>) => {
 }
 
 const mockSetSelectedRobot = vi.fn()
+<<<<<<< HEAD
 
 const mockRunTimeParameters: RunTimeParameter[] = [
   {
@@ -100,6 +105,11 @@ const mockRunTimeParameters: RunTimeParameter[] = [
 describe('ChooseRobotSlideout', () => {
   beforeEach(() => {
     vi.mocked(useFeatureFlag).mockReturnValue(true)
+=======
+
+describe('ChooseRobotSlideout', () => {
+  beforeEach(() => {
+>>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
     vi.mocked(getConnectableRobots).mockReturnValue([mockConnectableRobot])
     vi.mocked(getUnreachableRobots).mockReturnValue([mockUnreachableRobot])
     vi.mocked(getReachableRobots).mockReturnValue([mockReachableRobot])
