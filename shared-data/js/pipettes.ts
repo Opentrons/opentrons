@@ -158,7 +158,7 @@ const V2_DEFINITION_TYPES = ['general', 'geometry']
 
 /* takes in pipetteName such as 'p300_single' or 'p300_single_gen1' 
 or PipetteModel such as 'p300_single_v1.3' and converts it to channels,
-model, and version from generation in order to return the correct pipette schema v2 json files. 
+model, and version in order to return the correct pipette schema v2 json files. 
 **/
 export const getPipetteSpecsV2 = (
   name: PipetteName | PipetteModel
@@ -181,8 +181,9 @@ export const getPipetteSpecsV2 = (
   const generalGeometricJsons = Object.keys(generalGeometric).map(
     path => generalGeometric[path]
   ) as ModuleSpecs[]
+
+  //  matchingJsons retuns an array of 2 jsons for general and geometric
   const matchingJsons = generalGeometricJsons.reduce(
-    //  NOTE: combinedModules = array of 2 jsons, module = 1 json
     (combinedModules: CombinedModules[], module: ModuleSpecs, index) => {
       const path = Object.keys(generalGeometric)[index]
       V2_DEFINITION_TYPES.forEach(type => {
@@ -203,8 +204,9 @@ export const getPipetteSpecsV2 = (
   const liquidJsons = Object.keys(liquid).map(
     path => liquid[path]
   ) as LiquidSpecs[]
+
+  //  liquidMatchingJsons returns an array of all liquid definition jsons
   const liquidMatchingJsons = liquidJsons.reduce(
-    //  NOTE: combinedModules = array of 2+ jsons, module = 1 json
     (combinedModules: PipetteV2LiquidSpecs[], module: LiquidSpecs, index) => {
       const path = Object.keys(liquid)[index]
 

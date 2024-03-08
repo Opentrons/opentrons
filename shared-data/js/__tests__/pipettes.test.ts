@@ -1,7 +1,11 @@
 // tests for pipette info accessors in `shared-data/js/pipettes.js`
 import { describe, expect, it } from 'vitest'
-import { getPipetteSpecsV2, PipetteV2LiquidSpecs, PipetteV2Specs } from '..'
-import { getPipetteNameSpecs, getPipetteModelSpecs } from '../pipettes'
+import {
+  getPipetteSpecsV2,
+  getPipetteNameSpecs,
+  getPipetteModelSpecs,
+} from '../pipettes'
+import type { PipetteV2LiquidSpecs, PipetteV2Specs } from '../types'
 
 const PIPETTE_NAMES = [
   'p10_single',
