@@ -33,9 +33,6 @@ from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
 from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons_shared_data.errors.exceptions import (
-    StallOrCollisionDetectedError,
-)
 
 from opentrons import types as top_types
 from opentrons.config import robot_configs
