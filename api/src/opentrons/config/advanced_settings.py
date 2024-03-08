@@ -606,7 +606,7 @@ def _migrate23to24(previous: SettingsMap) -> SettingsMap:
     - flips the rearPanelIntegration config element default to true.
     """
     newmap = {k: v for k, v in previous.items()}
-    newmap["rearPanelIntegration"] = True
+    newmap["rearPanelIntegration"] = False
     return newmap
 
 

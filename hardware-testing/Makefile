@@ -26,7 +26,7 @@ cov_opts ?= --cov=hardware_testing --cov-report term-missing:skip-covered --cov-
 test_opts ?=
 
 # Host key location for robot
-ssh_key ?= $(default_ssh_key)
+ssh_key ?= ~/.ssh/flex_ssh_key
 # Other SSH args for robot
 ssh_opts ?= $(default_ssh_opts)
 # Helper to safely bundle ssh options

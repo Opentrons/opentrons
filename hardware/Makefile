@@ -37,7 +37,7 @@ pypi_username ?=
 pypi_password ?=
 
 # Host key location for robot
-ssh_key ?= $(default_ssh_key)
+ssh_key ?=  ~/.ssh/flex_ssh_key
 # Other SSH args for robot
 ssh_opts ?= $(default_ssh_opts)
 # Helper to safely bundle ssh options
