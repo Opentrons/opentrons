@@ -312,26 +312,33 @@ class InstrumentContext(publisher.CommandPublisher):
         :type volume: int or float
 
         :param location: Tells the robot where to dispense liquid held in the pipette.
-                         The location can be a :py:class:`.Well` or a
-                         :py:class:`.Location`.
+            The location can be a :py:class:`.Well`, :py:class:`.Location`,
+            :py:class:`.TrashBin`, or :py:class:`.WasteChute`.
 
-                            - If the location is a ``Well``, the pipette will dispense
+                            - If a ``Well``, the pipette will dispense
                               at or above the bottom center of the well. The distance (in
                               mm) from the well bottom is specified by
                               :py:obj:`well_bottom_clearance.dispense
                               <well_bottom_clearance>`.
 
-                            - If the location is a ``Location`` (e.g., the result of
-                              :py:meth:`.Well.top` or :py:meth:`.Well.bottom`), the robot
-                              will dispense into that specified position.
+                            - If a ``Location`` (e.g., the result of
+                              :py:meth:`.Well.top` or :py:meth:`.Well.bottom`), the pipette
+                              will dispense at that specified position.
 
-                            - If the ``location`` is unspecified, the robot will
-                              dispense into its current position.
+                            - If a trash container, the pipette will dispense at a location
+                              relative to its center and the trash container's top center.
+                              See :ref:`position-relative-trash` for details.
+
+                            - If unspecified, the pipette will
+                              dispense at its current position.
 
                             If only a ``location`` is passed (e.g.,
                             ``pipette.dispense(location=plate['A1'])``), all of the
                             liquid aspirated into the pipette will be dispensed (the
                             amount is accessible through :py:attr:`current_volume`).
+
+            .. versionchanged:: 2.16
+                Accepts ``TrashBin`` and ``WasteChute`` values.
 
         :param rate: How quickly a pipette dispenses liquid. The speed in µL/s is
                      calculated as ``rate`` multiplied by :py:attr:`flow_rate.dispense
@@ -549,7 +556,11 @@ class InstrumentContext(publisher.CommandPublisher):
         :ref:`blow-out`.
 
         :param location: The blowout location. If no location is specified, the pipette
-                         will blow out from its current position.
+            will blow out from its current position.
+
+            .. versionchanged:: 2.16
+                Accepts ``TrashBin`` and ``WasteChute`` values.
+
         :type location: :py:class:`.Well` or :py:class:`.Location` or ``None``
 
         :raises RuntimeError: If no location is specified and the location cache is
@@ -1034,7 +1045,11 @@ class InstrumentContext(publisher.CommandPublisher):
               ``pipette.drop_tip(location=waste_chute)``.
 
         :param location:
-            The location to drop the tip.
+            Where to drop the tip.
+
+            .. versionchanged:: 2.16
+                Accepts ``TrashBin`` and ``WasteChute`` values.
+
         :type location:
             :py:class:`~.types.Location` or :py:class:`.Well` or ``None``
         :param home_after:
@@ -1481,7 +1496,11 @@ class InstrumentContext(publisher.CommandPublisher):
 
         See :ref:`move-to` for examples.
 
-        :param location: The location to move to.
+        :param location: Where to move to.
+
+          .. versionchanged:: 2.16
+               Accepts ``TrashBin`` and ``WasteChute`` values.
+
         :type location: :py:class:`~.types.Location`
         :param force_direct: If ``True``, move directly to the destination without arc
                              motion.
