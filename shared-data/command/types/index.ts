@@ -47,6 +47,7 @@ export interface CommonCommandRunTimeInfo {
   startedAt: string | null
   completedAt: string | null
   intent?: 'protocol' | 'setup'
+  notes?: CommandNote[] | null
 }
 export interface CommonCommandCreateInfo {
   key?: string
