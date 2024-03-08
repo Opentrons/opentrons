@@ -11,7 +11,7 @@ benchmark_output := $(shell node -e 'console.log(new Date());')
 # These variables can be overriden when make is invoked to customize the
 # behavior of jest
 tests ?=
-cov_opts ?= --coverage=true --ci=true --collectCoverageFrom='protocol-designer/src/**/*.(js|ts|tsx)'
+cov_opts ?= --coverage=true
 test_opts ?=
 
 # standard targets
@@ -30,12 +30,11 @@ clean:
 
 # artifacts
 #####################################################################
-# override webpack's default hashing algorithm for node 18: https://github.com/webpack/webpack/issues/14532
 
 .PHONY: build
 build: export NODE_ENV := production
 build:
-	export NODE_OPTIONS=--openssl-legacy-provider && webpack --profile
+	vite build
 	git rev-parse HEAD > dist/.commit
 
 # development
@@ -50,9 +49,8 @@ benchmarks:
 
 .PHONY: dev
 dev: export NODE_ENV := development
-dev: export NODE_OPTIONS := --openssl-legacy-provider
 dev:
-	webpack-dev-server --hot --host=::
+	vite serve
 
 # production assets server
 .PHONY: serve

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
@@ -6,20 +7,20 @@ import {
   ANALYTICS_OPEN_LABWARE_CREATOR_FROM_OVERFLOW_MENU,
 } from '../../redux/analytics'
 import {
+  AlertPrimaryButton,
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
+  Btn,
+  COLORS,
+  DIRECTION_COLUMN,
   Flex,
   Icon,
-  useConditionalConfirm,
-  SPACING,
-  COLORS,
-  POSITION_ABSOLUTE,
-  AlertPrimaryButton,
-  DIRECTION_COLUMN,
-  POSITION_RELATIVE,
-  ALIGN_FLEX_END,
   JUSTIFY_FLEX_END,
-  ALIGN_CENTER,
+  POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
+  SPACING,
   TYPOGRAPHY,
-  Btn,
+  useConditionalConfirm,
   useOnClickOutside,
 } from '@opentrons/components'
 
@@ -28,7 +29,7 @@ import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import { LegacyModal } from '../../molecules/LegacyModal'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import {
   deleteCustomLabwareFile,
   openCustomLabwareDirectory,
@@ -134,8 +135,8 @@ export function CustomLabwareOverflowMenu(
           </MenuItem>
         </Flex>
       )}
-      {showDeleteConfirmation && (
-        <Portal level="top">
+      {showDeleteConfirmation &&
+        createPortal(
           <LegacyModal
             type="warning"
             title={t('delete_this_labware')}
@@ -164,9 +165,9 @@ export function CustomLabwareOverflowMenu(
                 </AlertPrimaryButton>
               </Flex>
             </Flex>
-          </LegacyModal>
-        </Portal>
-      )}
+          </LegacyModal>,
+          getTopPortalEl()
+        )}
     </Flex>
   )
 }

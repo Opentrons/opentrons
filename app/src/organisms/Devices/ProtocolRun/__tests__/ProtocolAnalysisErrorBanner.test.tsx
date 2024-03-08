@@ -1,6 +1,8 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, beforeEach } from 'vitest'
+
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { ProtocolAnalysisErrorBanner } from '../ProtocolAnalysisErrorBanner'
 
@@ -28,14 +30,14 @@ describe('ProtocolAnalysisErrorBanner', () => {
     }
   })
   it('renders error banner and show error link', () => {
-    const { getByText, getByLabelText } = render(props)
-    getByText('Protocol analysis failed.')
-    getByLabelText('error_link')
+    render(props)
+    screen.getByText('Protocol analysis failed.')
+    screen.getByLabelText('error_link')
   })
   it('renders error details modal when error link clicked', () => {
-    const { getByText, getByLabelText } = render(props)
-    const btn = getByLabelText('error_link')
+    render(props)
+    const btn = screen.getByLabelText('error_link')
     fireEvent.click(btn)
-    getByText('protocol analysis error')
+    screen.getByText('protocol analysis error')
   })
 })

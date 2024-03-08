@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -23,7 +24,7 @@ import { TertiaryButton } from '../../atoms/buttons'
 import { ERROR_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
 import { useToaster } from '../../organisms/ToasterOven'
 import { LegacyModal } from '../../molecules/LegacyModal'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import {
   clearDiscoveryCache,
   getReachableRobots,
@@ -62,42 +63,43 @@ export function ClearUnavailableRobots(): JSX.Element {
   } = useConditionalConfirm(handleDeleteUnavailRobots, true)
   return (
     <>
-      {showConfirmDeleteUnavailRobots ? (
-        <Portal level="top">
-          <LegacyModal
-            type="warning"
-            title={t('clear_unavailable_robots')}
-            onClose={cancelExit}
-          >
-            <StyledText as="p">{t('clearing_cannot_be_undone')}</StyledText>
-            <Flex
-              flexDirection={DIRECTION_ROW}
-              paddingTop={SPACING.spacing32}
-              justifyContent={JUSTIFY_FLEX_END}
+      {showConfirmDeleteUnavailRobots
+        ? createPortal(
+            <LegacyModal
+              type="warning"
+              title={t('clear_unavailable_robots')}
+              onClose={cancelExit}
             >
+              <StyledText as="p">{t('clearing_cannot_be_undone')}</StyledText>
               <Flex
-                paddingRight={SPACING.spacing4}
-                data-testid="AdvancedSettings_ConfirmClear_Cancel"
+                flexDirection={DIRECTION_ROW}
+                paddingTop={SPACING.spacing32}
+                justifyContent={JUSTIFY_FLEX_END}
               >
-                <Btn
-                  onClick={cancelExit}
-                  textTransform={TYPOGRAPHY.textTransformCapitalize}
-                  color={COLORS.blue50}
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  marginRight={SPACING.spacing32}
+                <Flex
+                  paddingRight={SPACING.spacing4}
+                  data-testid="AdvancedSettings_ConfirmClear_Cancel"
                 >
-                  {t('shared:cancel')}
-                </Btn>
+                  <Btn
+                    onClick={cancelExit}
+                    textTransform={TYPOGRAPHY.textTransformCapitalize}
+                    color={COLORS.blue50}
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    marginRight={SPACING.spacing32}
+                  >
+                    {t('shared:cancel')}
+                  </Btn>
+                </Flex>
+                <Flex data-testid="AdvancedSettings_ConfirmClear_Proceed">
+                  <AlertPrimaryButton onClick={confirmDeleteUnavailRobots}>
+                    {t('clear_confirm')}
+                  </AlertPrimaryButton>
+                </Flex>
               </Flex>
-              <Flex data-testid="AdvancedSettings_ConfirmClear_Proceed">
-                <AlertPrimaryButton onClick={confirmDeleteUnavailRobots}>
-                  {t('clear_confirm')}
-                </AlertPrimaryButton>
-              </Flex>
-            </Flex>
-          </LegacyModal>
-        </Portal>
-      ) : null}
+            </LegacyModal>,
+            getTopPortalEl()
+          )
+        : null}
       <Flex
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_SPACE_BETWEEN}

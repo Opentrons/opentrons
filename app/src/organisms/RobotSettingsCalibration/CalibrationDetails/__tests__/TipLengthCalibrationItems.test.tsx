@@ -1,23 +1,22 @@
 import * as React from 'react'
-import { renderWithProviders, Mount } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { Mount } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
-
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { TipLengthCalibrationItems } from '../TipLengthCalibrationItems'
 import { OverflowMenu } from '../OverflowMenu'
 
-jest.mock('../../../../redux/custom-labware/selectors')
-jest.mock('../../../../redux/config')
-jest.mock('../../../../redux/sessions/selectors')
-jest.mock('../../../../redux/discovery')
-jest.mock('../../../../assets/labware/findLabware')
-jest.mock('../../../../organisms/Devices/hooks')
-jest.mock('../OverflowMenu')
+vi.mock('../../../../redux/custom-labware/selectors')
+vi.mock('../../../../redux/config')
+vi.mock('../../../../redux/sessions/selectors')
+vi.mock('../../../../redux/discovery')
+vi.mock('../../../../assets/labware/findLabware')
+vi.mock('../../../../organisms/Devices/hooks')
+vi.mock('../OverflowMenu')
 
 const ROBOT_NAME = 'otie'
-
-const mockOverflowMenu = OverflowMenu as jest.MockedFunction<
-  typeof OverflowMenu
->
 
 const mockPipetteOffsetCalibrations = [
   {
@@ -52,7 +51,7 @@ const mockTipLengthCalibrations = [
   },
 ]
 
-const mockUpdateRobotStatus = jest.fn()
+const mockUpdateRobotStatus = vi.fn()
 
 const render = (
   props: React.ComponentProps<typeof TipLengthCalibrationItems>
@@ -65,7 +64,7 @@ describe('TipLengthCalibrationItems', () => {
   let props: React.ComponentProps<typeof TipLengthCalibrationItems>
 
   beforeEach(() => {
-    mockOverflowMenu.mockReturnValue(<div>mock overflow menu</div>)
+    vi.mocked(OverflowMenu).mockReturnValue(<div>mock overflow menu</div>)
     props = {
       robotName: ROBOT_NAME,
       formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrations,
@@ -75,24 +74,24 @@ describe('TipLengthCalibrationItems', () => {
   })
 
   it('should render table headers', () => {
-    const [{ getByText }] = render(props)
-    getByText('Tip Rack')
-    getByText('Pipette Model and Serial')
-    getByText('Last Calibrated')
+    render(props)
+    screen.getByText('Tip Rack')
+    screen.getByText('Pipette Model and Serial')
+    screen.getByText('Last Calibrated')
   })
 
   it('should render overFlow menu', () => {
-    const [{ queryAllByText }] = render(props)
-    expect(queryAllByText('mock overflow menu')).toHaveLength(2)
+    render(props)
+    expect(screen.queryAllByText('mock overflow menu')).toHaveLength(2)
   })
 
   it('should render tip length calibrations data', () => {
-    const [{ getByText }] = render(props)
+    render(props)
     // todo tiprack
-    getByText('Mock-P1KSV222021011802')
-    getByText('11/10/2022 18:14:01')
+    screen.getByText('Mock-P1KSV222021011802')
+    screen.getByText('11/10/2022 18:14:01')
 
-    getByText('Mock-P2KSV222021011802')
-    getByText('11/10/2022 18:15:02')
+    screen.getByText('Mock-P2KSV222021011802')
+    screen.getByText('11/10/2022 18:15:02')
   })
 })

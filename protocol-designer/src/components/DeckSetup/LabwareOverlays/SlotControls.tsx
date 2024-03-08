@@ -1,4 +1,3 @@
-import assert from 'assert'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
@@ -19,6 +18,7 @@ import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locati
 import { selectors as labwareDefSelectors } from '../../../labware-defs'
 import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../../../steplist'
 import { BlockedSlot } from './BlockedSlot'
+import styles from './LabwareOverlays.module.css'
 
 import type {
   CoordinateTuple,
@@ -27,7 +27,6 @@ import type {
 } from '@opentrons/shared-data'
 import type { LabwareOnDeck } from '../../../step-forms'
 
-import styles from './LabwareOverlays.css'
 interface SlotControlsProps {
   slotPosition: CoordinateTuple | null
   slotBoundingBox: Dimensions

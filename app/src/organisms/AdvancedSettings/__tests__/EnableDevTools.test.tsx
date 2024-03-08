@@ -1,20 +1,13 @@
 import * as React from 'react'
 import { screen, fireEvent } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-
+import { renderWithProviders } from '../../../__testing-utils__'
 import { getDevtoolsEnabled, toggleDevtools } from '../../../redux/config'
 import { EnableDevTools } from '../EnableDevTools'
 
-jest.mock('../../../redux/config')
-
-const mockGetDevtoolsEnabled = getDevtoolsEnabled as jest.MockedFunction<
-  typeof getDevtoolsEnabled
->
-const mockToggleDevtools = toggleDevtools as jest.MockedFunction<
-  typeof toggleDevtools
->
+vi.mock('../../../redux/config')
 
 const render = () => {
   return renderWithProviders(<EnableDevTools />, {
@@ -24,11 +17,7 @@ const render = () => {
 
 describe('EnableDevTools', () => {
   beforeEach(() => {
-    mockGetDevtoolsEnabled.mockReturnValue(true)
-  })
-
-  afterEach(() => {
-    jest.clearAllMocks()
+    vi.mocked(getDevtoolsEnabled).mockReturnValue(true)
   })
 
   it('should render text and toggle button', () => {
@@ -46,6 +35,6 @@ describe('EnableDevTools', () => {
       name: 'enable_dev_tools',
     })
     fireEvent.click(toggleButton)
-    expect(mockToggleDevtools).toHaveBeenCalled()
+    expect(vi.mocked(toggleDevtools)).toHaveBeenCalled()
   })
 })

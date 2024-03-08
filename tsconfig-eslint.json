@@ -22,6 +22,7 @@
     "shared-data/deck",
     "shared-data/js",
     "shared-data/protocol",
+    "shared-data/labware",
     "shared-data/pipette",
     "shared-data/liquid",
     "shared-data/commandAnnotations",
@@ -33,6 +34,7 @@
     "react-api-client/src",
     "usb-bridge/node-client/src",
     "**/*.js",
+    "**/*.ts",
     "*.js",
     ".*.js",
     "**/*.json"

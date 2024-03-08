@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { createMaintenanceRun } from '@opentrons/api-client'
@@ -13,13 +13,8 @@ import type {
   MaintenanceRun,
 } from '@opentrons/api-client'
 
-jest.mock('@opentrons/api-client')
-jest.mock('../../api/useHost')
-
-const mockCreateMaintenanceRun = createMaintenanceRun as jest.MockedFunction<
-  typeof createMaintenanceRun
->
-const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
+vi.mock('@opentrons/api-client')
+vi.mock('../../api/useHost')
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
@@ -36,15 +31,10 @@ describe('useCreateMaintenanceRunMutation hook', () => {
 
     wrapper = clientProvider
   })
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
 
   it('should return no data when calling createMaintenanceRun if the request fails', async () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockCreateMaintenanceRun)
-      .calledWith(HOST_CONFIG, {})
-      .mockRejectedValue('oh no')
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(createMaintenanceRun).mockRejectedValue('oh no')
 
     const { result } = renderHook(() => useCreateMaintenanceRunMutation(), {
       wrapper,
@@ -64,12 +54,10 @@ describe('useCreateMaintenanceRunMutation hook', () => {
       location: { slotName: '1' },
       vector: { x: 1, y: 2, z: 3 },
     }
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockCreateMaintenanceRun)
-      .calledWith(HOST_CONFIG, { labwareOffsets: [mockOffset] })
-      .mockResolvedValue({
-        data: mockMaintenanceRunResponse,
-      } as Response<MaintenanceRun>)
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(createMaintenanceRun).mockResolvedValue({
+      data: mockMaintenanceRunResponse,
+    } as Response<MaintenanceRun>)
 
     const { result } = renderHook(() => useCreateMaintenanceRunMutation(), {
       wrapper,

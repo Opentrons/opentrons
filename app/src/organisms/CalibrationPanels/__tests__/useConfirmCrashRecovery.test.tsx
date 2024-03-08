@@ -1,8 +1,11 @@
 import * as React from 'react'
 import { fireEvent, renderHook } from '@testing-library/react'
 import { I18nextProvider } from 'react-i18next'
+import { vi, it, describe, expect } from 'vitest'
+
 import { LEFT } from '@opentrons/shared-data'
-import { renderWithProviders } from '@opentrons/components'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { useConfirmCrashRecovery } from '../useConfirmCrashRecovery'
 import { mockCalibrationCheckLabware } from '../../../redux/sessions/__fixtures__'
@@ -13,19 +16,15 @@ import {
 } from '../../../redux/sessions'
 
 describe('useConfirmCrashRecovery', () => {
-  const mockSendCommands = jest.fn()
+  const mockSendCommands = vi.fn()
   const mockProps = {
-    cleanUpAndExit: jest.fn(),
+    cleanUpAndExit: vi.fn(),
     tipRack: mockCalibrationCheckLabware,
     isMulti: false,
     mount: LEFT,
     currentStep: DECK_STEP_JOGGING_TO_DECK,
     sessionType: SESSION_TYPE_DECK_CALIBRATION,
   }
-
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
 
   it('renders the link text', () => {
     const { result } = renderHook(

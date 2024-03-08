@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_FLEX_END,
@@ -11,7 +12,7 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import { Portal } from '../../../App/portal'
+import { getTopPortalEl } from '../../../App/portal'
 import { LegacyModal } from '../../../molecules/LegacyModal'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 
@@ -33,30 +34,31 @@ export function NewRobotSetupHelp(): JSX.Element {
       >
         {t('see_how_to_setup_new_robot')}
       </Link>
-      <Portal level="top">
-        {showNewRobotHelpModal ? (
-          <LegacyModal
-            title={t('how_to_setup_a_robot')}
-            onClose={() => setShowNewRobotHelpModal(false)}
-          >
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText as="p" marginBottom={SPACING.spacing16}>
-                {t('use_usb_cable_for_new_robot')}
-              </StyledText>
-              <ExternalLink href={NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF}>
-                {t('learn_more_about_new_robot_setup')}
-              </ExternalLink>
-              <PrimaryButton
-                onClick={() => setShowNewRobotHelpModal(false)}
-                alignSelf={ALIGN_FLEX_END}
-                textTransform={TYPOGRAPHY.textTransformCapitalize}
-              >
-                {t('shared:close')}
-              </PrimaryButton>
-            </Flex>
-          </LegacyModal>
-        ) : null}
-      </Portal>
+      {showNewRobotHelpModal
+        ? createPortal(
+            <LegacyModal
+              title={t('how_to_setup_a_robot')}
+              onClose={() => setShowNewRobotHelpModal(false)}
+            >
+              <Flex flexDirection={DIRECTION_COLUMN}>
+                <StyledText as="p" marginBottom={SPACING.spacing16}>
+                  {t('use_usb_cable_for_new_robot')}
+                </StyledText>
+                <ExternalLink href={NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF}>
+                  {t('learn_more_about_new_robot_setup')}
+                </ExternalLink>
+                <PrimaryButton
+                  onClick={() => setShowNewRobotHelpModal(false)}
+                  alignSelf={ALIGN_FLEX_END}
+                  textTransform={TYPOGRAPHY.textTransformCapitalize}
+                >
+                  {t('shared:close')}
+                </PrimaryButton>
+              </Flex>
+            </LegacyModal>,
+            getTopPortalEl()
+          )
+        : null}
     </>
   )
 }

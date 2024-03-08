@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen, fireEvent } from '@testing-library/react'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 
 import { getConfig, toggleConfigValue } from '../../../redux/config'
@@ -10,12 +11,7 @@ import { PreventRobotCaching } from '../PreventRobotCaching'
 
 import type { State } from '../../../redux/types'
 
-jest.mock('../../../redux/config')
-
-const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
-const mockToggleConfigValue = toggleConfigValue as jest.MockedFunction<
-  typeof toggleConfigValue
->
+vi.mock('../../../redux/config')
 
 const MOCK_STATE: State = {
   config: {
@@ -33,14 +29,7 @@ const render = () => {
 
 describe('PreventRobotCaching', () => {
   beforeEach(() => {
-    when(mockGetConfig)
-      .calledWith(MOCK_STATE)
-      .mockReturnValue(MOCK_STATE.config)
-  })
-
-  afterEach(() => {
-    jest.clearAllMocks()
-    resetAllWhenMocks()
+    when(getConfig).calledWith(MOCK_STATE).thenReturn(MOCK_STATE.config)
   })
 
   it('should render text and toggle button', () => {
@@ -58,6 +47,8 @@ describe('PreventRobotCaching', () => {
       name: 'display_unavailable_robots',
     })
     fireEvent.click(toggleButton)
-    expect(mockToggleConfigValue).toHaveBeenCalledWith('discovery.disableCache')
+    expect(vi.mocked(toggleConfigValue)).toHaveBeenCalledWith(
+      'discovery.disableCache'
+    )
   })
 })

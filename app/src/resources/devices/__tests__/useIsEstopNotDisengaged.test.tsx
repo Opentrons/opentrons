@@ -1,5 +1,5 @@
-import { when, resetAllWhenMocks } from 'jest-when'
-
+import { when } from 'vitest-when'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useIsFlex } from '../../../organisms/Devices/hooks'
 import { useEstopQuery } from '@opentrons/react-api-client'
 import {
@@ -10,13 +10,8 @@ import {
 } from '../../../organisms/EmergencyStop'
 import { useIsEstopNotDisengaged } from '../hooks/useIsEstopNotDisengaged'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../organisms/Devices/hooks')
-
-const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
-const mockUseEstopQuery = useEstopQuery as jest.MockedFunction<
-  typeof useEstopQuery
->
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../organisms/Devices/hooks')
 
 const ROBOT_NAME = 'mockRobot'
 const mockEstopStatus = {
@@ -47,16 +42,11 @@ const mockNotPresentStatus = {
 
 describe('useIsEstopNotDisengaged', () => {
   beforeEach(() => {
-    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
-    mockUseEstopQuery.mockReturnValue({
+    when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.mocked(useEstopQuery).mockReturnValue({
       data: mockEstopStatus,
       error: null,
     } as any)
-  })
-
-  afterAll(() => {
-    resetAllWhenMocks()
-    jest.clearAllMocks()
   })
 
   it('should return false when e-stop status is disengaged', () => {
@@ -65,7 +55,7 @@ describe('useIsEstopNotDisengaged', () => {
   })
 
   it('should return true when e-stop status is physically engaged', () => {
-    mockUseEstopQuery.mockReturnValue({
+    vi.mocked(useEstopQuery).mockReturnValue({
       data: mockPhysicallyEngagedStatus,
     } as any)
     const isEstopNotDisengaged = useIsEstopNotDisengaged(ROBOT_NAME)
@@ -73,20 +63,22 @@ describe('useIsEstopNotDisengaged', () => {
   })
 
   it('should return true when e-stop status is logically engaged', () => {
-    mockUseEstopQuery.mockReturnValue({
+    vi.mocked(useEstopQuery).mockReturnValue({
       data: mockLogicallyEngagedStatus,
     } as any)
     const isEstopNotDisengaged = useIsEstopNotDisengaged(ROBOT_NAME)
     expect(isEstopNotDisengaged).toBe(true)
   })
   it('should return true when e-stop status is not present', () => {
-    mockUseEstopQuery.mockReturnValue({ data: mockNotPresentStatus } as any)
+    vi.mocked(useEstopQuery).mockReturnValue({
+      data: mockNotPresentStatus,
+    } as any)
     const isEstopNotDisengaged = useIsEstopNotDisengaged(ROBOT_NAME)
     expect(isEstopNotDisengaged).toBe(true)
   })
   it('should return false when a robot is OT-2', () => {
-    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(false)
-    mockUseEstopQuery.mockReturnValue({
+    when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(false)
+    vi.mocked(useEstopQuery).mockReturnValue({
       data: mockPhysicallyEngagedStatus,
     } as any)
     const isEstopNotDisengaged = useIsEstopNotDisengaged(ROBOT_NAME)

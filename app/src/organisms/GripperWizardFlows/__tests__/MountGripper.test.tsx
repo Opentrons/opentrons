@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { instrumentsResponseFixture } from '@opentrons/api-client'
 import { i18n } from '../../../i18n'
@@ -8,19 +9,15 @@ import { i18n } from '../../../i18n'
 import { MountGripper } from '../MountGripper'
 import { GRIPPER_FLOW_TYPES } from '../constants'
 
-jest.mock('@opentrons/react-api-client')
-
-const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
-  typeof useInstrumentsQuery
->
+vi.mock('@opentrons/react-api-client')
 
 const mockRunId = 'fakeRunId'
 
 describe('MountGripper', () => {
-  let mockRefetch: jest.Mock
-  let mockProceed: jest.Mock
-  let mockChainRunCommands: jest.Mock
-  let mockSetErrorMessage: jest.Mock
+  let mockRefetch: any
+  let mockProceed: any
+  let mockChainRunCommands: any
+  let mockSetErrorMessage: any
 
   const render = (
     props: Partial<React.ComponentProps<typeof MountGripper>> = {}
@@ -43,17 +40,13 @@ describe('MountGripper', () => {
   }
 
   beforeEach(() => {
-    mockProceed = jest.fn()
-    mockChainRunCommands = jest.fn()
-    mockRefetch = jest.fn(() => Promise.resolve())
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
+    mockProceed = vi.fn()
+    mockChainRunCommands = vi.fn()
+    mockRefetch = vi.fn(() => Promise.resolve())
   })
 
   it('clicking confirm calls proceed if attached gripper', async () => {
-    mockUseInstrumentsQuery.mockReturnValue({
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
       refetch: mockRefetch,
       data: instrumentsResponseFixture,
     } as any)
@@ -64,7 +57,7 @@ describe('MountGripper', () => {
   })
 
   it('clicking confirm shows unable to detect if no gripper attached', async () => {
-    mockUseInstrumentsQuery.mockReturnValue({
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
       refetch: mockRefetch,
       data: null,
     } as any)
@@ -83,7 +76,7 @@ describe('MountGripper', () => {
   })
 
   it('renders correct text', () => {
-    mockUseInstrumentsQuery.mockReturnValue({
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
       refetch: mockRefetch,
       data: null,
     } as any)

@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { when } from 'jest-when'
+import { describe, it, expect, vi } from 'vitest'
+import { when } from 'vitest-when'
 import { renderHook, waitFor } from '@testing-library/react'
 
 import { useNotifyAllRunsQuery } from '../../../../resources/runs/useNotifyAllRunsQuery'
@@ -9,11 +10,7 @@ import { mockSuccessQueryResults } from '../../../../__fixtures__'
 
 import type { RunData } from '@opentrons/api-client'
 
-jest.mock('../../../../resources/runs/useNotifyAllRunsQuery')
-
-const mockuseNotifyAllRunsQuery = useNotifyAllRunsQuery as jest.MockedFunction<
-  typeof useNotifyAllRunsQuery
->
+vi.mock('../../../../resources/runs/useNotifyAllRunsQuery')
 
 const MOCK_RUN_LATER: RunData = {
   ...mockRunningRun,
@@ -33,9 +30,9 @@ const MOCK_RUN_EARLIER: RunData = {
 }
 
 describe('useHistoricRunDetails', () => {
-  when(mockuseNotifyAllRunsQuery)
+  when(useNotifyAllRunsQuery)
     .calledWith({}, {}, undefined)
-    .mockReturnValue(
+    .thenReturn(
       mockSuccessQueryResults({
         data: [MOCK_RUN_LATER, MOCK_RUN_EARLIER],
         links: {},
@@ -52,9 +49,9 @@ describe('useHistoricRunDetails', () => {
     })
   })
   it('returns historical run details with newest first to specific host', async () => {
-    when(mockuseNotifyAllRunsQuery)
+    when(useNotifyAllRunsQuery)
       .calledWith({}, {}, { hostname: 'fakeIp' })
-      .mockReturnValue(
+      .thenReturn(
         mockSuccessQueryResults({
           data: [MOCK_RUN_EARLIER, MOCK_RUN_EARLIER, MOCK_RUN_LATER],
           links: {},

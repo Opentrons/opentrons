@@ -3,8 +3,7 @@
   "description": "Opentrons robot HTTP API client for React apps",
   "version": "0.0.0-dev",
   "license": "Apache-2.0",
-  "main": "dist/react-api-client.browser.js",
-  "module": "dist/react-api-client.browser.mjs",
+  "main": "src/index.ts",
   "types": "lib/index.d.ts",
   "source": "src/index.ts",
   "peerDependencies": {
@@ -13,6 +12,7 @@
   "dependencies": {
     "@opentrons/api-client": "link:../api-client",
     "@opentrons/shared-data": "link:../shared-data",
+    "axios": "^0.21.1",
     "react-query": "3.35.0"
   }
 }

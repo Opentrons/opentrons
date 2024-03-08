@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { Route } from 'react-router'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
-import { renderWithProviders } from '@opentrons/components'
+import { Route, MemoryRouter } from 'react-router-dom'
 
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { RobotSettingsCalibration } from '../../../../organisms/RobotSettingsCalibration'
 import { RobotSettingsNetworking } from '../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
@@ -11,7 +11,7 @@ import { RobotSettingsAdvanced } from '../../../../organisms/Devices/RobotSettin
 import { RobotSettingsPrivacy } from '../../../../organisms/Devices/RobotSettings/RobotSettingsPrivacy'
 import { useRobot } from '../../../../organisms/Devices/hooks'
 import { RobotSettings } from '..'
-import { when } from 'jest-when'
+import { when } from 'vitest-when'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -19,31 +19,13 @@ import {
 } from '../../../../redux/discovery/__fixtures__'
 import { getRobotUpdateSession } from '../../../../redux/robot-update'
 
-jest.mock('../../../../organisms/RobotSettingsCalibration')
-jest.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking')
-jest.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced')
-jest.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsPrivacy')
-jest.mock('../../../../organisms/Devices/hooks')
-jest.mock('../../../../redux/discovery/selectors')
-jest.mock('../../../../redux/robot-update')
-
-const mockRobotSettingsCalibration = RobotSettingsCalibration as jest.MockedFunction<
-  typeof RobotSettingsCalibration
->
-const mockRobotSettingsNetworking = RobotSettingsNetworking as jest.MockedFunction<
-  typeof RobotSettingsNetworking
->
-const mockRobotSettingsAdvanced = RobotSettingsAdvanced as jest.MockedFunction<
-  typeof RobotSettingsAdvanced
->
-const mockRobotSettingsPrivacy = RobotSettingsPrivacy as jest.MockedFunction<
-  typeof RobotSettingsPrivacy
->
-const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
-
-const mockGetRobotUpdateSession = getRobotUpdateSession as jest.MockedFunction<
-  typeof getRobotUpdateSession
->
+vi.mock('../../../../organisms/RobotSettingsCalibration')
+vi.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking')
+vi.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced')
+vi.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsPrivacy')
+vi.mock('../../../../organisms/Devices/hooks')
+vi.mock('../../../../redux/discovery/selectors')
+vi.mock('../../../../redux/robot-update')
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -63,22 +45,24 @@ const render = (path = '/') => {
 
 describe('RobotSettings', () => {
   beforeEach(() => {
-    when(mockUseRobot).calledWith('otie').mockReturnValue(mockConnectableRobot)
-    mockRobotSettingsCalibration.mockReturnValue(
+    when(vi.mocked(useRobot))
+      .calledWith('otie')
+      .thenReturn(mockConnectableRobot)
+    vi.mocked(RobotSettingsCalibration).mockReturnValue(
       <div>Mock RobotSettingsCalibration</div>
     )
-    mockRobotSettingsNetworking.mockReturnValue(
+    vi.mocked(RobotSettingsNetworking).mockReturnValue(
       <div>Mock RobotSettingsNetworking</div>
     )
-    mockRobotSettingsAdvanced.mockReturnValue(
+    vi.mocked(RobotSettingsAdvanced).mockReturnValue(
       <div>Mock RobotSettingsAdvanced</div>
     )
-    mockRobotSettingsPrivacy.mockReturnValue(
+    vi.mocked(RobotSettingsPrivacy).mockReturnValue(
       <div>Mock RobotSettingsPrivacy</div>
     )
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders a title and navigation tabs', () => {
@@ -91,20 +75,22 @@ describe('RobotSettings', () => {
   })
 
   it('redirects to device details if robot is unreachable', () => {
-    when(mockUseRobot).calledWith('otie').mockReturnValue(mockUnreachableRobot)
+    when(vi.mocked(useRobot))
+      .calledWith('otie')
+      .thenReturn(mockUnreachableRobot)
     render('/devices/otie/robot-settings/calibration')
     screen.getByText('mock device details')
   })
 
   it('redirects to device details if robot is null', () => {
-    when(mockUseRobot).calledWith('otie').mockReturnValue(null)
+    when(vi.mocked(useRobot)).calledWith('otie').thenReturn(null)
     render('/devices/otie/robot-settings/calibration')
     screen.getByText('mock device details')
   })
 
   it('does NOT redirect to device details if robot is null but a robot update session is active', () => {
-    when(mockUseRobot).calledWith('otie').mockReturnValue(null)
-    mockGetRobotUpdateSession.mockReturnValue({
+    when(vi.mocked(useRobot)).calledWith('otie').thenReturn(null)
+    vi.mocked(getRobotUpdateSession).mockReturnValue({
       robotName: 'some robot',
       fileInfo: null,
       token: null,
@@ -119,21 +105,21 @@ describe('RobotSettings', () => {
   })
 
   it('redirects to device details if robot is reachable but server is down', () => {
-    when(mockUseRobot)
+    when(vi.mocked(useRobot))
       .calledWith('otie')
-      .mockReturnValue({ ...mockReachableRobot, serverHealthStatus: 'notOk' })
+      .thenReturn({ ...mockReachableRobot, serverHealthStatus: 'notOk' })
     render('/devices/otie/robot-settings/calibration')
     screen.getByText('mock device details')
   })
 
   it('redirects to networking tab if robot not connectable', () => {
-    when(mockUseRobot).calledWith('otie').mockReturnValue(mockReachableRobot)
+    when(vi.mocked(useRobot)).calledWith('otie').thenReturn(mockReachableRobot)
     render('/devices/otie/robot-settings/calibration')
     screen.getByText('Mock RobotSettingsNetworking')
   })
 
   it('redirects to networking tab if feature flags hidden', () => {
-    when(mockUseRobot).calledWith('otie').mockReturnValue(mockReachableRobot)
+    when(vi.mocked(useRobot)).calledWith('otie').thenReturn(mockReachableRobot)
     render('/devices/otie/robot-settings/feature-flags')
     screen.getByText('Mock RobotSettingsNetworking')
   })

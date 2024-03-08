@@ -9,7 +9,6 @@ on:
       - 'step-generation/**'
       - 'shared-data/**'
       - 'components/**'
-      - 'webpack-config/**'
       - 'package.json'
       - '.github/workflows/pd-test-build-deploy.yaml'
   push:
@@ -18,7 +17,6 @@ on:
       - 'step-generation/**'
       - 'shared-data/**'
       - 'components/**'
-      - 'webpack-config/**'
       - 'package.json'
       - '.github/workflows/pd-test-build-deploy.yaml'
     branches:
@@ -145,8 +143,6 @@ jobs:
             ${{ github.workspace }}/.yarn-cache
             ${{ github.workspace }}/.npm-cache
           key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: 'setup-js'
         run: |
           npm config set cache ./.npm-cache

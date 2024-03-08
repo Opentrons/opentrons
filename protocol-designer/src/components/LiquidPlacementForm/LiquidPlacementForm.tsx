@@ -3,7 +3,7 @@ import { Controller, useForm } from 'react-hook-form'
 import isEmpty from 'lodash/isEmpty'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
-import assert from 'assert'
+
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import * as fieldProcessors from '../../steplist/fieldLevel/processing'
 import {
@@ -13,6 +13,9 @@ import {
   DeprecatedPrimaryButton,
   InputField,
 } from '@opentrons/components'
+import styles from './LiquidPlacementForm.module.css'
+import formStyles from '../forms/forms.module.css'
+import stepEditFormStyles from '../StepEditForm/StepEditForm.module.css'
 import { deselectAllWells } from '../../well-selection/actions'
 import {
   removeWellsContents,
@@ -21,10 +24,6 @@ import {
 import { getSelectedWells } from '../../well-selection/selectors'
 
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-
-import styles from './LiquidPlacementForm.css'
-import formStyles from '../forms/forms.css'
-import stepEditFormStyles from '../StepEditForm/StepEditForm.css'
 
 interface ValidFormValues {
   selectedLiquidId: string
@@ -119,23 +118,23 @@ export const LiquidPlacementForm = (): JSX.Element | null => {
   const handleSaveForm = (values: LiquidPlacementFormValues): void => {
     const volume = Number(values.volume)
     const { selectedLiquidId } = values
-    assert(
+    console.assert(
       labwareId != null,
       'when saving liquid placement form, expected a selected labware ID'
     )
-    assert(
+    console.assert(
       selectedWells && selectedWells.length > 0,
       `when saving liquid placement form, expected selected wells to be array with length > 0 but got ${String(
         selectedWells
       )}`
     )
-    assert(
+    console.assert(
       selectedLiquidId != null,
       `when saving liquid placement form, expected selectedLiquidId to be non-nullsy but got ${String(
         selectedLiquidId
       )}`
     )
-    assert(
+    console.assert(
       volume > 0,
       `when saving liquid placement form, expected volume > 0, got ${volume}`
     )

@@ -1,6 +1,8 @@
+/* eslint-disable jest/consistent-test-it */
 import path from 'path'
 import glob from 'glob'
 import Ajv from 'ajv'
+import { describe, expect, it, beforeAll, test } from 'vitest'
 
 import schema from '../../labware/schemas/2.json'
 import type { LabwareDefinition2, LabwareWell } from '../types'

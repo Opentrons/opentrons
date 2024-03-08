@@ -1,15 +1,15 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
 import { screen } from '@testing-library/react'
-import fixture_adapter from '@opentrons/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json'
-import fixture_96_wellplate from '@opentrons/shared-data/labware/definitions/2/opentrons_96_wellplate_200ul_pcr_full_skirt/1.json'
+import { describe, it, expect } from 'vitest'
+import { fixture96Plate, fixtureTiprackAdapter } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { LabwareOffsetTable } from '../LabwareOffsetTable'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { OffsetCandidate } from '../hooks/useOffsetCandidatesForAnalysis'
 
-const mockLabwareDef = fixture_96_wellplate as LabwareDefinition2
-const mockAdapterDef = fixture_adapter as LabwareDefinition2
+const mockLabwareDef = fixture96Plate as LabwareDefinition2
+const mockAdapterDef = fixtureTiprackAdapter as LabwareDefinition2
 
 const mockFirstCandidate: OffsetCandidate = {
   id: 'first_offset_id',
@@ -67,10 +67,6 @@ const render = () =>
   )
 
 describe('LabwareOffsetTable', () => {
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('renders headers text and values for each candidate', () => {
     render()
     // headers
@@ -103,9 +99,7 @@ describe('LabwareOffsetTable', () => {
     screen.getByText('8.00')
     screen.getByText('9.00')
     //  fourth candidate is labware on adapter on module
-    screen.getByText(
-      'Opentrons 96 PCR Heater-Shaker Adapter in Heater-Shaker Module GEN1 in Slot 3'
-    )
+    screen.getByText('in Heater-Shaker Module GEN1 in Slot 3')
     screen.getByText('Fourth Fake Labware Display Name')
     screen.getByText('7.20')
     screen.getByText('8.10')

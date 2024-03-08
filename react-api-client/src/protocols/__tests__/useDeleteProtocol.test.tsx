@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { deleteProtocol } from '@opentrons/api-client'
@@ -7,13 +7,8 @@ import { useHost } from '../../api'
 import { useDeleteProtocolMutation } from '..'
 import type { HostConfig, Response, EmptyResponse } from '@opentrons/api-client'
 
-jest.mock('@opentrons/api-client')
-jest.mock('../../api/useHost')
-
-const mockDeleteProtocol = deleteProtocol as jest.MockedFunction<
-  typeof deleteProtocol
->
-const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
+vi.mock('@opentrons/api-client')
+vi.mock('../../api/useHost')
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const DELETE_PROTOCOL_RESPONSE = {
@@ -34,15 +29,10 @@ describe('useDeleteProtocolMutation hook', () => {
 
     wrapper = clientProvider
   })
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
 
   it('should return no data when calling deleteProtocol if the request fails', async () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockDeleteProtocol)
-      .calledWith(HOST_CONFIG, protocolId)
-      .mockRejectedValue('oh no')
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(deleteProtocol).mockRejectedValue('oh no')
 
     const { result } = renderHook(() => useDeleteProtocolMutation(protocolId), {
       wrapper,
@@ -56,12 +46,10 @@ describe('useDeleteProtocolMutation hook', () => {
   })
 
   it('should delete a protocol when calling the deleteProtocol callback', async () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockDeleteProtocol)
-      .calledWith(HOST_CONFIG, protocolId)
-      .mockResolvedValue({
-        data: DELETE_PROTOCOL_RESPONSE,
-      } as Response<EmptyResponse>)
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(deleteProtocol).mockResolvedValue({
+      data: DELETE_PROTOCOL_RESPONSE,
+    } as Response<EmptyResponse>)
 
     const { result } = renderHook(() => useDeleteProtocolMutation(protocolId), {
       wrapper,

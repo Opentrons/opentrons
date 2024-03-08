@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { UpdateInProgressModal } from '../UpdateInProgressModal'
 

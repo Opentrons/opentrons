@@ -196,7 +196,7 @@ export function InterventionModal({
       <Flex {...BASE_STYLE} zIndex={10}>
         <Box
           {...MODAL_STYLE}
-          onClick={e => {
+          onClick={(e: React.MouseEvent) => {
             e.stopPropagation()
           }}
         >

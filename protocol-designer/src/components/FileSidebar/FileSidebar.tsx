@@ -18,7 +18,7 @@ import { selectors as stepFormSelectors } from '../../step-forms'
 import { getRobotType } from '../../file-data/selectors'
 import { getAdditionalEquipment } from '../../step-forms/selectors'
 import { resetScrollElements } from '../../ui/steps/utils'
-import { Portal } from '../portals/MainPageModalPortal'
+import { getMainPagePortalEl } from '../portals/MainPageModalPortal'
 import { useBlockingHint } from '../Hints/useBlockingHint'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import {
@@ -26,8 +26,8 @@ import {
   getUnusedTrash,
   getUnusedStagingAreas,
 } from './utils'
-import modalStyles from '../modals/modal.css'
-import styles from './FileSidebar.css'
+import modalStyles from '../modals/modal.module.css'
+import styles from './FileSidebar.module.css'
 
 import type {
   CreateCommand,
@@ -42,6 +42,7 @@ import type {
   PipetteOnDeck,
 } from '../../step-forms'
 import type { ThunkDispatch } from '../../types'
+import { createPortal } from 'react-dom'
 
 export interface AdditionalEquipment {
   [additionalEquipmentId: string]: {
@@ -365,8 +366,8 @@ export function FileSidebar(): JSX.Element {
   return (
     <>
       {blockingExportHint}
-      {showExportWarningModal && (
-        <Portal>
+      {showExportWarningModal &&
+        createPortal(
           <AlertModal
             alertOverlay
             className={modalStyles.modal}
@@ -388,9 +389,9 @@ export function FileSidebar(): JSX.Element {
             ]}
           >
             {warning && warning.content}
-          </AlertModal>
-        </Portal>
-      )}
+          </AlertModal>,
+          getMainPagePortalEl()
+        )}
       <SidePanel title="Protocol File">
         <div className={styles.file_sidebar}>
           <OutlineButton onClick={createNewFile} className={styles.button}>

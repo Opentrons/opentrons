@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { AlertItem } from '@opentrons/components'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 interface Props {
   message?: string | null

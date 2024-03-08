@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { FormGroup } from '@opentrons/components'
 import { TextField } from '../../fields'
 
-import styles from '../../StepEditForm.css'
+import styles from '../../StepEditForm.module.css'
 
 import { FieldPropsByName } from '../../types'
 

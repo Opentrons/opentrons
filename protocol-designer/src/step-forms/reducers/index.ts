@@ -1,4 +1,3 @@
-import assert from 'assert'
 import { handleActions } from 'redux-actions'
 import { Reducer } from 'redux'
 import mapValues from 'lodash/mapValues'
@@ -534,7 +533,7 @@ export const _editModuleFormUpdate = ({
         ? getLabwareDefaultEngageHeight(labwareEntity.def)
         : null
       const moduleEntity = initialDeckSetup.modules[moduleId]
-      assert(
+      console.assert(
         moduleEntity,
         `editModuleFormUpdate expected moduleEntity for module ${moduleId}`
       )
@@ -618,7 +617,7 @@ export const savedStepForms = (
         action.type === 'CREATE_CONTAINER'
           ? action.payload.id
           : action.payload.duplicateLabwareId
-      assert(
+      console.assert(
         prevInitialDeckSetupStep,
         'expected initial deck setup step to exist, could not handle CREATE_CONTAINER'
       )
@@ -944,7 +943,7 @@ export const savedStepForms = (
       const { stepId } = action.payload
 
       if (stepId == null) {
-        assert(
+        console.assert(
           false,
           `savedStepForms got CHANGE_SAVED_STEP_FORM action without a stepId`
         )
@@ -1026,7 +1025,7 @@ export const savedStepForms = (
           const defaults = getDefaultsForStepType(prevStepForm.stepType)
 
           if (!prevStepForm) {
-            assert(false, `expected stepForm for id ${stepId}`)
+            console.assert(false, `expected stepForm for id ${stepId}`)
             return acc
           }
 

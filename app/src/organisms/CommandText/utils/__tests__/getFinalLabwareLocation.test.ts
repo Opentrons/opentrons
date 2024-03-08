@@ -1,4 +1,5 @@
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import { describe, it, expect } from 'vitest'
+import { fixtureTiprack10ul } from '@opentrons/shared-data'
 import { getFinalLabwareLocation } from '../getFinalLabwareLocation'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
@@ -19,7 +20,7 @@ describe('getFinalLabwareLocation', () => {
           },
           result: {
             labwareId,
-            definition: fixture_tiprack_10_ul as LabwareDefinition2,
+            definition: fixtureTiprack10ul as LabwareDefinition2,
             offset: { x: 1, y: 2, z: 3 },
           },
           status: 'succeeded',
@@ -47,7 +48,7 @@ describe('getFinalLabwareLocation', () => {
           },
           result: {
             labwareId,
-            definition: fixture_tiprack_10_ul as LabwareDefinition2,
+            definition: fixtureTiprack10ul as LabwareDefinition2,
             offset: { x: 1, y: 2, z: 3 },
           },
           status: 'succeeded',
@@ -89,7 +90,7 @@ describe('getFinalLabwareLocation', () => {
           },
           result: {
             labwareId,
-            definition: fixture_tiprack_10_ul as LabwareDefinition2,
+            definition: fixtureTiprack10ul as LabwareDefinition2,
             offset: { x: 1, y: 2, z: 3 },
           },
           status: 'succeeded',

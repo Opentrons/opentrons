@@ -1,8 +1,11 @@
 import * as React from 'react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders, COLORS, BORDERS } from '@opentrons/components'
+import { COLORS, BORDERS } from '@opentrons/components'
 
 import { SmallButton } from '../SmallButton'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 const render = (props: React.ComponentProps<typeof SmallButton>) => {
   return renderWithProviders(<SmallButton {...props} />)[0]
@@ -13,7 +16,7 @@ describe('SmallButton', () => {
 
   beforeEach(() => {
     props = {
-      onClick: jest.fn(),
+      onClick: vi.fn(),
       buttonText: 'small button',
     }
   })
@@ -22,7 +25,7 @@ describe('SmallButton', () => {
     fireEvent.click(screen.getByText('small button'))
     expect(props.onClick).toHaveBeenCalled()
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.blue50}`
+      `background-color: ${COLORS.blue60}`
     )
     expect(screen.getByRole('button')).toHaveStyle(
       `border-radius: ${BORDERS.borderRadiusSize4}`
@@ -35,7 +38,7 @@ describe('SmallButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.red50}`
+      `background-color: ${COLORS.red55}`
     )
   })
   it('renders the secondary button', () => {
@@ -45,7 +48,7 @@ describe('SmallButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.blue35}`
+      `background-color: ${COLORS.blue40}`
     )
   })
   it('renders the tertiary high light button', () => {

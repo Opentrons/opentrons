@@ -12,6 +12,7 @@ module.exports = {
     'plugin:react/recommended',
     'prettier',
     'plugin:json/recommended',
+    'plugin:storybook/recommended',
   ],
 
   plugins: ['react', 'react-hooks', 'json', 'jest', 'testing-library'],
@@ -89,6 +90,11 @@ module.exports = {
         '@typescript-eslint/unbound-method': 'warn',
         '@typescript-eslint/consistent-generic-constructors': 'warn',
         '@typescript-eslint/no-misused-promises': 'warn',
+        // need this to be able to pass in css prop into raw elements (babel adds this at build time for styled-components)
+        'react/no-unknown-property': [
+          'error',
+          { ignore: ['css', 'indeterminate'] },
+        ],
       },
     },
     {
@@ -98,6 +104,7 @@ module.exports = {
         '**/__mocks__/**.@(js|ts|tsx)',
         '**/__utils__/**.@(js|ts|tsx)',
         '**/__fixtures__/**.@(js|ts|tsx)',
+        '**/fixtures/**.@(js|ts|tsx)',
         'scripts/*.@(js|ts|tsx)',
       ],
       env: {
@@ -108,7 +115,7 @@ module.exports = {
         'jest/expect-expect': 'off',
         'jest/no-standalone-expect': 'off',
         'jest/no-disabled-tests': 'error',
-        'jest/consistent-test-it': 'error',
+        'jest/consistent-test-it': ['error', { fn: 'it' }],
         '@typescript-eslint/consistent-type-assertions': 'off',
         '@typescript-eslint/no-var-requires': 'off',
         '@typescript-eslint/explicit-function-return-type': 'off',
@@ -127,6 +134,7 @@ module.exports = {
       env: { jest: true },
       extends: ['plugin:testing-library/react'],
       rules: {
+        'testing-library/no-manual-cleanup': 'off',
         'testing-library/prefer-screen-queries': 'warn',
       },
     },
@@ -140,6 +148,9 @@ module.exports = {
     {
       files: ['**/cypress/**'],
       extends: ['plugin:cypress/recommended'],
+      rules: {
+        'cypress/unsafe-to-chain-command': 'warn',
+      },
     },
   ],
 }

@@ -1,4 +1,5 @@
 import * as Fixtures from '../../../../../../redux/networking/__fixtures__'
+import { describe, it, expect } from 'vitest'
 
 import {
   CONFIGURE_FIELD_SSID,

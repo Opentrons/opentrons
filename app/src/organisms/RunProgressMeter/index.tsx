@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
@@ -31,7 +32,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
 import { CommandText } from '../CommandText'
@@ -188,17 +189,18 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
       analysisCommands != null &&
       runStatus != null &&
       runData != null &&
-      !TERMINAL_RUN_STATUSES.includes(runStatus) ? (
-        <Portal level="top">
-          <InterventionModal
-            robotName={robotName}
-            command={lastRunCommand}
-            onResume={resumeRunHandler}
-            run={runData}
-            analysis={analysis}
-          />
-        </Portal>
-      ) : null}
+      !TERMINAL_RUN_STATUSES.includes(runStatus)
+        ? createPortal(
+            <InterventionModal
+              robotName={robotName}
+              command={lastRunCommand}
+              onResume={resumeRunHandler}
+              run={runData}
+              analysis={analysis}
+            />,
+            getTopPortalEl()
+          )
+        : null}
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex gridGap={SPACING.spacing8}>

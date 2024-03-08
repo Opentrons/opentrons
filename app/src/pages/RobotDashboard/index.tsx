@@ -12,7 +12,6 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { Navigation } from '../../organisms/Navigation'
-import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import {
   EmptyRecentRun,
   RecentRunProtocolCarousel,
@@ -82,7 +81,7 @@ export function RobotDashboard(): JSX.Element {
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <Navigation routes={onDeviceDisplayRoutes} />
+      <Navigation />
       <Flex
         paddingX={SPACING.spacing40}
         flexDirection={DIRECTION_COLUMN}

@@ -7,7 +7,7 @@ import {
 } from '../../localization'
 import { ExternalLink, LabelText, Value, LABEL_TOP } from '../ui'
 import type { LabwareBrand } from '../../types'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 export interface ManufacturerStatsProps {
   brand: LabwareBrand

@@ -75,8 +75,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
           <img
             src={flexGripper}
             alt="Flex Gripper"
-            max-width="100%"
-            max-height="100%"
+            style={{ maxWidth: '100%', maxHeight: '100%' }}
           />
         </Flex>
       ) : null}

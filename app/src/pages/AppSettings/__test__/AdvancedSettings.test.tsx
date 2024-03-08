@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { i18n } from '../../../i18n'
 import {
@@ -20,15 +21,15 @@ import {
 
 import { AdvancedSettings } from '../AdvancedSettings'
 
-jest.mock('../../../redux/config')
-jest.mock('../../../redux/calibration')
-jest.mock('../../../redux/custom-labware')
-jest.mock('../../../redux/discovery')
-jest.mock('../../../redux/protocol-analysis')
-jest.mock('../../../redux/system-info')
-jest.mock('@opentrons/components/src/hooks')
-jest.mock('../../../redux/analytics')
-jest.mock('../../../organisms/AdvancedSettings')
+vi.mock('../../../redux/config')
+vi.mock('../../../redux/calibration')
+vi.mock('../../../redux/custom-labware')
+vi.mock('../../../redux/discovery')
+vi.mock('../../../redux/protocol-analysis')
+vi.mock('../../../redux/system-info')
+vi.mock('@opentrons/components/src/hooks')
+vi.mock('../../../redux/analytics')
+vi.mock('../../../organisms/AdvancedSettings')
 
 const render = (): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(
@@ -41,64 +42,36 @@ const render = (): ReturnType<typeof renderWithProviders> => {
   )
 }
 
-const mockAdditionalCustomLabwareSourceFolder = AdditionalCustomLabwareSourceFolder as jest.MockedFunction<
-  typeof AdditionalCustomLabwareSourceFolder
->
-const mockPreventRobotCaching = PreventRobotCaching as jest.MockedFunction<
-  typeof PreventRobotCaching
->
-
-const mockOT2AdvancedSettings = OT2AdvancedSettings as jest.MockedFunction<
-  typeof OT2AdvancedSettings
->
-const mockEnableDevTools = EnableDevTools as jest.MockedFunction<
-  typeof EnableDevTools
->
-const mockU2EInformation = U2EInformation as jest.MockedFunction<
-  typeof U2EInformation
->
-const mockShowLabwareOffsetSnippets = ShowLabwareOffsetSnippets as jest.MockedFunction<
-  typeof ShowLabwareOffsetSnippets
->
-const mockClearUnavailableRobots = ClearUnavailableRobots as jest.MockedFunction<
-  typeof ClearUnavailableRobots
->
-const mockOverridePathToPython = OverridePathToPython as jest.MockedFunction<
-  typeof OverridePathToPython
->
-const mockShowHeaterShakerAttachmentModal = ShowHeaterShakerAttachmentModal as jest.MockedFunction<
-  typeof ShowHeaterShakerAttachmentModal
->
-const mockUpdatedChannel = UpdatedChannel as jest.MockedFunction<
-  typeof UpdatedChannel
->
-
 describe('AdvancedSettings', () => {
   beforeEach(() => {
-    mockPreventRobotCaching.mockReturnValue(<div>mock PreventRobotCaching</div>)
-    mockOT2AdvancedSettings.mockReturnValue(<div>mock OT2AdvancedSettings</div>)
-    mockEnableDevTools.mockReturnValue(<div>mock EnableDevTools</div>)
-    mockU2EInformation.mockReturnValue(<div>mock U2EInformation</div>)
-    mockShowLabwareOffsetSnippets.mockReturnValue(
+    vi.mocked(PreventRobotCaching).mockReturnValue(
+      <div>mock PreventRobotCaching</div>
+    )
+    vi.mocked(OT2AdvancedSettings).mockReturnValue(
+      <div>mock OT2AdvancedSettings</div>
+    )
+    vi.mocked(EnableDevTools).mockReturnValue(<div>mock EnableDevTools</div>)
+    vi.mocked(U2EInformation).mockReturnValue(<div>mock U2EInformation</div>)
+    vi.mocked(ShowLabwareOffsetSnippets).mockReturnValue(
       <div>mock ShowLabwareOffsetSnippets</div>
     )
-    mockClearUnavailableRobots.mockReturnValue(
+    vi.mocked(ClearUnavailableRobots).mockReturnValue(
       <div>mock ClearUnavailableRobots</div>
     )
-    mockOverridePathToPython.mockReturnValue(
+    vi.mocked(OverridePathToPython).mockReturnValue(
       <div>mock OverridePathToPython</div>
     )
-    mockShowHeaterShakerAttachmentModal.mockReturnValue(
+    vi.mocked(ShowHeaterShakerAttachmentModal).mockReturnValue(
       <div>mock ShowHeaterShakerAttachmentModal</div>
     )
-    mockUpdatedChannel.mockReturnValue(<div>mock UpdatedChannel</div>)
-    mockAdditionalCustomLabwareSourceFolder.mockReturnValue(
+    vi.mocked(UpdatedChannel).mockReturnValue(<div>mock UpdatedChannel</div>)
+    vi.mocked(AdditionalCustomLabwareSourceFolder).mockReturnValue(
       <div>mock AdditionalCustomLabwareSourceFolder</div>
     )
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('should render mock UpdatedChannel section', () => {

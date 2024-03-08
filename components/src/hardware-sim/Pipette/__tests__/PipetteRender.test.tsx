@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { render } from '@testing-library/react'
-import _uncasted_fixtureTiprack300Ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import { anyProps, partialComponentPropsMatcher } from '../../../testing/utils'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { screen } from '@testing-library/react'
+import { fixtureTiprack300ul as _fixtureTiprack300ul } from '@opentrons/shared-data'
+import { renderWithProviders } from '../../../testing/utils'
 import { RobotCoordsForeignDiv } from '../../Deck/RobotCoordsForeignDiv'
 import { PipetteRender } from '../PipetteRender'
 import { EmanatingNozzle } from '../EmanatingNozzle'
@@ -16,117 +16,84 @@ import {
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-jest.mock('../../Deck/RobotCoordsForeignDiv')
-jest.mock('../EmanatingNozzle')
-jest.mock('../EightEmanatingNozzles')
+vi.mock('../../Deck/RobotCoordsForeignDiv')
+vi.mock('../EmanatingNozzle')
+vi.mock('../EightEmanatingNozzles')
 
-const fixtureTiprack300Ul = _uncasted_fixtureTiprack300Ul as LabwareDefinition2
+const fixtureTiprack300Ul = _fixtureTiprack300ul as LabwareDefinition2
 
-const mockRobotCoordsForeignDiv = RobotCoordsForeignDiv as jest.MockedFunction<
-  typeof RobotCoordsForeignDiv
->
-
-const mockEmanatingNozzle = EmanatingNozzle as jest.MockedFunction<
-  typeof EmanatingNozzle
->
-
-const mockEightEmanatingNozzles = EightEmanatingNozzles as jest.MockedFunction<
-  typeof EightEmanatingNozzles
->
+const render = (props: React.ComponentProps<typeof PipetteRender>) => {
+  return renderWithProviders(<PipetteRender {...props} />)[0]
+}
 
 describe('PipetteRender', () => {
+  let props: React.ComponentProps<typeof PipetteRender>
   beforeEach(() => {
-    when(mockRobotCoordsForeignDiv).mockReturnValue(<div></div>)
-  })
-
-  afterEach(() => {
-    resetAllWhenMocks()
+    props = {
+      labwareDef: fixtureTiprack300Ul,
+      pipetteName: 'p1000_single',
+    }
+    vi.mocked(RobotCoordsForeignDiv).mockReturnValue(<div></div>)
   })
 
   describe('when the pipette is single channel', () => {
     beforeEach(() => {
-      when(mockRobotCoordsForeignDiv)
-        .calledWith(
-          partialComponentPropsMatcher({
-            width: SINGLE_CHANNEL_PIPETTE_WIDTH,
-            height: SINGLE_CHANNEL_PIPETTE_HEIGHT,
-          })
-        )
-        .mockImplementation(({ children }) => (
-          <div>
-            {`rectangle with width ${SINGLE_CHANNEL_PIPETTE_WIDTH} and height ${SINGLE_CHANNEL_PIPETTE_HEIGHT}`}{' '}
-            {children}
-          </div>
-        ))
+      vi.mocked(RobotCoordsForeignDiv).mockImplementation(({ children }) => (
+        <div>
+          {`rectangle with width ${SINGLE_CHANNEL_PIPETTE_WIDTH} and height ${SINGLE_CHANNEL_PIPETTE_HEIGHT}`}{' '}
+          {children}
+        </div>
+      ))
 
-      when(mockEmanatingNozzle)
-        .calledWith(anyProps())
-        .mockReturnValue(<div>mock emanating nozzle</div>)
+      vi.mocked(EmanatingNozzle).mockReturnValue(
+        <div>mock emanating nozzle</div>
+      )
     })
 
     it('should render a rectangle with the correct dimensions', () => {
-      const { getByText } = render(
-        <PipetteRender
-          labwareDef={fixtureTiprack300Ul}
-          pipetteName={'p1000_single'}
-        />
-      )
-      getByText(
+      render(props)
+      screen.getByText(
         `rectangle with width ${SINGLE_CHANNEL_PIPETTE_WIDTH} and height ${SINGLE_CHANNEL_PIPETTE_HEIGHT}`
       )
-      mockEmanatingNozzle.mockRestore()
+      vi.mocked(EmanatingNozzle).mockRestore()
     })
     it('should render a single emanating nozzle', () => {
-      const { getByText } = render(
-        <PipetteRender
-          labwareDef={fixtureTiprack300Ul}
-          pipetteName={'p1000_single'}
-        />
-      )
-      getByText('mock emanating nozzle')
-      expect(mockEightEmanatingNozzles).not.toHaveBeenCalled()
+      render(props)
+      screen.getByText('mock emanating nozzle')
+      expect(EightEmanatingNozzles).not.toHaveBeenCalled()
     })
   })
   describe('when the pipette is 8 channel', () => {
     beforeEach(() => {
-      when(mockRobotCoordsForeignDiv)
-        .calledWith(
-          partialComponentPropsMatcher({
-            width: MULTI_CHANNEL_PIPETTE_WIDTH,
-            height: MULTI_CHANNEL_PIPETTE_HEIGHT,
-          })
-        )
-        .mockImplementation(({ children }) => (
-          <div>
-            {`rectangle with width ${MULTI_CHANNEL_PIPETTE_WIDTH} and height ${MULTI_CHANNEL_PIPETTE_HEIGHT}`}{' '}
-            {children}
-          </div>
-        ))
+      vi.mocked(RobotCoordsForeignDiv).mockImplementation(({ children }) => (
+        <div>
+          {`rectangle with width ${MULTI_CHANNEL_PIPETTE_WIDTH} and height ${MULTI_CHANNEL_PIPETTE_HEIGHT}`}{' '}
+          {children}
+        </div>
+      ))
 
-      when(mockEightEmanatingNozzles)
-        .calledWith(anyProps())
-        .mockReturnValue(<div>mock eight emanating nozzles</div>)
+      vi.mocked(EightEmanatingNozzles).mockReturnValue(
+        <div>mock eight emanating nozzles</div>
+      )
     })
     it('should render a rectangle with the correct dimensions', () => {
-      const { getByText } = render(
-        <PipetteRender
-          labwareDef={fixtureTiprack300Ul}
-          pipetteName={'p10_multi'}
-        />
-      )
-      getByText(
+      props = {
+        ...props,
+        pipetteName: 'p10_multi',
+      }
+      render(props)
+      screen.getByText(
         `rectangle with width ${MULTI_CHANNEL_PIPETTE_WIDTH} and height ${MULTI_CHANNEL_PIPETTE_HEIGHT}`
       )
-      mockEightEmanatingNozzles.mockRestore()
+      vi.mocked(EightEmanatingNozzles).mockRestore()
     })
     it('should render eight emanating nozzles', () => {
-      const { getByText } = render(
-        <PipetteRender
-          labwareDef={fixtureTiprack300Ul}
-          pipetteName={'p10_multi'}
-        />
-      )
-      getByText('mock eight emanating nozzles')
+      props = {
+        ...props,
+        pipetteName: 'p10_multi',
+      }
+      render(props)
+      screen.getByText('mock eight emanating nozzles')
     })
   })
 })

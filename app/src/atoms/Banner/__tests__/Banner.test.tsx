@@ -1,8 +1,10 @@
 import * as React from 'react'
+import { describe, it, vi, expect, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { Banner } from '..'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 const render = (props: React.ComponentProps<typeof Banner>) => {
   return renderWithProviders(<Banner {...props} />, {
@@ -28,7 +30,7 @@ describe('Banner', () => {
     props = {
       type: 'success',
       children: 'TITLE',
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
     }
     const { getByText, getByLabelText } = render(props)
     getByText('TITLE')
@@ -78,7 +80,7 @@ describe('Banner', () => {
       type: 'warning',
       children: 'TITLE',
       closeButton: 'close button',
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
     }
     const { getByText } = render(props)
     const btn = getByText('close button')

@@ -1,14 +1,16 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import * as Fixtures from '../../../redux/networking/__fixtures__'
 import { DisplaySearchNetwork } from '../DisplaySearchNetwork'
 import { DisplayWifiList } from '../DisplayWifiList'
 
-const mockPush = jest.fn()
+import type { useHistory } from 'react-router-dom'
+
+const mockPush = vi.fn()
 const mockWifiList = [
   { ...Fixtures.mockWifiNetwork, ssid: 'foo', active: true },
   { ...Fixtures.mockWifiNetwork, ssid: 'bar' },
@@ -18,20 +20,16 @@ const mockWifiList = [
   },
 ]
 
-jest.mock('../../../redux/networking/selectors')
-jest.mock('../../../redux/discovery/selectors')
-jest.mock('../DisplaySearchNetwork')
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
+vi.mock('../../../redux/networking/selectors')
+vi.mock('../../../redux/discovery/selectors')
+vi.mock('../DisplaySearchNetwork')
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<typeof useHistory>()
   return {
-    ...reactRouterDom,
+    ...actual,
     useHistory: () => ({ push: mockPush } as any),
   }
 })
-
-const mockDisplaySearchNetwork = DisplaySearchNetwork as jest.MockedFunction<
-  typeof DisplaySearchNetwork
->
 
 const render = (props: React.ComponentProps<typeof DisplayWifiList>) => {
   return renderWithProviders(<DisplayWifiList {...props} />, {
@@ -44,44 +42,46 @@ describe('DisplayWifiList', () => {
   beforeEach(() => {
     props = {
       list: mockWifiList,
-      handleJoinAnotherNetwork: jest.fn(),
-      handleNetworkPress: jest.fn(),
+      handleJoinAnotherNetwork: vi.fn(),
+      handleNetworkPress: vi.fn(),
       isHeader: true,
     }
-    mockDisplaySearchNetwork.mockReturnValue(
+    vi.mocked(DisplaySearchNetwork).mockReturnValue(
       <div>mock DisplaySearchNetwork</div>
     )
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('should render a wifi list, button and spinner', () => {
-    const [{ getByText, getByLabelText }] = render(props)
-    getByText('Select a network')
-    getByText('foo')
-    getByText('bar')
-    getByText('baz')
-    getByLabelText('back-button')
+    render(props)
+    screen.getByText('Select a network')
+    screen.getByText('foo')
+    screen.getByText('bar')
+    screen.getByText('baz')
+    screen.getByLabelText('back-button')
   })
 
   it('should not render a spinner', () => {
     props = { ...props }
-    const [{ queryByTestId }] = render(props)
-    expect(queryByTestId('wifi_list_search_spinner')).not.toBeInTheDocument()
+    render(props)
+    expect(
+      screen.queryByTestId('wifi_list_search_spinner')
+    ).not.toBeInTheDocument()
   })
 
   it('should call mock functions when back', () => {
-    const [{ getByLabelText }] = render(props)
-    const button = getByLabelText('back-button')
+    render(props)
+    const button = screen.getByLabelText('back-button')
     fireEvent.click(button)
     expect(mockPush).toHaveBeenCalledWith('/network-setup')
   })
 
   it('should call mock function when tapping tapping a ssid', () => {
-    const [{ getByText }] = render(props)
-    const button = getByText('foo')
+    render(props)
+    const button = screen.getByText('foo')
     fireEvent.click(button)
     expect(props.handleNetworkPress).toHaveBeenCalledWith('foo')
   })

@@ -18,8 +18,7 @@ import {
 } from '../../containers/ConnectedStepItem'
 import { PDTitledList } from '../lists'
 import { ContextMenu } from './ContextMenu'
-
-import styles from './StepItem.css'
+import styles from './StepItem.module.css'
 
 interface DragDropStepItemProps extends ConnectedStepItemProps {
   stepId: StepIdType

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import round from 'lodash/round'
 import { useTranslation } from 'react-i18next'
 import {
@@ -7,11 +8,11 @@ import {
   RadioGroup,
   InputField,
 } from '@opentrons/components'
-import { Portal } from '../../../portals/MainPageModalPortal'
-import modalStyles from '../../../modals/modal.css'
-import stepFormStyles from '../../StepEditForm.css'
-import styles from './FlowRateInput.css'
-import { FieldProps } from '../../types'
+import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
+import modalStyles from '../../../modals/modal.module.css'
+import stepFormStyles from '../../StepEditForm.module.css'
+import styles from './FlowRateInput.module.css'
+import type { FieldProps } from '../../types'
 
 const DECIMALS_ALLOWED = 1
 
@@ -146,8 +147,9 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
     />
   )
 
-  const FlowRateModal = pipetteDisplayName && (
-    <Portal>
+  const FlowRateModal =
+    pipetteDisplayName &&
+    createPortal(
       <AlertModal
         alertOverlay
         className={modalStyles.modal}
@@ -192,9 +194,9 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
             },
           ]}
         />
-      </AlertModal>
-    </Portal>
-  )
+      </AlertModal>,
+      getMainPagePortalEl()
+    )
 
   return (
     <React.Fragment>

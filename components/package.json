@@ -4,7 +4,7 @@
   "description": "React components library for Opentrons' projects",
   "source": "src/index.ts",
   "types": "lib/index.d.ts",
-  "style": "src/index.css",
+  "style": "src/index.module.css",
   "main": "lib/opentrons-components.js",
   "module": "src/index.ts",
   "repository": {
@@ -38,7 +38,11 @@
     "react-popper": "1.0.0",
     "react-remove-scroll": "2.4.3",
     "react-select": "5.4.0",
+    "redux": "4.0.5",
     "styled-components": "5.3.6"
+  },
+  "devDependencies": {
+    "react-redux": "8.1.2"
   },
   "browser": {
     "jest-when": false

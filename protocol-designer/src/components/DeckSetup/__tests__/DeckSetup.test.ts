@@ -1,15 +1,21 @@
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import fixture_24_tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
+import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest'
+import {
+  fixture_96_plate,
+  fixture_24_tuberack,
+} from '@opentrons/shared-data/labware/fixtures/2'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
   TEMPERATURE_MODULE_V1,
-  LabwareDefinition2,
 } from '@opentrons/shared-data'
 import { TEMPERATURE_AT_TARGET } from '@opentrons/step-generation'
 import * as labwareModuleCompatibility from '../../../utils/labwareModuleCompatibility'
-import { getSwapBlocked, SwapBlockedArgs } from '../utils'
+import { getSwapBlocked } from '../utils'
+
+import type { MockInstance } from 'vitest'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { SwapBlockedArgs } from '../utils'
 
 describe('DeckSetup', () => {
   describe('getSwapBlocked', () => {
@@ -48,11 +54,9 @@ describe('DeckSetup', () => {
       slot: '7',
     }
 
-    let getLabwareIsCompatibleSpy: jest.SpiedFunction<
-      typeof labwareModuleCompatibility.getLabwareIsCompatible
-    >
+    let getLabwareIsCompatibleSpy: MockInstance
     beforeEach(() => {
-      getLabwareIsCompatibleSpy = jest.spyOn(
+      getLabwareIsCompatibleSpy = vi.spyOn(
         labwareModuleCompatibility,
         'getLabwareIsCompatible'
       )

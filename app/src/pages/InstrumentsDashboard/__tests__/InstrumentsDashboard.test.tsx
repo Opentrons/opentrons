@@ -1,55 +1,18 @@
 import * as React from 'react'
-import { Route } from 'react-router'
-import { MemoryRouter } from 'react-router-dom'
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderWithProviders } from '@opentrons/components'
+import { Route, MemoryRouter } from 'react-router-dom'
+import { fireEvent, screen } from '@testing-library/react'
+import { renderWithProviders } from '../../../__testing-utils__'
+import { vi, describe, it, afterEach, beforeEach, expect } from 'vitest'
+
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { ChoosePipette } from '../../../organisms/PipetteWizardFlows/ChoosePipette'
-import { Navigation } from '../../../organisms/Navigation'
-import { PipetteWizardFlows } from '../../../organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '../../../organisms/GripperWizardFlows'
 import { InstrumentsDashboard } from '..'
 import { formatTimeWithUtcLabel } from '../../../resources/runs/utils'
 import { InstrumentDetail } from '../../../pages/InstrumentDetail'
-import { fireEvent, screen } from '@testing-library/react'
+import type * as ReactApiClient from '@opentrons/react-api-client'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../organisms/GripperWizardFlows')
-jest.mock('../../../organisms/PipetteWizardFlows')
-jest.mock('../../../organisms/PipetteWizardFlows/ChoosePipette')
-jest.mock('../../../organisms/Navigation')
-
-const mockNavigation = Navigation as jest.MockedFunction<typeof Navigation>
-const mockGripperWizardFlows = GripperWizardFlows as jest.MockedFunction<
-  typeof GripperWizardFlows
->
-const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
-  typeof useInstrumentsQuery
->
-const mockPipetteWizardFlows = PipetteWizardFlows as jest.MockedFunction<
-  typeof PipetteWizardFlows
->
-const mockChoosePipette = ChoosePipette as jest.MockedFunction<
-  typeof ChoosePipette
->
-
-const render = () => {
-  const queryClient = new QueryClient()
-  return renderWithProviders(
-    <MemoryRouter initialEntries={['/instruments']} initialIndex={0}>
-      <QueryClientProvider client={queryClient}>
-        <Route path="/instruments">
-          <InstrumentsDashboard />
-        </Route>
-        <Route path="/instruments/:mount">
-          <InstrumentDetail />
-        </Route>
-      </QueryClientProvider>
-    </MemoryRouter>,
-    { i18nInstance: i18n }
-  )
-}
 const mockGripperData = {
   instrumentModel: 'gripper_v1',
   instrumentType: 'gripper',
@@ -111,20 +74,49 @@ const mock96ChannelData = {
     },
   },
 }
+vi.mock('@opentrons/react-api-client', async importOriginal => {
+  const actual = await importOriginal<typeof ReactApiClient>()
+  return {
+    ...actual,
+    useInstrumentsQuery: vi.fn(
+      () =>
+        ({
+          data: {
+            data: [mockLeftPipetteData, mockRightPipetteData, mockGripperData],
+          },
+        } as any)
+    ),
+  }
+})
+vi.mock('../../../organisms/GripperWizardFlows')
+vi.mock('../../../organisms/PipetteWizardFlows')
+vi.mock('../../../organisms/PipetteWizardFlows/ChoosePipette')
+vi.mock('../../../organisms/Navigation')
+
+const render = () => {
+  return renderWithProviders(
+    <MemoryRouter initialEntries={['/instruments', '/instruments/:mount']}>
+      <Route path="/instruments">
+        <InstrumentsDashboard />
+      </Route>
+      <Route path="/instruments/:mount">
+        <InstrumentDetail />
+      </Route>
+    </MemoryRouter>,
+    { i18nInstance: i18n }
+  )
+}
+
 describe('InstrumentsDashboard', () => {
   beforeEach(() => {
-    mockNavigation.mockReturnValue(<div>mock Navigation</div>)
-    mockChoosePipette.mockReturnValue(<div>mock choose pipette</div>)
-    mockUseInstrumentsQuery.mockReturnValue({
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: {
         data: [mockLeftPipetteData, mockRightPipetteData, mockGripperData],
       },
     } as any)
-    mockPipetteWizardFlows.mockReturnValue(<div>mock pipette wizard flows</div>)
-    mockGripperWizardFlows.mockReturnValue(<div>mock gripper wizard flows</div>)
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
   it('should render mount info for all attached mounts', () => {
     render()
@@ -164,25 +156,31 @@ describe('InstrumentsDashboard', () => {
     screen.getByText(mockGripperData.serialNumber)
   })
   it('should open choose pipette to attach to left mount when empty and clicked', () => {
-    mockUseInstrumentsQuery.mockReturnValue({ data: { data: [] } } as any)
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
+      data: { data: [] },
+    } as any)
     render()
     fireEvent.click(screen.getByText('left Mount'))
-    screen.getByText('mock choose pipette')
+    expect(vi.mocked(ChoosePipette)).toHaveBeenCalled()
   })
   it('should open choose pipette to attach to right mount when empty and clicked', () => {
-    mockUseInstrumentsQuery.mockReturnValue({ data: { data: [] } } as any)
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
+      data: { data: [] },
+    } as any)
     render()
     fireEvent.click(screen.getByText('right Mount'))
-    screen.getByText('mock choose pipette')
+    expect(vi.mocked(ChoosePipette)).toHaveBeenCalled()
   })
   it('should open attach gripper wizard when extension mount item empty and clicked', () => {
-    mockUseInstrumentsQuery.mockReturnValue({ data: { data: [] } } as any)
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
+      data: { data: [] },
+    } as any)
     render()
     fireEvent.click(screen.getByText('extension Mount'))
-    screen.getByText('mock gripper wizard flows')
+    expect(vi.mocked(GripperWizardFlows)).toHaveBeenCalled()
   })
   it('should render the correct info for 96 channel attached', async () => {
-    mockUseInstrumentsQuery.mockReturnValue({
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: {
         data: [mock96ChannelData, mockGripperData],
       },

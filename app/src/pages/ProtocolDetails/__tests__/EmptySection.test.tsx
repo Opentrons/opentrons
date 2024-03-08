@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { it, describe } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { EmptySection } from '../EmptySection'
 

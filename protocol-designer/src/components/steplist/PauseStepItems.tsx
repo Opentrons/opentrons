@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { PauseArgs } from '@opentrons/step-generation'
-import styles from './StepItem.css'
+import styles from './StepItem.module.css'
 interface Props {
   pauseArgs: PauseArgs
 }

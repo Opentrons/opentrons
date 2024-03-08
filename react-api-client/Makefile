@@ -7,7 +7,7 @@ SHELL := bash
 # These variables can be overriden when make is invoked to customize the
 # behavior of jest
 tests ?=
-cov_opts ?= --coverage=true --ci=true --collectCoverageFrom='react-api-client/src/**/*.(js|ts|tsx)'
+cov_opts ?= --coverage=true
 test_opts ?=
 
 # standard targets

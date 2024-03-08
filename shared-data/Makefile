@@ -6,7 +6,7 @@ SHELL := bash
 # These variables can be overriden when make is invoked to customize the
 # behavior of jest
 tests ?=
-cov_opts ?= --coverage=true --ci=true --collectCoverageFrom='shared-data/js/**/*.(js|ts|tsx)'
+cov_opts ?= --coverage=true
 test_opts ?=
 
 # Top level targets
@@ -28,7 +28,7 @@ clean: clean-py
 .PHONY: lib-js
 lib-js: export NODE_ENV := production
 lib-js:
-	NODE_OPTIONS=--openssl-legacy-provider yarn webpack
+	NODE_OPTIONS=--openssl-legacy-provider yarn vite build
 
 
 

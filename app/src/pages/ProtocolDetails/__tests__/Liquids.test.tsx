@@ -1,6 +1,7 @@
 import * as React from 'react'
+import { vi, it, describe, beforeEach } from 'vitest'
 import { UseQueryResult } from 'react-query'
-import { when } from 'jest-when'
+import { when } from 'vitest-when'
 import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
@@ -10,26 +11,14 @@ import {
   parseLiquidsInLoadOrder,
   Protocol,
 } from '@opentrons/api-client'
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { Liquids } from '../Liquids'
 import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
-jest.mock('@opentrons/api-client')
-jest.mock('@opentrons/react-api-client')
+vi.mock('@opentrons/api-client')
+vi.mock('@opentrons/react-api-client')
 
-const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
-  typeof useProtocolQuery
->
-const mockUseProtocolAnalysisAsDocumentQuery = useProtocolAnalysisAsDocumentQuery as jest.MockedFunction<
-  typeof useProtocolAnalysisAsDocumentQuery
->
-const mockParseLiquidsInLoadOrder = parseLiquidsInLoadOrder as jest.MockedFunction<
-  typeof parseLiquidsInLoadOrder
->
-const mockParseLabwareInfoByLiquidId = parseLabwareInfoByLiquidId as jest.MockedFunction<
-  typeof parseLabwareInfoByLiquidId
->
 const MOCK_PROTOCOL_ID = 'mockProtocolId'
 const MOCK_PROTOCOL_ANALYSIS = {
   id: 'fake_protocol_analysis',
@@ -192,22 +181,24 @@ describe('Liquids', () => {
     props = {
       protocolId: MOCK_PROTOCOL_ID,
     }
-    mockParseLiquidsInLoadOrder.mockReturnValue(MOCK_LIQUIDS_IN_LOAD_ORDER)
-    mockParseLabwareInfoByLiquidId.mockReturnValue(
+    vi.mocked(parseLiquidsInLoadOrder).mockReturnValue(
+      MOCK_LIQUIDS_IN_LOAD_ORDER
+    )
+    vi.mocked(parseLabwareInfoByLiquidId).mockReturnValue(
       MOCK_LABWARE_INFO_BY_LIQUID_ID
     )
-    when(mockUseProtocolQuery)
+    when(vi.mocked(useProtocolQuery))
       .calledWith(MOCK_PROTOCOL_ID)
-      .mockReturnValue({
+      .thenReturn({
         data: {
           data: { analysisSummaries: [{ id: MOCK_PROTOCOL_ANALYSIS.id }] },
         } as any,
       } as UseQueryResult<Protocol>)
-    when(mockUseProtocolAnalysisAsDocumentQuery)
+    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(MOCK_PROTOCOL_ID, MOCK_PROTOCOL_ANALYSIS.id, {
         enabled: true,
       })
-      .mockReturnValue({
+      .thenReturn({
         data: MOCK_PROTOCOL_ANALYSIS as any,
       } as UseQueryResult<CompletedProtocolAnalysis>)
   })

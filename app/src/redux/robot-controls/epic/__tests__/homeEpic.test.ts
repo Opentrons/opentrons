@@ -1,3 +1,4 @@
+import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { TestScheduler } from 'rxjs/testing'
 
 import { mockRobot } from '../../../robot-api/__fixtures__'
@@ -10,32 +11,22 @@ import { robotControlsEpic } from '..'
 
 import type { Action, State } from '../../../types'
 
-jest.mock('../../../robot-api/http')
-jest.mock('../../../discovery/selectors')
+vi.mock('../../../robot-api/http')
+vi.mock('../../../discovery/selectors')
 
 const mockState: State = { state: true } as any
-
-const mockFetchRobotApi = RobotApiHttp.fetchRobotApi as jest.MockedFunction<
-  typeof RobotApiHttp.fetchRobotApi
->
-
-const mockGetRobotByName = DiscoverySelectors.getRobotByName as jest.MockedFunction<
-  typeof DiscoverySelectors.getRobotByName
->
 
 describe('homeEpic', () => {
   let testScheduler: TestScheduler
 
   beforeEach(() => {
-    mockGetRobotByName.mockReturnValue(mockRobot as any)
+    vi.mocked(DiscoverySelectors.getRobotByName).mockReturnValue(
+      mockRobot as any
+    )
 
     testScheduler = new TestScheduler((actual, expected) => {
       expect(actual).toEqual(expected)
     })
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
   })
 
   const meta = { requestId: '1234' }
@@ -46,7 +37,7 @@ describe('homeEpic', () => {
 
   it('calls POST /robot/home with target: robot', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      mockFetchRobotApi.mockReturnValue(
+      vi.mocked(RobotApiHttp.fetchRobotApi).mockReturnValue(
         cold('r', { r: Fixtures.mockHomeSuccess })
       )
 
@@ -57,8 +48,11 @@ describe('homeEpic', () => {
       expectObservable(output$)
       flush()
 
-      expect(mockGetRobotByName).toHaveBeenCalledWith(mockState, mockRobot.name)
-      expect(mockFetchRobotApi).toHaveBeenCalledWith(mockRobot, {
+      expect(DiscoverySelectors.getRobotByName).toHaveBeenCalledWith(
+        mockState,
+        mockRobot.name
+      )
+      expect(RobotApiHttp.fetchRobotApi).toHaveBeenCalledWith(mockRobot, {
         method: 'POST',
         path: '/robot/home',
         body: { target: 'robot' },
@@ -72,7 +66,7 @@ describe('homeEpic', () => {
       meta,
     }
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      mockFetchRobotApi.mockReturnValue(
+      vi.mocked(RobotApiHttp.fetchRobotApi).mockReturnValue(
         cold('r', { r: Fixtures.mockHomeSuccess })
       )
 
@@ -83,8 +77,11 @@ describe('homeEpic', () => {
       expectObservable(output$)
       flush()
 
-      expect(mockGetRobotByName).toHaveBeenCalledWith(mockState, mockRobot.name)
-      expect(mockFetchRobotApi).toHaveBeenCalledWith(mockRobot, {
+      expect(DiscoverySelectors.getRobotByName).toHaveBeenCalledWith(
+        mockState,
+        mockRobot.name
+      )
+      expect(RobotApiHttp.fetchRobotApi).toHaveBeenCalledWith(mockRobot, {
         method: 'POST',
         path: '/robot/home',
         body: { target: 'pipette', mount: 'right' },
@@ -94,7 +91,7 @@ describe('homeEpic', () => {
 
   it('maps successful response to HOME_SUCCESS', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      mockFetchRobotApi.mockReturnValue(
+      vi.mocked(RobotApiHttp.fetchRobotApi).mockReturnValue(
         cold('r', { r: Fixtures.mockHomeSuccess })
       )
 
@@ -113,7 +110,7 @@ describe('homeEpic', () => {
 
   it('maps failed response to HOME_FAILURE', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      mockFetchRobotApi.mockReturnValue(
+      vi.mocked(RobotApiHttp.fetchRobotApi).mockReturnValue(
         cold('r', { r: Fixtures.mockHomeFailure })
       )
 

@@ -1,7 +1,9 @@
 import * as React from 'react'
 import { UseQueryResult } from 'react-query'
 import { screen, fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import '@testing-library/jest-dom/vitest'
+import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
+import { renderWithProviders } from '../../../../../__testing-utils__'
 import {
   SINGLE_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
@@ -10,20 +12,13 @@ import {
 import {
   useDeckConfigurationQuery,
   useUpdateDeckConfigurationMutation,
-} from '@opentrons/react-api-client/src/deck_configuration'
+} from '@opentrons/react-api-client'
 import { i18n } from '../../../../../i18n'
 import { LocationConflictModal } from '../LocationConflictModal'
 
 import type { DeckConfiguration } from '@opentrons/shared-data'
 
-jest.mock('@opentrons/react-api-client/src/deck_configuration')
-
-const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
-  typeof useDeckConfigurationQuery
->
-const mockUseUpdateDeckConfigurationMutation = useUpdateDeckConfigurationMutation as jest.MockedFunction<
-  typeof useUpdateDeckConfigurationMutation
->
+vi.mock('@opentrons/react-api-client')
 
 const mockFixture = {
   cutoutId: 'cutoutB3',
@@ -38,22 +33,22 @@ const render = (props: React.ComponentProps<typeof LocationConflictModal>) => {
 
 describe('LocationConflictModal', () => {
   let props: React.ComponentProps<typeof LocationConflictModal>
-  const mockUpdate = jest.fn()
+  const mockUpdate = vi.fn()
   beforeEach(() => {
     props = {
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       cutoutId: 'cutoutB3',
       requiredFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
     }
-    mockUseDeckConfigurationQuery.mockReturnValue({
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
       data: [mockFixture],
     } as UseQueryResult<DeckConfiguration>)
-    mockUseUpdateDeckConfigurationMutation.mockReturnValue({
+    vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdate,
     } as any)
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
   it('should render the modal information for a fixture conflict', () => {
     render(props)
@@ -70,7 +65,7 @@ describe('LocationConflictModal', () => {
   })
   it('should render the modal information for a module fixture conflict', () => {
     props = {
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       cutoutId: 'cutoutB3',
       requiredModule: 'heaterShakerModuleV1',
     }
@@ -84,7 +79,7 @@ describe('LocationConflictModal', () => {
     expect(mockUpdate).toHaveBeenCalled()
   })
   it('should render the modal information for a single slot fixture conflict', () => {
-    mockUseDeckConfigurationQuery.mockReturnValue({
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
       data: [
         {
           cutoutId: 'cutoutB1',
@@ -93,21 +88,21 @@ describe('LocationConflictModal', () => {
       ],
     } as UseQueryResult<DeckConfiguration>)
     props = {
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       cutoutId: 'cutoutB1',
       requiredFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
       missingLabwareDisplayName: 'a tiprack',
     }
-    const { getByText, getAllByText, getByRole } = render(props)
-    getByText('Deck location conflict')
-    getByText('Slot B1')
-    getByText('Protocol specifies')
-    getByText('Currently configured')
-    getAllByText('Trash bin')
-    getByText('a tiprack')
-    fireEvent.click(getByRole('button', { name: 'Cancel' }))
+    render(props)
+    screen.getByText('Deck location conflict')
+    screen.getByText('Slot B1')
+    screen.getByText('Protocol specifies')
+    screen.getByText('Currently configured')
+    screen.getAllByText('Trash bin')
+    screen.getByText('a tiprack')
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(props.onCloseClick).toHaveBeenCalled()
-    fireEvent.click(getByRole('button', { name: 'Update deck' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Update deck' }))
     expect(mockUpdate).toHaveBeenCalled()
   })
   it('should render correct info for a odd', () => {

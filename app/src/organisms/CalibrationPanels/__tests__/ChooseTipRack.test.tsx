@@ -1,8 +1,11 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { vi, it, describe, expect, beforeEach } from 'vitest'
+
 import { usePipettesQuery } from '@opentrons/react-api-client'
 import { LEFT } from '@opentrons/shared-data'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { mockAttachedPipette } from '../../../redux/pipettes/__fixtures__'
 import { mockDeckCalTipRack } from '../../../redux/sessions/__fixtures__'
@@ -18,33 +21,16 @@ import { ChooseTipRack } from '../ChooseTipRack'
 
 import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../redux/pipettes/selectors')
-jest.mock('../../../redux/calibration/')
-jest.mock('../../../redux/custom-labware/selectors')
-jest.mock('../../../atoms/SelectField/Select')
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../redux/pipettes/selectors')
+vi.mock('../../../redux/calibration')
+vi.mock('../../../redux/custom-labware/selectors')
+vi.mock('../../../atoms/SelectField/Select')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,
   right: null,
 } as any
-
-const mockGetCalibrationForPipette = getCalibrationForPipette as jest.MockedFunction<
-  typeof getCalibrationForPipette
->
-const mockGetTipLengthForPipetteAndTiprack = getTipLengthForPipetteAndTiprack as jest.MockedFunction<
-  typeof getTipLengthForPipetteAndTiprack
->
-const mockGetTipLengthCalibrations = getTipLengthCalibrations as jest.MockedFunction<
-  typeof getTipLengthCalibrations
->
-const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
-  typeof usePipettesQuery
->
-const mockGetCustomTipRackDefinitions = getCustomTipRackDefinitions as jest.MockedFunction<
-  typeof getCustomTipRackDefinitions
->
-const mockSelect = Select as jest.MockedFunction<typeof Select>
 
 const render = (props: React.ComponentProps<typeof ChooseTipRack>) => {
   return renderWithProviders(<ChooseTipRack {...props} />, {
@@ -56,14 +42,14 @@ describe('ChooseTipRack', () => {
   let props: React.ComponentProps<typeof ChooseTipRack>
 
   beforeEach(() => {
-    mockSelect.mockReturnValue(<div>mock select</div>)
-    mockGetCalibrationForPipette.mockReturnValue(null)
-    mockGetTipLengthForPipetteAndTiprack.mockReturnValue(null)
-    mockGetTipLengthCalibrations.mockReturnValue([])
-    mockUsePipettesQuery.mockReturnValue({
+    vi.mocked(Select).mockReturnValue(<div>mock select</div>)
+    vi.mocked(getCalibrationForPipette).mockReturnValue(null)
+    vi.mocked(getTipLengthForPipetteAndTiprack).mockReturnValue(null)
+    vi.mocked(getTipLengthCalibrations).mockReturnValue([])
+    vi.mocked(usePipettesQuery).mockReturnValue({
       data: mockAttachedPipettes,
     } as any)
-    mockGetCustomTipRackDefinitions.mockReturnValue([
+    vi.mocked(getCustomTipRackDefinitions).mockReturnValue([
       mockTipRackDefinition,
       mockDeckCalTipRack.definition,
     ])
@@ -71,14 +57,10 @@ describe('ChooseTipRack', () => {
       tipRack: mockDeckCalTipRack,
       mount: LEFT,
       chosenTipRack: null,
-      handleChosenTipRack: jest.fn(),
-      closeModal: jest.fn(),
+      handleChosenTipRack: vi.fn(),
+      closeModal: vi.fn(),
       robotName: 'otie',
     }
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
   })
 
   it('renders the correct text', () => {

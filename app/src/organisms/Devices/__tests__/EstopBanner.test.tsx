@@ -1,7 +1,8 @@
 import * as React from 'react'
-
-import { renderWithProviders } from '@opentrons/components'
-
+import { screen } from '@testing-library/react'
+import { describe, it, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { EstopBanner } from '../EstopBanner'
 
@@ -17,20 +18,20 @@ describe('EstopBanner', () => {
   })
 
   it('should render text and call a mock function when tapping text button - estop physicallyEngaged', () => {
-    const [{ getByText }] = render(props)
-    getByText('E-stop pressed. Robot movement is halted.')
-    getByText('Reset E-stop')
+    render(props)
+    screen.getByText('E-stop pressed. Robot movement is halted.')
+    screen.getByText('Reset E-stop')
   })
   it('should render text and call a mock function when tapping text button - estop logicallyEngaged', () => {
     props.status = 'logicallyEngaged'
-    const [{ getByText }] = render(props)
-    getByText('E-stop disengaged, but robot operation still halted.')
-    getByText('Resume operation')
+    render(props)
+    screen.getByText('E-stop disengaged, but robot operation still halted.')
+    screen.getByText('Resume operation')
   })
   it('should render text and call a mock function when tapping text button - estop notPresent', () => {
     props.status = 'notPresent'
-    const [{ getByText }] = render(props)
-    getByText('E-stop disconnected. Robot movement is halted.')
-    getByText('Resume operation')
+    render(props)
+    screen.getByText('E-stop disconnected. Robot movement is halted.')
+    screen.getByText('Resume operation')
   })
 })

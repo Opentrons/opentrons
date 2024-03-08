@@ -188,6 +188,13 @@ export interface LabwareDefinition2 {
   allowedRoles?: LabwareRoles[]
 }
 
+export interface LabwareDefByDefURI {
+  [defUri: string]: LabwareDefinition2
+}
+export interface LegacyLabwareDefByName {
+  [name: string]: LabwareDefinition1
+}
+
 export type ModuleType =
   | typeof MAGNETIC_MODULE_TYPE
   | typeof TEMPERATURE_MODULE_TYPE

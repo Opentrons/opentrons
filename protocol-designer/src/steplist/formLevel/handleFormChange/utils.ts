@@ -1,4 +1,3 @@
-import assert from 'assert'
 import round from 'lodash/round'
 import uniq from 'lodash/uniq'
 import { getWellSetForMultichannel, canPipetteUseLabware } from '../../../utils'
@@ -64,7 +63,7 @@ export function getMaxDisposalVolumeForMultidispense(
   // calculate max disposal volume for given volume & pipette. Might be negative!
   const pipetteId = values?.pipette
   if (!values || !pipetteId) return null
-  assert(
+  console.assert(
     values.path === 'multiDispense',
     `getMaxDisposalVolumeForMultidispense expected multiDispense, got path ${values.path}`
   )
@@ -83,7 +82,7 @@ export function volumeInCapacityForMulti(
   rawForm: FormData,
   pipetteEntities: PipetteEntities
 ): boolean {
-  assert(
+  console.assert(
     rawForm.pipette in pipetteEntities,
     `volumeInCapacityForMulti expected pipette ${rawForm.pipette} to be in pipetteEntities`
   )
@@ -155,7 +154,7 @@ export function getDefaultWells(args: GetDefaultWellsArgs): string[] {
 
   if (isSingleWellLabware) {
     const well = labwareDef.ordering[0][0]
-    assert(
+    console.assert(
       well === 'A1',
       `sanity check: expected single-well labware ${labwareId} to have only the well 'A1'`
     )

@@ -4,7 +4,7 @@ import cx from 'classnames'
 import { OutlineButton } from '../buttons'
 import { Icon } from '../icons'
 import { Modal } from './Modal'
-import styles from './modals.css'
+import styles from './modals.module.css'
 
 import type { ButtonProps } from '../buttons'
 import type { IconName } from '../icons'

@@ -12,7 +12,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getLabwareDisplayName, getIsTiprack } from '@opentrons/shared-data'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 import type {
   LabwareDefinition2,

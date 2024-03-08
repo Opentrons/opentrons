@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { when } from 'jest-when'
+import { vi, describe, beforeEach, it, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../__testing-utils__'
 
 import { getLocalRobot } from '../../redux/discovery'
 import { mockConnectableRobot } from '../../redux/discovery/__fixtures__'
@@ -11,27 +11,21 @@ import { useTrackEvent, ANALYTICS_ODD_APP_ERROR } from '../../redux/analytics'
 import { OnDeviceDisplayAppFallback } from '../OnDeviceDisplayAppFallback'
 
 import type { FallbackProps } from 'react-error-boundary'
+import type { Mock } from 'vitest'
 
-jest.mock('../../redux/shell')
-jest.mock('../../redux/analytics')
-jest.mock('../../redux/discovery', () => {
-  const actual = jest.requireActual('../../redux/discovery')
+vi.mock('../../redux/shell')
+vi.mock('../../redux/analytics')
+vi.mock('../../redux/discovery', async importOriginal => {
+  const actual = await importOriginal<typeof getLocalRobot>()
   return {
     ...actual,
-    getLocalRobot: jest.fn(),
+    getLocalRobot: vi.fn(),
   }
 })
 
 const mockError = {
   message: 'mock error',
 } as Error
-const mockAppRestart = appRestart as jest.MockedFunction<typeof appRestart>
-const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
-  typeof useTrackEvent
->
-const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
-  typeof getLocalRobot
->
 
 const render = (props: FallbackProps) => {
   return renderWithProviders(<OnDeviceDisplayAppFallback {...props} />, {
@@ -39,7 +33,7 @@ const render = (props: FallbackProps) => {
   })
 }
 
-let mockTrackEvent: jest.Mock
+let mockTrackEvent: Mock
 
 const MOCK_ROBOT_SERIAL_NUMBER = 'OT123'
 
@@ -51,9 +45,9 @@ describe('OnDeviceDisplayAppFallback', () => {
       error: mockError,
       resetErrorBoundary: {} as any,
     } as FallbackProps
-    mockTrackEvent = jest.fn()
-    when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
-    when(mockGetLocalRobot).mockReturnValue({
+    mockTrackEvent = vi.fn()
+    vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
+    vi.mocked(getLocalRobot).mockReturnValue({
       ...mockConnectableRobot,
       health: {
         ...mockConnectableRobot.health,
@@ -81,6 +75,6 @@ describe('OnDeviceDisplayAppFallback', () => {
         robotSerialNumber: MOCK_ROBOT_SERIAL_NUMBER,
       },
     })
-    expect(mockAppRestart).toHaveBeenCalled()
+    expect(vi.mocked(appRestart)).toHaveBeenCalled()
   })
 })

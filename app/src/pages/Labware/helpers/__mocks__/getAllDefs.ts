@@ -1,4 +1,5 @@
 import path from 'path'
+import { vi } from 'vitest'
 // replace webpack-specific require.context with Node-based glob in tests
 import glob from 'glob'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -12,7 +13,7 @@ const DEFS_FIXTURE_PATTERN = path.join(
 
 const allDefs: unknown[] = glob.sync(DEFS_FIXTURE_PATTERN).map(require)
 
-export const getAllDefs = jest.fn(() =>
+export const getAllDefs = vi.fn(() =>
   (allDefs as LabwareDefinition2[]).reduce(
     (acc, def: LabwareDefinition2): Record<string, LabwareDefinition2> => ({
       ...acc,

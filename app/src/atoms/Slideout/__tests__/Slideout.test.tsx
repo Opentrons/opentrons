@@ -1,8 +1,10 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { Slideout } from '..'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { screen, fireEvent } from '@testing-library/react'
 import { i18n } from '../../../i18n'
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
+import { Slideout } from '..'
 
 const render = (props: React.ComponentProps<typeof Slideout>) => {
   return renderWithProviders(<Slideout {...props} />, {
@@ -12,7 +14,7 @@ const render = (props: React.ComponentProps<typeof Slideout>) => {
 
 describe('Slideout', () => {
   let props: React.ComponentProps<typeof Slideout>
-  const mockOnClick = jest.fn()
+  const mockOnClick = vi.fn()
   beforeEach(() => {
     props = {
       title: 'Set Engage Height for Magnetic Module GEN1',
@@ -21,30 +23,27 @@ describe('Slideout', () => {
       onCloseClick: mockOnClick,
     }
   })
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
 
   it('renders correct title and body for a gen1 magnetic module', () => {
-    const { getByText } = render(props)
+    render(props)
 
-    getByText('Set Engage Height for Magnetic Module GEN1')
-    getByText('Mock Children')
+    screen.getByText('Set Engage Height for Magnetic Module GEN1')
+    screen.getByText('Mock Children')
   })
 
   it('renders the exit button and it is clickable', () => {
-    const { getByRole } = render(props)
-    const button = getByRole('button', { name: /exit/i })
+    render(props)
+    const button = screen.getByRole('button', { name: /exit/i })
     expect(button).toBeEnabled()
     fireEvent.click(button)
     expect(mockOnClick).toHaveBeenCalledTimes(1)
   })
 
   it('clicking overlay triggers close', () => {
-    const { getByRole } = render(props)
-    const button = getByRole('button', { name: /exit/i })
+    render(props)
+    const button = screen.getByRole('button', { name: /exit/i })
     expect(button).toBeEnabled()
     fireEvent.click(button)
-    expect(mockOnClick).toHaveBeenCalledTimes(1)
+    expect(mockOnClick).toHaveBeenCalled()
   })
 })

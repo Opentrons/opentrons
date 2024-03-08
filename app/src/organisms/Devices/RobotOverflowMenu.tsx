@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
@@ -20,7 +21,7 @@ import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { Tooltip } from '../../atoms/Tooltip'
 import { Divider } from '../../atoms/structure'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ConnectionTroubleshootingModal } from './ConnectionTroubleshootingModal'
@@ -141,7 +142,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
       data-testid={`RobotCard_${String(robot.name)}_overflowMenu`}
       flexDirection={DIRECTION_COLUMN}
       position={POSITION_RELATIVE}
-      onClick={e => {
+      onClick={(e: React.MouseEvent) => {
         e.stopPropagation()
       }}
       {...styleProps}
@@ -176,17 +177,19 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
           }}
         />
       ) : null}
-      <Portal level="top">
-        {showOverflowMenu && menuOverlay}
-
-        {showConnectionTroubleshootingModal ? (
-          <ConnectionTroubleshootingModal
-            onClose={() => {
-              setShowConnectionTroubleshootingModal(false)
-            }}
-          />
-        ) : null}
-      </Portal>
+      {createPortal(
+        <>
+          {showOverflowMenu && menuOverlay}
+          {showConnectionTroubleshootingModal ? (
+            <ConnectionTroubleshootingModal
+              onClose={() => {
+                setShowConnectionTroubleshootingModal(false)
+              }}
+            />
+          ) : null}
+        </>,
+        getTopPortalEl()
+      )}
     </Flex>
   )
 }
