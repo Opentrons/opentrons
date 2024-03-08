@@ -400,11 +400,11 @@ export interface PipetteV2GeneralSpecs {
   displayCategory: PipetteDisplayCategory
   pickUpTipConfigurations: {
     pressFit: {
-      speedByTipCount: any
+      speedByTipCount: Record<number, string>
       presses: number
       increment: number
-      distanceByTipcount: any
-      currentByTipCount: any
+      distanceByTipCount: Record<number, string>
+      currentByTipCount: Record<number, string>
     }
   }
   dropTipConfigurations: {
@@ -417,7 +417,7 @@ export interface PipetteV2GeneralSpecs {
     idle: number
     run: number
   }
-  plungerPositionConfigurations: {
+  plungerPositionsConfigurations: {
     default: {
       top: number
       bottom: number
@@ -427,10 +427,13 @@ export interface PipetteV2GeneralSpecs {
   }
   availableSensors: {
     sensors: string[]
+    capacitive?: { count: number }
+    environment?: { count: number }
+    pressure?: { count: number }
   }
   partialTipConfigurations: {
     partialTipSupported: boolean
-    availableConfigurations: number[]
+    availableConfigurations: number[] | null
   }
   channels: number
   shaftDiameter: number
@@ -448,16 +451,50 @@ export interface PipetteV2GeometrySpecs {
   nozzleOffset: number[]
   pipetteBoundingBoxOffsets: {
     backLeftCorner: number[]
-    frontRightCorner: []
+    frontRightCorner: number[]
   }
   pathTo3D: string
   orderedRows: any
   orderedColumns: any
-  nozzleMap: any
+  nozzleMap: Record<string, number[]>
 }
+
+type TipData = [number, number, number][]
+interface SupportedTips {
+  [tipType: string]: {
+    aspirate: {
+      default: {
+        1: TipData
+      }
+    }
+    defaultAspirateFlowRate: {
+      default: number
+      valuesByApiLevel: Record<string, number>
+    }
+    defaultBlowOutFlowRate: {
+      default: number
+      valuesByApiLevel: Record<string, number>
+    }
+    defaultDispenseFlowRate: {
+      default: number
+      valuesByApiLevel: Record<string, number>
+    }
+    defaultFlowAcceleration: number
+    defaultPushOutVolume: number
+    defaultReturnTipHeight: number
+    defaultTipLength: number
+    dispense: {
+      default: {
+        1: TipData
+      }
+    }
+  }
+}
+
 export interface PipetteV2LiquidSpecs {
-  supportedTips: any
-  defaultTipOverlapDictonary: any
+  $otSharedSchema: string
+  supportedTips: SupportedTips
+  defaultTipOverlapDictionary: Record<string, number>
   maxVolume: number
   minVolume: number
   defaultTipracks: string[]
@@ -466,6 +503,7 @@ export interface PipetteV2LiquidSpecs {
 type GenericAndGeometry = PipetteV2GeneralSpecs & PipetteV2GeometrySpecs
 
 export interface PipetteV2Specs extends GenericAndGeometry {
+  $otSharedSchema: string
   liquids: Record<string, PipetteV2LiquidSpecs>
 }
 

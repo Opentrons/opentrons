@@ -27,6 +27,9 @@ type CombinedModules = PipetteV2GeneralSpecs | PipetteV2GeometrySpecs
 interface ModuleSpecs {
   default: CombinedModules
 }
+interface LiquidSpecs {
+  default: PipetteV2LiquidSpecs
+}
 
 type SortableProps = 'maxVolume' | 'channels'
 
@@ -113,6 +116,7 @@ export const getIncompatiblePipetteNames = (
 }
 
 export * from '../pipette/fixtures/name'
+
 const getChannelsFromString = (
   pipChannelString: PipChannelString
 ): Channels | null => {
@@ -151,7 +155,7 @@ const getVersionFromGen = (gen: Gen): string | null => {
 }
 
 const V2_DEFINITION_TYPES = ['general', 'geometry']
-const LIDUID_TYPES = ['default', 'lowVolumeDefault']
+const LIQUID_TYPES = ['default', 'lowVolumeDefault']
 
 /* takes in pipetteName such as 'p300_single' or 'p300_single_gen1' 
 or PipetteModel such as 'p300_single_v1.3' and converts it to channels,
@@ -177,7 +181,7 @@ export const getPipetteSpecsV2 = (
 
   const generalGeometricJsons = Object.keys(generalGeometric).map(
     path => generalGeometric[path]
-  )
+  ) as ModuleSpecs[]
   const matchingJsons = generalGeometricJsons.reduce(
     //  NOTE: combinedModules = array of 2 jsons, module = 1 json
     (combinedModules: CombinedModules[], module: ModuleSpecs, index) => {
@@ -196,16 +200,14 @@ export const getPipetteSpecsV2 = (
   )
   const generalGeometricCombined = Object.assign({}, ...matchingJsons)
 
-  const liquidJsons = Object.keys(liquid).map(path => liquid[path])
+  const liquidJsons = Object.keys(liquid).map(
+    path => liquid[path]
+  ) as LiquidSpecs[]
   const liquidMatchingJsons = liquidJsons.reduce(
     //  NOTE: combinedModules = array of 2+ jsons, module = 1 json
-    (
-      combinedModules: PipetteV2LiquidSpecs[],
-      module: { default: PipetteV2LiquidSpecs },
-      index
-    ) => {
+    (combinedModules: PipetteV2LiquidSpecs[], module: LiquidSpecs, index) => {
       const path = Object.keys(liquid)[index]
-      LIDUID_TYPES.forEach(type => {
+      LIQUID_TYPES.forEach(type => {
         if (
           `../pipette/definitions/2/liquid/${channels}/${pipetteModel}/${type}/${version}.json` ===
           path
@@ -222,14 +224,15 @@ export const getPipetteSpecsV2 = (
     liquids: Record<string, PipetteV2LiquidSpecs>
   } = { liquids: {} }
 
-  Object.keys(liquidMatchingJsons).forEach((key, index) => {
-    const newKeyName = LIDUID_TYPES[index] || key
-    liquidMatchingJsonsGrouped.liquids[newKeyName] = liquidMatchingJsons[key]
-  })
+  for (const [key, value] of Object.entries(liquidMatchingJsons)) {
+    const index = Number(key)
+    const newKeyName = LIQUID_TYPES[index] || key
+    liquidMatchingJsonsGrouped.liquids[newKeyName] = value
+  }
 
-  const combinedRecords = {
+  const combinedRecords: PipetteV2Specs = {
     ...generalGeometricCombined,
     ...liquidMatchingJsonsGrouped,
   }
-  return combinedRecords as PipetteV2Specs
+  return combinedRecords
 }
