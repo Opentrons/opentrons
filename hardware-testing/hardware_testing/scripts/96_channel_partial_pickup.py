@@ -523,7 +523,7 @@ async def _main() -> None:
                                     tip_length=(tip_length[args.tip_size]-tip_overlap),
                                     presses = 1,
                                     increment = 0)
-            # print(f'Press Position: {press_dist[Axis.by_mount(mount)]}')
+            print(f'Press Position: {press_dist[Axis.by_mount(mount)]}')
             await hw_api.home_z(mount.LEFT)
             cp = CriticalPoint.TIP
             current_position = await hw_api.current_position_ot3(mount, cp)
