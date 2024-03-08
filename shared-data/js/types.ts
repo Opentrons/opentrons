@@ -459,7 +459,7 @@ export interface PipetteV2GeometrySpecs {
   nozzleMap: Record<string, number[]>
 }
 
-type TipData = [number, number, number][]
+type TipData = [number, number, number]
 interface SupportedTips {
   [tipType: string]: {
     aspirate: {
