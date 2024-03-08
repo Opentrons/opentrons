@@ -37,20 +37,50 @@ export function appShellRequestor<Data>(
   return remote.ipcRenderer.invoke('usb:request', configProxy)
 }
 
-export function appShellListener(
-  hostname: string | null,
-  topic: NotifyTopic,
+interface CallbackStore {
+  [hostname: string]: {
+    [topic in NotifyTopic]: Array<(data: NotifyResponseData) => void>
+  }
+}
+const callbackStore: CallbackStore = {}
+
+interface AppShellListener {
+  hostname: string
+  topic: NotifyTopic
   callback: (data: NotifyResponseData) => void
-): void {
-  remote.ipcRenderer.on(
-    'notify',
-    (_, shellHostname, shellTopic, shellMessage) => {
-      if (
-        hostname === shellHostname &&
-        (topic === shellTopic || shellTopic === 'ALL_TOPICS')
-      ) {
-        callback(shellMessage)
+  isDismounting?: boolean
+}
+export function appShellListener({
+  hostname,
+  topic,
+  callback,
+  isDismounting = false,
+}: AppShellListener): CallbackStore {
+  if (isDismounting) {
+    const callbacks = callbackStore[hostname]?.[topic]
+    if (callbacks != null) {
+      callbackStore[hostname][topic] = callbacks.filter(cb => cb !== callback)
+      if (!callbackStore[hostname][topic].length) {
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+        delete callbackStore[hostname][topic]
+        if (!Object.keys(callbackStore[hostname]).length) {
+          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+          delete callbackStore[hostname]
+        }
       }
     }
-  )
+  } else {
+    callbackStore[hostname] = callbackStore[hostname] ?? {}
+    callbackStore[hostname][topic] ??= []
+    callbackStore[hostname][topic].push(callback)
+  }
+  return callbackStore
 }
+
+// Instantiate the notify listener at runtime.
+remote.ipcRenderer.on(
+  'notify',
+  (_, shellHostname, shellTopic, shellMessage) => {
+    callbackStore[shellHostname]?.[shellTopic]?.forEach(cb => cb(shellMessage))
+  }
+)
