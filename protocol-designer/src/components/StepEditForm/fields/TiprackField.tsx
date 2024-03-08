@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { FormGroup, DropdownField } from '@opentrons/components'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
-import styles from '../StepEditForm.css'
+import styles from '../StepEditForm.module.css'
 
 import type { FieldProps } from '../types'
 
