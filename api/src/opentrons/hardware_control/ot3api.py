@@ -33,9 +33,6 @@ from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
 from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons_shared_data.errors.exceptions import (
-    StallOrCollisionDetectedError,
-)
 
 from opentrons import types as top_types
 from opentrons.config import robot_configs
@@ -1531,19 +1528,12 @@ class OT3API(
                 axis_home_dist = 20.0
             if origin[axis] - target_pos[axis] > axis_home_dist:
                 target_pos[axis] += axis_home_dist
-                try:
-                    await self._backend.move(
-                        origin,
-                        target_pos,
-                        speed=400,
-                        stop_condition=HWStopCondition.none,
-                    )
-                except StallOrCollisionDetectedError:
-                    self._log.warning(
-                        f"Stall on {axis} during fast home, encoder may have missed an overflow"
-                    )
-                    await self.refresh_positions(acquire_lock=False)
-
+                await self._backend.move(
+                    origin,
+                    target_pos,
+                    speed=400,
+                    stop_condition=HWStopCondition.none,
+                )
             await self._backend.home([axis], self.gantry_load)
         else:
             # both stepper and encoder positions are invalid, must home
