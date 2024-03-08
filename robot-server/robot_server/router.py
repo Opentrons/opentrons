@@ -72,7 +72,7 @@ router.include_router(
 
 router.include_router(
     router=deck_configuration_router,
-    tags=["Deck Configuration"],
+    tags=["Flex Deck Configuration"],
     dependencies=[Depends(check_version_header)],
 )
 
@@ -90,7 +90,7 @@ router.include_router(
 
 router.include_router(
     router=deprecated_session_router,
-    tags=["Session Management"],
+    tags=["OT-2 Calibration Sessions"],
     dependencies=[Depends(check_version_header)],
 )
 
@@ -120,7 +120,7 @@ router.include_router(
 
 router.include_router(
     router=subsystems_router,
-    tags=["Subsystem Management"],
+    tags=["Flex Subsystem Management"],
     dependencies=[Depends(check_version_header)],
 )
 
