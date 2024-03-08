@@ -5,6 +5,8 @@ from typing import List, Optional, Tuple, Any, Callable
 import matplotlib.pyplot as plot
 import numpy
 
+
+impossible_pressure = 9001.0
 # ----present day threshold based----
 def tick_th(pressure: float) -> Tuple[bool, float]:
     return (pressure < -150, pressure)
@@ -15,24 +17,23 @@ def reset_th() -> None:
 
 
 # -----Simple moving average derivative---
-impossible_pressure_smad = 9001.0
 samples_n_smad = 10
-running_samples_smad: List[float] = [impossible_pressure_smad] * samples_n_smad
+running_samples_smad: List[float] = [impossible_pressure] * samples_n_smad
 derivative_threshold_smad = -2.5
 
 
 def reset_smad() -> None:
     global running_samples_smad
-    running_samples_smad = [impossible_pressure_smad] * samples_n_smad
+    running_samples_smad = [impossible_pressure] * samples_n_smad
 
 
 def tick_smad(pressure: float) -> Tuple[bool, float]:
     global running_samples_smad
     try:
-        next_ind = running_samples_smad.index(impossible_pressure_smad)
+        next_ind = running_samples_smad.index(impossible_pressure)
         # if no exception we're still filling the minimum samples
         running_samples_smad[next_ind] = pressure
-        return (False, 0)
+        return (False, impossible_pressure)
     except ValueError:  # the array has been filled
         pass
     # store old running average
@@ -49,28 +50,27 @@ def tick_smad(pressure: float) -> Tuple[bool, float]:
 
 
 # -----weighted moving average derivative---
-impossible_pressure_wmad = 9001.0
 samples_n_wmad = 10
 weights_wmad: numpy.ndarray[Any, numpy.dtype[numpy.float32]] = numpy.array(
     [0.19, 0.17, 0.15, 0.13, 0.11, 0.09, 0.07, 0.05, 0.03, 0.01]
 )
-running_samples_wmad = numpy.full(samples_n_wmad, impossible_pressure_wmad)
+running_samples_wmad = numpy.full(samples_n_wmad, impossible_pressure)
 derivative_threshold_wmad = -2
 
 
 def reset_wmad() -> None:
     global running_samples_wmad
     assert numpy.sum(weights_wmad) == 1
-    running_samples_wmad = numpy.full(samples_n_wmad, impossible_pressure_wmad)
+    running_samples_wmad = numpy.full(samples_n_wmad, impossible_pressure)
 
 
 def tick_wmad(pressure: float) -> Tuple[bool, float]:
     global running_samples_wmad
-    if numpy.isin(impossible_pressure_wmad, running_samples_wmad):
-        next_ind = numpy.where(running_samples_wmad == impossible_pressure_wmad)[0][0]
+    if numpy.isin(impossible_pressure, running_samples_wmad):
+        next_ind = numpy.where(running_samples_wmad == impossible_pressure)[0][0]
         # if no exception we're still filling the minimum samples
         running_samples_wmad[next_ind] = pressure
-        return (False, 0)
+        return (False, impossible_pressure)
     # store old running average
     prev_running_avg = numpy.sum(numpy.multiply(running_samples_wmad, weights_wmad))
     # left shift old samples
@@ -85,22 +85,21 @@ def tick_wmad(pressure: float) -> Tuple[bool, float]:
 
 
 # -----exponential moving average derivative---
-impossible_pressure_emad: float = 9001.0
-current_average_emad: float = impossible_pressure_emad
+current_average_emad: float = impossible_pressure
 smoothing_factor = 0.1
 derivative_threshold_emad = -2.5
 
 
 def reset_emad() -> None:
     global current_average_emad
-    current_average_emad = impossible_pressure_emad
+    current_average_emad = impossible_pressure
 
 
 def tick_emad(pressure: float) -> Tuple[bool, float]:
     global current_average_emad
-    if current_average_emad == impossible_pressure_emad:
+    if current_average_emad == impossible_pressure:
         current_average_emad = pressure
-        return (False, 0)
+        return (False, impossible_pressure)
     else:
         new_average = (pressure * smoothing_factor) + (
             current_average_emad * (1 - smoothing_factor)
@@ -137,11 +136,12 @@ def running_avg(
             if no_plot:
                 # once we find it we don't need to keep going
                 break
-        running_avg_derivative = average - prev_avg
+        if (average != impossible_pressure and prev_avg != impossible_pressure):
+            running_avg_derivative = average - prev_avg
+            running_time.append(time[i])
+            running_derivative.append(running_avg_derivative)
+            running_avg.append(average)
 
-        running_time.append(time[i])
-        running_derivative.append(running_avg_derivative)
-        running_avg.append(average)
 
     time_array: numpy.ndarray[Any, numpy.dtype[numpy.float32]] = numpy.array(
         running_time
