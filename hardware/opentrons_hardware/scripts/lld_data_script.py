@@ -1,7 +1,7 @@
 import csv
 import os
 import argparse
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Any, Callable
 import matplotlib.pyplot as plot
 import numpy
 
@@ -42,13 +42,18 @@ def tick_smad(pressure: float) -> Tuple[bool, float]:
         running_samples_smad[i] = running_samples_smad[i + 1]
     running_samples_smad[samples_n_smad - 1] = pressure
     new_running_avg = sum(running_samples_smad) / samples_n_smad
-    return ((new_running_avg - prev_running_avg) < derivative_threshold_smad, new_running_avg)
+    return (
+        (new_running_avg - prev_running_avg) < derivative_threshold_smad,
+        new_running_avg,
+    )
 
 
 # -----weighted moving average derivative---
 impossible_pressure_wmad = 9001.0
 samples_n_wmad = 10
-weights_wmad = numpy.array([0.19,0.17,0.15,0.13,0.11,0.09,0.07, 0.05, 0.03, 0.01])
+weights_wmad: numpy.ndarray[Any, numpy.dtype[numpy.float32]] = numpy.array(
+    [0.19, 0.17, 0.15, 0.13, 0.11, 0.09, 0.07, 0.05, 0.03, 0.01]
+)
 running_samples_wmad = numpy.full(samples_n_wmad, impossible_pressure_wmad)
 derivative_threshold_wmad = -2
 
@@ -73,18 +78,23 @@ def tick_wmad(pressure: float) -> Tuple[bool, float]:
         running_samples_wmad[i] = running_samples_wmad[i + 1]
     running_samples_wmad[samples_n_wmad - 1] = pressure
     new_running_avg = numpy.sum(numpy.multiply(running_samples_wmad, weights_wmad))
-    return ((new_running_avg - prev_running_avg) < derivative_threshold_wmad, new_running_avg)
+    return (
+        (new_running_avg - prev_running_avg) < derivative_threshold_wmad,
+        new_running_avg,
+    )
 
 
-#-----exponential moving average derivative---
+# -----exponential moving average derivative---
 impossible_pressure_emad: float = 9001.0
-current_average_emad : float = impossible_pressure_emad
+current_average_emad: float = impossible_pressure_emad
 smoothing_factor = 0.1
 derivative_threshold_emad = -2.5
+
 
 def reset_emad() -> None:
     global current_average_emad
     current_average_emad = impossible_pressure_emad
+
 
 def tick_emad(pressure: float) -> Tuple[bool, float]:
     global current_average_emad
@@ -92,10 +102,13 @@ def tick_emad(pressure: float) -> Tuple[bool, float]:
         current_average_emad = pressure
         return (False, 0)
     else:
-        new_average = (pressure * smoothing_factor) + (current_average_emad * (1-smoothing_factor))
+        new_average = (pressure * smoothing_factor) + (
+            current_average_emad * (1 - smoothing_factor)
+        )
         derivative = new_average - current_average_emad
         current_average_emad = new_average
         return (derivative < derivative_threshold_emad, current_average_emad)
+
 
 def running_avg(
     time: List[float],
@@ -103,10 +116,10 @@ def running_avg(
     z_travel: List[float],
     p_travel: List[float],
     no_plot: bool,
-    reset_func,
-    tick_func,
+    reset_func: Callable[[], None],
+    tick_func: Callable[[float], Tuple[bool, float]],
     plot_name: str,
-) -> Optional[Tuple[str, str, str]]:
+) -> Optional[Tuple[float, float, float]]:
     reset_func()
     average = float(0)
     running_time = []
@@ -130,12 +143,13 @@ def running_avg(
         running_derivative.append(running_avg_derivative)
         running_avg.append(average)
 
-        # print(running_avg_derivative)
-
-
-    time_array = numpy.array(running_time)
-    derivative_array = numpy.array(running_derivative)
-    avg_array = numpy.array(running_avg)
+    time_array: numpy.ndarray[Any, numpy.dtype[numpy.float32]] = numpy.array(
+        running_time
+    )
+    derivative_array: numpy.ndarray[Any, numpy.dtype[numpy.float32]] = numpy.array(
+        running_derivative
+    )
+    avg_array: numpy.ndarray[Any, numpy.dtype[numpy.float32]] = numpy.array(running_avg)
 
     if not no_plot:
         plot.figure(plot_name)
@@ -146,13 +160,19 @@ def running_avg(
         der_ax.set_title("Derivative")
         plot.plot(time_array, derivative_array)
         mng = plot.get_current_fig_manager()
-        mng.resize(*mng.window.maxsize())
+        if mng is not None:
+            mng.resize(*mng.window.maxsize())  # type: ignore[attr-defined]
         plot.show()
 
     return return_val
 
 
-def run(args: argparse.Namespace, reset_func, tick_func, name) -> None:
+def run(
+    args: argparse.Namespace,
+    reset_func: Callable[[], None],
+    tick_func: Callable[[float], Tuple[bool, float]],
+    name: str,
+) -> None:
 
     path = args.filepath + "/"
     report_files = [
@@ -188,13 +208,20 @@ def run(args: argparse.Namespace, reset_func, tick_func, name) -> None:
                 ):
                     break
 
-                time.append(current_time)
-                pressure.append(current_pressure)
-                z_travel.append(current_z_pos)
-                p_travel.append(current_p_pos)
+                time.append(float(current_time))
+                pressure.append(float(current_pressure))
+                z_travel.append(float(current_z_pos))
+                p_travel.append(float(current_p_pos))
 
             threshold_data = running_avg(
-                time, pressure, z_travel, p_travel, args.no_plot, reset_func, tick_func, f"{name} trial: {trial+1}"
+                time,
+                pressure,
+                z_travel,
+                p_travel,
+                args.no_plot,
+                reset_func,
+                tick_func,
+                f"{name} trial: {trial+1}",
             )
             if threshold_data:
                 threshold_time = threshold_data[0]
