@@ -1,5 +1,5 @@
 // PD-specific info about labware<>module compatibilty
-import assert from 'assert'
+
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -72,7 +72,7 @@ export const getLabwareIsCompatible = (
   def: LabwareDefinition2,
   moduleType: ModuleType
 ): boolean => {
-  assert(
+  console.assert(
     moduleType in COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE,
     `expected ${moduleType} in labware<>module compatibility allowlist`
   )

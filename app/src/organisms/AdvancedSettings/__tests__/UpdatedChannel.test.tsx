@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
-
+import { describe, it, vi, beforeEach } from 'vitest'
 import { i18n } from '../../../i18n'
 import {
   getUpdateChannelOptions,
@@ -9,26 +8,17 @@ import {
   // updateConfigValue,
 } from '../../../redux/config'
 import { UpdatedChannel } from '../UpdatedChannel'
+import { renderWithProviders } from '../../../__testing-utils__'
 
-jest.mock('../../../redux/config')
+vi.mock('../../../redux/config')
 
 const render = () => {
   return renderWithProviders(<UpdatedChannel />, { i18nInstance: i18n })
 }
 
-const mockGetUpdateChannelOptions = getUpdateChannelOptions as jest.MockedFunction<
-  typeof getUpdateChannelOptions
->
-const mockGetUpdateChannel = getUpdateChannel as jest.MockedFunction<
-  typeof getUpdateChannel
->
-// const mockUpdateConfigValue = updateConfigValue as jest.MockedFunction<
-//   typeof updateConfigValue
-// >
-
 describe('UpdatedChannel', () => {
   beforeEach(() => {
-    mockGetUpdateChannelOptions.mockReturnValue([
+    vi.mocked(getUpdateChannelOptions).mockReturnValue([
       {
         label: 'Stable',
         value: 'latest',
@@ -36,7 +26,7 @@ describe('UpdatedChannel', () => {
       { label: 'Beta', value: 'beta' },
       { label: 'Alpha', value: 'alpha' },
     ])
-    mockGetUpdateChannel.mockReturnValue('beta')
+    vi.mocked(getUpdateChannel).mockReturnValue('beta')
   })
   it('renders text and selector', () => {
     render()

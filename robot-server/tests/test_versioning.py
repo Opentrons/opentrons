@@ -8,7 +8,7 @@ from fastapi import FastAPI, APIRouter, Request, Depends
 from fastapi.testclient import TestClient
 from typing import Dict
 
-from robot_server.errors import exception_handlers
+from robot_server.errors.exception_handlers import exception_handlers
 from robot_server.versioning import API_VERSION, check_version_header
 
 

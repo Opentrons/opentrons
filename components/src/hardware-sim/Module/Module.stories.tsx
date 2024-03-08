@@ -1,5 +1,6 @@
 import * as React from 'react'
 import {
+  fixture96Plate,
   getModuleDef2,
   LabwareDefinition2,
   MAGNETIC_MODULE_V1,
@@ -12,7 +13,6 @@ import {
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import { LabwareRender } from '../Labware'
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
 import { Module as ModuleComponent } from './'
@@ -50,7 +50,7 @@ const Template: Story<{
         orientation={args.orientation}
       >
         {args.hasLabware ? (
-          <LabwareRender definition={fixture_96_plate as LabwareDefinition2} />
+          <LabwareRender definition={fixture96Plate as LabwareDefinition2} />
         ) : null}
       </ModuleComponent>
     </RobotCoordinateSpace>

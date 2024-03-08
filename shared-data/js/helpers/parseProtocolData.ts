@@ -114,8 +114,8 @@ export function validateJsonProtocolFileContents(
 
       return parsedProtocol
     }
-  } catch (error) {
-    handleError && handleError('INVALID_JSON_FILE', { rawError: error })
+  } catch (error: any) {
+    handleError?.('INVALID_JSON_FILE', { rawError: String(error) })
     return null
   }
 }

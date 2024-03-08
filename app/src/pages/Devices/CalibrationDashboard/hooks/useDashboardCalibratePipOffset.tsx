@@ -1,8 +1,9 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
-import { Portal } from '../../../../App/portal'
+import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModalShell } from '../../../../molecules/LegacyModal'
 import { WizardHeader } from '../../../../molecules/WizardHeader'
 import { CalibratePipetteOffset } from '../../../../organisms/CalibratePipetteOffset'
@@ -160,25 +161,24 @@ export function useDashboardCalibratePipOffset(
     )
   }
 
-  let Wizard: JSX.Element | null = (
-    <Portal level="top">
-      {startingSession ? (
-        <LegacyModalShell
-          width="47rem"
-          header={<WizardHeader title={t('pipette_offset_calibration')} />}
-        >
-          <LoadingState />
-        </LegacyModalShell>
-      ) : (
-        <CalibratePipetteOffset
-          session={pipOffsetCalSession}
-          robotName={robotName}
-          showSpinner={startingSession || showSpinner}
-          dispatchRequests={dispatchRequests}
-          isJogging={isJogging}
-        />
-      )}
-    </Portal>
+  let Wizard: JSX.Element | null = createPortal(
+    startingSession ? (
+      <LegacyModalShell
+        width="47rem"
+        header={<WizardHeader title={t('pipette_offset_calibration')} />}
+      >
+        <LoadingState />
+      </LegacyModalShell>
+    ) : (
+      <CalibratePipetteOffset
+        session={pipOffsetCalSession}
+        robotName={robotName}
+        showSpinner={startingSession || showSpinner}
+        dispatchRequests={dispatchRequests}
+        isJogging={isJogging}
+      />
+    ),
+    getTopPortalEl()
   )
 
   if (!(startingSession || pipOffsetCalSession != null)) Wizard = null

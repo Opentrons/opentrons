@@ -1,4 +1,5 @@
 // config migration tests
+import { describe, it, expect } from 'vitest'
 import {
   MOCK_CONFIG_V0,
   MOCK_CONFIG_V1,
@@ -22,7 +23,7 @@ import {
   MOCK_CONFIG_V19,
   MOCK_CONFIG_V20,
   MOCK_CONFIG_V21,
-} from '../__fixtures__'
+} from '../../__fixtures__'
 import { migrate } from '../migrate'
 
 const NEWEST_VERSION = 21

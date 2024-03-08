@@ -3,7 +3,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import styles from './structure.css'
+import styles from './structure.module.css'
 
 export interface LabeledValueProps {
   /** Label */

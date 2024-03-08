@@ -1,4 +1,5 @@
-import { when, resetAllWhenMocks } from 'jest-when'
+import { vi, it, expect, describe, beforeEach } from 'vitest'
+import { when } from 'vitest-when'
 import { renderHook } from '@testing-library/react'
 
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
@@ -12,17 +13,9 @@ import {
 
 import type { ModuleDefinition } from '@opentrons/shared-data'
 
-jest.mock('../useAttachedModules')
-jest.mock('../useModuleRenderInfoForProtocolById')
-jest.mock('../useRobot')
-
-const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
-  typeof useModuleRenderInfoForProtocolById
->
-const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
-  typeof useAttachedModules
->
-const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
+vi.mock('../useAttachedModules')
+vi.mock('../useModuleRenderInfoForProtocolById')
+vi.mock('../useRobot')
 
 const mockMagneticBlockDef = {
   labwareOffset: { x: 5, y: 5, z: 5 },
@@ -47,28 +40,24 @@ const mockTemperatureModuleDef = {
 }
 describe('useModuleMatchResults', () => {
   beforeEach(() => {
-    when(mockUseRobot)
+    when(vi.mocked(useRobot))
       .calledWith(mockConnectedRobot.name)
-      .mockReturnValue(mockConnectedRobot)
-    when(mockUseModuleRenderInfoForProtocolById)
+      .thenReturn(mockConnectedRobot)
+    when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith('1')
-      .mockReturnValue({})
+      .thenReturn({})
 
-    when(mockUseAttachedModules)
+    when(vi.mocked(useAttachedModules))
       .calledWith()
-      .mockReturnValue([mockTemperatureModule])
-  })
-
-  afterEach(() => {
-    resetAllWhenMocks()
+      .thenReturn([mockTemperatureModule])
   })
 
   it('should return no missing Module Ids if all connecting modules are present', () => {
-    when(mockUseAttachedModules).calledWith().mockReturnValue([])
+    when(vi.mocked(useAttachedModules)).calledWith().thenReturn([])
     const moduleId = 'fakeMagBlockId'
-    when(mockUseModuleRenderInfoForProtocolById)
+    when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith('1')
-      .mockReturnValue({
+      .thenReturn({
         [moduleId]: {
           moduleId: moduleId,
           x: 0,
@@ -94,9 +83,9 @@ describe('useModuleMatchResults', () => {
   })
   it('should return 1 missing moduleId if requested model not attached', () => {
     const moduleId = 'fakeMagModuleId'
-    when(mockUseModuleRenderInfoForProtocolById)
+    when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith('1')
-      .mockReturnValue({
+      .thenReturn({
         [moduleId]: {
           moduleId: moduleId,
           x: 0,
@@ -112,7 +101,7 @@ describe('useModuleMatchResults', () => {
           conflictedFixture: null,
         },
       })
-    when(mockUseAttachedModules).calledWith().mockReturnValue([])
+    when(vi.mocked(useAttachedModules)).calledWith().thenReturn([])
 
     const { result } = renderHook(() =>
       useUnmatchedModulesForProtocol(mockConnectedRobot.name, '1')
@@ -122,9 +111,9 @@ describe('useModuleMatchResults', () => {
   })
   it('should return no missing moduleId if compatible model is attached', () => {
     const moduleId = 'someTempModule'
-    when(mockUseModuleRenderInfoForProtocolById)
+    when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith('1')
-      .mockReturnValue({
+      .thenReturn({
         [moduleId]: {
           moduleId: moduleId,
           x: 0,
@@ -149,9 +138,9 @@ describe('useModuleMatchResults', () => {
   })
   it('should return one missing moduleId if nocompatible model is attached', () => {
     const moduleId = 'someTempModule'
-    when(mockUseModuleRenderInfoForProtocolById)
+    when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith('1')
-      .mockReturnValue({
+      .thenReturn({
         [moduleId]: {
           moduleId: moduleId,
           x: 0,

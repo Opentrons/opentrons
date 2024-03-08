@@ -75,7 +75,7 @@ import {
 import { useToaster } from '../../organisms/ToasterOven'
 import { useIsHeaterShakerInProtocol } from '../../organisms/ModuleCard/hooks'
 import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
-import { getLocalRobot } from '../../redux/discovery'
+import { getLocalRobot, getRobotSerialNumber } from '../../redux/discovery'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_PROTOCOL_RUN_START,
@@ -216,6 +216,7 @@ interface PrepareToRunProps {
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
   confirmAttachment: () => void
   play: () => void
+  robotName: string
 }
 
 function PrepareToRun({
@@ -223,12 +224,11 @@ function PrepareToRun({
   setSetupScreen,
   confirmAttachment,
   play,
+  robotName,
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const history = useHistory()
   const { makeSnackbar } = useToaster()
-  const localRobot = useSelector(getLocalRobot)
-  const robotName = localRobot?.name != null ? localRobot.name : 'no name'
 
   // Watch for scrolling to toggle dropshadow
   const scrollRef = React.useRef<HTMLDivElement>(null)
@@ -744,10 +744,17 @@ export type SetupScreens =
 
 export function ProtocolSetup(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
+  const localRobot = useSelector(getLocalRobot)
+  const robotSerialNumber =
+    localRobot?.status != null ? getRobotSerialNumber(localRobot) : null
   const trackEvent = useTrackEvent()
   const { play } = useRunControls(runId)
+
   const handleProceedToRunClick = (): void => {
-    trackEvent({ name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN, properties: {} })
+    trackEvent({
+      name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+      properties: { robotSerialNumber },
+    })
     play()
   }
   const configBypassHeaterShakerAttachmentConfirmation = useSelector(
@@ -777,6 +784,7 @@ export function ProtocolSetup(): JSX.Element {
         setSetupScreen={setSetupScreen}
         confirmAttachment={confirmAttachment}
         play={play}
+        robotName={localRobot?.name != null ? localRobot.name : 'no name'}
       />
     ),
     instruments: (

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { resetAllWhenMocks } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { GripperWizardFlows } from '../../GripperWizardFlows'
@@ -9,19 +9,9 @@ import { AboutGripperSlideout } from '../AboutGripperSlideout'
 import { GripperCard } from '../'
 import type { GripperData } from '@opentrons/api-client'
 
-jest.mock('../../GripperWizardFlows')
-jest.mock('../AboutGripperSlideout')
-jest.mock('@opentrons/react-api-client')
-
-const mockGripperWizardFlows = GripperWizardFlows as jest.MockedFunction<
-  typeof GripperWizardFlows
->
-const mockAboutGripperSlideout = AboutGripperSlideout as jest.MockedFunction<
-  typeof AboutGripperSlideout
->
-const mockUseCurrentSubsystemUpdateQuery = useCurrentSubsystemUpdateQuery as jest.MockedFunction<
-  typeof useCurrentSubsystemUpdateQuery
->
+vi.mock('../../GripperWizardFlows')
+vi.mock('../AboutGripperSlideout')
+vi.mock('@opentrons/react-api-client')
 
 const render = (props: React.ComponentProps<typeof GripperCard>) => {
   return renderWithProviders(<GripperCard {...props} />, {
@@ -48,21 +38,19 @@ describe('GripperCard', () => {
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
-    mockGripperWizardFlows.mockReturnValue(<>wizard flow launched</>)
-    mockAboutGripperSlideout.mockReturnValue(<>about gripper</>)
-    mockUseCurrentSubsystemUpdateQuery.mockReturnValue({
+    vi.mocked(GripperWizardFlows).mockReturnValue(<>wizard flow launched</>)
+    vi.mocked(AboutGripperSlideout).mockReturnValue(<>about gripper</>)
+    vi.mocked(useCurrentSubsystemUpdateQuery).mockReturnValue({
       data: undefined,
     } as any)
-  })
-  afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
   })
 
   it('renders correct info when gripper is attached', () => {
     render(props)
     const image = screen.getByRole('img', { name: 'Flex Gripper' })
-    expect(image.getAttribute('src')).toEqual('flex_gripper.png')
+    expect(image.getAttribute('src')).toEqual(
+      '/app/src/assets/images/flex_gripper.png'
+    )
     screen.getByText('extension mount')
     screen.getByText('Flex Gripper')
     const overflowButton = screen.getByRole('button', {
@@ -182,7 +170,7 @@ describe('GripperCard', () => {
     )
   })
   it('renders firmware update in progress state if gripper is bad and update in progress', () => {
-    mockUseCurrentSubsystemUpdateQuery.mockReturnValue({
+    vi.mocked(useCurrentSubsystemUpdateQuery).mockReturnValue({
       data: { data: { updateProgress: 50 } as any },
     } as any)
     props = {

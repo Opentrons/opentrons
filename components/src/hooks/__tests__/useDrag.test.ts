@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { act, renderHook } from '@testing-library/react'
 import { useDrag } from '../useDrag'
 import type { ElementPosition } from '../useDrag'

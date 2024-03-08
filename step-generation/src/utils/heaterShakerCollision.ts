@@ -6,8 +6,10 @@ import {
   getIsLabwareAboveHeight,
   HEATERSHAKER_MODULE_TYPE,
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
-  PipetteNameSpecs,
 } from '@opentrons/shared-data'
+
+import type { PipetteNameSpecs } from '@opentrons/shared-data'
+
 import type {
   LabwareEntities,
   RobotState,

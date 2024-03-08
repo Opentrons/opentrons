@@ -3,7 +3,7 @@ from fastapi import Header, Request, Response, status
 from typing import Union
 from typing_extensions import Literal, Final
 
-from robot_server.errors import ErrorDetails
+from robot_server.errors.error_responses import ErrorDetails
 
 API_VERSION: Final[int] = 4
 """The current version of the HTTP API used by the server.
@@ -59,9 +59,10 @@ async def check_version_header(
     opentrons_version: Union[Literal["*"], int] = Header(
         ...,
         description=(
-            "The HTTP API version to use for this request. Must be "
-            f"'{MIN_API_VERSION}' or higher. To use the latest "
-            f"version unconditionally, specify '{LATEST_API_VERSION_HEADER_VALUE}'"
+            f"The HTTP API version to use for this request."
+            f" Must be `{MIN_API_VERSION}` or higher."
+            f" To use the latest version unconditionally,"
+            f" specify `{LATEST_API_VERSION_HEADER_VALUE}`."
         ),
     ),
 ) -> None:

@@ -1,8 +1,9 @@
 import * as React from 'react'
+import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { saveAs } from 'file-saver'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
 
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import * as Fixtures from '../../../../redux/sessions/__fixtures__'
 import * as Sessions from '../../../../redux/sessions'
@@ -14,29 +15,26 @@ import { ResultsSummary } from '../'
 
 import type { CalibrationPanelProps } from '../../../../organisms/CalibrationPanels/types'
 
-jest.mock('file-saver')
-jest.mock('../../../../redux/sessions')
-jest.mock('../../../../redux/pipettes')
-jest.mock('../CalibrationHealthCheckResults')
-jest.mock('../RenderMountInformation')
-jest.mock('../CalibrationResult')
+// file-saver has circular dep, need to mock with factory to prevent error
+vi.mock('file-saver', async importOriginal => {
+  const actual = await importOriginal<typeof saveAs>()
+  return {
+    ...actual,
+    saveAs: vi.fn(),
+  }
+})
+vi.mock('../../../../redux/sessions')
+vi.mock('../../../../redux/pipettes')
+vi.mock('../CalibrationHealthCheckResults')
+vi.mock('../RenderMountInformation')
+vi.mock('../CalibrationResult')
 
-const mockSaveAs = saveAs as jest.MockedFunction<typeof saveAs>
-const mockDeleteSession = jest.fn()
+const mockDeleteSession = vi.fn()
 const mockSessionDetails = Fixtures.mockRobotCalibrationCheckSessionDetails
-const mockCalibrationHealthCheckResults = CalibrationHealthCheckResults as jest.MockedFunction<
-  typeof CalibrationHealthCheckResults
->
-const mockRenderMountInformation = RenderMountInformation as jest.MockedFunction<
-  typeof RenderMountInformation
->
-const mockCalibrationResult = CalibrationResult as jest.MockedFunction<
-  typeof CalibrationResult
->
 
 const mockIsMulti = false
 const mockMount = 'left'
-const mockSendCommands = jest.fn()
+const mockSendCommands = vi.fn()
 
 const render = (props: CalibrationPanelProps) => {
   return renderWithProviders(<ResultsSummary {...props} />, {
@@ -61,13 +59,15 @@ describe('ResultsSummary', () => {
       comparisonsByPipette: mockSessionDetails.comparisonsByPipette,
       checkBothPipettes: true,
     }
-    mockCalibrationHealthCheckResults.mockReturnValue(
+    vi.mocked(CalibrationHealthCheckResults).mockReturnValue(
       <div>mock calibration health check results</div>
     )
-    mockRenderMountInformation.mockReturnValue(
+    vi.mocked(RenderMountInformation).mockReturnValue(
       <div>mock render mount information</div>
     )
-    mockCalibrationResult.mockReturnValue(<div>mock calibration result</div>)
+    vi.mocked(CalibrationResult).mockReturnValue(
+      <div>mock calibration result</div>
+    )
   })
 
   it('should render components', () => {
@@ -82,7 +82,7 @@ describe('ResultsSummary', () => {
     const { getByTestId } = render(props)
     const button = getByTestId('ResultsSummary_Download_Button')
     fireEvent.click(button)
-    expect(mockSaveAs).toHaveBeenCalled()
+    expect(vi.mocked(saveAs)).toHaveBeenCalled()
   })
 
   it('calls mock function when clicking finish', () => {

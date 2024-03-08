@@ -10,11 +10,10 @@ import { selectors as labwareIngredSelectors } from '../../labware-ingred/select
 import * as labwareIngredActions from '../../labware-ingred/actions'
 import { PDTitledList } from '../lists'
 import { swatchColors } from '../swatchColors'
+import listButtonStyles from '../listButtons.module.css'
+import styles from './styles.module.css'
 
 import type { ThunkDispatch } from '../../types'
-
-import styles from './styles.css'
-import listButtonStyles from '../listButtons.css'
 
 export function LiquidsSidebar(): JSX.Element {
   const { t } = useTranslation('button')

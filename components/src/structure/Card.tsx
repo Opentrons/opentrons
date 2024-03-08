@@ -26,7 +26,6 @@ export function Card(props: CardProps): JSX.Element {
   const { title, children, className, disabled, ...styleProps } = props
 
   return (
-    // @ts-expect-error TODO: allow Section to receive disabled prop
     <Section disabled={disabled} className={className} {...styleProps}>
       {title && <Title className={className}>{title}</Title>}
       {children}

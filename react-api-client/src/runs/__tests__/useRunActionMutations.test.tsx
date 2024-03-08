@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { act, renderHook } from '@testing-library/react'
 
@@ -13,19 +14,9 @@ import {
   useStopRunMutation,
 } from '..'
 
-jest.mock('../usePlayRunMutation')
-jest.mock('../usePauseRunMutation')
-jest.mock('../useStopRunMutation')
-
-const mockUsePlayRunMutation = usePlayRunMutation as jest.MockedFunction<
-  typeof usePlayRunMutation
->
-const mockUsePauseRunMutation = usePauseRunMutation as jest.MockedFunction<
-  typeof usePauseRunMutation
->
-const mockUseStopRunMutation = useStopRunMutation as jest.MockedFunction<
-  typeof useStopRunMutation
->
+vi.mock('../usePlayRunMutation')
+vi.mock('../usePauseRunMutation')
+vi.mock('../useStopRunMutation')
 
 describe('useRunActionMutations hook', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
@@ -40,23 +31,23 @@ describe('useRunActionMutations hook', () => {
     wrapper = clientProvider
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('should return run action callbacks', async () => {
-    const mockPlayRun = jest.fn()
-    const mockPauseRun = jest.fn()
-    const mockStopRun = jest.fn()
+    const mockPlayRun = vi.fn()
+    const mockPauseRun = vi.fn()
+    const mockStopRun = vi.fn()
 
-    mockUsePlayRunMutation.mockReturnValue(({
+    vi.mocked(usePlayRunMutation).mockReturnValue(({
       playRun: mockPlayRun,
     } as unknown) as UsePlayRunMutationResult)
 
-    mockUsePauseRunMutation.mockReturnValue(({
+    vi.mocked(usePauseRunMutation).mockReturnValue(({
       pauseRun: mockPauseRun,
     } as unknown) as UsePauseRunMutationResult)
 
-    mockUseStopRunMutation.mockReturnValue(({
+    vi.mocked(useStopRunMutation).mockReturnValue(({
       stopRun: mockStopRun,
     } as unknown) as UseStopRunMutationResult)
 

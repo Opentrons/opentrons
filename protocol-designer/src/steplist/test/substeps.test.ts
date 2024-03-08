@@ -1,3 +1,4 @@
+import { it, describe } from 'vitest'
 // TODO IMMEDIATELY: mock step-generation fns:
 // consolidate,
 // distribute,
@@ -18,13 +19,13 @@
 // })
 describe('substep timeline', () => {
   describe('substepTimelineSingleChannel', () => {
-    it('returns empty array if initial timeline frame has errors', () => {})
+    it.todo('returns empty array if initial timeline frame has errors')
   })
   describe('substepTimelineMultiChannel', () => {
-    it('returns empty array if initial timeline frame has errors', () => {})
+    it.todo('returns empty array if initial timeline frame has errors')
   })
   describe('_getNewActiveTips', () => {
-    it('gets params of last pickUpTip command in an array of commands', () => {})
-    it('returns null when there were no pickUpTip commands', () => {})
+    it.todo('gets params of last pickUpTip command in an array of commands')
+    it.todo('returns null when there were no pickUpTip commands')
   })
 })

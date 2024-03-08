@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { describe, it, expect } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { InterventionCommandMessage } from '../InterventionCommandMessage'
 import {
@@ -21,19 +23,19 @@ describe('InterventionCommandMessage', () => {
 
   it('truncates command text greater than 220 characters long', () => {
     props = { commandMessage: longCommandMessage }
-    const { getByText } = render(props)
-    expect(getByText(truncatedCommandMessage)).toBeTruthy()
+    render(props)
+    expect(screen.getByText(truncatedCommandMessage)).toBeTruthy()
   })
 
   it('does not truncate command text when shorter than 220 characters', () => {
     props = { commandMessage: shortCommandMessage }
-    const { getByText } = render(props)
-    expect(getByText(shortCommandMessage)).toBeTruthy()
+    render(props)
+    expect(screen.getByText(shortCommandMessage)).toBeTruthy()
   })
 
   it('displays a default message if pause step does not have a message', () => {
     props = { commandMessage: null }
-    const { getByText } = render(props)
-    expect(getByText('Pausing protocol')).toBeTruthy()
+    render(props)
+    expect(screen.getByText('Pausing protocol')).toBeTruthy()
   })
 })

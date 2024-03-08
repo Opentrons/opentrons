@@ -1,16 +1,15 @@
 import * as React from 'react'
 import { StaticRouter } from 'react-router-dom'
-import { renderWithProviders } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { describe, it, beforeEach, vi, expect } from 'vitest'
+
+import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import { mockLabwareDef } from '../../../../LabwarePositionCheck/__fixtures__/mockLabwareDef'
 import { LabwareListItem } from '../LabwareListItem'
 import { OffDeckLabwareList } from '../OffDeckLabwareList'
 
-jest.mock('../LabwareListItem')
-
-const mockLabwareListItem = LabwareListItem as jest.MockedFunction<
-  typeof LabwareListItem
->
+vi.mock('../LabwareListItem')
 
 const render = (props: React.ComponentProps<typeof OffDeckLabwareList>) => {
   return renderWithProviders(
@@ -25,18 +24,20 @@ const render = (props: React.ComponentProps<typeof OffDeckLabwareList>) => {
 
 describe('OffDeckLabwareList', () => {
   beforeEach(() => {
-    mockLabwareListItem.mockReturnValue(<div>mock labware list item</div>)
+    vi.mocked(LabwareListItem).mockReturnValue(
+      <div>mock labware list item</div>
+    )
   })
   it('renders null if labware items is null', () => {
-    const { container } = render({
+    render({
       labwareItems: [],
       isFlex: false,
       commands: [],
     })
-    expect(container.firstChild).toBeNull()
+    expect(screen.queryAllByText('Additional Off-Deck Labware')).toHaveLength(0)
   })
   it('renders additional offdeck labware info if there is an offdeck labware', () => {
-    const { getByText } = render({
+    render({
       labwareItems: [
         {
           nickName: 'nickName',
@@ -49,7 +50,7 @@ describe('OffDeckLabwareList', () => {
       isFlex: false,
       commands: [],
     })
-    getByText('Additional Off-Deck Labware')
-    getByText('mock labware list item')
+    screen.getByText('Additional Off-Deck Labware')
+    screen.getByText('mock labware list item')
   })
 })

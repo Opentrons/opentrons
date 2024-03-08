@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import { makeEvent } from '../make-event'
 
 import * as Alerts from '../../alerts'

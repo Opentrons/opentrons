@@ -2,7 +2,8 @@ import * as React from 'react'
 import { createStore, Store } from 'redux'
 import { Provider } from 'react-redux'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { resetAllWhenMocks, when } from 'jest-when'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
+import { when } from 'vitest-when'
 import { waitFor, renderHook } from '@testing-library/react'
 
 import { useTrackProtocolRunEvent } from '../useTrackProtocolRunEvent'
@@ -14,35 +15,28 @@ import {
 import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 import { useRobot } from '../useRobot'
 
-jest.mock('../../hooks')
-jest.mock('../useProtocolRunAnalyticsData')
-jest.mock('../../../../redux/discovery')
-jest.mock('../../../../redux/pipettes')
-jest.mock('../../../../redux/analytics')
-jest.mock('../../../../redux/robot-settings')
-jest.mock('../useRobot')
+import type { Mock } from 'vitest'
 
-const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
-  typeof useTrackEvent
->
-const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
-const mockUseProtocolRunAnalyticsData = useProtocolRunAnalyticsData as jest.MockedFunction<
-  typeof useProtocolRunAnalyticsData
->
+vi.mock('../useRobot')
+vi.mock('../useProtocolRunAnalyticsData')
+vi.mock('../../../../redux/discovery')
+vi.mock('../../../../redux/pipettes')
+vi.mock('../../../../redux/analytics')
+vi.mock('../../../../redux/robot-settings')
 
 const RUN_ID = 'runId'
 const ROBOT_NAME = 'otie'
 const PROTOCOL_PROPERTIES = { protocolType: 'python' }
 
-let mockTrackEvent: jest.Mock
-let mockGetProtocolRunAnalyticsData: jest.Mock
+let mockTrackEvent: Mock
+let mockGetProtocolRunAnalyticsData: Mock
 let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
-let store: Store<any> = createStore(jest.fn(), {})
+let store: Store<any> = createStore(vi.fn(), {})
 
 describe('useTrackProtocolRunEvent hook', () => {
   beforeEach(() => {
-    store = createStore(jest.fn(), {})
-    store.dispatch = jest.fn()
+    store = createStore(vi.fn(), {})
+    store.dispatch = vi.fn()
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (
       <Provider store={store}>
@@ -51,25 +45,25 @@ describe('useTrackProtocolRunEvent hook', () => {
         </QueryClientProvider>
       </Provider>
     )
-    mockTrackEvent = jest.fn()
-    mockGetProtocolRunAnalyticsData = jest.fn(
+    mockTrackEvent = vi.fn()
+    mockGetProtocolRunAnalyticsData = vi.fn(
       () =>
         new Promise(resolve =>
           resolve({ protocolRunAnalyticsData: PROTOCOL_PROPERTIES })
         )
     )
-    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
-    mockUseRobot.mockReturnValue(mockConnectableRobot)
-    when(mockUseProtocolRunAnalyticsData)
+    vi.mocked(useRobot).mockReturnValue(mockConnectableRobot)
+    vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
+
+    when(vi.mocked(useProtocolRunAnalyticsData))
       .calledWith(RUN_ID, mockConnectableRobot)
-      .mockReturnValue({
+      .thenReturn({
         getProtocolRunAnalyticsData: mockGetProtocolRunAnalyticsData,
       })
   })
 
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('returns trackProtocolRunEvent function', () => {
@@ -102,9 +96,9 @@ describe('useTrackProtocolRunEvent hook', () => {
   })
 
   it('trackProtocolRunEvent calls trackEvent without props when error is thrown in getProtocolRunAnalyticsData', async () => {
-    when(mockUseProtocolRunAnalyticsData)
+    when(vi.mocked(useProtocolRunAnalyticsData))
       .calledWith('errorId', mockConnectableRobot)
-      .mockReturnValue({
+      .thenReturn({
         getProtocolRunAnalyticsData: () =>
           new Promise(() => {
             throw new Error('error')

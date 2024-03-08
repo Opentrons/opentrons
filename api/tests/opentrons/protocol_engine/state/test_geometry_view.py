@@ -58,6 +58,7 @@ from opentrons.protocol_engine.state.pipettes import (
 )
 from opentrons.protocol_engine.state.addressable_areas import AddressableAreaView
 from opentrons.protocol_engine.state.geometry import GeometryView, _GripperMoveType
+from ..pipette_fixtures import get_default_nozzle_map
 
 
 @pytest.fixture
@@ -1842,6 +1843,12 @@ def test_get_next_drop_tip_location(
     decoy.when(
         labware_view.get_well_size(labware_id="abc", well_name="A1")
     ).then_return((well_size, 0, 0))
+    if pipette_channels == 96:
+        pip_type = PipetteNameType.P1000_96
+    elif pipette_channels == 8:
+        pip_type = PipetteNameType.P300_MULTI
+    else:
+        pip_type = PipetteNameType.P300_SINGLE
     decoy.when(mock_pipette_view.get_config("pip-123")).then_return(
         StaticPipetteConfig(
             min_volume=1,
@@ -1858,6 +1865,7 @@ def test_get_next_drop_tip_location(
                 back_left_offset=Point(x=10, y=20, z=30),
                 front_right_offset=Point(x=40, y=50, z=60),
             ),
+            default_nozzle_map=get_default_nozzle_map(pip_type),
             pipette_bounding_box_offsets=PipetteBoundingBoxOffsets(
                 back_left_corner=Point(x=10, y=20, z=30),
                 front_right_corner=Point(x=40, y=50, z=60),

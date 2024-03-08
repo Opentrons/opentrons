@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import map from 'lodash/map'
 import omit from 'lodash/omit'
 import isEmpty from 'lodash/isEmpty'
@@ -45,7 +46,7 @@ import {
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
@@ -363,16 +364,17 @@ export function ProtocolDetails(
 
   return (
     <>
-      <Portal level="top">
-        {showDeckViewModal ? (
-          <LegacyModal
-            title={t('deck_view')}
-            onClose={() => setShowDeckViewModal(false)}
-          >
-            {deckMap}
-          </LegacyModal>
-        ) : null}
-      </Portal>
+      {showDeckViewModal
+        ? createPortal(
+            <LegacyModal
+              title={t('deck_view')}
+              onClose={() => setShowDeckViewModal(false)}
+            >
+              {deckMap}
+            </LegacyModal>,
+            getTopPortalEl()
+          )
+        : null}
       <Flex
         flexDirection={DIRECTION_COLUMN}
         padding={SPACING.spacing16}

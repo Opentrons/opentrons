@@ -36,9 +36,8 @@ from opentrons.protocol_engine.types import (
     StagingSlotLocation,
 )
 from opentrons.types import DeckSlotName, StagingSlotName, Point
+from ...disposal_locations import TrashBin, WasteChute
 from . import point_calculations
-from ..._trash_bin import TrashBin
-from ..._waste_chute import WasteChute
 
 if TYPE_CHECKING:
     from ...labware import Labware
@@ -593,7 +592,9 @@ def _map_disposal_location(
     if isinstance(disposal_location, TrashBin):
         return (
             disposal_location.location,
-            wrapped_deck_conflict.TrashBin(name_for_errors="trash bin"),
+            wrapped_deck_conflict.TrashBin(
+                name_for_errors="trash bin", highest_z=disposal_location.height
+            ),
         )
     else:
         return None

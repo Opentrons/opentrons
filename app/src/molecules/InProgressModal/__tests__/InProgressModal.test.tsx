@@ -1,14 +1,12 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { describe, it, beforeEach, vi } from 'vitest'
 import { i18n } from '../../../i18n'
 import { getIsOnDevice } from '../../../redux/config'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { InProgressModal } from '../InProgressModal'
 
-jest.mock('../../../redux/config')
-
-const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
-  typeof getIsOnDevice
->
+vi.mock('../../../redux/config')
 
 const render = (props: React.ComponentProps<typeof InProgressModal>) => {
   return renderWithProviders(<InProgressModal {...props} />, {
@@ -18,30 +16,30 @@ const render = (props: React.ComponentProps<typeof InProgressModal>) => {
 describe('InProgressModal', () => {
   let props: React.ComponentProps<typeof InProgressModal>
   beforeEach(() => {
-    mockGetIsOnDevice.mockReturnValue(false)
+    vi.mocked(getIsOnDevice).mockReturnValue(false)
   })
   it('renders the correct text with no child', () => {
-    const { getByLabelText } = render(props)
-    getByLabelText('spinner')
+    render(props)
+    screen.getByLabelText('spinner')
   })
   it('renders the correct info for on device', () => {
-    const { getByLabelText } = render(props)
-    mockGetIsOnDevice.mockReturnValue(true)
-    getByLabelText('spinner')
+    render(props)
+    vi.mocked(getIsOnDevice).mockReturnValue(true)
+    screen.getByLabelText('spinner')
   })
   it('renders the correct text with child', () => {
     props = {
       children: <div>Moving gantry...</div>,
     }
-    const { getByText, getByLabelText } = render(props)
-    getByText('Moving gantry...')
-    getByLabelText('spinner')
+    render(props)
+    screen.getByText('Moving gantry...')
+    screen.getByLabelText('spinner')
   })
   it('renders the correct info when spinner is overriden', () => {
     props = {
       alternativeSpinner: <div>alternative spinner</div>,
     }
-    const { getByText } = render(props)
-    getByText('alternative spinner')
+    render(props)
+    screen.getByText('alternative spinner')
   })
 })

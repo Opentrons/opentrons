@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
@@ -27,7 +28,7 @@ import {
   HS_RPM_MIN,
   RPM,
 } from '@opentrons/shared-data'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { Slideout } from '../../atoms/Slideout'
 import { TertiaryButton } from '../../atoms/buttons'
 import { Divider } from '../../atoms/structure'
@@ -156,15 +157,16 @@ export const TestShakeSlideout = (
         </PrimaryButton>
       }
     >
-      {showConfirmationModal && (
-        <Portal level="top">
-          <ConfirmAttachmentModal
-            onCloseClick={cancelExit}
-            isProceedToRunModal={false}
-            onConfirmClick={sendCommands}
-          />
-        </Portal>
-      )}
+      {showConfirmationModal
+        ? createPortal(
+            <ConfirmAttachmentModal
+              onCloseClick={cancelExit}
+              isProceedToRunModal={false}
+              onConfirmClick={sendCommands}
+            />,
+            getTopPortalEl()
+          )
+        : null}
       <Flex
         borderRadius={BORDERS.radiusSoftCorners}
         marginBottom={SPACING.spacing8}

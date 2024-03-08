@@ -7,8 +7,7 @@ from opentrons.hardware_control.modules import ThermocyclerStep
 if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext
     from opentrons.protocol_api.labware import Well
-    from opentrons.protocol_api._trash_bin import TrashBin
-    from opentrons.protocol_api._waste_chute import WasteChute
+    from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
 
 from opentrons.types import Location
 

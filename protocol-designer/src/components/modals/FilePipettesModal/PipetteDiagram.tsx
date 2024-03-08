@@ -10,7 +10,7 @@ import {
 import { InstrumentDiagram } from '@opentrons/components'
 import { FormPipette } from '../../../step-forms/types'
 import { getRobotType } from '../../../file-data/selectors'
-import styles from './FilePipettesModal.css'
+import styles from './FilePipettesModal.module.css'
 
 interface Props {
   leftPipette?: FormPipette['pipetteName']

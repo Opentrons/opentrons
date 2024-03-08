@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import {
   FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC,
   getSimplestDeckConfigForProtocol,

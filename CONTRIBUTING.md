@@ -171,7 +171,7 @@ See [DEV_SETUP.md](./DEV_SETUP.md) for our recommended development setup guides 
 We use:
 
 - [pytest][] to test Python
-- [Jest][jest] to test JavaScript
+- [Vitest][vitest] to test JavaScript
   - To run tests in watch mode, you should also install [watchman][]
 - [Cypress.io][cypress] for end to end UI testing
 
@@ -199,7 +199,7 @@ make test-js watch=true
 make test-js cover=false
 
 # update snapshot tests
-# https://jestjs.io/docs/en/snapshot-testing
+# https://vitest.dev/guide/snapshot.html
 make test-js updateSnapshot=true
 ```
 
@@ -217,7 +217,7 @@ make check-js
 ```
 
 [pytest]: https://docs.pytest.org/en/latest/
-[jest]: https://jestjs.io/
+[vitest]: https://vitest.dev/
 [watchman]: https://facebook.github.io/watchman/
 [cypress]: https://www.cypress.io/
 

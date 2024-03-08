@@ -1,4 +1,3 @@
-import assert from 'assert'
 import * as React from 'react'
 import cx from 'classnames'
 import { useDispatch, useSelector } from 'react-redux'
@@ -11,8 +10,8 @@ import { selectors as stepFormSelectors } from '../../step-forms'
 import * as labwareIngredsActions from '../../labware-ingred/actions'
 import { BrowsableLabware } from './BrowsableLabware'
 
-import modalStyles from '../modals/modal.css'
-import styles from './labware.css'
+import modalStyles from '../modals/modal.module.css'
+import styles from './labware.module.css'
 
 export const BrowseLabwareModal = (): JSX.Element | null => {
   const { t } = useTranslation('modal')
@@ -30,7 +29,7 @@ export const BrowseLabwareModal = (): JSX.Element | null => {
       : null
 
   if (!definition) {
-    assert(definition, 'BrowseLabwareModal expected definition')
+    console.assert(definition, 'BrowseLabwareModal expected definition')
     return null
   }
 

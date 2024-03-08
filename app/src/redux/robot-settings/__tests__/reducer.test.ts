@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import { robotSettingsReducer } from '../reducer'
 import * as Fixtures from '../__fixtures__'
 

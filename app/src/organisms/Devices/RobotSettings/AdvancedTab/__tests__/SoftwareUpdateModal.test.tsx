@@ -1,6 +1,10 @@
+/* eslint-disable testing-library/no-node-access */
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { renderWithProviders } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import { getShellUpdateState } from '../../../../../redux/shell'
 import { useRobot } from '../../../hooks'
@@ -9,21 +13,19 @@ import { mockReachableRobot } from '../../../../../redux/discovery/__fixtures__'
 import { SoftwareUpdateModal } from '../SoftwareUpdateModal'
 
 import type { ShellUpdateState } from '../../../../../redux/shell/types'
+import type * as ShellUpdate from '../../../../../redux/shell/update'
 
-jest.mock('../../../../../redux/shell/update', () => ({
-  ...jest.requireActual<{}>('../../../../../redux/shell/update'),
-  getShellUpdateState: jest.fn(),
-}))
-jest.mock('../../../hooks')
-jest.mock('../../../../../redux/discovery/selectors')
+vi.mock('../../../../../redux/shell/update', async importOriginal => {
+  const actual = await importOriginal<typeof ShellUpdate>()
+  return {
+    ...actual,
+    getShellUpdateState: vi.fn(),
+  }
+})
+vi.mock('../../../hooks')
+vi.mock('../../../../../redux/discovery/selectors')
 
-const mockClose = jest.fn()
-
-const mockGetShellUpdateState = getShellUpdateState as jest.MockedFunction<
-  typeof getShellUpdateState
->
-
-const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
+const mockClose = vi.fn()
 
 const render = () => {
   return renderWithProviders(
@@ -39,8 +41,8 @@ const render = () => {
 
 describe('RobotSettings SoftwareUpdateModal', () => {
   beforeEach(() => {
-    mockUseRobot.mockReturnValue(mockReachableRobot)
-    mockGetShellUpdateState.mockReturnValue({
+    vi.mocked(useRobot).mockReturnValue(mockReachableRobot)
+    vi.mocked(getShellUpdateState).mockReturnValue({
       downloaded: true,
       info: {
         version: '1.2.3',
@@ -49,38 +51,36 @@ describe('RobotSettings SoftwareUpdateModal', () => {
     } as ShellUpdateState)
   })
 
-  afterAll(() => {
-    jest.resetAllMocks()
-  })
-
   it('should render title ,description and button', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText('Robot Update Available')
-    getByText('Updating the robot’s software requires restarting the robot')
-    getByText('App Changes in 1.2.3')
-    getByText('New Features')
-    getByText('Bug Fixes')
-    getByText('View Opentrons technical change log')
-    getByText('View Opentrons issue tracker')
-    getByText('View full Opentrons release notes')
-    getByRole('button', { name: 'Remind me later' })
-    getByRole('button', { name: 'Update robot now' })
+    render()
+    screen.getByText('Robot Update Available')
+    screen.getByText(
+      'Updating the robot’s software requires restarting the robot'
+    )
+    screen.getByText('App Changes in 1.2.3')
+    screen.getByText('New Features')
+    screen.getByText('Bug Fixes')
+    screen.getByText('View Opentrons technical change log')
+    screen.getByText('View Opentrons issue tracker')
+    screen.getByText('View full Opentrons release notes')
+    screen.getByRole('button', { name: 'Remind me later' })
+    screen.getByRole('button', { name: 'Update robot now' })
   })
 
   it('should have correct href', () => {
-    const [{ getByRole }] = render()
+    render()
     const changeLogUrl =
       'https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md'
     const issueTrackerUrl =
       'https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug'
     const releaseNotesUrl = 'https://github.com/Opentrons/opentrons/releases'
 
-    const linkForChangeLog = getByRole('link', {
+    const linkForChangeLog = screen.getByRole('link', {
       name: 'View Opentrons technical change log',
     })
     expect(linkForChangeLog).toHaveAttribute('href', changeLogUrl)
 
-    const linkForIssueTracker = getByRole('link', {
+    const linkForIssueTracker = screen.getByRole('link', {
       name: 'View Opentrons issue tracker',
     })
     expect(linkForIssueTracker.closest('a')).toHaveAttribute(
@@ -88,7 +88,7 @@ describe('RobotSettings SoftwareUpdateModal', () => {
       issueTrackerUrl
     )
 
-    const linkForReleaseNotes = getByRole('link', {
+    const linkForReleaseNotes = screen.getByRole('link', {
       name: 'View full Opentrons release notes',
     })
     expect(linkForReleaseNotes.closest('a')).toHaveAttribute(

@@ -1,15 +1,13 @@
 import * as React from 'react'
+import '@testing-library/jest-dom/vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { getIsOnDevice } from '../../../redux/config'
 import { GenericWizardTile } from '..'
 
-jest.mock('../../../redux/config')
-
-const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
-  typeof getIsOnDevice
->
+vi.mock('../../../redux/config')
 
 const render = (props: React.ComponentProps<typeof GenericWizardTile>) => {
   return renderWithProviders(<GenericWizardTile {...props} />, {
@@ -24,12 +22,12 @@ describe('GenericWizardTile', () => {
     props = {
       rightHandBody: <div>right hand body</div>,
       bodyText: 'body',
-      proceed: jest.fn(),
+      proceed: vi.fn(),
       proceedButtonText: <div>Continue</div>,
       header: 'header',
       getHelp: 'getHelpUrl',
     }
-    mockGetIsOnDevice.mockReturnValue(false)
+    vi.mocked(getIsOnDevice).mockReturnValue(false)
   })
   it('renders correct generic tile information with a help link', () => {
     render(props)
@@ -42,7 +40,7 @@ describe('GenericWizardTile', () => {
     expect(screen.queryByText('Go back')).not.toBeInTheDocument()
   })
   it('renders correct generic tile information for on device display', () => {
-    mockGetIsOnDevice.mockReturnValue(true)
+    vi.mocked(getIsOnDevice).mockReturnValue(true)
     render(props)
     screen.getByText('body')
     screen.getByText('header')
@@ -52,7 +50,7 @@ describe('GenericWizardTile', () => {
   it('renders correct generic tile information with a back button', () => {
     props = {
       ...props,
-      back: jest.fn(),
+      back: vi.fn(),
     }
     render(props)
     const btn = screen.getByText('Go back')
@@ -62,7 +60,7 @@ describe('GenericWizardTile', () => {
   it('renders correct generic tile information with back button disabled', () => {
     props = {
       ...props,
-      back: jest.fn(),
+      back: vi.fn(),
       backIsDisabled: true,
     }
     render(props)

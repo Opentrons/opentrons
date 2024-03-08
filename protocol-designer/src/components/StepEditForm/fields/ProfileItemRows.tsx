@@ -28,7 +28,7 @@ import {
   DELETE_PROFILE_CYCLE,
 } from '../../modals/ConfirmDeleteModal'
 import { getDynamicFieldFocusHandlerId } from '../utils'
-import styles from '../StepEditForm.css'
+import styles from '../StepEditForm.module.css'
 
 import { FocusHandlers } from '../types'
 

@@ -3,6 +3,7 @@ import get from 'lodash/get'
 import * as Constants from '../constants'
 import * as Copy from '../i18n'
 
+import type { FieldError } from 'react-hook-form'
 import type {
   WifiNetwork,
   WifiKey,
@@ -17,6 +18,8 @@ import type {
   ConnectFormTextField,
   ConnectFormSecurityField,
 } from '../types'
+
+type Errors = Record<string, FieldError>
 
 export const renderLabel = (label: string, required: boolean): string =>
   `${required ? '* ' : ''}${label}`
@@ -138,24 +141,43 @@ export function getConnectFormFields(
 export function validateConnectFormFields(
   network: WifiNetwork | null,
   eapOptions: EapOption[],
-  values: ConnectFormValues
-): ConnectFormErrors {
+  values: ConnectFormValues,
+  errors: Errors
+): Errors {
   const {
     ssid: formSsid,
     securityType: formSecurityType,
     psk: formPsk,
   } = values
-  const errors: Partial<ConnectFormErrors> = {}
+  let errorMessage: string | undefined
 
-  if (network === null && !formSsid) {
-    errors.ssid = Copy.FIELD_IS_REQUIRED(Copy.LABEL_SSID)
+  if (network === null && (formSsid == null || formSsid.length === 0)) {
+    errorMessage = Copy.FIELD_IS_REQUIRED(Copy.LABEL_SSID)
+    return errorMessage != null
+      ? {
+          ...errors,
+          ssid: {
+            type: 'ssidError',
+            message: errorMessage,
+          },
+        }
+      : errors
   }
 
   if (
     (network === null || network.securityType === Constants.SECURITY_WPA_EAP) &&
     !formSecurityType
   ) {
-    errors.securityType = Copy.FIELD_IS_REQUIRED(Copy.LABEL_SECURITY)
+    errorMessage = Copy.FIELD_IS_REQUIRED(Copy.LABEL_SECURITY)
+    return errorMessage != null
+      ? {
+          ...errors,
+          securityType: {
+            type: 'securityTypeError',
+            message: errorMessage,
+          },
+        }
+      : errors
   }
 
   if (
@@ -163,28 +185,56 @@ export function validateConnectFormFields(
       formSecurityType === Constants.SECURITY_WPA_PSK) &&
     (!formPsk || formPsk.length < Constants.CONFIGURE_PSK_MIN_LENGTH)
   ) {
-    errors.psk = Copy.FIELD_NOT_LONG_ENOUGH(
+    errorMessage = Copy.FIELD_NOT_LONG_ENOUGH(
       Copy.LABEL_PSK,
       Constants.CONFIGURE_PSK_MIN_LENGTH
     )
+    return errorMessage != null
+      ? {
+          ...errors,
+          psk: {
+            type: 'pskError',
+            message: errorMessage,
+          },
+        }
+      : errors
   }
 
   if (
     network?.securityType === Constants.SECURITY_WPA_EAP ||
     getEapIsSelected(formSecurityType)
   ) {
-    getEapFields(eapOptions, values)
+    const eapFieldErrors = getEapFields(eapOptions, values)
       .filter(
         ({ name, required }) => required && !get(values, getEapFieldName(name))
       )
-      .forEach(
-        ({ name, displayName }: Pick<EapOption, 'name' | 'displayName'>) => {
-          errors[
-            getEapFieldName(name) as keyof typeof errors
-            // @ts-expect-error TODO: displayName could be undefined
-          ] = Copy.FIELD_IS_REQUIRED(displayName)
-        }
+      .reduce(
+        (
+          acc: Errors,
+          { name, displayName }: Pick<EapOption, 'name' | 'displayName'>
+        ) => {
+          const fieldName = getEapFieldName(name)
+          const errorMessage =
+            displayName != null ? Copy.FIELD_IS_REQUIRED(displayName) : ''
+
+          if (errorMessage != null) {
+            acc[fieldName] = {
+              type: 'eapError',
+              message: errorMessage,
+            }
+          }
+
+          return acc
+        },
+        {}
       )
+
+    return Object.keys(eapFieldErrors).length > 0
+      ? {
+          ...errors,
+          ...eapFieldErrors,
+        }
+      : errors
   }
 
   return errors

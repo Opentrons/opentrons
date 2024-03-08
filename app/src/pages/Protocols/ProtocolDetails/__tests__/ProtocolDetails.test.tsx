@@ -1,11 +1,8 @@
 import * as React from 'react'
-import { Route } from 'react-router'
-import { MemoryRouter } from 'react-router-dom'
-import { resetAllWhenMocks, when } from 'jest-when'
-import {
-  componentPropsMatcher,
-  renderWithProviders,
-} from '@opentrons/components'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
+import { Route, MemoryRouter } from 'react-router-dom'
+import { when } from 'vitest-when'
+import { renderWithProviders } from '../../../../__testing-utils__'
 
 import { i18n } from '../../../../i18n'
 import { getStoredProtocol } from '../../../../redux/protocol-storage'
@@ -18,15 +15,8 @@ import type { State } from '../../../../redux/types'
 
 const mockProtocolKey = 'protocolKeyStub'
 
-jest.mock('../../../../redux/protocol-storage')
-jest.mock('../../../../organisms/ProtocolDetails')
-
-const mockGetStoredProtocol = getStoredProtocol as jest.MockedFunction<
-  typeof getStoredProtocol
->
-const mockProtocolDetailsContents = ProtocolDetailsContents as jest.MockedFunction<
-  typeof ProtocolDetailsContents
->
+vi.mock('../../../../redux/protocol-storage')
+vi.mock('../../../../organisms/ProtocolDetails')
 
 const MOCK_STATE: State = {
   protocolStorage: {
@@ -59,35 +49,33 @@ const render = (path = '/') => {
 
 describe('ProtocolDetails', () => {
   beforeEach(() => {
-    when(mockGetStoredProtocol)
+    when(vi.mocked(getStoredProtocol))
       .calledWith(MOCK_STATE, mockProtocolKey)
-      .mockReturnValue(storedProtocolData)
-    when(mockProtocolDetailsContents)
-      .calledWith(
-        componentPropsMatcher({
-          protocolKey: storedProtocolData.protocolKey,
-          modified: storedProtocolData.modified,
-          mostRecentAnalysis: storedProtocolData.mostRecentAnalysis,
-          srcFileNames: storedProtocolData.srcFileNames,
-          srcFiles: storedProtocolData.srcFiles,
-        })
-      )
-      .mockReturnValue(<div>mock protocol details</div>)
+      .thenReturn(storedProtocolData)
   })
 
   afterEach(() => {
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('should render protocol details', () => {
-    const { getByText } = render('/protocols/protocolKeyStub')
-    getByText('mock protocol details')
+    render('/protocols/protocolKeyStub')
+    expect(vi.mocked(ProtocolDetailsContents)).toHaveBeenCalledWith(
+      {
+        protocolKey: storedProtocolData.protocolKey,
+        modified: storedProtocolData.modified,
+        mostRecentAnalysis: storedProtocolData.mostRecentAnalysis,
+        srcFileNames: storedProtocolData.srcFileNames,
+        srcFiles: storedProtocolData.srcFiles,
+      },
+      {}
+    )
   })
 
   it('should redirect to protocols landing if there is no protocol', () => {
-    when(mockGetStoredProtocol)
+    when(vi.mocked(getStoredProtocol))
       .calledWith(MOCK_STATE, mockProtocolKey)
-      .mockReturnValue(null)
+      .thenReturn(null)
     const { getByText } = render('/protocols')
     getByText('protocols')
   })

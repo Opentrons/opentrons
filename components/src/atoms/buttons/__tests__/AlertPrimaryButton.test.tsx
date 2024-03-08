@@ -1,5 +1,7 @@
-import 'jest-styled-components'
 import * as React from 'react'
+import { describe, it, beforeEach, expect } from 'vitest'
+import { screen } from '@testing-library/react'
+import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../testing/utils'
 import { COLORS } from '../../../helix-design-system'
 import { BORDERS, TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
@@ -20,9 +22,9 @@ describe('AlertPrimaryButton', () => {
   })
 
   it('renders alert primary button with text', () => {
-    const { getByText } = render(props)
-    const button = getByText('alert primary button')
-    expect(button).toHaveStyle(`background-color: ${COLORS.red50}`)
+    render(props)
+    const button = screen.getByText('alert primary button')
+    expect(button).toHaveStyle(`background-color: ${COLORS.red55}`)
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16}`
     )
@@ -38,16 +40,8 @@ describe('AlertPrimaryButton', () => {
 
   it('renders alert primary button with text and disabled', () => {
     props.disabled = true
-    const { getByText } = render(props)
-    const button = getByText('alert primary button')
+    render(props)
+    const button = screen.getByText('alert primary button')
     expect(button).toBeDisabled()
-  })
-
-  it('applies the correct states to the button - hover', () => {
-    const { getByText } = render(props)
-    const button = getByText('alert primary button')
-    expect(button).toHaveStyleRule('box-shadow', '0 0 0', {
-      modifier: ':hover',
-    })
   })
 })

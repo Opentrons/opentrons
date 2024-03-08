@@ -1,13 +1,11 @@
 import * as React from 'react'
-
+import { createPortal } from 'react-dom'
 import { Popper, Reference, Manager } from 'react-popper'
 import cx from 'classnames'
-import { LocationLiquidState } from '@opentrons/step-generation'
-import { Portal } from '../portals/TopPortal'
+import { getTopPortalEl } from '../portals/TopPortal'
 import { PillTooltipContents } from '../steplist/SubstepRow'
-
-import styles from './labware.css'
-
+import styles from './labware.module.css'
+import type { LocationLiquidState } from '@opentrons/step-generation'
 import type { WellIngredientNames } from '../../steplist/types'
 
 const DEFAULT_TOOLTIP_OFFSET = 22
@@ -84,16 +82,17 @@ export const WellTooltip = (props: WellTooltipProps): JSX.Element => {
     <>
       <Manager>
         <Reference>
-          {({ ref }) => (
-            <Portal>
+          {({ ref }) =>
+            createPortal(
               <div
                 ref={ref}
                 className={styles.virtual_reference}
                 // @ts-expect-error(sa, 2021-6-21): can't use null as top and left, default to undefined
                 style={{ top: tooltipY, left: tooltipX }}
-              />
-            </Portal>
-          )}
+              />,
+              getTopPortalEl()
+            )
+          }
         </Reference>
         {children({
           makeHandleMouseEnterWell: makeHandleMouseEnterWell,
@@ -110,26 +109,25 @@ export const WellTooltip = (props: WellTooltipProps): JSX.Element => {
             }}
           >
             {({ ref, style, placement, arrowProps }) => {
-              return (
-                <Portal>
+              return createPortal(
+                <div
+                  style={style}
+                  ref={ref}
+                  data-placement={placement}
+                  className={styles.tooltip_box}
+                >
+                  <PillTooltipContents
+                    well={tooltipWellName || ''}
+                    ingredNames={ingredNames}
+                    ingreds={tooltipWellIngreds || {}}
+                  />
                   <div
-                    style={style}
-                    ref={ref}
-                    data-placement={placement}
-                    className={styles.tooltip_box}
-                  >
-                    <PillTooltipContents
-                      well={tooltipWellName || ''}
-                      ingredNames={ingredNames}
-                      ingreds={tooltipWellIngreds || {}}
-                    />
-                    <div
-                      className={cx(styles.arrow, styles[placement])}
-                      ref={arrowProps.ref}
-                      style={arrowProps.style}
-                    />
-                  </div>
-                </Portal>
+                    className={cx(styles.arrow, styles[placement])}
+                    ref={arrowProps.ref}
+                    style={arrowProps.style}
+                  />
+                </div>,
+                getTopPortalEl()
               )
             }}
           </Popper>

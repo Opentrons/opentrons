@@ -14,7 +14,7 @@ from opentrons.protocol_engine import (
     errors as pe_errors,
 )
 
-from robot_server.errors import ErrorDetails, ErrorBody
+from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,
@@ -235,6 +235,9 @@ async def create_run_command(
     summary="Get a list of all protocol commands in the run",
     description=(
         "Get a list of all commands in the run and their statuses. "
+        "\n\n"
+        "The commands are returned in order from oldest to newest."
+        "\n\n"
         "This endpoint returns command summaries. Use "
         "`GET /runs/{runId}/commands/{commandId}` to get all "
         "information available for a given command."

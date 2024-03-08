@@ -1,10 +1,9 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import assert from 'assert'
+
+import styles from './modalContents.module.css'
 import { FileUploadMessage } from '../../../load-file'
 import type { ModalContents } from './types'
-
-import styles from './modalContents.css'
 
 const PD = 'Protocol Designer'
 
@@ -192,11 +191,10 @@ export function useModalContents(
         t,
       })
     default: {
-      assert(
+      console.assert(
         false,
         `invalid messageKey ${uploadResponse.messageKey} specified for modal`
       )
-      // @ts-expect-error (ce, 2021-06-23) the case below will never happened, as we've already narrowed all posibilities
       return { title: '', body: uploadResponse.messageKey }
     }
   }

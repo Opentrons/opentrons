@@ -1,7 +1,7 @@
 // sets up the main window ui
 import { app, BrowserWindow } from 'electron'
 import path from 'path'
-import { sendReadyStatus } from '@opentrons/app/src/redux/shell'
+import { sendReadyStatus } from './actions'
 import { getConfig } from './config'
 import { createLogger } from './log'
 import systemd from './systemd'

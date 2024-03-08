@@ -1,15 +1,13 @@
 import * as React from 'react'
-import { Route } from 'react-router'
-import { UseQueryResult } from 'react-query'
-import { MemoryRouter } from 'react-router-dom'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { Route, MemoryRouter } from 'react-router-dom'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
+import { when } from 'vitest-when'
 
 import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_IDLE,
   RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
-import { renderWithProviders } from '@opentrons/components'
 import {
   useAllCommandsQuery,
   useProtocolAnalysesQuery,
@@ -17,19 +15,18 @@ import {
   useRunActionMutations,
 } from '@opentrons/react-api-client'
 
-import { getLocalRobot } from '../../../redux/discovery'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { mockRobotSideAnalysis } from '../../../organisms/CommandText/__fixtures__'
 import {
   CurrentRunningProtocolCommand,
-  RunningProtocolCommandList,
   RunningProtocolSkeleton,
 } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
 import { mockUseAllCommandsResponseNonDeterministic } from '../../../organisms/RunProgressMeter/__fixtures__'
-import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import {
   useRunStatus,
   useRunTimestamps,
 } from '../../../organisms/RunTimeControl/hooks'
+import { getLocalRobot } from '../../../redux/discovery'
 import { CancelingRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
 import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -38,73 +35,23 @@ import { RunningProtocol } from '..'
 import { useNotifyLastRunCommandKey } from '../../../resources/runs/useNotifyLastRunCommandKey'
 import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
 
+import type { UseQueryResult } from 'react-query'
 import type { ProtocolAnalyses } from '@opentrons/api-client'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../organisms/Devices/hooks')
-jest.mock('../../../organisms/Devices/hooks/useLastRunCommandKey')
-jest.mock('../../../organisms/RunTimeControl/hooks')
-jest.mock(
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../organisms/Devices/hooks')
+vi.mock('../../../organisms/Devices/hooks/useLastRunCommandKey')
+vi.mock('../../../organisms/RunTimeControl/hooks')
+vi.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
-jest.mock('../../../organisms/RunTimeControl/hooks')
-jest.mock('../../../organisms/OnDeviceDisplay/RunningProtocol')
-jest.mock('../../../redux/discovery')
-jest.mock(
-  '../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
-)
-jest.mock('../../../organisms/OpenDoorAlertModal')
-jest.mock('../../../resources/runs/useNotifyLastRunCommandKey')
-jest.mock('../../../resources/runs/useNotifyRunQuery')
-
-const mockUseProtocolAnalysesQuery = useProtocolAnalysesQuery as jest.MockedFunction<
-  typeof useProtocolAnalysesQuery
->
-const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
-  typeof useProtocolQuery
->
-const mockUseRunStatus = useRunStatus as jest.MockedFunction<
-  typeof useRunStatus
->
-const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
-  typeof useNotifyRunQuery
->
-const mockUseRunTimestamps = useRunTimestamps as jest.MockedFunction<
-  typeof useRunTimestamps
->
-const mockUseRunActionMutations = useRunActionMutations as jest.MockedFunction<
-  typeof useRunActionMutations
->
-const mockUseTrackProtocolRunEvent = useTrackProtocolRunEvent as jest.MockedFunction<
-  typeof useTrackProtocolRunEvent
->
-const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
-  typeof useMostRecentCompletedAnalysis
->
-const mockCurrentRunningProtocolCommand = CurrentRunningProtocolCommand as jest.MockedFunction<
-  typeof CurrentRunningProtocolCommand
->
-const mockRunningProtocolCommandList = RunningProtocolCommandList as jest.MockedFunction<
-  typeof RunningProtocolCommandList
->
-const mockRunningProtocolSkeleton = RunningProtocolSkeleton as jest.MockedFunction<
-  typeof RunningProtocolSkeleton
->
-const mockCancelingRunModal = CancelingRunModal as jest.MockedFunction<
-  typeof CancelingRunModal
->
-const mockUseAllCommandsQuery = useAllCommandsQuery as jest.MockedFunction<
-  typeof useAllCommandsQuery
->
-const mockOpenDoorAlertModal = OpenDoorAlertModal as jest.MockedFunction<
-  typeof OpenDoorAlertModal
->
-const mockUseNotifyLastRunCommandKey = useNotifyLastRunCommandKey as jest.MockedFunction<
-  typeof useNotifyLastRunCommandKey
->
-const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
-  typeof getLocalRobot
->
+vi.mock('../../../organisms/RunTimeControl/hooks')
+vi.mock('../../../organisms/OnDeviceDisplay/RunningProtocol')
+vi.mock('../../../redux/discovery')
+vi.mock('../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal')
+vi.mock('../../../organisms/OpenDoorAlertModal')
+vi.mock('../../../resources/runs/useNotifyLastRunCommandKey')
+vi.mock('../../../resources/runs/useNotifyRunQuery')
 
 const RUN_ID = 'run_id'
 const ROBOT_NAME = 'otie'
@@ -115,12 +62,9 @@ const PROTOCOL_ANALYSIS = {
   status: 'completed',
   labware: [],
 } as any
-const mockPlayRun = jest.fn()
-const mockPauseRun = jest.fn()
-const mockStopRun = jest.fn()
-const mockTrackProtocolRunEvent = jest.fn(
-  () => new Promise(resolve => resolve({}))
-)
+const mockPlayRun = vi.fn()
+const mockPauseRun = vi.fn()
+const mockStopRun = vi.fn()
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -134,9 +78,9 @@ const render = (path = '/') => {
 
 describe('RunningProtocol', () => {
   beforeEach(() => {
-    when(mockUseNotifyRunQuery)
+    when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, { staleTime: Infinity })
-      .mockReturnValue({
+      .thenReturn({
         data: {
           data: {
             id: RUN_ID,
@@ -144,15 +88,21 @@ describe('RunningProtocol', () => {
           },
         },
       } as any)
-    when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_IDLE)
-    when(mockUseProtocolAnalysesQuery)
+    vi.mocked(getLocalRobot).mockReturnValue({ name: ROBOT_NAME } as any)
+    when(vi.mocked(useTrackProtocolRunEvent))
+      .calledWith(RUN_ID, ROBOT_NAME)
+      .thenReturn({
+        trackProtocolRunEvent: vi.fn(),
+      })
+    when(vi.mocked(useRunStatus)).calledWith(RUN_ID).thenReturn(RUN_STATUS_IDLE)
+    when(vi.mocked(useProtocolAnalysesQuery))
       .calledWith(PROTOCOL_ID, { staleTime: Infinity }, expect.any(Boolean))
-      .mockReturnValue({
+      .thenReturn({
         data: { data: [PROTOCOL_ANALYSIS] },
       } as UseQueryResult<ProtocolAnalyses>)
-    when(mockUseProtocolQuery)
+    when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID, { staleTime: Infinity })
-      .mockReturnValue({
+      .thenReturn({
         data: {
           data: {
             key: PROTOCOL_KEY,
@@ -160,17 +110,13 @@ describe('RunningProtocol', () => {
           },
         },
       } as any)
-    mockUseRunTimestamps.mockReturnValue({
+    vi.mocked(useRunTimestamps).mockReturnValue({
       startedAt: '2022-05-04T18:24:40.833862+00:00',
       pausedAt: '',
       stoppedAt: '',
       completedAt: '2022-05-04T18:24:41.833862+00:00',
     })
-    mockGetLocalRobot.mockReturnValue({
-      ...mockConnectedRobot,
-      name: ROBOT_NAME,
-    })
-    when(mockUseRunActionMutations).calledWith(RUN_ID).mockReturnValue({
+    when(vi.mocked(useRunActionMutations)).calledWith(RUN_ID).thenReturn({
       playRun: mockPlayRun,
       pauseRun: mockPauseRun,
       stopRun: mockStopRun,
@@ -178,63 +124,46 @@ describe('RunningProtocol', () => {
       isPauseRunActionLoading: false,
       isStopRunActionLoading: false,
     })
-    when(mockUseTrackProtocolRunEvent)
-      .calledWith(RUN_ID, ROBOT_NAME)
-      .mockReturnValue({
-        trackProtocolRunEvent: mockTrackProtocolRunEvent,
-      })
-    when(mockUseMostRecentCompletedAnalysis)
+    when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
-      .mockReturnValue(mockRobotSideAnalysis)
-    mockCurrentRunningProtocolCommand.mockReturnValue(
-      <div>mock CurrentRunningProtocolCommand</div>
-    )
-    mockRunningProtocolCommandList.mockReturnValue(
-      <div>mock RunningProtocolCommandList</div>
-    )
-    mockRunningProtocolSkeleton.mockReturnValue(
-      <div>mock RunningProtocolSkeleton</div>
-    )
-    mockCancelingRunModal.mockReturnValue(<div>mock CancelingRunModal</div>)
-    when(mockUseAllCommandsQuery)
+      .thenReturn(mockRobotSideAnalysis)
+    when(vi.mocked(useAllCommandsQuery))
       .calledWith(RUN_ID, { cursor: null, pageLength: 1 })
-      .mockReturnValue(mockUseAllCommandsResponseNonDeterministic)
-    mockOpenDoorAlertModal.mockReturnValue(<div>mock OpenDoorAlertModal</div>)
-    mockUseNotifyLastRunCommandKey.mockReturnValue({
+      .thenReturn(mockUseAllCommandsResponseNonDeterministic)
+    vi.mocked(useNotifyLastRunCommandKey).mockReturnValue({
       data: {},
     } as any)
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('should render Skeleton when robotSideAnalysis does not have data', () => {
-    when(mockUseMostRecentCompletedAnalysis)
+    when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
-      .mockReturnValue(null)
-    const [{ getByText }] = render(`/runs/${RUN_ID}/run`)
-    getByText('mock RunningProtocolSkeleton')
+      .thenReturn(null)
+    render(`/runs/${RUN_ID}/run`)
+    expect(vi.mocked(RunningProtocolSkeleton)).toHaveBeenCalled()
   })
   it('should render the canceling run modal when run status is stop requested', () => {
-    when(mockUseRunStatus)
+    when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID, { refetchInterval: 5000 })
-      .mockReturnValue(RUN_STATUS_STOP_REQUESTED)
-    const [{ getByText }] = render(`/runs/${RUN_ID}/run`)
-    getByText('mock CancelingRunModal')
+      .thenReturn(RUN_STATUS_STOP_REQUESTED)
+    render(`/runs/${RUN_ID}/run`)
+    expect(vi.mocked(CancelingRunModal)).toHaveBeenCalled()
   })
   it('should render CurrentRunningProtocolCommand when loaded the data', () => {
-    const [{ getByText }] = render(`/runs/${RUN_ID}/run`)
-    getByText('mock CurrentRunningProtocolCommand')
+    render(`/runs/${RUN_ID}/run`)
+    expect(vi.mocked(CurrentRunningProtocolCommand)).toHaveBeenCalled()
   })
 
   it('should render open door alert modal, when run staus is blocked by open door', () => {
-    when(mockUseRunStatus)
+    when(vi.mocked(useRunStatus))
       .calledWith(RUN_ID, { refetchInterval: 5000 })
-      .mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
-    const [{ getByText }] = render(`/runs/${RUN_ID}/run`)
-    getByText('mock OpenDoorAlertModal')
+      .thenReturn(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
+    render(`/runs/${RUN_ID}/run`)
+    expect(vi.mocked(OpenDoorAlertModal)).toHaveBeenCalled()
   })
 
   // ToDo (kj:04/04/2023) need to figure out the way to simulate swipe

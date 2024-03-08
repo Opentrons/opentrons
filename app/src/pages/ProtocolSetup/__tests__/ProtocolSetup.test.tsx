@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { Route } from 'react-router'
-import { MemoryRouter } from 'react-router-dom'
+import { Route, MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 
 import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
@@ -14,14 +14,14 @@ import {
   useDeckConfigurationQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { mockHeaterShaker } from '../../../redux/modules/__fixtures__'
 import {
-  FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
+  FLEX_ROBOT_TYPE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  flexDeckDefV4,
 } from '@opentrons/shared-data'
-import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/4/ot3_standard.json'
 
 import { i18n } from '../../../i18n'
 import { useToaster } from '../../../organisms/ToasterOven'
@@ -52,18 +52,16 @@ import { useDeckConfigurationCompatibility } from '../../../resources/deck_confi
 import { ConfirmAttachedModal } from '../../../pages/ProtocolSetup/ConfirmAttachedModal'
 import { ProtocolSetup } from '../../../pages/ProtocolSetup'
 import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
+import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 
 import type { UseQueryResult } from 'react-query'
-import type {
-  DeckConfiguration,
-  CompletedProtocolAnalysis,
-} from '@opentrons/shared-data'
-
+import type * as SharedData from '@opentrons/shared-data'
+import type * as ReactRouterDom from 'react-router-dom'
 // Mock IntersectionObserver
 class IntersectionObserver {
-  observe = jest.fn()
-  disconnect = jest.fn()
-  unobserve = jest.fn()
+  observe = vi.fn()
+  disconnect = vi.fn()
+  unobserve = vi.fn()
 }
 
 Object.defineProperty(window, 'IntersectionObserver', {
@@ -72,116 +70,44 @@ Object.defineProperty(window, 'IntersectionObserver', {
   value: IntersectionObserver,
 })
 
-let mockHistoryPush: jest.Mock
+let mockHistoryPush = vi.fn()
 
-jest.mock('@opentrons/shared-data/js/helpers')
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../organisms/LabwarePositionCheck/useLaunchLPC')
-jest.mock('../../../organisms/Devices/hooks')
-jest.mock(
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const sharedData = await importOriginal<typeof SharedData>()
+  return {
+    ...sharedData,
+    getDeckDefFromRobotType: vi.fn(),
+  }
+})
+
+vi.mock('react-router-dom', async importOriginal => {
+  const reactRouterDom = await importOriginal<typeof ReactRouterDom>()
+  return {
+    ...reactRouterDom,
+    useHistory: () => ({
+      push: mockHistoryPush,
+    }),
+  }
+})
+
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../organisms/LabwarePositionCheck/useLaunchLPC')
+vi.mock('../../../organisms/Devices/hooks')
+vi.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
-jest.mock('../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo')
-jest.mock('../../../organisms/ProtocolSetupModulesAndDeck')
-jest.mock('../../../organisms/ProtocolSetupModulesAndDeck/utils')
-jest.mock('../../../organisms/OnDeviceDisplay/RunningProtocol')
-jest.mock('../../../organisms/RunTimeControl/hooks')
-jest.mock('../../../organisms/ProtocolSetupLiquids')
-jest.mock('../../../organisms/ModuleCard/hooks')
-jest.mock('../../../redux/discovery/selectors')
-jest.mock('../ConfirmAttachedModal')
-jest.mock('../../../organisms/ToasterOven')
-jest.mock('../../../resources/deck_configuration/hooks')
-jest.mock('../../../resources/runs/useNotifyRunQuery')
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useHistory: () => ({
-    push: mockHistoryPush,
-  }),
-}))
-
-const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
-  typeof getDeckDefFromRobotType
->
-const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
-  typeof useAttachedModules
->
-const mockUseRunCreatedAtTimestamp = useRunCreatedAtTimestamp as jest.MockedFunction<
-  typeof useRunCreatedAtTimestamp
->
-const mockGetProtocolModulesInfo = getProtocolModulesInfo as jest.MockedFunction<
-  typeof getProtocolModulesInfo
->
-const mockProtocolSetupModulesAndDeck = ProtocolSetupModulesAndDeck as jest.MockedFunction<
-  typeof ProtocolSetupModulesAndDeck
->
-const mockGetUnmatchedModulesForProtocol = getUnmatchedModulesForProtocol as jest.MockedFunction<
-  typeof getUnmatchedModulesForProtocol
->
-const mockConfirmCancelRunModal = ConfirmCancelRunModal as jest.MockedFunction<
-  typeof ConfirmCancelRunModal
->
-const mockUseRunControls = useRunControls as jest.MockedFunction<
-  typeof useRunControls
->
-const mockUseRunStatus = useRunStatus as jest.MockedFunction<
-  typeof useRunStatus
->
-const mockProtocolSetupLiquids = ProtocolSetupLiquids as jest.MockedFunction<
-  typeof ProtocolSetupLiquids
->
-const mockUseNotifyRunQuery = useNotifyRunQuery as jest.MockedFunction<
-  typeof useNotifyRunQuery
->
-const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
-  typeof useProtocolQuery
->
-const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
-  typeof useInstrumentsQuery
->
-const mockUseAllPipetteOffsetCalibrationsQuery = useAllPipetteOffsetCalibrationsQuery as jest.MockedFunction<
-  typeof useAllPipetteOffsetCalibrationsQuery
->
-const mockUseLaunchLPC = useLaunchLPC as jest.MockedFunction<
-  typeof useLaunchLPC
->
-const mockUseLPCDisabledReason = useLPCDisabledReason as jest.MockedFunction<
-  typeof useLPCDisabledReason
->
-const mockUseIsHeaterShakerInProtocol = useIsHeaterShakerInProtocol as jest.MockedFunction<
-  typeof useIsHeaterShakerInProtocol
->
-const mockUseRobotType = useRobotType as jest.MockedFunction<
-  typeof useRobotType
->
-const mockConfirmAttachedModal = ConfirmAttachedModal as jest.MockedFunction<
-  typeof ConfirmAttachedModal
->
-const mockUseDoorQuery = useDoorQuery as jest.MockedFunction<
-  typeof useDoorQuery
->
-const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
-  typeof useModulesQuery
->
-const mockUseProtocolAnalysisAsDocumentQuery = useProtocolAnalysisAsDocumentQuery as jest.MockedFunction<
-  typeof useProtocolAnalysisAsDocumentQuery
->
-const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
-  typeof useDeckConfigurationQuery
->
-const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
-const mockUseModuleCalibrationStatus = useModuleCalibrationStatus as jest.MockedFunction<
-  typeof useModuleCalibrationStatus
->
-const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
-  typeof getLocalRobot
->
-const mockUseDeckConfigurationCompatibility = useDeckConfigurationCompatibility as jest.MockedFunction<
-  typeof useDeckConfigurationCompatibility
->
-const mockUseTrackProtocolRunEvent = useTrackProtocolRunEvent as jest.MockedFunction<
-  typeof useTrackProtocolRunEvent
->
+vi.mock('../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo')
+vi.mock('../../../organisms/ProtocolSetupModulesAndDeck')
+vi.mock('../../../organisms/ProtocolSetupModulesAndDeck/utils')
+vi.mock('../../../organisms/OnDeviceDisplay/RunningProtocol')
+vi.mock('../../../organisms/RunTimeControl/hooks')
+vi.mock('../../../organisms/ProtocolSetupLiquids')
+vi.mock('../../../organisms/ModuleCard/hooks')
+vi.mock('../../../redux/discovery/selectors')
+vi.mock('../ConfirmAttachedModal')
+vi.mock('../../../organisms/ToasterOven')
+vi.mock('../../../resources/deck_configuration/hooks')
+vi.mock('../../../resources/runs/useNotifyRunQuery')
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -198,6 +124,7 @@ const render = (path = '/') => {
 
 const ROBOT_NAME = 'fake-robot-name'
 const RUN_ID = 'my-run-id'
+const ROBOT_SERIAL_NUMBER = 'OT123'
 const PROTOCOL_ID = 'my-protocol-id'
 const PROTOCOL_NAME = 'Mock Protocol Name'
 const CREATED_AT = 'top of the hour'
@@ -224,7 +151,7 @@ const mockEmptyAnalysis = ({
   labware: [],
   pipettes: [],
   commands: [],
-} as unknown) as CompletedProtocolAnalysis
+} as unknown) as SharedData.CompletedProtocolAnalysis
 const mockLiquids = [
   {
     id: 'm',
@@ -233,7 +160,7 @@ const mockLiquids = [
   },
 ]
 
-const mockPlay = jest.fn()
+const mockPlay = vi.fn()
 const mockOffset = {
   id: 'fake_labware_offset',
   createdAt: 'timestamp',
@@ -253,33 +180,31 @@ const mockFixture = {
   cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
 }
 
-const MOCK_MAKE_SNACKBAR = jest.fn()
-const mockTrackProtocolRunEvent = jest.fn()
+const MOCK_MAKE_SNACKBAR = vi.fn()
+const mockTrackProtocolRunEvent = vi.fn()
 
 describe('ProtocolSetup', () => {
-  let mockLaunchLPC: jest.Mock
+  let mockLaunchLPC = vi.fn()
   beforeEach(() => {
-    mockLaunchLPC = jest.fn()
-    mockHistoryPush = jest.fn()
-    mockUseLPCDisabledReason.mockReturnValue(null)
-    mockUseAttachedModules.mockReturnValue([])
-    mockProtocolSetupModulesAndDeck.mockReturnValue(
-      <div>Mock ProtocolSetupModulesAndDeck</div>
-    )
-    mockProtocolSetupLiquids.mockReturnValue(
-      <div>Mock ProtocolSetupLiquids</div>
-    )
-    mockConfirmCancelRunModal.mockReturnValue(
-      <div>Mock ConfirmCancelRunModal</div>
-    )
-    mockUseModuleCalibrationStatus.mockReturnValue({ complete: true })
-    mockGetLocalRobot.mockReturnValue({ name: ROBOT_NAME } as any)
-    when(mockUseRobotType)
+    mockLaunchLPC = vi.fn()
+    mockHistoryPush = vi.fn()
+    vi.mocked(useLPCDisabledReason).mockReturnValue(null)
+    vi.mocked(useAttachedModules).mockReturnValue([])
+    vi.mocked(useModuleCalibrationStatus).mockReturnValue({ complete: true })
+    vi.mocked(getLocalRobot).mockReturnValue({
+      ...mockConnectableRobot,
+      name: ROBOT_NAME,
+      health: {
+        ...mockConnectableRobot.health,
+        robot_serial: ROBOT_SERIAL_NUMBER,
+      },
+    } as any)
+    when(vi.mocked(useRobotType))
       .calledWith(ROBOT_NAME)
-      .mockReturnValue(FLEX_ROBOT_TYPE)
-    when(mockUseRunControls)
+      .thenReturn(FLEX_ROBOT_TYPE)
+    when(vi.mocked(useRunControls))
       .calledWith(RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         play: mockPlay,
         pause: () => {},
         stop: () => {},
@@ -289,25 +214,25 @@ describe('ProtocolSetup', () => {
         isStopRunActionLoading: false,
         isResetRunLoading: false,
       })
-    when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_IDLE)
-    mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
+    when(vi.mocked(useRunStatus)).calledWith(RUN_ID).thenReturn(RUN_STATUS_IDLE)
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: mockEmptyAnalysis,
     } as any)
-    when(mockUseRunCreatedAtTimestamp)
+    when(vi.mocked(useRunCreatedAtTimestamp))
       .calledWith(RUN_ID)
-      .mockReturnValue(CREATED_AT)
-    when(mockGetProtocolModulesInfo)
-      .calledWith(mockEmptyAnalysis, ot3StandardDeckDef as any)
-      .mockReturnValue([])
-    when(mockGetUnmatchedModulesForProtocol)
+      .thenReturn(CREATED_AT)
+    when(vi.mocked(getProtocolModulesInfo))
+      .calledWith(mockEmptyAnalysis, flexDeckDefV4 as any)
+      .thenReturn([])
+    when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith([], [])
-      .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
-    when(mockGetDeckDefFromRobotType)
+      .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
+    when(vi.mocked(getDeckDefFromRobotType))
       .calledWith('OT-3 Standard')
-      .mockReturnValue(ot3StandardDeckDef as any)
-    when(mockUseNotifyRunQuery)
+      .thenReturn(flexDeckDefV4 as any)
+    when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, { staleTime: Infinity })
-      .mockReturnValue({
+      .thenReturn({
         data: {
           data: {
             protocolId: PROTOCOL_ID,
@@ -315,52 +240,48 @@ describe('ProtocolSetup', () => {
           },
         },
       } as any)
-    when(mockUseProtocolQuery)
+    when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID, { staleTime: Infinity })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: { metadata: { protocolName: PROTOCOL_NAME } } },
       } as any)
-    when(mockUseInstrumentsQuery)
+    when(vi.mocked(useInstrumentsQuery))
       .calledWith()
-      .mockReturnValue({
+      .thenReturn({
         data: {
           data: [mockLeftPipetteData, mockRightPipetteData, mockGripperData],
         },
       } as any)
-    when(mockUseAllPipetteOffsetCalibrationsQuery)
+    when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
       .calledWith()
-      .mockReturnValue({ data: { data: [] } } as any)
-    when(mockUseLaunchLPC)
+      .thenReturn({ data: { data: [] } } as any)
+    when(vi.mocked(useLaunchLPC))
       .calledWith(RUN_ID, FLEX_ROBOT_TYPE, PROTOCOL_NAME)
-      .mockReturnValue({
+      .thenReturn({
         launchLPC: mockLaunchLPC,
         LPCWizard: <div>mock LPC Wizard</div>,
       })
-    mockUseIsHeaterShakerInProtocol.mockReturnValue(false)
-    mockConfirmAttachedModal.mockReturnValue(
-      <div>mock ConfirmAttachedModal</div>
-    )
-    mockUseDoorQuery.mockReturnValue({ data: mockDoorStatus } as any)
-    mockUseModulesQuery.mockReturnValue({
+    vi.mocked(useIsHeaterShakerInProtocol).mockReturnValue(false)
+    vi.mocked(useDoorQuery).mockReturnValue({ data: mockDoorStatus } as any)
+    vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [mockHeaterShaker] },
     } as any)
-    mockUseDeckConfigurationQuery.mockReturnValue({
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
       data: [mockFixture],
-    } as UseQueryResult<DeckConfiguration>)
-    when(mockUseToaster)
+    } as UseQueryResult<SharedData.DeckConfiguration>)
+    when(vi.mocked(useToaster))
       .calledWith()
-      .mockReturnValue(({
+      .thenReturn(({
         makeSnackbar: MOCK_MAKE_SNACKBAR,
       } as unknown) as any)
-    when(mockUseDeckConfigurationCompatibility).mockReturnValue([])
-    when(mockUseTrackProtocolRunEvent)
+    vi.mocked(useDeckConfigurationCompatibility).mockReturnValue([])
+    when(vi.mocked(useTrackProtocolRunEvent))
       .calledWith(RUN_ID, ROBOT_NAME)
-      .mockReturnValue({ trackProtocolRunEvent: mockTrackProtocolRunEvent })
+      .thenReturn({ trackProtocolRunEvent: mockTrackProtocolRunEvent })
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('should render text, image, and buttons', () => {
@@ -382,49 +303,46 @@ describe('ProtocolSetup', () => {
 
   it('should launch cancel modal when click close button', () => {
     render(`/runs/${RUN_ID}/setup/`)
-    expect(screen.queryByText('Mock ConfirmCancelRunModal')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'close' }))
-    screen.getByText('Mock ConfirmCancelRunModal')
+    expect(vi.mocked(ConfirmCancelRunModal)).toHaveBeenCalled()
   })
 
   it('should launch protocol setup modules screen when click modules', () => {
-    mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: mockRobotSideAnalysis,
     } as any)
-    when(mockGetProtocolModulesInfo)
-      .calledWith(mockRobotSideAnalysis, ot3StandardDeckDef as any)
-      .mockReturnValue(mockProtocolModuleInfo)
-    when(mockGetUnmatchedModulesForProtocol)
+    when(vi.mocked(getProtocolModulesInfo))
+      .calledWith(mockRobotSideAnalysis, flexDeckDefV4 as any)
+      .thenReturn(mockProtocolModuleInfo)
+    when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith([], mockProtocolModuleInfo)
-      .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
+      .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     render(`/runs/${RUN_ID}/setup/`)
-    expect(screen.queryByText('Mock ProtocolSetupModulesAndDeck')).toBeNull()
     fireEvent.click(screen.getByText('Modules & deck'))
-    screen.getByText('Mock ProtocolSetupModulesAndDeck')
+    expect(vi.mocked(ProtocolSetupModulesAndDeck)).toHaveBeenCalled()
   })
 
   it('should launch protocol setup liquids screen when click liquids', () => {
-    mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: { ...mockRobotSideAnalysis, liquids: mockLiquids },
     } as any)
-    when(mockGetProtocolModulesInfo)
+    when(vi.mocked(getProtocolModulesInfo))
       .calledWith(
         { ...mockRobotSideAnalysis, liquids: mockLiquids },
-        ot3StandardDeckDef as any
+        flexDeckDefV4 as any
       )
-      .mockReturnValue(mockProtocolModuleInfo)
-    when(mockGetUnmatchedModulesForProtocol)
+      .thenReturn(mockProtocolModuleInfo)
+    when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith([], mockProtocolModuleInfo)
-      .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
+      .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     render(`/runs/${RUN_ID}/setup/`)
-    expect(screen.queryByText('Mock ProtocolSetupLiquids')).toBeNull()
     screen.getByText('1 initial liquid')
     fireEvent.click(screen.getByText('Liquids'))
-    screen.getByText('Mock ProtocolSetupLiquids')
+    expect(vi.mocked(ProtocolSetupLiquids)).toHaveBeenCalled()
   })
 
   it('should launch LPC when clicked', () => {
-    mockUseLPCDisabledReason.mockReturnValue(null)
+    vi.mocked(useLPCDisabledReason).mockReturnValue(null)
     render(`/runs/${RUN_ID}/setup/`)
     screen.getByText(/Recommended/)
     screen.getByText(/1 offset applied/)
@@ -434,13 +352,13 @@ describe('ProtocolSetup', () => {
   })
 
   it('should render a confirmation modal when heater-shaker is in a protocol and it is not shaking', () => {
-    mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
+    vi.mocked(useIsHeaterShakerInProtocol).mockReturnValue(true)
     render(`/runs/${RUN_ID}/setup/`)
     fireEvent.click(screen.getByRole('button', { name: 'play' }))
-    screen.getByText('mock ConfirmAttachedModal')
+    expect(vi.mocked(ConfirmAttachedModal)).toHaveBeenCalled()
   })
   it('should render a loading skeleton while awaiting a response from the server', () => {
-    mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: null,
     } as any)
     render(`/runs/${RUN_ID}/setup/`)
@@ -454,7 +372,7 @@ describe('ProtocolSetup', () => {
         doorRequiredClosedForProtocol: true,
       },
     }
-    mockUseDoorQuery.mockReturnValue({ data: mockOpenDoorStatus } as any)
+    vi.mocked(useDoorQuery).mockReturnValue({ data: mockOpenDoorStatus } as any)
     render(`/runs/${RUN_ID}/setup/`)
     fireEvent.click(screen.getByRole('button', { name: 'play' }))
     expect(MOCK_MAKE_SNACKBAR).toBeCalledWith(
@@ -473,7 +391,7 @@ describe('ProtocolSetup', () => {
   })
 
   it('should redirect to the protocols page when a run is stopped', () => {
-    mockUseRunStatus.mockReturnValue(RUN_STATUS_STOPPED)
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_STOPPED)
     render(`/runs/${RUN_ID}/setup/`)
     expect(mockHistoryPush).toHaveBeenCalledWith('/protocols')
   })

@@ -1,7 +1,7 @@
 import * as React from 'react'
+import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
-import { useFormik } from 'formik'
 import { css } from 'styled-components'
 import { useHistory } from 'react-router-dom'
 
@@ -38,7 +38,7 @@ import { SmallButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
 import { useIsUnboxingFlowOngoing } from '../../organisms/RobotSettingsDashboard/NetworkSettings/hooks'
 import { ConfirmRobotName } from '../../organisms/OnDeviceDisplay/NameRobot/ConfirmRobotName'
-
+import type { FieldError, Resolver } from 'react-hook-form'
 import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { State, Dispatch } from '../../redux/types'
 
@@ -50,8 +50,8 @@ const INPUT_FIELD_ODD_STYLE = css`
   text-align: center;
 `
 
-interface FormikErrors {
-  newRobotName?: string
+interface FormValues {
+  newRobotName: string
 }
 
 export function NameRobot(): JSX.Element {
@@ -61,7 +61,6 @@ export function NameRobot(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const ipAddress = localRobot?.ip
   const previousName = localRobot?.name != null ? localRobot.name : null
-  const [name, setName] = React.useState<string>('')
   const [newName, setNewName] = React.useState<string>('')
   const [
     isShowConfirmRobotName,
@@ -81,39 +80,72 @@ export function NameRobot(): JSX.Element {
     getUnreachableRobots(state)
   )
 
-  const formik = useFormik({
-    initialValues: {
+  const validate = (
+    data: FormValues,
+    errors: Record<string, FieldError>
+  ): Record<string, FieldError> => {
+    const newName = data.newRobotName
+    let errorMessage: string | undefined
+    // In ODD users cannot input letters and numbers from software keyboard
+    // so the app only checks the length of input string
+    if (newName.length < 1) {
+      errorMessage = t('name_rule_error_name_length')
+    }
+
+    if (
+      [...connectableRobots, ...reachableRobots].some(
+        robot => newName === robot.name && robot.ip !== ipAddress
+      )
+    ) {
+      errorMessage = t('name_rule_error_exist')
+    }
+
+    const updatedErrors =
+      errorMessage != null
+        ? {
+            ...errors,
+            newRobotName: {
+              type: 'error',
+              message: errorMessage,
+            },
+          }
+        : errors
+    return updatedErrors
+  }
+
+  const resolver: Resolver<FormValues> = values => {
+    let errors = {}
+    errors = validate(values, errors)
+    return { values, errors }
+  }
+
+  const {
+    handleSubmit,
+    control,
+    formState: { errors },
+    reset,
+    trigger,
+    watch,
+  } = useForm({
+    defaultValues: {
       newRobotName: '',
     },
-    onSubmit: (values, { resetForm }) => {
-      const newName = values.newRobotName.concat(name)
-      const sameNameRobotInUnavailable = unreachableRobots.find(
-        robot => robot.name === newName
-      )
-      if (sameNameRobotInUnavailable != null) {
-        dispatch(removeRobot(sameNameRobotInUnavailable.name))
-      }
-      updateRobotName(newName)
-      resetForm({ values: { newRobotName: '' } })
-    },
-    validate: values => {
-      const errors: FormikErrors = {}
-      const newName = values.newRobotName.concat(name)
-      // In ODD users cannot input letters and numbers from software keyboard
-      // so the app only checks the length of input string
-      if (newName.length < 1) {
-        errors.newRobotName = t('name_rule_error_name_length')
-      }
-      if (
-        [...connectableRobots, ...reachableRobots].some(
-          robot => newName === robot.name && robot.ip !== ipAddress
-        )
-      ) {
-        errors.newRobotName = t('name_rule_error_exist')
-      }
-      return errors
-    },
+    resolver: resolver,
   })
+
+  const newRobotName = watch('newRobotName')
+
+  const onSubmit = (data: FormValues): void => {
+    const newName = data.newRobotName
+    const sameNameRobotInUnavailable = unreachableRobots.find(
+      robot => robot.name === newName
+    )
+    if (sameNameRobotInUnavailable != null) {
+      dispatch(removeRobot(sameNameRobotInUnavailable.name))
+    }
+    updateRobotName(newName)
+    reset({ newRobotName: '' })
+  }
 
   const { updateRobotName, isLoading: isNaming } = useUpdateRobotNameMutation({
     onSuccess: (data: UpdatedRobotName) => {
@@ -134,16 +166,18 @@ export function NameRobot(): JSX.Element {
     },
   })
 
-  const handleConfirm = (): void => {
+  const handleConfirm = async (): Promise<void> => {
+    await trigger('newRobotName')
+
     // check robot name in the same network
     trackEvent({
       name: ANALYTICS_RENAME_ROBOT,
       properties: {
         previousRobotName: previousName,
-        newRobotName: formik.values.newRobotName,
+        newRobotName: newRobotName,
       },
     })
-    formik.handleSubmit()
+    handleSubmit(onSubmit)()
   }
 
   return (
@@ -230,15 +264,21 @@ export function NameRobot(): JSX.Element {
                   {t('name_your_robot_description')}
                 </StyledText>
               ) : null}
-              <InputField
-                data-testid="name-robot_input"
-                id="newRobotName"
+              <Controller
+                control={control}
                 name="newRobotName"
-                type="text"
-                onChange={formik.handleChange}
-                value={name}
-                error={formik.errors.newRobotName && ''}
-                css={INPUT_FIELD_ODD_STYLE}
+                render={({ field, fieldState }) => (
+                  <InputField
+                    data-testid="name-robot_input"
+                    id="newRobotName"
+                    name="newRobotName"
+                    type="text"
+                    readOnly
+                    value={field.value}
+                    error={fieldState.error?.message && ''}
+                    css={INPUT_FIELD_ODD_STYLE}
+                  />
+                )}
               />
             </Flex>
             <StyledText
@@ -248,21 +288,30 @@ export function NameRobot(): JSX.Element {
             >
               {t('name_rule_description')}
             </StyledText>
-            {formik.errors.newRobotName && (
+            {errors.newRobotName != null ? (
               <StyledText
                 as="p"
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
                 color={COLORS.red50}
               >
-                {formik.errors.newRobotName}
+                {errors.newRobotName.message}
               </StyledText>
-            )}
+            ) : null}
           </Flex>
 
           <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">
-            <CustomKeyboard
-              onChange={e => e != null && setName(e)}
-              keyboardRef={keyboardRef}
+            <Controller
+              control={control}
+              name="newRobotName"
+              render={({ field }) => (
+                <CustomKeyboard
+                  onChange={(input: string) => {
+                    field.onChange(input)
+                    trigger('newRobotName')
+                  }}
+                  keyboardRef={keyboardRef}
+                />
+              )}
             />
           </Flex>
         </>

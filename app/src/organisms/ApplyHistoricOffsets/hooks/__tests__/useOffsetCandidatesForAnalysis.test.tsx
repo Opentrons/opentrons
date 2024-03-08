@@ -1,10 +1,11 @@
 import * as React from 'react'
-import { resetAllWhenMocks, when } from 'jest-when'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { when } from 'vitest-when'
 import { renderHook, waitFor } from '@testing-library/react'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import {
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
+  fixtureTiprack300ul,
 } from '@opentrons/shared-data'
 import { useAllHistoricOffsets } from '../useAllHistoricOffsets'
 import { getLabwareLocationCombos } from '../getLabwareLocationCombos'
@@ -15,20 +16,12 @@ import { storedProtocolData as storedProtocolDataFixture } from '../../../../red
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { OffsetCandidate } from '../useOffsetCandidatesForAnalysis'
 
-jest.mock('../useAllHistoricOffsets')
-jest.mock('../getLabwareLocationCombos')
-jest.mock('@opentrons/shared-data')
+vi.mock('../useAllHistoricOffsets')
+vi.mock('../getLabwareLocationCombos')
+vi.mock('@opentrons/shared-data')
 
-const mockLabwareDef = fixture_tiprack_300_ul as LabwareDefinition2
-const mockUseAllHistoricOffsets = useAllHistoricOffsets as jest.MockedFunction<
-  typeof useAllHistoricOffsets
->
-const mockGetLabwareLocationCombos = getLabwareLocationCombos as jest.MockedFunction<
-  typeof getLabwareLocationCombos
->
-const mockGetLoadedLabwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri as jest.MockedFunction<
-  typeof getLoadedLabwareDefinitionsByUri
->
+const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition2
+
 const mockFirstCandidate: OffsetCandidate = {
   id: 'first_offset_id',
   labwareDisplayName: 'First Fake Labware Display Name',
@@ -68,18 +61,18 @@ const mockRobotIp = 'fakeRobotIp'
 
 describe('useOffsetCandidatesForAnalysis', () => {
   beforeEach(() => {
-    when(mockUseAllHistoricOffsets)
+    when(useAllHistoricOffsets)
       .calledWith({ hostname: mockRobotIp })
-      .mockReturnValue([
+      .thenReturn([
         mockFirstDupCandidate,
         mockThirdCandidate,
         mockSecondCandidate,
         mockFirstCandidate,
       ])
-    when(mockUseAllHistoricOffsets).calledWith(null).mockReturnValue([])
-    when(mockGetLabwareLocationCombos)
+    when(useAllHistoricOffsets).calledWith(null).thenReturn([])
+    when(getLabwareLocationCombos)
       .calledWith(expect.any(Array), expect.any(Array), expect.any(Array))
-      .mockReturnValue([
+      .thenReturn([
         {
           location: { slotName: '1' },
           definitionUri: 'firstFakeDefURI',
@@ -97,17 +90,13 @@ describe('useOffsetCandidatesForAnalysis', () => {
           definitionUri: 'thirdFakeDefURI',
         },
       ])
-    when(mockGetLoadedLabwareDefinitionsByUri)
+    when(getLoadedLabwareDefinitionsByUri)
       .calledWith(expect.any(Array))
-      .mockReturnValue({
+      .thenReturn({
         firstFakeDefURI: mockLabwareDef,
         secondFakeDefURI: mockLabwareDef,
         thirdFakeDefURI: mockLabwareDef,
       })
-  })
-
-  afterEach(() => {
-    resetAllWhenMocks()
   })
 
   it('returns an empty array if robot ip but no analysis output', async () => {

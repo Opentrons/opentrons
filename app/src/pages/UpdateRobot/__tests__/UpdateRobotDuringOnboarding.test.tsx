@@ -1,7 +1,8 @@
 import * as React from 'react'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { act, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 
 import * as RobotUpdate from '../../../redux/robot-update'
@@ -12,18 +13,8 @@ import { UpdateRobotDuringOnboarding } from '../UpdateRobotDuringOnboarding'
 
 import type { State } from '../../../redux/types'
 
-jest.mock('../../../redux/discovery')
-jest.mock('../../../redux/robot-update')
-
-const mockGetRobotUpdateUpdateAvailable = RobotUpdate.getRobotUpdateAvailable as jest.MockedFunction<
-  typeof RobotUpdate.getRobotUpdateAvailable
->
-const mockGetRobotUpdateSession = RobotUpdate.getRobotUpdateSession as jest.MockedFunction<
-  typeof RobotUpdate.getRobotUpdateSession
->
-const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
-  typeof getLocalRobot
->
+vi.mock('../../../redux/discovery')
+vi.mock('../../../redux/robot-update')
 
 const MOCK_STATE: State = {
   discovery: {
@@ -85,31 +76,37 @@ const render = () => {
 
 describe('UpdateRobotDuringOnboarding', () => {
   beforeEach(() => {
-    jest.useFakeTimers()
-    mockGetRobotUpdateUpdateAvailable.mockReturnValue(RobotUpdate.UPGRADE)
-    mockGetLocalRobot.mockReturnValue(mockRobot)
+    vi.useFakeTimers()
+    vi.mocked(RobotUpdate.getRobotUpdateAvailable).mockReturnValue(
+      RobotUpdate.UPGRADE
+    )
+    vi.mocked(getLocalRobot).mockReturnValue(mockRobot)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('should render CheckUpdates if it does not already have an upgrade', () => {
-    mockGetRobotUpdateUpdateAvailable.mockReturnValue(RobotUpdate.REINSTALL)
+    vi.mocked(RobotUpdate.getRobotUpdateAvailable).mockReturnValue(
+      RobotUpdate.REINSTALL
+    )
     render()
     screen.getByText('Checking for updates')
   })
 
   it('should stop rendering CheckUpdates should after 10 sec', async () => {
-    jest.useFakeTimers()
-    mockGetRobotUpdateUpdateAvailable.mockReturnValue(RobotUpdate.REINSTALL)
+    vi.useFakeTimers()
+    vi.mocked(RobotUpdate.getRobotUpdateAvailable).mockReturnValue(
+      RobotUpdate.REINSTALL
+    )
     render()
     act(() => {
-      jest.advanceTimersByTime(1000)
+      vi.advanceTimersByTime(1000)
     })
     expect(screen.getByText('Checking for updates')).toBeInTheDocument()
     act(() => {
-      jest.advanceTimersByTime(11000)
+      vi.advanceTimersByTime(11000)
     })
     expect(screen.queryByText('Checking for updates')).not.toBeInTheDocument()
   })
@@ -125,27 +122,33 @@ describe('UpdateRobotDuringOnboarding', () => {
       ...mockSession,
       step: RobotUpdate.RESTART,
     }
-    mockGetRobotUpdateSession.mockReturnValue(mockDownloadSession)
+    vi.mocked(RobotUpdate.getRobotUpdateSession).mockReturnValue(
+      mockDownloadSession
+    )
     render()
     screen.getByText('Downloading software...')
   })
 
   it('should render NoUpdate found when there is no upgrade - reinstall', () => {
-    jest.useFakeTimers()
-    mockGetRobotUpdateUpdateAvailable.mockReturnValue(RobotUpdate.REINSTALL)
+    vi.useFakeTimers()
+    vi.mocked(RobotUpdate.getRobotUpdateAvailable).mockReturnValue(
+      RobotUpdate.REINSTALL
+    )
     render()
     act(() => {
-      jest.advanceTimersByTime(11000)
+      vi.advanceTimersByTime(11000)
     })
     screen.getByText('Your software is already up to date!')
   })
 
   it('should render NoUpdate found when there is no upgrade - downgrade', () => {
-    jest.useFakeTimers()
-    mockGetRobotUpdateUpdateAvailable.mockReturnValue(RobotUpdate.DOWNGRADE)
+    vi.useFakeTimers()
+    vi.mocked(RobotUpdate.getRobotUpdateAvailable).mockReturnValue(
+      RobotUpdate.DOWNGRADE
+    )
     render()
     act(() => {
-      jest.advanceTimersByTime(11000)
+      vi.advanceTimersByTime(11000)
     })
     screen.getByText('Your software is already up to date!')
   })
@@ -155,7 +158,9 @@ describe('UpdateRobotDuringOnboarding', () => {
       ...mockSession,
       error: 'oh no!',
     }
-    mockGetRobotUpdateSession.mockReturnValue(mockErrorSession)
+    vi.mocked(RobotUpdate.getRobotUpdateSession).mockReturnValue(
+      mockErrorSession
+    )
     render()
 
     screen.getByText('Software update error')

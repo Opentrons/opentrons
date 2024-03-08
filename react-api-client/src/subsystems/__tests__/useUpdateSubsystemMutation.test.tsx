@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { updateSubsystem } from '@opentrons/api-client'
@@ -12,13 +12,8 @@ import type {
   SubsystemUpdateProgressData,
 } from '@opentrons/api-client'
 
-jest.mock('@opentrons/api-client')
-jest.mock('../../api/useHost')
-
-const mockUpdateSubsystem = updateSubsystem as jest.MockedFunction<
-  typeof updateSubsystem
->
-const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
+vi.mock('@opentrons/api-client')
+vi.mock('../../api/useHost')
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const SUBSYSTEM = 'pipette_left'
@@ -45,12 +40,9 @@ describe('useUpdateSubsystemMutation hook', () => {
     )
     wrapper = clientProvider
   })
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
 
   it('should return no data if no host', () => {
-    when(mockUseHost).calledWith().mockReturnValue(null)
+    vi.mocked(useHost).mockReturnValue(null)
 
     const { result } = renderHook(() => useUpdateSubsystemMutation(), {
       wrapper,
@@ -60,10 +52,8 @@ describe('useUpdateSubsystemMutation hook', () => {
   })
 
   it('should return no data if the get runs request fails', () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockUpdateSubsystem)
-      .calledWith(HOST_CONFIG, SUBSYSTEM)
-      .mockRejectedValue('oh no')
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(updateSubsystem).mockRejectedValue('oh no')
 
     const { result } = renderHook(() => useUpdateSubsystemMutation(), {
       wrapper,
@@ -72,12 +62,10 @@ describe('useUpdateSubsystemMutation hook', () => {
   })
 
   it('should update subsystem a play run action when calling the playRun callback', async () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockUpdateSubsystem)
-      .calledWith(HOST_CONFIG, SUBSYSTEM)
-      .mockResolvedValue({
-        data: SUBSYSTEM_UPDATE_RESPONSE,
-      } as Response<SubsystemUpdateProgressData>)
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(updateSubsystem).mockResolvedValue({
+      data: SUBSYSTEM_UPDATE_RESPONSE,
+    } as Response<SubsystemUpdateProgressData>)
 
     const { result } = renderHook(() => useUpdateSubsystemMutation(), {
       wrapper,

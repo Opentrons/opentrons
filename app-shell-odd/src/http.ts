@@ -6,7 +6,7 @@ import pump from 'pump'
 import _fetch from 'node-fetch'
 import FormData from 'form-data'
 
-import { HTTP_API_VERSION } from '@opentrons/app/src/redux/robot-api/constants'
+import { HTTP_API_VERSION } from './constants'
 
 import type { Request, RequestInit, Response } from 'node-fetch'
 

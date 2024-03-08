@@ -13,11 +13,11 @@ import sqlalchemy
 
 from opentrons.protocols.parse import PythonParseMode
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
-from robot_server.persistence import (
+from robot_server.persistence.database import sqlite_rowid
+from robot_server.persistence.tables import (
     analysis_table,
     protocol_table,
     run_table,
-    sqlite_rowid,
 )
 
 
@@ -188,7 +188,10 @@ class ProtocolStore:
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
     def get_all(self) -> List[ProtocolResource]:
-        """Get all protocols currently saved in this store."""
+        """Get all protocols currently saved in this store.
+
+        Results are ordered from first-added to last-added.
+        """
         all_sql_resources = self._sql_get_all()
         return [
             ProtocolResource(
@@ -297,17 +300,16 @@ class ProtocolStore:
 
         See the `runs` module for information about runs.
 
-        Results are ordered with the oldest-added (NOT created) run first.
+        Results are ordered with the oldest run first.
         """
-        select_referencing_run_ids = sqlalchemy.select(run_table.c.id).where(
-            run_table.c.protocol_id == protocol_id
+        select_referencing_run_ids = (
+            sqlalchemy.select(run_table.c.id)
+            .where(run_table.c.protocol_id == protocol_id)
+            .order_by(sqlite_rowid)
         )
 
         with self._sql_engine.begin() as transaction:
-            referencing_run_ids = (
-                transaction.execute(select_referencing_run_ids).scalars().all()
-            )
-        return referencing_run_ids
+            return transaction.execute(select_referencing_run_ids).scalars().all()
 
     def _sql_insert(self, resource: _DBProtocolResource) -> None:
         statement = sqlalchemy.insert(protocol_table).values(
@@ -334,7 +336,7 @@ class ProtocolStore:
     def _sql_get_all_from_engine(
         sql_engine: sqlalchemy.engine.Engine,
     ) -> List[_DBProtocolResource]:
-        statement = sqlalchemy.select(protocol_table)
+        statement = sqlalchemy.select(protocol_table).order_by(sqlite_rowid)
         with sql_engine.begin() as transaction:
             all_rows = transaction.execute(statement).all()
         return [_convert_sql_row_to_dataclass(sql_row=row) for row in all_rows]

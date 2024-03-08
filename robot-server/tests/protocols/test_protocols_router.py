@@ -21,7 +21,7 @@ from opentrons.protocol_reader import (
     BufferedFile,
 )
 
-from robot_server.errors import ApiError
+from robot_server.errors.error_responses import ApiError
 from robot_server.service.json_api import SimpleEmptyBody, MultiBodyMeta
 from robot_server.service.task_runner import TaskRunner
 from robot_server.protocols.analysis_store import AnalysisStore, AnalysisNotFoundError

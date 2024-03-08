@@ -38,6 +38,7 @@ from ..pipette_fixtures import (
     EIGHT_CHANNEL_ROWS,
     EIGHT_CHANNEL_COLS,
     EIGHT_CHANNEL_MAP,
+    get_default_nozzle_map,
 )
 
 _SAMPLE_NOZZLE_BOUNDS_OFFSETS = BoundingNozzlesOffsets(
@@ -272,6 +273,7 @@ def test_get_pipette_working_volume(
                 home_position=0,
                 nozzle_offset_z=0,
                 bounding_nozzle_offsets=_SAMPLE_NOZZLE_BOUNDS_OFFSETS,
+                default_nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
                 pipette_bounding_box_offsets=_SAMPLE_PIPETTE_BOUNDING_BOX_OFFSETS,
             )
         },
@@ -301,6 +303,7 @@ def test_get_pipette_working_volume_raises_if_tip_volume_is_none(
                 home_position=0,
                 nozzle_offset_z=0,
                 bounding_nozzle_offsets=_SAMPLE_NOZZLE_BOUNDS_OFFSETS,
+                default_nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
                 pipette_bounding_box_offsets=_SAMPLE_PIPETTE_BOUNDING_BOX_OFFSETS,
             )
         },
@@ -339,6 +342,7 @@ def test_get_pipette_available_volume(
                 home_position=0,
                 nozzle_offset_z=0,
                 bounding_nozzle_offsets=_SAMPLE_NOZZLE_BOUNDS_OFFSETS,
+                default_nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
                 pipette_bounding_box_offsets=_SAMPLE_PIPETTE_BOUNDING_BOX_OFFSETS,
             ),
             "pipette-id-none": StaticPipetteConfig(
@@ -353,6 +357,7 @@ def test_get_pipette_available_volume(
                 home_position=0,
                 nozzle_offset_z=0,
                 bounding_nozzle_offsets=_SAMPLE_NOZZLE_BOUNDS_OFFSETS,
+                default_nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
                 pipette_bounding_box_offsets=_SAMPLE_PIPETTE_BOUNDING_BOX_OFFSETS,
             ),
         },
@@ -463,6 +468,7 @@ def test_get_static_config(
         home_position=10.12,
         nozzle_offset_z=12.13,
         bounding_nozzle_offsets=_SAMPLE_NOZZLE_BOUNDS_OFFSETS,
+        default_nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
         pipette_bounding_box_offsets=_SAMPLE_PIPETTE_BOUNDING_BOX_OFFSETS,
     )
 
@@ -512,6 +518,7 @@ def test_get_nominal_tip_overlap(
         home_position=0,
         nozzle_offset_z=0,
         bounding_nozzle_offsets=_SAMPLE_NOZZLE_BOUNDS_OFFSETS,
+        default_nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
         pipette_bounding_box_offsets=_SAMPLE_PIPETTE_BOUNDING_BOX_OFFSETS,
     )
 
@@ -747,6 +754,7 @@ def test_get_nozzle_bounds_at_location(
                 nominal_tip_overlap={},
                 home_position=0,
                 nozzle_offset_z=0,
+                default_nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
                 bounding_nozzle_offsets=_SAMPLE_NOZZLE_BOUNDS_OFFSETS,
                 pipette_bounding_box_offsets=bounding_box_offsets,
             )

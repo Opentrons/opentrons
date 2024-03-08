@@ -6,7 +6,7 @@ import PATH_IMAGE from '../../../../images/well_order_path.svg'
 
 import { WellOrderOption } from '../../../../form-types'
 
-import styles from './WellOrderInput.css'
+import styles from './WellOrderInput.module.css'
 
 interface Props {
   firstValue: WellOrderOption

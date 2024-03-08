@@ -1,6 +1,9 @@
 import * as React from 'react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders, COLORS } from '@opentrons/components'
+import { COLORS } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { LargeButton } from '../LargeButton'
 
@@ -12,7 +15,7 @@ describe('LargeButton', () => {
   let props: React.ComponentProps<typeof LargeButton>
   beforeEach(() => {
     props = {
-      onClick: jest.fn(),
+      onClick: vi.fn(),
       buttonText: 'large button',
       iconName: 'play-round-corners',
     }
@@ -22,7 +25,7 @@ describe('LargeButton', () => {
     fireEvent.click(screen.getByText('large button'))
     expect(props.onClick).toHaveBeenCalled()
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.blue50}`
+      `background-color: ${COLORS.blue60}`
     )
   })
   it('renders the alert button', () => {
@@ -32,7 +35,7 @@ describe('LargeButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.red35}`
+      `background-color: ${COLORS.red40}`
     )
   })
   it('renders the secondary button', () => {
@@ -42,7 +45,7 @@ describe('LargeButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.blue35}`
+      `background-color: ${COLORS.blue40}`
     )
   })
   it('renders the button as disabled', () => {

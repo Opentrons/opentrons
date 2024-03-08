@@ -10,11 +10,11 @@ import {
   BORDERS,
   JUSTIFY_CENTER,
   COLORS,
-  StyleProps,
   TYPOGRAPHY,
   useHoverTooltip,
   Tooltip,
 } from '@opentrons/components'
+import type { StyleProps } from '@opentrons/components'
 
 const EQUIPMENT_OPTION_STYLE = css`
   background-color: ${COLORS.white};

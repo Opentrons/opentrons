@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -19,7 +20,7 @@ import {
 
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { getIsOnDevice } from '../../redux/config'
@@ -511,29 +512,28 @@ export const DropTipWizardComponent = (
     />
   )
 
-  return (
-    <Portal level="top">
-      {isOnDevice ? (
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          width="992px"
-          height="568px"
-          left="14.5px"
-          top="16px"
-          border={BORDERS.lineBorder}
-          boxShadow={BORDERS.shadowSmall}
-          borderRadius={BORDERS.borderRadiusSize4}
-          position={POSITION_ABSOLUTE}
-          backgroundColor={COLORS.white}
-        >
-          {wizardHeader}
-          {modalContent}
-        </Flex>
-      ) : (
-        <LegacyModalShell width="47rem" header={wizardHeader} overflow="hidden">
-          {modalContent}
-        </LegacyModalShell>
-      )}
-    </Portal>
+  return createPortal(
+    isOnDevice ? (
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        width="992px"
+        height="568px"
+        left="14.5px"
+        top="16px"
+        border={BORDERS.lineBorder}
+        boxShadow={BORDERS.shadowSmall}
+        borderRadius={BORDERS.borderRadiusSize4}
+        position={POSITION_ABSOLUTE}
+        backgroundColor={COLORS.white}
+      >
+        {wizardHeader}
+        {modalContent}
+      </Flex>
+    ) : (
+      <LegacyModalShell width="47rem" header={wizardHeader} overflow="hidden">
+        {modalContent}
+      </LegacyModalShell>
+    ),
+    getTopPortalEl()
   )
 }

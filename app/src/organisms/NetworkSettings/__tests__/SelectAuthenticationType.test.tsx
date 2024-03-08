@@ -1,28 +1,30 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import * as Networking from '../../../redux/networking'
-import { SetWifiCred } from '../SetWifiCred'
-import { AlternativeSecurityTypeModal } from '../AlternativeSecurityTypeModal'
+import { getNetworkInterfaces, INTERFACE_WIFI } from '../../../redux/networking'
 import { useIsUnboxingFlowOngoing } from '../../RobotSettingsDashboard/NetworkSettings/hooks'
+import { AlternativeSecurityTypeModal } from '../AlternativeSecurityTypeModal'
 import { SelectAuthenticationType } from '../SelectAuthenticationType'
+import { SetWifiCred } from '../SetWifiCred'
 
-const mockPush = jest.fn()
-const mockSetSelectedAuthType = jest.fn()
+import type { useHistory } from 'react-router-dom'
 
-jest.mock('../SetWifiCred')
-jest.mock('../../../redux/networking')
-jest.mock('../../../redux/discovery/selectors')
-jest.mock('../AlternativeSecurityTypeModal')
-jest.mock('../../RobotSettingsDashboard/NetworkSettings/hooks')
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
+const mockPush = vi.fn()
+const mockSetSelectedAuthType = vi.fn()
+
+vi.mock('../SetWifiCred')
+vi.mock('../../../redux/networking')
+vi.mock('../../../redux/discovery/selectors')
+vi.mock('../AlternativeSecurityTypeModal')
+vi.mock('../../RobotSettingsDashboard/NetworkSettings/hooks')
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<typeof useHistory>()
   return {
-    ...reactRouterDom,
+    ...actual,
     useHistory: () => ({ push: mockPush } as any),
   }
 })
@@ -31,19 +33,8 @@ const initialMockWifi = {
   ipAddress: '127.0.0.100',
   subnetMask: '255.255.255.230',
   macAddress: 'WI:FI:00:00:00:00',
-  type: Networking.INTERFACE_WIFI,
+  type: INTERFACE_WIFI,
 }
-
-const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedFunction<
-  typeof Networking.getNetworkInterfaces
->
-const mockSetWifiCred = SetWifiCred as jest.MockedFunction<typeof SetWifiCred>
-const mockAlternativeSecurityTypeModal = AlternativeSecurityTypeModal as jest.MockedFunction<
-  typeof AlternativeSecurityTypeModal
->
-const mockUseIsUnboxingFlowOngoing = useIsUnboxingFlowOngoing as jest.MockedFunction<
-  typeof useIsUnboxingFlowOngoing
->
 
 const render = (
   props: React.ComponentProps<typeof SelectAuthenticationType>
@@ -65,19 +56,19 @@ describe('SelectAuthenticationType', () => {
       selectedAuthType: 'wpa-psk',
       setSelectedAuthType: mockSetSelectedAuthType,
     }
-    mockGetNetworkInterfaces.mockReturnValue({
+    vi.mocked(getNetworkInterfaces).mockReturnValue({
       wifi: initialMockWifi,
       ethernet: null,
     })
-    mockSetWifiCred.mockReturnValue(<div>Mock SetWifiCred</div>)
-    mockAlternativeSecurityTypeModal.mockReturnValue(
+    vi.mocked(SetWifiCred).mockReturnValue(<div>Mock SetWifiCred</div>)
+    vi.mocked(AlternativeSecurityTypeModal).mockReturnValue(
       <div>mock AlternativeSecurityTypeModal</div>
     )
-    mockUseIsUnboxingFlowOngoing.mockReturnValue(true)
+    vi.mocked(useIsUnboxingFlowOngoing).mockReturnValue(true)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('should render text and buttons', () => {

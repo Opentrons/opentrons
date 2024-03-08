@@ -3,7 +3,7 @@ import * as React from 'react'
 import { IconButton, DeprecatedTooltip } from '@opentrons/components'
 import { LabelText, LABEL_TOP } from '../ui'
 import { API_NAME, COPIED_TO_CLIPBOARD } from '../../localization'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 const COPY_ICON = 'ot-copy-text'
 const SUCCESS_TIMEOUT_MS = 1500

@@ -1,27 +1,18 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { describe, it, beforeEach, vi } from 'vitest'
 import {
   parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ProtocolLiquidsDetails } from '../ProtocolLiquidsDetails'
 import { LiquidsListItemDetails } from '../../Devices/ProtocolRun/SetupLiquids/SetupLiquidsList'
 
-jest.mock('../../Devices/ProtocolRun/SetupLiquids/SetupLiquidsList')
-jest.mock('@opentrons/api-client')
-
-const mockLiquidsListItemDetails = LiquidsListItemDetails as jest.MockedFunction<
-  typeof LiquidsListItemDetails
->
-
-const mockParseLiquidsInLoadOrder = parseLiquidsInLoadOrder as jest.MockedFunction<
-  typeof parseLiquidsInLoadOrder
->
-
-const mockParseLabwareInfoByLiquidId = parseLabwareInfoByLiquidId as jest.MockedFunction<
-  typeof parseLabwareInfoByLiquidId
->
+vi.mock('../../Devices/ProtocolRun/SetupLiquids/SetupLiquidsList')
+vi.mock('@opentrons/api-client')
 
 const render = (props: React.ComponentProps<typeof ProtocolLiquidsDetails>) => {
   return renderWithProviders(<ProtocolLiquidsDetails {...props} />, {
@@ -42,10 +33,10 @@ describe('ProtocolLiquidsDetails', () => {
         },
       ],
     }
-    mockLiquidsListItemDetails.mockReturnValue(
+    vi.mocked(LiquidsListItemDetails).mockReturnValue(
       <div>mock liquids list item</div>
     )
-    mockParseLiquidsInLoadOrder.mockReturnValue([
+    vi.mocked(parseLiquidsInLoadOrder).mockReturnValue([
       {
         id: '1',
         displayName: 'mock liquid',
@@ -53,19 +44,19 @@ describe('ProtocolLiquidsDetails', () => {
         displayColor: '#FFFFFF',
       },
     ])
-    mockParseLabwareInfoByLiquidId.mockReturnValue({
+    vi.mocked(parseLabwareInfoByLiquidId).mockReturnValue({
       '1': [{ labwareId: '123', volumeByWell: { A1: 30 } }],
     })
   })
   it('renders the display name, description and total volume', () => {
-    const [{ getAllByText }] = render(props)
-    getAllByText('mock liquids list item')
+    render(props)
+    screen.getAllByText('mock liquids list item')
   })
   it('renders the correct info for no liquids in the protocol', () => {
     props.liquids = []
-    mockParseLiquidsInLoadOrder.mockReturnValue([])
-    const [{ getByText, getByLabelText }] = render(props)
-    getByText('No liquids are specified for this protocol')
-    getByLabelText('ProtocolLIquidsDetails_noLiquidsIcon')
+    vi.mocked(parseLiquidsInLoadOrder).mockReturnValue([])
+    render(props)
+    screen.getByText('No liquids are specified for this protocol')
+    screen.getByLabelText('ProtocolLIquidsDetails_noLiquidsIcon')
   })
 })

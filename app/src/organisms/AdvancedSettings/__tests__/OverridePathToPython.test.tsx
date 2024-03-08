@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import { i18n } from '../../../i18n'
 import { getPathToPythonOverride } from '../../../redux/config'
@@ -9,13 +8,14 @@ import {
   useTrackEvent,
   ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
 } from '../../../redux/analytics'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { openPythonInterpreterDirectory } from '../../../redux/protocol-analysis'
 
 import { OverridePathToPython } from '../OverridePathToPython'
 
-jest.mock('../../../redux/config')
-jest.mock('../../../redux/analytics')
-jest.mock('../../../redux/protocol-analysis')
+vi.mock('../../../redux/config')
+vi.mock('../../../redux/analytics')
+vi.mock('../../../redux/protocol-analysis')
 
 const render = () => {
   return (
@@ -26,24 +26,14 @@ const render = () => {
   )
 }
 
-const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
-  typeof useTrackEvent
->
-const mockGetPathToPythonOverride = getPathToPythonOverride as jest.MockedFunction<
-  typeof getPathToPythonOverride
->
-const mockOpenPythonInterpreterDirectory = openPythonInterpreterDirectory as jest.MockedFunction<
-  typeof openPythonInterpreterDirectory
->
-
-const mockTrackEvent = jest.fn()
+const mockTrackEvent = vi.fn()
 
 describe('OverridePathToPython', () => {
   beforeEach(() => {
-    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
+    vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
   })
   it('renders the path to python override text and button with no default path', () => {
-    mockGetPathToPythonOverride.mockReturnValue(null)
+    vi.mocked(getPathToPythonOverride).mockReturnValue(null)
     render()
     screen.getByText('Override Path to Python')
     screen.getByText(
@@ -60,7 +50,7 @@ describe('OverridePathToPython', () => {
   })
 
   it('renders the path to python override text and button with a selected path', () => {
-    mockGetPathToPythonOverride.mockReturnValue('otherPath')
+    vi.mocked(getPathToPythonOverride).mockReturnValue('otherPath')
     render()
     screen.getByText('Override Path to Python')
     screen.getByText(
@@ -70,8 +60,8 @@ describe('OverridePathToPython', () => {
     const specifiedPath = screen.getByText('otherPath')
     const button = screen.getByRole('button', { name: 'Reset to default' })
     fireEvent.click(button)
-    expect(mockGetPathToPythonOverride).toHaveBeenCalled()
+    expect(vi.mocked(getPathToPythonOverride)).toHaveBeenCalled()
     fireEvent.click(specifiedPath)
-    expect(mockOpenPythonInterpreterDirectory).toHaveBeenCalled()
+    expect(vi.mocked(openPythonInterpreterDirectory)).toHaveBeenCalled()
   })
 })

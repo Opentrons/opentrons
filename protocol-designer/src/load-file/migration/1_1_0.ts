@@ -1,4 +1,3 @@
-import assert from 'assert'
 import isUndefined from 'lodash/isUndefined'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
@@ -77,12 +76,12 @@ function getPipetteCapacityLegacy(
     return Math.min(specs.maxVolume, tiprackDef.metadata.tipVolume)
   }
 
-  assert(specs, `Expected spec for pipette ${JSON.stringify(pipette)}`)
-  assert(
+  console.assert(specs, `Expected spec for pipette ${JSON.stringify(pipette)}`)
+  console.assert(
     tiprackDef,
     `expected tiprack def for pipette ${JSON.stringify(pipette)}`
   )
-  assert(
+  console.assert(
     tiprackDef?.metadata?.tipVolume,
     `expected tiprack volume for tiprack def ${JSON.stringify(
       tiprackDef?.metadata || 'undefined'

@@ -205,12 +205,7 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
         if (counter === MAX_RETRIES) {
           clearInterval(intervalId)
           // log.warn(`Failed to subscribe on ${hostname} to topic: ${topic}`)
-          sendToBrowserDeserialized({
-            browserWindow,
-            hostname,
-            topic,
-            message: FAILURE_STATUSES.ECONNFAILED,
-          })
+          reject(new Error('Maximum subscription retries exceeded.'))
         }
       }, CHECK_CONNECTION_INTERVAL)
     })

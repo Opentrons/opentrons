@@ -29,6 +29,12 @@ from opentrons.protocol_engine.types import (
     RowNozzleLayoutConfiguration,
     SingleNozzleLayoutConfiguration,
     ColumnNozzleLayoutConfiguration,
+    AddressableOffsetVector,
+)
+from opentrons.protocol_api.disposal_locations import (
+    TrashBin,
+    WasteChute,
+    DisposalOffset,
 )
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocol_api.core.engine import (
@@ -380,6 +386,68 @@ def test_drop_tip_with_location(
             ),
             home_after=True,
             alternateDropLocation=False,
+        ),
+    )
+
+
+def test_drop_tip_in_trash_bin(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
+) -> None:
+    """It should move to the trash bin and drop the tip in place."""
+    trash_bin = decoy.mock(cls=TrashBin)
+
+    decoy.when(trash_bin.offset).then_return(DisposalOffset(x=1, y=2, z=3))
+    decoy.when(trash_bin.area_name).then_return("my tubular area")
+
+    subject.drop_tip_in_disposal_location(
+        trash_bin, home_after=True, alternate_tip_drop=True
+    )
+
+    decoy.verify(
+        mock_engine_client.move_to_addressable_area_for_drop_tip(
+            pipette_id="abc123",
+            addressable_area_name="my tubular area",
+            offset=AddressableOffsetVector(x=1, y=2, z=3),
+            force_direct=False,
+            speed=None,
+            minimum_z_height=None,
+            alternate_drop_location=True,
+            ignore_tip_configuration=True,
+        ),
+        mock_engine_client.drop_tip_in_place(
+            pipette_id="abc123",
+            home_after=True,
+        ),
+    )
+
+
+def test_drop_tip_in_waste_chute(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
+) -> None:
+    """It should move to the trash bin and drop the tip in place."""
+    waste_chute = decoy.mock(cls=WasteChute)
+
+    decoy.when(waste_chute.offset).then_return(DisposalOffset(x=4, y=5, z=6))
+    decoy.when(
+        mock_engine_client.state.tips.get_pipette_channels("abc123")
+    ).then_return(96)
+
+    subject.drop_tip_in_disposal_location(
+        waste_chute, home_after=True, alternate_tip_drop=True
+    )
+
+    decoy.verify(
+        mock_engine_client.move_to_addressable_area(
+            pipette_id="abc123",
+            addressable_area_name="96ChannelWasteChute",
+            offset=AddressableOffsetVector(x=4, y=5, z=6),
+            force_direct=False,
+            speed=None,
+            minimum_z_height=None,
+        ),
+        mock_engine_client.drop_tip_in_place(
+            pipette_id="abc123",
+            home_after=True,
         ),
     )
 

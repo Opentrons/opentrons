@@ -15,21 +15,23 @@ import {
   InputField,
 } from '@opentrons/components'
 import { resetScrollElements } from '../ui/steps/utils'
-import { Portal } from './portals/MainPageModalPortal'
 import { EditModulesCard } from './modules'
 import { EditModules } from './EditModules'
+
+import styles from './FilePage.module.css'
+import modalStyles from '../components/modals/modal.module.css'
+import formStyles from '../components/forms/forms.module.css'
 import { actions, selectors as fileSelectors } from '../file-data'
 import { actions as navActions } from '../navigation'
 import { actions as steplistActions } from '../steplist'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../constants'
 import { FilePipettesModal } from './modals/FilePipettesModal'
-import styles from './FilePage.css'
-import modalStyles from '../components/modals/modal.css'
-import formStyles from '../components/forms/forms.css'
 
 import type { ModuleType } from '@opentrons/shared-data'
 import type { FileMetadataFields } from '../file-data'
+import { createPortal } from 'react-dom'
+import { getTopPortalEl } from './portals/TopPortal'
 
 // TODO(mc, 2020-02-28): explore l10n for these dates
 const DATE_ONLY_FORMAT = 'MMM dd, yyyy'
@@ -235,18 +237,20 @@ export const FilePage = (): JSX.Element => {
           {t('continue_to_liquids')}
         </DeprecatedPrimaryButton>
       </div>
-
-      <Portal>
-        {isEditPipetteModalOpen && (
-          <FilePipettesModal closeModal={closeEditPipetteModal} />
-        )}
-        {moduleToEdit != null && (
-          <EditModules
-            moduleToEdit={moduleToEdit}
-            onCloseClick={closeEditModulesModal}
-          />
-        )}
-      </Portal>
+      {createPortal(
+        <>
+          {isEditPipetteModalOpen && (
+            <FilePipettesModal closeModal={closeEditPipetteModal} />
+          )}
+          {moduleToEdit != null && (
+            <EditModules
+              moduleToEdit={moduleToEdit}
+              onCloseClick={closeEditModulesModal}
+            />
+          )}
+        </>,
+        getTopPortalEl()
+      )}
     </div>
   )
 }

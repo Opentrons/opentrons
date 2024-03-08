@@ -6,31 +6,26 @@ import {
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 
 import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
 import { useRunStatus } from '../../../RunTimeControl/hooks'
 import { useRunStatuses } from '..'
 
-jest.mock('../../../ProtocolUpload/hooks')
-jest.mock('../../../RunTimeControl/hooks')
+vi.mock('../../../ProtocolUpload/hooks')
+vi.mock('../../../RunTimeControl/hooks')
 
-const mockUseRunStatus = useRunStatus as jest.MockedFunction<
-  typeof useRunStatus
->
-const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
-  typeof useCurrentRunId
->
 describe(' useRunStatuses ', () => {
   beforeEach(() => {
-    mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
-    mockUseCurrentRunId.mockReturnValue('123')
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_RUNNING)
+    vi.mocked(useCurrentRunId).mockReturnValue('123')
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('returns everything as false when run status is null', () => {
-    mockUseRunStatus.mockReturnValue(null)
+    vi.mocked(useRunStatus).mockReturnValue(null)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
       isRunRunning: false,
@@ -41,7 +36,7 @@ describe(' useRunStatuses ', () => {
   })
 
   it('returns true isRunStill and Terminal when run status is suceeded', () => {
-    mockUseRunStatus.mockReturnValue(RUN_STATUS_SUCCEEDED)
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_SUCCEEDED)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
       isRunRunning: false,
@@ -52,7 +47,7 @@ describe(' useRunStatuses ', () => {
   })
 
   it('returns true isRunStill and Terminal when run status is stopped', () => {
-    mockUseRunStatus.mockReturnValue(RUN_STATUS_STOPPED)
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_STOPPED)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
       isRunRunning: false,
@@ -63,7 +58,7 @@ describe(' useRunStatuses ', () => {
   })
 
   it('returns true isRunStill and Terminal when run status is failed', () => {
-    mockUseRunStatus.mockReturnValue(RUN_STATUS_FAILED)
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_FAILED)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
       isRunRunning: false,
@@ -74,7 +69,7 @@ describe(' useRunStatuses ', () => {
   })
 
   it('returns true isRunStill and isRunIdle when run status is idle', () => {
-    mockUseRunStatus.mockReturnValue(RUN_STATUS_IDLE)
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_IDLE)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
       isRunRunning: false,
@@ -85,7 +80,7 @@ describe(' useRunStatuses ', () => {
   })
 
   it('returns true isRunRunning when status is running', () => {
-    mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_RUNNING)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
       isRunRunning: true,
@@ -96,7 +91,7 @@ describe(' useRunStatuses ', () => {
   })
 
   it('returns true isRunRunning when status is paused', () => {
-    mockUseRunStatus.mockReturnValue(RUN_STATUS_PAUSED)
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_PAUSED)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
       isRunRunning: true,

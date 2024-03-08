@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { actions as stepsActions } from '../../../ui/steps'
 import { TerminalItemId } from '../../../steplist'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 interface Props {
   terminalId: TerminalItemId

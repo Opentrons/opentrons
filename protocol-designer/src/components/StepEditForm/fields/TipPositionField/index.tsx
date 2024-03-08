@@ -16,9 +16,8 @@ import {
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { TipPositionModal } from './TipPositionModal'
 import { getDefaultMmFromBottom } from './utils'
-import stepFormStyles from '../../StepEditForm.css'
-import styles from './TipPositionInput.css'
-
+import stepFormStyles from '../../StepEditForm.module.css'
+import styles from './TipPositionInput.module.css'
 import type { FieldProps } from '../../types'
 
 interface TipPositionFieldProps extends FieldProps {

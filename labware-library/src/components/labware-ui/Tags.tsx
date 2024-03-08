@@ -2,7 +2,7 @@ import * as React from 'react'
 import { LabelText, Value, LABEL_LEFT } from '../ui'
 import { TAGS } from '../../localization'
 import type { LabwareDefinition } from '../../types'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 export interface TagsProps {
   definition: LabwareDefinition

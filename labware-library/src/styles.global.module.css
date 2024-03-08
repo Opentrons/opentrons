@@ -1,0 +1,18 @@
+/*
+ * global styles
+*/
+
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,800');
+@import url('https://fonts.googleapis.com/css?family=Ropa+Sans');
+@import './styles/reset.module.css';
+
+html,
+body,
+:root {
+  height: 100%;
+}
+
+/* disable scroll when mobile nav open */
+body.no_scroll {
+  overflow: hidden;
+}

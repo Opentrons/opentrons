@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 import { I18nextProvider } from 'react-i18next'
 import { renderHook } from '@testing-library/react'
 import {
@@ -29,7 +30,7 @@ describe('usePipetteFlowWizardHeaderText', () => {
     )
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
   it('should return correct title for calibrating single mount', () => {
     const { result } = renderHook(

@@ -111,6 +111,7 @@ class StaticPipetteConfig:
     nozzle_offset_z: float
     pipette_bounding_box_offsets: PipetteBoundingBoxOffsets
     bounding_nozzle_offsets: BoundingNozzlesOffsets
+    default_nozzle_map: NozzleMap
 
 
 @dataclass
@@ -180,11 +181,15 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     front_right_corner=config.front_right_corner_offset,
                 ),
                 bounding_nozzle_offsets=BoundingNozzlesOffsets(
-                    back_left_offset=config.back_left_nozzle_offset,
-                    front_right_offset=config.front_right_nozzle_offset,
+                    back_left_offset=config.nozzle_map.back_left_nozzle_offset,
+                    front_right_offset=config.nozzle_map.front_right_nozzle_offset,
                 ),
+                default_nozzle_map=config.nozzle_map,
             )
             self._state.flow_rates_by_id[private_result.pipette_id] = config.flow_rates
+            self._state.nozzle_configuration_by_id[
+                private_result.pipette_id
+            ] = config.nozzle_map
         elif isinstance(private_result, PipetteNozzleLayoutResultMixin):
             self._state.nozzle_configuration_by_id[
                 private_result.pipette_id
@@ -201,7 +206,11 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.aspirated_volume_by_id[pipette_id] = None
             self._state.movement_speed_by_id[pipette_id] = None
             self._state.attached_tip_by_id[pipette_id] = None
-            self._state.nozzle_configuration_by_id[pipette_id] = None
+            static_config = self._state.static_config_by_id.get(pipette_id)
+            if static_config:
+                self._state.nozzle_configuration_by_id[
+                    pipette_id
+                ] = static_config.default_nozzle_map
 
         elif isinstance(command.result, (AspirateResult, AspirateInPlaceResult)):
             pipette_id = command.params.pipetteId

@@ -1,14 +1,15 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
-
+import '@testing-library/jest-dom/vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { i18n } from '../../../i18n'
 import { getScanning, getViewableRobots } from '../../../redux/discovery'
 import { getConfig } from '../../../redux/config'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { ConnectRobotSlideout } from '../ConnectRobotSlideout'
 
-jest.mock('../../../redux/discovery')
-jest.mock('../../../redux/config')
+vi.mock('../../../redux/discovery')
+vi.mock('../../../redux/config')
 
 const render = (props: React.ComponentProps<typeof ConnectRobotSlideout>) => {
   return renderWithProviders(<ConnectRobotSlideout {...props} />, {
@@ -16,24 +17,18 @@ const render = (props: React.ComponentProps<typeof ConnectRobotSlideout>) => {
   })[0]
 }
 
-const mockGetScanning = getScanning as jest.MockedFunction<typeof getScanning>
-const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
-const mockGetViewableRobots = getViewableRobots as jest.MockedFunction<
-  typeof getViewableRobots
->
-
 describe('ConnectRobotSlideout', () => {
   let props: React.ComponentProps<typeof ConnectRobotSlideout>
 
   beforeEach(() => {
-    mockGetScanning.mockReturnValue(true)
+    vi.mocked(getScanning).mockReturnValue(true)
 
-    mockGetConfig.mockReturnValue({
+    vi.mocked(getConfig).mockReturnValue({
       discovery: {
         candidates: ['1.1.1.1', 'localhost', '192.168.1.1'],
       },
     } as any)
-    mockGetViewableRobots.mockReturnValue([
+    vi.mocked(getViewableRobots).mockReturnValue([
       {
         name: 'other-robot-name',
         host: '1.1.1.1',
@@ -56,14 +51,10 @@ describe('ConnectRobotSlideout', () => {
 
     props = {
       candidates: [],
-      checkIpAndHostname: jest.fn(),
+      checkIpAndHostname: vi.fn(),
       isExpanded: true,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
     } as React.ComponentProps<typeof ConnectRobotSlideout>
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
   })
 
   it('renders correct title, body, and footer for ConnectRobotSlideout', () => {
@@ -135,7 +126,7 @@ describe('ConnectRobotSlideout', () => {
   it.todo(
     'Clicking Add button with an IP address/hostname should display the IP address/hostname and Not Found label'
   )
-  // NOTE: consider mocking formik here?
+  // NOTE: consider mocking react-hook-form here?
   // , async () => {
   //   mockGetConfig.mockReturnValue({ discovery: { candidates: ['1.1.1.2'] } } as any)
   //   mockGetViewableRobots.mockReturnValue([] as any[])
