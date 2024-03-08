@@ -10,7 +10,13 @@ module.exports = {
 
   extends: ['stylelint-config-standard', 'stylelint-config-styled-components'],
 
-  ignoreFiles: ['api/**', '**/dist/**', '**/coverage/**', '**/venv/**'],
+  ignoreFiles: [
+    'api/**',
+    '**/dist/**',
+    '**/coverage/**',
+    '**/venv/**',
+    'app/src/atoms/SoftwareKeyboard/index.css', // ignore software keyboard css
+  ],
 
   rules: {
     'selector-class-pattern': /^[a-z0-9_]+$/,
