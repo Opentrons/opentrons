@@ -68,7 +68,7 @@ async def run_hepa_fan(
     start_time = datetime.datetime.now()
 
     # Dont run task if there are no valid parameters
-    if not fan_on_time and not fan_off_time:
+    if not fan_on_time and not fan_off_time and not run_forever:
         return None
 
     log.info(
