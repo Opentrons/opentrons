@@ -447,6 +447,10 @@ export interface PipetteV2GeneralSpecs {
   }
 }
 
+interface NozzleInfo {
+  key: string
+  orderedNozzles: string[]
+}
 export interface PipetteV2GeometrySpecs {
   nozzleOffset: number[]
   pipetteBoundingBoxOffsets: {
@@ -454,8 +458,8 @@ export interface PipetteV2GeometrySpecs {
     frontRightCorner: number[]
   }
   pathTo3D: string
-  orderedRows: any
-  orderedColumns: any
+  orderedRows: Record<number, NozzleInfo>
+  orderedColumns: Record<number, NozzleInfo>
   nozzleMap: Record<string, number[]>
 }
 
@@ -500,9 +504,10 @@ export interface PipetteV2LiquidSpecs {
   defaultTipracks: string[]
 }
 
-type GenericAndGeometry = PipetteV2GeneralSpecs & PipetteV2GeometrySpecs
+export type GenericAndGeometrySpecs = PipetteV2GeneralSpecs &
+  PipetteV2GeometrySpecs
 
-export interface PipetteV2Specs extends GenericAndGeometry {
+export interface PipetteV2Specs extends GenericAndGeometrySpecs {
   $otSharedSchema: string
   liquids: Record<string, PipetteV2LiquidSpecs>
 }

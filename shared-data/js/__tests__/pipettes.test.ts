@@ -137,13 +137,14 @@ describe('pipette data accessors', () => {
     })
   })
   it('returns the correct liquid info for a p50 pipette with default and lowVolume', () => {
+    const tiprack50uL = 'opentrons/opentrons_flex_96_tiprack_50ul/1'
     const mockLiquidDefault = {
       $otSharedSchema: '#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json',
       defaultTipOverlapDictionary: {
         default: 10.5,
-        'opentrons/opentrons_flex_96_tiprack_50ul/1': 10.5,
+        [tiprack50uL]: 10.5,
       },
-      defaultTipracks: ['opentrons/opentrons_flex_96_tiprack_50ul/1'],
+      defaultTipracks: [tiprack50uL],
       maxVolume: 50,
       minVolume: 5,
       supportedTips: {
@@ -187,9 +188,9 @@ describe('pipette data accessors', () => {
       $otSharedSchema: '#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json',
       defaultTipOverlapDictionary: {
         default: 10.5,
-        'opentrons/opentrons_flex_96_tiprack_50ul/1': 10.5,
+        [tiprack50uL]: 10.5,
       },
-      defaultTipracks: ['opentrons/opentrons_flex_96_tiprack_50ul/1'],
+      defaultTipracks: [tiprack50uL],
       maxVolume: 30,
       minVolume: 1,
       supportedTips: {

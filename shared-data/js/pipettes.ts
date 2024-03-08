@@ -10,27 +10,29 @@ import type {
   PipetteModelSpecs,
 } from './types'
 
-const generalGeometric = import.meta.glob(
-  '../pipette/definitions/2/*/*/*/*.json',
-  { eager: true }
-)
-const liquid = import.meta.glob(
-  '../pipette/definitions/2/liquid/*/*/*/*.json',
-  { eager: true }
-)
-
-type PipChannelString = 'single' | 'multi' | '96'
-type Channels = 'eight_channel' | 'single_channel' | 'ninety_six_channel'
-type Gen = 'gen1' | 'gen2' | 'gen3' | 'flex'
-
-type CombinedModules = PipetteV2GeneralSpecs | PipetteV2GeometrySpecs
-interface ModuleSpecs {
-  default: CombinedModules
+type GeneralGeometricModules = PipetteV2GeneralSpecs | PipetteV2GeometrySpecs
+interface GeneralGeometricSpecs {
+  default: GeneralGeometricModules
 }
 interface LiquidSpecs {
   default: PipetteV2LiquidSpecs
 }
 
+const generalGeometric: Record<
+  string,
+  GeneralGeometricSpecs
+> = import.meta.glob('../pipette/definitions/2/*/*/*/*.json', { eager: true })
+
+const liquid: Record<string, LiquidSpecs> = import.meta.glob(
+  '../pipette/definitions/2/liquid/*/*/*/*.json',
+  {
+    eager: true,
+  }
+)
+
+type PipChannelString = 'single' | 'multi' | '96'
+type Channels = 'eight_channel' | 'single_channel' | 'ninety_six_channel'
+type Gen = 'gen1' | 'gen2' | 'gen3' | 'flex'
 type SortableProps = 'maxVolume' | 'channels'
 
 // TODO(mc, 2021-04-30): use these types, pulled directly from the JSON,
@@ -178,71 +180,48 @@ export const getPipetteSpecsV2 = (
     version = versionDot.replace('.', '_') // ex: v1.1 -> 1_1
   }
 
-  const generalGeometricJsons = Object.keys(generalGeometric).map(
-    path => generalGeometric[path]
-  ) as ModuleSpecs[]
-
-  //  matchingJsons retuns an array of 2 jsons for general and geometric
-  const matchingJsons = generalGeometricJsons.reduce(
-    (combinedModules: CombinedModules[], module: ModuleSpecs, index) => {
-      const path = Object.keys(generalGeometric)[index]
+  const generalGeometricMatchingJsons = Object.entries(generalGeometric).reduce(
+    (genericGeometricModules: GeneralGeometricModules[], [path, module]) => {
       V2_DEFINITION_TYPES.forEach(type => {
         if (
           `../pipette/definitions/2/${type}/${channels}/${pipetteModel}/${version}.json` ===
           path
         ) {
-          combinedModules.push(module.default)
+          genericGeometricModules.push(module.default)
         }
       })
-      return combinedModules
+      return genericGeometricModules
     },
     []
   )
-  const generalGeometricCombined = Object.assign({}, ...matchingJsons)
+
   const liquidTypes: string[] = []
-
-  const liquidJsons = Object.keys(liquid).map(
-    path => liquid[path]
-  ) as LiquidSpecs[]
-
-  //  liquidMatchingJsons returns an array of all liquid definition jsons
-  const liquidMatchingJsons = liquidJsons.reduce(
-    (combinedModules: PipetteV2LiquidSpecs[], module: LiquidSpecs, index) => {
-      const path = Object.keys(liquid)[index]
-
-      //  dynamically check the different liquid types and store unique types
-      //  into an array to parse through
-      const type = path.split('/')[7]
-      if (!liquidTypes.includes(type)) {
-        liquidTypes.push(type)
-      }
-
-      liquidTypes.forEach(type => {
-        if (
-          `../pipette/definitions/2/liquid/${channels}/${pipetteModel}/${type}/${version}.json` ===
-          path
-        ) {
-          combinedModules.push(module.default)
-        }
-      })
-      return combinedModules
-    },
-    []
-  )
-
-  const liquidMatchingJsonsGrouped: {
+  //  liquidMatchingJsons retuns liquid (default, lowVolume) jsons in a record
+  const liquidMatchingJsons: {
     liquids: Record<string, PipetteV2LiquidSpecs>
   } = { liquids: {} }
 
-  for (const [key, value] of Object.entries(liquidMatchingJsons)) {
-    const index = Number(key)
-    const newKeyName = liquidTypes[index] || key
-    liquidMatchingJsonsGrouped.liquids[newKeyName] = value
+  Object.entries(liquid).forEach(([path, module]) => {
+    const type = path.split('/')[7]
+    //  dynamically check the different liquid types and store unique types
+    //  into an array to parse through
+    if (!liquidTypes.includes(type)) {
+      liquidTypes.push(type)
+    }
+    if (
+      `../pipette/definitions/2/liquid/${channels}/${pipetteModel}/${type}/${version}.json` ===
+      path
+    ) {
+      const index = liquidTypes.indexOf(type)
+      const newKeyName = index !== -1 ? liquidTypes[index] : path
+      liquidMatchingJsons.liquids[newKeyName] = module.default
+    }
+  })
+
+  const pipetteV2Specs: PipetteV2Specs = {
+    ...Object.assign({}, ...generalGeometricMatchingJsons),
+    ...liquidMatchingJsons,
   }
 
-  const combinedRecords: PipetteV2Specs = {
-    ...generalGeometricCombined,
-    ...liquidMatchingJsonsGrouped,
-  }
-  return combinedRecords
+  return pipetteV2Specs
 }
