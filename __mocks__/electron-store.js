@@ -1,7 +1,7 @@
 // mock electron-store
 'use strict'
 import { vi } from 'vitest'
-import { DEFAULTS_V12, migrate } from '../app-shell-odd/src/config/migrate'
+// import { DEFAULTS_V12, migrate } from '../app-shell-odd/src/config/migrate'
 
 // will by default mock the config dir. if you need other behaavior you can
 // override this mock (see app-shell/src/__tests__/discovery.test.ts for an example)
