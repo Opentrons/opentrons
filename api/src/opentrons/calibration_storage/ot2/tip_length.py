@@ -43,6 +43,11 @@ def tip_lengths_for_pipette(
     except FileNotFoundError:
         log.debug(f"Tip length calibrations not found for {pipette_id}")
         return {}
+    except json.JSONDecodeError:
+        log.warning(
+            f"Tip length calibration is malformed for {pipette_id}", exc_info=True
+        )
+        return {}
 
     tip_lengths: typing.Dict[LabwareUri, v1.TipLengthModel] = {}
 
@@ -55,7 +60,7 @@ def tip_lengths_for_pipette(
             tiprack_identifier = data.pop("uri")
         try:
             tip_lengths[LabwareUri(tiprack_identifier)] = v1.TipLengthModel(**data)
-        except (json.JSONDecodeError, ValidationError):
+        except ValidationError:
             log.warning(
                 f"Tip length calibration is malformed for {tiprack_identifier} on {pipette_id}",
                 exc_info=True,
