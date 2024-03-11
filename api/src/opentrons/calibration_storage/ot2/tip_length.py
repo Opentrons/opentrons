@@ -55,9 +55,17 @@ def tip_lengths_for_pipette(
         # We normally key these calibrations by their tip rack URI,
         # but older software had them keyed by their tip rack hash.
         # Migrate from the old format, if necessary.
-        if "/" not in tiprack_identifier:
+        tiprack_identifier_is_uri = "/" in tiprack_identifier
+        if not tiprack_identifier_is_uri:
             data["definitionHash"] = tiprack_identifier
-            tiprack_identifier = data.pop("uri")
+            uri = data.pop("uri", None)
+            if uri is None:
+                # We don't have a way to migrate old records without a URI,
+                # so skip over them.
+                continue
+            else:
+                tiprack_identifier = uri
+
         try:
             tip_lengths[LabwareUri(tiprack_identifier)] = v1.TipLengthModel(**data)
         except ValidationError:
