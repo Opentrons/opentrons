@@ -1,14 +1,11 @@
 """Protocol engine commands sub-state."""
 from __future__ import annotations
-from collections import OrderedDict
 from enum import Enum
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Optional, Union
+from typing import List, Optional, Union
 
 from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonException
-
-from opentrons.ordered_set import OrderedSet
 
 from opentrons.hardware_control.types import DoorState
 
@@ -38,6 +35,10 @@ from ..errors import (
 )
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
+from .command_structure import (
+    CommandEntry,
+    CommandStructure,
+)
 from .config import Config
 
 
@@ -88,32 +89,11 @@ class CurrentCommand:
     index: int
 
 
-@dataclass(frozen=True)
-class CommandEntry:
-    """An command entry in state, including its index in the list."""
-
-    command: Command
-    index: int
-
-
 @dataclass
 class CommandState:
     """State of all protocol engine command resources."""
 
-    all_command_ids: List[str]
-    """All command IDs, in insertion order."""
-
-    queued_command_ids: OrderedSet[str]
-    """The IDs of queued commands, in FIFO order"""
-
-    queued_setup_command_ids: OrderedSet[str]
-    """The IDs of queued setup commands, in FIFO order"""
-
-    running_command_id: Optional[str]
-    """The ID of the currently running command, if any"""
-
-    commands_by_id: Dict[str, CommandEntry]
-    """All command resources, in insertion order, mapped by their unique IDs."""
+    command_structure: CommandStructure
 
     queue_status: QueueStatus
     """Whether the engine is currently pulling new commands off the queue to execute.
@@ -152,6 +132,7 @@ class CommandState:
     are stored on the individual commands themselves.
     """
 
+    # TODO: Consider moving
     failed_command: Optional[CommandEntry]
     """The command, if any, that made the run fail and the index in the command list."""
 
@@ -182,14 +163,10 @@ class CommandStore(HasState[CommandState], HandlesActions):
         """Initialize a CommandStore and its state."""
         self._config = config
         self._state = CommandState(
+            command_structure=CommandStructure(),
             queue_status=QueueStatus.SETUP,
             is_door_blocking=is_door_open and config.block_on_door_open,
             run_result=None,
-            running_command_id=None,
-            all_command_ids=[],
-            queued_command_ids=OrderedSet(),
-            queued_setup_command_ids=OrderedSet(),
-            commands_by_id=OrderedDict(),
             run_error=None,
             finish_error=None,
             failed_command=None,
