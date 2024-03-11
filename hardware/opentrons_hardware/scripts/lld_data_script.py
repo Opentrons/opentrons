@@ -136,12 +136,11 @@ def running_avg(
             if no_plot:
                 # once we find it we don't need to keep going
                 break
-        if (average != impossible_pressure and prev_avg != impossible_pressure):
+        if average != impossible_pressure and prev_avg != impossible_pressure:
             running_avg_derivative = average - prev_avg
             running_time.append(time[i])
             running_derivative.append(running_avg_derivative)
             running_avg.append(average)
-
 
     time_array: numpy.ndarray[Any, numpy.dtype[numpy.float32]] = numpy.array(
         running_time
