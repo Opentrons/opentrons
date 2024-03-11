@@ -66,17 +66,23 @@ class RunsPublisher:
             self._run_data_manager_polling.set()
             self._poller.cancel()
 
-    def publish_runs(self, run_id: str, should_unsubscribe: bool = False) -> None:
+    def publish_runs_advise_refetch(self, run_id: str) -> None:
         """Publishes the equivalent of GET /runs and GET /runs/:runId.
 
         Args:
             run_id: ID of the current run.
-            should_unsubscribe: Whether the client should unsubscribe from the run_id topic.
         """
-        self._client.publish(topic=Topics.RUNS)
-        self._client.publish(
-            topic=f"{Topics.RUNS}/{run_id}", should_unsubscribe=should_unsubscribe
-        )
+        self._client.publish_advise_refetch(topic=Topics.RUNS)
+        self._client.publish_advise_refetch(topic=f"{Topics.RUNS}/{run_id}")
+
+    def publish_runs_advise_unsubscribe(self, run_id: str) -> None:
+        """Publishes the equivalent of GET /runs and GET /runs/:runId.
+
+        Args:
+            run_id: ID of the current run.
+        """
+        self._client.publish_advise_unsubscribe(topic=Topics.RUNS)
+        self._client.publish_advise_unsubscribe(topic=f"{Topics.RUNS}/{run_id}")
 
     async def _poll_engine_store(
         self,
@@ -108,8 +114,10 @@ class RunsPublisher:
                 await asyncio.sleep(1)
         except asyncio.CancelledError:
             self._clean_up_poller()
-            await self._publish_runs_async(run_id=run_id, should_unsubscribe=True)
-            await self._client.publish_async(topic=Topics.RUNS_CURRENT_COMMAND)
+            await self._publish_runs_advise_unsubscribe_async(run_id=run_id)
+            await self._client.publish_advise_refetch_async(
+                topic=Topics.RUNS_CURRENT_COMMAND
+            )
         except Exception as e:
             log.error(f"Error within run data manager poller: {e}")
 
@@ -117,22 +125,19 @@ class RunsPublisher:
         self,
     ) -> None:
         """Publishes the equivalent of GET /runs/:runId/commands?cursor=null&pageLength=1."""
-        await self._client.publish_async(topic=Topics.RUNS_CURRENT_COMMAND)
+        await self._client.publish_advise_refetch_async(
+            topic=Topics.RUNS_CURRENT_COMMAND
+        )
 
-    async def _publish_runs_async(
-        self, run_id: str, should_unsubscribe: bool = False
-    ) -> None:
+    async def _publish_runs_advise_unsubscribe_async(self, run_id: str) -> None:
         """Asynchronously publishes the equivalent of GET /runs and GET /runs/:runId.
 
         Args:
             run_id: ID of the current run.
-            should_unsubscribe: Whether the client should unsubscribe from the run_id topic.
         """
-        await self._client.publish_async(
-            topic=Topics.RUNS, should_unsubscribe=should_unsubscribe
-        )
-        await self._client.publish_async(
-            topic=f"{Topics.RUNS}/{run_id}", should_unsubscribe=should_unsubscribe
+        await self._client.publish_advise_unsubscribe_async(topic=Topics.RUNS)
+        await self._client.publish_advise_unsubscribe_async(
+            topic=f"{Topics.RUNS}/{run_id}"
         )
 
     def _clean_up_poller(self) -> None:

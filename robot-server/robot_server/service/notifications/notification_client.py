@@ -77,28 +77,32 @@ class NotificationClient:
         self.client.loop_stop()
         await to_thread.run_sync(self.client.disconnect)
 
-    async def publish_async(self, topic: str, should_unsubscribe: bool = False) -> None:
-        """Asynchronously Publish a message on a specific topic to the MQTT broker.
+    async def publish_advise_refetch_async(self, topic: str) -> None:
+        """Asynchronously publish a refetch message on a specific topic to the MQTT broker.
 
         Args:
             topic: The topic to publish the message on.
-            should_unsubscribe: Whether the client should unsubscribe from the topic.
-
         """
-        await to_thread.run_sync(self.publish, topic, should_unsubscribe)
+        await to_thread.run_sync(self.publish_advise_refetch, topic)
 
-    def publish(
+    async def publish_advise_unsubscribe_async(self, topic: str) -> None:
+        """Asynchronously publish an unsubscribe message on a specific topic to the MQTT broker.
+
+        Args:
+            topic: The topic to publish the message on.
+        """
+        await to_thread.run_sync(self.publish_advise_unsubscribe, topic)
+
+    def publish_advise_refetch(
         self,
         topic: str,
-        should_unsubscribe: bool = False,
     ) -> None:
-        """Publish a message on a specific topic to the MQTT broker.
+        """Publish a refetch message on a specific topic to the MQTT broker.
 
         Args:
             topic: The topic to publish the message on.
-            should_unsubscribe: Whether the client should unsubscribe from the topic.
         """
-        message = self._create_message(should_unsubscribe)
+        message = NotifyRefetchBody.construct()
         payload = message.json()
         self.client.publish(
             topic=topic,
@@ -107,16 +111,23 @@ class NotificationClient:
             retain=self._retain_message,
         )
 
-    def _create_message(
-        self, should_unsubscribe: bool
-    ) -> Union[NotifyRefetchBody, NotifyUnsubscribeBody]:
-        message: Union[NotifyRefetchBody, NotifyUnsubscribeBody]
-        message = (
-            NotifyUnsubscribeBody.construct()
-            if should_unsubscribe
-            else NotifyRefetchBody.construct()
+    def publish_advise_unsubscribe(
+        self,
+        topic: str,
+    ) -> None:
+        """Publish an unsubscribe message on a specific topic to the MQTT broker.
+
+        Args:
+            topic: The topic to publish the message on.
+        """
+        message = NotifyUnsubscribeBody.construct()
+        payload = message.json()
+        self.client.publish(
+            topic=topic,
+            payload=payload,
+            qos=self._default_qos,
+            retain=self._retain_message,
         )
-        return message
 
     def _on_connect(
         self,

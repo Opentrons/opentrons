@@ -129,7 +129,7 @@ class RunStore:
             action_rows = transaction.execute(select_actions).all()
 
         self._clear_caches()
-        self._runs_publisher.publish_runs(run_id=run_id)
+        self._runs_publisher.publish_runs_advise_refetch(run_id=run_id)
         return _convert_row_to_run(row=run_row, action_rows=action_rows)
 
     def insert_action(self, run_id: str, action: RunAction) -> None:
@@ -152,7 +152,7 @@ class RunStore:
             transaction.execute(insert)
 
         self._clear_caches()
-        self._runs_publisher.publish_runs(run_id=run_id)
+        self._runs_publisher.publish_runs_advise_refetch(run_id=run_id)
 
     def insert(
         self,
@@ -194,7 +194,7 @@ class RunStore:
                 raise ProtocolNotFoundError(protocol_id=run.protocol_id)
 
         self._clear_caches()
-        self._runs_publisher.publish_runs(run_id=run_id)
+        self._runs_publisher.publish_runs_advise_refetch(run_id=run_id)
         return run
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
@@ -411,7 +411,7 @@ class RunStore:
             raise RunNotFoundError(run_id)
 
         self._clear_caches()
-        self._runs_publisher.publish_runs(run_id=run_id, should_unsubscribe=True)
+        self._runs_publisher.publish_runs_advise_unsubscribe(run_id=run_id)
 
     def _run_exists(
         self, run_id: str, connection: sqlalchemy.engine.Connection
