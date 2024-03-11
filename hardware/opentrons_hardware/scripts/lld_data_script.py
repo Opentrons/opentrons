@@ -1,3 +1,4 @@
+"""Script that can process previous real world data to test lld processes."""
 import csv
 import os
 import argparse
@@ -7,12 +8,16 @@ import numpy
 
 
 impossible_pressure = 9001.0
+
+
 # ----present day threshold based----
 def tick_th(pressure: float) -> Tuple[bool, float]:
+    """Simulate firmware motor interrupt tick."""
     return (pressure < -150, pressure)
 
 
 def reset_th() -> None:
+    """Reset simulator between runs."""
     pass
 
 
@@ -23,11 +28,13 @@ derivative_threshold_smad = -2.5
 
 
 def reset_smad() -> None:
+    """Reset simulator between runs."""
     global running_samples_smad
     running_samples_smad = [impossible_pressure] * samples_n_smad
 
 
 def tick_smad(pressure: float) -> Tuple[bool, float]:
+    """Simulate firmware motor interrupt tick."""
     global running_samples_smad
     try:
         next_ind = running_samples_smad.index(impossible_pressure)
@@ -59,12 +66,14 @@ derivative_threshold_wmad = -2
 
 
 def reset_wmad() -> None:
+    """Reset simulator between runs."""
     global running_samples_wmad
     assert numpy.sum(weights_wmad) == 1
     running_samples_wmad = numpy.full(samples_n_wmad, impossible_pressure)
 
 
 def tick_wmad(pressure: float) -> Tuple[bool, float]:
+    """Simulate firmware motor interrupt tick."""
     global running_samples_wmad
     if numpy.isin(impossible_pressure, running_samples_wmad):
         next_ind = numpy.where(running_samples_wmad == impossible_pressure)[0][0]
@@ -91,11 +100,13 @@ derivative_threshold_emad = -2.5
 
 
 def reset_emad() -> None:
+    """Reset simulator between runs."""
     global current_average_emad
     current_average_emad = impossible_pressure
 
 
 def tick_emad(pressure: float) -> Tuple[bool, float]:
+    """Simulate firmware motor interrupt tick."""
     global current_average_emad
     if current_average_emad == impossible_pressure:
         current_average_emad = pressure
@@ -109,7 +120,7 @@ def tick_emad(pressure: float) -> Tuple[bool, float]:
         return (derivative < derivative_threshold_emad, current_average_emad)
 
 
-def running_avg(
+def _running_avg(
     time: List[float],
     pressure: List[float],
     z_travel: List[float],
@@ -172,7 +183,7 @@ def run(
     tick_func: Callable[[float], Tuple[bool, float]],
     name: str,
 ) -> None:
-
+    """Run the test with a given algorithm on all the data."""
     path = args.filepath + "/"
     report_files = [
         file for file in os.listdir(args.filepath) if file == "final_report.csv"
@@ -212,7 +223,7 @@ def run(
                 z_travel.append(float(current_z_pos))
                 p_travel.append(float(current_p_pos))
 
-            threshold_data = running_avg(
+            threshold_data = _running_avg(
                 time,
                 pressure,
                 z_travel,
@@ -223,9 +234,9 @@ def run(
                 f"{name} trial: {trial+1}",
             )
             if threshold_data:
-                threshold_time = threshold_data[0]
+                # threshold_time = threshold_data[0]
                 threshold_z_pos = threshold_data[1]
-                threshold_p_pos = threshold_data[2]
+                # threshold_p_pos = threshold_data[2]
                 # print(
                 #    f"Threshold found at:\n\ttime: {threshold_time}\n\tz distance: {threshold_z_pos}\n\tp distance: {threshold_p_pos}"
                 # )
@@ -242,7 +253,6 @@ def run(
 
 def main() -> None:
     """Main function."""
-
     # data starts at row 59 + number of trials
 
     parser = argparse.ArgumentParser()
