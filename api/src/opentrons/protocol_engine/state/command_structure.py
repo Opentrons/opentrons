@@ -140,14 +140,10 @@ class CommandStructure:
 
         self._failed_command = self._commands_by_id[command_id]
         if prev_entry.command.intent == CommandIntent.SETUP:
-            other_command_ids_to_fail = [
-                *[i for i in self._queued_setup_command_ids],
-            ]
+            other_command_ids_to_fail = self._queued_setup_command_ids
             self._queued_setup_command_ids.clear()
         else:
-            other_command_ids_to_fail = [
-                *[i for i in self._queued_command_ids],
-            ]
+            other_command_ids_to_fail = self._queued_command_ids
             self._queued_command_ids.clear()
 
         for command_id in other_command_ids_to_fail:
