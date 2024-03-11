@@ -266,7 +266,7 @@ describe('Create a Tip Rack', () => {
     cy.get('input[name="pipetteName"]')
       .invoke('attr', 'value', 'p20_single_gen2')
       .should('have.attr', 'value', 'p20_single_gen2')
-    cy.get('*[class^="Dropdown__option"]')
+    cy.get('*[class^="_option_label"]')
       .contains(/P20.*Single-Channel.*GEN2/)
       .click()
     cy.get('#DefinitionTest a').contains('tip rack test guide').click()

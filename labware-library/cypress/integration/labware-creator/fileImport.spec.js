@@ -14,7 +14,7 @@ context('File Import', () => {
   it('drags in a file', () => {
     cy.fixture(importedLabwareFile, 'utf8').then(fileJson => {
       const fileContent = JSON.stringify(fileJson)
-      cy.get('[class*="_file_drop__"]').upload(
+      cy.get('[class*="file_drop"]').first().upload(
         {
           fileContent,
           fileName: importedLabwareFile,

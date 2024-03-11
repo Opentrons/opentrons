@@ -223,9 +223,7 @@ context('Tubes and Block', () => {
           .children()
           .first()
           .trigger('mousedown')
-        cy.get('*[class^="_option_label"]')
-          .contains('PCR Tube Strip')
-          .click()
+        cy.get('*[class^="_option_label"]').contains('PCR Tube Strip').click()
 
         cy.contains('start creating labware').click({ force: true })
       })
@@ -412,9 +410,7 @@ context('Tubes and Block', () => {
           .children()
           .first()
           .trigger('mousedown')
-        cy.get('*[class^="_option_label"]')
-          .contains('PCR Plate')
-          .click()
+        cy.get('*[class^="_option_label"]').contains('PCR Plate').click()
 
         cy.contains('start creating labware').click({ force: true })
       })

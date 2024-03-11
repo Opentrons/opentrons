@@ -24,9 +24,7 @@ context('Tubes and Rack', () => {
         .children()
         .first()
         .trigger('mousedown')
-      cy.get('*[class^="_option_label"]')
-        .contains('Tubes + Tube Rack')
-        .click()
+      cy.get('*[class^="_option_label"]').contains('Tubes + Tube Rack').click()
 
       // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
       cy.get('label')

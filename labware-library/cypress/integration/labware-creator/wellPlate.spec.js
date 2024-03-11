@@ -21,9 +21,7 @@ context('Well Plates', () => {
         .children()
         .first()
         .trigger('mousedown')
-      cy.get('*[class^="_option_label"]')
-        .contains('Well Plate')
-        .click()
+      cy.get('*[class^="_option_label"]').contains('Well Plate').click()
       cy.get('button').contains('start creating labware').click({ force: true })
     })
 
