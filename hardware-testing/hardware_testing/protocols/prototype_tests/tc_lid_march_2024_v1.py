@@ -1,4 +1,8 @@
-from opentrons.protocol_api import ProtocolContext
+from typing import List
+
+from opentrons.protocol_api import ProtocolContext, Labware
+
+# NOTE: branch used for previous testing >>> `thermocycler_lid_testing_for_hardware`
 
 metadata = {"protocolName": "tc-lid-march-2024-v1"}
 requirements = {"robotType": "Flex", "apiLevel": "2.16"}
@@ -20,6 +24,13 @@ Protocol is now complete
  - Include the current offset in the PAUSE messages, so we can then record the failing offset
 """
 
+ADAPTERS_DEFINITION = "tc_lid_march_2024_v1"
+ADAPTERS_STARTING_SLOT = "D2"
+ADAPTERS_COUNT = 5
+
 
 def run(protocol: ProtocolContext):
-    pass
+    adapters: List[Labware] = []
+    for i in range(ADAPTERS_COUNT):
+        parent = adapters[-1] if adapters else protocol
+        adapters.append(parent.load_adapter(ADAPTERS_DEFINITION))  # FIXME: how to load an adapter on-top of adapter?

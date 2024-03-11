@@ -1,0 +1,73 @@
+{
+  "ordering": [],
+  "brand": {
+    "brand": "Opentrons",
+    "brandId": []
+  },
+  "metadata": {
+    "displayName": "Opentrons Thermocycler Lid",
+    "displayCategory": "adapter",
+    "displayVolumeUnits": "\u00b5L",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 127.5,
+    "yDimension": 85.5,
+    "zDimension": 12.8
+  },
+  "wells": {},
+  "groups": [
+    {
+      "metadata": {},
+      "wells": []
+    }
+  ],
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "parameters": {
+    "format": "96Standard",
+    "quirks": [],
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "tc_lid_march_2024_v1"
+  },
+  "namespace": "custom_beta",
+  "version": 1,
+  "schemaVersion": 2,
+  "stackingOffsetWithLabware": {
+    "custom_thermocycler_lid": {
+      "x": 0,
+      "y": 0,
+      "z": 2.99
+    },
+    "armadillo_96_wellplate_200ul_pcr_full_skirt": {
+      "x": 0,
+      "y": 0,
+      "z": 10.45
+    },
+    "opentrons_96_wellplate_200ul_pcr_full_skirt": {
+      "x": 0,
+      "y": 0,
+      "z": 10.45
+    }
+  },
+  "gripForce": 15,
+  "gripHeightFromLabwareBottom": 6.905,
+  "gripperOffsets": {
+    "default": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    }
+  }
+}
