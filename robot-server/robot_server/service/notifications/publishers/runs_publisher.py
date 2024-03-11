@@ -1,5 +1,6 @@
 from fastapi import Depends
 import asyncio
+import logging
 from typing import Union, Callable, Optional
 
 from opentrons.protocol_engine import CurrentCommand, StateSummary, EngineStatus
@@ -11,6 +12,9 @@ from server_utils.fastapi_utils.app_state import (
 )
 from ..notification_client import NotificationClient, get_notification_client
 from ..topics import Topics
+
+
+log: logging.Logger = logging.getLogger(__name__)
 
 
 class RunsPublisher:
@@ -106,6 +110,8 @@ class RunsPublisher:
             self._clean_up_poller()
             await self._publish_runs_async(run_id=run_id, should_unsubscribe=True)
             await self._client.publish_async(topic=Topics.RUNS_CURRENT_COMMAND)
+        except Exception as e:
+            log.error(f"Error within run data manager poller: {e}")
 
     async def _publish_current_command(
         self,
