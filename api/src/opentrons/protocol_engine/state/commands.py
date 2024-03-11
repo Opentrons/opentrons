@@ -468,12 +468,18 @@ class CommandView(HasState[CommandState]):
             if running_command_id is not None:
                 cursor = commands_by_id[running_command_id].index
             elif len(queued_command_ids) > 0:
+                # Get the most recently executed command,
+                # which we can find just before the first queued command.
                 cursor = commands_by_id[queued_command_ids.head()].index - 1
             elif (
                 self._state.run_result
                 and self._state.run_result == RunResult.FAILED
                 and self._state.failed_command
             ):
+                # Currently, if the run fails, we mark all the commands we didn't
+                # reach as failed. This makes command status alone insufficient to
+                # find the most recent command that actually executed, so we need to
+                # store that separately.
                 cursor = self._state.failed_command.index
             else:
                 cursor = total_length - length
