@@ -5,7 +5,10 @@ from opentrons.protocol_api import ProtocolContext, Labware
 # NOTE: branch used for previous testing >>> `thermocycler_lid_testing_for_hardware`
 
 metadata = {"protocolName": "tc-lid-march-2024-v1"}
-requirements = {"robotType": "Flex", "apiLevel": "2.16"}  # TODO: confirm which version to use
+requirements = {
+    "robotType": "Flex",
+    "apiLevel": "2.16",
+}  # TODO: confirm which version to use
 
 
 """
@@ -32,11 +35,11 @@ USING_THERMOCYCLER = True
 
 
 def _move_labware_with_offset_and_pause(
-        protocol: ProtocolContext,
-        labware: Labware,
-        destination: Any,
-        pick_up_offset: Optional[Dict[str, float]] = None,
-        drop_offset: Optional[Dict[str, float]] = None
+    protocol: ProtocolContext,
+    labware: Labware,
+    destination: Any,
+    pick_up_offset: Optional[Dict[str, float]] = None,
+    drop_offset: Optional[Dict[str, float]] = None,
 ) -> None:
     protocol.move_labware(
         labware,
@@ -45,12 +48,14 @@ def _move_labware_with_offset_and_pause(
         pick_up_offset=pick_up_offset,
         drop_offset=drop_offset,
     )
-    protocol.pause(f'Pick(x={round(pick_up_offset["x"], 1)},'
-                   f'y={round(pick_up_offset["y"], 1)},'
-                   f'z={round(pick_up_offset["z"], 1)}) | '
-                   f'Drop(x={round(drop_offset["x"], 1)},'
-                   f'y={round(drop_offset["y"], 1)},'
-                   f'z={round(drop_offset["z"], 1)})')
+    protocol.pause(
+        f'Pick(x={round(pick_up_offset["x"], 1)},'
+        f'y={round(pick_up_offset["y"], 1)},'
+        f'z={round(pick_up_offset["z"], 1)}) | '
+        f'Drop(x={round(drop_offset["x"], 1)},'
+        f'y={round(drop_offset["y"], 1)},'
+        f'z={round(drop_offset["z"], 1)})'
+    )
 
 
 def run(protocol: ProtocolContext):
@@ -63,7 +68,9 @@ def run(protocol: ProtocolContext):
         # TODO: confirm if we need to load 96-well adapter onto Thermocycler
         thermocycler = protocol.load_module("thermocyclerModuleV2")
         thermocycler.open_lid()
-        plate_in_cycler = thermocycler.load_labware("armadillo_96_wellplate_200ul_pcr_full_skirt")
+        plate_in_cycler = thermocycler.load_labware(
+            "armadillo_96_wellplate_200ul_pcr_full_skirt"
+        )
     else:
         plate_in_cycler = None
 
