@@ -14,6 +14,7 @@ from typing import (
     Tuple,
     Union,
     Literal,
+    List,
 )
 
 from pydantic import BaseModel, Field
@@ -173,6 +174,13 @@ class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
             " If not specified or `protocol`, it is part of the protocol itself."
             " If `setup`, it was added as part of setup; for example,"
             " a command that is part of a calibration procedure."
+        ),
+    )
+    notes: Optional[List[CommandNote]] = Field(
+        None,
+        description=(
+            "Information not critical to the execution of the command derived from either"
+            " the command's execution or the command's generation."
         ),
     )
 

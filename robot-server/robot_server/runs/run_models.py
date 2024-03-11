@@ -16,6 +16,7 @@ from opentrons.protocol_engine import (
     LabwareOffset,
     LabwareOffsetCreate,
     Liquid,
+    CommandNote,
 )
 from opentrons_shared_data.errors import GeneralError
 from robot_server.service.json_api import ResourceModel
@@ -55,6 +56,10 @@ class RunCommandSummary(ResourceModel):
     intent: Optional[CommandIntent] = Field(
         None,
         description="Why this command was added to the run.",
+    )
+    notes: Optional[List[CommandNote]] = Field(
+        None,
+        description="Notes pertaining to this command.",
     )
 
 
