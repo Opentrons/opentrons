@@ -30,6 +30,7 @@ beforeEach(() => {
     id: 'leftPipetteId',
     spec: fixtureP10SingleV2Specs,
     tiprackLabwareDef: [fixture_tiprack_10_ul],
+    tiprackDefURI: ['defaultTipRack'],
   }
   const labwareOnMagModule = {
     id: 'labwareOnMagModule',

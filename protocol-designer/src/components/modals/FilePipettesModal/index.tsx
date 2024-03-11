@@ -177,7 +177,6 @@ const makeUpdatePipettes = (
       id: string
     }
   } = {}
-  console.log('newPipetteArray', newPipetteArray)
   // from array of pipettes from Edit Pipette form (with no IDs),
   // assign IDs and populate nextPipettes
   newPipetteArray.forEach((newPipette: PipetteFieldsData) => {
@@ -198,8 +197,6 @@ const makeUpdatePipettes = (
       }
     }
   })
-
-  console.log('next pipettes', nextPipettes)
 
   dispatch(
     stepFormActions.createPipettes(
@@ -356,7 +353,6 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
   }
 
   const handleFormSubmit: (values: FormState) => void = values => {
-    console.log('hit here')
     if (!showEditPipetteConfirmation) {
       setShowEditPipetteConfirmation(true)
     }
@@ -415,7 +411,6 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
       // if both are present, move the Mag mod to slot 9, since both can't be in slot 1
       modules[magModIndex].slot = '9'
     }
-    console.log('pipettes from handle click', pipettes)
     onSave({ newProtocolFields, modules, pipettes })
   }
 
@@ -444,8 +439,6 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
     defaultValues: getInitialValues(),
     resolver: yupResolver(validationSchema),
   })
-  console.log('formState.errors', formState.errors)
-  console.log('validationSchema', validationSchema)
   const pipettesByMount = watch('pipettesByMount')
   const { modulesByType } = getValues()
 

@@ -253,9 +253,10 @@ export const getTiprackOptions: Selector<Options> = createSelector(
         labwareId: string
       ): Options => {
         const labwareDefURI = labwareEntity.labwareDefURI
-        const labwareDefURIs = acc.map(option => option.value.split(':')[1])
+        const optionValues = acc.map(option => option.value)
+
         if (
-          labwareDefURIs.includes(labwareDefURI) ||
+          optionValues.includes(labwareDefURI) ||
           !getIsTiprack(labwareEntity.def)
         ) {
           return acc

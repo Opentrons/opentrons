@@ -10,13 +10,6 @@ import type { FieldProps } from '../types'
 export const TiprackField = (props: FieldProps): JSX.Element => {
   const { t } = useTranslation('form')
   const options = useSelector(uiLabwareSelectors.getTiprackOptions)
-  const defaultValue = options[0].value
-
-  React.useEffect(() => {
-    if (props.value == null) {
-      props.updateValue(defaultValue)
-    }
-  }, [props.value, props.updateValue])
 
   return (
     <FormGroup
@@ -26,7 +19,7 @@ export const TiprackField = (props: FieldProps): JSX.Element => {
       <DropdownField
         options={options}
         name={props.name}
-        value={String(props.value) != null ? String(props.value) : defaultValue}
+        value={String(props.value) != null ? String(props.value) : null}
         onBlur={props.onFieldBlur}
         onFocus={props.onFieldFocus}
         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
