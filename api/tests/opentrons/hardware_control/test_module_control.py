@@ -1,7 +1,7 @@
 """Tests for opentrons.hardware_control.module_control."""
 import pytest
 from decoy import Decoy, matchers
-from typing import Awaitable, Callable, cast, Union
+from typing import Awaitable, Callable, cast, Union, List
 
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.rpi_drivers.interfaces import USBDriverInterface
@@ -62,8 +62,14 @@ def subject(
 @pytest.mark.parametrize(
     "module_at_port_input",
     [
-        (ModuleAtPort(port="/dev/foo", name="bar")),
-        SimulatingModuleAtPort(port="/dev/foo", name="bar", serial_number="test-123"),
+        ([ModuleAtPort(port="/dev/foo", name="bar")]),
+        (
+            [
+                SimulatingModuleAtPort(
+                    port="/dev/foo", name="bar", serial_number="test-123"
+                )
+            ]
+        ),
     ],
 )
 async def test_register_modules(
@@ -72,10 +78,9 @@ async def test_register_modules(
     build_module: Callable[..., Awaitable[AbstractModule]],
     hardware_api: HardwareAPI,
     subject: AttachedModulesControl,
-    module_at_port_input: Union[ModuleAtPort, SimulatingModuleAtPort],
+    module_at_port_input: Union[List[ModuleAtPort], List[SimulatingModuleAtPort]],
 ) -> None:
     """It should register attached modules."""
-    new_mods_at_ports = [module_at_port_input]
     actual_ports = [
         ModuleAtPort(
             port="/dev/foo",
@@ -87,16 +92,19 @@ async def test_register_modules(
     module = decoy.mock(cls=AbstractModule)
     decoy.when(module.usb_port).then_return(USBPort(name="baz", port_number=0))
 
-    decoy.when(usb_bus.match_virtual_ports(new_mods_at_ports)).then_return(actual_ports)
+    decoy.when(usb_bus.match_virtual_ports(module_at_port_input)).then_return(
+        actual_ports
+    )
     decoy.when(
         await build_module(
             port="/dev/foo",
             usb_port=USBPort(name="baz", port_number=0),
             type=ModuleType.TEMPERATURE,
+            serial_number=None,
         )
     ).then_return(module)
 
-    await subject.register_modules(new_mods_at_ports=new_mods_at_ports)
+    await subject.register_modules(new_mods_at_ports=module_at_port_input)
     result = subject.available_modules
 
     assert result == [module]
@@ -142,6 +150,7 @@ async def test_register_modules_sort(
                 usb_port=mod.usb_port,
                 port=matchers.Anything(),
                 type=matchers.Anything(),
+                serial_number=None,
             )
         ).then_return(mod)
 

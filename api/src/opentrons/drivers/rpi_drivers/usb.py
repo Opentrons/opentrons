@@ -92,7 +92,7 @@ class USBBus(USBDriverInterface):
         the physical usb port information.
         The virtual port path looks something like:
         dev/ot_module_[MODULE NAME]
-        :param virtual_ports: A list of ModuleAtPort objects
+        :param virtual_ports: A list of ModuleAtPort or SimulatingModuleAtPort objects
         that hold the name and virtual port of each module
         connected to the robot.
 
