@@ -16,6 +16,8 @@ from ..topics import Topics
 
 log: logging.Logger = logging.getLogger(__name__)
 
+POLL_INTERVAL = 1
+
 
 class RunsPublisher:
     """Publishes protocol runs topics."""
@@ -111,7 +113,7 @@ class RunsPublisher:
                 if self._previous_state_summary_status != current_state_summary_status:
                     await self._publish_runs_async(run_id=run_id)
                     self._previous_state_summary_status = current_state_summary_status
-                await asyncio.sleep(1)
+                await asyncio.sleep(POLL_INTERVAL)
         except asyncio.CancelledError:
             self._clean_up_poller()
             await self._publish_runs_advise_unsubscribe_async(run_id=run_id)
