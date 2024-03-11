@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional
 
 from opentrons.ordered_set import OrderedSet
+from opentrons.protocol_engine.commands.command import CommandIntent
 from opentrons.protocol_engine.commands.command_unions import Command
 
 
@@ -37,3 +38,23 @@ class CommandStructure:
         self._queued_command_ids = OrderedSet()
         self._queued_setup_command_ids = OrderedSet()
         self._commands_by_id = OrderedDict()
+
+    def has(self, command_id: str) -> bool:
+        return command_id in self._all_command_ids
+
+    def get_if_present(self, command_id: str) -> Optional[Command]:
+        entry = self._commands_by_id.get(command_id)
+        return None if entry is None else entry.command
+
+    def add(self, queued_command: Command) -> None:
+        next_index = len(self._all_command_ids)
+        self._all_command_ids.append(queued_command.id)
+        self._commands_by_id[queued_command.id] = CommandEntry(
+            index=next_index,
+            command=queued_command,
+        )
+
+        if queued_command.intent == CommandIntent.SETUP:
+            self._queued_setup_command_ids.add(queued_command.id)
+        else:
+            self._queued_command_ids.add(queued_command.id)

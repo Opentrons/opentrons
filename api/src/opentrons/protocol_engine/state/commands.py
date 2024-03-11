@@ -179,7 +179,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
     def handle_action(self, action: Action) -> None:  # noqa: C901
         """Modify state in reaction to an action."""
         if isinstance(action, QueueCommandAction):
-            assert action.command_id not in self._state.commands_by_id
+            assert not self._state.command_structure.has(action.command_id)
 
             # TODO(mc, 2021-06-22): mypy has trouble with this automatic
             # request > command mapping, figure out how to type precisely
@@ -198,17 +198,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 status=CommandStatus.QUEUED,
             )
 
-            next_index = len(self._state.all_command_ids)
-            self._state.all_command_ids.append(action.command_id)
-            self._state.commands_by_id[queued_command.id] = CommandEntry(
-                index=next_index,
-                command=queued_command,
-            )
-
-            if action.request.intent == CommandIntent.SETUP:
-                self._state.queued_setup_command_ids.add(queued_command.id)
-            else:
-                self._state.queued_command_ids.add(queued_command.id)
+            self._state.command_structure.add(queued_command)
 
             if action.request_hash is not None:
                 self._state.latest_command_hash = action.request_hash
