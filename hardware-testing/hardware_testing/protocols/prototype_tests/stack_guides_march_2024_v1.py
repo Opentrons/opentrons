@@ -21,13 +21,20 @@ Run:
      - PAUSE, wait for tester to press continue
 """
 
-TIPS_DEFINITION = "opentrons_flex_96_tiprack_1000ul_stacking_v1"
-# TIPS_DEFINITION = "opentrons_flex_96_tiprack_200ul_stacking_v1"
-# TIPS_DEFINITION = "opentrons_flex_96_tiprack_50ul_stacking_v1"
 TIPS_DECK_SLOTS = ["C2", "C3"]
 GUIDES_SLOT = "C4"
+TIPS_DEFINITION = "opentrons_flex_96_tiprack_1000ul_stacking_v1"
 
 START_UNSTACKED = True
+
+OFFSET_DECK = {
+    "pick-up": {"x": 0, "y": 0, "z": 0},
+    "drop": {"x": 0, "y": 0, "z": 0},
+}
+OFFSET_GUIDES = {
+    "pick-up": {"x": 0, "y": 0, "z": 0},
+    "drop": {"x": 0, "y": 0, "z": 0},
+}
 
 
 def _move_labware_with_offset_and_pause(
@@ -75,8 +82,8 @@ def run(protocol: ProtocolContext):
                 protocol,
                 rack,
                 prev_rack if prev_rack else GUIDES_SLOT,
-                pick_up_offset={"x": 0, "y": 0, "z": 0},  # PICK-UP from DECK
-                drop_offset={"x": 0, "y": 0, "z": 0},  # DROP-OFF in GUIDES
+                pick_up_offset=OFFSET_DECK["pick-up"],
+                drop_offset=OFFSET_GUIDES["drop"],
             )
             prev_rack = rack
     # remove from stack in reverse order
@@ -87,6 +94,6 @@ def run(protocol: ProtocolContext):
             protocol,
             rack,
             destination,
-            pick_up_offset={"x": 0, "y": 0, "z": 0},  # PICK-UP from GUIDES
-            drop_offset={"x": 0, "y": 0, "z": 0},  # DROP-OFF in DECK
+            pick_up_offset=OFFSET_GUIDES["pick-up"],
+            drop_offset=OFFSET_DECK["drop"],
         )

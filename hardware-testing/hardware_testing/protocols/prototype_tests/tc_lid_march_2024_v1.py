@@ -2,13 +2,8 @@ from typing import List, Dict, Any, Optional
 
 from opentrons.protocol_api import ProtocolContext, Labware
 
-# NOTE: branch used for previous testing >>> `thermocycler_lid_testing_for_hardware`
-
 metadata = {"protocolName": "tc-lid-march-2024-v1"}
-requirements = {
-    "robotType": "Flex",
-    "apiLevel": "2.16",
-}  # TODO: confirm which version to use
+requirements = {"robotType": "Flex", "apiLevel": "2.16"}
 
 
 """
@@ -26,12 +21,21 @@ Run:
      - PAUSE, wait for tester to press continue
 """
 
-LID_DEFINITION = "tc_lid_march_2024_v1"
 LID_STARTING_SLOT = "D2"
 LID_ENDING_SLOT = "C2"
 LID_COUNT = 5
+LID_DEFINITION = "tc_lid_march_2024_v1"
 
 USING_THERMOCYCLER = True
+
+OFFSET_DECK = {
+    "pick-up": {"x": 0, "y": 0, "z": 0},
+    "drop": {"x": 0, "y": 0, "z": 0},
+}
+OFFSET_THERMOCYCLER = {
+    "pick-up": {"x": 0, "y": 0, "z": 0},
+    "drop": {"x": 0, "y": 0, "z": 0},
+}
 
 
 def _move_labware_with_offset_and_pause(
@@ -82,14 +86,22 @@ def run(protocol: ProtocolContext):
                 protocol,
                 lid,
                 plate_in_cycler,
-                pick_up_offset={"x": 0, "y": 0, "z": 0},  # PICK-UP from STACK
-                drop_offset={"x": 0, "y": 0, "z": 0},  # DROP-OFF in THERMOCYCLER
+                pick_up_offset=OFFSET_DECK["pick-up"],
+                drop_offset=OFFSET_THERMOCYCLER["drop"],
             )
-        _move_labware_with_offset_and_pause(
-            protocol,
-            lid,
-            prev_moved_lid if prev_moved_lid else LID_ENDING_SLOT,
-            pick_up_offset={"x": 0, "y": 0, "z": 0},  # PICK-UP from THERMOCYCLER
-            drop_offset={"x": 0, "y": 0, "z": 0},  # DROP-OFF in DECK-SLOT
-        )
+            _move_labware_with_offset_and_pause(
+                protocol,
+                lid,
+                prev_moved_lid if prev_moved_lid else LID_ENDING_SLOT,
+                pick_up_offset=OFFSET_THERMOCYCLER["pick-up"],
+                drop_offset=OFFSET_DECK["drop"],
+            )
+        else:
+            _move_labware_with_offset_and_pause(
+                protocol,
+                lid,
+                prev_moved_lid if prev_moved_lid else LID_ENDING_SLOT,
+                pick_up_offset=OFFSET_DECK["pick-up"],
+                drop_offset=OFFSET_DECK["drop"],
+            )
         prev_moved_lid = lid
