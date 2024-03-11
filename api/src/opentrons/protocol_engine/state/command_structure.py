@@ -83,6 +83,9 @@ class CommandStructure:
     def get_queued_command_ids(self) -> OrderedSet[str]:
         return self._queued_command_ids
 
+    def get_queued_setup_command_ids(self) -> OrderedSet[str]:
+        return self._queued_setup_command_ids
+
     def add_queued(self, queued_command: Command) -> None:
         assert queued_command.status == CommandStatus.QUEUED
         assert not self.has(queued_command.id)

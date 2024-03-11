@@ -165,7 +165,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
             run_result=None,
             run_error=None,
             finish_error=None,
-            failed_command=None,
             run_completed_at=None,
             run_started_at=None,
             latest_command_hash=None,
@@ -473,13 +472,15 @@ class CommandView(HasState[CommandState]):
             raise RunStoppedError("Engine was stopped")
 
         # if there is a setup command queued, prioritize it
-        next_setup_cmd = self._state.queued_setup_command_ids.head(None)
+        next_setup_cmd = self._state.command_structure.get_queued_command_ids().head(
+            None
+        )
         if self._state.queue_status != QueueStatus.PAUSED and next_setup_cmd:
             return next_setup_cmd
 
         # if the queue is running, return the next protocol command
         if self._state.queue_status == QueueStatus.RUNNING:
-            return self._state.queued_command_ids.head(None)
+            return self._state.command_structure.get_queued_command_ids().head(None)
 
         # otherwise we've got nothing to do
         return None
@@ -490,8 +491,8 @@ class CommandView(HasState[CommandState]):
             return True
         elif (
             self.get_status() == EngineStatus.IDLE
-            and self._state.running_command_id is None
-            and len(self._state.queued_setup_command_ids) == 0
+            and self._state.command_structure.get_running_command() is None
+            and len(self._state.command_structure.get_queued_setup_command_ids()) == 0
         ):
             return True
         else:
@@ -539,15 +540,14 @@ class CommandView(HasState[CommandState]):
             CommandExecutionFailedError: if any added command failed, and its `intent` wasn't
             `setup`.
         """
-        no_command_running = self._state.running_command_id is None
+        no_command_running = self._state.command_structure.get_running_command() is None
         no_command_to_execute = (
             self._state.run_result is not None
-            or len(self._state.queued_command_ids) == 0
+            or len(self._state.command_structure.get_queued_command_ids()) == 0
         )
 
         if no_command_running and no_command_to_execute:
-            for command_id in self._state.all_command_ids:
-                command = self._state.commands_by_id[command_id].command
+            for command in self._state.command_structure.get_all():
                 if command.error and command.intent != CommandIntent.SETUP:
                     # TODO(tz, 7-11-23): avoid raising an error and return the status instead
                     raise ProtocolCommandFailedError(
