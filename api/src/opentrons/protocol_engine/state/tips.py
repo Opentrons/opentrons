@@ -1,7 +1,7 @@
 """Tip state tracking."""
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, Union
 
 from .abstract_store import HasState, HandlesActions
 from ..actions import (
@@ -205,7 +205,7 @@ class TipView(HasState[TipState]):
                     else:
                         return None
                 elif entry_well == "A12" or entry_well == "H12":
-                    if critical_column + i <= len(columns):
+                    if critical_column + i < len(columns):
                         column = columns[critical_column + i]
                     else:
                         return None
@@ -220,7 +220,7 @@ class TipView(HasState[TipState]):
                         else:
                             return None
                     elif entry_well == "H1" or entry_well == "H12":
-                        if critical_row + j <= len(column):
+                        if critical_row + j < len(column):
                             well = column[critical_row + j]
                         else:
                             return None
@@ -233,7 +233,7 @@ class TipView(HasState[TipState]):
 
         def _validate_tip_cluster(
             active_columns: int, active_rows: int, tip_cluster: List[str]
-        ) -> Optional[str]:
+        ) -> Union[str, int, None]:
             if not any(wells[well] == TipRackWellState.USED for well in tip_cluster):
                 return tip_cluster[0]
             elif all(wells[well] == TipRackWellState.USED for well in tip_cluster):
@@ -261,9 +261,8 @@ class TipView(HasState[TipState]):
                 ):
                     return None
                 else:
-                    raise KeyError(
-                        f"Tiprack {labware_id} has no valid tip selection for current Nozzle Configuration."
-                    )
+                    # Tiprack has no valid tip selection, cannot progress
+                    return -1
 
         # Search through the tiprack beginning at A1
         def _cluster_search_A1(active_columns: int, active_rows: int) -> Optional[str]:
@@ -280,6 +279,8 @@ class TipView(HasState[TipState]):
                     )
                     if isinstance(result, str):
                         return result
+                    elif isinstance(result, int) and result == -1:
+                        return None
                 if critical_row + active_rows < len(columns[0]):
                     critical_row = critical_row + active_rows
                 else:
@@ -302,6 +303,8 @@ class TipView(HasState[TipState]):
                     )
                     if isinstance(result, str):
                         return result
+                    elif isinstance(result, int) and result == -1:
+                        return None
                 if critical_row + active_rows < len(columns[0]):
                     critical_row = critical_row + active_rows
                 else:
@@ -324,7 +327,9 @@ class TipView(HasState[TipState]):
                     )
                     if isinstance(result, str):
                         return result
-                if critical_row - active_rows > 0:
+                    elif isinstance(result, int) and result == -1:
+                        return None
+                if critical_row - active_rows >= 0:
                     critical_row = critical_row - active_rows
                 else:
                     critical_column = critical_column + 1
@@ -346,7 +351,9 @@ class TipView(HasState[TipState]):
                     )
                     if isinstance(result, str):
                         return result
-                if critical_row - active_rows > 0:
+                    elif isinstance(result, int) and result == -1:
+                        return None
+                if critical_row - active_rows >= 0:
                     critical_row = critical_row - active_rows
                 else:
                     critical_column = critical_column - 1
