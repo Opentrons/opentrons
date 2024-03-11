@@ -196,7 +196,6 @@ export const getPipetteSpecsV2 = (
   )
 
   const liquidTypes: string[] = []
-  //  liquidMatchingJsons retuns liquid (default, lowVolume) jsons in a record
   const liquidMatchingJsons: {
     liquids: Record<string, PipetteV2LiquidSpecs>
   } = { liquids: {} }
