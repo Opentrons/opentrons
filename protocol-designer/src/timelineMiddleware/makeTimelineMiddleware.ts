@@ -102,7 +102,6 @@ export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
       if (prevTimelineArgs !== null && prevSubstepsArgs !== null) {
         const timelineArgs: GenerateRobotStateTimelineArgs = prevTimelineArgs
         const substepsArgs: SubstepsArgsNoTimeline = prevSubstepsArgs
-        console.log('about to post worker message')
         worker.postMessage({
           needsTimeline: true,
           timelineArgs,
