@@ -37,20 +37,34 @@ except Exception:
 log = logging.getLogger(ROBOT_NAME)
 
 
-async def _turn_off_hepa_uv(api: OT3API) -> None:
-    """Set and Make sure that the Hepa fan and UV light are off."""
-    log.info("Turning off Hepa Fan and UV Light.")
-    await api.set_hepa_uv_state(turn_on=False)
-    await api.set_hepa_fan_state(turn_on=False)
-
-    # Confirm that they are off
-    hepa_uv_state: Optional[HepaUVState] = await api.get_hepa_uv_state()
-    if hepa_uv_state:
-        assert not hepa_uv_state.light_on, "Hepa UV did not turn OFF!"
+async def _turn_off_fan(api: OT3API) -> None:
+    """Turn off fan if on."""
+    hepa_fan_state: Optional[HepaFanState] = await api.get_hepa_fan_state()
+    if hepa_fan_state or hepa_fan_state.fan_on:
+        log.info("Turning off Hepa Fan.")
+        await api.set_hepa_fan_state(turn_on=False)
 
     hepa_fan_state: Optional[HepaFanState] = await api.get_hepa_fan_state()
     if hepa_fan_state:
         assert not hepa_fan_state.fan_on, "Hepa Fan did not turn OFF!"
+
+
+async def _turn_off_uv(api: OT3API) -> None:
+    """Turn off UV if on."""
+    hepa_uv_state: Optional[HepaUVState] = await api.get_hepa_uv_state()
+    if not hepa_uv_state or hepa_uv_state.light_on:
+        log.info("Turning off Hepa UV Light.")
+        await api.set_hepa_uv_state(turn_on=False)
+
+    hepa_uv_state: Optional[HepaUVState] = await api.get_hepa_uv_state()
+    if hepa_uv_state:
+        assert not hepa_uv_state.light_on, "Hepa UV did not turn OFF!"
+
+
+async def _turn_off_hepa_uv(api: OT3API) -> None:
+    """Set and Make sure that the Hepa fan and UV light are off."""
+    await _turn_off_uv(api)
+    await _turn_off_fan(api)
 
 
 async def run_hepa_fan(
@@ -59,7 +73,9 @@ async def run_hepa_fan(
     on_time: int,
     off_time: int,
     cycles: int,
-) -> Optional[Dict[str, Any]]:
+    result: Dict[str, Any],
+    event: asyncio.Event,
+) -> None:
     """Coroutine that will run the hepa fan."""
     fan_duty_cycle = max(0, min(duty_cycle, MAX_DUTY_CYCLE))
     fan_on_time = on_time if on_time > 0 else 0
@@ -77,13 +93,10 @@ async def run_hepa_fan(
         f"run_forever: {run_forever}"
     )
 
-    # record the result
-    RESULT = {
-        "HEPA": {cycle + 1: None for cycle in range(cycles)}
-    }
+    
     fan_on: bool = False
     cycle: int = 1
-    while True:
+    while not event.is_set():
         try:
             if not run_forever and cycle > cycles:
                 log.info(f"Hepa Task: Reached target cycles={cycles}")
@@ -98,7 +111,7 @@ async def run_hepa_fan(
                 success = await api.set_hepa_fan_state(
                     turn_on=True, duty_cycle=fan_duty_cycle
                 )
-                RESULT["HEPA"][cycle] = success  # type: ignore
+                result["HEPA"][cycle] = success  # type: ignore
                 if not success:
                     log.error("Hepa Task: FAILED to turn ON fan.")
                     break
@@ -108,7 +121,7 @@ async def run_hepa_fan(
             if fan_off_time:
                 log.info(f"Hepa Task: Turning off fan for {fan_off_time} seconds")
                 success = await api.set_hepa_fan_state(turn_on=False, duty_cycle=0)
-                RESULT["HEPA"][cycle] = success  # type: ignore
+                result["HEPA"][cycle] = success  # type: ignore
                 if not success:
                     log.error("Hepa Task: FAILED to turn OFF fan.")
                     break
@@ -123,16 +136,15 @@ async def run_hepa_fan(
             break
 
     log.info("Hepa Task: Finished - Turning off Fan")
-    await api.set_hepa_fan_state(turn_on=False, duty_cycle=DEFAULT_DUTY_CYCLE)
+    await asyncio.shield(_turn_off_fan(api))
 
     elapsed_time = datetime.datetime.now() - start_time
     log.info(f"Hepa Task: Elapsed time={elapsed_time}")
-    return RESULT
 
 
 async def run_hepa_uv(
-    api: OT3API, on_time: int, off_time: int, cycles: int
-) -> Optional[Dict[str, Any]]:
+    api: OT3API, on_time: int, off_time: int, cycles: int, result: Dict[str, Any], event: asyncio.Event,
+) -> None:
     """Coroutine that will run the hepa uv light."""
     light_on_time = max(0, min(on_time, MAX_UV_DOSAGE))
     light_off_time = off_time if off_time > 0 else 0
@@ -151,13 +163,9 @@ async def run_hepa_uv(
         f"off_time={light_off_time}s, cycles={cycles}"
     )
 
-    # record the result
-    RESULT = {
-        "UV": {cycle + 1: None for cycle in range(cycles)}
-    }
     uv_light_on: bool = False
     cycle: int = 1
-    while True:
+    while not event.is_set():
         try:
             if cycle > cycles:
                 log.info(f"UV Task: Reached target cycles={cycles}")
@@ -173,7 +181,7 @@ async def run_hepa_uv(
                 success = await api.set_hepa_uv_state(
                     turn_on=True, uv_duration_s=light_on_time
                 )
-                RESULT["UV"][cycle] = success  # type: ignore
+                result["UV"][cycle] = success  # type: ignore
                 if not success:
                     log.error("UV Task: FAILED to turned ON uv light.")
                     break
@@ -185,7 +193,7 @@ async def run_hepa_uv(
                     f"UV Task: Turning off the UV Light for {light_off_time} seconds"
                 )
                 success = await api.set_hepa_uv_state(turn_on=False, uv_duration_s=0)
-                RESULT["UV"][cycle] = success  # type: ignore
+                result["UV"][cycle] = success  # type: ignore
                 if not success:
                     log.error("UV Task: FAILED to turned OFF uv light.")
                     break
@@ -198,18 +206,17 @@ async def run_hepa_uv(
             break
 
     log.info("UV Task: Finished - Turning off UV Light ")
-    await api.set_hepa_uv_state(turn_on=False, uv_duration_s=DEFAULT_UV_DOSAGE_DURATION)
+    await asyncio.shield(_turn_off_uv(api))
 
     elapsed_time = datetime.datetime.now() - start_time
     log.info(f"UV Task: Elapsed time={elapsed_time}")
-    return RESULT
 
 
 async def _control_task(
-    api: OT3API, hepa_task: asyncio.Task, uv_task: asyncio.Task
+    api: OT3API, hepa_task: asyncio.Task, uv_task: asyncio.Task, event: asyncio.Event,
 ) -> None:
     """Checks robot status and cancels tasks."""
-    while True:
+    while not event.is_set():
         # Make sure the door is closed
         if api.door_state == DoorState.OPEN:
             if not uv_task.done():
@@ -239,32 +246,44 @@ async def _main(args: argparse.Namespace) -> None:
     # Make sure everything is off before we start testing
     await _turn_off_hepa_uv(api)
 
+    stop_event = asyncio.Event()
+
+    def issue_stop():
+        nonlocal stop_event
+        while True:
+            stop = input("******** Press ENTER to stop script ********\n")
+            if stop == "":
+                log.info("STOP issued by user.")
+                stop_event.set()
+                return
+
+    RESULT = {
+        "HEPA": {},
+        "UV": {},
+    }
+
     # create tasks
     hepa_fan_task = asyncio.create_task(
         run_hepa_fan(
-            api, args.fan_duty_cycle, args.fan_on_time, args.fan_off_time, args.cycles
+            api, args.fan_duty_cycle, args.fan_on_time, args.fan_off_time, args.cycles, RESULT, stop_event
         )
     )
     hepa_uv_task = asyncio.create_task(
-        run_hepa_uv(api, args.uv_on_time, args.uv_off_time, args.cycles)
+        run_hepa_uv(api, args.uv_on_time, args.uv_off_time, args.cycles, RESULT, stop_event)
     )
-    control_task = asyncio.create_task(_control_task(api, hepa_fan_task, hepa_uv_task))
+    control_task = asyncio.create_task(_control_task(api, hepa_fan_task, hepa_uv_task, stop_event))
 
     # start the tasks
-    results = []
     try:
-        results = await asyncio.gather(control_task, hepa_fan_task, hepa_uv_task)
+        task = asyncio.gather(asyncio.to_thread(issue_stop), control_task, hepa_fan_task, hepa_uv_task)
+        await task
     finally:
-        # Make sure we always turn OFF everything!
-        await _turn_off_hepa_uv(api)
         log.info("===================== RESULT ======================")
-        for result in results:
-            if result is None:
-                continue
-            for task, data in result.items():
-                for cycle, success in data.items():
-                    msg = "PASSED" if success else "FAILED"
-                    log.info(f"{task}: cycle={cycle} result={msg}")
+        for task, data in RESULT.items():
+            for cycle, success in data.items():
+                msg = "PASSED" if success else "FAILED"
+                log.info(f"{task}: cycle={cycle} result={msg}")
+
         log.info("===================== RESULT =======================")
 
 
