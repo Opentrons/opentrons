@@ -15,7 +15,7 @@ module.exports = {
     'plugin:storybook/recommended',
   ],
 
-  plugins: ['react', 'react-hooks', 'json', 'jest', 'testing-library'],
+  plugins: ['react', 'react-hooks', 'json', 'testing-library'],
 
   rules: {
     camelcase: 'off',
@@ -107,31 +107,21 @@ module.exports = {
         '**/fixtures/**.@(js|ts|tsx)',
         'scripts/*.@(js|ts|tsx)',
       ],
-      env: {
-        jest: true,
-      },
-      extends: ['plugin:jest/recommended'],
+      // env: {
+      //   jest: true,
+      // },
+      // extends: ['plugin:jest/recommended'],
       rules: {
-        'jest/expect-expect': 'off',
-        'jest/no-standalone-expect': 'off',
-        'jest/no-disabled-tests': 'error',
-        'jest/consistent-test-it': ['error', { fn: 'it' }],
         '@typescript-eslint/consistent-type-assertions': 'off',
         '@typescript-eslint/no-var-requires': 'off',
         '@typescript-eslint/explicit-function-return-type': 'off',
         '@typescript-eslint/no-confusing-void-expression': 'warn',
         'node/handle-callback-err': 'off',
-        // TODO(mc, 2021-01-29): fix these and remove warning overrides
-        'jest/no-deprecated-functions': 'warn',
-        'jest/valid-title': 'warn',
-        'jest/no-conditional-expect': 'warn',
-        'jest/no-alias-methods': 'warn',
-        'jest/valid-describe-callback': 'warn',
       },
     },
     {
       files: ['**/__tests__/**test.tsx'],
-      env: { jest: true },
+      // env: { jest: true },
       extends: ['plugin:testing-library/react'],
       rules: {
         'testing-library/no-manual-cleanup': 'off',
