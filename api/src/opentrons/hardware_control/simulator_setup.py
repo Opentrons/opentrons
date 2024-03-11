@@ -17,7 +17,6 @@ from opentrons.hardware_control.types import OT3Mount, HardwareFeatureFlags
 @dataclass(frozen=True)
 class ModuleCall:
     function_name: str
-    serial_number: str
     args: List[Any] = field(default_factory=list)
     kwargs: Dict[str, Any] = field(default_factory=dict)
 
@@ -25,6 +24,7 @@ class ModuleCall:
 # Name and kwargs for a module function
 @dataclass(frozen=True)
 class ModuleItem:
+    serial_number: str
     items: List[ModuleCall] = field(default_factory=list)
 
 
@@ -205,18 +205,15 @@ def _prepare_for_ot3_simulator_setup(key: str, value: Dict[str, Any]) -> Any:
     if key == "config" and value:
         return robot_configs.build_config_ot3(value)
     if key == "attached_modules" and value:
-        attached_modules: Dict[str, ModuleItem] = {}
-        # list of items with id, item - loop and set to ModuleCall
+        attached_modules: Dict[str, List[ModuleItem]] = {}
         for key, item in value.items():
             for obj in item:
-                for data in obj["items"]:
-                    attached_modules.setdefault(key, ModuleItem().items).append(
-                        ModuleCall(**data)
+                attached_modules.setdefault(key, []).append(
+                    ModuleItem(
+                        serial_number=obj["serial_number"],
+                        items=[ModuleCall(**data) for data in obj["items"]],
                     )
+                )
 
-        print(attached_modules)
-        print("----")
-
-        # items = {k: [ModuleCall(**data) for data in v] for (k, v) in value.items()}
         return attached_modules
     return value

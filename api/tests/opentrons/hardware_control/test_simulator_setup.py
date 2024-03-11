@@ -164,10 +164,10 @@ def test_persistence_ot3(tmpdir: str) -> None:
         attached_modules={
             "magdeck": [
                 simulator_setup.ModuleItem(
+                    serial_number="mag-1",
                     items=[
                         simulator_setup.ModuleCall(
                             function_name="engage",
-                            serial_number="mag-1",
                             kwargs={"height": 3},
                         )
                     ],
@@ -175,15 +175,27 @@ def test_persistence_ot3(tmpdir: str) -> None:
             ],
             "tempdeck": [
                 simulator_setup.ModuleItem(
+                    serial_number="temp-1",
                     items=[
                         simulator_setup.ModuleCall(
                             function_name="set_temperature",
-                            serial_number="temp-1",
                             kwargs={"celsius": 23},
                         ),
                         simulator_setup.ModuleCall(
                             function_name="set_temperature",
-                            serial_number="temp-2",
+                            kwargs={"celsius": 24},
+                        ),
+                    ],
+                ),
+                simulator_setup.ModuleItem(
+                    serial_number="temp-2",
+                    items=[
+                        simulator_setup.ModuleCall(
+                            function_name="set_temperature",
+                            kwargs={"celsius": 23},
+                        ),
+                        simulator_setup.ModuleCall(
+                            function_name="set_temperature",
                             kwargs={"celsius": 24},
                         ),
                     ],
@@ -196,7 +208,4 @@ def test_persistence_ot3(tmpdir: str) -> None:
     simulator_setup.save_simulator_setup(sim, file)
     test_sim = simulator_setup.load_simulator_setup(file)
 
-    print(sim.attached_modules)
-    print("====")
-    print(test_sim.attached_modules)
     assert test_sim == sim
