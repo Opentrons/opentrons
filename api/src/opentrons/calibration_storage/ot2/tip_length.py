@@ -52,9 +52,9 @@ def tip_lengths_for_pipette(
                 tip_lengths[LabwareUri(tiprack_identifier)] = v1.TipLengthModel(**data)
             except (json.JSONDecodeError, ValidationError):
                 log.warning(
-                    f"Tip length calibration is malformed for {tiprack_identifier} on {pipette_id}"
+                    f"Tip length calibration is malformed for {tiprack_identifier} on {pipette_id}",
+                    exc_info=True,
                 )
-                pass
         return tip_lengths
     except FileNotFoundError:
         log.debug(f"Tip length calibrations not found for {pipette_id}")
