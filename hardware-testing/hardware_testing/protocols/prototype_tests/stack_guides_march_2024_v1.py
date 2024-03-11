@@ -1,4 +1,6 @@
-from opentrons.protocol_api import ProtocolContext
+from typing import Any, Optional, Dict
+
+from opentrons.protocol_api import ProtocolContext, Labware
 
 metadata = {"protocolName": "stack-guides-march-2024-v1"}
 requirements = {"robotType": "Flex", "apiLevel": "2.16"}
@@ -17,6 +19,30 @@ Repeat step 2, but with purposeful XYZ offsets,
 Protocol is now complete
  - Test can repeated, and Tester can modify the Protocol
 """
+
+START_UNSTACKED = True
+
+
+def _move_labware_with_offset_and_pause(
+        protocol: ProtocolContext,
+        labware: Labware,
+        destination: Any,
+        pick_up_offset: Optional[Dict[str, float]] = None,
+        drop_offset: Optional[Dict[str, float]] = None
+) -> None:
+    protocol.move_labware(
+        labware,
+        destination,
+        use_gripper=True,
+        pick_up_offset=pick_up_offset,
+        drop_offset=drop_offset,
+    )
+    protocol.pause(f'Pick(x={round(pick_up_offset["x"], 1)},'
+                   f'y={round(pick_up_offset["y"], 1)},'
+                   f'z={round(pick_up_offset["z"], 1)}) | '
+                   f'Drop(x={round(drop_offset["x"], 1)},'
+                   f'y={round(drop_offset["y"], 1)},'
+                   f'z={round(drop_offset["z"], 1)})')
 
 
 def run(protocol: ProtocolContext):
