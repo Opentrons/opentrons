@@ -531,7 +531,7 @@ def test_pick_up_tip_from_labware(
             starting_tip=None,
             tip_racks=[mock_tip_rack],
             channels=123,
-            nozzle_map=None,
+            nozzle_map=mock_map,
         )
     ).then_return((mock_tip_rack, mock_well))
     decoy.when(mock_well.top()).then_return(top_location)
@@ -595,7 +595,7 @@ def test_pick_up_tip_from_labware_location(
             starting_tip=None,
             tip_racks=[mock_tip_rack],
             channels=123,
-            nozzle_map=None,
+            nozzle_map=mock_map,
         )
     ).then_return((mock_tip_rack, mock_well))
     decoy.when(mock_well.top()).then_return(top_location)
@@ -640,7 +640,7 @@ def test_pick_up_from_associated_tip_racks(
             starting_tip=mock_starting_tip,
             tip_racks=[mock_tip_rack_1, mock_tip_rack_2],
             channels=123,
-            nozzle_map=None,
+            nozzle_map=mock_map,
         )
     ).then_return((mock_tip_rack_2, mock_well))
     decoy.when(mock_well.top()).then_return(top_location)
