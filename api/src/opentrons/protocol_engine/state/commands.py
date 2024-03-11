@@ -522,6 +522,16 @@ class CommandView(HasState[CommandState]):
         else:
             return run_error or finish_error
 
+    # TODO: Why is this different from get_slice()?
+    # TODO:
+    # - GET /runs/commands docs say that links.current is "currently running or NEXT QUEUED", and attempts to implement that via this.
+    # - These docs say that this implements "currently [running] or MOST RECENT TO HAVE COMPLETED"
+    # - This actual implementation returns currently running or MOST RECENT TO HAVE COMPLETED.
+    #
+    # Not to be confused with the ?cursor param to GET /runs/commands, which:
+    # - HTTP docs say "MOST RECENTLY EXECUTED"
+    # - Docs in this file say "MOST RECENTLY EXECUTED"
+    # - Implementation returns MOST RECENTLY EXECUTED
     def get_current(self) -> Optional[CurrentCommand]:
         """Return the "current" command, if any.
 
