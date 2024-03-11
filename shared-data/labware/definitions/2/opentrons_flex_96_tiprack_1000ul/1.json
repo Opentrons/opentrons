@@ -1021,21 +1021,6 @@
       "x": 0,
       "y": 0,
       "z": 121
-    },
-    "opentrons_flex_96_tiprack_50ul": {
-      "x": 0,
-      "y": 0,
-      "z": 0.5
-    },
-    "opentrons_flex_96_tiprack_200ul": {
-      "x": 0,
-      "y": 0,
-      "z": 0.5
-    },
-    "opentrons_flex_96_tiprack_1000ul": {
-      "x": 0,
-      "y": 0,
-      "z": 0.5
     }
   }
 }
