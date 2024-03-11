@@ -11,8 +11,8 @@
     "tags": []
   },
   "dimensions": {
-    "xDimension": 127.5,
-    "yDimension": 85.5,
+    "xDimension": 127.7,
+    "yDimension": 85.48,
     "zDimension": 12.8
   },
   "wells": {},
@@ -34,24 +34,29 @@
   "version": 1,
   "schemaVersion": 2,
   "stackingOffsetWithLabware": {
-    "custom_thermocycler_lid": {
+    "deck": {
       "x": 0,
       "y": 0,
-      "z": 2.99
+      "z": 0.71
+    },
+    "tc_lid_march_2024_v1": {
+      "x": 0,
+      "y": 0,
+      "z": 6.492
     },
     "armadillo_96_wellplate_200ul_pcr_full_skirt": {
       "x": 0,
       "y": 0,
-      "z": 10.45
+      "z": 8.193
     },
     "opentrons_96_wellplate_200ul_pcr_full_skirt": {
       "x": 0,
       "y": 0,
-      "z": 10.45
+      "z": 8.193
     }
   },
   "gripForce": 15,
-  "gripHeightFromLabwareBottom": 6.905,
+  "gripHeightFromLabwareBottom": 7.91,
   "gripperOffsets": {
     "default": {
       "pickUpOffset": {
