@@ -151,4 +151,21 @@ describe('useNotifyService', () => {
     rerender()
     expect(mockHTTPRefetch).toHaveBeenCalledWith('once')
   })
+
+  it('should trigger a single HTTP refetch if the unsubscribe flag was returned', () => {
+    vi.mocked(appShellListener).mockImplementation(
+      (_: any, __: any, mockCb: any) => {
+        mockCb({ unsubscribe: true })
+      }
+    )
+    const { rerender } = renderHook(() =>
+      useNotifyService({
+        topic: MOCK_TOPIC,
+        setRefetchUsingHTTP: mockHTTPRefetch,
+        options: MOCK_OPTIONS,
+      } as any)
+    )
+    rerender()
+    expect(mockHTTPRefetch).toHaveBeenCalledWith('once')
+  })
 })

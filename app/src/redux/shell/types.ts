@@ -24,7 +24,7 @@ interface NotifyRefetchData {
   statusCode: never
 }
 
-interface NotifyUnsubscribeData extends NotifyRefetchData {
+interface NotifyUnsubscribeData {
   unsubscribe: boolean
 }
 
