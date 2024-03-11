@@ -96,24 +96,15 @@ class RunsPublisher:
 
         Args:
             get_current_command: Retrieves the engine store's current command.
+            get_state_summary: Retrieves the engine store's state summary.
             run_id: ID of the current run.
         """
         try:
-            while not self._run_data_manager_polling.is_set():
-                current_command = get_current_command(run_id)
-                current_state_summary = get_state_summary(run_id)
-                current_state_summary_status = (
-                    current_state_summary.status if current_state_summary else None
-                )
-
-                if self._previous_current_command != current_command:
-                    await self._publish_current_command()
-                    self._previous_current_command = current_command
-
-                if self._previous_state_summary_status != current_state_summary_status:
-                    await self._publish_runs_async(run_id=run_id)
-                    self._previous_state_summary_status = current_state_summary_status
-                await asyncio.sleep(POLL_INTERVAL)
+            await self._poll_for_run_id_info(
+                get_current_command=get_current_command,
+                get_state_summary=get_state_summary,
+                run_id=run_id,
+            )
         except asyncio.CancelledError:
             self._clean_up_poller()
             await self._publish_runs_advise_unsubscribe_async(run_id=run_id)
@@ -123,6 +114,36 @@ class RunsPublisher:
         except Exception as e:
             log.error(f"Error within run data manager poller: {e}")
 
+    async def _poll_for_run_id_info(
+        self,
+        get_current_command: Callable[[str], Optional[CurrentCommand]],
+        get_state_summary: Callable[[str], Optional[StateSummary]],
+        run_id: str,
+    ):
+        """Poll the engine store for a specific run's state while the poll is active.
+
+        Args:
+            get_current_command: Retrieves the engine store's current command.
+            get_state_summary: Retrieves the engine store's state summary.
+            run_id: ID of the current run.
+        """
+
+        while not self._run_data_manager_polling.is_set():
+            current_command = get_current_command(run_id)
+            current_state_summary = get_state_summary(run_id)
+            current_state_summary_status = (
+                current_state_summary.status if current_state_summary else None
+            )
+
+            if self._previous_current_command != current_command:
+                await self._publish_current_command()
+                self._previous_current_command = current_command
+
+            if self._previous_state_summary_status != current_state_summary_status:
+                await self._publish_runs_advise_refetch_async(run_id=run_id)
+                self._previous_state_summary_status = current_state_summary_status
+            await asyncio.sleep(POLL_INTERVAL)
+
     async def _publish_current_command(
         self,
     ) -> None:
@@ -131,8 +152,17 @@ class RunsPublisher:
             topic=Topics.RUNS_CURRENT_COMMAND
         )
 
+    async def _publish_runs_advise_refetch_async(self, run_id: str) -> None:
+        """Asynchronously publishes the equivalent of GET /runs and GET /runs/:runId via a refetch message.
+
+        Args:
+            run_id: ID of the current run.
+        """
+        await self._client.publish_advise_refetch_async(topic=Topics.RUNS)
+        await self._client.publish_advise_refetch_async(topic=f"{Topics.RUNS}/{run_id}")
+
     async def _publish_runs_advise_unsubscribe_async(self, run_id: str) -> None:
-        """Asynchronously publishes the equivalent of GET /runs and GET /runs/:runId.
+        """Asynchronously publishes the equivalent of GET /runs and GET /runs/:runId via an unsubscribe message.
 
         Args:
             run_id: ID of the current run.
