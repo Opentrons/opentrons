@@ -25,7 +25,7 @@ MAX_DUTY_CYCLE: int = 100
 DEFAULT_UV_DOSAGE_DURATION: int = 900  # 15m
 MAX_UV_DOSAGE: int = 60 * 60  # 1hr max dosage
 DEFAULT_CYCLES: int = 1
-
+MAX_RUN_TIME: int = 86400  # 24hrs
 
 # Get the name of the robot
 try:
@@ -93,7 +93,6 @@ async def run_hepa_fan(
         f"run_forever: {run_forever}"
     )
 
-    
     fan_on: bool = False
     cycle: int = 1
     while not event.is_set():
@@ -213,7 +212,11 @@ async def run_hepa_uv(
 
 
 async def _control_task(
-    api: OT3API, hepa_task: asyncio.Task, uv_task: asyncio.Task, event: asyncio.Event,
+    api: OT3API,
+    hepa_task: asyncio.Task,
+    run_forever: bool,
+    uv_task: asyncio.Task,
+    event: asyncio.Event,
 ) -> None:
     """Checks robot status and cancels tasks."""
     while not event.is_set():
@@ -223,9 +226,16 @@ async def _control_task(
                 log.warning("Control Task: Flex Door Opened, stopping UV task")
                 uv_task.cancel()
 
-        if uv_task.done() and hepa_task.done():
-            log.info("Control Task: No more running tasks")
-            break
+        if uv_task.done():
+            if hepa_task.done():
+                log.info("Control Task: No more running tasks")
+                event.set()
+                return
+            elif run_forever:
+                log.info(f"Leave FAN on for {MAX_RUN_TIME} before ending script")
+                await asyncio.sleep(MAX_RUN_TIME)
+                event.set()
+                return
 
         await asyncio.sleep(1)
 
@@ -248,15 +258,6 @@ async def _main(args: argparse.Namespace) -> None:
 
     stop_event = asyncio.Event()
 
-    def issue_stop():
-        nonlocal stop_event
-        while True:
-            stop = input("******** Press ENTER to stop script ********\n")
-            if stop == "":
-                log.info("STOP issued by user.")
-                stop_event.set()
-                return
-
     RESULT = {
         "HEPA": {},
         "UV": {},
@@ -271,11 +272,19 @@ async def _main(args: argparse.Namespace) -> None:
     hepa_uv_task = asyncio.create_task(
         run_hepa_uv(api, args.uv_on_time, args.uv_off_time, args.cycles, RESULT, stop_event)
     )
-    control_task = asyncio.create_task(_control_task(api, hepa_fan_task, hepa_uv_task, stop_event))
+    control_task = asyncio.create_task(
+        _control_task(
+            api,
+            hepa_fan_task,
+            args.fan_on_time == -1,
+            hepa_uv_task,
+            stop_event
+        )
+    )
 
     # start the tasks
     try:
-        task = asyncio.gather(asyncio.to_thread(issue_stop), control_task, hepa_fan_task, hepa_uv_task)
+        task = asyncio.gather(control_task, hepa_fan_task, hepa_uv_task)
         await task
     finally:
         log.info("===================== RESULT ======================")
