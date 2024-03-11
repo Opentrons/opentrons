@@ -62,7 +62,7 @@ serve: all
 test-e2e:
 	concurrently --no-color --kill-others --success first --names "protocol-designer-server,protocol-designer-tests" \
 	"$(MAKE) dev CYPRESS=1" \
-	"wait-on http://localhost:8080/ && cypress run --browser chrome --headless --record false"
+	"wait-on http://localhost:5173/ && cypress run --browser chrome --headless --record false"
 
 .PHONY: test
 test:
