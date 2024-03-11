@@ -124,7 +124,9 @@ class TipStore(HasState[TipState], HandlesActions):
             pipette_id = command.params.pipetteId
             self._state.length_by_pipette_id.pop(pipette_id, None)
 
-    def _set_used_tips(self, pipette_id: str, well_name: str, labware_id: str) -> None:
+    def _set_used_tips(  # noqa: C901
+        self, pipette_id: str, well_name: str, labware_id: str
+    ) -> None:
         columns = self._state.column_by_labware_id.get(labware_id, [])
         wells = self._state.tips_by_labware_id.get(labware_id, {})
         nozzle_map = self._state.nozzle_map_by_pipette_id[pipette_id]
@@ -143,17 +145,25 @@ class TipStore(HasState[TipState], HandlesActions):
         for i in range(num_nozzle_cols):
             for j in range(num_nozzle_rows):
                 if nozzle_map.starting_nozzle == "A1":
-                    well = columns[critical_column + i][critical_row + j]
-                    wells[well] = TipRackWellState.USED
+                    if (critical_column + i < len(columns)) and (
+                        critical_row + j < len(columns[critical_column])
+                    ):
+                        well = columns[critical_column + i][critical_row + j]
+                        wells[well] = TipRackWellState.USED
                 elif nozzle_map.starting_nozzle == "A12":
-                    well = columns[critical_column + i][critical_row - j]
-                    wells[well] = TipRackWellState.USED
+                    if (critical_column - i >= 0) and (
+                        critical_row + j < len(columns[critical_column])
+                    ):
+                        well = columns[critical_column - i][critical_row + j]
+                        wells[well] = TipRackWellState.USED
                 elif nozzle_map.starting_nozzle == "H1":
-                    well = columns[critical_column - i][critical_row + j]
-                    wells[well] = TipRackWellState.USED
+                    if (critical_column + i < len(columns)) and (critical_row - j >= 0):
+                        well = columns[critical_column + i][critical_row - j]
+                        wells[well] = TipRackWellState.USED
                 elif nozzle_map.starting_nozzle == "H12":
-                    well = columns[critical_column - i][critical_row - j]
-                    wells[well] = TipRackWellState.USED
+                    if (critical_column - i >= 0) and (critical_row - j >= 0):
+                        well = columns[critical_column - i][critical_row - j]
+                        wells[well] = TipRackWellState.USED
 
 
 class TipView(HasState[TipState]):
