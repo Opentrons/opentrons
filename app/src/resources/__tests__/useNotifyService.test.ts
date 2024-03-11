@@ -74,7 +74,7 @@ describe('useNotifyService', () => {
     expect(mockDispatch).not.toHaveBeenCalledWith(
       notifyUnsubscribeAction(MOCK_HOST_CONFIG.hostname, MOCK_TOPIC)
     )
-    expect(appShellListener).toHaveBeenCalled()
+    expect(mockAppShellListener).toHaveBeenCalled()
   })
 
   it('should trigger an unsubscribe action on dismount', () => {
@@ -100,7 +100,7 @@ describe('useNotifyService', () => {
       } as any)
     )
     expect(mockHTTPRefetch).toHaveBeenCalled()
-    expect(appShellListener).not.toHaveBeenCalled()
+    expect(mockAppShellListener).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
@@ -113,7 +113,7 @@ describe('useNotifyService', () => {
       } as any)
     )
     expect(mockHTTPRefetch).toHaveBeenCalled()
-    expect(appShellListener).not.toHaveBeenCalled()
+    expect(mockAppShellListener).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
@@ -126,7 +126,7 @@ describe('useNotifyService', () => {
       } as any)
     )
     expect(mockHTTPRefetch).toHaveBeenCalled()
-    expect(appShellListener).not.toHaveBeenCalled()
+    expect(mockAppShellListener).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
@@ -144,8 +144,9 @@ describe('useNotifyService', () => {
   })
 
   it('should return set HTTP refetch to always and fire an analytics reporting event if the connection was refused', () => {
-    mockAppShellListener.mockImplementation((_: any, __: any, mockCb: any) => {
-      mockCb('ECONNREFUSED')
+    mockAppShellListener.mockImplementation(function ({ callback }): any {
+      // eslint-disable-next-line n/no-callback-literal
+      callback('ECONNREFUSED')
     })
     const { rerender } = renderHook(() =>
       useNotifyService({
@@ -160,8 +161,9 @@ describe('useNotifyService', () => {
   })
 
   it('should trigger a single HTTP refetch if the refetch flag was returned', () => {
-    mockAppShellListener.mockImplementation((_: any, __: any, mockCb: any) => {
-      mockCb({ refetchUsingHTTP: true })
+    mockAppShellListener.mockImplementation(function ({ callback }): any {
+      // eslint-disable-next-line n/no-callback-literal
+      callback('ECONNREFUSED')
     })
     const { rerender } = renderHook(() =>
       useNotifyService({
@@ -172,5 +174,17 @@ describe('useNotifyService', () => {
     )
     rerender()
     expect(mockHTTPRefetch).toHaveBeenCalledWith('once')
+  })
+
+  it('should clean up the listener on dismount', () => {
+    const { unmount } = renderHook(() =>
+      useNotifyService({
+        topic: MOCK_TOPIC,
+        setRefetchUsingHTTP: mockHTTPRefetch,
+        options: MOCK_OPTIONS,
+      })
+    )
+    unmount()
+    expect(mockAppShellListener).toHaveBeenCalled()
   })
 })
