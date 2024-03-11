@@ -171,13 +171,19 @@ export const getPipetteSpecsV2 = (
   const gen = getVersionFromGen(nameSplit[2] as Gen)
 
   let version: string
-  if (nameSplit.length === 2) {
+  if (channels === 'ninety_six_channel' && nameSplit.length === 2) {
+    version = '3_0' //  special-casing p1000_96
+  } else if (channels !== 'ninety_six_channel' && nameSplit.length === 2) {
     version = '1_0'
   } else if (gen != null) {
     version = gen //  ex: gen1 -> 1_0
   } else {
-    const versionDot = nameSplit[2].split('v')[1]
-    version = versionDot.replace('.', '_') // ex: v1.1 -> 1_1
+    const versionNumber = nameSplit[2].split('v')[1]
+    if (versionNumber.includes('.')) {
+      version = versionNumber.replace('.', '_') // ex: v1.0 -> 1_0
+    } else {
+      version = `${versionNumber}_0` //  ex: v1 -> 1_0
+    }
   }
 
   const generalGeometricMatchingJsons = Object.entries(generalGeometric).reduce(
