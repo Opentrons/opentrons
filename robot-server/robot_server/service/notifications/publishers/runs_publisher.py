@@ -61,10 +61,6 @@ class RunsPublisher:
         if self._poller is not None:
             self._run_data_manager_polling.set()
             self._poller.cancel()
-            self._poller = None
-            self._run_data_manager_polling.clear()
-            self._previous_current_command = None
-            self._previous_state_summary_status = None
 
     def publish_runs(self, run_id: str, should_unsubscribe: bool = False) -> None:
         """Publishes the equivalent of GET /runs and GET /runs/:runId.
@@ -107,6 +103,7 @@ class RunsPublisher:
                     self._previous_state_summary_status = current_state_summary_status
                 await asyncio.sleep(1)
         except asyncio.CancelledError:
+            self._clean_up_poller()
             await self._publish_runs_async(run_id=run_id, should_unsubscribe=True)
             await self._client.publish_async(topic=Topics.RUNS_CURRENT_COMMAND)
 
@@ -131,6 +128,13 @@ class RunsPublisher:
         await self._client.publish_async(
             topic=f"{Topics.RUNS}/{run_id}", should_unsubscribe=should_unsubscribe
         )
+
+    def _clean_up_poller(self) -> None:
+        """Cleans up the runs data manager poller."""
+        self._poller = None
+        self._run_data_manager_polling.clear()
+        self._previous_current_command = None
+        self._previous_state_summary_status = None
 
 
 _runs_publisher_accessor: AppStateAccessor[RunsPublisher] = AppStateAccessor[
