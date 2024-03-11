@@ -21,7 +21,9 @@ Run:
      - PAUSE, wait for tester to press continue
 """
 
-TIPS_DEFINITION = "opentrons_flex_96_tiprack_1000ul"
+TIPS_DEFINITION = "opentrons_flex_96_tiprack_1000ul_stacking_v1"
+# TIPS_DEFINITION = "opentrons_flex_96_tiprack_200ul_stacking_v1"
+# TIPS_DEFINITION = "opentrons_flex_96_tiprack_50ul_stacking_v1"
 TIPS_DECK_SLOTS = ["C2", "C3"]
 GUIDES_SLOT = "C4"
 

@@ -6,7 +6,7 @@
   },
   "metadata": {
     "displayName": "Opentrons Thermocycler Lid",
-    "displayCategory": "labware",
+    "displayCategory": "other",
     "displayVolumeUnits": "\u00b5L",
     "tags": []
   },
@@ -17,10 +17,6 @@
   },
   "wells": {},
   "groups": [
-    {
-      "metadata": {},
-      "wells": []
-    }
   ],
   "cornerOffsetFromSlot": {
     "x": 0,

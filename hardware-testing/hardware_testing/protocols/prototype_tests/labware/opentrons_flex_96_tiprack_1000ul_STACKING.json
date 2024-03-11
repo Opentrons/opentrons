@@ -18,7 +18,7 @@
     "brandId": []
   },
   "metadata": {
-    "displayName": "Opentrons Flex 96 Tip Rack 1000 µL",
+    "displayName": "Opentrons Flex 96 Tip Rack 1000 µL STACKING",
     "displayCategory": "tipRack",
     "displayVolumeUnits": "µL",
     "tags": []
@@ -1006,9 +1006,9 @@
     "tipLength": 95.6,
     "tipOverlap": 10.5,
     "isMagneticModuleCompatible": false,
-    "loadName": "opentrons_flex_96_tiprack_1000ul"
+    "loadName": "opentrons_flex_96_tiprack_1000ul_stacking_v1"
   },
-  "namespace": "opentrons",
+  "namespace": "custom_beta",
   "version": 1,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {
