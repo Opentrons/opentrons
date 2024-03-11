@@ -199,7 +199,9 @@ def test_update_run_state(
     )
     assert run_summary_result == state_summary
     assert commands_result.commands == protocol_commands
-    mock_runs_publisher.publish_runs.assert_called_once_with(run_id="run-id")
+    mock_runs_publisher.publish_runs_advise_refetch.assert_called_once_with(
+        run_id="run-id"
+    )
 
 
 def test_update_state_run_not_found(
@@ -392,8 +394,8 @@ def test_remove_run(subject: RunStore, mock_runs_publisher: mock.Mock) -> None:
     subject.remove(run_id="run-id")
 
     assert subject.get_all(length=20) == []
-    mock_runs_publisher.publish_runs.assert_called_once_with(
-        run_id="run-id", shouldUnsubscribe=True
+    mock_runs_publisher.publish_runs_advise_unsubscribe.assert_called_once_with(
+        run_id="run-id"
     )
 
 
@@ -427,7 +429,9 @@ def test_get_state_summary(
     subject.update_run_state(run_id="run-id", summary=state_summary, commands=[])
     result = subject.get_state_summary(run_id="run-id")
     assert result == state_summary
-    mock_runs_publisher.publish_runs.assert_called_once_with(run_id="run-id")
+    mock_runs_publisher.publish_runs_advise_refetch.assert_called_once_with(
+        run_id="run-id"
+    )
 
 
 def test_get_state_summary_failure(

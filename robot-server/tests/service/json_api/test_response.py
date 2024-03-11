@@ -119,7 +119,7 @@ RESPONSE_SPECS = [
     ResponseSpec(subject=NotifyRefetchBody(), expected={"refetchUsingHTTP": True}),
     ResponseSpec(
         subject=NotifyUnsubscribeBody(),
-        expected={"refetchUsingHTTP": True, "unsubscribe": True},
+        expected={"unsubscribe": True},
     ),
 ]
 
