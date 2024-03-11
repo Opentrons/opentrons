@@ -64,6 +64,9 @@ class CommandStructure:
     def get_all(self) -> List[Command]:
         return [self._commands_by_id[cid].command for cid in self._all_command_ids]
 
+    def get_all_ids(self) -> List[str]:
+        return [*self._all_command_ids]
+
     def get_slice(self, start: int, stop: int) -> List[Command]:
         command_ids = self._all_command_ids[start:stop]
         return [self._commands_by_id[command_id].command for command_id in command_ids]

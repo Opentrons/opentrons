@@ -434,25 +434,27 @@ class CommandView(HasState[CommandState]):
         The "current" command is the command that is currently executing,
         or the most recent command to have completed.
         """
-        if self._state.running_command_id:
-            entry = self._state.commands_by_id[self._state.running_command_id]
+        running_command = self._state.command_structure.get_running_command()
+        if running_command:
             return CurrentCommand(
-                command_id=entry.command.id,
-                command_key=entry.command.key,
-                created_at=entry.command.createdAt,
-                index=entry.index,
+                command_id=running_command.command.id,
+                command_key=running_command.command.key,
+                created_at=running_command.command.createdAt,
+                index=running_command.index,
             )
 
         # TODO(mc, 2022-02-07): this is O(n) in the worst case for no good reason.
         # Resolve prior to JSONv6 support, where this will matter.
-        for reverse_index, cid in enumerate(reversed(self._state.all_command_ids)):
+        for reverse_index, cid in enumerate(
+            reversed(self._state.command_structure.get_all_ids())
+        ):
             if self.get_command_is_final(cid):
-                entry = self._state.commands_by_id[cid]
+                entry = self._state.command_structure.get(cid)
                 return CurrentCommand(
                     command_id=entry.command.id,
                     command_key=entry.command.key,
                     created_at=entry.command.createdAt,
-                    index=len(self._state.all_command_ids) - reverse_index - 1,
+                    index=self._state.command_structure.length() - reverse_index - 1,
                 )
 
         return None
