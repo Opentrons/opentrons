@@ -3,7 +3,7 @@ import logging
 import paho.mqtt.client as mqtt
 from anyio import to_thread
 from fastapi import Depends
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional
 from enum import Enum
 
 from ..json_api import NotifyRefetchBody, NotifyUnsubscribeBody
