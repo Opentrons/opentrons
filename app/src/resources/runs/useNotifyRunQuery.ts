@@ -24,7 +24,7 @@ export function useNotifyRunQuery<TError = Error>(
   useNotifyService({
     topic: `robot-server/runs/${runId}` as NotifyTopic,
     setRefetchUsingHTTP,
-    options: { ...options, enabled: options?.enabled != null && runId != null },
+    options: { ...options, enabled: options.enabled != null && runId != null },
   })
 
   const httpResponse = useRunQuery(runId, {
