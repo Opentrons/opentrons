@@ -296,5 +296,4 @@ class NotifyUnsubscribeBody(BaseResponseBody):
     Returns flags for refetching via HTTP and unsubscribing from a topic.
     """
 
-    refetchUsingHTTP: bool = True
-    unsubscribe: bool = True
+    refetchAndUnsubscribe: bool = True
