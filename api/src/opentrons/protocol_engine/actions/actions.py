@@ -114,14 +114,9 @@ class QueueCommandAction:
 
 @dataclass(frozen=True)
 class UpdateCommandAction:
-    """Update a command from queued->running or running->succeeded.
-
-    For other state transitions, there are more specific actions, so use those instead.
-    """
+    """Update a given command."""
 
     command: Command
-    """The command in its new state."""
-
     private_result: CommandPrivateResult
 
 
