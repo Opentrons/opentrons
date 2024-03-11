@@ -14,6 +14,7 @@ from typing import (
     Tuple,
     Union,
     Literal,
+    List,
 )
 
 from pydantic import BaseModel, Field
