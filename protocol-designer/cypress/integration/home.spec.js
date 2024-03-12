@@ -1,5 +1,3 @@
-import { beforeEach, describe, it } from 'vitest'
-
 describe('The Home Page', () => {
   beforeEach(() => {
     cy.visit('/')

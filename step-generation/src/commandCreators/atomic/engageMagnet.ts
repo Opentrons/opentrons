@@ -13,7 +13,7 @@ export const engageMagnet: CommandCreator<EngageMagnetArgs> = (
   const { module: moduleId, engageHeight } = args
   const commandType = 'magneticModule/engage'
 
-  if (module === null) {
+  if (moduleId === null) {
     return {
       errors: [errorCreators.missingModuleError()],
     }

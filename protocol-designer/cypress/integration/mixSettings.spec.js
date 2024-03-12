@@ -1,4 +1,3 @@
-import { describe, it } from 'vitest'
 const isMacOSX = Cypress.platform === 'darwin'
 const invalidInput = 'abcdefghijklmnopqrstuvwxyz!@#$%^&*()<>?,-'
 const batchEditClickOptions = { [isMacOSX ? 'metaKey' : 'ctrlKey']: true }
