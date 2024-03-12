@@ -1,13 +1,19 @@
 /* eslint-disable @typescript-eslint/no-dynamic-delete */
 import mqtt from 'mqtt'
+import isEqual from 'lodash/isEqual'
 
 import { createLogger } from './log'
 
 import type { BrowserWindow } from 'electron'
-import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
+import type {
+  NotifyTopic,
+  NotifyResponseData,
+  NotifyRefetchData,
+  NotifyUnsubscribeData,
+  NotifyNetworkError,
+} from '@opentrons/app/src/redux/shell/types'
 import type { Action, Dispatch } from './types'
 
-// TODO(jh, 2024-01-22): refactor the ODD connection store to manage a single client only.
 // TODO(jh, 2024-03-01): after refactoring notify connectivity and subscription logic, uncomment logs.
 
 // Manages MQTT broker connections via a connection store, establishing a connection to the broker only if a connection does not
@@ -123,7 +129,7 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
         log.warn(
           `Failed to connect to ${hostname} - ${error.name}: ${error.message} `
         )
-        let failureMessage: string = FAILURE_STATUSES.ECONNFAILED
+        let failureMessage: NotifyNetworkError = FAILURE_STATUSES.ECONNFAILED
         if (connectionStore[hostname]?.client == null) {
           unreachableHosts.add(hostname)
           if (
@@ -344,12 +350,21 @@ function establishListeners({
   client.on(
     'message',
     (topic: NotifyTopic, message: Buffer, packet: mqtt.IPublishPacket) => {
-      sendToBrowserDeserialized({
-        browserWindow,
-        hostname,
-        topic,
-        message: message.toString(),
-      })
+      deserialize(message.toString())
+        .then(deserializedMessage => {
+          log.debug('Received notification data from main via IPC', {
+            hostname,
+            topic,
+          })
+
+          browserWindow.webContents.send(
+            'notify',
+            hostname,
+            topic,
+            deserializedMessage
+          )
+        })
+        .catch(error => log.debug(`${error.message}`))
     }
   )
 
@@ -410,7 +425,7 @@ interface SendToBrowserParams {
   browserWindow: BrowserWindow
   hostname: string
   topic: NotifyTopic
-  message: string
+  message: NotifyResponseData
 }
 
 function sendToBrowserDeserialized({
@@ -419,18 +434,34 @@ function sendToBrowserDeserialized({
   topic,
   message,
 }: SendToBrowserParams): void {
-  let deserializedMessage: string | Object
+  browserWindow.webContents.send('notify', hostname, topic, message)
+}
 
-  try {
-    deserializedMessage = JSON.parse(message)
-  } catch {
-    deserializedMessage = message
-  }
+const VALID_MODELS: [NotifyRefetchData, NotifyUnsubscribeData] = [
+  { refetchUsingHTTP: true },
+  { unsubscribe: true },
+]
 
-  // log.info('Received notification data from main via IPC', {
-  //   hostname,
-  //   topic,
-  // })
+function deserialize(message: string): Promise<NotifyResponseData> {
+  return new Promise((resolve, reject) => {
+    let deserializedMessage: NotifyResponseData | Record<string, unknown>
+    const error = new Error(
+      `Unexpected data received from notify broker: ${message}`
+    )
 
-  browserWindow.webContents.send('notify', hostname, topic, deserializedMessage)
+    try {
+      deserializedMessage = JSON.parse(message)
+    } catch {
+      reject(error)
+    }
+
+    const isValidNotifyResponse = VALID_MODELS.some(model =>
+      isEqual(model, deserializedMessage)
+    )
+    if (!isValidNotifyResponse) {
+      reject(error)
+    } else {
+      resolve(JSON.parse(message))
+    }
+  })
 }
