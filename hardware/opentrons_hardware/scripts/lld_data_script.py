@@ -85,8 +85,6 @@ class LLDSMAT(LLDAlgoABC):
             return (False, impossible_pressure)
         except ValueError:  # the array has been filled
             pass
-        # store old running average
-        prev_running_avg = sum(self.running_samples_smat) / self.samples_n_smat
         # left shift old samples
         for i in range(self.samples_n_smat - 1):
             self.running_samples_smat[i] = self.running_samples_smat[i + 1]
@@ -96,6 +94,7 @@ class LLDSMAT(LLDAlgoABC):
             new_running_avg < self.threshold_smat,
             new_running_avg,
         )
+
 
 class LLDSMAD(LLDAlgoABC):
     """Simple moving average derivative."""
@@ -352,7 +351,9 @@ def run(
                 results.append(float(threshold_z_pos))
             else:
                 print("No threshold found")
-        print(f"{algorithm.name()}, expected {expected_height} max {max(results)} min{min(results)}, avg {sum(results)/len(results)}")
+        print(
+            f"{algorithm.name()}, expected {expected_height} max {max(results)} min{min(results)}, avg {sum(results)/len(results)}"
+        )
         final_results.append(
             (float(expected_height), results, f"{algorithm.name()}", f"{report_file}")
         )
@@ -365,13 +366,17 @@ def _check_for_failure(expected_height: float, results: List[float]) -> bool:
             return True
     return False
 
-def _score(algorithms: List[LLDAlgoABC], analysis: List[Tuple[float, List[float], str, str]]) -> Dict[str, int]:
+
+def _score(
+    algorithms: List[LLDAlgoABC], analysis: List[Tuple[float, List[float], str, str]]
+) -> Dict[str, int]:
     algorithm_score: Dict[str, int] = {algo.name(): 0 for algo in algorithms}
     a_score = len(analysis)
     for a in analysis:
         algorithm_score[a[2]] += a_score
         a_score -= 2
     return dict(sorted(algorithm_score.items(), key=lambda item: item[1], reverse=True))
+
 
 def main() -> None:
     """Main function."""
@@ -406,31 +411,30 @@ def main() -> None:
         print(f"Algorithm {result[2]} {res_string}")
 
     accuracy = sorted(
-        analysis,
-        key=lambda acc: abs((sum(acc[1]) / len(acc[1])) - acc[0])
+        analysis, key=lambda acc: abs((sum(acc[1]) / len(acc[1])) - acc[0])
     )
-    precision = sorted(
-        analysis, key=lambda per: (max(per[1]) - min(per[1]))
-    )
+    precision = sorted(analysis, key=lambda per: (max(per[1]) - min(per[1])))
 
     accuracy_score: Dict[str, int] = _score(algorithms, accuracy)
     precision_score: Dict[str, int] = _score(algorithms, precision)
     algorithm_score: Dict[str, int] = {algo.name(): 0 for algo in algorithms}
 
     print("Accuracy Scores")
-    for algorithm in accuracy_score.keys():
-        print(f"{algorithm} {accuracy_score[algorithm]}")
+    for a_name in accuracy_score.keys():
+        print(f"{a_name} {accuracy_score[a_name]}")
 
     print("Precision Scores")
-    for algorithm in precision_score.keys():
-        print(f"{algorithm} {precision_score[algorithm]}")
-        #add the two scores together for final score so we can sort before printing
-        algorithm_score[algorithm] = precision_score[algorithm] + accuracy_score[algorithm]
+    for a_name in precision_score.keys():
+        print(f"{a_name} {precision_score[a_name]}")
+        # add the two scores together for final score so we can sort before printing
+        algorithm_score[a_name] = precision_score[a_name] + accuracy_score[a_name]
 
-    algorithm_score = dict(sorted(algorithm_score.items(), key=lambda item: item[1], reverse=True))
+    algorithm_score = dict(
+        sorted(algorithm_score.items(), key=lambda item: item[1], reverse=True)
+    )
     print("Total Scores")
-    for algorithm in algorithm_score.keys():
-        print(f"{algorithm} {algorithm_score[algorithm]}")
+    for a_name in algorithm_score.keys():
+        print(f"{a_name} {algorithm_score[a_name]}")
 
 
 if __name__ == "__main__":
