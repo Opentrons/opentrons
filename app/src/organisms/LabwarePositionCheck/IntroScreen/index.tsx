@@ -8,7 +8,7 @@ import {
 import { StyledText } from '../../../atoms/text'
 import { RobotMotionLoader } from '../RobotMotionLoader'
 import { getPrepCommands } from './getPrepCommands'
-import { useChainRunCommands } from '../../../resources/runs/hooks'
+import { useChainRunCommands } from '../../../resources/runs'
 import type { RegisterPositionAction } from '../types'
 import type { Jog } from '../../../molecules/JogControls'
 import { WizardRequiredEquipmentList } from '../../../molecules/WizardRequiredEquipmentList'

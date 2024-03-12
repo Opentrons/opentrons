@@ -37,7 +37,7 @@ import { LocationConflictModal } from '../../organisms/Devices/ProtocolRun/Setup
 import { ModuleWizardFlows } from '../../organisms/ModuleWizardFlows'
 import { useToaster } from '../../organisms/ToasterOven'
 import { getLocalRobot } from '../../redux/discovery'
-import { useChainLiveCommands } from '../../resources/runs/hooks'
+import { useChainLiveCommands } from '../../resources/runs'
 
 import type { CommandData } from '@opentrons/api-client'
 import type { CutoutConfig, DeckDefinition } from '@opentrons/shared-data'

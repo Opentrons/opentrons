@@ -5,7 +5,7 @@ import {
   useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
 
-import { useCreateTargetedMaintenanceRunMutation } from '../../resources/runs/hooks'
+import { useCreateTargetedMaintenanceRunMutation } from '../../resources/runs'
 import { LabwarePositionCheck } from '.'
 import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
 import { getLabwareDefinitionsFromCommands } from './utils/labware'
