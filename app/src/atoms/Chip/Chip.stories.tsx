@@ -40,27 +40,3 @@ ChipComponent.args = {
   type: 'basic',
   text: 'Chip component',
 }
-
-// export const Error = Template.bind({})
-// Error.args = {
-//   type: 'error',
-//   text: 'Not connected',
-// }
-
-// export const Success = Template.bind({})
-// Success.args = {
-//   type: 'success',
-//   text: 'Connected',
-// }
-
-// export const Warning = Template.bind({})
-// Warning.args = {
-//   type: 'warning',
-//   text: 'Missing 1 module',
-// }
-
-// export const Neutral = Template.bind({})
-// Neutral.args = {
-//   type: 'neutral',
-//   text: 'Not connected',
-// }
