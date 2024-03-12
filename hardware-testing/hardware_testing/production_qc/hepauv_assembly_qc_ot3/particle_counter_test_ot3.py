@@ -35,6 +35,9 @@ async def _main(simulating: bool) -> None:
     attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
     current_pos = await api.gantry_position(OT3Mount.LEFT)
     await api.move_to(OT3Mount.LEFT, attach_pos._replace(z=current_pos.z),)
+    await api.move_rel(
+                                mount, Point(z=-attach_pos.z)
+                            )
     HEPASN = input("Enter HEPA/UV Barcode Number:: ").strip()
     instrument = BuildAsairGT521S()
     uvinstrument = BuildAsairUV()
