@@ -26,6 +26,7 @@ from datetime import datetime
 async def _main(simulating: bool) -> None:
 
     
+    HEPASN = input("Enter HEPA/UV Barcode Number:: ").strip()
     final_result = []
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=simulating, use_defaults=True
@@ -33,12 +34,14 @@ async def _main(simulating: bool) -> None:
     # home and move to attach position
     await api.home([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R])
     attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
-    current_pos = await api.gantry_position(OT3Mount.LEFT)
-    await api.move_to(OT3Mount.LEFT, attach_pos._replace(z=current_pos.z),)
-    await api.move_rel(
-                                mount, Point(z=-attach_pos.z)
-                            )
-    HEPASN = input("Enter HEPA/UV Barcode Number:: ").strip()
+    # current_pos = await api.gantry_position(OT3Mount.LEFT)
+    # await api.move_to(OT3Mount.LEFT, attach_pos._replace(z=current_pos.z),)
+    # await api.move_rel(
+    #                             mount, Point(z=-attach_pos.z)
+    #                         )
+
+    await helpers_ot3.move_to_arched_ot3(api, mount, attach_pos)
+    
     instrument = BuildAsairGT521S()
     uvinstrument = BuildAsairUV()
     INTSN = instrument.serial_number().strip("SS").replace(' ', '')
@@ -113,17 +116,34 @@ async def _main(simulating: bool) -> None:
         }
 
         #test uv
+        print("homing......")
         await api.home([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R,Axis.Z_G,Axis.G])
+        mount = OT3Mount.GRIPPER
         for slot in  GRIP_SLOT:
-            attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(slot[0])
-            current_pos = await api.gantry_position(OT3Mount.LEFT)
-            await api.move_to(OT3Mount.LEFT, attach_pos._replace(z=current_pos.z),)
-
+            
+            #hover_pos, target_pos = _get_width_hover_and_grip_positions(api, slot[0])
+            print("grip uv meter probe(夹取UV探头)......")
             await api.ungrip()
+            hover_pos = helpers_ot3.get_slot_calibration_square_position_ot3(slot[0])
+            # MOVE TO SLOT
+            await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos)
+            await api.grip(20)
+
+            if slot_loc[slot[1]]:
+                print("ungrip uv meter probe(放取UV探头)......")
+                await api.ungrip()
+                hover_pos = helpers_ot3.get_slot_calibration_square_position_ot3(slot[0])
+                # MOVE TO SLOT
+                await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos)
+                await api.grip(20)  
+
+
+
+            
             for sl in slot:
 
                 if sl is not None:
-                    mount = OT3Mount.GRIPPER
+                    
                     print("homing......")
                     
                     hover_pos, target_pos = _get_width_hover_and_grip_positions(api, slot)
