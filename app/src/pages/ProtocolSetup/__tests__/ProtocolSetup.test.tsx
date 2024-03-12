@@ -51,7 +51,7 @@ import { useIsHeaterShakerInProtocol } from '../../../organisms/ModuleCard/hooks
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
 import { ConfirmAttachedModal } from '../../../pages/ProtocolSetup/ConfirmAttachedModal'
 import { ProtocolSetup } from '../../../pages/ProtocolSetup'
-import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../../resources/runs'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 
 import type { UseQueryResult } from 'react-query'
@@ -107,7 +107,7 @@ vi.mock('../../../redux/discovery/selectors')
 vi.mock('../ConfirmAttachedModal')
 vi.mock('../../../organisms/ToasterOven')
 vi.mock('../../../resources/deck_configuration/hooks')
-vi.mock('../../../resources/runs/useNotifyRunQuery')
+vi.mock('../../../resources/runs')
 
 const render = (path = '/') => {
   return renderWithProviders(

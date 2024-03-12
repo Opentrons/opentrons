@@ -19,7 +19,7 @@ import {
 import { SetupLabwareList } from '../SetupLabwareList'
 import { SetupLabwareMap } from '../SetupLabwareMap'
 import { SetupLabware } from '..'
-import { useNotifyRunQuery } from '../../../../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../../../../resources/runs'
 
 vi.mock('../SetupLabwareList')
 vi.mock('../SetupLabwareMap')
@@ -29,7 +29,7 @@ vi.mock('../../../../RunTimeControl/hooks')
 vi.mock('../../../../../redux/config')
 vi.mock('../../../hooks')
 vi.mock('../../../hooks/useLPCSuccessToast')
-vi.mock('../../../../../resources/runs/useNotifyRunQuery')
+vi.mock('../../../../../resources/runs')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'

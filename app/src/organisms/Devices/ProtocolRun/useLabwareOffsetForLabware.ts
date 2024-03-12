@@ -1,9 +1,9 @@
 import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 
-import { getCurrentOffsetForLabwareInLocation } from '../../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
-import { getLabwareDefinitionUri } from '../../Devices/ProtocolRun/utils/getLabwareDefinitionUri'
-import { getLabwareOffsetLocation } from '../../Devices/ProtocolRun/utils/getLabwareOffsetLocation'
-import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
+import { getCurrentOffsetForLabwareInLocation } from './utils/getCurrentOffsetForLabwareInLocation'
+import { getLabwareDefinitionUri } from './utils/getLabwareDefinitionUri'
+import { getLabwareOffsetLocation } from './utils/getLabwareOffsetLocation'
+import { useNotifyRunQuery } from '../../../resources/runs'
 
 import type { LabwareOffset } from '@opentrons/api-client'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'

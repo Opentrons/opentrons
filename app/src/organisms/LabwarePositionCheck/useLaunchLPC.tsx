@@ -9,7 +9,7 @@ import { useCreateTargetedMaintenanceRunMutation } from '../../resources/runs/ho
 import { LabwarePositionCheck } from '.'
 import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
 import { getLabwareDefinitionsFromCommands } from './utils/labware'
-import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../resources/runs'
 
 import type { RobotType } from '@opentrons/shared-data'
 

@@ -18,7 +18,10 @@ import { InterventionModal } from '../../InterventionModal'
 import { ProgressBar } from '../../../atoms/ProgressBar'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useNotifyLastRunCommandKey } from '../../../resources/runs'
+import {
+  useNotifyLastRunCommandKey,
+  useNotifyRunQuery,
+} from '../../../resources/runs'
 import { useDownloadRunLog } from '../../Devices/hooks'
 import {
   mockUseAllCommandsResponseNonDeterministic,
@@ -31,7 +34,6 @@ import {
   mockRunData,
 } from '../../InterventionModal/__fixtures__'
 import { RunProgressMeter } from '..'
-import { useNotifyRunQuery } from '../../../resources/runs'
 import { renderWithProviders } from '../../../__testing-utils__'
 import type * as ApiClient from '@opentrons/react-api-client'
 
