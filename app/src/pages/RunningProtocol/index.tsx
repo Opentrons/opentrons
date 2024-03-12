@@ -29,7 +29,7 @@ import {
 
 import { StepMeter } from '../../atoms/StepMeter'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useNotifyLastRunCommandKey } from '../../resources/runs/useNotifyLastRunCommandKey'
+import { useNotifyLastRunCommandKey } from '../../resources/runs'
 import { InterventionModal } from '../../organisms/InterventionModal'
 import { isInterventionCommand } from '../../organisms/InterventionModal/utils'
 import {
