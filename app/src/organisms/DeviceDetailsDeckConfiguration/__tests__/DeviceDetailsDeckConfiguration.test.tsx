@@ -30,6 +30,7 @@ vi.mock('@opentrons/components', async importOriginal => {
 vi.mock('@opentrons/react-api-client')
 vi.mock('../DeckFixtureSetupInstructionsModal')
 vi.mock('../../Devices/hooks')
+vi.mock('../../../resources/maintenance_runs')
 vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
 
 const ROBOT_NAME = 'otie'
