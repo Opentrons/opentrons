@@ -748,7 +748,7 @@ class PostRunHardwareState(Enum):
     DISENGAGE_IN_PLACE = "disengageInPlace"
 
 
-NOZZLE_NAME_REGEX = "[A-Z][0-100]"
+NOZZLE_NAME_REGEX = r"[A-Z]\d{1,2}"
 PRIMARY_NOZZLE_LITERAL = Literal["A1", "H1", "A12", "H12"]
 
 

@@ -23,6 +23,7 @@ from opentrons_shared_data.errors.exceptions import (
 
 from ...disposal_locations import TrashBin, WasteChute
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 
 from ..instrument import AbstractInstrument
 
@@ -467,6 +468,10 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
     def get_active_channels(self) -> int:
         """This will never be called because it was added in API 2.16."""
         assert False, "get_active_channels only supported in API 2.16 & later"
+
+    def get_nozzle_map(self) -> NozzleMap:
+        """This will never be called because it was added in API 2.18."""
+        assert False, "get_nozzle_map only supported in API 2.18 & later"
 
     def is_tip_tracking_available(self) -> bool:
         # Tip tracking is always available in legacy context

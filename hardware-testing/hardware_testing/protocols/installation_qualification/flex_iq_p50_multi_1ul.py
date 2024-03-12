@@ -296,7 +296,11 @@ def _transfer(
         # transfer
         if not same_tip:
             pipette.configure_for_volume(volume)
-            pipette.pick_up_tip(tips.next_tip(pipette.channels))
+            pipette.pick_up_tip(
+                tips.next_tip(
+                    pipette.channels,
+                )
+            )
         if pipette.current_volume > 0:
             pipette.dispense(pipette.current_volume, reservoir[source].top())
         pipette.aspirate(volume, aspirate_pos)
