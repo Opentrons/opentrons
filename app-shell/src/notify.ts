@@ -188,7 +188,6 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
   function subscribeCb(error: Error, result: mqtt.ISubscriptionGrant[]): void {
     const { subscriptions } = connectionStore[hostname]
     if (error != null) {
-      // log.warn(`Failed to subscribe on ${hostname} to topic: ${topic}`)
       sendToBrowserDeserialized({
         browserWindow,
         hostname,
@@ -201,7 +200,6 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
         }
       }, RENDER_TIMEOUT)
     } else {
-      // log.info(`Successfully subscribed on ${hostname} to topic: ${topic}`)
       if (subscriptions[topic] > 0) {
         subscriptions[topic] += 1
       } else {
@@ -231,7 +229,6 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
         counter++
         if (counter === MAX_RETRIES) {
           clearInterval(intervalId)
-          // log.warn(`Failed to subscribe on ${hostname} to topic: ${topic}`)
           reject(new Error('Maximum subscription retries exceeded.'))
         }
       }, CHECK_CONNECTION_INTERVAL)
@@ -256,24 +253,13 @@ function unsubscribe(notifyParams: NotifyParams): Promise<void> {
 
         if (isLastSubscription) {
           client?.unsubscribe(topic, {}, (error, result) => {
-            if (error != null) {
-              // log.warn(
-              //   `Failed to unsubscribe on ${hostname} from topic: ${topic}`
-              // )
-            } else {
-              // log.info(
-              //   `Successfully unsubscribed on ${hostname} from topic: ${topic}`
-              // )
+            if (error == null) {
               handleDecrementSubscriptionCount(hostname, topic)
             }
           })
         } else {
           subscriptions[topic] -= 1
         }
-      } else {
-        // log.info(
-        //   `Attempted to unsubscribe from unconnected hostname: ${hostname}`
-        // )
       }
     }, RENDER_TIMEOUT)
   })
