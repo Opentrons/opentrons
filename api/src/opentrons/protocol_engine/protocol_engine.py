@@ -241,6 +241,7 @@ class ProtocolEngine:
         if self._state_store.commands.get_is_stopped():
             return
         current_id = (
+            # todo
             self._state_store.commands.state.running_command_id
             or self._state_store.commands.state.queued_command_ids.head(None)
         )
@@ -256,6 +257,7 @@ class ProtocolEngine:
 
             # In the case where the running command was a setup command - check if there
             # are any pending *run* commands and, if so, clear them all
+            # todo
             current_id = self._state_store.commands.state.queued_command_ids.head(None)
             if current_id is not None:
                 fail_action = FailCommandAction(
