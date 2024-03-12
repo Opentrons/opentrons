@@ -1532,7 +1532,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         return self
 
-    @requires_version(2, 0)
+    @requires_version(2, 18)
     def _retract(
         self,
     ) -> None:
