@@ -77,7 +77,7 @@ export function useNotifyService<TData, TError = Error>({
           properties: {},
         })
       }
-    } else if ('refetchUsingHTTP' in data) {
+    } else if ('refetchUsingHTTP' in data || 'unsubscribe' in data) {
       setRefetchUsingHTTP('once')
     }
   }
