@@ -16,6 +16,7 @@ import type {
   RobotState,
   ThermocyclerModuleState,
 } from './'
+import { COLUMN_4_SLOTS } from './constants'
 export function sortLabwareBySlot(
   labwareState: RobotState['labware']
 ): string[] {
@@ -93,8 +94,12 @@ export function getNextTiprack(
         `cannot getNextTiprack, no labware entity for "${labwareId}"`
       )
       const isOnDeck = robotState.labware[labwareId].slot != null
+      const isIn4thColumn = COLUMN_4_SLOTS.includes(
+        robotState.labware[labwareId].slot
+      )
       return (
         isOnDeck &&
+        !isIn4thColumn &&
         pipetteEntity.tiprackDefURI ===
           invariantContext.labwareEntities[labwareId]?.labwareDefURI
       )
