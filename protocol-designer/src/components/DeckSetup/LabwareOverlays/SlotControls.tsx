@@ -70,7 +70,10 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
     accept: DND_TYPES.LABWARE,
     canDrop: (item: DroppedItem) => {
       const draggedDef = item?.labwareOnDeck?.def
-      assert(draggedDef, 'no labware def of dragged item, expected it on drop')
+      console.assert(
+        draggedDef,
+        'no labware def of dragged item, expected it on drop'
+      )
 
       if (moduleType != null && draggedDef != null) {
         // this is a module slot, prevent drop if the dragged labware is not compatible

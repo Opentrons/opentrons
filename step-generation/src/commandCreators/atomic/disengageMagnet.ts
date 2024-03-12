@@ -13,7 +13,7 @@ export const disengageMagnet: CommandCreator<DisengageMagnetArgs> = (
   const { module: moduleId } = args
   const commandType = 'magneticModule/disengage'
 
-  if (module === null) {
+  if (moduleId === null) {
     return {
       errors: [errorCreators.missingModuleError()],
     }
