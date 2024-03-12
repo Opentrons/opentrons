@@ -780,4 +780,5 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def retract(self) -> None:
         """Retract this instrument to the top of the gantry."""
-        self._sync_hardware_api.retract(self.get_mount())
+        z_axis = self._engine_client.state.pipettes.get_z_axis(self._pipette_id)
+        self._engine_client.home([z_axis])
