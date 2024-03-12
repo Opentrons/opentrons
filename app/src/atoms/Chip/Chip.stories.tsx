@@ -6,6 +6,16 @@ import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'ODD/Atoms/Chip',
+  argTypes: {
+    type: {
+      options: ['basic', 'error', 'info', 'neutral', 'success', 'warning'],
+      control: {
+        type: 'select',
+      },
+      defaultValue: 'basic',
+    },
+
+  },
   component: Chip,
   parameters: touchScreenViewport,
 } as Meta
@@ -25,32 +35,32 @@ const Template: Story<ChipStorybookProps> = ({ ...args }) => (
   </Flex>
 )
 
-export const Basic = Template.bind({})
-Basic.args = {
+export const ChipComponent = Template.bind({})
+ChipComponent.args = {
   type: 'basic',
-  text: 'Basic chip text',
+  text: 'Chip component',
 }
 
-export const Error = Template.bind({})
-Error.args = {
-  type: 'error',
-  text: 'Not connected',
-}
+// export const Error = Template.bind({})
+// Error.args = {
+//   type: 'error',
+//   text: 'Not connected',
+// }
 
-export const Success = Template.bind({})
-Success.args = {
-  type: 'success',
-  text: 'Connected',
-}
+// export const Success = Template.bind({})
+// Success.args = {
+//   type: 'success',
+//   text: 'Connected',
+// }
 
-export const Warning = Template.bind({})
-Warning.args = {
-  type: 'warning',
-  text: 'Missing 1 module',
-}
+// export const Warning = Template.bind({})
+// Warning.args = {
+//   type: 'warning',
+//   text: 'Missing 1 module',
+// }
 
-export const Neutral = Template.bind({})
-Neutral.args = {
-  type: 'neutral',
-  text: 'Not connected',
-}
+// export const Neutral = Template.bind({})
+// Neutral.args = {
+//   type: 'neutral',
+//   text: 'Not connected',
+// }

@@ -15,7 +15,7 @@ import { StyledText } from '../text'
 
 import type { IconName, StyleProps } from '@opentrons/components'
 
-export type ChipType = 'basic' | 'error' | 'neutral' | 'success' | 'warning'
+export type ChipType = 'basic' | 'error' | 'info' | 'neutral' | 'success' | 'warning'
 
 interface ChipProps extends StyleProps {
   /** Display background color? */
@@ -48,6 +48,12 @@ const CHIP_PROPS_BY_TYPE: Record<
     borderRadius: BORDERS.borderRadiusSize5,
     iconColor: COLORS.red60,
     textColor: COLORS.red60,
+  },
+  info: {
+    backgroundColor: COLORS.blue35,
+    borderRadius: BORDERS.borderRadiusSize5,
+    iconColor: COLORS.blue60,
+    textColor: COLORS.blue60,
   },
   neutral: {
     backgroundColor: `${COLORS.black90}${COLORS.opacity20HexCode}`,
