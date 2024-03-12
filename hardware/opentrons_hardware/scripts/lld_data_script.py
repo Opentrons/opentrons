@@ -2,7 +2,7 @@
 import csv
 import os
 import argparse
-from typing import List, Optional, Tuple, Any
+from typing import List, Optional, Tuple, Any, Dict
 import matplotlib.pyplot as plot
 import numpy
 from abc import ABC, abstractmethod
@@ -404,6 +404,33 @@ def main() -> None:
             "FAILURE" if _check_for_failure(result[0], result[1]) else "success"
         )
         print(f"Algorithm {result[2]} {res_string}")
+
+    accuracy = sorted(
+        analysis,
+        key=lambda acc: abs((sum(acc[1]) / len(acc[1])) - acc[0])
+    )
+    precision = sorted(
+        analysis, key=lambda per: (max(per[1]) - min(per[1]))
+    )
+
+    accuracy_score: Dict[str, int] = _score(algorithms, accuracy)
+    precision_score: Dict[str, int] = _score(algorithms, precision)
+    algorithm_score: Dict[str, int] = {algo.name(): 0 for algo in algorithms}
+
+    print("Accuracy Scores")
+    for algorithm in accuracy_score.keys():
+        print(f"{algorithm} {accuracy_score[algorithm]}")
+
+    print("Precision Scores")
+    for algorithm in precision_score.keys():
+        print(f"{algorithm} {precision_score[algorithm]}")
+        #add the two scores together for final score so we can sort before printing
+        algorithm_score[algorithm] = precision_score[algorithm] + accuracy_score[algorithm]
+
+    algorithm_score = dict(sorted(algorithm_score.items(), key=lambda item: item[1], reverse=True))
+    print("Total Scores")
+    for algorithm in algorithm_score.keys():
+        print(f"{algorithm} {algorithm_score[algorithm]}")
 
 
 if __name__ == "__main__":
