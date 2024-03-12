@@ -34,7 +34,10 @@ Cypress.Commands.add('closeAnnouncementModal', () => {
   cy.get('[data-test="ComputingSpinner"]', { timeout: 30000 }).should(
     'not.exist'
   )
-  cy.get('button').contains('Got It!').should('be.visible').click({force: true})
+  cy.get('button')
+    .contains('Got It!')
+    .should('be.visible')
+    .click({ force: true })
 })
 
 //

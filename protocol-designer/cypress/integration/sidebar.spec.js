@@ -35,7 +35,7 @@ describe('Desktop Navigation', () => {
   })
 
   it('contains a settings button', () => {
-    cy.get("button").contains('Settings').should('exist')
+    cy.get('button').contains('Settings').should('exist')
   })
 
   it('returns to the file controls when the file button is clicked', () => {
