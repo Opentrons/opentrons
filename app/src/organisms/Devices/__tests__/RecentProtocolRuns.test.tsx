@@ -4,7 +4,7 @@ import { screen } from '@testing-library/react'
 import { describe, it, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
-import { useNotifyAllRunsQuery } from '../../../resources/runs/useNotifyAllRunsQuery'
+import { useNotifyAllRunsQuery } from '../../../resources/runs'
 import { i18n } from '../../../i18n'
 import { useIsRobotViewable, useRunStatuses } from '../hooks'
 import { RecentProtocolRuns } from '../RecentProtocolRuns'
@@ -13,7 +13,7 @@ import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
 import type { Runs } from '@opentrons/api-client'
 import type { AxiosError } from 'axios'
 
-vi.mock('../../../resources/runs/useNotifyAllRunsQuery')
+vi.mock('../../../resources/runs')
 vi.mock('../hooks')
 vi.mock('../../ProtocolUpload/hooks')
 vi.mock('../HistoricalProtocolRun')

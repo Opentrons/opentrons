@@ -6,14 +6,16 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
-import { EmptyRecentRun } from '../../../organisms/OnDeviceDisplay/RobotDashboard/EmptyRecentRun'
-import { RecentRunProtocolCarousel } from '../../../organisms/OnDeviceDisplay/RobotDashboard'
+import {
+  RecentRunProtocolCarousel,
+  EmptyRecentRun,
+} from '../../../organisms/OnDeviceDisplay/RobotDashboard'
 import { Navigation } from '../../../organisms/Navigation'
 import { useMissingProtocolHardware } from '../../Protocols/hooks'
 import { getOnDeviceDisplaySettings } from '../../../redux/config'
 import { WelcomeModal } from '../WelcomeModal'
 import { RobotDashboard } from '..'
-import { useNotifyAllRunsQuery } from '../../../resources/runs/useNotifyAllRunsQuery'
+import { useNotifyAllRunsQuery } from '../../../resources/runs'
 
 import type { ProtocolResource } from '@opentrons/shared-data'
 import type * as ReactRouterDom from 'react-router-dom'
@@ -36,7 +38,7 @@ vi.mock('../../../organisms/Navigation')
 vi.mock('../../Protocols/hooks')
 vi.mock('../../../redux/config')
 vi.mock('../WelcomeModal')
-vi.mock('../../../resources/runs/useNotifyAllRunsQuery')
+vi.mock('../../../resources/runs')
 
 const render = () => {
   return renderWithProviders(
