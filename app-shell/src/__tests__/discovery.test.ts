@@ -27,6 +27,7 @@ vi.mock('../log', () => {
     },
   }
 })
+vi.mock('../notify')
 
 let mockGet = vi.fn(property => {
   return []

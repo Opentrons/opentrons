@@ -9,15 +9,18 @@ import {
   DEFAULT_PORT,
 } from '@opentrons/discovery-client'
 import {
-  CLEAR_CACHE,
-  DISCOVERY_FINISH,
-  DISCOVERY_REMOVE,
-  DISCOVERY_START,
-  OPENTRONS_USB,
   UI_INITIALIZED,
   USB_HTTP_REQUESTS_START,
   USB_HTTP_REQUESTS_STOP,
-} from './constants'
+} from '@opentrons/app/src/redux/shell/actions'
+import {
+  DISCOVERY_START,
+  DISCOVERY_FINISH,
+  DISCOVERY_REMOVE,
+  CLEAR_CACHE,
+} from '@opentrons/app/src/redux/discovery/actions'
+import { OPENTRONS_USB } from '@opentrons/app/src/redux/discovery/constants'
+import { handleNotificationConnectionsFor } from './notify'
 
 import { getFullConfig, handleConfigChange } from './config'
 import { createLogger } from './log'
@@ -199,6 +202,7 @@ export function registerDiscovery(
 
   function handleRobots(): void {
     const robots = client.getRobots()
+    handleNotificationConnectionsFor(robots)
 
     if (!disableCache) store.set('robots', robots)
 

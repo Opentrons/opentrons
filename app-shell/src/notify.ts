@@ -19,7 +19,7 @@ import type { DiscoveryClientRobot } from '@opentrons/discovery-client'
 // Manages MQTT broker connections through a connection store. Broker connections are added or removed based on
 // health status changes reported by discovery-client. Subscriptions are handled "lazily", in which a component must
 // express interest in a topic before a subscription request is made. Unsubscribe requests only occur if an "unsubscribe"
-// flag is received from the broker.
+// flag is received from the broker. Pending subs and unsubs are used to prevent unnecessary network and broker load.
 
 interface HostnameInfo {
   client: mqtt.MqttClient | null
