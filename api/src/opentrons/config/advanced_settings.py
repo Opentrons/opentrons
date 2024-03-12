@@ -231,6 +231,7 @@ settings = [
             " bring misfortune and pestilence upon you and your livestock, etc."
         ),
         robot_type=[RobotTypeEnum.FLEX],
+        internal_only=True,
     ),
 ]
 
