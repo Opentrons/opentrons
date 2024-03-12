@@ -141,7 +141,7 @@ describe('The Settings Page', () => {
     cy.contains(exptlSettingText).next().click()
     cy.get('button').contains('Continue').click()
     // Leave the settings page
-    cy.get("button[class*='navbar__tab__']").contains('FILE').click()
+    cy.get("button[id='NavTab_file']").contains('FILE').click()
     // Go back to settings
     cy.openSettingsPage()
     // The toggle is still on
@@ -159,7 +159,7 @@ describe('The Settings Page', () => {
     cy.contains(exptlSettingText).next().click()
     cy.get('button').contains('Continue').click()
     // Leave the settings page
-    cy.get("button[class*='navbar__tab__']").contains('FILE')
+    cy.get("button[id='NavTab_file']").contains('FILE')
     // Go back to settings
     cy.openSettingsPage()
     // The toggle is still off
