@@ -8,7 +8,6 @@
     "email": "engineering@opentrons.com"
   },
   "name": "protocol-designer",
-  "type": "module",
   "productName": "Opentrons Protocol Designer",
   "private": true,
   "version": "0.0.0-dev",
