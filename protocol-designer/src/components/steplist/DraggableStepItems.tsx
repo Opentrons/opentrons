@@ -21,7 +21,6 @@ import styles from './StepItem.module.css'
 
 interface DragDropStepItemProps extends ConnectedStepItemProps {
   stepId: StepIdType
-  clickDrop: () => void
   moveStep: (stepId: StepIdType, value: number) => void
   findStepIndex: (stepId: StepIdType) => number
   orderedStepIds: string[]
@@ -32,7 +31,7 @@ interface DropType {
 }
 
 const DragDropStepItem = (props: DragDropStepItemProps): JSX.Element => {
-  const { stepId, moveStep, clickDrop, findStepIndex, orderedStepIds } = props
+  const { stepId, moveStep, findStepIndex, orderedStepIds } = props
   const ref = React.useRef<HTMLDivElement>(null)
 
   const [{ isDragging }, drag] = useDrag(
