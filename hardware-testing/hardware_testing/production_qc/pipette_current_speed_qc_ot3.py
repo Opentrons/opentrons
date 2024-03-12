@@ -39,21 +39,18 @@ assert (
 #     DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] + 10,
 #     DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P] + 20,
 # ]
-# TEST_SPEEDS = [
-#     90,
-#     80,
-#     70,
-#     60
-# ]
 TEST_SPEEDS = [
-    150,
-    140,
-    130,
-    120,
-    110,
-    100,
-    90
+    90,
+    80,
+    70,
+    60
 ]
+# TEST_SPEEDS = [
+#     120,
+#     130,
+#     140,
+#     150,
+# ]
 # PLUNGER_CURRENTS_SPEED = {
 #     MUST_PASS_CURRENT - 0.45: TEST_SPEEDS,
 #     MUST_PASS_CURRENT - 0.35: TEST_SPEEDS,
@@ -61,22 +58,21 @@ TEST_SPEEDS = [
 #     MUST_PASS_CURRENT: TEST_SPEEDS,
 #     DEFAULT_CURRENT: TEST_SPEEDS,
 # }
-# PLUNGER_CURRENTS_SPEED = {
-#     0.3: TEST_SPEEDS,
-#     0.35: TEST_SPEEDS,
-#     0.4: TEST_SPEEDS,
-#     0.45: TEST_SPEEDS,
-#     0.5: TEST_SPEEDS,
-#     0.55: TEST_SPEEDS,
-#     0.6: TEST_SPEEDS,
-#     1: TEST_SPEEDS,
-# }
 PLUNGER_CURRENTS_SPEED = {
-    0.7: TEST_SPEEDS,
-    0.8: TEST_SPEEDS,
-    0.9: TEST_SPEEDS,
+    0.3: TEST_SPEEDS,
+    0.35: TEST_SPEEDS,
+    0.4: TEST_SPEEDS,
+    0.45: TEST_SPEEDS,
+    0.5: TEST_SPEEDS,
+    0.55: TEST_SPEEDS,
+    0.6: TEST_SPEEDS,
     1: TEST_SPEEDS,
 }
+# PLUNGER_CURRENTS_SPEED = {
+#     0.6: TEST_SPEEDS,
+#     0.8: TEST_SPEEDS,
+#     1: TEST_SPEEDS,
+# }
 
 MAX_SPEED = max(TEST_SPEEDS)
 MAX_CURRENT = max(max(list(PLUNGER_CURRENTS_SPEED.keys())), 1.0)
