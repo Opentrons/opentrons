@@ -13,6 +13,7 @@ from robot_server.service.json_api.response import (
     MultiBody,
     MultiBodyMeta,
     NotifyRefetchBody,
+    NotifyUnsubscribeBody,
     DeprecatedResponseModel,
     DeprecatedMultiResponseModel,
 )
@@ -116,6 +117,10 @@ RESPONSE_SPECS = [
         },
     ),
     ResponseSpec(subject=NotifyRefetchBody(), expected={"refetchUsingHTTP": True}),
+    ResponseSpec(
+        subject=NotifyUnsubscribeBody(),
+        expected={"unsubscribe": True},
+    ),
 ]
 
 
