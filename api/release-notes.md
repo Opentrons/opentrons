@@ -6,6 +6,16 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## Opentrons Robot Software Changes in 7.2.1
+
+Welcome to the v7.2.1 release of the Opentrons robot software!
+
+### Bug Fixes
+
+* Fixed an OT-2 issue where tip length calibrations created before v4.1.0 would cause a "missing calibration data" error that you could only resolve by resetting calibration.
+
+---
+
 ## Opentrons Robot Software Changes in 7.2.0
 
 Welcome to the v7.2.0 release of the Opentrons robot software!
