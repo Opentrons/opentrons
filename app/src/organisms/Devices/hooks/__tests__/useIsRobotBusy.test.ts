@@ -24,7 +24,7 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('../../../ProtocolUpload/hooks')
 vi.mock('../useIsFlex')
 vi.mock('../../../../resources/runs')
-vi.mock('../../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
+vi.mock('../../../../resources/maintenance_runs')
 
 const mockEstopStatus = {
   data: {

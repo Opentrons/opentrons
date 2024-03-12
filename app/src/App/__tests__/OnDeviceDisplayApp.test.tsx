@@ -27,7 +27,7 @@ import { getIsShellReady } from '../../redux/shell'
 import { getLocalRobot } from '../../redux/discovery'
 import { mockConnectedRobot } from '../../redux/discovery/__fixtures__'
 import { useCurrentRunRoute, useProtocolReceiptToast } from '../hooks'
-import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
 
 import type { OnDeviceDisplaySettings } from '../../redux/config/schema-types'
 
@@ -51,7 +51,7 @@ vi.mock('../../pages/DeckConfiguration')
 vi.mock('../../redux/config')
 vi.mock('../../redux/shell')
 vi.mock('../../redux/discovery')
-vi.mock('../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
+vi.mock('../../resources/maintenance_runs')
 vi.mock('../hooks')
 
 const mockSettings = {

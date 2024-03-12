@@ -15,7 +15,7 @@ import { useIsRobotViewable, useRunStatuses } from '../../Devices/hooks'
 import { DeckFixtureSetupInstructionsModal } from '../DeckFixtureSetupInstructionsModal'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 import { DeviceDetailsDeckConfiguration } from '../'
-import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
+import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs'
 
 import type { MaintenanceRun } from '@opentrons/api-client'
 import type * as OpentronsComponents from '@opentrons/components'
@@ -30,7 +30,6 @@ vi.mock('@opentrons/components', async importOriginal => {
 vi.mock('@opentrons/react-api-client')
 vi.mock('../DeckFixtureSetupInstructionsModal')
 vi.mock('../../Devices/hooks')
-vi.mock('../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
 vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
 
 const ROBOT_NAME = 'otie'
