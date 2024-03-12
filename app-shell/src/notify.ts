@@ -235,9 +235,9 @@ function unsubscribe(hostname: string, topic: NotifyTopic): Promise<void> {
           //   `Failed to unsubscribe on ${hostname} from topic: ${topic}`
           // )
         } else {
-          // log.info(
-          //   `Successfully unsubscribed on ${hostname} from topic: ${topic}`
-          // )
+          log.debug(
+            `Successfully unsubscribed on ${hostname} from topic: ${topic}`
+          )
           const { subscriptions } = connectionStore[hostname]
           subscriptions.delete(topic)
           pendingUnsubs.delete(topic)
