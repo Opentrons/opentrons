@@ -26,6 +26,8 @@ from ..error_recovery_policy import ErrorRecoveryType
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+
 
 class TipRackWellState(Enum):
     """The state of a single tip in a tip rack's well."""
@@ -74,7 +76,11 @@ class TipStore(HasState[TipState], HandlesActions):
                 self._state.channels_by_pipette_id[pipette_id] = config.channels
                 self._state.active_channels_by_pipette_id[pipette_id] = config.channels
                 self._state.nozzle_map_by_pipette_id[pipette_id] = config.nozzle_map
+<<<<<<< HEAD
             self._handle_succeeded_command(action.command)
+=======
+            self._handle_command(action.command)
+>>>>>>> c6bdd88992 (feat(api): Tip tracking for all 96ch configurations (#14488))
 
             if isinstance(action.private_result, PipetteNozzleLayoutResultMixin):
                 pipette_id = action.private_result.pipette_id
@@ -130,6 +136,7 @@ class TipStore(HasState[TipState], HandlesActions):
             pipette_id = command.params.pipetteId
             self._state.length_by_pipette_id.pop(pipette_id, None)
 
+<<<<<<< HEAD
     def _handle_failed_command(
         self,
         action: FailCommandAction,
@@ -152,6 +159,8 @@ class TipStore(HasState[TipState], HandlesActions):
             # Note: We're logically removing the tip from the tip rack,
             # but we're not logically updating the pipette to have that tip on it.
 
+=======
+>>>>>>> c6bdd88992 (feat(api): Tip tracking for all 96ch configurations (#14488))
     def _set_used_tips(  # noqa: C901
         self, pipette_id: str, well_name: str, labware_id: str
     ) -> None:
@@ -267,6 +276,7 @@ class TipView(HasState[TipState]):
             elif all(wells[well] == TipRackWellState.USED for well in tip_cluster):
                 return None
             else:
+<<<<<<< HEAD
                 # In the case of an 8ch pipette where a column has mixed state tips we may simply progress to the next column in our search
                 if (
                     nozzle_map is not None
@@ -306,6 +316,39 @@ class TipView(HasState[TipState]):
             critical_row = active_rows - 1
 
             while critical_column < len(columns):
+=======
+                # The tip cluster list is ordered: Each row from a column in order by columns
+                tip_cluster_final_column = []
+                for i in range(active_rows):
+                    tip_cluster_final_column.append(
+                        tip_cluster[((active_columns * active_rows) - 1) - i]
+                    )
+                tip_cluster_final_row = []
+                for i in range(active_columns):
+                    tip_cluster_final_row.append(
+                        tip_cluster[(active_rows - 1) + (i * active_rows)]
+                    )
+                if all(
+                    wells[well] == TipRackWellState.USED
+                    for well in tip_cluster_final_column
+                ):
+                    return None
+                elif all(
+                    wells[well] == TipRackWellState.USED
+                    for well in tip_cluster_final_row
+                ):
+                    return None
+                else:
+                    # Tiprack has no valid tip selection, cannot progress
+                    return -1
+
+        # Search through the tiprack beginning at A1
+        def _cluster_search_A1(active_columns: int, active_rows: int) -> Optional[str]:
+            critical_column = active_columns - 1
+            critical_row = active_rows - 1
+
+            while critical_column <= len(columns):
+>>>>>>> c6bdd88992 (feat(api): Tip tracking for all 96ch configurations (#14488))
                 tip_cluster = _identify_tip_cluster(
                     active_columns, active_rows, critical_column, critical_row, "A1"
                 )
@@ -320,7 +363,11 @@ class TipView(HasState[TipState]):
                 if critical_row + active_rows < len(columns[0]):
                     critical_row = critical_row + active_rows
                 else:
+<<<<<<< HEAD
                     critical_column += 1
+=======
+                    critical_column = critical_column + 1
+>>>>>>> c6bdd88992 (feat(api): Tip tracking for all 96ch configurations (#14488))
                     critical_row = active_rows - 1
             return None
 
@@ -344,7 +391,11 @@ class TipView(HasState[TipState]):
                 if critical_row + active_rows < len(columns[0]):
                     critical_row = critical_row + active_rows
                 else:
+<<<<<<< HEAD
                     critical_column -= 1
+=======
+                    critical_column = critical_column - 1
+>>>>>>> c6bdd88992 (feat(api): Tip tracking for all 96ch configurations (#14488))
                     critical_row = active_rows - 1
             return None
 
@@ -368,9 +419,13 @@ class TipView(HasState[TipState]):
                 if critical_row - active_rows >= 0:
                     critical_row = critical_row - active_rows
                 else:
+<<<<<<< HEAD
                     critical_column += 1
                     if critical_column >= len(columns):
                         return None
+=======
+                    critical_column = critical_column + 1
+>>>>>>> c6bdd88992 (feat(api): Tip tracking for all 96ch configurations (#14488))
                     critical_row = len(columns[critical_column]) - active_rows
             return None
 
@@ -394,9 +449,13 @@ class TipView(HasState[TipState]):
                 if critical_row - active_rows >= 0:
                     critical_row = critical_row - active_rows
                 else:
+<<<<<<< HEAD
                     critical_column -= 1
                     if critical_column < 0:
                         return None
+=======
+                    critical_column = critical_column - 1
+>>>>>>> c6bdd88992 (feat(api): Tip tracking for all 96ch configurations (#14488))
                     critical_row = len(columns[critical_column]) - active_rows
             return None
 

@@ -60,8 +60,11 @@ _PARTIAL_NOZZLE_CONFIGURATION_ADDED_IN = APIVersion(2, 16)
 """The version after which a partial nozzle configuration became available for the 96 Channel Pipette."""
 _PARTIAL_NOZZLE_CONFIGURATION_AUTOMATIC_TIP_TRACKING_IN = APIVersion(2, 18)
 """The version after which automatic tip tracking supported partially configured nozzle layouts."""
+<<<<<<< HEAD
 _DISPOSAL_LOCATION_OFFSET_ADDED_IN = APIVersion(2, 18)
 """The version after which offsets for deck configured trash containers and changes to alternating tip drop behavior were introduced."""
+=======
+>>>>>>> c6bdd88992 (feat(api): Tip tracking for all 96ch configurations (#14488))
 
 
 class InstrumentContext(publisher.CommandPublisher):

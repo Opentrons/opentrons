@@ -16,7 +16,10 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons.types import DeckSlotName, Point
 from opentrons.hardware_control.nozzle_manager import NozzleMap
+<<<<<<< HEAD
 
+=======
+>>>>>>> c6bdd88992 (feat(api): Tip tracking for all 96ch configurations (#14488))
 
 from ..labware import AbstractLabware, LabwareLoadParams
 from .well import WellCore
