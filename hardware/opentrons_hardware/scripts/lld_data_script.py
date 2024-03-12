@@ -294,7 +294,7 @@ def run(
     """Run the test with a given algorithm on all the data."""
     path = args.filepath + "/"
     report_files = [
-        file for file in os.listdir(args.filepath) if file == "final_report.csv"
+        file for file in os.listdir(args.filepath) if "final_report" in file
     ]
     for report_file in report_files:
         with open(path + report_file, "r") as file:
